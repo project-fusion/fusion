@@ -50,4 +50,20 @@ describe('page nav server output', () => {
       ),
     ).toEqual(['label', 'offset'])
   })
+
+  test('serves the heading slot in its box above the landmark', () => {
+    const markup = rendered(
+      ssr(html`<helix-headless-outline></helix-headless-outline>`),
+      'helix-headless-outline',
+    )
+    expect(markup).toMatch(/<div\s+part="heading"\s*>\s*(?:<!--[^>]*-->\s*)*<slot\s+name="heading"/)
+    expect(markup.indexOf('part="heading"')).toBeLessThan(markup.indexOf('part="nav"'))
+  })
+
+  test('serves no lists, since a server cannot read the levels of links it cannot see', () => {
+    const markup = withoutStyles(
+      ssr(html`<helix-headless-outline><a href="#a" data-level="2">A</a></helix-headless-outline>`),
+    )
+    expect(markup).not.toContain('role="list')
+  })
 })

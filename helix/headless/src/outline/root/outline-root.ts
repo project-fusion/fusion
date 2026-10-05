@@ -4,9 +4,15 @@ import {
   HelixActivateEvent,
   HelixElement,
   IndicatorController,
+  reflectElements,
 } from '@fusion.dev/helix-core'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { type Branch, levelOf, nest } from '../levels.js'
+
+/** Whether an element is a link to a fragment on this page. */
+const isFragment = (element: Element): element is HTMLAnchorElement =>
+  element instanceof HTMLAnchorElement && element.getAttribute('href')?.startsWith('#') === true
 
 /**
  * @summary Links to the headings on the page, with the section in view marked.
@@ -20,8 +26,12 @@ import { property } from 'lit/decorators.js'
  * the same page.
  *
  * Write the anchors flat, with `data-level` for their depth, or nested in
- * lists, `<ul><li><a>`. A screen reader hears a nested list's levels; it hears
- * `data-level` as a flat run of links.
+ * lists, `<ul><li><a>`. A screen reader hears the levels either way: the
+ * outline puts a flat run into lists inside list items of its own, nested by
+ * `data-level`, and leaves the links where they are. A link without
+ * `data-level` is at the top level.
+ *
+ * A heading slotted into `heading` names the navigation, in place of `label`.
  *
  * The current section is decided by the headings' positions. An
  * `IntersectionObserver` with a band near the top fails both ways: when
@@ -35,14 +45,29 @@ import { property } from 'lit/decorators.js'
  * @documentation https://fusion.dev/helix/components/outline
  *
  * @slot - The links, as anchors with fragment hrefs, or lists holding them.
+ * @slot heading - A heading above the links, such as "On this page". It names the navigation.
  *
  * @event {HelixActivateEvent} helix-activate - Fired when the section in view changes, with its id as the value. It reports the scroll position and cannot be prevented.
  *
+ * @csspart heading - The box holding the `heading` slot, above the navigation.
  * @csspart indicator - The mark that moves to the section in view.
  * @csspart nav - The navigation landmark.
  */
 @customElement('helix-headless-outline')
 export class HelixHeadlessOutline extends HelixElement {
+  /**
+   * Manual, so each link in a flat run can be put in a list item of its own.
+   *
+   * The list items are slots, which lay out as nothing at all, so each link is
+   * still laid out as a child of the navigation exactly where it was, and the
+   * consumer's markup is not touched. A run holding anything but links, a
+   * `<ul>` among them, goes to one plain slot as before.
+   */
+  static override shadowRootOptions: ShadowRootInit = {
+    ...HelixElement.shadowRootOptions,
+    slotAssignment: 'manual',
+  }
+
   /* The mark. Vertical, which the controller needs no telling about: it writes
      all four values and the stylesheet uses the two it cares about. */
   private readonly indicator = new IndicatorController(this, {
@@ -76,7 +101,8 @@ export class HelixHeadlessOutline extends HelixElement {
   behavior: ScrollBehavior = 'auto'
 
   /**
-   * The navigation's name, read by screen readers.
+   * The navigation's name, read by screen readers. A heading in the `heading`
+   * slot names it in place of this.
    */
   @property()
   label = 'On this page'
@@ -120,6 +146,12 @@ export class HelixHeadlessOutline extends HelixElement {
   private observer: IntersectionObserver | undefined
 
   /**
+   * Watches the children, which a manual root is not told about: a link
+   * arriving, leaving or changing its level changes the lists drawn for them.
+   */
+  private childWatch: MutationObserver | undefined
+
+  /**
    * The links, in document order. Empty on the server, which has no tree.
    *
    * **Anchors inside what is slotted count too.** A contents list is written
@@ -128,14 +160,40 @@ export class HelixHeadlessOutline extends HelixElement {
    * nothing was announced, and nothing said why.
    */
   private get links(): HTMLAnchorElement[] {
-    const slot = this.renderRoot?.querySelector<HTMLSlotElement>('slot')
-    const fragment = (element: Element): element is HTMLAnchorElement =>
-      element instanceof HTMLAnchorElement && element.getAttribute('href')?.startsWith('#') === true
-    return (slot?.assignedElements({ flatten: true }) ?? []).flatMap((element) =>
-      fragment(element)
-        ? [element]
-        : [...element.querySelectorAll<HTMLAnchorElement>('a[href^="#"]')].filter(fragment),
-    )
+    const slots = [
+      ...(this.renderRoot?.querySelectorAll?.<HTMLSlotElement>(
+        'slot[data-link], nav > slot:not([role])',
+      ) ?? []),
+    ]
+    return slots
+      .flatMap((slot) => slot.assignedElements({ flatten: true }))
+      .flatMap((element) =>
+        isFragment(element)
+          ? [element]
+          : [...element.querySelectorAll<HTMLAnchorElement>('a[href^="#"]')].filter(isFragment),
+      )
+  }
+
+  /** The children that are the content, which is all of them but the heading. */
+  private get content(): Element[] {
+    return this.knownChildren.filter((child) => child.slot !== 'heading')
+  }
+
+  /**
+   * The links of a flat run, which the render puts into lists, or `undefined`
+   * where the content is anything else.
+   *
+   * Anything else is a list a consumer wrote, which already has its levels, a
+   * slot forwarded from a component around this one, or a server's render and
+   * the hydration of one, which cannot know the children. A root a server sent
+   * routes by name, so it keeps the plain slot after hydration too.
+   */
+  private get run(): HTMLAnchorElement[] | undefined {
+    const content = this.content
+    if (this.assignsByName || content.length === 0 || !content.every(isFragment)) {
+      return undefined
+    }
+    return content
   }
 
   /**
@@ -510,6 +568,8 @@ export class HelixHeadlessOutline extends HelixElement {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    this.childWatch?.disconnect()
+    this.childWatch = undefined
     this.removeEventListener('click', this.handleClick)
     document.removeEventListener('scroll', this.handleScroll, true)
     if (this.frame !== 0) {
@@ -543,6 +603,12 @@ export class HelixHeadlessOutline extends HelixElement {
 
   override connectedCallback(): void {
     super.connectedCallback()
+    this.childWatch = new MutationObserver(() => this.requestUpdate())
+    this.childWatch.observe(this, {
+      attributeFilter: ['data-level', 'href', 'slot'],
+      childList: true,
+      subtree: true,
+    })
     this.addEventListener('click', this.handleClick)
     /* The document in capture rather than the window: an element's `scroll`
        does not bubble, so a panel scrolling never reached a window listener,
@@ -566,10 +632,65 @@ export class HelixHeadlessOutline extends HelixElement {
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
     this.watch()
+    this.finishHydration()
+  }
+
+  /**
+   * Puts each child in its slot, on a root this element made.
+   *
+   * A link of a flat run goes to the slot inside its list item, and anything
+   * else, with the text between, to the plain slot. A root a server sent
+   * routes by name and needs none of it.
+   */
+  private assign(): void {
+    if (this.assignsByName) {
+      return
+    }
+    const root = this.renderRoot as ShadowRoot | undefined
+    const heading = root?.querySelector?.<HTMLSlotElement>('slot[name="heading"]')
+    heading?.assign?.(...this.knownChildren.filter((child) => child.slot === 'heading'))
+    const run = this.run
+    if (run) {
+      for (const slot of root?.querySelectorAll?.<HTMLSlotElement>('slot[data-link]') ?? []) {
+        const link = run[Number(slot.dataset.link)]
+        if (link) {
+          slot.assign(link)
+        }
+      }
+      return
+    }
+    const plain = root?.querySelector?.<HTMLSlotElement>('nav > slot:not([role])')
+    plain?.assign?.(
+      ...[...this.childNodes].filter((node): node is Element | Text =>
+        node instanceof Element ? node.slot !== 'heading' : node instanceof Text,
+      ),
+    )
+  }
+
+  /** Whether the heading is what names the navigation. */
+  private namedByHeading = false
+
+  /**
+   * Names the navigation by what is in the `heading` slot, in place of `label`.
+   *
+   * An element reference, because the heading is in the light DOM and the
+   * `<nav>` in this shadow root, which an IDREF cannot cross. A browser without
+   * element reflection keeps `label`.
+   */
+  private readonly nameByHeading = (): void => {
+    const slot = this.renderRoot?.querySelector?.<HTMLSlotElement>('slot[name="heading"]')
+    this.namedByHeading = reflectElements(
+      this.partNamed('nav'),
+      'ariaLabelledByElements',
+      slot?.assignedElements({ flatten: true }) ?? [],
+      this.namedByHeading,
+    )
   }
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    this.assign()
+    this.nameByHeading()
     /* The reading line moved, so where the reader is may have changed without
        the page having moved at all. Nothing else would notice: the observer
        fires on sections crossing the viewport, and this changes what crossing
@@ -590,10 +711,36 @@ export class HelixHeadlessOutline extends HelixElement {
   }
 
   protected override render(): TemplateResult {
-    return html`<nav part="nav" aria-label=${this.label}>
-      <slot @slotchange=${this.handleSlotChange}></slot>
+    const run = this.run
+    return html`<div part="heading"><slot name="heading" @slotchange=${this.nameByHeading}></slot></div>
+      <nav part="nav" aria-label=${this.label} @slotchange=${this.handleSlotChange}>
+      ${run ? this.renderList(nest(run.map((link) => levelOf(link.getAttribute('data-level'))))) : html`<slot></slot>`}
       <span part="indicator" aria-hidden="true"></span>
     </nav>`
+  }
+
+  /**
+   * A list for a run of links, with a list item for each, nested by level.
+   *
+   * **Slots, because a slot lays out as nothing.** A list and its items drawn
+   * as boxes would put each link inside an item, out of the navigation's own
+   * flex column, and every outline styled against that column would move. A
+   * slot is `display: contents`, keeps a role it is given, and shows its
+   * children while nothing is assigned to it, so the items nest in the
+   * accessibility tree and nowhere else. Measured in Chromium: every link at the
+   * same box with and without the lists, and each item at the level its
+   * nesting gives it.
+   */
+  protected renderList(branches: Branch[]): TemplateResult {
+    return html`<slot role="list"
+      >${branches.map(
+        (branch) =>
+          html`<slot role="listitem"
+            ><slot data-link=${branch.index}></slot
+            >${branch.children.length > 0 ? this.renderList(branch.children) : nothing}</slot
+          >`,
+      )}</slot
+    >`
   }
 }
 

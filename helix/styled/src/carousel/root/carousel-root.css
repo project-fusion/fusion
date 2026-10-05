@@ -195,9 +195,29 @@
 
 [part="rotation"] svg,
 [part="previous"] svg,
-[part="next"] svg {
+[part="next"] svg,
+::slotted([slot="previous-icon"]),
+::slotted([slot="next-icon"]) {
   block-size: 1em;
   inline-size: 1em;
+}
+
+/* An icon slotted in place of a caret turns on a right-to-left page as the
+   caret does. The caret is turned by `core`, being marked where it is drawn;
+   what a consumer slots carries no mark, so it is turned here. */
+:host(:dir(rtl)) ::slotted([slot="previous-icon"]),
+:host(:dir(rtl)) ::slotted([slot="next-icon"]) {
+  scale: -1 1;
+}
+
+/* A track a mouse can drag says so, and says it is held while it is. */
+:host([mouse-drag]) [part="track"] {
+  cursor: grab;
+}
+
+:host(:state(dragging)) [part="track"] {
+  cursor: grabbing;
+  user-select: none;
 }
 
 /* A scroller with snap points, so a drag, a trackpad swipe and the browser's own
