@@ -9,10 +9,14 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-import { cleanCode, type PinCase, type PinType } from '../code.js'
+import { cleanCode } from '../code.js'
 import { separatorsAfter } from '../format.js'
 
-export type { PinCase, PinType } from '../code.js'
+/** What a cell accepts, which decides the keyboard a phone offers. */
+export type PinType = 'alphanumeric' | 'numeric' | 'text'
+
+/** How typed letters are cased: as typed, or turned upper or lower case. */
+export type PinCase = 'lower' | 'preserve' | 'upper'
 
 /**
  * @summary A field for a short code, with one box for each character.

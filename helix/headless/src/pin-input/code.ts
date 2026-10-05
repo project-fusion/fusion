@@ -1,8 +1,4 @@
-/** What a cell accepts, which decides the keyboard a phone offers. */
-export type PinType = 'alphanumeric' | 'numeric' | 'text'
-
-/** How typed letters are cased: as typed, or turned upper or lower case. */
-export type PinCase = 'lower' | 'preserve' | 'upper'
+import type { PinCase, PinType } from './root/pin-input-root.js'
 
 /**
  * Typed or pasted text as the code's characters: trimmed, with what `type`

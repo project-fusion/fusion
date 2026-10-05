@@ -250,7 +250,7 @@ describe('what a restored page gets back', () => {
     document.body.innerHTML = `<form><helix-headless-filter-input label="Filter" name="q" value="refund">
       <helix-headless-filter-chip slot="tags" name="status">open</helix-headless-filter-chip>
     </helix-headless-filter-input></form>`
-    const host = document.querySelector('helix-headless-filter-input') as Updatable & {
+    const host = document.querySelector('helix-headless-filter-input') as unknown as Updatable & {
       formStateRestoreCallback(state: unknown): void
       internals: ElementInternals
       value: string
