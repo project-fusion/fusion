@@ -64,6 +64,12 @@ const readDirection = (value: string | undefined): (typeof DIRECTIONS)[Direction
 @customElement('helix-headless-trend')
 export class HelixHeadlessTrend extends HelixElement {
   /**
+   * The word read out after the direction when the move is an improvement.
+   */
+  @property({ attribute: 'better-label' })
+  betterLabel = 'better'
+
+  /**
    * Which way the measurement moved.
    *
    * Absent is neutral, so a trend with nothing to report draws a bar rather
@@ -77,6 +83,12 @@ export class HelixHeadlessTrend extends HelixElement {
   direction?: 'down' | 'neutral' | 'up'
 
   /**
+   * The word read out for a move down.
+   */
+  @property({ attribute: 'down-label' })
+  downLabel = 'Down'
+
+  /**
    * Which direction counts as an improvement for this metric.
    *
    * Absent states the movement without judging it, which is the honest default:
@@ -86,18 +98,6 @@ export class HelixHeadlessTrend extends HelixElement {
    */
   @property({ reflect: true })
   good?: 'down' | 'up'
-
-  /**
-   * The word read out after the direction when the move is an improvement.
-   */
-  @property({ attribute: 'better-label' })
-  betterLabel = 'better'
-
-  /**
-   * The word read out for a move down.
-   */
-  @property({ attribute: 'down-label' })
-  downLabel = 'Down'
 
   /**
    * The word read out for no move, or for a direction that is not one of the

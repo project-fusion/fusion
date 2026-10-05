@@ -60,6 +60,14 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 @customElement('helix-headless-tree-item')
 export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
   /**
+   * @internal Set by the tree: whether a branch heads the list under it, as
+   * under `nesting="heading"`. Such a branch only opens and closes when it is
+   * pressed, because it names a list and is not a destination of its own.
+   */
+  @property({ attribute: false })
+  heads = false
+
+  /**
    * The URL this node links to. Setting it makes the row a link.
    *
    * Unset by default, and unreflected: a tree of choosable nodes is not a tree
@@ -125,24 +133,16 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
   target = ''
 
   /**
-   * Identifies the item to your code. It is sent in `helix-select`.
-   */
-  @property()
-  value = ''
-
-  /**
    * Whether this item holds the tree's single tab stop.
    */
   @state()
   focusable = false
 
   /**
-   * @internal Set by the tree: whether a branch heads the list under it, as
-   * under `nesting="heading"`. Such a branch only opens and closes when it is
-   * pressed, because it names a list and is not a destination of its own.
+   * Identifies the item to your code. It is sent in `helix-select`.
    */
-  @property({ attribute: false })
-  heads = false
+  @property()
+  value = ''
 
   /**
    * Whether anything is slotted into `children`.

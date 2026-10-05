@@ -113,6 +113,12 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
   gridlines?: 'both' | 'category' | 'value'
 
   /**
+   * The word the summary puts before each series' highest reading.
+   */
+  @property({ attribute: 'highest-label' })
+  highestLabel = 'Highest'
+
+  /**
    * The names of the series to draw as lines. The other series are drawn as
    * columns.
    *
@@ -190,12 +196,6 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
    */
   @property({ reflect: true })
   secondary?: string
-
-  /**
-   * The word the summary puts before each series' highest reading.
-   */
-  @property({ attribute: 'highest-label' })
-  highestLabel = 'Highest'
 
   /** The series names on the second scale, lowercased and trimmed. */
   private get scaled(): Set<string> {

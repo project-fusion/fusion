@@ -98,15 +98,6 @@ export class HelixHeadlessNotification extends MixinDismissible(HelixElement) {
   defaultRead = false
 
   /**
-   * What a screen reader hears before an unread notification's text.
-   *
-   * The unread mark is drawn, so a reader who cannot see it hears this word in
-   * its place. Translate it with the rest of your interface.
-   */
-  @property({ attribute: 'unread-label' })
-  unreadLabel = 'Unread'
-
-  /**
    * Locale for the timestamp.
    *
    * Empty is the runtime's own.
@@ -139,6 +130,15 @@ export class HelixHeadlessNotification extends MixinDismissible(HelixElement) {
     this.readState = next
     this.requestUpdate('read', previous)
   }
+
+  /**
+   * What a screen reader hears before an unread notification's text.
+   *
+   * The unread mark is drawn, so a reader who cannot see it hears this word in
+   * its place. Translate it with the rest of your interface.
+   */
+  @property({ attribute: 'unread-label' })
+  unreadLabel = 'Unread'
 
   /**
    * @internal Read by the list to identify its children across the light DOM,

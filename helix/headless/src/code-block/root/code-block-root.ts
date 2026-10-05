@@ -75,15 +75,6 @@ import { type DiffFile, type DiffHunk, type DiffLine, pairLines, parsePatch } fr
 @customElement('helix-headless-code-block')
 export class HelixHeadlessCodeBlock extends HelixElement {
   /**
-   * Whether the content is a unified diff, drawn as the lines it changed.
-   *
-   * Reflected, because the stylesheet paints a diff differently from code, and
-   * `false` reflects as no attribute at all.
-   */
-  @property({ reflect: true, type: Boolean })
-  diff = false
-
-  /**
    * The copy button's name and tooltip text after a copy.
    */
   @property({ attribute: 'copied-label' })
@@ -94,6 +85,15 @@ export class HelixHeadlessCodeBlock extends HelixElement {
    */
   @property({ attribute: 'copy-label' })
   copyLabel = 'Copy code'
+
+  /**
+   * Whether the content is a unified diff, drawn as the lines it changed.
+   *
+   * Reflected, because the stylesheet paints a diff differently from code, and
+   * `false` reflects as no attribute at all.
+   */
+  @property({ reflect: true, type: Boolean })
+  diff = false
 
   /**
    * The block's name, usually a file name or a language.

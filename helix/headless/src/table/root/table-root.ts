@@ -144,6 +144,10 @@ const numberOf = (value: string): number => Number(value.replaceAll(',', ''))
  */
 @customElement('helix-headless-table')
 export class HelixHeadlessTable extends MixinCollection(HelixElement) {
+  /** The word for an ascending sort, in `sorted-label`. */
+  @property({ attribute: 'ascending-label' })
+  ascendingLabel = 'ascending'
+
   /**
    * The column widths as one track list, written once on the table.
    *
@@ -176,10 +180,6 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
    */
   @property()
   columns = ''
-
-  /** The word for an ascending sort, in `sorted-label`. */
-  @property({ attribute: 'ascending-label' })
-  ascendingLabel = 'ascending'
 
   /**
    * The starting sort order, used until `sort` is set.

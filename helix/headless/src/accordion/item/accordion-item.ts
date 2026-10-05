@@ -87,6 +87,30 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
   }
 
   /**
+   * Whether the section is disabled, so its trigger cannot be pressed or
+   * reached with the arrow keys. A script can still open and close it.
+   */
+  @property({ reflect: true, type: Boolean })
+  disabled = false
+
+  /**
+   * @internal The accordion's `heading-level`, written by the accordion. A
+   * property, because an attribute written onto your element after it upgrades
+   * causes a hydration mismatch.
+   */
+  @property({ attribute: false })
+  groupHeadingLevel: number | undefined = undefined
+
+  /**
+   * The level of the heading around the trigger, from 1 to 6.
+   *
+   * Unset takes the accordion's `heading-level`, and 3 where that is unset
+   * too.
+   */
+  @property({ attribute: 'heading-level', type: Number })
+  headingLevel?: number
+
+  /**
    * A group name. Opening an item closes the other items with the same name,
    * as `<details name>` does.
    *
@@ -108,30 +132,6 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
    */
   @property({ reflect: true })
   name?: string
-
-  /**
-   * Whether the section is disabled, so its trigger cannot be pressed or
-   * reached with the arrow keys. A script can still open and close it.
-   */
-  @property({ reflect: true, type: Boolean })
-  disabled = false
-
-  /**
-   * The level of the heading around the trigger, from 1 to 6.
-   *
-   * Unset takes the accordion's `heading-level`, and 3 where that is unset
-   * too.
-   */
-  @property({ attribute: 'heading-level', type: Number })
-  headingLevel?: number
-
-  /**
-   * @internal The accordion's `heading-level`, written by the accordion. A
-   * property, because an attribute written onto your element after it upgrades
-   * causes a hydration mismatch.
-   */
-  @property({ attribute: false })
-  groupHeadingLevel: number | undefined = undefined
 
   /** Whether the item was open at the last update, and `undefined` before one. */
   private wasOpen: boolean | undefined = undefined
