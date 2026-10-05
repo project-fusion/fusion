@@ -4,8 +4,10 @@ import {
   drawIcon,
   drawStatus,
   fillTemplate,
+  formatNumbers,
   HelixBeforeChangeEvent,
   HelixFormElement,
+  HelixRejectEvent,
   MixinField,
   requestChange,
   restoreValue,
@@ -110,7 +112,7 @@ const kind = (file: File): string => {
  *
  * @event {Event} change - Fired after the value changes.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the chosen files change, with their names, and cancelable. Canceling it keeps the files the field had, even when the browser has already written a new pick.
- * @event {CustomEvent} helix-reject - Fired when files arrive and some are refused. `detail.files` lists each with its `reason`: `type`, `size`, `count` or `invalid`, and your `validate` message.
+ * @event {HelixRejectEvent} helix-reject - Fired when files arrive and some are left out. `detail.files` lists each with its `reason`: `type`, `size`, `count` or `invalid`, and your `validate` message.
  * @event {Event} input - Fired after the value changes.
  *
  * @csspart control - The file input itself, which carries the label and validity.
@@ -267,16 +269,15 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
 
   /** Sends `helix-reject` and says which files were left out. */
   private refuse(refused: RefusedFile[]): void {
-    this.dispatchEvent(
-      new CustomEvent('helix-reject', {
-        bubbles: true,
-        composed: true,
-        detail: { files: refused },
-      }),
-    )
+    this.dispatchEvent(new HelixRejectEvent({ files: refused }))
+    /* The names as the page's language lists them, which in English is the
+       comma list it always was: `unit` and `short` join with commas and no
+       "and". The count is written as the language writes a number. */
     const words = fillTemplate(this.rejectedText, {
-      count: refused.length,
-      names: refused.map((one) => one.file.name).join(', '),
+      count: formatNumbers(this.lang)(refused.length),
+      names: new Intl.ListFormat(this.lang || undefined, { style: 'short', type: 'unit' }).format(
+        refused.map((one) => one.file.name),
+      ),
     })
     /* The region arrives empty and takes its words a frame later, since a
        region that arrives with its words is read inconsistently. Cleared

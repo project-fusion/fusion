@@ -2,9 +2,14 @@ import { beforeAll, describe, expect, test } from 'bun:test'
 import { trash } from '@fusion.dev/helix-icons'
 import { formValue, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
+/* Imported once the page exists, as the element is. */
+let HelixRejectEvent: typeof import('@fusion.dev/helix-core').HelixRejectEvent
+type HelixRejectEvent = import('@fusion.dev/helix-core').HelixRejectEvent
+
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  ;({ HelixRejectEvent } = await import('@fusion.dev/helix-core'))
 })
 
 type InputFile = HTMLElement & {
@@ -445,6 +450,26 @@ describe('screening the files that arrive', () => {
     await choose(host, 'draft.txt', 'final.txt')
     expect(host.files.map((file) => file.name)).toEqual(['final.txt'])
     expect(message).toBe('Drafts cannot be attached')
+  })
+
+  test('a refusal is a HelixRejectEvent, which nothing can cancel', async () => {
+    const host = await field('accept="image/*"')
+    let heard: Event | undefined
+    host.addEventListener('helix-reject', (event) => {
+      heard = event
+    })
+    await dropOn(host, [sized('notes.txt', 10)])
+    expect(heard).toBeInstanceOf(HelixRejectEvent)
+    expect(heard?.cancelable).toBe(false)
+    expect((heard as HelixRejectEvent).detail.files.map((one) => one.reason)).toEqual(['type'])
+  })
+
+  test('several refusals are said as the page lists them, with commas in English', async () => {
+    const host = await field('multiple accept="image/*"')
+    await dropOn(host, [sized('notes.txt', 10), sized('todo.txt', 10), sized('plan.md', 10)])
+    await new Promise((done) => setTimeout(done, 40))
+    await host.updateComplete
+    expect(part(host, 'live')?.textContent).toBe('Not added: notes.txt, todo.txt, plan.md')
   })
 
   test('a refusal is said in a live region, with the names filled in', async () => {
