@@ -1,6 +1,6 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
-import { inlineStep } from '../../utils/inline-step/inline-step.js'
 import { isRtl } from '../../utils/is-rtl/is-rtl.js'
+import { stepReading } from './reading-step.js'
 
 /**
  * The id every chart puts on its plot, and the boundary a bubble is kept inside.
@@ -278,45 +278,6 @@ export class ChartPointerController implements ReactiveController {
     )
   }
 
-  /**
-   * Which way a key moves along the readings: `1`, `-1`, or `0` for a key that
-   * moves something else.
-   *
-   * Along the inline axis, the arrows that point along the line of text, asked
-   * through `inlineStep` so the right arrow moves back on a right-to-left page,
-   * where the drawing is turned. Down the box on a chart whose readings run
-   * down it. A grid moves a whole column across, and a reading up or down.
-   */
-  private along(key: string): number {
-    if (this.axis === 'block') {
-      const down = key === 'ArrowDown' ? 1 : key === 'ArrowUp' ? -1 : 0
-      return down !== 0 || this.columns().length > 1 ? down : inlineStep(this.host, key)
-    }
-    const across = inlineStep(this.host, key)
-    if (across !== 0) {
-      return across * Math.max(1, this.grid)
-    }
-    if (this.grid > 1 || this.columns().length < 2) {
-      return key === 'ArrowDown' ? 1 : key === 'ArrowUp' ? -1 : 0
-    }
-    return 0
-  }
-
-  /**
-   * Which way a key moves among the series of a reading: the pair of arrows
-   * that does not walk the readings, and only where a reading holds two or
-   * more. Down the bubble's list for the arrow pointing down or along the line.
-   */
-  private among(key: string): number {
-    if (this.grid > 1 || this.columns().length < 2) {
-      return 0
-    }
-    if (this.axis === 'block') {
-      return inlineStep(this.host, key)
-    }
-    return key === 'ArrowDown' ? 1 : key === 'ArrowUp' ? -1 : 0
-  }
-
   /** Puts the reading away, as Escape and leaving the plot both do. */
   private clear(): void {
     const was = this.at
@@ -343,25 +304,21 @@ export class ChartPointerController implements ReactiveController {
       }
       return
     }
-    const last = count - 1
-    const along = this.along(event.key)
-    const among = this.among(event.key)
-    let at = this.at
-    let series = this.series
-    if (event.key === 'Home') {
-      at = 0
-    } else if (event.key === 'End') {
-      at = last
-    } else if (along !== 0) {
-      /* From nowhere, the first reading for a key moving on and the last for
-         one moving back, so either arrow starts somewhere a reader expects. */
-      at = at < 0 ? (along > 0 ? 0 : last) : Math.min(Math.max(at + along, 0), last)
-    } else if (among !== 0) {
-      at = Math.max(at, 0)
-      series = Math.min(Math.max(series + among, -1), this.columns().length - 1)
-    } else {
+    const next = stepReading(
+      event.key,
+      { at: this.at, series: this.series },
+      {
+        axis: this.axis,
+        count,
+        grid: this.grid,
+        rtl: isRtl(this.host),
+        series: this.columns().length,
+      },
+    )
+    if (next === undefined) {
       return
     }
+    const { at, series } = next
     event.preventDefault()
     if (at === this.at && series === this.series && this.keyed) {
       return
