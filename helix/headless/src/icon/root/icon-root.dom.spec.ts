@@ -180,3 +180,76 @@ describe('an icon handed over as data', () => {
     expect(svg(icon)?.getAttribute('aria-label')).toBe('Status')
   })
 })
+
+/* Web Awesome's `registerIconLibrary`: a page names glyphs it brought, and
+   the element draws them when they are registered, even later. */
+describe('a name the page registered', () => {
+  type Icon = HTMLElement & { name: string; updateComplete: Promise<boolean> }
+  const glyph = (name: string) => ({
+    content: `<rect width="24" height="24" data-glyph-name="${name}"></rect>`,
+    name,
+    viewBox: '0 0 24 24',
+  })
+  const drawnName = (icon: HTMLElement): string | null | undefined =>
+    svg(icon)?.querySelector('rect')?.getAttribute('data-glyph-name')
+
+  test('draws a glyph registered after it rendered', async () => {
+    const { registerIcons } = await import('../index.js')
+    const icon = (await mount(
+      '<helix-headless-icon name="spec-late"></helix-headless-icon>',
+    )) as Icon
+    expect(svg(icon)).toBeNull()
+    registerIcons([glyph('spec-late')])
+    await icon.updateComplete
+    expect(drawnName(icon)).toBe('spec-late')
+  })
+
+  test('draws what a library gives later, and fires `load` once it is drawn', async () => {
+    const { registerIconLibrary } = await import('../index.js')
+    let answer: (value: ReturnType<typeof glyph>) => void = () => {}
+    registerIconLibrary(
+      'spec-remote',
+      (name) =>
+        new Promise((resolve) => {
+          answer = () => resolve(glyph(name))
+        }),
+    )
+    const icon = (await mount('<helix-headless-icon></helix-headless-icon>')) as Icon
+    const heard: string[] = []
+    icon.addEventListener('load', () => heard.push('load'))
+    icon.addEventListener('error', () => heard.push('error'))
+    icon.name = 'spec-remote:camera'
+    await icon.updateComplete
+    expect(svg(icon)).toBeNull()
+    expect(heard).toEqual([])
+    answer(glyph('camera'))
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await icon.updateComplete
+    expect(drawnName(icon)).toBe('camera')
+    icon.setAttribute('mirror', '')
+    await icon.updateComplete
+    expect(heard).toEqual(['load'])
+  })
+
+  test('fires `error` when the library answers nothing', async () => {
+    const { registerIconLibrary } = await import('../index.js')
+    registerIconLibrary('spec-empty', () => Promise.resolve(undefined))
+    const icon = (await mount('<helix-headless-icon></helix-headless-icon>')) as Icon
+    let errors = 0
+    icon.addEventListener('error', () => {
+      errors += 1
+    })
+    const original = console.warn
+    console.warn = () => {}
+    try {
+      icon.name = 'spec-empty:camera'
+      await icon.updateComplete
+      await new Promise((resolve) => setTimeout(resolve, 0))
+      await icon.updateComplete
+    } finally {
+      console.warn = original
+    }
+    expect(svg(icon)).toBeNull()
+    expect(errors).toBe(1)
+  })
+})
