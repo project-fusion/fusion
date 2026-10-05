@@ -241,6 +241,21 @@ export class HelixHeadlessFilterMenu extends HelixElement {
   }
 
   /**
+   * Keeps each choice row's tick where this element puts it.
+   *
+   * A choice row checks itself after `helix-before-toggle`, and this element
+   * already sets `checked` on every row from its own state. The request is
+   * refused, so a tick moves only when the choice is applied, and stopped, so
+   * it does not reach a page that never placed the row.
+   */
+  private readonly keepTick = (event: Event): void => {
+    if (event.target === event.currentTarget) {
+      event.preventDefault()
+      event.stopPropagation()
+    }
+  }
+
+  /**
    * A row was chosen: a value to tick, or a comparison to use.
    *
    * **Read off the row rather than encoded into its `value`.** Packing the three
@@ -347,6 +362,7 @@ export class HelixHeadlessFilterMenu extends HelixElement {
                       checkable
                       exclusive
                       ?checked=${operator.name === using?.name}
+                      @helix-before-toggle=${this.keepTick}
                       data-facet="operator"
                       data-field=${name}
                       data-value=${operator.name}
@@ -379,6 +395,7 @@ export class HelixHeadlessFilterMenu extends HelixElement {
               checkable
               ?exclusive=${using?.arity === 'one'}
               ?checked=${ticked.has(option.value)}
+              @helix-before-toggle=${this.keepTick}
               data-facet="value"
               data-field=${name}
               data-value=${option.value}

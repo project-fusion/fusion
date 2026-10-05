@@ -25,10 +25,6 @@ describe('the icon element', () => {
      without drawing it ships the whole set to name none of it. */
   test('is registered only by a family that draws one', () => {
     expect(importers('headless')).toEqual([])
-    expect(importers('styled')).toEqual([
-      'speed-dial/root/speed-dial-root.ts',
-      'video-playlist/menu/video-playlist-menu.ts',
-      'video/root/video-root.ts',
-    ])
+    expect(importers('styled')).toEqual(['speed-dial/root/speed-dial-root.ts'])
   })
 })

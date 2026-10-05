@@ -316,6 +316,23 @@ describe('a comparison that takes one value', () => {
     expect(seen[0]?.values).toEqual([])
   })
 
+  test('one row is ticked, and the request to tick it stays inside the picker', async () => {
+    const element = await picker(SCALAR)
+    const asked: string[] = []
+    element.addEventListener('helix-before-toggle', (event) => asked.push(event.type))
+    press(element, 'value', 'created', 'today')
+    await element.updateComplete
+    press(element, 'value', 'created', 'week')
+    await element.updateComplete
+    const rows = [
+      ...(element.shadowRoot?.querySelectorAll<HTMLElement & { checked: boolean }>(
+        '[data-facet="value"]',
+      ) ?? []),
+    ]
+    expect(rows.map((row) => row.checked)).toEqual([false, true])
+    expect(asked).toEqual([])
+  })
+
   test('its rows are one of a set, and say so', async () => {
     const element = await picker(SCALAR)
     for (const row of element.shadowRoot?.querySelectorAll('[data-facet="value"]') ?? []) {
@@ -402,6 +419,20 @@ describe('refusing', () => {
     element.addEventListener('helix-facet', (event) => event.preventDefault())
     press(element, 'value', 'disposition', 'refunded')
     expect(element.valuesFor('disposition')).toEqual([])
+  })
+
+  /* A row checks itself after `helix-before-toggle`, and the picker already
+     sets every tick from what is in force. A refused tick stayed drawn on the
+     row, because the picker's own value for it had not changed. */
+  test('a refused tick is not drawn on the row either', async () => {
+    const element = await picker()
+    element.addEventListener('helix-facet', (event) => event.preventDefault())
+    press(element, 'value', 'disposition', 'refunded')
+    await element.updateComplete
+    const row = element.shadowRoot?.querySelector(
+      '[data-facet="value"][data-value="refunded"]',
+    ) as HTMLElement & { checked: boolean }
+    expect(row.checked).toBe(false)
   })
 
   test('and a refused comparison goes back to the default', async () => {

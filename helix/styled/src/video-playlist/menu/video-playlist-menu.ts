@@ -3,7 +3,6 @@ import { HelixHeadlessVideoPlaylistMenu } from '@fusion.dev/helix-headless/video
 import type { CSSResultGroup } from 'lit'
 import { styles as glyphStyles } from '../../shared/glyph/glyph.css.js'
 import { styles } from './video-playlist-menu.css.js'
-import '../../icon/index.js'
 import '../../menu/index.js'
 
 /**
