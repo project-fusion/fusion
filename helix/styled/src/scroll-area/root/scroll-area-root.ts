@@ -11,6 +11,9 @@ import { styles } from './scroll-area-root.css.js'
  * styled to match the design system. The base class measures which edges have
  * content past them.
  *
+ * Under `scrollbars`, the browser's scrollbar is hidden and the component's own
+ * are drawn over the content at the edge, in the same colors.
+ *
  * @since 0.1.0
  * @status stable
  * @category layout
@@ -24,7 +27,10 @@ import { styles } from './scroll-area-root.css.js'
  * @cssproperty --scroll-area-fade-inline-end - The depth of the fade at the inline end, or `0` to remove it.
  * @cssproperty --scroll-area-fade-inline-start - The depth of the fade at the inline start, or `0` to remove it.
  * @cssproperty --scroll-area-scrollbar - The scrollbar width, as a `scrollbar-width` keyword.
+ * @cssproperty --scroll-area-scrollbar-size - The thickness of each scrollbar drawn under `scrollbars`, and the size of the corner.
  * @cssproperty --scroll-area-thumb-color - The color of the scrollbar's thumb.
+ * @cssproperty --scroll-area-thumb-hover-color - The color of a thumb drawn under `scrollbars` while the pointer is over it.
+ * @cssproperty --scroll-area-thumb-min-size - The shortest a thumb drawn under `scrollbars` gets, however long the content.
  * @cssproperty --scroll-area-track-color - The color of the scrollbar's track.
  */
 @customElement('helix-scroll-area')

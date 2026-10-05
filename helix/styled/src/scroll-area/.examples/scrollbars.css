@@ -1,0 +1,10 @@
+/* The scrollbar is drawn over the content, so the text keeps clear of it. */
+helix-scroll-area {
+  block-size: 12rem;
+  inline-size: 20rem;
+}
+
+helix-scroll-area p {
+  margin: 0 0 var(--helix-space-sm);
+  padding-inline-end: var(--helix-space-md);
+}
