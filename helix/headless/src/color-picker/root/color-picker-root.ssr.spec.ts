@@ -42,4 +42,12 @@ describe('color picker server output', () => {
     )
     expect(partTag(markup, 'swatch')).toContain('aria-label="dark vibrant blue"')
   })
+
+  test('the format button forwards its live region, so it can be styled from outside', () => {
+    const forwards = partTag(
+      ssr(html`<helix-headless-color-picker></helix-headless-color-picker>`),
+      'format',
+    )
+    expect(forwards).toContain('live: format-live')
+  })
 })

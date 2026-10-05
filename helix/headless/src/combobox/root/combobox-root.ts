@@ -120,9 +120,11 @@ const isInsertion = (event: Event): boolean =>
  * @csspart rest - The count of choices held beyond `max-tags`. A `<button>` with `expandable`, a `<span>` without it.
  * @csspart surface - The floating panel.
  * @csspart tag - One chosen option.
+ * @csspart tag-cell - The tag's grid cell, which a tag draws only inside a tag group.
  * @csspart tag-dismiss - The remove button, when `dismissible`.
  * @csspart tag-dismiss-mark - The glyph on the dismiss control, where none is slotted.
  * @csspart tag-label - The label, trimmed to its capitals and baseline.
+ * @csspart tag-link - The tag's link around its label, which a tag draws only with `href`.
  * @csspart tag-start - The category before the label.
  * @csspart tags - The row of chosen options, when `multiple` is set.
  *
@@ -1107,7 +1109,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   protected renderTag(option: { text: string; value: string }): TemplateResult {
     return html`<${this.tag('tag')}
                     part="tag"
-      exportparts="dismiss: tag-dismiss, dismiss-mark: tag-dismiss-mark, label: tag-label, start: tag-start"
+      exportparts="cell: tag-cell, dismiss: tag-dismiss, dismiss-mark: tag-dismiss-mark, label: tag-label, link: tag-link, start: tag-start"
                     data-value=${option.value}
                     dismiss-label=${fillTemplate(this.removeLabel, { name: option.text })}
                     ?dismissible=${!this.isDisabled && !this.readOnly}
