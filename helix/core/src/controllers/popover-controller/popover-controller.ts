@@ -139,8 +139,11 @@ export class PopoverController implements ReactiveController {
   /** Whether the surface is currently shown, so the calls can be idempotent. */
   private shown = false
 
+  private readonly host: ReactiveControllerHost & HTMLElement
+
   constructor(host: ReactiveControllerHost & HTMLElement, options: PopoverOptions) {
     this.options = options
+    this.host = host
     this.floating = new FloatingController(host, {
       anchor: options.anchor,
       ...(options.arrow === undefined ? {} : { arrow: options.arrow }),
@@ -271,5 +274,20 @@ export class PopoverController implements ReactiveController {
    */
   hostDisconnected(): void {
     this.shown = false
+  }
+
+  /**
+   * Asks a reconnected host that is still open to update, so the panel is shown
+   * again.
+   *
+   * The flag above lets it show, and nothing asked it to: a host moved in the
+   * DOM while open kept `open` and `aria-expanded="true"` with the panel
+   * hidden until something else updated it, and Escape did not close it,
+   * because the dismissal is started by showing.
+   */
+  hostConnected(): void {
+    if (this.options.open?.()) {
+      this.host.requestUpdate()
+    }
   }
 }

@@ -13,6 +13,7 @@ import {
   MixinPickerEditing,
   MixinPickerField,
   MixinTokens,
+  writtenList,
 } from '@fusion.dev/helix-core'
 import { calendarBlank } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -51,7 +52,13 @@ const dates = (value: string): string[] =>
  *
  * You can type a date as well as pick one. The native `<input type="date">`
  * gives a picker and locale formatting but allows almost no styling, so the
- * field is a text field.
+ * field is a text field. Typing sends `input` on each keystroke and `change`
+ * when you leave the field, as a text field does. A date picked from the
+ * calendar sends both.
+ *
+ * The trigger opens the calendar with focus on the selected day, and Escape
+ * closes it and returns focus to the field. Focusing the field opens the
+ * calendar too, and Tab out of the field closes it again.
  *
  * @since 0.1.0
  * @status stable
@@ -61,6 +68,8 @@ const dates = (value: string): string[] =>
  *
  * @slot feedback - The error message under the field.
  * @slot hint - The help text under the field.
+ * @slot next-icon - The icon on the calendar's next month control.
+ * @slot previous-icon - The icon on the calendar's previous month control.
  * @slot trigger - The icon on the button that opens the calendar.
  *
  * @event {Event} change - Fired after the value changes.
@@ -162,15 +171,25 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
   @property({ attribute: 'date-style' })
   dateStyle: 'full' | 'iso' | 'long' | 'medium' | 'short' = 'long'
 
+  /** Typed, so a keystroke is announced as `input` alone. See `announcesInput`. */
+  protected override readonly announcesInput = true
+
   /**
-   * Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list.
+   * The name of the calendar's grid of days, read by screen readers.
+   */
+  @property({ attribute: 'calendar-label' })
+  calendarLabel = 'Date Picker'
+
+  /**
+   * Dates that cannot be chosen, as `YYYY-MM-DD`, separated by commas or
+   * spaces.
    */
   @property({ attribute: 'disable-dates' })
   disableDates = ''
 
   /**
    * Days of the week that cannot be chosen, from `0` for Sunday to `6` for
-   * Saturday.
+   * Saturday, separated by commas or spaces.
    */
   @property({ attribute: 'disable-days' })
   disableDays = ''
@@ -178,9 +197,12 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
   /**
    * The day in the calendar's first column, from `0` for Sunday to `6` for
    * Saturday.
+   *
+   * Absent follows `locale`, where the engine knows the week of that language,
+   * and is Sunday otherwise.
    */
   @property({ attribute: 'first-day-of-week', type: Number })
-  firstDayOfWeek = 0
+  firstDayOfWeek?: number
 
   /**
    * The language tag for the names of months and days in the calendar.
@@ -281,10 +303,22 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
   }
 
   /**
+   * The name of the calendar's control that moves to the next month.
+   */
+  @property({ attribute: 'next-label' })
+  nextLabel = 'Next month'
+
+  /**
    * The text the field shows before a date is entered.
    */
   @property()
   placeholder = 'YYYY-MM-DD'
+
+  /**
+   * The name of the calendar's control that moves to the previous month.
+   */
+  @property({ attribute: 'previous-label' })
+  previousLabel = 'Previous month'
 
   /**
    * The message shown when a range holds more than two dates.
@@ -330,6 +364,18 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
    */
   @property({ type: Number })
   step = 1
+
+  /**
+   * The message shown when a date is not on `step`.
+   */
+  @property({ attribute: 'step-mismatch-message' })
+  stepMismatchMessage?: string
+
+  /**
+   * The message shown when `disable-dates` or `disable-days` bars a date.
+   */
+  @property({ attribute: 'unavailable-message' })
+  unavailableMessage?: string
 
   /**
    * What the calendar should show, which is only ever a whole date.
@@ -432,14 +478,14 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
     if (event.key === 'Enter' && isDateValue(this.draft)) {
       event.preventDefault()
       if (!held.includes(this.draft)) {
-        this.requestValue([...held, this.draft].join(','))
+        this.requestPicked([...held, this.draft].join(','))
       }
       this.draft = ''
     } else if (event.key === 'Backspace' && this.draft === '' && held.length > 0) {
       /* The convention every tag field has: an empty field and a backspace takes
          the last one back, so a mistake costs one key rather than a hunt for a
          small control. */
-      this.requestValue(held.slice(0, -1).join(','))
+      this.requestPicked(held.slice(0, -1).join(','))
     }
   }
 
@@ -459,7 +505,7 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
 
   /** Takes one date back out of the set. */
   private readonly removeDate = (date: string): void => {
-    this.requestValue(
+    this.requestPicked(
       dates(this.value)
         .filter((one) => one !== date)
         .join(','),
@@ -469,7 +515,15 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
   private readonly handleCalendarChange = (event: Event): void => {
     event.stopPropagation()
     const { value } = (event as HelixBeforeChangeEvent).detail
-    this.requestValue(value)
+    /* A refusal reaches the calendar too, so it stays on the date the field
+       holds. Measured before this: a read-only field, or a consumer refusing
+       the change, kept its date while the calendar moved to the refused one
+       and showed it again on reopening. */
+    if (!this.requestPicked(value)) {
+      event.preventDefault()
+      this.restore()
+      return
+    }
     this.restore()
     /* A single date has nothing more to say, so the panel gets out of the way.
        A range or a multiple has: the reader is still choosing, and shutting the
@@ -518,6 +572,29 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
         max: this.written(this.max),
       })
     }
+    /* What the calendar bars, a typed or seeded date is barred from too.
+       Measured before this: a weekend typed into a field that disables
+       weekends reported valid and was submitted. */
+    const days = writtenList(this.disableDays)
+    const listed = writtenList(this.disableDates)
+    if (
+      held.some(
+        (one) => listed.includes(one) || days.includes(String(asDate(one)?.getUTCDay() ?? '')),
+      )
+    ) {
+      return this.unavailableMessage || 'Choose a date that is available.'
+    }
+    const step = Math.max(1, Math.floor(this.step) || 1)
+    if (step > 1) {
+      const base = asDate(this.min)?.getTime() ?? 0
+      const off = held.some((one) => {
+        const at = asDate(one)?.getTime()
+        return at !== undefined && Math.round((at - base) / 86_400_000) % step !== 0
+      })
+      if (off) {
+        return this.stepMismatchMessage || 'Choose one of the dates the calendar offers.'
+      }
+    }
     if (this.mode === 'range' && held.length > 2) {
       return this.rangeLengthMessage || 'A range is two dates.'
     }
@@ -529,16 +606,6 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
    */
   @property({ attribute: 'trigger-label' })
   triggerLabel = 'Choose a date'
-
-  protected override updated(changed: PropertyValues): void {
-    super.updated(changed)
-    /* After the mixin has shown the panel, and only on the update that opened
-       it, or every keystroke while it is up would steal focus back into the
-       grid. */
-    if (this.open && changed.has('open')) {
-      this.partNamed('picker')?.focus()
-    }
-  }
 
   /**
    * The calendar the field opens, behind a seam the styled tier can move.
@@ -566,15 +633,21 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
       .value=${this.picked}
       disable-dates=${this.disableDates || nothing}
       disable-days=${this.disableDays || nothing}
-      first-day-of-week=${this.firstDayOfWeek}
+      first-day-of-week=${this.firstDayOfWeek ?? nothing}
+      label=${this.calendarLabel}
       locale=${this.locale || nothing}
       max=${this.max || nothing}
       min=${this.min || nothing}
+      next-label=${this.nextLabel}
+      previous-label=${this.previousLabel}
       step=${this.step}
       @helix-before-change=${this.handleCalendarChange}
       @change=${this.stopInner}
       @input=${this.stopInner}
-    ></${this.tag('date-picker')}>`
+    >
+      <slot name="previous-icon" slot="previous-icon"></slot>
+      <slot name="next-icon" slot="next-icon"></slot>
+    </${this.tag('date-picker')}>`
   }
 
   /* Time Input's tag is this one under its own part name, with its own label
@@ -658,6 +731,7 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
           ?readonly=${this.readOnly}
           ?required=${this.required}
           @blur=${this.handleBlur}
+          @change=${this.handleCommit}
           @focus=${this.handleFocus}
           @input=${this.handleInput}
           @keydown=${this.handleDraftKey}
@@ -666,11 +740,12 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
           part="trigger"
           type="button"
           aria-controls="surface"
+          aria-disabled=${this.readOnly ? 'true' : nothing}
           aria-expanded=${this.open ? 'true' : 'false'}
           aria-haspopup="dialog"
           aria-label=${this.triggerLabel}
           ?disabled=${this.isDisabled}
-          @click=${() => this.toggleOpen()}
+          @click=${this.handleTriggerClick}
         >
           ${this.renderTrigger()}
         </button>

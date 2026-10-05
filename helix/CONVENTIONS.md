@@ -1419,9 +1419,13 @@ then the state is on the element: `input` and `change` on a value control,
 `toggle` with `newState` and `oldState` on anything that opens, `close` on a
 dialog. `announcesInput` survives and means something narrower now, picking
 which native event a control sends rather than what its request is called:
-Input, Textarea, Number Input, Pin Input, Filter Input and Slider are
-continuous, and the rest send `input` and `change` together the way a native
-`<select>` does.
+Input, Textarea, Number Input, Pin Input, Filter Input, Slider, Date Input,
+Time Input, Color Input and Color Picker are continuous, and the rest send
+`input` and `change` together the way a native `<select>` does. The three
+fields are typed into, so `change` waits for the reader to leave the text, as
+it does on a text `<input>`; a pick from their panel is a finished choice and
+sends both. Color Picker is dragged, so `change` waits for the drag to end,
+as it does on `<input type="color">`.
 
 **The eleven families that sent a generic `helix-change` have verbs of their
 own.** They are not form controls, so no native word applied, and one word was doing for them

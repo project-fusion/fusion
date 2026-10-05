@@ -78,10 +78,26 @@
   justify-content: center;
 }
 
-[part="previous"]:hover,
-[part="next"]:hover {
+[part="previous"]:hover:not(:disabled),
+[part="next"]:hover:not(:disabled) {
   background-color: var(--helix-color-surface-sunken);
   color: var(--helix-color-foreground);
+}
+
+/* `all: unset` above takes the browser's own focus outline with it, so the ring
+   is put back here, the same ring a day takes. Measured before this: these two,
+   the first stops in every calendar, showed nothing when reached by Tab. */
+[part="previous"]:focus-visible,
+[part="next"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* At `min` or `max` there is no month to move to, and the control says so. */
+[part="previous"]:disabled,
+[part="next"]:disabled {
+  cursor: default;
+  opacity: 0.4;
 }
 
 /* Both selectors, and that is the point.
@@ -234,7 +250,10 @@
   cursor: default;
 }
 
-[part~="cell"][aria-disabled] [part~="day"] {
+/* Read off the day's own part rather than the cell's `aria-disabled`, which a
+   filler day from a neighboring month carries too: it takes no press, and it
+   keeps the quieter look above rather than this one. */
+[part~="day-disabled"] {
   color: var(--helix-color-foreground-subtle);
   opacity: 0.4;
 }

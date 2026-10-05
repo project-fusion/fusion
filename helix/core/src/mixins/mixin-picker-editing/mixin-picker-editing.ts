@@ -42,6 +42,12 @@ export declare class MixinPickerEditingInterface {
    * returns `false`.
    */
   requestValue(next: string): boolean
+
+  /**
+   * Requests the panel open or closed. While `readOnly` is set, it does not
+   * open, and it returns `false`.
+   */
+  requestOpen(next: boolean): boolean
 }
 
 /**
@@ -56,9 +62,9 @@ export declare class MixinPickerEditingInterface {
  * know when the caret is in the field, which is `editing`; and a reader who
  * reaches such a field is choosing, so arriving opens the picker. A color has
  * neither: `#ff0000` is what is typed and what is shown, and a reader who has
- * the hex pastes it and never opens anything. `readOnly` is the third thing
- * Color Input does not have, and a mixin cannot give it one without changing
- * its API.
+ * the hex pastes it and never opens anything. `readOnly` comes along here for
+ * the two that take this mixin; Color Input declares its own, the same
+ * property refusing the same two requests.
  */
 export const MixinPickerEditing = <T extends Constructor<EditingBase>>(Base: T) => {
   // JSDoc is duplicated from MixinPickerEditingInterface deliberately. The
@@ -96,6 +102,21 @@ export const MixinPickerEditing = <T extends Constructor<EditingBase>>(Base: T) 
         return false
       }
       return super.requestValue(next)
+    }
+
+    /**
+     * Requests the panel open or closed. While `readOnly` is set, it does not
+     * open, and it returns `false`.
+     *
+     * A read-only field opened its picker on focus and on its trigger, and
+     * then refused every pick in it, so the panel offered choices that went
+     * nowhere. A native read-only `<input type="date">` opens nothing.
+     */
+    override requestOpen(next: boolean): boolean {
+      if (next && this.readOnly) {
+        return false
+      }
+      return super.requestOpen(next)
     }
 
     /** The caret has left, so the field renders again. */
