@@ -48,6 +48,7 @@ export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'te
  *
  * @event {Event} change - Sent when the user finishes changing the value. Relayed from the native input.
  * @event {HelixBeforeChangeEvent} helix-before-change - The text is about to change. Cancelable: cancel it to keep the current text.
+ * @event {Event} helix-clear - Fired after the clear button has emptied the field, after `input` and `change`.
  * @event {Event} input - Fired as the value changes.
  *
  * @csspart clear - The button that empties the field.
@@ -337,6 +338,7 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
        consumer saving on `change` never learned the field was emptied. */
     if (this.value !== '' && this.requestValue('')) {
       this.announceChange()
+      this.dispatchEvent(new Event('helix-clear', { bubbles: true, composed: true }))
     }
     const control = this.control
     if (control) {
@@ -393,6 +395,30 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
   /** Selects everything in the field. */
   select(): void {
     this.control?.select()
+  }
+
+  /**
+   * Moves a number, a date or a time up by `step`, `count` times, as the native
+   * method does. It sends no event, as the native method sends none, and it
+   * throws `InvalidStateError` on a type with no step, such as `text`.
+   */
+  stepUp(count = 1): void {
+    this.control?.stepUp(count)
+    this.takeStep()
+  }
+
+  /** Moves a number, a date or a time down by `step`, `count` times. See `stepUp`. */
+  stepDown(count = 1): void {
+    this.control?.stepDown(count)
+    this.takeStep()
+  }
+
+  /** Takes the native control's answer, which knows `min`, `max` and `step`. */
+  private takeStep(): void {
+    const control = this.control
+    if (control) {
+      this.value = control.value
+    }
   }
 
   /**
