@@ -187,11 +187,11 @@ export const THEMED_PAGE_STYLES = css`
   }
 
   /* The one large area of \`primary-surface\` on the page, which makes it the one
-     place \`foreground-on-accent\` is doing real work rather than sitting on a
+     place \`foreground-on-primary\` is doing real work rather than sitting on a
      button the size of a word. */
   .themedClose {
     background-color: var(--helix-color-primary-surface);
-    color: var(--helix-color-foreground-on-accent);
+    color: var(--helix-color-foreground-on-primary);
     padding: var(--helix-space-xl) var(--helix-space-2xl);
   }
 
@@ -203,7 +203,7 @@ export const THEMED_PAGE_STYLES = css`
      the button cannot disagree with the text beside it about what is legible
      here. */
   .themedClose helix-button {
-    --button-background-color: var(--helix-color-foreground-on-accent);
+    --button-background-color: var(--helix-color-foreground-on-primary);
     --button-foreground-color: var(--helix-color-primary-surface);
   }
 

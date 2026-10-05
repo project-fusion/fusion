@@ -358,7 +358,7 @@
  *
  * **Except a card already given a fill on purpose**, which is what
  * `:not([data-filled])` is for: the showcase's anchor supplies its own
- * `foreground-on-accent` text, so 30 percent glass leaves white type on a
+ * `foreground-on-primary` text, so 30 percent glass leaves white type on a
  * near-transparent panel. On the card the page uses to advertise that it
  * measures contrast. */
 /* Named once, because the animated edge further down has to paint this same
