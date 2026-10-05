@@ -42,6 +42,7 @@ import { pressedValue, selectedValues, type TagSelectionMode, tabStop } from '..
  *
  * @event {Event} change - Fired once a press has changed which tags are selected.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired before a press changes which tags are selected, with the `value` it would leave. Cancelable.
+ * @event {HelixDismissEvent} helix-dismiss - A tag's remove button was pressed, or Delete or Backspace on the focused tag. Bubbles from that tag, which is its `target`; remove the tag in response. Cancelable.
  */
 @customElement('helix-headless-tag-group')
 export class HelixHeadlessTagGroup extends HelixElement {

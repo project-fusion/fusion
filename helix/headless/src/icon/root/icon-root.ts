@@ -1,8 +1,9 @@
 import { customElement, HelixElement, hostAria, reportRuntime } from '@fusion.dev/helix-core'
-import { type HelixIcon, icons } from '@fusion.dev/helix-icons'
+import type { HelixIcon } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
+import { resolveIcon, watchIcons } from '../registry.js'
 
 /**
  * @summary A named icon from the Helix set.
@@ -21,6 +22,15 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * a dark background. Shapes that set their own `fill` or `stroke` are
  * unaffected.
  *
+ * **A name is looked up in a registry.** The family's entry registers the
+ * whole set, so any name in it draws. The element's own entry,
+ * `@fusion.dev/helix-headless/icon/root`, registers none: a page that imports
+ * it and calls `registerIcons` with the glyphs it names ships those and no
+ * others. `registerIconLibrary` resolves names under a prefix of your own,
+ * such as `lucide:camera`, at once or later, and the element fires `load` when
+ * a glyph that came later is drawn. A glyph registered after the element
+ * rendered is drawn then.
+ *
  * A name with no match renders nothing, and the element fires `error`, so a
  * typo in a name can be heard.
  *
@@ -35,7 +45,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @aliases Glyph, Symbol
  * @documentation https://fusion.dev/helix/components/icon
  *
- * @event {Event} error - `name` matches no icon in the set, so nothing is drawn.
+ * @event {Event} error - `name` matches no registered icon and no library answers it, so nothing is drawn.
+ * @event {Event} load - A glyph a library gave later for `name` is drawn.
  *
  * @csspart svg - The rendered SVG.
  */
@@ -83,8 +94,12 @@ export class HelixHeadlessIcon extends HelixElement {
    * so it is what markup can carry, and resolving one means an index of the
    * whole set that no bundler can shake: 15 kB for a consumer who renders one
    * mark. An attribute is the only thing an HTML author can write, and that is
-   * worth the index; a consumer who would rather not pay it hands over the
-   * value instead.
+   * worth the index; a consumer who would rather not pay it imports the
+   * element from `icon/root` and registers the glyphs it names, or hands over
+   * the value instead.
+   *
+   * A name written `prefix:name` asks the library registered under that
+   * prefix.
    */
   @property()
   name = ''
@@ -115,6 +130,52 @@ export class HelixHeadlessIcon extends HelixElement {
   /** The name the last `error` was fired for, so it fires once per name. */
   private missed = ''
 
+  /** The glyph this render draws, from `icon` or the registry. */
+  private drawn: HelixIcon | undefined
+
+  /** A library is still answering for `name`, so it is not missing yet. */
+  private waiting = false
+
+  /** The name whose late glyph arrived and has not been announced with `load`. */
+  private arrived = ''
+
+  /** Stops listening to the registry. */
+  private unwatch: (() => void) | undefined
+
+  /* A glyph or a library registered after this element rendered may be the
+     one its name was waiting for, so it looks again. */
+  override connectedCallback(): void {
+    super.connectedCallback()
+    this.unwatch = watchIcons(() => {
+      if (this.icon === undefined && this.name !== '') {
+        this.requestUpdate()
+      }
+    })
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    this.unwatch?.()
+    this.unwatch = undefined
+  }
+
+  /** What the registry gives for `name` now, starting the wait for a late glyph. */
+  private lookup(): HelixIcon | undefined {
+    const found = this.name === '' ? undefined : resolveIcon(this.name)
+    this.waiting = found instanceof Promise
+    if (!(found instanceof Promise)) {
+      return found
+    }
+    const name = this.name
+    void found.then(() => {
+      if (this.name === name && this.isConnected) {
+        this.arrived = name
+        this.requestUpdate()
+      }
+    })
+    return undefined
+  }
+
   /* **An `aria-label` on the element names it.** The glyph is hidden unless
      `label` is set, so an `aria-label` written on the host, the way a page
      names anything, left a generic element with a name nobody heard. The host
@@ -123,13 +184,18 @@ export class HelixHeadlessIcon extends HelixElement {
     super.willUpdate(changed)
     const named = this.label === '' && (this.getAttribute?.('aria-label') ?? '') !== ''
     hostAria(this.internals, { role: named ? 'img' : '' })
+    this.drawn = this.icon ?? this.lookup()
   }
 
   /* Said once per name, after the render that drew nothing. A server runs no
      `updated`, so nothing fires there. */
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    if (this.icon === undefined && this.name !== '' && !Object.hasOwn(icons, this.name)) {
+    if (this.arrived === this.name && this.drawn !== undefined) {
+      this.dispatchEvent(new Event('load', { bubbles: false, cancelable: false, composed: false }))
+    }
+    this.arrived = ''
+    if (this.drawn === undefined && this.name !== '' && !this.waiting) {
       if (this.missed !== this.name) {
         this.missed = this.name
         this.dispatchEvent(
@@ -138,8 +204,9 @@ export class HelixHeadlessIcon extends HelixElement {
         reportRuntime({
           kind: 'unknown-icon',
           message:
-            `<${this.localName} name="${this.name}"> names no icon in the Helix set, so it draws ` +
-            'nothing. Check the name, or import the glyph and pass it as `icon`.',
+            `<${this.localName} name="${this.name}"> names no registered icon, so it draws ` +
+            'nothing. Check the name, register the glyph with `registerIcons`, or import it ' +
+            'and pass it as `icon`.',
           tag: this.localName,
         })
       }
@@ -149,11 +216,10 @@ export class HelixHeadlessIcon extends HelixElement {
   }
 
   protected override render(): TemplateResult | typeof nothing {
-    /* Own keys only. A truthiness check on a plain-object index lets an
-       inherited `Object.prototype` key through, and the component renders a
-       sized, empty `<svg viewBox="">` rather than nothing at all. */
-    const named = Object.hasOwn(icons, this.name) ? icons[this.name] : undefined
-    const icon = this.icon ?? named
+    /* The registry is a `Map`, so an inherited `Object.prototype` key such as
+       `constructor` resolves to nothing rather than a sized, empty
+       `<svg viewBox="">`. */
+    const icon = this.drawn
     if (!icon) {
       return nothing
     }
