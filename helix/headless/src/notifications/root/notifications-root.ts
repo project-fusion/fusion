@@ -11,6 +11,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { feedStep } from '../feed-keys.js'
 import type { HelixHeadlessNotificationGroup } from '../group/notification-group.js'
 import type { HelixHeadlessNotification } from '../notification/notification.js'
 
@@ -322,22 +323,12 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
     if (!inside) {
       return
     }
-    const at = rows.indexOf(inside)
-    const to = (
-      {
-        ArrowDown: own ? at + 1 : undefined,
-        ArrowUp: own ? at - 1 : undefined,
-        End: own ? rows.length - 1 : undefined,
-        Home: own ? 0 : undefined,
-        PageDown: at + 1,
-        PageUp: at - 1,
-      } as Record<string, number | undefined>
-    )[event.key]
+    const to = feedStep(event.key, rows.indexOf(inside), rows.length, own !== undefined)
     if (to === undefined) {
       return
     }
     event.preventDefault()
-    const next = rows[Math.max(0, Math.min(to, rows.length - 1))]
+    const next = rows[to]
     if (next) {
       this.stopRow = next
       this.rove()

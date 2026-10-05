@@ -67,6 +67,12 @@ export {
   SKIP_SECONDS,
 } from './controllers/media-session-controller/media-session-controller.js'
 export {
+  animationsSettled,
+  type OpenPhase,
+  OpenPhaseController,
+  type OpenPhaseOptions,
+} from './controllers/open-phase-controller/open-phase-controller.js'
+export {
   MAX_FRAME_STEP,
   PaintGateController,
   type PaintGateOptions,
