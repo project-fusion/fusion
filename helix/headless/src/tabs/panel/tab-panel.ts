@@ -1,5 +1,5 @@
-import { customElement, HelixElement } from '@fusion.dev/helix-core'
-import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
+import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
@@ -10,6 +10,11 @@ import { property } from 'lit/decorators.js'
  * still there when the person comes back, and the content of every panel is in
  * the server-rendered markup for crawlers, whichever tab is open.
  *
+ * The host is the `tabpanel` while its tab is selected, through
+ * `ElementInternals`, so the tab's `aria-controls` can reach it from the tab's
+ * shadow root. The box inside takes the focus, for a panel with nothing
+ * focusable in it.
+ *
  * @since 0.1.0
  * @status stable
  * @aliases TabPanel
@@ -17,7 +22,7 @@ import { property } from 'lit/decorators.js'
  *
  * @slot - The panel's content.
  *
- * @csspart panel - The panel container.
+ * @csspart panel - The panel container, which takes the focus.
  *
  * @cssstate selected - While its tab is the one selected.
  */
@@ -31,10 +36,9 @@ export class HelixHeadlessTabPanel extends HelixElement {
    * writes: the tab already says it.
    *
    * A string and not a reference: an IDREF resolves only in the tree it is
-   * written in, and an element reference cannot reach a sibling shadow tree
-   * either, so `aria-labelledby` to the tab's own id leaves the panel with no
-   * accessible name. `aria-label` on a `tabpanel` is how the pattern names one
-   * anyway.
+   * written in, and the tab's control is inside the tab's shadow root, which no
+   * reference from the light DOM can reach. `aria-label` on a `tabpanel` is how
+   * the pattern names one anyway.
    */
   @property({ attribute: false })
   label = ''
@@ -67,13 +71,14 @@ export class HelixHeadlessTabPanel extends HelixElement {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     this.toggleState('selected', this.selected)
+    /* The role only while showing: a hidden panel's host is not hidden itself,
+       and an empty `tabpanel` would be one more stop in a reader's list. */
+    hostAria(this.internals, { label: this.label, role: this.selected ? 'tabpanel' : '' })
   }
 
   protected override render(): TemplateResult {
     return html`<div
       part="panel"
-      role="tabpanel"
-      aria-label=${this.label || nothing}
       ?hidden=${!this.selected}
       tabindex="0"
     >

@@ -40,7 +40,7 @@ describe('tabs server output', () => {
 
   test('the panel ships its content, so a crawler reads it whichever tab is open', () => {
     const panel = ssr(html`<helix-tab-panel value="two"></helix-tab-panel>`)
-    expect(partTag(panel, 'panel')).toContain('role="tabpanel"')
+    expect(partTag(panel, 'panel')).toContain('tabindex="0"')
     expect(rendered(panel, 'helix-tab-panel')).toContain('<slot></slot>')
   })
 
