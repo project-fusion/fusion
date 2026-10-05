@@ -552,3 +552,49 @@ describe('entering and exiting', () => {
     expect(hasState(host, 'exiting')).toBe(false)
   })
 })
+
+describe('Tab at either end of the dialog', () => {
+  const press = (from: Element, shiftKey = false): KeyboardEvent => {
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key: 'Tab',
+      shiftKey,
+    })
+    from.dispatchEvent(event)
+    return event
+  }
+
+  test('wraps to the other end, the close control included, rather than leaving the page', async () => {
+    const host = (await mount(
+      `<helix-headless-dialog label="Rename" dismissible>
+        <input id="name" aria-label="Name">
+        <button id="save" slot="footer">Save</button>
+      </helix-headless-dialog>`,
+    )) as Dialog
+    host.show()
+    await host.updateComplete
+    const dismiss = part(host, 'dismiss') as HTMLElement
+    dismiss.focus()
+    expect(press(dismiss).defaultPrevented).toBe(true)
+    expect(document.activeElement?.id).toBe('name')
+    const name = host.querySelector('#name') as HTMLElement
+    expect(press(name, true).defaultPrevented).toBe(true)
+    expect(host.shadowRoot?.activeElement).toBe(dismiss)
+  })
+
+  test('and moves on as usual in between', async () => {
+    const host = (await mount(
+      `<helix-headless-dialog label="Rename">
+        <input id="name" aria-label="Name">
+        <button id="save" slot="footer">Save</button>
+      </helix-headless-dialog>`,
+    )) as Dialog
+    host.show()
+    await host.updateComplete
+    const name = host.querySelector('#name') as HTMLElement
+    name.focus()
+    expect(press(name).defaultPrevented).toBe(false)
+  })
+})

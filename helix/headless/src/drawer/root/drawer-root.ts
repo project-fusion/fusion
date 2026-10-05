@@ -54,9 +54,9 @@ import { startsSwipe } from '../swipe-start.js'
  * the nearest. While a swipe moves the panel, the distance is written on it as
  * `--drawer-swipe-x` and `--drawer-swipe-y`. `swipe="false"` turns swiping off.
  *
- * The snap point the panel rests at is on the panel as `--drawer-snap`, and
- * `:state(snapped)` is on the host while that is less than the whole panel.
- * `snapTo()` moves it to another. **Focus moving to a control past the
+ * `snap` is the snap point the panel rests at, and `:state(snapped)` is on the
+ * host while that is less than the whole panel. `snapTo()` moves it to
+ * another. **Focus moving to a control past the
  * window's edge opens the panel to its largest snap point**, so a reader
  * moving through a half open sheet with `Tab` never lands on a control they
  * cannot see.
@@ -104,7 +104,6 @@ import { startsSwipe } from '../swipe-start.js'
  * @csspart header - The header region.
  * @csspart panel - The sliding panel.
  *
- * @cssproperty --drawer-snap - The fraction of the panel on screen at the snap point it rests at, such as `0.5`. Written while the drawer is open and has `snap-points`.
  * @cssproperty --drawer-swipe-x - How far a swipe, or a snap point, has moved the panel across, in pixels, toward the right.
  * @cssproperty --drawer-swipe-y - How far a swipe, or a snap point, has moved the panel down, in pixels.
  *
@@ -321,8 +320,17 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
   }
 
   /**
-   * Puts the panel at rest at a snap point, and says which one: as
-   * `--drawer-snap` on the panel and as `:state(snapped)` short of the whole.
+   * The fraction of the panel on screen at the snap point it rests at, such as
+   * `0.5`. It is `1`, the whole panel, while the drawer is closed or has no
+   * `snap-points`.
+   */
+  get snap(): number {
+    return this.open ? this.shown : 1
+  }
+
+  /**
+   * Puts the panel at rest at a snap point, and says on the host, as
+   * `:state(snapped)`, while that is short of the whole panel.
    */
   private restAt(shown: number): void {
     this.shown = shown
@@ -331,11 +339,9 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
     this.markSnap()
   }
 
-  /** Writes the snap point the panel rests at, and nothing while closed or without `snap-points`. */
+  /** Says whether the panel rests short of the whole, and nothing while closed. */
   private markSnap(): void {
-    const marked = this.open && this.snapPoints.trim() !== ''
-    this.partNamed('panel')?.style.setProperty('--drawer-snap', marked ? String(this.shown) : '')
-    this.toggleState('snapped', marked && this.shown < 1)
+    this.toggleState('snapped', this.open && this.shown < 1)
   }
 
   /**

@@ -110,14 +110,4 @@ describe('drawer server output, the close control', () => {
       ),
     ).toBeFalsy()
   })
-
-  test('and no snap point, which only an open panel in a browser rests at', () => {
-    const served = rendered(
-      ssr(
-        html`<helix-headless-drawer label="Filters" snap-points="0.5 1" open></helix-headless-drawer>`,
-      ),
-      'helix-headless-drawer',
-    )
-    expect(served).not.toContain('--drawer-snap')
-  })
 })

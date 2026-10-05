@@ -4,6 +4,7 @@ import {
   customElement,
   drawDismiss,
   drawDismissGlyph,
+  FocusScopeController,
   HelixElement,
   headingsIn,
   hostAria,
@@ -29,6 +30,10 @@ import { wordsIn } from '../description.js'
  * - an inert page behind the dialog, unreachable by pointer, keyboard, or
  *   virtual cursor
  *
+ * The dialog adds one thing to those: `Tab` from its last control goes to its
+ * first, and `Shift+Tab` from its first to its last. A native modal lets `Tab`
+ * past its last control out to the browser's own controls.
+ *
  * `open` calls `showModal()`, and every way the dialog closes goes through
  * `requestOpen`. A native dialog closes three ways: the property, Escape, and a
  * `<form method="dialog">` submit. Routing all three through `requestOpen`
@@ -41,7 +46,8 @@ import { wordsIn } from '../description.js'
  *
  * The dialog is described by the words at the start of its body: the elements
  * in the default slot before the first one that is or holds a control. A
- * question above a form describes the dialog, and the form does not. An
+ * question above a form describes the dialog, and the form does not. A Helix
+ * component that draws words and no control, such as `Text`, counts as words. An
  * `aria-describedby` on the host replaces it.
  *
  * Set `alert` for a dialog that interrupts to ask for an answer, such as a
@@ -316,6 +322,24 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
       this.namedByHeader,
     )
   }
+
+  /* `Tab` from the last control goes to the first, and `Shift+Tab` from the
+     first to the last. A native modal lets `Tab` past its last control out to
+     the browser's own controls, which takes a keyboard reader out of the page. */
+  protected readonly scope = new FocusScopeController(this, {
+    contain: () => this.open,
+    contents: () => [
+      ...['icon', 'header', '', 'footer'].flatMap(
+        (name) =>
+          this.renderRoot
+            ?.querySelector<HTMLSlotElement>(name ? `slot[name="${name}"]` : 'slot:not([name])')
+            ?.assignedElements({ flatten: true }) ?? [],
+      ),
+      /* And what the dialog draws itself besides its slots, its close control. */
+      ...[...(this.dialog?.children ?? [])].filter((one) => !(one instanceof HTMLSlotElement)),
+    ],
+    surface: () => this.dialog,
+  })
 
   /** Whether the body's words are what currently describe the dialog. */
   private describedByBody = false
