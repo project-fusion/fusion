@@ -347,6 +347,7 @@ export {
   type ScrollItemOptions,
   scrollItemIntoView,
 } from './utils/scroll-item-into-view/scroll-item-into-view.js'
+export { lockScroll, scrollHolders, unlockScroll } from './utils/scroll-lock/scroll-lock.js'
 export { slotFilled } from './utils/slot-filled/slot-filled.js'
 export { slottedWords } from './utils/slotted-words/slotted-words.js'
 export { splitValues } from './utils/split-values/split-values.js'

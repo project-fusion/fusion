@@ -1,5 +1,12 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { formValue, mount, part, registerDom, slotted } from '@fusion.dev/helix-testing/dom'
+import {
+  formValue,
+  hasLayout,
+  mount,
+  part,
+  registerDom,
+  slotted,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -756,3 +763,26 @@ describe('a read-only grid', () => {
     )
   })
 })
+
+/* Only in a real engine, which gives a form-associated host its labels and
+   reflects element references. The group was named "Date Picker" whatever the
+   page's `<label for>` said. */
+if (hasLayout()) {
+  describe('a date picker a page labels', () => {
+    test('is a group named by that label', async () => {
+      const label = await mount(
+        '<label for="due">Due</label><helix-headless-date-picker id="due"></helix-headless-date-picker>',
+      )
+      const picker = label.parentElement?.querySelector(
+        'helix-headless-date-picker',
+      ) as unknown as HTMLElement & {
+        internals: ElementInternals
+        updateComplete: Promise<unknown>
+      }
+      await picker.updateComplete
+      const names = (picker.internals as ElementInternals & { ariaLabelledByElements: Element[] })
+        .ariaLabelledByElements
+      expect(names.map((one) => one.textContent)).toEqual(['Due'])
+    })
+  })
+}

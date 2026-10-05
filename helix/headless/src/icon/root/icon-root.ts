@@ -1,4 +1,4 @@
-import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, hostAria, reportRuntime } from '@fusion.dev/helix-core'
 import { type HelixIcon, icons } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -126,7 +126,16 @@ export class HelixHeadlessIcon extends HelixElement {
     if (this.icon === undefined && this.name !== '' && !Object.hasOwn(icons, this.name)) {
       if (this.missed !== this.name) {
         this.missed = this.name
-        this.dispatchEvent(new Event('error', { bubbles: false, cancelable: false, composed: false }))
+        this.dispatchEvent(
+          new Event('error', { bubbles: false, cancelable: false, composed: false }),
+        )
+        reportRuntime({
+          kind: 'unknown-icon',
+          message:
+            `<${this.localName} name="${this.name}"> names no icon in the Helix set, so it draws ` +
+            'nothing. Check the name, or import the glyph and pass it as `icon`.',
+          tag: this.localName,
+        })
       }
     } else {
       this.missed = ''

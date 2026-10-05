@@ -13,6 +13,15 @@ export interface AriaForwardOptions {
    */
   label?: boolean | (() => boolean)
   /**
+   * Elements read after whatever names the control from outside, the host's
+   * `aria-labelledby` or its `<label>`.
+   *
+   * For a control whose name is the label and then what it shows, as a
+   * native `<select>` is named. Added only where the host gives a name, so a
+   * control named by its own template keeps its own.
+   */
+  labelledByAfter?: () => Element[]
+  /**
    * Whether the control has a name of its own, where its own labels do not
    * say.
    *
@@ -161,11 +170,15 @@ export class AriaForwardController implements ReactiveController {
   /** The component's own answer to whether the control is named. See the option. */
   private readonly named: (() => boolean) | undefined
 
+  /** What is read after the host's names. See the option. */
+  private readonly after: (() => Element[]) | undefined
+
   constructor(host: ReactiveControllerHost & HTMLElement, options: AriaForwardOptions) {
     this.host = host
     this.target = options.target
     this.asked = options.label ?? false
     this.named = options.named
+    this.after = options.labelledByAfter
     host.addController(this)
   }
 
@@ -260,7 +273,11 @@ export class AriaForwardController implements ReactiveController {
           : referenced
       const reflect = target as unknown as Record<string, Element[] | null>
       if (elements.length > 0) {
-        reflect[property] = elements
+        /* In the same write, so no listener order can leave the control with
+           the host's names and without what follows them. */
+        const after = attribute === 'aria-labelledby' ? (this.after?.() ?? []) : []
+        const named: Element[] = elements
+        reflect[property] = [...named, ...after.filter((one) => !named.includes(one))]
         this.forwarded.add(attribute)
         continue
       }

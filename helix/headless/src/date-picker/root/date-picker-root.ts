@@ -772,7 +772,15 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
       this.focused = ''
     }
     this.choosing = false
-    hostAria(this.internals, { label: this.label, role: 'group' })
+    /* A page's `<label for>` names the group where `label` is still the
+       default, which is how a native control takes one. The platform gives
+       the host its labels, and the host is the group a reader is on. */
+    const outside = this.label === 'Date Picker' ? [...(this.internals.labels ?? [])] : []
+    hostAria(this.internals, {
+      label: this.label,
+      labelledBy: outside as HTMLElement[],
+      role: 'group',
+    })
     /* Announced as off, not merely inert. Removing it from the accessibility
        tree would take the dates with it; this says the control exists and
        cannot be used, which is the same call `HelixFormElement` documents. */

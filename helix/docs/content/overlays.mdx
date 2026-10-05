@@ -84,6 +84,14 @@ scroll while it is open.
 `Popover` does not trap focus. When focus moves out of its trigger and its
 panel, the popover closes.
 
+The fields with a panel behave the same way:
+
+- `Select` and `Combobox` close their list when `Tab` moves focus out.
+- `Date Input`, `Time Input`, and `Color Input` close their panel when focus
+  leaves the field, and `Escape` returns focus to the field.
+- Opening one of those panels from its trigger, or with `ArrowDown`, moves
+  focus into the panel.
+
 **A tooltip never takes focus.** A tooltip only describes a control, so it
 cannot contain a button. For something with a button in it, use a `Popover`.
 

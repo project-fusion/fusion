@@ -1,5 +1,5 @@
-import { customElement, HelixElement } from '@fusion.dev/helix-core'
-import { html, type TemplateResult } from 'lit'
+import { customElement, HelixElement, reportRuntime } from '@fusion.dev/helix-core'
+import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
@@ -56,6 +56,23 @@ export class HelixHeadlessStat extends HelixElement {
    */
   @property({ reflect: true })
   direction?: 'column-reverse' | 'row' | 'row-reverse'
+
+  /* Said once for the mix-up the description warns about. A server runs no
+     `updated`, so nothing is said there. */
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    const given = this.direction as string | undefined
+    if (changed.has('direction') && (given === 'up' || given === 'down' || given === 'neutral')) {
+      reportRuntime({
+        kind: 'misread-direction',
+        message:
+          `<${this.localName} direction="${given}"> lays out as the column: \`${given}\` is a ` +
+          "direction of Trend's, which says which way a number moved. Put it on the " +
+          '`helix-trend` beside the stat.',
+        tag: this.localName,
+      })
+    }
+  }
 
   protected override render(): TemplateResult {
     return html`<slot name="label"></slot>

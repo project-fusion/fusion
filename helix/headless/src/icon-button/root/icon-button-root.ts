@@ -27,7 +27,7 @@ import { HelixHeadlessButton } from '../../button/root/button-root.js'
  *
  * @slot - The icon.
  *
- * @csspart button - The inner button or anchor.
+ * @csspart button - The inner button.
  */
 @customElement('helix-headless-icon-button')
 export class HelixHeadlessIconButton extends HelixHeadlessButton {}

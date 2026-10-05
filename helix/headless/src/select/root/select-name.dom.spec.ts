@@ -52,5 +52,23 @@ describe('a select trigger', () => {
       trigger.focus()
       expect(words()).toEqual(['Language', 'Spanish'])
     })
+
+    /* The trigger named itself by its value, so a page's `<label for>` named
+       only the host: read from Chromium's tree, a button named "Choose". */
+    test('and names it by a label the page wrote, then the value', async () => {
+      const host = await mount(
+        `<label for="fruit">Fruit</label>
+        <helix-headless-select id="fruit" default-value="es">${OPTIONS}</helix-headless-select>`,
+      )
+      const select = host.parentElement?.querySelector('helix-headless-select') as HTMLElement
+      await (select as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+      const trigger = part(select, 'trigger') as HTMLElement & {
+        ariaLabelledByElements: Element[]
+      }
+      expect(trigger.ariaLabelledByElements.map((one) => one.textContent?.trim())).toEqual([
+        'Fruit',
+        'Spanish',
+      ])
+    })
   }
 })

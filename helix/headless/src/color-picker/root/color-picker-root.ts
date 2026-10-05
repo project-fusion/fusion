@@ -10,6 +10,7 @@ import {
   HelixFormElement,
   HelixSampleEndEvent,
   HelixSampleStartEvent,
+  hostAria,
   isRtl,
   MixinControllerValue,
   parseColor,
@@ -847,6 +848,11 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     this.internals.ariaInvalid = this.invalid ? 'true' : null
+    /* A group only where a page's `<label for>` names the picker, so the
+       name has somewhere to be read. Unlabeled, the host stays without a
+       role, as it is inside Color Input. */
+    const outside = [...(this.internals.labels ?? [])] as HTMLElement[]
+    hostAria(this.internals, { labelledBy: outside, role: outside.length > 0 ? 'group' : '' })
     if (!this.hydrating) {
       this.sampling = 'EyeDropper' in globalThis
     }

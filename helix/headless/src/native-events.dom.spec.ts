@@ -92,6 +92,29 @@ const innerControl = (
   ) as (HTMLElement & { requestValue(next: string): boolean }) | undefined
 }
 
+/**
+ * A whole change in the inner control: its request, and for one that is
+ * dragged, the release that settles it.
+ *
+ * Color Picker sends `change` when a drag or a key settles, as
+ * `<input type="color">` does, so a request alone is one step of a drag and
+ * Color Input rightly relays `input` alone for it. The release is the inner
+ * range's own `change`.
+ */
+const changeInner = (
+  tag: string,
+  inner: HTMLElement & { requestValue(next: string): boolean },
+): void => {
+  if (tag !== 'helix-headless-color-input') {
+    inner.requestValue('b')
+    return
+  }
+  inner.requestValue('#336699')
+  ;(inner as unknown as { renderRoot: ParentNode }).renderRoot
+    .querySelector('input[type="range"]')
+    ?.dispatchEvent(new Event('change'))
+}
+
 describe('a control that renders another control', () => {
   test.each(COMPOSED)('%s announces once, not once per element', async (tag, markup) => {
     const host = (await mount(markup)) as HTMLElement
@@ -105,7 +128,9 @@ describe('a control that renders another control', () => {
         heard.push(`${type}@${(event.composedPath()[0] as Element).localName}`)
       })
     }
-    inner?.requestValue('b')
+    if (inner) {
+      changeInner(tag, inner)
+    }
     await settle(host)
 
     /* Named by element rather than counted, so a failure says which one spoke

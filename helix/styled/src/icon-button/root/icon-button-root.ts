@@ -25,7 +25,7 @@ import { styles } from './icon-button-root.css.js'
  *
  * @slot - The icon.
  *
- * @csspart button - The inner button or anchor.
+ * @csspart button - The inner button.
  *
  * @cssproperty --icon-button-background-color - Fill behind the button, in every state.
  * @cssproperty --icon-button-background-color-hover - Fill behind the button under the pointer. Without it, `--icon-button-background-color` also applies on hover.
