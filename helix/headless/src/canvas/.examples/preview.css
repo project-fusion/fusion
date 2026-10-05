@@ -54,6 +54,7 @@ helix-headless-canvas::part(edges) {
   inset: 0;
   overflow: visible;
   position: absolute;
+  z-index: -1;
 }
 
 helix-headless-canvas::part(edge) {

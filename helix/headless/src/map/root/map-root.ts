@@ -155,7 +155,8 @@ const SETTLES = 400
  * for each layer, which sets the layer's `hidden` attribute. Layers with the
  * same `group`, such as a route and its dotted legs, share one tile. A tile
  * sends `helix-before-toggle` from the layer first, so you can store the
- * choice or refuse it.
+ * choice or refuse it, and `helix-toggle` from it once `hidden` holds the
+ * choice.
  *
  * Imagery, a `helix-map-raster` with `ground`, is a map type and not a tile.
  * The menu opens with a card for each type, Standard, Hybrid, and Satellite,
@@ -190,6 +191,7 @@ const SETTLES = 400
  * @event {HelixMapRotateEvent} helix-map-rotate - A rotate or Face north button, or Shift with Left or Right, was pressed. Turn your map in response.
  * @event {HelixMapTiltEvent} helix-map-tilt - The 3D button, or Shift with Up or Down, was pressed. Tilt your map in response.
  * @event {HelixMapZoomEvent} helix-map-zoom - A zoom button or key was pressed, with a direction. Zoom your map in response.
+ * @event {Event} helix-toggle - A layer's tile in the layers menu showed or hid it. Sent from the layer once its `hidden` attribute holds the choice.
  *
  * @csspart attribution - The strip under the map that holds the credit.
  * @csspart compass - The compass and the pan and rotate buttons around it.
@@ -553,14 +555,16 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
    * **Asked first, from the layer.** The tile wrote `hidden` onto the
    * consumer's element and said nothing, so a page could neither keep the
    * choice nor keep its own state in step. The request comes from the first
-   * layer of the tile, which is the element the page wrote.
+   * layer of the tile, which is the element the page wrote. Once `hidden`
+   * holds the answer, the same layer sends `helix-toggle`, the request's verb
+   * without `before`, since the platform has no word for a layer shown.
    */
   private showLayers(layers: readonly MapLayer[], shown: boolean): void {
     const first = layers[0]
     if (!first) {
       return
     }
-    requestChange({
+    const applied = requestChange({
       apply: () => {
         for (const layer of layers) {
           layer.hidden = !shown
@@ -571,6 +575,9 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
       host: first,
       next: shown,
     })
+    if (applied) {
+      first.dispatchEvent(new Event('helix-toggle', { bubbles: true, composed: true }))
+    }
   }
 
   /** Asks for a map type, and sends `change` once it holds. */

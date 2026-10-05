@@ -116,11 +116,16 @@
   }
 }
 
-/* Under the cards, and the size of the whole plane. */
+/* Under the cards, and the size of the whole plane. **Under by its stacking**,
+   since each card's connections follow that card in the tree, which is the
+   order a screen reader reads them in, and a layer later in the tree paints
+   over what came before it. The board is a stacking context, being
+   transformed, so below zero is still above the board. */
 [part="edges"] {
   inset: 0;
   overflow: visible;
   position: absolute;
+  z-index: var(--helix-layer-beneath);
 }
 
 [part="edge"] {

@@ -186,6 +186,24 @@ describe('map layers menu', () => {
     expect(route?.hidden).toBe(false)
   })
 
+  test('a tile says so from the layer once the layer holds the choice, and not when refused', async () => {
+    const host = await menuFrame()
+    const [route] = [...host.children] as HTMLElement[]
+    const told: Array<{ from: EventTarget | null; hidden: unknown }> = []
+    host.addEventListener('helix-toggle', (event) =>
+      told.push({ from: event.target, hidden: route?.hidden }),
+    )
+    const tile = (): HTMLButtonElement =>
+      part(host, 'layers-menu')?.querySelector('[part="layer-choice"]') as HTMLButtonElement
+    tile().click()
+    await settle(host)
+    expect(told).toEqual([{ from: route ?? null, hidden: true }])
+    host.addEventListener('helix-before-toggle', (event) => event.preventDefault())
+    tile().click()
+    await settle(host)
+    expect(told).toHaveLength(1)
+  })
+
   test('choosing a map type asks first and says so once it holds', async () => {
     const host = (await mount(
       `<helix-headless-map controls="layers" label="Ground">
