@@ -191,3 +191,48 @@ describe('clearing and stepping', () => {
     expect(host.value).toBe('5')
   })
 })
+
+describe('your own rule, and an empty field', () => {
+  type Checked = Input & {
+    validate?: (value: string) => string | string[] | true | null | undefined
+    validationMessage: string
+  }
+
+  /* React Aria's TextField takes a validate function. A custom error went
+     through feedback or setCustomValidity, written again on every change. */
+  test('validate runs on every change and its message is the verdict', async () => {
+    const host = (await mount(
+      '<helix-headless-input label="Handle" value="ada"></helix-headless-input>',
+    )) as Checked
+    host.validate = (value) => (value.length < 4 ? 'Use four characters or more.' : true)
+    await host.updateComplete
+    expect(host.validationMessage).toBe('Use four characters or more.')
+    host.value = 'lovelace'
+    await host.updateComplete
+    expect(host.validationMessage).toBe('')
+  })
+
+  test('a list of messages is said as one, and the browser speaks first', async () => {
+    const host = (await mount(
+      '<helix-headless-input label="Handle" required></helix-headless-input>',
+    )) as Checked
+    host.validate = () => ['Too short.', 'Taken.']
+    await host.updateComplete
+    expect(host.validationMessage).not.toBe('Too short. Taken.')
+    host.value = 'ada'
+    await host.updateComplete
+    expect(host.validationMessage).toBe('Too short. Taken.')
+  })
+
+  /* Web Awesome's input carries :state(blank). */
+  test('says it is blank while it holds no text', async () => {
+    const host = (await mount(
+      '<helix-headless-input label="Name"></helix-headless-input>',
+    )) as Input
+    const states = (host as unknown as { internals: ElementInternals }).internals.states
+    expect(states.has('blank')).toBe(true)
+    host.value = 'Ada'
+    await host.updateComplete
+    expect(states.has('blank')).toBe(false)
+  })
+})
