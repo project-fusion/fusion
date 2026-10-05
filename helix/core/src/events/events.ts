@@ -496,6 +496,13 @@ export type MapZoomDetail = ViewportZoomDetail
 
 /** Detail carried by `helix-navigate`. */
 export interface NavigateDetail {
+  /**
+   * The page asked for, as a number, where the component pages by number.
+   *
+   * Beside `value` rather than in place of it, because a calendar pages by
+   * month and its `value` is a month.
+   */
+  page?: number
   /** Where the view is moving to, in whatever the component pages by. */
   value: string
 }

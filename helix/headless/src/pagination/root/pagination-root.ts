@@ -107,7 +107,7 @@ const fill = (
  * @slot next-icon - The glyph on the forward-one-page control, usually a caret.
  * @slot previous-icon - The glyph on the back-one-page control, usually a caret.
  *
- * @event {HelixNavigateEvent} helix-navigate - Fired before the page changes, and cancelable. Canceling it is the only way to stop a page change. `detail.value` is the page number as a string, so read it with `Number()`.
+ * @event {HelixNavigateEvent} helix-navigate - Fired before the page changes, and cancelable. Canceling it is the only way to stop a page change. `detail.page` is the page asked for, as a number, and `detail.value` is the same page as a string.
  *
  * @csspart first - The control that jumps to the first page, under `ends`.
  * @csspart gap - The control in place of hidden pages, which jumps into them.
@@ -453,7 +453,7 @@ export class HelixHeadlessPagination extends HelixElement {
         }
         this.applyPage(page)
       },
-      event: (page) => new HelixNavigateEvent({ value: String(page) }),
+      event: (page) => new HelixNavigateEvent({ page, value: String(page) }),
       host: this,
       next,
     })
