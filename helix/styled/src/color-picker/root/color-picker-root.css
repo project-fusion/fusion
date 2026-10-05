@@ -319,6 +319,77 @@
   outline-color: var(--helix-color-danger);
 }
 
+/* The channel number fields, in `channel-fields`: equal columns under the
+   ramps, each a name over a box in the value field's look, so the two read as
+   one kind of field. */
+[part="fields"] {
+  display: grid;
+  gap: var(--color-picker-fields-gap, var(--helix-space-xs));
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  margin-block-start: var(--helix-space-sm);
+  padding-inline: var(--color-picker-padding, var(--helix-space-none));
+}
+
+/* Four fields with the opacity are two rows of two: four columns of a panel's
+   width are narrower than "Saturation" is long, and the names ran into each
+   other. */
+:host([alpha]) [part="fields"] {
+  grid-auto-flow: row;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+[part="field"] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-2xs);
+  min-inline-size: 0;
+}
+
+[part="field-label"] {
+  color: var(--color-picker-field-label-color, var(--helix-color-foreground-muted));
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-medium);
+}
+
+[part="field-input"] {
+  all: unset;
+  /* Arrows rather than spinners: the box is a few digits wide, and the keys
+     step it as the spinners would. */
+  appearance: textfield;
+  background-color: var(--helix-color-surface-sunken);
+  block-size: var(--helix-size-control);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  color: var(--helix-color-foreground);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-control);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--helix-weight-medium);
+  inline-size: 100%;
+  min-inline-size: 0;
+  padding-inline: var(--helix-space-xs);
+  transition: border-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+[part="field-input"]::-webkit-inner-spin-button,
+[part="field-input"]::-webkit-outer-spin-button {
+  appearance: none;
+  margin: 0;
+}
+
+[part="field-input"]:hover {
+  border-color: var(--helix-color-foreground-muted);
+}
+
+[part="field-input"]:focus-visible {
+  border-color: var(--helix-color-primary);
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: 0;
+}
+
 /* The tools keep their own width beside the text, and take the row when there is
    no text: `flex: 1 1 0` on each button splits whatever the row has left, which
    is everything when the value is withheld and nothing it does not need when it

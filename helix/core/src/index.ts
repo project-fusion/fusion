@@ -291,6 +291,8 @@ export {
   formatColor,
   parseColor,
   toCss,
+  toHsl,
+  toRgb,
 } from './utils/css-color/css-color.js'
 export {
   customElement,

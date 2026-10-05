@@ -312,3 +312,14 @@ describe('a color input, said by its name', () => {
     )
   })
 })
+
+describe('a color input with channel fields', () => {
+  test('hands `channel-fields` to its panel', async () => {
+    const host = await field('channel-fields value="#336699"')
+    expect((part(host, 'picker') as unknown as { channelFields: boolean }).channelFields).toBe(true)
+    const plain = await field('value="#336699"')
+    expect((part(plain, 'picker') as unknown as { channelFields: boolean }).channelFields).toBe(
+      false,
+    )
+  })
+})

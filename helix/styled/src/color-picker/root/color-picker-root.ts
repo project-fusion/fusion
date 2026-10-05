@@ -40,6 +40,8 @@ import { styles } from './color-picker-root.css.js'
  * @aliases Color, ColorArea, Swatch picker
  * @documentation https://fusion.dev/helix/components/color-picker
  *
+ * @cssproperty --color-picker-field-label-color - The color of the names above the channel number fields, in `channel-fields`.
+ * @cssproperty --color-picker-fields-gap - The space between the channel number fields, in `channel-fields`.
  * @cssproperty --color-picker-grid-radius - The corner radius of the square.
  * @cssproperty --color-picker-grid-ratio - The aspect ratio of the square.
  * @cssproperty --color-picker-padding - The inset of the rows under the square and of the picker's bottom edge.

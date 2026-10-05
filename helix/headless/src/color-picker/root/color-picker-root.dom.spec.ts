@@ -757,3 +757,55 @@ describe('the square named with the picker', () => {
     expect(part(bare, 'grid-saturation')?.getAttribute('aria-label')).toBe('Saturation')
   })
 })
+
+describe('a number field for each channel', () => {
+  const fields = (host: HTMLElement): HTMLInputElement[] => [
+    ...(host.shadowRoot?.querySelectorAll<HTMLInputElement>('[part="field-input"]') ?? []),
+  ]
+  const names = (host: HTMLElement): string[] =>
+    [...(host.shadowRoot?.querySelectorAll('[part="field-label"]') ?? [])].map(
+      (label) => label.textContent?.trim() ?? '',
+    )
+  const typeInto = async (host: Color, field: HTMLInputElement, text: string): Promise<void> => {
+    field.value = text
+    field.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+    field.dispatchEvent(new Event('change', { bubbles: true }))
+    await host.updateComplete
+  }
+
+  test('is not drawn unless asked for', async () => {
+    expect(part(await picker('value="#ff0000"'), 'fields')).toBeNull()
+  })
+
+  test('is red, green and blue for hex, named by the words a page gives', async () => {
+    const host = await picker('channel-fields value="#ff0000" green-label="Grün"')
+    expect(names(host)).toEqual(['Red', 'Grün', 'Blue'])
+    expect(fields(host).map((one) => one.value)).toEqual(['255', '0', '0'])
+    expect(fields(host).map((one) => one.max)).toEqual(['255', '255', '255'])
+  })
+
+  test('a number typed into one moves the color, in the picker’s syntax', async () => {
+    const host = await picker('channel-fields value="#ff0000"')
+    let changes = 0
+    host.addEventListener('change', () => changes++)
+    await typeInto(host, fields(host)[1] as HTMLInputElement, '128')
+    expect(host.value).toBe('#ff8000')
+    expect(changes).toBe(1)
+  })
+
+  test('is hue, saturation and lightness for hsl, with the opacity where alpha is on', async () => {
+    const host = await picker('channel-fields alpha format="hsl" value="hsla(0, 100%, 50%, 0.5)"')
+    expect(names(host)).toEqual(['Hue', 'Saturation', 'Lightness', 'Opacity'])
+    await typeInto(host, fields(host)[2] as HTMLInputElement, '25')
+    expect(host.value).toBe('hsla(0, 100%, 25%, 0.5)')
+  })
+
+  test('a number out of range is put back inside it, and an empty field moves nothing', async () => {
+    const host = await picker('channel-fields value="#ff0000"')
+    await typeInto(host, fields(host)[2] as HTMLInputElement, '999')
+    expect(host.value).toBe('#ff00ff')
+    expect(fields(host)[2]?.value).toBe('255')
+    await typeInto(host, fields(host)[0] as HTMLInputElement, '')
+    expect(host.value).toBe('#ff00ff')
+  })
+})

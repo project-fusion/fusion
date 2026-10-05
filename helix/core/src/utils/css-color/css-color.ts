@@ -93,7 +93,7 @@ const rgbToHsb = (red: number, green: number, blue: number, alpha: number): Colo
 }
 
 /** HSB to bytes, which is the road every written syntax goes down. */
-const toRgb = (color: Color): { blue: number; green: number; red: number } => {
+export const toRgb = (color: Color): { blue: number; green: number; red: number } => {
   const hue = (((color.hue % 360) + 360) % 360) / 60
   const saturation = color.saturation / 100
   const brightness = color.brightness / 100
@@ -117,7 +117,7 @@ const toRgb = (color: Color): { blue: number; green: number; red: number } => {
 }
 
 /** HSB to HSL, which is a different pair of numbers for the same color. */
-const toHsl = (color: Color): { hue: number; lightness: number; saturation: number } => {
+export const toHsl = (color: Color): { hue: number; lightness: number; saturation: number } => {
   const saturation = color.saturation / 100
   const brightness = color.brightness / 100
   const lightness = (brightness * (2 - saturation)) / 2
