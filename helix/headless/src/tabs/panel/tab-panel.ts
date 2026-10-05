@@ -1,6 +1,6 @@
-import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { customElement, focusableElements, HelixElement, hostAria } from '@fusion.dev/helix-core'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { property, state } from 'lit/decorators.js'
 
 /**
  * @summary The content shown for one tab.
@@ -12,8 +12,10 @@ import { property } from 'lit/decorators.js'
  *
  * The host is the `tabpanel` while its tab is selected, through
  * `ElementInternals`, so the tab's `aria-controls` can reach it from the tab's
- * shadow root. The box inside takes the focus, for a panel with nothing
- * focusable in it.
+ * shadow root. The box inside is a tab stop only while the panel holds nothing
+ * focusable, as the ARIA tabs pattern and React Aria's tab panel do: Tab from
+ * the tab list lands on the panel's first link or control where there is one,
+ * and on the panel itself where there is none.
  *
  * @since 0.1.0
  * @status stable
@@ -22,7 +24,7 @@ import { property } from 'lit/decorators.js'
  *
  * @slot - The panel's content.
  *
- * @csspart panel - The panel container, which takes the focus.
+ * @csspart panel - The panel container, which takes the focus while it holds nothing focusable.
  *
  * @cssstate selected - While its tab is the one selected.
  */
@@ -56,6 +58,47 @@ export class HelixHeadlessTabPanel extends HelixElement {
   value = ''
 
   /**
+   * Whether the content holds a tab stop of its own, so the panel needs none.
+   * False on a server, which serves the panel as a stop: it cannot look.
+   */
+  @state()
+  private holdsStop = false
+
+  /** Re-reads the content when it changes in a way that adds or removes a stop. */
+  private readonly watcher =
+    typeof MutationObserver === 'undefined'
+      ? undefined
+      : new MutationObserver(() => this.readStops())
+
+  private readonly readStops = (): void => {
+    this.holdsStop = this.selected && focusableElements(this).length > 0
+  }
+
+  override connectedCallback(): void {
+    super.connectedCallback()
+    this.watcher?.observe(this, {
+      attributeFilter: ['contenteditable', 'disabled', 'hidden', 'href', 'tabindex'],
+      attributes: true,
+      childList: true,
+      subtree: true,
+    })
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    this.watcher?.disconnect()
+  }
+
+  /* After the render that shows the content, since a hidden panel's content
+     has no box and so no stop. */
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    if (changed.has('selected')) {
+      this.readStops()
+    }
+  }
+
+  /**
    * Mirrors the chosen state where a stylesheet can select on it.
    *
    * **A custom state, never a reflected `selected` attribute.** The parent
@@ -80,9 +123,9 @@ export class HelixHeadlessTabPanel extends HelixElement {
     return html`<div
       part="panel"
       ?hidden=${!this.selected}
-      tabindex="0"
+      tabindex=${this.holdsStop ? nothing : '0'}
     >
-      <slot></slot>
+      <slot @slotchange=${this.readStops}></slot>
     </div>`
   }
 }

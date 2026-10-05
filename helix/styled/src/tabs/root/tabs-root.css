@@ -77,8 +77,8 @@
      measured 0.004 apart in OKLCH lightness, so the only thing separating the
      tab you are on from the tab under your pointer was a `shadow-sm`. */
   border: var(--_indicator-border, 0) solid var(--_indicator-border-color, transparent);
-  border-radius: var(--_indicator-radius, var(--helix-radii-none));
-  box-shadow: var(--_indicator-shadow, none);
+  border-radius: var(--tabs-indicator-radius, var(--_indicator-radius, var(--helix-radii-none)));
+  box-shadow: var(--tabs-indicator-shadow, var(--_indicator-shadow, none));
   inline-size: var(--indicator-inline-size, 0);
   inset-block-start: 0;
   inset-inline-start: 0;

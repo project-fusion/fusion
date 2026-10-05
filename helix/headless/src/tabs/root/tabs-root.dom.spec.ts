@@ -442,6 +442,16 @@ describe('vertical tabs', () => {
   })
 })
 
+describe('a mark of your own', () => {
+  /* React Aria's SelectionIndicator: a consumer's own element rides the
+     selected tab, reading the place and size the moving part carries. */
+  test('is slotted inside the indicator part, which carries the geometry', async () => {
+    const host = await mount(markup)
+    const slot = host.shadowRoot?.querySelector('slot[name="indicator"]')
+    expect(slot?.parentElement).toBe(part(host, 'indicator') as HTMLElement)
+  })
+})
+
 describe('each tab and the panel it shows', () => {
   /* The pattern's aria-controls, which no id could carry across two sibling
      shadow roots. The set hands each tab its panel's host. */

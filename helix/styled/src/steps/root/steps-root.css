@@ -54,7 +54,38 @@
   --_steps-trail-block-size: var(--helix-border-thin);
   counter-reset: helix-step;
   display: flex;
+  /* So a progress bar a page shows takes a line of its own. The steps share
+     the row from a zero basis, so they never wrap. */
+  flex-wrap: wrap;
   gap: var(--steps-gap, var(--helix-space-md));
+}
+
+/* How far through the sequence is: a bar, once a page gives the part a
+   `display`. Last, across the whole row or column. */
+[part="progress"] {
+  background-color: var(--steps-progress-track-color, var(--helix-color-border));
+  background-image: linear-gradient(
+    to right,
+    var(--steps-progress-color, var(--helix-color-success)) var(--steps-progress, 0%),
+    transparent 0
+  );
+  block-size: var(--steps-progress-thickness, var(--helix-border-thick));
+  border-radius: var(--helix-radii-full);
+  flex: 0 0 100%;
+  order: 1;
+}
+
+[part="progress"]:dir(rtl) {
+  background-image: linear-gradient(
+    to left,
+    var(--steps-progress-color, var(--helix-color-success)) var(--steps-progress, 0%),
+    transparent 0
+  );
+}
+
+:host([orientation="vertical"]) [part="progress"] {
+  flex: none;
+  inline-size: 100%;
 }
 
 /* A row hands each step an equal share, so the marks sit at even intervals

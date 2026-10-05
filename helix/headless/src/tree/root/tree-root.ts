@@ -54,6 +54,16 @@ const KEYS = new Set([
  * checked values, comma separated, which `values` also gives as a list, and
  * the tree says `aria-multiselectable`.
  *
+ * `selection-mode="leaf"` chooses one item at a time and only the items at the
+ * ends: a press, Enter or Space on a branch opens or closes it and chooses
+ * nothing, as Web Awesome's `leaf` mode does.
+ *
+ * Keys: Up and Down Arrow move between the items a reader can see; Right
+ * Arrow opens a shut branch and then moves into it, and Left Arrow shuts an
+ * open one and then moves to its parent, the two swapping on a right-to-left
+ * page. Home and End go to the first and the last item, Enter and Space choose
+ * or open, and the tree's one tab stop stays on the item last reached.
+ *
  * @since 0.1.0
  * @status stable
  * @category navigation
@@ -131,13 +141,13 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
   nesting?: 'heading' | 'peer' | 'subordinate'
 
   /**
-   * Whether a reader can check many items. Unset, one item is chosen at a
-   * time.
+   * Whether a reader can check many items, or choose only the items at the
+   * ends. Unset, one item is chosen at a time, branches included.
    *
    * Optional, so a tree of one choice writes no attribute onto the host.
    */
   @property({ attribute: 'selection-mode', reflect: true })
-  selectionMode?: 'multiple'
+  selectionMode?: 'leaf' | 'multiple'
 
   /**
    * The checked values, as a list, under `selection-mode="multiple"`, and the
@@ -276,7 +286,9 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
       visible.find((item) => item.focusable) ??
       this.visibleAncestor(this.items.find((item) => item.focusable))
     const stop = held ?? chosen
-    const heads = this.nesting === 'heading'
+    /* A branch under `leaf` is not chosen, which is what heading a list
+       already means to an item. */
+    const heads = this.nesting === 'heading' || this.selectionMode === 'leaf'
     const multiple = this.multiple
     const checked = new Set(this.values)
 

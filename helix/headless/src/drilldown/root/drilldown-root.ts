@@ -36,9 +36,16 @@ import { HelixHeadlessDrilldownItem } from '../item/drilldown-item.js'
  * which `Menu` shares.
  *
  * After each move the host carries `data-direction`, `forward` into a page or
- * `back` out of one, so a stylesheet can slide the new page in from the side
- * the reader is going. The styled tier does, and holds still under reduced
- * motion.
+ * `back` out of one, and records `:state(forward)` or `:state(back)`, so a
+ * stylesheet can slide the new page in from the side the reader is going. Both
+ * are written again on every move, so an animation keyed on them runs for each
+ * page, two moves the same way included. The styled tier slides the page and
+ * swaps it at once under `prefers-reduced-motion`.
+ *
+ * Keys, on a row: Up and Down Arrow move between the rows, Home and End go to
+ * the first and the last, and a typed letter moves to the next row whose name
+ * starts with it. Enter, Space, or Right Arrow opens a row's page, and Left
+ * Arrow or Escape goes back, the two arrows swapping on a right-to-left page.
  *
  * The rows of the page showing are a `menu`, named by `label` on the top page
  * and by the page's title below it. The back button and the title sit above
@@ -65,7 +72,9 @@ import { HelixHeadlessDrilldownItem } from '../item/drilldown-item.js'
  * @csspart page - The menu the rows are in.
  * @csspart title - The name of the page showing.
  *
+ * @cssstate back - The last move went back out of a page.
  * @cssstate drilled - A row's page is showing, so a frame around the drilldown can style itself for that depth.
+ * @cssstate forward - The last move went into a page.
  */
 @customElement('helix-headless-drilldown')
 export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
@@ -104,6 +113,9 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
    */
   @state()
   private direction?: 'back' | 'forward'
+
+  /** Whether a move happened since the last update, so its marks are written again. */
+  private moved = false
 
   private readonly drilldown = new DrilldownController<HelixHeadlessDrilldownItem>(this, {
     isRow: (element: Element): boolean =>
@@ -192,6 +204,7 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
       return
     }
     this.direction = 'forward'
+    this.moved = true
     this.updateComplete.then(() => this.items[0]?.focusItem())
   }
 
@@ -209,6 +222,7 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
       return false
     }
     this.direction = 'back'
+    this.moved = true
     this.updateComplete.then(() => leaving?.focusItem())
     return true
   }
@@ -326,11 +340,33 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
        by nothing and documented nowhere, so it was the mirror without even the
        consumer the exception is for. */
     this.toggleState('drilled', !this.drilldown.atRoot)
+    this.markDirection()
+  }
+
+  /**
+   * Writes which way the last move went. After a move, the marks come off and
+   * the page's style is read before they go back on, so an animation keyed on
+   * them starts again for the new page: two moves the same way would otherwise
+   * leave the same rule in force and the second page would arrive still.
+   */
+  private markDirection(): void {
+    if (this.moved) {
+      this.moved = false
+      this.removeAttribute('data-direction')
+      this.toggleState('back', false)
+      this.toggleState('forward', false)
+      const page = this.partNamed('page')
+      if (page && typeof getComputedStyle === 'function') {
+        getComputedStyle(page).animationName
+      }
+    }
     if (this.direction === undefined) {
       this.removeAttribute('data-direction')
     } else {
       this.setAttribute('data-direction', this.direction)
     }
+    this.toggleState('back', this.direction === 'back')
+    this.toggleState('forward', this.direction === 'forward')
   }
 
   /** Walks the tree marking which rows are on the page showing. */

@@ -61,6 +61,28 @@ helix-headless-accordion-item::part(content-inner) {
   padding: 0 1rem 0.75rem;
 }
 
+/* Opening grows the section from nothing to the height it publishes. */
+helix-headless-accordion-item:state(open)::part(content) {
+  animation: accordion-open 200ms ease-out;
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  helix-headless-accordion-item:state(open)::part(content) {
+    animation: none;
+  }
+}
+
+@keyframes accordion-open {
+  from {
+    block-size: 0;
+  }
+
+  to {
+    block-size: var(--accordion-content-height, auto);
+  }
+}
+
 helix-headless-accordion-item::part(trigger):focus-visible {
   outline: 2px solid var(--_gray-mark);
   outline-offset: -2px;

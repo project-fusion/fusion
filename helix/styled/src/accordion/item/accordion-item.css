@@ -8,11 +8,11 @@
      `border-box` every shadow root is given comes from a rule this one outranks. */
   box-sizing: border-box;
   align-items: center;
-  color: var(--helix-color-foreground);
+  color: var(--accordion-item-color, var(--helix-color-foreground));
   cursor: pointer;
   display: flex;
-  font-size: var(--helix-text-md);
-  font-weight: var(--helix-weight-medium);
+  font-size: var(--accordion-item-font-size, var(--helix-text-md));
+  font-weight: var(--accordion-item-font-weight, var(--helix-weight-medium));
   inline-size: 100%;
   /* No `space-between`. */
   gap: var(--helix-space-xs);
@@ -26,7 +26,7 @@
    substitution. */
 [part="chevron"] {
   block-size: 1em;
-  color: var(--helix-color-foreground-subtle);
+  color: var(--accordion-item-chevron-color, var(--helix-color-foreground-subtle));
   flex: 0 0 auto;
   inline-size: 1em;
   transform: scaleY(1);
@@ -36,7 +36,7 @@
 /* An icon slotted in its place is sized, colored and turned the same way. */
 ::slotted([slot="chevron"]) {
   block-size: 1em;
-  color: var(--helix-color-foreground-subtle);
+  color: var(--accordion-item-chevron-color, var(--helix-color-foreground-subtle));
   flex: 0 0 auto;
   inline-size: 1em;
   transition: transform var(--helix-duration-fast) var(--helix-easing-standard);
@@ -53,15 +53,19 @@
   transform: scaleY(-1);
 }
 
-/* No fill on hover. */
+/* No fill on hover, unless a page asks for one. */
+[part="trigger"]:hover:not(:disabled) {
+  background-color: var(--accordion-item-hover-background-color, transparent);
+}
+
 [part="trigger"]:hover:not(:disabled) [part="chevron"],
 [part="trigger"]:hover:not(:disabled) ::slotted([slot="chevron"]) {
-  color: var(--helix-color-foreground);
+  color: var(--accordion-item-chevron-hover-color, var(--helix-color-foreground));
 }
 
 [part="trigger"]:disabled {
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: var(--accordion-item-disabled-opacity, 0.5);
 }
 
 /* Inset, because the trigger runs to the item's edge and an outset ring would be
@@ -96,7 +100,7 @@
    is outside the clip and survives a zero track, so a closed region measured
    12px instead of 0, a shut accordion with a band of space under it. */
 [part="content-inner"] > slot {
-  color: var(--helix-color-foreground-muted);
+  color: var(--accordion-item-content-color, var(--helix-color-foreground-muted));
   display: block;
   line-height: var(--helix-leading-normal);
   padding: var(--accordion-item-padding, var(--helix-space-sm) var(--helix-space-md));

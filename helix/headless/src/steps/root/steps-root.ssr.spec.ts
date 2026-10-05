@@ -13,6 +13,13 @@ describe('steps server output', () => {
     expect(hostAttributes(served, 'helix-headless-steps')).toEqual(['label', 'linear'])
   })
 
+  /* A server cannot count the stages, so it serves the bar at the start. */
+  test('serves the progress part hidden, at nothing done', () => {
+    expect(partTag(served, 'progress')).toContain('role="progressbar"')
+    expect(partTag(served, 'progress')).toContain('aria-valuenow="0"')
+    expect(partTag(served, 'progress')).toContain('hidden')
+  })
+
   /* A server knows which stage is finished and which is current, so the words
      and the state are served on the stage's own button. */
   test('a finished stage is described in words, and the current one is marked on its button', () => {

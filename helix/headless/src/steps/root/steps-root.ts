@@ -7,7 +7,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-import { canReach } from '../reach.js'
+import { canReach, progressOf } from '../reach.js'
 import type { HelixHeadlessStep } from '../step/step.js'
 
 /**
@@ -25,9 +25,25 @@ import type { HelixHeadlessStep } from '../step/step.js'
  * `linear` keeps a reader from passing a stage they have not finished, as Ark
  * UI's linear steps do: a stage ahead is out of reach, and its button disabled,
  * until every stage before it is `complete` or `optional`. Going back is always
- * allowed. To check a stage before a reader leaves it, cancel
- * `helix-before-activate` while it is not valid. `next()` and `previous()` move
- * one stage either way, under the same rules, for your own buttons.
+ * allowed. `next()` and `previous()` move one stage either way, under the
+ * same rules, for your own buttons.
+ *
+ * To check a stage before a reader moves on from it, set `validate` to a
+ * function that answers whether the stage is valid, as Ark UI's `isStepValid`
+ * does. Moving forward asks it about the stage the reader is on, and where it
+ * answers `false` the reader stays and the stage is `:state(invalid)` until it
+ * answers `true`. An `optional` stage is not asked. `helix-before-activate`
+ * is still sent for every move, for a check of your own.
+ *
+ * `progress` is how far through the sequence is, from 0 to 100: the share of
+ * its stages that are `complete`. The `progress` part carries it as a
+ * `progressbar` and as `--steps-progress`, and is hidden until a stylesheet
+ * gives it a `display`, so a bar of your own costs nothing until you draw it.
+ * The sequence is `:state(complete)` once every stage is.
+ *
+ * The sequence is a list named by `label`, and each step a list item. The
+ * current stage's button says `aria-current="step"`, and a finished stage's
+ * button is described by its `complete-label`.
  *
  * @since 0.1.0
  * @status stable
@@ -40,6 +56,12 @@ import type { HelixHeadlessStep } from '../step/step.js'
  * @event {HelixActivateEvent} helix-activate - Fired after the current step changes, when the element already holds the new step.
  * @event {HelixBeforeActivateEvent} helix-before-activate - Fired before the active step changes. Cancelable: cancel it to keep the current step.
  * @event {HelixSelectEvent} helix-select - Fired when a step is pressed. The step dispatches it, and you can listen for it on the sequence. Cancelable: cancel it to keep the current step.
+ *
+ * @csspart progress - How far through the sequence is, as a `progressbar` carrying `--steps-progress`. Hidden until a stylesheet gives it a `display`.
+ *
+ * @cssproperty --steps-progress - How far through the sequence is, as a percentage, written on the `progress` part.
+ *
+ * @cssstate complete - Every stage is complete.
  */
 @customElement('helix-headless-steps')
 export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
@@ -74,6 +96,22 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
    */
   @property({ reflect: true })
   orientation?: 'vertical'
+
+  /**
+   * A function that answers whether a stage is valid, asked about the stage a
+   * reader is on before they move forward from it. Return `false` to keep them
+   * there. Not asked of an `optional` stage, nor for a move back.
+   */
+  @property({ attribute: false })
+  validate?: (step: HelixHeadlessStep) => boolean
+
+  /**
+   * How far through the sequence is, from 0 to 100: the share of its stages
+   * that are `complete`, rounded to a whole number.
+   */
+  get progress(): number {
+    return progressOf(this.steps)
+  }
 
   /**
    * What each step is marked with.
@@ -124,10 +162,25 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
       index += delta
     }
     const target = steps[index]
-    if (!target || !this.reachable(index)) {
+    if (!target || !this.reachable(index) || !this.valid(index)) {
       return false
     }
     return this.requestActive(target.value)
+  }
+
+  /**
+   * Whether the stage the reader is on lets them go to the stage at `index`,
+   * by `validate`. Only a move forward is asked, and an `optional` stage is
+   * never asked. The stage is marked invalid while the answer is no.
+   */
+  private valid(index: number): boolean {
+    const from = this.steps[this.at]
+    if (!from || index <= this.at || !this.validate || from.optional) {
+      return true
+    }
+    const valid = this.validate(from)
+    from.invalid = !valid
+    return valid
   }
 
   /** Whether the stage at `index` can be gone to from where the reader is. */
@@ -190,7 +243,8 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
     if (event.defaultPrevented || !this.steps.includes(event.target as HelixHeadlessStep)) {
       return
     }
-    if (!this.reachable(this.steps.indexOf(event.target as HelixHeadlessStep))) {
+    const index = this.steps.indexOf(event.target as HelixHeadlessStep)
+    if (!this.reachable(index) || !this.valid(index)) {
       return
     }
     this.requestActive((event as CustomEvent<{ value: string }>).detail.value)
@@ -207,7 +261,10 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
     /* A stage a script finishes, or one the reader arrives at, moves what a
        linear sequence can reach. Both are reflected, so their attributes say
        when they change. */
-    this.watcher = new MutationObserver(() => this.lock())
+    this.watcher = new MutationObserver(() => {
+      this.lock()
+      this.requestUpdate()
+    })
     this.watcher.observe(this, {
       attributeFilter: ['complete', 'current', 'optional'],
       attributes: true,
@@ -222,9 +279,24 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
     this.watcher = undefined
   }
 
+  /**
+   * The steps where they can be known, and none on a server or while
+   * hydrating, so the progress drawn first is the server's.
+   */
+  private get known(): HelixHeadlessStep[] {
+    return this.knownChildren.filter((one): one is HelixHeadlessStep => 'current' in one)
+  }
+
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     hostAria(this.internals, { label: this.label, role: 'list' })
+    const known = this.known
+    this.toggleState('complete', known.length > 0 && known.every((step) => step.complete))
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.finishHydration()
   }
 
   protected override updated(changed: PropertyValues): void {
@@ -238,7 +310,18 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
   }
 
   protected override render(): TemplateResult {
-    return html`<slot @slotchange=${this.handleSlotChange}></slot>`
+    const progress = progressOf(this.known)
+    return html`<slot @slotchange=${this.handleSlotChange}></slot>
+      <div
+        part="progress"
+        role="progressbar"
+        aria-label=${this.label}
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow=${progress}
+        style="--steps-progress: ${progress}%"
+        hidden
+      ></div>`
   }
 }
 

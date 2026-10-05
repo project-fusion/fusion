@@ -24,12 +24,12 @@
      element in the strip that travels, not a border that blinks off here and
      on there. The width is kept so the box is the same either way. */
   border-block-end: var(--helix-border-thick) solid transparent;
-  border-radius: var(--_tab-radius, var(--helix-radii-none));
+  border-radius: var(--tabs-tab-radius, var(--_tab-radius, var(--helix-radii-none)));
   color: var(--tabs-tab-color, var(--helix-color-foreground-subtle));
   cursor: pointer;
   font: inherit;
-  font-size: var(--helix-text-sm);
-  font-weight: var(--helix-weight-medium);
+  font-size: var(--tabs-tab-font-size, var(--helix-text-sm));
+  font-weight: var(--tabs-tab-font-weight, var(--helix-weight-medium));
   display: inline-flex;
   /* A tab set in a column makes each tab as wide as the column, its words at
      the start. */
@@ -54,21 +54,28 @@
  * five percent wash the nav bar uses, so a row of tabs and a row of navigation
  * behave alike.
  */
-[part="tab"]:hover:not(:disabled) {
-  background-color: color-mix(in oklab, var(--helix-color-foreground) 5%, transparent);
-  color: var(--helix-color-foreground);
+[part="tab"]:hover:not(:disabled, [aria-disabled="true"]) {
+  background-color: var(
+    --tabs-tab-hover-background-color,
+    color-mix(in oklab, var(--helix-color-foreground) 5%, transparent)
+  );
+  color: var(--tabs-tab-hover-color, var(--helix-color-foreground));
 }
 
 :host(:state(selected)) [part="tab"],
 :host(:state(selected)) [part="tab"]:hover {
-  background-color: var(--_tab-selected-surface, transparent);
+  background-color: var(
+    --tabs-tab-selected-background-color,
+    var(--_tab-selected-surface, transparent)
+  );
   box-shadow: var(--_tab-selected-shadow, none);
   color: var(--tabs-tab-selected-color, var(--helix-color-foreground));
 }
 
-[part="tab"]:disabled {
+[part="tab"]:disabled,
+[part="tab"][aria-disabled="true"] {
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: var(--tabs-tab-disabled-opacity, 0.5);
 }
 
 /* Inset, because the tab sits against the list's own rule and an outset ring

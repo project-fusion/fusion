@@ -113,6 +113,45 @@ describe('drilldown', () => {
     expect(showing(host)).toEqual(['appearance', 'about'])
   })
 
+  test('records the way it went as a state, and writes it again for every move', async () => {
+    /* Two moves the same way left the same rule in force, so the second page
+       arrived still. The mark comes off and goes back on for each move. */
+    const host = (await mount(
+      `<helix-headless-drilldown label="Settings">
+        <helix-headless-drilldown-item value="a">A
+          <helix-headless-drilldown-item slot="page" value="b">B
+            <helix-headless-drilldown-item slot="page" value="c">C</helix-headless-drilldown-item>
+          </helix-headless-drilldown-item>
+        </helix-headless-drilldown-item>
+      </helix-headless-drilldown>`,
+    )) as Stack
+    await press(host, host.querySelector('[value="a"]') as Element)
+    expect(hasState(host, 'forward')).toBe(true)
+    expect(hasState(host, 'back')).toBe(false)
+    /* What the attribute held before each write: absent once, on the way. */
+    const before: (string | null)[] = []
+    const watcher = new MutationObserver((records) => {
+      for (const record of records) {
+        before.push(record.oldValue)
+      }
+    })
+    watcher.observe(host, {
+      attributeFilter: ['data-direction'],
+      attributeOldValue: true,
+      attributes: true,
+    })
+    await new Promise((resolve) => setTimeout(resolve))
+    await press(host, host.querySelector('[value="b"]') as Element)
+    await new Promise((resolve) => setTimeout(resolve))
+    watcher.disconnect()
+    expect(before).toContain(null)
+    expect(host.getAttribute('data-direction')).toBe('forward')
+    host.back()
+    await host.updateComplete
+    expect(hasState(host, 'back')).toBe(true)
+    expect(hasState(host, 'forward')).toBe(false)
+  })
+
   test('back at the top does nothing and says so', async () => {
     const host = await stack()
     expect(host.back()).toBe(false)

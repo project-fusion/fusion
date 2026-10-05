@@ -48,12 +48,15 @@ const navigable = (item: HelixHeadlessAccordionItem): NavigableItem => ({
  * matched with `instanceof HelixHeadlessAccordionItem`, so the headless tier
  * does not depend on the styled tier's tag names.
  *
- * The keyboard listener belongs to the controller and is attached on connect,
- * so it does not run on the server.
+ * Keys, on a trigger: Up and Down Arrow move to the previous and the next
+ * trigger, and so do Left and Right, wrapping at the ends; Home and End go to
+ * the first and the last. Enter and Space open and close the section. Disabled
+ * sections are passed over.
  *
- * Each trigger sits inside a heading, level 3 unless `heading-level` says
- * otherwise, so the sections are in a screen reader's list of headings. Set the
- * level that fits the page's outline.
+ * Each trigger is a button with `aria-expanded` and `aria-controls`, inside a
+ * heading, level 3 unless `heading-level` says otherwise, so the sections are
+ * in a screen reader's list of headings. An open section is a region named by
+ * its trigger. Set the level that fits the page's outline.
  *
  * @since 0.1.0
  * @status stable
