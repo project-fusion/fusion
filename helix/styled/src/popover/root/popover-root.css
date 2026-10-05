@@ -15,6 +15,9 @@
      border rather than none at all. */
   border: var(--popover-border-width, var(--helix-border-floating)) solid
     var(--popover-border-color, var(--helix-color-border));
+  /* The same edge, for the point to draw on its two outer sides. */
+  --_popover-edge: var(--popover-border-width, var(--helix-border-floating)) solid
+    var(--popover-border-color, var(--helix-color-border));
   /* The house radius, so a menu and the dialog it opens from draw the same
      corner. */
   border-radius: var(--helix-radii-sm);
@@ -140,31 +143,23 @@
 }
 
 [part="popover"][data-placement^="bottom"] [part~="arrow"] {
-  border-left: var(--popover-border-width, var(--helix-border-floating)) solid
-    var(--popover-border-color, var(--helix-color-border));
-  border-top: var(--popover-border-width, var(--helix-border-floating)) solid
-    var(--popover-border-color, var(--helix-color-border));
+  border-left: var(--_popover-edge);
+  border-top: var(--_popover-edge);
 }
 
 [part="popover"][data-placement^="top"] [part~="arrow"] {
-  border-bottom: var(--popover-border-width, var(--helix-border-floating)) solid
-    var(--popover-border-color, var(--helix-color-border));
-  border-right: var(--popover-border-width, var(--helix-border-floating)) solid
-    var(--popover-border-color, var(--helix-color-border));
+  border-bottom: var(--_popover-edge);
+  border-right: var(--_popover-edge);
 }
 
 [part="popover"][data-placement^="right"] [part~="arrow"] {
-  border-bottom: var(--popover-border-width, var(--helix-border-floating)) solid
-    var(--popover-border-color, var(--helix-color-border));
-  border-left: var(--popover-border-width, var(--helix-border-floating)) solid
-    var(--popover-border-color, var(--helix-color-border));
+  border-bottom: var(--_popover-edge);
+  border-left: var(--_popover-edge);
 }
 
 [part="popover"][data-placement^="left"] [part~="arrow"] {
-  border-right: var(--popover-border-width, var(--helix-border-floating)) solid
-    var(--popover-border-color, var(--helix-color-border));
-  border-top: var(--popover-border-width, var(--helix-border-floating)) solid
-    var(--popover-border-color, var(--helix-color-border));
+  border-right: var(--_popover-edge);
+  border-top: var(--_popover-edge);
 }
 
 /* Not printed, being an overlay. */
