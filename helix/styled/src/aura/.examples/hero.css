@@ -1,0 +1,21 @@
+/* Aura fills the box it is given, the way an image does, so an example has to
+   give it one. */
+.stage {
+  block-size: 20rem;
+}
+
+/* The glow and the haze from the accent rather than the primary color. The
+   ground and the peak keep the theme's. */
+.hero {
+  --aura-glow: var(--helix-color-accent);
+  --aura-haze: var(--helix-color-accent-subtle);
+}
+
+/* The content box covers the field, so placing the content is placing it in
+   the aura. */
+.hero::part(content) {
+  align-content: center;
+  display: grid;
+  gap: var(--helix-space-md);
+  justify-items: center;
+}

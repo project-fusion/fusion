@@ -14,8 +14,7 @@ describe('orb server output', () => {
   test('the host carries nothing the consumer did not write', () => {
     /* `size` is the only reflected property and it takes no default, so an
        unconfigured orb writes no attribute and hydration reconciles nothing.
-       `state` is not reflected: no rule selects on it, because the state is
-       drawn rather than styled. */
+       `state` is not reflected: it reaches a stylesheet as a custom state. */
     expect(hostAttributes(ssr(html`<helix-orb></helix-orb>`), 'helix-orb')).toEqual([])
   })
 
@@ -29,7 +28,7 @@ describe('orb server output', () => {
     /* Set as a property rather than an attribute, which is the case reflection
        would betray: a reflected `state` appears in server markup a React
        consumer never wrote, and hydration then reconciles an attribute against
-       nothing. Asked this way because an attribute the consumer wrote is
+       nothing. The state reaches a stylesheet as a custom state instead. Asked this way because an attribute the consumer wrote is
        indistinguishable from one reflection wrote, once it is in the output. */
     expect(
       hostAttributes(ssr(html`<helix-orb .state=${'working'}></helix-orb>`), 'helix-orb'),
