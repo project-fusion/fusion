@@ -13,9 +13,11 @@ describe('stat server output', () => {
       ssr(html`<helix-headless-stat></helix-headless-stat>`),
       'helix-headless-stat',
     )
-    expect(markup).toContain('<slot name="label"></slot>')
+    /* The label's slot carries a listener, which the server leaves out. */
+    expect(markup).toMatch(/<slot name="label"\s*><\/slot>/)
     expect(markup).toContain('<slot part="value"></slot>')
     expect(markup).toContain('<slot name="unit"></slot>')
+    expect(markup).toContain('<slot name="trend"></slot>')
   })
 
   test('the host carries nothing the consumer did not write', () => {
