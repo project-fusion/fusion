@@ -11,6 +11,7 @@ import {
   useState,
 } from 'react'
 import {
+  BRAND_FLAG,
   clearSiteThemeFrom,
   clearSiteThemeFromRoot,
   OWNED,
@@ -192,9 +193,15 @@ const applyScope = (
 const paintRoot = (
   theme: { seeds: Record<string, string>; tokens: readonly { hex: string; name: string }[] },
   scheme: 'dark' | 'light',
+  brand: string,
 ): void => {
   const root = document.documentElement
   root.dataset.helixTheme = ''
+  if (brand) {
+    root.dataset[BRAND_FLAG] = ''
+  } else {
+    delete root.dataset[BRAND_FLAG]
+  }
   for (const token of theme.tokens) {
     root.style.setProperty(`${OWNED}${token.name}`, token.hex)
   }
@@ -338,7 +345,7 @@ export const ThemeScope = ({ children }: { children: ReactNode }) => {
        ships. */
     if (touched) {
       applyScope(node, report.theme, scheme)
-      paintRoot(report.theme, scheme)
+      paintRoot(report.theme, scheme, brand)
       /* **Stored at the same moment it is painted, and storing the same
          thing.** The alternative was to save on a control's change handler,
          which would have written the settings a frame before the engine turned

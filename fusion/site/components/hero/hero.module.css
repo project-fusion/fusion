@@ -209,11 +209,12 @@
 /*
  *  The half of the heading the brand paints.
  *
- * **In the brand's quiet tone, which ink has too.** With no brand set, `primary`
- * is the ink itself, and beside a heading already in the foreground it was the
- * same color: near-white on white in dark mode, and near-black on black in
- * light. `primary-muted` is a quieter tone of the brand where there is one, and
- * the muted gray where there is none, so the two halves stay two tones.
+ * **In the muted gray with no brand, and in the brand with one.** With no brand
+ * set, `primary` is the ink itself, and beside a heading already in the
+ * foreground it was the same color: near-white on white in dark mode, and
+ * near-black on black in light. So ink takes `primary-muted`. A brand is a
+ * second tone on its own, and muted it read as washed out, so a brand takes
+ * `primary`, under `data-site-brand` on the root.
  */
 .tDisplayAccent {
   color: var(--helix-color-primary-muted);
@@ -224,6 +225,10 @@
      phrase that starts with the last word of the line above it is not a phrase
      any more. Block, so the accent always begins a line, at every width. */
   display: block;
+}
+
+:global([data-site-brand]) .tDisplayAccent {
+  color: var(--helix-color-primary);
 }
 
 .tDisplay {

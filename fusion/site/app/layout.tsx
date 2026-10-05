@@ -8,7 +8,7 @@ import type { ReactNode } from 'react'
 import { COLOR_MODE_KEY } from '@/utils/color-mode/color-mode'
 import { siteUrl } from '@/utils/metadata/metadata'
 import { SITE } from '@/utils/site/site'
-import { OWNED, SITE_THEME_KEY, THEME_VERSION } from '@/utils/site-theme/site-theme'
+import { BRAND_FLAG, OWNED, SITE_THEME_KEY, THEME_VERSION } from '@/utils/site-theme/site-theme'
 
 /** The faces `fonts.css` declares, in the order the page asks for them. */
 const FACES = [
@@ -107,7 +107,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
          * on the page changing one frame in.
          */}
         <Script id="site-appearance" strategy="beforeInteractive">
-          {`try{var d=document.documentElement;var m=localStorage.getItem(${JSON.stringify(COLOR_MODE_KEY)});if(m==='light'||m==='dark')d.dataset.colorMode=m;var t=JSON.parse(localStorage.getItem(${JSON.stringify(SITE_THEME_KEY)})||'null');if(t&&t.version===${THEME_VERSION}&&t.tokens){var s=d.style,i;for(i=0;i<t.tokens.length;i++)s.setProperty(${JSON.stringify(OWNED)}+t.tokens[i].name,t.tokens[i].hex);for(i in t.seeds)s.setProperty(${JSON.stringify(OWNED)}+i,t.seeds[i]);d.dataset.helixTheme=''}}catch(e){}`}
+          {`try{var d=document.documentElement;var m=localStorage.getItem(${JSON.stringify(COLOR_MODE_KEY)});if(m==='light'||m==='dark')d.dataset.colorMode=m;var t=JSON.parse(localStorage.getItem(${JSON.stringify(SITE_THEME_KEY)})||'null');if(t&&t.version===${THEME_VERSION}&&t.tokens){var s=d.style,i;for(i=0;i<t.tokens.length;i++)s.setProperty(${JSON.stringify(OWNED)}+t.tokens[i].name,t.tokens[i].hex);for(i in t.seeds)s.setProperty(${JSON.stringify(OWNED)}+i,t.seeds[i]);d.dataset.helixTheme='';if(t.settings&&t.settings.brand)d.dataset[${JSON.stringify(BRAND_FLAG)}]=''}}catch(e){}`}
         </Script>
       </head>
       <body>{children}</body>
