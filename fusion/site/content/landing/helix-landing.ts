@@ -158,13 +158,11 @@ export const MECHANISMS: readonly Capability[] = [
 export const DELIVERY = {
   lede: 'Every service runs two days a week, alongside your team.',
   /**
-   * **Named, because `it` had nothing to point at.** The band above this one is
-   * about the engineers and the one above that about the essays, so a reader
-   * arriving at "get it into your product" has to guess which noun three
-   * sections back is being referred to. The page says `Helix` in the heading
-   * that needs it.
+   * **How long the services run, from the shortest to the longest.** The
+   * eyebrow names them, so the heading says the one thing a reader weighs
+   * first: one to two weeks for the audit, and six to eight for the build.
    */
-  title: 'Three ways to get Helix into your product',
+  title: 'From a one-week audit to an eight-week build',
 } as const
 
 /**
@@ -199,6 +197,5 @@ export const ENGAGEMENT: readonly CopyItem[] = [
 
 /** The frame above those four cards. */
 export const ENGAGEMENT_COPY = {
-  lede: 'We built Helix, and we build with it in your codebase.',
-  title: 'What working with us is like',
+  title: 'We built Helix, and we build with it in your codebase',
 } as const

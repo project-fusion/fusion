@@ -10,17 +10,15 @@ export const ProofBand = () => (
   <Band>
     <helix-flex class={band.bandSection} direction="column" gap="sm">
       <Eyebrow>Package size</Eyebrow>
-      {/* **Not "fast" and not "small".** Both are adjectives a reader has been
-          promised by every library they have ever evaluated, and neither is
-          checkable. The kicker above carries the epistemics, so this heading
-          names the subject rather than restating where the numbers came
-          from. */}
+      {/* **Where the numbers come from, under the subject.** "Fast" and
+          "small" are adjectives every library promises, and neither can be
+          checked. The eyebrow names the subject, so the heading says how each
+          number below is measured. */}
       <helix-text as="h2" data-measure data-section-title>
-        How much Helix adds to a page
+        Measured from the built packages on every release
       </helix-text>
       <helix-text as="p" data-measure emphasis="muted">
-        Measured from the built packages on every release, compressed with Brotli as a CDN serves
-        them.
+        Compressed with Brotli, as a CDN serves them.
       </helix-text>
     </helix-flex>
 
