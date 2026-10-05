@@ -13,7 +13,7 @@
 //! page's own color. That is why each role has a label of its own: one name
 //! could not be dark on the ink fill and light on the danger fill beside it.
 
-use crate::derive::emphasis::emphasis;
+use crate::derive::emphasis::{chosen, emphasis};
 use crate::derive::solve::solve_against;
 use crate::derive::status::StatusColor;
 use crate::derive::{Cast, Deriving};
@@ -53,7 +53,11 @@ pub fn status_fills(statuses: &[StatusColor], ctx: &Deriving) -> Vec<(&'static s
     statuses
         .iter()
         .map(|status| {
-            let steps = emphasis(status.color, ctx);
+            let steps = if status.pinned {
+                chosen(status.color, ctx)
+            } else {
+                emphasis(status.color, ctx)
+            };
             (
                 status.name,
                 Fill {

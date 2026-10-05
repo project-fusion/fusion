@@ -176,8 +176,10 @@ Equal numeric steps in sRGB do not look like equal steps. That makes scales and
 contrast math in sRGB unreliable. Helix computes themes in OKLCH for this
 reason. Colors are written in OKLCH and converted to other formats on output.
 
-The engine keeps your brand color's hue and chroma and changes only its
-lightness to meet the target. Your brand color stays recognizable, and its
+The engine keeps your brand color's hue and chroma. Where the color already
+meets the contrast target, the engine uses it as it is: a navy brand stays navy
+on a light page. Where it does not, the engine changes only its lightness, by as
+little as the target needs. Your brand color stays recognizable, and its
 contrast is guaranteed.
 
 ## Errors the engine prevents

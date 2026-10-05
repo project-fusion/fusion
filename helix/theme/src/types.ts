@@ -108,15 +108,25 @@ export interface ThemeIntent {
     light?: Color
   }
   /**
-   * The one color most consumers care about.
+   * The one color most consumers care about, or one for each scheme.
    *
    * **Unnamed, the theme is ink**: the primary is the neutral's own near-black
    * on a light page and near-white on a dark one, and a filled control is drawn
    * in it with the page's color for its label. An accent related to the brand
    * is refused without one, and an accent named as a color is the one second
    * color an ink theme has.
+   *
+   * **A brand that already reads is kept as it is.** Where the color clears
+   * every ground it lands on, it is the primary, and where its label clears on
+   * it, it is the fill. A navy brand stays navy on a light page. A color that
+   * does not read is moved only as far as the contrast target needs.
+   *
+   * **`{ light, dark }` names the color each scheme takes**, the way
+   * `background` does, for a brand whose two faces are two colors: a navy that
+   * turns sky blue in the dark. A scheme the pair leaves out has no brand, and
+   * is ink.
    */
-  brand?: Color
+  brand?: Color | { dark?: Color; light?: Color }
   /**
    * How saturated the palette is, independent of which hue it is.
    *

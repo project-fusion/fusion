@@ -69,7 +69,9 @@ pub fn derive_theme(intent: &ThemeIntent) -> Result<Theme, IntentError> {
 mod tests {
     use super::derive_theme;
     use crate::derive::resolve::IntentError;
-    use crate::intent::{Background, Color, From, Neutral, Relation, Scheme, Seed, ThemeIntent};
+    use crate::intent::{
+        Background, Brand, BrandPair, Color, From, Neutral, Relation, Scheme, Seed, ThemeIntent,
+    };
 
     fn hex(value: &str) -> Color {
         Color::Hex(value.to_owned())
@@ -244,5 +246,89 @@ mod tests {
         })
         .expect("derives");
         assert_eq!(token(&theme, "color-background").hex, "#ffffff");
+    }
+
+    /// A navy for light and a sky blue for dark, each a color that reads where
+    /// it is given.
+    fn two_brands() -> Brand {
+        Brand::Each(BrandPair {
+            dark: Some(hex("#7dd3fc")),
+            light: Some(hex("#1e3a8a")),
+        })
+    }
+
+    #[test]
+    fn a_brand_that_reads_is_kept_as_its_ink_and_its_fill() {
+        let theme = derive_theme(&ThemeIntent::new(hex("#1e3a8a"))).expect("navy derives");
+        assert_eq!(token(&theme, "color-primary").hex, "#1e3a8a");
+        assert_eq!(token(&theme, "color-primary-surface").hex, "#1e3a8a");
+        assert!(theme.violations.is_empty(), "{:?}", theme.violations);
+    }
+
+    #[test]
+    fn a_brand_that_does_not_read_is_still_solved() {
+        /* Fusion's blue is 3.68 to 1 on white, under the 4.5 the ink needs, so
+        the ink and the fill are both solved darker. */
+        let theme = derive_theme(&ThemeIntent::new(hex("#3b82f6"))).expect("blue derives");
+        assert_ne!(token(&theme, "color-primary").hex, "#3b82f6");
+        assert_ne!(token(&theme, "color-primary-surface").hex, "#3b82f6");
+        assert!(theme.violations.is_empty(), "{:?}", theme.violations);
+    }
+
+    #[test]
+    fn a_brand_for_each_scheme_is_the_brand_each_scheme_takes() {
+        let light = derive_theme(&ThemeIntent {
+            brand: Some(two_brands()),
+            ..ThemeIntent::ink()
+        })
+        .expect("the light half derives");
+        let dark = derive_theme(&ThemeIntent {
+            brand: Some(two_brands()),
+            scheme: Some(Scheme::Dark),
+            ..ThemeIntent::ink()
+        })
+        .expect("the dark half derives");
+        assert_eq!(token(&light, "color-primary").hex, "#1e3a8a");
+        assert_eq!(token(&dark, "color-primary").hex, "#7dd3fc");
+        assert!(light.violations.is_empty(), "{:?}", light.violations);
+        assert!(dark.violations.is_empty(), "{:?}", dark.violations);
+    }
+
+    #[test]
+    fn a_scheme_the_pair_leaves_out_is_ink() {
+        let dark = derive_theme(&ThemeIntent {
+            brand: Some(Brand::Each(BrandPair {
+                dark: None,
+                light: Some(hex("#1e3a8a")),
+            })),
+            scheme: Some(Scheme::Dark),
+            ..ThemeIntent::ink()
+        })
+        .expect("derives");
+        let ink = derive_theme(&ThemeIntent {
+            scheme: Some(Scheme::Dark),
+            ..ThemeIntent::ink()
+        })
+        .expect("ink derives");
+        assert_eq!(
+            token(&dark, "color-primary").hex,
+            token(&ink, "color-primary").hex
+        );
+        assert!(!dark.seeds.iter().any(|(name, _)| name == "seed-brand"));
+    }
+
+    #[test]
+    fn an_unreadable_half_of_a_pair_is_refused_by_its_own_name() {
+        let refused = derive_theme(&ThemeIntent {
+            brand: Some(Brand::Each(BrandPair {
+                dark: Some(hex("not-a-color")),
+                light: Some(hex("#1e3a8a")),
+            })),
+            ..ThemeIntent::ink()
+        });
+        let Err(IntentError::Unreadable { label, .. }) = refused else {
+            panic!("an unreadable dark brand is refused on a light derive, got {refused:?}")
+        };
+        assert_eq!(label, "brand.dark");
     }
 }

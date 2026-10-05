@@ -79,9 +79,10 @@ OKLCH lets the theme engine *solve* for a palette from your brand color. See
 
 ## How the engine meets contrast targets
 
-The engine measures each ink against the ground it will be painted on. It then
-searches for the lightness that meets the target. Every pair it produces meets
-the target.
+The engine measures each ink against the ground it will be painted on. A brand
+color that already meets the target there is used as it is. For any other color,
+the engine searches for the lightness that meets the target. Every pair it
+produces meets the target.
 
 The engine can solve only the pairs it knows about, so we check two things:
 

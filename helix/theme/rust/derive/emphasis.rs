@@ -64,9 +64,40 @@ fn tint(base: Cast, ctx: &Deriving) -> (Oklch, Vec<Oklch>) {
 /// Solves a role from its base color.
 #[must_use]
 pub fn emphasis(base: Oklch, ctx: &Deriving) -> Emphasis {
+    role(base, ctx, false)
+}
+
+/// A role from a color the consumer chose: the brand, or an accent or a status
+/// named as a color.
+///
+/// **The color itself wherever it already reads.** A solved color moves only as
+/// far as the contrast target needs, so a navy brand, which clears every ground
+/// on a light page, came back lightened to the target: a mid blue. A chosen
+/// color that already reads is kept as it is, as the ink where it clears every
+/// ground and as the fill where its label clears on it, which is what the
+/// stylesheet does with a seed. One that does not read is solved as before.
+///
+/// **Only a chosen color.** A derived status's lightness is this engine's
+/// starting point, and the solve is what places it.
+#[must_use]
+pub fn chosen(base: Oklch, ctx: &Deriving) -> Emphasis {
+    role(base, ctx, true)
+}
+
+/// A role, kept where it reads when `keep` is set, and solved otherwise.
+fn role(base: Oklch, ctx: &Deriving, keep: bool) -> Emphasis {
     let dark = ctx.scheme == Scheme::Dark;
     let (subtle, grounds) = tint(Cast::of(base), ctx);
-    let raw = solve_against(&grounds, Cast::of(base), ctx.contrast_target);
+    let own = fit_to_gamut(base, GAMUT_STEPS);
+    let reads = keep
+        && grounds
+            .iter()
+            .all(|ground| shipped_contrast_ratio(own, *ground) >= ctx.contrast_target);
+    let raw = if reads {
+        base
+    } else {
+        solve_against(&grounds, Cast::of(base), ctx.contrast_target)
+    };
 
     /* Hover and active step *away* from the page, which is lighter in a dark
     theme and darker in a light one. The fill below is the one that does not
@@ -91,21 +122,26 @@ pub fn emphasis(base: Oklch, ctx: &Deriving) -> Emphasis {
     sits on. That would also be why it does not follow the scheme, where
     everything else here does. Asserted either way, `color-primary-surface`
     failing on the hex when the 0.98 is moved. */
-    let filled = lightness_for_contrast(
-        base.chroma,
-        base.hue,
-        fit_to_gamut(
-            Oklch {
-                chroma: 0.0,
-                hue: 0.0,
-                lightness: 0.98,
-            },
-            GAMUT_STEPS,
-        ),
-        ctx.contrast_target,
-        Some(true),
-        CONTRAST_STEPS,
+    let label = fit_to_gamut(
+        Oklch {
+            chroma: 0.0,
+            hue: 0.0,
+            lightness: 0.98,
+        },
+        GAMUT_STEPS,
     );
+    let filled = if keep && shipped_contrast_ratio(label, own) >= ctx.contrast_target {
+        base
+    } else {
+        lightness_for_contrast(
+            base.chroma,
+            base.hue,
+            label,
+            ctx.contrast_target,
+            Some(true),
+            CONTRAST_STEPS,
+        )
+    };
 
     Emphasis {
         active: step(0.1),
