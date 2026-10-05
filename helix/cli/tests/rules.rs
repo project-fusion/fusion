@@ -1369,6 +1369,40 @@ fn hooks_in_a_shallower_tier() {
     );
 }
 
+/// A hook the token layer reads, on a component's slotted content, is that
+/// component's to publish: the layer ships with the components, and a page rule
+/// is the only one that reaches a slotted link.
+#[test]
+fn hooks_read_by_the_layer() {
+    plant_in(
+        "hooks-layer",
+        "hooks",
+        &[
+            (
+                "helix.json",
+                r#"{ "tiers": ["pkg/styled/src"], "layer": ["pkg/styles/src/base.css"] }"#,
+            ),
+            (
+                "pkg/styled/src/navigation/navigation.ts",
+                "/**\n * @cssproperty --navigation-item-color - The links' color.\n */\nexport class Navigation extends HTMLElement {}\n",
+            ),
+            (
+                "pkg/styled/src/navigation/navigation.css",
+                ":host {\n  display: flex;\n}\n",
+            ),
+            (
+                "pkg/styles/src/base.css",
+                "helix-navigation a {\n  color: var(--navigation-item-color, gray);\n}\n",
+            ),
+        ],
+        |tree| {
+            tree.write("pkg/styles/src/base.css", "helix-navigation a {\n  color: gray;\n}\n");
+        },
+        "documents `--navigation-item-color`, which nothing in pkg/styled reads or writes",
+        "pkg/styled/src/navigation/navigation.ts",
+    );
+}
+
 /// The analyzer reads the block the element is declared on, so the decorator
 /// under it is where a documented hook stops being collected.
 #[test]
