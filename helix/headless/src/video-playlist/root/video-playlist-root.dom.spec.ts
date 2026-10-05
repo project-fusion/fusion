@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
@@ -206,5 +206,172 @@ describe('choosing an entry', () => {
     await one.updateComplete
     await Promise.resolve()
     expect(seen).toEqual(['/two.mp4'])
+  })
+})
+
+/* The list stopped at its last entry, said nothing when it did, and had no
+ * way to go round or to play in another order. */
+describe('the end of the list', () => {
+  const ended = async (host: Playlist): Promise<void> => {
+    player(host).dispatchEvent(new Event('ended'))
+    await host.updateComplete
+  }
+
+  test('sends `helix-end` when the last entry ends, and stays on it', async () => {
+    const host = await list()
+    await host.updateComplete
+    const heard: Event[] = []
+    host.addEventListener('helix-end', (event) => heard.push(event))
+    await ended(host)
+    expect(host.active).toBe('two')
+    expect(heard).toHaveLength(0)
+
+    // Three is disabled, so two is the last entry that can play.
+    await ended(host)
+    expect(host.active).toBe('two')
+    expect(heard).toHaveLength(1)
+    expect(heard[0]?.bubbles).toBe(true)
+    expect(heard[0]?.composed).toBe(true)
+  })
+
+  test('`repeat="one"` plays the same entry again, and sends nothing', async () => {
+    const host = await list(' repeat="one"')
+    await host.updateComplete
+    const plays = watchPlays(player(host))
+    let ends = 0
+    host.addEventListener('helix-end', () => {
+      ends += 1
+    })
+    await ended(host)
+    expect(host.active).toBe('one')
+    expect(plays()).toBe(1)
+    expect(ends).toBe(0)
+  })
+
+  test('and next still moves, being a reader asking for another entry', async () => {
+    const host = await list(' repeat="one"')
+    await host.updateComplete
+    player(host).dispatchEvent(new CustomEvent('helix-next', { bubbles: true, composed: true }))
+    await host.updateComplete
+    expect(host.active).toBe('two')
+  })
+
+  test('`repeat="all"` goes from the last entry to the first, and plays it', async () => {
+    const host = await list(' repeat="all"')
+    await host.updateComplete
+    host.requestActive('two')
+    await host.updateComplete
+    const plays = watchPlays(player(host))
+    let ends = 0
+    host.addEventListener('helix-end', () => {
+      ends += 1
+    })
+    await ended(host)
+    await player(host).updateComplete
+    await Promise.resolve()
+    expect(host.active).toBe('one')
+    expect(plays()).toBe(1)
+    expect(ends).toBe(0)
+  })
+
+  test('and previous on the first entry goes round to the last', async () => {
+    const host = await list(' repeat="all"')
+    await host.updateComplete
+    player(host).dispatchEvent(new CustomEvent('helix-previous', { bubbles: true, composed: true }))
+    await host.updateComplete
+    expect(host.active).toBe('two')
+  })
+
+  test('a move refused by the consumer plays nothing later', async () => {
+    const host = await list()
+    await host.updateComplete
+    const plays = watchPlays(player(host))
+    const refuse = (event: Event): void => event.preventDefault()
+    host.addEventListener('helix-before-activate', refuse)
+    await ended(host)
+    expect(host.active).toBe('one')
+    host.removeEventListener('helix-before-activate', refuse)
+    /* A consumer setting `active` is not a reader asking for playback. */
+    host.active = 'two'
+    await host.updateComplete
+    await player(host).updateComplete
+    await Promise.resolve()
+    expect(plays()).toBe(0)
+  })
+})
+
+describe('shuffle', () => {
+  const many = async (): Promise<Playlist> =>
+    (await mount(`<helix-headless-video-playlist default-active="a" label="Episodes" shuffle>
+      <helix-headless-video label="Player" slot="player"></helix-headless-video>
+      ${['a', 'b', 'c', 'd', 'e']
+        .map(
+          (one) =>
+            `<helix-headless-video-playlist-item src="/${one}.mp4" value="${one}">${one}</helix-headless-video-playlist-item>`,
+        )
+        .join('')}
+    </helix-headless-video-playlist>`)) as Playlist
+
+  /* The order is drawn from `Math.random`, which is put back after each test. */
+  const random = Math.random
+  afterEach(() => {
+    Math.random = random
+  })
+
+  test('plays every entry once, starting from the current one, then ends', async () => {
+    Math.random = () => 0
+    const host = await many()
+    await host.updateComplete
+    let ends = 0
+    host.addEventListener('helix-end', () => {
+      ends += 1
+    })
+    const played = [host.active]
+    for (let turn = 0; turn < 4; turn += 1) {
+      player(host).dispatchEvent(new Event('ended'))
+      await host.updateComplete
+      played.push(host.active)
+    }
+    expect([...played].sort()).toEqual(['a', 'b', 'c', 'd', 'e'])
+    /* A zero every time is not the written order, which is how a shuffle that
+       did nothing would show itself. */
+    expect(played).not.toEqual(['a', 'b', 'c', 'd', 'e'])
+    expect(ends).toBe(0)
+    player(host).dispatchEvent(new Event('ended'))
+    await host.updateComplete
+    expect(ends).toBe(1)
+  })
+
+  test('and previous goes back the way next came', async () => {
+    const host = (await many()) as Playlist & { next(): void; previous(): void }
+    await host.updateComplete
+    host.next()
+    await host.updateComplete
+    const second = host.active
+    host.next()
+    await host.updateComplete
+    host.previous()
+    await host.updateComplete
+    expect(host.active).toBe(second)
+    host.previous()
+    await host.updateComplete
+    expect(host.active).toBe('a')
+  })
+})
+
+describe('next() and previous()', () => {
+  test('move as the player`s controls do, and play', async () => {
+    const host = (await list()) as Playlist & { next(): void; previous(): void }
+    await host.updateComplete
+    const plays = watchPlays(player(host))
+    host.next()
+    await host.updateComplete
+    await player(host).updateComplete
+    await Promise.resolve()
+    expect(host.active).toBe('two')
+    expect(plays()).toBe(1)
+    host.previous()
+    await host.updateComplete
+    expect(host.active).toBe('one')
   })
 })

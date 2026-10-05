@@ -63,4 +63,7 @@
   episodes.addEventListener('helix-activate', (event) => {
     say('helix-activate', `"${event.detail.value}" is now playing`)
   })
+  episodes.addEventListener('helix-end', () => {
+    say('helix-end', 'the last clip finished, and the playlist stopped there')
+  })
 </script>
