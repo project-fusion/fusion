@@ -3278,17 +3278,9 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     /* **Not hidden as a whole any more**, because a connection is now something
        a reader focuses. What is drawn is hidden, piece by piece: the painted
        line and its label are pictures of what the target already names. */
-    /* **Focus is heard here as well as on the host.** Moving from one
-       connection to the next moves focus inside this shadow root, and a
-       browser does not tell the host about a move that starts and ends in
-       its own tree: the target and where focus came from are both the host
-       once retargeted. So the stop stayed on the first of two connections in
-       a row, which is every card with two leaving it. Heard twice from a
-       card, which the handler answers the same way both times. */
     return html`<svg
       part="edges"
       role="none"
-      @focusin=${this.handleFocusIn}
       viewBox=${`0 0 ${box.width} ${box.height}`}
       width=${box.width}
       height=${box.height}
@@ -3482,9 +3474,19 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
              ruling's own offset is where the document's zero lands, so a line
              falls on every multiple of its spacing in the document's units and
              a card placed on one sits on a line. -->
+        <!-- **Focus is heard here as well as on the host.** Moving from one
+             connection to the next moves focus inside this shadow root, and a
+             browser does not tell the host about a move that starts and ends
+             in its own tree. So the stop stayed on the first of two
+             connections in a row. Heard on the board and never on the edges'
+             SVG element: Chromium makes an SVG element with a focus listener
+             a Tab stop of its own, an unnamed one between the board and the
+             first card. Heard twice from a card, which the handler answers
+             the same way both times. -->
         <div
           part="board"
           style=${`--_canvas-plane-inline-size: ${box.width}px; --_canvas-plane-block-size: ${box.height}px`}
+          @focusin=${this.handleFocusIn}
         >
           ${this.renderEdges(origin, box)} ${this.renderLabels(origin)}
           <slot @slotchange=${this.handleSlotChange}></slot>
