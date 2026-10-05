@@ -19,6 +19,11 @@ import { styles } from './tab.css.js'
  * @slot - The tab's label.
  *
  * @csspart tab - The tab itself.
+ *
+ * @cssproperty --tab-block-size - The height of a tab. `segmented` sizes its tabs to the track and does not read it.
+ * @cssproperty --tab-color - The label color of a tab that is not current.
+ * @cssproperty --tab-padding-inline - The space either side of the label.
+ * @cssproperty --tab-selected-color - The label color of the current tab.
  */
 @customElement('helix-tab')
 export class HelixTab extends HelixHeadlessTab {
