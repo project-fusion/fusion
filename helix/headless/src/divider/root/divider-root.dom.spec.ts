@@ -33,8 +33,10 @@ describe('divider semantics', () => {
   /* A word set into the line, such as "Or", was beside an unnamed separator. */
   test('an announced separator is named by the content set into it', async () => {
     const divider = await mount('<helix-headless-divider announced>Or</helix-headless-divider>')
-    const labelledBy = line(divider)?.getAttribute('aria-labelledby') ?? ''
-    expect(divider.shadowRoot?.getElementById(labelledBy)).toBe(part(divider, 'content'))
+    const reference = line(divider)?.getAttribute('aria-labelledby') ?? ''
+    expect(divider.shadowRoot?.getElementById(reference) ?? null).toBe(
+      part(divider, 'content') as HTMLElement | null,
+    )
     const plain = await mount('<helix-headless-divider>Or</helix-headless-divider>')
     expect(line(plain)?.hasAttribute('aria-labelledby')).toBe(false)
   })

@@ -27,8 +27,9 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * The live region is its own part. When the announcement appears after the page
  * has loaded, the message is written into the region one frame later, so screen
- * readers read it reliably, and the region is emptied seven seconds later, so
- * the message is not in the page twice. When the announcement is in the served
+ * readers read it reliably, and the region is emptied seven seconds later.
+ * While the region holds the copy, the message itself is hidden from screen
+ * readers, so it is in the page once. When the announcement is in the served
  * HTML, the region stays empty and nothing is read out.
  *
  * The dismiss button fires `helix-dismiss`, and the announcement stays in the
@@ -197,7 +198,12 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
   }
 
   protected override render(): TemplateResult {
-    return html`<div part="content"><slot @slotchange=${() => this.arrival.say()}></slot></div>
+    /* **The message is in the tree once.** While the live copy holds it, the
+       message itself is hidden from readers; when the copy empties, it is
+       back. */
+    return html`<div aria-hidden=${this.arrival.said === '' ? nothing : 'true'} part="content"
+        ><slot @slotchange=${() => this.arrival.say()}></slot
+      ></div>
       <span part="live" role="status">${this.arrival.said}</span>
       <div part="actions"><slot name="actions" @slotchange=${() => this.markEmpty()}></slot></div>
       ${

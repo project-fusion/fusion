@@ -9,7 +9,7 @@ import {
 } from 'lit'
 import { property } from 'lit/decorators.js'
 import { encode } from 'uqr'
-import { qrSvg } from '../export.js'
+import { type QrBox, type QrLogo, qrSvg } from '../export.js'
 
 /** How much of the code can be lost and still read. */
 export type QrCorrection = 'H' | 'L' | 'M' | 'Q'
@@ -19,6 +19,23 @@ export type QrStyle = 'dots' | 'rounded' | 'square'
 
 /** The quiet zone in modules, which the specification requires around a code. */
 const QUIET = 4
+
+/**
+ * An image's pixels as a data address, where the page may read them, and its
+ * address otherwise. A file drawn into a PNG loads nothing from outside
+ * itself, so only the pixels reach a PNG; the address still reaches an SVG.
+ */
+const pixelsOf = (image: HTMLImageElement): string => {
+  try {
+    const canvas = document.createElement('canvas')
+    canvas.width = image.naturalWidth
+    canvas.height = image.naturalHeight
+    canvas.getContext('2d')?.drawImage(image, 0, 0)
+    return canvas.toDataURL('image/png')
+  } catch {
+    return image.currentSrc || image.src
+  }
+}
 
 /** Whether a module is one of the three finder squares, or their separators. */
 const isFinder = (x: number, y: number, size: number): boolean => {
@@ -126,11 +143,13 @@ const pathFor = (
  *
  * A higher level holds fewer characters, so a value that fits at `M` can be too
  * long once a logo raises the level to `H`. A value too long for the level
- * draws no code, and the element fires `error`.
+ * draws no code: the element fires `error`, carries `:state(overflow)`, and
+ * shows what is in the `fallback` slot, such as the link written out.
  *
  * `toSvg()`, `toPng()` and `download()` give the drawn code as a file of its
- * own, in the colors it is drawn in, for a page that offers it to save or
- * print, as Zag's download trigger does.
+ * own, in the colors it is drawn in, with a slotted image or SVG logo where
+ * it sits, for a page that offers it to save or print, as Zag's download
+ * trigger does.
  *
  * @since 0.1.0
  * @status stable
@@ -138,14 +157,18 @@ const pathFor = (
  * @aliases QR, Barcode, Scan code
  * @documentation https://fusion.dev/helix/components/qr-code
  *
+ * @slot fallback - Shown in place of the code when the value is too long for it, such as the link as text.
  * @slot logo - A logo for the center. A code with a logo scans only at a high correction level.
  *
  * @event {Event} error - The value is too long for a code at the correction level, so no code is drawn.
  *
  * @csspart code - The square code image.
+ * @csspart fallback - The box around the `fallback` slot, drawn only when the value is too long for a code.
  * @csspart finders - The three corner squares, which can take their own color.
  * @csspart logo - The box that holds the center logo.
  * @csspart modules - Every module except the three corner squares.
+ *
+ * @cssstate overflow - The value is too long for a code at the correction level, so the fallback shows.
  */
 @customElement('helix-headless-qr-code')
 export class HelixHeadlessQrCode extends HelixElement {
@@ -248,7 +271,9 @@ export class HelixHeadlessQrCode extends HelixElement {
     /* Told once per value and level, after the render that drew nothing, as an
        image says it failed. Not on a server, which runs no `updated`. */
     const key = `${this.level}:${this.value}`
-    if (this.value !== '' && this.encoded() === undefined) {
+    const overflow = this.value !== '' && this.encoded() === undefined
+    this.toggleState('overflow', overflow)
+    if (overflow) {
       if (this.overflowed !== key) {
         this.overflowed = key
         this.dispatchEvent(
@@ -265,8 +290,10 @@ export class HelixHeadlessQrCode extends HelixElement {
    * is drawn in, with its background under the quiet zone.
    *
    * `''` where no code is drawn, before the first render or for a value too
-   * long for the level. A slotted logo is not in the file, being the page's
-   * own markup; save the file at `H` and the code still scans without it.
+   * long for the level. A slotted `<img>` or `<svg>` logo is written in where
+   * it is drawn: an image as its address, or as its pixels where the page may
+   * read them, which a PNG needs. A logo of text is left out, a file having
+   * none of the page's fonts; the code still scans without it.
    */
   toSvg(size = 512): string {
     const code = this.renderRoot?.querySelector('svg[part="code"]')
@@ -279,18 +306,61 @@ export class HelixHeadlessQrCode extends HelixElement {
        nothing of its own is saved on white. */
     const ground = getComputedStyle(this).backgroundColor
     const clear = ground === '' || ground === 'transparent' || /^rgba\(.*,\s*0\)$/.test(ground)
+    const background = clear ? '#ffffff' : rgbOf(ground)
+    const box = Number(code.getAttribute('viewBox')?.split(' ')[2] ?? 0)
+    const logo = this.logoDrawing(code, box, background)
     return qrSvg(
       {
-        background: clear ? '#ffffff' : rgbOf(ground),
-        box: Number(code.getAttribute('viewBox')?.split(' ')[2] ?? 0),
+        background,
+        box,
         finderColor: rgbOf(getComputedStyle(finders).fill || '#000000'),
         finders: finders.getAttribute('d') ?? '',
         moduleColor: rgbOf(getComputedStyle(modules).fill || '#000000'),
         modules: modules.getAttribute('d') ?? '',
         quiet: QUIET,
+        ...(logo ? { logo } : {}),
       },
       size,
     )
+  }
+
+  /**
+   * The slotted logo as the file draws it, measured against the drawn code, or
+   * nothing where none is slotted, where it is not over the code (the headless
+   * tier sets it beside it), or where it is neither an image nor an SVG.
+   */
+  private logoDrawing(code: Element, box: number, background: string): QrLogo | undefined {
+    const holder = this.renderRoot.querySelector<HTMLElement>('[part="logo"]')
+    const mark = this.knownChildren.find((child) => child.slot === 'logo')
+    const area = code.getBoundingClientRect()
+    if (!holder || holder.hidden || !mark || area.width === 0) {
+      return undefined
+    }
+    const scale = box / area.width
+    const at = (rect: DOMRect): QrBox => [
+      (rect.left - area.left) * scale,
+      (rect.top - area.top) * scale,
+      rect.width * scale,
+      rect.height * scale,
+    ]
+    const frame = at(holder.getBoundingClientRect())
+    if (frame[0] < 0 || frame[1] < 0 || frame[0] + frame[2] > box || frame[1] + frame[3] > box) {
+      return undefined
+    }
+    const fill = getComputedStyle(holder).backgroundColor
+    const ground = fill === '' || fill === 'transparent' || /^rgba\(.*,\s*0\)$/.test(fill)
+    const logo = {
+      frame,
+      ground: ground ? background : rgbOf(fill),
+      mark: at(mark.getBoundingClientRect()),
+    }
+    if (mark instanceof HTMLImageElement) {
+      return { ...logo, href: pixelsOf(mark) }
+    }
+    if (mark instanceof SVGSVGElement) {
+      return { ...logo, svg: new XMLSerializer().serializeToString(mark) }
+    }
+    return undefined
   }
 
   /**
@@ -333,14 +403,7 @@ export class HelixHeadlessQrCode extends HelixElement {
     setTimeout(() => URL.revokeObjectURL(url))
   }
 
-  private renderCode(): SVGTemplateResult | typeof nothing {
-    if (this.value === '') {
-      return nothing
-    }
-    /* Regenerated on every render rather than cached. It is a pure function of
-       two properties, Lit only renders when one of them moved, and a cache here
-       would be a second place for them to disagree. */
-    const result = this.encoded()
+  private renderCode(result: ReturnType<typeof encode> | undefined): SVGTemplateResult | typeof nothing {
     if (result === undefined) {
       return nothing
     }
@@ -382,7 +445,16 @@ export class HelixHeadlessQrCode extends HelixElement {
   }
 
   protected override render(): TemplateResult {
-    return html`${this.renderCode()}
+    /* Regenerated on every render rather than cached. It is a pure function of
+       two properties, Lit only renders when one of them moved, and a cache here
+       would be a second place for them to disagree. */
+    const result = this.value === '' ? undefined : this.encoded()
+    /* The fallback only for a value too long for a code, so a code that fits
+       renders what it always did. Decided on a server too, which encodes. */
+    const overflow = this.value !== '' && result === undefined
+    return html`${this.renderCode(result)}${
+      overflow ? html`<span part="fallback"><slot name="fallback"></slot></span>` : nothing
+    }
     <span ?hidden=${!this.logo} part="logo">
       <slot
         name="logo"

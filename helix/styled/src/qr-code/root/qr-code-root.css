@@ -18,6 +18,19 @@
   inline-size: 100%;
 }
 
+/* In place of a code that does not fit, the square holds the fallback,
+   centered and in the code's own ink, so the page keeps its shape. */
+[part="fallback"] {
+  align-items: center;
+  block-size: 100%;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  overflow-wrap: anywhere;
+  padding: var(--helix-space-md);
+  text-align: center;
+}
+
 /* The corner squares can take their own color, and default to the code's. */
 [part="finders"] {
   fill: var(--qr-code-finder-color, currentColor);

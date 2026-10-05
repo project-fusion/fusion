@@ -219,10 +219,21 @@ describe('an image', () => {
     expect(img(host).hasAttribute('src')).toBe(false)
   })
 
-  test('neither stand-in is read out, the picture having a name of its own', async () => {
+  test('neither stand-in is read out while the picture is on its way', async () => {
     const host = await image('src="/pier.jpg"')
     expect(part(host, 'placeholder')?.getAttribute('aria-hidden')).toBe('true')
     expect(part(host, 'fallback')?.getAttribute('aria-hidden')).toBe('true')
+  })
+
+  /* The fallback said "Photo unavailable" to a sighted reader and nothing to a
+     screen reader, which heard the picture's name as if it had arrived. */
+  test('the fallback is read once the picture fails', async () => {
+    const host = await image('src="/missing.jpg" alt="Pier at dusk"')
+    img(host).dispatchEvent(new Event('error'))
+    await host.updateComplete
+    expect(part(host, 'fallback')?.hasAttribute('aria-hidden')).toBe(false)
+    expect(part(host, 'fallback')?.hasAttribute('hidden')).toBe(false)
+    expect(part(host, 'placeholder')?.getAttribute('aria-hidden')).toBe('true')
   })
 })
 

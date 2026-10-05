@@ -10,7 +10,7 @@ describe('announcement server output', () => {
        all. Read off one with no children: the only shadow root is its own. */
     const markup = ssr(html`<helix-headless-announcement></helix-headless-announcement>`)
     expect(rendered(markup, 'helix-headless-announcement')).toMatch(
-      /<div part="content">(?:<!--lit-node \d+-->)?<slot\s*><\/slot><\/div>/,
+      /<div\s+part="content"\s*>(?:<!--lit-node \d+-->)?<slot\s*><\/slot\s*><\/div>/,
     )
   })
 

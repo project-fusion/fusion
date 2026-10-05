@@ -41,6 +41,27 @@ describe('announcement', () => {
     expect(live.textContent?.trim()).toBe('Service degraded')
   })
 
+  /* The message was in the tree twice for the seven-second hold. */
+  test('hides the message while the live copy holds it', async () => {
+    document.body.innerHTML =
+      '<helix-headless-announcement>Service degraded</helix-headless-announcement>'
+    const announcement = document.body.firstElementChild as HTMLElement & {
+      arrival: { said: string }
+      requestUpdate: () => void
+      updateComplete: Promise<boolean>
+    }
+    await announcement.updateComplete
+    const content = part(announcement, 'content') as HTMLElement
+    expect(content.hasAttribute('aria-hidden')).toBe(false)
+    await new Promise((done) => requestAnimationFrame(() => done(undefined)))
+    await announcement.updateComplete
+    expect(content.getAttribute('aria-hidden')).toBe('true')
+    announcement.arrival.said = ''
+    announcement.requestUpdate()
+    await announcement.updateComplete
+    expect(content.hasAttribute('aria-hidden')).toBe(false)
+  })
+
   /* The region was re-marked only when a property changed, so a link a
      framework rendered after the first render stayed hidden for good. */
   test('actions slotted after the first render are shown', async () => {
