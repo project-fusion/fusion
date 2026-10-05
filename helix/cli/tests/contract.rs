@@ -2140,6 +2140,41 @@ fn a_member_marked_internal_is_not_published() {
     assert!(!said.contains("isDisabled"), "the internal one: {said}");
 }
 
+/// The attribute of an `@internal` field is published, and names no field.
+#[test]
+fn the_attribute_of_an_internal_field_names_no_field() {
+    let sandbox = Sandbox::new("manifest-internal-attribute", None);
+    let src = sandbox.0.join("src/field");
+    std::fs::create_dir_all(&src).expect("a source tree");
+    std::fs::write(
+        src.join("field.ts"),
+        "@customElement('helix-field')\n\
+         export class HelixField extends HelixElement {\n\
+         \x20 /**\n\
+         \x20  * @internal The host's own name, observed.\n\
+         \x20  */\n\
+         \x20 @property({ attribute: 'aria-label' })\n\
+         \x20 protected namedBy: string | null = null\n\
+         }\n",
+    )
+    .expect("a source");
+
+    let output = run(&sandbox.0, &["manifest", "build", "."]);
+    assert_eq!(code(&output), 0);
+    let said = out(&output);
+    let parsed: serde_json::Value = serde_json::from_str(&said).expect("a manifest");
+    let class = &parsed["modules"][0]["declarations"][0];
+    assert_eq!(class["attributes"][0]["name"], "aria-label", "{said}");
+    assert!(
+        class["attributes"][0].get("fieldName").is_none(),
+        "the attribute names no field: {said}"
+    );
+    assert!(
+        !said.contains("\"namedBy\""),
+        "the field is not published: {said}"
+    );
+}
+
 /// A field initialized from a constant beside it, and the attribute that
 /// mirrors it, which do not say the same thing.
 #[test]

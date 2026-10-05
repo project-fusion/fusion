@@ -54,7 +54,7 @@ import type { HelixHeadlessTourStop } from '../stop/tour-stop.js'
  * @event {HelixCompleteEvent} helix-complete - Fired when the last stop is
  * finished.
  * @event {HelixTourAskEvent} helix-tour-ask - Fired when a stop's control is pressed to move the tour. The stop sends it, and the tour handles it.
- * @event {Event} toggle - Sent when the tour starts or ends, with `newState` and `oldState`.
+ * @event {ToggleEvent} toggle - Sent when the tour starts or ends, with `newState` and `oldState`.
  *
  * @csspart spotlight - The box over the current target. It also draws the dimmed area around the target.
  *

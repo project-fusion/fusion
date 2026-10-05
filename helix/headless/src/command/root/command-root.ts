@@ -65,7 +65,7 @@ const parse = (hotkey: string) => {
  * @event {HelixBeforeOpenEvent} helix-before-open - The palette is about to open. Cancelable: cancel it to keep it closed.
  * @event {HelixFilterEvent} helix-filter - Fired as the user types, with the text the list is filtered by. Cancelable: cancel it to leave the list unfiltered and filter the commands yourself, for example on a server while `loading` is set.
  * @event {HelixSelectEvent} helix-select - A command was chosen. Cancelable: cancel it to keep the palette open.
- * @event {Event} toggle - The palette opened or closed. The event carries `newState` and `oldState`.
+ * @event {ToggleEvent} toggle - The palette opened or closed. The event carries `newState` and `oldState`.
  *
  * @csspart dialog - The box of the dialog the palette opens in, forwarded from `Dialog`.
  * @csspart footer - The row under the list.

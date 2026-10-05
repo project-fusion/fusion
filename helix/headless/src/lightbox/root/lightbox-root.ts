@@ -56,7 +56,7 @@ import { HelixHeadlessLightboxItem } from '../item/lightbox-item.js'
  * @event {HelixBeforeActivateEvent} helix-before-activate - Fired before the shown item changes. Cancelable: cancel it to keep the current item. It is the only way to stop the change.
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the viewer closes. Cancelable.
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the viewer opens. Cancelable.
- * @event {Event} toggle - Fired when the viewer opens or closes, with `newState` and `oldState`.
+ * @event {ToggleEvent} toggle - Fired when the viewer opens or closes, with `newState` and `oldState`.
  *
  * @csspart dialog - The native dialog element.
  * @csspart live - The live region that announces which item is shown.

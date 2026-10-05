@@ -65,7 +65,7 @@ import '../../color-picker/index.js'
  * @event {HelixBeforeCloseEvent} helix-before-close - The panel is about to close. Cancelable: cancel it to keep it open.
  * @event {HelixBeforeOpenEvent} helix-before-open - The panel is about to open. Cancelable: cancel it to keep it closed.
  * @event {Event} input - Fired as the value changes.
- * @event {Event} toggle - The panel opened or closed. The event carries `newState` and `oldState`.
+ * @event {ToggleEvent} toggle - The panel opened or closed. The event carries `newState` and `oldState`.
  *
  * @csspart control - The text input that holds the value. Absent in the `swatch` variant.
  * @csspart feedback - The message that says what is wrong with the value.

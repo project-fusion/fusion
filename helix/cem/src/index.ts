@@ -5,6 +5,7 @@ import { dirname, join, resolve } from 'node:path'
 import { lintOf, type ManifestSource } from '@fusion.dev/helix-diagnostics'
 import { jsxTypesPlugin } from '@wc-toolkit/jsx-types'
 import { vuejsTypesPlugin } from '@wc-toolkit/vuejs-types'
+import { jsxBaseProps } from './plugins/jsx-base-props.js'
 import { jsxDeclaredEvents } from './plugins/jsx-declared-events.js'
 import { jsxImports } from './plugins/jsx-imports.js'
 import { jsxNativeEvents } from './plugins/jsx-native-events.js'
@@ -100,6 +101,8 @@ export const afterManifest = ({
         // Also after the generator: its `ref` type is framework-agnostic and
         // rejects the `useRef` every React consumer reaches for.
         jsxReactRef({ fileName: `${TYPES}/jsx.d.ts` }),
+        // Before `jsxNativeEvents`, which rewrites the handler lines it reads.
+        jsxBaseProps({ fileName: `${TYPES}/jsx.d.ts` }),
         jsxNativeEvents({ fileName: `${TYPES}/jsx.d.ts` }),
         // After it, which is what makes `BaseEvents` generic, and before
         // `jsxOptionalUndefined` so these entries get the same `| undefined`.
@@ -266,6 +269,7 @@ export type {
   TypeText,
 } from './types.js'
 export {
+  jsxBaseProps,
   jsxDeclaredEvents,
   jsxImports,
   jsxNativeEvents,

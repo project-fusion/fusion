@@ -56,7 +56,7 @@ import { property } from 'lit/decorators.js'
  * @event {Event} close - Sent from the host after the drawer closes, because the native `close` event does not leave the shadow root.
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the panel closes, and cancelable.
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the panel opens, and cancelable. Canceling it keeps the panel closed.
- * @event {Event} toggle - Sent when the drawer opens or closes, with `newState` and `oldState`.
+ * @event {ToggleEvent} toggle - Sent when the drawer opens or closes, with `newState` and `oldState`.
  *
  * @csspart content - The scrolling content region.
  * @csspart header - The header region.

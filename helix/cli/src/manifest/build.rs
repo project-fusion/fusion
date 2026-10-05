@@ -1049,6 +1049,27 @@ fn attributes_of(members: &[Value], written: &[Option<Written>]) -> Vec<Value> {
         .collect()
 }
 
+/// Takes the field's name off an attribute whose field is `@internal`.
+///
+/// **The attribute stays, and names no field.** A consumer still writes it:
+/// `aria-label` is observed through `MixinField`'s `@internal` `namedBy`.
+/// Naming the field sent the typings generator to it, which typed the
+/// attribute as a lookup into a protected member and offered `namedBy` as a
+/// prop, 152 errors across nineteen fields.
+fn unnamed(attributes: &mut [Value], hidden: &BTreeSet<String>) {
+    for attribute in attributes {
+        let field = attribute
+            .get("fieldName")
+            .and_then(Value::as_str)
+            .unwrap_or_default();
+        if hidden.contains(field) {
+            if let Some(fields) = attribute.as_object_mut() {
+                fields.remove("fieldName");
+            }
+        }
+    }
+}
+
 /// Where a base class came from, in the shape the manifest records it.
 fn heritage(superclass: Superclass, path: &str) -> Value {
     let mut said = serde_json::Map::new();
@@ -1193,7 +1214,8 @@ fn declaration_of(
         let written: Vec<Option<Written>> =
             one.members.iter().map(|two| two.written.clone()).collect();
         let members: Vec<Value> = one.members.into_iter().map(member_of).collect();
-        let attributes = attributes_of(&members, &written);
+        let mut attributes = attributes_of(&members, &written);
+        unnamed(&mut attributes, &hidden);
         if !attributes.is_empty() {
             fields.insert("attributes".to_owned(), json!(attributes));
         }

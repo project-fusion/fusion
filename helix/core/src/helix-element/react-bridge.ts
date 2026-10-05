@@ -253,16 +253,30 @@ export const reactPropFor = (event: Event): string | undefined => {
   return `on${event.type.charAt(0).toUpperCase()}${event.type.slice(1)}`
 }
 
+/**
+ * The lowercase spelling of a native event's prop, `ontoggle` or `onchange`.
+ *
+ * **React binds it on the element, like one of ours, so it is bound the same
+ * way.** It is no registration name of React's, so on a client mount React
+ * adds it with `addEventListener` under the name after `on`, bubbling or not,
+ * and while hydrating it adds nothing. Bound here, a later commit's own
+ * listener is the same callback and a no-op. The typings offer this spelling
+ * on every element that sends the event.
+ */
+const lowercasePropFor = (event: Event): string | undefined =>
+  event.type.includes('-') || REACT_WIRES.has(event.type) ? undefined : `on${event.type}`
+
 export const bindReactHandler = (host: EventTarget, event: Event): void => {
   const props = reactPropsOf(host)
   if (props === undefined) {
     return
   }
   auditReactProps(host, props)
-  const key = reactPropFor(event)
-  const handler = key === undefined ? undefined : props[key]
-  if (typeof handler === 'function') {
-    host.addEventListener(event.type, handler as EventListener)
+  for (const key of [reactPropFor(event), lowercasePropFor(event)]) {
+    const handler = key === undefined ? undefined : props[key]
+    if (typeof handler === 'function') {
+      host.addEventListener(event.type, handler as EventListener)
+    }
   }
 }
 

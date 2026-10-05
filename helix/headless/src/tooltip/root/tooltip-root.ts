@@ -86,7 +86,7 @@ const warmth = (): Warmth => {
  *
  * @event {HelixBeforeCloseEvent} helix-before-close - The bubble is about to hide. Cancelable: cancel it to keep it shown.
  * @event {HelixBeforeOpenEvent} helix-before-open - The bubble is about to show. Cancelable: cancel it to keep it hidden.
- * @event {Event} toggle - The bubble opened or closed. The event carries `newState` and `oldState`.
+ * @event {ToggleEvent} toggle - The bubble opened or closed. The event carries `newState` and `oldState`.
  *
  * @csspart arrow - The arrow that points at the trigger.
  * @csspart arrow-bottom - Added to `arrow` while the bubble is below its trigger, with the arrow on the bubble's top edge.

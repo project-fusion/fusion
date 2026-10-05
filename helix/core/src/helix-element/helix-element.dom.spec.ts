@@ -91,19 +91,6 @@ describe('the handler React is holding', () => {
     expect(seen).toEqual(['first', 'second'])
   })
 
-  test('is left alone for a relayed native event, which React binds itself', () => {
-    let calls = 0
-    const element = hydrated({
-      onchange: () => {
-        calls += 1
-      },
-    })
-
-    element.dispatchEvent(new Event('change'))
-
-    expect(calls).toBe(0)
-  })
-
   test('is not looked for when React is not on the page', () => {
     const element = document.createElement(tag)
     document.body.append(element)
@@ -250,6 +237,27 @@ describe('a relayed native event', () => {
     element.dispatchEvent(new Event(type, { bubbles: true, composed: true }))
 
     expect(calls).toBe(0)
+  })
+
+  /* React binds `ontoggle` and `onchange` on the element itself, by the name
+     after `on`, on a client mount, and binds nothing while hydrating: the
+     lowercase spelling the typings offer was dead on a hydrated page. */
+  test.each([
+    ['toggle', false],
+    ['change', true],
+  ])('the lowercase spelling of %s is bound once, whatever its bubbling', (type, bubbles) => {
+    let calls = 0
+    const handler = (): void => {
+      calls += 1
+    }
+    const element = hydrated({ [`on${type}`]: handler })
+
+    element.dispatchEvent(new Event(type, { bubbles }))
+    // React's own binding on a later commit is the same callback, and adds nothing.
+    element.addEventListener(type, handler)
+    element.dispatchEvent(new Event(type, { bubbles }))
+
+    expect(calls).toBe(2)
   })
 
   test('is left alone where React wires the element itself', () => {
