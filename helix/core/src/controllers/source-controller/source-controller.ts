@@ -45,10 +45,24 @@ export interface SourceHost extends ReactiveControllerHost, HTMLElement {
  * The element is watched for `childList` and `characterData` alike, because
  * renaming a series edits a text node in place rather than replacing a cell,
  * and nothing in a page has reason to know a chart is reading it.
+ *
+ * **The tree around it is watched as well, for the table that is not there
+ * yet.** A framework page renders a chart first and its table once the data
+ * loads, or re-keys the table and so replaces it under the same id. Watching
+ * only the element resolved on connect found nothing in the first case and
+ * kept a detached table in the second, and the chart drew neither until some
+ * unrelated property changed. So the root the id resolves in is watched for
+ * nodes arriving and leaving and for `id` and `role` changing, and each batch
+ * asks the id again. That is one lookup by id per batch, and a chart redraws
+ * only when the answer is a different element.
  */
 export class SourceController implements ReactiveController {
   private host: SourceHost
   private observer: MutationObserver | undefined
+  /** Watches the tree `for` resolves in, for the table arriving, leaving or being replaced. */
+  private tree: MutationObserver | undefined
+  /** The element the watcher is on, or null where `for` named nothing. */
+  private watched: Element | null = null
   /** Whether a hydrating render was told there was nothing, and needs the render after. */
   private deferred = false
 
@@ -170,6 +184,8 @@ export class SourceController implements ReactiveController {
   hostDisconnected(): void {
     this.observer?.disconnect()
     this.observer = undefined
+    this.tree?.disconnect()
+    this.tree = undefined
   }
 
   /**
@@ -180,9 +196,15 @@ export class SourceController implements ReactiveController {
    */
   watch(): void {
     this.observer?.disconnect()
+    this.tree?.disconnect()
     this.version += 1
     const element = this.resolve()
-    if (!element || typeof MutationObserver === 'undefined') {
+    this.watched = element
+    if (typeof MutationObserver === 'undefined') {
+      return
+    }
+    this.watchTree()
+    if (!element) {
       return
     }
     this.observer ??= new MutationObserver(() => {
@@ -191,6 +213,31 @@ export class SourceController implements ReactiveController {
     })
     this.observer.observe(element, {
       characterData: true,
+      childList: true,
+      subtree: true,
+    })
+  }
+
+  /**
+   * Watches the root `for` resolves in, so a table that arrives, leaves or is
+   * replaced under the same id is followed.
+   *
+   * Only while `for` names something and the host sits in a tree that can
+   * resolve an id, which a detached host and a server render do not.
+   */
+  private watchTree(): void {
+    const root = this.host.getRootNode() as Node & Partial<Document>
+    if (this.host.for === '' || typeof root.getElementById !== 'function') {
+      return
+    }
+    this.tree ??= new MutationObserver(() => {
+      if (this.resolve() !== this.watched) {
+        this.watch()
+        this.host.requestUpdate()
+      }
+    })
+    this.tree.observe(root, {
+      attributeFilter: ['id', 'role'],
       childList: true,
       subtree: true,
     })
