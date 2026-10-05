@@ -5,6 +5,9 @@ import {
   elementById,
   HelixFallbackCommandEvent,
   HelixFormElement,
+  HelixPressEvent,
+  pressType,
+  type RecentPress,
   StatusController,
   supportsInvokers,
 } from '@fusion.dev/helix-core'
@@ -43,6 +46,15 @@ import { property } from 'lit/decorators.js'
  * Set `pending` while the action a press started is still running. The button
  * keeps focus and refuses presses, and a reader on it hears `pending-label`.
  *
+ * Every press that acts sends `helix-press` with what pressed it in
+ * `detail.pointerType`: `mouse`, `pen`, `touch`, `keyboard`, or `virtual` for
+ * a screen reader's press or a script's `click()`, as React Aria's `onPress`
+ * does. It is sent once the press has done its own work, before `click`
+ * reaches listeners on the element, and never for a disabled or pending
+ * button.
+ *
+ * **Keyboard.** Enter and Space press the button, as on a native one.
+ *
  * @since 0.1.0
  * @status stable
  * @category actions
@@ -51,6 +63,8 @@ import { property } from 'lit/decorators.js'
  * @slot - The button's label.
  * @slot end - Content after the label.
  * @slot start - Content before the label, usually an icon.
+ *
+ * @event {HelixPressEvent} helix-press - Fired when a press acts, with `detail.pointerType` saying what pressed the button.
  *
  * @csspart button - The inner control.
  * @csspart live - The live region that says `pending-label` when the button becomes pending under focus. It is rendered from the first time the button is pending, and the styled button clips it out of view.
@@ -280,6 +294,32 @@ export class HelixHeadlessButton extends HelixFormElement {
     delegatesFocus: true,
   }
 
+  /** What the control saw before a click that the click may not carry. */
+  private recent: RecentPress = {}
+
+  /**
+   * @internal Records what starts a press, a pointer's kind or Enter or Space,
+   * for `helix-press`. Bound on the inner control by this render and by any
+   * subclass that draws its own.
+   */
+  protected readonly notePress = (event: Event): void => {
+    if (event.type === 'pointerdown') {
+      this.recent = { pointer: (event as PointerEvent).pointerType }
+    } else if ((event as KeyboardEvent).key === 'Enter' || (event as KeyboardEvent).key === ' ') {
+      this.recent = { key: true }
+    }
+  }
+
+  /**
+   * @internal Sends `helix-press` for a click that acted, with what pressed it,
+   * and forgets what started it.
+   */
+  protected announcePress(click: Event): void {
+    const pointerType = pressType(click as MouseEvent, this.recent)
+    this.recent = {}
+    this.dispatchEvent(new HelixPressEvent({ pointerType }))
+  }
+
   private readonly handleClick = (event: Event): void => {
     /* **Refused before anything else, and kept from the page.** A native
        disabled button sends no click at all. A pending one has to stay
@@ -291,7 +331,12 @@ export class HelixHeadlessButton extends HelixFormElement {
       event.stopImmediatePropagation()
       return
     }
+    this.act()
+    this.announcePress(event)
+  }
 
+  /** What a press does: sends the command, and submits or resets the form. */
+  private act(): void {
     /* **Re-linked here, and this is the line that makes a trigger reliable.**
      *
      * From `updated` alone the target resolves once, whenever the button last
@@ -583,6 +628,8 @@ export class HelixHeadlessButton extends HelixFormElement {
       tabindex=${stop}
       ?disabled=${this.isDisabled}
       @click=${this.handleClick}
+      @keydown=${this.notePress}
+      @pointerdown=${this.notePress}
     >
       ${label}
     </button>${this.renderLive()}`

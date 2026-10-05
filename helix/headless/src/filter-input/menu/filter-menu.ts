@@ -77,6 +77,8 @@ import '../../menu/index.js'
  * @csspart entry-mark - The mark at the end of a row: a check mark on a chosen value, and a caret on a field.
  * @csspart entry-shortcut - The key drawn for a row's shortcut. The filter menu sets none, so it renders only where a subclass does.
  * @csspart entry-shortcut-kbd - The key inside it.
+ * @csspart entry-shortcut-key - One key of the shortcut's chord.
+ * @csspart entry-shortcut-separator - The `+` between two keys of the shortcut, where the platform writes one.
  * @csspart entry-start - The leading column.
  * @csspart menu - The menu the fields are offered in.
  * @csspart menu-back - The button that goes back from a field's page.
@@ -335,7 +337,9 @@ export class HelixHeadlessFilterMenu extends HelixElement {
         return html`<${item}
           part="entry"
           exportparts="end: entry-end, item: entry-item, mark: entry-mark, shortcut: entry-shortcut,
-            shortcut-kbd: entry-shortcut-kbd, start: entry-start"
+            shortcut-kbd: entry-shortcut-kbd,
+            shortcut-key: entry-shortcut-key, shortcut-separator: entry-shortcut-separator,
+            start: entry-start"
           data-facet="field"
           data-field=${name}
         >
@@ -353,7 +357,9 @@ export class HelixHeadlessFilterMenu extends HelixElement {
               ? html`<${item}
                   part="entry"
                   exportparts="end: entry-end, item: entry-item, mark: entry-mark, shortcut: entry-shortcut,
-            shortcut-kbd: entry-shortcut-kbd, start: entry-start"
+            shortcut-kbd: entry-shortcut-kbd,
+            shortcut-key: entry-shortcut-key, shortcut-separator: entry-shortcut-separator,
+            start: entry-start"
                   slot="submenu"
                   data-facet="comparison"
                   data-field=${name}
@@ -363,7 +369,9 @@ export class HelixHeadlessFilterMenu extends HelixElement {
                     (operator) => html`<${item}
                       part="entry"
                       exportparts="end: entry-end, item: entry-item, mark: entry-mark, shortcut: entry-shortcut,
-            shortcut-kbd: entry-shortcut-kbd, start: entry-start"
+            shortcut-kbd: entry-shortcut-kbd,
+            shortcut-key: entry-shortcut-key, shortcut-separator: entry-shortcut-separator,
+            start: entry-start"
                       slot="submenu"
                       checkable
                       exclusive
@@ -397,7 +405,9 @@ export class HelixHeadlessFilterMenu extends HelixElement {
             (option) => html`<${item}
               part="entry"
               exportparts="end: entry-end, item: entry-item, mark: entry-mark, shortcut: entry-shortcut,
-            shortcut-kbd: entry-shortcut-kbd, start: entry-start"
+            shortcut-kbd: entry-shortcut-kbd,
+            shortcut-key: entry-shortcut-key, shortcut-separator: entry-shortcut-separator,
+            start: entry-start"
               slot="submenu"
               checkable
               ?exclusive=${using?.arity === 'one'}
