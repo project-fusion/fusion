@@ -236,6 +236,45 @@
   grid-column: 1 / -1;
 }
 
+/* A tree grid's row headers step in by their depth, and a row with nothing
+   under it keeps the room its button would take, so the names of siblings
+   share an edge. Only in a tree grid, so a flat table keeps its own inset. */
+:host([child-field]) [part~="cell-header"] {
+  --_data-table-gutter: calc(var(--helix-size-icon-tight) + var(--helix-space-2xs));
+  padding-inline-start: calc(
+    (var(--data-table-level, 1) - 1) *
+    var(--data-table-indent, var(--_data-table-gutter))
+  );
+}
+
+:host([child-field]) [part~="cell-header"]:not(:has([part~="toggle"])) {
+  padding-inline-start: calc(
+    (var(--data-table-level, 1) - 1) *
+    var(--data-table-indent, var(--_data-table-gutter)) +
+    var(--_data-table-gutter)
+  );
+}
+
+[part~="toggle"] {
+  align-items: center;
+  background: none;
+  block-size: var(--helix-size-icon-tight);
+  border: none;
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  display: inline-flex;
+  inline-size: var(--helix-size-icon-tight);
+  justify-content: center;
+  margin-inline-end: var(--helix-space-2xs);
+  padding: 0;
+  vertical-align: middle;
+}
+
+[part="toggle-mark"] {
+  block-size: 100%;
+  inline-size: 100%;
+}
+
 /* The row that asks for more rows: one cell across every column, with its
    button at the inline start of it, where the eye leaves the last row. */
 [part="more"] {

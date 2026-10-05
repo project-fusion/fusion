@@ -49,6 +49,7 @@ import '../../table/index.js'
  * @cssproperty --data-table-heading-background-color - The fill behind a heading while `windowed`.
  * It is opaque, because rows scroll under the sticky heading. Unset otherwise.
  * @cssproperty --data-table-heading-color - The text color of a heading.
+ * @cssproperty --data-table-indent - How far a tree grid's row header steps in for each level. It defaults to the width of the mark that opens a row.
  * @cssproperty --data-table-padding-block - The space above and below a cell's content.
  * @cssproperty --data-table-padding-inline - The space on either side of a cell's content.
  * @cssproperty --data-table-rule-color - The color of the line between rows. It takes a
