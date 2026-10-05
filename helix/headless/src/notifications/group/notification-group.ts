@@ -38,6 +38,7 @@ const LABEL_ID = 'label'
  *
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the group collapses. Cancelable.
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the group expands. Cancelable: cancel it to keep the group collapsed.
+ * @event {ToggleEvent} toggle - The group expanded or collapsed. The event carries `newState` and `oldState`.
  *
  * @csspart actions - The trailing region of the header.
  * @csspart count - The number of notifications in the group.

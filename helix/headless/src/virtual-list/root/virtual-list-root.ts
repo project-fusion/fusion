@@ -47,6 +47,8 @@ type Row = Record<string, string>
  * @category layout
  * @documentation https://fusion.dev/helix/components/virtual-list
  *
+ * @slot - The `<template>` that defines one row. The list writes the rows it renders beside it, and this slot shows them between the two spacers.
+ *
  * @csspart after - The space that stands in for the rows below the rendered ones.
  * @csspart before - The space that stands in for the rows above the rendered ones.
  * @csspart viewport - The scrolling box. On this tier, it needs only a block size.

@@ -44,7 +44,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before a branch closes, and cancelable.
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired before a branch opens, and cancelable.
  * @event {HelixSelectEvent} helix-select - Fired when the item is chosen, and cancelable. Canceling it changes nothing.
- * @event {Event} toggle - Sent when the branch opens or closes, with `newState` and `oldState`.
+ * @event {ToggleEvent} toggle - Sent when the branch opens or closes, with `newState` and `oldState`.
  *
  * @csspart group - The container for nested items.
  * @csspart item - The node, and the focus target unless `href` moves it to the row.

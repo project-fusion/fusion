@@ -125,3 +125,18 @@ describe('registry matches content on disk', () => {
     }
   })
 })
+
+/* The barrel registers every element in the library, and a guide's snippet is
+   what a reader copies. A line that imports it on its own is the one that
+   ships the whole library to a page that uses one family; a line that shows
+   it as the thing to avoid carries a comment saying so. */
+describe('a guide registers elements by family', () => {
+  test('no snippet imports the whole library', () => {
+    const barrel = pages.filter((page) =>
+      readFileSync(join(ROOT, contentPath(page)), 'utf8')
+        .split('\n')
+        .some((line) => line.trim() === "import '@fusion.dev/helix'"),
+    )
+    expect(barrel.map((page) => page.slug)).toEqual([])
+  })
+})

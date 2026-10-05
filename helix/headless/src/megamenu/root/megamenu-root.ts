@@ -52,7 +52,7 @@ let showing: HelixHeadlessMegamenu | undefined
  *
  * @event {HelixBeforeCloseEvent} helix-before-close - The panel is about to close. Cancelable.
  * @event {HelixBeforeOpenEvent} helix-before-open - The panel is about to open. Cancelable.
- * @event {Event} toggle - The panel opened or closed. Carries `newState` and `oldState`.
+ * @event {ToggleEvent} toggle - The panel opened or closed. Carries `newState` and `oldState`.
  *
  * @csspart surface - The floating panel that opens.
  * @csspart trigger - The default trigger button, shown when the `trigger` slot is empty.

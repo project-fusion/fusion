@@ -51,7 +51,7 @@ import type { HelixHeadlessSpeedDialItem } from '../item/speed-dial-item.js'
  * @event {HelixBeforeCloseEvent} helix-before-close - The actions are about to close. Cancelable: cancel it to keep them open.
  * @event {HelixBeforeOpenEvent} helix-before-open - The actions are about to open. Cancelable: cancel it to keep them closed.
  * @event {HelixSelectEvent} helix-select - An action was chosen. The action sends the event, and the dial closes after it. Cancelable: cancel it to keep the dial open.
- * @event {Event} toggle - The dial opened or closed. The event carries `newState` and `oldState`.
+ * @event {ToggleEvent} toggle - The dial opened or closed. The event carries `newState` and `oldState`.
  *
  * @csspart actions - The region the actions are drawn in.
  * @csspart trigger - The default trigger, drawn when none is slotted.
