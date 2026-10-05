@@ -1,10 +1,11 @@
 import { CopyController, customElement } from '@fusion.dev/helix-core'
-import { check, copy } from '@fusion.dev/helix-icons'
+import { check, copy, x } from '@fusion.dev/helix-icons'
 import { nothing, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html } from 'lit/static-html.js'
 import { HelixHeadlessIconButton } from '../../icon-button/root/icon-button-root.js'
+import { readFrom } from '../from.js'
 import '../../tooltip/index.js'
 
 /** How long the confirmation stands before the button goes back to itself. */
@@ -21,7 +22,13 @@ const CONFIRM = 1600
  * The confirmation and the event wait for the write to finish. The browser can
  * refuse a clipboard write, for example on an insecure origin, in a document
  * that is not focused, or after a gesture that does not qualify. A refused
- * write leaves the button unchanged.
+ * write, or nothing to copy, names the button with `error-label` for the same
+ * moment a copy shows `copied-label`, draws a cross, and sends
+ * `helix-copy-error`.
+ *
+ * `from` copies from another element on the page: its text, an attribute
+ * written `id[attribute]`, or a property written `id.property`, read at the
+ * press. It takes the place of `value`.
  *
  * It replaces Button's render and its press, so it never submits a form or
  * sends a command: `type`, `command`, `commandfor` and the `form*` overrides
@@ -37,8 +44,10 @@ const CONFIRM = 1600
  *
  * @slot - The icon shown before a copy. Defaults to a clipboard.
  * @slot copied - The icon shown after a successful copy. Defaults to a check mark.
+ * @slot failed - The icon shown after a copy that put nothing on the clipboard. Defaults to a cross.
  *
  * @event {HelixCopyEvent} helix-copy - Fired after the clipboard write succeeds.
+ * @event {Event} helix-copy-error - Fired when a press put nothing on the clipboard: the browser refused the write, or there was nothing to copy.
  *
  * @csspart button - The inner button.
  * @csspart live - The live region that says `pending-label` when the button becomes pending under focus. It is rendered from the first time the button is pending.
@@ -64,6 +73,22 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
    */
   @property({ attribute: 'copied-label' })
   copiedLabel = 'Copied'
+
+  /**
+   * The button's name and tooltip text after a press that put nothing on the
+   * clipboard.
+   */
+  @property({ attribute: 'error-label' })
+  errorLabel = 'Could not copy'
+
+  /**
+   * The element to copy from, by its id: `key` for its text, `key[value]` for
+   * an attribute, and `key.value` for a property. Read at the press, and used
+   * in place of `value`. An element that is not there copies nothing, which is
+   * a failed copy.
+   */
+  @property()
+  from = ''
 
   /**
    * The button's name and tooltip text before a copy.
@@ -95,6 +120,9 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
    * makes the announcement happen at all.
    */
   private get says(): string {
+    if (this.failed) {
+      return this.errorLabel
+    }
     return this.copied ? this.copiedLabel : this.namedBy || this.label
   }
 
@@ -139,6 +167,15 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
     return this.clipboard.copied
   }
 
+  private get failed(): boolean {
+    return this.clipboard.failed
+  }
+
+  /** What a press copies: the text `from` names, or `value`. */
+  private get text(): string {
+    return this.from === '' ? this.value : (readFrom(this.from, this) ?? '')
+  }
+
   private readonly handleCopy = async (event: Event): Promise<void> => {
     if (this.pending) {
       event.preventDefault()
@@ -148,7 +185,10 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
     if (this.isDisabled) {
       return
     }
-    await this.clipboard.copy(this.value)
+    const wrote = await this.clipboard.copy(this.text)
+    if (!wrote && this.isConnected) {
+      this.dispatchEvent(new Event('helix-copy-error', { bubbles: true, composed: true }))
+    }
   }
 
   /**
@@ -187,11 +227,12 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
       aria-disabled=${this.pending ? 'true' : nothing}
       aria-label=${this.says}
       data-copied=${this.copied ? '' : nothing}
+      data-failed=${this.failed ? '' : nothing}
       tabindex=${this.focusable ? nothing : '-1'}
       ?disabled=${this.isDisabled}
       @click=${this.handleCopy}
     >
-      ${this.renderCopiedIcon()} ${this.renderCopyIcon()}
+      ${this.renderCopiedIcon()} ${this.renderFailedIcon()} ${this.renderCopyIcon()}
       </button>`,
     )}${this.renderLive()}`
   }
@@ -205,7 +246,9 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
    * the check holding its green through a hover where this one does not.
    */
   protected renderCopyIcon(): TemplateResult {
-    return html`<slot ?hidden=${this.copied}>${HelixHeadlessCopyButton.icon(copy)}</slot>`
+    return html`<slot ?hidden=${this.copied || this.failed}
+      >${HelixHeadlessCopyButton.icon(copy)}</slot
+    >`
   }
 
   /**
@@ -220,6 +263,13 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
   protected renderCopiedIcon(): TemplateResult {
     return html`<slot name="copied" ?hidden=${!this.copied}
       >${HelixHeadlessCopyButton.icon(check)}</slot
+    >`
+  }
+
+  /** The mark for a press that put nothing on the clipboard, behind a seam of its own. */
+  protected renderFailedIcon(): TemplateResult {
+    return html`<slot name="failed" ?hidden=${!this.failed}
+      >${HelixHeadlessCopyButton.icon(x)}</slot
     >`
   }
 

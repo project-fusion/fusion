@@ -30,6 +30,13 @@ slot[hidden] {
   color: var(--helix-color-success);
 }
 
+/* A press that put nothing on the clipboard says so in the danger ink, held
+   under the pointer for the same reason as the confirmation. */
+[part="button"][data-failed],
+:host(:not(:disabled)) [part="button"][data-failed]:hover {
+  color: var(--helix-color-danger);
+}
+
 /* The fallback icons need sizing here, and this is the whole reason why.
    Measured: both glyphs rendered, both took the right color, and both came out
    0x0, so the button was a correctly sized box containing nothing. */

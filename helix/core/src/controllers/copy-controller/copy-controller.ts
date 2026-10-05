@@ -82,10 +82,10 @@ const write = async (text: string): Promise<boolean> => {
  * in more places than it looks and a control that does nothing is
  * indistinguishable from a broken one. See `write` above.
  *
- * **Where neither route is allowed, the failure is silence.** The confirmation
- * does not appear, which is the honest report: a message about a clipboard is
- * worse than a chip that did not flash, and there is nothing a reader could do
- * about a permission policy anyway.
+ * **Where neither route is allowed, the copy has failed**, and `failed` holds
+ * for the moment a confirmation would. A component decides whether to say so:
+ * `CopyButton` names itself with its `error-label`, where Color's chip does
+ * not flash at all.
  *
  * **The event is announced after the write, not before it.** It is not
  * cancelable for the same reason: by the time anything could be said, the text
@@ -99,6 +99,9 @@ export class CopyController implements ReactiveController {
   /** Whether the last write succeeded and is still being confirmed. */
   copied = false
 
+  /** Whether the last copy put nothing on the clipboard, and is still being said. */
+  failed = false
+
   private timer: ReturnType<typeof setTimeout> | undefined
 
   constructor(
@@ -110,17 +113,15 @@ export class CopyController implements ReactiveController {
 
   /**
    * Writes to the clipboard, and confirms it if the platform allowed it.
+   * Resolves to whether the text is on the clipboard.
    *
    * Empty text is not copied. An empty clipboard is not a thing a reader ever
-   * asks for, and confirming one is worse than doing nothing.
+   * asks for, and confirming one is worse than doing nothing. Empty text and a
+   * refused write each hold `failed` for the same moment a copy holds
+   * `copied`, for a component that says so.
    */
-  async copy(text: string): Promise<void> {
-    if (text === '') {
-      return
-    }
-    if (!(await write(text))) {
-      return
-    }
+  async copy(text: string): Promise<boolean> {
+    const wrote = text !== '' && (await write(text))
     /* **The host may have gone while the clipboard was being written.** Writing
        is asynchronous, `hostDisconnected` runs the moment the element leaves,
        and it clears a timer that does not exist yet, so without this the
@@ -129,21 +130,27 @@ export class CopyController implements ReactiveController {
        `reset`, because the thing to skip is the whole confirmation and not only
        its clock. */
     if (this.host instanceof HTMLElement && !this.host.isConnected) {
-      return
+      return wrote
     }
-    this.copied = true
+    this.copied = wrote
+    this.failed = !wrote
     this.host.requestUpdate()
-    this.host.dispatchEvent(new HelixCopyEvent({ value: text }))
+    if (wrote) {
+      this.host.dispatchEvent(new HelixCopyEvent({ value: text }))
+    }
     this.reset()
     this.timer = setTimeout(() => {
       this.copied = false
+      this.failed = false
       this.host.requestUpdate()
     }, this.options.after ?? 1200)
+    return wrote
   }
 
   hostDisconnected(): void {
     this.reset()
     this.copied = false
+    this.failed = false
   }
 
   private reset(): void {

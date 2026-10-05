@@ -187,16 +187,17 @@ describe('a write that succeeded', () => {
 })
 
 describe('a write neither route was allowed', () => {
-  /* The failure is silence. A message about a clipboard is worse than a chip
-     that did not flash, and there is nothing a reader could do about a
-     permission policy anyway. */
-  test('confirms nothing, because there is nothing a reader could do about it', async () => {
+  /* Nothing is confirmed. The controller holds `failed` for the moment a
+     confirmation would last, and the component decides whether to say so. */
+  test('confirms nothing, and holds failed for a component that says so', async () => {
     routes({ legacy: false, modern: false })
     const one = host()
     const { values } = announced(one)
-    const copy = new CopyController(one as never)
-    await copy.copy('ada')
-    expect([copy.copied, values.length]).toEqual([false, 0])
+    const copy = new CopyController(one as never, { after: 5 })
+    expect(await copy.copy('ada')).toBe(false)
+    expect([copy.copied, copy.failed, values.length]).toEqual([false, true, 0])
+    await new Promise((done) => setTimeout(done, 20))
+    expect(copy.failed).toBe(false)
   })
 
   test('including where the platform has no second route at all', async () => {
@@ -213,8 +214,8 @@ describe('an empty copy', () => {
     const one = host()
     const { values } = announced(one)
     const copy = new CopyController(one as never)
-    await copy.copy('')
-    expect([carriers.length, values.length, copy.copied]).toEqual([0, 0, false])
+    expect(await copy.copy('')).toBe(false)
+    expect([carriers.length, values.length, copy.copied, copy.failed]).toEqual([0, 0, false, true])
   })
 })
 

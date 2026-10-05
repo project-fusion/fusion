@@ -103,7 +103,7 @@ describe('what it says and shows', () => {
        when the fallback is present and correct: measured here, both slots hold
        an `<svg>` and both report zero. Asserting through it tests the test
        double, and it fails on a component that is right. */
-    expect(slots.map((slot) => slot.querySelector('svg') !== null)).toEqual([true, true])
+    expect(slots.map((slot) => slot.querySelector('svg') !== null)).toEqual([true, true, true])
   })
 
   /* The tooltip is the visible confirmation and the accessible name is the
@@ -215,5 +215,68 @@ describe('a copy button named on the host', () => {
     expect(button.getAttribute('aria-label')).toBe('Copy invite link')
     await press(el)
     expect(button.getAttribute('aria-label')).toBe('Copied')
+  })
+})
+
+/** Mounts a button, presses it, and lists the copy events it sent. */
+const failing = async (markup: string): Promise<{ el: Updatable; heard: string[] }> => {
+  const el = (await mount(markup)) as Updatable
+  const heard: string[] = []
+  el.addEventListener('helix-copy', () => heard.push('helix-copy'))
+  el.addEventListener('helix-copy-error', () => heard.push('helix-copy-error'))
+  await press(el)
+  return { el, heard }
+}
+
+describe('a press that copies nothing', () => {
+  /* Web Awesome names its button with an error label and says so. Before,
+     an empty value or a refused write did nothing at all: a reader pressed and
+     heard nothing back. */
+  test('a refused write names the button with its error label and says so', async () => {
+    clipboard('refuse')
+    ;(document as unknown as Record<string, unknown>).execCommand = () => false
+    const { el, heard } = await failing(
+      '<helix-headless-copy-button error-label="Not copied" value="one"></helix-headless-copy-button>',
+    )
+    delete (document as unknown as Record<string, unknown>).execCommand
+    const button = el.shadowRoot?.querySelector('[part="button"]') as HTMLButtonElement
+    expect(heard).toEqual(['helix-copy-error'])
+    expect(button.getAttribute('aria-label')).toBe('Not copied')
+    expect(button.hasAttribute('data-failed')).toBe(true)
+    expect(el.shadowRoot?.querySelector('slot[name="failed"]')?.hasAttribute('hidden')).toBe(false)
+  })
+
+  test('so does an empty value, on every press', async () => {
+    clipboard('accept')
+    const { el, heard } = await failing('<helix-headless-copy-button></helix-headless-copy-button>')
+    await press(el)
+    expect(heard).toEqual(['helix-copy-error', 'helix-copy-error'])
+  })
+})
+
+describe('copying from another element', () => {
+  /* Web Awesome's `from`: an id, then an attribute in brackets or a property
+     after a dot. */
+  test('copies its text, an attribute or a property, read at the press', async () => {
+    const written = clipboard('accept')
+    document.body.innerHTML = `<code id="key">sk-123</code><input id="field" value="typed" data-token="t-9">
+      <helix-headless-copy-button from="key"></helix-headless-copy-button>
+      <helix-headless-copy-button from="field[data-token]"></helix-headless-copy-button>
+      <helix-headless-copy-button from="field.value" value="ignored"></helix-headless-copy-button>`
+    const buttons = [...document.querySelectorAll('helix-headless-copy-button')] as Updatable[]
+    ;(document.getElementById('field') as HTMLInputElement).value = 'edited'
+    for (const one of buttons) {
+      await one.updateComplete
+      await press(one)
+    }
+    expect(written).toEqual(['sk-123', 't-9', 'edited'])
+  })
+
+  test('an element that is not there copies nothing, which is a failed copy', async () => {
+    clipboard('accept')
+    const { heard } = await failing(
+      '<helix-headless-copy-button from="missing" value="one"></helix-headless-copy-button>',
+    )
+    expect(heard).toEqual(['helix-copy-error'])
   })
 })
