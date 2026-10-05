@@ -71,6 +71,11 @@ const parse = (hotkey: string) => {
  * @event {ToggleEvent} toggle - The palette opened or closed. The event carries `newState` and `oldState`.
  *
  * @csspart dialog - The box of the dialog the palette opens in, forwarded from `Dialog`.
+ * @csspart dialog-body - The dialog's slot for its content, which holds the list. It draws no box until you give it one.
+ * @csspart dialog-dismiss - The dialog's close control, drawn when the dialog is `dismissible`.
+ * @csspart dialog-dismiss-mark - The glyph on the dialog's close control, where none is slotted.
+ * @csspart dialog-footer - The dialog's slot for its actions, which holds the `footer` row. It draws no box until you give it one.
+ * @csspart dialog-header - The dialog's slot for its title. It draws no box until you give it one.
  * @csspart footer - The row under the list.
  * @csspart listbox - The listbox inside the palette.
  * @csspart listbox-empty - The text shown when the filter matches no commands.
@@ -362,7 +367,8 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
    */
   protected renderDialog(): TemplateResult {
     return html`<${this.tag('dialog')}
-    exportparts="dialog"
+    exportparts="body: dialog-body, dialog, dismiss: dialog-dismiss, dismiss-mark: dialog-dismiss-mark,
+      footer: dialog-footer, header: dialog-header"
       label=${this.label}
       .open=${this.open}
       @helix-before-close=${() => {
