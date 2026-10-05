@@ -103,6 +103,23 @@ describe('flex layout', () => {
     },
   )
 
+  laid('switch keeps the items in a row above its width, and one to a line below it', async () => {
+    const tops = async (width: number): Promise<number[]> => {
+      const wrapper = await mount(
+        `<div style="inline-size: ${width}px"><helix-flex layout="switch" style="--flex-switch-at: 400px"><i>a</i><i>b</i><i>c</i></helix-flex></div>`,
+      )
+      return [...wrapper.querySelectorAll('i')].map((item) =>
+        Math.round(item.getBoundingClientRect().top),
+      )
+    }
+    const [a, b, c] = await tops(600)
+    expect(b).toBe(a as number)
+    expect(c).toBe(a as number)
+    const [d, e, f] = await tops(300)
+    expect(e).toBeGreaterThan(d as number)
+    expect(f).toBeGreaterThan(e as number)
+  })
+
   laid(
     'flank gives the last item the rest of the row, and stacks the pair when it cannot',
     async () => {
