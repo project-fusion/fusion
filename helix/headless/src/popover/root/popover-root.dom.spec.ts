@@ -287,6 +287,42 @@ describe('focus on the way in', () => {
     await host.updateComplete
     expect(document.activeElement).toBe(trigger)
   })
+
+  test('goes back to the trigger when `open` closes it from inside, as a controlled popover closes', async () => {
+    const host = await withControls()
+    const trigger = host.querySelector('[slot="trigger"]') as HTMLElement
+    trigger.focus()
+    host.show()
+    await host.updateComplete
+    expect(document.activeElement?.id).toBe('first')
+    host.open = false
+    await host.updateComplete
+    expect(document.activeElement).toBe(trigger)
+  })
+
+  test('goes back to the trigger from the panel itself, where it holds no control', async () => {
+    const host = await popover()
+    const trigger = host.querySelector('[slot="trigger"]') as HTMLElement
+    trigger.focus()
+    host.show()
+    await host.updateComplete
+    host.open = false
+    await host.updateComplete
+    expect(document.activeElement).toBe(trigger)
+  })
+
+  test('stays where it is when the panel closes while focus is elsewhere', async () => {
+    const host = await withControls()
+    const outside = document.createElement('button')
+    document.body.append(outside)
+    host.show()
+    await host.updateComplete
+    outside.focus()
+    host.open = false
+    await host.updateComplete
+    expect(document.activeElement).toBe(outside)
+    outside.remove()
+  })
 })
 
 describe('a modal popover', () => {

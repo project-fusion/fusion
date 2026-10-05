@@ -27,6 +27,10 @@ import { styles } from './toast-root.css.js'
  */
 @customElement('helix-toast')
 export class HelixToast extends HelixHeadlessToast {
+  /* So `add()` appends `helix-toast-item`, which this tier draws, and not the
+     headless message. */
+  static override tier = 'helix-'
+
   static override styles: CSSResultGroup = styles
 }
 
