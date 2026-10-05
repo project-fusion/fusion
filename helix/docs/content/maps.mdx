@@ -487,7 +487,10 @@ is a map type, which the frame's `map-type` attribute chooses:
 - `satellite`: the imagery alone, without the roads and names.
 
 With `layers` in the frame's `controls`, the layers menu opens with a card for
-each map type, showing a picture of the map in it. Set `max-zoom` to the deepest
+each map type, showing a picture of the map in it. Choosing a card sends
+`helix-before-change` with the type's name, `standard`, `hybrid`, or
+`satellite`, and `change` once `map-type` holds it. Cancel the first to keep the
+current type, or listen for the second to store the choice. Set `max-zoom` to the deepest
 zoom your provider has tiles for, and the map enlarges those tiles when a user
 zooms in further.
 
@@ -559,6 +562,10 @@ a tile for each layer: a picture of what the layer draws, and its `label`. A
 tile is lit while its layer is shown. Pressing a tile sets its layer's `hidden`
 attribute, and `connectMap` does not draw a hidden layer. Write `hidden` on a
 layer to start it turned off.
+
+Before it sets `hidden`, a tile sends `helix-before-toggle` from the layer, with
+`checked` true when the layer is to be shown. Store the choice from it, or
+cancel it to keep the layer as it is.
 
 Give layers the same `group` to show them as one tile, such as a route and the
 dotted legs at its ends. The tile takes the name of the first layer in the

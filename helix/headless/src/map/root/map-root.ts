@@ -3,6 +3,8 @@ import {
   fillTemplate,
   formatNumbers,
   HelixActivateEvent,
+  HelixBeforeChangeEvent,
+  HelixBeforeToggleEvent,
   HelixElement,
   HelixMapClusterEvent,
   HelixMapPanEvent,
@@ -15,6 +17,7 @@ import {
   KeyboardNavigationController,
   MixinViewport,
   type NavigableItem,
+  requestChange,
   type ViewportControlsPlacement,
   type ViewportGestureLabels,
   type ViewportPanDetail,
@@ -34,6 +37,7 @@ import {
 } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { live } from 'lit/directives/live.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import type { HelixHeadlessMapMarker } from '../marker/map-marker.js'
 
@@ -149,14 +153,17 @@ const SETTLES = 400
  *
  * Add `layers` to `controls` for a layers button. It opens a menu with a tile
  * for each layer, which sets the layer's `hidden` attribute. Layers with the
- * same `group`, such as a route and its dotted legs, share one tile.
+ * same `group`, such as a route and its dotted legs, share one tile. A tile
+ * sends `helix-before-toggle` from the layer first, so you can store the
+ * choice or refuse it.
  *
  * Imagery, a `helix-map-raster` with `ground`, is a map type and not a tile.
  * The menu opens with a card for each type, Standard, Hybrid, and Satellite,
  * with a picture of the map in it, and `map-type` says which is chosen.
  * Standard hides the imagery, Hybrid draws it under the roads and names, and
- * Satellite draws it alone. `connectMap` does not draw a hidden layer, so a layer you write with
- * `hidden` starts turned off.
+ * Satellite draws it alone. Choosing one sends `helix-before-change` with its
+ * name, and `change` once `map-type` holds it. `connectMap` does not draw a
+ * hidden layer, so a layer you write with `hidden` starts turned off.
  *
  * Markers, routes, areas, live positions, and points layers go inside the
  * frame as child elements.
@@ -172,7 +179,10 @@ const SETTLES = 400
  * @slot footer - Content below the map, such as a legend or a scale.
  * @slot header - Content above the map, such as a title or a search field.
  *
+ * @event {Event} change - The layers menu changed the map type, which `map-type` now holds.
  * @event {HelixActivateEvent} helix-activate - A marker was pressed. The value is the marker's `name`, or its `label` if it has no name. A cluster sends `helix-map-cluster` instead.
+ * @event {HelixBeforeChangeEvent} helix-before-change - A map type was chosen in the layers menu, with its name: `standard`, `hybrid`, or `satellite`. Cancelable: cancel it to keep the current type.
+ * @event {HelixBeforeToggleEvent} helix-before-toggle - A layer's tile in the layers menu was pressed. Sent from the layer, with `checked` true when it is to be shown. Cancelable: cancel it to keep the layer as it is.
  * @event {HelixMapClusterEvent} helix-map-cluster - A cluster was pressed. Sent from the marker that shows the cluster, with the names of its places.
  * @event {HelixMapPanEvent} helix-map-pan - A pan button or arrow key was pressed. Move your map in response.
  * @event {HelixMapPartChangeEvent} helix-map-part-change - Clustering was turned on or off. Used by `connectMap`; pages do not need to listen for it.
@@ -537,12 +547,48 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
         : this.standardLabel
   }
 
-  /** Shows or hides layers, which `connectMap` draws or takes off the map. */
+  /**
+   * Shows or hides layers, which `connectMap` draws or takes off the map.
+   *
+   * **Asked first, from the layer.** The tile wrote `hidden` onto the
+   * consumer's element and said nothing, so a page could neither keep the
+   * choice nor keep its own state in step. The request comes from the first
+   * layer of the tile, which is the element the page wrote.
+   */
   private showLayers(layers: readonly MapLayer[], shown: boolean): void {
-    for (const layer of layers) {
-      layer.hidden = !shown
+    const first = layers[0]
+    if (!first) {
+      return
     }
-    this.requestUpdate()
+    requestChange({
+      apply: () => {
+        for (const layer of layers) {
+          layer.hidden = !shown
+        }
+        this.requestUpdate()
+      },
+      event: (checked) => new HelixBeforeToggleEvent({ checked }),
+      host: first,
+      next: shown,
+    })
+  }
+
+  /** Asks for a map type, and sends `change` once it holds. */
+  private chooseMapType(type: MapType): void {
+    const applied = requestChange({
+      apply: (value) => {
+        this.mapType = value === 'standard' ? undefined : (value as 'hybrid' | 'satellite')
+      },
+      event: (value) => new HelixBeforeChangeEvent({ value }),
+      host: this,
+      next: type as string,
+    })
+    if (applied) {
+      this.dispatchEvent(new Event('change', { bubbles: true }))
+    } else {
+      /* Refused: the radio the reader pressed is checked, and the type is not. */
+      this.requestUpdate()
+    }
   }
 
   /**
@@ -887,9 +933,10 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
           <input
             type="radio"
             name="map-type"
-            .checked=${chosen === type}
-            @change=${() => {
-              this.mapType = type === 'standard' ? undefined : type
+            .checked=${live(chosen === type)}
+            @change=${(event: Event) => {
+              event.stopPropagation()
+              this.chooseMapType(type)
             }}
           />
           ${

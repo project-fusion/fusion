@@ -164,6 +164,50 @@ describe('map layers menu', () => {
     expect(listed(host)).toEqual(['Depot to Mission', 'Delivery zone'])
   })
 
+  /* A tile wrote `hidden` onto the page's own element and sent nothing, so a
+     page could neither store the choice nor keep its own state in step. */
+  test('a tile asks first, from the layer, and refusing keeps the layer as it is', async () => {
+    const host = await menuFrame()
+    const [route] = [...host.children] as HTMLElement[]
+    const asked: Array<{ checked: boolean; from: EventTarget | null }> = []
+    host.addEventListener('helix-before-toggle', (event) => {
+      asked.push({
+        checked: (event as CustomEvent<{ checked: boolean }>).detail.checked,
+        from: event.target,
+      })
+      event.preventDefault()
+    })
+    const tile = part(host, 'layers-menu')?.querySelector(
+      '[part="layer-choice"]',
+    ) as HTMLButtonElement
+    tile.click()
+    await settle(host)
+    expect(asked).toEqual([{ checked: false, from: route }])
+    expect(route?.hidden).toBe(false)
+  })
+
+  test('choosing a map type asks first and says so once it holds', async () => {
+    const host = (await mount(
+      `<helix-headless-map controls="layers" label="Ground">
+        <helix-headless-map-raster ground label="Imagery"></helix-headless-map-raster>
+      </helix-headless-map>`,
+    )) as Frame & { mapType?: string }
+    await settle(host)
+    const heard: string[] = []
+    host.addEventListener('helix-before-change', (event) => {
+      heard.push(`before:${(event as CustomEvent<{ value: string }>).detail.value}`)
+    })
+    host.addEventListener('change', () => heard.push(`change:${host.mapType}`))
+    const radios = [
+      ...(part(host, 'layers-menu')?.querySelectorAll('input[type="radio"]') ?? []),
+    ] as HTMLInputElement[]
+    const satellite = radios[2] as HTMLInputElement
+    satellite.checked = true
+    satellite.dispatchEvent(new Event('change', { bubbles: true }))
+    await settle(host)
+    expect(heard).toEqual(['before:satellite', 'change:satellite'])
+  })
+
   test('keys in the menu do not reach the map, and a press outside closes it', async () => {
     const host = await menuFrame()
     const panned: string[] = []
