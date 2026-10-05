@@ -3,7 +3,6 @@ import {
   elementById,
   HelixElement,
   HelixTourAskEvent,
-  hostAria,
   type Placement,
   PopoverController,
   type Side,
@@ -36,6 +35,10 @@ import '../../button/index.js'
  * **`for` is an id, as with `Tooltip`**, so you can point at a target elsewhere
  * on the page from markup. It resolves against the stop's root node, so a stop
  * inside a shadow tree points at a target in that tree.
+ *
+ * The panel is a `group`, named by the first heading in the stop's content,
+ * and only while the stop is shown. `focus()` moves focus to the panel, which
+ * is what the tour does when it opens or moves on.
  *
  * @since 0.1.0
  * @status stable
@@ -188,17 +191,44 @@ export class HelixHeadlessTourStop extends HelixElement {
     surface: () => this.partNamed('bubble'),
   })
 
-  protected override willUpdate(changed: PropertyValues): void {
-    super.willUpdate(changed)
-    /* `group`, not `dialog`, and this is a decision rather than a shortcut. A
-       tour must not trap focus: the reader has to be able to look at the thing
-       being pointed at, and an overlay that will not let them has hidden its
-       own subject. */
-    hostAria(this.internals, { role: 'group' })
+  /**
+   * Moves focus to the panel while the stop is shown.
+   *
+   * The host draws no box and takes no focus, so focusing it did nothing. The
+   * panel takes focus without joining the `Tab` order, and a screen reader
+   * reads the group it is.
+   */
+  override focus(options?: FocusOptions): void {
+    const bubble = this.partNamed('bubble')
+    if (this.current && bubble) {
+      bubble.focus(options)
+      return
+    }
+    super.focus(options)
+  }
+
+  /**
+   * Names the panel by the first heading in the content, by element
+   * reference: the heading is in the light DOM and the panel in this shadow
+   * root, which an IDREF cannot cross.
+   */
+  private nameByHeading(): void {
+    const bubble = this.partNamed('bubble') as
+      | (HTMLElement & { ariaLabelledByElements?: Element[] | null })
+      | null
+    if (!bubble || !('ariaLabelledByElements' in bubble)) {
+      return
+    }
+    const heading = 'h1, h2, h3, h4, h5, h6, [role="heading"]'
+    const found = [...this.children].flatMap((one) =>
+      one.matches(heading) ? [one] : [...one.querySelectorAll(heading)],
+    )[0]
+    bubble.ariaLabelledByElements = found ? [found] : null
   }
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    this.nameByHeading()
     /* Shown and hidden from here rather than by a controller reading a
        property, because `current` is written onto this element by the root and
        is not a property this element decides. The controller does the top layer
@@ -251,7 +281,18 @@ export class HelixHeadlessTourStop extends HelixElement {
   }
 
   protected override render(): TemplateResult {
-    return html`<div part="bubble" popover="manual" ?hidden=${!this.current}>
+    /* `group` and not `dialog`, and this is a decision rather than a shortcut.
+       A tour must not trap focus: the reader has to be able to look at the
+       thing being pointed at, and an overlay that will not let them has hidden
+       its own subject. On the panel rather than the host, so a stop that is not
+       shown is in the tree as nothing at all. */
+    return html`<div
+      part="bubble"
+      popover="manual"
+      role="group"
+      tabindex="-1"
+      ?hidden=${!this.current}
+    >
       ${
         /* The one surface in this library that draws an arrow, and every other
            one deliberately does not. A menu or a select hangs off its trigger
