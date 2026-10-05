@@ -14,9 +14,10 @@
 /** Where a rule was read from, so a reader can go and look at it. */
 export interface Origin {
   /**
-   * The rule's own text, which is the receipt.
+   * The rule's own text, which is the receipt. For a scan's finding about
+   * an attribute, the opening tag's text.
    *
-   * **There is no line number and there cannot be one.** CSSOM exposes
+   * **A page has no line number and cannot have one.** CSSOM exposes
    * `cssText` and an index within the sheet; the byte offset in the authored
    * file is not in the object model at any level. A line was asked for, and
    * this is the honest substitute: the text of the rule is what a
@@ -24,9 +25,18 @@ export interface Origin {
    * line number would not.
    */
   cssText: string
-  /** Position within the sheet's own rule list, for a sheet with repeats. */
+  /**
+   * Position within the sheet's own rule list, for a sheet with repeats. For
+   * a scan's finding about an attribute, the element's position in the file.
+   */
   index: number
-  /** The sheet's `href`, or a description of why it has none. */
+  /**
+   * The line the rule's first declaration, or the element's opening tag, is
+   * on, counting from 1. A scan reads the file, so its findings have one. A
+   * page's never do.
+   */
+  line?: number
+  /** The sheet's `href`, or a description of why it has none. For a scan, the file's path. */
   sheet: string
 }
 
@@ -143,6 +153,21 @@ export const CATEGORIES = [
 export type Category = (typeof CATEGORIES)[number]
 
 /**
+ * What each Helix family adds to a build, measured by `helix scan --build`
+ * from the build's source maps, in bytes before compression.
+ */
+export interface Weight {
+  /** The bytes from each family's folder, across the tiers. */
+  families: Record<string, number>
+  /** The bundle files read with a source map, and without one, which cannot be split. */
+  files: { mapped: number; unmapped: number }
+  /** The bytes from each Helix package. */
+  packages: Record<string, number>
+  /** Every byte in the bundle files read, Helix or not. */
+  total: number
+}
+
+/**
  * What the components cost on a page, by tag, where a project asked for it.
  */
 export interface PerformanceReport {
@@ -168,6 +193,12 @@ export interface PerformanceReport {
       shift: number
     }
   >
+  /**
+   * What each family adds to the build, from a scan given the build. A scan
+   * measures nothing in a browser, so its `measured` is false and its `tags`
+   * are empty.
+   */
+  weight?: Weight
 }
 
 /**
@@ -199,9 +230,14 @@ export interface RuntimeEntry {
 /** Where a run was declared to happen. Undeclared is never sent. */
 export type Environment = 'ci' | 'development' | 'production'
 
-/** A sheet the collector could not read, and the reason. */
+/**
+ * A sheet the collector could not read, and the reason. For a scan, a file
+ * that did not parse is `threw`, and a stylesheet in a language the scan does
+ * not read, such as Sass's indented syntax or Stylus, is `unsupported`.
+ */
 export interface Unreadable {
-  reason: 'cross-origin' | 'detached' | 'threw'
+  reason: 'cross-origin' | 'detached' | 'threw' | 'unsupported'
+  /** The sheet's `href`, or for a scan, the file's path. */
   sheet: string
 }
 
@@ -215,6 +251,8 @@ export interface Unreadable {
  * hole this reports rather than steps over.
  */
 export interface Coverage {
+  /** Files read, for a scan: stylesheets, templates, and modules. */
+  files?: number
   /** Sheets whose rules were read end to end. */
   read: number
   /** Shadow roots entered, including nested ones. */
@@ -247,9 +285,10 @@ export interface Usage {
    * How the elements were counted. `watched`: every element that rendered
    * since `watch()` began, including the ones that have gone, such as a
    * closed dialog. `walked`: the elements in the page at the moment of the
-   * run, which misses those.
+   * run, which misses those. `scanned`: each element written in the code, by
+   * `helix scan`, counted once however many times it renders.
    */
-  counted: 'walked' | 'watched'
+  counted: 'scanned' | 'walked' | 'watched'
   /** Each hook the page's stylesheets set, by tag, counted per declaration. */
   hooks: Record<string, Record<string, number>>
   /**
@@ -350,6 +389,12 @@ export interface Report {
    * first load: one entry per distinct event, counted.
    */
   runtime: RuntimeEntry[]
+  /**
+   * The faults a scan found and only a page can settle, such as a hook set
+   * on an element for one inside it, each with the fingerprint the page's
+   * finding would have. A scan's alone.
+   */
+  unsettled?: Identified[]
   /**
    * The project's own name and labels, as its configuration gives them. The
    * key is never written into a report.

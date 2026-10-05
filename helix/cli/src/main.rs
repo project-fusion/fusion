@@ -22,6 +22,7 @@ mod diagnostics;
 mod manifest;
 mod mcp;
 mod new;
+mod scan;
 mod theme;
 
 use std::path::PathBuf;
@@ -71,6 +72,7 @@ fn main() {
         },
         Noun::Diagnostics(args) => diagnostics::run(args, &from, cli.json, paint),
         Noun::New(args) => new::run(args, &from, cli.json, paint),
+        Noun::Scan(args) => scan::run(args, &from, cli.json, paint),
         Noun::Theme { verb } => match verb {
             Theme::Audit(args) => theme::audit::run(args, &from, cli.json, paint),
             Theme::Build(args) => theme::build::run(args, &from, cli.json),

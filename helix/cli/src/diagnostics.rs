@@ -184,6 +184,33 @@ fn respond(
     stream.flush()
 }
 
+/// Writes the CI file: `runs` in place of every run from `source`, and every
+/// run from another source kept as the file has it, so the relay and
+/// `helix scan` can write one `--out`, in either order. A run that names no
+/// source is a page's.
+pub fn write_runs(out: &Path, source: &str, runs: &[&Value]) -> std::io::Result<()> {
+    let kept: Vec<Value> = std::fs::read_to_string(out)
+        .ok()
+        .and_then(|text| serde_json::from_str::<Value>(&text).ok())
+        .and_then(|file| file.get("runs").and_then(Value::as_array).cloned())
+        .unwrap_or_default()
+        .into_iter()
+        .filter(|run| {
+            run.pointer("/run/source")
+                .and_then(Value::as_str)
+                .unwrap_or("page")
+                != source
+        })
+        .collect();
+    let mut all: Vec<&Value> = kept.iter().collect();
+    all.extend(runs);
+    let file = json!({ "runs": all, "schema": 1 });
+    /* The folder made as the CI sink makes it, so one `--out` works for
+    both. */
+    out.parent().map_or(Ok(()), std::fs::create_dir_all)?;
+    std::fs::write(out, format!("{file:#}\n"))
+}
+
 /// What the relay holds: the latest run of each page, and what it has printed.
 struct Relay {
     json: bool,
@@ -285,14 +312,7 @@ impl Relay {
                     .and_then(Value::as_str)
                     .unwrap_or("")
             });
-            let file = json!({ "runs": runs, "schema": 1 });
-            /* The folder made as the CI sink makes it, so one `--out` works
-            for both. */
-            let written = out
-                .parent()
-                .map_or(Ok(()), std::fs::create_dir_all)
-                .and_then(|()| std::fs::write(out, format!("{file:#}\n")));
-            if let Err(error) = written {
+            if let Err(error) = write_runs(out, "page", &runs) {
                 eprintln!(
                     "helix diagnostics: could not write {}: {error}",
                     out.display()

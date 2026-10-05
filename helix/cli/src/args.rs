@@ -105,6 +105,17 @@ pub enum Noun {
     /// `--template` to be shown what there is.
     New(New),
 
+    /* **A noun with no verb, like `diagnostics`**: it does one thing to one
+    project. */
+    /// Read your project's code for what it uses of Helix and what it gets wrong.
+    ///
+    /// Reads every stylesheet, template, and module in the repository, judges
+    /// them against the lint data of the Helix packages you installed, and
+    /// prints each finding with its file and line. Writes the run to `--out`
+    /// beside the runs `helix diagnostics` writes there. Exits 1 on a finding
+    /// at `error`.
+    Scan(Scan),
+
     /// Derive, verify and inspect a theme.
     #[command(subcommand_required = true, arg_required_else_help = true)]
     Theme {
@@ -127,6 +138,30 @@ pub struct Diagnostics {
 
     /// The settings to serve to the page. Defaults to `helix-diagnostics.json`
     /// in the directory it runs in.
+    #[arg(long, value_name = "PATH")]
+    pub config: Option<PathBuf>,
+}
+
+/// What `helix scan` takes.
+#[derive(Args, Debug)]
+pub struct Scan {
+    /// The project to read. Defaults to the directory it runs in.
+    #[arg(value_name = "DIR")]
+    pub dir: Option<PathBuf>,
+
+    /// The folder your bundler writes the browser's files to, with source
+    /// maps on, such as `dist` or `.next/static`. Weighs what each Helix
+    /// family adds to it.
+    #[arg(long, value_name = "DIR")]
+    pub build: Option<PathBuf>,
+
+    /// Write the run to this CI file, keeping the runs `helix diagnostics`
+    /// wrote there.
+    #[arg(long, value_name = "PATH")]
+    pub out: Option<PathBuf>,
+
+    /// The settings to use. Defaults to `helix-diagnostics.json` in the
+    /// project, then in the directory it runs in.
     #[arg(long, value_name = "PATH")]
     pub config: Option<PathBuf>,
 }

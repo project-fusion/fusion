@@ -126,6 +126,54 @@ The address is always on a local host.
   `[::1]`, `*.localhost`, and `*.test`. It listens on `127.0.0.1`, so nothing
   else on your network reaches it, and production pages never send to it.
 
+## Scan your code
+
+`helix scan` reads every stylesheet, template, and module in your repository,
+judges them against the lint data of the Helix packages you installed, and
+writes one run in the shape a page writes, with `source: "code"`:
+
+```sh
+npx helix scan
+npx helix scan --build dist --out reports/helix-diagnostics.json
+```
+
+- **Each finding has its file and line**, and the kind and fingerprint a page
+  gives the same fault, so a dashboard joins the two.
+- **It reads every file, and so every route.** A page sees the routes someone
+  opened, so a scan is the better count of what your project uses. An element
+  written once counts once, however many times it renders, and
+  `usage.counted` is `scanned`.
+- **What only a page can settle is `unsettled`.** A hook set on a Helix tag
+  that does not have it works where an element with the hook is inside that
+  tag, and only the running page shows whether one is. The scan lists these
+  apart, each with the fingerprint the page's finding would have, and they
+  never fail the scan.
+- **It reads** CSS, Sass, and Less files; HTML, Vue, Svelte, and Astro
+  templates; MDX outside its code samples; and JavaScript and TypeScript, for
+  JSX, Lit's `html` and `css` templates, and Angular's inline templates. A
+  file that does not parse, and a stylesheet in Sass's indented syntax or
+  Stylus, is listed in `coverage.unreadable`.
+- **It leaves out** what `.gitignore` leaves out, the folders a build or a
+  package manager writes, and tests: a name with `.test.` or `.spec.`, and
+  anything under `__tests__`.
+- **An attribute is checked where the code writes it as one.** In
+  `tone="primary"`, the name and the value are checked. Lit's `tone=${...}`
+  writes the attribute, so its name is checked. An expression in JSX, Svelte,
+  or Angular, and Vue's `:tone`, set a property where the element has one, so
+  none of them is checked.
+- **With `--build`, it weighs your bundle**: what each Helix family and
+  package adds to it, from its source maps, as `performance.weight`. Turn
+  source maps on in your bundler, and pass the folder it writes the browser's
+  files to, such as `dist` or `.next/static`.
+- **With `--out`, it writes its run to the CI file**, and keeps the runs
+  `helix diagnostics` wrote there. The relay keeps the scan's run the same
+  way, so the two share one file, in either order.
+
+It reads `helix-diagnostics.json` from the project, then from the directory it
+runs in, or the file `--config <path>` names, and refuses a setting that names
+nothing, as the page does. It exits 1 on a finding at `error`, and 3 where the
+project installs no Helix lint data. `--json` prints the run.
+
 ## Run it once, directly
 
 `diagnose()` is one run, which `initDiagnostics()` makes for you. Call it
@@ -169,9 +217,12 @@ A report is one run, in one shape for every sink, versioned by `schema`:
   severity, the tag and its family, a `category` (`styling`, `markup`,
   `integrity`, or `guideline`), an `owner` (`consumer`, or `helix` for a fault
   in the library), a `fingerprint` that stays the same from one run to the next
-  for the same fault, and the rule's own text as evidence.
+  for the same fault, and the rule's own text as evidence. A scan's findings
+  also have the file's `line`.
 - **`performance`**: what the components cost, by tag, where you asked for it.
   See [Performance](#performance).
+- **`unsettled`**: from a scan, the faults only a page can settle. See
+  [Scan your code](#scan-your-code).
 - **`runtime`**: what the library reported going wrong as it ran on the page,
   from its first load. One entry per distinct event, with its `kind`, its
   `tag`, the sentence that says what to do, how many times it was reported,
@@ -284,6 +335,9 @@ that has not asked pays one property read per element. Layout shift and long
 tasks are measured in Chromium only. Elsewhere `measured` says so, and their
 numbers are left out.
 
+What each family adds to your bundle is measured from the code, by
+`helix scan --build`, as `weight`. See [Scan your code](#scan-your-code).
+
 ## Configure it
 
 Every setting can be given in three places, and a later place wins, field by
@@ -356,6 +410,10 @@ process.exitCode = code
 A fault found on many pages is one line, with the pages it was on. `error`
 findings fail the job by default; pass `failOn: 'warn'` to fail on warnings
 too, or `'never'` to report without failing.
+
+`ciSink` writes the whole file, so to add a run from your code, run
+`helix scan --out` with the same file after it. The scan keeps the runs it
+finds there.
 
 ## Versions
 

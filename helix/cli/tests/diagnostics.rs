@@ -184,6 +184,29 @@ fn a_run_prints_its_new_findings_once_and_is_kept_as_its_page_s_latest() {
 }
 
 #[test]
+fn a_scan_s_run_in_the_ci_file_is_kept_beside_the_pages() {
+    let relay = Relay::start("beside", None);
+    std::fs::create_dir_all(relay.directory.join("reports")).expect("a folder");
+    std::fs::write(
+        relay.directory.join("reports/runs.json"),
+        r#"{ "runs": [{ "run": { "id": "scan", "source": "code" } }], "schema": 1 }"#,
+    )
+    .expect("a CI file");
+    relay.ask("POST", "/runs", Some("http://localhost:5173"), RUN);
+    let file: serde_json::Value = serde_json::from_str(
+        &std::fs::read_to_string(relay.directory.join("reports/runs.json")).expect("written"),
+    )
+    .expect("json");
+    let ids: Vec<&str> = file["runs"]
+        .as_array()
+        .expect("runs")
+        .iter()
+        .filter_map(|run| run["run"]["id"].as_str())
+        .collect();
+    assert_eq!(ids, ["scan", "one"]);
+}
+
+#[test]
 fn the_project_s_settings_are_served_to_the_page_and_only_whole() {
     let relay = Relay::start("settings", Some(r#"{ "console": { "findings": "warn" } }"#));
     let answer = relay.ask("GET", "/config", Some("http://localhost:5173"), "");
