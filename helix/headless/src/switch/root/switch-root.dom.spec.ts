@@ -89,3 +89,33 @@ describe('a switch named on the host', () => {
     expect(control(host).getAttribute('aria-label')).toBe('Wi-Fi')
   })
 })
+
+describe('a read-only switch', () => {
+  /* React Aria's isReadOnly. A native checkbox has no read-only state, so the
+     press is refused at the inner control. */
+  test('refuses a press on the control and on the host, and still submits', async () => {
+    document.body.innerHTML =
+      '<form><helix-headless-switch name="ok" readonly default-checked>Agree</helix-headless-switch></form>'
+    const host = document.querySelector('helix-headless-switch') as Updatable & {
+      checked: boolean
+      readOnly: boolean
+    }
+    await settle(host)
+    const heard: string[] = []
+    host.addEventListener('change', () => heard.push('change'))
+    ;(part(host, 'control') as HTMLInputElement).click()
+    host.click()
+    await settle(host)
+    expect(host.checked).toBe(true)
+    expect((part(host, 'control') as HTMLInputElement).checked).toBe(true)
+    expect(heard).toEqual([])
+    expect(part(host, 'control')?.getAttribute('aria-readonly')).toBe('true')
+    expect(formValue(host)).toBe('on')
+    host.readOnly = false
+    await settle(host)
+    ;(part(host, 'control') as HTMLInputElement).click()
+    await settle(host)
+    expect(host.checked).toBe(false)
+    expect(part(host, 'control')?.hasAttribute('aria-readonly')).toBe(false)
+  })
+})
