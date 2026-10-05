@@ -159,6 +159,49 @@
   color: var(--badge-color, var(--helix-color-foreground));
 }
 
+/*
+ * **`placement` moves the mark to another corner, or into the line.** The
+ * resting corner is the top end, as above. A corner keeps the same pull
+ * inward and the same half-overhang, mirrored on the axis that moved.
+ */
+:host([placement="top-start"]) [part="indicator"],
+:host([placement="bottom-start"]) [part="indicator"] {
+  inset-inline-end: auto;
+  inset-inline-start: var(--badge-offset, calc(var(--_badge-size) / 4));
+}
+
+:host([placement="bottom-end"]) [part="indicator"],
+:host([placement="bottom-start"]) [part="indicator"] {
+  inset-block-end: var(--badge-offset, calc(var(--_badge-size) / 4));
+  inset-block-start: auto;
+}
+
+:host([placement="top-start"]) [part="indicator"] {
+  translate: -50% -50%;
+}
+
+:host([placement="bottom-end"]) [part="indicator"] {
+  translate: 50% 50%;
+}
+
+:host([placement="bottom-start"]) [part="indicator"] {
+  translate: -50% 50%;
+}
+
+/* In the line, after what it counts: the shape WA and Shoelace draw inside a
+   button. Put inside a control, its count is read as part of the control's
+   name. No ring, having nothing to overlap. */
+:host([placement="inline"]) {
+  align-items: center;
+  gap: var(--badge-gap, var(--helix-space-2xs));
+}
+
+:host([placement="inline"]) [part="indicator"] {
+  box-shadow: none;
+  position: static;
+  translate: none;
+}
+
 /* Print: a count.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this

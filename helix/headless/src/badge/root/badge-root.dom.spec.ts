@@ -158,3 +158,25 @@ describe('badge', () => {
     expect(part(badge, 'indicator')?.textContent?.trim()).toBe('9+')
   })
 })
+
+/* A badge inside a control is read as part of its name. Chromium reads a
+   status region's `aria-label` into an ancestor's name and leaves its text out,
+   so the count names the region where no label does. */
+describe('a badge inside a control', () => {
+  test('names its region with the count when it has no label', async () => {
+    const badge = await mount('<helix-headless-badge value="3"></helix-headless-badge>')
+    expect(part(badge, 'indicator')?.getAttribute('aria-label')).toBe('3')
+  })
+
+  test('and with the label where it has one', async () => {
+    const badge = await mount(
+      '<helix-headless-badge value="8" label="8 unread"></helix-headless-badge>',
+    )
+    expect(part(badge, 'indicator')?.getAttribute('aria-label')).toBe('8 unread')
+  })
+
+  test('a dot with no label still says nothing', async () => {
+    const badge = await mount('<helix-headless-badge></helix-headless-badge>')
+    expect(part(badge, 'indicator')?.hasAttribute('aria-label')).toBe(false)
+  })
+})

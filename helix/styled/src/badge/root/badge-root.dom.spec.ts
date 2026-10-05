@@ -100,3 +100,33 @@ describe('badge', () => {
     }
   })
 })
+
+/* wa-badge sits inside a button; Helix's sat in one corner only. */
+describe('placement', () => {
+  test('moves the mark to another corner, mirrored on the axis that moved', () => {
+    expect(sheet()).toMatch(
+      /\[placement="top-start"\]\) \[part="indicator"\] \{\s*translate: -50% -50%/,
+    )
+    expect(sheet()).toMatch(
+      /\[placement="bottom-end"\]\) \[part="indicator"\] \{\s*translate: 50% 50%/,
+    )
+    expect(sheet()).toMatch(
+      /\[placement="bottom-start"\]\) \[part="indicator"\] \{\s*translate: -50% 50%/,
+    )
+  })
+
+  test('or into the line, with no ring and nothing pinned', () => {
+    const inline = rule(':host([placement="inline"]) [part="indicator"]')
+    expect(inline).toContain('position: static')
+    expect(inline).toContain('box-shadow: none')
+  })
+
+  test('reflects, so the sheet can reach it from a script', async () => {
+    const badge = (await mount('<helix-badge value="2"></helix-badge>')) as Updatable & {
+      placement?: string
+    }
+    badge.placement = 'inline'
+    await badge.updateComplete
+    expect(badge.getAttribute('placement')).toBe('inline')
+  })
+})
