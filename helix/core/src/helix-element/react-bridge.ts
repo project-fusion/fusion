@@ -295,6 +295,16 @@ export const reactNativeProp = (type: string): string =>
 const lowercasePropFor = (event: Event): string | undefined =>
   event.type.includes('-') || REACT_WIRES.has(event.type) ? undefined : `on${event.type}`
 
+/**
+ * Binds the handler React is holding for an event the host is about to send,
+ * where React never bound it: under the event's React prop and its lowercase
+ * spelling.
+ *
+ * Called by the host as it dispatches, which is the first moment it knows the
+ * event's name. A host React does not render holds no props, and nothing is
+ * bound. The props are audited on the way, so a handler attached to nothing
+ * warns.
+ */
 export const bindReactHandler = (host: EventTarget, event: Event): void => {
   const props = reactPropsOf(host)
   if (props === undefined) {

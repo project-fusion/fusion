@@ -4,6 +4,7 @@ import {
   HelixActivateEvent,
   HelixElement,
   IndicatorController,
+  plainClick,
   reflectElements,
   scrollItemIntoView,
 } from '@fusion.dev/helix-core'
@@ -495,10 +496,7 @@ export class HelixHeadlessOutline extends HelixElement {
    * handled is not ours, and `auto` is the whole point of `auto`.
    */
   private readonly handleClick = (event: MouseEvent): void => {
-    if (event.defaultPrevented || event.button !== 0) {
-      return
-    }
-    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+    if (event.defaultPrevented || !plainClick(event)) {
       return
     }
     const link = (event.target as Element | null)?.closest?.('a[href^="#"]')

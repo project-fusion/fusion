@@ -3,8 +3,8 @@ import {
   elapsedTime,
   HelixElement,
   type Relative,
+  RelativeClockController,
   relativeTime,
-  subscribe,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -204,22 +204,28 @@ export class HelixHeadlessFormatDate extends HelixElement {
   year?: 'numeric' | '2-digit'
 
   /**
-   * The clock this element last drew against.
+   * The clock this element last drew against, moved on when the reading goes
+   * stale.
    *
-   * A state field and not a read of `Date.now()` inside `render`, which would
-   * make the template a function of something Lit cannot see change: the element
-   * would draw the right text once and never notice it had gone stale.
+   * A controller's time and not a read of `Date.now()` inside `render`, which
+   * would make the template a function of something Lit cannot see change: the
+   * element would draw the right text once and never notice it had gone stale.
+   * The formatter says when its own answer expires, so the clock wakes at
+   * exactly that moment rather than polling: an item minutes old once a minute,
+   * an item hours old once an hour, and an item showing a date never.
    */
-  @state()
-  private clock: number | undefined = undefined
+  private readonly clock = new RelativeClockController(this, {
+    expires: (now) => {
+      const moment = this.moment
+      return moment && this.reading ? this.readingAt(moment, now).next : undefined
+    },
+  })
 
   /**
    * The date read out of the light DOM, where no attribute carried one.
    */
   @state()
   private written = ''
-
-  private stopTicking: (() => void) | undefined = undefined
 
   private watching: MutationObserver | undefined = undefined
 
@@ -275,7 +281,6 @@ export class HelixHeadlessFormatDate extends HelixElement {
 
   override connectedCallback(): void {
     super.connectedCallback()
-    this.tick()
     /* Rebuilt on every connection rather than built once, because
        `disconnectedCallback` takes it down and a framework moves nodes for
        ordinary reasons: built in `firstUpdated` alone this comes back
@@ -289,10 +294,8 @@ export class HelixHeadlessFormatDate extends HelixElement {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
-    /* Both outlive the element otherwise, and a page that mounts and unmounts a
-       feed leaks one of each every time it opens. */
-    this.stopTicking?.()
-    this.stopTicking = undefined
+    /* It outlives the element otherwise, and a page that mounts and unmounts a
+       feed leaks one every time it opens. The clock stops itself. */
     this.watching?.disconnect()
     this.watching = undefined
   }
@@ -319,7 +322,7 @@ export class HelixHeadlessFormatDate extends HelixElement {
       changed.has('numeric') ||
       changed.has('relative')
     ) {
-      this.tick()
+      this.clock.tick()
     }
   }
 
@@ -331,7 +334,7 @@ export class HelixHeadlessFormatDate extends HelixElement {
     const written = this.textContent?.trim() ?? ''
     if (written !== this.written) {
       this.written = written
-      this.tick()
+      this.clock.tick()
     }
   }
 
@@ -339,35 +342,6 @@ export class HelixHeadlessFormatDate extends HelixElement {
     this.watching?.disconnect()
     this.watching = new MutationObserver(() => this.read())
     this.watching.observe(this, { characterData: true, childList: true, subtree: true })
-  }
-
-  /**
-   * Schedules the next reading, and only the next one.
-   *
-   * The formatter says when its own answer expires, so this asks for exactly
-   * that moment rather than polling: an item minutes old wakes once a minute, an
-   * item hours old once an hour, and an item showing a date never, which is the
-   * difference between a feed that costs nothing to leave open and one that
-   * does.
-   */
-  private tick(): void {
-    this.stopTicking?.()
-    this.stopTicking = undefined
-    const moment = this.moment
-    if (!moment || !this.reading) {
-      return
-    }
-    const now = new Date()
-    this.clock = now.getTime()
-    const { next } = this.readingAt(moment, now)
-    /* Only on a page. A server runs `willUpdate` and has nobody to update a
-       reading for, and a subscription there is a timer up to an hour long that
-       holds the element after its markup has been sent: measured, rendering the
-       notifications examples left a process that would not exit. */
-    if (!Number.isFinite(next) || !this.isConnected) {
-      return
-    }
-    this.stopTicking = subscribe(next, () => this.tick())
   }
 
   protected override render(): TemplateResult | typeof nothing {
@@ -384,7 +358,7 @@ export class HelixHeadlessFormatDate extends HelixElement {
        reader read for it, with the instant in `datetime` exposed to nobody. So
        the reading is named in full, "3 hours ago", and the whole date is its
        title. `time` is a role that takes a name. */
-    const now = new Date(this.clock ?? Date.now())
+    const now = new Date(this.clock.now)
     const zone = this.timeZone || (this.dateOnly ? 'UTC' : undefined)
     const whole = new Intl.DateTimeFormat(this.locale || undefined, {
       dateStyle: 'long',

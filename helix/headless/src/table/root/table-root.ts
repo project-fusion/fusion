@@ -13,6 +13,7 @@ import {
   reflectElements,
   requestChange,
   splitValues,
+  toggleEvery,
   whenHydrated,
 } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -504,16 +505,14 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     const keys = this.chosen
     if (root === this.renderRoot) {
       event.preventDefault()
-      const every = this.keyed.map(({ key }) => key)
-      const all = every.length > 0 && every.every((key) => keys.has(key))
-      for (const key of every) {
-        if (all) {
-          keys.delete(key)
-        } else {
-          keys.add(key)
-        }
-      }
-      this.requestSelected(keys)
+      this.requestSelected(
+        new Set(
+          toggleEvery(
+            keys,
+            this.keyed.map(({ key }) => key),
+          ),
+        ),
+      )
       return
     }
     const found = this.keyed.find(({ row }) => row.shadowRoot === root)

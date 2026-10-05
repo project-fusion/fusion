@@ -11,6 +11,7 @@ import {
   scrollItemIntoView,
   slottedWords,
   Typeahead,
+  treeArrow,
   typesCharacter,
   whenHydrated,
 } from '@fusion.dev/helix-core'
@@ -485,20 +486,19 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
       this.focusOn(this.visibleItems[0])
     } else if (event.key === 'End') {
       this.focusOn(this.visibleItems.at(-1))
-    } else if (along === 1) {
+    } else if (along !== 0) {
       // Open a closed branch, then step into it. Two presses rather than one
       // that does both, which is what the pattern specifies.
-      if (current.isBranch && !current.open && !current.disabled) {
-        current.requestOpen(true)
+      const arrow = treeArrow(
+        { branch: current.isBranch, disabled: current.disabled, open: current.open },
+        along,
+      )
+      if (arrow === 'open' || arrow === 'close') {
+        current.requestOpen(arrow === 'open')
         this.syncItems()
-      } else if (current.isBranch) {
+      } else if (arrow === 'child') {
         this.move(current, 1)
-      }
-    } else if (along === -1) {
-      if (current.isBranch && current.open && !current.disabled) {
-        current.requestOpen(false)
-        this.syncItems()
-      } else {
+      } else if (arrow === 'parent') {
         const parent = closestInstance(current.parentElement, HelixHeadlessTreeItem)
         this.focusOn(parent instanceof HelixHeadlessTreeItem ? parent : undefined)
       }

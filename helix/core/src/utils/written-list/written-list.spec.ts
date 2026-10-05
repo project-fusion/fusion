@@ -1,5 +1,13 @@
 import { describe, expect, test } from 'bun:test'
-import { commaList, toggleValue, writtenList, writtenNumbers } from './written-list.js'
+import {
+  commaList,
+  pressedValue,
+  prunedValue,
+  toggleEvery,
+  toggleValue,
+  writtenList,
+  writtenNumbers,
+} from './written-list.js'
 
 /**
  * A list a consumer wrote into an attribute.
@@ -106,5 +114,55 @@ describe('a value toggled in a list', () => {
     expect(toggleValue(['underline'], 'bold', order)).toEqual(['bold', 'underline'])
     expect(toggleValue(['underline', 'bold'], 'underline', order)).toEqual(['bold'])
     expect(toggleValue(['gone'], 'italic', order)).toEqual(['italic'])
+  })
+})
+
+describe('a press on an item in a set that selects', () => {
+  test('in a single selection selects it alone, and again selects none', () => {
+    expect(pressedValue('single', 'a', 'b')).toBe('b')
+    expect(pressedValue('single', 'b', 'b')).toBe('')
+  })
+
+  /* A value with a space in it is one value: Tag Group's case. */
+  test('in a multiple selection adds it, and again takes it out', () => {
+    expect(pressedValue('multiple', 'a', 'b c')).toBe('a, b c')
+    expect(pressedValue('multiple', 'a, b c', 'a')).toBe('b c')
+  })
+
+  test('selects nothing where the set selects nothing', () => {
+    expect(pressedValue('none', 'a', 'b')).toBe('a')
+  })
+})
+
+describe('an item that leaves a set', () => {
+  test('takes its value out where no item left stands for it', () => {
+    expect(prunedValue('a, b c', 'b c', ['a'])).toBe('a')
+  })
+
+  test('keeps it where another item still stands for it', () => {
+    expect(prunedValue('a, b', 'b', ['a', 'b'])).toBe('a, b')
+  })
+
+  test('leaves a value that never held it as written', () => {
+    expect(prunedValue('a,b', 'c', [])).toBe('a,b')
+  })
+})
+
+describe('every one of a set at once', () => {
+  test('is added where any was missing, after what was chosen', () => {
+    expect(toggleEvery(['x', 'b'], ['a', 'b', 'c'])).toEqual(['x', 'b', 'a', 'c'])
+  })
+
+  test('and taken out where every one was in', () => {
+    expect(toggleEvery(['a', 'x', 'b'], ['a', 'b'])).toEqual(['x'])
+  })
+
+  test('in an order, holding only what the order holds', () => {
+    expect(toggleEvery(['c'], ['a', 'b'], ['a', 'b', 'c'])).toEqual(['a', 'b', 'c'])
+    expect(toggleEvery(['z', 'a'], ['a'], ['a', 'b'])).toEqual([])
+  })
+
+  test('changes nothing for an empty set', () => {
+    expect(toggleEvery(['a'], [])).toEqual(['a'])
   })
 })

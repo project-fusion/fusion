@@ -1,4 +1,4 @@
-import { commaList, rangeAdd, toggleValue } from '@fusion.dev/helix-core'
+import { commaList, pressedValue, rangeAdd, type SelectionMode } from '@fusion.dev/helix-core'
 
 /*
  * What an interactive list's selection and its arrow keys come to, as
@@ -7,32 +7,14 @@ import { commaList, rangeAdd, toggleValue } from '@fusion.dev/helix-core'
  * without a page.
  */
 
-/** How many rows a reader can select in an interactive list. */
-export type ListSelectionMode = 'multiple' | 'none' | 'single'
+/** How many rows a reader can select in an interactive list: core's `SelectionMode`. */
+export type ListSelectionMode = SelectionMode
 
 /**
  * What a press does to the rows already selected: `toggle` adds or takes out
  * the row, and `replace` selects it alone, as a file list does.
  */
 export type ListSelectionBehavior = 'replace' | 'toggle'
-
-/**
- * The `value` a press on the row carrying `pressed` leaves.
- *
- * `single` selects that row alone, or none where it was the one selected.
- * `multiple` adds it, or takes it out. `none` selects nothing and leaves the
- * value as it was. Tag Group answers the same question for its tags.
- */
-export const pressedValue = (mode: ListSelectionMode, value: string, pressed: string): string => {
-  const now = commaList(value)
-  if (mode === 'single') {
-    return now.includes(pressed) ? '' : pressed
-  }
-  if (mode === 'multiple') {
-    return toggleValue(now, pressed).join(', ')
-  }
-  return value
-}
 
 /** A press on a row, or a key arriving on one, and what the list held then. */
 export interface ListChoice {

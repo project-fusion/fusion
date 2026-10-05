@@ -19,6 +19,7 @@ import {
   StatusController,
   scrollItemIntoView,
   searchableById,
+  treeArrow,
   VirtualizeController,
 } from '@fusion.dev/helix-core'
 import { caretDown, caretRight } from '@fusion.dev/helix-icons'
@@ -703,21 +704,25 @@ export class HelixHeadlessObjectInspector extends HelixElement {
       case 'ArrowLeft':
         /* In is where a shut row's caret points, along the line, so it is the
            left arrow on a right-to-left page and the right one comes back. */
-        if (inlineStep(this, event.key) === 1) {
-          if (row.branch && !row.open) {
-            this.toggle(row, true)
-          } else if (row.open) {
+        switch (treeArrow(row, inlineStep(this, event.key) === 1 ? 1 : -1)) {
+          case 'open':
+          case 'close':
+            this.toggle(row, !row.open)
+            break
+          case 'child':
             this.move(this.cursor + 1)
+            break
+          case 'parent': {
+            const parent = rows.findLastIndex(
+              (candidate, at) => at < this.cursor && candidate.depth === row.depth - 1,
+            )
+            if (parent >= 0) {
+              this.move(parent)
+            }
+            break
           }
-        } else if (row.open) {
-          this.toggle(row, false)
-        } else {
-          const parent = rows.findLastIndex(
-            (candidate, at) => at < this.cursor && candidate.depth === row.depth - 1,
-          )
-          if (parent >= 0) {
-            this.move(parent)
-          }
+          default:
+            break
         }
         break
       case 'Enter':

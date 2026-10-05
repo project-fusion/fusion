@@ -1,4 +1,10 @@
-import { customElement, elementById, HelixElement, reportRuntime } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  elementById,
+  HelixElement,
+  plainClick,
+  reportRuntime,
+} from '@fusion.dev/helix-core'
 import { html, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -92,7 +98,7 @@ export class HelixHeadlessSkipLink extends HelixElement {
    * region.
    */
   private readonly skip = (event: MouseEvent): void => {
-    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+    if (!plainClick(event)) {
       return
     }
     const target = this.target
