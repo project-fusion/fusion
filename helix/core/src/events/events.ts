@@ -1570,6 +1570,12 @@ export interface SelectDetail {
    * A flag says it outright.
    */
   alternate?: boolean
+  /**
+   * The link of a row that is a link, which the browser follows once the event
+   * is done unless it is canceled. A client-side router cancels it and follows
+   * the link itself.
+   */
+  href?: string
   /** Value of the item the reader chose. */
   value: string
 }

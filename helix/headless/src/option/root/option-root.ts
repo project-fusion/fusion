@@ -1,4 +1,10 @@
-import { customElement, HelixElement, HelixSelectEvent } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  followLink,
+  HelixElement,
+  HelixSelectEvent,
+  type LinkModifiers,
+} from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -43,6 +49,9 @@ export const optionsAmong = (elements: readonly Element[]): HelixHeadlessOption[
  * Filtering belongs to the owner, which hides an option with `hidden`. What
  * counts as a match differs between a select and a command palette.
  *
+ * An option with `href` is a link: choosing it follows the link and selects
+ * nothing, as an entry in a command palette that goes to a page does.
+ *
  * @since 0.1.0
  * @status stable
  * @category forms
@@ -53,7 +62,7 @@ export const optionsAmong = (elements: readonly Element[]): HelixHeadlessOption[
  * @slot end - Content after the label, such as a shortcut or a count.
  * @slot start - Content before the label, such as an icon or an avatar.
  *
- * @event {HelixSelectEvent} helix-select - The option was chosen. Cancelable: canceling it leaves the selection as it was.
+ * @event {HelixSelectEvent} helix-select - The option was chosen. Cancelable: canceling it leaves the selection as it was, and keeps the browser from following an option's `href`.
  *
  * @csspart description - The description under the label, when there is one.
  * @csspart item - The row.
@@ -175,6 +184,32 @@ export class HelixHeadlessOption extends HelixElement {
   disabled = false
 
   /**
+   * Whether following the link downloads what it names. Only meaningful
+   * beside an `href`.
+   */
+  @property({ type: Boolean })
+  download = false
+
+  /**
+   * The URL the option links to. Setting it makes the option a link: choosing
+   * it, with a press, Enter or a click, follows the link and selects nothing,
+   * as React Aria's items with `href` do. Command, Control and Shift open it
+   * where they open a link, in a new tab or a new window.
+   *
+   * `helix-select` is said first with the `href` in it, and canceling it keeps
+   * the browser from following, so a client-side router follows it instead.
+   *
+   * **The option stays an option**, and an anchor is never drawn inside it:
+   * `role="option"` sits on the host, where a listbox's
+   * `aria-activedescendant` can name it, and an `<a>` inside would be exposed
+   * as a link within the option and take its name (Menu Item's `href` records
+   * the measurement). The link is followed through an anchor made for the
+   * moment, which `followLink` describes.
+   */
+  @property()
+  href = ''
+
+  /**
    * A shorter name for this choice, for where the row does not fit.
    *
    * `<option label>`'s own meaning: the text a chooser shows when it has less
@@ -190,12 +225,24 @@ export class HelixHeadlessOption extends HelixElement {
   label = ''
 
   /**
+   * The link's `rel`. Set it whenever you set `target="_blank"`.
+   */
+  @property()
+  rel = ''
+
+  /**
    * Whether this choice is currently chosen.
    *
    * Written by the listbox.
    */
   @property({ type: Boolean })
   selected = false
+
+  /**
+   * Where the link opens, such as `_blank`, for an option with an `href`.
+   */
+  @property()
+  target = ''
 
   /**
    * The words a reader types to reach this choice, where the row's own words
@@ -273,12 +320,23 @@ export class HelixHeadlessOption extends HelixElement {
     )
   }
 
-  /** Sends `helix-select` for this option. Does nothing when it is disabled. */
-  select(): void {
+  /**
+   * Sends `helix-select` for this option. Does nothing when it is disabled.
+   *
+   * An option with an `href` then follows its link, unless the event was
+   * canceled, with the keys `modifiers` names held.
+   */
+  select(modifiers?: LinkModifiers): void {
     if (this.disabled) {
       return
     }
-    this.dispatchEvent(new HelixSelectEvent({ value: this.value }))
+    if (this.href === '') {
+      this.dispatchEvent(new HelixSelectEvent({ value: this.value }))
+      return
+    }
+    if (this.dispatchEvent(new HelixSelectEvent({ href: this.href, value: this.value }))) {
+      followLink(this.ownerDocument, this, modifiers)
+    }
   }
 
   /**
@@ -307,7 +365,9 @@ export class HelixHeadlessOption extends HelixElement {
        option's semantics have to be visible to the listbox that owns it and a
        wrapper in here would put a box between them. */
     this.internals.role = 'option'
-    this.internals.ariaSelected = String(this.selected)
+    /* A link is followed, not chosen, so it says nothing about being chosen,
+       as React Aria's link items in a list that selects nothing. */
+    this.internals.ariaSelected = this.href === '' ? String(this.selected) : null
     this.internals.ariaDisabled = this.disabled ? 'true' : null
     this.internals.ariaDescription =
       this.alternate !== '' && this.alternateLabel !== '' ? this.alternateLabel : null
@@ -325,7 +385,7 @@ export class HelixHeadlessOption extends HelixElement {
        selector naming the host, and `::part()` reaches the row. */
     return html`<div
       part="item${this.selected ? ' item-selected' : ''}${this.active ? ' item-active' : ''}"
-      @click=${() => this.select()}
+      @click=${(event: MouseEvent) => this.select(event)}
     >
       <slot name="start"></slot>
       <span part="text">
