@@ -1,5 +1,14 @@
 {
   "excused": {
+    "helix-copy-button": {
+      "command": "It replaces Button's press, so it sends no command: a press copies and does nothing else.",
+      "formAction": "It submits no form, whatever its `type`, so a form override has nothing to override.",
+      "formEnctype": "See `formAction`.",
+      "formMethod": "See `formAction`.",
+      "formNoValidate": "See `formAction`.",
+      "formTarget": "See `formAction`.",
+      "type": "A press copies and never submits or resets, so `submit` and `reset` would be words the element ignores."
+    },
     "helix-date-picker": {
       "autocomplete": "Renders a calendar of `<button>`s and no text entry, so there is nothing for a browser to fill. A property the platform cannot act on is worse than an absent one."
     },
