@@ -12,15 +12,10 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { focusTarget, linkDescription, unlinkDescription } from '../describe.js'
 
 /** Tags that exist to hold something, and say nothing when they hold nothing. */
 const GENERIC = new Set(['div', 'p', 'section', 'span'])
-
-/**
- * How long after a tooltip hides the next one still shows at once, in
- * milliseconds. The same skip delay Radix uses.
- */
-const SKIP_DELAY = 300
 
 /**
  * The tooltips showing on the page, and when the last one hid.
@@ -48,29 +43,32 @@ const warmth = (): Warmth => {
  * does not clip it and no `z-index` is needed. `FloatingController` positions
  * it and flips it to another side when the preferred side does not fit.
  *
- * Wrapping the trigger is the convenient form. Use it where the trigger already
- * has an accessible name, because the tooltip cannot describe a slotted
- * trigger: an IDREF cannot cross a shadow boundary.
- *
- * To add a description, place the tooltip beside the trigger and name the
- * trigger with `for`:
+ * **The tooltip describes its trigger itself, in both forms.** Wrap the
+ * trigger, or place the tooltip beside it and name the trigger with `for`:
  *
  * ```html
- * <helix-headless-button id="save" aria-describedby="save-tip">Save</helix-headless-button>
- * <helix-headless-tooltip id="save-tip" for="save" content="Save your work"></helix-headless-tooltip>
+ * <helix-headless-button id="save">Save</helix-headless-button>
+ * <helix-headless-tooltip for="save" content="Save your work"></helix-headless-tooltip>
  * ```
  *
- * Write the `aria-describedby` yourself, pointing at the tooltip host. Setting
- * it at runtime causes a hydration mismatch that React does not fix. With
- * `for`, the tooltip warns once on first open if the attribute is missing.
+ * The link is an element reference on the control that takes focus, and it is
+ * never written into your markup before a reader has acted. A trigger that is a
+ * Helix component is described at once, inside its own shadow root. A plain
+ * element in your markup is described when a reader first points at it or
+ * focuses it, which is after any hydration, and only where you have written no
+ * `aria-describedby` or `aria-labelledby` of your own. Write
+ * `aria-describedby` pointing at the tooltip yourself to have the link in the
+ * server's markup. Where the browser has no element references, write it
+ * yourself; the tooltip warns once on first open if nothing links the two.
  *
  * The tooltip shows on hover and on focus. It hides on pointer leave, on blur,
  * on Escape, and when the trigger is activated. The pointer can move from the
  * trigger onto the bubble and the bubble stays.
  *
  * Once one tooltip is showing, moving to another trigger shows its tooltip
- * with no `delay`, and the first one hides. The same holds for 300
- * milliseconds after a tooltip hides.
+ * with no `delay`, and the first one hides. The same holds for `skip-delay`
+ * milliseconds after a tooltip hides, 300 unless you set it. `show-on="focus"`
+ * shows the tooltip on keyboard focus only, for a hint a pointer does not need.
  *
  * @since 0.1.0
  * @status stable
@@ -78,9 +76,8 @@ const warmth = (): Warmth => {
  * @aliases Hint, Popup label
  * @documentation https://fusion.dev/helix/components/tooltip
  *
- * @slot - The trigger, in the wrapping form. A trigger here gets no
- * description, so use it only where the trigger's name says what the tooltip
- * says, and use `for` otherwise.
+ * @slot - The trigger, in the wrapping form. The tooltip describes it, as it
+ * describes the element `for` names.
  * @slot content - Rich content for the bubble. It replaces the `content`
  * property.
  *
@@ -203,6 +200,22 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
    */
   @property()
   placement: Placement = 'top'
+
+  /**
+   * What shows the bubble. Unset, it is a pointer resting on the trigger and
+   * keyboard focus. `focus` is keyboard focus alone, for a hint a pointer does
+   * not need, such as a shortcut a mouse reader has no use for.
+   */
+  @property({ attribute: 'show-on' })
+  showOn?: 'focus'
+
+  /**
+   * How long after a tooltip hides the next one still shows at once, with no
+   * `delay`, in milliseconds. The same skip delay Radix uses. Zero makes every
+   * tooltip wait.
+   */
+  @property({ attribute: 'skip-delay', type: Number })
+  skipDelay = 300
 
   /**
    * The id of a box to keep the bubble inside. Defaults to the viewport.
@@ -478,16 +491,19 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
    * Shows after the pointer has rested for `delay`, or at once while the
    * tooltips are warm.
    *
-   * **Warm is another tooltip showing, or one that hid within `SKIP_DELAY`.**
+   * **Warm is another tooltip showing, or one that hid within `skipDelay`.**
    * A reader scanning a toolbar has already waited once, and waiting again on
    * every control turns the scan into a series of pauses.
    */
   private readonly showLater = (): void => {
+    if (this.showOn === 'focus') {
+      return
+    }
     this.holds.add('pointer')
     clearTimeout(this.timer)
     const warm = warmth()
     const others = [...warm.showing].some((one) => one !== this)
-    if (others || performance.now() - warm.hidAt < SKIP_DELAY) {
+    if (others || performance.now() - warm.hidAt < this.skipDelay) {
       this.show()
       return
     }
@@ -627,6 +643,10 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
       return
     }
     this.unbind()
+    /* Before the listeners that open the bubble, so the link is in place when
+       a screen reader reads the control focus has just landed on. */
+    target.addEventListener('pointerenter', this.linkOnArrival)
+    target.addEventListener('focusin', this.linkOnArrival)
     target.addEventListener('pointerenter', this.showLater)
     target.addEventListener('pointerleave', this.hideLater)
     // Focus opens at once: a keyboard reader landing on a control has already
@@ -635,9 +655,52 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
     target.addEventListener('focusout', this.releaseFocus)
     target.addEventListener('click', this.handleActivate)
     this.bound = target
+    /* A Helix trigger is described at once, inside its own shadow root, once
+       it has drawn the control that takes its focus. */
+    this.link(false)
+    const drawn = (this.trigger as Partial<{ updateComplete: Promise<unknown> }>).updateComplete
+    void drawn?.then(() => {
+      if (this.bound === target) {
+        this.link(false)
+      }
+    })
+  }
+
+  /** The control this tooltip has described, so the link can be taken back. */
+  private linked: Element | undefined
+
+  /**
+   * Describes the control that takes the trigger's focus by this tooltip.
+   *
+   * `light` says a reader has just acted, which is what allows a write onto a
+   * plain element in the consumer's markup. See `linkDescription`.
+   */
+  private link(light: boolean, target: Element = focusTarget(this.trigger)): void {
+    if (this.linked === target) {
+      return
+    }
+    if (this.linked) {
+      unlinkDescription(this.linked, this)
+      this.linked = undefined
+    }
+    if (linkDescription(target, this, light)) {
+      this.linked = target
+    }
+  }
+
+  /** A reader arriving on the trigger, which is late enough to write the link. */
+  private readonly linkOnArrival = (event: Event): void => {
+    const first = event.composedPath()[0]
+    this.link(true, event.type === 'focusin' && first instanceof Element ? first : undefined)
   }
 
   private unbind(): void {
+    if (this.linked) {
+      unlinkDescription(this.linked, this)
+      this.linked = undefined
+    }
+    this.bound?.removeEventListener('pointerenter', this.linkOnArrival)
+    this.bound?.removeEventListener('focusin', this.linkOnArrival)
     this.bound?.removeEventListener('pointerenter', this.showLater)
     this.bound?.removeEventListener('pointerleave', this.hideLater)
     this.bound?.removeEventListener('click', this.handleActivate)
@@ -674,6 +737,10 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
       return
     }
     this.audited = true
+    /* Described already, by the link this element made or the consumer wrote. */
+    if (this.linked) {
+      return
+    }
     /* **The unlinked form is the one that describes nothing, so it is the one
        warned about.** This returned on `for === ''`, which made the guard the
        exact inverse of the risk: the wrapping form is never linked, so it was
@@ -827,12 +894,13 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
      * everywhere else. Measured against the site's own header: React logged the
      * mismatch on every tooltip on the page and said it would not patch it up.
      *
-     * So the description stays on the host and the gap is recorded rather than
-     * papered over. There is no third option: a description has to live on the
-     * element being described, that element belongs to the consumer, and the
-     * bubble is in a tree no reference from there can name. Closing it means
-     * either writing to the consumer's markup or moving the bubble into the
-     * light DOM, and both are decisions rather than fixes. */
+     * So the description stays on the host, and the trigger reaches it by a
+     * reference from outside instead, which `link` writes: inward is the one
+     * direction a reference cannot go, and the host is outward of the trigger
+     * in both forms. The host names itself with the bubble's words for that
+     * reason. Where the trigger is the consumer's own plain element, the link is
+     * written only after a reader has acted on it, which is after hydration;
+     * `linkDescription` says the rest. */
     hostAria(this.internals, {
       describedBy: this.hasContent ? [bubble] : [],
       /* **And the host names itself, which is what makes `for` work when the
@@ -853,10 +921,9 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
        *   OPEN    bare host     Description A
        *   OPEN    labeled host Description B
        *
-       * Only when `for` is set, because only then is this host the thing being
-       * referenced. Wrapping, it is an ancestor of the trigger and naming it
-       * would put a name on a box that is `display: contents`. */
-      label: this.for === '' ? '' : this.describedText,
+       * In both forms, since the host is what the trigger's link references
+       * whether it wraps the trigger or sits beside it. */
+      label: this.describedText,
     })
   }
 
