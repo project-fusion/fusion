@@ -20,7 +20,9 @@ import {
 import { eyedropper } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { live } from 'lit/directives/live.js'
 import { html } from 'lit/static-html.js'
+import { type ChannelName, channelFields, writeChannel } from '../channels.js'
 import { type ColorWords, colorName, hueName } from '../color-name.js'
 /* Relative, so this registers the base slider and the styled file's identical
    import registers the styled one. `tier` picks which the template asks for. */
@@ -107,6 +109,10 @@ interface EyeDropperConstructor {
  * @csspart eyedropper-button - The button inside `eyedropper`.
  * @csspart eyedropper-live - The live region of the button inside `eyedropper`, which says its pending label.
  * @csspart eyedropper-text - The words on the button inside `eyedropper`, trimmed to their capitals and baseline.
+ * @csspart field - One channel's number field with its label, in `channel-fields`.
+ * @csspart field-input - The number input in a channel's field.
+ * @csspart field-label - The name above a channel's number input.
+ * @csspart fields - The row of channel number fields, in `channel-fields`.
  * @csspart footer - The row holding the value and the tools.
  * @csspart format - The control that changes the syntax the value is written in.
  * @csspart format-button - The button inside `format`.
@@ -157,6 +163,12 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
   badInputMessage?: string
 
   /**
+   * What the blue channel's field is called, in `channel-fields`.
+   */
+  @property({ attribute: 'blue-label' })
+  blueLabel = 'Blue'
+
+  /**
    * What the square's vertical ramp is called.
    *
    * **Every word the picker speaks is a property**, so a page in another
@@ -164,6 +176,19 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
    */
   @property({ attribute: 'brightness-label' })
   brightnessLabel = 'Brightness'
+
+  /**
+   * Whether the picker shows a number field for each channel of the color, as
+   * React Aria's ColorField does with `channel`: red, green and blue for hex
+   * and rgb, hue, saturation and lightness for hsl, and the opacity with
+   * `alpha`.
+   *
+   * For a reader who has the numbers from a brand guide, and for a keyboard,
+   * where typing 128 is quicker than holding an arrow key. The fields follow
+   * the syntax the format toggle sets.
+   */
+  @property({ attribute: 'channel-fields', type: Boolean })
+  channelFields = false
 
   /**
    * The words a color's name is spoken in, as JSON keyed by their English,
@@ -217,6 +242,12 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
   formatLabel = 'Syntax: {format}. Change it.'
 
   /**
+   * What the green channel's field is called, in `channel-fields`.
+   */
+  @property({ attribute: 'green-label' })
+  greenLabel = 'Green'
+
+  /**
    * What the hue channel is called.
    */
   @property({ attribute: 'hue-label' })
@@ -233,6 +264,13 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
    */
   @property({ reflect: true, type: Boolean })
   invalid = false
+
+  /**
+   * What the lightness channel's field is called, in `channel-fields` with
+   * hsl.
+   */
+  @property({ attribute: 'lightness-label' })
+  lightnessLabel = 'Lightness'
 
   /**
    * Hides the eyedropper. Without it, the eyedropper appears in browsers that
@@ -305,6 +343,12 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
    */
   @property({ attribute: 'readonly', reflect: true, type: Boolean })
   readOnly = false
+
+  /**
+   * What the red channel's field is called, in `channel-fields`.
+   */
+  @property({ attribute: 'red-label' })
+  redLabel = 'Red'
 
   /**
    * Requires a color before the form can submit.
@@ -751,6 +795,97 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
     this.partNamed('grid-saturation')?.focus(options)
   }
 
+  /** What each channel's field is called, from the words a page gives. */
+  private channelWord(channel: ChannelName): string {
+    return {
+      alpha: this.opacityLabel,
+      blue: this.blueLabel,
+      green: this.greenLabel,
+      hue: this.hueLabel,
+      lightness: this.lightnessLabel,
+      red: this.redLabel,
+      saturation: this.saturationLabel,
+    }[channel]
+  }
+
+  /**
+   * Takes a number typed into a channel's field. A field emptied or holding
+   * something that is not a number moves nothing, so a reader can clear it to
+   * type afresh.
+   */
+  private readonly handleField = (channel: ChannelName, event: Event): void => {
+    // Stopped for the reason `Input.handleInput` gives.
+    event.stopPropagation()
+    const typed = (event.target as HTMLInputElement).value
+    if (typed.trim() === '') {
+      return
+    }
+    const format = this.format ?? 'hex'
+    const written = writeChannel(
+      channelFields(this.value, this.color, format, this.alpha),
+      format,
+      this.alpha,
+      channel,
+      Number(typed),
+    )
+    if (written !== null) {
+      this.takeWritten(written)
+    }
+  }
+
+  /**
+   * Takes a value written out whole, as `move` takes a part of the model: the
+   * square follows it, keeping its hue where the value is a gray with none to
+   * give, and a refusal puts the square back.
+   */
+  private takeWritten(next: string): void {
+    const parsed = parseColor(next)
+    if (this.readOnly || parsed === null) {
+      return
+    }
+    const before = this.moved
+    const hueless = parsed.saturation === 0 || parsed.brightness === 0
+    this.moved = hueless ? { ...parsed, hue: this.color.hue } : parsed
+    this.owned = next !== this.value
+    if (!this.requestValue(next)) {
+      this.moved = before
+      this.owned = false
+    }
+  }
+
+  /**
+   * A number field for each channel, behind a seam the styled tier can move.
+   *
+   * `live` on the value, so a number put back inside its range, 300 for a byte,
+   * is redrawn though the value it settles on is the one drawn before.
+   */
+  protected renderFields(color: Color): TemplateResult {
+    return html`<div part="fields">
+      ${channelFields(this.value, color, this.format ?? 'hex', this.alpha).map(
+        (field) => html`<label part="field">
+          <span part="field-label">${this.channelWord(field.channel)}</span>
+          <input
+            part="field-input"
+            type="number"
+            inputmode="numeric"
+            min=${field.min}
+            max=${field.max}
+            step="1"
+            .value=${live(String(field.value))}
+            ?disabled=${this.isDisabled}
+            ?readonly=${this.readOnly}
+            @input=${(event: Event) => this.handleField(field.channel, event)}
+            @change=${(event: Event) => {
+              event.stopPropagation()
+              this.settle()
+              this.requestUpdate()
+            }}
+          />
+        </label>`,
+      )}
+    </div>`
+  }
+
   /**
    * One of the ramps under the square.
    *
@@ -1012,6 +1147,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
           ${this.alpha ? this.renderChannel('alpha', this.opacityLabel, 100, color.alpha) : nothing}
         </div>
       </div>
+      ${this.channelFields ? this.renderFields(color) : nothing}
 
       <!-- The syntax and the presets share a row, because neither fills one.
            Above them the ramps get the whole width, which is what they need:
