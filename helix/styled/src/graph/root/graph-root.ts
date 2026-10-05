@@ -25,6 +25,14 @@ import { styles } from './graph-root.css.js'
  * @cssproperty --graph-background-color - The color behind the drawing while it loads.
  * @cssproperty --graph-block-size - The frame's height, as a length.
  * @cssproperty --graph-border-color - The frame's border color.
+ * @cssproperty --graph-note-hover-color - The wash over a note in the list while the pointer is over it, and over the note the keyboard is on.
+ * @cssproperty --graph-note-padding-inline - The space at either end of a note in the list.
+ * @cssproperty --graph-note-relation-color - The color of how a note stands to the selected one, such as "Linked from Alpha".
+ * @cssproperty --graph-note-selected-background-color - The fill behind the selected note, which leads the list.
+ * @cssproperty --graph-note-selected-weight - The weight of the selected note's name.
+ * @cssproperty --graph-note-text - The size of a note's name in the list.
+ * @cssproperty --graph-panel-background-color - The fill behind the search and the list.
+ * @cssproperty --graph-panel-color - The text color of the search and the list.
  * @cssproperty --graph-panel-size - The list's width beside the drawing, or over it when opened with `no-panel`.
  * @cssproperty --viewport-control-background-color - The background of the zoom and fullscreen buttons. Map and Canvas use the same property.
  */

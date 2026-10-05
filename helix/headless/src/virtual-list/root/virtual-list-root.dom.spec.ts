@@ -640,3 +640,92 @@ describe('rows shorter than the estimate', () => {
     }
   })
 })
+
+describe('choosing items', () => {
+  const press = async (host: Updatable, key: string, init: KeyboardEventInit = {}) => {
+    ;(document.activeElement as HTMLElement).dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key, ...init }),
+    )
+    await settle(host)
+  }
+  const row = (host: HTMLElement, at: number) =>
+    host.querySelector(`[data-index="${at}"]`) as HTMLElement
+
+  test('is a list box of options, each saying whether it is chosen', async () => {
+    const host = await fed(named(50))
+    host.selectionMode = 'multiple'
+    host.keyField = 'name'
+    host.value = 'Row 2'
+    await settle(host)
+    const viewport = part(host, 'viewport') as HTMLElement
+    expect(viewport.getAttribute('role')).toBe('listbox')
+    expect(viewport.getAttribute('aria-multiselectable')).toBe('true')
+    expect(row(host, 0).getAttribute('role')).toBe('option')
+    expect([0, 1].map((at) => row(host, at).getAttribute('aria-selected'))).toEqual([
+      'false',
+      'true',
+    ])
+    host.selectionMode = undefined
+    await settle(host)
+    expect(viewport.getAttribute('role')).toBe('list')
+    expect(row(host, 0).getAttribute('role')).toBe('listitem')
+    expect(row(host, 1).hasAttribute('aria-selected')).toBe(false)
+  })
+
+  test('selects with Space or a press, asking first, and keeps the keys in order', async () => {
+    const host = await fed(named(50))
+    host.selectionMode = 'multiple'
+    host.keyField = 'name'
+    await settle(host)
+    const asked: string[] = []
+    let changed = 0
+    host.addEventListener('helix-before-change', (event) =>
+      asked.push((event as CustomEvent<{ value: string }>).detail.value),
+    )
+    host.addEventListener('change', () => {
+      changed += 1
+    })
+    row(host, 2).click()
+    await settle(host)
+    row(host, 0).focus()
+    await press(host, ' ')
+    expect(host.value).toBe('Row 1,Row 3')
+    expect(asked).toEqual(['Row 3', 'Row 1,Row 3'])
+    expect(changed).toBe(2)
+    host.addEventListener('helix-before-change', (event) => event.preventDefault(), { once: true })
+    await press(host, ' ')
+    expect(host.value).toBe('Row 1,Row 3')
+  })
+
+  test('takes in a range with Shift, and every item with Control or Command and A', async () => {
+    const host = await fed(named(5000))
+    host.selectionMode = 'multiple'
+    host.keyField = 'name'
+    await settle(host)
+    row(host, 0).focus()
+    await press(host, ' ')
+    await press(host, 'ArrowDown', { shiftKey: true })
+    await press(host, 'ArrowDown', { shiftKey: true })
+    expect(host.value).toBe('Row 1,Row 2,Row 3')
+    expect((document.activeElement as HTMLElement).dataset.index).toBe('2')
+    await press(host, 'a', { ctrlKey: true })
+    expect(String(host.value).split(',')).toHaveLength(5000)
+  })
+
+  test('chooses one item at a time in single, and lets it go on a second press', async () => {
+    const host = await fed(['alpha', 'bravo', 'charlie'], '')
+    host.renderItem = (item: string) => item
+    host.selectionMode = 'single'
+    await settle(host)
+    row(host, 1).click()
+    await settle(host)
+    expect(host.value).toBe('bravo')
+    row(host, 2).click()
+    await settle(host)
+    expect(host.value).toBe('charlie')
+    row(host, 2).click()
+    await settle(host)
+    expect(host.value).toBe('')
+    expect(part(host, 'viewport')?.hasAttribute('aria-multiselectable')).toBe(false)
+  })
+})

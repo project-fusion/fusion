@@ -30,6 +30,16 @@
   outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }
 
+/* A chosen row, in a list with `selection-mode`: the fill a chosen List row
+   takes. The list is what chooses, so the fill is the list's, as the ring is,
+   and a document rule on the row still wins over it. */
+::slotted([aria-selected="true"]) {
+  background-color: var(
+    --virtual-list-selected-background-color,
+    var(--helix-color-primary-subtle)
+  );
+}
+
 /* The row after the last item while more are fetched: quiet, and centered
    under the rows, so it reads as the list's own state and not as an item. */
 [part="loading"] {
