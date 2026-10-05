@@ -8,6 +8,7 @@ import {
   MixinField,
   PopoverController,
   reportValues,
+  typesCharacter,
 } from '@fusion.dev/helix-core'
 import { caretDown } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -33,6 +34,14 @@ import '../../listbox/index.js'
  * `Select` owns the value, passes it down to the listbox, and takes changes
  * back, so the value lives in one place.
  *
+ * In the open list the arrow keys, Home, End, PageUp, PageDown and typed
+ * letters move the highlight, and Enter, Space or a click chooses it and
+ * closes the list. Tab closes the list and moves on. On the closed trigger,
+ * ArrowDown, Enter and Space open the list on the chosen option, ArrowUp opens
+ * it on the chosen or last option, Home and End open it on the first or last,
+ * and typed letters choose the option whose words start with them, as a native
+ * `<select>` does.
+ *
  * @since 0.1.0
  * @status stable
  * @category forms
@@ -50,6 +59,7 @@ import '../../listbox/index.js'
  * @event {HelixBeforeChangeEvent} helix-before-change - Relayed from the listbox when the value is about to change. Cancelable: canceling it stops the change and leaves the decision to you.
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the list closes. Cancelable: canceling it keeps the list open and leaves the decision to you.
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the list opens. Cancelable: canceling it keeps the list closed and leaves the decision to you.
+ * @event {HelixFilterEvent} helix-filter - Fired as the user types in the filter field of a `filterable` select, with the text the list is filtered by. Cancelable: cancel it to leave the list unfiltered and filter the options yourself.
  * @event {Event} input - Fired after the value changes.
  * @event {Event} toggle - Fired after the list opens or closes, with `newState` and `oldState`.
  *
@@ -144,11 +154,12 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
     return this.listbox?.selectedIndex ?? -1
   }
 
+  /* Through this element's own value, which is the one the trigger shows and
+     the form receives. Written to the listbox instead, the index changed and
+     nothing else did, because the listbox tells nobody about a value it was
+     given. */
   set selectedIndex(at: number) {
-    const listbox = this.listbox
-    if (listbox) {
-      listbox.selectedIndex = at
-    }
+    this.value = this.listbox?.options[at]?.value ?? ''
   }
 
   /** The kind of select, as the platform names it: `select-one` or `select-multiple`. */
@@ -261,6 +272,56 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
     return chosen.size > 0 && !this.childrenKnown ? nothing : this.placeholder
   }
 
+  /** Where the highlight goes when the list opens, set by the key that opened it. */
+  private opening: 'first' | 'last' | 'selected' = 'selected'
+
+  /**
+   * The values of the options seen on the last update, so an option that
+   * leaves can be told apart from one that has not arrived yet.
+   */
+  private seen = new Set<string>()
+
+  /**
+   * Hears an option's words change, which no slot reports, and the host's
+   * `aria-labelledby` change, which `nameWithValue` follows.
+   *
+   * The trigger shows the chosen option's words, read at render time. A slot
+   * reports an option arriving or leaving and says nothing when the text of
+   * one already there changes, so a relabeled option left the old words on the
+   * trigger. `label` and `value` are attributes that change the words too.
+   *
+   * Made on connection, there being no `MutationObserver` on a server.
+   */
+  private watchers: MutationObserver[] = []
+
+  override connectedCallback(): void {
+    super.connectedCallback()
+    const words = new MutationObserver(() => this.requestUpdate())
+    words.observe(this, {
+      attributeFilter: ['label', 'value'],
+      characterData: true,
+      childList: true,
+      subtree: true,
+    })
+    const naming = new MutationObserver(() => this.requestUpdate())
+    naming.observe(this, { attributeFilter: ['aria-labelledby'] })
+    this.watchers = [words, naming]
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    for (const watcher of this.watchers) {
+      watcher.disconnect()
+    }
+    this.watchers = []
+  }
+
+  /** Opens the list with the highlight where the opening key says. */
+  private openAt(where: 'first' | 'last' | 'selected'): void {
+    this.opening = where
+    this.requestOpen(true)
+  }
+
   /** Closes the list and puts focus back where it came from. */
   private close(): void {
     if (!this.open) {
@@ -313,10 +374,94 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
     event.stopPropagation()
   }
 
+  /**
+   * The keys of the closed trigger.
+   *
+   * Letters choose without opening, the way a native `<select>` and React
+   * Aria's Select do, so a reader who knows the answer types it. A Space in the
+   * middle of those letters is one of them. With `multiple`, a letter opens the
+   * list on the match instead, because adding to a set is a choice the reader
+   * makes in the list.
+   */
   private readonly handleTriggerKeydown = (event: KeyboardEvent): void => {
-    if (event.key === 'ArrowDown' || event.key === 'Enter' || event.key === ' ') {
+    const listbox = this.listbox
+    if (typesCharacter(event) && (event.key !== ' ' || listbox?.typing)) {
       event.preventDefault()
-      this.requestOpen(true)
+      const match = listbox?.typeaheadTo(event.key)
+      if (match === undefined) {
+        return
+      }
+      if (this.multiple) {
+        this.opening = 'selected'
+        this.requestOpen(true)
+      } else {
+        this.requestValue(match)
+      }
+      return
+    }
+    const opens: Record<string, 'first' | 'last' | 'selected'> = {
+      ' ': 'selected',
+      ArrowDown: 'selected',
+      ArrowUp: 'last',
+      End: 'last',
+      Enter: 'selected',
+      Home: 'first',
+    }
+    const where = opens[event.key]
+    if (where !== undefined) {
+      event.preventDefault()
+      /* ArrowUp opens on the chosen option where there is one, and on the
+         last where there is none, which is where Up from nothing goes. */
+      this.openAt(
+        where === 'last' && event.key === 'ArrowUp' && this.value !== '' ? 'selected' : where,
+      )
+    }
+  }
+
+  /**
+   * Tab closes the list and lets focus move on, as a native `<select>` does.
+   *
+   * Measured before this: Tab moved focus to the next control and left the
+   * panel open over the page, because the panel closes on a press outside or
+   * on Escape and nothing closed it when focus left.
+   */
+  private readonly handleListKeydown = (event: KeyboardEvent): void => {
+    if (event.key === 'Tab' && this.open) {
+      this.requestOpen(false)
+    }
+  }
+
+  /**
+   * Takes `<helix-option selected>` as the default value, and an option that
+   * has left out of the value.
+   *
+   * The first is what a native `<select>` does with `<option selected>`, and
+   * what `Option.defaultSelected` says: a form reset returns to it. A
+   * `default-value` on the select wins.
+   *
+   * The second keeps the trigger and the form in agreement. Measured before
+   * this: removing the chosen option made the trigger say "Choose" while the
+   * form still submitted the removed value. Only an option seen before is
+   * dropped, so a value set ahead of options that load later is kept.
+   */
+  private reconcileOptions(): void {
+    /* Off this element's own children, as `display` reads its words, so the
+       two cannot disagree about which options exist. */
+    const options = optionsAmong(this.knownChildren)
+    if (this.defaultValue === '' && !this.hasAttribute('default-value')) {
+      const declared = options
+        .filter((option) => option.defaultSelected)
+        .map((option) => option.value)
+      if (declared.length > 0) {
+        this.defaultValue = this.multiple ? declared.join(',') : (declared.at(-1) ?? '')
+      }
+    }
+    const present = new Set(options.map((option) => option.value))
+    const held = this.value === '' ? [] : this.value.split(',')
+    const gone = held.filter((value) => this.seen.has(value) && !present.has(value))
+    this.seen = present
+    if (gone.length > 0) {
+      this.value = held.filter((value) => !gone.includes(value)).join(',')
     }
   }
 
@@ -336,6 +481,9 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     hostAria(this.internals, { label: this.label })
+    if (this.childrenKnown) {
+      this.reconcileOptions()
+    }
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
@@ -347,6 +495,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
     super.updated(changed)
     this.sync()
     this.linkHost()
+    this.nameWithValue()
     /* The panel follows `open` through the controller, which reads it after
        every update. What is left here is what only this element knows. */
     if (this.open) {
@@ -359,6 +508,10 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
        * the panel is up, a filter keystroke or a value arriving, and moving
        * focus on each of those is a focus thief. */
       if (changed.has('open')) {
+        /* On the chosen option, or where the opening key says, and never on a
+           highlight left over from the last time the list was open. */
+        this.listbox?.highlight(this.opening)
+        this.opening = 'selected'
         this.listbox?.focus()
       }
     } else {
@@ -393,7 +546,9 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
       .value=${this.value}
       ?multiple=${this.multiple}
       ?filterable=${this.filterable}
+      manual
       aria-label=${this.label || nothing}
+      @keydown=${this.handleListKeydown}
       @helix-before-change=${this.handleChange}
       @change=${this.stopInner}
       @input=${this.stopInner}
@@ -432,13 +587,43 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
    * and then the value, in that order.
    *
    * A consumer's own `aria-labelledby` on the host wins, carried to the trigger
-   * by `AriaForwardController`, so nothing is written here to fight it.
+   * by `AriaForwardController`, so nothing is written here to fight it. The
+   * value is added after it in `nameWithValue`.
    */
   private get triggerNames(): string | typeof nothing {
     if (this.hasAttribute('aria-labelledby')) {
       return nothing
     }
     return this.labeled ? `${this.labelId} value` : 'value'
+  }
+
+  /**
+   * Names the trigger by the host's `aria-labelledby` and then by the value.
+   *
+   * `AriaForwardController` hands the trigger the elements the host names,
+   * and that list alone dropped the value from the name: a reader heard the
+   * label and never what was chosen. The value element is added after them,
+   * which an element reference can do where an id cannot, the two being in
+   * different trees. Runs after the controller, which writes its list first on
+   * every update.
+   */
+  private nameWithValue(): void {
+    const trigger = this.partNamed('trigger') as
+      | (HTMLElement & { ariaLabelledByElements?: Element[] | null })
+      | null
+    const value = this.partNamed('value')
+    if (
+      !trigger ||
+      !value ||
+      !this.hasAttribute('aria-labelledby') ||
+      !('ariaLabelledByElements' in trigger)
+    ) {
+      return
+    }
+    const named = trigger.ariaLabelledByElements ?? []
+    if (named.length > 0 && !named.includes(value)) {
+      trigger.ariaLabelledByElements = [...named, value]
+    }
   }
 
   protected override render(): TemplateResult {

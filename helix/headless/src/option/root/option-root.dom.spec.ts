@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -32,6 +32,7 @@ describe('option', () => {
     host.active = true
     await host.updateComplete
     expect(names()).toBe('item item-selected item-active')
+    expect(hasState(host, 'active')).toBe(true)
     host.selected = false
     host.active = false
     await host.updateComplete

@@ -123,6 +123,17 @@ describe('command', () => {
       true,
     )
   })
+
+  test('`loading` reaches the list, which says so while the commands load', async () => {
+    /* A palette filled from a server had no way to say it was waiting: the
+       listbox has the state and the words, and nothing passed them down. */
+    const host = await palette(
+      markup.replace('label="Commands"', 'label="Commands" loading loading-text="Fetching"'),
+    )
+    const list = listbox(host) as unknown as HTMLElement & { loading: boolean; loadingText: string }
+    expect(list.loading).toBe(true)
+    expect(list.loadingText).toBe('Fetching')
+  })
 })
 
 /* Choosing, and anything that follows from it, needs a real engine.
@@ -232,6 +243,32 @@ if (hasLayout()) {
         }
       ).select()
       await settle(host)
+      expect(host.open).toBe(true)
+    })
+
+    test('a space typed in the filter is typed, and runs nothing', async () => {
+      /* Measured before this: "open f" ran the highlighted command on the space
+         and shut the palette with the filter emptied. */
+      const host = await palette()
+      const heard: string[] = []
+      host.addEventListener('helix-select', (event) =>
+        heard.push((event as CustomEvent<{ value: string }>).detail.value),
+      )
+      press('k', { metaKey: true })
+      await settle(host)
+      listbox(host).requestFilter('open')
+      await settle(host)
+      const field = listbox(host).shadowRoot?.querySelector('[part="search-field"]') as HTMLElement
+      const space = new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        key: ' ',
+      })
+      field.dispatchEvent(space)
+      await settle(host)
+      expect(space.defaultPrevented).toBe(false)
+      expect(heard).toEqual([])
       expect(host.open).toBe(true)
     })
 

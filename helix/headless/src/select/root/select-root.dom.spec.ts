@@ -294,3 +294,115 @@ describe('select holding several, in its form', () => {
     expect(formValue(one as unknown as HTMLElement)).toBe('two')
   })
 })
+
+describe('the keyboard in a select', () => {
+  type Select = Updatable & { open: boolean; selectedIndex: number; value: string }
+
+  const key = (target: Element, name: string): KeyboardEvent => {
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key: name,
+    })
+    target.dispatchEvent(event)
+    return event
+  }
+
+  const list = (host: Updatable): HTMLElement => part(host as HTMLElement, 'listbox') as HTMLElement
+
+  const active = (host: Updatable): string | undefined =>
+    [
+      ...(host as HTMLElement).querySelectorAll<HTMLElement & { active: boolean }>(
+        'helix-headless-option',
+      ),
+    ]
+      .find((option) => option.active)
+      ?.textContent?.trim()
+
+  test('in the open list the arrows move without choosing, and Enter chooses and closes', async () => {
+    /* Measured before this: each ArrowDown chose the next option, sent
+       `change` and shut the panel, so a reader moved one option per opening. */
+    const host = (await select()) as Select
+    key(trigger(host), 'Enter')
+    await settle(host)
+    expect(host.open).toBe(true)
+    expect(active(host)).toBe('Alpha')
+    key(list(host), 'ArrowDown')
+    await settle(host)
+    expect(host.value).toBe('')
+    expect(host.open).toBe(true)
+    expect(active(host)).toBe('Beta')
+    key(list(host), 'Enter')
+    await settle(host)
+    expect(host.value).toBe('two')
+    expect(host.open).toBe(false)
+  })
+
+  test('Tab closes the list and leaves focus to move on', async () => {
+    const host = (await select('open')) as Select
+    const event = key(list(host), 'Tab')
+    await settle(host)
+    expect(host.open).toBe(false)
+    expect(event.defaultPrevented).toBe(false)
+  })
+
+  test('a letter on the closed trigger chooses the option it starts', async () => {
+    const host = (await select()) as Select
+    key(trigger(host), 'b')
+    await settle(host)
+    expect(host.value).toBe('two')
+    expect(host.open).toBe(false)
+  })
+
+  test('ArrowUp opens the list on the last option where none is chosen', async () => {
+    const host = (await select()) as Select
+    key(trigger(host), 'ArrowUp')
+    await settle(host)
+    expect(host.open).toBe(true)
+    expect(active(host)).toBe('Beta')
+  })
+})
+
+describe('select and the options it holds', () => {
+  type Select = Updatable & { selectedIndex: number; value: string }
+
+  test('selectedIndex moves the value, the trigger and the form together', async () => {
+    const host = (await select('default-value="two"')) as Select
+    host.selectedIndex = 0
+    await settle(host)
+    expect(host.value).toBe('one')
+    expect(shown(host)).toBe('Alpha')
+    expect(formValue(host as unknown as HTMLElement)).toBe('one')
+  })
+
+  test('an option marked selected in the markup is the default value', async () => {
+    document.body.innerHTML = `<helix-headless-select label="L" name="c">
+      <helix-headless-option value="one">Alpha</helix-headless-option>
+      <helix-headless-option value="two" selected>Beta</helix-headless-option>
+    </helix-headless-select>`
+    const host = document.body.firstElementChild as Select
+    await settle(host)
+    expect(host.value).toBe('two')
+    expect(shown(host)).toBe('Beta')
+  })
+
+  test('removing the chosen option takes it out of the value and the form', async () => {
+    const host = (await select('default-value="two"')) as Select
+    ;(host as HTMLElement).querySelector('[value="two"]')?.remove()
+    await settle(host)
+    await settle(host)
+    expect(host.value).toBe('')
+    expect(shown(host)).toBe('Choose')
+    expect(formValue(host as unknown as HTMLElement)).toBeNull()
+  })
+
+  test('relabeling the chosen option relabels the trigger', async () => {
+    const host = (await select('default-value="two"')) as Select
+    const chosen = (host as HTMLElement).querySelector('[value="two"]') as HTMLElement
+    chosen.textContent = 'Bravo'
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await settle(host)
+    expect(shown(host)).toBe('Bravo')
+  })
+})

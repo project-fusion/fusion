@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 /**
  * A select's trigger is named by its label and then its choice.
@@ -34,4 +34,21 @@ describe('a select trigger', () => {
     )
     expect((part(host, 'trigger') as HTMLElement).hasAttribute('aria-labelledby')).toBe(false)
   })
+
+  /* Only in a real engine, which reflects element references: happy-dom does
+     not, and the component feature-tests it. Measured before this: a select
+     named by a host `aria-labelledby` was a button named by the label alone. */
+  if (hasLayout()) {
+    test('and names it by that and then the value', async () => {
+      const host = await mount(
+        `<helix-headless-select aria-labelledby="outside" default-value="es">${OPTIONS}</helix-headless-select>
+        <span id="outside">Language</span>`,
+      )
+      const trigger = part(host, 'trigger') as HTMLElement & { ariaLabelledByElements: Element[] }
+      expect(trigger.ariaLabelledByElements.map((one) => one.textContent?.trim())).toEqual([
+        'Language',
+        'Spanish',
+      ])
+    })
+  }
 })
