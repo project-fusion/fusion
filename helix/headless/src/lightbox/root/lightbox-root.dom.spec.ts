@@ -445,3 +445,22 @@ describe('zooming into the shown item', () => {
     expect(zoom(host)).toBe('')
   })
 })
+
+describe('the counter', () => {
+  test('is drawn with `counter`, in the words of `status-label`, and hidden from screen readers', async () => {
+    const host = await lightbox('counter status-label="Picture {index} of {count}"')
+    host.show()
+    await host.updateComplete
+    const counter = part(host, 'counter') as HTMLElement
+    expect(counter.textContent).toBe('Picture 1 of 3')
+    expect(counter.getAttribute('aria-hidden')).toBe('true')
+    host.next()
+    await host.updateComplete
+    expect(counter.textContent).toBe('Picture 2 of 3')
+  })
+
+  test('is not drawn unless asked for', async () => {
+    const host = await lightbox()
+    expect(part(host, 'counter')).toBeNull()
+  })
+})

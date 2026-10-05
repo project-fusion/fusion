@@ -92,6 +92,7 @@ import { ZoomController } from '../zoom-controller.js'
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the viewer opens. Cancelable.
  * @event {ToggleEvent} toggle - Fired when the viewer opens or closes, with `newState` and `oldState`.
  *
+ * @csspart counter - The place of the shown item in the set, drawn with `counter`.
  * @csspart dialog - The native dialog element.
  * @csspart dismiss - The close control, drawn with `controls`.
  * @csspart dismiss-mark - The glyph on the close control, where none is slotted.
@@ -126,6 +127,15 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
    */
   @property({ reflect: true, type: Boolean })
   controls = false
+
+  /**
+   * Draws the place of the shown item in the set over the picture, in the
+   * words of `status-label`, such as "2 of 5". It hides with the controls while
+   * the reader is idle. Screen readers hear the place from the live region, so
+   * the drawn copy is hidden from them.
+   */
+  @property({ reflect: true, type: Boolean })
+  counter = false
 
   /**
    * The close control's accessible name. Translate it with the rest of your
@@ -613,6 +623,19 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
           })
   }
 
+  /** The shown item's place in the set, in the words of `status-label`. */
+  private place(): string {
+    const items = this.items
+    const current = resolveActiveItem(this.active, items)
+    return current
+      ? fillTemplate(this.statusLabel, {
+          count: items.length,
+          index: items.indexOf(current) + 1,
+          label: current.label,
+        })
+      : ''
+  }
+
   protected override render(): TemplateResult {
     /* **Opening focuses the viewer itself** rather than whichever of the
        consumer's controls came first. A screen reader hears the viewer's name,
@@ -640,6 +663,7 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
       </div>
       <slot name="footer"></slot>
       ${this.controls ? this.renderControls() : nothing}
+      ${this.counter ? html`<span part="counter" aria-hidden="true">${this.place()}</span>` : nothing}
       <span part="live" role="status" aria-live="polite">${this.announcement || nothing}</span>
     </dialog>`
   }
