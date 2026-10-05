@@ -290,7 +290,7 @@ describe('the hotkey', () => {
     )
     const item = host.querySelector('helix-headless-toast-item') as Item
     await item.updateComplete
-    /* Watched rather than read back: happy-dom's `activeElement` on a shadow
+    /* Watched, and not read back: happy-dom's `activeElement` on a shadow
        root throws for an element focused inside it. */
     const dismiss = item.shadowRoot?.querySelector('[part="dismiss"]') as HTMLElement
     let focused = 0
