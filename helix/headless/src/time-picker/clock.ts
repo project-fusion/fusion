@@ -1,4 +1,4 @@
-/**
+/*
  * The clock Time Picker and Time Input share: reading and writing a time of
  * day to the second, the times on offer, and which clock a locale writes on.
  *
