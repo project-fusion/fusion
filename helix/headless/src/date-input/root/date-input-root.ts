@@ -56,9 +56,11 @@ const dates = (value: string): string[] =>
  * when you leave the field, as a text field does. A date picked from the
  * calendar sends both.
  *
- * The trigger opens the calendar with focus on the selected day, and Escape
- * closes it and returns focus to the field. Focusing the field opens the
- * calendar too, and Tab out of the field closes it again.
+ * The trigger and ArrowDown open the calendar with focus on the selected day,
+ * Tab moves between the calendar's controls without leaving it, and Escape
+ * closes it and returns focus to the field. A press into the field opens the
+ * calendar too. Tab into the field opens nothing, and Tab out of the field
+ * closes the calendar.
  *
  * @since 0.1.0
  * @status stable

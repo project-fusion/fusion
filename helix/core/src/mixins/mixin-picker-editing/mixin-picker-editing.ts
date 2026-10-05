@@ -29,7 +29,10 @@ export declare class MixinPickerEditingInterface {
   /** The caret has left, so the field renders again. */
   protected readonly handleBlur: () => void
 
-  /** Focusing the field opens the picker, and only from outside the element. */
+  /**
+   * A press that focuses the field opens the picker, and only from outside the
+   * element. Focus that arrives by Tab or from a script opens nothing.
+   */
   protected readonly handleFocus: (event: FocusEvent) => void
 
   /**
@@ -51,8 +54,8 @@ export declare class MixinPickerEditingInterface {
 }
 
 /**
- * Grafts the typing half of a picker field: it opens on arrival, holds the
- * value while the caret is in it, and refuses while read-only.
+ * Grafts the typing half of a picker field: a press into it opens the picker,
+ * it holds the value while the caret is in it, and it refuses while read-only.
  *
  * **Over `MixinPickerField` and not part of it, because Color Input takes the
  * one and not the other.** Date Input and Time Input show a rendering while
@@ -60,9 +63,16 @@ export declare class MixinPickerEditingInterface {
  * while somebody is, because `Intl` formats and does not parse and a document
  * being edited must not be a rendering of something else. That split needs to
  * know when the caret is in the field, which is `editing`; and a reader who
- * reaches such a field is choosing, so arriving opens the picker. A color has
- * neither: `#ff0000` is what is typed and what is shown, and a reader who has
- * the hex pastes it and never opens anything. `readOnly` comes along here for
+ * presses into such a field is choosing, so the press opens the picker. A color
+ * has neither: `#ff0000` is what is typed and what is shown, and a reader who
+ * has the hex pastes it and never opens anything.
+ *
+ * **Tab into the field opens nothing.** It did, and a reader moving through a
+ * form with a screen reader heard a dialog appear at every date and every
+ * time they passed. React Aria's DatePicker opens on its button alone and the
+ * APG date picker combobox opens on its button or Down; here the trigger and
+ * ArrowDown open it from the keyboard, and a press into the text opens it for
+ * a pointer, which is where the reader has already shown what they came for. `readOnly` comes along here for
  * the two that take this mixin; Color Input declares its own, the same
  * property refusing the same two requests.
  */
@@ -125,12 +135,42 @@ export const MixinPickerEditing = <T extends Constructor<EditingBase>>(Base: T) 
     }
 
     /**
-     * Focusing the field opens the picker.
+     * Whether a press on the text is under way, which is the one arrival that
+     * opens the picker.
      *
-     * A reader who reaches this control is choosing, and making them find the
-     * trigger afterwards is a second action for something they have already
+     * Set on `pointerdown`, which a browser sends before the focus it causes,
+     * and cleared on the `click` that ends the press: a touch moves focus after
+     * `pointerup`, so `pointerup` would clear it too soon. A press that scrolls
+     * instead is canceled, and focus takes the flag either way.
+     */
+    private pressing = false
+
+    private readonly handlePress = (event: Event): void => {
+      this.pressing = event.type === 'pointerdown' && event.composedPath()[0] === this.control
+    }
+
+    override connectedCallback(): void {
+      super.connectedCallback()
+      this.addEventListener('pointerdown', this.handlePress)
+      this.addEventListener('pointercancel', this.handlePress)
+      this.addEventListener('click', this.handlePress)
+    }
+
+    override disconnectedCallback(): void {
+      super.disconnectedCallback()
+      this.removeEventListener('pointerdown', this.handlePress)
+      this.removeEventListener('pointercancel', this.handlePress)
+      this.removeEventListener('click', this.handlePress)
+    }
+
+    /**
+     * A press that focuses the field opens the picker.
+     *
+     * A reader who presses into this control is choosing, and making them find
+     * the trigger afterwards is a second action for something they have already
      * asked for. Typing still works with it up, because the picker follows the
-     * field rather than the other way round.
+     * field rather than the other way round. Focus by Tab or by `focus()` opens
+     * nothing: see the mixin's note.
      *
      * **Only where focus arrived from outside this element**, which is the whole
      * of the difficulty: picking shuts the panel and puts the caret back in the
@@ -153,8 +193,10 @@ export const MixinPickerEditing = <T extends Constructor<EditingBase>>(Base: T) 
          everywhere except the one moment this element moved the focus itself,
          and it already knows when that is. */
       this.editing = !this.returning
+      const pressed = this.pressing
+      this.pressing = false
       const from = event.relatedTarget
-      if (this.open || this.isDisabled || this.returning) {
+      if (!pressed || this.open || this.isDisabled || this.returning) {
         return
       }
       if (from instanceof Node && this.renderRoot?.contains?.(from)) {

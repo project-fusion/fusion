@@ -45,6 +45,10 @@ import '../../color-picker/index.js'
  * waits until you are done. Dragging in the panel sends `input` as the color
  * moves and `change` when it settles.
  *
+ * The trigger and ArrowDown open the panel with focus in the square. Tab moves
+ * between the panel's controls without leaving it, and Escape closes it and
+ * returns focus to the field.
+ *
  * The component sets `--color-input-swatch`, so do not set it yourself. It
  * holds the resolved color, so the styled tier can paint the swatch without
  * parsing the value.

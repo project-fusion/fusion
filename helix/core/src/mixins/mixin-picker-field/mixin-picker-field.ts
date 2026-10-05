@@ -11,6 +11,42 @@ import type { MixinFieldInterface } from '../mixin-field/mixin-field.js'
 type Constructor<T> = new (...args: any[]) => T
 
 /**
+ * Every element in `root` that Tab stops at, in the order Tab reaches them,
+ * through shadow roots and slots.
+ *
+ * Through them because a panel's controls are inside the picker's shadow root
+ * and often a button's inside that, so a light-DOM query finds none of them.
+ * Walked in the composed tree's order: a host's shadow root in place of its
+ * children, and a slot's assigned elements in place of its fallback. A host
+ * that delegates its focus is passed through to what it delegates to.
+ */
+const tabStops = (root: Element): HTMLElement[] => {
+  const found: HTMLElement[] = []
+  const visit = (node: Element): void => {
+    const element = node as HTMLElement
+    if (element.hidden || element.inert) {
+      return
+    }
+    if (
+      element.tabIndex >= 0 &&
+      !element.shadowRoot?.delegatesFocus &&
+      !(element as HTMLButtonElement).disabled &&
+      element.getClientRects().length > 0
+    ) {
+      found.push(element)
+    }
+    const assigned = node instanceof HTMLSlotElement ? node.assignedElements() : []
+    const children =
+      assigned.length > 0 ? assigned : [...(node.shadowRoot ?? node).children]
+    for (const child of children) {
+      visit(child)
+    }
+  }
+  visit(root)
+  return found
+}
+
+/**
  * What this is applied over: a form field that opens, holds a value and has a
  * label, which is the three controller mixins and `MixinField` together.
  */
@@ -153,10 +189,11 @@ export declare class MixinPickerFieldInterface {
  * same way, and for the same reason: a mixin reads a part out of whatever host
  * applies it.
  *
- * **Opening on focus, `readOnly` and the idle rendering are not here.** They
- * are `MixinPickerEditing`'s, because Color Input takes neither of the first
- * and last: a hex is pasted and read at a glance, so its field neither renders
- * nor opens on arrival. Color Input declares its own `readOnly`.
+ * **Opening on a press into the text, `readOnly` and the idle rendering are
+ * not here.** They are `MixinPickerEditing`'s, because Color Input takes
+ * neither of the first and last: a hex is pasted and read at a glance, so its
+ * field neither renders nor opens when pressed. Color Input declares its own
+ * `readOnly`.
  *
  * **Three things the two typed families share stay with them.** `renderTrigger`
  * differs only by its icon and would still be the wrong thing to lift: a part a
@@ -331,11 +368,11 @@ export const MixinPickerField = <T extends Constructor<PickerBase>>(Base: T) => 
      * shuts a panel the reader is passing, and ArrowDown in the text moves
      * into it.
      *
-     * **Tab is for a reader moving through a form.** The panel opens when the
-     * text is reached, which is `MixinPickerEditing`'s, and left open it added
-     * its own controls to the Tab order: a reader passing a Date Input pressed
-     * Tab five times for one field. Leaving the text by Tab closes it, so the
-     * panel is reached by its trigger, which moves focus into it.
+     * **Tab is for a reader moving through a form.** A panel opened by a
+     * press into the text, which is `MixinPickerEditing`'s, and left open,
+     * added its own controls to the Tab order: a reader passing a Date Input
+     * pressed Tab five times for one field. Leaving the text by Tab closes it,
+     * so the panel is reached by its trigger, which moves focus into it.
      */
     protected readonly handleKeydown = (event: KeyboardEvent): void => {
       if (event.key === 'Escape' && this.open) {
@@ -367,23 +404,40 @@ export const MixinPickerField = <T extends Constructor<PickerBase>>(Base: T) => 
     }
 
     /**
-     * Escape pressed inside the panel, which `handleKeydown` never hears.
+     * Escape and Tab pressed inside the panel, which `handleKeydown` never
+     * hears.
      *
      * A family binds `handleKeydown` on the field, and the surface is the
      * field's sibling, so a key pressed in the grid or the list went past it to
      * the document, where the dismissal closed the panel and left focus on a
      * cell that was no longer shown. Measured: focus fell to the body. Here the
      * key is taken on the host, and focus goes back to the text.
+     *
+     * **Tab stays in the panel**, which is the APG date picker dialog and
+     * React Aria's popover: the panel is a dialog, so Tab from its last control
+     * goes to its first and Shift+Tab from its first goes to its last. Tab from
+     * the grid left the dialog for the page behind it while the dialog stayed
+     * open. Escape, a pick, or a press outside leaves it.
      */
     private readonly handleSurfaceKeydown = (event: KeyboardEvent): void => {
       const surface = this.partNamed('surface')
       if (
-        event.key !== 'Escape' ||
+        (event.key !== 'Escape' && event.key !== 'Tab') ||
         !this.open ||
         event.defaultPrevented ||
         !surface ||
         !event.composedPath().includes(surface)
       ) {
+        return
+      }
+      if (event.key === 'Tab') {
+        const stops = tabStops(surface)
+        const at = event.composedPath()[0]
+        const edge = event.shiftKey ? stops[0] : stops.at(-1)
+        if (edge !== undefined && at === edge) {
+          event.preventDefault()
+          ;(event.shiftKey ? stops.at(-1) : stops[0])?.focus()
+        }
         return
       }
       event.stopPropagation()
@@ -453,10 +507,9 @@ export const MixinPickerField = <T extends Constructor<PickerBase>>(Base: T) => 
      * **Focus moves only when the trigger opened it**, which is what the APG
      * date picker dialog does: the panel is a dialog, and opening one from a
      * button takes focus into it. Measured before this: Enter on the trigger
-     * left focus there, three Tab presses from the selected day. Focusing the
-     * text opens the panel too, on the families that open on arrival, and
-     * moving focus from there would take the caret from a reader who came to
-     * type.
+     * left focus there, three Tab presses from the selected day. A press into
+     * the text opens the panel too, on the families that type, and moving
+     * focus from there would take the caret from a reader who came to type.
      */
     protected readonly handleTriggerClick = (): void => {
       this.fromTrigger = !this.open
@@ -489,9 +542,10 @@ export const MixinPickerField = <T extends Constructor<PickerBase>>(Base: T) => 
     /**
      * Whether this element is moving the focus itself, right now.
      *
-     * Focus opens the panel on the families that open on arrival, so handing
-     * focus back after a pick reopens the thing that was just answered.
-     * `relatedTarget` was the guard and it is not enough on its own: it catches
+     * Focus puts the typed families into the shape they take for typing, so
+     * handing focus back after a pick showed `2026-08-04` where the reader had
+     * picked August 4, and while focus opened the panel it reopened the thing
+     * that was just answered. `relatedTarget` was the guard and it is not enough on its own: it catches
      * a hand-off from the trigger, and it does not catch this, because the cell
      * or the option that had focus is gone by the time the caret moves and the
      * document has fallen back to something outside this element.

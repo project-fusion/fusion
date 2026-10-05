@@ -164,7 +164,7 @@ describe('input date', () => {
   })
 })
 
-describe('input date opens on focus', () => {
+describe('input date opens on a press, and not on Tab', () => {
   const dateField = async (
     attrs = '',
   ): Promise<HTMLElement & { open: boolean; updateComplete: Promise<unknown> }> => {
@@ -178,12 +178,23 @@ describe('input date opens on focus', () => {
     return host
   }
 
-  test('reaching the field from outside brings the calendar up', async () => {
+  test('pressing into the field from outside brings the calendar up', async () => {
+    const host = await dateField()
+    const control = part(host, 'control') as HTMLInputElement
+    control.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true }))
+    control.dispatchEvent(new FocusEvent('focus', { relatedTarget: null }))
+    await host.updateComplete
+    expect(host.open).toBe(true)
+  })
+
+  /* A reader tabbing through a form heard a dialog appear at every date they
+     passed. */
+  test('tabbing into the field leaves it shut', async () => {
     const host = await dateField()
     const control = part(host, 'control') as HTMLInputElement
     control.dispatchEvent(new FocusEvent('focus', { relatedTarget: null }))
     await host.updateComplete
-    expect(host.open).toBe(true)
+    expect(host.open).toBe(false)
   })
 
   test('but a hand-off from inside does not, or picking a date reopens it', async () => {
