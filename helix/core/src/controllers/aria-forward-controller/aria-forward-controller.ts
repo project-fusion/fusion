@@ -11,6 +11,16 @@ export interface AriaForwardOptions {
    * label already, so it leaves this off.
    */
   label?: boolean
+  /**
+   * Whether the control has a name of its own, where its own labels do not
+   * say.
+   *
+   * A file input is labeled by the trigger that opens its picker, "Choose
+   * files", which is an action rather than a name, so a page's `<label>`
+   * should still name it. Absent, the control's own `aria-label`,
+   * `aria-labelledby` and labels with words in them decide.
+   */
+  named?: () => boolean
   /** The focusable thing in the shadow root, or null before it renders. */
   target: () => HTMLElement | null
 }
@@ -143,10 +153,14 @@ export class AriaForwardController implements ReactiveController {
   /** Whether a host `aria-label` is carried down. See the option. */
   private readonly label: boolean
 
+  /** The component's own answer to whether the control is named. See the option. */
+  private readonly named: (() => boolean) | undefined
+
   constructor(host: ReactiveControllerHost & HTMLElement, options: AriaForwardOptions) {
     this.host = host
     this.target = options.target
     this.label = options.label === true
+    this.named = options.named
     host.addController(this)
   }
 
@@ -172,7 +186,8 @@ export class AriaForwardController implements ReactiveController {
    */
   private hostLabels(target: HTMLElement): HTMLElement[] {
     const labels = (this.host as HTMLElement & { labels?: NodeList | null }).labels
-    if (!labels || labels.length === 0 || this.namedByItself(target)) {
+    const named = this.named ? this.named() : this.namedByItself(target)
+    if (!labels || labels.length === 0 || named) {
       return []
     }
     return [...labels].filter((label): label is HTMLElement => label instanceof HTMLElement)
