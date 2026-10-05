@@ -4,6 +4,7 @@ import type { CSSResultGroup } from 'lit'
 /* Inherited from the base along with the template: this file has no
    `<helix-button>` in it to remind anyone. */
 import '../../button/index.js'
+import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './step.css.js'
 
 /**
@@ -18,7 +19,7 @@ import { styles } from './step.css.js'
 export class HelixStep extends HelixHeadlessStep {
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [liveStyles, styles]
 }
 
 declare global {
