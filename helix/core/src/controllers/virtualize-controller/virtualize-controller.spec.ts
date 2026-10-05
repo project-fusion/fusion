@@ -71,6 +71,18 @@ describe('the window a scroll offset asks for', () => {
     expect(window.after).toBe(0)
   })
 
+  test('an offset left past the end of a set that shrank still asks for the set', () => {
+    /* A box clamps its offset only after the content under it has shrunk, so
+       for a pass the offset is past the last item. Started there, the window
+       held nothing and moved again when the offset came back. */
+    expect(windowFor(20_000, { count: 1 }).window).toEqual({
+      after: 0,
+      before: 0,
+      first: 0,
+      last: 1,
+    })
+  })
+
   test('an empty set asks for nothing', () => {
     expect(windowFor(0, { count: 0 }).window).toEqual({ after: 0, before: 0, first: 0, last: 0 })
   })

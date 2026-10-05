@@ -1,4 +1,5 @@
 import {
+  AriaForwardController,
   customElement,
   elementById,
   HelixElement,
@@ -31,6 +32,11 @@ type Row = Record<string, string>
  * `aria-setsize`. Charts that use the same `for="<id>"` shape render an
  * accessible `<table>`, and ten thousand rows in one is the cost this component
  * avoids.
+ *
+ * The list follows the source: editing the script's text, or replacing the
+ * script under the same id, draws the new rows. A row that stays in view keeps
+ * its element as the list scrolls, and the row holding focus stays drawn when
+ * it scrolls out, so a link or a button in a row keeps focus.
  *
  * The viewport scrolls on this tier. It carries `data-scroller`, and `core`
  * ships `[data-scroller] { overflow: auto }` into every shadow root, so
@@ -65,6 +71,9 @@ export class HelixHeadlessVirtualList extends HelixElement {
   /**
    * The list's name, read by screen readers, because only some of its rows
    * are rendered at a time.
+   *
+   * An `aria-label` or `aria-labelledby` on the host names the list too, and
+   * wins over this.
    */
   @property()
   label = ''
@@ -92,6 +101,28 @@ export class HelixHeadlessVirtualList extends HelixElement {
 
   /** The `for` that `rows` came from, so it is read again only when that changes. */
   private readFor: string | undefined
+
+  /** The rows the drawn elements were filled from, so new data fills them again. */
+  private filledFrom: Row[] | undefined
+
+  /** The script the rows were read from, which the watcher follows. */
+  private source: Element | null = null
+
+  /**
+   * Watches the source and the tree around it.
+   *
+   * **The list read its source once per `for`**, so a page that wrote new JSON
+   * into the script, the way a framework updates a text child, kept the old
+   * rows. The script's own text is watched, and the tree it sits in, for a
+   * script replaced under the same id.
+   */
+  private watcher: MutationObserver | undefined
+
+  /** Carries a host `aria-label` and `aria-labelledby` to the element with the `list` role. */
+  protected readonly aria = new AriaForwardController(this, {
+    label: true,
+    target: () => this.partNamed('viewport'),
+  })
 
   /* No `overscan` property. The controller's four is a frame of fast scrolling
      at a 32 pixel row, which is a fact about the platform rather than a
@@ -144,6 +175,43 @@ export class HelixHeadlessVirtualList extends HelixElement {
     }
   }
 
+  override connectedCallback(): void {
+    super.connectedCallback()
+    if (typeof MutationObserver === 'undefined') {
+      return
+    }
+    this.watcher = new MutationObserver((records) => this.handleMutations(records))
+    /* Connected, so the root is the document or a shadow root. */
+    this.watcher.observe(this.getRootNode(), {
+      characterData: true,
+      childList: true,
+      subtree: true,
+    })
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    this.watcher?.disconnect()
+    this.watcher = undefined
+  }
+
+  /**
+   * Reads the source again when its text changed or another element took its
+   * id. Rows this list drew are its own writes and are not news.
+   */
+  private handleMutations(records: MutationRecord[]): void {
+    if (this.for === '' || this.hydrating || this.readFor === undefined) {
+      return
+    }
+    const found = elementById(this, this.for)
+    const edited = records.some(
+      (record) => found !== null && (record.target === found || found.contains(record.target)),
+    )
+    if (found !== this.source || edited) {
+      this.read()
+    }
+  }
+
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated?.(changed)
     this.finishHydration()
@@ -157,6 +225,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
 
   private read(): void {
     const source = this.for === '' ? null : elementById(this, this.for)
+    this.source = source
     const text = source?.textContent ?? ''
     if (text.trim() === '') {
       this.rows = []
@@ -173,51 +242,117 @@ export class HelixHeadlessVirtualList extends HelixElement {
   }
 
   /**
+   * The item whose row holds focus, where one does.
+   *
+   * Asked of the root this list is in, which retargets focus inside a row's
+   * own shadow root to the row's element.
+   */
+  private focusedIndex(): number | undefined {
+    const root = this.getRootNode() as Document | ShadowRoot
+    let node = root.activeElement as Element | null
+    while (node && node.parentElement !== this) {
+      node = node.parentElement
+    }
+    const index = node instanceof HTMLElement ? node.dataset.index : undefined
+    return index === undefined ? undefined : Number(index)
+  }
+
+  /** The item drawn outside the window to keep focus, if there is one. */
+  private keptIndex(): number | undefined {
+    const index = this.focusedIndex()
+    const { first, last } = this.virtualize.window
+    return index !== undefined && index < this.rows.length && (index < first || index >= last)
+      ? index
+      : undefined
+  }
+
+  /** Fills a row's holes and its place in the set from an item. */
+  private fill(elements: Element[], row: Row, at: number): void {
+    const total = String(this.rows.length)
+    for (const element of elements) {
+      for (const hole of [
+        ...(element.matches('[data-field]') ? [element as HTMLElement] : []),
+        ...element.querySelectorAll<HTMLElement>('[data-field]'),
+      ]) {
+        hole.textContent = row[hole.dataset.field ?? ''] ?? ''
+      }
+      /* The real index and the real total, not the position in the window. A
+         reader arrowing through this should hear where they are in the set. */
+      element.setAttribute('role', 'listitem')
+      element.setAttribute('aria-posinset', String(at + 1))
+      element.setAttribute('aria-setsize', total)
+      /* Which item this drew, for the controller to measure it against. The
+         real index, the same one `aria-posinset` carries one higher. */
+      element.setAttribute('data-index', String(at))
+    }
+  }
+
+  /**
    * Puts the windowed rows into the light DOM, and takes the rest out.
    *
-   * Cleared and re-cloned rather than reconciled: a window is twenty-odd rows
-   * and cloning that many is well under a frame. A reconciler here would carry
-   * keys and identity for a set nothing selects into.
+   * **A row that stays in the window keeps its element.** Clearing and
+   * cloning every row on every move replaced the node a reader had focused,
+   * so a link in a row lost focus to the body on any scroll, even with its row
+   * still on screen. Rows are keyed by item: the ones leaving go, the ones
+   * arriving are cloned in their place, and the ones staying are not moved.
+   *
+   * **The row holding focus is drawn outside the window too**, beside it on the
+   * side it belongs, and the spacer on that side gives up its room.
    */
   private place(): void {
     const template = this.querySelector('template')
     if (!template) {
       return
     }
-    for (const stale of [...this.children]) {
-      if (stale !== template) {
-        stale.remove()
-      }
-    }
     const { first, last } = this.virtualize.window
-    const total = this.rows.length
-    const fragment = this.ownerDocument.createDocumentFragment()
-    for (let at = first; at < last; at += 1) {
-      const row = this.rows[at]
-      if (!row) {
+    const kept = this.keptIndex()
+    const wanted: number[] = []
+    for (let at = first; at < Math.min(last, this.rows.length); at += 1) {
+      wanted.push(at)
+    }
+    if (kept !== undefined) {
+      wanted.push(kept)
+      wanted.sort((a, b) => a - b)
+    }
+    const keep = new Set(wanted)
+    const drawn = new Map<number, Element[]>()
+    for (const child of [...this.children]) {
+      if (child === template) {
+        continue
+      }
+      const index = Number((child as HTMLElement).dataset.index)
+      if (!Number.isInteger(index) || !keep.has(index)) {
+        child.remove()
+        continue
+      }
+      drawn.set(index, [...(drawn.get(index) ?? []), child])
+    }
+    const refill = this.filledFrom !== this.rows
+    this.filledFrom = this.rows
+    let anchor: Element | null = drawn.values().next().value?.[0] ?? null
+    for (const at of wanted) {
+      const row = this.rows[at] as Row
+      const group = drawn.get(at)
+      if (group) {
+        if (refill) {
+          this.fill(group, row, at)
+        }
+        anchor = (group.at(-1) as Element).nextElementSibling
         continue
       }
       const clone = template.content.cloneNode(true) as DocumentFragment
-      for (const hole of clone.querySelectorAll<HTMLElement>('[data-field]')) {
-        hole.textContent = row[hole.dataset.field ?? ''] ?? ''
-      }
-      /* The real index and the real total, not the position in the window. A
-         reader arrowing through this should hear where they are in the set. */
-      for (const element of clone.children) {
-        element.setAttribute('role', 'listitem')
-        element.setAttribute('aria-posinset', String(at + 1))
-        element.setAttribute('aria-setsize', String(total))
-        /* Which item this drew, for the controller to measure it against. The
-           real index, the same one `aria-posinset` carries one higher. */
-        element.setAttribute('data-index', String(at))
-      }
-      fragment.append(clone)
+      this.fill([...clone.children], row, at)
+      this.insertBefore(clone, anchor)
     }
-    this.append(fragment)
   }
 
   protected override render(): TemplateResult {
-    const { after, before } = this.virtualize.window
+    const window = this.virtualize.window
+    /* The row kept for focus takes its own room out of the spacer on its side. */
+    const kept = this.hasUpdated ? this.keptIndex() : undefined
+    const room = kept === undefined ? 0 : this.virtualize.sizeOf(kept)
+    const before = window.before - (kept !== undefined && kept < window.first ? room : 0)
+    const after = window.after - (kept !== undefined && kept >= window.last ? room : 0)
     return html`<div
       data-scroller
       part="viewport"
