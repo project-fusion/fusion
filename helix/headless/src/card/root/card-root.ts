@@ -23,7 +23,7 @@ import { property, state } from 'lit/decorators.js'
  * `header-actions` and `footer-actions` hold controls at the end of the
  * header's and the footer's line, as Web Awesome's card does. While one holds
  * something, its line is a `header-row` or `footer-row` part; otherwise there
- * is no wrapper and the regions lay out as before. A server cannot see slotted
+ * is no wrapper and every region is a bare slot. A server cannot see slotted
  * content, so served actions sit on their own line until the script runs.
  *
  * @since 0.1.0

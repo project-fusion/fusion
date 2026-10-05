@@ -29,6 +29,9 @@ import { property, state } from 'lit/decorators.js'
  * @csspart fallback - The fallback, shown when the image fails to load.
  * @csspart image - The image itself.
  * @csspart placeholder - The placeholder, shown until the image loads.
+ *
+ * @cssstate error - The image failed to load, and the fallback shows.
+ * @cssstate loaded - The image loaded.
  */
 @customElement('helix-headless-image')
 export class HelixHeadlessImage extends HelixElement {
@@ -85,6 +88,16 @@ export class HelixHeadlessImage extends HelixElement {
   loading?: 'eager' | 'lazy'
 
   /**
+   * How long, in milliseconds, the placeholder waits before it shows.
+   *
+   * Absent or `0` shows it at once. A picture that arrives inside
+   * the wait never shows a placeholder at all, so a cached or fast image does
+   * not flash one. Radix's `delayMs` on its avatar fallback is the same idea.
+   */
+  @property({ attribute: 'placeholder-delay', type: Number })
+  placeholderDelay = 0
+
+  /**
    * How much of the referring URL to send with the request.
    */
   @property({ attribute: 'referrerpolicy' })
@@ -136,6 +149,13 @@ export class HelixHeadlessImage extends HelixElement {
    */
   @state()
   private answered = ''
+
+  /** Whether the placeholder's wait for this `src` is over. */
+  @state()
+  private waited = false
+
+  /** The timer counting down the placeholder's wait. */
+  private wait: ReturnType<typeof setTimeout> | undefined
 
   /**
    * Whether this picture's answer has been given, or is on its way.
@@ -275,6 +295,9 @@ export class HelixHeadlessImage extends HelixElement {
     if (changed.has('src')) {
       this.settle()
     }
+    if (changed.has('src') || changed.has('placeholderDelay')) {
+      this.startWait()
+    }
     /* The mirror, written here rather than reflected. `loading` is the resting
        state and writes nothing, so a picture on its way carries no attribute
        and one that has arrived or failed says which. */
@@ -284,6 +307,27 @@ export class HelixHeadlessImage extends HelixElement {
       } else {
         this.setAttribute('data-status', this.status)
       }
+      /* And as custom states, which a stylesheet reaches without an attribute
+         on the consumer's markup: `:state(loaded)`, `:state(error)`. */
+      this.toggleState('loaded', this.status === 'loaded')
+      this.toggleState('error', this.status === 'error')
+    }
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    clearTimeout(this.wait)
+  }
+
+  /* Client only, from `updated`, so a server serves the placeholder hidden
+     while there is a wait and shown when there is none. */
+  private startWait(): void {
+    clearTimeout(this.wait)
+    this.waited = false
+    if (this.placeholderDelay > 0) {
+      this.wait = setTimeout(() => {
+        this.waited = true
+      }, this.placeholderDelay)
     }
   }
 
@@ -347,7 +391,7 @@ export class HelixHeadlessImage extends HelixElement {
       <span
         part="placeholder"
         aria-hidden="true"
-        ?hidden=${this.status !== 'loading'}
+        ?hidden=${this.status !== 'loading' || (this.placeholderDelay > 0 && !this.waited)}
         ><slot name="placeholder"></slot
       ></span>
       <span

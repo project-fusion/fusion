@@ -35,9 +35,11 @@ describe('blockquote', () => {
        larger, on the display face, a step back from full strength. On the slot
        rather than on `::slotted(*)`, so bare text and a `<p>` come out alike. */
     const passage = rule('slot:not([name])')
-    expect(passage).toContain('font-family: var(--helix-font-display)')
+    expect(passage).toContain(
+      'font-family: var(--blockquote-font-family, var(--helix-font-display))',
+    )
     expect(passage).toContain('font-size: var(--blockquote-size, var(--helix-text-xl))')
-    expect(passage).toContain('color: var(--helix-color-foreground-muted)')
+    expect(passage).toContain('color: var(--blockquote-color, var(--helix-color-foreground-muted))')
   })
 
   test('an attribution nobody wrote takes no room, and one that was keeps its caption', async () => {
@@ -55,8 +57,10 @@ describe('blockquote', () => {
   })
 
   test('the attribution stands off the passage as a separate thing', () => {
-    expect(rule('[part="attribution"]')).toContain('margin-block-start: var(--helix-space-sm)')
-    expect(rule('[part="attribution"]')).toContain('font-size: var(--helix-text-sm)')
+    expect(rule('[part="attribution"]')).toContain('var(--helix-space-sm))')
+    expect(rule('[part="attribution"]')).toContain(
+      'font-size: var(--blockquote-attribution-size, var(--helix-text-sm))',
+    )
   })
 
   test('carries no attribute of its own', async () => {
@@ -64,5 +68,17 @@ describe('blockquote', () => {
     expect(bare.getAttributeNames()).toEqual([])
     const cited = await mount('<helix-blockquote cite="https://x.test">x</helix-blockquote>')
     expect(cited.getAttributeNames()).toEqual(['cite'])
+  })
+})
+
+describe('blockquote hooks', () => {
+  test('the attribution takes a color and a gap that fall back to today', () => {
+    const attribution = rule('[part="attribution"]')
+    expect(attribution).toContain(
+      'color: var(--blockquote-attribution-color, var(--helix-color-foreground-muted))',
+    )
+    expect(attribution).toContain(
+      'margin-block-start: var(--blockquote-gap, var(--helix-space-sm))',
+    )
   })
 })
