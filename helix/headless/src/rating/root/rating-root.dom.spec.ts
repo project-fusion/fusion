@@ -577,3 +577,41 @@ describe('the names of the options', () => {
     expect(part(host, 'marks')?.getAttribute('aria-label')).toBe('4 von 5')
   })
 })
+
+describe('a clearable rating', () => {
+  type Rated = HTMLElement & { updateComplete: Promise<unknown>; value: string }
+
+  /* Zag's rating group clears on a second press. Without it, a reader who
+     rated by mistake could not take the answer back. */
+  test('a second press on the chosen score takes it back to unrated, and says so', async () => {
+    const host = (await rating('clearable value="3" name="score"')) as Rated
+    const heard: string[] = []
+    for (const name of ['input', 'change', 'helix-clear']) {
+      host.addEventListener(name, () => heard.push(name))
+    }
+    options(host)[2]?.click()
+    await host.updateComplete
+    expect(host.value).toBe('')
+    expect(heard).toEqual(['input', 'change', 'helix-clear'])
+    expect(formValue(host)).toBeNull()
+  })
+
+  test('Backspace and Delete clear it from the keyboard', async () => {
+    for (const key of ['Backspace', 'Delete']) {
+      const host = (await rating('clearable value="2"')) as Rated
+      part(host, 'marks')?.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key }))
+      await host.updateComplete
+      expect(host.value).toBe('')
+    }
+  })
+
+  test('without clearable, a second press keeps the score', async () => {
+    const host = (await rating('value="3"')) as Rated
+    options(host)[2]?.click()
+    part(host, 'marks')?.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, key: 'Delete' }),
+    )
+    await host.updateComplete
+    expect(host.value).toBe('3')
+  })
+})

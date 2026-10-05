@@ -4,14 +4,17 @@ import {
   CommandController,
   customElement,
   deepActiveElement,
+  FocusScopeController,
   HelixElement,
   MixinControllerOpen,
   type Placement,
   PopoverController,
+  type Side,
   tellDisclosure,
 } from '@fusion.dev/helix-core'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { property, state } from 'lit/decorators.js'
+import { headingIn } from '../heading.js'
 
 /**
  * @summary A panel that opens next to its trigger and holds any content.
@@ -33,9 +36,28 @@ import { property } from 'lit/decorators.js'
  * commands work as they do on `Dialog` and `Drawer`, so a button anywhere on
  * the page can open the popover with no script.
  *
- * It closes on Escape, on a press outside it, and when focus moves out of the
- * trigger and the panel to somewhere else on the page. It does not trap focus.
- * An `aria-labelledby` on the host names the panel in place of `label`.
+ * **Opening moves focus into the panel**, to the first control in it, or to the
+ * panel itself where it holds none, and closing from inside gives it back to
+ * the trigger. It closes on Escape, on a press outside it, and when focus moves
+ * out of the trigger and the panel to somewhere else on the page.
+ *
+ * `modal` keeps `Tab` inside the panel while it is open and says so with
+ * `aria-modal`, for a panel that has to be answered before the page goes on.
+ * Without it the popover does not trap focus.
+ *
+ * The panel's name is `label` when you set it. Otherwise it is the first
+ * heading in the panel, or the elements an `aria-labelledby` on the host names.
+ *
+ * `arrow` draws a point on the panel's edge facing the trigger. The side the
+ * panel landed on is on the host as `:state(placed-top)` and its kin, and the
+ * trigger's width is on the panel as `--floating-anchor-inline-size`, for a
+ * panel as wide as its trigger:
+ *
+ * ```css
+ * helix-popover::part(popover) {
+ *   min-inline-size: var(--floating-anchor-inline-size);
+ * }
+ * ```
  *
  * @since 0.1.0
  * @status stable
@@ -50,18 +72,44 @@ import { property } from 'lit/decorators.js'
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired before it opens, and cancelable.
  * @event {ToggleEvent} toggle - Fired after the panel opens or closes, with `newState` and `oldState`.
  *
+ * @csspart arrow - The point on the panel's edge facing the trigger, drawn with `arrow`.
+ * @csspart arrow-bottom - Added to `arrow` while the panel is below its trigger, with the point on the panel's top edge.
+ * @csspart arrow-left - Added to `arrow` while the panel is left of its trigger, with the point on the panel's right edge.
+ * @csspart arrow-right - Added to `arrow` while the panel is right of its trigger, with the point on the panel's left edge.
+ * @csspart arrow-top - Added to `arrow` while the panel is above its trigger, with the point on the panel's bottom edge.
  * @csspart content - The scrolling region inside the panel.
  * @csspart popover - The panel.
  *
  * @cssstate open - While the popover is open.
+ * @cssstate placed-bottom - While the panel sits below its trigger.
+ * @cssstate placed-left - While the panel sits to the left of its trigger.
+ * @cssstate placed-right - While the panel sits to the right of its trigger.
+ * @cssstate placed-top - While the panel sits above its trigger.
  */
 @customElement('helix-headless-popover')
 export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
   /**
-   * The panel's name, read by screen readers.
+   * Draws a point on the panel's edge facing the trigger.
+   *
+   * Off by default, which is the house style: a panel that opens from its
+   * trigger already reads as belonging to it.
+   */
+  @property({ type: Boolean })
+  arrow = false
+
+  /**
+   * The panel's name, read by screen readers. Left at `Popover`, the first
+   * heading in the panel names it instead.
    */
   @property()
   label = 'Popover'
+
+  /**
+   * Keeps `Tab` inside the panel while it is open, and marks the panel
+   * `aria-modal`. A press outside and Escape still close it.
+   */
+  @property({ type: Boolean })
+  modal = false
 
   /* `aria-labelledby` and `aria-describedby` written on the host, carried to
      the panel, which is the `dialog` a reader is on. */
@@ -91,6 +139,7 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
    * at runtime is break the API this is built on. */
   private readonly panel = new PopoverController(this, {
     anchor: () => this.trigger,
+    arrow: () => this.partNamed('arrow'),
     /* The host *and* whatever invoked it, never the panel alone. An outside
        press is measured against this, and the host is not a box to rely on, a
        sheet being free to give it none, so a boundary of the panel alone would
@@ -99,12 +148,76 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
        give it: pressing it while the panel is open should close it once, not
        close it on `pointerdown` and reopen it on the `click` that follows. */
     boundary: (): (HTMLElement | undefined)[] => [this, this.invoker],
-    offset: () => this.offset,
+    /* Measured to the point where there is one, as `Tooltip` measures it: the
+       arrow is a square turned on its center, which reaches `n / sqrt(2)` past
+       the edge it sits on. */
+    offset: () => this.offset + (this.partNamed('arrow')?.offsetWidth ?? 0) / Math.SQRT2,
     onDismiss: () => this.hide(),
+    /* The side the panel landed on, for a sheet outside that draws by side,
+       where no attribute can follow `::part()`. As `Tooltip` records it. */
+    onPlace: (placement) => {
+      const side = placement.split('-')[0] as Side
+      this.toggleState('placed-bottom', side === 'bottom')
+      this.toggleState('placed-left', side === 'left')
+      this.toggleState('placed-right', side === 'right')
+      this.toggleState('placed-top', side === 'top')
+      this.side = side
+    },
     open: () => this.open,
     placement: () => this.placement,
     surface: () => this.partNamed('popover'),
   })
+
+  /**
+   * The side of its trigger the panel last landed on, which names the arrow's
+   * second part. Undefined until the first placement, which the server never
+   * makes.
+   */
+  @state()
+  private side?: Side
+
+  /* Focus into the panel on the way in and back on the way out, and kept in
+     while `modal`. */
+  private readonly scope = new FocusScopeController(this, {
+    contain: () => this.modal && this.open,
+    contents: () => this.slotted,
+    surface: () => this.partNamed('popover'),
+  })
+
+  /** What is assigned to the panel's slot. */
+  private get slotted(): Element[] {
+    return (
+      this.renderRoot
+        ?.querySelector<HTMLSlotElement>('slot:not([name])')
+        ?.assignedElements({ flatten: true }) ?? []
+    )
+  }
+
+  /** Whether the first heading in the panel is what names it. */
+  private namedByHeading = false
+
+  /**
+   * Names the panel by its first heading, where `label` was left alone and no
+   * `aria-labelledby` on the host names it. An element reference, for the
+   * reason `Dialog` gives.
+   */
+  private nameByHeading(): void {
+    const panel = this.partNamed('popover') as
+      | (HTMLElement & { ariaLabelledByElements?: Element[] | null })
+      | null
+    if (!panel || !('ariaLabelledByElements' in panel)) {
+      return
+    }
+    const asked = this.label !== 'Popover' || this.hasAttribute('aria-labelledby')
+    const heading = asked ? null : headingIn(this.slotted)
+    if (heading) {
+      panel.ariaLabelledByElements = [heading]
+      this.namedByHeading = true
+    } else if (this.namedByHeading) {
+      panel.ariaLabelledByElements = null
+      this.namedByHeading = false
+    }
+  }
 
   /**
    * The invoker that last opened the panel, when a command did.
@@ -240,6 +353,14 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
        change. Idempotent, so saying it twice costs an assignment Lit compares
        and discards. */
     this.tellTrigger()
+    this.nameByHeading()
+    /* Into the panel once it is up, which the controller has done by now, and
+       never on the first update: a popover served open has not been opened by
+       anybody, and taking focus as the page loads would move a reader who has
+       not asked for anything. */
+    if (changed.has('open') && this.open && changed.get('open') === false) {
+      this.scope.enter()
+    }
   }
 
   protected override render(): TemplateResult {
@@ -249,9 +370,19 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
         popover="manual"
         role="dialog"
         aria-label=${this.label}
+        aria-modal=${this.modal ? 'true' : nothing}
+        tabindex="-1"
         ?hidden=${!this.open}
       >
-        <div part="content"><slot></slot></div>
+        ${
+          this.arrow
+            ? html`<div
+                part="arrow${this.side ? { bottom: ' arrow-bottom', left: ' arrow-left', right: ' arrow-right', top: ' arrow-top' }[this.side] : ''}"
+                aria-hidden="true"
+              ></div>`
+            : nothing
+        }
+        <div part="content"><slot @slotchange=${this.nameByHeading}></slot></div>
       </div>`
   }
 }
