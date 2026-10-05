@@ -206,7 +206,7 @@
   /* The ring's unbanded ink, muted rather than the bar's primary. Named here
      rather than left in the `stroke` declaration so `emphasis` has one property
      to quieten, whichever shape and whichever band chose the color. */
-  --_meter-hue: var(--helix-color-foreground-muted);
+  --_meter-hue: var(--meter-color, var(--helix-color-foreground-muted));
   scale: none;
   stroke: var(--_meter-hue);
   stroke-dasharray: var(--meter-along) 100;
@@ -236,19 +236,19 @@
    already resolved and written onto the element that carries the reading. */
 :host([shape="arc"]) [part~="indicator"][data-band="good"],
 :host([shape="ring"]) [part~="indicator"][data-band="good"] {
-  --_meter-hue: var(--helix-color-success);
+  --_meter-hue: var(--meter-color, var(--helix-color-success));
   stroke: var(--_meter-hue);
 }
 
 :host([shape="arc"]) [part~="indicator"][data-band="fair"],
 :host([shape="ring"]) [part~="indicator"][data-band="fair"] {
-  --_meter-hue: var(--helix-color-warning);
+  --_meter-hue: var(--meter-color, var(--helix-color-warning));
   stroke: var(--_meter-hue);
 }
 
 :host([shape="arc"]) [part~="indicator"][data-band="poor"],
 :host([shape="ring"]) [part~="indicator"][data-band="poor"] {
-  --_meter-hue: var(--helix-color-danger);
+  --_meter-hue: var(--meter-color, var(--helix-color-danger));
   stroke: var(--_meter-hue);
 }
 

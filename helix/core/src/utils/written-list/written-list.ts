@@ -1,4 +1,14 @@
 /**
+ * What a list property may hold: what an attribute writes, or an array a
+ * framework assigned to the property.
+ *
+ * **An array as well, because React 19 sets a property and not an attribute.**
+ * `values={[1240, 1318]}` arrives as an array, and splitting it as a string
+ * threw inside the render and left the old drawing on the screen.
+ */
+export type WrittenList = string | readonly (number | string)[] | null | undefined
+
+/**
  * A list a consumer wrote into an attribute, split the way they write one.
  *
  * **Whitespace or commas, because a reader listing words puts commas between
@@ -20,8 +30,10 @@
  * `for` take whitespace and only whitespace, and accepting a comma there would
  * resolve an id nobody can write.
  */
-export const writtenList = (source: string | undefined): string[] =>
-  (source ?? '').split(/[\s,]+/).filter((one) => one !== '')
+export const writtenList = (source: WrittenList): string[] =>
+  (Array.isArray(source) ? source.join(' ') : String(source ?? ''))
+    .split(/[\s,]+/)
+    .filter((one) => one !== '')
 
 /**
  * The same list read as numbers, with everything that is not one dropped.
@@ -35,7 +47,7 @@ export const writtenList = (source: string | undefined): string[] =>
  * answer, because a number that makes sense here is a bound, a reading and a
  * playback rate, and only the caller knows that a rate of zero is not a rate.
  */
-export const writtenNumbers = (source: string | undefined): number[] =>
+export const writtenNumbers = (source: WrittenList): number[] =>
   writtenList(source)
     .map(Number)
     .filter((one) => Number.isFinite(one))

@@ -55,6 +55,16 @@ describe('meter', () => {
     expect(part(host, 'value')?.textContent?.trim()).toBe('42%')
     expect(internals(host).ariaValueText).toBeNull()
   })
+
+  /* Written by concatenation it ignored the locale: no space before the sign
+     in French, Latin digits in Arabic. */
+  test('written the way `locale` writes a percentage, on the screen and when read out', async () => {
+    const french = new Intl.NumberFormat('fr', { style: 'percent' })
+    const shown = await meter('locale="fr" show-value value="42"')
+    expect(part(shown, 'value')?.textContent?.trim()).toBe(french.format(0.42))
+    const over = await meter('locale="fr" value="250"')
+    expect(internals(over).ariaValueText).toBe(french.format(2.5))
+  })
 })
 
 describe('meter bands', () => {

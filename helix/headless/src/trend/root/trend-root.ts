@@ -4,11 +4,14 @@ import { html, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
-/** The three directions a measurement can have moved, and how each is drawn. */
+/**
+ * The three directions a measurement can have moved, how each is drawn, and
+ * the property that holds its word.
+ */
 const DIRECTIONS = {
-  down: { icon: arrowDown, word: 'Down' },
-  neutral: { icon: minus, word: 'Unchanged' },
-  up: { icon: arrowUp, word: 'Up' },
+  down: { icon: arrowDown, word: 'downLabel' },
+  neutral: { icon: minus, word: 'unchangedLabel' },
+  up: { icon: arrowUp, word: 'upLabel' },
 } as const
 
 type Direction = keyof typeof DIRECTIONS
@@ -39,7 +42,8 @@ const readDirection = (value: string | undefined): (typeof DIRECTIONS)[Direction
  *
  * The direction is also written as a word, so a screen reader reads it. The
  * styled tier hides `part="direction"` visually and keeps it in the
- * accessibility tree.
+ * accessibility tree. The words are properties, `up-label` through
+ * `worse-label`, so a page in another language can set its own.
  *
  * The metric and the label are bare slots. An element that assigned its own
  * slot on connect would add an attribute to its host after upgrade, which the
@@ -83,15 +87,44 @@ export class HelixHeadlessTrend extends HelixElement {
   @property({ reflect: true })
   good?: 'down' | 'up'
 
+  /**
+   * The word read out after the direction when the move is an improvement.
+   */
+  @property({ attribute: 'better-label' })
+  betterLabel = 'better'
+
+  /**
+   * The word read out for a move down.
+   */
+  @property({ attribute: 'down-label' })
+  downLabel = 'Down'
+
+  /**
+   * The word read out for no move, or for a direction that is not one of the
+   * three.
+   */
+  @property({ attribute: 'unchanged-label' })
+  unchangedLabel = 'Unchanged'
+
+  /**
+   * The word read out for a move up.
+   */
+  @property({ attribute: 'up-label' })
+  upLabel = 'Up'
+
+  /**
+   * The word read out after the direction when the move is a setback.
+   */
+  @property({ attribute: 'worse-label' })
+  worseLabel = 'worse'
+
   protected override render(): TemplateResult {
     const direction = readDirection(this.direction)
     /* Silent on a neutral move, whatever `good` says. Neither better nor worse
        is a reading of "unchanged" that the word already carries. */
     const judgment =
       this.good && this.direction && this.direction !== 'neutral'
-        ? this.good === this.direction
-          ? ', better'
-          : ', worse'
+        ? `, ${this.good === this.direction ? this.betterLabel : this.worseLabel}`
         : ''
 
     /* One interpolation rather than two, so the phrase is one text node.
@@ -111,7 +144,7 @@ export class HelixHeadlessTrend extends HelixElement {
       >
         ${unsafeSVG(direction.icon.content)}
       </svg>
-      <span part="direction">${`${direction.word}${judgment}`}</span>
+      <span part="direction">${`${this[direction.word]}${judgment}`}</span>
       <slot></slot>
       <slot name="label"></slot>`
   }

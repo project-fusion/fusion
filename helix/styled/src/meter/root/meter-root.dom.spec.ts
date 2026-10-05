@@ -52,10 +52,15 @@ describe('meter', () => {
       expect(rule(`[part~="indicator"][data-band="${band}"]`)).toContain(
         `--_meter-hue: var(--meter-color, var(--helix-color-${token}))`,
       )
+      /* `--meter-color` overrides a band on the round shapes as it does on the
+         bar, which it did not: a ring and an arc kept the band's own tone. */
       expect(rule(`:host([shape="ring"]) [part~="indicator"][data-band="${band}"]`)).toContain(
-        `--_meter-hue: var(--helix-color-${token})`,
+        `--_meter-hue: var(--meter-color, var(--helix-color-${token}))`,
       )
     }
+    expect(rule(':host([shape="ring"]) [part~="indicator"]')).toContain(
+      '--_meter-hue: var(--meter-color, var(--helix-color-foreground-muted))',
+    )
     expect(rule('[part="tick"]')).toContain('inset-inline-start: var(--meter-at, 0%)')
   })
 

@@ -2,6 +2,23 @@ import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
+/* Built once per locale and kept, `Intl.NumberFormat` being expensive to construct
+   and cheap to call. */
+const percents = new Map<string, Intl.NumberFormat>()
+
+/** A share from 0 to 1 as a whole percentage, the way the locale writes one. */
+const percent = (share: number, locale: string): string => {
+  let format = percents.get(locale)
+  if (!format) {
+    format = new Intl.NumberFormat(locale || undefined, {
+      maximumFractionDigits: 0,
+      style: 'percent',
+    })
+    percents.set(locale, format)
+  }
+  return format.format(share)
+}
+
 /** Which band a value falls in, once `optimum` has said which end is good. */
 export type MeterBand = 'fair' | 'good' | 'poor'
 
@@ -88,6 +105,14 @@ export class HelixHeadlessMeter extends HelixElement {
    */
   @property()
   label = 'Meter'
+
+  /**
+   * The locale the percentage is written in, such as `fr` for `72 %`.
+   *
+   * Absent uses the runtime's own.
+   */
+  @property()
+  locale = ''
 
   /**
    * Top of the low band.
@@ -262,7 +287,7 @@ export class HelixHeadlessMeter extends HelixElement {
 
   /** What the reading says, which is the consumer's words or a percentage. */
   private get text(): string {
-    return this.valueText || `${Math.round(this.ratio * 100)}%`
+    return this.valueText || percent(this.ratio, this.locale)
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -280,7 +305,7 @@ export class HelixHeadlessMeter extends HelixElement {
        *unless* the value is past an end. `ariaValueNow` has to sit inside the
        range, so it is the only place a reader can be told that 250 is not 100. */
     this.internals.ariaValueText =
-      this.valueText || (this.beyond ? `${Math.round(this.ratio * 100)}%` : null)
+      this.valueText || (this.beyond ? percent(this.ratio, this.locale) : null)
   }
 
   /**

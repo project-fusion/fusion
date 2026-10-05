@@ -68,6 +68,16 @@ describe('trend judgment', () => {
     expect(word(await trend('direction="down" good="up"'))).toBe('Down, worse')
   })
 
+  /* The words were fixed English, so a page in another language announced
+     "Up, worse" beside its own copy. */
+  test('every word is a property, so a page can say it in its own language', async () => {
+    const words =
+      'up-label="Hausse" down-label="Baisse" unchanged-label="Stable" better-label="mieux" worse-label="pire"'
+    expect(word(await trend(`direction="up" good="down" ${words}`))).toBe('Hausse, pire')
+    expect(word(await trend(`direction="down" good="down" ${words}`))).toBe('Baisse, mieux')
+    expect(word(await trend(`${words}`))).toBe('Stable')
+  })
+
   test('an unchanged measurement is neither, whatever good says', async () => {
     expect(word(await trend('direction="neutral" good="up"'))).toBe('Unchanged')
     expect(word(await trend('good="down"'))).toBe('Unchanged')

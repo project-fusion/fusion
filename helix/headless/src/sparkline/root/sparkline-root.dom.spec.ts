@@ -34,9 +34,20 @@ describe('sparkline', () => {
        dates read aloud in place of the sentence that carries the meaning. */
     expect(heights(await spark('values="1 2 3"'))).toHaveLength(3)
     expect(heights(await spark('values="1, 2, 3"'))).toHaveLength(3)
-    // An array assigned to the property stringifies to a comma list, so it
-    // works where an array property would not survive React's hydration.
     expect(heights(await spark('values="1,2,3"'))).toEqual(heights(await spark('values="1 2 3"')))
+  })
+
+  /* React 19 sets a property, so `values={[...]}` arrives as an array. Lit does
+     not stringify a property, and the split threw inside the render, leaving
+     the old line on the screen. */
+  test('an array assigned to the property is drawn', async () => {
+    const host = (await spark('values="1 2 3"')) as HTMLElement & {
+      updateComplete: Promise<unknown>
+      values: unknown
+    }
+    host.values = [10, 50, 20, 40]
+    await host.updateComplete
+    expect(heights(host)).toHaveLength(4)
   })
 
   test('the largest value is drawn at the top, since svg counts down', async () => {
