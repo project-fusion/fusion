@@ -9,9 +9,9 @@ import { styles } from './skip-link-root.css.js'
  *
  * @description
  * Hidden until it receives keyboard focus, then shown in the corner of the
- * viewport. It is hidden with the base layer's visually hidden helper, so it
- * stays in the tab order and the accessibility tree. This stylesheet adds the
- * reveal.
+ * viewport. Its own stylesheet hides it with the visually hidden recipe the
+ * base layer uses, so it stays in the tab order and the accessibility tree,
+ * and is hidden with or without the base layer.
  *
  * It is fixed to the viewport, because the page may already be scrolled when
  * focus arrives, from a restored position or an anchor in the address.
