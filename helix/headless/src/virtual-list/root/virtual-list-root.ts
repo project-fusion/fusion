@@ -225,16 +225,6 @@ export class HelixHeadlessVirtualList extends HelixElement {
     rows: () => this.drawn(),
   })
 
-  constructor() {
-    super()
-    /* On the host, because the rows are light DOM and their events reach it
-       without crossing a shadow boundary. */
-    this.addEventListener('keydown', (event) => this.handleKeydown(event))
-    this.addEventListener('focusin', (event) => this.handleFocusIn(event))
-    /* The row kept for focus is let go once focus has left it. */
-    this.addEventListener('focusout', () => this.requestUpdate())
-  }
-
   /**
    * The items on screen, as `items.slice(first, last)` reads them.
    *
@@ -308,6 +298,11 @@ export class HelixHeadlessVirtualList extends HelixElement {
 
   override connectedCallback(): void {
     super.connectedCallback()
+    /* On the host, because the rows are light DOM and their events reach it
+       without crossing a shadow boundary. */
+    this.addEventListener('keydown', this.handleKeydown)
+    this.addEventListener('focusin', this.handleFocusIn)
+    this.addEventListener('focusout', this.handleFocusOut)
     if (typeof MutationObserver === 'undefined') {
       return
     }
@@ -322,6 +317,9 @@ export class HelixHeadlessVirtualList extends HelixElement {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    this.removeEventListener('keydown', this.handleKeydown)
+    this.removeEventListener('focusin', this.handleFocusIn)
+    this.removeEventListener('focusout', this.handleFocusOut)
     this.watcher?.disconnect()
     this.watcher = undefined
   }
@@ -421,7 +419,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
    * Only from a row itself. A key pressed in a row's own link, button or field
    * is that control's, so a field in a row keeps its arrows.
    */
-  private handleKeydown(event: KeyboardEvent): void {
+  private readonly handleKeydown = (event: KeyboardEvent): void => {
     if (
       event.defaultPrevented ||
       event.altKey ||
@@ -459,8 +457,13 @@ export class HelixHeadlessVirtualList extends HelixElement {
     this.rowFor(index)?.focus()
   }
 
+  /** The row kept for focus is let go once focus has left it. */
+  private readonly handleFocusOut = (): void => {
+    this.requestUpdate()
+  }
+
   /** A row that takes focus, by a press or by Tab, takes the tab stop with it. */
-  private handleFocusIn(event: FocusEvent): void {
+  private readonly handleFocusIn = (event: FocusEvent): void => {
     let node = event.target as Node | null
     while (node && node.parentNode !== this) {
       node = node.parentNode

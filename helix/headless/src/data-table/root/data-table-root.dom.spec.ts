@@ -1001,4 +1001,175 @@ describe('the grid keyboard', () => {
     expect(pagination.nextLabel).toBe('Weiter')
     expect(pagination.pageLabel).toBe('Seite {page}')
   })
+
+  /* RAC's Table names each row by its row header column; every body cell here
+     was a gridcell, so moving between rows said nothing of which row. */
+  test('names each row by its first column with a field, or the one marked row-header', async () => {
+    const { element } = await mount(GRID)
+    await settled(element)
+    const roles = (row: number) =>
+      [...(element.shadowRoot?.querySelectorAll(`[data-row="${row}"] > [data-column]`) ?? [])].map(
+        (cell) => cell.getAttribute('role'),
+      )
+    expect(roles(0)).toEqual(['gridcell', 'rowheader', 'gridcell'])
+    expect(
+      element.shadowRoot?.querySelector('[data-row="0"] > [data-column="1"]')?.getAttribute('part'),
+    ).toBe('cell cell-header')
+    ;(
+      element.querySelectorAll('helix-headless-table-column')[1] as HTMLElement & {
+        rowHeader: boolean
+      }
+    ).rowHeader = true
+    ;(element as unknown as { requestUpdate: () => void }).requestUpdate()
+    await settled(element)
+    await settled(element)
+    expect(roles(0)).toEqual(['gridcell', 'gridcell', 'rowheader'])
+  })
+
+  test('moves to the row whose header starts with the letters typed', async () => {
+    const element = await start()
+    await press(element, 'ArrowRight')
+    await press(element, 'c')
+    expect(place(focused(element))).toBe('2:1')
+    // Typed on: "ch" is still charlie, the row it is on.
+    await press(element, 'h')
+    expect(place(focused(element))).toBe('2:1')
+    await press(element, 'x')
+    expect(place(focused(element))).toBe('2:1')
+  })
+
+  test('takes a Space typed in the middle of a search as part of it', async () => {
+    const { element } = await mount(GRID, [
+      { name: 'new jersey', size: 1 },
+      { name: 'new york', size: 2 },
+      { name: 'nevada', size: 3 },
+    ])
+    await settled(element)
+    const stop = element.shadowRoot?.querySelector('[part="table"] [tabindex="0"]') as HTMLElement
+    stop.focus()
+    await settled(element)
+    const grid = element as Grid
+    for (const key of ['n', 'e', 'w', ' ', 'y']) {
+      await press(grid, key)
+    }
+    expect(place(focused(grid))).toBe('1:0')
+    expect(grid.selected).toBe('')
+  })
+
+  test('selects every row with Control or Command and A', async () => {
+    const element = await start()
+    await press(element, 'a', { ctrlKey: true })
+    expect(element.selected.split(',').sort()).toEqual(['alpha', 'bravo', 'charlie', 'delta'])
+  })
+
+  test('selects the rows Shift with Down crosses, and Shift with Space a range', async () => {
+    const element = await start()
+    await press(element, 'ArrowDown', { shiftKey: true })
+    expect(element.selected.split(',').sort()).toEqual(['alpha', 'delta'])
+    expect(place(focused(element))).toBe('1:0')
+    await press(element, 'ArrowDown')
+    await press(element, 'ArrowDown')
+    await press(element, ' ', { shiftKey: true })
+    expect(element.selected.split(',').sort()).toEqual(['alpha', 'bravo', 'charlie', 'delta'])
+  })
+
+  test('selects from the row last chosen with Shift on a checkbox', async () => {
+    const element = await start()
+    await press(element, ' ')
+    expect(element.selected).toBe('delta')
+    const box = element.shadowRoot?.querySelectorAll(
+      '[part~="select"] [part="checkbox"]',
+    )[2] as HTMLElement
+    box.dispatchEvent(
+      new PointerEvent('pointerdown', { bubbles: true, composed: true, shiftKey: true }),
+    )
+    box.dispatchEvent(
+      new CustomEvent('helix-before-toggle', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        detail: { checked: true },
+      }),
+    )
+    await settled(element)
+    expect(element.selected.split(',').sort()).toEqual(['alpha', 'charlie', 'delta'])
+  })
+})
+
+describe('a row that asks for more', () => {
+  const MORE = `
+    <helix-headless-data-table label="Files" load-more load-more-label="Show more files">
+      <helix-headless-table-column field="name">Name</helix-headless-table-column>
+      <helix-headless-table-column field="size">Size</helix-headless-table-column>
+    </helix-headless-data-table>`
+
+  test('follows the rows, spans every column, and counts as a row', async () => {
+    const { element } = await mount(MORE)
+    await settled(element)
+    const more = part(element, 'more') as HTMLElement
+    expect(more.getAttribute('role')).toBe('row')
+    const cell = part(element, 'more-cell') as HTMLElement
+    expect(cell.getAttribute('aria-colspan')).toBe('2')
+    expect(part(element, 'more-button')?.textContent).toBe('Show more files')
+    expect(more.previousElementSibling?.getAttribute('part')).toBe('row')
+    expect(grid(element).ariaRowCount).toBe('6')
+  })
+
+  test('sends helix-load-more from its button, and from Enter on its cell', async () => {
+    const { element } = await mount(MORE)
+    await settled(element)
+    let asked = 0
+    element.addEventListener('helix-load-more', () => {
+      asked += 1
+    })
+    ;(part(element, 'more-button') as HTMLElement).click()
+    expect(asked).toBe(1)
+    const stop = element.shadowRoot?.querySelector('[part="table"] [tabindex="0"]') as HTMLElement
+    stop.focus()
+    await settled(element)
+    for (let step = 0; step < 4; step += 1) {
+      ;(element.shadowRoot?.activeElement as HTMLElement | null)?.dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, composed: true, key: 'ArrowDown' }),
+      )
+      await settled(element)
+      await new Promise((resolve) => setTimeout(resolve, 0))
+    }
+    expect(element.shadowRoot?.activeElement?.getAttribute('part')).toBe('more-cell')
+    ;(element.shadowRoot?.activeElement as HTMLElement | null)?.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, composed: true, key: 'Enter' }),
+    )
+    expect(asked).toBe(2)
+  })
+
+  test('is not drawn while rows are loading, or when there are none', async () => {
+    const { element } = await mount(MORE)
+    ;(element as unknown as { loading: boolean }).loading = true
+    await settled(element)
+    expect(part(element, 'more')).toBeNull()
+    ;(element as unknown as { loading: boolean }).loading = false
+    element.rows = []
+    await settled(element)
+    expect(part(element, 'more')).toBeNull()
+  })
+
+  test('a windowed table asks by itself within a screen of the end, once for each length', async () => {
+    const { element } = await mount(
+      MORE.replace('load-more ', 'load-more windowed '),
+      Array.from({ length: 50 }, (_, at) => ({ name: `row ${at}`, size: at })),
+    )
+    await settled(element)
+    let asked = 0
+    element.addEventListener('helix-load-more', () => {
+      asked += 1
+    })
+    const box = part(element, 'table') as HTMLElement
+    Object.defineProperty(box, 'clientHeight', { configurable: true, value: 320 })
+    box.scrollTop = 0
+    box.dispatchEvent(new Event('scroll'))
+    expect(asked).toBe(0)
+    box.scrollTop = 50 * 32 - 400
+    box.dispatchEvent(new Event('scroll'))
+    box.dispatchEvent(new Event('scroll'))
+    expect(asked).toBe(1)
+  })
 })

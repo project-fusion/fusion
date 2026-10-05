@@ -3,6 +3,7 @@ import {
   fillTemplate,
   HelixBeforeResizeEvent,
   HelixElement,
+  HelixResizedEvent,
   hostAria,
   inlineStep,
   isRtl,
@@ -119,6 +120,7 @@ export const edgeOf = (align: string | undefined): string | undefined =>
  * @slot - The heading.
  *
  * @event {HelixBeforeResizeEvent} helix-before-resize - The column is about to be resized, with the requested width. Cancelable: cancel it to keep the current width.
+ * @event {HelixResizedEvent} helix-resized - Fired after the column is resized, with the new width.
  *
  * @csspart column - The heading cell.
  * @csspart grip - The handle for moving the column, when the table allows it.
@@ -201,6 +203,18 @@ export class HelixHeadlessTableColumn extends HelixElement {
    */
   @property({ attribute: 'resize-label' })
   resizeLabel = 'Resize {name}'
+
+  /**
+   * Makes this column's cells the headers of their rows, in `DataTable`.
+   *
+   * A screen reader moving along a row or down a column names the row by its
+   * row header, so the cell that identifies a row, a file's name say, is the
+   * one to mark. Where no column sets it, `DataTable` makes the first column
+   * with a `field` the row header. A `Table`'s cells are your markup, so there
+   * a cell is a row header through its own `header` attribute.
+   */
+  @property({ attribute: 'row-header', type: Boolean })
+  rowHeader = false
 
   /**
    * Whether the table can be sorted by this column.
@@ -543,6 +557,7 @@ export class HelixHeadlessTableColumn extends HelixElement {
     requestChange({
       apply: (value) => {
         this.width = value
+        this.dispatchEvent(new HelixResizedEvent({ value }))
       },
       event: (value) => new HelixBeforeResizeEvent({ value }),
       host: this,
