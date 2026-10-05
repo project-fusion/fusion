@@ -13,7 +13,7 @@
   --_callout-tone: var(--helix-color-info);
   /* The tone, or a color of the page's own through the hook. */
   --_callout-color: var(--callout-accent-color, var(--_callout-tone));
-  --_callout-bar: var(--callout-bar-width, var(--helix-border-thick));
+  --_callout-bar: var(--callout-bar-thickness, var(--helix-border-thick));
   --_callout-inset: var(--callout-padding, var(--helix-space-md));
   /* Its own size rather than the page's. A callout is an aside inside prose, so
      it sets its type a step down from the body it interrupts: inheriting left
@@ -73,10 +73,12 @@
    change without the other. Absent, or `filled`, is the tint with the bar. */
 
 /* The tone at the edge, with no fill: for a page where a tinted box is too
-   much. An inset line, so the box is the same size as the tinted one. */
+   much. An inset line, so the box is the same size as the tinted one. A hairline
+   of the tone rather than the theme's surface edge, being a mark of the tone
+   like the bar. */
 :host([separation="outlined"]) {
   background-color: var(--callout-background-color, transparent);
-  box-shadow: inset 0 0 0 var(--helix-border-surface)
+  box-shadow: inset 0 0 0 var(--helix-border-thin)
     color-mix(in oklab, var(--_callout-color) 45%, var(--helix-color-background));
 }
 

@@ -53,7 +53,7 @@ describe('callout', () => {
     /* A bar drawn inside and clipped rather than a border: a thick border on
        one side of a rounded box thins to a crescent at each end. */
     expect(rule(':host')).toContain(
-      '--_callout-bar: var(--callout-bar-width, var(--helix-border-thick))',
+      '--_callout-bar: var(--callout-bar-thickness, var(--helix-border-thick))',
     )
     expect(rule(':host::before')).toContain('inline-size: var(--_callout-bar)')
     expect(rule(':host::before')).toContain('background-color: var(--_callout-color)')
@@ -113,7 +113,7 @@ describe('callout separation and hooks', () => {
   test('every hook falls back to the value it replaced', () => {
     const host = rule(':host')
     expect(host).toContain('--_callout-color: var(--callout-accent-color, var(--_callout-tone))')
-    expect(host).toContain('--_callout-bar: var(--callout-bar-width, var(--helix-border-thick))')
+    expect(host).toContain('--_callout-bar: var(--callout-bar-thickness, var(--helix-border-thick))')
     expect(host).toContain('--_callout-inset: var(--callout-padding, var(--helix-space-md))')
     expect(host).toContain('font-size: var(--callout-font-size, var(--helix-text-sm))')
     expect(host).toContain('gap: var(--callout-gap, var(--helix-space-sm))')

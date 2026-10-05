@@ -74,3 +74,32 @@ describe('divider', () => {
     }
   })
 })
+
+/* wa-divider's label placement: content toward one end, with a short length of
+   line kept before or after it. */
+describe('content placement', () => {
+  test('keeps a short line before the content at the start, or after it at the end', () => {
+    const placed = rule(
+      ':host([content-placement="start"]) [part="line"]:has(+ [part="content"]:not([data-empty])),\n:host([content-placement="end"]) [part="content"]:not([data-empty]) + [part="line"]',
+    )
+    expect(placed).toContain('flex: 0 0 var(--divider-content-offset, var(--helix-space-lg))')
+  })
+
+  test('reflects, so the sheet can reach it from a script', async () => {
+    const divider = (await mount('<helix-divider>Or</helix-divider>')) as HTMLElement & {
+      contentPlacement?: string
+      updateComplete: Promise<boolean>
+    }
+    divider.contentPlacement = 'start'
+    await divider.updateComplete
+    expect(divider.getAttribute('content-placement')).toBe('start')
+  })
+
+  test('the content takes a color and a gap hook that fall back to today', () => {
+    const content = rule('[part="content"]')
+    expect(content).toContain(
+      'color: var(--divider-content-color, var(--helix-color-foreground-muted))',
+    )
+    expect(content).toContain('margin-inline: var(--divider-content-gap, var(--helix-space-sm))')
+  })
+})

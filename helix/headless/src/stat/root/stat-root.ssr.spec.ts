@@ -14,7 +14,7 @@ describe('stat server output', () => {
       'helix-headless-stat',
     )
     expect(markup).toContain('<slot name="label"></slot>')
-    expect(markup).toContain('<slot></slot>')
+    expect(markup).toContain('<slot part="value"></slot>')
     expect(markup).toContain('<slot name="unit"></slot>')
   })
 

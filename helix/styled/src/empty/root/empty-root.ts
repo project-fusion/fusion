@@ -17,6 +17,15 @@ import { styles } from './empty-root.css.js'
  * @aliases Placeholder, NoResults, Blank
  * @documentation https://fusion.dev/helix/components/empty
  *
+ * @cssproperty --empty-actions-gap - Space added above the actions.
+ * @cssproperty --empty-gap - Space between the icon, the heading, the message and the actions.
+ * @cssproperty --empty-heading-color - Color of the heading.
+ * @cssproperty --empty-heading-size - Size of the heading.
+ * @cssproperty --empty-icon-color - Color of the icon.
+ * @cssproperty --empty-icon-size - Size of the icon.
+ * @cssproperty --empty-message-color - Color of the message.
+ * @cssproperty --empty-message-measure - Widest the message runs before it wraps.
+ * @cssproperty --empty-message-size - Size of the message.
  * @cssproperty --empty-padding - Space around the whole block.
  */
 @customElement('helix-empty')

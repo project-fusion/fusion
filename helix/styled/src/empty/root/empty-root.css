@@ -2,21 +2,21 @@
   align-items: center;
   display: flex;
   flex-direction: column;
-  gap: var(--helix-space-sm);
+  gap: var(--empty-gap, var(--helix-space-sm));
   padding: var(--empty-padding, var(--helix-space-2xl));
   text-align: center;
 }
 
 slot[name="icon"]::slotted(*) {
   /* The `lg` step, not a raw rem, so the icon moves with density. */
-  --icon-size: var(--helix-size-icon-lg);
+  --icon-size: var(--empty-icon-size, var(--helix-size-icon-lg));
 
-  color: var(--helix-color-foreground-subtle);
+  color: var(--empty-icon-color, var(--helix-color-foreground-subtle));
 }
 
 slot[name="heading"]::slotted(*) {
-  color: var(--helix-color-foreground);
-  font-size: var(--helix-text-lg);
+  color: var(--empty-heading-color, var(--helix-color-foreground));
+  font-size: var(--empty-heading-size, var(--helix-text-lg));
   font-weight: var(--helix-weight-semibold);
   letter-spacing: var(--helix-tracking-tight);
   margin: var(--helix-space-none);
@@ -26,18 +26,18 @@ slot[name="heading"]::slotted(*) {
  *  The inherited half on the slot, the rest on what was slotted.
  */
 slot:not([name]) {
-  color: var(--helix-color-foreground-muted);
-  font-size: var(--helix-text-sm);
+  color: var(--empty-message-color, var(--helix-color-foreground-muted));
+  font-size: var(--empty-message-size, var(--helix-text-sm));
 }
 
 /* The explanation runs to a measure even though the block is centered: centered
    text past about 50 characters loses the reader on the return sweep. */
 slot:not([name])::slotted(*) {
   margin: var(--helix-space-none);
-  max-inline-size: 46ch;
+  max-inline-size: var(--empty-message-measure, 46ch);
 }
 slot[name="actions"]::slotted(*) {
-  margin-block-start: var(--helix-space-sm);
+  margin-block-start: var(--empty-actions-gap, var(--helix-space-sm));
 }
 
 /* Print: a notice, not a panel.

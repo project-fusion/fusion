@@ -94,3 +94,24 @@ describe('trend judgment', () => {
     expect(host.getAttribute('good')).toBe('down')
   })
 })
+
+/* The arrow is the `icon` slot's fallback, so a page's own glyph replaces it
+   and the word beside it still says the direction. */
+describe('an icon of the page', () => {
+  test('replaces the arrow, and the direction is still said in words', async () => {
+    const host = await mount(
+      '<helix-headless-trend direction="up">8%<span slot="icon">^</span></helix-headless-trend>',
+    )
+    const slot = host.shadowRoot?.querySelector('slot[name="icon"]') as HTMLSlotElement
+    expect(slot.assignedElements()[0]?.textContent).toBe('^')
+    expect(slot.querySelector('[part="icon"]')).not.toBeNull()
+    expect(word(host)).toBe('Up')
+  })
+
+  test('without one, the arrow is drawn as before', async () => {
+    const host = await mount('<helix-headless-trend direction="down">8%</helix-headless-trend>')
+    const slot = host.shadowRoot?.querySelector('slot[name="icon"]') as HTMLSlotElement
+    expect(slot.assignedElements()).toHaveLength(0)
+    expect(part(host, 'icon')?.parentElement).toBe(slot)
+  })
+})

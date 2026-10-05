@@ -33,7 +33,7 @@ import { styles } from './callout-root.css.js'
  *
  * @cssproperty --callout-accent-color - The color of the bar, the mark and the tint, in place of the tone's.
  * @cssproperty --callout-background-color - The fill behind the callout.
- * @cssproperty --callout-bar-width - The width of the bar on the inline start edge.
+ * @cssproperty --callout-bar-thickness - The thickness of the bar on the inline start edge.
  * @cssproperty --callout-font-size - The size of the callout's text.
  * @cssproperty --callout-gap - The space between the mark and the content.
  * @cssproperty --callout-padding - The inset around the content, to which the bar's width is added at the start.

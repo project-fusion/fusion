@@ -34,7 +34,9 @@ describe('trend', () => {
   test('gray until told what good means', () => {
     /* Not a fallback that never fires: it is the state of every trend whose
        consumer has not set `good`, and it is meant to be. */
-    expect(sheet()).toContain('--_trend-color: var(--helix-color-foreground-muted)')
+    expect(sheet()).toContain(
+      '--_trend-color: var(--trend-neutral-color, var(--helix-color-foreground-muted))',
+    )
     expect(sheet()).toContain('color: var(--trend-color, var(--_trend-color))')
   })
 
@@ -45,13 +47,13 @@ describe('trend', () => {
       ':host([direction="up"][good="up"]),\n:host([direction="down"][good="down"]) {',
     )
     expect(rule(':host([direction="down"][good="down"])')).toContain(
-      '--_trend-color: var(--helix-color-success)',
+      '--_trend-color: var(--trend-better-color, var(--helix-color-success))',
     )
     expect(sheet()).toContain(
       ':host([direction="up"][good="down"]),\n:host([direction="down"][good="up"]) {',
     )
     expect(rule(':host([direction="down"][good="up"])')).toContain(
-      '--_trend-color: var(--helix-color-danger)',
+      '--_trend-color: var(--trend-worse-color, var(--helix-color-danger))',
     )
     expect(sheet()).not.toContain('[direction="neutral"]')
   })
@@ -66,7 +68,31 @@ describe('trend', () => {
   test('the label is quieter than the metric, and quiet enough to still be read', () => {
     // Muted rather than subtle: subtle is 3.78:1 on the light surface, under
     // the 4.5:1 this text needs.
-    expect(rule('slot[name="label"]')).toContain('color: var(--helix-color-foreground-muted)')
+    expect(rule('slot[name="label"]')).toContain(
+      'color: var(--trend-label-color, var(--helix-color-foreground-muted))',
+    )
     expect(rule('slot[name="label"]')).toContain('font-weight: var(--helix-weight-regular)')
+  })
+})
+
+describe('trend hooks', () => {
+  test('each judgment has a hook that falls back to its status color', () => {
+    expect(
+      rule(':host([direction="up"][good="up"]),\n:host([direction="down"][good="down"])'),
+    ).toContain('--_trend-color: var(--trend-better-color, var(--helix-color-success))')
+    expect(sheet()).toContain('--_trend-color: var(--trend-worse-color, var(--helix-color-danger))')
+    expect(sheet()).toContain(
+      '--_trend-color: var(--trend-neutral-color, var(--helix-color-foreground-muted))',
+    )
+  })
+
+  test('the gap, the label and a slotted glyph each take a hook', () => {
+    expect(sheet()).toContain('gap: var(--trend-gap, var(--helix-space-2xs))')
+    expect(rule('slot[name="label"]')).toContain(
+      'color: var(--trend-label-color, var(--helix-color-foreground-muted))',
+    )
+    expect(rule('slot[name="icon"]::slotted(*)')).toContain(
+      'block-size: var(--trend-icon-size, 1em)',
+    )
   })
 })

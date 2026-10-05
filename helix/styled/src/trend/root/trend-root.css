@@ -3,7 +3,7 @@
   display: inline-flex;
   font-size: var(--helix-text-sm);
   font-weight: var(--helix-weight-medium);
-  gap: var(--helix-space-2xs);
+  gap: var(--trend-gap, var(--helix-space-2xs));
   line-height: var(--helix-leading-tight);
 }
 
@@ -22,12 +22,21 @@
    *
    * Not a fallback that never fires: it is the state of every trend whose
    * consumer has not set `good`, and it is meant to be. See the property. */
-  --_trend-color: var(--helix-color-foreground-muted);
+  --_trend-color: var(--trend-neutral-color, var(--helix-color-foreground-muted));
   color: var(--trend-color, var(--_trend-color));
 }
 
 [part="icon"] {
   --icon-size: var(--trend-icon-size, 1em);
+}
+
+/* A glyph of the page's own takes the arrow's size, so swapping it moves
+   nothing, and its color from the host like the arrow. */
+slot[name="icon"]::slotted(*) {
+  --icon-size: var(--trend-icon-size, 1em);
+
+  block-size: var(--trend-icon-size, 1em);
+  inline-size: var(--trend-icon-size, 1em);
 }
 
 /* The judgment, which is the direction crossed with what counts as better.
@@ -37,12 +46,12 @@
  * gray, as does any trend with no `good` set. */
 :host([direction="up"][good="up"]),
 :host([direction="down"][good="down"]) {
-  --_trend-color: var(--helix-color-success);
+  --_trend-color: var(--trend-better-color, var(--helix-color-success));
 }
 
 :host([direction="up"][good="down"]),
 :host([direction="down"][good="up"]) {
-  --_trend-color: var(--helix-color-danger);
+  --_trend-color: var(--trend-worse-color, var(--helix-color-danger));
 }
 
 /* Out of sight and still in the accessibility tree.
@@ -68,7 +77,7 @@
  * text needs, and muted is 5.76:1 and still visibly quieter than the metric.
  */
 slot[name="label"] {
-  color: var(--helix-color-foreground-muted);
+  color: var(--trend-label-color, var(--helix-color-foreground-muted));
   font-weight: var(--helix-weight-regular);
 }
 
