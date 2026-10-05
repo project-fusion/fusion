@@ -247,9 +247,10 @@ describe('tooltip for', () => {
     expect(tip.internals?.ariaLabel).toBe('Save now')
   })
 
-  test('wrapping names nothing, because the host is an ancestor and not a reference', async () => {
+  test('wrapping names the host too, since the trigger references it in both forms', async () => {
     const tip = await tooltip()
-    expect(tip.internals?.ariaLabel ?? null).toBeNull()
+    await tip.updateComplete
+    expect(tip.internals?.ariaLabel ?? null).toBe('Regenerates the manifests')
   })
 
   test('an id that names nothing resolves to no trigger', async () => {
@@ -537,5 +538,94 @@ describe('the wrapping form', () => {
       '<helix-headless-tooltip content="Settings"><button aria-label="Settings">⚙</button></helix-headless-tooltip>',
     )
     expect(warnings).toEqual([])
+  })
+})
+
+describe('the trigger is described by the tooltip itself', () => {
+  type Reflecting = HTMLElement & { ariaDescribedByElements: Element[] | null }
+  /* happy-dom has no element reflection, so the accessor is stood in. */
+  const reflecting = (element: Element): Reflecting => {
+    Object.defineProperty(element, 'ariaDescribedByElements', { value: null, writable: true })
+    return element as Reflecting
+  }
+
+  test('a plain trigger in the consumer’s markup, once a reader points at it, and not before', async () => {
+    const host = await mount(
+      '<div><button id="save">Save</button><helix-headless-tooltip for="save" content="Writes the file"></helix-headless-tooltip></div>',
+    )
+    const button = reflecting(host.querySelector('button') as HTMLElement)
+    const tip = host.querySelector('helix-headless-tooltip') as unknown as Tooltip
+    await tip.updateComplete
+    expect(button.ariaDescribedByElements).toBeNull()
+    button.dispatchEvent(new Event('pointerenter'))
+    expect(button.ariaDescribedByElements).toEqual([tip as unknown as Element])
+  })
+
+  test('a wrapped trigger the same way, by the host around it', async () => {
+    const tip = await tooltip()
+    const button = reflecting(tip.querySelector('button') as HTMLElement)
+    button.dispatchEvent(new Event('focusin', { bubbles: true, composed: true }))
+    expect(button.ariaDescribedByElements).toEqual([tip as unknown as Element])
+  })
+
+  test('never over an aria-describedby the consumer wrote', async () => {
+    const host = await mount(
+      '<div><span id="other">Other</span><button id="save" aria-describedby="other">Save</button><helix-headless-tooltip for="save" content="Writes the file"></helix-headless-tooltip></div>',
+    )
+    const button = reflecting(host.querySelector('button') as HTMLElement)
+    button.dispatchEvent(new Event('pointerenter'))
+    expect(button.ariaDescribedByElements).toBeNull()
+  })
+
+  test('a control inside a component’s shadow root is described where it takes focus', async () => {
+    const host = await mount(
+      '<div><div id="save"></div><helix-headless-tooltip for="save" content="Writes the file"></helix-headless-tooltip></div>',
+    )
+    const component = host.querySelector('#save') as HTMLElement
+    const root = component.attachShadow({ mode: 'open' })
+    root.innerHTML = '<button>Save</button>'
+    const inner = reflecting(root.querySelector('button') as HTMLElement)
+    const tip = host.querySelector('helix-headless-tooltip') as unknown as Tooltip
+    inner.dispatchEvent(new Event('focusin', { bubbles: true, composed: true }))
+    expect(inner.ariaDescribedByElements).toEqual([tip as unknown as Element])
+  })
+
+  test('a described trigger is not warned about', async () => {
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      const tip = await tooltip()
+      const button = reflecting(tip.querySelector('button') as HTMLElement)
+      button.dispatchEvent(new Event('focusin', { bubbles: true, composed: true }))
+      tip.show()
+      await tip.updateComplete
+    } finally {
+      console.warn = original
+    }
+    expect(warnings).toEqual([])
+  })
+})
+
+describe('the knobs on what shows it', () => {
+  test('`show-on="focus"` ignores a pointer and still answers focus', async () => {
+    const tip = await tooltip('content="Shortcut" show-on="focus" delay="0"')
+    tip.dispatchEvent(new Event('pointerenter'))
+    await new Promise((resolve) => setTimeout(resolve, 10))
+    await tip.updateComplete
+    expect(tip.open).toBe(false)
+  })
+
+  test('`skip-delay` is how long the next one shows at once', async () => {
+    const first = await tooltip('content="One" delay="0"')
+    const second = await tooltip('content="Two" delay="5000" skip-delay="0"')
+    first.show()
+    await first.updateComplete
+    first.hide()
+    await first.updateComplete
+    second.dispatchEvent(new Event('pointerenter'))
+    await second.updateComplete
+    expect(second.open).toBe(false)
+    second.dispatchEvent(new Event('pointerleave'))
   })
 })
