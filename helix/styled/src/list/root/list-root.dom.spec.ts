@@ -95,11 +95,14 @@ describe('list', () => {
     )
   })
 
-  test('a row that navigates is an anchor that does not look like one', async () => {
+  test('a row that navigates holds an anchor that does not look like one', async () => {
     const item = await mount('<helix-list-item href="#one">One</helix-list-item>')
-    expect(part(item, 'row')?.tagName).toBe('A')
-    expect(rule('helix-list-item', 'a[part="row"]')).toContain('text-decoration: none')
-    expect(rule('helix-list-item', 'a[part="row"]')).toContain('color: inherit')
+    expect(part(item, 'link')?.tagName).toBe('A')
+    expect(rule('helix-list-item', '[part="link"]')).toContain('text-decoration: none')
+    expect(rule('helix-list-item', '[part="link"]')).toContain('color: inherit')
+    /* The row's own tracks, so the link lines its regions up as a row with no
+       link does, and leaves the fourth to `end`. */
+    expect(rule('helix-list-item', '[part="link"]')).toContain('grid-template-columns: subgrid')
   })
 
   test('the hooks the docs name are what the sheets read', () => {

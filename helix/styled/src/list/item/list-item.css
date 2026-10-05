@@ -107,9 +107,19 @@ slot[name="end"]::slotted(*) {
   grid-row: 1 / span 2;
 }
 
-/* The row is an `<a>` when the item has somewhere to go, and must not look like
-   one: a list of links underlined in brand blue is a list nobody can read. */
-a[part="row"] {
+/* The link, when the item has somewhere to go, and it must not look like one:
+   a list of links underlined in brand blue is a list nobody can read.
+
+   **It takes the row's first three tracks as a subgrid**, so the leading mark,
+   the label and the description sit exactly where they sit in a row with no
+   link, and `end` keeps the fourth track outside it. */
+[part="link"] {
+  align-items: center;
   color: inherit;
+  display: grid;
+  grid-column: 1 / 4;
+  grid-row: 1 / span 2;
+  grid-template-columns: subgrid;
+  grid-template-rows: subgrid;
   text-decoration: none;
 }

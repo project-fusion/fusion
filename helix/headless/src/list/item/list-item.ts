@@ -8,11 +8,16 @@ import { property } from 'lit/decorators.js'
  * @description
  * Provides layout and semantics. The row is a target only when you set `href`.
  *
- * **`href` makes the whole row a link.** The component wraps its own layout in
- * an `<a part="row">`, as `Tree.Item` does. An anchor of your own cannot wrap
- * slots it does not own. With the anchor, the whole row is a target, Enter
- * follows it, middle click opens a new tab, the status bar shows the
- * destination, and all of it works before JavaScript runs.
+ * **`href` makes the row a link.** The component wraps the leading content,
+ * the label, and the description in an `<a part="link">` inside the row, as
+ * `Tree.Item` does. An anchor of your own cannot wrap slots it does not own.
+ * With the anchor, the row is a target, Enter follows it, middle click opens a
+ * new tab, the status bar shows the destination, and all of it works before
+ * JavaScript runs.
+ *
+ * **The `end` slot sits beside the link, outside it**, so a button or a menu
+ * there is a control of its own: a click on it does not follow the link, and
+ * its name is not part of the link's.
  *
  * Client-side routing needs your own handling. A router cannot render its
  * anchor inside the shadow root, so to navigate without a page load, intercept
@@ -32,6 +37,7 @@ import { property } from 'lit/decorators.js'
  * @slot end - Trailing content.
  * @slot start - Leading content, usually an icon or an avatar.
  *
+ * @csspart link - The link, when the row has `href`. It holds every region except `end`.
  * @csspart row - The row's layout. It sits inside the host so the host can carry a list marker.
  */
 @customElement('helix-headless-list-item')
@@ -107,22 +113,26 @@ export class HelixHeadlessListItem extends HelixElement {
        its supporting text beside the label instead of under it. */
     const content = html`${this.renderRail()}<slot name="start"></slot>
       <slot></slot>
-      <slot name="description"></slot>
-      <slot name="end"></slot>`
+      <slot name="description"></slot>`
 
-    /* An anchor where there is somewhere to go, and the same box either way.
-       The host keeps `role="listitem"`, so the row inside it is the link and
-       not the item: an `<a>` carrying `listitem` would be a link that claims to
-       be a list entry, and the list would have one fewer entry than it has. */
+    /* An anchor where there is somewhere to go, inside the same box either
+       way. The host keeps `role="listitem"`, so the link is inside the item:
+       an `<a>` carrying `listitem` would be a link that claims to be a list
+       entry, and the list would have one fewer entry than it has.
+
+       **`end` is outside the anchor.** It is where a row's own action goes, a
+       delete button or a menu, and inside the link it was interactive content
+       inside interactive content: the link's name took the button's words and a
+       click on the button followed the link. */
     return this.href === ''
-      ? html`<div part="row">${content}</div>`
-      : html`<a
-          part="row"
+      ? html`<div part="row">${content}<slot name="end"></slot></div>`
+      : html`<div part="row"><a
+          part="link"
           href=${this.href}
           target=${this.target || nothing}
           rel=${this.rel || nothing}
           >${content}</a
-        >`
+        ><slot name="end"></slot></div>`
   }
 }
 
