@@ -143,6 +143,27 @@
    so the count reads the same here as it does in Combobox and Filter Input
    and gains the same control when `expandable` is asked for. */
 
+/* The row of segments, in `segmented`, is `shared/field/field-segments`'s.
+   These are the family's hooks for it. */
+[part="segments"] {
+  --_segment-focus-background-color: var(
+    --time-input-segment-focus-background-color,
+    var(--helix-color-primary)
+  );
+  --_segment-focus-color: var(
+    --time-input-segment-focus-color,
+    var(--helix-color-foreground-on-primary)
+  );
+  --_segment-literal-color: var(
+    --time-input-segment-literal-color,
+    var(--helix-color-foreground-muted)
+  );
+  --_segment-placeholder-color: var(
+    --time-input-segment-placeholder-color,
+    var(--helix-color-foreground-subtle)
+  );
+}
+
 /* Print: a control prints the value it holds, and a state carried by a fill has
  * to survive, or the paper says the opposite of the truth.
  *

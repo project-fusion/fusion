@@ -11,6 +11,7 @@ import {
   MixinField,
   MixinPickerEditing,
   MixinPickerField,
+  MixinSegmentedField,
   MixinTokens,
   writtenList,
 } from '@fusion.dev/helix-core'
@@ -58,6 +59,10 @@ import '../../time-picker/index.js'
  * the panel. With `variant="wheels"` each wheel moves the time as you turn it,
  * the panel stays open, and Enter or Escape closes it.
  *
+ * With `segmented`, the field is a row of segments in place of the text: an
+ * hour, a minute, and AM or PM where the clock has them, each set with digits
+ * or the arrow keys. Alt+Down opens the list from a segment.
+ *
  * @since 0.1.0
  * @status stable
  * @category forms
@@ -80,6 +85,7 @@ import '../../time-picker/index.js'
  * @csspart field - The box that holds the text and the trigger.
  * @csspart hint - Help under the field, while nothing is wrong.
  * @csspart label - The label above the field.
+ * @csspart literal - The text the locale writes between two segments, such as a colon, in `segmented`.
  * @csspart picker - The time picker inside the panel.
  * @csspart picker-column - One column of the picker.
  * @csspart picker-column-empty - The text shown when the filter hides every option.
@@ -115,12 +121,17 @@ import '../../time-picker/index.js'
  * @csspart picker-option-label - The option's label.
  * @csspart picker-option-text - The label and the caption, as one column.
  * @csspart rest - The count of times held beyond the ones shown. A `<button>` with `expandable`, and a `<span>` without it.
+ * @csspart segment - One part of the time, an hour, a minute, a second or AM and PM, in `segmented`.
+ * @csspart segment-placeholder - A segment with nothing in it yet. Applied with `segment`.
+ * @csspart segments - The row of segments that holds the time, in `segmented`.
  * @csspart surface - The floating panel.
  * @csspart tags - The row the times sit in.
  * @csspart time - One held time, as a tag, in `multiple`.
+ * @csspart time-cell - The tag's grid cell, which a tag draws only inside a tag group.
  * @csspart time-dismiss - The remove button, when `dismissible`.
  * @csspart time-dismiss-mark - The default icon on the remove button, shown when none is slotted.
  * @csspart time-label - The label, trimmed to its capitals and baseline.
+ * @csspart time-link - The tag's link around its label, which a tag draws only with `href`.
  * @csspart time-start - The category before the label.
  * @csspart trigger - The control that opens the list.
  * @csspart trigger-icon - The icon on the button that opens the clock.
@@ -129,9 +140,11 @@ import '../../time-picker/index.js'
  * @cssstate open - While the clock is open.
  */
 @customElement('helix-headless-time-input')
-export class HelixHeadlessTimeInput extends MixinPickerEditing(
-  MixinPickerField(
-    MixinControllerOpen(MixinTokens(MixinControllerValue(MixinField(HelixFormElement)))),
+export class HelixHeadlessTimeInput extends MixinSegmentedField(
+  MixinPickerEditing(
+    MixinPickerField(
+      MixinControllerOpen(MixinTokens(MixinControllerValue(MixinField(HelixFormElement)))),
+    ),
   ),
 ) {
   /* A consumer's `aria-describedby` names ids in their own tree and the control
@@ -140,7 +153,7 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
      in Chrome's own tree, the host held the description and the control the
      reader is actually on was exposed without it. */
   protected readonly aria = new AriaForwardController(this, {
-    target: () => this.partNamed('control'),
+    target: () => this.partNamed('control') ?? this.segmentGroup,
   })
 
   /**
@@ -293,6 +306,26 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
       .split(',')
       .map((one) => one.trim())
       .filter(Boolean)
+  }
+
+  /**
+   * Segments hold one time, so `range` and `multiple` keep the line of text,
+   * whose separators and tags are how those modes write several.
+   */
+  protected override get segmentable(): boolean {
+    return this.mode === undefined
+  }
+
+  protected override get segmentedKind(): 'time' {
+    return 'time'
+  }
+
+  protected override get segmentLocale(): string {
+    return this.locale
+  }
+
+  protected override get segmentOptions(): { hourCycle?: HourCycle | undefined; seconds: boolean } {
+    return { hourCycle: this.hourCycle, seconds: this.seconds }
   }
 
   /** Whether a typed time is one this field holds, to the second where it holds seconds. */
@@ -575,7 +608,7 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
   protected renderTag(at: string): TemplateResult {
     return html`<${this.tag('tag')}
                   part="time"
-      exportparts="dismiss: time-dismiss, dismiss-mark: time-dismiss-mark, label: time-label, start: time-start"
+      exportparts="cell: time-cell, dismiss: time-dismiss, dismiss-mark: time-dismiss-mark, label: time-label, link: time-link, start: time-start"
                   dismissible
                   dismiss-label=${fillTemplate(this.removeLabel, { name: this.written(at) })}
                   ?disabled=${this.isDisabled}
@@ -622,28 +655,34 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
               )
             : nothing
         }
-        <input
-          part="control"
-          id=${this.controlId}
-          type="text"
-          .value=${this.display}
-          name=${this.name || nothing}
-          placeholder=${
-            this.mode === 'multiple' && this.held.length > 0 ? nothing : this.placeholder || nothing
-          }
-          autocomplete=${this.autocomplete || nothing}
-          aria-describedby=${this.describedBy ?? nothing}
-          aria-invalid=${this.invalidity ?? nothing}
-          ?disabled=${this.isDisabled}
-          ?readonly=${this.readOnly}
-          ?required=${this.required}
-          @blur=${this.handleBlur}
-          @change=${this.handleCommit}
-          @focus=${this.handleFocus}
-          @input=${this.handleInput}
-          @keydown=${this.handleDraftKey}
-          @keypress=${this.handleKeypress}
-        />
+        ${
+          this.segmentsShown
+            ? this.renderSegments()
+            : html`<input
+                part="control"
+                id=${this.controlId}
+                type="text"
+                .value=${this.display}
+                name=${this.name || nothing}
+                placeholder=${
+                  this.mode === 'multiple' && this.held.length > 0
+                    ? nothing
+                    : this.placeholder || nothing
+                }
+                autocomplete=${this.autocomplete || nothing}
+                aria-describedby=${this.describedBy ?? nothing}
+                aria-invalid=${this.invalidity ?? nothing}
+                ?disabled=${this.isDisabled}
+                ?readonly=${this.readOnly}
+                ?required=${this.required}
+                @blur=${this.handleBlur}
+                @change=${this.handleCommit}
+                @focus=${this.handleFocus}
+                @input=${this.handleInput}
+                @keydown=${this.handleDraftKey}
+                @keypress=${this.handleKeypress}
+              />`
+        }
         <button
           part="trigger"
           type="button"

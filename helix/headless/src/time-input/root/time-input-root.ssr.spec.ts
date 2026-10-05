@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { partTag, ssr } from '@fusion.dev/helix-testing/ssr'
+import { partTag, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -49,5 +49,21 @@ describe('time input server output', () => {
     const shut = ssr(html`<helix-headless-time-input label="Start"></helix-headless-time-input>`)
     expect(partTag(shut, 'surface')).toMatch(/\shidden[\s=>]/)
     expect(partTag(shut, 'trigger')).toContain('aria-expanded="false"')
+  })
+
+  test('`segmented` serves a segment for each part of the time, holding the value', () => {
+    const markup = ssr(
+      html`<helix-headless-time-input
+        label="Start"
+        segmented
+        locale="en-US"
+        value="14:30"
+      ></helix-headless-time-input>`,
+    )
+    const shadow = rendered(markup, 'helix-headless-time-input')
+    expect(partTag(markup, 'segments')).toContain('role="group"')
+    expect(shadow).toContain('data-segment="dayPeriod"')
+    expect(shadow).toContain('aria-valuetext="PM"')
+    expect(partTag(markup, 'control')).toBe('')
   })
 })
