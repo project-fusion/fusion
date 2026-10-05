@@ -1,3 +1,10 @@
+/* **Fusion's blue, named the way any site names its brand.** Helix draws in
+   ink when no brand is set, so the site sets the seed, and the stylesheet
+   derives the rest from it. The value is the blue Helix shipped before ink. */
+:root {
+  --helix-seed-brand: oklch(0.539 0.19 258);
+}
+
 /* The brand faces, mapped onto the design system's tokens. */
 :root {
   --_helix-family-sans: var(--fusion-font-sans), ui-sans-serif, system-ui, sans-serif;

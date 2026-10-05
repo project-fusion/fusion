@@ -34,7 +34,7 @@
 .kickerBadge {
   background: var(--helix-color-primary);
   border-radius: var(--helix-radii-sm);
-  color: var(--helix-color-foreground-on-accent);
+  color: var(--helix-color-foreground-on-primary);
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-semibold);
   padding-block: var(--helix-space-2xs);

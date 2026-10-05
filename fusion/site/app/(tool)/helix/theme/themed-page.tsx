@@ -385,7 +385,7 @@ function MarketingPage(context: Context) {
 
       {/* The closing band, on the brand fill, which is the one large area of
           `primary-surface` on the page and therefore the one place
-          `foreground-on-accent` is doing real work. */}
+          `foreground-on-primary` is doing real work. */}
       <section className="themedClose">
         <helix-flex align-items="center" gap="md" justify-content="between" wrap>
           <helix-flex direction="column" gap="2xs">
