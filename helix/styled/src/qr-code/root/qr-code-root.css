@@ -26,7 +26,10 @@
 /* The middle, for a mark that only reads at a high correction. */
 [part="logo"] {
   align-items: center;
-  background-color: var(--qr-code-background-color, var(--helix-color-surface-raised));
+  /* The code's own ground, which is the same paper in both schemes. A raised
+     surface flips to near black in the dark, and drew a dark square in the
+     middle of a white code. */
+  background-color: var(--qr-code-background-color, var(--helix-color-foreground-media));
   border-radius: var(--helix-radii-sm);
   /* A quiet zone of its own. */
   box-sizing: border-box;

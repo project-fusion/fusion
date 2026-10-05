@@ -61,7 +61,11 @@
   border-color: transparent;
 }
 
+/* No frame at all, so no lift either: a theme that separates surfaces with a
+   shadow put one under a plain card, which then floated inside the box it was
+   meant to be part of. */
 :host([separation="plain"]) {
+  --card-shadow: none;
   background-color: transparent;
   border-color: transparent;
 }

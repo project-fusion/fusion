@@ -8,8 +8,11 @@ import { styles } from './loader-root.css.js'
  * @summary Shows that work of unknown length is in progress.
  *
  * @description
- * Sized in `em`, so it matches the text beside it. The color is `currentColor`,
- * so it matches the text color around it, including inside a primary button.
+ * Sized from the loader size tokens, so a loader is the same size wherever it
+ * is placed and follows the density region it sits in. Set `--loader-size:
+ * 1em` to match the text beside it, as inside a button. The color is
+ * `currentColor`, so it matches the text color around it, including inside a
+ * primary button.
  *
  * @since 0.1.0
  * @status stable
@@ -18,13 +21,13 @@ import { styles } from './loader-root.css.js'
  * @documentation https://fusion.dev/helix/components/loader
  *
  * @cssproperty --loader-color - Color of the moving arc.
- * @cssproperty --loader-size - Diameter. Defaults to 1.5em.
+ * @cssproperty --loader-size - Diameter. Defaults to the size token that `size` picks, which is 1.5rem at the default density.
  * @cssproperty --loader-track-color - Color of the circle behind the arc.
  */
 @customElement('helix-loader')
 export class HelixLoader extends HelixHeadlessLoader {
   /**
-   * Diameter relative to the surrounding text.
+   * Diameter, from the loader size tokens.
    */
   @property({ reflect: true })
   size?: 'sm' | 'md' | 'lg'

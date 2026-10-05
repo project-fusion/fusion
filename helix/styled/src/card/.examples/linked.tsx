@@ -5,9 +5,10 @@ export function Example() {
         data-card
         href="#one"
       >
-        <helix-card>
+        <helix-card aria-labelledby="redesign-title">
           <helix-text
             as="h3"
+            id="redesign-title"
             slot="header"
           >
             Website redesign
@@ -20,9 +21,10 @@ export function Example() {
         data-card
         href="#two"
       >
-        <helix-card>
+        <helix-card aria-labelledby="app-title">
           <helix-text
             as="h3"
+            id="app-title"
             slot="header"
           >
             Mobile app

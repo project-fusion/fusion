@@ -19,6 +19,7 @@ import { styles } from './skeleton-root.css.js'
  *
  * @csspart skeleton - The placeholder shape.
  *
+ * @cssproperty --skeleton-block-size - The height of the block shape, which is the shape when `shape` is unset. Defaults to the control height.
  * @cssproperty --skeleton-size - The diameter of the circle shape.
  */
 @customElement('helix-skeleton')
@@ -26,7 +27,9 @@ export class HelixSkeleton extends HelixHeadlessSkeleton {
   /**
    * The shape of the placeholder: `text`, `circle`, or a block when unset.
    *
-   * Unset is a block, which is what most missing things are.
+   * Unset is a block, which is what most missing things are. A block is the
+   * control height until you size it, with a height on the element or
+   * `--skeleton-block-size`.
    */
   @property({ reflect: true })
   shape?: 'text' | 'circle'

@@ -6,8 +6,9 @@ beforeAll(async () => {
   await import('../index.js')
 })
 
+/* The region carries the name, so a slotted icon keeps it. */
 const iconSvg = (host: HTMLElement): Element | null =>
-  host.shadowRoot?.querySelector('[part="icon"] svg') ?? null
+  host.shadowRoot?.querySelector('[part="icon"]') ?? null
 
 describe('callout tone', () => {
   test('carries the tone as an accessible name, not only as a color', async () => {
@@ -45,6 +46,25 @@ describe('callout tone', () => {
   test('is announced as a note', async () => {
     const callout = await mount('<helix-headless-callout>x</helix-headless-callout>')
     expect(role(callout)).toBe('note')
+  })
+})
+
+describe('the tone name', () => {
+  /* It was fixed English, and it was on the fallback glyph, so a slotted icon
+     took the tone's name away with the glyph. */
+  test('can be said in another language', async () => {
+    const callout = await mount(
+      '<helix-headless-callout tone="danger" tone-label="Fehler">x</helix-headless-callout>',
+    )
+    expect(iconSvg(callout)?.getAttribute('aria-label')).toBe('Fehler')
+  })
+
+  test('stays when an icon is slotted in place of the glyph', async () => {
+    const callout = await mount(
+      '<helix-headless-callout tone="danger"><span slot="icon">!</span>Payment failed.</helix-headless-callout>',
+    )
+    expect(iconSvg(callout)?.getAttribute('role')).toBe('img')
+    expect(iconSvg(callout)?.getAttribute('aria-label')).toBe('Error')
   })
 })
 

@@ -198,6 +198,24 @@ describe('qr code', () => {
     expect(part(host, 'code')).toBeNull()
   })
 
+  /* `encode` threw from the render for a value past the level's capacity, so
+     the update rejected and the old drawing stayed. A logo raising the level
+     to `H` was the easy way there. */
+  test('a value too long for the level draws no code, and says so', async () => {
+    const host = await code('<helix-headless-qr-code value="one"></helix-headless-qr-code>')
+    let heard = 0
+    host.addEventListener('error', () => {
+      heard += 1
+    })
+    ;(host as unknown as HTMLElement & { value: string }).value = 'x'.repeat(3000)
+    await host.updateComplete
+    expect(part(host, 'code')).toBeNull()
+    expect(heard).toBe(1)
+    ;(host as unknown as HTMLElement & { value: string }).value = 'two'
+    await host.updateComplete
+    expect(part(host, 'code')).not.toBeNull()
+  })
+
   test('a code that changes is re-encoded', async () => {
     const host = await code('<helix-headless-qr-code value="one"></helix-headless-qr-code>')
     const before = svgOf(host).querySelector('path')?.getAttribute('d')

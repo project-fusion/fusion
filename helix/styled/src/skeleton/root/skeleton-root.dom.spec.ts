@@ -33,6 +33,13 @@ describe('skeleton', () => {
     expect(host.getAttribute('shape')).toBe('circle')
   })
 
+  /* The block had no height of its own, so an unsized skeleton drew nothing. */
+  test('a block is the control height until a page sizes it', () => {
+    expect(rule(':host(:not([shape]))')).toContain(
+      'block-size: var(--skeleton-block-size, var(--helix-size-control))',
+    )
+  })
+
   test('a line of text is one line tall, and a circle is round at the control step', () => {
     // The control step rather than a bare rem, so a circle standing in for an
     // avatar shrinks with the density region the avatar would.
