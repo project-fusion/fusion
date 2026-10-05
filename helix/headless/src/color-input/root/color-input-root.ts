@@ -63,6 +63,8 @@ import '../../color-picker/index.js'
  * @slot end - Content at the trailing end, before the trigger.
  * @slot feedback - The message that says what is wrong with the value.
  * @slot hint - Help text under the field.
+ * @slot panel-footer - Content in the panel under the picker, such as a note or an action.
+ * @slot panel-header - Content in the panel above the picker, such as a heading or a shortcut.
  * @slot start - Content at the leading end of the field, inside its border.
  * @slot trigger - The icon on the trigger, which shows that the field opens a panel.
  *
@@ -561,7 +563,9 @@ export class HelixHeadlessColorInput extends MixinPickerField(
         popover="manual"
         ?hidden=${!this.open}
       >
+        <slot name="panel-header"></slot>
         ${this.renderPicker()}
+        <slot name="panel-footer"></slot>
       </div>
       ${this.renderHint()}${this.renderFeedback()}`
   }

@@ -303,3 +303,18 @@ describe('segmented', () => {
     expect(internals(host).validity.valid).toBe(false)
   })
 })
+
+describe('the panel of a time input takes content of your own', () => {
+  test('a header above the times and a footer under it', async () => {
+    const host = (await mount(
+      `<helix-headless-time-input label="Field"><h3 slot="panel-header">Saved</h3><button slot="panel-footer">Reset</button></helix-headless-time-input>`,
+    )) as InputTime
+    await host.updateComplete
+    const surface = part(host, 'surface') as HTMLElement
+    const slots = [...surface.querySelectorAll<HTMLSlotElement>(':scope > slot')]
+    expect(slots.map((one) => one.name)).toEqual(['panel-header', 'panel-footer'])
+    expect(slots[0]?.nextElementSibling?.getAttribute('part')).toBe('picker')
+    expect(slots[0]?.assignedElements()[0]?.textContent).toBe('Saved')
+    expect(slots[1]?.assignedElements()[0]?.textContent).toBe('Reset')
+  })
+})

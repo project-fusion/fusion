@@ -105,6 +105,21 @@
   position: absolute;
 }
 
+/* What a page puts above or below the times stands apart from them by the
+   panel's own inset, with the inline inset the panel leaves to its rows. A
+   margin, so a slotted button keeps its own padding. */
+::slotted([slot="panel-header"]) {
+  display: block;
+  margin-block-end: var(--helix-space-sm);
+  margin-inline: var(--helix-space-sm);
+}
+
+::slotted([slot="panel-footer"]) {
+  display: block;
+  margin-block-start: var(--helix-space-sm);
+  margin-inline: var(--helix-space-sm);
+}
+
 @media (prefers-reduced-motion: reduce) {
   [part="field"],
   [part="trigger"] {

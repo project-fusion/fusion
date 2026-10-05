@@ -81,6 +81,18 @@
   position: absolute;
 }
 
+/* What a page puts above or below the calendar stands apart from it by the
+   panel's own inset. */
+::slotted([slot="panel-header"]) {
+  display: block;
+  margin-block-end: var(--helix-space-sm);
+}
+
+::slotted([slot="panel-footer"]) {
+  display: block;
+  margin-block-start: var(--helix-space-sm);
+}
+
 :host(:disabled) [part="field"] {
   color: var(--helix-color-foreground-subtle);
 }
