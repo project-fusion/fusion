@@ -32,25 +32,23 @@
 
 /* A glyph of the page's own takes the arrow's size, so swapping it moves
    nothing, and its color from the host like the arrow. */
-slot[name="icon"]::slotted(*) {
+slot[name$="icon"]::slotted(*) {
   --icon-size: var(--trend-icon-size, 1em);
 
   block-size: var(--trend-icon-size, 1em);
   inline-size: var(--trend-icon-size, 1em);
 }
 
-/* The judgment, which is the direction crossed with what counts as better.
+/* The judgment, which is the movement crossed with what counts as better.
  *
- * Written as four selectors rather than computed, because the pair is four
- * cases and CSS has no exclusive-or. Neutral matches none of them and stays
- * gray, as does any trend with no `good` set. */
-:host([direction="up"][good="up"]),
-:host([direction="down"][good="down"]) {
+ * Read from the base tier's states rather than from four attribute pairs,
+ * which named `direction` and so missed a trend written with `movement`.
+ * Neutral is neither and stays gray, as does any trend with no `good` set. */
+:host(:state(better)) {
   --_trend-color: var(--trend-better-color, var(--helix-color-success));
 }
 
-:host([direction="up"][good="down"]),
-:host([direction="down"][good="up"]) {
+:host(:state(worse)) {
   --_trend-color: var(--trend-worse-color, var(--helix-color-danger));
 }
 

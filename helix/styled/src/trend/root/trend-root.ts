@@ -17,7 +17,7 @@ import { styles } from './trend-root.css.js'
  * no surface for material, and no area for a wash. The text weight comes from
  * `Text` and the size from the region.
  *
- * The meaning axis is derived: `direction` and `good` resolve to success,
+ * The meaning axis is derived: `movement` and `good` resolve to success,
  * danger, or muted, so you state the metric's polarity once. There is no
  * `tone`, because a declared tone could disagree with the arrow.
  *
@@ -31,7 +31,7 @@ import { styles } from './trend-root.css.js'
  * @cssproperty --trend-better-color - Color of a move that `good` says is an improvement.
  * @cssproperty --trend-color - Color of the arrow. Setting it overrides the color that `good` sets.
  * @cssproperty --trend-gap - Space between the arrow, the metric and the label.
- * @cssproperty --trend-icon-size - Size of the arrow, or of a glyph in the `icon` slot.
+ * @cssproperty --trend-icon-size - Size of the arrow, or of a glyph in one of the icon slots.
  * @cssproperty --trend-label-color - Color of the label.
  * @cssproperty --trend-neutral-color - Color of a trend that `good` does not judge, or one that did not move.
  * @cssproperty --trend-worse-color - Color of a move that `good` says is a setback.

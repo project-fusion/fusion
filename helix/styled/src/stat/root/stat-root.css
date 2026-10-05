@@ -51,6 +51,11 @@ slot[name="unit"]::slotted(*) {
   font-weight: var(--helix-weight-medium);
 }
 
+/* A trend under the figure it qualifies, across the whole width. */
+slot[name="trend"]::slotted(*) {
+  grid-column: 1 / -1;
+}
+
 /* Which way the pair goes. */
 :host([direction="column-reverse"]) slot[name="label"]::slotted(*) {
   order: 1;

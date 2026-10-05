@@ -1,5 +1,11 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, registerDom, slotted } from '@fusion.dev/helix-testing/dom'
+import {
+  hasLayout,
+  mount,
+  registerDom,
+  slotted,
+  type Updatable,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -54,9 +60,9 @@ describe('stat direction', () => {
   })
 
   test('there is no second line of words to write', async () => {
-    /* A stat is a number and the word for what it measures. A change beside it
-       is a second fact and goes beside the stat rather than inside it, which is
-       what the group is for. */
+    /* A stat is a number and the word for what it measures. The one second
+       fact it takes is how the number moved, a Trend in the `trend` slot, so
+       the two are read as one; prose about it goes beside the stat. */
     const stat = await mount(markup)
     expect(slotted(stat, 'detail')).toHaveLength(0)
   })
@@ -137,5 +143,49 @@ describe('the value part', () => {
     const value = stat.shadowRoot?.querySelector('[part="value"]')
     expect(value?.tagName).toBe('SLOT')
     expect((value as HTMLSlotElement).assignedNodes()[0]?.textContent).toBe('4,210')
+  })
+})
+
+/* A lone stat was a run of loose words to a reader: "Revenue", "42", "M". With
+   a label it is a group named by it, and a trend in its slot is read inside. */
+describe('a stat with a label', () => {
+  type Stat = Updatable & { internals: ElementInternals }
+
+  test('is a group named by the label', async () => {
+    const stat = (await mount(markup)) as Stat
+    await stat.updateComplete
+    expect(stat.internals.role).toBe('group')
+    const reflected = (stat.internals as ElementInternals & { ariaLabelledByElements?: Element[] })
+      .ariaLabelledByElements
+    const name = reflected ? reflected.map((element) => element.textContent).join(' ') : ''
+    expect(name || stat.internals.ariaLabel).toBe('Revenue')
+  })
+
+  test('without a label, has no role', async () => {
+    const stat = (await mount('<helix-headless-stat>42</helix-headless-stat>')) as Stat
+    await stat.updateComplete
+    expect(stat.internals.role ?? null).toBeNull()
+  })
+
+  test('a label arriving later names it', async () => {
+    const stat = (await mount('<helix-headless-stat>42</helix-headless-stat>')) as Stat
+    const label = document.createElement('span')
+    label.slot = 'label'
+    label.textContent = 'Orders'
+    stat.append(label)
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await stat.updateComplete
+    expect(stat.internals.role).toBe('group')
+  })
+
+  test('takes a trend in a slot of its own, after the value and the unit', async () => {
+    const stat = await mount(
+      '<helix-headless-stat>42<span slot="label">Revenue</span><span slot="trend">Up 8%</span></helix-headless-stat>',
+    )
+    expect(slotted(stat, 'trend')[0]?.textContent).toBe('Up 8%')
+    const names = [...(stat.shadowRoot?.querySelectorAll('slot') ?? [])].map(
+      (slot) => slot.getAttribute('name') ?? '',
+    )
+    expect(names).toEqual(['label', '', 'unit', 'trend'])
   })
 })
