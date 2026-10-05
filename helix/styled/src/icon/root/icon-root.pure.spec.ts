@@ -28,3 +28,20 @@ describe('the icon element', () => {
     expect(importers('styled')).toEqual(['speed-dial/root/speed-dial-root.ts'])
   })
 })
+
+/* The styled element extends the headless one from its lean entry, so the
+   styled `icon/root` carries no glyph; the styled family entry re-exports the
+   headless family entry, which registers the set as it always did. */
+describe('the styled entries', () => {
+  const read = (path: string) => readFileSync(join(import.meta.dir, path), 'utf8')
+
+  test('the family entry brings the whole set', () => {
+    expect(read('../index.ts')).toContain("from '@fusion.dev/helix-headless/icon'")
+  })
+
+  test('the element and its own entry bring none', () => {
+    expect(read('icon-root.ts')).toContain("from '@fusion.dev/helix-headless/icon/root'")
+    expect(read('index.ts')).toContain("from '@fusion.dev/helix-headless/icon/root'")
+    expect(read('index.ts')).not.toContain("from '@fusion.dev/helix-headless/icon'")
+  })
+})
