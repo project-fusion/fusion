@@ -353,7 +353,7 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
    * your own replaces it by being slotted.
    */
   protected renderBackIcon(): TemplateResult {
-    return html`<slot name="back-icon"
+    return html`<slot name="back-icon" aria-hidden="true"
       ><svg part="back-mark" data-mirror fill="currentColor" viewBox=${caretLeft.viewBox} aria-hidden="true">
         ${unsafeSVG(caretLeft.content)}
       </svg></slot
