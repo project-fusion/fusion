@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, idle, registerDom } from '@fusion.dev/helix-testing/dom'
+import choosing from '../.examples/choosing.html' with { type: 'text' }
 import loadingMore from '../.examples/loading-more.html' with { type: 'text' }
 import preview from '../.examples/preview.html' with { type: 'text' }
 
@@ -35,5 +36,27 @@ describe('the loading more example', () => {
     await idle()
     await idle()
     expect(list.items.length).toBe(400)
+  })
+})
+
+describe('the choosing example', () => {
+  run('starts with two people chosen, and Space and Shift with Down take in more', async () => {
+    await example(choosing)
+    await idle()
+    const list = document.getElementById('people') as HTMLElement & { value: string }
+    expect(list.value).toBe('p3,p4')
+    expect(list.querySelector('[data-index="2"]')?.getAttribute('aria-selected')).toBe('true')
+    const first = list.querySelector('[data-index="0"]') as HTMLElement
+    first.focus()
+    const press = async (key: string, init: KeyboardEventInit = {}) => {
+      ;(document.activeElement as HTMLElement).dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key, ...init }),
+      )
+      await idle()
+    }
+    await press(' ')
+    expect(list.value).toBe('p1,p3,p4')
+    await press('ArrowDown', { shiftKey: true })
+    expect(list.value).toBe('p1,p2,p3,p4')
   })
 })

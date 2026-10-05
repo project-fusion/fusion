@@ -1,0 +1,38 @@
+<!-- @summary Five hundred people to choose from, with Shift for a range and Control or Command with A for all of them. -->
+
+<helix-virtual-list
+  id="people"
+  key-field="id"
+  label="People"
+  selection-mode="multiple"
+  value="p3,p4"
+>
+  <template>
+    <div class="personRow">
+      <strong data-field="name"></strong>
+      <span data-field="team"></span>
+    </div>
+  </template>
+</helix-virtual-list>
+
+<script>
+  /* `value` holds the chosen people's `id`s, which `key-field` names. */
+  const people = document.getElementById('people')
+  const teams = ['Design', 'Platform', 'Support', 'Sales']
+  people.items = Array.from({ length: 500 }, (_, index) => ({
+    id: `p${index + 1}`,
+    name: `Person ${index + 1}`,
+    team: teams[index % teams.length],
+  }))
+</script>
+
+<style>
+  .personRow {
+    align-items: center;
+    block-size: 32px;
+    cursor: default;
+    display: flex;
+    justify-content: space-between;
+    padding-inline: var(--helix-space-sm);
+  }
+</style>
