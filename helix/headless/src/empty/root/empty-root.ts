@@ -18,7 +18,9 @@ import { property } from 'lit/decorators.js'
  * was loading, and the announcement tells a screen reader user that the search
  * returned nothing. It is announced from a status region of its own, which is
  * rendered empty and filled a frame after the view appears. Screen readers read
- * a region that arrives with its text already in it inconsistently.
+ * a region that arrives with its text already in it inconsistently. For the
+ * seven seconds the region holds its copy, the heading and the message are
+ * hidden from screen readers, so the words are in the page once.
  *
  * Every region is a bare slot. There is no `empty-state-heading` or
  * `empty-state-actions` element: assign your own heading and actions to the
@@ -61,9 +63,14 @@ export class HelixHeadlessEmpty extends HelixElement {
 
   protected override render(): TemplateResult {
     const say = () => this.arrival.say()
+    /* **The words are in the tree once.** While the live copy holds them, the
+       heading and the message it copies are hidden from readers, so a reader
+       moving through the page meets them in one place; when the copy empties,
+       they are back. The actions are never hidden. */
+    const copied = this.arrival.said !== '' && !this.noAnnounce ? 'true' : nothing
     return html`<slot name="icon"></slot>
-      <slot name="heading" @slotchange=${say}></slot>
-      <slot @slotchange=${say}></slot>
+      <slot aria-hidden=${copied} name="heading" @slotchange=${say}></slot>
+      <slot aria-hidden=${copied} @slotchange=${say}></slot>
       <slot name="actions"></slot>
       ${
         this.noAnnounce

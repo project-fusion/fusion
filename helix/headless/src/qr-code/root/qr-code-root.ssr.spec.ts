@@ -32,4 +32,14 @@ describe('qr code server output', () => {
       hasPart(ssr(html`<helix-headless-qr-code value=""></helix-headless-qr-code>`), 'code'),
     ).toBe(false)
   })
+
+  test('a value too long for a code serves the fallback in its place', () => {
+    const long = 'x'.repeat(3000)
+    const markup = ssr(html`<helix-headless-qr-code value=${long}></helix-headless-qr-code>`)
+    expect(hasPart(markup, 'code')).toBe(false)
+    expect(hasPart(markup, 'fallback')).toBe(true)
+    expect(
+      hasPart(ssr(html`<helix-headless-qr-code value="one"></helix-headless-qr-code>`), 'fallback'),
+    ).toBe(false)
+  })
 })

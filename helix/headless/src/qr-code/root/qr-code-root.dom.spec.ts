@@ -216,6 +216,28 @@ describe('qr code', () => {
     expect(part(host, 'code')).not.toBeNull()
   })
 
+  /* wa-qr-code and Zag draw nothing for a value that does not fit; a page
+     had no way to show the link as text in its place. */
+  test('a value too long for the level shows the fallback and says so as a state', async () => {
+    const host = (await code(
+      '<helix-headless-qr-code value="one"><a slot="fallback" href="/long">Open the link</a></helix-headless-qr-code>',
+    )) as unknown as HTMLElement & {
+      internals: ElementInternals
+      updateComplete: Promise<unknown>
+      value: string
+    }
+    expect(part(host, 'fallback')).toBeNull()
+    expect(host.internals.states.has('overflow')).toBe(false)
+    host.value = 'x'.repeat(3000)
+    await host.updateComplete
+    expect(part(host, 'fallback')?.querySelector('slot')?.getAttribute('name')).toBe('fallback')
+    expect(host.internals.states.has('overflow')).toBe(true)
+    host.value = 'two'
+    await host.updateComplete
+    expect(part(host, 'fallback')).toBeNull()
+    expect(host.internals.states.has('overflow')).toBe(false)
+  })
+
   test('a code that changes is re-encoded', async () => {
     const host = await code('<helix-headless-qr-code value="one"></helix-headless-qr-code>')
     const before = svgOf(host).querySelector('path')?.getAttribute('d')

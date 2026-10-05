@@ -14,13 +14,17 @@ import { property, state } from 'lit/decorators.js'
  * The `placeholder` slot is empty by default, so the headless tier does not
  * depend on `Skeleton`, which it does not ship.
  *
+ * The placeholder is hidden from screen readers, the picture having a name of
+ * its own. The fallback is read once the picture fails, after the picture's
+ * `alt`, so a reader hears that it did not load, as a sighted reader sees.
+ *
  * @since 0.1.0
  * @status stable
  * @category media
  * @aliases Picture, Img, Figure
  * @documentation https://fusion.dev/helix/components/image
  *
- * @slot fallback - Shown in place of the image if it fails to load.
+ * @slot fallback - Shown in place of the image if it fails to load, and read by screen readers then, such as "Photo unavailable".
  * @slot placeholder - Shown until the image loads.
  *
  * @event {Event} error - The image failed to load. Relayed from the inner image, whose own event stays inside the shadow root.
@@ -393,7 +397,7 @@ export class HelixHeadlessImage extends HelixElement {
       ></span>
       <span
         part="fallback"
-        aria-hidden="true"
+        aria-hidden=${this.status === 'error' ? nothing : 'true'}
         ?hidden=${this.status !== 'error'}
         ><slot name="fallback"></slot
       ></span>`
