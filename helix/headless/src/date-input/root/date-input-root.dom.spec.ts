@@ -851,3 +851,39 @@ describe('Enter in a date input', () => {
     expect(submitted).toBe(1)
   })
 })
+
+describe('input date hands its calendar a rule, a drawing and the months', () => {
+  test('a date isDateUnavailable refuses is barred when typed', async () => {
+    const host = (await field()) as InputDate & {
+      isDateUnavailable?: (date: string) => boolean
+      internals: ElementInternals
+    }
+    host.isDateUnavailable = (date) => date === '2026-08-13'
+    await type(host, '2026-08-13')
+    expect(host.internals.validity.badInput).toBe(true)
+    expect(host.internals.validationMessage).toBe('Choose a date that is available.')
+    const calendar = picker(host) as HTMLElement & {
+      isDateUnavailable?: (date: string) => boolean
+    }
+    expect(calendar.isDateUnavailable?.('2026-08-13')).toBe(true)
+  })
+
+  test('max-view, the view labels and dayContent reach the calendar', async () => {
+    const host = (await field(
+      'max-view="year" year-view-label="{heading}: Jahre"',
+    )) as InputDate & {
+      dayContent?: (date: string) => unknown
+    }
+    const draw = (date: string): string => date.slice(8)
+    host.dayContent = draw
+    await host.updateComplete
+    const calendar = picker(host) as unknown as {
+      dayContent?: unknown
+      maxView?: string
+      yearViewLabel: string
+    }
+    expect(calendar.maxView).toBe('year')
+    expect(calendar.yearViewLabel).toBe('{heading}: Jahre')
+    expect(calendar.dayContent).toBe(draw)
+  })
+})

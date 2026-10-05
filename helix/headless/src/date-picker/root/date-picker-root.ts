@@ -10,12 +10,25 @@ import {
   MixinControllerValue,
   reportValues,
   requestChange,
-  writtenList,
 } from '@fusion.dev/helix-core'
 import { caretLeft, caretRight } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
+import {
+  addDays,
+  addMonths,
+  barredBy,
+  type CalendarView,
+  datesIn as list,
+  localToday,
+  monthOf,
+  periodMove,
+  sameMonth,
+  weekStartOf,
+  YEARS_SHOWN,
+  yearPageOf,
+} from '../calendar.js'
 
 /** Keys the grid answers to, per the APG date grid. */
 const KEYS = new Set([
@@ -30,70 +43,6 @@ const KEYS = new Set([
   'PageUp',
   ' ',
 ])
-
-/**
- * Today, in the reader's own timezone.
- *
- * **`toISOString` converts to UTC first, which makes "today" a different day
- * for most of the planet.** Anywhere west of UTC, from late afternoon onward,
- * `fromDate(new Date())` names tomorrow. The parts are read locally instead and
- * pasted together, which is the only way to get a calendar date out of a `Date`
- * without a conversion happening on the way.
- */
-const localToday = (): string => {
-  const now = new Date()
-  const month = `${now.getMonth() + 1}`.padStart(2, '0')
-  const day = `${now.getDate()}`.padStart(2, '0')
-  return `${now.getFullYear()}-${month}-${day}`
-}
-
-/** Splits the value, which is comma separated, tolerating spaces and empty entries. */
-const list = (value: string): string[] =>
-  value
-    .split(',')
-    .map((entry) => entry.trim())
-    .filter(Boolean)
-
-/**
- * The first day of the week where a language is spoken, `0` for Sunday.
- *
- * From `Intl.Locale`'s week information, which an engine offers as
- * `getWeekInfo()` or, in older versions, as `weekInfo`. Sunday where it offers
- * neither, as Firefox does not, or where the tag cannot be read.
- */
-const weekStartOf = (locale: string): number => {
-  try {
-    const tag = new Intl.Locale(locale) as Intl.Locale & {
-      getWeekInfo?: () => { firstDay: number }
-      weekInfo?: { firstDay: number }
-    }
-    const first = tag.getWeekInfo?.().firstDay ?? tag.weekInfo?.firstDay
-    return first === undefined ? 0 : first % 7
-  } catch {
-    return 0
-  }
-}
-
-/** A month as `YYYY-MM`. */
-const monthOf = (date: Date): string =>
-  `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}`
-
-const addDays = (date: Date, days: number): Date =>
-  new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() + days))
-
-/** Whether two dates fall in the same month of the same year. */
-const sameMonth = (left: Date, right: Date): boolean =>
-  left.getUTCFullYear() === right.getUTCFullYear() && left.getUTCMonth() === right.getUTCMonth()
-
-const addMonths = (date: Date, months: number): Date => {
-  const target = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + months, 1))
-  // Clamped, so the last of a long month lands on the last of a short one
-  // instead of rolling into the month after it.
-  const last = new Date(Date.UTC(target.getUTCFullYear(), target.getUTCMonth() + 1, 0)).getUTCDate()
-  return new Date(
-    Date.UTC(target.getUTCFullYear(), target.getUTCMonth(), Math.min(date.getUTCDate(), last)),
-  )
-}
 
 /**
  * @summary A month calendar for choosing one or more dates.
@@ -116,6 +65,14 @@ const addMonths = (date: Date, months: number): Date => {
  * `mode` sets how many dates are held. Unset holds one, `range` holds two and
  * marks the dates between them, and `multiple` toggles each date. All three
  * read and write the same comma-separated `value`.
+ *
+ * `max-view` makes the heading a button that steps back to the months of the
+ * year, and with `year` to a page of years, as Zag's date picker does. The
+ * arrows, Home, End and the page keys move there, Enter or a press chooses, and
+ * Escape goes back to the days.
+ *
+ * `isDateUnavailable` and `dayContent` are properties for a script: a rule
+ * that bars dates, and what each day shows in place of its number.
  *
  * The month heading is a live region, so a screen reader hears the new month
  * when Previous or Next is pressed. Neither moves past `min` or `max`, and the
@@ -149,10 +106,17 @@ const addMonths = (date: Date, months: number): Date => {
  * @csspart grid - The grid of days.
  * @csspart header - The month name and its controls.
  * @csspart heading - The month and year being shown.
+ * @csspart heading-button - The heading as a button that shows the months or the years, where `max-view` is set.
  * @csspart month - One month, its header and its grid.
  * @csspart months - The run of months.
  * @csspart next - The control that moves to the next month.
  * @csspart next-mark - The glyph on the next month control, where none is slotted.
+ * @csspart period - One month in the months view, or one year in the years view.
+ * @csspart period-current - This month or this year, beside `period`.
+ * @csspart period-disabled - A month or a year wholly outside `min` and `max`, beside `period`.
+ * @csspart period-row - One row of three months or years.
+ * @csspart period-selected - The month or the year on show, beside `period`.
+ * @csspart periods - The grid of months or years.
  * @csspart previous - The control that moves to the previous month.
  * @csspart previous-mark - The glyph on the previous month control, where none is slotted.
  * @csspart week - One row of days.
@@ -171,6 +135,20 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
    */
   @property({ attribute: 'bad-input-message' })
   badInputMessage?: string
+
+  /**
+   * What each day shows, in place of its number: a function given the date as
+   * `YYYY-MM-DD` that returns text, an element or a Lit template.
+   *
+   * For a price or a dot under the number, as React Aria's `CalendarCell`
+   * takes children. The cell is still named by its whole date, so what you
+   * draw here is for the eye; say anything a reader must hear in the date's
+   * description elsewhere. Return the day's number with it where it should
+   * still show. A property only, there being no way to write a function in
+   * markup.
+   */
+  @property({ attribute: false })
+  dayContent?: ((date: string) => unknown) | undefined
 
   /**
    * The month to open on when `month` is not set.
@@ -208,6 +186,18 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   invalid = false
 
   /**
+   * A rule for which dates cannot be chosen: a function given the date as
+   * `YYYY-MM-DD` that returns `true` to bar it.
+   *
+   * For what a list cannot say, such as the second Tuesday of each month or
+   * the days a server has fully booked. It bars a date as `disable-dates`
+   * does, in the grid and in validation. A property only, as React Aria's
+   * `isDateUnavailable` is a prop.
+   */
+  @property({ attribute: false })
+  isDateUnavailable?: ((date: string) => boolean) | undefined
+
+  /**
    * Accessible name for the grid.
    */
   @property()
@@ -226,6 +216,19 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
    */
   @property()
   max = ''
+
+  /**
+   * How far the heading lets a reader step back from the days: `month` to a
+   * year's months, or `year` to a page of years and then its months.
+   *
+   * Absent, the heading is text and the calendar moves a month at a time. Set,
+   * the heading is a button that shows the months, and from there the years,
+   * so a birth date forty years back is three presses rather than four hundred
+   * and eighty. Choosing a year shows its months, and choosing a month shows
+   * its days.
+   */
+  @property({ attribute: 'max-view' })
+  maxView?: 'month' | 'year'
 
   /**
    * Earliest selectable date, as `YYYY-MM-DD`.
@@ -274,10 +277,29 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   months = 1
 
   /**
+   * The name of the heading where it shows the months, with `{heading}`
+   * filled in as the month on show.
+   */
+  @property({ attribute: 'month-view-label' })
+  monthViewLabel = '{heading}. Choose a month'
+
+  /**
    * Accessible name for the control that pages forward.
    */
   @property({ attribute: 'next-label' })
   nextLabel = 'Next month'
+
+  /**
+   * Accessible name for the control that moves forward a year, in the months.
+   */
+  @property({ attribute: 'next-year-label' })
+  nextYearLabel = 'Next year'
+
+  /**
+   * Accessible name for the control that moves forward a page, in the years.
+   */
+  @property({ attribute: 'next-years-label' })
+  nextYearsLabel = 'Later years'
 
   /**
    * Accessible name for the control that pages back.
@@ -289,6 +311,18 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
    */
   @property({ attribute: 'previous-label' })
   previousLabel = 'Previous month'
+
+  /**
+   * Accessible name for the control that moves back a year, in the months.
+   */
+  @property({ attribute: 'previous-year-label' })
+  previousYearLabel = 'Previous year'
+
+  /**
+   * Accessible name for the control that moves back a page, in the years.
+   */
+  @property({ attribute: 'previous-years-label' })
+  previousYearsLabel = 'Earlier years'
 
   /**
    * The validation message for a date after `max`. `{max}` is replaced with
@@ -415,21 +449,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
     if (this.max !== '' && iso > this.max) {
       return true
     }
-    if (writtenList(this.disableDays).includes(String(date.getUTCDay()))) {
-      return true
-    }
-    /* Counted from `min` where there is one and from the epoch where there is
-       not, which is what the platform does with a `step` and no `min`. Whole
-       days, because both ends are midnight UTC and neither carries a time. */
-    const step = Math.max(1, Math.floor(this.step) || 1)
-    if (step > 1) {
-      const base = this.min === '' ? 0 : (asDate(this.min)?.getTime() ?? 0)
-      const days = Math.round((date.getTime() - base) / 86_400_000)
-      if (days % step !== 0) {
-        return true
-      }
-    }
-    return writtenList(this.disableDates).includes(iso)
+    return barredBy(date, this) !== null
   }
 
   /** Pulls a date inside `min` and `max`, so the keys stop at the bounds. */
@@ -537,6 +557,10 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   }
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {
+    if (this.view !== 'day') {
+      this.handlePeriodKeydown(event)
+      return
+    }
     if (!KEYS.has(event.key) || this.isDisabled) {
       return
     }
@@ -578,6 +602,166 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   }
 
   /**
+   * The year the months view shows, and the year the years view is on.
+   *
+   * Its own state rather than `month`, because looking through the months of
+   * another year chooses nothing and moves nothing on show: the month changes,
+   * and `helix-navigate` is sent, only once a month is chosen.
+   */
+  @state()
+  private pageYear: number | undefined = undefined
+
+  /**
+   * Where the tab stop is among the months, as their index, or among the
+   * years, as the year.
+   */
+  @state()
+  private periodFocus: number | undefined = undefined
+
+  /** The year on show in the months and the years. */
+  private get periodYear(): number {
+    return this.pageYear ?? this.shown.getUTCFullYear()
+  }
+
+  /** The index or the year the tab stop sits on in the months or the years. */
+  private get periodStop(): number {
+    if (this.periodFocus !== undefined) {
+      return this.periodFocus
+    }
+    return this.view === 'year' ? this.periodYear : this.shown.getUTCMonth()
+  }
+
+  /** Whether a month, as its first day, lies wholly outside `min` and `max`. */
+  private monthOut(first: Date): boolean {
+    const month = monthOf(first)
+    return (
+      (this.min !== '' && month < this.min.slice(0, 7)) ||
+      (this.max !== '' && month > this.max.slice(0, 7))
+    )
+  }
+
+  /** Whether a year lies wholly outside `min` and `max`. */
+  private yearOut(year: number): boolean {
+    return (
+      (this.min !== '' && year < Number(this.min.slice(0, 4))) ||
+      (this.max !== '' && year > Number(this.max.slice(0, 4)))
+    )
+  }
+
+  /** Changes the view, and takes focus to its tab stop once it has drawn. */
+  private zoom(view: CalendarView): void {
+    this.view = view
+    void this.updateComplete.then(() => this.focus())
+  }
+
+  /**
+   * The heading's press: from the days to the months, and from the months to
+   * the years where `max-view` allows.
+   */
+  private readonly handleHeading = (): void => {
+    if (this.isDisabled) {
+      return
+    }
+    if (this.view === 'day') {
+      this.pageYear = this.shown.getUTCFullYear()
+      this.periodFocus = this.shown.getUTCMonth()
+      this.zoom('month')
+    } else if (this.view === 'month' && this.maxView === 'year') {
+      this.periodFocus = this.periodYear
+      this.zoom('year')
+    }
+  }
+
+  /**
+   * Takes a month or a year: a year shows its months, and a month shows its
+   * days, moving the calendar there with `helix-navigate` first.
+   */
+  private choosePeriod(at: number): void {
+    if (this.isDisabled) {
+      return
+    }
+    if (this.view === 'year') {
+      if (this.yearOut(at)) {
+        return
+      }
+      this.pageYear = at
+      this.periodFocus = at === this.shown.getUTCFullYear() ? this.shown.getUTCMonth() : 0
+      this.zoom('month')
+      return
+    }
+    const first = new Date(Date.UTC(this.periodYear, at, 1))
+    if (this.monthOut(first)) {
+      return
+    }
+    this.show(first)
+    /* A refused move leaves the months up, the month on show being where it
+       was; the reader is still choosing. */
+    if (this.month !== monthOf(first)) {
+      return
+    }
+    this.pageYear = undefined
+    this.periodFocus = undefined
+    this.focused = ''
+    this.zoom('day')
+  }
+
+  /** Moves the months a year, or the years a page. */
+  private turnPage(direction: number): void {
+    const by = this.view === 'year' ? YEARS_SHOWN : 1
+    this.pageYear = this.periodYear + direction * by
+    if (this.view === 'year') {
+      this.periodFocus = this.periodStop + direction * by
+    }
+  }
+
+  /**
+   * The keys in the months and the years: the arrows, Home, End and the page
+   * keys move, Enter and Space choose, and Escape goes back to the days.
+   *
+   * Escape is stopped here, so a Date Input around this calendar keeps its
+   * panel open: a reader backing out of the years has not asked to leave.
+   */
+  private handlePeriodKeydown(event: KeyboardEvent): void {
+    if (this.isDisabled) {
+      return
+    }
+    if (event.key === 'Escape') {
+      event.preventDefault()
+      event.stopPropagation()
+      this.pageYear = undefined
+      this.periodFocus = undefined
+      this.zoom('day')
+      return
+    }
+    const grid = this.partNamed('periods')
+    if (!grid || !event.composedPath().includes(grid)) {
+      return
+    }
+    const stop = this.periodStop
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      this.choosePeriod(stop)
+      return
+    }
+    const index = this.view === 'year' ? stop - yearPageOf(stop) : stop
+    const delta = periodMove(event.key, index, inlineStep(this, event.key))
+    if (delta === null) {
+      return
+    }
+    event.preventDefault()
+    if (this.view === 'year') {
+      const year = stop + delta
+      this.periodFocus = year
+      this.pageYear = year
+    } else {
+      const months = this.periodYear * 12 + stop + delta
+      this.pageYear = Math.floor(months / 12)
+      this.periodFocus = ((months % 12) + 12) % 12
+    }
+    void this.updateComplete.then(() => this.focus())
+  }
+
+  /**
    * Moves focus to the grid's tab stop: the selected day, or the day last
    * moved to, or the first of the month.
    *
@@ -586,7 +770,9 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
    * plain `focus()` on it did nothing and focus stayed on the trigger.
    */
   override focus(options?: FocusOptions): void {
-    this.renderRoot?.querySelector<HTMLElement>('[part~="cell"][tabindex="0"]')?.focus(options)
+    this.renderRoot
+      ?.querySelector<HTMLElement>('[part~="cell"][tabindex="0"], [part~="period"][tabindex="0"]')
+      ?.focus(options)
   }
 
   override connectedCallback(): void {
@@ -671,6 +857,22 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   @property({ attribute: 'value-missing-message' })
   valueMissingMessage?: string
 
+  /**
+   * What the calendar shows: the days of a month, the months of a year, or a
+   * page of years. `day` unless `max-view` lets a reader step back.
+   *
+   * Not reflected, being state. Set it to open on the months or the years.
+   */
+  @property()
+  view: CalendarView = 'day'
+
+  /**
+   * The name of the heading where it shows a page of years, with `{heading}`
+   * filled in as the year on show.
+   */
+  @property({ attribute: 'year-view-label' })
+  yearViewLabel = '{heading}. Choose a year'
+
   /** A date written for a message, in `locale`. */
   private spoken(iso: string): string {
     const date = asDate(iso)
@@ -703,13 +905,11 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
       ]
     }
     const date = asDate(iso)
-    if (!date || !this.barred(date)) {
+    const why = date ? barredBy(date, this) : null
+    if (why === null) {
       return undefined
     }
-    const listed =
-      writtenList(this.disableDates).includes(iso) ||
-      writtenList(this.disableDays).includes(String(date.getUTCDay()))
-    return listed
+    return why === 'listed'
       ? ['badInput', this.unavailableMessage || 'Choose a date that is available.']
       : ['stepMismatch', this.stepMismatchMessage || 'Choose one of the dates the calendar offers.']
   }
@@ -861,7 +1061,9 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
         heading: Intl.DateTimeFormat
         locale: string
         long: Intl.DateTimeFormat
+        monthName: Intl.DateTimeFormat
         weekday: Intl.DateTimeFormat
+        year: Intl.DateTimeFormat
       }
     | undefined
 
@@ -869,7 +1071,9 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
     full: Intl.DateTimeFormat
     heading: Intl.DateTimeFormat
     long: Intl.DateTimeFormat
+    monthName: Intl.DateTimeFormat
     weekday: Intl.DateTimeFormat
+    year: Intl.DateTimeFormat
   } {
     if (this.cachedFormats?.locale === this.locale) {
       return this.cachedFormats
@@ -880,7 +1084,9 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
       heading: new Intl.DateTimeFormat(locale, { month: 'long', timeZone: 'UTC', year: 'numeric' }),
       locale: this.locale,
       long: new Intl.DateTimeFormat(locale, { dateStyle: 'long', timeZone: 'UTC' }),
+      monthName: new Intl.DateTimeFormat(locale, { month: 'short', timeZone: 'UTC' }),
       weekday: new Intl.DateTimeFormat(locale, { timeZone: 'UTC', weekday: 'short' }),
+      year: new Intl.DateTimeFormat(locale, { timeZone: 'UTC', year: 'numeric' }),
     }
     this.cachedFormats = built
     return built
@@ -952,7 +1158,9 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
              date picker announces the new month. */
           ''
         }
-        <span part="heading" aria-live="polite">${heading.format(month)}</span>
+        <span part="heading" aria-live="polite"
+          >${this.renderHeadingText(heading.format(month), this.monthViewLabel)}</span
+        >
         ${
           last
             ? html`<button
@@ -1025,7 +1233,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
                 @click=${outside ? nothing : () => this.select(date)}
                 ><span
                   part="day${!outside && selected && !middle ? ' day-selected' : ''}${iso === today ? ' day-today' : ''}${outside ? ' day-outside' : ''}${disabled ? ' day-disabled' : ''}"
-                  >${date.getUTCDate()}</span
+                  >${this.renderDay(date, outside)}</span
                 ></span
               >`
             })}
@@ -1035,7 +1243,114 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
     </div>`
   }
 
+  /**
+   * What a day shows: its number, or what `day-content` returns for it.
+   *
+   * A seam, so a tier above can draw a day its own way, and filler days from a
+   * neighboring month keep their number, being only there to square the grid.
+   */
+  protected renderDay(date: Date, outside: boolean): unknown {
+    return this.dayContent && !outside ? this.dayContent(fromDate(date)) : date.getUTCDate()
+  }
+
+  /**
+   * The heading's words, as a button that steps back to the months or the
+   * years where `max-view` allows, and as text everywhere else.
+   */
+  private renderHeadingText(text: string, label: string): TemplateResult | string {
+    const steps =
+      this.maxView !== undefined &&
+      (this.view === 'day' || (this.view === 'month' && this.maxView === 'year'))
+    if (!steps) {
+      return text
+    }
+    return html`<button
+      part="heading-button"
+      type="button"
+      aria-label=${fillTemplate(label, { heading: text })}
+      ?disabled=${this.isDisabled}
+      @click=${this.handleHeading}
+    >${text}</button>`
+  }
+
+  /**
+   * The months of a year, or a page of years, in rows of three, with the
+   * controls that turn the page.
+   *
+   * A grid of its own, `periods`, so a stylesheet tells it from the days, and
+   * one tab stop in it, the month or year the keys are on.
+   */
+  private renderPeriods(): TemplateResult {
+    const { monthName, year: yearName } = this.formats
+    const years = this.view === 'year'
+    const page = years ? yearPageOf(this.periodYear) : this.periodYear
+    const heading = years
+      ? `${yearName.format(new Date(Date.UTC(page, 0, 1)))} – ${yearName.format(
+          new Date(Date.UTC(page + YEARS_SHOWN - 1, 0, 1)),
+        )}`
+      : yearName.format(new Date(Date.UTC(page, 0, 1)))
+    const today = localToday()
+    const stop = this.periodStop
+    const cells = Array.from({ length: 12 }, (_, index) => {
+      const at = years ? page + index : index
+      const first = new Date(Date.UTC(years ? at : page, years ? 0 : index, 1))
+      const out = years ? this.yearOut(at) : this.monthOut(first)
+      const current = years
+        ? String(at) === today.slice(0, 4)
+        : monthOf(first) === today.slice(0, 7)
+      const chosen = years
+        ? at === this.shown.getUTCFullYear()
+        : monthOf(first) === monthOf(this.shown)
+      const words = years ? yearName.format(first) : monthName.format(first)
+      return html`<span
+        part="period${chosen ? ' period-selected' : ''}${current ? ' period-current' : ''}${out ? ' period-disabled' : ''}"
+        role="gridcell"
+        aria-current=${current ? 'date' : nothing}
+        aria-disabled=${out ? 'true' : nothing}
+        aria-label=${years ? words : `${words} ${yearName.format(first)}`}
+        aria-selected=${chosen ? 'true' : nothing}
+        tabindex=${at === stop && !this.isDisabled ? '0' : '-1'}
+        @click=${() => this.choosePeriod(at)}
+        >${words}</span
+      >`
+    })
+    const rows = [0, 3, 6, 9].map(
+      (from) => html`<div part="period-row" role="row">${cells.slice(from, from + 3)}</div>`,
+    )
+    return html`<div part="month">
+      <div part="header">
+        <button
+          part="previous"
+          type="button"
+          aria-label=${years ? this.previousYearsLabel : this.previousYearLabel}
+          ?disabled=${this.isDisabled || this.yearOut(page - 1)}
+          @click=${() => this.turnPage(-1)}
+        >
+          ${this.renderPreviousMark()}
+        </button>
+        <span part="heading" aria-live="polite"
+          >${this.renderHeadingText(heading, this.yearViewLabel)}</span
+        >
+        <button
+          part="next"
+          type="button"
+          aria-label=${years ? this.nextYearsLabel : this.nextYearLabel}
+          ?disabled=${this.isDisabled || this.yearOut(years ? page + YEARS_SHOWN : page + 1)}
+          @click=${() => this.turnPage(1)}
+        >
+          ${this.renderNextMark()}
+        </button>
+      </div>
+      <div part="periods" role="grid" aria-label=${heading}>${rows}</div>
+    </div>`
+  }
+
   protected override render(): TemplateResult {
+    if (this.view !== 'day') {
+      return html`<div part="months" style="--date-picker-column-count: 1">
+        ${this.renderPeriods()}
+      </div>`
+    }
     const shown = this.shown
     const count = this.monthCount
     /* The column count, written out for the tier above.

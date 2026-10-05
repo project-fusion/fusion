@@ -630,7 +630,7 @@ describe('a clock and a precision of your choosing', () => {
     })
     hour.dispatchEvent(right)
     expect(right.defaultPrevented).toBe(true)
-    expect(focused).toBe(minute)
+    expect(focused as Element | null).toBe(minute)
     const past = new KeyboardEvent('keydown', {
       bubbles: true,
       cancelable: true,

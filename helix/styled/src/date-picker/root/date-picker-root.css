@@ -93,6 +93,79 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
+/* The heading as a button, where `max-view` lets it show the months or the
+   years. It keeps the heading's look, so the calendar reads the same, and takes
+   the hover and the ring every control in the header has. */
+[part="heading-button"] {
+  all: unset;
+  box-sizing: border-box;
+  border-radius: var(--helix-radii-sm);
+  cursor: pointer;
+  padding-inline: var(--helix-space-2xs);
+}
+
+[part="heading-button"]:hover:not(:disabled) {
+  background-color: var(--helix-color-surface-sunken);
+}
+
+[part="heading-button"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* The months of a year, or a page of years, three to a row, in the width the
+   seven days take, so the calendar keeps its size as it steps back. */
+[part="periods"] {
+  display: grid;
+  gap: var(--helix-space-2xs);
+  inline-size: calc(var(--_calendar-track) * 7);
+}
+
+[part="period-row"] {
+  display: grid;
+  gap: var(--helix-space-2xs);
+  grid-template-columns: repeat(3, 1fr);
+}
+
+[part~="period"] {
+  align-items: center;
+  block-size: var(--date-picker-period-size, calc(var(--_calendar-row) * 1.5));
+  border-radius: var(--helix-radii-sm);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: var(--helix-text-sm);
+  justify-content: center;
+  transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+[part~="period"]:hover:not([aria-disabled]) {
+  background-color: var(--helix-color-surface-sunken);
+}
+
+[part~="period-current"] {
+  box-shadow: inset 0 0 0 var(--helix-border-thin) var(--helix-color-border);
+}
+
+[part~="period-selected"] {
+  background-color: var(--date-picker-selected-color, var(--helix-color-surface-inverse));
+  color: var(--helix-color-foreground-inverse);
+}
+
+[part~="period-selected"]:hover:not([aria-disabled]) {
+  background-color: var(--date-picker-selected-color, var(--helix-color-surface-inverse));
+}
+
+[part~="period-disabled"] {
+  color: var(--helix-color-foreground-subtle);
+  cursor: default;
+  opacity: 0.4;
+}
+
+[part~="period"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
 /* At `min` or `max` there is no month to move to, and the control says so. */
 [part="previous"]:disabled,
 [part="next"]:disabled {
