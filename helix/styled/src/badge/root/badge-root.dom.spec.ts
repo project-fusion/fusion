@@ -59,7 +59,7 @@ describe('badge', () => {
        surface ladder, so the page's own foreground is said, or white lands on
        gray. */
     expect(rule(':host')).toContain('--_badge-on: var(--helix-color-foreground-on-primary)')
-    expect(rule('[part="indicator"]')).toContain('color: var(--_badge-on)')
+    expect(rule('[part="indicator"]')).toContain('var(--_badge-on)')
     expect(sheet()).toMatch(
       /:host\(\[tone="accent"\]\) \{\s*--_badge-on: var\(--helix-color-foreground-on-accent\)/,
     )
@@ -67,7 +67,7 @@ describe('badge', () => {
       /:host\(\[tone="warning"\]\) \{\s*--_badge-on: var\(--helix-color-foreground-on-status\)/,
     )
     expect(rule(':host([tone="neutral"]) [part="indicator"]')).toContain(
-      'color: var(--helix-color-foreground)',
+      'var(--helix-color-foreground)',
     )
     expect(rule(':host([tone="success"]) [part="indicator"]')).not.toMatch(/\ncolor:/)
   })
@@ -80,8 +80,22 @@ describe('badge', () => {
     expect(rule('[part="indicator"]')).toContain('pointer-events: none')
   })
 
+  /* The count's ink had no hook, so a page that lightened the fill could not
+     darken the count to keep it readable. */
+  test('the count takes its color from a hook, on every fill', () => {
+    expect(rule('[part="indicator"]')).toContain('color: var(--badge-color, var(--_badge-on))')
+    expect(rule(':host([tone="neutral"]) [part="indicator"]')).toContain(
+      'color: var(--badge-color, var(--helix-color-foreground))',
+    )
+  })
+
   test('the hooks the docs name are what the sheet reads', () => {
-    for (const hook of ['--badge-background-color', '--badge-offset', '--badge-ring-color']) {
+    for (const hook of [
+      '--badge-background-color',
+      '--badge-color',
+      '--badge-offset',
+      '--badge-ring-color',
+    ]) {
       expect(sheet()).toMatch(new RegExp(`var\\(\\s*${hook},`))
     }
   })

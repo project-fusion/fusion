@@ -1,4 +1,10 @@
-import { customElement, HelixElement, hostAria, reportRuntime } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  HelixElement,
+  hostAria,
+  reportRuntime,
+  whenHydrated,
+} from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -23,8 +29,10 @@ export const FOLDS_UP_TO = 12
  * There is no slot for it, because the number has to match which avatars are
  * hidden.
  *
- * Avatars past `max` stay in the DOM and are hidden. Changing `max` re-renders
- * nothing, and the accessible name is still built from all of them.
+ * Avatars past `max` stay in the DOM and are hidden. The group writes `hidden`
+ * on each of them, so they are hidden on the headless tier as well, and the
+ * count is read out as `overflow-label`, such as "3 more", so a screen reader
+ * hears that there are more people than the ones it can reach.
  *
  * @since 0.1.0
  * @status stable
@@ -33,7 +41,7 @@ export const FOLDS_UP_TO = 12
  *
  * @slot - The avatars, in the order they should be read.
  *
- * @csspart overflow - The count of avatars past `max`.
+ * @csspart overflow - The count of avatars past `max`, an image named by `overflow-label`.
  */
 @customElement('helix-headless-avatar-group')
 export class HelixHeadlessAvatarGroup extends HelixElement {
@@ -63,6 +71,18 @@ export class HelixHeadlessAvatarGroup extends HelixElement {
    */
   @property({ reflect: true, type: Number })
   max?: number
+
+  /**
+   * What a screen reader is told the count is, with `{count}` for the number.
+   *
+   * The count shows "+3", which reads as "plus three" and says nothing about
+   * what was counted.
+   */
+  @property({ attribute: 'overflow-label' })
+  overflowLabel = '{count} more'
+
+  /** The avatars this group hid, so it unhides only those. */
+  private readonly folded = new WeakSet<HTMLElement>()
 
   /** The avatars, in light-DOM order. Empty on the server, which has no tree. */
   get avatars(): HTMLElement[] {
@@ -100,6 +120,7 @@ export class HelixHeadlessAvatarGroup extends HelixElement {
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    this.fold()
     /* Nothing hides anything here: the stylesheet does it, from `max` on the
        host. What is left is saying so when a `max` is set that no rule can
        match, because showing everyone is a defensible answer and showing
@@ -118,10 +139,50 @@ export class HelixHeadlessAvatarGroup extends HelixElement {
     }
   }
 
+  /**
+   * Hides the avatars past `max`, with the platform's own `hidden`.
+   *
+   * **State in markup, so the headless tier folds too.** The fold was a styled
+   * rule alone, and on the headless tier every avatar was drawn beside a "+3".
+   * The styled rule stays, because it is what folds a server's markup before
+   * this runs. Written through `whenHydrated`, so an avatar's hydrating render
+   * is the server's, and undone only on the avatars this group hid.
+   */
+  private fold(): void {
+    const limit = this.max ?? 0
+    const limited = limit > 0 && limit <= FOLDS_UP_TO
+    for (const [index, avatar] of this.avatars.entries()) {
+      const past = limited && index >= limit
+      if (past && !avatar.hidden) {
+        this.folded.add(avatar)
+        whenHydrated(avatar, () => {
+          avatar.hidden = true
+        })
+      } else if (!past && this.folded.has(avatar)) {
+        this.folded.delete(avatar)
+        whenHydrated(avatar, () => {
+          avatar.hidden = false
+        })
+      }
+    }
+  }
+
   protected override render(): TemplateResult {
     const past = this.overflow
+    /* An image named by the label, and not hidden: the people past `max` are
+       out of the accessibility tree, and the count is the only thing that
+       says they exist. */
     return html`<slot @slotchange=${() => this.requestUpdate()}></slot>
-      ${past > 0 ? html`<span part="overflow" aria-hidden="true">+${past}</span>` : ''}`
+      ${
+        past > 0
+          ? html`<span
+              part="overflow"
+              role="img"
+              aria-label=${this.overflowLabel.replace('{count}', String(past))}
+              >+${past}</span
+            >`
+          : ''
+      }`
   }
 }
 

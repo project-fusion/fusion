@@ -74,11 +74,34 @@ describe('avatar group', () => {
     expect((await group(9)).overflow).toBe(0)
   })
 
-  test('the count is hidden from assistive technology, which hears the group', async () => {
-    /* "+2" read aloud says nothing useful: the number is a fact about how much
-       room there was. The group's own name is what carries the meaning. */
+  /* The count was hidden, and the people past `max` are out of the tree, so a
+     screen reader heard the group and nothing said there were more people in
+     it. "+2" read aloud says nothing useful, so the count has a name. */
+  test('the count is read out by its label, so the people past the limit are heard of', async () => {
     const host = await group(3)
-    expect((part(host, 'overflow') as HTMLElement).getAttribute('aria-hidden')).toBe('true')
+    const count = part(host, 'overflow') as HTMLElement
+    expect(count.getAttribute('aria-hidden')).toBeNull()
+    expect(count.getAttribute('role')).toBe('img')
+    expect(count.getAttribute('aria-label')).toBe('2 more')
+  })
+
+  /* The fold was a styled rule alone, so on the headless tier every avatar was
+     drawn beside the "+3". `hidden` is the platform's own, and both tiers have
+     it. */
+  test('hides the ones past the limit with the platform `hidden`, on either tier', async () => {
+    const styled = await group(3)
+    expect(styled.avatars.map((one) => one.hidden)).toEqual([false, false, false, true, true])
+    const inside = names
+      .map((name) => `<helix-headless-avatar name="${name}"></helix-headless-avatar>`)
+      .join('')
+    const headless = (await mount(
+      `<helix-headless-avatar-group max="2">${inside}</helix-headless-avatar-group>`,
+    )) as Group
+    await headless.updateComplete
+    expect(headless.avatars.map((one) => one.hidden)).toEqual([false, false, true, true, true])
+    headless.max = 4
+    await headless.updateComplete
+    expect(headless.avatars.map((one) => one.hidden)).toEqual([false, false, false, false, true])
   })
 
   test('the limit follows a change to it', async () => {

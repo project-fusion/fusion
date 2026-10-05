@@ -31,7 +31,8 @@
      separating ring is a rule like any other and a theme that thickens its
      rules should thicken this with them. */
   box-shadow: 0 0 0 var(--helix-border-thick) var(--badge-ring-color, var(--helix-color-background));
-  color: var(--_badge-on);
+  /* A hook, so a page that lightens the fill can darken the count with it. */
+  color: var(--badge-color, var(--_badge-on));
   display: inline-flex;
   font-size: var(--_badge-text);
   font-weight: var(--helix-weight-semibold);
@@ -155,7 +156,7 @@
 
 :host([tone="neutral"]) [part="indicator"] {
   background-color: var(--badge-background-color, var(--helix-color-surface-raised));
-  color: var(--helix-color-foreground);
+  color: var(--badge-color, var(--helix-color-foreground));
 }
 
 /* Print: a count.
