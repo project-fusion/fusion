@@ -94,6 +94,39 @@ describe('a key drawn from a chord', () => {
   })
 })
 
+/* A chord was one box holding its whole label, with nothing a sheet could
+   reach inside it. */
+describe('caps', () => {
+  const parts = (host: Kbd): string[] =>
+    [...(part(host, 'kbd')?.children ?? [])].map(
+      (one) => `${one.getAttribute('part')} ${one.textContent}`,
+    )
+
+  test('draws a part per key, with the platform separator between', async () => {
+    expect(
+      await onPlatform(OTHER_AGENT, async () => parts(await kbd('caps keys="mod+k"'))),
+    ).toEqual(['key Ctrl', 'separator +', 'key K'])
+    expect(
+      await onPlatform(APPLE_AGENT, async () => parts(await kbd('caps keys="mod+k"'))),
+    ).toEqual(['key ⌘', 'key K'])
+  })
+
+  test('absent keeps the chord one label with no part inside, as it was', async () => {
+    const host = await onPlatform(OTHER_AGENT, () => kbd('keys="mod+k"'))
+    expect([parts(host), label(host)]).toEqual([[], 'Ctrl+K'])
+  })
+})
+
+describe('key-labels', () => {
+  test('renames a key on every platform, and leaves the chord said to a reader alone', async () => {
+    const attrs = `key-labels='{"mod":"Command","enter":"Return"}' keys="mod+enter"`
+    expect(await onPlatform(OTHER_AGENT, async () => label(await kbd(attrs)))).toBe(
+      'Command+Return',
+    )
+    expect(await onPlatform(APPLE_AGENT, async () => label(await kbd(attrs)))).toBe('CommandReturn')
+  })
+})
+
 describe('kbd', () => {
   test('renders a real kbd, so the markup still means "press this"', async () => {
     const host = await mount('<helix-headless-kbd>K</helix-headless-kbd>')

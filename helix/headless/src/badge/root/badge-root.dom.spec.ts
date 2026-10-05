@@ -180,3 +180,17 @@ describe('a badge inside a control', () => {
     expect(part(badge, 'indicator')?.hasAttribute('aria-label')).toBe(false)
   })
 })
+
+/* A worded count, "8 unread", was the consumer's to keep in step with the
+   value. `{count}` in the label keeps it for them. */
+describe('a counted label', () => {
+  test('fills `{count}` with what the badge shows, and follows the value', async () => {
+    const badge = (await mount(
+      '<helix-headless-badge label="{count} unread" max="9" value="8"><span>x</span></helix-headless-badge>',
+    )) as HTMLElement & { value: number; updateComplete: Promise<unknown> }
+    expect(part(badge, 'indicator')?.getAttribute('aria-label')).toBe('8 unread')
+    badge.value = 12
+    await badge.updateComplete
+    expect(part(badge, 'indicator')?.getAttribute('aria-label')).toBe('9+ unread')
+  })
+})

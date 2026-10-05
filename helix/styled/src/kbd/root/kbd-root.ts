@@ -21,6 +21,8 @@ import { styles } from './kbd-root.css.js'
  *
  * @cssproperty --kbd-background-color - The fill of the key.
  * @cssproperty --kbd-border-color - The color of the key's border and its bottom edge.
+ * @cssproperty --kbd-gap - The space between two keys of a chord under `caps`.
+ * @cssproperty --kbd-separator-color - The color of the `+` between two keys of a chord under `caps`.
  */
 @customElement('helix-kbd')
 export class HelixKbd extends HelixHeadlessKbd {

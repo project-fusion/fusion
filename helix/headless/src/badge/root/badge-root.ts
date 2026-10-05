@@ -1,4 +1,4 @@
-import { customElement, HelixElement } from '@fusion.dev/helix-core'
+import { customElement, fillTemplate, HelixElement } from '@fusion.dev/helix-core'
 import { html, nothing, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -47,7 +47,9 @@ export class HelixHeadlessBadge extends HelixElement {
   /**
    * The badge's name, read by screen readers.
    *
-   * Required for a dot, which has no text to read.
+   * Required for a dot, which has no text to read. `{count}` is replaced with
+   * what the badge shows, so `label="{count} unread"` reads "8 unread" and
+   * stays current as `value` changes, with no label of yours to keep in step.
    */
   @property()
   label = ''
@@ -145,7 +147,7 @@ export class HelixHeadlessBadge extends HelixElement {
         data-blank=${blank ? '' : nothing}
         data-single=${text.length <= 1 ? '' : nothing}
         role="status"
-        aria-label=${announced ? this.label || text : nothing}
+        aria-label=${announced ? fillTemplate(this.label, { count: text }) || text : nothing}
         >${blank ? html`<span aria-hidden="true">${text}</span>` : text}</span
       >`
   }

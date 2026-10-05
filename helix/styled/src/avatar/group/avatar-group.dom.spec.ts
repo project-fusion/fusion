@@ -63,11 +63,21 @@ describe('avatar group', () => {
     expect((await group(0)).overflow).toBe(0)
   })
 
-  test('a limit past what the fold is written for counts nothing', async () => {
-    /* Twelve is where the stylesheet runs out of selectors. Counting past it
-       would put a "+N" beside N avatars that are still on screen, so the count
-       and the sheet agree by refusing together. */
-    expect((await group(13, 5)).overflow).toBe(0)
+  /* Twelve is where the stylesheet runs out of selectors, and the group
+     stopped counting there. It hides with `hidden` at any `max` now, so past
+     twelve it folds and counts as it does below. */
+  test('a limit past what the stylesheet rules is folded by the group, and counted', async () => {
+    const inside = Array.from(
+      { length: 15 },
+      (_, at) => `<helix-avatar name="Person ${at + 1}"></helix-avatar>`,
+    ).join('')
+    const host = (await mount(
+      `<helix-avatar-group label="Reviewers" max="13">${inside}</helix-avatar-group>`,
+    )) as Group
+    await host.updateComplete
+    expect(host.overflow).toBe(2)
+    expect(host.avatars.filter((one) => one.hidden)).toHaveLength(2)
+    expect(part(host, 'overflow')?.getAttribute('aria-label')).toBe('2 more: Person 14, Person 15')
   })
 
   test('a limit past the count is not a negative overflow', async () => {
@@ -82,7 +92,7 @@ describe('avatar group', () => {
     const count = part(host, 'overflow') as HTMLElement
     expect(count.getAttribute('aria-hidden')).toBeNull()
     expect(count.getAttribute('role')).toBe('img')
-    expect(count.getAttribute('aria-label')).toBe('2 more')
+    expect(count.getAttribute('aria-label')).toBe('2 more: Katherine Johnson, Barbara Liskov')
   })
 
   /* The fold was a styled rule alone, so on the headless tier every avatar was
