@@ -148,12 +148,17 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
          * The topic keeps its wash and its link, so the one tag that leads
          * somewhere is the one that looks like it does, and the date beside it
          * is text rather than a second chip: two chips read as a set of filters
-         * and this is one filter and one fact. */
+         * and this is one filter and one fact.
+         *
+         * **The date at full strength, as the lede is, because both sit on the
+         * band.** Muted, it measured 3.67:1 on the band in light mode, and
+         * small text needs 4.5:1. The caption size already sets it apart from
+         * the title. */
         <helix-flex align-items="center" class={styles.insightFiling} gap="sm" wrap>
           <Link data-link="quiet" href={`/insights?topic=${encodeURIComponent(insight.topic)}`}>
             <helix-tag tone="primary">{insight.topic}</helix-tag>
           </Link>
-          <helix-text emphasis="muted" variant="caption">
+          <helix-text variant="caption">
             <PublishedOn date={insight.date}>{formatDate(insight.date)}</PublishedOn>
           </helix-text>
         </helix-flex>
