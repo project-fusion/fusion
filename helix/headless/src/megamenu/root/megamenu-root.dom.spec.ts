@@ -199,6 +199,18 @@ describe('a megamenu opening on hover', () => {
     expect(host.open).toBe(true)
   })
 
+  test('but a mouse press that beats the wait opens it at once', async () => {
+    /* The press clears the wait, so a quick click would otherwise open nothing. */
+    const host = await section()
+    host.dispatchEvent(pointer('pointerenter', 'mouse'))
+    press(host, 'mouse')
+    await host.updateComplete
+    expect(host.open).toBe(true)
+    await settle(200)
+    await host.updateComplete
+    expect(host.open).toBe(true)
+  })
+
   test('leaving closes it, and later than entering opened it', async () => {
     /* The pointer has to get from the trigger down to the panel, and the line
        it takes is not the straight one. */
@@ -299,8 +311,8 @@ describe('a megamenu', () => {
   })
 
   test('and each says which way the reader moved, for a sliding stylesheet', async () => {
-    /* Radix's data-motion: the panel taking over enters from the side the old
-       one was on, and the old one leaves toward the new. */
+    /* Radix's data-motion: moving toward the end, the panel taking over
+       enters from the end and the old one leaves toward the start. */
     const bar = (await mount(
       `<nav>
         <helix-headless-megamenu id="a" label="A"><a href="/a">A</a></helix-headless-megamenu>
@@ -317,13 +329,70 @@ describe('a megamenu', () => {
     await second.updateComplete
     await first.updateComplete
     expect(hasState(second, 'from-end')).toBe(true)
-    expect(hasState(first, 'to-end')).toBe(true)
+    expect(hasState(first, 'to-start')).toBe(true)
+    expect(hasState(first, 'to-end')).toBe(false)
     ;(part(first, 'trigger') as HTMLElement).click()
     await first.updateComplete
     await second.updateComplete
     expect(hasState(first, 'from-start')).toBe(true)
-    expect(hasState(first, 'to-end')).toBe(false)
-    expect(hasState(second, 'to-start')).toBe(true)
+    expect(hasState(first, 'to-start')).toBe(false)
+    expect(hasState(second, 'to-end')).toBe(true)
+    expect(hasState(second, 'from-end')).toBe(false)
+  })
+
+  test('and a panel that closes on its own moved nowhere, so every direction clears', async () => {
+    const bar = (await mount(
+      `<nav>
+        <helix-headless-megamenu id="a" label="A"><a href="/a">A</a></helix-headless-megamenu>
+        <helix-headless-megamenu id="b" label="B"><a href="/b">B</a></helix-headless-megamenu>
+      </nav>`,
+    )) as HTMLElement
+    const first = bar.querySelector('#a') as Section
+    const second = bar.querySelector('#b') as Section
+    await first.updateComplete
+    ;(part(first, 'trigger') as HTMLElement).click()
+    await first.updateComplete
+    ;(part(second, 'trigger') as HTMLElement).click()
+    await second.updateComplete
+    await first.updateComplete
+    expect(hasState(second, 'from-end')).toBe(true)
+    ;(part(second, 'trigger') as HTMLElement).click()
+    await second.updateComplete
+    expect(second.open).toBe(false)
+    for (const host of [first, second]) {
+      for (const name of ['from-end', 'from-start', 'to-end', 'to-start']) {
+        expect(hasState(host, name)).toBe(false)
+      }
+    }
+  })
+
+  test('and a press on another trigger hands over with a direction, rather than dismissing first', async () => {
+    const bar = (await mount(
+      `<nav>
+        <helix-headless-megamenu id="a" label="A" open-on="click"><a href="/a">A</a></helix-headless-megamenu>
+        <helix-headless-megamenu id="b" label="B" open-on="click"><a href="/b">B</a></helix-headless-megamenu>
+      </nav>`,
+    )) as HTMLElement
+    const first = bar.querySelector('#a') as Section
+    const second = bar.querySelector('#b') as Section
+    await first.updateComplete
+    first.open = true
+    await first.updateComplete
+    /* The press the dismissal watches for, landing on the other trigger. */
+    trigger(second).dispatchEvent(
+      new PointerEvent('pointerdown', { bubbles: true, composed: true, pointerType: 'mouse' }),
+    )
+    await first.updateComplete
+    expect(first.open).toBe(true)
+    trigger(second).dispatchEvent(
+      new MouseEvent('click', { bubbles: true, composed: true, detail: 1 }),
+    )
+    await second.updateComplete
+    await first.updateComplete
+    expect(second.open).toBe(true)
+    expect(first.open).toBe(false)
+    expect(hasState(second, 'from-end')).toBe(true)
+    expect(hasState(first, 'to-start')).toBe(true)
   })
 
   test('and asks rather than overrules, so a consumer holding one open is heard', async () => {
@@ -464,6 +533,27 @@ describe('a megamenu and keyboard focus', () => {
     await host.updateComplete
     expect(host.open).toBe(false)
     after.remove()
+  })
+
+  test('Down Arrow on the trigger of an open panel moves to its first link', async () => {
+    const host = await section()
+    const down = (): KeyboardEvent => {
+      const event = new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        key: 'ArrowDown',
+      })
+      trigger(host).dispatchEvent(event)
+      return event
+    }
+    /* Closed, it leaves the key to the page. */
+    expect(down().defaultPrevented).toBe(false)
+    host.open = true
+    await host.updateComplete
+    const link = host.querySelector('a') as HTMLElement
+    expect(down().defaultPrevented).toBe(true)
+    expect(document.activeElement).toBe(link)
   })
 
   test('and stays open while focus moves inside it, or leaves the window', async () => {

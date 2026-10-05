@@ -382,6 +382,7 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
   protected renderToggle(): TemplateResult {
     return html`<slot
       name="chevron"
+      aria-hidden="true"
       @click=${this.href === '' ? nothing : this.handleToggleClick}
       ><svg part="toggle" fill="currentColor" viewBox=${caretDown.viewBox} aria-hidden="true">
         ${unsafeSVG(caretDown.content)}

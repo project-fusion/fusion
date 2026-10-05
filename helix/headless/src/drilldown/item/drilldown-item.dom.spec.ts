@@ -96,6 +96,8 @@ describe('a row that opens a page', () => {
     /* The fallback of the `chevron` slot, which sits after `end` in the row. */
     const slot = mark?.parentElement
     expect(slot?.getAttribute('name')).toBe('chevron')
+    /* So a glyph written as text there stays out of the row's name too. */
+    expect(slot?.getAttribute('aria-hidden')).toBe('true')
     expect(slot?.parentElement).toBe(part(host, 'item') as HTMLElement)
     expect(slot?.previousElementSibling?.getAttribute('name')).toBe('end')
     expect(part(host, 'item')?.getAttribute('aria-haspopup')).toBe('menu')

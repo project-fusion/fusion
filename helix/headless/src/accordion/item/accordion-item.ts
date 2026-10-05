@@ -92,7 +92,7 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
     if (this.chevronPlacement === 'none') {
       return nothing
     }
-    return html`<slot name="chevron"
+    return html`<slot name="chevron" aria-hidden="true"
       ><svg part="chevron" fill="currentColor" viewBox=${caretDown.viewBox} aria-hidden="true">
         ${unsafeSVG(caretDown.content)}
       </svg></slot
@@ -325,9 +325,14 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
    * overrides `display`, `inert` is the only one of the two still in force.
    * `content-visibility: hidden` keeps skipped content out of the tab order and
    * the accessibility tree by itself, and an inert region is never searched.
+   * It leaves the region's own box in the tree, so a closed findable section
+   * drops `role="region"` and its name until it opens.
    */
   protected override render(): TemplateResult {
     const open = this.open
+    /* A closed findable section is skipped content, and an empty landmark
+       named by its trigger would still be listed among the page's regions. */
+    const landmark = open || !this.findable
     const level = Math.min(6, Math.max(1, this.headingLevel ?? this.groupHeadingLevel ?? 3))
     return html`
       <div part="container">
@@ -348,11 +353,11 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
         </div>
         <div
           id=${CONTENT_ID}
-          aria-labelledby=${TRIGGER_ID}
+          aria-labelledby=${landmark ? TRIGGER_ID : nothing}
           part="content"
           hidden=${open ? nothing : this.findable ? 'until-found' : ''}
           ?inert=${!open && !this.findable}
-          role="region"
+          role=${landmark ? 'region' : nothing}
           @beforematch=${this.handleBeforeMatch}
         >
           <div part="content-inner">

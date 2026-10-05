@@ -29,6 +29,14 @@ describe('tree item structure', () => {
     ]).toEqual([true, false])
   })
 
+  /* A glyph written as text, such as "+", joined the row's name. */
+  test('keeps what is slotted as the chevron out of the row name', async () => {
+    const tree = await mount(mixed)
+    const [branch] = items(tree)
+    const slot = (branch as HTMLElement).shadowRoot?.querySelector('slot[name="chevron"]')
+    expect(slot?.getAttribute('aria-hidden')).toBe('true')
+  })
+
   test('the row is the treeitem, and the group is inside it', async () => {
     const tree = await mount(mixed)
     const [branch] = items(tree)
