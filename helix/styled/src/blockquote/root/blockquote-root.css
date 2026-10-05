@@ -20,9 +20,9 @@ slot:not([name]) {
   color: var(--blockquote-color, var(--helix-color-foreground-muted));
   font-family: var(--blockquote-font-family, var(--helix-font-display));
   font-size: var(--blockquote-size, var(--helix-text-xl));
-  font-weight: var(--helix-weight-medium);
+  font-weight: var(--blockquote-font-weight, var(--helix-weight-medium));
   letter-spacing: var(--helix-tracking-tight);
-  line-height: var(--helix-leading-tight);
+  line-height: var(--blockquote-line-height, var(--helix-leading-tight));
 }
 
 slot:not([name])::slotted(*) {

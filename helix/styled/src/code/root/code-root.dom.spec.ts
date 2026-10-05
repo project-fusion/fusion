@@ -31,7 +31,7 @@ describe('code', () => {
     /* A monospace face reads larger than the prose around it at the same
        nominal size. A ratio, because a fixed 13px inside a 32px heading sits on
        the line like a footnote. */
-    expect(rule('[part="code"]')).toContain('font-family: var(--helix-font-mono)')
+    expect(rule('[part="code"]')).toContain('font-family: var(--code-font-family, var(--helix-font-mono))')
     expect(rule('[part="code"]')).toContain(
       'font-size: var(--code-size, calc(var(--helix-text-sm) / var(--helix-text-md) * 1em))',
     )
@@ -48,8 +48,10 @@ describe('code', () => {
   test('the hooks the docs name are what the sheet reads', () => {
     for (const hook of [
       '--code-background-color',
+      '--code-font-family',
       '--code-foreground-color',
       '--code-padding',
+      '--code-radius',
       '--code-size',
     ]) {
       // A fallback written across lines keeps its line breaks in the sheet.

@@ -30,6 +30,15 @@ describe('divider semantics', () => {
     expect(line(divider)?.getAttribute('aria-orientation')).toBe('vertical')
   })
 
+  /* A word set into the line, such as "Or", was beside an unnamed separator. */
+  test('an announced separator is named by the content set into it', async () => {
+    const divider = await mount('<helix-headless-divider announced>Or</helix-headless-divider>')
+    const labelledBy = line(divider)?.getAttribute('aria-labelledby') ?? ''
+    expect(divider.shadowRoot?.getElementById(labelledBy)).toBe(part(divider, 'content'))
+    const plain = await mount('<helix-headless-divider>Or</helix-headless-divider>')
+    expect(line(plain)?.hasAttribute('aria-labelledby')).toBe(false)
+  })
+
   test('an announced separator with no orientation is horizontal', async () => {
     const divider = await mount('<helix-headless-divider announced></helix-headless-divider>')
     expect(line(divider)?.getAttribute('aria-orientation')).toBe('horizontal')

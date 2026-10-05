@@ -153,3 +153,24 @@ describe('card actions', () => {
     expect(row(card, 'footer-row')).toBeNull()
   })
 })
+
+/* Web Awesome's card publishes its header, body and footer as parts. Here the
+   regions are bare slots, so the part is on the slot: a name a page reaches,
+   with no box until the page gives it one. */
+describe('card region parts', () => {
+  test('each region slot is a part of its name, the default one body', async () => {
+    const card = await mount('<helix-headless-card>Body</helix-headless-card>')
+    const parts = [...(card.shadowRoot?.querySelectorAll('[part]') ?? [])].map((element) => [
+      element.tagName,
+      element.getAttribute('part'),
+    ])
+    expect(parts).toEqual([
+      ['SLOT', 'media'],
+      ['SLOT', 'header'],
+      ['SLOT', 'header-actions'],
+      ['SLOT', 'body'],
+      ['SLOT', 'footer'],
+      ['SLOT', 'footer-actions'],
+    ])
+  })
+})

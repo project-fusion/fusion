@@ -24,7 +24,7 @@ describe('card server output', () => {
        back, so it passed whether the card rendered its shadow root or nothing
        at all. The unnamed slot is the smallest thing that is only there if it
        rendered. */
-    expect(rendered(markup, 'helix-card')).toContain('<slot></slot>')
+    expect(rendered(markup, 'helix-card')).toContain('<slot part="body"></slot>')
   })
 
   test('declarative shadow DOM carries the styles', () => {
@@ -38,7 +38,7 @@ describe('card server output', () => {
     expect(hostAttributes(markup, 'helix-card')).toEqual(['aria-labelledby'])
     const structure = rendered(markup, 'helix-card')
     for (const name of ['media', 'header', 'footer']) {
-      expect(structure, name).toContain(`<slot name="${name}">`)
+      expect(structure, name).toContain(`<slot name="${name}" part="${name}">`)
     }
   })
 
@@ -53,7 +53,7 @@ describe('card server output', () => {
     `)
     const structure = rendered(horizontal, 'helix-card')
     for (const name of ['media', 'header', 'footer']) {
-      expect(structure, name).toContain(`<slot name="${name}">`)
+      expect(structure, name).toContain(`<slot name="${name}" part="${name}">`)
     }
     /* The host, not the string. `toMatch(/orientation="horizontal"/)` against
        the whole document passed on `:host([orientation="horizontal"])` in the
@@ -67,10 +67,19 @@ describe('card server output', () => {
        spec's own `<h2>`, which is in the response whatever the card renders:
        measured with the shadow root emptied, both held. The served frame is the
        claim a crawler cares about. Six slots (four regions and two lines of
-       actions) and no part means every child lands somewhere and nothing of
-       the card's own wraps it or reorders it. */
+       actions) and no wrapper means every child lands somewhere and nothing of
+       the card's own wraps it or reorders it. Each slot is a part of its
+       region's name, which wraps nothing. */
     expect(rendered(markup, 'helix-card').match(/<slot\b/g)).toHaveLength(6)
-    expect(servedParts(markup)).toEqual([])
+    expect(rendered(markup, 'helix-card')).not.toContain('<div')
+    expect(servedParts(markup).sort()).toEqual([
+      'body',
+      'footer',
+      'footer-actions',
+      'header',
+      'header-actions',
+      'media',
+    ])
   })
 
   test('an omitted region needs no rule to hide it', () => {
@@ -78,6 +87,6 @@ describe('card server output', () => {
     // and generates no box, which is what makes this correct on the server,
     // where the component cannot inspect its own children.
     expect(markup).not.toContain(':has(')
-    expect(rendered(markup, 'helix-card')).toContain('<slot name="footer">')
+    expect(rendered(markup, 'helix-card')).toContain('<slot name="footer" part="footer">')
   })
 })
