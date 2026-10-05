@@ -27,9 +27,12 @@
  *  The base fill, and nothing animated on this element at all.
  */
 [part="skeleton"] {
-  background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
+  background-color: var(
+    --skeleton-color,
+    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)
+  );
   block-size: 100%;
-  border-radius: var(--helix-radii-sm);
+  border-radius: var(--skeleton-radius, var(--helix-radii-sm));
   display: block;
   inline-size: 100%;
   /* The containing block for the sweep, and the clip that keeps it inside the
@@ -42,11 +45,13 @@
  *  The sweep, on a layer of its own so it can be moved rather than redrawn.
  */
 [part="skeleton"]::after {
-  animation: helix-skeleton-sweep calc(var(--helix-duration-slow) * 4) ease-in-out infinite;
+  animation: helix-skeleton-sweep var(--skeleton-duration, calc(var(--helix-duration-slow) * 4))
+    ease-in-out infinite;
   background-image: linear-gradient(
     90deg,
     transparent 0%,
-    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent) 50%,
+    var(--skeleton-sheen-color, color-mix(in oklab, var(--helix-color-foreground) 8%, transparent))
+      50%,
     transparent 100%
   );
   content: "";
@@ -66,6 +71,60 @@
   border-radius: var(--helix-radii-full);
 }
 
+/*
+ * **`effect` picks how the placeholder says it is waiting.** Absent is the
+ * sweep above. `pulse` fades the fill in and out instead, which is quieter in
+ * a dense list; `none` sits still, for a page that draws its own.
+ */
+:host([effect="pulse"]) [part="skeleton"]::after,
+:host([effect="none"]) [part="skeleton"]::after {
+  animation: none;
+  background-image: none;
+}
+
+:host([effect="pulse"]) [part="skeleton"] {
+  animation: helix-skeleton-pulse var(--skeleton-duration, calc(var(--helix-duration-slow) * 4))
+    ease-in-out infinite;
+}
+
+@keyframes helix-skeleton-pulse {
+  50% {
+    opacity: 0.4;
+  }
+}
+
+/*
+ * **Around content, the skeleton is the content's size.** `:empty` is how a
+ * sheet tells a placeholder from a wrapper with no script: the host takes the
+ * content's box, the content keeps its place and is hidden while `loading`,
+ * and the shape lies over that box. Once `loading` goes the shape goes, and the
+ * content is shown where it already was, so nothing on the page moves.
+ */
+:host(:not(:empty)) {
+  block-size: auto;
+  inline-size: fit-content;
+  max-inline-size: 100%;
+  position: relative;
+}
+
+:host(:not(:empty)) [part="content"] {
+  display: block;
+}
+
+:host(:not(:empty)) [part="skeleton"] {
+  block-size: auto;
+  inset: 0;
+  position: absolute;
+}
+
+:host(:not(:empty):not([loading])) [part="skeleton"] {
+  display: none;
+}
+
+:host([loading]:not(:empty)) [part="content"] {
+  visibility: hidden;
+}
+
 @keyframes helix-skeleton-sweep {
   from {
     translate: -50% 0;
@@ -79,8 +138,12 @@
 /* The sweep is the whole effect, so with motion reduced the placeholder simply
    sits there rather than animating something else instead. */
 @media (prefers-reduced-motion: reduce) {
-  [part="skeleton"]::after {
+  [part="skeleton"]::after,
+  :host([effect="pulse"]) [part="skeleton"] {
     animation: none;
+  }
+
+  [part="skeleton"]::after {
     background-image: none;
   }
 }
