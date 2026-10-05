@@ -288,3 +288,201 @@ describe('an object inspector in another language', () => {
     expect(tree(host).getAttribute('aria-label')).toBe('Response')
   })
 })
+
+/* Nothing in an inspector is chosen. Chromium takes the active descendant of a
+   single-selection tree as selected unless a row says otherwise, so every
+   arrow press was also announced as a selection. */
+describe('an object inspector that selects nothing', () => {
+  test('says on every row that it is not selected, the active one included', async () => {
+    const host = await inspector()
+    await press(host, 'ArrowDown')
+    expect(rows(host).map((row) => row.getAttribute('aria-selected'))).toEqual(
+      rows(host).map(() => 'false'),
+    )
+  })
+})
+
+type Pathed = Inspector & { active: string; expanded: string[]; filter: string }
+
+describe('the active row as a path', () => {
+  test('reads as a JSON Pointer, and a move asks first and then says where it went', async () => {
+    const host = (await inspector()) as Pathed
+    expect(host.active).toBe('')
+    const heard: string[] = []
+    host.addEventListener('helix-before-activate', (event) =>
+      heard.push(`before ${(event as CustomEvent<{ value: string }>).detail.value} ${host.active}`),
+    )
+    host.addEventListener('helix-activate', (event) =>
+      heard.push(`after ${(event as CustomEvent<{ value: string }>).detail.value} ${host.active}`),
+    )
+    await press(host, 'ArrowDown')
+    expect(heard).toEqual(['before /meta ', 'after /meta /meta'])
+  })
+
+  test('stays where it is when the move is refused', async () => {
+    const host = (await inspector()) as Pathed
+    host.addEventListener('helix-before-activate', (event) => event.preventDefault())
+    let told = 0
+    host.addEventListener('helix-activate', () => told++)
+    await press(host, 'ArrowDown')
+    expect([host.active, told, active(host)]).toEqual(['', 0, rows(host)[0]])
+  })
+
+  test('written, moves to the path and opens the branches around it, and sends nothing', async () => {
+    const host = (await inspector()) as Pathed
+    let told = 0
+    host.addEventListener('helix-activate', () => told++)
+    host.active = '/meta/branch'
+    await host.updateComplete
+    expect(active(host)?.textContent).toContain('branch')
+    expect(host.active).toBe('/meta/branch')
+    expect(host.expanded.sort()).toEqual(['', '/meta'])
+    expect(told).toBe(0)
+  })
+
+  test('a path the value does not hold moves to the nearest branch above it', async () => {
+    const host = (await inspector()) as Pathed
+    host.active = '/meta/missing'
+    await host.updateComplete
+    expect(host.active).toBe('/meta')
+  })
+})
+
+describe('the open branches as paths', () => {
+  test('read as the branches a reader opened', async () => {
+    const host = (await inspector()) as Pathed
+    await press(host, 'ArrowDown')
+    await press(host, 'ArrowRight')
+    expect(host.expanded.sort()).toEqual(['', '/meta'])
+  })
+
+  test('written, open exactly those, and keep the active row', async () => {
+    const host = (await inspector()) as Pathed
+    host.active = '/size'
+    await host.updateComplete
+    host.expanded = ['', '/tags']
+    await host.updateComplete
+    expect(rows(host).filter((row) => row.getAttribute('aria-expanded') === 'true')).toHaveLength(2)
+    expect(host.active).toBe('/size')
+  })
+
+  test('a branch closed around the active row hands it to that branch', async () => {
+    const host = (await inspector()) as Pathed
+    host.active = '/meta/branch'
+    await host.updateComplete
+    host.expanded = ['']
+    await host.updateComplete
+    expect(host.active).toBe('/meta')
+  })
+
+  test('a new value keeps the branches written before it arrived', async () => {
+    const host = (await mount(
+      '<helix-headless-object-inspector></helix-headless-object-inspector>',
+    )) as Pathed
+    host.expanded = ['', '/meta']
+    host.value = VALUE
+    await host.updateComplete
+    expect(rows(host).some((row) => row.textContent?.includes('branch'))).toBe(true)
+  })
+})
+
+const live = (host: HTMLElement): string | undefined =>
+  host.shadowRoot?.querySelector('[part="live"]')?.textContent ?? undefined
+
+describe('a filtered object inspector', () => {
+  test('shows the entries that match, by key or by value, and the branches that lead to them, open', async () => {
+    const host = await inspector('filter="MAIN"')
+    expect(rows(host).map((row) => row.textContent?.replace(/\s+/g, ' ').trim())).toEqual([
+      '{…} 6 keys',
+      'meta: {…} 1 key',
+      'branch: "main"',
+    ])
+    const matched = rows(host).filter((row) =>
+      (row.getAttribute('part') ?? '').split(' ').includes('row-match'),
+    )
+    expect(matched.map((row) => row.getAttribute('aria-level'))).toEqual(['3'])
+  })
+
+  test('counts each set among the entries it shows', async () => {
+    const host = await inspector('filter="ta"')
+    const tags = rows(host).find((row) => row.textContent?.includes('tags'))
+    expect([tags?.getAttribute('aria-posinset'), tags?.getAttribute('aria-setsize')]).toEqual([
+      '2',
+      '3',
+    ])
+  })
+
+  test('keeps everything under a branch whose key matches', async () => {
+    const host = await inspector('filter="tags"')
+    await press(host, 'End')
+    expect(active(host)?.textContent).toContain('tags')
+    await press(host, 'ArrowRight')
+    expect(rows(host)).toHaveLength(4)
+  })
+
+  test('says how many entries matched, and moves off a row the filter hid', async () => {
+    const host = (await inspector()) as Pathed
+    host.active = '/size'
+    await host.updateComplete
+    host.filter = 'a'
+    await host.updateComplete
+    await new Promise((done) => requestAnimationFrame(done))
+    await host.updateComplete
+    expect(live(host)).toBe('6 results')
+    expect(active(host)?.getAttribute('part')).toContain('row-match')
+    host.filter = 'branch'
+    await host.updateComplete
+    await new Promise((done) => requestAnimationFrame(done))
+    await host.updateComplete
+    expect(live(host)).toBe('1 result')
+  })
+
+  test('shows no row where nothing matches', async () => {
+    const host = await inspector('filter="nowhere"')
+    expect(rows(host)).toHaveLength(0)
+    expect(tree(host).hasAttribute('aria-activedescendant')).toBe(false)
+  })
+})
+
+describe('an object inspector with a filter field', () => {
+  const field = (host: HTMLElement): HTMLInputElement =>
+    host.shadowRoot?.querySelector('[part="search-field"]') as HTMLInputElement
+
+  test('draws no field without filterable', async () => {
+    const host = await inspector()
+    expect(field(host)).toBeNull()
+  })
+
+  test('filters as it is typed in, asking first and saying so after', async () => {
+    const host = await inspector('filterable filter-label="Find"')
+    expect(field(host).getAttribute('aria-label')).toBe('Find')
+    const heard: string[] = []
+    host.addEventListener('helix-filter', (event) =>
+      heard.push(`filter ${(event as CustomEvent<{ value: string }>).detail.value}`),
+    )
+    host.addEventListener('helix-filtered', (event) =>
+      heard.push(`filtered ${(event as CustomEvent<{ value: string }>).detail.value}`),
+    )
+    field(host).value = 'dpl'
+    field(host).dispatchEvent(new Event('input', { bubbles: true }))
+    await host.updateComplete
+    expect(heard).toEqual(['filter dpl', 'filtered dpl'])
+    expect(rows(host)).toHaveLength(2)
+  })
+
+  test('keeps the filter it had when the request is refused', async () => {
+    const host = await inspector('filterable')
+    host.addEventListener('helix-filter', (event) => event.preventDefault())
+    field(host).value = 'dpl'
+    field(host).dispatchEvent(new Event('input', { bubbles: true }))
+    await host.updateComplete
+    expect([field(host).value, rows(host).length]).toEqual(['', 7])
+  })
+
+  test('Down moves from the field to the tree', async () => {
+    const host = await inspector('filterable')
+    field(host).focus()
+    field(host).dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowDown' }))
+    expect(host.shadowRoot?.activeElement).toBe(tree(host))
+  })
+})
