@@ -27,3 +27,32 @@ describe('quote', () => {
     expect(part(quote, 'quote')?.hasAttribute('cite')).toBe(false)
   })
 })
+
+describe('a quote with typed marks', () => {
+  /** What the console was warned while `markup` mounted and settled. */
+  const warnedOn = async (markup: string): Promise<string[]> => {
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      await mount(markup)
+      await new Promise((done) => setTimeout(done, 5))
+    } finally {
+      console.warn = original
+    }
+    return warnings
+  }
+
+  /* The `<q>` sets its own marks, so “"typed"” showed both. */
+  test('is reported once, by its tag', async () => {
+    const warnings = await warnedOn('<helix-headless-quote>"Less is more."</helix-headless-quote>')
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0]).toContain(
+      '<helix-headless-quote> starts or ends with a typed quotation mark',
+    )
+  })
+
+  test('and a quote without them is not', async () => {
+    expect(await warnedOn('<helix-headless-quote>Less is more.</helix-headless-quote>')).toEqual([])
+  })
+})

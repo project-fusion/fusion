@@ -1,4 +1,4 @@
-import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
+import { auditName, customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -8,7 +8,7 @@ import { property } from 'lit/decorators.js'
  * @description
  * Sets `role="group"` on the host through internals, and `label` names the
  * group. Without a name, a screen reader announces the buttons as separate
- * controls.
+ * controls, and a development build warns once with the kind `missing-name`.
  *
  * The group does not manage focus, so each button keeps its own tab stop. For
  * one tab stop with arrow keys between the buttons, the APG toolbar pattern,
@@ -61,6 +61,18 @@ export class HelixHeadlessButtonGroup extends HelixElement {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     hostAria(this.internals, { label: this.label, role: 'group' })
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    /* A group with no name reads as its buttons one by one, with nothing
+       saying they belong together. Development builds only. */
+    auditName(
+      this,
+      () => null,
+      'Give it a `label`, or an `aria-label` that says what the buttons are for.',
+      () => this.label !== '',
+    )
   }
 
   protected override render(): TemplateResult {

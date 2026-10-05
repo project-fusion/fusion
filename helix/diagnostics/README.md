@@ -242,13 +242,12 @@ diagnostics counts it by kind and tag. None fails a CI job.
 | --- | --- |
 | `duplicate-registration` | Two copies of Helix are on the page. Also the finding of the same name |
 | `fullscreen-refused` | The browser refused fullscreen, usually in a frame without `allow="fullscreen"` |
-| `max-past-fold` | An avatar group's `max` is past the number its fold is written for |
 | `min-out-of-range` | A rating's `min` is not a score between 0 and its `max` |
 | `misplaced-handler` | A React `on` prop names an event that another element dispatches |
 | `misread-direction` | A stat was given `up`, `down` or `neutral`, which are Trend's directions and lay nothing out |
 | `missing-alt` | An image has no `alt`, so a screen reader announces its file name |
 | `missing-layout` | The three.js graph driver could not load `d3-force-3d` |
-| `missing-name` | A button or form control has no accessible name. Development builds only (the `development` export condition) |
+| `missing-name` | A button, form control, button group or open dialog has no accessible name. Development builds only (the `development` export condition) |
 | `missing-row-key` | A selectable data table has no `row-key`, so it knows each row by its place |
 | `missing-stencil-parts` | A graph stencil names parts its shape does not have |
 | `missing-target` | A skip link's `href` names no element on the page |
@@ -263,6 +262,7 @@ diagnostics counts it by kind and tag. None fails a CI job.
 | `stencil-without-inside` | A graph stencil has no inside to place the notes in |
 | `too-many-rows` | A data table is drawing more rows at once than it stays responsive to |
 | `two-default-operators` | A filter field marks more than one operator as its default |
+| `typed-marks` | A quote's text starts or ends with a typed quotation mark, which the browser's marks double |
 | `unknown-event` | A React `on` prop names an event that no element dispatches |
 | `unknown-icon` | An icon's `name` is not in the Helix set, so it draws nothing |
 | `unlinked-trigger` | A tooltip's trigger does not name it in `aria-describedby` |

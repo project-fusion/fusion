@@ -598,3 +598,44 @@ describe('Tab at either end of the dialog', () => {
     expect(press(name).defaultPrevented).toBe(false)
   })
 })
+
+/**
+ * What the console was warned while `markup` mounted, opened and settled.
+ *
+ * The missing-name warning is in development builds only: the package's
+ * `test:dom` script passes `bun test --conditions helix-development`, which
+ * core's `#audit-name` reads as it reads `development`.
+ */
+const warnedOn = async (markup: string): Promise<string[]> => {
+  const warnings: string[] = []
+  const original = console.warn
+  console.warn = (message: string) => warnings.push(message)
+  try {
+    await mount(markup)
+    await new Promise((done) => setTimeout(done, 5))
+  } finally {
+    console.warn = original
+  }
+  return warnings
+}
+
+describe('a dialog with no name', () => {
+  /* A modal with no name is announced as "dialog" and nothing more. */
+  test('is reported once it opens, by its tag', async () => {
+    const warnings = await warnedOn(
+      '<helix-headless-dialog default-open>This cannot be undone.</helix-headless-dialog>',
+    )
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0]).toContain('<helix-headless-dialog> has no accessible name')
+  })
+
+  test('and a dialog named by its label or a header heading, or not yet open, is not', async () => {
+    for (const markup of [
+      '<helix-headless-dialog default-open label="Filters">Body</helix-headless-dialog>',
+      '<helix-headless-dialog default-open><h2 slot="header">Filters</h2>Body</helix-headless-dialog>',
+      '<helix-headless-dialog>Body</helix-headless-dialog>',
+    ]) {
+      expect([markup, ...(await warnedOn(markup))]).toEqual([markup])
+    }
+  })
+})

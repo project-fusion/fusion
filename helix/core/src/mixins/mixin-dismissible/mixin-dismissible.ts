@@ -5,6 +5,7 @@ import {
   deepActiveElement,
   deepContains,
 } from '../../utils/focusable-elements/focusable-elements.js'
+import { tabStops } from '../../utils/tab-stops/tab-stops.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
 type Constructor<T> = new (...args: any[]) => T
@@ -96,13 +97,36 @@ export const MixinDismissible = <T extends Constructor<LitElement>>(Base: T) => 
 
     /** Fires `helix-dismiss`, and returns `false` if a listener cancels it. */
     dismiss(): boolean {
-      const neighbors = deepContains(this, deepActiveElement()) ? this.neighbors() : []
+      const inside = deepContains(this, deepActiveElement())
+      const neighbors = inside ? this.neighbors() : []
+      const beside = inside && neighbors.length === 0 ? this.stopBeside() : undefined
       const event = this.dismissEvent()
       this.dispatchEvent(event)
-      if (neighbors.length > 0 && !event.defaultPrevented) {
-        this.keepFocus(neighbors)
+      if ((neighbors.length > 0 || beside) && !event.defaultPrevented) {
+        this.keepFocus(neighbors, beside)
       }
       return !event.defaultPrevented
+    }
+
+    /**
+     * The tab stop after this element on the page, or the one before it at the
+     * end, for a lone element whose removal would drop focus to the body.
+     *
+     * **A lone Callout or Announcement had nowhere to hand focus**, so a
+     * keyboard reader who dismissed one started again from the top of the
+     * page. React Aria's Toast hands focus on the same way. Read before the
+     * event, in the order Tab reaches the stops, while this element's own are
+     * still among them.
+     */
+    private stopBeside(): HTMLElement | undefined {
+      const stops = tabStops(document.body)
+      const own = stops.flatMap((stop, at) => (deepContains(this, stop) ? [at] : []))
+      const first = own[0]
+      const last = own.at(-1)
+      if (first === undefined || last === undefined) {
+        return undefined
+      }
+      return stops[last + 1] ?? stops[first - 1]
     }
 
     /**
@@ -130,8 +154,11 @@ export const MixinDismissible = <T extends Constructor<LitElement>>(Base: T) => 
       return [...after, ...before]
     }
 
-    /** Moves focus to a neighbor's dismiss control if removing this element dropped it. */
-    private keepFocus(neighbors: HTMLElement[]): void {
+    /**
+     * Moves focus to a neighbor's dismiss control if removing this element
+     * dropped it, or, with no neighbor, to the tab stop beside where it was.
+     */
+    private keepFocus(neighbors: HTMLElement[], beside?: HTMLElement): void {
       const settle = (): void => {
         const active = document.activeElement
         if (this.isConnected || (active !== null && active !== document.body)) {
@@ -148,6 +175,9 @@ export const MixinDismissible = <T extends Constructor<LitElement>>(Base: T) => 
               return
             }
           }
+        }
+        if (beside?.isConnected) {
+          beside.focus()
         }
       }
       settle()
