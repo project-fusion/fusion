@@ -1,4 +1,9 @@
-import { customElement, HelixElement, MixinSelectableItem } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  HelixElement,
+  HostClickController,
+  MixinSelectableItem,
+} from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -28,6 +33,9 @@ import { property } from 'lit/decorators.js'
  */
 @customElement('helix-headless-toggle')
 export class HelixHeadlessToggle extends MixinSelectableItem(HelixElement) {
+  /** A click on the element itself, `click()` included, chooses it, as on `Radio`. */
+  protected readonly clicks = new HostClickController(this, () => this.partNamed('item'))
+
   /**
    * Whether the markup declares the item chosen. A form reset returns to it.
    *

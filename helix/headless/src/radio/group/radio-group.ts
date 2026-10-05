@@ -39,6 +39,7 @@ import { HelixHeadlessRadio } from '../root/radio-root.js'
  * @documentation https://fusion.dev/helix/components/radio
  *
  * @slot - The radios.
+ * @slot feedback - The error message, for content richer than a string. It shows while there is a message.
  * @slot hint - The help text under the group, for content richer than a string.
  * @slot label - The group's label, for a question that needs more than a string.
  *
@@ -109,26 +110,69 @@ export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(Hel
    */
   private readonly handleSelection = (event: HelixSelectEvent): void => {
     event.stopPropagation()
-    /* **And only if the item's own choice stood.** `Radio` documents
-       `helix-select` as refusable and this group is the only thing that acts on
-       it, so a refusal nothing read was a veto that did nothing anywhere. Read
-       inline rather than a microtask later: this is a bubble listener for an
-       event from a child, so every listener on the item has already run.
-       `Toggle.Group` and `Listbox` hold the same pair for the same event. */
-    if (event.defaultPrevented) {
+    /* **And only if the item's own choice stood, read a microtask later.**
+       `Radio` documents `helix-select` as refusable, and its docblock tells you
+       to listen for it on the group. This listener is on the group too, added
+       when the group connected, so it runs ahead of a listener a consumer adds
+       afterwards, which is the usual order, and read inline the flag was never
+       set yet. The dispatch is synchronous, so a microtask is after every
+       listener, the item's and the group's. `Toggle.Group` holds the same pair
+       for the same event. */
+    queueMicrotask(() => {
+      if (event.defaultPrevented) {
+        return
+      }
+      const next = event.detail.value
+      if (next === this.value) {
+        return
+      }
+      this.requestValue(next)
+    })
+  }
+
+  /**
+   * The radio holding the answer, or nothing.
+   *
+   * Nothing where `value` names no radio here: a chosen radio that was removed
+   * is no longer an answer, as a native group drops it from the form. `value`
+   * keeps the name, so a value written before its radios arrive takes once they
+   * do.
+   */
+  private get answer(): HelixHeadlessRadio | undefined {
+    return this.items.find((item) => item.value === this.value)
+  }
+
+  /** Whether the group holds an answer the form can submit. */
+  private get answered(): boolean {
+    if (this.value === '') {
+      return false
+    }
+    const items = this.items
+    return items.length === 0 || items.some((item) => item.value === this.value)
+  }
+
+  /**
+   * Takes the answer from a radio whose markup says `selected`, where nothing
+   * else declared one.
+   *
+   * As `Toggle.Group` does, so `<helix-radio selected>` preselects as
+   * `<option selected>` and `<helix-toggle selected>` do, and a reset returns
+   * to it. Client only: the server's element shim has no children to read.
+   */
+  private adopt(): void {
+    if (this.value !== '' || this.children === undefined) {
       return
     }
-    const next = event.detail.value
-    if (next === this.value) {
-      return
+    const declared = this.items.find((item) => item.defaultSelected)
+    if (declared) {
+      this.defaultValue = declared.value
     }
-    this.requestValue(next)
   }
 
   /** Writes the answer onto the items, and nothing onto the host. */
   private place(): void {
     const items = this.items
-    const answer = items.find((item) => item.value === this.value)
+    const answer = this.answer
     for (const item of items) {
       item.selected = item === answer
     }
@@ -145,8 +189,12 @@ export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(Hel
 
        **And the entry skips a disabled choice**, whose control is not focusable
        at all, so a group whose first option is disabled would be unreachable
-       the same way. `Toggle.Group` picks its entry the same two ways. */
-    const entry = answer ? undefined : items.find((item) => !item.disabled)
+       the same way. `Toggle.Group` picks its entry the same two ways.
+
+       **And an answer that is disabled is no stop either**, its button taking
+       no focus, so the entry goes to the first choice that can be made, as a
+       native group tabs past a disabled checked radio to an enabled one. */
+    const entry = answer && !answer.disabled ? undefined : items.find((item) => !item.disabled)
     for (const item of items) {
       item.focusable = item === entry
     }
@@ -154,8 +202,9 @@ export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(Hel
 
   /** Reports the answer and the verdict on it. */
   private sync(): void {
-    this.internals.setFormValue(this.value === '' ? null : this.value)
-    this.reportRequired(this.value === '', 'Choose one to continue.', 'items')
+    const answered = this.answered
+    this.internals.setFormValue(answered ? this.value : null)
+    this.reportRequired(!answered, 'Choose one to continue.', 'items')
   }
 
   override connectedCallback(): void {
@@ -175,6 +224,7 @@ export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(Hel
     /* The string half, which is what a server can write. `linkHost` adds the
        element references on the client, and those win where a consumer slotted
        a label richer than a string. */
+    this.adopt()
     hostAria(this.internals, { label: this.label, role: 'radiogroup' })
     /* `required` reflects, sets validity and paints the asterisk the field
        sheet draws, and tells the accessibility tree nothing on its own. Without
@@ -196,7 +246,7 @@ export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(Hel
        label and the hint as well. */
     return html`${this.renderGroupLabel()}
       <div part="items">
-        <slot @slotchange=${() => this.place()}></slot>
+        <slot @slotchange=${() => this.requestUpdate()}></slot>
       </div>
       ${this.renderHint()}${this.renderFeedback()}`
   }

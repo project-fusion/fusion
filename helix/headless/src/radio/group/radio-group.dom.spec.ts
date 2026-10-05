@@ -300,3 +300,73 @@ describe("radio group in the page's words", () => {
     expect(host.internals.validationMessage).toBe('Choisissez-en un.')
   })
 })
+
+describe('a radio the markup declares selected', () => {
+  /* `<helix-tab selected>` and `<helix-toggle selected>` preselected and a radio
+     did not, though Radio documents `selected` as the declared default a reset
+     returns to. */
+  test('is the group’s answer, and where a reset returns', async () => {
+    document.body.innerHTML = `<helix-headless-radio-group label="Plan" name="plan">
+      <helix-headless-radio value="free">Free</helix-headless-radio>
+      <helix-headless-radio value="pro" selected>Pro</helix-headless-radio>
+    </helix-headless-radio-group>`
+    const host = document.body.firstElementChild as Updatable & {
+      formResetCallback(): void
+      value: string
+    }
+    await settle(host)
+    expect(host.value).toBe('pro')
+    expect(formValue(host)).toBe('pro')
+    host.value = 'free'
+    await settle(host)
+    host.formResetCallback()
+    await settle(host)
+    expect(host.value).toBe('pro')
+  })
+})
+
+describe('a chosen radio that is disabled', () => {
+  /* Its button takes no focus, and with the answer present no other radio held
+     the stop, so Tab skipped the whole group. */
+  test('leaves the stop on the first radio that can be chosen', async () => {
+    document.body.innerHTML = `<helix-headless-radio-group label="Plan" default-value="old">
+      <helix-headless-radio value="old" disabled>Old</helix-headless-radio>
+      <helix-headless-radio value="new">New</helix-headless-radio>
+    </helix-headless-radio-group>`
+    const host = document.body.firstElementChild as Updatable
+    await settle(host)
+    const stops = options(host).map((radio) => {
+      const button = radio.shadowRoot?.querySelector('button') as HTMLButtonElement
+      return button.disabled ? 'disabled' : button.getAttribute('tabindex')
+    })
+    expect(stops).toEqual(['disabled', '0'])
+  })
+})
+
+describe('a refusal on the group itself', () => {
+  /* The docblock says to listen for `helix-select` on the group, and the
+     group's own listener, added first, applied the choice before a consumer's
+     could refuse it. */
+  test('keeps the current choice', async () => {
+    const host = (await group('', 'one')) as Updatable & { value: string }
+    host.addEventListener('helix-select', (event) => event.preventDefault())
+    options(host)[2]?.click()
+    await settle(host)
+    await new Promise((resolve) => setTimeout(resolve))
+    expect(host.value).toBe('one')
+  })
+})
+
+describe('a chosen radio that is removed', () => {
+  /* The value and the form entry kept pointing at an option that no longer
+     existed, and `required` passed. */
+  test('is no longer submitted, and a required group is unanswered', async () => {
+    const host = (await group('required', 'two')) as Updatable & { validity: ValidityState }
+    options(host)[1]?.remove()
+    await settle(host)
+    await new Promise((resolve) => setTimeout(resolve))
+    await settle(host)
+    expect(formValue(host)).toBeNull()
+    expect(host.validity.valueMissing).toBe(true)
+  })
+})

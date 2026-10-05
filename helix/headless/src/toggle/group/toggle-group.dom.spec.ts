@@ -50,7 +50,10 @@ describe('toggle group', () => {
 
     const dark = items(group)[2] as unknown as HTMLElement & { select: () => void }
     dark.select()
-    await Promise.resolve()
+    /* A task rather than a microtask: the group reads the choice a microtask
+       after the dispatch, so a refusal on the group itself is read, and the
+       update follows that. */
+    await new Promise((resolve) => setTimeout(resolve))
 
     expect(seen).toBe('dark')
     expect(
@@ -248,3 +251,45 @@ describe('toggle group in a form', () => {
  * which in a forty pixel track holding a thirty pixel thumb is six above it and
  * four below.
  */
+
+describe('toggle group edges', () => {
+  /* `click()` on a radio chose it, and on a toggle did nothing, because only
+     the inner button answered. */
+  test('`click()` on an item chooses it', async () => {
+    const group = (await mount(markup)) as Updatable & { value: string }
+    items(group)[2]?.click()
+    await new Promise((resolve) => setTimeout(resolve))
+    expect(group.value).toBe('dark')
+  })
+
+  test('a disabled answer leaves the stop on the first item that can be chosen', async () => {
+    const group = await mount(`<helix-headless-toggle-group label="Mode" default-value="x">
+      <helix-headless-toggle value="x" disabled>X</helix-headless-toggle>
+      <helix-headless-toggle value="y">Y</helix-headless-toggle>
+    </helix-headless-toggle-group>`)
+    await (group as Updatable).updateComplete
+    const stops = items(group).map((item) => {
+      const button = item.shadowRoot?.querySelector('button') as HTMLButtonElement
+      return button.disabled ? 'disabled' : button.getAttribute('tabindex')
+    })
+    expect(stops).toEqual(['disabled', '0'])
+  })
+
+  test('a refusal on the group itself keeps the current choice', async () => {
+    const group = (await mount(markup)) as Updatable & { value: string }
+    group.addEventListener('helix-select', (event) => event.preventDefault())
+    ;(items(group)[2] as unknown as { select: () => void }).select()
+    await new Promise((resolve) => setTimeout(resolve))
+    expect(group.value).toBe('light')
+  })
+
+  test('a removed answer is no longer submitted', async () => {
+    const group = (await mount(
+      markup.replace('default-value="light"', 'default-value="light" name="mode"'),
+    )) as Updatable
+    items(group)[1]?.remove()
+    await new Promise((resolve) => setTimeout(resolve))
+    await group.updateComplete
+    expect(formValue(group)).toBeNull()
+  })
+})
