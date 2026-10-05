@@ -208,9 +208,15 @@
  */
 /*
  *  The half of the heading the brand paints.
+ *
+ * **In the brand's quiet tone, which ink has too.** With no brand set, `primary`
+ * is the ink itself, and beside a heading already in the foreground it was the
+ * same color: near-white on white in dark mode, and near-black on black in
+ * light. `primary-muted` is a quieter tone of the brand where there is one, and
+ * the muted gray where there is none, so the two halves stay two tones.
  */
 .tDisplayAccent {
-  color: var(--helix-color-primary);
+  color: var(--helix-color-primary-muted);
   /* **Its own line, so the color break and the line break are the same break.**
      `text-wrap: balance` on the heading optimises for even line lengths and
      knows nothing about the two tones: it stranded "and" at the end of the first
