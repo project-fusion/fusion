@@ -192,7 +192,31 @@
   border: var(--drawer-border-width, var(--helix-border-floating)) solid
     var(--drawer-border-color, var(--helix-color-border));
   box-shadow: var(--drawer-shadow, var(--helix-shadow-floating));
-  transform: translate(0, 0);
+  /* Home, less however far a swipe or a snap point has moved it toward its
+     edge. Both are unset at rest, which is `translate(0, 0)`. */
+  transform: translate(var(--drawer-swipe-x, 0), var(--drawer-swipe-y, 0));
+}
+
+/* **The page's own panning stays off the swipe's axis.** A touch the browser
+   reads as a pan is taken from the page and the swipe is canceled, so a panel
+   that slides across leaves only the vertical pan to the browser, and one that
+   slides up or down only the horizontal. The content region is a scroller and
+   decides for itself, so it keeps its vertical scrolling and gives up only the
+   horizontal pan, which it has no use for. */
+[part="panel"],
+[part="content"] {
+  touch-action: pan-y;
+}
+
+:host([placement="bottom"]) [part="panel"],
+:host([placement="top"]) [part="panel"] {
+  touch-action: pan-x;
+}
+
+/* Under the finger while it moves, and back to the slide once it lets go. */
+[part="panel"][data-swiping] {
+  transition: none;
+  user-select: none;
 }
 
 /* A panel coming out of `display: none` has no earlier style to slide from,
@@ -228,6 +252,21 @@
   line-height: var(--helix-leading-tight);
   margin: var(--helix-space-none);
   margin-block-end: var(--helix-space-md);
+}
+
+/* The actions under the content, pinned like the header. No rule draws a box
+   here either, so a drawer with no footer has none. */
+[part="footer"] {
+  flex: 0 0 auto;
+}
+
+/* A step clear of the content above, from the slotted element itself, for the
+   reason the title takes its step from its own margin. */
+::slotted([slot="footer"]) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helix-space-xs);
+  margin-block-start: var(--helix-space-md);
 }
 
 [part="content"] {

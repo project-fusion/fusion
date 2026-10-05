@@ -1,0 +1,46 @@
+export function Example() {
+  return (
+    <>
+      <helix-button
+        command="--show"
+        commandfor="sheet"
+        emphasis="solid"
+        tone="primary"
+      >
+        Open filters
+      </helix-button>
+
+      <helix-drawer
+        id="sheet"
+        label="Filters"
+        placement="bottom"
+        snap-points="0.5 1"
+      >
+        <span slot="header">Filters</span>
+        <helix-text variant="body">
+          Show projects by owner, status, and the date they last changed.
+        </helix-text>
+        <helix-button-group
+          label="Filter actions"
+          slot="footer"
+          variant="spaced"
+        >
+          <helix-button
+            command="--close"
+            commandfor="sheet"
+          >
+            Clear
+          </helix-button>
+          <helix-button
+            command="--close"
+            commandfor="sheet"
+            emphasis="solid"
+            tone="primary"
+          >
+            Apply
+          </helix-button>
+        </helix-button-group>
+      </helix-drawer>
+    </>
+  )
+}
