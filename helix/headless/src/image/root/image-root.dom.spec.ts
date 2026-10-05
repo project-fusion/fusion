@@ -75,6 +75,18 @@ describe('an image', () => {
     expect(img(host).getAttribute('alt')).toBe('')
   })
 
+  /* `alt` defaulted to empty and was always written, so a forgotten one made
+     the picture silently decorative, the opposite of what its docs say. Left
+     off, a reader announces the file name and a checker reports it, as with a
+     native image. */
+  test('leaves the alt off where the host has none', async () => {
+    const host = (await mount(
+      '<helix-headless-image src="/pier.jpg"></helix-headless-image>',
+    )) as Picture
+    await host.updateComplete
+    expect(img(host).hasAttribute('alt')).toBe(false)
+  })
+
   test('waits until it is nearly needed, unless told otherwise', async () => {
     expect(img(await image('src="/pier.jpg"')).getAttribute('loading')).toBe('lazy')
     expect(img(await image('src="/pier.jpg" loading="eager"')).getAttribute('loading')).toBe(
@@ -128,6 +140,42 @@ describe('an image', () => {
       await host.updateComplete
       expect(host.status).toBe('loaded')
       expect(heard).toEqual(['load'])
+    } finally {
+      host.remove()
+      for (const [name, descriptor] of own) {
+        if (descriptor) {
+          Object.defineProperty(proto, name, descriptor)
+        } else {
+          delete (proto as unknown as Record<string, unknown>)[name]
+        }
+      }
+    }
+  })
+
+  /* The cached picture's own `load` is still queued when `settle` answers for
+     it, and a browser delivers it a task later: relayed as well, a page heard
+     the picture arrive twice. */
+  test('and not again when the platform sends its own `load` for it', async () => {
+    const proto = HTMLImageElement.prototype
+    const own = ['complete', 'naturalWidth'].map(
+      (name) => [name, Object.getOwnPropertyDescriptor(proto, name)] as const,
+    )
+    Object.defineProperty(proto, 'complete', { configurable: true, get: () => true })
+    Object.defineProperty(proto, 'naturalWidth', { configurable: true, get: () => 40 })
+    const host = document.createElement('helix-headless-image') as Picture
+    try {
+      host.setAttribute('alt', 'A pier')
+      host.setAttribute('src', '/pier.jpg')
+      const heard: string[] = []
+      host.addEventListener('load', () => heard.push('load'))
+      document.body.append(host)
+      await host.updateComplete
+      img(host).dispatchEvent(new Event('load'))
+      expect(heard).toEqual(['load'])
+      /* A later load of the same element, a new candidate from `srcset`, is
+         still heard. */
+      img(host).dispatchEvent(new Event('load'))
+      expect(heard).toEqual(['load', 'load'])
     } finally {
       host.remove()
       for (const [name, descriptor] of own) {

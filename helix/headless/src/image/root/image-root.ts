@@ -36,10 +36,12 @@ export class HelixHeadlessImage extends HelixElement {
    * A text description of the image, read by screen readers.
    *
    * Empty is a real answer and means decoration. Omitting the attribute is not
-   * the same thing: a reader with nothing to read announces the file name.
+   * the same thing: the inner image is then written with no `alt` either, as a
+   * native one would be, so a screen reader announces the file name and an
+   * accessibility checker reports the missing description.
    */
   @property()
-  alt = ''
+  alt?: string
 
   /**
    * How the image is fetched across origins. It decides whether a canvas can
@@ -144,6 +146,12 @@ export class HelixHeadlessImage extends HelixElement {
   private reported = false
 
   /**
+   * The event `settle` sent for a picture that finished before anything
+   * listened, so the platform's own, still on its way, is not sent again.
+   */
+  private synthesized: 'error' | 'load' | undefined = undefined
+
+  /**
    * Says so under the platform's own name, because the platform's cannot escape.
    *
    * `load` and `error` on an `<img>` neither bubble nor compose, so the ones
@@ -169,10 +177,18 @@ export class HelixHeadlessImage extends HelixElement {
     this.reported = true
     const name = status === 'loaded' ? 'load' : 'error'
     if (event) {
+      /* The platform's own event for a picture `settle` already answered for.
+         A cached picture is complete before anything listens, and its `load`
+         is still queued: relayed as well, a page heard it twice. */
+      if (this.synthesized === name) {
+        this.synthesized = undefined
+        return
+      }
       this.status = status
       this.relayNativeEvent(event)
       return
     }
+    this.synthesized = name
     /* No original to relay: `settle` catches a picture that was already
        complete when the listener attached, which is the cached case, and the
        platform fired its `load` before anyone was listening. The synthesized
@@ -249,6 +265,7 @@ export class HelixHeadlessImage extends HelixElement {
     if (changed.has('src') && this.answered !== this.src) {
       this.answered = this.src
       this.reported = false
+      this.synthesized = undefined
       this.status = 'loading'
     }
   }
@@ -315,7 +332,7 @@ export class HelixHeadlessImage extends HelixElement {
   protected override render(): TemplateResult {
     return html`<img
         part="image"
-        alt=${this.alt}
+        alt=${this.alt ?? nothing}
         loading=${this.loading ?? 'lazy'}
         decoding=${this.decoding}
         crossorigin=${this.crossOrigin ?? nothing}
