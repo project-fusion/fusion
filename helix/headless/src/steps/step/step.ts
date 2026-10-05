@@ -1,6 +1,13 @@
-import { customElement, HelixElement, HelixSelectEvent, hostAria } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  drawStatus,
+  HelixElement,
+  HelixSelectEvent,
+  hostAria,
+  StatusController,
+} from '@fusion.dev/helix-core'
 import { check, circle, record } from '@fusion.dev/helix-icons'
-import type { PropertyValues, TemplateResult } from 'lit'
+import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html } from 'lit/static-html.js'
@@ -28,6 +35,11 @@ import '../../button/index.js'
  * and `::after` from properties the list sets, so the step renders no extra
  * element for them.
  *
+ * A finished stage says so in words: the name's button is described by
+ * `complete-label`, "Complete" unless you translate it, and a stage that
+ * becomes complete while the page is open says it once in a polite live
+ * region. The current stage's button carries `aria-current="step"`.
+ *
  * @since 0.1.0
  * @status stable
  * @aliases Stage
@@ -43,12 +55,14 @@ import '../../button/index.js'
  * @csspart body - The name and its description.
  * @csspart content - What the stage holds, while it is open.
  * @csspart description - The line under the name.
+ * @csspart live - The live region that says a stage was completed, rendered from the first time one is.
  * @csspart label - The step's name, which is a control.
  * @csspart label-button - The button inside the label.
  * @csspart label-live - The live region inside that button, rendered only from the first time the button is pending.
  * @csspart label-text - The words on that button, trimmed to their capitals and baseline.
  * @csspart mark - The glyph inside the marker: a tick, a dot, or an empty ring.
  * @csspart marker - The shape carrying the number or the check.
+ * @csspart state - The words that describe a finished stage's button. Hidden.
  */
 @customElement('helix-headless-step')
 export class HelixHeadlessStep extends HelixElement {
@@ -57,6 +71,13 @@ export class HelixHeadlessStep extends HelixElement {
    */
   @property({ reflect: true, type: Boolean })
   complete = false
+
+  /**
+   * The words that tell a screen reader the stage is finished. Translate it
+   * with the page.
+   */
+  @property({ attribute: 'complete-label' })
+  completeLabel = 'Complete'
 
   /**
    * Whether this is the current stage.
@@ -71,14 +92,35 @@ export class HelixHeadlessStep extends HelixElement {
   disabled = false
 
   /**
+   * @internal Set by a linear sequence: whether the stage is out of reach
+   * until the ones before it are finished. A property, because the sequence
+   * writes it after the step upgrades.
+   */
+  @property({ attribute: false })
+  locked = false
+
+  /**
+   * Whether a reader may pass the stage without finishing it, in a sequence
+   * with `linear`. Ark UI's skippable step.
+   */
+  @property({ reflect: true, type: Boolean })
+  optional = false
+
+  /**
    * The value the step sends in `helix-select`.
    */
   @property()
   value = ''
 
-  /** Fires `helix-select` for the step, unless the step is `disabled`. */
+  /** Says a stage was finished, from the first time one is. */
+  private readonly status = new StatusController(this)
+
+  /**
+   * Fires `helix-select` for the step, unless the step is `disabled` or a
+   * linear sequence has it out of reach.
+   */
   select(): void {
-    if (this.disabled) {
+    if (this.disabled || this.locked) {
       return
     }
     this.dispatchEvent(new HelixSelectEvent({ value: this.value }))
@@ -121,6 +163,20 @@ export class HelixHeadlessStep extends HelixElement {
   }
 
   /**
+   * Says a stage that was finished while the page is open, with its name.
+   *
+   * Only a change after the first update, so a sequence served with its done
+   * stages says nothing when it arrives.
+   */
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    if (changed.get('complete') === false && this.complete) {
+      const name = (this.textContent ?? '').replace(/\s+/g, ' ').trim()
+      this.status.say(name === '' ? this.completeLabel : `${name}, ${this.completeLabel}`)
+    }
+  }
+
+  /**
    * The step's own label, which is a control because a step can be gone to, behind a seam the styled tier can move.
    *
    * A method rather than a fragment inline, so a tier above can render its own,
@@ -134,11 +190,13 @@ export class HelixHeadlessStep extends HelixElement {
       part="label"
       exportparts="button: label-button, live: label-live, text: label-text"
       emphasis="ghost"
-      ?disabled=${this.disabled}
+      aria-current=${this.current ? 'step' : nothing}
+      aria-describedby=${this.complete ? 'state' : nothing}
+      ?disabled=${this.disabled || this.locked}
       @click=${this.select}
     >
       <slot></slot>
-    </${this.tag('button')}>`
+    </${this.tag('button')}><span id="state" part="state" hidden>${this.complete ? this.completeLabel : ''}</span>`
   }
 
   protected override render(): TemplateResult {
@@ -162,7 +220,7 @@ export class HelixHeadlessStep extends HelixElement {
         ${this.renderLabel()}
         <span part="description"><slot name="description"></slot></span>
       </span>
-      <div part="content"><slot name="content"></slot></div>`
+      <div part="content"><slot name="content"></slot></div>${drawStatus(this.status)}`
   }
 }
 

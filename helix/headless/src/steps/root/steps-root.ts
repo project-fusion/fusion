@@ -7,6 +7,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { canReach } from '../reach.js'
 import type { HelixHeadlessStep } from '../step/step.js'
 
 /**
@@ -20,6 +21,13 @@ import type { HelixHeadlessStep } from '../step/step.js'
  * `active` is optional. Without it, each step keeps its own `current`, so the
  * sequence is correct in the server's markup, where the root cannot count its
  * slotted children.
+ *
+ * `linear` keeps a reader from passing a stage they have not finished, as Ark
+ * UI's linear steps do: a stage ahead is out of reach, and its button disabled,
+ * until every stage before it is `complete` or `optional`. Going back is always
+ * allowed. To check a stage before a reader leaves it, cancel
+ * `helix-before-activate` while it is not valid. `next()` and `previous()` move
+ * one stage either way, under the same rules, for your own buttons.
  *
  * @since 0.1.0
  * @status stable
@@ -43,6 +51,13 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
    */
   @property()
   label = 'Steps'
+
+  /**
+   * Whether a reader has to finish each stage, or pass an `optional` one,
+   * before going on to the next.
+   */
+  @property({ reflect: true, type: Boolean })
+  linear = false
 
   /**
    * Which way the steps run.
@@ -81,6 +96,58 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
       (one) => 'current' in one,
     )
   }
+
+  /** The index of the stage the reader is on, or `-1`. */
+  private get at(): number {
+    return this.steps.findIndex((step) => step.current)
+  }
+
+  /**
+   * Moves to the next stage that can be gone to, as Ark UI's `goToNextStep`
+   * does. Returns whether it moved: not past the last stage, not into a stage
+   * `linear` holds out of reach, and not where a listener refused.
+   */
+  next(): boolean {
+    return this.step(1)
+  }
+
+  /** Moves to the stage before, as Ark UI's `goToPrevStep` does. Returns whether it moved. */
+  previous(): boolean {
+    return this.step(-1)
+  }
+
+  /** Moves `delta` stages, skipping disabled ones. */
+  private step(delta: number): boolean {
+    const steps = this.steps
+    let index = this.at + delta
+    while (steps[index]?.disabled) {
+      index += delta
+    }
+    const target = steps[index]
+    if (!target || !this.reachable(index)) {
+      return false
+    }
+    return this.requestActive(target.value)
+  }
+
+  /** Whether the stage at `index` can be gone to from where the reader is. */
+  private reachable(index: number): boolean {
+    return !this.linear || canReach(this.steps, this.at, index)
+  }
+
+  /** Marks the stages a linear sequence holds out of reach. Client only. */
+  private lock(): void {
+    const steps = this.steps
+    steps.forEach((step, index) => {
+      const locked = !this.reachable(index)
+      whenHydrated(step, () => {
+        step.locked = locked
+      })
+    })
+  }
+
+  /** Watches what decides a stage's reach: which is current, which are done. */
+  private watcher: MutationObserver | undefined
 
   /**
    * Puts `active` on whichever step owns it.
@@ -123,21 +190,36 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
     if (event.defaultPrevented || !this.steps.includes(event.target as HelixHeadlessStep)) {
       return
     }
+    if (!this.reachable(this.steps.indexOf(event.target as HelixHeadlessStep))) {
+      return
+    }
     this.requestActive((event as CustomEvent<{ value: string }>).detail.value)
   }
 
   private readonly handleSlotChange = (): void => {
     this.sync()
+    this.lock()
   }
 
   override connectedCallback(): void {
     super.connectedCallback()
     this.addEventListener('helix-select', this.handleSelection)
+    /* A stage a script finishes, or one the reader arrives at, moves what a
+       linear sequence can reach. Both are reflected, so their attributes say
+       when they change. */
+    this.watcher = new MutationObserver(() => this.lock())
+    this.watcher.observe(this, {
+      attributeFilter: ['complete', 'current', 'optional'],
+      attributes: true,
+      subtree: true,
+    })
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('helix-select', this.handleSelection)
+    this.watcher?.disconnect()
+    this.watcher = undefined
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -149,6 +231,9 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
     super.updated(changed)
     if (changed.has('active')) {
       this.sync()
+    }
+    if (changed.has('linear') || changed.has('active')) {
+      this.lock()
     }
   }
 
