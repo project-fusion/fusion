@@ -84,6 +84,32 @@ table should not be seen, hide it visually, and the data is still there:
 The table's caption becomes the chart's accessible name unless you set `label`.
 The caption usually has the right words already.
 
+Each chart writes a short summary for screen readers, which starts with that
+name. The drawing is hidden from screen readers, and the summary gives the one
+reading a chart is usually read for:
+
+- `Bar Chart`: each series' highest reading.
+- `Line Chart`: each series' latest reading.
+- `Area Chart`: the latest total and each part's share of it.
+- `Donut Chart`: each slice's share of the whole.
+- `Scatter Chart`: each series' number of points and how strongly the two
+  measures relate.
+
+`Heatmap` is an image with that name. `Sparkline` takes a `label` of its own.
+
+## Tables that change
+
+A chart follows its table. It redraws when you edit a cell, add a row, or
+replace the table with a new one under the same id. It also draws a table that
+arrives after the chart does, such as one a framework renders once its data
+loads.
+
+A blank cell, or one that does not hold a number, is a gap in its series. The
+row keeps its place on the axis, a line breaks at the gap, a bar chart draws no
+bar there, and a heatmap draws the cell with no tone. The readings after the gap
+stay under their own labels, and the tooltip for that row still shows the
+row's cells.
+
 ## Series colors
 
 Helix has twenty-four series color tokens, in order, from
