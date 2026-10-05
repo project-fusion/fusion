@@ -98,9 +98,15 @@ export interface DonutShare {
  * **Negative values are skipped.** An arc cannot show a negative number, so
  * those rows are left out and the total is the sum of the remaining rows.
  *
- * The ring is `aria-hidden`. The `summary` part names the chart, from `label`
- * or the table's caption, and gives each slice's share, and the table beside
- * the chart has every amount.
+ * The ring is hidden from screen readers. The `summary` part names the chart,
+ * from `label` or the table's caption, and gives each slice's share, and the
+ * table beside the chart has every amount.
+ *
+ * **The ring is read by key.** The plot takes focus, named by `label` or the
+ * caption. Every arrow moves from slice to slice, the right and down arrows to
+ * the next, and Home and End go to the first and the last. The tooltip
+ * follows, the `live` part says the slice in words, and Escape puts the
+ * tooltip away.
  *
  * @since 0.1.0
  * @status stable
@@ -111,8 +117,9 @@ export interface DonutShare {
  * @slot - Content in the middle of the ring, usually a total. It is read by screen readers, while the ring itself is hidden from them.
  *
  * @csspart center - The middle of the ring, holding whatever is slotted.
+ * @csspart live - The readout: a polite live region that says the slice the keys moved to. Hide it visually.
  * @csspart mark - The invisible point the tooltip is anchored to.
- * @csspart plot - The drawing.
+ * @csspart plot - The drawing, which takes focus to be read by key.
  * @csspart segment - One slice.
  * @csspart segment-active - The slice under the pointer. Set alongside `segment`.
  * @csspart segment-edge - One slice as a closed shape, used to draw its outline.
@@ -126,6 +133,7 @@ export interface DonutShare {
  * @csspart tooltip-arrow-top - The point while the bubble is above the reading, on its bottom edge. Set alongside `tooltip-arrow`.
  * @csspart tooltip-bottom - The bubble while it is below the reading. Set alongside `tooltip`.
  * @csspart tooltip-cell - One column's name and value inside the tooltip.
+ * @csspart tooltip-cell-current - The cell the series keys rest on, in the charts whose readings hold several series. A ring draws one, so it is never set here.
  * @csspart tooltip-label - The slice's own name inside the tooltip.
  * @csspart tooltip-left - The bubble while it is left of the reading. Set alongside `tooltip`.
  * @csspart tooltip-name - A column's name inside the tooltip.
@@ -267,6 +275,25 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
     })
   }
 
+  /**
+   * The palette slot for a cell, which a ring gives its first plotted column
+   * alone: it draws that column and no other, so a second numeric column is
+   * no series the keys could move to.
+   */
+  override seriesOf(cell: number): number | undefined {
+    return cell === this.plottedColumns[0] ? seriesIndex(0) : undefined
+  }
+
+  /**
+   * The number of slices, which the keys walk.
+   *
+   * The mixin counts the table's rows, and a row with no amount draws no
+   * slice, so a key stepping by rows would land on a slice that is not there.
+   */
+  override get readings(): number {
+    return this.shares.length
+  }
+
   protected override render(): TemplateResult {
     const shares = this.shares
     /* No middle where there is no hole. A `center` part over a pie would put
@@ -291,7 +318,7 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
       (share) => `${rows[share.row]?.label ?? ''} ${percentIn(this.locale).format(share.fraction)}`,
     )
     const named = this.named ? `${this.named}: ` : ''
-    return html`<p part="summary">${named}${parts.join(', ')}.</p>`
+    return html`<p id="helix-chart-summary" part="summary">${named}${parts.join(', ')}.</p>`
   }
 
   /**
@@ -309,9 +336,14 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
        only ever read the fallback, sizing the hole as if every ring were the
        resting thickness. */
     return html`<div
+      aria-describedby=${this.named ? `helix-chart-summary${this.hole === 'none' ? '' : ' helix-chart-center'}` : nothing}
+      aria-label=${this.named || nothing}
+      aria-labelledby=${this.named ? nothing : 'helix-chart-summary'}
       id=${CHART_PLOT}
       part="plot"
+      role="application"
       style="--donut-chart-stroke: ${this.thickness}"
+      tabindex="0"
     >
       <svg
         aria-hidden="true"
@@ -330,7 +362,7 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
         />
         ${shares.map((share, index) => this.renderSegment(share, index))}
       </svg>
-      ${this.hole === 'none' ? nothing : html`<div part="center"><slot></slot></div>`}
+      ${this.hole === 'none' ? nothing : html`<div id="helix-chart-center" part="center"><slot></slot></div>`}
       ${this.renderTooltip()}
     </div>`
   }
@@ -484,7 +516,14 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
     const at = this.pointer.at
     const share = this.shares[at]
     if (!share) {
-      return drawTooltip(this.sourceRows, at, this.tag('tooltip'))
+      return drawTooltip(
+        this.sourceRows,
+        -1,
+        this.tag('tooltip'),
+        undefined,
+        undefined,
+        this.pointer,
+      )
     }
     /* **Outside the ring, on the slice's own bearing**, rather than centered in
        the hole: centered covers the data on a pie, and in neither shape does it
@@ -536,6 +575,7 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
          counted by column every slice's bubble came out series one, the first
          slice's own, beside a ring painting the third slice something else. */
       () => seriesIndex(at),
+      this.pointer,
     )
   }
 }

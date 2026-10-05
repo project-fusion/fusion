@@ -98,7 +98,7 @@
    The scale's smallest step is 4px, a third of a 12px cell, and a third is a
    dot: ninety of them read as beads on a string. Halved they read as cells, and
    the value still comes off the seed. */
-[part="cell"] {
+[part~="cell"] {
   background-color: var(--heatmap-tone, var(--helix-color-surface-sunken));
   border-radius: var(--heatmap-cell-radius, calc(var(--helix-radii-sm) * 0.5));
   inline-size: var(--_heatmap-cell-width);
@@ -143,7 +143,7 @@
 
 /* Name and value on one line, the value pushed to the end so a column of them
    lines up whatever the names are. */
-[part="tooltip-cell"] {
+[part~="tooltip-cell"] {
   align-items: baseline;
   display: flex;
   gap: var(--helix-space-sm);
@@ -167,14 +167,49 @@
  *    one token of offset keeps the ring clear of both neighbors inside the gap.
  */
 @media (hover: hover) {
-  [part="cell"]:hover {
+  [part~="cell"]:hover {
     outline: var(--helix-border-thin) solid var(--helix-color-foreground);
     outline-offset: var(--helix-border-thin);
   }
 
-  [part="strip"]:not([data-spaced]) [part="cell"]:hover {
+  [part="strip"]:not([data-spaced]) [part~="cell"]:hover {
     outline-offset: calc(var(--helix-border-thin) * -1);
   }
+}
+
+/* The same ring on the cell the keys rest on, which a reader moving by key has
+   no pointer to show them. */
+[part~="cell-active"] {
+  outline: var(--helix-border-thin) solid var(--helix-color-foreground);
+  outline-offset: var(--helix-border-thin);
+}
+
+[part="strip"]:not([data-spaced]) [part~="cell-active"] {
+  outline-offset: calc(var(--helix-border-thin) * -1);
+}
+
+/* The strip takes focus once it has cells to read, so it draws the ring:
+   outside, the default situation. */
+[part="strip"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* The current cell's line in the bubble, while the keys rest on one. */
+[part~="tooltip-cell-current"] {
+  font-weight: var(--helix-weight-medium);
+}
+
+/* The readout is for screen readers, and the bubble is what a sighted reader
+   reads. */
+[part="live"] {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  margin: var(--helix-space-none);
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
 }
 
 /* The footer is `meter`'s three-slot arrangement: start, summary, end. The
@@ -227,7 +262,7 @@
    `@media print` does not cross a shadow boundary, so every family says it for
    itself. */
 @media print {
-  [part="cell"] {
+  [part~="cell"] {
     outline: var(--helix-border-thin) solid var(--helix-color-border);
     outline-offset: calc(var(--helix-border-thin) * -1);
   }

@@ -111,10 +111,18 @@ describe('bar chart', () => {
 
   test('the drawing is hidden and the table is the readable version', async () => {
     /* A screen reader hearing both hears the same numbers twice, once as data
-       and once as a description of a picture of the data. */
+       and once as a description of a picture of the data. The plot around the
+       drawing takes focus instead, named by the caption, so it can be read by
+       key. */
     const host = await chart(REVENUE, 'for="revenue"')
-    expect(part(host, 'plot')?.getAttribute('aria-hidden')).toBe('true')
+    const plot = part(host, 'plot')
+    expect(plot?.querySelector('svg')?.getAttribute('aria-hidden')).toBe('true')
     expect(part(host, 'labels')?.getAttribute('aria-hidden')).toBe('true')
+    expect([
+      plot?.getAttribute('role'),
+      plot?.getAttribute('tabindex'),
+      plot?.getAttribute('aria-label'),
+    ]).toEqual(['application', '0', 'Revenue by quarter'])
   })
 
   test('naming nothing draws an empty plot rather than throwing', async () => {
@@ -257,5 +265,26 @@ describe('the summary', () => {
   test('and from `label` where one is set, in words the page can change', async () => {
     const host = await chart(REVENUE, 'for="revenue" label="Sales" highest-label="Höchster"')
     expect(part(host, 'summary')?.textContent?.trim()).toBe('Sales. Höchster: Revenue Q3 $200k.')
+  })
+})
+
+/* The plot is read by key: it takes focus, the arrows move the reading the
+   tooltip shows, and the readout says it in words. No peer charting library
+   ships this, so it is asserted per chart rather than assumed from the
+   controller. */
+describe('reading by key', () => {
+  const press = (host: HTMLElement, key: string): void => {
+    part(host, 'plot')?.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key }),
+    )
+  }
+
+  test('the arrows move the reading, and the readout says it', async () => {
+    const host = await chart(REVENUE, 'for="revenue"')
+    expect(part(host, 'live')?.textContent).toBe('')
+    press(host, 'ArrowRight')
+    await (host as HTMLElement & { updateComplete: Promise<boolean> }).updateComplete
+    expect(part(host, 'live')?.textContent).toBe('Q1: Revenue $100k')
+    expect(part(host, 'tooltip-label')?.textContent).toBe('Q1')
   })
 })

@@ -55,7 +55,7 @@ const strip = async (attributes: string, readings: Array<[string, number, string
 }
 
 const cells = (element: HTMLElement) => [
-  ...(element.shadowRoot?.querySelectorAll('[part="cell"]') ?? []),
+  ...(element.shadowRoot?.querySelectorAll('[part~="cell"]') ?? []),
 ]
 
 describe('the footer', () => {
@@ -106,9 +106,12 @@ describe('the data comes from the table', () => {
    * On the strip, because on the host the footer's slots were inside an
    * image, whose children are presentational.
    */
-  test('the strip is a named picture, since the table beside it is the reading', async () => {
+  /* A strip with cells is read by key, so it takes focus as an application, the
+     role every chart's plot takes; an empty one is still a picture. */
+  test('the strip is named, and is read by key once it has cells', async () => {
     const element = await strip('label="Uptime"', [['Mon', 1]])
-    expect(part(element, 'strip')?.getAttribute('role')).toBe('img')
+    expect(part(element, 'strip')?.getAttribute('role')).toBe('application')
+    expect(part(element, 'strip')?.getAttribute('tabindex')).toBe('0')
     expect(part(element, 'strip')?.getAttribute('aria-label')).toBe('Uptime')
     expect(role(element)).toBeNull()
   })
@@ -371,5 +374,37 @@ describe('a touch', () => {
     )
     await element.updateComplete
     expect(element.shadowRoot?.querySelector('[part="tooltip-label"]')).toBeNull()
+  })
+})
+
+describe('reading by key', () => {
+  const press = (element: HTMLElement, key: string): void => {
+    part(element, 'strip')?.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key }),
+    )
+  }
+
+  test('the arrows move a cell, the readout says its row, and the cell is marked', async () => {
+    const element = await strip('', [
+      ['Mon', 1],
+      ['Tue', 2],
+    ])
+    press(element, 'End')
+    await element.updateComplete
+    expect(part(element, 'live')?.textContent).toBe('Tue: 2')
+    expect(cells(element).map((one) => one.getAttribute('part'))).toEqual([
+      'cell',
+      'cell cell-active',
+    ])
+  })
+
+  /* `rows="7"` stands a week to a column, so the across arrows move a week. */
+  test('a column at a time across, in a calendar', async () => {
+    const days = Array.from({ length: 14 }, (_, day) => [`Day ${day + 1}`, day] as [string, number])
+    const element = await strip('rows="7"', days)
+    press(element, 'Home')
+    press(element, 'ArrowRight')
+    await element.updateComplete
+    expect(part(element, 'live')?.textContent).toBe('Day 8: 7')
   })
 })

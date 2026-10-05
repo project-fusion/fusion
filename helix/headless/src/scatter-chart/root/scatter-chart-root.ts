@@ -109,7 +109,14 @@ const correlation = (pairs: Array<[number, number]>): number | undefined => {
  * round numbers, and the range extends to them.
  *
  * The summary gives each series' correlation coefficient and its number of
- * points. The table has every number, and the drawing is `aria-hidden`.
+ * points. The table has every number, and the drawing is hidden from screen
+ * readers.
+ *
+ * **The plot is read by key.** It takes focus, named by `label` or the caption.
+ * The left and right arrows move from row to row in the table's order, Home
+ * and End go to the first and the last, and the up and down arrows move among
+ * the series of a row. The tooltip sits on that point, the `live` part says the
+ * row in words, and Escape puts the tooltip away.
  *
  * Each point is a `<span>` placed by percentage over the drawing, as
  * `LineChart` places its end points, so points stay round when the drawing
@@ -128,9 +135,10 @@ const correlation = (pairs: Array<[number, number]>): number | undefined => {
  * @documentation https://fusion.dev/helix/components/scatter-chart
  *
  * @csspart gridline - One line across the plot, drawn when `gridlines` is set.
+ * @csspart live - The readout: a polite live region that says the row the keys moved to. Hide it visually.
  * @csspart mark - The invisible point the tooltip is anchored to.
  * @csspart plane - The grid that holds the plot, both axes, and their names. It runs left to right on every page.
- * @csspart plot - The drawing.
+ * @csspart plot - The drawing, which takes focus to be read by key.
  * @csspart point - One row, as a point.
  * @csspart point-active - A point in the row under the pointer. Set alongside `point`.
  * @csspart summary - The text that says how strongly the measures relate, for people who cannot see the points.
@@ -144,6 +152,7 @@ const correlation = (pairs: Array<[number, number]>): number | undefined => {
  * @csspart tooltip-arrow-top - The point while the bubble is above the reading, on its bottom edge. Set alongside `tooltip-arrow`.
  * @csspart tooltip-bottom - The bubble while it is below the reading. Set alongside `tooltip`.
  * @csspart tooltip-cell - One column's name and value inside the tooltip.
+ * @csspart tooltip-cell-current - The cell the up and down arrows rest on, while they rest there. Set alongside `tooltip-cell`.
  * @csspart tooltip-label - The row's own name inside the tooltip.
  * @csspart tooltip-left - The bubble while it is left of the reading. Set alongside `tooltip`.
  * @csspart tooltip-name - A column's name inside the tooltip.
@@ -316,8 +325,17 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
     up: (value: number) => number,
   ): TemplateResult {
     const at = this.pointer.at
-    return html`<div aria-hidden="true" id=${CHART_PLOT} part="plot">
+    return html`<div
+      aria-describedby=${this.named ? 'helix-chart-summary' : nothing}
+      aria-label=${this.named || nothing}
+      aria-labelledby=${this.named ? nothing : 'helix-chart-summary'}
+      id=${CHART_PLOT}
+      part="plot"
+      role="application"
+      tabindex="0"
+    >
       <svg part="svg"
+        aria-hidden="true"
         preserveAspectRatio="none"
         viewBox="0 0 ${PLOT_WIDTH} ${PLOT_HEIGHT}"
         xmlns="http://www.w3.org/2000/svg"
@@ -342,6 +360,7 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
       ${field.points.map((point) => {
         const index = seriesIndex(point.depth)
         return html`<span
+          aria-hidden="true"
           data-series=${index}
           ?data-active=${point.row === at}
           part="point${point.row === at ? ' point-active' : ''}"
@@ -368,15 +387,33 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
       return `${name} / ${field.xName}: ${pairs.length} ${this.pointsLabel}${strength}`
     })
     const named = this.named ? `${this.named}. ` : ''
-    return html`<p part="summary">${named}${clauses.join('; ')}.</p>`
+    return html`<p id="helix-chart-summary" part="summary">${named}${clauses.join('; ')}.</p>`
   }
 
-  /** The row a pointer is resting on, over the point it is nearest. */
+  /**
+   * The row a pointer is resting on, over the point it is nearest.
+   *
+   * A row reached by key has no nearest point, so the bubble sits on the
+   * point of the series the keys rest on, or on the row's first point.
+   */
   protected renderTooltip(): TemplateResult | typeof nothing {
     const at = this.pointer.at
-    const point = this.nearest
+    const column = this.pointer.column
+    const depth = column === undefined ? -1 : this.plottedColumns.indexOf(column) - 1
+    const point =
+      this.nearest?.row === at && !this.pointer.keyed
+        ? this.nearest
+        : (this.drawn.find((one) => one.row === at && one.depth === depth) ??
+          this.drawn.find((one) => one.row === at))
     if (at < 0 || !point) {
-      return drawTooltip(this.sourceRows, -1, this.tag('tooltip'))
+      return drawTooltip(
+        this.sourceRows,
+        -1,
+        this.tag('tooltip'),
+        undefined,
+        undefined,
+        this.pointer,
+      )
     }
     return drawTooltip(
       this.sourceRows,
@@ -392,6 +429,7 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
         y: `${point.y}%`,
       },
       (cell) => this.seriesOf(cell),
+      this.pointer,
     )
   }
 

@@ -41,6 +41,12 @@ import { fits, type Reading, toneOf } from './buckets.js'
  * your own stylesheet defines that property. The headless tier does not use
  * `var(--helix-color-*)`.
  *
+ * **The strip is read by key.** It takes focus once it has cells. The up and
+ * down arrows move a cell, the left and right arrows move a column, which is a
+ * week with `rows="7"`, and Home and End go to the first and the last. The
+ * tooltip follows, the `live` part says the cell's row in words, and Escape
+ * puts the tooltip away.
+ *
  * @since 0.1.0
  * @status stable
  * @category charts
@@ -54,12 +60,14 @@ import { fits, type Reading, toneOf } from './buckets.js'
  * @event {HelixResizeEvent} helix-resize - Fired when the number of cells drawn changes, with the new number.
  *
  * @csspart cell - One reading.
+ * @csspart cell-active - The cell the pointer or the keys rest on. Set alongside `cell`.
  * @csspart empty - Shown when the table has no readings. It stays hidden until the table can be read: on the server and during hydration, there is no document to resolve `for` in.
  * @csspart end - The trailing slot's box.
  * @csspart footer - The three-slot row under the strip.
+ * @csspart live - The readout: a polite live region that says the cell the keys moved to. Hide it visually.
  * @csspart mark - The invisible point the tooltip is anchored to.
  * @csspart start - The leading slot's box.
- * @csspart strip - The grid of cells. It is an image, named by the host's `aria-labelledby` or `aria-label`, then by `label`, then by the caption of the table.
+ * @csspart strip - The grid of cells, which takes focus to be read by key. It is named by the host's `aria-labelledby` or `aria-label`, then by `label`, then by the caption of the table.
  * @csspart summary - The middle slot's box.
  * @csspart tooltip - The bubble, forwarded from `Tooltip`.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
@@ -70,6 +78,7 @@ import { fits, type Reading, toneOf } from './buckets.js'
  * @csspart tooltip-arrow-top - The point while the bubble is above the reading, on its bottom edge. Set alongside `tooltip-arrow`.
  * @csspart tooltip-bottom - The bubble while it is below the reading. Set alongside `tooltip`.
  * @csspart tooltip-cell - One column's name and value inside the tooltip.
+ * @csspart tooltip-cell-current - The cell the series keys rest on, in the charts whose readings hold several series. A strip draws one, so it is never set here.
  * @csspart tooltip-label - The reading's own name inside the tooltip.
  * @csspart tooltip-left - The bubble while it is left of the reading. Set alongside `tooltip`.
  * @csspart tooltip-name - A column's name inside the tooltip.
@@ -217,13 +226,6 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
    */
   @state()
   private metrics: { cell: number; gap: number } | undefined = undefined
-
-  /**
-   * Which drawn cell the pointer is on, as an index into `drawn`, or -1 for
-   * none.
-   */
-  @state()
-  private hovered = -1
 
   /**
    * Carries a host `aria-labelledby` and `aria-describedby` to the strip, the
@@ -397,6 +399,26 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
     return all.slice(Math.max(0, all.length - this.room))
   }
 
+  /**
+   * The number of cells drawn, which the keys walk.
+   *
+   * The mixin counts the table's rows, and a strip too narrow for all of them
+   * draws the newest, so a key stepping by rows would walk off the drawing.
+   */
+  override get readings(): number {
+    return this.drawn.length
+  }
+
+  /**
+   * Tells the keys how many days stand in a column, so the up and down arrows
+   * move a day and the across pair a week. Here rather than in `updated`, for
+   * the reason `BarChart` gives: SSR calls this one.
+   */
+  protected override willUpdate(changed: PropertyValues<this>): void {
+    super.willUpdate(changed)
+    this.pointer.grid = this.rowCount
+  }
+
   override connectedCallback(): void {
     super.connectedCallback()
     /* Guarded because Lit SSR provides no `ResizeObserver`, and a component that
@@ -473,13 +495,20 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
        whose children are presentational. Named by `named`, so a table's
        caption names it as it names every other chart. An `aria-label` on the
        host still names it, as it did while the host was the image: the host is
-       now a generic, where the name reached nobody. */
+       now a generic, where the name reached nobody.
+
+       **A strip with cells takes focus and is an application**, the role every
+       chart's plot takes, because its cells are read by key: the arrows walk
+       the days, a column at a time across, and the readout says each one. An
+       empty strip has nothing to read and stays a picture. */
+    const readable = cells.length > 0
     return html`<div
         aria-label=${this.getAttribute?.('aria-label') || this.named || 'Heatmap'}
         part="strip"
         id=${CHART_PLOT}
-        role="img"
+        role=${readable ? 'application' : 'img'}
         style="--heatmap-rows: ${this.rowCount}"
+        tabindex=${readable ? '0' : nothing}
         @pointerover=${this.onPointerOver}
         @pointerleave=${this.onPointerLeave}
       >
@@ -496,10 +525,14 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
                    declines to use its own fallback because the property *is*
                    set. An untoned cell came out transparent rather than taking
                    the quiet ground the sheet has for it. */
+                const active = this.pointer.at === index
                 return tone === undefined
-                  ? html`<span part="cell" data-index=${index}></span>`
+                  ? html`<span
+                      part="cell${active ? ' cell-active' : ''}"
+                      data-index=${index}
+                    ></span>`
                   : html`<span
-                part="cell"
+                part="cell${active ? ' cell-active' : ''}"
                 data-index=${index}
                 data-tone=${tone}
                 style="--heatmap-tone: var(--heatmap-tone-${tone})"
@@ -539,9 +572,16 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
    * pitch is `cell + gap` and both are measured.
    */
   protected renderTooltip(): TemplateResult | typeof nothing {
-    const at = this.hovered
+    const at = this.pointer.at
     if (at < 0) {
-      return nothing
+      return drawTooltip(
+        this.sourceRows,
+        -1,
+        this.tag('tooltip'),
+        undefined,
+        undefined,
+        this.pointer,
+      )
     }
     /* `sourceRows` is indexed over every reading and the strip draws a tail of
        them, so the two agree only when nothing was dropped. Off by the length of
@@ -552,11 +592,18 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
     const gap = this.gapPx
     const column = Math.floor(at / this.rowCount)
     const row = at % this.rowCount
-    return drawTooltip(this.sourceRows, offset + at, this.tag('tooltip'), {
-      placement: 'top',
-      x: `${column * (cell + gap) + cell / 2}px`,
-      y: `${row * (cell + gap)}px`,
-    })
+    return drawTooltip(
+      this.sourceRows,
+      offset + at,
+      this.tag('tooltip'),
+      {
+        placement: 'top',
+        x: `${column * (cell + gap) + cell / 2}px`,
+        y: `${row * (cell + gap)}px`,
+      },
+      undefined,
+      this.pointer,
+    )
   }
 
   /**
@@ -572,13 +619,16 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
     if (!this.pointer.accepts(event)) {
       return
     }
-    const cell = (event.target as Element | null)?.closest?.('[part="cell"]')
+    const cell = (event.target as Element | null)?.closest?.('[part~="cell"]')
     const index = Number(cell?.getAttribute('data-index') ?? -1)
-    this.hovered = Number.isInteger(index) ? index : -1
+    this.pointer.set(Number.isInteger(index) ? index : -1)
   }
 
+  /* A cell the keys chose stays when the pointer leaves, as on every chart. */
   private readonly onPointerLeave = (): void => {
-    this.hovered = -1
+    if (!this.pointer.keyed) {
+      this.pointer.set(-1)
+    }
   }
 }
 
