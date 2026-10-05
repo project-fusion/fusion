@@ -41,7 +41,7 @@ export default function Home() {
 
   return (
     <ThemeScope>
-      <div className={`${styles.reel} ${styles.oneBrand} ${styles.fabClearance} ${styles.noRules}`}>
+      <div className={`${styles.reel} ${styles.fabClearance} ${styles.noRules}`}>
         {/* **The field, and nothing tempering it.** A scrim over this, a
           vertical gradient of the page background holding the aura back
           everywhere at once, answers a problem already solved elsewhere: every

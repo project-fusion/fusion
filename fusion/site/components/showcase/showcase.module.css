@@ -85,28 +85,12 @@
   }
 }
 
-/* The switch and the color share a line above the grid, and neither moves with
-   it. A control that jumps to a new position when you use it is one you have to
-   find again each time. */
+/* The switch has a line of its own above the grid, and does not move with it. A
+   control that jumps to a new position when you use it is one you have to find
+   again each time. */
 .showcaseSwitch {
   align-self: center;
   grid-area: switch;
-}
-
-/* The color and its reset share the brand cell, so the switch keeps its own
-   column and the pair stays together at the end of the row. */
-.showcaseBrand {
-  align-self: center;
-  grid-area: brand;
-}
-
-/*
- * *On the button, not on the tooltip that wraps it.**
- */
-.showcaseReset > helix-icon-button {
-  align-self: center;
-  grid-area: reset;
-  justify-self: start;
 }
 
 /*
@@ -115,16 +99,15 @@
  * Centering every row centers the views row too, and the views are taller than
  * the `1fr` they are given: a centered overflow spills in both directions, so
  * the first card of each view climbed over the switch and into the anchor. What
- * wanted centering was the switch beside the color, which can ask for itself.
+ * wanted centering was the switch, which can ask for itself.
  */
 .showcaseStage {
-  column-gap: var(--helix-space-md);
   display: grid;
   grid-template-areas:
-    "anchor anchor anchor"
-    "switch brand  reset"
-    "views  views  views";
-  grid-template-columns: minmax(0, 1fr) auto auto;
+    "anchor"
+    "switch"
+    "views";
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto auto minmax(0, 1fr);
   row-gap: var(--helix-space-lg);
 }
@@ -217,27 +200,9 @@
   inline-size: var(--helix-size-checkbox);
 }
 
-/*
- *  The stage's own controls stack too, not only its `views` grid.
- *
- * `"switch brand reset"` is one row of three at every width, and at 390 there is
- * not room for it: the toggle group breaks its four options onto four lines and
- * the color field beside it is squeezed until `#3b82f6` renders as `32f6`, the
- * two of them overlapping. Measured at 390, the group occupying x=65 to 240 and
- * the field starting at 245 with its value clipped.
- */
+/* Each view takes one column too, for the reason the panel's grid does. */
 @media (width < 56rem) {
   .showcaseView {
     grid-template-columns: minmax(0, 1fr);
-  }
-
-  .showcaseStage {
-    grid-template-areas:
-      "anchor anchor"
-      "switch switch"
-      "brand  reset"
-      "views  views";
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-rows: auto auto auto minmax(0, 1fr);
   }
 }

@@ -1,13 +1,13 @@
 'use client'
 
-import { initTheme, type ThemeEngine, type ThemeIntent } from '@fusion.dev/helix-theme'
 import { useEffect, useRef, useState } from 'react'
-import { SITE_BRAND } from '../../utils/theme-defaults/theme-defaults'
-import { THEME_ENGINE } from '../../utils/theme-engine/theme-engine'
 import styles from './showcase.module.css'
 
 /**
  * The library, running, with a switch that changes what it is showing.
+ *
+ * **In the page's own colors.** The page keeps one brand control, the theme
+ * panel, and this draws in whatever it sets.
  *
  * **And every view is rendered, always.** Swapping them with a conditional
  * unmounts one set of custom elements and mounts another, and a freshly created
@@ -38,85 +38,6 @@ const FACES = [
 /** How long a view holds before the next one, when nobody is looking at it. */
 const DWELL = 7000
 
-/** What the page is derived from before anybody touches it: the site's own. */
-const BRAND = SITE_BRAND
-
-/**
- * True when something above this panel has already themed the document.
- */
-const pageIsThemed = (): boolean => document.documentElement.hasAttribute('data-helix-theme')
-
-/**
- * Re-derives from one color and puts the result on the panel.
- */
-const restyle = (
-  engine: ThemeEngine,
-  node: HTMLElement,
-  hex: string,
-  scheme: ThemeIntent['scheme'],
-): void => {
-  /* Stand down and inherit. Anything written here on a previous pass has to come
-     off too, or the panel keeps the last palette it derived for itself. With no
-     brand there is nothing to derive: the panel is the page's own ink. */
-  if (pageIsThemed() || hex === '') {
-    for (const name of [...node.style]) {
-      if (name.startsWith('--helix-')) {
-        node.style.removeProperty(name)
-      }
-    }
-    delete node.dataset.helixTheme
-    return
-  }
-
-  const theme = engine.derive({ brand: engine.hexToOklch(hex), scheme })
-
-  node.dataset.helixTheme = ''
-  for (const token of theme.tokens) {
-    node.style.setProperty(`--helix-${token.name}`, token.hex)
-  }
-  for (const [name, value] of Object.entries(theme.seeds)) {
-    node.style.setProperty(`--helix-${name}`, value)
-  }
-}
-
-/**
- * Paints the panel, and again whenever the color mode moves. Returns its own
- * teardown.
- *
- * Separate from the effect that calls it, which is about *when the engine is
- * ready* where this is about what to do once it is.
- */
-const listen = (engine: ThemeEngine, node: HTMLElement, brand: string): (() => void) => {
-  /* **Two signals, because the preference has three states.** The drawer
-     writes `data-color-mode` for an explicit choice and *deletes* it for
-     "system", so the media query alone answers only the third of them. Watched
-     rather than read once: the drawer is on this page, so the mode can change
-     while the panel is on screen.
-
-     Left unwatched, the panel kept the tokens it was painted with and the page
-     around it changed: measured at `#030407` behind text the page had turned
-     black, which is not a section that failed to follow the mode so much as
-     one that cannot be read. */
-  const root = document.documentElement
-  const query = window.matchMedia('(prefers-color-scheme: dark)')
-  const scheme = (): ThemeIntent['scheme'] => {
-    const chosen = root.dataset.colorMode
-    if (chosen === 'dark' || chosen === 'light') {
-      return chosen
-    }
-    return query.matches ? 'dark' : 'light'
-  }
-  const paint = (): void => restyle(engine, node, brand, scheme())
-  paint()
-  query.addEventListener('change', paint)
-  const modes = new MutationObserver(paint)
-  modes.observe(root, { attributeFilter: ['data-color-mode'], attributes: true })
-  return () => {
-    query.removeEventListener('change', paint)
-    modes.disconnect()
-  }
-}
-
 export function Showcase(): React.ReactElement {
   const [view, setView] = useState<View>('controls')
 
@@ -124,39 +45,7 @@ export function Showcase(): React.ReactElement {
    * It cycles on its own, and stops the moment anybody arrives.
    */
   const [held, setHeld] = useState(false)
-  const [brand, setBrand] = useState(BRAND)
   const stage = useRef<HTMLDivElement>(null)
-
-  /* **Derived on the client only, which is why the engine arriving late costs
-     nothing here.** The server has no reader and no preference, so it renders
-     the page's own tokens and this has always arrived afterwards. The engine is
-     WebAssembly now and instantiates asynchronously, so "afterwards" is a
-     fraction later; what the panel shows in the meantime is the page's own
-     palette, which is what it showed before this ran at all. No state to add and
-     nothing to show a reader.
-
-     `stop` rather than a plain flag, because the teardown has two jobs depending
-     on when it runs: before the engine lands it has to stop the listeners being
-     wired at all, and after it has to unwire them. One mutable holder does both,
-     and a reader clicking two swatches quickly has two loads in flight where
-     only the second should end up listening. */
-  useEffect(() => {
-    const node = stage.current
-    if (!node) {
-      return
-    }
-    let stop: (() => void) | undefined
-    let live = true
-    void initTheme(THEME_ENGINE).then((engine) => {
-      if (live) {
-        stop = listen(engine, node, brand)
-      }
-    })
-    return () => {
-      live = false
-      stop?.()
-    }
-  }, [brand])
 
   /* **Listened for on the node rather than bound in the markup.** A panel that
      pauses when a pointer arrives is not an interactive element: it has no
@@ -255,37 +144,6 @@ export function Showcase(): React.ReactElement {
           </helix-toggle>
         ))}
       </helix-toggle-group>
-
-      {/* On the switch's own line, because it belongs to the panel rather than
-          to any one view: changing the color with Data showing and finding the
-          control gone would be the same fault the switch avoids. */}
-      {/* **`aria-label` rather than `label`, which is the field mixin's own
-          distinction: `label` means a visible label and `aria-label` means a
-          name.** A visible label costs a row of the field's grid, which would
-          drop this control 20px below the toggle group beside it and line the
-          reset button up with neither. Nothing here is a workaround for it:
-          the mixin renders the name clipped and the control is 40px, the same
-          `--helix-size-control` every other control is. */}
-      <helix-color-input
-        aria-label="Brand"
-        class={styles.showcaseBrand}
-        default-value={BRAND}
-        name="brand"
-        onChange={(event) => {
-          setBrand(event.currentTarget.value)
-        }}
-        value={brand}
-      ></helix-color-input>
-
-      <helix-tooltip class={styles.showcaseReset} content="Back to the site's colors">
-        <helix-icon-button
-          disabled={brand === BRAND || undefined}
-          label="Reset the brand color"
-          onClick={() => setBrand(BRAND)}
-        >
-          <helix-icon name="arrow-counter-clockwise"></helix-icon>
-        </helix-icon-button>
-      </helix-tooltip>
 
       <div className={styles.showcase}>
         <div className={styles.showcaseView} hidden={view !== 'controls'}>
