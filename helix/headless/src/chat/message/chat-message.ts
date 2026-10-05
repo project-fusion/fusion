@@ -9,8 +9,10 @@ import {
   TONE_MARKS,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property, state } from 'lit/decorators.js'
+import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
+import { authorWords, TURN_WORDS, turnName } from '../naming.js'
+import { RelativeClockController } from '../relative-clock.js'
 
 /**
  * What a turn that did not send is called, where nobody said otherwise.
@@ -31,6 +33,13 @@ export const FAILED_LABEL = 'Not sent'
  * changes height on every frame, so it is marked `aria-busy` while it arrives
  * and announced once when it settles. A screen reader cannot follow a stream
  * read out character by character.
+ *
+ * A screen reader names the turn by its author and its time, such as "You, 2
+ * minutes ago". The author is `author-label`, or "You" for `me`, or the
+ * `author` itself where it is a name; give a turn by `them` an `author-label`
+ * to name it. The chat it sits in holds the sentence and the word for `me`, so
+ * a page in another language sets them once there. The time moves on by
+ * itself, so "now" becomes "1 minute ago" while the page is open.
  *
  * @since 0.1.0
  * @status stable
@@ -86,6 +95,16 @@ export class HelixHeadlessChatMessage extends HelixElement {
   author?: string
 
   /**
+   * The author's name, as a screen reader says it at the start of the turn,
+   * such as "Support" or "Ada Lovelace".
+   *
+   * Empty reads "You" for `me`, the `author` itself where it is a name, and
+   * nothing for `them`.
+   */
+  @property({ attribute: 'author-label' })
+  authorLabel = ''
+
+  /**
    * Label for a message that did not send.
    */
   @property({ attribute: 'failed-label' })
@@ -127,13 +146,23 @@ export class HelixHeadlessChatMessage extends HelixElement {
   state?: 'failed' | 'sending' | 'sent' | 'streaming'
 
   /**
+   * @internal Set by the chat: the word for `me` and the sentence that names a
+   * turn with both an author and a time, in the chat's language.
+   */
+  @property({ attribute: false })
+  turnWords = TURN_WORDS
+
+  /**
    * @internal Read by the transcript to identify its children across the light
    * DOM, which is cheaper than `instanceof`. Not a consumer's to read or set.
    */
   readonly isChatMessage = true
 
-  @state()
-  private clock: number | undefined = undefined
+  /** The time the reading is drawn against, moved on when the words go stale. */
+  private readonly clock = new RelativeClockController(this, {
+    locale: () => this.locale,
+    moment: () => this.moment,
+  })
 
   /** The timestamp, or nothing where there is not one to read. */
   private get moment(): Date | undefined {
@@ -146,8 +175,8 @@ export class HelixHeadlessChatMessage extends HelixElement {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    if (changed.has('at')) {
-      this.clock = Date.now()
+    if (changed.has('at') || changed.has('locale')) {
+      this.clock.tick()
     }
     /* `article` rather than `listitem`, because the transcript is a `log` and a
        log's children are not list items: a turn is a self-contained thing a
@@ -166,8 +195,29 @@ export class HelixHeadlessChatMessage extends HelixElement {
        were each caught by. Internals carry it to the accessibility tree and
        nothing to the markup, which is what `Skeleton`, `Loader` and `Orb`
        already do with this exact flag. */
-    hostAria(this.internals, { role: 'article' })
+    hostAria(this.internals, { label: this.name, role: 'article' })
     this.internals.ariaBusy = this.state === 'streaming' ? 'true' : null
+  }
+
+  /** The time as it reads now, or nothing where the turn has none. */
+  private get reading(): string {
+    const moment = this.moment
+    return moment ? relativeTime(this.locale)(moment, new Date(this.clock.now)).text : ''
+  }
+
+  /**
+   * What a screen reader calls the turn: who wrote it, and when.
+   *
+   * **The name of an `article` is never its content**, so without one a reader
+   * moving through a transcript heard "article" for every turn and had to read
+   * each to learn who wrote it.
+   */
+  private get name(): string {
+    return turnName(
+      authorWords(this.author, this.authorLabel, this.turnWords),
+      this.reading,
+      this.turnWords,
+    )
   }
 
   private renderTime(): TemplateResult | typeof nothing {
@@ -175,8 +225,7 @@ export class HelixHeadlessChatMessage extends HelixElement {
     if (!moment) {
       return nothing
     }
-    const { text } = relativeTime(this.locale)(moment, new Date(this.clock ?? Date.now()))
-    return html`<time part="time" datetime=${moment.toISOString()}>${text}</time>`
+    return html`<time part="time" datetime=${moment.toISOString()}>${this.reading}</time>`
   }
 
   /**

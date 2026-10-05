@@ -1,6 +1,7 @@
 import {
   customElement,
-  HelixElement,
+  DelayController,
+  HelixFormElement,
   HelixSendEvent,
   hostAria,
   markRegion,
@@ -26,6 +27,16 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * The composer clears only when no listener cancels the send, so the text is
  * kept when you cancel a send that failed.
  *
+ * **In a form, the draft is the composer's value**, submitted under `name`. A
+ * form reset puts back the `value` the markup declared, and a `<fieldset
+ * disabled>` turns the composer off. Sending is still `helix-send`, and it
+ * does not submit the form.
+ *
+ * **`typing` says whether the user is writing**, and `helix-typing` is sent
+ * each time it changes: when they start, and when they send or stop for
+ * `typing-timeout` milliseconds. Pass it on to show "is typing" to the other
+ * side.
+ *
  * @since 0.1.0
  * @status stable
  * @category forms
@@ -36,6 +47,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @slot start - Content under the field at the leading edge, such as an attachment button or a model picker.
  *
  * @event {HelixSendEvent} helix-send - Fired when the user sends their turn, and cancelable.
+ * @event {Event} helix-typing - The user started or stopped writing. Read which from `typing`.
  * @event {Event} input - The user changed the text. Read it from `value`, for a typing indicator or a saved draft. Sent on the composer and does not bubble.
  *
  * @csspart composer - The whole composer.
@@ -47,13 +59,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @csspart tools - The row under the field.
  */
 @customElement('helix-headless-chat-composer')
-export class HelixHeadlessChatComposer extends HelixElement {
-  /**
-   * Whether the composer blocks input, such as while a turn is being sent.
-   */
-  @property({ reflect: true, type: Boolean })
-  disabled = false
-
+export class HelixHeadlessChatComposer extends HelixFormElement {
   /**
    * The field's name, read by screen readers.
    */
@@ -92,6 +98,13 @@ export class HelixHeadlessChatComposer extends HelixElement {
   submitOn: 'button' | 'enter' = 'enter'
 
   /**
+   * How long after the last keystroke the user still counts as typing, in
+   * milliseconds.
+   */
+  @property({ attribute: 'typing-timeout', type: Number })
+  typingTimeout = 3000
+
+  /**
    * The text the user has written.
    *
    * It follows typing, so reading it gives the draft. Set it to seed a draft or
@@ -105,6 +118,34 @@ export class HelixHeadlessChatComposer extends HelixElement {
    */
   readonly isChatComposer = true
 
+  /** Whether the user is writing, which `helix-typing` announces. */
+  private writing = false
+
+  /** The pause after which the user has stopped writing. */
+  private readonly pause = new DelayController(this, { renders: false })
+
+  /**
+   * Whether the user is writing: true from their first keystroke until they
+   * send, clear the field, or pause for `typing-timeout` milliseconds.
+   */
+  get typing(): boolean {
+    return this.writing
+  }
+
+  /** Records whether the user is writing, and says so when that changed. */
+  private markTyping(typing: boolean): void {
+    if (typing) {
+      this.pause.start(Math.max(0, this.typingTimeout), () => this.markTyping(false))
+    } else {
+      this.pause.cancel()
+    }
+    if (typing === this.writing) {
+      return
+    }
+    this.writing = typing
+    this.dispatchEvent(new Event('helix-typing', { bubbles: true, composed: true }))
+  }
+
   /**
    * Sends what is written, and returns whether the send went through.
    *
@@ -114,7 +155,7 @@ export class HelixHeadlessChatComposer extends HelixElement {
    */
   send(): boolean {
     const value = this.value.trim()
-    if (value === '' || this.disabled) {
+    if (value === '' || this.isDisabled) {
       return false
     }
     if (!this.dispatchEvent(new HelixSendEvent({ value }))) {
@@ -124,7 +165,27 @@ export class HelixHeadlessChatComposer extends HelixElement {
        first and hears about the failure afterwards has thrown away the only copy
        of what the reader wrote. */
     this.value = ''
+    this.markTyping(false)
     return true
+  }
+
+  /**
+   * The value the markup declared, which a form reset and an empty restore go
+   * back to. `value` does not reflect, so its attribute stays as written.
+   */
+  private get declared(): string {
+    return this.getAttribute('value') ?? ''
+  }
+
+  /** Puts back the draft the markup declared when the form is reset. */
+  override formResetCallback(): void {
+    super.formResetCallback()
+    this.value = this.declared
+  }
+
+  /** Brings back the draft when the browser restores the form. */
+  formStateRestoreCallback(state: string | File | FormData | null): void {
+    this.value = typeof state === 'string' ? state : this.declared
   }
 
   /**
@@ -144,6 +205,11 @@ export class HelixHeadlessChatComposer extends HelixElement {
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.markEmpty()
+    /* Nothing where nothing is written, so an empty composer submits no entry
+       rather than a blank one. */
+    if (changed.has('value')) {
+      this.internals.setFormValue(this.value === '' ? null : this.value)
+    }
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -171,7 +237,7 @@ export class HelixHeadlessChatComposer extends HelixElement {
       part="send"
       type="button"
       aria-label=${this.sendLabel}
-      ?disabled=${this.disabled}
+      ?disabled=${this.isDisabled}
       @click=${this.handleSend}
     >
       <svg
@@ -206,7 +272,7 @@ export class HelixHeadlessChatComposer extends HelixElement {
         aria-label=${this.label}
         placeholder=${this.placeholder}
         rows=${this.rows}
-        ?disabled=${this.disabled}
+        ?disabled=${this.isDisabled}
         @input=${this.handleInput}
         @keydown=${this.handleKey}
       ></textarea>
@@ -241,6 +307,7 @@ export class HelixHeadlessChatComposer extends HelixElement {
        a React `onInput`, which `HelixElement` binds for an event that does not
        bubble. */
     this.dispatchEvent(new Event('input'))
+    this.markTyping(this.value !== '')
   }
 
   private readonly handleSend = (): void => {

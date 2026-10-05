@@ -10,6 +10,7 @@ import {
   type Rendered,
   requestChange,
   VirtualizeController,
+  whenHydrated,
 } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -19,6 +20,7 @@ import { repeat } from 'lit/directives/repeat.js'
    own message tag, and an interpolated tag is a static value. */
 import { html } from 'lit/static-html.js'
 import { FAILED_LABEL, type HelixHeadlessChatMessage } from '../message/chat-message.js'
+import { TURN_WORDS, type TurnWords } from '../naming.js'
 
 /**
  * The regions a consumer fills, in the order they are rendered.
@@ -35,6 +37,8 @@ export interface ChatTurn {
   at?: string
   /** Who said it: `me`, `them`, or a name the consumer styles. */
   author?: string
+  /** Who said it, as a screen reader names the turn, as on `ChatMessage`. */
+  authorLabel?: string
   /**
    * What identifies it across changes to the set.
    *
@@ -133,6 +137,20 @@ const spoken = (message: Element): string =>
  * Pass the turns as children or as `turns` data. Do not use both. Children
  * render from the server and suit most conversations. `turns` draws a long
  * transcript one window at a time, so the log needs a block size of its own.
+ *
+ * **A conversation is built from three elements.** The chat holds the
+ * transcript, a `Chat.Message` stands for each turn, and a `Chat.Composer` sits
+ * in the `composer` slot. When the user sends, `helix-send` reaches the chat:
+ * add their turn with `author="me"` and `state="sending"`, then set `state` to
+ * `sent` or `failed` when your server answers. Add the reply as a turn with
+ * `state="streaming"`, write its text as it arrives, and set `state` to `sent`
+ * when it is complete. While the user types, the composer sends
+ * `helix-typing`, which you can pass on to the other side. Show the other
+ * side's typing in the `status` slot.
+ *
+ * A screen reader names each turn by its author and its time, such as "You, 2
+ * minutes ago". Set `me-label` and `message-label` to say it in your language,
+ * and give each turn by `them` an `author-label`.
  *
  * A turn from `turns` is drawn in the chat's shadow root, so style it through
  * the forwarded `message-*` parts. A turn by `me` also gets each part with
@@ -246,6 +264,20 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
   label = ''
 
   /**
+   * The word a screen reader says for `me` when it names a turn.
+   */
+  @property({ attribute: 'me-label' })
+  meLabel = 'You'
+
+  /**
+   * The name a screen reader gives a turn with both an author and a time.
+   * `{author}` is who wrote it and `{time}` is when, as the turn shows it. A
+   * turn with only one of the two is named by that one.
+   */
+  @property({ attribute: 'message-label' })
+  messageLabel = '{author}, {time}'
+
+  /**
    * Whether the transcript follows new turns to the bottom.
    *
    * The reader's scrolling asks first: `helix-before-pin` is cancelable, so a
@@ -308,6 +340,12 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
 
   @state()
   private said = 0
+
+  /**
+   * The words every turn is named with, kept as one object between changes so
+   * a turn is told again only when they change.
+   */
+  private words: TurnWords = TURN_WORDS
 
   /** Watches for turns arriving, since a manual slot hears nothing about them. */
   private watcher: MutationObserver | undefined = undefined
@@ -786,6 +824,9 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     hostAria(this.internals, { label: this.label || 'Conversation', role: 'region' })
+    if (changed.has('meLabel') || changed.has('messageLabel')) {
+      this.words = { me: this.meLabel, sentence: this.messageLabel }
+    }
     this.countRegions()
     if (changed.has('history')) {
       this.asked = false
@@ -826,6 +867,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.assign()
+    this.tellTurns()
     /* After the render that added the turn, because the scroll height it is
        being sent to does not exist until then. */
     if (this.pinned) {
@@ -840,6 +882,18 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
     this.remember()
     this.reachHistory()
     this.announce()
+  }
+
+  /**
+   * Hands each turn written as a child the words it is named with, once it
+   * has hydrated, so its first render is the server's.
+   */
+  private tellTurns(): void {
+    for (const message of this.messages) {
+      whenHydrated(message, () => {
+        message.turnWords = this.words
+      })
+    }
   }
 
   private readonly handleSlotChange = (): void => {
@@ -908,7 +962,9 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
                 meta: message-meta, retry: message-retry, sources: message-sources,
                 state: message-state, time: message-time${secondNames(SECOND_NAMES.author, turn.author)}${secondNames(SECOND_NAMES.state, turn.state)}"
               author=${turn.author ?? nothing}
+              author-label=${turn.authorLabel ?? nothing}
               at=${turn.at ?? nothing}
+              .turnWords=${this.words}
               state=${turn.state ?? nothing}
             >${turn.text}</${message}>
           </div>`,
