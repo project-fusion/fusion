@@ -128,7 +128,7 @@ fn deriving_returns_css_a_stylesheet_can_take() {
 fn deriving_no_brand_returns_ink_in_both_modes() {
     let replies = talk(&[
         HELLO,
-        r##"{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"helix_derive_theme","arguments":{"intent":{}}}}"##,
+        r#"{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"helix_derive_theme","arguments":{"intent":{}}}}"#,
     ]);
     let (failed, css) = answer(&replies[1]);
     assert!(!failed, "{css}");
