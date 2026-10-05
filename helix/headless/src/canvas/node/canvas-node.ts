@@ -124,9 +124,10 @@ export class HelixHeadlessCanvasNode extends HelixElement {
    * The card's name as text. A group shows it, and another card's connections
    * read it out.
    *
-   * A group needs one because it has no text of its own; a card that has text
-   * is named by it, and one holding a picture or a figure is named by nothing
-   * short enough to read out in another card's connections.
+   * A group needs one because it has no text of its own. A card is named by
+   * it where it is set, and by its content where it is not, so a screen reader
+   * moving between cards hears each one's name. Set it on a card holding a
+   * picture or a figure, which has no words short enough to name it.
    */
   @property()
   label = ''
@@ -314,12 +315,13 @@ export class HelixHeadlessCanvasNode extends HelixElement {
     }<div
       part="node"
       aria-describedby=${this.meaning || this.links ? 'about' : nothing}
-      aria-label=${this.group ? this.label || nothing : nothing}
+      aria-label=${this.label || nothing}
+      aria-labelledby=${this.label || this.group ? nothing : 'content'}
       aria-keyshortcuts=${this.connectable ? 'Enter F2 Space Shift+ArrowRight Shift+ArrowDown Alt+ArrowRight Alt+ArrowDown C Delete' : nothing}
       role=${this.group ? 'group' : 'article'}
       tabindex=${this.current ? '0' : '-1'}
     >
-      <slot></slot>
+      <slot id="content"></slot>
       <slot name="description"></slot>
       <span id="about" hidden>${[this.meaning, this.links].filter(Boolean).join(', ')}</span>
     </div>
