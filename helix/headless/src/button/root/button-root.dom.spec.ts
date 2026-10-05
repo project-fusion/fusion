@@ -4,7 +4,22 @@ import { formValue, mount, part, registerDom, type Updatable } from '@fusion.dev
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  await import('../../icon-button/index.js')
 })
+
+/** What the console was warned while `markup` mounted and settled, with nothing printed. */
+const warnedOn = async (markup: string): Promise<string[]> => {
+  const warnings: string[] = []
+  const original = console.warn
+  console.warn = (message: string) => warnings.push(message)
+  try {
+    await mount(markup)
+    await new Promise((done) => setTimeout(done, 5))
+  } finally {
+    console.warn = original
+  }
+  return warnings
+}
 
 const control = (host: HTMLElement): Element | null => part(host, 'button')
 
@@ -289,5 +304,31 @@ describe('button state and name written on the host', () => {
       '<helix-headless-button aria-label="Close">X</helix-headless-button>',
     )
     expect(control(button)?.getAttribute('aria-label')).toBe('Close')
+  })
+})
+
+describe('a button with no name', () => {
+  /* WA warns about an icon-only button with no label. A button with nothing in
+     it a reader can hear is announced as "button" and nothing else. */
+  test('is reported once, after it renders', async () => {
+    const warnings = await warnedOn('<helix-headless-button><svg></svg></helix-headless-button>')
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0]).toContain('<helix-headless-button> has no accessible name')
+  })
+
+  test('words, a label or an aria-label name it', async () => {
+    for (const markup of [
+      '<helix-headless-button>Save</helix-headless-button>',
+      '<helix-headless-button label="Close"><svg></svg></helix-headless-button>',
+      '<helix-headless-icon-button aria-label="Delete row"><svg></svg></helix-headless-icon-button>',
+    ]) {
+      expect(await warnedOn(markup)).toEqual([])
+    }
+  })
+
+  test('an icon button with no label is reported', async () => {
+    expect(
+      await warnedOn('<helix-headless-icon-button><svg></svg></helix-headless-icon-button>'),
+    ).toHaveLength(1)
   })
 })
