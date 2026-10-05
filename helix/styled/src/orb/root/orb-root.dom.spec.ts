@@ -132,6 +132,49 @@ describe('orb', () => {
     expect(label(host)).toBe('Done')
   })
 
+  test('names a state from the words its `state-labels` attribute holds', async () => {
+    const host = (await mount(
+      `<helix-orb state="done" state-labels='{"done":"Terminé"}'></helix-orb>`,
+    )) as Upgraded
+    expect(label(host)).toBe('Terminé')
+    const broken = (await mount(
+      `<helix-orb state="done" state-labels="not json"></helix-orb>`,
+    )) as Upgraded
+    expect(label(broken)).toBe('Done')
+  })
+
+  test('each state is a custom state, and one it does not draw is `thinking`', async () => {
+    const host = (await mount('<helix-orb state="working"></helix-orb>')) as Upgraded
+    expect(hasState(host, 'working')).toBe(true)
+    expect(hasState(host, 'thinking')).toBe(false)
+    host.state = 'done'
+    await host.updateComplete
+    expect(hasState(host, 'done')).toBe(true)
+    expect(hasState(host, 'working')).toBe(false)
+    host.state = 'compiling'
+    await host.updateComplete
+    expect(hasState(host, 'thinking')).toBe(true)
+    expect(host.hasAttribute('state')).toBe(true)
+    expect(host.getAttribute('state')).toBe('working')
+  })
+
+  test('says a new state aloud only when `announce` is set, and never the first one', async () => {
+    const quiet = (await mount('<helix-orb state="working"></helix-orb>')) as Upgraded
+    quiet.state = 'done'
+    await quiet.updateComplete
+    expect(quiet.shadowRoot?.querySelector('[part="live"]')).toBeNull()
+
+    const loud = (await mount('<helix-orb announce state="working"></helix-orb>')) as Upgraded
+    expect(loud.shadowRoot?.querySelector('[part="live"]')).toBeNull()
+    loud.state = 'done'
+    await loud.updateComplete
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+    await loud.updateComplete
+    const live = loud.shadowRoot?.querySelector('[part="live"]')
+    expect(live?.getAttribute('role')).toBe('status')
+    expect(live?.textContent).toBe('Done')
+  })
+
   /* **Lit updates an element whether or not it is still connected**, so one
      inserted and removed in the same task reaches `firstUpdated` detached. What
      it installed there had no disconnection left to take it down, and the

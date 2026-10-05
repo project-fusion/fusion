@@ -121,6 +121,7 @@ export {
 } from './controllers/virtualize-controller/virtualize-controller.js'
 export { eventsForTag, registerElementEvents } from './events/element-events.js'
 export {
+  type AuraFallbackDetail,
   type CanvasView,
   type CaretDetail,
   type ChangeDetail,
@@ -137,6 +138,7 @@ export {
   type GraphPartChangeDetail,
   type GraphSignalDetail,
   HelixActivateEvent,
+  HelixAuraFallbackEvent,
   HelixBeforeActivateEvent,
   HelixBeforeChangeEvent,
   HelixBeforeCloseEvent,
@@ -156,10 +158,12 @@ export {
   HelixCanvasViewEvent,
   HelixCanvasZoomEvent,
   HelixCaretEvent,
+  HelixClearEvent,
   HelixCollapseEvent,
   HelixCompleteEvent,
   HelixConnectEvent,
   HelixConsoleEvent,
+  HelixCopyErrorEvent,
   HelixCopyEvent,
   HelixCreateEvent,
   HelixDismissEvent,

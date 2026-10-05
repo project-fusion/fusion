@@ -1,4 +1,4 @@
-import { CopyController, customElement } from '@fusion.dev/helix-core'
+import { CopyController, customElement, HelixCopyErrorEvent } from '@fusion.dev/helix-core'
 import { check, copy, x } from '@fusion.dev/helix-icons'
 import { nothing, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -47,7 +47,7 @@ const CONFIRM = 1600
  * @slot failed - The icon shown after a copy that put nothing on the clipboard. Defaults to a cross.
  *
  * @event {HelixCopyEvent} helix-copy - Fired after the clipboard write succeeds.
- * @event {Event} helix-copy-error - Fired when a press put nothing on the clipboard: the browser refused the write, or there was nothing to copy.
+ * @event {HelixCopyErrorEvent} helix-copy-error - Fired when a press put nothing on the clipboard: the browser refused the write, or there was nothing to copy.
  *
  * @csspart button - The inner button.
  * @csspart live - The live region that says `pending-label` when the button becomes pending under focus. It is rendered from the first time the button is pending.
@@ -187,7 +187,7 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
     }
     const wrote = await this.clipboard.copy(this.text)
     if (!wrote && this.isConnected) {
-      this.dispatchEvent(new Event('helix-copy-error', { bubbles: true, composed: true }))
+      this.dispatchEvent(new HelixCopyErrorEvent())
     }
   }
 
