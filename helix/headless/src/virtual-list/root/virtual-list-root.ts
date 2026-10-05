@@ -3,6 +3,7 @@ import {
   customElement,
   elementById,
   HelixElement,
+  HelixLoadMoreEvent,
   searchableById,
   VirtualizeController,
 } from '@fusion.dev/helix-core'
@@ -92,7 +93,7 @@ export interface VirtualListRange {
  *
  * @slot - The `<template>` that defines one row. The list writes the rows it renders beside it, and this slot shows them between the two spacers.
  *
- * @event {Event} helix-load-more - Fired when a reader comes within one screen of the last item, once for each length of the set.
+ * @event {HelixLoadMoreEvent} helix-load-more - Fired when a reader comes within one screen of the last item, once for each length of the set.
  * @event {Event} helix-range-change - Fired when the items on screen change. `range` holds them.
  *
  * @csspart after - The space that stands in for the rows below the rendered ones.
@@ -395,7 +396,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
       this.virtualize.remaining() <= screen
     ) {
       this.askedAt = count
-      this.dispatchEvent(new Event('helix-load-more', { bubbles: true, composed: true }))
+      this.dispatchEvent(new HelixLoadMoreEvent())
     }
   }
 
