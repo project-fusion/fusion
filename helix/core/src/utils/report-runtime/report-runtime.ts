@@ -69,7 +69,7 @@ export type RuntimeKind =
   | 'unknown-icon'
   /** A tooltip's trigger does not name it in `aria-describedby`, so it is not read out. */
   | 'unlinked-trigger'
-  /** A Text rendered as a label wraps or names a control, which its shadow root cannot reach. */
+  /** A Text is rendered as a label, a deprecated value whose shadow root reaches no control. */
   | 'unreachable-label'
   /** A virtualized list's box has no height of its own, so its window never settles. */
   | 'unsettled-window'
