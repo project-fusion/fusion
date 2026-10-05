@@ -182,6 +182,15 @@
   padding-inline: var(--chat-padding-inline, var(--helix-space-md));
 }
 
+/* Who is typing, in the band: the dots the message draws while it waits, then
+   the words, on one line. Muted, as the rest of the band is. */
+[part="typing"] {
+  align-items: center;
+  color: var(--chat-typing-color, var(--helix-color-foreground-muted));
+  display: inline-flex;
+  gap: var(--chat-typing-gap, var(--helix-space-xs));
+}
+
 /* **No rule above it.** The composer draws its own edge, so a hairline twelve
    pixels above that edge is a second line separating the same two things, and
    the pair reads as one badly drawn border. The header

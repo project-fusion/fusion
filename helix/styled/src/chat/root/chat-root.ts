@@ -3,6 +3,7 @@ import { HelixHeadlessChat } from '@fusion.dev/helix-headless/chat'
 import type { CSSResultGroup } from 'lit'
 import { styles as collectionStateStyles } from '../../shared/collection/state.css.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
+import { styles as typingStyles } from '../typing.css.js'
 import { styles } from './chat-root.css.js'
 import '../composer/chat-composer.js'
 import '../message/chat-message.js'
@@ -41,12 +42,14 @@ import '../message/chat-message.js'
  * @cssproperty --chat-resume-border-width - Width of the edge around the resume control, which sits over content.
  * @cssproperty --chat-resume-shadow - Shadow under the resume control, which floats over the transcript.
  * @cssproperty --chat-rule - The hairline under the header.
+ * @cssproperty --chat-typing-color - The color of the dots and the words that say who is typing.
+ * @cssproperty --chat-typing-gap - The space between the dots and the words that say who is typing.
  */
 @customElement('helix-chat')
 export class HelixChat extends HelixHeadlessChat {
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = [liveStyles, collectionStateStyles, styles]
+  static override styles: CSSResultGroup = [liveStyles, collectionStateStyles, typingStyles, styles]
 }
 
 declare global {

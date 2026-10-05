@@ -49,36 +49,26 @@ export const MEDIA_EVENTS = [
 export type MediaEventName = (typeof MEDIA_EVENTS)[number]
 
 /**
- * The copy the host sends: the same name, neither bubbling nor composed.
+ * Hands each media event the video fires to `relay`, and returns what stops
+ * it. The player relays through `relayNativeEvent`, which sends the same name
+ * with the same `bubbles`, `cancelable` and `composed`.
  *
- * **As the platform sends it, which is what makes it reach a React consumer at
- * all.** These names are in react-dom's `nonDelegatedEvents`, which React wires
- * on a `<video>` and never on a custom element, so its root listener hears none
- * of them. `bindReactHandler` closes that for an event that does not bubble,
- * and skips one that does, on the grounds that a bubbling relay already reaches
- * React's delegated listener and binding it again would double every call. A
- * copy sent with `bubbles: true` lands in the branch that refuses to bind, and
- * `onPlay` on the player is silent.
- *
- * Not cancelable, as the platform's are not: the media has already moved by the
- * time the event is sent, and a refusal would have nothing to stop.
- */
-export const relayedCopy = (event: Event): Event =>
-  new Event(event.type, { bubbles: false, cancelable: false, composed: false })
-
-/**
- * Sends each media event the video fires on from the host, and returns what
- * stops it.
+ * **As the platform sends it, neither bubbling nor composed, which is what
+ * makes it reach a React consumer at all.** These names are in react-dom's
+ * `nonDelegatedEvents`, which React wires on a `<video>` and never on a custom
+ * element, so its root listener hears none of them. `bindReactHandler` closes
+ * that for an event that does not bubble, and skips one that does, on the
+ * grounds that a bubbling relay already reaches React's delegated listener and
+ * binding it again would double every call. A copy sent with `bubbles: true`
+ * would land in the branch that refuses to bind, and `onPlay` on the player
+ * would be silent.
  *
  * Bound once, after the first render, so the player's own listeners in its
  * template are ahead of it on the same video: what a consumer reads off the
  * player in a handler (`paused`, `volume`, `currentTime`) is already the
  * player's state by the time the copy reaches them.
  */
-export const relayMedia = (video: EventTarget, host: EventTarget): (() => void) => {
-  const relay = (event: Event): void => {
-    host.dispatchEvent(relayedCopy(event))
-  }
+export const relayMedia = (video: EventTarget, relay: (event: Event) => void): (() => void) => {
   for (const name of MEDIA_EVENTS) {
     video.addEventListener(name, relay)
   }

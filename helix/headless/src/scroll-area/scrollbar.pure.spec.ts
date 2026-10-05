@@ -1,5 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import {
+  alongTrack,
+  extentOf,
   hasScrollbar,
   offsetAt,
   scrollFraction,
@@ -79,5 +81,28 @@ describe('whether a scrollbar is drawn', () => {
     expect(showsScrollbar('scroll', { ...idle, held: true })).toBe(true)
     expect(showsScrollbar('scroll', { ...idle, hovered: true })).toBe(false)
     expect(showsScrollbar('hover', { ...idle, hovered: true })).toBe(true)
+  })
+})
+
+describe('reading a box', () => {
+  const box = {
+    clientHeight: 100,
+    clientWidth: 200,
+    scrollHeight: 400,
+    scrollLeft: -50,
+    scrollTop: 30,
+    scrollWidth: 800,
+  }
+
+  test('reads each axis, counting a right-to-left offset from zero', () => {
+    expect(extentOf(box, 'vertical')).toEqual({ client: 100, offset: 30, scroll: 400 })
+    expect(extentOf(box, 'horizontal')).toEqual({ client: 200, offset: 50, scroll: 800 })
+  })
+
+  test('places a pointer along a track from its start, the right edge on a right-to-left page', () => {
+    const track = { bottom: 300, left: 10, right: 210, top: 100 }
+    expect(alongTrack(150, track, 'vertical', false)).toBe(50)
+    expect(alongTrack(60, track, 'horizontal', false)).toBe(50)
+    expect(alongTrack(160, track, 'horizontal', true)).toBe(50)
   })
 })
