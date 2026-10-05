@@ -1,5 +1,13 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { formValue, mount, part, registerDom, settle, slotted } from '@fusion.dev/helix-testing/dom'
+import {
+  formValue,
+  hasLayout,
+  mount,
+  part,
+  registerDom,
+  settle,
+  slotted,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -448,12 +456,16 @@ describe('a required color', () => {
     expect(internals(host).validationMessage).toBe('Choose a color.')
   })
 
-  test('and a half-typed color is left alone, the field above owning bad input', async () => {
-    /* Every keystroke in the value row reaches `requestValue`, so reporting
-       bad input here would fault `#0`, `#00` and `#00f` on the way to a color.
-       Color Input reports it once, against the field that was typed into. */
+  /* Measured before this: a picker standing in a form submitted `#00` and the
+     form stayed valid. The picker draws no message, so reporting it as each
+     keystroke arrives shows nothing until the form asks. */
+  test('and a half-typed color is bad input, so a form does not submit it', async () => {
     const host = await picker('name="brand" required')
     const field = part(host, 'value') as HTMLInputElement
+    field.value = '#00'
+    field.dispatchEvent(new Event('input', { bubbles: true }))
+    await host.updateComplete
+    expect(internals(host).validity.badInput).toBe(true)
     field.value = '#00f'
     field.dispatchEvent(new Event('input', { bubbles: true }))
     await host.updateComplete
@@ -581,5 +593,87 @@ describe('color picker channels', () => {
     await drag(host, 'hue', 120)
     expect(said.length).toBeGreaterThan(0)
     expect(said.every((value) => value.startsWith('#'))).toBe(true)
+  })
+})
+
+/* Only in a real engine: the press is placed by the square's box, and happy-dom
+   measures every box as zero, so the handler stops before it reads a point
+   whether or not the picker is disabled. */
+if (hasLayout()) {
+  describe('a disabled color picker', () => {
+    /* Measured before this: a click in the square of a disabled picker, by its
+       own attribute or a disabled fieldset, changed its value. */
+    test('takes no press in the square', async () => {
+      const host = await picker('disabled default-value="#3366ff"')
+      const grid = part(host, 'grid') as HTMLElement
+      const box = grid.getBoundingClientRect()
+      grid.dispatchEvent(
+        new PointerEvent('pointerdown', {
+          bubbles: true,
+          clientX: box.left + box.width / 4,
+          clientY: box.top + box.height / 4,
+        }),
+      )
+      await host.updateComplete
+      expect(host.value).toBe('#3366ff')
+    })
+  })
+}
+
+describe('the square from the keyboard', () => {
+  const key = async (host: Color, name: string): Promise<void> => {
+    part(host, 'grid-saturation')?.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: name }),
+    )
+    await host.updateComplete
+  }
+
+  const reading = (host: Color): [number, number] => [
+    Number((part(host, 'grid-saturation') as HTMLInputElement).value),
+    Number((part(host, 'grid-brightness') as HTMLInputElement).value),
+  ]
+
+  /* Measured before this: on the saturation input, where focus lands, ArrowUp
+     moved the handle sideways, a native range mapping every arrow to its one
+     axis. */
+  test('moves brightness up and down, and saturation along', async () => {
+    const host = await picker('default-value="hsl(0 50% 50%)"')
+    const [saturation, brightness] = reading(host)
+    await key(host, 'ArrowUp')
+    expect(reading(host)).toEqual([saturation, brightness + 1])
+    await key(host, 'ArrowRight')
+    expect(reading(host)).toEqual([saturation + 1, brightness + 1])
+  })
+
+  test('is one tab stop', async () => {
+    const host = await picker()
+    expect(part(host, 'grid-brightness')?.getAttribute('tabindex')).toBe('-1')
+    expect(part(host, 'grid-saturation')?.hasAttribute('tabindex')).toBe(false)
+  })
+})
+
+describe('when a color picker says the color changed', () => {
+  test('`input` as it moves, and `change` once it settles', async () => {
+    const host = await picker()
+    const log: string[] = []
+    for (const name of ['input', 'change']) {
+      host.addEventListener(name, () => log.push(name))
+    }
+    await axis(host, 'saturation', 20)
+    await axis(host, 'saturation', 30)
+    expect(log).toEqual(['input', 'input'])
+    part(host, 'grid-saturation')?.dispatchEvent(new Event('change'))
+    expect(log).toEqual(['input', 'input', 'change'])
+  })
+})
+
+describe('the tools of a color picker', () => {
+  /* The two buttons are Helix buttons, which name their inner button from
+     `label`. Measured before this: an `aria-label` on the host left the
+     eyedropper unnamed and the syntax toggle named "hex". */
+  test('name their buttons through `label`', async () => {
+    const host = await picker()
+    const format = part(host, 'format') as HTMLElement & { label: string }
+    expect(format.label).toBe('Syntax: hex. Change it.')
   })
 })
