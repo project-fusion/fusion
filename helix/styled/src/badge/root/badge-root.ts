@@ -32,8 +32,8 @@ export class HelixBadge extends HelixHeadlessBadge {
    * different sets for no reason anybody decided: a tag could say `success` and
    * a badge could not, so a page marking a build green wrote one word on the
    * chip and had no word for the count beside it. Every fill these name already
-   * exists and every one carries `foreground-on-accent`, so this costs a rule
-   * apiece and no new color.
+   * exists with its family's label, so this costs a rule apiece and no new
+   * color.
    *
    * **`primary` is sayable as well as the default**, which is the reason
    * `Announcement` gives for its own neutral: a generated page should be able to

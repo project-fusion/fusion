@@ -8,6 +8,14 @@ title: Deriving a theme
 
 Helix computes your color tokens from a few inputs, such as your brand color.
 
+## Without a brand color
+
+With no brand color set, Helix draws in ink. The primary color is near-black in
+light mode and near-white in dark mode, and a filled button is the opposite of
+the page, with the page's own color for its label. The neutral ramp supplies
+both, so a gray with a tint gives a tinted ink. Set a brand color to replace the
+ink, as a seed in CSS or as `brand` in the theme engine.
+
 When a design system ships two hundred fixed color values, you theme it by
 changing them one at a time. A change to one value can break the contrast of a
 component elsewhere, and nothing tells you.
@@ -38,8 +46,9 @@ resolved at the root. The stylesheet declares the ramp again on each
 
 Tuned does not guarantee contrast. CSS has no contrast function.
 `oklch(from …)` can step and rotate a color, but it cannot search for the
-lightness that meets a target. The contrast figures built into the ramp are
-exact for the default seed and approximate for any other.
+lightness that meets a target. The contrast figures built into the ramp were
+measured on one blue seed, so they are exact for that seed and approximate for
+any other.
 
 **Verified** uses the theme engine. It searches for each color that meets its
 target, measures every pair, and returns the theme with any violations:
@@ -109,6 +118,16 @@ console.log(css[':root'])
 `[data-color-mode]` on any element, as described in [Color modes](./color-modes).
 A value that is not a color and still changes with the mode, such as the edge
 of a floating surface, is set by rules after the block, one for each mode.
+
+The CLI writes the same block. `helix theme init` writes a `helix.theme.json`,
+with your brand color if you pass `--brand`. `helix theme build` derives it in
+both modes, unless the file names a `scheme`, and refuses to write a theme with
+a pair that misses its target:
+
+```sh
+helix theme init --brand '#0b3d91'
+helix theme build --out theme.css
+```
 
 ## Color one section
 

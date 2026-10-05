@@ -415,7 +415,7 @@ helix-text[tone="warning"]:is([emphasis="muted"], [emphasis="subtle"]) {
   --_button-edge: var(--helix-color-primary);
   --_button-fill: var(--helix-color-primary-surface);
   --_button-fill-hover: var(--helix-color-primary-surface-hover);
-  --_button-on-tone: var(--helix-color-foreground-on-accent);
+  --_button-on-tone: var(--helix-color-foreground-on-primary);
   --_button-tone: var(--helix-color-primary);
   --_button-tone-hover: var(--helix-color-primary-hover);
 }
@@ -434,7 +434,7 @@ helix-text[tone="warning"]:is([emphasis="muted"], [emphasis="subtle"]) {
   --_button-edge: var(--helix-color-danger);
   --_button-fill: var(--helix-color-danger-surface);
   --_button-fill-hover: var(--helix-color-danger-surface-hover);
-  --_button-on-tone: var(--helix-color-foreground-on-accent);
+  --_button-on-tone: var(--helix-color-foreground-on-status);
   --_button-tone: var(--helix-color-danger);
   --_button-tone-hover: color-mix(
     in oklab,

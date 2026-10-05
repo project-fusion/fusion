@@ -52,10 +52,20 @@ describe('badge', () => {
     expect(missing).toEqual([])
   })
 
-  test('neutral is the one fill that sets its own ink', () => {
-    /* Every status fill carries `foreground-on-accent`, solved once on the base
-       rule. Neutral is a rung on the surface ladder rather than a status fill,
-       so the page's own foreground has to be said, or white lands on gray. */
+  test('each family of fill carries its own label, and neutral sets its own ink', () => {
+    /* The primary's label is on the base rule, and the accent and the four
+       statuses each name theirs: an ink fill is light in the dark, so one label
+       could not stand on it and on a danger fill. Neutral is a rung on the
+       surface ladder, so the page's own foreground is said, or white lands on
+       gray. */
+    expect(rule(':host')).toContain('--_badge-on: var(--helix-color-foreground-on-primary)')
+    expect(rule('[part="indicator"]')).toContain('color: var(--_badge-on)')
+    expect(sheet()).toMatch(
+      /:host\(\[tone="accent"\]\) \{\s*--_badge-on: var\(--helix-color-foreground-on-accent\)/,
+    )
+    expect(sheet()).toMatch(
+      /:host\(\[tone="warning"\]\) \{\s*--_badge-on: var\(--helix-color-foreground-on-status\)/,
+    )
     expect(rule(':host([tone="neutral"]) [part="indicator"]')).toContain(
       'color: var(--helix-color-foreground)',
     )

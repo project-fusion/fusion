@@ -2,8 +2,8 @@
    what it draws them in is read off this element by the connector: the fill
    as `color`, the edge as the border, and a count's ink as the outline, each a
    color the page's stylesheet settles and the renderer can only be handed.
-   **The fill is a `-surface` step**, the one the token layer pairs with white,
-   since a cluster writes its count on it. */
+   **The fill is a `-surface` step**, the one the token layer pairs with its
+   role's label, since a cluster writes its count on it. */
 :host {
   border-color: var(--map-points-casing-color, var(--helix-color-surface));
   color: var(--map-points-color, var(--helix-color-primary-surface));
@@ -15,7 +15,7 @@
   inline-size: 0;
   inset-block-start: 0;
   left: 0;
-  outline-color: var(--map-points-ink, var(--helix-color-foreground-on-accent));
+  outline-color: var(--map-points-ink, var(--helix-color-foreground-on-primary));
   pointer-events: none;
   position: absolute;
 }
@@ -70,14 +70,17 @@
 
 :host([tone="accent"]) {
   color: var(--helix-color-accent-surface);
+  outline-color: var(--map-points-ink, var(--helix-color-foreground-on-accent));
 }
 
 :host([tone="danger"]) {
   color: var(--helix-color-danger-surface);
+  outline-color: var(--map-points-ink, var(--helix-color-foreground-on-status));
 }
 
 :host([tone="info"]) {
   color: var(--helix-color-info-surface);
+  outline-color: var(--map-points-ink, var(--helix-color-foreground-on-status));
 }
 
 /* Muted ink has no fill of its own to carry white, so its counts are the surface. */
@@ -88,8 +91,10 @@
 
 :host([tone="success"]) {
   color: var(--helix-color-success-surface);
+  outline-color: var(--map-points-ink, var(--helix-color-foreground-on-status));
 }
 
 :host([tone="warning"]) {
   color: var(--helix-color-warning-surface);
+  outline-color: var(--map-points-ink, var(--helix-color-foreground-on-status));
 }

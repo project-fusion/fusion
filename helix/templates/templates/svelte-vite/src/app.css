@@ -341,9 +341,9 @@ helix-app-header {
  * left of every chosen row.
  *
  * The values are still the library's, so a theme carries them like everything
- * else. `primary-subtle`, because `primary-surface` is the solid accent a
- * button stands on, made for white text, so a row painted with it would put the
- * table's own ink on a saturated fill.
+ * else. `primary-subtle`, because `primary-surface` is the solid fill a
+ * button stands on, made for its own label, so a row painted with it would put
+ * the table's own ink on a solid fill.
  */
 helix-data-table::part(cell-selected),
 helix-data-table::part(select-selected) {

@@ -38,7 +38,7 @@
   --_icon-button-ink-hover: var(--helix-color-primary);
   --_icon-button-fill: var(--helix-color-primary-surface);
   --_icon-button-fill-hover: var(--helix-color-primary-surface-hover);
-  --_icon-button-on-tone: var(--helix-color-foreground-on-accent);
+  --_icon-button-on-tone: var(--helix-color-foreground-on-primary);
   --_icon-button-tone: var(--helix-color-primary);
   --_icon-button-tone-hover: var(--helix-color-primary-hover);
 }
@@ -62,7 +62,7 @@
   --_icon-button-ink-hover: var(--helix-color-danger);
   --_icon-button-fill: var(--helix-color-danger-surface);
   --_icon-button-fill-hover: var(--helix-color-danger-surface-hover);
-  --_icon-button-on-tone: var(--helix-color-foreground-on-accent);
+  --_icon-button-on-tone: var(--helix-color-foreground-on-status);
   --_icon-button-tone: var(--helix-color-danger);
   --_icon-button-tone-hover: color-mix(
     in oklab,

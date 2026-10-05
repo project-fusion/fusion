@@ -167,13 +167,14 @@
      it comes out light by construction, and a fill made of it cannot carry the
      pale ink this trigger puts on it: measured, `foreground-on-accent` over
      `primary` is 2.96:1 in dark against 4.50:1 over `primary-surface`.
-     `primary-surface` exists for exactly this and its own comment says so. */
+     `primary-surface` exists for exactly this and its own comment says so, and
+     its label is `foreground-on-primary`. */
   background-color: var(--helix-color-primary-surface);
   block-size: var(--helix-size-control);
   border-radius: var(--helix-radii-full);
   box-shadow: var(--helix-shadow-md);
   box-sizing: border-box;
-  color: var(--helix-color-foreground-on-accent);
+  color: var(--helix-color-foreground-on-primary);
   cursor: pointer;
   display: inline-flex;
   inline-size: var(--helix-size-control);
