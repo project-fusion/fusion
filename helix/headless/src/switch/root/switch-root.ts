@@ -49,7 +49,9 @@ import { property } from 'lit/decorators.js'
  * @csspart track - The track. Draw the thumb on the track itself, with
  * `::part(track)::after` in your stylesheet. This tier ships no CSS, so it
  * renders no separate thumb element, which would be an empty child that costs
- * your layout as much as any other child. `ListItem` measured that cost.
+ * your layout as much as any other child. `ListItem` measured that cost. A
+ * subclass that draws one returns it from `renderThumb`, as the styled switch
+ * does.
  *
  * @cssstate checked - While it is on.
  * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
@@ -136,6 +138,17 @@ export class HelixHeadlessSwitch extends MixinControllerChecked(MixinField(Helix
     markRegion(this.renderRoot, 'label', [''])
   }
 
+  /**
+   * The thumb, drawn inside the track after the input: nothing on this tier.
+   *
+   * A seam for a tier that draws the thumb as an element, so it can be a part
+   * and hold icons. An element here would be an empty child on every page that
+   * loads only this tier, which is the cost the `track` part notes.
+   */
+  protected renderThumb(): TemplateResult | typeof nothing {
+    return nothing
+  }
+
   protected override render(): TemplateResult {
     /* A real `<label>` around both, so pressing the words works with no click
        handler: the browser does the forwarding.
@@ -162,7 +175,7 @@ export class HelixHeadlessSwitch extends MixinControllerChecked(MixinField(Helix
           @change=${this.handleChange}
           @click=${this.holdReadOnly}
           @input=${this.stopInner}
-        />
+        />${this.renderThumb()}
       </span>
       <span part="label"><slot>${this.label}</slot></span>
     </label>
