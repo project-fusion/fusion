@@ -17,8 +17,8 @@
 /* On the slot, not on what was slotted into it. */
 slot:not([name]) {
   /* A step back from full strength. */
-  color: var(--helix-color-foreground-muted);
-  font-family: var(--helix-font-display);
+  color: var(--blockquote-color, var(--helix-color-foreground-muted));
+  font-family: var(--blockquote-font-family, var(--helix-font-display));
   font-size: var(--blockquote-size, var(--helix-text-xl));
   font-weight: var(--helix-weight-medium);
   letter-spacing: var(--helix-tracking-tight);
@@ -30,10 +30,10 @@ slot:not([name])::slotted(*) {
 }
 
 [part="attribution"] {
-  color: var(--helix-color-foreground-muted);
-  font-size: var(--helix-text-sm);
+  color: var(--blockquote-attribution-color, var(--helix-color-foreground-muted));
+  font-size: var(--blockquote-attribution-size, var(--helix-text-sm));
   /* Room to be a separate thing. */
-  margin-block-start: var(--helix-space-sm);
+  margin-block-start: var(--blockquote-gap, var(--helix-space-sm));
 }
 
 /* Nothing said it, so no caption and no gap under the quote. */

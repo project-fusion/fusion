@@ -283,3 +283,47 @@ if (hasLayout()) {
     })
   })
 }
+
+/* Radix's `delayMs`: a picture that arrives inside the wait never flashes a
+   placeholder. */
+describe('placeholder delay and states', () => {
+  const placeholderHidden = (host: HTMLElement): boolean =>
+    part(host, 'placeholder')?.hasAttribute('hidden') ?? true
+  const states = (host: HTMLElement): ElementInternals['states'] =>
+    (host as unknown as { internals: ElementInternals }).internals.states
+
+  test('keeps the placeholder hidden until the wait is over', async () => {
+    const host = await image('src="/pier.avif" placeholder-delay="30"')
+    expect(placeholderHidden(host)).toBe(true)
+    await new Promise((resolve) => setTimeout(resolve, 60))
+    await host.updateComplete
+    expect(placeholderHidden(host)).toBe(false)
+  })
+
+  test('shows it at once with no wait, as before', async () => {
+    const host = await image('src="/pier.avif"')
+    expect(placeholderHidden(host)).toBe(false)
+  })
+
+  test('a picture that arrives inside the wait never shows one', async () => {
+    const host = await image('src="/pier.avif" placeholder-delay="30"')
+    host.shadowRoot?.querySelector('img')?.dispatchEvent(new Event('load'))
+    await new Promise((resolve) => setTimeout(resolve, 60))
+    await host.updateComplete
+    expect(placeholderHidden(host)).toBe(true)
+  })
+
+  test('says loaded and error as custom states', async () => {
+    const host = await image('src="/pier.avif"')
+    host.shadowRoot?.querySelector('img')?.dispatchEvent(new Event('load'))
+    await host.updateComplete
+    expect(states(host).has('loaded')).toBe(true)
+    expect(states(host).has('error')).toBe(false)
+    host.src = '/missing.avif'
+    await host.updateComplete
+    host.shadowRoot?.querySelector('img')?.dispatchEvent(new Event('error'))
+    await host.updateComplete
+    expect(states(host).has('loaded')).toBe(false)
+    expect(states(host).has('error')).toBe(true)
+  })
+})

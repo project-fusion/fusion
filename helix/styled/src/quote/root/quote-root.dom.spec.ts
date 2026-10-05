@@ -35,7 +35,7 @@ describe('quote', () => {
   test('the slant says it is set apart and the ink says how far, and the ink is the hook', () => {
     // Muted rather than subtle, because this is prose a reader is meant to
     // read and not a label they are meant to skip.
-    expect(rule('[part="quote"]')).toContain('font-style: italic')
+    expect(rule('[part="quote"]')).toContain('font-style: var(--quote-font-style, italic)')
     expect(rule('[part="quote"]')).toContain(
       'color: var(--quote-color, var(--helix-color-foreground-muted))',
     )

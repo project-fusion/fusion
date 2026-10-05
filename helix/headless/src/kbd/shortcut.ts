@@ -1,0 +1,95 @@
+/**
+ * A chord written for `Kbd.keys` in the words `aria-keyshortcuts` takes, and
+ * the bookkeeping that writes it onto the control a shortcut belongs to.
+ *
+ * Beside the family's `index.ts`, because the translation is a fact about ARIA
+ * and the attribute is a fact about another element, and neither is the key's
+ * template.
+ */
+
+/** Each name `keys` accepts, as `aria-keyshortcuts` spells it: the UI Events key values. */
+const ARIA: Record<string, string> = {
+  alt: 'Alt',
+  backspace: 'Backspace',
+  cmd: 'Meta',
+  ctrl: 'Control',
+  del: 'Delete',
+  down: 'ArrowDown',
+  enter: 'Enter',
+  esc: 'Escape',
+  escape: 'Escape',
+  left: 'ArrowLeft',
+  meta: 'Meta',
+  opt: 'Alt',
+  right: 'ArrowRight',
+  shift: 'Shift',
+  space: 'Space',
+  tab: 'Tab',
+  up: 'ArrowUp',
+}
+
+/**
+ * `mod+k` as `aria-keyshortcuts` writes it: `Meta+K` on an Apple keyboard and
+ * `Control+K` elsewhere. A letter is written in capitals and a symbol as
+ * itself. Empty for no keys.
+ */
+export const ariaChord = (keys: string, apple: boolean): string =>
+  keys
+    .split('+')
+    .map((part) => part.trim())
+    .filter((part) => part !== '')
+    .map((part) => {
+      const name = part.toLowerCase()
+      if (name === 'mod') {
+        return apple ? 'Meta' : 'Control'
+      }
+      return ARIA[name] ?? (part.length === 1 ? part.toUpperCase() : part)
+    })
+    .join('+')
+
+/** The space-separated list with `chord` added once. */
+export const withShortcut = (list: string | null, chord: string): string => {
+  const chords = (list ?? '').split(/\s+/).filter(Boolean)
+  return chords.includes(chord) ? chords.join(' ') : [...chords, chord].join(' ')
+}
+
+/** The list with `chord` taken out, or `null` when nothing is left. */
+export const withoutShortcut = (list: string | null, chord: string): string | null => {
+  const chords = (list ?? '').split(/\s+/).filter((one) => one !== '' && one !== chord)
+  return chords.length > 0 ? chords.join(' ') : null
+}
+
+/** What each control was given, so only a chord this file wrote is ever taken away. */
+const WRITTEN = new WeakMap<Element, Set<string>>()
+
+/**
+ * Adds a chord to the control's `aria-keyshortcuts`, leaving any the page
+ * wrote itself.
+ */
+export const claimShortcut = (control: Element, chord: string): void => {
+  if (chord === '') {
+    return
+  }
+  const before = control.getAttribute('aria-keyshortcuts')
+  if ((before ?? '').split(/\s+/).includes(chord) && !WRITTEN.get(control)?.has(chord)) {
+    return
+  }
+  const written = WRITTEN.get(control) ?? new Set<string>()
+  written.add(chord)
+  WRITTEN.set(control, written)
+  control.setAttribute('aria-keyshortcuts', withShortcut(before, chord))
+}
+
+/** Takes back a chord this file wrote, and the attribute with the last one. */
+export const releaseShortcut = (control: Element, chord: string): void => {
+  const written = WRITTEN.get(control)
+  if (!written?.delete(chord)) {
+    return
+  }
+  const after = withoutShortcut(control.getAttribute('aria-keyshortcuts'), chord)
+  if (after === null) {
+    control.removeAttribute('aria-keyshortcuts')
+  } else {
+    control.setAttribute('aria-keyshortcuts', after)
+  }
+}

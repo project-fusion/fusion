@@ -260,3 +260,48 @@ describe('a key that binds', () => {
     expect(heard).toBe(0)
   })
 })
+
+/* `aria-keyshortcuts` is how a screen reader learns a control has a shortcut,
+   and the key on screen already knows the chord. */
+describe('the control a shortcut works', () => {
+  const frame = (): Promise<void> =>
+    new Promise((resolve) => requestAnimationFrame(() => resolve()))
+  const apple = /mac|iphone|ipad|ipod/i.test(navigator.userAgent)
+  const chord = apple ? 'Meta+K' : 'Control+K'
+
+  test('is given the chord in the platform words, and loses it when the key goes', async () => {
+    const field = document.createElement('input')
+    field.id = 'spec-search'
+    document.body.append(field)
+    const key = document.createElement('helix-headless-kbd') as Kbd & { for: string }
+    key.setAttribute('for', 'spec-search')
+    key.keys = 'mod+k'
+    document.body.append(key)
+    await key.updateComplete
+    await frame()
+    expect(field.getAttribute('aria-keyshortcuts')).toBe(chord)
+    key.remove()
+    expect(field.hasAttribute('aria-keyshortcuts')).toBe(false)
+    field.remove()
+  })
+
+  test('keeps the shortcuts the page wrote, and follows a new chord', async () => {
+    const field = document.createElement('input')
+    field.id = 'spec-help'
+    field.setAttribute('aria-keyshortcuts', '?')
+    document.body.append(field)
+    const key = document.createElement('helix-headless-kbd') as Kbd & { for: string }
+    key.setAttribute('for', 'spec-help')
+    key.keys = 'mod+k'
+    document.body.append(key)
+    await key.updateComplete
+    await frame()
+    expect(field.getAttribute('aria-keyshortcuts')).toBe(`? ${chord}`)
+    key.keys = 'shift+/'
+    await key.updateComplete
+    expect(field.getAttribute('aria-keyshortcuts')).toBe('? Shift+/')
+    key.remove()
+    expect(field.getAttribute('aria-keyshortcuts')).toBe('?')
+    field.remove()
+  })
+})

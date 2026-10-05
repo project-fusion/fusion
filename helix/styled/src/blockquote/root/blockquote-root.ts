@@ -17,6 +17,11 @@ import { styles } from './blockquote-root.css.js'
  * @aliases Pullquote, Citation, Excerpt
  * @documentation https://fusion.dev/helix/components/blockquote
  *
+ * @cssproperty --blockquote-attribution-color - The color of the attribution.
+ * @cssproperty --blockquote-attribution-size - The font size of the attribution.
+ * @cssproperty --blockquote-color - The color of the quoted passage.
+ * @cssproperty --blockquote-font-family - The typeface of the quoted passage, the display face by default.
+ * @cssproperty --blockquote-gap - The space between the passage and its attribution.
  * @cssproperty --blockquote-size - The font size of the quoted passage.
  */
 @customElement('helix-blockquote')

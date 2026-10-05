@@ -1,6 +1,12 @@
-import { customElement, HelixElement, HelixShortcutEvent } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  elementById,
+  HelixElement,
+  HelixShortcutEvent,
+} from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { ariaChord, claimShortcut, releaseShortcut } from '../shortcut.js'
 
 /**
  * Whether a node is something a reader types into.
@@ -101,6 +107,12 @@ const onApple = (): boolean =>
  * The element binds the shortcut only when `within` is set. By default it draws
  * the key and listens for nothing.
  *
+ * **`for` names the control the shortcut works**, and the key writes its chord
+ * onto that control's `aria-keyshortcuts`, in the platform's words (`Meta+K`
+ * on an Apple keyboard, `Control+K` elsewhere), so a screen reader announces
+ * the shortcut with the control. A chord the page wrote there itself is left
+ * alone, and the key takes back only what it added.
+ *
  * @since 0.1.0
  * @status stable
  * @category typography
@@ -115,6 +127,17 @@ const onApple = (): boolean =>
  */
 @customElement('helix-headless-kbd')
 export class HelixHeadlessKbd extends HelixElement {
+  /**
+   * The id of the control the shortcut works, which is given the chord as its
+   * `aria-keyshortcuts`.
+   *
+   * Names an element in the same tree, the way `Tooltip.for` does. Separate
+   * from `within`, which says where the key listens: a key can describe a
+   * shortcut the page binds itself.
+   */
+  @property()
+  for = ''
+
   /**
    * The key or chord to show, such as `mod+k`, `?`, or `/`.
    *
@@ -147,14 +170,43 @@ export class HelixHeadlessKbd extends HelixElement {
   /** The element the listener is on, kept so it can be taken off the same one. */
   private listening: EventTarget | undefined
 
+  /** The control and the chord written onto it, so the same pair is taken back. */
+  private described: { chord: string; control: Element } | undefined
+
   override connectedCallback(): void {
     super.connectedCallback()
     this.listen()
+    /* A frame after connecting, which is after a framework has hydrated the
+       control: an attribute it never rendered, arriving while it compares, is
+       one it reports. */
+    requestAnimationFrame(() => this.describe())
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.deafen()
+    this.undescribe()
+  }
+
+  /** Writes the chord onto the control `for` names, taking back one written before. */
+  private describe(): void {
+    const control = this.isConnected && this.for !== '' ? elementById(this, this.for) : null
+    const chord = ariaChord(this.keys, onApple())
+    if (control === this.described?.control && chord === this.described?.chord) {
+      return
+    }
+    this.undescribe()
+    if (control && chord !== '') {
+      claimShortcut(control, chord)
+      this.described = { chord, control }
+    }
+  }
+
+  private undescribe(): void {
+    if (this.described) {
+      releaseShortcut(this.described.control, this.described.chord)
+      this.described = undefined
+    }
   }
 
   protected override updated(changed: Map<string, unknown>): void {
@@ -165,6 +217,12 @@ export class HelixHeadlessKbd extends HelixElement {
     if (changed.has('within') || changed.has('keys')) {
       this.deafen()
       this.listen()
+    }
+    if (
+      (changed.has('for') && changed.get('for') !== undefined) ||
+      (changed.has('keys') && changed.get('keys') !== undefined)
+    ) {
+      this.describe()
     }
   }
 
