@@ -259,8 +259,12 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
   private get shares(): DonutShare[] {
     const series = this.series
     const points = series[0]?.points ?? []
+    /* A slice a legend hid is none of the whole, so the others close over
+       it. A ring's legend names its rows, the slices being the rows. */
     const values = points.map((point) =>
-      Number.isFinite(point.value) && point.value > 0 ? point.value : 0,
+      Number.isFinite(point.value) && point.value > 0 && this.showsSeries(point.label)
+        ? point.value
+        : 0,
     )
     const total = values.reduce((sum, one) => sum + one, 0)
     if (total === 0) {
@@ -314,9 +318,12 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
    */
   protected renderSummary(shares: DonutShare[]): TemplateResult {
     const rows = this.sourceRows
-    const parts = shares.map(
-      (share) => `${rows[share.row]?.label ?? ''} ${percentIn(this.locale).format(share.fraction)}`,
-    )
+    const parts = shares
+      .filter((share) => this.showsSeries(rows[share.row]?.label ?? ''))
+      .map(
+        (share) =>
+          `${rows[share.row]?.label ?? ''} ${percentIn(this.locale).format(share.fraction)}`,
+      )
     const named = this.named ? `${this.named}: ` : ''
     return html`<p id="helix-chart-summary" part="summary">${named}${parts.join(', ')}.</p>`
   }

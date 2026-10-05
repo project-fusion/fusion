@@ -208,7 +208,11 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
 
   /** The domain every series is drawn against, which the tooltip also needs. */
   private range(series: Series[]): [number, number] {
-    const values = series.flatMap((one) => one.points.map((point) => point.value))
+    /* Over the series drawn, so hiding one from a legend fits the scale to
+       the rest, which is what hiding a series in a chart is for. */
+    const values = series
+      .filter((one) => this.showsSeries(one.name))
+      .flatMap((one) => one.points.map((point) => point.value))
     const [low, high] = extent(values.length > 0 ? values : [0])
     return this.zero ? [Math.min(0, low), Math.max(0, high)] : [low, high]
   }
@@ -239,6 +243,9 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
   ): Array<{ index: number; x: number; y: number }> {
     return series.flatMap((one, depth) => {
       const last = one.points.at(-1)
+      if (!this.showsSeries(one.name)) {
+        return []
+      }
       /* A single reading is a point rather than a line, and a mark on the end of
          something with no length is a mark on nothing. */
       if (!last || one.points.length < 2) {
@@ -491,6 +498,10 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
     x: (value: number) => number,
     y: (value: number) => number,
   ): TemplateResult {
+    /* A series a legend hid keeps its palette slot and draws nothing. */
+    if (!this.showsSeries(one.name)) {
+      return html`${nothing}`
+    }
     const runs = unbroken(one)
       .map((run) => {
         const points: Point[] = run.map((point) => [x(point.at), y(point.value)])
@@ -570,6 +581,7 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
     const domain = this.range(series)
     const scale = linear(domain, [PLOT_HEIGHT, 0])
     const tops = series
+      .filter((one) => this.showsSeries(one.name))
       .map((one) => byRow(one, this.readings)[at]?.value)
       .filter((one): one is number => one !== undefined)
       .map((one) => scale(one))

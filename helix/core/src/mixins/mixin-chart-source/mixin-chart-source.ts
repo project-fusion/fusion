@@ -172,6 +172,11 @@ export declare class MixinChartSourceInterface {
    */
   seriesOf(cell: number): number | undefined
   /**
+   * Whether the series of this name is drawn, which it is unless a legend
+   * reading the same table hid it.
+   */
+  showsSeries(name: string): boolean
+  /**
    * The number of readings, which the pointer position maps onto.
    */
   get readings(): number
@@ -330,6 +335,19 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
     seriesOf(cell: number): number | undefined {
       const depth = this.plottedColumns.indexOf(cell)
       return depth < 0 ? undefined : seriesIndex(depth)
+    }
+
+    /**
+     * Whether the series of this name is drawn, which it is unless a legend
+     * reading the same table hid it.
+     *
+     * Asked of the table rather than of a legend, the table being the one
+     * thing the two share: see `SourceController.hide`. A series keeps its
+     * palette slot while it is hidden, so the colors of the others do not move.
+     * For a ring the names are its rows, the slices being the rows.
+     */
+    showsSeries(name: string): boolean {
+      return !this.source.hidden.has(name.trim().toLowerCase())
     }
 
     /** The number of readings, which the pointer position maps onto. */

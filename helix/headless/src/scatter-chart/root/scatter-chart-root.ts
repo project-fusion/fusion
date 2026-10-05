@@ -270,7 +270,10 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
         return x === undefined || y === undefined ? [] : [[x, y, index] as const]
       }),
     )
-    const all = pairs.flat()
+    /* A series a legend hid draws no points and stretches no scale. It keeps
+       its depth, so the others keep their colors. */
+    const shown = ups.map((column) => this.showsSeries(name(column)))
+    const all = pairs.filter((_, depth) => shown[depth]).flat()
     const x = nice(extent(all.length > 0 ? all.map(([one]) => one) : [0]))
     const y = nice(extent(all.length > 0 ? all.map(([, one]) => one) : [0]))
     const along = linear(x, [0, PLOT_WIDTH])
@@ -278,7 +281,9 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
     return {
       pairs: pairs.map((series) => series.map(([one, two]) => [one, two] as [number, number])),
       points: pairs.flatMap((series, depth) =>
-        series.map(([one, two, row]) => ({ depth, row, x: along(one), y: up(two) })),
+        shown[depth]
+          ? series.map(([one, two, row]) => ({ depth, row, x: along(one), y: up(two) }))
+          : [],
       ),
       x,
       xName: name(across),

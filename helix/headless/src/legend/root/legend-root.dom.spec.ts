@@ -146,3 +146,103 @@ describe('chart legend', () => {
     expect(names(host)[0]).toBe('Typed in')
   })
 })
+
+/* Under `toggles` each name is a button that hides its series in every chart
+   reading the same table. A series keeps its color while it is hidden. */
+describe('toggling a series', () => {
+  type Legend = HTMLElement & { hiddenSeries: string; updateComplete: Promise<unknown> }
+  const toggles = (host: HTMLElement): HTMLButtonElement[] => [
+    ...(host.shadowRoot?.querySelectorAll<HTMLButtonElement>('[part="toggle"]') ?? []),
+  ]
+
+  test('is nothing without `toggles`: the names are text', async () => {
+    const host = await legend(TRAFFIC, 'for="traffic"')
+    expect(toggles(host)).toHaveLength(0)
+  })
+
+  test('makes each name a pressed button, pressed while its series is shown', async () => {
+    const host = await legend(TRAFFIC, 'for="traffic" toggles hidden-series="Search"')
+    expect(toggles(host).map((one) => one.getAttribute('aria-pressed'))).toEqual([
+      'true',
+      'false',
+      'true',
+    ])
+    expect(
+      [...(host.shadowRoot?.querySelectorAll('[part~="entry"]') ?? [])].map((one) =>
+        one.getAttribute('part'),
+      ),
+    ).toEqual(['entry', 'entry entry-hidden', 'entry'])
+  })
+
+  test('hides a series on a press, asking first and telling after', async () => {
+    const host = (await legend(TRAFFIC, 'for="traffic" toggles')) as Legend
+    const heard: string[] = []
+    host.addEventListener('helix-before-change', (event) =>
+      heard.push(`before ${(event as CustomEvent<{ value: string }>).detail.value}`),
+    )
+    host.addEventListener('change', () => heard.push(`change ${host.hiddenSeries}`))
+    toggles(host)[2]?.click()
+    toggles(host)[0]?.click()
+    await host.updateComplete
+    expect(heard).toEqual([
+      'before Referral',
+      'change Referral',
+      'before Referral, Direct',
+      'change Referral, Direct',
+    ])
+    expect(toggles(host)[0]?.getAttribute('aria-pressed')).toBe('false')
+  })
+
+  test('keeps the series when the request is refused', async () => {
+    const host = (await legend(TRAFFIC, 'for="traffic" toggles')) as Legend
+    host.addEventListener('helix-before-change', (event) => event.preventDefault())
+    toggles(host)[0]?.click()
+    await host.updateComplete
+    expect(host.hiddenSeries).toBe('')
+  })
+
+  /* The chart finds what the legend hid through the table they share. */
+  test('takes the series out of a chart reading the same table', async () => {
+    await import('../../line-chart/index.js')
+    await mount(
+      `<div>${TRAFFIC}<helix-headless-line-chart for="traffic"></helix-headless-line-chart><helix-headless-legend for="traffic" toggles></helix-headless-legend></div>`,
+    )
+    const chart = document.querySelector('helix-headless-line-chart') as unknown as Legend
+    const host = document.querySelector('helix-headless-legend') as Legend
+    await host.updateComplete
+    await chart.updateComplete
+    const lines = () => [...(chart.shadowRoot?.querySelectorAll('[part="line"]') ?? [])]
+    expect(lines().map((one) => one.getAttribute('data-series'))).toEqual(['1', '2', '3'])
+    toggles(host)[1]?.click()
+    await host.updateComplete
+    await chart.updateComplete
+    expect(lines().map((one) => one.getAttribute('data-series'))).toEqual(['1', '3'])
+    toggles(host)[1]?.click()
+    await host.updateComplete
+    await chart.updateComplete
+    expect(lines()).toHaveLength(3)
+  })
+
+  /* A ring's legend names its rows, and a hidden row is no slice: the others
+     close over it. Bar, Area and Scatter read the same set the same way. */
+  test('takes a slice out of a ring, by its row', async () => {
+    await import('../../donut-chart/index.js')
+    await import('../../bar-chart/index.js')
+    await mount(
+      `<div>${PLANS}<helix-headless-donut-chart for="plans"></helix-headless-donut-chart><helix-headless-legend entries="categories" for="plans" hidden-series="Team"></helix-headless-legend></div>${TRAFFIC}<helix-headless-bar-chart for="traffic"></helix-headless-bar-chart><helix-headless-legend for="traffic" hidden-series="Direct, Referral"></helix-headless-legend>`,
+    )
+    const ring = document.querySelector('helix-headless-donut-chart') as unknown as Legend
+    const bars = document.querySelector('helix-headless-bar-chart') as unknown as Legend
+    for (const one of document.querySelectorAll<Legend>('helix-headless-legend')) {
+      await one.updateComplete
+    }
+    await ring.updateComplete
+    await bars.updateComplete
+    expect(part(ring, 'summary')?.textContent).toBe('Accounts by plan: Free 96%, Enterprise 4%.')
+    expect(
+      [...(bars.shadowRoot?.querySelectorAll('[part="bar"]') ?? [])].map((one) =>
+        one.getAttribute('data-series'),
+      ),
+    ).toEqual(['2', '2'])
+  })
+})

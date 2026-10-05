@@ -19,6 +19,9 @@ import { styles } from './legend-root.css.js'
  * put a color in the headless tier. Charts and legends share the file, so both
  * use the same twenty-four color names.
  *
+ * Under `toggles`, each name is a button. A hidden series' entry fades and
+ * its swatch empties to an outline, so the color stays readable.
+ *
  * @since 0.1.0
  * @status stable
  * @category charts
@@ -27,7 +30,10 @@ import { styles } from './legend-root.css.js'
  * @documentation https://fusion.dev/helix/components/legend
  *
  * @cssproperty --legend-direction - The direction the entries run: `row`, which wraps, or `column`.
+ * @cssproperty --legend-entry-gap - The space between a swatch and its name.
  * @cssproperty --legend-gap - The space between entries.
+ * @cssproperty --legend-hidden-opacity - How strongly a hidden series' entry is drawn, under `toggles`.
+ * @cssproperty --legend-swatch-radius - The corner of the color swatch.
  * @cssproperty --legend-swatch-size - The size of the color swatch.
  * @cssproperty --legend-swatch-stroke - The width of the edge an `outlined` or
  *   `subtle` swatch is drawn with.
@@ -159,7 +165,7 @@ export class HelixLegend extends HelixHeadlessLegend {
     const outlined = slots(this.outlined)
     const subtle = slots(this.subtle)
     const glass = slots(this.glass)
-    const entries = [...this.renderRoot.querySelectorAll('[part="entry"]')]
+    const entries = [...this.renderRoot.querySelectorAll('[part~="entry"]')]
     for (const [at, entry] of entries.entries()) {
       mark(entry, 'emphasis', outlined.has(at) ? 'outlined' : subtle.has(at) ? 'subtle' : undefined)
       mark(entry, 'material', glass.has(at) ? 'glass' : undefined)

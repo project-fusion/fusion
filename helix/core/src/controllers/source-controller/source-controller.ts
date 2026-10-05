@@ -18,6 +18,22 @@ interface Parsed<T> {
   version: number
 }
 
+/**
+ * The series hidden on each table, by lowercased name, which a legend writes
+ * and every chart reading the table draws without.
+ *
+ * **Keyed by the table, because the table is the one thing a legend and a
+ * chart share.** Each names it with `for` and neither names the other, so a
+ * legend cannot find the charts it keys and a chart cannot find its legend.
+ * Both find the table. Weak, so a table a page removes takes its entry with it.
+ */
+const HIDDEN = new WeakMap<Element, ReadonlySet<string>>()
+
+/** Every controller reading a table, so a change to what is hidden redraws each. */
+const READERS = new WeakMap<Element, Set<SourceController>>()
+
+const NONE: ReadonlySet<string> = new Set()
+
 /** A host that names the element it reads from. */
 export interface SourceHost extends ReactiveControllerHost, HTMLElement {
   /**
@@ -169,6 +185,58 @@ export class SourceController implements ReactiveController {
     return { element, value: read(element), version: this.version }
   }
 
+  /**
+   * The series hidden on the table, by lowercased name. Empty where there is
+   * no table, which is every server render.
+   */
+  get hidden(): ReadonlySet<string> {
+    const element = this.element
+    return element ? (HIDDEN.get(element) ?? NONE) : NONE
+  }
+
+  /**
+   * Hides these series on the table and shows every other, for every chart
+   * and legend reading it, which then redraw.
+   *
+   * Names are matched without regard to case or surrounding space, as a
+   * column's heading is everywhere else. Nothing happens where `for` names no
+   * table, or the set is already this one.
+   */
+  hide(names: Iterable<string>): void {
+    const element = this.resolve()
+    if (!element) {
+      return
+    }
+    const next = new Set([...names].map((one) => one.trim().toLowerCase()).filter(Boolean))
+    const now = HIDDEN.get(element) ?? NONE
+    if (next.size === now.size && [...next].every((one) => now.has(one))) {
+      return
+    }
+    if (next.size === 0) {
+      HIDDEN.delete(element)
+    } else {
+      HIDDEN.set(element, next)
+    }
+    for (const reader of READERS.get(element) ?? []) {
+      reader.host.requestUpdate()
+    }
+  }
+
+  /** Counts this controller among the readers of the table it watches, or of none. */
+  private enlist(element: Element | null): void {
+    if (this.watched) {
+      READERS.get(this.watched)?.delete(this)
+    }
+    if (element) {
+      let readers = READERS.get(element)
+      if (!readers) {
+        readers = new Set()
+        READERS.set(element, readers)
+      }
+      readers.add(this)
+    }
+  }
+
   hostConnected(): void {
     this.watch()
   }
@@ -182,6 +250,8 @@ export class SourceController implements ReactiveController {
   }
 
   hostDisconnected(): void {
+    this.enlist(null)
+    this.watched = null
     this.observer?.disconnect()
     this.observer = undefined
     this.tree?.disconnect()
@@ -199,6 +269,7 @@ export class SourceController implements ReactiveController {
     this.tree?.disconnect()
     this.version += 1
     const element = this.resolve()
+    this.enlist(element)
     this.watched = element
     if (typeof MutationObserver === 'undefined') {
       return

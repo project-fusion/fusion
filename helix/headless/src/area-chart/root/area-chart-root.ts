@@ -206,8 +206,17 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
        bubble disagreed about which column is which is the fault that made it
        shared. */
     const columns = this.plottedColumns
-    const values = columns.map((column) =>
+    const names = columns.map(
+      (column) => rows.find((row) => row.cells[column])?.cells[column]?.name ?? '',
+    )
+    /* A part a legend hid is none of the total, so its band closes and the
+       top edge is the sum of the parts still drawn. It keeps its place, and so
+       its color. */
+    const values = columns.map((column, depth) =>
       rows.map((row) => {
+        if (!this.showsSeries(names[depth] ?? '')) {
+          return 0
+        }
         const value = row.cells[column]?.value ?? 0
         if (value < 0) {
           this.warnNegative()
@@ -235,9 +244,7 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
     return {
       columns,
       layers,
-      names: columns.map(
-        (column) => rows.find((row) => row.cells[column])?.cells[column]?.name ?? '',
-      ),
+      names,
       totals,
       values,
     }
@@ -424,9 +431,12 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
     const last = rows.length - 1
     const total = stack.totals[last] ?? 0
     const format = formatNumbers(this.locale)
-    const shares = stack.names.map(
-      (name, depth) =>
-        `${name} ${percentIn(this.locale).format(total > 0 ? (stack.values[depth]?.[last] ?? 0) / total : 0)}`,
+    const shares = stack.names.flatMap((name, depth) =>
+      this.showsSeries(name)
+        ? [
+            `${name} ${percentIn(this.locale).format(total > 0 ? (stack.values[depth]?.[last] ?? 0) / total : 0)}`,
+          ]
+        : [],
     )
     const named = this.named ? `${this.named}, ` : ''
     return html`<p id="helix-chart-summary" part="summary">
