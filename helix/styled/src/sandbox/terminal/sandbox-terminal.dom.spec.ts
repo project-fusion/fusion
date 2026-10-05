@@ -42,6 +42,17 @@ describe('sandbox terminal', () => {
     expect(part(term, 'empty')).toBeNull()
   })
 
+  /* The level was hidden from screen readers, so an error read the same as a
+     log. A plain log keeps its word hidden, being every other line. */
+  test('reads a warning and an error by their level', async () => {
+    const term = await terminal()
+    term.write({ level: 'error', text: 'Boom' })
+    term.write({ level: 'log', text: 'hi' })
+    await term.updateComplete
+    const levels = [...(term.shadowRoot?.querySelectorAll('[part="level"]') ?? [])]
+    expect(levels.map((level) => level.getAttribute('aria-hidden'))).toEqual([null, 'true'])
+  })
+
   test('consecutive repeats collapse into one line and a count', async () => {
     const term = await terminal()
     for (let index = 0; index < 4; index += 1) {

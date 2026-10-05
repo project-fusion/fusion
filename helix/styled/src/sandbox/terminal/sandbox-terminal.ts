@@ -26,7 +26,9 @@ const LIMIT = 200
  * warning. Only consecutive repeats collapse, so the order of messages is kept.
  *
  * The panel has `role="log"`, the role for an append-only stream. Screen
- * readers announce new output without reading the whole panel again.
+ * readers announce new output without reading the whole panel again. A line's
+ * level is read before it, except a plain `log`, so an error does not sound
+ * like any other line.
  *
  * @since 0.1.0
  * @status stable
@@ -116,7 +118,9 @@ export class HelixSandboxTerminal extends HelixElement {
           ? html`<p part="empty">${this.emptyLabel}</p>`
           : this.entries.map(
               (entry) => html`<div part="entry" data-level=${entry.level}>
-                <span part="level" aria-hidden="true">${entry.level}</span>
+                <span part="level" aria-hidden=${entry.level === 'log' ? 'true' : nothing}
+                  >${entry.level}</span
+                >
                 <span part="message">${entry.text}</span>
                 ${
                   entry.count > 1

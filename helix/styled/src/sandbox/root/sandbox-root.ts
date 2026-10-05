@@ -174,12 +174,16 @@ export class HelixSandbox extends HelixElement {
 
   /**
    * The name of the divider between the panes, read by screen readers.
+   *
+   * Empty names the lead pane, "Resize source pane" or "Resize preview pane",
+   * since the divider's value is that pane's share.
    */
   @property({ attribute: 'separator-label' })
-  separatorLabel = 'Resize source pane'
+  separatorLabel = ''
 
   /**
-   * Percentage of the sandbox given to the source pane.
+   * Percentage of the sandbox given to the lead pane: the source, unless `lead`
+   * is `preview`.
    */
   @property({ attribute: 'split', type: Number })
   split = DEFAULT_SPLIT
@@ -314,21 +318,59 @@ export class HelixSandbox extends HelixElement {
     const { value } = (event as HelixBeforeEditEvent).detail
     /* Which pane is the element, and the element is `composedPath()[0]` rather
        than `event.target`, which is retargeted to the outermost host once the
-       event has crossed a shadow boundary.
+       event has crossed a shadow boundary. Read now: the path is empty once
+       the dispatch is over.
 
        Named, not guessed. Treating anything that is not `css` as markup holds
        only while there are two panes: a pane showing the example as JSX
        announces itself the same way, and the preview renders the text of a React
        component as though it were markup. */
     const pane = event.composedPath()[0] as { name?: string }
-    if (pane?.name !== 'css' && pane?.name !== 'html') {
+    const name = pane?.name
+    if (name !== 'css' && name !== 'html') {
       return
     }
+    /* **After the dispatch, and only if nobody refused.** This listener is
+       on the host from connection, so it runs before any listener a consumer
+       adds, while `defaultPrevented` is still unanswered: a refused edit kept
+       the source and still reached the preview. The dispatch is synchronous,
+       so a microtask reads the final answer. */
+    queueMicrotask(() => {
+      if (!event.defaultPrevented) {
+        this.write(name, value, false)
+      }
+    })
+  }
+
+  /**
+   * Writes a pane's text into every preview here.
+   *
+   * `seeding` writes only into a preview that has nothing yet, so a preview
+   * given its own `source` keeps it until the first edit.
+   */
+  private write(name: 'css' | 'html', value: string, seeding: boolean): void {
     for (const preview of this.previews) {
-      if (pane.name === 'css') {
-        preview.styles = value
-      } else {
-        preview.source = value
+      const key = name === 'css' ? 'styles' : 'source'
+      if (!seeding || !preview[key]) {
+        preview[key] = value
+      }
+    }
+  }
+
+  /**
+   * Hands what the source panes already hold to the previews.
+   *
+   * Only edits were forwarded, so a pane written with a `value` showed its
+   * text beside an empty preview until the first keystroke, and the text had
+   * to be written twice. Client only, like the other reads of the light DOM.
+   */
+  private readonly seed = (): void => {
+    const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="source"]')
+    for (const pane of slot?.assignedElements({ flatten: true }) ?? []) {
+      const { name, value } = pane as Element & { name?: unknown; value?: unknown }
+      const text = typeof value === 'string' ? value : pane.getAttribute('value')
+      if ((name === 'css' || name === 'html') && text) {
+        this.write(name, text, true)
       }
     }
   }
@@ -644,6 +686,7 @@ export class HelixSandbox extends HelixElement {
       this.finishHydration()
     }
     this.watchBody(this.watch === undefined)
+    this.seed()
   }
 
   override disconnectedCallback(): void {
@@ -693,7 +736,7 @@ export class HelixSandbox extends HelixElement {
           part="panes"
           exportparts="separator"
           default-position=${Number.isFinite(this.defaultSplit) ? this.defaultSplit : DEFAULT_SPLIT}
-          label=${this.separatorLabel}
+          label=${this.separatorLabel || (first === 'preview' ? 'Resize preview pane' : 'Resize source pane')}
           orientation=${vertical ? 'vertical' : 'horizontal'}
           .position=${split}
           @helix-before-collapse=${this.handleCollapse}
@@ -707,8 +750,8 @@ export class HelixSandbox extends HelixElement {
                first. */
             ''
           }
-          <div part="pane" data-pane=${first} slot="start"><slot name=${first}></slot></div>
-          <div part="pane" data-pane=${second} slot="end"><slot name=${second}></slot></div>
+          <div part="pane" data-pane=${first} slot="start"><slot name=${first} @slotchange=${this.seed}></slot></div>
+          <div part="pane" data-pane=${second} slot="end"><slot name=${second} @slotchange=${this.seed}></slot></div>
         </helix-splitter>
         <div part="panel" slot="end"><slot name="panel" @slotchange=${this.readPanel}></slot></div>
       </helix-splitter>
