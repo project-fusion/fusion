@@ -140,7 +140,36 @@
    instead. */
 :host(:not([diff])) [part="code"] {
   display: block;
+  /* A long file stops growing here and scrolls, when a page asks. */
+  max-block-size: var(--code-block-max-block-size, none);
   overflow-x: auto;
+}
+
+/* Wrapped rather than scrolled, for prose-like code. Anywhere, since a long
+   path or a hash has no space to break at. Not under line numbers, where a
+   wrapped line would take one number and several rows. */
+:host([wrap]:not([diff], [line-numbers])) [part="code"] {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+/* The numbers beside the code, level with its lines: the gutter is in the same
+   `<pre>`, set in the code's face, size and line height, and the code scrolls
+   beside it rather than under it. */
+:host([line-numbers]:not([diff])) [part="block"] {
+  column-gap: var(--helix-space-md);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+[part="gutter"] {
+  color: var(--code-block-gutter-color, var(--helix-color-foreground-subtle));
+  font-family: var(--helix-font-mono);
+  font-size: var(--helix-text-sm);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--helix-leading-normal);
+  text-align: end;
+  user-select: none;
 }
 
 /* ================================================================ diff === */

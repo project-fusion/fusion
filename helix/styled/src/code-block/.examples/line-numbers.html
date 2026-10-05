@@ -1,0 +1,11 @@
+<!-- @summary A named block with its lines numbered in a gutter that a copy leaves out. -->
+
+<helix-code-block
+  label="save.ts"
+  line-numbers
+>import '@fusion.dev/helix/button'
+
+const save = document.querySelector('helix-button')
+save?.addEventListener('click', () => {
+  console.log('Saved')
+})</helix-code-block>

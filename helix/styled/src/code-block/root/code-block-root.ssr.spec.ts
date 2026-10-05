@@ -8,6 +8,15 @@ describe('code-block server output', () => {
     const markup = withoutStyles(ssr(html`<helix-code-block>one</helix-code-block>`))
     expect(hasPart(markup, 'code')).toBe(true)
   })
+
+  /* The server has no code to read, so it numbers nothing and highlights
+     nothing; the client makes the same first render and fills both in. */
+  test('serves an empty gutter under line numbers', () => {
+    const markup = withoutStyles(ssr(html`<helix-code-block line-numbers>one</helix-code-block>`))
+    expect(rendered(markup, 'helix-code-block')).toMatch(
+      /<span part="gutter" aria-hidden="true">(?:<!--[^>]*-->)*<\/span>/,
+    )
+  })
 })
 
 /* A diff is slotted text, and a server has no children to read, so what it
@@ -28,7 +37,7 @@ describe('code-block diff server output', () => {
        the shadow root empty. The claim is the slot inside the code element,
        which is what sends the patch as code rather than as parsed rows. */
     expect(rendered(markup, 'helix-code-block')).toMatch(
-      /<pre part="block"><code part="code">(?:<!--[^>]*-->)?<slot\s*><\/slot><\/code><\/pre>/,
+      /<pre part="block">(?:<!--[^>]*-->)*<code part="code">(?:<!--[^>]*-->)?<slot\s*><\/slot><\/code>(?:<!--[^>]*-->)*<\/pre>/,
     )
   })
 })
