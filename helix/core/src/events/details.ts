@@ -363,6 +363,19 @@ export interface ScrolledDetail {
   scrolled: boolean
 }
 
+/**
+ * What a press came from, React Aria's `PointerType`: a pointer by its kind, a
+ * key, or `virtual` for a press with neither behind it, which is how a screen
+ * reader's press and a script's `click()` arrive.
+ */
+export type PressPointerType = 'keyboard' | 'mouse' | 'pen' | 'touch' | 'virtual'
+
+/** Detail carried by `helix-press`. */
+export interface PressDetail {
+  /** What the press came from. */
+  pointerType: PressPointerType
+}
+
 /** Detail carried by `helix-before-toggle`. */
 export interface ToggleDetail {
   /** The state being asked for, as a boolean and not a word that reads like one. */
