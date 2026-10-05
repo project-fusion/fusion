@@ -49,3 +49,52 @@ describe('skeleton', () => {
     expect(part(skeleton, 'skeleton')).not.toBeNull()
   })
 })
+
+/* Radix Themes' Skeleton wraps the real content and takes its size, and sets
+   the region busy while it loads, which is what a placeholder beside the
+   content cannot do. */
+describe('a skeleton around content', () => {
+  type Skeleton = HTMLElement & {
+    internals: ElementInternals
+    loading: boolean
+    updateComplete: Promise<unknown>
+  }
+
+  test('keeps the content inert and the region busy while it loads', async () => {
+    const skeleton = (await mount(
+      '<helix-headless-skeleton loading><a href="/profile">Ada</a></helix-headless-skeleton>',
+    )) as Skeleton
+    await skeleton.updateComplete
+    expect(part(skeleton, 'content')?.hasAttribute('inert')).toBe(true)
+    expect(skeleton.internals.ariaBusy).toBe('true')
+    expect(skeleton.internals.ariaHidden ?? null).toBeNull()
+  })
+
+  test('and shows it as it is once loaded', async () => {
+    const skeleton = (await mount(
+      '<helix-headless-skeleton loading><a href="/profile">Ada</a></helix-headless-skeleton>',
+    )) as Skeleton
+    skeleton.loading = false
+    await skeleton.updateComplete
+    expect(part(skeleton, 'content')?.hasAttribute('inert')).toBe(false)
+    expect(skeleton.internals.ariaBusy ?? null).toBeNull()
+    expect(skeleton.internals.ariaHidden ?? null).toBeNull()
+  })
+
+  test('an empty skeleton stays hidden, loading or not', async () => {
+    const skeleton = (await mount(
+      '<helix-headless-skeleton loading> </helix-headless-skeleton>',
+    )) as Skeleton
+    expect(skeleton.internals.ariaHidden).toBe('true')
+  })
+
+  test('content arriving later is read as content', async () => {
+    const skeleton = (await mount(
+      '<helix-headless-skeleton></helix-headless-skeleton>',
+    )) as Skeleton
+    skeleton.append(document.createTextNode('Ada'))
+    await new Promise((done) => setTimeout(done, 0))
+    await skeleton.updateComplete
+    expect(skeleton.internals.ariaHidden ?? null).toBeNull()
+  })
+})

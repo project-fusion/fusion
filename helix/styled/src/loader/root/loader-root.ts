@@ -14,6 +14,9 @@ import { styles } from './loader-root.css.js'
  * `currentColor`, so it matches the text color around it, including inside a
  * primary button.
  *
+ * While `delay` runs, the loader keeps its size and draws nothing, so the line
+ * it sits in does not move when it appears.
+ *
  * @since 0.1.0
  * @status stable
  * @category feedback

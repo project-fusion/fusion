@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostAttributes, ssr } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, hostAttributes, partTag, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -17,5 +17,13 @@ describe('spinner server output', () => {
         'helix-headless-loader',
       ),
     ).toEqual([])
+  })
+})
+
+describe('a loader with a delay, served', () => {
+  /* A page that loads quickly never draws it, the server included. */
+  test('is served hidden', () => {
+    const markup = ssr(html`<helix-headless-loader delay="300"></helix-headless-loader>`)
+    expect(partTag(markup, 'svg')).toMatch(/\shidden/)
   })
 })

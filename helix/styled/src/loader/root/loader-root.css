@@ -226,6 +226,18 @@
   }
 }
 
+/* Waiting out `delay`: the drawing keeps its box and is not drawn, so the
+   line it sits in does not move when it appears. */
+[part="svg"][hidden] {
+  display: inline;
+  visibility: hidden;
+}
+
+[part="mark"][hidden] {
+  display: flex;
+  visibility: hidden;
+}
+
 /* Print: a spinner is a promise that something is coming, which on paper it is
  * not.
  *

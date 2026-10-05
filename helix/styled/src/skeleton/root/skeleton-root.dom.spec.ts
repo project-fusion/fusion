@@ -72,3 +72,30 @@ describe('skeleton', () => {
     expect(reduced).toContain('background-image: none')
   })
 })
+
+/* Radix Themes wraps the real content and keeps its size; wa-skeleton offers an
+   effect and color and sheen hooks. */
+describe('skeleton around content', () => {
+  test('takes the content box, hides the content while loading, and steps aside after', () => {
+    expect(rule(':host(:not(:empty))')).toContain('inline-size: fit-content')
+    expect(rule(':host(:not(:empty)) [part="skeleton"]')).toContain('position: absolute')
+    expect(rule(':host([loading]:not(:empty)) [part="content"]')).toContain('visibility: hidden')
+    expect(rule(':host(:not(:empty):not([loading])) [part="skeleton"]')).toContain('display: none')
+  })
+
+  test('the fill, the sheen, the corner and the pace are hooks that rest on the old values', () => {
+    expect(sheet()).toMatch(/var\(\s*--skeleton-color,\s*color-mix/)
+    expect(sheet()).toMatch(/var\(\s*--skeleton-sheen-color,\s*color-mix/)
+    expect(sheet()).toMatch(/var\(\s*--skeleton-radius,\s*var\(--helix-radii-sm\)\)/)
+    expect(sheet()).toMatch(
+      /var\(\s*--skeleton-duration,\s*calc\(var\(--helix-duration-slow\) \* 4\)\)/,
+    )
+  })
+
+  test('effect="pulse" fades the fill, and effect="none" sits still', async () => {
+    expect(rule(':host([effect="pulse"]) [part="skeleton"]')).toContain('helix-skeleton-pulse')
+    const still = (await mount('<helix-skeleton effect="none"></helix-skeleton>')) as Updatable
+    expect(still.getAttribute('effect')).toBe('none')
+    expect(sheet()).toContain(':host([effect="none"]) [part="skeleton"]::after')
+  })
+})
