@@ -1,9 +1,8 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessFileInput } from '@fusion.dev/helix-headless/file-input'
 import type { CSSResultGroup } from 'lit'
-/* Inherited from the base along with the template: the tier below renders
-   `<helix-icon>` for each file's remove control. */
-import '../../icon/index.js'
+/* Inherited from the base along with the template: the tier below renders a
+   `<helix-tag>` for each file's size and kind. */
 import '../../tag/index.js'
 import { styles as fieldStyles } from '../../shared/field/field.css.js'
 import { styles as fieldFrameStyles } from '../../shared/field/field-frame.css.js'

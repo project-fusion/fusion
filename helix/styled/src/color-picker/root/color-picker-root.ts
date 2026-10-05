@@ -5,7 +5,6 @@ import type { CSSResultGroup } from 'lit'
    tags in it to remind anyone. */
 import '../../button/index.js'
 import '../../button-group/index.js'
-import '../../icon/index.js'
 import '../../slider/index.js'
 import { styles as glyphStyles } from '../../shared/glyph/glyph.css.js'
 import { styles } from './color-picker-root.css.js'

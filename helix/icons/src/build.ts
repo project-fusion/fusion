@@ -149,7 +149,10 @@ export function build(options: BuildOptions): number {
         `export const ${name}: HelixIcon = {\n  content: '${content.replace(/'/g, "\\'")}',\n  name: '${slug}',\n  viewBox: '${viewBox}',\n}`,
     )
     .join('\n\n')
-  const record = entries.map(({ camel: name }) => `  [${name}.name]: ${name},`).join('\n')
+  /* **Literal keys.** A computed `[peak.name]` reads a property, and Bun and
+     esbuild keep any object whose keys read one, so a module importing one
+     glyph shipped every glyph the record names. */
+  const record = entries.map(({ camel: name, slug }) => `  '${slug}': ${name},`).join('\n')
 
   writeFileSync(
     out,
