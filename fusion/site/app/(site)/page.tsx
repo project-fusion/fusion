@@ -114,11 +114,10 @@ export default function Home() {
               explains, so you can see it is the same subject in more depth. */}
           <helix-flex class={band.bandSection} direction="column" gap="md">
             <Eyebrow>Theming</Eyebrow>
-            <SectionTitle>How one color becomes a full theme</SectionTitle>
-            <Lede>
-              You enter one brand color. Helix computes every token from it and measures each text
-              and background pair for contrast before the theme is used.
-            </Lede>
+            <SectionTitle>
+              Every text and background pair is measured before the theme is used
+            </SectionTitle>
+            <Lede>You enter one brand color, and Helix computes every token from it.</Lede>
           </helix-flex>
           <DerivationDiagrams className={band.bandSection} />
         </Band>
@@ -135,11 +134,8 @@ export default function Home() {
               {/* Named after the card above that this band explains, like the
                   Theming band. */}
               <Eyebrow>Components</Eyebrow>
-              <SectionTitle>Live Helix components, running on the page</SectionTitle>
-              <Lede>
-                Each control in the panel is a custom element from the Helix package, running in
-                your browser.
-              </Lede>
+              <SectionTitle>The panel is Helix, running in your browser</SectionTitle>
+              <Lede>Each control in it is a custom element from the Helix package.</Lede>
               <helix-flex class="siteActions" data-density="lg" direction="column" gap="md">
                 <Link data-button="subtle" href="/helix">
                   Explore components
@@ -223,7 +219,6 @@ export default function Home() {
           <helix-flex class={band.bandSection} direction="column" gap="md">
             <Eyebrow>Working with us</Eyebrow>
             <SectionTitle>{ENGAGEMENT_COPY.title}</SectionTitle>
-            <Lede>{ENGAGEMENT_COPY.lede}</Lede>
           </helix-flex>
 
           <div className={`${band.bandRow} ${styles.stagger}`}>
@@ -249,15 +244,14 @@ export default function Home() {
             <helix-flex align-items="center" gap="md" justify-content="between" wrap>
               <helix-flex direction="column" gap="sm">
                 <Eyebrow>Insights</Eyebrow>
-                <SectionTitle>Articles from the team</SectionTitle>
+                <SectionTitle>
+                  How we make design, engineering, and business decisions, and why
+                </SectionTitle>
               </helix-flex>
               <Link className="siteActions" data-button="subtle" href="/insights">
                 Read all articles
               </Link>
             </helix-flex>
-            {/* Below the row rather than inside it, so `Read all` stays on the
-                    heading's line and the sentence runs the full measure. */}
-            <Lede>How we make design, engineering, and business decisions, and why.</Lede>
           </helix-flex>
 
           {/* **No card and no art, because the band is the card.**

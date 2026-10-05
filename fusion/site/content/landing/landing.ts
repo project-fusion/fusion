@@ -28,17 +28,14 @@ export const LANDING: PageCopy = {
       title: 'The part you can buy today',
     },
     {
-      body: [
-        'Each control in the panel is a custom element from the Helix package, running in your browser. Their colors come from one brand color.',
-      ],
+      body: ['Each control in the panel is a custom element from the Helix package.'],
       kicker: 'Components',
-      title: 'Live Helix components, running on the page',
+      title: 'The panel is Helix, running in your browser',
     },
     {
       /* The cards live in `helix-landing.ts`, because the page renders them
          too. Holding them here alone makes this document describe a band the
          page does not have. */
-      body: [ENGAGEMENT_COPY.lede],
       items: ENGAGEMENT,
       kicker: 'Working with us',
       title: ENGAGEMENT_COPY.title,
@@ -46,7 +43,7 @@ export const LANDING: PageCopy = {
     {
       from: 'insights',
       kicker: 'Insights',
-      title: 'Articles from the team',
+      title: 'How we make design, engineering, and business decisions, and why',
     },
     {
       body: ['Tell us what you need built. If we are not the right team for it, we will tell you.'],

@@ -241,22 +241,20 @@ export const MAPS: PageCopy = {
         name: pillar.name,
       })),
       kicker: 'Why Helix',
-      title: 'What Helix adds to a map',
+      title: 'Styled by your theme and written in HTML, on MapLibre or Leaflet',
     },
     {
-      body: [
-        `Every café, bar, and restaurant in Austin, ${AUSTIN_PLACES.toLocaleString('en-US')} places, loaded from one GeoJSON file.`,
-      ],
+      body: [`${AUSTIN_PLACES.toLocaleString('en-US')} places, loaded from one GeoJSON file.`],
       kicker: 'Thousands of points',
-      title: 'Thousands of places on one map',
+      title: 'Every café, bar, and restaurant in Austin',
     },
     {
       body: [
-        'Each is an HTML element you place inside the map. Each takes a tone, such as primary or danger, for its color.',
+        'Place each inside the map. Each takes a tone, such as primary or danger, for its color.',
       ],
       items: MAP_FEATURES.map((feature) => ({ body: feature.body, name: feature.title })),
       kicker: 'What you can add',
-      title: 'Markers, routes, and live positions',
+      title: 'Markers, routes, and live positions are HTML elements',
     },
     {
       body: [
@@ -267,11 +265,11 @@ export const MAPS: PageCopy = {
     },
     {
       body: [
-        'Each is an HTML element you place inside the map. Open the layers menu to turn each one on or off.',
+        'Terrain, buildings, imagery, and weather are each an HTML element you place inside the map.',
       ],
       items: MAP_LAYERS.map((feature) => ({ body: feature.body, name: feature.title })),
       kicker: 'Layers',
-      title: 'Terrain, buildings, imagery, and weather',
+      title: 'One menu turns each layer on or off',
     },
     {
       body: [
@@ -291,22 +289,20 @@ export const MAPS: PageCopy = {
     },
     {
       body: [
-        'Install Helix, the map connector, and MapLibre. The Maps guide shows how to add a map, connect it, and style it with your theme.',
+        'One command installs all three. The Maps guide shows how to add a map, connect it, and style it with your theme.',
         `\`${MAP_INSTALL}\``,
       ],
       kicker: 'Get started',
-      title: 'Add a map to your site',
+      title: 'Helix, the map connector, and MapLibre',
     },
     {
-      body: [
-        'The parts of Helix Maps, from the elements you write to the map data. MapLibre or Leaflet draws the map itself.',
-      ],
+      body: ['MapLibre or Leaflet draws the map itself.'],
       items: MAP_STACK.map((layer) => ({
         body: `${layer.stage ?? layer.owner}. ${layer.body}`,
         name: layer.title,
       })),
       kicker: 'Under the hood',
-      title: 'How it is built',
+      title: 'Six parts, from the elements you write to the map tiles',
     },
   ],
   lede: 'Interactive maps styled with your theme. Add places, routes, live positions, terrain, and thousands of data points to a map drawn by MapLibre or Leaflet.',

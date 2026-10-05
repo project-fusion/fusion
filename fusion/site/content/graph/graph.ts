@@ -137,35 +137,34 @@ export const GRAPH: PageCopy = {
         name: pillar.name,
       })),
       kicker: 'Why Helix',
-      title: 'What Helix adds',
+      title: 'Your theme’s colors, a searchable list, and a choice of renderer',
     },
     {
       body: [
-        'New notes arrive and messages travel the links, drawn by Sigma.js.',
+        'Sigma.js draws the graph as it changes.',
         'Press a note to see its links, or a group in the legend to hide its notes. New calls appear in the list as they arrive.',
       ],
       kicker: 'Live data',
-      title: 'Updates as your data changes',
+      title: 'New notes arrive and messages travel the links',
     },
     {
-      body: ['Set each on a note or on the frame.'],
       items: GRAPH_FEATURES.map((feature) => ({ body: feature.body, name: feature.title })),
       kicker: 'Features',
-      title: 'Styles, signals, and live updates',
+      title: 'Set styles, signals, and updates on a note or on the frame',
     },
     {
       body: [
-        'Three thousand services on a knot, drawn by three.js. Drag to turn it.',
+        'Drawn by three.js. Drag to turn it.',
         'Press a note to see its links. The Notes button opens the list.',
       ],
       kicker: '3D',
-      title: 'Graphs on 3D models',
+      title: 'Three thousand services on a knot',
     },
     {
-      body: ['Notes take the shape from the first frame, with no layout to wait for.'],
+      body: ['Models, outlines, and solids, with no layout to wait for.'],
       items: GRAPH_SHAPES.map((shape) => ({ body: shape.body, name: shape.title })),
       kicker: 'Shapes',
-      title: 'Models, outlines, and solids',
+      title: 'Notes take the shape from the first frame',
     },
     {
       body: [
@@ -177,20 +176,20 @@ export const GRAPH: PageCopy = {
     },
     {
       body: [
-        'Install Helix, the connector, and a renderer. The Graphs guide covers the rest.',
+        'One command installs them, and the Graphs guide covers the rest.',
         `\`${GRAPH_INSTALL}\``,
       ],
       kicker: 'Get started',
-      title: 'Add a graph to your site',
+      title: 'Helix, the connector, and a renderer',
     },
     {
-      body: ['Four parts, from the element you write to the renderer.'],
+      body: ['Sigma.js, cosmos.gl, or three.js draws the graph itself.'],
       items: GRAPH_STACK.map((layer) => ({
         body: `${layer.stage ?? layer.owner}. ${layer.body}`,
         name: layer.title,
       })),
       kicker: 'Under the hood',
-      title: 'How it is built',
+      title: 'Four parts, from the element you write to the renderer',
     },
   ],
   lede: 'Interactive graphs styled with your theme, in 2D, in 3D, and on 3D models. Drawn by Sigma.js, cosmos.gl, or three.js.',
