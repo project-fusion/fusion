@@ -96,6 +96,7 @@ export class HelixHeadlessIcon extends HelixElement {
    * belongs to the platform.
    */
   static override get observedAttributes(): string[] {
+    // biome-ignore lint/complexity/noThisInStatic: super runs Lit's getter with the subclass as this, so a styled icon keeps its own attributes, where the class name would read the base's
     return [...super.observedAttributes, 'aria-label']
   }
 

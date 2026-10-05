@@ -182,7 +182,7 @@ describe('map layers menu', () => {
     ) as HTMLButtonElement
     tile.click()
     await settle(host)
-    expect(asked).toEqual([{ checked: false, from: route }])
+    expect(asked).toEqual([{ checked: false, from: route ?? null }])
     expect(route?.hidden).toBe(false)
   })
 
