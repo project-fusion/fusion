@@ -11,6 +11,7 @@ import {
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixHeadlessToggle } from '../root/toggle-root.js'
+import { pressedValues, toggledValues } from '../selection.js'
 
 /**
  * @summary A row of options with the selection marked by a moving indicator.
@@ -24,6 +25,17 @@ import { HelixHeadlessToggle } from '../root/toggle-root.js'
  * indicator as custom properties, because labels have different lengths.
  * Measurement happens on the client, so the server renders the indicator hidden
  * and it fades in once measured.
+ *
+ * `selection-mode="multiple"` makes the group a toolbar of buttons that each
+ * say whether they are pressed with `aria-pressed`, as React Aria's
+ * ToggleButtonGroup and Radix's ToggleGroup do. A press presses or releases
+ * one item, the arrow keys move focus without pressing, and `value` is the
+ * pressed values, comma separated, which `values` also gives as a list. The
+ * form receives one entry per pressed value. The indicator stays hidden, and
+ * each pressed item is marked with `:state(pressed)`.
+ *
+ * `orientation="vertical"` runs the items down a column, says so to the
+ * accessibility tree, and the up and down arrows move between them.
  *
  * @since 0.1.0
  * @status stable
@@ -118,10 +130,12 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
      * That fallback is right where it came from. A tab set always shows a panel,
      * so something has to be current; a group that reports a form value has the
      * honest option of reporting none. */
-    const active = this.items.find((item) => item.value === this.value)
+    const active = this.multiple ? undefined : this.items.find((item) => item.value === this.value)
+    const pressed = new Set(this.values)
     const entry = this.focusable ? this.entry() : undefined
     for (const item of this.items) {
       item.selected = item === active
+      item.pressed = this.multiple ? pressed.has(item.value) : undefined
       item.focusable = item === entry
     }
   }
@@ -136,8 +150,35 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
    * goes to the first item that can be chosen, as in `Radio.Group`.
    */
   private entry(): HelixHeadlessToggle | undefined {
-    const active = this.items.find((item) => item.value === this.value)
-    return active && !active.disabled ? active : this.items.find((item) => !item.disabled)
+    const items = this.items
+    /* A toolbar's stop follows focus, so Tab comes back to the button a reader
+       left. Then the first pressed one, as a radio group's is its answer. */
+    if (this.multiple) {
+      const left = this.lastFocused
+      if (left && items.includes(left) && !left.disabled) {
+        return left
+      }
+      const first = items.find((item) => item.pressed && !item.disabled)
+      return first ?? items.find((item) => !item.disabled)
+    }
+    const active = items.find((item) => item.value === this.value)
+    return active && !active.disabled ? active : items.find((item) => !item.disabled)
+  }
+
+  /** The item focus was last on, in a toolbar, which holds its tab stop. */
+  private lastFocused: HelixHeadlessToggle | undefined = undefined
+
+  private readonly noteFocus = (event: FocusEvent): void => {
+    const item = this.items.find((one) => one === event.target)
+    if (this.multiple && item && item !== this.lastFocused) {
+      this.lastFocused = item
+      this.sync()
+    }
+  }
+
+  /** Whether several items can be pressed at once. */
+  private get multiple(): boolean {
+    return this.selectionMode === 'multiple'
   }
 
   /**
@@ -155,6 +196,38 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
   focusable = true
 
   /**
+   * The direction the items run. `vertical` puts them in a column, and the up
+   * and down arrows move between them.
+   *
+   * Optional, so the attribute is absent until a consumer writes it.
+   */
+  @property({ reflect: true })
+  orientation?: 'horizontal' | 'vertical'
+
+  /**
+   * Whether one item is chosen, as a radio group, or several can be pressed,
+   * as a toolbar of buttons with `aria-pressed`.
+   *
+   * Optional, so the attribute is absent until a consumer writes it.
+   */
+  @property({ attribute: 'selection-mode', reflect: true })
+  selectionMode?: 'multiple' | 'single'
+
+  /**
+   * The pressed values as a list, under `selection-mode="multiple"`, in the
+   * order the items are written. Written, it presses exactly those items.
+   * Where one item is chosen, it is that one value, or none.
+   */
+  @property({ attribute: false })
+  get values(): string[] {
+    return this.multiple ? pressedValues(this.value) : this.value === '' ? [] : [this.value]
+  }
+
+  set values(next: string[]) {
+    this.value = next.join(',')
+  }
+
+  /**
    * Focus goes to the item that holds the stop, and to the item that would
    * hold it while a toolbar holds the stop instead, so a label press or a
    * refused submission still lands in the group.
@@ -170,7 +243,8 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
   private readonly indicator = new IndicatorController(this, {
     // The same exact match `sync` makes: nothing chosen means nothing marked,
     // and the controller takes the mark away rather than parking it on item one.
-    active: () => this.items.find((item) => item.value === this.value),
+    active: () =>
+      this.multiple ? undefined : this.items.find((item) => item.value === this.value),
     indicator: () => this.partNamed('indicator'),
     /* Per item, not only the host, which the controller watches on its own. An
        item can change width inside a track that keeps its size, and the host
@@ -189,7 +263,10 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
      is why it is `protected` and not `private`. A private field nothing reads
      is an unused one, and the honest reading is that the subclass tier is where
      a consumer would reach for it. */
-  protected readonly keys = new KeyboardNavigationController(this, { items: () => this.items })
+  protected readonly keys = new KeyboardNavigationController(this, {
+    items: () => this.items,
+    selects: () => !this.multiple,
+  })
 
   /* Stated once, and the group never thinks about it again. The controller is
      what stops the cascade being hand-called from whichever methods a component
@@ -218,7 +295,16 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
       if (event.defaultPrevented) {
         return
       }
-      this.requestValue((event as CustomEvent<{ value: string }>).detail.value)
+      const value = (event as CustomEvent<{ value: string }>).detail.value
+      this.requestValue(
+        this.multiple
+          ? toggledValues(
+              this.values,
+              value,
+              this.items.map((item) => item.value),
+            ).join(',')
+          : value,
+      )
     })
   }
 
@@ -231,6 +317,9 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
     if (this.value === '') {
       return false
     }
+    if (this.multiple) {
+      return this.children === undefined || this.values.length > 0
+    }
     if (this.children === undefined) {
       return true
     }
@@ -241,11 +330,13 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
   override connectedCallback(): void {
     super.connectedCallback()
     this.addEventListener('helix-select', this.handleSelection)
+    this.addEventListener('focusin', this.noteFocus)
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('helix-select', this.handleSelection)
+    this.removeEventListener('focusin', this.noteFocus)
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
@@ -280,11 +371,12 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
        `linkHost` sets, because this is the half a server can write. The
        reference wins on the client, which is what lets a consumer slot a label
        richer than a string. */
-    hostAria(this.internals, { label: this.label, role: 'radiogroup' })
+    hostAria(this.internals, { label: this.label, role: this.multiple ? 'toolbar' : 'radiogroup' })
+    this.internals.ariaOrientation = this.orientation ?? null
     // `null` rather than an empty string when nothing is chosen, which is the
     // difference between a control that submits nothing and one that submits a
     // blank.
-    this.internals.setFormValue(this.answered ? this.value : null)
+    this.internals.setFormValue(this.formValue())
   }
 
   /**
@@ -298,6 +390,24 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
    * The anchor is the track rather than the host, so the browser's own bubble
    * points at the control rather than at a box with nothing in it.
    */
+  /**
+   * What the form receives: the value, or under `selection-mode="multiple"`
+   * one entry per pressed value, as a native `<select multiple>` sends.
+   */
+  private formValue(): FormData | string | null {
+    if (!this.answered) {
+      return null
+    }
+    if (!this.multiple || this.name === '') {
+      return this.value
+    }
+    const data = new FormData()
+    for (const value of this.values) {
+      data.append(this.name, value)
+    }
+    return data
+  }
+
   private validate(): void {
     this.reportRequired(!this.answered, 'Choose one to continue.', 'track')
   }
