@@ -1,5 +1,14 @@
 import { describe, expect, test } from 'bun:test'
-import { ancestorsOf, child, flatten, search, seed } from './rows.js'
+import {
+  ancestorsOf,
+  child,
+  cursorFor,
+  flatten,
+  search,
+  seed,
+  siblingBranches,
+  withAncestors,
+} from './rows.js'
 
 const VALUE = { a: { b: 'Main', 'c/d': [1, 'x'] }, e: null }
 
@@ -66,5 +75,46 @@ describe('seed', () => {
     const { branches } = seed({ a: {} }, 1)
     const next = seed({ a: {}, b: {} }, 2, branches, new Set(['']))
     expect([...next.opened]).toEqual(['', '/b'])
+  })
+})
+
+describe('cursorFor', () => {
+  const value = { a: { b: { c: 1 } }, d: 2 }
+  const rowsOf = (opened: string[], found?: Set<string>) => flatten(value, new Set(opened), found)
+
+  test('stays on the path where it is still shown', () => {
+    const rows = rowsOf(['', '/a'])
+    expect(rows[cursorFor(rows, '/a/b', 0, false)]?.path).toBe('/a/b')
+  })
+
+  test('moves to the nearest branch around a path that closed', () => {
+    const rows = rowsOf([''])
+    expect(rows[cursorFor(rows, '/a/b/c', 3, false)]?.path).toBe('/a')
+  })
+
+  test('moves to the first match where a filter hid the path', () => {
+    const rows = rowsOf(['', '/a', '/a/b'], new Set(['/d']))
+    expect(rows[cursorFor(rows, '/a/b/c', 0, true)]?.path).toBe('/d')
+  })
+
+  test('holds the cursor inside the rows with no path to keep', () => {
+    const rows = rowsOf([''])
+    expect(cursorFor(rows, undefined, 9, false)).toBe(2)
+    expect(cursorFor([], undefined, 9, false)).toBe(0)
+  })
+})
+
+describe('withAncestors', () => {
+  test('opens every branch around each path that the value has', () => {
+    const opened = withAncestors(new Set(['/x']), new Set(['', '/a', '/a/b']), ['/a/b/c', '/q/r'])
+    expect([...opened].sort()).toEqual(['', '/a', '/a/b', '/x'])
+  })
+})
+
+describe('siblingBranches', () => {
+  test('names the closed branches beside a row under the same parent', () => {
+    const rows = flatten({ a: {}, b: [1], c: 3, d: { e: {} } }, new Set(['', '/d']))
+    const a = rows.find((row) => row.path === '/a') as (typeof rows)[number]
+    expect(siblingBranches(rows, a)).toEqual(['/a', '/b'])
   })
 })

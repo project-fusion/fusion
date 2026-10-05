@@ -209,3 +209,114 @@ describe('a reversed list', () => {
     expect(slot.getAttribute('style')).toBe('--list-first: 3; --list-step: -1')
   })
 })
+
+describe('ranges and replacing', () => {
+  const rows5 = async (extra = ''): Promise<List> => {
+    const list =
+      (await mount(`<helix-headless-list label="Files" selection-mode="multiple" ${extra}>
+      <helix-headless-list-item value="a">Alpha</helix-headless-list-item>
+      <helix-headless-list-item value="b">Beta</helix-headless-list-item>
+      <helix-headless-list-item value="c" disabled>Gamma</helix-headless-list-item>
+      <helix-headless-list-item value="d">Delta</helix-headless-list-item>
+      <helix-headless-list-item value="e">Epsilon</helix-headless-list-item>
+    </helix-headless-list>`)) as List
+    await settle(list)
+    return list
+  }
+
+  const key = (target: Element, name: string, init: KeyboardEventInit = {}): void => {
+    target.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        key: name,
+        ...init,
+      }),
+    )
+  }
+
+  const click = (target: Element, init: MouseEventInit = {}): void => {
+    target.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true, ...init }))
+  }
+
+  test('Shift with Down takes in each row it reaches, past a disabled one', async () => {
+    const list = await rows5()
+    const [a] = list.rows as [Row]
+    cell(a).focus()
+    key(cell(a), 'ArrowDown', { shiftKey: true })
+    await settle(list)
+    expect(list.value).toBe('a, b')
+    key(focused(list) as Element, 'ArrowDown', { shiftKey: true })
+    await settle(list)
+    expect(list.value).toBe('a, b, d')
+  })
+
+  test('Shift with a press or Space takes in the rows from the last one pressed', async () => {
+    const list = await rows5()
+    const [a, , , d, e] = list.rows as [Row, Row, Row, Row, Row]
+    click(cell(a))
+    await settle(list)
+    click(cell(e), { shiftKey: true })
+    await settle(list)
+    expect(list.value).toBe('a, b, d, e')
+    click(cell(d))
+    await settle(list)
+    expect(list.value).toBe('a, b, e')
+    key(cell(a), ' ', { shiftKey: true })
+    await settle(list)
+    expect(list.value).toBe('a, b, e, d')
+  })
+
+  test('Control or Command with A selects every row a key can reach', async () => {
+    const list = await rows5()
+    const changes: string[] = []
+    list.addEventListener('helix-before-change', (event) =>
+      changes.push((event as CustomEvent<{ value: string }>).detail.value),
+    )
+    key(cell(list.rows[0] as Row), 'a', { ctrlKey: true })
+    await settle(list)
+    expect(list.value).toBe('a, b, d, e')
+    key(cell(list.rows[0] as Row), 'A', { metaKey: true })
+    // Everything is already selected, so nothing is asked.
+    expect(changes).toEqual(['a, b, d, e'])
+  })
+
+  test('replace selects a pressed row alone, and the keys carry the selection', async () => {
+    const list = await rows5('selection-behavior="replace"')
+    const [a, b, , d] = list.rows as [Row, Row, Row, Row]
+    click(cell(a))
+    await settle(list)
+    click(cell(b))
+    await settle(list)
+    expect(list.value).toBe('b')
+    cell(b).focus()
+    key(cell(b), 'ArrowDown')
+    await settle(list)
+    expect(focused(list)).toBe(cell(d))
+    expect(list.value).toBe('d')
+    key(cell(d), 'ArrowUp', { ctrlKey: true })
+    await settle(list)
+    expect(focused(list)).toBe(cell(b))
+    expect(list.value).toBe('d')
+    click(cell(a), { metaKey: true })
+    await settle(list)
+    expect(list.value).toBe('d, a')
+  })
+
+  test('a row is named by its label and described by its description, not its controls', async () => {
+    const list = (await mount(`<helix-headless-list label="Files" selection-mode="single">
+      <helix-headless-list-item value="q">Quarterly report<span slot="description">Edited today</span><button slot="end">Share</button></helix-headless-list-item>
+      <helix-headless-list-item value="r"><span slot="start">Only a start</span></helix-headless-list-item>
+    </helix-headless-list>`)) as List
+    await settle(list)
+    const [named, bare] = list.rows as [Row, Row]
+    const label = cell(named).getAttribute('aria-labelledby')
+    expect(label).toBe('label')
+    expect(named.shadowRoot?.getElementById(label as string)?.tagName).toBe('SLOT')
+    expect(cell(named).getAttribute('aria-describedby')).toBe('description')
+    // A row with no label words is named by its content.
+    expect(cell(bare).hasAttribute('aria-labelledby')).toBe(false)
+    expect(cell(bare).hasAttribute('aria-describedby')).toBe(false)
+  })
+})
