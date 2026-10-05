@@ -392,7 +392,9 @@ describe('a read-only radio group', () => {
   test('refuses a press and the keys that move the answer, and still submits', async () => {
     const host = await group('readonly', 'one')
     const value = (): string => (host as Updatable & { value: string }).value
-    ;(at(options(host), 1).shadowRoot?.querySelector('[part="item"]') as HTMLElement).click()
+    ;(
+      at(options(host), 1).shadowRoot?.querySelector('[part="item"]') as HTMLElement | null
+    )?.click()
     await settle(host)
     expect(value()).toBe('one')
     for (const key of ['ArrowDown', 'End']) {
