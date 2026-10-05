@@ -4,7 +4,7 @@ export function Example() {
       default-selected="billing-api"
       selectable
     >
-      <h3 slot="caption">Deployments to roll back</h3>
+      <h3 slot="heading">Deployments to roll back</h3>
       <helix-table-column width="12rem">Service</helix-table-column>
       <helix-table-column>Region</helix-table-column>
       <helix-table-column>Status</helix-table-column>

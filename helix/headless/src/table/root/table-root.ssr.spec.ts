@@ -98,13 +98,13 @@ describe('table column server output', () => {
   })
 })
 
-describe('a table with a caption, on the server', () => {
-  test('serves the caption slot ahead of the grid', () => {
+describe('a table with a heading, on the server', () => {
+  test('serves the heading slot ahead of the grid', () => {
     const served = rendered(
       ssr(html`<helix-headless-table label="T"></helix-headless-table>`),
       'helix-headless-table',
     )
-    expect(served).toMatch(/<slot name="caption"><\/slot>(<!--[^>]*-->)*<div\s+part="table"/)
+    expect(served).toMatch(/<slot name="heading"><\/slot>(<!--[^>]*-->)*<div\s+part="table"/)
   })
 
   test('serves a selectable table its checkbox heading', () => {
