@@ -2,6 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessBreadcrumbs } from '@fusion.dev/helix-headless/breadcrumbs'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './breadcrumbs-root.css.js'
+import '../breadcrumb/breadcrumb.js'
 
 /**
  * @summary Shows the path to the current page.
@@ -20,10 +21,13 @@ import { styles } from './breadcrumbs-root.css.js'
  *
  * @csspart list - The ordered list.
  *
+ * @cssproperty --breadcrumbs-font-size - Size of the trail's text.
  * @cssproperty --breadcrumbs-gap - Space between items and separators.
  */
 @customElement('helix-breadcrumbs')
 export class HelixBreadcrumbs extends HelixHeadlessBreadcrumbs {
+  static override tier = 'helix-'
+
   static override styles: CSSResultGroup = styles
 }
 

@@ -7,6 +7,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { inSectioningContent } from '../sectioning.js'
 
 /**
  * @summary Page-level banner holding brand, navigation, and actions.
@@ -26,6 +27,12 @@ import { property } from 'lit/decorators.js'
  *
  * The page is the window unless `scroller` names the element that scrolls, for
  * an app shell whose content scrolls inside a container.
+ *
+ * The host is the page's `banner` landmark. Placed inside `main`, `article`,
+ * `aside`, `nav` or `section`, it is a plain box instead, as a native
+ * `<header>` is there, so a header inside a card or a pane does not add a
+ * second banner. A server cannot see the ancestors, so it serves the banner and
+ * the browser corrects it when the element connects.
  *
  * @since 0.1.0
  * @status stable
@@ -76,6 +83,10 @@ export class HelixHeadlessAppHeader extends HelixElement {
    */
   @property()
   scroller?: string
+
+  /* The role the host takes: `banner`, or none inside sectioning content. Read
+     when the element connects, since a server has no ancestors to read. */
+  private landmark: 'banner' | '' = 'banner'
 
   /* Whether the bar currently believes the page has moved, kept alongside the
      custom state so a scroll that changes nothing writes nothing. */
@@ -146,11 +157,13 @@ export class HelixHeadlessAppHeader extends HelixElement {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     // On the host, since the host is the banner.
-    hostAria(this.internals, { role: 'banner' })
+    hostAria(this.internals, { role: this.landmark })
   }
 
   override connectedCallback(): void {
     super.connectedCallback()
+    this.landmark = inSectioningContent(this) ? '' : 'banner'
+    hostAria(this.internals, { role: this.landmark })
     // Never reached on the server, which is correct: there is no scroll
     // position to read there, and the un-scrolled markup it emits is what a
     // fresh load actually shows.

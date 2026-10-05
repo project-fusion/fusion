@@ -25,10 +25,19 @@ import { styles } from './skip-link-root.css.js'
  * @aliases Skip navigation, Skip to content
  * @documentation https://fusion.dev/helix/components/skip-link
  *
+ * @cssproperty --skip-link-background-color - The background of the link while it is shown.
  * @cssproperty --skip-link-border-color - The border color of the link while it is shown.
  * @cssproperty --skip-link-border-width - The border width of the link while it is shown. Follows
  *   `--helix-border-floating`, which is `0`, so the link is set apart by its shadow unless a
  *   theme sets a border.
+ * @cssproperty --skip-link-color - The text color of the link while it is shown.
+ * @cssproperty --skip-link-font-size - The size of the link's text.
+ * @cssproperty --skip-link-inset-block - How far the shown link sits from the top of the viewport.
+ * @cssproperty --skip-link-inset-inline - How far the shown link sits from the start edge of the
+ *   viewport.
+ * @cssproperty --skip-link-padding-block - The space above and below the link's text.
+ * @cssproperty --skip-link-padding-inline - The space either side of the link's text.
+ * @cssproperty --skip-link-radius - The corner radius of the link.
  * @cssproperty --skip-link-shadow - The shadow under the link while it is shown. Follows
  *   `--helix-shadow-floating`, because the link sits over the corner of the page.
  */
