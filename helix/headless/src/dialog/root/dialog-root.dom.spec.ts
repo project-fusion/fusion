@@ -15,6 +15,7 @@ type Dialog = HTMLElement & {
   close(): void
   open: boolean
   persistent: boolean
+  requestUpdate(): void
   show(): void
   updateComplete: Promise<boolean>
 }
@@ -123,6 +124,106 @@ describe('dialog', () => {
     await host.updateComplete
     expect(cancel.defaultPrevented).toBe(true)
     expect(hasState(host, 'open')).toBe(true)
+  })
+})
+
+describe('a form in the dialog', () => {
+  /* The platform closes the nearest `<dialog>` ancestor of a `method="dialog"`
+     form, and a slotted form's ancestors are the light DOM, where there is
+     none. So the dialog stayed open and said nothing. */
+  test('closes it with `method="dialog"`, and the button’s value is the return value', async () => {
+    const host = (await mount(
+      `<helix-headless-dialog label="Confirm">
+        <form method="dialog"><button value="ok">OK</button></form>
+      </helix-headless-dialog>`,
+    )) as Dialog & { returnValue: string }
+    host.show()
+    await host.updateComplete
+    const form = host.querySelector('form') as HTMLFormElement
+    const submit = new SubmitEvent('submit', {
+      bubbles: true,
+      cancelable: true,
+      submitter: form.querySelector('button'),
+    })
+    /* Read while the close is still a request: happy-dom's `close()` resets
+       `returnValue`, where a browser's keeps it. */
+    let returned = ''
+    host.addEventListener('helix-before-close', () => {
+      returned = host.returnValue
+    })
+    form.dispatchEvent(submit)
+    await host.updateComplete
+    expect([hasState(host, 'open'), returned, submit.defaultPrevented]).toEqual([false, 'ok', true])
+  })
+
+  test('and leaves any other form alone', async () => {
+    const host = (await mount(
+      `<helix-headless-dialog label="Search">
+        <form><button>Go</button></form>
+      </helix-headless-dialog>`,
+    )) as Dialog
+    host.show()
+    await host.updateComplete
+    const form = host.querySelector('form') as HTMLFormElement
+    form.addEventListener('submit', (event) => event.preventDefault())
+    form.dispatchEvent(new SubmitEvent('submit', { bubbles: true, cancelable: true }))
+    await host.updateComplete
+    expect(hasState(host, 'open')).toBe(true)
+  })
+})
+
+describe('the dialog’s name', () => {
+  /* happy-dom has no ARIA element reflection, so the accessor is stood in on
+     the `<dialog>`, which is what an engine with reflection provides. */
+  const reflecting = async (markup: string): Promise<{ host: Dialog; names: () => string[] }> => {
+    const host = (await mount(markup)) as Dialog
+    const native = part(host, 'dialog') as HTMLDialogElement & Record<string, unknown>
+    if (!('ariaLabelledByElements' in native)) {
+      Object.defineProperty(native, 'ariaLabelledByElements', { value: null, writable: true })
+    }
+    host.requestUpdate()
+    await host.updateComplete
+    const names = (): string[] =>
+      ((native.ariaLabelledByElements as Element[] | null) ?? []).map(
+        (one) => one.textContent ?? '',
+      )
+    return { host, names }
+  }
+
+  test('is the heading in the header when no label is given', async () => {
+    const { names } = await reflecting(
+      `<helix-headless-dialog>
+        <div slot="header"><h2>Delete project</h2><button>Close</button></div>
+      </helix-headless-dialog>`,
+    )
+    expect(names()).toEqual(['Delete project'])
+  })
+
+  test('and steps aside for a label', async () => {
+    const { names } = await reflecting(
+      `<helix-headless-dialog label="Given">
+        <h2 slot="header">Delete project</h2>
+      </helix-headless-dialog>`,
+    )
+    expect(names()).toEqual([])
+  })
+})
+
+describe('the page behind an open dialog', () => {
+  test('does not scroll, and gets its own overflow back once the dialog closes', async () => {
+    const root = document.documentElement
+    root.style.overflow = 'clip'
+    try {
+      const host = await dialog()
+      host.show()
+      await host.updateComplete
+      const held = root.style.overflow
+      host.close()
+      await host.updateComplete
+      expect([held, root.style.overflow]).toEqual(['hidden', 'clip'])
+    } finally {
+      root.style.overflow = ''
+    }
   })
 })
 

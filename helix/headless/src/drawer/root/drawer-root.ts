@@ -1,4 +1,5 @@
 import {
+  AriaForwardController,
   CommandController,
   customElement,
   HelixElement,
@@ -16,11 +17,18 @@ import { property } from 'lit/decorators.js'
  * `helix-before-open` and `helix-before-close` events work the same way as on
  * an accordion item.
  *
- * The drawer is modal by default, which means three things:
+ * The drawer is modal by default, which means four things:
  *
  * - focus is trapped inside
  * - Escape and a press outside close it
  * - the page behind is covered
+ * - the page behind does not scroll
+ *
+ * A drawer with `modal="false"` leaves the page usable and still closes on
+ * Escape.
+ *
+ * The panel's name is `label` when you set it. Otherwise it is the heading in
+ * the `header` slot, or the elements an `aria-labelledby` on the host names.
  *
  * Content stays mounted when the drawer is closed, so it is in the server
  * markup and can animate. A closed `<dialog>` is already out of the tab order
@@ -86,10 +94,15 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
   closedBy?: 'any' | 'closerequest' | 'none'
 
   /**
-   * Accessible name for the panel.
+   * Accessible name for the panel. When it is empty, the heading in the
+   * `header` slot names the panel.
    */
   @property()
   label = ''
+
+  /* `aria-labelledby` and `aria-describedby` written on the host, carried to
+     the `<dialog>` that is the node a reader is on. */
+  protected readonly aria = new AriaForwardController(this, { target: () => this.panel })
 
   /**
    * Whether the drawer blocks the page behind it.
@@ -186,18 +199,73 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
   /**
    * A press on the backdrop, which lands on the dialog element itself.
    *
-   * The panel fills only part of the dialog's box, so a press beside it hits
-   * the dialog and not a child. A native `<dialog>` does not close on that, and
-   * it is the gesture that most obviously means close.
+   * A native `<dialog>` does not close on that, and it is the gesture that most
+   * obviously means close.
+   *
+   * **The target alone is not enough.** The panel is the `<dialog>`, and a
+   * press in its own padding has the dialog as its target too, the same as a
+   * press on the backdrop. So the point is compared against the panel's box,
+   * as `Dialog` does.
    */
   private readonly handleBackdrop = (event: MouseEvent): void => {
-    if (event.target === this.panel && this.modal) {
-      this.requestOpen(false)
+    const panel = this.panel
+    if (!panel || event.target !== panel || !this.modal) {
+      return
     }
+    const box = panel.getBoundingClientRect()
+    if (
+      event.clientX >= box.left &&
+      event.clientX <= box.right &&
+      event.clientY >= box.top &&
+      event.clientY <= box.bottom
+    ) {
+      return
+    }
+    this.requestOpen(false)
+  }
+
+  /** Whether the `header` slot's heading is what currently names the panel. */
+  private namedByHeader = false
+
+  /**
+   * Names the panel by its heading, where nothing else names it.
+   *
+   * An element reference, because the heading is in the light DOM and the
+   * `<dialog>` is in this shadow root, which an IDREF cannot cross. `label` and
+   * an `aria-labelledby` on the host come first. A browser without element
+   * reflection keeps the fallback name.
+   */
+  private nameByHeader(): void {
+    const panel = this.panel as
+      | (HTMLDialogElement & { ariaLabelledByElements?: Element[] | null })
+      | null
+    if (!panel || !('ariaLabelledByElements' in panel)) {
+      return
+    }
+    const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="header"]')
+    const heading = this.label || this.hasAttribute('aria-labelledby') ? [] : headingsIn(slot)
+    if (heading.length > 0) {
+      panel.ariaLabelledByElements = heading
+      this.namedByHeader = true
+    } else if (this.namedByHeader) {
+      panel.ariaLabelledByElements = null
+      this.namedByHeader = false
+    }
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    unlockScroll(this)
   }
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    this.nameByHeader()
+    if (this.open && this.modal) {
+      lockScroll(this)
+    } else {
+      unlockScroll(this)
+    }
     /* After render, and only on a difference: `showModal()` on an open dialog
        throws and `close()` on a shut one fires a second `close` event.
      *
@@ -223,18 +291,82 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
     /* No `role`, no `aria-modal`, no `inert`, no `tabindex`: a `<dialog>` opened
        with `showModal()` carries all four, and each hand-written version was a
        thing that could drift from what the element actually did. */
+    /* **A non-modal panel asks for Escape.** `show()` gives a `<dialog>` no
+       close watcher unless `closedby` says so, and a drawer that ignores Escape
+       has no keyboard way out. `closerequest` is what `showModal()` gets by
+       default, and its `cancel` comes back through `handleCancel` like the
+       modal one's. */
+    const closedBy = this.closedBy ?? (this.modal ? undefined : 'closerequest')
     return html`<dialog
       part="panel"
-      closedby=${this.closedBy ?? nothing}
+      closedby=${closedBy ?? nothing}
       aria-label=${this.label || 'Drawer'}
       @cancel=${this.handleCancel}
       @click=${this.handleBackdrop}
       @close=${this.handleClose}
     >
-      <div part="header"><slot name="header"></slot></div>
+      <div part="header"><slot name="header" @slotchange=${this.nameByHeader}></slot></div>
       <div part="content"><slot></slot></div>
     </dialog>`
   }
+}
+
+/**
+ * The headings among a slot's elements, or the elements themselves when none
+ * is a heading or holds one. The same reading `Dialog` makes of its header.
+ */
+const headingsIn = (slot: HTMLSlotElement | null): Element[] => {
+  const assigned = slot?.assignedElements({ flatten: true }) ?? []
+  const heading = 'h1, h2, h3, h4, h5, h6, [role="heading"]'
+  const found = assigned.flatMap((one) =>
+    one.matches(heading) ? [one] : [...one.querySelectorAll(heading)].slice(0, 1),
+  )
+  return found.length > 0 ? found.slice(0, 1) : assigned
+}
+
+/**
+ * The modal surfaces holding the page still, on `globalThis` under the key
+ * `Dialog` uses, so an open dialog and an open drawer share one count.
+ */
+interface ScrollLock {
+  holders: Set<Element>
+  overflow: string
+  gutter: string
+}
+const SCROLL_LOCK = Symbol.for('fusion.helix.scroll-lock')
+
+/**
+ * Stops the page behind a modal drawer from scrolling. See `lockScroll` in
+ * `Dialog`, which this matches line for line.
+ */
+const lockScroll = (holder: Element): void => {
+  const globals = globalThis as unknown as Record<symbol, ScrollLock | undefined>
+  const root = document.documentElement
+  globals[SCROLL_LOCK] ??= { gutter: '', holders: new Set(), overflow: '' }
+  const lock = globals[SCROLL_LOCK]
+  if (lock.holders.has(holder)) {
+    return
+  }
+  if (lock.holders.size === 0) {
+    lock.overflow = root.style.overflow
+    lock.gutter = root.style.scrollbarGutter
+    if (window.innerWidth > root.clientWidth) {
+      root.style.scrollbarGutter = 'stable'
+    }
+    root.style.overflow = 'hidden'
+  }
+  lock.holders.add(holder)
+}
+
+/** Lets go of the page, and gives it back once nothing else holds it. */
+const unlockScroll = (holder: Element): void => {
+  const lock = (globalThis as unknown as Record<symbol, ScrollLock | undefined>)[SCROLL_LOCK]
+  if (!lock?.holders.delete(holder) || lock.holders.size > 0) {
+    return
+  }
+  const root = document.documentElement
+  root.style.overflow = lock.overflow
+  root.style.scrollbarGutter = lock.gutter
 }
 
 declare global {

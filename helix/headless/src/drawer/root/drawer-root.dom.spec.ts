@@ -128,3 +128,95 @@ describe('drawer', () => {
     expect(drawer.open).toBe(true)
   })
 })
+
+describe('a press on the drawer', () => {
+  /* The panel is the `<dialog>`, so a press in its own padding has the dialog
+     as its target, the same as a press on the backdrop. Only the point says
+     which of the two it was. */
+  const press = (panel: HTMLElement, x: number, y: number): void => {
+    panel.dispatchEvent(new MouseEvent('click', { bubbles: true, clientX: x, clientY: y }))
+  }
+
+  test('inside the panel’s own box leaves it open', async () => {
+    const drawer = (await mount(markup)) as Updatable
+    drawer.requestOpen(true)
+    await drawer.updateComplete
+    const panel = part(drawer, 'panel') as HTMLElement
+    const box = panel.getBoundingClientRect()
+    press(panel, box.left, box.bottom)
+    await drawer.updateComplete
+    expect(drawer.open).toBe(true)
+  })
+
+  test('and on the backdrop beside it closes it', async () => {
+    const drawer = (await mount(markup)) as Updatable
+    drawer.requestOpen(true)
+    await drawer.updateComplete
+    const panel = part(drawer, 'panel') as HTMLElement
+    const box = panel.getBoundingClientRect()
+    press(panel, box.left - 10, box.top)
+    await drawer.updateComplete
+    expect(drawer.open).toBe(false)
+  })
+})
+
+describe('a drawer that is not modal', () => {
+  /* `show()` gives a `<dialog>` no close watcher of its own, so Escape did
+     nothing. `closerequest` asks for one, and its `cancel` comes back through
+     the request as the modal drawer's does. */
+  test('asks the platform for Escape', async () => {
+    const drawer = await mount(
+      '<helix-headless-drawer label="Side" modal="false">Body</helix-headless-drawer>',
+    )
+    expect((part(drawer, 'panel') as HTMLElement).getAttribute('closedby')).toBe('closerequest')
+  })
+
+  test('unless `closedby` says otherwise, and a modal one leaves it to the platform', async () => {
+    const chosen = await mount(
+      '<helix-headless-drawer label="Side" modal="false" closedby="any">Body</helix-headless-drawer>',
+    )
+    const modal = await mount(markup)
+    expect([
+      (part(chosen, 'panel') as HTMLElement).getAttribute('closedby'),
+      (part(modal, 'panel') as HTMLElement).hasAttribute('closedby'),
+    ]).toEqual(['any', false])
+  })
+
+  test('leaves the page scrolling, where a modal one holds it still', async () => {
+    const root = document.documentElement
+    const side = (await mount(
+      '<helix-headless-drawer label="Side" modal="false">Body</helix-headless-drawer>',
+    )) as Updatable
+    side.requestOpen(true)
+    await side.updateComplete
+    const free = root.style.overflow
+    side.requestOpen(false)
+    await side.updateComplete
+    const modal = (await mount(markup)) as Updatable
+    modal.requestOpen(true)
+    await modal.updateComplete
+    const held = root.style.overflow
+    modal.requestOpen(false)
+    await modal.updateComplete
+    expect([free, held, root.style.overflow]).toEqual(['', 'hidden', ''])
+  })
+})
+
+describe('the drawer’s name', () => {
+  test('is the heading in the header when no label is given', async () => {
+    const drawer = (await mount(
+      `<helix-headless-drawer>
+        <div slot="header"><h2>Cart</h2><button>Close</button></div>
+      </helix-headless-drawer>`,
+    )) as Updatable & { requestUpdate(): void }
+    /* happy-dom has no ARIA element reflection, so the accessor is stood in. */
+    const panel = part(drawer, 'panel') as HTMLElement & Record<string, unknown>
+    if (!('ariaLabelledByElements' in panel)) {
+      Object.defineProperty(panel, 'ariaLabelledByElements', { value: null, writable: true })
+    }
+    drawer.requestUpdate()
+    await drawer.updateComplete
+    const named = (panel.ariaLabelledByElements as Element[] | null) ?? []
+    expect(named.map((one) => one.textContent)).toEqual(['Cart'])
+  })
+})

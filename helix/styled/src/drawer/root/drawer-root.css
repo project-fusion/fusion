@@ -87,12 +87,22 @@
   flex-direction: column;
   outline: none;
   position: fixed;
+  /* Out past its own edge at rest. Each placement says which way that is. */
+  transform: var(--_drawer-away);
   /* `display` and `overlay` are what let the slide run on the way out as well. */
   transition:
     transform var(--helix-duration-normal) var(--helix-easing-decelerate),
     display var(--helix-duration-normal) allow-discrete,
     overlay var(--helix-duration-normal) allow-discrete;
   z-index: var(--helix-layer-overlay);
+}
+
+/* The UA hides a closed dialog with `dialog:not([open]) { display: none }`, and
+   the `display: flex` above took that away: a closed drawer stayed in the tab
+   order and the accessibility tree, only moved off screen. The `display`
+   transition holds it on screen until the slide out has finished. */
+[part="panel"]:not([open]) {
+  display: none;
 }
 
 /* **Glass, and a drawer is where the pair earns the most.** `Card` and `App
@@ -136,7 +146,7 @@
   inline-size: min(var(--_drawer-size), 100%);
   inset-block: 0;
   inset-inline-end: 0;
-  transform: translateX(100%);
+  --_drawer-away: translateX(100%);
 }
 
 :host([placement="start"]) [part="panel"] {
@@ -146,7 +156,7 @@
   inline-size: min(var(--_drawer-size), 100%);
   inset-block: 0;
   inset-inline-start: 0;
-  transform: translateX(-100%);
+  --_drawer-away: translateX(-100%);
 }
 
 :host([placement="bottom"]) [part="panel"] {
@@ -155,7 +165,7 @@
   block-size: min(var(--_drawer-size), 100%);
   inset-block-end: 0;
   inset-inline: 0;
-  transform: translateY(100%);
+  --_drawer-away: translateY(100%);
 }
 
 :host([placement="top"]) [part="panel"] {
@@ -164,7 +174,18 @@
   block-size: min(var(--_drawer-size), 100%);
   inset-block-start: 0;
   inset-inline: 0;
-  transform: translateY(-100%);
+  --_drawer-away: translateY(-100%);
+}
+
+/* The inline edges are logical and `translateX` is physical, so on a
+   right-to-left page the end sits on the left and slides out leftward. */
+:host(:dir(rtl):not([placement])) [part="panel"],
+:host(:dir(rtl)[placement="end"]) [part="panel"] {
+  --_drawer-away: translateX(-100%);
+}
+
+:host(:dir(rtl)[placement="start"]) [part="panel"] {
+  --_drawer-away: translateX(100%);
 }
 
 :host(:state(open)) [part="panel"] {
@@ -172,6 +193,15 @@
     var(--drawer-border-color, var(--helix-color-border));
   box-shadow: var(--drawer-shadow, var(--helix-shadow-floating));
   transform: translate(0, 0);
+}
+
+/* A panel coming out of `display: none` has no earlier style to slide from,
+   so the slide in starts from here. After the rule above, which it has to
+   follow to win the opening frame. */
+@starting-style {
+  :host(:state(open)) [part="panel"][open] {
+    transform: var(--_drawer-away);
+  }
 }
 
 /* No rule under it either. */
