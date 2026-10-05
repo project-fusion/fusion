@@ -1,6 +1,7 @@
 import {
   AriaForwardController,
   customElement,
+  defaultButton,
   drawStatus,
   elementById,
   HelixFallbackCommandEvent,
@@ -9,6 +10,7 @@ import {
   pressType,
   type RecentPress,
   StatusController,
+  submitsOnEnter,
   supportsInvokers,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -576,8 +578,8 @@ export class HelixHeadlessButton extends HelixFormElement {
       event.key !== 'Enter' ||
       event.defaultPrevented ||
       !form ||
-      !HelixFormElement.submitsOnEnter(event.composedPath()[0], form) ||
-      HelixFormElement.defaultButton(form) !== this
+      !submitsOnEnter(event.composedPath()[0], form) ||
+      defaultButton(form) !== this
     ) {
       return
     }

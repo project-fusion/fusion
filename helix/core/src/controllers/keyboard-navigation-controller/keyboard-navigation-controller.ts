@@ -1,6 +1,7 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
 import { inlineStep } from '../../utils/inline-step/inline-step.js'
 import { keyClaimed } from '../../utils/key-claimed/key-claimed.js'
+import { type TypeaheadBy, typesCharacter } from '../../utils/typeahead/typeahead.js'
 
 /** What a controller needs of an item to move to it and choose it. */
 export interface NavigableItem {
@@ -75,14 +76,15 @@ export interface KeyboardNavigationOptions {
    */
   reserved?: () => string[]
   /**
-   * The words of an item, which turns on typeahead: a printable key moves to
-   * the next item whose words start with what was typed.
+   * The search that turns on typeahead, built with `typeaheadBy` from the
+   * words of an item: a printable key moves to the next item whose words
+   * start with what was typed.
    *
    * Off unless given. A set whose items have no words a reader would type, or
    * that holds a text field of its own, leaves it out. See `Typeahead` for how
    * the letters are matched.
    */
-  typeahead?: (item: NavigableItem) => string
+  typeahead?: TypeaheadBy<NavigableItem>
   /**
    * Whether the ends join up, which they do unless a set says otherwise.
    *
@@ -106,87 +108,6 @@ export interface KeyboardNavigationOptions {
 
 /** Every key that moves within a set, which is the whole of what this handles. */
 const KEYS = new Set(['ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'End', 'Home'])
-
-/**
- * Whether a press types a character, which is what typeahead reads.
- *
- * One character with no Control, Command or Alt held, so a shortcut such as
- * Control+A is never taken for the letter A. Shift is allowed, because a
- * capital is still a letter.
- */
-export const typesCharacter = (event: KeyboardEvent): boolean =>
-  event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey
-
-/**
- * Finds an item by the letters a reader types at a set, the way a native
- * `<select>` does.
- *
- * Letters typed within `timeout` milliseconds of each other build one search,
- * so typing "ca" moves to "Canada" past "Cambodia". The same letter typed again
- * moves to the next item that starts with it, so pressing "c" three times visits
- * the first three. A pause starts a new search.
- *
- * Matching ignores case and leading spaces, and searches from the reader's
- * position, wrapping at the end. A search that matches nothing moves nothing.
- *
- * Holds only the letters, so one instance serves any set: the caller passes the
- * words of the items and where the reader is on every key.
- */
-export class Typeahead {
-  private letters = ''
-
-  private last = 0
-
-  private readonly timeout: number
-
-  constructor({ timeout = 500 }: { timeout?: number } = {}) {
-    this.timeout = timeout
-  }
-
-  /**
-   * Whether a search is under way.
-   *
-   * A set that chooses on Space asks this first, because a Space typed in the
-   * middle of a search is part of the words, as in "New York".
-   */
-  typing(now = Date.now()): boolean {
-    return this.letters !== '' && now - this.last <= this.timeout
-  }
-
-  /**
-   * Adds a character to the search, and returns the index of the item it
-   * matches, or `-1` where none does.
-   *
-   * `texts` are the words of the items a reader can reach, in order, and
-   * `from` is the index of the item the reader is on, or `-1`.
-   */
-  match(key: string, texts: readonly string[], from: number, now = Date.now()): number {
-    if (!this.typing(now)) {
-      this.letters = ''
-    }
-    this.last = now
-    this.letters += key.toLowerCase()
-    const words = texts.map((text) => text.trim().toLowerCase())
-    /* One letter, or the same letter repeated, cycles through the items that
-       start with it. Anything longer is a word, and the item the reader is on
-       may already be the answer, so the search includes it. */
-    const repeated = [...this.letters].every((letter) => letter === this.letters[0])
-    const needle = repeated ? (this.letters[0] ?? '') : this.letters
-    const start = repeated ? from + 1 : Math.max(from, 0)
-    for (let step = 0; step < words.length; step += 1) {
-      const at = (start + step) % words.length
-      if (words[at]?.startsWith(needle)) {
-        return at
-      }
-    }
-    return -1
-  }
-
-  /** Ends the search, so the next letter starts a new one. */
-  reset(): void {
-    this.letters = ''
-  }
-}
 
 /**
  * Moves through a set of items with the arrow keys, and chooses as it goes.
@@ -213,9 +134,10 @@ export class Typeahead {
  * Disabled items are skipped rather than stopped at, so a set with a gap in it
  * still moves in one press.
  *
- * **Typeahead is opt-in.** Pass `typeahead` with a function that returns an
- * item's words, and a printable key moves to the next item whose words start
- * with the letters typed, choosing it where arriving chooses. A key that a text
+ * **Typeahead is opt-in.** Pass `typeahead`, built by `typeaheadBy` from a
+ * function that returns an item's words, and a printable key moves to the next
+ * item whose words start with the letters typed, choosing it where arriving
+ * chooses. A key that a text
  * field inside the set is typing into is left to the field.
  *
  * A set that starts from focus rather than from the selection, or that moves
@@ -235,9 +157,7 @@ export class KeyboardNavigationController implements ReactiveController {
 
   private readonly wrap: boolean
 
-  private readonly words: ((item: NavigableItem) => string) | undefined
-
-  private readonly typeahead = new Typeahead()
+  private readonly typeahead: TypeaheadBy<NavigableItem> | undefined
 
   constructor(
     host: ReactiveControllerHost & HTMLElement,
@@ -255,7 +175,7 @@ export class KeyboardNavigationController implements ReactiveController {
     this.originOf = typeof origin === 'function' ? origin : () => origin
     this.reserved = reserved
     this.selects = selects
-    this.words = typeahead
+    this.typeahead = typeahead
     this.wrap = wrap
     host.addController(this)
   }
@@ -297,13 +217,13 @@ export class KeyboardNavigationController implements ReactiveController {
 
   /** Moves to the item whose words start with what was typed, if any. */
   private handleTypeahead(event: KeyboardEvent): void {
-    const words = this.words
-    if (!words || !typesCharacter(event) || keyClaimed(event)) {
+    const typeahead = this.typeahead
+    if (!typeahead || !typesCharacter(event) || keyClaimed(event)) {
       return
     }
     /* A Space with no search under way is a press, which a set may bind to
        choosing. Inside a search it is part of the words. */
-    if (event.key === ' ' && !this.typeahead.typing()) {
+    if (event.key === ' ' && !typeahead.search.typing()) {
       return
     }
     const items = this.items().filter((item) => !item.disabled)
@@ -316,7 +236,7 @@ export class KeyboardNavigationController implements ReactiveController {
     if (this.origin === 'focus' && from === -1) {
       return
     }
-    const at = this.typeahead.match(event.key, items.map(words), from)
+    const at = typeahead.search.match(event.key, items.map(typeahead.words), from)
     event.preventDefault()
     if (at >= 0 && at !== from) {
       this.arrive(items[at])
@@ -389,7 +309,7 @@ export class KeyboardNavigationController implements ReactiveController {
     }
 
     event.preventDefault()
-    this.typeahead.reset()
+    this.typeahead?.search.reset()
     this.arrive(items[next])
   }
 

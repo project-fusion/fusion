@@ -14,6 +14,7 @@ import {
   MixinTokens,
   PopoverController,
   reportValues,
+  submitImplicitly,
 } from '@fusion.dev/helix-core'
 import { caretDown } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -883,7 +884,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
    */
   private readonly handleKeypress = (event: KeyboardEvent): void => {
     if (event.key === 'Enter' && !this.open && !event.defaultPrevented) {
-      this.submitImplicitly()
+      submitImplicitly(this.form)
     }
   }
 
