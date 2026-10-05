@@ -1,5 +1,6 @@
 import {
   ArrivalController,
+  CountdownController,
   customElement,
   HelixElement,
   MixinDismissible,
@@ -38,6 +39,11 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * announcement beside it, move focus yourself, for example to the page's main
  * heading.
  *
+ * Set `duration` to dismiss it after a time. The clock stops while the pointer
+ * or focus is on the announcement, and continues from what was left, so a
+ * reader partway through is not cut off. When the time runs out it sends
+ * `helix-dismiss`, as the button does.
+ *
  * @since 0.1.0
  * @status stable
  * @category feedback
@@ -48,7 +54,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @slot actions - Actions for the message, usually a link or a button.
  * @slot icon - Replaces the icon inside the dismiss button.
  *
- * @event {HelixDismissEvent} helix-dismiss - The dismiss button was pressed. The announcement does not remove itself, so remove it in response. Cancelable.
+ * @event {HelixDismissEvent} helix-dismiss - The dismiss button was pressed, or `duration` ran out. The announcement does not remove itself, so remove it in response. Cancelable.
  *
  * @csspart actions - The region after the message that holds the actions.
  * @csspart content - The region that holds the message.
@@ -58,6 +64,16 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  */
 @customElement('helix-headless-announcement')
 export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
+  /**
+   * How long the announcement stays, in milliseconds, before it sends
+   * `helix-dismiss`. When it is not set, it stays until it is dismissed.
+   *
+   * Read once when the announcement is first rendered, as `Toast` reads its
+   * own. The clock stops while the pointer or focus is on the announcement.
+   */
+  @property({ type: Number })
+  duration?: number
+
   /**
    * The band's color.
    *
@@ -89,6 +105,52 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
     arriving: () => !this.serverRendered && document.readyState === 'complete',
     text: () => slottedWords(this, ['']),
   })
+
+  /** The time `duration` gives it, held while a reader is on it. */
+  private readonly countdown = new CountdownController(this, {
+    done: () => {
+      this.dismiss()
+    },
+  })
+
+  /* Hover and focus hold the clock, counted by the countdown. On the host,
+     because the announcement's regions are its children, with no box around
+     them all. */
+  private readonly handleHold = (): void => {
+    this.countdown.hold()
+  }
+
+  private readonly handleRelease = (): void => {
+    this.countdown.release()
+  }
+
+  override connectedCallback(): void {
+    super.connectedCallback()
+    this.addEventListener('mouseenter', this.handleHold)
+    this.addEventListener('mouseleave', this.handleRelease)
+    this.addEventListener('focusin', this.handleHold)
+    this.addEventListener('focusout', this.handleRelease)
+    /* The clock again after a move, from what was left of it. */
+    if (this.hasUpdated) {
+      this.countdown.resume()
+    }
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    this.removeEventListener('mouseenter', this.handleHold)
+    this.removeEventListener('mouseleave', this.handleRelease)
+    this.removeEventListener('focusin', this.handleHold)
+    this.removeEventListener('focusout', this.handleRelease)
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    /* Here rather than in `connectedCallback`, which the server never calls,
+       and started only once: the clock belongs to this announcement's life on
+       screen. */
+    this.countdown.start(this.duration)
+  }
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)

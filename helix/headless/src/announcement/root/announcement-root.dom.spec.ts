@@ -101,4 +101,28 @@ describe('announcement', () => {
     const glyph = dismiss.querySelector('slot[name="icon"]') as HTMLSlotElement | null
     expect(glyph?.assignedNodes().length).toBeGreaterThan(0)
   })
+
+  test('with a duration it asks to be dismissed once the time is spent, and not while held', async () => {
+    const asked: string[] = []
+    const announcement = await mount(
+      '<helix-headless-announcement duration="40">Trial ends Friday</helix-headless-announcement>',
+    )
+    announcement.addEventListener('helix-dismiss', () => asked.push('dismiss'))
+    announcement.dispatchEvent(new Event('mouseenter'))
+    await new Promise((resolve) => setTimeout(resolve, 80))
+    expect(asked).toEqual([])
+    announcement.dispatchEvent(new Event('mouseleave'))
+    await new Promise((resolve) => setTimeout(resolve, 80))
+    expect(asked).toEqual(['dismiss'])
+  })
+
+  test('with no duration it stays', async () => {
+    const asked: string[] = []
+    const announcement = await mount(
+      '<helix-headless-announcement>Trial ends Friday</helix-headless-announcement>',
+    )
+    announcement.addEventListener('helix-dismiss', () => asked.push('dismiss'))
+    await new Promise((resolve) => setTimeout(resolve, 40))
+    expect(asked).toEqual([])
+  })
 })
