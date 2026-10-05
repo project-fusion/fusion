@@ -7,6 +7,7 @@ import {
   type Series,
   SourceController,
   seriesIndex,
+  seriesKey,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -34,7 +35,9 @@ import { isHidden, toggledNames } from '../hidden-series.js'
  * reading the same table draws without a hidden series and fits its scale to
  * the rest, and the series keeps its color. The button says whether its
  * series is shown with `aria-pressed`. `hidden-series` holds the hidden names,
- * so a page can start with some hidden or read which are.
+ * so a page can start with some hidden or read which are. Two legends on one
+ * table show the same hidden series: the list written last wins, and the
+ * other legend takes it for its own entries.
  *
  * @since 0.1.0
  * @status stable
@@ -125,12 +128,58 @@ export class HelixHeadlessLegend extends HelixElement {
      out for itself, which drifts into two names for the same lookup. */
   protected readonly source = new SourceController(this)
 
-  /** Whether this legend has written the table's hidden series, so leaving undoes it. */
-  private wrote = false
+  /** The table this legend last wrote its `hidden-series` to, so leaving undoes it. */
+  private wroteTo: Element | null = null
 
+  /** Whether this update writes `hidden-series` to the table, decided before the render. */
+  private writes = false
+
+  /**
+   * Decides who holds the hidden series for this update: this legend, or the
+   * table.
+   *
+   * **This legend, where its own `hidden-series` moved**, by a press, by the
+   * page, or by its first value, and where it has a list the table it now
+   * reads has not had from it yet. **The table otherwise**, which is a second
+   * legend on the same table having hidden something: this one takes the
+   * table's list for its own entries and writes nothing back.
+   *
+   * Writing back on every update is what hung a page with two legends whose
+   * lists differed: each write asks every reader of the table to update,
+   * which included the other legend, which wrote its own list back. Now the
+   * last list written wins and the other legend shows it, as two switches on
+   * one lamp do.
+   */
   protected override willUpdate(changed: PropertyValues<this>): void {
     if (changed.has('for')) {
       this.source.watch()
+    }
+    const table = this.source.element
+    const asked =
+      changed.has('hiddenSeries') &&
+      !(changed.get('hiddenSeries') === undefined && this.hiddenSeries === '')
+    this.writes = asked || (table !== null && table !== this.wroteTo && this.hiddenSeries !== '')
+    if (!this.writes && table !== null) {
+      this.follow()
+    }
+  }
+
+  /**
+   * Takes the table's hidden series as this legend's own, for its entries.
+   *
+   * A name hidden on the table that is not one of this legend's entries stays
+   * out of its list: a legend of the rows and one of the columns share a
+   * table and not a list.
+   */
+  private follow(): void {
+    const hidden = this.source.hidden
+    const now = commaList(this.hiddenSeries)
+    const next = this.names().filter((name) => hidden.has(seriesKey(name)))
+    const same =
+      next.length === now.length &&
+      next.every((name) => now.some((one) => seriesKey(one) === seriesKey(name)))
+    if (!same) {
+      this.hiddenSeries = next.join(', ')
     }
   }
 
@@ -140,23 +189,24 @@ export class HelixHeadlessLegend extends HelixElement {
    *
    * After the update rather than before, because a server has no table and a
    * hydrating render must draw what the server drew: the charts follow a frame
-   * after the legend, which is when they draw at all.
+   * after the legend, which is when they draw at all. Only this legend's own
+   * entries are written, so a series another legend hid among other names
+   * stays hidden.
    */
   protected override updated(changed: PropertyValues<this>): void {
     super.updated(changed)
-    const names = commaList(this.hiddenSeries)
-    if (names.length > 0 || this.wrote) {
-      this.source.hide(names)
-      this.wrote = names.length > 0
+    if (this.writes) {
+      this.writes = false
+      this.wroteTo = this.source.hide(commaList(this.hiddenSeries), this.names()) ?? this.wroteTo
     }
   }
 
   override disconnectedCallback(): void {
     /* A legend that leaves takes its hidden series with it, so a chart is not
        left drawing without a series nobody can show again. */
-    if (this.wrote) {
-      this.source.hide([])
-      this.wrote = false
+    if (this.wroteTo !== null) {
+      this.source.hide([], this.names())
+      this.wroteTo = null
     }
     super.disconnectedCallback()
   }

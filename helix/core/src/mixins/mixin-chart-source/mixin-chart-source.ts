@@ -176,6 +176,12 @@ export declare class MixinChartSourceInterface {
    */
   showsSeries(name: string): boolean
   /**
+   * Whether the series read from the cell at this place in a row is drawn,
+   * by its column's heading. The keys and the readout pass over one a legend
+   * hid.
+   */
+  showsColumn(cell: number): boolean
+  /**
    * The number of readings, which the pointer position maps onto.
    */
   get readings(): number
@@ -347,6 +353,19 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
      */
     showsSeries(name: string): boolean {
       return !this.source.hidden.has(seriesKey(name))
+    }
+
+    /**
+     * Whether the series read from the cell at this place in a row is drawn,
+     * by its column's heading. The keys and the readout pass over one a
+     * legend hid.
+     *
+     * A column's heading is the cell's name in every row, so the first row
+     * answers for the column.
+     */
+    showsColumn(cell: number): boolean {
+      const name = this.sourceRows[0]?.cells[cell]?.name
+      return name === undefined || this.showsSeries(name)
     }
 
     /** The number of readings, which the pointer position maps onto. */

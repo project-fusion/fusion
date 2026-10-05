@@ -203,3 +203,24 @@ describe('reading by key', () => {
     expect(part(host, 'live')?.textContent).toBe('Mar: Search 25, Direct 15, Social 10, Total 50')
   })
 })
+
+/* A band a legend hid is not drawn, so the series keys pass over it. */
+describe('a band a legend hid', () => {
+  test('is passed over by the series keys', async () => {
+    await import('../../legend/index.js')
+    const host = await chart(
+      `${SOURCES}<helix-headless-legend for="sources" hidden-series="Search"></helix-headless-legend>`,
+      'for="sources"',
+    )
+    const legend = document.querySelector('helix-headless-legend') as unknown as Chart
+    await legend.updateComplete
+    await host.updateComplete
+    for (const key of ['ArrowRight', 'ArrowDown']) {
+      part(host, 'plot')?.dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key }),
+      )
+    }
+    await host.updateComplete
+    expect(part(host, 'live')?.textContent).toBe('Jan, Direct 6')
+  })
+})

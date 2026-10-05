@@ -19,7 +19,7 @@ let Controller: new (
   rows: { label: string }[]
   series: unknown[]
   hidden: ReadonlySet<string>
-  hide(names: Iterable<string>): void
+  hide(names: Iterable<string>, among?: Iterable<string>): Element | null
   hostConnected(): void
   hostDisconnected(): void
   watch(): void
@@ -254,10 +254,25 @@ describe('the series hidden on a table', () => {
     expect(leaves.updates()).toBe(0)
   })
 
+  /* A legend of the rows and one of the columns share a table and not a list,
+     so each writes among its own names and keeps what the other hid. */
+  test('are written among some names, keeping what was hidden outside them', () => {
+    document.body.innerHTML = '<table id="src"><tr><td>1</td></tr></table>'
+    const one = chart('src')
+    one.controller.hostConnected()
+    one.controller.hide(['Feb'], ['Jan', 'Feb', 'Mar'])
+    one.controller.hide(['Direct'], ['Direct', 'Referral'])
+    expect([...one.controller.hidden].sort()).toEqual(['direct', 'feb'])
+    expect(one.controller.hide([], ['Direct', 'Referral'])).toBe(
+      document.getElementById('src') as Element,
+    )
+    expect([...one.controller.hidden]).toEqual(['feb'])
+  })
+
   test('are none where the id names no table', () => {
     document.body.innerHTML = ''
     const one = chart('missing')
-    one.controller.hide(['x'])
+    expect(one.controller.hide(['x'])).toBeNull()
     expect(one.controller.hidden.size).toBe(0)
   })
 })

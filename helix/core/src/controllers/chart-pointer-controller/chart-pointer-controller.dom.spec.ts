@@ -344,7 +344,12 @@ interface Keyed extends Scene {
 
 const keyed = (
   readings: number,
-  options: { columns?: number[]; seriesOf?: (cell: number) => number | undefined } = {},
+  options: {
+    columns?: number[]
+    seriesOf?: (cell: number) => number | undefined
+    showsColumn?: (cell: number) => boolean
+    showsReading?: (at: number) => boolean
+  } = {},
 ): Keyed => {
   const one = scene(readings) as Keyed
   const root = one.host.shadowRoot as ShadowRoot
@@ -354,6 +359,8 @@ const keyed = (
   Object.assign(one.host, {
     plottedColumns: options.columns ?? [0],
     seriesOf: options.seriesOf ?? ((cell: number) => cell + 1),
+    showsColumn: options.showsColumn,
+    showsReading: options.showsReading,
   })
   one.plot = plot
   one.press = (key: string) => {
@@ -441,6 +448,28 @@ describe('a reader on the keyboard', () => {
   })
 })
 
+describe('a reading a legend hid', () => {
+  /* A ring's slices are its rows, and a slice a legend hid is closed over. */
+  test('is passed over by the arrows, Home and End', () => {
+    const one = keyed(4, { showsReading: (at) => at !== 0 && at !== 2 })
+    one.press('ArrowRight')
+    expect(one.point.at).toBe(1)
+    one.press('ArrowRight')
+    expect(one.point.at).toBe(3)
+    one.press('Home')
+    expect(one.point.at).toBe(1)
+    one.press('ArrowLeft')
+    expect(one.point.at).toBe(1)
+  })
+
+  test('and is not where a reader arriving by key starts', () => {
+    const one = keyed(3, { showsReading: (at) => at > 0 })
+    one.plot.matches = (() => true) as never
+    one.plot.dispatchEvent(new FocusEvent('focusin', { bubbles: true, composed: true }))
+    expect(one.point.at).toBe(1)
+  })
+})
+
 describe('the series of a reading', () => {
   /* The up and down arrows walk the bubble's list, which is the table's
      columns, and the readout then says the one cell. Up from the first goes
@@ -465,6 +494,17 @@ describe('the series of a reading', () => {
     const one = keyed(4, { columns: [0, 1, 2], seriesOf: (cell) => (cell < 1 ? undefined : cell) })
     one.press('ArrowDown')
     expect(one.point.column).toBe(1)
+  })
+
+  /* A series a legend hid is not drawn, so a key resting on it would say a
+     reading nobody can see. */
+  test('pass over a series a legend hid', () => {
+    const one = keyed(4, { columns: [0, 1, 2], showsColumn: (cell) => cell !== 0 })
+    one.press('ArrowDown')
+    expect(one.point.column).toBe(1)
+    one.press('ArrowDown')
+    expect(one.point.column).toBe(2)
+    expect([one.point.shows(0), one.point.shows(1)]).toEqual([false, true])
   })
 
   test('and with one series, the up and down arrows walk the readings too', () => {
