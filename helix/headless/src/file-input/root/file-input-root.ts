@@ -2,12 +2,14 @@ import {
   AriaForwardController,
   customElement,
   drawIcon,
+  drawStatus,
   fillTemplate,
   HelixBeforeChangeEvent,
   HelixFormElement,
   MixinField,
   requestChange,
   restoreValue,
+  StatusController,
 } from '@fusion.dev/helix-core'
 import { trash } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -233,13 +235,8 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
   @property({ attribute: false })
   validate?: (file: File) => string | null | undefined
 
-  /** Whether the live region is rendered: from the first refusal. */
-  @state()
-  private spoke = false
-
-  /** What the live region says. */
-  @state()
-  private said = ''
+  /** The live region, rendered from the first refusal. */
+  private readonly status = new StatusController(this)
 
   /**
    * Screens arriving files and commits what is taken, after the files the
@@ -284,16 +281,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
     /* The region arrives empty and takes its words a frame later, since a
        region that arrives with its words is read inconsistently. Cleared
        first, so the same words twice are said twice. */
-    this.spoke = true
-    this.said = ''
-    const fill = (): void => {
-      this.said = words
-    }
-    if (typeof requestAnimationFrame === 'function') {
-      requestAnimationFrame(fill)
-    } else {
-      fill()
-    }
+    this.status.say(words)
   }
 
   /** Takes files pasted onto the field, as a drop takes them. */
@@ -671,7 +659,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
            one ordering decision this component makes differently from the way it
            reads. Reasoning above renderMeta. -->
       ${this.renderHint()}${this.renderFeedback()}
-      ${this.spoke ? html`<span part="live" role="status">${this.said}</span>` : nothing}
+      ${drawStatus(this.status)}
       ${
         files.length === 0
           ? nothing

@@ -1,6 +1,12 @@
-import { customElement, elementById, HelixElement, hostAria } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  DelayController,
+  elementById,
+  HelixElement,
+  hostAria,
+} from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
-import { property, state } from 'lit/decorators.js'
+import { property } from 'lit/decorators.js'
 import { claimBusy, releaseBusy } from '../busy.js'
 
 /**
@@ -73,26 +79,21 @@ export class HelixHeadlessLoader extends HelixElement {
   @property()
   label = 'Loading'
 
-  /** Whether `delay` has run out, or there was none. */
-  @state()
-  private due = false
-
-  private timer: ReturnType<typeof setTimeout> | undefined
+  /** The wait `delay` asks for, and whether it has run out. */
+  private readonly due = new DelayController(this)
 
   /** The region this loader marked busy, so it is the one released. */
   private region: Element | null = null
 
   /** Whether the loader is still waiting out its `delay`. */
   private get waiting(): boolean {
-    return this.delay > 0 && !this.due
+    return this.delay > 0 && !this.due.elapsed
   }
 
   override connectedCallback(): void {
     super.connectedCallback()
-    if (this.delay > 0 && !this.due) {
-      this.timer = setTimeout(() => {
-        this.due = true
-      }, this.delay)
+    if (this.delay > 0 && !this.due.elapsed) {
+      this.due.start(this.delay)
     }
     /* A frame after connecting, which is after a framework has hydrated the
        region: an attribute it never rendered, arriving while it compares, is
@@ -102,8 +103,6 @@ export class HelixHeadlessLoader extends HelixElement {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
-    clearTimeout(this.timer)
-    this.timer = undefined
     this.release()
   }
 
