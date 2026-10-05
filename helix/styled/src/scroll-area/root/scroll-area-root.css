@@ -31,6 +31,99 @@
 }
 
 /*
+ *  The scrollbars drawn under `scrollbars`, in place of the browser's.
+ *
+ * Over the content at the edge, as the browser's overlay scrollbars are, so
+ * turning them on does not narrow the content. The vertical one sits at the
+ * inline end, which is the side Chromium puts its own on in both directions.
+ * The thumb is placed from the two fractions the headless tier writes on each
+ * scrollbar: its length is its share of the track, no shorter than the
+ * minimum, and its start is how far along the content is, times the room the
+ * thumb has left to travel.
+ */
+:host([scrollbars]) [part="viewport"] {
+  scrollbar-width: none;
+}
+
+[part~="scrollbar"] {
+  --_scroll-area-thumb: max(
+    var(--scroll-area-thumb-min-size, var(--helix-space-lg)),
+    var(--scroll-area-thumb-fraction, 1) *
+    100%
+  );
+  background-color: var(--scroll-area-track-color, transparent);
+  opacity: 0;
+  position: absolute;
+  touch-action: none;
+  transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+  user-select: none;
+  /* Above the fades, which would otherwise wash the thumb out at the ends. */
+  z-index: calc(var(--helix-layer-raised) + 1);
+}
+
+[part~="scrollbar-visible"] {
+  opacity: 1;
+}
+
+[part~="scrollbar-vertical"] {
+  inline-size: var(--scroll-area-scrollbar-size, var(--helix-space-sm));
+  inset-block: 0;
+  inset-inline-end: 0;
+}
+
+[part~="scrollbar-horizontal"] {
+  block-size: var(--scroll-area-scrollbar-size, var(--helix-space-sm));
+  inset-block-end: 0;
+  inset-inline: 0;
+}
+
+/* Each stops short of the corner while the other is drawn. */
+:host(:state(scrollbar-horizontal)) [part~="scrollbar-vertical"] {
+  inset-block-end: var(--scroll-area-scrollbar-size, var(--helix-space-sm));
+}
+
+:host(:state(scrollbar-vertical)) [part~="scrollbar-horizontal"] {
+  inset-inline-end: var(--scroll-area-scrollbar-size, var(--helix-space-sm));
+}
+
+[part~="thumb"] {
+  background-color: var(--scroll-area-thumb-color, var(--helix-color-border));
+  border-radius: var(--helix-radii-full);
+  position: absolute;
+}
+
+[part~="thumb"]:hover {
+  background-color: var(--scroll-area-thumb-hover-color, var(--helix-color-foreground-subtle));
+}
+
+[part~="thumb-vertical"] {
+  block-size: var(--_scroll-area-thumb);
+  inset-block-start: calc(
+    var(--scroll-area-scroll-fraction, 0) *
+    (100% - var(--_scroll-area-thumb))
+  );
+  inset-inline: var(--helix-border-thick);
+}
+
+[part~="thumb-horizontal"] {
+  inline-size: var(--_scroll-area-thumb);
+  inset-block: var(--helix-border-thick);
+  inset-inline-start: calc(
+    var(--scroll-area-scroll-fraction, 0) *
+    (100% - var(--_scroll-area-thumb))
+  );
+}
+
+[part="corner"] {
+  background-color: var(--scroll-area-track-color, transparent);
+  block-size: var(--scroll-area-scrollbar-size, var(--helix-space-sm));
+  inline-size: var(--scroll-area-scrollbar-size, var(--helix-space-sm));
+  inset-block-end: 0;
+  inset-inline-end: 0;
+  position: absolute;
+}
+
+/*
  *  What says there is more.
  */
 :host::before,
@@ -138,7 +231,8 @@
   :host::before,
   :host::after,
   [part="edges"]::before,
-  [part="edges"]::after {
+  [part="edges"]::after,
+  [part~="scrollbar"] {
     transition: none;
   }
 }
