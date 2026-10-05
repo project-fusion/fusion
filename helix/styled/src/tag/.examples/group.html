@@ -1,0 +1,25 @@
+<!-- @summary A tag group: the arrow keys move between tags, Delete removes one, and Space selects. -->
+<helix-tag-group
+  id="filters"
+  label="Filters"
+  selection-mode="multiple"
+  value="Open"
+>
+  <helix-tag dismissible>Open</helix-tag>
+  <helix-tag
+    dismissible
+    tone="primary"
+  >Assigned to me</helix-tag>
+  <helix-tag
+    disabled
+    dismissible
+  >Archived</helix-tag>
+  <helix-tag href="#labels">All labels</helix-tag>
+</helix-tag-group>
+
+<script type="module">
+  const filters = document.getElementById('filters')
+  filters.addEventListener('helix-dismiss', (event) => {
+    event.target.closest('helix-tag')?.remove()
+  })
+</script>

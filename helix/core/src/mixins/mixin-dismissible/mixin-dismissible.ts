@@ -24,6 +24,9 @@ export declare class DismissibleElement {
 
   /** The event, built but not dispatched, for a caller that owns the timing. */
   protected dismissEvent(): HelixDismissEvent
+
+  /** Where focus lands when a neighbor that held it is removed: the dismiss control. */
+  protected get returnFocusTo(): HTMLElement | null
 }
 
 /**
@@ -79,6 +82,18 @@ export const MixinDismissible = <T extends Constructor<LitElement>>(Base: T) => 
       return new HelixDismissEvent({ label: own.trim() })
     }
 
+    /**
+     * Where focus lands when a neighbor that held it is removed: this
+     * element's dismiss control.
+     *
+     * A seam for a member whose focus lives elsewhere: a tag in a Tag Group is
+     * a row the arrows move between, so a removed row hands focus to the next
+     * row rather than to its remove button.
+     */
+    protected get returnFocusTo(): HTMLElement | null {
+      return this.shadowRoot?.querySelector<HTMLElement>('[part~="dismiss"]') ?? null
+    }
+
     /** Fires `helix-dismiss`, and returns `false` if a listener cancels it. */
     dismiss(): boolean {
       const neighbors = deepContains(this, deepActiveElement()) ? this.neighbors() : []
@@ -123,12 +138,15 @@ export const MixinDismissible = <T extends Constructor<LitElement>>(Base: T) => 
           return
         }
         for (const neighbor of neighbors) {
-          const control =
-            neighbor.isConnected &&
-            neighbor.shadowRoot?.querySelector<HTMLElement>('[part~="dismiss"]')
+          /* The neighbor is this element's own kind, so it has the seam. */
+          const control = neighbor.isConnected && (neighbor as unknown as Dismissible).returnFocusTo
           if (control) {
             control.focus()
-            return
+            /* A control that cannot take focus, such as a disabled button,
+               passes the turn to the next neighbor. */
+            if (deepContains(neighbor, deepActiveElement())) {
+              return
+            }
           }
         }
       }
