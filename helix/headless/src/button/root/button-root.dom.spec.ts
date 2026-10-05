@@ -409,3 +409,44 @@ describe('a pending button', () => {
     expect(part(button, 'live')).toBeNull()
   })
 })
+
+describe('what pressed the button', () => {
+  /* React Aria's onPress carries pointerType. A click says it only in some
+     engines, and a keyboard press and a script's click() arrive alike. */
+  const heard = (host: HTMLElement): string[] => {
+    const kinds: string[] = []
+    host.addEventListener('helix-press', (event) => {
+      kinds.push((event as CustomEvent<{ pointerType: string }>).detail.pointerType)
+    })
+    return kinds
+  }
+
+  test('a script click is virtual, and a click after Enter is the keyboard', async () => {
+    const host = await mount('<helix-headless-button>Save</helix-headless-button>')
+    const kinds = heard(host)
+    const inner = control(host) as HTMLButtonElement
+    inner.click()
+    inner.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Enter' }))
+    inner.click()
+    inner.click()
+    expect(kinds).toEqual(['virtual', 'keyboard', 'virtual'])
+  })
+
+  test('a click after a pen goes down is the pen', async () => {
+    const host = await mount('<helix-headless-button>Save</helix-headless-button>')
+    const kinds = heard(host)
+    const inner = control(host) as HTMLButtonElement
+    const down = new Event('pointerdown', { bubbles: true })
+    Object.defineProperty(down, 'pointerType', { value: 'pen' })
+    inner.dispatchEvent(down)
+    inner.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }))
+    expect(kinds).toEqual(['pen'])
+  })
+
+  test('a pending button sends none', async () => {
+    const host = await mount('<helix-headless-button pending>Save</helix-headless-button>')
+    const kinds = heard(host)
+    ;(control(host) as HTMLButtonElement).click()
+    expect(kinds).toEqual([])
+  })
+})

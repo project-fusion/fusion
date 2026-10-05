@@ -153,7 +153,7 @@ export class HelixHeadlessRadio extends MixinSelectableItem(HelixElement) {
       tabindex=${(this.focusable ?? this.selected) || !this.childrenKnown ? '0' : '-1'}
       @click=${() => this.select()}
     >
-      <span part="box"
+      <span part="box" aria-hidden="true"
         ><slot
           name="indicator"
           @slotchange=${(event: Event) =>

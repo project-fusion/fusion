@@ -97,7 +97,9 @@ const kind = (file: File): string => {
  * is screened: `accept`, `max-file-size`, `max-files` and your own `validate`
  * can refuse it. A refused file is left out, `helix-reject` lists each one with
  * its reason, and a reader hears `rejected-text` with the names filled in.
- * `directory` asks the picker for a folder. `transformFiles` changes the files
+ * A reader also hears `added-text` for the files a drop or a paste adds, and
+ * `removed-text` for a file a remove button takes out, since neither moves
+ * focus or says anything on its own. `directory` asks the picker for a folder. `transformFiles` changes the files
  * a field takes before it holds them, such as shrinking an image.
  *
  * Each chosen file is a row: its name, its size and type as tags, and a
@@ -144,7 +146,7 @@ const kind = (file: File): string => {
  * @csspart kind-start - The category before the label.
  * @csspart label - The label above the field.
  * @csspart list - The chosen files.
- * @csspart live - The live region that says `rejected-text` when files are refused. It is rendered from the first refusal.
+ * @csspart live - The live region that says `added-text`, `rejected-text`, and `removed-text`. It is rendered from the first time it has something to say.
  * @csspart meta - The row that holds a file's size and type.
  * @csspart name - A file's name.
  * @csspart remove - The control that removes a file.
@@ -181,6 +183,13 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
    */
   @property()
   accept = ''
+
+  /**
+   * What a reader hears when a drop or a paste adds files, with `{names}` and
+   * `{count}` filled in.
+   */
+  @property({ attribute: 'added-text' })
+  addedText = 'Added: {names}'
 
   /**
    * Which camera or microphone a mobile picker should offer, if any.
@@ -230,6 +239,12 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
   rejectedText = 'Not added: {names}'
 
   /**
+   * What a reader hears when a file is removed, with `{name}` filled in.
+   */
+  @property({ attribute: 'removed-text' })
+  removedText = 'Removed: {name}'
+
+  /**
    * The accessible name of the control that removes a file. `{name}` is
    * replaced with the file's name.
    *
@@ -270,13 +285,12 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
   @property({ attribute: false })
   validate?: (file: File) => string | null | undefined
 
-  /** The live region, rendered from the first refusal. */
+  /** The live region, rendered from the first time it has something to say. */
   private readonly status = new StatusController(this)
 
   /**
    * Screens arriving files and commits what is taken, after the files the
-   * field keeps, through `transformFiles` where it is set. Refused files are
-   * announced and said.
+   * field keeps, through `transformFiles` where it is set.
    */
   private take(arriving: File[], keeping: File[], picked = false): void {
     const { kept, refused } = screenFiles(arriving, keeping, {
@@ -288,43 +302,77 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
       multiple: this.multiple || picked,
       validate: this.validate,
     })
-    /* Nothing taken and nothing moved, as when every dropped file is refused:
-       no change to announce. A pick is the platform's own `change`, relayed
-       whatever it holds, as before. */
-    const same = (one: File[], two: File[]): boolean =>
-      one.length === two.length && one.every((file, at) => file === two[at])
-    const transform = this.transformFiles
     const taken = kept.filter((file) => !keeping.includes(file))
+    const transform = this.transformFiles
     if (!transform || taken.length === 0) {
-      if (picked || !(same(kept, this.committed) && same(kept, this.files))) {
-        this.commit(kept)
-      }
-      if (refused.length > 0) {
-        this.refuse(refused)
-      }
+      this.finish(kept, taken, refused, picked)
       return
     }
     const held = kept.filter((file) => keeping.includes(file))
     Promise.resolve()
       .then(() => transform(taken))
       .then(
-        (made) => {
-          this.commit([...held, ...made])
-          if (refused.length > 0) {
-            this.refuse(refused)
-          }
-        },
+        (made) => this.finish([...held, ...made], made, refused, picked),
         (error: unknown) => {
           const message = error instanceof Error ? error.message : String(error)
-          if (picked) {
-            this.commit(held)
-          }
-          this.refuse([
-            ...refused,
-            ...taken.map((file) => ({ file, message, reason: 'invalid' as const })),
-          ])
+          this.finish(
+            held,
+            [],
+            [...refused, ...taken.map((file) => ({ file, message, reason: 'invalid' as const }))],
+            picked,
+          )
         },
       )
+  }
+
+  /**
+   * Commits what an arrival leaves, sends `helix-reject` for what it refused,
+   * and says both.
+   *
+   * Nothing taken and nothing moved, as when every dropped file is refused, is
+   * no change to announce. A pick is the platform's own `change`, relayed
+   * whatever it holds, and the picker itself tells a reader what was chosen,
+   * so `added-text` is said for a drop or a paste only.
+   */
+  private finish(next: File[], added: File[], refused: RefusedFile[], picked: boolean): void {
+    const same = (one: File[], two: File[]): boolean =>
+      one.length === two.length && one.every((file, at) => file === two[at])
+    const moved = picked || !(same(next, this.committed) && same(next, this.files))
+    const applied = moved && this.commit(next)
+    if (refused.length > 0) {
+      this.dispatchEvent(new HelixRejectEvent({ files: refused }))
+    }
+    /* The region arrives empty and takes its words a frame later, since a
+       region that arrives with its words is read inconsistently. Cleared
+       first, so the same words twice are said twice. */
+    const words = [
+      applied && !picked && added.length > 0 ? this.listed(this.addedText, added) : '',
+      refused.length > 0
+        ? this.listed(
+            this.rejectedText,
+            refused.map((one) => one.file),
+          )
+        : '',
+    ].filter((one) => one !== '')
+    if (words.length > 0) {
+      this.status.say(words.join(' '))
+    }
+  }
+
+  /**
+   * A sentence about some files, with `{count}` and `{names}` filled in.
+   *
+   * The names as the page's language lists them, which in English is the comma
+   * list it always was: `unit` and `short` join with commas and no "and". The
+   * count is written as the language writes a number.
+   */
+  private listed(sentence: string, files: File[]): string {
+    return fillTemplate(sentence, {
+      count: formatNumbers(this.lang)(files.length),
+      names: new Intl.ListFormat(this.lang || undefined, { style: 'short', type: 'unit' }).format(
+        files.map((file) => file.name),
+      ),
+    })
   }
 
   /** The element slotted into `remove-icon`, which each remove button copies. */
@@ -347,24 +395,6 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
     const held = this.removeIcons.get(at) ?? this.removeIcon.cloneNode(true)
     this.removeIcons.set(at, held)
     return held
-  }
-
-  /** Sends `helix-reject` and says which files were left out. */
-  private refuse(refused: RefusedFile[]): void {
-    this.dispatchEvent(new HelixRejectEvent({ files: refused }))
-    /* The names as the page's language lists them, which in English is the
-       comma list it always was: `unit` and `short` join with commas and no
-       "and". The count is written as the language writes a number. */
-    const words = fillTemplate(this.rejectedText, {
-      count: formatNumbers(this.lang)(refused.length),
-      names: new Intl.ListFormat(this.lang || undefined, { style: 'short', type: 'unit' }).format(
-        refused.map((one) => one.file.name),
-      ),
-    })
-    /* The region arrives empty and takes its words a frame later, since a
-       region that arrives with its words is read inconsistently. Cleared
-       first, so the same words twice are said twice. */
-    this.status.say(words)
   }
 
   /** Takes files pasted onto the field, as a drop takes them. */
@@ -435,7 +465,10 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
    * picker come back out the same way.
    */
   removeAt(at: number): void {
-    this.commit(this.files.filter((_, index) => index !== at))
+    const gone = this.files[at]
+    if (gone && this.commit(this.files.filter((_, index) => index !== at))) {
+      this.status.say(fillTemplate(this.removedText, { name: gone.name }))
+    }
   }
 
   /**
@@ -465,10 +498,10 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
    * assignment left to skip and the honest answer is to restore the list the
    * element last stood behind.
    */
-  private commit(next: File[]): void {
+  private commit(next: File[]): boolean {
     const control = this.control
     if (!control) {
-      return
+      return false
     }
     const previous = this.committed
     const applied = requestChange({
@@ -484,6 +517,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
     if (!applied) {
       this.put(control, previous)
     }
+    return applied
   }
 
   /**

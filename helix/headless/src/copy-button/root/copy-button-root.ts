@@ -229,7 +229,9 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
     if (this.isDisabled) {
       return
     }
-    const wrote = await this.clipboard.copy(this.text)
+    const copying = this.clipboard.copy(this.text)
+    this.announcePress(event)
+    const wrote = await copying
     if (!wrote && this.isConnected) {
       this.dispatchEvent(new HelixCopyErrorEvent())
     }
@@ -275,6 +277,8 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
       tabindex=${this.focusable ? nothing : '-1'}
       ?disabled=${this.isDisabled}
       @click=${this.handleCopy}
+      @keydown=${this.notePress}
+      @pointerdown=${this.notePress}
     >
       ${this.renderCopiedIcon()} ${this.renderFailedIcon()} ${this.renderCopyIcon()}
       </button>`,
