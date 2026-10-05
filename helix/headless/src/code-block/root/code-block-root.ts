@@ -275,48 +275,35 @@ export class HelixHeadlessCodeBlock extends HelixElement {
   @state()
   private expanded = false
 
-  /** Watches the drawn code's size, while the block is expandable. */
+  /** Watches the block's size, while it is expandable. */
   private sizes: ResizeObserver | undefined
 
   /**
    * Reads whether the cap hides lines: the scroller is taller inside than it
    * is drawn. The styled tier caps the `<code>`, and a page may cap the
-   * `<pre>`, so both are asked. Not while expanded, which shows everything.
+   * `<pre>`, so both are asked. Left as it was while expanded, which shows
+   * everything.
    */
   private readonly measure = (): void => {
-    if (this.expanded) {
-      return
+    if (!this.expanded) {
+      this.capped =
+        this.expandable &&
+        !this.diff &&
+        [...this.renderRoot.querySelectorAll<HTMLElement>('[part="block"], [part="code"]')].some(
+          (box) => box.scrollHeight > box.clientHeight + 1,
+        )
     }
-    const boxes = [
-      ...(this.renderRoot?.querySelectorAll<HTMLElement>('[part="block"], [part="code"]') ?? []),
-    ]
-    this.capped = boxes.some((box) => box.scrollHeight > box.clientHeight + 1)
   }
 
-  /* Measured after each render, and again whenever the drawn code changes
-     size, which a font arriving or a narrower page does with no render. */
+  /* Measured after each render, and again whenever the block changes size,
+     which a narrower page or a font arriving does with no render. */
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    if (!this.expandable || this.diff || typeof ResizeObserver === 'undefined') {
-      this.sizes?.disconnect()
-      this.sizes = undefined
-      this.capped = false
-      return
-    }
-    this.sizes ??= new ResizeObserver(this.measure)
-    this.sizes.disconnect()
-    for (const box of this.renderRoot.querySelectorAll('[part="block"], [part="code"]')) {
-      this.sizes.observe(box)
+    if (this.expandable && typeof ResizeObserver !== 'undefined') {
+      this.sizes ??= new ResizeObserver(this.measure)
+      this.sizes.observe(this)
     }
     this.measure()
-  }
-
-  private toggleExpanded(): void {
-    this.expanded = !this.expanded
-    this.toggleState('expanded', this.expanded)
-    if (!this.expanded) {
-      this.updateComplete.then(this.measure)
-    }
   }
 
   override connectedCallback(): void {
@@ -389,7 +376,10 @@ export class HelixHeadlessCodeBlock extends HelixElement {
       aria-expanded=${this.expanded ? 'true' : 'false'}
       part="expand"
       type="button"
-      @click=${() => this.toggleExpanded()}
+      @click=${() => {
+        this.expanded = !this.expanded
+        this.toggleState('expanded', this.expanded)
+      }}
     >
       ${this.expanded ? this.collapseLabel : this.expandLabel}
     </button>`
