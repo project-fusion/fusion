@@ -250,12 +250,8 @@ describe('focus when a message goes', () => {
     await two?.updateComplete
     const dismiss = one?.shadowRoot?.querySelector<HTMLElement>('[part="dismiss"]')
     dismiss?.focus()
-    if (!one?.matches(':focus-within')) {
-      // A double that does not track focus into a shadow root has nothing to ask.
-      return
-    }
     dismiss?.click()
-    await one.updateComplete
+    await one?.updateComplete
     await new Promise((resolve) => setTimeout(resolve, 0))
     expect(two?.shadowRoot?.activeElement?.getAttribute('part')).toBe('dismiss')
   })

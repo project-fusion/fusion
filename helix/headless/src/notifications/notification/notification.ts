@@ -1,5 +1,8 @@
 import {
   customElement,
+  deepActiveElement,
+  deepContains,
+  focusableElements,
   HelixElement,
   HelixReadEvent,
   hostAria,
@@ -93,6 +96,15 @@ export class HelixHeadlessNotification extends MixinDismissible(HelixElement) {
    */
   @property({ attribute: 'default-read', type: Boolean })
   defaultRead = false
+
+  /**
+   * What a screen reader hears before an unread notification's text.
+   *
+   * The unread mark is drawn, so a reader who cannot see it hears this word in
+   * its place. Translate it with the rest of your interface.
+   */
+  @property({ attribute: 'unread-label' })
+  unreadLabel = 'Unread'
 
   /**
    * Locale for the timestamp.
@@ -293,7 +305,12 @@ export class HelixHeadlessNotification extends MixinDismissible(HelixElement) {
     return html`<div part="item">
       <span part="media"><slot name="media"></slot></span>
       <div part="body">
-        <div part="label"><slot></slot></div>
+        <div part="label">${
+          /* An empty image named for the state, so the word is read with the
+             row and draws nothing: an empty inline box inside the label's own
+             line. This tier has no stylesheet to hide text with. */
+          this.read ? nothing : html`<span role="img" aria-label=${this.unreadLabel}></span>`
+        }<slot></slot></div>
         <slot name="description"></slot>
         <slot name="detail"></slot>
         <span part="actions"><slot name="actions" @slotchange=${this.handleActions}></slot></span>
@@ -336,8 +353,46 @@ export class HelixHeadlessNotification extends MixinDismissible(HelixElement) {
   private readonly handleDismiss = (event: Event): void => {
     event.stopPropagation()
     if (this.dismiss()) {
+      /* Focus was on the control that is leaving with the row, so it moves to
+         the row beside it, or to the feed's own controls, before the row
+         goes. Left alone it would fall to the body. */
+      const next = deepContains(this, deepActiveElement()) ? this.neighbor() : null
       this.remove()
+      next?.focus()
     }
+  }
+
+  /**
+   * Where focus goes when this row leaves: the next row's first control, the
+   * one before, then the first control left in the feed.
+   */
+  private neighbor(): HTMLElement | null {
+    let feed = this.parentElement
+    while (feed && !('markEveryoneRead' in feed)) {
+      feed = feed.parentElement
+    }
+    const rows = feed
+      ? (feed as unknown as { items: HelixHeadlessNotification[] }).items
+      : [...(this.parentElement?.children ?? [])].filter(
+          (one): one is HelixHeadlessNotification => 'isNotification' in one,
+        )
+    const at = rows.indexOf(this)
+    const order = [...rows.slice(at + 1), ...rows.slice(0, Math.max(at, 0)).reverse()]
+    for (const row of order) {
+      const target =
+        row.shadowRoot?.querySelector<HTMLElement>('[part="dismiss"]') ?? focusableElements(row)[0]
+      if (target) {
+        return target
+      }
+    }
+    if (!feed) {
+      return null
+    }
+    return (
+      feed.shadowRoot?.querySelector<HTMLElement>('[part="mark-all"]') ??
+      focusableElements(feed).find((one) => !this.contains(one)) ??
+      null
+    )
   }
 }
 

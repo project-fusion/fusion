@@ -248,7 +248,7 @@ export class HelixHeadlessToast extends HelixElement {
     if (!(item instanceof HTMLElement) || item.parentElement !== this) {
       return
     }
-    if (!item.matches(':focus-within')) {
+    if (!deepContains(item, deepActiveElement())) {
       return
     }
     const before = this.showing
