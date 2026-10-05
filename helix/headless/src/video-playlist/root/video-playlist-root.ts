@@ -67,7 +67,7 @@ type Player = HTMLElement & {
  * @slot - The entries.
  * @slot player - The player that plays the entries.
  *
- * @event {HelixActivateEvent} helix-activate - The current entry changed. The playlist already holds the new entry when this is sent.
+ * @event {HelixActivateEvent} helix-activate - The current entry changed. The playlist already holds the new entry when this is sent, and `detail.previous` is the entry it left.
  * @event {HelixBeforeActivateEvent} helix-before-activate - The current entry is about to change. Cancelable: cancel it to keep the current entry.
  * @event {HelixEndEvent} helix-end - The last entry finished playing, and the playlist stopped there. Not sent while `repeat` is set.
  *
