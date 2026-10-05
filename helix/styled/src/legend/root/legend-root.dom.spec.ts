@@ -46,7 +46,7 @@ const legend = async (attributes = ''): Promise<Legend> => {
 }
 
 const entries = (host: HTMLElement): Element[] => [
-  ...(host.shadowRoot?.querySelectorAll('[part="entry"]') ?? []),
+  ...(host.shadowRoot?.querySelectorAll('[part~="entry"]') ?? []),
 ]
 
 describe('legend', () => {
@@ -59,7 +59,7 @@ describe('legend', () => {
          already carries its series, so there was nothing for a box to hold. */
       expect(entry.querySelector('[part="swatch"]')).toBeNull()
     }
-    expect(rule('[part="entry"]::before')).toContain('content: ""')
+    expect(rule('[part~="entry"]::before')).toContain('content: ""')
   })
 
   test('emphasis, material and placement reflect, and rest on nothing', async () => {
@@ -109,14 +109,16 @@ describe('legend', () => {
 
   test('beside a chart the entries stack, and on the end side they read from the swatch inward', () => {
     expect(rule(':host([placement="end"]) [part="list"]')).toContain('flex-direction: column')
-    expect(rule(':host([placement="end"]) [part="entry"]')).toContain('flex-direction: row-reverse')
+    expect(rule(':host([placement="end"]) [part~="entry"]')).toContain(
+      'flex-direction: row-reverse',
+    )
   })
 
   test('outlined keeps the fill under the edge, and the hooks the docs name are what the sheet reads', () => {
     // What `outlined` means on a mark whose area encodes a value, rather than
     // on a control whose fill is the loud part.
     const outlined = rule(
-      ':host([emphasis="outlined"]) [part="entry"]:not([data-emphasis])::before',
+      ':host([emphasis="outlined"]) [part~="entry"]:not([data-emphasis])::before',
     )
     expect(outlined).toContain('background-color: color-mix(')
     expect(outlined).toMatch(

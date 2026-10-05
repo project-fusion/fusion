@@ -265,9 +265,12 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
        one thing splitting the axes was meant to stop. Empty on either side
        falls back to the whole set, so `secondary` naming a column that is not
        there leaves a chart rather than a blank. */
-    const values = series.flatMap((one) => one.points.map((point) => point.value))
+    /* Over the series drawn, so hiding one from a legend fits the scale to
+       the rest. */
+    const shown = series.filter((one) => this.showsSeries(one.name))
+    const values = shown.flatMap((one) => one.points.map((point) => point.value))
     const on = (which: (one: Series) => boolean): number[] => {
-      const found = series.filter(which).flatMap((one) => one.points.map((point) => point.value))
+      const found = shown.filter(which).flatMap((one) => one.points.map((point) => point.value))
       return found.length > 0 ? found : values.length > 0 ? values : [0]
     }
     const [low, high] = extent(scaled.size === 0 ? on(() => true) : on((one) => !own(one)))
@@ -396,7 +399,8 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
       z !== undefined && own(one) ? z : y
     const columns = series
       .map((one, index) => ({ one, slots: byRow(one, categories.length), tone: index }))
-      .filter(({ one }) => !lined.has(one.name.trim().toLowerCase()))
+      /* A series a legend hid takes no room in the slot, and keeps its tone. */
+      .filter(({ one }) => !lined.has(one.name.trim().toLowerCase()) && this.showsSeries(one.name))
     /* **The stride is what the columns share and the thickness is what they
        draw.** Back to back, two columns meet on one coordinate and each one's
        edge is the other's: an outlined chart then shows a single line between
@@ -533,7 +537,7 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
              category and a line crosses all of them, so it belongs to the plot
              rather than to any one slot. */
           series.map((one) =>
-            lined.has(one.name.trim().toLowerCase())
+            lined.has(one.name.trim().toLowerCase()) && this.showsSeries(one.name)
               ? this.renderLine(one, series.indexOf(one), slot, against(one), sideways)
               : nothing,
           )
@@ -741,10 +745,11 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
        so the far end is along x: rightward, or leftward where the drawing is
        mirrored, and the bubble goes on that side because a placement is
        physical. */
-    const values = series
+    const shown = series.filter((one) => this.showsSeries(one.name))
+    const values = shown
       .map((one) => byRow(one, this.readings)[at]?.value)
       .filter((one): one is number => one !== undefined)
-    const all = series.flatMap((one) => one.points.map((point) => point.value))
+    const all = shown.flatMap((one) => one.points.map((point) => point.value))
     const [low, high] = extent(all.length > 0 ? all : [0])
     const domain: [number, number] = [Math.min(0, low), Math.max(0, high)]
     const sideways = this.orientation === 'horizontal'
