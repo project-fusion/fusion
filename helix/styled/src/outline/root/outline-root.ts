@@ -15,6 +15,13 @@ import { styles } from './outline-root.css.js'
  * `data-level` is at the top level. The outline does not read heading levels
  * from the document, because the headings are not always in the document.
  *
+ * Links in a nested `<ul>` take their indentation from your own stylesheet:
+ * the outline's styles reach the elements slotted into it and nothing inside
+ * them. Write the links flat with `data-level` for the indentation drawn here,
+ * and screen readers still hear them as nested lists.
+ *
+ * A heading slotted into `heading` is set above the links, lined up with them.
+ *
  * @since 0.1.0
  * @status stable
  * @category navigation

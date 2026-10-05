@@ -41,6 +41,17 @@ describe('carousel', () => {
     expect(cal.getAttributeNames()).toEqual(['label'])
   })
 
+  test('says its role in the page’s language, and nothing where that is empty', async () => {
+    /* The slides' word was a property and the carousel's own was English
+       whatever the page was written in. */
+    const cal = await carousel('role-label="Karussell" slide-role-label=""')
+    expect(cal.internals?.ariaRoleDescription).toBe('Karussell')
+    expect(panes(cal).every((pane) => !pane.hasAttribute('aria-roledescription'))).toBe(true)
+    ;(cal as Carousel & { roleLabel: string }).roleLabel = ''
+    await cal.updateComplete
+    expect(cal.internals?.ariaRoleDescription ?? null).toBe(null)
+  })
+
   test('names each slide by its place in the set', async () => {
     // Without it a reader is told "group" three times and cannot tell where
     // they are in the run.
@@ -947,3 +958,146 @@ describe('the carets', () => {
     expect(await faces()).toEqual({ next: '-1 1', previous: '-1 1', previousOnRight: true })
   })
 })
+
+describe('the glyphs on the arrows', () => {
+  const withIcons = async (): Promise<Carousel> => {
+    const cal = (await mount(`<helix-headless-carousel label="Verticals">
+      <div>Design</div>
+      <div>Mind</div>
+      <svg slot="previous-icon" id="back"></svg>
+      <svg slot="next-icon" id="on"></svg>
+    </helix-headless-carousel>`)) as Carousel
+    await cal.updateComplete
+    await cal.updateComplete
+    return cal
+  }
+
+  const assigned = (cal: Carousel, name: string): string[] =>
+    (
+      cal.shadowRoot?.querySelector<HTMLSlotElement>(`slot[name="${name}"]`)?.assignedElements() ??
+      []
+    ).map((one) => one.id)
+
+  test('take what is slotted for them, which is not a slide', async () => {
+    const cal = await withIcons()
+    expect(panes(cal).length).toBe(2)
+    expect(assigned(cal, 'previous-icon')).toEqual(['back'])
+    expect(assigned(cal, 'next-icon')).toEqual(['on'])
+  })
+
+  test('keep the caret as the fallback inside each slot', async () => {
+    const cal = await carousel()
+    const pairs: [string, string][] = [
+      ['previous-icon', 'previous-mark'],
+      ['next-icon', 'next-mark'],
+    ]
+    for (const [slot, mark] of pairs) {
+      expect(part(cal, mark)?.parentElement?.getAttribute('name')).toBe(slot)
+    }
+  })
+})
+
+describe('a mouse dragging the track', () => {
+  const pointer = (type: string, x: number, init: PointerEventInit = {}): PointerEvent =>
+    new PointerEvent(type, {
+      bubbles: true,
+      button: 0,
+      buttons: type === 'pointerup' ? 0 : 1,
+      clientX: x,
+      clientY: 10,
+      composed: true,
+      pointerType: 'mouse',
+      ...init,
+    })
+
+  const drag = async (cal: Carousel, init: PointerEventInit = {}): Promise<HTMLElement> => {
+    await cal.updateComplete
+    const track = part(cal, 'track') as HTMLElement
+    track.dispatchEvent(pointer('pointerdown', 200, init))
+    track.dispatchEvent(pointer('pointermove', 150, init))
+    await cal.updateComplete
+    return track
+  }
+
+  const dragging = (cal: Carousel): boolean =>
+    (cal.internals as ElementInternals & { states?: Set<string> })?.states?.has('dragging') ?? false
+
+  test('turns snapping off for the length of the drag, under mouse-drag', async () => {
+    const cal = await carousel('mouse-drag')
+    const track = await drag(cal)
+    expect(dragging(cal)).toBe(true)
+    expect(track.getAttribute('style')).toContain('scroll-snap-type: none !important')
+    track.dispatchEvent(pointer('pointerup', 150))
+    await cal.updateComplete
+    await cal.updateComplete
+    expect(dragging(cal)).toBe(false)
+    expect(track.getAttribute('style')).toBe('--carousel-per-view: 1')
+  })
+
+  test('keeps the click that ends a drag from reaching a link in the slide', async () => {
+    const cal = await carousel('mouse-drag')
+    const track = await drag(cal)
+    track.dispatchEvent(pointer('pointerup', 150))
+    const click = new MouseEvent('click', { bubbles: true, cancelable: true })
+    track.dispatchEvent(click)
+    expect(click.defaultPrevented).toBe(true)
+  })
+
+  test('is a press, while the mouse has moved only a few pixels', async () => {
+    const cal = await carousel('mouse-drag')
+    const track = part(cal, 'track') as HTMLElement
+    track.dispatchEvent(pointer('pointerdown', 200))
+    track.dispatchEvent(pointer('pointermove', 198))
+    await cal.updateComplete
+    expect(dragging(cal)).toBe(false)
+  })
+
+  test('does nothing without mouse-drag, or for a touch, which scrolls the track itself', async () => {
+    const plain = await carousel()
+    await drag(plain)
+    expect(dragging(plain)).toBe(false)
+    const touched = await carousel('mouse-drag')
+    await drag(touched, { pointerType: 'touch' })
+    expect(dragging(touched)).toBe(false)
+  })
+})
+
+/* Where a drag settles, which needs slides laid out side by side. */
+if (hasLayout()) {
+  describe('a mouse drag in a browser', () => {
+    const sheet = document.createElement('style')
+    sheet.textContent = `
+      helix-headless-carousel { display: block; inline-size: 300px; }
+      helix-headless-carousel::part(track) { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; }
+      helix-headless-carousel::part(slide) { flex: 0 0 100%; scroll-snap-align: start; }`
+
+    afterEach(() => {
+      sheet.remove()
+    })
+
+    test('settles on the slide nearest to where it was let go, and announces it', async () => {
+      document.head.append(sheet)
+      const cal = await carousel('mouse-drag')
+      await cal.updateComplete
+      const track = part(cal, 'track') as HTMLElement
+      const at = track.getBoundingClientRect()
+      const event = (type: string, x: number): PointerEvent =>
+        new PointerEvent(type, {
+          bubbles: true,
+          button: 0,
+          buttons: type === 'pointerup' ? 0 : 1,
+          clientX: x,
+          clientY: at.top + 5,
+          pointerType: 'mouse',
+        })
+      track.dispatchEvent(event('pointerdown', at.left + 250))
+      track.dispatchEvent(event('pointermove', at.left + 150))
+      track.dispatchEvent(event('pointermove', at.left + 50))
+      expect(Math.round(track.scrollLeft)).toBe(200)
+      track.dispatchEvent(event('pointerup', at.left + 50))
+      await cal.updateComplete
+      expect(cal.index).toBe(1)
+      expect(part(cal, 'live')?.textContent).toBe('2 of 3')
+    })
+  })
+}
