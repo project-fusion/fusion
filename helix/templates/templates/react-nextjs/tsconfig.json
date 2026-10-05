@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
-    "jsx": "preserve",
+    "allowJs": true,
+    "esModuleInterop": true,
+    "jsx": "react-jsx",
     "lib": [
       "DOM",
       "DOM.Iterable",
@@ -27,6 +29,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
     "helix-jsx.d.ts"
   ],
   "exclude": [
