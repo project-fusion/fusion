@@ -54,3 +54,25 @@ describe('the preview example', () => {
     expect(box(host).width).toBeGreaterThan(80)
   })
 })
+
+describe('the hooks the docs name', () => {
+  /* The shown link's fill, ink, room and corner were fixed values, so a page
+     whose header is dark could not make its skip link match without ::part. */
+  test('are what the sheet reads, each falling back to the value it replaced', () => {
+    const sheet = (
+      customElements.get('helix-skip-link') as unknown as { styles: { cssText: string } }
+    ).styles.cssText
+    for (const [hook, fallback] of [
+      ['--skip-link-background-color', '--helix-color-surface-inverse'],
+      ['--skip-link-color', '--helix-color-foreground-inverse'],
+      ['--skip-link-font-size', '--helix-text-sm'],
+      ['--skip-link-inset-block', '--helix-space-sm'],
+      ['--skip-link-inset-inline', '--helix-space-sm'],
+      ['--skip-link-padding-block', '--helix-space-sm'],
+      ['--skip-link-padding-inline', '--helix-space-md'],
+      ['--skip-link-radius', '--helix-radii-sm'],
+    ]) {
+      expect(sheet).toContain(`var(${hook}, var(${fallback}))`)
+    }
+  })
+})

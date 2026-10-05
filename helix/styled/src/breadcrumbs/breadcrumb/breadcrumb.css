@@ -63,7 +63,7 @@
    and the sunken surface on hover, which is what `data-button="ghost"` does. */
 ::slotted(a) {
   background-color: transparent;
-  border-radius: var(--helix-radii-sm);
+  border-radius: var(--breadcrumbs-radius, var(--helix-radii-sm));
   padding: var(--helix-space-2xs) var(--helix-space-xs);
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
@@ -93,11 +93,11 @@
 
 /* The current page reads as where you are, not as somewhere you can go. */
 :host {
-  font-weight: var(--helix-weight-medium);
+  font-weight: var(--breadcrumbs-font-weight, var(--helix-weight-medium));
 }
 
 :host([current]) {
-  color: var(--helix-color-foreground);
+  color: var(--breadcrumbs-current-color, var(--helix-color-foreground));
 }
 
 /* The crumb itself, whether it is a link or the current page.
@@ -109,8 +109,8 @@
  * to read as part of the word. */
 [part="link"] {
   align-items: center;
-  border-radius: var(--helix-radii-sm);
-  color: var(--helix-color-foreground-muted);
+  border-radius: var(--breadcrumbs-radius, var(--helix-radii-sm));
+  color: var(--breadcrumbs-link-color, var(--helix-color-foreground-muted));
   display: inline-flex;
   gap: var(--helix-space-xs);
   padding: var(--helix-space-2xs) var(--helix-space-xs);
@@ -151,12 +151,12 @@ a[part="link"]:hover {
     --breadcrumbs-hover-color,
     color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)
   );
-  color: var(--helix-color-foreground);
+  color: var(--breadcrumbs-current-color, var(--helix-color-foreground));
 }
 
 /* The page the reader is on reads as where they are, not as somewhere to go. */
 :host([current]) [part="link"] {
-  color: var(--helix-color-foreground);
+  color: var(--breadcrumbs-current-color, var(--helix-color-foreground));
 }
 
 /* A hidden crumb takes no room. */
