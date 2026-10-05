@@ -313,6 +313,13 @@ export {
 } from './utils/calendar/calendar.js'
 export { capturePointer } from './utils/capture-pointer/capture-pointer.js'
 export {
+  ariaChord,
+  type ChordPress,
+  chordParts,
+  matchesChord,
+  printableChord,
+} from './utils/chord/chord.js'
+export {
   clockLocale,
   dayPeriod,
   type HourCycle,
@@ -389,6 +396,7 @@ export {
 } from './utils/media-copy/media-copy.js'
 export { formatNumber, parseNumber } from './utils/number-format/number-format.js'
 export { onUnlessFalse } from './utils/on-unless-false/on-unless-false.js'
+export { appleTouch, onApple, type Platform } from './utils/platform/platform.js'
 export { type ColorBytes, readColor, rgbOf } from './utils/read-color/read-color.js'
 export {
   byRow,
@@ -436,6 +444,7 @@ export {
   resolveActiveItem,
 } from './utils/resolve-active-item/resolve-active-item.js'
 export { holdCaret, restoreValue } from './utils/restore-value/restore-value.js'
+export { type RovingOptions, rovingStop } from './utils/roving-stop/roving-stop.js'
 export { extent, linear, type Scale } from './utils/scale/scale.js'
 export { ticks } from './utils/scale/ticks.js'
 export {

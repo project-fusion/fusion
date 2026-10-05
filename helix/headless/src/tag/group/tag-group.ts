@@ -7,13 +7,14 @@ import {
   KeyboardNavigationController,
   type NavigableItem,
   requestChange,
+  rovingStop,
   slottedWords,
   whenHydrated,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixHeadlessTag } from '../root/tag-root.js'
-import { pressedValue, type TagSelectionMode, tabStop } from '../selection.js'
+import { pressedValue, type TagSelectionMode } from '../selection.js'
 
 /**
  * @summary A set of tags that the arrow keys move through, and that can be removed and selected from the keyboard.
@@ -138,9 +139,10 @@ export class HelixHeadlessTagGroup extends HelixElement {
       selected: chosen.has(this.valueFor(tag)),
       tag,
     }))
-    const holder = tabStop(
+    const holder = rovingStop(
       items,
       items.find((item) => item.tag === this.last),
+      { disabled: (item) => item.disabled, selected: (item) => item.selected },
     )?.tag
     for (const tag of tags) {
       whenHydrated(tag, () => {
