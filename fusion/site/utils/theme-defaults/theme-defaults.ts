@@ -22,6 +22,7 @@ export interface Settings {
   band: string
   blur: number
   bodyFace: string
+  /** The brand color, as a hex, or empty for none, which is the ink Helix ships. */
   brand: string
   chromaScale: number
   contrastTarget: number
@@ -52,7 +53,7 @@ export const INITIAL: Settings = {
   band: '',
   blur: 16,
   bodyFace: '',
-  brand: '#3b82f6',
+  brand: '',
   chromaScale: 100,
   contrastTarget: 4.5,
   density: 100,
@@ -117,11 +118,13 @@ export function intentFrom(settings: Settings, site: 'dark' | 'light' = 'light')
     textScale,
     translucency,
   } = settings
-  const accent = accentFrom(accentHue)
+  /* An angle is measured from the brand, so with no brand there is nothing to
+     turn, and the accent is the ink with the primary. */
+  const accent = brand ? accentFrom(accentHue) : undefined
 
   /* **White and black are no page of its own**, so they leave `background`
-     out: the fields always hold a color, as Brand does, and at rest they hold
-     the page the engine draws without one. */
+     out: the fields always hold a color, and at rest they hold the page the
+     engine draws without one. */
   const dark = pageDark !== INITIAL.pageDark ? pageDark : undefined
   const light = pageLight !== INITIAL.pageLight ? pageLight : undefined
 
@@ -135,7 +138,8 @@ export function intentFrom(settings: Settings, site: 'dark' | 'light' = 'light')
           },
         }
       : {}),
-    brand,
+    /* No brand is no key, which the engine reads as ink. */
+    ...(brand ? { brand } : {}),
     chroma: { scale: chromaScale / 100 },
     contrastTarget,
     density: density / 100,

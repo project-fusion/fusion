@@ -198,6 +198,9 @@ const faceOptions = (groups: FaceGroup[], rest: Face, current: string) => (
 /** Where the band switch starts the band: a deep teal, a band of its own on any light page. */
 const BAND_COLOR = '#0b2a33'
 
+/** Where the brand switch starts the brand: a blue, until you type your own. */
+const BRAND_COLOR = '#3b82f6'
+
 export function ThemeBuilder({
   contexts,
   findable,
@@ -288,16 +291,23 @@ export function ThemeBuilder({
       setControlsShown(Number(event.detail.value) > 2)
     }
   }
+  /* **The brand, empty for none, which is the ink Helix ships**, with the
+     color the switch brings back once it has been turned off. */
   const [brand, setBrand] = useState(initialSettings.brand)
+  const [brandColor, setBrandColor] = useState(initialSettings.brand || BRAND_COLOR)
   /* **What the field holds, apart from the brand the theme is derived from.**
      A color input announces what is typed as it is typed, and `#`, `#1` and
      `#12` are all on the way to a color without being one: handed to the
      engine, the first keystroke threw and took the page down with it. The
      field keeps the text, and the brand moves only when the text reads as a
      color, written as the hex the engine and the link both take. */
-  const [brandText, setBrandText] = useState(initialSettings.brand)
+  const [brandText, setBrandText] = useState(initialSettings.brand || BRAND_COLOR)
   const brandTyped = (typed: string): void => {
     setBrandText(typed)
+    const taken = (next: string): void => {
+      setBrand(next)
+      setBrandColor(next)
+    }
     /* A whole hex as typed: the picker's model is hue, saturation and
        brightness in whole numbers, and a trip through it moved `#123abc` to
        `#133abd`. Any other syntax the field reads goes through it, since there
@@ -305,12 +315,12 @@ export function ThemeBuilder({
     const hex = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(typed.trim())?.[1]
     if (hex) {
       const whole = hex.length === 3 ? [...hex].map((one) => one + one).join('') : hex
-      setBrand(`#${whole.toLowerCase()}`)
+      taken(`#${whole.toLowerCase()}`)
       return
     }
     const read = parseColor(typed)
     if (read) {
-      setBrand(formatColor(read, 'hex', false))
+      taken(formatColor(read, 'hex', false))
     }
   }
   /* **The page's color for each scheme, white and black at rest**, each with
@@ -496,7 +506,8 @@ export function ThemeBuilder({
     setBlur(INITIAL.blur)
     setBodyFace(INITIAL.bodyFace)
     setBrand(INITIAL.brand)
-    setBrandText(INITIAL.brand)
+    setBrandColor(BRAND_COLOR)
+    setBrandText(BRAND_COLOR)
     setChromaScale(INITIAL.chromaScale)
     setContrastTarget(INITIAL.contrastTarget)
     setDensity(INITIAL.density)
@@ -718,7 +729,10 @@ export function ThemeBuilder({
      comparison is on lightness and the threshold is what a reader could see. */
   const derived = theme.tokens.find((token) => token.name === 'color-primary')
   const derivedPrimary = derived?.hex ?? brand
-  const shift = (derived?.value.lightness ?? 0) - (engine?.hexToOklch(brand).lightness ?? 0)
+  /* Ink is held, never solved, so with no brand there is nothing to report. */
+  const shift = brand
+    ? (derived?.value.lightness ?? 0) - (engine?.hexToOklch(brand).lightness ?? 0)
+    : 0
   const moved = Math.abs(shift) > 0.06
 
   /* **Injected rather than applied per property.** A `<style>` carrying the
@@ -811,8 +825,8 @@ export function ThemeBuilder({
                 </helix-tooltip>
               </helix-flex>
               <helix-text variant="caption">
-                Describe a brand. Every pair the palette produces is measured against the ground it
-                lands on.
+                Start from ink, or describe a brand. Every pair the palette produces is measured
+                against the ground it lands on.
               </helix-text>
             </helix-flex>
 
@@ -860,13 +874,24 @@ export function ThemeBuilder({
               ))}
             </helix-select>
 
-            <helix-color-input
-              hint="The one color you own. Everything else is derived from it."
-              label="Brand"
-              name="brand"
-              onChange={(event) => brandTyped(event.currentTarget.value)}
-              value={brandText}
-            ></helix-color-input>
+            {/* **No brand is a theme too, and it is the one Helix ships.** Off,
+                the palette is ink; on, it is derived from the color below,
+                and turning it off and on again brings that color back. */}
+            <helix-switch
+              checked={brand !== ''}
+              hint="Off, the palette is ink: near-black in light mode and near-white in dark."
+              label="Brand color"
+              onChange={(event) => setBrand(event.currentTarget.checked ? brandColor : '')}
+            ></helix-switch>
+            {brand ? (
+              <helix-color-input
+                hint="The one color you own. Everything else is derived from it."
+                label="Brand"
+                name="brand"
+                onChange={(event) => brandTyped(event.currentTarget.value)}
+                value={brandText}
+              ></helix-color-input>
+            ) : null}
 
             {/* **What the brand became, and why, because the gap surprises
                 everybody once.** Pick a bright yellow at AAA and the button
@@ -1031,7 +1056,8 @@ export function ThemeBuilder({
             <helix-slider
               {...BOUNDS.accentHue}
               className="themeChannel"
-              hint="How far around the wheel the accent sits from the brand, in degrees. At 0 it is the brand."
+              disabled={brand === '' || undefined}
+              hint="How far around the wheel the accent sits from the brand, in degrees. At 0 it is the brand. With no brand, it is the ink."
               label="Accent angle"
               name="accent"
               onInput={(event) => setAccentHue(Number(event.currentTarget.value))}
