@@ -2,7 +2,16 @@ import { type ConsoleDetail, customElement, HelixElement } from '@fusion.dev/hel
 import type { CSSResultGroup, TemplateResult } from 'lit'
 import { html, nothing } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { type ConsoleLevel, LEVELS, shows } from '../levels.js'
 import { styles } from './sandbox-terminal.css.js'
+
+/** What each choice of the level filter reads, in English until a page says otherwise. */
+const LEVEL_WORDS: Record<ConsoleLevel, string> = {
+  error: 'Errors',
+  info: 'Info and above',
+  log: 'All levels',
+  warn: 'Warnings and errors',
+}
 
 /** One line, with however many times it has arrived in a row. */
 interface Entry extends ConsoleDetail {
@@ -35,8 +44,15 @@ const LIMIT = 200
  * @aliases Console, Output
  * @documentation https://fusion.dev/helix/components/sandbox
  *
+ * **`controls` adds a clear button and a level filter** above the log. Both
+ * are also yours to drive without them: `clear()` empties the log, and
+ * `level` hides the quieter lines.
+ *
+ * @csspart clear - The button that empties the log, under `controls`.
+ * @csspart controls - The row holding the clear button and the level filter, under `controls`.
  * @csspart count - How many times a repeated line was written.
- * @csspart empty - Shown while nothing has been written.
+ * @csspart empty - Shown while nothing has been written, or while the level filter hides every line.
+ * @csspart filter - The level filter, a native select, under `controls`.
  * @csspart entry - One line.
  * @csspart level - The console level a line was written at.
  * @csspart log - The scrolling region.
@@ -46,6 +62,21 @@ const LIMIT = 200
  */
 @customElement('helix-sandbox-terminal')
 export class HelixSandboxTerminal extends HelixElement {
+  /**
+   * The clear button's text, under `controls`.
+   */
+  @property({ attribute: 'clear-label' })
+  clearLabel = 'Clear'
+
+  /**
+   * Shows a clear button and a level filter above the log.
+   *
+   * Off by default, because a sandbox that puts the terminal in a panel often
+   * has a toolbar of its own for them.
+   */
+  @property({ reflect: true, type: Boolean })
+  controls = false
+
   /**
    * Text shown before anything has been written.
    */
@@ -57,6 +88,30 @@ export class HelixSandboxTerminal extends HelixElement {
    */
   @property()
   label = 'Console output'
+
+  /**
+   * The quietest level shown: `info` hides plain logs, `warn` shows warnings
+   * and errors, and `error` shows errors only. Absent shows every line.
+   *
+   * Lines it hides are kept, so lowering it shows them again. The filter under
+   * `controls` sets it.
+   */
+  @property()
+  level?: ConsoleLevel | undefined
+
+  /**
+   * The level filter's name, read by screen readers, under `controls`.
+   */
+  @property({ attribute: 'level-label' })
+  levelLabel = 'Levels shown'
+
+  /**
+   * What each choice of the level filter reads, for a page in another
+   * language, keyed by level, such as `{ warn: '…' }`. A level left out keeps
+   * its English words. As an attribute it is that object as JSON.
+   */
+  @property({ attribute: 'level-words', type: Object })
+  levelWords: Partial<Record<ConsoleLevel, string>> = {}
 
   @state()
   private entries: Entry[] = []
@@ -111,12 +166,37 @@ export class HelixSandboxTerminal extends HelixElement {
     }
   }
 
+  /** Takes the level the reader chose in the filter. */
+  private readonly handleLevel = (event: Event): void => {
+    const chosen = (event.target as HTMLSelectElement).value as ConsoleLevel
+    this.level = chosen === 'log' ? undefined : chosen
+  }
+
+  /** The clear button and the level filter, under `controls`. */
+  private renderControls(): TemplateResult | typeof nothing {
+    if (!this.controls) {
+      return nothing
+    }
+    return html`<div part="controls">
+      <select part="filter" aria-label=${this.levelLabel} @change=${this.handleLevel}>
+        ${LEVELS.map(
+          (one) =>
+            html`<option value=${one} ?selected=${(this.level ?? 'log') === one}>
+              ${this.levelWords[one] ?? LEVEL_WORDS[one]}
+            </option>`,
+        )}
+      </select>
+      <button part="clear" type="button" @click=${() => this.clear()}>${this.clearLabel}</button>
+    </div>`
+  }
+
   protected override render(): TemplateResult {
-    return html`<div part="log" role="log" aria-label=${this.label} tabindex="0">
+    const shown = this.entries.filter((entry) => shows(entry.level, this.level))
+    return html`${this.renderControls()}<div part="log" role="log" aria-label=${this.label} tabindex="0">
       ${
-        this.entries.length === 0
+        shown.length === 0
           ? html`<p part="empty">${this.emptyLabel}</p>`
-          : this.entries.map(
+          : shown.map(
               (entry) => html`<div part="entry" data-level=${entry.level}>
                 <span part="level" aria-hidden=${entry.level === 'log' ? 'true' : nothing}
                   >${entry.level}</span

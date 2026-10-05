@@ -500,6 +500,20 @@ describe('sandbox dividers', () => {
     expect(panes(sandbox).position).toBe(start)
   })
 
+  test('a split that moved is announced again once it has, and a refused one is not', async () => {
+    const sandbox = (await mount(wired)) as Updatable & { split: number }
+    const settled: string[] = []
+    sandbox.addEventListener('helix-split', (event) => {
+      settled.push((event as CustomEvent<{ value: string }>).detail.value)
+    })
+    await press(sandbox, panes(sandbox), 'ArrowRight')
+    expect(settled).toEqual([String(sandbox.split)])
+
+    sandbox.addEventListener('helix-before-split', (event) => event.preventDefault())
+    await press(sandbox, panes(sandbox), 'ArrowRight')
+    expect(settled).toHaveLength(1)
+  })
+
   /* Browser only: the panel is pixels and the divider is a share, so the
      conversion between them needs a measured body and happy-dom has none. With
      no height the handler returns before it proposes anything, which is a test
@@ -517,6 +531,16 @@ describe('sandbox dividers', () => {
     expect(proposed).not.toBe('')
     expect(Number(proposed)).not.toBe(start)
     expect(sandbox.panelSize).toBe(start)
+  })
+
+  browser('a panel that moved is announced again at its new height', async () => {
+    const sandbox = (await mount(withPanel)) as Updatable & { panelSize: number }
+    const settled: string[] = []
+    sandbox.addEventListener('helix-panel-resize', (event) => {
+      settled.push((event as CustomEvent<{ value: string }>).detail.value)
+    })
+    await press(sandbox, body(sandbox), 'ArrowUp')
+    expect(settled).toEqual([String(sandbox.panelSize)])
   })
 
   /**

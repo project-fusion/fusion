@@ -144,6 +144,30 @@ describe('the source pane', () => {
     expect(heard?.value).toBe('.a{}')
     expect(host.getAttribute('name')).toBe('css')
   })
+
+  test('says an edit happened once the pane holds it, and says nothing of a refused one', async () => {
+    const host = (await source()) as HTMLElement & { value: string }
+    const field = part(host, 'source') as HTMLTextAreaElement
+    const edits: string[] = []
+    host.addEventListener('helix-edit', (event) => {
+      edits.push(`${(event as CustomEvent<{ value: string }>).detail.value}=${host.value}`)
+    })
+    field.value = '<b>'
+    field.dispatchEvent(new Event('input', { bubbles: true }))
+    expect(edits).toEqual(['<b>=<b>'])
+
+    host.addEventListener('helix-before-edit', (event) => event.preventDefault())
+    field.value = '<i>'
+    field.dispatchEvent(new Event('input', { bubbles: true }))
+    expect(edits).toEqual(['<b>=<b>'])
+  })
+
+  test('its description names both ways out of the field', async () => {
+    const host = await source()
+    const keys = host.shadowRoot?.getElementById('keys')?.textContent ?? ''
+    expect(keys).toContain('Escape and then Tab')
+    expect(keys).toContain('Shift+Tab')
+  })
 })
 
 /**

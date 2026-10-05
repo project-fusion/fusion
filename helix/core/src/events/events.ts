@@ -1248,6 +1248,26 @@ export class HelixBeforeSplitEvent extends CustomEvent<ChangeDetail> {
 }
 
 /**
+ * The divider between a sandbox's panes settled somewhere new.
+ *
+ * The notification half of `helix-before-split`, sent once `split` has moved,
+ * with the lead pane's new share. Not cancelable: the decision was the
+ * request's.
+ */
+export class HelixSplitEvent extends CustomEvent<ChangeDetail> {
+  static readonly eventName = 'helix-split'
+
+  constructor(detail: ChangeDetail) {
+    super(HelixSplitEvent.eventName, {
+      bubbles: true,
+      cancelable: false,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/**
  * A sandbox's panel is about to change height, and can be refused.
  *
  * The sibling of `helix-before-split`, and named for the divider rather than for
@@ -1262,6 +1282,26 @@ export class HelixBeforePanelResizeEvent extends CustomEvent<ChangeDetail> {
     super(HelixBeforePanelResizeEvent.eventName, {
       bubbles: true,
       cancelable: true,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/**
+ * A sandbox's panel settled at a new height.
+ *
+ * The notification half of `helix-before-panel-resize`, sent once `panelSize`
+ * has moved, with the height in pixels. Not cancelable: the decision was the
+ * request's.
+ */
+export class HelixPanelResizeEvent extends CustomEvent<ChangeDetail> {
+  static readonly eventName = 'helix-panel-resize'
+
+  constructor(detail: ChangeDetail) {
+    super(HelixPanelResizeEvent.eventName, {
+      bubbles: true,
+      cancelable: false,
       composed: true,
       detail,
     })
@@ -1310,6 +1350,26 @@ export class HelixBeforeEditEvent extends CustomEvent<ChangeDetail> {
     super(HelixBeforeEditEvent.eventName, {
       bubbles: true,
       cancelable: true,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/**
+ * Source was edited.
+ *
+ * The notification half of `helix-before-edit`, sent once the pane holds the
+ * new source, with that source. Not cancelable: the decision was the
+ * request's.
+ */
+export class HelixEditEvent extends CustomEvent<ChangeDetail> {
+  static readonly eventName = 'helix-edit'
+
+  constructor(detail: ChangeDetail) {
+    super(HelixEditEvent.eventName, {
+      bubbles: true,
+      cancelable: false,
       composed: true,
       detail,
     })
@@ -1475,8 +1535,9 @@ export class HelixClearEvent extends Event {
 }
 
 /**
- * A press put nothing on the clipboard: the browser refused the write, such as
- * on a page without the clipboard permission, or there was nothing to copy.
+ * A press put nothing on the clipboard: the browser did not allow the write,
+ * such as on a page without the clipboard permission, or there was nothing to
+ * copy.
  */
 export class HelixCopyErrorEvent extends Event {
   static readonly eventName = 'helix-copy-error'
@@ -2090,6 +2151,7 @@ const registry = {
   HelixCopyEvent,
   HelixCreateEvent,
   HelixDismissEvent,
+  HelixEditEvent,
   HelixFacetEvent,
   HelixFilterEvent,
   HelixFilteredEvent,
@@ -2111,6 +2173,7 @@ const registry = {
   HelixMoveEvent,
   HelixNavigateEvent,
   HelixNextEvent,
+  HelixPanelResizeEvent,
   HelixPinEvent,
   HelixPreviousEvent,
   HelixReadEvent,
@@ -2131,6 +2194,7 @@ const registry = {
   HelixShortcutEvent,
   HelixSortEvent,
   HelixSortedEvent,
+  HelixSplitEvent,
   HelixTourAskEvent,
 } as const
 

@@ -42,3 +42,25 @@ describe('the events that carried no class before', () => {
     expect(helixEventNames.has('helix-aura-fallback')).toBe(true)
   })
 })
+
+describe('the notifications a sandbox sends once a request is applied', () => {
+  test('helix-edit, helix-split and helix-panel-resize carry the new value and cannot be canceled', async () => {
+    const { HelixEditEvent, HelixPanelResizeEvent, HelixSplitEvent } = await import('./events.js')
+    const sent = [
+      new HelixEditEvent({ value: '<p>' }),
+      new HelixSplitEvent({ value: '60' }),
+      new HelixPanelResizeEvent({ value: '120' }),
+    ]
+    expect(sent.map((event) => event.type)).toEqual([
+      'helix-edit',
+      'helix-split',
+      'helix-panel-resize',
+    ])
+    for (const event of sent) {
+      expect(event.cancelable).toBe(false)
+      expect(event.bubbles).toBe(true)
+      expect(event.composed).toBe(true)
+      expect(helixEventNames.has(event.type)).toBe(true)
+    }
+  })
+})

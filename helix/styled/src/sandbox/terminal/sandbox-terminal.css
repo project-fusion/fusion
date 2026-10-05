@@ -11,6 +11,46 @@
   min-block-size: 0;
 }
 
+:host([controls]) {
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+/* A row of small controls along the top edge, in the log's own type. */
+[part="controls"] {
+  align-items: center;
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  display: flex;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  gap: var(--helix-space-xs);
+  justify-content: space-between;
+  padding: var(--helix-space-2xs) var(--helix-space-sm);
+}
+
+[part="filter"],
+[part="clear"] {
+  background-color: transparent;
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground);
+  font: inherit;
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+}
+
+[part="clear"] {
+  cursor: pointer;
+}
+
+[part="clear"]:hover {
+  background-color: var(--helix-color-surface-sunken);
+}
+
+[part="filter"]:focus-visible,
+[part="clear"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
 [part="log"] {
   font-family: var(--helix-font-mono);
   font-size: var(--helix-text-xs);
