@@ -74,8 +74,11 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
    * Shows the box as neither checked nor unchecked.
    *
    * Presentation only. It never submits, and the first change resolves it.
+   *
+   * Not reflected, as no state is: the element resolves it itself, and a
+   * reflected one removed the attribute the consumer wrote.
    */
-  @property({ reflect: true, type: Boolean })
+  @property({ type: Boolean })
   indeterminate = false
 
   /**
@@ -113,11 +116,15 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
      * losing the third one: a box neither ticked nor dashed, which is a state
      * nobody asked for. Refusing leaves everything as it was, which is the
      * argument the line below already makes for `checked`. */
-    if (this.requestChecked(next)) {
+    const taken = this.requestChecked(next)
+    if (taken) {
       this.indeterminate = false
     }
     input.checked = this.checked
-    this.relayNativeEvent(event)
+    // A refused change changed nothing, so there is no `change` to send.
+    if (taken) {
+      this.relayNativeEvent(event)
+    }
   }
 
   /** Reports the value and the validity the host stands behind. */

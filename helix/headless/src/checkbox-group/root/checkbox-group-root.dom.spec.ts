@@ -200,3 +200,84 @@ describe('checkbox group after a reset', () => {
     expect(group.boxes.map((box) => box.checked)).toEqual([false, true])
   })
 })
+
+describe('checkbox group reset with its value in the markup', () => {
+  /* The value went back to the attribute, which it already held, so no update
+     ran and the boxes, which reset themselves to unchecked, stayed unchecked:
+     the form submitted nothing for a group still claiming its set. */
+  test('ticks the declared boxes again', async () => {
+    const form =
+      await mount(`<form><helix-headless-checkbox-group label="L" name="g" value="one,two">
+      <helix-headless-checkbox value="one">One</helix-headless-checkbox>
+      <helix-headless-checkbox value="two">Two</helix-headless-checkbox>
+      <helix-headless-checkbox value="three">Three</helix-headless-checkbox>
+    </helix-headless-checkbox-group></form>`)
+    type Reset = Updatable & { formResetCallback(): void }
+    const g = form.firstElementChild as Reset & { boxes: (Reset & { checked: boolean })[] }
+    await settle(g)
+    for (const one of [g, ...g.boxes]) {
+      one.formResetCallback()
+    }
+    await settle(g)
+    expect(g.boxes.map((box) => box.checked)).toEqual([true, true, false])
+  })
+})
+
+describe('a checkbox inside a wrapper of the consumer’s', () => {
+  /* Only direct children counted, so a box in a row with a description got no
+     name, no place in the set, and its events stopped at the group. */
+  test('is a member, named and counted', async () => {
+    const g = (await mount(`<helix-headless-checkbox-group label="L" name="t">
+      <div><helix-headless-checkbox value="a">A</helix-headless-checkbox></div>
+    </helix-headless-checkbox-group>`)) as Group
+    await settle(g)
+    const box = g.querySelector('helix-headless-checkbox') as unknown as Group['boxes'][number]
+    expect(g.boxes).toHaveLength(1)
+    expect(box.name).toBe('t')
+    await tick(g, 0)
+    expect(g.value).toBe('a')
+  })
+})
+
+describe('a field of another kind inside the group', () => {
+  /* Every `input` and `change` from inside was stopped, so a form listening
+     for an "Other" text field's edits heard nothing. */
+  test('is heard past the group', async () => {
+    const g = (await mount(`<helix-headless-checkbox-group label="L">
+      <helix-headless-checkbox value="a">A</helix-headless-checkbox>
+      <div><input id="other" /></div>
+    </helix-headless-checkbox-group>`)) as Group
+    let heard = 0
+    document.body.addEventListener('input', () => {
+      heard += 1
+    })
+    g.querySelector('#other')?.dispatchEvent(new Event('input', { bubbles: true }))
+    expect(heard).toBe(1)
+  })
+})
+
+describe('a box a script ticks directly', () => {
+  /* The value went stale, and the next unrelated update of the group pushed
+     the stale value back and unticked the box with no event. */
+  test('is in the value, and stays ticked', async () => {
+    const g = (await group('label="L" name="u" value="design"')) as Group & { hint: string }
+    await settle(g)
+    const box = g.boxes[1] as Group['boxes'][number]
+    box.checked = true
+    expect(g.value).toBe('design,mind')
+    g.hint = 'Anything that updates the group'
+    await settle(g)
+    expect(box.checked).toBe(true)
+  })
+})
+
+describe('a refused change to the set', () => {
+  /* The @event line promises a refusal leaves every box as it was. */
+  test('leaves the box where it was', async () => {
+    const g = await group()
+    g.addEventListener('helix-before-change', (event) => event.preventDefault())
+    await tick(g, 2)
+    expect(g.boxes.map((one) => one.checked)).toEqual([true, true, false])
+    expect(g.value).toBe('design,mind')
+  })
+})

@@ -309,3 +309,31 @@ describe('checkbox validation message', () => {
     expect(hasState(host, 'invalid')).toBe(false)
   })
 })
+
+describe('a refused toggle', () => {
+  /* Nothing changed, and the box still sent `change`, which Switch does not. */
+  test('sends no change', async () => {
+    const box = await checkbox('checked')
+    box.addEventListener('helix-before-toggle', (event) => event.preventDefault())
+    let changes = 0
+    box.addEventListener('change', () => {
+      changes += 1
+    })
+    control(box).click()
+    await box.updateComplete
+    expect(changes).toBe(0)
+    expect(box.checked).toBe(true)
+  })
+})
+
+describe('indeterminate', () => {
+  /* No state reflects, and this one is resolved by the element itself, which
+     then removed the attribute the consumer wrote. */
+  test('leaves the consumer’s attribute where they wrote it', async () => {
+    const box = await checkbox('indeterminate')
+    control(box).click()
+    await box.updateComplete
+    expect(box.indeterminate).toBe(false)
+    expect(box.hasAttribute('indeterminate')).toBe(true)
+  })
+})

@@ -25,8 +25,13 @@ import { HelixHeadlessCheckbox } from '../../checkbox/root/checkbox-root.js'
  * `name` that you write once, and one place to read and write the whole set.
  *
  * `value` is the checked values, separated by commas, in the order the
- * checkboxes are written. Setting it checks exactly those values and unchecks
- * the rest.
+ * checkboxes are written, read from the boxes themselves. Setting it checks
+ * exactly those values and unchecks the rest.
+ *
+ * A checkbox is a member wherever it sits inside the group, in a row or a grid
+ * cell of your own, unless another group inside this one holds it. A field of
+ * another kind inside the group, such as an "Other" text field, sends its own
+ * `input` and `change` past the group.
  *
  * **The group shows the message you set in `feedback`.** It is form-associated
  * only for validity and never calls `setFormValue`, so the browser does not
@@ -38,7 +43,8 @@ import { HelixHeadlessCheckbox } from '../../checkbox/root/checkbox-root.js'
  * @aliases Checkbox list, Multi-select
  * @documentation https://fusion.dev/helix/components/checkbox-group
  *
- * @slot - The checkboxes.
+ * @slot - The checkboxes, and anything laid out around them.
+ * @slot feedback - The message that says what is wrong, for content richer than a string. It shows while there is a message.
  * @slot hint - Help under the checkboxes, for help that needs more than plain text.
  * @slot label - The group's label, for a label that needs more than plain text.
  *
@@ -62,9 +68,45 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
 
   /**
    * The checked values, comma separated.
+   *
+   * Read from the boxes once they are known, so a box a script ticks directly
+   * is in it at once. Written, it is pushed onto the boxes.
    */
   @property()
-  value = ''
+  get value(): string {
+    if (this.pending || !this.hasUpdated || !this.childrenKnown) {
+      return this.declared
+    }
+    const boxes = this.boxes
+    return boxes.length === 0
+      ? this.declared
+      : boxes
+          .filter((box) => box.checked)
+          .map((box) => box.value)
+          .join(',')
+  }
+
+  set value(next: string) {
+    const previous = this.declared
+    this.declared = next
+    this.pending = true
+    this.requestUpdate('value', previous)
+  }
+
+  /** The value last written, which the boxes are given at the next update. */
+  private declared = ''
+
+  /**
+   * Whether `declared` has yet to reach the boxes.
+   *
+   * **Pushed once and then left alone**, which is the fix for a box a script
+   * ticked being unticked by the next unrelated update: every update used to
+   * push the group's value onto every box, whatever the boxes said since.
+   */
+  private pending = false
+
+  /** Watches for boxes arriving inside a wrapper, which no slot reports. */
+  private observer: MutationObserver | undefined
 
   /* Stated once, and the group never thinks about it again. The controller is
      what stops the cascade being hand-called from whichever methods a component
@@ -73,57 +115,63 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
     items: () => this.boxes,
   })
 
-  /** The checkboxes in the group, in the order they are written. Browser only. */
+  /**
+   * The checkboxes in the group, in the order they are written. Browser only.
+   *
+   * Descendants rather than children, so a box inside a layout wrapper of the
+   * consumer's is a member: only direct children counted, and a box in a row
+   * with a description got no name and no place in the set. A box held by a
+   * group nested inside this one is that group's.
+   */
   get boxes(): HelixHeadlessCheckbox[] {
-    return [...this.children].filter(
-      (child): child is HelixHeadlessCheckbox => child instanceof HelixHeadlessCheckbox,
+    return [...this.querySelectorAll('*')].filter(
+      (element): element is HelixHeadlessCheckbox =>
+        element instanceof HelixHeadlessCheckbox && this.holds(element),
     )
   }
 
+  /** Whether this is the nearest group around `box`. */
+  private holds(box: Element): boolean {
+    let parent = box.parentElement
+    while (parent && parent !== this) {
+      if (parent instanceof HelixHeadlessCheckboxGroup) {
+        return false
+      }
+      parent = parent.parentElement
+    }
+    return parent === this
+  }
+
   /**
-   * Pushes the group's name and value onto the boxes.
+   * Pushes the group's name onto the boxes, and its value where one is waiting.
    *
    * As properties rather than attributes. A `name` written onto a box is a
    * change to markup the consumer rendered, which a React consumer's hydration
    * reports and does not patch up. A box that names itself keeps its own.
+   *
+   * **Nothing is pushed for a value nobody wrote**, so a group written with no
+   * `value` keeps what its boxes declare, and `group.value = ''` still clears
+   * every box, being a value somebody wrote.
    */
   private sync(): void {
+    const boxes = this.boxes
+    for (const box of boxes) {
+      if (this.name !== '' && box.name === '') {
+        box.name = this.name
+      }
+    }
+    if (!this.pending || boxes.length === 0) {
+      return
+    }
+    this.pending = false
     const wanted = new Set(
-      this.value
+      this.declared
         .split(',')
         .map((entry) => entry.trim())
         .filter(Boolean),
     )
-    for (const box of this.boxes) {
-      if (this.name !== '' && box.name === '') {
-        box.name = this.name
-      }
+    for (const box of boxes) {
       box.checked = wanted.has(box.value)
-    }
-  }
-
-  /** Whether `seed` has had its one chance. */
-  private seeded = false
-
-  /**
-   * Reads the boxes' own state into `value`, once, before anything is pushed.
-   *
-   * Seeding, and never a guard in `sync` refusing to write while `value` is
-   * empty. The guard would answer the same case, a group written with no `value`
-   * whose boxes declare their own `checked` being cleared on the first update,
-   * and it also makes `group.value = ''` do nothing at all: the obvious way to
-   * clear a group would silently not, and the last box could not be unticked
-   * through the group either.
-   *
-   * The markup decides the starting set, and from then on `value` is what the
-   * boxes follow, including when it is empty. The group's `value` is a derived
-   * read of the boxes rather than state it owns, so reading it out of them at
-   * the start is what it already means.
-   */
-  private seed(): void {
-    const checked = this.boxes.filter((box) => box.checked).map((box) => box.value)
-    if (checked.length > 0) {
-      this.value = checked.join(',')
     }
   }
 
@@ -171,15 +219,16 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
        the boxes rather than state it owns, so there is nothing for the mixin to
        control.
 
-       The box moves either way. It applies once this listener returns, the
-       request above having stood, so refusing here stops only the group's value
-       from following. */
+       A refusal here refuses the box's own request too, which it reads once
+       this listener returns: the group's value is read from the boxes, so a
+       box that moved anyway would carry the refused set into it. */
     const next = this.boxes
       .filter((box) => (box === changed ? wanted : box.checked))
       .map((box) => box.value)
       .join(',')
 
     if (!this.dispatchEvent(new HelixBeforeChangeEvent({ value: next }))) {
+      event.preventDefault()
       return
     }
     this.value = next
@@ -212,7 +261,10 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
    * one box answering a question asked of the set.
    */
   private readonly handleMemberNative = (event: Event): void => {
-    if (event.target !== this) {
+    /* A member's only. Any other field inside the group, an "Other" text box,
+       is a control of its own, and a form listening for its edits heard
+       nothing. */
+    if (event.target instanceof HelixHeadlessCheckbox && this.holds(event.target)) {
       event.stopImmediatePropagation()
     }
   }
@@ -222,6 +274,8 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
     this.addEventListener('helix-before-toggle', this.handleToggle)
     this.addEventListener('change', this.handleMemberNative)
     this.addEventListener('input', this.handleMemberNative)
+    this.observer = new MutationObserver(() => this.requestUpdate())
+    this.observer.observe(this, { childList: true, subtree: true })
   }
 
   override disconnectedCallback(): void {
@@ -229,6 +283,8 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
     this.removeEventListener('helix-before-toggle', this.handleToggle)
     this.removeEventListener('change', this.handleMemberNative)
     this.removeEventListener('input', this.handleMemberNative)
+    this.observer?.disconnect()
+    this.observer = undefined
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -238,44 +294,24 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
        a label richer than a string. */
     hostAria(this.internals, { label: this.label, role: 'group' })
     this.internals.ariaRequired = this.required ? 'true' : null
-    /* Before the first `sync`, and only ever once: after this the group's value
-       is what the boxes follow. Before the render too, so the first one has it.
-       Client only, the server having no boxes to read, and not while hydrating
-       what a server rendered without them. */
-    if (!this.seeded && this.childrenKnown) {
-      this.seeded = true
-      if (this.value === '') {
-        this.seed()
-      }
-    }
-  }
-
-  /* Where hydrating skipped the seed, it happens here: after the render, which
-     had to match the server's, and before `updated` pushes the empty value onto
-     the boxes and clears the very state this reads. */
-  protected override firstUpdated(changed: PropertyValues): void {
-    super.firstUpdated(changed)
-    if (!this.seeded && this.children !== undefined) {
-      this.seeded = true
-      if (this.value === '') {
-        this.seed()
-      }
-    }
   }
 
   /**
    * Goes back to the set the markup started with.
    *
-   * **Seeded again rather than cleared.** The form resets each box too, in the
-   * same task and after this, so by the next update the boxes are back to
-   * what they declared and the seed reads them. Without this the group kept
-   * the reader's set, reported valid over boxes the reset had emptied, and
-   * ticked them again the next time anything updated it.
+   * The form resets each box too, in the same task and after this, so a group
+   * whose markup wrote no `value` has nothing to do: its boxes return to what
+   * they declared, and its value is read from them. A `value` the markup wrote
+   * is pushed again at the next update, after the boxes have reset, and an
+   * update is asked for, since an unchanged value schedules none.
    */
   override formResetCallback(): void {
     super.formResetCallback()
-    this.value = this.getAttribute('value') ?? ''
-    this.seeded = false
+    const declared = this.getAttribute('value')
+    if (declared !== null) {
+      this.value = declared
+    }
+    this.requestUpdate()
   }
 
   /**
@@ -293,8 +329,8 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
    * `invalid`, which is what marks the field touched and puts the message on
    * screen.
    *
-   * Anchored on the list, because the browser needs somewhere to point the
-   * bubble.
+   * Anchored on the list, which takes no focus, so the base points the bubble
+   * at the first box instead.
    */
   private validate(): void {
     this.reportRequired(this.value === '', 'Choose at least one to continue.', 'items')
@@ -302,8 +338,8 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    this.validate()
     this.sync()
+    this.validate()
     this.linkHost()
   }
 
