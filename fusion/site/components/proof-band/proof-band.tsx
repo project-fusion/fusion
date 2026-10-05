@@ -15,10 +15,10 @@ export const ProofBand = () => (
           checked. The eyebrow names the subject, so the heading says how each
           number below is measured. */}
       <helix-text as="h2" data-measure data-section-title>
-        Measured from the built packages on every release
+        Measured on every release
       </helix-text>
       <helix-text as="p" data-measure emphasis="muted">
-        Compressed with Brotli, as a CDN serves them.
+        From the built packages, compressed with Brotli as a CDN serves them.
       </helix-text>
     </helix-flex>
 

@@ -30,7 +30,7 @@ export const LANDING: PageCopy = {
     {
       body: ['Each control in the panel is a custom element from the Helix package.'],
       kicker: 'Components',
-      title: 'The panel is Helix, running in your browser',
+      title: 'The panel runs in your browser',
     },
     {
       /* The cards live in `helix-landing.ts`, because the page renders them
@@ -43,7 +43,7 @@ export const LANDING: PageCopy = {
     {
       from: 'insights',
       kicker: 'Insights',
-      title: 'How we make design, engineering, and business decisions, and why',
+      title: 'How we decide, and why',
     },
     {
       body: ['Tell us what you need built. If we are not the right team for it, we will tell you.'],

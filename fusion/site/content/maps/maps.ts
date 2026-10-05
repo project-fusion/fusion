@@ -241,20 +241,20 @@ export const MAPS: PageCopy = {
         name: pillar.name,
       })),
       kicker: 'Why Helix',
-      title: 'Styled by your theme and written in HTML, on MapLibre or Leaflet',
+      title: 'Themed maps, written in HTML',
     },
     {
       body: [`${AUSTIN_PLACES.toLocaleString('en-US')} places, loaded from one GeoJSON file.`],
       kicker: 'Thousands of points',
-      title: 'Every café, bar, and restaurant in Austin',
+      title: 'Austin’s cafés, bars, and restaurants',
     },
     {
       body: [
-        'Place each inside the map. Each takes a tone, such as primary or danger, for its color.',
+        'Place markers, routes, and live positions inside the map. Each takes a tone, such as primary or danger, for its color.',
       ],
       items: MAP_FEATURES.map((feature) => ({ body: feature.body, name: feature.title })),
       kicker: 'What you can add',
-      title: 'Markers, routes, and live positions are HTML elements',
+      title: 'All HTML elements',
     },
     {
       body: [
@@ -269,7 +269,7 @@ export const MAPS: PageCopy = {
       ],
       items: MAP_LAYERS.map((feature) => ({ body: feature.body, name: feature.title })),
       kicker: 'Layers',
-      title: 'One menu turns each layer on or off',
+      title: 'One menu for every layer',
     },
     {
       body: [
@@ -289,11 +289,11 @@ export const MAPS: PageCopy = {
     },
     {
       body: [
-        'One command installs all three. The Maps guide shows how to add a map, connect it, and style it with your theme.',
+        'Helix, the map connector, and MapLibre. The Maps guide shows how to add a map, connect it, and style it with your theme.',
         `\`${MAP_INSTALL}\``,
       ],
       kicker: 'Get started',
-      title: 'Helix, the map connector, and MapLibre',
+      title: 'Install with one command',
     },
     {
       body: ['MapLibre or Leaflet draws the map itself.'],
@@ -302,7 +302,7 @@ export const MAPS: PageCopy = {
         name: layer.title,
       })),
       kicker: 'Under the hood',
-      title: 'Six parts, from the elements you write to the map tiles',
+      title: 'Six parts, from elements to tiles',
     },
   ],
   lede: 'Interactive maps styled with your theme. Add places, routes, live positions, terrain, and thousands of data points to a map drawn by MapLibre or Leaflet.',
