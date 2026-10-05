@@ -476,3 +476,89 @@ describe('a grid of times that refuses or insists', () => {
     expect((host as Time & { internals: ElementInternals }).internals.validity.valid).toBe(true)
   })
 })
+
+describe('the wheels stay inside the bounds', () => {
+  const turn = async (host: Time, which: string, value: string): Promise<void> => {
+    host.shadowRoot
+      ?.querySelector(`[data-column="${which}"]`)
+      ?.dispatchEvent(
+        new CustomEvent('helix-before-change', {
+          bubbles: true,
+          composed: true,
+          detail: { value },
+        }),
+      )
+    await host.updateComplete
+  }
+
+  /* Measured before this: from 16:45, the hour 5 built 17:45 against a max of
+     17:00, and AM built 05:45 against a min of 09:00, and both were valid. */
+  test('a turn that would leave them lands on the nearest time on offer', async () => {
+    const attrs = 'variant="wheels" locale="en-US" min="09:00" max="17:00" default-value="16:45"'
+    const late = await picker(attrs)
+    await turn(late, 'hour', '5')
+    expect(late.value).toBe('17:00')
+    const early = await picker(attrs)
+    await turn(early, 'meridiem', 'AM')
+    expect(early.value).toBe('09:00')
+  })
+})
+
+describe('a time outside what the picker offers', () => {
+  type Checked = Time & { internals: ElementInternals }
+
+  test('is invalid, with the bound it is past', async () => {
+    const late = (await picker('max="17:00" default-value="18:00"')) as Checked
+    expect(late.internals.validity.rangeOverflow).toBe(true)
+    const early = (await picker('min="09:00" default-value="08:00"')) as Checked
+    expect(early.internals.validity.rangeUnderflow).toBe(true)
+  })
+
+  test('and so is a barred one, or one off the step', async () => {
+    const barred = (await picker('disable-times="10:00 11:00" default-value="10:00"')) as Checked
+    expect(barred.internals.validity.valid).toBe(false)
+    const off = (await picker('default-value="09:07"')) as Checked
+    expect(off.internals.validity.stepMismatch).toBe(true)
+    const fine = (await picker('default-value="09:15"')) as Checked
+    expect(fine.internals.validity.valid).toBe(true)
+  })
+})
+
+describe('the words on the wheels', () => {
+  const column = (host: Time, which: string): HTMLElement =>
+    host.shadowRoot?.querySelector(`[data-column="${which}"]`) as HTMLElement
+
+  test('are properties, and the halves of the day are the locale’s', async () => {
+    const host = await picker(
+      'variant="wheels" locale="ko-KR" hour-label="시" minute-label="분" meridiem-label="오전 또는 오후"',
+    )
+    expect(column(host, 'hour').getAttribute('aria-label')).toBe('시')
+    expect(column(host, 'minute').getAttribute('aria-label')).toBe('분')
+    const halves = [...column(host, 'meridiem').querySelectorAll('[part~="option"]')]
+    expect(halves.map((one) => one.getAttribute('value'))).toEqual(['AM', 'PM'])
+    expect(halves.map((one) => one.textContent?.trim())).toEqual(['오전', '오후'])
+  })
+})
+
+describe('the name of a time picker', () => {
+  test('is the host’s aria-label where it has one', async () => {
+    const host = await picker('aria-label="Slot"')
+    expect(part(host, 'list')?.getAttribute('aria-label')).toBe('Slot')
+  })
+
+  test('and the words its aria-labelledby names', async () => {
+    const host = (await mount(
+      '<helix-headless-time-picker aria-labelledby="named"></helix-headless-time-picker><span id="named">Opening</span>',
+    )) as Time
+    await host.updateComplete
+    expect(part(host, 'list')?.getAttribute('aria-label')).toBe('Opening')
+  })
+})
+
+describe('focus on a time picker', () => {
+  test('goes to the first wheel where there is no list', async () => {
+    const host = await picker('variant="wheels" locale="en-GB"')
+    host.focus()
+    expect(host.shadowRoot?.activeElement?.getAttribute('data-column')).toBe('hour')
+  })
+})

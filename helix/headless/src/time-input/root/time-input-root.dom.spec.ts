@@ -133,3 +133,71 @@ describe('input time', () => {
     expect(scope.getElementById(described as string)?.textContent).toContain('Any quarter hour')
   })
 })
+
+describe('the list a time input opens', () => {
+  const picker = (host: InputTime): HTMLElement & { manual: boolean } =>
+    part(host, 'picker') as HTMLElement & { manual: boolean }
+
+  const pick = async (host: InputTime, value: string): Promise<void> => {
+    ;(picker(host) as unknown as { requestValue(next: string): boolean }).requestValue(value)
+    await host.updateComplete
+  }
+
+  /* Measured before this: the first ArrowDown chose the next time and closed
+     the panel, so a reader moved one row per opening. */
+  test('is manual, so its arrows move without choosing', async () => {
+    const host = await field('default-value="09:30"')
+    expect(picker(host).manual).toBe(true)
+  })
+
+  test('is handed the times the field bars, and a typed one is invalid', async () => {
+    const host = await field('disable-times="10:00 11:00"')
+    expect(picker(host).getAttribute('disable-times')).toBe('10:00 11:00')
+    await type(host, '10:00')
+    expect(internals(host).validity.valid).toBe(false)
+    expect(internals(host).validationMessage).toBe('Choose a time that is available.')
+  })
+
+  test('closes on a time chosen from the list', async () => {
+    const host = await field('default-value="09:30"')
+    host.open = true
+    await host.updateComplete
+    await pick(host, '10:00')
+    expect(host.value).toBe('10:00')
+    expect(host.open).toBe(false)
+  })
+
+  /* Measured before this: turning the hour wheel closed the panel before a
+     minute could be chosen. */
+  test('stays open while the wheels turn', async () => {
+    const host = await field('default-value="09:30" variant="wheels"')
+    host.open = true
+    await host.updateComplete
+    await pick(host, '10:30')
+    expect(host.value).toBe('10:30')
+    expect(host.open).toBe(true)
+  })
+
+  test('keeps a refused time off its list as well as off the field', async () => {
+    const host = await field('default-value="09:30"')
+    host.addEventListener('helix-before-change', (event) => event.preventDefault())
+    await pick(host, '10:00')
+    expect(host.value).toBe('09:30')
+    expect((picker(host) as unknown as { value: string }).value).toBe('09:30')
+  })
+})
+
+describe('the events a time input sends', () => {
+  test('typing sends `input`, and `change` once the reader is done', async () => {
+    const host = await field()
+    const log: string[] = []
+    for (const name of ['input', 'change']) {
+      host.addEventListener(name, () => log.push(name))
+    }
+    await type(host, '09:')
+    await type(host, '09:45')
+    expect(log).toEqual(['input', 'input'])
+    control(host).dispatchEvent(new Event('change'))
+    expect(log).toEqual(['input', 'input', 'change'])
+  })
+})

@@ -15,6 +15,7 @@ import {
   MixinTokens,
   valueAsMinutes,
   writeTime,
+  writtenList,
 } from '@fusion.dev/helix-core'
 import { clock } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -45,6 +46,12 @@ import '../../time-picker/index.js'
  * Once the caret is in the field, it shows the value itself, because a
  * formatted time such as `2:30 PM` cannot be typed back and `Intl` has no
  * parser for it.
+ *
+ * Typing sends `input` on each keystroke and `change` when you leave the
+ * field. In the list, the arrow keys, typed digits and PageUp and PageDown
+ * move through the times, and Enter, Space or a click chooses one and closes
+ * the panel. With `variant="wheels"` each wheel moves the time as you turn it,
+ * the panel stays open, and Enter or Escape closes it.
  *
  * @since 0.1.0
  * @status stable
@@ -140,6 +147,18 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
   @property()
   autocomplete = ''
 
+  /** Typed, so a keystroke is announced as `input` alone. See `announcesInput`. */
+  protected override readonly announcesInput = true
+
+  /**
+   * Times that cannot be chosen, as `HH:mm`, separated by commas or spaces.
+   *
+   * Handed to the list, which offers them as unavailable, and checked against
+   * a typed time, which is then invalid.
+   */
+  @property({ attribute: 'disable-times' })
+  disableTimes = ''
+
   /**
    * Language tag the times are written in.
    *
@@ -200,6 +219,12 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
    */
   @property({ attribute: 'range-underflow-message' })
   rangeUnderflowMessage?: string
+
+  /**
+   * The message shown when `disable-times` bars a time.
+   */
+  @property({ attribute: 'unavailable-message' })
+  unavailableMessage?: string
 
   /**
    * The name of the button that removes one time, with `{name}` filled in.
@@ -298,17 +323,17 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
     if (event.key === 'Enter' && isTimeValue(this.draft)) {
       event.preventDefault()
       if (!held.includes(this.draft)) {
-        this.requestValue([...held, this.draft].sort().join(','))
+        this.requestPicked([...held, this.draft].sort().join(','))
       }
       this.draft = ''
     } else if (event.key === 'Backspace' && this.draft === '' && held.length > 0) {
-      this.requestValue(held.slice(0, -1).join(','))
+      this.requestPicked(held.slice(0, -1).join(','))
     }
   }
 
   /** Takes one time back out of the set. */
   private readonly removeTime = (at: string): void => {
-    this.requestValue(this.held.filter((one) => one !== at).join(','))
+    this.requestPicked(this.held.filter((one) => one !== at).join(','))
   }
 
   /**
@@ -349,14 +374,40 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
 
   private readonly handlePicked = (event: Event): void => {
     event.stopPropagation()
-    this.requestValue((event as HelixBeforeChangeEvent).detail.value)
+    /* A refusal reaches the list too, so it stays on the time the field holds.
+       Measured before this: the field kept 09:30 while the list moved to the
+       refused 10:00. */
+    if (!this.requestPicked((event as HelixBeforeChangeEvent).detail.value)) {
+      event.preventDefault()
+      this.restore()
+      return
+    }
     this.restore()
     /* One time has nothing more to say, so the list gets out of the way. A range
        or a multiple has: the reader is still choosing, and shutting the list
-       under them after the first pick is taking the control away mid-answer. */
-    if (this.mode === undefined) {
+       under them after the first pick is taking the control away mid-answer.
+
+       Nor on the wheels, where turning the hour is a third of a time. Measured
+       before this: choosing an hour closed the panel before a minute could be
+       chosen. Enter or Escape closes them. */
+    if (this.mode === undefined && this.variant !== 'wheels') {
       this.requestOpen(false)
       this.updateComplete.then(() => this.returnFocus())
+    }
+  }
+
+  /**
+   * Enter on the wheels closes the panel, the time on them being the answer.
+   *
+   * The list closes on the choice Enter makes. A wheel turned by the arrows
+   * already holds its time, so Enter there chooses nothing new, and this is
+   * what says the reader is done.
+   */
+  private readonly handleWheelEnter = (event: KeyboardEvent): void => {
+    if (event.key === 'Enter' && this.variant === 'wheels' && this.open) {
+      event.preventDefault()
+      this.requestOpen(false)
+      this.returnFocus()
     }
   }
 
@@ -395,6 +446,10 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
       return fillTemplate(this.rangeOverflowMessage || 'Choose a time at or before {max}.', {
         max: writeTime(this.max, this.locale),
       })
+    }
+    const barred = writtenList(this.disableTimes)
+    if (held.some((one) => barred.includes(one))) {
+      return this.unavailableMessage || 'Choose a time that is available.'
     }
     if (this.mode === 'range' && held.length > 2) {
       return this.rangeLengthMessage || 'A range is two times.'
@@ -461,6 +516,8 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
       ?invalid=${this.resolvedFeedback !== ''}
       mode=${this.mode ?? nothing}
       variant=${this.variant ?? nothing}
+      disable-times=${this.disableTimes || nothing}
+      manual
       label=${this.label || 'Time'}
       locale=${this.locale || nothing}
       max=${this.max}
@@ -548,6 +605,7 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
           ?readonly=${this.readOnly}
           ?required=${this.required}
           @blur=${this.handleBlur}
+          @change=${this.handleCommit}
           @focus=${this.handleFocus}
           @input=${this.handleInput}
           @keydown=${this.handleDraftKey}
@@ -556,17 +614,24 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
           part="trigger"
           type="button"
           aria-controls="surface"
+          aria-disabled=${this.readOnly ? 'true' : nothing}
           aria-expanded=${this.open ? 'true' : 'false'}
           aria-haspopup="listbox"
           aria-label=${this.triggerLabel}
           ?disabled=${this.isDisabled}
-          @click=${() => this.toggleOpen()}
+          @click=${this.handleTriggerClick}
         >
           ${this.renderTrigger()}
         </button>
       </div>
 
-      <div part="surface" id="surface" popover="manual" ?hidden=${!this.open}>
+      <div
+        part="surface"
+        id="surface"
+        popover="manual"
+        ?hidden=${!this.open}
+        @keydown=${this.handleWheelEnter}
+      >
         ${this.renderPicker()}
       </div>
       ${this.renderHint()}${this.renderFeedback()}`

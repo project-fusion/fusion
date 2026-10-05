@@ -765,6 +765,19 @@ export class HelixHeadlessListbox extends MixinCollection(
   }
 
   /**
+   * Whether another Helix component renders this list and binds its value
+   * down, as Select, Combobox, Command and Time Picker do. That component seeds
+   * and corrects the value, so this list leaves both to it.
+   *
+   * By the tag rather than by `instanceof`, for the reason `optionsAmong`
+   * gives: a second copy of the library on a page is a second class.
+   */
+  private get owned(): boolean {
+    const root = this.getRootNode()
+    return root instanceof ShadowRoot && root.host.localName.startsWith('helix-')
+  }
+
+  /**
    * Takes an option that has left the list out of the value.
    *
    * Only one that was here before: a value set ahead of its options, which a
@@ -774,6 +787,13 @@ export class HelixHeadlessListbox extends MixinCollection(
    * `<select>` drops it too, and sends no event for it.
    */
   private forgetRemoved(): void {
+    /* Not inside another component, which owns the value and binds it down:
+       Select drops a removed option from its own value, and a list that
+       dropped it here as well would hold a value its owner never set, which a
+       binding that has not changed would never put back. */
+    if (this.owned) {
+      return
+    }
     const present = new Set(this.options.map((option) => option.value))
     const gone = this.values.filter((value) => this.seen.has(value) && !present.has(value))
     this.seen = present
@@ -863,7 +883,7 @@ export class HelixHeadlessListbox extends MixinCollection(
    * shows the choice from hydration on.
    */
   private seedDeclared(): void {
-    if (this.defaultValue !== '' || this.hasAttribute('default-value')) {
+    if (this.owned || this.defaultValue !== '' || this.hasAttribute('default-value')) {
       return
     }
     const declared = this.options
