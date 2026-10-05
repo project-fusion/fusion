@@ -173,3 +173,18 @@ helix-headless-donut-chart::part(summary) {
   position: absolute;
   white-space: nowrap;
 }
+
+helix-headless-donut-chart::part(live) {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  margin: 0;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
+helix-headless-donut-chart::part(plot):focus-visible {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: 2px;
+}

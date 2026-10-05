@@ -333,3 +333,214 @@ describe('a plot that was replaced', () => {
     expect(one.point.at).toBe(-1)
   })
 })
+
+/* The keyboard moves the same reading the pointer does, so the tooltip and the
+   readout follow it with nothing of their own to keep in step. The plot takes
+   focus, and the keys are heard only from it. */
+interface Keyed extends Scene {
+  plot: HTMLElement
+  press: (key: string) => KeyboardEvent
+}
+
+const keyed = (
+  readings: number,
+  options: { columns?: number[]; seriesOf?: (cell: number) => number | undefined } = {},
+): Keyed => {
+  const one = scene(readings) as Keyed
+  const root = one.host.shadowRoot as ShadowRoot
+  const plot = root.querySelector('[part="plot"]') as HTMLElement
+  plot.id = 'helix-chart-plot'
+  plot.tabIndex = 0
+  Object.assign(one.host, {
+    plottedColumns: options.columns ?? [0],
+    seriesOf: options.seriesOf ?? ((cell: number) => cell + 1),
+  })
+  one.plot = plot
+  one.press = (key: string) => {
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key,
+    })
+    plot.dispatchEvent(event)
+    return event
+  }
+  return one
+}
+
+describe('a reader on the keyboard', () => {
+  test('starts at the first reading on the arrow that moves on, and walks from there', () => {
+    const one = keyed(4)
+    one.press('ArrowRight')
+    expect([one.point.at, one.point.keyed]).toEqual([0, true])
+    one.press('ArrowRight')
+    one.press('ArrowRight')
+    expect(one.point.at).toBe(2)
+    one.press('ArrowLeft')
+    expect(one.point.at).toBe(1)
+  })
+
+  test('and at the last on the arrow that moves back', () => {
+    const one = keyed(4)
+    one.press('ArrowLeft')
+    expect(one.point.at).toBe(3)
+  })
+
+  test('never walks off either end', () => {
+    const one = keyed(3)
+    for (const key of ['ArrowRight', 'ArrowRight', 'ArrowRight', 'ArrowRight']) {
+      one.press(key)
+    }
+    expect(one.point.at).toBe(2)
+  })
+
+  test('goes to the first and the last with Home and End', () => {
+    const one = keyed(5)
+    one.press('End')
+    expect(one.point.at).toBe(4)
+    one.press('Home')
+    expect(one.point.at).toBe(0)
+  })
+
+  /* A key the chart answered must not also scroll the page under it. */
+  test('takes the key from the page', () => {
+    const one = keyed(4)
+    expect(one.press('ArrowDown').defaultPrevented).toBe(true)
+    expect(one.press('Tab').defaultPrevented).toBe(false)
+  })
+
+  test('puts the reading away with Escape', () => {
+    const one = keyed(4)
+    one.press('ArrowRight')
+    one.press('Escape')
+    expect([one.point.at, one.point.keyed]).toEqual([-1, false])
+  })
+
+  /* A key pressed in a donut's middle, which a consumer can fill with a link,
+     is that link's and not the chart's. */
+  test('is heard from the plot and from nothing else in the chart', () => {
+    const one = keyed(4)
+    const link = document.createElement('a')
+    ;(one.host.shadowRoot as ShadowRoot).append(link)
+    link.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, composed: true, key: 'End' }))
+    expect(one.point.at).toBe(-1)
+  })
+
+  test('leaves a chord with a modifier to the page', () => {
+    const one = keyed(4)
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      ctrlKey: true,
+      key: 'End',
+    })
+    one.plot.dispatchEvent(event)
+    expect([one.point.at, event.defaultPrevented]).toEqual([-1, false])
+  })
+})
+
+describe('the series of a reading', () => {
+  /* The up and down arrows walk the bubble's list, which is the table's
+     columns, and the readout then says the one cell. Up from the first goes
+     back to the whole reading. */
+  test('are walked with the other pair of arrows, where there are two or more', () => {
+    const one = keyed(4, { columns: [0, 2] })
+    one.press('ArrowRight')
+    expect(one.point.column).toBeUndefined()
+    one.press('ArrowDown')
+    expect([one.point.at, one.point.column]).toEqual([0, 0])
+    one.press('ArrowDown')
+    expect(one.point.column).toBe(2)
+    one.press('ArrowDown')
+    expect(one.point.column).toBe(2)
+    one.press('ArrowUp')
+    one.press('ArrowUp')
+    expect(one.point.column).toBeUndefined()
+  })
+
+  /* A scatter's first numeric column is its measure across and no series. */
+  test('skip a column no series was drawn from', () => {
+    const one = keyed(4, { columns: [0, 1, 2], seriesOf: (cell) => (cell < 1 ? undefined : cell) })
+    one.press('ArrowDown')
+    expect(one.point.column).toBe(1)
+  })
+
+  test('and with one series, the up and down arrows walk the readings too', () => {
+    const one = keyed(4)
+    one.press('ArrowDown')
+    one.press('ArrowDown')
+    expect([one.point.at, one.point.column]).toEqual([1, undefined])
+  })
+
+  /* A horizontal bar chart runs its categories down the box, so the arrows
+     trade places: up and down walk the categories, the across pair the series. */
+  test('trade arrows with the readings on a chart that runs down the box', () => {
+    const one = keyed(4, { columns: [0, 1] })
+    one.point.axis = 'block'
+    one.press('ArrowDown')
+    one.press('ArrowDown')
+    expect(one.point.at).toBe(1)
+    one.press('ArrowRight')
+    expect(one.point.column).toBe(0)
+  })
+})
+
+describe('a grid of readings', () => {
+  /* A heatmap stands a week to a column, so the across arrows move a week. */
+  test('moves a column across and a reading up and down', () => {
+    const one = keyed(21)
+    one.point.grid = 7
+    one.press('Home')
+    one.press('ArrowRight')
+    expect(one.point.at).toBe(7)
+    one.press('ArrowDown')
+    expect(one.point.at).toBe(8)
+    one.press('ArrowLeft')
+    expect(one.point.at).toBe(1)
+  })
+})
+
+describe('the keyboard and the pointer together', () => {
+  test('a pointer moving takes the reading back, and the readout goes quiet', () => {
+    const one = keyed(4)
+    one.press('End')
+    move(one, 21, 100)
+    expect([one.point.at, one.point.keyed]).toEqual([0, false])
+  })
+
+  /* A reader who nudged the mouse while reading by key keeps their place. */
+  test('a pointer leaving keeps a reading the keys chose', () => {
+    const one = keyed(4)
+    one.press('End')
+    one.host.dispatchEvent(new Event('pointerleave'))
+    expect(one.point.at).toBe(3)
+  })
+
+  test('leaving the plot puts a reading the keys chose away', () => {
+    const one = keyed(4)
+    one.press('End')
+    one.plot.dispatchEvent(new FocusEvent('focusout', { bubbles: true, composed: true }))
+    expect([one.point.at, one.point.keyed]).toEqual([-1, false])
+  })
+
+  /* `:focus-visible` is how the platform says a key brought focus. happy-dom
+     does not answer it, so the plot answers for it here. */
+  const arrive = (one: Keyed, byKey: boolean): void => {
+    one.plot.matches = ((selector: string) => byKey && selector === ':focus-visible') as never
+    one.plot.dispatchEvent(new FocusEvent('focusin', { bubbles: true, composed: true }))
+  }
+
+  test('arriving at the plot by key shows the first reading', () => {
+    const one = keyed(4)
+    arrive(one, true)
+    expect([one.point.at, one.point.keyed]).toEqual([0, true])
+  })
+
+  test('and a press of the pointer that focuses it shows nothing of its own', () => {
+    const one = keyed(4)
+    arrive(one, false)
+    expect(one.point.at).toBe(-1)
+  })
+})

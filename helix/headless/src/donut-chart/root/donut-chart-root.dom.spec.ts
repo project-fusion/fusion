@@ -341,3 +341,27 @@ describe('a row that does not parse', () => {
     expect(named).toEqual(['Direct', 'Search', 'Social'])
   })
 })
+
+describe('reading by key', () => {
+  /* A ring has one series, so every arrow walks the slices. */
+  test('every arrow moves from slice to slice, and the readout says it', async () => {
+    const host = await chart(TRAFFIC, 'for="traffic"')
+    const plot = part(host, 'plot')
+    expect([plot?.getAttribute('role'), plot?.getAttribute('aria-label')]).toEqual([
+      'application',
+      'Sessions by source',
+    ])
+    for (const key of ['ArrowDown', 'ArrowDown']) {
+      plot?.dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key }),
+      )
+    }
+    await (host as HTMLElement & { updateComplete: Promise<boolean> }).updateComplete
+    expect(part(host, 'live')?.textContent).toBe('Search: Share 30')
+    expect(segments(host).map((one) => one.getAttribute('part'))).toEqual([
+      'segment',
+      'segment segment-active',
+      'segment',
+    ])
+  })
+})

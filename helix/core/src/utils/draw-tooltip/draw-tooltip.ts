@@ -1,6 +1,10 @@
 import { nothing, type TemplateResult } from 'lit'
 import { styleMap } from 'lit/directives/style-map.js'
 import { html, type StaticValue } from 'lit/static-html.js'
+import {
+  CHART_PLOT,
+  type ChartPointerController,
+} from '../../controllers/chart-pointer-controller/chart-pointer-controller.js'
 import { seriesIndex } from '../../mixins/mixin-chart-source/mixin-chart-source.js'
 import type { Row } from '../read-series/read-series.js'
 
@@ -29,20 +33,9 @@ import type { Row } from '../read-series/read-series.js'
  * name, which is how every composed tag in the library already resolves. That
  * makes this `static-html` rather than `lit`, a tag being a `StaticValue`.
  */
-/**
- * The id every chart puts on its plot, and the boundary a bubble is kept inside.
- *
- * **A name six templates and this file have to agree on is a name that will
- * stop agreeing**, which is `PALETTE`'s argument and it holds harder here: the
- * failure is silent. `within` resolves by id, so a plot renamed on one side
- * returns null, the boundary falls back to the viewport,
- * and the bubble goes back to hanging past the drawing with nothing reported
- * anywhere.
- *
- * Fixed rather than generated, for the reason the mark's id below gives: it is
- * scoped to one chart's shadow root, where it is the only one.
- */
-export const CHART_PLOT = 'helix-chart-plot'
+/* The plot's id is declared beside the keys that find the plot by it, and
+   re-exported here, where every chart has always imported it from. */
+export { CHART_PLOT }
 
 /**
  * The id of the bubble, which the mark names as its description.
@@ -92,6 +85,31 @@ export interface TooltipAt {
 }
 
 /**
+ * What the keyboard is reading, which `drawTooltip` says aloud and marks.
+ *
+ * The chart's `pointer` is one, and is what every chart passes.
+ */
+export type ReadingCursor = Pick<ChartPointerController, 'column' | 'keyed'>
+
+/**
+ * A reading in words, for the readout: the row's name and every cell that
+ * says something, or the one cell the series keys rest on.
+ *
+ * The table's own text, as the bubble shows it, so the words and the picture
+ * agree, and nothing in it is English: the names are the table's headings.
+ */
+const spoken = (row: Row, column: number | undefined): string => {
+  const cell = column === undefined ? undefined : row.cells[column]
+  if (cell) {
+    return `${row.label}, ${cell.name} ${cell.text}`.trim()
+  }
+  const said = row.cells
+    .filter((one) => one.text.trim() !== '')
+    .map((one) => `${one.name} ${one.text}`.trim())
+  return said.length === 0 ? row.label : `${row.label}: ${said.join(', ')}`
+}
+
+/**
  * What a pointer resting on a reading shows, as `Tooltip` pointed at a mark.
  *
  * **A chart does not draw its own tooltip, and the top layer is why.** `Tooltip`
@@ -124,12 +142,12 @@ export interface TooltipAt {
  * here, including columns nothing was plotted from, because a note beside the
  * figures is most of the reason to want a tooltip.
  *
- * **Hidden from assistive technology, on purpose.** The table is the accessible
- * representation and the drawing is `aria-hidden`; a reader on a keyboard gets
- * the table, which they can reach, rather than a tooltip which they cannot.
- * The mark and the bubble carry `aria-hidden` themselves, so they stay hidden
- * in a chart whose plot also holds something a reader should hear, such as
- * the middle of a donut.
+ * **The bubble is hidden from assistive technology, and the readout is what is
+ * heard.** The bubble carries `aria-hidden`, and so does the mark, because a
+ * bubble of figures announced on every move is noise. Given `reading`, which
+ * is the chart's `pointer`, this also renders the `live` part: a polite region
+ * that says the reading in words when a key moves it, and is empty otherwise.
+ * The cell the series keys rest on is named `tooltip-cell-current` as well.
  */
 export const drawTooltip = (
   rows: Row[],
@@ -137,10 +155,22 @@ export const drawTooltip = (
   tag: StaticValue,
   where?: TooltipAt,
   slotOf?: (cell: number) => number | undefined,
+  reading?: ReadingCursor,
 ): TemplateResult | typeof nothing => {
   const row = rows[at]
+  /* **Rendered whether or not there is a reading, and empty until a key moves
+     one.** A live region is heard when what it holds changes, so a region that
+     arrived with its words would be read inconsistently at best; this one is
+     in the plot from the first drawing and only its words come and go. Not
+     before there is a table to read, so a server's frame holds none. */
+  const live =
+    reading === undefined || rows.length === 0
+      ? nothing
+      : html`<span aria-live="polite" part="live" role="status">${
+          reading.keyed && row ? spoken(row, reading.column) : ''
+        }</span>`
   if (!row || rows.length === 0) {
-    return nothing
+    return live
   }
   const slot = 100 / rows.length
   const place: TooltipAt = where ?? {
@@ -224,9 +254,11 @@ export const drawTooltip = (
              what the caller said are two questions. */
           const answer = slotOf === undefined ? seriesIndex(index) : slotOf(index)
           const series = cell.value === undefined ? undefined : answer
+          /* The cell the series keys rest on takes a second name while they
+             rest there, so a sheet can draw which one the readout is saying. */
           return html`<span
               data-series=${series ?? nothing}
-              part="tooltip-cell"
+              part="tooltip-cell${index === reading?.column ? ' tooltip-cell-current' : ''}"
               style=${series === undefined ? nothing : `--chart-series: var(--chart-series-${series})`}
             >
               <span part="tooltip-name">${cell.name}</span>
@@ -234,5 +266,6 @@ export const drawTooltip = (
             </span>`
         })}
       </div>
-    </${tag}>`
+    </${tag}>
+    ${live}`
 }
