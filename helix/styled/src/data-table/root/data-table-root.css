@@ -147,6 +147,16 @@
   cursor: pointer;
 }
 
+/* The grid is one tab stop and the arrow keys move it between the cells, so
+   the cell itself shows where focus is. Inset, so a cell at the edge of the
+   scrolling box is not clipped. */
+[part~="cell"]:focus-visible,
+[part~="select"]:focus-visible,
+[part="select-all"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(-1 * var(--helix-size-focus-ring));
+}
+
 /* The checkbox column: the same box as a cell, the box centered in it. */
 [part~="select"],
 [part="select-all"] {

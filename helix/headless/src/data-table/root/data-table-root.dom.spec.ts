@@ -50,6 +50,10 @@ const mount = async (markup: string, data: readonly Record<string, unknown>[] = 
   return { element, remove: () => element.remove() }
 }
 
+/** The grid's own semantics, which the host carries on its internals. */
+const grid = (element: HTMLElement): ElementInternals =>
+  (element as unknown as { internals: ElementInternals }).internals
+
 /** Lets a spec write the change and then read what it produced. */
 const settled = async (element: Table): Promise<void> => {
   await element.updateComplete
@@ -441,22 +445,22 @@ describe('aria', () => {
       <helix-headless-data-table page-size="2">
         <helix-headless-table-column field="name">Name</helix-headless-table-column>
       </helix-headless-data-table>`)
-    const grid = part(element, 'table')
-    expect(grid?.getAttribute('aria-rowcount')).toBe('5')
+    expect(grid(element).ariaRowCount).toBe('5')
     expect(bodyRows(element).map((row) => row.getAttribute('aria-rowindex'))).toEqual(['2', '3'])
 
     element.page = 2
     await settled(element)
     expect(bodyRows(element).map((row) => row.getAttribute('aria-rowindex'))).toEqual(['4', '5'])
-    expect(grid?.getAttribute('aria-rowcount')).toBe('5')
+    expect(grid(element).ariaRowCount).toBe('5')
+    /* On the grid, where the two counts mean something. Neither applies to
+       the `rowgroup` inside it. */
+    expect(part(element, 'table')?.hasAttribute('aria-rowcount')).toBe(false)
     remove()
   })
 
   test('the column count is the columns declared', async () => {
     const { element, remove } = await mount(SCHEMA)
-    expect(element.shadowRoot?.querySelector('[part="table"]')?.getAttribute('aria-colcount')).toBe(
-      '2',
-    )
+    expect(grid(element).ariaColCount).toBe('2')
     remove()
   })
 })
@@ -487,9 +491,7 @@ describe('server mode', () => {
       </helix-headless-data-table>`,
       [{ name: 'zulu' }, { name: 'yankee' }],
     )
-    expect(element.shadowRoot?.querySelector('[part="table"]')?.getAttribute('aria-rowcount')).toBe(
-      '901',
-    )
+    expect(grid(element).ariaRowCount).toBe('901')
     remove()
   })
 })
@@ -591,7 +593,7 @@ describe('windowing', () => {
 
   test('the count is the result, and the indices describe it', async () => {
     const { element, remove } = await mount(WINDOWED, many(500))
-    expect(part(element, 'table')?.getAttribute('aria-rowcount')).toBe('501')
+    expect(grid(element).ariaRowCount).toBe('501')
     expect(bodyRows(element)[0]?.getAttribute('aria-rowindex')).toBe('2')
     remove()
   })
@@ -618,7 +620,7 @@ describe('windowing', () => {
     /* Both offsets, stacked: the page starts at 100 and the window at the top
        of it, so the reader hears row 102 counting the head. */
     expect(bodyRows(element)[0]?.getAttribute('aria-rowindex')).toBe('102')
-    expect(part(element, 'table')?.getAttribute('aria-rowcount')).toBe('501')
+    expect(grid(element).ariaRowCount).toBe('501')
     remove()
   })
 
@@ -661,7 +663,7 @@ describe('windowing', () => {
     await settled(element)
 
     // `row 0490` through `row 0499`, and the head.
-    expect(part(element, 'table')?.getAttribute('aria-rowcount')).toBe('11')
+    expect(grid(element).ariaRowCount).toBe('11')
     expect(cells(element)[0]).toBe('row 0490')
     expect(bodyRows(element)[0]?.getAttribute('aria-rowindex')).toBe('2')
     remove()
@@ -679,7 +681,7 @@ describe('windowing', () => {
     expect(drawn).toBeLessThan(300)
     /* The consumer's total: not the chunk they sent and not the window drawn
        from it. */
-    expect(part(element, 'table')?.getAttribute('aria-rowcount')).toBe('9001')
+    expect(grid(element).ariaRowCount).toBe('9001')
     remove()
   })
 
@@ -713,7 +715,7 @@ describe('a hidden column', () => {
     const { element, remove } = await mount(HIDING)
     expect(template(element)).toBe('--data-table-template: 6rem')
     expect(cells(element)).toEqual(['30', '4', '1000', '200'])
-    expect(part(element, 'table')?.getAttribute('aria-colcount')).toBe('1')
+    expect(grid(element).ariaColCount).toBe('1')
     remove()
   })
 
@@ -735,7 +737,7 @@ describe('a hidden column', () => {
     await settled(element)
     expect(template(element)).toBe('--data-table-template: 12rem 6rem')
     expect(cells(element).slice(0, 2)).toEqual(['alpha', '30'])
-    expect(part(element, 'table')?.getAttribute('aria-colcount')).toBe('2')
+    expect(grid(element).ariaColCount).toBe('2')
     remove()
   })
 })
@@ -771,5 +773,163 @@ describe('an empty data table', () => {
     )
     expect(part(element, 'loading')?.textContent?.trim()).toBe('Still fetching')
     expect(part(element, 'empty')).toBeNull()
+  })
+})
+
+/* The grid keyboard model, the way a screen reader in a grid expects it: one
+ * tab stop, and the arrow keys moving between cells. The table declared
+ * `role="grid"` and implemented none of it, so the arrows did nothing and every
+ * grip, sort button and checkbox was a Tab stop of its own. */
+describe('the grid keyboard', () => {
+  const GRID = `
+    <helix-headless-data-table label="Files" selectable row-key="name">
+      <helix-headless-table-column field="name" sortable>Name</helix-headless-table-column>
+      <helix-headless-table-column field="size" sortable text-align="end">Size</helix-headless-table-column>
+    </helix-headless-data-table>`
+
+  type Grid = Table & { selected: string }
+
+  /** Every element of the grid a Tab can land on. */
+  const stops = (element: HTMLElement): Element[] => [
+    ...(element.shadowRoot?.querySelectorAll('[part="table"] [tabindex="0"]') ?? []),
+    ...[...element.querySelectorAll('helix-headless-table-column')].flatMap((column) => [
+      ...(column.shadowRoot?.querySelectorAll('[tabindex="0"], button:not([tabindex])') ?? []),
+    ]),
+  ]
+
+  /** The focused element, inside the table's shadow root or a column's. */
+  const focused = (element: HTMLElement): Element | null => {
+    const active = document.activeElement
+    if (active === element) {
+      return element.shadowRoot?.activeElement ?? null
+    }
+    return active && element.contains(active) ? (active.shadowRoot?.activeElement ?? null) : null
+  }
+
+  const press = async (element: Grid, key: string, init: KeyboardEventInit = {}) => {
+    const target = focused(element) as HTMLElement
+    target.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, composed: true, key, ...init }),
+    )
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await element.updateComplete
+    await new Promise((resolve) => setTimeout(resolve, 0))
+  }
+
+  const place = (cell: Element | null): string =>
+    cell?.getAttribute('part') === 'column'
+      ? `heading ${(cell.getRootNode() as ShadowRoot).host.textContent?.trim()}`
+      : `${cell?.parentElement?.getAttribute('data-row') ?? 'head'}:${cell?.getAttribute('data-column')}`
+
+  const start = async (): Promise<Grid> => {
+    const { element } = await mount(GRID)
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await settled(element)
+    const stop = element.shadowRoot?.querySelector('[part="table"] [tabindex="0"]') as HTMLElement
+    stop.focus()
+    await settled(element)
+    return element as Grid
+  }
+
+  test('is one tab stop, with every control inside it out of the order', async () => {
+    const { element } = await mount(GRID)
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await settled(element)
+    expect(stops(element)).toHaveLength(1)
+    expect(place(stops(element)[0] as Element)).toBe('0:0')
+    for (const checkbox of element.shadowRoot?.querySelectorAll('[part="checkbox"]') ?? []) {
+      expect(checkbox.getAttribute('tabindex')).toBe('-1')
+    }
+  })
+
+  test('moves between cells and rows with the arrows, Home and End', async () => {
+    const element = await start()
+    await press(element, 'ArrowRight')
+    expect(place(focused(element))).toBe('0:1')
+    await press(element, 'ArrowDown')
+    expect(place(focused(element))).toBe('1:1')
+    await press(element, 'End')
+    expect(place(focused(element))).toBe('1:2')
+    await press(element, 'Home')
+    expect(place(focused(element))).toBe('1:0')
+    await press(element, 'End', { ctrlKey: true })
+    expect(place(focused(element))).toBe('3:2')
+    await press(element, 'Home', { ctrlKey: true })
+    expect(place(focused(element))).toBe('head:0')
+    expect(stops(element)).toHaveLength(1)
+  })
+
+  test('reaches the headings, and Enter on a sortable one sorts', async () => {
+    const element = await start()
+    await press(element, 'ArrowRight')
+    await press(element, 'ArrowUp')
+    expect(place(focused(element))).toBe('heading Name')
+    expect(focused(element)?.getAttribute('role')).toBe('columnheader')
+    await press(element, 'Enter')
+    expect(element.sort).toBe('name:asc')
+  })
+
+  test('selects a row with Space', async () => {
+    const element = await start()
+    await press(element, 'ArrowDown')
+    await press(element, ' ')
+    expect(element.selected).toBe('alpha')
+  })
+
+  test('moves into a cell with F2 and back out with Escape', async () => {
+    const element = await start()
+    await press(element, 'F2')
+    expect(focused(element)?.getAttribute('part')).toBe('checkbox')
+    await press(element, 'Escape')
+    expect(place(focused(element))).toBe('0:0')
+  })
+
+  /* A row that scrolled out of the window took the focus inside it to the
+     body, and the next Tab started again from the top of the page. */
+  test('keeps the row holding focus drawn when the window moves away from it', async () => {
+    const { element, remove } = await mount(
+      `<helix-headless-data-table windowed>
+        <helix-headless-table-column field="name">Name</helix-headless-table-column>
+      </helix-headless-data-table>`,
+      Array.from({ length: 500 }, (_, at) => ({ name: `row ${at}` })),
+    )
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await settled(element)
+    const cell = element.shadowRoot?.querySelector('[data-row="0"] > [data-column]') as HTMLElement
+    cell.focus()
+    await settled(element)
+    const box = part(element, 'table') as HTMLElement
+    box.style.blockSize = '200px'
+    box.style.overflowY = 'auto'
+    box.scrollTop = 3_200
+    box.dispatchEvent(new Event('scroll'))
+    await settled(element)
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await settled(element)
+    const drawn = bodyRows(element).map((row) => row.getAttribute('data-row'))
+    expect(drawn.length).toBeLessThan(100)
+    expect(drawn).toContain('100')
+    expect(drawn).toContain('0')
+    expect(cell.isConnected).toBe(true)
+    expect(focused(element)).toBe(cell)
+    remove()
+  })
+
+  test('says every word in the words it is given', async () => {
+    const { element } = await mount(
+      GRID.replace(
+        'label="Files"',
+        'label="Files" select-all-label="Alle" select-row-label="{row} wählen" page-size="2" previous-label="Zurück" next-label="Weiter" page-label="Seite {page}" pagination-label="Seiten"',
+      ),
+    )
+    const names = [...(element.shadowRoot?.querySelectorAll('[part="checkbox"]') ?? [])].map(
+      (box) => box.getAttribute('aria-label'),
+    )
+    expect(names).toEqual(['Alle', 'delta wählen', 'alpha wählen'])
+    const pagination = part(element, 'pagination') as HTMLElement & Record<string, string>
+    expect(pagination.label).toBe('Seiten')
+    expect(pagination.previousLabel).toBe('Zurück')
+    expect(pagination.nextLabel).toBe('Weiter')
+    expect(pagination.pageLabel).toBe('Seite {page}')
   })
 })

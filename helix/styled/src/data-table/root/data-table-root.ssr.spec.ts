@@ -43,9 +43,12 @@ describe('data table server output', () => {
     expect(partTag(unknown, 'pagination')).not.toContain('total=')
   })
 
-  test('a table handed its rows counts them, header included', () => {
+  /* The count is the grid's, on the host's internals, which a server does not
+     write: the `rowgroup` it used to sit on applied it to nothing. */
+  test('a table handed its rows serves them with their place in the result', () => {
     const markup = ssr(html`<helix-data-table .rows=${rows} label="Files"></helix-data-table>`)
-    expect(partTag(markup, 'table')).toContain('aria-rowcount="3"')
+    expect(partTag(markup, 'table')).not.toContain('aria-rowcount')
+    expect(rendered(markup, 'helix-data-table')).toContain('aria-rowindex="3"')
   })
 
   test('the host carries only what the consumer wrote', () => {
