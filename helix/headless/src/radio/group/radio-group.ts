@@ -33,6 +33,13 @@ import { HelixHeadlessRadio } from '../root/radio-root.js'
  * the value until something is chosen, and where a reset returns. The two work
  * like `checked` and `defaultChecked`.
  *
+ * A choice sends its events in this order: `helix-select` from the radio, then,
+ * a microtask later and only if nobody refused it, `helix-before-change` from
+ * the group, and once the value has moved, `input` and `change`. The microtask
+ * is what lets a listener you add to the group after it connected refuse the
+ * `helix-select`. A native radio sends `input` and `change` in the same task as
+ * the click.
+ *
  * @since 0.1.0
  * @status stable
  * @aliases RadioButtons, Choice group
@@ -55,6 +62,9 @@ import { HelixHeadlessRadio } from '../root/radio-root.js'
  *
  * @cssstate invalid - The group has an error to show, from the browser's validation or from your `feedback`.
  */
+/** The keys that move the answer in a radio group. */
+const MOVING_KEYS = new Set(['ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'End', 'Home'])
+
 @customElement('helix-headless-radio-group')
 export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(HelixFormElement)) {
   /**
@@ -83,6 +93,30 @@ export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(Hel
    */
   @property({ reflect: true })
   orientation?: 'horizontal' | 'vertical'
+
+  /**
+   * Whether a reader can see and focus the answer and cannot change it. A
+   * read-only group still submits its value.
+   *
+   * React Aria's `isReadOnly`. A press on a radio is refused, and the arrow
+   * keys, Home and End leave focus on the answer, so Tab still reaches it and
+   * a reader hears it with the group's name. The group says `aria-readonly`.
+   * A script can still set `value`.
+   */
+  @property({ attribute: 'readonly', reflect: true, type: Boolean })
+  readOnly = false
+
+  /**
+   * Keeps the keys that would move the answer from the keyboard controller
+   * while the group is read-only. A capture listener on the host runs ahead of
+   * the controller's own on the same target.
+   */
+  private readonly holdKeys = (event: KeyboardEvent): void => {
+    if (this.readOnly && MOVING_KEYS.has(event.key)) {
+      event.stopImmediatePropagation()
+      event.preventDefault()
+    }
+  }
 
   /* Moving and choosing are one act, which is the radio group pattern and is
      what this controller exists to stop being written per component. */
@@ -125,6 +159,10 @@ export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(Hel
    */
   private readonly handleSelection = (event: HelixSelectEvent): void => {
     event.stopPropagation()
+    if (this.readOnly) {
+      event.preventDefault()
+      return
+    }
     /* **And only if the item's own choice stood, read a microtask later.**
        `Radio` documents `helix-select` as refusable, and its docblock tells you
        to listen for it on the group. This listener is on the group too, added
@@ -246,11 +284,13 @@ export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(Hel
   override connectedCallback(): void {
     super.connectedCallback()
     this.addEventListener('helix-select', this.handleSelection as EventListener)
+    this.addEventListener('keydown', this.holdKeys, { capture: true })
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('helix-select', this.handleSelection as EventListener)
+    this.removeEventListener('keydown', this.holdKeys, { capture: true })
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -267,6 +307,7 @@ export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(Hel
        this a reader meets a mark beside the label they cannot see, and no
        announcement of why the form would refuse the group. */
     this.internals.ariaRequired = this.required ? 'true' : null
+    this.internals.ariaReadOnly = this.readOnly ? 'true' : null
   }
 
   protected override updated(changed: PropertyValues): void {

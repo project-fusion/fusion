@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import {
+  formValue,
   hasLayout,
   hasState,
   mount,
@@ -348,5 +349,35 @@ describe('indeterminate', () => {
     box.indeterminate = true
     await box.updateComplete
     expect(hasState(box, 'indeterminate')).toBe(true)
+  })
+})
+
+describe('a read-only checkbox', () => {
+  /* React Aria's isReadOnly. A native checkbox has no read-only state, so the
+     press is refused at the inner control. */
+  test('refuses a press on the control and on the host, and still submits', async () => {
+    document.body.innerHTML =
+      '<form><helix-headless-checkbox name="ok" readonly default-checked>Agree</helix-headless-checkbox></form>'
+    const host = document.querySelector('helix-headless-checkbox') as Updatable & {
+      checked: boolean
+      readOnly: boolean
+    }
+    await settle(host)
+    const heard: string[] = []
+    host.addEventListener('change', () => heard.push('change'))
+    ;(part(host, 'control') as HTMLInputElement).click()
+    host.click()
+    await settle(host)
+    expect(host.checked).toBe(true)
+    expect((part(host, 'control') as HTMLInputElement).checked).toBe(true)
+    expect(heard).toEqual([])
+    expect(part(host, 'control')?.getAttribute('aria-readonly')).toBe('true')
+    expect(formValue(host)).toBe('on')
+    host.readOnly = false
+    await settle(host)
+    ;(part(host, 'control') as HTMLInputElement).click()
+    await settle(host)
+    expect(host.checked).toBe(false)
+    expect(part(host, 'control')?.hasAttribute('aria-readonly')).toBe(false)
   })
 })

@@ -30,6 +30,18 @@ export declare class MixinControllerCheckedInterface {
   defaultChecked: boolean
 
   /**
+   * Whether a reader can see and focus the control and cannot change it. A
+   * read-only control still submits its value.
+   */
+  readOnly: boolean
+
+  /**
+   * Refuses a press on the inner control while the control is read-only,
+   * bound to its `click`.
+   */
+  protected readonly holdReadOnly: (event: Event) => void
+
+  /**
    * Requests a change to `checked`, and returns whether it was applied.
    *
    * Announces before it acts: a listener calling `preventDefault()` on the
@@ -102,6 +114,32 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
      * does when a script assigns to it.
      */
     private checkedState: boolean | undefined = undefined
+
+    /**
+     * Whether a reader can see and focus the control and cannot change it. A
+     * read-only control still submits its value.
+     *
+     * React Aria's `isReadOnly`. A native checkbox has no read-only state, so
+     * the press is refused at the inner control, which keeps its box as it
+     * was, and the control says `aria-readonly`. A script can still set
+     * `checked`, as it can set the value of a read-only text field.
+     *
+     * The attribute is `readonly`, which is the platform's spelling for the
+     * text fields.
+     */
+    @property({ attribute: 'readonly', reflect: true, type: Boolean })
+    readOnly = false
+
+    /**
+     * @internal Refuses a press on the inner control while the control is
+     * read-only. Bound to its `click`, which a pointer, Space and a press on
+     * the label all arrive as, so the box never flips.
+     */
+    protected readonly holdReadOnly = (event: Event): void => {
+      if (this.readOnly) {
+        event.preventDefault()
+      }
+    }
 
     /**
      * Records the resolved state as the custom state `checked`.
@@ -187,5 +225,8 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
     }
   }
 
-  return CheckedElement as Constructor<MixinControllerCheckedInterface> & T
+  /* Through `unknown`, which the protected member makes necessary, as
+     `MixinField` explains: two protected members are compatible only when
+     they come from one declaration. */
+  return CheckedElement as unknown as Constructor<MixinControllerCheckedInterface> & T
 }

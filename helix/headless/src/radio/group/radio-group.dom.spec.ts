@@ -385,3 +385,37 @@ describe('a chosen radio that is removed', () => {
     expect(host.validity.valueMissing).toBe(true)
   })
 })
+
+describe('a read-only radio group', () => {
+  /* React Aria's isReadOnly: the answer is seen, reached and submitted, and
+     nothing a reader does changes it. */
+  test('refuses a press and the keys that move the answer, and still submits', async () => {
+    const host = await group('readonly', 'one')
+    const value = (): string => (host as Updatable & { value: string }).value
+    ;(at(options(host), 1).shadowRoot?.querySelector('[part="item"]') as HTMLElement).click()
+    await settle(host)
+    expect(value()).toBe('one')
+    for (const key of ['ArrowDown', 'End']) {
+      host.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key }))
+      await settle(host)
+    }
+    expect(value()).toBe('one')
+    expect(formValue(host)).toBe('one')
+    expect((host as unknown as { internals: ElementInternals }).internals.ariaReadOnly).toBe('true')
+  })
+
+  test('a script still sets the value, and leaving read-only lets the keys move it', async () => {
+    const host = (await group('readonly', 'one')) as Updatable & {
+      readOnly: boolean
+      value: string
+    }
+    host.value = 'three'
+    await settle(host)
+    expect(host.value).toBe('three')
+    host.readOnly = false
+    await settle(host)
+    host.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Home' }))
+    await settle(host)
+    expect(host.value).toBe('one')
+  })
+})
