@@ -121,7 +121,8 @@ Every stateful component also sends native events once the change is applied:
 
 - `input` and `change` on a value control
 - `toggle` on anything that opens, carrying `newState` and `oldState` as
-  `<details>` does
+  `<details>` does. It is a `ToggleEvent` in browsers that have one, and it is
+  sent whether the change came from a reader or from assigning `open`
 - `close` on a dialog
 - `load` and `error` on an image
 

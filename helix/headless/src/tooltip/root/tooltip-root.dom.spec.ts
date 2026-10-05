@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
+import { beforeAll, beforeEach, describe, expect, test } from 'bun:test'
 import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
@@ -6,6 +6,13 @@ beforeAll(async () => {
   await import('../index.js')
   // The popover too, for the specs about two overlays open at once.
   await import('../../popover/index.js')
+})
+
+/* A tooltip that hid in the test before is still warm here, a few milliseconds
+   later, and the next one would skip its delay. Each test starts cold. */
+const WARMTH = Symbol.for('fusion.helix.tooltip.warmth')
+beforeEach(() => {
+  delete (globalThis as unknown as Record<symbol, unknown>)[WARMTH]
 })
 
 type Tooltip = HTMLElement & {
@@ -441,5 +448,92 @@ describe('a tooltip that markup declared open', () => {
     tip.hide()
     await tip.updateComplete
     expect(tip.open).toBe(false)
+  })
+})
+
+describe('moving onto the bubble', () => {
+  /* WCAG 1.4.13: a reader can move the pointer onto the bubble, to read it
+     under a magnifier, without it going. In the `for` form the bubble is not
+     inside the trigger, so leaving the trigger for it used to hide it. */
+  test('keeps a `for` tooltip open', async () => {
+    const host = (await mount(
+      `<div><button id="trigger" aria-describedby="tip">Save</button>
+        <helix-headless-tooltip id="tip" for="trigger" content="Save your work" delay="0" delay-out="0"></helix-headless-tooltip></div>`,
+    )) as HTMLElement
+    const tip = host.querySelector('helix-headless-tooltip') as unknown as Tooltip
+    const trigger = host.querySelector('button') as HTMLButtonElement
+    await tip.updateComplete
+    trigger.dispatchEvent(new Event('pointerenter'))
+    await new Promise((resolve) => setTimeout(resolve, 5))
+    await tip.updateComplete
+    trigger.dispatchEvent(new Event('pointerleave'))
+    part(tip, 'tooltip')?.dispatchEvent(new Event('pointerenter'))
+    await new Promise((resolve) => setTimeout(resolve, 20))
+    await tip.updateComplete
+    expect(tip.open).toBe(true)
+  })
+})
+
+describe('tooltips that are warm', () => {
+  /* Scanning a toolbar waits once. While one tooltip shows, the next trigger
+     shows its own at once, and the first one goes. */
+  test('show the next one with no delay, and hide the one left', async () => {
+    const host = (await mount(
+      `<div>
+        <helix-headless-tooltip content="First" delay="1000"><button>One</button></helix-headless-tooltip>
+        <helix-headless-tooltip content="Second" delay="1000"><button>Two</button></helix-headless-tooltip>
+      </div>`,
+    )) as HTMLElement
+    const [first, second] = [
+      ...host.querySelectorAll('helix-headless-tooltip'),
+    ] as unknown as Tooltip[]
+    await first?.updateComplete
+    await second?.updateComplete
+    first?.show()
+    await first?.updateComplete
+    second?.dispatchEvent(new Event('pointerenter'))
+    await second?.updateComplete
+    await first?.updateComplete
+    expect([first?.open, second?.open]).toEqual([false, true])
+  })
+
+  test('and a cold one still waits out its delay', async () => {
+    const tip = await tooltip('content="x" delay="1000"')
+    tip.dispatchEvent(new Event('pointerenter'))
+    await tip.updateComplete
+    expect(tip.open).toBe(false)
+  })
+})
+
+describe('the wrapping form', () => {
+  const warned = async (markup: string): Promise<string[]> => {
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      const tip = (await mount(markup)) as Tooltip
+      tip.show()
+      await tip.updateComplete
+    } finally {
+      console.warn = original
+    }
+    return warnings
+  }
+
+  test('warns where the tooltip says what the trigger’s name does not', async () => {
+    const warnings = await warned(
+      '<helix-headless-tooltip content="Regenerates the manifests"><button>Analyze</button></helix-headless-tooltip>',
+    )
+    expect(warnings.length).toBe(1)
+  })
+
+  /* An icon button named Settings under a tooltip reading Settings loses a
+     reader nothing. A copy button draws exactly that in its own shadow root,
+     where its consumer could not have acted on the warning. */
+  test('and says nothing where the trigger is already named by its words', async () => {
+    const warnings = await warned(
+      '<helix-headless-tooltip content="Settings"><button aria-label="Settings">⚙</button></helix-headless-tooltip>',
+    )
+    expect(warnings).toEqual([])
   })
 })

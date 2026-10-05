@@ -66,11 +66,18 @@ for a slot of the same name. Helix never renders both.
 
 ```html
 <!-- The property -->
-<helix-tooltip content="Save"></helix-tooltip>
+<helix-tooltip
+  content="Save"
+  for="save"
+  id="save-tip"
+></helix-tooltip>
 
 <!-- The slot, which replaces it -->
-<helix-tooltip>
-  <strong>Save</strong>, or press <helix-kbd>⌘S</helix-kbd>
+<helix-tooltip
+  for="save"
+  id="save-tip"
+>
+  <span slot="content"><strong>Save</strong>, or press <helix-kbd>⌘S</helix-kbd></span>
 </helix-tooltip>
 ```
 
