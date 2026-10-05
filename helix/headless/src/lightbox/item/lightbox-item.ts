@@ -10,6 +10,11 @@ import { property } from 'lit/decorators.js'
  * or a chart. The lightbox shows one item at a time, and the root decides
  * which.
  *
+ * Each item is a `group` with the role description `slide`, named by its
+ * `label` or, without one, by its place in the set, such as "2 of 5", as the
+ * APG carousel pattern names a slide. The lightbox supplies both words, so they
+ * are translated on the lightbox.
+ *
  * An item that is not current is hidden and stays in the DOM, as a `TabPanel`
  * does. Crawlers can read it, it is in the server-rendered markup, and an
  * `<img>` that has decoded does not decode again when you go back to it.
@@ -45,6 +50,20 @@ export class HelixHeadlessLightboxItem extends HelixElement {
   label = ''
 
   /**
+   * @internal Set by the lightbox: the item's name where it has no `label`,
+   * which is its place in the set.
+   */
+  @property({ attribute: false })
+  position = ''
+
+  /**
+   * @internal Set by the lightbox: the word a screen reader says in place of
+   * the item's role. Empty leaves the role as it is.
+   */
+  @property({ attribute: false })
+  roleLabel = ''
+
+  /**
    * The item's identifier. The root compares its `active` value against it.
    */
   @property()
@@ -67,7 +86,8 @@ export class HelixHeadlessLightboxItem extends HelixElement {
     return html`<div
       part="item"
       role="group"
-      aria-label=${this.label || nothing}
+      aria-roledescription=${this.roleLabel || nothing}
+      aria-label=${this.label || this.position || nothing}
       ?hidden=${!this.current}
     >
       <slot></slot>

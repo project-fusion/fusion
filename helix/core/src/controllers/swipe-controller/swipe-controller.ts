@@ -87,13 +87,16 @@ export class SwipeController implements ReactiveController {
 
   private readonly handleDown = (event: PointerEvent): void => {
     const surface = this.options.surface()
-    const target = event.composedPath()[0]
+    const path = event.composedPath()
+    const target = path[0]
+    /* On the surface in the flattened tree: the path, and not `contains`, so a
+       press on content slotted into it counts. */
     if (
       event.button !== 0 ||
       this.options.axis() === undefined ||
       !surface ||
       !(target instanceof Element) ||
-      !(target === surface || surface.contains(target) || surface.shadowRoot?.contains(target)) ||
+      !path.includes(surface) ||
       (this.options.start && !this.options.start(target, event))
     ) {
       return
