@@ -7,7 +7,8 @@ import {
 } from '@fusion.dev/helix-core'
 import { arrowElbowDownLeft } from '@fusion.dev/helix-icons'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
-import { property, state } from 'lit/decorators.js'
+import { property } from 'lit/decorators.js'
+import { live } from 'lit/directives/live.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
 /**
@@ -34,6 +35,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @slot end - Content under the field, beside the send button.
  * @slot start - Content under the field at the leading edge, such as an attachment button or a model picker.
  *
+ * @event {Event} input - The user changed the text. Read it from `value`, for a typing indicator or a saved draft. Sent on the composer and does not bubble.
  * @event {HelixSendEvent} helix-send - Fired when the user sends their turn, and cancelable.
  *
  * @csspart composer - The whole composer.
@@ -92,23 +94,16 @@ export class HelixHeadlessChatComposer extends HelixElement {
   /**
    * The text the user has written.
    *
-   * Read it, or set it to seed a draft.
+   * It follows typing, so reading it gives the draft. Set it to seed a draft or
+   * to replace the one in the field, and set it to `''` to clear it.
    */
   @property()
   value = ''
-
-  @state()
-  private draft = ''
 
   /**
    * @internal Read by the transcript to find the composer among its children.
    */
   readonly isChatComposer = true
-
-  /** What is in the field, whoever last wrote it. */
-  private get text(): string {
-    return this.draft || this.value
-  }
 
   /**
    * Sends what is written, and returns whether the send went through.
@@ -118,7 +113,7 @@ export class HelixHeadlessChatComposer extends HelixElement {
    * a reasonable way to send.
    */
   send(): boolean {
-    const value = this.text.trim()
+    const value = this.value.trim()
     if (value === '' || this.disabled) {
       return false
     }
@@ -128,7 +123,6 @@ export class HelixHeadlessChatComposer extends HelixElement {
     /* Cleared only here, after nobody refused. A composer that empties itself
        first and hears about the failure afterwards has thrown away the only copy
        of what the reader wrote. */
-    this.draft = ''
     this.value = ''
     return true
   }
@@ -208,7 +202,7 @@ export class HelixHeadlessChatComposer extends HelixElement {
     return html`<div part="composer">
       <textarea
         part="field"
-        .value=${this.text}
+        .value=${live(this.value)}
         aria-label=${this.label}
         placeholder=${this.placeholder}
         rows=${this.rows}
@@ -225,18 +219,28 @@ export class HelixHeadlessChatComposer extends HelixElement {
   }
 
   /**
-   * Records the draft, and stops the textarea speaking in this element's name.
+   * Takes what was typed into `value`, and says so from this element.
    *
-   * **The stop is not incidental.** `input` is composed by specification, so
-   * the `<textarea>` in this shadow root sent its own past this host and on
-   * through whatever `<helix-headless-chat>` it is slotted into, and neither
-   * element declares an `input`: a consumer binding one on either received an
-   * undeclared event whose target was a control they cannot reach. What a
-   * composer offers is `helix-send`, once, when the reader is done.
+   * **The textarea's own `input` is stopped and this element sends one.**
+   * `input` is composed by specification, so the `<textarea>` in this shadow
+   * root sent its own past this host with a target a consumer cannot reach.
+   * The one sent here comes from the composer, whose `value` already holds
+   * the text, which is what a typing indicator or a saved draft reads.
+   *
+   * **The text is `value` and nothing beside it.** A private draft read before
+   * `value` sent a seed the reader had deleted, since an empty draft fell back
+   * to it, and left `value` reading empty while the field held a whole draft.
    */
   private readonly handleInput = (event: Event): void => {
     event.stopPropagation()
-    this.draft = (event.target as HTMLTextAreaElement).value
+    this.value = (event.target as HTMLTextAreaElement).value
+    /* On the composer alone, without bubbling, the way a media element sends
+       its events. A transcript speaks for the controls it holds, and a bubbling
+       `input` from the composer slotted into one was the transcript speaking in
+       another element's name. A listener on the composer hears it, and so does
+       a React `onInput`, which `HelixElement` binds for an event that does not
+       bubble. */
+    this.dispatchEvent(new Event('input'))
   }
 
   private readonly handleSend = (): void => {

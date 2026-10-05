@@ -92,6 +92,48 @@ describe('sending', () => {
   })
 })
 
+describe('the value', () => {
+  /* The field fell back to `value` whenever the draft was empty, so a reader
+     who deleted a suggested prompt and pressed Enter sent what they deleted. */
+  test('a seed the reader cleared is not sent', async () => {
+    const element = await composer('value="Seed"')
+    expect((part(element, 'field') as HTMLTextAreaElement).value).toBe('Seed')
+    await type(element, '')
+    let heard = 0
+    element.addEventListener('helix-send', () => {
+      heard += 1
+    })
+    expect(element.send()).toBe(false)
+    expect(heard).toBe(0)
+  })
+
+  /* Typing went into a private draft, so `value` read empty under a whole
+     draft and writing it did not replace what was in the field. */
+  test('follows typing, and replaces the draft when it is set', async () => {
+    const element = await composer()
+    let heard = 0
+    element.addEventListener('input', () => {
+      heard += 1
+    })
+    await type(element, 'Typed')
+    expect(element.value).toBe('Typed')
+    expect(heard).toBe(1)
+    element.value = ''
+    await element.updateComplete
+    expect((part(element, 'field') as HTMLTextAreaElement).value).toBe('')
+  })
+
+  test('the input a consumer hears comes from the composer', async () => {
+    const element = await composer()
+    let target: EventTarget | null = null
+    element.addEventListener('input', (event) => {
+      target = event.target
+    })
+    await type(element, 'Typed')
+    expect(target).toBe(element)
+  })
+})
+
 describe('Enter', () => {
   test('sends, and takes the keystroke with it', async () => {
     const element = await composer()
