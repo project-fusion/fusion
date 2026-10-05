@@ -19,9 +19,12 @@
   object-position: var(--image-position, center);
 }
 
-/* Nothing to look at until there is something to look at. */
+/* Nothing to look at until there is something to look at. Transparent, so the
+   picture keeps its `alt` in the accessibility tree the way a broken native
+   image does. `visibility: hidden` took the `alt` out too, and a broken picture
+   said nothing at all. */
 :host([data-status="error"]) [part="image"] {
-  visibility: hidden;
+  opacity: 0;
 }
 
 /* Both stand-ins cover the box exactly, because they are standing in for it. */
