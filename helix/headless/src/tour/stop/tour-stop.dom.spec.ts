@@ -178,3 +178,21 @@ if (hasLayout()) {
     })
   })
 }
+
+describe('the stop’s title and description', () => {
+  test('are optional slots, published as parts that draw no box of their own', async () => {
+    const host = await stop()
+    expect(part(host, 'heading')?.localName).toBe('slot')
+    expect(part(host, 'description')?.localName).toBe('slot')
+  })
+
+  test('a label names the panel where nothing else does', async () => {
+    const host = await stop('current label="Your projects"')
+    expect(part(host, 'bubble')?.getAttribute('aria-label')).toBe('Your projects')
+  })
+
+  test('a wait stop never shows its panel', async () => {
+    const host = await stop('current type="wait"')
+    expect((part(host, 'bubble') as HTMLElement | null)?.hidden).toBe(true)
+  })
+})

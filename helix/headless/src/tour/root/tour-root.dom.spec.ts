@@ -443,3 +443,87 @@ const deepFocus = (): Element | null => {
   }
   return active
 }
+
+describe('each stop’s place in the run', () => {
+  type Stop = HTMLElement & { updateComplete: Promise<boolean> }
+  const settled = async (tour: Tour): Promise<Stop[]> => {
+    const stops = tour.stops as unknown as Stop[]
+    await Promise.all(stops.map((stop) => stop.updateComplete))
+    return stops
+  }
+
+  test('is told to every stop, in the consumer’s words, and kept out of sight', async () => {
+    const tour = await run()
+    tour.setAttribute('progress-label', 'Schritt {index} von {count}')
+    await tour.updateComplete
+    const stops = await settled(tour)
+    const said = stops.map((stop) => part(stop, 'progress') as HTMLElement | null)
+    expect(said.map((one) => one?.textContent)).toEqual([
+      'Schritt 1 von 3',
+      'Schritt 2 von 3',
+      'Schritt 3 von 3',
+    ])
+    expect(said.every((one) => one?.hidden)).toBe(true)
+  })
+
+  test('is drawn as well with `progress`', async () => {
+    const tour = await run()
+    tour.toggleAttribute('progress', true)
+    await tour.updateComplete
+    const [first] = await settled(tour)
+    expect((part(first as Stop, 'progress') as HTMLElement | null)?.hidden).toBe(false)
+  })
+})
+
+describe('stops with nothing to light', () => {
+  const tour = async (stops: string): Promise<Tour> => {
+    const host = (await mount(
+      `<div><button id="target">Target</button>
+        <helix-headless-tour label="Getting started" open>${stops}</helix-headless-tour></div>`,
+    )) as HTMLElement
+    const element = host.querySelector('helix-headless-tour') as Tour
+    await element.updateComplete
+    return element
+  }
+
+  test('a dialog stop is a dialog, shown over the backdrop', async () => {
+    const element = await tour(
+      '<helix-headless-tour-stop type="dialog">Welcome</helix-headless-tour-stop>',
+    )
+    const [stop] = element.stops
+    await (stop as unknown as { updateComplete: Promise<boolean> }).updateComplete
+    expect(part(stop as HTMLElement, 'bubble')?.getAttribute('role')).toBe('dialog')
+    expect(part(element, 'backdrop')).not.toBeNull()
+  })
+
+  test('a stop that points at something has no backdrop, the spotlight dims the page', async () => {
+    const element = await tour(
+      '<helix-headless-tour-stop for="target">Here</helix-headless-tour-stop>',
+    )
+    expect(part(element, 'backdrop')).toBeNull()
+  })
+
+  test('a wait stop shows nothing, and the run moves on once its target is on the page', async () => {
+    const element = await tour(
+      `<helix-headless-tour-stop for="target">Open the menu</helix-headless-tour-stop>
+       <helix-headless-tour-stop type="wait" for="menu"></helix-headless-tour-stop>
+       <helix-headless-tour-stop for="target">Pick one</helix-headless-tour-stop>`,
+    )
+    element.next()
+    await element.updateComplete
+    const waiting = element.stops[1] as unknown as HTMLElement & {
+      updateComplete: Promise<boolean>
+    }
+    await waiting.updateComplete
+    expect(element.index).toBe(1)
+    expect((part(waiting, 'bubble') as HTMLElement | null)?.hidden).toBe(true)
+    expect(part(element, 'backdrop')).toBeNull()
+    const menu = document.createElement('div')
+    menu.id = 'menu'
+    menu.textContent = 'Menu'
+    element.parentElement?.append(menu)
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await element.updateComplete
+    expect(element.index).toBe(2)
+  })
+})
