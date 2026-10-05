@@ -174,7 +174,11 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
     this.step(-1)
   }
 
-  private readonly handleEnded = (): void => {
+  private readonly handleEnded = (event: Event): void => {
+    /* Only the player's own end: media somewhere inside it may end too. */
+    if (event.target !== this.player) {
+      return
+    }
     this.chased = true
     this.step(1)
   }
@@ -187,8 +191,13 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
     /* `ended` is a media event and does not compose out of the player's shadow
        root on its own. The player relays it, which is why listening here works
        at all, and why this listens on the element rather than on a `<video>` it
-       has no reference to. */
-    this.addEventListener('ended', this.handleEnded)
+       has no reference to.
+
+       **In the capture phase.** The player relays `ended` as the platform sends
+       it, without bubbling, so a listener here in the bubble phase never heard
+       it and the playlist stopped at the end of the first clip. Capture reaches
+       every ancestor whether the event bubbles or not. */
+    this.addEventListener('ended', this.handleEnded, true)
   }
 
   override disconnectedCallback(): void {
@@ -196,7 +205,7 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
     this.removeEventListener('helix-select', this.handleSelect)
     this.removeEventListener('helix-next', this.handleNext)
     this.removeEventListener('helix-previous', this.handlePrevious)
-    this.removeEventListener('ended', this.handleEnded)
+    this.removeEventListener('ended', this.handleEnded, true)
   }
 
   /**

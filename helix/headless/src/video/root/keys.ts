@@ -19,19 +19,44 @@ export interface KeyActions {
   toggle: () => void
 }
 
+/** The controls whose own activation key is Space. */
+const PRESSED_BY_SPACE = new Set(['a', 'button', 'select', 'summary', 'textarea'])
+
+/** Roles whose element Space activates, whatever its tag. */
+const PRESSED_ROLES = /^(button|checkbox|link|menuitem\w*|option|radio|switch|tab)$/
+
 /**
  * Answers one press, and says whether it was one of these.
  *
  * Nothing is taken while focus is in a range. The scrubber and the volume are
  * real inputs and the arrows are already theirs, so intercepting would mean
  * seeking twice for one press.
+ *
+ * **Nor a press a control already handled, nor Space on a control.** Space is
+ * how a button is pressed, so Space on Mute played the video and left it
+ * unmuted, and a menu row chosen with Space also toggled playback. A key a
+ * menu or a control took for itself arrives here already refused.
  */
 export const takeKey = (
   event: KeyboardEvent,
   video: HTMLVideoElement,
   actions: KeyActions,
 ): boolean => {
-  if ((event.target as HTMLElement)?.tagName === 'INPUT') {
+  if (event.defaultPrevented) {
+    return false
+  }
+  /* The element the press began on, inside whatever shadow root holds it:
+     `target` is retargeted to the host of each root it leaves. */
+  const origin = (event.composedPath?.()[0] ?? event.target) as HTMLElement | null
+  if (origin?.tagName === 'INPUT' || origin?.isContentEditable) {
+    return false
+  }
+  if (
+    event.key === ' ' &&
+    origin &&
+    (PRESSED_BY_SPACE.has(origin.localName) ||
+      PRESSED_ROLES.test(origin.getAttribute?.('role') ?? ''))
+  ) {
     return false
   }
   /* Five seconds an arrow, the distance a native `<video controls>` moves by,
