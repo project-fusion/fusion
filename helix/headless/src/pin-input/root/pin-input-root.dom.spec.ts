@@ -525,3 +525,42 @@ describe('Home and End', () => {
     expect(host.shadowRoot?.activeElement).toBe(cells(host)[2] ?? null)
   })
 })
+
+describe('the gaps Zag and Web Awesome close', () => {
+  /* Zag maps Delete: the character in the box goes, and the rest of the code
+     moves back one. */
+  test('Delete removes the character in the focused box and pulls the rest back', async () => {
+    const host = await pin('length="4" value="1234"')
+    cells(host)[1]?.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Delete' }))
+    await host.updateComplete
+    expect(host.value).toBe('134')
+  })
+
+  /* Web Awesome's autosubmit, Radix's autoSubmit. */
+  test('autosubmit submits the form once a code it took fills the last box', async () => {
+    document.body.innerHTML =
+      '<form><helix-headless-pin-input label="Code" length="4" autosubmit></helix-headless-pin-input></form>'
+    const form = document.querySelector('form') as HTMLFormElement
+    const host = document.querySelector('helix-headless-pin-input') as Pin
+    await host.updateComplete
+    let submitted = 0
+    form.requestSubmit = () => {
+      submitted += 1
+    }
+    await paste(host, 0, '12')
+    expect(submitted).toBe(0)
+    await paste(host, 2, '34')
+    await host.updateComplete
+    expect([host.value, submitted]).toEqual(['1234', 1])
+  })
+
+  test('format draws its separators between the boxes, hidden from the reader', async () => {
+    const host = await pin('length="6" format="###-###"')
+    const separators = [...(host.shadowRoot?.querySelectorAll('[part="separator"]') ?? [])]
+    expect(separators.map((one) => [one.textContent, one.getAttribute('aria-hidden')])).toEqual([
+      ['-', 'true'],
+    ])
+    expect(separators[0]?.previousElementSibling).toBe(cells(host)[2] as Element)
+    expect(part(await pin(), 'separator')).toBeNull()
+  })
+})

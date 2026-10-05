@@ -26,7 +26,12 @@ import { styles } from './pin-input-root.css.js'
  *
  * @csspart cell - One box.
  * @csspart field - The row of boxes.
+ * @csspart separator - The text `format` draws between two boxes.
  *
+ * @cssproperty --pin-input-cell-background-color - Fill behind each box.
+ * @cssproperty --pin-input-cell-border-color - Edge of each box at rest. Hover, focus and an error still draw their own.
+ * @cssproperty --pin-input-cell-radius - Corner radius of each box.
+ * @cssproperty --pin-input-cell-size - Width and height of each box.
  * @cssproperty --pin-input-gap - The space between one box and the next.
  */
 @customElement('helix-pin-input')
