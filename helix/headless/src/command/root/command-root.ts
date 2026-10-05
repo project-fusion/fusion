@@ -42,7 +42,8 @@ const parse = (hotkey: string) => {
  *
  * The palette keeps no value. It is not a form control and submits nothing.
  * Choosing an option dispatches `helix-select` once. To remember the last
- * command, store it yourself.
+ * command, store it yourself. An option with `href` is a link to a page, which
+ * the browser follows once the palette has closed.
  *
  * The hotkey listener is on the document, so the hotkey works from anywhere on
  * the page, including inside another control's text field, whether or not the
@@ -67,7 +68,7 @@ const parse = (hotkey: string) => {
  * @event {HelixBeforeCloseEvent} helix-before-close - The palette is about to close. Cancelable: cancel it to keep it open.
  * @event {HelixBeforeOpenEvent} helix-before-open - The palette is about to open. Cancelable: cancel it to keep it closed.
  * @event {HelixFilterEvent} helix-filter - Fired as the user types, with the text the list is filtered by. Cancelable: cancel it to leave the list unfiltered and filter the commands yourself, for example on a server while `loading` is set.
- * @event {HelixSelectEvent} helix-select - A command was chosen. Cancelable: cancel it to keep the palette open.
+ * @event {HelixSelectEvent} helix-select - A command was chosen, with its `href` where the option is a link. Cancelable: cancel it to keep the palette open, and to keep the browser from following the link.
  * @event {ToggleEvent} toggle - The palette opened or closed. The event carries `newState` and `oldState`.
  *
  * @csspart dialog - The box of the dialog the palette opens in, forwarded from `Dialog`.
@@ -299,9 +300,23 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
    * this element needs is lost by ending it here.
    */
   private readonly swallowOptionSelect = (event: Event): void => {
-    if (event.target !== this) {
-      event.stopImmediatePropagation()
+    if (event.target === this) {
+      return
     }
+    event.stopImmediatePropagation()
+    /* A row that is a link is said under this element's name with its `href`,
+       and the palette closes as it does for any command. Canceled, the palette
+       stays open and the row does not follow its link, so a client-side router
+       takes it. */
+    const { href, value } = (event as HelixSelectEvent).detail
+    if (href === undefined) {
+      return
+    }
+    if (!this.dispatchEvent(new HelixSelectEvent({ href, value }))) {
+      event.preventDefault()
+      return
+    }
+    this.requestOpen(false)
   }
 
   override connectedCallback(): void {

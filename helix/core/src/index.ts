@@ -311,6 +311,7 @@ export {
   deepContains,
   focusableElements,
 } from './utils/focusable-elements/focusable-elements.js'
+export { followLink, type LinkModifiers, type LinkTarget } from './utils/follow-link/follow-link.js'
 export { formatNumbers } from './utils/format-numbers/format-numbers.js'
 export { type HostAria, hostAria } from './utils/host-aria/host-aria.js'
 export {

@@ -168,3 +168,54 @@ describe('an option whose words are not what a reader types', () => {
     expect(host.text).toBe('Japan')
   })
 })
+
+describe('an option that is a link', () => {
+  /* What an anchor would hear, caught on the way down and kept from navigating. */
+  const followed = (): string[] => {
+    const heard: string[] = []
+    document.addEventListener(
+      'click',
+      (event) => {
+        if (event.target instanceof HTMLAnchorElement) {
+          heard.push(
+            `${event.target.getAttribute('href')} ${event.target.target}${(event as MouseEvent).metaKey ? ' meta' : ''}`,
+          )
+          event.preventDefault()
+        }
+      },
+      { capture: true },
+    )
+    return heard
+  }
+
+  test('says helix-select with its href, then follows it with the keys held', async () => {
+    const heard = followed()
+    const host = (await mount(
+      '<helix-headless-option value="docs" href="/docs" target="_blank">Docs</helix-headless-option>',
+    )) as HTMLElement & { select(modifiers?: { metaKey?: boolean }): void }
+    const said: unknown[] = []
+    host.addEventListener('helix-select', (event) => said.push((event as CustomEvent).detail))
+    part(host, 'item')?.dispatchEvent(new MouseEvent('click', { bubbles: true, metaKey: true }))
+    expect(said).toEqual([{ href: '/docs', value: 'docs' }])
+    expect(heard).toEqual(['/docs _blank meta'])
+  })
+
+  test('follows nothing where helix-select is canceled, so a router can take it', async () => {
+    const heard = followed()
+    const host = (await mount(
+      '<helix-headless-option value="docs" href="/docs">Docs</helix-headless-option>',
+    )) as HTMLElement & { select(): void }
+    host.addEventListener('helix-select', (event) => event.preventDefault())
+    host.select()
+    expect(heard).toEqual([])
+  })
+
+  test('says nothing about being chosen, a link being followed rather than chosen', async () => {
+    const host = (await mount(
+      '<helix-headless-option value="docs" href="/docs">Docs</helix-headless-option>',
+    )) as HTMLElement & { internals: ElementInternals }
+    expect(host.internals.role).toBe('option')
+    expect(host.internals.ariaSelected).toBeNull()
+    expect(host.shadowRoot?.querySelector('a')).toBeNull()
+  })
+})
