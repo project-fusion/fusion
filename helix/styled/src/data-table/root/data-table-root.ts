@@ -50,12 +50,17 @@ import '../../table/index.js'
  * It is opaque, because rows scroll under the sticky heading. Unset otherwise.
  * @cssproperty --data-table-heading-color - The text color of a heading.
  * @cssproperty --data-table-indent - How far a tree grid's row header steps in for each level. It defaults to the width of the mark that opens a row.
+ * @cssproperty --data-table-more-border-color - The color of the edge around the button in the `load-more` row.
+ * @cssproperty --data-table-more-hover-background-color - The fill behind the button in the `load-more` row while the pointer is over it.
+ * @cssproperty --data-table-more-radius - The corner radius of the button in the `load-more` row.
  * @cssproperty --data-table-padding-block - The space above and below a cell's content.
  * @cssproperty --data-table-padding-inline - The space on either side of a cell's content.
  * @cssproperty --data-table-rule-color - The color of the line between rows. It takes a
  * color only, because it fills the color in a border shorthand, and a full border value
  * makes the rule invalid. It is drawn on the cells, because the row is `display: contents`.
  * @cssproperty --data-table-text - The font size of headings and cells.
+ * @cssproperty --data-table-toggle-color - The color of the mark that opens and closes a row of a tree grid.
+ * @cssproperty --data-table-toggle-size - The size of the mark that opens and closes a row of a tree grid, and of the room a row with no children keeps for it.
  */
 @customElement('helix-data-table')
 export class HelixDataTable extends HelixHeadlessDataTable {

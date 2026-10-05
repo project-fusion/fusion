@@ -1,4 +1,5 @@
 import {
+  commaList,
   countLabel,
   customElement,
   deepActiveElement,
@@ -46,6 +47,7 @@ import { html } from 'lit/static-html.js'
 import { at, edgeOf, type HelixHeadlessTableColumn } from '../../table/column/table-column.js'
 import '../../checkbox/index.js'
 import '../../pagination/index.js'
+import { anchorAt, inRowOrder, toggledOpen } from '../keys.js'
 import { type Grown, grow } from '../tree.js'
 import {
   type Arranged,
@@ -113,20 +115,29 @@ const isControl = (element: HTMLElement): boolean =>
  *
  * To act on a single row, such as opening it, put a link or a button in a cell.
  *
- * The grid is one tab stop, and the arrow keys move between its cells, the
- * headings included:
+ * **Keyboard.** The grid is one tab stop, and the arrow keys move between its
+ * cells, the headings included.
  *
- * - The arrow keys move one cell, and Home and End to the ends of the row.
- * - Control with Home or End moves to the first or the last cell of the grid.
- * - Page Up and Page Down move by the rows that fit in view.
- * - Enter or F2 moves into the cell's controls, and Escape moves back to the
- *   cell. Tab moves between the controls of one cell.
- * - Enter or Space on a sortable heading sorts by it, and Space on a row of a
- *   `selectable` table selects it.
- * - In a `selectable` table, Shift with Up or Down selects the rows it moves
- *   across, Shift with Space selects every row from the one last chosen, and
- *   Control or Command with A selects every row.
- * - Typing letters moves to the next row whose row header starts with them.
+ * | Key | What it does |
+ * |---|---|
+ * | Right, Left | Moves one cell along the row. Left moves on, on a right-to-left page. |
+ * | Down, Up | Moves one row, the heading row and the `load-more` row included. |
+ * | Home, End | Moves to the first or the last cell of the row. |
+ * | Control with Home or End | Moves to the first or the last cell of the grid. |
+ * | Page Down, Page Up | Moves by the rows that fit in view. |
+ * | Enter, F2 | Moves into the cell's controls. Escape moves back to the cell, and Tab moves between the controls of one cell. |
+ * | Enter, Space on a sortable heading | Sorts by the column. |
+ * | Enter, Space on the `load-more` row | Sends `helix-load-more`. |
+ * | Space on a row | Selects the row, in a `selectable` table. |
+ * | Shift with Down or Up | Selects the rows it moves across, in a `selectable` table. |
+ * | Shift with Space | Selects every row from the one last chosen, in a `selectable` table. |
+ * | Control or Command with A | Selects every row, in a `selectable` table. |
+ * | Right on a row header in a tree grid | Opens a closed row, and moves one cell along an open one. |
+ * | Left on a row header in a tree grid | Closes an open row, and moves to the parent of a closed one. |
+ * | A letter or a word | Moves to the next row whose row header starts with what you typed. |
+ *
+ * `selected` and `expanded` hold their keys in the order of the rows, as do
+ * `helix-select`, `helix-selected` and `helix-expand`.
  *
  * Each row is named by its row header, the column marked `row-header`, or the
  * first column with a `field` where none is. A screen reader says it as a reader
@@ -871,9 +882,12 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     return value
   }
 
-  /** The keys of the open rows. */
+  /**
+   * The keys of the open rows. Split on commas only, as every other list of
+   * keys is, so a key may hold a space.
+   */
   private get opened(): Set<string> {
-    return new Set(writtenList(this.expanded.replaceAll(',', ' ')))
+    return new Set(commaList(this.expanded))
   }
 
   /**
@@ -1290,18 +1304,13 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       },
       event: (value) => new HelixSelectEvent({ value }),
       host: this,
-      next: [...keys].join(','),
+      next: inRowOrder(keys, this.everyKey).join(','),
     })
   }
 
   /** The keys selected now. */
   private get chosen(): Set<string> {
-    return new Set(
-      this.selected
-        .split(',')
-        .map((key) => key.trim())
-        .filter(Boolean),
-    )
+    return new Set(commaList(this.selected))
   }
 
   /**
@@ -1365,11 +1374,8 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    */
   private selectRange(to: number, from = to): void {
     const keys = this.pageKeys
-    let anchor = this.anchorKey === undefined ? -1 : keys.indexOf(this.anchorKey)
-    if (anchor < 0) {
-      anchor = from
-      this.anchorKey = keys[from]
-    }
+    const { anchor, anchorKey } = anchorAt(keys, this.anchorKey, from)
+    this.anchorKey = anchorKey
     const next = rangeAdd([...this.chosen], keys, anchor, to)
     if (next) {
       this.requestSelected(new Set(next))
@@ -1827,17 +1833,11 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * Nothing moves where it is that way already.
    */
   private toggleOpen(row: DataRow, open: boolean): boolean {
-    const key = this.rowKeyOf(row, -1)
-    const keys = this.opened
-    if (keys.has(key) === open) {
+    const next = toggledOpen(this.expanded, this.rowKeyOf(row, -1), open, this.everyKey)
+    if (next === undefined) {
       return false
     }
-    if (open) {
-      keys.add(key)
-    } else {
-      keys.delete(key)
-    }
-    this.expanded = [...keys].join(',')
+    this.expanded = next
     this.dispatchEvent(new HelixExpandEvent({ value: this.expanded }))
     return true
   }

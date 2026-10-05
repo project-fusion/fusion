@@ -240,7 +240,10 @@
    under it keeps the room its button would take, so the names of siblings
    share an edge. Only in a tree grid, so a flat table keeps its own inset. */
 :host([child-field]) [part~="cell-header"] {
-  --_data-table-gutter: calc(var(--helix-size-icon-tight) + var(--helix-space-2xs));
+  --_data-table-gutter: calc(
+    var(--data-table-toggle-size, var(--helix-size-icon-tight)) +
+    var(--helix-space-2xs)
+  );
   padding-inline-start: calc(
     (var(--data-table-level, 1) - 1) *
     var(--data-table-indent, var(--_data-table-gutter))
@@ -258,12 +261,12 @@
 [part~="toggle"] {
   align-items: center;
   background: none;
-  block-size: var(--helix-size-icon-tight);
+  block-size: var(--data-table-toggle-size, var(--helix-size-icon-tight));
   border: none;
-  color: var(--helix-color-foreground-muted);
+  color: var(--data-table-toggle-color, var(--helix-color-foreground-muted));
   cursor: pointer;
   display: inline-flex;
-  inline-size: var(--helix-size-icon-tight);
+  inline-size: var(--data-table-toggle-size, var(--helix-size-icon-tight));
   justify-content: center;
   margin-inline-end: var(--helix-space-2xs);
   padding: 0;
@@ -289,8 +292,9 @@
 
 [part="more-button"] {
   background: none;
-  border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-sm);
+  border: var(--helix-border-thin) solid
+    var(--data-table-more-border-color, var(--helix-color-border));
+  border-radius: var(--data-table-more-radius, var(--helix-radii-sm));
   color: var(--data-table-color, var(--helix-color-foreground));
   cursor: pointer;
   font-family: var(--helix-font-sans);
@@ -300,7 +304,10 @@
 }
 
 [part="more-button"]:hover {
-  background-color: var(--helix-color-surface-raised);
+  background-color: var(
+    --data-table-more-hover-background-color,
+    var(--helix-color-surface-raised)
+  );
 }
 
 /*

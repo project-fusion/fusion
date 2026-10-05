@@ -1068,6 +1068,23 @@ describe('the grid keyboard', () => {
     expect(element.selected.split(',').sort()).toEqual(['alpha', 'bravo', 'charlie', 'delta'])
   })
 
+  test('writes the selection in the order of the rows, whatever order they were chosen in', async () => {
+    const element = await start()
+    const rowOrder = bodyRows(element).map(
+      (row) => row.querySelector('[role="rowheader"]')?.textContent?.trim() ?? '',
+    )
+    const heard: string[] = []
+    element.addEventListener('helix-select', (event) =>
+      heard.push((event as CustomEvent<{ value: string }>).detail.value),
+    )
+    await press(element, 'ArrowDown')
+    await press(element, 'ArrowDown')
+    await press(element, ' ')
+    await press(element, 'a', { ctrlKey: true })
+    expect(element.selected.split(',')).toEqual(rowOrder)
+    expect(heard.at(-1)).toBe(rowOrder.join(','))
+  })
+
   test('selects the rows Shift with Down crosses, and Shift with Space a range', async () => {
     const element = await start()
     await press(element, 'ArrowDown', { shiftKey: true })
@@ -1252,6 +1269,25 @@ describe('rows that hold rows', () => {
       '[data-row="2"] [role="rowheader"]',
     ) as HTMLElement
     expect(cell.getAttribute('style')).toContain('--data-table-level: 2')
+  })
+
+  test('holds the open rows in row order, and takes a key that holds a space', async () => {
+    const { element } = await mount(TREE, [
+      { children: [{ name: 'a.ts', size: 1 }], name: 'my notes', size: 0 },
+      ...FILES,
+    ])
+    await settled(element)
+    const tree = element as Tree
+    const toggles = () => [
+      ...(element.shadowRoot?.querySelectorAll<HTMLElement>('[part~="toggle"]') ?? []),
+    ]
+    // src is the second branch: open it first, then the one above it.
+    toggles()[1]?.click()
+    await settled(element)
+    toggles()[0]?.click()
+    await settled(element)
+    expect(tree.expanded).toBe('my notes,src')
+    expect(names(element)).toContain('a.ts')
   })
 
   test('opens with Right, closes with Left, and goes to the parent with Left', async () => {
