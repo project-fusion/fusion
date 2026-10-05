@@ -98,6 +98,7 @@ import '../../color-picker/index.js'
  * @csspart picker-eyedropper-button - The button inside `picker-eyedropper`.
  * @csspart picker-eyedropper-live - The live region of the button inside `picker-eyedropper`, which says its pending label.
  * @csspart picker-eyedropper-text - The words on the button inside `picker-eyedropper`.
+ * @csspart picker-feedback - The field's message inside the open panel, under the picker, where the panel covers the one under the field.
  * @csspart picker-field - One channel's number field with its label, in `channel-fields`.
  * @csspart picker-field-input - The number input in a channel's field.
  * @csspart picker-field-label - The name above a channel's number input.
@@ -454,13 +455,14 @@ export class HelixHeadlessColorInput extends MixinPickerField(
         channel-markers: picker-channel-markers, channel-output: picker-channel-output,
         channels: picker-channels, controls: picker-controls, eyedropper: picker-eyedropper,
         eyedropper-button: picker-eyedropper-button, eyedropper-live: picker-eyedropper-live, eyedropper-text: picker-eyedropper-text,
-        field: picker-field, field-input: picker-field-input, field-label: picker-field-label,
+        feedback: picker-feedback, field: picker-field, field-input: picker-field-input, field-label: picker-field-label,
         fields: picker-fields, footer: picker-footer, format: picker-format,
         format-button: picker-format-button, format-live: picker-format-live, format-text: picker-format-text, grid: picker-grid,
         grid-brightness: picker-grid-brightness, grid-handle: picker-grid-handle,
         grid-saturation: picker-grid-saturation, icon: picker-icon, sample: picker-sample,
         swatch: picker-swatch, swatches: picker-swatches, value: picker-value"
       ?invalid=${this.resolvedFeedback !== ''}
+      .feedback=${this.resolvedFeedback}
       ?alpha=${this.alpha}
       ?channel-fields=${this.channelFields}
       ?no-format=${this.noFormat}

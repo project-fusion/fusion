@@ -338,3 +338,18 @@ describe('the panel of a color input takes content of your own', () => {
     expect(slots[1]?.assignedElements()[0]?.textContent).toBe('Reset')
   })
 })
+
+describe('the open panel of a color input', () => {
+  test('shows the field’s message under the picker, once the field says it', async () => {
+    const host = await field()
+    const inner = part(host, 'picker') as HTMLElement & { feedback: string }
+    await type(host, 'not a color')
+    expect(inner.feedback).toBe('')
+    host.dispatchEvent(new Event('change'))
+    await host.updateComplete
+    expect(inner.feedback).toContain('Enter a color')
+    await type(host, '#ff0000')
+    await host.updateComplete
+    expect(inner.feedback).toBe('')
+  })
+})

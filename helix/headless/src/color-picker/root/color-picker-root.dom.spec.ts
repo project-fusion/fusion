@@ -851,3 +851,25 @@ describe('a number field for each channel', () => {
     expect(host.value).toBe('#ff00ff')
   })
 })
+
+describe('the message under a color picker', () => {
+  test('shows `feedback`, describes the square and the value by it, and is a verdict', async () => {
+    const host = await picker('value="#ff0000" feedback="Pick a darker red"')
+    const message = host.shadowRoot?.querySelector('[part="feedback"]') as HTMLElement
+    expect(message.textContent?.trim()).toBe('Pick a darker red')
+    expect(
+      host.shadowRoot?.querySelector('[part="grid-saturation"]')?.getAttribute('aria-describedby'),
+    ).toBe(message.id)
+    const internals = (host as unknown as { internals: ElementInternals }).internals
+    expect(internals.validity.customError).toBe(true)
+    expect(internals.validationMessage).toBe('Pick a darker red')
+  })
+
+  test('is not drawn while there is none', async () => {
+    const host = await picker('value="#ff0000"')
+    expect(host.shadowRoot?.querySelector('[part="feedback"]')).toBeNull()
+    expect(
+      host.shadowRoot?.querySelector('[part="grid-saturation"]')?.hasAttribute('aria-describedby'),
+    ).toBe(false)
+  })
+})
