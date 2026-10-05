@@ -2,6 +2,7 @@ import {
   AriaForwardController,
   capturePointer,
   closestInstance,
+  commaList,
   customElement,
   HelixBeforeCollapseEvent,
   HelixBeforeResizeEvent,
@@ -14,6 +15,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { snapTo } from '../snap.js'
 
 /**
  * The inline size under which `orientation="auto"` stacks, in pixels.
@@ -322,6 +324,21 @@ export class HelixHeadlessSplitter extends HelixElement {
     this.reached = undefined
     this.requestUpdate('position', previous)
   }
+
+  /**
+   * Where a dragged divider snaps, comma separated, as Web Awesome's split
+   * panel does: a bare number is a percentage and a length such as `240px` is
+   * measured along the splitter, so `snap="25, 50, 75"` or `snap="240px, 50"`.
+   * The arrow keys move by `step` and do not snap.
+   */
+  @property()
+  snap = ''
+
+  /**
+   * How close a drag has to come to a snap point to land on it, in pixels.
+   */
+  @property({ attribute: 'snap-threshold', type: Number })
+  snapThreshold = 12
 
   /**
    * How far one arrow key press moves the divider, as a percentage.
@@ -758,7 +775,18 @@ export class HelixHeadlessSplitter extends HelixElement {
        right, so dragging right makes it *larger*. */
     const raw = ((along - origin.start) / origin.length) * 100
     const rtl = !this.vertical && isRtl(this)
-    this.move(rtl ? 100 - raw : raw)
+    this.move(this.snapped(rtl ? 100 - raw : raw, origin.length))
+  }
+
+  /** Where a drag at `position` lands once `snap` has had its say. */
+  private snapped(position: number, length: number): number {
+    if (this.snap === '' || length <= 0) {
+      return position
+    }
+    const points = commaList(this.snap)
+      .map((point) => this.toPercent(point, Number.NaN))
+      .filter((point) => Number.isFinite(point))
+    return snapTo(position, points, (this.snapThreshold / length) * 100)
   }
 
   private readonly handlePointerUp = (event: PointerEvent): void => {
