@@ -804,3 +804,56 @@ describe('a combobox with an option that is a link', () => {
     expect(host.open).toBe(true)
   })
 })
+
+describe('a combobox that waits for typing to rest', () => {
+  test('narrows once, after `filter-delay`, and an arrow narrows at once', async () => {
+    const host = await combobox('filter-delay="40"')
+    const sent: string[] = []
+    ;(host as HTMLElement).addEventListener('helix-filter', (event) =>
+      sent.push((event as CustomEvent<{ value: string }>).detail.value),
+    )
+    await type(host, 'r')
+    await type(host, 'ru')
+    expect(sent).toEqual([])
+    expect(shown(host)).toEqual(['Rust', 'Ruby', 'Go'])
+    await new Promise((done) => setTimeout(done, 80))
+    await settle(host)
+    expect(sent).toEqual(['ru'])
+    expect(shown(host)).toEqual(['Rust', 'Ruby'])
+    await type(host, 'g')
+    await press(host, 'ArrowDown')
+    expect(sent).toEqual(['ru', 'g'])
+    expect(shown(host)).toEqual(['Go'])
+  })
+})
+
+describe('the statuses a combobox hands its list', () => {
+  const list = (host: Updatable): HTMLElement => part(host as HTMLElement, 'listbox') as HTMLElement
+
+  test('`no-results-text` and `load-error` reach the list', async () => {
+    const host = await combobox('no-results-text="Nothing like it" load-error="Offline"')
+    const inner = list(host) as HTMLElement & { loadError: string; noResultsText?: string }
+    expect(inner.noResultsText).toBe('Nothing like it')
+    expect(inner.loadError).toBe('Offline')
+    expect(part(inner, 'error')?.textContent?.trim()).toBe('Offline')
+    const plain = await combobox('no-results-text="Nothing like it"')
+    await type(plain, 'zzz')
+    const list2 = list(plain)
+    await settle(list2 as unknown as Updatable)
+    expect(part(list2, 'empty')?.textContent?.trim()).toBe('Nothing like it')
+  })
+
+  test('a slotted no-results is handed on only while there is one', async () => {
+    const bare = await combobox()
+    const forward = (host: Updatable) =>
+      (host as HTMLElement).shadowRoot?.querySelector('slot[name="no-results"]')
+    expect(forward(bare)?.hasAttribute('slot')).toBe(false)
+    document.body.innerHTML = `<helix-headless-combobox label="L">
+      <helix-headless-option value="rs">Rust</helix-headless-option>
+      <b slot="no-results">No language by that name</b>
+    </helix-headless-combobox>`
+    const given = document.body.firstElementChild as Updatable
+    await settle(given)
+    expect(forward(given)?.getAttribute('slot')).toBe('no-results')
+  })
+})
