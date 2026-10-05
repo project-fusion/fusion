@@ -73,6 +73,13 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
   protected override readonly announcesInput = true
 
   /**
+   * Whether a phone capitalizes as the reader types: `off`, `sentences`,
+   * `words` or `characters`, as the platform's `autocapitalize`.
+   */
+  @property()
+  override autocapitalize = ''
+
+  /**
    * What the browser may autofill in the field, as an HTML `autocomplete`
    * token.
    *
@@ -100,10 +107,38 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
   clearLabel = 'Clear'
 
   /**
+   * The key the on-screen keyboard shows for Enter, as the platform's
+   * `enterkeyhint`: `search`, `send`, `go`, `next`, `previous`, `done` or
+   * `enter`.
+   */
+  @property({ attribute: 'enterkeyhint' })
+  override enterKeyHint = ''
+
+  /**
+   * The keyboard a phone offers, as the platform's `inputmode`, such as
+   * `numeric` for a code typed as text.
+   */
+  @property({ attribute: 'inputmode' })
+  override inputMode = ''
+
+  /**
+   * The greatest value, for `type="number"`. Number Input adds steppers and
+   * keys to the same bounds.
+   */
+  @property()
+  max = ''
+
+  /**
    * Most characters the value may have.
    */
   @property({ attribute: 'maxlength', type: Number })
   maxLength?: number
+
+  /**
+   * The least value, for `type="number"`.
+   */
+  @property()
+  min = ''
 
   /**
    * Fewest characters the value may have.
@@ -143,6 +178,13 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
    */
   @property({ attribute: 'readonly', reflect: true, type: Boolean })
   readOnly = false
+
+  /**
+   * The step a valid value is a multiple of, counted from `min`, for
+   * `type="number"`.
+   */
+  @property()
+  step = ''
 
   /**
    * Whether the password is currently showing.
@@ -283,7 +325,12 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
    * where it was.
    */
   private readonly handleClear = (): void => {
-    this.requestValue('')
+    /* `change` as well as `input`, because the reader is done: the native
+       control never saw an edit, so no `change` of its own would follow, and a
+       consumer saving on `change` never learned the field was emptied. */
+    if (this.value !== '' && this.requestValue('')) {
+      this.announceChange()
+    }
     const control = this.control
     if (control) {
       restoreValue(control, this.value)
@@ -426,6 +473,12 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
         pattern=${this.pattern || nothing}
         minlength=${this.minLength ?? nothing}
         maxlength=${this.maxLength ?? nothing}
+        min=${this.min || nothing}
+        max=${this.max || nothing}
+        step=${this.step || nothing}
+        inputmode=${this.inputMode || nothing}
+        enterkeyhint=${this.enterKeyHint || nothing}
+        autocapitalize=${this.autocapitalize || nothing}
         aria-describedby=${this.describedBy ?? nothing}
         aria-invalid=${this.invalidity ?? nothing}
         ?disabled=${this.isDisabled}

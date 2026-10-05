@@ -77,6 +77,25 @@ describe('textarea', () => {
     expect(reported.get('notes.dir')).toBe('ltr')
   })
 
+  /* The browser saves what a control hands it as the restore state, and with
+     `dirname` that was the `FormData`, which the restore cannot read: a form
+     brought back by the back button came back empty. The double records the
+     value alone, so the call is read where it is made. */
+  test('dirname saves the text as the restore state, beside the two entries', async () => {
+    const host = (await mount(
+      '<helix-headless-textarea label="A" name="notes" dirname="notes.dir" default-value="hi"></helix-headless-textarea>',
+    )) as Updatable & { internals: ElementInternals; value: string }
+    const states: unknown[] = []
+    const report = host.internals.setFormValue.bind(host.internals)
+    host.internals.setFormValue = (value, state) => {
+      states.push(state)
+      report(value, state)
+    }
+    host.value = 'typed'
+    await host.updateComplete
+    expect(states.at(-1)).toBe('typed')
+  })
+
   test('a field with no dirname reports the plain string, not a one-entry FormData', async () => {
     // The common case, and the reason the branch exists: a `FormData` holding
     // one entry says the same thing at more cost.

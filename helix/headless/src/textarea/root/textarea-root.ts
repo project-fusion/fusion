@@ -315,7 +315,11 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
 
   /** Reports the value and the validity the host stands behind. */
   private sync(): void {
-    this.internals.setFormValue(this.formValue())
+    /* The text as the restore state, because with `dirName` the value is a
+       `FormData`, and the browser saves what it is given: a restored form
+       handed that back, which the restore cannot read, and the field came back
+       empty. */
+    this.internals.setFormValue(this.formValue(), this.value)
     const control = this.control
     if (!control) {
       return
