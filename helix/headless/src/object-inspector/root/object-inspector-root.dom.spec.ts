@@ -219,3 +219,72 @@ describe('an object inspector', () => {
     expect(rows(element)).toHaveLength(0)
   })
 })
+
+describe('an object inspector given a new value', () => {
+  /* An inspector showing live data, a polled response or a debug panel, closed
+     every branch and went back to the root on each update. */
+  test('keeps the branches a reader opened and the row the keys were on', async () => {
+    const host = await inspector()
+    await press(host, 'ArrowDown')
+    await press(host, 'ArrowRight')
+    expect(rows(host)).toHaveLength(8)
+    await press(host, 'ArrowDown')
+    expect(active(host)?.textContent).toContain('branch')
+    host.value = { ...VALUE, meta: { branch: 'next' } }
+    await host.updateComplete
+    expect(rows(host)).toHaveLength(8)
+    expect(active(host)?.textContent).toContain('"next"')
+  })
+
+  test('opens a branch the old value did not have to the default depth', async () => {
+    const host = await inspector('', { a: 1 })
+    host.value = { a: 1, added: { inner: true } }
+    await host.updateComplete
+    const added = rows(host).find((row) => row.textContent?.includes('added'))
+    expect(added?.getAttribute('aria-expanded')).toBe('false')
+    expect(rows(host)[0]?.getAttribute('aria-expanded')).toBe('true')
+  })
+})
+
+describe('an object inspector read by its keys', () => {
+  test('moves to the next key that starts with what was typed', async () => {
+    const host = await inspector()
+    await press(host, 't')
+    expect(active(host)?.textContent).toContain('tags')
+    await press(host, 't')
+    expect(active(host)?.textContent).toContain('target')
+  })
+
+  test('opens every branch beside the active row with `*`', async () => {
+    const host = await inspector()
+    await press(host, 'ArrowDown')
+    await press(host, '*')
+    const opened = rows(host)
+      .filter((row) => row.getAttribute('aria-level') === '2')
+      .filter((row) => row.getAttribute('aria-expanded') === 'true')
+    expect(opened.map((row) => row.querySelector('[part="key"]')?.textContent)).toEqual([
+      'meta',
+      'tags',
+    ])
+  })
+})
+
+describe('an object inspector in another language', () => {
+  test('counts and names its tree in the words it is given', async () => {
+    const host = await inspector(
+      'item-label="{count} Eintrag" items-label="{count} Einträge" key-label="{count} Schlüssel" keys-label="{count} Schlüssel" tree-label="Wert"',
+    )
+    const counts = [...(host.shadowRoot?.querySelectorAll('[part="count"]') ?? [])].map((count) =>
+      count.textContent?.trim(),
+    )
+    expect(counts).toEqual(['6 Schlüssel', '1 Schlüssel', '2 Einträge'])
+    expect(tree(host).getAttribute('aria-label')).toBe('Wert')
+  })
+
+  /* A heading beside the inspector named a generic wrapper, and the tree was
+     announced as "Value". */
+  test('takes a name written on the host onto the tree', async () => {
+    const host = await inspector('aria-label="Response"')
+    expect(tree(host).getAttribute('aria-label')).toBe('Response')
+  })
+})
