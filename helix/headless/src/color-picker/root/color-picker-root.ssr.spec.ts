@@ -31,4 +31,15 @@ describe('color picker server output', () => {
       ),
     ).toBe(false)
   })
+  test('the square and the presets are served with the color named', () => {
+    /* A reader on a page that has not upgraded yet hears what the server sent,
+       so the name has to be in that markup and not only in the client's. */
+    const markup = ssr(
+      html`<helix-headless-color-picker value="#ff0000" swatches="#0000ff"></helix-headless-color-picker>`,
+    )
+    expect(partTag(markup, 'grid-saturation')).toContain(
+      'aria-valuetext="Saturation 100%, Brightness 100%, vibrant red"',
+    )
+    expect(partTag(markup, 'swatch')).toContain('aria-label="dark vibrant blue"')
+  })
 })
