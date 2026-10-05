@@ -193,6 +193,26 @@ describe('line numbers and a highlighter', () => {
     expect(copyValue(el)).toBe('const a = 1')
   })
 
+  /* Shiki's `codeToHtml` returns a `<pre tabindex="0"><code>` of its own,
+     which sat below the gutter's first number and added a tab stop. */
+  test("draws Shiki's lines in the block's own pre, with no second tab stop", async () => {
+    const el = (await mount(
+      '<helix-headless-code-block line-numbers></helix-headless-code-block>',
+    )) as Block
+    el.highlight = (code) =>
+      `<pre class="shiki" tabindex="0" style="background-color:#fff"><code>${code
+        .split('\n')
+        .map((line) => `<span class="line">${line}</span>`)
+        .join('\n')}</code></pre>`
+    el.textContent = 'one\ntwo'
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await el.updateComplete
+    expect(el.shadowRoot?.querySelectorAll('pre')).toHaveLength(1)
+    expect(el.shadowRoot?.querySelector('[part="code"] [tabindex]')).toBeNull()
+    expect(el.shadowRoot?.querySelectorAll('[part="code"] .line')).toHaveLength(2)
+    expect(copyValue(el)).toBe('one\ntwo')
+  })
+
   test('is not asked about empty code', async () => {
     let asked = 0
     const el = (await mount('<helix-headless-code-block></helix-headless-code-block>')) as Block

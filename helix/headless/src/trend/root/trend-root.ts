@@ -56,7 +56,7 @@ const readDirection = (value: string | undefined): (typeof DIRECTIONS)[Direction
  * @documentation https://fusion.dev/helix/components/trend
  *
  * @slot - The metric that moved.
- * @slot icon - Replaces the arrow, such as with a glyph of your own set. Slot the one for the current direction.
+ * @slot icon - Replaces the arrow, such as with a glyph of your own set. Slot the one for the current direction. Hidden from screen readers, since the direction is also a word.
  * @slot label - The period the metric moved over.
  *
  * @csspart direction - The direction as a word, for people who cannot see the arrow.
@@ -131,8 +131,13 @@ export class HelixHeadlessTrend extends HelixElement {
     /* Written out rather than through `drawIcon`, because this one needs a
        `part` and a part behind an interpolation is one the manifest cannot see:
        the helper's `part=${…}` binding took `[part="icon"]` out of the
-       stylesheet's reach. */
-    return html`<slot name="icon"
+       stylesheet's reach.
+
+       **Hidden on the slot, so a glyph the page slots is hidden too.** The
+       word beside it says the direction; a slotted `^` or an unlabeled image
+       read as well put "^ Up, better 8%" into the name of a button holding
+       the trend. */
+    return html`<slot aria-hidden="true" name="icon"
       ><svg
         aria-hidden="true"
         data-glyph

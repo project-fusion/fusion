@@ -4,6 +4,7 @@ import { property } from 'lit/decorators.js'
 import { unsafeHTML } from 'lit/directives/unsafe-html.js'
 import { html } from 'lit/static-html.js'
 import '../../copy-button/index.js'
+import { highlightedLines } from '../highlight.js'
 import { gutterNumbers, lineCount } from '../lines.js'
 import { type DiffFile, type DiffHunk, type DiffLine, pairLines, parsePatch } from '../patch.js'
 
@@ -116,7 +117,9 @@ export class HelixHeadlessCodeBlock extends HelixElement {
    * Called with the code as written and returning HTML, such as the output of
    * Shiki's `codeToHtml` or Prism's `highlight`. **The markup is drawn as
    * given**, so it has to escape the code it was handed, which those
-   * highlighters do. Bind the language in the function you pass. The code
+   * highlighters do. A `<pre>` and `<code>` around the whole of it, which
+   * Shiki writes, are taken off, so the lines sit level with the gutter's
+   * numbers and the block keeps one tab stop. Bind the language in the function you pass. The code
    * stays in the slot, so the copy button copies it as written and a reader
    * without the script still has it. Not called on a server, which has no code
    * to read, nor for a diff.
@@ -256,7 +259,8 @@ export class HelixHeadlessCodeBlock extends HelixElement {
       return this.renderDiff(files)
     }
     const text = this.text
-    const highlighted = this.highlight && text !== '' ? this.highlight(text) : undefined
+    const highlighted =
+      this.highlight && text !== '' ? highlightedLines(this.highlight(text)) : undefined
     /* The slot stays either way, hidden under highlighted markup, so a change
        to the code still reaches `slotchange` and the code stays the page's. */
     const code =
