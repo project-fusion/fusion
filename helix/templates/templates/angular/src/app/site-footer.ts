@@ -8,8 +8,8 @@ import { DOCS } from './docs'
  * and a caption, which on a tall window left the bottom third of the screen
  * empty. The footer is also where the links you want once belong.
  *
- * `data-link="subtle"` reads as body text until it is hovered, which suits a
- * row of links under a rule.
+ * `data-link="quiet"` sets a link in the muted ink with no underline, and it
+ * takes the foreground on hover, which suits a row of links under a rule.
  */
 @Component({
   host: { class: 'site-footer' },

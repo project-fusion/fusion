@@ -6,8 +6,7 @@
       "id": "react-vite",
       "named": [
         "index.html",
-        "package.json",
-        "src/site-header.tsx"
+        "package.json"
       ],
       "title": "React (Vite)"
     },
@@ -16,7 +15,6 @@
       "id": "react-nextjs",
       "named": [
         "app/layout.tsx",
-        "app/site-header.tsx",
         "package.json"
       ],
       "title": "React (Next.js)"
@@ -26,8 +24,7 @@
       "id": "vue-vite",
       "named": [
         "index.html",
-        "package.json",
-        "src/SiteHeader.vue"
+        "package.json"
       ],
       "title": "Vue (Vite)"
     },
@@ -37,7 +34,6 @@
       "named": [
         "angular.json",
         "package.json",
-        "src/app/site-header.html",
         "src/index.html"
       ],
       "title": "Angular"
@@ -47,8 +43,7 @@
       "id": "svelte-vite",
       "named": [
         "index.html",
-        "package.json",
-        "src/SiteHeader.svelte"
+        "package.json"
       ],
       "title": "Svelte (Vite)"
     },
@@ -57,8 +52,7 @@
       "id": "solid-vite",
       "named": [
         "index.html",
-        "package.json",
-        "src/site-header.tsx"
+        "package.json"
       ],
       "title": "Solid (Vite)"
     }

@@ -37,12 +37,10 @@
 
 <helix-app-header material="glass" sticky>
   <!-- The wordmark is the way back to the first page, so there is no third
-       destination in the bar saying the same thing. It is also the only name of
-       the project on the screen. The mark is a placeholder for your own, drawn
-       in `--helix-color-brand-mark`, the token for the brand as a graphic. -->
+       destination in the bar saying the same thing. It names the library the
+       starter is built on, and it is the place for your own name or logo. -->
   <a class="wordmark" data-link="quiet" href="#/" slot="start">
-    <helix-icon name="cube"></helix-icon>
-    <helix-text variant="body-strong">__PROJECT_NAME__</helix-text>
+    <helix-text variant="body-strong">Helix</helix-text>
   </a>
 
   <!-- The links are yours. Navigation owns the marker that travels between them

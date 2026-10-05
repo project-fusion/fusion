@@ -53,38 +53,38 @@ export const templates: readonly Template[] = [
   {
     description: 'React and TypeScript on Vite. The shortest path to a running app.',
     id: 'react-vite',
-    named: ['index.html', 'package.json', 'src/site-header.tsx'],
+    named: ['index.html', 'package.json'],
     title: 'React (Vite)',
   },
   {
     description:
       'React and TypeScript on the Next.js App Router, with the three pages as real routes.',
     id: 'react-nextjs',
-    named: ['app/layout.tsx', 'app/site-header.tsx', 'package.json'],
+    named: ['app/layout.tsx', 'package.json'],
     title: 'React (Next.js)',
   },
   {
     description: 'Vue and TypeScript on Vite.',
     id: 'vue-vite',
-    named: ['index.html', 'package.json', 'src/SiteHeader.vue'],
+    named: ['index.html', 'package.json'],
     title: 'Vue (Vite)',
   },
   {
     description: 'Angular and TypeScript on the Angular CLI.',
     id: 'angular',
-    named: ['angular.json', 'package.json', 'src/app/site-header.html', 'src/index.html'],
+    named: ['angular.json', 'package.json', 'src/index.html'],
     title: 'Angular',
   },
   {
     description: 'Svelte and TypeScript on Vite.',
     id: 'svelte-vite',
-    named: ['index.html', 'package.json', 'src/SiteHeader.svelte'],
+    named: ['index.html', 'package.json'],
     title: 'Svelte (Vite)',
   },
   {
     description: 'Solid and TypeScript on Vite.',
     id: 'solid-vite',
-    named: ['index.html', 'package.json', 'src/site-header.tsx'],
+    named: ['index.html', 'package.json'],
     title: 'Solid (Vite)',
   },
 ]

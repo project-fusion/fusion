@@ -39,12 +39,14 @@ const figure = new Intl.NumberFormat('en-US')
         </div>
       </div>
 
-      <!-- **The library at work, on the first screen.** The figures are the roster
-           the data view draws, read from the same module, so the panel is the app
-           itself, on glass over the light. -->
-      <helix-card class="specimen" material="glass" separation="outlined">
-        <helix-text as="h2" slot="header" variant="title">The roster, in three figures</helix-text>
-        <helix-stat-group divided>
+      <!-- **The library at work, on the first screen.** The figures are the
+           roster the data view draws, read from the same module, so the panel
+           is the app itself. Frosted, so the light behind it never washes out
+           a label, and with no link of its own: the button beside it goes to
+           the same page. -->
+      <helix-card class="specimen" material="frosted" separation="outlined">
+        <helix-text as="h2" slot="header" variant="title">Roster</helix-text>
+        <helix-stat-group>
           <helix-stat>
             {{ roster.people }}
             <span slot="label">People</span>
@@ -58,7 +60,6 @@ const figure = new Intl.NumberFormat('en-US')
             <span slot="label">Reviews</span>
           </helix-stat>
         </helix-stat-group>
-        <a data-link href="#/overview" slot="footer">Open the data view</a>
       </helix-card>
     </header>
 
