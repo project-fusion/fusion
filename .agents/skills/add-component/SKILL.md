@@ -48,9 +48,11 @@ procedure.
   first five.
 - Each `@property` gets a one-line description.
 
-New event? Add a class to `helix/core/src/events/events.ts` carrying its own
-`eventName` and augmenting `HTMLElementEventMap`, then reference it as
-`@event {HelixThingEvent} thing-change - …`.
+New event? Add a class in a module of its own beside
+`helix/core/src/events/events.ts`, named after the event, carrying its own
+`static readonly eventName`. Export it and add it to `registry` in `events.ts`,
+which types `HTMLElementEventMap`, and add its name to `names.ts`. Then
+reference it as `@event {HelixThingEvent} thing-change - …`.
 
 **Watch the SSR rules in `helix/CONVENTIONS.md`.** State seeded in
 `connectedCallback` does not exist on the server, and `querySelector` is
