@@ -92,6 +92,10 @@ export class HelixHeadlessCodeBlock extends HelixElement {
 
   /**
    * The copy button's name and tooltip text before a copy.
+   *
+   * Where the block has a name, the button says it too, such as "Copy code,
+   * app.ts", so each copy button on a page with several blocks is told apart.
+   * In a diff, that is each file's own name.
    */
   @property({ attribute: 'copy-label' })
   copyLabel = 'Copy code'
@@ -296,12 +300,12 @@ export class HelixHeadlessCodeBlock extends HelixElement {
    */
   private renderHeader(name: string, value?: string): TemplateResult | typeof nothing {
     return name
-      ? html`<div part="header"><span part="label">${name}</span>${this.renderCopy(value)}</div>`
+      ? html`<div part="header"><span part="label">${name}</span>${this.renderCopy(value, name)}</div>`
       : nothing
   }
 
-  private renderCopy(value?: string): TemplateResult | typeof nothing {
-    return this.noCopy ? nothing : this.renderCopyButton(value)
+  private renderCopy(value?: string, name?: string): TemplateResult | typeof nothing {
+    return this.noCopy ? nothing : this.renderCopyButton(value, name)
   }
 
   /**
@@ -313,8 +317,11 @@ export class HelixHeadlessCodeBlock extends HelixElement {
    * interpolated rather than written, so `tier` resolves it: this renders the
    * base button, and a styled subclass that sets `tier` renders the styled one
    * from the same template.
+   *
+   * @param value The text the button copies.
+   * @param name The name of what it copies, which its label carries.
    */
-  protected renderCopyButton(value: string = this.text): TemplateResult {
+  protected renderCopyButton(value: string = this.text, name = this.label): TemplateResult {
     return html`<${this.tag('copy-button')}
       part="copy"
       exportparts="button: copy-button, text: copy-text, mark: copy-mark, live: copy-live, tooltip: copy-tooltip,
@@ -323,7 +330,7 @@ export class HelixHeadlessCodeBlock extends HelixElement {
         tooltip-arrow-top: copy-tooltip-arrow-top, tooltip-bottom: copy-tooltip-bottom,
         tooltip-left: copy-tooltip-left, tooltip-right: copy-tooltip-right, tooltip-top: copy-tooltip-top"
       copied-label=${this.copiedLabel}
-      label=${this.copyLabel}
+      label=${name ? `${this.copyLabel}, ${name}` : this.copyLabel}
       .value=${value}
     ></${this.tag('copy-button')}>`
   }

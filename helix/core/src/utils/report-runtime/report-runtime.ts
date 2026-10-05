@@ -31,6 +31,8 @@ export type RuntimeKind =
   | 'misread-direction'
   /** A React handler prop names an event the element never dispatches itself. */
   | 'misplaced-handler'
+  /** An Image has no `alt`, so a screen reader announces its file name. */
+  | 'missing-alt'
   /** The three.js driver could not load its layout, so the notes stay where they started. */
   | 'missing-layout'
   /** A control has no accessible name, so a screen reader announces it by its role alone. */
