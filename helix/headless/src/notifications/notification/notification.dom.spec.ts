@@ -257,3 +257,49 @@ describe('structure', () => {
     expect(label).toBe('Could not reach the server')
   })
 })
+
+describe('unread, for a reader who cannot see the mark', () => {
+  /* The unread mark is a dot and a weight, so read and unread rows were the
+     same row to a screen reader. An empty image named for the state is read
+     with the row and draws nothing. */
+  const said = (element: HTMLElement): string | null =>
+    element.shadowRoot?.querySelector('[part="label"] [role="img"]')?.getAttribute('aria-label') ??
+    null
+
+  test('an unread row says so, in words a consumer can translate', async () => {
+    expect([said(await item()), said(await item('unread-label="Non lu"'))]).toEqual([
+      'Unread',
+      'Non lu',
+    ])
+  })
+
+  test('and a read row says nothing extra', async () => {
+    const element = await item()
+    element.markRead(true)
+    await element.updateComplete
+    expect(said(element)).toBeNull()
+  })
+})
+
+describe('focus when a row is dismissed', () => {
+  /* The dismiss control had focus and left with its row, so focus fell to the
+     body. It moves to the row after, as a list's own neighbor. */
+  test('moves to the next row', async () => {
+    const feed = await mount(
+      `<helix-headless-notifications>
+        <helix-headless-notification id="one" dismissible>One</helix-headless-notification>
+        <helix-headless-notification id="two" dismissible>Two</helix-headless-notification>
+      </helix-headless-notifications>`,
+    )
+    const [one, two] = [...feed.querySelectorAll('helix-headless-notification')] as Item[]
+    await one?.updateComplete
+    await two?.updateComplete
+    const dismiss = one?.shadowRoot?.querySelector<HTMLElement>('[part="dismiss"]')
+    dismiss?.focus()
+    dismiss?.click()
+    expect([one?.isConnected, two?.shadowRoot?.activeElement?.getAttribute('part')]).toEqual([
+      false,
+      'dismiss',
+    ])
+  })
+})

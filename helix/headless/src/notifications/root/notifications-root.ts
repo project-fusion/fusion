@@ -1,5 +1,6 @@
 import {
   customElement,
+  focusableElements,
   HelixElement,
   HelixReadEvent,
   hostAria,
@@ -377,8 +378,34 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
       <div part="footer"><slot name="footer"></slot></div>`
   }
 
-  private readonly handleMarkAll = (): void => {
+  /**
+   * Marks everything read, and keeps focus in the feed.
+   *
+   * The button shows only while something is unread, so the press that
+   * succeeds removes the button it was made on. Focus moves to the first row's
+   * control, or the first control left in the feed.
+   */
+  private readonly handleMarkAll = (event: Event): void => {
+    const button = event.currentTarget as HTMLElement
+    const focused = this.shadowRoot?.activeElement === button
     this.markEveryoneRead()
+    if (!focused) {
+      return
+    }
+    void this.updateComplete.then(() => {
+      if (button.isConnected) {
+        return
+      }
+      const target =
+        this.items
+          .map(
+            (row) =>
+              row.shadowRoot?.querySelector<HTMLElement>('[part="dismiss"]') ??
+              focusableElements(row)[0],
+          )
+          .find((one) => one !== undefined) ?? focusableElements(this)[0]
+      target?.focus()
+    })
   }
 }
 

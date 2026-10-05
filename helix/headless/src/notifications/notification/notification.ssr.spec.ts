@@ -26,12 +26,14 @@ describe('notification server output', () => {
        back out of the document, which is true of any element that renders
        nothing at all. What the notification owes is the named box the words
        land in, read off a render with no children. */
-    expect(
-      rendered(
-        ssr(html`<helix-headless-notification at=${at}></helix-headless-notification>`),
-        'helix-headless-notification',
-      ),
-    ).toContain('<div part="label"><slot></slot></div>')
+    /* An unread row also serves the word that says so, inside the same box,
+       so the server's markup is already read out correctly. */
+    const served = rendered(
+      ssr(html`<helix-headless-notification at=${at}></helix-headless-notification>`),
+      'helix-headless-notification',
+    )
+    expect(served).toMatch(/<div part="label">.*<slot><\/slot><\/div>/su)
+    expect(served).toContain('<span role="img" aria-label="Unread"></span>')
   })
 
   test('the exact instant is in `datetime`, whatever clock computed the reading', () => {

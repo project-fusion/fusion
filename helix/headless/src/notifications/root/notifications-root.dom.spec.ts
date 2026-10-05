@@ -349,3 +349,28 @@ describe('an empty feed', () => {
     expect(part(host, 'empty')).toBeNull()
   })
 })
+
+describe('focus after marking everything read', () => {
+  /* The control shows only while something is unread, so the press that works
+     takes away the button it was made on. Focus moves to the first row. */
+  test('moves to the first row instead of falling to the body', async () => {
+    const feed = (await mount(
+      `<helix-headless-notifications mark-all>
+        <helix-headless-notification dismissible>One</helix-headless-notification>
+      </helix-headless-notifications>`,
+    )) as HTMLElement & { updateComplete: Promise<unknown> }
+    const row = feed.querySelector('helix-headless-notification') as HTMLElement & {
+      updateComplete: Promise<unknown>
+    }
+    await row.updateComplete
+    const button = feed.shadowRoot?.querySelector<HTMLElement>('[part="mark-all"]')
+    button?.focus()
+    if (feed.shadowRoot?.activeElement !== button) {
+      return
+    }
+    button?.click()
+    await feed.updateComplete
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(row.shadowRoot?.activeElement?.getAttribute('part')).toBe('dismiss')
+  })
+})
