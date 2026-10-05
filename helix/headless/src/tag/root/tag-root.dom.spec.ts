@@ -116,3 +116,38 @@ describe('tag start', () => {
     expect(slotted(tag, 'start')).toHaveLength(0)
   })
 })
+
+describe('a tag on its own', () => {
+  test('is a link under `href`, around its label', async () => {
+    const tag = await mount('<helix-headless-tag href="/fruit/apple">Apple</helix-headless-tag>')
+    const link = part(tag, 'link')
+    expect([link?.tagName, link?.getAttribute('href')]).toEqual(['A', '/fruit/apple'])
+    expect(link?.querySelector('slot')).not.toBeNull()
+  })
+
+  /* A disabled link loses its address, which takes it out of the tab order and
+     stops a press going anywhere. */
+  test('takes no press when disabled: no address and a disabled remove button', async () => {
+    const tag = await mount(
+      '<helix-headless-tag disabled dismissible href="/fruit/apple">Apple</helix-headless-tag>',
+    )
+    expect(part(tag, 'link')?.hasAttribute('href')).toBe(false)
+    expect(part(tag, 'link')?.getAttribute('aria-disabled')).toBe('true')
+    expect((part(tag, 'dismiss') as HTMLButtonElement).disabled).toBe(true)
+  })
+
+  test('takes a glyph of your own for its remove button', async () => {
+    const tag = await mount(
+      '<helix-headless-tag dismissible>Apple<span slot="dismiss-icon">×</span></helix-headless-tag>',
+    )
+    expect(part(tag, 'dismiss')?.querySelector('slot[name="dismiss-icon"]')).not.toBeNull()
+    expect(slotted(tag, 'dismiss-icon').map((one) => one.textContent)).toEqual(['×'])
+  })
+
+  /* A tag outside a group is no row and draws no cell: the markup a lone tag
+     served before the group existed. */
+  test('renders no cell outside a group', async () => {
+    const tag = await mount('<helix-headless-tag>Apple</helix-headless-tag>')
+    expect(part(tag, 'cell')).toBeNull()
+  })
+})

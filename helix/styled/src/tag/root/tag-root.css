@@ -167,6 +167,69 @@ slot[name="start"]::slotted(*) {
   opacity: 0.75;
 }
 
+/*
+ * **A link tag looks like the tag it is.** The label keeps the tag's ink and
+ * takes an underline under the pointer, and it truncates as the plain label
+ * does, being the flex item now.
+ */
+[part="link"] {
+  color: inherit;
+  display: block;
+  min-inline-size: 0;
+  text-decoration: none;
+}
+
+@media (hover: hover) {
+  [part="link"][href]:hover {
+    text-decoration: underline;
+  }
+}
+
+[part="link"]:focus-visible {
+  border-radius: var(--helix-radii-sm);
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* Out of reach, and drawn so: the platform's own disabled step. */
+:host([disabled]) {
+  opacity: var(--tag-disabled-opacity, 0.5);
+}
+
+:host([disabled]) [part="dismiss"] {
+  cursor: not-allowed;
+}
+
+/*
+ * **In a `Tag.Group` the tag is a row and its cell takes focus.** The cell
+ * stretches over the host's padding, so the ring goes round the whole tag, and
+ * lays out the tag's content as the host does, so a grouped tag looks like a
+ * lone one.
+ */
+[part="cell"] {
+  align-items: center;
+  align-self: stretch;
+  border-radius: inherit;
+  cursor: default;
+  display: inline-flex;
+  gap: var(--helix-space-2xs);
+  margin-inline: calc(var(--_tag-inset) * -1);
+  min-inline-size: 0;
+  padding-inline: var(--_tag-inset);
+}
+
+[part="cell"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* Selected in a group that selects: the tone filled, as `solid` draws it. */
+:host(:state(selected)) {
+  --_tag-fill: color-mix(in oklab, var(--_tag-color) 82%, var(--helix-color-foreground));
+  --_tag-edge: var(--_tag-fill);
+  --_tag-label: var(--helix-color-foreground-inverse);
+}
+
 /* Print: a label. */
 @media print {
   :host {
