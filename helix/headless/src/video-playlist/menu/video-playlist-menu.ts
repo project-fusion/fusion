@@ -35,8 +35,11 @@ import '../../menu/index.js'
  * @event {HelixSelectEvent} helix-select - An entry was chosen. The event carries its value, and the playlist listens for it. Cancelable: cancel it to keep the current entry.
  *
  * @csspart entry - One entry in the menu.
+ * @csspart entry-end - The column at the end of an entry, which holds its shortcut. It is always present.
  * @csspart entry-item - The entry's row. It is an `<a>` when `href` is set.
  * @csspart entry-mark - The mark at the end of an entry: a check mark when it is checked, or a caret when it opens a submenu.
+ * @csspart entry-shortcut - The key drawn for an entry's shortcut. The playlist's entries set none.
+ * @csspart entry-shortcut-kbd - The key inside `entry-shortcut`.
  * @csspart entry-start - The column at the start of an entry. It is a slot and is always present.
  * @csspart menu - The menu that holds the entries.
  * @csspart menu-back - The button that goes back from a submenu.
@@ -220,7 +223,8 @@ export class HelixHeadlessVideoPlaylistMenu extends HelixElement {
       ${this.entries.map(
         (entry) => html`<${this.tag('menu-item')}
           part="entry"
-      exportparts="item: entry-item, mark: entry-mark, start: entry-start"
+      exportparts="end: entry-end, item: entry-item, mark: entry-mark, shortcut: entry-shortcut,
+        shortcut-kbd: entry-shortcut-kbd, start: entry-start"
           value=${entry.value}
           checkable
           ?checked=${entry.current}

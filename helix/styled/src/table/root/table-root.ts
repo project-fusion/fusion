@@ -19,15 +19,15 @@ import '../../checkbox/index.js'
  * @documentation https://fusion.dev/helix/components/table
  *
  * @slot - The table's rows.
- * @slot caption - Words that name the table, shown above it in the weight of a heading.
+ * @slot heading - Words that name the table, shown above it in the weight of a heading.
  *
  * @csspart live - A live region that repeats the empty and loading text, so screen readers announce it when it changes. Visually hidden in the styled tier.
  * @csspart table - The grid.
  *
- * @cssproperty --table-caption-color - The color of the caption.
- * @cssproperty --table-caption-gap - The space between the caption and the grid.
- * @cssproperty --table-caption-text - The font size of the caption.
  * @cssproperty --table-columns - Track list for the columns. It overrides the track list worked out from the columns.
+ * @cssproperty --table-title-color - The color of the words in the `heading` slot.
+ * @cssproperty --table-title-gap - The space between the `heading` slot and the grid.
+ * @cssproperty --table-title-text - The font size of the words in the `heading` slot.
  */
 @customElement('helix-table')
 export class HelixTable extends HelixHeadlessTable {

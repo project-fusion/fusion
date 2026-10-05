@@ -131,8 +131,8 @@ const numberOf = (value: string): number => Number(value.replaceAll(',', ''))
  * the rows in the sorted order. `helix-sort` asks first, so you can refuse it
  * and reorder the rows yourself.
  *
- * A `caption` names the table: slot a heading or a line of text into it, and
- * the table is named by its words. An `aria-label` or `aria-labelledby` on the
+ * The `heading` slot names the table: slot a heading or a line of text into
+ * it, and the table is named by its words. An `aria-label` or `aria-labelledby` on the
  * host wins over it.
  *
  * `selectable` adds a column of checkboxes. Each row is known by its `value`,
@@ -154,7 +154,7 @@ const numberOf = (value: string): number => Number(value.replaceAll(',', ''))
  * @documentation https://fusion.dev/helix/components/table
  *
  * @slot - The table's rows.
- * @slot caption - Words that name the table, shown above it, such as a heading.
+ * @slot heading - Words that name the table, shown above it, such as a heading.
  *
  * @event {HelixSelectEvent} helix-select - The selection is about to change. The event carries every selected key, separated by commas. Cancelable: cancel it to keep the current selection.
  * @event {HelixSelectedEvent} helix-selected - Fired after the selection changes, with every selected key, separated by commas.
@@ -326,8 +326,8 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
   @state()
   private selectedState: string | undefined = undefined
 
-  /** Whether the caption names the table, so taking it away clears only this element's own name. */
-  private captioned = false
+  /** Whether the heading names the table, so taking it away clears only this element's own name. */
+  private headed = false
 
   /**
    * Carries a host `aria-label` and `aria-labelledby` to the grid, which is
@@ -528,25 +528,24 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
   }
 
   /**
-   * Names the table by its caption, where the host names it no other way.
+   * Names the table by its heading, where the host names it no other way.
    *
-   * Through element reflection, because the caption is the consumer's markup
+   * Through element reflection, because the heading is the consumer's markup
    * and the table is in this shadow root, which an id cannot reach across.
    */
-  private nameByCaption(): void {
+  private nameByHeading(): void {
     const named = this.hasAttribute('aria-label') || this.hasAttribute('aria-labelledby')
-    const caption = named ? [] : this.captions
-    this.captioned = reflectElements(
+    this.headed = reflectElements(
       this.partNamed('table'),
       'ariaLabelledByElements',
-      caption,
-      this.captioned,
+      named ? [] : this.headings,
+      this.headed,
     )
   }
 
-  /** What the caption slot is given. */
-  private get captions(): Element[] {
-    return [...(this.children ?? [])].filter((child) => child.getAttribute('slot') === 'caption')
+  /** What the heading slot is given. */
+  private get headings(): Element[] {
+    return [...(this.children ?? [])].filter((child) => child.getAttribute('slot') === 'heading')
   }
 
   /**
@@ -746,7 +745,7 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
   protected override get slotted(): Element[] {
     const columns = new Set<Element>(this.tableColumns)
     return [...(this.children ?? [])].filter(
-      (child) => !columns.has(child) && child.getAttribute('slot') !== 'caption',
+      (child) => !columns.has(child) && child.getAttribute('slot') !== 'heading',
     )
   }
 
@@ -767,8 +766,8 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     head.assign(...this.tableColumns)
     body.assign(...this.arrangedRows)
     this.renderRoot
-      ?.querySelector<HTMLSlotElement>('slot[name="caption"]')
-      ?.assign(...this.captions)
+      ?.querySelector<HTMLSlotElement>('slot[name="heading"]')
+      ?.assign(...this.headings)
   }
 
   /**
@@ -847,7 +846,7 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     this.alignCells()
     this.markSorted()
     this.markSelected()
-    this.nameByCaption()
+    this.nameByHeading()
   }
 
   /** The heading of the checkbox column, which selects every row. */
@@ -875,7 +874,7 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
 
   protected override render(): TemplateResult {
     const template = this.template
-    return html`<slot name="caption"></slot><div
+    return html`<slot name="heading"></slot><div
       part="table"
       role="table"
       aria-busy=${this.loading ? 'true' : nothing}
