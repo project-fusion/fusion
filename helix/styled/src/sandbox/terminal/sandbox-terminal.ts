@@ -1,7 +1,14 @@
-import { type ConsoleDetail, customElement, HelixElement } from '@fusion.dev/helix-core'
+import {
+  type ConsoleDetail,
+  customElement,
+  HelixBeforeChangeEvent,
+  HelixElement,
+  requestChange,
+} from '@fusion.dev/helix-core'
 import type { CSSResultGroup, TemplateResult } from 'lit'
 import { html, nothing } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { wordsConverter } from '../../shared/words/words.js'
 import { type ConsoleLevel, LEVELS, shows } from '../levels.js'
 import { styles } from './sandbox-terminal.css.js'
 
@@ -47,6 +54,9 @@ const LIMIT = 200
  * @status stable
  * @aliases Console, Output
  * @documentation https://fusion.dev/helix/components/sandbox
+ *
+ * @event {Event} change - Fired after the reader chose another level in the filter. `level` holds it.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the level filter changes, with the level chosen, `log` for every level. Cancelable: cancel it to keep the current level.
  *
  * @csspart clear - The button that empties the log, under `controls`.
  * @csspart controls - The row holding the clear button and the level filter, under `controls`.
@@ -108,9 +118,10 @@ export class HelixSandboxTerminal extends HelixElement {
   /**
    * What each choice of the level filter reads, for a page in another
    * language, keyed by level, such as `{ warn: '…' }`. A level left out keeps
-   * its English words. As an attribute it is that object as JSON.
+   * its English words. As an attribute it is that object as JSON, and JSON
+   * that does not parse is no words.
    */
-  @property({ attribute: 'level-words', type: Object })
+  @property({ attribute: 'level-words', converter: wordsConverter })
   levelWords: Partial<Record<ConsoleLevel, string>> = {}
 
   @state()
@@ -166,10 +177,26 @@ export class HelixSandboxTerminal extends HelixElement {
     }
   }
 
-  /** Takes the level the reader chose in the filter. */
+  /**
+   * Takes the level the reader chose in the filter, unless a listener
+   * refused it, and then says so with the select's own `change`, which stops
+   * at the shadow root otherwise. A refusal puts the select back.
+   */
   private readonly handleLevel = (event: Event): void => {
-    const chosen = (event.target as HTMLSelectElement).value as ConsoleLevel
-    this.level = chosen === 'log' ? undefined : chosen
+    const field = event.target as HTMLSelectElement
+    const taken = requestChange({
+      apply: (next: string) => {
+        this.level = next === 'log' ? undefined : (next as ConsoleLevel)
+      },
+      event: (next) => new HelixBeforeChangeEvent({ value: next }),
+      host: this,
+      next: field.value,
+    })
+    if (taken) {
+      this.relayNativeEvent(event)
+    } else {
+      field.value = this.level ?? 'log'
+    }
   }
 
   /** The clear button and the level filter, under `controls`. */
@@ -182,7 +209,7 @@ export class HelixSandboxTerminal extends HelixElement {
         ${LEVELS.map(
           (one) =>
             html`<option value=${one} ?selected=${(this.level ?? 'log') === one}>
-              ${this.levelWords[one] ?? LEVEL_WORDS[one]}
+              ${this.levelWords?.[one] ?? LEVEL_WORDS[one]}
             </option>`,
         )}
       </select>

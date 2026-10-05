@@ -133,6 +133,47 @@ describe('sandbox terminal', () => {
     expect(part(term, 'empty')).not.toBeNull()
   })
 
+  /* Lit's `Object` converter turned JSON that did not parse into `null`, and
+     the render read a level off it and threw, so the terminal drew nothing. */
+  test('words that do not parse keep the English ones, and the terminal still draws', async () => {
+    const term = (await mount(
+      `<helix-sandbox-terminal controls level-words="oops"></helix-sandbox-terminal>`,
+    )) as Terminal
+    expect(part(term, 'log')).not.toBeNull()
+    const choices = [...(part(term, 'filter')?.querySelectorAll('option') ?? [])]
+    expect(choices.map((choice) => choice.textContent?.trim())).toEqual([
+      'All levels',
+      'Info and above',
+      'Warnings and errors',
+      'Errors',
+    ])
+  })
+
+  test('the filter asks before it changes, and says so after', async () => {
+    const term = (await mount(
+      '<helix-sandbox-terminal controls></helix-sandbox-terminal>',
+    )) as Terminal & { level?: string | undefined }
+    const heard: string[] = []
+    term.addEventListener('helix-before-change', (event) => {
+      heard.push(`before ${(event as CustomEvent<{ value: string }>).detail.value}`)
+    })
+    term.addEventListener('change', () => heard.push(`change ${term.level}`))
+    const filter = part(term, 'filter') as HTMLSelectElement
+    filter.value = 'error'
+    filter.dispatchEvent(new Event('change'))
+    await term.updateComplete
+    expect(heard).toEqual(['before error', 'change error'])
+
+    const refuse = (event: Event): void => event.preventDefault()
+    term.addEventListener('helix-before-change', refuse)
+    filter.value = 'log'
+    filter.dispatchEvent(new Event('change'))
+    await term.updateComplete
+    expect(term.level).toBe('error')
+    expect(filter.value).toBe('error')
+    expect(heard).toEqual(['before error', 'change error', 'before log'])
+  })
+
   test('`level` hides the quieter lines without the controls', async () => {
     const term = (await mount(
       '<helix-sandbox-terminal level="error"></helix-sandbox-terminal>',
