@@ -2311,3 +2311,58 @@ describe('canvas at its edges', () => {
     expect(saved.nodes[0]?.x).toBe(0)
   })
 })
+
+/**
+ * What the board holds, in the order of its tree: each slot by the cards
+ * assigned to it, and each layer of connections by the connections in it.
+ */
+const readingOrder = (host: Canvas): string[] =>
+  [...(part(host, 'board')?.children ?? [])].flatMap((child): string[] => {
+    if (child instanceof HTMLSlotElement) {
+      return child.name.startsWith('card-')
+        ? child.assignedElements().map((one) => one.getAttribute('name') ?? '')
+        : []
+    }
+    return [...child.querySelectorAll('[part="edge-target"]')].map(
+      (one) => one.getAttribute('data-edge') ?? '',
+    )
+  })
+
+/* The connections were one layer drawn before every card, so a screen reader
+   read every connection and then every card, while the arrows walked each card
+   and then the connections leaving it. */
+describe('the order a screen reader reads a board in', () => {
+  test('is the walk: each card, then the connections leaving it', async () => {
+    const host = await canvas()
+    expect(readingOrder(host)).toEqual(await walk(host))
+  })
+
+  test('follows a card moved past another', async () => {
+    const host = await canvas()
+    card(host, 'a').y = 500
+    await host.updateComplete
+    await host.updateComplete
+    expect(readingOrder(host)).toEqual(['pair', 'b', 'edge:e2', 'c', 'a', 'edge:e1'])
+  })
+
+  test('keeps focus on a connection whose card moves in the walk', async () => {
+    const host = await canvas()
+    const target = host.shadowRoot?.querySelector<SVGElement>('[data-edge="edge:e1"]')
+    target?.focus()
+    card(host, 'a').y = 500
+    await host.updateComplete
+    await host.updateComplete
+    expect(host.shadowRoot?.activeElement?.getAttribute('data-edge')).toBe('edge:e1')
+  })
+
+  test('assigns the header, the footer and the empty state to their slots', async () => {
+    const host = await canvas('', `<p slot="header">Above</p><p slot="footer">Below</p>${BOARD}`)
+    const slotted = (name: string): string[] =>
+      (
+        host.shadowRoot
+          ?.querySelector<HTMLSlotElement>(`slot[name="${name}"]`)
+          ?.assignedElements() ?? []
+      ).map((one) => one.textContent ?? '')
+    expect([slotted('header'), slotted('footer')]).toEqual([['Above'], ['Below']])
+  })
+})

@@ -274,7 +274,7 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  * @csspart edge - One connector between two cards.
  * @csspart edge-end - An end of a selected connection. Drag it, or click it to pick it up.
  * @csspart edge-target - A wider, invisible line over a connection, which receives focus and presses.
- * @csspart edges - The layer the connectors are drawn in.
+ * @csspart edges - A layer the connectors are drawn in: one holding the arrowhead, and one after each card holding the connections leaving it, so they are read in the order the arrows walk them. Give it `z-index: -1` to draw it under the cards.
  * @csspart footer - The strip below the board.
  * @csspart fullscreen - The button that makes the board fill the screen.
  * @csspart gesture-hint - Words over the board for a moment when it lets a gesture pass to the page, such as how to zoom it.
@@ -305,6 +305,15 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  */
 @customElement('helix-headless-canvas')
 export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
+  /** The connection whose target had focus as an update began, and that target. */
+  private focusedEdge: { key: string; target: Element } | undefined
+
+  /** Each card is assigned to its own slot, in the order the arrows walk them. */
+  static override shadowRootOptions: ShadowRootInit = {
+    ...HelixElement.shadowRootOptions,
+    slotAssignment: 'manual',
+  }
+
   /** The text read with a card to say where its connections come from, with `{cards}`. */
   @property({ attribute: 'comes-from-label' })
   comesFromLabel = 'from {cards}'
@@ -2959,6 +2968,15 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   protected override updated(changed: PropertyValues): void {
     this.keying = undefined
     super.updated(changed)
+    this.assign()
+    /* A connection is drawn after the card it leaves, so a render that moves
+       that card in the walk draws it in another layer, and the target that
+       had focus is gone or is another connection's. Focus goes back to it. */
+    const edge = this.focusedEdge
+    this.focusedEdge = undefined
+    if (edge && (!edge.target.isConnected || edge.target.getAttribute('data-edge') !== edge.key)) {
+      this.focusStop(edge.key)
+    }
     /* A hold that ended some other way than being put down or put back, a
        connection finished with Enter, still stops listening for its end. */
     if (this.holding && !this.held) {
@@ -3142,6 +3160,14 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   protected override willUpdate(changed: PropertyValues): void {
     this.keying = this.keyAll()
     super.willUpdate(changed)
+    /* Asked of the shadow root only while focus is in it, which the document
+       reports as the host: a card holding focus is the page's own element. */
+    const focused =
+      this.ownerDocument?.activeElement === this
+        ? (this.renderRoot as ShadowRoot).activeElement
+        : undefined
+    const key = focused?.getAttribute?.('data-edge')
+    this.focusedEdge = focused && key ? { key, target: focused } : undefined
     const drawn = extent(this.nodes)
     const origin = { x: drawn.x - MARGIN, y: drawn.y - MARGIN }
     /* Held where the plane's corner moved, so the cards stay where they are on
@@ -3262,23 +3288,17 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   }
 
   /**
-   * The connectors, in one layer under the cards.
+   * The layer that holds the arrowhead and the connection being drawn.
    *
    * **The arrowhead is measured in the board's own units, not in multiples of
    * the line's width.** `markerUnits="strokeWidth"` multiplies by the stroke, so
    * an eight-unit head on a two-pixel line drew a sixteen-pixel triangle that
    * read as a shape of its own rather than as a direction. In user space it is
    * eight units of the document, which is what the cards are measured in, and it
-   * grows with the zoom like everything else.
+   * grows with the zoom like everything else. Each card's connections reach it
+   * by its id, which every layer in this shadow root shares.
    */
   private renderEdges(origin: { x: number; y: number }, box: { width: number; height: number }) {
-    const elements = new Map(this.edgeElements.map((child) => [this.keyOfElement(child), child]))
-    const stop =
-      this.stop !== undefined && this.keyNamed(this.stop) === this.stop ? this.stop : undefined
-    const pickedKeys = new Set(this.picked)
-    /* **Not hidden as a whole any more**, because a connection is now something
-       a reader focuses. What is drawn is hidden, piece by piece: the painted
-       line and its label are pictures of what the target already names. */
     return html`<svg
       part="edges"
       role="none"
@@ -3299,60 +3319,169 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
           <path part="arrow" d="M0 0 L8 4 L0 8 z" />
         </marker>
       </defs>
-      ${this.edges.map((edge) => {
-        const key = this.keyOf(edge)
-        const element = elements.get(key)
-        const drawn = this.geometryOf(edge, origin)
-        /* The connection whose end is in hand is drawn by the draft instead,
-           so a reader sees it lifted rather than drawn twice. **Lifted from
-           the keyboard, its target stays**, with only the line gone: the
-           target is what has focus, and taking it away dropped the reader to
-           the page with no card able to take the tab stop. */
-        const lifted = this.linking?.edge === key && !this.linking.pressed
-        if (!drawn || (lifted && this.linking?.pointer !== undefined)) {
-          return nothing
-        }
-        const { from, to } = drawn
-        /* **`svg` and not `html`, which is the whole of whether this draws.** A
-           nested template is parsed in the namespace its tag names, so a `<path>`
-           built with `html` inside an `<svg>` is an unknown HTML element that
-           takes the attributes, answers `querySelector` and paints nothing. It
-           cost a spec that passed against a board with no lines on it. */
-        const ends = heads(edge)
-        /* The target comes first so the painted line after it can answer its
-           focus with a sibling selector, and the painted line takes no pointer
-           so a press lands on the target under it. */
-        return svg`<path
-            part="edge-target"
-            aria-description=${[element?.tone ? this.toneLabels[element.tone] : undefined, edge.label].filter(Boolean).join(', ') || nothing}
-            aria-label=${fillTemplate(this.connectionLabel, { from: this.textOf(from), to: this.textOf(to) })}
-            d=${drawn.d}
-            data-edge=${key}
-            fill="none"
-            aria-keyshortcuts="Enter F2 C Delete"
-            role="button"
-            tabindex=${key === stop ? '0' : '-1'}
-          />
-          ${
-            lifted
-              ? nothing
-              : svg`<path
-            part="edge"
-            aria-hidden="true"
-            d=${drawn.d}
-            data-selected=${pickedKeys.has(key) ? '' : nothing}
-            data-tone=${element?.tone ?? nothing}
-            data-variant=${element?.variant ?? nothing}
-            fill="none"
-            marker-end=${ends.end ? `url(#${ARROW})` : nothing}
-            marker-start=${ends.start ? `url(#${ARROW})` : nothing}
-            style=${custom(element, '--canvas-edge-color') ? `--_canvas-edge-color: ${custom(element, '--canvas-edge-color')}` : nothing}
-          />`
-          }
-`
-      })}
       ${this.renderDraft(origin)}
     </svg>`
+  }
+
+  /**
+   * Each card, and then the connections leaving it, in the order the arrows
+   * walk them.
+   *
+   * **The order is the accessibility tree's.** The connections were one layer
+   * drawn before every card, so a screen reader's reading went through every
+   * connection and then every card, while the arrow keys went card by card
+   * with each card's connections after it. Each card now has a slot of its
+   * own, assigned by hand, with its connections' layer straight after it, so
+   * both orders are the walk. The cards are read before hydration, which
+   * knows none, from the default slot after these, as they always were.
+   *
+   * **Every layer sits under the cards by its stacking.** A layer after a card
+   * in the tree would otherwise paint over it, so the styled sheet sets
+   * `--helix-layer-beneath` on `edges`, and a headless page sets `z-index: -1`.
+   */
+  private renderStops(origin: { x: number; y: number }, box: { width: number; height: number }) {
+    const elements = new Map(this.edgeElements.map((child) => [this.keyOfElement(child), child]))
+    const stop =
+      this.stop !== undefined && this.keyNamed(this.stop) === this.stop ? this.stop : undefined
+    const picked = new Set(this.picked)
+    const groups: { key: string; edges: CanvasEdge[] }[] = []
+    for (const one of this.walk) {
+      if (one.kind === 'node') {
+        groups.push({ edges: [], key: one.key })
+      } else {
+        groups.at(-1)?.edges.push(one.edge)
+      }
+    }
+    return groups.map(
+      ({ edges }, at) =>
+        html`<slot name=${`card-${at}`}></slot>${
+          edges.length === 0
+            ? nothing
+            : html`<svg
+                part="edges"
+                role="none"
+                viewBox=${`0 0 ${box.width} ${box.height}`}
+                width=${box.width}
+                height=${box.height}
+              >
+                ${edges.map((edge) => this.renderEdge(edge, origin, elements, stop, picked))}
+              </svg>`
+        }`,
+    )
+  }
+
+  /** One connector: the target that takes focus and presses, and the line it paints. */
+  private renderEdge(
+    edge: CanvasEdge,
+    origin: { x: number; y: number },
+    elements: Map<string, HelixHeadlessCanvasEdge>,
+    stop: string | undefined,
+    pickedKeys: Set<string>,
+  ) {
+    const key = this.keyOf(edge)
+    const element = elements.get(key)
+    const drawn = this.geometryOf(edge, origin)
+    /* The connection whose end is in hand is drawn by the draft instead,
+       so a reader sees it lifted rather than drawn twice. **Lifted from
+       the keyboard, its target stays**, with only the line gone: the
+       target is what has focus, and taking it away dropped the reader to
+       the page with no card able to take the tab stop. */
+    const lifted = this.linking?.edge === key && !this.linking.pressed
+    if (!drawn || (lifted && this.linking?.pointer !== undefined)) {
+      return nothing
+    }
+    const { from, to } = drawn
+    /* **`svg` and not `html`, which is the whole of whether this draws.** A
+       nested template is parsed in the namespace its tag names, so a `<path>`
+       built with `html` inside an `<svg>` is an unknown HTML element that
+       takes the attributes, answers `querySelector` and paints nothing. It
+       cost a spec that passed against a board with no lines on it. */
+    const ends = heads(edge)
+    /* The target comes first so the painted line after it can answer its
+       focus with a sibling selector, and the painted line takes no pointer
+       so a press lands on the target under it. */
+    return svg`<path
+        part="edge-target"
+        aria-description=${[element?.tone ? this.toneLabels[element.tone] : undefined, edge.label].filter(Boolean).join(', ') || nothing}
+        aria-label=${fillTemplate(this.connectionLabel, { from: this.textOf(from), to: this.textOf(to) })}
+        d=${drawn.d}
+        data-edge=${key}
+        fill="none"
+        aria-keyshortcuts="Enter F2 C Delete"
+        role="button"
+        tabindex=${key === stop ? '0' : '-1'}
+      />
+      ${
+        lifted
+          ? nothing
+          : svg`<path
+        part="edge"
+        aria-hidden="true"
+        d=${drawn.d}
+        data-selected=${pickedKeys.has(key) ? '' : nothing}
+        data-tone=${element?.tone ?? nothing}
+        data-variant=${element?.variant ?? nothing}
+        fill="none"
+        marker-end=${ends.end ? `url(#${ARROW})` : nothing}
+        marker-start=${ends.start ? `url(#${ARROW})` : nothing}
+        style=${custom(element, '--canvas-edge-color') ? `--_canvas-edge-color: ${custom(element, '--canvas-edge-color')}` : nothing}
+      />`
+      }
+`
+  }
+
+  /**
+   * Sends each card to its slot, and everything else to the slot it names.
+   *
+   * A root that assigns by hand routes nothing by itself, the named slots
+   * included, so the header, the footer and the empty state are assigned here
+   * too. Paired with the walk by position, as the template was built, and a
+   * card the walk does not reach, a second one of the same name, goes to the
+   * default slot with everything else. On a root a server sent, which routes
+   * by name, each card is sent to its slot by name instead.
+   */
+  private assign(): void {
+    if (!this.childrenKnown) {
+      return
+    }
+    /* The first card of each name, which is the one the walk reaches. */
+    const cards = new Map<string, HelixHeadlessCanvasNode>()
+    for (const card of this.cards) {
+      if (!cards.has(card.name)) {
+        cards.set(card.name, card)
+      }
+    }
+    const placed = new Map<Element, string>()
+    for (const [at, one] of this.walk.filter((stop) => stop.kind === 'node').entries()) {
+      const card = cards.get(one.key)
+      if (card) {
+        placed.set(card, `card-${at}`)
+      }
+    }
+    if (this.assignsByName) {
+      for (const card of this.cards) {
+        this.route(card, placed.get(card))
+      }
+      return
+    }
+    const root = this.renderRoot
+    const rest: Element[] = []
+    const named = new Map<string, Element[]>()
+    for (const child of this.knownChildren) {
+      const name = placed.get(child) ?? child.getAttribute('slot') ?? undefined
+      if (name === undefined) {
+        rest.push(child)
+      } else {
+        named.set(name, [...(named.get(name) ?? []), child])
+      }
+    }
+    for (const slot of root?.querySelectorAll?.<HTMLSlotElement>('slot') ?? []) {
+      const wanted = slot.name === '' ? rest : (named.get(slot.name) ?? [])
+      const had = slot.assignedNodes()
+      if (had.length !== wanted.length || had.some((one, at) => one !== wanted[at])) {
+        slot.assign?.(...wanted)
+      }
+    }
   }
 
   /**
@@ -3490,6 +3619,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
           @focusin=${this.handleFocusIn}
         >
           ${this.renderEdges(origin, box)} ${this.renderLabels(origin)}
+          ${this.renderStops(origin, box)}
           <slot @slotchange=${this.handleSlotChange}></slot>
           ${this.renderEnds(origin)}
           ${this.renderEditor(origin)}
