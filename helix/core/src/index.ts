@@ -30,6 +30,10 @@ export {
   showCaption,
 } from './controllers/cue-controller/cue-controller.js'
 export {
+  DelayController,
+  type DelayOptions,
+} from './controllers/delay-controller/delay-controller.js'
+export {
   DisabledCascadeController,
   type DisabledCascadeOptions,
 } from './controllers/disabled-cascade-controller/disabled-cascade-controller.js'
@@ -95,6 +99,11 @@ export {
   SourceController,
   type SourceHost,
 } from './controllers/source-controller/source-controller.js'
+export {
+  drawStatus,
+  type SayOptions,
+  StatusController,
+} from './controllers/status-controller/status-controller.js'
 export {
   SwipeController,
   type SwipeOptions,

@@ -3,6 +3,7 @@ import {
   countLabel,
   customElement,
   drawIcon,
+  drawStatus,
   type FacetDetail,
   HelixFacetEvent,
   HelixFormElement,
@@ -13,6 +14,7 @@ import {
   MixinTokens,
   PopoverController,
   restoreValue,
+  StatusController,
   scrollItemIntoView,
 } from '@fusion.dev/helix-core'
 import { x } from '@fusion.dev/helix-icons'
@@ -207,13 +209,8 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
   @property({ attribute: 'suggestions-label' })
   suggestionsLabel = '{count} suggestions'
 
-  /** Whether the live region is rendered: from the first count said. */
-  @state()
-  private spoke = false
-
-  /** What the live region says. */
-  @state()
-  private said = ''
+  /** The live region, rendered from the first count said. */
+  private readonly status = new StatusController(this)
 
   /** The count last said, so the same panel is said once. */
   private saidCount = -1
@@ -255,8 +252,7 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
     if (count < 0) {
       return
     }
-    this.spoke = true
-    this.said = countLabel(count, this.suggestionLabel, this.suggestionsLabel, this.lang)
+    this.status.sayNow(countLabel(count, this.suggestionLabel, this.suggestionsLabel, this.lang))
   }
 
   /**
@@ -1007,7 +1003,7 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
     >
       <slot name="suggestions" @slotchange=${this.handleSuggestions}></slot>
     </div>
-    ${this.spoke ? html`<span part="live" role="status">${this.said}</span>` : nothing}
+    ${drawStatus(this.status)}
     ${this.renderHint()}${this.renderFeedback()}`
   }
 }
