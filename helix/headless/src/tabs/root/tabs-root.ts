@@ -1,4 +1,5 @@
 import {
+  AriaForwardController,
   customElement,
   HelixElement,
   IndicatorController,
@@ -65,8 +66,17 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
     surface: () => this.partNamed('tabs'),
   })
 
+  /** Carries a host `aria-label` and `aria-labelledby` to the tab list. */
+  protected readonly aria = new AriaForwardController(this, {
+    label: true,
+    target: () => this.partNamed('tabs'),
+  })
+
   /**
    * The tab list's name, read by screen readers.
+   *
+   * An `aria-label` or `aria-labelledby` on the host names the tab list too,
+   * and wins over this.
    */
   @property()
   label = 'Tabs'
@@ -135,7 +145,11 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
      element refuses with `helix-before-activate` instead, which the mixin
      dispatches below. */
   private readonly handleSelection = (event: Event): void => {
-    if (event.defaultPrevented) {
+    /* Only a choice made by one of this set's own tabs. `helix-select` bubbles
+       and is composed, and a tree, a menu or another tab set inside a panel
+       sends it too: acted on, it set `active` to a value no tab has, and the
+       set fell back to its first tab under the reader. */
+    if (event.defaultPrevented || !this.tabs.includes(event.target as HelixHeadlessTab)) {
       return
     }
     this.requestActive((event as CustomEvent<{ value: string }>).detail.value)

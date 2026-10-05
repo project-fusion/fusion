@@ -1,11 +1,16 @@
 import {
+  AriaForwardController,
   closestInstance,
   customElement,
   HelixElement,
   inlineStep,
+  keyClaimed,
   MixinCollection,
   MixinControllerActive,
   scrollItemIntoView,
+  slottedWords,
+  Typeahead,
+  typesCharacter,
   whenHydrated,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -36,6 +41,9 @@ const KEYS = new Set([
  * Items are found with `instanceof`, never by tag name, so the headless tier
  * does not depend on the styled one.
  *
+ * Typing a letter moves to the next visible item whose name starts with it,
+ * and `*` opens every branch beside the focused item.
+ *
  * @since 0.1.0
  * @status stable
  * @category navigation
@@ -57,9 +65,21 @@ const KEYS = new Set([
 export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(HelixElement)) {
   /**
    * Accessible name for the tree.
+   *
+   * An `aria-label` or `aria-labelledby` on the host names the tree too, and
+   * wins over this.
    */
   @property()
   label = 'Tree'
+
+  /** Carries a host `aria-label` and `aria-labelledby` to the tree. */
+  protected readonly aria = new AriaForwardController(this, {
+    label: true,
+    target: () => this.partNamed('tree'),
+  })
+
+  /** The letters typed so far, for moving to an item by its name. */
+  private readonly typeahead = new Typeahead()
 
   /**
    * What a deeper level means: `peer` for no change, `subordinate` for a lower
@@ -145,6 +165,12 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
      are still synced either way: what a refusal stops is the selection moving,
      not the tree redrawing what it already holds. */
   private readonly handleSelection = (event: Event): void => {
+    /* Only a choice made by one of this tree's own items. A menu in a row's
+       `end` slot sends `helix-select` too, and it bubbles out of the row. */
+    const origin = event.target
+    if (!(origin instanceof HelixHeadlessTreeItem) || !this.items.includes(origin)) {
+      return
+    }
     if (!event.defaultPrevented) {
       this.requestActive((event as CustomEvent<{ value: string }>).detail.value)
     }
@@ -168,8 +194,14 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
        is no longer reachable. Bound to the selection instead, a branch opening
        or a child arriving throws the reader back to the selected row from
        wherever they had arrowed to. */
-    const held = visible.find((item) => item.focusable)
+    /* A stop inside a branch that has just closed goes to the nearest row
+       still showing above it, which is where a reader who closed the branch
+       is. */
+    const held =
+      visible.find((item) => item.focusable) ??
+      this.visibleAncestor(this.items.find((item) => item.focusable))
     const stop = held ?? chosen
+    const heads = this.nesting === 'heading'
 
     for (const item of this.items) {
       const selected = item.value !== '' && item.value === this.active
@@ -193,8 +225,60 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
         item.selected = selected
         item.focusable = focusable
         item.level = level
+        item.heads = heads
       })
     }
+  }
+
+  /** The nearest item around `item` that a reader can see, if any. */
+  private visibleAncestor(item: HelixHeadlessTreeItem | undefined): HelixHeadlessTreeItem | undefined {
+    const visible = this.visibleItems
+    let node = item?.parentElement ?? null
+    while (node && node !== this) {
+      if (node instanceof HelixHeadlessTreeItem && visible.includes(node)) {
+        return node
+      }
+      node = node.parentElement
+    }
+    return undefined
+  }
+
+  /**
+   * Moves to the next visible item whose name starts with the letters typed,
+   * or opens every branch beside the focused item on `*`.
+   *
+   * Returns whether the press was one of those.
+   */
+  private handleTyping(current: HelixHeadlessTreeItem, event: KeyboardEvent): boolean {
+    if (!typesCharacter(event) || keyClaimed(event)) {
+      return false
+    }
+    if (event.key === ' ' && !this.typeahead.typing()) {
+      return false
+    }
+    if (event.key === '*') {
+      const siblings = [...(current.parentElement?.children ?? [])].filter(
+        (node): node is HelixHeadlessTreeItem =>
+          node instanceof HelixHeadlessTreeItem && node.slot === current.slot,
+      )
+      for (const sibling of siblings) {
+        if (sibling.isBranch && !sibling.open) {
+          sibling.requestOpen(true)
+        }
+      }
+      this.syncItems()
+      return true
+    }
+    const visible = this.visibleItems
+    const at = this.typeahead.match(
+      event.key,
+      visible.map((item) => slottedWords(item, [''])),
+      visible.indexOf(current),
+    )
+    if (at >= 0) {
+      this.focusOn(visible[at])
+    }
+    return true
   }
 
   private move(from: HelixHeadlessTreeItem, delta: number): void {
@@ -233,9 +317,17 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
      * way, which is the util that exists for exactly this. `closest('*')` is a
      * no-op: it returns the element it was called on. */
     const current = closestInstance(event.target as Element | null, HelixHeadlessTreeItem)
-    if (!current || !this.items.includes(current) || !KEYS.has(event.key)) {
+    if (!current || !this.items.includes(current)) {
       return
     }
+    if (this.handleTyping(current, event)) {
+      event.preventDefault()
+      return
+    }
+    if (!KEYS.has(event.key)) {
+      return
+    }
+    this.typeahead.reset()
 
     /* In and out are along the line, which is where a shut branch's chevron
        points: right on a left-to-right page and left on a right-to-left one,
@@ -269,6 +361,9 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
       }
     } else {
       if (current.isBranch) {
+        if (current.choosable) {
+          current.select()
+        }
         current.toggleOpen()
         this.syncItems()
       } else {
@@ -286,10 +381,15 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
   /**
    * A branch opened or closed, whoever did it.
    *
-   * Listening for the item's own open events rather than calling `syncItems`
-   * from each keyboard path: that misses the pointer, and collapsing a branch
-   * by clicking its chevron then leaves the tree's one tab stop on a row inside
-   * the subtree just hidden. It also covers a consumer setting `open` directly.
+   * Listening for the item's own `toggle` rather than calling `syncItems` from
+   * each keyboard path: that misses the pointer, and collapsing a branch by
+   * clicking its row then left the tree's one tab stop on a row inside the
+   * subtree just hidden, so Tab passed over the tree. It also covers a
+   * consumer setting `open` directly.
+   *
+   * **In capture**, because `toggle` does not bubble, which is the platform's
+   * shape for it. The `helix-before-*` pair this listened for does not bubble
+   * either, and is sent before the branch has moved.
    */
   private readonly handleBranch = (): void => {
     this.syncItems()
@@ -298,8 +398,7 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
   override connectedCallback(): void {
     super.connectedCallback()
     this.addEventListener('helix-select', this.handleSelection)
-    this.addEventListener('helix-before-open', this.handleBranch)
-    this.addEventListener('helix-before-close', this.handleBranch)
+    this.addEventListener('toggle', this.handleBranch, true)
     this.addEventListener('keydown', this.handleKeydown)
     /* Nested items arrive on a *branch's* slot, not on this element's, so the
        root's `slotchange` never fires for them: without this, a subtree
@@ -313,8 +412,7 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('helix-select', this.handleSelection)
-    this.removeEventListener('helix-before-open', this.handleBranch)
-    this.removeEventListener('helix-before-close', this.handleBranch)
+    this.removeEventListener('toggle', this.handleBranch, true)
     this.removeEventListener('keydown', this.handleKeydown)
     this.watcher?.disconnect()
     this.watcher = undefined
@@ -327,7 +425,7 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    if (changed.has('active')) {
+    if (changed.has('active') || changed.has('nesting')) {
       this.syncItems()
     }
   }

@@ -27,6 +27,10 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * **`href` makes the whole row a link**, rendered as an `<a>`. Enter, middle
  * click, and the status bar then work anywhere on the row.
  *
+ * Pressing a branch, or Enter or Space on it, opens or closes it. A branch with
+ * a `value` is chosen as well and sends `helix-select`, unless the tree has
+ * `nesting="heading"`, where a branch names the list under it.
+ *
  * @since 0.1.0
  * @status stable
  * @aliases TreeNode, Branch, Leaf
@@ -133,6 +137,14 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
   focusable = false
 
   /**
+   * @internal Set by the tree: whether a branch heads the list under it, as
+   * under `nesting="heading"`. Such a branch only opens and closes when it is
+   * pressed, because it names a list and is not a destination of its own.
+   */
+  @property({ attribute: false })
+  heads = false
+
+  /**
    * Whether anything is slotted into `children`.
    *
    * Read from the children before each render, so the first one draws the
@@ -150,6 +162,15 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
     slot?.addEventListener('slotchange', () => {
       this.branch = slot.assignedElements().length > 0
     })
+  }
+
+  /**
+   * @internal Whether pressing this branch chooses it as well as opening or
+   * closing it: it has a value and does not head its list. Read by the tree
+   * for Enter and Space.
+   */
+  get choosable(): boolean {
+    return this.value !== '' && !this.heads
   }
 
   /**
@@ -263,9 +284,14 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
     const onLink = event.composedPath().some((node) => node instanceof HTMLAnchorElement)
 
     /* A branch that is also a link goes where it points, and its chevron is
-       what opens it. A branch that is not toggles from anywhere in the row. */
+       what opens it. A branch that is not toggles from anywhere in the row, and
+       is chosen as well where it has a value and does not head its list, so a
+       tree of folders can report the folder a reader picked. */
     if (this.branch && this.href === '') {
       if (!onLink) {
+        if (this.choosable) {
+          this.select()
+        }
         this.toggleOpen()
       }
       return
