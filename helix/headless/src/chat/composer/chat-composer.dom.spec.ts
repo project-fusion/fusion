@@ -292,7 +292,11 @@ describe('typing', () => {
   test('starting to write says so once, and sending says it stopped', async () => {
     const element = await composer()
     const heard: boolean[] = []
-    element.addEventListener('helix-typing', () => heard.push(element.typing))
+    element.addEventListener('helix-typing', (event) => {
+      // The event carries the same answer the composer holds.
+      expect((event as CustomEvent<{ typing: boolean }>).detail.typing).toBe(element.typing)
+      heard.push(element.typing)
+    })
     await type(element, 'H')
     await type(element, 'He')
     expect(heard).toEqual([true])

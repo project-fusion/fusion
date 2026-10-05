@@ -1220,8 +1220,10 @@ describe('rows that hold rows', () => {
     const { element } = await mount(TREE, FILES)
     await settled(element)
     let heard = 0
-    element.addEventListener('helix-expand', () => {
+    let said: unknown
+    element.addEventListener('helix-expand', (event) => {
       heard += 1
+      said = (event as CustomEvent<{ value: string }>).detail.value
     })
     const toggle = element.shadowRoot?.querySelector('[part~="toggle"]') as HTMLElement
     expect(toggle.getAttribute('aria-hidden')).toBe('true')
@@ -1229,6 +1231,7 @@ describe('rows that hold rows', () => {
     await settled(element)
     expect((element as Tree).expanded).toBe('src')
     expect(heard).toBe(1)
+    expect(said).toBe('src')
     expect(names(element)).toEqual(['src', 'zeta.ts', 'lib', 'README.md'])
     expect(bodyRows(element)[2]?.getAttribute('aria-level')).toBe('2')
     const cell = element.shadowRoot?.querySelector(

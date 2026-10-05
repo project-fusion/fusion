@@ -8,6 +8,7 @@ import {
   HelixActivateEvent,
   type HelixBeforeToggleEvent,
   HelixElement,
+  HelixExpandEvent,
   HelixFilterEvent,
   HelixFilteredEvent,
   HelixLoadMoreEvent,
@@ -174,7 +175,7 @@ const isControl = (element: HTMLElement): boolean =>
  * @slot toolbar - Content above the grid, such as a search field or actions.
  *
  * @event {HelixActivateEvent} helix-activate - Fired after the page changes, with the new page as a string in `detail.value`.
- * @event {Event} helix-expand - Fired after a row opens or closes. `expanded` holds the open rows.
+ * @event {HelixExpandEvent} helix-expand - Fired after a row opens or closes, with every open row's key, separated by commas, which `expanded` also holds.
  * @event {HelixFilterEvent} helix-filter - The search query is about to change. Cancelable: cancel it to keep the current query.
  * @event {HelixFilteredEvent} helix-filtered - Fired after the search query changes, with the new query.
  * @event {HelixLoadMoreEvent} helix-load-more - Fired when a reader asks for more rows, by the `load-more` row's button or by scrolling a `windowed` table near its end.
@@ -1846,7 +1847,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       keys.delete(key)
     }
     this.expanded = [...keys].join(',')
-    this.dispatchEvent(new Event('helix-expand', { bubbles: true, composed: true }))
+    this.dispatchEvent(new HelixExpandEvent({ value: this.expanded }))
     return true
   }
 

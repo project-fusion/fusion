@@ -189,15 +189,19 @@ describe('map layers menu', () => {
   test('a tile says so from the layer once the layer holds the choice, and not when refused', async () => {
     const host = await menuFrame()
     const [route] = [...host.children] as HTMLElement[]
-    const told: Array<{ from: EventTarget | null; hidden: unknown }> = []
+    const told: Array<{ checked: unknown; from: EventTarget | null; hidden: unknown }> = []
     host.addEventListener('helix-toggle', (event) =>
-      told.push({ from: event.target, hidden: route?.hidden }),
+      told.push({
+        checked: (event as CustomEvent<{ checked: boolean }>).detail.checked,
+        from: event.target,
+        hidden: route?.hidden,
+      }),
     )
     const tile = (): HTMLButtonElement =>
       part(host, 'layers-menu')?.querySelector('[part="layer-choice"]') as HTMLButtonElement
     tile().click()
     await settle(host)
-    expect(told).toEqual([{ from: route ?? null, hidden: true }])
+    expect(told).toEqual([{ checked: false, from: route ?? null, hidden: true }])
     host.addEventListener('helix-before-toggle', (event) => event.preventDefault())
     tile().click()
     await settle(host)

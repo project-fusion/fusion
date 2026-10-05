@@ -1,6 +1,7 @@
 import {
   customElement,
   HelixElement,
+  HelixLoadEvent,
   HelixSelectEvent,
   MixinControllerOpen,
 } from '@fusion.dev/helix-core'
@@ -51,7 +52,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before a branch closes, and cancelable.
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired before a branch opens, and cancelable.
- * @event {Event} helix-load - Fired when a `lazy` item opens, so you can load its children.
+ * @event {HelixLoadEvent} helix-load - Fired when a `lazy` item opens, so you can load its children.
  * @event {HelixSelectEvent} helix-select - Fired when the item is chosen, and cancelable. Canceling it changes nothing.
  * @event {ToggleEvent} toggle - Sent when the branch opens or closes, with `newState` and `oldState`.
  *
@@ -443,7 +444,7 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     if (changed.has('open') && this.open && this.lazy) {
-      this.dispatchEvent(new Event('helix-load', { bubbles: true, composed: true }))
+      this.dispatchEvent(new HelixLoadEvent())
     }
   }
 

@@ -3,6 +3,7 @@ import {
   DelayController,
   HelixFormElement,
   HelixSendEvent,
+  HelixTypingEvent,
   hostAria,
   markRegion,
 } from '@fusion.dev/helix-core'
@@ -47,7 +48,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @slot start - Content under the field at the leading edge, such as an attachment button or a model picker.
  *
  * @event {HelixSendEvent} helix-send - Fired when the user sends their turn, and cancelable.
- * @event {Event} helix-typing - The user started or stopped writing. Read which from `typing`.
+ * @event {HelixTypingEvent} helix-typing - The user started or stopped writing, with `typing` saying which, as the composer's `typing` does.
  * @event {Event} input - The user changed the text. Read it from `value`, for a typing indicator or a saved draft. Sent on the composer and does not bubble.
  *
  * @csspart composer - The whole composer.
@@ -143,7 +144,7 @@ export class HelixHeadlessChatComposer extends HelixFormElement {
       return
     }
     this.writing = typing
-    this.dispatchEvent(new Event('helix-typing', { bubbles: true, composed: true }))
+    this.dispatchEvent(new HelixTypingEvent({ typing }))
   }
 
   /**

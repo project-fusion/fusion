@@ -76,3 +76,50 @@ describe('the event a reader sends to ask for more items', () => {
     expect(helixEventNames.has('helix-load-more')).toBe(true)
   })
 })
+
+describe('the events phase two sent as plain events', () => {
+  test('bubble out of the shadow root, cannot be canceled, and are names this library dispatches', async () => {
+    const {
+      HelixActionEvent,
+      HelixEndEvent,
+      HelixExpandEvent,
+      HelixLoadEvent,
+      HelixRangeChangeEvent,
+      HelixToggleEvent,
+      HelixTypingEvent,
+    } = await import('./events.js')
+    const sent = [
+      new HelixActionEvent(),
+      new HelixEndEvent(),
+      new HelixExpandEvent({ value: 'a,b' }),
+      new HelixLoadEvent(),
+      new HelixRangeChangeEvent({ first: 2, last: 9 }),
+      new HelixToggleEvent({ checked: true }),
+      new HelixTypingEvent({ typing: false }),
+    ]
+    expect(sent.map((event) => event.type)).toEqual([
+      'helix-action',
+      'helix-end',
+      'helix-expand',
+      'helix-load',
+      'helix-range-change',
+      'helix-toggle',
+      'helix-typing',
+    ])
+    for (const event of sent) {
+      expect(event.bubbles).toBe(true)
+      expect(event.composed).toBe(true)
+      expect(event.cancelable).toBe(false)
+      expect(helixEventNames.has(event.type)).toBe(true)
+    }
+  })
+
+  test('carry the state they report, where there is one', async () => {
+    const { HelixExpandEvent, HelixRangeChangeEvent, HelixToggleEvent, HelixTypingEvent } =
+      await import('./events.js')
+    expect(new HelixExpandEvent({ value: 'a,b' }).detail.value).toBe('a,b')
+    expect(new HelixRangeChangeEvent({ first: 2, last: 9 }).detail).toEqual({ first: 2, last: 9 })
+    expect(new HelixToggleEvent({ checked: false }).detail.checked).toBe(false)
+    expect(new HelixTypingEvent({ typing: true }).detail.typing).toBe(true)
+  })
+})

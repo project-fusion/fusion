@@ -13,6 +13,7 @@ import {
   HelixMapRotateEvent,
   HelixMapTiltEvent,
   HelixMapZoomEvent,
+  HelixToggleEvent,
   hostAria,
   KeyboardNavigationController,
   MixinViewport,
@@ -191,7 +192,7 @@ const SETTLES = 400
  * @event {HelixMapRotateEvent} helix-map-rotate - A rotate or Face north button, or Shift with Left or Right, was pressed. Turn your map in response.
  * @event {HelixMapTiltEvent} helix-map-tilt - The 3D button, or Shift with Up or Down, was pressed. Tilt your map in response.
  * @event {HelixMapZoomEvent} helix-map-zoom - A zoom button or key was pressed, with a direction. Zoom your map in response.
- * @event {Event} helix-toggle - A layer's tile in the layers menu showed or hid it. Sent from the layer once its `hidden` attribute holds the choice.
+ * @event {HelixToggleEvent} helix-toggle - A layer's tile in the layers menu showed or hid it. Sent from the layer once its `hidden` attribute holds the choice, with `checked` true when it is shown.
  *
  * @csspart attribution - The strip under the map that holds the credit.
  * @csspart compass - The compass and the pan and rotate buttons around it.
@@ -576,7 +577,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
       next: shown,
     })
     if (applied) {
-      first.dispatchEvent(new Event('helix-toggle', { bubbles: true, composed: true }))
+      first.dispatchEvent(new HelixToggleEvent({ checked: shown }))
     }
   }
 

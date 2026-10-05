@@ -1,4 +1,9 @@
-import { customElement, HelixElement, MixinControllerActive } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  HelixElement,
+  HelixEndEvent,
+  MixinControllerActive,
+} from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixHeadlessVideoPlaylistItem } from '../item/video-playlist-item.js'
@@ -58,7 +63,7 @@ type Player = HTMLElement & {
  *
  * @event {HelixActivateEvent} helix-activate - The current entry changed. The playlist already holds the new entry when this is sent.
  * @event {HelixBeforeActivateEvent} helix-before-activate - The current entry is about to change. Cancelable: cancel it to keep the current entry.
- * @event {Event} helix-end - The last entry finished playing, and the playlist stopped there. Not sent while `repeat` is set.
+ * @event {HelixEndEvent} helix-end - The last entry finished playing, and the playlist stopped there. Not sent while `repeat` is set.
  *
  * @csspart items - The list of entries.
  * @csspart player - The region that holds the player.
@@ -278,7 +283,7 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
       return
     }
     if (this.following(1).next === undefined) {
-      this.dispatchEvent(new Event('helix-end', { bubbles: true, composed: true }))
+      this.dispatchEvent(new HelixEndEvent())
       return
     }
     this.step(1)

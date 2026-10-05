@@ -4,6 +4,7 @@ import {
   elementById,
   HelixElement,
   HelixLoadMoreEvent,
+  HelixRangeChangeEvent,
   searchableById,
   VirtualizeController,
 } from '@fusion.dev/helix-core'
@@ -94,7 +95,7 @@ export interface VirtualListRange {
  * @slot - The `<template>` that defines one row. The list writes the rows it renders beside it, and this slot shows them between the two spacers.
  *
  * @event {HelixLoadMoreEvent} helix-load-more - Fired when a reader comes within one screen of the last item, once for each length of the set.
- * @event {Event} helix-range-change - Fired when the items on screen change. `range` holds them.
+ * @event {HelixRangeChangeEvent} helix-range-change - Fired when the items on screen change, with the new `first` and `last`, which `range` also holds.
  *
  * @csspart after - The space that stands in for the rows below the rendered ones.
  * @csspart before - The space that stands in for the rows above the rendered ones.
@@ -384,7 +385,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
     const { first, last } = this.virtualize.visible()
     if (first !== this.said.first || last !== this.said.last) {
       this.said = { first, last }
-      this.dispatchEvent(new Event('helix-range-change', { bubbles: true, composed: true }))
+      this.dispatchEvent(new HelixRangeChangeEvent({ first, last }))
     }
     const box = this.partNamed('viewport')
     const count = this.data.length
