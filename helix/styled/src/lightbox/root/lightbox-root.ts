@@ -27,6 +27,7 @@ import { styles } from './lightbox-root.css.js'
  *
  * @event {HelixActivateEvent} helix-activate - Fired after the shown item changes, when the element already holds the new item.
  *
+ * @cssproperty --lightbox-control-size - Size of the previous, next and close controls drawn with `controls`.
  * @cssproperty --lightbox-foreground - Color of the controls and text drawn over the content.
  * @cssproperty --lightbox-gap - Space between the header or footer and the content.
  * @cssproperty --lightbox-padding - Inset from the edges of the screen.

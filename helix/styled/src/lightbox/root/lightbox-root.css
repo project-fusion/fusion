@@ -30,6 +30,9 @@
   max-block-size: 100dvh;
   max-inline-size: 100vw;
   padding: var(--lightbox-padding, var(--helix-space-md));
+  /* A horizontal drag is the viewer's, which reads it as a swipe to the next or
+     the previous item. The browser keeps the vertical pan and the pinch. */
+  touch-action: pan-y pinch-zoom;
 }
 
 /* **No ring on the viewer itself.** It takes focus when it opens, so a reader
@@ -92,6 +95,97 @@
 @media (prefers-reduced-motion: reduce) {
   ::slotted([slot="header"]),
   ::slotted([slot="footer"]) {
+    transition: none;
+  }
+}
+
+/* **The viewer's own controls, drawn with `controls`.** Placed over the picture
+   and out of the grid, so a viewer that draws them lays the picture out exactly
+   as one that does not: previous and next at the middle of either side, the
+   close in the top corner at the end of the line. Each has a ground of its own,
+   since an arrow drawn straight onto a photograph is legible against about half
+   of one. */
+[part="previous"],
+[part="next"],
+[part="dismiss"] {
+  all: unset;
+  /* `all: unset` takes the `border-box` every shadow root is given with it. */
+  box-sizing: border-box;
+  align-items: center;
+  background-color: var(--helix-color-surface-overlay);
+  block-size: var(--lightbox-control-size, var(--helix-size-control));
+  border-radius: var(--helix-radii-full);
+  box-shadow: var(--helix-shadow-md);
+  color: var(--lightbox-foreground, var(--helix-color-foreground));
+  cursor: pointer;
+  display: inline-flex;
+  inline-size: var(--lightbox-control-size, var(--helix-size-control));
+  justify-content: center;
+  position: absolute;
+  transition:
+    opacity var(--helix-duration-fast) var(--helix-easing-standard),
+    visibility var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+[part="previous"],
+[part="next"] {
+  inset-block-start: 50%;
+  translate: 0 -50%;
+}
+
+[part="previous"] {
+  inset-inline-start: var(--lightbox-padding, var(--helix-space-md));
+}
+
+[part="next"] {
+  inset-inline-end: var(--lightbox-padding, var(--helix-space-md));
+}
+
+[part="dismiss"] {
+  inset-block-start: var(--lightbox-padding, var(--helix-space-md));
+  inset-inline-end: var(--lightbox-padding, var(--helix-space-md));
+}
+
+[part="previous"] svg,
+[part="next"] svg,
+[part="dismiss"] svg {
+  block-size: var(--helix-size-icon);
+  inline-size: var(--helix-size-icon);
+}
+
+[part="previous"]:hover,
+[part="next"]:hover,
+[part="dismiss"]:hover {
+  background-color: var(--helix-color-surface-sunken);
+}
+
+[part="previous"]:focus-visible,
+[part="next"]:focus-visible,
+[part="dismiss"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* At either end of a set that does not loop. Still focusable, so a control that
+   has just shown the last picture keeps the reader on it. */
+[part="previous"][aria-disabled="true"],
+[part="next"][aria-disabled="true"] {
+  cursor: default;
+  opacity: 0.4;
+}
+
+/* With the rest of the chrome while the reader is still. */
+:host(:state(idle)) [part="previous"],
+:host(:state(idle)) [part="next"],
+:host(:state(idle)) [part="dismiss"] {
+  opacity: 0;
+  visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="previous"],
+  [part="next"],
+  [part="dismiss"] {
     transition: none;
   }
 }

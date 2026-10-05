@@ -96,3 +96,23 @@ export const settleSwipe = ({ points, size, travel, velocity }: SwipeRelease): n
 /** How far toward its edge a surface resting at `fraction` sits, in pixels. */
 export const snapTravel = (size: number, fraction: number): number =>
   Math.round((1 - fraction) * size)
+
+/**
+ * Which way a swipe across a row of items moves: `1` to the next, `-1` to the
+ * previous, `0` to stay.
+ *
+ * Dragging the picture toward the start of the line brings the next one in,
+ * so the next item is a drag leftward on a left-to-right page and rightward on
+ * a right-to-left one. A quarter of the width, or a fling, is enough.
+ */
+export const swipeStep = (dx: number, vx: number, width: number, rtl: boolean): -1 | 0 | 1 => {
+  const along = rtl ? dx : -dx
+  const speed = rtl ? vx : -vx
+  if (speed >= FLING || (speed > -FLING && along > width / 4)) {
+    return 1
+  }
+  if (speed <= -FLING || along < -width / 4) {
+    return -1
+  }
+  return 0
+}

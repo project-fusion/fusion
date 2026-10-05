@@ -7,6 +7,7 @@ import {
   snapTravel,
   swipeAxis,
   swipeEdge,
+  swipeStep,
   towardEdge,
 } from './swipe.js'
 
@@ -85,5 +86,23 @@ describe('where a release comes to rest', () => {
 
   test('a surface with no size stays where it is', () => {
     expect(settleSwipe({ points: [0.5, 1], size: 0, travel: 10, velocity: FLING })).toBe(1)
+  })
+})
+
+describe('a swipe across a row of items', () => {
+  test('a drag toward the start of the line brings the next one, past a quarter of the width', () => {
+    expect(swipeStep(-120, 0, 400, false)).toBe(1)
+    expect(swipeStep(120, 0, 400, false)).toBe(-1)
+    expect(swipeStep(-80, 0, 400, false)).toBe(0)
+  })
+
+  test('the start of the line is on the right on a right-to-left page', () => {
+    expect(swipeStep(120, 0, 400, true)).toBe(1)
+    expect(swipeStep(-120, 0, 400, true)).toBe(-1)
+  })
+
+  test('a fling is enough, however short', () => {
+    expect(swipeStep(-20, -FLING, 400, false)).toBe(1)
+    expect(swipeStep(20, FLING, 400, false)).toBe(-1)
   })
 })

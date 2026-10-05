@@ -381,6 +381,7 @@ export {
   snapTravel,
   swipeAxis,
   swipeEdge,
+  swipeStep,
   towardEdge,
 } from './utils/swipe/swipe.js'
 export { tellDisclosure } from './utils/tell-disclosure/tell-disclosure.js'

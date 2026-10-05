@@ -9,15 +9,21 @@ import {
   hostAria,
   IdleController,
   inlineStep,
+  isRtl,
   keyClaimed,
   lockScroll,
   MixinControllerActive,
   MixinControllerOpen,
   resolveActiveItem,
+  SwipeController,
+  swipeStep,
   unlockScroll,
+  whenHydrated,
 } from '@fusion.dev/helix-core'
+import { caretLeft, caretRight, x } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { HelixHeadlessLightboxItem } from '../item/lightbox-item.js'
 
 /**
@@ -36,6 +42,16 @@ import { HelixHeadlessLightboxItem } from '../item/lightbox-item.js'
  * A lightbox shows one item at a time and has no scrolling track, so `active`
  * holds the current item, as in `Tabs`. The arrow keys change the item while
  * focus stays in the dialog.
+ *
+ * Set `controls` for the viewer's own previous, next and close controls, named
+ * by `previous-label`, `next-label` and `dismiss-label`. Without it, compose the
+ * chrome yourself in the `header` and `footer` slots, with buttons that send
+ * `--previous`, `--next` and `--close`.
+ *
+ * Each item is a slide: a `group` with the role description in
+ * `slide-role-label`, named by its `label` or by `slide-label`. A touch or a pen
+ * swiped across the picture shows the next or the previous item, the way the
+ * line of text runs.
  *
  * The chrome hides when there is no input, through `IdleController`, and comes
  * back on a pointer move, a key press, or a focus. It stays while focus is on a
@@ -61,7 +77,13 @@ import { HelixHeadlessLightboxItem } from '../item/lightbox-item.js'
  * @event {ToggleEvent} toggle - Fired when the viewer opens or closes, with `newState` and `oldState`.
  *
  * @csspart dialog - The native dialog element.
+ * @csspart dismiss - The close control, drawn with `controls`.
+ * @csspart dismiss-mark - The glyph on the close control.
  * @csspart live - The live region that announces which item is shown.
+ * @csspart next - The control that shows the next item, drawn with `controls`.
+ * @csspart next-mark - The glyph on the next control.
+ * @csspart previous - The control that shows the previous item, drawn with `controls`.
+ * @csspart previous-mark - The glyph on the previous control.
  * @csspart viewport - The box the current item is shown in.
  *
  * @cssstate fullscreen - While the viewer fills the screen.
@@ -72,6 +94,24 @@ import { HelixHeadlessLightboxItem } from '../item/lightbox-item.js'
 export class HelixHeadlessLightbox extends MixinControllerActive(
   MixinControllerOpen(HelixElement),
 ) {
+  /**
+   * Draws the viewer's own previous, next and close controls over the picture.
+   *
+   * Off by default, for a viewer whose chrome you compose in the `header` and
+   * `footer` slots. The controls hide with the rest of the chrome while the
+   * reader is idle, and the previous and next ones say they are unavailable at
+   * either end of a set that does not `loop`.
+   */
+  @property({ reflect: true, type: Boolean })
+  controls = false
+
+  /**
+   * The close control's accessible name. Translate it with the rest of your
+   * interface.
+   */
+  @property({ attribute: 'dismiss-label' })
+  dismissLabel = 'Close'
+
   /**
    * How long the user can be idle before the header and footer hide, in
    * milliseconds.
@@ -96,6 +136,33 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
   loop = false
 
   /**
+   * The next control's accessible name.
+   */
+  @property({ attribute: 'next-label' })
+  nextLabel = 'Next'
+
+  /**
+   * The previous control's accessible name.
+   */
+  @property({ attribute: 'previous-label' })
+  previousLabel = 'Previous'
+
+  /**
+   * The name of an item with no `label` of its own, with `{index}` and
+   * `{count}` filled in.
+   */
+  @property({ attribute: 'slide-label' })
+  slideLabel = '{index} of {count}'
+
+  /**
+   * The word screen readers announce in place of an item's role, set as
+   * `aria-roledescription`. Translate it with the rest of your text, or empty
+   * it to leave the role as `group`.
+   */
+  @property({ attribute: 'slide-role-label' })
+  slideRoleLabel = 'slide'
+
+  /**
    * The status text that says which item is shown, with `{index}`, `{count}`
    * and the item's `{label}` filled in.
    *
@@ -118,6 +185,22 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
   @state()
   private announcement = ''
 
+  /* A swipe across the viewer, read by `swipeStep` as next or previous. The
+     whole viewer, since the picture may be far smaller than the screen. */
+  protected readonly swipes = new SwipeController(this, {
+    axis: () => (this.open ? 'x' : undefined),
+    end: (dx, _dy, vx) => {
+      const width = this.partNamed('viewport')?.getBoundingClientRect().width ?? 0
+      const step = swipeStep(dx, vx, width, isRtl(this))
+      if (step !== 0) {
+        this.step(step)
+      }
+    },
+    move: () => this.idle.stir(),
+    start: (_target, event) => event.pointerType !== 'mouse',
+    surface: () => this.dialog,
+  })
+
   private readonly fullscreen = new FullscreenController(this, (full) => {
     this.filled = full
   })
@@ -139,9 +222,15 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
    */
   private chromeHasFocus(): boolean {
     const active = deepActiveElement()
-    return this.knownChildren.some(
-      (child) =>
-        (child.slot === 'header' || child.slot === 'footer') && deepContains(child, active),
+    const own = this.shadowRoot?.activeElement?.matches(
+      '[part="previous"], [part="next"], [part="dismiss"]',
+    )
+    return (
+      own === true ||
+      this.knownChildren.some(
+        (child) =>
+          (child.slot === 'header' || child.slot === 'footer') && deepContains(child, active),
+      )
     )
   }
 
@@ -388,9 +477,26 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
   private mark(): void {
     const items = this.items
     const current = resolveActiveItem(this.active, items)
-    for (const item of items) {
+    items.forEach((item, at) => {
       item.current = item === current
-    }
+      /* Once the item has hydrated, so its first render is the server's. */
+      whenHydrated(item, () => {
+        item.position = fillTemplate(this.slideLabel, {
+          count: items.length,
+          index: at + 1,
+          label: item.label,
+        })
+        item.roleLabel = this.slideRoleLabel
+      })
+    })
+  }
+
+  /** Whether a step that way would show nothing new, at the end of a set that does not loop. */
+  private atEnd(by: -1 | 1): boolean {
+    const items = this.items
+    const shown = this.shown
+    const at = shown ? items.indexOf(shown) : 0
+    return !this.loop && (items.length === 0 || (by === 1 ? at >= items.length - 1 : at <= 0))
   }
 
   /**
@@ -447,8 +553,51 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
         <slot></slot>
       </div>
       <slot name="footer"></slot>
+      ${this.controls ? this.renderControls() : nothing}
       <span part="live" role="status" aria-live="polite">${this.announcement || nothing}</span>
     </dialog>`
+  }
+
+  /**
+   * The viewer's own controls, behind a seam a tier above can move.
+   *
+   * After the item in the order, so `Tab` from the viewer reaches the picture's
+   * content first. `aria-disabled` at the ends rather than `disabled`, so a
+   * control that has just shown the last picture keeps focus.
+   */
+  protected renderControls(): TemplateResult {
+    return html`<button
+        part="previous"
+        type="button"
+        aria-label=${this.previousLabel}
+        aria-disabled=${this.atEnd(-1) ? 'true' : nothing}
+        @click=${() => this.previous()}
+      >
+        <svg part="previous-mark" data-mirror fill="currentColor" viewBox=${caretLeft.viewBox} aria-hidden="true">
+          ${unsafeSVG(caretLeft.content)}
+        </svg>
+      </button>
+      <button
+        part="next"
+        type="button"
+        aria-label=${this.nextLabel}
+        aria-disabled=${this.atEnd(1) ? 'true' : nothing}
+        @click=${() => this.next()}
+      >
+        <svg part="next-mark" data-mirror fill="currentColor" viewBox=${caretRight.viewBox} aria-hidden="true">
+          ${unsafeSVG(caretRight.content)}
+        </svg>
+      </button>
+      <button
+        part="dismiss"
+        type="button"
+        aria-label=${this.dismissLabel}
+        @click=${() => this.close()}
+      >
+        <svg part="dismiss-mark" fill="currentColor" viewBox=${x.viewBox} aria-hidden="true">
+          ${unsafeSVG(x.content)}
+        </svg>
+      </button>`
   }
 }
 
