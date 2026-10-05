@@ -29,9 +29,9 @@
     var(--pin-input-cell-border-color, var(--helix-color-border));
   border-radius: var(--pin-input-cell-radius, var(--helix-radii-sm));
   box-sizing: border-box;
-  color: var(--helix-color-foreground);
+  color: var(--pin-input-cell-color, var(--helix-color-foreground));
   font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-lg);
+  font-size: var(--pin-input-cell-font-size, var(--helix-text-lg));
   /* Tabular, so a 1 takes the same room as an 8 and the row does not breathe as
      a code is typed into it. */
   font-variant-numeric: tabular-nums;
@@ -58,7 +58,7 @@
    component than on any other, because the cells sit a few pixels apart and a
    ring standing off one of them reaches toward its neighbors. */
 [part="cell"]:focus-visible {
-  border-color: var(--helix-color-primary);
+  border-color: var(--pin-input-cell-border-color-focus, var(--helix-color-primary));
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: 0;
 }
@@ -98,7 +98,7 @@
    on them and quieter than a typed character. */
 [part="separator"] {
   align-self: center;
-  color: var(--helix-color-foreground-muted);
+  color: var(--pin-input-separator-color, var(--helix-color-foreground-muted));
   font-size: var(--helix-text-lg);
 }
 

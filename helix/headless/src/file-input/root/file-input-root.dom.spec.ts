@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { trash } from '@fusion.dev/helix-icons'
-import { formValue, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { formValue, hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 /* Imported once the page exists, as the element is. */
 let HelixRejectEvent: typeof import('@fusion.dev/helix-core').HelixRejectEvent
@@ -579,5 +579,19 @@ describe('your own rows and your own step', () => {
     await new Promise((done) => setTimeout(done, 0))
     expect(host.files).toEqual([])
     expect(heard).toEqual(['a.txt:Too large to shrink'])
+  })
+
+  /* Every state styleable from CSS: the drop target lit while files hover, and
+     a field holding files, on the host. */
+  test('says it is being dropped on, and that it holds files, as states', async () => {
+    const host = (await field('multiple')) as Shaping
+    expect(hasState(host, 'has-files')).toBe(false)
+    const over = new Event('dragover', { bubbles: true, cancelable: true })
+    part(host, 'field')?.dispatchEvent(over)
+    await host.updateComplete
+    expect(hasState(host, 'dropping')).toBe(true)
+    await dropOn(host, [text('a.txt')])
+    expect(hasState(host, 'dropping')).toBe(false)
+    expect(hasState(host, 'has-files')).toBe(true)
   })
 })
