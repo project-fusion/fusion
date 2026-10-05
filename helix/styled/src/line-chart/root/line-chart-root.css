@@ -113,7 +113,8 @@
   background-color: var(--chart-series);
   block-size: var(--line-chart-marker-size, 6px);
   border-radius: var(--helix-radii-full);
-  box-shadow: 0 0 0 var(--helix-border-thin) var(--helix-color-background);
+  box-shadow: 0 0 0 var(--helix-border-thin)
+    var(--line-chart-marker-ring-color, var(--helix-color-background));
   inline-size: var(--line-chart-marker-size, 6px);
   pointer-events: none;
   position: absolute;

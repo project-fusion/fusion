@@ -164,7 +164,8 @@
 
 /* The cursor is ringed in the page's ground, so it reads over the line. */
 [part="cursor"] {
-  box-shadow: 0 0 0 var(--helix-border-thick) var(--helix-color-background);
+  box-shadow: 0 0 0 var(--helix-border-thick)
+    var(--sparkline-mark-ring-color, var(--helix-color-background));
 }
 
 /* The reading in words, above the dot, set as a tooltip is set. */

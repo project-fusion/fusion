@@ -306,8 +306,7 @@ export class HelixHeadlessSparkline extends HelixElement {
       this.plot === 'bar'
         ? linear([Math.min(0, low), Math.max(0, high)], [STRIP_HEIGHT, 0])
         : linear([low, high], [STRIP_HEIGHT, 0])
-    /* One path per unbroken run, so a blank reading is a gap and not a line
-       across it. A series with no blank is one run, and draws what it did. */
+    /* One path per unbroken run, so a blank reading is a gap in the line. A series with no blank is one run, and draws what it did. */
     const runs =
       this.plot === 'bar'
         ? []
@@ -484,16 +483,13 @@ export class HelixHeadlessSparkline extends HelixElement {
       return nothing
     }
     const found = extremesOf(slots)
-    return html`${(['high', 'low'] as const).map((name) => {
-      const index = found[name]
-      return asked.includes(name) && index !== undefined
-        ? html`<span
-            aria-hidden="true"
-            part=${name}
-            style=${at(index, slots[index] as number)}
-          ></span>`
-        : nothing
-    })}`
+    const place = (index: number | undefined, name: 'high' | 'low'): string | undefined =>
+      asked.includes(name) && index !== undefined ? at(index, slots[index] as number) : undefined
+    const high = place(found.high, 'high')
+    const low = place(found.low, 'low')
+    return html`${high === undefined ? nothing : html`<span aria-hidden="true" part="high" style=${high}></span>`}${
+      low === undefined ? nothing : html`<span aria-hidden="true" part="low" style=${low}></span>`
+    }`
   }
 
   /**

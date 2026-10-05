@@ -131,7 +131,7 @@ const ELSEWHERE: Record<string, string> = {
  *
  * @csspart kbd - The key, or the chord under `keys`.
  * @csspart key - One key of a chord under `keys` and `caps`, such as `Ctrl` in `Ctrl+K`.
- * @csspart separator - The `+` between two keys of a chord under `keys` and `caps`, drawn where the platform writes one: on Windows and Linux, and not on an Apple keyboard.
+ * @csspart separator - The `+` between two keys of a chord under `keys` and `caps`, drawn where the platform writes one: on Windows and Linux. An Apple keyboard writes none.
  */
 @customElement('helix-headless-kbd')
 export class HelixHeadlessKbd extends HelixElement {
@@ -141,8 +141,7 @@ export class HelixHeadlessKbd extends HelixElement {
    * and most docs draw `Ctrl` `K`.
    *
    * Absent, a chord is one key holding the whole label, as it always was.
-   * Reflected, because the styled tier draws the caps on the keys and not on
-   * the whole.
+   * Reflected, because the styled tier draws the caps on the keys under it.
    */
   @property({ reflect: true, type: Boolean })
   caps = false
@@ -159,6 +158,20 @@ export class HelixHeadlessKbd extends HelixElement {
   for = ''
 
   /**
+   * Names for keys in place of the platform's own, by the key's name in
+   * `keys`, written as JSON in the attribute: `key-labels='{"mod":"Command",
+   * "enter":"Return"}'` shows `Command` and `Return` wherever `mod` and
+   * `enter` are written.
+   *
+   * For a page in another language, or a product with its own word for a key.
+   * Absent, the platform's glyphs and words are used. Only what is shown
+   * changes: the chord written onto `aria-keyshortcuts` keeps the names a
+   * screen reader knows.
+   */
+  @property({ attribute: 'key-labels', type: Object })
+  keyLabels?: Record<string, string>
+
+  /**
    * The key or chord to show, such as `mod+k`, `?`, or `/`.
    *
    * `mod` is the platform's own command modifier, which is the reason to write
@@ -172,20 +185,6 @@ export class HelixHeadlessKbd extends HelixElement {
    */
   @property()
   keys = ''
-
-  /**
-   * Names for keys in place of the platform's own, by the key's name in
-   * `keys`, written as JSON in the attribute: `key-labels='{"mod":"Command",
-   * "enter":"Return"}'` shows `Command` and `Return` wherever `mod` and
-   * `enter` are written.
-   *
-   * For a page in another language, or a product with its own word for a key.
-   * Absent, the platform's glyphs and words are used. Only what is shown
-   * changes: the chord written onto `aria-keyshortcuts` keeps the names a
-   * screen reader knows.
-   */
-  @property({ attribute: 'key-labels', type: Object })
-  keyLabels?: Record<string, string>
 
   /**
    * Where the chord is listened for. `control` listens inside the control the

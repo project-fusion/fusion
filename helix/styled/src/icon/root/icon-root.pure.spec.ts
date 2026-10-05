@@ -22,10 +22,11 @@ const importers = (tier: 'headless' | 'styled'): string[] => {
 describe('the icon element', () => {
   /* Every template draws its glyphs inline with `drawIcon`, and the element
      looks a name up in the record of every glyph. A family that registers it
-     without drawing it ships the whole set to name none of it. */
-  test('is registered only by a family that draws one', () => {
+     without drawing it ships the whole set to name none of it. Speed Dial
+     was the one that did, and it asks the page to import the icon now. */
+  test('is registered by no family', () => {
     expect(importers('headless')).toEqual([])
-    expect(importers('styled')).toEqual(['speed-dial/root/speed-dial-root.ts'])
+    expect(importers('styled')).toEqual([])
   })
 })
 

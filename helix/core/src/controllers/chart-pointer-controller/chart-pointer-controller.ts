@@ -240,7 +240,7 @@ export class ChartPointerController implements ReactiveController {
   /**
    * The readings the keys walk, by place: every one, less those a legend hid.
    *
-   * The keys step through this list and not through the count, so a hidden
+   * The keys step through this list, so a hidden
    * slice is passed over as if it were not in the table, which is how the
    * ring draws it.
    */
