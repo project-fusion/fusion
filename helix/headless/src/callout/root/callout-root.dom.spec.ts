@@ -87,3 +87,27 @@ describe('callout icon slot', () => {
     expect(slot.querySelector('svg')).not.toBeNull()
   })
 })
+
+/* sl-alert's `closable`: a note a reader may put away, which the page then
+   removes. */
+describe('a dismissible callout', () => {
+  test('draws a named dismiss button that asks to be removed, and stays', async () => {
+    const note = await mount(
+      '<helix-headless-callout dismissible dismiss-label="Hide tip">Drafts save every minute.</helix-headless-callout>',
+    )
+    const button = note.shadowRoot?.querySelector('[part="dismiss"]') as HTMLButtonElement
+    expect(button.getAttribute('aria-label')).toBe('Hide tip')
+    let heard = ''
+    note.addEventListener('helix-dismiss', (event) => {
+      heard = (event as CustomEvent<{ label: string }>).detail.label
+    })
+    button.click()
+    expect(heard).toBe('Drafts save every minute.')
+    expect(note.isConnected).toBe(true)
+  })
+
+  test('draws no button unless asked', async () => {
+    const note = await mount('<helix-headless-callout>Text</helix-headless-callout>')
+    expect(note.shadowRoot?.querySelector('[part="dismiss"]')).toBeNull()
+  })
+})

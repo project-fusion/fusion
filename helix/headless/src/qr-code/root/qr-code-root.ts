@@ -9,12 +9,37 @@ import {
 } from 'lit'
 import { property } from 'lit/decorators.js'
 import { encode } from 'uqr'
+import { qrSvg } from '../export.js'
 
 /** How much of the code can be lost and still read. */
 export type QrCorrection = 'H' | 'L' | 'M' | 'Q'
 
 /** How the modules are drawn. */
 export type QrStyle = 'dots' | 'rounded' | 'square'
+
+/** The quiet zone in modules, which the specification requires around a code. */
+const QUIET = 4
+
+/**
+ * A computed color as `rgb()`, which every SVG reader can draw.
+ *
+ * A theme's colors compute to `oklch()` or `color()`, which a browser draws
+ * and an image editor opening the saved file may not, so each is painted onto
+ * one pixel and read back. A page with no canvas keeps the color as it is.
+ */
+const asRgb = (color: string): string => {
+  const pixel = typeof document === 'undefined' ? null : document.createElement('canvas')
+  const context = pixel?.getContext?.('2d', { willReadFrequently: true })
+  if (!context) {
+    return color
+  }
+  context.fillStyle = color
+  context.fillRect(0, 0, 1, 1)
+  const [red, green, blue, alpha] = context.getImageData(0, 0, 1, 1).data
+  return alpha === 255
+    ? `rgb(${red}, ${green}, ${blue})`
+    : `rgba(${red}, ${green}, ${blue}, ${(alpha ?? 0) / 255})`
+}
 
 /** Whether a module is one of the three finder squares, or their separators. */
 const isFinder = (x: number, y: number, size: number): boolean => {
@@ -123,6 +148,10 @@ const pathFor = (
  * A higher level holds fewer characters, so a value that fits at `M` can be too
  * long once a logo raises the level to `H`. A value too long for the level
  * draws no code, and the element fires `error`.
+ *
+ * `toSvg()`, `toPng()` and `download()` give the drawn code as a file of its
+ * own, in the colors it is drawn in, for a page that offers it to save or
+ * print, as Zag's download trigger does.
  *
  * @since 0.1.0
  * @status stable
@@ -252,6 +281,79 @@ export class HelixHeadlessQrCode extends HelixElement {
     }
   }
 
+  /**
+   * The code as an SVG file of its own, `size` pixels square, in the colors it
+   * is drawn in, with its background under the quiet zone.
+   *
+   * `''` where no code is drawn, before the first render or for a value too
+   * long for the level. A slotted logo is not in the file, being the page's
+   * own markup; save the file at `H` and the code still scans without it.
+   */
+  toSvg(size = 512): string {
+    const code = this.renderRoot?.querySelector('svg[part="code"]')
+    const modules = code?.querySelector('[part="modules"]')
+    const finders = code?.querySelector('[part="finders"]')
+    if (!code || !modules || !finders) {
+      return ''
+    }
+    /* A transparent ground is no ground for a scanner, so a code drawn over
+       nothing of its own is saved on white. */
+    const ground = getComputedStyle(this).backgroundColor
+    const clear = ground === '' || ground === 'transparent' || /^rgba\(.*,\s*0\)$/.test(ground)
+    return qrSvg(
+      {
+        background: clear ? '#ffffff' : asRgb(ground),
+        box: Number(code.getAttribute('viewBox')?.split(' ')[2] ?? 0),
+        finderColor: asRgb(getComputedStyle(finders).fill || '#000000'),
+        finders: finders.getAttribute('d') ?? '',
+        moduleColor: asRgb(getComputedStyle(modules).fill || '#000000'),
+        modules: modules.getAttribute('d') ?? '',
+        quiet: QUIET,
+      },
+      size,
+    )
+  }
+
+  /**
+   * The code as a PNG, `size` pixels square, drawn from `toSvg()`.
+   *
+   * `null` where no code is drawn.
+   */
+  async toPng(size = 512): Promise<Blob | null> {
+    const markup = this.toSvg(size)
+    if (markup === '') {
+      return null
+    }
+    const image = new Image()
+    image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(markup)}`
+    await image.decode()
+    const canvas = document.createElement('canvas')
+    canvas.width = size
+    canvas.height = size
+    canvas.getContext('2d')?.drawImage(image, 0, 0, size, size)
+    return new Promise((resolve) => canvas.toBlob(resolve, 'image/png'))
+  }
+
+  /**
+   * Saves the code as a PNG named `filename`, `size` pixels square.
+   *
+   * Call it from a press, since a browser lets a page start a download only
+   * in answer to one. Does nothing where no code is drawn.
+   */
+  async download(filename = 'qr-code.png', size = 512): Promise<void> {
+    const png = await this.toPng(size)
+    if (!png) {
+      return
+    }
+    const url = URL.createObjectURL(png)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = filename
+    link.click()
+    /* Later, so the download has the address before it is let go. */
+    setTimeout(() => URL.revokeObjectURL(url))
+  }
+
   private renderCode(): SVGTemplateResult | typeof nothing {
     if (this.value === '') {
       return nothing
@@ -268,7 +370,7 @@ export class HelixHeadlessQrCode extends HelixElement {
        modules is what the specification requires and what a scanner looks for,
        so it has to scale with the code and not with whatever box the component
        was given. */
-    const quiet = 4
+    const quiet = QUIET
     const box = size + quiet * 2
     /* The three corner squares as their own path, so they can take their own
        color. Their positions are structural rather than guessed: seven by

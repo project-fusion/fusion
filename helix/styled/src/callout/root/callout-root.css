@@ -115,6 +115,54 @@ slot[name="icon"]::slotted(*) {
   min-inline-size: 0;
 }
 
+/* At the end of the first line, as quiet as the mark at the start: the glyph
+   with a small pad, which is chrome and not the passage's point. */
+[part="dismiss"] {
+  all: unset;
+  /* `all: unset` takes `box-sizing` with it; restored here, as everywhere. */
+  box-sizing: border-box;
+  block-size: calc(var(--helix-size-icon) + var(--helix-space-2xs) * 2);
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 auto;
+  inline-size: calc(var(--helix-size-icon) + var(--helix-space-2xs) * 2);
+  margin-block: calc(var(--helix-space-2xs) * -1);
+  margin-inline: auto calc(var(--helix-space-2xs) * -1);
+  place-content: center;
+  place-items: center;
+  transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* A well under the pointer, mixed from the foreground so it shows on the
+   tone's tint as on no fill at all. */
+[part="dismiss"]:hover {
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
+  color: var(--helix-color-foreground);
+}
+
+[part="dismiss"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+[part="dismiss"] svg,
+slot[name="dismiss-icon"]::slotted(*) {
+  --icon-size: var(--helix-size-icon);
+
+  block-size: var(--helix-size-icon);
+  inline-size: var(--helix-size-icon);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="dismiss"] {
+    transition: none;
+  }
+}
+
 /* The heading, when there is one. A bare slot, so an omitted one generates no
    box and the content sits where it would have anyway. */
 slot[name="heading"]::slotted(*) {
