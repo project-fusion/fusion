@@ -50,6 +50,7 @@ import '../../listbox/index.js'
  *
  * @slot - The options, and any groups of them.
  * @slot end - Content after the chosen value, such as a count, a unit, or a clear button.
+ * @slot feedback - The message that says what is wrong, for content richer than a string. It shows while there is a message.
  * @slot hint - The hint, for content richer than plain text.
  * @slot indicator - The icon on the trigger that shows it opens, usually a caret.
  * @slot label - The label, for content richer than plain text.

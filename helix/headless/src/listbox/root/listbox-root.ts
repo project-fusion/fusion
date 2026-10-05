@@ -160,6 +160,7 @@ const rangeFor = (root: Element, needle: string): Range[] => {
  * @documentation https://fusion.dev/helix/components/listbox
  *
  * @slot - The options, and any groups of them.
+ * @slot feedback - The message that says what is wrong, for content richer than a string. It shows while there is a message.
  * @slot filter-icon - The icon in the filter field. Defaults to a magnifying glass.
  * @slot hint - The hint, for content richer than plain text.
  * @slot label - The label, for content richer than plain text.
