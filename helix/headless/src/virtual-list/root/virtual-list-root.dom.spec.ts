@@ -126,6 +126,62 @@ describe('virtual list', () => {
     expect(part(host, 'viewport')?.getAttribute('role')).toBe('list')
     expect(part(host, 'viewport')?.getAttribute('aria-label')).toBe('Rows')
   })
+
+  /* A heading beside the list named a generic wrapper, and the list kept the
+     name in `label`. */
+  test('takes a name written on the host', async () => {
+    const host = await list(10, 'aria-label="Recent files"')
+    expect(part(host, 'viewport')?.getAttribute('aria-label')).toBe('Recent files')
+  })
+
+  /* Every window move cleared the rows and cloned them again, so a link a
+     reader had focused was replaced while its row was still on screen. */
+  test('keeps the element of a row that stays in the window', async () => {
+    const host = await list(500)
+    const row = host.querySelector('[data-index="6"]')
+    const viewport = part(host, 'viewport') as HTMLElement
+    viewport.scrollTop = 192
+    viewport.dispatchEvent(new Event('scroll'))
+    await settle(host)
+    expect(host.querySelector('[data-index="0"]')).toBeNull()
+    expect(host.querySelector('[data-index="6"]')).toBe(row)
+    expect(row?.isConnected).toBe(true)
+    expect(drawn(host).map((one) => one.getAttribute('data-index'))).toEqual(
+      drawn(host).map((_, at) => String(Number(drawn(host)[0]?.getAttribute('data-index')) + at)),
+    )
+  })
+
+  test('keeps the row holding focus drawn when it scrolls out of the window', async () => {
+    const rows = Array.from({ length: 500 }, (_, at) => ({ name: `Row ${at + 1}` }))
+    document.body.innerHTML = `<helix-headless-virtual-list for="rows" estimate="32" label="Rows">
+        <template><div><a href="#" data-field="name"></a></div></template>
+      </helix-headless-virtual-list>
+      <script id="rows" type="application/json">${JSON.stringify(rows)}</script>`
+    const host = document.body.firstElementChild as Updatable
+    await settle(host)
+    const link = host.querySelector('[data-index="1"] a') as HTMLElement
+    link.focus()
+    const viewport = part(host, 'viewport') as HTMLElement
+    viewport.scrollTop = 3_200
+    viewport.dispatchEvent(new Event('scroll'))
+    await settle(host)
+    expect(host.querySelector('[data-index="100"]')).not.toBeNull()
+    expect(link.isConnected).toBe(true)
+    expect(document.activeElement).toBe(link)
+  })
+
+  /* The source was read once per `for`, so new JSON written into the script,
+     which is how a framework updates a text child, left the old rows drawn. */
+  test('draws the rows again when the source is edited', async () => {
+    const host = await list(500)
+    const source = document.getElementById('rows') as HTMLScriptElement
+    source.textContent = JSON.stringify([{ name: 'Only' }])
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await settle(host)
+    expect(drawn(host)).toHaveLength(1)
+    expect(drawn(host)[0]?.textContent?.trim()).toBe('Only')
+    expect(drawn(host)[0]?.getAttribute('aria-setsize')).toBe('1')
+  })
 })
 
 if (hasLayout()) {

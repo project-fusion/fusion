@@ -295,7 +295,10 @@ export class VirtualizeController implements ReactiveController {
 
   /** The straight line: one estimate, so offset and index convert by division. */
   private uniform(box: HTMLElement, total: number, size: number, overscan: number): Window {
-    const first = Math.max(0, Math.floor(box.scrollTop / size) - overscan)
+    /* Held to the set, for an offset left past the end of a set that shrank:
+       the box clamps its offset a frame later, and a window starting past the
+       last item until then moved on every pass. */
+    const first = Math.max(0, Math.min(Math.floor(box.scrollTop / size), total) - overscan)
     const fits = Math.ceil(box.clientHeight / size) + overscan * 2
     const last = Math.min(total, first + fits)
     return { after: Math.max(0, (total - last) * size), before: first * size, first, last }
