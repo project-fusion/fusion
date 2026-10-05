@@ -79,8 +79,8 @@ describe('sandbox coordination', () => {
       styles: string
     }
 
-    // Set by hand, because the panes reach the preview by event and an initial
-    // attribute dispatches nothing.
+    // Seeded from the markup pane, and set here too so the assertion below
+    // reads what this test wrote.
     preview.source = '<p>one</p>'
     await preview.updateComplete
 
@@ -92,6 +92,44 @@ describe('sandbox coordination', () => {
     expect(preview.styles).toBe('p { color: rebeccapurple }')
     // The markup pane is untouched: they are told apart by name.
     expect(preview.source).toBe('<p>one</p>')
+  })
+
+  /* The sandbox listens from connection, before any listener a page adds, and
+     it forwarded the value during the dispatch: the source kept the old text
+     while the preview drew the refused one. */
+  test('a refused edit stays out of the preview', async () => {
+    const sandbox = await mount(wired)
+    sandbox.addEventListener('helix-before-edit', (event) => event.preventDefault())
+    const source = sandbox.querySelector('helix-sandbox-source') as Updatable & { value: string }
+    const preview = sandbox.querySelector('helix-sandbox-preview') as Updatable & { source: string }
+    const field = source.shadowRoot?.querySelector('textarea') as HTMLTextAreaElement
+    field.value = '<p>refused</p>'
+    field.dispatchEvent(new Event('input'))
+    await preview.updateComplete
+    expect(source.value).toBe('<p>one</p>')
+    expect(preview.source).toBe('<p>one</p>')
+  })
+
+  /* Only edits were forwarded, so the text had to be written twice: once in the
+     pane and again on the preview. */
+  test('a pane written with a value fills the preview before any edit', async () => {
+    const sandbox = await mount(withCss)
+    const preview = sandbox.querySelector('helix-sandbox-preview') as Updatable & {
+      source: string
+      styles: string
+    }
+    expect(preview.source).toBe('<p>one</p>')
+    expect(preview.styles).toBe('p { color: red }')
+  })
+
+  test('and a preview given its own source keeps it until the first edit', async () => {
+    const sandbox = await mount(`
+      <helix-sandbox>
+        <helix-sandbox-source slot="source" name="html" value="<p>pane</p>"></helix-sandbox-source>
+        <helix-sandbox-preview slot="preview" source="<p>own</p>"></helix-sandbox-preview>
+      </helix-sandbox>`)
+    const preview = sandbox.querySelector('helix-sandbox-preview') as Updatable & { source: string }
+    expect(preview.source).toBe('<p>own</p>')
   })
 
   test('the preview is a frame, and renders nothing into the page', async () => {
@@ -623,6 +661,16 @@ describe('lead', () => {
   /* The slot has to travel with the pane. Leaving `name="source"` in the first
      position and only relabelling the box would put the consumer's preview in
      the pane marked source, which is the bug this property exists to avoid. */
+  /* The divider's value is the lead pane's share, so its name says which pane
+     that is. */
+  test('the divider is named for the pane it sizes', async () => {
+    const name = async (markup: string): Promise<string | null | undefined> =>
+      (await mount(markup)).shadowRoot?.querySelector('[part="panes"]')?.getAttribute('label')
+    expect(await name('<helix-sandbox></helix-sandbox>')).toBe('Resize source pane')
+    expect(await name('<helix-sandbox lead="preview"></helix-sandbox>')).toBe('Resize preview pane')
+    expect(await name('<helix-sandbox separator-label="Split"></helix-sandbox>')).toBe('Split')
+  })
+
   test('the slot moves with the pane, so content is never orphaned', async () => {
     const sandbox = await mount(
       '<helix-sandbox lead="preview"><p slot="preview">shown</p></helix-sandbox>',

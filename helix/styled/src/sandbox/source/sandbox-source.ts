@@ -7,9 +7,12 @@ import {
   restoreValue,
 } from '@fusion.dev/helix-core'
 import type { CSSResultGroup, TemplateResult } from 'lit'
-import { html } from 'lit'
+import { html, nothing } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './sandbox-source.css.js'
+
+/** Keys that only ever modify another, and so are not a press of their own. */
+const MODIFIERS = new Set(['Alt', 'AltGraph', 'Control', 'Meta', 'Shift'])
 
 /**
  * @summary An editable source pane for a sandbox preview.
@@ -19,7 +22,8 @@ import { styles } from './sandbox-source.css.js'
  * keyboards, and screen reader support come from the platform.
  *
  * Tab inserts two spaces, so you can indent code. To move focus out of the
- * field, press Escape and then Tab.
+ * field, press Escape and then Tab. Shift+Tab moves focus back as it does
+ * anywhere else. The field's description says so to a screen reader.
  *
  * @since 0.1.0
  * @status stable
@@ -41,6 +45,12 @@ export class HelixSandboxSource extends HelixElement {
    */
   @property({ attribute: 'field-label' })
   fieldLabel = 'Example source'
+
+  /**
+   * The field's description, read by screen readers while Tab indents.
+   */
+  @property({ attribute: 'keys-description' })
+  keysDescription = 'Tab inserts two spaces. To leave, press Escape and then Tab.'
 
   /**
    * Which source this pane holds. Every `helix-before-edit` event includes it.
@@ -132,8 +142,15 @@ export class HelixSandboxSource extends HelixElement {
       this.escaped = true
       return
     }
-
-    if (event.key !== 'Tab' || !this.tabIndents || this.escaped) {
+    /* A modifier on its own is the first half of a chord, and pressing Shift
+       to go back after Escape must not undo the Escape. */
+    if (MODIFIERS.has(event.key)) {
+      return
+    }
+    /* **Shift+Tab always leaves.** It indented too, so a reader moving
+       backward into the field had no way back out but Escape, which nothing
+       told them. */
+    if (event.key !== 'Tab' || event.shiftKey || !this.tabIndents || this.escaped) {
       this.escaped = false
       return
     }
@@ -151,6 +168,7 @@ export class HelixSandboxSource extends HelixElement {
     return html`<textarea
       part="source"
       aria-label=${this.fieldLabel}
+      aria-describedby=${this.tabIndents ? 'keys' : nothing}
       spellcheck="false"
       .value=${this.value}
       @focus=${this.reportCaret}
@@ -158,7 +176,8 @@ export class HelixSandboxSource extends HelixElement {
       @keydown=${this.handleKeydown}
       @keyup=${this.reportCaret}
       @pointerup=${this.reportCaret}
-    ></textarea>`
+    ></textarea>
+      <span id="keys" hidden>${this.keysDescription}</span>`
   }
 
   static override styles: CSSResultGroup = styles

@@ -12,13 +12,12 @@ export function Example() {
 
         {/* The frame runs with `allow-scripts` and without `allow-same-origin`,
             so code in it cannot reach your page. `src` is the document the
-            frame loads, `styles` is the CSS it adds, and `source` is the code
-            it runs. */}
+            frame loads and `styles` is the CSS it adds. The sandbox hands it
+            the source pane's value as the code it runs. */}
         <helix-sandbox-preview
           label="Live preview"
           layout="padded"
           slot="preview"
-          source="&lt;p&gt;Edited here, drawn beside it.&lt;/p&gt;"
           src="/sandbox/frame.html"
           styles="p { font: inherit }"
         ></helix-sandbox-preview>

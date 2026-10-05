@@ -41,18 +41,76 @@ without tracking which element sent each event. A pane named `html` sets the
 preview's markup, and a pane named `css` sets its stylesheet. The sandbox
 ignores a pane with any other name, so that pane only displays its contents.
 
+A pane's text goes in its `value`. The pane renders no children. The sandbox
+also hands each pane's `value` to the preview when it starts, so you write the
+text once, in the pane. A preview given its own `source` keeps it until the
+first edit.
+
 ```html
 <helix-sandbox>
   <helix-sandbox-source
     name="html"
     slot="source"
-  >…</helix-sandbox-source>
+    value="<p>Hello</p>"
+  ></helix-sandbox-source>
   <helix-sandbox-source
     name="css"
     slot="source"
-  >…</helix-sandbox-source>
-  <helix-sandbox-preview slot="preview"></helix-sandbox-preview>
+    value="p { color: teal }"
+  ></helix-sandbox-source>
+  <helix-sandbox-preview
+    slot="preview"
+    src="/frame.html"
+  ></helix-sandbox-preview>
 </helix-sandbox>
+```
+
+Cancel `helix-before-edit` to refuse an edit. The pane keeps its text, and the
+preview does not receive the refused one.
+
+In a source pane, Tab inserts two spaces. Shift+Tab moves focus back, and
+Escape then Tab moves it forward. The field's description says this to a
+screen reader.
+
+## The frame document
+
+`helix-sandbox-preview` loads `src` into a sandboxed frame. You provide that
+document. It loads the styles and the elements your examples use, and it talks
+to the preview through `postMessage`:
+
+| Message | Sent by | What it carries |
+|---|---|---|
+| `helix-preview-console` | The frame | One console call: `level` (`log`, `info`, `warn` or `error`) and `text` |
+| `helix-preview-press` | The frame | Nothing. Send it on `pointerdown`, so menus outside the frame close |
+| `helix-preview-ready` | The frame | Nothing. Send it once the listener for renders is in place |
+| `helix-preview-render` | The preview | `source`, `styles`, `layout`, `direction` and an optional `colorMode` |
+| `helix-preview-size` | The frame | `size`, the height of the content in CSS pixels |
+
+Each message is an object with a `type` naming it. The preview sends
+`helix-preview-render` once the frame posts `helix-preview-ready` or fires
+`load`, and again after each edit settles. The frame writes `source` into its
+body and `styles` into a stylesheet. The preview accepts a message only from
+its own frame, and only from an opaque origin, so the frame keeps the sandbox
+it was given. The types are exported from `@fusion.dev/helix/sandbox` as
+`PreviewMessage` and its members.
+
+A minimal frame follows. `/helix.css` is the stylesheet from
+`@fusion.dev/helix-styles`, and `/elements.js` is a classic script that
+registers your elements, for the reason under "How the preview is isolated".
+
+```html
+<!doctype html>
+<link rel="stylesheet" href="/helix.css">
+<script src="/elements.js" defer></script>
+<style id="example-styles"></style>
+<script defer>
+  addEventListener('message', ({ data }) => {
+    if (data?.type !== 'helix-preview-render') return
+    document.getElementById('example-styles').textContent = data.styles
+    document.body.innerHTML = data.source
+  })
+  parent.postMessage({ type: 'helix-preview-ready' }, '*')
+</script>
 ```
 
 ## Console output from the example

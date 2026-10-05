@@ -60,6 +60,49 @@ describe('the source pane', () => {
     expect(field.value).toBe('  ')
   })
 
+  /* A reader moving backward into the field had no way back out but Escape,
+     which nothing told them, and the attempt wrote two spaces as an edit. */
+  test('lets Shift+Tab leave, with or without Escape first', async () => {
+    const host = await source()
+    const field = part(host, 'source') as HTMLTextAreaElement
+    field.value = ''
+    const back = (): KeyboardEvent => {
+      const event = new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        key: 'Tab',
+        shiftKey: true,
+      })
+      field.dispatchEvent(event)
+      return event
+    }
+    expect(back().defaultPrevented).toBe(false)
+    press(field, 'Escape')
+    press(field, 'Shift')
+    expect(back().defaultPrevented).toBe(false)
+    expect(field.value).toBe('')
+  })
+
+  /* The Shift that starts the chord is a keydown of its own, and it cleared the
+     Escape before the Tab arrived. */
+  test('keeps an Escape through a modifier pressed after it', async () => {
+    const host = await source()
+    const field = part(host, 'source') as HTMLTextAreaElement
+    field.value = ''
+    press(field, 'Escape')
+    press(field, 'Control')
+    expect(press(field, 'Tab').defaultPrevented).toBe(false)
+  })
+
+  test('tells a screen reader how to leave while Tab indents', async () => {
+    const host = await source()
+    const field = part(host, 'source') as HTMLTextAreaElement
+    const id = field.getAttribute('aria-describedby') ?? ''
+    expect(host.shadowRoot?.getElementById(id)?.textContent).toContain('Escape')
+    const plain = part(await source('tab-indents="false"'), 'source') as HTMLTextAreaElement
+    expect(plain.hasAttribute('aria-describedby')).toBe(false)
+  })
+
   /* A consumer who wants a plain field says so, and then Tab never indents and
      there is nothing to escape from. */
   test('gives the key back entirely where a consumer asked for a plain field', async () => {
