@@ -1,0 +1,21 @@
+<!-- @summary A button that waits after a press: it keeps focus, refuses another press, and says Saving to a screen reader. -->
+<helix-button
+  emphasis="solid"
+  id="save"
+  pending-label="Saving"
+  tone="primary"
+>Save changes</helix-button>
+
+<script type="module">
+  const save = document.getElementById('save')
+
+  // The time the pretend request takes.
+  const WAIT = 2000
+
+  save.addEventListener('click', () => {
+    save.pending = true
+    setTimeout(() => {
+      save.pending = false
+    }, WAIT)
+  })
+</script>

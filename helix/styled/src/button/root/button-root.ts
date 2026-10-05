@@ -2,6 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessButton } from '@fusion.dev/helix-headless/button'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
+import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { MixinControlSurface } from '../../shared/mixin-control-surface/mixin-control-surface.js'
 import { styles } from './button-root.css.js'
 
@@ -30,9 +31,11 @@ import { styles } from './button-root.css.js'
  * @slot start - Content before the label, usually an icon.
  *
  * @csspart button - The inner control.
+ * @csspart live - The live region that says `pending-label` when the button becomes pending under focus. It is clipped out of view and still read.
  *
  * @cssproperty --button-background-color - Fill behind the button, in every state.
  * @cssproperty --button-background-color-hover - Fill behind the button under the pointer. Without it, `--button-background-color` also applies on hover.
+ * @cssproperty --button-border-color - Edge color of an outlined button. The other emphases draw no edge.
  * @cssproperty --button-foreground-color - Label and icon color.
  * @cssproperty --button-gap - Space between the label and the content on either side of it.
  * @cssproperty --button-inline-size - Minimum width. It inherits, so you can set it once on a section for every button inside it.
@@ -45,6 +48,9 @@ import { styles } from './button-root.css.js'
  * @cssproperty --button-radius-start-end - The top trailing corner, for a group stacking down.
  * @cssproperty --button-radius-start-start - The top leading corner, for a group stacking down.
  * @cssproperty --button-size - Height of the control, for a row height outside the density steps.
+ * @cssproperty --button-spinner-size - Size of the ring a pending button turns. Defaults to the size of its icons.
+ *
+ * @cssstate pending - The button is pending: `pending` is set. A ring turns over its hidden words.
  */
 @customElement('helix-button')
 export class HelixButton extends MixinControlSurface(HelixHeadlessButton) {
@@ -76,7 +82,7 @@ export class HelixButton extends MixinControlSurface(HelixHeadlessButton) {
   @property({ reflect: true })
   width?: 'auto' | 'full'
 
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [liveStyles, styles]
 }
 
 declare global {

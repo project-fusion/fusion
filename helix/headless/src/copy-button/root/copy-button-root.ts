@@ -41,6 +41,7 @@ const CONFIRM = 1600
  * @event {HelixCopyEvent} helix-copy - Fired after the clipboard write succeeds.
  *
  * @csspart button - The inner button.
+ * @csspart live - The live region that says `pending-label` when the button becomes pending under focus. It is rendered from the first time the button is pending.
  * @csspart mark - The clipboard icon, and the confirmation icon that replaces it.
  * @csspart tooltip - The tooltip bubble, forwarded from the tooltip inside the button.
  * @csspart tooltip-arrow - The tooltip's arrow, which points at the button.
@@ -138,7 +139,12 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
     return this.clipboard.copied
   }
 
-  private readonly handleCopy = async (): Promise<void> => {
+  private readonly handleCopy = async (event: Event): Promise<void> => {
+    if (this.pending) {
+      event.preventDefault()
+      event.stopImmediatePropagation()
+      return
+    }
     if (this.isDisabled) {
       return
     }
@@ -173,10 +179,12 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
        The rest of what `Button` renders is deliberately not carried over.
        `aria-expanded` describes a disclosure and this is not one, and `command`
        is sent from a click handler this component replaces with the copy. */
-    return this.renderTooltip(
+    return html`${this.renderTooltip(
       html`<button
       part="button"
       type="button"
+      aria-busy=${this.pending ? 'true' : nothing}
+      aria-disabled=${this.pending ? 'true' : nothing}
       aria-label=${this.says}
       data-copied=${this.copied ? '' : nothing}
       tabindex=${this.focusable ? nothing : '-1'}
@@ -185,7 +193,7 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
     >
       ${this.renderCopiedIcon()} ${this.renderCopyIcon()}
       </button>`,
-    )
+    )}${this.renderLive()}`
   }
 
   /**

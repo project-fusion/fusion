@@ -15,6 +15,9 @@
   --_button-fill-hover: var(--_button-tone-hover);
   --_button-on-tone: var(--helix-color-background);
   --_button-tone: var(--helix-color-foreground);
+  /* `Loader`'s own turn, so two rings on one page agree. No rung of the
+     duration scale is that long. */
+  --_button-turn: 0.8s;
   /* Softened toward the page rather than deepened, because neutral's tone is
      already the darkest ink there is and there is nothing past it to go to. */
   --_button-tone-hover: color-mix(
@@ -72,7 +75,7 @@
      button slotted into one steps the whole trail: measured 40 at the default
      and still 32 under `data-density="sm"`, against links of 28. */
   block-size: var(--button-size, var(--helix-size-control));
-  border: var(--helix-border-thin) solid var(--_button-edge);
+  border: var(--helix-border-thin) solid var(--button-border-color, var(--_button-edge));
   box-sizing: border-box;
   color: var(--button-foreground-color, var(--_button-tone));
   cursor: pointer;
@@ -240,6 +243,47 @@
    large button does not end up with a small glyph beside big text. */
 [part="button"] ::slotted(helix-icon) {
   --icon-size: 1.15em;
+}
+
+/* **Pending: the words stay where they are, unseen, and a ring turns over
+   them**, so the button keeps its width and nothing beside it moves. The ring
+   is the control's own `::after`, so the headless tier renders nothing for it.
+   The cursor says the press is held. */
+:host(:state(pending)) [part="button"] {
+  cursor: progress;
+  position: relative;
+}
+
+:host(:state(pending)) [part="button"] > slot {
+  visibility: hidden;
+}
+
+:host(:state(pending)) [part="button"]::after {
+  animation: helix-button-turn var(--_button-turn) linear infinite;
+  block-size: var(--button-spinner-size, 1.15em);
+  border: var(--helix-border-thick) solid color-mix(in oklab, currentColor 30%, transparent);
+  border-block-start-color: currentColor;
+  border-radius: var(--helix-radii-full);
+  box-sizing: border-box;
+  content: "";
+  inline-size: var(--button-spinner-size, 1.15em);
+  inset: 0;
+  margin: auto;
+  position: absolute;
+}
+
+@keyframes helix-button-turn {
+  to {
+    rotate: 1turn;
+  }
+}
+
+/* Slowed rather than stopped, as `Loader` does: a ring that holds still reads
+   as broken, and the wait is still the thing to show. */
+@media (prefers-reduced-motion: reduce) {
+  :host(:state(pending)) [part="button"]::after {
+    animation-duration: calc(var(--helix-duration-slow) * 12);
+  }
 }
 
 /* Not printed, being a control. */
