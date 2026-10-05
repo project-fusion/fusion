@@ -2,6 +2,8 @@ import {
   AriaForwardController,
   customElement,
   DisabledCascadeController,
+  fillTemplate,
+  formatNumbers,
   HelixFilterEvent,
   HelixFormElement,
   type HelixSelectEvent,
@@ -153,6 +155,10 @@ const rangeFor = (root: Element, needle: string): Range[] => {
  * Control+A or Command+A chooses every option, or none where all are chosen.
  * In a filter field, Space, Home, End and letters edit the text.
  *
+ * As a filter narrows the list, a screen reader hears how many options are
+ * left, such as "3 results", from `result-label` and `results-label`. A filter
+ * that leaves none says `empty-text`.
+ *
  * @since 0.1.0
  * @status stable
  * @category forms
@@ -160,10 +166,12 @@ const rangeFor = (root: Element, needle: string): Range[] => {
  * @documentation https://fusion.dev/helix/components/listbox
  *
  * @slot - The options, and any groups of them.
+ * @slot empty - What the list shows when it has no options to show, for content richer than `empty-text`.
  * @slot feedback - The message that says what is wrong, for content richer than a string. It shows while there is a message.
  * @slot filter-icon - The icon in the filter field. Defaults to a magnifying glass.
  * @slot hint - The hint, for content richer than plain text.
  * @slot label - The label, for content richer than plain text.
+ * @slot loading - What the list shows while its options load, for content richer than `loading-text`.
  *
  * @event {Event} change - Fired after the value changes.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the value is about to change, and cancelable.
@@ -177,12 +185,14 @@ const rangeFor = (root: Element, needle: string): Range[] => {
  * @csspart hint - Help under the list.
  * @csspart items - The list of options.
  * @csspart label - The label above the list.
- * @csspart live - A copy of the empty and loading text, in a region that screen readers announce when it changes. Visually hidden in the styled tier.
+ * @csspart live - A copy of the empty and loading text, and how many options a filter left, in a region that screen readers announce when it changes. Visually hidden in the styled tier.
  * @csspart loading - The text shown while the options load.
  * @csspart search - The region that holds the filter field.
  * @csspart search-field - The filter field.
  *
+ * @cssstate empty - The list has no options to show: none were given, or the filter hid every one.
  * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
+ * @cssstate loading - While `loading` is set.
  */
 @customElement('helix-headless-listbox')
 export class HelixHeadlessListbox extends MixinCollection(
@@ -280,6 +290,24 @@ export class HelixHeadlessListbox extends MixinCollection(
    */
   @property({ reflect: true, type: Boolean })
   multiple = false
+
+  /**
+   * What a screen reader hears when a filter leaves one option. `{count}` is
+   * the count.
+   */
+  @property({ attribute: 'result-label' })
+  resultLabel = '{count} result'
+
+  /**
+   * What a screen reader hears when a filter leaves any other number of
+   * options. `{count}` is the count.
+   *
+   * **Two sentences, chosen by `Intl.PluralRules`**, which is Data Table's
+   * pair: a language with more forms than two picks the one for its `one` and
+   * writes the rest here.
+   */
+  @property({ attribute: 'results-label' })
+  resultsLabel = '{count} results'
 
   /**
    * Which option the keyboard is on, which is not what is chosen.
@@ -388,6 +416,32 @@ export class HelixHeadlessListbox extends MixinCollection(
     if (this.childrenKnown) {
       this.place()
     }
+  }
+
+  /**
+   * Says how many options a filter left, in the live region.
+   *
+   * **A reader typing into a filter cannot see the list narrow**, and React
+   * Aria and Web Awesome both say the count as it changes. Only "No matches"
+   * was said here, so a query that left forty options and one that left one
+   * sounded the same. Said when the filter changes and the count with it, so
+   * a keystroke that leaves the same options says nothing new. An empty filter
+   * says nothing, being the list as it was given; no matches is `empty-text`,
+   * which the region says in place of this.
+   */
+  private tell(changed: PropertyValues): void {
+    if (!changed.has('filter') || !this.hasUpdated) {
+      return
+    }
+    const count = this.shown.length
+    if (this.filter.trim() === '' || count === 0) {
+      this.announced = ''
+      return
+    }
+    const one = new Intl.PluralRules(this.lang || undefined).select(count) === 'one'
+    this.announced = fillTemplate(one ? this.resultLabel : this.resultsLabel, {
+      count: formatNumbers(this.lang)(count),
+    })
   }
 
   /**
@@ -895,7 +949,13 @@ export class HelixHeadlessListbox extends MixinCollection(
        shim has no `children`, nor while hydrating what one sent. */
     if (this.childrenKnown) {
       this.place()
+      this.tell(changed)
     }
+    /* The two states a stylesheet reads off the host, so a list can draw its
+       own empty look or dim while it loads. Read from the same answer the
+       empty line is drawn from. */
+    this.toggleState('empty', !this.showsOptions)
+    this.toggleState('loading', this.loading)
   }
 
   /**
@@ -1095,16 +1155,40 @@ export class HelixHeadlessListbox extends MixinCollection(
     </slot>`
   }
 
+  /**
+   * Whether there is anything to show.
+   *
+   * Showing nothing is not the same as empty. A filter that hides every option
+   * is empty, and one with no filter and no options is empty too, but a list
+   * still waiting on its options is neither.
+   */
+  private get showsOptions(): boolean {
+    return this.counted && !this.loading
+      ? this.filter === ''
+        ? this.options.length > 0
+        : this.hasMatches
+      : true
+  }
+
+  /**
+   * The empty or loading line, with a slot for each so either can be richer
+   * than its text.
+   *
+   * **The text is the slot's fallback**, which is this library's rule for a
+   * content property, so `empty-text` still shows where nothing is slotted and
+   * the live region still says it.
+   */
+  protected override renderStatus(hasContent: boolean): TemplateResult | typeof nothing {
+    if (!this.loading && hasContent) {
+      return nothing
+    }
+    return this.loading
+      ? html`<p part="loading"><slot name="loading">${this.loadingText}</slot></p>`
+      : html`<p part="empty"><slot name="empty">${this.emptyText}</slot></p>`
+  }
+
   protected override render(): TemplateResult {
-    /* Showing nothing is not the same as empty. A filter that hides every
-       option is empty, and one with no filter and no options is empty too,
-       but a list still waiting on its options is neither. */
-    const shown =
-      this.counted && !this.loading
-        ? this.filter === ''
-          ? this.options.length > 0
-          : this.hasMatches
-        : true
+    const shown = this.showsOptions
     /* One tab stop for the whole list, which is what a listbox is in the tab
        order: the arrows move within it. `tabindex` on the wrapper rather than
        the host so the host stays as the consumer wrote it. */

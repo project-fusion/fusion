@@ -117,3 +117,55 @@ describe('combobox typing, as a consumer sees it', () => {
     expect(heard).toEqual(['ru'])
   })
 })
+
+describe('combobox typing, as a screen reader hears it', () => {
+  /* The list narrowed in silence: only "No matches" was said, where React Aria
+     and Web Awesome say how many options are left. */
+  const said = (host: HTMLElement): string => {
+    const list = listbox(host)
+    return list.shadowRoot?.querySelector('[part="live"]')?.textContent?.trim() ?? ''
+  }
+
+  test('says how many options are left, in the words it was given', async () => {
+    const combobox = await mount(
+      OPTIONS.replace('label="Language"', 'label="Language" result-label="{count} langue"'),
+    )
+    await type(combobox, 'ru')
+    await (listbox(combobox) as unknown as { updateComplete: Promise<unknown> }).updateComplete
+    expect(said(combobox)).toBe('2 results')
+    await type(combobox, 'rus')
+    await (listbox(combobox) as unknown as { updateComplete: Promise<unknown> }).updateComplete
+    expect(said(combobox)).toBe('1 langue')
+  })
+
+  test('and empty content can be richer than the text', async () => {
+    const combobox = await mount(
+      OPTIONS.replace(
+        '</helix-headless-combobox>',
+        '<span slot="empty">No language. <a href="#add">Suggest one</a></span></helix-headless-combobox>',
+      ),
+    )
+    await type(combobox, 'zz')
+    const list = listbox(combobox) as unknown as HTMLElement & { updateComplete: Promise<unknown> }
+    await list.updateComplete
+    const empty = list.shadowRoot?.querySelector('[part="empty"] slot') as HTMLSlotElement
+    const handed = empty.assignedElements()[0] as HTMLSlotElement
+    expect(handed.assignedElements({ flatten: true })[0]?.textContent).toContain('Suggest one')
+  })
+
+  test('without it, the empty text still shows', async () => {
+    const combobox = await mount(
+      OPTIONS.replace('label="Language"', 'label="Language" empty-text="Nothing"'),
+    )
+    await type(combobox, 'zz')
+    const list = listbox(combobox) as unknown as HTMLElement & { updateComplete: Promise<unknown> }
+    await list.updateComplete
+    const empty = list.shadowRoot?.querySelector('[part="empty"] slot') as HTMLSlotElement
+    /* The combobox's own slot is what the list's is given, and with nothing
+       slotted into it, it shows its fallback, which is the text. happy-dom
+       does not flatten through a fallback, so the handed slot is read. */
+    const handed = empty.assignedElements()[0] as HTMLSlotElement
+    expect(handed.assignedNodes()).toHaveLength(0)
+    expect(handed.textContent?.trim()).toBe('Nothing')
+  })
+})
