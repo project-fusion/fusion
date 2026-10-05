@@ -10,6 +10,7 @@ import {
   HelixElement,
   HelixFilterEvent,
   HelixFilteredEvent,
+  HelixLoadMoreEvent,
   HelixNavigateEvent,
   HelixReorderEvent,
   HelixReorderedEvent,
@@ -176,7 +177,7 @@ const isControl = (element: HTMLElement): boolean =>
  * @event {Event} helix-expand - Fired after a row opens or closes. `expanded` holds the open rows.
  * @event {HelixFilterEvent} helix-filter - The search query is about to change. Cancelable: cancel it to keep the current query.
  * @event {HelixFilteredEvent} helix-filtered - Fired after the search query changes, with the new query.
- * @event {Event} helix-load-more - Fired when a reader asks for more rows, by the `load-more` row's button or by scrolling a `windowed` table near its end.
+ * @event {HelixLoadMoreEvent} helix-load-more - Fired when a reader asks for more rows, by the `load-more` row's button or by scrolling a `windowed` table near its end.
  * @event {HelixNavigateEvent} helix-navigate - Another page was requested. Cancelable: cancel it to stay on the current page.
  * @event {HelixReorderEvent} helix-reorder - The columns are about to move. The event carries every field in the new order. Cancelable: cancel it to keep the current order.
  * @event {HelixReorderedEvent} helix-reordered - Fired after the columns move, with every field in the new order.
@@ -1399,7 +1400,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
 
   /** Sends `helix-load-more`, for the button in the `more` row or a scroll near the end. */
   private askForMore(): void {
-    this.dispatchEvent(new Event('helix-load-more', { bubbles: true, composed: true }))
+    this.dispatchEvent(new HelixLoadMoreEvent())
   }
 
   /**
