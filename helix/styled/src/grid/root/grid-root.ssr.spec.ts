@@ -16,6 +16,18 @@ describe('grid server output', () => {
     expect(styles(served)).toContain(':host([columns="3"])')
   })
 
+  /* A rule filled in after upgrade left a server-rendered `min` grid in one
+     column until then, and it reflowed as it upgraded. */
+  test('a minimum is in the server output, so the grid reflows before upgrade', () => {
+    const served = rendered(ssr(html`<helix-grid min="12rem">x</helix-grid>`), 'helix-grid')
+    expect(served).toContain('minmax(min(12rem, 100%), 1fr)')
+  })
+
+  test('so is a count the stylesheet does not list', () => {
+    const served = rendered(ssr(html`<helix-grid columns="12">x</helix-grid>`), 'helix-grid')
+    expect(served).toContain('repeat(12, minmax(0, 1fr))')
+  })
+
   test('the content is projected, not built on the client', () => {
     /* `toContain('item')` passed on the host's own text, which is in the
        response whatever the grid renders. The unnamed slot is the claim. */

@@ -252,6 +252,7 @@ diagnostics counts it by kind and tag. None fails a CI job.
 | `negative-value` | An area chart was given a negative number, which it draws as none |
 | `not-a-graph` | `connectGraph` was given an element that is not a graph frame |
 | `picture-in-picture-refused` | The browser refused picture in picture |
+| `refused-length` | A grid's `min` is not a length it can write, so it lays out by `columns` |
 | `removed-callback` | A React prop is a callback that was removed and never ran from JSX |
 | `solid-handler-syntax` | A React prop uses Solid's `on:` syntax |
 | `stencil-regions-unused` | A graph stencil's regions could not be used |
