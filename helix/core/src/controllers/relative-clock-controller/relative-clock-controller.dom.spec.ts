@@ -1,7 +1,8 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { registerDom } from '@fusion.dev/helix-testing/dom'
 
-/* The clock a turn's name is read against, on its own.
+/* The clock a relative reading is drawn against, on its own: Chat Message's
+ * turns and Format Date's readings.
  *
  * **Driven by a clock that runs only when told**, installed where core's
  * `withClock` installs one: the ticker keeps its state under a global symbol,
@@ -9,11 +10,13 @@ import { registerDom } from '@fusion.dev/helix-testing/dom'
  * the words to go stale is the flaky test the ticker's own spec moved away
  * from. */
 
-let RelativeClockController: typeof import('./relative-clock.js').RelativeClockController
+let relativeTime: typeof import('../../utils/relative-time/relative-time.js').relativeTime
+let RelativeClockController: typeof import('./relative-clock-controller.js').RelativeClockController
 
 beforeAll(async () => {
   registerDom()
-  ;({ RelativeClockController } = await import('./relative-clock.js'))
+  ;({ RelativeClockController } = await import('./relative-clock-controller.js'))
+  ;({ relativeTime } = await import('../../utils/relative-time/relative-time.js'))
 })
 
 const KEY = Symbol.for('helix.ticker')
@@ -80,8 +83,7 @@ describe('the relative clock', () => {
     const element = host(true)
     const moment = new Date(Date.now() - 30_000)
     const controller = new RelativeClockController(element, {
-      locale: () => 'en',
-      moment: () => moment,
+      expires: (now) => relativeTime('en')(moment, now).next,
     })
     controller.hostConnected()
     expect(clock.waiting.size).toBe(1)
@@ -93,22 +95,22 @@ describe('the relative clock', () => {
     element.remove()
   })
 
-  test('waits on nothing once disconnected, or while there is no instant', () => {
+  test('waits on nothing once disconnected, or while there is no reading, and draws nothing new for none', () => {
     const clock = stopped()
     const element = host(true)
     const controller = new RelativeClockController(element, {
-      locale: () => 'en',
-      moment: () => new Date(Date.now() - 30_000),
+      expires: (now) => relativeTime('en')(new Date(Date.now() - 30_000), now).next,
     })
     controller.hostConnected()
     controller.hostDisconnected()
     expect(clock.waiting.size).toBe(0)
     const none = new RelativeClockController(element, {
-      locale: () => 'en',
-      moment: () => undefined,
+      expires: () => undefined,
     })
+    const drawn = element.updates
     none.tick()
     expect(clock.waiting.size).toBe(0)
+    expect(element.updates).toBe(drawn)
     element.remove()
   })
 
@@ -116,8 +118,7 @@ describe('the relative clock', () => {
     const clock = stopped()
     const element = host(false)
     const controller = new RelativeClockController(element, {
-      locale: () => 'en',
-      moment: () => new Date(Date.now() - 30_000),
+      expires: (now) => relativeTime('en')(new Date(Date.now() - 30_000), now).next,
     })
     const was = controller.now
     controller.tick()

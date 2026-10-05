@@ -2,6 +2,7 @@ import {
   closestInstance,
   customElement,
   HelixElement,
+  headingLevel,
   MixinControllerOpen,
 } from '@fusion.dev/helix-core'
 import { caretDown } from '@fusion.dev/helix-icons'
@@ -354,7 +355,7 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
     /* A closed findable section is skipped content, and an empty landmark
        named by its trigger would still be listed among the page's regions. */
     const landmark = open || !this.findable
-    const level = Math.min(6, Math.max(1, this.headingLevel ?? this.groupHeadingLevel ?? 3))
+    const level = headingLevel(this.headingLevel ?? this.groupHeadingLevel)
     return html`
       <div part="container">
         <div part="heading" role="heading" aria-level=${level}>

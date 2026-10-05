@@ -82,3 +82,66 @@ export const toggleValue = (
   const next = list.includes(value) ? list.filter((one) => one !== value) : [...list, value]
   return order ? order.filter((one) => next.includes(one)) : next
 }
+
+/**
+ * `chosen` with every one of `values` added, or with every one taken out
+ * where each was already in it: a select-all box, or a branch of a checkbox
+ * tree pressed. `values` empty changes nothing.
+ *
+ * With `order`, the result is put in that order and holds only what `order`
+ * holds. Without it, what was chosen keeps its place and what is added
+ * follows.
+ */
+export const toggleEvery = (
+  chosen: Iterable<string>,
+  values: readonly string[],
+  order?: readonly string[],
+): string[] => {
+  const next = new Set(chosen)
+  const every = values.length > 0 && values.every((value) => next.has(value))
+  for (const value of values) {
+    if (every) {
+      next.delete(value)
+    } else {
+      next.add(value)
+    }
+  }
+  return order ? order.filter((value) => next.has(value)) : [...next]
+}
+
+/** How many items a set lets a reader select: Tag Group's and List's `selection-mode`. */
+export type SelectionMode = 'multiple' | 'none' | 'single'
+
+/**
+ * The comma-separated `value` a press on the item carrying `pressed` leaves.
+ *
+ * `single` selects that item alone, or none where it was the one selected.
+ * `multiple` adds it, or takes it out. `none` selects nothing and leaves the
+ * value as it was. Tag Group and List answer the same question for their
+ * tags and rows.
+ */
+export const pressedValue = (mode: SelectionMode, value: string, pressed: string): string => {
+  const now = commaList(value)
+  if (mode === 'single') {
+    return now.includes(pressed) ? '' : pressed
+  }
+  if (mode === 'multiple') {
+    return toggleValue(now, pressed).join(', ')
+  }
+  return value
+}
+
+/**
+ * The comma-separated `value` once an item carrying `removed` has left, where
+ * `left` is what the items still there stand for.
+ *
+ * Taken out only where no item left still stands for it, so two items with
+ * one value keep it while either remains. The rest is written back as it was.
+ */
+export const prunedValue = (value: string, removed: string, left: readonly string[]): string => {
+  const now = commaList(value)
+  if (!now.includes(removed) || left.includes(removed)) {
+    return value
+  }
+  return now.filter((one) => one !== removed).join(', ')
+}
