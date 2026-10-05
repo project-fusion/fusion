@@ -711,7 +711,13 @@ describe('play()', () => {
     const video = part(host, 'video') as HTMLVideoElement
     const refused = new Error('NotAllowedError')
     video.play = () => Promise.reject(refused)
-    await expect(host.play()).rejects.toBe(refused)
+    /* Caught by hand rather than through `rejects`, which the browser
+       runner's `expect` does not have. */
+    const caught = await host.play().then(
+      () => undefined,
+      (error: unknown) => error,
+    )
+    expect(caught).toBe(refused)
   })
 })
 

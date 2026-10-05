@@ -81,11 +81,12 @@ describe('lines, alignment and wrapping', () => {
     const [heading, run] = [...wrapper.querySelectorAll('helix-text')] as HTMLElement[]
     expect(getComputedStyle(heading as HTMLElement).fontSize).toBe('31px')
     expect(getComputedStyle(run as HTMLElement).fontSize).toBe('31px')
+    /* Read before the next mount, which replaces the body: a heading off the
+       page has no computed style at all. */
+    const weight = getComputedStyle(heading as HTMLElement).fontWeight
     const plain = await mount('<helix-text as="h2">Big</helix-text>')
     expect(getComputedStyle(plain).fontSize).not.toBe('31px')
-    expect(getComputedStyle(heading as HTMLElement).fontWeight).toBe(
-      getComputedStyle(plain).fontWeight,
-    )
+    expect(weight).toBe(getComputedStyle(plain).fontWeight)
   })
 })
 

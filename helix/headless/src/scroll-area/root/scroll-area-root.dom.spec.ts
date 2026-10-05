@@ -116,15 +116,25 @@ describe('scrollbars of its own', () => {
   })
 
   test('publish the thumb as two fractions on the scrollbar, for the stylesheet to draw', async () => {
-    const host = await area('scrollbars="auto"')
+    const host = await area('scrollbars="auto"', '<p style="margin:0;block-size:400px">One</p>')
     const view = part(host, 'viewport') as HTMLElement
-    sized(view, 100, 400)
+    if (hasLayout()) {
+      /* A browser clamps an offset to what the box can scroll, so it is given
+         the box: 100 of 400. */
+      view.style.blockSize = '100px'
+      await host.updateComplete
+    } else {
+      sized(view, 100, 400)
+    }
     view.scrollTop = 150
     view.dispatchEvent(new Event('scroll'))
     await host.updateComplete
     const bar = part(host, 'scrollbar-vertical') as HTMLElement
-    expect(bar.style.getPropertyValue('--scroll-area-thumb-fraction').trim()).toBe('0.25')
-    expect(bar.style.getPropertyValue('--scroll-area-scroll-fraction').trim()).toBe('0.5')
+    /* Close rather than exact: the page's base layer can add a pixel of
+       content, which moves the third decimal. */
+    const fraction = (name: string): number => Number(bar.style.getPropertyValue(name).trim())
+    expect(fraction('--scroll-area-thumb-fraction')).toBeCloseTo(0.25, 2)
+    expect(fraction('--scroll-area-scroll-fraction')).toBeCloseTo(0.5, 2)
   })
 
   test('under scroll, show while the content moves and go after the hide delay', async () => {
@@ -274,7 +284,10 @@ if (hasLayout()) {
           clientY: track.top + 100,
         }),
       )
-      expect(Math.round(view.scrollTop)).toBe(300)
+      /* The middle of a 50 thumb at 100 on a 200 track: 75 of 150 to travel,
+         half of the 600 the content can move. Within a pixel, since the page's
+         base layer can add one to the content and move the half over it. */
+      expect(Math.abs(view.scrollTop - 300)).toBeLessThanOrEqual(1)
       bar.dispatchEvent(new PointerEvent('pointerup', { bubbles: true }))
     })
   })
