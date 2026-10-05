@@ -27,6 +27,10 @@ const warned = new WeakSet<Element>()
  * menu        nothing             no
  * ```
  *
+ * The popover row holds for the first render. Since then Popover writes
+ * `aria-expanded` onto a plain `<button>` trigger from the reader's first
+ * press on, after hydration, and calls this only for a Helix trigger.
+ *
  * React reports "some attributes of the server rendered HTML didn't match the
  * client properties. This won't be patched up", and the cost is not the console
  * line: it answers a mismatch by discarding the server's HTML for that subtree

@@ -1,3 +1,5 @@
+import { segmentName } from '@fusion.dev/helix-core'
+
 /** A part of the time a Time Picker wheel sets. */
 export type WheelField = 'dayPeriod' | 'hour' | 'minute' | 'second'
 
@@ -10,21 +12,17 @@ const ENGLISH: Record<WheelField, string> = {
 }
 
 /**
- * What a locale calls a wheel, from `Intl.DisplayNames`, with its first letter
- * in capitals as a name standing on its own: "Hour" in English, "Stunde" in
+ * What a locale calls a wheel, core's `segmentName`, with its first letter in
+ * capitals as a name standing on its own: "Hour" in English, "Stunde" in
  * German, "時" in Japanese, and "AM/PM" for the half of the day, React Aria's
  * name for it.
  */
 export const wheelName = (field: WheelField, locale: string): string => {
-  try {
-    const name = new Intl.DisplayNames(locale || undefined, { type: 'dateTimeField' }).of(field)
-    if (!name) {
-      return ENGLISH[field]
-    }
-    const first = name.codePointAt(0) as number
-    const lead = String.fromCodePoint(first)
-    return `${lead.toLocaleUpperCase(locale || undefined)}${name.slice(lead.length)}`
-  } catch {
+  const name = segmentName(field, locale)
+  /* The field's own key back is `Intl` having no name for it. */
+  if (name === field || name === '') {
     return ENGLISH[field]
   }
+  const lead = String.fromCodePoint(name.codePointAt(0) as number)
+  return `${lead.toLocaleUpperCase(locale || undefined)}${name.slice(lead.length)}`
 }
