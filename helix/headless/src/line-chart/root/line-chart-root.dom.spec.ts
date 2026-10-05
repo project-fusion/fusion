@@ -447,3 +447,36 @@ describe('naming and placing a reading', () => {
     expect(part(host, 'live')?.textContent).toBe('Jan: Direct 10, Referral 4')
   })
 })
+
+describe('markers', () => {
+  const marks = (host: HTMLElement): Element[] => [
+    ...(host.shadowRoot?.querySelectorAll('[part~="marker"]') ?? []),
+  ]
+
+  test('absent draws none on a line of readings', async () => {
+    expect(marks(await chart(CHANNELS, 'for="channels"'))).toHaveLength(0)
+  })
+
+  test('`markers` draws one on every reading, in its series color, at its place', async () => {
+    const host = await chart(CHANNELS, 'for="channels" markers')
+    const all = marks(host)
+    expect(all).toHaveLength(4)
+    expect(all[0]?.getAttribute('style')).toContain('--chart-series: var(--chart-series-1)')
+    expect(all[0]?.getAttribute('style')).toContain('inset-inline-start: 25%')
+  })
+
+  /* A reading with a blank on either side is a run of one, which no line can
+     draw: it was in the table and nowhere in the picture. */
+  test('a reading no line reaches takes a lone mark without being asked', async () => {
+    const table = `<table id="lone">
+      <thead><tr><th>Month</th><th>Visits</th></tr></thead>
+      <tbody>
+        <tr><th>Jan</th><td>4</td></tr><tr><th>Feb</th><td>6</td></tr>
+        <tr><th>Mar</th><td></td></tr><tr><th>Apr</th><td>8</td></tr><tr><th>May</th><td></td></tr>
+      </tbody>
+    </table>`
+    const host = await chart(table, 'for="lone"')
+    expect(marks(host).map((one) => one.getAttribute('part'))).toEqual(['marker marker-lone'])
+    expect(marks(host)[0]?.getAttribute('style')).toContain('inset-inline-start: 70%')
+  })
+})

@@ -43,6 +43,8 @@ import '../../tooltip/index.js'
  * @cssproperty --scatter-chart-point-opacity - Opacity of a point, so a cluster looks darker where it is denser.
  * @cssproperty --scatter-chart-point-ring-color - Color of the ring around each point. It matches the page, so change it when the chart sits on another surface.
  * @cssproperty --scatter-chart-point-size - Diameter of a point.
+ * @cssproperty --scatter-chart-trend-dash - The dash pattern of a line of best fit, under `trend`, as `stroke-dasharray` takes it. `none` draws it solid.
+ * @cssproperty --scatter-chart-trend-width - The thickness of a line of best fit, under `trend`.
  */
 @customElement('helix-scatter-chart')
 export class HelixScatterChart extends HelixHeadlessScatterChart {

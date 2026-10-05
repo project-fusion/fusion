@@ -124,6 +124,7 @@ export interface DonutShare {
  * @csspart segment - One slice.
  * @csspart segment-active - The slice under the pointer. Set alongside `segment`.
  * @csspart segment-edge - One slice as a closed shape, used to draw its outline.
+ * @csspart slice-label - One slice's share, written on the slice under `slice-labels`. Placed with `left` and `top`, or `inset-inline-start` and `top` on a half ring, and carries its series color as `--chart-series`.
  * @csspart summary - The chart's name and each slice's share, written as a sentence for screen readers. Hide it visually.
  * @csspart tooltip - The bubble, forwarded from `Tooltip`.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
@@ -196,6 +197,18 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
    */
   @property()
   hole?: 'large' | 'none' | 'small'
+
+  /**
+   * Writes each slice's share on the slice, the `slice-label` part, so a
+   * reader sees the parts without a legend or a pointer: "29%" in the middle
+   * of the band.
+   *
+   * Absent writes none. A slice under a twentieth of the whole takes no
+   * label, there being no room on it for one. The labels are drawn, not read:
+   * the summary says every share.
+   */
+  @property({ attribute: 'slice-labels', reflect: true, type: Boolean })
+  sliceLabels = false
 
   /**
    * How much of the circle the whole occupies.
@@ -379,8 +392,39 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
         ${shares.map((share, index) => this.renderSegment(share, index))}
       </svg>
       ${this.hole === 'none' ? nothing : html`<div id="helix-chart-center" part="center"><slot></slot></div>`}
+      ${this.sliceLabels ? this.renderSliceLabels(shares) : nothing}
       ${this.renderTooltip()}
     </div>`
+  }
+
+  /**
+   * Each slice's share, written in the middle of its band at its mid-angle,
+   * as an element beside the drawing so the text is not stretched with it.
+   * Placed as the tooltip's point is placed: from the left on a whole ring,
+   * whose bearing is a clock's, and from the inline start on a half one.
+   */
+  protected renderSliceLabels(shares: DonutShare[]): TemplateResult {
+    const half = this.sweep === 'half'
+    const top = half ? CENTER - EDGE : 0
+    const tall = half ? EDGE + this.thickness / 2 : PLOT_HEIGHT
+    const format = percentIn(this.locale)
+    return html`${shares.map((share, index) => {
+      if (share.fraction < 0.05) {
+        return nothing
+      }
+      const angle = (share.start + share.fraction / 2) * 2 * Math.PI * this.span + this.origin
+      const x = ((CENTER + Math.cos(angle) * this.radius) / PLOT_WIDTH) * 100
+      const y = ((CENTER + Math.sin(angle) * this.radius - top) / tall) * 100
+      return html`<span
+        aria-hidden="true"
+        data-series=${seriesIndex(index)}
+        part="slice-label"
+        style=${`--chart-series: var(--chart-series-${seriesIndex(index)}); ${
+          half ? 'inset-inline-start' : 'left'
+        }: ${x}%; top: ${y}%`}
+        >${format.format(share.fraction)}</span
+      >`
+    })}`
   }
 
   /**
