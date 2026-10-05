@@ -6,7 +6,7 @@ let readRows: (table: Element) => Array<{
   when?: string
   cells: Array<{ name: string; text: string; value?: number }>
 }>
-let readSeries: (table: Element) => Array<{ name: string; points: unknown[] }>
+let readSeries: (table: Element) => Array<{ name: string; points: Array<{ at: number }> }>
 
 beforeAll(async () => {
   registerDom()
@@ -70,5 +70,17 @@ describe('readRows', () => {
     </div>`
     const rows = readRows(document.body.firstElementChild as Element)
     expect(rows.at(-1)?.cells[0]).toEqual({ name: 'Direct', text: '10', value: 10 })
+  })
+
+  /* Its header row holds no cell, and counted it put a nameless category at
+     the front of a chart and every row one place along from its readings. */
+  test('leaves out the header row of a grid, as `readSeries` does', () => {
+    document.body.innerHTML = `<div role="grid">
+      <div role="row"><span role="columnheader">Month</span><span role="columnheader">Direct</span></div>
+      <div role="row"><span role="rowheader">Jan</span><span role="gridcell">10</span></div>
+    </div>`
+    const grid = document.body.firstElementChild as Element
+    expect(readRows(grid).map((row) => row.label)).toEqual(['Jan'])
+    expect(readSeries(grid)[0]?.points[0]?.at).toBe(0)
   })
 })

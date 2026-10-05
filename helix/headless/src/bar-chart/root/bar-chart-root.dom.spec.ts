@@ -189,3 +189,57 @@ describe('naming a series', () => {
     expect(bars(await chart(MIXED, 'for="mixed" lines="Nothing"'))).toHaveLength(6)
   })
 })
+
+/* A blank keeps its place. Counted by position, a blank in the first data
+   column took Q2 off the axis, and Partner's Q2 value stood under Q3. */
+describe('a blank cell', () => {
+  const GAP = `<table id="gap">
+    <thead><tr><th>Quarter</th><th>Direct</th><th>Partner</th></tr></thead>
+    <tbody>
+      <tr><th>Q1</th><td>10</td><td>5</td></tr>
+      <tr><th>Q2</th><td></td><td>6</td></tr>
+      <tr><th>Q3</th><td>30</td><td>7</td></tr>
+      <tr><th>Q4</th><td>40</td><td>8</td></tr>
+    </tbody>
+  </table>`
+
+  test('keeps its category on the axis', async () => {
+    const host = await chart(GAP, 'for="gap"')
+    expect(labels(host)).toEqual(['Q1', 'Q2', 'Q3', 'Q4'])
+  })
+
+  test('draws no column, and every other reading stays under its own label', async () => {
+    const host = await chart(GAP, 'for="gap"')
+    const groups = [...(host.shadowRoot?.querySelectorAll('[part~="group"]') ?? [])]
+    const heights = groups.map((group) =>
+      [...group.querySelectorAll('[part="bar"]')].map((bar) => [
+        bar.getAttribute('data-series'),
+        Number(bar.getAttribute('height')),
+      ]),
+    )
+    // 10, 30, 40 and 5, 6, 7, 8 against a top of 40 in a box of 100.
+    expect(heights).toEqual([
+      [
+        ['1', 25],
+        ['2', 12.5],
+      ],
+      [['2', 15]],
+      [
+        ['1', 75],
+        ['2', 17.5],
+      ],
+      [
+        ['1', 100],
+        ['2', 20],
+      ],
+    ])
+  })
+
+  test('breaks a series drawn as a line', async () => {
+    const host = await chart(GAP, 'for="gap" lines="Direct"')
+    const d = host.shadowRoot?.querySelector('[part="line"]')?.getAttribute('d') ?? ''
+    // Q1 alone is no line, and Q3 to Q4 is one run.
+    expect(d.match(/M/g)).toHaveLength(1)
+    expect(d.startsWith('M62.5,')).toBe(true)
+  })
+})

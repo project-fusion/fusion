@@ -1,4 +1,5 @@
 import {
+  byRow,
   CHART_PLOT,
   customElement,
   drawTooltip,
@@ -14,7 +15,7 @@ import {
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import '../../tooltip/index.js'
-import { fits, toneOf } from './buckets.js'
+import { fits, type Reading, toneOf } from './buckets.js'
 
 /**
  * @summary A strip of cells, each colored by its reading, for uptime, contributions, or activity.
@@ -229,14 +230,24 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
   private announced: number | undefined = undefined
 
   /**
-   * Every reading in the table, oldest first, as the table is written.
+   * Every row in the table, oldest first, as the table is written, with its
+   * reading where the row has one.
    *
    * **Not `readings`, which the mixin already has and which means a count.**
    * Two members of the same name meaning a number and an array is the kind of
    * collision that type-checks in one direction and reads wrong in both.
+   *
+   * **One cell per row, and a blank row is a cell with no reading.** Taken from
+   * the series alone, a blank dropped its day and every day after it moved one
+   * cell along, while the tooltip still counted rows and named the day beside
+   * the one under the pointer.
    */
-  private get points(): Array<{ label: string; tone?: string | undefined; value: number }> {
-    return this.series[0]?.points ?? []
+  private get points(): Reading[] {
+    const series = this.series[0]
+    if (!series) {
+      return []
+    }
+    return byRow(series, this.sourceRows.length).map((point) => point ?? { value: undefined })
   }
 
   /**
@@ -351,7 +362,7 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
    * The tail rather than the head: a status strip that drops the newest days to
    * keep the oldest is answering a question nobody asked.
    */
-  private get drawn(): Array<{ label: string; tone?: string | undefined; value: number }> {
+  private get drawn(): Reading[] {
     const all = this.points
     return all.slice(Math.max(0, all.length - this.room))
   }

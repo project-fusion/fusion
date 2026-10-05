@@ -1,4 +1,5 @@
 import {
+  byRow,
   CHART_PLOT,
   type Curve,
   customElement,
@@ -14,6 +15,7 @@ import {
   type Series,
   seriesIndex,
   ticks,
+  unbroken,
 } from '@fusion.dev/helix-core'
 import { html, nothing, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -235,7 +237,7 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
       return [
         {
           index: seriesIndex(depth),
-          x: (x(one.points.length - 1) / PLOT_WIDTH) * 100,
+          x: (x(last.at) / PLOT_WIDTH) * 100,
           y: (y(last.value) / PLOT_HEIGHT) * 100,
         },
       ]
@@ -244,7 +246,9 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
 
   protected override render(): TemplateResult {
     const series = this.series
-    const readings = series[0]?.points.map((point) => point.label) ?? []
+    /* Every row is a reading's place, whether or not each series has a number
+       in it, which is also how the pointer and the tooltip count them. */
+    const readings = series.length === 0 ? [] : this.sourceRows.map((row) => row.label)
     if (readings.length === 0) {
       return html`<div id=${CHART_PLOT} part="plot"></div>`
     }
@@ -315,13 +319,13 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
         viewBox="0 0 ${PLOT_WIDTH} ${PLOT_HEIGHT}"
         xmlns="http://www.w3.org/2000/svg"
       >
-        ${this.renderGridlines(x, y, domain, series[0]?.points.length ?? 0)}
+        ${this.renderGridlines(x, y, domain, this.readings)}
         ${
           floor === undefined
             ? nothing
             : svg`<line part="baseline" x1="0" x2=${PLOT_WIDTH} y1=${floor} y2=${floor} />`
         }
-        ${this.renderBand(series[0]?.points.length ?? 0)}
+        ${this.renderBand(this.readings)}
         ${this.renderGuide(x)}
         ${series.map((one, depth) => this.renderSeries(one, depth, x, y))}
       </svg>
@@ -430,26 +434,41 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
     )}`
   }
 
-  /** One series, its wash first so the line is drawn over its own fill. */
+  /**
+   * One series, its wash first so the line is drawn over its own fill.
+   *
+   * Each reading sits at its own row, and the line breaks where a row has no
+   * reading: a line drawn across a blank claims a value nobody measured.
+   */
   protected renderSeries(
     one: Series,
     depth: number,
     x: (value: number) => number,
     y: (value: number) => number,
   ): TemplateResult {
-    const points: Point[] = one.points.map((point, index) => [x(index), y(point.value)])
-    const path = linePath(points, this.curve ?? 'smooth')
-    if (path === '') {
+    const runs = unbroken(one)
+      .map((run) => {
+        const points: Point[] = run.map((point) => [x(point.at), y(point.value)])
+        return { path: linePath(points, this.curve ?? 'smooth'), points }
+      })
+      .filter((run) => run.path !== '')
+    if (runs.length === 0) {
       return html`${nothing}`
     }
     const index = seriesIndex(depth)
+    const path = runs.map((run) => run.path).join('')
     /* Closed along the floor of the box and back, which is what makes it
        fillable: a `<path>` is filled between its own ends, so an open line
        fills the region between the stroke and the straight line joining its
-       first point to its last. */
-    const first = points[0] as Point
-    const last = points.at(-1) as Point
-    const wash = `${path}L${last[0]},${PLOT_HEIGHT}L${first[0]},${PLOT_HEIGHT}Z`
+       first point to its last. One closed shape per run, so a gap is not
+       washed either. */
+    const wash = runs
+      .map((run) => {
+        const first = run.points[0] as Point
+        const last = run.points.at(-1) as Point
+        return `${run.path}L${last[0]},${PLOT_HEIGHT}L${first[0]},${PLOT_HEIGHT}Z`
+      })
+      .join('')
     return svg`${
       this.area
         ? svg`<path
@@ -499,7 +518,7 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
     const domain = this.range(series)
     const scale = linear(domain, [PLOT_HEIGHT, 0])
     const tops = series
-      .map((one) => one.points[at]?.value)
+      .map((one) => byRow(one, this.readings)[at]?.value)
       .filter((one): one is number => one !== undefined)
       .map((one) => scale(one))
     const slot = 100 / this.readings

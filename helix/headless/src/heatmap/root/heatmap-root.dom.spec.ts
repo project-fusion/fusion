@@ -274,3 +274,42 @@ describe('rows', () => {
     expect(part(element, 'strip')?.getAttribute('style')).toContain('--heatmap-rows: 1')
   })
 })
+
+/* A blank keeps its place. Taken from the series alone, a blank dropped its day
+   and every day after it moved a cell along, while the tooltip still counted
+   rows and named the day beside the one under the pointer. */
+describe('a blank cell', () => {
+  const GAP = `<table id="uptime">
+    <tbody>
+      <tr><th>Mon</th><td>99</td></tr>
+      <tr><th>Tue</th><td></td></tr>
+      <tr><th>Wed</th><td>50</td></tr>
+    </tbody>
+  </table>`
+
+  test('is a cell with no tone, and the days after it keep theirs', async () => {
+    const host = (await mount(
+      `<div>${GAP}<helix-headless-heatmap for="uptime" thresholds="0 90" tones="danger success"></helix-headless-heatmap></div>`,
+    )) as HTMLElement
+    const element = host.querySelector('helix-headless-heatmap') as Strip
+    await element.updateComplete
+    expect(cells(element).map((cell) => cell.getAttribute('data-tone'))).toEqual([
+      'success',
+      null,
+      'danger',
+    ])
+  })
+
+  test('and the tooltip over the day after it names that day', async () => {
+    const host = (await mount(
+      `<div>${GAP}<helix-headless-heatmap for="uptime"></helix-headless-heatmap></div>`,
+    )) as HTMLElement
+    const element = host.querySelector('helix-headless-heatmap') as Strip
+    await element.updateComplete
+    cells(element)[2]?.dispatchEvent(
+      new PointerEvent('pointerover', { bubbles: true, composed: true, pointerType: 'mouse' }),
+    )
+    await element.updateComplete
+    expect(element.shadowRoot?.querySelector('[part="tooltip-label"]')?.textContent).toBe('Wed')
+  })
+})

@@ -1,4 +1,5 @@
 import {
+  byRow,
   CHART_PLOT,
   customElement,
   drawTooltip,
@@ -13,6 +14,7 @@ import {
   seriesIndex,
   seriesNames,
   ticks,
+  unbroken,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -224,7 +226,10 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
 
   protected override render(): TemplateResult {
     const series = this.series
-    const categories = series[0]?.points.map((point) => point.label) ?? []
+    /* Every row is a category, whether or not each series has a reading in
+       it. Taken from the first series' points, a blank in its column took the
+       category off the axis and every other series slid one place left. */
+    const categories = series.length === 0 ? [] : this.sourceRows.map((row) => row.label)
     if (categories.length === 0) {
       return html`<div id=${CHART_PLOT} part="plot"></div>`
     }
@@ -343,7 +348,7 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
     const against = (one: Series): ((value: number) => number) =>
       z !== undefined && own(one) ? z : y
     const columns = series
-      .map((one, index) => ({ one, tone: index }))
+      .map((one, index) => ({ one, slots: byRow(one, categories.length), tone: index }))
       .filter(({ one }) => !lined.has(one.name.trim().toLowerCase()))
     /* **The stride is what the columns share and the thickness is what they
        draw.** Back to back, two columns meet on one coordinate and each one's
@@ -460,7 +465,14 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
               data-active=${this.pointer.at === index ? '' : nothing}
               part="group${this.pointer.at === index ? ' group-active' : ''}"
             >
-              ${columns.map(({ one, tone }, depth) => bar(one.points[index]?.value ?? 0, index, depth, tone, against(one)))}
+              ${columns.map(({ slots, one, tone }, depth) => {
+                const point = slots[index]
+                /* A blank cell is no column at all, which is what a blank says.
+                   A column of no height would claim a zero. */
+                return point === undefined
+                  ? nothing
+                  : bar(point.value, index, depth, tone, against(one))
+              })}
             </g>`,
         )}
         ${
@@ -624,11 +636,20 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
     y: (value: number) => number,
     sideways: boolean,
   ): TemplateResult {
-    const points = one.points.map((point, index): [number, number] => {
-      const across = index * slot + slot / 2
-      const along = y(point.value)
-      return sideways ? [along, across] : [across, along]
-    })
+    /* Each reading at its own row's category, and the line broken where a row
+       has none, so a blank is a gap and not a straight run past it. */
+    const path = unbroken(one)
+      .map((run) =>
+        linePath(
+          run.map((point): [number, number] => {
+            const across = point.at * slot + slot / 2
+            const along = y(point.value)
+            return sideways ? [along, across] : [across, along]
+          }),
+          'straight',
+        ),
+      )
+      .join('')
     /* Straight between the category centers, and no `curve` property to change
        it. A bar chart's other axis is categorical: there is nothing between
        Gateway and Billing, so a curve through them draws values at positions
@@ -636,7 +657,7 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
        offers the choice because its axis is continuous and the shape between
        two readings is a claim somebody may legitimately want to make. */
     return svg`<path
-      d=${linePath(points, 'straight')}
+      d=${path}
       data-series=${seriesIndex(depth)}
       part="line"
       style="--chart-series: var(--chart-series-${seriesIndex(depth)})"
@@ -661,13 +682,15 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
        so the far end is along x: rightward, or leftward where the drawing is
        mirrored, and the bubble goes on that side because a placement is
        physical. */
-    const values = series.map((one) => one.points[at]?.value ?? 0)
+    const values = series
+      .map((one) => byRow(one, this.readings)[at]?.value)
+      .filter((one): one is number => one !== undefined)
     const all = series.flatMap((one) => one.points.map((point) => point.value))
     const [low, high] = extent(all.length > 0 ? all : [0])
     const domain: [number, number] = [Math.min(0, low), Math.max(0, high)]
     const sideways = this.orientation === 'horizontal'
     const scale = sideways ? linear(domain, [0, PLOT_HEIGHT]) : linear(domain, [PLOT_HEIGHT, 0])
-    const ends = values.map((one) => scale(one))
+    const ends = (values.length > 0 ? values : [0]).map((one) => scale(one))
     const far = sideways ? Math.max(...ends) : Math.min(...ends)
     const slot = 100 / this.readings
     const across = at * slot + slot / 2

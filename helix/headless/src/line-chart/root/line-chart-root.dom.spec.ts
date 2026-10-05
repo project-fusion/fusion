@@ -273,3 +273,48 @@ describe('line chart', () => {
     expect(line.getBBox().width).toBeGreaterThan(0)
   })
 })
+
+/* A blank keeps its place. Counted by position, a blank in the first data
+   column took Feb off the axis and Referral's Feb value stood under Mar. */
+describe('a blank cell', () => {
+  const GAP = `<table id="gap">
+    <thead><tr><th>Month</th><th>Direct</th><th>Referral</th></tr></thead>
+    <tbody>
+      <tr><th>Jan</th><td>10</td><td>4</td></tr>
+      <tr><th>Feb</th><td></td><td>8</td></tr>
+      <tr><th>Mar</th><td>30</td><td>6</td></tr>
+      <tr><th>Apr</th><td>40</td><td>2</td></tr>
+    </tbody>
+  </table>`
+
+  const labels = (host: HTMLElement): string[] =>
+    [...(host.shadowRoot?.querySelectorAll('[part="label"]') ?? [])].map(
+      (one) => one.textContent?.trim() ?? '',
+    )
+
+  test('keeps its reading on the axis', async () => {
+    const host = await chart(GAP, 'for="gap"')
+    expect(labels(host)).toEqual(['Jan', 'Feb', 'Mar', 'Apr'])
+  })
+
+  test('breaks the line, and the readings after it stay over their own names', async () => {
+    const host = await chart(GAP, 'for="gap" curve="straight"')
+    const [direct, referral] = lines(host)
+    // Four slots of 25, so the readings sit at 12.5, 37.5, 62.5 and 87.5.
+    expect(d(direct).match(/M/g)).toHaveLength(1)
+    expect(anchors(d(direct)).map(([x]) => x)).toEqual([62.5, 87.5])
+    expect(anchors(d(referral)).map(([x]) => x)).toEqual([12.5, 37.5, 62.5, 87.5])
+  })
+
+  test('and the tooltip and the drawing describe the same row', async () => {
+    const host = (await chart(GAP, 'for="gap"')) as HTMLElement & {
+      pointer: { set: (at: number) => void }
+      updateComplete: Promise<unknown>
+    }
+    host.pointer.set(1)
+    await host.updateComplete
+    expect(host.shadowRoot?.querySelector('[part="tooltip-label"]')?.textContent).toBe('Feb')
+    const guide = host.shadowRoot?.querySelector('[part="guide"]')
+    expect(Number(guide?.getAttribute('x1'))).toBe(37.5)
+  })
+})

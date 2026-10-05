@@ -289,3 +289,31 @@ describe('donut chart sweep', () => {
     expect(whole.shadowRoot?.querySelector('svg')?.hasAttribute('data-mirror')).toBe(false)
   })
 })
+
+/* A row that does not parse has no slice. The tooltip counted slices against
+   the table's rows, so every slice after it named the row before its own. */
+describe('a row that does not parse', () => {
+  const GAP = `<table id="gap">
+    <tbody>
+      <tr><th>Direct</th><td>40</td></tr>
+      <tr><th>Email</th><td>n/a</td></tr>
+      <tr><th>Search</th><td>30</td></tr>
+      <tr><th>Social</th><td>30</td></tr>
+    </tbody>
+  </table>`
+
+  test('leaves each later slice naming its own row in the tooltip', async () => {
+    const host = (await chart(GAP, 'for="gap"')) as HTMLElement & {
+      pointer: { set: (at: number) => void }
+      updateComplete: Promise<unknown>
+    }
+    expect(segments(host)).toHaveLength(3)
+    const named: (string | null | undefined)[] = []
+    for (const at of [0, 1, 2]) {
+      host.pointer.set(at)
+      await host.updateComplete
+      named.push(host.shadowRoot?.querySelector('[part="tooltip-label"]')?.textContent)
+    }
+    expect(named).toEqual(['Direct', 'Search', 'Social'])
+  })
+})

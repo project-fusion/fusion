@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { registerDom } from '@fusion.dev/helix-testing/dom'
-import { readSeries } from './read-series.js'
+import { byRow, readSeries, type Series, unbroken } from './read-series.js'
 
 beforeAll(() => {
   registerDom()
@@ -60,7 +60,7 @@ describe('reading a table as series', () => {
         <tr><th scope="row"><time datetime="2026-08-21">21 Aug</time></th><td>4</td></tr>
       </tbody></table>`),
     )
-    expect(series[0]?.points[0]).toEqual({ label: '21 Aug', value: 4, when: '2026-08-21' })
+    expect(series[0]?.points[0]).toEqual({ at: 0, label: '21 Aug', value: 4, when: '2026-08-21' })
   })
 
   test('a cell that is nearly a number is dropped rather than rounded off', () => {
@@ -75,7 +75,7 @@ describe('reading a table as series', () => {
         <tr><th scope="row">C</th><td>7</td></tr>
       </tbody></table>`),
     )
-    expect(series[0]?.points).toEqual([{ label: 'C', value: 7 }])
+    expect(series[0]?.points).toEqual([{ at: 2, label: 'C', value: 7 }])
   })
 
   test('a table with no body and no columns is no series rather than a throw', () => {
@@ -94,6 +94,55 @@ describe('reading a table as series', () => {
     )
     expect(series[0]?.points).toHaveLength(2)
     expect(series[1]?.points.map((p) => p.label)).toEqual(['W1'])
+  })
+})
+
+/* A blank keeps its place. Counted by position in `points`, a blank in Q2 slid
+   Q3's reading under Q2's label, and a blank in the first column took a
+   category off the axis for every series. */
+describe('a blank cell', () => {
+  const quarters = () =>
+    readSeries(
+      table(`<table>
+        <thead><tr><th>Quarter</th><th>Direct</th><th>Partner</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Q1</th><td>10</td><td>5</td></tr>
+          <tr><th scope="row">Q2</th><td></td><td>6</td></tr>
+          <tr><th scope="row">Q3</th><td>30</td><td>n/a</td></tr>
+          <tr><th scope="row">Q4</th><td>40</td><td>8</td></tr>
+        </tbody>
+      </table>`),
+    )
+
+  test('leaves the readings after it at their own rows', () => {
+    const [direct, partner] = quarters()
+    expect(direct?.points.map((p) => [p.at, p.label, p.value])).toEqual([
+      [0, 'Q1', 10],
+      [2, 'Q3', 30],
+      [3, 'Q4', 40],
+    ])
+    expect(partner?.points.map((p) => [p.at, p.value])).toEqual([
+      [0, 5],
+      [1, 6],
+      [3, 8],
+    ])
+  })
+
+  test('is an empty slot when the series is laid out by row', () => {
+    const [direct] = quarters()
+    expect(byRow(direct, 4).map((p) => p?.value)).toEqual([10, undefined, 30, 40])
+  })
+
+  test('ends one run of the line and starts the next', () => {
+    const [direct, partner] = quarters()
+    expect(unbroken(direct as Series).map((run) => run.map((p) => p.label))).toEqual([
+      ['Q1'],
+      ['Q3', 'Q4'],
+    ])
+    expect(unbroken(partner as Series).map((run) => run.map((p) => p.label))).toEqual([
+      ['Q1', 'Q2'],
+      ['Q4'],
+    ])
   })
 })
 
@@ -192,7 +241,7 @@ describe('reading a grid built from roles', () => {
       </div>`),
     )
     expect(series[0]?.name).toBe('Accounts')
-    expect(series[0]?.points[0]).toEqual({ label: 'Free', value: 1840 })
+    expect(series[0]?.points[0]).toEqual({ at: 0, label: 'Free', value: 1840 })
   })
 
   test('data-value wins in a grid too, because the text is for the reader', () => {

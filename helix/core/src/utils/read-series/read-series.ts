@@ -1,6 +1,11 @@
 /** One point in a series: what it is called, what it is worth, and when. */
 export interface SeriesPoint {
   /**
+   * The row the reading is in, counting from zero, which is its place among
+   * the rows `readRows` reads and so the category it is drawn at.
+   */
+  at: number
+  /**
    * The row's own label, taken from its header cell.
    */
   label: string
@@ -66,14 +71,14 @@ const isGrid = (element: Element): boolean =>
  */
 const readGrid = (grid: Element): Series[] => {
   const columns = [...grid.querySelectorAll(COLUMNS)]
-  const rows = [...grid.querySelectorAll(ROWS)]
+  const rows = gridRows(grid)
   const names = columns.slice(1).map((cell) => cell.textContent?.trim() ?? '')
   const cellsOf = (row: Element): Element[] => [...row.querySelectorAll(CELLS)]
   const count = Math.max(0, ...rows.map((row) => cellsOf(row).length - 1))
 
   return Array.from({ length: count }, (_, column) => ({
     name: names[column] ?? grid.getAttribute('label') ?? '',
-    points: rows.flatMap((row) => {
+    points: rows.flatMap((row, at) => {
       const cells = cellsOf(row)
       const head = cells[0]
       const cell = cells[column + 1]
@@ -87,6 +92,7 @@ const readGrid = (grid: Element): Series[] => {
       return Number.isFinite(value) && raw.trim() !== ''
         ? [
             {
+              at,
               label: head?.textContent?.trim() ?? '',
               value,
               ...(tone ? { tone } : {}),
@@ -97,6 +103,15 @@ const readGrid = (grid: Element): Series[] => {
     }),
   }))
 }
+
+/* A grid's rows that hold readings, which leaves out a header row.
+ *
+ * A grid written with roles by hand puts its column headers in a row of their
+ * own, and that row has no cell. Counted, it is a category with no name at the
+ * front of every chart, and every row after it is one place along from where
+ * `readSeries` and `readRows` say it is. */
+const gridRows = (grid: Element): Element[] =>
+  [...grid.querySelectorAll(ROWS)].filter((row) => row.querySelector(CELLS) !== null)
 
 /* A column with no numbers in it is not a series.
  *
@@ -128,6 +143,12 @@ const plotted = (series: Series[]): Series[] => series.filter((one) => one.point
  * the second reads `12abc` as 12: a value that is nearly a number is a mistake
  * worth dropping rather than rounding off, and a dropped point is visible where
  * a silently truncated one is not.
+ *
+ * **A dropped point keeps its place.** Each point carries `at`, the row it was
+ * read from, and a chart draws it at that row's category. Counted by position
+ * in `points`, a blank in March slid April's reading under March's label, and a
+ * blank in the first column took a category off the axis for every series.
+ * `byRow` lays a series out one slot per row with the blanks left empty.
  */
 export const readSeries = (table: Element): Series[] => {
   if (isGrid(table)) {
@@ -143,7 +164,7 @@ export const readSeries = (table: Element): Series[] => {
   return plotted(
     Array.from({ length: columns }, (_, column) => ({
       name: names[column] ?? element.caption?.textContent?.trim() ?? '',
-      points: rows.flatMap((row) => {
+      points: rows.flatMap((row, at) => {
         const head = row.cells[0]
         const cell = row.cells[column + 1]
         if (!cell) {
@@ -156,6 +177,7 @@ export const readSeries = (table: Element): Series[] => {
         return Number.isFinite(value) && raw.trim() !== ''
           ? [
               {
+                at,
                 label: head?.textContent?.trim() ?? '',
                 value,
                 ...(tone ? { tone } : {}),
@@ -166,6 +188,46 @@ export const readSeries = (table: Element): Series[] => {
       }),
     })),
   )
+}
+
+/**
+ * A series laid out one slot per row, with nothing in a slot whose cell was
+ * blank or did not parse.
+ *
+ * This is the shape a chart drawing categories wants: slot `i` is the reading at
+ * the `i`th row, which is the label under it and the row the tooltip reads.
+ */
+export const byRow = (series: Series | undefined, rows: number): (SeriesPoint | undefined)[] => {
+  const slots: (SeriesPoint | undefined)[] = Array.from({ length: rows }, () => undefined)
+  for (const point of series?.points ?? []) {
+    if (point.at >= 0 && point.at < rows) {
+      slots[point.at] = point
+    }
+  }
+  return slots
+}
+
+/**
+ * A series cut into its unbroken runs, where a run ends at a row with no
+ * reading.
+ *
+ * A line drawn through a gap claims a value in the gap. Drawn as runs, the
+ * line stops at the last reading before a blank and starts again at the first
+ * one after it.
+ */
+export const unbroken = (series: Series): SeriesPoint[][] => {
+  const runs: SeriesPoint[][] = []
+  let previous: SeriesPoint | undefined
+  for (const point of series.points) {
+    const run = runs.at(-1)
+    if (run && previous && point.at === previous.at + 1) {
+      run.push(point)
+    } else {
+      runs.push([point])
+    }
+    previous = point
+  }
+  return runs
 }
 
 /** One cell of a row, as a reader sees it and as a chart measures it. */
@@ -249,7 +311,7 @@ export const readRows = (table: Element): Row[] => {
     const names = [...table.querySelectorAll(COLUMNS)]
       .slice(1)
       .map((one) => one.textContent?.trim() ?? '')
-    return [...table.querySelectorAll(ROWS)].map((one) => {
+    return gridRows(table).map((one) => {
       const cells = [...one.querySelectorAll(CELLS)]
       return row(cells[0], cells.slice(1), names)
     })
