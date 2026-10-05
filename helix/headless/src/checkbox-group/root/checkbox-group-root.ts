@@ -13,6 +13,7 @@ import { property } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
 import { HelixHeadlessCheckbox } from '../../checkbox/root/checkbox-root.js'
 import '../../checkbox/index.js'
+import { type SetBox, selectAllPress, selectAllState } from '../select-all.js'
 
 /**
  * @summary A group of related checkboxes under one label, with one value for the set.
@@ -436,11 +437,7 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
   private readonly handleSelectAll = (event: Event): void => {
     event.preventDefault()
     event.stopPropagation()
-    const enabled = this.boxes.filter((box) => !box.isDisabled)
-    const every = enabled.length > 0 && enabled.every((box) => box.checked)
-    const next = this.boxes
-      .filter((box) => (enabled.includes(box) ? !every : box.checked))
-      .map((box) => box.value)
+    const next = selectAllPress(this.setBoxes())
     if (!this.dispatchEvent(new HelixBeforeChangeEvent({ value: next.join(',') }))) {
       return
     }
@@ -449,20 +446,28 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
     this.announceChange()
   }
 
+  /** The set as the select-all helper reads it. */
+  private setBoxes(): SetBox[] {
+    return this.boxes.map((box) => ({
+      checked: box.checked,
+      disabled: box.isDisabled,
+      value: box.value,
+    }))
+  }
+
   /**
    * The box above the set that checks or unchecks every box, under
    * `select-all`, behind a seam a tier can move.
    *
-   * Checked while every box is, and showing a dash while only some are. It is
-   * in this shadow root, so it is no member of the set and submits nothing.
+   * Checked while every enabled box is, and showing a dash while only some
+   * are, so its state says what a press does. It is in this shadow root, so
+   * it is no member of the set and submits nothing.
    */
   protected renderSelectAll(): TemplateResult | typeof nothing {
     if (!this.selectAll) {
       return nothing
     }
-    const boxes = this.childrenKnown ? this.boxes : []
-    const ticked = boxes.filter((box) => box.checked).length
-    const every = boxes.length > 0 && ticked === boxes.length
+    const { checked, indeterminate } = selectAllState(this.childrenKnown ? this.setBoxes() : [])
     const box = this.tag('checkbox')
     return html`<${box}
       part="select-all"
@@ -470,8 +475,8 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
         feedback: select-all-feedback, field: select-all-field, hint: select-all-hint,
         label: select-all-label, mark: select-all-mark, mark-checked: select-all-mark-checked,
         mark-dash: select-all-mark-dash, mark-indeterminate: select-all-mark-indeterminate"
-      .checked=${every}
-      .indeterminate=${ticked > 0 && !every}
+      .checked=${checked}
+      .indeterminate=${indeterminate}
       ?disabled=${this.isDisabled}
       label=${this.selectAllLabel}
       @helix-before-toggle=${this.handleSelectAll}

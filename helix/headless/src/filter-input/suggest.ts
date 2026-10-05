@@ -20,21 +20,58 @@ export const suggests = (words: string, term: string): boolean => {
   return term === '' || plain(words).includes(plain(term))
 }
 
+/** What a token says about the filter it shows, as `tokenEntry` reads it. */
+export interface TokenWords {
+  /** The field it filters, from its `name` attribute. */
+  readonly field: string | null
+  /** The comparison, from its `operator` attribute. */
+  readonly operator: string | null
+  /** The values it shows, from its text. */
+  readonly text: string
+  /** What it sends as written, from its `value` attribute. */
+  readonly value: string | null
+}
+
 /**
- * What a token sends a form: its `value` attribute, or for a token naming a
- * field, the field and the values it shows, written `field:values` the way the
- * field reads them typed. Nothing for a token that says neither.
+ * The form entry for a token's words: its `value` where it has one, or else
+ * `field:values`, the way the field reads a filter typed.
+ *
+ * - The values are the token's text, with the spaces around each comma taken
+ *   out: `status:open,pending`.
+ * - The comparison named `none`, which a typed `-field:` asks for, leads with a
+ *   `-`: `-team:ops`.
+ * - Any comparison other than `any` and `none` is written in brackets after
+ *   the field, so a chip that says `is after` keeps it: `created[after]:2024`.
+ *   `any`, or no `operator`, writes none.
+ * - A token naming no field, or showing no values, sends nothing.
  */
-export const tokenEntry = (token: Element): string | null => {
-  const written = token.getAttribute('value')
-  if (written !== null) {
-    return written
+export const entryFor = ({ field, operator, text, value }: TokenWords): string | null => {
+  if (value !== null) {
+    return value
   }
-  const field = token.getAttribute('name')
-  const values = (token.textContent ?? '').replace(/\s+/gu, ' ').trim()
+  const values = text.replace(/\s+/gu, ' ').trim()
   if (!field || values === '') {
     return null
   }
-  const negated = token.getAttribute('operator')?.startsWith('not') ? '-' : ''
-  return `${negated}${field}:${values.replace(/\s*,\s*/gu, ',')}`
+  const shown = values.replace(/\s*,\s*/gu, ',')
+  if (operator === 'none') {
+    return `-${field}:${shown}`
+  }
+  return operator && operator !== 'any' ? `${field}[${operator}]:${shown}` : `${field}:${shown}`
 }
+
+/**
+ * The form entry for a slotted token. See `entryFor`. The values are the text
+ * of the token's unslotted content, so a name or a comparison slotted into a
+ * chip's `field` or `operator` is not read as a value.
+ */
+export const tokenEntry = (token: Element): string | null =>
+  entryFor({
+    field: token.getAttribute('name'),
+    operator: token.getAttribute('operator'),
+    text: [...token.childNodes]
+      .filter((node) => !(node.nodeType === 1 && (node as Element).hasAttribute('slot')))
+      .map((node) => node.textContent ?? '')
+      .join(''),
+    value: token.getAttribute('value'),
+  })

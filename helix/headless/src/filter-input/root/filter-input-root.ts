@@ -61,12 +61,36 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * its tokens show a selection it owns, drawn from the options it was given.
  *
  * `value` is the typed text. Every keystroke fires `input` with the text on the
- * element, so a table can narrow as the user types. A form receives the text
- * under `name`, and then one more entry under `name` for each token: its
- * `value` attribute, or for a `FilterChip`, its field and values written
- * `field:values` as the field reads them typed. Backspace in an empty field fires
- * `helix-dismiss` on the last token, the same event its remove control fires,
- * so one handler covers the pointer and the keyboard.
+ * element, so a table can narrow as the user types. Backspace in an empty field
+ * fires `helix-dismiss` on the last token, the same event its remove control
+ * fires, so one handler covers the pointer and the keyboard.
+ *
+ * **What a form receives.** The text under `name`, and then one more entry
+ * under `name` for each token, in the order the tokens stand:
+ *
+ * | Token | Entry |
+ * |---|---|
+ * | Any element with a `value` attribute | The value as written: `saved:mine` |
+ * | `FilterChip` with `name` and values | `status:open,pending` |
+ * | The same, with `operator="none"` (what a typed `-status:` makes) | `-status:open,pending` |
+ * | The same, with any other `operator` except `any` | `created[after]:2024` |
+ * | A token with neither | Nothing |
+ *
+ * The values are the chip's text outside its `field` and `operator` slots,
+ * with the spaces around each comma removed. A server splits an entry at its
+ * first colon, reads a leading `-` as the negation, and reads a word in
+ * brackets before the colon as the comparison.
+ *
+ * **Keyboard.** Focus stays in the text. The text names the highlighted
+ * suggestion as its `aria-activedescendant`.
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Enter | Presses the highlighted suggestion. With none highlighted, reads the typed filters into chips, or submits the form when there are none. |
+ * | Down, Up | Moves the highlight through the suggestions, wrapping, and opens the panel. |
+ * | Home, End | Highlights the first or the last suggestion while the panel is open. |
+ * | Escape | Closes the panel and stops there, so a dialog around the field stays open. |
+ * | Backspace | In an empty field, asks the last token to go. |
  *
  * **Typed filters.** The field parses only the fields you declare. Write
  * `FilterField` elements, usually inside the `FilterMenu` slotted into `start`,
