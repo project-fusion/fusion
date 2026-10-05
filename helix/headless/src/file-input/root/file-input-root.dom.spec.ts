@@ -395,3 +395,87 @@ describe('removing a file from the list', () => {
     expect(host.shadowRoot?.activeElement).toBe(part(host, 'remove'))
   })
 })
+
+describe('screening the files that arrive', () => {
+  type Screening = InputFile & { files: File[]; validate?: (file: File) => string | null }
+  const sized = (name: string, size: number, type = 'text/plain'): File =>
+    new File([new Uint8Array(size)], name, { type })
+  const dropOn = async (host: InputFile, files: File[]): Promise<void> => {
+    const carrier = new DataTransfer()
+    for (const file of files) {
+      carrier.items.add(file)
+    }
+    const event = new Event('drop', { bubbles: true, cancelable: true }) as DragEvent
+    Object.defineProperty(event, 'dataTransfer', { value: carrier })
+    part(host, 'field')?.dispatchEvent(event)
+    await host.updateComplete
+  }
+  const rejected = (host: InputFile): string[][] => {
+    const heard: string[][] = []
+    host.addEventListener('helix-reject', (event) => {
+      const { files } = (event as CustomEvent<{ files: { file: File; reason: string }[] }>).detail
+      heard.push(files.map((one) => `${one.file.name}:${one.reason}`))
+    })
+    return heard
+  }
+
+  /* Zag's file upload: maxFiles, maxFileSize, a validate hook and a rejected
+     event. A refused file used to vanish with no signal. */
+  test('a drop past max-files or max-file-size is cut, and each refusal is reported', async () => {
+    const host = (await field('multiple max-files="2" max-file-size="50"')) as Screening
+    const heard = rejected(host)
+    await dropOn(host, [
+      sized('a.txt', 10),
+      sized('big.txt', 99),
+      sized('b.txt', 10),
+      sized('c.txt', 10),
+    ])
+    expect(host.files.map((file) => file.name)).toEqual(['a.txt', 'b.txt'])
+    expect(heard).toEqual([['big.txt:size', 'c.txt:count']])
+  })
+
+  test('validate refuses a file with its own reason, from the picker too', async () => {
+    const host = (await field('multiple')) as Screening
+    host.validate = (file) => (file.name.startsWith('draft') ? 'Drafts cannot be attached' : null)
+    let message = ''
+    host.addEventListener('helix-reject', (event) => {
+      message =
+        (event as CustomEvent<{ files: { message?: string }[] }>).detail.files[0]?.message ?? ''
+    })
+    await choose(host, 'draft.txt', 'final.txt')
+    expect(host.files.map((file) => file.name)).toEqual(['final.txt'])
+    expect(message).toBe('Drafts cannot be attached')
+  })
+
+  test('a refusal is said in a live region, with the names filled in', async () => {
+    const host = await field('accept="image/*" rejected-text="{count} left out: {names}"')
+    expect(part(host, 'live')).toBeNull()
+    await dropOn(host, [sized('notes.txt', 10)])
+    await new Promise((done) => setTimeout(done, 40))
+    await host.updateComplete
+    expect(part(host, 'live')?.textContent).toBe('1 left out: notes.txt')
+    expect(part(host, 'live')?.getAttribute('role')).toBe('status')
+  })
+
+  test('a drop that is wholly refused changes nothing and sends no change', async () => {
+    const host = await field('accept="image/*"')
+    let changes = 0
+    host.addEventListener('change', () => {
+      changes += 1
+    })
+    await dropOn(host, [sized('notes.txt', 10)])
+    expect(changes).toBe(0)
+  })
+
+  test('files pasted onto the field are taken as a drop is', async () => {
+    const host = (await field('multiple')) as Screening
+    const carrier = new DataTransfer()
+    carrier.items.add(sized('pasted.txt', 4))
+    const event = new Event('paste', { bubbles: true, cancelable: true }) as ClipboardEvent
+    Object.defineProperty(event, 'clipboardData', { value: carrier })
+    part(host, 'field')?.dispatchEvent(event)
+    await host.updateComplete
+    expect(host.files.map((file) => file.name)).toEqual(['pasted.txt'])
+    expect(event.defaultPrevented).toBe(true)
+  })
+})
