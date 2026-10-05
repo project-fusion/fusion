@@ -62,12 +62,39 @@ const size = (bytes: number, locale?: string): string => {
  * shows, which makes it a poor label and a better one than nothing.
  */
 const kind = (file: File): string => {
-  const subtype = file.type.split('/')[1]
-  if (subtype) {
-    return subtype.replace(/^x-/, '').split('+')[0]?.toUpperCase() ?? 'File'
+  /* The extension first, because it is the word a reader has for the file:
+     a Word document's subtype is a 59-character vendor string and a text
+     file's is `plain`. The subtype only where the name has no extension, and
+     only a short one. */
+  const extension = /\.([a-z0-9]{1,6})$/i.exec(file.name)?.[1]
+  if (extension) {
+    return extension.toUpperCase()
   }
-  const extension = file.name.includes('.') ? file.name.split('.').pop() : ''
-  return extension ? extension.toUpperCase() : 'File'
+  const subtype = file.type.split('/')[1]?.replace(/^x-/, '').split('+')[0] ?? ''
+  return /^[a-z0-9]{1,6}$/i.test(subtype) ? subtype.toUpperCase() : 'File'
+}
+
+/**
+ * Whether a file is one `accept` lists: an extension, a type, or a family
+ * such as `image/*`, as the platform reads it.
+ */
+const accepts = (file: File, accept: string): boolean => {
+  const tokens = accept
+    .split(',')
+    .map((token) => token.trim().toLowerCase())
+    .filter(Boolean)
+  if (tokens.length === 0) {
+    return true
+  }
+  const name = file.name.toLowerCase()
+  const type = file.type.toLowerCase()
+  return tokens.some((token) =>
+    token.startsWith('.')
+      ? name.endsWith(token)
+      : token.endsWith('/*')
+        ? type.startsWith(token.slice(0, -1))
+        : type === token,
+  )
 }
 
 /**
@@ -131,11 +158,15 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
      in Chrome's own tree, the host held the description and the control the
      reader is actually on was exposed without it. */
   protected readonly aria = new AriaForwardController(this, {
+    named: () => this.labeled,
     target: () => this.partNamed('control'),
   })
 
   /**
-   * Which files the picker offers, as a native `accept` list.
+   * Which files the picker offers and a drop takes, as a native `accept` list.
+   *
+   * A dropped file the list does not name is left out, because the picker's
+   * filter is the only check the platform makes and a drop never meets it.
    */
   @property()
   accept = ''
@@ -399,7 +430,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
       return
     }
     event.preventDefault()
-    const dropped = [...event.dataTransfer.files]
+    const dropped = [...event.dataTransfer.files].filter((file) => accepts(file, this.accept))
     if (dropped.length === 0) {
       return
     }
@@ -408,11 +439,23 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
     this.commit(this.multiple ? [...this.files, ...dropped] : dropped.slice(-1))
   }
 
+  /**
+   * Removes a file and keeps focus in the field.
+   *
+   * The pressed button goes with its file, so focus moves to the file that took
+   * its place, or to the one before it, or to the input once the list is empty:
+   * left alone, it fell to the page's body.
+   */
   private readonly handleRemove = (event: Event): void => {
     const at = Number((event.currentTarget as HTMLElement).dataset.at)
-    if (Number.isFinite(at)) {
-      this.removeAt(at)
+    if (!Number.isFinite(at)) {
+      return
     }
+    this.removeAt(at)
+    this.updateComplete.then(() => {
+      const buttons = [...this.renderRoot.querySelectorAll<HTMLButtonElement>('[part="remove"]')]
+      ;(buttons[Math.min(at, buttons.length - 1)] ?? this.control)?.focus()
+    })
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
@@ -420,6 +463,16 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
     // Whatever the markup arrived with, so a form knows before anything is
     // touched. `willUpdate` is too early: there is no control to read yet.
     this.committed = this.files
+    this.sync()
+  }
+
+  /**
+   * Reports again on every update, so a new `name` or `required` reaches the
+   * form. Only a pick and the first render reported, so the form kept the old
+   * name and the old verdict.
+   */
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
     this.sync()
   }
 

@@ -301,6 +301,23 @@ describe('a label the page wrote for the host', () => {
     expect(held(control, 'ariaLabelledByElements')).toEqual(['outer'])
   })
 
+  /* A file input is labeled by its trigger, "Choose files", which is an
+     action, so the component says whether the control is named. */
+  test('and the component may say the control is unnamed whatever its labels', () => {
+    document.body.innerHTML = '<label id="outer">Resume</label><span></span>'
+    const host = document.body.lastElementChild as HTMLElement
+    Object.assign(host, { addController: () => {} })
+    Object.defineProperty(host, 'labels', { value: [document.getElementById('outer')] })
+    const control = reflecting()
+    control.setAttribute('aria-labelledby', 'trigger')
+    host.attachShadow({ mode: 'open' }).append(control)
+    new AriaForwardController(host as never, {
+      named: () => false,
+      target: () => control,
+    }).hostUpdated()
+    expect(held(control, 'ariaLabelledByElements')).toEqual(['outer'])
+  })
+
   test('and leaves a control that has one alone', () => {
     const control = reflecting()
     control.setAttribute('aria-label', 'Own name')

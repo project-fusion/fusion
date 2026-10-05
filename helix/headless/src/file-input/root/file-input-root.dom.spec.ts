@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { trash } from '@fusion.dev/helix-icons'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { formValue, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -127,7 +127,9 @@ describe('input file', () => {
       )
     // Two readings of a file rather than a sentence about it, so two tags.
     expect(read('size')).toEqual(['2 KB', '1 byte'])
-    expect(read('kind')).toEqual(['PNG', 'PLAIN'])
+    // The extension, which is the word a reader has: a text file's subtype is
+    // `plain`, and a Word document's is a 59-character vendor string.
+    expect(read('kind')).toEqual(['PNG', 'TXT'])
   })
 
   test('one byte is a byte', async () => {
@@ -303,5 +305,93 @@ describe('input file', () => {
 
     expect(size(english)).toBe('1.5 KB')
     expect(size(french)).not.toBe(size(english))
+  })
+})
+
+describe('the type tag', () => {
+  test('is the extension, never a vendor string', async () => {
+    const host = await field()
+    control(host).files = (() => {
+      const carrier = new DataTransfer()
+      carrier.items.add(
+        new File(['x'], 'report.docx', {
+          type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        }),
+      )
+      return carrier.files
+    })()
+    control(host).dispatchEvent(new Event('change', { bubbles: true }))
+    await host.updateComplete
+    expect(part(host, 'kind')?.textContent?.trim()).toBe('DOCX')
+  })
+})
+
+describe('what the form is told', () => {
+  /* Only a pick and the first render reported, so a renamed field submitted
+     under its old name and a field no longer required stayed invalid. */
+  test('follows a new name', async () => {
+    const host = (await field('name="first"')) as InputFile & { name: string }
+    await choose(host, 'one.txt')
+    host.name = 'second'
+    await host.updateComplete
+    expect([...(formValue(host) as FormData).keys()]).toEqual(['second'])
+  })
+
+  test('and a required that is taken off', async () => {
+    const host = (await field('required')) as InputFile & {
+      required: boolean
+      validity: ValidityState
+    }
+    control(host).required = true
+    host.required = false
+    await host.updateComplete
+    expect(host.validity.valid).toBe(true)
+  })
+})
+
+describe('a drop', () => {
+  const drop = async (host: InputFile, ...files: File[]): Promise<void> => {
+    const carrier = new DataTransfer()
+    for (const file of files) {
+      carrier.items.add(file)
+    }
+    const event = new Event('drop', { bubbles: true, cancelable: true }) as DragEvent
+    Object.defineProperty(event, 'dataTransfer', { value: carrier })
+    part(host, 'field')?.dispatchEvent(event)
+    await host.updateComplete
+  }
+
+  /* `accept` filters the picker and nothing else, so a text file dropped on an
+     image field was listed, valid, and submitted. */
+  test('takes only what accept lists', async () => {
+    const host = await field('accept="image/*,.pdf" multiple')
+    await drop(
+      host,
+      new File(['x'], 'notes.txt', { type: 'text/plain' }),
+      new File(['x'], 'shot.png', { type: 'image/png' }),
+      new File(['x'], 'paper.PDF', { type: 'application/pdf' }),
+    )
+    expect(host.files.map((file) => file.name)).toEqual(['shot.png', 'paper.PDF'])
+  })
+})
+
+describe('removing a file from the list', () => {
+  /* The button goes with its file, and focus went with it to the page's body. */
+  test('keeps focus in the field once the last file is gone', async () => {
+    const host = await field()
+    await choose(host, 'one.txt')
+    ;(part(host, 'remove') as HTMLButtonElement).click()
+    await host.updateComplete
+    await host.updateComplete
+    expect(host.shadowRoot?.activeElement).toBe(control(host))
+  })
+
+  test('and moves to the file that took its place', async () => {
+    const host = await field('multiple')
+    await choose(host, 'one.txt', 'two.txt')
+    ;(part(host, 'remove') as HTMLButtonElement).click()
+    await host.updateComplete
+    await host.updateComplete
+    expect(host.shadowRoot?.activeElement).toBe(part(host, 'remove'))
   })
 })
