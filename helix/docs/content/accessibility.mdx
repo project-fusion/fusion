@@ -66,10 +66,11 @@ words are yours to choose. An icon-only control has no other text to name it:
 ></helix-icon-button>
 ```
 
-A button or a form control that renders with no name warns once in the console:
-`<helix-icon-button> has no accessible name`, followed by the ways to give it
-one. The check runs a moment after the control first renders, so a label your
-framework writes beside the control in the same pass counts. The warning has the
+A button, a form control, a button group or an open dialog that has no name
+warns once in the console: `<helix-icon-button> has no accessible name`,
+followed by the ways to give it one. The check runs a moment after the control
+first renders, so a label your framework writes beside the control in the same
+pass counts. The warning has the
 kind `missing-name`, so `@fusion.dev/helix-diagnostics` counts it with the
 other runtime events.
 

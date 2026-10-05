@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { registerDom } from '@fusion.dev/helix-testing/dom'
 
 /**
@@ -160,5 +160,51 @@ describe('a dismissed element the listener removes', () => {
     control(first as Element).focus()
     first?.dismiss()
     expect(first?.shadowRoot?.activeElement).toBe(control(first as Element))
+  })
+})
+
+describe('a lone dismissed element the listener removes', () => {
+  type Removable = HTMLElement & { dismiss(): boolean; updateComplete: Promise<boolean> }
+
+  /* happy-dom lays nothing out, so every element reports no box and no tab
+     stop. A box of one rectangle is what a browser gives each of these. */
+  const original = Element.prototype.getClientRects
+  afterEach(() => {
+    Element.prototype.getClientRects = original
+  })
+
+  const page = async (markup: string): Promise<Removable> => {
+    Element.prototype.getClientRects = (): DOMRectList => [{}] as unknown as DOMRectList
+    document.body.innerHTML = markup
+    const lone = document.querySelector('probe-removable') as Removable
+    await lone.updateComplete
+    lone.addEventListener('helix-dismiss', () => lone.remove())
+    ;(lone.shadowRoot?.querySelector('[part="dismiss"]') as HTMLElement).focus()
+    return lone
+  }
+
+  /* A lone Callout dropped focus to the body, and a keyboard reader started
+     the page again from the top. */
+  test('hands focus to the tab stop after it', async () => {
+    const lone = await page(
+      '<button id="before">Before</button><probe-removable></probe-removable><button id="after">After</button>',
+    )
+    lone.dismiss()
+    expect(document.activeElement?.id).toBe('after')
+  })
+
+  test('or to the one before it, at the end of the page', async () => {
+    const lone = await page(
+      '<button id="before">Before</button><probe-removable></probe-removable>',
+    )
+    lone.dismiss()
+    expect(document.activeElement?.id).toBe('before')
+  })
+
+  test('and leaves focus alone where the page refused', async () => {
+    const lone = await page('<probe-removable></probe-removable><button id="after">After</button>')
+    lone.addEventListener('helix-dismiss', (event) => event.preventDefault())
+    lone.dismiss()
+    expect(document.activeElement?.id).not.toBe('after')
   })
 })

@@ -43,3 +43,41 @@ describe('button group', () => {
     }
   })
 })
+
+/**
+ * What the console was warned while `markup` mounted and settled.
+ *
+ * The missing-name warning is in development builds only: the package's
+ * `test:dom` script passes `bun test --conditions helix-development`, which
+ * core's `#audit-name` reads as it reads `development`.
+ */
+const warnedOn = async (markup: string): Promise<string[]> => {
+  const warnings: string[] = []
+  const original = console.warn
+  console.warn = (message: string) => warnings.push(message)
+  try {
+    await mount(markup)
+    await new Promise((done) => setTimeout(done, 5))
+  } finally {
+    console.warn = original
+  }
+  return warnings
+}
+
+describe('a button group with no name', () => {
+  test('is reported once, by its tag', async () => {
+    const warnings = await warnedOn('<helix-headless-button-group></helix-headless-button-group>')
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0]).toContain('<helix-headless-button-group> has no accessible name')
+  })
+
+  test('and one named by `label`, `aria-label` or `aria-labelledby` is not', async () => {
+    for (const markup of [
+      '<helix-headless-button-group label="Alignment"></helix-headless-button-group>',
+      '<helix-headless-button-group aria-label="Alignment"></helix-headless-button-group>',
+      '<helix-headless-button-group aria-labelledby="t"></helix-headless-button-group><p id="t">Alignment</p>',
+    ]) {
+      expect([markup, ...(await warnedOn(markup))]).toEqual([markup])
+    }
+  })
+})
