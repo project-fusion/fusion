@@ -200,7 +200,28 @@
   opacity: 0.4;
 }
 
+/* The place in the set, drawn with `counter`, in the top corner at the start
+   of the line, across from the close control. */
+[part="counter"] {
+  background-color: var(--helix-color-surface-overlay);
+  border-radius: var(--helix-radii-full);
+  box-shadow: var(--helix-shadow-md);
+  color: var(--lightbox-foreground, var(--helix-color-foreground));
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  font-variant-numeric: tabular-nums;
+  inset-block-start: var(--lightbox-padding, var(--helix-space-md));
+  inset-inline-start: var(--lightbox-padding, var(--helix-space-md));
+  line-height: var(--helix-leading-tight);
+  padding: var(--helix-space-2xs) var(--helix-space-sm);
+  position: absolute;
+  transition:
+    opacity var(--helix-duration-fast) var(--helix-easing-standard),
+    visibility var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
 /* With the rest of the chrome while the reader is still. */
+:host(:state(idle)) [part="counter"],
 :host(:state(idle)) [part="previous"],
 :host(:state(idle)) [part="next"],
 :host(:state(idle)) [part="dismiss"] {
@@ -209,6 +230,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  [part="counter"],
   [part="previous"],
   [part="next"],
   [part="dismiss"] {

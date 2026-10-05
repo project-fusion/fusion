@@ -126,7 +126,9 @@ describe('what a message is to a screen reader', () => {
       '<helix-headless-toast-item>Saved</helix-headless-toast-item>',
     )) as Item
     await plain.updateComplete
-    expect(internalsOf(plain).ariaLabelledByElements).toEqual([part(plain, 'content') as Element])
+    const named = internalsOf(plain).ariaLabelledByElements ?? []
+    expect(named.length).toBe(1)
+    expect(named[0]).toBe(part(plain, 'content') as Element)
   })
 
   test('named by its heading and described by its description, where it has them', async () => {
