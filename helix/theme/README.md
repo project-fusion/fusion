@@ -20,7 +20,8 @@ document.head.append(Object.assign(document.createElement('style'), {
 
 Give it what you mean, a brand color and whatever else you have an opinion
 about, and it returns every token the system needs with the contrast
-relationships already satisfied, rather than a palette you then have to check.
+relationships already satisfied. With no brand, the theme is ink: near-black on
+a light page and near-white on a dark one.
 
 **It has to be awaited and there is no way around that.** WebAssembly
 instantiates asynchronously, so the engine is handed back from `initTheme`

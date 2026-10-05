@@ -74,7 +74,8 @@ pub const PAGE_SURFACES: [&str; 5] = [
 /// Tinted grounds a quiet badge or a selected row sits on.
 pub const TINTS: [&str; 2] = ["color-primary-subtle", "color-accent-subtle"];
 
-/// Filled grounds, every one of which carries `foreground-on-accent`.
+/// Filled grounds, each of which carries the label named for its role:
+/// `foreground-on-primary`, `-on-accent`, or `-on-status`.
 ///
 /// **The hover states are grounds too.** A filled button under a pointer is a
 /// different color with the same text on it, so an ink solved against the
@@ -171,10 +172,31 @@ pub static INKS: LazyLock<Vec<Ink>> = LazyLock::new(|| {
             grounds: pages.clone(),
             name: "color-foreground-muted".to_owned(),
         },
+        /* **A label per role**, because the roles do not share a polarity. A
+        colored fill is dark in both modes and an ink fill is light in the dark,
+        so one label measured against all twelve could never pass. */
         Ink {
             contrast: Contrast::Text,
-            grounds: owned(&FILLS),
+            grounds: owned(&["color-primary-surface", "color-primary-surface-hover"]),
+            name: "color-foreground-on-primary".to_owned(),
+        },
+        Ink {
+            contrast: Contrast::Text,
+            grounds: owned(&["color-accent-surface", "color-accent-surface-hover"]),
             name: "color-foreground-on-accent".to_owned(),
+        },
+        Ink {
+            contrast: Contrast::Text,
+            grounds: STATUSES
+                .iter()
+                .flat_map(|status| {
+                    [
+                        format!("color-{status}-surface"),
+                        format!("color-{status}-surface-hover"),
+                    ]
+                })
+                .collect(),
+            name: "color-foreground-on-status".to_owned(),
         },
         Ink {
             contrast: Contrast::Text,

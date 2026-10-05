@@ -45,13 +45,13 @@ use serde_json::Value;
 
 use crate::css::{to_css, to_css_modes};
 use crate::derive::accent::{seeded, settle};
-use crate::derive::emphasis::emphasis;
+use crate::derive::emphasis::{emphasis, ink};
 use crate::derive::inks::neutral_inks;
 use crate::derive::marks::walk_outward;
 use crate::derive::report::Outcome;
-use crate::derive::resolve::{brand_and_neutral, default_pairings, resolve, Policy};
+use crate::derive::resolve::{brand, default_pairings, neutral, resolve, Policy};
 use crate::derive::solve::solve_against;
-use crate::derive::status::{repair_hue, statuses};
+use crate::derive::status::{repair_hue, statuses, REFERENCE_CHROMA};
 use crate::derive::surfaces::{ladder, surfaces};
 use crate::derive::theme::derive_theme;
 use crate::derive::tokens::derive_tokens;
@@ -678,7 +678,7 @@ fn the_surface_ladder_is_the_one_the_typescript_derives() {
         let intent = intent_for(label);
         let resolved = resolve(&intent).expect("the oracle's intents all resolve");
         let policy = Policy::new(resolved.chroma);
-        let (_raw_brand, _brand, neutral) = brand_and_neutral(&resolved, policy);
+        let neutral = neutral(&resolved, policy);
         let built = surfaces(
             resolved.scheme,
             neutral,
@@ -851,6 +851,9 @@ pub fn labels() -> Vec<&'static str> {
         "paced",
         "complement",
         "pinned-accent",
+        "ink",
+        "ink-dark",
+        "ink-accent",
     ]
 }
 
@@ -897,8 +900,8 @@ pub fn intent_for(label: &str) -> ThemeIntent {
             });
         }
         "aaa" => intent.contrast_target = Some(7.0),
-        "red" => intent.brand = Color::Hex("#c1272d".to_owned()),
-        "amber" => intent.brand = Color::Hex("#f59e0b".to_owned()),
+        "red" => intent.brand = Some(Color::Hex("#c1272d".to_owned())),
+        "amber" => intent.brand = Some(Color::Hex("#f59e0b".to_owned())),
         "quiet" => {
             intent.chroma = Some(Chroma {
                 ceiling: None,
@@ -920,7 +923,7 @@ pub fn intent_for(label: &str) -> ThemeIntent {
                 ("color-primary".to_owned(), Color::Hex("#7c3aed".to_owned())),
             ]);
         }
-        "pale" => intent.brand = Color::Hex("#fef08a".to_owned()),
+        "pale" => intent.brand = Some(Color::Hex("#fef08a".to_owned())),
         "expressive" => {
             intent.font = Some(Font {
                 base: Some(16.0),
@@ -995,6 +998,20 @@ pub fn intent_for(label: &str) -> ThemeIntent {
             }));
         }
         "pinned-accent" => intent.accent = Some(Seed::Color(Color::Hex("#db2777".to_owned()))),
+        /* No brand, which is ink: the primary held at the neutral's near-black
+        or near-white, a fill that turns light in the dark with the page's color
+        on it, and statuses at their own chroma. The accent named as a color is
+        the one second color an ink theme can have, and its label is the
+        near-white beside the ink's page-colored one. */
+        "ink" => intent.brand = None,
+        "ink-dark" => {
+            intent.brand = None;
+            intent.scheme = Some(Scheme::Dark);
+        }
+        "ink-accent" => {
+            intent.brand = None;
+            intent.accent = Some(Seed::Color(Color::Hex("#db2777".to_owned())));
+        }
         other => panic!("no intent is recorded for `{other}`"),
     }
     intent
@@ -1014,7 +1031,7 @@ fn the_neutral_inks_land_where_the_typescript_lands() {
         let intent = intent_for(label);
         let resolved = resolve(&intent).expect("the oracle's intents all resolve");
         let policy = Policy::new(resolved.chroma);
-        let (_raw, _brand, neutral) = brand_and_neutral(&resolved, policy);
+        let neutral = neutral(&resolved, policy);
         let built = surfaces(
             resolved.scheme,
             neutral,
@@ -1059,7 +1076,7 @@ fn body_text_is_the_strongest_ink_and_stands_clear_of_the_muted_one() {
     for (label, intent) in intents {
         let resolved = resolve(&intent).expect("the intent resolves");
         let policy = Policy::new(resolved.chroma);
-        let (_raw, _brand, neutral) = brand_and_neutral(&resolved, policy);
+        let neutral = neutral(&resolved, policy);
         let built = surfaces(
             resolved.scheme,
             neutral,
@@ -1262,12 +1279,22 @@ fn the_solver_maximises_the_weakest_pairing() {
     );
 }
 
-/// Builds the shared capture every phase after the ladder takes.
-fn deriving_for(label: &str) -> (crate::derive::resolve::Resolved, Deriving, Oklch) {
+/// Builds the shared capture every phase after the ladder takes: the resolved
+/// intent, the context, and the primary, which is the brand's emphasis or the
+/// ink, with the chroma the statuses measure their loudness against.
+fn deriving_for(
+    label: &str,
+) -> (
+    crate::derive::resolve::Resolved,
+    Deriving,
+    crate::derive::emphasis::Emphasis,
+    f64,
+) {
     let intent = intent_for(label);
     let resolved = resolve(&intent).expect("the oracle's intents all resolve");
     let policy = Policy::new(resolved.chroma);
-    let (_raw, brand, neutral) = brand_and_neutral(&resolved, policy);
+    let brand = brand(&resolved, policy).map(|(_, brand)| brand);
+    let neutral = neutral(&resolved, policy);
     let built = surfaces(
         resolved.scheme,
         neutral,
@@ -1279,7 +1306,9 @@ fn deriving_for(label: &str) -> (crate::derive::resolve::Resolved, Deriving, Okl
         scheme: resolved.scheme,
         surfaces: built,
     };
-    (resolved, ctx, brand)
+    let primary = brand.map_or_else(|| ink(neutral, &ctx), |brand| emphasis(brand, &ctx));
+    let loudness = brand.map_or(REFERENCE_CHROMA, |brand| brand.chroma);
+    (resolved, ctx, primary, loudness)
 }
 
 /// The emphasis role, which is the first phase that genuinely exercises the
@@ -1290,8 +1319,7 @@ fn the_primary_role_lands_where_the_typescript_lands() {
     let data = oracle();
     for theme in derived_themes(&data) {
         let label = theme["label"].as_str().expect("label");
-        let (_resolved, ctx, brand) = deriving_for(label);
-        let primary = emphasis(brand, &ctx);
+        let (_resolved, ctx, primary, _loudness) = deriving_for(label);
 
         /* `color-primary` reports against the page; the other four report
         against nothing, which `assert_token` holds them to. */
@@ -1331,9 +1359,8 @@ fn the_statuses_land_where_the_typescript_lands() {
     let data = oracle();
     for theme in derived_themes(&data) {
         let label = theme["label"].as_str().expect("label");
-        let (resolved, ctx, brand) = deriving_for(label);
-        let primary = emphasis(brand, &ctx);
-        let resolved_statuses = statuses(&resolved.status, brand.chroma, primary.raw, &ctx);
+        let (resolved, ctx, primary, loudness) = deriving_for(label);
+        let resolved_statuses = statuses(&resolved.status, loudness, primary.raw, &ctx);
 
         assert_eq!(resolved_statuses.len(), 4, "{label}: four statuses");
         for status in resolved_statuses {
@@ -1412,10 +1439,9 @@ fn the_accent_lands_where_the_typescript_lands() {
     let data = oracle();
     for theme in derived_themes(&data) {
         let label = theme["label"].as_str().expect("label");
-        let (resolved, ctx, brand) = deriving_for(label);
-        let raw_brand = to_oklch(&resolved.brand).expect("a resolved brand reads");
-        let primary = emphasis(brand, &ctx);
-        let statuses_resolved = statuses(&resolved.status, brand.chroma, primary.raw, &ctx);
+        let (resolved, ctx, primary, loudness) = deriving_for(label);
+        let raw_brand = resolved.brand.as_ref().and_then(to_oklch);
+        let statuses_resolved = statuses(&resolved.status, loudness, primary.raw, &ctx);
 
         let (steps, origin) = match &resolved.accent {
             None => (primary, Origin::Derived),

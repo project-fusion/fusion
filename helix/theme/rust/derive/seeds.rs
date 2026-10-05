@@ -48,6 +48,11 @@ const LOUDEST_SERIES: f64 = 0.277;
 /// literal beats both in the stylesheet, so they change nothing there; they are
 /// written so every seed it reads has an answer and a page reading them back
 /// reads this theme's relationship, not the stylesheet's default one.
+///
+/// **Ink writes no brand seed, and no accent seeds where the accent is ink
+/// too.** The stylesheet reads an unset brand seed as ink. Written out, the
+/// ink's own hex would be read as a brand, and the stylesheet would derive a
+/// brand ramp from a near-black, whose dark half is a dark gray on a black page.
 #[must_use]
 pub fn seeds(
     resolved: &Resolved,
@@ -70,14 +75,23 @@ pub fn seeds(
         (second.hue - brand.hue).rem_euclid(360.0)
     };
 
-    vec![
-        ("seed-accent".to_owned(), oklch_to_hex(second)),
-        ("seed-accent-hue".to_owned(), trimmed(angle, 1)),
-        (
-            "seed-accent-lightness".to_owned(),
-            trimmed(second.lightness, 3),
-        ),
-        ("seed-brand".to_owned(), oklch_to_hex(brand)),
+    let ink = resolved.brand.is_none();
+    let ink_accent = ink && resolved.accent.is_none();
+    let mut seeds = Vec::new();
+    if !ink_accent {
+        seeds.extend([
+            ("seed-accent".to_owned(), oklch_to_hex(second)),
+            ("seed-accent-hue".to_owned(), trimmed(angle, 1)),
+            (
+                "seed-accent-lightness".to_owned(),
+                trimmed(second.lightness, 3),
+            ),
+        ]);
+    }
+    if !ink {
+        seeds.push(("seed-brand".to_owned(), oklch_to_hex(brand)));
+    }
+    seeds.extend([
         ("seed-chroma-scale".to_owned(), trimmed(series, 3)),
         ("seed-density".to_owned(), number(resolved.density)),
         ("seed-neutral-chroma".to_owned(), trimmed(neutral.chroma, 4)),
@@ -86,7 +100,8 @@ pub fn seeds(
             "seed-radii".to_owned(),
             format!("{}rem", number(resolved.radius)),
         ),
-    ]
+    ]);
+    seeds
 }
 
 /// `Number(x.toFixed(n))`: fixed to `n` places, then read back as a number so

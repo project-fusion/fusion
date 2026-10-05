@@ -69,7 +69,7 @@ pub fn derive_theme(intent: &ThemeIntent) -> Result<Theme, IntentError> {
 mod tests {
     use super::derive_theme;
     use crate::derive::resolve::IntentError;
-    use crate::intent::{Background, Color, Neutral, Scheme, ThemeIntent};
+    use crate::intent::{Background, Color, From, Neutral, Relation, Scheme, Seed, ThemeIntent};
 
     fn hex(value: &str) -> Color {
         Color::Hex(value.to_owned())
@@ -161,6 +161,76 @@ mod tests {
         };
         assert_eq!(label, "background.light");
         assert!(message.contains("black, the strongest"), "{message}");
+    }
+
+    #[test]
+    fn a_theme_with_no_brand_is_ink_and_its_fill_carries_the_page() {
+        let theme = derive_theme(&ThemeIntent::ink()).expect("ink derives");
+        let primary = token(&theme, "color-primary").value;
+        assert!((primary.lightness - 0.21).abs() < 0.005, "{primary:?}");
+        assert!(primary.chroma < 0.0005, "{primary:?}");
+        assert_eq!(
+            token(&theme, "color-primary-surface").hex,
+            token(&theme, "color-primary").hex
+        );
+        assert_eq!(token(&theme, "color-foreground-on-primary").hex, "#ffffff");
+        assert!(theme.violations.is_empty(), "{:?}", theme.violations);
+    }
+
+    #[test]
+    fn ink_turns_over_in_the_dark_and_the_statuses_keep_their_label() {
+        let theme = derive_theme(&ThemeIntent {
+            scheme: Some(Scheme::Dark),
+            ..ThemeIntent::ink()
+        })
+        .expect("ink derives in the dark");
+        assert!(token(&theme, "color-primary-surface").value.lightness > 0.9);
+        assert_eq!(token(&theme, "color-foreground-on-primary").hex, "#000000");
+        assert_eq!(token(&theme, "color-foreground-on-accent").hex, "#000000");
+        /* A danger fill is dark in both modes, so its label stays light while
+        the ink's turns dark beside it. */
+        assert!(token(&theme, "color-foreground-on-status").value.lightness > 0.9);
+        assert!(theme.violations.is_empty(), "{:?}", theme.violations);
+    }
+
+    #[test]
+    fn ink_writes_no_brand_seed_and_its_statuses_keep_their_chroma() {
+        let ink = derive_theme(&ThemeIntent::ink()).expect("ink derives");
+        assert!(ink
+            .seeds
+            .iter()
+            .all(|(name, _)| !name.starts_with("seed-brand")));
+        assert!(ink
+            .seeds
+            .iter()
+            .all(|(name, _)| !name.starts_with("seed-accent")));
+        let blue = derive_theme(&ThemeIntent::new(hex("#3b82f6"))).expect("derives");
+        /* As loud as the shipped blue's, which sits near the reference. At the
+        floor, a danger would be 0.55 of its chroma, about 0.09 short of this. */
+        let chroma = |theme: &super::Theme| token(theme, "color-danger").value.chroma;
+        assert!(
+            (chroma(&ink) - chroma(&blue)).abs() < 0.01,
+            "{} against {}",
+            chroma(&ink),
+            chroma(&blue)
+        );
+    }
+
+    #[test]
+    fn an_accent_related_to_no_brand_is_refused() {
+        let refused = derive_theme(&ThemeIntent {
+            accent: Some(Seed::Relation(Relation {
+                allowance: None,
+                chroma: None,
+                from: From::Brand,
+                rotate: 180.0,
+            })),
+            ..ThemeIntent::ink()
+        });
+        let Err(IntentError::OutOfRange { label, .. }) = refused else {
+            panic!("a relation with no brand is refused, got {refused:?}")
+        };
+        assert_eq!(label, "accent");
     }
 
     #[test]

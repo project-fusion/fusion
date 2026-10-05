@@ -92,7 +92,8 @@ pub struct Resolved {
     /// accent nobody named is the brand, so there is no seed to fill in.
     pub accent: Option<Seed>,
     pub background: Background,
-    pub brand: Color,
+    /// `None` when the intent names no brand, which makes the theme ink.
+    pub brand: Option<Color>,
     pub chroma: Chroma,
     pub contrast_target: f64,
     pub density: f64,
@@ -210,24 +211,12 @@ fn range(label: &str, message: &str) -> IntentError {
 /// is meaningful in, or when the brand is not a color this engine can read.
 pub fn resolve(intent: &ThemeIntent) -> Result<Resolved, IntentError> {
     let resolved = defaults(intent);
-    let brand = to_oklch(&resolved.brand).ok_or_else(|| IntentError::Unreadable {
-        label: "brand".to_owned(),
-        value: resolved.brand.to_string(),
-    })?;
-
-    finite("brand.chroma", brand.chroma)?;
-    finite("brand.hue", brand.hue)?;
-    finite("brand.lightness", brand.lightness)?;
+    if let Some(color) = &resolved.brand {
+        readable_brand(color)?;
+    }
     finite("contrastTarget", resolved.contrast_target)?;
     finite("density", resolved.density)?;
     finite("radius", resolved.radius)?;
-
-    if brand.chroma < 0.0 {
-        return Err(range("brand.chroma", "must not be negative"));
-    }
-    if !(0.0..=1.0).contains(&brand.lightness) {
-        return Err(range("brand.lightness", "must be between 0 and 1"));
-    }
     /* 1 is "no contrast at all" and 21 is black on white. Anything outside that
     is not a target, it is a typo. */
     if !(1.0..=21.0).contains(&resolved.contrast_target) {
@@ -284,6 +273,16 @@ pub fn resolve(intent: &ThemeIntent) -> Result<Resolved, IntentError> {
         }
     }
 
+    /* **An accent related to a brand that is not there is refused.** Ink has no
+    hue, so the angle would be measured from a direction that does not exist,
+    and the accent would land wherever `atan2` happened to put a gray. */
+    if matches!(resolved.accent, Some(Seed::Relation(_))) && resolved.brand.is_none() {
+        return Err(range(
+            "accent",
+            "is related to the brand, and this theme names none. Name the accent as a color",
+        ));
+    }
+
     /* **A page is refused where no ink can be read on it**, which is the one
     bound that is not a number somebody chose: black on a light page and white
     on a dark one are the strongest inks there are, so where they miss the
@@ -334,6 +333,26 @@ pub fn resolve(intent: &ThemeIntent) -> Result<Resolved, IntentError> {
     Ok(resolved)
 }
 
+/// Refuses a brand that is not a color, or one whose numbers are not numbers.
+fn readable_brand(color: &Color) -> Result<(), IntentError> {
+    let brand = to_oklch(color).ok_or_else(|| IntentError::Unreadable {
+        label: "brand".to_owned(),
+        value: color.to_string(),
+    })?;
+
+    finite("brand.chroma", brand.chroma)?;
+    finite("brand.hue", brand.hue)?;
+    finite("brand.lightness", brand.lightness)?;
+
+    if brand.chroma < 0.0 {
+        return Err(range("brand.chroma", "must not be negative"));
+    }
+    if !(0.0..=1.0).contains(&brand.lightness) {
+        return Err(range("brand.lightness", "must be between 0 and 1"));
+    }
+    Ok(())
+}
+
 /// The strongest ink a scheme has: black in light and white in dark.
 #[must_use]
 pub fn strongest_ink(scheme: Scheme) -> Oklch {
@@ -358,10 +377,13 @@ pub fn page(resolved: &Resolved) -> Option<Oklch> {
         .map(|color| to_oklch(color).expect("resolve refused an unreadable page"))
 }
 
-/// The brand, with the policy applied, and the neutral cast derived from it.
-///
-/// Together because the neutral takes the brand's hue when it is given none, so
-/// the two are one step rather than two that happen to run in order.
+/// The hue the neutral takes when there is no brand to take one from, which is
+/// the hue the stylesheet's own `--helix-seed-neutral-hue` falls back to. At the
+/// default chroma of 0 it changes no color, and it is the seed written out.
+pub const INK_HUE: f64 = 258.0;
+
+/// The brand as the consumer wrote it, and with the chroma policy applied, or
+/// `None` for ink.
 ///
 /// # Panics
 ///
@@ -369,16 +391,28 @@ pub fn page(resolved: &Resolved) -> Option<Oklch> {
 /// and so cannot be constructed through it. Taking a `Resolved` rather than a
 /// `ThemeIntent` is what makes that guarantee: the validation is the only way in.
 #[must_use]
-pub fn brand_and_neutral(resolved: &Resolved, policy: Policy) -> (Oklch, Oklch, Cast) {
-    let raw = to_oklch(&resolved.brand).expect("resolve refused an unreadable brand");
-    let brand = Oklch {
-        chroma: policy.apply(raw.chroma),
-        ..raw
-    };
+pub fn brand(resolved: &Resolved, policy: Policy) -> Option<(Oklch, Oklch)> {
+    let raw = to_oklch(resolved.brand.as_ref()?).expect("resolve refused an unreadable brand");
+    Some((
+        raw,
+        Oklch {
+            chroma: policy.apply(raw.chroma),
+            ..raw
+        },
+    ))
+}
+
+/// The neutral cast.
+///
+/// It takes the brand's hue when it is given none, and [`INK_HUE`] where there
+/// is no brand either.
+#[must_use]
+pub fn neutral(resolved: &Resolved, policy: Policy) -> Cast {
+    let hue = brand(resolved, policy).map_or(INK_HUE, |(_, brand)| brand.hue);
     /* Chroma 0 by default, which is what `primitives.css` settled on: a fixed
     chroma is a rising saturation as a surface darkens, and 0.008 reads navy
     across a dark page. */
-    let neutral = match (page(resolved), resolved.neutral.chroma) {
+    match (page(resolved), resolved.neutral.chroma) {
         /* **A page given, the grays take its cast**, so a cream page has warm
         cards on it where a gray card would read as a hole. Its own chroma and
         hue, and the chroma policy left out: the page is a color handed in,
@@ -390,8 +424,7 @@ pub fn brand_and_neutral(resolved: &Resolved, policy: Policy) -> (Oklch, Oklch, 
         },
         (_, chroma) => Cast {
             chroma: policy.apply(chroma.unwrap_or(0.0)),
-            hue: resolved.neutral.hue.unwrap_or(brand.hue),
+            hue: resolved.neutral.hue.unwrap_or(hue),
         },
-    };
-    (raw, brand, neutral)
+    }
 }

@@ -26,25 +26,30 @@ use crate::oklch::{fit_to_gamut, Oklch, GAMUT_STEPS};
 ///
 /// # Panics
 ///
-/// If handed a [`Seed::Color`] that is not a color, which [`resolve`] refuses,
-/// so it cannot arrive through one.
+/// If handed a [`Seed::Color`] that is not a color, or a [`Seed::Relation`] with
+/// no brand to relate to, both of which [`resolve`] refuses, so neither can
+/// arrive through one.
 ///
 /// [`resolve`]: crate::derive::resolve::resolve
 #[must_use]
-pub fn seeded(accent: &Seed, raw_brand: Oklch, policy: Policy) -> (Oklch, bool) {
+pub fn seeded(accent: &Seed, raw_brand: Option<Oklch>, policy: Policy) -> (Oklch, bool) {
     match accent {
         Seed::Color(color) => (
             to_oklch(color).expect("resolve refused an unreadable accent"),
             true,
         ),
-        Seed::Relation(relation) => (
-            Oklch {
-                chroma: policy.apply(raw_brand.chroma * relation.chroma.unwrap_or(1.0).min(1.0)),
-                hue: (raw_brand.hue + relation.rotate) % 360.0,
-                lightness: raw_brand.lightness,
-            },
-            false,
-        ),
+        Seed::Relation(relation) => {
+            let raw_brand = raw_brand.expect("resolve refused a relation with no brand");
+            (
+                Oklch {
+                    chroma: policy
+                        .apply(raw_brand.chroma * relation.chroma.unwrap_or(1.0).min(1.0)),
+                    hue: (raw_brand.hue + relation.rotate) % 360.0,
+                    lightness: raw_brand.lightness,
+                },
+                false,
+            )
+        }
     }
 }
 
