@@ -8,7 +8,7 @@
      after this, which is the descender. */
   align-items: baseline;
   display: grid;
-  gap: var(--helix-space-2xs);
+  gap: var(--stat-gap, var(--helix-space-2xs));
   grid-template-columns: auto 1fr;
 }
 
@@ -28,8 +28,8 @@
    content beside it and not a note under it. `subtle` was `neutral-500` when
    this was written, `#808080` and 3.95, and the ramp has moved since. */
 slot[name="label"]::slotted(*) {
-  color: var(--helix-color-foreground-muted);
-  font-size: calc(var(--helix-text-xs) / var(--helix-text-md) * 1em);
+  color: var(--stat-label-color, var(--helix-color-foreground-muted));
+  font-size: var(--stat-label-size, calc(var(--helix-text-xs) / var(--helix-text-md) * 1em));
   font-weight: var(--helix-weight-medium);
   grid-column: 1 / -1;
   letter-spacing: var(--helix-tracking-wide);
@@ -37,7 +37,7 @@ slot[name="label"]::slotted(*) {
 
 /* The inherited half on the slot, the rest on what was slotted. */
 slot:not([name]) {
-  color: var(--helix-color-foreground);
+  color: var(--stat-value-color, var(--helix-color-foreground));
   font-family: var(--helix-font-display);
   font-size: var(--stat-value-size, calc(var(--helix-text-3xl) / var(--helix-text-md) * 1em));
   font-weight: var(--helix-weight-semibold);
@@ -46,8 +46,8 @@ slot:not([name]) {
 }
 /* Quieter and smaller than the number it qualifies. */
 slot[name="unit"]::slotted(*) {
-  color: var(--helix-color-foreground-muted);
-  font-size: calc(var(--helix-text-md) / var(--helix-text-md) * 1em);
+  color: var(--stat-unit-color, var(--helix-color-foreground-muted));
+  font-size: var(--stat-unit-size, calc(var(--helix-text-md) / var(--helix-text-md) * 1em));
   font-weight: var(--helix-weight-medium);
 }
 
@@ -61,7 +61,7 @@ slot[name="unit"]::slotted(*) {
 :host([direction="row-reverse"]) {
   align-items: baseline;
   display: flex;
-  gap: var(--helix-space-xs);
+  gap: var(--stat-gap, var(--helix-space-xs));
 }
 
 :host([direction="row"]) slot[name="label"]::slotted(*),

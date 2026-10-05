@@ -7,7 +7,7 @@ export function Example() {
         name="folder-open"
         slot="icon"
       ></helix-icon>
-      <span slot="heading">No projects yet</span>
+      <h3 slot="heading">No projects yet</h3>
       Anything you create will show up here.
       <helix-button
         emphasis="solid"

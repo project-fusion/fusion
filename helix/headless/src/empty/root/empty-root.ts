@@ -32,7 +32,7 @@ import { property } from 'lit/decorators.js'
  *
  * @slot - The message: why the region is empty, and what to do about it.
  * @slot actions - The action that would put something in the region.
- * @slot heading - The heading, which names what is missing.
+ * @slot heading - The heading, which names what is missing. Slot a heading element, such as an `<h3>`, so a reader can find it in the page's outline.
  * @slot icon - An icon above the heading.
  *
  * @csspart live - A copy of the heading and the message, in a live region that screen readers announce when the view appears. Visually hidden in the styled tier.

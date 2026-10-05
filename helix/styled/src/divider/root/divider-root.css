@@ -15,8 +15,8 @@
 
 /* What is set into the rule, and the space either side of it. */
 [part="content"] {
-  color: var(--helix-color-foreground-muted);
-  margin-inline: var(--helix-space-sm);
+  color: var(--divider-content-color, var(--helix-color-foreground-muted));
+  margin-inline: var(--divider-content-gap, var(--helix-space-sm));
   display: inline-flex;
   flex: 0 0 auto;
   font-family: var(--helix-font-sans);
@@ -72,7 +72,7 @@
 }
 
 :host([orientation="vertical"]) [part="content"] {
-  margin-block: var(--helix-space-sm);
+  margin-block: var(--divider-content-gap, var(--helix-space-sm));
   margin-inline: var(--helix-space-none);
 }
 
@@ -106,6 +106,14 @@
   /* A stretched parent may resolve to zero height, in which case the rule would
      vanish rather than degrade. One line of text is the sensible floor. */
   min-block-size: 1em;
+}
+
+/* *Content toward one end**, with a short length of line kept before it under
+   `start` and after it under `end`. Only where content is set in: an empty
+   divider is one line whatever the attribute says. */
+:host([content-placement="start"]) [part="line"]:has(+ [part="content"]:not([data-empty])),
+:host([content-placement="end"]) [part="content"]:not([data-empty]) + [part="line"] {
+  flex: 0 0 var(--divider-content-offset, var(--helix-space-lg));
 }
 
 /* Print: a rule, which prints.

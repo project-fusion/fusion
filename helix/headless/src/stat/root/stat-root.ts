@@ -23,6 +23,8 @@ import { property } from 'lit/decorators.js'
  * @slot - The value.
  * @slot label - What the value measures.
  * @slot unit - The unit, shown beside the value.
+ *
+ * @csspart value - The slot the value is written in. A slot draws no box, so it takes the inherited properties, such as color and font, and passes them to the value.
  */
 @customElement('helix-headless-stat')
 export class HelixHeadlessStat extends HelixElement {
@@ -76,7 +78,7 @@ export class HelixHeadlessStat extends HelixElement {
 
   protected override render(): TemplateResult {
     return html`<slot name="label"></slot>
-      <slot></slot>
+      <slot part="value"></slot>
       <slot name="unit"></slot>`
   }
 }

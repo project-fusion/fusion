@@ -28,8 +28,13 @@ import { styles } from './trend-root.css.js'
  * @aliases Delta, Change, Movement
  * @documentation https://fusion.dev/helix/components/trend
  *
+ * @cssproperty --trend-better-color - Color of a move that `good` says is an improvement.
  * @cssproperty --trend-color - Color of the arrow. Setting it overrides the color that `good` sets.
- * @cssproperty --trend-icon-size - Size of the arrow.
+ * @cssproperty --trend-gap - Space between the arrow, the metric and the label.
+ * @cssproperty --trend-icon-size - Size of the arrow, or of a glyph in the `icon` slot.
+ * @cssproperty --trend-label-color - Color of the label.
+ * @cssproperty --trend-neutral-color - Color of a trend that `good` does not judge, or one that did not move.
+ * @cssproperty --trend-worse-color - Color of a move that `good` says is a setback.
  */
 @customElement('helix-trend')
 export class HelixTrend extends HelixHeadlessTrend {
