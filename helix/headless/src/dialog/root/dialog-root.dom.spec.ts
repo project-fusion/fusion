@@ -424,3 +424,121 @@ describe('a dialog opening on its own', () => {
     host.remove()
   })
 })
+
+describe('an alert dialog', () => {
+  test('is an alertdialog when asked, and an ordinary dialog otherwise', async () => {
+    const plain = await dialog()
+    expect(part(plain, 'dialog')?.hasAttribute('role')).toBe(false)
+    const alert = await dialog('alert')
+    expect(part(alert, 'dialog')?.getAttribute('role')).toBe('alertdialog')
+  })
+})
+
+describe('the dialog’s description', () => {
+  /* The same stand-in the name uses: happy-dom has no element reflection. */
+  const reflecting = async (markup: string): Promise<{ host: Dialog; said: () => string[] }> => {
+    const host = (await mount(markup)) as Dialog
+    const native = part(host, 'dialog') as HTMLDialogElement & Record<string, unknown>
+    if (!('ariaDescribedByElements' in native)) {
+      Object.defineProperty(native, 'ariaDescribedByElements', { value: null, writable: true })
+    }
+    host.requestUpdate()
+    await host.updateComplete
+    const said = (): string[] =>
+      ((native.ariaDescribedByElements as Element[] | null) ?? []).map(
+        (one) => one.textContent?.trim() ?? '',
+      )
+    return { host, said }
+  }
+
+  test('is the words at the start of the body, and stops at the first control', async () => {
+    const { said } = await reflecting(
+      `<helix-headless-dialog alert>
+        <h2 slot="header">Delete project</h2>
+        <p>The project and its history go.</p>
+        <p>This cannot be undone.</p>
+        <form><label>Name <input /></label></form>
+        <p>After the form.</p>
+      </helix-headless-dialog>`,
+    )
+    expect(said()).toEqual(['The project and its history go.', 'This cannot be undone.'])
+  })
+
+  test('is nothing where the body starts with a control', async () => {
+    const { said } = await reflecting(
+      `<helix-headless-dialog>
+        <helix-headless-input label="Name"></helix-headless-input>
+        <p>Below the field.</p>
+      </helix-headless-dialog>`,
+    )
+    expect(said()).toEqual([])
+  })
+
+  test('steps aside for an aria-describedby on the host', async () => {
+    const { said } = await reflecting(
+      `<helix-headless-dialog aria-describedby="nowhere">
+        <p>The project and its history go.</p>
+      </helix-headless-dialog>`,
+    )
+    expect(said()).not.toContain('The project and its history go.')
+  })
+})
+
+describe('the dialog’s regions and close control', () => {
+  test('the header, body and footer are parts on their slots, which draw no box of their own', async () => {
+    const host = await dialog()
+    for (const name of ['header', 'body', 'footer']) {
+      expect(part(host, name)?.localName).toBe('slot')
+    }
+  })
+
+  test('no close control unless it is dismissible', async () => {
+    expect(part(await dialog(), 'dismiss')).toBeNull()
+  })
+
+  test('a dismissible dialog draws one, named in the consumer’s words, that asks to close', async () => {
+    const host = await dialog('dismissible dismiss-label="Schließen" default-open')
+    const control = part(host, 'dismiss') as HTMLButtonElement
+    expect(control.localName).toBe('button')
+    expect(control.getAttribute('aria-label')).toBe('Schließen')
+    let asked = 0
+    host.addEventListener('helix-before-close', () => {
+      asked += 1
+    })
+    control.click()
+    await host.updateComplete
+    expect(asked).toBe(1)
+    expect(host.open).toBe(false)
+  })
+
+  test('the close control is last, so opening still focuses the content first', async () => {
+    const host = await dialog('dismissible')
+    const native = part(host, 'dialog') as HTMLDialogElement
+    expect(native.lastElementChild?.getAttribute('part')).toBe('dismiss')
+  })
+})
+
+describe('entering and exiting', () => {
+  const frames = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 80))
+
+  test('a dialog opening is entering until it settles, and one closing is exiting', async () => {
+    const host = await dialog()
+    host.show()
+    await host.updateComplete
+    expect(hasState(host, 'entering')).toBe(true)
+    expect(hasState(host, 'exiting')).toBe(false)
+    await frames()
+    expect(hasState(host, 'entering')).toBe(false)
+    host.close()
+    await host.updateComplete
+    expect(hasState(host, 'exiting')).toBe(true)
+    await frames()
+    expect(hasState(host, 'exiting')).toBe(false)
+  })
+
+  test('a dialog served open is neither, since nothing moved', async () => {
+    const host = await dialog('default-open')
+    expect(hasState(host, 'entering')).toBe(false)
+    expect(hasState(host, 'exiting')).toBe(false)
+  })
+})

@@ -227,6 +227,57 @@
   margin-inline: auto;
 }
 
+/* The close control, drawn only on a `dismissible` dialog. In the corner and out
+   of the flow, centered on the title's first line, so the title keeps its line
+   and the rows under it do not move. */
+[part="dismiss"] {
+  all: unset;
+  /* `all: unset` takes the `border-box` every shadow root is given with it. */
+  box-sizing: border-box;
+  position: absolute;
+  inset-block-start: calc(
+    var(--dialog-padding, var(--helix-space-lg)) +
+    (var(--helix-text-xl) * var(--helix-leading-tight) - var(--helix-size-control-sm)) /
+    2
+  );
+  inset-inline-end: var(--helix-space-md);
+  block-size: var(--helix-size-control-sm);
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  display: inline-flex;
+  inline-size: var(--helix-size-control-sm);
+  place-content: center;
+  place-items: center;
+  transition: color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+[part="dismiss"] svg {
+  block-size: var(--helix-size-icon-sm);
+  inline-size: var(--helix-size-icon-sm);
+}
+
+[part="dismiss"]:hover {
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
+  color: var(--helix-color-foreground);
+}
+
+[part="dismiss"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* Room for it at the end of the title, so a long title wraps before it. */
+:host([dismissible]) ::slotted([slot="header"]) {
+  padding-inline-end: calc(var(--helix-size-control-sm) + var(--helix-space-xs));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="dismiss"] {
+    transition: none;
+  }
+}
+
 /* Not printed, being an overlay. */
 @media print {
   :host {
