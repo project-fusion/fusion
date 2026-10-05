@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasState, label, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -67,21 +67,16 @@ describe('tabs selection', () => {
   })
 
   test('the panel is named by its tab, since an IDREF cannot reach one', async () => {
-    /* An IDREF resolves only in the tree it is written in, and a tab's id and
-       its panel's id are each rendered inside their own element's shadow root,
-       which are sibling trees. Asserting that the two IDREFs exist says nothing
-       about either one reaching anything, and neither does.
-
-       No element reference can fix it either: a reference is valid into the
-       same tree or a shadow-including ancestor, and these are siblings. A name
-       is the one form that crosses, so the root reads the tab's words and hands
-       them to the panel. */
+    /* An IDREF resolves only in the tree it is written in, and a tab's control
+       is inside its own shadow root, which no reference from the light DOM can
+       reach. A name is the one form that crosses, so the root reads the tab's
+       words and hands them to the panel, whose host is the `tabpanel`. The tab
+       writes no IDREF `aria-controls`: it is an element reference instead. */
     const host = await mount(markup)
     const tab = part(tabs(host)[0] as HTMLElement, 'tab')
-    const panel = part(panels(host)[0] as HTMLElement, 'panel')
-    expect(panel?.getAttribute('aria-label')).toBe('One')
+    expect(label(panels(host)[0] as HTMLElement)).toBe('One')
     expect(tab?.hasAttribute('aria-controls')).toBe(false)
-    expect(panel?.hasAttribute('aria-labelledby')).toBe(false)
+    expect(part(panels(host)[0] as HTMLElement, 'panel')?.hasAttribute('aria-labelledby')).toBe(false)
   })
 
   test('content stays mounted when its tab is not the current one', async () => {
@@ -427,5 +422,64 @@ describe('tabs and what is inside a panel', () => {
       '<helix-headless-tabs aria-label="Account sections"><helix-headless-tab value="a">A</helix-headless-tab></helix-headless-tabs>',
     )) as Updatable
     expect(part(host, 'tabs')?.getAttribute('aria-label')).toBe('Account sections')
+  })
+})
+
+describe('vertical tabs', () => {
+  /* React Aria's orientation: a column of tabs beside the panels, and a screen
+     reader told the list runs down rather than across. */
+  test('say so on the tab list, and say nothing while horizontal', async () => {
+    const host = await mount(markup.replace('default-active="one"', 'default-active="one" orientation="vertical"'))
+    expect(part(host, 'tabs')?.getAttribute('aria-orientation')).toBe('vertical')
+    const row = await mount(markup)
+    expect(part(row, 'tabs')?.hasAttribute('aria-orientation')).toBe(false)
+  })
+})
+
+describe('each tab and the panel it shows', () => {
+  /* The pattern's aria-controls, which no id could carry across two sibling
+     shadow roots. The set hands each tab its panel's host. */
+  test('are paired by the set, for an element reference', async () => {
+    const host = (await mount(markup)) as Updatable
+    await host.updateComplete
+    const [one, two] = tabs(host) as (Updatable & { controls?: Element })[]
+    expect(one?.controls).toBe(panels(host)[0])
+    expect(two?.controls).toBe(panels(host)[1])
+  })
+})
+
+describe('tabs that are links', () => {
+  const links = `
+    <helix-headless-tabs>
+      <helix-headless-tab value="home" href="/home" selected>Home</helix-headless-tab>
+      <helix-headless-tab value="docs" href="/docs">Docs</helix-headless-tab>
+    </helix-headless-tabs>`
+
+  test('draw an anchor carrying the tab role', async () => {
+    const host = await mount(links)
+    const anchor = part(tabs(host)[1] as HTMLElement, 'tab')
+    expect(anchor?.tagName).toBe('A')
+    expect(anchor?.getAttribute('role')).toBe('tab')
+    expect(anchor?.getAttribute('href')).toBe('/docs')
+  })
+
+  /* Arriving chose the tab, which for a link would have moved the mark to a
+     page the reader never went to. */
+  test('the arrow keys move focus and choose nothing', async () => {
+    const host = (await mount(links)) as Updatable & { active: string }
+    const [home, docs] = tabs(host)
+    home?.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowRight' }))
+    await host.updateComplete
+    expect(document.activeElement).toBe(docs ?? null)
+    expect(hasState(docs as Element, 'selected')).toBe(false)
+  })
+
+  test('a refused choice keeps the browser from following the link', async () => {
+    const host = await mount(links)
+    const docs = tabs(host)[1] as Updatable
+    docs.addEventListener('helix-select', (event) => event.preventDefault())
+    const click = new MouseEvent('click', { bubbles: true, cancelable: true, composed: true })
+    part(docs, 'tab')?.dispatchEvent(click)
+    expect(click.defaultPrevented).toBe(true)
   })
 })

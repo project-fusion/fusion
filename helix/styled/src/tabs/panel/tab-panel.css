@@ -12,7 +12,11 @@
   min-block-size: 0;
   min-inline-size: 0;
   outline: none;
-  padding-block-start: var(--tabs-panel-padding-block-start, var(--helix-space-md));
+  padding-block-start: var(
+    --tabs-panel-padding-block-start,
+    var(--_tabs-panel-padding-block-start, var(--helix-space-md))
+  );
+  padding-inline-start: var(--_tabs-panel-padding-inline-start, var(--helix-space-none));
 }
 
 [part="panel"][hidden] {

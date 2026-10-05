@@ -62,7 +62,6 @@ describe('tabs server output', () => {
     const other = ssr(html`<helix-headless-tab-panel value="two"></helix-headless-tab-panel>`)
     expect(partTag(current, 'panel')).not.toContain('hidden')
     expect(partTag(other, 'panel')).toContain('hidden')
-    expect(partTag(other, 'panel')).toContain('role="tabpanel"')
     expect(rendered(other, 'helix-headless-tab-panel')).toContain('<slot></slot>')
   })
 })

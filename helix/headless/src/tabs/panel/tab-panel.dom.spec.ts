@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { label, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -32,26 +32,28 @@ describe('one tab panel', () => {
     host.label = 'First'
     await host.updateComplete
 
-    const region = part(host, 'panel')
-    expect(region?.getAttribute('aria-label')).toBe('First')
-    expect(region?.hasAttribute('aria-labelledby')).toBe(false)
+    expect(label(host)).toBe('First')
+    expect(part(host, 'panel')?.hasAttribute('aria-labelledby')).toBe(false)
   })
 
   /* And no empty name where it was never told one, which would be worse than
      none: an `aria-label=""` is a name a reader is given and cannot use. */
   test('claims no name at all before the root has told it one', async () => {
-    expect(part(await panel(), 'panel')?.hasAttribute('aria-label')).toBe(false)
+    expect(label(await panel())).toBeNull()
   })
 
   /* The panel is hidden in its markup rather than by a stylesheet, and it stays
      focusable, which is the tabpanel pattern: a panel of prose with nothing
      tabbable in it has to be reachable from the tab. */
   test('is hidden in its markup, and is a tab stop when it is showing', async () => {
-    const showing = part(await panel('selected'), 'panel')
+    const host = await panel('selected')
+    const showing = part(host, 'panel')
     expect(showing?.hasAttribute('hidden')).toBe(false)
-    expect(showing?.getAttribute('role')).toBe('tabpanel')
+    expect(role(host)).toBe('tabpanel')
     expect(showing?.getAttribute('tabindex')).toBe('0')
 
-    expect(part(await panel(), 'panel')?.hasAttribute('hidden')).toBe(true)
+    const other = await panel()
+    expect(part(other, 'panel')?.hasAttribute('hidden')).toBe(true)
+    expect(role(other)).toBeNull()
   })
 })

@@ -90,7 +90,8 @@
      gives the strip height of its own: the sandbox's panel puts 32px tabs in a
      48px row, and the pill then draws seven and a half pixels above the label it
      is marking. */
-  translate: var(--indicator-x, 0) calc(var(--indicator-y, 0px) + var(--_indicator-offset, 0px));
+  translate: calc(var(--indicator-x, 0px) + var(--_indicator-offset-x, 0px))
+    calc(var(--indicator-y, 0px) + var(--_indicator-offset, 0px));
   /* It slides and then settles: `emphasized` overshoots slightly and comes back,
      which is the breath. */
   transition:
@@ -157,6 +158,61 @@
 :host(:not([variant])) {
   --_tab-selected-surface: transparent;
   --_tab-selected-shadow: none;
+}
+
+/* Vertical: the tabs in a column at the inline start, the panels beside them. */
+:host([orientation="vertical"]) {
+  /* Which way the inline axis runs, for the bar at the column's inline end. */
+  --_tabs-inline-sign: 1;
+  --_tabs-panel-padding-block-start: var(--helix-space-none);
+  --_tabs-panel-padding-inline-start: var(--helix-space-md);
+
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+}
+
+:host([orientation="vertical"]:dir(rtl)) {
+  --_tabs-inline-sign: -1;
+}
+
+:host([orientation="vertical"]) [part="tabs"] {
+  align-content: start;
+  background-position: right;
+  background-repeat: repeat-y;
+  background-size: var(--helix-border-thin) 100%;
+  flex-direction: column;
+  overflow-x: visible;
+  overflow-y: auto;
+}
+
+:host([orientation="vertical"]:dir(rtl)) [part="tabs"] {
+  background-position: left;
+}
+
+/* A tab fills the column and its words start at its inline start. */
+:host([orientation="vertical"]) ::slotted(helix-tab) {
+  --_tab-inline-size: 100%;
+  --_tab-justify: flex-start;
+}
+
+/* The segmented groove grows down with its tabs. */
+:host([orientation="vertical"][variant="segmented"]) [part="tabs"] {
+  --_tab-height: initial;
+
+  block-size: auto;
+  justify-self: start;
+}
+
+/* The bar stands along the column's inline end, on the rule it replaces. */
+:host([orientation="vertical"][variant="underlined"]) [part="indicator"] {
+  --_indicator-block: var(--indicator-block-size, 0);
+  --_indicator-offset: 0px;
+  --_indicator-offset-x: calc(
+    (var(--indicator-inline-size, 0px) - var(--tabs-indicator-thickness, var(--helix-border-thick))) *
+    var(--_tabs-inline-sign, 1)
+  );
+
+  inline-size: var(--tabs-indicator-thickness, var(--helix-border-thick));
 }
 
 /* Print: the panel that is open, without the strip that would open another. */

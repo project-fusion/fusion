@@ -7,7 +7,7 @@ import {
   MixinControllerActive,
   whenHydrated,
 } from '@fusion.dev/helix-core'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixHeadlessTabPanel } from '../panel/tab-panel.js'
 import { HelixHeadlessTab } from '../tab/tab.js'
@@ -27,6 +27,18 @@ import { HelixHeadlessTab } from '../tab/tab.js'
  * panel is cheap. Set `manual` when showing a panel is expensive, so focus can
  * move without selecting.
  *
+ * `orientation="vertical"` sets the tabs in a column beside the panels, and the
+ * tab list says `aria-orientation="vertical"`. The arrow keys of both axes move
+ * between tabs either way.
+ *
+ * A tab with an `href` is a link, for tabs that are pages of a site. Pressing
+ * it follows the link, and the arrow keys move focus without choosing, so
+ * arrowing past a tab never leaves the page. Mark the tab of the page you are
+ * on with `selected`, or set `active` to its value.
+ *
+ * Each tab says which panel it controls through `aria-controls`, set as an
+ * element reference to the panel's host, where the engine has reflection.
+ *
  * @since 0.1.0
  * @status stable
  * @category navigation
@@ -40,7 +52,10 @@ import { HelixHeadlessTab } from '../tab/tab.js'
  * @event {HelixBeforeActivateEvent} helix-before-activate - Fired before the active tab changes, and cancelable. Canceling it is the only way to block a change.
  * @event {HelixSelectEvent} helix-select - Fired when a tab is chosen. The tab sends it and the root handles it, so you can listen on the root. Cancelable: canceling it stops the change and leaves the decision to you.
  *
- * @csspart indicator - The marker that moves to the selected tab.
+ * @csspart indicator - The marker that moves to the selected tab. It carries the selected tab's
+ *   place and size as `--indicator-x`, `--indicator-y`, `--indicator-inline-size` and
+ *   `--indicator-block-size`, and `data-placed` once it has been placed, for a mark you draw
+ *   and animate yourself.
  * @csspart panels - The panel container.
  * @csspart tabs - The tab list.
  */
@@ -52,7 +67,7 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
   protected readonly keys = new KeyboardNavigationController(this, {
     items: () => this.tabs,
     origin: 'focus',
-    selects: () => !this.manual,
+    selects: () => !this.manual && !this.linked,
   })
 
   /* The mark. Same controller as the nav bar, the toggle group and the page nav.
@@ -93,6 +108,15 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
   manual = false
 
   /**
+   * The direction the tabs run. `vertical` sets them in a column beside the
+   * panels and tells a screen reader the list is vertical.
+   *
+   * Optional, so the resting row writes no attribute onto the host.
+   */
+  @property({ reflect: true })
+  orientation?: 'horizontal' | 'vertical'
+
+  /**
    * How the row of tabs is drawn.
    *
    * Unset is a raised pill on the selected tab with nothing behind the row,
@@ -123,6 +147,11 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
     return [...this.children].filter(
       (child): child is HelixHeadlessTab => child instanceof HelixHeadlessTab,
     )
+  }
+
+  /** Whether any tab is a link, so arriving on one chooses nothing. */
+  private get linked(): boolean {
+    return this.tabs.some((tab) => (tab.href ?? '') !== '')
   }
 
   private get panels(): HelixHeadlessTabPanel[] {
@@ -190,6 +219,13 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
        Read from the tab's light DOM, which is where the consumer wrote the
        words, so it is whatever the reader sees on the tab. */
     const names = new Map(tabs.map((tab) => [tab.value, (tab.textContent ?? '').trim()]))
+    const panels = new Map(this.panels.map((panel) => [panel.value, panel]))
+    for (const tab of tabs) {
+      const panel = panels.get(tab.value)
+      whenHydrated(tab, () => {
+        tab.controls = panel
+      })
+    }
     for (const panel of this.panels) {
       const selected = panel.value === value
       const label = names.get(panel.value) ?? ''
@@ -255,7 +291,12 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
   }
 
   protected override render(): TemplateResult {
-    return html`<div part="tabs" role="tablist" aria-label=${this.label}>
+    return html`<div
+        part="tabs"
+        role="tablist"
+        aria-label=${this.label}
+        aria-orientation=${this.orientation === 'vertical' ? 'vertical' : nothing}
+      >
         <slot @slotchange=${this.handleSlotChange}></slot>
         <span part="indicator" aria-hidden="true"></span>
       </div>
