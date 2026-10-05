@@ -74,6 +74,15 @@ describe('heatmap server output', () => {
    * for the same reason, so the server's output and a hydrating consumer's
    * markup agree that neither has it yet.
    */
+  /* The server names the strip from the host's `aria-label` as the client
+     does, so hydration has nothing to change. */
+  test('an aria-label on the host names the served strip', () => {
+    const named = ssr(
+      html`<helix-headless-heatmap for="uptime" label="Uptime" aria-label="Uptime this week"></helix-headless-heatmap>`,
+    )
+    expect(partTag(named, 'strip')).toContain('aria-label="Uptime this week"')
+  })
+
   test('the host writes no attributes of its own', () => {
     expect(hostAttributes(markup, 'helix-headless-heatmap')).toEqual(['for', 'label'])
   })

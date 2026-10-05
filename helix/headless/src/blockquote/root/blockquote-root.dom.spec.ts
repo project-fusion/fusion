@@ -23,6 +23,19 @@ describe('blockquote', () => {
     expect(slotted(quote, 'attribution')[0]?.textContent).toBe('A')
   })
 
+  /* HTML-AAM names a figure from its caption. Read in Chromium's own tree, the
+     figure was unnamed, since the caption's words are slotted. The reference
+     is by id inside the shadow root, so it resolves there. */
+  test('the attribution names the figure', async () => {
+    const quote = await mount(
+      '<helix-headless-blockquote><p>Said so.</p><cite slot="attribution">A</cite></helix-headless-blockquote>',
+    )
+    const figure = part(quote, 'figure')
+    const id = figure?.getAttribute('aria-labelledby') ?? ''
+    expect(id).not.toBe('')
+    expect(quote.shadowRoot?.getElementById(id)).toBe(part(quote, 'attribution') as HTMLElement)
+  })
+
   /* The region was re-marked only when a property changed, so an attribution a
      framework rendered later stayed hidden. */
   test('an attribution slotted after the first render is shown', async () => {
