@@ -243,6 +243,35 @@ describe('a subclass registered under a tag of its own', () => {
   })
 })
 
+describe('what a restored page gets back', () => {
+  /* The form state was the FormData the tokens make, which the shared restore
+     cannot read, so the typed text came back empty. */
+  test('the typed text is the saved state, with tokens beside it', async () => {
+    document.body.innerHTML = `<form><helix-headless-filter-input label="Filter" name="q" value="refund">
+      <helix-headless-filter-chip slot="tags" name="status">open</helix-headless-filter-chip>
+    </helix-headless-filter-input></form>`
+    const host = document.querySelector('helix-headless-filter-input') as Updatable & {
+      formStateRestoreCallback(state: unknown): void
+      internals: ElementInternals
+      value: string
+    }
+    const states: unknown[] = []
+    const record = host.internals.setFormValue.bind(host.internals)
+    host.internals.setFormValue = (value, state) => {
+      states.push(state)
+      record(value, state)
+    }
+    host.value = 'refund tuesday'
+    await settle(host)
+    expect(states.at(-1)).toBe('refund tuesday')
+    host.value = ''
+    await settle(host)
+    host.formStateRestoreCallback('refund tuesday')
+    await settle(host)
+    expect(host.value).toBe('refund tuesday')
+  })
+})
+
 describe('what the form receives', () => {
   /* The tokens were never submitted, so a form posted only the typed text. */
   test('the text, then one entry for each token that says what it filters', async () => {
