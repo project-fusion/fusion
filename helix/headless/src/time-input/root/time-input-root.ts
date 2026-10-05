@@ -88,6 +88,7 @@ import '../../time-picker/index.js'
  * @csspart picker - The time picker inside the panel.
  * @csspart picker-column - One column of the picker.
  * @csspart picker-column-empty - The text shown when the filter hides every option.
+ * @csspart picker-column-error - A wheel's `error` part, which the list never sets: its times do not load.
  * @csspart picker-column-feedback - The column's message that says what is wrong with the value.
  * @csspart picker-column-filter-icon - The icon beside the filter field.
  * @csspart picker-column-filter-mark - The default icon beside the filter field, shown when none is slotted.
@@ -101,6 +102,7 @@ import '../../time-picker/index.js'
  * @csspart picker-columns - The row of columns, in `wheels`.
  * @csspart picker-list - The listbox holding the times, in `list`.
  * @csspart picker-list-empty - The text shown when the filter hides every option.
+ * @csspart picker-list-error - The list's `error` part, which the list never sets: its times do not load.
  * @csspart picker-list-feedback - The inner list's message that says what is wrong with the value.
  * @csspart picker-list-filter-icon - The icon beside the filter field.
  * @csspart picker-list-filter-mark - The default icon beside the filter field, shown when none is slotted.
@@ -570,13 +572,13 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
   protected renderPicker(): TemplateResult {
     return html`<${this.tag('time-picker')}
       part="picker"
-      exportparts="column: picker-column, column-empty: picker-column-empty,
+      exportparts="column: picker-column, column-empty: picker-column-empty, column-error: picker-column-error,
         column-feedback: picker-column-feedback, column-filter-icon: picker-column-filter-icon,
         column-filter-mark: picker-column-filter-mark, column-hint: picker-column-hint,
         column-items: picker-column-items, column-label: picker-column-label,
         column-live: picker-column-live, column-loading: picker-column-loading, column-search: picker-column-search,
         column-search-field: picker-column-search-field, columns: picker-columns, list: picker-list,
-        list-empty: picker-list-empty, list-feedback: picker-list-feedback,
+        list-empty: picker-list-empty, list-error: picker-list-error, list-feedback: picker-list-feedback,
         list-filter-icon: picker-list-filter-icon, list-filter-mark: picker-list-filter-mark,
         list-hint: picker-list-hint, list-items: picker-list-items, list-label: picker-list-label,
         list-live: picker-list-live, list-loading: picker-list-loading, list-search: picker-list-search,

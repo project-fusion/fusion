@@ -299,14 +299,6 @@ export class HelixHeadlessListbox extends MixinCollection(
   filterLabel = 'Filter'
 
   /**
-   * Stops the arrow keys from choosing each option they move to. Enter, Space
-   * or a click chooses the highlighted option.
-   *
-   * By default a single-choice list chooses as the arrows move, as a radio
-   * group does. Select and Time Input set this on the list in their panel, so
-   * a reader can move through the options before closing the panel on one.
-   */
-  /**
    * What the list says when its options could not be loaded, such as after a
    * request to a server fails. Empty is no error.
    *
@@ -316,6 +308,14 @@ export class HelixHeadlessListbox extends MixinCollection(
   @property({ attribute: 'load-error' })
   loadError = ''
 
+  /**
+   * Stops the arrow keys from choosing each option they move to. Enter, Space
+   * or a click chooses the highlighted option.
+   *
+   * By default a single-choice list chooses as the arrows move, as a radio
+   * group does. Select and Time Input set this on the list in their panel, so
+   * a reader can move through the options before closing the panel on one.
+   */
   @property({ type: Boolean })
   manual = false
 
