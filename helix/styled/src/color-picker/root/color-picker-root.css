@@ -70,14 +70,24 @@
    thumb.** Centered on a corner, half the mark was outside the square, and so
    outside the picker. In a popover, whose content scrolls, the right edge
    overflowed by 6.4px and drew a horizontal scrollbar, and the top and left
-   edges cut the mark in half. */
+   edges cut the mark in half.
+
+   **A white ring with a dark edge, in the media tokens, because the mark sits on
+   the color being picked and no theme decides that color.** In the surface
+   color, the ring was white on the square's white corner in light mode, and
+   dark on its black corner in dark mode, where it all but disappeared.
+   `foreground-media` and `surface-media` are white and black in both modes, the
+   pair a video's controls use over its picture. */
 [part="grid"]::after {
   /* How close the mark's center comes to an edge. */
   --_color-picker-mark-half: calc(var(--helix-size-icon-tight) / 2);
   block-size: var(--helix-size-icon-tight);
-  border: var(--helix-border-thick) solid var(--helix-color-surface);
+  border: var(--helix-border-thick) solid var(--helix-color-foreground-media);
   border-radius: var(--helix-radii-full);
-  box-shadow: var(--helix-shadow-sm);
+  box-shadow:
+    0 0 0 var(--helix-border-thin)
+    color-mix(in oklab, var(--helix-color-surface-media) 60%, transparent),
+    var(--helix-shadow-sm);
   content: "";
   inline-size: var(--helix-size-icon-tight);
   inset-block-start: clamp(
