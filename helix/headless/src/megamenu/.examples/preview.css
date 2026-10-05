@@ -153,7 +153,7 @@ helix-headless-megamenu:is(:state(from-start), :state(from-end))::part(surface) 
   }
 }
 
-helix-headless-megamenu[data-narrow]::part(surface) {
+helix-headless-megamenu:state(narrow)::part(surface) {
   border: none;
   border-block-end: 1px solid var(--_gray-edge);
   border-radius: 0;
