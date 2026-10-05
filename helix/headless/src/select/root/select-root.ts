@@ -2,6 +2,7 @@ import {
   AriaForwardController,
   afterLinkFollowed,
   customElement,
+  elementById,
   HelixFormElement,
   hostAria,
   MixinControllerOpen,
@@ -595,7 +596,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
       ?multiple=${this.multiple}
       ?filterable=${this.filterable}
       manual
-      aria-label=${this.label || this.getAttribute('aria-label') || nothing}
+      aria-label=${this.listName || nothing}
       @keydown=${this.handleListKeydown}
       @helix-before-change=${this.handleChange}
       @change=${this.stopInner}
@@ -639,6 +640,31 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
    * to the trigger by `AriaForwardController`, which reads the value after
    * them, so nothing is written here to fight it.
    */
+  /**
+   * What names the list once it opens: the `label`, the host's `aria-label`,
+   * or the words of what names the host from outside, its `aria-labelledby`
+   * or a `<label>` for it.
+   *
+   * **Words rather than a reference**, because the list is inside another
+   * element's shadow root and neither an IDREF nor the host's labels reach it.
+   * Read as the list renders, which opening it makes happen, so a label
+   * changed while the list is closed is read when it next opens. Without the
+   * last two routes a Select named by a `<label for>` opened onto a listbox
+   * with no name, which the missing-name warning reported.
+   */
+  private get listName(): string {
+    const own = this.label || this.getAttribute('aria-label')
+    if (own) {
+      return own
+    }
+    const ids = (this.getAttribute('aria-labelledby') ?? '').split(/\s+/).filter(Boolean)
+    const named = ids.length > 0 ? ids.map((id) => elementById(this, id)) : [...(this.labels ?? [])]
+    return named
+      .map((one) => (one?.textContent ?? '').replace(/\s+/g, ' ').trim())
+      .filter(Boolean)
+      .join(' ')
+  }
+
   private get triggerNames(): string | typeof nothing {
     const outside = (this.internals.labels?.length ?? 0) > 0 && !this.labeled
     if (this.hasAttribute('aria-labelledby') || outside) {

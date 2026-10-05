@@ -108,6 +108,18 @@ describe('select', () => {
     )
     expect(part(host, 'listbox')?.getAttribute('aria-label')).toBe('Sort by')
   })
+
+  /* Named from outside, the list opened unnamed: neither an id nor the host's
+     labels reach a listbox inside another shadow root, so it carries the words. */
+  test('a select named by `aria-labelledby` names its list with those words', async () => {
+    const host = await mount(
+      `<helix-headless-select aria-labelledby="sort-heading" name="c">
+        <helix-headless-option value="a">A</helix-headless-option>
+      </helix-headless-select>
+      <p id="sort-heading">Sort  by</p>`,
+    )
+    expect(part(host, 'listbox')?.getAttribute('aria-label')).toBe('Sort by')
+  })
 })
 
 if (hasLayout()) {
