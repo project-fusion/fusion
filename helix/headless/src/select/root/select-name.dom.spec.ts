@@ -45,10 +45,12 @@ describe('a select trigger', () => {
         <span id="outside">Language</span>`,
       )
       const trigger = part(host, 'trigger') as HTMLElement & { ariaLabelledByElements: Element[] }
-      expect(trigger.ariaLabelledByElements.map((one) => one.textContent?.trim())).toEqual([
-        'Language',
-        'Spanish',
-      ])
+      const words = (): (string | undefined)[] =>
+        trigger.ariaLabelledByElements.map((one) => one.textContent?.trim())
+      expect(words()).toEqual(['Language', 'Spanish'])
+      /* And still after focus arrives, when the forwarding runs again. */
+      trigger.focus()
+      expect(words()).toEqual(['Language', 'Spanish'])
     })
   }
 })
