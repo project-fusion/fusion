@@ -3,6 +3,7 @@ import type { ReactiveController, ReactiveControllerHost } from 'lit'
 /** The two journeys an overlay makes. */
 export type OpenPhase = 'entering' | 'exiting'
 
+/** What an `OpenPhaseController` reads of its host and writes onto it. */
 export interface OpenPhaseOptions {
   /**
    * Records each phase on the host, or takes it off: the host's own

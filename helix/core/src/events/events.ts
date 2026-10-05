@@ -420,6 +420,46 @@ export class HelixCanvasEditEvent extends CustomEvent<{ name: string }> {
   }
 }
 
+/** Why a file field did not take a file. */
+export type Refusal = 'count' | 'invalid' | 'size' | 'type'
+
+/** One file a file field did not take, and why. */
+export interface RefusedFile {
+  /** The file. */
+  readonly file: File
+  /** What the field's `validate` said about it, where it was the one refusing. */
+  readonly message?: string
+  /** Why it was not taken. */
+  readonly reason: Refusal
+}
+
+/** The files a file field refused. */
+export interface RejectDetail {
+  /** Each refused file with its reason, in the order they arrived. */
+  files: RefusedFile[]
+}
+
+/**
+ * Files arrived at a file field and some were refused: by `accept`, by
+ * `max-file-size`, by `max-files`, or by the field's own `validate`.
+ *
+ * A notification and not a request, because the files are already left out;
+ * the event is how a page tells the reader why. Bubbles and is composed, so a
+ * form around the field hears it.
+ */
+export class HelixRejectEvent extends CustomEvent<RejectDetail> {
+  static readonly eventName = 'helix-reject'
+
+  constructor(detail: RejectDetail) {
+    super(HelixRejectEvent.eventName, {
+      bubbles: true,
+      cancelable: false,
+      composed: true,
+      detail,
+    })
+  }
+}
+
 /** What a reader asked to take off the board. */
 export interface RemoveDetail {
   /** The cards, by name. */
@@ -2014,6 +2054,7 @@ const registry = {
   HelixPreviousEvent,
   HelixReadEvent,
   HelixReconnectEvent,
+  HelixRejectEvent,
   HelixRelabelEvent,
   HelixRemoveEvent,
   HelixReorderEvent,
