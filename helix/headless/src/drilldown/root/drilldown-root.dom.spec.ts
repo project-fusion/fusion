@@ -34,10 +34,19 @@ const press = async (host: Stack, target: Element): Promise<void> => {
 }
 
 describe('drilldown', () => {
-  test('the region says what it is through internals, not an attribute', async () => {
+  /* The rows are the menu, and the back button and the title sit above it: a
+     menu may hold only rows, groups and separators, and the host held both. */
+  test('the page of rows is the menu, and the way back is outside it', async () => {
     const host = await stack()
-    expect(role(host)).toBe('menu')
+    expect(role(host)).toBeNull()
     expect(host.hasAttribute('role')).toBe(false)
+    const page = part(host, 'page')
+    expect(page?.getAttribute('role')).toBe('menu')
+    expect(page?.getAttribute('aria-label')).toBe('Settings')
+    await press(host, host.querySelector('[value="appearance"]') as Element)
+    await host.updateComplete
+    expect(page?.contains(part(host, 'back'))).toBe(false)
+    expect(page?.getAttribute('aria-labelledby')).toBe(part(host, 'title')?.id)
   })
 
   test('only the top page shows to begin with', async () => {
@@ -311,5 +320,51 @@ describe('an empty page of a drilldown', () => {
     await (host as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
     expect(part(host, 'loading')?.textContent?.trim()).toBe('Still fetching')
     expect(part(host, 'empty')).toBeNull()
+  })
+})
+
+describe('moving through a page by key', () => {
+  const rows = async (): Promise<{ host: Stack; items: HTMLElement[] }> => {
+    const host = (await mount(
+      `<helix-headless-drilldown label="Settings">
+        <helix-headless-drilldown-item value="appearance">Appearance</helix-headless-drilldown-item>
+        <helix-headless-drilldown-item disabled value="locked">Locked</helix-headless-drilldown-item>
+        <helix-headless-drilldown-item value="about">About</helix-headless-drilldown-item>
+      </helix-headless-drilldown>`,
+    )) as Stack
+    const items = [...host.querySelectorAll('helix-headless-drilldown-item')] as HTMLElement[]
+    for (const item of items) {
+      await (item as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    }
+    await host.updateComplete
+    return { host, items }
+  }
+
+  const key = (from: Element, name: string): void => {
+    from.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key: name }))
+  }
+
+  /* The row renders `aria-disabled` so it can be reached and say why it cannot
+     be chosen, and the stack had filtered it out of the keys. */
+  test('a disabled row is reached by the arrows, and choosing it does nothing', async () => {
+    const { items } = await rows()
+    const [appearance, locked] = items as [HTMLElement, HTMLElement]
+    ;(appearance as HTMLElement & { focusItem(): void }).focusItem()
+    key(appearance, 'ArrowDown')
+    expect(locked.ownerDocument.activeElement).toBe(locked)
+    let chosen = false
+    locked.addEventListener('helix-select', () => {
+      chosen = true
+    })
+    ;(locked as HTMLElement & { select(): void }).select()
+    expect(chosen).toBe(false)
+  })
+
+  test('a typed letter moves to the next row whose name starts with it', async () => {
+    const { items } = await rows()
+    const [appearance, , about] = items as [HTMLElement, HTMLElement, HTMLElement]
+    ;(appearance as HTMLElement & { focusItem(): void }).focusItem()
+    key(appearance, 'a')
+    expect(about.ownerDocument.activeElement).toBe(about)
   })
 })

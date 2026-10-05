@@ -1,4 +1,4 @@
-import { customElement, HelixElement, HelixSelectEvent } from '@fusion.dev/helix-core'
+import { customElement, deepActiveElement, HelixElement, HelixSelectEvent } from '@fusion.dev/helix-core'
 import { caretRight } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -156,15 +156,13 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
    * word, and the two are one pattern: a menu that drills and a drill-down are
    * the same rows through the same controller.
    *
-   * Asked of the document rather than of the shadow root. `focusItem` puts
-   * focus on the control inside this row and the platform retargets it, so from
-   * outside the shadow tree `activeElement` is this element already and nothing
-   * has to walk a tree. `ShadowRoot.activeElement` is also the reading that does
-   * not survive happy-dom, which climbs `getRootNode()` to the top and then
-   * dereferences what it ran out of.
+   * The focused node is found through every shadow root and asked whether it
+   * is in this row's own, as `Menu.Item` does, so a drill-down inside another
+   * component's shadow root still knows its current row.
    */
   get selected(): boolean {
-    return this.ownerDocument.activeElement === this
+    const active = deepActiveElement()
+    return active !== null && active.getRootNode() === this.renderRoot
   }
 
   /** Fires `helix-select` for this row. */
