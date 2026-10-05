@@ -665,3 +665,162 @@ describe('taking a reader to an item', () => {
     expect(at(scroller(0, 320)).offsetOf(7)).toBe(224)
   })
 })
+
+describe('a uniform set of rows shorter than the estimate', () => {
+  /* The straight line with its rows offered and `measured` off, which is
+     Virtual List's default. Rows of 21 against an estimate of 32 covered two
+     thirds of the room they were counted for, so the window stopped short of
+     the bottom of the box and the last rows were never drawn. */
+  const uniformOf = (box: ReturnType<typeof scroller>, height: number, count = 5000) => {
+    const owner = host()
+    const controller = new VirtualizeController(owner, {
+      container: () => box,
+      count: () => count,
+      estimate: () => 32,
+      measured: () => false,
+      overscan: 0,
+      rows: () => drawn(Array(12).fill(height), controller.window.first),
+    })
+    return { controller, owner }
+  }
+
+  test('fills the box, read once from the rows it drew', () => {
+    const box = scroller(0, 300)
+    const { controller } = uniformOf(box, 21)
+    controller.measure()
+    // Placed by the estimate: ten rows of 32 for a box of 300.
+    expect(controller.window.last).toBe(10)
+    controller.hostUpdated()
+    // Read at 21, fifteen rows fill it, and the spacer after them counts 21 each.
+    expect(controller.window.last).toBe(15)
+    expect(controller.window.after).toBe((5000 - 15) * 21)
+    expect(controller.sizeOf(4999)).toBe(21)
+  })
+
+  test('reaches the last row at the end of the scroll', () => {
+    const box = scroller(0, 300)
+    const { controller } = uniformOf(box, 21)
+    controller.measure()
+    controller.hostUpdated()
+    controller.reveal(4999)
+    controller.measure()
+    expect(box.scrollTop).toBe(5000 * 21 - 300)
+    expect(controller.window.last).toBe(5000)
+    expect(controller.window.after).toBe(0)
+  })
+
+  test('keeps the item at the top of the box where the line moves', () => {
+    const box = scroller(3200, 300)
+    const { controller } = uniformOf(box, 16)
+    controller.measure()
+    expect(controller.window.first).toBe(100)
+    controller.hostUpdated()
+    expect(box.scrollTop).toBe(1600)
+    expect(controller.window.first).toBe(100)
+  })
+
+  test('reads once, and again only for a new estimate or a forgotten set', () => {
+    const box = scroller(0, 300)
+    let height = 21
+    const owner = host()
+    const controller = new VirtualizeController(owner, {
+      container: () => box,
+      count: () => 100,
+      estimate: () => 32,
+      measured: () => false,
+      overscan: 0,
+      rows: () => drawn([height, height]),
+    })
+    controller.measure()
+    controller.hostUpdated()
+    height = 40
+    controller.hostUpdated()
+    expect(controller.sizeOf(0)).toBe(21)
+    controller.forget()
+    controller.hostUpdated()
+    expect(controller.sizeOf(0)).toBe(40)
+  })
+
+  test('rows with no height say nothing, and rows that match change nothing', () => {
+    const box = scroller(0, 300)
+    const flat = uniformOf(box, 0)
+    flat.controller.measure()
+    flat.controller.hostUpdated()
+    expect(flat.controller.sizeOf(0)).toBe(32)
+    const even = uniformOf(scroller(0, 300), 32)
+    even.controller.measure()
+    const updates = even.owner.updates
+    even.controller.hostUpdated()
+    expect(even.owner.updates).toBe(updates)
+  })
+})
+
+describe('a measured set of short rows', () => {
+  test('draws the last row at the end of the scroll with no space after it', () => {
+    const box = scroller(0, 300)
+    const controller = new VirtualizeController(host(), {
+      container: () => box,
+      count: () => 500,
+      estimate: () => 32,
+      overscan: 0,
+      rows: () => drawn(Array(30).fill(18), controller.window.first),
+    })
+    controller.measure()
+    controller.hostUpdated()
+    controller.reveal(499)
+    controller.measure()
+    controller.hostUpdated()
+    controller.reveal(499)
+    controller.measure()
+    expect(controller.window.last).toBe(500)
+    expect(controller.window.after).toBe(0)
+  })
+})
+
+describe('asking for more near the end', () => {
+  test('answers once a reader is within one screen of the end, once per length', () => {
+    let count = 100
+    const box = scroller(0, 320)
+    const controller = new VirtualizeController(host(), {
+      container: () => box,
+      count: () => count,
+      estimate: () => 32,
+    })
+    expect(controller.endInSight()).toBe(false)
+    box.scrollTop = 3200 - 640
+    expect(controller.endInSight()).toBe(true)
+    expect(controller.endInSight()).toBe(false)
+    count = 200
+    expect(controller.endInSight()).toBe(false)
+    box.scrollTop = 6400 - 640
+    expect(controller.endInSight()).toBe(true)
+  })
+
+  test('asks nothing of a box with no height or a set with no items', () => {
+    expect(
+      new VirtualizeController(host(), {
+        container: () => scroller(0, 0),
+        count: () => 10,
+        estimate: () => 32,
+      }).endInSight(),
+    ).toBe(false)
+    expect(
+      new VirtualizeController(host(), {
+        container: () => scroller(0, 320),
+        count: () => 0,
+        estimate: () => 32,
+      }).endInSight(),
+    ).toBe(false)
+  })
+
+  test('is kept for the length a host passes', () => {
+    const controller = new VirtualizeController(host(), {
+      container: () => scroller(0, 320),
+      count: () => 5,
+      estimate: () => 32,
+    })
+    expect(controller.endInSight(40)).toBe(true)
+    expect(controller.endInSight(40)).toBe(false)
+    expect(controller.endInSight(60)).toBe(true)
+  })
+})

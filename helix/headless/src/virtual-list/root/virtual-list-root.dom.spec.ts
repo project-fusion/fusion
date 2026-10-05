@@ -425,6 +425,47 @@ describe('the keyboard', () => {
     expect(host.querySelector('[data-index="1"]')?.getAttribute('tabindex')).toBe('0')
   })
 
+  test('moves to the item whose text starts with the letters typed', async () => {
+    const host = await fed(
+      ['Apple', 'Banana', 'Blueberry', 'Cherry', 'Bilberry'].map((name) => ({ name })),
+    )
+    ;(host.querySelector('[data-index="0"]') as HTMLElement).focus()
+    await press(host, 'b')
+    expect((document.activeElement as HTMLElement).dataset.index).toBe('1')
+    // "bi" is a word, which starts the search on the item it is on.
+    await press(host, 'i')
+    expect((document.activeElement as HTMLElement).dataset.index).toBe('4')
+    const again = await fed(['Banana', 'Blueberry'].map((name) => ({ name })))
+    ;(again.querySelector('[data-index="0"]') as HTMLElement).focus()
+    // The same letter again moves on to the next item that starts with it.
+    await press(again, 'b')
+    await press(again, 'b')
+    expect((document.activeElement as HTMLElement).dataset.index).toBe('0')
+  })
+
+  test('types against text-field, or a string item itself, and reaches an undrawn item', async () => {
+    const host = await fed(
+      [...named(4000), { name: 'Zed' }].map((item) => ({ person: item })),
+      '<template><div><span data-field="person.name"></span></div></template>',
+    )
+    ;(host.querySelector('[data-index="0"]') as HTMLElement).focus()
+    await press(host, 'z')
+    expect((document.activeElement as HTMLElement).dataset.index).toBe('4000')
+    const drawnBy = await fed([{ person: { name: 'Ada' } }, { person: { name: 'Grace' } }], '')
+    drawnBy.textField = 'person.name'
+    drawnBy.renderItem = (item: { person: { name: string } }) => item.person.name
+    await settle(drawnBy)
+    ;(drawnBy.querySelector('[data-index="0"]') as HTMLElement).focus()
+    await press(drawnBy, 'g')
+    expect((document.activeElement as HTMLElement).dataset.index).toBe('1')
+    const plain = await fed(['one', 'two', 'three'], '')
+    plain.renderItem = (item: string) => item
+    await settle(plain)
+    ;(plain.querySelector('[data-index="0"]') as HTMLElement).focus()
+    await press(plain, 't')
+    expect((document.activeElement as HTMLElement).dataset.index).toBe('1')
+  })
+
   test('moves the tab stop to the first row on screen when its row scrolls away', async () => {
     const host = await fed(named(500))
     const viewport = part(host, 'viewport') as HTMLElement
@@ -510,5 +551,92 @@ describe('what is on screen, and the end of the set', () => {
     await settle(host)
     await scrollTo(host, viewport, 1_000)
     expect(asked).toBe(2)
+  })
+})
+
+describe('loading more', () => {
+  test('marks the list busy and draws a row after the last item while loading', async () => {
+    const host = await fed(named(3))
+    expect(part(host, 'loading')).toBeNull()
+    expect(part(host, 'viewport')?.hasAttribute('aria-busy')).toBe(false)
+    host.loading = true
+    await settle(host)
+    const row = part(host, 'loading') as HTMLElement
+    expect(row.getAttribute('role')).toBe('listitem')
+    expect(row.hasAttribute('aria-posinset')).toBe(false)
+    expect(row.textContent?.trim()).toBe('Loading more')
+    expect(part(host, 'viewport')?.getAttribute('aria-busy')).toBe('true')
+    // After the room the undrawn rows stand for, so it closes the list.
+    expect(row.previousElementSibling?.getAttribute('part')).toBe('after')
+    host.loadingLabel = 'Fetching files'
+    await settle(host)
+    expect(row.textContent?.trim()).toBe('Fetching files')
+  })
+
+  test('keeps a slotted loading row of your own out of the rows it draws', async () => {
+    const host = await fed(named(3))
+    const own = document.createElement('span')
+    own.slot = 'loading'
+    own.textContent = 'One moment'
+    host.append(own)
+    host.loading = true
+    await settle(host)
+    expect(own.isConnected).toBe(true)
+    expect(own.hasAttribute('data-index')).toBe(false)
+    expect(drawn(host).filter((row) => row !== own)).toHaveLength(3)
+  })
+
+  test('asks for nothing while loading', async () => {
+    const host = await fed(named(20))
+    const viewport = part(host, 'viewport') as HTMLElement
+    Object.defineProperty(viewport, 'clientHeight', { configurable: true, value: 192 })
+    let asked = 0
+    host.addEventListener('helix-load-more', () => {
+      asked += 1
+    })
+    host.loading = true
+    await settle(host)
+    viewport.scrollTop = 400
+    viewport.dispatchEvent(new Event('scroll'))
+    await settle(host)
+    expect(asked).toBe(0)
+    host.loading = false
+    await settle(host)
+    expect(asked).toBe(1)
+  })
+})
+
+describe('rows shorter than the estimate', () => {
+  /* Chromium only: the height is read from what was laid out. Rows of 21
+     pixels against the estimate's 32 left the last rows undrawn at the end of
+     the scroll, with a blank spacer under the window. */
+  test.if(hasLayout())('reaches the last row by scrollToIndex', async () => {
+    document.body.innerHTML = `<helix-headless-virtual-list class="short" label="Rows"></helix-headless-virtual-list>`
+    const host = document.body.firstElementChild as HTMLElement &
+      Updatable &
+      Record<string, unknown>
+    const sheet = document.createElement('style')
+    sheet.textContent = 'helix-headless-virtual-list.short > [data-index] { block-size: 21px }'
+    document.head.append(sheet)
+    try {
+      host.renderItem = (item: { name: string }) => item.name
+      host.items = named(5000)
+      await settle(host)
+      ;(host as unknown as { scrollToIndex: (at: number) => void }).scrollToIndex(4999)
+      await settle(host)
+      await new Promise((resolve) => requestAnimationFrame(resolve))
+      await settle(host)
+      const last = host.querySelector('[data-index="4999"]') as HTMLElement | null
+      expect(last).not.toBeNull()
+      const viewport = part(host, 'viewport') as HTMLElement
+      expect(
+        Math.abs(
+          (last as HTMLElement).getBoundingClientRect().bottom -
+            viewport.getBoundingClientRect().bottom,
+        ),
+      ).toBeLessThan(2)
+    } finally {
+      sheet.remove()
+    }
   })
 })

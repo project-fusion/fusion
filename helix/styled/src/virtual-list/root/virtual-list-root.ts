@@ -11,7 +11,8 @@ import { styles } from './virtual-list-root.css.js'
  * The styled tier styles the scrolling box and draws the focus ring on the row
  * holding focus. Rows are your markup in the light DOM, so your stylesheet
  * styles them the same as any other content, and a rule of yours on a row wins
- * over the ring.
+ * over the ring. While `loading` is set, a muted, centered row after the last
+ * item says "Loading more".
  *
  * @category layout
  * @since 0.1.0
@@ -20,9 +21,12 @@ import { styles } from './virtual-list-root.css.js'
  *
  * @csspart after - The space that stands in for the rows below the rendered ones.
  * @csspart before - The space that stands in for the rows above the rendered ones.
+ * @csspart loading - The row after the last item while `loading` is set.
  * @csspart viewport - The scrolling box.
  *
  * @cssproperty --virtual-list-block-size - How tall the scrolling box is.
+ * @cssproperty --virtual-list-loading-color - The color of the text in the row drawn while `loading` is set.
+ * @cssproperty --virtual-list-loading-padding - The space around the text in the row drawn while `loading` is set.
  */
 @customElement('helix-virtual-list')
 export class HelixVirtualList extends HelixHeadlessVirtualList {

@@ -23,7 +23,9 @@ export interface VirtualizeOptions {
    * the straight line the note below defends. A host that returns its row
    * elements gets each one measured after it renders and placed by what it
    * came to; a host that returns nothing gets every item at `estimate`, which
-   * is right whenever the rows really are uniform and is cheaper.
+   * is right whenever the rows really are uniform and is cheaper. A host that
+   * returns its rows and turns `measured` off keeps the straight line, with its
+   * slope read once from the rows it drew.
    *
    * **Each row carries its own index rather than being counted off from
    * `window.first`.** A host is free to place its rows whenever it likes, and
@@ -165,6 +167,17 @@ export class VirtualizeController implements ReactiveController {
   /** Room `shift` added above the window, owed to the scroll offset once drawn. */
   private owed = 0
 
+  /**
+   * The drawn rows' height on the straight line, read once per estimate.
+   *
+   * Undefined until a host that offers `rows` has drawn some on the uniform
+   * path, and again after `forget`.
+   */
+  private sample: { estimate: number; size: number } | undefined
+
+  /** The length of the set when `endInSight` last answered true. */
+  private askedAt = -1
+
   constructor(host: ReactiveControllerHost, options: VirtualizeOptions) {
     this.host = host
     this.options = options
@@ -246,7 +259,7 @@ export class VirtualizeController implements ReactiveController {
     this.watch()
     const box = this.options.container()
     const total = Math.max(0, this.options.count())
-    const size = Math.max(1, this.options.estimate())
+    const size = this.line()
     if (!box) {
       return
     }
@@ -297,6 +310,58 @@ export class VirtualizeController implements ReactiveController {
     return { after: Math.max(0, (total - last) * size), before: first * size, first, last }
   }
 
+  /**
+   * How tall one item is on the straight line: the drawn rows' height once
+   * read, and `estimate` until then.
+   *
+   * **An estimate that is wrong on the straight line leaves the end of the
+   * set out of reach.** Rows of 21 pixels placed at 32 fill two thirds of the
+   * room they are counted for, so the window stops short of the bottom of the
+   * box and the spacer after it holds the rest: in Chromium, `scrollToIndex`
+   * on the last of 5,000 such rows scrolled to the end and drew nothing there.
+   * Reading the drawn rows once corrects the slope, and it is still a line.
+   */
+  private line(): number {
+    const estimate = Math.max(1, this.options.estimate())
+    return this.sample?.estimate === estimate ? this.sample.size : estimate
+  }
+
+  /**
+   * Reads the drawn rows' height once for the straight line, for a host that
+   * offers `rows` and does not measure.
+   *
+   * The mean of the rows drawn, each item's elements counted together. A row
+   * with no height, such as one that is not laid out, says nothing. When the
+   * line moves, the scroll offset moves with it, so the item at the top of the
+   * box stays there.
+   */
+  private sampleRows(): void {
+    const estimate = Math.max(1, this.options.estimate())
+    if (this.sample?.estimate === estimate) {
+      return
+    }
+    const heights = new Map<number, number>()
+    for (const { element, index } of this.options.rows?.() ?? []) {
+      heights.set(index, (heights.get(index) ?? 0) + element.getBoundingClientRect().height)
+    }
+    const seen = [...heights.values()].filter((height) => height > 0)
+    if (seen.length === 0) {
+      return
+    }
+    const was = this.line()
+    const size = Math.max(1, seen.reduce((sum, height) => sum + height, 0) / seen.length)
+    this.sample = { estimate, size }
+    if (Math.abs(size - was) < 0.5) {
+      return
+    }
+    const box = this.options.container()
+    if (box && box.scrollTop > 0) {
+      box.scrollTop = (box.scrollTop / was) * size
+    }
+    this.settling = 0
+    this.measure()
+  }
+
   /** Whether this pass places by measurement: offered, and wanted. */
   private measuring(): boolean {
     return this.options.rows !== undefined && (this.options.measured?.() ?? true)
@@ -343,7 +408,7 @@ export class VirtualizeController implements ReactiveController {
     const top = Math.max(0, box.scrollTop)
     const bottom = top + box.clientHeight
     if (!this.measuring()) {
-      const size = Math.max(1, this.options.estimate())
+      const size = this.line()
       const first = Math.min(Math.floor(top / size), total)
       return { first, last: Math.max(first, Math.min(total, Math.ceil(bottom / size))) }
     }
@@ -368,10 +433,36 @@ export class VirtualizeController implements ReactiveController {
     if (!box) {
       return 0
     }
-    const length = this.measuring()
-      ? this.heights.total(total)
-      : total * Math.max(1, this.options.estimate())
+    const length = this.measuring() ? this.heights.total(total) : total * this.line()
     return Math.max(0, length - Math.max(0, box.scrollTop) - box.clientHeight)
+  }
+
+  /**
+   * Whether a reader has come within one screen of the end of the set, true
+   * once for each length of it.
+   *
+   * For a host that asks for more items as a reader nears the end: it sends
+   * its request when this answers true, and the set growing lets it answer
+   * true again. False while the box has no height or the set no items, so a
+   * list that has not been laid out asks for nothing.
+   *
+   * `length` is what the answer is kept for, the count by default. A host
+   * whose count is a filtered view of what it holds passes what it holds, so
+   * new items that the filter hides still let it ask again.
+   */
+  endInSight(length = Math.max(0, this.options.count())): boolean {
+    const screen = this.options.container()?.clientHeight ?? 0
+    if (
+      length === 0 ||
+      screen <= 0 ||
+      this.askedAt === length ||
+      this.options.count() <= 0 ||
+      this.remaining() > screen
+    ) {
+      return false
+    }
+    this.askedAt = length
+    return true
   }
 
   /**
@@ -423,6 +514,7 @@ export class VirtualizeController implements ReactiveController {
       this.owed = 0
     }
     if (!this.measuring()) {
+      this.sampleRows()
       return
     }
     const rows = this.options.rows?.()
@@ -486,7 +578,7 @@ export class VirtualizeController implements ReactiveController {
    * say, and has to take that item's room out of a spacer.
    */
   sizeOf(index: number): number {
-    return this.measuring() ? this.heights.at(index) : Math.max(1, this.options.estimate())
+    return this.measuring() ? this.heights.at(index) : this.line()
   }
 
   /**
@@ -541,7 +633,7 @@ export class VirtualizeController implements ReactiveController {
     const total = Math.max(0, this.options.count())
     return this.measuring()
       ? this.heights.before(index, total)
-      : Math.max(0, Math.min(index, total)) * Math.max(1, this.options.estimate())
+      : Math.max(0, Math.min(index, total)) * this.line()
   }
 
   /**
@@ -555,6 +647,7 @@ export class VirtualizeController implements ReactiveController {
    */
   forget(): void {
     this.heights.forget()
+    this.sample = undefined
   }
 
   /**

@@ -30,6 +30,15 @@
   outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }
 
+/* The row after the last item while more are fetched: quiet, and centered
+   under the rows, so it reads as the list's own state and not as an item. */
+[part="loading"] {
+  color: var(--virtual-list-loading-color, var(--helix-color-foreground-muted));
+  font-size: var(--helix-text-sm);
+  padding: var(--virtual-list-loading-padding, var(--helix-space-sm));
+  text-align: center;
+}
+
 /* The spacers are geometry, not content. They carry the room the rows outside
    the window would have taken so the scrollbar is honest about the real length:
    a box that scrolls for twenty rows while claiming ten thousand gives a thumb

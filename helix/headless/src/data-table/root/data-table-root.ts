@@ -725,9 +725,6 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   /** Whether Shift was held on the last press, for a checkbox that asks to range. */
   private shiftPressed = false
 
-  /** The number of rows when `helix-load-more` last went out on its own. */
-  private askedAt = -1
-
   /** The grid's size as the last render counted it, for the internals. */
   private counts: { columns: number | undefined; rows: number | undefined } = {
     columns: undefined,
@@ -1412,15 +1409,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     if (!this.windowed || !this.loadMore || this.loading) {
       return
     }
-    const screen = this.partNamed('table')?.clientHeight ?? 0
-    const count = this.rows.length
-    if (
-      screen > 0 &&
-      count > 0 &&
-      this.askedAt !== count &&
-      this.virtualize.remaining() <= screen
-    ) {
-      this.askedAt = count
+    /* Kept by the rows held, which grow with each page whatever the search
+       shows of them. */
+    if (this.virtualize.endInSight(this.rows.length)) {
       this.askForMore()
     }
   }
