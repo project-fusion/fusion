@@ -272,6 +272,18 @@ export class HelixHeadlessListbox extends MixinCollection(
   filterable = false
 
   /**
+   * How long typing in the filter field rests before the list is filtered, in
+   * milliseconds. `0` filters on every keystroke.
+   *
+   * For a list filtered on a server, where `helix-filter` starts a request: a
+   * reader typing a word sends one request for the word, not one for each
+   * letter. Enter and the arrow keys filter at once on what is typed, so they
+   * act on the list the reader expects.
+   */
+  @property({ attribute: 'filter-delay', type: Number })
+  filterDelay = 0
+
+  /**
    * Placeholder text for the filter field.
    */
   @property({ attribute: 'filter-label' })
@@ -940,6 +952,8 @@ export class HelixHeadlessListbox extends MixinCollection(
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    clearTimeout(this.filterTimer)
+    this.filterTimer = undefined
     this.removeEventListener('helix-select', this.handleSelection as EventListener)
     this.removeEventListener('keydown', this.handleKeydown)
     /* Its marks go with it. The registry is the document's and outlives this
@@ -1078,9 +1092,35 @@ export class HelixHeadlessListbox extends MixinCollection(
     // `input` is composed and would reach a consumer beside this element's.
     event.stopPropagation()
     const control = event.target as HTMLInputElement
+    clearTimeout(this.filterTimer)
+    if (this.filterDelay > 0) {
+      this.filterTimer = setTimeout(() => this.takeFilter(control), this.filterDelay)
+      return
+    }
+    this.takeFilter(control)
+  }
+
+  /** The filter waiting out `filterDelay`, if any. */
+  private filterTimer: ReturnType<typeof setTimeout> | undefined = undefined
+
+  /** Filters on what the field holds, and puts the field back where that was refused. */
+  private takeFilter(control: HTMLInputElement): void {
+    this.filterTimer = undefined
     this.requestFilter(control.value)
     if (control.value !== this.filter) {
       control.value = this.filter
+    }
+  }
+
+  /** Filters at once on a filter still waiting out `filterDelay`. */
+  private flushFilter(): void {
+    if (this.filterTimer === undefined) {
+      return
+    }
+    clearTimeout(this.filterTimer)
+    const control = this.partNamed<HTMLInputElement>('search-field')
+    if (control) {
+      this.takeFilter(control)
     }
   }
 
@@ -1117,14 +1157,24 @@ export class HelixHeadlessListbox extends MixinCollection(
    * they meant as an undo.
    */
   private readonly handleFilterKeydown = (event: KeyboardEvent): void => {
-    if (event.key === 'Escape' && this.filter !== '') {
+    if (event.key === 'Enter' || FIELD_MOVES.has(event.key)) {
+      this.flushFilter()
+    }
+    if (event.key === 'Escape' && (this.filter !== '' || this.filterTimer !== undefined)) {
       /* Stopped and prevented whether or not the clearing stands. The reader
          pressed Escape at a filtered list, so the key was for this list either
          way, and letting it through to close the surface around it would be a
-         second thing happening from one press. */
+         second thing happening from one press. Text still waiting out
+         `filterDelay` is a filter too, and goes with it. */
       event.stopPropagation()
       event.preventDefault()
+      clearTimeout(this.filterTimer)
+      this.filterTimer = undefined
       this.requestFilter('')
+      const control = this.partNamed<HTMLInputElement>('search-field')
+      if (control && control.value !== this.filter) {
+        control.value = this.filter
+      }
       return
     }
     if (!FIELD_MOVES.has(event.key)) {

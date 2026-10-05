@@ -945,6 +945,11 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
       this.colorWords,
       this.lang,
     )
+    /* The square's two inputs are named with the picker's own name where it
+       has one, as React Aria's color area names its own: "Brand, Saturation"
+       says which picker on a page with two. */
+    const owner = this.getAttribute('aria-label')?.trim()
+    const axisName = (channel: string): string => (owner ? `${owner}, ${channel}` : channel)
     return html`<div
         part="grid"
         style="--color-picker-hue: ${color.hue}; --color-picker-saturation: ${color.saturation}%; --color-picker-brightness: ${color.brightness}%"
@@ -959,7 +964,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
           type="range"
           min="0"
           max="100"
-          aria-label=${this.saturationLabel}
+          aria-label=${axisName(this.saturationLabel)}
           aria-valuetext=${both}
           aria-invalid=${this.invalid ? 'true' : nothing}
           .value=${String(color.saturation)}
@@ -979,7 +984,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
           min="0"
           max="100"
           tabindex="-1"
-          aria-label=${this.brightnessLabel}
+          aria-label=${axisName(this.brightnessLabel)}
           aria-valuetext=${reversed}
           aria-invalid=${this.invalid ? 'true' : nothing}
           .value=${String(color.brightness)}

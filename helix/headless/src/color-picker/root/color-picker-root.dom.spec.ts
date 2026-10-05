@@ -747,3 +747,13 @@ describe('a color, said by its name', () => {
     expect(part(host, 'swatch')?.getAttribute('aria-label')).toBe('dunkles kräftiges blau')
   })
 })
+
+describe('the square named with the picker', () => {
+  test('says the picker’s own name before each axis, where the picker has one', async () => {
+    const named = await picker('aria-label="Brand"')
+    expect(part(named, 'grid-saturation')?.getAttribute('aria-label')).toBe('Brand, Saturation')
+    expect(part(named, 'grid-brightness')?.getAttribute('aria-label')).toBe('Brand, Brightness')
+    const bare = await picker()
+    expect(part(bare, 'grid-saturation')?.getAttribute('aria-label')).toBe('Saturation')
+  })
+})

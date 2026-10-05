@@ -365,3 +365,12 @@ describe('a command that is a link', () => {
     expect(followed).toEqual([])
   })
 })
+
+describe('a palette filtered on a server', () => {
+  test('hands `filter-delay` to its list', async () => {
+    const host = await palette(
+      markup.replace('<helix-headless-command ', '<helix-headless-command filter-delay="250" '),
+    )
+    expect((listbox(host) as unknown as { filterDelay: number }).filterDelay).toBe(250)
+  })
+})
