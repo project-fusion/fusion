@@ -1,25 +1,49 @@
-/* Fixed to the window, and transparent to a pointer. */
+/* The host draws nothing. The stack is the `region`, which is a popover in the
+   top layer while a message shows. */
 :host {
   --_toast-inset: var(--toast-inset, var(--helix-space-lg));
-
-  inset-inline: var(--_toast-inset);
-  pointer-events: none;
-  position: fixed;
-  /* `--helix-layer-toast` is the top of the stack. */
-  z-index: var(--helix-layer-toast);
+  display: contents;
 }
 
 /* The resting arrangement, which is bottom-end. */
 :host(:not([placement])) {
   --_toast-enter: var(--helix-space-lg);
-  inset-block-end: var(--_toast-inset);
 }
 
+/* Fixed to the window, and transparent to a pointer. The UA's popover box
+   (centered, bordered, padded and painted) is undone, because the stack has no
+   surface of its own. */
 [part="region"] {
   /* No `gap`. */
   --_toast-gap: var(--toast-gap, var(--helix-space-xs));
+  background: none;
+  block-size: auto;
+  border: none;
+  color: inherit;
   display: flex;
   flex-direction: column;
+  inline-size: auto;
+  inset: auto;
+  inset-inline: var(--_toast-inset);
+  margin: var(--helix-space-none);
+  max-block-size: none;
+  max-inline-size: none;
+  overflow: visible;
+  padding: var(--helix-space-none);
+  pointer-events: none;
+  position: fixed;
+  /* Under the top layer, where a browser without the popover API leaves it. */
+  z-index: var(--helix-layer-toast);
+}
+
+:host(:not([placement])) [part="region"] {
+  inset-block-end: var(--_toast-inset);
+}
+
+/* The UA hides a popover that is not showing. Said again here, because the
+   `display: flex` above takes that away. */
+[part="region"]:not(:popover-open) {
+  display: none;
 }
 
 ::slotted(*) {
@@ -31,11 +55,17 @@
    them. */
 :host([placement^="bottom"]) {
   --_toast-enter: var(--helix-space-lg);
+}
+
+:host([placement^="bottom"]) [part="region"] {
   inset-block-end: var(--_toast-inset);
 }
 
 :host([placement^="top"]) {
   --_toast-enter: calc(var(--helix-space-lg) * -1);
+}
+
+:host([placement^="top"]) [part="region"] {
   inset-block-start: var(--_toast-inset);
 }
 
