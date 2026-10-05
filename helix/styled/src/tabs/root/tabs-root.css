@@ -208,7 +208,10 @@
   --_indicator-block: var(--indicator-block-size, 0);
   --_indicator-offset: 0px;
   --_indicator-offset-x: calc(
-    (var(--indicator-inline-size, 0px) - var(--tabs-indicator-thickness, var(--helix-border-thick))) *
+    (
+      var(--indicator-inline-size, 0px) -
+      var(--tabs-indicator-thickness, var(--helix-border-thick))
+    ) *
     var(--_tabs-inline-sign, 1)
   );
 

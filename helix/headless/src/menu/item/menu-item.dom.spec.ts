@@ -197,3 +197,26 @@ describe('the row the keyboard is on', () => {
     expect(one.selected).toBe(true)
   })
 })
+
+describe('a row with a shortcut', () => {
+  /* WA's dropdown item details and React Aria's keyboard slot: the shortcut is
+     drawn after the label, and the row says it to a screen reader. */
+  test('draws the key after the label and gives the row aria-keyshortcuts', async () => {
+    const host = (await mount(
+      '<helix-headless-menu-item shortcut="mod+s">Save</helix-headless-menu-item>',
+    )) as HTMLElement & { updateComplete: Promise<unknown> }
+    const key = part(host, 'shortcut') as HTMLElement & { keys: string }
+    expect(key.localName).toBe('helix-headless-kbd')
+    expect(key.keys).toBe('mod+s')
+    expect(part(host, 'end')?.hasAttribute('data-empty')).toBe(false)
+    expect(['Control+S', 'Meta+S']).toContain(
+      part(host, 'item')?.getAttribute('aria-keyshortcuts') ?? '',
+    )
+  })
+
+  test('a row with neither a shortcut nor end content leaves its trailing column empty', async () => {
+    const host = await mount('<helix-headless-menu-item>Save</helix-headless-menu-item>')
+    expect(part(host, 'end')?.hasAttribute('data-empty')).toBe(true)
+    expect(part(host, 'item')?.hasAttribute('aria-keyshortcuts')).toBe(false)
+  })
+})

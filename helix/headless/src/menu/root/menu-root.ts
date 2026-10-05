@@ -21,6 +21,11 @@ import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import type { HelixHeadlessMenuItem } from '../item/menu-item.js'
+import type { HelixHeadlessMenuSection } from '../section/menu-section.js'
+
+/** Whether an element is a `Menu.Section`, read by identity across both tiers. */
+const isSection = (element: Element): element is HelixHeadlessMenuSection =>
+  'isMenuSection' in element && element.isMenuSection === true
 
 /**
  * @summary A menu of commands that opens from a trigger.
@@ -45,6 +50,16 @@ import type { HelixHeadlessMenuItem } from '../item/menu-item.js'
  * sets this on items as a property, never as an attribute. An attribute written
  * onto your element after it upgrades causes a hydration mismatch.
  *
+ * Group rows under a heading with `Menu.Section`, which is a `group` named by
+ * its heading. Between runs of rows, a `<helix-divider announced>` is a
+ * separator a screen reader announces.
+ *
+ * With `context`, the trigger is an area and the menu is its context menu: a
+ * right-click, a long press, Shift+F10 or the menu key over the area opens it
+ * at the pointer, or at the area's corner from the keyboard, as Radix's context
+ * menu does. A press on the area does not open it, and closing it returns focus
+ * to where it was.
+ *
  * @since 0.1.0
  * @status stable
  * @category overlays
@@ -52,7 +67,7 @@ import type { HelixHeadlessMenuItem } from '../item/menu-item.js'
  * @documentation https://fusion.dev/helix/components/menu
  *
  * @slot - The items.
- * @slot trigger - The control that opens the menu.
+ * @slot trigger - The control that opens the menu, or with `context` the area a context menu opens over.
  *
  * @event {HelixBeforeCloseEvent} helix-before-close - The menu is about to close. Cancelable: cancel it to keep it open.
  * @event {HelixBeforeOpenEvent} helix-before-open - The menu is about to open. Cancelable: cancel it to keep it closed.
@@ -80,6 +95,13 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
    */
   @property({ attribute: 'back-label' })
   backLabel = 'Back'
+
+  /**
+   * Whether the menu is the trigger's context menu, opened where the reader
+   * asks for one rather than by a press.
+   */
+  @property({ reflect: true, type: Boolean })
+  context = false
 
   /**
    * Accessible name for the surface.
@@ -114,7 +136,12 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
    */
   private readonly drilldown = new DrilldownController<HelixHeadlessMenuItem>(this, {
     isRow: (element: Element): boolean => 'isMenuItem' in element && element.isMenuItem === true,
-    root: () => [...this.children].filter((child) => child.slot !== 'trigger'),
+    /* A section's rows are rows of the page it is on, so the first page reads
+       through each section to the rows in it. */
+    root: () =>
+      [...this.children]
+        .filter((child) => child.slot !== 'trigger')
+        .flatMap((child) => (isSection(child) ? [...child.children] : [child])),
     slot: 'submenu',
   })
 
@@ -151,8 +178,17 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     target: () => this.partNamed('surface'),
   })
 
+  /** Where a context menu was asked for, in the viewport, while it is open. */
+  private point: { x: number; y: number } | undefined
+
+  /** Where focus was when a context menu opened, so closing it returns there. */
+  private returnTo: HTMLElement | undefined
+
   private readonly panel = new PopoverController(this, {
-    anchor: () => this.trigger,
+    anchor: () =>
+      this.context && this.point
+        ? this.renderRoot?.querySelector<HTMLElement>('#point')
+        : this.trigger,
     // The host is `display: contents`, so it has no box a press can land in.
     // What counts as inside is the surface, plus the trigger, whose own click
     // handler decides what a press there means.
@@ -234,8 +270,37 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
        that component's host, which this element does not contain, so focus was
        dropped to the page on Escape. */
     if (deepContains(this, deepActiveElement())) {
-      this.trigger.focus()
+      ;(this.context ? (this.returnTo ?? this.trigger) : this.trigger).focus()
     }
+    this.point = undefined
+    this.returnTo = undefined
+  }
+
+  /**
+   * Opens a context menu where the reader asked for it: at the pointer, or at
+   * the area's corner where the keyboard asked and the event has no position.
+   */
+  private readonly handleContextMenu = (event: MouseEvent): void => {
+    if (!this.context) {
+      return
+    }
+    const slot = this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]')
+    const areas = slot?.assignedElements({ flatten: true }) ?? []
+    if (!event.composedPath().some((node) => areas.includes(node as Element))) {
+      return
+    }
+    event.preventDefault()
+    const box = this.trigger.getBoundingClientRect()
+    const keyed = event.clientX === 0 && event.clientY === 0
+    this.point = keyed ? { x: box.left, y: box.top } : { x: event.clientX, y: event.clientY }
+    if (this.open) {
+      this.requestUpdate()
+      this.updateComplete.then(() => this.panel.reposition())
+      return
+    }
+    const active = deepActiveElement()
+    this.returnTo = active instanceof HTMLElement ? active : undefined
+    this.show()
   }
 
   /** Shows an item's submenu in place of the current page. */
@@ -353,7 +418,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
    * while the menu is closed, so a dialog around the menu still closes on it.
    */
   private handleClosedKeydown(event: KeyboardEvent): void {
-    if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') {
+    if (this.context || (event.key !== 'ArrowDown' && event.key !== 'ArrowUp')) {
       return
     }
     const slot = this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]')
@@ -366,6 +431,9 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
   }
 
   private readonly handleTriggerClick = (): void => {
+    if (this.context) {
+      return
+    }
     if (this.open) {
       this.hide()
     } else {
@@ -383,6 +451,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     this.addEventListener('helix-select', this.handleSelect, true)
     this.addEventListener('keydown', this.handleKeydown)
     this.addEventListener('focusin', this.handleFocusIn)
+    this.addEventListener('contextmenu', this.handleContextMenu)
   }
 
   override disconnectedCallback(): void {
@@ -390,16 +459,29 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     this.removeEventListener('helix-select', this.handleSelect, true)
     this.removeEventListener('keydown', this.handleKeydown)
     this.removeEventListener('focusin', this.handleFocusIn)
+    this.removeEventListener('contextmenu', this.handleContextMenu)
   }
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     // Every update, so a trigger slotted after the first render is told too.
-    this.tellTrigger()
+    // An area a context menu opens over is no button and is told nothing.
+    if (!this.context) {
+      this.tellTrigger()
+    }
     // Every item shows or hides itself: which page is open is this element's
     // business, and where an item belongs is the item's. Set as a property, so
     // nothing is written onto a consumer's element.
     for (const child of this.children) {
+      if (isSection(child)) {
+        child.onPage = this.drilldown.atRoot
+        for (const row of child.children) {
+          if ((row as HelixHeadlessMenuItem).isMenuItem === true) {
+            this.mark(row as HelixHeadlessMenuItem, this.drilldown.atRoot)
+          }
+        }
+        continue
+      }
       const item = child as HelixHeadlessMenuItem
       if (item.isMenuItem !== true) {
         continue
@@ -508,7 +590,18 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
   }
 
   protected override render(): TemplateResult {
-    return html`<slot name="trigger" @click=${this.handleTriggerClick}></slot>
+    /* The point a context menu opens against: a box of no size where the
+       reader asked, fixed to the viewport. Drawn only while there is one. */
+    const point = this.context && this.point
+    return html`<slot name="trigger" @click=${this.handleTriggerClick}></slot>${
+      point
+        ? html`<span
+            id="point"
+            aria-hidden="true"
+            style="position: fixed; left: 0; top: 0; translate: ${point.x}px ${point.y}px"
+          ></span>`
+        : nothing
+    }
       <div
         part="surface"
         popover="manual"
