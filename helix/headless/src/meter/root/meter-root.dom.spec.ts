@@ -67,6 +67,40 @@ describe('meter', () => {
   })
 })
 
+/* React Aria's Meter takes Intl `formatOptions`; a percentage was the only
+   thing this could write. */
+describe('format-options', () => {
+  test('writes the value in a unit, on the screen and when read out', async () => {
+    const host = await meter(
+      `max="32" show-value value="18" locale="en" format-options='{"style":"unit","unit":"gigabyte"}'`,
+    )
+    const words = new Intl.NumberFormat('en', { style: 'unit', unit: 'gigabyte' }).format(18)
+    expect(part(host, 'value')?.textContent?.trim()).toBe(words)
+    expect(internals(host).ariaValueText).toBe(words)
+  })
+
+  test('writes a share of the range for a percent, with the decimals asked for', async () => {
+    const host = await meter(
+      `show-value value="42.5" locale="en" format-options='{"style":"percent","maximumFractionDigits":1}'`,
+    )
+    expect(part(host, 'value')?.textContent?.trim()).toBe('42.5%')
+  })
+
+  test('a value past an end is written as it is', async () => {
+    const host = await meter(
+      `max="32" value="40" locale="en" format-options='{"style":"currency","currency":"USD"}'`,
+    )
+    expect(internals(host).ariaValueText).toBe('$40.00')
+  })
+
+  test('and `value-text` still wins', async () => {
+    const host = await meter(
+      `show-value value="18" value-text="Most" format-options='{"style":"unit","unit":"gigabyte"}'`,
+    )
+    expect(part(host, 'value')?.textContent?.trim()).toBe('Most')
+  })
+})
+
 describe('meter bands', () => {
   test('nothing is banded until a threshold is declared', async () => {
     /* The platform defaults `optimum` to the midpoint and both thresholds to the
