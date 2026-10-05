@@ -1,23 +1,15 @@
-import { customElement, HelixElement, hostAria, slottedWords } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  formatNumber,
+  HelixElement,
+  hostAria,
+  slottedWords,
+} from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
-/* Built once per locale and kept, `Intl.NumberFormat` being expensive to construct
-   and cheap to call. */
-const percents = new Map<string, Intl.NumberFormat>()
-
-/** A share from 0 to 1 as a whole percentage, the way the locale writes one. */
-const percent = (share: number, locale: string): string => {
-  let format = percents.get(locale)
-  if (!format) {
-    format = new Intl.NumberFormat(locale || undefined, {
-      maximumFractionDigits: 0,
-      style: 'percent',
-    })
-    percents.set(locale, format)
-  }
-  return format.format(share)
-}
+/** A whole percentage, which a reading is written as where nothing else is asked. */
+const WHOLE_PERCENT: Intl.NumberFormatOptions = { maximumFractionDigits: 0, style: 'percent' }
 
 /**
  * @summary A bar or ring that shows how far along a task is.
@@ -51,6 +43,22 @@ const percent = (share: number, locale: string): string => {
  */
 @customElement('helix-headless-progress')
 export class HelixHeadlessProgress extends HelixElement {
+  /**
+   * `Intl.NumberFormat` options the reading is written with, as React Aria's
+   * Meter and ProgressBar take them: a unit, a currency, or a number of
+   * decimals. Written as JSON in the attribute.
+   *
+   * ```html
+   * <helix-progress value="18" max="32" format-options='{"style":"unit","unit":"gigabyte"}'></helix-progress>
+   * ```
+   *
+   * A `percent` style writes the share of the range, and any other the value
+   * itself, so the example says "18 GB". Absent is a whole percentage. The
+   * words are announced as well as shown. `value-text` still wins.
+   */
+  @property({ attribute: 'format-options', type: Object })
+  formatOptions?: Intl.NumberFormatOptions
+
   /**
    * Whether the length of the task is unknown. The bar then shows activity
    * without a value.
@@ -199,7 +207,27 @@ export class HelixHeadlessProgress extends HelixElement {
     this.internals.ariaValueNow = this.indeterminate
       ? null
       : String(Math.min(Math.max(this.value || min, min), max))
-    this.internals.ariaValueText = this.valueText || null
+    this.internals.ariaValueText =
+      this.valueText || (this.formatOptions !== undefined && !this.indeterminate ? this.text : null)
+  }
+
+  /**
+   * What the bar says: the consumer's words, or the reading in
+   * `format-options`, a share of the range for a percent and the value for
+   * anything else.
+   */
+  private get text(): string {
+    const options = this.formatOptions
+    return (
+      this.valueText ||
+      (options && options.style !== 'percent'
+        ? formatNumber(
+            Math.min(Math.max(this.value, this.range.min), this.range.max),
+            this.locale,
+            options,
+          )
+        : formatNumber(this.fraction, this.locale, options ?? WHOLE_PERCENT))
+    )
   }
 
   /** A label's words changed, so the name is written again. */
@@ -244,7 +272,7 @@ export class HelixHeadlessProgress extends HelixElement {
            fact. It is here to be looked at, not to be read out. */
         this.showValue && !this.indeterminate
           ? html`<span part="value" aria-hidden="true"
-              >${this.valueText || percent(this.fraction, this.locale)}</span
+              >${this.text}</span
             >`
           : ''
       }`

@@ -84,8 +84,10 @@ slot[name="label"]::slotted(*) {
   scale: var(--meter-fraction, 0) 1;
   transform-origin: left center;
   transition:
-    background-color var(--helix-duration-normal) var(--helix-easing-standard),
-    scale var(--helix-duration-normal) var(--helix-easing-decelerate);
+    background-color var(--meter-transition-duration, var(--helix-duration-normal))
+    var(--helix-easing-standard),
+    scale var(--meter-transition-duration, var(--helix-duration-normal))
+    var(--helix-easing-decelerate);
 }
 
 :host(:dir(rtl)) [part~="indicator"] {
@@ -239,7 +241,8 @@ slot[name="label"]::slotted(*) {
   stroke: var(--_meter-hue);
   stroke-dasharray: var(--meter-along) 100;
   stroke-linecap: round;
-  transition: stroke-dasharray var(--helix-duration-normal) var(--helix-easing-standard);
+  transition: stroke-dasharray var(--meter-transition-duration, var(--helix-duration-normal))
+    var(--helix-easing-standard);
 }
 
 /*

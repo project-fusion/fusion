@@ -1,23 +1,15 @@
-import { customElement, HelixElement, hostAria, slottedWords } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  formatNumber,
+  HelixElement,
+  hostAria,
+  slottedWords,
+} from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
-/* Built once per locale and kept, `Intl.NumberFormat` being expensive to construct
-   and cheap to call. */
-const percents = new Map<string, Intl.NumberFormat>()
-
-/** A share from 0 to 1 as a whole percentage, the way the locale writes one. */
-const percent = (share: number, locale: string): string => {
-  let format = percents.get(locale)
-  if (!format) {
-    format = new Intl.NumberFormat(locale || undefined, {
-      maximumFractionDigits: 0,
-      style: 'percent',
-    })
-    percents.set(locale, format)
-  }
-  return format.format(share)
-}
+/** A whole percentage, which a reading is written as where nothing else is asked. */
+const WHOLE_PERCENT: Intl.NumberFormatOptions = { maximumFractionDigits: 0, style: 'percent' }
 
 /** Which band a value falls in, once `optimum` has said which end is good. */
 export type MeterBand = 'fair' | 'good' | 'poor'
@@ -93,6 +85,23 @@ export class HelixHeadlessMeter extends HelixElement {
    */
   @property()
   band?: MeterBand
+
+  /**
+   * `Intl.NumberFormat` options the reading is written with, as React Aria's
+   * Meter and ProgressBar take them: a unit, a currency, or a number of
+   * decimals. Written as JSON in the attribute.
+   *
+   * ```html
+   * <helix-meter value="18" max="32" format-options='{"style":"unit","unit":"gigabyte"}'></helix-meter>
+   * ```
+   *
+   * A `percent` style writes the share of the range, and any other the value
+   * itself, so the example says "18 GB", and a value past an end as it is.
+   * Absent is a whole percentage. The words are announced as well as shown.
+   * `value-text` still wins.
+   */
+  @property({ attribute: 'format-options', type: Object })
+  formatOptions?: Intl.NumberFormatOptions
 
   /**
    * Bottom of the high band.
@@ -290,9 +299,23 @@ export class HelixHeadlessMeter extends HelixElement {
     return distance === 0 ? 'good' : distance === 1 ? 'fair' : 'poor'
   }
 
-  /** What the reading says, which is the consumer's words or a percentage. */
+  /**
+   * What the reading says: the consumer's words, or the reading in
+   * `format-options`, a share of the range for a percent and the value for
+   * anything else.
+   */
   private get text(): string {
-    return this.valueText || percent(this.ratio, this.locale)
+    const options = this.formatOptions
+    return (
+      this.valueText ||
+      (options && options.style !== 'percent'
+        ? formatNumber(
+            Number.isFinite(this.value) ? this.value : this.span.min,
+            this.locale,
+            options,
+          )
+        : formatNumber(this.ratio, this.locale, options ?? WHOLE_PERCENT))
+    )
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -308,9 +331,10 @@ export class HelixHeadlessMeter extends HelixElement {
     this.internals.ariaValueNow = String(this.reading)
     /* The consumer's words where they gave any, and otherwise nothing at all
        *unless* the value is past an end. `ariaValueNow` has to sit inside the
-       range, so it is the only place a reader can be told that 250 is not 100. */
+       range, so it is the only place a reader can be told that 250 is not 100.
+       Under `format-options` the words shown are the words said. */
     this.internals.ariaValueText =
-      this.valueText || (this.beyond ? percent(this.ratio, this.locale) : null)
+      this.valueText || this.formatOptions !== undefined || this.beyond ? this.text : null
   }
 
   /**
