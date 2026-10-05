@@ -33,17 +33,29 @@
   transition: transform var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
+/* An icon slotted in its place is sized, colored and turned the same way. */
+::slotted([slot="chevron"]) {
+  block-size: 1em;
+  color: var(--helix-color-foreground-subtle);
+  flex: 0 0 auto;
+  inline-size: 1em;
+  transition: transform var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
 /* Pushed to the far end only where it belongs there. */
-:host(:not([chevron-placement="start"])) [part="chevron"] {
+:host(:not([chevron-placement="start"])) [part="chevron"],
+:host(:not([chevron-placement="start"])) ::slotted([slot="chevron"]) {
   margin-inline-start: auto;
 }
 
-:host(:state(open)) [part="chevron"] {
+:host(:state(open)) [part="chevron"],
+:host(:state(open)) ::slotted([slot="chevron"]) {
   transform: scaleY(-1);
 }
 
 /* No fill on hover. */
-[part="trigger"]:hover:not(:disabled) [part="chevron"] {
+[part="trigger"]:hover:not(:disabled) [part="chevron"],
+[part="trigger"]:hover:not(:disabled) ::slotted([slot="chevron"]) {
   color: var(--helix-color-foreground);
 }
 
