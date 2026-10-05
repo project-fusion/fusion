@@ -53,8 +53,8 @@ import { styles } from './meter-root.css.js'
  * @cssproperty --meter-ring-width - The thickness of the stroke in `ring` and `arc`.
  * @cssproperty --meter-size - The thickness of the bar.
  * @cssproperty --meter-tick-color - The color of the mark at each threshold.
- * @cssproperty --meter-transition-duration - How long the fill takes to move to a new reading, and to change its color. `0s` moves it at once.
  * @cssproperty --meter-track-color - The color of the groove behind the fill.
+ * @cssproperty --meter-transition-duration - How long the fill takes to move to a new reading, and to change its color. `0s` moves it at once.
  */
 @customElement('helix-meter')
 export class HelixMeter extends HelixHeadlessMeter {

@@ -51,7 +51,7 @@
   background-color: transparent;
   border: 0;
   box-shadow: none;
-  gap: var(--kbd-gap, 0.2em);
+  gap: var(--kbd-gap, var(--helix-space-2xs));
   min-inline-size: 0;
   padding: 0;
 }

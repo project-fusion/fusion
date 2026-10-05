@@ -141,7 +141,7 @@ export class HelixHeadlessLegend extends HelixElement {
 
   /**
    * The arrow keys, Home, End and typed letters among the toggles, so a
-   * legend of twelve series is one tab stop and not twelve, as a toolbar of
+   * legend of twelve series is one tab stop, as a toolbar of
    * toggle buttons is. Nothing without `toggles`, where there is nothing to
    * press.
    */
@@ -205,7 +205,7 @@ export class HelixHeadlessLegend extends HelixElement {
    *
    * A name hidden on the table that is not one of this legend's entries stays
    * out of its list: a legend of the rows and one of the columns share a
-   * table and not a list.
+   * table, and each keeps a list of its own.
    */
   private follow(): void {
     const hidden = this.source.hidden

@@ -45,6 +45,7 @@ import '../../tooltip/index.js'
  * @cssproperty --line-chart-block-size - Height of the drawing.
  * @cssproperty --line-chart-gap - Space between the drawing and its labels.
  * @cssproperty --line-chart-gridline-color - Color of the rules drawn across the plot under `gridlines`.
+ * @cssproperty --line-chart-marker-ring-color - Color of the ring round the mark on a reading, which matches the page. Change it when the chart sits on another surface.
  * @cssproperty --line-chart-marker-size - Size of the mark on a reading, under `markers`.
  * @cssproperty --line-chart-width - Thickness of a line. Overrides `--chart-stroke`.
  */

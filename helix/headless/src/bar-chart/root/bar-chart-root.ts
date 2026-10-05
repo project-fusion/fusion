@@ -214,7 +214,7 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
    *
    * Absent stands them side by side, as it always did. A negative reading
    * hangs below zero on the negatives before it, so neither direction hides
-   * the other. The scale fits the stacks, not the single readings. A series
+   * the other. The scale fits the stacks. A series
    * in `lines` is still a line, measured on its own reading; columns on the
    * second scale stack among themselves.
    */

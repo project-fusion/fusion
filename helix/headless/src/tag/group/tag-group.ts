@@ -40,7 +40,7 @@ import { pressedValue, prunedValue, type TagSelectionMode } from '../selection.j
  * its remove button.
  *
  * **Removing the last tag keeps focus in the group.** With no tags left the
- * set is a `group` rather than a grid, and focus moves to its `empty` part,
+ * set is a `group`, and focus moves to its `empty` part,
  * which holds the `empty` slot: put words there such as "No filters" for a
  * reader to hear.
  *
@@ -239,8 +239,8 @@ export class HelixHeadlessTagGroup extends HelixElement {
    * that the last tag took with it comes to the group's `empty` part.
    *
    * Asked after the event and again a frame later, as `MixinDismissible`
-   * asks, because a framework removes the tag on its next render rather than
-   * in the handler. A cancelled dismissal changes nothing.
+   * asks, because a framework removes the tag on its next render, after the
+   * handler. A canceled dismissal changes nothing.
    */
   private readonly handleDismiss = (event: Event): void => {
     const tag = this.tagOf(event)
