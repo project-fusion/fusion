@@ -35,7 +35,7 @@ import { HelixHeadlessToggle } from '../root/toggle-root.js'
  * @slot start - Content before the track, on the same line, such as an icon or a caption.
  *
  * @event {Event} change - Fired after the value changes.
- * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the choice changes. Cancelable: call `preventDefault()` to keep the current choice. It is the only way to block a change.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the choice changes. Cancelable: call `preventDefault()` to keep the current choice.
  * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. The item sends it, and you listen for it on the group. Cancelable: call `preventDefault()` to keep the current choice.
  * @event {Event} input - Fired after the value changes.
  *
@@ -119,8 +119,9 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
     /* With nothing chosen there is no selection to carry the tab stop, so the
        first item holds one until there is. Otherwise an unanswered group is a
        control the keyboard cannot enter, which is what the fallback was quietly
-       also doing for it. */
-    const entry = active ? undefined : this.items.find((item) => !item.disabled)
+       also doing for it. A disabled answer takes no focus either, so the entry
+       goes to the first item that can be chosen, as in `Radio.Group`. */
+    const entry = active && !active.disabled ? undefined : this.items.find((item) => !item.disabled)
     for (const item of this.items) {
       item.selected = item === active
       item.focusable = item === entry
@@ -167,17 +168,34 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
   /* Through the mixin, so a consumer can refuse the change with
      `helix-before-change`.
 
-     **And only if the item's own choice stood.** `helix-select` is cancelable
-     and the item documents it as refusable; this group is the only thing that
-     acts on it, so a refusal nothing read was a veto that did nothing. Read
-     here rather than a microtask later: this is a bubble listener for an event
-     from a child, so every listener on the item has already run. A consumer on
-     the group refuses with `helix-before-change` instead. */
+     **And only if the item's own choice stood, read a microtask later.**
+     `helix-select` is cancelable and the docblock tells you to listen for it on
+     the group, where this listener was added first, when the group connected:
+     read inline, a consumer's refusal on the group came too late. The dispatch
+     is synchronous, so a microtask is after every listener. */
   private readonly handleSelection = (event: Event): void => {
-    if (event.defaultPrevented) {
-      return
+    queueMicrotask(() => {
+      if (event.defaultPrevented) {
+        return
+      }
+      this.requestValue((event as CustomEvent<{ value: string }>).detail.value)
+    })
+  }
+
+  /**
+   * Whether the group holds an answer the form can submit: a value an item
+   * here carries. A chosen item that was removed is no longer an answer, and
+   * `value` keeps the name for an item that arrives later.
+   */
+  private get answered(): boolean {
+    if (this.value === '') {
+      return false
     }
-    this.requestValue((event as CustomEvent<{ value: string }>).detail.value)
+    if (this.children === undefined) {
+      return true
+    }
+    const items = this.items
+    return items.length === 0 || items.some((item) => item.value === this.value)
   }
 
   override connectedCallback(): void {
@@ -226,7 +244,7 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
     // `null` rather than an empty string when nothing is chosen, which is the
     // difference between a control that submits nothing and one that submits a
     // blank.
-    this.internals.setFormValue(this.value === '' ? null : this.value)
+    this.internals.setFormValue(this.answered ? this.value : null)
   }
 
   /**
@@ -241,7 +259,7 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
    * points at the control rather than at a box with nothing in it.
    */
   private validate(): void {
-    this.reportRequired(this.value === '', 'Choose one to continue.', 'track')
+    this.reportRequired(!this.answered, 'Choose one to continue.', 'track')
   }
 
   /**
@@ -306,6 +324,8 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
             this.adopt()
             this.sync()
             this.indicator.place()
+            // And the form, which a removed answer no longer holds.
+            this.requestUpdate()
           }}
           ></slot>
         </div>
