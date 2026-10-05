@@ -226,6 +226,27 @@ if (hasLayout()) {
   })
 }
 
+describe('the spotlight’s box', () => {
+  test('is published on the spotlight as custom properties, padding included', async () => {
+    const tour = await run()
+    const target = tour.ownerDocument.getElementById('one') as HTMLElement
+    target.getBoundingClientRect = () =>
+      ({ bottom: 140, height: 40, left: 20, right: 120, top: 100, width: 100 }) as DOMRect
+    tour.setAttribute('spotlight-padding', '4')
+    /* Twice: the update measures, and the box it measured draws in the next. */
+    await tour.updateComplete
+    await tour.updateComplete
+    const light = part(tour, 'spotlight') as HTMLElement
+    const read = (name: string): string => light.style.getPropertyValue(`--tour-spotlight-${name}`)
+    expect([read('x'), read('y'), read('width'), read('height')]).toEqual([
+      '16px',
+      '96px',
+      '108px',
+      '48px',
+    ])
+  })
+})
+
 describe('a stop', () => {
   test('finds its target by id, the way a tooltip does', async () => {
     const tour = await run()
@@ -518,6 +539,7 @@ describe('stops with nothing to light', () => {
     expect(element.index).toBe(1)
     expect((part(waiting, 'bubble') as HTMLElement | null)?.hidden).toBe(true)
     expect(part(element, 'backdrop')).toBeNull()
+    expect(hasState(element, 'waiting')).toBe(true)
     const menu = document.createElement('div')
     menu.id = 'menu'
     menu.textContent = 'Menu'
@@ -525,6 +547,7 @@ describe('stops with nothing to light', () => {
     await new Promise((resolve) => setTimeout(resolve, 0))
     await element.updateComplete
     expect(element.index).toBe(2)
+    expect(hasState(element, 'waiting')).toBe(false)
   })
 
   test('while a wait stop waits, focus is on the target of the stop before it', async () => {

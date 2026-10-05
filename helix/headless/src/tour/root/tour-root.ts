@@ -39,6 +39,11 @@ import { onPage, waitFor } from '../wait.js'
  * `toggle` work as they do on `Dialog`. Setting `open` starts the run, and
  * `skip()` and `requestOpen(false)` end it early.
  *
+ * The box the light falls on is on the `spotlight` part as
+ * `--tour-spotlight-x`, `--tour-spotlight-y`, `--tour-spotlight-width` and
+ * `--tour-spotlight-height`, for a sheet that draws its own light, such as a
+ * ring around the target.
+ *
  * Each stop is told its place in the run, from `progress-label`, such as "2 of
  * 5". It describes the stop's panel, so a screen reader says it at every stop,
  * and `progress` draws it in the panel as well. A dialog or a floating stop,
@@ -72,7 +77,13 @@ import { onPage, waitFor } from '../wait.js'
  * @csspart backdrop - Behind a dialog or a floating stop, which lights nothing. It draws no box until you give it one.
  * @csspart spotlight - The box over the current target. It also draws the dimmed area around the target.
  *
+ * @cssproperty --tour-spotlight-height - The lit box's height, in pixels, padding included. Written on the spotlight while it lights a target.
+ * @cssproperty --tour-spotlight-width - The lit box's width, in pixels, padding included. Written on the spotlight while it lights a target.
+ * @cssproperty --tour-spotlight-x - The lit box's left edge, from the window's left edge, in pixels. Written on the spotlight while it lights a target.
+ * @cssproperty --tour-spotlight-y - The lit box's top edge, from the window's top edge, in pixels. Written on the spotlight while it lights a target.
+ *
  * @cssstate open - While the tour is running.
+ * @cssstate waiting - While the tour waits at a `wait` stop for its target to be on the page.
  */
 /*
  * **On `MixinControllerOpen`, where it once kept an `open` of its own.** That
@@ -321,6 +332,7 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
     this.unwait?.()
     this.unwait = undefined
     this.waiting = undefined
+    this.toggleState('waiting', false)
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -506,6 +518,7 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
     this.unwait?.()
     this.unwait = undefined
     this.waiting = next
+    this.toggleState('waiting', next !== undefined)
     if (!next) {
       return
     }
@@ -515,6 +528,7 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
       () => {
         this.waiting = undefined
         this.unwait = undefined
+        this.toggleState('waiting', false)
         /* A microtask on, so the move is an update of its own, after the one
            that found the target. */
         queueMicrotask(() => {
@@ -594,7 +608,7 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
         : html`<div
             part="spotlight"
             aria-hidden="true"
-            style=${`left: ${spot.left}px; top: ${spot.top}px; block-size: ${spot.height}px; inline-size: ${spot.width}px`}
+            style=${`left: ${spot.left}px; top: ${spot.top}px; block-size: ${spot.height}px; inline-size: ${spot.width}px; --tour-spotlight-x: ${spot.left}px; --tour-spotlight-y: ${spot.top}px; --tour-spotlight-width: ${spot.width}px; --tour-spotlight-height: ${spot.height}px`}
           ></div>`
     }
       <slot></slot>`
