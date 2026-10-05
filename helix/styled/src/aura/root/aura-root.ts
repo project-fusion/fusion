@@ -5,7 +5,6 @@ import {
   MAX_FRAME_STEP,
   PaintGateController,
   readColor,
-  TokenColorController,
 } from '@fusion.dev/helix-core'
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
 import { html } from 'lit'
@@ -124,7 +123,9 @@ const SOFTWARE_RENDERER = /swiftshader|llvmpipe|softpipe|software rasterizer|bas
  *
  * **The colors are the theme's, and each has a hook**: `--aura-ground`,
  * `--aura-haze`, `--aura-glow` and `--aura-peak`, read by the shader and by the
- * fallback gradient alike, from wherever on the page you set them.
+ * fallback gradient alike, from wherever on the page you set them. A hook
+ * changed while the aura draws, by a class, a style or the color mode,
+ * reaches the shader on the next frame.
  *
  * Where the gradient shows in place of the shader, the aura matches
  * `:state(fallback)` and sends `helix-aura-fallback` with the reason.
@@ -318,29 +319,28 @@ export class HelixAura extends HelixElement {
     | 'threads'
     | 'waves'
 
-  constructor() {
-    super()
-    /* Repaints when the palette moves, which no re-render would do on its own.
-       Kept by the host it registers with, since nothing here reads from it: the
-       palette is read off the canvas, where a page's hooks reach. */
-    new TokenColorController(this, () => {
-      this.readPalette()
-      this.paintOnce()
-    })
-  }
-
   /**
    * The four ramp stops, resolved.
    *
-   * **Cached, because reading them is not free and they do not move.** Each
-   * read sets a style, calls `getComputedStyle`, fills a pixel and reads it
-   * back: a style recalc and a canvas readback apiece. Doing that inside
-   * `paint` meant four of each on every frame, forever, to fetch values that
-   * change only when the color mode does. The controller already says when
-   * that happens, so this is filled from there and from the first paint.
+   * **Read on every frame drawn, and converted only when they moved.** A hook
+   * can change anywhere above the aura at any time: a class on a section, a
+   * style written by script, a scoped theme, the color mode. Each frame reads
+   * the five colors the canvas carries off its live computed style, which is
+   * a string compare while nothing changed, and `paletteOf` converts them only
+   * when the text differs. Converting on every frame was the cost: a style
+   * recalc and a canvas readback per stop, forever, for values that rarely
+   * move.
+   *
+   * A stopped loop draws no frame to read in, so a change of any of the five
+   * also runs a short transition on the canvas, and its end paints one frame.
+   * That covers a reader who asked for no motion.
    */
   /* The default theme's dark page, ink on black, until the first read. */
   private palette: AuraPalette = { ...RESTING_PALETTE }
+
+  /** The canvas's live computed style, and the five colors it last carried. */
+  private carried: { canvas: HTMLCanvasElement; style: CSSStyleDeclaration; text: string } | null =
+    null
 
   /** Why the gradient shows, while it does, or `undefined` while the shader draws. */
   private fallback: HelixAuraFallbackEvent['detail']['reason'] | undefined
@@ -544,6 +544,7 @@ export class HelixAura extends HelixElement {
     }
     this.canvas?.addEventListener('webglcontextlost', this.handleLost)
     this.canvas?.addEventListener('webglcontextrestored', this.handleRestored)
+    this.canvas?.addEventListener('transitionend', this.handleRestyle)
 
     this.addEventListener('pointermove', this.handlePointer)
     this.addEventListener('pointerleave', this.handleLeave)
@@ -554,7 +555,6 @@ export class HelixAura extends HelixElement {
        the pointer is measured against. Passive, because nothing here cancels. */
     window.addEventListener('scroll', this.handleScroll, { capture: true, passive: true })
 
-    this.readPalette()
     /* The second half is a return before the first frame. The removal canceled
        the opening, and a move comes back to a box the same size, so `measure`
        reports nothing to do while the opening is still owed. */
@@ -779,6 +779,7 @@ export class HelixAura extends HelixElement {
        answered by asking for it back. */
     this.canvas?.removeEventListener('webglcontextlost', this.handleLost)
     this.canvas?.removeEventListener('webglcontextrestored', this.handleRestored)
+    this.canvas?.removeEventListener('transitionend', this.handleRestyle)
     this.removeEventListener('pointermove', this.handlePointer)
     this.removeEventListener('pointerleave', this.handleLeave)
     window.removeEventListener('scroll', this.handleScroll, { capture: true })
@@ -894,7 +895,8 @@ export class HelixAura extends HelixElement {
   }
 
   /**
-   * Resolves the ramp. Called when the palette moves, not when a frame draws.
+   * Resolves the ramp, converting only when the colors the canvas carries
+   * moved since the last read.
    *
    * From the canvas's own computed style, which carries each stop on a color
    * property: the `--aura-*` hook where a page set one, and the token
@@ -902,10 +904,24 @@ export class HelixAura extends HelixElement {
    * chosen for a light page or a dark one.
    */
   private readPalette(): void {
-    const canvas = this.renderRoot.querySelector('canvas')
-    if (canvas) {
-      this.palette = paletteOf(getComputedStyle(canvas), readColor)
+    const canvas = this.canvas
+    if (!canvas) {
+      return
     }
+    if (this.carried?.canvas !== canvas) {
+      this.carried = { canvas, style: getComputedStyle(canvas), text: '' }
+    }
+    const { style } = this.carried
+    const text = `${style.color} ${style.textDecorationColor} ${style.outlineColor} ${style.columnRuleColor} ${style.caretColor}`
+    if (text !== this.carried.text) {
+      this.carried.text = text
+      this.palette = paletteOf(style, readColor)
+    }
+  }
+
+  /** One frame for a stopped loop, once a color the canvas carries has moved. */
+  private readonly handleRestyle = (): void => {
+    this.paintOnce()
   }
 
   private link(vertex: string, fragment: string): WebGLProgram | null {
@@ -1056,6 +1072,7 @@ export class HelixAura extends HelixElement {
     if (!gl || !this.program || !this.width) {
       return
     }
+    this.readPalette()
     const { glow, ground, haze, peak } = this.palette
     gl.uniform3fv(uniforms.uGround ?? null, ground)
     gl.uniform3fv(uniforms.uHaze ?? null, haze)

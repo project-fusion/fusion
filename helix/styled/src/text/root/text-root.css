@@ -209,17 +209,13 @@
 }
 
 /* A line count needs a width to break against, so a clamped text is a block.
-   The count itself is written on the part, as `-webkit-line-clamp`, which
-   every engine reads with the `-webkit-box` display it needs. */
+   The count itself is written on the part, as `-webkit-line-clamp`, with the
+   `-webkit-box` display every engine reads it with and the overflow that
+   hides the rest. Written there rather than here, so a count that is no count
+   cuts nothing off. */
 :host([lines]) {
   display: block;
   min-inline-size: 0;
-}
-
-:host([lines]) [part="text"] {
-  -webkit-box-orient: vertical;
-  display: -webkit-box;
-  overflow: hidden;
 }
 
 /* Named for the CSS properties they set, so each rule is the value. */

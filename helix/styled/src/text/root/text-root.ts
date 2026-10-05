@@ -114,7 +114,8 @@ export class HelixText extends HelixElement {
    * Lays the text out as a block, because a line count needs a width to break
    * against. The whole text stays in the page, so a screen reader and a search
    * still read all of it. Set it as an attribute, such as `lines="1"` for a
-   * single line.
+   * single line. A count that is not a whole number above zero, such as `0`,
+   * cuts nothing off.
    */
   @property({ reflect: true, type: Number })
   lines?: number

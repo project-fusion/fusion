@@ -32,8 +32,10 @@ const wrapConverter = {
  * write wins over the pattern's own value:
  *
  * - `cluster`: items in a wrapping row, centered on one line, such as tags.
- * - `split`: the first item at the start and the rest pushed to the end, such
- *   as a title and its actions. Wraps when there is no room.
+ * - `split`: the first item at the start, the last at the end, and any between
+ *   them spaced evenly, such as a title and its actions. Put several actions
+ *   in a flex of their own so they stay together at the end. Wraps when there
+ *   is no room.
  * - `flank` and `flank-end`: a fixed item beside one that takes the rest, such
  *   as an icon and its text, or a field and its button. The item that takes
  *   the rest stays at least `--flex-flank-min` wide, and the pair stacks once
@@ -128,8 +130,10 @@ export class HelixFlex extends HelixElement {
    * A common layout pattern: `cluster`, `split`, `flank` or `flank-end`.
    *
    * Each sets the wrapping, alignment and spread it needs, and an attribute
-   * you write as well wins over it. `flank` holds the first item at its own
-   * width and gives the last one the rest, and `flank-end` does the reverse.
+   * you write as well wins over it. `split` spreads the items as
+   * `justify-content: space-between` does, so a third item sits midway.
+   * `flank` holds the first item at its own width and gives the last one the
+   * rest, and `flank-end` does the reverse.
    */
   @property({ reflect: true })
   layout?: 'cluster' | 'flank' | 'flank-end' | 'split'

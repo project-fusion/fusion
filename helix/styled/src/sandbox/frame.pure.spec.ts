@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { isRender, loggedText, withoutStylesheets } from './frame.js'
+import { isRender, LAYOUT_RULES, loggedText, withoutStylesheets } from './frame.js'
 
 describe('the frame side of the preview protocol', () => {
   test('a render is an object whose type names it, and nothing else is', () => {
@@ -24,5 +24,13 @@ describe('the frame side of the preview protocol', () => {
     expect(loggedText({ a: 1 })).toBe('{"a":1}')
     expect(loggedText(undefined)).toBe('undefined')
     expect(loggedText(cycle)).toBe('[object Object]')
+  })
+
+  test('a layout that fills the viewport counts its padding inside that height', () => {
+    const rules = LAYOUT_RULES.split('}').filter((rule) => rule.includes('100dvh'))
+    expect(rules).toHaveLength(2)
+    for (const rule of rules) {
+      expect(rule).toContain('box-sizing: border-box')
+    }
   })
 })
