@@ -40,6 +40,10 @@ const wrapConverter = {
  *   as an icon and its text, or a field and its button. The item that takes
  *   the rest stays at least `--flex-flank-min` wide, and the pair stacks once
  *   it cannot.
+ * - `switch`: the items share a row while the flex is at least
+ *   `--flex-switch-at` wide, and each takes a line of its own below that, such
+ *   as cards that stack on a narrow screen. It answers the width the flex is
+ *   given, wherever it sits, with no breakpoint to maintain.
  *
  * Flex is presentation only, so it has no headless tier.
  *
@@ -53,6 +57,7 @@ const wrapConverter = {
  *
  * @cssproperty --flex-flank-min - The narrowest the growing item of a `flank` layout gets before the two stack, as a share of the row. Defaults to `50%`.
  * @cssproperty --flex-flank-size - The width of the fixed item of a `flank` layout. Defaults to its own width.
+ * @cssproperty --flex-switch-at - The narrowest a `switch` layout keeps its items in one row, below which each takes a line. Defaults to `30rem`.
  */
 @customElement('helix-flex')
 export class HelixFlex extends HelixElement {
@@ -127,16 +132,18 @@ export class HelixFlex extends HelixElement {
   justifyContent?: 'start' | 'center' | 'end' | 'between' | 'around'
 
   /**
-   * A common layout pattern: `cluster`, `split`, `flank` or `flank-end`.
+   * A common layout pattern: `cluster`, `split`, `flank`, `flank-end` or
+   * `switch`.
    *
    * Each sets the wrapping, alignment and spread it needs, and an attribute
    * you write as well wins over it. `split` spreads the items as
    * `justify-content: space-between` does, so a third item sits midway.
    * `flank` holds the first item at its own width and gives the last one the
-   * rest, and `flank-end` does the reverse.
+   * rest, and `flank-end` does the reverse. `switch` puts the items in one
+   * row, or one to a line once the flex is narrower than `--flex-switch-at`.
    */
   @property({ reflect: true })
-  layout?: 'cluster' | 'flank' | 'flank-end' | 'split'
+  layout?: 'cluster' | 'flank' | 'flank-end' | 'split' | 'switch'
 
   /**
    * Space between the lines of a wrapping row, or between the items of a
