@@ -5,10 +5,10 @@ import { valueAsMinutes, valueAsSeconds } from '../value-as/value-as.js'
  *
  * `Intl` decides between a twelve and a twenty-four hour clock, because that is
  * a property of the locale rather than of any component: `en-US` gets `2:30 PM`
- * and `en-GB` gets `14:30` without either being configured. There is no flag to
- * force one, deliberately. A product that needs to override its reader's own
- * convention has a locale problem rather than a component one, and the value is
- * 24 hour regardless.
+ * and `en-GB` gets `14:30` without either being configured. This function takes
+ * no flag to force one. A family that offers the choice, such as Time Picker
+ * and Time Input with `hour-cycle`, passes it in the locale, as its `-u-hc-`
+ * extension (`en-US-u-hc-h23`). The value is 24 hour regardless.
  *
  * A value this cannot read is handed back unchanged, so a field showing what is
  * being typed shows the letters rather than blanking under the reader. Minute

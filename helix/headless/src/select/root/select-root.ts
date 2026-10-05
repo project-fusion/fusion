@@ -593,7 +593,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
       ?multiple=${this.multiple}
       ?filterable=${this.filterable}
       manual
-      aria-label=${this.label || nothing}
+      aria-label=${this.label || this.getAttribute('aria-label') || nothing}
       @keydown=${this.handleListKeydown}
       @helix-before-change=${this.handleChange}
       @change=${this.stopInner}

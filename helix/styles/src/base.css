@@ -707,6 +707,14 @@ helix-toggle:state(selected)::part(item) {
   color: var(--helix-color-foreground);
 }
 
+/* Several pressed at once: each pressed item carries the marker's fill, which
+   the group draws, so its label goes to full strength as a chosen one does. A
+   shadow rule cannot reach this, because the document's `::part(item)` color
+   above beats it. */
+helix-toggle:state(pressed)::part(item) {
+  color: var(--helix-color-foreground);
+}
+
 helix-toggle[disabled]::part(item) {
   cursor: not-allowed;
   opacity: 0.5;

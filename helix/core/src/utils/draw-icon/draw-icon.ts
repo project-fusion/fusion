@@ -13,16 +13,17 @@ export interface DrawIconOptions {
 /**
  * Draws an icon that was imported by name, rather than looked up by string.
  *
- * **`<helix-icon name="play">` indexes the whole icon set at runtime.** Its
- * render is `icons[this.name]`, and no bundler can shake a dynamic index, so
- * every consumer of any component that renders one ships all of the generated
- * path data: measured at 50,814 bytes raw and 15,010 gzipped for 102 icons, and
+ * **`<helix-icon name="play">` looks its glyph up in a registry at runtime.**
+ * The registry holds the whole set once `@fusion.dev/helix-headless/icon`
+ * registers it, and no bundler can shake a lookup by string, so every consumer
+ * of any component that renders one ships all of the generated path data: measured at 50,814 bytes raw and 15,010 gzipped for 102 icons, and
  * growing about 147 gzipped bytes per icon added. A named import ships one path
  * and is checked when the package compiles rather than by a name lookup later.
  *
  * That element still earns its place as *public* API, where a consumer writes a
- * name in markup and a lookup is the only thing that can work. What it should
- * not be is how this library draws its own marks.
+ * name in markup and a lookup is the only thing that can work, and
+ * `@fusion.dev/helix-headless/icon/root` names glyphs without registering the
+ * set. What it should not be is how this library draws its own marks.
  *
  * **There is no `part` option, and there cannot be.** A part name behind an
  * interpolation is a part the manifest cannot see, so the component's own

@@ -98,6 +98,8 @@ The fields with a panel behave the same way:
   leaves the field, and `Escape` returns focus to the field.
 - Opening one of those panels from its trigger, or with `ArrowDown`, moves
   focus into the panel.
+- Inside one of those panels, `Tab` moves between the panel's controls and
+  does not leave the panel.
 
 **A tooltip never takes focus.** A tooltip only describes a control, so it
 cannot contain a button. For something with a button in it, use a `Popover`.
