@@ -306,6 +306,9 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
     const naming = new MutationObserver(() => this.requestUpdate())
     naming.observe(this, { attributeFilter: ['aria-labelledby'] })
     this.watchers = [words, naming]
+    /* After `AriaForwardController`'s own, which forwards again as focus
+       arrives and writes the host's list without the value. */
+    this.addEventListener('focusin', this.keepValueInName)
   }
 
   override disconnectedCallback(): void {
@@ -314,6 +317,12 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
       watcher.disconnect()
     }
     this.watchers = []
+    this.removeEventListener('focusin', this.keepValueInName)
+  }
+
+  /** Puts the value back into the trigger's name. See `nameWithValue`. */
+  private readonly keepValueInName = (): void => {
+    this.nameWithValue()
   }
 
   /** Opens the list with the highlight where the opening key says. */
