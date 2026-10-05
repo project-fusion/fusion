@@ -1,5 +1,7 @@
 import {
   customElement,
+  deepActiveElement,
+  deepContains,
   fillTemplate,
   formatNumbers,
   type HelixBeforeToggleEvent,
@@ -43,6 +45,21 @@ import {
   window_,
 } from './order.js'
 
+/** What makes an element a control the grid moves focus into, whatever its tab index. */
+const CONTROL = [
+  'a[href]',
+  'button:not([disabled])',
+  'input:not([disabled])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  '[contenteditable]:not([contenteditable="false"])',
+  '[tabindex]',
+].join(',')
+
+/** Whether an element inside a cell is a control a reader can work. */
+const isControl = (element: HTMLElement): boolean =>
+  element.matches(CONTROL) || element.shadowRoot?.delegatesFocus === true
+
 /**
  * @summary A table drawn from an array of rows, with sorting, filtering, and paging.
  *
@@ -79,6 +96,21 @@ import {
  *   and shows a dash while only some are chosen.
  *
  * To act on a single row, such as opening it, put a link or a button in a cell.
+ *
+ * The grid is one tab stop, and the arrow keys move between its cells, the
+ * headings included:
+ *
+ * - The arrow keys move one cell, and Home and End to the ends of the row.
+ * - Control with Home or End moves to the first or the last cell of the grid.
+ * - Page Up and Page Down move by the rows that fit in view.
+ * - Enter or F2 moves into the cell's controls, and Escape moves back to the
+ *   cell. Tab moves between the controls of one cell.
+ * - Enter or Space on a sortable heading sorts by it, and Space on a row of a
+ *   `selectable` table selects it.
+ *
+ * The controls inside the cells leave the tab order, so Tab moves past the
+ * whole grid. A windowed table keeps the row holding focus drawn while the
+ * rest scroll away.
  *
  * People can resize and reorder the columns. `resizable` on a column puts a
  * separator on its edge. `reorderable` on the table puts a grip on each heading
@@ -229,6 +261,13 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   estimate = 32
 
   /**
+   * The built-in pagination's name for a gap in its run of pages. `{page}` is
+   * replaced with the page it jumps to.
+   */
+  @property({ attribute: 'gap-label' })
+  gapLabel = 'Skip to page {page}'
+
+  /**
    * The search query. A row is shown when the query matches any of its columns.
    *
    * One query rather than a predicate per column, which is what a reader means
@@ -251,6 +290,10 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    */
   @property()
   label = ''
+
+  /** The built-in pagination's name for the button that moves forward a page. */
+  @property({ attribute: 'next-label' })
+  nextLabel = 'Next page'
 
   /**
    * Where filtering, sorting, and paging happen. `client` does them in the
@@ -326,6 +369,17 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
+   * The built-in pagination's name for one page. `{page}` and `{pages}` are
+   * replaced with the page number and the page count.
+   */
+  @property({ attribute: 'page-label' })
+  pageLabel = 'Page {page}'
+
+  /** The name of the built-in pagination's navigation landmark. */
+  @property({ attribute: 'pagination-label' })
+  paginationLabel = 'Pagination'
+
+  /**
    * Shows a pagination under the grid.
    *
    * On by default once a page size is set, because a paged table with no way to
@@ -343,6 +397,10 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     this.paginatedState = next
     this.requestUpdate('paginated', previous)
   }
+
+  /** The built-in pagination's name for the button that moves back a page. */
+  @property({ attribute: 'previous-label' })
+  previousLabel = 'Previous page'
 
   /**
    * Lets users reorder the columns.
@@ -393,6 +451,17 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   @property({ type: Boolean })
   selectable = false
 
+  /** The name of the checkbox in the heading that selects every row. */
+  @property({ attribute: 'select-all-label' })
+  selectAllLabel = 'Select every row'
+
+  /**
+   * The name of a row's checkbox. `{row}` is replaced with the row's value in
+   * the first column that has a field, or with its key.
+   */
+  @property({ attribute: 'select-row-label' })
+  selectRowLabel = 'Select {row}'
+
   /**
    * The keys of the selected rows, separated by commas.
    *
@@ -423,9 +492,10 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   /**
    * The sort order, as `field:direction`.
    *
-   * Set it and this element defers: a reader's click fires `helix-sort` and
-   * changes nothing until a new value arrives. `default-sort` seeds an order this
-   * element then owns.
+   * A reader's click on a sortable heading fires `helix-sort` first, and
+   * refusing it leaves the order as it was. To own the order yourself, refuse
+   * the event and set this to the order you chose. `default-sort` seeds an
+   * order this element then owns.
    */
   @property()
   get sort(): string {
@@ -504,6 +574,36 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   @state()
   private selectedState: string | undefined = undefined
 
+  /**
+   * The row holding the grid's tab stop: `-1` for the headings, otherwise a
+   * row of the page counted from 0. Unset until a reader moves, when the stop
+   * rests on the first row, or on the headings where there is none.
+   */
+  @state()
+  private activeRow: number | undefined = undefined
+
+  /** The column holding the grid's tab stop, the checkbox column counted. */
+  @state()
+  private activeColumn = 0
+
+  /**
+   * The key of the row holding the tab stop, so a sort or a filter keeps the
+   * stop on the row a reader was on. Only kept while `row-key` is set.
+   */
+  private activeKey: string | undefined = undefined
+
+  /** Whether the next render should move focus to the active cell. */
+  private focusWanted = false
+
+  /** The page as last drawn, for the keys to count rows against between renders. */
+  private drawnPage: readonly DataRow[] = []
+
+  /** The grid's size as the last render counted it, for the internals. */
+  private counts: { columns: number | undefined; rows: number | undefined } = {
+    columns: undefined,
+    rows: undefined,
+  }
+
   /** The order while a grip is being dragged, before anybody has been asked. */
   @state()
   private dragOrder: string[] | undefined = undefined
@@ -546,8 +646,20 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * against the wrong rows every time the window moved.
    */
   private drawn(): { element: HTMLElement; index: number }[] {
-    return [...this.renderRoot.querySelectorAll<HTMLElement>('[part="row"][data-index]')].map(
-      (element) => ({ element, index: Number(element.dataset.index) }),
+    /* **Measured by its first cell.** A row is `display: contents` and has no
+       box, so its own height reads as zero, every row stayed at the estimate,
+       and a row drawn taller than that moved the content under the scroll each
+       time the window moved: the browser's scroll anchoring then moved the
+       offset back, and the window swung between two places until the
+       controller gave up and blamed the box. A cell is a grid item, stretched
+       to its row. */
+    return [...this.renderRoot.querySelectorAll<HTMLElement>('[part="row"][data-index]')].flatMap(
+      (row) => {
+        const cell = row.firstElementChild
+        return cell instanceof HTMLElement
+          ? [{ element: cell, index: Number(row.dataset.index) }]
+          : []
+      },
     )
   }
 
@@ -601,13 +713,78 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     return value
   }
 
-  /** The part of a page the reader can see, which is every row when not windowed. */
-  private windowOf(rows: DataRow[]): DataRow[] {
+  /**
+   * The part of a page the reader can see, which is every row when not
+   * windowed, each with its place in the page.
+   *
+   * **The row holding the tab stop is drawn wherever the window is.** A row
+   * that scrolled out took the focus inside it to the body, and a grid whose
+   * one tab stop is not drawn has no tab stop at all. It is drawn beside the
+   * window, on the side it belongs, and the spacer on that side gives up its
+   * room, so every other row stays where it was.
+   */
+  private windowOf(rows: readonly DataRow[]): { index: number; row: DataRow }[] {
+    const all = rows.map((row, index) => ({ index, row }))
     if (!this.windowed) {
-      return rows
+      return all
     }
     const { first, last } = this.virtualize.window
-    return rows.slice(first, last)
+    const drawn = all.slice(first, last)
+    const kept = this.keptRow(rows)
+    if (kept === undefined) {
+      return drawn
+    }
+    const row = rows[kept] as DataRow
+    return kept < first ? [{ index: kept, row }, ...drawn] : [...drawn, { index: kept, row }]
+  }
+
+  /** The row drawn outside the window to keep the tab stop, if there is one. */
+  private keptRow(rows: readonly DataRow[]): number | undefined {
+    if (!this.windowed) {
+      return undefined
+    }
+    const row = this.currentRow(rows)
+    const { first, last } = this.virtualize.window
+    return row >= 0 && (row < first || row >= last) ? row : undefined
+  }
+
+  /** What a row is known by between renders: its `row-key`, or its place in the page. */
+  private rowKeyOf(row: DataRow, index: number): string {
+    if (!this.rowKey) {
+      return String(index)
+    }
+    const value = at(row, this.rowKey)
+    return value === undefined || value === null ? String(index) : String(value)
+  }
+
+  /**
+   * The row holding the tab stop in this page: the row with the key it was
+   * on, where `row-key` says, and otherwise the same place, held to the page.
+   */
+  private currentRow(rows: readonly DataRow[]): number {
+    const asked = this.activeRow
+    if (asked === undefined) {
+      /* At rest the stop follows the window, so Tab lands on a row in view. */
+      const first = this.windowed ? this.virtualize.window.first : 0
+      return rows.length > 0 ? Math.min(first, rows.length - 1) : -1
+    }
+    if (asked >= 0 && this.activeKey !== undefined && this.rowKey) {
+      const found = rows.findIndex((row, index) => this.rowKeyOf(row, index) === this.activeKey)
+      if (found >= 0) {
+        return found
+      }
+    }
+    return Math.min(asked, rows.length - 1)
+  }
+
+  /** How many cells a row has: the checkbox and every drawn column. */
+  private get width(): number {
+    return this.shownColumns.length + (this.selectable ? 1 : 0)
+  }
+
+  /** The column holding the tab stop, held to the row's width. */
+  private get currentColumn(): number {
+    return Math.max(0, Math.min(this.activeColumn, this.width - 1))
   }
 
   /** The columns declared as children, in the order they are written. */
@@ -760,17 +937,12 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   private get view(): {
     available: number
     matched: number
-    rows: DataRow[]
+    page: readonly DataRow[]
     total: number
   } {
     if (this.mode === 'server') {
       const total = Math.max(this.total, this.rows.length)
-      return {
-        available: this.rows.length,
-        matched: total,
-        rows: this.windowOf([...this.rows]),
-        total,
-      }
+      return { available: this.rows.length, matched: total, page: this.rows, total }
     }
     if (!this.windowed) {
       const view = ordered(this.rows, this.axes, {
@@ -780,14 +952,19 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         spec: this.sort,
       })
       this.warnIfCrowded(view.rows.length)
-      return { ...view, available: view.rows.length }
+      return {
+        available: view.rows.length,
+        matched: view.matched,
+        page: view.rows,
+        total: view.total,
+      }
     }
     /* No crowding warning on this path. Windowing is the answer to the warning
        rather than a case of it: the result being larger than a table can draw
        is the reason the window exists. */
     const { rows: inOrder, total } = this.arrange()
     const page = window_(inOrder, this.page, this.pageSize)
-    return { available: page.length, matched: inOrder.length, rows: this.windowOf(page), total }
+    return { available: page.length, matched: inOrder.length, page, total }
   }
 
   /** How many pages the result makes, which is at least one even when empty. */
@@ -959,8 +1136,13 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   /** Ticks or clears one row, which the checkbox asked for and was refused. */
   private readonly toggleRow = (key: string, event: HelixBeforeToggleEvent): void => {
     event.preventDefault()
+    this.chooseRow(key, event.detail.checked)
+  }
+
+  /** Asks for one row to be chosen or let go. */
+  private chooseRow(key: string, checked: boolean): void {
     const keys = this.chosen
-    if (event.detail.checked) {
+    if (checked) {
       keys.add(key)
     } else {
       keys.delete(key)
@@ -971,6 +1153,11 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   /** Selects every row, or clears them all where every one already was. */
   private readonly toggleAll = (event: HelixBeforeToggleEvent): void => {
     event.preventDefault()
+    this.chooseAll()
+  }
+
+  /** Asks for every row, or for none where every one already was. */
+  private chooseAll(): void {
     const every = this.everyKey
     const keys = this.chosen
     if (every.length > 0 && every.every((key) => keys.has(key))) {
@@ -1181,6 +1368,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    this.hadFocus = this.hasUpdated && this.gridHasFocus()
     this.announced = this.news()
     hostAria(this.internals, { label: this.label || 'Table', role: 'grid' })
     this.internals.ariaMultiSelectable = this.selectable ? 'true' : null
@@ -1225,9 +1413,14 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    this.internals.ariaRowCount = this.counts.rows === undefined ? null : String(this.counts.rows)
+    this.internals.ariaColCount =
+      this.counts.columns === undefined ? null : String(this.counts.columns)
     this.markEmpty()
     this.assign()
     this.announceSort()
+    this.quietControls()
+    this.placeFocus()
     /* After the rows are in the tree, so the pass that measures them is looking
        at the window this render drew. The controller holds its answer when it
        stops changing, so this settles rather than looping. */
@@ -1252,10 +1445,16 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    */
   private announceSort(): void {
     const current = parse(this.sort)
+    const stop = this.currentRow(this.drawnPage) === -1 ? this.currentColumn : -1
+    const offset = this.selectable ? 1 : 0
+    const shown = this.shownColumns
     for (const column of this.tableColumns) {
       /* Whether a reader may move it, pushed down for the same reason: the order
          is the table's, and the grip is drawn by the column. */
       column.movable = this.reorderable && column.field !== ''
+      /* A cell of this grid, and its one tab stop when the stop is on it. */
+      column.gridCell = true
+      column.tabStop = shown.indexOf(column) + offset === stop
       column.sorted =
         current && column.canSort && column.field === current.field
           ? current.direction === 'asc'
@@ -1289,11 +1488,15 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     column: HelixHeadlessTableColumn,
     row: DataRow,
     picked: boolean,
+    place: number,
+    stop: boolean,
   ): TemplateResult {
     const edge = edgeOf(column.textAlign)
     return html`<span
       part="cell${picked ? ' cell-selected' : ''}"
       role="gridcell"
+      tabindex=${stop ? '0' : '-1'}
+      data-column=${place}
       style=${edge ? `--data-table-cell-align: ${edge}` : nothing}
       >${column.read(row)}</span
     >`
@@ -1319,32 +1522,38 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         mark-checked: checkbox-mark-checked, mark-dash: checkbox-mark-dash,
         mark-indeterminate: checkbox-mark-indeterminate"
       aria-label=${name}
+      tabindex="-1"
       .checked=${checked}
       .indeterminate=${indeterminate}
       @helix-before-toggle=${toggle}
     ></${checkbox}>`
   }
 
-  private renderRows(rows: readonly DataRow[]): TemplateResult {
+  private renderRows(
+    rows: readonly { index: number; row: DataRow }[],
+    page: readonly DataRow[],
+  ): TemplateResult {
     const columns = this.shownColumns
-    const field = this.rowKey
     /* Keyed, so a sort moves a row's element rather than rewriting every cell
        in place: focus inside a cell survives and a transition stays attached to
        the row it belongs to. The index is the fallback and is correct only
        while nothing reorders, which is why `row-key` is worth setting.
 
-       Counted from the window's start rather than from the row's place in it,
-       or every window would key its first row `0` and hand a scroll the element
-       belonging to a row it has just left. */
-    const start = this.windowStart
+       Keyed by the row's place in the page, which a window does not change:
+       keyed by its place in the window, every window would key its first row
+       `0` and hand a scroll the element belonging to a row it has just left. */
     const chosen = this.selectable ? this.chosen : undefined
     const named = columns.find((column) => column.field !== '')
+    const stopRow = this.currentRow(page)
+    const stopColumn = this.currentColumn
+    const offset = this.selectable ? 1 : 0
     return html`${repeat(
       rows,
-      (row, index) => (field ? String(row[field] ?? start + index) : start + index),
-      (row, index) => {
+      ({ index, row }) => this.rowKeyOf(row, index),
+      ({ index, row }) => {
         const key = chosen ? this.keyOf(row, this.rowIndex(index) - 2) : ''
         const picked = chosen?.has(key) ?? false
+        const stop = (place: number): boolean => index === stopRow && place === stopColumn
         /* Selected is said on the row for the accessibility tree and on each of
            its cells for a stylesheet: the row is `display: contents`, so the
            cells are what a selection is painted on, and nothing outside can
@@ -1354,20 +1563,29 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
           role="row"
           aria-rowindex=${this.rowIndex(index)}
           aria-selected=${chosen ? String(picked) : nothing}
-          data-index=${this.windowed ? start + index : nothing}
+          data-index=${this.windowed ? index : nothing}
+          data-row=${index}
         >
           ${
             chosen
-              ? html`<span part="select${picked ? ' select-selected' : ''}" role="gridcell"
+              ? html`<span
+                  part="select${picked ? ' select-selected' : ''}"
+                  role="gridcell"
+                  tabindex=${stop(0) ? '0' : '-1'}
+                  data-column="0"
                   >${this.renderCheckbox(
-                    `Select ${named ? String(named.order(row) ?? key) : key}`,
+                    fillTemplate(this.selectRowLabel, {
+                      row: named ? String(named.order(row) ?? key) : key,
+                    }),
                     picked,
                     false,
                     (event) => this.toggleRow(key, event),
                   )}</span
                 >`
               : nothing
-          }${columns.map((column) => this.renderCell(column, row, picked))}
+          }${columns.map((column, place) =>
+            this.renderCell(column, row, picked, place + offset, stop(place + offset)),
+          )}
         </div>`
       },
     )}`
@@ -1381,13 +1599,12 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * reader on page three should hear row 41, and a grid whose indices restart at
    * every page tells a reader the result is twenty rows long however many it has.
    *
-   * A window is the second offset and stacks on the page: with both on, row one
-   * of the window is the page's start plus how far down the page it begins.
+   * `within` is the row's place in the page, which already counts the window.
    */
   private rowIndex(within: number): number {
     const size = this.pageSize
     const page = size > 0 ? (this.page - 1) * size : 0
-    return page + this.windowStart + within + 2
+    return page + within + 2
   }
 
   /**
@@ -1404,11 +1621,6 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   /** The signature the recorded heights were measured against. */
   private measuredAgainst = ''
 
-  /** Where the window begins in the page, which is the top when there is none. */
-  private get windowStart(): number {
-    return this.windowed ? this.virtualize.window.first : 0
-  }
-
   /**
    * The room the rows outside the window would have taken.
    *
@@ -1418,11 +1630,22 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * room itself is what keeps the scrollbar honest: a box that scrolls twenty
    * rows while claiming ten thousand gives a thumb the size of its track.
    */
-  private renderSpacer(end: 'after' | 'before'): TemplateResult | typeof nothing {
+  private renderSpacer(
+    end: 'after' | 'before',
+    kept: number | undefined,
+  ): TemplateResult | typeof nothing {
     if (!this.windowed) {
       return nothing
     }
-    const { after, before } = this.virtualize.window
+    const window = this.virtualize.window
+    /* The row kept for the tab stop takes its own room out of the spacer on
+       its side, so the rows in the window stay where the spacer put them. */
+    const room = kept === undefined ? 0 : this.virtualize.sizeOf(kept)
+    const before = Math.max(
+      0,
+      window.before - (kept !== undefined && kept < window.first ? room : 0),
+    )
+    const after = Math.max(0, window.after - (kept !== undefined && kept >= window.last ? room : 0))
     /* Written out rather than bound through `part=${end}`. A part assembled at
        run time is one nothing can check: the rule that pairs a documented part
        with a rendered one reads the template, and a name it cannot see is a
@@ -1440,12 +1663,17 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /** The heading of the checkbox column, which selects the whole result. */
-  private renderSelectAll(): TemplateResult {
+  private renderSelectAll(stop: boolean): TemplateResult {
     const every = this.everyKey
     const keys = this.chosen
     const count = every.filter((key) => keys.has(key)).length
-    return html`<span part="select-all" role="columnheader">${this.renderCheckbox(
-      'Select every row',
+    return html`<span
+      part="select-all"
+      role="columnheader"
+      tabindex=${stop ? '0' : '-1'}
+      data-column="0"
+    >${this.renderCheckbox(
+      this.selectAllLabel,
       every.length > 0 && count === every.length,
       count > 0 && count < every.length,
       this.toggleAll,
@@ -1453,7 +1681,11 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   protected override render(): TemplateResult {
-    const { available, matched, rows } = this.view
+    const { available, matched, page } = this.view
+    this.drawnPage = page
+    const rows = this.windowOf(page)
+    const kept = this.keptRow(page)
+    const headStop = this.currentRow(page) === -1
     /* Through `hasRows`, which every other collection in the library asks and
        which this one overrode and then never read: two spellings of one
        question, and the live one was not the documented one. */
@@ -1472,18 +1704,24 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
        false; one told nothing counts what it can see. */
     const counted = this.mode === 'server' ? Math.max(this.total, available) : matched
     const countKnown = counted > 0 || this.sourceKnown
+    /* **On the grid, which is the host.** `aria-rowcount` and `aria-colcount`
+       belong to a table or a grid and mean nothing on a `rowgroup`, which is
+       where they sat, so a windowed or paged result never said how long it
+       was. Written in `updated`, the internals being no part of the render. */
+    this.counts = {
+      columns: columns.length ? columns.length + (this.selectable ? 1 : 0) : undefined,
+      rows: countKnown ? counted + 1 : undefined,
+    }
     return html`<div part="toolbar"><slot name="toolbar"></slot></div>
       <div
         part="table"
         role="rowgroup"
         aria-busy=${this.loading ? 'true' : nothing}
-        aria-rowcount=${countKnown ? counted + 1 : nothing}
-        aria-colcount=${columns.length ? columns.length + (this.selectable ? 1 : 0) : nothing}
         style=${template ? `--data-table-template: ${template}` : nothing}
         @scroll=${this.handleScroll}
       >
-        <div part="head" role="row">
-          ${this.selectable ? this.renderSelectAll() : nothing}${
+        <div part="head" role="row" aria-rowindex="1">
+          ${this.selectable ? this.renderSelectAll(headStop && this.currentColumn === 0) : nothing}${
             this.assignsByName && !this.hydrating
               ? this.orderedColumns.map(
                   (_, index) =>
@@ -1492,8 +1730,8 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
               : html`<slot name="columns" @slotchange=${this.handleSlotChange}></slot>`
           }
         </div>
-        ${this.renderSpacer('before')}${this.renderRows(rows)}${this.renderSpacer('after')}
-        ${this.renderStatus(filled)}
+        ${this.renderSpacer('before', kept)}${this.renderRows(rows, page)}${this.renderSpacer('after', kept)}
+        ${this.renderStatus(filled, 'gridcell')}
       </div>
       ${this.renderLive(filled)}
       <div part="footer">
@@ -1510,6 +1748,11 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
               page=${this.page}
               page-size=${this.pageSize || 1}
               total=${countKnown ? matched : nothing}
+              label=${this.paginationLabel}
+              gap-label=${this.gapLabel}
+              next-label=${this.nextLabel}
+              page-label=${this.pageLabel}
+              previous-label=${this.previousLabel}
               @helix-navigate=${this.handleNavigate}
             ></${pagination}>`
             : nothing
@@ -1535,6 +1778,8 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   override connectedCallback(): void {
     super.connectedCallback()
     this.addEventListener('click', this.handleHeadClick)
+    this.addEventListener('focusin', this.handleFocusIn)
+    this.addEventListener('keydown', this.handleGridKey)
     this.addEventListener('keydown', this.handleGripKey)
     this.addEventListener('pointerdown', this.handleGripDown)
     this.addEventListener('helix-before-resize', this.handleResize)
@@ -1543,6 +1788,8 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('click', this.handleHeadClick)
+    this.removeEventListener('focusin', this.handleFocusIn)
+    this.removeEventListener('keydown', this.handleGridKey)
     this.removeEventListener('keydown', this.handleGripKey)
     this.removeEventListener('pointerdown', this.handleGripDown)
     this.removeEventListener('helix-before-resize', this.handleResize)
@@ -1562,6 +1809,333 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     const column = this.columnFrom(event)
     if (column?.canSort) {
       this.toggleSort(column.field)
+    }
+  }
+
+  /**
+   * The cell at a place in the grid. The headings are row `-1`, the rows of
+   * the page count from 0, and the checkbox column, where there is one, is
+   * column 0.
+   */
+  private cellAt(row: number, column: number): HTMLElement | null {
+    const offset = this.selectable ? 1 : 0
+    if (row === -1) {
+      return column < offset
+        ? this.partNamed('select-all')
+        : (this.shownColumns[column - offset]?.cellBox ?? null)
+    }
+    const line = this.renderRoot.querySelector(`[part="row"][data-row="${row}"]`)
+    return line?.querySelector<HTMLElement>(`:scope > [data-column="${column}"]`) ?? null
+  }
+
+  /** The cell an event came from or through, and its place in the grid. */
+  private placeOf(event: Event): { cell: HTMLElement; column: number; row: number } | undefined {
+    const columns = this.shownColumns
+    const offset = this.selectable ? 1 : 0
+    for (const node of event.composedPath()) {
+      if (node === this) {
+        break
+      }
+      if (!(node instanceof HTMLElement)) {
+        continue
+      }
+      const index = columns.indexOf(node as HelixHeadlessTableColumn)
+      if (index >= 0) {
+        const cell = (node as HelixHeadlessTableColumn).cellBox
+        return cell ? { cell, column: index + offset, row: -1 } : undefined
+      }
+      const role = node.getAttribute('role')
+      if (
+        node.dataset.column !== undefined &&
+        (role === 'gridcell' || role === 'columnheader') &&
+        node.getRootNode() === this.renderRoot
+      ) {
+        const line = node.parentElement?.dataset.row
+        return {
+          cell: node,
+          column: Number(node.dataset.column),
+          row: line === undefined ? -1 : Number(line),
+        }
+      }
+    }
+    return undefined
+  }
+
+  /**
+   * The controls inside a cell, in order: what Enter and F2 move into, and
+   * what Tab moves between while focus is in the cell.
+   */
+  private controlsIn(place: { cell: HTMLElement; column: number; row: number }): HTMLElement[] {
+    const offset = this.selectable ? 1 : 0
+    if (place.row === -1 && place.column >= offset) {
+      return this.shownColumns[place.column - offset]?.controls ?? []
+    }
+    return [...place.cell.querySelectorAll<HTMLElement>('*')].filter(isControl)
+  }
+
+  /**
+   * Takes the controls a consumer's `cell` drew out of the tab order, so the
+   * grid stays one tab stop. They are reached with Enter or F2.
+   */
+  private quietControls(): void {
+    const offset = this.selectable ? 1 : 0
+    const drawn = this.shownColumns
+    const read = new Set(drawn.flatMap((column, place) => (column.cell ? [place + offset] : [])))
+    if (read.size === 0) {
+      return
+    }
+    for (const cell of this.renderRoot.querySelectorAll<HTMLElement>('[part~="cell"]')) {
+      if (!read.has(Number(cell.dataset.column))) {
+        continue
+      }
+      for (const control of cell.querySelectorAll<HTMLElement>('*')) {
+        if (isControl(control) && control.getAttribute('tabindex') !== '-1') {
+          control.setAttribute('tabindex', '-1')
+        }
+      }
+    }
+  }
+
+  /** Moves the tab stop to a cell, and focus with it on the next render. */
+  private moveTo(row: number, column: number): void {
+    const page = this.drawnPage
+    this.activeRow = row
+    this.activeColumn = column
+    this.activeKey =
+      row >= 0 && this.rowKey && page[row] ? this.rowKeyOf(page[row] as DataRow, row) : undefined
+    this.focusWanted = true
+  }
+
+  /** How many rows Page Up and Page Down move: those that fit in view, less one. */
+  private pageStep(cell: HTMLElement): number {
+    const box = this.partNamed('table')
+    const tall = cell.getBoundingClientRect().height || this.estimate
+    const scrolls = box !== null && box.scrollHeight > box.clientHeight + 1
+    const room = scrolls ? box.clientHeight - this.headHeight() : window.innerHeight
+    return Math.max(1, Math.floor(room / tall) - 1)
+  }
+
+  /** How tall the headings are, which stick over the rows in a windowed table. */
+  private headHeight(): number {
+    return this.cellAt(-1, 0)?.getBoundingClientRect().height ?? 0
+  }
+
+  /** Whether focus is on a cell of the grid, or inside one. */
+  private gridHasFocus(): boolean {
+    const active = deepActiveElement()
+    const grid = this.partNamed('table')
+    if (!active || !grid) {
+      return false
+    }
+    return (
+      deepContains(grid, active) || this.shownColumns.some((column) => deepContains(column, active))
+    )
+  }
+
+  /** Whether focus was in the grid before this render, for `placeFocus` to keep it there. */
+  private hadFocus = false
+
+  /**
+   * Focuses the cell holding the tab stop, where a key asked to move there or
+   * a render took focus away from the grid.
+   *
+   * **A render can take focus away**: a sort moves the row elements, and a
+   * moved element loses focus to the body. Put back on the cell the stop is on,
+   * which follows the row by its key.
+   */
+  private placeFocus(): void {
+    const lost =
+      this.hadFocus &&
+      !this.gridHasFocus() &&
+      (document.activeElement === null || document.activeElement === document.body)
+    if (!this.focusWanted && !lost) {
+      return
+    }
+    const row = this.currentRow(this.drawnPage)
+    const target = this.cellAt(row, this.currentColumn)
+    if (!target) {
+      return
+    }
+    this.focusWanted = false
+    if (!this.windowed) {
+      target.focus()
+      return
+    }
+    target.focus({ preventScroll: true })
+    const kept = this.keptRow(this.drawnPage)
+    if (row >= 0 && kept === row) {
+      /* Drawn beside the window, away from where it belongs, so its box is
+         the wrong place to scroll to: the window is moved to the row, which
+         stays the same element when the window arrives. */
+      this.virtualize.reveal(row, this.headHeight())
+      return
+    }
+    const box = this.partNamed('table')
+    if (!box) {
+      return
+    }
+    const frame = box.getBoundingClientRect()
+    const rect = target.getBoundingClientRect()
+    const top = row === -1 ? frame.top : frame.top + this.headHeight()
+    if (rect.top < top) {
+      box.scrollTop -= top - rect.top
+    } else if (rect.bottom > frame.bottom) {
+      box.scrollTop += rect.bottom - frame.bottom
+    }
+    if (rect.left < frame.left) {
+      box.scrollLeft -= frame.left - rect.left
+    } else if (rect.right > frame.right) {
+      box.scrollLeft += rect.right - frame.right
+    }
+  }
+
+  /** A cell, or a control inside one, took focus: the tab stop moves there. */
+  private readonly handleFocusIn = (event: FocusEvent): void => {
+    const place = this.placeOf(event)
+    if (!place) {
+      return
+    }
+    /* Tab back into a grid whose stop was kept outside the window: the window
+       moves to the row, which stays the same element when it arrives. */
+    if (place.row >= 0 && this.keptRow(this.drawnPage) === place.row) {
+      this.virtualize.reveal(place.row, this.headHeight())
+    }
+    /* Set even where it is the stop already, which at rest is only where the
+       window starts: written down, it stays with the row as the window moves. */
+    if (
+      this.activeRow === undefined ||
+      place.row !== this.currentRow(this.drawnPage) ||
+      place.column !== this.currentColumn
+    ) {
+      const page = this.drawnPage
+      this.activeRow = place.row
+      this.activeColumn = place.column
+      this.activeKey =
+        place.row >= 0 && this.rowKey && page[place.row]
+          ? this.rowKeyOf(page[place.row] as DataRow, place.row)
+          : undefined
+    }
+  }
+
+  /**
+   * The grid's keys, on a cell and inside one.
+   *
+   * On a cell, the arrows, Home, End, Page Up and Page Down move between
+   * cells, and Enter, Space and F2 act on it. Inside a cell the control has the
+   * keys, apart from Escape and F2, which go back to the cell, and Tab, which
+   * moves between the cell's controls. A key a control already handled is left
+   * alone.
+   */
+  private readonly handleGridKey = (event: KeyboardEvent): void => {
+    if (event.defaultPrevented || event.altKey) {
+      return
+    }
+    const place = this.placeOf(event)
+    if (!place) {
+      return
+    }
+    if (event.composedPath()[0] !== place.cell) {
+      this.handleControlKey(event, place)
+      return
+    }
+    const last = this.drawnPage.length - 1
+    const edge = this.width - 1
+    const control = event.ctrlKey || event.metaKey
+    let { column, row } = place
+    switch (event.key) {
+      case 'ArrowUp':
+        row = Math.max(-1, row - 1)
+        break
+      case 'ArrowDown':
+        row = Math.min(last, row + 1)
+        break
+      case 'ArrowLeft':
+      case 'ArrowRight':
+        column = Math.max(0, Math.min(edge, column + inlineStep(this, event.key)))
+        break
+      case 'Home':
+        row = control ? -1 : row
+        column = 0
+        break
+      case 'End':
+        row = control ? Math.max(row, last) : row
+        column = edge
+        break
+      case 'PageUp':
+        row = Math.max(-1, row - this.pageStep(place.cell))
+        break
+      case 'PageDown':
+        row = Math.min(last, row + this.pageStep(place.cell))
+        break
+      case 'Enter':
+      case ' ':
+      case 'F2':
+        this.activate(event, place)
+        return
+      default:
+        return
+    }
+    event.preventDefault()
+    if (row !== place.row || column !== place.column) {
+      this.moveTo(row, column)
+    }
+  }
+
+  /** Enter, Space and F2 on a cell. */
+  private activate(
+    event: KeyboardEvent,
+    place: { cell: HTMLElement; column: number; row: number },
+  ): void {
+    const offset = this.selectable ? 1 : 0
+    const heading = place.row === -1 ? this.shownColumns[place.column - offset] : undefined
+    if (event.key !== 'F2') {
+      if (heading?.canSort) {
+        event.preventDefault()
+        this.toggleSort(heading.field)
+        return
+      }
+      if (this.selectable && place.column === 0 && place.row === -1) {
+        event.preventDefault()
+        this.chooseAll()
+        return
+      }
+      if (event.key === ' ') {
+        const row = this.drawnPage[place.row]
+        if (this.selectable && row) {
+          event.preventDefault()
+          const key = this.keyOf(row, this.rowIndex(place.row) - 2)
+          this.chooseRow(key, !this.chosen.has(key))
+        }
+        return
+      }
+    }
+    const first = this.controlsIn(place)[0]
+    if (first) {
+      event.preventDefault()
+      first.focus()
+    }
+  }
+
+  /** The keys the grid takes while focus is on a control inside a cell. */
+  private handleControlKey(
+    event: KeyboardEvent,
+    place: { cell: HTMLElement; column: number; row: number },
+  ): void {
+    if (event.key === 'Escape' || event.key === 'F2') {
+      event.preventDefault()
+      place.cell.focus()
+      return
+    }
+    if (event.key !== 'Tab') {
+      return
+    }
+    const origin = event.composedPath()[0] as Node
+    const controls = this.controlsIn(place)
+    const at = controls.findIndex((one) => deepContains(one, origin))
+    const next = controls[at + (event.shiftKey ? -1 : 1)]
+    if (at >= 0 && next) {
+      event.preventDefault()
+      next.focus()
     }
   }
 

@@ -447,3 +447,55 @@ describe('a set whose items are not the same height', () => {
     expect(controller.window.after).toBe(900)
   })
 })
+
+describe('an item a host has to show that is outside the window', () => {
+  /* A writable box, so the offset `reveal` writes can be read back. */
+  const scroller = (scrollTop: number, clientHeight: number) =>
+    ({
+      addEventListener: () => {},
+      clientHeight,
+      removeEventListener: () => {},
+      scrollTop,
+    }) as unknown as HTMLElement
+
+  test('is scrolled to the least distance that shows it whole', () => {
+    const container = scroller(0, 320)
+    const controller = new VirtualizeController(host(), {
+      container: () => container,
+      count: () => 10_000,
+      estimate: () => 32,
+    })
+    controller.reveal(500)
+    // Its bottom at the box's bottom: 501 rows of 32, less the 320 that show.
+    expect(container.scrollTop).toBe(501 * 32 - 320)
+    controller.reveal(2)
+    expect(container.scrollTop).toBe(64)
+    // Already whole in view: nothing moves.
+    controller.reveal(4)
+    expect(container.scrollTop).toBe(64)
+  })
+
+  test('below a heading that covers the top of the box', () => {
+    const container = scroller(0, 320)
+    const controller = new VirtualizeController(host(), {
+      container: () => container,
+      count: () => 10_000,
+      estimate: () => 32,
+    })
+    controller.reveal(500, 40)
+    expect(container.scrollTop).toBe(501 * 32 + 40 - 320)
+  })
+
+  test('has its own measured height, for the spacer that gives up its room', () => {
+    const row = { getBoundingClientRect: () => ({ height: 48 }) } as unknown as HTMLElement
+    const controller = new VirtualizeController(host(), {
+      container: () => scroller(0, 320),
+      count: () => 100,
+      estimate: () => 32,
+      rows: () => [{ element: row, index: 3 }],
+    })
+    controller.hostUpdated()
+    expect(controller.sizeOf(3)).toBe(48)
+    expect(controller.sizeOf(4)).toBe(32)
+  })
+})

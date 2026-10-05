@@ -96,12 +96,14 @@ describe('data table server output', () => {
   })
 
   /**
-   * The count describes the result. On the server there is no window yet and
-   * the number still has to be the whole set, or the first thing a screen reader
-   * hears is a smaller table than the one that arrives.
+   * The counts belong to the grid, which is the host, and the host says them
+   * through its internals, which a server does not write. On the `rowgroup`
+   * they applied to nothing, so the served markup carries none there, and the
+   * rows still carry their place in the result.
    */
-  test('the row count is the whole result, header included', () => {
-    expect(partTag(markup, 'table')).toContain('aria-rowcount="3"')
+  test('the row count is not served on the row group, where it means nothing', () => {
+    expect(partTag(markup, 'table')).not.toContain('aria-rowcount')
+    expect(rendered(markup, 'helix-headless-data-table')).toContain('aria-rowindex="2"')
   })
 
   /**

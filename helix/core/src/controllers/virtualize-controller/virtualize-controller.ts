@@ -415,6 +415,41 @@ export class VirtualizeController implements ReactiveController {
   }
 
   /**
+   * How tall item `index` is: what was measured, or the estimate.
+   *
+   * For a host that draws an item outside the window, the row holding focus
+   * say, and has to take that item's room out of a spacer.
+   */
+  sizeOf(index: number): number {
+    return this.measuring() ? this.heights.at(index) : Math.max(1, this.options.estimate())
+  }
+
+  /**
+   * Scrolls the box the least distance that shows item `index` whole.
+   *
+   * For a host moving focus to an item outside the window, whose own element
+   * cannot be scrolled to because it is not drawn where it belongs. `inset` is
+   * how far into the box the items start, for a heading that sticks at its
+   * top and covers that much of every item scrolled under it.
+   */
+  reveal(index: number, inset = 0): void {
+    const box = this.options.container()
+    if (!box) {
+      return
+    }
+    const total = Math.max(0, this.options.count())
+    const top = this.measuring()
+      ? this.heights.before(index, total)
+      : index * Math.max(1, this.options.estimate())
+    const bottom = top + this.sizeOf(index) + inset
+    if (top < box.scrollTop) {
+      box.scrollTop = top
+    } else if (bottom > box.scrollTop + box.clientHeight) {
+      box.scrollTop = bottom - box.clientHeight
+    }
+  }
+
+  /**
    * Drops every measurement, for a host that swapped its data.
    *
    * Not called on a count change, which would be the obvious place and is
@@ -451,7 +486,9 @@ export class VirtualizeController implements ReactiveController {
         'the last one. That happens when the scrolling box has no height of its own: its ' +
         '`clientHeight` is then a function of the rows just drawn, so measuring moves what is ' +
         'being measured and the two never agree. Give the container a block size and an ' +
-        'overflow, which is what the styled tier does and what a headless consumer has to.',
+        'overflow, which is what the styled tier does and what a headless consumer has to. ' +
+        'It also happens when the rows report no height, such as a row drawn with ' +
+        '`display: contents`, which is a fault in the component that draws them.',
       tag: typeof host.localName === 'string' ? host.localName : undefined,
     })
   }

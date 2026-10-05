@@ -103,12 +103,13 @@ export const edgeOf = (align: string | undefined): string | undefined =>
  * them with the column: a row with more cells than the table has tracks wraps
  * onto the next line.
  *
- * A heading that does something holds a control. A column header is not
- * focusable, so a sortable heading contains a `<button>`, which is the pattern
- * for a sortable table and the only way to reach the sort by keyboard. A
- * resizable column has a `separator` on its end edge, moved by dragging or with
- * the arrow keys. In a table with reorderable columns, each column has a grip
- * that the table moves.
+ * A heading that does something holds a control. In a `Table` a column
+ * header is not focusable, so a sortable heading contains a `<button>`, which
+ * is the pattern for a sortable table and the only way to reach the sort by
+ * keyboard. In a `DataTable` the heading is a cell of the grid, reached with
+ * the arrow keys, and its controls with Enter or F2. A resizable column has a
+ * `separator` on its end edge, moved by dragging or with the arrow keys. In a
+ * table with reorderable columns, each column has a grip that the table moves.
  *
  * @since 0.1.0
  * @status stable
@@ -315,6 +316,25 @@ export class HelixHeadlessTableColumn extends HelixElement {
   @state()
   movable = false
 
+  /**
+   * @internal Whether the column is a cell of a grid that moves focus between
+   * its cells, written by that table. Not a consumer's to set.
+   *
+   * **The heading's box takes the role and the focus.** The column element has
+   * no box, being `display: contents`, and an element with no box cannot be
+   * focused, so in a grid the `columnheader` role, `aria-sort` and the focus all
+   * go to `[part="column"]`, and the controls on it leave the tab order.
+   */
+  @state()
+  gridCell = false
+
+  /**
+   * @internal Whether the heading is the grid's one tab stop, written by the
+   * table that sets `gridCell`. Not a consumer's to set.
+   */
+  @state()
+  tabStop = false
+
   /** How wide the heading drew, for the separator to report. */
   @state()
   private drawn = 0
@@ -403,10 +423,14 @@ export class HelixHeadlessTableColumn extends HelixElement {
        File 412 pixels" was the name every cell under it was read with. The
        controls keep their own names. */
     const named = this.movable || this.resizable
-    hostAria(this.internals, { label: named ? this.name : '', role: 'columnheader' })
+    const host = !this.gridCell
+    hostAria(this.internals, {
+      label: host && named ? this.name : '',
+      role: host ? 'columnheader' : '',
+    })
     /* Set here rather than through `hostAria`, which carries the four semantics
        every family needs and not this one. */
-    this.internals.ariaSort = this.canSort ? (this.sorted ?? 'none') : null
+    this.internals.ariaSort = host && this.canSort ? (this.sorted ?? 'none') : null
     /* And the same fact as a custom state, because ARIA is not a style hook.
        Whoever draws this column draws the caret, and had nothing to draw it
        from: no state and no part told the sorted column from the rest, so the
@@ -420,6 +444,25 @@ export class HelixHeadlessTableColumn extends HelixElement {
        name written out, since a state is read from the source as a literal. */
     this.toggleState('sorted-ascending', this.sorted === 'ascending')
     this.toggleState('sorted-descending', this.sorted === 'descending')
+  }
+
+  /**
+   * @internal The box a grid focuses for this heading, read by the table that
+   * sets `gridCell`. Not a consumer's to call.
+   */
+  get cellBox(): HTMLElement | null {
+    return this.partNamed('column')
+  }
+
+  /**
+   * @internal The controls on the heading, in order, read by the table that
+   * sets `gridCell` to move focus into them. Not a consumer's to call.
+   */
+  get controls(): HTMLElement[] {
+    return ['grip', 'sort', 'resizer'].flatMap((name) => {
+      const control = this.partNamed(name)
+      return control ? [control] : []
+    })
   }
 
   /** The words of the heading, for naming the controls on it. */
@@ -557,9 +600,19 @@ export class HelixHeadlessTableColumn extends HelixElement {
 
   protected override render(): TemplateResult {
     const name = this.name
-    return html`<span part="column">${
+    const grid = this.gridCell
+    /* In a grid the controls leave the tab order, which has one stop: the cell
+       holding them. A reader reaches them with Enter or F2. */
+    const control = grid ? '-1' : nothing
+    return html`<span
+      part="column"
+      role=${grid ? 'columnheader' : nothing}
+      tabindex=${grid ? (this.tabStop ? '0' : '-1') : nothing}
+      aria-sort=${grid && this.canSort ? (this.sorted ?? 'none') : nothing}
+      aria-label=${grid && (this.movable || this.resizable) && name ? name : nothing}
+    >${
       this.movable
-        ? html`<button part="grip" type="button" aria-label=${fillTemplate(this.moveLabel, { name: name || 'column' })}>
+        ? html`<button part="grip" type="button" tabindex=${control} aria-label=${fillTemplate(this.moveLabel, { name: name || 'column' })}>
             <svg aria-hidden="true" fill="currentColor" part="grip-mark" viewBox=${dotsThreeVertical.viewBox}>
               ${unsafeSVG(dotsThreeVertical.content)}
             </svg>
@@ -567,14 +620,14 @@ export class HelixHeadlessTableColumn extends HelixElement {
         : nothing
     }${
       this.canSort
-        ? html`<button part="sort" type="button"><slot></slot></button>`
+        ? html`<button part="sort" type="button" tabindex=${control}><slot></slot></button>`
         : html`<slot></slot>`
     }${
       this.resizable
         ? html`<span
             part="resizer"
             role="separator"
-            tabindex="0"
+            tabindex=${grid ? '-1' : '0'}
             aria-label=${fillTemplate(this.resizeLabel, { name: name || 'column' })}
             aria-orientation="vertical"
             aria-valuemin=${HelixHeadlessTableColumn.NARROWEST}

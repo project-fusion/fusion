@@ -89,6 +89,13 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
+/* A heading that is a cell of a data table's grid takes focus itself, inset
+   so the scrolling box does not clip the ring. */
+[part="column"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(-1 * var(--helix-size-focus-ring));
+}
+
 /* Quiet until held: a grip on every heading is furniture, and at the heading's
    own ink it would read as part of the heading's words. */
 [part="grip"] {
