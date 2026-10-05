@@ -2290,9 +2290,8 @@ One family per module, subpath exports (`@fusion.dev/helix/card`) so consumers
 need not import the barrel, and `sideEffects` declared honestly. Getting it
 wrong is silent both ways.
 
-**Both element tiers have side effects**, because both register: `styled`
-declares `true` and `headless` declares `./dist/**/*.js`, which is the same
-answer narrowed to what it ships. `core` declares `false` and means it, shipping
+**Both element tiers have side effects**, because both register: `styled` and
+`headless` both declare `true`. `core` declares `false` and means it, shipping
 mixins and controllers that register nothing. This page said `headless` had none
-until September 2, 2026, against 116 files calling `@customElement` and a manifest that
-had always been right.
+until September 2, 2026, against every file calling `@customElement` and a
+manifest that had always been right.

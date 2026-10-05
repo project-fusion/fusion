@@ -548,7 +548,7 @@ export interface FacetDetail {
 export interface ReadDetail {
   /**
    * The state being asked for, as a boolean rather than a word that reads like
-   * one, which is `helix-toggle`'s rule and for the same reason: `"false"` is
+   * one, which is `helix-before-toggle`'s rule and for the same reason: `"false"` is
    * truthy and a consumer who forgets that marks everything read.
    */
   read: boolean
@@ -696,7 +696,7 @@ export class HelixDismissEvent extends CustomEvent<DismissDetail> {
  *
  * A boolean is the case where it *is* lost, because `"false"` is truthy, so a
  * consumer who forgets to compare against the word gets the opposite answer and
- * no error. That is why checkedness has `helix-toggle` and its own boolean, and
+ * no error. That is why checkedness has `helix-before-toggle` and its own boolean, and
  * it is the line to hold: **stringify a value, never a fact.** A new control
  * whose state is a boolean wants an event with a typed detail, not a `String()`
  * call here.
@@ -1274,12 +1274,12 @@ export class HelixBeforeToggleEvent extends CustomEvent<ToggleDetail> {
 export interface ScrolledDetail {
   /**
    * Whether the page is scrolled away from the top, as a boolean and not a word
-   * that reads like one. Follows `helix-toggle`'s rule for the same reason.
+   * that reads like one. Follows `helix-before-toggle`'s rule for the same reason.
    */
   scrolled: boolean
 }
 
-/** Detail carried by `helix-toggle`. */
+/** Detail carried by `helix-before-toggle`. */
 export interface ToggleDetail {
   /** The state being asked for, as a boolean and not a word that reads like one. */
   checked: boolean

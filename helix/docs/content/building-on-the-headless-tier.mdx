@@ -39,8 +39,8 @@ customElements.define('acme-combobox', AcmeCombobox)
 ```
 
 That one line sets the prefix. The styled tier sets its prefix the same way, with
-`static override tier = 'helix-'` and nothing else. The static appears 116 times
-in the headless manifest, so you can find it there.
+`static override tier = 'helix-'` and nothing else. Every element in the
+headless manifest carries the static, so you can find it there.
 
 ## Register every component a component renders
 
@@ -108,24 +108,26 @@ Use `visibility` so the page does not reflow when the definitions arrive.
 
 ### Typings for your tags
 
-`@fusion.dev/helix-cem` is the generator we use for our own typings. It reads
-your package and writes `jsx.d.ts`, `vue.d.ts`, and `svelte.d.ts` for your tags,
-with every member your subclasses inherit from ours. Add a `cem.config.ts`
-beside your `package.json`:
+Your typings come from a manifest of your package. `helix manifest build`, in
+`@fusion.dev/helix-cli`, writes one that includes every member your subclasses
+inherit from ours. Name each Helix package you extend and where its manifest is:
 
-```ts
-import type { HelixCemOptions } from '@fusion.dev/helix-cem'
-
-export default {
-  frameworkTypes: true,
-  packageName: 'acme-system',
-  tier: 'styled',
-} satisfies HelixCemOptions
+```sh
+helix manifest build . --tier styled \
+  --dependency @fusion.dev/helix=node_modules/@fusion.dev/helix/custom-elements.json \
+  --dependency @fusion.dev/helix-headless=node_modules/@fusion.dev/helix-headless/custom-elements.json \
+  --dependency @fusion.dev/helix-core=node_modules/@fusion.dev/helix-core/custom-elements.json \
+  > custom-elements.json
 ```
 
-Then run `bun --bun helix-cem`. It finds the classes you extend through your
-`dependencies`. The typings for `acme-combobox` then include the hundred or so
-members it inherits, as well as the two you wrote.
+Then run a typings generator over it. Our own typings start from
+`@wc-toolkit/jsx-types` and `@wc-toolkit/vuejs-types`. The typings for
+`acme-combobox` then include the hundred or so members it inherits, as well as
+the two you wrote.
+
+`@fusion.dev/helix-cem`, the step that runs those generators for our packages
+and corrects what they write, is not published. It is build tooling for this
+repository.
 
 ### The tag map
 

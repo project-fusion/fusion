@@ -44,15 +44,15 @@ Each file has its own export. If you bring your own reset or your own ramp,
 import the two files you want and skip `helix.css`.
 
 - **`primitives.css`** holds the raw ramp that the semantic layer is derived
-  from. The seven `--helix-seed-*` properties are read here. Your own code
-  should not name a primitive, and leaving the file out does not enforce that.
-  `tokens.css` refers to a primitive 297 times, so without `primitives.css`
-  every semantic token resolves to nothing. We measured a page without it:
+  from. The `--helix-seed-*` properties are read here. Your own code should
+  not name a primitive, and leaving the file out does not enforce that.
+  `tokens.css` refers to the primitives throughout, so without
+  `primitives.css` every semantic token resolves to nothing. We measured a page without it:
   `--helix-color-background` computes to `rgba(0, 0, 0, 0)`, and so does every
   other color. [Theming](theming.mdx) also depends on this file, because without
   it, setting `--helix-seed-brand` changes nothing.
-- **`tokens.css`** declares the semantic layer: 185 custom properties in 15
-  categories, plus `color-scheme: light dark` on `:root`. The files below read
+- **`tokens.css`** declares the semantic layer, the custom properties grouped
+  by category, plus `color-scheme: light dark` on `:root`. The files below read
   from it, and it reads from `primitives.css`.
 - **`base.css`** holds the element reset, the type scale on bare `h1` through
   `h6`, and the recipes for markup that Helix does not render. It reads tokens.
@@ -67,25 +67,23 @@ components. The order then stays visible in one place.
 
 ## Register the elements
 
-```ts
-import '@fusion.dev/helix'
-```
-
-This import has a side effect: it calls `customElements.define` once for every
-element. You can run it more than once. A second `define` for the same tag
-throws an error and stops the rest of the module, so the helper behind the
-import checks the registry first.
-
-To register only some elements, import them from subpaths:
+Import each family you use from its subpath:
 
 ```ts
 import '@fusion.dev/helix/button'
 import '@fusion.dev/helix/dialog'
 ```
 
-Import from subpaths when you use a few components. The package has side
-effects by design, so a bundler keeps everything you import. The whole-package
-import registers every element, and a subpath registers only its family.
+Each import has a side effect: it calls `customElements.define` for the
+elements of that family, and for the families they render. You can run it more
+than once. A second `define` for the same tag throws an error and stops the rest
+of the module, so the helper behind the import checks the registry first.
+
+The package has side effects by design, so a bundler keeps everything you
+import. `import '@fusion.dev/helix'` registers every element in the library,
+which is the whole library in your bundle. Use it for a prototype, and use
+subpaths in an app. [Metrics](./metrics) lists the size of each family and of
+the whole package.
 
 ## Check the installation
 

@@ -42,7 +42,8 @@ That works for every Helix element. A string goes through either path, and an
 array or an object goes through the property.
 
 ```vue
-<helix-tabs :items="items" @helix-before-activate="onActivate" />
+<helix-data-table label="People" :rows="people" />
+<helix-tabs @helix-before-activate="onActivate" />
 ```
 
 `@helix-before-activate` binds with `addEventListener`, so use the event's own
