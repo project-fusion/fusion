@@ -1,5 +1,6 @@
 import {
   customElement,
+  deepActiveElement,
   fillTemplate,
   formatNumbers,
   HelixElement,
@@ -16,6 +17,7 @@ import {
 } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { repeat } from 'lit/directives/repeat.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
 /** What one step control is made of, once the arithmetic is done. */
@@ -105,7 +107,7 @@ const fill = (
  * @slot next-icon - The glyph on the forward-one-page control, usually a caret.
  * @slot previous-icon - The glyph on the back-one-page control, usually a caret.
  *
- * @event {HelixNavigateEvent} helix-navigate - Fired before the page changes, and cancelable. Canceling it is the only way to stop a page change.
+ * @event {HelixNavigateEvent} helix-navigate - Fired before the page changes, and cancelable. Canceling it is the only way to stop a page change. `detail.value` is the page number as a string, so read it with `Number()`.
  *
  * @csspart first - The control that jumps to the first page, under `ends`.
  * @csspart gap - The control in place of hidden pages, which jumps into them.
@@ -335,6 +337,12 @@ export class HelixHeadlessPagination extends HelixElement {
   /** The page on show, whoever set it, and `undefined` until somebody has. */
   private pageState: number | undefined = undefined
 
+  /**
+   * The control a reader just used, while it held focus, and whether it was a
+   * gap. Read once by the update that follows, which decides where focus goes.
+   */
+  private used: { control: HTMLElement; gap: boolean } | undefined = undefined
+
   /** Held across every component asking for the same locale. */
   private get numbers(): (value: number) => string {
     return formatNumbers(this.locale)
@@ -433,9 +441,17 @@ export class HelixHeadlessPagination extends HelixElement {
     }
     return requestChange({
       apply: (page) => {
-        const previous = this.page
-        this.pageState = page
-        this.requestUpdate('page', previous)
+        /* **A link is followed after this click, so in `href` mode the change
+           waits a task.** The page would otherwise re-render in the microtask
+           after the click listener, before the browser reads the `href` of the
+           link that was clicked, and the browser would follow whatever that link
+           now points at: Next from page 5 went to page 7. A task is after the
+           browser has read it. */
+        if (this.href) {
+          setTimeout(() => this.applyPage(page))
+          return
+        }
+        this.applyPage(page)
       },
       event: (page) => new HelixNavigateEvent({ value: String(page) }),
       host: this,
@@ -451,10 +467,55 @@ export class HelixHeadlessPagination extends HelixElement {
    * on a button's click does nothing and costs nothing, so this is one handler
    * for both shapes rather than two that have to stay in step.
    */
-  private readonly go = (next: number, event: Event): void => {
+  private readonly go = (next: number, event: Event, gap = false): void => {
+    const control = event.currentTarget as HTMLElement | null
     if (!this.request(next)) {
       event.preventDefault()
+      return
     }
+    if (control && deepActiveElement() === control) {
+      this.used = { control, gap }
+    }
+  }
+
+  private applyPage(page: number): void {
+    const previous = this.page
+    this.pageState = page
+    this.requestUpdate('page', previous)
+  }
+
+  /**
+   * Puts focus back in the row after the control a reader used has gone.
+   *
+   * A page keeps its own control across a move, because the run is keyed by
+   * page, so focus stays on the page that was chosen. A gap points somewhere
+   * new once the run moves, and a step control is disabled at the end it
+   * reached, so after either of those focus goes to the current page, or in
+   * `compact` to the first step control that can still be used. Left alone,
+   * focus fell to the top of the document.
+   */
+  private restoreFocus(): void {
+    const used = this.used
+    this.used = undefined
+    if (!used) {
+      return
+    }
+    const { control, gap } = used
+    const usable = (element: Element | null): element is HTMLElement =>
+      element instanceof HTMLElement &&
+      element.isConnected &&
+      !(element as HTMLButtonElement).disabled &&
+      element.getAttribute('aria-disabled') !== 'true'
+    if (!gap && usable(control)) {
+      return
+    }
+    const target = [
+      this.renderRoot.querySelector('[part~="page-current"]'),
+      ...['previous', 'next', 'first', 'last'].map((name) =>
+        this.renderRoot.querySelector(`[part="${name}"]`),
+      ),
+    ].find(usable)
+    target?.focus()
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -481,6 +542,7 @@ export class HelixHeadlessPagination extends HelixElement {
    */
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    this.restoreFocus()
     if (this.announced === undefined) {
       // The first render establishes where we started. Arriving is not moving.
       this.announced = this.page
@@ -560,14 +622,14 @@ export class HelixHeadlessPagination extends HelixElement {
               part="gap"
               href=${fill(this.href, to, this.count)}
               aria-label=${name}
-              @click=${(event: Event) => this.go(to, event)}
+              @click=${(event: Event) => this.go(to, event, true)}
               >&hellip;</a
             >`
           : html`<button
               part="gap"
               type="button"
               aria-label=${name}
-              @click=${(event: Event) => this.go(to, event)}
+              @click=${(event: Event) => this.go(to, event, true)}
             >
               &hellip;
             </button>`
@@ -706,9 +768,22 @@ export class HelixHeadlessPagination extends HelixElement {
     }
     return html`${this.ends ? this.renderFirst() : nothing}${this.renderPrevious()}
       <ol part="list" role="list">
-        ${this.slots.map((slot) =>
-          typeof slot === 'number' ? this.renderPage(slot) : this.renderGap(slot),
-        )}
+        ${
+          /* Keyed by page, so a page's control stays that page's as the run
+             moves under it, and a reader who chose page 5 is still on page 5.
+             By position, the focused button took the next page's number. A gap
+             is keyed by its side of the current page. */
+          repeat(
+            this.slots,
+            (slot) =>
+              typeof slot === 'number'
+                ? slot
+                : slot.from < this.current
+                  ? 'gap-before'
+                  : 'gap-after',
+            (slot) => (typeof slot === 'number' ? this.renderPage(slot) : this.renderGap(slot)),
+          )
+        }
       </ol>
       ${this.renderNext()}${this.ends ? this.renderLast() : nothing}${this.renderLive()}`
   }
