@@ -138,3 +138,60 @@
 :host([emphasis="solid"]) [part="area"] {
   opacity: 1;
 }
+
+/* *Read by key.** A named sparkline's drawing takes focus, and the ring goes
+   round the whole drawing, as it goes round every chart's plot. */
+[part="svg"]:focus-visible {
+  border-radius: var(--helix-radii-sm);
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* The reading a pointer or a key rests on, and the highest and lowest under
+   `marks`: a dot centered on the reading, in the line's own color, placed by
+   the component in percentages of the box. */
+[part="cursor"],
+[part="high"],
+[part="low"] {
+  background-color: var(--sparkline-mark-color, currentColor);
+  block-size: var(--sparkline-mark-size, 5px);
+  border-radius: var(--helix-radii-full);
+  inline-size: var(--sparkline-mark-size, 5px);
+  pointer-events: none;
+  position: absolute;
+  translate: -50% -50%;
+}
+
+/* The cursor is ringed in the page's ground, so it reads over the line. */
+[part="cursor"] {
+  box-shadow: 0 0 0 var(--helix-border-thick) var(--helix-color-background);
+}
+
+/* The reading in words, above the dot, set as a tooltip is set. */
+[part="readout"] {
+  background-color: var(--sparkline-readout-background-color, var(--helix-color-surface-inverse));
+  border-radius: var(--helix-radii-sm);
+  color: var(--sparkline-readout-color, var(--helix-color-foreground-inverse));
+  font-family: var(--helix-font-sans);
+  font-size: var(--sparkline-readout-font-size, var(--helix-text-xs));
+  font-variant-numeric: tabular-nums;
+  line-height: 1.4;
+  padding: 0 var(--helix-space-2xs);
+  pointer-events: none;
+  position: absolute;
+  translate: -50% calc(-100% - var(--sparkline-mark-size, 5px));
+  white-space: nowrap;
+  z-index: 1;
+}
+
+/* On a right-to-left page the inline start is the right, so a mark hangs left
+   of its reading and is brought back the other way, as the terminus is. */
+:host(:dir(rtl)) [part="cursor"],
+:host(:dir(rtl)) [part="high"],
+:host(:dir(rtl)) [part="low"] {
+  translate: 50% -50%;
+}
+
+:host(:dir(rtl)) [part="readout"] {
+  translate: 50% calc(-100% - var(--sparkline-mark-size, 5px));
+}

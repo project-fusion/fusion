@@ -16,7 +16,10 @@ describe('sparkline server output', () => {
        on the host two attributes away: a whole-render search for it passes on
        the consumer's own `label=` whether or not the drawing carries a name,
        and went on passing here with `aria-label` removed from the render. */
-    expect(partTag(markup, 'svg')).toContain('role="img"')
+    /* Named and with readings, it is read by key, so it is served as the
+       focusable `application` every chart's plot is. */
+    expect(partTag(markup, 'svg')).toContain('role="application"')
+    expect(partTag(markup, 'svg')).toContain('tabindex="0"')
     expect(partTag(markup, 'svg')).toContain('aria-label="Sessions over a week"')
   })
 
