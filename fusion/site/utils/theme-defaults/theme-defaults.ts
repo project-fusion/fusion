@@ -74,11 +74,14 @@ export const INITIAL: Settings = {
 }
 
 /**
- * The brand the site wears, which its own theme panel starts from and goes back
- * to. **Its own constant, apart from `INITIAL`**: the builder starts from ink,
- * the palette Helix ships, and the site is Fusion's, which is blue.
+ * The brand the site wears, which its theme panel, its showcase, and its share
+ * cards start from: empty, so the site draws in ink, Helix's own default.
+ *
+ * **Its own constant, apart from `INITIAL`**, which is the builder's, so the
+ * site can wear a brand the builder does not start from. To give the site one,
+ * follow the steps at the top of `app/site.css`.
  */
-export const SITE_BRAND = '#3b82f6'
+export const SITE_BRAND = ''
 
 /** The stack a face becomes, so a fetch that has not landed still reads. */
 const stack = (family: string, fallback: string): string =>

@@ -99,7 +99,11 @@ export const ThemeFab = () => {
           onClick={() => setOpen(true)}
           type="button"
         >
-          <span className={styles.fabDot} style={{ '--swatch': c.brand } as CSSProperties} />
+          {/* No brand is ink, the foreground of either mode. */}
+          <span
+            className={styles.fabDot}
+            style={{ '--swatch': c.brand || 'var(--helix-color-foreground)' } as CSSProperties}
+          />
           Make it yours
         </button>
 

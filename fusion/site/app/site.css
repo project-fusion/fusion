@@ -1,9 +1,11 @@
-/* **Fusion's blue, named the way any site names its brand.** Helix draws in
-   ink when no brand is set, so the site sets the seed, and the stylesheet
-   derives the rest from it. The value is the blue Helix shipped before ink. */
-:root {
-  --helix-seed-brand: oklch(0.539 0.19 258);
-}
+/* **No brand color: the site draws in ink, Helix's own default.** To give the
+   site Fusion's blue again:
+
+   - Add `:root { --helix-seed-brand: oklch(0.539 0.19 258); }` here.
+   - Set `SITE_BRAND` in `utils/theme-defaults` to `#3b82f6`, which the theme
+     panel, the showcase, and the share cards start from.
+   - Put the blue back in the fallbacks in `app/icon.svg`, `#1068da`,
+     `#0059c8`, and `#0049b8`, and remove its dark mode rule. */
 
 /* The brand faces, mapped onto the design system's tokens. */
 :root {

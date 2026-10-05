@@ -1,5 +1,6 @@
 import { ImageResponse } from 'next/og'
 import { plainText } from '@/components/code-text/code-text'
+import { SITE_BRAND } from '@/utils/theme-defaults/theme-defaults'
 import { findFamily } from '../../../../../../content/catalog/catalog'
 
 /*
@@ -47,7 +48,7 @@ export default async function Image({ params }: { params: Promise<{ family: stri
       }}
     >
       <div style={{ alignItems: 'center', display: 'flex', gap: 16 }}>
-        <div style={{ color: '#3b82f6', fontSize: 40, fontWeight: 700 }}>Fusion</div>
+        <div style={{ color: SITE_BRAND || '#f7f8f8', fontSize: 40, fontWeight: 700 }}>Fusion</div>
         <div style={{ color: '#3f4650', fontSize: 40 }}>/</div>
         <div style={{ color: '#9aa4b2', fontSize: 40 }}>Helix</div>
       </div>

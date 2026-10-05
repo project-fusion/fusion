@@ -2,6 +2,7 @@
 
 import { initTheme, type ThemeEngine, type ThemeIntent } from '@fusion.dev/helix-theme'
 import { useEffect, useRef, useState } from 'react'
+import { SITE_BRAND } from '../../utils/theme-defaults/theme-defaults'
 import { THEME_ENGINE } from '../../utils/theme-engine/theme-engine'
 import styles from './showcase.module.css'
 
@@ -37,8 +38,8 @@ const FACES = [
 /** How long a view holds before the next one, when nobody is looking at it. */
 const DWELL = 7000
 
-/** What the page is derived from before anybody touches it. */
-const BRAND = '#3b82f6'
+/** What the page is derived from before anybody touches it: the site's own. */
+const BRAND = SITE_BRAND
 
 /**
  * True when something above this panel has already themed the document.
@@ -55,8 +56,9 @@ const restyle = (
   scheme: ThemeIntent['scheme'],
 ): void => {
   /* Stand down and inherit. Anything written here on a previous pass has to come
-     off too, or the panel keeps the last palette it derived for itself. */
-  if (pageIsThemed()) {
+     off too, or the panel keeps the last palette it derived for itself. With no
+     brand there is nothing to derive: the panel is the page's own ink. */
+  if (pageIsThemed() || hex === '') {
     for (const name of [...node.style]) {
       if (name.startsWith('--helix-')) {
         node.style.removeProperty(name)
@@ -228,8 +230,8 @@ export function Showcase(): React.ReactElement {
             One brand color, a full palette
           </helix-text>
           <helix-text>
-            Every surface, border, and text color on this page comes from one brand color. Each text
-            color is checked for contrast against its background.
+            Pick one brand color, and every surface, border, and text color on this page follows
+            from it. Each text color is checked for contrast against its background.
           </helix-text>
           <helix-flex>
             <helix-button emphasis="solid">Read about theming</helix-button>
@@ -275,7 +277,7 @@ export function Showcase(): React.ReactElement {
         value={brand}
       ></helix-color-input>
 
-      <helix-tooltip class={styles.showcaseReset} content="Back to the Fusion blue">
+      <helix-tooltip class={styles.showcaseReset} content="Back to the site's colors">
         <helix-icon-button
           disabled={brand === BRAND || undefined}
           label="Reset the brand color"
