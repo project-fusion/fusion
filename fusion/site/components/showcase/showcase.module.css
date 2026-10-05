@@ -49,7 +49,12 @@
   color: var(--helix-color-foreground-on-primary);
 }
 
+/* **The title takes the card's text color.** A card gives the headings in it
+   the page's foreground, and with no brand set that is the color of this fill:
+   measured black on `oklch(0.21 0 258)` in light mode, and white on
+   `oklch(0.91 0 258)` in dark. */
 .anchorTitle {
+  color: var(--helix-color-foreground-on-primary);
   font-size: var(--helix-text-xl);
   font-weight: var(--helix-weight-semibold);
   line-height: var(--helix-leading-tight);
