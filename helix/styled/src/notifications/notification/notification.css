@@ -475,6 +475,13 @@ slot[name="detail"]::slotted(*) {
   outline-offset: var(--helix-size-focus-offset);
 }
 
+/* A row a reader moved to with the keys. Ringed inside its own edge, so the ring
+   does not run under the row above or below it. */
+[part="item"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}
+
 /* Print: the dismiss control is not a thing on paper, and the unread mark is a
    fill printers drop unevenly. */
 @media print {
