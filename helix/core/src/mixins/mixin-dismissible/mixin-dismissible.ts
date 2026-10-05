@@ -1,6 +1,10 @@
 import type { LitElement } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixDismissEvent } from '../../events/events.js'
+import {
+  deepActiveElement,
+  deepContains,
+} from '../../utils/focusable-elements/focusable-elements.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
 type Constructor<T> = new (...args: any[]) => T
@@ -77,9 +81,59 @@ export const MixinDismissible = <T extends Constructor<LitElement>>(Base: T) => 
 
     /** Fires `helix-dismiss`, and returns `false` if a listener cancels it. */
     dismiss(): boolean {
+      const neighbors = deepContains(this, deepActiveElement()) ? this.neighbors() : []
       const event = this.dismissEvent()
       this.dispatchEvent(event)
+      if (neighbors.length > 0 && !event.defaultPrevented) {
+        this.keepFocus(neighbors)
+      }
       return !event.defaultPrevented
+    }
+
+    /**
+     * The elements of the same kind beside this one, where focus goes if this
+     * one is removed: the next ones nearest first, then the previous ones
+     * nearest first.
+     *
+     * Read before the event, while this element is still beside them.
+     */
+    private neighbors(): HTMLElement[] {
+      const same = (node: Element | null): node is HTMLElement =>
+        node instanceof HTMLElement && node.localName === this.localName
+      const after: HTMLElement[] = []
+      for (let node = this.nextElementSibling; node; node = node.nextElementSibling) {
+        if (same(node)) {
+          after.push(node)
+        }
+      }
+      const before: HTMLElement[] = []
+      for (let node = this.previousElementSibling; node; node = node.previousElementSibling) {
+        if (same(node)) {
+          before.push(node)
+        }
+      }
+      return [...after, ...before]
+    }
+
+    /** Moves focus to a neighbor's dismiss control if removing this element dropped it. */
+    private keepFocus(neighbors: HTMLElement[]): void {
+      const settle = (): void => {
+        const active = document.activeElement
+        if (this.isConnected || (active !== null && active !== document.body)) {
+          return
+        }
+        for (const neighbor of neighbors) {
+          const control =
+            neighbor.isConnected &&
+            neighbor.shadowRoot?.querySelector<HTMLElement>('[part~="dismiss"]')
+          if (control) {
+            control.focus()
+            return
+          }
+        }
+      }
+      settle()
+      requestAnimationFrame(settle)
     }
   }
 

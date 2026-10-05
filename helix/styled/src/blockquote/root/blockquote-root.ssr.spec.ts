@@ -31,9 +31,9 @@ describe('blockquote server output', () => {
     )
   })
 
-  test('the footer ships unmarked, since only a client can see whether it is filled', () => {
+  test('the caption ships unmarked, since only a client can see whether it is filled', () => {
     /* The server has no children to inspect, so it cannot know whether the
-       attribution slot is filled. The honest output is the footer as rendered,
+       attribution slot is filled. The honest output is the caption as rendered,
        and the client marks it once it can look. */
     expect(hasPart(markup, 'attribution')).toBe(true)
     expect(partTag(markup, 'attribution')).not.toContain('data-empty')

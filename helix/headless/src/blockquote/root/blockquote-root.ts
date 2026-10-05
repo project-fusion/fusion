@@ -6,9 +6,13 @@ import { property } from 'lit/decorators.js'
  * @summary A passage set off from the prose around it.
  *
  * @description
- * Renders a `<blockquote>` with a `<footer>` for the attribution, the structure
- * the HTML spec describes. The attribution sits outside the quoted text because
- * it is about the quotation.
+ * Renders a `<figure>` holding the `<blockquote>` and a `<figcaption>` for the
+ * attribution, the structure the HTML spec describes. The attribution sits
+ * outside the quotation because it is about the quotation, and a screen
+ * reader reads the source as the figure's caption.
+ *
+ * The figure keeps the browser's default margins on this tier. Set
+ * `::part(figure) { margin: 0 }` where they are unwanted.
  *
  * For a quotation inside a sentence, use `Quote`.
  *
@@ -21,8 +25,9 @@ import { property } from 'lit/decorators.js'
  * @slot - The quoted passage.
  * @slot attribution - Who said it, and where.
  *
- * @csspart attribution - The footer carrying the source.
+ * @csspart attribution - The `<figcaption>` carrying the source.
  * @csspart blockquote - The quotation.
+ * @csspart figure - The `<figure>` holding the quotation and its attribution.
  */
 @customElement('helix-headless-blockquote')
 export class HelixHeadlessBlockquote extends HelixElement {
@@ -33,13 +38,13 @@ export class HelixHeadlessBlockquote extends HelixElement {
   cite = ''
 
   /**
-   * Says on the footer whether there is an attribution in it.
+   * Says on the caption whether there is an attribution in it.
    *
-   * A `<footer>` with nothing in it is still a block in the quote's flow and
+   * A `<figcaption>` with nothing in it is still a block in the quote's flow and
    * still takes the container's gap, so every blockquote written without an
    * attribution reserved a full space below itself. There is no selector that
    * can ask, `slot:empty` being about a slot's fallback rather than its
-   * assigned nodes, so the component asks and says so on the footer inside this
+   * assigned nodes, so the component asks and says so on the caption inside this
    * shadow root: an attribute on the host is a change to markup the consumer
    * rendered, which React reports on hydration.
    */
@@ -58,13 +63,18 @@ export class HelixHeadlessBlockquote extends HelixElement {
   }
 
   protected override render(): TemplateResult {
-    // The footer is a bare slot inside a real `<footer>`: the element is the
-    // semantics and cannot be omitted, while an unfilled slot inside it is
-    // `display: contents` and generates no box.
-    return html`<blockquote part="blockquote" cite=${this.cite || nothing}>
-      <slot></slot>
-      <footer part="attribution"><slot name="attribution"></slot></footer>
-    </blockquote>`
+    /* The attribution is a bare slot inside a real `<figcaption>`: the element
+       is the semantics and cannot be omitted, while an unfilled slot inside it
+       is `display: contents` and generates no box. Beside the `<blockquote>`,
+       because the HTML spec puts attribution outside it: inside, it was read as
+       part of the quotation. Re-marked on `slotchange`, so an attribution that
+       arrives after the first render is shown. */
+    return html`<figure part="figure">
+      <blockquote part="blockquote" cite=${this.cite || nothing}><slot></slot></blockquote>
+      <figcaption part="attribution"
+        ><slot name="attribution" @slotchange=${() => this.markEmpty()}></slot
+      ></figcaption>
+    </figure>`
   }
 }
 

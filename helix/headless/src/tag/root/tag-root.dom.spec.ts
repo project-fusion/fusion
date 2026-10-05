@@ -21,7 +21,40 @@ describe('tag', () => {
     expect(dismiss?.tagName).toBe('BUTTON')
     // A real button, so Enter and Space work without a key handler.
     expect(dismiss?.getAttribute('type')).toBe('button')
-    expect(dismiss?.getAttribute('aria-label')).toBe('Remove')
+    expect(dismiss?.getAttribute('aria-label')).toBe('Remove Draft')
+  })
+
+  /* Each one was named "Remove", so a screen reader's list of buttons read
+     "Remove, Remove, Remove" with nothing to say which tag each one takes. */
+  test('names each remove control for its own tag, category first', async () => {
+    const host = await mount(
+      '<div><helix-headless-tag dismissible>Apple</helix-headless-tag><helix-headless-tag dismissible><span slot="start">Fruit</span>Plum</helix-headless-tag></div>',
+    )
+    const names = [...host.querySelectorAll('helix-headless-tag')].map((one) =>
+      part(one as HTMLElement, 'dismiss')?.getAttribute('aria-label'),
+    )
+    expect(names).toEqual(['Remove Apple', 'Remove Fruit Plum'])
+  })
+
+  test('and `{label}` puts the words where a language wants them', async () => {
+    const tag = await mount(
+      '<helix-headless-tag dismissible dismiss-label="{label} entfernen">Apfel</helix-headless-tag>',
+    )
+    expect(part(tag, 'dismiss')?.getAttribute('aria-label')).toBe('Apfel entfernen')
+  })
+
+  /* Removing a tag as documented dropped focus to the body, so a keyboard user
+     clearing tags started again from the top of the page. */
+  test('hands focus to the next tag when its handler removes it', async () => {
+    const host = await mount(
+      '<div><helix-headless-tag dismissible>Apple</helix-headless-tag><helix-headless-tag dismissible>Pear</helix-headless-tag></div>',
+    )
+    const [apple, pear] = [...host.querySelectorAll('helix-headless-tag')] as HTMLElement[]
+    apple?.addEventListener('helix-dismiss', () => apple.remove())
+    const control = part(apple as HTMLElement, 'dismiss') as HTMLElement
+    control.focus()
+    control.click()
+    expect(pear?.shadowRoot?.activeElement).toBe(part(pear as HTMLElement, 'dismiss'))
   })
 
   test('the dismiss control can be named for what it removes', async () => {

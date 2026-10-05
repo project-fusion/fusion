@@ -23,6 +23,10 @@ helix-headless-blockquote {
   line-height: 1.2;
 }
 
+helix-headless-blockquote::part(figure) {
+  margin: 0;
+}
+
 helix-headless-blockquote::part(blockquote) {
   display: block;
   margin: 0;

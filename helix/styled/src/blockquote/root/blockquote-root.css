@@ -2,6 +2,12 @@
   display: block;
 }
 
+/* The figure is a frame for the quotation and its caption, with no space of
+   its own. */
+[part="figure"] {
+  margin: var(--helix-space-none);
+}
+
 /* Block, not flex. */
 [part="blockquote"] {
   display: block;
@@ -30,7 +36,7 @@ slot:not([name])::slotted(*) {
   margin-block-start: var(--helix-space-sm);
 }
 
-/* Nothing said it, so no footer and no gap under the quote. */
+/* Nothing said it, so no caption and no gap under the quote. */
 [part="attribution"][data-empty] {
   display: none;
 }
