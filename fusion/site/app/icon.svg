@@ -1,5 +1,16 @@
 <svg aria-label="Fusion" fill="none" role="img" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" >
   <title>Fusion</title>
+  <!-- In ink, as the site is: the fallbacks below are near-black, and a dark
+       color scheme takes near-white. -->
+  <style>
+    @media (prefers-color-scheme: dark) {
+      svg {
+        --logo-color-from: #e1e1e1;
+        --logo-color-mid: #c4c4c4;
+        --logo-color-to: #ababab;
+      }
+    }
+  </style>
   <g transform="translate(42.5 28) scale(2.38)">
     <path
       d="M0 1H72C72 10.9411 63.9411 19 54 19H18C8.05888 19 0 10.9411 0 1Z"
@@ -22,26 +33,26 @@
     <linearGradient 
       gradientTransform="translate(42.5 28) scale(2.38)" gradientUnits="userSpaceOnUse" id="fusion-grad-bar-top"
       x1="0" x2="72" y1="10" y2="10">
-      <stop stop-color="var(--logo-color-from, var(--helix-color-primary, #1068da))" />
-      <stop offset="1" stop-color="var(--logo-color-to, var(--helix-color-primary-active, #0049b8))" />
+      <stop stop-color="var(--logo-color-from, var(--helix-color-primary, #181818))" />
+      <stop offset="1" stop-color="var(--logo-color-to, var(--helix-color-primary-active, #000000))" />
     </linearGradient>
     <linearGradient 
       gradientTransform="translate(42.5 28) scale(2.38)" gradientUnits="userSpaceOnUse" id="fusion-grad-bar-shadow"
       x1="27.9766" x2="71.9766" y1="10" y2="10">
-      <stop stop-color="var(--logo-color-from, var(--helix-color-primary, #1068da))" />
-      <stop offset="1" stop-color="var(--logo-color-to, var(--helix-color-primary-active, #0049b8))" />
+      <stop stop-color="var(--logo-color-from, var(--helix-color-primary, #181818))" />
+      <stop offset="1" stop-color="var(--logo-color-to, var(--helix-color-primary-active, #000000))" />
     </linearGradient>
     <linearGradient 
       gradientTransform="translate(42.5 28) scale(2.38)" gradientUnits="userSpaceOnUse" id="fusion-grad-c"
       x1="27.043" x2="27.043" y1="26" y2="83.6826">
-      <stop stop-color="var(--logo-color-to, var(--helix-color-primary-active, #0049b8))" />
-      <stop offset="1" stop-color="var(--logo-color-mid, var(--helix-color-primary-hover, #0059c8))" />
+      <stop stop-color="var(--logo-color-to, var(--helix-color-primary-active, #000000))" />
+      <stop offset="1" stop-color="var(--logo-color-mid, var(--helix-color-primary-hover, #060606))" />
     </linearGradient>
     <linearGradient 
       gradientTransform="translate(42.5 28) scale(2.38)" gradientUnits="userSpaceOnUse" id="fusion-grad-c-highlight"
       x1="20.1232" x2="20.1232" y1="26" y2="57.6558">
-      <stop stop-color="var(--logo-color-from, var(--helix-color-primary, #1068da))" />
-      <stop offset="1" stop-color="var(--logo-color-from, var(--helix-color-primary, #1068da))" stop-opacity="0.2" />
+      <stop stop-color="var(--logo-color-from, var(--helix-color-primary, #181818))" />
+      <stop offset="1" stop-color="var(--logo-color-from, var(--helix-color-primary, #181818))" stop-opacity="0.2" />
     </linearGradient>
   </defs>
 </svg>

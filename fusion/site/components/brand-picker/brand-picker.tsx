@@ -47,10 +47,10 @@ export const BrandPicker = () => {
       <button
         aria-expanded={open}
         aria-haspopup="dialog"
-        aria-label={`Brand color, currently ${c.brand}`}
+        aria-label={`Brand color, currently ${c.brand || 'ink'}`}
         className={styles.brandSwatch}
         slot="trigger"
-        style={{ '--swatch': c.brand } as React.CSSProperties}
+        style={{ '--swatch': c.brand || 'var(--helix-color-foreground)' } as React.CSSProperties}
         type="button"
       />
       <helix-color-picker
