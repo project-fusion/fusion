@@ -223,3 +223,173 @@ describe('the drawer’s name', () => {
     expect(named.map((one) => one.textContent)).toEqual(['Cart'])
   })
 })
+
+type Drawer = Updatable & {
+  close(value?: string): void
+  returnValue: string
+  show(): void
+}
+
+describe('the footer', () => {
+  test('is a region of its own below the scrolling content, and holds the footer slot', async () => {
+    const drawer = await mount(markup)
+    const footer = part(drawer, 'footer') as HTMLElement
+    expect(footer.querySelector('slot')?.getAttribute('name')).toBe('footer')
+    expect(part(drawer, 'content')?.nextElementSibling).toBe(footer)
+  })
+})
+
+describe('show() and close()', () => {
+  test('open and close it through the request, and close() keeps what it closed with', async () => {
+    const drawer = (await mount(markup)) as Drawer
+    drawer.show()
+    await drawer.updateComplete
+    expect(drawer.open).toBe(true)
+    /* Read while the close is still a request: happy-dom's `close()` resets
+       `returnValue`, where a browser's keeps it. */
+    let returned = ''
+    drawer.addEventListener('helix-before-close', () => {
+      returned = drawer.returnValue
+    })
+    drawer.close('saved')
+    await drawer.updateComplete
+    expect(drawer.open).toBe(false)
+    expect(returned).toBe('saved')
+  })
+
+  test('a refused close keeps the drawer open and the value it had', async () => {
+    const drawer = (await mount(markup)) as Drawer
+    drawer.show()
+    await drawer.updateComplete
+    drawer.addEventListener('helix-before-close', (event) => event.preventDefault())
+    drawer.close('saved')
+    await drawer.updateComplete
+    expect(drawer.open).toBe(true)
+    expect(drawer.returnValue).toBe('')
+  })
+})
+
+describe('Escape on a drawer that is not modal', () => {
+  const browserKnows = 'closedBy' in HTMLDialogElement.prototype
+
+  test('closes it where the browser has no `closedby` to ask', async () => {
+    const drawer = (await mount(
+      markup.replace('<helix-headless-drawer', '<helix-headless-drawer modal="false"'),
+    )) as Drawer
+    drawer.show()
+    await drawer.updateComplete
+    const key = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' })
+    ;(part(drawer, 'panel') as HTMLElement).dispatchEvent(key)
+    await drawer.updateComplete
+    expect(drawer.open).toBe(browserKnows)
+    expect(key.defaultPrevented).toBe(!browserKnows)
+  })
+
+  test('and leaves a modal one to the platform', async () => {
+    const drawer = (await mount(markup)) as Drawer
+    drawer.show()
+    await drawer.updateComplete
+    const key = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' })
+    ;(part(drawer, 'panel') as HTMLElement).dispatchEvent(key)
+    expect(key.defaultPrevented).toBe(false)
+  })
+})
+
+describe('swiping it away', () => {
+  /* happy-dom has no layout, so the panel is given a size, and the pointer is
+     a touch, which is what swipes. */
+  const swipe = async (
+    drawer: Drawer,
+    to: number,
+    { pointerType = 'touch', steps = [to] }: { pointerType?: string; steps?: number[] } = {},
+  ): Promise<HTMLElement> => {
+    const panel = part(drawer, 'panel') as HTMLElement
+    panel.getBoundingClientRect = () => ({ height: 600, width: 320 }) as DOMRect
+    const at = (type: string, x: number, time: number, target: EventTarget = window): void => {
+      const event = new PointerEvent(type, {
+        bubbles: true,
+        button: 0,
+        clientX: x,
+        clientY: 100,
+        composed: true,
+        pointerId: 7,
+        pointerType,
+      })
+      Object.defineProperty(event, 'timeStamp', { value: time })
+      target.dispatchEvent(event)
+    }
+    at('pointerdown', 0, 0, panel)
+    for (const [index, x] of steps.entries()) {
+      at('pointermove', x, 1000 + index * 1000)
+    }
+    return panel
+  }
+  const release = (x: number, time: number): void => {
+    const event = new PointerEvent('pointerup', {
+      bubbles: true,
+      button: 0,
+      clientX: x,
+      clientY: 100,
+      pointerId: 7,
+    })
+    Object.defineProperty(event, 'timeStamp', { value: time })
+    window.dispatchEvent(event)
+  }
+
+  test('follows the finger toward the edge it came from', async () => {
+    const drawer = (await mount(markup)) as Drawer
+    drawer.show()
+    await drawer.updateComplete
+    const panel = await swipe(drawer, 60)
+    expect(panel.style.getPropertyValue('--drawer-swipe-x')).toBe('60px')
+    release(60, 3000)
+    await drawer.updateComplete
+    expect(drawer.open).toBe(true)
+    expect(panel.style.getPropertyValue('--drawer-swipe-x')).toBe('')
+  })
+
+  test('closes it past halfway, through the request', async () => {
+    const drawer = (await mount(markup)) as Drawer
+    drawer.show()
+    await drawer.updateComplete
+    let asked = 0
+    drawer.addEventListener('helix-before-close', () => {
+      asked += 1
+    })
+    await swipe(drawer, 200)
+    release(200, 3000)
+    await drawer.updateComplete
+    expect(asked).toBe(1)
+    expect(drawer.open).toBe(false)
+  })
+
+  test('comes to rest at a snap point', async () => {
+    const drawer = (await mount(
+      markup.replace('<helix-headless-drawer', '<helix-headless-drawer snap-points="0.5 1"'),
+    )) as Drawer
+    drawer.show()
+    await drawer.updateComplete
+    const panel = await swipe(drawer, 150)
+    release(150, 3000)
+    await drawer.updateComplete
+    expect(drawer.open).toBe(true)
+    expect(panel.style.getPropertyValue('--drawer-swipe-x')).toBe('160px')
+  })
+
+  test('a mouse drags nothing, and swipe="false" turns it off', async () => {
+    const drawer = (await mount(markup)) as Drawer
+    drawer.show()
+    await drawer.updateComplete
+    const panel = await swipe(drawer, 200, { pointerType: 'mouse' })
+    expect(panel.style.getPropertyValue('--drawer-swipe-x')).toBe('')
+    release(200, 3000)
+    const off = (await mount(
+      markup.replace('<helix-headless-drawer', '<helix-headless-drawer swipe="false"'),
+    )) as Drawer
+    off.show()
+    await off.updateComplete
+    const still = await swipe(off, 200)
+    expect(still.style.getPropertyValue('--drawer-swipe-x')).toBe('')
+    release(200, 3000)
+  })
+})

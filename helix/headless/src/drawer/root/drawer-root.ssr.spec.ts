@@ -74,3 +74,23 @@ describe('drawer server output', () => {
     ).not.toContain('closedby')
   })
 })
+
+describe('drawer server output, the footer', () => {
+  test('is served as a region below the content, holding the footer slot', () => {
+    const served = rendered(
+      ssr(html`<helix-headless-drawer label="Filters"></helix-headless-drawer>`),
+      'helix-headless-drawer',
+    )
+    expect(served).toMatch(
+      /<div part="content">[\s\S]*<\/div>\s*<div part="footer"><slot name="footer"><\/slot><\/div>/,
+    )
+  })
+
+  test('and writes no swipe offset, which only a moving panel has', () => {
+    const served = rendered(
+      ssr(html`<helix-headless-drawer label="Filters" open></helix-headless-drawer>`),
+      'helix-headless-drawer',
+    )
+    expect(served).not.toContain('--drawer-swipe')
+  })
+})

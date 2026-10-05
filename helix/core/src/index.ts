@@ -91,6 +91,10 @@ export {
   type SourceHost,
 } from './controllers/source-controller/source-controller.js'
 export {
+  SwipeController,
+  type SwipeOptions,
+} from './controllers/swipe-controller/swipe-controller.js'
+export {
   type TokenColor,
   TokenColorController,
 } from './controllers/token-color-controller/token-color-controller.js'
@@ -366,6 +370,19 @@ export { lockScroll, scrollHolders, unlockScroll } from './utils/scroll-lock/scr
 export { slotFilled } from './utils/slot-filled/slot-filled.js'
 export { slottedWords } from './utils/slotted-words/slotted-words.js'
 export { splitValues } from './utils/split-values/split-values.js'
+export {
+  edgeOffset,
+  FLING,
+  parseSnapPoints,
+  type SwipeAxis,
+  type SwipeEdge,
+  type SwipeRelease,
+  settleSwipe,
+  snapTravel,
+  swipeAxis,
+  swipeEdge,
+  towardEdge,
+} from './utils/swipe/swipe.js'
 export { tellDisclosure } from './utils/tell-disclosure/tell-disclosure.js'
 export { subscribe } from './utils/ticker/ticker.js'
 export {
