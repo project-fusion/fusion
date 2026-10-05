@@ -127,21 +127,42 @@ const numberOf = (value: string): number => Number(value.replaceAll(',', ''))
  * `rowheader` for a `header` cell in a row of values. Rows are
  * `display: contents`, so their cells become items of the one grid.
  *
- * A column with `sortable` and a `field` sorts the rows by the text of its
- * cells, numbers by their value. Your markup is not reordered: the table draws
- * the rows in the sorted order. `helix-sort` asks first, so you can refuse it
- * and reorder the rows yourself.
+ * **Sorting.** A column with `sortable` and a `field` draws its heading as a
+ * button that sorts the rows by the text of its cells, numbers by their value.
+ * Your markup is not reordered: the table draws the rows in the sorted order.
+ *
+ * 1. Each press cycles the column through ascending, descending, and the
+ *    order the rows were written in, which keeps a server's own ranking
+ *    reachable.
+ * 2. `helix-sort` asks first, with `field:direction`, or empty for the written
+ *    order. Refuse it to keep the order, or to sort the rows yourself and set
+ *    `sort`.
+ * 3. `helix-sorted` follows once the order stands, and `sort` holds it.
+ * 4. The heading carries `aria-sort`, and a screen reader hears `sorted-label`
+ *    ("Sorted by Name, ascending") or `unsorted-label` from a polite region.
+ *
+ * Tab reaches each sort button, and Enter or Space presses it.
  *
  * The `heading` slot names the table: slot a heading or a line of text into
  * it, and the table is named by its words. An `aria-label` or `aria-labelledby` on the
  * host wins over it.
  *
- * `selectable` adds a column of checkboxes. Each row is known by its `value`,
- * and `selected` holds the chosen keys, comma separated, the same shape
- * `DataTable` uses. The checkbox in the heading selects every row. For a grid
- * a reader moves through with the arrow keys, with typeahead and range
- * selection, use `DataTable`. To act on one row, put a link or a button in a
- * cell.
+ * **Selecting.** `selectable` adds a column of checkboxes.
+ *
+ * 1. Each row is known by its `value`, or by its place among the rows where it
+ *    has none, and `selected` holds the chosen keys, comma separated, the same
+ *    shape `DataTable` uses. `default-selected` is where it starts.
+ * 2. A row's checkbox is named by `select-row-label` ("Select {row}") with the
+ *    words of the row's first cell. The checkbox in the heading selects every
+ *    row, and shows a dash while only some are chosen.
+ * 3. `helix-select` asks first, with every key the change would leave.
+ *    Refuse it to keep the selection. `helix-selected` follows once it stands.
+ * 4. A chosen row takes `:state(selected)`, and a screen reader hears
+ *    `selected-label` ("2 selected") from a polite region.
+ *
+ * Tab reaches each checkbox, and Space ticks it. For a grid a reader moves
+ * through with the arrow keys, with typeahead and range selection, use
+ * `DataTable`. To act on one row, put a link or a button in a cell.
  *
  * The CSS custom properties listed for this component are written by it and
  * read by the stylesheet that draws it. Do not set them. Each holds a number

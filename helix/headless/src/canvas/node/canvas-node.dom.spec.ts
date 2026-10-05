@@ -28,6 +28,17 @@ describe('canvas node', () => {
     expect((part(group, 'node') as HTMLElement).getAttribute('aria-label')).toBe('A group')
   })
 
+  test('a card is named by its label, and by its content where it has none', async () => {
+    const named = part(await node('label="Kickoff"'), 'node') as HTMLElement
+    expect(named.getAttribute('aria-label')).toBe('Kickoff')
+    expect(named.hasAttribute('aria-labelledby')).toBe(false)
+    const host = await node()
+    const plain = part(host, 'node') as HTMLElement
+    expect(plain.hasAttribute('aria-label')).toBe(false)
+    const by = plain.getAttribute('aria-labelledby') as string
+    expect(host.shadowRoot?.getElementById(by)?.localName).toBe('slot')
+  })
+
   test('nothing is written onto the host that the consumer did not write', async () => {
     /* A card with no type is a card of text, and a default that reflected would
        put `type="text"` onto markup a server never sent. */
