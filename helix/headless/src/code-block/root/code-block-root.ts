@@ -263,9 +263,17 @@ export class HelixHeadlessCodeBlock extends HelixElement {
               @slotchange=${() => this.requestUpdate()}
             ></slot>`
     /* Inside the `<pre>`, so the numbers are set in the code's own face and
-       line height and stay level with its lines. */
+       line height and stay level with its lines.
+
+       **No lines renders `nothing`.** A server has no code to count, and an
+       empty string serves no text node between the part's markers. Hydration
+       then remembers the string as written, and the numbers the next render
+       brings are written into the closing marker, a comment, so a served
+       gutter stayed empty for good. `nothing` makes that render insert the
+       text. */
+    const lines = lineCount(text)
     const gutter = this.lineNumbers
-      ? html`<span part="gutter" aria-hidden="true">${gutterNumbers(lineCount(text))}</span>`
+      ? html`<span part="gutter" aria-hidden="true">${lines === 0 ? nothing : gutterNumbers(lines)}</span>`
       : nothing
     return html`${this.renderHeader(this.label)}
       <div part="frame">
