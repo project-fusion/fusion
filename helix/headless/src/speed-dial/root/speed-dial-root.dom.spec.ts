@@ -29,6 +29,14 @@ const dial = async (extra = ''): Promise<{ actions: Action[]; host: Dial }> => {
   return { actions, host }
 }
 
+/* The click is sent from the trigger's slot: happy-dom does not carry a click
+   on a slotted element through the slot it is assigned to. */
+const pressTrigger = (host: Dial): void => {
+  host.shadowRoot
+    ?.querySelector('slot[name="trigger"]')
+    ?.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+}
+
 const press = (host: Dial, key: string) => {
   host.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key }))
 }
@@ -106,6 +114,7 @@ describe('a speed dial', () => {
     await host.updateComplete
     await trigger.updateComplete
     expect(trigger.expanded).toBe(true)
+    expect(part(trigger, 'button')?.getAttribute('aria-haspopup')).toBe('menu')
     expect(trigger.hasAttribute('aria-expanded')).toBe(false)
     expect(part(trigger, 'button')?.getAttribute('aria-expanded')).toBe('true')
     expect((part(host, 'actions') as HTMLElement).hasAttribute('hidden')).toBe(false)
@@ -139,12 +148,26 @@ describe('a speed dial', () => {
     expect(trigger.getAttribute('aria-expanded')).toBe('false')
   })
 
-  test('opening lands on the first action, which is where a keyboard expects it', async () => {
+  test('opening from the trigger lands on the first action, which is where a keyboard expects it', async () => {
     const { actions, host } = await dial()
-    host.open = true
+    pressTrigger(host)
     await host.updateComplete
     await host.updateComplete
     expect(focused(at(actions, 0))).toBe(at(actions, 0))
+  })
+
+  /* `default-open` on load, or a script opening the dial while the reader is
+     typing somewhere else, leaves focus where the reader put it. */
+  test('opening any other way leaves focus where it is', async () => {
+    const { host } = await dial()
+    const field = document.createElement('input')
+    document.body.append(field)
+    field.focus()
+    host.open = true
+    await host.updateComplete
+    await host.updateComplete
+    expect(field.ownerDocument.activeElement).toBe(field)
+    field.remove()
   })
 
   test('every arrow moves, because a dial reserves nothing', async () => {
@@ -152,7 +175,7 @@ describe('a speed dial', () => {
        A dial goes nowhere, so all four move and a reader who guesses either axis
        is answered, which is the controller's own house position. */
     const { actions, host } = await dial()
-    host.open = true
+    pressTrigger(host)
     await host.updateComplete
     await host.updateComplete
 
@@ -217,5 +240,53 @@ describe('a speed dial', () => {
     host.addEventListener('helix-select', () => taken.push('x'))
     ;(part(action, 'item') as HTMLElement).click()
     expect(taken).toEqual([])
+  })
+})
+
+describe('a speed dial and the keys around it', () => {
+  const pressOn = (target: Element, key: string): KeyboardEvent => {
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key,
+    })
+    target.dispatchEvent(event)
+    return event
+  }
+
+  /* A dialog around the dial closes on Escape, and the trigger is where focus
+     rests after every use of the dial. */
+  test('lets Escape through while it is closed', async () => {
+    const { host } = await dial()
+    let heard = false
+    host.parentElement?.addEventListener('keydown', () => {
+      heard = true
+    })
+    const event = pressOn(host.querySelector('button[slot="trigger"]') as Element, 'Escape')
+    expect(event.defaultPrevented).toBe(false)
+    expect(heard).toBe(true)
+  })
+
+  test('keeps the actions out of the tab order, and closes when Tab leaves', async () => {
+    const { actions, host } = await dial()
+    expect(part(at(actions, 0), 'item')?.getAttribute('tabindex')).toBe('-1')
+    host.open = true
+    await host.updateComplete
+    const event = pressOn(at(actions, 0), 'Tab')
+    await host.updateComplete
+    expect(event.defaultPrevented).toBe(false)
+    expect(host.open).toBe(false)
+  })
+
+  test('moves to the next action that starts with a typed letter', async () => {
+    const { actions, host } = await dial()
+    pressTrigger(host)
+    await host.updateComplete
+    await host.updateComplete
+    pressOn(at(actions, 0), 'd')
+    expect(focused(at(actions, 0))).toBe(at(actions, 1))
+    pressOn(at(actions, 1), 'd')
+    expect(focused(at(actions, 0))).toBe(at(actions, 2))
   })
 })

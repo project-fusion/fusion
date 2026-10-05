@@ -7,6 +7,7 @@ import {
   MixinControllerOpen,
   type Placement,
   PopoverController,
+  slottedWords,
   tellDisclosure,
 } from '@fusion.dev/helix-core'
 import { plus } from '@fusion.dev/helix-icons'
@@ -24,8 +25,8 @@ import type { HelixHeadlessSpeedDialItem } from '../item/speed-dial-item.js'
  * - `PopoverController` for the panel
  * - `MixinControllerOpen` for open and closed
  *
- * It is a separate component because a speed dial has no submenus, headers,
- * checkable items, or type-ahead.
+ * It is a separate component because a speed dial has no submenus, headers, or
+ * checkable items.
  *
  * You slot the trigger. The usual floating action button is `IconButton` with
  * `shape="circle"` and `raised`. There is no `helix-fab`, because `IconButton`
@@ -34,7 +35,9 @@ import type { HelixHeadlessSpeedDialItem } from '../item/speed-dial-item.js'
  *
  * All four arrow keys move through the actions, because a speed dial has no
  * nested levels to reserve the horizontal pair for. This is the default
- * behavior of the keyboard controller.
+ * behavior of the keyboard controller. Typing a letter moves to the next
+ * action whose name starts with it. The actions are one tab stop, and Tab
+ * closes the dial and moves on.
  *
  * @since 0.1.0
  * @status stable
@@ -83,9 +86,21 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
      Delete must not delete, which is the difference between a set of commands
      and a set of choices. */
   protected readonly keys = new KeyboardNavigationController(this, {
-    items: () => this.items,
+    // None while closed, when the actions are hidden and cannot take focus.
+    items: () => (this.open ? this.items : []),
     selects: () => false,
+    typeahead: (item) => slottedWords(item as HelixHeadlessSpeedDialItem, ['']),
   })
+
+  /**
+   * Whether the trigger asked for the open that is under way, which is the one
+   * open that moves focus onto the first action.
+   *
+   * A dial opened by `default-open` or by a script setting `open` leaves focus
+   * where it is: on load that is wherever `autofocus` put it, and later it is
+   * wherever the reader is typing.
+   */
+  private focusOnOpen = false
 
   /* Registered rather than held, the way `ToggleGroup` holds its keys: the
      controller follows `open` on its own, so nothing here talks to it after
@@ -128,7 +143,11 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
   }
 
   private readonly handleTriggerClick = (): void => {
-    this.requestOpen(!this.open)
+    if (this.open) {
+      this.requestOpen(false)
+      return
+    }
+    this.focusOnOpen = this.requestOpen(true)
   }
 
   /* Chosen, so the dial shuts behind it. An action that leaves the fan standing
@@ -147,6 +166,17 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
   }
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {
+    /* Closed, a key is not this element's, so Escape reaches a dialog around
+       the dial. */
+    if (!this.open) {
+      return
+    }
+    if (event.key === 'Tab') {
+      /* Out, and the dial goes with it, as `Menu` does. Focus carries on to
+         where the reader tabbed, so it is not put back on the trigger. */
+      this.requestOpen(false)
+      return
+    }
     if (event.key !== 'Escape') {
       return
     }
@@ -195,13 +225,14 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
     if (trigger === this.partNamed('trigger')) {
       return
     }
-    tellDisclosure(trigger, this.open)
+    tellDisclosure(trigger, this.open, 'menu')
   }
 
   protected override updated(changed: PropertyValues): void {
     super.updated?.(changed)
     this.announce()
-    if (this.open) {
+    if (this.open && this.focusOnOpen) {
+      this.focusOnOpen = false
       /* On the first action, which is where a reader who opened this with the
          keyboard expects to be. The pointer does not mind either way.
 
