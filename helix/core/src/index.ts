@@ -290,6 +290,7 @@ export {
   type ViewportWay,
 } from './mixins/mixin-viewport/mixin-viewport.js'
 export { anchorElement } from './utils/anchor-element/anchor-element.js'
+export { arrowReach, sideOf } from './utils/arrow/arrow.js'
 export {
   addDays,
   addMonths,
@@ -343,6 +344,11 @@ export {
   definedTags,
   duplicateRegistrations,
 } from './utils/custom-element/custom-element.js'
+export {
+  type DrawDismissOptions,
+  drawDismiss,
+  drawDismissGlyph,
+} from './utils/draw-dismiss/draw-dismiss.js'
 export { type DrawIconOptions, drawIcon } from './utils/draw-icon/draw-icon.js'
 export { CHART_PLOT, drawTooltip } from './utils/draw-tooltip/draw-tooltip.js'
 export { elapsedTime } from './utils/elapsed-time/elapsed-time.js'
@@ -364,6 +370,7 @@ export {
   type LinkTarget,
 } from './utils/follow-link/follow-link.js'
 export { formatNumbers } from './utils/format-numbers/format-numbers.js'
+export { headingIn, headingsIn } from './utils/heading-in/heading-in.js'
 export { type HostAria, hostAria } from './utils/host-aria/host-aria.js'
 export {
   type DisableableItem,
@@ -394,6 +401,12 @@ export {
   seriesKey,
   unbroken,
 } from './utils/read-series/read-series.js'
+export {
+  type ElementsProperty,
+  linkDescription,
+  reflectElements,
+  unlinkDescription,
+} from './utils/reflect-elements/reflect-elements.js'
 export {
   type Relative,
   type RelativeOptions,

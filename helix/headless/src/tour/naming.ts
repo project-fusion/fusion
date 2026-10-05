@@ -1,4 +1,4 @@
-const HEADING = 'h1, h2, h3, h4, h5, h6, [role="heading"]'
+import { headingIn } from '@fusion.dev/helix-core'
 
 /** What names and describes a stop's panel. */
 export interface StopNaming {
@@ -38,12 +38,8 @@ export const stopNaming = ({
   labeled,
   progress,
 }: StopWords): StopNaming => {
-  const found =
-    heading.length > 0
-      ? [...heading]
-      : content
-          .flatMap((one) => (one.matches(HEADING) ? [one] : [...one.querySelectorAll(HEADING)]))
-          .slice(0, 1)
+  const first = heading.length > 0 ? null : headingIn(content)
+  const found = heading.length > 0 ? [...heading] : first ? [first] : []
   const place = progress ? [progress] : []
   if (found.length === 0 && !labeled) {
     return { describedBy: [...description], labelledBy: place }

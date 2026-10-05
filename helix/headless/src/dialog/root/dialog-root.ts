@@ -2,17 +2,19 @@ import {
   AriaForwardController,
   CommandController,
   customElement,
+  drawDismiss,
+  drawDismissGlyph,
   HelixElement,
+  headingsIn,
   hostAria,
   lockScroll,
   MixinControllerOpen,
   OpenPhaseController,
+  reflectElements,
   unlockScroll,
 } from '@fusion.dev/helix-core'
-import { x } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { wordsIn } from '../description.js'
 
 /**
@@ -302,21 +304,17 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
    * either. A browser without element reflection keeps the fallback name.
    */
   private nameByHeader(): void {
-    const dialog = this.dialog as
-      | (HTMLDialogElement & { ariaLabelledByElements?: Element[] | null })
-      | null
-    if (!dialog || !('ariaLabelledByElements' in dialog)) {
-      return
-    }
     const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="header"]')
-    const heading = this.label || this.hasAttribute('aria-labelledby') ? [] : headingsIn(slot)
-    if (heading.length > 0) {
-      dialog.ariaLabelledByElements = heading
-      this.namedByHeader = true
-    } else if (this.namedByHeader) {
-      dialog.ariaLabelledByElements = null
-      this.namedByHeader = false
-    }
+    const heading =
+      this.label || this.hasAttribute('aria-labelledby')
+        ? []
+        : headingsIn(slot?.assignedElements({ flatten: true }) ?? [])
+    this.namedByHeader = reflectElements(
+      this.dialog,
+      'ariaLabelledByElements',
+      heading,
+      this.namedByHeader,
+    )
   }
 
   /** Whether the body's words are what currently describe the dialog. */
@@ -333,21 +331,14 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
    * `aria-describedby` on the host comes first.
    */
   private describeByBody(): void {
-    const dialog = this.dialog as
-      | (HTMLDialogElement & { ariaDescribedByElements?: Element[] | null })
-      | null
-    if (!dialog || !('ariaDescribedByElements' in dialog)) {
-      return
-    }
     const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot:not([name])')
     const words = this.hasAttribute('aria-describedby') ? [] : wordsIn(slot)
-    if (words.length > 0) {
-      dialog.ariaDescribedByElements = words
-      this.describedByBody = true
-    } else if (this.describedByBody) {
-      dialog.ariaDescribedByElements = null
-      this.describedByBody = false
-    }
+    this.describedByBody = reflectElements(
+      this.dialog,
+      'ariaDescribedByElements',
+      words,
+      this.describedByBody,
+    )
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -515,9 +506,7 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
    */
   protected renderDismissIcon(): TemplateResult {
     return html`<slot name="dismiss-icon">
-      <svg part="dismiss-mark" viewBox=${x.viewBox} fill="currentColor" aria-hidden="true">
-        ${unsafeSVG(x.content)}
-      </svg>
+      ${drawDismissGlyph()}
     </slot>`
   }
 
@@ -541,34 +530,15 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
       <slot name="footer" part="footer"></slot>
       ${
         this.dismissible
-          ? html`<button
-              part="dismiss"
-              type="button"
-              aria-label=${this.dismissLabel}
-              @click=${() => this.close()}
-            >
-              ${this.renderDismissIcon()}
-            </button>`
+          ? drawDismiss({
+              label: this.dismissLabel,
+              mark: this.renderDismissIcon(),
+              onDismiss: () => this.close(),
+            })
           : nothing
       }
     </dialog>`
   }
-}
-
-/**
- * The headings among a slot's elements, or the elements themselves when none
- * is a heading or holds one.
- *
- * A header region can hold a close button beside its title, and a name that
- * read "Delete project Close" would be worse than the title alone.
- */
-const headingsIn = (slot: HTMLSlotElement | null): Element[] => {
-  const assigned = slot?.assignedElements({ flatten: true }) ?? []
-  const heading = 'h1, h2, h3, h4, h5, h6, [role="heading"]'
-  const found = assigned.flatMap((one) =>
-    one.matches(heading) ? [one] : [...one.querySelectorAll(heading)].slice(0, 1),
-  )
-  return found.length > 0 ? found.slice(0, 1) : assigned
 }
 
 declare global {

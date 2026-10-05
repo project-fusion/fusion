@@ -1,18 +1,22 @@
 import {
   anchorElement,
+  arrowReach,
   customElement,
   elementById,
   HelixElement,
   hostAria,
+  linkDescription,
   MixinControllerOpen,
   type Placement,
   PopoverController,
   reportRuntime,
   type Side,
+  sideOf,
+  unlinkDescription,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
-import { focusTarget, linkDescription, unlinkDescription } from '../describe.js'
+import { focusTarget } from '../focus-target.js'
 
 /** Tags that exist to hold something, and say nothing when they hold nothing. */
 const GENERIC = new Set(['div', 'p', 'section', 'span'])
@@ -317,10 +321,7 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
      * `offsetWidth` and not `getBoundingClientRect`, which reports the rotated
      * box and would count the reach twice. Zero while the bubble is closed and
      * unrendered, which is right: there is nothing to place then either. */
-    offset: () => {
-      const point = this.partNamed('arrow')
-      return this.offset + (point?.offsetWidth ?? 0) / Math.SQRT2
-    },
+    offset: () => this.offset + arrowReach(this.partNamed('arrow')),
     /* Escape closes the bubble from wherever the reader is, and this is the
        one listener that hears it.
 
@@ -351,7 +352,7 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
        part name because a tooltip is usually inside another component, where
        a document cannot reach its host's state. */
     onPlace: (placement) => {
-      const side = placement.split('-')[0] as Side
+      const side = sideOf(placement)
       this.toggleState('placed-bottom', side === 'bottom')
       this.toggleState('placed-left', side === 'left')
       this.toggleState('placed-right', side === 'right')

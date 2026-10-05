@@ -1,22 +1,41 @@
-/** An element with ARIA element reflection, where the engine has it. */
-type Describable = Element & { ariaDescribedByElements?: Element[] | null }
+/** The ARIA properties that take elements rather than ids. */
+export type ElementsProperty = 'ariaDescribedByElements' | 'ariaLabelledByElements'
 
-/** What takes focus inside a component that hands its focus on. */
-const CONTROL =
-  'a[href], button, input, select, textarea, [contenteditable], [tabindex]:not([tabindex="-1"])'
+/** An element with ARIA element reflection, where the engine has it. */
+type Reflecting = Element & Partial<Record<ElementsProperty, Element[] | null>>
 
 /**
- * The element focus lands on when a trigger is focused: the trigger itself,
- * or, for a component that delegates focus, the control inside its shadow root,
- * followed down through any component nested there.
+ * Writes elements onto an ARIA element-reflection property of `target`, or
+ * clears it, and says whether the property is now this caller's.
+ *
+ * Element references, because the words are in the light DOM and the panel in
+ * a shadow root, which an IDREF cannot cross. Nothing is written where the
+ * engine has no reflection, which keeps the fallback name, and the answer is
+ * then `owned` as it was. **An empty list clears the property only where the
+ * caller wrote it**, which `owned` says, so a name another hand wrote stays.
+ *
+ * Dialog and Drawer name their panel by its header this way, Popover by its
+ * first heading, Dialog describes itself by its body, and a Tour stop names
+ * and describes its panel.
  */
-export const focusTarget = (trigger: Element): Element => {
-  const root = trigger.shadowRoot
-  if (!root?.delegatesFocus) {
-    return trigger
+export const reflectElements = (
+  target: Element | null | undefined,
+  property: ElementsProperty,
+  elements: readonly Element[],
+  owned: boolean,
+): boolean => {
+  const element = target as Reflecting | null | undefined
+  if (!element || !(property in element)) {
+    return owned
   }
-  const inner = root.querySelector(CONTROL)
-  return inner ? focusTarget(inner) : trigger
+  if (elements.length > 0) {
+    element[property] = elements as Element[]
+    return true
+  }
+  if (owned) {
+    element[property] = null
+  }
+  return false
 }
 
 /**
@@ -33,10 +52,11 @@ export const focusTarget = (trigger: Element): Element => {
  *   hydration, and never where the consumer wrote `aria-describedby` or
  *   `aria-labelledby` themselves, which are theirs to keep.
  *
- * Existing references are kept, so a field's hint still describes it.
+ * Existing references are kept, so a field's hint still describes it. Tooltip
+ * describes its trigger this way.
  */
 export const linkDescription = (target: Element, by: Element, light: boolean): boolean => {
-  const element = target as Describable
+  const element = target as Reflecting
   if (!('ariaDescribedByElements' in element)) {
     return false
   }
@@ -57,7 +77,7 @@ export const linkDescription = (target: Element, by: Element, light: boolean): b
 
 /** Takes `by` back off the elements that describe `target`, leaving the rest. */
 export const unlinkDescription = (target: Element, by: Element): void => {
-  const element = target as Describable
+  const element = target as Reflecting
   const current = element.ariaDescribedByElements
   if (!current?.includes(by)) {
     return

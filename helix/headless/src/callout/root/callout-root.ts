@@ -1,12 +1,13 @@
 import {
   customElement,
+  drawDismiss,
+  drawDismissGlyph,
   HelixElement,
   hostAria,
   MixinDismissible,
   TONE_MARKS,
   toneMark,
 } from '@fusion.dev/helix-core'
-import { x } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
@@ -113,9 +114,7 @@ export class HelixHeadlessCallout extends MixinDismissible(HelixElement) {
    */
   protected renderDismissIcon(): TemplateResult {
     return html`<slot name="dismiss-icon">
-      <svg part="dismiss-mark" viewBox=${x.viewBox} fill="currentColor" aria-hidden="true">
-        ${unsafeSVG(x.content)}
-      </svg>
+      ${drawDismissGlyph()}
     </slot>`
   }
 
@@ -140,14 +139,11 @@ export class HelixHeadlessCallout extends MixinDismissible(HelixElement) {
         /* A plain `<button>`, as `Announcement` draws its own, so the styled
            tier reaches the control itself through `[part="dismiss"]`. */
         this.dismissible
-          ? html`<button
-              part="dismiss"
-              type="button"
-              aria-label=${this.dismissLabel}
-              @click=${() => this.dismiss()}
-            >
-              ${this.renderDismissIcon()}
-            </button>`
+          ? drawDismiss({
+              label: this.dismissLabel,
+              mark: this.renderDismissIcon(),
+              onDismiss: () => this.dismiss(),
+            })
           : nothing
       }`
   }
