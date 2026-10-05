@@ -151,3 +151,54 @@ describe('the no-copy attribute follows the property', () => {
     expect(el.hasAttribute('no-copy')).toBe(false)
   })
 })
+
+/* Expressive Code's line numbers and Shiki's or Prism's highlighting, with the
+   code itself left in the slot so a copy is the code as written. */
+describe('line numbers and a highlighter', () => {
+  type Block = Updatable & { highlight?: (code: string) => string }
+  const copyValue = (el: Element): string =>
+    (el.shadowRoot?.querySelector('helix-headless-copy-button') as HTMLElement & { value: string })
+      .value
+
+  test('numbers each line in a gutter hidden from readers and left out of a copy', async () => {
+    const el = (await mount(
+      '<helix-headless-code-block line-numbers>one\ntwo\nthree\n</helix-headless-code-block>',
+    )) as Block
+    await el.updateComplete
+    await el.updateComplete
+    const gutter = el.shadowRoot?.querySelector('[part="gutter"]')
+    expect(gutter?.textContent).toBe('1\n2\n3')
+    expect(gutter?.getAttribute('aria-hidden')).toBe('true')
+    expect(gutter?.parentElement?.getAttribute('part')).toBe('block')
+    expect(copyValue(el)).toBe('one\ntwo\nthree\n')
+  })
+
+  test('draws no gutter unless asked', async () => {
+    const el = await mount('<helix-headless-code-block>one</helix-headless-code-block>')
+    expect(el.shadowRoot?.querySelector('[part="gutter"]')).toBeNull()
+  })
+
+  test('draws what the highlighter returns, and copies the code as written', async () => {
+    const el = (await mount('<helix-headless-code-block></helix-headless-code-block>')) as Block
+    el.highlight = (code) => `<span class="keyword">${code.replace(/</g, '&lt;')}</span>`
+    el.textContent = 'const a = 1'
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await el.updateComplete
+    const code = el.shadowRoot?.querySelector('[part="code"]')
+    expect(code?.querySelector('.keyword')?.textContent).toBe('const a = 1')
+    expect(el.shadowRoot?.querySelector('slot:not([name])')?.hasAttribute('hidden')).toBe(true)
+    expect(copyValue(el)).toBe('const a = 1')
+  })
+
+  test('is not asked about empty code', async () => {
+    let asked = 0
+    const el = (await mount('<helix-headless-code-block></helix-headless-code-block>')) as Block
+    el.highlight = (code) => {
+      asked += 1
+      return code
+    }
+    await el.updateComplete
+    expect(asked).toBe(0)
+    expect(el.shadowRoot?.querySelector('slot:not([name])')?.hasAttribute('hidden')).toBe(false)
+  })
+})

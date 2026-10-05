@@ -1,8 +1,10 @@
 import { customElement, HelixElement } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { unsafeHTML } from 'lit/directives/unsafe-html.js'
 import { html } from 'lit/static-html.js'
 import '../../copy-button/index.js'
+import { gutterNumbers, lineCount } from '../lines.js'
 import { type DiffFile, type DiffHunk, type DiffLine, pairLines, parsePatch } from '../patch.js'
 
 /**
@@ -17,6 +19,12 @@ import { type DiffFile, type DiffHunk, type DiffLine, pairLines, parsePatch } fr
  * the slotted text, so there is no second copy of the code to keep in sync.
  *
  * For a fragment of code inside a sentence, use `Code`.
+ *
+ * Set `line-numbers` to number the lines in a gutter beside the code, hidden
+ * from the accessibility tree and left out of a copy. Set `highlight` to a
+ * function that turns the code into highlighted markup, such as one wrapping
+ * Shiki or Prism, and the block draws what it returns; the code stays in the
+ * slot, so the copy button and the page's own text are the code as written.
  *
  * Set `diff` to show a change. Put a unified diff, the output of `git diff` or
  * `diff -u`, in the same slot, and the block draws the lines it added and
@@ -46,6 +54,7 @@ import { type DiffFile, type DiffHunk, type DiffLine, pairLines, parsePatch } fr
  * @csspart context - In a diff, a line both versions share.
  * @csspart copy - The copy button. It sits in the header when there is one, and beside the code otherwise.
  * @csspart copy-button - The inner button.
+ * @csspart copy-live - The copy button's live region, which speaks while the button is pending.
  * @csspart copy-mark - The clipboard icon, and the check mark that replaces it after a copy.
  * @csspart copy-text - The words on that button, trimmed to their capitals and baseline.
  * @csspart copy-tooltip - The copy button's tooltip.
@@ -61,6 +70,7 @@ import { type DiffFile, type DiffHunk, type DiffLine, pairLines, parsePatch } fr
  * @csspart file - In a diff, one file's header and block.
  * @csspart filler - In a split diff, the empty row opposite a line the other side does not have.
  * @csspart frame - The code, and the copy button beside it where there is no header.
+ * @csspart gutter - The line numbers beside the code, shown when `line-numbers` is set.
  * @csspart header - The bar that holds the name and the copy button, shown when there is a name.
  * @csspart hunk - In a diff, a `@@` line saying where the lines under it are.
  * @csspart label - The file name or language, where one is given.
@@ -96,6 +106,21 @@ export class HelixHeadlessCodeBlock extends HelixElement {
   diff = false
 
   /**
+   * Turns the code into highlighted markup, which the block draws in place of
+   * the plain text.
+   *
+   * Called with the code as written and returning HTML, such as the output of
+   * Shiki's `codeToHtml` or Prism's `highlight`. **The markup is drawn as
+   * given**, so it has to escape the code it was handed, which those
+   * highlighters do. Bind the language in the function you pass. The code
+   * stays in the slot, so the copy button copies it as written and a reader
+   * without the script still has it. Not called on a server, which has no code
+   * to read, nor for a diff.
+   */
+  @property({ attribute: false })
+  highlight?: (code: string) => string
+
+  /**
    * The block's name, usually a file name or a language.
    *
    * In a diff, each file is named from the patch, and this names a patch that
@@ -103,6 +128,17 @@ export class HelixHeadlessCodeBlock extends HelixElement {
    */
   @property()
   label = ''
+
+  /**
+   * Whether the lines are numbered in a gutter beside the code.
+   *
+   * The numbers are hidden from the accessibility tree and are not part of a
+   * copy, which takes the code alone. Reflected, because the stylesheet lays
+   * the gutter out beside the code. A diff numbers its lines from its hunks
+   * whether or not this is set.
+   */
+  @property({ attribute: 'line-numbers', reflect: true, type: Boolean })
+  lineNumbers = false
 
   /**
    * Whether to leave the copy button off.
@@ -215,10 +251,25 @@ export class HelixHeadlessCodeBlock extends HelixElement {
     if (files.length > 0) {
       return this.renderDiff(files)
     }
+    const text = this.text
+    const highlighted = this.highlight && text !== '' ? this.highlight(text) : undefined
+    /* The slot stays either way, hidden under highlighted markup, so a change
+       to the code still reaches `slotchange` and the code stays the page's. */
+    const code =
+      highlighted === undefined
+        ? html`<code part="code"><slot @slotchange=${() => this.requestUpdate()}></slot></code>`
+        : html`<code part="code">${unsafeHTML(highlighted)}</code><slot
+              hidden
+              @slotchange=${() => this.requestUpdate()}
+            ></slot>`
+    /* Inside the `<pre>`, so the numbers are set in the code's own face and
+       line height and stay level with its lines. */
+    const gutter = this.lineNumbers
+      ? html`<span part="gutter" aria-hidden="true">${gutterNumbers(lineCount(text))}</span>`
+      : nothing
     return html`${this.renderHeader(this.label)}
       <div part="frame">
-        <pre part="block"><code part="code"><slot @slotchange=${() =>
-          this.requestUpdate()}></slot></code></pre>
+        <pre part="block">${gutter}${code}</pre>
         ${this.label ? nothing : this.renderCopy()}
       </div>`
   }
@@ -258,7 +309,7 @@ export class HelixHeadlessCodeBlock extends HelixElement {
   protected renderCopyButton(value: string = this.text): TemplateResult {
     return html`<${this.tag('copy-button')}
       part="copy"
-      exportparts="button: copy-button, text: copy-text, mark: copy-mark, tooltip: copy-tooltip,
+      exportparts="button: copy-button, text: copy-text, mark: copy-mark, live: copy-live, tooltip: copy-tooltip,
         tooltip-arrow: copy-tooltip-arrow, tooltip-arrow-bottom: copy-tooltip-arrow-bottom,
         tooltip-arrow-left: copy-tooltip-arrow-left, tooltip-arrow-right: copy-tooltip-arrow-right,
         tooltip-arrow-top: copy-tooltip-arrow-top, tooltip-bottom: copy-tooltip-bottom,
