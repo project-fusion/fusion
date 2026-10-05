@@ -43,6 +43,8 @@ export type RuntimeKind =
   | 'not-a-graph'
   /** The browser refused picture in picture. */
   | 'picture-in-picture-refused'
+  /** A Grid's `min` is no length it can write, so the grid lays out by its column count. */
+  | 'refused-length'
   /** A React handler prop is a removed callback, which never ran from JSX. */
   | 'removed-callback'
   /** A React handler prop uses Solid's `on:`, which React reads as another event's name. */

@@ -55,6 +55,40 @@ describe('grid', () => {
     expect(rule(grid)).not.toContain('repeat')
   })
 
+  test('a count past six is written as a rule, where the stylesheet has none', async () => {
+    const grid = await mount('<helix-grid columns="8"></helix-grid>')
+    expect(rule(grid)).toContain('repeat(8, minmax(0, 1fr))')
+  })
+
+  test('a minimum may be a calculation or a variable over lengths', async () => {
+    const calc = await mount('<helix-grid min="calc(10rem + 1px)"></helix-grid>')
+    expect(rule(calc)).toContain('min(calc(10rem + 1px), 100%)')
+    const variable = await mount('<helix-grid min="var(--card-min, 12cqi)"></helix-grid>')
+    expect(rule(variable)).toContain('var(--card-min, 12cqi)')
+  })
+
+  test('a minimum that could end the rule is refused, and said so', async () => {
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      for (const min of [
+        '1px,1fr)} :host{background:url(//elsewhere/?stolen)} @media all{',
+        'calc(1px; color: red)',
+        'min(1px, 2px',
+        'url(x)',
+      ]) {
+        const grid = (await mount('<helix-grid></helix-grid>')) as Grid
+        grid.min = min
+        await grid.updateComplete
+        expect(rule(grid)).not.toContain('repeat')
+      }
+    } finally {
+      console.warn = original
+    }
+    expect(warnings.length).toBe(4)
+  })
+
   test('takes no track list from a grid around it', async () => {
     /* The rule is there with or without a minimum, and sets both back. */
     const grid = await mount('<helix-grid columns="3"></helix-grid>')
@@ -74,6 +108,13 @@ describe('grid', () => {
     const inner = outer.querySelector('helix-grid') as Grid
     await inner.updateComplete
     expect(getComputedStyle(inner).gridTemplateColumns.split(' ')).toHaveLength(3)
+  })
+
+  laid('a count past six lays out that many columns', async () => {
+    const grid = await mount(
+      '<helix-grid columns="12" style="inline-size: 60rem"><span>A</span></helix-grid>',
+    )
+    expect(getComputedStyle(grid).gridTemplateColumns.split(' ')).toHaveLength(12)
   })
 
   laid('a track list written on the outer grid stays there', async () => {
