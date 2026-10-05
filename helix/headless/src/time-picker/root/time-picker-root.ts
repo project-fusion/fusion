@@ -1,49 +1,35 @@
 import {
-  valueAsTime as asTime,
   customElement,
   elementById,
   fillTemplate,
-  timeAsValue as fromTime,
   type HelixBeforeChangeEvent,
   HelixFormElement,
+  inlineStep,
   MixinControllerValue,
-  minutesAsValue,
   reportValues,
-  valueAsMinutes,
-  writeTime,
   writtenList,
 } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
+import {
+  clockLocale,
+  dayPeriod,
+  type HourCycle,
+  isTwelveHour,
+  nearestTime,
+  offeredTimes,
+  secondsAsValue,
+  valueAsSeconds,
+  wheelParts,
+  wholeHour,
+  writeClock,
+} from '../clock.js'
 /* Relative, so this registers the headless elements and the styled file's
    identical imports register the styled ones. `tier` picks which the template
    asks for. */
 import '../../listbox/index.js'
 import '../../option/index.js'
-
-/**
- * Whether the reader's locale writes times on a twelve hour clock.
- *
- * Asked of `Intl` rather than derived from a list of locales, because it is
- * exactly the question `resolvedOptions` answers and the list is long and
- * changes. `en-US` is true, `en-GB`, `fr-FR` and `ja-JP` are false, measured.
- */
-const isTwelveHour = (locale?: string): boolean =>
-  new Intl.DateTimeFormat(locale || undefined, { timeStyle: 'short' }).resolvedOptions().hour12 ===
-  true
-
-/**
- * What a locale calls the half of the day before or after noon, such as `AM`,
- * `PM`, `오전` or `오후`.
- *
- * Read off `Intl`'s own rendering of a time in that half, which is the one
- * place every engine states it.
- */
-const dayPeriod = (half: 'AM' | 'PM', locale?: string): string =>
-  new Intl.DateTimeFormat(locale || undefined, { hour: 'numeric', hour12: true, timeZone: 'UTC' })
-    .formatToParts(new Date(Date.UTC(1970, 0, 1, half === 'AM' ? 9 : 21)))
-    .find((part) => part.type === 'dayPeriod')?.value ?? half
 
 /**
  * @summary A control for choosing a time from a list or from wheels.
@@ -52,14 +38,19 @@ const dayPeriod = (half: 'AM' | 'PM', locale?: string): string =>
  * Shows the times at each `step` as a `Listbox`, which provides the keyboard
  * behavior, typeahead, scrolling into view, and announcements for a set of
  * options. `variant="wheels"` shows a column each for the hour, the minute, and
- * the meridiem.
+ * the meridiem, and one for the second with `seconds`. Left and Right move
+ * between the wheels, and Tab does too.
+ *
+ * `hour-cycle` writes every time on a twelve or a twenty-four hour clock
+ * whatever the locale, and `seconds` holds times to the second.
  *
  * The step keeps the list usable. At the default of 15 minutes a day is 96
  * rows, which people can scroll or type into. At 1 minute it is 1,440. Use the
  * list for the times your product offers, and Time Input for any time, the same
  * way Date Input separates typing a date from picking one on the calendar.
  *
- * The value is always `HH:mm` on a 24-hour clock. A form submits that shape,
+ * The value is always `HH:mm` on a 24-hour clock, or `HH:mm:ss` with
+ * `seconds`. A form submits that shape,
  * `min` and `max` compare against it, and it sorts as a string. Each row's text
  * follows the person's own conventions, from `Intl`.
  *
@@ -142,6 +133,17 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
    */
   @property({ attribute: 'disable-times' })
   disableTimes = ''
+
+  /**
+   * The clock the times are written on: `h12` for twelve hours with a
+   * meridiem, `h23` for twenty-four.
+   *
+   * Absent is the locale's own, which is right for a reader's own form. Set it
+   * where every reader must see the same clock whatever their language, as a
+   * timetable does. The value is `HH:mm` on twenty-four hours either way.
+   */
+  @property({ attribute: 'hour-cycle' })
+  hourCycle?: HourCycle
 
   /**
    * What the wheel of hours is called, read by screen readers.
@@ -249,23 +251,26 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
   rangeUnderflowMessage?: string
 
   /**
-   * Every time on offer, as minutes since midnight.
+   * Every time on offer, as seconds since midnight.
    *
    * Built from `min` upward rather than from midnight, so a list that starts at
    * `09:00` steps from nine rather than offering `09:15` because that is where
    * the quarter hours from midnight happen to land. A step that does not divide
    * the hour is a real thing to want, twenty minutes being the obvious one, and
-   * this is the reading that makes it behave.
+   * this is the reading that makes it behave. See `offeredTimes`.
    */
   private get times(): number[] {
-    const from = valueAsMinutes(this.min) ?? 0
-    const to = valueAsMinutes(this.max) ?? 1439
-    const step = Math.max(1, Math.round(this.step))
-    const found: number[] = []
-    for (let at = from; at <= to; at += step) {
-      found.push(at)
-    }
-    return found
+    return offeredTimes(this.min, this.max, this.step, this.seconds)
+  }
+
+  /** The locale with the clock `hour-cycle` asks for. */
+  private get clock(): string {
+    return clockLocale(this.locale, this.hourCycle)
+  }
+
+  /** A time as the value writes it, to the second where `seconds` asks. */
+  private valueFor(at: number): string {
+    return secondsAsValue(at, this.seconds)
   }
 
   /**
@@ -280,7 +285,13 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
    * outside the bounds is absent rather than present and refused.
    */
   private barred(at: string): boolean {
-    return writtenList(this.disableTimes).includes(at)
+    const seconds = valueAsSeconds(at)
+    return seconds !== null && this.barredAt(seconds)
+  }
+
+  /** The same question of seconds since midnight, matching `09:30` and `09:30:00` alike. */
+  private barredAt(at: number): boolean {
+    return writtenList(this.disableTimes).some((one) => valueAsSeconds(one) === at)
   }
 
   /**
@@ -293,15 +304,8 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
    * both reported valid and were submitted. The nearest earlier time wins a
    * tie, so a step past `max` lands on `max`'s own row.
    */
-  private nearest(minutes: number): number {
-    const times = this.times
-    let best = times[0] ?? minutes
-    for (const at of times) {
-      if (Math.abs(at - minutes) < Math.abs(best - minutes)) {
-        best = at
-      }
-    }
-    return best
+  private nearest(at: number): number {
+    return nearestTime(this.times, at)
   }
 
   /**
@@ -311,15 +315,15 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
    * 13:00 under PM. Absent is a 24 hour clock, where the number is the hour.
    */
   private wholeHourBarred(shown: number, half?: 'AM' | 'PM'): boolean {
-    const whole = half === undefined ? shown : (shown % 12) + (half === 'PM' ? 12 : 0)
-    const within = this.times.filter((at) => Math.floor(at / 60) === whole)
-    return within.length > 0 && within.every((at) => this.barred(minutesAsValue(at)))
+    const whole = wholeHour(shown, half)
+    const within = this.times.filter((at) => Math.floor(at / 3600) === whole)
+    return within.length > 0 && within.every((at) => this.barredAt(at))
   }
 
   /** Whether every offered time in a half of the clock is barred. */
   private halfBarred(half: 'AM' | 'PM'): boolean {
-    const within = this.times.filter((at) => (half === 'PM') === at >= 720)
-    return within.length > 0 && within.every((at) => this.barred(minutesAsValue(at)))
+    const within = this.times.filter((at) => (half === 'PM') === at >= 43_200)
+    return within.length > 0 && within.every((at) => this.barredAt(at))
   }
 
   /** The times held, which is a list whether or not a mode is set. */
@@ -396,56 +400,70 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
     return from !== undefined && to !== undefined && at > from && at < to
   }
 
-  /** The three readings a wheel shows, from the value or from `min`. */
-  private get parts(): { hour: number; meridiem: 'AM' | 'PM'; minute: number } {
-    const at = valueAsMinutes(this.value) ?? valueAsMinutes(this.min) ?? 0
-    const hour = Math.floor(at / 60)
-    return { hour, meridiem: hour < 12 ? 'AM' : 'PM', minute: at % 60 }
+  /** The readings the wheels show, from the value or from `min`. */
+  private get parts(): ReturnType<typeof wheelParts> {
+    const at = valueAsSeconds(this.value) ?? valueAsSeconds(this.min) ?? 0
+    return wheelParts(at, isTwelveHour(this.clock))
   }
 
   /** Puts a changed column back together into a whole time. */
-  private readonly moveColumn = (part: 'hour' | 'meridiem' | 'minute', to: string): void => {
+  private readonly moveColumn = (
+    part: 'hour' | 'meridiem' | 'minute' | 'second',
+    to: string,
+  ): void => {
     if (this.isDisabled) {
       return
     }
-    const { hour, meridiem, minute } = this.parts
-    let next = hour * 60 + minute
+    const { hour, meridiem, minute, second } = this.parts
+    let [h, m, sec] = [hour, minute, second]
     if (part === 'minute') {
-      next = hour * 60 + Number(to)
+      m = Number(to)
+    } else if (part === 'second') {
+      sec = Number(to)
     } else if (part === 'hour') {
       /* On a twelve hour clock the column says 1 to 12 and the meridiem says
          which half, so the two have to be recombined rather than read straight:
          12 AM is midnight and 12 PM is noon, which is the one pair that does not
          follow the pattern. */
-      const shown = Number(to)
-      const whole = isTwelveHour(this.locale) ? (shown % 12) + (meridiem === 'PM' ? 12 : 0) : shown
-      next = whole * 60 + minute
+      h = wholeHour(Number(to), isTwelveHour(this.clock) ? meridiem : undefined)
     } else {
-      const half = hour % 12
-      next = (half + (to === 'PM' ? 12 : 0)) * 60 + minute
+      h = (hour % 12) + (to === 'PM' ? 12 : 0)
     }
-    /* The wheels build a value from three columns and never reach
+    /* The wheels build a value from their columns and never reach
        `handleChange`, so the refusal has to be repeated here. Disabling the
        options is not enough on its own: a reader on 09:00 who moves the hour to
        10 lands on 10:00, and 10:00 can be barred while nothing in the hour
        column was. */
-    const whole = minutesAsValue(this.nearest(next))
-    if (this.barred(whole)) {
+    const nearest = this.nearest(h * 3600 + m * 60 + sec)
+    if (this.barredAt(nearest)) {
       return
     }
-    this.requestValue(whole)
+    this.requestValue(this.valueFor(nearest))
   }
 
   /** Every whole hour that has at least one offered time in it. */
   private get hours(): number[] {
-    const found = new Set(this.times.map((at) => Math.floor(at / 60)))
+    const found = new Set(this.times.map((at) => Math.floor(at / 3600)))
     return [...found]
   }
 
   /** Every minute offered within the hour currently shown. */
   private get minutes(): number[] {
     const hour = this.parts.hour
-    return this.times.filter((at) => Math.floor(at / 60) === hour).map((at) => at % 60)
+    const found = new Set(
+      this.times
+        .filter((at) => Math.floor(at / 3600) === hour)
+        .map((at) => Math.floor(at / 60) % 60),
+    )
+    return [...found]
+  }
+
+  /** Every second offered within the minute currently shown. */
+  private get secondsShown(): number[] {
+    const { hour, minute } = this.parts
+    return this.times
+      .filter((at) => Math.floor(at / 60) === hour * 60 + minute)
+      .map((at) => at % 60)
   }
 
   /**
@@ -520,7 +538,26 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
   required = false
 
   /**
-   * How far apart the offered times are, in minutes.
+   * What the wheel of seconds is called, read by screen readers.
+   */
+  @property({ attribute: 'second-label' })
+  secondLabel = 'Second'
+
+  /**
+   * Whether times carry their seconds.
+   *
+   * The value becomes `HH:mm:ss`, each time is written with its seconds, the
+   * wheels take a column of seconds, and `step` counts seconds, the unit
+   * `<input type="time">` counts in. A list at a step of one second is 86,400
+   * rows, so give `seconds` a `step` and bounds that keep it a list, or use
+   * the wheels.
+   */
+  @property({ type: Boolean })
+  seconds = false
+
+  /**
+   * How far apart the offered times are, in minutes, or in seconds with
+   * `seconds`.
    *
    * Fifteen, which is four rows an hour and ninety-six in a day: enough that a
    * reader scrolls rather than hunts, and few enough that the list is a list.
@@ -556,29 +593,29 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
    * submitted, where a native time input reports the bound it is past.
    */
   private fault(at: string): [keyof ValidityStateFlags, string] | undefined {
-    const minutes = valueAsMinutes(at) ?? 0
-    const floor = valueAsMinutes(this.min) ?? 0
-    const ceiling = valueAsMinutes(this.max) ?? 1439
-    if (minutes < floor) {
+    const seconds = valueAsSeconds(at) ?? 0
+    const floor = valueAsSeconds(this.min) ?? 0
+    const ceiling = valueAsSeconds(this.max) ?? 86_399
+    if (seconds < floor) {
       return [
         'rangeUnderflow',
         fillTemplate(this.rangeUnderflowMessage || 'Choose a time at or after {min}.', {
-          min: writeTime(this.min, this.locale),
+          min: writeClock(this.min, this.clock, this.seconds),
         }),
       ]
     }
-    if (minutes > ceiling) {
+    if (seconds > ceiling) {
       return [
         'rangeOverflow',
         fillTemplate(this.rangeOverflowMessage || 'Choose a time at or before {max}.', {
-          max: writeTime(this.max, this.locale),
+          max: writeClock(this.max, this.clock, this.seconds),
         }),
       ]
     }
     if (this.barred(at)) {
       return ['badInput', this.unavailableMessage || 'Choose a time that is available.']
     }
-    if (!this.times.includes(minutes)) {
+    if (!this.times.includes(seconds)) {
       return ['stepMismatch', this.stepMismatchMessage || 'Choose one of the times on offer.']
     }
     return undefined
@@ -636,17 +673,18 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
     }
     /* A value the wheels cannot read is bad input, the same as on the calendar:
        `value="not-a-time"` marks no row, and would otherwise report `:valid` and
-       be handed to the form. `asTime` rejects the hours and minutes that are
-       shaped right and out of range as well as the ones that are not shaped
-       right at all. */
+       be handed to the form. `valueAsSeconds` rejects the hours and minutes
+       that are shaped right and out of range as well as the ones that are not
+       shaped right at all. */
     const held = this.held
-    if (held.length > 0 && held.some((one) => asTime(one) === null)) {
+    if (held.length > 0 && held.some((one) => valueAsSeconds(one) === null)) {
+      const shape = this.seconds ? 'HH:mm:ss' : 'HH:mm'
       this.internals.setValidity(
         { badInput: true },
         this.badInputMessage ||
           (this.mode === undefined
-            ? 'Enter a time as HH:mm.'
-            : 'Enter times as HH:mm, separated by commas.'),
+            ? `Enter a time as ${shape}.`
+            : `Enter times as ${shape}, separated by commas.`),
         anchor,
       )
       return
@@ -808,7 +846,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
    * open the wheel rather than to close it.
    */
   protected renderColumn(
-    part: 'hour' | 'meridiem' | 'minute',
+    part: 'hour' | 'meridiem' | 'minute' | 'second',
     label: string,
     values: string[],
     written: (one: string) => string,
@@ -847,10 +885,32 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
     </${this.tag('listbox')}>`
   }
 
+  /**
+   * Left and Right move between the wheels, as Web Awesome's columns do, and
+   * Tab still does.
+   *
+   * A wheel is a listbox and takes Up and Down, so the horizontal pair was
+   * free. Along the line of text, which runs from the right on a right-to-left
+   * page, and stopping at the first and last wheel.
+   */
+  private readonly handleColumnsKeydown = (event: KeyboardEvent): void => {
+    const step = inlineStep(this, event.key)
+    if (step === 0 || event.altKey || event.ctrlKey || event.metaKey) {
+      return
+    }
+    const columns = [...(this.renderRoot?.querySelectorAll<HTMLElement>('[part="column"]') ?? [])]
+    const at = columns.findIndex((column) => event.composedPath().includes(column))
+    const next = columns[at + step]
+    if (at < 0 || !next) {
+      return
+    }
+    event.preventDefault()
+    next.focus()
+  }
+
   private renderSpinner(): TemplateResult {
-    const twelve = isTwelveHour(this.locale)
-    const { hour, meridiem, minute } = this.parts
-    const shownHour = twelve ? String(hour % 12 === 0 ? 12 : hour % 12) : String(hour)
+    const twelve = isTwelveHour(this.clock)
+    const { hour, meridiem, minute, second, shown } = this.parts
     /* The hour column reads 1 to 12 on a twelve hour clock, so the whole hours
        on offer are mapped into that half and de-duplicated: 13:00 and 01:00 are
        both "1", and offering it twice is offering a choice that is not one. */
@@ -859,20 +919,21 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
           (a, b) => a - b,
         )
       : this.hours
-    /* A group named as the list would be, so the three wheels are heard as
-       the parts of one named time. */
+    /* A group named as the list would be, so the wheels are heard as the parts
+       of one named time. */
     return html`<div
       part="columns"
       role="group"
       aria-label=${this.listName}
       data-unset=${this.value === '' ? '' : nothing}
+      @keydown=${this.handleColumnsKeydown}
     >
       ${this.renderColumn(
         'hour',
         this.hourLabel,
         hours.map(String),
         (one) => (twelve ? one : one.padStart(2, '0')),
-        shownHour,
+        String(shown),
         (one) => this.wholeHourBarred(Number(one), twelve ? meridiem : undefined),
       )}
       ${this.renderColumn(
@@ -881,15 +942,27 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
         this.minutes.map(String),
         (one) => one.padStart(2, '0'),
         String(minute),
-        (one) => this.barred(minutesAsValue(hour * 60 + Number(one))),
+        (one) => this.barredAt(hour * 3600 + Number(one) * 60),
       )}
+      ${
+        this.seconds
+          ? this.renderColumn(
+              'second',
+              this.secondLabel,
+              this.secondsShown.map(String),
+              (one) => one.padStart(2, '0'),
+              String(second),
+              (one) => this.barredAt(hour * 3600 + minute * 60 + Number(one)),
+            )
+          : nothing
+      }
       ${
         twelve
           ? this.renderColumn(
               'meridiem',
               this.meridiemLabel,
               ['AM', 'PM'],
-              (one) => dayPeriod(one as 'AM' | 'PM', this.locale),
+              (one) => dayPeriod(one as 'AM' | 'PM', this.clock),
               meridiem,
               (one) => this.halfBarred(one as 'AM' | 'PM'),
             )
@@ -924,8 +997,8 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
       @helix-before-change=${this.handleChange}
       @input=${this.handleListInput}
     >
-      ${this.times.map((minutes) => {
-        const at = minutesAsValue(minutes)
+      ${this.times.map((seconds) => {
+        const at = this.valueFor(seconds)
         const between = this.between(at)
         return html`<${this.tag('option')}
           part="option${between ? ' option-between' : ''}"
@@ -936,7 +1009,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
           ?disabled=${this.barred(at)}
           ?selected=${this.held.includes(at)}
           data-between=${between ? '' : nothing}
-          >${writeTime(at, this.locale)}</${this.tag('option')}
+          >${writeClock(at, this.clock, this.seconds)}</${this.tag('option')}
         >`
       })}
     </${this.tag('listbox')}>`
@@ -962,20 +1035,26 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
    * a consumer handing over `new Date()` gets the time of day they expected.
    */
   get valueAsDate(): Date | null {
-    return asTime(this.value)
+    const at = valueAsSeconds(this.value)
+    return at === null ? null : new Date(at * 1000)
   }
 
   set valueAsDate(date: Date | null) {
-    this.value = fromTime(date)
+    this.valueAsNumber = date ? date.getTime() : Number.NaN
   }
 
   /** The value as milliseconds since midnight, or `NaN` while there is no time. */
   get valueAsNumber(): number {
-    return asTime(this.value)?.getTime() ?? Number.NaN
+    const at = valueAsSeconds(this.value)
+    return at === null ? Number.NaN : at * 1000
   }
 
+  /* Read off the day the time falls in, so any `Date` gives its time of day,
+     to the minute or, with `seconds`, to the second. */
   set valueAsNumber(ms: number) {
-    this.value = Number.isNaN(ms) ? '' : fromTime(new Date(ms))
+    this.value = Number.isNaN(ms)
+      ? ''
+      : this.valueFor(Math.floor((((ms % 86_400_000) + 86_400_000) % 86_400_000) / 1000))
   }
 }
 
