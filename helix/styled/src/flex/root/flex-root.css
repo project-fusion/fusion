@@ -1,9 +1,18 @@
 /* The host is the container. No wrapper part, so the element adds no box of its
    own and costs exactly the div it replaces. */
 :host {
+  /* The gap on each axis is a private property, so `row-gap` and `column-gap`
+     can each win over `gap` on their own axis with no rule for every pair.
+     Named for the family, and set on every host, so a flex inside another
+     takes nothing from it. */
+  --_flex-column-gap: var(--_flex-gap);
+  --_flex-gap: var(--helix-space-none);
+  --_flex-row-gap: var(--_flex-gap);
+
+  column-gap: var(--_flex-column-gap);
   display: flex;
   flex-direction: row;
-  gap: var(--helix-space-none);
+  row-gap: var(--_flex-row-gap);
 }
 
 :host([inline]) {
@@ -14,37 +23,136 @@
   flex-direction: column;
 }
 
+:host([direction="row-reverse"]) {
+  flex-direction: row-reverse;
+}
+
+:host([direction="column-reverse"]) {
+  flex-direction: column-reverse;
+}
+
+/* The patterns first, so every attribute below, written on the same element,
+   wins over the value a pattern chose. */
+:host([layout="cluster"]),
+:host([layout="flank"]),
+:host([layout="flank-end"]),
+:host([layout="split"]) {
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+:host([layout="split"]) {
+  justify-content: space-between;
+}
+
+/* The fixed item keeps its own width, or `--flex-flank-size`, and the other
+   takes the rest. A grow of 999 against 1 gives the rest to the second, and
+   its minimum is what makes the pair stack once the row is too narrow for
+   both. */
+:host([layout="flank"]) ::slotted(:first-child),
+:host([layout="flank-end"]) ::slotted(:last-child) {
+  flex-basis: var(--flex-flank-size, auto);
+  flex-grow: 1;
+}
+
+:host([layout="flank"]) ::slotted(:last-child),
+:host([layout="flank-end"]) ::slotted(:first-child) {
+  flex-basis: 0;
+  flex-grow: 999;
+  min-inline-size: var(--flex-flank-min, 50%);
+}
+
 :host([wrap]) {
   flex-wrap: wrap;
 }
 
+:host([wrap="reverse"]) {
+  flex-wrap: wrap-reverse;
+}
+
 :host([gap="2xs"]) {
-  gap: var(--helix-space-2xs);
+  --_flex-gap: var(--helix-space-2xs);
 }
 :host([gap="xs"]) {
-  gap: var(--helix-space-xs);
+  --_flex-gap: var(--helix-space-xs);
 }
 :host([gap="sm"]) {
-  gap: var(--helix-space-sm);
+  --_flex-gap: var(--helix-space-sm);
 }
 :host([gap="md"]) {
-  gap: var(--helix-space-md);
+  --_flex-gap: var(--helix-space-md);
 }
 :host([gap="lg"]) {
-  gap: var(--helix-space-lg);
+  --_flex-gap: var(--helix-space-lg);
 }
 :host([gap="xl"]) {
-  gap: var(--helix-space-xl);
+  --_flex-gap: var(--helix-space-xl);
 }
 :host([gap="2xl"]) {
-  gap: var(--helix-space-2xl);
+  --_flex-gap: var(--helix-space-2xl);
 }
 
 /*
  *  `3xl` is the top of the space scale, and the pair stops where it does.
  */
 :host([gap="3xl"]) {
-  gap: var(--helix-space-3xl);
+  --_flex-gap: var(--helix-space-3xl);
+}
+
+:host([row-gap="none"]) {
+  --_flex-row-gap: var(--helix-space-none);
+}
+:host([row-gap="2xs"]) {
+  --_flex-row-gap: var(--helix-space-2xs);
+}
+:host([row-gap="xs"]) {
+  --_flex-row-gap: var(--helix-space-xs);
+}
+:host([row-gap="sm"]) {
+  --_flex-row-gap: var(--helix-space-sm);
+}
+:host([row-gap="md"]) {
+  --_flex-row-gap: var(--helix-space-md);
+}
+:host([row-gap="lg"]) {
+  --_flex-row-gap: var(--helix-space-lg);
+}
+:host([row-gap="xl"]) {
+  --_flex-row-gap: var(--helix-space-xl);
+}
+:host([row-gap="2xl"]) {
+  --_flex-row-gap: var(--helix-space-2xl);
+}
+:host([row-gap="3xl"]) {
+  --_flex-row-gap: var(--helix-space-3xl);
+}
+
+:host([column-gap="none"]) {
+  --_flex-column-gap: var(--helix-space-none);
+}
+:host([column-gap="2xs"]) {
+  --_flex-column-gap: var(--helix-space-2xs);
+}
+:host([column-gap="xs"]) {
+  --_flex-column-gap: var(--helix-space-xs);
+}
+:host([column-gap="sm"]) {
+  --_flex-column-gap: var(--helix-space-sm);
+}
+:host([column-gap="md"]) {
+  --_flex-column-gap: var(--helix-space-md);
+}
+:host([column-gap="lg"]) {
+  --_flex-column-gap: var(--helix-space-lg);
+}
+:host([column-gap="xl"]) {
+  --_flex-column-gap: var(--helix-space-xl);
+}
+:host([column-gap="2xl"]) {
+  --_flex-column-gap: var(--helix-space-2xl);
+}
+:host([column-gap="3xl"]) {
+  --_flex-column-gap: var(--helix-space-3xl);
 }
 
 /* The attribute is named for the property, so the rule is the value with the
@@ -62,6 +170,32 @@
   align-items: baseline;
 }
 
+:host([align-content="start"]) {
+  align-content: flex-start;
+}
+:host([align-content="center"]) {
+  align-content: center;
+}
+:host([align-content="end"]) {
+  align-content: flex-end;
+}
+:host([align-content="between"]) {
+  align-content: space-between;
+}
+:host([align-content="around"]) {
+  align-content: space-around;
+}
+:host([align-content="stretch"]) {
+  align-content: stretch;
+}
+
+:host([align-items="stretch"]) {
+  align-items: stretch;
+}
+
+:host([justify-content="start"]) {
+  justify-content: flex-start;
+}
 :host([justify-content="center"]) {
   justify-content: center;
 }
