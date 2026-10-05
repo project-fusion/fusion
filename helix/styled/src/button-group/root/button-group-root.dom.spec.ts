@@ -1,5 +1,11 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, registerDom, slotted, type Updatable } from '@fusion.dev/helix-testing/dom'
+import {
+  hasLayout,
+  mount,
+  registerDom,
+  slotted,
+  type Updatable,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -81,4 +87,40 @@ describe('button group', () => {
     expect(raised).toContain('position: relative')
     expect(raised).toContain('z-index: var(--helix-layer-raised)')
   })
+
+  if (hasLayout()) {
+    /* The page's base layer joins a native button, since its corners are its
+       own radius and a page rule setting one beats any `::slotted()` rule. */
+    test('in a browser, native buttons join too, even under a page rule with a radius', async () => {
+      const corners = async (orientation: string): Promise<string[][]> => {
+        const host = await mount(`<helix-button-group label="Export" ${orientation}>
+            <button class="mine">CSV</button><button class="mine">JSON</button><button class="mine">Copy</button>
+          </helix-button-group><style>.mine { border-radius: 8px }</style>`)
+        return [...host.querySelectorAll('button')].map((button) => {
+          const style = getComputedStyle(button)
+          return [
+            style.borderStartStartRadius,
+            style.borderStartEndRadius,
+            style.borderEndStartRadius,
+            style.borderEndEndRadius,
+          ]
+        })
+      }
+      expect(await corners('')).toEqual([
+        ['8px', '0px', '8px', '0px'],
+        ['0px', '0px', '0px', '0px'],
+        ['0px', '8px', '0px', '8px'],
+      ])
+      expect(await corners('orientation="vertical"')).toEqual([
+        ['8px', '8px', '0px', '0px'],
+        ['0px', '0px', '0px', '0px'],
+        ['0px', '0px', '8px', '8px'],
+      ])
+      expect(await corners('variant="spaced"')).toEqual([
+        ['8px', '8px', '8px', '8px'],
+        ['8px', '8px', '8px', '8px'],
+        ['8px', '8px', '8px', '8px'],
+      ])
+    })
+  }
 })

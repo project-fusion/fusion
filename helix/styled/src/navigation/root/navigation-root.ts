@@ -23,6 +23,8 @@ import { styles } from './navigation-root.css.js'
  * @cssproperty --navigation-indicator-radius - Corner radius of the marker.
  * @cssproperty --navigation-indicator-shadow - Shadow under the marker, for a marker that sits
  *   raised on the bar.
+ * @cssproperty --navigation-item-color - Text color of a destination that is not the current one. Read by the page's stylesheet, which styles the links you slot.
+ * @cssproperty --navigation-item-current-color - Text color of the current destination, the one marked `aria-current="page"`.
  */
 @customElement('helix-navigation')
 export class HelixNavigation extends HelixHeadlessNavigation {

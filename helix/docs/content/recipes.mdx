@@ -62,6 +62,27 @@ loading state, no pressed state, and no `type="submit"` handling.
 navigation, where an underline on every row would distract. If a link opens a
 new tab or window, say so in the link text, so it does not surprise your users.
 
+## Navigation items
+
+```html
+<helix-navigation label="Sections">
+  <a aria-current="page" href="/guide">Guide</a>
+  <a href="/api">API</a>
+</helix-navigation>
+<button data-navigation-item>Menu</button>
+```
+
+A link inside `helix-navigation` is styled by the page's stylesheet, because the
+page's styles reach a slotted link before the component's do.
+`data-navigation-item` gives the same look to an element outside a navigation
+bar. Two custom properties set the text color:
+
+- `--navigation-item-color` colors every destination except the current one.
+- `--navigation-item-current-color` colors the destination marked
+  `aria-current="page"`.
+
+Set them on `helix-navigation` or on any element that contains it.
+
 ## Surfaces and layout
 
 ```html

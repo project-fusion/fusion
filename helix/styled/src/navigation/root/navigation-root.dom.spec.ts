@@ -88,6 +88,24 @@ describe('navigation', () => {
     })
   }
 
+  if (hasLayout()) {
+    /* The page's link rule colors a slotted destination, since the page's
+       styles reach it before the shadow root's, so the hooks are read there. */
+    test('in a browser, a destination takes its color from the hooks the docs name', async () => {
+      const nav = await mount(`<helix-navigation label="Sections"
+        style="--navigation-item-color: rgb(1, 2, 3); --navigation-item-current-color: rgb(4, 5, 6)">
+        <a aria-current="page" href="#one">One</a>
+        <a href="#two">Two</a>
+      </helix-navigation>`)
+      await idle()
+      const [current, other] = [...nav.querySelectorAll('a')].map(
+        (link) => getComputedStyle(link).color,
+      )
+      expect(current).toBe('rgb(4, 5, 6)')
+      expect(other).toBe('rgb(1, 2, 3)')
+    })
+  }
+
   test('carries no attribute of its own', async () => {
     expect((await mount(bar)).getAttributeNames()).toEqual(['label'])
   })
