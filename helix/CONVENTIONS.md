@@ -343,16 +343,20 @@ styling**.
 6. **A parent finds its children; they do not announce themselves.** There is no
    ready event, and reaching for one is the wrong instinct: a parent cannot poll
    for a child that has not upgraded, and what it needs from that child decides
-   which of four mechanisms it takes. For what a consumer slotted,
+   which of five mechanisms it takes. For what a consumer slotted,
    `assignedElements` on the slot, re-read on `slotchange`. For children that
    arrive, move or change outside a slot, a `MutationObserver` on the light DOM.
    For a child's *property*, `customElements.whenDefined`, which is the case
    Toolbar states best: a custom element has no properties at all before it
    upgrades, so a pass that ran first would find no `focusable`, take the
    `tabindex` fallback, and write the very attribute the property exists to
-   avoid. And where the child is the one that knows, it reaches up by identity
-   with `closestInstance` rather than announcing, which is what `Accordion.Item`
-   and the video playlist's menu do.
+   avoid. For a child's state that a script can change with no event, a
+   controller the parent adds to the child with `addController`, whose
+   `hostUpdated` runs after every update of the child: Checkbox Group judges
+   `required` again that way when a script unchecks a box. And where the child
+   is the one that knows, it reaches up by identity with `closestInstance`
+   rather than announcing, which is what `Accordion.Item` and the video
+   playlist's menu do.
 7. **Every component needs a `*.ssr.spec.ts`** asserting the server output. A
    DOM spec runs after hydration, when everything already looks correct.
 
