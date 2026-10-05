@@ -46,4 +46,11 @@ describe('orb server output', () => {
        claim. */
     expect(servedParts(ssr(html`<helix-orb state="done"></helix-orb>`))).toEqual(['canvas'])
   })
+
+  test('an orb that announces serves its first word, so it speaks only on a change', () => {
+    expect(servedParts(ssr(html`<helix-orb announce state="working"></helix-orb>`))).toEqual([
+      'canvas',
+      'live',
+    ])
+  })
 })

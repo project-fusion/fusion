@@ -1,17 +1,16 @@
 import {
   type ColorBytes,
   customElement,
-  drawStatus,
   HelixElement,
   hostAria,
   PaintGateController,
   readColor,
-  StatusController,
 } from '@fusion.dev/helix-core'
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
-import { html } from 'lit'
+import { html, nothing } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
+import { wordsConverter } from '../../shared/words/words.js'
 import {
   blendStaged,
   evenSphere,
@@ -60,24 +59,6 @@ interface Dot {
   z: number
 }
 
-/**
- * Reads `state-labels` as a JSON object of words keyed by state. Anything
- * else, including JSON that does not parse, is no words, so every state keeps
- * its English one.
- */
-const labelsConverter = {
-  fromAttribute: (value: string | null): Partial<Record<OrbState, string>> => {
-    try {
-      const parsed: unknown = JSON.parse(value ?? '')
-      return parsed && typeof parsed === 'object' && !Array.isArray(parsed)
-        ? (parsed as Partial<Record<OrbState, string>>)
-        : {}
-    } catch {
-      return {}
-    }
-  },
-}
-
 /** What an unreadable color answers with, mid gray in both modes. */
 const GRAY: ColorBytes = [128, 128, 128]
 
@@ -111,7 +92,8 @@ const GRAY: ColorBytes = [128, 128, 128]
  * `prefers-reduced-motion`, it draws one still frame.
  *
  * The orb is styled only and has behavior, which the tier split does not
- * otherwise allow. Its role, name and busy state follow `state`, and the rest
+ * otherwise allow. Its role, name and busy state follow `state`, unless
+ * `announce` makes it a status region, and the rest
  * is drawing dots to a canvas, so there is no structure to restyle. For a
  * drawing of your own, the headless `Loader` holds the same busy progress bar
  * and its name.
@@ -127,7 +109,7 @@ const GRAY: ColorBytes = [128, 128, 128]
  * @documentation https://fusion.dev/helix/components/orb
  *
  * @csspart canvas - The canvas the dots are drawn on.
- * @csspart live - The live region that says the new state when `announce` is set. It is rendered from the first change of state and clipped out of view.
+ * @csspart live - The word for the state, which the orb says as it changes when `announce` is set. Rendered only then, and clipped out of view.
  *
  * @cssproperty --orb-color - The color of the nearest dots. Defaults to `currentColor`.
  * @cssproperty --orb-ground - The color the farthest dots fade toward. Defaults to the page's background.
@@ -146,8 +128,13 @@ export class HelixOrb extends HelixElement {
   static override styles: CSSResultGroup = [liveStyles, styles]
 
   /**
-   * Says each new state through a polite live region, such as "Working" and
-   * then "Done".
+   * Says each new state politely, such as "Working" and then "Done".
+   *
+   * **The orb becomes the live region**: its role is `status` rather than
+   * `progressbar` or `img`, and it holds the state's word. A region inside a
+   * progress bar or an image may never be heard, because assistive technology
+   * treats what those two hold as presentation. The name is still `label` or
+   * the state's word.
    *
    * Off by default, because the name and the busy state already change with
    * the state, and an orb beside a stream of messages would otherwise talk
@@ -207,11 +194,8 @@ export class HelixOrb extends HelixElement {
    * object as JSON, such as `state-labels='{"done":"Terminé"}'`, so server
    * markup and plain HTML can carry the words too.
    */
-  @property({ attribute: 'state-labels', converter: labelsConverter })
+  @property({ attribute: 'state-labels', converter: wordsConverter })
   stateLabels: Partial<Record<OrbState, string>> = {}
-
-  /** The region `announce` speaks in. */
-  private readonly status = new StatusController(this)
 
   private canvas: HTMLCanvasElement | undefined
   private context: CanvasRenderingContext2D | null = null
@@ -277,17 +261,18 @@ export class HelixOrb extends HelixElement {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    const state = (ORB_STATES as readonly string[]).includes(this.state)
-      ? (this.state as OrbState)
-      : 'thinking'
+    const state = this.shown
     /* `progressbar` while there is work outstanding, and a plain image once
        there is not: a finished orb that still announced itself as a progress
-       bar would leave a screen reader waiting for a bar that never fills. */
+       bar would leave a screen reader waiting for a bar that never fills.
+
+       A `status` under `announce`, and never busy: a busy live region holds
+       back what it says until it is not. */
     hostAria(this.internals, {
-      label: this.label || this.stateLabels[state] || LABELS[state],
-      role: state === 'done' ? 'img' : 'progressbar',
+      label: this.label || this.word,
+      role: this.announce ? 'status' : state === 'done' ? 'img' : 'progressbar',
     })
-    this.internals.ariaBusy = state === 'done' ? 'false' : 'true'
+    this.internals.ariaBusy = this.announce ? null : state === 'done' ? 'false' : 'true'
 
     /* One literal per state, so each is documented and checked by name. */
     this.toggleState('connecting', state === 'connecting')
@@ -300,17 +285,31 @@ export class HelixOrb extends HelixElement {
 
     if (changed.has('state') && changed.get('state') !== undefined) {
       this.turn()
-      if (this.announce) {
-        this.status.say(this.label || this.stateLabels[state] || LABELS[state])
-      }
     }
+  }
+
+  /** The state drawn: `state`, or `thinking` for one it does not draw. */
+  private get shown(): OrbState {
+    return (ORB_STATES as readonly string[]).includes(this.state)
+      ? (this.state as OrbState)
+      : 'thinking'
+  }
+
+  /** The word for the state drawn, in the page's words where it gave them. */
+  private get word(): string {
+    return this.stateLabels?.[this.shown] || LABELS[this.shown]
   }
 
   protected override render(): TemplateResult {
     /* `aria-hidden` on the canvas rather than the host: the host carries the
        name and the role through `ElementInternals`, and the canvas has nothing
-       of its own to announce. */
-    return html`<canvas part="canvas" aria-hidden="true"></canvas>${drawStatus(this.status)}`
+       of its own to announce.
+
+       Under `announce` the word is served with the first render, so the orb
+       arrives saying its first state and speaks only when the word changes. */
+    return html`<canvas part="canvas" aria-hidden="true"></canvas>${
+      this.announce ? html`<span part="live">${this.word}</span>` : nothing
+    }`
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
