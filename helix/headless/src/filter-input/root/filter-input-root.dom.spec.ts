@@ -1,5 +1,13 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, slotted } from '@fusion.dev/helix-testing/dom'
+import {
+  formValue,
+  mount,
+  part,
+  registerDom,
+  settle,
+  slotted,
+  type Updatable,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -232,5 +240,21 @@ describe('a subclass registered under a tag of its own', () => {
       '<acme-filter-input label="Issues"><acme-filter-field name="status"></acme-filter-field></acme-filter-input>',
     )) as HTMLElement & { fields: HTMLElement[] }
     expect(filter.fields.map((field) => field.localName)).toEqual(['acme-filter-field'])
+  })
+})
+
+describe('what the form receives', () => {
+  /* The tokens were never submitted, so a form posted only the typed text. */
+  test('the text, then one entry for each token that says what it filters', async () => {
+    document.body.innerHTML = `<form><helix-headless-filter-input label="Filter" name="q" value="refund">
+      <helix-headless-filter-chip slot="tags" name="status">open, pending</helix-headless-filter-chip>
+      <helix-headless-filter-chip slot="tags" name="team" operator="not">ops</helix-headless-filter-chip>
+      <span slot="tags" value="saved:mine">Mine</span>
+      <span slot="tags">Says nothing</span>
+    </helix-headless-filter-input></form>`
+    const host = document.querySelector('helix-headless-filter-input') as Updatable
+    await settle(host)
+    const sent = formValue(host as HTMLElement) as unknown as FormData
+    expect(sent.getAll('q')).toEqual(['refund', 'status:open,pending', '-team:ops', 'saved:mine'])
   })
 })

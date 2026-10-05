@@ -1,5 +1,6 @@
 import {
   AriaForwardController,
+  countLabel,
   customElement,
   drawIcon,
   type FacetDetail,
@@ -20,6 +21,7 @@ import { property, state } from 'lit/decorators.js'
 import { HelixHeadlessFilterField } from '../field/filter-field.js'
 import { readFilterText } from '../grammar.js'
 import { HelixHeadlessFilterMenu } from '../menu/filter-menu.js'
+import { currentTerm, suggests, tokenEntry } from '../suggest.js'
 
 /** A token that answers a request to go, which is what `Tag` is. */
 type DismissibleToken = Element & { dismiss(): boolean }
@@ -57,8 +59,10 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * its tokens show a selection it owns, drawn from the options it was given.
  *
  * `value` is the typed text. Every keystroke fires `input` with the text on the
- * element, so a table can narrow as the user types. Tokens are not reported,
- * because they are markup you already hold. Backspace in an empty field fires
+ * element, so a table can narrow as the user types. A form receives the text
+ * under `name`, and then one more entry under `name` for each token: its
+ * `value` attribute, or for a `FilterChip`, its field and values written
+ * `field:values` as the field reads them typed. Backspace in an empty field fires
  * `helix-dismiss` on the last token, the same event its remove control fires,
  * so one handler covers the pointer and the keyboard.
  *
@@ -82,8 +86,11 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * moves through them with the arrow keys, and presses one on Enter. The option
  * fires its own `helix-select`, and you decide what choosing it means. Keys
  * before a colon and values after it use the same panel with different
- * contents. `readFilterText` is exported so you can narrow the panel against
- * partly typed text. The panel opens when it has options and closes when it has
+ * contents. `filter-suggestions` narrows the panel to the options whose words
+ * hold the term at the caret, after its colon, ignoring case and accents, and
+ * hides the rest. `readFilterText` is exported so you can narrow it yourself
+ * against partly typed text. While the panel is open, a reader hears how many
+ * suggestions it offers. The panel opens when it has options and closes when it has
  * none, and a choice does not close it, so after picking a key you see its
  * values next. Use `selectionStart` and `setSelectionRange` to write a
  * completion back and put the caret after it, or the next parse reads the wrong
@@ -137,6 +144,7 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * @csspart hint - The help text under the field, shown while there is no error.
  * @csspart label - The label above the field.
  * @csspart lead - The box before the text that holds the `start` slot.
+ * @csspart live - The live region that says how many suggestions the open panel offers. It is rendered from the first time the panel opens with suggestions.
  * @csspart rest - The count of tokens that did not fit. It is a `<button>` with `expandable` and a `<span>` without it.
  * @csspart surface - The floating panel the suggestions sit in.
  * @csspart tags - The row the tokens sit in.
@@ -176,12 +184,99 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
   clearLabel = 'Clear'
 
   /**
+   * Whether the panel narrows itself to the suggestions that hold the term
+   * being typed, as React Aria's Autocomplete filters. Off, the panel shows
+   * what you slot and you narrow it.
+   */
+  @property({ attribute: 'filter-suggestions', type: Boolean })
+  filterSuggestions = false
+
+  /**
    * The text shown while the field is empty.
    *
    * Not a label: it goes when typing starts.
    */
   @property()
   placeholder = ''
+
+  /** What a reader hears for one suggestion, with `{count}` filled in. */
+  @property({ attribute: 'suggestion-label' })
+  suggestionLabel = '{count} suggestion'
+
+  /** What a reader hears for any other number of suggestions, with `{count}` filled in. */
+  @property({ attribute: 'suggestions-label' })
+  suggestionsLabel = '{count} suggestions'
+
+  /** Whether the live region is rendered: from the first count said. */
+  @state()
+  private spoke = false
+
+  /** What the live region says. */
+  @state()
+  private said = ''
+
+  /** The count last said, so the same panel is said once. */
+  private saidCount = -1
+
+  /** The options this element hid while narrowing, so only those are shown again. */
+  private readonly narrowed = new Set<Element>()
+
+  /**
+   * Hides the slotted options whose words do not hold the term at the caret,
+   * under `filter-suggestions`, and shows again the ones it hid before.
+   */
+  private narrow(): void {
+    const slot = this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="suggestions"]')
+    const term = this.filterSuggestions
+      ? currentTerm(this.value, this.control?.selectionStart ?? this.value.length)
+      : ''
+    for (const node of slot?.assignedElements({ flatten: true }) ?? []) {
+      const options = isOption(node) ? [node] : [...node.children].filter(isOption)
+      for (const option of options) {
+        const hide = !suggests(option.textContent ?? '', term)
+        if (hide && !option.hidden) {
+          option.hidden = true
+          this.narrowed.add(option)
+        } else if (!hide && this.narrowed.has(option)) {
+          option.hidden = false
+          this.narrowed.delete(option)
+        }
+      }
+    }
+  }
+
+  /** Says how many suggestions the open panel offers, when that changes. */
+  private sayCount(): void {
+    const count = this.open && this.suggesting ? this.suggestions.length : -1
+    if (count === this.saidCount) {
+      return
+    }
+    this.saidCount = count
+    if (count < 0) {
+      return
+    }
+    this.spoke = true
+    this.said = countLabel(count, this.suggestionLabel, this.suggestionsLabel, this.lang)
+  }
+
+  /**
+   * What the form receives: the text, then one entry for each token that
+   * says what it filters. See the class description.
+   */
+  private formValue(): FormData | string {
+    const entries = (this.tokens?.assignedElements({ flatten: true }) ?? [])
+      .map(tokenEntry)
+      .filter((entry): entry is string => entry !== null)
+    if (this.name === '' || entries.length === 0) {
+      return this.value
+    }
+    const data = new FormData()
+    data.append(this.name, this.value)
+    for (const entry of entries) {
+      data.append(this.name, entry)
+    }
+    return data
+  }
 
   /** How many tokens did not fit, which is what the row's count renders. */
   @state()
@@ -310,7 +405,7 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
         }
       }
     }
-    return found.filter((option) => !option.disabled)
+    return found.filter((option) => !option.disabled && !option.hidden)
   }
 
   /**
@@ -670,6 +765,7 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
    * is why `settleOpen` is not called from here.
    */
   private refreshSuggesting(): void {
+    this.narrow()
     const options = this.suggestions
     this.suggesting = options.length > 0
     /* Clamped rather than kept: the list under the highlight has just been
@@ -789,7 +885,8 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
     super.updated(changed)
     this.releaseCaret?.()
     this.releaseCaret = undefined
-    this.internals.setFormValue(this.value)
+    this.internals.setFormValue(this.formValue())
+    this.sayCount()
     /* The control's own validity, anchored on it, the way `Input` takes it.
        The control is in this shadow root and takes no part in the form, so
        `required` on it alone let an empty filter submit. */
@@ -910,6 +1007,7 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
     >
       <slot name="suggestions" @slotchange=${this.handleSuggestions}></slot>
     </div>
+    ${this.spoke ? html`<span part="live" role="status">${this.said}</span>` : nothing}
     ${this.renderHint()}${this.renderFeedback()}`
   }
 }

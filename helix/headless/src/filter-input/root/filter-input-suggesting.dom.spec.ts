@@ -323,3 +323,32 @@ describe('a filter field that suggests', () => {
     expect(field.selectionEnd).toBe('disposition:ab'.length)
   })
 })
+
+describe('narrowing and counting the suggestions', () => {
+  /* React Aria's Autocomplete filters its collection; here it is asked for. */
+  test('filter-suggestions shows only the options holding the term at the caret', async () => {
+    const host = await mount(['Open', 'Closed', 'Reopened'], 'filter-suggestions')
+    await enter(host)
+    await type(host, 'status:ope')
+    expect(options(host).map((option) => option.hidden)).toEqual([false, true, false])
+    await type(host, 'status:')
+    expect(options(host).map((option) => option.hidden)).toEqual([false, false, false])
+  })
+
+  test('without it, every option stays as slotted', async () => {
+    const host = await mount(['Open', 'Closed'])
+    await enter(host)
+    await type(host, 'zzz')
+    expect(options(host).map((option) => option.hidden)).toEqual([false, false])
+  })
+
+  /* RAC Autocomplete and WA combobox say how many results the panel has. */
+  test('the open panel says how many suggestions it offers', async () => {
+    const host = await mount(['Open', 'Closed', 'Reopened'], 'filter-suggestions')
+    expect(part(host as HTMLElement, 'live')).toBeNull()
+    await enter(host)
+    expect(part(host as HTMLElement, 'live')?.textContent).toBe('3 suggestions')
+    await type(host, 'clo')
+    expect(part(host as HTMLElement, 'live')?.textContent).toBe('1 suggestion')
+  })
+})

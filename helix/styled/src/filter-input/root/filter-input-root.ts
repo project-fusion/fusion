@@ -11,6 +11,7 @@ import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.c
 import { styles as floatingEntranceStyles } from '../../shared/floating/entrance.css.js'
 import { styles as floatingPanelStyles } from '../../shared/floating/panel.css.js'
 import { styles as glyphStyles } from '../../shared/glyph/glyph.css.js'
+import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles as tagRowStyles } from '../../shared/tags/tags.css.js'
 import { styles } from './filter-input-root.css.js'
 
@@ -56,6 +57,7 @@ import { styles } from './filter-input-root.css.js'
 @customElement('helix-filter-input')
 export class HelixFilterInput extends HelixHeadlessFilterInput {
   static override styles: CSSResultGroup = [
+    liveStyles,
     glyphStyles,
     fieldStyles,
     fieldFrameStyles,
