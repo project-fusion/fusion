@@ -302,12 +302,14 @@ export {
 export { onUnlessFalse } from './utils/on-unless-false/on-unless-false.js'
 export { type ColorBytes, readColor } from './utils/read-color/read-color.js'
 export {
+  byRow,
   type Row,
   type RowCell,
   readRows,
   readSeries,
   type Series,
   type SeriesPoint,
+  unbroken,
 } from './utils/read-series/read-series.js'
 export {
   type Relative,

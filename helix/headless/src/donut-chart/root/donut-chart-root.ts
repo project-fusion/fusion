@@ -58,6 +58,13 @@ const THICKNESS: Record<string, number> = {
   small: 26,
 }
 
+/** One slice: its share of the whole, where it starts, and the row it was read from. */
+interface Share {
+  fraction: number
+  row: number
+  start: number
+}
+
 /**
  * @summary A chart that shows parts of a whole as a ring, read from a table.
  *
@@ -208,21 +215,30 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
     return EDGE - this.thickness / 2
   }
 
-  private get shares(): { fraction: number; start: number }[] {
+  /**
+   * Each slice's share of the circle, where it starts, and the row it was read
+   * from.
+   *
+   * The row because a slice is not its row once a row is left out: a value
+   * that does not parse has no slice, and the tooltip counting slices against
+   * the table's rows named the row before the one under the pointer.
+   */
+  private get shares(): Share[] {
     const series = this.series
-    const values = (series[0]?.points ?? [])
-      .map((point) => point.value)
-      .map((value) => (Number.isFinite(value) && value > 0 ? value : 0))
+    const points = series[0]?.points ?? []
+    const values = points.map((point) =>
+      Number.isFinite(point.value) && point.value > 0 ? point.value : 0,
+    )
     const total = values.reduce((sum, one) => sum + one, 0)
     if (total === 0) {
       return []
     }
     let start = 0
-    return values.map((value) => {
+    return values.map((value, index) => {
       const fraction = value / total
       const at = start
       start += fraction
-      return { fraction, start: at }
+      return { fraction, row: points[index]?.at ?? index, start: at }
     })
   }
 
@@ -241,7 +257,7 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
    * `aria-hidden`, because the table it was read from is the readable version
    * and a screen reader hearing both hears the same numbers twice.
    */
-  protected renderPlot(shares: { fraction: number; start: number }[]): TemplateResult {
+  protected renderPlot(shares: Share[]): TemplateResult {
     /* The thickness is declared here, on the box that holds both the ring and
        the middle, and never on the slices. A custom property inherits down and
        never sideways, so `[part="center"]` is a sibling of the circles and would
@@ -292,10 +308,7 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
   }
 
   /** One slice, as a dash the length of its share. */
-  protected renderSegment(
-    share: { fraction: number; start: number },
-    index: number,
-  ): TemplateResult {
+  protected renderSegment(share: Share, index: number): TemplateResult {
     const circumference = 2 * Math.PI * this.radius
     const length = share.fraction * circumference * this.span
     /* Negative, because `stroke-dashoffset` counts backwards along the path:
@@ -349,7 +362,7 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
    * `transform-box: fill-box`, so it spins each element about its own bounding
    * box, which is the ring's center for a circle and is not for a sector.
    */
-  protected renderEdge(share: { fraction: number; start: number }, index: number): TemplateResult {
+  protected renderEdge(share: Share, index: number): TemplateResult {
     const turn = 2 * Math.PI * this.span
     const from = share.start * turn + this.origin
     const to = (share.start + share.fraction) * turn + this.origin
@@ -449,7 +462,7 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
     const across = Math.cos(angle) > 0 !== turned
     return drawTooltip(
       this.sourceRows,
-      at,
+      share.row,
       this.tag('tooltip'),
       {
         fixed: this.sweep !== 'half',

@@ -11,7 +11,8 @@
 /** A reading, reduced to what the bucketing needs. */
 export interface Reading {
   tone?: string | undefined
-  value: number
+  /** The number, or undefined for a row whose cell was blank. */
+  value: number | undefined
 }
 
 /**
@@ -42,8 +43,12 @@ export const toneOf = (
     return undefined
   }
   let chosen: string | undefined
+  const value = reading.value
+  if (value === undefined) {
+    return undefined
+  }
   for (const [index, bound] of thresholds.entries()) {
-    if (reading.value >= bound) {
+    if (value >= bound) {
       chosen = tones[index] ?? chosen
     }
   }
