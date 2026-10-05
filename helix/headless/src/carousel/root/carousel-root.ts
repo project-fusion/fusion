@@ -1,4 +1,5 @@
 import {
+  capturePointer,
   customElement,
   fillTemplate,
   HelixActivateEvent,
@@ -38,6 +39,12 @@ const COUNT_OR_AUTO = {
     value === undefined ? null : String(value),
 }
 
+/** The named slots for the arrows' glyphs, which are not slides. */
+const ICON_SLOTS = ['previous-icon', 'next-icon'] as const
+
+/** How far a mouse moves, in pixels, before a press on the track is a drag. */
+const DRAG_SLOP = 4
+
 /**
  * @summary Shows one slide of several, with controls to move between them.
  *
@@ -67,6 +74,15 @@ const COUNT_OR_AUTO = {
  * and the last. Without `loop`, Previous on the first slide and Next on the
  * last are marked `aria-disabled`.
  *
+ * **`mouse-drag` lets a mouse drag the track**, which otherwise only a touch
+ * screen, a trackpad, or the scroll wheel moves. The drag follows the pointer
+ * with snapping off and settles on the nearest slide when it is let go, and
+ * that move is announced and refusable like a press of Next. A link in a slide
+ * is not followed at the end of a drag.
+ *
+ * The glyphs on Previous and Next can be replaced by slotting an icon of your
+ * own into `previous-icon` and `next-icon`.
+ *
  * @since 0.1.0
  * @status stable
  * @category layout
@@ -74,6 +90,8 @@ const COUNT_OR_AUTO = {
  * @documentation https://fusion.dev/helix/components/carousel
  *
  * @slot - The slides.
+ * @slot next-icon - The glyph on the control that moves to the next slide. Defaults to a caret.
+ * @slot previous-icon - The glyph on the control that moves to the previous slide. Defaults to a caret.
  *
  * @event {HelixActivateEvent} helix-activate - Fired after the slide in view changes, with the new index as a string in `detail.value`.
  * @event {HelixSelectEvent} helix-select - Fired before the slide in view changes, with the requested index. Cancelable: cancel it to keep the current slide. Nothing moves, and a drag returns to the slide the index still holds. See `handleScroll`.
@@ -97,6 +115,8 @@ const COUNT_OR_AUTO = {
  * @cssproperty --carousel-per-view - How many slides go across. The component writes it onto the track, so your stylesheet divides the track by the same number the component counts positions from. Read this property to follow `per-view`, because attribute selectors cannot cover every possible count. Under `per-view="auto"` the component writes nothing and your stylesheet declares it, so the same name works in both modes. See `perView`.
  * @cssproperty --carousel-run-end - How far short of a whole pixel the run ends, set on the last slide only. Your stylesheet applies it as `margin-inline-end`. See `runEnd`.
  * @cssproperty --carousel-slide-min - The narrowest a slide may be. `per-view="auto"` uses it to fit slides into the track. It must be a length, because the stylesheet divides by it. When unset, it is the whole track, which shows one slide across.
+ *
+ * @cssstate dragging - While a mouse drags the track, under `mouse-drag`.
  */
 @customElement('helix-headless-carousel')
 export class HelixHeadlessCarousel extends HelixElement {
@@ -226,6 +246,16 @@ export class HelixHeadlessCarousel extends HelixElement {
   loop = false
 
   /**
+   * Whether a mouse can drag the track from slide to slide.
+   *
+   * Off unless asked for, because a press on a slide is then the start of a
+   * drag, and text in a slide can no longer be selected with the mouse. A drag
+   * of a few pixels or less is still a press.
+   */
+  @property({ attribute: 'mouse-drag', reflect: true, type: Boolean })
+  mouseDrag = false
+
+  /**
    * The name of the control that moves to the next slide.
    */
   @property({ attribute: 'next-label' })
@@ -327,6 +357,14 @@ export class HelixHeadlessCarousel extends HelixElement {
    */
   @property({ attribute: 'previous-label' })
   previousLabel = 'Previous slide'
+
+  /**
+   * The word screen readers announce in place of the carousel's role, set as
+   * `aria-roledescription`. Translate it with the rest of your text, or empty
+   * it to leave the role as `group`.
+   */
+  @property({ attribute: 'role-label' })
+  roleLabel = 'carousel'
 
   /**
    * The name of each slide, with `{index}` and `{count}` filled in.
@@ -522,6 +560,33 @@ export class HelixHeadlessCarousel extends HelixElement {
     return this.fits ? nothing : `--carousel-per-view: ${this.clamped}`
   }
 
+  /**
+   * The track's inline style: the count above, and snapping off while a mouse
+   * drags it.
+   *
+   * **Inline, because the drag does not work without it.** A track that snaps
+   * puts every scroll the drag asks for back on the nearest slide, so the
+   * slides jump from one to the next under the pointer. A stylesheet cannot be
+   * relied on to turn snapping off, since the headless tier has none, so the
+   * component says it for the length of the drag and no longer.
+   *
+   * **And `!important`, because a document rule beats a shadow root's inline
+   * style.** The style attribute is in the shadow tree's context, and a
+   * consumer's `::part(track)` rule is in the document's, which wins every
+   * normal declaration. Measured in Chromium on a headless track snapping from
+   * the document: the inline `none` was there and the computed value stayed
+   * `x mandatory`, and the drag never moved the track. An important
+   * declaration sorts the other way, the inner context first.
+   */
+  private trackStyle(): string | typeof nothing {
+    const handed = this.handed()
+    if (!this.dragging) {
+      return handed
+    }
+    const off = 'scroll-snap-type: none !important'
+    return handed === nothing ? off : `${handed}; ${off}`
+  }
+
   /** What the box resolved to, and `undefined` until it has been laid out. */
   @state()
   private fitted: number | undefined
@@ -597,7 +662,15 @@ export class HelixHeadlessCarousel extends HelixElement {
        children, which the server cannot see, so they arrive with the upgrade.
        Nothing moves when they do: the tags are hidden until they are
        defined, and after hydration the update that follows counts them. */
-    return this.knownChildren.filter((child): child is HTMLElement => child instanceof HTMLElement)
+    return this.knownChildren.filter(
+      (child): child is HTMLElement =>
+        child instanceof HTMLElement && !(ICON_SLOTS as readonly string[]).includes(child.slot),
+    )
+  }
+
+  /** What a consumer slotted into one of the arrows' glyph slots. */
+  private iconsFor(name: (typeof ICON_SLOTS)[number]): Element[] {
+    return this.knownChildren.filter((child) => child.slot === name)
   }
 
   /**
@@ -814,6 +887,118 @@ export class HelixHeadlessCarousel extends HelixElement {
     this.settling = false
   }
 
+  /** Whether a mouse is dragging the track. */
+  @state()
+  private dragging = false
+
+  /** A mouse pressed on the track under `mouse-drag`, from where it pressed. */
+  private pull: { left: number; top: number; x: number; y: number } | undefined
+
+  /** Takes the press, and under `mouse-drag` the start of a drag. */
+  private readonly handlePress = (event: PointerEvent): void => {
+    this.handleTake()
+    const track = this.partNamed('track')
+    if (!this.mouseDrag || event.pointerType !== 'mouse' || event.button !== 0 || !track) {
+      return
+    }
+    this.pull = { left: track.scrollLeft, top: track.scrollTop, x: event.clientX, y: event.clientY }
+  }
+
+  /**
+   * Moves the track with the pointer.
+   *
+   * Not until the pointer has moved a few pixels, so a press on a link or a
+   * button in a slide stays a press. Instant scrolls, since a smooth one would
+   * trail the pointer.
+   */
+  private readonly handlePull = (event: PointerEvent): void => {
+    const pull = this.pull
+    const track = this.partNamed('track')
+    if (!pull || !track) {
+      return
+    }
+    /* Let go off the track before it was a drag, where no release reached it. */
+    if ((event.buttons & 1) === 0) {
+      this.pull = undefined
+      return
+    }
+    const across = event.clientX - pull.x
+    const down = event.clientY - pull.y
+    if (!this.dragging) {
+      if (Math.hypot(across, down) < DRAG_SLOP) {
+        return
+      }
+      this.dragging = true
+      track.style.setProperty('scroll-snap-type', 'none', 'important')
+      capturePointer(track, event.pointerId)
+    }
+    track.scrollTo(
+      this.orientation === 'vertical'
+        ? { behavior: 'instant', top: pull.top - down }
+        : { behavior: 'instant', left: pull.left - across },
+    )
+  }
+
+  /**
+   * Lets go of the track, and settles on the slide nearest to where it was let
+   * go.
+   *
+   * Through the same request as a press of Next, so the move is refusable,
+   * sends `helix-activate`, and is announced. A refusal, or a drag that ends on
+   * the slide it began on, goes back to that slide once snapping is on again.
+   */
+  private readonly handleLetGo = (): void => {
+    if (!this.pull) {
+      return
+    }
+    this.pull = undefined
+    if (!this.dragging) {
+      return
+    }
+    this.swallowClick()
+    const nearest = this.nearest()
+    this.dragging = false
+    this.showing = undefined
+    const moved =
+      nearest !== undefined &&
+      nearest !== this.index &&
+      requestChange({
+        apply: (value) => this.applyIndex(value),
+        event: (value) => new HelixSelectEvent({ value: String(value) }),
+        host: this,
+        next: nearest,
+      })
+    if (!moved) {
+      this.updateComplete.then(() => this.scrollToIndex())
+    }
+  }
+
+  /**
+   * Keeps the click that ends a drag from following a link in the slide.
+   *
+   * Once, in capture on the track, and given up a moment later where no click
+   * comes, which is a drag let go off the track.
+   */
+  private swallowClick(): void {
+    const track = this.partNamed('track')
+    if (!track) {
+      return
+    }
+    const swallow = (event: Event): void => {
+      event.preventDefault()
+      event.stopPropagation()
+    }
+    track.addEventListener('click', swallow, { capture: true, once: true })
+    setTimeout(() => track.removeEventListener('click', swallow, { capture: true }))
+  }
+
+  /** Keeps a mouse drag from picking up a link or an image under `mouse-drag`. */
+  private readonly handleDragStart = (event: DragEvent): void => {
+    if (this.mouseDrag) {
+      event.preventDefault()
+    }
+  }
+
   /**
    * Stops rotation for good.
    *
@@ -941,6 +1126,11 @@ export class HelixHeadlessCarousel extends HelixElement {
   private readonly handleScroll = (): void => {
     if (this.settling) {
       this.settling = false
+      return
+    }
+    /* A mouse drag scrolls the track itself, one instant scroll per move, and
+       each can end in a `scrollend`. The drag settles when it is let go. */
+    if (this.dragging) {
       return
     }
     /* The marker goes back to following the committed index, whatever this
@@ -1082,8 +1272,9 @@ export class HelixHeadlessCarousel extends HelixElement {
     }
     hostAria(this.internals, { label: this.label, role: 'group' })
     // Announced as a carousel rather than as a bare group, so a reader knows
-    // what the controls beside it are for.
-    this.internals.ariaRoleDescription = 'carousel'
+    // what the controls beside it are for. In the page's language, from
+    // `roleLabel`, and with no role description where that is empty.
+    this.internals.ariaRoleDescription = this.roleLabel || null
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
@@ -1133,6 +1324,7 @@ export class HelixHeadlessCarousel extends HelixElement {
     this.holdIndex()
     this.watchPane()
     this.assign()
+    this.toggleState('dragging', this.dragging)
   }
 
   /**
@@ -1169,6 +1361,12 @@ export class HelixHeadlessCarousel extends HelixElement {
         this.route(slide, `slide-${index + 1}`)
       })
       return
+    }
+    /* The glyphs, which a manual root does not route by their `slot` either. */
+    for (const name of ICON_SLOTS) {
+      this.renderRoot
+        ?.querySelector?.<HTMLSlotElement>(`slot[name="${name}"]`)
+        ?.assign?.(...this.iconsFor(name))
     }
     const panes = this.renderRoot?.querySelectorAll?.<HTMLSlotElement>('[part="slide"] slot')
     if (!panes) {
@@ -1252,6 +1450,30 @@ export class HelixHeadlessCarousel extends HelixElement {
     return side === 'start' ? this.index <= 0 : this.index >= this.positions - 1
   }
 
+  /**
+   * The glyph on Previous: the `previous-icon` slot, holding a caret until
+   * something is slotted. A tier above overrides this to draw its own caret.
+   */
+  protected renderPreviousMark(): TemplateResult {
+    return html`<slot name="previous-icon"
+      ><svg part="previous-mark" data-mirror fill="currentColor" viewBox=${caretLeft.viewBox} aria-hidden="true">
+        ${unsafeSVG(caretLeft.content)}
+      </svg></slot
+    >`
+  }
+
+  /**
+   * The glyph on Next: the `next-icon` slot, holding a caret until something
+   * is slotted. A tier above overrides this to draw its own caret.
+   */
+  protected renderNextMark(): TemplateResult {
+    return html`<slot name="next-icon"
+      ><svg part="next-mark" data-mirror fill="currentColor" viewBox=${caretRight.viewBox} aria-hidden="true">
+        ${unsafeSVG(caretRight.content)}
+      </svg></slot
+    >`
+  }
+
   protected override render(): TemplateResult {
     const rotating = this.rotating
     const last = this.slides.length - 1
@@ -1289,9 +1511,7 @@ export class HelixHeadlessCarousel extends HelixElement {
                   aria-disabled=${this.atEnd('start') ? 'true' : nothing}
                   @click=${() => this.goTo(this.index - 1)}
                 >
-                  <svg part="previous-mark" data-mirror fill="currentColor" viewBox=${caretLeft.viewBox} aria-hidden="true">
-                    ${unsafeSVG(caretLeft.content)}
-                  </svg>
+                  ${this.renderPreviousMark()}
                 </button>
                 <button
                   part="next"
@@ -1300,19 +1520,22 @@ export class HelixHeadlessCarousel extends HelixElement {
                   aria-disabled=${this.atEnd('end') ? 'true' : nothing}
                   @click=${() => this.goTo(this.index + 1)}
                 >
-                  <svg part="next-mark" data-mirror fill="currentColor" viewBox=${caretRight.viewBox} aria-hidden="true">
-                    ${unsafeSVG(caretRight.content)}
-                  </svg>
+                  ${this.renderNextMark()}
                 </button>`
         }
       </div>
       <div
         data-scroller
         part="track"
-        style=${this.handed()}
+        style=${this.trackStyle()}
         @scroll=${this.handleTrackScroll}
         @scrollend=${this.handleScroll}
-        @pointerdown=${this.handleTake}
+        @pointerdown=${this.handlePress}
+        @pointermove=${this.handlePull}
+        @pointerup=${this.handleLetGo}
+        @pointercancel=${this.handleLetGo}
+        @lostpointercapture=${this.handleLetGo}
+        @dragstart=${this.handleDragStart}
         @touchstart=${this.handleTake}
         @wheel=${this.handleTake}
       >
@@ -1320,7 +1543,7 @@ export class HelixHeadlessCarousel extends HelixElement {
           (_, index) => html`<div
             part="slide"
             role="group"
-            aria-roledescription=${this.slideRoleLabel}
+            aria-roledescription=${this.slideRoleLabel || nothing}
             aria-label=${fillTemplate(this.slideLabel, { count: this.slides.length, index: index + 1 })}
             style=${index === last ? this.runEnd() : nothing}
           >

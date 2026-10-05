@@ -1,5 +1,12 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostAttributes, partTag, servedParts, ssr } from '@fusion.dev/helix-testing/ssr'
+import {
+  hasPart,
+  hostAttributes,
+  partTag,
+  rendered,
+  servedParts,
+  ssr,
+} from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -60,5 +67,30 @@ describe('carousel server output', () => {
 
   test('the host carries only what the consumer wrote', () => {
     expect(hostAttributes(ssr(carousel), 'helix-headless-carousel')).toEqual(['label'])
+  })
+
+  test('serves each arrow its glyph slot, holding the caret', () => {
+    /* A slotted icon lands by name on a server's root, and the caret is what
+       shows when nothing is slotted. */
+    const shadow = rendered(ssr(carousel), 'helix-headless-carousel')
+    expect(shadow).toMatch(
+      /<slot\s+name="previous-icon"\s*>\s*(?:<!--[^>]*-->\s*)*<svg\s[^>]*part="previous-mark"/,
+    )
+    expect(shadow).toMatch(
+      /<slot\s+name="next-icon"\s*>\s*(?:<!--[^>]*-->\s*)*<svg\s[^>]*part="next-mark"/,
+    )
+  })
+
+  test('a carousel a mouse can drag serves no drag in progress', () => {
+    const markup =
+      ssr(html`<helix-headless-carousel label="Verticals" mouse-drag role-label="Karussell">
+      <div>Design</div>
+    </helix-headless-carousel>`)
+    expect(partTag(markup, 'track')).not.toContain('scroll-snap-type')
+    expect(hostAttributes(markup, 'helix-headless-carousel')).toEqual([
+      'label',
+      'mouse-drag',
+      'role-label',
+    ])
   })
 })

@@ -140,6 +140,19 @@
   );
 }
 
+/* The heading above the links, set like them and a step heavier, its text
+   lined up with theirs past the rail. Its own margins go, since a heading's
+   are the page's rhythm and this one sits in a rail. */
+::slotted([slot="heading"]) {
+  color: var(--helix-color-foreground);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-semibold);
+  line-height: var(--helix-leading-normal);
+  margin-block: 0 var(--helix-space-xs);
+  margin-inline: 0;
+  padding-inline-start: calc(var(--outline-rail) + var(--helix-space-sm));
+}
+
 /* Print: a table of contents, which is what paper invented. */
 @media print {
   :host {

@@ -167,3 +167,93 @@ describe('outline scrolling', () => {
     }
   })
 })
+
+describe('the levels of a flat run', () => {
+  const outline = async (body: string): Promise<Nav> => {
+    const nav = (await mount(
+      `<helix-headless-outline label="On this page">${body}</helix-headless-outline>`,
+    )) as Nav
+    await nav.updateComplete
+    await nav.updateComplete
+    return nav
+  }
+
+  /** The lists drawn in the shadow root, written short: each link's href in its list. */
+  const lists = (nav: Nav): string => {
+    const read = (list: Element): string =>
+      `[${[...list.children]
+        .map((item) => {
+          const link = item.querySelector<HTMLSlotElement>(':scope > slot[data-link]')
+          const href = link?.assignedElements()[0]?.getAttribute('href') ?? '?'
+          const inner = item.querySelector(':scope > slot[role="list"]')
+          return inner ? `${href} ${read(inner)}` : href
+        })
+        .join(' ')}]`
+    const top = nav.shadowRoot?.querySelector('nav > slot[role="list"]')
+    return top ? read(top) : 'none'
+  }
+
+  test('are lists inside list items, nested by data-level', async () => {
+    /* A screen reader heard `data-level` as a flat run of links, the level
+       being an attribute only a stylesheet read. */
+    const nav = await outline(
+      '<a href="#a">A</a><a href="#b" data-level="2">B</a><a href="#c" data-level="3">C</a>' +
+        '<a href="#d" data-level="2">D</a><a href="#e">E</a>',
+    )
+    expect(lists(nav)).toBe('[#a [#b [#c] #d] #e]')
+    expect(
+      [...(nav.shadowRoot?.querySelectorAll('[role="listitem"]') ?? [])].every(
+        (item) => item.tagName === 'SLOT' && item.parentElement?.getAttribute('role') === 'list',
+      ),
+    ).toBe(true)
+  })
+
+  test('follow a level that changes, or a link that arrives', async () => {
+    const nav = await outline('<a href="#a">A</a><a href="#b">B</a>')
+    expect(lists(nav)).toBe('[#a #b]')
+    nav.querySelector('[href="#b"]')?.setAttribute('data-level', '2')
+    const c = document.createElement('a')
+    c.href = '#c'
+    nav.append(c)
+    await new Promise((settled) => setTimeout(settled, 0))
+    await nav.updateComplete
+    await nav.updateComplete
+    expect(lists(nav)).toBe('[#a [#b] #c]')
+  })
+
+  test('are left to a list a consumer wrote, which has its levels already', async () => {
+    const nav = await outline('<ul><li><a href="#a">A</a></li></ul>')
+    expect(lists(nav)).toBe('none')
+    const plain = nav.shadowRoot?.querySelector<HTMLSlotElement>('nav > slot:not([role])')
+    expect(plain?.assignedElements().map((one) => one.tagName)).toEqual(['UL'])
+  })
+})
+
+describe('the heading slot', () => {
+  test('holds what is slotted for it, outside the run of links', async () => {
+    const nav = (await mount(
+      '<helix-headless-outline><h2 slot="heading">Contents</h2><a href="#a">A</a></helix-headless-outline>',
+    )) as Nav
+    await nav.updateComplete
+    await nav.updateComplete
+    const heading = nav.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="heading"]')
+    expect(heading?.assignedElements().map((one) => one.textContent)).toEqual(['Contents'])
+    expect(heading?.parentElement?.getAttribute('part')).toBe('heading')
+    expect(nav.shadowRoot?.querySelectorAll('[role="listitem"]').length).toBe(1)
+  })
+
+  test('names the navigation, where the browser can point at it from the shadow root', async () => {
+    /* happy-dom has no element reflection, so this half runs in a browser. */
+    const nav = (await mount(
+      '<helix-headless-outline><h2 slot="heading">Contents</h2><a href="#a">A</a></helix-headless-outline>',
+    )) as Nav
+    await nav.updateComplete
+    const landmark = nav.shadowRoot?.querySelector('nav') as Element & {
+      ariaLabelledByElements?: Element[] | null
+    }
+    if (!('ariaLabelledByElements' in landmark)) {
+      return
+    }
+    expect(landmark.ariaLabelledByElements?.map((one) => one.textContent)).toEqual(['Contents'])
+  })
+})
