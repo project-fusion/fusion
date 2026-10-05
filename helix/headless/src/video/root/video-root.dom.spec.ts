@@ -462,6 +462,34 @@ describe('video', () => {
     expect(part(host, 'captions')).toBeNull()
   })
 
+  /* Each row checks itself after `helix-before-toggle`, and the player already
+     marks the track showing. The request is the player's own business, and a
+     page listening on the player heard it for markup it never wrote. */
+  test('choosing a track leaves exactly one row checked, and keeps the request inside', async () => {
+    const host = await player(`<helix-headless-video label="A clip" src="/clip.mp4">
+      <track kind="captions" label="English" src="/en.vtt" srclang="en" />
+      <track kind="captions" label="French" src="/fr.vtt" srclang="fr" />
+    </helix-headless-video>`)
+    await host.updateComplete
+    const asked: string[] = []
+    host.addEventListener('helix-before-toggle', (event) => asked.push(event.type))
+    const menu = part(host, 'captions-menu') as HTMLElement
+    const rows = [...menu.querySelectorAll<Player>('[part="entry"]')]
+    const pick = (row: HTMLElement | undefined): void => {
+      ;(part(row as HTMLElement, 'item') as HTMLElement).click()
+    }
+    const checked = (): boolean[] =>
+      rows.map((row) => (row as Player & { checked: boolean }).checked)
+    expect(checked()).toEqual([true, false, false])
+    pick(rows[2])
+    await host.updateComplete
+    expect(checked()).toEqual([false, false, true])
+    pick(rows[0])
+    await host.updateComplete
+    expect(checked()).toEqual([true, false, false])
+    expect(asked).toEqual([])
+  })
+
   test('the clock drops an hour it does not have', async () => {
     // `0:42`, not `00:00:42`. A reader comparing position to duration reads two
     // numbers at a glance, and leading zeroes that never change are digits in

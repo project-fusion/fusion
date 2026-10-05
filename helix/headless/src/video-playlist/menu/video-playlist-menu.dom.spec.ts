@@ -150,6 +150,43 @@ describe('video playlist menu', () => {
     expect(playlist.active).toBe('two')
   })
 
+  /* A row checks itself after `helix-before-toggle`, and this menu already
+     marks the current entry from the playlist. With both at it, a refused
+     choice left the tick on the entry that was refused, on every later open. */
+  describe('the tick, read when the menu next opens', () => {
+    /* A press on the row a reader lands on, which is what chooses it. */
+    const pick = (entry: HTMLElement | undefined): void => {
+      ;(part(entry as HTMLElement, 'item') as HTMLElement).click()
+    }
+
+    const reopen = async (menu: Menu): Promise<void> => {
+      menu.dispatchEvent(new CustomEvent('helix-before-open', { bubbles: true, composed: true }))
+      await menu.updateComplete
+    }
+
+    test('is on the entry chosen, and only that one', async () => {
+      const { menu, playlist } = await mountMenu()
+      const asked: string[] = []
+      playlist.addEventListener('helix-before-toggle', (event) => asked.push(event.type))
+      pick(entries(menu)[1])
+      await playlist.updateComplete
+      await reopen(menu)
+      expect(playlist.active).toBe('two')
+      expect(await ticked(menu)).toEqual(['false', 'true', 'false'])
+      expect(asked).toEqual([])
+    })
+
+    test('stays on the entry playing when the choice is refused', async () => {
+      const { menu, playlist } = await mountMenu()
+      playlist.addEventListener('helix-before-activate', (event) => event.preventDefault())
+      pick(entries(menu)[1])
+      await playlist.updateComplete
+      await reopen(menu)
+      expect(playlist.active).toBe('one')
+      expect(await ticked(menu)).toEqual(['true', 'false', 'false'])
+    })
+  })
+
   test("what leaves the menu is the menu's own event, not the item's", async () => {
     /* So a consumer listening here sees what the playlist sees. The item's
        event is stopped and re-announced from the host rather than let through,

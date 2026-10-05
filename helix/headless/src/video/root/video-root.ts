@@ -1066,6 +1066,21 @@ export class HelixHeadlessVideo extends HelixElement {
     this.seek(video.currentTime + seconds)
   }
 
+  /**
+   * Keeps each choice row's tick where this element puts it.
+   *
+   * A choice row checks itself after `helix-before-toggle`, and this element
+   * already sets `checked` on every row from its own state. The request is
+   * refused, so a tick moves only when the choice is applied, and stopped, so
+   * it does not reach a page that never placed the row.
+   */
+  private readonly keepTick = (event: Event): void => {
+    if (event.target === event.currentTarget) {
+      event.preventDefault()
+      event.stopPropagation()
+    }
+  }
+
   /** Shows one track and disables every other, or shows none at `-1`. */
   private showCaption(index: number): void {
     showCaption(captionTracks(this.video), index)
@@ -1461,6 +1476,7 @@ export class HelixHeadlessVideo extends HelixElement {
         checkable
         exclusive
         ?checked=${this.captionIndex < 0}
+        @helix-before-toggle=${this.keepTick}
         @helix-select=${() => this.showCaption(-1)}
       >
         ${this.captionsOffLabel}
@@ -1472,6 +1488,7 @@ export class HelixHeadlessVideo extends HelixElement {
           checkable
           exclusive
           ?checked=${this.captionIndex === at}
+          @helix-before-toggle=${this.keepTick}
           @helix-select=${() => this.showCaption(at)}
         >
           ${track.label || track.language}

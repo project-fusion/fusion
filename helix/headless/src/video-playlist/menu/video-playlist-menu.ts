@@ -4,6 +4,7 @@ import {
   drawIcon,
   HelixElement,
   HelixSelectEvent,
+  type Placement,
 } from '@fusion.dev/helix-core'
 import { list } from '@fusion.dev/helix-icons'
 import { nothing, type TemplateResult } from 'lit'
@@ -67,7 +68,7 @@ export class HelixHeadlessVideoPlaylistMenu extends HelixElement {
    * opening downward from there opens off the player.
    */
   @property()
-  placement = 'top-end'
+  placement: Placement = 'top-end'
 
   /** Whether the menu is open, for the built-in trigger to say so. */
   @state()
@@ -178,6 +179,21 @@ export class HelixHeadlessVideoPlaylistMenu extends HelixElement {
     this.requestUpdate()
   }
 
+  /**
+   * Keeps each choice row's tick where this element puts it.
+   *
+   * A choice row checks itself after `helix-before-toggle`, and this element
+   * already sets `checked` on every row from its own state. The request is
+   * refused, so a tick moves only when the choice is applied, and stopped, so
+   * it does not reach a page that never placed the row.
+   */
+  private readonly keepTick = (event: Event): void => {
+    if (event.target === event.currentTarget) {
+      event.preventDefault()
+      event.stopPropagation()
+    }
+  }
+
   private readonly choose = (value: string): void => {
     this.dispatchEvent(new HelixSelectEvent({ value }))
   }
@@ -210,6 +226,7 @@ export class HelixHeadlessVideoPlaylistMenu extends HelixElement {
           ?checked=${entry.current}
           ?disabled=${entry.disabled}
           exclusive
+          @helix-before-toggle=${this.keepTick}
           @helix-select=${(event: Event) => {
             /* Stopped and re-announced from the host rather than let through.
                What travels up is then this element's own event, so a consumer
