@@ -79,9 +79,11 @@ export class HelixHeadlessOption extends HelixElement {
   /**
    * Whether this is the option the keyboard is on.
    *
-   * Written by the listbox, which writes it once a reader moves the highlight.
-   * It shows as `:state(active)`, and as a `data-active` attribute for the
-   * stylesheets written before the state existed.
+   * Written by the listbox once a reader moves the highlight. Style it with
+   * `:state(active)`, or `::part(item-active)` for an option inside another
+   * component's shadow root. The `data-active` attribute sets it from markup;
+   * it is also written back for stylesheets from before the state, and no
+   * stylesheet of the library's own selects it.
    */
   @property({ attribute: 'data-active', reflect: true, type: Boolean })
   active = false
@@ -380,7 +382,7 @@ export class HelixHeadlessOption extends HelixElement {
        key cannot tell the difference.
 
        `item-selected` and `item-active` say on the row what `:state(selected)`
-       and `data-active` say on the host, for the option a component draws in
+       and `:state(active)` say on the host, for the option a component draws in
        its own shadow root: `Time Picker`'s times are out of reach of any
        selector naming the host, and `::part()` reaches the row. */
     return html`<div

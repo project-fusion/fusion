@@ -25,6 +25,7 @@ import {
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
+import { wheelName } from '../wheel-name.js'
 /* Relative, so this registers the headless elements and the styled file's
    identical imports register the styled ones. `tier` picks which the template
    asks for. */
@@ -147,9 +148,12 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
 
   /**
    * What the wheel of hours is called, read by screen readers.
+   *
+   * Absent is the locale's own word, from `Intl.DisplayNames`: "Hour" in
+   * English, "Stunde" in German.
    */
   @property({ attribute: 'hour-label' })
-  hourLabel = 'Hour'
+  hourLabel?: string
 
   /**
    * Whether the current selection fails validation.
@@ -198,9 +202,12 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
   /**
    * What the wheel of the half of the day is called, read by screen readers.
    * Its two options are written as the locale writes them, such as AM and PM.
+   *
+   * Absent is the locale's own word, from `Intl.DisplayNames`: "AM/PM" in
+   * English, "Tageshälfte" in German.
    */
   @property({ attribute: 'meridiem-label' })
-  meridiemLabel = 'Before or after noon'
+  meridiemLabel?: string
 
   /**
    * Earliest time offered, as `HH:mm`.
@@ -210,9 +217,12 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
 
   /**
    * What the wheel of minutes is called, read by screen readers.
+   *
+   * Absent is the locale's own word, from `Intl.DisplayNames`: "Minute" in
+   * English and German, "分" in Japanese.
    */
   @property({ attribute: 'minute-label' })
-  minuteLabel = 'Minute'
+  minuteLabel?: string
 
   /**
    * How many times can be held at once.
@@ -536,9 +546,12 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
 
   /**
    * What the wheel of seconds is called, read by screen readers.
+   *
+   * Absent is the locale's own word, from `Intl.DisplayNames`: "Second" in
+   * English, "Sekunde" in German.
    */
   @property({ attribute: 'second-label' })
-  secondLabel = 'Second'
+  secondLabel?: string
 
   /**
    * Whether times carry their seconds.
@@ -930,7 +943,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
     >
       ${this.renderColumn(
         'hour',
-        this.hourLabel,
+        this.hourLabel ?? wheelName('hour', this.locale),
         hours.map(String),
         (one) => (twelve ? one : one.padStart(2, '0')),
         String(shown),
@@ -938,7 +951,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
       )}
       ${this.renderColumn(
         'minute',
-        this.minuteLabel,
+        this.minuteLabel ?? wheelName('minute', this.locale),
         this.minutes.map(String),
         (one) => one.padStart(2, '0'),
         String(minute),
@@ -948,7 +961,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
         this.seconds
           ? this.renderColumn(
               'second',
-              this.secondLabel,
+              this.secondLabel ?? wheelName('second', this.locale),
               this.secondsShown.map(String),
               (one) => one.padStart(2, '0'),
               String(second),
@@ -960,7 +973,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
         twelve
           ? this.renderColumn(
               'meridiem',
-              this.meridiemLabel,
+              this.meridiemLabel ?? wheelName('dayPeriod', this.locale),
               ['AM', 'PM'],
               (one) => dayPeriod(one as 'AM' | 'PM', this.clock),
               meridiem,

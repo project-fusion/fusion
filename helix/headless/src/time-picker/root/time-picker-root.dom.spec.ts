@@ -536,6 +536,17 @@ describe('the words on the wheels', () => {
     expect(halves.map((one) => one.getAttribute('value'))).toEqual(['AM', 'PM'])
     expect(halves.map((one) => one.textContent?.trim())).toEqual(['오전', '오후'])
   })
+
+  test('are the locale’s own names where no property is set', async () => {
+    const english = await picker('variant="wheels" locale="en-US" seconds')
+    expect(column(english, 'hour').getAttribute('aria-label')).toBe('Hour')
+    expect(column(english, 'second').getAttribute('aria-label')).toBe('Second')
+    expect(column(english, 'meridiem').getAttribute('aria-label')).toBe('AM/PM')
+    const german = await picker('variant="wheels" locale="de-DE" hour-cycle="h12"')
+    expect(column(german, 'hour').getAttribute('aria-label')).toBe('Stunde')
+    expect(column(german, 'minute').getAttribute('aria-label')).toBe('Minute')
+    expect(column(german, 'meridiem').getAttribute('aria-label')).toBe('Tageshälfte')
+  })
 })
 
 describe('the name of a time picker', () => {
