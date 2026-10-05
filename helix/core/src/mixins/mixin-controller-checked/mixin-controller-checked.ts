@@ -25,7 +25,9 @@ export declare class MixinControllerCheckedInterface {
   checked: boolean
 
   /**
-   * Whether the control starts checked. A form reset returns it to this state.
+   * Whether the control starts checked. A form reset returns it to this state,
+   * and to the `checked` attribute where this one is not written, as a native
+   * checkbox resets to the `checked` it declares.
    */
   defaultChecked: boolean
 
@@ -53,7 +55,8 @@ export declare class MixinControllerCheckedInterface {
   toggleChecked(): boolean
 
   /**
-   * Drops the recorded state, so the control reads `defaultChecked` again.
+   * Returns the control to what its markup declared: `defaultChecked` where
+   * `default-checked` is written, and the `checked` attribute where it is not.
    *
    * A form reset has to return a control to what its markup declared, and
    * assigning `checked` cannot do it: any assignment records a state, and the
@@ -102,7 +105,9 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
     }
 
     /**
-     * Whether the control starts checked. A form reset returns it to this state.
+     * Whether the control starts checked. A form reset returns it to this state,
+     * and to the `checked` attribute where this one is not written, as a native
+     * checkbox resets to the `checked` it declares.
      */
     @property({ attribute: 'default-checked', type: Boolean })
     defaultChecked = false
@@ -212,15 +217,23 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
     }
 
     /**
-     * Drops the recorded state, so the control reads `defaultChecked` again.
+     * Returns the control to what its markup declared: `defaultChecked` where
+     * `default-checked` is written, and the `checked` attribute where it is
+     * not.
      *
      * A form reset has to return a control to what its markup declared, and no
      * assignment to `checked` can do that: any assignment records a state. The
      * recorded state lives here, so this is where it is dropped.
+     *
+     * **The platform's rule for the second half.** `<input type="checkbox"
+     * checked>` declares itself checked and a reset returns there, because the
+     * attribute is its default. `checked` never reflects, so the attribute is
+     * still what the page wrote.
      */
     resetChecked(): void {
       const previous = this.checked
-      this.checkedState = undefined
+      this.checkedState =
+        this.hasAttribute('default-checked') || !this.hasAttribute('checked') ? undefined : true
       this.requestUpdate('checked', previous)
     }
   }
