@@ -102,6 +102,42 @@ describe('a table that changes under it', () => {
     expect(chartOne.updates()).toBeGreaterThan(0)
   })
 
+  /* A framework page renders the chart first and the table once its data
+     loads. Watching only what resolved on connect found nothing to watch, and
+     the chart drew nothing until some unrelated property changed. */
+  test('draws a table that arrives after it connected', async () => {
+    document.body.innerHTML = '<div id="slot"></div>'
+    const chartOne = chart('src')
+    chartOne.controller.hostConnected()
+    expect(chartOne.controller.element).toBeNull()
+    const before = chartOne.updates()
+    const slot = document.querySelector('#slot') as Element
+    slot.innerHTML = '<table id="src"><tbody><tr><th>March</th><td>1</td></tr></tbody></table>'
+    await new Promise((done) => setTimeout(done, 0))
+    expect(chartOne.updates()).toBeGreaterThan(before)
+    expect(chartOne.controller.element?.id).toBe('src')
+    expect(chartOne.controller.rows.map((each) => each.label)).toEqual(['March'])
+  })
+
+  /* A re-keyed table is a new element under the old id, and the old one is
+     detached: still watched, it reported nothing ever again. */
+  test('follows a table replaced under the same id, and the edits to it', async () => {
+    document.body.innerHTML =
+      '<div id="slot"><table id="src"><tbody><tr><th>March</th><td>1</td></tr></tbody></table></div>'
+    const chartOne = chart('src')
+    chartOne.controller.hostConnected()
+    const slot = document.querySelector('#slot') as Element
+    slot.innerHTML = '<table id="src"><tbody><tr><th>June</th><td>6</td></tr></tbody></table>'
+    await new Promise((done) => setTimeout(done, 0))
+    const before = chartOne.updates()
+    const row = document.createElement('tr')
+    row.innerHTML = '<th>July</th><td>7</td>'
+    document.querySelector('tbody')?.append(row)
+    await new Promise((done) => setTimeout(done, 0))
+    expect(chartOne.updates()).toBeGreaterThan(before)
+    expect(chartOne.controller.rows.map((each) => each.label)).toEqual(['June', 'July'])
+  })
+
   test('and stops asking once the chart is gone', async () => {
     document.body.innerHTML = '<table id="src"><tbody><tr><td>1</td></tr></tbody></table>'
     const chartOne = chart('src')
@@ -109,6 +145,7 @@ describe('a table that changes under it', () => {
     chartOne.controller.hostDisconnected()
     const before = chartOne.updates()
     document.querySelector('tbody')?.append(document.createElement('tr'))
+    document.body.innerHTML = '<table id="src"><tbody><tr><td>2</td></tr></tbody></table>'
     await new Promise((done) => setTimeout(done, 0))
     expect(chartOne.updates()).toBe(before)
   })
