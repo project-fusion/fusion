@@ -887,3 +887,64 @@ describe('input date hands its calendar a rule, a drawing and the months', () =>
     expect(calendar.dayContent).toBe(draw)
   })
 })
+
+describe('segmented', () => {
+  const segments = (host: HTMLElement): HTMLElement[] => [
+    ...(host.shadowRoot?.querySelectorAll<HTMLElement>('[part~="segment"]') ?? []),
+  ]
+  const press = async (host: InputDate, at: HTMLElement, key: string): Promise<void> => {
+    at.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key }),
+    )
+    await host.updateComplete
+  }
+
+  test('the field is a segment for each part of the date, in the order of `locale`', async () => {
+    const host = await field('segmented locale="de-DE" default-value="2026-08-04"')
+    expect(part(host, 'control')).toBeNull()
+    expect(segments(host).map((one) => one.textContent?.trim())).toEqual(['04', '08', '2026'])
+    expect(part(host, 'segments')?.getAttribute('role')).toBe('group')
+  })
+
+  test('a key in a segment moves the value, which the form and the calendar hold', async () => {
+    const host = await field('segmented name="d" default-value="2026-08-04"')
+    await press(host, segments(host)[0] as HTMLElement, 'ArrowUp')
+    expect(host.value).toBe('2026-09-04')
+    expect(formValue(host)).toBe('2026-09-04')
+    expect(picker(host).value).toBe('2026-09-04')
+  })
+
+  test('a date picked in the calendar is what the segments show', async () => {
+    const host = await field('segmented default-value="2026-08-04"')
+    picker(host).dispatchEvent(
+      new CustomEvent('helix-before-change', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        detail: { value: '2026-10-21' },
+      }),
+    )
+    await host.updateComplete
+    expect(segments(host).map((one) => one.textContent?.trim())).toEqual(['10', '21', '2026'])
+  })
+
+  test('a date the field bars is invalid, as a typed one is', async () => {
+    const host = (await field(
+      'segmented min="2026-08-01" default-value="2026-08-04"',
+    )) as InputDate & {
+      internals: ElementInternals
+    }
+    await press(host, segments(host)[1] as HTMLElement, 'Home')
+    expect(host.value).toBe('2026-08-01')
+    expect(host.internals.validity.valid).toBe(true)
+    await press(host, segments(host)[0] as HTMLElement, 'ArrowDown')
+    expect(host.value).toBe('2026-07-01')
+    expect(host.internals.validity.badInput).toBe(true)
+  })
+
+  test('a range and a multiple keep the line of text, which writes several dates', async () => {
+    const host = await field('segmented mode="range"')
+    expect(part(host, 'control')).not.toBeNull()
+    expect(part(host, 'segments')).toBeNull()
+  })
+})

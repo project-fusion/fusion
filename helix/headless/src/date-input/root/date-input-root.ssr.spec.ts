@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { partTag, ssr } from '@fusion.dev/helix-testing/ssr'
+import { partTag, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -55,5 +55,22 @@ describe('date input server output', () => {
     const shut = ssr(html`<helix-headless-date-input label="Born"></helix-headless-date-input>`)
     expect(partTag(shut, 'surface')).toMatch(/\shidden[\s=>]/)
     expect(partTag(shut, 'trigger')).toContain('aria-expanded="false"')
+  })
+
+  test('`segmented` serves a segment for each part of the date, holding the value', () => {
+    const markup = ssr(
+      html`<helix-headless-date-input
+        label="Born"
+        segmented
+        locale="en-US"
+        value="2026-08-04"
+      ></helix-headless-date-input>`,
+    )
+    const shadow = rendered(markup, 'helix-headless-date-input')
+    expect(partTag(markup, 'segments')).toContain('role="group"')
+    expect(partTag(markup, 'segments')).toContain('aria-labelledby="label"')
+    expect(shadow).toContain('aria-valuetext="8 – August"')
+    expect(shadow).toContain('aria-valuenow="2026"')
+    expect(partTag(markup, 'control')).toBe('')
   })
 })

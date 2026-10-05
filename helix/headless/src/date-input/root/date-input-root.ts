@@ -12,6 +12,7 @@ import {
   MixinField,
   MixinPickerEditing,
   MixinPickerField,
+  MixinSegmentedField,
   MixinTokens,
 } from '@fusion.dev/helix-core'
 import { calendarBlank } from '@fusion.dev/helix-icons'
@@ -62,6 +63,10 @@ const dates = (value: string): string[] =>
  * calendar too. Tab into the field opens nothing, and Tab out of the field
  * closes the calendar.
  *
+ * With `segmented`, the field is a row of segments in place of the text: a
+ * month, a day and a year in the order the locale writes them, each set with
+ * digits or the arrow keys. Alt+Down opens the calendar from a segment.
+ *
  * @since 0.1.0
  * @status stable
  * @category forms
@@ -83,14 +88,17 @@ const dates = (value: string): string[] =>
  *
  * @csspart control - The text input.
  * @csspart date - One held date, as a tag, in `multiple`.
+ * @csspart date-cell - The tag's grid cell, which a tag draws only inside a tag group.
  * @csspart date-dismiss - The remove button, when `dismissible`.
  * @csspart date-dismiss-mark - The icon on the remove button, shown when no icon is slotted.
  * @csspart date-label - The label, trimmed to its capitals and baseline.
+ * @csspart date-link - The tag's link around its label, which a tag draws only with `href`.
  * @csspart date-start - The category before the label.
  * @csspart feedback - The error message under the field.
  * @csspart field - The box that holds the text and the trigger.
  * @csspart hint - The help text under the field, shown while there is no error.
  * @csspart label - The label above the field.
+ * @csspart literal - The text the locale writes between two segments, such as a slash, in `segmented`.
  * @csspart picker - The date picker inside the panel.
  * @csspart picker-cell - One cell in a row of days. A range colors these cells.
  * @csspart picker-cell-range-end - The cell of a range's last day. Applied with `picker-cell`.
@@ -120,6 +128,9 @@ const dates = (value: string): string[] =>
  * @csspart picker-week - One row of days.
  * @csspart picker-weekday - A column header naming a day of the week.
  * @csspart rest - The count of dates beyond the ones shown. It is a `<button>` with `expandable` and a `<span>` without it.
+ * @csspart segment - One part of the date, a year, a month or a day, in `segmented`.
+ * @csspart segment-placeholder - A segment with nothing in it yet. Applied with `segment`.
+ * @csspart segments - The row of segments that holds the date, in `segmented`.
  * @csspart surface - The floating panel.
  * @csspart tags - The row the dates sit in.
  * @csspart trigger - The control that opens the calendar.
@@ -129,9 +140,11 @@ const dates = (value: string): string[] =>
  * @cssstate open - The calendar is open.
  */
 @customElement('helix-headless-date-input')
-export class HelixHeadlessDateInput extends MixinPickerEditing(
-  MixinPickerField(
-    MixinControllerOpen(MixinTokens(MixinControllerValue(MixinField(HelixFormElement)))),
+export class HelixHeadlessDateInput extends MixinSegmentedField(
+  MixinPickerEditing(
+    MixinPickerField(
+      MixinControllerOpen(MixinTokens(MixinControllerValue(MixinField(HelixFormElement)))),
+    ),
   ),
 ) {
   /* A consumer's `aria-describedby` names ids in their own tree and the control
@@ -140,7 +153,7 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
      in Chrome's own tree, the host held the description and the control the
      reader is actually on was exposed without it. */
   protected readonly aria = new AriaForwardController(this, {
-    target: () => this.partNamed('control'),
+    target: () => this.partNamed('control') ?? this.segmentGroup,
   })
 
   /**
@@ -453,6 +466,22 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
     return held.length > 0 && held.every(isDateValue) ? held.join(',') : ''
   }
 
+  /**
+   * Segments hold one date, so `range` and `multiple` keep the line of text,
+   * whose separators and tags are how those modes write several.
+   */
+  protected override get segmentable(): boolean {
+    return this.mode === undefined
+  }
+
+  protected override get segmentedKind(): 'date' {
+    return 'date'
+  }
+
+  protected override get segmentLocale(): string {
+    return this.locale
+  }
+
   /** One date, written the way `dateStyle` asks for. */
   private written(date: string): string {
     if (this.dateStyle === 'iso' || !isDateValue(date)) {
@@ -759,7 +788,7 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
   protected renderTag(date: string): TemplateResult {
     return html`<${this.tag('tag')}
                   part="date"
-      exportparts="dismiss: date-dismiss, dismiss-mark: date-dismiss-mark, label: date-label, start: date-start"
+      exportparts="cell: date-cell, dismiss: date-dismiss, dismiss-mark: date-dismiss-mark, label: date-label, link: date-link, start: date-start"
                   dismissible
                   dismiss-label=${fillTemplate(this.removeLabel, { name: this.written(date) })}
                   ?disabled=${this.isDisabled}
@@ -807,31 +836,35 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
               )
             : nothing
         }
-        <input
-          part="control"
-          id=${this.controlId}
-          type="text"
-          .value=${this.display}
-          name=${this.name || nothing}
-          placeholder=${
-            this.mode === 'multiple' && dates(this.value).length > 0
-              ? nothing
-              : this.placeholder || nothing
-          }
-          autocomplete=${this.autocomplete || nothing}
-          inputmode="numeric"
-          aria-describedby=${this.describedBy ?? nothing}
-          aria-invalid=${this.invalidity ?? nothing}
-          ?disabled=${this.isDisabled}
-          ?readonly=${this.readOnly}
-          ?required=${this.required}
-          @blur=${this.handleBlur}
-          @change=${this.handleCommit}
-          @focus=${this.handleFocus}
-          @input=${this.handleInput}
-          @keydown=${this.handleDraftKey}
-          @keypress=${this.handleKeypress}
-        />
+        ${
+          this.segmentsShown
+            ? this.renderSegments()
+            : html`<input
+                part="control"
+                id=${this.controlId}
+                type="text"
+                .value=${this.display}
+                name=${this.name || nothing}
+                placeholder=${
+                  this.mode === 'multiple' && dates(this.value).length > 0
+                    ? nothing
+                    : this.placeholder || nothing
+                }
+                autocomplete=${this.autocomplete || nothing}
+                inputmode="numeric"
+                aria-describedby=${this.describedBy ?? nothing}
+                aria-invalid=${this.invalidity ?? nothing}
+                ?disabled=${this.isDisabled}
+                ?readonly=${this.readOnly}
+                ?required=${this.required}
+                @blur=${this.handleBlur}
+                @change=${this.handleCommit}
+                @focus=${this.handleFocus}
+                @input=${this.handleInput}
+                @keydown=${this.handleDraftKey}
+                @keypress=${this.handleKeypress}
+              />`
+        }
         <button
           part="trigger"
           type="button"

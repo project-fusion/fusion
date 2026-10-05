@@ -74,4 +74,16 @@ describe('input time server output', () => {
   test('the host carries only what the consumer wrote', () => {
     expect(hostAttributes(ssr(field), TAG)).toEqual(['hint', 'label', 'locale', 'name', 'value'])
   })
+
+  test('`segmented` ships its segments on the clock asked for, before any script runs', () => {
+    const markup = ssr(
+      html`<helix-time-input hour-cycle="h23" label="Starts" locale="en-US" segmented value="14:30"></helix-time-input>`,
+    )
+    const shadow = rendered(markup, TAG)
+    expect(hasPart(markup, 'segments')).toBe(true)
+    expect(hasPart(markup, 'control')).toBe(false)
+    const order = [...shadow.matchAll(/data-segment="([a-z]+)"/gi)].map((match) => match[1])
+    expect(order).toEqual(['hour', 'minute'])
+    expect(shadow).toContain('aria-valuenow="14"')
+  })
 })

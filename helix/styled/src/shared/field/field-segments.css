@@ -1,0 +1,50 @@
+/* A date or a time as a row of segments, `segmented` on Date Input and Time
+   Input, which `MixinSegmentedField` draws. One sheet for both families, as the
+   mixin is one; each family hands it its own hooks through the `--_segment-*`
+   properties, the way `shared/floating` takes its own.
+
+   The row stands where the text input stands and takes the text's type, so a
+   field reads the same size whichever it holds. */
+[part="segments"] {
+  align-items: center;
+  color: var(--helix-color-foreground);
+  display: flex;
+  flex: 1 1 auto;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-md);
+  /* Figures of one width, so a segment does not move the ones after it as its
+     number changes under the arrow keys. */
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--helix-weight-medium);
+  min-inline-size: 0;
+  white-space: nowrap;
+}
+
+/* The segment with focus is marked by its fill, the way a selection is: the
+   field draws the ring for the whole control, and a second ring inside it is a
+   second control where a reader sees one. */
+[part~="segment"] {
+  border-radius: var(--helix-radii-sm);
+  caret-color: transparent;
+  outline: none;
+  padding-inline: calc(var(--helix-space-2xs) / 2);
+}
+
+[part~="segment"]:focus {
+  background-color: var(--_segment-focus-background-color, var(--helix-color-primary));
+  color: var(--_segment-focus-color, var(--helix-color-foreground-on-primary));
+}
+
+[part~="segment-placeholder"] {
+  color: var(--_segment-placeholder-color, var(--helix-color-foreground-subtle));
+}
+
+[part="literal"] {
+  color: var(--_segment-literal-color, var(--helix-color-foreground-muted));
+  white-space: pre;
+}
+
+:host(:disabled) [part="segments"] {
+  color: var(--helix-color-foreground-subtle);
+  cursor: not-allowed;
+}

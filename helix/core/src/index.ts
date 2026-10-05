@@ -263,6 +263,10 @@ export {
   type MixinPickerFieldInterface,
 } from './mixins/mixin-picker-field/mixin-picker-field.js'
 export {
+  MixinSegmentedField,
+  type MixinSegmentedFieldInterface,
+} from './mixins/mixin-segmented-field/mixin-segmented-field.js'
+export {
   MixinSelectableItem,
   type MixinSelectableItemInterface,
 } from './mixins/mixin-selectable-item/mixin-selectable-item.js'

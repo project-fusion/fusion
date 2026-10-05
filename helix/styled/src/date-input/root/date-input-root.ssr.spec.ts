@@ -83,4 +83,16 @@ describe('input date server output', () => {
       'value',
     ])
   })
+
+  test('`segmented` ships its segments in the locale’s order, before any script runs', () => {
+    const markup = ssr(
+      html`<helix-date-input label="Starts" locale="de-DE" segmented value="2026-08-18"></helix-date-input>`,
+    )
+    const shadow = rendered(markup, TAG)
+    expect(hasPart(markup, 'segments')).toBe(true)
+    expect(hasPart(markup, 'control')).toBe(false)
+    const order = [...shadow.matchAll(/data-segment="([a-z]+)"/gi)].map((match) => match[1])
+    expect(order).toEqual(['day', 'month', 'year'])
+    expect(shadow).toContain('aria-label="Monat"')
+  })
 })
