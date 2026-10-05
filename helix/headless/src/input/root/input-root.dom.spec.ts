@@ -143,3 +143,51 @@ describe('a field with no name', () => {
     }
   })
 })
+
+describe('clearing and stepping', () => {
+  type Field = Input & { stepDown: (count?: number) => void; stepUp: (count?: number) => void }
+
+  /* Web Awesome sends wa-clear. A consumer resetting a search on the clear
+     button alone could not tell it from typing the field empty. */
+  test('the clear button sends helix-clear after input and change', async () => {
+    const host = (await mount(
+      '<helix-headless-input label="Search" clearable value="cats"></helix-headless-input>',
+    )) as Field
+    const heard: string[] = []
+    for (const name of ['input', 'change', 'helix-clear']) {
+      host.addEventListener(name, () => heard.push(name))
+    }
+    ;(part(host, 'clear') as HTMLElement).click()
+    await host.updateComplete
+    expect(host.value).toBe('')
+    expect(heard).toEqual(['input', 'change', 'helix-clear'])
+  })
+
+  test('a refused clear sends no helix-clear', async () => {
+    const host = (await mount(
+      '<helix-headless-input label="Search" clearable value="cats"></helix-headless-input>',
+    )) as Field
+    let cleared = 0
+    host.addEventListener('helix-before-change', (event) => event.preventDefault())
+    host.addEventListener('helix-clear', () => {
+      cleared += 1
+    })
+    ;(part(host, 'clear') as HTMLElement).click()
+    await host.updateComplete
+    expect([host.value, cleared]).toEqual(['cats', 0])
+  })
+
+  test('stepUp and stepDown move a number by its step, within its bounds', async () => {
+    const host = (await mount(
+      '<helix-headless-input label="Seats" type="number" step="5" max="12" value="0"></helix-headless-input>',
+    )) as Field
+    host.stepUp()
+    expect(host.value).toBe('5')
+    host.stepUp(3)
+    expect(host.value).toBe('10')
+    /* Once: happy-dom's own `stepDown(2)` moves one step, measured, where a
+       browser moves two. */
+    host.stepDown()
+    expect(host.value).toBe('5')
+  })
+})

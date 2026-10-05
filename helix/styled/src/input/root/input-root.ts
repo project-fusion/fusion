@@ -30,6 +30,9 @@ import { styles } from './input-root.css.js'
  * @documentation https://fusion.dev/helix/components/input
  *
  * @cssproperty --input-background-color - Fill behind the text.
+ * @cssproperty --input-border-color - Edge of the field at rest. Hover, focus and an error still draw their own.
+ * @cssproperty --input-padding-inline - Space between the edge of the field and what is inside it.
+ * @cssproperty --input-radius - Corner radius of the field.
  * @cssproperty --input-size - Height of the field.
  */
 @customElement('helix-input')
