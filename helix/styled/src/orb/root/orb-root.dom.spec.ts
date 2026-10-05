@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { readColor } from '@fusion.dev/helix-core'
+import type { readColor as ReadColor } from '@fusion.dev/helix-core'
 import {
   at,
   framesBooked,
@@ -27,9 +27,13 @@ import {
    exactly that reason: `@customElement` runs at evaluation, and a static import
    would run it before `registerDom` has installed a `customElements` to
    register against. The element then never upgrades and every assertion about
-   its shadow root reads `undefined`. */
+   its shadow root reads `undefined`. Core is imported here too: it reads
+   the globals it finds when it is evaluated, and a static import of it breaks
+   six of these when the file runs alone. */
+let readColor: typeof ReadColor
 beforeAll(async () => {
   registerDom()
+  ;({ readColor } = await import('@fusion.dev/helix-core'))
   await import('../index.js')
 })
 
@@ -114,6 +118,18 @@ describe('orb', () => {
     )) as Upgraded
     await host.updateComplete
     expect(label(host)).toBe('Running tests')
+  })
+
+  test('names a state in the words it is given, and keeps English for the rest', async () => {
+    const host = (await mount('<helix-orb state="working"></helix-orb>')) as Upgraded & {
+      stateLabels: Record<string, string>
+    }
+    host.stateLabels = { working: 'En cours' }
+    await host.updateComplete
+    expect(label(host)).toBe('En cours')
+    host.state = 'done'
+    await host.updateComplete
+    expect(label(host)).toBe('Done')
   })
 
   /* **Lit updates an element whether or not it is still connected**, so one

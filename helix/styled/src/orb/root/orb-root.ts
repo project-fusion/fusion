@@ -90,8 +90,10 @@ const GRAY: ColorBytes = [128, 128, 128]
  * `prefers-reduced-motion`, it draws one still frame.
  *
  * The orb is styled only and has behavior, which the tier split does not
- * otherwise allow. The behavior is drawing dots to a canvas, so there is no
- * structure to restyle and nothing for a headless element to hold.
+ * otherwise allow. Its role, name and busy state follow `state`, and the rest
+ * is drawing dots to a canvas, so there is no structure to restyle. For a
+ * drawing of your own, the headless `Loader` holds the same busy progress bar
+ * and its name.
  *
  * @since 0.8.0
  * @status stable
@@ -151,6 +153,15 @@ export class HelixOrb extends HelixElement {
    */
   @property()
   state: OrbState = 'thinking'
+
+  /**
+   * The word for each state, for a page in another language.
+   *
+   * A state left out keeps its English word, and `label` wins over both. It is
+   * a property with no attribute, keyed by state, such as `{ thinking: '…' }`.
+   */
+  @property({ attribute: false })
+  stateLabels: Partial<Record<OrbState, string>> = {}
 
   private canvas: HTMLCanvasElement | undefined
   private context: CanvasRenderingContext2D | null = null
@@ -223,7 +234,7 @@ export class HelixOrb extends HelixElement {
        there is not: a finished orb that still announced itself as a progress
        bar would leave a screen reader waiting for a bar that never fills. */
     hostAria(this.internals, {
-      label: this.label || LABELS[state],
+      label: this.label || this.stateLabels[state] || LABELS[state],
       role: state === 'done' ? 'img' : 'progressbar',
     })
     this.internals.ariaBusy = state === 'done' ? 'false' : 'true'
