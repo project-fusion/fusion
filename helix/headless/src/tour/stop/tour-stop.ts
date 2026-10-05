@@ -1,11 +1,14 @@
 import {
+  arrowReach,
   customElement,
   elementById,
   HelixElement,
   HelixTourAskEvent,
   type Placement,
   PopoverController,
+  reflectElements,
   type Side,
+  sideOf,
 } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -212,9 +215,7 @@ export class HelixHeadlessTourStop extends HelixElement {
        at. `offsetWidth` rather than a rect, which reports the rotated box. */
     offset: () => {
       const tour = this.parentElement as (HTMLElement & { spotlightPadding?: number }) | null
-      return (
-        (tour?.spotlightPadding ?? 0) + (this.partNamed('arrow')?.offsetWidth ?? 0) / Math.SQRT2
-      )
+      return (tour?.spotlightPadding ?? 0) + arrowReach(this.partNamed('arrow'))
     },
     /* A press outside does not end a tour, and this is the decision rather than
        a stub. Everywhere else a surface closes on an outside press because
@@ -234,7 +235,7 @@ export class HelixHeadlessTourStop extends HelixElement {
        from below wherever React had set it as a property and there was no
        attribute to read. */
     onPlace: (placement) => {
-      const side = placement.split('-')[0] as Side
+      const side = sideOf(placement)
       this.toggleState('placed-bottom', side === 'bottom')
       this.toggleState('placed-left', side === 'left')
       this.toggleState('placed-right', side === 'right')
@@ -270,15 +271,7 @@ export class HelixHeadlessTourStop extends HelixElement {
    * `stopNaming` decides which words.
    */
   private nameByHeading(): void {
-    const bubble = this.partNamed('bubble') as
-      | (HTMLElement & {
-          ariaDescribedByElements?: Element[] | null
-          ariaLabelledByElements?: Element[] | null
-        })
-      | null
-    if (!bubble || !('ariaLabelledByElements' in bubble)) {
-      return
-    }
+    const bubble = this.partNamed('bubble')
     const slotted = (name: string): Element[] =>
       this.renderRoot
         .querySelector<HTMLSlotElement>(`slot[name="${name}"]`)
@@ -290,8 +283,10 @@ export class HelixHeadlessTourStop extends HelixElement {
       labeled: this.label !== '',
       progress: this.position === '' ? null : this.partNamed('progress'),
     })
-    bubble.ariaLabelledByElements = labelledBy.length > 0 ? labelledBy : null
-    bubble.ariaDescribedByElements = describedBy.length > 0 ? describedBy : null
+    /* Owned outright: the stop writes both whatever it found, and clears what
+       it finds nothing for. */
+    reflectElements(bubble, 'ariaLabelledByElements', labelledBy, true)
+    reflectElements(bubble, 'ariaDescribedByElements', describedBy, true)
   }
 
   protected override updated(changed: PropertyValues): void {

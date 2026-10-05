@@ -1,20 +1,23 @@
 import {
   AriaForwardController,
   anchorElement,
+  arrowReach,
   CommandController,
   customElement,
   deepActiveElement,
   FocusScopeController,
   HelixElement,
+  headingIn,
   MixinControllerOpen,
   type Placement,
   PopoverController,
+  reflectElements,
   type Side,
+  sideOf,
   tellDisclosure,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
-import { headingIn } from '../heading.js'
 
 /**
  * @summary A panel that opens next to its trigger and holds any content.
@@ -151,12 +154,12 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
     /* Measured to the point where there is one, as `Tooltip` measures it: the
        arrow is a square turned on its center, which reaches `n / sqrt(2)` past
        the edge it sits on. */
-    offset: () => this.offset + (this.partNamed('arrow')?.offsetWidth ?? 0) / Math.SQRT2,
+    offset: () => this.offset + arrowReach(this.partNamed('arrow')),
     onDismiss: () => this.hide(),
     /* The side the panel landed on, for a sheet outside that draws by side,
        where no attribute can follow `::part()`. As `Tooltip` records it. */
     onPlace: (placement) => {
-      const side = placement.split('-')[0] as Side
+      const side = sideOf(placement)
       this.toggleState('placed-bottom', side === 'bottom')
       this.toggleState('placed-left', side === 'left')
       this.toggleState('placed-right', side === 'right')
@@ -202,21 +205,14 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
    * reason `Dialog` gives.
    */
   private nameByHeading(): void {
-    const panel = this.partNamed('popover') as
-      | (HTMLElement & { ariaLabelledByElements?: Element[] | null })
-      | null
-    if (!panel || !('ariaLabelledByElements' in panel)) {
-      return
-    }
     const asked = this.label !== 'Popover' || this.hasAttribute('aria-labelledby')
     const heading = asked ? null : headingIn(this.slotted)
-    if (heading) {
-      panel.ariaLabelledByElements = [heading]
-      this.namedByHeading = true
-    } else if (this.namedByHeading) {
-      panel.ariaLabelledByElements = null
-      this.namedByHeading = false
-    }
+    this.namedByHeading = reflectElements(
+      this.partNamed('popover'),
+      'ariaLabelledByElements',
+      heading ? [heading] : [],
+      this.namedByHeading,
+    )
   }
 
   /**

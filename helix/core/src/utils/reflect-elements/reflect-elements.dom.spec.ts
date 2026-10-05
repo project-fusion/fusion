@@ -1,33 +1,49 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { registerDom } from '@fusion.dev/helix-testing/dom'
-import { focusTarget, linkDescription, unlinkDescription } from './describe.js'
+import { linkDescription, reflectElements, unlinkDescription } from './reflect-elements.js'
 
 beforeAll(() => {
   registerDom()
 })
 
-type Reflecting = HTMLElement & { ariaDescribedByElements: Element[] | null }
+type Reflecting = HTMLElement & {
+  ariaDescribedByElements: Element[] | null
+  ariaLabelledByElements: Element[] | null
+}
 
-/* happy-dom has no element reflection, so the accessor is stood in, as an
-   engine with reflection provides it. */
+/* happy-dom has no element reflection, so the accessors are stood in, as an
+   engine with reflection provides them. */
 const reflecting = <T extends HTMLElement>(element: T): T & Reflecting => {
   Object.defineProperty(element, 'ariaDescribedByElements', { value: null, writable: true })
+  Object.defineProperty(element, 'ariaLabelledByElements', { value: null, writable: true })
   return element as T & Reflecting
 }
 
-describe('the element a trigger’s focus lands on', () => {
-  test('is the trigger, where it keeps its own focus', () => {
-    const button = document.createElement('button')
-    expect(focusTarget(button)).toBe(button)
+describe('reflecting the elements that name a panel', () => {
+  test("writes them, and the property is then the caller's", () => {
+    const panel = reflecting(document.createElement('div'))
+    const heading = document.createElement('h2')
+    expect(reflectElements(panel, 'ariaLabelledByElements', [heading], false)).toBe(true)
+    expect(panel.ariaLabelledByElements).toEqual([heading])
   })
 
-  test('is the control inside a component that delegates focus', () => {
-    const host = document.createElement('div')
-    const root = host.attachShadow({ delegatesFocus: true, mode: 'open' })
-    /* happy-dom answers false however it was asked, so the answer is stood in. */
-    Object.defineProperty(root, 'delegatesFocus', { value: true })
-    root.innerHTML = '<span>Label</span><button>Inside</button>'
-    expect(focusTarget(host)).toBe(root.querySelector('button') as Element)
+  test('clears only what the caller wrote', () => {
+    const panel = reflecting(document.createElement('div'))
+    const theirs = document.createElement('span')
+    panel.ariaLabelledByElements = [theirs]
+    expect(reflectElements(panel, 'ariaLabelledByElements', [], false)).toBe(false)
+    expect(panel.ariaLabelledByElements).toEqual([theirs])
+    expect(reflectElements(panel, 'ariaLabelledByElements', [], true)).toBe(false)
+    expect(panel.ariaLabelledByElements).toBeNull()
+  })
+
+  test('writes nothing where the engine has no reflection, and keeps what was owned', () => {
+    const plain = document.createElement('div')
+    const words = [document.createElement('p')]
+    expect(reflectElements(plain, 'ariaDescribedByElements', words, true)).toBe(true)
+    expect(reflectElements(plain, 'ariaDescribedByElements', words, false)).toBe(false)
+    expect('ariaDescribedByElements' in plain).toBe(false)
+    expect(reflectElements(null, 'ariaDescribedByElements', words, false)).toBe(false)
   })
 })
 
