@@ -46,9 +46,14 @@ import { styles } from './filter-input-root.css.js'
  * @cssproperty --filter-input-background-color - The fill behind the field.
  * @cssproperty --filter-input-border-color - The color of the suggestion panel's border.
  * @cssproperty --filter-input-border-width - The width of the suggestion panel's border. It follows `--helix-border-floating`.
+ * @cssproperty --filter-input-clear-color - The clear button's icon at rest.
+ * @cssproperty --filter-input-clear-color-hover - The clear button's icon under the pointer.
  * @cssproperty --filter-input-control-size - The smallest width the text keeps as tokens fill the line. Below it, the text wraps to its own line.
+ * @cssproperty --filter-input-field-border-color - The field's edge at rest. Hover, focus, and an error still draw their own.
  * @cssproperty --filter-input-lead-border-color - The color of the line between the leading box and the text.
+ * @cssproperty --filter-input-padding-inline - Space at each side of the field, inside its edge.
  * @cssproperty --filter-input-panel-size - The width of the suggestion panel. It matches the field by default.
+ * @cssproperty --filter-input-radius - Corner radius of the field.
  * @cssproperty --filter-input-shadow - The shadow under the panel. It follows
  *   `--helix-shadow-floating`. The panel can sit over any content, so it has a
  *   shadow by default.

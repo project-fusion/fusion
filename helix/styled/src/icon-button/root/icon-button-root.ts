@@ -37,6 +37,8 @@ import { styles } from './icon-button-root.css.js'
  * @cssproperty --icon-button-radius - Corner radius of the control, which a group flattens through `--button-radius-start` and `--button-radius-end`.
  * @cssproperty --icon-button-shadow - Shadow of a raised icon button.
  * @cssproperty --icon-button-size - Edge length of the control.
+ * @cssproperty --icon-button-spinner-color - Color of the ring a pending button turns. It follows the icon's color.
+ * @cssproperty --icon-button-spinner-duration - How long the ring takes to turn once.
  * @cssproperty --icon-button-spinner-size - Size of the ring a pending button turns.
  *
  * @cssstate pending - The button is pending: `pending` is set. A ring turns over its hidden icon.

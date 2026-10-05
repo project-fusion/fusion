@@ -30,9 +30,13 @@ import { styles } from './pin-input-root.css.js'
  *
  * @cssproperty --pin-input-cell-background-color - Fill behind each box.
  * @cssproperty --pin-input-cell-border-color - Edge of each box at rest. Hover, focus and an error still draw their own.
+ * @cssproperty --pin-input-cell-border-color-focus - Edge of the box holding focus.
+ * @cssproperty --pin-input-cell-color - The color of a typed character.
+ * @cssproperty --pin-input-cell-font-size - The size of a typed character.
  * @cssproperty --pin-input-cell-radius - Corner radius of each box.
  * @cssproperty --pin-input-cell-size - Width and height of each box.
  * @cssproperty --pin-input-gap - The space between one box and the next.
+ * @cssproperty --pin-input-separator-color - The color of the text `format` draws between boxes.
  */
 @customElement('helix-pin-input')
 export class HelixPinInput extends HelixHeadlessPinInput {

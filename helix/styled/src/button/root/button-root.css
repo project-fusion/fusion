@@ -259,10 +259,11 @@
 }
 
 :host(:state(pending)) [part="button"]::after {
-  animation: helix-button-turn var(--_button-turn) linear infinite;
+  animation: helix-button-turn var(--button-spinner-duration, var(--_button-turn)) linear infinite;
   block-size: var(--button-spinner-size, 1.15em);
-  border: var(--helix-border-thick) solid color-mix(in oklab, currentColor 30%, transparent);
-  border-block-start-color: currentColor;
+  border: var(--helix-border-thick) solid
+    color-mix(in oklab, var(--button-spinner-color, currentColor) 30%, transparent);
+  border-block-start-color: var(--button-spinner-color, currentColor);
   border-radius: var(--helix-radii-full);
   box-sizing: border-box;
   content: "";

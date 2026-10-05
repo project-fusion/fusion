@@ -19,8 +19,9 @@
 [part="field"] {
   align-items: center;
   background-color: var(--filter-input-background-color, var(--helix-color-well));
-  border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-sm);
+  border: var(--helix-border-thin) solid
+    var(--filter-input-field-border-color, var(--helix-color-border));
+  border-radius: var(--filter-input-radius, var(--helix-radii-sm));
   color: var(--helix-color-foreground-subtle);
   display: flex;
   flex-wrap: wrap;
@@ -28,7 +29,7 @@
   min-block-size: var(--_filter-input-size);
   /* Room above and below a token, which a fixed-height field does not need. */
   padding-block: var(--helix-space-2xs);
-  padding-inline: var(--helix-space-xs);
+  padding-inline: var(--filter-input-padding-inline, var(--helix-space-xs));
   transition:
     border-color var(--helix-duration-fast) var(--helix-easing-standard),
     background-color var(--helix-duration-fast) var(--helix-easing-standard);
@@ -124,7 +125,7 @@ slot[name="end"]::slotted(*) {
   align-self: center;
   border-radius: var(--helix-radii-sm);
   box-sizing: border-box;
-  color: var(--helix-color-foreground-subtle);
+  color: var(--filter-input-clear-color, var(--helix-color-foreground-subtle));
   cursor: pointer;
   display: flex;
   flex: 0 0 auto;
@@ -136,7 +137,7 @@ slot[name="end"]::slotted(*) {
 
 [part="clear"]:hover {
   background-color: color-mix(in oklab, currentcolor 12%, transparent);
-  color: var(--helix-color-foreground);
+  color: var(--filter-input-clear-color-hover, var(--helix-color-foreground));
 }
 
 [part="clear"]:focus-visible {
