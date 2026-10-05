@@ -519,7 +519,17 @@ describe('the dialog’s regions and close control', () => {
 })
 
 describe('entering and exiting', () => {
-  const frames = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 80))
+  /* Polls until neither phase holds, rather than sleeping a fixed time. */
+  const frames = async (host?: Dialog): Promise<void> => {
+    const until = Date.now() + 1500
+    do {
+      await new Promise((resolve) => setTimeout(resolve, 10))
+    } while (
+      host &&
+      (hasState(host, 'entering') || hasState(host, 'exiting')) &&
+      Date.now() < until
+    )
+  }
 
   test('a dialog opening is entering until it settles, and one closing is exiting', async () => {
     const host = await dialog()
@@ -527,12 +537,12 @@ describe('entering and exiting', () => {
     await host.updateComplete
     expect(hasState(host, 'entering')).toBe(true)
     expect(hasState(host, 'exiting')).toBe(false)
-    await frames()
+    await frames(host)
     expect(hasState(host, 'entering')).toBe(false)
     host.close()
     await host.updateComplete
     expect(hasState(host, 'exiting')).toBe(true)
-    await frames()
+    await frames(host)
     expect(hasState(host, 'exiting')).toBe(false)
   })
 

@@ -34,6 +34,15 @@ const setup = (surface: Element | null = null) => {
 
 const later = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 80))
 
+/* Polls to the outcome rather than sleeping at it: two frames on a loaded
+   runner can take longer than any fixed wait worth writing down. */
+const settles = async (marks: Set<OpenPhase>): Promise<void> => {
+  const until = Date.now() + 1500
+  while (marks.size > 0 && Date.now() < until) {
+    await new Promise((resolve) => setTimeout(resolve, 10))
+  }
+}
+
 describe('entering and exiting', () => {
   test('the first update marks nothing, open or not', () => {
     const { marks, update } = setup()
@@ -46,11 +55,11 @@ describe('entering and exiting', () => {
     update(false)
     update(true)
     expect([...marks]).toEqual(['entering'])
-    await later()
+    await settles(marks)
     expect([...marks]).toEqual([])
     update(false)
     expect([...marks]).toEqual(['exiting'])
-    await later()
+    await settles(marks)
     expect([...marks]).toEqual([])
   })
 
@@ -60,7 +69,7 @@ describe('entering and exiting', () => {
     update(true)
     update(false)
     expect([...marks]).toEqual(['exiting'])
-    await later()
+    await settles(marks)
     expect([...marks]).toEqual([])
   })
 
