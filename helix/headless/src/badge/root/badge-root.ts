@@ -20,13 +20,17 @@ import { property } from 'lit/decorators.js'
  * fuller name, such as `4 unread`. A dot needs a `label`. Without one, the dot
  * is a colored circle that screen readers do not announce.
  *
- * **The count is not part of the wrapped control's name.** It is a status of
- * its own, read when it changes and when a reader moves to it, so focusing a
- * button inside a badge announces the button's name alone. Where the count
- * belongs in that name, write it into the control's own label, such as
- * `aria-label="Inbox, 8 unread"` on a button that reads "Inbox". The badge
- * cannot add it: a reference from the control to the count would point into
- * the badge's shadow root, which the platform does not allow.
+ * **A badge wrapped around a control is not part of the control's name.** It
+ * is a status of its own, read when it changes and when a reader moves to it,
+ * so focusing a button inside a badge announces the button's name alone. A
+ * reference from the control to the count would point into the badge's shadow
+ * root, which the platform does not allow.
+ *
+ * **Put the badge inside the control to have its count read with the
+ * control's name**, as Web Awesome and Shoelace do: `<button>Inbox
+ * <helix-badge value="8" label="8 unread"></helix-badge></button>` is the
+ * button "Inbox 8 unread", and stays current as the count changes. The styled
+ * tier's `placement="inline"` draws the mark in the line for that case.
  *
  * @since 0.1.0
  * @status stable
@@ -108,7 +112,12 @@ export class HelixHeadlessBadge extends HelixElement {
      *
      * A dot with no label still says nothing, which is the deliberate half: a
      * dot means "something here" and cannot say what, so naming it is the
-     * consumer's to do and silence is better than "badge". */
+     * consumer's to do and silence is better than "badge".
+     *
+     * **The count names the region even with no label**, the text it already
+     * shows. Chromium leaves a status region's own text out of an ancestor's
+     * name and reads its `aria-label`, so this is what puts "Alerts 3" on a
+     * button holding the badge, measured. */
     const announced = !blank && (text !== '' || this.label !== '')
 
     // The indicator holds the text and nothing else, so an absent value leaves
@@ -136,7 +145,7 @@ export class HelixHeadlessBadge extends HelixElement {
         data-blank=${blank ? '' : nothing}
         data-single=${text.length <= 1 ? '' : nothing}
         role="status"
-        aria-label=${this.label !== '' && announced ? this.label : nothing}
+        aria-label=${announced ? this.label || text : nothing}
         >${blank ? html`<span aria-hidden="true">${text}</span>` : text}</span
       >`
   }

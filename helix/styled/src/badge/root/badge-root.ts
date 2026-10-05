@@ -12,6 +12,12 @@ import { styles } from './badge-root.css.js'
  * where it overlaps the element it is pinned to, such as a dark badge on a dark
  * icon.
  *
+ * `placement` pins it to another corner, or puts it in the line with
+ * `inline`. **Inside a control, `inline` puts the count in the control's
+ * name**: `<button>Inbox <helix-badge placement="inline" value="8"
+ * label="8 unread"></helix-badge></button>` is the button "Inbox 8 unread",
+ * kept current by the badge with no label of yours to update.
+ *
  * @since 0.1.0
  * @status stable
  * @category markers
@@ -20,11 +26,23 @@ import { styles } from './badge-root.css.js'
  *
  * @cssproperty --badge-background-color - The fill of the indicator.
  * @cssproperty --badge-color - The color of the count, to pair with a fill set through `--badge-background-color`.
+ * @cssproperty --badge-gap - The space between the content and the count under `placement="inline"`.
  * @cssproperty --badge-offset - Pulls the mark in from the corner, along both axes.
  * @cssproperty --badge-ring-color - The color of the ring between the indicator and what is behind it.
  */
 @customElement('helix-badge')
 export class HelixBadge extends HelixHeadlessBadge {
+  /**
+   * Where the mark sits: a corner, `top-start`, `bottom-end` or `bottom-start`,
+   * or `inline`, in the line after the content.
+   *
+   * Absent is the top end, the corner a count is looked for in. `inline` is
+   * for a badge inside a control, where its count is read as part of the
+   * control's name.
+   */
+  @property({ reflect: true })
+  placement?: 'bottom-end' | 'bottom-start' | 'inline' | 'top-start'
+
   /**
    * What the mark means. The stylesheet picks the fill from it.
    *
