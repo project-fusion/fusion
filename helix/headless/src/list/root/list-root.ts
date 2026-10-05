@@ -99,8 +99,8 @@ export class HelixHeadlessList extends HelixElement {
   label = ''
 
   /**
-   * Numbers an ordered list down to its first row rather than up from it, as
-   * `<ol reversed>` does.
+   * Numbers an ordered list downward, so the count falls row by row and ends at
+   * its last row, as `<ol reversed>` does.
    */
   @property({ type: Boolean })
   reversed = false
