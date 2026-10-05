@@ -25,10 +25,13 @@ import { styles } from './callout-root.css.js'
  * @documentation https://fusion.dev/helix/components/callout
  *
  * @slot - The callout's content.
+ * @slot dismiss-icon - Replaces the cross inside the dismiss button.
  * @slot heading - A heading above the content.
  * @slot icon - Replaces the icon chosen by `tone`.
  *
  * @csspart content - The content region.
+ * @csspart dismiss - The button that dismisses the callout, shown when `dismissible` is set.
+ * @csspart dismiss-mark - The cross on the dismiss button, shown when the `dismiss-icon` slot is empty.
  * @csspart icon - The icon region.
  *
  * @cssproperty --callout-accent-color - The color of the bar, the mark and the tint, in place of the tone's.

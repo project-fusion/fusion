@@ -227,3 +227,33 @@ describe('qr code', () => {
 
 /* The center mark needs a real engine: `assignedNodes` is what tells the
    element the slot was filled, and happy-dom does not report it here. */
+
+/* Zag's download trigger: the drawn code as a file of its own. */
+describe('a code as a file', () => {
+  type Code = HTMLElement & {
+    toPng: (size?: number) => Promise<Blob | null>
+    toSvg: (size?: number) => string
+    updateComplete: Promise<unknown>
+    value: string
+  }
+
+  test('is the drawn paths in a standalone SVG on a ground a scanner can read', async () => {
+    const code = (await mount(
+      '<helix-headless-qr-code value="https://fusion.dev"></helix-headless-qr-code>',
+    )) as Code
+    await code.updateComplete
+    const markup = code.toSvg(256)
+    const drawn = code.shadowRoot?.querySelector('[part="modules"]')?.getAttribute('d') ?? ''
+    expect(markup.startsWith('<svg xmlns="http://www.w3.org/2000/svg"')).toBe(true)
+    expect(markup).toContain('width="256" height="256"')
+    expect(markup).toContain(`d="${drawn}"`)
+    expect(markup).toContain('fill="#ffffff"')
+  })
+
+  test('is nothing where no code is drawn', async () => {
+    const code = (await mount('<helix-headless-qr-code></helix-headless-qr-code>')) as Code
+    await code.updateComplete
+    expect(code.toSvg()).toBe('')
+    expect(await code.toPng()).toBeNull()
+  })
+})
