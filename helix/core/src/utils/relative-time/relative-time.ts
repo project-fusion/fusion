@@ -44,18 +44,37 @@ export interface Relative {
 }
 
 /**
+ * How a reading is written: `style` is `Intl.RelativeTimeFormat`'s, from
+ * "3 hours ago" at `long` to "3h ago" at `narrow` in English, and `numeric`
+ * says whether a day back is "yesterday" (`auto`) or "1 day ago" (`always`).
+ */
+export interface RelativeOptions {
+  numeric?: 'always' | 'auto'
+  style?: 'long' | 'narrow' | 'short'
+}
+
+/**
  * A formatter for one locale, kept.
  *
  * `now` is a parameter rather than read from the clock, which is what makes this
  * testable at all: a function that reads `Date.now()` internally can only be
  * tested by waiting or by replacing a global, and both produce specs that fail
  * on a slow machine.
+ *
+ * Long and `auto` unless `options` says otherwise, which is what a person
+ * says aloud and what every caller wanted before Format Date offered the rest.
  */
-export const relativeTime = (locale: string): ((from: Date, now: Date) => Relative) => {
-  let format = held.get(locale)
+export const relativeTime = (
+  locale: string,
+  options: RelativeOptions = {},
+): ((from: Date, now: Date) => Relative) => {
+  const numeric = options.numeric ?? 'auto'
+  const style = options.style ?? 'long'
+  const key = `${locale}|${numeric}|${style}`
+  let format = held.get(key)
   if (!format) {
-    format = new Intl.RelativeTimeFormat(locale || undefined, { numeric: 'auto' })
-    held.set(locale, format)
+    format = new Intl.RelativeTimeFormat(locale || undefined, { numeric, style })
+    held.set(key, format)
   }
   const found = format
 

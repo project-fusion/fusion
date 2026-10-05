@@ -121,3 +121,58 @@ describe('format-date server output', () => {
     expect(hostAttributes(markup, 'helix-headless-format-date')).toEqual(['date'])
   })
 })
+
+describe('format-date options a reader can see on the server', () => {
+  /* Shoelace's format-date and relative-time offer these, and Helix had the
+     compact reading and the separate fields alone. */
+
+  test('a relative reading in a shorter style, named in full', () => {
+    const recent = new Date(Date.now() - 3 * 3_600_000 - 60_000).toISOString()
+    const served = rendered(
+      ssr(
+        html`<helix-headless-format-date locale="en-US" date=${recent} relative="narrow"></helix-headless-format-date>`,
+      ),
+      TAG,
+    )
+    expect(served).toContain('3h ago')
+    expect(served).toContain('aria-label="3 hours ago"')
+  })
+
+  test('a number where a word was, when asked', () => {
+    const yesterday = new Date(Date.now() - 26 * 3_600_000).toISOString()
+    const served = rendered(
+      ssr(
+        html`<helix-headless-format-date locale="en-US" date=${yesterday} relative="long" numeric="always"></helix-headless-format-date>`,
+      ),
+      TAG,
+    )
+    expect(served).toContain('1 day ago')
+  })
+
+  test('the locale’s own pattern, and an era', () => {
+    const styled = rendered(
+      ssr(
+        html`<helix-headless-format-date locale="en-US" date="2026-08-04" date-style="full"></helix-headless-format-date>`,
+      ),
+      TAG,
+    )
+    expect(styled).toContain('Tuesday, August 4, 2026')
+    const era = rendered(
+      ssr(
+        html`<helix-headless-format-date locale="en-US" date="2026-08-04" year="numeric" era="short"></helix-headless-format-date>`,
+      ),
+      TAG,
+    )
+    expect(era).toContain('2026 AD')
+  })
+
+  test('a clock other than the locale’s', () => {
+    const served = rendered(
+      ssr(
+        html`<helix-headless-format-date locale="en-US" date="2026-08-04T15:30:00Z" time-zone="UTC" time-style="short" hour-cycle="h23"></helix-headless-format-date>`,
+      ),
+      TAG,
+    )
+    expect(served).toContain('15:30')
+  })
+})
