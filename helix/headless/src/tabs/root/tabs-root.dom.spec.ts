@@ -76,7 +76,9 @@ describe('tabs selection', () => {
     const tab = part(tabs(host)[0] as HTMLElement, 'tab')
     expect(label(panels(host)[0] as HTMLElement)).toBe('One')
     expect(tab?.hasAttribute('aria-controls')).toBe(false)
-    expect(part(panels(host)[0] as HTMLElement, 'panel')?.hasAttribute('aria-labelledby')).toBe(false)
+    expect(part(panels(host)[0] as HTMLElement, 'panel')?.hasAttribute('aria-labelledby')).toBe(
+      false,
+    )
   })
 
   test('content stays mounted when its tab is not the current one', async () => {
@@ -429,7 +431,9 @@ describe('vertical tabs', () => {
   /* React Aria's orientation: a column of tabs beside the panels, and a screen
      reader told the list runs down rather than across. */
   test('say so on the tab list, and say nothing while horizontal', async () => {
-    const host = await mount(markup.replace('default-active="one"', 'default-active="one" orientation="vertical"'))
+    const host = await mount(
+      markup.replace('default-active="one"', 'default-active="one" orientation="vertical"'),
+    )
     expect(part(host, 'tabs')?.getAttribute('aria-orientation')).toBe('vertical')
     const row = await mount(markup)
     expect(part(row, 'tabs')?.hasAttribute('aria-orientation')).toBe(false)

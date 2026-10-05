@@ -286,7 +286,8 @@ slot[name="chevron"]::slotted(*) {
   align-self: center;
   background-color: var(--tree-checkbox-background-color, var(--helix-color-background));
   block-size: var(--tree-checkbox-size, var(--_tree-chevron));
-  border: var(--helix-border-thin) solid var(--tree-checkbox-border-color, var(--helix-color-border));
+  border: var(--helix-border-thin) solid
+    var(--tree-checkbox-border-color, var(--helix-color-border));
   border-radius: var(--helix-radii-sm);
   color: var(--tree-checkbox-mark-color, var(--helix-color-foreground));
   display: grid;

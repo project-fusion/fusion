@@ -1,0 +1,30 @@
+<!-- @summary A context menu that opens where you right-click the field, or press Shift+F10 in it. -->
+<!-- @min 300 -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+>
+
+<helix-menu
+  context
+  label="Edit"
+>
+  <textarea
+    aria-label="Notes"
+    class="area"
+    slot="trigger"
+  >Right-click in this field.</textarea>
+
+  <helix-menu-item
+    shortcut="mod+x"
+    value="cut"
+  >Cut</helix-menu-item>
+  <helix-menu-item
+    shortcut="mod+c"
+    value="copy"
+  >Copy</helix-menu-item>
+  <helix-menu-item
+    shortcut="mod+v"
+    value="paste"
+  >Paste</helix-menu-item>
+</helix-menu>

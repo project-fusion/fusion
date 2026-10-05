@@ -1,0 +1,14 @@
+:host {
+  display: block;
+}
+
+/* The menu's small type, a step quieter than the rows, at the rows' inset. */
+[part="heading"] {
+  color: var(--menu-section-heading-color, var(--helix-color-foreground-subtle));
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-medium);
+  line-height: var(--helix-leading-normal);
+  padding-block: var(--helix-space-xs) var(--helix-space-2xs);
+  padding-inline: var(--helix-space-sm);
+  user-select: none;
+}

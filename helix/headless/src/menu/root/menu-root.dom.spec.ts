@@ -714,3 +714,42 @@ describe('a menu inside another component', () => {
     expect(root.activeElement).toBe(trigger)
   })
 })
+
+describe('a context menu', () => {
+  /* Radix's ContextMenu: the trigger is an area, a right-click over it opens
+     the menu where the pointer is, and a plain press does not. */
+  const area = async (): Promise<Menu> =>
+    (await mount(`<helix-headless-menu context label="File">
+      <div slot="trigger" tabindex="0">Area</div>
+      <helix-headless-menu-item value="open">Open</helix-headless-menu-item>
+    </helix-headless-menu>`)) as Menu
+
+  test('opens on a context menu request over the area, at the pointer', async () => {
+    const host = await area()
+    const zone = host.querySelector('[slot="trigger"]') as HTMLElement
+    zone.click()
+    await host.updateComplete
+    expect(host.open).toBe(false)
+    const ask = new MouseEvent('contextmenu', {
+      bubbles: true,
+      cancelable: true,
+      clientX: 40,
+      clientY: 60,
+      composed: true,
+    })
+    zone.dispatchEvent(ask)
+    await host.updateComplete
+    expect(ask.defaultPrevented).toBe(true)
+    expect(host.open).toBe(true)
+    expect(host.shadowRoot?.getElementById('point')?.getAttribute('style')).toContain(
+      'translate: 40px 60px',
+    )
+  })
+
+  test('a context request anywhere else is left to the page', async () => {
+    const host = await area()
+    const ask = new MouseEvent('contextmenu', { bubbles: true, cancelable: true })
+    host.querySelector('helix-headless-menu-item')?.dispatchEvent(ask)
+    expect(ask.defaultPrevented).toBe(false)
+  })
+})

@@ -301,7 +301,9 @@ describe('a disabled item', () => {
     expect(part(b as Item, 'item')?.getAttribute('aria-disabled')).toBe('true')
     await press(b as Item, 'Enter')
     await press(b as Item, 'ArrowRight')
-    part(b as Item, 'row')?.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+    part(b as Item, 'row')?.dispatchEvent(
+      new MouseEvent('click', { bubbles: true, composed: true }),
+    )
     await settleTree(host)
     expect((b as Item).open).toBe(false)
     expect((host as Tree & { active: string }).active).not.toBe('b')
@@ -347,7 +349,9 @@ describe('a tree of check marks', () => {
     expect(part(host, 'tree')?.getAttribute('aria-multiselectable')).toBe('true')
     expect(part(c as Item, 'item')?.getAttribute('aria-checked')).toBe('false')
     expect(part(c as Item, 'item')?.hasAttribute('aria-selected')).toBe(false)
-    part(docs as Item, 'checkbox')?.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+    part(docs as Item, 'checkbox')?.dispatchEvent(
+      new MouseEvent('click', { bubbles: true, composed: true }),
+    )
     await settleTree(host)
     expect((host as Tree & { values: string[] }).values).toEqual(['a', 'b'])
     expect(part(docs as Item, 'item')?.getAttribute('aria-checked')).toBe('true')
@@ -373,6 +377,8 @@ describe('a tree of check marks', () => {
 
   test('a single-choice tree is not multiselectable', async () => {
     const { branch } = await tree()
-    expect(part(branch.parentElement as HTMLElement, 'tree')?.hasAttribute('aria-multiselectable')).toBe(false)
+    expect(
+      part(branch.parentElement as HTMLElement, 'tree')?.hasAttribute('aria-multiselectable'),
+    ).toBe(false)
   })
 })
