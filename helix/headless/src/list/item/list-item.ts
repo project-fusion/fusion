@@ -1,6 +1,12 @@
-import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, hostAria, slottedWords } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+
+/** What a control in the `end` slot can be, which Left and Right move between. */
+const CONTROL = 'a[href], button, input, select, textarea, [tabindex]'
+
+/** The values `current` takes, which are `aria-current`'s. */
+export type ListItemCurrent = 'date' | 'location' | 'page' | 'step' | 'time' | 'true'
 
 /**
  * @summary One row of a list.
@@ -27,6 +33,14 @@ import { property } from 'lit/decorators.js'
  * **For a row that holds controls and is not a destination, use
  * `data-list-item`.** With `href` unset, the row is not a link.
  *
+ * `current` marks the row a reader is on, such as the page in a list of
+ * pages, with `aria-current` on its link, or on the row where it has none.
+ *
+ * **In a list with `selection-mode`, the row is a row of a grid.** The list
+ * gives it its role, its place in the one tab stop and, where the list
+ * selects, whether it is selected. Its link leaves the tab order there, and
+ * Enter follows it from the row.
+ *
  * @since 0.1.0
  * @status stable
  * @aliases Row, Entry
@@ -37,11 +51,50 @@ import { property } from 'lit/decorators.js'
  * @slot end - Trailing content.
  * @slot start - Leading content, usually an icon or an avatar.
  *
+ * @event {Event} helix-action - The reader pressed Enter on the row, or pressed the row in a list that selects nothing, in a list with `selection-mode`. Read the row from `target`. A row with `href` follows its link instead.
+ *
  * @csspart link - The link, when the row has `href`. It holds every region except `end`.
- * @csspart row - The row's layout. It sits inside the host so the host can carry a list marker.
+ * @csspart row - The row's layout. It sits inside the host so the host can carry a list marker. In a list with `selection-mode` it is the grid cell that takes focus.
+ * @csspart row-current - Added to `row` while the row is `current`.
+ *
+ * @cssstate selected - The row is selected, in a list that selects.
  */
 @customElement('helix-headless-list-item')
 export class HelixHeadlessListItem extends HelixElement {
+  /**
+   * Marks the row a reader is on: `page` for the page they are reading, `step`,
+   * `location`, `date` or `time` for those, and written bare for the current
+   * one of a set. It is `aria-current` on the row's link, or on the row where
+   * it has none.
+   *
+   * Not reflected, as a state never is. `row-current` is the part a
+   * stylesheet draws it from.
+   */
+  @property({
+    converter: {
+      fromAttribute: (value: string | null): ListItemCurrent | undefined =>
+        value === null || value === 'false' ? undefined : ((value || 'true') as ListItemCurrent),
+    },
+  })
+  current?: ListItemCurrent
+
+  /**
+   * Takes the row out of reach in a list with `selection-mode`: the arrow keys
+   * pass over it and it cannot be selected or acted on.
+   */
+  @property({ reflect: true, type: Boolean })
+  disabled = false
+
+  /**
+   * Whether the row holds its list's tab stop.
+   *
+   * Written by a list with `selection-mode` on every row it holds, and unset
+   * otherwise, which is how a row knows it is a row of a grid. No attribute:
+   * it is coordination between elements, as `Tag.focusable` is.
+   */
+  @property({ attribute: false })
+  focusable?: boolean | undefined
+
   /**
    * The URL the row links to. Leave it empty for a row that is not a link.
    *
@@ -60,14 +113,83 @@ export class HelixHeadlessListItem extends HelixElement {
   rel = ''
 
   /**
+   * Whether the row is selected, in a list that selects.
+   *
+   * Written by the list from its own `value`, and unset where nothing can be
+   * selected, which keeps `aria-selected` off a list that does not select.
+   */
+  @property({ attribute: false })
+  selected?: boolean | undefined
+
+  /**
    * Where the link opens. Use it for a row that leaves the site.
    */
   @property()
   target = ''
 
+  /**
+   * What the row stands for in its list's `value`.
+   *
+   * Absent is the row's own words.
+   */
+  @property()
+  value = ''
+
+  /** The row's words, or none where the children are not known yet. */
+  get words(): string {
+    return this.childrenKnown ? slottedWords(this, ['']) : ''
+  }
+
+  /** Whether a list with `selection-mode` holds this row, which makes it a row of a grid. */
+  private get grouped(): boolean {
+    return this.focusable !== undefined
+  }
+
+  /** @internal The cell a list with `selection-mode` moves focus to. */
+  get cell(): HTMLElement | null {
+    return this.renderRoot?.querySelector?.<HTMLElement>('[part~="row"]') ?? null
+  }
+
+  /**
+   * @internal The controls in the `end` slot, in order, which Left and Right
+   * move between in a list with `selection-mode`. Disabled ones are passed
+   * over.
+   */
+  get controls(): HTMLElement[] {
+    const slot = this.renderRoot?.querySelector?.<HTMLSlotElement>('slot[name="end"]')
+    return (slot?.assignedElements({ flatten: true }) ?? [])
+      .flatMap((element) => [element, ...element.querySelectorAll('*')])
+      .filter(
+        (element): element is HTMLElement =>
+          element instanceof HTMLElement &&
+          element.matches(CONTROL) &&
+          !element.matches(':disabled'),
+      )
+  }
+
+  /** Moves focus to the row's cell, in a list with `selection-mode`. */
+  focusItem(): void {
+    this.cell?.focus()
+  }
+
+  /** @internal Follows the row's link, as a press on it would. Called by the list on Enter. */
+  follow(): void {
+    this.renderRoot?.querySelector<HTMLElement>('[part~="link"]')?.click()
+  }
+
+  /* What the list gives the row, said through `ElementInternals` so nothing is
+     written onto a host the consumer rendered. In `willUpdate`, which a server
+     calls too. */
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    hostAria(this.internals, { role: 'listitem' })
+    hostAria(this.internals, { role: this.grouped ? 'row' : 'listitem' })
+    this.internals.ariaSelected = this.selected === undefined ? null : String(this.selected)
+    this.internals.ariaDisabled = this.grouped && this.disabled ? 'true' : null
+    /* On the link where there is one, which is what a reader lands on, and on
+       the row otherwise. */
+    this.internals.ariaCurrent =
+      this.current !== undefined && this.href === '' ? this.current : null
+    this.toggleState('selected', this.selected === true)
   }
 
   /**
@@ -114,6 +236,10 @@ export class HelixHeadlessListItem extends HelixElement {
     const content = html`${this.renderRail()}<slot name="start"></slot>
       <slot></slot>
       <slot name="description"></slot>`
+    /* A grid cell only in a list with `selection-mode`, so a row in a plain
+       list renders exactly what it did. */
+    const role = this.grouped ? 'gridcell' : nothing
+    const tabindex = this.grouped ? (this.focusable ? '0' : '-1') : nothing
 
     /* An anchor where there is somewhere to go, inside the same box either
        way. The host keeps `role="listitem"`, so the link is inside the item:
@@ -125,12 +251,22 @@ export class HelixHeadlessListItem extends HelixElement {
        inside interactive content: the link's name took the button's words and a
        click on the button followed the link. */
     return this.href === ''
-      ? html`<div part="row">${content}<slot name="end"></slot></div>`
-      : html`<div part="row"><a
+      ? html`<div
+          part="row${this.current === undefined ? '' : ' row-current'}"
+          role=${role}
+          tabindex=${tabindex}
+        >${content}<slot name="end"></slot></div>`
+      : html`<div
+          part="row${this.current === undefined ? '' : ' row-current'}"
+          role=${role}
+          tabindex=${tabindex}
+        ><a
           part="link"
           href=${this.href}
           target=${this.target || nothing}
           rel=${this.rel || nothing}
+          aria-current=${this.current ?? nothing}
+          tabindex=${this.grouped ? '-1' : nothing}
           >${content}</a
         ><slot name="end"></slot></div>`
   }
