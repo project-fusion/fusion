@@ -7,7 +7,7 @@ import {
   hostAria,
   MixinField,
 } from '@fusion.dev/helix-core'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { html, type PropertyValues, type ReactiveController, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixHeadlessCheckbox } from '../../checkbox/root/checkbox-root.js'
 
@@ -108,6 +108,30 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
   /** Watches for boxes arriving inside a wrapper, which no slot reports. */
   private observer: MutationObserver | undefined
 
+  /** The value the required check last judged. */
+  private judged: string | undefined
+
+  /** The boxes `member` is added to. */
+  private readonly watched = new Set<HelixHeadlessCheckbox>()
+
+  /**
+   * Asks for an update when a box's own update moved the set.
+   *
+   * **A controller on each box, because a box changed by a script says
+   * nothing.** `box.checked = false` sends no event, as on a native checkbox,
+   * so the group heard of it only at its next unrelated update: a required
+   * group whose last box a script unchecked still passed `checkValidity()` and
+   * let its form submit. A box's update is the one thing every change to its
+   * state goes through, whatever made it.
+   */
+  private readonly member: ReactiveController = {
+    hostUpdated: () => {
+      if (this.isConnected && this.value !== this.judged) {
+        this.requestUpdate()
+      }
+    },
+  }
+
   /* Stated once, and the group never thinks about it again. The controller is
      what stops the cascade being hand-called from whichever methods a component
      happens to have. */
@@ -158,6 +182,15 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
     for (const box of boxes) {
       if (this.name !== '' && box.name === '') {
         box.name = this.name
+      }
+      if (!this.watched.has(box)) {
+        box.addController(this.member)
+        this.watched.add(box)
+      }
+    }
+    for (const box of this.watched) {
+      if (!boxes.includes(box)) {
+        this.unwatch(box)
       }
     }
     if (!this.pending || boxes.length === 0) {
@@ -285,6 +318,15 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
     this.removeEventListener('input', this.handleMemberNative)
     this.observer?.disconnect()
     this.observer = undefined
+    for (const box of this.watched) {
+      this.unwatch(box)
+    }
+  }
+
+  /** Stops listening to a box that left the group. */
+  private unwatch(box: HelixHeadlessCheckbox): void {
+    box.removeController(this.member)
+    this.watched.delete(box)
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -333,7 +375,8 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
    * at the first box instead.
    */
   private validate(): void {
-    this.reportRequired(this.value === '', 'Choose at least one to continue.', 'items')
+    this.judged = this.value
+    this.reportRequired(this.judged === '', 'Choose at least one to continue.', 'items')
   }
 
   protected override updated(changed: PropertyValues): void {

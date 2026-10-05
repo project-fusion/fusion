@@ -269,6 +269,27 @@ describe('a box a script ticks directly', () => {
     await settle(g)
     expect(box.checked).toBe(true)
   })
+
+  /* A box changed by a script sends no event, so the group judged `required`
+     only at its next unrelated update, and a form with the set emptied this
+     way submitted. */
+  test('unticked, it leaves a required set refused', async () => {
+    const g = (await group('label="L" name="r" required value="mind"')) as Group & {
+      validity: ValidityState
+    }
+    await settle(g)
+    expect(g.validity.valueMissing === true).toBe(false)
+    const box = g.boxes[1] as Group['boxes'][number] & Updatable
+    box.checked = false
+    await settle(box)
+    await settle(g)
+    expect(g.value).toBe('')
+    expect(g.validity.valueMissing).toBe(true)
+    box.checked = true
+    await settle(box)
+    await settle(g)
+    expect(g.validity.valueMissing === true).toBe(false)
+  })
 })
 
 describe('a refused change to the set', () => {
