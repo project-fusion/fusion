@@ -84,9 +84,20 @@ fn reaches(selector: &str, prefix: &str) -> Option<(String, String)> {
         if one.contains("::part(") {
             continue;
         }
-        return Some((one[tag.end()..].trim().to_owned(), tag.as_str().to_owned()));
+        return Some((past_compound(&one[tag.end()..]), tag.as_str().to_owned()));
     }
     None
+}
+
+/// What a selector reaches past the tag's own compound, empty for the host.
+///
+/// **A pseudo-class, an attribute or a class written onto the tag is still the
+/// host.** `helix-flex:first-child` and `helix-flex[wrap]` select the element
+/// itself, so only what follows a space or a combinator is another element.
+fn past_compound(after: &str) -> String {
+    after
+        .find(|one: char| one.is_whitespace() || matches!(one, '>' | '+' | '~'))
+        .map_or_else(String::new, |at| after[at..].trim().to_owned())
 }
 
 /// A document rule that reaches a component.
@@ -219,5 +230,31 @@ pub fn run(context: &Context) -> Report {
         findings,
         notes: Vec::new(),
         unit: "document rules reaching a component",
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{past_compound, reaches};
+
+    #[test]
+    fn a_compound_on_the_tag_is_the_host() {
+        assert_eq!(past_compound(""), "");
+        assert_eq!(past_compound(":first-child"), "");
+        assert_eq!(past_compound("[wrap]:hover"), "");
+    }
+
+    #[test]
+    fn what_follows_a_space_or_a_combinator_is_another_element() {
+        assert_eq!(past_compound(" > span"), "> span");
+        assert_eq!(past_compound(":first-child span"), "span");
+        assert_eq!(
+            reaches(".row > helix-flex:first-child", "helix-"),
+            Some((String::new(), "helix-flex".to_owned()))
+        );
+        assert_eq!(
+            reaches("helix-flex > span", "helix-"),
+            Some(("> span".to_owned(), "helix-flex".to_owned()))
+        );
     }
 }

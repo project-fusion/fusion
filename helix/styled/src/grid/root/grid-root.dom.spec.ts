@@ -94,6 +94,8 @@ describe('grid', () => {
     const grid = await mount('<helix-grid columns="3"></helix-grid>')
     expect(rule(grid)).toContain('--_grid-template: initial')
     expect(rule(grid)).toContain('--grid-columns: initial')
+    expect(rule(grid)).toContain('--grid-rows: initial')
+    expect(rule(grid)).toContain('--grid-areas: initial')
   })
 
   /* Browser only: happy-dom lays nothing out. */
@@ -128,4 +130,60 @@ describe('grid', () => {
     expect(getComputedStyle(outer).gridTemplateColumns.split(' ')).toHaveLength(2)
     expect(getComputedStyle(inner).gridTemplateColumns.split(' ')).toHaveLength(4)
   })
+
+  laid('each axis takes its own gap, and `gap` fills the axis left unset', async () => {
+    const both = await mount('<helix-grid gap="lg"><span>A</span></helix-grid>')
+    const lg = getComputedStyle(both).rowGap
+    const split = await mount('<helix-grid gap="lg" column-gap="none"><span>A</span></helix-grid>')
+    expect(getComputedStyle(split).rowGap).toBe(lg)
+    expect(getComputedStyle(split).columnGap).toBe('0px')
+    const inner = (
+      await mount('<helix-grid row-gap="lg"><helix-grid><span>A</span></helix-grid></helix-grid>')
+    ).querySelector('helix-grid') as Grid
+    expect(getComputedStyle(inner).rowGap).toBe('0px')
+  })
+
+  laid('`auto-flow` and `justify-items` set the properties they are named for', async () => {
+    const grid = await mount(
+      '<helix-grid auto-flow="column-dense" justify-items="center"><span>A</span></helix-grid>',
+    )
+    expect(getComputedStyle(grid).gridAutoFlow).toBe('column dense')
+    expect(getComputedStyle(grid).justifyItems).toBe('center')
+  })
+
+  laid('a child spans the columns its `data-grid-span` names', async () => {
+    const grid = await mount(
+      `<helix-grid columns="4" style="inline-size: 40rem">
+        <h2 data-grid-span="full">Heading</h2><span data-grid-span="2">A</span><span>B</span>
+      </helix-grid>`,
+    )
+    const [heading, wide, narrow] = [...grid.children] as HTMLElement[]
+    const width = (element: HTMLElement | undefined): number =>
+      Math.round(element?.getBoundingClientRect().width ?? 0)
+    expect(width(heading)).toBe(width(grid))
+    expect(width(wide)).toBe(width(narrow) * 2)
+  })
+
+  laid(
+    'rows and named areas come from their hooks, and stay on the grid that set them',
+    async () => {
+      const outer = await mount(
+        `<helix-grid style="--grid-columns: 5rem 1fr; --grid-rows: 3rem auto; --grid-areas: 'rail head' 'rail main'; inline-size: 30rem">
+        <span style="grid-area: rail">R</span><span style="grid-area: head">H</span>
+        <helix-grid style="grid-area: main"><span>A</span></helix-grid>
+      </helix-grid>`,
+      )
+      const [rail, head] = [...outer.querySelectorAll('span')] as HTMLElement[]
+      const inner = outer.querySelector('helix-grid') as Grid
+      await inner.updateComplete
+      expect(getComputedStyle(outer).gridTemplateRows.split(' ')[0]).toBe('48px')
+      expect(Math.round(head?.getBoundingClientRect().height ?? 0)).toBe(48)
+      expect(Math.round(rail?.getBoundingClientRect().width ?? 0)).toBe(80)
+      expect(getComputedStyle(inner).gridTemplateAreas).toBe('none')
+      /* A grid reports its rows as the sizes it laid out, so a row track list
+       taken from the outer grid would start at its 48px. */
+      expect(getComputedStyle(inner).gridTemplateRows.split(' ')).toHaveLength(1)
+      expect(getComputedStyle(inner).gridTemplateRows).not.toBe('48px')
+    },
+  )
 })
