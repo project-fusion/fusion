@@ -14,6 +14,7 @@ import { caretLeft, caretRight, play, stop } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
+import { stepStop, stopFor, stopsOf } from '../stops.js'
 
 /**
  * `per-view` as the two things it can be: a count, or the word that is not one.
@@ -69,10 +70,30 @@ const DRAG_SLOP = 4
  * polite live region. While the carousel rotates the region is off, so a
  * screen reader is not interrupted every few seconds.
  *
- * The indicators are one tab stop. The arrow keys along the track move between
- * them, Up and Down on a vertical carousel, and Home and End go to the first
- * and the last. Without `loop`, Previous on the first slide and Next on the
- * last are marked `aria-disabled`.
+ * **Keyboard.** The indicators are one tab stop.
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Tab | Moves through the rotation control, Previous, Next, the slides' own links and buttons, and the indicators, in that order. |
+ * | Enter, Space | Presses the control or the indicator that has focus. |
+ * | Right, Left | On an indicator, moves to the next or the previous slide and its indicator. Left moves on, on a right-to-left page. |
+ * | Down, Up | The same, on a vertical carousel. |
+ * | Home, End | On an indicator, moves to the first or the last slide. |
+ *
+ * Without `loop`, Previous on the first slide and Next on the last are marked
+ * `aria-disabled`, and keep focus.
+ *
+ * **What a screen reader hears.** The carousel is a group named by `label`,
+ * announced as `role-label` ("carousel"). Each slide is a group announced as
+ * `slide-role-label` ("slide") and named by `slide-label` ("2 of 5"). After a
+ * move by a control, an indicator, a key, or a drag, the `live` part says the
+ * slide's name politely. While the carousel rotates the region is off.
+ *
+ * **`slides-per-move` moves several slides at a time.** With `per-view="3"`
+ * and `slides-per-move="3"`, Next shows the next three, there is one
+ * indicator for each stop, and the track snaps only at the stops. The last
+ * stop is always the end of the run, so a run that does not divide evenly
+ * ends on its last slides. Unset moves one slide.
  *
  * **`mouse-drag` lets a mouse drag the track**, which otherwise only a touch
  * screen, a trackpad, or the scroll wheel moves. The drag follows the pointer
@@ -380,6 +401,14 @@ export class HelixHeadlessCarousel extends HelixElement {
   slideRoleLabel = 'slide'
 
   /**
+   * How many slides Previous, Next, the indicators, rotation, and a drag move
+   * at a time. Unset moves one. The track stops at every `slides-per-move`th
+   * position from the first, and at the last.
+   */
+  @property({ attribute: 'slides-per-move', type: Number })
+  slidesPerMove?: number
+
+  /**
    * The name of the rotation control while rotation is stopped.
    */
   @property({ attribute: 'start-label' })
@@ -462,6 +491,11 @@ export class HelixHeadlessCarousel extends HelixElement {
    */
   get positions(): number {
     return Math.max(1, this.slides.length - (this.across ?? 1) + 1)
+  }
+
+  /** The positions the track stops at, `slides-per-move` apart, and the last. See `stopsOf`. */
+  private get stops(): number[] {
+    return stopsOf(this.positions, this.slidesPerMove)
   }
 
   /**
@@ -694,13 +728,15 @@ export class HelixHeadlessCarousel extends HelixElement {
           ? -1
           : 0
       : inlineStep(this, event.key)
-    let to = this.index + step
+    let to: number
     if (event.key === 'Home') {
       to = 0
     } else if (event.key === 'End') {
       to = this.positions - 1
     } else if (step === 0) {
       return
+    } else {
+      to = this.move(step)
     }
     event.preventDefault()
     this.goTo(to)
@@ -721,6 +757,14 @@ export class HelixHeadlessCarousel extends HelixElement {
     this.indexState = value
     this.requestUpdate('index', previous)
     this.dispatchEvent(new HelixActivateEvent({ value: String(value) }))
+  }
+
+  /**
+   * The position one stop forward or back lands on, wrapping where `loop`
+   * says so.
+   */
+  private move(step: number): number {
+    return stepStop(this.stops, this.index, step < 0 ? -1 : 1, this.loop)
   }
 
   /** Moves to a slide. It wraps past either end only when `loop` is set. */
@@ -1036,7 +1080,7 @@ export class HelixHeadlessCarousel extends HelixElement {
        rotation stopped on the last slide while its control still said it was
        running and the timer went on firing at nothing. */
     this.timer = setInterval(
-      () => this.goTo(this.index >= this.positions - 1 ? 0 : this.index + 1),
+      () => this.goTo(this.index >= this.positions - 1 ? 0 : this.move(1)),
       this.interval,
     )
   }
@@ -1061,9 +1105,13 @@ export class HelixHeadlessCarousel extends HelixElement {
     }
     const bleed = this.bleed(track)
     const at = this.orientation === 'vertical' ? track.scrollTop : track.scrollLeft
-    return this.panes.slice(0, this.positions).reduce(
-      (best, slide, index) => {
-        const distance = Math.abs(this.edgeOf(slide, track, bleed) - at)
+    /* The stops only, where `slides-per-move` leaves some positions out. */
+    return this.stops.reduce(
+      (best, index) => {
+        const slide = this.panes[index]
+        const distance = slide
+          ? Math.abs(this.edgeOf(slide, track, bleed) - at)
+          : Number.POSITIVE_INFINITY
         return distance < best.distance ? { distance, index } : best
       },
       { distance: Number.POSITIVE_INFINITY, index: this.index },
@@ -1474,9 +1522,34 @@ export class HelixHeadlessCarousel extends HelixElement {
     >`
   }
 
+  /**
+   * A pane's own declarations: the last pane's `runEnd`, and no snap point on
+   * a pane the track does not stop at under `slides-per-move`, so a swipe
+   * settles on a stop as the controls do.
+   */
+  private paneStyle(
+    index: number,
+    last: number,
+    stops: readonly number[],
+  ): string | typeof nothing {
+    const declared = [
+      index === last ? this.runEnd() : nothing,
+      /* Important, as the drag's own `scroll-snap-type` is: a document
+         `::part(slide)` rule outranks a shadow root's inline declaration, and
+         the stops are the carousel's to say. */
+      (this.slidesPerMove ?? 1) > 1 && !stops.includes(index)
+        ? 'scroll-snap-align: none !important'
+        : nothing,
+    ].filter((one): one is string => one !== nothing)
+    return declared.length > 0 ? declared.join('; ') : nothing
+  }
+
   protected override render(): TemplateResult {
     const rotating = this.rotating
     const last = this.slides.length - 1
+    const stops = this.stops
+    const place = stopFor(stops, this.index)
+    const showing = stopFor(stops, this.showing ?? this.index)
 
     return html`<div part="controls">
         ${
@@ -1509,7 +1582,7 @@ export class HelixHeadlessCarousel extends HelixElement {
                   type="button"
                   aria-label=${this.previousLabel}
                   aria-disabled=${this.atEnd('start') ? 'true' : nothing}
-                  @click=${() => this.goTo(this.index - 1)}
+                  @click=${() => this.goTo(this.move(-1))}
                 >
                   ${this.renderPreviousMark()}
                 </button>
@@ -1518,7 +1591,7 @@ export class HelixHeadlessCarousel extends HelixElement {
                   type="button"
                   aria-label=${this.nextLabel}
                   aria-disabled=${this.atEnd('end') ? 'true' : nothing}
-                  @click=${() => this.goTo(this.index + 1)}
+                  @click=${() => this.goTo(this.move(1))}
                 >
                   ${this.renderNextMark()}
                 </button>`
@@ -1545,7 +1618,7 @@ export class HelixHeadlessCarousel extends HelixElement {
             role="group"
             aria-roledescription=${this.slideRoleLabel || nothing}
             aria-label=${fillTemplate(this.slideLabel, { count: this.slides.length, index: index + 1 })}
-            style=${index === last ? this.runEnd() : nothing}
+            style=${this.paneStyle(index, last, stops)}
           >
             <slot
               name=${this.assignsByName ? `slide-${index + 1}` : nothing}
@@ -1582,17 +1655,17 @@ export class HelixHeadlessCarousel extends HelixElement {
                  * being selected. */
                 ''
               }
-              ${Array.from({ length: this.positions }).map((_place, at) => {
-                const current = at === (this.showing ?? this.index)
+              ${stops.map((stop, at) => {
+                const current = at === showing
                 return html`<button
                   part="indicator${current ? ' indicator-current' : ''}"
                   type="button"
                   aria-label=${fillTemplate(this.indicatorLabel, { index: at + 1 })}
-                  aria-current=${at === this.index ? 'true' : nothing}
-                  tabindex=${at === this.index ? '0' : '-1'}
+                  aria-current=${at === place ? 'true' : nothing}
+                  tabindex=${at === place ? '0' : '-1'}
                   ?data-current=${current}
                   @keydown=${this.handleIndicatorKeydown}
-                  @click=${() => this.goTo(at)}
+                  @click=${() => this.goTo(stop)}
                 ></button>`
               })}
             </div>`

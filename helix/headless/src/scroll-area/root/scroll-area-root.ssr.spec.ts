@@ -60,4 +60,17 @@ describe('scroll area server output', () => {
     }
     expect(hostAttributes(markup, 'helix-headless-scroll-area')).toEqual(['scrollbars'])
   })
+
+  test('serves the axis orientation clips, so the content does not scroll sideways before it upgrades', () => {
+    const markup = ssr(
+      html`<helix-headless-scroll-area orientation="vertical"><p>One</p></helix-headless-scroll-area>`,
+    )
+    expect(partTag(markup, 'viewport')).toContain('overflow-x: hidden')
+    expect(
+      partTag(
+        ssr(html`<helix-headless-scroll-area><p>One</p></helix-headless-scroll-area>`),
+        'viewport',
+      ),
+    ).not.toContain('style=')
+  })
 })

@@ -1101,3 +1101,80 @@ if (hasLayout()) {
     })
   })
 }
+
+describe('several slides at a time', () => {
+  /* Eight slides three across stand at six positions, 0 to 5. Three at a time
+     stops at 0, 3 and 5, the last being the end of the run. */
+  const reel = async (attrs: string): Promise<Carousel> => {
+    const host = (await mount(`<helix-headless-carousel label="Reel" per-view="3" ${attrs}>
+      ${Array.from({ length: 8 }, (_, at) => `<div>Slide ${at + 1}</div>`).join('')}
+    </helix-headless-carousel>`)) as Carousel
+    await host.updateComplete
+    return host
+  }
+  const indicators = (host: Carousel): HTMLElement[] => [
+    ...(host.shadowRoot?.querySelectorAll<HTMLElement>('[part~="indicator"]') ?? []),
+  ]
+  const press = async (host: Carousel, name: 'next' | 'previous'): Promise<void> => {
+    ;(part(host, name) as HTMLElement).click()
+    await host.updateComplete
+  }
+
+  test('Next and Previous move by slides-per-move, ending on the last position', async () => {
+    const host = await reel('slides-per-move="3"')
+    const heard: string[] = []
+    host.addEventListener('helix-select', (event) =>
+      heard.push((event as CustomEvent<{ value: string }>).detail.value),
+    )
+    await press(host, 'next')
+    expect(host.index).toBe(3)
+    await press(host, 'next')
+    expect(host.index).toBe(5)
+    expect(part(host, 'next')?.getAttribute('aria-disabled')).toBe('true')
+    await press(host, 'previous')
+    expect(host.index).toBe(3)
+    expect(heard).toEqual(['3', '5', '3'])
+  })
+
+  test('draws one indicator for each stop, and marks the stop in view', async () => {
+    const host = await reel('slides-per-move="3"')
+    expect(indicators(host)).toHaveLength(3)
+    indicators(host)[2]?.click()
+    await host.updateComplete
+    expect(host.index).toBe(5)
+    expect(indicators(host).map((one) => one.getAttribute('aria-current'))).toEqual([
+      null,
+      null,
+      'true',
+    ])
+    indicators(host)[2]?.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowLeft' }),
+    )
+    await host.updateComplete
+    expect(host.index).toBe(3)
+  })
+
+  test('snaps only at the stops, and wraps through them with loop', async () => {
+    const host = await reel('slides-per-move="3" loop')
+    const snaps = panes(host).map((pane) =>
+      pane.style.getPropertyPriority('scroll-snap-align') === 'important'
+        ? pane.style.getPropertyValue('scroll-snap-align')
+        : '',
+    )
+    expect(snaps.slice(0, 6)).toEqual(['', 'none', 'none', '', 'none', ''])
+    host.index = 5
+    await host.updateComplete
+    await press(host, 'next')
+    expect(host.index).toBe(0)
+    await press(host, 'previous')
+    expect(host.index).toBe(5)
+  })
+
+  test('moves one slide and snaps at every slide while it is unset', async () => {
+    const host = await reel('')
+    expect(indicators(host)).toHaveLength(6)
+    expect(panes(host).some((pane) => pane.style.getPropertyValue('scroll-snap-align'))).toBe(false)
+    await press(host, 'next')
+    expect(host.index).toBe(1)
+  })
+})
