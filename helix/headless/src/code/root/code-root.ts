@@ -16,7 +16,7 @@ import { html, type TemplateResult } from 'lit'
  * @since 0.1.0
  * @status stable
  * @category typography
- * @aliases Inline code, Kbd
+ * @aliases Inline code
  * @documentation https://fusion.dev/helix/components/code
  *
  * @slot - The code.
