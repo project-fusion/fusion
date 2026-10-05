@@ -20,8 +20,11 @@
 
 [part="toolbar"] {
   align-items: center;
+  background-color: var(--toolbar-background-color, transparent);
+  border-radius: var(--toolbar-radius, var(--helix-radii-none));
   display: flex;
   gap: var(--toolbar-gap, var(--helix-space-2xs));
+  padding: var(--toolbar-padding, var(--helix-space-none));
 }
 
 :host([orientation="vertical"]) [part="toolbar"] {

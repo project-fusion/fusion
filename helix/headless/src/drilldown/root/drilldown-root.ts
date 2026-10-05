@@ -35,6 +35,11 @@ import { HelixHeadlessDrilldownItem } from '../item/drilldown-item.js'
  * and reads the rest from the DOM. The behavior lives in `DrilldownController`,
  * which `Menu` shares.
  *
+ * After each move the host carries `data-direction`, `forward` into a page or
+ * `back` out of one, so a stylesheet can slide the new page in from the side
+ * the reader is going. The styled tier does, and holds still under reduced
+ * motion.
+ *
  * The rows of the page showing are a `menu`, named by `label` on the top page
  * and by the page's title below it. The back button and the title sit above
  * the menu. Disabled rows stay reachable with the arrow keys, and typing a
@@ -47,6 +52,7 @@ import { HelixHeadlessDrilldownItem } from '../item/drilldown-item.js'
  * @documentation https://fusion.dev/helix/components/drilldown
  *
  * @slot - The rows of the top page.
+ * @slot back-icon - Replaces the icon on the back button.
  *
  * @event {HelixSelectEvent} helix-select - Fired when a row with no page is chosen. Cancelable: canceling it stops the change and leaves the decision to you.
  *
@@ -342,15 +348,25 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
     }
   }
 
+  /**
+   * The back button's icon, as the `back-icon` slot's fallback, so an icon of
+   * your own replaces it by being slotted.
+   */
+  protected renderBackIcon(): TemplateResult {
+    return html`<slot name="back-icon"
+      ><svg part="back-mark" data-mirror fill="currentColor" viewBox=${caretLeft.viewBox} aria-hidden="true">
+        ${unsafeSVG(caretLeft.content)}
+      </svg></slot
+    >`
+  }
+
   protected override render(): TemplateResult {
     return html`${
       this.drilldown.atRoot
         ? ''
         : html`<div part="header">
             <button part="back" type="button" aria-label=${this.backLabel} @click=${() => this.back()}>
-              <svg part="back-mark" data-mirror fill="currentColor" viewBox=${caretLeft.viewBox} aria-hidden="true">
-                ${unsafeSVG(caretLeft.content)}
-              </svg>
+              ${this.renderBackIcon()}
             </button>
             <span id="title" part="title">${this.drilldown.label}</span>
           </div>`

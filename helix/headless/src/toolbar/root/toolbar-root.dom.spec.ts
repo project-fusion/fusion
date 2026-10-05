@@ -273,3 +273,52 @@ describe('what a toolbar moves between', () => {
     expect(part(toolbar, 'toolbar')?.getAttribute('aria-label')).toBe('Formatting')
   })
 })
+
+describe('a group of buttons in a toolbar', () => {
+  /* React Aria's toolbar flattens a group: its buttons are the toolbar's own
+     stops, so the arrows walk through them and Tab passes the bar once. */
+  const grouped = `
+    <helix-headless-toolbar label="Format">
+      <helix-headless-button id="bold">Bold</helix-headless-button>
+      <div role="group" aria-label="Align">
+        <helix-headless-button id="left">Left</helix-headless-button>
+        <helix-headless-button id="center">Center</helix-headless-button>
+      </div>
+      <helix-headless-button id="link">Link</helix-headless-button>
+    </helix-headless-toolbar>`
+
+  const press = (from: Element, key: string): void => {
+    from.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key }),
+    )
+  }
+
+  test('walks through the group, and each of its buttons is a stop of the toolbar', async () => {
+    const toolbar = await mount(grouped)
+    await settle(toolbar)
+    const order: string[] = []
+    let at = toolbar.querySelector('#bold') as HTMLElement
+    for (let step = 0; step < 4; step += 1) {
+      press(at, 'ArrowRight')
+      at = document.activeElement as HTMLElement
+      order.push(at.id)
+    }
+    expect(order).toEqual(['left', 'center', 'link', 'bold'])
+    const tabbable = [...toolbar.querySelectorAll('helix-headless-button')].map(
+      (button) => part(button as HTMLElement, 'button')?.getAttribute('tabindex') !== '-1',
+    )
+    expect(tabbable).toEqual([true, false, false, false])
+  })
+
+  test('stop-at-ends keeps the arrows at the last and the first control', async () => {
+    const toolbar = await mount(grouped.replace('label="Format"', 'label="Format" stop-at-ends'))
+    await settle(toolbar)
+    const link = toolbar.querySelector('#link') as HTMLElement
+    link.focus()
+    press(link, 'ArrowRight')
+    expect(document.activeElement).toBe(link)
+    const bold = toolbar.querySelector('#bold') as HTMLElement
+    press(bold, 'ArrowLeft')
+    expect(document.activeElement).toBe(bold)
+  })
+})
