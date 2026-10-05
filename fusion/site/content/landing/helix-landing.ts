@@ -162,7 +162,7 @@ export const DELIVERY = {
    * eyebrow names them, so the heading says the one thing a reader weighs
    * first: one to two weeks for the audit, and six to eight for the build.
    */
-  title: 'From a one-week audit to an eight-week build',
+  title: 'One to eight weeks',
 } as const
 
 /**
@@ -197,5 +197,5 @@ export const ENGAGEMENT: readonly CopyItem[] = [
 
 /** The frame above those four cards. */
 export const ENGAGEMENT_COPY = {
-  title: 'We built Helix, and we build with it in your codebase',
+  title: 'We build in your codebase',
 } as const

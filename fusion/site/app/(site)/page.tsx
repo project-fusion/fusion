@@ -114,9 +114,7 @@ export default function Home() {
               explains, so you can see it is the same subject in more depth. */}
           <helix-flex class={band.bandSection} direction="column" gap="md">
             <Eyebrow>Theming</Eyebrow>
-            <SectionTitle>
-              Every text and background pair is measured before the theme is used
-            </SectionTitle>
+            <SectionTitle>Every pair checked for contrast</SectionTitle>
             <Lede>You enter one brand color, and Helix computes every token from it.</Lede>
           </helix-flex>
           <DerivationDiagrams className={band.bandSection} />
@@ -134,7 +132,7 @@ export default function Home() {
               {/* Named after the card above that this band explains, like the
                   Theming band. */}
               <Eyebrow>Components</Eyebrow>
-              <SectionTitle>The panel is Helix, running in your browser</SectionTitle>
+              <SectionTitle>The panel runs in your browser</SectionTitle>
               <Lede>Each control in it is a custom element from the Helix package.</Lede>
               <helix-flex class="siteActions" data-density="lg" direction="column" gap="md">
                 <Link data-button="subtle" href="/helix">
@@ -244,9 +242,7 @@ export default function Home() {
             <helix-flex align-items="center" gap="md" justify-content="between" wrap>
               <helix-flex direction="column" gap="sm">
                 <Eyebrow>Insights</Eyebrow>
-                <SectionTitle>
-                  How we make design, engineering, and business decisions, and why
-                </SectionTitle>
+                <SectionTitle>How we decide, and why</SectionTitle>
               </helix-flex>
               <Link className="siteActions" data-button="subtle" href="/insights">
                 Read all articles
