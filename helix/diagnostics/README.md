@@ -249,6 +249,7 @@ diagnostics counts it by kind and tag. None fails a CI job.
 | `missing-layout` | The three.js graph driver could not load `d3-force-3d` |
 | `missing-row-key` | A selectable data table has no `row-key`, so it knows each row by its place |
 | `missing-stencil-parts` | A graph stencil names parts its shape does not have |
+| `missing-target` | A skip link's `href` names no element on the page |
 | `missing-trigger` | A tooltip's `for` names no element in its own tree |
 | `negative-value` | An area chart was given a negative number, which it draws as none |
 | `not-a-graph` | `connectGraph` was given an element that is not a graph frame |

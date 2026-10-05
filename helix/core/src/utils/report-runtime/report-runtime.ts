@@ -37,6 +37,8 @@ export type RuntimeKind =
   | 'missing-row-key'
   /** A stencil names parts the shape does not have. */
   | 'missing-stencil-parts'
+  /** A Skip Link's `href` names no element in its tree, so a press moves focus nowhere. */
+  | 'missing-target'
   /** A tooltip's `for` names no element in its own tree. */
   | 'missing-trigger'
   /** An area chart was handed a negative number, which it draws as none. */

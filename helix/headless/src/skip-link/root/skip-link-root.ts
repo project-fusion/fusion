@@ -1,4 +1,4 @@
-import { customElement, elementById, HelixElement } from '@fusion.dev/helix-core'
+import { customElement, elementById, HelixElement, reportRuntime } from '@fusion.dev/helix-core'
 import { html, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -97,6 +97,7 @@ export class HelixHeadlessSkipLink extends HelixElement {
     }
     const target = this.target
     if (!target) {
+      this.reportMissing()
       return
     }
     event.preventDefault()
@@ -107,6 +108,30 @@ export class HelixHeadlessSkipLink extends HelixElement {
     target.setAttribute('tabindex', '-1')
     target.addEventListener('blur', () => target.removeAttribute('tabindex'), { once: true })
     target.focus()
+  }
+
+  /** The `href` the last warning was for, so a page hears once per target. */
+  private missed = ''
+
+  /**
+   * Says so when an in-page `href` names nothing.
+   *
+   * Asked on a press and not on connection: the link is first in the
+   * document, so its target is usually parsed or rendered after it, and an
+   * early check would warn about a page that is still arriving.
+   */
+  private reportMissing(): void {
+    if (!this.href.startsWith('#') || this.href.length < 2 || this.missed === this.href) {
+      return
+    }
+    this.missed = this.href
+    reportRuntime({
+      kind: 'missing-target',
+      message:
+        `<${this.localName} href="${this.href}"> names no element in its tree, so the press ` +
+        'moves focus nowhere. Give the main content that id, or point `href` at the id it has.',
+      tag: this.localName,
+    })
   }
 
   protected override render(): TemplateResult {
