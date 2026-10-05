@@ -29,6 +29,32 @@ describe('empty view', () => {
     expect(live.textContent?.trim()).toBe('Nothing here No results.')
   })
 
+  /* The live copy and the words it copies were both in the tree for the
+     seven-second hold, so a reader moving through the page met them twice. */
+  test('hides the words it copies while the copy holds them, and never the actions', async () => {
+    document.body.innerHTML =
+      '<helix-headless-empty><h2 slot="heading">Nothing here</h2><p>No results.</p><button slot="actions">Clear</button></helix-headless-empty>'
+    const empty = document.body.firstElementChild as HTMLElement & {
+      arrival: { said: string }
+      requestUpdate: () => void
+      updateComplete: Promise<boolean>
+    }
+    await empty.updateComplete
+    const hidden = (name: string): string | null =>
+      empty.shadowRoot
+        ?.querySelector(name === '' ? 'slot:not([name])' : `slot[name="${name}"]`)
+        ?.getAttribute('aria-hidden') ?? null
+    expect(hidden('heading')).toBeNull()
+    await new Promise((done) => requestAnimationFrame(() => done(undefined)))
+    await empty.updateComplete
+    expect([hidden('heading'), hidden(''), hidden('actions')]).toEqual(['true', 'true', null])
+    /* The hold ending: the copy empties and the words are back. */
+    empty.arrival.said = ''
+    empty.requestUpdate()
+    await empty.updateComplete
+    expect([hidden('heading'), hidden('')]).toEqual([null, null])
+  })
+
   test('one that came with the page as it loaded is not announced', async () => {
     /* A framework that serves no declarative shadow DOM sends an empty state
        that was always there, and this cannot tell it from one that arrived by
