@@ -709,3 +709,105 @@ describe('input date holding several, in its form', () => {
     expect(formValue(host)).toBeNull()
   })
 })
+
+describe('the events a date input sends', () => {
+  const heard = (host: InputDate): string[] => {
+    const log: string[] = []
+    for (const name of ['input', 'change']) {
+      host.addEventListener(name, () => log.push(name))
+    }
+    return log
+  }
+
+  /* Measured before this: typing 2026-09-03 sent ten `change` events, one per
+     keystroke, half of them for dates that did not exist yet. */
+  test('typing sends `input`, and `change` once the reader is done', async () => {
+    const host = await field()
+    const log = heard(host)
+    await type(host, '2026-09-0')
+    await type(host, '2026-09-03')
+    expect(log).toEqual(['input', 'input'])
+    control(host).dispatchEvent(new Event('change'))
+    expect(log).toEqual(['input', 'input', 'change'])
+  })
+
+  test('a date picked in the calendar sends both, being a finished choice', async () => {
+    const host = await field('default-value="2026-08-14"')
+    const log = heard(host)
+    ;(picker(host) as unknown as { requestValue(next: string): boolean }).requestValue('2026-08-20')
+    await host.updateComplete
+    expect(host.value).toBe('2026-08-20')
+    expect(log).toEqual(['input', 'change'])
+  })
+})
+
+describe('a date input that refuses a pick', () => {
+  /* Measured before this: the field kept its date while the calendar moved to
+     the refused one, and showed it as chosen on reopening. */
+  test('leaves the calendar on the date the field holds', async () => {
+    const host = await field('default-value="2026-08-14"')
+    host.addEventListener('helix-before-change', (event) => event.preventDefault())
+    ;(picker(host) as unknown as { requestValue(next: string): boolean }).requestValue('2026-08-20')
+    await host.updateComplete
+    expect(host.value).toBe('2026-08-14')
+    expect(picker(host).value).toBe('2026-08-14')
+  })
+})
+
+describe('a date input and the dates its calendar bars', () => {
+  type Checked = InputDate & { internals: ElementInternals }
+
+  test('a barred day typed or seeded is invalid', async () => {
+    const host = (await field(
+      'disable-days="0 6" disable-dates="2026-08-12" default-value="2026-08-12"',
+    )) as Checked
+    expect(host.internals.validity.valid).toBe(false)
+    expect(host.internals.validationMessage).toBe('Choose a date that is available.')
+    host.value = '2026-08-15'
+    await host.updateComplete
+    expect(host.internals.validity.valid).toBe(false)
+    host.value = '2026-08-13'
+    await host.updateComplete
+    expect(host.internals.validity.valid).toBe(true)
+  })
+
+  test('and so is a date off the step', async () => {
+    const host = (await field('min="2026-08-03" step="7" default-value="2026-08-04"')) as Checked
+    expect(host.internals.validity.valid).toBe(false)
+  })
+})
+
+describe('the calendar a date input opens', () => {
+  test('is named and labeled in the words the field is given', async () => {
+    const host = await field(
+      'calendar-label="Kalender" previous-label="Vorheriger Monat" next-label="Nächster Monat"',
+    )
+    const calendar = picker(host)
+    expect(calendar.getAttribute('label')).toBe('Kalender')
+    expect(
+      calendar.shadowRoot?.querySelector('[part="previous"]')?.getAttribute('aria-label'),
+    ).toBe('Vorheriger Monat')
+    expect(calendar.shadowRoot?.querySelector('[part="next"]')?.getAttribute('aria-label')).toBe(
+      'Nächster Monat',
+    )
+  })
+
+  test('takes the icons slotted on the field', async () => {
+    const host = await field()
+    const slots = [...picker(host).querySelectorAll('slot')].map((one) => one.getAttribute('slot'))
+    expect(slots).toEqual(['previous-icon', 'next-icon'])
+  })
+
+  /* Measured before this: Enter on the trigger opened the calendar and left
+     focus on the trigger, three Tab presses from the selected day. */
+  test('takes focus to the selected day when the trigger opens it', async () => {
+    const host = await field('default-value="2026-08-14"')
+    ;(part(host, 'trigger') as HTMLElement).click()
+    await host.updateComplete
+    await (picker(host) as unknown as { updateComplete: Promise<unknown> }).updateComplete
+    expect(host.open).toBe(true)
+    expect(picker(host).shadowRoot?.activeElement?.getAttribute('aria-label')).toContain(
+      'August 14, 2026',
+    )
+  })
+})

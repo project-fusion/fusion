@@ -618,3 +618,132 @@ describe("a date picker in the page's words", () => {
     expect(wrong.internals.validationMessage).toBe('Pas une date.')
   })
 })
+
+describe('a date picker in a disabled fieldset', () => {
+  /* Measured before this: the handlers read `disabled`, the control's own
+     attribute, so inside `<fieldset disabled>` Enter chose a day and Next moved
+     the month. */
+  test('takes no key, no press and no tab stop', async () => {
+    document.body.innerHTML = `<fieldset disabled><helix-headless-date-picker
+      default-month="2026-08" default-value="2026-08-14"></helix-headless-date-picker></fieldset>`
+    const cal = document.querySelector('helix-headless-date-picker') as DatePicker & {
+      formDisabledCallback(disabled: boolean): void
+      updateComplete: Promise<unknown>
+    }
+    // happy-dom does not run the fieldset's half, so it is called as a browser would.
+    cal.formDisabledCallback(true)
+    await cal.updateComplete
+    await press(cal, 'ArrowRight')
+    await press(cal, 'Enter')
+    expect(cal.value).toBe('2026-08-14')
+    expect(stop(cal)).toBeNull()
+    expect(cal.shadowRoot?.querySelector('[part="next"]')?.hasAttribute('disabled')).toBe(true)
+  })
+})
+
+describe('the bounds of a date picker', () => {
+  type Checked = DatePicker & {
+    internals: ElementInternals
+    updateComplete: Promise<unknown>
+  }
+
+  test('take Previous and Next out of use at the months they end in', async () => {
+    const cal = await calendar('default-month="2026-08" min="2026-08-03" max="2026-08-20"')
+    expect(cal.shadowRoot?.querySelector('[part="previous"]')?.hasAttribute('disabled')).toBe(true)
+    expect(cal.shadowRoot?.querySelector('[part="next"]')?.hasAttribute('disabled')).toBe(true)
+  })
+
+  test('stop the keys, so a reader cannot page into a month with nothing in it', async () => {
+    // Measured before this: Shift+PageDown reached a September a year past `max`.
+    const cal = await calendar(
+      'default-month="2026-08" default-value="2026-08-14" min="2026-08-03" max="2026-09-20"',
+    )
+    await press(cal, 'PageDown', true)
+    expect(cal.month).toBe('2026-09')
+    expect(stop(cal)).toContain('September 20, 2026')
+  })
+
+  test('make a value outside them invalid, with the bound it is past', async () => {
+    const early = (await calendar('min="2026-01-01" default-value="2020-01-01"')) as Checked
+    await early.updateComplete
+    expect(early.internals.validity.rangeUnderflow).toBe(true)
+    const late = (await calendar(
+      'max="2026-01-01" default-value="2026-03-01" range-overflow-message="Too late: {max}"',
+    )) as Checked
+    await late.updateComplete
+    expect(late.internals.validity.rangeOverflow).toBe(true)
+    expect(late.internals.validationMessage.startsWith('Too late: ')).toBe(true)
+  })
+
+  test('and a barred day or one off the step invalid too', async () => {
+    const barred = (await calendar(
+      'disable-dates="2026-08-12" default-value="2026-08-12"',
+    )) as Checked
+    await barred.updateComplete
+    expect(barred.internals.validity.valid).toBe(false)
+    const off = (await calendar('min="2026-08-03" step="7" default-value="2026-08-04"')) as Checked
+    await off.updateComplete
+    expect(off.internals.validity.stepMismatch).toBe(true)
+  })
+})
+
+describe('the lists a date picker is given', () => {
+  // Every other list a consumer writes takes spaces as well as commas.
+  test('are split on spaces as well as commas', async () => {
+    const cal = await calendar('default-month="2026-08" disable-days="0 6"')
+    const saturday = days(cal).find((day) => day.getAttribute('aria-label')?.includes('August 15'))
+    expect(saturday?.getAttribute('aria-disabled')).toBe('true')
+  })
+})
+
+describe('what a date picker tells a screen reader', () => {
+  test('the month heading is a live region, so paging is heard', async () => {
+    const cal = await calendar()
+    expect(cal.shadowRoot?.querySelector('[part="heading"]')?.getAttribute('aria-live')).toBe(
+      'polite',
+    )
+  })
+
+  test('a day from a neighboring month is unavailable, since it takes no press', async () => {
+    const cal = await calendar('default-month="2026-08"')
+    const filler = days(cal).find((one) => one.hasAttribute('data-outside'))
+    expect(filler?.getAttribute('aria-disabled')).toBe('true')
+  })
+})
+
+describe('where the tab stop goes', () => {
+  /* Measured before this: after a date was typed into Date Input, Tab into the
+     grid landed on the day picked before, while the selected day was another. */
+  test('to the selected day when the value moves from outside', async () => {
+    const cal = (await calendar('default-month="2026-08"')) as DatePicker & {
+      updateComplete: Promise<unknown>
+    }
+    days(cal)
+      .find((day) => day.getAttribute('aria-label')?.includes('August 20'))
+      ?.click()
+    await cal.updateComplete
+    cal.value = '2026-08-05'
+    await cal.updateComplete
+    expect(stop(cal)).toContain('August 5, 2026')
+  })
+})
+
+describe('the first day of the week', () => {
+  const firstHeader = (cal: DatePicker): string =>
+    cal.shadowRoot?.querySelector('[part="weekday"]')?.textContent?.trim() ?? ''
+
+  test('follows `locale` where nothing sets it', async () => {
+    const supported = typeof (new Intl.Locale('de-DE') as { getWeekInfo?: unknown }).getWeekInfo
+    const cal = await calendar('default-month="2026-08" locale="en-GB"')
+    if (supported === 'function') {
+      expect(firstHeader(cal)).toBe('Mon')
+    }
+    const us = await calendar('default-month="2026-08" locale="en-US"')
+    expect(firstHeader(us)).toBe('Sun')
+  })
+
+  test('and `first-day-of-week` still wins', async () => {
+    const cal = await calendar('default-month="2026-08" locale="en-GB" first-day-of-week="0"')
+    expect(firstHeader(cal)).toBe('Sun')
+  })
+})

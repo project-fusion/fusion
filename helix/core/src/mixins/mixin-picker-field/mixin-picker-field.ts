@@ -61,7 +61,22 @@ export declare class MixinPickerFieldInterface {
   /** Puts the caret in the field, as clicking its label does. */
   focus(options?: FocusOptions): void
 
-  /** Escape shuts the panel without moving the value. */
+  /**
+   * The text control's own `change`, which a reader's edit ends with, said
+   * under the host's name.
+   */
+  protected readonly handleCommit: (event: Event) => void
+
+  /**
+   * The trigger's press: opens the panel with focus in the picker, or closes
+   * it.
+   */
+  protected readonly handleTriggerClick: () => void
+
+  /**
+   * Escape shuts the panel without moving the value, Tab out of the text shuts
+   * a panel the reader is passing, and ArrowDown in the text moves into it.
+   */
   protected readonly handleKeydown: (event: KeyboardEvent) => void
 
   /** The overlay, placed against the field rather than the trigger. */
@@ -74,6 +89,15 @@ export declare class MixinPickerFieldInterface {
    * Nothing, unless a family fits what its panel holds to the room it has.
    */
   protected placed(room: number | undefined): void
+
+  /**
+   * Takes a value the reader picked in the panel, and says it is settled.
+   *
+   * Returns whether it was taken. A family whose typing announces `input`
+   * alone sends `change` from here for a pick, since a pick is a finished
+   * choice.
+   */
+  protected requestPicked(next: string): boolean
 
   /** Puts the field back where the answer differs from what was typed. */
   protected restore(): void
@@ -127,9 +151,9 @@ export declare class MixinPickerFieldInterface {
  * applies it.
  *
  * **Opening on focus, `readOnly` and the idle rendering are not here.** They
- * are `MixinPickerEditing`'s, because Color Input has none of the three: a hex
- * is pasted and read at a glance, so its field neither renders nor opens on
- * arrival, and giving it `readOnly` would be a property its API does not have.
+ * are `MixinPickerEditing`'s, because Color Input takes neither of the first
+ * and last: a hex is pasted and read at a glance, so its field neither renders
+ * nor opens on arrival. Color Input declares its own `readOnly`.
  *
  * **Three things the two typed families share stay with them.** `renderTrigger`
  * differs only by its icon and would still be the wrong thing to lift: a part a
@@ -299,13 +323,145 @@ export const MixinPickerField = <T extends Constructor<PickerBase>>(Base: T) => 
       this.refreshFeedback()
     }
 
-    /** Escape shuts the panel without moving the value. */
+    /**
+     * Escape shuts the panel without moving the value, Tab out of the text
+     * shuts a panel the reader is passing, and ArrowDown in the text moves
+     * into it.
+     *
+     * **Tab is for a reader moving through a form.** The panel opens when the
+     * text is reached, which is `MixinPickerEditing`'s, and left open it added
+     * its own controls to the Tab order: a reader passing a Date Input pressed
+     * Tab five times for one field. Leaving the text by Tab closes it, so the
+     * panel is reached by its trigger, which moves focus into it.
+     */
     protected readonly handleKeydown = (event: KeyboardEvent): void => {
       if (event.key === 'Escape' && this.open) {
         event.stopPropagation()
         this.requestOpen(false)
         this.returnFocus()
+        return
       }
+      const fromText = event.composedPath()[0] === this.control
+      if (event.key === 'Tab' && this.open && fromText) {
+        this.requestOpen(false)
+        return
+      }
+      /* Down from the text goes into the panel, opening it first where it is
+         shut, which is what Alt+Down and Down do on the APG date picker
+         combobox. A single line of text has nothing below the caret, so the key
+         has no other meaning here. */
+      if (event.key === 'ArrowDown' && fromText && !this.isDisabled) {
+        event.preventDefault()
+        if (this.open) {
+          this.partNamed('picker')?.focus()
+        } else {
+          this.fromTrigger = true
+          if (!this.requestOpen(true)) {
+            this.fromTrigger = false
+          }
+        }
+      }
+    }
+
+    /**
+     * Escape pressed inside the panel, which `handleKeydown` never hears.
+     *
+     * A family binds `handleKeydown` on the field, and the surface is the
+     * field's sibling, so a key pressed in the grid or the list went past it to
+     * the document, where the dismissal closed the panel and left focus on a
+     * cell that was no longer shown. Measured: focus fell to the body. Here the
+     * key is taken on the host, and focus goes back to the text.
+     */
+    private readonly handleSurfaceKeydown = (event: KeyboardEvent): void => {
+      const surface = this.partNamed('surface')
+      if (
+        event.key !== 'Escape' ||
+        !this.open ||
+        event.defaultPrevented ||
+        !surface ||
+        !event.composedPath().includes(surface)
+      ) {
+        return
+      }
+      event.stopPropagation()
+      event.preventDefault()
+      this.requestOpen(false)
+      this.returnFocus()
+    }
+
+    /**
+     * Closes the panel when focus leaves the whole control.
+     *
+     * Only for a move to somewhere else that can hold focus. Focus that goes
+     * nowhere, which is a press on the panel's own padding or a hidden cell
+     * giving it up, has no `relatedTarget`, and closing then would shut the
+     * panel under a reader who pressed inside it.
+     */
+    private readonly handleFocusOut = (event: FocusEvent): void => {
+      const to = event.relatedTarget
+      if (!this.open || !(to instanceof Node)) {
+        return
+      }
+      if (this.contains(to) || this.renderRoot?.contains?.(to)) {
+        return
+      }
+      this.requestOpen(false)
+    }
+
+    /**
+     * The text control's own `change`, which a reader's edit ends with, said
+     * under the host's name.
+     *
+     * A native `change` is not composed, so it stops at this shadow root. The
+     * families whose typing announces `input` alone send this one when the
+     * reader is done, as `<input>` does.
+     */
+    protected readonly handleCommit = (event: Event): void => {
+      event.stopPropagation()
+      this.announceChange()
+    }
+
+    /** Whether the trigger opened the panel, so focus moves into the picker. */
+    private fromTrigger = false
+
+    /**
+     * The trigger's press: opens the panel with focus in the picker, or closes
+     * it.
+     *
+     * **Focus moves only when the trigger opened it**, which is what the APG
+     * date picker dialog does: the panel is a dialog, and opening one from a
+     * button takes focus into it. Measured before this: Enter on the trigger
+     * left focus there, three Tab presses from the selected day. Focusing the
+     * text opens the panel too, on the families that open on arrival, and
+     * moving focus from there would take the caret from a reader who came to
+     * type.
+     */
+    protected readonly handleTriggerClick = (): void => {
+      this.fromTrigger = !this.open
+      this.toggleOpen()
+    }
+
+    /**
+     * Takes a value the reader picked in the panel, and says it is settled.
+     */
+    protected requestPicked(next: string): boolean {
+      const taken = this.requestValue(next)
+      if (taken && this.announcesInput) {
+        this.announceChange()
+      }
+      return taken
+    }
+
+    override connectedCallback(): void {
+      super.connectedCallback()
+      this.addEventListener('keydown', this.handleSurfaceKeydown)
+      this.addEventListener('focusout', this.handleFocusOut)
+    }
+
+    override disconnectedCallback(): void {
+      super.disconnectedCallback()
+      this.removeEventListener('keydown', this.handleSurfaceKeydown)
+      this.removeEventListener('focusout', this.handleFocusOut)
     }
 
     /**
@@ -337,10 +493,15 @@ export const MixinPickerField = <T extends Constructor<PickerBase>>(Base: T) => 
      */
     protected returning = false
 
-    /** Puts the caret back in the field without the field reopening the panel. */
+    /**
+     * Puts the caret back in the field without the field reopening the panel.
+     *
+     * The anchor rather than the text, which is the trigger where there is no
+     * text: Color Input's swatch dropped focus to the body on Escape.
+     */
     protected returnFocus(): void {
       this.returning = true
-      this.control?.focus()
+      this.anchor?.focus()
       this.returning = false
     }
 
@@ -357,6 +518,13 @@ export const MixinPickerField = <T extends Constructor<PickerBase>>(Base: T) => 
 
     protected override updated(changed: PropertyValues): void {
       super.updated(changed)
+      /* After the panel is shown, which the controller does on this update. */
+      if (changed.has('open')) {
+        if (this.open && this.fromTrigger) {
+          this.partNamed('picker')?.focus()
+        }
+        this.fromTrigger = false
+      }
       /* Every update, not only the ones that name `value`.
          `value` is an accessor over `valueState ?? defaultValue`, so a consumer
          moving `default-value` on an untouched control moves what the form

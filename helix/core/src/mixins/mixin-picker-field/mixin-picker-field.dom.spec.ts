@@ -202,6 +202,51 @@ describe('the panel', () => {
     expect(control(host).value).toBe('[v]')
   })
 
+  /* The field's handler is on the field, and the surface is its sibling, so a
+     key pressed in the grid or the list went past it. Measured before this:
+     the document's dismissal shut the panel and focus fell to the body. */
+  test('shuts on Escape pressed inside the panel, and hands the caret back', async () => {
+    const host = await mount('default-value="v"')
+    host.open = true
+    await host.updateComplete
+    const surface = host.shadowRoot?.querySelector('[part="surface"]') as HTMLElement
+    surface.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        key: 'Escape',
+      }),
+    )
+    await host.updateComplete
+    expect(host.open).toBe(false)
+    expect(host.shadowRoot?.activeElement).toBe(control(host))
+  })
+
+  /* A reader passing through a form tabbed into the field, which opened the
+     panel, and then through its controls too: five stops for one field. */
+  test('shuts when Tab leaves the text', async () => {
+    const host = await mount()
+    host.open = true
+    await host.updateComplete
+    control(host).dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key: 'Tab' }),
+    )
+    await host.updateComplete
+    expect(host.open).toBe(false)
+  })
+
+  test('shows again when the host is moved while open', async () => {
+    const host = await mount()
+    host.open = true
+    await host.updateComplete
+    host.remove()
+    document.body.append(host)
+    await host.updateComplete
+    expect(host.open).toBe(true)
+    expect(host.panel.open).toBe(true)
+  })
+
   /* Shut already, Escape is somebody else's: an overlay holding this field
      should hear it. */
   test('and leaves Escape alone while it is shut', async () => {
@@ -236,6 +281,18 @@ describe('a read-only field', () => {
     const host = await mount('default-value="v" readonly')
     expect(host.readOnly).toBe(true)
     expect(host.value).toBe('v')
+  })
+
+  /* A native read-only date input opens nothing, and this one opened a panel
+     whose every pick was then refused. */
+  test('does not open, from the field or the trigger', async () => {
+    const host = await mount('readonly')
+    focus(host, null)
+    await host.updateComplete
+    expect(host.open).toBe(false)
+    trigger(host).click()
+    await host.updateComplete
+    expect(host.open).toBe(false)
   })
 
   test('and is reachable from markup as the platform spells it', async () => {

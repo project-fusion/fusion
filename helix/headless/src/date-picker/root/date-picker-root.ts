@@ -1,6 +1,7 @@
 import {
   valueAsDate as asDate,
   customElement,
+  fillTemplate,
   dateAsValue as fromDate,
   HelixFormElement,
   HelixNavigateEvent,
@@ -9,6 +10,7 @@ import {
   MixinControllerValue,
   reportValues,
   requestChange,
+  writtenList,
 } from '@fusion.dev/helix-core'
 import { caretLeft, caretRight } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -45,12 +47,36 @@ const localToday = (): string => {
   return `${now.getFullYear()}-${month}-${day}`
 }
 
-/** Splits a comma-separated attribute, tolerating spaces and empty entries. */
+/** Splits the value, which is comma separated, tolerating spaces and empty entries. */
 const list = (value: string): string[] =>
   value
     .split(',')
     .map((entry) => entry.trim())
     .filter(Boolean)
+
+/**
+ * The first day of the week where a language is spoken, `0` for Sunday.
+ *
+ * From `Intl.Locale`'s week information, which an engine offers as
+ * `getWeekInfo()` or, in older versions, as `weekInfo`. Sunday where it offers
+ * neither, as Firefox does not, or where the tag cannot be read.
+ */
+const weekStartOf = (locale: string): number => {
+  try {
+    const tag = new Intl.Locale(locale) as Intl.Locale & {
+      getWeekInfo?: () => { firstDay: number }
+      weekInfo?: { firstDay: number }
+    }
+    const first = tag.getWeekInfo?.().firstDay ?? tag.weekInfo?.firstDay
+    return first === undefined ? 0 : first % 7
+  } catch {
+    return 0
+  }
+}
+
+/** A month as `YYYY-MM`. */
+const monthOf = (date: Date): string =>
+  `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}`
 
 const addDays = (date: Date, days: number): Date =>
   new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() + days))
@@ -90,6 +116,12 @@ const addMonths = (date: Date, months: number): Date => {
  * `mode` sets how many dates are held. Unset holds one, `range` holds two and
  * marks the dates between them, and `multiple` toggles each date. All three
  * read and write the same comma-separated `value`.
+ *
+ * The month heading is a live region, so a screen reader hears the new month
+ * when Previous or Next is pressed. Neither moves past `min` or `max`, and the
+ * keys stop at them too. A value outside the bounds, on a barred day, or off
+ * `step` reports `rangeUnderflow`, `rangeOverflow`, `badInput` or
+ * `stepMismatch`, so a form does not submit it.
  *
  * @since 0.1.0
  * @status stable
@@ -147,22 +179,27 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   defaultMonth = ''
 
   /**
-   * Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`.
+   * Dates that cannot be chosen, as `YYYY-MM-DD`, separated by commas or
+   * spaces.
    */
   @property({ attribute: 'disable-dates' })
   disableDates = ''
 
   /**
-   * Days of the week that cannot be chosen, comma separated, `0` to `6`.
+   * Days of the week that cannot be chosen, `0` for Sunday to `6` for
+   * Saturday, separated by commas or spaces.
    */
   @property({ attribute: 'disable-days' })
   disableDays = ''
 
   /**
    * First column of the week, `0` for Sunday through `6` for Saturday.
+   *
+   * Absent follows `locale`, where the engine knows the week of that language
+   * (Firefox does not), and is Sunday otherwise.
    */
   @property({ attribute: 'first-day-of-week', type: Number })
-  firstDayOfWeek = 0
+  firstDayOfWeek?: number
 
   /**
    * Whether the current selection fails validation.
@@ -282,6 +319,24 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
     return list(this.value)
   }
 
+  /** The day the week starts on: `firstDayOfWeek`, or the locale's. */
+  private get weekStart(): number {
+    if (this.firstDayOfWeek !== undefined && Number.isFinite(this.firstDayOfWeek)) {
+      return ((Math.floor(this.firstDayOfWeek) % 7) + 7) % 7
+    }
+    return this.locale === '' ? 0 : weekStartOf(this.locale)
+  }
+
+  /**
+   * Whether the last date the reader moved to is this picker's own doing.
+   *
+   * A value that moves from outside, typed into Date Input or set by a script,
+   * takes the tab stop to the selected day, as the APG date picker does. A
+   * value this grid chose leaves it where the reader pressed, which in a range
+   * is the end they just picked.
+   */
+  private choosing = false
+
   /** The range's ends, when there are two and the mode asks for them. */
   private get range(): [string, string] | null {
     const dates = this.selected
@@ -346,7 +401,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
 
   /** Six weeks of dates, so a grid does not change height between months. */
   private weeksOf(month: Date): Date[][] {
-    const offset = (month.getUTCDay() - this.firstDayOfWeek + 7) % 7
+    const offset = (month.getUTCDay() - this.weekStart + 7) % 7
     const start = addDays(month, -offset)
     return Array.from({ length: 6 }, (_, week) =>
       Array.from({ length: 7 }, (_, day) => addDays(start, week * 7 + day)),
@@ -369,7 +424,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
     if (this.max !== '' && iso > this.max) {
       return true
     }
-    if (list(this.disableDays).includes(String(date.getUTCDay()))) {
+    if (writtenList(this.disableDays).includes(String(date.getUTCDay()))) {
       return true
     }
     /* Counted from `min` where there is one and from the epoch where there is
@@ -383,7 +438,34 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
         return true
       }
     }
-    return list(this.disableDates).includes(iso)
+    return writtenList(this.disableDates).includes(iso)
+  }
+
+  /** Pulls a date inside `min` and `max`, so the keys stop at the bounds. */
+  private clamp(date: Date): Date {
+    const iso = fromDate(date)
+    const min = asDate(this.min)
+    const max = asDate(this.max)
+    if (min && iso < this.min) {
+      return min
+    }
+    if (max && iso > this.max) {
+      return max
+    }
+    return date
+  }
+
+  /** Whether the month before the first one shown is wholly before `min`. */
+  private get atStart(): boolean {
+    return asDate(this.min) !== null && monthOf(addMonths(this.shown, -1)) < this.min.slice(0, 7)
+  }
+
+  /** Whether the month after the last one shown is wholly after `max`. */
+  private get atEnd(): boolean {
+    return (
+      asDate(this.max) !== null &&
+      monthOf(addMonths(this.shown, this.monthCount)) > this.max.slice(0, 7)
+    )
   }
 
   /**
@@ -395,10 +477,10 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
    * moves.
    */
   private show(date: Date): void {
-    if (this.disabled) {
+    if (this.isDisabled) {
       return
     }
-    const next = `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}`
+    const next = monthOf(date)
     if (next === this.month) {
       return
     }
@@ -414,7 +496,8 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
     })
   }
 
-  private moveTo(date: Date): void {
+  private moveTo(wanted: Date): void {
+    const date = this.clamp(wanted)
     this.focused = fromDate(date)
     this.show(date)
     this.updateComplete.then(() => {
@@ -431,8 +514,8 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
    */
   private select(date: Date): void {
     /* Refused at the source rather than at each cell, so every path in is
-       covered by one check. */
-    if (this.disabled) {
+       covered by one check. `isDisabled`, so a disabled fieldset counts. */
+    if (this.isDisabled) {
       return
     }
     if (this.barred(date)) {
@@ -458,11 +541,12 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
     /* Announced before it is written, so a listener calling `preventDefault()`
        refuses a date that has not been chosen yet. `requestChange` is the one
        path every stateful change in the library goes through. */
+    this.choosing = true
     this.requestValue(next.join(','))
   }
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {
-    if (!KEYS.has(event.key) || this.disabled) {
+    if (!KEYS.has(event.key) || this.isDisabled) {
       return
     }
     /* Grid keys, from the grid.
@@ -490,9 +574,9 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
     } else if (event.key === 'ArrowDown') {
       this.moveTo(addDays(from, 7))
     } else if (event.key === 'Home') {
-      this.moveTo(addDays(from, -((from.getUTCDay() - this.firstDayOfWeek + 7) % 7)))
+      this.moveTo(addDays(from, -((from.getUTCDay() - this.weekStart + 7) % 7)))
     } else if (event.key === 'End') {
-      this.moveTo(addDays(from, 6 - ((from.getUTCDay() - this.firstDayOfWeek + 7) % 7)))
+      this.moveTo(addDays(from, 6 - ((from.getUTCDay() - this.weekStart + 7) % 7)))
     } else {
       // Shift pages by a year, which is the same move twelve months over.
       const step = event.key === 'PageUp' ? -1 : 1
@@ -500,6 +584,18 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
     }
 
     event.preventDefault()
+  }
+
+  /**
+   * Moves focus to the grid's tab stop: the selected day, or the day last
+   * moved to, or the first of the month.
+   *
+   * Date Input calls this when its trigger opens the calendar, which is where
+   * the APG date picker dialog puts focus. The host is not focusable, so a
+   * plain `focus()` on it did nothing and focus stayed on the trigger.
+   */
+  override focus(options?: FocusOptions): void {
+    this.renderRoot?.querySelector<HTMLElement>('[part~="cell"][tabindex="0"]')?.focus(options)
   }
 
   override connectedCallback(): void {
@@ -549,6 +645,76 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   valueMissingMessage?: string
 
   /**
+   * The validation message for a date after `max`. `{max}` is replaced with
+   * `max`, written as a date in `locale`.
+   */
+  @property({ attribute: 'range-overflow-message' })
+  rangeOverflowMessage?: string
+
+  /**
+   * The validation message for a date before `min`. `{min}` is replaced with
+   * `min`, written as a date in `locale`.
+   */
+  @property({ attribute: 'range-underflow-message' })
+  rangeUnderflowMessage?: string
+
+  /**
+   * The validation message for a date that `step` skips.
+   */
+  @property({ attribute: 'step-mismatch-message' })
+  stepMismatchMessage?: string
+
+  /**
+   * The validation message for a date that `disable-dates` or `disable-days`
+   * bars.
+   */
+  @property({ attribute: 'unavailable-message' })
+  unavailableMessage?: string
+
+  /** A date written for a message, in `locale`. */
+  private spoken(iso: string): string {
+    const date = asDate(iso)
+    return date ? this.formats.long.format(date) : iso
+  }
+
+  /**
+   * What is wrong with a date the calendar can read, as a validity flag and a
+   * message, or nothing.
+   *
+   * Measured before this: a value before `min`, after `max`, or on a barred
+   * day reported valid and was submitted, where a native date input reports
+   * the bound it is past.
+   */
+  private fault(iso: string): [keyof ValidityStateFlags, string] | undefined {
+    if (this.min !== '' && iso < this.min) {
+      return [
+        'rangeUnderflow',
+        fillTemplate(this.rangeUnderflowMessage || 'Choose a date on or after {min}.', {
+          min: this.spoken(this.min),
+        }),
+      ]
+    }
+    if (this.max !== '' && iso > this.max) {
+      return [
+        'rangeOverflow',
+        fillTemplate(this.rangeOverflowMessage || 'Choose a date on or before {max}.', {
+          max: this.spoken(this.max),
+        }),
+      ]
+    }
+    const date = asDate(iso)
+    if (!date || !this.barred(date)) {
+      return undefined
+    }
+    const listed =
+      writtenList(this.disableDates).includes(iso) ||
+      writtenList(this.disableDays).includes(String(date.getUTCDay()))
+    return listed
+      ? ['badInput', this.unavailableMessage || 'Choose a date that is available.']
+      : ['stepMismatch', this.stepMismatchMessage || 'Choose one of the dates the calendar offers.']
+  }
+
+  /**
    * Reports "required and empty", or clears it.
    *
    * Written out rather than taken from `MixinField`, which is where the seven
@@ -587,11 +753,25 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
       )
       return
     }
+    for (const one of held) {
+      const fault = this.fault(one)
+      if (fault) {
+        this.internals.setValidity({ [fault[0]]: true }, fault[1], anchor)
+        return
+      }
+    }
     this.internals.setValidity({})
   }
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    /* A value moved from outside takes the tab stop to the selected day. See
+       `choosing`. Measured before this: after a date was typed into Date
+       Input, Tab into the grid landed on the day picked before. */
+    if (changed.has('value') && !this.choosing) {
+      this.focused = ''
+    }
+    this.choosing = false
     hostAria(this.internals, { label: this.label, role: 'group' })
     /* Announced as off, not merely inert. Removing it from the accessibility
        tree would take the dates with it; this says the control exists and
@@ -636,7 +816,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
    * so an unnamed calendar would submit empty-named dates.
    */
   private report(): void {
-    if (this.disabled) {
+    if (this.isDisabled) {
       this.internals.setFormValue(null)
       return
     }
@@ -672,6 +852,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
         full: Intl.DateTimeFormat
         heading: Intl.DateTimeFormat
         locale: string
+        long: Intl.DateTimeFormat
         weekday: Intl.DateTimeFormat
       }
     | undefined
@@ -679,6 +860,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   private get formats(): {
     full: Intl.DateTimeFormat
     heading: Intl.DateTimeFormat
+    long: Intl.DateTimeFormat
     weekday: Intl.DateTimeFormat
   } {
     if (this.cachedFormats?.locale === this.locale) {
@@ -689,6 +871,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
       full: new Intl.DateTimeFormat(locale, { dateStyle: 'full', timeZone: 'UTC' }),
       heading: new Intl.DateTimeFormat(locale, { month: 'long', timeZone: 'UTC', year: 'numeric' }),
       locale: this.locale,
+      long: new Intl.DateTimeFormat(locale, { dateStyle: 'long', timeZone: 'UTC' }),
       weekday: new Intl.DateTimeFormat(locale, { timeZone: 'UTC', weekday: 'short' }),
     }
     this.cachedFormats = built
@@ -748,19 +931,27 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
                 part="previous"
                 type="button"
                 aria-label=${this.previousLabel}
+                ?disabled=${this.isDisabled || this.atStart}
                 @click=${() => this.show(addMonths(this.shown, -1))}
               >
                 ${this.renderPreviousMark()}
               </button>`
             : nothing
         }
-        <span part="heading">${heading.format(month)}</span>
+        ${
+          /* A live region, so the month a reader pages to is said. Measured
+             before this: Next month changed the grid in silence, where the APG
+             date picker announces the new month. */
+          ''
+        }
+        <span part="heading" aria-live="polite">${heading.format(month)}</span>
         ${
           last
             ? html`<button
                 part="next"
                 type="button"
                 aria-label=${this.nextLabel}
+                ?disabled=${this.isDisabled || this.atEnd}
                 @click=${() => this.show(addMonths(this.shown, 1))}
               >
                 ${this.renderNextMark()}
@@ -806,10 +997,13 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
               // stylesheet outside, which cannot follow `::part()` with one.
               // `day-selected` is the solid mark, so a day between a range's
               // ends is not one: its cell carries the band instead.
+              /* A filler day is said to be unavailable, which it is: it takes
+                 no click. Exposed as an ordinary cell, a screen reader in
+                 browse mode offered it and nothing happened. */
               return html`<span
                 part="cell${start ? ' cell-range-start' : ''}${middle ? ' cell-range-middle' : ''}${end ? ' cell-range-end' : ''}"
                 role="gridcell"
-                aria-disabled=${disabled ? 'true' : nothing}
+                aria-disabled=${disabled || outside ? 'true' : nothing}
                 aria-label=${full.format(date)}
                 aria-current=${iso === today ? 'date' : nothing}
                 aria-selected=${!outside && selected ? 'true' : nothing}
@@ -818,7 +1012,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
                 data-range-middle=${middle ? '' : nothing}
                 data-range-start=${start ? '' : nothing}
                 data-today=${iso === today ? '' : nothing}
-                tabindex=${!outside && iso === anchor ? '0' : '-1'}
+                tabindex=${!outside && iso === anchor && !this.isDisabled ? '0' : '-1'}
                 @click=${outside ? nothing : () => this.select(date)}
                 ><span
                   part="day${!outside && selected && !middle ? ' day-selected' : ''}${iso === today ? ' day-today' : ''}${outside ? ' day-outside' : ''}${disabled ? ' day-disabled' : ''}"
