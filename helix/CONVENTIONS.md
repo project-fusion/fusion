@@ -2340,3 +2340,19 @@ wrong is silent both ways.
 mixins and controllers that register nothing. This page said `headless` had none
 until September 2, 2026, against every file calling `@customElement` and a
 manifest that had always been right.
+
+**The missing-name warning ships in development builds only, and it is the one
+that does.** Core imports it as `#audit-name`, a subpath in its own
+`package.json` `imports` that resolves to the audit under the `development`
+export condition and to a function that does nothing otherwise: the mechanism
+Lit uses for its dev-mode warnings, without a second build of core. Vite and
+webpack ask for `development` while a page is developed, a production build
+does not, and so every field and Button stops carrying about 450 bytes gzip for
+a sentence meant for whoever writes the page. `nameText`, which
+`AriaForwardController` needs at runtime to decide where a label goes, is a
+module of its own and stays in every build. The repository's specs run with
+`--conditions helix-development`, which the map reads as it reads `development`
+without also switching Lit to its development build, whose class-field check
+throws on classes a spec defines. Core's add `--conditions helix-source`, which
+resolves to the source files, since its specs run before `dist` exists. Every
+other runtime warning still reports in every build.

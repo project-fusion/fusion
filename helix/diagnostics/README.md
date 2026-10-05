@@ -248,7 +248,7 @@ diagnostics counts it by kind and tag. None fails a CI job.
 | `misread-direction` | A stat was given `up`, `down` or `neutral`, which are Trend's directions and lay nothing out |
 | `missing-alt` | An image has no `alt`, so a screen reader announces its file name |
 | `missing-layout` | The three.js graph driver could not load `d3-force-3d` |
-| `missing-name` | A button or form control has no accessible name |
+| `missing-name` | A button or form control has no accessible name. Development builds only (the `development` export condition) |
 | `missing-row-key` | A selectable data table has no `row-key`, so it knows each row by its place |
 | `missing-stencil-parts` | A graph stencil names parts its shape does not have |
 | `missing-target` | A skip link's `href` names no element on the page |

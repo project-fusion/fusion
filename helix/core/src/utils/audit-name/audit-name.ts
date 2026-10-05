@@ -1,39 +1,5 @@
+import { nameText } from '../name-text/name-text.js'
 import { reportRuntime } from '../report-runtime/report-runtime.js'
-
-/**
- * The words a node gives a name computed from its content: its text, read
- * through slots, and the `aria-label` or `alt` of a picture in it, such as an
- * icon named by its own label. A node hidden from the reader gives none, and
- * so does `shown`, the part where a control shows its value.
- *
- * Exported for `AriaForwardController`, which asks whether a control's own
- * label has words in it.
- */
-export const nameText = (node: Node, shown?: Element | null): string => {
-  if (node === shown) {
-    return ''
-  }
-  if (node instanceof HTMLSlotElement) {
-    return node
-      .assignedNodes({ flatten: true })
-      .map((one) => nameText(one, shown))
-      .join('')
-  }
-  if (node.nodeType === Node.TEXT_NODE) {
-    return node.textContent ?? ''
-  }
-  if (!(node instanceof Element)) {
-    return ''
-  }
-  if ((node instanceof HTMLElement && node.hidden) || node.getAttribute('aria-hidden') === 'true') {
-    return ''
-  }
-  const said = node.getAttribute('aria-label') ?? node.getAttribute('alt')
-  if (said?.trim()) {
-    return said
-  }
-  return [...node.childNodes].map((one) => nameText(one, shown)).join('')
-}
 
 /** Whether the ids in an IDREF list name something with words, in the tree `from` is in. */
 const namesWithWords = (ids: string | null, from: Node, shown?: Element | null): boolean => {
@@ -122,9 +88,15 @@ const readWaiting = (): void => {
  * that task, and an element is read once in its life, so a name taken away
  * later is not reported.
  *
- * **In every build.** Every runtime warning in the library reports through the
- * same channel whatever the build, and a project that wants the console quiet
- * tells `@fusion.dev/helix-diagnostics` with `core.warnings: false`.
+ * **In a development build only.** Every field and Button calls it, so in
+ * production it would cost each of them about 450 bytes gzip for a sentence
+ * meant for the person writing the page. Core imports it as `#audit-name`,
+ * which `package.json` resolves here under the `development` condition (Vite
+ * and webpack in development, `bun --conditions development`,
+ * `node --conditions=development`) and to `audit-name-off.ts`, which does
+ * nothing, everywhere else. Like every runtime warning it reports through the
+ * one channel, and a project that wants the console quiet tells
+ * `@fusion.dev/helix-diagnostics` with `core.warnings: false`.
  *
  * `also` answers for a name the component gave through its internals, which no
  * attribute shows. `fix` is the sentence that says how to name it. `shown` is

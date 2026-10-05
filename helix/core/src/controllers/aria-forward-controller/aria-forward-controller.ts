@@ -1,6 +1,7 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
-import { auditName, nameText } from '../../utils/audit-name/audit-name.js'
+import { auditName } from '#audit-name'
 import { elementById } from '../../utils/element-by-id/element-by-id.js'
+import { nameText } from '../../utils/name-text/name-text.js'
 
 /** What the controller needs to know: which element inside is the control. */
 export interface AriaForwardOptions {

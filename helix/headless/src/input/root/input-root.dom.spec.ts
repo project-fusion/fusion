@@ -6,7 +6,14 @@ beforeAll(async () => {
   await import('../index.js')
 })
 
-/** What the console was warned while `markup` mounted and settled, with nothing printed. */
+/**
+ * What the console was warned while `markup` mounted and settled, with nothing printed.
+ *
+ * The missing-name warning is in development builds only, so these specs run
+ * with it: the package's `test:dom` script passes
+ * `bun test --conditions helix-development`, which core's `#audit-name` reads as
+ * it reads `development`, and a run by hand needs the same flag.
+ */
 const warnedOn = async (markup: string): Promise<string[]> => {
   const warnings: string[] = []
   const original = console.warn
