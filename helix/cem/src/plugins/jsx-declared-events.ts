@@ -31,8 +31,31 @@ const platformType = (types: Set<string> | undefined): string => {
   return types?.size === 1 && only !== undefined && PLATFORM.test(only) ? only : 'Event'
 }
 
-/** `toggle` to `onToggle`, and `dragend` to `onDragend`, which is what React reads. */
-const handlerName = (event: string): string => `on${event.charAt(0).toUpperCase()}${event.slice(1)}`
+/**
+ * React's casing for the native events whose names are two words run together,
+ * `onTimeUpdate` for `timeupdate`.
+ *
+ * **The same table as `reactNativeProp` in core**, which is what the element
+ * binds on a hydrated page, so the typings offer the prop that is bound. Kept
+ * here as well because this package is a build tool core depends on, and the
+ * dependency cannot run the other way. Each side's spec lists the names.
+ */
+const REACT_CASING: Readonly<Record<string, string>> = {
+  canplay: 'onCanPlay',
+  canplaythrough: 'onCanPlayThrough',
+  durationchange: 'onDurationChange',
+  loadeddata: 'onLoadedData',
+  loadedmetadata: 'onLoadedMetadata',
+  loadstart: 'onLoadStart',
+  ratechange: 'onRateChange',
+  scrollend: 'onScrollEnd',
+  timeupdate: 'onTimeUpdate',
+  volumechange: 'onVolumeChange',
+}
+
+/** `toggle` to `onToggle`, and `timeupdate` to `onTimeUpdate`, which is what React reads. */
+const handlerName = (event: string): string =>
+  REACT_CASING[event] ?? `on${event.charAt(0).toUpperCase()}${event.slice(1)}`
 
 /**
  * Adds a handler for every native-named event the manifest declares.
