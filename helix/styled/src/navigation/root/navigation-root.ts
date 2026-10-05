@@ -17,8 +17,12 @@ import { styles } from './navigation-root.css.js'
  * @aliases Nav, NavList, Tabs
  * @documentation https://fusion.dev/helix/components/navigation
  *
+ * @cssproperty --navigation-block-size - Height of the bar in a row. Each destination fills it.
  * @cssproperty --navigation-gap - Space between destinations.
  * @cssproperty --navigation-indicator-color - Fill of the marker on the current destination.
+ * @cssproperty --navigation-indicator-radius - Corner radius of the marker.
+ * @cssproperty --navigation-indicator-shadow - Shadow under the marker, for a marker that sits
+ *   raised on the bar.
  */
 @customElement('helix-navigation')
 export class HelixNavigation extends HelixHeadlessNavigation {

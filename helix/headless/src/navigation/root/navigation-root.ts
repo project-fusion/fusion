@@ -1,11 +1,41 @@
 import {
   AriaForwardController,
   customElement,
+  focusableElements,
   HelixElement,
   IndicatorController,
+  KeyboardNavigationController,
+  type NavigableItem,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+
+/** What can take focus itself, which a destination usually is. */
+const FOCUSABLE = 'a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
+
+/**
+ * A destination as the keyboard controller moves through it: the link itself,
+ * a `Megamenu`'s trigger, or the first thing inside it that takes focus.
+ *
+ * `contains` is that control and what is inside it, and not the whole
+ * destination, so an arrow pressed among the links of an open megamenu panel
+ * stays with the panel.
+ */
+const navigable = (item: HTMLElement): NavigableItem => {
+  const control = (): HTMLElement | undefined =>
+    (item as HTMLElement & { navigationControl?: HTMLElement }).navigationControl ??
+    (item.matches(FOCUSABLE) ? item : focusableElements(item)[0])
+  return {
+    contains: (node) => {
+      const target = control()
+      return target !== undefined && node !== null && (node === target || target.contains(node))
+    },
+    disabled: false,
+    focusItem: () => control()?.focus(),
+    select: () => {},
+    selected: false,
+  }
+}
 
 /**
  * @summary A set of destinations, with a marker on the current one.
@@ -28,6 +58,13 @@ import { property } from 'lit/decorators.js'
  *
  * Set `orientation="vertical"` to stack the destinations in a column, for a
  * sidebar.
+ *
+ * Set `arrows` and the arrow keys move focus between the destinations, as
+ * Radix's navigation menu does: left and right along a row, up and down a
+ * column, Home and End to the ends. A `Megamenu` among them is reached at its
+ * trigger. Tab still stops at every link, since a navigation is a list of
+ * links and not a single control, and the keys across the other axis are
+ * left to the page and to an open panel.
  *
  * @since 0.1.0
  * @status stable
@@ -62,6 +99,15 @@ export class HelixHeadlessNavigation extends HelixElement {
   })
 
   /**
+   * Whether the arrow keys move focus between the destinations.
+   *
+   * Off by default, so a page whose readers scroll with the arrow keys while
+   * a link has focus keeps doing so.
+   */
+  @property({ type: Boolean })
+  arrows = false
+
+  /**
    * The landmark's name, read by screen readers.
    *
    * An `aria-label` or `aria-labelledby` on the host names the landmark too,
@@ -70,6 +116,18 @@ export class HelixHeadlessNavigation extends HelixElement {
    */
   @property()
   label = 'Main'
+
+  /* The arrow keys, through the shared controller: from where focus is,
+     choosing nothing, stopping at the ends. Only the axis the destinations run
+     along: the other is the page's to scroll with and an open panel's. */
+  protected readonly keys = new KeyboardNavigationController(this, {
+    items: () => (this.arrows ? this.items.map(navigable) : []),
+    origin: 'focus',
+    reserved: () =>
+      this.orientation === 'vertical' ? ['ArrowLeft', 'ArrowRight'] : ['ArrowDown', 'ArrowUp'],
+    selects: () => false,
+    wrap: false,
+  })
 
   /** Carries a host `aria-label` and `aria-labelledby` to the `<nav>`. */
   protected readonly aria = new AriaForwardController(this, {
