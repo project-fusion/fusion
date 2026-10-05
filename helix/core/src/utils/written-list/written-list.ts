@@ -2,7 +2,7 @@
  * What a list property may hold: what an attribute writes, or an array a
  * framework assigned to the property.
  *
- * **An array as well, because React 19 sets a property and not an attribute.**
+ * **An array as well, because React 19 sets the property.**
  * `values={[1240, 1318]}` arrives as an array, and splitting it as a string
  * threw inside the render and left the old drawing on the screen.
  */

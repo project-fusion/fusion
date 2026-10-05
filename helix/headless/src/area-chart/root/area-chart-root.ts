@@ -20,7 +20,19 @@ import { html, nothing, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import '../../tooltip/index.js'
 
-const percent = new Intl.NumberFormat(undefined, { maximumFractionDigits: 0, style: 'percent' })
+/* Built once per locale and kept, `Intl.NumberFormat` being expensive to
+   construct and cheap to call. */
+const PERCENTS = new Map<string, Intl.NumberFormat>()
+
+/** A share from 0 to 1 as a whole percentage, the way the locale writes one. */
+const percentIn = (locale: string): Intl.NumberFormat => {
+  let found = PERCENTS.get(locale)
+  if (!found) {
+    found = new Intl.NumberFormat(locale || undefined, { maximumFractionDigits: 0, style: 'percent' })
+    PERCENTS.set(locale, found)
+  }
+  return found
+}
 
 /** The table as parts of a total: which columns, what each holds, and the running sums. */
 export interface AreaStack {
@@ -391,10 +403,10 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
   protected renderSummary(stack: AreaStack, rows: Row[]): TemplateResult {
     const last = rows.length - 1
     const total = stack.totals[last] ?? 0
-    const format = formatNumbers('')
+    const format = formatNumbers(this.locale)
     const shares = stack.names.map(
       (name, depth) =>
-        `${name} ${percent.format(total > 0 ? (stack.values[depth]?.[last] ?? 0) / total : 0)}`,
+        `${name} ${percentIn(this.locale).format(total > 0 ? (stack.values[depth]?.[last] ?? 0) / total : 0)}`,
     )
     const named = this.named ? `${this.named}, ` : ''
     return html`<p part="summary">
@@ -409,7 +421,7 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
    * no series color: it is the sum of the bands, not a band.
    */
   private tallied(rows: Row[], stack: AreaStack): Row[] {
-    const format = formatNumbers('')
+    const format = formatNumbers(this.locale)
     return rows.map((row, index) => {
       const total = stack.totals[index] ?? 0
       return {
@@ -419,7 +431,7 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
             this.share && cell.value !== undefined && stack.columns.includes(column) && total > 0
               ? {
                   ...cell,
-                  text: `${cell.text} (${percent.format(Math.max(0, cell.value) / total)})`,
+                  text: `${cell.text} (${percentIn(this.locale).format(Math.max(0, cell.value) / total)})`,
                 }
               : cell,
           ),

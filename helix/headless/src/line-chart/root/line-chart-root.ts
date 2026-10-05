@@ -284,7 +284,7 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
    * The latest, because where a series ended is the question a line over time
    * is asked first, which is what `AreaChart` gives too. Each series' own last
    * reading, so a series with a blank in the last row still says where it was.
-   * Written the way the table writes it, so `$128k` and not `128000`.
+   * Written the way the table writes it, such as `$128k` for `128000`.
    */
   protected renderSummary(series: Series[]): TemplateResult {
     const rows = this.sourceRows

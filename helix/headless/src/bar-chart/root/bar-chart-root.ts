@@ -4,6 +4,7 @@ import {
   customElement,
   drawTooltip,
   extent,
+  formatNumbers,
   HelixElement,
   linear,
   linePath,
@@ -293,7 +294,7 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
       z === undefined
         ? 0
         : Math.max(
-            ...[...ticks(domain), ...ticks(other)].map((level) => level.toLocaleString().length),
+            ...[...ticks(domain), ...ticks(other)].map((level) => formatNumbers(this.locale)(level).length),
           )
 
     /* The second axis wears its series' color when exactly one series is on it,
@@ -324,7 +325,7 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
    *
    * The highest, because which category leads is the question a bar chart is
    * read for, and the table beside it has every other number. The reading is
-   * written the way the table writes it, so `$128k` and not `128000`.
+   * written the way the table writes it, such as `$128k` for `128000`.
    */
   protected renderSummary(series: Series[]): TemplateResult {
     const rows = this.sourceRows
@@ -572,7 +573,7 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
           html`<span
             part="tick"
             style=${sideways ? `inset-inline-start: ${scale(level)}%` : `inset-block-start: ${scale(level)}%`}
-            >${level.toLocaleString()}</span
+            >${formatNumbers(this.locale)(level)}</span
           >`,
       )}
     </div>`
@@ -672,7 +673,7 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
     sideways: boolean,
   ): TemplateResult {
     /* Each reading at its own row's category, and the line broken where a row
-       has none, so a blank is a gap and not a straight run past it. */
+       has none, so a blank is a gap with no line across it. */
     const path = unbroken(one)
       .map((run) =>
         linePath(

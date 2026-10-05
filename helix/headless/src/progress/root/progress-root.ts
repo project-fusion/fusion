@@ -87,6 +87,15 @@ export class HelixHeadlessProgress extends HelixElement {
   max = 100
 
   /**
+   * Where the work starts, in the same units as `max`. Defaults to zero.
+   *
+   * For a measure that does not start at nothing, such as a migration from
+   * version 12 to version 20, where 12 is the empty bar.
+   */
+  @property({ type: Number })
+  min = 0
+
+  /**
    * Whether the value is drawn as a bar or as a ring.
    *
    * **On this tier because it changes the markup**, which is the headless tier's to
@@ -120,7 +129,7 @@ export class HelixHeadlessProgress extends HelixElement {
   /**
    * What has been done so far, in the same units as `max`.
    *
-   * Clamped between zero and `max` for both the fill and the announcement, so
+   * Clamped between `min` and `max` for both the fill and the announcement, so
    * the two can never disagree about what is on screen.
    */
   @property({ type: Number })
@@ -138,9 +147,15 @@ export class HelixHeadlessProgress extends HelixElement {
   @property({ attribute: 'value-text' })
   valueText = ''
 
+  /** The range the value is measured in, with a top above its bottom. */
+  private get range(): { max: number; min: number } {
+    const min = Number.isFinite(this.min) ? this.min : 0
+    return { max: this.max > min ? this.max : min + 100, min }
+  }
+
   /** What is done, as a fraction of the whole, between 0 and 1. */
   get fraction(): number {
-    const max = this.max > 0 ? this.max : 100
+    const { max, min } = this.range
     /* `|| 0` catches the value that is not a number.
      *
      * `undefined / 100` is `NaN`, `Math.min(Math.max(NaN, 0), 1)` is `NaN`, and
@@ -149,7 +164,7 @@ export class HelixHeadlessProgress extends HelixElement {
      * painted COMPLETE for a value nobody had given. `aria-valuenow` announced
      * the string "NaN" beside it. Empty means nothing done, which is the only
      * reading that is not a claim. */
-    return Math.min(Math.max(this.value / max, 0), 1) || 0
+    return Math.min(Math.max((this.value - min) / (max - min), 0), 1) || 0
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -159,8 +174,9 @@ export class HelixHeadlessProgress extends HelixElement {
        drawn. Written as strings because that is what `ElementInternals` takes;
        a number assigned here is stringified anyway and reads as though the
        type were checked. */
-    this.internals.ariaValueMin = '0'
-    this.internals.ariaValueMax = String(this.max > 0 ? this.max : 100)
+    const { max, min } = this.range
+    this.internals.ariaValueMin = String(min)
+    this.internals.ariaValueMax = String(max)
     /* Absent while indeterminate, not zero. An omitted `aria-valuenow` is the
      * platform's own signal for indeterminate, and it is the only one:
      * `aria-busy` says the element is being updated, which is a different claim.
@@ -172,10 +188,9 @@ export class HelixHeadlessProgress extends HelixElement {
      * float, and for roughly one integer pair in sixteen it does not come back:
      * `1/3*3` is `0.9999999999999998`, which is what the accessibility tree
      * carried and what a screen reader read out. */
-    const ceiling = this.max > 0 ? this.max : 100
     this.internals.ariaValueNow = this.indeterminate
       ? null
-      : String(Math.min(Math.max(this.value || 0, 0), ceiling))
+      : String(Math.min(Math.max(this.value || min, min), max))
     this.internals.ariaValueText = this.valueText || null
   }
 

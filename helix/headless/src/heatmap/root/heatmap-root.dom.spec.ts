@@ -103,7 +103,7 @@ describe('the data comes from the table', () => {
    * the drawing is a picture of it and takes `role="img"` with a name. A grid of
    * ninety spans with no name is ninety things a screen reader has to walk.
    *
-   * The strip and not the host: on the host, the footer's slots were inside an
+   * On the strip, because on the host the footer's slots were inside an
    * image, whose children are presentational.
    */
   test('the strip is a named picture, since the table beside it is the reading', async () => {

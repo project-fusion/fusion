@@ -141,6 +141,16 @@ describe('what a reader is told', () => {
     )
   })
 
+  /* The percentages and the total were written in the runtime's locale, with
+     no way to ask for the page's. */
+  test('and its numbers are written in `locale`', async () => {
+    const host = await chart(SOURCES, 'for="sources" locale="fr"')
+    const share = new Intl.NumberFormat('fr', { maximumFractionDigits: 0, style: 'percent' })
+    expect(part(host, 'summary')?.textContent?.replace(/\s+/g, ' ')).toContain(
+      `Search ${share.format(0.5)}`.replace(/\s+/g, ' '),
+    )
+  })
+
   test('the tooltip adds the total, and with `share` each part’s share', async () => {
     const host = await chart(SOURCES, 'for="sources" share total-label="All visits"')
     host.pointer.set(1)
