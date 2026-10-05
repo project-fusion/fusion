@@ -102,6 +102,14 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
   emptyText = 'No commands'
 
   /**
+   * How long typing rests before the commands are filtered, in milliseconds,
+   * so a palette filtered on a server sends one `helix-filter` for a word.
+   * `0` filters on every keystroke. See Listbox's `filter-delay`.
+   */
+  @property({ attribute: 'filter-delay', type: Number })
+  filterDelay = 0
+
+  /**
    * The key that opens the palette, written as `mod+k`, `shift+p`, or `k`.
    *
    * Empty turns it off, for a consumer who opens the palette from a button or
@@ -400,6 +408,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
         search-field: listbox-search-field"
         aria-label=${this.label}
         empty-text=${this.emptyText}
+        filter-delay=${this.filterDelay}
         filter-label=${this.placeholder}
         loading-text=${this.loadingText}
         result-label=${this.resultLabel}
