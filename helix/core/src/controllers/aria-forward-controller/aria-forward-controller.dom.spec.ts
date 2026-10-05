@@ -332,6 +332,26 @@ describe('a label the page wrote for the host', () => {
     labeled(control).hostUpdated()
     expect(held(control, 'ariaLabelledByElements')).toBeNull()
   })
+  /* A framework renders the label after the field, and the platform tells the
+     host nothing. The control stayed unnamed until it took focus. */
+  test('names the control when the label arrives after it, with no focus', async () => {
+    document.body.innerHTML = '<span id="field"></span>'
+    const host = document.getElementById('field') as HTMLElement
+    Object.assign(host, { addController: () => {} })
+    Object.defineProperty(host, 'labels', {
+      get: () => document.querySelectorAll('label[for="field"]'),
+    })
+    const control = reflecting()
+    host.attachShadow({ mode: 'open' }).append(control)
+    const forward = new AriaForwardController(host as never, { target: () => control })
+    forward.hostConnected()
+    forward.hostUpdated()
+    expect(held(control, 'ariaLabelledByElements')).toBeNull()
+    document.body.insertAdjacentHTML('afterbegin', '<label id="late" for="field">Email</label>')
+    await new Promise((done) => setTimeout(done, 0))
+    expect(held(control, 'ariaLabelledByElements')).toEqual(['late'])
+    forward.hostDisconnected()
+  })
 })
 
 describe('what is read after the names from outside', () => {
