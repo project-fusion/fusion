@@ -57,3 +57,56 @@ describe('Enter in the field', () => {
     expect(() => enter(host)).not.toThrow()
   })
 })
+
+describe('the clear button', () => {
+  /* The native control never saw an edit, so no `change` of its own followed,
+     and a consumer saving on `change` never learned the field was emptied. */
+  test('announces change as well as input', async () => {
+    const host = (await mount(
+      '<helix-headless-input label="Search" clearable value="abc"></helix-headless-input>',
+    )) as Input
+    const heard: string[] = []
+    host.addEventListener('input', () => heard.push('input'))
+    host.addEventListener('change', () => heard.push(`change:${host.value}`))
+    ;(part(host, 'clear') as HTMLButtonElement).click()
+    expect(heard).toEqual(['input', 'change:'])
+  })
+
+  test('and nothing when the clear is refused', async () => {
+    const host = (await mount(
+      '<helix-headless-input label="Search" clearable value="abc"></helix-headless-input>',
+    )) as Input
+    host.addEventListener('helix-before-change', (event) => event.preventDefault())
+    let changes = 0
+    host.addEventListener('change', () => {
+      changes += 1
+    })
+    ;(part(host, 'clear') as HTMLButtonElement).click()
+    expect(changes).toBe(0)
+    expect(host.value).toBe('abc')
+  })
+})
+
+describe('what the host passes to its input', () => {
+  test('the keyboard a phone offers and the label on its Enter key', async () => {
+    const host = await mount(
+      '<helix-headless-input label="Code" inputmode="numeric" enterkeyhint="search" autocapitalize="off"></helix-headless-input>',
+    )
+    const input = control(host)
+    expect(input.getAttribute('inputmode')).toBe('numeric')
+    expect(input.getAttribute('enterkeyhint')).toBe('search')
+    expect(input.getAttribute('autocapitalize')).toBe('off')
+  })
+
+  /* `type="number"` was accepted with no bounds at all, so a `max` written on
+     it was ignored and 9 passed for a field that allows 5. */
+  test('the bounds of a number, which the platform then judges', async () => {
+    const host = await mount(
+      '<helix-headless-input label="Guests" type="number" min="1" max="5" step="2"></helix-headless-input>',
+    )
+    const input = control(host)
+    expect(input.getAttribute('min')).toBe('1')
+    expect(input.getAttribute('max')).toBe('5')
+    expect(input.getAttribute('step')).toBe('2')
+  })
+})
