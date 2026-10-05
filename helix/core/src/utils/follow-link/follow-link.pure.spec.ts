@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { afterLinkFollowed } from './links.js'
+import { afterLinkFollowed } from './follow-link.js'
 
 const said = (detail: object): Event => {
   const event = new Event('helix-select', { cancelable: true })

@@ -84,3 +84,30 @@ export const readColor = (value: string): ColorBytes | undefined => {
   known.set(value, read)
   return read ? [...read] : undefined
 }
+
+/**
+ * A computed color as `rgb()`, or `rgba()` where it is see-through, which
+ * every SVG reader can draw.
+ *
+ * A theme's colors compute to `oklch()` or `color()`, which a browser draws
+ * and an image editor opening a saved file may not, so the color is painted
+ * onto one fresh pixel and read back, its alpha with it. Unlike `readColor`,
+ * which refuses what it cannot tell apart from its ground, this keeps what the
+ * pixel says: a computed style is always a color the engine parsed. A page with
+ * no canvas keeps the color as it is.
+ *
+ * @param color A resolved color, as `getComputedStyle` reports one.
+ */
+export const rgbOf = (color: string): string => {
+  const pixel = typeof document === 'undefined' ? null : document.createElement('canvas')
+  const context = pixel?.getContext?.('2d', { willReadFrequently: true })
+  if (!context) {
+    return color
+  }
+  context.fillStyle = color
+  context.fillRect(0, 0, 1, 1)
+  const [red, green, blue, alpha] = context.getImageData(0, 0, 1, 1).data
+  return alpha === 255
+    ? `rgb(${red}, ${green}, ${blue})`
+    : `rgba(${red}, ${green}, ${blue}, ${(alpha ?? 0) / 255})`
+}

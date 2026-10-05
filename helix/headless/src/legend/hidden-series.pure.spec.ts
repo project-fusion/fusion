@@ -1,10 +1,11 @@
 import { describe, expect, test } from 'bun:test'
-import { hiddenNames, isHidden, toggledNames } from './hidden-series.js'
+import { isHidden, toggledNames } from './hidden-series.js'
 
 describe('a hidden-series list', () => {
   /* A heading may hold a space, so only a comma separates two names. */
   test('is split on commas and nothing else', () => {
-    expect(hiddenNames(' Direct sales,Partner ,, ')).toEqual(['Direct sales', 'Partner'])
+    expect(isHidden(' Direct sales,Partner ,, ', 'Direct sales')).toBe(true)
+    expect(isHidden(' Direct sales,Partner ,, ', 'sales')).toBe(false)
   })
 
   test('matches a name whatever its case and spacing', () => {

@@ -1,5 +1,6 @@
 import {
   AriaForwardController,
+  afterLinkFollowed,
   customElement,
   fillTemplate,
   type HelixBeforeChangeEvent,
@@ -27,7 +28,6 @@ import '../../listbox/index.js'
 /* And the tags, for the same reason: `multiple` renders one per chosen option
    and a custom element registers on import. */
 import '../../tag/index.js'
-import { afterLinkFollowed } from '../../listbox/links.js'
 
 /**
  * Whether an edit added characters rather than taking them away.

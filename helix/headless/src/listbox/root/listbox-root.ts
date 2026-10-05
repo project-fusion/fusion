@@ -22,6 +22,7 @@ import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { HelixHeadlessOptionGroup } from '../../option/group/option-group.js'
 import { HelixHeadlessOption } from '../../option/root/option-root.js'
+import { rangeAdd } from '../range.js'
 
 /** The keys that move within a list, which is every key that moves at all. */
 const MOVES = new Set(['ArrowDown', 'ArrowUp', 'End', 'Home', 'PageDown', 'PageUp'])
@@ -699,11 +700,14 @@ export class HelixHeadlessListbox extends MixinCollection(
          listbox. */
       const ranged = event.key === 'Home' || event.key === 'End'
       if (this.multiple && !typing && event.shiftKey && ranged) {
-        const [from, to] = at < 0 ? [next, next] : [Math.min(at, next), Math.max(at, next)]
-        const span = shown.slice(from, to + 1).map((option) => option.value)
-        const added = span.filter((value) => !this.values.includes(value))
-        if (added.length > 0) {
-          this.requestValue([...this.values, ...added].join(','))
+        const taken = rangeAdd(
+          this.values,
+          shown.map((option) => option.value),
+          at,
+          next,
+        )
+        if (taken) {
+          this.requestValue(taken.join(','))
         }
         return
       }

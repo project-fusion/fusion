@@ -1,4 +1,4 @@
-import { customElement, HelixElement } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, rgbOf } from '@fusion.dev/helix-core'
 import {
   html,
   nothing,
@@ -19,27 +19,6 @@ export type QrStyle = 'dots' | 'rounded' | 'square'
 
 /** The quiet zone in modules, which the specification requires around a code. */
 const QUIET = 4
-
-/**
- * A computed color as `rgb()`, which every SVG reader can draw.
- *
- * A theme's colors compute to `oklch()` or `color()`, which a browser draws
- * and an image editor opening the saved file may not, so each is painted onto
- * one pixel and read back. A page with no canvas keeps the color as it is.
- */
-const asRgb = (color: string): string => {
-  const pixel = typeof document === 'undefined' ? null : document.createElement('canvas')
-  const context = pixel?.getContext?.('2d', { willReadFrequently: true })
-  if (!context) {
-    return color
-  }
-  context.fillStyle = color
-  context.fillRect(0, 0, 1, 1)
-  const [red, green, blue, alpha] = context.getImageData(0, 0, 1, 1).data
-  return alpha === 255
-    ? `rgb(${red}, ${green}, ${blue})`
-    : `rgba(${red}, ${green}, ${blue}, ${(alpha ?? 0) / 255})`
-}
 
 /** Whether a module is one of the three finder squares, or their separators. */
 const isFinder = (x: number, y: number, size: number): boolean => {
@@ -302,11 +281,11 @@ export class HelixHeadlessQrCode extends HelixElement {
     const clear = ground === '' || ground === 'transparent' || /^rgba\(.*,\s*0\)$/.test(ground)
     return qrSvg(
       {
-        background: clear ? '#ffffff' : asRgb(ground),
+        background: clear ? '#ffffff' : rgbOf(ground),
         box: Number(code.getAttribute('viewBox')?.split(' ')[2] ?? 0),
-        finderColor: asRgb(getComputedStyle(finders).fill || '#000000'),
+        finderColor: rgbOf(getComputedStyle(finders).fill || '#000000'),
         finders: finders.getAttribute('d') ?? '',
-        moduleColor: asRgb(getComputedStyle(modules).fill || '#000000'),
+        moduleColor: rgbOf(getComputedStyle(modules).fill || '#000000'),
         modules: modules.getAttribute('d') ?? '',
         quiet: QUIET,
       },

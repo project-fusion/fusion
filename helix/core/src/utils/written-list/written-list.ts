@@ -51,3 +51,34 @@ export const writtenNumbers = (source: WrittenList): number[] =>
   writtenList(source)
     .map(Number)
     .filter((one) => Number.isFinite(one))
+
+/**
+ * A value list: the entries between commas, trimmed, with the empty ones
+ * dropped.
+ *
+ * **Commas only**, which is the value rule `writtenList` describes beside it: a
+ * value may hold a space, and `value="New York, Paris"` is two cities. Select,
+ * Listbox, Checkbox Group, Tag Group, Toggle Group, Date Picker, Time Picker
+ * and Legend's hidden series all read their lists this way.
+ */
+export const commaList = (value: string): string[] =>
+  value
+    .split(',')
+    .map((one) => one.trim())
+    .filter((one) => one !== '')
+
+/**
+ * A list with `value` taken out where it is in it, or added at the end where
+ * it is not.
+ *
+ * With `order`, the result is put in that order and holds only what `order`
+ * holds, so a set of pressed items reads the same whichever was pressed first.
+ */
+export const toggleValue = (
+  list: readonly string[],
+  value: string,
+  order?: readonly string[],
+): string[] => {
+  const next = list.includes(value) ? list.filter((one) => one !== value) : [...list, value]
+  return order ? order.filter((one) => next.includes(one)) : next
+}

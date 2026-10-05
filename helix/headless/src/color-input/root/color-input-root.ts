@@ -1,6 +1,8 @@
 import {
   AriaForwardController,
   type ColorFormat,
+  type ColorWords,
+  colorName,
   customElement,
   type HelixBeforeChangeEvent,
   HelixFormElement,
@@ -14,7 +16,6 @@ import {
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
-import { type ColorWords, colorName } from '../../color-picker/color-name.js'
 /* Relative, so this registers the base picker and the styled file's identical
    import registers the styled one. `tier` picks which the template asks for. */
 import '../../color-picker/index.js'

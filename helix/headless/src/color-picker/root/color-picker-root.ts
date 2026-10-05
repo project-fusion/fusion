@@ -1,8 +1,10 @@
 import {
   type Color,
   type ColorFormat,
+  type ColorWords,
   CopyController,
   capturePointer,
+  colorName,
   customElement,
   drawIcon,
   fillTemplate,
@@ -11,6 +13,7 @@ import {
   HelixSampleEndEvent,
   HelixSampleStartEvent,
   hostAria,
+  hueName,
   isRtl,
   MixinControllerValue,
   parseColor,
@@ -23,7 +26,6 @@ import { property, state } from 'lit/decorators.js'
 import { live } from 'lit/directives/live.js'
 import { html } from 'lit/static-html.js'
 import { type ChannelName, channelFields, writeChannel } from '../channels.js'
-import { type ColorWords, colorName, hueName } from '../color-name.js'
 /* Relative, so this registers the base slider and the styled file's identical
    import registers the styled one. `tier` picks which the template asks for. */
 import '../../button/index.js'

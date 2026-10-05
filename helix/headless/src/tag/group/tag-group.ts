@@ -1,4 +1,5 @@
 import {
+  commaList,
   customElement,
   HelixBeforeChangeEvent,
   HelixElement,
@@ -12,7 +13,7 @@ import {
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixHeadlessTag } from '../root/tag-root.js'
-import { pressedValue, selectedValues, type TagSelectionMode, tabStop } from '../selection.js'
+import { pressedValue, type TagSelectionMode, tabStop } from '../selection.js'
 
 /**
  * @summary A set of tags that the arrow keys move through, and that can be removed and selected from the keyboard.
@@ -130,7 +131,7 @@ export class HelixHeadlessTagGroup extends HelixElement {
    */
   private sync(): void {
     const mode = this.selectionMode ?? 'none'
-    const chosen = new Set(selectedValues(this.value))
+    const chosen = new Set(commaList(this.value))
     const tags = this.tags
     const items = tags.map((tag) => ({
       disabled: tag.disabled,

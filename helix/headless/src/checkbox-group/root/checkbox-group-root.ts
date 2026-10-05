@@ -1,4 +1,5 @@
 import {
+  commaList,
   customElement,
   DisabledCascadeController,
   HelixBeforeChangeEvent,
@@ -109,10 +110,7 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
   }
 
   set value(next: string) {
-    this.values = next
-      .split(',')
-      .map((entry) => entry.trim())
-      .filter(Boolean)
+    this.values = commaList(next)
   }
 
   /**

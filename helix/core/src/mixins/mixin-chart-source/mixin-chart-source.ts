@@ -3,7 +3,7 @@ import { property } from 'lit/decorators.js'
 import { ChartPointerController } from '../../controllers/chart-pointer-controller/chart-pointer-controller.js'
 import { SourceController } from '../../controllers/source-controller/source-controller.js'
 import type { HelixElement } from '../../helix-element/helix-element.js'
-import type { Row, Series } from '../../utils/read-series/read-series.js'
+import { type Row, type Series, seriesKey } from '../../utils/read-series/read-series.js'
 import { writtenList } from '../../utils/written-list/written-list.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
@@ -56,11 +56,10 @@ export const PLOT_HEIGHT = 100
  * nothing to read off the page that says why.
  *
  * `writtenList` is the split, and carries the argument for accepting a comma.
- * What this adds is the lowercase, the headings being matched
+ * What this adds is `seriesKey`, the headings being matched
  * case-insensitively.
  */
-export const seriesNames = (list: string | undefined): string[] =>
-  writtenList(list).map((name) => name.toLowerCase())
+export const seriesNames = (list: string | undefined): string[] => writtenList(list).map(seriesKey)
 
 /**
  * The public surface `MixinChartSource` adds.
@@ -347,7 +346,7 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
      * For a ring the names are its rows, the slices being the rows.
      */
     showsSeries(name: string): boolean {
-      return !this.source.hidden.has(name.trim().toLowerCase())
+      return !this.source.hidden.has(seriesKey(name))
     }
 
     /** The number of readings, which the pointer position maps onto. */

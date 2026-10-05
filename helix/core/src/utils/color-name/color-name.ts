@@ -1,4 +1,4 @@
-import type { Color } from '@fusion.dev/helix-core'
+import type { Color } from '../css-color/css-color.js'
 
 /**
  * The words a color's name is made of, keyed by their English, with the two

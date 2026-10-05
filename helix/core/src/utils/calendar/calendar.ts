@@ -26,13 +26,6 @@ export const localToday = (now = new Date()): string => {
   return `${now.getFullYear()}-${month}-${day}`
 }
 
-/** Splits a comma-separated value, tolerating spaces and empty entries. */
-export const datesIn = (value: string): string[] =>
-  value
-    .split(',')
-    .map((entry) => entry.trim())
-    .filter(Boolean)
-
 /**
  * The first day of the week where a language is spoken, `0` for Sunday.
  *
