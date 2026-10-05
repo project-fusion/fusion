@@ -19,4 +19,9 @@ describe('text server output', () => {
   test('the host carries only what the consumer wrote', () => {
     expect(hostAttributes(ssr(html`<helix-text>x</helix-text>`), 'helix-text')).toEqual([])
   })
+
+  test('a clamp is in the served markup, so it holds before hydration', () => {
+    const markup = withoutStyles(ssr(html`<helix-text lines="3">Long</helix-text>`))
+    expect(rendered(markup, 'helix-text')).toMatch(/<span[^>]*-webkit-line-clamp: 3/)
+  })
 })

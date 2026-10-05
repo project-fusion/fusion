@@ -1,0 +1,19 @@
+<!-- @summary A heading balanced over two lines, and a description cut off after two lines. -->
+<helix-flex
+  direction="column"
+  gap="sm"
+>
+  <helix-text
+    as="h3"
+    text-wrap="balance"
+  >Invoices sent before the fix show the correct due date</helix-text>
+  <helix-text
+    as="p"
+    emphasis="muted"
+    lines="2"
+  >
+    Fixed an issue where invoices showed the wrong due date in some time zones.
+    Invoices sent before this fix show the correct date the next time you open
+    them, and every export made after it includes the corrected date.
+  </helix-text>
+</helix-flex>

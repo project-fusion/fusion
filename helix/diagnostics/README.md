@@ -247,6 +247,7 @@ diagnostics counts it by kind and tag. None fails a CI job.
 | `misplaced-handler` | A React `on` prop names an event that another element dispatches |
 | `misread-direction` | A stat was given `up`, `down` or `neutral`, which are Trend's directions and lay nothing out |
 | `missing-layout` | The three.js graph driver could not load `d3-force-3d` |
+| `missing-name` | A button or form control has no accessible name |
 | `missing-row-key` | A selectable data table has no `row-key`, so it knows each row by its place |
 | `missing-stencil-parts` | A graph stencil names parts its shape does not have |
 | `missing-target` | A skip link's `href` names no element on the page |
@@ -264,7 +265,7 @@ diagnostics counts it by kind and tag. None fails a CI job.
 | `unknown-event` | A React `on` prop names an event that no element dispatches |
 | `unknown-icon` | An icon's `name` is not in the Helix set, so it draws nothing |
 | `unlinked-trigger` | A tooltip's trigger does not name it in `aria-describedby` |
-| `unreachable-label` | A text rendered as a label wraps or names a control, which it cannot label |
+| `unreachable-label` | A text is rendered as a label, a deprecated value that labels no control |
 | `unsettled-window` | A virtualized list's box has no height of its own |
 | `untold-trigger` | A slotted trigger is a plain element, which cannot carry `aria-expanded` |
 | `wrapped-trigger` | A tooltip wraps its trigger, so its text reaches no screen reader |

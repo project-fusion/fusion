@@ -21,20 +21,71 @@ describe('text', () => {
   })
 
   /* Its label is in its shadow root, which neither `for` nor a wrapped control
-     reaches, so the page is told rather than left with an unnamed field. */
-  test('a label that wraps or names a control is reported, and a bare one is not', async () => {
+     reaches, so the value is deprecated and every use of it is told so. */
+  test('`as="label"` still renders a label, and is reported as deprecated wherever it is', async () => {
     const warnings: string[] = []
     const original = console.warn
     console.warn = (message: string) => warnings.push(message)
     try {
-      await mount('<helix-text as="label">Email <input /></helix-text>')
+      const wrapped = await mount('<helix-text as="label">Email <input /></helix-text>')
+      expect(part(wrapped, 'text')?.tagName).toBe('LABEL')
       await mount('<helix-text as="label" for="phone">Phone</helix-text>')
       await mount('<helix-text as="label">Section</helix-text>')
+      await mount('<helix-text variant="label">Section</helix-text>')
     } finally {
       console.warn = original
     }
-    expect(warnings.length).toBe(2)
+    expect(warnings.length).toBe(3)
+    expect(warnings[0]).toContain('deprecated')
     expect(warnings[0]).toContain('data-text="label"')
+  })
+
+  test('`lines` clamps the part to that many lines, and a count that is no count clamps nothing', async () => {
+    const clamped = await mount('<helix-text lines="2">Long</helix-text>')
+    expect(part(clamped, 'text')?.getAttribute('style')).toBe('-webkit-line-clamp: 2')
+    const plain = await mount('<helix-text lines="none">Long</helix-text>')
+    expect(part(plain, 'text')?.hasAttribute('style')).toBe(false)
+    const unset = await mount('<helix-text>Long</helix-text>')
+    expect(part(unset, 'text')?.hasAttribute('style')).toBe(false)
+  })
+})
+
+describe('lines, alignment and wrapping', () => {
+  /* The rest is layout, which only a browser has. */
+  const laid = hasLayout() ? test : (): void => {}
+
+  laid('two lines of a long text are two lines tall, and end in an ellipsis box', async () => {
+    const wrapper = await mount(
+      `<div style="inline-size: 120px"><helix-text as="p" lines="2">${'word '.repeat(60)}</helix-text><helix-text as="p">One</helix-text></div>`,
+    )
+    const [clamped, one] = [...wrapper.querySelectorAll('helix-text')] as HTMLElement[]
+    const line = (one as HTMLElement).getBoundingClientRect().height
+    expect(Math.round((clamped as HTMLElement).getBoundingClientRect().height)).toBe(
+      Math.round(line * 2),
+    )
+    expect(getComputedStyle(clamped as HTMLElement).display).toBe('block')
+  })
+
+  laid('`text-align` and `text-wrap` set the properties they are named for', async () => {
+    const text = await mount(
+      '<helix-text as="p" text-align="center" text-wrap="balance">A</helix-text>',
+    )
+    expect(getComputedStyle(text).textAlign).toBe('center')
+    expect(getComputedStyle(text).textWrap).toBe('balance')
+  })
+
+  laid('a `--text-*` property overrides that value of the ramp, and only that one', async () => {
+    const wrapper = await mount(
+      '<div style="--text-font-size: 31px"><helix-text as="h2">Big</helix-text><helix-text>Run</helix-text></div>',
+    )
+    const [heading, run] = [...wrapper.querySelectorAll('helix-text')] as HTMLElement[]
+    expect(getComputedStyle(heading as HTMLElement).fontSize).toBe('31px')
+    expect(getComputedStyle(run as HTMLElement).fontSize).toBe('31px')
+    const plain = await mount('<helix-text as="h2">Big</helix-text>')
+    expect(getComputedStyle(plain).fontSize).not.toBe('31px')
+    expect(getComputedStyle(heading as HTMLElement).fontWeight).toBe(
+      getComputedStyle(plain).fontWeight,
+    )
   })
 })
 
