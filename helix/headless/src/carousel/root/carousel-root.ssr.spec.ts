@@ -21,8 +21,11 @@ describe('carousel server output', () => {
        pane nor a slot to project one is drawn, and what ships is the frame.
        The frame entire rather than the parts somebody named, so a mark drawn
        into a template nobody meant to change fails here. */
+    /* `live` with them: a region is heard when its words change, so it has to
+       be there, empty, before the first move says anything. */
     expect(servedParts(ssr(carousel))).toEqual([
       'controls',
+      'live',
       'next',
       'next-mark',
       'previous',

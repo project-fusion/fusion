@@ -402,6 +402,17 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   @property({ attribute: 'previous-label' })
   previousLabel = 'Previous page'
 
+  /** What screen readers hear when a search leaves one row. `{count}` is the count. */
+  @property({ attribute: 'result-label' })
+  resultLabel = '{count} result'
+
+  /**
+   * What screen readers hear when a search leaves any other number of rows.
+   * `{count}` is the count.
+   */
+  @property({ attribute: 'results-label' })
+  resultsLabel = '{count} results'
+
   /**
    * Lets users reorder the columns.
    *
@@ -1330,6 +1341,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   /** The selection last heard, for the same reason. */
   private heardSelected: string | undefined = undefined
 
+  /** The search last heard, for the same reason. */
+  private heardFilter: string | undefined = undefined
+
   /**
    * What the table says after a sort or a change to the chosen rows.
    *
@@ -1360,9 +1374,19 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       said = fillTemplate(this.selectedLabel, {
         count: formatNumbers(this.lang)(this.chosen.size),
       })
+    } else if (this.hasUpdated && this.filter !== this.heardFilter) {
+      /* A search narrows the rows under a reader who is in the search field,
+         so how many it left is said. None left is the empty text, which the
+         region says in place of this. */
+      const count = this.mode === 'server' ? Math.max(this.total, this.rows.length) : this.matched
+      const one = new Intl.PluralRules(this.lang || undefined).select(count) === 'one'
+      said = fillTemplate(one ? this.resultLabel : this.resultsLabel, {
+        count: formatNumbers(this.lang)(count),
+      })
     }
     this.heardSort = sort
     this.heardSelected = selected
+    this.heardFilter = this.filter
     return said
   }
 
