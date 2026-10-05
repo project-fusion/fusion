@@ -7,7 +7,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-import { claimBusy, releaseBusy } from '../busy.js'
+import { awaitRegion, claimBusy, releaseBusy } from '../busy.js'
 
 /**
  * @summary Shows that work of unknown length is in progress.
@@ -31,11 +31,12 @@ import { claimBusy, releaseBusy } from '../busy.js'
  * **`for` names the region being loaded**, and the loader sets
  * `aria-busy="true"` on it for as long as the loader is on the page, so a
  * screen reader waits for the region rather than reading it half filled. Two
- * loaders in one region hold it busy until the last one leaves.
+ * loaders in one region hold it busy until the last one leaves. A region drawn
+ * after the loader is marked when it arrives.
  *
  * **`delay` keeps a quick load from flashing a loader.** The loader stays
  * hidden, and silent, for that many milliseconds, and appears only if the work
- * is still going.
+ * is still going. While it waits it carries `:state(waiting)`.
  *
  * @since 0.1.0
  * @status stable
@@ -49,6 +50,8 @@ import { claimBusy, releaseBusy } from '../busy.js'
  * @csspart mark - The region that holds the slotted content at the center.
  * @csspart svg - The rotating circle pair.
  * @csspart track - The full circle behind the indicator.
+ *
+ * @cssstate waiting - The loader is waiting out its `delay`, hidden and silent.
  */
 @customElement('helix-headless-loader')
 export class HelixHeadlessLoader extends HelixElement {
@@ -85,6 +88,9 @@ export class HelixHeadlessLoader extends HelixElement {
   /** The region this loader marked busy, so it is the one released. */
   private region: Element | null = null
 
+  /** Stops waiting for a region `for` names that is not on the page yet. */
+  private stopAwaiting: (() => void) | undefined
+
   /** Whether the loader is still waiting out its `delay`. */
   private get waiting(): boolean {
     return this.delay > 0 && !this.due.elapsed
@@ -103,12 +109,25 @@ export class HelixHeadlessLoader extends HelixElement {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    this.stopAwaiting?.()
+    this.stopAwaiting = undefined
     this.release()
   }
 
   /** Marks the region `for` names busy, releasing one it named before. */
   private mark(): void {
-    const region = this.isConnected && this.for !== '' ? elementById(this, this.for) : null
+    this.stopAwaiting?.()
+    this.stopAwaiting = undefined
+    const named = this.isConnected && this.for !== ''
+    const region = named ? elementById(this, this.for) : null
+    if (named && !region) {
+      /* Not drawn yet: marked when it arrives. */
+      this.stopAwaiting = awaitRegion(
+        this.getRootNode(),
+        () => elementById(this, this.for),
+        () => this.mark(),
+      )
+    }
     if (region === this.region) {
       return
     }
@@ -139,6 +158,7 @@ export class HelixHeadlessLoader extends HelixElement {
     this.internals.ariaBusy = 'true'
     /* Silent while it waits, as well as unseen. */
     this.internals.ariaHidden = this.waiting ? 'true' : null
+    this.toggleState('waiting', this.waiting)
   }
 
   protected override render(): TemplateResult {

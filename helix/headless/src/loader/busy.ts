@@ -40,3 +40,28 @@ export const releaseBusy = (region: Element): void => {
     CLAIMS.set(region, held - 1)
   }
 }
+
+/**
+ * Calls `found` with the region `find` answers once it is in `root`, and
+ * returns the call that stops waiting.
+ *
+ * For a loader whose region is not on the page yet: a framework often draws
+ * the loader before the list it stands for, and a region looked up once, a
+ * frame after connecting, was never marked. Watches for children and ids being
+ * written, and stops at the first answer.
+ */
+export const awaitRegion = (
+  root: Node,
+  find: () => Element | null,
+  found: (region: Element) => void,
+): (() => void) => {
+  const observer = new MutationObserver(() => {
+    const region = find()
+    if (region) {
+      observer.disconnect()
+      found(region)
+    }
+  })
+  observer.observe(root, { attributeFilter: ['id'], childList: true, subtree: true })
+  return () => observer.disconnect()
+}

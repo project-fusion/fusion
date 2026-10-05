@@ -24,8 +24,10 @@ import { styles } from './loader-root.css.js'
  * @documentation https://fusion.dev/helix/components/loader
  *
  * @cssproperty --loader-color - Color of the moving arc.
+ * @cssproperty --loader-duration - How long one turn of the arc takes, 0.8s by default. With motion reduced the turn slows to a crawl whatever this says.
  * @cssproperty --loader-size - Diameter. Defaults to the size token that `size` picks, which is 1.5rem at the default density.
  * @cssproperty --loader-track-color - Color of the circle behind the arc.
+ * @cssproperty --loader-track-width - Width of the arc and the circle behind it, in units of a 24-unit drawing. Defaults to 2.
  */
 @customElement('helix-loader')
 export class HelixLoader extends HelixHeadlessLoader {

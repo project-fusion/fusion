@@ -10,6 +10,12 @@ describe('skeleton server output', () => {
     ).toBe(true)
   })
 
+  test('serves the sheen inside the shape, as a part', () => {
+    expect(
+      hasPart(ssr(html`<helix-headless-skeleton></helix-headless-skeleton>`), 'sheen'),
+    ).toBe(true)
+  })
+
   test('the host carries only what the consumer wrote', () => {
     const markup = ssr(html`<helix-headless-skeleton shape="text"></helix-headless-skeleton>`)
     expect(hostAttributes(markup, 'helix-headless-skeleton')).toEqual(['shape'])

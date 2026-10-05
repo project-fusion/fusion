@@ -58,6 +58,51 @@ describe('a loader for a region', () => {
   })
 })
 
+/* `for` was resolved once, a frame after connecting, so a region a framework
+   drew after the loader was never marked. */
+describe('a loader for a region drawn after it', () => {
+  const frame = (): Promise<void> => new Promise((done) => requestAnimationFrame(() => done()))
+  const settle = (): Promise<void> => new Promise((done) => setTimeout(done, 0))
+
+  test('marks the region when it arrives', async () => {
+    const host = await mount(
+      '<div><helix-headless-loader for="later"></helix-headless-loader></div>',
+    )
+    await frame()
+    const region = document.createElement('section')
+    region.id = 'later'
+    host.append(region)
+    await settle()
+    expect(region.getAttribute('aria-busy')).toBe('true')
+    host.querySelector('helix-headless-loader')?.remove()
+    expect(region.hasAttribute('aria-busy')).toBe(false)
+  })
+
+  test('and when an element takes the id later', async () => {
+    const host = await mount(
+      '<div><section></section><helix-headless-loader for="named"></helix-headless-loader></div>',
+    )
+    await frame()
+    const region = host.querySelector('section') as HTMLElement
+    region.id = 'named'
+    await settle()
+    expect(region.getAttribute('aria-busy')).toBe('true')
+  })
+
+  test('stops waiting once it leaves the page', async () => {
+    const host = await mount(
+      '<div><helix-headless-loader for="gone"></helix-headless-loader></div>',
+    )
+    await frame()
+    host.querySelector('helix-headless-loader')?.remove()
+    const region = document.createElement('section')
+    region.id = 'gone'
+    host.append(region)
+    await settle()
+    expect(region.hasAttribute('aria-busy')).toBe(false)
+  })
+})
+
 describe('a loader with a delay', () => {
   type Loader = HTMLElement & { internals: ElementInternals; updateComplete: Promise<unknown> }
 
@@ -67,10 +112,12 @@ describe('a loader with a delay', () => {
     )) as Loader
     expect(part(loader, 'svg')?.hasAttribute('hidden')).toBe(true)
     expect(loader.internals.ariaHidden).toBe('true')
+    expect(loader.internals.states.has('waiting')).toBe(true)
     await new Promise((done) => setTimeout(done, 40))
     await loader.updateComplete
     expect(part(loader, 'svg')?.hasAttribute('hidden')).toBe(false)
     expect(loader.internals.ariaHidden ?? null).toBeNull()
+    expect(loader.internals.states.has('waiting')).toBe(false)
   })
 
   test('shows at once without one', async () => {
