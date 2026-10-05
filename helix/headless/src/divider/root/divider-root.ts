@@ -11,6 +11,9 @@ import { property } from 'lit/decorators.js'
  * rendered element. The semantics are then in the server-rendered markup, with
  * no attribute written by script after the element connects.
  *
+ * Set `announced` for a line that divides one thing from another, and it is
+ * read as a separator, named by any content set into it.
+ *
  * Use `orientation="vertical"` between items on one line, such as inside a
  * toolbar. A vertical divider stretches to fit its flex parent and sets no
  * height of its own.
@@ -93,12 +96,17 @@ export class HelixHeadlessDivider extends HelixElement {
      * The role is not repeated on the second half. Two separators where a reader
      * crossed one line is the announcement saying twice what happened once, and
      * the content between them is not a boundary of its own. */
+    /* **An announced line is named by what is set into it**, so a reader
+       hears "Or, separator" where the page wrote "Or" on the line. By id, in
+       one shadow root, which reads the slotted words where a name taken from
+       the line's own content would not; an empty content names nothing. */
     return html`<div
       part="line"
       role=${this.announced ? 'separator' : 'presentation'}
+      aria-labelledby=${this.announced ? 'content' : nothing}
       aria-orientation=${this.announced ? (this.orientation ?? 'horizontal') : nothing}
     ></div>
-      <span part="content"><slot @slotchange=${() => this.markEmpty()}></slot></span>
+      <span id="content" part="content"><slot @slotchange=${() => this.markEmpty()}></slot></span>
       <div part="line" role="presentation"></div>`
   }
 }

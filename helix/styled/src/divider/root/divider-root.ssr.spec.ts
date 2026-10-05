@@ -20,7 +20,7 @@ describe('divider server output', () => {
     /* `toContain('OR')` passed on the host's own text, which is in the response
        whatever the divider renders. The slot in the content region is what sets
        that text between the two rules. */
-    expect(shadow).toMatch(/<span part="content">(?:<!--[^>]*-->)?<slot\s*><\/slot><\/span>/)
+    expect(shadow).toMatch(/<span id="content" part="content">(?:<!--[^>]*-->)?<slot\s*><\/slot><\/span>/)
   })
 
   test('a plain rule is presentation, and an announced one a separator with its axis', () => {
