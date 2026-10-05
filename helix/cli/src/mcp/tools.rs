@@ -11,9 +11,12 @@
 //! hands back what was measured. An agent picking a brand color wants the second
 //! long before it wants the first.
 
+use fusion_helix_theme::css::{to_css, to_css_modes};
 use fusion_helix_theme::derive::report::Outcome as Pair;
-use fusion_helix_theme::derive::theme::derive_theme;
 use fusion_helix_theme::intent::ThemeIntent;
+
+use crate::theme::audit::measurement;
+use crate::theme::{modes, violations};
 
 /// What the tools take, described for a client that has never seen Helix.
 ///
@@ -26,7 +29,7 @@ fn intent_schema() -> serde_json::Value {
     serde_json::json!({
         "properties": {
             "intent": {
-                "description": "A theme intent, the same JSON `helix.theme.json` holds. `brand` is the only required key: a hex color. Optional keys include `scheme` (\"light\" or \"dark\"), `contrastTarget` (4.5 for AA, 7 for AAA), `accent`, `background` (the page's color, `{ \"light\": hex, \"dark\": hex }`), `chroma`, `neutral`, `radius`, `density` and `separation`.",
+                "description": "A theme intent, the same JSON `helix.theme.json` holds. Every key is optional. `brand` is a hex color, and without one the theme is ink: near-black on a light page and near-white on a dark one. Without `scheme` (\"light\" or \"dark\") the theme is derived in both modes. Other keys include `contrastTarget` (4.5 for AA, 7 for AAA), `accent`, `background` (the page's color, `{ \"light\": hex, \"dark\": hex }`), `chroma`, `neutral`, `radius`, `density`, and `separation`.",
                 "type": "object",
             },
         },
@@ -39,7 +42,7 @@ fn intent_schema() -> serde_json::Value {
 pub fn catalog() -> Vec<serde_json::Value> {
     vec![
         serde_json::json!({
-            "description": "Derives a complete Helix token set from a brand color and returns the CSS to write. Every foreground and background pair meets its contrast target by construction rather than by review. Use this when you need the actual custom properties for a theme.",
+            "description": "Derives a complete Helix token set from a brand color, or from none for ink, and returns the CSS to write, with each color a `light-dark()` pair unless the intent names one mode. Every foreground and background pair meets its contrast target by construction. Use this when you need the actual custom properties for a theme.",
             "inputSchema": intent_schema(),
             "name": "helix_derive_theme",
         }),
@@ -70,36 +73,22 @@ pub fn call(name: &str, arguments: &serde_json::Value) -> Result<String, String>
         ));
     }
     let intent = read(arguments)?;
-    let theme =
-        derive_theme(&intent).map_err(|failure| format!("cannot derive that intent: {failure}"))?;
+    let themes =
+        modes(&intent).map_err(|failure| format!("cannot derive that intent: {failure}"))?;
 
     match name {
         "helix_audit_theme" => {
-            let failed = theme
-                .pairings
+            let failed = themes
                 .iter()
+                .flat_map(|theme| &theme.pairings)
                 .filter(|pairing| pairing.status == Pair::Fail)
                 .count();
-            Ok(serde_json::json!({
-                "collisions": theme.collisions,
-                /* The same shape `helix theme audit --json` emits, deliberately.
-                   Two representations of one report would be two things to keep
-                   true, and an agent that learned one has learned the other. */
-                "failed": failed,
-                "pairings": theme.pairings.iter().map(|pairing| serde_json::json!({
-                    "background": pairing.background,
-                    "foreground": pairing.foreground,
-                    "ratio": pairing.ratio,
-                    "status": match pairing.status {
-                        Pair::Fail => "fail",
-                        Pair::Pass => "pass",
-                        Pair::Unverifiable => "unverifiable",
-                    },
-                    "target": pairing.target,
-                })).collect::<Vec<_>>(),
-                "violations": theme.violations,
-            })
-            .to_string())
+            /* The same shape `helix theme audit --json` emits, deliberately. Two
+            representations of one report would be two things to keep true, and
+            an agent that learned one has learned the other. */
+            let mut report = measurement(&themes);
+            report.insert("failed".to_owned(), failed.into());
+            Ok(serde_json::Value::Object(report).to_string())
         }
         "helix_derive_theme" => {
             /* **Refused when it fails its own contract, the way `build` is.** A
@@ -107,13 +96,18 @@ pub fn call(name: &str, arguments: &serde_json::Value) -> Result<String, String>
             this engine exists to prevent, and handing one to a model that will
             paste it into a stylesheet is worse than handing it to a person who
             might read the warning above it. */
-            if !theme.violations.is_empty() {
+            let failing = violations(&themes);
+            if !failing.is_empty() {
                 return Err(format!(
                     "that intent derives a palette that fails its own contrast targets, so it is not returned. {}\n\nCall helix_audit_theme with the same intent to see every pair.",
-                    theme.violations.join(" ")
+                    failing.join(" ")
                 ));
             }
-            Ok(fusion_helix_theme::css::to_css(&theme, ":root"))
+            Ok(match themes.as_slice() {
+                [light, dark] => to_css_modes(light, dark, ":root"),
+                [one, ..] => to_css(one, ":root"),
+                [] => unreachable!("an intent derives in at least one mode"),
+            })
         }
         /* Unreachable: the guard above is exhaustive over the two names, and it
         is there rather than here so the message can be written once. */
@@ -131,6 +125,6 @@ pub fn call(name: &str, arguments: &serde_json::Value) -> Result<String, String>
 fn read(arguments: &serde_json::Value) -> Result<ThemeIntent, String> {
     let body = arguments.get("intent").unwrap_or(arguments);
     serde_json::from_value(body.clone()).map_err(|failure| {
-        format!("that is not a theme intent: {failure}. It needs at least a `brand` hex color.")
+        format!("that is not a theme intent: {failure}. It is the JSON `helix.theme.json` holds, such as `{{\"brand\": \"#0b3d91\"}}`.")
     })
 }

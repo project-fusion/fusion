@@ -103,6 +103,44 @@ fn a_clean_theme_checks_quietly() {
     assert_eq!(err(&output), "", "check wrote to stderr on a clean theme");
 }
 
+/// **No brand is a theme, and it is ink.** `init` writes an empty intent, and
+/// `build` derives it in both modes as one block of `light-dark()` pairs, with no
+/// brand seed for the stylesheet to read a brand ramp from.
+#[test]
+fn an_intent_with_no_brand_builds_ink_in_both_modes() {
+    let sandbox = Sandbox::new("ink", None);
+    let init = run(&sandbox.0, &["theme", "init"]);
+    assert_eq!(code(&init), 0, "{}", err(&init));
+    let written =
+        std::fs::read_to_string(sandbox.0.join("helix.theme.json")).expect("init wrote the file");
+    assert_eq!(written.trim(), "{}");
+
+    let build = run(&sandbox.0, &["theme", "build"]);
+    assert_eq!(code(&build), 0, "{}", err(&build));
+    let css = out(&build);
+    assert!(
+        css.contains("--helix-color-primary: light-dark(#181818, #e1e1e1);"),
+        "{css}"
+    );
+    assert!(
+        css.contains("--helix-color-foreground-on-primary: light-dark(#ffffff, #000000);"),
+        "{css}"
+    );
+    assert!(!css.contains("--helix-seed-brand"), "{css}");
+}
+
+/// A `scheme` in the intent is that one mode, and no pairs.
+#[test]
+fn a_scheme_in_the_intent_builds_that_mode_alone() {
+    let sandbox = Sandbox::new(
+        "one-mode",
+        Some(r##"{ "brand": "#3b82f6", "scheme": "dark" }"##),
+    );
+    let build = run(&sandbox.0, &["theme", "build"]);
+    assert_eq!(code(&build), 0, "{}", err(&build));
+    assert!(!out(&build).contains("light-dark("), "{}", out(&build));
+}
+
 #[test]
 fn a_failing_theme_exits_one_and_says_why() {
     let sandbox = Sandbox::new("failing", Some(FAILING));

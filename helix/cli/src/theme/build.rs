@@ -2,41 +2,42 @@
 
 use std::path::Path;
 
-use fusion_helix_theme::css::to_css;
+use fusion_helix_theme::css::{to_css, to_css_modes};
 use fusion_rules::error::{Failure, Outcome};
 use fusion_rules::exit::Code;
 
 use crate::args::Build;
-use crate::theme::load;
+use crate::theme::{load, violations};
 
 /// # Errors
 ///
 /// [`Failure`] when the intent cannot be loaded, when the theme has violations
 /// and `--force` was not given, or when the output cannot be written.
 pub fn run(args: &Build, from: &Path, json: bool) -> Outcome<Code> {
-    let (theme, source) = load(
+    let (themes, source) = load(
         args.common.intent.as_deref(),
         args.common.config.as_deref(),
         from,
     )?;
+    let violations = violations(&themes);
 
     /* **Refusing by default is the argument for deriving at all.** A palette that
     does not meet the contrast it claims is the failure this engine exists to
     prevent, and writing it with a warning above it produces a file that outlives
     the warning by years. */
-    if !theme.violations.is_empty() && !args.force {
+    if !violations.is_empty() && !args.force {
         /* **The count and the first line, not all of them.** Seven violations
         joined with semicolons is one unreadable paragraph, and the command that
         prints them properly is named right underneath. One example is what makes
         the count concrete without becoming the report. */
-        let count = theme.violations.len();
+        let count = violations.len();
         let plural = if count == 1 { "pair" } else { "pairs" };
         return Err(Failure::new(
             Code::Failed,
             format!("cannot build {source}"),
             format!(
                 "{count} {plural} miss their contrast target, starting with {}",
-                theme.violations.first().map_or("", String::as_str)
+                violations.first().map_or("", String::as_str)
             ),
         )
         .hint("helix theme audit"));
@@ -46,20 +47,27 @@ pub fn run(args: &Build, from: &Path, json: bool) -> Outcome<Code> {
     request rather than a mistake, but a file that does not meet the contrast it
     claims must not be produced in silence: the flag is typed once and the file
     is read for years. To stderr, so it never lands in the artifact. */
-    if !theme.violations.is_empty() {
+    if !violations.is_empty() {
         eprintln!(
             "helix: forced past {} failing {}, starting with {}",
-            theme.violations.len(),
-            if theme.violations.len() == 1 {
+            violations.len(),
+            if violations.len() == 1 {
                 "pair"
             } else {
                 "pairs"
             },
-            theme.violations.first().map_or("", String::as_str)
+            violations.first().map_or("", String::as_str)
         );
     }
 
-    let css = to_css(&theme, &args.selector);
+    /* **Both modes as one block of `light-dark()` pairs**, the way the
+    stylesheet writes its own tokens, unless the intent named one mode. */
+    let css = match themes.as_slice() {
+        [light, dark] => to_css_modes(light, dark, &args.selector),
+        [one, ..] => to_css(one, &args.selector),
+        [] => unreachable!("an intent derives in at least one mode"),
+    };
+    let tokens = themes.first().map_or(0, |theme| theme.tokens.len());
     let written = match &args.out {
         None => None,
         Some(path) => {
@@ -81,8 +89,8 @@ pub fn run(args: &Build, from: &Path, json: bool) -> Outcome<Code> {
             "{}",
             serde_json::json!({
                 "css": css,
-                "tokens": theme.tokens.len(),
-                "violations": theme.violations,
+                "tokens": tokens,
+                "violations": violations,
                 "written": written,
             })
         );
@@ -94,8 +102,7 @@ pub fn run(args: &Build, from: &Path, json: bool) -> Outcome<Code> {
         redirect and a note on the terminal, rather than a note in the file they
         were building. */
         eprintln!(
-            "helix: wrote {} tokens to {}",
-            theme.tokens.len(),
+            "helix: wrote {tokens} tokens to {}",
             written.unwrap_or_default()
         );
     }

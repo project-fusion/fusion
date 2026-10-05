@@ -22,9 +22,8 @@ use fusion_rules::exit::Code;
 use fusion_rules::style::Paint;
 
 use crate::args::{Audit, Common};
-use crate::theme::load;
 use crate::theme::report::{measured, rows, widths, Counts, Filter, Order};
-use crate::theme::tui;
+use crate::theme::{load, scheme_name, tui, violations};
 
 /// # Errors
 ///
@@ -32,15 +31,15 @@ use crate::theme::tui;
 /// put into raw mode. **A terminal failure is `Internal` rather than `Input`**:
 /// it is not a statement about anything the reader wrote.
 pub fn run(args: &Audit, from: &Path, json: bool, paint: Paint) -> Outcome<Code> {
-    let (theme, source) = load(
+    let (themes, source) = load(
         args.common.intent.as_deref(),
         args.common.config.as_deref(),
         from,
     )?;
-    let code = verdict(&theme);
+    let code = verdict(&themes);
 
     if json {
-        println!("{}", report(&theme, &source));
+        println!("{}", report(&themes, &source));
         return Ok(code);
     }
     /* **The tty decides, and `--plain` is the only override.** A screen written
@@ -49,10 +48,15 @@ pub fn run(args: &Audit, from: &Path, json: bool, paint: Paint) -> Outcome<Code>
     it: color is off in a file for a reason that is about legibility, and a
     screen is off there for a reason that is about the file being unusable. */
     if args.plain || !std::io::stdout().is_terminal() {
-        matrix(&theme, &source, paint);
+        for (at, theme) in themes.iter().enumerate() {
+            if at > 0 {
+                println!();
+            }
+            matrix(theme, &title(&source, &themes, theme), paint);
+        }
         return Ok(code);
     }
-    tui::run(&theme, &source).map_err(|failure| {
+    tui::run(&themes, &source).map_err(|failure| {
         Failure::new(
             Code::Internal,
             "cannot open the audit screen".to_owned(),
@@ -73,27 +77,27 @@ pub fn run(args: &Audit, from: &Path, json: bool, paint: Paint) -> Outcome<Code>
 ///
 /// [`Failure`] when the intent cannot be loaded.
 pub fn check(args: &Common, from: &Path, json: bool) -> Outcome<Code> {
-    let (theme, source) = load(args.intent.as_deref(), args.config.as_deref(), from)?;
-    let code = verdict(&theme);
+    let (themes, source) = load(args.intent.as_deref(), args.config.as_deref(), from)?;
+    let code = verdict(&themes);
 
     if json {
-        println!("{}", report(&theme, &source));
+        println!("{}", report(&themes, &source));
         return Ok(code);
     }
     /* A clean theme says nothing at all, so a green pipeline stays quiet and the
     one that is not green is the only one with output in it. */
-    for line in &theme.violations {
+    for line in violations(&themes) {
         eprintln!("helix: {line}");
     }
     Ok(code)
 }
 
-/// One place decides whether a theme passed, so three presentations cannot
-/// disagree about the exit code.
-fn verdict(theme: &Theme) -> Code {
-    let failed = theme
-        .pairings
+/// One place decides whether a theme passed, in every mode it was derived in,
+/// so three presentations cannot disagree about the exit code.
+fn verdict(themes: &[Theme]) -> Code {
+    let failed = themes
         .iter()
+        .flat_map(|theme| &theme.pairings)
         .any(|pairing| pairing.status == Pair::Fail);
     if failed {
         Code::Failed
@@ -102,23 +106,64 @@ fn verdict(theme: &Theme) -> Code {
     }
 }
 
-fn report(theme: &Theme, source: &str) -> serde_json::Value {
-    serde_json::json!({
-        "collisions": theme.collisions,
-        "pairings": theme.pairings.iter().map(|pairing| serde_json::json!({
-            "background": pairing.background,
-            "foreground": pairing.foreground,
-            "ratio": pairing.ratio,
-            "status": match pairing.status {
-                Pair::Fail => "fail",
-                Pair::Pass => "pass",
-                Pair::Unverifiable => "unverifiable",
-            },
-            "target": pairing.target,
-        })).collect::<Vec<_>>(),
-        "source": source,
-        "violations": theme.violations,
-    })
+/// The heading a mode's table is printed under.
+fn title(source: &str, themes: &[Theme], theme: &Theme) -> String {
+    if themes.len() > 1 {
+        format!("{source}, {}", scheme_name(theme.intent.scheme))
+    } else {
+        source.to_owned()
+    }
+}
+
+fn report(themes: &[Theme], source: &str) -> serde_json::Value {
+    let mut report = measurement(themes);
+    report.insert("source".to_owned(), source.into());
+    serde_json::Value::Object(report)
+}
+
+/// What was measured, in every mode, as `--json` and `helix_audit_theme` both
+/// return it.
+///
+/// **Each pair carries its mode**, and a finding is named by its mode where
+/// there are two. The pairs are one list, so filtering it for failures finds
+/// every failure in both modes.
+#[must_use]
+pub fn measurement(themes: &[Theme]) -> serde_json::Map<String, serde_json::Value> {
+    let named = |theme: &Theme, line: &String| {
+        if themes.len() > 1 {
+            format!("{}: {line}", scheme_name(theme.intent.scheme))
+        } else {
+            line.clone()
+        }
+    };
+    let collisions: Vec<String> = themes
+        .iter()
+        .flat_map(|theme| theme.collisions.iter().map(move |line| named(theme, line)))
+        .collect();
+    let pairings: Vec<serde_json::Value> = themes
+        .iter()
+        .flat_map(|theme| {
+            theme.pairings.iter().map(|pairing| {
+                serde_json::json!({
+                    "background": pairing.background,
+                    "foreground": pairing.foreground,
+                    "ratio": pairing.ratio,
+                    "scheme": scheme_name(theme.intent.scheme),
+                    "status": match pairing.status {
+                        Pair::Fail => "fail",
+                        Pair::Pass => "pass",
+                        Pair::Unverifiable => "unverifiable",
+                    },
+                    "target": pairing.target,
+                })
+            })
+        })
+        .collect();
+    let mut report = serde_json::Map::new();
+    report.insert("collisions".to_owned(), collisions.into());
+    report.insert("pairings".to_owned(), pairings.into());
+    report.insert("violations".to_owned(), violations(themes).into());
+    report
 }
 
 /// The matrix, as a table.

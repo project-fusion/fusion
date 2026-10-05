@@ -207,9 +207,9 @@ pub struct Init {
     #[arg(long, short, value_name = "PATH")]
     pub out: Option<PathBuf>,
 
-    /// The brand color to seed it with.
-    #[arg(long, default_value = "#3b82f6", value_name = "HEX")]
-    pub brand: String,
+    /// The brand color to seed it with. Without one, the theme is ink.
+    #[arg(long, value_name = "HEX")]
+    pub brand: Option<String>,
 
     /// Overwrite an existing file.
     #[arg(long)]

@@ -122,6 +122,23 @@ fn deriving_returns_css_a_stylesheet_can_take() {
     assert!(css.contains("--helix-color-background:"), "{css}");
 }
 
+/// **No brand is a theme, and with no `scheme` it comes back in both modes**, as
+/// one block of `light-dark()` pairs a stylesheet can take whole.
+#[test]
+fn deriving_no_brand_returns_ink_in_both_modes() {
+    let replies = talk(&[
+        HELLO,
+        r##"{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"helix_derive_theme","arguments":{"intent":{}}}}"##,
+    ]);
+    let (failed, css) = answer(&replies[1]);
+    assert!(!failed, "{css}");
+    assert!(
+        css.contains("--helix-color-primary: light-dark(#181818, #e1e1e1);"),
+        "{css}"
+    );
+    assert!(!css.contains("--helix-seed-brand"), "{css}");
+}
+
 /// **A palette that fails its own contract is refused rather than returned**, the
 /// way `helix theme build` refuses it. Handing one to a model that will paste it
 /// into a stylesheet is worse than handing it to a person who might read a
