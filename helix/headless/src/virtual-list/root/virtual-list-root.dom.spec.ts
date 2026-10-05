@@ -25,9 +25,15 @@ import {
  *
  * `::part()` because it is the published door into a shadow root, and a
  * document rule beats a shadow one, so nothing here is fighting the component.
+ *
+ * Each row is the `estimate` tall, so a browser lays the rows out where the
+ * arithmetic below expects them, as happy-dom's estimate does.
  */
 const VIEWPORT = `helix-headless-virtual-list::part(viewport) {
   block-size: 12rem;
+}
+helix-headless-virtual-list > [data-index] {
+  block-size: 2rem;
 }`
 
 beforeAll(async () => {
@@ -457,15 +463,28 @@ describe('what is on screen, and the end of the set', () => {
     await settle(host)
   }
 
+  /* Chromium's scroll anchoring moved the offset to 138, 522 and back to 330
+     on one scroll, as the window swapped the rows above what was on screen. */
+  test('takes its box out of the browser’s scroll anchoring', async () => {
+    const host = await fed(named(500))
+    expect(part(host, 'viewport')?.hasAttribute('data-virtual')).toBe(true)
+    if (hasLayout()) {
+      expect(getComputedStyle(part(host, 'viewport') as HTMLElement).overflowAnchor).toBe('none')
+    }
+  })
+
   test('reports the items on screen as they change', async () => {
     const host = await fed(named(500))
     const viewport = tall(host)
     let heard = 0
-    host.addEventListener('helix-range-change', () => {
+    let said: unknown
+    host.addEventListener('helix-range-change', (event) => {
       heard += 1
+      said = (event as CustomEvent).detail
     })
     await scrollTo(host, viewport, 330)
     expect(heard).toBe(1)
+    expect(said).toEqual({ first: 10, last: 17 })
     // Row 10 at the top, and row 16 cut by the bottom edge.
     expect((host as unknown as { range: unknown }).range).toEqual({ first: 10, last: 17 })
     // The same rows at either edge: nothing moved.

@@ -1,5 +1,11 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount as mountMarkup, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import {
+  hasLayout,
+  mount as mountMarkup,
+  part,
+  registerDom,
+  role,
+} from '@fusion.dev/helix-testing/dom'
 
 /* The data table after hydration.
  *
@@ -1153,8 +1159,12 @@ describe('a row that asks for more', () => {
   })
 
   test('a windowed table asks by itself within a screen of the end, once for each length', async () => {
+    /* The headless tier draws no box, so a browser is given the one a
+       stylesheet would give it, through the part. An inline style on the part
+       would not last: the template writes its `style` on every render. */
     const { element } = await mount(
-      MORE.replace('load-more ', 'load-more windowed '),
+      `${MORE.replace('load-more ', 'load-more windowed ')}
+      <style>helix-headless-data-table::part(table) { block-size: 320px; overflow: auto; }</style>`,
       Array.from({ length: 50 }, (_, at) => ({ name: `row ${at}`, size: at })),
     )
     await settled(element)
@@ -1163,13 +1173,17 @@ describe('a row that asks for more', () => {
       asked += 1
     })
     const box = part(element, 'table') as HTMLElement
-    Object.defineProperty(box, 'clientHeight', { configurable: true, value: 320 })
+    if (!hasLayout()) {
+      Object.defineProperty(box, 'clientHeight', { configurable: true, value: 320 })
+    }
     box.scrollTop = 0
     box.dispatchEvent(new Event('scroll'))
     expect(asked).toBe(0)
     box.scrollTop = 50 * 32 - 400
     box.dispatchEvent(new Event('scroll'))
     box.dispatchEvent(new Event('scroll'))
+    // The browser's own scroll event as well, which asks nothing more.
+    await new Promise((resolve) => setTimeout(resolve, 20))
     expect(asked).toBe(1)
   })
 })
