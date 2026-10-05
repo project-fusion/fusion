@@ -551,3 +551,65 @@ describe('pagination announcements', () => {
     })
   })
 })
+
+describe('where focus goes after a move', () => {
+  type Nav = HTMLElement & { page: number; updateComplete: Promise<boolean> }
+
+  const control = (nav: HTMLElement, name: string): HTMLElement =>
+    nav.shadowRoot?.querySelector(`[aria-label="${name}"]`) as HTMLElement
+
+  const press = async (nav: Nav, target: HTMLElement): Promise<void> => {
+    target.focus()
+    target.click()
+    await nav.updateComplete
+  }
+
+  test('stays on the page that was chosen while the run moves under it', async () => {
+    const nav = (await mount(
+      '<helix-headless-pagination pages="20"></helix-headless-pagination>',
+    )) as Nav
+    const five = control(nav, 'Page 5')
+    await press(nav, five)
+    expect(nav.page).toBe(5)
+    expect(nav.shadowRoot?.activeElement?.getAttribute('aria-label')).toBe('Page 5')
+  })
+
+  test('moves to the page a gap opened', async () => {
+    const nav = (await mount(
+      '<helix-headless-pagination default-page="5" pages="20"></helix-headless-pagination>',
+    )) as Nav
+    await press(nav, control(nav, 'Skip to page 3'))
+    expect(nav.page).toBe(3)
+    expect(nav.shadowRoot?.activeElement?.getAttribute('aria-label')).toBe('Page 3')
+  })
+
+  test('moves to the current page when Next reaches the end', async () => {
+    const nav = (await mount(
+      '<helix-headless-pagination default-page="2" pages="3"></helix-headless-pagination>',
+    )) as Nav
+    await press(nav, part(nav, 'next') as HTMLElement)
+    expect(nav.page).toBe(3)
+    expect(nav.shadowRoot?.activeElement?.getAttribute('aria-label')).toBe('Page 3')
+  })
+})
+
+describe('pagination links', () => {
+  type Nav = HTMLElement & { page: number; updateComplete: Promise<boolean> }
+
+  /* The browser reads the href of a clicked link after the click listeners
+     and their microtasks, so the link has to point where it did when it was
+     pressed until a task has passed. */
+  test('keep their address until the browser has followed them', async () => {
+    const nav = (await mount(
+      '<helix-headless-pagination default-page="5" href="?p={page}" pages="20"></helix-headless-pagination>',
+    )) as Nav
+    const next = part(nav, 'next') as HTMLAnchorElement
+    next.click()
+    await Promise.resolve()
+    await nav.updateComplete
+    expect(next.getAttribute('href')).toBe('?p=6')
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await nav.updateComplete
+    expect(nav.page).toBe(6)
+  })
+})
