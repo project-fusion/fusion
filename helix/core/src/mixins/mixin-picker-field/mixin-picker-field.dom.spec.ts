@@ -8,7 +8,7 @@ import { registerDom } from '@fusion.dev/helix-testing/dom'
  * Three families take `MixinPickerField` and two of them `MixinPickerEditing`
  * on top, so a fault here is a fault three times over, and each family's own
  * spec covers only the path that family reaches. What is asked here is the
- * shared half: arriving from outside opens and a hand-off from inside does
+ * * shared half: a press from outside opens and a hand-off from inside does
  * not, Escape shuts the panel and hands the caret back, a read-only field
  * refuses, a refusal puts the control back, and the family's verdict reaches
  * the form as `badInput`.
@@ -80,7 +80,10 @@ beforeAll(async () => {
               @blur=${this.handleBlur} @focus=${this.handleFocus} @input=${this.handleInput} />
             <button part="trigger" type="button" @click=${() => this.toggleOpen()}></button>
           </div>
-          <div part="surface" popover="manual" ?hidden=${!this.open}></div>`
+          <div part="surface" popover="manual" ?hidden=${!this.open}>
+            <button id="first" type="button">Previous</button>
+            <button id="last" type="button">Next</button>
+          </div>`
       }
     },
   )
@@ -117,12 +120,37 @@ const focus = (host: Probe, from: EventTarget | null): void => {
   control(host).dispatchEvent(new FocusEvent('focus', { relatedTarget: from }))
 }
 
+/** A press into the text, which a browser sends before the focus it causes. */
+const press = (host: Probe, from: EventTarget | null): void => {
+  control(host).dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true }))
+  focus(host, from)
+}
+
 describe('arriving at the field', () => {
-  test('from outside opens the picker', async () => {
+  test('by a press from outside opens the picker', async () => {
+    const host = await mount()
+    press(host, null)
+    await host.updateComplete
+    expect(host.open).toBe(true)
+  })
+
+  /* A reader tabbing through a form heard a dialog appear at every date and
+     every time they passed. React Aria opens on the button alone, and the
+     trigger and ArrowDown open it from the keyboard here. */
+  test('by Tab or by a script opens nothing', async () => {
     const host = await mount()
     focus(host, null)
     await host.updateComplete
-    expect(host.open).toBe(true)
+    expect(host.open).toBe(false)
+  })
+
+  test('and a press that ended elsewhere is not taken for the next arrival', async () => {
+    const host = await mount()
+    control(host).dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true }))
+    control(host).dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+    focus(host, null)
+    await host.updateComplete
+    expect(host.open).toBe(false)
   })
 
   /* Picking shuts the panel and puts the caret back in the field, so a hand-off
@@ -130,14 +158,14 @@ describe('arriving at the field', () => {
      picker straight back and the reader cannot get out. */
   test('but a hand-off from inside the element does not', async () => {
     const host = await mount()
-    focus(host, trigger(host))
+    press(host, trigger(host))
     await host.updateComplete
     expect(host.open).toBe(false)
   })
 
   test('and a disabled field stays shut', async () => {
     const host = await mount('disabled')
-    focus(host, null)
+    press(host, null)
     await host.updateComplete
     expect(host.open).toBe(false)
   })
@@ -236,6 +264,36 @@ describe('the panel', () => {
     expect(host.open).toBe(false)
   })
 
+  /* The panel is a dialog, and Tab from the grid left it for the page behind
+     while it stayed open. APG's date picker dialog and React Aria's popover
+     keep Tab inside. */
+  test('keeps Tab inside, from its last control to its first and back', async () => {
+    const host = await mount()
+    host.open = true
+    await host.updateComplete
+    const first = host.shadowRoot?.getElementById('first') as HTMLElement
+    const last = host.shadowRoot?.getElementById('last') as HTMLElement
+    const tab = (from: HTMLElement, shiftKey = false): KeyboardEvent => {
+      from.focus()
+      const event = new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        key: 'Tab',
+        shiftKey,
+      })
+      from.dispatchEvent(event)
+      return event
+    }
+    expect(tab(last).defaultPrevented).toBe(true)
+    expect(host.shadowRoot?.activeElement).toBe(first)
+    expect(tab(first, true).defaultPrevented).toBe(true)
+    expect(host.shadowRoot?.activeElement).toBe(last)
+    /* Between the two ends the browser moves focus itself. */
+    expect(tab(first).defaultPrevented).toBe(false)
+    expect(host.open).toBe(true)
+  })
+
   test('shows again when the host is moved while open', async () => {
     const host = await mount()
     host.open = true
@@ -287,7 +345,7 @@ describe('a read-only field', () => {
      whose every pick was then refused. */
   test('does not open, from the field or the trigger', async () => {
     const host = await mount('readonly')
-    focus(host, null)
+    press(host, null)
     await host.updateComplete
     expect(host.open).toBe(false)
     trigger(host).click()

@@ -47,7 +47,8 @@ import '../../time-picker/index.js'
  * parser for it.
  *
  * Typing sends `input` on each keystroke and `change` when you leave the
- * field. In the list, the arrow keys, typed digits and PageUp and PageDown
+ * field. The trigger and ArrowDown open the list, and so does a press into the
+ * field; Tab into the field opens nothing. In the list, the arrow keys, typed digits and PageUp and PageDown
  * move through the times, and Enter, Space or a click chooses one and closes
  * the panel. With `variant="wheels"` each wheel moves the time as you turn it,
  * the panel stays open, and Enter or Escape closes it.
