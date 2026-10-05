@@ -45,4 +45,15 @@ describe('sandbox source server output', () => {
     )
     expect(written.filter((one) => !one.startsWith('data-'))).toEqual([])
   })
+
+  test('a highlighted pane serves its colors, so the first paint is colored', () => {
+    const highlight = (text: string) => [{ kind: 'keyword', text }]
+    expect(
+      servedParts(
+        ssr(
+          html`<helix-sandbox-source .highlight=${highlight} value="let"></helix-sandbox-source>`,
+        ),
+      ),
+    ).toEqual(['field', 'highlight', 'source', 'token'])
+  })
 })

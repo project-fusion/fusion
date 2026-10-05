@@ -225,4 +225,58 @@ describe('the source pane reporting its cursor', () => {
     expect(seen?.bubbles).toBe(true)
     expect(seen?.composed).toBe(true)
   })
+
+  /* A highlighter is the consumer's, so the pane takes runs of text rather
+     than markup, and draws them as text: nothing a highlighter returns is
+     parsed as HTML. */
+  test('`highlight` draws the runs under the field, each with its kind', async () => {
+    const host = (await source('value="<p>Hi</p>"')) as Source & {
+      highlight?: (source: string, name: string) => { kind?: string; text: string }[]
+    }
+    expect(part(host, 'field')).toBeNull()
+    const asked: string[] = []
+    host.highlight = (text, name) => {
+      asked.push(name)
+      return text
+        .split(/(<\/?|>)/)
+        .filter(Boolean)
+        .map((run) =>
+          /^<|>$/.test(run)
+            ? { text: run }
+            : { kind: run === 'p' || run === '/p' ? 'tag' : 'string', text: run },
+        )
+    }
+    await host.updateComplete
+    expect(asked).toEqual(['html'])
+    const drawn = part(host, 'highlight') as HTMLElement
+    expect(drawn.getAttribute('aria-hidden')).toBe('true')
+    expect(drawn.textContent).toBe('<p>Hi</p>\n')
+    const tokens = [...drawn.querySelectorAll('[part="token"]')]
+    expect(tokens.map((token) => token.getAttribute('data-kind'))).toEqual(['tag', 'string', 'tag'])
+    expect(part(host, 'field')?.contains(part(host, 'source') as Element)).toBe(true)
+  })
+
+  test('runs that do not add up to the source draw it plain, so the caret stays on its text', async () => {
+    const host = (await source('value="a b"')) as Source & {
+      highlight?: () => { kind?: string; text: string }[]
+    }
+    host.highlight = () => [{ kind: 'name', text: 'a' }]
+    await host.updateComplete
+    const drawn = part(host, 'highlight') as HTMLElement
+    expect(drawn.textContent).toBe('a b\n')
+    expect(drawn.querySelector('[part="token"]')).toBeNull()
+  })
+
+  test('an edit draws the new source in color', async () => {
+    const host = (await source('value="a"')) as Source & {
+      highlight?: (text: string) => { kind?: string; text: string }[]
+    }
+    host.highlight = (text) => [{ kind: 'keyword', text }]
+    await host.updateComplete
+    const field = part(host, 'source') as HTMLTextAreaElement
+    field.value = 'ab'
+    field.dispatchEvent(new Event('input', { bubbles: true }))
+    await host.updateComplete
+    expect(part(host, 'highlight')?.textContent).toBe('ab\n')
+  })
 })

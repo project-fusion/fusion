@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, idle, logged, part, registerDom } from '@fusion.dev/helix-testing/dom'
 import events from '../.examples/events.html' with { type: 'text' }
+import highlightedSource from '../.examples/highlighted-source.html' with { type: 'text' }
 
 beforeAll(async () => {
   registerDom()
@@ -27,5 +28,18 @@ describe('the events example', () => {
     type(field, '<p>Hello, again</p>')
     await idle()
     expect(logged()).toContain('helix-before-edit')
+  })
+})
+
+describe('the highlighted source example', () => {
+  run('what a reader types is colored by its kind', async () => {
+    await example(highlightedSource)
+    const source = document.querySelector('helix-sandbox-source') as HTMLElement
+    type(part(source, 'source') as HTMLTextAreaElement, '<b id="x">Bold</b>')
+    await idle()
+    const kinds = [...(source.shadowRoot?.querySelectorAll('[part="token"]') ?? [])].map((token) =>
+      token.getAttribute('data-kind'),
+    )
+    expect(kinds).toEqual(['tag', 'name', 'string', 'tag'])
   })
 })
