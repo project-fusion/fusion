@@ -8,8 +8,10 @@ import {
   MixinControllerOpen,
   unlockScroll,
 } from '@fusion.dev/helix-core'
+import { x } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
 /**
  * @summary A modal window built on the native `<dialog>` element.
@@ -33,6 +35,16 @@ import { property } from 'lit/decorators.js'
  * the `header` slot, or the elements an `aria-labelledby` on the host names.
  * While it is open, the page behind it does not scroll.
  *
+ * The dialog is described by the words at the start of its body: the elements
+ * in the default slot before the first one that is or holds a control. A
+ * question above a form describes the dialog, and the form does not. An
+ * `aria-describedby` on the host replaces it.
+ *
+ * Set `alert` for a dialog that interrupts to ask for an answer, such as a
+ * confirmation before a deletion. It is an `alertdialog`, which a screen reader
+ * announces with its description as it opens. Set `dismissible` to draw a
+ * close control, labeled by `dismiss-label`.
+ *
  * @since 0.1.0
  * @status stable
  * @category overlays
@@ -40,6 +52,7 @@ import { property } from 'lit/decorators.js'
  * @documentation https://fusion.dev/helix/components/dialog
  *
  * @slot - The dialog's content.
+ * @slot dismiss-icon - Replaces the glyph inside the close control.
  * @slot footer - The dialog's actions.
  * @slot header - The title, and anything beside it.
  * @slot icon - An icon above the title, for a warning dialog.
@@ -49,12 +62,33 @@ import { property } from 'lit/decorators.js'
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired before it opens, and cancelable.
  * @event {ToggleEvent} toggle - Sent when the dialog opens or closes, with `newState` and `oldState`.
  *
+ * @csspart body - The slot the content is in. It draws no box until you give it one.
  * @csspart dialog - The native dialog element.
+ * @csspart dismiss - The close control, drawn when the dialog is `dismissible`.
+ * @csspart dismiss-mark - The glyph on the close control, where none is slotted.
+ * @csspart footer - The slot the actions are in. It draws no box until you give it one.
+ * @csspart header - The slot the title is in. It draws no box until you give it one.
  *
+ * @cssstate entering - From the moment the dialog opens until its entrance has finished.
+ * @cssstate exiting - From the moment the dialog closes until its exit has finished.
  * @cssstate open - While the dialog is open.
  */
 @customElement('helix-headless-dialog')
 export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
+  /**
+   * Makes the dialog an alert dialog, for a message that interrupts to ask for
+   * an answer, such as a confirmation before something is deleted.
+   *
+   * The `<dialog>` takes `role="alertdialog"`, so a screen reader announces the
+   * dialog and its description as it opens. Everything else stays the same:
+   * the dialog is modal, Escape asks to close it, and `persistent` still
+   * refuses that.
+   *
+   * Not reflected, because no stylesheet selects on it.
+   */
+  @property({ type: Boolean })
+  alert = false
+
   /**
    * Which close requests the browser handles on its own.
    *
@@ -69,6 +103,22 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
    */
   @property({ attribute: 'closedby', reflect: true })
   closedBy?: 'any' | 'closerequest' | 'none'
+
+  /**
+   * Draws a control that closes the dialog, in the corner where the title is.
+   *
+   * Pressing it is `close()`, so it sends `helix-before-close` like every other
+   * way out, and `persistent` does not disable it.
+   */
+  @property({ reflect: true, type: Boolean })
+  dismissible = false
+
+  /**
+   * The close control's accessible name. Translate it with the rest of your
+   * interface.
+   */
+  @property({ attribute: 'dismiss-label' })
+  dismissLabel = 'Close'
 
   /**
    * Accessible name for the dialog. When it is empty, the heading in the
@@ -256,6 +306,66 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
     }
   }
 
+  /** Whether the body's words are what currently describe the dialog. */
+  private describedByBody = false
+
+  /**
+   * Describes the dialog by the words at the start of its body, where nothing
+   * else describes it.
+   *
+   * An element reference, for the reason `nameByHeader` gives. Only the leading
+   * run of elements that hold no control, so a dialog asking a question above a
+   * form is described by the question: a description that read out every field
+   * label would repeat what a reader hears again as they reach each field. An
+   * `aria-describedby` on the host comes first.
+   */
+  private describeByBody(): void {
+    const dialog = this.dialog as
+      | (HTMLDialogElement & { ariaDescribedByElements?: Element[] | null })
+      | null
+    if (!dialog || !('ariaDescribedByElements' in dialog)) {
+      return
+    }
+    const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot:not([name])')
+    const words = this.hasAttribute('aria-describedby') ? [] : wordsIn(slot)
+    if (words.length > 0) {
+      dialog.ariaDescribedByElements = words
+      this.describedByBody = true
+    } else if (this.describedByBody) {
+      dialog.ariaDescribedByElements = null
+      this.describedByBody = false
+    }
+  }
+
+  /** Which run of entering or exiting is the latest, so an old one cannot clear a new one. */
+  private phase = 0
+
+  /**
+   * Says on the host that the dialog is on its way in or out, until its
+   * animations have finished.
+   *
+   * `:state(open)` turns at once, which is right for what the dialog is and too
+   * early for a stylesheet that wants to draw the journey: an exit has to know
+   * it is an exit while the panel is still on screen. Cleared when every
+   * animation on the panel and its backdrop has finished, or two frames after
+   * the change when nothing animates.
+   */
+  private markPhase(changed: PropertyValues): void {
+    if (!changed.has('open') || changed.get('open') === undefined) {
+      return
+    }
+    this.phase += 1
+    const turn = this.phase
+    this.toggleState('entering', this.open)
+    this.toggleState('exiting', !this.open)
+    void settled(this.dialog).then(() => {
+      if (turn === this.phase) {
+        this.toggleState('entering', false)
+        this.toggleState('exiting', false)
+      }
+    })
+  }
+
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     hostAria(this.internals, { label: this.label })
@@ -275,6 +385,8 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.nameByHeader()
+    this.describeByBody()
+    this.markPhase(changed)
     if (this.open) {
       lockScroll(this)
     } else {
@@ -412,9 +524,28 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
   /** Bounds the refusal listener to one, whether or not it ever fires. */
   private refusal: AbortController | undefined
 
+  /**
+   * The glyph on the close control, behind a seam.
+   *
+   * Slot fallback, so a consumer replaces it by slotting, and a method, so a
+   * tier above replaces it by overriding. The same pair `Toast.Item` draws.
+   */
+  protected renderDismissIcon(): TemplateResult {
+    return html`<slot name="dismiss-icon">
+      <svg part="dismiss-mark" viewBox=${x.viewBox} fill="currentColor" aria-hidden="true">
+        ${unsafeSVG(x.content)}
+      </svg>
+    </slot>`
+  }
+
   protected override render(): TemplateResult {
+    /* The three regions are parts on their slots, with no wrapper, so a region
+       nobody filled still draws no box, and a stylesheet that wants a box gives
+       the slot a `display`. The close control comes last, so
+       opening still focuses the first control in the content. */
     return html`<dialog
       part="dialog"
+      role=${this.alert ? 'alertdialog' : nothing}
       closedby=${this.closedBy ?? nothing}
       aria-label=${this.label || 'Dialog'}
       @cancel=${this.handleCancel}
@@ -422,9 +553,21 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
       @close=${this.handleClose}
     >
       <slot name="icon"></slot>
-      <slot name="header" @slotchange=${this.nameByHeader}></slot>
-      <slot></slot>
-      <slot name="footer"></slot>
+      <slot name="header" part="header" @slotchange=${this.nameByHeader}></slot>
+      <slot part="body" @slotchange=${this.describeByBody}></slot>
+      <slot name="footer" part="footer"></slot>
+      ${
+        this.dismissible
+          ? html`<button
+              part="dismiss"
+              type="button"
+              aria-label=${this.dismissLabel}
+              @click=${() => this.close()}
+            >
+              ${this.renderDismissIcon()}
+            </button>`
+          : nothing
+      }
     </dialog>`
   }
 }
@@ -443,6 +586,53 @@ const headingsIn = (slot: HTMLSlotElement | null): Element[] => {
     one.matches(heading) ? [one] : [...one.querySelectorAll(heading)].slice(0, 1),
   )
   return found.length > 0 ? found.slice(0, 1) : assigned
+}
+
+/** What counts as a control when reading a body for its words. */
+const CONTROL =
+  'a[href], audio[controls], button, details, form, iframe, input, select, textarea, video[controls], [contenteditable], [tabindex]'
+
+/** Whether an element is a control. A custom element counts, since this cannot see what it draws. */
+const isControl = (element: Element): boolean =>
+  element.localName.includes('-') || element.matches(CONTROL)
+
+/**
+ * The elements at the start of a slot that hold words and no control, up to the
+ * first one that is or holds a control.
+ */
+const wordsIn = (slot: HTMLSlotElement | null): Element[] => {
+  const words: Element[] = []
+  for (const one of slot?.assignedElements({ flatten: true }) ?? []) {
+    if (isControl(one) || [...one.querySelectorAll('*')].some(isControl)) {
+      break
+    }
+    if ((one.textContent ?? '').trim() !== '') {
+      words.push(one)
+    }
+  }
+  return words
+}
+
+/**
+ * Resolves once an element's animations have finished, or two frames on where
+ * it has none: long enough for an entrance that starts on the next frame to be
+ * counted.
+ */
+const settled = async (element: Element | null): Promise<void> => {
+  const frame = (): Promise<void> =>
+    new Promise((resolve) => {
+      if (typeof requestAnimationFrame === 'function') {
+        requestAnimationFrame(() => resolve())
+      } else {
+        setTimeout(resolve, 16)
+      }
+    })
+  await frame()
+  await frame()
+  if (!element || typeof element.getAnimations !== 'function') {
+    return
+  }
+  await Promise.allSettled(element.getAnimations({ subtree: true }).map((one) => one.finished))
 }
 
 declare global {
