@@ -144,6 +144,12 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
   disableTimes = ''
 
   /**
+   * What the wheel of hours is called, read by screen readers.
+   */
+  @property({ attribute: 'hour-label' })
+  hourLabel = 'Hour'
+
+  /**
    * Whether the current selection fails validation.
    *
    * A flag rather than a message, the same split Date Picker draws. A flat
@@ -154,12 +160,6 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
    */
   @property({ reflect: true, type: Boolean })
   invalid = false
-
-  /**
-   * What the wheel of hours is called, read by screen readers.
-   */
-  @property({ attribute: 'hour-label' })
-  hourLabel = 'Hour'
 
   /**
    * Accessible name for the list, which has no visible one of its own.
@@ -178,18 +178,6 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
   locale = ''
 
   /**
-   * Latest time offered, as `HH:mm`.
-   */
-  @property()
-  max = '23:59'
-
-  /**
-   * Earliest time offered, as `HH:mm`.
-   */
-  @property()
-  min = '00:00'
-
-  /**
    * Stops the arrow keys in the list from choosing each time they move to.
    * Enter, Space or a click chooses.
    *
@@ -200,11 +188,23 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
   manual = false
 
   /**
+   * Latest time offered, as `HH:mm`.
+   */
+  @property()
+  max = '23:59'
+
+  /**
    * What the wheel of the half of the day is called, read by screen readers.
    * Its two options are written as the locale writes them, such as AM and PM.
    */
   @property({ attribute: 'meridiem-label' })
   meridiemLabel = 'Before or after noon'
+
+  /**
+   * Earliest time offered, as `HH:mm`.
+   */
+  @property()
+  min = '00:00'
 
   /**
    * What the wheel of minutes is called, read by screen readers.
@@ -235,26 +235,18 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
   mode?: 'multiple' | 'range'
 
   /**
-   * Blocks changes to the time. The value is still submitted with the form.
-   *
-   * **Enforced by refusing every request in one place**, which is the seam this
-   * component already has: `requestValue` is what every path here comes through,
-   * and gating it once is what stops the next call site from being written
-   * without the check.
-   *
-   * Not `disabled`, which is the confusion worth naming: a disabled control
-   * submits nothing and leaves the tab order, and a read-only one submits its
-   * value and stays reachable, which is what a form showing a value somebody
-   * else set needs.
+   * The validation message for a time after `max`. `{max}` is replaced with
+   * `max`, written in `locale`.
    */
-  @property({ attribute: 'readonly', reflect: true, type: Boolean })
-  readOnly = false
+  @property({ attribute: 'range-overflow-message' })
+  rangeOverflowMessage?: string
 
   /**
-   * Stops the form from submitting while no time is chosen.
+   * The validation message for a time before `min`. `{min}` is replaced with
+   * `min`, written in `locale`.
    */
-  @property({ reflect: true, type: Boolean })
-  required = false
+  @property({ attribute: 'range-underflow-message' })
+  rangeUnderflowMessage?: string
 
   /**
    * Every time on offer, as minutes since midnight.
@@ -498,14 +490,20 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
   }
 
   /**
-   * How far apart the offered times are, in minutes.
+   * Blocks changes to the time. The value is still submitted with the form.
    *
-   * Fifteen, which is four rows an hour and ninety-six in a day: enough that a
-   * reader scrolls rather than hunts, and few enough that the list is a list.
-   * Anything under five is a thousand rows and wants a field instead.
+   * **Enforced by refusing every request in one place**, which is the seam this
+   * component already has: `requestValue` is what every path here comes through,
+   * and gating it once is what stops the next call site from being written
+   * without the check.
+   *
+   * Not `disabled`, which is the confusion worth naming: a disabled control
+   * submits nothing and leaves the tab order, and a read-only one submits its
+   * value and stays reachable, which is what a form showing a value somebody
+   * else set needs.
    */
-  @property({ type: Number })
-  step = 15
+  @property({ attribute: 'readonly', reflect: true, type: Boolean })
+  readOnly = false
 
   /** Refuses every change while read-only. See `readOnly`. */
   override requestValue(next: string): boolean {
@@ -516,24 +514,20 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
   }
 
   /**
-   * The validation message for a required time picker with no time chosen.
+   * Stops the form from submitting while no time is chosen.
    */
-  @property({ attribute: 'value-missing-message' })
-  valueMissingMessage?: string
+  @property({ reflect: true, type: Boolean })
+  required = false
 
   /**
-   * The validation message for a time after `max`. `{max}` is replaced with
-   * `max`, written in `locale`.
+   * How far apart the offered times are, in minutes.
+   *
+   * Fifteen, which is four rows an hour and ninety-six in a day: enough that a
+   * reader scrolls rather than hunts, and few enough that the list is a list.
+   * Anything under five is a thousand rows and wants a field instead.
    */
-  @property({ attribute: 'range-overflow-message' })
-  rangeOverflowMessage?: string
-
-  /**
-   * The validation message for a time before `min`. `{min}` is replaced with
-   * `min`, written in `locale`.
-   */
-  @property({ attribute: 'range-underflow-message' })
-  rangeUnderflowMessage?: string
+  @property({ type: Number })
+  step = 15
 
   /**
    * The validation message for a time that `step` skips.
@@ -546,6 +540,12 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
    */
   @property({ attribute: 'unavailable-message' })
   unavailableMessage?: string
+
+  /**
+   * The validation message for a required time picker with no time chosen.
+   */
+  @property({ attribute: 'value-missing-message' })
+  valueMissingMessage?: string
 
   /**
    * What is wrong with a time the picker can read, as a validity flag and a

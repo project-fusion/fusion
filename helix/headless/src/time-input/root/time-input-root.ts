@@ -220,12 +220,6 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
   rangeUnderflowMessage?: string
 
   /**
-   * The message shown when `disable-times` bars a time.
-   */
-  @property({ attribute: 'unavailable-message' })
-  unavailableMessage?: string
-
-  /**
    * The name of the button that removes one time, with `{name}` filled in.
    *
    * **The name goes in**, so a row of them is heard as which one each
@@ -257,6 +251,12 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
    */
   @property({ attribute: 'trigger-label' })
   triggerLabel = 'Choose a time'
+
+  /**
+   * The message shown when `disable-times` bars a time.
+   */
+  @property({ attribute: 'unavailable-message' })
+  unavailableMessage?: string
 
   /** Every time in the value, which may hold more than one. */
   private get held(): string[] {

@@ -183,11 +183,15 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
   readOnly = false
 
   /**
-   * The step a valid value is a multiple of, counted from `min`, for
-   * `type="number"`.
+   * Whether a password field offers a toggle that shows what was typed.
+   *
+   * Ignored on every other type. A reveal on an email field would be a button
+   * that does nothing visible, and guarding it here rather than asking the
+   * consumer not to means the property can be set once on a component that
+   * changes type.
    */
-  @property()
-  step = ''
+  @property({ type: Boolean })
+  reveal = false
 
   /**
    * Whether the password is currently showing.
@@ -422,23 +426,19 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
   }
 
   /**
-   * Whether a password field offers a toggle that shows what was typed.
-   *
-   * Ignored on every other type. A reveal on an email field would be a button
-   * that does nothing visible, and guarding it here rather than asking the
-   * consumer not to means the property can be set once on a component that
-   * changes type.
-   */
-  @property({ type: Boolean })
-  reveal = false
-
-  /**
    * The accessible name of the reveal toggle.
    *
    * The state is `aria-pressed`, not this.
    */
   @property({ attribute: 'reveal-label' })
   revealLabel = 'Show password'
+
+  /**
+   * The step a valid value is a multiple of, counted from `min`, for
+   * `type="number"`.
+   */
+  @property()
+  step = ''
 
   /**
    * The kind of text the field accepts. It sets the on-screen keyboard and the

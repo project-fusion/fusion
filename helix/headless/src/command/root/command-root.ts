@@ -103,6 +103,12 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
   hotkey = 'mod+k'
 
   /**
+   * Accessible name for the overlay, which has no visible heading.
+   */
+  @property()
+  label = 'Commands'
+
+  /**
    * Whether the commands are still loading, for a palette that asks a server
    * for them as the user types.
    *
@@ -116,12 +122,6 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
    */
   @property({ attribute: 'loading-text' })
   loadingText = 'Loading'
-
-  /**
-   * Accessible name for the overlay, which has no visible heading.
-   */
-  @property()
-  label = 'Commands'
 
   /**
    * The text shown in the filter field before anything is typed.

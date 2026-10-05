@@ -291,20 +291,11 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   previousLabel = 'Previous month'
 
   /**
-   * Blocks changes to the dates. The value is still submitted with the form.
-   *
-   * **Enforced by refusing every request in one place**, which is the seam this
-   * component already has: `requestValue` is what every path here comes through,
-   * and gating it once is what stops the next call site from being written
-   * without the check.
-   *
-   * Not `disabled`, which is the confusion worth naming: a disabled control
-   * submits nothing and leaves the tab order, and a read-only one submits its
-   * value and stays reachable, which is what a form showing a value somebody
-   * else set needs.
+   * The validation message for a date after `max`. `{max}` is replaced with
+   * `max`, written as a date in `locale`.
    */
-  @property({ attribute: 'readonly', reflect: true, type: Boolean })
-  readOnly = false
+  @property({ attribute: 'range-overflow-message' })
+  rangeOverflowMessage?: string
 
   /**
    * The date the grid's tab stop is on.
@@ -609,10 +600,11 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   }
 
   /**
-   * Stops the form from submitting while no date is chosen.
+   * The validation message for a date before `min`. `{min}` is replaced with
+   * `min`, written as a date in `locale`.
    */
-  @property({ reflect: true, type: Boolean })
-  required = false
+  @property({ attribute: 'range-underflow-message' })
+  rangeUnderflowMessage?: string
 
   /** Refuses every change while read-only. See `readOnly`. */
   override requestValue(next: string): boolean {
@@ -621,6 +613,28 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
     }
     return super.requestValue(next)
   }
+
+  /**
+   * Blocks changes to the dates. The value is still submitted with the form.
+   *
+   * **Enforced by refusing every request in one place**, which is the seam this
+   * component already has: `requestValue` is what every path here comes through,
+   * and gating it once is what stops the next call site from being written
+   * without the check.
+   *
+   * Not `disabled`, which is the confusion worth naming: a disabled control
+   * submits nothing and leaves the tab order, and a read-only one submits its
+   * value and stays reachable, which is what a form showing a value somebody
+   * else set needs.
+   */
+  @property({ attribute: 'readonly', reflect: true, type: Boolean })
+  readOnly = false
+
+  /**
+   * Stops the form from submitting while no date is chosen.
+   */
+  @property({ reflect: true, type: Boolean })
+  required = false
 
   /**
    * How far apart the selectable dates are, in days.
@@ -639,26 +653,6 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   step = 1
 
   /**
-   * The validation message for a required date picker with no date chosen.
-   */
-  @property({ attribute: 'value-missing-message' })
-  valueMissingMessage?: string
-
-  /**
-   * The validation message for a date after `max`. `{max}` is replaced with
-   * `max`, written as a date in `locale`.
-   */
-  @property({ attribute: 'range-overflow-message' })
-  rangeOverflowMessage?: string
-
-  /**
-   * The validation message for a date before `min`. `{min}` is replaced with
-   * `min`, written as a date in `locale`.
-   */
-  @property({ attribute: 'range-underflow-message' })
-  rangeUnderflowMessage?: string
-
-  /**
    * The validation message for a date that `step` skips.
    */
   @property({ attribute: 'step-mismatch-message' })
@@ -670,6 +664,12 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
    */
   @property({ attribute: 'unavailable-message' })
   unavailableMessage?: string
+
+  /**
+   * The validation message for a required date picker with no date chosen.
+   */
+  @property({ attribute: 'value-missing-message' })
+  valueMissingMessage?: string
 
   /** A date written for a message, in `locale`. */
   private spoken(iso: string): string {

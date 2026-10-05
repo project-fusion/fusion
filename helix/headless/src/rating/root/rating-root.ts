@@ -126,6 +126,16 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
   min = 0
 
   /**
+   * The name of each mark a reader can choose, with `{score}` and `{max}`
+   * filled in. Set it to translate "3 out of 5".
+   *
+   * Also what a read-only rating says for its score where `value-text` is
+   * empty.
+   */
+  @property({ attribute: 'option-label' })
+  optionLabel = '{score} out of {max}'
+
+  /**
    * Shows the score without letting users change it.
    *
    * A readout is not a control that has been switched off. It takes no focus,
@@ -168,16 +178,6 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
    */
   @property({ attribute: 'value-text' })
   valueText = ''
-
-  /**
-   * The name of each mark a reader can choose, with `{score}` and `{max}`
-   * filled in. Set it to translate "3 out of 5".
-   *
-   * Also what a read-only rating says for its score where `value-text` is
-   * empty.
-   */
-  @property({ attribute: 'option-label' })
-  optionLabel = '{score} out of {max}'
 
   /* The row of marks is what a reader is on, a radiogroup, and the host is a
      generic beside it: a host `aria-labelledby` and a page's `<label>` named

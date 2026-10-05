@@ -271,13 +271,6 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   estimate = 32
 
   /**
-   * The built-in pagination's name for a gap in its run of pages. `{page}` is
-   * replaced with the page it jumps to.
-   */
-  @property({ attribute: 'gap-label' })
-  gapLabel = 'Skip to page {page}'
-
-  /**
    * The search query. A row is shown when the query matches any of its columns.
    *
    * One query rather than a predicate per column, which is what a reader means
@@ -296,14 +289,17 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
+   * The built-in pagination's name for a gap in its run of pages. `{page}` is
+   * replaced with the page it jumps to.
+   */
+  @property({ attribute: 'gap-label' })
+  gapLabel = 'Skip to page {page}'
+
+  /**
    * The grid's name, read by screen readers.
    */
   @property()
   label = ''
-
-  /** The built-in pagination's name for the button that moves forward a page. */
-  @property({ attribute: 'next-label' })
-  nextLabel = 'Next page'
 
   /**
    * Where filtering, sorting, and paging happen. `client` does them in the
@@ -318,6 +314,10 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    */
   @property()
   mode: 'client' | 'server' = 'client'
+
+  /** The built-in pagination's name for the button that moves forward a page. */
+  @property({ attribute: 'next-label' })
+  nextLabel = 'Next page'
 
   /**
    * The column order, as field names separated by spaces.
@@ -359,6 +359,13 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
+   * The built-in pagination's name for one page. `{page}` and `{pages}` are
+   * replaced with the page number and the page count.
+   */
+  @property({ attribute: 'page-label' })
+  pageLabel = 'Page {page}'
+
+  /**
    * The number of rows on a page. `0` shows every row, with no paging.
    *
    * **It announces nothing, and that is not an omission.** Nothing in this
@@ -379,17 +386,6 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
-   * The built-in pagination's name for one page. `{page}` and `{pages}` are
-   * replaced with the page number and the page count.
-   */
-  @property({ attribute: 'page-label' })
-  pageLabel = 'Page {page}'
-
-  /** The name of the built-in pagination's navigation landmark. */
-  @property({ attribute: 'pagination-label' })
-  paginationLabel = 'Pagination'
-
-  /**
    * Shows a pagination under the grid.
    *
    * On by default once a page size is set, because a paged table with no way to
@@ -408,9 +404,22 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     this.requestUpdate('paginated', previous)
   }
 
+  /** The name of the built-in pagination's navigation landmark. */
+  @property({ attribute: 'pagination-label' })
+  paginationLabel = 'Pagination'
+
   /** The built-in pagination's name for the button that moves back a page. */
   @property({ attribute: 'previous-label' })
   previousLabel = 'Previous page'
+
+  /**
+   * Lets users reorder the columns.
+   *
+   * Each heading with a `field` gets a grip, dragged along the header or moved a
+   * place at a time with the arrow keys once it has focus.
+   */
+  @property({ type: Boolean })
+  reorderable = false
 
   /** What screen readers hear when a search leaves one row. `{count}` is the count. */
   @property({ attribute: 'result-label' })
@@ -422,15 +431,6 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    */
   @property({ attribute: 'results-label' })
   resultsLabel = '{count} results'
-
-  /**
-   * Lets users reorder the columns.
-   *
-   * Each heading with a `field` gets a grip, dragged along the header or moved a
-   * place at a time with the arrow keys once it has focus.
-   */
-  @property({ type: Boolean })
-  reorderable = false
 
   /**
    * The field that identifies each row.
@@ -477,13 +477,6 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   selectAllLabel = 'Select every row'
 
   /**
-   * The name of a row's checkbox. `{row}` is replaced with the row's value in
-   * the first column that has a field, or with its key.
-   */
-  @property({ attribute: 'select-row-label' })
-  selectRowLabel = 'Select {row}'
-
-  /**
    * The keys of the selected rows, separated by commas.
    *
    * A string rather than an array, so it is an attribute a server writes and a
@@ -509,6 +502,13 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    */
   @property({ attribute: 'selected-label' })
   selectedLabel = '{count} selected'
+
+  /**
+   * The name of a row's checkbox. `{row}` is replaced with the row's value in
+   * the first column that has a field, or with its key.
+   */
+  @property({ attribute: 'select-row-label' })
+  selectRowLabel = 'Select {row}'
 
   /**
    * The sort order, as `field:direction`.

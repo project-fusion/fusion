@@ -159,17 +159,14 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   range = false
 
   /**
-   * What a screen reader says for a thumb's value, with `{value}` filled in,
-   * such as `{value} degrees`. Empty announces the number alone.
-   */
-  @property({ attribute: 'value-text' })
-  valueText = ''
-
-  /**
    * Shows the chosen value beside the track.
    */
   @property({ attribute: 'show-value', reflect: true, type: Boolean })
   showValue = false
+
+  /** How far one press of an arrow key moves the thumb. */
+  @property({ type: Number })
+  step = 1
 
   /**
    * How many characters the readout has to be able to hold, widest case.
@@ -428,9 +425,12 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
     this.sync()
   }
 
-  /** How far one press of an arrow key moves the thumb. */
-  @property({ type: Number })
-  step = 1
+  /**
+   * What a screen reader says for a thumb's value, with `{value}` filled in,
+   * such as `{value} degrees`. Empty announces the number alone.
+   */
+  @property({ attribute: 'value-text' })
+  valueText = ''
 
   protected override render(): TemplateResult {
     /* The range's bounds are written before its value below, and that order is

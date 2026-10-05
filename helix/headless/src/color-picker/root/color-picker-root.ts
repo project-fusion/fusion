@@ -143,6 +143,12 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
   autocomplete = 'off'
 
   /**
+   * The message shown when the value is text that is not a color.
+   */
+  @property({ attribute: 'bad-input-message' })
+  badInputMessage?: string
+
+  /**
    * What the square's vertical ramp is called.
    *
    * **Every word the picker speaks is a property**, so a page in another
@@ -299,12 +305,6 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
    */
   @property({ reflect: true, type: Boolean })
   required = false
-
-  /**
-   * The message shown when the value is text that is not a color.
-   */
-  @property({ attribute: 'bad-input-message' })
-  badInputMessage?: string
 
   /**
    * What the square's horizontal ramp is called.

@@ -131,29 +131,6 @@ export class HelixHeadlessObjectInspector extends HelixElement {
   @property({ attribute: 'copy-value-label' })
   copyValueLabel = 'Copy value'
 
-  /** How an array of one entry counts it. `{count}` is replaced with the count. */
-  @property({ attribute: 'item-label' })
-  itemLabel = '{count} item'
-
-  /** How an array of any other number of entries counts them. `{count}` is replaced with the count. */
-  @property({ attribute: 'items-label' })
-  itemsLabel = '{count} items'
-
-  /** How an object of one key counts it. `{count}` is replaced with the count. */
-  @property({ attribute: 'key-label' })
-  keyLabel = '{count} key'
-
-  /** How an object of any other number of keys counts them. `{count}` is replaced with the count. */
-  @property({ attribute: 'keys-label' })
-  keysLabel = '{count} keys'
-
-  /**
-   * The tree's accessible name when `label` is empty and the host names it
-   * with neither `aria-label` nor `aria-labelledby`.
-   */
-  @property({ attribute: 'tree-label' })
-  treeLabel = 'Value'
-
   /**
    * How many levels start open.
    *
@@ -174,6 +151,22 @@ export class HelixHeadlessObjectInspector extends HelixElement {
    */
   @property()
   for = ''
+
+  /** How an array of one entry counts it. `{count}` is replaced with the count. */
+  @property({ attribute: 'item-label' })
+  itemLabel = '{count} item'
+
+  /** How an array of any other number of entries counts them. `{count}` is replaced with the count. */
+  @property({ attribute: 'items-label' })
+  itemsLabel = '{count} items'
+
+  /** How an object of one key counts it. `{count}` is replaced with the count. */
+  @property({ attribute: 'key-label' })
+  keyLabel = '{count} key'
+
+  /** How an object of any other number of keys counts them. `{count}` is replaced with the count. */
+  @property({ attribute: 'keys-label' })
+  keysLabel = '{count} keys'
 
   /**
    * Accessible name for the tree, and the text of the header where there is one.
@@ -196,6 +189,13 @@ export class HelixHeadlessObjectInspector extends HelixElement {
    */
   @property({ attribute: 'no-copy', type: Boolean })
   noCopy = false
+
+  /**
+   * The tree's accessible name when `label` is empty and the host names it
+   * with neither `aria-label` nor `aria-labelledby`.
+   */
+  @property({ attribute: 'tree-label' })
+  treeLabel = 'Value'
 
   /**
    * The value to show, when your code already holds it as an object.

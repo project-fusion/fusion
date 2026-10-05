@@ -66,6 +66,14 @@ const navigable = (item: HelixHeadlessAccordionItem): NavigableItem => ({
 @customElement('helix-headless-accordion')
 export class HelixHeadlessAccordion extends HelixElement {
   /**
+   * The level of the heading around each trigger, from 1 to 6.
+   *
+   * Unset is 3. An item's own `heading-level` wins over this.
+   */
+  @property({ attribute: 'heading-level', type: Number })
+  headingLevel?: number
+
+  /**
    * How many sections may be open at once.
    *
    * Absent is `multiple`, so nothing closes unexpectedly and the default costs
@@ -82,14 +90,6 @@ export class HelixHeadlessAccordion extends HelixElement {
    */
   @property({ reflect: true })
   mode?: 'single' | 'single-collapsible'
-
-  /**
-   * The level of the heading around each trigger, from 1 to 6.
-   *
-   * Unset is 3. An item's own `heading-level` wins over this.
-   */
-  @property({ attribute: 'heading-level', type: Number })
-  headingLevel?: number
 
   /** The accordion's own items, in the order they are written. Browser only. */
   get items(): HelixHeadlessAccordionItem[] {

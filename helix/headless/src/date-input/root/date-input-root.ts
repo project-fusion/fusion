@@ -145,6 +145,15 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
   autocomplete = ''
 
   /**
+   * The name of the calendar's grid of days, read by screen readers.
+   */
+  @property({ attribute: 'calendar-label' })
+  calendarLabel = 'Date Picker'
+
+  /** Typed, so a keystroke is announced as `input` alone. See `announcesInput`. */
+  protected override readonly announcesInput = true
+
+  /**
    * How a date is written in the field: `short` through `full`, or ISO.
    *
    * **The field renders when it is idle and holds the value when it is being
@@ -170,15 +179,6 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
    */
   @property({ attribute: 'date-style' })
   dateStyle: 'full' | 'iso' | 'long' | 'medium' | 'short' = 'long'
-
-  /** Typed, so a keystroke is announced as `input` alone. See `announcesInput`. */
-  protected override readonly announcesInput = true
-
-  /**
-   * The name of the calendar's grid of days, read by screen readers.
-   */
-  @property({ attribute: 'calendar-label' })
-  calendarLabel = 'Date Picker'
 
   /**
    * Dates that cannot be chosen, as `YYYY-MM-DD`, separated by commas or
@@ -372,10 +372,10 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
   stepMismatchMessage?: string
 
   /**
-   * The message shown when `disable-dates` or `disable-days` bars a date.
+   * The name of the button that opens the calendar, read by screen readers.
    */
-  @property({ attribute: 'unavailable-message' })
-  unavailableMessage?: string
+  @property({ attribute: 'trigger-label' })
+  triggerLabel = 'Choose a date'
 
   /**
    * What the calendar should show, which is only ever a whole date.
@@ -602,10 +602,10 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
   }
 
   /**
-   * The name of the button that opens the calendar, read by screen readers.
+   * The message shown when `disable-dates` or `disable-days` bars a date.
    */
-  @property({ attribute: 'trigger-label' })
-  triggerLabel = 'Choose a date'
+  @property({ attribute: 'unavailable-message' })
+  unavailableMessage?: string
 
   /**
    * The calendar the field opens, behind a seam the styled tier can move.
