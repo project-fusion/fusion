@@ -1,4 +1,9 @@
-import { customElement, HelixElement, HelixSelectEvent } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  deepActiveElement,
+  HelixElement,
+  HelixSelectEvent,
+} from '@fusion.dev/helix-core'
 import { html, nothing, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -71,13 +76,13 @@ export class HelixHeadlessSpeedDialItem extends HelixElement {
   /**
    * Whether the action has focus, which is what selected means in a speed dial.
    *
-   * Asked of the document rather than of the shadow root: focus lands on the
-   * control inside this element and the platform retargets it, so from outside
-   * `activeElement` already is this element. `Menu.Item` records the same;
-   * reading it off the shadow root does not survive happy-dom.
+   * The focused node is found through every shadow root, as `Menu.Item` does,
+   * so a dial inside another component's shadow root still knows its current
+   * action.
    */
   get selected(): boolean {
-    return this.ownerDocument.activeElement === this
+    const active = deepActiveElement()
+    return active !== null && active.getRootNode() === this.renderRoot
   }
 
   private choose(): void {
@@ -98,6 +103,7 @@ export class HelixHeadlessSpeedDialItem extends HelixElement {
       type="button"
       aria-disabled=${this.disabled ? 'true' : nothing}
       ?disabled=${this.disabled}
+      tabindex="-1"
       @click=${this.handleClick}
     >
       <span part="icon"><slot name="icon"></slot></span>
