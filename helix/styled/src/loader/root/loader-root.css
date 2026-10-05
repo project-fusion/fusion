@@ -32,7 +32,7 @@
 }
 
 [part="svg"] {
-  animation: helix-loader-turn var(--_loader-turn) linear infinite;
+  animation: helix-loader-turn var(--loader-duration, var(--_loader-turn)) linear infinite;
   grid-area: 1 / 1;
   block-size: var(--loader-size, var(--_loader-size));
   inline-size: var(--loader-size, var(--_loader-size));
@@ -55,7 +55,7 @@
   animation: helix-loader-breathe var(--_loader-breathe) ease-in-out infinite;
   opacity: 0.18;
   stroke: var(--loader-track-color, currentColor);
-  stroke-width: var(--_loader-stroke);
+  stroke-width: var(--loader-track-width, var(--_loader-stroke));
 }
 
 /*
@@ -98,7 +98,7 @@
   stroke: var(--loader-color, currentColor);
   stroke-dasharray: 50, 100;
   stroke-linecap: round;
-  stroke-width: var(--_loader-stroke);
+  stroke-width: var(--loader-track-width, var(--_loader-stroke));
 }
 
 @keyframes helix-loader-turn {
