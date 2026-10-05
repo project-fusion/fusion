@@ -1,4 +1,5 @@
 import {
+  AriaForwardController,
   anchorElement,
   CommandController,
   customElement,
@@ -32,6 +33,10 @@ import { property } from 'lit/decorators.js'
  * commands work as they do on `Dialog` and `Drawer`, so a button anywhere on
  * the page can open the popover with no script.
  *
+ * It closes on Escape, on a press outside it, and when focus moves out of the
+ * trigger and the panel to somewhere else on the page. It does not trap focus.
+ * An `aria-labelledby` on the host names the panel in place of `label`.
+ *
  * @since 0.1.0
  * @status stable
  * @category overlays
@@ -57,6 +62,12 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
    */
   @property()
   label = 'Popover'
+
+  /* `aria-labelledby` and `aria-describedby` written on the host, carried to
+     the panel, which is the `dialog` a reader is on. */
+  protected readonly aria = new AriaForwardController(this, {
+    target: () => this.partNamed('popover'),
+  })
 
   /**
    * Space between the trigger and the panel, in pixels.
@@ -164,6 +175,36 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
     if (this.contains(deepActiveElement())) {
       this.trigger.focus()
     }
+  }
+
+  /**
+   * Focus leaving the control closes the panel.
+   *
+   * A popover does not trap focus, so `Tab` past its last control walks on
+   * into the page, and a panel left open there covers what the reader moved
+   * to. Focus moving between the trigger, the panel and a command's invoker
+   * stays inside the control. With no `relatedTarget`, focus left the
+   * document or went nowhere, and a press outside is already its own signal.
+   */
+  private readonly handleFocusOut = (event: FocusEvent): void => {
+    const next = event.relatedTarget
+    if (!this.open || !(next instanceof Node)) {
+      return
+    }
+    if (this.contains(next) || this.renderRoot.contains(next) || this.invoker?.contains(next)) {
+      return
+    }
+    this.hide()
+  }
+
+  override connectedCallback(): void {
+    super.connectedCallback()
+    this.addEventListener('focusout', this.handleFocusOut)
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    this.removeEventListener('focusout', this.handleFocusOut)
   }
 
   private readonly handleTriggerClick = (): void => {

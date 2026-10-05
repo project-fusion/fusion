@@ -1,4 +1,5 @@
 import {
+  AriaForwardController,
   CommandController,
   customElement,
   HelixElement,
@@ -25,6 +26,10 @@ import { property } from 'lit/decorators.js'
  * `<form method="dialog">` submit. Routing all three through `requestOpen`
  * keeps your state in step, so the dialog never closes while your state still
  * says it is open, which would leave it impossible to reopen.
+ *
+ * The dialog's name is `label` when you set it. Otherwise it is the heading in
+ * the `header` slot, or the elements an `aria-labelledby` on the host names.
+ * While it is open, the page behind it does not scroll.
  *
  * @since 0.1.0
  * @status stable
@@ -64,10 +69,15 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
   closedBy?: 'any' | 'closerequest' | 'none'
 
   /**
-   * Accessible name for the dialog.
+   * Accessible name for the dialog. When it is empty, the heading in the
+   * `header` slot names the dialog.
    */
   @property()
   label = ''
+
+  /* `aria-labelledby` and `aria-describedby` written on the host, carried to
+     the `<dialog>` that is the node a reader is on. */
+  protected readonly aria = new AriaForwardController(this, { target: () => this.dialog })
 
   /* Opened and closed from anywhere on the page, without a line of script:
      `<helix-headless-button commandfor="…" command="--show">`. See `CommandController`
@@ -192,13 +202,82 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
     this.relayNativeEvent(event)
   }
 
+  /**
+   * A `<form method="dialog">` slotted into the dialog, closed the way the
+   * platform closes its own.
+   *
+   * **The platform cannot find this dialog from the form.** A submit with the
+   * `dialog` method closes the nearest `<dialog>` ancestor, and a slotted form's
+   * ancestors are the light DOM, where there is none. So the submit is read
+   * here, and the submitter's `value` is the `returnValue`, as it would be.
+   */
+  private readonly handleSubmit = (event: SubmitEvent): void => {
+    const form = event.target
+    if (!(form instanceof HTMLFormElement) || form.closest('dialog')) {
+      return
+    }
+    const submitter = event.submitter as HTMLButtonElement | HTMLInputElement | null
+    const method = submitter?.hasAttribute('formmethod') ? submitter.formMethod : form.method
+    if (method !== 'dialog') {
+      return
+    }
+    event.preventDefault()
+    this.close(submitter?.hasAttribute('value') ? submitter.value : undefined)
+  }
+
+  /** Whether the `header` slot's heading is what currently names the dialog. */
+  private namedByHeader = false
+
+  /**
+   * Names the dialog by its heading, where nothing else names it.
+   *
+   * An element reference, because the heading is in the light DOM and the
+   * `<dialog>` is in this shadow root, which an IDREF cannot cross. `label` and
+   * an `aria-labelledby` on the host come first, so this steps aside for
+   * either. A browser without element reflection keeps the fallback name.
+   */
+  private nameByHeader(): void {
+    const dialog = this.dialog as
+      | (HTMLDialogElement & { ariaLabelledByElements?: Element[] | null })
+      | null
+    if (!dialog || !('ariaLabelledByElements' in dialog)) {
+      return
+    }
+    const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="header"]')
+    const heading = this.label || this.hasAttribute('aria-labelledby') ? [] : headingsIn(slot)
+    if (heading.length > 0) {
+      dialog.ariaLabelledByElements = heading
+      this.namedByHeader = true
+    } else if (this.namedByHeader) {
+      dialog.ariaLabelledByElements = null
+      this.namedByHeader = false
+    }
+  }
+
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     hostAria(this.internals, { label: this.label })
   }
 
+  override connectedCallback(): void {
+    super.connectedCallback()
+    this.addEventListener('submit', this.handleSubmit)
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    this.removeEventListener('submit', this.handleSubmit)
+    unlockScroll(this)
+  }
+
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    this.nameByHeader()
+    if (this.open) {
+      lockScroll(this)
+    } else {
+      unlockScroll(this)
+    }
     /* After render, because the element has to exist to be opened, and only on
        a difference: `showModal()` on an open dialog throws, and `close()` on a
        shut one fires a second `close` event. */
@@ -241,13 +320,12 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
   /**
    * A press on the backdrop, which lands on the dialog element itself.
    *
-   * **The target alone is not enough here, where it is for `Drawer`.** A modal
-   * `<dialog>` attributes backdrop clicks to itself, which is the usual trick,
-   * and this panel also carries `--dialog-padding` of padding: a press in that
-   * padding has the same target as a press on the backdrop, so the trick alone
-   * closes a dialog when a reader clicks just inside its own edge. The drawer
-   * escapes that because its panel is flush against the window and its content
-   * fills it. So the point is compared against the panel's box.
+   * **The target alone is not enough.** A modal `<dialog>` attributes backdrop
+   * clicks to itself, which is the usual trick, and this panel also carries
+   * `--dialog-padding` of padding: a press in that padding has the same target
+   * as a press on the backdrop, so the trick alone closes a dialog when a reader
+   * clicks just inside its own edge. So the point is compared against the
+   * panel's box. `Drawer` does the same.
    */
   private readonly handleBackdrop = (event: MouseEvent): void => {
     const panel = this.dialog
@@ -342,11 +420,78 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
       @close=${this.handleClose}
     >
       <slot name="icon"></slot>
-      <slot name="header"></slot>
+      <slot name="header" @slotchange=${this.nameByHeader}></slot>
       <slot></slot>
       <slot name="footer"></slot>
     </dialog>`
   }
+}
+
+/**
+ * The headings among a slot's elements, or the elements themselves when none
+ * is a heading or holds one.
+ *
+ * A header region can hold a close button beside its title, and a name that
+ * read "Delete project Close" would be worse than the title alone.
+ */
+const headingsIn = (slot: HTMLSlotElement | null): Element[] => {
+  const assigned = slot?.assignedElements({ flatten: true }) ?? []
+  const heading = 'h1, h2, h3, h4, h5, h6, [role="heading"]'
+  const found = assigned.flatMap((one) =>
+    one.matches(heading) ? [one] : [...one.querySelectorAll(heading)].slice(0, 1),
+  )
+  return found.length > 0 ? found.slice(0, 1) : assigned
+}
+
+/**
+ * The modal surfaces holding the page still, kept on `globalThis` so a dialog
+ * and a drawer from two copies of Helix agree on one count. `Drawer` keeps the
+ * same record under the same key.
+ */
+interface ScrollLock {
+  holders: Set<Element>
+  overflow: string
+  gutter: string
+}
+const SCROLL_LOCK = Symbol.for('fusion.helix.scroll-lock')
+
+/**
+ * Stops the page behind a modal surface from scrolling.
+ *
+ * `showModal()` makes the page inert and leaves it scrollable, so a wheel over
+ * the backdrop moves the page under the dialog. `overflow: hidden` on the root
+ * stops that, and `scrollbar-gutter: stable` keeps the space a classic
+ * scrollbar took, so the page does not shift sideways when it goes. What the
+ * root carried before is put back when the last holder lets go.
+ */
+const lockScroll = (holder: Element): void => {
+  const globals = globalThis as unknown as Record<symbol, ScrollLock | undefined>
+  const root = document.documentElement
+  globals[SCROLL_LOCK] ??= { gutter: '', holders: new Set(), overflow: '' }
+  const lock = globals[SCROLL_LOCK]
+  if (lock.holders.has(holder)) {
+    return
+  }
+  if (lock.holders.size === 0) {
+    lock.overflow = root.style.overflow
+    lock.gutter = root.style.scrollbarGutter
+    if (window.innerWidth > root.clientWidth) {
+      root.style.scrollbarGutter = 'stable'
+    }
+    root.style.overflow = 'hidden'
+  }
+  lock.holders.add(holder)
+}
+
+/** Lets go of the page, and gives it back once nothing else holds it. */
+const unlockScroll = (holder: Element): void => {
+  const lock = (globalThis as unknown as Record<symbol, ScrollLock | undefined>)[SCROLL_LOCK]
+  if (!lock?.holders.delete(holder) || lock.holders.size > 0) {
+    return
+  }
+  const root = document.documentElement
+  root.style.overflow = lock.overflow
+  root.style.scrollbarGutter = lock.gutter
 }
 
 declare global {

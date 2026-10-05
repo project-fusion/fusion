@@ -87,6 +87,57 @@ describe('popover', () => {
   })
 })
 
+describe('focus leaving a popover', () => {
+  /* The panel traps nothing, so `Tab` past its last control walks on into the
+     page. Left open there, it covered what the reader had moved to. */
+  const leave = async (to: (host: Popover) => Element): Promise<boolean> => {
+    document.body.innerHTML = ''
+    const host = await popover()
+    const after = document.createElement('button')
+    document.body.append(after)
+    host.show()
+    await host.updateComplete
+    const inside = host.querySelector('span') as HTMLElement
+    inside.dispatchEvent(
+      new FocusEvent('focusout', { bubbles: true, composed: true, relatedTarget: to(host) }),
+    )
+    await host.updateComplete
+    return hasState(host, 'open')
+  }
+
+  test('closes it when focus goes elsewhere on the page', async () => {
+    expect(await leave(() => document.body.lastElementChild as Element)).toBe(false)
+  })
+
+  test('and keeps it open while focus moves between the trigger and the panel', async () => {
+    expect(await leave((host) => host.querySelector('button') as Element)).toBe(true)
+  })
+})
+
+describe('the popover’s name', () => {
+  test('is what a host `aria-labelledby` names, carried to the panel', async () => {
+    document.body.innerHTML = ''
+    const host = (await mount(
+      `<div><h3 id="title">Filters</h3>
+        <helix-headless-popover aria-labelledby="title"><span>Body</span></helix-headless-popover>
+      </div>`,
+    )) as HTMLElement
+    const popoverHost = host.querySelector('helix-headless-popover') as Popover & {
+      requestUpdate(): void
+    }
+    await popoverHost.updateComplete
+    /* happy-dom has no ARIA element reflection, so the accessor is stood in. */
+    const panel = part(popoverHost, 'popover') as HTMLElement & Record<string, unknown>
+    if (!('ariaLabelledByElements' in panel)) {
+      Object.defineProperty(panel, 'ariaLabelledByElements', { value: null, writable: true })
+    }
+    popoverHost.requestUpdate()
+    await popoverHost.updateComplete
+    const named = (panel.ariaLabelledByElements as Element[] | null) ?? []
+    expect(named.map((one) => one.id)).toEqual(['title'])
+  })
+})
+
 if (hasLayout()) {
   describe('popover in a browser', () => {
     test('the trigger opens it, and pressing it again closes it', async () => {

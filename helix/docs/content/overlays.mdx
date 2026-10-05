@@ -70,13 +70,19 @@ checks focus by walking through the shadow roots.
 Nested overlays work because lifecycle events do not bubble.
 `helix-before-open` and `helix-before-close` do not bubble and are not composed,
 so a menu that closes inside a dialog does not close the dialog. `Escape` closes
-the innermost overlay and leaves the others open.
+the innermost overlay and leaves the others open. The overlay that closes
+cancels the key press, so a `Dialog` or `Drawer` around it stays open until you
+press `Escape` again.
 
 ## Where focus goes
 
 A modal overlay keeps `Tab` inside itself while it is open, and it returns focus
-to the element that opened it. `Dialog` and `Drawer` always do this. `Popover`
-does it only in its modal mode.
+to the element that opened it. `Dialog` does this, and so does `Drawer` unless
+you set `modal="false"`. The page behind a modal `Dialog` or `Drawer` does not
+scroll while it is open.
+
+`Popover` does not trap focus. When focus moves out of its trigger and its
+panel, the popover closes.
 
 **A tooltip never takes focus.** A tooltip only describes a control, so it
 cannot contain a button. For something with a button in it, use a `Popover`.
