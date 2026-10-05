@@ -322,3 +322,46 @@ describe('the palette says how many commands are left', () => {
     expect(flattened.map((node) => node.textContent).join('')).toContain('to close')
   })
 })
+
+describe('a command that is a link', () => {
+  const linked = `<helix-headless-command label="Commands">
+    <helix-headless-option value="docs" href="/docs">Read the docs</helix-headless-option>
+  </helix-headless-command>`
+  const followed: string[] = []
+  document.addEventListener(
+    'click',
+    (event) => {
+      if (event.target instanceof HTMLAnchorElement) {
+        followed.push(event.target.getAttribute('href') ?? '')
+        event.preventDefault()
+      }
+    },
+    { capture: true },
+  )
+
+  test('closes the palette, says its href, and the link is followed', async () => {
+    followed.length = 0
+    const host = await palette(linked)
+    host.open = true
+    await settle(host)
+    const said: unknown[] = []
+    host.addEventListener('helix-select', (event) => said.push((event as CustomEvent).detail))
+    ;(host.firstElementChild as HTMLElement & { select(): void }).select()
+    await settle(host)
+    expect(said).toEqual([{ href: '/docs', value: 'docs' }])
+    expect(host.open).toBe(false)
+    expect(followed).toEqual(['/docs'])
+  })
+
+  test('canceled, keeps the palette open and follows nothing', async () => {
+    followed.length = 0
+    const host = await palette(linked)
+    host.open = true
+    await settle(host)
+    host.addEventListener('helix-select', (event) => event.preventDefault())
+    ;(host.firstElementChild as HTMLElement & { select(): void }).select()
+    await settle(host)
+    expect(host.open).toBe(true)
+    expect(followed).toEqual([])
+  })
+})

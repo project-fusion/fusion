@@ -724,3 +724,57 @@ describe('ranges from the keyboard', () => {
     expect(host.value.split(',').sort()).toEqual(['one', 'three', 'two'])
   })
 })
+
+describe('an option that is a link', () => {
+  const linked = async (extra = ''): Promise<Updatable & { value: string }> => {
+    document.body.innerHTML = `<helix-headless-listbox label="L" ${extra}>
+      <helix-headless-option value="one">Alpha</helix-headless-option>
+      <helix-headless-option value="docs" href="/docs">Docs</helix-headless-option>
+    </helix-headless-listbox>`
+    const host = document.body.firstElementChild as Updatable & { value: string }
+    await settle(host)
+    return host
+  }
+  const followed: string[] = []
+  document.addEventListener(
+    'click',
+    (event) => {
+      if (event.target instanceof HTMLAnchorElement) {
+        followed.push(event.target.getAttribute('href') ?? '')
+        event.preventDefault()
+      }
+    },
+    { capture: true },
+  )
+
+  test('is passed over by the arrows without being chosen or followed', async () => {
+    followed.length = 0
+    const host = await linked('default-value="one"')
+    await press(host, 'ArrowDown')
+    expect(host.value).toBe('one')
+    expect(followed).toEqual([])
+  })
+
+  test('is followed by Enter, and the selection stays as it was', async () => {
+    followed.length = 0
+    const host = await linked('manual default-value="one"')
+    await press(host, 'ArrowDown')
+    await press(host, 'Enter')
+    expect(followed).toEqual(['/docs'])
+    expect(host.value).toBe('one')
+  })
+
+  test('is followed by a press, and its helix-select reaches the page', async () => {
+    followed.length = 0
+    const host = await linked()
+    const said: unknown[] = []
+    document.body.addEventListener('helix-select', (event) =>
+      said.push((event as CustomEvent).detail),
+    )
+    ;(host.children[1] as HTMLElement & { select(): void }).select()
+    await settle(host)
+    expect(followed).toEqual(['/docs'])
+    expect(said).toEqual([{ href: '/docs', value: 'docs' }])
+    expect(host.value).toBe('')
+  })
+})

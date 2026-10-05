@@ -155,6 +155,9 @@ const rangeFor = (root: Element, needle: string): Range[] => {
  * Control+A or Command+A chooses every option, or none where all are chosen.
  * In a filter field, Space, Home, End and letters edit the text.
  *
+ * An option with `href` is a link: Enter or a press follows it and selects
+ * nothing, and moving onto it with the arrows does not follow it.
+ *
  * As a filter narrows the list, a screen reader hears how many options are
  * left, such as "3 results", from `result-label` and `results-label`. A filter
  * that leaves none says `empty-text`.
@@ -575,6 +578,11 @@ export class HelixHeadlessListbox extends MixinCollection(
      set, and a consumer on this element refuses with `helix-before-change`,
      which `choose` dispatches through the mixin. */
   private readonly handleSelection = (event: HelixSelectEvent): void => {
+    /* A link is followed, not chosen: its event goes on to the page, which may
+       cancel it and route there itself, and the selection stays as it was. */
+    if (event.detail.href !== undefined) {
+      return
+    }
     event.stopPropagation()
     if (event.defaultPrevented) {
       return
@@ -606,7 +614,15 @@ export class HelixHeadlessListbox extends MixinCollection(
     if (event.key === 'Enter' || (event.key === ' ' && !typing && !this.typeahead.typing())) {
       /* Only where there is something to choose, so an Enter over a list with
          no highlight is left to the page, which may submit a form with it. */
-      if (this.activeValue !== '') {
+      const link = shown.find((option) => option.value === this.activeValue && Boolean(option.href))
+      if (link !== undefined) {
+        /* Enter follows a link, as Enter on an anchor does, and Space does
+           nothing to one, as Space on an anchor does nothing. */
+        event.preventDefault()
+        if (event.key === 'Enter') {
+          link.select(event)
+        }
+      } else if (this.activeValue !== '') {
         event.preventDefault()
         this.choose(this.activeValue)
       } else if (event.key === ' ') {
@@ -704,7 +720,10 @@ export class HelixHeadlessListbox extends MixinCollection(
   private arrive(value: string): void {
     this.parked = false
     this.activeValue = value
-    if (!this.multiple && !this.manual && !this.forwarded) {
+    /* Nor a link, which is followed by Enter or a press and never on the way
+       past: moving onto a link must not leave the page. */
+    const link = this.options.some((option) => option.value === value && Boolean(option.href))
+    if (!this.multiple && !this.manual && !this.forwarded && !link) {
       this.choose(value)
     }
   }
