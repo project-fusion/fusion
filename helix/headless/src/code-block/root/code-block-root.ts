@@ -1,6 +1,6 @@
 import { customElement, HelixElement } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { property, state } from 'lit/decorators.js'
 import { unsafeHTML } from 'lit/directives/unsafe-html.js'
 import { html } from 'lit/static-html.js'
 import '../../copy-button/index.js'
@@ -26,6 +26,12 @@ import { type DiffFile, type DiffHunk, type DiffLine, pairLines, parsePatch } fr
  * function that turns the code into highlighted markup, such as one wrapping
  * Shiki or Prism, and the block draws what it returns; the code stays in the
  * slot, so the copy button and the page's own text are the code as written.
+ *
+ * Set `expandable` on a block whose height is capped, such as by
+ * `--code-block-max-block-size`, and a button under it shows every line and
+ * then fewer again, as a docs site's long example does. The button is drawn
+ * only while the cap hides something, says whether the block is expanded, and
+ * the block carries `:state(expanded)` while it is.
  *
  * Set `diff` to show a change. Put a unified diff, the output of `git diff` or
  * `diff -u`, in the same slot, and the block draws the lines it added and
@@ -68,6 +74,7 @@ import { type DiffFile, type DiffHunk, type DiffLine, pairLines, parsePatch } fr
  * @csspart copy-tooltip-left - The tooltip while it is left of the copy button. Applied with `copy-tooltip`.
  * @csspart copy-tooltip-right - The tooltip while it is right of the copy button. Applied with `copy-tooltip`.
  * @csspart copy-tooltip-top - The tooltip while it is above the copy button. Applied with `copy-tooltip`.
+ * @csspart expand - The button under a capped block that shows every line, and fewer again. Drawn when `expandable` is set and the cap hides something.
  * @csspart file - In a diff, one file's header and block.
  * @csspart filler - In a split diff, the empty row opposite a line the other side does not have.
  * @csspart frame - The code, and the copy button beside it where there is no header.
@@ -82,9 +89,17 @@ import { type DiffFile, type DiffHunk, type DiffLine, pairLines, parsePatch } fr
  * @csspart removed - In a diff, a line only the old version has, a `<del>`.
  * @csspart split - In a split diff, the two versions side by side.
  * @csspart text - In a diff, a line's code.
+ *
+ * @cssstate expanded - The expand button has shown every line of a capped block.
  */
 @customElement('helix-headless-code-block')
 export class HelixHeadlessCodeBlock extends HelixElement {
+  /**
+   * The expand button's words while the block shows every line.
+   */
+  @property({ attribute: 'collapse-label' })
+  collapseLabel = 'Show fewer lines'
+
   /**
    * The copy button's name and tooltip text after a copy.
    */
@@ -109,6 +124,23 @@ export class HelixHeadlessCodeBlock extends HelixElement {
    */
   @property({ reflect: true, type: Boolean })
   diff = false
+
+  /**
+   * Whether a block whose height is capped takes a button that shows every
+   * line, and fewer again.
+   *
+   * The cap is the page's, `--code-block-max-block-size` on the styled tier;
+   * the button is drawn only while the cap hides something, measured as the
+   * block lays out. Not for a diff, whose files each scroll on their own.
+   */
+  @property({ type: Boolean })
+  expandable = false
+
+  /**
+   * The expand button's words while the cap hides lines.
+   */
+  @property({ attribute: 'expand-label' })
+  expandLabel = 'Show all lines'
 
   /**
    * Turns the code into highlighted markup, which the block draws in place of
@@ -235,6 +267,58 @@ export class HelixHeadlessCodeBlock extends HelixElement {
    */
   private observer: MutationObserver | undefined
 
+  /** Whether the cap hides lines, measured from the drawn block. */
+  @state()
+  private capped = false
+
+  /** Whether the expand button has shown every line. */
+  @state()
+  private expanded = false
+
+  /** Watches the drawn code's size, while the block is expandable. */
+  private sizes: ResizeObserver | undefined
+
+  /**
+   * Reads whether the cap hides lines: the scroller is taller inside than it
+   * is drawn. The styled tier caps the `<code>`, and a page may cap the
+   * `<pre>`, so both are asked. Not while expanded, which shows everything.
+   */
+  private readonly measure = (): void => {
+    if (this.expanded) {
+      return
+    }
+    const boxes = [
+      ...(this.renderRoot?.querySelectorAll<HTMLElement>('[part="block"], [part="code"]') ?? []),
+    ]
+    this.capped = boxes.some((box) => box.scrollHeight > box.clientHeight + 1)
+  }
+
+  /* Measured after each render, and again whenever the drawn code changes
+     size, which a font arriving or a narrower page does with no render. */
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    if (!this.expandable || this.diff || typeof ResizeObserver === 'undefined') {
+      this.sizes?.disconnect()
+      this.sizes = undefined
+      this.capped = false
+      return
+    }
+    this.sizes ??= new ResizeObserver(this.measure)
+    this.sizes.disconnect()
+    for (const box of this.renderRoot.querySelectorAll('[part="block"], [part="code"]')) {
+      this.sizes.observe(box)
+    }
+    this.measure()
+  }
+
+  private toggleExpanded(): void {
+    this.expanded = !this.expanded
+    this.toggleState('expanded', this.expanded)
+    if (!this.expanded) {
+      this.updateComplete.then(this.measure)
+    }
+  }
+
   override connectedCallback(): void {
     super.connectedCallback()
     if (typeof MutationObserver !== 'undefined') {
@@ -245,6 +329,8 @@ export class HelixHeadlessCodeBlock extends HelixElement {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    this.sizes?.disconnect()
+    this.sizes = undefined
     this.observer?.disconnect()
   }
 
@@ -287,7 +373,26 @@ export class HelixHeadlessCodeBlock extends HelixElement {
       <div part="frame">
         <pre part="block">${gutter}${code}</pre>
         ${this.label ? nothing : this.renderCopy()}
-      </div>`
+      </div>${this.renderExpand()}`
+  }
+
+  /**
+   * The button that shows every line of a capped block, and fewer again, or
+   * nothing while the cap hides nothing. Not on a server, which cannot
+   * measure, so a served block draws none and the client adds it.
+   */
+  private renderExpand(): TemplateResult | typeof nothing {
+    if (!this.expandable || !(this.capped || this.expanded)) {
+      return nothing
+    }
+    return html`<button
+      aria-expanded=${this.expanded ? 'true' : 'false'}
+      part="expand"
+      type="button"
+      @click=${() => this.toggleExpanded()}
+    >
+      ${this.expanded ? this.collapseLabel : this.expandLabel}
+    </button>`
   }
 
   /**

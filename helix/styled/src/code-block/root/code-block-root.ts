@@ -32,9 +32,10 @@ import '../../copy-button/index.js'
  * @cssproperty --code-block-backdrop - A backdrop filter for the block and its header, for a translucent background.
  * @cssproperty --code-block-background-color - The background behind the code. Set it for a block that sits on a surface other than the page background.
  * @cssproperty --code-block-border-color - The line around the block and its header.
+ * @cssproperty --code-block-expand-color - The color of the button under a capped block that shows every line.
  * @cssproperty --code-block-gutter-color - The color of the line numbers.
  * @cssproperty --code-block-header-background-color - The background behind the name. The default is `surface-raised`.
- * @cssproperty --code-block-max-block-size - The tallest the code grows before it scrolls. The default is no limit.
+ * @cssproperty --code-block-max-block-size - The tallest the code grows before it scrolls, or until `expandable`'s button shows every line. The default is no limit.
  * @cssproperty --code-block-radius - The corner radius of the header's top and the block's bottom, which form one shape.
  */
 @customElement('helix-code-block')

@@ -1,0 +1,4 @@
+/* A cap a docs page might set on every long example. */
+helix-code-block {
+  --code-block-max-block-size: 8rem;
+}

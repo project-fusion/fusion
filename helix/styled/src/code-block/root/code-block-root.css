@@ -145,6 +145,36 @@
   overflow-x: auto;
 }
 
+/* Every line, once the expand button has asked for them. */
+:host(:state(expanded)) [part="code"] {
+  max-block-size: none;
+}
+
+/* Under the block, a quiet line of text rather than a second control bar:
+   it adds lines to what is there and is read after them. */
+[part="expand"] {
+  all: unset;
+  /* `all: unset` takes `box-sizing` with it; restored here, as everywhere. */
+  box-sizing: border-box;
+  border-radius: var(--helix-radii-sm);
+  color: var(--code-block-expand-color, var(--helix-color-foreground-muted));
+  cursor: pointer;
+  display: block;
+  font-size: var(--helix-text-sm);
+  margin-block-start: var(--helix-space-2xs);
+  padding-block: var(--helix-space-2xs);
+  padding-inline: var(--helix-space-xs);
+}
+
+[part="expand"]:hover {
+  color: var(--helix-color-foreground);
+}
+
+[part="expand"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
 /* Wrapped rather than scrolled, for prose-like code. Anywhere, since a long
    path or a hash has no space to break at. Not under line numbers, where a
    wrapped line would take one number and several rows. */
