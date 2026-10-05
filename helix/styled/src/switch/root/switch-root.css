@@ -70,10 +70,14 @@
    this size the shadow was only ever doing the separating a border does
    honestly.
 
-   On the groove rather than in it, because the thumb is paint and this is the
-   tier that paints. It was already out of flow, so the groove's one grid cell
-   still holds the input alone and nothing about the track moved. */
-[part="track"]::after {
+   An element on this tier, so it is a part and can hold an icon. Out of flow,
+   so the groove's one grid cell still holds the input alone and nothing about
+   the track moved. */
+[part="thumb"] {
+  align-items: center;
+  color: var(--switch-icon-color, var(--helix-color-foreground-muted));
+  display: flex;
+  justify-content: center;
   /*
  *  Over the groove rather than on it, which is `overlay` and is the same token
  *      the segmented control's thumb takes for the same reason. `raised` is the
@@ -86,7 +90,6 @@
   block-size: calc(var(--_switch-height) - var(--_switch-inset) * 2);
   border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-full);
-  content: "";
   inline-size: calc(var(--_switch-height) - var(--_switch-inset) * 2);
   inset-block-start: 50%;
   /*
@@ -108,8 +111,14 @@
 /* No hairline once it is on: the thumb is white on the accent, which separates
    it further than a border would, and a border there reads as an outline drawn
    around something already distinct. */
-:host(:state(checked)) [part="track"]::after {
+:host(:state(checked)) [part="thumb"] {
   border-color: transparent;
+  color: var(--switch-icon-color, var(--switch-on-color, var(--helix-color-primary)));
+}
+
+/* An icon takes most of the thumb, and the thumb's own color. */
+[part="thumb"] ::slotted(*) {
+  --icon-size: calc((var(--_switch-height) - var(--_switch-inset) * 2) * 0.7);
 }
 
 /* Color, and this is the one control that needs it. A checkbox says "on" with
@@ -133,7 +142,7 @@
   opacity: 0;
 }
 
-:host(:state(checked)) [part="track"]::after {
+:host(:state(checked)) [part="thumb"] {
   /* On the primary now, so it takes the label meant to sit on it: white on a
      brand, and the page's own color on ink, which is light in the dark. `raised`
      against the brand is a dark thumb on a mid blue in dark mode, and a white
@@ -146,7 +155,7 @@
 
 /* `:has()` rather than the adjacent combinator the element took: the thumb is
    no longer a sibling of anything, and the input is the groove's only child. */
-[part="track"]:has([part="control"]:focus-visible)::after {
+[part="track"]:has([part="control"]:focus-visible) [part="thumb"] {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
 }
