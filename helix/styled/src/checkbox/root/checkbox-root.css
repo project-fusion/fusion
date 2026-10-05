@@ -113,6 +113,23 @@
   mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M7 12h10'/%3E%3C/svg%3E");
 }
 
+/* A slotted icon is the mark for its shape, so the mask and the fill go and the
+   icon takes the ink. It still scales in and out with the mark. */
+:host(:state(has-check)) [part~="mark"]:not([part~="mark-dash"]),
+:host(:state(has-dash)) [part~="mark-dash"] {
+  background-color: transparent;
+  color: var(--checkbox-mark-color, var(--helix-color-foreground));
+  display: grid;
+  mask-image: none;
+  place-items: center;
+}
+
+slot[name="check"]::slotted(*),
+slot[name="dash"]::slotted(*) {
+  block-size: var(--checkbox-icon-size, 100%);
+  inline-size: var(--checkbox-icon-size, 100%);
+}
+
 /* Offset, because the ring surrounds a box whose own edge is not moving. */
 [part="control"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);

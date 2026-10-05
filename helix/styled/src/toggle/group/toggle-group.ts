@@ -32,7 +32,12 @@ import { styles } from './toggle-group.css.js'
  *
  * @csspart indicator - The moving marker behind the selected item.
  *
- * @cssproperty --toggle-group-indicator-color - The fill of the moving marker.
+ * @cssproperty --toggle-group-background-color - The groove behind the items, when the group is framed.
+ * @cssproperty --toggle-group-border-color - The edge of the groove, when the group is framed.
+ * @cssproperty --toggle-group-indicator-color - The fill of the moving marker, and of each pressed item under `selection-mode="multiple"`.
+ * @cssproperty --toggle-group-indicator-shadow - The shadow of the moving marker and of each pressed item.
+ * @cssproperty --toggle-group-item-radius - Corner radius of each item, the marker, and a pressed item's fill. Without it, the curve stays concentric with the groove.
+ * @cssproperty --toggle-group-radius - Corner radius of the groove, when the group is framed.
  */
 @customElement('helix-toggle-group')
 export class HelixToggleGroup extends HelixHeadlessToggleGroup {

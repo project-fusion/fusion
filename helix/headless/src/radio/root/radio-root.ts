@@ -35,15 +35,19 @@ import { property } from 'lit/decorators.js'
  * replaces the visible label, and the label becomes the name read by screen
  * readers. The icon has its own slot so the chip can hide the label and show
  * the icon.
+ * @slot indicator - An icon drawn inside the circle in place of the dot, such
+ * as a check mark.
  *
  * @event {HelixSelectEvent} helix-select - Fired when the radio is chosen. Cancelable: call `preventDefault()` to keep the current choice.
  *
  * @csspart box - The circle. Draw the dot inside it with `::part(box)::after` in
- * your stylesheet. This tier ships no CSS, so it renders no separate element for
- * the dot, which would add an empty child to your layout.
+ * your stylesheet, or slot an icon into `indicator`. This tier ships no CSS, so
+ * it renders no separate element for the dot, which would add an empty child to
+ * your layout.
  * @csspart item - The button, which covers the whole row.
  * @csspart label - The label beside the circle.
  *
+ * @cssstate has-indicator - An icon is slotted into `indicator`.
  * @cssstate selected - The radio is chosen.
  */
 @customElement('helix-headless-radio')
@@ -149,7 +153,16 @@ export class HelixHeadlessRadio extends MixinSelectableItem(HelixElement) {
       tabindex=${(this.focusable ?? this.selected) || !this.childrenKnown ? '0' : '-1'}
       @click=${() => this.select()}
     >
-      <span part="box"></span>
+      <span part="box"
+        ><slot
+          name="indicator"
+          @slotchange=${(event: Event) =>
+            this.toggleState(
+              'has-indicator',
+              (event.target as HTMLSlotElement).assignedNodes().length > 0,
+            )}
+        ></slot
+      ></span>
       <slot name="icon"></slot>
       <span part="label"><slot></slot></span>
     </button>`

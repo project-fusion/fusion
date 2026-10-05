@@ -1,3 +1,15 @@
+/* Copy Button's own hooks, over the icon button's defaults. Each falls back to
+   what the icon button draws, and the icon button's hook still reaches it. A
+   `tone` keeps its own ink. */
+:host {
+  --_icon-button-ink: var(--copy-button-color, var(--helix-color-foreground-muted));
+  --_icon-button-ink-hover: var(
+    --copy-button-color-hover,
+    var(--copy-button-color, var(--helix-color-foreground))
+  );
+  --_icon-button-size: var(--copy-button-size, var(--icon-button-size, var(--helix-size-control)));
+}
+
 /* The confirmation must not resize the button. */
 [part="button"] {
   display: inline-grid;
@@ -18,7 +30,7 @@ slot[hidden] {
 
 /* The confirmation is the one moment this control is allowed to be loud. */
 [part="button"][data-copied] {
-  color: var(--helix-color-success);
+  color: var(--copy-button-success-color, var(--helix-color-success));
 }
 
 /* And it stays loud under the pointer, which needs this second rule.
@@ -27,22 +39,22 @@ slot[hidden] {
    hover wins on specificity whatever the order of the sheets, so the check mark
    goes back to the hover ink at the one moment a reader is looking at it. */
 :host(:not(:disabled)) [part="button"][data-copied]:hover {
-  color: var(--helix-color-success);
+  color: var(--copy-button-success-color, var(--helix-color-success));
 }
 
 /* A press that put nothing on the clipboard says so in the danger ink, held
    under the pointer for the same reason as the confirmation. */
 [part="button"][data-failed],
 :host(:not(:disabled)) [part="button"][data-failed]:hover {
-  color: var(--helix-color-danger);
+  color: var(--copy-button-error-color, var(--helix-color-danger));
 }
 
 /* The fallback icons need sizing here, and this is the whole reason why.
    Measured: both glyphs rendered, both took the right color, and both came out
    0x0, so the button was a correctly sized box containing nothing. */
 slot > svg {
-  block-size: var(--helix-size-icon-tight);
-  inline-size: var(--helix-size-icon-tight);
+  block-size: var(--copy-button-icon-size, var(--helix-size-icon-tight));
+  inline-size: var(--copy-button-icon-size, var(--helix-size-icon-tight));
 }
 
 /* Not printed, being a control. */

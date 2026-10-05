@@ -40,8 +40,16 @@ import { styles } from './number-input-root.css.js'
  *
  * @cssproperty --number-input-background-color - The fill behind the number.
  * @cssproperty --number-input-border-color - Edge of the field at rest. Hover, focus and an error still draw their own.
+ * @cssproperty --number-input-padding-inline - Space at each side of the number, inside the steppers.
  * @cssproperty --number-input-radius - Corner radius of the field.
  * @cssproperty --number-input-size - Height of the field.
+ * @cssproperty --number-input-stepper-background-color - Fill behind each stepper button at rest.
+ * @cssproperty --number-input-stepper-background-color-hover - Fill behind a stepper button under the pointer.
+ * @cssproperty --number-input-stepper-border-color - The rule between each stepper button and the number.
+ * @cssproperty --number-input-stepper-color - Icon color of the stepper buttons at rest.
+ * @cssproperty --number-input-stepper-color-hover - Icon color of a stepper button under the pointer.
+ * @cssproperty --number-input-stepper-icon-size - Width and height of the stepper icons.
+ * @cssproperty --number-input-stepper-size - Width of each stepper button.
  */
 @customElement('helix-number-input')
 export class HelixNumberInput extends HelixHeadlessNumberInput {

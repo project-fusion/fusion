@@ -72,6 +72,30 @@ describe('checkbox', () => {
     expect(names()).toBe('mark')
   })
 
+  /* Web Awesome and Shoelace name the check and the dash as parts of their
+     own. The mark was a masked box with nothing to put in it. */
+  test('the mark holds the check slot, and the dash slot while it draws the dash', async () => {
+    const box = await checkbox('indeterminate')
+    const slots = (): (string | null)[] =>
+      [...(part(box, 'mark')?.querySelectorAll('slot') ?? [])].map((slot) => slot.name)
+    expect(slots()).toEqual(['dash'])
+    box.indeterminate = false
+    box.checked = true
+    await box.updateComplete
+    expect(slots()).toEqual(['check'])
+  })
+
+  if (hasLayout()) {
+    test('an icon in a mark slot is recorded, so the stylesheet drops its own shape', async () => {
+      const box = (await mount(
+        '<helix-headless-checkbox checked>Terms<svg slot="check"></svg></helix-headless-checkbox>',
+      )) as Checkbox
+      await settle(box)
+      expect(hasState(box, 'has-check')).toBe(true)
+      expect(hasState(box, 'has-dash')).toBe(false)
+    })
+  }
+
   test('is a real input, so the platform gives it the space key and the tick', async () => {
     const box = await checkbox()
     expect(control(box).type).toBe('checkbox')

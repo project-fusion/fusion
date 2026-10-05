@@ -19,6 +19,8 @@ import { HelixHeadlessButton } from '../../button/root/button-root.js'
  * mean a part of a button, and an icon-only button is a complete button with
  * different content and a different shape.
  *
+ * **Keyboard.** Enter and Space press the button, as `Button`'s do.
+ *
  * @since 0.1.0
  * @status stable
  * @category actions

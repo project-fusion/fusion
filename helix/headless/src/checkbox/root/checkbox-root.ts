@@ -29,6 +29,16 @@ import { property } from 'lit/decorators.js'
  * it as neither checked nor unchecked, it never submits, and the first click
  * resolves it.
  *
+ * **Keyboard.** The box is one tab stop.
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Space | Checks or unchecks the box, and resolves `indeterminate`. |
+ *
+ * The native input reports checked, unchecked, or mixed. `aria-readonly` is set
+ * under `readonly`, and `aria-invalid` and `aria-describedby` point at the
+ * message while one shows.
+ *
  * @since 0.1.0
  * @status stable
  * @category forms
@@ -36,6 +46,8 @@ import { property } from 'lit/decorators.js'
  * @documentation https://fusion.dev/helix/components/checkbox
  *
  * @slot - The label.
+ * @slot check - An icon drawn as the mark while the box is checked, in place of the tick.
+ * @slot dash - An icon drawn as the mark while the box is indeterminate, in place of the dash.
  * @slot feedback - The message that says what is wrong, for content richer than a string. It shows while there is a message.
  * @slot hint - Help under the control, for content richer than the `hint` text.
  *
@@ -55,6 +67,8 @@ import { property } from 'lit/decorators.js'
  * @csspart mark-indeterminate - Added to `mark` while the box is indeterminate.
  *
  * @cssstate checked - While the box is checked.
+ * @cssstate has-check - An icon is slotted into `check`.
+ * @cssstate has-dash - An icon is slotted into `dash`.
  * @cssstate has-label - The label slot has content, so the label is drawn.
  * @cssstate indeterminate - While the box shows the dash, neither checked nor unchecked.
  * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
@@ -185,6 +199,21 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
   }
 
   /**
+   * Records which of the mark's slots hold an icon, as `:state(has-check)` and
+   * `:state(has-dash)`, so a stylesheet drops its own drawing of that shape.
+   * A state, for the reason `:state(has-label)` is one.
+   */
+  private readonly handleMarkChange = (event: Event): void => {
+    const slot = event.target as HTMLSlotElement
+    const filled = slot.assignedNodes().length > 0
+    if (slot.name === 'dash') {
+      this.toggleState('has-dash', filled)
+    } else {
+      this.toggleState('has-check', filled)
+    }
+  }
+
+  /**
    * Asks the slot, and records the answer as a state.
    *
    * Called on `slotchange` and after every update, and the second is not
@@ -274,7 +303,14 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
         <span
           part="mark${this.checked ? ' mark-checked' : ''}${this.indeterminate ? ' mark-indeterminate' : ''}${this.dashed ? ' mark-dash' : ''}"
           aria-hidden="true"
-        ></span>
+          >${
+            /* One slot at a time, since a slot holds its content on screen
+               whatever its own `hidden` says, and this tier has no sheet. */
+            this.dashed
+              ? html`<slot name="dash" @slotchange=${this.handleMarkChange}></slot>`
+              : html`<slot name="check" @slotchange=${this.handleMarkChange}></slot>`
+          }</span
+        >
       </span>
       <span part="label" ?data-hidden=${named !== null}
         ><slot @slotchange=${this.handleLabelChange}>${this.label || named}</slot></span

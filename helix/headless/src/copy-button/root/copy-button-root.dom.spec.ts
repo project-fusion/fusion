@@ -53,6 +53,20 @@ describe('copy button', () => {
     expect(button.hasAttribute('data-copied')).toBe(true)
   })
 
+  test('holds the confirmation for feedback-duration, then goes back to its label', async () => {
+    clipboard('accept')
+    const el = await mount(
+      '<helix-headless-copy-button feedback-duration="30" value="one"></helix-headless-copy-button>',
+    )
+    const button = el.shadowRoot?.querySelector('[part="button"]') as HTMLButtonElement
+    await press(el)
+    expect(button.getAttribute('aria-label')).toBe('Copied')
+    await new Promise((done) => setTimeout(done, 60))
+    await (el as Updatable).updateComplete
+    expect(button.hasAttribute('data-copied')).toBe(false)
+    expect(button.getAttribute('aria-label')).toBe('Copy')
+  })
+
   test('announces what it copied, after the write', async () => {
     clipboard('accept')
     const el = (await mount(
