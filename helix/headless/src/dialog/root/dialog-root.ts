@@ -6,12 +6,14 @@ import {
   hostAria,
   lockScroll,
   MixinControllerOpen,
+  OpenPhaseController,
   unlockScroll,
 } from '@fusion.dev/helix-core'
 import { x } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
+import { wordsIn } from '../description.js'
 
 /**
  * @summary A modal window built on the native `<dialog>` element.
@@ -126,6 +128,17 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
    */
   @property()
   label = ''
+
+  /* `:state(entering)` and `:state(exiting)`, for a stylesheet drawing the
+     journey in or out. */
+  protected readonly phases = new OpenPhaseController(this, {
+    mark: {
+      entering: (on) => this.toggleState('entering', on),
+      exiting: (on) => this.toggleState('exiting', on),
+    },
+    open: () => this.open,
+    surface: () => this.dialog,
+  })
 
   /* `aria-labelledby` and `aria-describedby` written on the host, carried to
      the `<dialog>` that is the node a reader is on. */
@@ -337,35 +350,6 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
     }
   }
 
-  /** Which run of entering or exiting is the latest, so an old one cannot clear a new one. */
-  private phase = 0
-
-  /**
-   * Says on the host that the dialog is on its way in or out, until its
-   * animations have finished.
-   *
-   * `:state(open)` turns at once, which is right for what the dialog is and too
-   * early for a stylesheet that wants to draw the journey: an exit has to know
-   * it is an exit while the panel is still on screen. Cleared when every
-   * animation on the panel and its backdrop has finished, or two frames after
-   * the change when nothing animates.
-   */
-  private markPhase(changed: PropertyValues): void {
-    if (!changed.has('open') || changed.get('open') === undefined) {
-      return
-    }
-    this.phase += 1
-    const turn = this.phase
-    this.toggleState('entering', this.open)
-    this.toggleState('exiting', !this.open)
-    void settled(this.dialog).then(() => {
-      if (turn === this.phase) {
-        this.toggleState('entering', false)
-        this.toggleState('exiting', false)
-      }
-    })
-  }
-
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     hostAria(this.internals, { label: this.label })
@@ -386,7 +370,6 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
     super.updated(changed)
     this.nameByHeader()
     this.describeByBody()
-    this.markPhase(changed)
     if (this.open) {
       lockScroll(this)
     } else {
@@ -586,53 +569,6 @@ const headingsIn = (slot: HTMLSlotElement | null): Element[] => {
     one.matches(heading) ? [one] : [...one.querySelectorAll(heading)].slice(0, 1),
   )
   return found.length > 0 ? found.slice(0, 1) : assigned
-}
-
-/** What counts as a control when reading a body for its words. */
-const CONTROL =
-  'a[href], audio[controls], button, details, form, iframe, input, select, textarea, video[controls], [contenteditable], [tabindex]'
-
-/** Whether an element is a control. A custom element counts, since this cannot see what it draws. */
-const isControl = (element: Element): boolean =>
-  element.localName.includes('-') || element.matches(CONTROL)
-
-/**
- * The elements at the start of a slot that hold words and no control, up to the
- * first one that is or holds a control.
- */
-const wordsIn = (slot: HTMLSlotElement | null): Element[] => {
-  const words: Element[] = []
-  for (const one of slot?.assignedElements({ flatten: true }) ?? []) {
-    if (isControl(one) || [...one.querySelectorAll('*')].some(isControl)) {
-      break
-    }
-    if ((one.textContent ?? '').trim() !== '') {
-      words.push(one)
-    }
-  }
-  return words
-}
-
-/**
- * Resolves once an element's animations have finished, or two frames on where
- * it has none: long enough for an entrance that starts on the next frame to be
- * counted.
- */
-const settled = async (element: Element | null): Promise<void> => {
-  const frame = (): Promise<void> =>
-    new Promise((resolve) => {
-      if (typeof requestAnimationFrame === 'function') {
-        requestAnimationFrame(() => resolve())
-      } else {
-        setTimeout(resolve, 16)
-      }
-    })
-  await frame()
-  await frame()
-  if (!element || typeof element.getAnimations !== 'function') {
-    return
-  }
-  await Promise.allSettled(element.getAnimations({ subtree: true }).map((one) => one.finished))
 }
 
 declare global {
