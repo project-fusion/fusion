@@ -33,6 +33,7 @@ import { property } from 'lit/decorators.js'
  * @slot - The content the skeleton stands in for, which sizes it. Optional.
  *
  * @csspart content - The box around the content, inert while `loading`.
+ * @csspart sheen - The highlight inside the shape, which the styled tier sweeps across it. Empty, and drawn by no rule on this tier.
  * @csspart skeleton - The placeholder shape.
  *
  * @cssstate wrapping - The skeleton holds content, an element or words, and takes that content's size. Line breaks and spaces alone are not content.
@@ -107,9 +108,12 @@ export class HelixHeadlessSkeleton extends HelixElement {
     /* The content before the shape, so a sheet can lay the shape over the
        content's box. Content arriving later asks for the update that says
        whether the skeleton wraps anything. */
+    /* The sheen is an element rather than a sheet's `::after`, so a page
+       reaches it as a part, as Web Awesome's skeleton publishes its
+       indicator. */
     return html`<span part="content" ?inert=${this.loading}
         ><slot @slotchange=${() => this.requestUpdate()}></slot></span
-      ><span part="skeleton"></span>`
+      ><span part="skeleton"><span part="sheen"></span></span>`
   }
 }
 

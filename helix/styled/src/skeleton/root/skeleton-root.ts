@@ -22,6 +22,7 @@ import { styles } from './skeleton-root.css.js'
  * @documentation https://fusion.dev/helix/components/skeleton
  *
  * @csspart content - The box around the content, hidden while `loading`.
+ * @csspart sheen - The highlight swept across the shape. Hidden for `effect="pulse"` and `effect="none"`.
  * @csspart skeleton - The placeholder shape.
  *
  * @cssproperty --skeleton-block-size - The height of the block shape, which is the shape when `shape` is unset. Defaults to the control height.

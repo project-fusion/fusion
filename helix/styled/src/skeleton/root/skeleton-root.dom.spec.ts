@@ -58,10 +58,12 @@ describe('skeleton', () => {
   test('the sweep is a layer moved across the fill, and the fill itself never animates', () => {
     /* A block fading in and out reads as something broken; a highlight
        traveling across it reads as work in progress. So the animated thing is
-       a pseudo-element clipped by the surface, and the surface holds still. */
+       a layer clipped by the surface, and the surface holds still. The layer
+       is the `sheen` part, which a page reaches. */
     expect(rule('[part="skeleton"]')).not.toContain('animation')
     expect(rule('[part="skeleton"]')).toContain('overflow: hidden')
-    expect(rule('[part="skeleton"]::after')).toContain('animation: helix-skeleton-sweep')
+    expect(rule('[part="sheen"]')).toContain('animation: helix-skeleton-sweep')
+    expect(sheet()).not.toContain('::after')
     expect(sheet()).toContain('@keyframes helix-skeleton-sweep')
   })
 
@@ -107,6 +109,6 @@ describe('skeleton around content', () => {
     expect(rule(':host([effect="pulse"]) [part="skeleton"]')).toContain('helix-skeleton-pulse')
     const still = (await mount('<helix-skeleton effect="none"></helix-skeleton>')) as Updatable
     expect(still.getAttribute('effect')).toBe('none')
-    expect(sheet()).toContain(':host([effect="none"]) [part="skeleton"]::after')
+    expect(sheet()).toContain(':host([effect="none"]) [part="sheen"]')
   })
 })
