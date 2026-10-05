@@ -1,4 +1,5 @@
-import { valueAsDate as asDate, dateAsValue as fromDate, writtenList } from '@fusion.dev/helix-core'
+import { valueAsDate as asDate, dateAsValue as fromDate } from '../value-as/value-as.js'
+import { writtenList } from '../written-list/written-list.js'
 
 /*
  * The calendar arithmetic Date Picker and Date Input share: days and months in
@@ -56,6 +57,7 @@ export const weekStartOf = (locale: string): number => {
 export const monthOf = (date: Date): string =>
   `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}`
 
+/** A date some days away, which may be negative, at midnight UTC. */
 export const addDays = (date: Date, days: number): Date =>
   new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() + days))
 
@@ -154,4 +156,92 @@ export const periodMove = (key: string, at: number, along: number): number | nul
     default:
       return null
   }
+}
+
+/** Whether a month, as its first day, lies wholly outside `min` and `max`, either of which may be empty. */
+export const monthOut = (first: Date, min: string, max: string): boolean => {
+  const month = monthOf(first)
+  return (min !== '' && month < min.slice(0, 7)) || (max !== '' && month > max.slice(0, 7))
+}
+
+/** Whether a year lies wholly outside `min` and `max`, either of which may be empty. */
+export const yearOut = (year: number, min: string, max: string): boolean =>
+  (min !== '' && year < Number(min.slice(0, 4))) || (max !== '' && year > Number(max.slice(0, 4)))
+
+/** One month or year in the months or the years view. */
+export interface PeriodCell {
+  /** The month's index in its year, or the year. */
+  at: number
+  /** Whether it is the month or year the calendar shows. */
+  chosen: boolean
+  /** Whether today falls in it. */
+  current: boolean
+  /** Its first day. */
+  first: Date
+  /** Whether it lies wholly outside `min` and `max`. */
+  out: boolean
+}
+
+/** What the months or the years view is drawn from. */
+export interface PeriodPage {
+  /** The latest date, or empty. */
+  max: string
+  /** The earliest date, or empty. */
+  min: string
+  /** The year the months view is on, or any year on the page of years. */
+  page: number
+  /** The first of the month the calendar shows. */
+  shown: Date
+  /** Today, as `YYYY-MM-DD`. */
+  today: string
+  /** Which view: `month` for the months of a year, `year` for a page of years. */
+  view: 'month' | 'year'
+}
+
+/**
+ * The twelve cells of the months or the years view, in reading order: the
+ * months of `page`, or the page of years that holds it.
+ */
+export const periodCells = ({ max, min, page, shown, today, view }: PeriodPage): PeriodCell[] => {
+  const years = view === 'year'
+  const start = years ? yearPageOf(page) : page
+  return Array.from({ length: 12 }, (_, index) => {
+    const at = years ? start + index : index
+    const first = new Date(Date.UTC(years ? at : start, years ? 0 : index, 1))
+    return {
+      at,
+      chosen: years ? at === shown.getUTCFullYear() : monthOf(first) === monthOf(shown),
+      current: years ? String(at) === today.slice(0, 4) : monthOf(first) === today.slice(0, 7),
+      first,
+      out: years ? yearOut(at, min, max) : monthOut(first, min, max),
+    }
+  })
+}
+
+/**
+ * Where a key takes the tab stop in the months or the years, or `null` for a
+ * key the grid leaves alone.
+ *
+ * `stop` is the month's index or the year the stop is on, `year` the year the
+ * months view shows, and `along` which way the inline keys go, as
+ * `periodMove` takes it. A move off the months of one year lands in the next
+ * or the last, and a move off a page of years turns the page.
+ */
+export const periodKey = (
+  view: 'month' | 'year',
+  stop: number,
+  year: number,
+  key: string,
+  along: number,
+): { focus: number; pageYear: number } | null => {
+  const index = view === 'year' ? stop - yearPageOf(stop) : stop
+  const delta = periodMove(key, index, along)
+  if (delta === null) {
+    return null
+  }
+  if (view === 'year') {
+    return { focus: stop + delta, pageYear: stop + delta }
+  }
+  const months = year * 12 + stop + delta
+  return { focus: ((months % 12) + 12) % 12, pageYear: Math.floor(months / 12) }
 }

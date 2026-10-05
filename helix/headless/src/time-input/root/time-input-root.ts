@@ -1,11 +1,14 @@
 import {
   AriaForwardController,
   valueAsTime as asTime,
+  clockLocale,
   customElement,
   fillTemplate,
   timeAsValue as fromTime,
   type HelixBeforeChangeEvent,
   HelixFormElement,
+  type HourCycle,
+  isClockValue,
   MixinControllerOpen,
   MixinControllerValue,
   MixinField,
@@ -13,20 +16,14 @@ import {
   MixinPickerField,
   MixinSegmentedField,
   MixinTokens,
-  writtenList,
+  timeFault,
+  writeClock,
 } from '@fusion.dev/helix-core'
 import { clock } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html } from 'lit/static-html.js'
-import {
-  clockLocale,
-  type HourCycle,
-  isClockValue,
-  valueAsSeconds,
-  writeClock,
-} from '../../time-picker/clock.js'
 /* Base elements here, styled ones in the styled file. The arrangement Date
    Input has with its calendar. */
 import '../../tag/index.js'
@@ -490,8 +487,6 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
        chosen from the picker reported "Enter a time as HH:mm" and the field went
        invalid on being used correctly. */
     const held = this.held
-    const floor = valueAsSeconds(this.min) ?? 0
-    const ceiling = valueAsSeconds(this.max) ?? 86_399
     const shape = this.seconds ? 'HH:mm:ss' : 'HH:mm'
     if (held.length > 0 && !held.every((one) => this.isTime(one))) {
       return (
@@ -501,18 +496,21 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
           : `Enter times as ${shape}, separated by commas.`)
       )
     }
-    if (held.some((one) => (valueAsSeconds(one) ?? 0) < floor)) {
+    /* Each fault across every time, in the order the messages take, so a
+       range with one end early and the other late says it is early. */
+    const rules = { disableTimes: this.disableTimes, max: this.max, min: this.min }
+    const faults = held.map((one) => timeFault(one, rules))
+    if (faults.includes('rangeUnderflow')) {
       return fillTemplate(this.rangeUnderflowMessage || 'Choose a time at or after {min}.', {
         min: writeClock(this.min, clockLocale(this.locale, this.hourCycle), this.seconds),
       })
     }
-    if (held.some((one) => (valueAsSeconds(one) ?? 0) > ceiling)) {
+    if (faults.includes('rangeOverflow')) {
       return fillTemplate(this.rangeOverflowMessage || 'Choose a time at or before {max}.', {
         max: writeClock(this.max, clockLocale(this.locale, this.hourCycle), this.seconds),
       })
     }
-    const barred = writtenList(this.disableTimes).map(valueAsSeconds)
-    if (held.some((one) => barred.includes(valueAsSeconds(one)))) {
+    if (faults.includes('unavailable')) {
       return this.unavailableMessage || 'Choose a time that is available.'
     }
     if (this.mode === 'range' && held.length > 2) {

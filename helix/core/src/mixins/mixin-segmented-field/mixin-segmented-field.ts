@@ -9,6 +9,7 @@ import {
   type SegmentOptions,
   type SegmentSlot,
   type Segments,
+  segmentKey,
   segmentLayout,
   segmentName,
   segmentRange,
@@ -16,10 +17,7 @@ import {
   segmentsValue,
   segmentText,
   segmentValueText,
-  setSegment,
   shownValue,
-  stepSegment,
-  typeDigit,
 } from '../../utils/date-segments/date-segments.js'
 import { inlineStep } from '../../utils/inline-step/inline-step.js'
 import type { MixinControllerOpenInterface } from '../mixin-controller-open/mixin-controller-open.js'
@@ -242,37 +240,20 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
       if ((this as { readOnly?: boolean }).readOnly || this.isDisabled) {
         return
       }
-      const { max, min } = segmentRange(kind, this.parts, twelve)
-      let next: Segments | undefined
-      if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
-        next = stepSegment(this.parts, kind, event.key === 'ArrowUp' ? 1 : -1, twelve)
-      } else if (event.key === 'Home' || event.key === 'End') {
-        next = setSegment(this.parts, kind, event.key === 'Home' ? min : max, twelve)
-      } else if (event.key === 'Backspace' || event.key === 'Delete') {
-        next = setSegment(this.parts, kind, undefined, twelve)
-      } else if (/^\d$/.test(event.key) && kind !== 'dayPeriod') {
-        const typed = typeDigit(this.parts, kind, this.typed, event.key, twelve)
+      const edit = segmentKey(event.key, {
+        kind,
+        locale: this.segmentLocale,
+        segments: this.parts,
+        twelve,
+        typed: this.typed,
+      })
+      if (edit) {
         event.preventDefault()
-        this.typed = typed.typed
-        this.take(typed.segments)
-        if (typed.advance) {
+        this.typed = edit.typed
+        this.take(edit.segments)
+        if (edit.advance) {
           this.moveFocus(element, 1)
         }
-        return
-      } else if (kind === 'dayPeriod' && event.key.length === 1) {
-        const letter = event.key.toLowerCase()
-        const words = [0, 1].map((half) =>
-          segmentText('dayPeriod', { dayPeriod: half }, true, this.segmentLocale).toLowerCase(),
-        )
-        const half = words.findIndex((word) => word.startsWith(letter))
-        if (half >= 0) {
-          next = setSegment(this.parts, kind, half, twelve)
-        }
-      }
-      if (next !== undefined) {
-        event.preventDefault()
-        this.typed = ''
-        this.take(next)
       }
     }
 

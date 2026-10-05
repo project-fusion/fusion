@@ -216,6 +216,59 @@ export const typeDigit = (
   return { advance: full && value >= min, segments: next, typed: full ? '' : text }
 }
 
+/** Where a segment stands when a key arrives: its kind, the field's parts, and what was typed into it. */
+export interface SegmentKeyState {
+  /** The segment the key was pressed on. */
+  kind: SegmentKind
+  /** The locale the meridiem is written in, whose words a letter picks. */
+  locale: string
+  /** The field's parts. */
+  segments: Segments
+  /** Whether the field is on a twelve hour clock. */
+  twelve: boolean
+  /** The digits typed into the segment so far. */
+  typed: string
+}
+
+/**
+ * What an editing key does to a segment, or `null` for a key that edits
+ * nothing.
+ *
+ * The arrows step it and wrap, Home and End take it to its lowest and highest,
+ * Backspace and Delete empty it, a digit is typed as `typeDigit` types it, and
+ * on the meridiem a letter picks the half whose word starts with it. `advance`
+ * says the segment is full and focus moves on.
+ */
+export const segmentKey = (
+  key: string,
+  { kind, locale, segments, twelve, typed }: SegmentKeyState,
+): { advance: boolean; segments: Segments; typed: string } | null => {
+  const done = (next: Segments | undefined) =>
+    next === undefined ? null : { advance: false, segments: next, typed: '' }
+  if (key === 'ArrowUp' || key === 'ArrowDown') {
+    return done(stepSegment(segments, kind, key === 'ArrowUp' ? 1 : -1, twelve))
+  }
+  if (key === 'Home' || key === 'End') {
+    const { max, min } = segmentRange(kind, segments, twelve)
+    return done(setSegment(segments, kind, key === 'Home' ? min : max, twelve))
+  }
+  if (key === 'Backspace' || key === 'Delete') {
+    return done(setSegment(segments, kind, undefined, twelve))
+  }
+  if (/^\d$/.test(key) && kind !== 'dayPeriod') {
+    return typeDigit(segments, kind, typed, key, twelve)
+  }
+  if (kind === 'dayPeriod' && key.length === 1) {
+    const letter = key.toLowerCase()
+    const words = [0, 1].map((half) =>
+      segmentText('dayPeriod', { dayPeriod: half }, true, locale).toLowerCase(),
+    )
+    const half = words.findIndex((word) => word.startsWith(letter))
+    return done(half >= 0 ? setSegment(segments, kind, half, twelve) : undefined)
+  }
+  return null
+}
+
 /** The segments a value names, or none where it names nothing whole. */
 export const segmentsOf = (kind: SegmentedKind, value: string): Segments => {
   if (kind === 'date') {

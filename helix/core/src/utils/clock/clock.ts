@@ -1,6 +1,11 @@
+import { valueAsSeconds } from '../value-as/value-as.js'
+import { writtenList } from '../written-list/written-list.js'
+
 /*
- * The clock Time Picker and Time Input share: reading and writing a time of
- * day to the second, the times on offer, and which clock a locale writes on.
+ * The clock Time Picker and Time Input share: the times on offer, which clock a
+ * locale writes on, the parts a wheel shows, and what is wrong with a time.
+ * Reading and writing one to the second is `valueAsSeconds`, `secondsAsValue`
+ * and `writeClock`, beside the minute readings they extend.
  *
  * In seconds since midnight, because a time held to the second is a time held
  * to the minute as well, and one unit means one set of arithmetic for the list,
@@ -10,44 +15,8 @@
 /** The two clocks a time is written on: twelve hours, or twenty-four. */
 export type HourCycle = 'h12' | 'h23'
 
-/** The seconds in a day, and the last second of one. */
+/** The seconds in a day. */
 const DAY = 86_400
-
-/** `HH:mm`, or `HH:mm:ss`, on a twenty-four hour clock. */
-const CLOCK = /^([01]\d|2[0-3]):([0-5]\d)(?::([0-5]\d))?$/
-
-/**
- * The seconds since midnight a value names, or `null` where it is not a time.
- *
- * Both shapes are read whatever a control writes, so a value with seconds
- * handed to a field without them is a time it can judge, off its step, rather
- * than text it cannot read.
- */
-export const valueAsSeconds = (value: string): number | null => {
-  const parts = CLOCK.exec(value.trim())
-  if (!parts) {
-    return null
-  }
-  return Number(parts[1]) * 3600 + Number(parts[2]) * 60 + Number(parts[3] ?? 0)
-}
-
-/**
- * Whether a value is a time a control holds: `HH:mm`, or either shape where it
- * holds `seconds`.
- */
-export const isClockValue = (value: string, seconds = false): boolean =>
-  valueAsSeconds(value) !== null && (seconds || value.trim().length === 5)
-
-/**
- * Seconds since midnight as `HH:mm`, or `HH:mm:ss` with `seconds`, wrapping
- * rather than running off the day.
- */
-export const secondsAsValue = (at: number, seconds = false): string => {
-  const whole = ((Math.round(at) % DAY) + DAY) % DAY
-  const pad = (part: number): string => String(part).padStart(2, '0')
-  const clock = `${pad(Math.floor(whole / 3600))}:${pad(Math.floor(whole / 60) % 60)}`
-  return seconds ? `${clock}:${pad(whole % 60)}` : clock
-}
 
 /**
  * The locale with its clock set, or the locale as given where no clock is.
@@ -91,25 +60,6 @@ export const dayPeriod = (half: 'AM' | 'PM', locale?: string): string =>
   new Intl.DateTimeFormat(locale || undefined, { hour: 'numeric', hour12: true, timeZone: 'UTC' })
     .formatToParts(new Date(Date.UTC(1970, 0, 1, half === 'AM' ? 9 : 21)))
     .find((part) => part.type === 'dayPeriod')?.value ?? half
-
-/**
- * A time written the way the locale writes one, with its seconds where asked.
- *
- * `timeStyle` rather than the parts assembled by hand, for the reason core's
- * `writeTime` gives: `short` and `medium` are each locale's own answer, padded
- * and ordered as it pads and orders them. A value that is not a time is handed
- * back unchanged, so a field showing what is being typed shows the letters.
- */
-export const writeClock = (value: string, locale: string, seconds = false): string => {
-  const at = valueAsSeconds(value)
-  if (at === null) {
-    return value
-  }
-  return new Intl.DateTimeFormat(locale || undefined, {
-    timeStyle: seconds ? 'medium' : 'short',
-    timeZone: 'UTC',
-  }).format(new Date(at * 1000))
-}
 
 /**
  * Every time on offer, as seconds since midnight, from `min` to `max` by
@@ -168,3 +118,54 @@ export const wheelParts = (
  */
 export const wholeHour = (shown: number, half?: 'AM' | 'PM'): number =>
   half === undefined ? shown : (shown % 12) + (half === 'PM' ? 12 : 0)
+
+/** What a time is checked against: its bounds, the times barred by name, and the times on offer. */
+export interface TimeRules {
+  /** Times barred by name, separated by commas or spaces. */
+  disableTimes: string
+  /** The latest time, or empty for the end of the day. */
+  max: string
+  /** The earliest time, or empty for midnight. */
+  min: string
+  /**
+   * The times on offer, as seconds since midnight, where a time off them is a
+   * fault. Left out, the step is not checked.
+   */
+  offered?: readonly number[] | undefined
+}
+
+/** What is wrong with a time, as the validity flag a control reports, or `unavailable` for a barred one. */
+export type TimeFault = 'rangeOverflow' | 'rangeUnderflow' | 'stepMismatch' | 'unavailable'
+
+/**
+ * Whether a time, as seconds since midnight, is one `disable-times` names,
+ * matching `09:30` and `09:30:00` alike.
+ */
+export const timeBarred = (at: number, disableTimes: string): boolean =>
+  writtenList(disableTimes).some((one) => valueAsSeconds(one) === at)
+
+/**
+ * What is wrong with a time a control can read, or `null`: before `min`, past
+ * `max`, barred by name, or off the times on offer, asked in that order.
+ *
+ * Time Picker reports the first fault of each time it holds, and Time Input
+ * the first fault any of its times has, so each asks this of every time and
+ * keeps the order its own message has always taken.
+ */
+export const timeFault = (value: string, rules: TimeRules): TimeFault | null => {
+  const read = valueAsSeconds(value)
+  const at = read ?? 0
+  if (at < (valueAsSeconds(rules.min) ?? 0)) {
+    return 'rangeUnderflow'
+  }
+  if (at > (valueAsSeconds(rules.max) ?? DAY - 1)) {
+    return 'rangeOverflow'
+  }
+  if (read !== null && timeBarred(at, rules.disableTimes)) {
+    return 'unavailable'
+  }
+  if (rules.offered && !rules.offered.includes(at)) {
+    return 'stepMismatch'
+  }
+  return null
+}

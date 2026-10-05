@@ -281,7 +281,42 @@ export {
   type ViewportWay,
 } from './mixins/mixin-viewport/mixin-viewport.js'
 export { anchorElement } from './utils/anchor-element/anchor-element.js'
+export {
+  addDays,
+  addMonths,
+  type Barring,
+  barredBy,
+  type CalendarView,
+  datesIn,
+  localToday,
+  monthOf,
+  monthOut,
+  type PeriodCell,
+  type PeriodPage,
+  periodCells,
+  periodKey,
+  periodMove,
+  sameMonth,
+  weekStartOf,
+  YEARS_SHOWN,
+  yearOut,
+  yearPageOf,
+} from './utils/calendar/calendar.js'
 export { capturePointer } from './utils/capture-pointer/capture-pointer.js'
+export {
+  clockLocale,
+  dayPeriod,
+  type HourCycle,
+  isTwelveHour,
+  nearestTime,
+  offeredTimes,
+  type TimeFault,
+  type TimeRules,
+  timeBarred,
+  timeFault,
+  wheelParts,
+  wholeHour,
+} from './utils/clock/clock.js'
 export { closestInstance } from './utils/closest-instance/closest-instance.js'
 export { countLabel } from './utils/count-label/count-label.js'
 export { createSheet } from './utils/create-sheet/create-sheet.js'
@@ -407,17 +442,20 @@ export {
 } from './utils/tone-marks/tone-marks.js'
 export {
   dateAsValue,
+  isClockValue,
   isDateValue,
   isTimeValue,
   minutesAsValue,
   numberAsValue,
+  secondsAsValue,
   timeAsValue,
   valueAsDate,
   valueAsMinutes,
   valueAsNumber,
+  valueAsSeconds,
   valueAsTime,
 } from './utils/value-as/value-as.js'
 export { watchTheme } from './utils/watch-theme/watch-theme.js'
-export { writeTime } from './utils/write-time/write-time.js'
+export { writeClock, writeTime } from './utils/write-time/write-time.js'
 export { writtenList, writtenNumbers } from './utils/written-list/written-list.js'
 export { VERSION } from './version.js'
