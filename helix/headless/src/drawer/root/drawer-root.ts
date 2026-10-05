@@ -2,6 +2,8 @@ import {
   AriaForwardController,
   CommandController,
   customElement,
+  drawDismiss,
+  drawDismissGlyph,
   edgeOffset,
   HelixElement,
   headingsIn,
@@ -23,6 +25,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { beyondWindow } from '../reveal.js'
 import { startsSwipe } from '../swipe-start.js'
 
 /**
@@ -51,6 +54,16 @@ import { startsSwipe } from '../swipe-start.js'
  * the nearest. While a swipe moves the panel, the distance is written on it as
  * `--drawer-swipe-x` and `--drawer-swipe-y`. `swipe="false"` turns swiping off.
  *
+ * The snap point the panel rests at is on the panel as `--drawer-snap`, and
+ * `:state(snapped)` is on the host while that is less than the whole panel.
+ * `snapTo()` moves it to another. **Focus moving to a control past the
+ * window's edge opens the panel to its largest snap point**, so a reader
+ * moving through a half open sheet with `Tab` never lands on a control they
+ * cannot see.
+ *
+ * Set `dismissible` to draw a close control in the corner, labeled by
+ * `dismiss-label`, as `Dialog` draws one.
+ *
  * The panel's name is `label` when you set it. Otherwise it is the heading in
  * the `header` slot, or the elements an `aria-labelledby` on the host names.
  *
@@ -75,6 +88,7 @@ import { startsSwipe } from '../swipe-start.js'
  * @documentation https://fusion.dev/helix/components/drawer
  *
  * @slot - The drawer's content.
+ * @slot dismiss-icon - Replaces the glyph inside the close control.
  * @slot footer - Content pinned below the scrolling area, such as the drawer's actions.
  * @slot header - Content pinned above the scrolling area.
  *
@@ -84,16 +98,20 @@ import { startsSwipe } from '../swipe-start.js'
  * @event {ToggleEvent} toggle - Sent when the drawer opens or closes, with `newState` and `oldState`.
  *
  * @csspart content - The scrolling content region.
+ * @csspart dismiss - The close control, drawn when the drawer is `dismissible`.
+ * @csspart dismiss-mark - The glyph on the close control, where none is slotted.
  * @csspart footer - The footer region.
  * @csspart header - The header region.
  * @csspart panel - The sliding panel.
  *
+ * @cssproperty --drawer-snap - The fraction of the panel on screen at the snap point it rests at, such as `0.5`. Written while the drawer is open and has `snap-points`.
  * @cssproperty --drawer-swipe-x - How far a swipe, or a snap point, has moved the panel across, in pixels, toward the right.
  * @cssproperty --drawer-swipe-y - How far a swipe, or a snap point, has moved the panel down, in pixels.
  *
  * @cssstate entering - From the moment the drawer opens until its entrance has finished.
  * @cssstate exiting - From the moment the drawer closes until its exit has finished.
  * @cssstate open - While the drawer is open.
+ * @cssstate snapped - While the panel rests at a snap point that shows less than the whole panel.
  */
 @customElement('helix-headless-drawer')
 export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
@@ -123,6 +141,22 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
    */
   @property({ attribute: 'closedby', reflect: true })
   closedBy?: 'any' | 'closerequest' | 'none'
+
+  /**
+   * Draws a control that closes the drawer, in the corner where the title is.
+   *
+   * Pressing it is `close()`, so it sends `helix-before-close` like every other
+   * way out.
+   */
+  @property({ reflect: true, type: Boolean })
+  dismissible = false
+
+  /**
+   * The close control's accessible name. Translate it with the rest of your
+   * interface.
+   */
+  @property({ attribute: 'dismiss-label' })
+  dismissLabel = 'Close'
 
   /**
    * Accessible name for the panel. When it is empty, the heading in the
@@ -225,6 +259,9 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
   /** How far the panel rests toward its edge, in pixels, at the snap point it settled on. */
   private rest = 0
 
+  /** The fraction of the panel on screen at the snap point it rests at. */
+  private shown = 1
+
   /** The edge the panel leaves through, from its placement and the writing direction. */
   private get edge(): SwipeEdge {
     return swipeEdge(this.placement ?? 'end', isRtl(this))
@@ -277,9 +314,58 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
       return
     }
     if (shown !== 0) {
-      this.rest = snapTravel(size, shown)
+      this.restAt(shown)
+    } else {
+      this.place(this.rest)
     }
+  }
+
+  /**
+   * Puts the panel at rest at a snap point, and says which one: as
+   * `--drawer-snap` on the panel and as `:state(snapped)` short of the whole.
+   */
+  private restAt(shown: number): void {
+    this.shown = shown
+    this.rest = snapTravel(this.extent, shown)
     this.place(this.rest)
+    this.markSnap()
+  }
+
+  /** Writes the snap point the panel rests at, and nothing while closed or without `snap-points`. */
+  private markSnap(): void {
+    const marked = this.open && this.snapPoints.trim() !== ''
+    this.partNamed('panel')?.style.setProperty('--drawer-snap', marked ? String(this.shown) : '')
+    this.toggleState('snapped', marked && this.shown < 1)
+  }
+
+  /**
+   * Moves the open panel to rest at the snap point nearest `point`, a fraction
+   * of the panel such as `1` for the whole of it.
+   */
+  snapTo(point: number): void {
+    if (!this.open) {
+      return
+    }
+    const points = parseSnapPoints(this.snapPoints)
+    const nearest = points.reduce((best, one) =>
+      Math.abs(one - point) < Math.abs(best - point) ? one : best,
+    )
+    this.restAt(nearest)
+  }
+
+  /**
+   * Focus moving to a control past the window's edge, in a panel resting short
+   * of the whole: the panel opens to its largest snap point, so the control is
+   * on screen.
+   */
+  private readonly handleFocusIn = (event: FocusEvent): void => {
+    const target = event.composedPath()[0]
+    if (this.shown >= 1 || !(target instanceof Element) || typeof window === 'undefined') {
+      return
+    }
+    if (beyondWindow(target.getBoundingClientRect(), window.innerWidth, window.innerHeight)) {
+      this.snapTo(1)
+    }
   }
 
   /** Opens the drawer. */
@@ -410,8 +496,16 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
     )
   }
 
+  /* On the host, which hears focus moving to slotted content and to the
+     panel's own controls alike. */
+  override connectedCallback(): void {
+    super.connectedCallback()
+    this.addEventListener('focusin', this.handleFocusIn)
+  }
+
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    this.removeEventListener('focusin', this.handleFocusIn)
     unlockScroll(this)
   }
 
@@ -420,7 +514,9 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
     this.nameByHeader()
     if (changed.has('open') && !this.open) {
       this.rest = 0
+      this.shown = 1
       this.place(0)
+      this.markSnap()
     }
     if (this.open && this.modal) {
       lockScroll(this)
@@ -444,8 +540,7 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
         panel.show()
       }
       /* At the smallest snap point, once the panel has a size to measure. */
-      this.rest = snapTravel(this.extent, parseSnapPoints(this.snapPoints)[0] ?? 1)
-      this.place(this.rest)
+      this.restAt(parseSnapPoints(this.snapPoints)[0] ?? 1)
     } else if (!this.open && panel.open) {
       panel.close()
     }
@@ -473,7 +568,27 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
       <div part="header"><slot name="header" @slotchange=${this.nameByHeader}></slot></div>
       <div part="content"><slot></slot></div>
       <div part="footer"><slot name="footer"></slot></div>
+      ${
+        this.dismissible
+          ? drawDismiss({
+              label: this.dismissLabel,
+              mark: this.renderDismissIcon(),
+              onDismiss: () => this.close(),
+            })
+          : nothing
+      }
     </dialog>`
+  }
+
+  /**
+   * The glyph on the close control, behind a seam: slot fallback, so a
+   * consumer replaces it by slotting, and a method, so a tier above replaces it
+   * by overriding. As `Dialog` draws it.
+   */
+  protected renderDismissIcon(): TemplateResult {
+    return html`<slot name="dismiss-icon">
+      ${drawDismissGlyph()}
+    </slot>`
   }
 }
 

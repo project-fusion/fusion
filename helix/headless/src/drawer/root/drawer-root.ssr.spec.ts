@@ -94,3 +94,30 @@ describe('drawer server output, the footer', () => {
     expect(served).not.toContain('--drawer-swipe')
   })
 })
+
+describe('drawer server output, the close control', () => {
+  test('is served on a dismissible drawer, named, and on no other', () => {
+    expect(
+      partTag(
+        ssr(html`<helix-headless-drawer label="Filters" dismissible></helix-headless-drawer>`),
+        'dismiss',
+      ),
+    ).toContain('aria-label="Close"')
+    expect(
+      partTag(
+        ssr(html`<helix-headless-drawer label="Filters"></helix-headless-drawer>`),
+        'dismiss',
+      ),
+    ).toBeFalsy()
+  })
+
+  test('and no snap point, which only an open panel in a browser rests at', () => {
+    const served = rendered(
+      ssr(
+        html`<helix-headless-drawer label="Filters" snap-points="0.5 1" open></helix-headless-drawer>`,
+      ),
+      'helix-headless-drawer',
+    )
+    expect(served).not.toContain('--drawer-snap')
+  })
+})
