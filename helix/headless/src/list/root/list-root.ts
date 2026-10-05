@@ -10,6 +10,7 @@ import {
   type NavigableItem,
   requestChange,
   rovingStop,
+  typeaheadBy,
   whenHydrated,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -196,7 +197,7 @@ export class HelixHeadlessList extends HelixElement {
     origin: 'focus',
     reserved: () => ['ArrowLeft', 'ArrowRight'],
     selects: () => false,
-    typeahead: (item) => (item as NavigableItem & { words: string }).words,
+    typeahead: typeaheadBy((item) => (item as NavigableItem & { words: string }).words),
     wrap: false,
   })
 
