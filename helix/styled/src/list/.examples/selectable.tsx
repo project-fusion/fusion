@@ -1,0 +1,37 @@
+export function Example() {
+  return (
+    <helix-list
+      label="Files"
+      selection-mode="multiple"
+      value="report"
+    >
+      <helix-list-item value="report">
+        <helix-icon
+          name="cube"
+          slot="start"
+        ></helix-icon>
+        Quarterly report
+        <span slot="description">Edited today</span>
+      </helix-list-item>
+      <helix-list-item value="budget">
+        <helix-icon
+          name="cube"
+          slot="start"
+        ></helix-icon>
+        Budget
+        <span slot="description">Edited yesterday</span>
+      </helix-list-item>
+      <helix-list-item
+        disabled
+        value="archive"
+      >
+        <helix-icon
+          name="cube"
+          slot="start"
+        ></helix-icon>
+        Archive
+        <span slot="description">Locked</span>
+      </helix-list-item>
+    </helix-list>
+  )
+}

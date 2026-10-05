@@ -7,7 +7,7 @@
 
 /* The layout lives here rather than on the host, so the host is free to be a
    `list-item` when the list asks for a marker. */
-[part="row"] {
+[part~="row"] {
   align-items: center;
   display: grid;
   /* Four tracks, and the first holds the rail. `auto` rather than a width, so
@@ -122,4 +122,28 @@ slot[name="end"]::slotted(*) {
   grid-template-columns: subgrid;
   grid-template-rows: subgrid;
   text-decoration: none;
+}
+
+/* The row a reader is on, which `current` marks. */
+[part~="row-current"] {
+  background-color: var(--list-item-current-background-color, var(--helix-color-well));
+  border-radius: var(--helix-radii-sm);
+}
+
+/* In a list with `selection-mode`: the row is the grid cell that takes focus,
+   so the ring goes inside it, where the next row cannot cover it. */
+[part~="row"]:focus-visible {
+  border-radius: var(--helix-radii-sm);
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}
+
+:host(:state(selected)) [part~="row"] {
+  background-color: var(--list-item-selected-background-color, var(--helix-color-primary-subtle));
+  border-radius: var(--helix-radii-sm);
+}
+
+/* Out of reach, and drawn so: the platform's own disabled step. */
+:host([disabled]) {
+  opacity: var(--list-item-disabled-opacity, 0.5);
 }

@@ -17,9 +17,12 @@ import { styles } from './list-item.css.js'
  *
  * @csspart rail - The cell that holds the number in a railed list.
  *
+ * @cssproperty --list-item-current-background-color - The fill behind a row that is `current`.
+ * @cssproperty --list-item-disabled-opacity - The opacity of a `disabled` row.
  * @cssproperty --list-item-padding - The padding inside the row.
  * @cssproperty --list-item-rail-content - What the rail cell shows. The list sets it.
  * @cssproperty --list-item-rail-display - Whether the row has a rail. The list sets it.
+ * @cssproperty --list-item-selected-background-color - The fill behind a selected row, in a list that selects.
  * @cssproperty --list-item-term-weight - The font weight of a term in a description list.
  */
 @customElement('helix-list-item')

@@ -51,7 +51,8 @@
    `list-item` counter, and Chrome 148 does not let an author reset it:
    `counter-reset: list-item 4` moves nothing on a `<div>`, a `<ul>`, or a real
    `<ol>`, while `<ol start="5">` moves it and a named counter with explicit
-   `::before` content does too. */
+   `::before` content does too. `counter-set` on a row does move it, measured
+   in Chromium, which is how `start` and `reversed` work below. */
 
 :host([kind="ordered"][type="a"]) ::slotted(*) {
   list-style-type: lower-alpha;
@@ -71,6 +72,21 @@
 
 :host([kind="unordered"]) ::slotted(*) {
   list-style-type: disc;
+}
+
+/* Where an ordered list starts and which way it runs. The list writes
+   `--list-first` and `--list-step` on its slot where `start` or `reversed` asks
+   for them, and the rows inherit both. The `list-item` counter cannot be reset
+   from the list in Chrome 148, so the first row sets it: a counter is
+   incremented before it is set, so the first row reads `--list-first` and each
+   row after adds `--list-step`. Unset, `counter-set` falls back to `none` and
+   the count is the ordinary one. */
+:host([kind="ordered"]) ::slotted(*) {
+  counter-increment: list-item var(--list-step, 1);
+}
+
+:host([kind="ordered"]) ::slotted(:first-child) {
+  counter-set: list-item var(--list-first);
 }
 
 /* The rail: the same numbering, at the start edge of the block. **The native
@@ -94,7 +110,12 @@
   /* The two things a row cannot work out for itself: that there is a rail at
      all, and what number this row is. */
   --list-item-rail-display: block;
-  counter-increment: list-rail;
+  counter-increment: list-rail var(--list-step, 1);
+}
+
+/* The rail counts from `start` and down for `reversed` the same way. */
+:host([marker="rail"]) ::slotted(:first-child) {
+  counter-set: list-rail var(--list-first);
 }
 
 /* The marker goes when the rail arrives. */

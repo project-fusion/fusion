@@ -110,13 +110,37 @@ describe('list', () => {
       expect(sheet('helix-list')).toMatch(new RegExp(`var\\(\\s*${hook},`))
     }
     for (const hook of [
+      '--list-item-current-background-color',
+      '--list-item-disabled-opacity',
       '--list-item-padding',
       '--list-item-rail-content',
       '--list-item-rail-display',
+      '--list-item-selected-background-color',
       '--list-item-term-weight',
       '--list-rail-inline-size',
     ]) {
       expect(sheet('helix-list-item')).toMatch(new RegExp(`var\\(\\s*${hook},`))
     }
+  })
+
+  /* The `list-item` counter cannot be reset from the list, and `counter-set`
+     on the first row moves it, measured in Chromium, where the markers read
+     5, 6 for `start="5"` and 3, 2, 1 for a reversed list of three. */
+  test('an ordered list counts from what its slot says, and the rail does too', () => {
+    expect(rule('helix-list', ':host([kind="ordered"]) ::slotted(:first-child)')).toContain(
+      'counter-set: list-item var(--list-first)',
+    )
+    expect(sheet('helix-list')).toContain('counter-increment: list-item var(--list-step, 1)')
+    expect(rule('helix-list', ':host([marker="rail"]) ::slotted(:first-child)')).toContain(
+      'counter-set: list-rail var(--list-first)',
+    )
+  })
+
+  test('a current row and a selected row are drawn from their part and their state', () => {
+    expect(rule('helix-list-item', '[part~="row-current"]')).toContain('background-color')
+    expect(rule('helix-list-item', ':host(:state(selected)) [part~="row"]')).toContain(
+      'background-color',
+    )
+    expect(rule('helix-list-item', '[part~="row"]:focus-visible')).toContain('outline')
   })
 })
