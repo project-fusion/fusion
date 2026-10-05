@@ -471,3 +471,86 @@ describe('what a screen reader says for the value', () => {
     expect(control(host).hasAttribute('aria-valuetext')).toBe(false)
   })
 })
+
+describe('a formatted number', () => {
+  /* React Aria's NumberField formatOptions: the field shows the currency and
+     reads one typed back, and the value stays the number. */
+  test('shows its format until it is edited, and the number while it is', async () => {
+    const host = await field(
+      `locale="en-US" value="1200" format-options='{"style":"currency","currency":"USD"}'`,
+    )
+    expect(control(host).value).toBe('$1,200.00')
+    expect(control(host).getAttribute('aria-valuetext')).toBe('$1,200.00')
+    control(host).dispatchEvent(new Event('focus'))
+    await host.updateComplete
+    expect(control(host).value).toBe('1200')
+    control(host).dispatchEvent(new Event('blur'))
+    await host.updateComplete
+    expect(control(host).value).toBe('$1,200.00')
+    expect(formValue(host)).toBe('1200')
+  })
+
+  test('reads a typed currency and grouped thousands back to the number', async () => {
+    const host = await field(
+      `locale="en-US" step="0.01" format-options='{"style":"currency","currency":"USD"}'`,
+    )
+    await type(host, '$1,250.50')
+    control(host).dispatchEvent(new Event('blur'))
+    await host.updateComplete
+    expect(host.value).toBe('1250.5')
+    const plain = await field('locale="en-US"')
+    await type(plain, '1,234')
+    expect(control(plain).getAttribute('aria-valuenow')).toBe('1234')
+  })
+})
+
+describe('the wheel', () => {
+  /* React Aria steps on the wheel unless isWheelDisabled. Here it is asked
+     for, since a reader scrolling past a form should scroll the page. */
+  const wheel = (host: Field, deltaY: number): WheelEvent => {
+    const event = new WheelEvent('wheel', { bubbles: true, cancelable: true, deltaY })
+    control(host).dispatchEvent(event)
+    return event
+  }
+
+  test('steps a focused field only where asked', async () => {
+    const quiet = await field('value="5"')
+    control(quiet).dispatchEvent(new Event('focus'))
+    await quiet.updateComplete
+    expect(wheel(quiet, -100).defaultPrevented).toBe(false)
+    expect(quiet.value).toBe('5')
+    const asked = await field('value="5" wheel')
+    wheel(asked, -100)
+    expect(asked.value).toBe('5')
+    control(asked).dispatchEvent(new Event('focus'))
+    await asked.updateComplete
+    expect(wheel(asked, -100).defaultPrevented).toBe(true)
+    expect(asked.value).toBe('6')
+    wheel(asked, 100)
+    expect(asked.value).toBe('5')
+  })
+})
+
+describe('on iOS and iPadOS', () => {
+  /* VoiceOver reads a spinbutton text field as a slider a reader cannot type
+     in, so React Aria drops the role there and describes the field. */
+  test('the field is described as a number field and carries no spinbutton role', async () => {
+    const agent = Object.getOwnPropertyDescriptor(navigator, 'userAgent')
+    Object.defineProperty(navigator, 'userAgent', {
+      configurable: true,
+      value: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)',
+    })
+    try {
+      const host = await field()
+      expect(control(host).hasAttribute('role')).toBe(false)
+      expect(control(host).getAttribute('aria-roledescription')).toBe('number field')
+    } finally {
+      if (agent) {
+        Object.defineProperty(navigator, 'userAgent', agent)
+      } else {
+        delete (navigator as unknown as Record<string, unknown>).userAgent
+      }
+    }
+    expect(control(await field()).getAttribute('role')).toBe('spinbutton')
+  })
+})

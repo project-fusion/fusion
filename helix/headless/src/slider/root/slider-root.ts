@@ -2,6 +2,7 @@ import {
   AriaForwardController,
   customElement,
   fillTemplate,
+  formatNumber,
   HelixFormElement,
   MixinControllerValue,
   MixinField,
@@ -29,6 +30,13 @@ import { property } from 'lit/decorators.js'
  *
  * A range with two thumbs is two inputs stacked on one track, because there is
  * no native two-thumb range. Each thumb keeps its own value.
+ * `min-steps-between-thumbs` keeps them that many steps apart.
+ *
+ * `format-options` writes the value with `Intl.NumberFormat` in `locale`, as a
+ * currency, a percent or a unit, and `formatter` writes it with a function of
+ * your own, such as words for a scale. Either one is what a screen reader
+ * hears, what the readout shows and what the marker labels say. `value-text`
+ * still wraps it in a sentence, with the formatted value in its place.
  *
  * `required` comes with the field mixin and cannot fail. A range is never
  * empty: the platform shows its midpoint when no value is set, and `willUpdate`
@@ -84,6 +92,33 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   /**
    * Shows the value at each mark.
    */
+  /**
+   * `Intl.NumberFormat` options the value is written with: a currency, a
+   * percent, a unit, or a number of decimals. Written as JSON in the
+   * attribute.
+   *
+   * ```html
+   * <helix-slider format-options='{"style":"currency","currency":"USD"}'></helix-slider>
+   * ```
+   */
+  @property({ attribute: 'format-options', type: Object })
+  formatOptions?: Intl.NumberFormatOptions
+
+  /**
+   * Writes a value as text, in place of `format-options`: words for a scale,
+   * or anything `Intl.NumberFormat` cannot say. A property, since a function
+   * cannot be written in an attribute.
+   */
+  @property({ attribute: false })
+  formatter?: (value: number) => string
+
+  /**
+   * The locale `format-options` writes the value in, such as `de-DE`. Empty is
+   * the reader's own.
+   */
+  @property()
+  locale = ''
+
   @property({ attribute: 'marker-labels', reflect: true, type: Boolean })
   markerLabels = false
 
@@ -128,6 +163,13 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
    */
   @property({ type: Number })
   min = 0
+
+  /**
+   * How many steps a range's two thumbs stay apart, as Zag's
+   * `minStepsBetweenThumbs`. A thumb pushed closer stops there.
+   */
+  @property({ attribute: 'min-steps-between-thumbs', type: Number })
+  minStepsBetweenThumbs = 0
 
   /** The name of a range's lower thumb, read after the slider's label. */
   @property({ attribute: 'minimum-label' })
@@ -189,7 +231,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
    * same way a different-length one shifted the box.
    */
   private get reserve(): number {
-    const widest = Math.max(String(this.min).length, String(this.max).length)
+    const widest = Math.max(this.said(this.min).length, this.said(this.max).length)
     return this.range ? widest * 2 + ' to '.length : widest
   }
 
@@ -283,10 +325,11 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
       /* Clamped against the other thumb rather than bounded by it, for the
          reason the class says: bounding shortens the input's own range and the
          two thumbs stop sharing a track. */
+      const gap = this.gap
       const pair =
         control.dataset.thumb === 'start'
-          ? [Math.min(moved, end), end]
-          : [start, Math.max(moved, start)]
+          ? [Math.min(moved, end - gap), end]
+          : [start, Math.max(moved, start + gap)]
       this.requestValue(pair.join(','))
       restoreValue(
         control,
@@ -416,8 +459,33 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   }
 
   /** What a screen reader says for one thumb, where `value-text` asks. */
+  /** How far apart a range's thumbs stay, in the slider's own units. */
+  private get gap(): number {
+    return Math.max(0, this.minStepsBetweenThumbs) * this.step
+  }
+
+  /** Whether the value is written by `formatter` or `format-options`. */
+  private get formats(): boolean {
+    return this.formatter !== undefined || this.formatOptions !== undefined
+  }
+
+  /** A value as the reader sees it: formatted where asked, the number otherwise. */
+  private said(at: number | string): string {
+    const number = typeof at === 'number' ? at : Number.parseFloat(at)
+    if (!Number.isFinite(number)) {
+      return String(at)
+    }
+    if (this.formatter) {
+      return this.formatter(number)
+    }
+    return this.formatOptions ? formatNumber(number, this.locale, this.formatOptions) : String(at)
+  }
+
   private spoken(at: number | string): string | typeof nothing {
-    return this.valueText ? fillTemplate(this.valueText, { value: at }) : nothing
+    if (this.valueText) {
+      return fillTemplate(this.valueText, { value: this.said(at) })
+    }
+    return this.formats ? this.said(at) : nothing
   }
 
   protected override updated(changed: PropertyValues): void {
@@ -475,8 +543,8 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
         step=${this.step}
         .value=${String(at)}
         aria-labelledby=${this.labeled ? `${this.labelId} ${which}-name` : `${which}-name`}
-        aria-valuemin=${which === 'end' ? start : nothing}
-        aria-valuemax=${which === 'start' ? end : nothing}
+        aria-valuemin=${which === 'end' ? start + this.gap : nothing}
+        aria-valuemax=${which === 'start' ? end - this.gap : nothing}
         aria-valuetext=${this.spoken(at)}
         aria-describedby=${this.describedBy ?? nothing}
         aria-invalid=${this.invalidity ?? nothing}
@@ -551,7 +619,9 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
                     part="marker"
                     style="--slider-marker-at: ${((at - this.min) / (this.max - this.min)) * 100}%"
                     >${
-                      this.markerLabels ? html`<span part="marker-label">${at}</span>` : nothing
+                      this.markerLabels
+                        ? html`<span part="marker-label">${this.said(at)}</span>`
+                        : nothing
                     }</span
                   >`,
               )}
@@ -572,7 +642,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
               for=${this.range ? 'control control-end' : 'control'}
               aria-hidden="true"
               style=${`--_slider-output-reserve: ${this.reserve}ch`}
-              >${this.range ? `${start} to ${end}` : this.value}</output
+              >${this.range ? `${this.said(start)} to ${this.said(end)}` : this.said(this.value)}</output
             >`
           : nothing
       }

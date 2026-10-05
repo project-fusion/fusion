@@ -13,9 +13,9 @@
 [part="field"] {
   align-items: center;
   background-color: var(--number-input-background-color, var(--helix-color-well));
-  block-size: var(--helix-size-control);
-  border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-sm);
+  block-size: var(--number-input-size, var(--helix-size-control));
+  border: var(--helix-border-thin) solid var(--number-input-border-color, var(--helix-color-border));
+  border-radius: var(--number-input-radius, var(--helix-radii-sm));
   box-sizing: border-box;
   display: flex;
   /*

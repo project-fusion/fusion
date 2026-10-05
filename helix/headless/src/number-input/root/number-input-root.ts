@@ -3,17 +3,20 @@ import {
   valueAsNumber as asNumber,
   customElement,
   fillTemplate,
+  formatNumber,
   numberAsValue as fromNumber,
   HelixFormElement,
   holdCaret,
   MixinControllerValue,
   MixinField,
+  parseNumber,
   restoreValue,
 } from '@fusion.dev/helix-core'
 import { minus, plus } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
+import { appleTouch } from '../platform.js'
 
 /**
  * How far a pointer travels for one step of the value, in pixels.
@@ -52,6 +55,17 @@ const SCRUB_FINE = 16
  * - `selectionStart` is `null`, so the caret cannot be managed.
  *
  * `inputmode="decimal"` keeps the numeric keypad on phones.
+ *
+ * `format-options` shows the number with `Intl.NumberFormat` in `locale`, as a
+ * currency, a percent or a unit, while the field is not being edited. Focus
+ * shows the number itself, and a typed `$1,200` or `25%` is read back with the
+ * same options. The value stays the plain number: `1200`, or `0.25` for 25%.
+ * The locale's group separators are read in every field, so `1,234` is a
+ * number in `en-US`.
+ *
+ * On iOS and iPadOS the field is a text field described as a number field,
+ * with no `role="spinbutton"`, which VoiceOver reads as a slider you cannot
+ * type in. React Aria's NumberField does the same.
  *
  * Validity follows the platform's rules: `min`, `max`, and `step` are checked
  * and reported through the host's own `setValidity`, under the platform's flag
@@ -144,6 +158,18 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
    * and a property because ten of a step of `0.01` is a hundredth and rarely
    * what a reader wants from a whole key.
    */
+  /**
+   * `Intl.NumberFormat` options the number is shown with while the field is
+   * not being edited: a currency, a percent, a unit, or a number of decimals.
+   * Written as JSON in the attribute.
+   *
+   * ```html
+   * <helix-number-input format-options='{"style":"currency","currency":"EUR"}'></helix-number-input>
+   * ```
+   */
+  @property({ attribute: 'format-options', type: Object })
+  formatOptions?: Intl.NumberFormatOptions
+
   @property({ attribute: 'large-step', type: Number })
   largeStep?: number
 
@@ -186,6 +212,13 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
    * The message the browser shows when the number is above `max`, with `{max}`
    * filled in.
    */
+  /**
+   * What the field is described as on iOS and iPadOS, where it carries no
+   * spinbutton role. See the class description.
+   */
+  @property({ attribute: 'role-description' })
+  roleDescription = 'number field'
+
   @property({ attribute: 'range-overflow-message' })
   rangeOverflowMessage?: string
 
@@ -240,6 +273,53 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
   @property({ attribute: 'value-text' })
   valueText = ''
 
+  /**
+   * Whether the mouse wheel steps the number while the field has focus, as
+   * React Aria's NumberField does unless told not to. Off, the wheel scrolls
+   * the page, which is what a reader passing over a form expects.
+   */
+  @property({ type: Boolean })
+  wheel = false
+
+  /** Whether the field has focus, so it shows the number itself and not its format. */
+  @state()
+  private editing = false
+
+  /**
+   * What the field shows: the value as written while it is edited, and with
+   * `format-options` once it is not.
+   */
+  private get shown(): string {
+    const parsed = this.numeric
+    if (this.editing || this.formatOptions === undefined || parsed === null) {
+      return this.value
+    }
+    return formatNumber(parsed, this.locale, this.formatOptions)
+  }
+
+  /** Steps on the wheel, where asked, while the field has focus. */
+  private readonly handleWheel = (event: WheelEvent): void => {
+    if (!this.wheel || !this.editing || event.deltaY === 0) {
+      return
+    }
+    event.preventDefault()
+    if (event.deltaY < 0) {
+      this.stepUp()
+    } else {
+      this.stepDown()
+    }
+  }
+
+  private readonly handleFocus = (): void => {
+    this.editing = true
+  }
+
+  /**
+   * Whether this is an iPhone or an iPad, read once on the client. A server
+   * has no navigator and renders the spinbutton.
+   */
+  private readonly touchApple = appleTouch(typeof navigator === 'undefined' ? undefined : navigator)
+
   private get control(): HTMLInputElement | null {
     return this.partNamed<HTMLInputElement>('control')
   }
@@ -250,16 +330,11 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     if (text === '') {
       return null
     }
-    /* A decimal comma where the locale writes one, and nowhere else: in a
-       locale whose comma groups thousands, `1,5` is not a number a native field
-       would take either. Only where there is no dot, so `1.234,5` is not read
-       as two decimal points. */
-    const read =
-      decimalComma(this.locale) && text.includes(',') && !text.includes('.')
-        ? text.replace(',', '.')
-        : text
-    const parsed = read.includes(',') ? Number.NaN : Number(read)
-    return Number.isFinite(parsed) ? parsed : null
+    /* Read in the locale with the options it is shown with, so a typed
+       `$1,200` is 1200 and `1,5` in a locale with a decimal comma is one and a
+       half. A point is a decimal point in every locale, unless the locale's
+       decimal comma is there too. */
+    return parseNumber(text, this.locale, this.formatOptions)
   }
 
   /** Whether `value` is on the step grid, counted from `min`. */
@@ -491,6 +566,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
    * the same as preventing one.
    */
   private readonly handleBlur = (): void => {
+    this.editing = false
     /* A value the reader did not type, written by a script or seeded off the
        grid, is settled here too, and a settled value is a committed one. */
     if (this.settle()) {
@@ -730,9 +806,10 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
         <input
           part="control"
           id=${this.controlId}
-          .value=${this.value}
+          .value=${this.shown}
           type="text"
-          role="spinbutton"
+          role=${this.touchApple ? nothing : 'spinbutton'}
+          aria-roledescription=${this.touchApple ? this.roleDescription : nothing}
           inputmode="decimal"
           autocomplete=${this.autocomplete || nothing}
           name=${this.name || nothing}
@@ -743,18 +820,28 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
           aria-valuemax=${this.max ?? nothing}
           aria-valuenow=${parsed ?? nothing}
           aria-valuetext=${
-            this.valueText && parsed !== null
-              ? fillTemplate(this.valueText, { value: this.value })
-              : nothing
+            parsed === null
+              ? nothing
+              : this.valueText
+                ? fillTemplate(this.valueText, {
+                    value: this.formatOptions
+                      ? formatNumber(parsed, this.locale, this.formatOptions)
+                      : this.value,
+                  })
+                : this.formatOptions
+                  ? formatNumber(parsed, this.locale, this.formatOptions)
+                  : nothing
           }
           ?disabled=${this.isDisabled}
           ?readonly=${this.readOnly}
           ?required=${this.required}
           @blur=${this.handleBlur}
           @change=${this.handleChange}
+          @focus=${this.handleFocus}
           @input=${this.handleInput}
           @keydown=${this.handleKeydown}
           @keypress=${this.handleKeypress}
+          @wheel=${this.handleWheel}
         />
         <slot name="end"></slot>
         <button
@@ -786,19 +873,6 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
   set valueAsNumber(count: number) {
     this.value = fromNumber(count)
   }
-}
-
-/** Whether a locale writes a decimal comma, read once per locale. */
-const commas = new Map<string, boolean>()
-
-const decimalComma = (locale: string): boolean => {
-  let comma = commas.get(locale)
-  if (comma === undefined) {
-    const parts = new Intl.NumberFormat(locale || undefined).formatToParts(1.5)
-    comma = parts.find((part) => part.type === 'decimal')?.value === ','
-    commas.set(locale, comma)
-  }
-  return comma
 }
 
 /**

@@ -324,6 +324,7 @@ export {
   type MediaCopy,
   sameCopies,
 } from './utils/media-copy/media-copy.js'
+export { formatNumber, parseNumber } from './utils/number-format/number-format.js'
 export { onUnlessFalse } from './utils/on-unless-false/on-unless-false.js'
 export { type ColorBytes, readColor } from './utils/read-color/read-color.js'
 export {
