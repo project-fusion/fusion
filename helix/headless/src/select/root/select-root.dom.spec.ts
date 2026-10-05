@@ -435,3 +435,47 @@ describe('what the trigger shows', () => {
     expect(shown(japanese)).toBe('Alpha Beta')
   })
 })
+
+describe('a select with an option that is a link', () => {
+  const followed: string[] = []
+  document.addEventListener(
+    'click',
+    (event) => {
+      if (event.target instanceof HTMLAnchorElement) {
+        followed.push(event.target.getAttribute('href') ?? '')
+        event.preventDefault()
+      }
+    },
+    { capture: true },
+  )
+  const linked = async (): Promise<Updatable & { open: boolean; value: string }> => {
+    document.body.innerHTML = `<helix-headless-select label="L">
+      <helix-headless-option value="home">Home</helix-headless-option>
+      <helix-headless-option value="docs" href="/docs">Docs</helix-headless-option>
+    </helix-headless-select>`
+    const host = document.body.firstElementChild as Updatable & { open: boolean; value: string }
+    host.open = true
+    await settle(host)
+    return host
+  }
+
+  test('follows it, selects nothing, and closes as a choice does', async () => {
+    followed.length = 0
+    const host = await linked()
+    ;(host.children[1] as HTMLElement & { select(): void }).select()
+    await settle(host)
+    expect(followed).toEqual(['/docs'])
+    expect(host.value).toBe('')
+    expect(host.open).toBe(false)
+  })
+
+  test('stays open and follows nothing where the page cancels it', async () => {
+    followed.length = 0
+    const host = await linked()
+    host.addEventListener('helix-select', (event) => event.preventDefault())
+    ;(host.children[1] as HTMLElement & { select(): void }).select()
+    await settle(host)
+    expect(followed).toEqual([])
+    expect(host.open).toBe(true)
+  })
+})
