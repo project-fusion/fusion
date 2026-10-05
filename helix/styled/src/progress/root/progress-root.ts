@@ -22,7 +22,12 @@ import { styles } from './progress-root.css.js'
  * @aliases Progress bar, Loading bar
  * @documentation https://fusion.dev/helix/components/progress
  *
+ * @slot label - A visible label, above a bar and under a ring. Its words name it in place of `label`.
+ *
  * @cssproperty --progress-color - Fill of the part that is done.
+ * @cssproperty --progress-label-color - Color of a slotted label.
+ * @cssproperty --progress-label-gap - Space between a slotted label and the bar.
+ * @cssproperty --progress-label-size - Type size of a slotted label.
  * @cssproperty --progress-ring-size - Diameter of the ring.
  * @cssproperty --progress-ring-width - Thickness of the ring's stroke.
  * @cssproperty --progress-size - Thickness of the bar.

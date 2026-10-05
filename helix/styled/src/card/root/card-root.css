@@ -31,7 +31,7 @@
      `space-between`, which is what the site's insight cards ask for. */
   align-content: var(--card-align, start);
   display: grid;
-  gap: var(--helix-space-sm);
+  gap: var(--card-gap, var(--helix-space-sm));
   grid-template-columns: minmax(0, 1fr);
   line-height: var(--helix-leading-normal);
   /* Clips the media to the corner radius, so a full-bleed image needs no corner
@@ -100,6 +100,38 @@ slot[name="header"]::slotted(*) {
    which is what a grid item does by default. */
 slot[name="footer"]::slotted(*) {
   justify-self: end;
+}
+
+/* *A line of its own and its actions at the end of it**, once the actions slot
+   holds something: the header or the footer takes the room and the actions
+   keep their own width. Served before the script can see the slot, the
+   actions stand on their own line at the end. */
+[part="header-row"],
+[part="footer-row"] {
+  align-items: center;
+  display: flex;
+  /* A narrow card puts the actions under what they belong to rather than
+     past its edge. */
+  flex-wrap: wrap;
+  gap: var(--card-gap, var(--helix-space-sm));
+  min-inline-size: 0;
+}
+
+[part="header-row"] slot[name="header"]::slotted(*) {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+}
+
+slot[name="header-actions"]::slotted(*),
+slot[name="footer-actions"]::slotted(*) {
+  flex: none;
+  justify-self: end;
+}
+
+/* The footer moves to the start of its line, so the two ends hold the two
+   kinds of control. */
+[part="footer-row"] slot[name="footer-actions"]::slotted(*) {
+  margin-inline-start: auto;
 }
 
 /* Sideways is the same stack with the media taken out of flow beside it. And

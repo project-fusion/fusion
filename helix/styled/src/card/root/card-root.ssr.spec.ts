@@ -66,9 +66,10 @@ describe('card server output', () => {
     /* `toContain('Report')` and `toContain('slot="header"')` both passed on the
        spec's own `<h2>`, which is in the response whatever the card renders:
        measured with the shadow root emptied, both held. The served frame is the
-       claim a crawler cares about. Four slots and no part means every child
-       lands somewhere and nothing of the card's own wraps it or reorders it. */
-    expect(rendered(markup, 'helix-card').match(/<slot\b/g)).toHaveLength(4)
+       claim a crawler cares about. Six slots (four regions and two lines of
+       actions) and no part means every child lands somewhere and nothing of
+       the card's own wraps it or reorders it. */
+    expect(rendered(markup, 'helix-card').match(/<slot\b/g)).toHaveLength(6)
     expect(servedParts(markup)).toEqual([])
   })
 

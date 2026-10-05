@@ -1,4 +1,4 @@
-import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, hostAria, slottedWords } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -41,6 +41,8 @@ export type MeterBand = 'fair' | 'good' | 'poor'
  * @category feedback
  * @aliases Gauge, Level, Capacity
  * @documentation https://fusion.dev/helix/components/meter
+ *
+ * @slot label - A visible label. Its words name the meter in place of `label`.
  *
  * @csspart groove - The unfilled circle, in `ring` and `arc`.
  * @csspart indicator - The part of the track the value fills.
@@ -102,6 +104,9 @@ export class HelixHeadlessMeter extends HelixElement {
 
   /**
    * Accessible name for the reading.
+   *
+   * A visible label in the `label` slot names it instead, with the words it
+   * shows, so the name and the label cannot disagree.
    */
   @property()
   label = 'Meter'
@@ -297,7 +302,7 @@ export class HelixHeadlessMeter extends HelixElement {
        an author's own `aria-label` beats it without anything being written onto
        markup their server never had. `meter` is the ARIA role for exactly this
        and is not `progressbar`: a progress bar promises it is going somewhere. */
-    hostAria(this.internals, { label: this.label, role: 'meter' })
+    hostAria(this.internals, { label: slottedWords(this, ['label']) || this.label, role: 'meter' })
     this.internals.ariaValueMin = String(min)
     this.internals.ariaValueMax = String(max)
     this.internals.ariaValueNow = String(this.reading)
@@ -365,13 +370,20 @@ export class HelixHeadlessMeter extends HelixElement {
     </svg>`
   }
 
+  /** A label's words changed, so the name is written again. */
+  private readonly renamed = (): void => {
+    this.requestUpdate()
+  }
+
   protected override render(): TemplateResult {
     const bounds = this.thresholds
     const band = this.computedBand
     const beyond = this.beyond
     const { max, min } = this.span
     const at = (value: number): string => `${((value - min) / (max - min)) * 100}%`
-    return html`${
+    /* A bare slot, so one with no label generates the box it always did.
+       A label arriving later renames the host, which `slotchange` asks for. */
+    return html`<slot name="label" @slotchange=${this.renamed}></slot>${
       this.shape
         ? this.renderRound()
         : html`<div part="track">

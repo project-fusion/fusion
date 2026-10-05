@@ -10,9 +10,36 @@
 
 :host([show-value]) {
   align-items: center;
+  column-gap: var(--helix-space-sm);
   display: grid;
-  gap: var(--helix-space-sm);
   grid-template-columns: 1fr auto;
+  /* Between a slotted label and the row under it, the only two rows there are. */
+  row-gap: var(--meter-label-gap, var(--helix-space-2xs));
+}
+
+/* A label above a meter, across the whole row when the reading sits
+   beside it. A bare slot, so without one nothing here generates a box. */
+slot[name="label"]::slotted(*) {
+  color: var(--meter-label-color, var(--helix-color-foreground));
+  display: block;
+  font-size: var(--meter-label-size, var(--helix-text-sm));
+  grid-column: 1 / -1;
+  margin-block-end: var(--meter-label-gap, var(--helix-space-2xs));
+}
+
+/* In the grid the row gap is the space, so the margin would count it twice. */
+:host([show-value]) slot[name="label"]::slotted(*) {
+  margin-block-end: 0;
+}
+
+/* Under a ring or an arc, the place a gauge's caption has, since the drawing is
+   centered and a label above it would sit over nothing. */
+:host([shape="arc"]) slot[name="label"]::slotted(*),
+:host([shape="ring"]) slot[name="label"]::slotted(*) {
+  /* The drawing's own column, so a reading beside nothing does not pull the
+     caption off its center; the shape's row gap is the space above it. */
+  grid-column: 1;
+  margin-block: 0;
 }
 
 /* Tabular figures, right-aligned with a floor under them, for the reason
@@ -135,6 +162,7 @@
 :host([shape="ring"]) {
   display: inline-grid;
   place-items: center;
+  row-gap: var(--meter-label-gap, var(--helix-space-2xs));
 }
 
 :host([shape="arc"]) [part="track"],

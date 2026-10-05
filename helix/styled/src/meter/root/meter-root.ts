@@ -33,6 +33,8 @@ import { styles } from './meter-root.css.js'
  * @aliases Gauge, Level, Capacity
  * @documentation https://fusion.dev/helix/components/meter
  *
+ * @slot label - A visible label, above a bar and under a ring or an arc. Its words name it in place of `label`.
+ *
  * @csspart indicator - The part of the track the value fills.
  * @csspart indicator-fair - The fill while the reading is in a band next to the good band. Set alongside `indicator`.
  * @csspart indicator-good - The fill while the reading is in the good band. Set alongside `indicator`.
@@ -44,6 +46,9 @@ import { styles } from './meter-root.css.js'
  * @csspart value - The reading as text, shown when `show-value` is set.
  *
  * @cssproperty --meter-color - The fill color. Overrides the band's tone.
+ * @cssproperty --meter-label-color - The color of a slotted label.
+ * @cssproperty --meter-label-gap - The space between a slotted label and the meter.
+ * @cssproperty --meter-label-size - The type size of a slotted label.
  * @cssproperty --meter-ring-size - The width and height of the drawing in `ring` and `arc`.
  * @cssproperty --meter-ring-width - The thickness of the stroke in `ring` and `arc`.
  * @cssproperty --meter-size - The thickness of the bar.

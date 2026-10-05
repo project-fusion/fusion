@@ -10,12 +10,16 @@
    straight rectangle, so nothing thins, and the corner it sits in is the host's
    own, so the outside is a rounded box like everything beside it. */
 :host {
-  --_callout-color: var(--helix-color-info);
+  --_callout-tone: var(--helix-color-info);
+  /* The tone, or a color of the page's own through the hook. */
+  --_callout-color: var(--callout-accent-color, var(--_callout-tone));
+  --_callout-bar: var(--callout-bar-width, var(--helix-border-thick));
+  --_callout-inset: var(--callout-padding, var(--helix-space-md));
   /* Its own size rather than the page's. A callout is an aside inside prose, so
      it sets its type a step down from the body it interrupts: inheriting left
      it at 15 while its own title was 14, which is a title smaller than the text
      under it. */
-  font-size: var(--helix-text-sm);
+  font-size: var(--callout-font-size, var(--helix-text-sm));
   background-color: var(
     --callout-background-color,
     color-mix(in oklab, var(--_callout-color) 10%, transparent)
@@ -28,11 +32,11 @@
   border-radius: var(--callout-radius, var(--helix-radii-sm));
   color: var(--helix-color-foreground);
   display: flex;
-  gap: var(--helix-space-sm);
+  gap: var(--callout-gap, var(--helix-space-sm));
   /* The bar's width added to the inset, so the text sits where it did when the
      bar was a border and the border box was doing this arithmetic. */
-  padding: var(--helix-space-md);
-  padding-inline-start: calc(var(--helix-space-md) + var(--helix-border-thick));
+  padding: var(--_callout-inset);
+  padding-inline-start: calc(var(--_callout-inset) + var(--_callout-bar));
 }
 
 /* The accent edge. Straight, and clipped to the host's corners by the overflow
@@ -40,7 +44,7 @@
 :host::before {
   background-color: var(--_callout-color);
   content: "";
-  inline-size: var(--helix-border-thick);
+  inline-size: var(--_callout-bar);
   inset-block: 0;
   inset-inline-start: 0;
   position: absolute;
@@ -50,19 +54,36 @@
    every palette, because the hue is what it says; this has nothing to say, so
    it stays in the neutral ramp, ink included. */
 :host([tone="neutral"]) {
-  --_callout-color: var(--helix-color-foreground-muted);
+  --_callout-tone: var(--helix-color-foreground-muted);
 }
 
 :host([tone="success"]) {
-  --_callout-color: var(--helix-color-success);
+  --_callout-tone: var(--helix-color-success);
 }
 
 :host([tone="warning"]) {
-  --_callout-color: var(--helix-color-warning);
+  --_callout-tone: var(--helix-color-warning);
 }
 
 :host([tone="danger"]) {
-  --_callout-color: var(--helix-color-danger);
+  --_callout-tone: var(--helix-color-danger);
+}
+
+/* *Separation is where the box ends, and tone what it says**, so either can
+   change without the other. Absent, or `filled`, is the tint with the bar. */
+
+/* The tone at the edge, with no fill: for a page where a tinted box is too
+   much. An inset line, so the box is the same size as the tinted one. */
+:host([separation="outlined"]) {
+  background-color: var(--callout-background-color, transparent);
+  box-shadow: inset 0 0 0 var(--helix-border-surface)
+    color-mix(in oklab, var(--_callout-color) 45%, var(--helix-color-background));
+}
+
+/* The bar and the mark and nothing behind them, for an aside in running
+   prose. The bar stays, being what says the tone where the hue is not seen. */
+:host([separation="plain"]) {
+  background-color: var(--callout-background-color, transparent);
 }
 
 [part="icon"] {
@@ -100,7 +121,7 @@ slot[name="heading"]::slotted(*) {
      first words of the content run together as one sentence in two weights,
      which reads as emphasis rather than as a heading. */
   display: block;
-  font-size: var(--helix-text-sm);
+  font-size: var(--callout-font-size, var(--helix-text-sm));
   font-weight: var(--helix-weight-semibold);
   margin: var(--helix-space-none);
 }

@@ -1,4 +1,4 @@
-import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, hostAria, slottedWords } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -40,6 +40,8 @@ const percent = (share: number, locale: string): string => {
  * @aliases Progress bar, Loading bar
  * @documentation https://fusion.dev/helix/components/progress
  *
+ * @slot label - A visible label. Its words name the progress bar in place of `label`.
+ *
  * @csspart groove - The unfilled circle under the ring's filled arc.
  * @csspart indicator - The filled part that shows the work done.
  * @csspart track - The full length the work is measured against.
@@ -68,6 +70,9 @@ export class HelixHeadlessProgress extends HelixElement {
 
   /**
    * Accessible name for what is in progress.
+   *
+   * A visible label in the `label` slot names it instead, with the words it
+   * shows, so the name and the label cannot disagree.
    */
   @property()
   label = 'Progress'
@@ -169,7 +174,10 @@ export class HelixHeadlessProgress extends HelixElement {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    hostAria(this.internals, { label: this.label, role: 'progressbar' })
+    hostAria(this.internals, {
+      label: slottedWords(this, ['label']) || this.label,
+      role: 'progressbar',
+    })
     /* The clamped value, not the given one, so what is announced is what is
        drawn. Written as strings because that is what `ElementInternals` takes;
        a number assigned here is stringified anyway and reads as though the
@@ -194,6 +202,11 @@ export class HelixHeadlessProgress extends HelixElement {
     this.internals.ariaValueText = this.valueText || null
   }
 
+  /** A label's words changed, so the name is written again. */
+  private readonly renamed = (): void => {
+    this.requestUpdate()
+  }
+
   protected override render(): TemplateResult {
     /* A custom property rather than a width, so the styled tier decides what
        the number means: a bar fills along it, and a ring would sweep. */
@@ -215,7 +228,9 @@ export class HelixHeadlessProgress extends HelixElement {
       <circle part="indicator" pathLength="100" style="--progress-fraction: ${fraction}" />
     </svg>`
 
-    return html`${
+    /* A bare slot, so one with no label generates the box it always did.
+       A label arriving later renames the host, which `slotchange` asks for. */
+    return html`<slot name="label" @slotchange=${this.renamed}></slot>${
       this.shape === 'ring'
         ? ring
         : html`<div part="track">

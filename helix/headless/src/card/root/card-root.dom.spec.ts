@@ -19,9 +19,9 @@ describe('card regions', () => {
     // and not wrapper divs either.
     expect(card.querySelectorAll('helix-card-header, helix-card-content').length).toBe(0)
     // The host is the surface, so the shadow root holds only slots: no
-    // wrapper element at all.
+    // wrapper element at all while no actions slot holds anything.
     expect(card.shadowRoot?.querySelectorAll('div').length).toBe(0)
-    expect(card.shadowRoot?.querySelectorAll('slot').length).toBe(4)
+    expect(card.shadowRoot?.querySelectorAll('slot').length).toBe(6)
   })
 
   test('routes content to the right region', async () => {
@@ -77,14 +77,79 @@ describe('card regions', () => {
     expect(heading?.getAttribute('role')).toBeNull()
   })
 
-  test('carries the group role', async () => {
-    const card = await mount('<helix-headless-card>Body</helix-headless-card>')
-    // On the host, since the host is the box.
+  /* A group with no name adds "group" to what a reader says and nothing else,
+     so the role waits for a name. */
+  test('is a group once it is named, on the host since the host is the box', async () => {
+    const card = (await mount('<helix-headless-card>Body</helix-headless-card>')) as HTMLElement & {
+      updateComplete: Promise<boolean>
+    }
+    expect(role(card)).toBeNull()
+    card.setAttribute('aria-label', 'Storage')
+    await card.updateComplete
+    expect(role(card)).toBe('group')
+    card.removeAttribute('aria-label')
+    await card.updateComplete
+    expect(role(card)).toBeNull()
+  })
+
+  test('and named by a heading it points at', async () => {
+    const card = await mount(
+      '<helix-headless-card aria-labelledby="t"><h2 id="t" slot="header">Storage</h2></helix-headless-card>',
+    )
     expect(role(card)).toBe('group')
   })
 
   test('a consumer-supplied name is left alone', async () => {
     const card = await mount('<helix-headless-card aria-label="Report">Body</helix-headless-card>')
     expect(card.getAttribute('aria-label')).toBe('Report')
+  })
+})
+
+/* wa-card's header-actions and footer-actions. A line becomes a wrapper only
+   while its actions slot holds something, so a card without actions renders the
+   bare slots it always did. */
+describe('card actions', () => {
+  type Card = HTMLElement & { updateComplete: Promise<boolean> }
+  const row = (card: Element, name: string) => card.shadowRoot?.querySelector(`[part="${name}"]`)
+
+  test('a card without actions draws no line of its own', async () => {
+    const card = await mount(
+      '<helix-headless-card><h2 slot="header">T</h2>Body<button slot="footer">Go</button></helix-headless-card>',
+    )
+    expect(row(card, 'header-row')).toBeNull()
+    expect(row(card, 'footer-row')).toBeNull()
+  })
+
+  test('header actions share a line with the header', async () => {
+    const card = (await mount(
+      '<helix-headless-card><h2 slot="header">T</h2><button slot="header-actions">Menu</button>Body</helix-headless-card>',
+    )) as Card
+    await card.updateComplete
+    const line = row(card, 'header-row')
+    expect(line?.querySelector('slot[name="header"]')).not.toBeNull()
+    expect(slotted(card, 'header-actions')[0]?.textContent).toBe('Menu')
+    expect(
+      (
+        line?.querySelector('slot[name="header-actions"]') as HTMLSlotElement | null
+      )?.assignedElements(),
+    ).toHaveLength(1)
+    expect(row(card, 'footer-row')).toBeNull()
+  })
+
+  test('footer actions arriving later draw the footer line, and leaving remove it', async () => {
+    const card = (await mount(
+      '<helix-headless-card>Body<button slot="footer">Back</button></helix-headless-card>',
+    )) as Card
+    const action = document.createElement('button')
+    action.slot = 'footer-actions'
+    action.textContent = 'Save'
+    card.append(action)
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await card.updateComplete
+    expect(row(card, 'footer-row')?.querySelector('slot[name="footer"]')).not.toBeNull()
+    action.remove()
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await card.updateComplete
+    expect(row(card, 'footer-row')).toBeNull()
   })
 })
