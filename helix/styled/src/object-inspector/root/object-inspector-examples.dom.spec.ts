@@ -76,20 +76,31 @@ describe('the windowed example', () => {
     },
   )
 
-  run(
-    'End reaches the last entry, drawn and pointed at, with focus still on the tree',
-    async () => {
-      await example(windowed)
-      await idle()
-      tree().focus()
-      await press('End')
-      await idle()
-      const id = tree().getAttribute('aria-activedescendant') ?? ''
-      const last = inspector().shadowRoot?.getElementById(id)
-      expect(last?.getAttribute('aria-posinset')).toBe('10000')
-      expect(inspector().shadowRoot?.activeElement).toBe(tree())
-    },
-  )
+  run('End reaches the last entry, drawn and focused', async () => {
+    await example(windowed)
+    await idle()
+    rows()[0]?.focus()
+    await press('End')
+    await idle()
+    const focused = inspector().shadowRoot?.activeElement
+    expect(focused?.getAttribute('aria-posinset')).toBe('10000')
+    expect(focused?.getAttribute('tabindex')).toBe('0')
+  })
+
+  run('keeps the focused row drawn when it scrolls out of the window', async () => {
+    await example(windowed)
+    await idle()
+    await press('ArrowRight')
+    await press('ArrowDown')
+    await idle()
+    const focused = inspector().shadowRoot?.activeElement as HTMLElement
+    tree().scrollTop = 40_000
+    tree().dispatchEvent(new Event('scroll'))
+    await idle()
+    await idle()
+    expect(focused.isConnected).toBe(true)
+    expect(inspector().shadowRoot?.activeElement === focused).toBe(true)
+  })
 })
 
 describe('the filter example', () => {

@@ -14,7 +14,8 @@ describe('list server output', () => {
 
     const row = ssr(html`<helix-headless-list-item></helix-headless-list-item>`)
     expect(partTag(row, 'row')).toMatch(/^<div\b/)
-    expect(rendered(row, 'helix-headless-list-item')).toContain('<slot></slot>')
+    // The default slot carries the id the grid cell is named by.
+    expect(rendered(row, 'helix-headless-list-item')).toContain('<slot id="label"></slot>')
   })
 
   test('neither the list nor a row carries an attribute the consumer did not write', () => {

@@ -73,22 +73,28 @@ describe('an object inspector', () => {
     expect(counts).toEqual(['6 keys', '1 key', '2 items'])
   })
 
-  test('is a tree whose rows say their real level, position and set size', async () => {
+  test('is a tree grid whose rows say their real level, position and set size', async () => {
     const host = await inspector()
-    expect(tree(host).getAttribute('role')).toBe('tree')
+    expect(tree(host).getAttribute('role')).toBe('treegrid')
     const name = rows(host)[2]
     expect([
       name?.getAttribute('role'),
       name?.getAttribute('aria-level'),
       name?.getAttribute('aria-posinset'),
       name?.getAttribute('aria-setsize'),
-    ]).toEqual(['treeitem', '2', '2', '6'])
+      [...(name?.children ?? [])].map((cell) => cell.getAttribute('role')).join(),
+    ]).toEqual(['row', '2', '2', '6', 'gridcell'])
   })
 
-  test('points the tree at the row the keys are on, and moves it with the arrows', async () => {
+  test('the row the keys are on holds the one tab stop and takes focus as they move', async () => {
     const host = await inspector()
-    expect(tree(host).getAttribute('aria-activedescendant')).toBe(active(host)?.id ?? null)
+    const stops = () => rows(host).map((row) => row.getAttribute('tabindex'))
+    expect(stops()).toEqual(['0', '-1', '-1', '-1', '-1', '-1', '-1'])
+    expect(tree(host).hasAttribute('tabindex')).toBe(false)
+    expect(tree(host).hasAttribute('aria-activedescendant')).toBe(false)
     await press(host, 'ArrowDown')
+    expect(host.shadowRoot?.activeElement === active(host)).toBe(true)
+    expect(stops()).toEqual(['-1', '0', '-1', '-1', '-1', '-1', '-1'])
     await press(host, 'ArrowDown')
     expect(active(host)?.textContent).toContain('name')
     await press(host, 'End')
@@ -293,12 +299,91 @@ describe('an object inspector in another language', () => {
    single-selection tree as selected unless a row says otherwise, so every
    arrow press was also announced as a selection. */
 describe('an object inspector that selects nothing', () => {
-  test('says on every row that it is not selected, the active one included', async () => {
+  test('says nothing about being selected on any row, the focused one included', async () => {
     const host = await inspector()
     await press(host, 'ArrowDown')
-    expect(rows(host).map((row) => row.getAttribute('aria-selected'))).toEqual(
-      rows(host).map(() => 'false'),
+    expect(rows(host).some((row) => row.hasAttribute('aria-selected'))).toBe(false)
+  })
+
+  test('a row focused some other way becomes the active row, and says so', async () => {
+    const host = (await inspector()) as Inspector & { active: string }
+    const heard: string[] = []
+    host.addEventListener('helix-activate', (event) =>
+      heard.push((event as CustomEvent<{ value: string }>).detail.value),
     )
+    rows(host)[3]?.focus()
+    await host.updateComplete
+    expect(host.active).toBe('/ok')
+    expect(heard).toEqual(['/ok'])
+    expect(rows(host)[3]?.getAttribute('tabindex')).toBe('0')
+  })
+
+  test('a script writing active moves the row and leaves focus where it is', async () => {
+    const host = (await inspector()) as Inspector & { active: string }
+    const outside = document.createElement('button')
+    document.body.append(outside)
+    outside.focus()
+    host.active = '/name'
+    await host.updateComplete
+    expect(active(host)?.textContent).toContain('name')
+    expect(document.activeElement === outside).toBe(true)
+    outside.remove()
+  })
+})
+
+describe('a branch opened or closed by a reader', () => {
+  const listen = (host: HTMLElement): string[] => {
+    const heard: string[] = []
+    for (const name of ['helix-before-open', 'helix-before-close']) {
+      host.addEventListener(name, (event) => heard.push(event.type))
+    }
+    host.addEventListener('toggle', (event) => {
+      const { newState, oldState } = event as Event & { newState: string; oldState: string }
+      heard.push(`toggle ${oldState} ${newState}`)
+    })
+    return heard
+  }
+
+  test('asks first, then says so with toggle, and expanded holds it', async () => {
+    const host = (await inspector()) as Inspector & { expanded: string[] }
+    const heard = listen(host)
+    await press(host, 'ArrowDown')
+    await press(host, 'ArrowRight')
+    expect(heard).toEqual(['helix-before-open', 'toggle closed open'])
+    expect(host.expanded.sort()).toEqual(['', '/meta'])
+    await press(host, 'Enter')
+    expect(heard.slice(2)).toEqual(['helix-before-close', 'toggle open closed'])
+    expect(host.expanded).toEqual([''])
+  })
+
+  test('stays closed when the request is refused, and says nothing after', async () => {
+    const host = (await inspector()) as Inspector & { expanded: string[] }
+    const heard = listen(host)
+    host.addEventListener('helix-before-open', (event) => event.preventDefault())
+    await press(host, 'ArrowDown')
+    await press(host, 'ArrowRight')
+    expect(heard).toEqual(['helix-before-open'])
+    expect(rows(host)[1]?.getAttribute('aria-expanded')).toBe('false')
+  })
+
+  test('asks once for every branch `*` opens', async () => {
+    const host = (await inspector()) as Inspector & { expanded: string[] }
+    const heard = listen(host)
+    await press(host, 'ArrowDown')
+    await press(host, '*')
+    expect(heard).toEqual(['helix-before-open', 'toggle closed open'])
+    expect(host.expanded.sort()).toEqual(['', '/meta', '/tags'])
+    await press(host, '*')
+    // Nothing left to open, so nothing is asked.
+    expect(heard).toHaveLength(2)
+  })
+
+  test('a script writing expanded sends nothing', async () => {
+    const host = (await inspector()) as Inspector & { expanded: string[] }
+    const heard = listen(host)
+    host.expanded = ['', '/meta']
+    await host.updateComplete
+    expect(heard).toEqual([])
   })
 })
 
@@ -479,10 +564,11 @@ describe('an object inspector with a filter field', () => {
     expect([field(host).value, rows(host).length]).toEqual(['', 7])
   })
 
-  test('Down moves from the field to the tree', async () => {
+  test('Down moves from the field to the row the keys are on', async () => {
     const host = await inspector('filterable')
     field(host).focus()
     field(host).dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowDown' }))
-    expect(host.shadowRoot?.activeElement).toBe(tree(host))
+    await host.updateComplete
+    expect(host.shadowRoot?.activeElement === active(host)).toBe(true)
   })
 })

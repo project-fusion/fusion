@@ -12,12 +12,14 @@ import '../index.js'
  * already makes for the same channel.
  */
 describe('object inspector server output', () => {
-  test('a bound value is drawn as a tree, its rows in the markup', () => {
+  test('a bound value is drawn as a tree grid, its rows in the markup', () => {
     const markup = ssr(
       html`<helix-headless-object-inspector .value=${{ a: 1 }}></helix-headless-object-inspector>`,
     )
-    expect(partTag(markup, 'tree')).toContain('role="tree"')
-    expect(partTag(markup, 'row')).toContain('role="treeitem"')
+    expect(partTag(markup, 'tree')).toContain('role="treegrid"')
+    expect(partTag(markup, 'row')).toContain('role="row"')
+    // The first row holds the tab stop, so a served tree is reachable before it upgrades.
+    expect(partTag(markup, 'row')).toContain('tabindex="0"')
     expect(rendered(markup, 'helix-headless-object-inspector')).toContain('1 key')
   })
 
@@ -36,8 +38,8 @@ describe('object inspector server output', () => {
         <helix-headless-object-inspector for="payload"></helix-headless-object-inspector>
       </div>`,
     )
-    expect(partTag(markup, 'tree')).toContain('role="tree"')
-    expect(partTag(markup, 'tree')).not.toContain('role="treeitem"')
+    expect(partTag(markup, 'tree')).toContain('role="treegrid"')
+    expect(partTag(markup, 'tree')).not.toContain('role="row"')
     /* The frame whole rather than the marks somebody thought to name, and not
        `toContain('{"a":1}')`, which was the spec's own `<script>` sibling: this
        component neither renders it nor can remove it, so that held whatever the
@@ -103,10 +105,11 @@ describe('object inspector server output', () => {
     expect(servedParts(markup)).not.toContain('live')
   })
 
-  test('every row says it is not selected', () => {
+  test('no row says anything about being selected, since nothing is chosen', () => {
     const markup = ssr(
       html`<helix-headless-object-inspector .value=${{ a: 1 }}></helix-headless-object-inspector>`,
     )
-    expect(partTag(markup, 'row')).toContain('aria-selected="false"')
+    expect(partTag(markup, 'row')).not.toContain('aria-selected')
+    expect(partTag(markup, 'tree')).not.toContain('aria-activedescendant')
   })
 })

@@ -85,12 +85,6 @@
   overscroll-behavior: contain;
 }
 
-/* The ring moves to the row the keys are on, since the tree is what holds focus
-   and a ring around the whole value says nothing about where a reader is. */
-[part="tree"]:focus-visible {
-  outline: none;
-}
-
 /* **One line per entry, and a long string ends in an ellipsis** rather than
    wrapping, so every row is the same height: that is what lets a windowed tree
    place ten thousand of them without measuring each. The whole value is one
@@ -125,11 +119,12 @@
    on carries `row-active` for exactly this, and nothing can follow `::part()`
    with an attribute selector, so a sheet that reached for `[data-active]` drew a
    state no consumer of this component could draw. */
-[part="tree"]:focus [part~="row-active"] {
+[part="tree"]:focus-within [part~="row-active"] {
   background-color: var(--helix-color-surface-sunken);
 }
 
-[part="tree"]:focus-visible [part~="row-active"] {
+/* The row the keys are on holds focus, so the ring is the row's own. */
+[part~="row"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }

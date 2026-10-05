@@ -57,9 +57,9 @@ helix-headless-object-inspector[label]::part(tree) {
   border-start-start-radius: 0;
 }
 
-helix-headless-object-inspector::part(tree):focus-visible {
+helix-headless-object-inspector::part(row):focus-visible {
   outline: 2px solid var(--_gray-mark);
-  outline-offset: 2px;
+  outline-offset: -2px;
 }
 
 helix-headless-object-inspector:focus-within::part(row-active) {
