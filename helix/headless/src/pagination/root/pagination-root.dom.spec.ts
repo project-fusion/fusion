@@ -206,6 +206,18 @@ describe('pagination state', () => {
     expect((nav as HTMLElement & { page: number }).page).toBe(3)
   })
 
+  test('names the page asked for as a number, beside the string', async () => {
+    const nav = await mount(
+      '<helix-headless-pagination default-page="4" pages="12"></helix-headless-pagination>',
+    )
+    let detail: { page?: number; value: string } | undefined
+    nav.addEventListener('helix-navigate', (event) => {
+      detail = (event as CustomEvent<{ page?: number; value: string }>).detail
+    })
+    part(nav, 'previous')?.dispatchEvent(new Event('click', { bubbles: true }))
+    expect(detail).toEqual({ page: 3, value: '3' })
+  })
+
   test('a step off either end asks for nothing', async () => {
     const nav = await mount(
       '<helix-headless-pagination default-page="1" pages="3"></helix-headless-pagination>',
