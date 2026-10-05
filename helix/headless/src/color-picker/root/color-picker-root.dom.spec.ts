@@ -202,7 +202,7 @@ describe('color picker', () => {
       [...(host.shadowRoot?.querySelectorAll('[part="swatch"]') ?? [])].map((one) =>
         one.getAttribute('aria-label'),
       ),
-    ).toEqual(['#ff0000', 'rgb(0 255 0)'])
+    ).toEqual(['vibrant red', 'very light vibrant green'])
   })
 
   test('a preset is taken in the picker format, not as the preset spelled it', async () => {
@@ -703,3 +703,47 @@ if (hasLayout()) {
     })
   })
 }
+
+describe('a color, said by its name', () => {
+  /* React Aria names a color where Helix said only numbers: "Saturation 80%,
+     Brightness 100%" told a reader where the handle was and not what it showed,
+     and a preset was read out as its CSS. */
+  test('the square says the name after both numbers', async () => {
+    const host = await picker('value="#ff0000"')
+    const saturation = part(host, 'grid-saturation') as HTMLInputElement
+    const brightness = part(host, 'grid-brightness') as HTMLInputElement
+    expect(saturation.getAttribute('aria-valuetext')).toBe(
+      'Saturation 100%, Brightness 100%, vibrant red',
+    )
+    expect(brightness.getAttribute('aria-valuetext')).toBe(
+      'Brightness 100%, Saturation 100%, vibrant red',
+    )
+    await axis(host, 'brightness', 40)
+    expect(saturation.getAttribute('aria-valuetext')).toContain('Brightness 40%, dark red')
+  })
+
+  test('the hue ramp says the hue it paints, even over a gray', async () => {
+    const host = await picker('value="#808080"')
+    const hue = host.shadowRoot?.querySelector('[data-channel="hue"]') as HTMLElement
+    expect(hue.getAttribute('value-text')).toBe('{value}, red')
+    await ramp(host, 'hue', 225)
+    expect(hue.getAttribute('value-text')).toBe('{value}, cyan blue')
+  })
+
+  test('a transparent color says how transparent', async () => {
+    const host = await picker('alpha value="#ff000080"')
+    expect(part(host, 'grid-saturation')?.getAttribute('aria-valuetext')).toContain(
+      'vibrant red, 50% transparent',
+    )
+  })
+
+  test('color-words speaks the names in the words a page gives', async () => {
+    const host = await picker(
+      `value="#ff0000" swatches="#0000ff" color-words='{"red": "Rot", "blue": "Blau", "vibrant": "kräftiges", "dark": "dunkles", "colorName": "{lightness} {chroma} {hue}"}'`,
+    )
+    expect(part(host, 'grid-saturation')?.getAttribute('aria-valuetext')).toBe(
+      'Saturation 100%, Brightness 100%, kräftiges rot',
+    )
+    expect(part(host, 'swatch')?.getAttribute('aria-label')).toBe('dunkles kräftiges blau')
+  })
+})

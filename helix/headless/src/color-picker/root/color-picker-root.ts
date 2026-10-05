@@ -21,6 +21,7 @@ import { eyedropper } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
+import { type ColorWords, colorName, hueName } from '../color-name.js'
 /* Relative, so this registers the base slider and the styled file's identical
    import registers the styled one. `tier` picks which the template asks for. */
 import '../../button/index.js'
@@ -68,6 +69,11 @@ interface EyeDropperConstructor {
  * brightness by ten. The picker sends `input` as the color moves and `change`
  * when a drag, a key, a typed value or a preset settles it, as
  * `<input type="color">` does.
+ *
+ * A screen reader hears the color's name, such as "vibrant red", after the two
+ * numbers on the square and after the number on the hue ramp, and each preset
+ * is named by its color. Set `color-words` to speak the names in another
+ * language.
  *
  * @since 0.1.0
  * @status stable
@@ -156,6 +162,23 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
    */
   @property({ attribute: 'brightness-label' })
   brightnessLabel = 'Brightness'
+
+  /**
+   * The words a color's name is spoken in, as JSON keyed by their English,
+   * such as `{"red": "rot", "vibrant": "kräftiges"}`.
+   *
+   * **A color is named the way React Aria names one**, as "vibrant red" or
+   * "dark grayish blue", and the keys are the ones `@react-stately/color`
+   * translates, so a table a page already has for it can be handed over whole.
+   * `colorName` and `transparentColorName` are the two sentences that put the
+   * words together. A word left out is spoken in English.
+   *
+   * The name follows the numbers on the square, follows the number on the hue
+   * ramp, and names each preset, so a reader who cannot see the color hears
+   * which one it is.
+   */
+  @property({ attribute: 'color-words', type: Object })
+  colorWords: Partial<ColorWords> = {}
 
   /**
    * The text the sample shows for a moment after it copies the value.
@@ -730,13 +753,15 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
    * One of the ramps under the square.
    *
    * `protected` rather than `private`, the method being the seam a tier above
-   * renders its own ramp through.
+   * renders its own ramp through. `spoken` is what a screen reader says for the
+   * ramp's value, with `{value}` filled in, and empty says the number alone.
    */
   protected renderChannel(
     channel: 'alpha' | 'hue',
     label: string,
     max: number,
     value: number,
+    spoken = '',
   ): TemplateResult {
     return html`<${this.tag('slider')}
       part="channel"
@@ -748,6 +773,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
       label=${label}
       max=${max}
       min="0"
+      value-text=${spoken || nothing}
       .value=${String(value)}
       ?disabled=${this.isDisabled}
       @input=${(event: Event) => this.takeChannel(channel, event)}
@@ -903,8 +929,20 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
     const painted = toCss(color)
     /* Each axis says both numbers, its own first, since either key pair moves
        either axis from the one tab stop. */
-    const both = `${this.saturationLabel} ${color.saturation}%, ${this.brightnessLabel} ${color.brightness}%`
-    const reversed = `${this.brightnessLabel} ${color.brightness}%, ${this.saturationLabel} ${color.saturation}%`
+    /* And then the color's name, which is what the two numbers make: "Saturation
+       100%, Brightness 100%" says where the handle is and "vibrant red" says
+       what a sighted reader sees there, which is React Aria's reading. */
+    const named = colorName(color, this.colorWords, this.lang)
+    const both = `${this.saturationLabel} ${color.saturation}%, ${this.brightnessLabel} ${color.brightness}%, ${named}`
+    const reversed = `${this.brightnessLabel} ${color.brightness}%, ${this.saturationLabel} ${color.saturation}%, ${named}`
+    /* The hue ramp names the hue at full strength, which is what the ramp
+       paints: the current color's own hue is gray wherever saturation is
+       nothing, and a ramp read out as gray all the way along says nothing. */
+    const hue = hueName(
+      { alpha: 100, brightness: 100, hue: color.hue, saturation: 100 },
+      this.colorWords,
+      this.lang,
+    )
     return html`<div
         part="grid"
         style="--color-picker-hue: ${color.hue}; --color-picker-saturation: ${color.saturation}%; --color-picker-brightness: ${color.brightness}%"
@@ -963,7 +1001,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
           @click=${() => this.copier.copy(this.value)}
         ></button>
         <div part="channels">
-          ${this.renderChannel('hue', this.hueLabel, 360, color.hue)}
+          ${this.renderChannel('hue', this.hueLabel, 360, color.hue, `{value}, ${hue}`)}
           ${this.alpha ? this.renderChannel('alpha', this.opacityLabel, 100, color.alpha) : nothing}
         </div>
       </div>
@@ -1005,7 +1043,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
                   return html`<button
                     part="swatch"
                     type="button"
-                    aria-label=${preset}
+                    aria-label=${parsed ? colorName(parsed, this.colorWords, this.lang) : preset}
                     aria-pressed=${parsed !== null && toCss(parsed) === painted ? 'true' : 'false'}
                     style="--color-picker-swatch: ${preset}"
                     ?disabled=${this.isDisabled}

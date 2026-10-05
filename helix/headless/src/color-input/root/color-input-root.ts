@@ -14,6 +14,7 @@ import {
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
+import { type ColorWords, colorName } from '../../color-picker/color-name.js'
 /* Relative, so this registers the base picker and the styled file's identical
    import registers the styled one. `tier` picks which the template asks for. */
 import '../../color-picker/index.js'
@@ -142,6 +143,17 @@ export class HelixHeadlessColorInput extends MixinPickerField(
   autocomplete = 'off'
 
   /**
+   * The words a color's name is spoken in, as JSON keyed by their English,
+   * such as `{"red": "rot", "vibrant": "kräftiges"}`.
+   *
+   * Passed to the panel, whose square, hue ramp and presets say the color's
+   * name, and read by the swatch in `swatch`, which says it before the value.
+   * Color Picker lists the keys.
+   */
+  @property({ attribute: 'color-words', type: Object })
+  colorWords: Partial<ColorWords> = {}
+
+  /**
    * The syntax the value is written in: `hex`, `rgb`, or `hsl`.
    *
    * **Undefaulted, because it reflects.** The two together stamp an attribute
@@ -259,6 +271,22 @@ export class HelixHeadlessColorInput extends MixinPickerField(
   /** What the picker should show, which is only ever a color. */
   private get picked(): string {
     return parseColor(this.value) ? this.value : this.settled
+  }
+
+  /**
+   * What the swatch says in `swatch`: the color's name and then the value, or
+   * the trigger's words where there is no color yet.
+   *
+   * The name first, because it is what a sighted reader takes from the block of
+   * color, and the value after it, because it is what the field holds and what
+   * a reader may need to copy.
+   */
+  private get swatchWords(): string {
+    const parsed = parseColor(this.value)
+    if (!parsed) {
+      return this.value || this.triggerLabel
+    }
+    return `${colorName(parsed, this.colorWords, this.lang)} ${this.value}`
   }
 
   /** What the trigger's swatch paints, which is only ever a color. */
@@ -414,6 +442,7 @@ export class HelixHeadlessColorInput extends MixinPickerField(
       ?alpha=${this.alpha}
       ?no-format=${this.noFormat}
       ?no-value=${this.variant !== 'swatch'}
+      .colorWords=${this.colorWords}
       .format=${this.format ?? 'hex'}
       .value=${this.picked}
       swatches=${this.swatches || nothing}
@@ -491,7 +520,7 @@ export class HelixHeadlessColorInput extends MixinPickerField(
                was never said. The label, then the value, or the trigger's words
                where there is no value yet. */
             this.variant === 'swatch'
-              ? html`<span id="swatch-value" hidden>${this.value || this.triggerLabel}</span>`
+              ? html`<span id="swatch-value" hidden>${this.swatchWords}</span>`
               : nothing
           }
         </button>
