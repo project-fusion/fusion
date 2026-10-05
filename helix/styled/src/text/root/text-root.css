@@ -2,6 +2,16 @@
    out as a paragraph without a second property saying so. */
 :host {
   display: inline;
+
+  /* Each value of the ramp reads its hook first. Unset, a declaration whose
+     only value is an unset property inherits, which is what these inherited
+     properties do with no declaration at all, so the resting text is
+     unchanged. */
+  font-family: var(--text-font-family);
+  font-size: var(--text-font-size);
+  font-weight: var(--text-font-weight);
+  letter-spacing: var(--text-letter-spacing);
+  line-height: var(--text-line-height);
 }
 
 :host([as="p"]),
@@ -25,84 +35,84 @@
  */
 :host([variant="display"]),
 :host(:not([variant])[as="h1"]) {
-  font-family: var(--helix-font-display);
-  font-size: var(--helix-text-3xl);
-  font-weight: var(--helix-weight-semibold);
-  letter-spacing: var(--helix-tracking-tight);
-  line-height: var(--helix-leading-heading);
+  font-family: var(--text-font-family, var(--helix-font-display));
+  font-size: var(--text-font-size, var(--helix-text-3xl));
+  font-weight: var(--text-font-weight, var(--helix-weight-semibold));
+  letter-spacing: var(--text-letter-spacing, var(--helix-tracking-tight));
+  line-height: var(--text-line-height, var(--helix-leading-heading));
 }
 
 :host([variant="heading"]),
 :host(:not([variant])[as="h2"]) {
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-2xl);
-  font-weight: var(--helix-weight-semibold);
-  letter-spacing: var(--helix-tracking-tight);
-  line-height: var(--helix-leading-heading);
+  font-family: var(--text-font-family, var(--helix-font-sans));
+  font-size: var(--text-font-size, var(--helix-text-2xl));
+  font-weight: var(--text-font-weight, var(--helix-weight-semibold));
+  letter-spacing: var(--text-letter-spacing, var(--helix-tracking-tight));
+  line-height: var(--text-line-height, var(--helix-leading-heading));
 }
 
 :host([variant="subheading"]),
 :host(:not([variant])[as="h3"]) {
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-xl);
-  font-weight: var(--helix-weight-semibold);
-  letter-spacing: var(--helix-tracking-tight);
-  line-height: var(--helix-leading-heading);
+  font-family: var(--text-font-family, var(--helix-font-sans));
+  font-size: var(--text-font-size, var(--helix-text-xl));
+  font-weight: var(--text-font-weight, var(--helix-weight-semibold));
+  letter-spacing: var(--text-letter-spacing, var(--helix-tracking-tight));
+  line-height: var(--text-line-height, var(--helix-leading-heading));
 }
 
 :host([variant="title"]),
 :host(:not([variant])[as="h4"]) {
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-lg);
-  font-weight: var(--helix-weight-semibold);
-  letter-spacing: var(--helix-tracking-normal);
-  line-height: var(--helix-leading-heading);
+  font-family: var(--text-font-family, var(--helix-font-sans));
+  font-size: var(--text-font-size, var(--helix-text-lg));
+  font-weight: var(--text-font-weight, var(--helix-weight-semibold));
+  letter-spacing: var(--text-letter-spacing, var(--helix-tracking-normal));
+  line-height: var(--text-line-height, var(--helix-leading-heading));
 }
 
 :host([variant="body"]),
 :host(:not([variant])[as="p"]) {
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-md);
-  font-weight: var(--helix-weight-regular);
-  letter-spacing: var(--helix-tracking-normal);
-  line-height: var(--helix-leading-normal);
+  font-family: var(--text-font-family, var(--helix-font-sans));
+  font-size: var(--text-font-size, var(--helix-text-md));
+  font-weight: var(--text-font-weight, var(--helix-weight-regular));
+  letter-spacing: var(--text-letter-spacing, var(--helix-tracking-normal));
+  line-height: var(--text-line-height, var(--helix-leading-normal));
 }
 
 :host([variant="body-strong"]),
 :host(:not([variant])[as="h5"]),
 :host(:not([variant])[as="h6"]),
 :host(:not([variant])[as="strong"]) {
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-md);
-  font-weight: var(--helix-weight-medium);
-  letter-spacing: var(--helix-tracking-normal);
-  line-height: var(--helix-leading-normal);
+  font-family: var(--text-font-family, var(--helix-font-sans));
+  font-size: var(--text-font-size, var(--helix-text-md));
+  font-weight: var(--text-font-weight, var(--helix-weight-medium));
+  letter-spacing: var(--text-letter-spacing, var(--helix-tracking-normal));
+  line-height: var(--text-line-height, var(--helix-leading-normal));
 }
 
 :host([variant="caption"]) {
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-sm);
-  font-weight: var(--helix-weight-regular);
-  letter-spacing: var(--helix-tracking-normal);
-  line-height: var(--helix-leading-normal);
+  font-family: var(--text-font-family, var(--helix-font-sans));
+  font-size: var(--text-font-size, var(--helix-text-sm));
+  font-weight: var(--text-font-weight, var(--helix-weight-regular));
+  letter-spacing: var(--text-letter-spacing, var(--helix-tracking-normal));
+  line-height: var(--text-line-height, var(--helix-leading-normal));
 }
 
 :host([variant="label"]),
 :host(:not([variant])[as="label"]) {
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-xs);
-  font-weight: var(--helix-weight-medium);
-  letter-spacing: var(--helix-tracking-wide);
-  line-height: var(--helix-leading-normal);
+  font-family: var(--text-font-family, var(--helix-font-sans));
+  font-size: var(--text-font-size, var(--helix-text-xs));
+  font-weight: var(--text-font-weight, var(--helix-weight-medium));
+  letter-spacing: var(--text-letter-spacing, var(--helix-tracking-wide));
+  line-height: var(--text-line-height, var(--helix-leading-normal));
 }
 
 :host([variant="code"]),
 :host(:not([variant])[as="code"]) {
-  font-family: var(--helix-font-mono);
-  font-size: var(--helix-text-xs);
-  font-weight: var(--helix-weight-regular);
-  letter-spacing: var(--helix-tracking-normal);
-  line-height: var(--helix-leading-normal);
+  font-family: var(--text-font-family, var(--helix-font-mono));
+  font-size: var(--text-font-size, var(--helix-text-xs));
+  font-weight: var(--text-font-weight, var(--helix-weight-regular));
+  letter-spacing: var(--text-letter-spacing, var(--helix-tracking-normal));
+  line-height: var(--text-line-height, var(--helix-leading-normal));
 }
 
 /* **A heading keeps the heading ink where a surface mutes its body.** A card
@@ -196,6 +206,44 @@
   font: inherit;
   letter-spacing: inherit;
   margin: var(--helix-space-none);
+}
+
+/* A line count needs a width to break against, so a clamped text is a block.
+   The count itself is written on the part, as `-webkit-line-clamp`, which
+   every engine reads with the `-webkit-box` display it needs. */
+:host([lines]) {
+  display: block;
+  min-inline-size: 0;
+}
+
+:host([lines]) [part="text"] {
+  -webkit-box-orient: vertical;
+  display: -webkit-box;
+  overflow: hidden;
+}
+
+/* Named for the CSS properties they set, so each rule is the value. */
+:host([text-align="start"]) {
+  text-align: start;
+}
+:host([text-align="center"]) {
+  text-align: center;
+}
+:host([text-align="end"]) {
+  text-align: end;
+}
+:host([text-align="justify"]) {
+  text-align: justify;
+}
+
+:host([text-wrap="balance"]) {
+  text-wrap: balance;
+}
+:host([text-wrap="pretty"]) {
+  text-wrap: pretty;
+}
+:host([text-wrap="nowrap"]) {
+  text-wrap: nowrap;
 }
 
 /*

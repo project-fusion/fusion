@@ -1,7 +1,9 @@
 import { customElement, HelixElement, reportRuntime } from '@fusion.dev/helix-core'
 import type { CSSResultGroup, PropertyValues } from 'lit'
+import { nothing } from 'lit'
 import { property } from 'lit/decorators.js'
 import { literal, type StaticValue, html as staticHtml } from 'lit/static-html.js'
+import { clampOf } from '../clamp.js'
 import { styles } from './text-root.css.js'
 
 /** Tags this may render. Static values, so they can be interpolated as a tag. */
@@ -45,6 +47,14 @@ const TAGS: Record<string, StaticValue> = {
  * state. Combining them would need a variant for every pair, such as
  * `caption-danger` and `label-muted`.
  *
+ * `lines` cuts the text off after that many lines and ends it with an
+ * ellipsis. `text-wrap` balances or tidies the line breaks, and `text-align`
+ * sets the alignment. Each `--text-*` property overrides one value of the
+ * ramp, for a text or for every text inside an element.
+ *
+ * **To label a control, write a native `<label data-text="label">`.** The
+ * base layer gives it the label ramp. A Helix field takes its own `label`.
+ *
  * @since 0.1.0
  * @status stable
  * @category typography
@@ -54,6 +64,12 @@ const TAGS: Record<string, StaticValue> = {
  * @slot - The text.
  *
  * @csspart text - The rendered element.
+ *
+ * @cssproperty --text-font-family - The typeface. Overrides the ramp's.
+ * @cssproperty --text-font-size - The size. Overrides the ramp's.
+ * @cssproperty --text-font-weight - The weight. Overrides the ramp's.
+ * @cssproperty --text-letter-spacing - The tracking. Overrides the ramp's.
+ * @cssproperty --text-line-height - The leading. Overrides the ramp's.
  */
 @customElement('helix-text')
 export class HelixText extends HelixElement {
@@ -62,13 +78,15 @@ export class HelixText extends HelixElement {
    *
    * Decides the outline and the semantics.
    *
-   * **`label` gives the label ramp and labels no control.** The element is in
-   * this one's shadow root, which neither `for` nor a wrapped control can
-   * reach, so a page that writes either is warned. Name a Helix field with its
-   * own `label`, and a native control with `<label data-text="label">`.
+   * **`label` is deprecated and no longer listed.** The element is in this
+   * one's shadow root, which neither `for` nor a wrapped control can reach, so
+   * it labeled nothing. Written anyway, it still renders a `<label>` in the
+   * label ramp and warns. Use `variant="label"` for the look, a native
+   * `<label data-text="label">` to label a native control, and a Helix field's
+   * own `label`.
    */
   @property({ reflect: true })
-  as?: 'span' | 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'strong' | 'em' | 'code' | 'label'
+  as?: 'span' | 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'strong' | 'em' | 'code'
 
   /**
    * Makes the text quieter: `muted`, or the quieter `subtle`.
@@ -88,6 +106,39 @@ export class HelixText extends HelixElement {
    */
   @property({ reflect: true })
   emphasis?: 'muted' | 'subtle'
+
+  /**
+   * The most lines to show. Text past the last one is cut off with an
+   * ellipsis.
+   *
+   * Lays the text out as a block, because a line count needs a width to break
+   * against. The whole text stays in the page, so a screen reader and a search
+   * still read all of it. Set it as an attribute, such as `lines="1"` for a
+   * single line.
+   */
+  @property({ reflect: true, type: Number })
+  lines?: number
+
+  /**
+   * How the lines align, set as `text-align`.
+   *
+   * Named for the CSS property it sets. `align` alone is a legacy HTML
+   * attribute the browser maps to `text-align` by itself on any element, and
+   * it has no `start` or `end`.
+   */
+  @property({ attribute: 'text-align', reflect: true })
+  textAlign?: 'start' | 'center' | 'end' | 'justify'
+
+  /**
+   * How the lines break, set as `text-wrap`.
+   *
+   * `balance` evens out the length of every line, for a heading of a few
+   * lines. `pretty` avoids a last line of one short word, for a paragraph.
+   * `nowrap` keeps the text on one line. Absent, the lines break as the
+   * browser breaks them.
+   */
+  @property({ attribute: 'text-wrap', reflect: true })
+  textWrap?: 'balance' | 'pretty' | 'nowrap'
 
   /**
    * The meaning of the text, shown by its color, such as `danger` or `success`.
@@ -123,28 +174,17 @@ export class HelixText extends HelixElement {
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    if (changed.has('as') && this.as === 'label' && this.labelsNothing()) {
+    if (changed.has('as') && (this.as as string) === 'label') {
       reportRuntime({
         kind: 'unreachable-label',
         message:
-          '<helix-text as="label"> names no control: its label is in a shadow root, which ' +
-          '`for` and a wrapped control cannot reach. Give a Helix field its own `label`, or ' +
-          'write `<label data-text="label">` for a native control.',
+          '<helix-text as="label"> is deprecated: its label is in a shadow root, which `for` ' +
+          'and a wrapped control cannot reach, so it labels nothing. Write `variant="label"` ' +
+          'for the look, `<label data-text="label">` for a native control, and give a Helix ' +
+          'field its own `label`.',
         tag: this.localName,
       })
     }
-  }
-
-  /** Whether the page wrote this as the label of a control, which it cannot be. */
-  private labelsNothing(): boolean {
-    const fields = [...this.querySelectorAll('*')].some(
-      (element) => (element.constructor as { formAssociated?: boolean }).formAssociated === true,
-    )
-    return (
-      fields ||
-      this.hasAttribute('for') ||
-      this.querySelector('input, select, textarea, button, meter, output, progress') !== null
-    )
   }
 
   protected override render(): unknown {
@@ -156,7 +196,7 @@ export class HelixText extends HelixElement {
      * name, not the span fallback and not a throw. Own keys only. */
     const tag =
       (this.as && Object.hasOwn(TAGS, this.as) ? TAGS[this.as] : undefined) ?? literal`span`
-    return staticHtml`<${tag} part="text"><slot></slot></${tag}>`
+    return staticHtml`<${tag} part="text" style=${clampOf(this.lines) ?? nothing}><slot></slot></${tag}>`
   }
 
   static override styles: CSSResultGroup = styles
