@@ -222,7 +222,7 @@ describe('the swatch as the field', () => {
       .split(/\s+/)
       .map((id) => scope.getElementById(id)?.textContent?.trim())
       .join(' ')
-    expect(name).toBe('Brand #ff0000')
+    expect(name).toBe('Brand vibrant red #ff0000')
     expect(trigger.hasAttribute('aria-label')).toBe(false)
   })
 
@@ -296,5 +296,19 @@ describe('the events a color input sends', () => {
     expect(log).toEqual(['input', 'input'])
     control(host).dispatchEvent(new Event('change'))
     expect(log).toEqual(['input', 'input', 'change'])
+  })
+})
+
+describe('a color input, said by its name', () => {
+  test('hands color-words to the panel, whose square says the name in them', async () => {
+    const host = await field(
+      `value="#ff0000" color-words='{"red": "rouge", "vibrant": "vif", "colorName": "{hue} {chroma}"}'`,
+    )
+    const picker = part(host, 'picker') as HTMLElement & { updateComplete: Promise<unknown> }
+    await picker.updateComplete
+    const square = picker.shadowRoot?.querySelector('[part="grid-saturation"]')
+    expect(square?.getAttribute('aria-valuetext')).toBe(
+      'Saturation 100%, Brightness 100%, rouge vif',
+    )
   })
 })

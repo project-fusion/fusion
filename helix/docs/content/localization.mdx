@@ -166,6 +166,18 @@ language. Every other control shows its English sentence.
 ></helix-number-input>
 ```
 
+Color Picker and Color Input say a color's name to a screen reader, such as
+"vibrant red". Set `color-words` to a JSON table of the words a name is made
+of. The keys are the English words, and they match the strings that React
+Aria's `@react-stately/color` translates, so you can reuse that table.
+
+```html
+<helix-color-picker
+  color-words='{"red": "rot", "vibrant": "kräftiges", "colorName": "{lightness} {chroma} {hue}"}'
+  lang="de"
+></helix-color-picker>
+```
+
 **Pass these strings from your own translation system.** Helix ships English
 defaults and no translation tools. If Helix had its own string catalog, you
 would have to keep two catalogs in step.
