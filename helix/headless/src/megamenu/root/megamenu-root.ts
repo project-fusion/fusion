@@ -1,6 +1,7 @@
 import {
   anchorElement,
   customElement,
+  deepContains,
   HelixElement,
   MixinControllerOpen,
   PopoverController,
@@ -356,6 +357,22 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
     })
   }
 
+  /**
+   * Closes the panel when keyboard focus leaves it for the page.
+   *
+   * Only when focus went somewhere: a `relatedTarget` of null is focus leaving
+   * the document, such as a switch to another window, and a reader who comes
+   * back expects the panel as they left it. `requestOpen` rather than `close`,
+   * because focus has already gone where the reader sent it.
+   */
+  private readonly handleFocusOut = (event: FocusEvent): void => {
+    const next = event.relatedTarget as Node | null
+    if (!this.open || next === null || deepContains(this, next)) {
+      return
+    }
+    this.requestOpen(false)
+  }
+
   private readonly handleTriggerClick = (event: MouseEvent): void => {
     this.stop()
     if (this.openOn !== 'hover') {
@@ -431,6 +448,7 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
     this.addEventListener('click', this.handleContentClick)
     this.addEventListener('pointerenter', this.handlePointerEnter)
     this.addEventListener('pointerleave', this.handlePointerLeave)
+    this.addEventListener('focusout', this.handleFocusOut)
   }
 
   override disconnectedCallback(): void {
@@ -442,6 +460,7 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
     this.removeEventListener('click', this.handleContentClick)
     this.removeEventListener('pointerenter', this.handlePointerEnter)
     this.removeEventListener('pointerleave', this.handlePointerLeave)
+    this.removeEventListener('focusout', this.handleFocusOut)
     this.stop()
     if (showing === this) {
       showing = undefined

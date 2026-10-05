@@ -419,3 +419,37 @@ describe('a megamenu whose trigger the consumer slotted', () => {
     expect(own(host).hasAttribute('aria-controls')).toBe(false)
   })
 })
+
+describe('a megamenu and keyboard focus', () => {
+  /* Only a pointer outside, Escape and leaving with the mouse closed it, so a
+     reader tabbing past the last link left the panel over the page. */
+  test('closes when focus leaves it for the page', async () => {
+    const host = await section()
+    host.open = true
+    await host.updateComplete
+    const link = host.querySelector('a') as HTMLElement
+    const after = document.createElement('button')
+    document.body.append(after)
+    link.dispatchEvent(
+      new FocusEvent('focusout', { bubbles: true, composed: true, relatedTarget: after }),
+    )
+    await host.updateComplete
+    expect(host.open).toBe(false)
+    after.remove()
+  })
+
+  test('and stays open while focus moves inside it, or leaves the window', async () => {
+    const host = await section()
+    host.open = true
+    await host.updateComplete
+    const link = host.querySelector('a') as HTMLElement
+    link.dispatchEvent(
+      new FocusEvent('focusout', { bubbles: true, composed: true, relatedTarget: trigger(host) }),
+    )
+    link.dispatchEvent(
+      new FocusEvent('focusout', { bubbles: true, composed: true, relatedTarget: null }),
+    )
+    await host.updateComplete
+    expect(host.open).toBe(true)
+  })
+})

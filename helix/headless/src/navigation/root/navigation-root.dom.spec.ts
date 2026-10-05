@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -31,5 +31,28 @@ describe('nav bar', () => {
     const current = nav.querySelectorAll('[aria-current="page"]')
     expect(current).toHaveLength(1)
     expect(current[0]?.getAttribute('href')).toBe('/design')
+  })
+})
+
+describe('naming the landmark', () => {
+  /* A footer navigation written the usual way was a second "Main". */
+  test('takes its name from an aria-label on the host', async () => {
+    const nav = await mount(
+      '<helix-headless-navigation aria-label="Footer"><a href="/a">A</a></helix-headless-navigation>',
+    )
+    expect(part(nav, 'nav')?.getAttribute('aria-label')).toBe('Footer')
+  })
+})
+
+/* Browser only: the marker is placed by measuring, and happy-dom has no layout. */
+const measured = hasLayout() ? test : (): void => {}
+
+describe('the marker on a sidebar of sections', () => {
+  measured('follows aria-current="location" as it follows page', async () => {
+    const nav = await mount(`<helix-headless-navigation orientation="vertical">
+      <a href="#one">One</a><a aria-current="location" href="#two">Two</a>
+    </helix-headless-navigation>`)
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+    expect(part(nav, 'indicator')?.hasAttribute('data-placed')).toBe(true)
   })
 })
