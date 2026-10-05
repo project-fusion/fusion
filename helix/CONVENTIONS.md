@@ -1609,6 +1609,14 @@ form. Four things follow, and the ones a mixin does not do are the component's.
   is about applying the mixin and then not rendering it, and a component that
   never applied it owes nothing under it.
 
+  **Color Picker also takes a `feedback` of its own, and it is not the
+  mixin's.** It is one line under the picker, drawn only while set, and a
+  verdict as a field's `feedback` is. Color Input hands it the field's own
+  message, because its panel opens over the line under the field and a reader
+  in the panel otherwise cannot see what is wrong; the message is said once,
+  in the place the reader is looking. Decided October 5, 2026, for the
+  forms gap the review named (no message region inside the panel).
+
   **Rating is the worked example of taking it.** It is the one control here
   whose control is genuinely inline, so the seams could not simply be stacked
   around it: what it does is keep the marks and the readout in a `field` row and

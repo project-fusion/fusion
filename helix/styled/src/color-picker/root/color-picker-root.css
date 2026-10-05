@@ -454,6 +454,16 @@
   padding: var(--helix-space-none);
 }
 
+/* The message, under everything it is about, in the danger ink and the size a
+   field's feedback takes, on the inset every other row takes. */
+[part="feedback"] {
+  color: var(--color-picker-feedback-color, var(--helix-color-danger));
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  margin: var(--helix-space-sm) var(--helix-space-none) var(--helix-space-none);
+  padding-inline: var(--color-picker-padding, var(--helix-space-none));
+}
+
 @media (prefers-reduced-motion: reduce) {
   /* The confirmation still has to read, so what goes is the press rather than
      the mark: the tick over the chip stays and the chip stops shrinking. */

@@ -118,6 +118,7 @@ interface EyeDropperConstructor {
  * @csspart eyedropper-button - The button inside `eyedropper`.
  * @csspart eyedropper-live - The live region of the button inside `eyedropper`, which says its pending label.
  * @csspart eyedropper-text - The words on the button inside `eyedropper`, trimmed to their capitals and baseline.
+ * @csspart feedback - The message under the picker, while `feedback` is set.
  * @csspart field - One channel's number field with its label, in `channel-fields`.
  * @csspart field-input - The number input in a channel's field.
  * @csspart field-label - The name above a channel's number input.
@@ -234,6 +235,17 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
    */
   @property({ attribute: 'eyedropper-label' })
   eyedropperLabel = 'Sample a color from the screen'
+
+  /**
+   * A message under the picker, such as what is wrong with the color.
+   *
+   * While set, the picker is invalid and does not submit, as a field's
+   * `feedback` is, and the square and the value text are described by it.
+   * Color Input shows its own message here, so a reader in the open panel
+   * still sees it.
+   */
+  @property()
+  feedback = ''
 
   /**
    * The syntax the value is written in: `hex`, `rgb`, or `hsl`.
@@ -783,6 +795,11 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
    * the browser's bubble points at the thing to do rather than at the row that
    * states the result.
    */
+  /** @internal `feedback` marks the picker invalid, as a field's does. */
+  protected override get validityFeedback(): string {
+    return this.feedback
+  }
+
   private reportRequired(): void {
     if (this.required && this.value === '') {
       this.internals.setValidity(
@@ -1171,6 +1188,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
           min="0"
           max="100"
           aria-label=${axisName(this.saturationLabel)}
+          aria-describedby=${this.feedback === '' ? nothing : 'feedback'}
           aria-valuetext=${both}
           aria-invalid=${this.invalid ? 'true' : nothing}
           .value=${String(color.saturation)}
@@ -1191,6 +1209,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
           max="100"
           tabindex="-1"
           aria-label=${axisName(this.brightnessLabel)}
+          aria-describedby=${this.feedback === '' ? nothing : 'feedback'}
           aria-valuetext=${reversed}
           aria-invalid=${this.invalid ? 'true' : nothing}
           .value=${String(color.brightness)}
@@ -1247,6 +1266,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
                 part="value"
                 type="text"
                 aria-label=${this.valueLabel}
+                aria-describedby=${this.feedback === '' ? nothing : 'feedback'}
                 aria-invalid=${this.invalid ? 'true' : nothing}
                 autocomplete=${this.autocomplete || nothing}
                 spellcheck="false"
@@ -1263,7 +1283,8 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
         ${this.tools ? html`${this.renderTools()}` : nothing}
       </div>
 
-      ${this.presets.length === 0 ? nothing : this.renderSwatches(painted)}`
+      ${this.presets.length === 0 ? nothing : this.renderSwatches(painted)}
+      ${this.feedback === '' ? nothing : html`<p part="feedback" id="feedback">${this.feedback}</p>`}`
   }
 }
 
