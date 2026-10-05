@@ -1,3 +1,5 @@
+import { commaList } from '@fusion.dev/helix-core'
+
 /**
  * Which of the files arriving at a file field it takes, and why it refuses the
  * rest: the rules `accept`, `max-file-size`, `max-files` and `validate` set.
@@ -37,10 +39,7 @@ export interface ScreenRules {
  * such as `image/*`, as the platform reads it.
  */
 export const accepts = (file: File, accept: string): boolean => {
-  const tokens = accept
-    .split(',')
-    .map((token) => token.trim().toLowerCase())
-    .filter(Boolean)
+  const tokens = commaList(accept).map((token) => token.toLowerCase())
   if (tokens.length === 0) {
     return true
   }

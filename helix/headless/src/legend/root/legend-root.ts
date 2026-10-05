@@ -1,4 +1,5 @@
 import {
+  commaList,
   customElement,
   HelixBeforeChangeEvent,
   HelixElement,
@@ -9,7 +10,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-import { hiddenNames, isHidden, toggledNames } from '../hidden-series.js'
+import { isHidden, toggledNames } from '../hidden-series.js'
 
 /**
  * @summary A list of the series in a chart, each name beside the color it is drawn in.
@@ -143,7 +144,7 @@ export class HelixHeadlessLegend extends HelixElement {
    */
   protected override updated(changed: PropertyValues<this>): void {
     super.updated(changed)
-    const names = hiddenNames(this.hiddenSeries)
+    const names = commaList(this.hiddenSeries)
     if (names.length > 0 || this.wrote) {
       this.source.hide(names)
       this.wrote = names.length > 0

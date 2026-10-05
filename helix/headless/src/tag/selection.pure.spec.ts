@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { pressedValue, selectedValues, tabStop } from './selection.js'
+import { pressedValue, tabStop } from './selection.js'
 
 describe('the tab stop', () => {
   const a = { disabled: false, name: 'a' }
@@ -36,8 +36,4 @@ describe('a press on a tag', () => {
   test('selects nothing where the group selects nothing', () => {
     expect(pressedValue('none', 'a', 'b')).toBe('a')
   })
-})
-
-test('values are separated by commas, since one may hold a space', () => {
-  expect(selectedValues(' New York ,Paris,,')).toEqual(['New York', 'Paris'])
 })

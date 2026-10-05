@@ -11,7 +11,7 @@ import {
   HelixNavigateEvent,
   hostAria,
   inlineStep,
-  datesIn as list,
+  commaList as list,
   localToday,
   MixinControllerValue,
   monthOf,

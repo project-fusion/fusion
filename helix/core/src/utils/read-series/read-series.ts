@@ -325,3 +325,10 @@ export const readRows = (table: Element): Row[] => {
     row(one.cells[0], [...one.cells].slice(1), names),
   )
 }
+
+/**
+ * A series name as it is matched: trimmed and in lower case, since a column's
+ * heading is matched without regard to case or surrounding space everywhere a
+ * name is written, in `lines`, `hidden-series` and `hide()` alike.
+ */
+export const seriesKey = (name: string): string => name.trim().toLowerCase()

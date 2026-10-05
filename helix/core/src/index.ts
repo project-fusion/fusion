@@ -287,7 +287,6 @@ export {
   type Barring,
   barredBy,
   type CalendarView,
-  datesIn,
   localToday,
   monthOf,
   monthOut,
@@ -318,6 +317,7 @@ export {
   wholeHour,
 } from './utils/clock/clock.js'
 export { closestInstance } from './utils/closest-instance/closest-instance.js'
+export { type ColorWords, colorName, hueName } from './utils/color-name/color-name.js'
 export { countLabel } from './utils/count-label/count-label.js'
 export { createSheet } from './utils/create-sheet/create-sheet.js'
 export {
@@ -348,7 +348,12 @@ export {
   deepContains,
   focusableElements,
 } from './utils/focusable-elements/focusable-elements.js'
-export { followLink, type LinkModifiers, type LinkTarget } from './utils/follow-link/follow-link.js'
+export {
+  afterLinkFollowed,
+  followLink,
+  type LinkModifiers,
+  type LinkTarget,
+} from './utils/follow-link/follow-link.js'
 export { formatNumbers } from './utils/format-numbers/format-numbers.js'
 export { type HostAria, hostAria } from './utils/host-aria/host-aria.js'
 export {
@@ -368,7 +373,7 @@ export {
 } from './utils/media-copy/media-copy.js'
 export { formatNumber, parseNumber } from './utils/number-format/number-format.js'
 export { onUnlessFalse } from './utils/on-unless-false/on-unless-false.js'
-export { type ColorBytes, readColor } from './utils/read-color/read-color.js'
+export { type ColorBytes, readColor, rgbOf } from './utils/read-color/read-color.js'
 export {
   byRow,
   type Row,
@@ -377,6 +382,7 @@ export {
   readSeries,
   type Series,
   type SeriesPoint,
+  seriesKey,
   unbroken,
 } from './utils/read-series/read-series.js'
 export {
@@ -457,5 +463,10 @@ export {
 } from './utils/value-as/value-as.js'
 export { watchTheme } from './utils/watch-theme/watch-theme.js'
 export { writeClock, writeTime } from './utils/write-time/write-time.js'
-export { writtenList, writtenNumbers } from './utils/written-list/written-list.js'
+export {
+  commaList,
+  toggleValue,
+  writtenList,
+  writtenNumbers,
+} from './utils/written-list/written-list.js'
 export { VERSION } from './version.js'

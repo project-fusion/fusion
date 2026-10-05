@@ -1,3 +1,5 @@
+import { commaList, toggleValue } from '@fusion.dev/helix-core'
+
 /**
  * What a Tag Group's selection and tab stop come to, as arithmetic over its
  * tags.
@@ -34,16 +36,6 @@ export const tabStop = <T extends StopCandidate>(
   tags.find((tag) => !tag.disabled)
 
 /**
- * The values in a group's `value`, separated by commas, a value being the
- * kind of thing that may hold a space.
- */
-export const selectedValues = (value: string): string[] =>
-  value
-    .split(',')
-    .map((one) => one.trim())
-    .filter((one) => one !== '')
-
-/**
  * The `value` a press on the tag carrying `pressed` leaves.
  *
  * `single` selects that tag alone, or none where it was the one selected.
@@ -51,13 +43,13 @@ export const selectedValues = (value: string): string[] =>
  * value as it was.
  */
 export const pressedValue = (mode: TagSelectionMode, value: string, pressed: string): string => {
-  const now = selectedValues(value)
+  const now = commaList(value)
   const held = now.includes(pressed)
   if (mode === 'single') {
     return held ? '' : pressed
   }
   if (mode === 'multiple') {
-    return (held ? now.filter((one) => one !== pressed) : [...now, pressed]).join(', ')
+    return toggleValue(now, pressed).join(', ')
   }
   return value
 }
