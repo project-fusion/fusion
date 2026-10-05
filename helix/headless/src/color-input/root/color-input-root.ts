@@ -95,6 +95,10 @@ import '../../color-picker/index.js'
  * @csspart picker-eyedropper-button - The button inside `picker-eyedropper`.
  * @csspart picker-eyedropper-live - The live region of the button inside `picker-eyedropper`, which says its pending label.
  * @csspart picker-eyedropper-text - The words on the button inside `picker-eyedropper`.
+ * @csspart picker-field - One channel's number field with its label, in `channel-fields`.
+ * @csspart picker-field-input - The number input in a channel's field.
+ * @csspart picker-field-label - The name above a channel's number input.
+ * @csspart picker-fields - The row of channel number fields, in `channel-fields`.
  * @csspart picker-footer - The row holding the value and the tools.
  * @csspart picker-format - The control that changes the syntax the value is written in.
  * @csspart picker-format-button - The button inside `picker-format`.
@@ -147,6 +151,13 @@ export class HelixHeadlessColorInput extends MixinPickerField(
    */
   @property()
   autocomplete = 'off'
+
+  /**
+   * Whether the panel shows a number field for each channel of the color.
+   * Passed to the panel; see Color Picker's `channel-fields`.
+   */
+  @property({ attribute: 'channel-fields', type: Boolean })
+  channelFields = false
 
   /**
    * The words a color's name is spoken in, as JSON keyed by their English,
@@ -439,13 +450,16 @@ export class HelixHeadlessColorInput extends MixinPickerField(
         channel-marker: picker-channel-marker, channel-marker-label: picker-channel-marker-label,
         channel-markers: picker-channel-markers, channel-output: picker-channel-output,
         channels: picker-channels, controls: picker-controls, eyedropper: picker-eyedropper,
-        eyedropper-button: picker-eyedropper-button, eyedropper-live: picker-eyedropper-live, eyedropper-text: picker-eyedropper-text, footer: picker-footer, format: picker-format,
+        eyedropper-button: picker-eyedropper-button, eyedropper-live: picker-eyedropper-live, eyedropper-text: picker-eyedropper-text,
+        field: picker-field, field-input: picker-field-input, field-label: picker-field-label,
+        fields: picker-fields, footer: picker-footer, format: picker-format,
         format-button: picker-format-button, format-live: picker-format-live, format-text: picker-format-text, grid: picker-grid,
         grid-brightness: picker-grid-brightness, grid-handle: picker-grid-handle,
         grid-saturation: picker-grid-saturation, icon: picker-icon, sample: picker-sample,
         swatch: picker-swatch, swatches: picker-swatches, value: picker-value"
       ?invalid=${this.resolvedFeedback !== ''}
       ?alpha=${this.alpha}
+      ?channel-fields=${this.channelFields}
       ?no-format=${this.noFormat}
       ?no-value=${this.variant !== 'swatch'}
       .colorWords=${this.colorWords}
