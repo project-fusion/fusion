@@ -129,6 +129,25 @@ export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T
     }
 
     /**
+     * The state `toggle` last reported, and `undefined` before the first update.
+     *
+     * `requestOpen` announces at once. An assignment to `open` announces here,
+     * once it has rendered, so a consumer binding `toggle` hears every change
+     * that a `close` listener on a dialog hears. The first update sets it and
+     * announces nothing, because a seed is where the element starts.
+     */
+    private announcedOpen: boolean | undefined = undefined
+
+    protected override updated(changed: PropertyValues): void {
+      super.updated(changed)
+      if (this.announcedOpen === undefined) {
+        this.announcedOpen = this.open
+      } else if (this.announcedOpen !== this.open) {
+        this.announceToggle(this.open)
+      }
+    }
+
+    /**
      * Requests that the element open or close, and returns whether the change
      * was applied.
      *
@@ -180,11 +199,20 @@ export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T
      * event for one transition is two answers to one question.
      */
     private announceToggle(open: boolean): void {
-      const event = new Event('toggle', { bubbles: false, cancelable: false, composed: false })
-      Object.assign(event, {
+      this.announcedOpen = open
+      const states = {
         newState: open ? 'open' : 'closed',
         oldState: open ? 'closed' : 'open',
-      })
+      }
+      /* A real `ToggleEvent` where the platform has one, so `instanceof` and
+         the DOM typings agree with what arrives. Where it does not, a plain
+         event carries the same two fields. */
+      if (typeof ToggleEvent === 'function') {
+        this.dispatchEvent(new ToggleEvent('toggle', states))
+        return
+      }
+      const event = new Event('toggle', { bubbles: false, cancelable: false, composed: false })
+      Object.assign(event, states)
       this.dispatchEvent(event)
     }
 

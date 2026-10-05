@@ -246,5 +246,64 @@ describe('saying the state moved', () => {
       const host = await mount(`<${kind.tag}></${kind.tag}>`)
       expect(heard(host, () => ask(host, kind, kind.resting))).toEqual([])
     })
+
+    /* An assignment closes a dialog as surely as a request does, and the dialog
+       relays `close` for it, so a `toggle` listener has to hear it as well. */
+    test('announces an assignment once it has rendered, and only once', async () => {
+      const host = await mount(`<${kind.tag}></${kind.tag}>`)
+      const said: string[] = []
+      host.addEventListener('toggle', (event) => {
+        said.push((event as Event & { newState: string }).newState)
+      })
+      host[kind.state] = kind.moved
+      await host.updateComplete
+      host[kind.state] = kind.resting
+      await host.updateComplete
+      ask(host, kind, kind.moved)
+      await host.updateComplete
+      expect(said).toEqual(['open', 'closed', 'open'])
+    })
+
+    test('and a seed is where it starts, so it announces nothing', async () => {
+      document.body.innerHTML = ''
+      const host = document.createElement(kind.tag) as Probe
+      const said: string[] = []
+      host.addEventListener('toggle', (event) => {
+        said.push((event as Event & { newState: string }).newState)
+      })
+      host.setAttribute(kind.fallback, '')
+      document.body.append(host)
+      await host.updateComplete
+      expect(said).toEqual([])
+    })
+
+    /* happy-dom has no `ToggleEvent`, so the platform's class is stood in for
+       and put back, which is the half of this a browser answers on its own. */
+    test('as a `ToggleEvent` where the platform has one', async () => {
+      const globals = globalThis as unknown as Record<string, unknown>
+      const had = globals.ToggleEvent
+      class StandIn extends Event {
+        readonly newState: string
+        readonly oldState: string
+        constructor(type: string, init: { newState: string; oldState: string }) {
+          super(type)
+          this.newState = init.newState
+          this.oldState = init.oldState
+        }
+      }
+      globals.ToggleEvent = StandIn
+      try {
+        const host = await mount(`<${kind.tag}></${kind.tag}>`)
+        let event: Event | undefined
+        host.addEventListener('toggle', (one) => {
+          event = one
+        })
+        ask(host, kind, kind.moved)
+        expect(event).toBeInstanceOf(StandIn)
+        expect((event as StandIn).oldState).toBe('closed')
+      } finally {
+        globals.ToggleEvent = had
+      }
+    })
   }
 })

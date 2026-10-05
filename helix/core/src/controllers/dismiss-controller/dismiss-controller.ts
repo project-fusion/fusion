@@ -29,6 +29,50 @@ const deepDepth = (node: Element | null): number => {
   return depth
 }
 
+/**
+ * The innermost open modal `<dialog>` a key was pressed inside, if any.
+ *
+ * Read from the composed path, because the dialog is usually in a component's
+ * shadow root. `:modal` is asked inside a guard, since a test double may not
+ * parse it.
+ */
+const modalAround = (event: Event): HTMLDialogElement | undefined => {
+  for (const node of event.composedPath()) {
+    if (node instanceof HTMLDialogElement && node.open) {
+      try {
+        if (node.matches(':modal')) {
+          return node
+        }
+      } catch {
+        return undefined
+      }
+    }
+  }
+  return undefined
+}
+
+/**
+ * Whether `node` is drawn inside `container`, following slots.
+ *
+ * A dialog's content is the host's light DOM, slotted into the `<dialog>` in
+ * its shadow root, so the parent chain alone never reaches the dialog. The
+ * assigned slot is the step that does.
+ */
+const flatContains = (container: Node, node: Node): boolean => {
+  let at: Node | null = node
+  while (at) {
+    if (at === container) {
+      return true
+    }
+    at =
+      (at as Partial<Element>).assignedSlot ??
+      at.parentNode ??
+      (at as unknown as { host?: Node }).host ??
+      null
+  }
+  return false
+}
+
 export interface DismissOptions {
   /**
    * The element a press must land inside to count as interacting rather than
@@ -147,18 +191,33 @@ export class DismissController implements ReactiveController {
     }
     taken.helixDismissTaken = true
 
+    /* **A modal dialog the key was pressed in is the top layer.** An overlay
+       outside it is under it and inert, so the press is the dialog's and
+       nothing here answers it. */
+    const modal = modalAround(event)
     /* Ties go to whoever asked, which is the first to run. Two overlays neither
        of which is inside the other have no better answer available, and exactly
        one closing is the point. */
-    let deepest: DismissController = this
-    let found = deepDepth(this.host)
-    for (const other of listening) {
+    let deepest: DismissController | undefined
+    let found = -1
+    for (const other of [this, ...listening]) {
+      if (modal && !flatContains(modal, other.host)) {
+        continue
+      }
       const depth = deepDepth(other.host)
       if (depth > found) {
         found = depth
         deepest = other
       }
     }
+    if (!deepest) {
+      return
+    }
+    /* **Consumed, so the layer under this one stays open.** A native `<dialog>`
+       hears Escape as a close request after every `keydown` listener has run,
+       and skips it when the `keydown` was canceled. Without this one press
+       closed a select and the dialog it sat in. */
+    event.preventDefault()
     deepest.onDismiss()
   }
 
