@@ -1,0 +1,42 @@
+<!-- @summary A file tree as a table: folders open and close in place, and their files sit under them. -->
+
+<helix-data-table
+  child-field="files"
+  default-expanded="src"
+  id="tree"
+  label="Project files"
+  row-key="path"
+>
+  <helix-table-column field="name">Name</helix-table-column>
+  <helix-table-column
+    field="size"
+    text-align="end"
+  >Size</helix-table-column>
+</helix-data-table>
+
+<script>
+  /* `child-field` names the field that holds a row's rows. `row-key` is what
+     `expanded` lists the open rows by. Right opens a folder from the keyboard,
+     and Left closes it. */
+  document.getElementById('tree').rows = [
+    {
+      files: [
+        { name: 'index.ts', path: 'src/index.ts', size: '2 KB' },
+        {
+          files: [
+            { name: 'format.ts', path: 'src/utils/format.ts', size: '4 KB' },
+            { name: 'parse.ts', path: 'src/utils/parse.ts', size: '6 KB' },
+          ],
+          name: 'utils',
+          path: 'src/utils',
+          size: '10 KB',
+        },
+      ],
+      name: 'src',
+      path: 'src',
+      size: '12 KB',
+    },
+    { name: 'package.json', path: 'package.json', size: '1 KB' },
+    { name: 'README.md', path: 'README.md', size: '3 KB' },
+  ]
+</script>

@@ -29,9 +29,11 @@ import {
   VirtualizeController,
   writtenList,
 } from '@fusion.dev/helix-core'
+import { caretDown, caretRight } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { repeat } from 'lit/directives/repeat.js'
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 /* `static-html`'s `html`, because the pagination's tag is interpolated: a
    template naming a literal `helix-pagination` renders the styled element from
    the headless tier, and `lit`'s own `html` treats `${tag}` in tag position as
@@ -42,6 +44,7 @@ import { at, edgeOf, type HelixHeadlessTableColumn } from '../../table/column/ta
 import '../../checkbox/index.js'
 import { rangeAdd } from '../../listbox/range.js'
 import '../../pagination/index.js'
+import { type Grown, grow } from '../tree.js'
 import {
   type Arranged,
   type Axis,
@@ -127,6 +130,14 @@ const isControl = (element: HTMLElement): boolean =>
  * first column with a `field` where none is. A screen reader says it as a reader
  * moves between rows.
  *
+ * **Rows that hold rows.** `child-field` names the field that holds a row's
+ * child rows, and the grid becomes a tree grid. The row header column draws a
+ * mark that a press opens and closes a row by, and `expanded` holds the keys of the open
+ * rows, which `row-key` names. Right on a closed row's header opens it, Left on
+ * an open one closes it, and Left on a child moves to its parent. A sort orders
+ * the rows under each parent, and a search shows the rows that lead to each
+ * match, open.
+ *
  * `load-more` adds a row after the last one with a button that sends
  * `helix-load-more`. A `windowed` table also sends it by itself once a reader
  * scrolls within one screen of the end, once for each number of rows. Add the
@@ -161,6 +172,7 @@ const isControl = (element: HTMLElement): boolean =>
  * @slot footer - Content below the grid. It replaces the built-in pagination.
  * @slot toolbar - Content above the grid, such as a search field or actions.
  *
+ * @event {Event} helix-expand - Fired after a row opens or closes. `expanded` holds the open rows.
  * @event {HelixActivateEvent} helix-activate - Fired after the page changes, with the new page as a string in `detail.value`.
  * @event {HelixFilterEvent} helix-filter - The search query is about to change. Cancelable: cancel it to keep the current query.
  * @event {Event} helix-load-more - Fired when a reader asks for more rows, by the `load-more` row's button or by scrolling a `windowed` table near its end.
@@ -215,8 +227,12 @@ const isControl = (element: HTMLElement): boolean =>
  * @csspart select-all - The heading that holds the checkbox that selects every row.
  * @csspart select-selected - Added to `select` in a selected row.
  * @csspart table - The grid.
+ * @csspart toggle - The mark in a row header that a press opens and closes its row by, in a tree grid.
+ * @csspart toggle-mark - The caret in `toggle`. It points along the line while the row is closed and down while it is open.
+ * @csspart toggle-open - Added to `toggle` while its row is open.
  * @csspart toolbar - The region above the grid.
  *
+ * @cssproperty --data-table-level - How deep a row is in a tree grid, from 1. The component writes it on each row header cell, and the stylesheet indents by it.
  * @cssproperty --data-table-cell-align - The alignment of the cell's column: `start`, `center`, or `end`. Unset when the column sets none. The component writes it on each cell it draws, and the stylesheet reads it. `Table` sets `--table-cell-align` for the same purpose.
  * @cssproperty --data-table-template - The column track list, worked out from the columns. The component writes it inline on the element that reads it, so setting it has no effect. Set a column's `width` to change it.
  */
@@ -240,6 +256,23 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   /** The word for an ascending sort, in `sorted-label`. */
   @property({ attribute: 'ascending-label' })
   ascendingLabel = 'ascending'
+
+  /**
+   * The field that holds a row's child rows, as an array. Set it, and `row-key`,
+   * and the grid becomes a tree grid.
+   *
+   * Reflected, because the styled tier indents a tree grid's row headers by
+   * it. No default, so a table that sets none writes nothing onto its host.
+   */
+  @property({ attribute: 'child-field', reflect: true })
+  childField?: string
+
+  /**
+   * The keys of the rows open at the start, separated by commas. Used until
+   * `expanded` is set.
+   */
+  @property({ attribute: 'default-expanded' })
+  defaultExpanded = ''
 
   /**
    * The starting search query, used until `filter` is set.
@@ -293,6 +326,21 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    */
   @property({ type: Number })
   estimate = 32
+
+  /**
+   * The keys of the open rows in a tree grid, separated by commas, the shape of
+   * `selected`. A reader's press writes it and then sends `helix-expand`.
+   */
+  @property()
+  get expanded(): string {
+    return this.expandedState ?? this.defaultExpanded
+  }
+
+  set expanded(next: string) {
+    const previous = this.expanded
+    this.expandedState = next
+    this.requestUpdate('expanded', previous)
+  }
 
   /**
    * The search query. A row is shown when the query matches any of its columns.
@@ -633,6 +681,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   @state()
   private selectedState: string | undefined = undefined
 
+  @state()
+  private expandedState: string | undefined = undefined
+
   /**
    * The row holding the grid's tab stop: `-1` for the headings, otherwise a
    * row of the page counted from 0. Unset until a reader moves, when the stop
@@ -754,9 +805,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    */
   private get available(): number {
     if (this.mode === 'server') {
-      return this.rows.length
+      return this.childField ? this.tree().rows.length : this.rows.length
     }
-    const matched = this.windowed ? this.arrange().rows.length : this.matched
+    const matched = this.windowed ? this.flat().rows.length : this.matched
     const size = this.pageSize
     if (size <= 0) {
       return matched
@@ -778,6 +829,65 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * result to save a sort is the wrong trade.
    */
   private held: { key: string; source: readonly DataRow[]; value: Arranged } | undefined
+
+  /** The tree last laid out, kept against what laid it out. */
+  private grown: { key: string; source: readonly DataRow[]; value: Grown } | undefined
+
+  /**
+   * The rows of a tree grid, laid out flat with each open row's children under
+   * it. `server` mode lays out the rows it was handed and neither filters nor
+   * sorts them.
+   */
+  private tree(): Grown {
+    const axes = this.axes
+    const server = this.mode === 'server'
+    const query = server ? '' : this.filter
+    const spec = server ? '' : this.sort
+    const key = [
+      query,
+      spec,
+      this.childField,
+      this.expanded,
+      axes.map((axis) => axis.field).join('\u0001'),
+    ].join('\u0000')
+    if (this.grown?.key === key && this.grown.source === this.rows) {
+      return this.grown.value
+    }
+    if (!this.rowKey && !this.warnedAboutKey && typeof window !== 'undefined') {
+      this.warnedAboutKey = true
+      reportRuntime({
+        kind: 'missing-row-key',
+        message: `<${this.localName} child-field> has no \`row-key\`, so it cannot tell which rows are open. Set \`row-key\` to the field that identifies a row.`,
+        tag: this.localName,
+      })
+    }
+    const open = this.opened
+    const value = grow(this.rows, axes, {
+      field: this.childField ?? '',
+      isOpen: (row) => open.has(this.rowKeyOf(row, -1)),
+      query,
+      spec,
+    })
+    this.grown = { key, source: this.rows, value }
+    return value
+  }
+
+  /** The keys of the open rows. */
+  private get opened(): Set<string> {
+    return new Set(writtenList(this.expanded.replaceAll(',', ' ')))
+  }
+
+  /**
+   * The result in order: the tree laid out flat in a tree grid, and the
+   * arranged rows otherwise.
+   */
+  private flat(): Arranged {
+    if (this.childField) {
+      const { rows, total } = this.tree()
+      return { rows, total }
+    }
+    return this.arrange()
+  }
 
   private arrange(): Arranged {
     const axes = this.axes
@@ -1021,7 +1131,16 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   } {
     if (this.mode === 'server') {
       const total = Math.max(this.total, this.rows.length)
-      return { available: this.rows.length, matched: total, page: this.rows, total }
+      const page = this.childField ? this.tree().rows : this.rows
+      return { available: page.length, matched: total, page, total }
+    }
+    if (this.childField) {
+      const { rows: inOrder, total } = this.tree()
+      const page = window_(inOrder, this.page, this.pageSize)
+      if (!this.windowed) {
+        this.warnIfCrowded(page.length)
+      }
+      return { available: page.length, matched: inOrder.length, page, total }
     }
     if (!this.windowed) {
       const view = ordered(this.rows, this.axes, {
@@ -1063,6 +1182,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * asking `view` for it would recurse through the clamp in `page`.
    */
   private get matched(): number {
+    if (this.childField) {
+      return this.tree().rows.length
+    }
     const query = this.filter.trim()
     if (query === '') {
       return this.rows.length
@@ -1211,6 +1333,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * is all it holds.
    */
   private get everyKey(): string[] {
+    if (this.childField) {
+      return this.tree().every.map((row, place) => this.keyOf(row, place))
+    }
     const rows = this.mode === 'server' ? this.rows : this.arrange().rows
     return rows.map((row, place) => this.keyOf(row, place))
   }
@@ -1374,7 +1499,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    */
   csv(): string {
     const columns = this.shownColumns.filter((column) => column.field !== '')
-    const rows = this.mode === 'server' ? this.rows : this.arrange().rows
+    const rows = this.mode === 'server' && !this.childField ? this.rows : this.flat().rows
     const quote = (value: unknown): string => {
       if (value === undefined || value === null) {
         return ''
@@ -1542,7 +1667,10 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     super.willUpdate(changed)
     this.hadFocus = this.hasUpdated && this.gridHasFocus()
     this.announced = this.news()
-    hostAria(this.internals, { label: this.label || 'Table', role: 'grid' })
+    hostAria(this.internals, {
+      label: this.label || 'Table',
+      role: this.childField ? 'treegrid' : 'grid',
+    })
     this.internals.ariaMultiSelectable = this.selectable ? 'true' : null
     /* **Anything that changes which row sits at which index**, and not just a
        new array. Heights are recorded against a position in the drawn set, so a
@@ -1666,14 +1794,59 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     header: boolean,
   ): TemplateResult {
     const edge = edgeOf(column.textAlign)
+    /* The depth goes on the row header, which indents, and holds the toggle. */
+    const placed = header && this.childField ? this.tree().placed.get(row) : undefined
+    const style = [
+      edge ? `--data-table-cell-align: ${edge}` : '',
+      placed ? `--data-table-level: ${placed.level}` : '',
+    ]
+      .filter(Boolean)
+      .join('; ')
     return html`<span
       part="cell${picked ? ' cell-selected' : ''}${header ? ' cell-header' : ''}"
       role=${header ? 'rowheader' : 'gridcell'}
       tabindex=${stop ? '0' : '-1'}
       data-column=${place}
-      style=${edge ? `--data-table-cell-align: ${edge}` : nothing}
-      >${column.read(row)}</span
+      style=${style || nothing}
+      >${placed?.branch ? this.renderToggle(row, placed.open) : nothing}${column.read(row)}</span
     >`
+  }
+
+  /**
+   * The mark a pointer opens or closes a row of a tree grid by.
+   *
+   * **Hidden from assistive technology, and no button.** The row says whether
+   * it is open with `aria-expanded`, and Right and Left open and close it. A
+   * button in the row header put its own name, "Expand src", into the name of
+   * the header that names the row.
+   */
+  private renderToggle(row: DataRow, open: boolean): TemplateResult {
+    const glyph = open ? caretDown : caretRight
+    return html`<span
+      part="toggle${open ? ' toggle-open' : ''}"
+      aria-hidden="true"
+      @click=${() => this.toggleOpen(row, !open)}
+    ><svg part="toggle-mark" ?data-mirror=${!open} fill="currentColor" viewBox=${glyph.viewBox}>${unsafeSVG(glyph.content)}</svg></span>`
+  }
+
+  /**
+   * Opens or closes a row of a tree grid, and says so with `helix-expand`.
+   * Nothing moves where it is that way already.
+   */
+  private toggleOpen(row: DataRow, open: boolean): boolean {
+    const key = this.rowKeyOf(row, -1)
+    const keys = this.opened
+    if (keys.has(key) === open) {
+      return false
+    }
+    if (open) {
+      keys.add(key)
+    } else {
+      keys.delete(key)
+    }
+    this.expanded = [...keys].join(',')
+    this.dispatchEvent(new Event('helix-expand', { bubbles: true, composed: true }))
+    return true
   }
 
   /**
@@ -1727,6 +1900,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       ({ index, row }) => {
         const key = chosen ? this.keyOf(row, this.rowIndex(index) - 2) : ''
         const picked = chosen?.has(key) ?? false
+        const placed = this.childField ? this.tree().placed.get(row) : undefined
         const stop = (place: number): boolean => index === stopRow && place === stopColumn
         /* Selected is said on the row for the accessibility tree and on each of
            its cells for a stylesheet: the row is `display: contents`, so the
@@ -1737,6 +1911,10 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
           role="row"
           aria-rowindex=${this.rowIndex(index)}
           aria-selected=${chosen ? String(picked) : nothing}
+          aria-level=${placed ? placed.level : nothing}
+          aria-posinset=${placed ? placed.position : nothing}
+          aria-setsize=${placed ? placed.siblings : nothing}
+          aria-expanded=${placed?.branch ? String(placed.open) : nothing}
           data-index=${this.windowed ? index : nothing}
           data-row=${index}
         >
@@ -1796,7 +1974,15 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * same order whatever object it is.
    */
   private get placement(): string {
-    return [this.mode, this.filter, this.sort, this.page, this.pageSize].join('\u0000')
+    return [
+      this.mode,
+      this.filter,
+      this.sort,
+      this.page,
+      this.pageSize,
+      this.childField,
+      this.expanded,
+    ].join('\u0000')
   }
 
   /** The signature the recorded heights were measured against. */
@@ -2284,6 +2470,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         break
       case 'ArrowLeft':
       case 'ArrowRight':
+        if (this.treeKey(event, place)) {
+          return
+        }
         column = Math.max(0, Math.min(edge, column + inlineStep(this, event.key)))
         break
       case 'Home':
@@ -2323,6 +2512,39 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     if (row !== place.row || column !== place.column) {
       this.moveTo(row, column)
     }
+  }
+
+  /**
+   * Left and Right on a row header of a tree grid: forward opens a closed row,
+   * back closes an open one, and back on a child moves to its parent. Says
+   * whether it took the key, and the arrows move between cells where it did not.
+   */
+  private treeKey(
+    event: KeyboardEvent,
+    place: { cell: HTMLElement; column: number; row: number },
+  ): boolean {
+    const row = this.drawnPage[place.row]
+    const header = this.headerColumn
+    if (!this.childField || !row || !header) {
+      return false
+    }
+    if (place.column !== this.shownColumns.indexOf(header) + (this.selectable ? 1 : 0)) {
+      return false
+    }
+    const placed = this.tree().placed.get(row)
+    const forward = inlineStep(this, event.key) > 0
+    if (placed?.branch && placed.open !== forward) {
+      event.preventDefault()
+      this.toggleOpen(row, forward)
+      return true
+    }
+    const parent = placed?.parent ? this.drawnPage.indexOf(placed.parent) : -1
+    if (!forward && parent >= 0) {
+      event.preventDefault()
+      this.moveTo(parent, place.column)
+      return true
+    }
+    return false
   }
 
   /** Enter, Space and F2 on a cell. */

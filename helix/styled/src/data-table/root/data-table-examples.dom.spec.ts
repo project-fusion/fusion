@@ -2,6 +2,7 @@ import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, idle, logged, registerDom } from '@fusion.dev/helix-testing/dom'
 import events from '../.examples/events.html' with { type: 'text' }
 import loadingMore from '../.examples/loading-more.html' with { type: 'text' }
+import nestedRows from '../.examples/nested-rows.html' with { type: 'text' }
 import paging from '../.examples/paging.html' with { type: 'text' }
 import preview from '../.examples/preview.html' with { type: 'text' }
 import searching from '../.examples/searching.html' with { type: 'text' }
@@ -171,5 +172,19 @@ describe('the loading-more example', () => {
     ;(releases.shadowRoot?.querySelector('[part="more-button"]') as HTMLElement | null)?.click()
     await idle()
     expect(rows(releases)).toHaveLength(12)
+  })
+})
+
+describe('the nested-rows example', () => {
+  run('src starts open with its files under it, and utils opens with a press', async () => {
+    await example(nestedRows)
+    const tree = document.getElementById('tree') as HTMLElement & { expanded: string }
+    await idle()
+    expect(rows(tree)).toHaveLength(5)
+    expect(rows(tree)[0]?.getAttribute('aria-expanded')).toBe('true')
+    ;(rows(tree)[2]?.querySelector('[part~="toggle"]') as HTMLElement | null)?.click()
+    await idle()
+    expect(tree.expanded).toBe('src,src/utils')
+    expect(rows(tree)).toHaveLength(7)
   })
 })

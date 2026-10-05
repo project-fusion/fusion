@@ -1173,3 +1173,127 @@ describe('a row that asks for more', () => {
     expect(asked).toBe(1)
   })
 })
+
+describe('rows that hold rows', () => {
+  const FILES = [
+    {
+      children: [
+        { name: 'zeta.ts', size: 3 },
+        { children: [{ name: 'deep.ts', size: 1 }], name: 'lib', size: 0 },
+      ],
+      name: 'src',
+      size: 0,
+    },
+    { name: 'README.md', size: 2 },
+  ]
+  const TREE = `
+    <helix-headless-data-table label="Files" child-field="children" row-key="name">
+      <helix-headless-table-column field="name" sortable>Name</helix-headless-table-column>
+      <helix-headless-table-column field="size">Size</helix-headless-table-column>
+    </helix-headless-data-table>`
+
+  type Tree = Table & { expanded: string }
+
+  const names = (element: HTMLElement) =>
+    bodyRows(element).map((row) => row.querySelector('[role="rowheader"]')?.textContent?.trim())
+
+  const key = async (element: Tree, cell: HTMLElement, name: string) => {
+    cell.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, composed: true, key: name }))
+    await settled(element)
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await settled(element)
+  }
+
+  test('is a tree grid whose rows say their depth and whether they are open', async () => {
+    const { element } = await mount(TREE, FILES)
+    await settled(element)
+    expect(grid(element).role).toBe('treegrid')
+    expect(names(element)).toEqual(['src', 'README.md'])
+    const [src, readme] = bodyRows(element)
+    expect(src?.getAttribute('aria-level')).toBe('1')
+    expect(src?.getAttribute('aria-expanded')).toBe('false')
+    expect(src?.getAttribute('aria-setsize')).toBe('2')
+    expect(readme?.hasAttribute('aria-expanded')).toBe(false)
+  })
+
+  test('opens a row from its button, and says so', async () => {
+    const { element } = await mount(TREE, FILES)
+    await settled(element)
+    let heard = 0
+    element.addEventListener('helix-expand', () => {
+      heard += 1
+    })
+    const toggle = element.shadowRoot?.querySelector('[part~="toggle"]') as HTMLElement
+    expect(toggle.getAttribute('aria-hidden')).toBe('true')
+    toggle.click()
+    await settled(element)
+    expect((element as Tree).expanded).toBe('src')
+    expect(heard).toBe(1)
+    expect(names(element)).toEqual(['src', 'zeta.ts', 'lib', 'README.md'])
+    expect(bodyRows(element)[2]?.getAttribute('aria-level')).toBe('2')
+    const cell = element.shadowRoot?.querySelector(
+      '[data-row="2"] [role="rowheader"]',
+    ) as HTMLElement
+    expect(cell.getAttribute('style')).toContain('--data-table-level: 2')
+  })
+
+  test('opens with Right, closes with Left, and goes to the parent with Left', async () => {
+    const { element } = await mount(TREE, FILES)
+    await settled(element)
+    const tree = element as Tree
+    const header = (row: number) =>
+      element.shadowRoot?.querySelector(`[data-row="${row}"] [role="rowheader"]`) as HTMLElement
+    header(0).focus()
+    await key(tree, header(0), 'ArrowRight')
+    expect(tree.expanded).toBe('src')
+    header(2).focus()
+    await key(tree, header(2), 'ArrowLeft')
+    expect(element.shadowRoot?.activeElement).toBe(header(0))
+    await key(tree, header(0), 'ArrowLeft')
+    expect(tree.expanded).toBe('')
+    expect(names(element)).toEqual(['src', 'README.md'])
+  })
+
+  test('sorts the rows under each parent, and keeps them there', async () => {
+    const { element } = await mount(
+      TREE.replace('row-key="name"', 'row-key="name" default-expanded="src,lib" sort="name:desc"'),
+      FILES,
+    )
+    await settled(element)
+    expect(names(element)).toEqual(['src', 'zeta.ts', 'lib', 'deep.ts', 'README.md'])
+  })
+
+  test('a search shows the rows that lead to a match, open', async () => {
+    const { element } = await mount(TREE, FILES)
+    await settled(element)
+    element.search('deep')
+    await settled(element)
+    expect(names(element)).toEqual(['src', 'lib', 'deep.ts'])
+  })
+
+  test('the box in the heading selects every row, those under closed rows too', async () => {
+    const { element } = await mount(
+      TREE.replace('row-key="name"', 'row-key="name" selectable'),
+      FILES,
+    )
+    await settled(element)
+    ;(
+      element.shadowRoot?.querySelector('[part="select-all"] [part="checkbox"]') as HTMLElement
+    ).dispatchEvent(
+      new CustomEvent('helix-before-toggle', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        detail: { checked: true },
+      }),
+    )
+    await settled(element)
+    expect((element as Tree & { selected: string }).selected.split(',').sort()).toEqual([
+      'README.md',
+      'deep.ts',
+      'lib',
+      'src',
+      'zeta.ts',
+    ])
+  })
+})
