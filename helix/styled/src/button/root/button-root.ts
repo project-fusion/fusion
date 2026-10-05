@@ -48,6 +48,8 @@ import { styles } from './button-root.css.js'
  * @cssproperty --button-radius-start-end - The top trailing corner, for a group stacking down.
  * @cssproperty --button-radius-start-start - The top leading corner, for a group stacking down.
  * @cssproperty --button-size - Height of the control, for a row height outside the density steps.
+ * @cssproperty --button-spinner-color - Color of the ring a pending button turns. It follows the label's color.
+ * @cssproperty --button-spinner-duration - How long the ring takes to turn once.
  * @cssproperty --button-spinner-size - Size of the ring a pending button turns. Defaults to the size of its icons.
  *
  * @cssstate pending - The button is pending: `pending` is set. A ring turns over its hidden words.

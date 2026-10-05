@@ -1,5 +1,12 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { formValue, hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import {
+  formValue,
+  hasLayout,
+  hasState,
+  mount,
+  part,
+  registerDom,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -572,5 +579,12 @@ describe('the gaps Zag and Web Awesome close', () => {
     const lower = await pin('length="4" type="alphanumeric" case="lower"')
     await arrive(lower, 0, 'Q')
     expect(lower.value).toBe('q')
+  })
+
+  test('says it is complete once every box holds a character', async () => {
+    const host = await pin('length="4"')
+    expect(hasState(host, 'complete')).toBe(false)
+    await paste(host, 0, '1234')
+    expect(hasState(host, 'complete')).toBe(true)
   })
 })

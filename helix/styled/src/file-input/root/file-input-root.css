@@ -12,8 +12,8 @@
   align-items: center;
   position: relative;
   background-color: var(--file-input-background-color, var(--helix-color-well));
-  border: var(--helix-border-thin) dashed var(--helix-color-border);
-  border-radius: var(--helix-radii-sm);
+  border: var(--helix-border-thin) dashed var(--file-input-border-color, var(--helix-color-border));
+  border-radius: var(--file-input-radius, var(--helix-radii-sm));
   display: flex;
   gap: var(--helix-space-xs);
   justify-content: center;
@@ -46,8 +46,8 @@
 
 /* Something is over it. */
 [part="field"][data-dropping] {
-  background-color: var(--helix-color-primary-subtle);
-  border-color: var(--helix-color-primary);
+  background-color: var(--file-input-drop-background-color, var(--helix-color-primary-subtle));
+  border-color: var(--file-input-drop-border-color, var(--helix-color-primary));
   border-style: solid;
 }
 
@@ -89,14 +89,15 @@
    0.9 rather than the 0.96 the panels use. */
 [part="file"] {
   align-items: center;
-  background-color: var(--helix-color-surface);
-  border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-sm);
+  background-color: var(--file-input-file-background-color, var(--helix-color-surface));
+  border: var(--helix-border-thin) solid
+    var(--file-input-file-border-color, var(--helix-color-border));
+  border-radius: var(--file-input-file-radius, var(--helix-radii-sm));
   display: flex;
   gap: var(--helix-space-sm);
   opacity: 1;
-  padding-block: var(--helix-space-xs);
-  padding-inline: var(--helix-space-sm);
+  padding-block: var(--file-input-file-padding-block, var(--helix-space-xs));
+  padding-inline: var(--file-input-file-padding-inline, var(--helix-space-sm));
   scale: 1 1;
   transform-origin: top;
   transition:
@@ -163,7 +164,7 @@
   align-items: center;
   border-radius: var(--helix-radii-sm);
   box-sizing: border-box;
-  color: var(--helix-color-foreground-muted);
+  color: var(--file-input-remove-color, var(--helix-color-foreground-muted));
   cursor: pointer;
   display: flex;
   flex: none;
@@ -174,7 +175,7 @@
 }
 
 [part="remove"]:hover {
-  color: var(--helix-color-danger);
+  color: var(--file-input-remove-color-hover, var(--helix-color-danger));
 }
 
 [part="remove"]:focus-visible {

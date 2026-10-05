@@ -81,6 +81,7 @@ export type { PinCase, PinType } from '../code.js'
  * @csspart label - The label above the boxes.
  * @csspart separator - The text `format` draws between two boxes.
  *
+ * @cssstate complete - Every box holds a character.
  * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
  */
 @customElement('helix-headless-pin-input')
@@ -597,6 +598,7 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    this.toggleState('complete', this.value.length >= this.count)
     this.paint()
     this.sync()
   }

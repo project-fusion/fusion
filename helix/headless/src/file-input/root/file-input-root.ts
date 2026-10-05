@@ -157,6 +157,8 @@ const kind = (file: File): string => {
  * @csspart size-start - The category before the label.
  * @csspart trigger - The label that opens the picker.
  *
+ * @cssstate dropping - Files are being dragged over the field.
+ * @cssstate has-files - The field holds at least one file.
  * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
  */
 @customElement('helix-headless-file-input')
@@ -644,6 +646,8 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.sync()
+    this.toggleState('dropping', this.dropping)
+    this.toggleState('has-files', this.files.length > 0)
   }
 
   /** Moves focus to the native file input, as a label pointing at it would. */

@@ -32,7 +32,18 @@ import { styles } from './file-input-root.css.js'
  * @documentation https://fusion.dev/helix/components/file-input
  *
  * @cssproperty --file-input-background-color - Fill behind the field.
+ * @cssproperty --file-input-border-color - The field's dashed edge at rest.
+ * @cssproperty --file-input-drop-background-color - Fill behind the field while files are dragged over it.
+ * @cssproperty --file-input-drop-border-color - The field's edge while files are dragged over it.
+ * @cssproperty --file-input-file-background-color - Fill behind each chosen file.
+ * @cssproperty --file-input-file-border-color - The edge of each chosen file.
+ * @cssproperty --file-input-file-padding-block - Padding above and below each chosen file.
+ * @cssproperty --file-input-file-padding-inline - Padding at each side of each chosen file.
+ * @cssproperty --file-input-file-radius - Corner radius of each chosen file.
  * @cssproperty --file-input-padding - Padding inside the field.
+ * @cssproperty --file-input-radius - Corner radius of the field.
+ * @cssproperty --file-input-remove-color - The remove button's icon at rest.
+ * @cssproperty --file-input-remove-color-hover - The remove button's icon under the pointer.
  */
 @customElement('helix-file-input')
 export class HelixFileInput extends HelixHeadlessFileInput {
