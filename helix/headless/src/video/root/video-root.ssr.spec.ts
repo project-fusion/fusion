@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { partTag, ssr } from '@fusion.dev/helix-testing/ssr'
+import { partTag, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -98,5 +98,32 @@ describe('video control names on the server', () => {
     ></helix-headless-video>`
     expect(partTag(ssr(named), 'start')).toContain('aria-label="Start the clip"')
     expect(partTag(ssr(named), 'play')).toContain('aria-label="Start the clip"')
+  })
+})
+
+describe('the player on the server', () => {
+  test('is named by `player-label` where there is no `label`', () => {
+    /* A literal "Video" before, so a page in another language was served an
+       English name for the group the keys are bound to. */
+    const unnamed = html`<helix-headless-video player-label="Vidéo" src="/clip.mp4"></helix-headless-video>`
+    expect(partTag(ssr(unnamed), 'stage')).toContain('aria-label="Vidéo"')
+    const plain = html`<helix-headless-video src="/clip.mp4"></helix-headless-video>`
+    expect(partTag(ssr(plain), 'stage')).toContain('aria-label="Video"')
+  })
+
+  test('serves one Play a keyboard can reach', () => {
+    const start = partTag(ssr(clip), 'start')
+    expect(start).toContain('tabindex="-1"')
+    expect(start).toContain('aria-hidden="true"')
+    expect(partTag(ssr(clip), 'play')).not.toContain('aria-hidden')
+  })
+
+  test('serves each glyph inside the slot that replaces it', () => {
+    /* A slot a consumer fills on the server's markup has to be there before
+       hydration, or the icon set arrives late and the drawn glyph flashes. */
+    const shadow = rendered(ssr(clip), 'helix-headless-video')
+    for (const name of ['start-icon', 'play-icon', 'volume-icon', 'fullscreen-icon']) {
+      expect(shadow).toMatch(new RegExp(`<slot\\s+name="${name}"[^>]*>(<!--[^>]*-->|\\s)*<svg`))
+    }
   })
 })

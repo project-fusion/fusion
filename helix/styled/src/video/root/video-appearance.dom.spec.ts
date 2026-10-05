@@ -64,5 +64,29 @@ if (hasLayout()) {
       expect(well).not.toBe(ink)
       expect(well).toBe('oklch(0 0 0)')
     })
+
+    /* `::slotted()` never matches the glyph this element draws, and the glyph's
+       rule never matches what a page slots, so an icon put in a slot with no
+       size of its own arrived at an `<svg>`'s 300 by 150. */
+    test('an icon put in a slot is the size and color of the glyph it replaces', async () => {
+      const drawn = await player()
+      const own = await player(`<helix-video label="A clip" src="/clip.mp4">
+        <svg slot="play-icon" viewBox="0 0 10 10"><rect height="10" width="10" /></svg>
+        <svg slot="start-icon" viewBox="0 0 10 10"><rect height="10" width="10" /></svg>
+      </helix-video>`)
+      for (const [control, name] of [
+        ['play', 'play-icon'],
+        ['start', 'start-icon'],
+      ] as const) {
+        const glyph = (part(drawn, control) as HTMLElement).querySelector('svg') as SVGElement
+        const icon = own.querySelector(`[slot="${name}"]`) as SVGElement
+        const size = (one: Element): string => {
+          const box = one.getBoundingClientRect()
+          return `${box.width} by ${box.height}`
+        }
+        expect(size(icon)).toBe(size(glyph))
+        expect(getComputedStyle(icon).color).toBe(getComputedStyle(glyph).color)
+      }
+    })
   })
 }
