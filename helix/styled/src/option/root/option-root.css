@@ -86,7 +86,7 @@
   mask-size: contain;
 }
 
-:host([data-active]) [part~="item"],
+:host(:state(active)) [part~="item"],
 :host(:not([disabled])) [part~="item"]:hover {
   /* A wash of the foreground rather than a step on the surface ladder. */
   background-color: var(

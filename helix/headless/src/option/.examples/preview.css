@@ -36,7 +36,7 @@ helix-headless-option::part(item) {
   user-select: none;
 }
 
-helix-headless-option[data-active]::part(item),
+helix-headless-option:state(active)::part(item),
 helix-headless-option:not([disabled])::part(item):hover {
   background-color: var(--_gray-subtle);
 }
