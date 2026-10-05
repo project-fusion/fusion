@@ -58,7 +58,7 @@ export const BrandPicker = () => {
         no-format
         no-value
         ref={picker}
-        swatches="#3b82f6 #0b6e4f #c2410c #7c3aed #be123c #0f766e"
+        swatches="#3b82f6, #0b6e4f, #c2410c, #7c3aed, #be123c, #0f766e"
         value={c.brand}
       ></helix-color-picker>
     </helix-popover>
