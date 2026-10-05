@@ -6,7 +6,15 @@ export interface ArrivalOptions {
   text: () => string
   /** Whether the element is arriving now, rather than with the page. */
   arriving: () => boolean
+  /**
+   * How long the region keeps the words once it has said them, in
+   * milliseconds. Defaults to seven seconds.
+   */
+  hold?: number
 }
+
+/** How long the region keeps what it said, the time React Aria's announcer keeps a message. */
+const HOLD = 7000
 
 /**
  * The words of an element that is announced when it appears, for a region that
@@ -26,6 +34,12 @@ export interface ArrivalOptions {
  * second time on the headless tier, which has no sheet to clip the region, and
  * a served page changed its picture on hydrating.
  *
+ * **And emptied again once it has been heard.** The words stay in the element
+ * itself, so a region that kept its copy put the message in the accessibility
+ * tree twice, and a reader moving through the page met it twice. The region
+ * keeps the copy for `hold` and then lets it go, which a polite region does not
+ * read out, removals being no news.
+ *
  * The component renders `said` into its region and calls `say` when what it
  * holds changes, from a `slotchange`.
  */
@@ -37,6 +51,8 @@ export class ArrivalController implements ReactiveController {
   private heard = ''
 
   private frame = 0
+
+  private timer: ReturnType<typeof setTimeout> | undefined
 
   constructor(
     private readonly host: ReactiveControllerHost,
@@ -61,6 +77,9 @@ export class ArrivalController implements ReactiveController {
   hostDisconnected(): void {
     cancelAnimationFrame(this.frame)
     this.frame = 0
+    clearTimeout(this.timer)
+    this.timer = undefined
+    this.said = ''
   }
 
   /** Reads the words again, and says them if they moved. */
@@ -72,5 +91,11 @@ export class ArrivalController implements ReactiveController {
     this.heard = next
     this.said = next
     this.host.requestUpdate()
+    clearTimeout(this.timer)
+    this.timer = setTimeout(() => {
+      this.timer = undefined
+      this.said = ''
+      this.host.requestUpdate()
+    }, this.options.hold ?? HOLD)
   }
 }

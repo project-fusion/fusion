@@ -41,6 +41,22 @@ describe('announcement', () => {
     expect(live.textContent?.trim()).toBe('Service degraded')
   })
 
+  /* The region was re-marked only when a property changed, so a link a
+     framework rendered after the first render stayed hidden for good. */
+  test('actions slotted after the first render are shown', async () => {
+    const announcement = (await mount(
+      '<helix-headless-announcement>Trial ends Friday.</helix-headless-announcement>',
+    )) as HTMLElement & { updateComplete: Promise<boolean> }
+    expect((part(announcement, 'actions') as HTMLElement | null)?.hidden).toBe(true)
+    const link = document.createElement('a')
+    link.slot = 'actions'
+    link.href = '#upgrade'
+    link.textContent = 'Upgrade'
+    announcement.append(link)
+    await new Promise((done) => setTimeout(done, 0))
+    expect((part(announcement, 'actions') as HTMLElement | null)?.hidden).toBe(false)
+  })
+
   test('no dismiss control unless it can be dismissed', async () => {
     const announcement = await mount(
       '<helix-headless-announcement>Notice</helix-headless-announcement>',

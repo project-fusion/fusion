@@ -24,6 +24,15 @@ beforeAll(async () => {
   const { HelixElement } = await import('../../helix-element/helix-element.js')
   const { MixinDismissible } = await import('./mixin-dismissible.js')
   customElements.define(tag, class extends MixinDismissible(HelixElement) {})
+  const { html } = await import('lit')
+  customElements.define(
+    'probe-removable',
+    class extends MixinDismissible(HelixElement) {
+      protected override render() {
+        return html`<button part="dismiss" type="button">x</button>`
+      }
+    },
+  )
 })
 
 const item = async (markup = '', attrs = ''): Promise<Dismissible> => {
@@ -96,5 +105,60 @@ describe('the defaults', () => {
   test('which reflects, so a stylesheet can select on it', async () => {
     const host = await item('', 'dismissible')
     expect(host.hasAttribute('dismissible')).toBe(true)
+  })
+})
+
+/* The surface does not remove itself, and a listener removing it as documented
+   dropped focus to the body: a keyboard user clearing tags started again from
+   the top of the page. */
+describe('a dismissed element the listener removes', () => {
+  type Removable = HTMLElement & { dismiss(): boolean; updateComplete: Promise<boolean> }
+
+  const set = async (): Promise<Removable[]> => {
+    document.body.innerHTML =
+      '<probe-removable></probe-removable><probe-removable></probe-removable><probe-removable></probe-removable>'
+    const all = [...document.body.children] as Removable[]
+    await Promise.all(all.map((one) => one.updateComplete))
+    return all
+  }
+
+  const control = (one: Element): HTMLElement =>
+    one.shadowRoot?.querySelector('[part="dismiss"]') as HTMLElement
+
+  test('hands focus to the next one of its kind', async () => {
+    const [first, second] = await set()
+    first?.addEventListener('helix-dismiss', () => first.remove())
+    control(first as Element).focus()
+    first?.dismiss()
+    expect(document.activeElement).toBe(second as Element)
+    expect(second?.shadowRoot?.activeElement).toBe(control(second as Element))
+  })
+
+  test('or to the one before it, at the end of the set', async () => {
+    const [, second, third] = await set()
+    third?.addEventListener('helix-dismiss', () => third.remove())
+    control(third as Element).focus()
+    third?.dismiss()
+    expect(document.activeElement).toBe(second as Element)
+  })
+
+  test('and a frame later, for a framework that removes it on its next render', async () => {
+    const [first, second] = await set()
+    /* React flushes the render that removes it in a microtask after the
+       handler returns. */
+    first?.addEventListener('helix-dismiss', () => {
+      queueMicrotask(() => first.remove())
+    })
+    control(first as Element).focus()
+    first?.dismiss()
+    await new Promise((done) => requestAnimationFrame(() => done(undefined)))
+    expect(document.activeElement).toBe(second as Element)
+  })
+
+  test('but leaves focus alone where the element stayed', async () => {
+    const [first] = await set()
+    control(first as Element).focus()
+    first?.dismiss()
+    expect(first?.shadowRoot?.activeElement).toBe(control(first as Element))
   })
 })

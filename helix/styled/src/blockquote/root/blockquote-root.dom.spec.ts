@@ -8,7 +8,7 @@ beforeAll(async () => {
 
 /* The stylesheet the element adopts, as text. happy-dom resolves no cascade,
    so what can be held here is that a rule exists rather than that it applied.
-   The `<blockquote>`, the footer and `cite` are the base tier's and are tested
+   The `<blockquote>`, the caption and `cite` are the base tier's and are tested
    there. */
 const sheet = (): string => {
   const declared = (customElements.get('helix-blockquote') as unknown as { styles: unknown }).styles
@@ -40,9 +40,9 @@ describe('blockquote', () => {
     expect(passage).toContain('color: var(--helix-color-foreground-muted)')
   })
 
-  test('an attribution nobody wrote takes no room, and one that was keeps its footer', async () => {
-    /* The base tier marks the footer empty; this sheet is what takes the box
-       out, since a `<footer>` with nothing in it is still a gap under the quote.
+  test('an attribution nobody wrote takes no room, and one that was keeps its caption', async () => {
+    /* The base tier marks the caption empty; this sheet is what takes the box
+       out, since a `<figcaption>` with nothing in it is still a gap under the quote.
        Both halves are needed for the gap to close. */
     const bare = await mount('<helix-blockquote>Said so.</helix-blockquote>')
     expect(part(bare, 'attribution')?.hasAttribute('data-empty')).toBe(true)

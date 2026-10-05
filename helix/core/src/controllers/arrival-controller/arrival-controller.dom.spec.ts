@@ -68,3 +68,24 @@ describe('an element announced when it appears', () => {
     expect(element.asked).toBe(1)
   })
 })
+
+/* The words stay in the element itself, so a region that kept its copy put the
+   message in the accessibility tree twice for good. */
+describe('once the words are said', () => {
+  test('the region lets them go after a while, and does not say them again', async () => {
+    const element = host()
+    const words = new ArrivalController(element, {
+      arriving: () => true,
+      hold: 10,
+      text: () => 'No results',
+    })
+    element.connect()
+    await frame()
+    expect(words.said).toBe('No results')
+    await new Promise((done) => setTimeout(done, 30))
+    expect(words.said).toBe('')
+    expect(element.asked).toBe(2)
+    words.say()
+    expect(words.said).toBe('')
+  })
+})

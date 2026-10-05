@@ -26,12 +26,17 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * The live region is its own part. When the announcement appears after the page
  * has loaded, the message is written into the region one frame later, so screen
- * readers read it reliably. When the announcement is in the served HTML, the
- * region is filled at once and nothing is read out.
+ * readers read it reliably, and the region is emptied seven seconds later, so
+ * the message is not in the page twice. When the announcement is in the served
+ * HTML, the region stays empty and nothing is read out.
  *
  * The dismiss button fires `helix-dismiss`, and the announcement stays in the
  * document, so remove it in your listener. The event is cancelable, and
- * `dismiss()` returns `false` when a listener calls `preventDefault()`.
+ * `dismiss()` returns `false` when a listener calls `preventDefault()`. When
+ * your listener removes an announcement whose dismiss button has focus, focus
+ * moves to the dismiss button of the announcement beside it. With no other
+ * announcement beside it, move focus yourself, for example to the page's main
+ * heading.
  *
  * @since 0.1.0
  * @status stable
@@ -49,7 +54,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @csspart content - The region that holds the message.
  * @csspart dismiss - The button that dismisses the announcement.
  * @csspart dismiss-mark - The icon on the dismiss button, shown when the `icon` slot is empty.
- * @csspart live - A copy of the message in a live region, read by screen readers when the announcement appears after the page has loaded. Visually hidden in the styled tier.
+ * @csspart live - A copy of the message in a live region, read by screen readers when the announcement appears after the page has loaded, and emptied seven seconds later. Visually hidden in the styled tier.
  */
 @customElement('helix-headless-announcement')
 export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
@@ -66,9 +71,8 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
    * components saying what a thing means, in three vocabularies, one of which
    * described itself as a fourth.
    *
-   * `accent` is the second emphasis, a rotation off the brand seed rather than a
-   * color of its own, so it stays in relation when somebody rethemes. `primary`
-   * is the seed itself.
+   * `accent` is the second emphasis, the second color a theme names, and the
+   * brand itself until one is named. `primary` is the brand.
    *
    * **`surface` was never a color and has moved to `separation`**, which is the
    * axis that owns where a box sits relative to the page. It said the band rode
@@ -133,7 +137,7 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
   protected override render(): TemplateResult {
     return html`<div part="content"><slot @slotchange=${() => this.arrival.say()}></slot></div>
       <span part="live" role="status">${this.arrival.said}</span>
-      <div part="actions"><slot name="actions"></slot></div>
+      <div part="actions"><slot name="actions" @slotchange=${() => this.markEmpty()}></slot></div>
       ${
         /* A plain `<button>`, the way `Menu` renders its way back and every
            other in-shadow control in the library. Never a nested component
