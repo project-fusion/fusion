@@ -103,4 +103,12 @@ export const INTENTS = [
      does. `complement` is what every intent above defaulted to before. */
   { intent: { accent: { from: 'brand', rotate: 180 }, brand: '#3b82f6' }, label: 'complement' },
   { intent: { accent: '#db2777', brand: '#3b82f6' }, label: 'pinned-accent' },
+  /* No brand, which is ink: the primary held at the neutral's near-black or
+     near-white, a fill that turns light in the dark with the page's color on it,
+     and statuses at their own chroma. The accent named as a color is the one
+     second color an ink theme can have, and its label is the near-white beside
+     the ink's page-colored one. */
+  { intent: {}, label: 'ink' },
+  { intent: { scheme: 'dark' }, label: 'ink-dark' },
+  { intent: { accent: '#db2777' }, label: 'ink-accent' },
 ]

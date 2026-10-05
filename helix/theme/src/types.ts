@@ -88,9 +88,9 @@ export interface PairingRequest {
 export interface ThemeIntent {
   /**
    * The second emphasis. A color pins it and the relationship stands aside.
-   * Unnamed, it is the brand: a palette with one color has one, and
-   * `tone="accent"` draws in it. `{ from: 'brand', rotate: 180 }` asks for the
-   * complement.
+   * Unnamed, it is the brand, or the ink where there is no brand: a palette
+   * with one color has one, and `tone="accent"` draws in it.
+   * `{ from: 'brand', rotate: 180 }` asks for the complement.
    */
   accent?: Seed
   /**
@@ -108,9 +108,15 @@ export interface ThemeIntent {
     light?: Color
   }
   /**
-   * The one color most consumers care about, and the only required input.
+   * The one color most consumers care about.
+   *
+   * **Unnamed, the theme is ink**: the primary is the neutral's own near-black
+   * on a light page and near-white on a dark one, and a filled control is drawn
+   * in it with the page's color for its label. An accent related to the brand
+   * is refused without one, and an accent named as a color is the one second
+   * color an ink theme has.
    */
-  brand: Color
+  brand?: Color
   /**
    * How saturated the palette is, independent of which hue it is.
    *

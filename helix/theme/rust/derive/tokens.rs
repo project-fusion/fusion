@@ -7,13 +7,13 @@
 //! as a list: a token silently missing is a token nobody notices is missing.
 
 use crate::derive::accent::{seeded, settle};
-use crate::derive::emphasis::{emphasis, Emphasis};
-use crate::derive::fills::{filled_grounds, hover_of, on_accent, status_fills, Fill};
+use crate::derive::emphasis::{emphasis, ink, Emphasis};
+use crate::derive::fills::{filled_grounds, hover_of, on_fill, on_ink, status_fills, Fill};
 use crate::derive::inks::{neutral_inks, NeutralInks};
 use crate::derive::marks::{brand_mark, focus_ring, inverse};
 use crate::derive::quiet::quiet;
 use crate::derive::resolve::{Policy, Resolved};
-use crate::derive::status::{statuses, StatusColor};
+use crate::derive::status::{statuses, StatusColor, REFERENCE_CHROMA};
 use crate::derive::surfaces::{ladder, surfaces_on};
 use crate::derive::{resolve, token, Cast, DerivedToken, Deriving, Origin};
 use crate::intent::{to_oklch, Seed};
@@ -23,7 +23,8 @@ use crate::oklch::Oklch;
 /// token list: `pairings` measures against these and `collisions` compares them.
 pub struct Derived {
     pub accent: Emphasis,
-    pub brand: Oklch,
+    /// The brand with the chroma policy applied, or `None` for ink.
+    pub brand: Option<Oklch>,
     pub ctx: Deriving,
     pub neutral: Cast,
     pub primary: Emphasis,
@@ -41,7 +42,9 @@ pub struct Derived {
 #[must_use]
 pub fn derive_tokens(resolved: &Resolved) -> Derived {
     let policy = Policy::new(resolved.chroma);
-    let (raw_brand, brand, neutral) = resolve::brand_and_neutral(resolved, policy);
+    let named = resolve::brand(resolved, policy);
+    let brand = named.map(|(_, brand)| brand);
+    let neutral = resolve::neutral(resolved, policy);
     let ctx = Deriving {
         contrast_target: resolved.contrast_target,
         policy,
@@ -54,7 +57,7 @@ pub fn derive_tokens(resolved: &Resolved) -> Derived {
         ),
     };
 
-    let phases = Phases::run(resolved, &ctx, raw_brand, brand, neutral);
+    let phases = Phases::run(resolved, &ctx, named, neutral);
     let tokens = assemble(resolved, &ctx, brand, &phases);
 
     Derived {
@@ -82,6 +85,8 @@ struct Phases {
     foreground_inverse: Oklch,
     inks: NeutralInks,
     on_accent: Oklch,
+    on_primary: Oklch,
+    on_status: Oklch,
     primary: Emphasis,
     statuses: Vec<StatusColor>,
     surface_inverse: Oklch,
@@ -94,20 +99,26 @@ impl Phases {
     fn run(
         resolved: &Resolved,
         ctx: &Deriving,
-        raw_brand: Oklch,
-        brand: Oklch,
+        named: Option<(Oklch, Oklch)>,
         neutral: Cast,
     ) -> Self {
-        let primary = emphasis(brand, ctx);
-        let statuses = statuses(&resolved.status, brand.chroma, primary.raw, ctx);
+        let primary = named.map_or_else(|| ink(neutral, ctx), |(_, brand)| emphasis(brand, ctx));
+        /* **Ink counts as an ordinary brand's loudness, as far as the statuses
+        go.** `harmony` pulls a status toward the palette's own loudness, and ink
+        has none to pull toward: taken as a brand at chroma 0, the default
+        `harmony` puts every status at its floor, 0.55 of its own chroma, on a
+        page with nothing else colored on it. */
+        let loudness = named.map_or(REFERENCE_CHROMA, |(_, brand)| brand.chroma);
+        let statuses = statuses(&resolved.status, loudness, primary.raw, ctx);
 
-        /* An accent nobody named is the brand's own five colors, so it is the
-        primary by construction rather than a solve that lands near it. */
+        /* An accent the intent does not name is the primary's own five colors,
+        the brand's or the ink's, so it is the primary by construction. A solve
+        would only land near it. */
         let (accent, accent_origin) = match &resolved.accent {
             None => (primary, Origin::Derived),
-            Some(named) => {
-                let (seed, pinned) = seeded(named, raw_brand, ctx.policy);
-                let bound = match named {
+            Some(wanted) => {
+                let (seed, pinned) = seeded(wanted, named.map(|(raw, _)| raw), ctx.policy);
+                let bound = match wanted {
                     Seed::Color(_) => 0.0,
                     Seed::Relation(relation) => relation.allowance.unwrap_or(45.0),
                 };
@@ -125,7 +136,26 @@ impl Phases {
         };
 
         let fills = status_fills(&statuses, ctx);
-        let grounds = filled_grounds(primary.filled, accent.filled, &fills);
+        /* **An ink role carries the page, and every colored one the
+        near-white**, which is solved without the ink fills in its list: a light
+        ink fill in the dark would drag it toward a gray that reads on nothing. */
+        let primary_ink = named.is_none();
+        let accent_ink = primary_ink && resolved.accent.is_none();
+        let grounds = filled_grounds(
+            (!primary_ink).then_some(primary.filled),
+            (!accent_ink).then_some(accent.filled),
+            &fills,
+        );
+        let colored = on_fill(&grounds, resolved.contrast_target);
+        let on_primary = if primary_ink {
+            on_ink(
+                primary.filled,
+                ctx.surfaces.raw_background,
+                resolved.contrast_target,
+            )
+        } else {
+            colored
+        };
         let (surface_inverse, foreground_inverse) =
             inverse(neutral, resolved.scheme, resolved.contrast_target);
 
@@ -135,7 +165,9 @@ impl Phases {
             fills,
             foreground_inverse,
             inks: neutral_inks(ctx.surfaces, neutral, resolved.contrast_target),
-            on_accent: on_accent(&grounds, resolved.contrast_target),
+            on_accent: if accent_ink { on_primary } else { colored },
+            on_primary,
+            on_status: colored,
             primary,
             statuses,
             surface_inverse,
@@ -174,7 +206,7 @@ fn quiet_inks(
 fn assemble(
     resolved: &Resolved,
     ctx: &Deriving,
-    brand: Oklch,
+    brand: Option<Oklch>,
     phases: &Phases,
 ) -> Vec<DerivedToken> {
     let Phases {
@@ -184,6 +216,8 @@ fn assemble(
         foreground_inverse,
         inks,
         on_accent,
+        on_primary,
+        on_status,
         primary,
         statuses,
         surface_inverse,
@@ -207,12 +241,21 @@ fn assemble(
         plain("color-surface-overlay", ctx.surfaces.raw_overlay),
         plain("color-surface-sunken", ctx.surfaces.raw_sunken),
         token("color-primary", primary.raw, Origin::Derived, ground),
-        /* **`foreground-on-accent`, which is the name the stylesheet reads.**
-        Every component putting text on the brand asks for
-        `--helix-color-foreground-on-accent`, so an engine naming that color
-        anything else leaves a themed page on the stock one. The token layer has
-        135 names and this has a handful, so the handful moved. */
-        against("color-foreground-on-accent", *on_accent, primary.filled),
+        /* **The labels, one per role, under the names the stylesheet reads.**
+        Every component that puts text on a fill reads
+        `--helix-color-foreground-on-` and the fill's role, so an engine naming
+        those colors anything else leaves a themed page on the stock ones. The
+        token layer has 135 names and this has a handful, so the handful moved.
+        Each is measured against its own role's fill, and the status label
+        against the first status's. */
+        against("color-foreground-on-primary", *on_primary, primary.filled),
+        against("color-foreground-on-accent", *on_accent, accent.filled),
+        token(
+            "color-foreground-on-status",
+            *on_status,
+            Origin::Derived,
+            fills.first().map(|(_, fill)| fill.rest),
+        ),
         plain("color-primary-hover", primary.hover),
         plain("color-primary-active", primary.active),
         plain("color-primary-subtle", primary.subtle),
@@ -262,15 +305,19 @@ fn assemble(
         *foreground_inverse,
         *surface_inverse,
     ));
+    /* Ink is its own ring and its own mark: it already clears every page
+    surface at the text target, so there is nothing nearer to solve toward. */
     tokens.push(token(
         "color-focus-ring",
-        focus_ring(brand, ctx),
+        brand.map_or(primary.raw, |brand| focus_ring(brand, ctx)),
         Origin::Derived,
         ground,
     ));
     tokens.push(token(
         "color-brand-mark",
-        brand_mark(brand, &ctx.surfaces.solved_against()),
+        brand.map_or(primary.raw, |brand| {
+            brand_mark(brand, &ctx.surfaces.solved_against())
+        }),
         Origin::Derived,
         ground,
     ));

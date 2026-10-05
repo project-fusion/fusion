@@ -358,12 +358,17 @@ pub struct Status {
     serde(deny_unknown_fields, rename_all = "camelCase")
 )]
 pub struct ThemeIntent {
-    /// The second emphasis. Unnamed, it is the brand.
+    /// The second emphasis. Unnamed, it is the brand, or the ink where there is
+    /// no brand.
     pub accent: Option<Seed>,
     /// The page's color for each scheme. Unset is pure white and pure black.
     pub background: Option<Background>,
-    /// The one color most consumers care about, and the only required input.
-    pub brand: Color,
+    /// The one color most consumers care about. **Unnamed, the theme is ink**:
+    /// the primary is the neutral's own near-black on a light page and
+    /// near-white on a dark one, and a filled control is drawn in it with the
+    /// page's color for its label.
+    #[cfg_attr(feature = "serde", serde(default))]
+    pub brand: Option<Color>,
     pub chroma: Option<Chroma>,
     /// 4.5 is WCAG AA and the default, being the figure with legal weight; 7 is
     /// AAA.
@@ -401,9 +406,18 @@ impl ThemeIntent {
     #[must_use]
     pub fn new(brand: Color) -> Self {
         Self {
+            brand: Some(brand),
+            ..Self::ink()
+        }
+    }
+
+    /// A theme with no brand, which is ink.
+    #[must_use]
+    pub fn ink() -> Self {
+        Self {
             accent: None,
             background: None,
-            brand,
+            brand: None,
             chroma: None,
             contrast_target: None,
             density: None,
