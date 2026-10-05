@@ -142,6 +142,14 @@ export declare class MixinChartSourceInterface {
    */
   label: string
   /**
+   * The locale the chart's own numbers are written in: its axis, its
+   * percentages and its totals, such as `de` for `1.240` and `32 %`.
+   *
+   * Absent uses the runtime's own. The table's cells are shown as the table
+   * writes them, whatever this says.
+   */
+  locale: string
+  /**
    * The table's columns, one series each. Empty when there is no table.
    */
   get series(): Series[]
@@ -223,6 +231,16 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
      */
     @property()
     label = ''
+
+    /**
+     * The locale the chart's own numbers are written in: its axis, its
+     * percentages and its totals, such as `de` for `1.240` and `32 %`.
+     *
+     * Absent uses the runtime's own. The table's cells are shown as the table
+     * writes them, whatever this says.
+     */
+    @property()
+    locale = ''
 
     /**
      * Re-resolves when the chart is pointed at a different table.

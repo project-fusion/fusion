@@ -78,6 +78,18 @@ describe('progress', () => {
     expect(bar.internals?.ariaValueNow).toBe('5')
   })
 
+  /* A range had to start at zero, which a measure such as a version number
+     does not: React Aria's progress bar takes a `minValue` for it. */
+  test('a range can start above zero, and the bar and the announcement measure from it', async () => {
+    const bar = await progress('min="12" max="20" value="16"')
+    expect(bar.fraction).toBe(0.5)
+    expect(bar.internals?.ariaValueMin).toBe('12')
+    expect(bar.internals?.ariaValueMax).toBe('20')
+    expect(bar.internals?.ariaValueNow).toBe('16')
+    const under = await progress('min="12" max="20" value="4"')
+    expect([under.fraction, under.internals?.ariaValueNow]).toEqual([0, '12'])
+  })
+
   test('value text is announced beside the number, never instead of it', async () => {
     const bar = await progress('max="8" value="3" value-text="3 of 8 records"')
     expect(bar.internals?.ariaValueText).toBe('3 of 8 records')

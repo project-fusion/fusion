@@ -12,7 +12,19 @@ import { html, nothing, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import '../../tooltip/index.js'
 
-const percent = new Intl.NumberFormat(undefined, { maximumFractionDigits: 0, style: 'percent' })
+/* Built once per locale and kept, `Intl.NumberFormat` being expensive to
+   construct and cheap to call. */
+const PERCENTS = new Map<string, Intl.NumberFormat>()
+
+/** A share from 0 to 1 as a whole percentage, the way the locale writes one. */
+const percentIn = (locale: string): Intl.NumberFormat => {
+  let found = PERCENTS.get(locale)
+  if (!found) {
+    found = new Intl.NumberFormat(locale || undefined, { maximumFractionDigits: 0, style: 'percent' })
+    PERCENTS.set(locale, found)
+  }
+  return found
+}
 
 /* Square, because the shape has to stay round: the plot box is already one and
    this is the center of it. */
@@ -273,7 +285,7 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
   protected renderSummary(shares: DonutShare[]): TemplateResult {
     const rows = this.sourceRows
     const parts = shares.map(
-      (share) => `${rows[share.row]?.label ?? ''} ${percent.format(share.fraction)}`,
+      (share) => `${rows[share.row]?.label ?? ''} ${percentIn(this.locale).format(share.fraction)}`,
     )
     const named = this.named ? `${this.named}: ` : ''
     return html`<p part="summary">${named}${parts.join(', ')}.</p>`

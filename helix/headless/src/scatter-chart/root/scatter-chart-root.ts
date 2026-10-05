@@ -20,11 +20,23 @@ import '../../tooltip/index.js'
 /** How near a pointer has to be to a point to be asking about it, in pixels. */
 const REACH = 24
 
-const coefficient = new Intl.NumberFormat(undefined, {
-  maximumFractionDigits: 2,
-  minimumFractionDigits: 2,
-  signDisplay: 'exceptZero',
-})
+/* Built once per locale and kept, `Intl.NumberFormat` being expensive to
+   construct and cheap to call. */
+const COEFFICIENTS = new Map<string, Intl.NumberFormat>()
+
+/** A correlation coefficient, to two places and signed, the way the locale writes one. */
+const coefficientIn = (locale: string): Intl.NumberFormat => {
+  let found = COEFFICIENTS.get(locale)
+  if (!found) {
+    found = new Intl.NumberFormat(locale || undefined, {
+      maximumFractionDigits: 2,
+      minimumFractionDigits: 2,
+      signDisplay: 'exceptZero',
+    })
+    COEFFICIENTS.set(locale, found)
+  }
+  return found
+}
 
 /** One row drawn as a point: which row, which series, and where, in percent of the plot. */
 export interface ScatterPoint {
@@ -274,7 +286,7 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
         <div id=${CHART_PLOT} part="plot"></div>
       </div>`
     }
-    const format = formatNumbers('')
+    const format = formatNumbers(this.locale)
     const along = linear(field.x, [0, PLOT_WIDTH])
     const up = linear(field.y, [PLOT_HEIGHT, 0])
     return html`<div dir="ltr" part="plane">
@@ -351,7 +363,7 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
     const clauses = field.yNames.map((name, depth) => {
       const pairs = field.pairs[depth] ?? []
       const r = correlation(pairs)
-      const strength = r === undefined ? '' : `, ${this.correlationLabel} ${coefficient.format(r)}`
+      const strength = r === undefined ? '' : `, ${this.correlationLabel} ${coefficientIn(this.locale).format(r)}`
       return `${name} / ${field.xName}: ${pairs.length} ${this.pointsLabel}${strength}`
     })
     const named = this.named ? `${this.named}. ` : ''
