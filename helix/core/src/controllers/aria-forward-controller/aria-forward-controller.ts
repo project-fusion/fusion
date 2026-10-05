@@ -1,5 +1,5 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
-import { auditName } from '../../utils/audit-name/audit-name.js'
+import { auditName, nameText } from '../../utils/audit-name/audit-name.js'
 import { elementById } from '../../utils/element-by-id/element-by-id.js'
 
 /** What the controller needs to know: which element inside is the control. */
@@ -42,26 +42,6 @@ export interface AriaForwardOptions {
    * field is checked by `MixinField`, which knows its label.
    */
   unnamed?: string
-}
-
-/**
- * The text a node shows, read through slots to what is assigned to them, and
- * skipping what is hidden.
- *
- * `textContent` stops at a slot, which is where a control's own label keeps
- * the words a consumer gave it.
- */
-const shownText = (node: Node): string => {
-  if (node instanceof HTMLSlotElement) {
-    return node.assignedNodes({ flatten: true }).map(shownText).join('')
-  }
-  if (node.nodeType === Node.TEXT_NODE) {
-    return node.textContent ?? ''
-  }
-  if (node instanceof HTMLElement && node.hidden) {
-    return ''
-  }
-  return [...node.childNodes].map(shownText).join('')
 }
 
 /** The two relationships a consumer writes on a host and means for the control. */
@@ -213,7 +193,7 @@ export class AriaForwardController implements ReactiveController {
       return true
     }
     const own = (target as HTMLElement & { labels?: NodeList | null }).labels
-    return [...(own ?? [])].some((label) => shownText(label).trim() !== '')
+    return [...(own ?? [])].some((label) => nameText(label).trim() !== '')
   }
 
   /**

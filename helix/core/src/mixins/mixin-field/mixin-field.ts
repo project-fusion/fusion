@@ -715,7 +715,8 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
       /* **Every field is asked whether it is named**, once it has rendered,
          and told so through the runtime channel when it is not. The control is
          the element the label points at, and a group, which has none, is named
-         by its label or by its host. */
+         by its label or by its host. The `value` part, where a field shows its
+         value or its placeholder, names nothing. */
       auditName(
         this,
         () => this.namedControl,
@@ -725,6 +726,7 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
           [...this.children].some(
             (child) => child.slot === 'label' && (child.textContent ?? '').trim() !== '',
           ),
+        () => this.partNamed('value'),
       )
     }
   }
