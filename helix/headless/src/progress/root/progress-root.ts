@@ -2,6 +2,23 @@ import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
+/* Built once per locale and kept, `Intl.NumberFormat` being expensive to construct
+   and cheap to call. */
+const percents = new Map<string, Intl.NumberFormat>()
+
+/** A share from 0 to 1 as a whole percentage, the way the locale writes one. */
+const percent = (share: number, locale: string): string => {
+  let format = percents.get(locale)
+  if (!format) {
+    format = new Intl.NumberFormat(locale || undefined, {
+      maximumFractionDigits: 0,
+      style: 'percent',
+    })
+    percents.set(locale, format)
+  }
+  return format.format(share)
+}
+
 /**
  * @summary A bar or ring that shows how far along a task is.
  *
@@ -54,6 +71,14 @@ export class HelixHeadlessProgress extends HelixElement {
    */
   @property()
   label = 'Progress'
+
+  /**
+   * The locale the percentage is written in, such as `fr` for `72 %`.
+   *
+   * Absent uses the runtime's own.
+   */
+  @property()
+  locale = ''
 
   /**
    * The total the work is measured against.
@@ -189,7 +214,7 @@ export class HelixHeadlessProgress extends HelixElement {
            fact. It is here to be looked at, not to be read out. */
         this.showValue && !this.indeterminate
           ? html`<span part="value" aria-hidden="true"
-              >${this.valueText || `${Math.round(this.fraction * 100)}%`}</span
+              >${this.valueText || percent(this.fraction, this.locale)}</span
             >`
           : ''
       }`

@@ -31,9 +31,8 @@ const STRIP_HEIGHT = 32
  * `values` to the data and `label` to the one sentence a screen reader
  * announces.
  *
- * This follows the library's rule that a content property is the fallback for
- * its slot, as with `Tooltip`'s `content` and `Avatar`'s `name`. Use `for` when
- * a sparkline has a real table behind it. `for` wins when both are set.
+ * Use `for` when a sparkline has a real table behind it. `for` wins when both
+ * are set.
  *
  * Without a `label` the sparkline is decorative and `aria-hidden`, for example
  * beside a stat that already says "Sessions, 1,102". With a `label` it is an
@@ -124,8 +123,8 @@ export class HelixHeadlessSparkline extends HelixElement {
   /**
    * What the readings are drawn as.
    *
-   * Absent is a line, `area` is a line with the region beneath it washed, and
-   * `bar` is a column per reading.
+   * Absent is `area`, a line with the region beneath it washed. `line` is the
+   * bare stroke, and `bar` is a column per reading.
    *
    * **A bar plot measures from zero and the other two measure from the data's
    * own range**, which is the one way the plots are not interchangeable. A line
@@ -156,13 +155,13 @@ export class HelixHeadlessSparkline extends HelixElement {
   /**
    * The numbers, separated by whitespace or by commas.
    *
-   * Both separators, so `values="1240 1318"` and an array assigned to the
-   * property both work: assigning `[1240, 1318]` stringifies to `1240,1318`,
-   * and a string is what survives React's hydration where an array property
-   * does not.
+   * An array assigned to the property works too, which is what React 19 does
+   * with `values={[1240, 1318]}`. The attribute is the form to prefer, because
+   * a string is what survives React's hydration where an array property does
+   * not.
    */
   @property()
-  values = ''
+  values: string | readonly number[] = ''
 
   /* One controller rather than the resolve-and-watch each chart had written
      out for itself. */

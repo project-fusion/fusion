@@ -41,6 +41,11 @@ export class HelixHeadlessStat extends HelixElement {
    * the value's baseline whichever way the pair goes, and only this element
    * knows which of its children the unit belongs to.
    *
+   * **`Trend` has a `direction` too, and there it means which way a number
+   * moved:** `up`, `down` or `neutral`. A Stat and a Trend are often written
+   * side by side, so watch for the mix-up. On a Stat those three words are not
+   * layouts, and the pair stays the column.
+   *
    * **Optional rather than defaulted to `column`, which is not a style
    * preference.** A reflecting property with a default writes its attribute onto
    * the host the moment the element upgrades, and the host is markup the

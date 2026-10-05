@@ -27,6 +27,13 @@ describe('how a consumer writes a list', () => {
     expect(writtenList('  , one ,, two,  ')).toEqual(['one', 'two'])
   })
 
+  /* React 19 sets a property, so `values={[1, 2]}` arrives as an array, and
+     splitting it as a string threw inside the render. */
+  test('an array a framework assigned to the property, entry by entry', () => {
+    expect(writtenList(['speed', 'pip'])).toEqual(['speed', 'pip'])
+    expect(writtenNumbers([1240, 1318, '7'])).toEqual([1240, 1318, 7])
+  })
+
   test('nothing written is no list, rather than one empty name', () => {
     expect(writtenList('')).toEqual([])
     expect(writtenList('   ')).toEqual([])

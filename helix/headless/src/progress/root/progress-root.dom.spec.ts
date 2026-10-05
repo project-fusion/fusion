@@ -27,6 +27,16 @@ const progress = async (attrs = 'value="62"'): Promise<Progress> =>
     `<helix-headless-progress label="Uploading" ${attrs}></helix-headless-progress>`,
   )) as Progress
 
+describe('the value shown', () => {
+  /* Written by concatenation it ignored the locale: no space before the sign
+     in French, Latin digits in Arabic. */
+  test('is written the way `locale` writes a percentage', async () => {
+    const bar = await progress('locale="fr" show-value value="62"')
+    const shown = bar.shadowRoot?.querySelector('[part="value"]')?.textContent?.trim()
+    expect(shown).toBe(new Intl.NumberFormat('fr', { style: 'percent' }).format(0.62))
+  })
+})
+
 describe('progress', () => {
   test('announces itself as a progress bar with a name, through internals', async () => {
     const bar = await progress()
