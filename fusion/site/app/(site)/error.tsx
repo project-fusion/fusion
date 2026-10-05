@@ -37,8 +37,8 @@ export default function SiteError({
       </helix-tag>
       <h1 className={styles.troubleTitle}>This page did not finish loading.</h1>
       <p className={styles.troubleLede}>
-        Something on our side threw while rendering. The rest of the site is unaffected, and trying
-        again is worth a moment: a fair number of these are transient.
+        Something went wrong on our side while this page loaded. The rest of the site still works,
+        and trying again often fixes it.
       </p>
 
       {error.digest ? <p className={styles.troubleDigest}>Reference: {error.digest}</p> : null}
