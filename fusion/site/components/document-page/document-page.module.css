@@ -12,14 +12,23 @@
    at while a reader decides what to read. **Diagonal, because the light has to
    come from somewhere**: a vertical ramp over a full-width band reads as a
    printing artifact. Mixed from `--helix-color-primary` into
-   `--helix-color-background`, so one declaration serves both modes. */
+   `--helix-color-background`, so one declaration serves both modes.
+
+   **The brand no darker than 0.54, so a dark brand cannot darken the band.**
+   With no brand set, the primary in light mode is near-black, and mixed at
+   these strengths it turned the band mid-gray: `rgb(149 149 149)` behind the
+   "All insights" link, where Fusion's blue left `rgb(161 194 243)`. The floor
+   is that blue's own lightness, so a blue band is unchanged. A dark mode
+   primary is lighter than the floor, so no dark band changes either. */
 .documentHero {
+  --_band-light: oklch(from var(--helix-color-primary) max(l, 0.54) c h);
+
   background-color: var(--helix-color-background);
   background-image: linear-gradient(
     152deg,
-    color-mix(in oklab, var(--helix-color-primary) 62%, var(--helix-color-background)) 0%,
-    color-mix(in oklab, var(--helix-color-primary) 38%, var(--helix-color-background)) 30%,
-    color-mix(in oklab, var(--helix-color-primary) 16%, var(--helix-color-background)) 62%,
+    color-mix(in oklab, var(--_band-light) 62%, var(--helix-color-background)) 0%,
+    color-mix(in oklab, var(--_band-light) 38%, var(--helix-color-background)) 30%,
+    color-mix(in oklab, var(--_band-light) 16%, var(--helix-color-background)) 62%,
     var(--helix-color-background) 100%
   );
   /* The header's own height plus the hairline under it, so the band starts at

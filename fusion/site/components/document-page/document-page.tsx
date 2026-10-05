@@ -58,7 +58,14 @@ export function DocumentPage({
   const head = (
     <helix-flex align-items="start" direction="column" gap="md">
       {kicker && (
-        <helix-text class={styles.documentKicker} emphasis="subtle" variant="label">
+        /* Full strength on the band, for the same reason as the lede below.
+           Subtle, it measured 3.04:1 on the band in light mode and 3.74:1 in
+           dark, and a 12px label needs 4.5:1. */
+        <helix-text
+          class={styles.documentKicker}
+          emphasis={hero ? undefined : 'subtle'}
+          variant="label"
+        >
           {kicker}
         </helix-text>
       )}
