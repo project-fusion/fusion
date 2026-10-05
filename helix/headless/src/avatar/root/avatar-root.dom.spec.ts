@@ -161,3 +161,34 @@ describe('the status an avatar reports', () => {
     expect(part(avatar, 'image')).not.toBeNull()
   })
 })
+
+/* Radix's `delayMs`: initials stand in for a slow picture, and a fast one
+   never flashes them. */
+describe('fallback delay', () => {
+  const wait = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms))
+
+  test('without one, a loading picture shows no initials, as before', async () => {
+    const avatar = (await mount(
+      '<helix-headless-avatar name="Ada Lovelace" src="/ada.avif"></helix-headless-avatar>',
+    )) as Updatable
+    await wait(20)
+    await avatar.updateComplete
+    expect(part(avatar, 'initials')).toBeNull()
+  })
+
+  test('the initials stand in once the wait is over, and the picture keeps loading', async () => {
+    const avatar = (await mount(
+      '<helix-headless-avatar name="Ada Lovelace" src="/ada.avif" fallback-delay="10"></helix-headless-avatar>',
+    )) as Updatable
+    expect(part(avatar, 'initials')).toBeNull()
+    await wait(30)
+    await avatar.updateComplete
+    expect(part(avatar, 'initials')?.textContent?.trim()).toBe('AL')
+    const image = part(avatar, 'image') as HTMLImageElement
+    expect(image.hidden).toBe(true)
+    image.dispatchEvent(new Event('load'))
+    await avatar.updateComplete
+    expect(part(avatar, 'initials')).toBeNull()
+    expect((part(avatar, 'image') as HTMLImageElement).hidden).toBe(false)
+  })
+})

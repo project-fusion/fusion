@@ -1,5 +1,5 @@
 import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
 /** Initials for a name: first letter of the first and last words. */
@@ -52,6 +52,19 @@ export const initialsOf = (name: string): string => {
 @customElement('helix-headless-avatar')
 export class HelixHeadlessAvatar extends HelixElement {
   /**
+   * How long, in milliseconds, a picture may take before the initials stand
+   * in for it while it loads.
+   *
+   * Absent keeps the picture's place empty until it arrives or fails. Set,
+   * the initials show once the wait is over and the picture
+   * replaces them when it arrives, so a slow connection shows who it is
+   * without a cached picture flashing initials first. Radix's `delayMs` is the
+   * same idea.
+   */
+  @property({ attribute: 'fallback-delay', type: Number })
+  fallbackDelay?: number
+
+  /**
    * Name of the person or entity.
    *
    * Used for the label and the initials.
@@ -91,6 +104,13 @@ export class HelixHeadlessAvatar extends HelixElement {
    */
   @state()
   private broken = false
+
+  /** Whether `fallback-delay` has run out for the picture loading now. */
+  @state()
+  private waited = false
+
+  /** The timer counting down `fallback-delay`. */
+  private wait: ReturnType<typeof setTimeout> | undefined
 
   private readonly handleError = (event: Event): void => {
     this.broken = true
@@ -162,8 +182,31 @@ export class HelixHeadlessAvatar extends HelixElement {
     }
   }
 
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    clearTimeout(this.wait)
+  }
+
+  /* Client only, from `updated`, so a server serves the picture's place as it
+     always did and the initials come after the wait. */
+  private startWait(): void {
+    clearTimeout(this.wait)
+    this.waited = false
+    if (this.fallbackDelay !== undefined && this.src !== '') {
+      this.wait = setTimeout(
+        () => {
+          this.waited = true
+        },
+        Math.max(this.fallbackDelay, 0),
+      )
+    }
+  }
+
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    if (changed.has('src') || changed.has('fallbackDelay')) {
+      this.startWait()
+    }
     /* The mirror, written here rather than reflected, the way `Image` writes
        it: `loading` is the resting state and writes nothing. */
     if (changed.has('status')) {
@@ -177,13 +220,18 @@ export class HelixHeadlessAvatar extends HelixElement {
 
   protected override render(): TemplateResult {
     if (this.src !== '' && !this.broken) {
-      return html`<img
-        part="image"
-        src=${this.src}
-        alt=""
-        @error=${this.handleError}
-        @load=${this.handleLoad}
-      />`
+      /* The initials stand in while a slow picture loads, and the picture
+         keeps loading, hidden, in the same element, so it is not fetched
+         twice. */
+      const standIn = this.waited && this.status === 'loading'
+      return html`${standIn ? this.renderInitials() : nothing}<img
+          part="image"
+          src=${this.src}
+          alt=""
+          ?hidden=${standIn}
+          @error=${this.handleError}
+          @load=${this.handleLoad}
+        />`
     }
 
     return this.renderInitials()

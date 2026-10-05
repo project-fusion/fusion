@@ -13,7 +13,7 @@
      skip. */
   color: var(--quote-color, var(--helix-color-foreground-muted));
   font: inherit;
-  font-style: italic;
+  font-style: var(--quote-font-style, italic);
 }
 
 /* Print: the marks and the slant, with no fill behind them.
