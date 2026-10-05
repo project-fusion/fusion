@@ -27,6 +27,10 @@ export function Example() {
     say('helix-activate', `"${event.detail.value}" is now playing`)
   }
 
+  const finished = () => {
+    say('helix-end', 'the last clip finished, and the playlist stopped there')
+  }
+
   return (
     <helix-flex
       direction="column"
@@ -37,6 +41,7 @@ export function Example() {
         label="Episodes"
         onhelix-activate={moved}
         onhelix-before-activate={proposed}
+        onhelix-end={finished}
       >
         <helix-video
           extra-controls="previous next"

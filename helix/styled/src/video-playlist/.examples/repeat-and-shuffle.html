@@ -1,0 +1,34 @@
+<!-- @summary A playlist that plays its clips in a random order and starts again after the last one. -->
+<helix-video-playlist
+  default-active="sintel"
+  label="Episodes"
+  repeat="all"
+  shuffle
+>
+  <helix-video
+    extra-controls="previous next"
+    label="Episode player"
+    slot="player"
+  ></helix-video>
+
+  <helix-video-playlist-item
+    poster="/media/sintel-short.jpg"
+    src="https://mdn.github.io/shared-assets/videos/sintel-short.mp4"
+    value="sintel"
+  >
+    Sintel
+  </helix-video-playlist-item>
+  <helix-video-playlist-item
+    poster="/media/tears-of-steel.jpg"
+    src="https://mdn.github.io/shared-assets/videos/tears-of-steel-battle-clip-medium.mp4"
+    value="tears"
+  >
+    Tears of Steel
+  </helix-video-playlist-item>
+  <helix-video-playlist-item
+    src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm"
+    value="flower"
+  >
+    Flower
+  </helix-video-playlist-item>
+</helix-video-playlist>

@@ -38,4 +38,15 @@ describe('video playlist server output', () => {
     ></helix-video-playlist>`)
     expect(hostAttributes(markup, 'helix-video-playlist')).toEqual(['default-active', 'label'])
   })
+
+  test('shuffle and repeat set as properties write nothing onto the host', () => {
+    /* Settings nothing selects on, so neither reflects: a host a server sends
+       carries only what the consumer wrote. */
+    const markup = ssr(html`<helix-video-playlist
+      label="Episodes"
+      .repeat=${'all'}
+      .shuffle=${true}
+    ></helix-video-playlist>`)
+    expect(hostAttributes(markup, 'helix-video-playlist')).toEqual(['label'])
+  })
 })

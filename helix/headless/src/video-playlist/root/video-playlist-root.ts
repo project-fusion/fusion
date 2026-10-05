@@ -2,6 +2,23 @@ import { customElement, HelixElement, MixinControllerActive } from '@fusion.dev/
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixHeadlessVideoPlaylistItem } from '../item/video-playlist-item.js'
+import { playOrder, type Repeat, stepTo } from '../order.js'
+
+/**
+ * What the playlist asks of the player it drives, whichever tag it is.
+ *
+ * `play` may answer with a promise, as a media element's does, and the playlist
+ * waits on nothing it returns: a refused play leaves the player paused on the
+ * chosen entry, which is the correct thing to be looking at.
+ */
+type Player = HTMLElement & {
+  currentTime?: number
+  label: string
+  play: () => Promise<void> | void
+  poster: string
+  src: string
+  updateComplete?: Promise<unknown>
+}
 
 /**
  * @summary A list of video clips that play one after another in a single player.
@@ -24,7 +41,11 @@ import { HelixHeadlessVideoPlaylistItem } from '../item/video-playlist-item.js'
  * - the player reaches the end.
  *
  * On `ended` the playlist advances and the next clip starts playing, because
- * the user already pressed play once.
+ * the user already pressed play once. `repeat` decides what happens at the
+ * end: `one` plays the same entry again, and `all` goes from the last entry
+ * back to the first. Without it, the playlist stops on the last entry and
+ * sends `helix-end`. `shuffle` plays the entries in a random order, starting
+ * from the one that is current, and `previous` retraces that order.
  *
  * @since 0.1.0
  * @status stable
@@ -37,6 +58,7 @@ import { HelixHeadlessVideoPlaylistItem } from '../item/video-playlist-item.js'
  *
  * @event {HelixActivateEvent} helix-activate - The current entry changed. The playlist already holds the new entry when this is sent.
  * @event {HelixBeforeActivateEvent} helix-before-activate - The current entry is about to change. Cancelable: cancel it to keep the current entry.
+ * @event {Event} helix-end - The last entry finished playing, and the playlist stopped there. Not sent while `repeat` is set.
  *
  * @csspart items - The list of entries.
  * @csspart player - The region that holds the player.
@@ -48,6 +70,35 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
    */
   @property()
   label = 'Playlist'
+
+  /**
+   * What happens when an entry ends with no next one to go to. `one` plays the
+   * same entry again, and `all` goes from the last entry back to the first.
+   * Absent, the playlist stops on the last entry and sends `helix-end`.
+   *
+   * `all` also lets the next and previous controls go round, so next on the
+   * last entry is the first. `one` changes only what an ending does: next and
+   * previous still move, being a reader asking for another entry.
+   */
+  @property()
+  repeat?: Repeat
+
+  /**
+   * Whether the entries play in a random order. The order starts from the
+   * entry that is current, and holds until shuffle is turned off or an entry
+   * arrives or leaves, so previous goes back through what has played.
+   */
+  @property({ type: Boolean })
+  shuffle = false
+
+  /**
+   * The shuffled order of the entries' values, while `shuffle` is on.
+   *
+   * Held rather than drawn on each step, so previous retraces the way next
+   * came. Dropped when shuffle turns off, so turning it on again deals a new
+   * order from wherever the reader is.
+   */
+  private dealt: string[] | undefined
 
   /**
    * The entries, in the order the consumer wrote them.
@@ -98,38 +149,75 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
    * be driven. What is needed of it is `src`, which is the whole of the
    * contract.
    */
-  private get player():
-    | (HTMLElement & {
-        label: string
-        play: () => void
-        poster: string
-        src: string
-        updateComplete?: Promise<unknown>
-      })
-    | null {
+  private get player(): Player | null {
     const slot = this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="player"]')
-    const first = slot?.assignedElements()[0]
-    return (
-      (first as
-        | (HTMLElement & {
-            label: string
-            play: () => void
-            poster: string
-            src: string
-            updateComplete?: Promise<unknown>
-          })
-        | undefined) ?? null
-    )
+    return (slot?.assignedElements()[0] as Player | undefined) ?? null
   }
 
-  /** Moves by one, and does nothing at either end. */
-  private step(by: number): void {
+  /**
+   * The entry a step of `by` lands on, in the order the playlist plays in, or
+   * `undefined` past an end. Disabled entries are not in the order, so a step
+   * passes over them.
+   */
+  private following(by: number): { current: string | undefined; next: string | undefined } {
     const items = this.items.filter((one) => !one.disabled)
-    const at = items.findIndex((one) => one.value === this.resolveActive(items)?.value)
-    const next = items[at + by]
-    if (next) {
-      this.requestActive(next.value)
+    const values = items.map((one) => one.value)
+    const current = this.resolveActive(items)?.value
+    this.dealt = this.shuffle ? playOrder(values, true, this.dealt, current) : undefined
+    const order = this.dealt ?? values
+    return { current, next: stepTo(order, current, by, this.repeat === 'all') }
+  }
+
+  /**
+   * Moves by one in the playing order and plays what it lands on. At an end it
+   * stays, unless `repeat` is `all`.
+   *
+   * A move a consumer refuses with `helix-before-activate` plays nothing, and
+   * leaves nothing behind to play on a later change.
+   */
+  private step(by: number): void {
+    const { current, next } = this.following(by)
+    if (next === undefined) {
+      return
     }
+    if (next === current) {
+      this.replay()
+      return
+    }
+    this.chased = true
+    if (!this.requestActive(next)) {
+      this.chased = false
+    }
+  }
+
+  /**
+   * Plays the current entry again from its start, which is what an ending
+   * under `repeat="one"` asks for, and a list of one under `repeat="all"`.
+   */
+  private replay(): void {
+    const player = this.player
+    if (!player) {
+      return
+    }
+    player.currentTime = 0
+    void Promise.resolve(player.play()).catch(() => {})
+  }
+
+  /**
+   * Moves to the next entry and plays it, as the player's next control does.
+   * Follows `shuffle`, goes round under `repeat="all"`, and stays on the last
+   * entry otherwise.
+   */
+  next(): void {
+    this.step(1)
+  }
+
+  /**
+   * Moves to the previous entry and plays it, as the player's previous control
+   * does. Under `shuffle` it goes back through the order that played.
+   */
+  previous(): void {
+    this.step(-1)
   }
 
   private readonly handleSelect = (event: Event): void => {
@@ -165,21 +253,34 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
   }
 
   private readonly handleNext = (): void => {
-    this.chased = true
-    this.step(1)
+    this.next()
   }
 
   private readonly handlePrevious = (): void => {
-    this.chased = true
-    this.step(-1)
+    this.previous()
   }
 
+  /**
+   * An entry ended: the same one again under `repeat="one"`, the next one in
+   * the order, or, past the last, `helix-end`.
+   *
+   * **A notification with no class of its own**, sent as a plain event and
+   * carrying nothing: the playlist is still on the last entry, and `active`
+   * says which. Not sent under `repeat`, where a list never runs out.
+   */
   private readonly handleEnded = (event: Event): void => {
     /* Only the player's own end: media somewhere inside it may end too. */
     if (event.target !== this.player) {
       return
     }
-    this.chased = true
+    if (this.repeat === 'one') {
+      this.replay()
+      return
+    }
+    if (this.following(1).next === undefined) {
+      this.dispatchEvent(new Event('helix-end', { bubbles: true, composed: true }))
+      return
+    }
     this.step(1)
   }
 
@@ -206,6 +307,14 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
     this.removeEventListener('helix-next', this.handleNext)
     this.removeEventListener('helix-previous', this.handlePrevious)
     this.removeEventListener('ended', this.handleEnded, true)
+  }
+
+  /** A shuffle turned off forgets its order, so the next one is new. */
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    if (changed.has('shuffle') && !this.shuffle) {
+      this.dealt = undefined
+    }
   }
 
   /**
@@ -244,9 +353,7 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
 
            A microtask later is still inside the press that got us here, so the
            platform still counts it as asked for. */
-        void player.updateComplete?.then(() => {
-          player.play()
-        })
+        void player.updateComplete?.then(() => player.play()).catch(() => {})
       }
     }
     this.chased = false
