@@ -28,7 +28,9 @@
   margin: var(--helix-space-none);
   /* Never wider than the window, whatever it was asked for. */
   max-inline-size: calc(100vw - var(--helix-space-lg));
-  padding: var(--popover-padding, var(--helix-space-md));
+  /* Said rather than left out, as the border is: the UA gives `[popover]` a
+     quarter-em of padding. The inset is on the scrolling box inside. */
+  padding: var(--helix-space-none);
   inline-size: var(--popover-inline-size, max-content);
 }
 
@@ -37,11 +39,6 @@
    specificity. */
 [part="popover"]:not(:popover-open) {
   display: none;
-}
-
-/* Nothing but the surface. */
-:host([separation="plain"]) [part="popover"] {
-  padding: var(--popover-padding, var(--helix-space-none));
 }
 
 /* It travels, a little, out of the edge it opened against. `2xs` is enough to
@@ -104,10 +101,24 @@
   }
 }
 
-/* The scrolling happens in here, not on the panel. */
+/* The scrolling happens in here, not on the panel.
+
+   **With the inset inside it, so the scrolling box has room at its edges.**
+   With the inset on the panel, this box ended where the content did, and
+   anything drawn past that edge was cut off or scrolled. A color picker's
+   square sits flush with the top of the box, and its focus ring, 2px wide and
+   2px out, fell wholly outside it: a reader on the keyboard saw no focus at
+   all. The picker's handle at the right of its square drew a horizontal
+   scrollbar the same way. */
 [part="content"] {
   max-block-size: var(--popover-max-block-size, var(--floating-available-block-size, none));
   overflow: auto;
+  padding: var(--popover-padding, var(--helix-space-md));
+}
+
+/* Nothing but the surface. */
+:host([separation="plain"]) [part="content"] {
+  padding: var(--popover-padding, var(--helix-space-none));
 }
 
 /* Not printed, being an overlay. */
