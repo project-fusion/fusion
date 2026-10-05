@@ -87,11 +87,14 @@ export class HelixHeadlessRadio extends MixinSelectableItem(HelixElement) {
   }
 
   /**
-   * Whether the radio holds the group's tab stop while nothing is chosen.
+   * Whether the radio holds the group's tab stop. Unset, the chosen radio
+   * holds it.
    *
    * The stop rides on the selection, and an unanswered group has no selection,
    * so without this every choice is `tabindex="-1"` and the keyboard cannot
-   * enter the set at all.
+   * enter the set at all. The group writes `true` for the chosen radio, or for
+   * the first that can be chosen while nothing is, and `false` for every radio,
+   * the chosen one too, while a toolbar the group sits in holds the stop.
    *
    * **Written by the group, with no attribute, and it reaches the control
    * rather than the host.** A `tabindex` on the host is two faults at once: it
@@ -103,7 +106,7 @@ export class HelixHeadlessRadio extends MixinSelectableItem(HelixElement) {
    * same reason.
    */
   @property({ attribute: false })
-  focusable = false
+  focusable?: boolean
 
   /**
    * Asks for the render that follows a hydration, so the stop stops being every
@@ -111,8 +114,8 @@ export class HelixHeadlessRadio extends MixinSelectableItem(HelixElement) {
    *
    * `tabindex` reads `childrenKnown` and a hydrating render is one where that is
    * false, which is what keeps the hydrating render the server's. Nothing else
-   * would ask: the group writes an already-false `focusable` onto every choice
-   * but one, which changes nothing and so re-renders nothing.
+   * is sure to ask: a write from the group that leaves `focusable` as it was
+   * re-renders nothing.
    */
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
@@ -143,7 +146,7 @@ export class HelixHeadlessRadio extends MixinSelectableItem(HelixElement) {
       role="radio"
       aria-checked=${this.selected ? 'true' : 'false'}
       ?disabled=${this.disabled}
-      tabindex=${this.selected || this.focusable || !this.childrenKnown ? '0' : '-1'}
+      tabindex=${(this.focusable ?? this.selected) || !this.childrenKnown ? '0' : '-1'}
       @click=${() => this.select()}
     >
       <span part="box"></span>

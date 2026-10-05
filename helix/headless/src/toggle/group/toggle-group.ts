@@ -119,16 +119,52 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
      * so something has to be current; a group that reports a form value has the
      * honest option of reporting none. */
     const active = this.items.find((item) => item.value === this.value)
-    /* With nothing chosen there is no selection to carry the tab stop, so the
-       first item holds one until there is. Otherwise an unanswered group is a
-       control the keyboard cannot enter, which is what the fallback was quietly
-       also doing for it. A disabled answer takes no focus either, so the entry
-       goes to the first item that can be chosen, as in `Radio.Group`. */
-    const entry = active && !active.disabled ? undefined : this.items.find((item) => !item.disabled)
+    const entry = this.focusable ? this.entry() : undefined
     for (const item of this.items) {
       item.selected = item === active
       item.focusable = item === entry
     }
+  }
+
+  /**
+   * The item that holds the group's tab stop: the chosen one.
+   *
+   * With nothing chosen there is no selection to carry the tab stop, so the
+   * first item holds one until there is. Otherwise an unanswered group is a
+   * control the keyboard cannot enter, which is what the fallback was quietly
+   * also doing for it. A disabled answer takes no focus either, so the entry
+   * goes to the first item that can be chosen, as in `Radio.Group`.
+   */
+  private entry(): HelixHeadlessToggle | undefined {
+    const active = this.items.find((item) => item.value === this.value)
+    return active && !active.disabled ? active : this.items.find((item) => !item.disabled)
+  }
+
+  /**
+   * Whether the group holds a tab stop of its own.
+   *
+   * A toolbar is one tab stop, so a toolbar the group sits in sets this to
+   * `false` while its stop is on another control, and every item, the chosen
+   * one too, is then out of the tab order. The arrow keys inside the group
+   * work as before once focus is in it.
+   *
+   * No attribute: it is coordination between elements, and a consumer has no
+   * reason to set it.
+   */
+  @property({ attribute: false })
+  focusable = true
+
+  /**
+   * Focus goes to the item that holds the stop, and to the item that would
+   * hold it while a toolbar holds the stop instead, so a label press or a
+   * refused submission still lands in the group.
+   */
+  protected override get focusTarget(): HTMLElement | null {
+    return (
+      super.focusTarget ??
+      this.entry()?.shadowRoot?.querySelector<HTMLElement>('[part="item"]') ??
+      null
+    )
   }
 
   private readonly indicator = new IndicatorController(this, {

@@ -152,6 +152,52 @@ describe('what a toolbar moves between', () => {
     return event
   }
 
+  /** What Tab stops at inside `node`, in order, through shadow roots and slots. */
+  const tabStops = (node: Element | ShadowRoot): string[] =>
+    (node instanceof HTMLSlotElement ? node.assignedElements() : [...node.children]).flatMap(
+      (child) => [
+        ...(child.matches(
+          'button:not([disabled]):not([tabindex="-1"]), [tabindex]:not([tabindex="-1"])',
+        )
+          ? [((child.getRootNode() as ShadowRoot).host as HTMLElement).id]
+          : []),
+        ...tabStops(child.shadowRoot ?? child),
+      ],
+    )
+
+  /* The group kept the stop on its chosen toggle while the toolbar held its
+     own, so Tab from before the toolbar stopped on the first button and again
+     on the toggle. */
+  test('a toggle group inside is not a second tab stop', async () => {
+    const toolbar = await mount(`
+      <helix-headless-toolbar label="Format">
+        <helix-headless-button id="b1">Bold</helix-headless-button>
+        <helix-headless-toggle-group label="Align" default-value="c">
+          <helix-headless-toggle id="l" value="l">Left</helix-headless-toggle>
+          <helix-headless-toggle id="c" value="c">Center</helix-headless-toggle>
+        </helix-headless-toggle-group>
+        <helix-headless-button id="b3">Link</helix-headless-button>
+      </helix-headless-toolbar>`)
+    await settle(toolbar)
+    const group = toolbar.querySelector('helix-headless-toggle-group') as Stop & { value: string }
+    await settle(group)
+    expect(tabStops(toolbar)).toEqual(['b1'])
+
+    press(toolbar.querySelector('#b1') as Element, 'ArrowRight')
+    await settle(group)
+    expect(tabStops(toolbar)).toEqual(['c'])
+
+    /* The arrows across the toolbar still move inside the group. */
+    press(toolbar.querySelector('#c') as Element, 'ArrowUp')
+    await settle(group)
+    expect(group.value).toBe('l')
+    expect(tabStops(toolbar)).toEqual(['l'])
+
+    press(toolbar.querySelector('#l') as Element, 'ArrowRight')
+    await settle(group)
+    expect(tabStops(toolbar)).toEqual(['b3'])
+  })
+
   test('skips a divider, passes a toggle group as one stop, and reaches a menu at its trigger', async () => {
     const toolbar = await mount(`
       <helix-headless-toolbar label="Format">

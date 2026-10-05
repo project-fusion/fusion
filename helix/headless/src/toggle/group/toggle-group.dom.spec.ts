@@ -275,6 +275,24 @@ describe('toggle group edges', () => {
     expect(stops).toEqual(['disabled', '0'])
   })
 
+  /* A toolbar holds one tab stop for everything in it, and the chosen item
+     kept one of its own beside it. */
+  test('a group told it is not focusable gives up its stop, and focus() still lands', async () => {
+    const group = (await mount(markup)) as Updatable & { focusable: boolean }
+    const tabindexes = () =>
+      items(group).map((item) => item.shadowRoot?.querySelector('button')?.getAttribute('tabindex'))
+    await group.updateComplete
+    expect(tabindexes()).toEqual(['-1', '0', '-1'])
+    group.focusable = false
+    await group.updateComplete
+    await Promise.all(items(group).map((item) => (item as unknown as Updatable).updateComplete))
+    expect(tabindexes()).toEqual(['-1', '-1', '-1'])
+    group.focus()
+    expect(items(group)[1]?.shadowRoot?.activeElement).toBe(
+      part(items(group)[1] as HTMLElement, 'item'),
+    )
+  })
+
   test('a refusal on the group itself keeps the current choice', async () => {
     const group = (await mount(markup)) as Updatable & { value: string }
     group.addEventListener('helix-select', (event) => event.preventDefault())

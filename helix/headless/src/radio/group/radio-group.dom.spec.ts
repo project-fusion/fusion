@@ -146,6 +146,21 @@ describe('radio group', () => {
     expect(stops).toEqual(['-1', '0'])
   })
 
+  /* A toolbar holds one tab stop for everything in it, and the chosen radio
+     kept one of its own beside it. */
+  test('a group told it is not focusable gives up its stop, and focus() still lands', async () => {
+    const host = (await group('', 'two')) as Updatable & { focusable: boolean }
+    const stops = () => options(host).map((item) => part(item, 'item')?.getAttribute('tabindex'))
+    expect(stops()).toEqual(['-1', '0', '-1'])
+    host.focusable = false
+    await settle(host)
+    await Promise.all(options(host).map((item) => settle(item as unknown as Updatable)))
+    expect(stops()).toEqual(['-1', '-1', '-1'])
+    host.focus()
+    const two = options(host)[1] as HTMLElement
+    expect(two.shadowRoot?.activeElement).toBe(part(two, 'item'))
+  })
+
   test('an arrow in a field inside the group moves its caret, not the answer', async () => {
     /* A group holds more than its items often enough: "Other" with a field
        beside it. The arrows there are the field's, and the answer moved with

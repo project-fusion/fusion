@@ -62,8 +62,8 @@ interface Control {
   /**
    * The elements inside the child that take focus. One for a control or for a
    * wrapper such as a menu around its trigger, and more than one for a nested
-   * composite such as a toggle group, which keeps its own tab stop and its own
-   * arrow keys across the toolbar's axis.
+   * composite such as a toggle group, which keeps its own arrow keys across the
+   * toolbar's axis.
    */
   stops: HTMLElement[]
 }
@@ -82,7 +82,9 @@ interface Control {
  *
  * A nested composite, such as a toggle group, is one stop on the toolbar's
  * axis: the toolbar's arrows move past it, and the arrows across the toolbar
- * move inside it. It keeps the tab stop it manages for itself.
+ * move inside it. A composite with a `focusable` property, as Toggle Group
+ * has, gives up its own tab stop while the toolbar's is elsewhere, so Tab
+ * stops once in the toolbar. A composite without one keeps its own tab stop.
  *
  * @since 0.1.0
  * @status stable
@@ -146,14 +148,30 @@ export class HelixHeadlessToolbar extends HelixElement {
       ) {
         continue
       }
-      const stops = takesFocus(child)
-        ? [child]
-        : [...child.querySelectorAll<HTMLElement>('*')].filter(takesFocus)
+      const stops = takesFocus(child) ? this.inside(child) : this.within(child)
       if (stops.length > 0) {
         controls.push({ child, stops })
       }
     }
     return controls
+  }
+
+  /** The elements in a child's light DOM that take focus. */
+  private within(child: HTMLElement): HTMLElement[] {
+    return [...child.querySelectorAll<HTMLElement>('*')].filter(takesFocus)
+  }
+
+  /**
+   * The stops of a child that takes focus itself: the child, or the members of
+   * a composite that owns its tab stop, such as a toggle group, which the
+   * toolbar enters at a member and moves the stop of through `focusable`.
+   */
+  private inside(child: HTMLElement): HTMLElement[] {
+    if (!ownsTabStop(child)) {
+      return [child]
+    }
+    const members = this.within(child)
+    return members.length > 1 ? members : [child]
   }
 
   /**
@@ -196,8 +214,12 @@ export class HelixHeadlessToolbar extends HelixElement {
       this.wroteForeign = true
     }
     for (const control of this.controls) {
-      /* A nested composite keeps its own stop, which is its business. */
       if (control.stops.length !== 1) {
+        /* A nested composite that owns its tab stop gives it up while the
+           toolbar's is elsewhere. One that does not keeps its own. */
+        if (ownsTabStop(control.child)) {
+          control.child.focusable = control.child === active?.child
+        }
         continue
       }
       const element = control.stops[0] as HTMLElement
@@ -252,13 +274,15 @@ export class HelixHeadlessToolbar extends HelixElement {
    */
   private readonly restoreTabStop = (): void => {
     const controls = this.controls
-    const held = controls.some(
-      (control) =>
-        control.stops.length !== 1 ||
-        (ownsTabStop(control.stops[0] as HTMLElement)
-          ? (control.stops[0] as HTMLElement & { focusable: boolean }).focusable
-          : (control.stops[0] as HTMLElement).tabIndex === 0),
-    )
+    const held = controls.some((control) => {
+      const composite = control.stops.length !== 1
+      const element = composite ? control.child : (control.stops[0] as HTMLElement)
+      if (ownsTabStop(element)) {
+        return element.focusable
+      }
+      /* A composite that cannot give up its stop always holds one. */
+      return composite || element.tabIndex === 0
+    })
     if (controls.length > 0 && !held) {
       this.setTabStop(controls[0], false)
     }

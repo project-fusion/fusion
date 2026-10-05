@@ -58,6 +58,20 @@ import { HelixHeadlessRadio } from '../root/radio-root.js'
 @customElement('helix-headless-radio-group')
 export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(HelixFormElement)) {
   /**
+   * Whether the group holds a tab stop of its own.
+   *
+   * A toolbar is one tab stop, so a toolbar the group sits in sets this to
+   * `false` while its stop is on another control, and every radio, the chosen
+   * one too, is then out of the tab order. The arrow keys inside the group
+   * work as before once focus is in it.
+   *
+   * No attribute: it is coordination between elements, and a consumer has no
+   * reason to set it.
+   */
+  @property({ attribute: false })
+  focusable = true
+
+  /**
    * The direction the choices run. `vertical` puts one choice on each line.
    *
    * **Optional rather than defaulted, which is not a style preference.** A
@@ -193,11 +207,32 @@ export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(Hel
 
        **And an answer that is disabled is no stop either**, its button taking
        no focus, so the entry goes to the first choice that can be made, as a
-       native group tabs past a disabled checked radio to an enabled one. */
-    const entry = answer && !answer.disabled ? undefined : items.find((item) => !item.disabled)
+       native group tabs past a disabled checked radio to an enabled one.
+
+       **And no stop at all while a toolbar holds it**, which `focusable` says. */
+    const entry = this.focusable ? this.entry() : undefined
     for (const item of items) {
       item.focusable = item === entry
     }
+  }
+
+  /** The radio that holds the group's tab stop: the answer, or the first that can be chosen. */
+  private entry(): HelixHeadlessRadio | undefined {
+    const answer = this.answer
+    return answer && !answer.disabled ? answer : this.items.find((item) => !item.disabled)
+  }
+
+  /**
+   * Focus goes to the radio that holds the stop, and to the radio that would
+   * hold it while a toolbar holds the stop instead, so a label press or a
+   * refused submission still lands in the group.
+   */
+  protected override get focusTarget(): HTMLElement | null {
+    return (
+      super.focusTarget ??
+      this.entry()?.shadowRoot?.querySelector<HTMLElement>('[part="item"]') ??
+      null
+    )
   }
 
   /** Reports the answer and the verdict on it. */
