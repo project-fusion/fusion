@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { rangeAdd } from './range.js'
+import { rangeAdd } from './range-add.js'
 
 const shown = ['a', 'b', 'c', 'd', 'e']
 
