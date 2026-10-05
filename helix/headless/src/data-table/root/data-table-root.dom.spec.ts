@@ -1278,8 +1278,10 @@ describe('rows that hold rows', () => {
     )
     await settled(element)
     ;(
-      element.shadowRoot?.querySelector('[part="select-all"] [part="checkbox"]') as HTMLElement
-    ).dispatchEvent(
+      element.shadowRoot?.querySelector(
+        '[part="select-all"] [part="checkbox"]',
+      ) as HTMLElement | null
+    )?.dispatchEvent(
       new CustomEvent('helix-before-toggle', {
         bubbles: true,
         cancelable: true,

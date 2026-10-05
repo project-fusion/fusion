@@ -538,18 +538,18 @@ describe('a table sort, told after it stood', () => {
   })
 })
 
-describe('a table with a caption', () => {
-  test('keeps the caption out of its rows', async () => {
+describe('a table with a heading', () => {
+  test('keeps the heading out of its rows', async () => {
     const host = (await mount(
       markup.replace(
         '<helix-headless-table-column>Service',
-        '<h2 slot="caption">Deployments this week</h2><helix-headless-table-column>Service',
+        '<h2 slot="heading">Deployments this week</h2><helix-headless-table-column>Service',
       ),
     )) as Updating
     await settle(host)
     expect(slotted(host).map((row) => row.localName)).toEqual(['helix-headless-table-row'])
-    const caption = host.shadowRoot?.querySelector('slot[name="caption"]') as HTMLSlotElement
-    expect(caption.assignedElements().map((one) => one.localName)).toEqual(['h2'])
+    const heading = host.shadowRoot?.querySelector('slot[name="heading"]') as HTMLSlotElement
+    expect(heading.assignedElements().map((one) => one.localName)).toEqual(['h2'])
   })
 })
 
@@ -588,8 +588,11 @@ describe('a selectable table', () => {
     expect(box?.getAttribute('aria-label')).toBe('Select web')
     expect((box as unknown as { checked: boolean }).checked).toBe(false)
     expect(
-      (billing?.shadowRoot?.querySelector('[part="checkbox"]') as unknown as { checked: boolean })
-        .checked,
+      (
+        billing?.shadowRoot?.querySelector('[part="checkbox"]') as unknown as
+          | { checked: boolean }
+          | undefined
+      )?.checked,
     ).toBe(true)
     expect(template(host)).toMatch(/--table-template: max-content /)
     expect(part(host, 'select-all')?.getAttribute('role')).toBe('columnheader')
