@@ -7,6 +7,7 @@ import {
 } from '../../controllers/chart-pointer-controller/chart-pointer-controller.js'
 import { seriesIndex } from '../../mixins/mixin-chart-source/mixin-chart-source.js'
 import type { Row } from '../read-series/read-series.js'
+import { spokenReading } from './spoken-reading.js'
 
 /*
  * What a pointer resting on a reading shows, as markup every chart can use.
@@ -92,24 +93,6 @@ export interface TooltipAt {
 export type ReadingCursor = Pick<ChartPointerController, 'column' | 'keyed'>
 
 /**
- * A reading in words, for the readout: the row's name and every cell that
- * says something, or the one cell the series keys rest on.
- *
- * The table's own text, as the bubble shows it, so the words and the picture
- * agree, and nothing in it is English: the names are the table's headings.
- */
-const spoken = (row: Row, column: number | undefined): string => {
-  const cell = column === undefined ? undefined : row.cells[column]
-  if (cell) {
-    return `${row.label}, ${cell.name} ${cell.text}`.trim()
-  }
-  const said = row.cells
-    .filter((one) => one.text.trim() !== '')
-    .map((one) => `${one.name} ${one.text}`.trim())
-  return said.length === 0 ? row.label : `${row.label}: ${said.join(', ')}`
-}
-
-/**
  * What a pointer resting on a reading shows, as `Tooltip` pointed at a mark.
  *
  * **A chart does not draw its own tooltip, and the top layer is why.** `Tooltip`
@@ -167,7 +150,7 @@ export const drawTooltip = (
     reading === undefined || rows.length === 0
       ? nothing
       : html`<span aria-live="polite" part="live" role="status">${
-          reading.keyed && row ? spoken(row, reading.column) : ''
+          reading.keyed && row ? spokenReading(row, reading.column) : ''
         }</span>`
   if (!row || rows.length === 0) {
     return live
