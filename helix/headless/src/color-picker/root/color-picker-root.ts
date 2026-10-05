@@ -416,7 +416,8 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
     const parsed = parseColor(typed)
     if (parsed) {
       this.moved = parsed
-      this.owned = true
+      // Owned only where the value moves, for the reason `move` gives.
+      this.owned = typed !== this.value
     }
     this.requestValue(typed)
   }
@@ -438,8 +439,13 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
       return
     }
     this.moved = { ...this.color, ...next }
-    this.owned = true
-    this.requestValue(formatColor(this.moved, this.format ?? 'hex', this.alpha))
+    const value = formatColor(this.moved, this.format ?? 'hex', this.alpha)
+    /* **Owned only where the value moves.** A move that hands back the value
+       already there, as a drag past a corner does, starts no update to clear the
+       flag, so the next value set from outside was taken for this element's own:
+       after a reset, the square stayed where the drag ended. */
+    this.owned = value !== this.value
+    this.requestValue(value)
   }
 
   /**
