@@ -5,19 +5,19 @@ export function Example() {
       gap="lg"
     >
       <helix-badge value="8">
-        <helix-button>Inbox</helix-button>
+        <helix-button aria-label="Inbox, 8 unread">Inbox</helix-button>
       </helix-badge>
       <helix-badge
         tone="neutral"
         value="8"
       >
-        <helix-button>Drafts</helix-button>
+        <helix-button aria-label="Drafts, 8 saved">Drafts</helix-button>
       </helix-badge>
       <helix-badge
         tone="danger"
         value="3"
       >
-        <helix-button>Errors</helix-button>
+        <helix-button aria-label="Errors, 3 new">Errors</helix-button>
       </helix-badge>
     </helix-flex>
   )

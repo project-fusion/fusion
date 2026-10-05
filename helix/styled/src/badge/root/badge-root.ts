@@ -19,6 +19,7 @@ import { styles } from './badge-root.css.js'
  * @documentation https://fusion.dev/helix/components/badge
  *
  * @cssproperty --badge-background-color - The fill of the indicator.
+ * @cssproperty --badge-color - The color of the count, to pair with a fill set through `--badge-background-color`.
  * @cssproperty --badge-offset - Pulls the mark in from the corner, along both axes.
  * @cssproperty --badge-ring-color - The color of the ring between the indicator and what is behind it.
  */

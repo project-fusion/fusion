@@ -17,6 +17,16 @@ describe('avatar', () => {
     expect(part(avatar, 'image')).toBeNull()
   })
 
+  /* `status` waited for an image that was never asked for, so code waiting
+     for the avatar to settle waited forever over initials already shown. */
+  test('with no image to wait for, it settles as the initials it shows', async () => {
+    const avatar = (await mount(
+      '<helix-headless-avatar name="Ada Lovelace"></helix-headless-avatar>',
+    )) as HTMLElement & { status: string }
+    await new Promise((done) => setTimeout(done, 0))
+    expect(avatar.status).toBe('error')
+  })
+
   test('a single name yields one initial', async () => {
     const avatar = await mount('<helix-headless-avatar name="Fusion"></helix-headless-avatar>')
     expect(part(avatar, 'initials')?.textContent?.trim()).toBe('F')

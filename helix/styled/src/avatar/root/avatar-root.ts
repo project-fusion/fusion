@@ -8,9 +8,9 @@ import { styles } from './avatar-root.css.js'
  * @summary A person or entity, shown as an image or as their initials.
  *
  * @description
- * The font size of the initials is set in `em` against the avatar's own
- * dimension, so the initials scale with every size, including a size you set
- * through `--avatar-size`.
+ * The font size of the initials is a share of the avatar's own size, so the
+ * initials scale with every size, including a size you set through
+ * `--avatar-size`.
  *
  * @since 0.1.0
  * @status stable

@@ -69,7 +69,9 @@ export class HelixHeadlessAvatar extends HelixElement {
 
   /**
    * The image's state: `loading` while it is on its way, `loaded` once it
-   * arrives, or `error` when it fails and the initials replace it.
+   * arrives, or `error` when it fails and the initials replace it. An avatar
+   * with no `src` has no image to wait for, and reports `error` as well, since
+   * the initials are what it shows.
    *
    * Read-only to a consumer: it is a report rather than a setting, and the same
    * report `Image` gives, for the same reason. `load` and `error` fire once, so
@@ -112,7 +114,11 @@ export class HelixHeadlessAvatar extends HelixElement {
      * the initials forever with no error to say why. */
     if (changed.has('src')) {
       this.broken = false
-      this.status = 'loading'
+      /* No source is no wait. Left at `loading`, code waiting for the avatar
+         to settle waited forever over initials that were already there. The
+         first update reports it a task later, in `firstUpdated`, so the mirror
+         is not written onto markup a server sent at the moment it hydrates. */
+      this.status = this.src === '' && this.hasUpdated ? 'error' : 'loading'
     }
     /* A role only where there is a name to carry.
      *
@@ -134,6 +140,13 @@ export class HelixHeadlessAvatar extends HelixElement {
      server sent, are listening when it arrives, as they are for a real one. */
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
+    if (this.src === '') {
+      setTimeout(() => {
+        if (this.src === '' && this.status === 'loading') {
+          this.status = 'error'
+        }
+      })
+    }
     const image = this.serverRendered ? this.renderRoot.querySelector('img') : null
     if (image?.complete) {
       const broken = image.naturalWidth === 0

@@ -20,6 +20,14 @@ import { property } from 'lit/decorators.js'
  * fuller name, such as `4 unread`. A dot needs a `label`. Without one, the dot
  * is a colored circle that screen readers do not announce.
  *
+ * **The count is not part of the wrapped control's name.** It is a status of
+ * its own, read when it changes and when a reader moves to it, so focusing a
+ * button inside a badge announces the button's name alone. Where the count
+ * belongs in that name, write it into the control's own label, such as
+ * `aria-label="Inbox, 8 unread"` on a button that reads "Inbox". The badge
+ * cannot add it: a reference from the control to the count would point into
+ * the badge's shadow root, which the platform does not allow.
+ *
  * @since 0.1.0
  * @status stable
  * @category markers
