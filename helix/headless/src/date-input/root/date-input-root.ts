@@ -645,9 +645,32 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
       @change=${this.stopInner}
       @input=${this.stopInner}
     >
-      <slot name="previous-icon" slot="previous-icon"></slot>
-      <slot name="next-icon" slot="next-icon"></slot>
+      ${this.renderIconSlot('previous-icon')}
+      ${this.renderIconSlot('next-icon')}
     </${this.tag('date-picker')}>`
+  }
+
+  /**
+   * Passes an icon slotted on the field to the calendar's slot of that name.
+   *
+   * **Forwarded only while the field holds one.** A forwarded slot is assigned
+   * to the calendar's slot even when it is empty, and an assigned slot does
+   * not show its fallback, so the calendar's own caret went missing whenever
+   * the field had no icon. With no `slot` attribute the forwarding slot is
+   * assigned nowhere, as the calendar has no default slot, and it still hears
+   * an icon arrive or leave.
+   */
+  private renderIconSlot(name: 'next-icon' | 'previous-icon'): TemplateResult {
+    const given = this.querySelector?.(`:scope > [slot="${name}"]`) != null
+    return html`<slot
+      name=${name}
+      slot=${given ? name : nothing}
+      @slotchange=${this.handleIconChange}
+    ></slot>`
+  }
+
+  private readonly handleIconChange = (): void => {
+    this.requestUpdate()
   }
 
   /* Time Input's tag is this one under its own part name, with its own label

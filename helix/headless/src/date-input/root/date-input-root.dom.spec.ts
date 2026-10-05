@@ -794,8 +794,19 @@ describe('the calendar a date input opens', () => {
 
   test('takes the icons slotted on the field', async () => {
     const host = await field()
+    host.innerHTML = '<span slot="previous-icon">‹</span><span slot="next-icon">›</span>'
+    await new Promise((resolve) => setTimeout(resolve))
+    await host.updateComplete
     const slots = [...picker(host).querySelectorAll('slot')].map((one) => one.getAttribute('slot'))
     expect(slots).toEqual(['previous-icon', 'next-icon'])
+  })
+
+  /* A forwarded slot is assigned even while it is empty, and an assigned slot
+     hides the calendar's own caret, so the months showed no caret at all. */
+  test('leaves the calendar its own carets while the field has no icons', async () => {
+    const host = await field()
+    const slots = [...picker(host).querySelectorAll('slot')].map((one) => one.hasAttribute('slot'))
+    expect(slots).toEqual([false, false])
   })
 
   /* Measured before this: Enter on the trigger opened the calendar and left
