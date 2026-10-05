@@ -18,6 +18,8 @@ let Controller: new (
   element: Element | null
   rows: { label: string }[]
   series: unknown[]
+  hidden: ReadonlySet<string>
+  hide(names: Iterable<string>): void
   hostConnected(): void
   hostDisconnected(): void
   watch(): void
@@ -204,5 +206,58 @@ describe('what it parsed', () => {
     document.body.innerHTML = TABLE('src', ROW('June', 6))
     expect(one.controller.rows).not.toBe(rows)
     expect(one.controller.rows.map((each) => each.label)).toEqual(['June'])
+  })
+})
+
+/* A legend and a chart each name the table and neither names the other, so the
+   series a legend hides are kept against the table, where both find them. */
+describe('the series hidden on a table', () => {
+  test('are shared by everything reading it, and redraw each', () => {
+    document.body.innerHTML = '<table id="src"><tr><td>1</td></tr></table>'
+    const legend = chart('src')
+    const line = chart('src')
+    legend.controller.hostConnected()
+    line.controller.hostConnected()
+    legend.controller.hide([' Direct ', 'PARTNER'])
+    expect([...line.controller.hidden]).toEqual(['direct', 'partner'])
+    expect([legend.updates(), line.updates()]).toEqual([1, 1])
+  })
+
+  test('redraw nothing when the set did not move', () => {
+    document.body.innerHTML = '<table id="src"><tr><td>1</td></tr></table>'
+    const one = chart('src')
+    one.controller.hostConnected()
+    one.controller.hide(['a'])
+    one.controller.hide(['A'])
+    expect(one.updates()).toBe(1)
+  })
+
+  test('belong to their table and no other', () => {
+    document.body.innerHTML =
+      '<table id="a"><tr><td>1</td></tr></table><table id="b"><tr><td>1</td></tr></table>'
+    const first = chart('a')
+    const second = chart('b')
+    first.controller.hostConnected()
+    second.controller.hostConnected()
+    first.controller.hide(['x'])
+    expect([second.controller.hidden.size, second.updates()]).toEqual([0, 0])
+  })
+
+  test('stop redrawing a reader that has left', () => {
+    document.body.innerHTML = '<table id="src"><tr><td>1</td></tr></table>'
+    const stays = chart('src')
+    const leaves = chart('src')
+    stays.controller.hostConnected()
+    leaves.controller.hostConnected()
+    leaves.controller.hostDisconnected()
+    stays.controller.hide(['x'])
+    expect(leaves.updates()).toBe(0)
+  })
+
+  test('are none where the id names no table', () => {
+    document.body.innerHTML = ''
+    const one = chart('missing')
+    one.controller.hide(['x'])
+    expect(one.controller.hidden.size).toBe(0)
   })
 })

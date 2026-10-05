@@ -14,12 +14,12 @@
   padding: var(--helix-space-none);
 }
 
-[part="entry"] {
+[part~="entry"] {
   align-items: center;
   color: var(--helix-color-foreground-muted);
   display: flex;
   font-size: var(--helix-text-sm);
-  gap: var(--helix-space-2xs);
+  gap: var(--legend-entry-gap, var(--helix-space-2xs));
   line-height: var(--helix-leading-tight);
 }
 
@@ -31,7 +31,7 @@
   flex-direction: column;
 }
 
-:host([placement="end"]) [part="entry"] {
+:host([placement="end"]) [part~="entry"] {
   flex-direction: row-reverse;
   text-align: end;
 }
@@ -39,14 +39,14 @@
 /* The mark, on the entry rather than in a box beside the name. The entry already
    carries the series it belongs to, so a box rendered for this would have read
    `--chart-series` off its own parent and carried nothing of its own. */
-[part="entry"]::before {
+[part~="entry"]::before {
   --_legend-shade: color-mix(in oklab, var(--chart-series) 60%, var(--helix-color-background));
 
   block-size: var(--legend-swatch-size, var(--helix-space-sm));
   /* Rounded rather than round, and rather than a line. A dot reads as a bullet
      and a line only suits the one chart that draws lines; a filled square is
      what a bar, an arc and a line all have in common. */
-  border-radius: var(--helix-radii-sm);
+  border-radius: var(--legend-swatch-radius, var(--helix-radii-sm));
   content: "";
   flex: 0 0 auto;
   inline-size: var(--legend-swatch-size, var(--helix-space-sm));
@@ -74,7 +74,7 @@
    the chart uses. Mix toward `transparent` rather than setting `opacity`:
    `opacity` on the box would take the border with it and the edge is the part
    that has to survive. */
-[part="entry"]::before {
+[part~="entry"]::before {
   background-color: color-mix(
     in oklab,
     var(--chart-series) calc(var(--_legend-area, 1) * var(--_legend-through, 1) * 100%),
@@ -85,8 +85,8 @@
 /* The edge, and the fill stays under it, which is what `outlined` means on a
    mark whose area encodes a value rather than on a control whose fill is the
    loud part. */
-[part="entry"][data-emphasis="outlined"]::before,
-:host([emphasis="outlined"]) [part="entry"]:not([data-emphasis])::before {
+[part~="entry"][data-emphasis="outlined"]::before,
+:host([emphasis="outlined"]) [part~="entry"]:not([data-emphasis])::before {
   background-color: color-mix(
     in oklab,
     var(--_legend-shade) calc(var(--_legend-through, 1) * 100%),
@@ -97,8 +97,8 @@
 }
 
 /* A wash under the same edge, which is the quiet end of the axis. */
-[part="entry"][data-emphasis="subtle"]::before,
-:host([emphasis="subtle"]) [part="entry"]:not([data-emphasis])::before {
+[part~="entry"][data-emphasis="subtle"]::before,
+:host([emphasis="subtle"]) [part~="entry"]:not([data-emphasis])::before {
   --_legend-area: 0.2;
   border: var(--legend-swatch-stroke, var(--helix-border-thick)) solid
     color-mix(in oklab, var(--chart-series) calc(var(--_legend-through, 1) * 100%), transparent);
@@ -106,8 +106,8 @@
 
 /* Glass, thinning whatever emphasis drew, so an outlined swatch goes see-through
    at its edge rather than the material being a no-op on a box with no fill. */
-[part="entry"][data-material="glass"]::before,
-:host([material="glass"]) [part="entry"]:not([data-material])::before {
+[part~="entry"][data-material="glass"]::before,
+:host([material="glass"]) [part~="entry"]:not([data-material])::before {
   --_legend-through: calc(0.62 * var(--helix-material-opacity));
 }
 /* `frosted` admits less, which on a mark is more ink rather than more ground.
@@ -117,8 +117,43 @@
    opaque, so the three points read glass, frosted, then no attribute at all.
    On the host only: the per-entry mark is `glass` or nothing, so there is no
    entry to write `frosted` on. */
-:host([material="frosted"]) [part="entry"]:not([data-material])::before {
+:host([material="frosted"]) [part~="entry"]:not([data-material])::before {
   --_legend-through: calc(0.88 * var(--helix-material-opacity));
+}
+
+/*
+ * **Under `toggles` a name is a button, and it looks like the name it was.**
+ * The entry keeps its swatch and its ink; the button takes the press, the
+ * pointer and the ring. Flush with the text rather than padded, so turning
+ * `toggles` on does not move a legend that was already laid out.
+ */
+[part="toggle"] {
+  all: unset;
+  box-sizing: border-box;
+  border-radius: var(--helix-radii-sm);
+  cursor: pointer;
+}
+
+[part="toggle"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+@media (hover: hover) {
+  [part="toggle"]:hover {
+    color: var(--helix-color-foreground);
+  }
+}
+
+/* A hidden series fades, and its swatch empties to an outline in its own
+   color, so the key still says which color comes back. */
+[part~="entry-hidden"] {
+  opacity: var(--legend-hidden-opacity, 0.56);
+}
+
+[part~="entry-hidden"]::before {
+  background-color: transparent;
+  border: var(--legend-swatch-stroke, var(--helix-border-thick)) solid var(--chart-series);
 }
 
 /* Print: what the colors in the drawing beside it mean.
