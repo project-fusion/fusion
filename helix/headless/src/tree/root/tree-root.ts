@@ -1,6 +1,7 @@
 import {
   AriaForwardController,
   closestInstance,
+  commaList,
   customElement,
   HelixElement,
   inlineStep,
@@ -16,6 +17,7 @@ import {
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixHeadlessTreeItem } from '../item/tree-item.js'
+import { type CheckableRow, checkedState, pressRow } from '../selection.js'
 
 /** Keys the tree handles, per the APG tree pattern. */
 const KEYS = new Set([
@@ -43,6 +45,14 @@ const KEYS = new Set([
  *
  * Typing a letter moves to the next visible item whose name starts with it,
  * and `*` opens every branch beside the focused item.
+ *
+ * `selection-mode="multiple"` draws a check mark on every row and lets a
+ * reader check many, as Web Awesome's and Ark UI's checkbox trees do. Checking
+ * a branch checks every item under it, and a branch some of whose items are
+ * checked is partly checked. Space or a press on the mark checks the focused
+ * row, and Enter or a press on a branch's row opens it. `active` then holds the
+ * checked values, comma separated, which `values` also gives as a list, and
+ * the tree says `aria-multiselectable`.
  *
  * @since 0.1.0
  * @status stable
@@ -120,6 +130,32 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
   @property({ reflect: true })
   nesting?: 'heading' | 'peer' | 'subordinate'
 
+  /**
+   * Whether a reader can check many items. Unset, one item is chosen at a
+   * time.
+   *
+   * Optional, so a tree of one choice writes no attribute onto the host.
+   */
+  @property({ attribute: 'selection-mode', reflect: true })
+  selectionMode?: 'multiple'
+
+  /**
+   * The checked values, as a list, under `selection-mode="multiple"`, and the
+   * chosen value alone otherwise. Writing it sets `active`.
+   */
+  get values(): string[] {
+    return this.multiple ? commaList(this.active) : this.active === '' ? [] : [this.active]
+  }
+
+  set values(next: string[]) {
+    this.active = next.join(',')
+  }
+
+  /** Whether many items can be checked. */
+  private get multiple(): boolean {
+    return this.selectionMode === 'multiple'
+  }
+
   private watcher: MutationObserver | undefined
 
   /**
@@ -172,9 +208,35 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
       return
     }
     if (!event.defaultPrevented) {
-      this.requestActive((event as CustomEvent<{ value: string }>).detail.value)
+      this.requestActive(
+        this.multiple
+          ? pressRow(this.rowOf(origin), this.values, this.order).join(',')
+          : (event as CustomEvent<{ value: string }>).detail.value,
+      )
     }
     this.syncItems()
+  }
+
+  /** Every value in the tree, in the order a reader meets the items. */
+  private get order(): string[] {
+    return this.items.map((item) => item.value).filter((value) => value !== '')
+  }
+
+  /** What the multiple selection reads of an item. */
+  private rowOf(item: HelixHeadlessTreeItem): CheckableRow {
+    const leaves = item.isBranch
+      ? this.items
+          .filter(
+            (other) =>
+              other !== item &&
+              item.contains(other) &&
+              !other.isBranch &&
+              !other.disabled &&
+              other.value !== '',
+          )
+          .map((other) => other.value)
+      : []
+    return { branch: item.isBranch, disabled: item.disabled, leaves, value: item.value }
   }
 
   /**
@@ -187,8 +249,7 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
   private syncItems(): void {
     const visible = this.visibleItems
     /* Through the mixin, which resolves an exact match and otherwise falls back
-       to the first item. No disabled rows are skipped, because `Tree.Item` is
-       the only selectable row in the library with no `disabled` property. */
+       to the first item that is not disabled. */
     const chosen = this.resolveActive(visible)
     /* The keyboard keeps its place: the stop moves only when the row holding it
        is no longer reachable. Bound to the selection instead, a branch opening
@@ -202,9 +263,12 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
       this.visibleAncestor(this.items.find((item) => item.focusable))
     const stop = held ?? chosen
     const heads = this.nesting === 'heading'
+    const multiple = this.multiple
+    const checked = new Set(this.values)
 
     for (const item of this.items) {
-      const selected = item.value !== '' && item.value === this.active
+      const selected = !multiple && item.value !== '' && item.value === this.active
+      const state = multiple ? checkedState(this.rowOf(item), checked) : false
       const focusable = item === stop
       let level = 1
       let parent = item.parentElement
@@ -223,6 +287,8 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
          page. Waiting for that render lets the one after it write the depth. */
       whenHydrated(item, () => {
         item.selected = selected
+        item.checkable = multiple
+        item.checked = state
         item.focusable = focusable
         item.level = level
         item.heads = heads
@@ -336,6 +402,14 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
        so the key that opens a branch is the one its chevron points along. */
     const along = inlineStep(this, event.key)
 
+    /* Space checks the row in a tree of check marks, and leaves a branch open
+       or shut: Enter is what opens one there. */
+    if (this.multiple && event.key === ' ') {
+      current.select()
+      event.preventDefault()
+      return
+    }
+
     if (event.key === 'ArrowDown') {
       this.move(current, 1)
     } else if (event.key === 'ArrowUp') {
@@ -347,14 +421,14 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
     } else if (along === 1) {
       // Open a closed branch, then step into it. Two presses rather than one
       // that does both, which is what the pattern specifies.
-      if (current.isBranch && !current.open) {
+      if (current.isBranch && !current.open && !current.disabled) {
         current.requestOpen(true)
         this.syncItems()
       } else if (current.isBranch) {
         this.move(current, 1)
       }
     } else if (along === -1) {
-      if (current.isBranch && current.open) {
+      if (current.isBranch && current.open && !current.disabled) {
         current.requestOpen(false)
         this.syncItems()
       } else {
@@ -427,7 +501,7 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    if (changed.has('active') || changed.has('nesting')) {
+    if (changed.has('active') || changed.has('nesting') || changed.has('selectionMode')) {
       this.syncItems()
     }
   }
@@ -437,6 +511,7 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
       part="tree"
       role="tree"
       aria-busy=${this.loading ? 'true' : nothing}
+      aria-multiselectable=${this.multiple ? 'true' : nothing}
       aria-label=${this.label}
     >
       <slot

@@ -4,7 +4,7 @@ import {
   HelixSelectEvent,
   MixinControllerOpen,
 } from '@fusion.dev/helix-core'
-import { caretDown } from '@fusion.dev/helix-icons'
+import { caretDown, check, minus } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
@@ -31,21 +31,33 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * a `value` is chosen as well and sends `helix-select`, unless the tree has
  * `nesting="heading"`, where a branch names the list under it.
  *
+ * A `disabled` item is reached by the arrow keys and announced as unavailable,
+ * and a press, Enter or Space on it does nothing.
+ *
+ * A `lazy` item is a branch whose children you load when it opens: opening it
+ * sends `helix-load`, the row says it is busy, and the children you add appear
+ * in it. Remove `lazy` once they are in.
+ *
  * @since 0.1.0
  * @status stable
  * @aliases TreeNode, Branch, Leaf
  * @documentation https://fusion.dev/helix/components/tree
  *
  * @slot - The item's label.
+ * @slot chevron - Replaces the expand and collapse mark of a branch, such as with your own icon.
  * @slot children - Nested items, which make this a branch.
  * @slot end - Content after the label, at the far side of the row, such as a count or a state.
  * @slot start - Content before the label and after the chevron, such as a mark for the item.
  *
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before a branch closes, and cancelable.
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired before a branch opens, and cancelable.
+ * @event {Event} helix-load - Fired when a `lazy` item opens, so you can load its children.
  * @event {HelixSelectEvent} helix-select - Fired when the item is chosen, and cancelable. Canceling it changes nothing.
  * @event {ToggleEvent} toggle - Sent when the branch opens or closes, with `newState` and `oldState`.
  *
+ * @csspart checkbox - The check mark's box, in a tree with `selection-mode="multiple"`.
+ * @csspart checkbox-checked - The check mark's box while the item is checked.
+ * @csspart checkbox-mixed - The check mark's box while some of a branch's items are checked.
  * @csspart group - The container for nested items.
  * @csspart item - The node, and the focus target unless `href` moves it to the row.
  * @csspart label - The label text.
@@ -54,11 +66,33 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @cssproperty --tree-level - How deep this row sits, counting from one as `aria-level` does, for the indent.
  *
+ * @cssstate loading - While a `lazy` item is open and its children have not arrived.
  * @cssstate open - While its children are shown.
  * @cssstate selected - While it is selected.
  */
 @customElement('helix-headless-tree-item')
 export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
+  /**
+   * @internal Set by the tree: whether the item draws a check mark and is
+   * checked rather than selected, as under `selection-mode="multiple"`.
+   */
+  @property({ attribute: false })
+  checkable = false
+
+  /**
+   * @internal Set by the tree in `selection-mode="multiple"`: whether the item
+   * is checked, `mixed` for a branch some of whose items are.
+   */
+  @property({ attribute: false })
+  checked: boolean | 'mixed' = false
+
+  /**
+   * Whether the item cannot be chosen, opened or followed. The arrow keys still
+   * reach it, so a reader knows it is there.
+   */
+  @property({ reflect: true, type: Boolean })
+  disabled = false
+
   /**
    * @internal Set by the tree: whether a branch heads the list under it, as
    * under `nesting="heading"`. Such a branch only opens and closes when it is
@@ -76,6 +110,15 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
    */
   @property()
   href = ''
+
+  /**
+   * Whether the item is a branch whose children are loaded when it opens.
+   *
+   * Opening it sends `helix-load`. Add the children to its `children` slot,
+   * and remove `lazy` once they are in, as Web Awesome's tree item does.
+   */
+  @property({ reflect: true, type: Boolean })
+  lazy = false
 
   /**
    * The node's depth from the root. The tree counts it, so indentation needs no
@@ -170,7 +213,7 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
    * for Enter and Space.
    */
   get choosable(): boolean {
-    return this.value !== '' && !this.heads
+    return this.value !== '' && !this.heads && !this.checkable && !this.disabled
   }
 
   /**
@@ -181,7 +224,7 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
    * slot was given, which is the markup they already wrote.
    */
   get isBranch(): boolean {
-    return this.branch
+    return this.branch || this.lazy
   }
 
   /**
@@ -203,8 +246,11 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
       ?.focus({ preventScroll: true })
   }
 
-  /** Selects this node and sends `helix-select`. */
+  /** Selects this node and sends `helix-select`. A disabled node sends nothing. */
   select(): void {
+    if (this.disabled) {
+      return
+    }
     this.dispatchEvent(new HelixSelectEvent({ value: this.value }))
   }
 
@@ -218,8 +264,21 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
    * value and nothing listens for it.
    */
   activate(): void {
+    if (this.disabled) {
+      return
+    }
     this.select()
     this.follow()
+  }
+
+  /**
+   * Opens or closes a branch, unless the item is disabled.
+   *
+   * Every press and key that opens a branch comes through here, so `disabled`
+   * holds for all of them. A script can still set `open`.
+   */
+  override toggleOpen(): boolean {
+    return this.disabled ? false : super.toggleOpen()
   }
 
   /**
@@ -265,6 +324,13 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
     }
   }
 
+  /** A press on the check mark checks the item and leaves a branch as it is. */
+  private readonly handleCheckClick = (event: MouseEvent): void => {
+    event.preventDefault()
+    event.stopPropagation()
+    this.select()
+  }
+
   private readonly handleToggleClick = (event: MouseEvent): void => {
     /* Only where the row is a link, and then it has to stop: the row would
        navigate away from the branch the reader was trying to open. Without an
@@ -287,7 +353,11 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
        what opens it. A branch that is not toggles from anywhere in the row, and
        is chosen as well where it has a value and does not head its list, so a
        tree of folders can report the folder a reader picked. */
-    if (this.branch && this.href === '') {
+    if (this.disabled) {
+      event.preventDefault()
+      return
+    }
+    if (this.isBranch && this.href === '') {
       if (!onLink) {
         if (this.choosable) {
           this.select()
@@ -304,21 +374,42 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
     }
   }
 
+  /**
+   * The expand and collapse mark of a branch, as the `chevron` slot's
+   * fallback, so an icon of your own replaces it by being slotted.
+   */
+  protected renderToggle(): TemplateResult {
+    return html`<slot
+      name="chevron"
+      @click=${this.href === '' ? nothing : this.handleToggleClick}
+      ><svg part="toggle" fill="currentColor" viewBox=${caretDown.viewBox} aria-hidden="true">
+        ${unsafeSVG(caretDown.content)}
+      </svg></slot
+    >`
+  }
+
+  /** The check mark, in a tree with `selection-mode="multiple"`. */
+  private renderCheckbox(): TemplateResult | typeof nothing {
+    if (!this.checkable) {
+      return nothing
+    }
+    const mixed = this.checked === 'mixed'
+    const glyph = mixed ? minus : this.checked ? check : undefined
+    return html`<span
+      part="checkbox${mixed ? ' checkbox-mixed' : this.checked ? ' checkbox-checked' : ''}"
+      aria-hidden="true"
+      @click=${this.handleCheckClick}
+      >${
+        glyph
+          ? html`<svg fill="currentColor" viewBox=${glyph.viewBox}>${unsafeSVG(glyph.content)}</svg>`
+          : nothing
+      }</span
+    >`
+  }
+
   /** Everything inside the row, which is the same whichever element it is. */
   private renderRow(): TemplateResult {
-    return html`${
-      this.branch
-        ? html`<svg
-            part="toggle"
-            fill="currentColor"
-            viewBox=${caretDown.viewBox}
-            aria-hidden="true"
-            @click=${this.href === '' ? nothing : this.handleToggleClick}
-          >
-          ${unsafeSVG(caretDown.content)}
-        </svg>`
-        : nothing
-    }
+    return html`${this.isBranch ? this.renderToggle() : nothing}${this.renderCheckbox()}
       <slot name="start"></slot>
       <span part="label"><slot></slot></span>
       <slot name="end"></slot>`
@@ -342,8 +433,17 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     this.toggleState('selected', this.selected)
+    this.toggleState('loading', this.open && this.lazy)
     if (this.childrenKnown) {
       this.branch = this.knownChildren.some((child) => child.slot === 'children')
+    }
+  }
+
+  /** Asks for a lazy branch's children when it opens. */
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    if (changed.has('open') && this.open && this.lazy) {
+      this.dispatchEvent(new Event('helix-load', { bubbles: true, composed: true }))
     }
   }
 
@@ -376,7 +476,14 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
        `TreeRoot.syncItems` writes the depth through `whenHydrated`, so the
        render after hydration is what fills this in. */
     const depth = this.level ?? nothing
-    const expanded = this.branch ? (this.open ? 'true' : 'false') : nothing
+    const expanded = this.isBranch ? (this.open ? 'true' : 'false') : nothing
+    /* Checked rather than selected in a tree of check marks, which is the tree
+       pattern's checkbox reading: a reader hears "checked", "not checked" or
+       "partially checked". */
+    const chosen = this.checkable ? undefined : this.selected ? 'true' : 'false'
+    const checked = this.checkable ? (this.checked === 'mixed' ? 'mixed' : String(this.checked)) : undefined
+    const busy = this.open && this.lazy ? 'true' : nothing
+    const off = this.disabled ? 'true' : nothing
     /* **A render the tree has not reached holds the stop open.** `focusable` is
        the tree's word and the tree reads its rows to say it, so on a server no
        row has it and a bare `'-1'` served a tree the keyboard could not enter
@@ -391,7 +498,10 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
         part="item"
         role=${linked ? 'none' : 'treeitem'}
         aria-expanded=${linked ? nothing : expanded}
-        aria-selected=${linked ? nothing : this.selected ? 'true' : 'false'}
+        aria-selected=${linked ? nothing : (chosen ?? nothing)}
+        aria-checked=${linked ? nothing : (checked ?? nothing)}
+        aria-disabled=${linked ? nothing : off}
+        aria-busy=${linked ? nothing : busy}
         aria-level=${linked ? nothing : depth}
         tabindex=${linked ? nothing : tabIndex}
       >
@@ -400,11 +510,14 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
             ? html`<a
                 part="row"
                 role="treeitem"
-                href=${this.href}
+                href=${this.disabled ? nothing : this.href}
                 target=${this.target || nothing}
                 rel=${this.rel || nothing}
                 aria-expanded=${expanded}
-                aria-selected=${this.selected ? 'true' : 'false'}
+                aria-selected=${chosen ?? nothing}
+                aria-checked=${checked ?? nothing}
+                aria-disabled=${off}
+                aria-busy=${busy}
                 aria-level=${depth}
                 tabindex=${tabIndex}
                 style="--tree-level: ${level}"
