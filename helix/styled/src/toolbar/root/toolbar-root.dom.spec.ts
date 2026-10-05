@@ -52,9 +52,9 @@ describe('toolbar', () => {
 
   test('no chrome of its own unless a hook asks for it', () => {
     // A toolbar is a place controls sit, and a border around them would be a
-    // second frame inside whatever already frames the bar. Its fill, corner
-    // and inset are hooks that default to none.
-    expect(rule('[part="toolbar"]')).not.toContain('border:')
+    // second frame inside whatever already frames the bar. Its edge, fill,
+    // corner and inset are hooks that default to none.
+    expect(rule('[part="toolbar"]')).toContain('border: var(--toolbar-border-width, 0) solid')
     expect(rule('[part="toolbar"]')).toContain(
       'background-color: var(--toolbar-background-color, transparent)',
     )
