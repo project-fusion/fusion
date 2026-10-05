@@ -8,8 +8,8 @@ import { property } from 'lit/decorators.js'
  * @description
  * Renders a `<figure>` holding the `<blockquote>` and a `<figcaption>` for the
  * attribution, the structure the HTML spec describes. The attribution sits
- * outside the quotation because it is about the quotation, and a screen
- * reader reads the source as the figure's caption.
+ * outside the quotation because it is about the quotation, and it names the
+ * figure, so a screen reader reads the source as the figure's caption.
  *
  * The figure keeps the browser's default margins on this tier. Set
  * `::part(figure) { margin: 0 }` where they are unwanted.
@@ -68,10 +68,16 @@ export class HelixHeadlessBlockquote extends HelixElement {
        is `display: contents` and generates no box. Beside the `<blockquote>`,
        because the HTML spec puts attribution outside it: inside, it was read as
        part of the quotation. Re-marked on `slotchange`, so an attribution that
-       arrives after the first render is shown. */
-    return html`<figure part="figure">
+       arrives after the first render is shown.
+
+       **The figure names itself from the caption by id.** HTML-AAM names a
+       figure from its figcaption, and Chromium does not read the caption's
+       words through the slot, so the figure came out unnamed. The reference
+       is inside one shadow root and resolves; the caption holds the slot, so
+       the words are the consumer's, and an empty caption names nothing. */
+    return html`<figure aria-labelledby="attribution" part="figure">
       <blockquote part="blockquote" cite=${this.cite || nothing}><slot></slot></blockquote>
-      <figcaption part="attribution"
+      <figcaption id="attribution" part="attribution"
         ><slot name="attribution" @slotchange=${() => this.markEmpty()}></slot
       ></figcaption>
     </figure>`

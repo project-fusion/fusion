@@ -9,6 +9,14 @@ describe('blockquote server output', () => {
     expect(partTag(markup, 'blockquote')).toContain('<blockquote')
   })
 
+  test('the served figure is named by its caption', () => {
+    const markup = ssr(
+      html`<helix-headless-blockquote>Said so.<span slot="attribution">A</span></helix-headless-blockquote>`,
+    )
+    expect(partTag(markup, 'figure')).toContain('aria-labelledby="attribution"')
+    expect(partTag(markup, 'attribution')).toContain('id="attribution"')
+  })
+
   test('the host carries nothing the consumer did not write', () => {
     const markup = ssr(html`<helix-headless-blockquote>x</helix-headless-blockquote>`)
     expect(hostAttributes(markup, 'helix-headless-blockquote')).toEqual([])

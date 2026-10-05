@@ -35,6 +35,13 @@ describe('the styled heatmap', () => {
     expect(part(await strip(), 'strip')?.getAttribute('role')).toBe('img')
   })
 
+  /* The styled class reads the base's observed attributes, so a host
+     `aria-label` reaches the strip on this tier too. */
+  test('an aria-label on the host names it', async () => {
+    const element = await strip('aria-label="Uptime this week"')
+    expect(part(element, 'strip')?.getAttribute('aria-label')).toBe('Uptime this week')
+  })
+
   test('a cell per reading, each carrying its tone', async () => {
     const element = await strip()
     const cells = [...(element.shadowRoot?.querySelectorAll('[part="cell"]') ?? [])]

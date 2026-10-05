@@ -120,6 +120,36 @@ describe('the data comes from the table', () => {
     expect(part(element, 'strip')?.getAttribute('aria-label')).toBe('Uptime')
   })
 
+  /* While the host was the image, its own `aria-label` named the picture. The
+     host is a generic now, so the name reached nobody until the strip took
+     it. It wins over `label`, as it did then. */
+  test('an aria-label on the host names it, and follows the attribute', async () => {
+    const element = await strip('label="Uptime" aria-label="Uptime this week"', [['Mon', 1]])
+    expect(part(element, 'strip')?.getAttribute('aria-label')).toBe('Uptime this week')
+
+    element.setAttribute('aria-label', 'Uptime last week')
+    await element.updateComplete
+    expect(part(element, 'strip')?.getAttribute('aria-label')).toBe('Uptime last week')
+
+    element.removeAttribute('aria-label')
+    await element.updateComplete
+    expect(part(element, 'strip')?.getAttribute('aria-label')).toBe('Uptime')
+  })
+
+  test('an aria-labelledby on the host names it too', async () => {
+    const element = await strip('aria-labelledby="heading"', [['Mon', 1]])
+    element.insertAdjacentHTML('beforebegin', '<h2 id="heading">Service uptime</h2>')
+    /* happy-dom has no ARIA element reflection, so the accessor is stood in. */
+    const picture = part(element, 'strip') as HTMLElement & Record<string, unknown>
+    if (!('ariaLabelledByElements' in picture)) {
+      Object.defineProperty(picture, 'ariaLabelledByElements', { value: null, writable: true })
+    }
+    ;(element as Strip).requestUpdate()
+    await element.updateComplete
+    const named = (picture.ariaLabelledByElements as Element[] | null) ?? []
+    expect(named.map((one) => one.textContent)).toEqual(['Service uptime'])
+  })
+
   test('an empty table says so rather than drawing nothing', async () => {
     const element = (await mount('<helix-headless-heatmap></helix-headless-heatmap>')) as Strip
     await element.updateComplete

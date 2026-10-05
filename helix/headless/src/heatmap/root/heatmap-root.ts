@@ -1,4 +1,5 @@
 import {
+  AriaForwardController,
   byRow,
   CHART_PLOT,
   customElement,
@@ -58,7 +59,7 @@ import { fits, type Reading, toneOf } from './buckets.js'
  * @csspart footer - The three-slot row under the strip.
  * @csspart mark - The invisible point the tooltip is anchored to.
  * @csspart start - The leading slot's box.
- * @csspart strip - The grid of cells. It is an image, named by `label` or by the caption of the table.
+ * @csspart strip - The grid of cells. It is an image, named by the host's `aria-labelledby` or `aria-label`, then by `label`, then by the caption of the table.
  * @csspart summary - The middle slot's box.
  * @csspart tooltip - The bubble, forwarded from `Tooltip`.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
@@ -223,6 +224,36 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
    */
   @state()
   private hovered = -1
+
+  /**
+   * Carries a host `aria-labelledby` and `aria-describedby` to the strip, the
+   * image a reader lands on. The host is a generic around it.
+   */
+  protected readonly aria = new AriaForwardController(this, {
+    target: () => this.partNamed('strip'),
+  })
+
+  /**
+   * Hears an `aria-label` written on the element, which no property mirrors.
+   *
+   * Lit observes the attributes of its own properties only, and `ariaLabel`
+   * belongs to the platform.
+   */
+  static override get observedAttributes(): string[] {
+    // biome-ignore lint/complexity/noThisInStatic: super runs Lit's getter with the subclass as this, so a styled heatmap keeps its own attributes, where the class name would read the base's
+    return [...super.observedAttributes, 'aria-label']
+  }
+
+  /**
+   * Called by the browser when an observed attribute changes. A new
+   * `aria-label` asks for an update, because it names the strip.
+   */
+  override attributeChangedCallback(name: string, old: string | null, value: string | null): void {
+    super.attributeChangedCallback(name, old, value)
+    if (name === 'aria-label') {
+      this.requestUpdate()
+    }
+  }
 
   private observer: ResizeObserver | undefined = undefined
 
@@ -440,9 +471,11 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
     /* **The strip is the picture, and the footer is beside it.** The role was
        the host's, which put the start, summary and end slots inside an image,
        whose children are presentational. Named by `named`, so a table's
-       caption names it as it names every other chart. */
+       caption names it as it names every other chart. An `aria-label` on the
+       host still names it, as it did while the host was the image: the host is
+       now a generic, where the name reached nobody. */
     return html`<div
-        aria-label=${this.named || 'Heatmap'}
+        aria-label=${this.getAttribute?.('aria-label') || this.named || 'Heatmap'}
         part="strip"
         id=${CHART_PLOT}
         role="img"
