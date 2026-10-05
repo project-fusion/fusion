@@ -19,7 +19,7 @@ describe('dialog server output', () => {
        read off one with no children of its own. */
     const bare = ssr(html`<helix-headless-dialog label="Delete"></helix-headless-dialog>`)
     expect(rendered(bare, 'helix-headless-dialog')).toMatch(
-      /<dialog[\s\S]*<slot><\/slot>[\s\S]*<\/dialog>/,
+      /<dialog[\s\S]*<slot\s+part="body"\s*><\/slot>[\s\S]*<\/dialog>/,
     )
   })
 
@@ -61,5 +61,27 @@ describe('dialog server output', () => {
     expect(
       partTag(ssr(html`<helix-headless-dialog label="Delete">x</helix-headless-dialog>`), 'dialog'),
     ).not.toContain('closedby')
+  })
+})
+
+describe('dialog server output, the new parts', () => {
+  test('the regions are served as parts on their slots, and no close control unless asked', () => {
+    const bare = rendered(
+      ssr(html`<helix-headless-dialog label="Delete"></helix-headless-dialog>`),
+      'helix-headless-dialog',
+    )
+    expect(bare).toMatch(/<slot\s+name="header"\s+part="header"/)
+    expect(bare).toMatch(/<slot\s+name="footer"\s+part="footer"/)
+    expect(bare).not.toContain('part="dismiss"')
+    expect(bare).not.toContain('alertdialog')
+  })
+
+  test('an alert dialog and a close control are served as the client renders them', () => {
+    const served = rendered(
+      ssr(html`<helix-headless-dialog alert dismissible label="Delete"></helix-headless-dialog>`),
+      'helix-headless-dialog',
+    )
+    expect(served).toMatch(/<dialog[^>]*role="alertdialog"/s)
+    expect(served).toMatch(/<button\s+part="dismiss"\s+type="button"\s+aria-label="Close"/)
   })
 })
