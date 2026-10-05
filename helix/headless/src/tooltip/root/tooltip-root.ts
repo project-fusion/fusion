@@ -17,6 +17,29 @@ import { property, state } from 'lit/decorators.js'
 const GENERIC = new Set(['div', 'p', 'section', 'span'])
 
 /**
+ * How long after a tooltip hides the next one still shows at once, in
+ * milliseconds. The same skip delay Radix uses.
+ */
+const SKIP_DELAY = 300
+
+/**
+ * The tooltips showing on the page, and when the last one hid.
+ *
+ * On `globalThis` under a `Symbol.for` key, so two copies of this module on
+ * one page share it, for the reason `DismissController` gives about its own.
+ */
+interface Warmth {
+  hidAt: number
+  showing: Set<HelixHeadlessTooltip>
+}
+const WARMTH = Symbol.for('fusion.helix.tooltip.warmth')
+const warmth = (): Warmth => {
+  const globals = globalThis as unknown as Record<symbol, Warmth | undefined>
+  globals[WARMTH] ??= { hidAt: Number.NEGATIVE_INFINITY, showing: new Set() }
+  return globals[WARMTH]
+}
+
+/**
  * @summary A short text that appears next to an element on hover and focus.
  *
  * @description
@@ -42,7 +65,12 @@ const GENERIC = new Set(['div', 'p', 'section', 'span'])
  * `for`, the tooltip warns once on first open if the attribute is missing.
  *
  * The tooltip shows on hover and on focus. It hides on pointer leave, on blur,
- * on Escape, and when the trigger is activated.
+ * on Escape, and when the trigger is activated. The pointer can move from the
+ * trigger onto the bubble and the bubble stays.
+ *
+ * Once one tooltip is showing, moving to another trigger shows its tooltip
+ * with no `delay`, and the first one hides. The same holds for 300
+ * milliseconds after a tooltip hides.
  *
  * @since 0.1.0
  * @status stable
@@ -50,7 +78,9 @@ const GENERIC = new Set(['div', 'p', 'section', 'span'])
  * @aliases Hint, Popup label
  * @documentation https://fusion.dev/helix/components/tooltip
  *
- * @slot - The trigger: the element the tooltip describes.
+ * @slot - The trigger, in the wrapping form. A trigger here gets no
+ * description, so use it only where the trigger's name says what the tooltip
+ * says, and use `for` otherwise.
  * @slot content - Rich content for the bubble. It replaces the `content`
  * property.
  *
@@ -444,11 +474,48 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
     this.bubbleLayer.hide()
   }
 
-  /** Shows after the pointer has rested for `delay`. */
+  /**
+   * Shows after the pointer has rested for `delay`, or at once while the
+   * tooltips are warm.
+   *
+   * **Warm is another tooltip showing, or one that hid within `SKIP_DELAY`.**
+   * A reader scanning a toolbar has already waited once, and waiting again on
+   * every control turns the scan into a series of pauses.
+   */
   private readonly showLater = (): void => {
     this.holds.add('pointer')
     clearTimeout(this.timer)
+    const warm = warmth()
+    const others = [...warm.showing].some((one) => one !== this)
+    if (others || performance.now() - warm.hidAt < SKIP_DELAY) {
+      this.show()
+      return
+    }
     this.timer = setTimeout(() => this.show(), this.delay)
+  }
+
+  /**
+   * The pointer reached the bubble, in the `for` form.
+   *
+   * The bubble is not inside the element `for` names, so moving onto it leaves
+   * the trigger and would hide it after `delay-out`. WCAG 1.4.13 asks that a
+   * reader can move onto it, to read it under a magnifier or to select its
+   * text. Wrapping, the bubble is inside the host and the host's own pointer
+   * listeners already hold it.
+   */
+  private readonly holdOnBubble = (): void => {
+    if (!this.named) {
+      return
+    }
+    this.holds.add('pointer')
+    clearTimeout(this.timer)
+  }
+
+  /** The pointer left the bubble, in the `for` form. */
+  private readonly leaveBubble = (): void => {
+    if (this.named) {
+      this.hideLater()
+    }
   }
 
   /** Hides after `delayOut`, so crossing the gap to the bubble does not close it. */
@@ -621,6 +688,14 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
        wrapping form is not the documented API, and this says so once, where
        somebody using it will see it. */
     if (this.for === '') {
+      /* **Unless the trigger's name already says it.** An icon button named
+         Settings under a tooltip reading Settings loses a reader nothing, and
+         that is the case the wrapping form is documented for. A component that
+         renders one in its own shadow root, as `CopyButton` does, is that case
+         too, and its consumer could not have acted on the warning. */
+      if (this.triggerSays(this.describedText)) {
+        return
+      }
       reportRuntime({
         kind: 'wrapped-trigger',
         message:
@@ -663,6 +738,21 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
     })
   }
 
+  /**
+   * Whether the wrapped trigger's own name is the tooltip's text.
+   *
+   * The name a consumer writes: `aria-label`, then a `label` a Helix control
+   * renders as its name, then the trigger's text.
+   */
+  private triggerSays(text: string): boolean {
+    const flat = (words: string | null | undefined): string =>
+      (words ?? '').replace(/\s+/gu, ' ').trim()
+    const trigger = this.trigger
+    const name =
+      trigger.getAttribute('aria-label') ?? trigger.getAttribute('label') ?? trigger.textContent
+    return text !== '' && flat(name) === flat(text)
+  }
+
   override connectedCallback(): void {
     super.connectedCallback()
     /* Bound again on a move, since the disconnect unbinds and `firstUpdated`
@@ -678,6 +768,7 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
     this.unbind()
     this.holds.clear()
     clearTimeout(this.timer)
+    warmth().showing.delete(this)
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
@@ -695,10 +786,23 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
       this.bind()
     }
     if (changed.has('open')) {
+      const warm = warmth()
       if (this.open) {
+        /* One bubble at a time, as a reader moving along a toolbar expects:
+           the one they left goes as the next one shows. */
+        for (const other of [...warm.showing]) {
+          if (other !== this) {
+            other.holds.clear()
+            other.hide()
+          }
+        }
+        warm.showing.add(this)
         this.bubbleLayer.show()
         this.auditDescription()
       } else {
+        if (warm.showing.delete(this)) {
+          warm.hidAt = performance.now()
+        }
         this.bubbleLayer.hide()
       }
     }
@@ -763,6 +867,8 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
         part="tooltip${side ? { bottom: ' tooltip-bottom', left: ' tooltip-left', right: ' tooltip-right', top: ' tooltip-top' }[side] : ''}"
         popover="manual"
         role="tooltip"
+        @pointerenter=${this.holdOnBubble}
+        @pointerleave=${this.leaveBubble}
       >
         <span
           part="arrow${side ? { bottom: ' arrow-bottom', left: ' arrow-left', right: ' arrow-right', top: ' arrow-top' }[side] : ''}"
