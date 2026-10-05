@@ -66,6 +66,7 @@ export {
 export {
   KeyboardNavigationController,
   type KeyboardNavigationOptions,
+  type KeyboardOrigin,
   type NavigableItem,
   Typeahead,
   typesCharacter,

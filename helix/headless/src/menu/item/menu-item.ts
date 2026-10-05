@@ -122,15 +122,12 @@ export class HelixHeadlessMenuItem extends HelixElement {
    * roves, which is the same maneuver `Tree.Item` makes and the reason `href`
    * changes the markup rather than only adding an attribute.
    *
-   * **`Option` cannot have this and the reason is worth knowing**, since a
-   * command palette is the obvious place to want it. A listbox has to keep
-   * focus somewhere else, in the text field for a combobox, so it says which
-   * option is current with `aria-activedescendant`. That reference can only
-   * point at the option's host, measured: assigning
-   * `ariaActiveDescendantElement` an element inside a sibling shadow root reads
-   * back `null`. So `role="option"` is pinned to the host, and an anchor under
-   * it hits the naming failure above. A menu has no such constraint because
-   * focus really moves to the row.
+   * **`Option` takes an `href` too, and keeps its role a different way.** A
+   * listbox keeps focus somewhere else, in the text field for a combobox, and
+   * names the current option with `aria-activedescendant`, which can only point
+   * at the option's host. So an option stays `role="option"` on its host, draws
+   * no anchor, and follows its link through an anchor made for the moment. A
+   * menu has no such constraint, because focus really moves to the row.
    */
   @property()
   href = ''
