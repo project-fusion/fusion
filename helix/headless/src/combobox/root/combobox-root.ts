@@ -2,6 +2,7 @@ import {
   AriaForwardController,
   afterLinkFollowed,
   customElement,
+  DelayController,
   fillTemplate,
   type HelixBeforeChangeEvent,
   HelixCreateEvent,
@@ -82,11 +83,13 @@ const isInsertion = (event: Event): boolean =>
  * @slot - The options.
  * @slot empty - What the list shows when typing hides every option, for content richer than `empty-text`.
  * @slot end - After the text, for a unit or a clear button.
+ * @slot error - What the list shows while `load-error` is set, for content richer than its text.
  * @slot feedback - The message that says what is wrong, for content richer than a string. It shows while there is a message.
  * @slot hint - The hint, for content richer than plain text.
  * @slot indicator - Replaces the caret that shows the field opens a list.
  * @slot label - The label, for content richer than plain text.
  * @slot loading - What the list shows while the options load, for content richer than `loading-text`.
+ * @slot no-results - What the list shows when typing hides every option, for content richer than `no-results-text`.
  * @slot start - Before the text, for an icon.
  *
  * @event {Event} change - Fired after the value changes.
@@ -108,6 +111,7 @@ const isInsertion = (event: Event): boolean =>
  * @csspart label - The label above the field.
  * @csspart listbox - The list inside the panel.
  * @csspart listbox-empty - Shown when a filter has hidden everything.
+ * @csspart listbox-error - Shown while `load-error` is set.
  * @csspart listbox-feedback - The inner list's error message.
  * @csspart listbox-filter-icon - The icon beside the list's filter field.
  * @csspart listbox-filter-mark - The glyph beside the filter field, where none is slotted.
@@ -194,10 +198,30 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   emptyText = 'No matches'
 
   /**
+   * How long typing rests before the list is narrowed and `helix-filter` is
+   * sent, in milliseconds.
+   *
+   * For options filtered on a server, where `helix-filter` starts a request: a
+   * delay sends one request for a word instead of one per letter. The arrow
+   * keys, Enter and Escape narrow at once on what was typed. `0` narrows on
+   * every keystroke. See Listbox's `filter-delay`.
+   */
+  @property({ attribute: 'filter-delay', type: Number })
+  filterDelay = 0
+
+  /**
    * The list's name, read by screen readers. The list has no visible name.
    */
   @property({ attribute: 'list-label' })
   listLabel = 'Options'
+
+  /**
+   * What the list says when its options could not be loaded, such as after a
+   * request to a server fails. Empty is no error. Passed to the list, which
+   * shows it under any options there are and tells screen readers.
+   */
+  @property({ attribute: 'load-error' })
+  loadError = ''
 
   /**
    * Whether the options are still loading.
@@ -235,6 +259,13 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
    */
   @property({ type: Boolean })
   multiple = false
+
+  /**
+   * The text shown when typing hides every one of the options, where there are
+   * some. Absent, `empty-text` shows. See Listbox's `no-results-text`.
+   */
+  @property({ attribute: 'no-results-text' })
+  noResultsText?: string
 
   /**
    * Text shown while nothing has been chosen.
@@ -655,6 +686,25 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
        consumer that refuses it leaves the list unnarrowed. Everything after
        this runs either way, because refusing a narrowing is not refusing to
        open, and that is the behavior refusing the listbox's own event had. */
+    const inserted = isInsertion(event)
+    this.narrowing.cancel()
+    if (this.filterDelay > 0) {
+      this.suggestion = ''
+      this.narrowing.start(this.filterDelay, () => this.narrow(typed, inserted))
+    } else {
+      this.narrow(typed, inserted)
+    }
+    if (!this.open) {
+      this.requestOpen(true)
+    }
+  }
+
+  /** The narrowing waiting out `filterDelay`, if any. */
+  private readonly narrowing = new DelayController(this, { renders: false })
+
+  /** Narrows the list to what was typed, and finds the completion in what is left. */
+  private narrow(typed: string, inserted: boolean): void {
+    this.narrowing.cancel()
     const narrowing = new HelixFilterEvent({ value: typed })
     /* The list is narrowed before the completion is looked for, because the
        completion is the first thing still showing and that is not known until
@@ -663,10 +713,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
       this.listbox?.requestFilter(typed)
       void this.listbox?.updateComplete.then(() => this.linkActive())
     }
-    this.suggestion = this.suggest && isInsertion(event) ? this.completionFor(typed) : ''
-    if (!this.open) {
-      this.requestOpen(true)
-    }
+    this.suggestion = this.suggest && inserted ? this.completionFor(typed) : ''
   }
 
   /**
@@ -704,6 +751,11 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
        key at it gets the same answer a reader would. */
     if (this.isDisabled) {
       return
+    }
+    /* A key that acts on the list acts on what was typed, so a narrowing still
+       waiting out `filterDelay` happens first. */
+    if (['ArrowDown', 'ArrowUp', 'Enter', 'Escape', 'PageDown', 'PageUp'].includes(event.key)) {
+      this.narrowing.flush()
     }
     if (event.key === 'Escape') {
       this.emptied = false
@@ -1074,13 +1126,15 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
     return html`<${this.tag('listbox')}
       part="listbox"
       id="listbox"
-      exportparts="empty: listbox-empty, feedback: listbox-feedback, filter-icon: listbox-filter-icon,
-        filter-mark: listbox-filter-mark, hint: listbox-hint, items: listbox-items,
-        label: listbox-label, live: listbox-live, loading: listbox-loading, search: listbox-search,
-        search-field: listbox-search-field"
+      exportparts="empty: listbox-empty, error: listbox-error, feedback: listbox-feedback,
+        filter-icon: listbox-filter-icon, filter-mark: listbox-filter-mark, hint: listbox-hint,
+        items: listbox-items, label: listbox-label, live: listbox-live, loading: listbox-loading,
+        search: listbox-search, search-field: listbox-search-field"
       aria-label=${this.listLabel}
       empty-text=${this.emptyText}
+      load-error=${this.loadError}
       loading-text=${this.loadingText}
+      no-results-text=${this.noResultsText ?? nothing}
       result-label=${this.resultLabel}
       results-label=${this.resultsLabel}
       ?loading=${this.loading}
@@ -1102,6 +1156,14 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
            fills it, so the list's fallback would never show. -->
       <slot name="empty" slot="empty">${this.emptyText}</slot>
       <slot name="loading" slot="loading">${this.loadingText}</slot>
+      <slot name="error" slot="error">${this.loadError}</slot>
+      <!-- Handed on only while something fills it: an assigned slot hides the
+           list's own fallback, which is no-results-text or empty-text. -->
+      <slot
+        name="no-results"
+        slot=${this.querySelector?.(':scope > [slot="no-results"]') ? 'no-results' : nothing}
+        @slotchange=${() => this.requestUpdate()}
+      ></slot>
     </${this.tag('listbox')}>`
   }
 

@@ -80,6 +80,17 @@
   --_collection-inset-inline: var(--helix-space-xs);
 }
 
+/* A list whose options could not be loaded says so on a line set like the
+   empty one, in the danger ink: of the three, it is the one that is a fault. */
+[part="error"] {
+  color: var(--listbox-error-color, var(--helix-color-danger));
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  margin: var(--helix-space-none);
+  padding: var(--helix-space-xs);
+  text-align: center;
+}
+
 /*
  *  The mark beside the field, and a slot so it can be something else.
  *
