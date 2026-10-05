@@ -59,7 +59,8 @@
   line-height: var(--helix-leading-heading);
 }
 
-:host([variant="body"]) {
+:host([variant="body"]),
+:host(:not([variant])[as="p"]) {
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-md);
   font-weight: var(--helix-weight-regular);
@@ -126,6 +127,68 @@
   )
 ) {
   color: var(--_heading-ink, currentColor);
+}
+
+/* **Tone and emphasis again, for a text inside another shadow root.** The base
+   layer colors `helix-text[tone]` from the document, which reaches no shadow
+   tree, so a component of yours that renders a `helix-text` got the inherited
+   ink. A `:host` rule loses to every rule outside it, so on the page the base
+   layer's rule still wins, with the same ink. After the heading ink, which a
+   tone overrides there too. */
+:host([emphasis="muted"]) {
+  color: var(--helix-color-foreground-muted);
+}
+
+:host([emphasis="subtle"]) {
+  color: var(--helix-color-foreground-subtle);
+}
+
+:host([tone="accent"]) {
+  color: var(--helix-color-accent);
+}
+
+:host([tone="danger"]) {
+  color: var(--helix-color-danger);
+}
+
+:host([tone="info"]) {
+  color: var(--helix-color-info);
+}
+
+:host([tone="primary"]) {
+  color: var(--helix-color-primary);
+}
+
+:host([tone="success"]) {
+  color: var(--helix-color-success);
+}
+
+:host([tone="warning"]) {
+  color: var(--helix-color-warning);
+}
+
+:host([tone="accent"]:is([emphasis="muted"], [emphasis="subtle"])) {
+  color: var(--helix-color-accent-muted);
+}
+
+:host([tone="danger"]:is([emphasis="muted"], [emphasis="subtle"])) {
+  color: var(--helix-color-danger-muted);
+}
+
+:host([tone="info"]:is([emphasis="muted"], [emphasis="subtle"])) {
+  color: var(--helix-color-info-muted);
+}
+
+:host([tone="primary"]:is([emphasis="muted"], [emphasis="subtle"])) {
+  color: var(--helix-color-primary-muted);
+}
+
+:host([tone="success"]:is([emphasis="muted"], [emphasis="subtle"])) {
+  color: var(--helix-color-success-muted);
+}
+
+:host([tone="warning"]:is([emphasis="muted"], [emphasis="subtle"])) {
+  color: var(--helix-color-warning-muted);
 }
 
 [part="text"] {

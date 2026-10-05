@@ -260,6 +260,7 @@ diagnostics counts it by kind and tag. None fails a CI job.
 | `two-default-operators` | A filter field marks more than one operator as its default |
 | `unknown-event` | A React `on` prop names an event that no element dispatches |
 | `unlinked-trigger` | A tooltip's trigger does not name it in `aria-describedby` |
+| `unreachable-label` | A text rendered as a label wraps or names a control, which it cannot label |
 | `unsettled-window` | A virtualized list's box has no height of its own |
 | `untold-trigger` | A slotted trigger is a plain element, which cannot carry `aria-expanded` |
 | `wrapped-trigger` | A tooltip wraps its trigger, so its text reaches no screen reader |
