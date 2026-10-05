@@ -33,6 +33,15 @@
 # type-checks a consumer's call to an API their Node does not have. The root's
 # ignore never reached them, each being its own entry, and the same bump came
 # through one of them on 1 Sep 2026 as #101.
+#
+# **The root is `bun`, the ecosystem that reads `bun.lock`.** Under `npm`, every
+# weekly run from 22 Sep 2026 on stopped at the lockfile: the `npm` updater
+# cannot write `bun.lock`, and Dependabot's own error named `bun` as the fix.
+#
+# **The templates ignore Helix's own packages**, which each one pins as
+# `^__HELIX_VERSION__` for `helix new` to fill in with the version it ships
+# with. Dependabot read the placeholder as a broken requirement, and every
+# template's run failed on those three packages.
 version: 2
 updates:
   - directory: /
@@ -48,7 +57,7 @@ updates:
       - dependency-name: '@types/node'
         update-types: [version-update:semver-major]
     open-pull-requests-limit: 5
-    package-ecosystem: npm
+    package-ecosystem: bun
     schedule:
       interval: weekly
   # The consumer templates are not workspace members, so the root entry never
@@ -60,6 +69,7 @@ updates:
       template:
         patterns: ['*']
     ignore:
+      - dependency-name: '@fusion.dev/*'
       - dependency-name: 'typescript'
         update-types: [version-update:semver-major]
     package-ecosystem: npm
@@ -70,6 +80,7 @@ updates:
       template:
         patterns: ['*']
     ignore:
+      - dependency-name: '@fusion.dev/*'
       - dependency-name: '@types/node'
         update-types: [version-update:semver-major]
     package-ecosystem: npm
@@ -80,6 +91,7 @@ updates:
       template:
         patterns: ['*']
     ignore:
+      - dependency-name: '@fusion.dev/*'
       - dependency-name: '@types/node'
         update-types: [version-update:semver-major]
     package-ecosystem: npm
@@ -89,6 +101,8 @@ updates:
     groups:
       template:
         patterns: ['*']
+    ignore:
+      - dependency-name: '@fusion.dev/*'
     package-ecosystem: npm
     schedule:
       interval: weekly
@@ -97,6 +111,7 @@ updates:
       template:
         patterns: ['*']
     ignore:
+      - dependency-name: '@fusion.dev/*'
       - dependency-name: 'typescript'
         update-types: [version-update:semver-major]
     package-ecosystem: npm
@@ -107,6 +122,7 @@ updates:
       template:
         patterns: ['*']
     ignore:
+      - dependency-name: '@fusion.dev/*'
       - dependency-name: 'typescript'
         update-types: [version-update:semver-major]
     package-ecosystem: npm
