@@ -16,6 +16,14 @@ the page, with the page's own color for its label. The neutral ramp supplies
 both, so a gray with a tint gives a tinted ink. Set a brand color to replace the
 ink, as a seed in CSS or as `brand` in the theme engine.
 
+Before ink, the default was a blue. To keep it, set it as your seed:
+
+```css
+:root {
+  --helix-seed-brand: oklch(0.539 0.19 258);
+}
+```
+
 When a design system ships two hundred fixed color values, you theme it by
 changing them one at a time. A change to one value can break the contrast of a
 component elsewhere, and nothing tells you.
