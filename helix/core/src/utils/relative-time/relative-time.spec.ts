@@ -82,3 +82,15 @@ describe('the cache', () => {
     expect(read(at(-120_000), now).text).toBe(relativeTime('en')(at(-120_000), now).text)
   })
 })
+
+describe('the reading, written another way', () => {
+  test('in a shorter style', () => {
+    expect(relativeTime('en', { style: 'short' })(at(-3 * 3_600_000), now).text).toBe('3 hr. ago')
+    expect(relativeTime('en', { style: 'narrow' })(at(-3 * 3_600_000), now).text).toBe('3h ago')
+  })
+
+  test('with a number where a word was', () => {
+    expect(relativeTime('en')(at(-86_400_000), now).text).toBe('yesterday')
+    expect(relativeTime('en', { numeric: 'always' })(at(-86_400_000), now).text).toBe('1 day ago')
+  })
+})
