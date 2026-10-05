@@ -235,28 +235,6 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
     target: () => this.partNamed('strip'),
   })
 
-  /**
-   * Hears an `aria-label` written on the element, which no property mirrors.
-   *
-   * Lit observes the attributes of its own properties only, and `ariaLabel`
-   * belongs to the platform.
-   */
-  static override get observedAttributes(): string[] {
-    // biome-ignore lint/complexity/noThisInStatic: super runs Lit's getter with the subclass as this, so a styled heatmap keeps its own attributes, where the class name would read the base's
-    return [...super.observedAttributes, 'aria-label']
-  }
-
-  /**
-   * Called by the browser when an observed attribute changes. A new
-   * `aria-label` asks for an update, because it names the strip.
-   */
-  override attributeChangedCallback(name: string, old: string | null, value: string | null): void {
-    super.attributeChangedCallback(name, old, value)
-    if (name === 'aria-label') {
-      this.requestUpdate()
-    }
-  }
-
   private observer: ResizeObserver | undefined = undefined
 
   private announced: number | undefined = undefined
@@ -503,7 +481,7 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
        empty strip has nothing to read and stays a picture. */
     const readable = cells.length > 0
     return html`<div
-        aria-label=${this.getAttribute?.('aria-label') || this.named || 'Heatmap'}
+        aria-label=${this.named || 'Heatmap'}
         part="strip"
         id=${CHART_PLOT}
         role=${readable ? 'application' : 'img'}

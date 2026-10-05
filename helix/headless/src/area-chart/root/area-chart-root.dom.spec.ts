@@ -200,7 +200,9 @@ describe('reading by key', () => {
       new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key: 'End' }),
     )
     await (host as HTMLElement & { updateComplete: Promise<boolean> }).updateComplete
-    expect(part(host, 'live')?.textContent).toBe('Mar: Search 25, Direct 15, Social 10, Total 50')
+    expect(part(host, 'live')?.textContent).toBe(
+      'Mar: Search 25, Direct 15, Social 10, Total 50 (3 of 3)',
+    )
   })
 })
 
@@ -221,6 +223,6 @@ describe('a band a legend hid', () => {
       )
     }
     await host.updateComplete
-    expect(part(host, 'live')?.textContent).toBe('Jan, Direct 6')
+    expect(part(host, 'live')?.textContent).toBe('Jan, Direct 6 (1 of 3)')
   })
 })

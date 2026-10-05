@@ -34,6 +34,13 @@ describe('a reading in words', () => {
     expect(spokenReading(ROW, undefined, (cell) => cell !== 0)).toBe('March: Status Outage')
   })
 
+  test('says where it stands after it, where the chart gives a position', () => {
+    expect(spokenReading(ROW, 0, undefined, '2 of 12')).toBe('March, Revenue $128k (2 of 12)')
+    expect(spokenReading({ cells: [], label: 'Q1' }, undefined, undefined, '1 of 4')).toBe(
+      'Q1 (1 of 4)',
+    )
+  })
+
   test('leaves out a heading the table does not have', () => {
     expect(spokenReading({ cells: [{ name: '', text: '7' }], label: 'Mon' })).toBe('Mon: 7')
   })
