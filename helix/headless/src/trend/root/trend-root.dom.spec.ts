@@ -108,6 +108,16 @@ describe('an icon of the page', () => {
     expect(word(host)).toBe('Up')
   })
 
+  /* A slotted `^` was read into the name of a button holding the trend, as
+     "^ Up, better 8%". The word already says the direction. */
+  test('is hidden from screen readers, as the arrow is', async () => {
+    const host = await mount(
+      '<helix-headless-trend direction="up">8%<span slot="icon">^</span></helix-headless-trend>',
+    )
+    const slot = host.shadowRoot?.querySelector('slot[name="icon"]') as HTMLSlotElement
+    expect(slot.getAttribute('aria-hidden')).toBe('true')
+  })
+
   test('without one, the arrow is drawn as before', async () => {
     const host = await mount('<helix-headless-trend direction="down">8%</helix-headless-trend>')
     const slot = host.shadowRoot?.querySelector('slot[name="icon"]') as HTMLSlotElement

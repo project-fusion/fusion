@@ -77,10 +77,21 @@ describe('skeleton', () => {
    effect and color and sheen hooks. */
 describe('skeleton around content', () => {
   test('takes the content box, hides the content while loading, and steps aside after', () => {
-    expect(rule(':host(:not(:empty))')).toContain('inline-size: fit-content')
-    expect(rule(':host(:not(:empty)) [part="skeleton"]')).toContain('position: absolute')
-    expect(rule(':host([loading]:not(:empty)) [part="content"]')).toContain('visibility: hidden')
-    expect(rule(':host(:not(:empty):not([loading])) [part="skeleton"]')).toContain('display: none')
+    expect(rule(':host(:state(wrapping))')).toContain('inline-size: fit-content')
+    expect(rule(':host(:state(wrapping)) [part="skeleton"]')).toContain('position: absolute')
+    expect(rule(':host([loading]:state(wrapping)) [part="content"]')).toContain(
+      'visibility: hidden',
+    )
+    expect(rule(':host(:state(wrapping):not([loading])) [part="skeleton"]')).toContain(
+      'display: none',
+    )
+  })
+
+  /* `:empty` counts a line break as content, so a skeleton written across two
+     lines took the wrapper's layout around nothing and drew a 0 by 0 box. The
+     sheet asks the base tier's state, which is the script's own test. */
+  test('tells a wrapper from a placeholder by the state, never by :empty', () => {
+    expect(sheet()).not.toContain(':empty')
   })
 
   test('the fill, the sheen, the corner and the pace are hooks that rest on the old values', () => {

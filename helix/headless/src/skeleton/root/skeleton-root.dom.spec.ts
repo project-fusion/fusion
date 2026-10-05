@@ -88,6 +88,24 @@ describe('a skeleton around content', () => {
     expect(skeleton.internals.ariaHidden).toBe('true')
   })
 
+  /* The styled sheet lays a wrapper out on this state. A skeleton written
+     across two lines holds only whitespace and is a placeholder, which `:empty`
+     got wrong. */
+  test('says it wraps content with a state, and whitespace is not content', async () => {
+    const blank = (await mount(
+      '<helix-headless-skeleton>\n  </helix-headless-skeleton>',
+    )) as Skeleton
+    expect(blank.internals.states.has('wrapping')).toBe(false)
+    const words = (await mount(
+      '<helix-headless-skeleton>Ada</helix-headless-skeleton>',
+    )) as Skeleton
+    expect(words.internals.states.has('wrapping')).toBe(true)
+    const element = (await mount(
+      '<helix-headless-skeleton>\n  <a href="/profile">Ada</a>\n</helix-headless-skeleton>',
+    )) as Skeleton
+    expect(element.internals.states.has('wrapping')).toBe(true)
+  })
+
   test('content arriving later is read as content', async () => {
     const skeleton = (await mount(
       '<helix-headless-skeleton></helix-headless-skeleton>',
@@ -96,5 +114,6 @@ describe('a skeleton around content', () => {
     await new Promise((done) => setTimeout(done, 0))
     await skeleton.updateComplete
     expect(skeleton.internals.ariaHidden ?? null).toBeNull()
+    expect(skeleton.internals.states.has('wrapping')).toBe(true)
   })
 })

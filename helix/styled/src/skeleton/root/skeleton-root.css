@@ -94,34 +94,38 @@
 }
 
 /*
- * **Around content, the skeleton is the content's size.** `:empty` is how a
- * sheet tells a placeholder from a wrapper with no script: the host takes the
+ * **Around content, the skeleton is the content's size.** `:state(wrapping)`
+ * is how the sheet tells a wrapper from a placeholder: the host takes the
  * content's box, the content keeps its place and is hidden while `loading`,
  * and the shape lies over that box. Once `loading` goes the shape goes, and the
  * content is shown where it already was, so nothing on the page moves.
+ *
+ * The state rather than `:empty`, which counts a line break as content: a
+ * skeleton written across two lines took this layout around nothing and drew
+ * a 0 by 0 box. The state is the script's test, which ignores whitespace.
  */
-:host(:not(:empty)) {
+:host(:state(wrapping)) {
   block-size: auto;
   inline-size: fit-content;
   max-inline-size: 100%;
   position: relative;
 }
 
-:host(:not(:empty)) [part="content"] {
+:host(:state(wrapping)) [part="content"] {
   display: block;
 }
 
-:host(:not(:empty)) [part="skeleton"] {
+:host(:state(wrapping)) [part="skeleton"] {
   block-size: auto;
   inset: 0;
   position: absolute;
 }
 
-:host(:not(:empty):not([loading])) [part="skeleton"] {
+:host(:state(wrapping):not([loading])) [part="skeleton"] {
   display: none;
 }
 
-:host([loading]:not(:empty)) [part="content"] {
+:host([loading]:state(wrapping)) [part="content"] {
   visibility: hidden;
 }
 

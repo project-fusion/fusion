@@ -34,6 +34,8 @@ import { property } from 'lit/decorators.js'
  *
  * @csspart content - The box around the content, inert while `loading`.
  * @csspart skeleton - The placeholder shape.
+ *
+ * @cssstate wrapping - The skeleton holds content, an element or words, and takes that content's size. Line breaks and spaces alone are not content.
  */
 @customElement('helix-headless-skeleton')
 export class HelixHeadlessSkeleton extends HelixElement {
@@ -77,15 +79,22 @@ export class HelixHeadlessSkeleton extends HelixElement {
   /* Content a skeleton wraps is the page's own, so it stays in the tree once
      it has loaded; while it loads it is inert, which takes it out, and the
      host says the region is busy. */
+  /* **The wrapper is a state, read with the script's own test.** The styled
+     sheet told a wrapper from a placeholder with `:empty`, which counts a line
+     break as content, so a skeleton written across two lines, as pretty-printed
+     markup and most templates write one, took the wrapper's layout around
+     nothing and drew a 0 by 0 box while the script still called it empty. */
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    const wraps = this.wraps
+    this.toggleState('wrapping', wraps)
     this.internals.ariaBusy = this.loading ? 'true' : null
     if (this.label) {
       hostAria(this.internals, { label: this.label, role: 'progressbar' })
       this.internals.ariaHidden = null
     } else {
       hostAria(this.internals, { label: '', role: '' })
-      this.internals.ariaHidden = this.wraps ? null : 'true'
+      this.internals.ariaHidden = wraps ? null : 'true'
     }
   }
 
