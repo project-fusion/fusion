@@ -6,13 +6,16 @@ import {
   HelixLoadMoreEvent,
   HelixRangeChangeEvent,
   searchableById,
+  Typeahead,
+  typesCharacter,
   VirtualizeController,
 } from '@fusion.dev/helix-core'
-import { html, type PropertyValues, render, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, render, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { holdControls, releaseControls } from '../controls.js'
-import { fillHoles } from '../fill.js'
+import { fillHoles, textOf, valueAt } from '../fill.js'
 import { stepIndex } from '../keys.js'
+import { drawPlan, stopAfter } from '../plan.js'
 
 /**
  * Draws one item into its row, for a list given `renderItem`.
@@ -63,12 +66,21 @@ export interface VirtualListRange {
  *
  * Rows are your markup in the light DOM, so your stylesheet styles them.
  *
- * **Keyboard.** The list is one tab stop. Up and Down move between items, Home
- * and End go to the first and the last, and Page Up and Page Down move by a
- * screen. An item that is not drawn is scrolled into view and focused, so a
- * keyboard reaches the whole set. Tab moves on into the focused row's own links
- * and buttons. When the row holding the tab stop scrolls away, the stop moves
- * to the first row on screen.
+ * **Keyboard.** The list is one tab stop.
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Down, Up | Moves to the next or the previous item. |
+ * | Home, End | Moves to the first or the last item. |
+ * | Page Down, Page Up | Moves by the number of items on screen. |
+ * | A letter or a word | Moves to the next item whose text starts with what you typed. |
+ * | Tab | Moves into the focused row's own links and buttons, then out of the list. |
+ *
+ * An item that is not drawn is scrolled into view and focused, so a keyboard
+ * reaches the whole set. When the row holding the tab stop scrolls away, the
+ * stop moves to the first row on screen. Typing matches each item's
+ * `text-field`, which is the first `data-field` of the row template by default,
+ * or the item itself when it is a string or a number.
  *
  * Each row says its place in the whole set with `aria-posinset` and
  * `aria-setsize`, so a screen reader says "4,000 of 10,000". The row holding
@@ -77,7 +89,14 @@ export interface VirtualListRange {
  * **Loading more.** `helix-range-change` fires as the items on screen change,
  * and `range` holds them. `helix-load-more` fires once a reader is within one
  * screen of the end, once for each length of the set: add to `items` and it can
- * fire again. `scrollToIndex` takes a reader to an item.
+ * fire again. While you fetch, set `loading`: the list is busy, and a row after
+ * the last item says "Loading more" (`loading-label`, or your own content in
+ * the `loading` slot). `scrollToIndex` takes a reader to an item.
+ *
+ * **Row height.** Rows are placed by `estimate` until they are drawn. Then the
+ * list reads the drawn rows' height once and places every row by it, so a
+ * wrong estimate still reaches the last item. Set `measured` for rows of
+ * different heights.
  *
  * The list follows its source. A new `items` array, an edit to the script's
  * text, or a script replaced under the same id draws the new rows. A row that
@@ -93,12 +112,14 @@ export interface VirtualListRange {
  * @documentation https://fusion.dev/helix/components/virtual-list
  *
  * @slot - The `<template>` that defines one row. The list writes the rows it renders beside it, and this slot shows them between the two spacers.
+ * @slot loading - Content for the row after the last item while `loading` is set. Falls back to `loading-label`.
  *
  * @event {HelixLoadMoreEvent} helix-load-more - Fired when a reader comes within one screen of the last item, once for each length of the set.
  * @event {HelixRangeChangeEvent} helix-range-change - Fired when the items on screen change, with the new `first` and `last`, which `range` also holds.
  *
  * @csspart after - The space that stands in for the rows below the rendered ones.
  * @csspart before - The space that stands in for the rows above the rendered ones.
+ * @csspart loading - The row after the last item while `loading` is set.
  * @csspart viewport - The scrolling box. On this tier, it needs only a block size.
  */
 @customElement('helix-headless-virtual-list')
@@ -140,11 +161,26 @@ export class HelixHeadlessVirtualList extends HelixElement {
   label = ''
 
   /**
-   * Places rows by their measured height. Without it, every row is placed by
-   * `estimate`.
+   * Marks the list as busy fetching more items, and draws a row after the last
+   * item that says so.
+   *
+   * Set it when `helix-load-more` starts a fetch, and clear it when the items
+   * arrive. The list does not ask for more while it is set.
+   */
+  @property({ type: Boolean })
+  loading = false
+
+  /** The text of the row drawn while `loading` is set, where the `loading` slot is empty. */
+  @property({ attribute: 'loading-label' })
+  loadingLabel = 'Loading more'
+
+  /**
+   * Places each row by its own measured height. Without it, rows are placed
+   * by one height: `estimate` until rows are drawn, then the drawn rows' height,
+   * read once.
    *
    * **Off by default, because the straight line is better when it holds.** One
-   * estimate makes offset and index convert by division, which can never
+   * height makes offset and index convert by division, which can never
    * disagree with itself; measuring is what a set of genuinely different
    * heights needs and costs a read of each row as it renders. A list of
    * one-line rows should leave this alone.
@@ -162,6 +198,16 @@ export class HelixHeadlessVirtualList extends HelixElement {
    */
   @property({ attribute: false })
   renderItem: VirtualListRenderer | undefined
+
+  /**
+   * The field of each item that typing matches, as a key or a path of keys
+   * (`author.name`).
+   *
+   * Empty by default, which matches the first `data-field` of the row
+   * template, or the item itself where it is a string or a number.
+   */
+  @property({ attribute: 'text-field' })
+  textField = ''
 
   /**
    * The parsed script.
@@ -197,8 +243,8 @@ export class HelixHeadlessVirtualList extends HelixElement {
   /** The range last reported, so `helix-range-change` fires only on a change. */
   private said: VirtualListRange = { first: 0, last: 0 }
 
-  /** The length of the set when `helix-load-more` last fired. */
-  private askedAt = -1
+  /** The letters typed at the list, which move to the item they start. */
+  private readonly typeahead = new Typeahead()
 
   /**
    * Watches the source and the tree around it.
@@ -387,18 +433,27 @@ export class HelixHeadlessVirtualList extends HelixElement {
       this.said = { first, last }
       this.dispatchEvent(new HelixRangeChangeEvent({ first, last }))
     }
-    const box = this.partNamed('viewport')
-    const count = this.data.length
-    const screen = box?.clientHeight ?? 0
-    if (
-      count > 0 &&
-      screen > 0 &&
-      this.askedAt !== count &&
-      this.virtualize.remaining() <= screen
-    ) {
-      this.askedAt = count
+    if (!this.loading && this.virtualize.endInSight()) {
       this.dispatchEvent(new HelixLoadMoreEvent())
     }
+  }
+
+  /**
+   * The text typing matches for each item: `text-field`, the template's first
+   * `data-field`, or a string or number item itself.
+   */
+  private texts(): string[] {
+    const field =
+      this.textField ||
+      this.querySelector<HTMLTemplateElement>(':scope > template')
+        ?.content.querySelector('[data-field]')
+        ?.getAttribute('data-field') ||
+      ''
+    return this.data.map((item) =>
+      field === '' || item === null || typeof item !== 'object'
+        ? textOf(item)
+        : textOf(valueAt(item, field)),
+    )
   }
 
   /** The item a row element drew, for an element that is one of the rows. */
@@ -422,17 +477,23 @@ export class HelixHeadlessVirtualList extends HelixElement {
    * is that control's, so a field in a row keeps its arrows.
    */
   private readonly handleKeydown = (event: KeyboardEvent): void => {
-    if (
-      event.defaultPrevented ||
-      event.altKey ||
-      event.ctrlKey ||
-      event.metaKey ||
-      event.shiftKey
-    ) {
+    if (event.defaultPrevented) {
       return
     }
     const at = this.indexOf(event.target)
     if (at === undefined) {
+      return
+    }
+    /* Space only continues a word, so a row's own use of it is left alone. */
+    if (typesCharacter(event) && (event.key !== ' ' || this.typeahead.typing())) {
+      const found = this.typeahead.match(event.key, this.texts(), at)
+      event.preventDefault()
+      if (found >= 0 && found !== at) {
+        void this.focusIndex(found)
+      }
+      return
+    }
+    if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) {
       return
     }
     const { first, last } = this.virtualize.visible()
@@ -573,26 +634,25 @@ export class HelixHeadlessVirtualList extends HelixElement {
     }
     const count = this.data.length
     const { first, last } = this.virtualize.window
-    const kept = this.keptIndex()
-    const wanted: number[] = []
-    for (let at = first; at < Math.min(last, count); at += 1) {
-      wanted.push(at)
-    }
-    if (kept !== undefined) {
-      wanted.push(kept)
-      wanted.sort((a, b) => a - b)
-    }
-    const keep = new Set(wanted)
-    /* A row drawn the other way, by the template or by the function, is
-       drawn again from nothing: its markup is not the other's to fill. */
-    const redraw = (this.filledBy === undefined) !== (this.renderItem === undefined)
+    /* A child given a slot of its own, such as `loading`, is the consumer's. */
+    const children = [...this.children].filter(
+      (child): child is HTMLElement =>
+        child !== template && child instanceof HTMLElement && !child.hasAttribute('slot'),
+    )
+    const plan = drawPlan({
+      count,
+      drawn: children.map((child) => Number(child.dataset.index)),
+      first,
+      kept: this.keptIndex(),
+      last,
+      /* A row drawn the other way, by the template or by the function, is
+         drawn again from nothing: its markup is not the other's to fill. */
+      redraw: (this.filledBy === undefined) !== (this.renderItem === undefined),
+    })
     const drawn = new Map<number, Element[]>()
-    for (const child of [...this.children]) {
-      if (child === template) {
-        continue
-      }
-      const index = Number((child as HTMLElement).dataset.index)
-      if (redraw || !Number.isInteger(index) || !keep.has(index)) {
+    for (const child of children) {
+      const index = Number(child.dataset.index)
+      if (plan.remove.has(index)) {
         child.remove()
         continue
       }
@@ -604,7 +664,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
     /* Rows drawn or filled on this pass, whose controls are new to the tab order. */
     const fresh = new Set<number>()
     let anchor: Element | null = drawn.values().next().value?.[0] ?? null
-    for (const at of wanted) {
+    for (const at of plan.wanted) {
       const group = drawn.get(at)
       if (group) {
         if (refill) {
@@ -619,10 +679,12 @@ export class HelixHeadlessVirtualList extends HelixElement {
       fresh.add(at)
       this.insertBefore(fragment, anchor)
     }
-    if (!keep.has(this.active)) {
-      const onScreen = this.virtualize.visible().first
-      this.active = Math.max(Math.min(onScreen, Math.min(last, count) - 1), first, 0)
-    }
+    this.active = stopAfter(this.active, plan.wanted, {
+      count,
+      first,
+      last,
+      onScreen: this.virtualize.visible().first,
+    })
     for (const [at, group] of drawn) {
       const stop = at === this.active
       group[0]?.setAttribute('tabindex', stop ? '0' : '-1')
@@ -644,6 +706,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
       data-scroller
       part="viewport"
       role="list"
+      aria-busy=${this.loading ? 'true' : nothing}
       aria-label=${this.label}
       @scroll=${() => {
         this.virtualize.measure()
@@ -653,6 +716,15 @@ export class HelixHeadlessVirtualList extends HelixElement {
       <div part="before" style="block-size: ${before}px"></div>
       <slot></slot>
       <div part="after" style="block-size: ${after}px"></div>
+      ${
+        /* An item of the list that is not one of the set, so it carries no
+           place in it, as React Aria's loading row does. */
+        this.loading
+          ? html`<div part="loading" role="listitem">
+              <slot name="loading">${this.loadingLabel}</slot>
+            </div>`
+          : nothing
+      }
     </div>`
   }
 }
