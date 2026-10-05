@@ -28,6 +28,9 @@ import { styles } from './number-input-root.css.js'
  * @documentation https://fusion.dev/helix/components/number-input
  *
  * @slot end - Content after the number, such as a unit.
+ * @slot feedback - The message that says what is wrong, for content richer than a string. It shows while there is a message.
+ * @slot hint - Help under the control, for content richer than the `hint` text.
+ * @slot label - The label, for content richer than the `label` text.
  * @slot start - Content before the number, such as a unit or an icon.
  *
  * @csspart control - The input that holds the number.

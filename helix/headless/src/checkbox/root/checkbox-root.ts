@@ -36,6 +36,8 @@ import { property } from 'lit/decorators.js'
  * @documentation https://fusion.dev/helix/components/checkbox
  *
  * @slot - The label.
+ * @slot feedback - The message that says what is wrong, for content richer than a string. It shows while there is a message.
+ * @slot hint - Help under the control, for content richer than the `hint` text.
  *
  * @event {Event} change - The box was checked or unchecked. Relayed from the native input.
  * @event {HelixBeforeToggleEvent} helix-before-toggle - The box is about to be checked or unchecked. Cancelable: cancel it to keep its state.

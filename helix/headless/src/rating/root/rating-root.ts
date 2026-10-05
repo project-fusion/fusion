@@ -34,6 +34,11 @@ import { property, state } from 'lit/decorators.js'
  * @aliases Stars, Score, Review score
  * @documentation https://fusion.dev/helix/components/rating
  *
+ * @slot feedback - The message that says what is wrong, for content richer than a string. It shows while there is a message.
+ * @slot hint - Help under the control, for content richer than the `hint` text.
+ * @slot label - The label, for content richer than the `label` text.
+ * @slot mark - The shape of a mark, copied into every position.
+ *
  * @event {Event} change - The score was chosen. Sent together with `input`, because each choice commits the score.
  * @event {HelixBeforeChangeEvent} helix-before-change - The score is about to change. Cancelable: cancel it to keep the current score.
  * @event {Event} input - The score changed.
