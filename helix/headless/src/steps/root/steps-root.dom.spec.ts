@@ -255,3 +255,25 @@ describe('the list can hold which step is current', () => {
     expect(currents(host)).toEqual([false, false, true])
   })
 })
+
+describe('steps and what is inside a step', () => {
+  /* A step's `content` holds the stage, so a tab set or a menu there is the
+     expected use, and its `helix-select` bubbles out of the step. */
+  test('a choice from inside a step leaves the sequence where it is', async () => {
+    const host = (await mount(`<helix-headless-steps active="s1">
+      <helix-headless-step value="s1">Cart<div slot="content"><span id="inside"></span></div></helix-headless-step>
+      <helix-headless-step value="s2">Pay</helix-headless-step>
+    </helix-headless-steps>`)) as Steps & { active: string }
+    await host.updateComplete
+    host.querySelector('#inside')?.dispatchEvent(
+      new CustomEvent('helix-select', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        detail: { value: 'y' },
+      }),
+    )
+    await host.updateComplete
+    expect(host.active).toBe('s1')
+  })
+})

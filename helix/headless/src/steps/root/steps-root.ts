@@ -117,7 +117,10 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
      a bubble listener for an event from a child, so every listener on the step
      has already run by the time it arrives. */
   private readonly handleSelection = (event: Event): void => {
-    if (event.defaultPrevented) {
+    /* Only a choice made by one of this sequence's own steps. A tab set, a tree
+       or a menu in a step's `content` sends `helix-select` too, and it bubbles
+       out of the step: acted on, it set `active` to a value no step has. */
+    if (event.defaultPrevented || !this.steps.includes(event.target as HelixHeadlessStep)) {
       return
     }
     this.requestActive((event as CustomEvent<{ value: string }>).detail.value)

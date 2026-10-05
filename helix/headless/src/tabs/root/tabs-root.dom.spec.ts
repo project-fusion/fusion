@@ -399,3 +399,33 @@ describe('tabs modes are decided once', () => {
     expect(host.active).toBe('one')
   })
 })
+
+describe('tabs and what is inside a panel', () => {
+  /* `helix-select` bubbles and is composed, and a tree, a menu or another tab
+     set inside a panel sends it. Only this set's own tabs may move it. */
+  test('a choice from inside a panel leaves the tab set where it is', async () => {
+    const host = (await mount(markup)) as Updatable & { active: string }
+    ;(tabs(host)[1] as Updatable & { select(): void }).select()
+    await host.updateComplete
+    const inside = document.createElement('div')
+    panels(host)[1]?.append(inside)
+    inside.dispatchEvent(
+      new CustomEvent('helix-select', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        detail: { value: 'elsewhere' },
+      }),
+    )
+    await host.updateComplete
+    expect(host.active).toBe('two')
+    expect(hasState(panels(host)[1] as Element, 'selected')).toBe(true)
+  })
+
+  test('takes its name from an aria-label on the host', async () => {
+    const host = (await mount(
+      '<helix-headless-tabs aria-label="Account sections"><helix-headless-tab value="a">A</helix-headless-tab></helix-headless-tabs>',
+    )) as Updatable
+    expect(part(host, 'tabs')?.getAttribute('aria-label')).toBe('Account sections')
+  })
+})

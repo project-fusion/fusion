@@ -176,3 +176,100 @@ describe('an empty tree', () => {
     expect(part(host, 'empty')).toBeNull()
   })
 })
+
+describe('what a tree acts on', () => {
+  test('a choice from content in a row leaves the tree where it is', async () => {
+    const { branch } = await tree()
+    const host = branch.parentElement as Tree & { active: string }
+    const inside = document.createElement('span')
+    inside.slot = 'end'
+    branch.append(inside)
+    inside.dispatchEvent(
+      new CustomEvent('helix-select', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        detail: { value: 'rename' },
+      }),
+    )
+    await host.updateComplete
+    expect(host.active).toBe('')
+  })
+
+  test('a branch with a value is chosen as it opens, by the pointer and by Enter', async () => {
+    const { branch } = await tree()
+    const host = branch.parentElement as Tree & { active: string }
+    ;(part(branch, 'row') as HTMLElement).click()
+    await host.updateComplete
+    expect(host.active).toBe('branch')
+    expect(branch.open).toBe(true)
+    host.active = 'leaf'
+    await host.updateComplete
+    await press(branch, 'Enter')
+    await host.updateComplete
+    expect(host.active).toBe('branch')
+    expect(branch.open).toBe(false)
+  })
+
+  test('and a branch that heads its list only opens', async () => {
+    const { branch } = await tree()
+    const host = branch.parentElement as Tree & { active: string }
+    host.nesting = 'heading'
+    await host.updateComplete
+    await branch.updateComplete
+    ;(part(branch, 'row') as HTMLElement).click()
+    await host.updateComplete
+    expect(host.active).toBe('')
+    expect(branch.open).toBe(true)
+  })
+
+  test('takes its name from an aria-label on the host', async () => {
+    const host = await mount(
+      '<helix-headless-tree aria-label="Project files"><helix-headless-tree-item value="a">A</helix-headless-tree-item></helix-headless-tree>',
+    )
+    expect(part(host, 'tree')?.getAttribute('aria-label')).toBe('Project files')
+  })
+})
+
+describe('the tab stop and the keys that find a row', () => {
+  /* The tree heard only `helix-before-open` and `helix-before-close`, which do
+     not bubble, so a pointer collapse left the one stop inside a hidden group
+     and Tab passed over the tree. */
+  test('a branch shut by the pointer takes back a stop that was inside it', async () => {
+    const { branch, child } = await tree()
+    await press(branch, 'ArrowRight')
+    await press(branch, 'ArrowDown')
+    expect(child.focusable).toBe(true)
+    ;(part(branch, 'toggle') ?? (part(branch, 'row') as HTMLElement)).dispatchEvent(
+      new MouseEvent('click', { bubbles: true, composed: true }),
+    )
+    await branch.updateComplete
+    await (branch.parentElement as Tree).updateComplete
+    expect(branch.open).toBe(false)
+    expect([branch.focusable, child.focusable]).toEqual([true, false])
+  })
+
+  test('a typed letter moves to the next row whose name starts with it', async () => {
+    const { branch } = await tree()
+    const leaf = branch.parentElement?.querySelector('[value="leaf"]') as Item
+    await press(branch, 'l')
+    expect(leaf.focusable).toBe(true)
+  })
+
+  test('* opens every branch beside the focused row', async () => {
+    const host = await mount(`
+      <helix-headless-tree label="Files">
+        <helix-headless-tree-item value="a">A
+          <helix-headless-tree-item slot="children" value="a1">A1</helix-headless-tree-item>
+        </helix-headless-tree-item>
+        <helix-headless-tree-item value="b">B
+          <helix-headless-tree-item slot="children" value="b1">B1</helix-headless-tree-item>
+        </helix-headless-tree-item>
+      </helix-headless-tree>`)
+    const [a, , b] = [...host.querySelectorAll('helix-headless-tree-item')] as Item[]
+    await a?.updateComplete
+    await b?.updateComplete
+    await press(a as Item, '*')
+    expect([a?.open, b?.open]).toEqual([true, true])
+  })
+})
