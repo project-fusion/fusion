@@ -78,7 +78,10 @@
    changes. */
 [part="button"] {
   align-items: center;
-  background-color: var(--icon-button-background-color, transparent);
+  background-color: var(
+    --_icon-button-pressed-fill,
+    var(--icon-button-background-color, transparent)
+  );
   block-size: var(--_icon-button-size);
   border: var(--helix-border-thin) solid transparent;
   /*
@@ -106,7 +109,10 @@
     --button-radius-start,
     var(--icon-button-radius, var(--helix-radii-sm))
   );
-  color: var(--icon-button-foreground-color, var(--_icon-button-ink));
+  color: var(
+    --_icon-button-pressed-ink,
+    var(--icon-button-foreground-color, var(--_icon-button-ink))
+  );
   cursor: pointer;
   display: inline-flex;
   /* The UA gives a button its own font, so this one was drawing at 13.33px
@@ -133,13 +139,27 @@
  */
 :host(:not(:disabled)) [part="button"]:hover {
   background-color: var(
-    --icon-button-background-color-hover,
+    --_icon-button-pressed-fill,
     var(
-      --icon-button-background-color,
-      color-mix(in oklab, var(--_icon-button-tone) 8%, transparent)
+      --icon-button-background-color-hover,
+      var(
+        --icon-button-background-color,
+        color-mix(in oklab, var(--_icon-button-tone) 8%, transparent)
+      )
     )
   );
-  color: var(--icon-button-foreground-color, var(--_icon-button-ink-hover));
+  color: var(
+    --_icon-button-pressed-ink,
+    var(--icon-button-foreground-color, var(--_icon-button-ink-hover))
+  );
+}
+
+/* Pressed, through two hooks that are read only while the button is down. Every
+   rule in this sheet that colors the button reads through these, so with
+   neither hook set a press looks as it always did. */
+:host(:not(:disabled)) [part="button"]:active {
+  --_icon-button-pressed-fill: var(--icon-button-background-color-active);
+  --_icon-button-pressed-ink: var(--icon-button-foreground-color-active);
 }
 
 :host([shape="circle"]) [part="button"] {
@@ -174,16 +194,28 @@
  * own; written out it selects nothing and lands on the block above.
  */
 :host([emphasis="solid"]) [part="button"] {
-  background-color: var(--icon-button-background-color, var(--_icon-button-fill));
+  background-color: var(
+    --_icon-button-pressed-fill,
+    var(--icon-button-background-color, var(--_icon-button-fill))
+  );
   border-color: transparent;
-  color: var(--icon-button-foreground-color, var(--_icon-button-on-tone));
+  color: var(
+    --_icon-button-pressed-ink,
+    var(--icon-button-foreground-color, var(--_icon-button-on-tone))
+  );
 }
 :host(:not(:disabled)[emphasis="solid"]) [part="button"]:hover {
   background-color: var(
-    --icon-button-background-color-hover,
-    var(--icon-button-background-color, var(--_icon-button-fill-hover))
+    --_icon-button-pressed-fill,
+    var(
+      --icon-button-background-color-hover,
+      var(--icon-button-background-color, var(--_icon-button-fill-hover))
+    )
   );
-  color: var(--icon-button-foreground-color, var(--_icon-button-on-tone));
+  color: var(
+    --_icon-button-pressed-ink,
+    var(--icon-button-foreground-color, var(--_icon-button-on-tone))
+  );
 }
 
 /* Framed, for a control standing beside a field: the field paints itself, and a
@@ -197,41 +229,65 @@
  * on in either mode, where a fixed neutral is not. */
 :host([emphasis="outlined"]) [part="button"] {
   background-color: var(
-    --icon-button-background-color,
-    color-mix(in oklab, var(--_icon-button-tone) 6%, transparent)
+    --_icon-button-pressed-fill,
+    var(
+      --icon-button-background-color,
+      color-mix(in oklab, var(--_icon-button-tone) 6%, transparent)
+    )
   );
   border-color: var(--_icon-button-edge);
-  color: var(--icon-button-foreground-color, var(--_icon-button-tone));
+  color: var(
+    --_icon-button-pressed-ink,
+    var(--icon-button-foreground-color, var(--_icon-button-tone))
+  );
 }
 :host(:not(:disabled)[emphasis="outlined"]) [part="button"]:hover {
   background-color: var(
-    --icon-button-background-color-hover,
+    --_icon-button-pressed-fill,
     var(
-      --icon-button-background-color,
-      color-mix(in oklab, var(--_icon-button-tone) 12%, transparent)
+      --icon-button-background-color-hover,
+      var(
+        --icon-button-background-color,
+        color-mix(in oklab, var(--_icon-button-tone) 12%, transparent)
+      )
     )
   );
-  color: var(--icon-button-foreground-color, var(--_icon-button-tone));
+  color: var(
+    --_icon-button-pressed-ink,
+    var(--icon-button-foreground-color, var(--_icon-button-tone))
+  );
 }
 
 :host([emphasis="subtle"]) [part="button"] {
   background-color: var(
-    --icon-button-background-color,
-    color-mix(in oklab, var(--_icon-button-tone) 14%, transparent)
+    --_icon-button-pressed-fill,
+    var(
+      --icon-button-background-color,
+      color-mix(in oklab, var(--_icon-button-tone) 14%, transparent)
+    )
   );
   border-color: transparent;
-  color: var(--icon-button-foreground-color, var(--_icon-button-tone));
+  color: var(
+    --_icon-button-pressed-ink,
+    var(--icon-button-foreground-color, var(--_icon-button-tone))
+  );
 }
 
 :host(:not(:disabled)[emphasis="subtle"]) [part="button"]:hover {
   background-color: var(
-    --icon-button-background-color-hover,
+    --_icon-button-pressed-fill,
     var(
-      --icon-button-background-color,
-      color-mix(in oklab, var(--_icon-button-tone) 22%, transparent)
+      --icon-button-background-color-hover,
+      var(
+        --icon-button-background-color,
+        color-mix(in oklab, var(--_icon-button-tone) 22%, transparent)
+      )
     )
   );
-  color: var(--icon-button-foreground-color, var(--_icon-button-tone));
+  color: var(
+    --_icon-button-pressed-ink,
+    var(--icon-button-foreground-color, var(--_icon-button-tone))
+  );
 }
 
 /* `:host(:disabled)`, not `:host([disabled])`.

@@ -30,8 +30,10 @@ import { styles } from './icon-button-root.css.js'
  * @csspart live - The live region that says `pending-label` when the button becomes pending under focus. It is clipped out of view and still read.
  *
  * @cssproperty --icon-button-background-color - Fill behind the button, in every state.
+ * @cssproperty --icon-button-background-color-active - Fill behind the button while it is pressed. Without it, a press shows the fill of the state under it.
  * @cssproperty --icon-button-background-color-hover - Fill behind the button under the pointer. Without it, `--icon-button-background-color` also applies on hover.
  * @cssproperty --icon-button-foreground-color - Icon color.
+ * @cssproperty --icon-button-foreground-color-active - Icon color while the button is pressed. Without it, a press shows the color of the state under it.
  * @cssproperty --icon-button-radius - Corner radius of the control, which a group flattens through `--button-radius-start` and `--button-radius-end`.
  * @cssproperty --icon-button-shadow - Shadow of a raised icon button.
  * @cssproperty --icon-button-size - Edge length of the control.

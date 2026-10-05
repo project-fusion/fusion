@@ -425,3 +425,14 @@ describe('a read-only radio group', () => {
     expect(host.value).toBe('one')
   })
 })
+
+describe('a radio with its own indicator', () => {
+  /* Web Awesome's radio has a checked icon of its own. The dot was a
+     pseudo-element with nothing to put in its place. */
+  test('draws an indicator slot inside the circle', async () => {
+    const host = await group()
+    const radio = options(host)[0] as HTMLElement
+    const box = radio.shadowRoot?.querySelector('[part="box"]')
+    expect(box?.querySelector('slot')?.getAttribute('name')).toBe('indicator')
+  })
+})

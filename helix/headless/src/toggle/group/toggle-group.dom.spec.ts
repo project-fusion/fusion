@@ -360,6 +360,44 @@ describe('a group where several can be pressed', () => {
     expect(sent.getAll('format')).toEqual(['bold', 'underline'])
   })
 
+  test('an item value holding a comma round-trips through values and a press', async () => {
+    const group =
+      (await mount(`<helix-headless-toggle-group label="Cities" name="city" selection-mode="multiple">
+      <helix-headless-toggle value="Paris, TX">Paris</helix-headless-toggle>
+      <helix-headless-toggle value="Austin">Austin</helix-headless-toggle>
+    </helix-headless-toggle-group>`)) as Toolbar
+    group.values = ['Paris, TX']
+    await settle(group)
+    expect(items(group).map((item) => button(item).getAttribute('aria-pressed'))).toEqual([
+      'true',
+      'false',
+    ])
+    button(items(group)[1] as HTMLElement).click()
+    await settle(group)
+    expect(group.values).toEqual(['Paris, TX', 'Austin'])
+    expect((formValue(group) as unknown as FormData).getAll('city')).toEqual([
+      'Paris, TX',
+      'Austin',
+    ])
+  })
+
+  test('a page the browser brings back presses the items it saved', async () => {
+    const group = await toolbar()
+    const saved = new FormData()
+    saved.append('format', 'bold')
+    saved.append('format', 'underline')
+    ;(
+      group as unknown as { formStateRestoreCallback(state: FormData): void }
+    ).formStateRestoreCallback(saved)
+    await settle(group)
+    expect(group.values).toEqual(['bold', 'underline'])
+    expect(items(group).map((item) => button(item).getAttribute('aria-pressed'))).toEqual([
+      'true',
+      'false',
+      'true',
+    ])
+  })
+
   test('the arrow keys move without pressing', async () => {
     const group = await toolbar()
     group.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'End' }))

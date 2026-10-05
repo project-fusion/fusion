@@ -55,7 +55,7 @@
 [part="track"] {
   --_toggle-height: calc(var(--helix-size-control) - var(--helix-space-2xs) * 2);
   /* No track, so nothing to be concentric with. */
-  --_toggle-radius: var(--helix-radii-sm);
+  --_toggle-radius: var(--toggle-group-item-radius, var(--helix-radii-sm));
   /* And no groove either, which decides the thumb's color. */
   --_indicator-surface: var(--helix-color-surface-raised);
   display: inline-flex;
@@ -91,7 +91,10 @@
 :host([separation="outlined"]) [part="track"] {
   /* Concentric, which is the outer radius less everything between the two
      curves: the border and the padding. */
-  --_toggle-radius: calc(var(--helix-radii-sm) - var(--helix-border-thin));
+  --_toggle-radius: var(
+    --toggle-group-item-radius,
+    calc(var(--toggle-group-radius, var(--helix-radii-sm)) - var(--helix-border-thin))
+  );
   /* The border joins the padding in what the row has to give back. */
   --_toggle-height: calc(
     var(--helix-size-control) -
@@ -102,9 +105,9 @@
   );
   /* A groove, so the thumb is over it rather than on it. */
   --_indicator-surface: var(--helix-color-surface-overlay);
-  background-color: var(--helix-color-surface-sunken);
-  border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-sm);
+  background-color: var(--toggle-group-background-color, var(--helix-color-surface-sunken));
+  border: var(--helix-border-thin) solid var(--toggle-group-border-color, var(--helix-color-border));
+  border-radius: var(--toggle-group-radius, var(--helix-radii-sm));
   padding: var(--helix-space-2xs);
 }
 
@@ -127,7 +130,7 @@
   background-color: var(--toggle-group-indicator-color, var(--_indicator-surface));
   block-size: var(--indicator-block-size, 0);
   border-radius: var(--_toggle-radius, var(--helix-radii-sm));
-  box-shadow: var(--helix-shadow-sm);
+  box-shadow: var(--toggle-group-indicator-shadow, var(--helix-shadow-sm));
   inline-size: var(--indicator-inline-size, 0);
   inset-block-start: 0;
   inset-inline-start: 0;
@@ -175,7 +178,7 @@
 :host([selection-mode="multiple"]) ::slotted(helix-toggle:state(pressed)) {
   background-color: var(--toggle-group-indicator-color, var(--_indicator-surface));
   border-radius: var(--_toggle-radius, var(--helix-radii-sm));
-  box-shadow: var(--helix-shadow-sm);
+  box-shadow: var(--toggle-group-indicator-shadow, var(--helix-shadow-sm));
 }
 
 /* A column: the items stack at their own height and the track does not wrap. */

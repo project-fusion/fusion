@@ -27,7 +27,8 @@ import { styles } from './radio-root.css.js'
  * @cssproperty --radio-card-border-color - The border color of a card-shaped choice.
  * @cssproperty --radio-card-padding - The padding inside a card-shaped choice.
  * @cssproperty --radio-chip-size - The diameter of a chip.
- * @cssproperty --radio-mark-color - The color of the dot.
+ * @cssproperty --radio-indicator-size - The width and height of an icon slotted into `indicator`. Three quarters of the circle by default.
+ * @cssproperty --radio-mark-color - The color of the dot, or of an icon slotted into `indicator`.
  * @cssproperty --radio-size - The diameter of the circle.
  */
 @customElement('helix-radio')

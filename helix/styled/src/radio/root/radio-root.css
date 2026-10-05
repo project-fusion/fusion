@@ -89,6 +89,24 @@
   scale: 1;
 }
 
+/* A slotted indicator is the mark, so the dot goes and the icon scales in the
+   way the dot did, in the dot's ink. */
+:host(:state(has-indicator)) [part="box"]::after {
+  content: none;
+}
+
+slot[name="indicator"]::slotted(*) {
+  block-size: var(--radio-indicator-size, calc(var(--_radio-size) * 0.75));
+  color: var(--radio-mark-color, var(--helix-color-foreground));
+  inline-size: var(--radio-indicator-size, calc(var(--_radio-size) * 0.75));
+  scale: 0;
+  transition: scale var(--helix-duration-fast) var(--helix-easing-emphasized);
+}
+
+:host(:state(selected)) slot[name="indicator"]::slotted(*) {
+  scale: 1;
+}
+
 /* Offset, because the ring surrounds a circle whose own edge is not moving. */
 [part="item"]:focus-visible [part="box"] {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);

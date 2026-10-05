@@ -18,6 +18,13 @@ import '../../tooltip/index.js'
  * @status stable
  * @category actions
  * @documentation https://fusion.dev/helix/components/copy-button
+ *
+ * @cssproperty --copy-button-color - The icon's color at rest. A `tone` keeps its own.
+ * @cssproperty --copy-button-color-hover - The icon's color under the pointer. Without it, `--copy-button-color` also applies on hover.
+ * @cssproperty --copy-button-error-color - The cross's color after a copy that put nothing on the clipboard.
+ * @cssproperty --copy-button-icon-size - The width and height of the clipboard, check, and cross icons drawn by default.
+ * @cssproperty --copy-button-size - Edge length of the button. Without it, `--icon-button-size` applies.
+ * @cssproperty --copy-button-success-color - The check mark's color after a copy.
  */
 @customElement('helix-copy-button')
 export class HelixCopyButton extends MixinControlSurface(HelixHeadlessCopyButton) {
