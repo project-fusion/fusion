@@ -5,13 +5,19 @@
  * page. What is styled here is only the block between them, which is why there
  * is no ground color and no chrome: inheriting the page is the point.
  */
+/* **The height of the window under the bar**, with the block in its middle, so
+   a dead end is the one thing on the screen and the footer starts below it.
+   `svh`, the height with a phone's browser bars shown, so the block never ends
+   behind them. */
 .trouble {
   align-items: center;
   display: flex;
   flex-direction: column;
   gap: var(--helix-space-lg);
+  justify-content: center;
   margin-inline: auto;
   max-inline-size: 44rem;
+  min-block-size: calc(100svh - var(--helix-size-header));
   padding-block: var(--helix-space-3xl);
   padding-inline: var(--helix-space-lg);
   text-align: center;

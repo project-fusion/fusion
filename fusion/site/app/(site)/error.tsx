@@ -57,8 +57,15 @@ export default function SiteError({
         </Link>
       </div>
 
+      {/* `subtle`, so the link reads as the line it sits in until it is pointed
+          at, and keeps its underline, so it is still a link. Bare, it took the
+          browser's own link colors, which on a dark page are a lavender nothing
+          else here is. */}
       <p className={styles.troubleAside}>
-        Still stuck? <Link href="/contact">Tell us about it</Link>
+        Still stuck?{' '}
+        <Link data-link="subtle" href="/contact">
+          Tell us about it
+        </Link>
       </p>
     </div>
   )
