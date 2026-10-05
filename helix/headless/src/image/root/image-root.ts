@@ -1,4 +1,4 @@
-import { customElement, HelixElement } from '@fusion.dev/helix-core'
+import { customElement, DelayController, HelixElement } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
@@ -150,12 +150,8 @@ export class HelixHeadlessImage extends HelixElement {
   @state()
   private answered = ''
 
-  /** Whether the placeholder's wait for this `src` is over. */
-  @state()
-  private waited = false
-
-  /** The timer counting down the placeholder's wait. */
-  private wait: ReturnType<typeof setTimeout> | undefined
+  /** The placeholder's wait for this `src`, and whether it is over. */
+  private readonly wait = new DelayController(this)
 
   /**
    * Whether this picture's answer has been given, or is on its way.
@@ -314,21 +310,10 @@ export class HelixHeadlessImage extends HelixElement {
     }
   }
 
-  override disconnectedCallback(): void {
-    super.disconnectedCallback()
-    clearTimeout(this.wait)
-  }
-
   /* Client only, from `updated`, so a server serves the placeholder hidden
      while there is a wait and shown when there is none. */
   private startWait(): void {
-    clearTimeout(this.wait)
-    this.waited = false
-    if (this.placeholderDelay > 0) {
-      this.wait = setTimeout(() => {
-        this.waited = true
-      }, this.placeholderDelay)
-    }
+    this.wait.start(this.placeholderDelay > 0 ? this.placeholderDelay : undefined)
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
@@ -391,7 +376,7 @@ export class HelixHeadlessImage extends HelixElement {
       <span
         part="placeholder"
         aria-hidden="true"
-        ?hidden=${this.status !== 'loading' || (this.placeholderDelay > 0 && !this.waited)}
+        ?hidden=${this.status !== 'loading' || (this.placeholderDelay > 0 && !this.wait.elapsed)}
         ><slot name="placeholder"></slot
       ></span>
       <span

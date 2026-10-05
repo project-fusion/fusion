@@ -1,4 +1,4 @@
-import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
+import { customElement, DelayController, HelixElement, hostAria } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
@@ -105,12 +105,8 @@ export class HelixHeadlessAvatar extends HelixElement {
   @state()
   private broken = false
 
-  /** Whether `fallback-delay` has run out for the picture loading now. */
-  @state()
-  private waited = false
-
-  /** The timer counting down `fallback-delay`. */
-  private wait: ReturnType<typeof setTimeout> | undefined
+  /** The wait `fallback-delay` asks for, which has run out for the picture loading now or not. */
+  private readonly wait = new DelayController(this)
 
   private readonly handleError = (event: Event): void => {
     this.broken = true
@@ -182,24 +178,14 @@ export class HelixHeadlessAvatar extends HelixElement {
     }
   }
 
-  override disconnectedCallback(): void {
-    super.disconnectedCallback()
-    clearTimeout(this.wait)
-  }
-
   /* Client only, from `updated`, so a server serves the picture's place as it
      always did and the initials come after the wait. */
   private startWait(): void {
-    clearTimeout(this.wait)
-    this.waited = false
-    if (this.fallbackDelay !== undefined && this.src !== '') {
-      this.wait = setTimeout(
-        () => {
-          this.waited = true
-        },
-        Math.max(this.fallbackDelay, 0),
-      )
-    }
+    this.wait.start(
+      this.fallbackDelay !== undefined && this.src !== ''
+        ? Math.max(this.fallbackDelay, 0)
+        : undefined,
+    )
   }
 
   protected override updated(changed: PropertyValues): void {
@@ -223,7 +209,7 @@ export class HelixHeadlessAvatar extends HelixElement {
       /* The initials stand in while a slow picture loads, and the picture
          keeps loading, hidden, in the same element, so it is not fetched
          twice. */
-      const standIn = this.waited && this.status === 'loading'
+      const standIn = this.wait.elapsed && this.status === 'loading'
       return html`${standIn ? this.renderInitials() : nothing}<img
           part="image"
           src=${this.src}

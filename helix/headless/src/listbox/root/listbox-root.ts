@@ -2,6 +2,7 @@ import {
   AriaForwardController,
   countLabel,
   customElement,
+  DelayController,
   DisabledCascadeController,
   HelixFilterEvent,
   HelixFormElement,
@@ -956,8 +957,6 @@ export class HelixHeadlessListbox extends MixinCollection(
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
-    clearTimeout(this.filterTimer)
-    this.filterTimer = undefined
     this.removeEventListener('helix-select', this.handleSelection as EventListener)
     this.removeEventListener('keydown', this.handleKeydown)
     /* Its marks go with it. The registry is the document's and outlives this
@@ -1096,20 +1095,20 @@ export class HelixHeadlessListbox extends MixinCollection(
     // `input` is composed and would reach a consumer beside this element's.
     event.stopPropagation()
     const control = event.target as HTMLInputElement
-    clearTimeout(this.filterTimer)
+    this.filtering.cancel()
     if (this.filterDelay > 0) {
-      this.filterTimer = setTimeout(() => this.takeFilter(control), this.filterDelay)
+      this.filtering.start(this.filterDelay, () => this.takeFilter(control))
       return
     }
     this.takeFilter(control)
   }
 
   /** The filter waiting out `filterDelay`, if any. */
-  private filterTimer: ReturnType<typeof setTimeout> | undefined = undefined
+  private readonly filtering = new DelayController(this, { renders: false })
 
   /** Filters on what the field holds, and puts the field back where that was refused. */
   private takeFilter(control: HTMLInputElement): void {
-    this.filterTimer = undefined
+    this.filtering.cancel()
     this.requestFilter(control.value)
     if (control.value !== this.filter) {
       control.value = this.filter
@@ -1118,14 +1117,7 @@ export class HelixHeadlessListbox extends MixinCollection(
 
   /** Filters at once on a filter still waiting out `filterDelay`. */
   private flushFilter(): void {
-    if (this.filterTimer === undefined) {
-      return
-    }
-    clearTimeout(this.filterTimer)
-    const control = this.partNamed<HTMLInputElement>('search-field')
-    if (control) {
-      this.takeFilter(control)
-    }
+    this.filtering.flush()
   }
 
   /** Requests a new filter, and returns whether the request went through. */
@@ -1164,7 +1156,7 @@ export class HelixHeadlessListbox extends MixinCollection(
     if (event.key === 'Enter' || FIELD_MOVES.has(event.key)) {
       this.flushFilter()
     }
-    if (event.key === 'Escape' && (this.filter !== '' || this.filterTimer !== undefined)) {
+    if (event.key === 'Escape' && (this.filter !== '' || this.filtering.pending)) {
       /* Stopped and prevented whether or not the clearing stands. The reader
          pressed Escape at a filtered list, so the key was for this list either
          way, and letting it through to close the surface around it would be a
@@ -1172,8 +1164,7 @@ export class HelixHeadlessListbox extends MixinCollection(
          `filterDelay` is a filter too, and goes with it. */
       event.stopPropagation()
       event.preventDefault()
-      clearTimeout(this.filterTimer)
-      this.filterTimer = undefined
+      this.filtering.cancel()
       this.requestFilter('')
       const control = this.partNamed<HTMLInputElement>('search-field')
       if (control && control.value !== this.filter) {

@@ -1,13 +1,15 @@
 import {
   AriaForwardController,
   customElement,
+  drawStatus,
   elementById,
   HelixFallbackCommandEvent,
   HelixFormElement,
+  StatusController,
   supportsInvokers,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property, state } from 'lit/decorators.js'
+import { property } from 'lit/decorators.js'
 
 /**
  * @summary Triggers an action, submits a form, or navigates.
@@ -241,15 +243,10 @@ export class HelixHeadlessButton extends HelixFormElement {
   popup?: 'dialog' | 'grid' | 'listbox' | 'menu' | 'tree'
 
   /**
-   * Whether the status region is rendered: from the first time the button is
-   * pending, so a button that never waits carries no live region.
+   * The status region, rendered from the first time the button is pending, so
+   * a button that never waits carries no live region.
    */
-  @state()
-  private spoke = false
-
-  /** What the status region says. */
-  @state()
-  private said = ''
+  private readonly status = new StatusController(this)
 
   /**
    * Says `pendingLabel` when the button becomes pending under focus, and
@@ -263,21 +260,10 @@ export class HelixHeadlessButton extends HelixFormElement {
    */
   private sayPending(): void {
     const focused = (this.renderRoot as ShadowRoot | undefined)?.activeElement != null
-    if (!focused && this.said === '') {
+    if (!focused && this.status.said === '') {
       return
     }
-    const words = this.pending && focused ? this.pendingLabel : ''
-    if (!this.spoke) {
-      this.spoke = true
-    }
-    const fill = (): void => {
-      this.said = words
-    }
-    if (typeof requestAnimationFrame === 'function') {
-      requestAnimationFrame(fill)
-    } else {
-      fill()
-    }
+    this.status.say(this.pending && focused ? this.pendingLabel : '', { clear: false })
   }
 
   /**
@@ -285,7 +271,7 @@ export class HelixHeadlessButton extends HelixFormElement {
    * replaces the template, as `CopyButton` does.
    */
   protected renderLive(): TemplateResult | typeof nothing {
-    return this.spoke ? html`<span part="live" role="status">${this.said}</span>` : nothing
+    return drawStatus(this.status)
   }
 
   /** Moves focus to the inner control, so the host is never the focus target. */
