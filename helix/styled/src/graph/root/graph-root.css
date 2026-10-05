@@ -48,9 +48,9 @@
 }
 
 [part="panel"] {
-  background-color: var(--helix-color-surface);
+  background-color: var(--graph-panel-background-color, var(--helix-color-surface));
   border-inline-start: var(--helix-border-thin) solid var(--helix-color-border);
-  color: var(--helix-color-foreground);
+  color: var(--graph-panel-color, var(--helix-color-foreground));
   display: grid;
   /* A column the panel's width and no wider: the field's own width, which
      the font decides, grew it past the panel where a face set wide. */
@@ -417,11 +417,11 @@ slot[name="filter-icon"]::slotted(*) {
   box-sizing: border-box;
   cursor: pointer;
   display: flex;
-  font-size: var(--helix-text-sm);
+  font-size: var(--graph-note-text, var(--helix-text-sm));
   gap: var(--helix-space-sm);
   min-block-size: var(--helix-size-control-tight);
   padding-block: var(--helix-space-2xs);
-  padding-inline: var(--helix-space-xs);
+  padding-inline: var(--graph-note-padding-inline, var(--helix-space-xs));
   user-select: none;
 }
 
@@ -431,9 +431,12 @@ slot[name="filter-icon"]::slotted(*) {
    on the row it starts on. */
 [part~="note"]:hover,
 [part="list"]:focus-visible [part~="note-cursor"] {
-  --_graph-wash: light-dark(
-    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent),
-    color-mix(in oklab, var(--helix-color-foreground) 12%, transparent)
+  --_graph-wash: var(
+    --graph-note-hover-color,
+    light-dark(
+      color-mix(in oklab, var(--helix-color-foreground) 8%, transparent),
+      color-mix(in oklab, var(--helix-color-foreground) 12%, transparent)
+    )
   );
 
   background-image: linear-gradient(var(--_graph-wash), var(--_graph-wash));
@@ -452,7 +455,7 @@ slot[name="filter-icon"]::slotted(*) {
 }
 
 [part="note-relation"] {
-  color: var(--helix-color-foreground-muted);
+  color: var(--graph-note-relation-color, var(--helix-color-foreground-muted));
   flex: 1 1 0;
   font-size: var(--helix-text-xs);
   min-inline-size: 0;
@@ -465,11 +468,11 @@ slot[name="filter-icon"]::slotted(*) {
 /* A surface and not the accent, as a tree marks its selected row, and the
    name's weight, so the note the list is about reads as its heading. */
 [part~="note-selected"] {
-  background-color: var(--helix-color-surface-sunken);
+  background-color: var(--graph-note-selected-background-color, var(--helix-color-surface-sunken));
 }
 
 [part~="note-selected"] [part="note-name"] {
-  font-weight: var(--helix-weight-semibold);
+  font-weight: var(--graph-note-selected-weight, var(--helix-weight-semibold));
 }
 
 [part="header"],
