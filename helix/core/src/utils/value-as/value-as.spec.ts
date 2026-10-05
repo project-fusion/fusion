@@ -8,6 +8,7 @@ import {
   numberAsValue,
   secondsAsValue,
   timeAsValue,
+  utcDate,
   valueAsDate,
   valueAsMinutes,
   valueAsNumber,
@@ -46,6 +47,17 @@ describe('a date value', () => {
     expect(isDateValue('2026-13-01')).toBe(false)
     expect(isDateValue('2026-8-26')).toBe(false)
     expect(isDateValue('')).toBe(false)
+  })
+
+  /* `Date.UTC` reads years 0 to 99 as 1900 to 1999. A year segment offers
+     year 1 at Home, and a native date input takes it, so the parse does too. */
+  test('takes a year below 100 as written, and refuses year 0', () => {
+    expect(valueAsDate('0001-08-04')?.getUTCFullYear()).toBe(1)
+    expect(dateAsValue(valueAsDate('0001-08-04'))).toBe('0001-08-04')
+    expect(isDateValue('0099-02-29')).toBe(false)
+    expect(isDateValue('0096-02-29')).toBe(true)
+    expect(isDateValue('0000-01-01')).toBe(false)
+    expect(utcDate(1, 12, 1).toISOString()).toBe('0002-01-01T00:00:00.000Z')
   })
 
   test('is refused while it is still being typed', () => {

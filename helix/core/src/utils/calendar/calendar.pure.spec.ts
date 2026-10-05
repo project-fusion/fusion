@@ -23,6 +23,12 @@ describe('the calendar arithmetic', () => {
     expect(monthOf(day('2026-08-04'))).toBe('2026-08')
   })
 
+  test('a year below 100 stays that year as days and months are added', () => {
+    expect(monthOf(day('0001-08-04'))).toBe('0001-08')
+    expect(addDays(day('0001-08-31'), 1).toISOString().slice(0, 10)).toBe('0001-09-01')
+    expect(addMonths(day('0001-12-15'), 1).toISOString().slice(0, 10)).toBe('0002-01-15')
+  })
+
   test('today is the local date', () => {
     expect(localToday(new Date(2026, 7, 4, 23, 30))).toBe('2026-08-04')
   })

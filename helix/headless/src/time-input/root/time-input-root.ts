@@ -476,7 +476,7 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
     return this.mode === undefined ? undefined : this.held
   }
   /** What is wrong with the times, which the text input cannot say. */
-  protected override validate(): string {
+  protected override validate(): string | readonly [keyof ValidityStateFlags, string] {
     /* Checked here rather than left to the input, which is `text` and has no
        idea what a time is.
 
@@ -500,15 +500,23 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
        range with one end early and the other late says it is early. */
     const rules = { disableTimes: this.disableTimes, max: this.max, min: this.min }
     const faults = held.map((one) => timeFault(one, rules))
+    /* With the flag a native time input sets, as Time Picker reports them; a
+       time barred by name is `badInput`, there being no native flag for one. */
     if (faults.includes('rangeUnderflow')) {
-      return fillTemplate(this.rangeUnderflowMessage || 'Choose a time at or after {min}.', {
-        min: writeClock(this.min, clockLocale(this.locale, this.hourCycle), this.seconds),
-      })
+      return [
+        'rangeUnderflow',
+        fillTemplate(this.rangeUnderflowMessage || 'Choose a time at or after {min}.', {
+          min: writeClock(this.min, clockLocale(this.locale, this.hourCycle), this.seconds),
+        }),
+      ]
     }
     if (faults.includes('rangeOverflow')) {
-      return fillTemplate(this.rangeOverflowMessage || 'Choose a time at or before {max}.', {
-        max: writeClock(this.max, clockLocale(this.locale, this.hourCycle), this.seconds),
-      })
+      return [
+        'rangeOverflow',
+        fillTemplate(this.rangeOverflowMessage || 'Choose a time at or before {max}.', {
+          max: writeClock(this.max, clockLocale(this.locale, this.hourCycle), this.seconds),
+        }),
+      ]
     }
     if (faults.includes('unavailable')) {
       return this.unavailableMessage || 'Choose a time that is available.'

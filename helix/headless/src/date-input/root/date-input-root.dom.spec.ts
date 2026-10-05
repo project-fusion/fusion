@@ -852,6 +852,25 @@ describe('Enter in a date input', () => {
   })
 })
 
+describe('input date says which rule a date breaks', () => {
+  test('before min, past max and off the step, each with the flag a date input sets', async () => {
+    const host = (await field('min="2026-08-10" max="2026-08-20" step="2"')) as InputDate & {
+      internals: ElementInternals
+    }
+    await type(host, '2026-08-01')
+    expect(host.internals.validity.rangeUnderflow).toBe(true)
+    expect(host.internals.validity.badInput).toBeFalsy()
+    await type(host, '2026-08-30')
+    expect(host.internals.validity.rangeOverflow).toBe(true)
+    await type(host, '2026-08-11')
+    expect(host.internals.validity.stepMismatch).toBe(true)
+    await type(host, '2026-08-12')
+    expect(host.internals.validity.valid).toBe(true)
+    await type(host, '12 August')
+    expect(host.internals.validity.badInput).toBe(true)
+  })
+})
+
 describe('input date hands its calendar a rule, a drawing and the months', () => {
   test('a date isDateUnavailable refuses is barred when typed', async () => {
     const host = (await field()) as InputDate & {
@@ -939,7 +958,18 @@ describe('segmented', () => {
     expect(host.internals.validity.valid).toBe(true)
     await press(host, segments(host)[0] as HTMLElement, 'ArrowDown')
     expect(host.value).toBe('2026-07-01')
-    expect(host.internals.validity.badInput).toBe(true)
+    expect(host.internals.validity.rangeUnderflow).toBe(true)
+    expect(host.internals.validity.badInput).toBeFalsy()
+  })
+
+  test('Home on the year is year 1, a date the field takes and submits', async () => {
+    const host = (await field('segmented name="d" default-value="2026-08-04"')) as InputDate & {
+      internals: ElementInternals
+    }
+    await press(host, segments(host)[2] as HTMLElement, 'Home')
+    expect(host.value).toBe('0001-08-04')
+    expect(host.internals.validity.valid).toBe(true)
+    expect(formValue(host)).toBe('0001-08-04')
   })
 
   test('a range and a multiple keep the line of text, which writes several dates', async () => {
