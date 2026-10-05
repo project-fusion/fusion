@@ -13,13 +13,13 @@ import {
   MixinPickerEditing,
   MixinPickerField,
   MixinTokens,
-  writtenList,
 } from '@fusion.dev/helix-core'
 import { calendarBlank } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html } from 'lit/static-html.js'
+import { barredBy } from '../../date-picker/calendar.js'
 import '../../date-picker/index.js'
 import '../../tag/index.js'
 
@@ -104,10 +104,17 @@ const dates = (value: string): string[] =>
  * @csspart picker-grid - The grid of days.
  * @csspart picker-header - The month name and its controls.
  * @csspart picker-heading - The month and year being shown.
+ * @csspart picker-heading-button - The calendar's heading as a button that shows the months or the years, where `max-view` is set.
  * @csspart picker-month - One month, with its header and its grid.
  * @csspart picker-months - The row of months.
  * @csspart picker-next - The control that moves to the next month.
  * @csspart picker-next-mark - The icon on the next month control.
+ * @csspart picker-period - One month or one year, in the calendar's months and years views.
+ * @csspart picker-period-current - This month or this year, beside `picker-period`.
+ * @csspart picker-period-disabled - A month or a year wholly outside `min` and `max`, beside `picker-period`.
+ * @csspart picker-period-row - One row of three months or years.
+ * @csspart picker-period-selected - The month or the year on show, beside `picker-period`.
+ * @csspart picker-periods - The grid of months or years.
  * @csspart picker-previous - The control that moves to the previous month.
  * @csspart picker-previous-mark - The icon on the previous month control.
  * @csspart picker-week - One row of days.
@@ -183,6 +190,14 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
   dateStyle: 'full' | 'iso' | 'long' | 'medium' | 'short' = 'long'
 
   /**
+   * What each day in the calendar shows, in place of its number: a function
+   * given the date as `YYYY-MM-DD`. Handed to the calendar; see Date Picker's
+   * `dayContent`.
+   */
+  @property({ attribute: false })
+  dayContent?: ((date: string) => unknown) | undefined
+
+  /**
    * Dates that cannot be chosen, as `YYYY-MM-DD`, separated by commas or
    * spaces.
    */
@@ -207,6 +222,14 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
   firstDayOfWeek?: number
 
   /**
+   * A rule for which dates cannot be chosen: a function given the date as
+   * `YYYY-MM-DD` that returns `true` to bar it. The calendar offers such a date
+   * as unavailable, and a typed one is invalid, as with `disable-dates`.
+   */
+  @property({ attribute: false })
+  isDateUnavailable?: ((date: string) => boolean) | undefined
+
+  /**
    * The language tag for the names of months and days in the calendar.
    */
   @property()
@@ -217,6 +240,13 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
    */
   @property()
   max = ''
+
+  /**
+   * How far the calendar's heading steps back from the days: `month` or
+   * `year`. Handed to the calendar; see Date Picker's `max-view`.
+   */
+  @property({ attribute: 'max-view' })
+  maxView?: 'month' | 'year'
 
   /**
    * The earliest date that can be chosen, as `YYYY-MM-DD`.
@@ -305,10 +335,29 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
   }
 
   /**
+   * The name of the calendar's heading where it shows the months, with
+   * `{heading}` filled in.
+   */
+  @property({ attribute: 'month-view-label' })
+  monthViewLabel = '{heading}. Choose a month'
+
+  /**
    * The name of the calendar's control that moves to the next month.
    */
   @property({ attribute: 'next-label' })
   nextLabel = 'Next month'
+
+  /**
+   * The name of the calendar's control that moves forward a year.
+   */
+  @property({ attribute: 'next-year-label' })
+  nextYearLabel = 'Next year'
+
+  /**
+   * The name of the calendar's control that moves forward a page of years.
+   */
+  @property({ attribute: 'next-years-label' })
+  nextYearsLabel = 'Later years'
 
   /**
    * The text the field shows before a date is entered.
@@ -321,6 +370,18 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
    */
   @property({ attribute: 'previous-label' })
   previousLabel = 'Previous month'
+
+  /**
+   * The name of the calendar's control that moves back a year.
+   */
+  @property({ attribute: 'previous-year-label' })
+  previousYearLabel = 'Previous year'
+
+  /**
+   * The name of the calendar's control that moves back a page of years.
+   */
+  @property({ attribute: 'previous-years-label' })
+  previousYearsLabel = 'Earlier years'
 
   /**
    * The message shown when a range holds more than two dates.
@@ -577,25 +638,15 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
     /* What the calendar bars, a typed or seeded date is barred from too.
        Measured before this: a weekend typed into a field that disables
        weekends reported valid and was submitted. */
-    const days = writtenList(this.disableDays)
-    const listed = writtenList(this.disableDates)
-    if (
-      held.some(
-        (one) => listed.includes(one) || days.includes(String(asDate(one)?.getUTCDay() ?? '')),
-      )
-    ) {
+    const why = held.map((one) => {
+      const date = asDate(one)
+      return date ? barredBy(date, this) : null
+    })
+    if (why.includes('listed')) {
       return this.unavailableMessage || 'Choose a date that is available.'
     }
-    const step = Math.max(1, Math.floor(this.step) || 1)
-    if (step > 1) {
-      const base = asDate(this.min)?.getTime() ?? 0
-      const off = held.some((one) => {
-        const at = asDate(one)?.getTime()
-        return at !== undefined && Math.round((at - base) / 86_400_000) % step !== 0
-      })
-      if (off) {
-        return this.stepMismatchMessage || 'Choose one of the dates the calendar offers.'
-      }
+    if (why.includes('step')) {
+      return this.stepMismatchMessage || 'Choose one of the dates the calendar offers.'
     }
     if (this.mode === 'range' && held.length > 2) {
       return this.rangeLengthMessage || 'A range is two dates.'
@@ -608,6 +659,13 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
    */
   @property({ attribute: 'unavailable-message' })
   unavailableMessage?: string
+
+  /**
+   * The name of the calendar's heading where it shows a page of years, with
+   * `{heading}` filled in.
+   */
+  @property({ attribute: 'year-view-label' })
+  yearViewLabel = '{heading}. Choose a year'
 
   /**
    * The calendar the field opens, behind a seam the styled tier can move.
@@ -625,9 +683,12 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
         cell-range-middle: picker-cell-range-middle, cell-range-start: picker-cell-range-start,
         day: picker-day, day-disabled: picker-day-disabled, day-outside: picker-day-outside,
         day-selected: picker-day-selected, day-today: picker-day-today, grid: picker-grid,
-        header: picker-header, heading: picker-heading, month: picker-month, months: picker-months,
-        next: picker-next,
-        next-mark: picker-next-mark, previous: picker-previous, previous-mark: picker-previous-mark,
+        header: picker-header, heading: picker-heading, heading-button: picker-heading-button,
+        month: picker-month, months: picker-months, next: picker-next,
+        next-mark: picker-next-mark, period: picker-period, period-current: picker-period-current,
+        period-disabled: picker-period-disabled, period-row: picker-period-row,
+        period-selected: picker-period-selected, periods: picker-periods,
+        previous: picker-previous, previous-mark: picker-previous-mark,
         week: picker-week, weekday: picker-weekday"
       ?invalid=${this.resolvedFeedback !== ''}
       mode=${this.mode ?? nothing}
@@ -639,10 +700,19 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
       label=${this.calendarLabel}
       locale=${this.locale || nothing}
       max=${this.max || nothing}
+      max-view=${this.maxView ?? nothing}
       min=${this.min || nothing}
+      month-view-label=${this.monthViewLabel}
       next-label=${this.nextLabel}
+      next-year-label=${this.nextYearLabel}
+      next-years-label=${this.nextYearsLabel}
       previous-label=${this.previousLabel}
+      previous-year-label=${this.previousYearLabel}
+      previous-years-label=${this.previousYearsLabel}
       step=${this.step}
+      year-view-label=${this.yearViewLabel}
+      .dayContent=${this.dayContent}
+      .isDateUnavailable=${this.isDateUnavailable}
       @helix-before-change=${this.handleCalendarChange}
       @change=${this.stopInner}
       @input=${this.stopInner}

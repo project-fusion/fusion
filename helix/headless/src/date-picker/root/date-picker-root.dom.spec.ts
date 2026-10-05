@@ -786,3 +786,138 @@ if (hasLayout()) {
     })
   })
 }
+
+describe('a rule and a drawing for each day', () => {
+  /* React Aria takes isDateUnavailable and cell children; Helix took lists of
+     dates and weekdays and drew the number alone. */
+  test('isDateUnavailable bars the dates it refuses, in the grid and the verdict', async () => {
+    const cal = (await calendar('default-month="2026-08"')) as DatePicker & {
+      isDateUnavailable?: (date: string) => boolean
+      updateComplete: Promise<unknown>
+      internals: ElementInternals
+    }
+    cal.isDateUnavailable = (date) => date.endsWith('-13')
+    await cal.updateComplete
+    const thirteenth = days(cal).find((day) =>
+      day.getAttribute('aria-label')?.includes('August 13'),
+    )
+    expect(thirteenth?.getAttribute('aria-disabled')).toBe('true')
+    cal.value = '2026-08-13'
+    await cal.updateComplete
+    expect(cal.internals.validity.badInput).toBe(true)
+  })
+
+  test('dayContent draws what each day shows, and the cell is still named by its date', async () => {
+    const cal = (await calendar('default-month="2026-08"')) as DatePicker & {
+      dayContent?: (date: string) => unknown
+      updateComplete: Promise<unknown>
+    }
+    cal.dayContent = (date) => `${Number(date.slice(8))}·$`
+    await cal.updateComplete
+    const fourth = days(cal).find((day) => day.getAttribute('aria-label')?.includes('August 4'))
+    expect(fourth?.querySelector('[part~="day"]')?.textContent?.trim()).toBe('4·$')
+  })
+})
+
+describe('the months and the years', () => {
+  /* A birth date forty years back was four hundred and eighty presses of
+     Previous; Zag's picker steps back to the months and the years. */
+  type Viewing = DatePicker & { updateComplete: Promise<unknown>; view: string }
+  const root = (cal: DatePicker): ShadowRoot =>
+    (cal as unknown as { renderRoot: ShadowRoot }).renderRoot
+  const periods = (cal: DatePicker): HTMLElement[] => [
+    ...root(cal).querySelectorAll<HTMLElement>('[part~="period"]'),
+  ]
+  const key = async (cal: Viewing, name: string): Promise<void> => {
+    root(cal)
+      .querySelector('[part="periods"]')
+      ?.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          bubbles: true,
+          cancelable: true,
+          composed: true,
+          key: name,
+        }),
+      )
+    await cal.updateComplete
+  }
+
+  test('the heading is text until max-view asks for more', async () => {
+    const plain = await calendar()
+    expect(root(plain).querySelector('[part="heading-button"]')).toBeNull()
+    const stepping = await calendar('default-month="2026-08" max-view="year"')
+    expect(
+      root(stepping).querySelector('[part="heading-button"]')?.getAttribute('aria-label'),
+    ).toBe('August 2026. Choose a month')
+  })
+
+  test('the heading shows the months, and a month shows its days', async () => {
+    const cal = (await calendar('default-month="2026-08" max-view="month"')) as Viewing
+    const moved: string[] = []
+    cal.addEventListener('helix-navigate', (event) => {
+      moved.push((event as CustomEvent<{ value: string }>).detail.value)
+    })
+    root(cal).querySelector<HTMLElement>('[part="heading-button"]')?.click()
+    await cal.updateComplete
+    expect(cal.view).toBe('month')
+    expect(periods(cal)).toHaveLength(12)
+    expect(periods(cal).find((one) => one.getAttribute('tabindex') === '0')?.textContent).toBe(
+      'Aug',
+    )
+    expect(root(cal).querySelector('[part="heading-button"]')).toBeNull()
+    periods(cal)[2]?.click()
+    await cal.updateComplete
+    expect(cal.view).toBe('day')
+    expect(cal.month).toBe('2026-03')
+    expect(moved).toEqual(['2026-03'])
+  })
+
+  test('the keys move through the months and into the next year, and Escape goes back', async () => {
+    const cal = (await calendar('default-month="2026-11" view="month"')) as Viewing
+    await key(cal, 'ArrowDown')
+    const stop = (): string | undefined =>
+      periods(cal)
+        .find((one) => one.getAttribute('tabindex') === '0')
+        ?.getAttribute('aria-label') ?? undefined
+    expect(stop()).toBe('Feb 2027')
+    await key(cal, 'Home')
+    expect(stop()).toBe('Jan 2027')
+    let escaped = 0
+    document.addEventListener(
+      'keydown',
+      () => {
+        escaped += 1
+      },
+      { once: true },
+    )
+    await key(cal, 'Escape')
+    expect(cal.view).toBe('day')
+    expect(escaped).toBe(0)
+  })
+
+  test('the years show a page of twelve, and a year shows its months', async () => {
+    const cal = (await calendar('default-month="2026-08" max-view="year" view="month"')) as Viewing
+    root(cal).querySelector<HTMLElement>('[part="heading-button"]')?.click()
+    await cal.updateComplete
+    expect(cal.view).toBe('year')
+    expect(periods(cal).map((one) => one.textContent)).toEqual(
+      Array.from({ length: 12 }, (_, at) => String(2016 + at)),
+    )
+    root(cal).querySelector<HTMLElement>('[part="previous"]')?.click()
+    await cal.updateComplete
+    expect(periods(cal)[0]?.textContent).toBe('2004')
+    periods(cal)[0]?.click()
+    await cal.updateComplete
+    expect(cal.view).toBe('month')
+    expect(root(cal).querySelector('[part="periods"]')?.getAttribute('aria-label')).toBe('2004')
+  })
+
+  test('a month outside the bounds is offered as unavailable and refuses a press', async () => {
+    const cal = (await calendar('default-month="2026-08" min="2026-04-10" view="month"')) as Viewing
+    expect(periods(cal)[2]?.getAttribute('aria-disabled')).toBe('true')
+    expect(periods(cal)[3]?.hasAttribute('aria-disabled')).toBe(false)
+    periods(cal)[2]?.click()
+    await cal.updateComplete
+    expect(cal.view).toBe('month')
+  })
+})
