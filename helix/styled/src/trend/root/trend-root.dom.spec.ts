@@ -25,7 +25,7 @@ describe('trend', () => {
   test('draws the arrow through the shared glyph sheet, which arrives with this one', async () => {
     // The arrow is a named import rather than a `<helix-icon>`, so it is sized
     // by the `[data-glyph]` rule and that rule has to be adopted here.
-    const trend = await mount('<helix-trend direction="up" good="up">12%</helix-trend>')
+    const trend = await mount('<helix-trend movement="up" good="up">12%</helix-trend>')
     expect(part(trend, 'icon')?.hasAttribute('data-glyph')).toBe(true)
     expect(rule('[data-glyph]')).toContain('block-size: var(--icon-size, var(--helix-size-icon))')
     expect(rule('[part="icon"]')).toContain('--icon-size: var(--trend-icon-size, 1em)')
@@ -40,22 +40,17 @@ describe('trend', () => {
     expect(sheet()).toContain('color: var(--trend-color, var(--_trend-color))')
   })
 
-  test('the judgment is four cases and no arithmetic', () => {
-    // CSS has no exclusive-or, so the pair is written out. Neutral matches
-    // none of them and stays gray, as does any trend with no `good` set.
-    expect(sheet()).toContain(
-      ':host([direction="up"][good="up"]),\n:host([direction="down"][good="down"]) {',
-    )
-    expect(rule(':host([direction="down"][good="down"])')).toContain(
+  /* Four attribute pairs named `direction`, so a trend written with
+     `movement` stayed gray. The base tier's states say the judgment whichever
+     word moved it. */
+  test("the judgment is read from the base tier's states", () => {
+    expect(rule(':host(:state(better))')).toContain(
       '--_trend-color: var(--trend-better-color, var(--helix-color-success))',
     )
-    expect(sheet()).toContain(
-      ':host([direction="up"][good="down"]),\n:host([direction="down"][good="up"]) {',
-    )
-    expect(rule(':host([direction="down"][good="up"])')).toContain(
+    expect(rule(':host(:state(worse))')).toContain(
       '--_trend-color: var(--trend-worse-color, var(--helix-color-danger))',
     )
-    expect(sheet()).not.toContain('[direction="neutral"]')
+    expect(sheet()).not.toContain('[direction=')
   })
 
   test('the direction word is out of sight and still in the tree', () => {
@@ -77,9 +72,9 @@ describe('trend', () => {
 
 describe('trend hooks', () => {
   test('each judgment has a hook that falls back to its status color', () => {
-    expect(
-      rule(':host([direction="up"][good="up"]),\n:host([direction="down"][good="down"])'),
-    ).toContain('--_trend-color: var(--trend-better-color, var(--helix-color-success))')
+    expect(rule(':host(:state(better))')).toContain(
+      '--_trend-color: var(--trend-better-color, var(--helix-color-success))',
+    )
     expect(sheet()).toContain('--_trend-color: var(--trend-worse-color, var(--helix-color-danger))')
     expect(sheet()).toContain(
       '--_trend-color: var(--trend-neutral-color, var(--helix-color-foreground-muted))',
@@ -91,7 +86,7 @@ describe('trend hooks', () => {
     expect(rule('slot[name="label"]')).toContain(
       'color: var(--trend-label-color, var(--helix-color-foreground-muted))',
     )
-    expect(rule('slot[name="icon"]::slotted(*)')).toContain(
+    expect(rule('slot[name$="icon"]::slotted(*)')).toContain(
       'block-size: var(--trend-icon-size, 1em)',
     )
   })
