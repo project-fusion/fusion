@@ -2,6 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessCarousel } from '@fusion.dev/helix-headless/carousel'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
+import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './carousel-root.css.js'
 
 /**
@@ -141,7 +142,7 @@ export class HelixCarousel extends HelixHeadlessCarousel {
   @property({ attribute: 'indicator-placement', reflect: true })
   indicatorPlacement?: 'start' | 'end' | 'top' | 'bottom' | 'overlay'
 
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [liveStyles, styles]
 }
 
 declare global {

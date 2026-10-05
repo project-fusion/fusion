@@ -114,6 +114,30 @@ describe('carousel', () => {
     expect(looping.index).toBe(2)
   })
 
+  /* The APG's live region: a move the reader makes is heard, and a carousel
+     rotating on its own is not read out every few seconds. */
+  test('says the slide a move lands on, politely, and nothing while it rotates', async () => {
+    const cal = await carousel()
+    const live = part(cal, 'live') as HTMLElement
+    expect(live.getAttribute('aria-live')).toBe('polite')
+    expect(live.textContent).toBe('')
+    ;(part(cal, 'next') as HTMLElement).click()
+    await cal.updateComplete
+    expect(live.textContent).toBe('2 of 3')
+
+    const rotating = await carousel('autoplay')
+    expect(part(rotating, 'live')?.getAttribute('aria-live')).toBe('off')
+  })
+
+  /* Without `loop` the timer clamped at the last slide and went on firing at
+     nothing, while the control still said rotation was running. */
+  test('rotation goes round from the last slide to the first, without `loop`', async () => {
+    const cal = await carousel('autoplay interval="20" default-index="2"')
+    await new Promise((done) => setTimeout(done, 60))
+    await cal.updateComplete
+    expect(cal.index).not.toBe(2)
+  })
+
   test('no rotation control unless it rotates', async () => {
     expect(part(await carousel(), 'rotation')).toBeNull()
     expect(part(await carousel('autoplay'), 'rotation')).not.toBeNull()
@@ -572,6 +596,26 @@ describe('the arrows on the indicators', () => {
     expect(host.index).toBe(2)
   })
 
+  test('Home and End go to the first and the last', async () => {
+    const host = await carousel('default-index="1"')
+    await press(host, 'End')
+    expect(host.index).toBe(2)
+    await press(host, 'Home')
+    expect(host.index).toBe(0)
+  })
+
+  /* The run of a vertical carousel is read up and down. Only the inline pair
+     was answered, so Down did nothing and Right moved the slide. */
+  test('are Up and Down on a vertical carousel', async () => {
+    const host = await carousel('orientation="vertical"')
+    await press(host, 'ArrowDown')
+    expect(host.index).toBe(1)
+    await press(host, 'ArrowRight')
+    expect(host.index).toBe(1)
+    await press(host, 'ArrowUp')
+    expect(host.index).toBe(0)
+  })
+
   /* The first dot is on the right of a right-to-left page, so the right arrow
      pointed away from the slide it moved to. */
   test('which on a right-to-left page is the left arrow', async () => {
@@ -738,6 +782,28 @@ describe('carousel across several slides at once', () => {
     await host.updateComplete
     expect(host.positions).toBe(2)
     expect(host.index).toBe(1)
+  })
+
+  /* Nobody asked for that move, so it is no request: it went out as a
+     cancelable `helix-select`, and refusing it left the index past the last
+     place and asked again on every update. */
+  test('and the correction is written, with no request anybody could refuse', async () => {
+    const host = (await mount(`<helix-headless-carousel label="Reel">
+      <div>1</div><div>2</div><div>3</div>
+    </helix-headless-carousel>`)) as Carousel
+    host.index = 2
+    await host.updateComplete
+    let asked = 0
+    host.addEventListener('helix-select', (event) => {
+      asked += 1
+      event.preventDefault()
+    })
+    host.lastElementChild?.remove()
+    await new Promise((done) => setTimeout(done, 0))
+    await host.updateComplete
+    await host.updateComplete
+    expect(host.index).toBe(1)
+    expect(asked).toBe(0)
   })
 })
 
