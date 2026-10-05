@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { formValue, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -110,5 +110,65 @@ describe('a slider with two thumbs', () => {
   test('the readout says a span, because the value is one', async () => {
     const host = await slider('range default-value="20,70" show-value')
     expect(part(host, 'output')?.textContent?.trim()).toBe('20 to 70')
+  })
+})
+
+describe('a range nobody has touched', () => {
+  /* It was seeded with the midpoint, drew its thumbs at the ends, and submitted
+     `sr=50`, a single number for a control that holds a pair. */
+  test('holds and submits the whole span as a pair', async () => {
+    const host = await slider('range name="sr" min="10" max="90"')
+    expect(host.value).toBe('10,90')
+    expect(formValue(host)).toBe('10,90')
+  })
+
+  test('and a reset returns it there', async () => {
+    const host = (await slider('range min="10" max="90"')) as Slider & {
+      formResetCallback(): void
+    }
+    await move(host, 'start', '40')
+    host.formResetCallback()
+    await host.updateComplete
+    expect(host.value).toBe('10,90')
+  })
+})
+
+describe('a value the slider cannot show', () => {
+  /* The thumb showed the clamped number and the form submitted the written
+     one, 150 on a slider that stops at 100. */
+  test('is clamped into the bounds', async () => {
+    const host = await slider('name="s" max="100"')
+    host.value = '150'
+    await host.updateComplete
+    expect(host.value).toBe('100')
+    expect(formValue(host)).toBe('100')
+  })
+
+  test('is snapped onto the step', async () => {
+    const host = await slider('step="10"')
+    host.value = '33'
+    await host.updateComplete
+    expect(host.value).toBe('30')
+  })
+
+  test('follows a bound that moves under it', async () => {
+    const host = (await slider('default-value="80"')) as Slider & { max: number }
+    host.max = 50
+    await host.updateComplete
+    expect(host.value).toBe('50')
+  })
+
+  test('and a range keeps its two ends in order and in bounds', async () => {
+    const host = await slider('range max="100"')
+    host.value = '120,-5'
+    await host.updateComplete
+    expect(host.value).toBe('0,100')
+  })
+})
+
+describe('what a screen reader says for the value', () => {
+  test('carries the words a consumer wrote for it', async () => {
+    const host = await slider('default-value="40" value-text="{value} degrees"')
+    expect(thumbs(host)[0]?.getAttribute('aria-valuetext')).toBe('40 degrees')
   })
 })
