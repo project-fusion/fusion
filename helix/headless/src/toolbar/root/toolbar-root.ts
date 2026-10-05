@@ -1,4 +1,10 @@
-import { customElement, HelixElement, inlineStep, keyClaimed } from '@fusion.dev/helix-core'
+import {
+  AriaForwardController,
+  customElement,
+  HelixElement,
+  inlineStep,
+  keyClaimed,
+} from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -15,6 +21,53 @@ const KEYS = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home',
 const ownsTabStop = (node: HTMLElement): node is HTMLElement & { focusable: boolean } =>
   'focusable' in node
 
+/** Elements the browser focuses with no help. */
+const NATIVE =
+  'a[href], button, input, select, textarea, [tabindex], [contenteditable=""], [contenteditable="true"]'
+
+/**
+ * The same, inside a child's shadow root, less what is out of the tab order.
+ * A menu row renders `tabindex="-1"`, and a menu is reached at its trigger.
+ */
+const TABBABLE = NATIVE.replace('[tabindex]', '[tabindex]:not([tabindex="-1"])')
+
+/**
+ * Whether an element takes focus itself: natively, by owning a tab stop, or
+ * through a shadow root that holds something focusable.
+ *
+ * Disabled and hidden elements do not count, and neither does an element that
+ * only holds focusable children in its light DOM. A divider takes none, and a
+ * menu's host passes focus to nothing: its trigger is the control.
+ */
+const takesFocus = (node: Element): boolean => {
+  if (
+    !(node instanceof HTMLElement) ||
+    node.hasAttribute('disabled') ||
+    node.getAttribute('aria-hidden') === 'true'
+  ) {
+    return false
+  }
+  return (
+    node.matches(NATIVE) ||
+    ownsTabStop(node) ||
+    node.shadowRoot?.delegatesFocus === true ||
+    node.shadowRoot?.querySelector(TABBABLE) != null
+  )
+}
+
+/** What the toolbar moves to for one of its children. */
+interface Control {
+  /** The child itself, which is what the toolbar holds. */
+  child: HTMLElement
+  /**
+   * The elements inside the child that take focus. One for a control or for a
+   * wrapper such as a menu around its trigger, and more than one for a nested
+   * composite such as a toggle group, which keeps its own tab stop and its own
+   * arrow keys across the toolbar's axis.
+   */
+  stops: HTMLElement[]
+}
+
 /**
  * @summary A group of controls that share one tab stop.
  *
@@ -24,7 +77,12 @@ const ownsTabStop = (node: HTMLElement): node is HTMLElement & { focusable: bool
  *
  * The toolbar is one tab stop, and the arrow keys move between its controls, so
  * three toolbars take three presses of Tab to pass. Any element the browser can
- * focus counts as a control, including your own elements.
+ * focus counts as a control, including your own elements. A child that takes no
+ * focus, such as a divider, is skipped. A menu is reached at its trigger.
+ *
+ * A nested composite, such as a toggle group, is one stop on the toolbar's
+ * axis: the toolbar's arrows move past it, and the arrows across the toolbar
+ * move inside it. It keeps the tab stop it manages for itself.
  *
  * @since 0.1.0
  * @status stable
@@ -40,9 +98,26 @@ const ownsTabStop = (node: HTMLElement): node is HTMLElement & { focusable: bool
 export class HelixHeadlessToolbar extends HelixElement {
   /**
    * The toolbar's name, read by screen readers.
+   *
+   * An `aria-label` or `aria-labelledby` on the host names the toolbar too,
+   * and wins over this.
    */
   @property()
   label = 'Toolbar'
+
+  /** Carries a host `aria-label` and `aria-labelledby` to the toolbar. */
+  protected readonly aria = new AriaForwardController(this, {
+    label: true,
+    target: () => this.partNamed('toolbar'),
+  })
+
+  /**
+   * Whether the stop has been written onto controls this package does not
+   * know, which happens on the first focus. From then on, every move of the
+   * stop has to write them too, or the one at `0` can be removed or disabled
+   * and leave every other one at `-1`.
+   */
+  private wroteForeign = false
 
   /**
    * The direction the arrow keys move focus in.
@@ -53,25 +128,56 @@ export class HelixHeadlessToolbar extends HelixElement {
   private watcher: MutationObserver | undefined
 
   /**
-   * Children that can take the tab stop, in document order.
+   * The children that take part in the toolbar, in document order, each with
+   * the elements in it that take focus.
    *
-   * Every child that is not `disabled` and not `aria-hidden`, which is
-   * deliberately a test on the element rather than a list of tag names: a
-   * toolbar holds anything, including elements this package has never heard of.
-   * Client only, there being no tree to walk on the server.
-   *
-   * **It does not ask a child whether it is focusable.** Reading a `focusable`
-   * property is what `setTabStop` does when moving the stop, not what this does
-   * when choosing the set, so an element that is neither disabled nor hidden and
-   * still cannot take focus is counted here and skipped there.
+   * A test on the element rather than a list of tag names: a toolbar holds
+   * anything, including elements this package has never heard of. A child
+   * that takes no focus and holds nothing that does is skipped. Client only,
+   * there being no tree to walk on the server.
    */
-  private get controls(): HTMLElement[] {
-    return [...this.children].filter((child): child is HTMLElement => {
-      if (!(child instanceof HTMLElement)) {
-        return false
+  private get controls(): Control[] {
+    const controls: Control[] = []
+    for (const child of this.children) {
+      if (
+        !(child instanceof HTMLElement) ||
+        child.hasAttribute('disabled') ||
+        child.getAttribute('aria-hidden') === 'true'
+      ) {
+        continue
       }
-      return !child.hasAttribute('disabled') && child.getAttribute('aria-hidden') !== 'true'
-    })
+      const stops = takesFocus(child)
+        ? [child]
+        : [...child.querySelectorAll<HTMLElement>('*')].filter(takesFocus)
+      if (stops.length > 0) {
+        controls.push({ child, stops })
+      }
+    }
+    return controls
+  }
+
+  /**
+   * Where focus lands on arriving at a control. A nested composite is entered
+   * at the stop it holds, which for a toggle group is the chosen toggle.
+   */
+  private entry(control: Control): HTMLElement | undefined {
+    const { stops } = control
+    if (stops.length === 1) {
+      return stops[0]
+    }
+    return (
+      stops.find(
+        (stop) =>
+          (ownsTabStop(stop) && stop.focusable) ||
+          (stop as HTMLElement & { selected?: boolean }).selected === true,
+      ) ?? stops[0]
+    )
+  }
+
+  /** The control a press or a focus came from, by its path. */
+  private origin(event: Event): Control | undefined {
+    const path = event.composedPath()
+    return this.controls.find((control) => control.stops.some((stop) => path.includes(stop)))
   }
 
   /**
@@ -85,13 +191,21 @@ export class HelixHeadlessToolbar extends HelixElement {
    * `tabindex` stays as the fallback, because a toolbar has to hold controls
    * this package has never heard of.
    */
-  private setTabStop(active: HTMLElement | undefined, foreign = true): void {
+  private setTabStop(active: Control | undefined, foreign = true): void {
+    if (foreign) {
+      this.wroteForeign = true
+    }
     for (const control of this.controls) {
-      const stop = control === active
-      if (ownsTabStop(control)) {
-        control.focusable = stop
-      } else if (foreign) {
-        control.tabIndex = stop ? 0 : -1
+      /* A nested composite keeps its own stop, which is its business. */
+      if (control.stops.length !== 1) {
+        continue
+      }
+      const element = control.stops[0] as HTMLElement
+      const stop = control.child === active?.child
+      if (ownsTabStop(element)) {
+        element.focusable = stop
+      } else if (foreign || this.wroteForeign) {
+        element.tabIndex = stop ? 0 : -1
       }
     }
   }
@@ -104,8 +218,8 @@ export class HelixHeadlessToolbar extends HelixElement {
    * write the very attribute this exists to avoid.
    */
   private async claimTabStop(): Promise<void> {
-    const pending = [...new Set(this.controls.map((control) => control.localName))].filter((name) =>
-      name.includes('-'),
+    const pending = [...new Set([...this.children].map((child) => child.localName))].filter(
+      (name) => name.includes('-'),
     )
     await Promise.all(pending.map((name) => customElements.whenDefined(name)))
     // Foreign controls are left alone until focus arrives. Writing `tabindex`
@@ -117,7 +231,7 @@ export class HelixHeadlessToolbar extends HelixElement {
   }
 
   private readonly handleFocusIn = (event: FocusEvent): void => {
-    const control = this.controls.find((entry) => entry.contains(event.target as Node))
+    const control = this.origin(event)
     if (control) {
       this.setTabStop(control)
     }
@@ -131,14 +245,19 @@ export class HelixHeadlessToolbar extends HelixElement {
    * already at `-1`, leaving a toolbar the keyboard cannot reach at all. A Save
    * button disabling itself once the form is clean is enough to do it.
    *
-   * `foreign` stays false, the same as the first claim: a control this package
-   * has never heard of that was never given `tabindex="-1"` is still in the
-   * document's own tab order, so it is never the one that gets stranded.
+   * `foreign` stays false, the same as the first claim, until a focus has
+   * written `tabindex="-1"` onto foreign controls. From then on `setTabStop`
+   * writes them as well, so removing or disabling the native button that held
+   * the stop hands it to the first one left.
    */
   private readonly restoreTabStop = (): void => {
     const controls = this.controls
-    const held = controls.some((control) =>
-      ownsTabStop(control) ? control.focusable : control.tabIndex === 0,
+    const held = controls.some(
+      (control) =>
+        control.stops.length !== 1 ||
+        (ownsTabStop(control.stops[0] as HTMLElement)
+          ? (control.stops[0] as HTMLElement & { focusable: boolean }).focusable
+          : (control.stops[0] as HTMLElement).tabIndex === 0),
     )
     if (controls.length > 0 && !held) {
       this.setTabStop(controls[0], false)
@@ -155,6 +274,25 @@ export class HelixHeadlessToolbar extends HelixElement {
     return this.orientation ?? 'horizontal'
   }
 
+  /**
+   * The toolbar's own keys, from inside a nested composite.
+   *
+   * In capture, ahead of the composite, which answers every arrow itself and
+   * would otherwise hold the reader inside it. Only the keys along the
+   * toolbar's axis and Home and End are taken, so the arrows across it still
+   * move inside the composite.
+   */
+  private readonly handleCompositeKeydown = (event: KeyboardEvent): void => {
+    const control = this.origin(event)
+    if (!control || control.stops.length === 1) {
+      return
+    }
+    this.handleKeydown(event)
+    if (event.defaultPrevented) {
+      event.stopPropagation()
+    }
+  }
+
   private readonly handleKeydown = (event: KeyboardEvent): void => {
     if (!KEYS.has(event.key) || keyClaimed(event)) {
       return
@@ -166,7 +304,8 @@ export class HelixHeadlessToolbar extends HelixElement {
     const back = this.axis === 'horizontal' ? along === -1 : event.key === 'ArrowUp'
 
     const controls = this.controls
-    const current = controls.findIndex((entry) => entry.contains(event.target as Node))
+    const origin = this.origin(event)
+    const current = origin ? controls.findIndex((control) => control.child === origin.child) : -1
     if (current === -1) {
       return
     }
@@ -188,11 +327,17 @@ export class HelixHeadlessToolbar extends HelixElement {
     event.preventDefault()
     const target = controls[next]
     this.setTabStop(target)
-    target?.focus()
+    const element = target ? this.entry(target) : undefined
+    if (element && 'focusItem' in element && typeof element.focusItem === 'function') {
+      element.focusItem()
+    } else {
+      element?.focus()
+    }
   }
 
   override connectedCallback(): void {
     super.connectedCallback()
+    this.addEventListener('keydown', this.handleCompositeKeydown, true)
     this.addEventListener('keydown', this.handleKeydown)
     this.addEventListener('focusin', this.handleFocusIn)
     /* `disabled` and `aria-hidden` are what `controls` filters on, so a change
@@ -209,6 +354,7 @@ export class HelixHeadlessToolbar extends HelixElement {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    this.removeEventListener('keydown', this.handleCompositeKeydown, true)
     this.removeEventListener('keydown', this.handleKeydown)
     this.removeEventListener('focusin', this.handleFocusIn)
     this.watcher?.disconnect()

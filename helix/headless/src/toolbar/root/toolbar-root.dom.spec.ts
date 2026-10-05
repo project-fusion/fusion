@@ -5,6 +5,9 @@ beforeAll(async () => {
   registerDom()
   await import('../index.js')
   await import('../../button/index.js')
+  await import('../../divider/index.js')
+  await import('../../menu/index.js')
+  await import('../../toggle/index.js')
 })
 
 const markup = `
@@ -132,5 +135,95 @@ describe('toolbar', () => {
     await settle(toolbar)
     // Only one control participates, so the stop stays where it was.
     expect(stops(toolbar)[0]).toBe('in')
+  })
+})
+
+describe('what a toolbar moves between', () => {
+  type Stop = HTMLElement & { focusable: boolean; updateComplete: Promise<unknown> }
+
+  const press = (from: Element, key: string): KeyboardEvent => {
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key,
+    })
+    from.dispatchEvent(event)
+    return event
+  }
+
+  test('skips a divider, passes a toggle group as one stop, and reaches a menu at its trigger', async () => {
+    const toolbar = await mount(`
+      <helix-headless-toolbar label="Format">
+        <helix-headless-button id="b1">Bold</helix-headless-button>
+        <helix-headless-divider></helix-headless-divider>
+        <helix-headless-toggle-group label="Align" default-value="l">
+          <helix-headless-toggle value="l">Left</helix-headless-toggle>
+          <helix-headless-toggle value="c">Center</helix-headless-toggle>
+        </helix-headless-toggle-group>
+        <helix-headless-menu><helix-headless-button id="more" slot="trigger">More</helix-headless-button>
+          <helix-headless-menu-item value="x">X</helix-headless-menu-item></helix-headless-menu>
+        <helix-headless-button id="b3">Link</helix-headless-button>
+      </helix-headless-toolbar>`)
+    await settle(toolbar)
+    const b1 = toolbar.querySelector('#b1') as Stop
+    const left = toolbar.querySelector('helix-headless-toggle[value="l"]') as Stop
+    const more = toolbar.querySelector('#more') as Stop
+    const b3 = toolbar.querySelector('#b3') as Stop
+    await left.updateComplete
+
+    press(b1, 'ArrowRight')
+    expect(b1.focusable).toBe(false)
+    expect(left.ownerDocument.activeElement).toBe(left)
+
+    /* Along the toolbar from inside the group moves past it, and the group
+       does not move as well. */
+    const out = press(left, 'ArrowRight')
+    await settle(toolbar)
+    expect(out.defaultPrevented).toBe(true)
+    expect(more.focusable).toBe(true)
+    expect(
+      (toolbar.querySelector('helix-headless-toggle-group') as HTMLElement & { value: string })
+        .value,
+    ).toBe('l')
+
+    press(more, 'ArrowRight')
+    await settle(toolbar)
+    expect([more.focusable, b3.focusable]).toEqual([false, true])
+
+    press(b3, 'ArrowRight')
+    await settle(toolbar)
+    expect(b1.focusable).toBe(true)
+  })
+
+  /* After the first focus every native button carries `tabindex="-1"` but
+     the one holding the stop, so losing that one has to hand the stop on. */
+  for (const loses of ['removed', 'disabled'] as const) {
+    test(`a native stop that is ${loses} hands the stop to the first button left`, async () => {
+      const toolbar = await mount(`
+        <helix-headless-toolbar label="Native">
+          <button id="n1">One</button><button id="n2">Two</button><button id="n3">Three</button>
+        </helix-headless-toolbar>`)
+      await settle(toolbar)
+      const [n1, , n3] = [...toolbar.querySelectorAll('button')] as HTMLButtonElement[]
+      ;(n3 as HTMLButtonElement).focus()
+      n3?.dispatchEvent(new FocusEvent('focusin', { bubbles: true, composed: true }))
+      expect(n1?.tabIndex).toBe(-1)
+      if (loses === 'removed') {
+        n3?.remove()
+      } else {
+        ;(n3 as HTMLButtonElement).disabled = true
+      }
+      await new Promise((resolve) => setTimeout(resolve, 0))
+      await settle(toolbar)
+      expect(n1?.tabIndex).toBe(0)
+    })
+  }
+
+  test('takes its name from an aria-label on the host', async () => {
+    const toolbar = await mount(
+      '<helix-headless-toolbar aria-label="Formatting"><helix-headless-button>B</helix-headless-button></helix-headless-toolbar>',
+    )
+    expect(part(toolbar, 'toolbar')?.getAttribute('aria-label')).toBe('Formatting')
   })
 })
