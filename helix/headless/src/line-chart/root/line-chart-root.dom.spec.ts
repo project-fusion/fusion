@@ -318,3 +318,28 @@ describe('a blank cell', () => {
     expect(Number(guide?.getAttribute('x1'))).toBe(37.5)
   })
 })
+
+/* `label` and the caption were documented to name the chart and did nothing:
+   the drawing is hidden, and nothing else was rendered. */
+describe('the summary', () => {
+  test('names the chart and gives each series its latest reading', async () => {
+    const host = await chart(CHANNELS, 'for="channels"')
+    expect(part(host, 'summary')?.textContent?.trim()).toBe(
+      'Sessions by channel, Feb: Direct 20, Referral 8.',
+    )
+  })
+
+  test('and says where a series ended when the last row is blank for it', async () => {
+    const table = `<table id="ended">
+      <thead><tr><th>Month</th><th>Direct</th><th>Referral</th></tr></thead>
+      <tbody>
+        <tr><th>Jan</th><td>10</td><td>4</td></tr>
+        <tr><th>Feb</th><td>20</td><td></td></tr>
+      </tbody>
+    </table>`
+    const host = await chart(table, 'for="ended" label="Sessions"')
+    expect(part(host, 'summary')?.textContent?.trim()).toBe(
+      'Sessions, Feb: Direct 20; Jan: Referral 4.',
+    )
+  })
+})

@@ -44,6 +44,14 @@ import type { Row } from '../read-series/read-series.js'
  */
 export const CHART_PLOT = 'helix-chart-plot'
 
+/**
+ * The id of the bubble, which the mark names as its description.
+ *
+ * Fixed for the reason `CHART_PLOT` is: it is scoped to one chart's shadow
+ * root, where it is the only one.
+ */
+const CHART_TOOLTIP = 'helix-chart-tooltip'
+
 /** Where a tooltip points, in the plot's own percentages, and which side it prefers. */
 export interface TooltipAt {
   /**
@@ -119,6 +127,9 @@ export interface TooltipAt {
  * **Hidden from assistive technology, on purpose.** The table is the accessible
  * representation and the drawing is `aria-hidden`; a reader on a keyboard gets
  * the table, which they can reach, rather than a tooltip which they cannot.
+ * The mark and the bubble carry `aria-hidden` themselves, so they stay hidden
+ * in a chart whose plot also holds something a reader should hear, such as
+ * the middle of a donut.
  */
 export const drawTooltip = (
   rows: Row[],
@@ -148,7 +159,14 @@ export const drawTooltip = (
      the mark: written from the left there, it pointed at the mirror of its own
      reading. A whole ring and a scatter's plane are not mirrored, say
      `fixed`, and are measured from the left, where their arithmetic starts. */
+  /* **The mark names the bubble with `aria-describedby`**, which is the link
+     `Tooltip` checks for when it opens and reports as missing otherwise. The
+     report named markup inside the chart's own shadow root, which no consumer
+     can reach, so the chart writes the link itself. Both are hidden from
+     assistive technology, so the link changes nothing a reader hears. */
   return html`<div
+      aria-describedby=${CHART_TOOLTIP}
+      aria-hidden="true"
       id="helix-chart-mark"
       part="mark"
       style=${styleMap(
@@ -158,12 +176,14 @@ export const drawTooltip = (
       )}
     ></div>
     <${tag}
+      aria-hidden="true"
       dir=${place.dir ?? nothing}
       exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom,
         arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right,
         arrow-top: tooltip-arrow-top, tooltip, tooltip-bottom, tooltip-left, tooltip-right,
         tooltip-top"
       for="helix-chart-mark"
+      id=${CHART_TOOLTIP}
       open
       part="tooltip-anchor"
       placement=${place.placement}

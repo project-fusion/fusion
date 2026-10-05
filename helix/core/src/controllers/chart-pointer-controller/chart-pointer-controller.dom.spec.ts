@@ -184,6 +184,19 @@ describe('a coarse pointer', () => {
     move(one, 121, 100, 'pen')
     expect(one.point.at).toBe(2)
   })
+
+  /* A donut's slices and a heatmap's cells hear the pointer themselves, and
+     heard unfiltered a touch opened the bubble under the finger. They ask this. */
+  test('is refused by the same rule wherever a chart hears the pointer itself', () => {
+    const one = scene(4)
+    const event = (pointerType: string) => new PointerEvent('pointerenter', { pointerType })
+    expect(['mouse', 'pen', 'touch', ''].map((type) => one.point.accepts(event(type)))).toEqual([
+      true,
+      true,
+      false,
+      false,
+    ])
+  })
 })
 
 describe('a chart with nothing in it', () => {

@@ -163,3 +163,13 @@ helix-headless-icon::part(svg) {
   display: block;
   inline-size: 100%;
 }
+
+helix-headless-donut-chart::part(summary) {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  margin: 0;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}

@@ -43,7 +43,8 @@ import '../../tooltip/index.js'
  * render at 10px in a narrow chart and 43px in a wide one.
  *
  * The table is the accessible representation, and the drawing is `aria-hidden`.
- * Screen reader users get the numbers.
+ * Screen reader users get the numbers. The `summary` part names the chart, from
+ * `label` or the table's caption, and gives each series' latest reading.
  *
  * @since 0.1.0
  * @status stable
@@ -61,6 +62,7 @@ import '../../tooltip/index.js'
  * @csspart line - The line for one series.
  * @csspart mark - The invisible point the tooltip is anchored to.
  * @csspart plot - The drawing.
+ * @csspart summary - The chart's name and each series' latest reading, written as a sentence for screen readers. Hide it visually.
  * @csspart svg - The drawing surface the lines and areas sit on.
  * @csspart terminus - The mark on one series' last reading.
  * @csspart tooltip - The bubble, forwarded from `Tooltip`.
@@ -272,7 +274,37 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
     const slot = PLOT_WIDTH / readings.length
     const x = linear([0, Math.max(readings.length - 1, 1)], [slot / 2, PLOT_WIDTH - slot / 2])
 
-    return html`${this.renderPlot(series, x, y, domain)} ${this.renderLabels(readings)}`
+    return html`${this.renderPlot(series, x, y, domain)} ${this.renderLabels(readings)}${this.renderSummary(series)}`
+  }
+
+  /**
+   * What a reader who cannot see the lines is told: the chart's name and the
+   * latest reading of each series.
+   *
+   * The latest, because where a series ended is the question a line over time
+   * is asked first, which is what `AreaChart` gives too. Each series' own last
+   * reading, so a series with a blank in the last row still says where it was.
+   * Written the way the table writes it, so `$128k` and not `128000`.
+   */
+  protected renderSummary(series: Series[]): TemplateResult {
+    const rows = this.sourceRows
+    const columns = this.plottedColumns
+    const latest = series.flatMap((one, depth) => {
+      const last = one.points.at(-1)
+      if (last === undefined) {
+        return []
+      }
+      const text = rows[last.at]?.cells[columns[depth] ?? -1]?.text ?? String(last.value)
+      return [{ label: last.label, reading: `${one.name} ${text}` }]
+    })
+    /* One label where every series ended on the same row, which is the usual
+       table, and each its own where they did not. */
+    const shared = latest.every((one) => one.label === latest[0]?.label)
+    const body = shared
+      ? `${latest[0]?.label ?? ''}: ${latest.map((one) => one.reading).join(', ')}`
+      : latest.map((one) => `${one.label}: ${one.reading}`).join('; ')
+    const named = this.named ? `${this.named}, ` : ''
+    return html`<p part="summary">${named}${body}.</p>`
   }
 
   /**

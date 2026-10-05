@@ -172,6 +172,23 @@ describe('where the bubble points', () => {
     expect(into.querySelector(`#${named}`)).not.toBeNull()
   })
 
+  /* `Tooltip` reports a trigger that does not name it in `aria-describedby`,
+     and the report named markup inside the chart's shadow root, which no
+     consumer can change. So the mark names the bubble itself. */
+  test('and the mark names the bubble as its description, so nothing is reported', () => {
+    const into = drawn(0)
+    const bubble = into.querySelector('helix-tooltip')
+    const mark = into.querySelector('#helix-chart-mark')
+    expect(bubble?.id).not.toBe('')
+    expect(mark?.getAttribute('aria-describedby')).toBe(bubble?.id ?? null)
+  })
+
+  test('and both are hidden from assistive technology themselves', () => {
+    const into = drawn(0)
+    expect(into.querySelector('helix-tooltip')?.getAttribute('aria-hidden')).toBe('true')
+    expect(into.querySelector('#helix-chart-mark')?.getAttribute('aria-hidden')).toBe('true')
+  })
+
   /* Whatever tag the caller hands over is the tag in the document: a headless
      tier passes `helix-headless-tooltip` and a styled one passes
      `helix-tooltip`, and neither is written down in the util. */

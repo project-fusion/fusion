@@ -182,3 +182,13 @@ helix-headless-bar-chart::part(tooltip-value) {
   font-variant-numeric: tabular-nums;
   grid-column: 3;
 }
+
+helix-headless-bar-chart::part(summary) {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  margin: 0;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}

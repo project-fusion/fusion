@@ -12,6 +12,8 @@ import { html, nothing, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import '../../tooltip/index.js'
 
+const percent = new Intl.NumberFormat(undefined, { maximumFractionDigits: 0, style: 'percent' })
+
 /* Square, because the shape has to stay round: the plot box is already one and
    this is the center of it. */
 const CENTER = PLOT_WIDTH / 2
@@ -59,9 +61,12 @@ const THICKNESS: Record<string, number> = {
 }
 
 /** One slice: its share of the whole, where it starts, and the row it was read from. */
-interface Share {
+export interface DonutShare {
+  /** The slice's share of the whole, from 0 to 1. */
   fraction: number
+  /** The table row the slice was read from, counting from zero. */
   row: number
+  /** Where the slice starts, as a share of the whole. */
   start: number
 }
 
@@ -78,13 +83,17 @@ interface Share {
  * **Negative values are skipped.** An arc cannot show a negative number, so
  * those rows are left out and the total is the sum of the remaining rows.
  *
+ * The ring is `aria-hidden`. The `summary` part names the chart, from `label`
+ * or the table's caption, and gives each slice's share, and the table beside
+ * the chart has every amount.
+ *
  * @since 0.1.0
  * @status stable
  * @category charts
  * @aliases Pie Chart, Ring Chart, Share Chart
  * @documentation https://fusion.dev/helix/components/donut-chart
  *
- * @slot - Content in the middle of the ring, usually a total.
+ * @slot - Content in the middle of the ring, usually a total. It is read by screen readers, while the ring itself is hidden from them.
  *
  * @csspart center - The middle of the ring, holding whatever is slotted.
  * @csspart mark - The invisible point the tooltip is anchored to.
@@ -92,6 +101,7 @@ interface Share {
  * @csspart segment - One slice.
  * @csspart segment-active - The slice under the pointer. Set alongside `segment`.
  * @csspart segment-edge - One slice as a closed shape, used to draw its outline.
+ * @csspart summary - The chart's name and each slice's share, written as a sentence for screen readers. Hide it visually.
  * @csspart tooltip - The bubble, forwarded from `Tooltip`.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
  * @csspart tooltip-arrow - The bubble's point, forwarded from `Tooltip`.
@@ -223,7 +233,7 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
    * that does not parse has no slice, and the tooltip counting slices against
    * the table's rows named the row before the one under the pointer.
    */
-  private get shares(): Share[] {
+  private get shares(): DonutShare[] {
     const series = this.series
     const points = series[0]?.points ?? []
     const values = points.map((point) =>
@@ -247,29 +257,49 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
     /* No middle where there is no hole. A `center` part over a pie would put
        slotted content on top of the slices, and a slot nobody can see is worse
        than one that is not there: a consumer fills it and nothing happens. */
-    return html`${this.renderPlot(shares)}
-`
+    return html`${this.renderPlot(shares)}${
+      shares.length === 0 ? nothing : this.renderSummary(shares)
+    }`
+  }
+
+  /**
+   * What a reader who cannot see the ring is told: the chart's name and each
+   * slice's share of the whole.
+   *
+   * The shares, because they are what the ring shows and the table does not:
+   * the table holds the amounts, and the percentages are this chart's
+   * arithmetic. In the ring's order, which is the table's and the legend's.
+   */
+  protected renderSummary(shares: DonutShare[]): TemplateResult {
+    const rows = this.sourceRows
+    const parts = shares.map(
+      (share) => `${rows[share.row]?.label ?? ''} ${percent.format(share.fraction)}`,
+    )
+    const named = this.named ? `${this.named}: ` : ''
+    return html`<p part="summary">${named}${parts.join(', ')}.</p>`
   }
 
   /**
    * The ring itself, behind a seam the styled tier can move.
    *
-   * `aria-hidden`, because the table it was read from is the readable version
-   * and a screen reader hearing both hears the same numbers twice.
+   * The drawing is `aria-hidden`, because the table it was read from is the
+   * readable version and a screen reader hearing both hears the same numbers
+   * twice. The middle is not: a total slotted there is usually a number the
+   * table does not hold.
    */
-  protected renderPlot(shares: Share[]): TemplateResult {
+  protected renderPlot(shares: DonutShare[]): TemplateResult {
     /* The thickness is declared here, on the box that holds both the ring and
        the middle, and never on the slices. A custom property inherits down and
        never sideways, so `[part="center"]` is a sibling of the circles and would
        only ever read the fallback, sizing the hole as if every ring were the
        resting thickness. */
     return html`<div
-      aria-hidden="true"
       id=${CHART_PLOT}
       part="plot"
       style="--donut-chart-stroke: ${this.thickness}"
     >
       <svg
+        aria-hidden="true"
         data-mirror=${this.sweep === 'half' ? '' : nothing}
         viewBox=${this.frame}
         xmlns="http://www.w3.org/2000/svg"
@@ -308,7 +338,7 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
   }
 
   /** One slice, as a dash the length of its share. */
-  protected renderSegment(share: Share, index: number): TemplateResult {
+  protected renderSegment(share: DonutShare, index: number): TemplateResult {
     const circumference = 2 * Math.PI * this.radius
     const length = share.fraction * circumference * this.span
     /* Negative, because `stroke-dashoffset` counts backwards along the path:
@@ -323,7 +353,11 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
       data-series=${seriesIndex(index)}
       fill="none"
       style="--chart-series: var(--chart-series-${seriesIndex(index)})"
-      @pointerenter=${() => this.pointer.set(index)}
+      @pointerenter=${(event: PointerEvent) => {
+        if (this.pointer.accepts(event)) {
+          this.pointer.set(index)
+        }
+      }}
       part="segment${active ? ' segment-active' : ''}"
       r=${this.radius}
       stroke-dasharray="${length} ${GAP}"
@@ -362,7 +396,7 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
    * `transform-box: fill-box`, so it spins each element about its own bounding
    * box, which is the ring's center for a circle and is not for a sector.
    */
-  protected renderEdge(share: Share, index: number): TemplateResult {
+  protected renderEdge(share: DonutShare, index: number): TemplateResult {
     const turn = 2 * Math.PI * this.span
     const from = share.start * turn + this.origin
     const to = (share.start + share.fraction) * turn + this.origin

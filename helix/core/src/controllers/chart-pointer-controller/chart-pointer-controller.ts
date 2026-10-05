@@ -147,6 +147,20 @@ export class ChartPointerController implements ReactiveController {
     return isRtl(this.host)
   }
 
+  /**
+   * Whether a pointer event may move the reading, which only a mouse or a pen
+   * may.
+   *
+   * Public for a chart that hears the pointer itself, a donut's slices and a
+   * heatmap's cells, so the rule a coarse pointer gets is this one everywhere.
+   * Heard unfiltered, a touch opened the bubble under the finger and left it
+   * there after the finger lifted.
+   */
+  accepts(event: Event): boolean {
+    const type = (event as PointerEvent).pointerType
+    return type === 'mouse' || type === 'pen'
+  }
+
   /** Puts the pointer on a reading, for a chart that resolves it some other way. */
   set(at: number): void {
     if (at !== this.at) {
@@ -157,7 +171,7 @@ export class ChartPointerController implements ReactiveController {
   }
 
   private readonly move = (event: PointerEvent): void => {
-    if (this.axis === 'none' || (event.pointerType !== 'mouse' && event.pointerType !== 'pen')) {
+    if (this.axis === 'none' || !this.accepts(event)) {
       return
     }
     const box = this.box()
