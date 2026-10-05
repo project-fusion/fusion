@@ -185,18 +185,32 @@ export class HelixHeadlessToast extends HelixElement {
    * stack, holding `message` as its text. The region removes it once it has
    * been dismissed and has finished leaving, which is the one case where it
    * removes anything: a message you render stays yours.
+   *
+   * `heading` gives the message a title, which names it, and `message` becomes
+   * the line of detail under it. `action` is an element for the message's
+   * `actions` slot, such as an Undo button you have wired up.
    */
   add(
     message: string,
     options: {
+      action?: Element
       dismissible?: boolean
       duration?: number
+      heading?: string
       tone?: 'danger' | 'info' | 'success' | 'warning'
     } = {},
   ): HTMLElement {
     const tier = (this.constructor as typeof HelixElement).tier
     const item = document.createElement(`${tier}toast-item`)
-    item.textContent = message
+    if (options.heading === undefined) {
+      item.textContent = message
+    } else {
+      item.append(slotted('heading', options.heading), slotted('description', message))
+    }
+    if (options.action) {
+      options.action.setAttribute('slot', 'actions')
+      item.append(options.action)
+    }
     if (options.tone) {
       item.setAttribute('tone', options.tone)
     }
@@ -441,6 +455,14 @@ const focusTarget = (item: HTMLElement): HTMLElement | null =>
   item.shadowRoot?.querySelector<HTMLElement>('[part="dismiss"]') ??
   focusableElements(item)[0] ??
   null
+
+/** A block of words for one of a message's named slots. */
+const slotted = (slot: string, words: string): HTMLElement => {
+  const element = document.createElement('div')
+  element.slot = slot
+  element.textContent = words
+  return element
+}
 
 declare global {
   interface HTMLElementTagNameMap {

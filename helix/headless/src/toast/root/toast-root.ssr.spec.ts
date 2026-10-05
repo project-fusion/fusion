@@ -30,7 +30,9 @@ describe('toast server output', () => {
         ssr(html`<helix-headless-toast-item tone="success"></helix-headless-toast-item>`),
         'helix-headless-toast-item',
       ),
-    ).toContain('<div part="content"><slot></slot></div>')
+    ).toMatch(
+      /<div part="content">\s*(<!--lit-node \d+-->)?<slot name="heading" part="heading"\s*><\/slot>\s*(<!--lit-node \d+-->)?<slot name="description" part="description"\s*><\/slot>\s*<slot><\/slot>\s*<\/div>/,
+    )
   })
 
   test('the host carries only what the consumer wrote', () => {

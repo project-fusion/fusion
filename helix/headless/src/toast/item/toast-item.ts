@@ -31,7 +31,9 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * seconds.
  *
  * **Each message is an `alertdialog` named by its words**, which is how a reader
- * who moves into the stack hears which message they are on. A `danger` message
+ * who moves into the stack hears which message they are on. Give it a
+ * `heading` and a `description`, and the heading names it and the description
+ * describes it, for a message with a title and a line of detail. A `danger` message
  * is its own assertive live region, so it is announced at once; every other one
  * is announced politely by the region.
  *
@@ -49,7 +51,9 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @slot - The message.
  * @slot actions - Actions for the message, usually a button or a link.
+ * @slot description - A line of detail under the heading, which describes the message.
  * @slot dismiss-icon - Replaces the glyph inside the dismiss control.
+ * @slot heading - The message's title, which names it.
  * @slot icon - Replaces the tone mark. The name matches `Callout`. The dismiss
  *   control's glyph uses `dismiss-icon`, because two slots cannot share a name:
  *   content goes to whichever slot comes first in the tree, and the tone mark is
@@ -59,8 +63,10 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @csspart actions - The region that holds the actions.
  * @csspart content - The message.
+ * @csspart description - The slot the description is in. It draws no box until you give it one.
  * @csspart dismiss - The control that dismisses the message.
  * @csspart dismiss-mark - The glyph on the dismiss control, where none is slotted.
+ * @csspart heading - The slot the heading is in. It draws no box until you give it one.
  * @csspart icon - The tone mark, where the message has one.
  * @csspart icon-mark - The tone glyph, where none is slotted.
  * @csspart item - The message's own surface.
@@ -265,10 +271,32 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    this.name()
+  }
+
+  /** The elements assigned to one of the message's named slots. */
+  private assigned(name: string): Element[] {
+    return (
+      this.renderRoot
+        ?.querySelector<HTMLSlotElement>(`slot[name="${name}"]`)
+        ?.assignedElements({ flatten: true }) ?? []
+    )
+  }
+
+  /**
+   * Names the message by its heading and describes it by its description,
+   * where it has them, and otherwise names it by all its words.
+   */
+  private readonly name = (): void => {
     const words = this.partNamed('content')
-    if (words) {
-      hostAria(this.internals, { labelledBy: [words] })
+    if (!words) {
+      return
     }
+    const heading = this.assigned('heading')
+    hostAria(this.internals, {
+      describedBy: this.assigned('description'),
+      labelledBy: heading.length > 0 ? heading : [words],
+    })
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
@@ -342,7 +370,11 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
             </span>`
           : nothing
       }
-      <div part="content"><slot></slot></div>
+      <div part="content">
+        <slot name="heading" part="heading" @slotchange=${this.name}></slot>
+        <slot name="description" part="description" @slotchange=${this.name}></slot>
+        <slot></slot>
+      </div>
       <div part="actions"><slot name="actions"></slot></div>
       ${
         this.dismissible
