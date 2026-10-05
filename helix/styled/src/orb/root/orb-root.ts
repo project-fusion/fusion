@@ -5,12 +5,12 @@ import {
   hostAria,
   PaintGateController,
   readColor,
+  wordsConverter,
 } from '@fusion.dev/helix-core'
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
 import { html, nothing } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
-import { wordsConverter } from '../../shared/words/words.js'
 import {
   blendStaged,
   evenSphere,

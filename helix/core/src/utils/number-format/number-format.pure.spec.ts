@@ -28,6 +28,11 @@ describe('reading a number', () => {
     expect(parseNumber('0.25', 'en-US', { style: 'percent' })).toBe(0.25)
     expect(parseNumber('$1,200.00', 'en-US', { currency: 'USD', style: 'currency' })).toBe(1200)
     expect(parseNumber('12 kg', 'en-US', { style: 'unit', unit: 'kilogram' })).toBe(12)
+    /* The plural was read off the sample and the singular was not, so one
+       kilogram written out in full was no number. */
+    const long = { style: 'unit', unit: 'kilogram', unitDisplay: 'long' } as const
+    expect(parseNumber('1 kilogram', 'en-US', long)).toBe(1)
+    expect(parseNumber('3 kilograms', 'en-US', long)).toBe(3)
     expect(parseNumber('−3', 'en-US')).toBe(-3)
   })
 

@@ -28,6 +28,7 @@ import {
   type ViewportPanDetail,
   type ViewportWay,
   type ViewportZoomDetail,
+  wordsConverter,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -458,7 +459,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    * see the board is told by the color; this is how a reader who cannot is
    * told the same. A tone left out is not read.
    */
-  @property({ attribute: 'tone-labels', type: Object })
+  @property({ attribute: 'tone-labels', converter: wordsConverter })
   toneLabels: Partial<Record<CanvasTone, string>> = {}
 
   /** The card or connection that holds the board's one tab stop, by its key. */

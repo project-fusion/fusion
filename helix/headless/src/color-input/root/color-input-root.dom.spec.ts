@@ -313,6 +313,14 @@ describe('a color input, said by its name', () => {
   })
 })
 
+describe('color-words that do not parse', () => {
+  test('are no words, rather than a panel that throws as it draws', async () => {
+    const host = await field(`value="#ff0000" color-words="oops"`)
+    expect((host as unknown as { colorWords: unknown }).colorWords).toEqual({})
+    expect(part(host, 'picker')).not.toBeNull()
+  })
+})
+
 describe('a color input with channel fields', () => {
   test('hands `channel-fields` to its panel', async () => {
     const host = await field('channel-fields value="#336699"')

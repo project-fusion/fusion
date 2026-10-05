@@ -12,6 +12,7 @@ import {
   MixinPickerField,
   parseColor,
   toCss,
+  wordsConverter,
 } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -171,7 +172,7 @@ export class HelixHeadlessColorInput extends MixinPickerField(
    * name, and read by the swatch in `swatch`, which says it before the value.
    * Color Picker lists the keys.
    */
-  @property({ attribute: 'color-words', type: Object })
+  @property({ attribute: 'color-words', converter: wordsConverter })
   colorWords: Partial<ColorWords> = {}
 
   /**

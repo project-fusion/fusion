@@ -21,6 +21,7 @@ import {
   rovingStop,
   splitValues,
   toCss,
+  wordsConverter,
 } from '@fusion.dev/helix-core'
 import { eyedropper } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -214,7 +215,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
    * ramp, and names each preset, so a reader who cannot see the color hears
    * which one it is.
    */
-  @property({ attribute: 'color-words', type: Object })
+  @property({ attribute: 'color-words', converter: wordsConverter })
   colorWords: Partial<ColorWords> = {}
 
   /**

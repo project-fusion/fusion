@@ -790,6 +790,18 @@ describe('a color, said by its name', () => {
   })
 })
 
+describe('color-words that do not parse', () => {
+  /* Lit's `Object` converter read a typo as `null`, and the next read of a
+     word off it threw, so the picker drew nothing. */
+  test('are no words, so the picker draws and says its own', async () => {
+    const host = await picker(`value="#ff0000" color-words="oops"`)
+    expect((host as unknown as { colorWords: unknown }).colorWords).toEqual({})
+    expect(part(host, 'grid-saturation')?.getAttribute('aria-valuetext')).toBe(
+      'Saturation 100%, Brightness 100%, vibrant red',
+    )
+  })
+})
+
 describe('the square named with the picker', () => {
   test('says the picker’s own name before each axis, where the picker has one', async () => {
     const named = await picker('aria-label="Brand"')
