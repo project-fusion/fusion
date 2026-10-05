@@ -1,10 +1,12 @@
 import {
   customElement,
+  deepActiveElement,
+  deepContains,
   HelixBeforeActivateEvent,
-  HelixBeforeCloseEvent,
   HelixCompleteEvent,
   HelixElement,
   hostAria,
+  MixinControllerOpen,
   requestChange,
   whenHydrated,
 } from '@fusion.dev/helix-core'
@@ -28,6 +30,16 @@ import type { HelixHeadlessTourStop } from '../stop/tour-stop.js'
  * The root measures the target's position in the browser. Nothing is measured
  * on the server, because a tour starts only on request.
  *
+ * `open`, `default-open`, `helix-before-open`, `helix-before-close` and
+ * `toggle` work as they do on `Dialog`. Setting `open` starts the run, and
+ * `skip()` and `requestOpen(false)` end it early.
+ *
+ * **Focus follows the run.** Opening moves focus to the first stop's panel,
+ * and moving on from a control in a stop moves it to the next one. Ending the
+ * tour puts focus back on the element that had it when the tour opened, unless
+ * you have moved it somewhere else on the page. A stop does not trap focus, so
+ * you can still `Tab` out to the element it describes.
+ *
  * @since 0.1.0
  * @status stable
  * @category overlays
@@ -38,32 +50,28 @@ import type { HelixHeadlessTourStop } from '../stop/tour-stop.js'
  *
  * @event {HelixBeforeActivateEvent} helix-before-activate - Fired before the current stop changes, with the new index. Cancelable: call `preventDefault()` to stay on the current stop.
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the user ends the tour early. Cancelable: call `preventDefault()` to keep the tour open.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired before `requestOpen(true)` starts the tour. Cancelable: call `preventDefault()` to keep it closed.
  * @event {HelixCompleteEvent} helix-complete - Fired when the last stop is
  * finished.
  * @event {HelixTourAskEvent} helix-tour-ask - Fired when a stop's control is pressed to move the tour. The stop sends it, and the tour handles it.
+ * @event {Event} toggle - Sent when the tour starts or ends, with `newState` and `oldState`.
  *
  * @csspart spotlight - The box over the current target. It also draws the dimmed area around the target.
+ *
+ * @cssstate open - While the tour is running.
  */
 /*
- * **There is no `toggle` here, and this element declared one for months.**
- *
- * `toggle` is announced by `MixinControllerOpen`, once, for the families whose
- * open state that mixin owns. A tour does not apply it: `open` is a plain
- * reflected property a consumer sets to start the run, and the two ways it comes
- * back down each announce themselves already, `helix-before-close` for leaving
- * early and `helix-complete` for reaching the end. So the declaration was a
- * channel nothing had ever sent on, and the shipped events example bound a
- * listener to it whose row could not appear.
- *
- * The `events` rule cannot see this, and says so: "declared and never dispatched
- * here" has two legitimate shapes, a parent declaring its children's bubbling
- * event and a control relaying a native one, and enforcing it flagged fifteen of
- * those and nothing else. `applied` is the narrow form that does see it, an
- * event built only inside a mixin being declared only by a component that
- * applies it, and this was its one hit in the library.
+ * **On `MixinControllerOpen`, where it once kept an `open` of its own.** That
+ * one reflected, which `CONVENTIONS.md` refuses for state, and the tour wrote it
+ * back to false on skip and on finish, so a server-rendered `open` came back
+ * from the client as an attribute nobody wrote. The mixin keeps `open` off the
+ * host and gives the tour the same `default-open`, before events, `toggle` and
+ * `:state(open)` as the other families that open. Finishing is still a report,
+ * so it assigns `open` rather than asking: `helix-complete` is sent, and no
+ * `helix-before-close`.
  */
 @customElement('helix-headless-tour')
-export class HelixHeadlessTour extends HelixElement {
+export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
   /**
    * Label for the control that goes back, passed to every stop.
    */
@@ -119,12 +127,6 @@ export class HelixHeadlessTour extends HelixElement {
    */
   @property({ attribute: 'next-label' })
   nextLabel = ''
-
-  /**
-   * Whether the tour is running.
-   */
-  @property({ reflect: true, type: Boolean })
-  open = false
 
   /**
    * Label for the control that leaves the tour.
@@ -195,12 +197,7 @@ export class HelixHeadlessTour extends HelixElement {
    * `preventDefault` refusing something that has already happened.
    */
   skip(): void {
-    const event = new HelixBeforeCloseEvent()
-    this.dispatchEvent(event)
-    if (event.defaultPrevented) {
-      return
-    }
-    this.open = false
+    this.requestOpen(false)
   }
 
   /* Announced before it closes, and not cancelable, which is the difference
@@ -286,13 +283,77 @@ export class HelixHeadlessTour extends HelixElement {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    hostAria(this.internals, { label: this.label, role: 'region' })
+    /* A landmark only while there is something in it. A closed tour on every
+       page that carries one put an empty "Getting started" in landmark
+       navigation. */
+    hostAria(this.internals, {
+      label: this.open ? this.label : '',
+      role: this.open ? 'region' : '',
+    })
   }
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.settle()
     this.light()
+    this.follow(changed)
+  }
+
+  /** Where focus was when the tour opened, to give it back when it ends. */
+  private returnFocus: HTMLElement | undefined
+
+  /** Whether `follow` has seen the first update. */
+  private followed = false
+
+  /**
+   * Moves focus with the run.
+   *
+   * Opening takes it to the current stop. Moving takes it to the new stop when
+   * it was in the tour, which is where a reader pressing Next is, and leaves it
+   * where it is otherwise. Closing gives it back to where it was before, again
+   * only when it was in the tour: a reader who moved to the target has chosen
+   * where to be.
+   */
+  private follow(changed: PropertyValues): void {
+    /* Never on the first update: a tour served open has not been opened by
+       anybody, and taking focus as the page loads would move a reader who has
+       not asked for anything. */
+    if (!this.followed) {
+      this.followed = true
+      return
+    }
+    const opened = changed.has('open') && this.open && changed.get('open') === false
+    const closed = changed.has('open') && !this.open && changed.get('open') === true
+    const active = deepActiveElement()
+    const inside = active === null || active === document.body || deepContains(this, active)
+    if (opened) {
+      if (active instanceof HTMLElement && !deepContains(this, active)) {
+        this.returnFocus = active
+      }
+      this.focusCurrent()
+    } else if (closed) {
+      const back = this.returnFocus
+      this.returnFocus = undefined
+      if (inside && back?.isConnected) {
+        back.focus()
+      }
+    } else if (this.open && changed.has('index') && inside) {
+      this.focusCurrent()
+    }
+  }
+
+  /** Focuses the current stop's panel once the stop has shown it. */
+  private focusCurrent(): void {
+    const stops = this.stops
+    const stop = stops[Math.max(0, Math.min(this.index, stops.length - 1))]
+    if (!stop) {
+      return
+    }
+    void stop.updateComplete.then(() => {
+      if (this.open && stop.current) {
+        stop.focus()
+      }
+    })
   }
 
   /**

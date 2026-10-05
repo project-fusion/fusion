@@ -1,5 +1,13 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { at, hasLayout, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import {
+  at,
+  hasLayout,
+  hasState,
+  mount,
+  part,
+  registerDom,
+  role,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -346,3 +354,78 @@ describe('leaving the run', () => {
     expect([openWhenHeard, tour.open]).toEqual([true, false])
   })
 })
+
+describe('a tour that is not running', () => {
+  /* Every page that carries a tour had an empty "Getting started" in its
+     landmarks, and an unnamed group for each stop. */
+  test('is no landmark, and its stops are no groups', async () => {
+    const tour = await run(false)
+    const groups = tour.stops.map(
+      (stop) => stop.shadowRoot?.querySelector('[role="group"]:not([hidden])') ?? null,
+    )
+    expect([role(tour), groups]).toEqual([null, [null, null, null]])
+  })
+})
+
+describe('the open state', () => {
+  /* The vocabulary of the other families that open: `open` stays off the
+     host, `:state(open)` carries it, and `toggle` says it moved. */
+  test('is not written back onto the host, and is said as a state and a toggle', async () => {
+    const tour = await run(false)
+    const said: string[] = []
+    tour.addEventListener('toggle', (event) => {
+      said.push((event as Event & { newState: string }).newState)
+    })
+    tour.open = true
+    await tour.updateComplete
+    const state = hasState(tour, 'open')
+    tour.skip()
+    await tour.updateComplete
+    expect([state, tour.hasAttribute('open'), said]).toEqual([true, false, ['open', 'closed']])
+  })
+})
+
+describe('focus through the run', () => {
+  const panelOf = (stop: HTMLElement | undefined): Element | null | undefined =>
+    stop?.shadowRoot?.querySelector('[part="bubble"]')
+
+  const settled = async (tour: Tour): Promise<void> => {
+    await tour.updateComplete
+    await Promise.all(
+      tour.stops.map(
+        (stop) => (stop as unknown as { updateComplete: Promise<unknown> }).updateComplete,
+      ),
+    )
+    await new Promise((resolve) => setTimeout(resolve, 0))
+  }
+
+  test('moves to the first stop when the tour opens, and back when it ends', async () => {
+    const tour = await run(false)
+    const begin = tour.parentElement?.querySelector('#one') as HTMLButtonElement
+    begin.focus()
+    tour.open = true
+    await settled(tour)
+    const opened = deepFocus() === panelOf(tour.stops[0])
+    tour.skip()
+    await settled(tour)
+    expect([opened, document.activeElement === begin]).toEqual([true, true])
+  })
+
+  test('and on to the next stop when Next is pressed from inside one', async () => {
+    const tour = await run(false)
+    tour.open = true
+    await settled(tour)
+    tour.next()
+    await settled(tour)
+    expect(deepFocus()).toBe(panelOf(tour.stops[1]) ?? null)
+  })
+})
+
+/** The focused element, through every shadow root. */
+const deepFocus = (): Element | null => {
+  let active = document.activeElement
+  while (active?.shadowRoot?.activeElement) {
+    active = active.shadowRoot.activeElement
+  }
+  return active
+}

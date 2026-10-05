@@ -32,6 +32,13 @@
   position: fixed;
 }
 
+/* No ring on the panel itself, which takes focus only so a reader lands on the
+   stop: the same choice `Dialog` makes for its panel. Its controls keep theirs. */
+[part="bubble"]:focus,
+[part="bubble"]:focus-visible {
+  outline: none;
+}
+
 /* The guard: an author rule beats the user agent's `[hidden] { display: none }`
    at any specificity, so a panel given a `display` here keeps it while closed
    unless something outranks the rule that gave it one. */
