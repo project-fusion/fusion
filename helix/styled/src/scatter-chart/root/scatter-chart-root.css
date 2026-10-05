@@ -45,6 +45,17 @@
   overflow: visible;
 }
 
+/* A series' line of best fit, under `trend`: dashed, so it reads as drawn
+   from the points rather than as one of them, in the series' color. */
+[part="trend"] {
+  fill: none;
+  stroke: var(--chart-series);
+  stroke-dasharray: var(--scatter-chart-trend-dash, 4 3);
+  stroke-linecap: round;
+  stroke-width: var(--scatter-chart-trend-width, 1.5px);
+  vector-effect: non-scaling-stroke;
+}
+
 [part="gridline"] {
   stroke: var(--scatter-chart-gridline-color, var(--helix-color-border));
   stroke-width: var(--helix-border-thin);

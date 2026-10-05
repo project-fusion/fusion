@@ -34,6 +34,9 @@ import '../../tooltip/index.js'
  *
  * @cssproperty --donut-chart-edge-stroke - Thickness of the slice boundary under `outlined`.
  * @cssproperty --donut-chart-size - Width and height of the ring.
+ * @cssproperty --donut-chart-slice-label-background-color - Plate behind a slice's share, under `slice-labels`.
+ * @cssproperty --donut-chart-slice-label-color - Color of a slice's share, under `slice-labels`.
+ * @cssproperty --donut-chart-slice-label-font-size - Size of a slice's share, under `slice-labels`.
  * @cssproperty --donut-chart-track-color - Color of the ring under the slices.
  */
 @customElement('helix-donut-chart')
