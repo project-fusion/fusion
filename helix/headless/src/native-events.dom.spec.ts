@@ -49,6 +49,7 @@ beforeAll(async () => {
     import('./number-input/index.js'),
     import('./pin-input/index.js'),
     import('./option/index.js'),
+    import('./pagination/index.js'),
     import('./select/index.js'),
     import('./slider/index.js'),
     import('./switch/index.js'),
@@ -78,6 +79,10 @@ const COMPOSED: Array<[string, string]> = [
     'helix-headless-color-input',
     `<helix-headless-color-input label="L"></helix-headless-color-input>`,
   ],
+  [
+    'helix-headless-pagination-size',
+    `<helix-headless-pagination-size default-value="10" sizes="10,25"></helix-headless-pagination-size>`,
+  ],
 ]
 
 /** The control this one renders, whichever it is, found by the API it answers to. */
@@ -105,6 +110,11 @@ const changeInner = (
   tag: string,
   inner: HTMLElement & { requestValue(next: string): boolean },
 ): void => {
+  if (tag === 'helix-headless-pagination-size') {
+    /* A size, which is all its select offers. */
+    inner.requestValue('25')
+    return
+  }
   if (tag !== 'helix-headless-color-input') {
     inner.requestValue('b')
     return

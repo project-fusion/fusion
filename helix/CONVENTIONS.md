@@ -1516,6 +1516,18 @@ cancelable. What comes after is the platform's own word where there is one,
 carries no detail because by then the state is on the element. The full argument
 is under [JSDoc contract](#jsdoc-contract).
 
+**Where there is no platform word, the notification is the request's verb
+without `before`**, carrying the state now in force: `helix-pin` after
+`helix-before-pin`, `helix-collapse` after `helix-before-collapse`, and
+`helix-activate` after any request that makes a different member of a set
+current, which is how Pagination and Carousel answer theirs. Some requests had
+the plain verb before this rule did, `helix-sort`, `helix-filter`,
+`helix-select` and `helix-reorder` on Data Table among them, and consumers bind
+them by those names, so the notification takes the past tense:
+`helix-sorted`, `helix-filtered`, `helix-selected`, `helix-reordered`. So does
+`helix-resized`, `helix-resize` being a measurement already. A request that is
+refused sends no notification.
+
 **The rule is `helix component`'s `decided`.** It reads every dispatch of a class
 whose constructor passes `cancelable: true`, and passes when the answer is used
 at the dispatch, read off the event afterwards, or read by a file in the family

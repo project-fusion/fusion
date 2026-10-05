@@ -275,6 +275,72 @@ describe('sorting', () => {
   })
 })
 
+/* Each request here is a proposal another listener may refuse, so a consumer
+   storing the table's state needs a notification after each, sent once the
+   state is on the element. The request had the plain verb first, so the
+   notification takes its past tense, and a page is `helix-activate`, as it is
+   from Pagination. */
+describe('what moved, said after it moved', () => {
+  test('a sort that stood is announced again as `helix-sorted`', async () => {
+    const { element, remove } = await mount(SCHEMA)
+    const heard: string[] = []
+    element.addEventListener('helix-sorted', (event) => {
+      heard.push(`${(event as CustomEvent<{ value: string }>).detail.value}@${element.sort}`)
+      expect(event.cancelable).toBe(false)
+    })
+    heading(element).click()
+    await settled(element)
+    expect(heard).toEqual(['name:asc@name:asc'])
+    remove()
+  })
+
+  test('and a refused one is not', async () => {
+    const { element, remove } = await mount(SCHEMA)
+    element.addEventListener('helix-sort', (event) => event.preventDefault())
+    let heard = false
+    element.addEventListener('helix-sorted', () => {
+      heard = true
+    })
+    heading(element).click()
+    await settled(element)
+    expect(heard).toBe(false)
+    remove()
+  })
+
+  test('a query that stood is announced again as `helix-filtered`', async () => {
+    const { element, remove } = await mount(SCHEMA)
+    const heard: string[] = []
+    element.addEventListener('helix-filtered', (event) => {
+      heard.push(`${(event as CustomEvent<{ value: string }>).detail.value}@${element.filter}`)
+    })
+    element.search('alpha')
+    await settled(element)
+    expect(heard).toEqual(['alpha@alpha'])
+    remove()
+  })
+
+  test('a page that stood is announced once, by the table', async () => {
+    /* The pagination inside sends its own after its own page moves, which is
+       stopped the way its request is: one move, one event, from this host. */
+    const { element, remove } = await mount(`
+      <helix-headless-data-table page-size="2">
+        <helix-headless-table-column field="name">Name</helix-headless-table-column>
+      </helix-headless-data-table>`)
+    const heard: string[] = []
+    element.addEventListener('helix-activate', (event) => {
+      const from = (event.composedPath()[0] as Element).localName
+      heard.push(
+        `${(event as CustomEvent<{ value: string }>).detail.value}@${element.page} ${from}`,
+      )
+    })
+    const pagination = part(element, 'pagination') as HTMLElement
+    part(pagination, 'next')?.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }))
+    await settled(element)
+    expect(heard).toEqual(['2@2 helix-headless-data-table'])
+    remove()
+  })
+})
+
 describe('controlled and uncontrolled', () => {
   test('`default-sort` seeds an order this element then owns', async () => {
     const { element, remove } = await mount(`

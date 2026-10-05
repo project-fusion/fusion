@@ -3,6 +3,7 @@ import {
   HelixBeforePinEvent,
   HelixElement,
   HelixHistoryEvent,
+  HelixPinEvent,
   hostAria,
   MixinCollection,
   onUnlessFalse,
@@ -154,6 +155,7 @@ const spoken = (message: Element): string =>
  *
  * @event {HelixBeforePinEvent} helix-before-pin - Fired when the user pins or unpins the transcript by scrolling. Cancelable.
  * @event {HelixHistoryEvent} helix-history - Fired when the user reaches the oldest turn while `history` is `more`. It reports the position and cannot be canceled.
+ * @event {HelixPinEvent} helix-pin - Fired after the transcript is pinned or unpinned, with `true` or `false` in `detail.value`.
  * @event {HelixSendEvent} helix-send - Fired when the user sends a turn from the composer or retries a failed one. It is fired inside and handled here, so you can listen for it on the conversation. Cancelable: canceling it sends nothing and leaves the decision to you.
  *
  * @csspart actions - The controls for the conversation, at the header's trailing edge.
@@ -488,6 +490,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
         const previous = this.pinned
         this.pinnedState = value
         this.requestUpdate('pinned', previous)
+        this.dispatchEvent(new HelixPinEvent({ value: String(value) }))
       },
       event: (value) => new HelixBeforePinEvent({ value: String(value) }),
       host: this,

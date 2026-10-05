@@ -4,13 +4,18 @@ import {
   deepContains,
   fillTemplate,
   formatNumbers,
+  HelixActivateEvent,
   type HelixBeforeToggleEvent,
   HelixElement,
   HelixFilterEvent,
+  HelixFilteredEvent,
   HelixNavigateEvent,
   HelixReorderEvent,
+  HelixReorderedEvent,
   HelixSelectEvent,
+  HelixSelectedEvent,
   HelixSortEvent,
+  HelixSortedEvent,
   hostAria,
   inlineStep,
   isRtl,
@@ -137,11 +142,16 @@ const isControl = (element: HTMLElement): boolean =>
  * @slot footer - Content below the grid. It replaces the built-in pagination.
  * @slot toolbar - Content above the grid, such as a search field or actions.
  *
+ * @event {HelixActivateEvent} helix-activate - Fired after the page changes, with the new page as a string in `detail.value`.
  * @event {HelixFilterEvent} helix-filter - The search query is about to change. Cancelable: cancel it to keep the current query.
+ * @event {HelixFilteredEvent} helix-filtered - Fired after the search query changes, with the new query.
  * @event {HelixNavigateEvent} helix-navigate - Another page was requested. Cancelable: cancel it to stay on the current page.
- * @event {HelixReorderEvent} helix-reorder - The columns were moved. The event carries every field in the new order. Cancelable: cancel it to keep the current order.
- * @event {HelixSelectEvent} helix-select - The selection changed. The event carries every selected key, separated by commas. Cancelable: cancel it to keep the current selection.
+ * @event {HelixReorderEvent} helix-reorder - The columns are about to move. The event carries every field in the new order. Cancelable: cancel it to keep the current order.
+ * @event {HelixReorderedEvent} helix-reordered - Fired after the columns move, with every field in the new order.
+ * @event {HelixSelectEvent} helix-select - The selection is about to change. The event carries every selected key, separated by commas. Cancelable: cancel it to keep the current selection.
+ * @event {HelixSelectedEvent} helix-selected - Fired after the selection changes, with every selected key, separated by commas.
  * @event {HelixSortEvent} helix-sort - A different sort order was requested. Cancelable: cancel it to keep the current order.
+ * @event {HelixSortedEvent} helix-sorted - Fired after the sort order changes, with the new order.
  *
  * @csspart after - The space that stands in for the rows below the window. Only while `windowed`.
  * @csspart before - The space that stands in for the rows above the window. Only while `windowed`.
@@ -1067,6 +1077,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         const previous = this.sort
         this.sortState = value
         this.requestUpdate('sort', previous)
+        this.dispatchEvent(new HelixSortedEvent({ value }))
       },
       event: (value) => new HelixSortEvent({ value }),
       host: this,
@@ -1081,6 +1092,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         const previous = this.order
         this.orderState = value
         this.requestUpdate('order', previous)
+        this.dispatchEvent(new HelixReorderedEvent({ value }))
       },
       event: (value) => new HelixReorderEvent({ value }),
       host: this,
@@ -1095,6 +1107,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         const previous = this.selected
         this.selectedState = value
         this.requestUpdate('selected', previous)
+        this.dispatchEvent(new HelixSelectedEvent({ value }))
       },
       event: (value) => new HelixSelectEvent({ value }),
       host: this,
@@ -1248,6 +1261,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         const previous = this.filter
         this.filterState = value
         this.requestUpdate('filter', previous)
+        this.dispatchEvent(new HelixFilteredEvent({ value }))
       },
       event: (value) => new HelixFilterEvent({ value }),
       host: this,
@@ -1265,6 +1279,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         const previous = this.page
         this.pageState = value
         this.requestUpdate('page', previous)
+        this.dispatchEvent(new HelixActivateEvent({ value: String(value) }))
       },
       event: (value) => new HelixNavigateEvent({ value: String(value) }),
       host: this,
@@ -1778,6 +1793,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
               page-label=${this.pageLabel}
               previous-label=${this.previousLabel}
               @helix-navigate=${this.handleNavigate}
+              @helix-activate=${this.stopPageNotification}
             ></${pagination}>`
             : nothing
         }
@@ -2273,6 +2289,15 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       }
     }
     return undefined
+  }
+
+  /**
+   * The composed pagination's notification, stopped for the reason its
+   * request is: this element sends its own `helix-activate` once its own page
+   * has moved, and one move is one event.
+   */
+  private readonly stopPageNotification = (event: Event): void => {
+    event.stopPropagation()
   }
 
   /**

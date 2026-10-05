@@ -1129,6 +1129,26 @@ export class HelixBeforePinEvent extends CustomEvent<ChangeDetail> {
   }
 }
 
+/**
+ * A transcript was pinned to the bottom, or let go of it.
+ *
+ * The notification half of `helix-before-pin`, sent once `pinned` has moved,
+ * so `currentTarget.pinned` is the new state and `detail.value` says it as
+ * `true` or `false`. Not cancelable: the decision was the request's.
+ */
+export class HelixPinEvent extends CustomEvent<ChangeDetail> {
+  static readonly eventName = 'helix-pin'
+
+  constructor(detail: ChangeDetail) {
+    super(HelixPinEvent.eventName, {
+      bubbles: true,
+      cancelable: false,
+      composed: true,
+      detail,
+    })
+  }
+}
+
 /** A divider is about to move, and can be refused. */
 export class HelixBeforeResizeEvent extends CustomEvent<ChangeDetail> {
   static readonly eventName = 'helix-before-resize'
@@ -1137,6 +1157,30 @@ export class HelixBeforeResizeEvent extends CustomEvent<ChangeDetail> {
     super(HelixBeforeResizeEvent.eventName, {
       bubbles: true,
       cancelable: true,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/**
+ * A divider settled somewhere new.
+ *
+ * The notification half of `helix-before-resize`, sent once `position` has
+ * moved, with the new position. Not cancelable: the decision was the
+ * request's.
+ *
+ * **Past tense, because `helix-resize` was already taken** by a measurement,
+ * the height a sandboxed preview reports for what it drew, and one name cannot
+ * carry both.
+ */
+export class HelixResizedEvent extends CustomEvent<ChangeDetail> {
+  static readonly eventName = 'helix-resized'
+
+  constructor(detail: ChangeDetail) {
+    super(HelixResizedEvent.eventName, {
+      bubbles: true,
+      cancelable: false,
       composed: true,
       detail,
     })
@@ -1192,6 +1236,26 @@ export class HelixBeforeCollapseEvent extends CustomEvent<ChangeDetail> {
     super(HelixBeforeCollapseEvent.eventName, {
       bubbles: true,
       cancelable: true,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/**
+ * A pane shut or reopened.
+ *
+ * The notification half of `helix-before-collapse`, sent once `collapsed` has
+ * moved. `detail.value` is the side that is shut, or empty where both panes
+ * are open. Not cancelable: the decision was the request's.
+ */
+export class HelixCollapseEvent extends CustomEvent<ChangeDetail> {
+  static readonly eventName = 'helix-collapse'
+
+  constructor(detail: ChangeDetail) {
+    super(HelixCollapseEvent.eventName, {
+      bubbles: true,
+      cancelable: false,
       composed: true,
       detail,
     })
@@ -1650,6 +1714,29 @@ export class HelixSortEvent extends CustomEvent<SortDetail> {
 }
 
 /**
+ * The rows are in a different order.
+ *
+ * The notification after `helix-sort`, sent once `sort` has moved, with the
+ * order now in force. Not cancelable: the decision was the request's.
+ *
+ * **Past tense, because the plain verb is the request.** `helix-sort` was
+ * cancelable before the library had a word for its notification, and
+ * consumers bind it by that name, so the notification takes the one after it.
+ */
+export class HelixSortedEvent extends CustomEvent<SortDetail> {
+  static readonly eventName = 'helix-sorted'
+
+  constructor(detail: SortDetail) {
+    super(HelixSortedEvent.eventName, {
+      bubbles: true,
+      cancelable: false,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/**
  * Fired when the reader changes which values a field is filtered by.
  *
  * **Not `helix-filter`, which is a different thing already taken.** That one
@@ -1688,6 +1775,26 @@ export class HelixFilterEvent extends CustomEvent<FilterDetail> {
     super(HelixFilterEvent.eventName, {
       bubbles: true,
       cancelable: true,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/**
+ * A component is showing a narrower or a wider set.
+ *
+ * The notification after `helix-filter`, sent once the query has moved, with
+ * the query now in force. Not cancelable, and past tense for the reason
+ * `helix-sorted` is.
+ */
+export class HelixFilteredEvent extends CustomEvent<FilterDetail> {
+  static readonly eventName = 'helix-filtered'
+
+  constructor(detail: FilterDetail) {
+    super(HelixFilteredEvent.eventName, {
+      bubbles: true,
+      cancelable: false,
       composed: true,
       detail,
     })
@@ -1747,6 +1854,26 @@ export class HelixSelectEvent extends CustomEvent<SelectDetail> {
 }
 
 /**
+ * A set holds a different selection.
+ *
+ * The notification after a `helix-select` that asked to change what is
+ * selected, sent once the selection has moved, with the selection now in
+ * force. Not cancelable, and past tense for the reason `helix-sorted` is.
+ */
+export class HelixSelectedEvent extends CustomEvent<SelectDetail> {
+  static readonly eventName = 'helix-selected'
+
+  constructor(detail: SelectDetail) {
+    super(HelixSelectedEvent.eventName, {
+      bubbles: true,
+      cancelable: false,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/**
  * Fired when the reader asks for the columns in a different order.
  *
  * Cancelable, and refusing it leaves the columns where they were, so a consumer
@@ -1766,6 +1893,26 @@ export class HelixReorderEvent extends CustomEvent<ChangeDetail> {
     super(HelixReorderEvent.eventName, {
       bubbles: true,
       cancelable: true,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/**
+ * The columns are in a different order.
+ *
+ * The notification after `helix-reorder`, sent once the order has moved, with
+ * every field in the new one. Not cancelable, and past tense for the reason
+ * `helix-sorted` is.
+ */
+export class HelixReorderedEvent extends CustomEvent<ChangeDetail> {
+  static readonly eventName = 'helix-reordered'
+
+  constructor(detail: ChangeDetail) {
+    super(HelixReorderedEvent.eventName, {
+      bubbles: true,
+      cancelable: false,
       composed: true,
       detail,
     })
@@ -1829,6 +1976,7 @@ const registry = {
   HelixCanvasViewEvent,
   HelixCanvasZoomEvent,
   HelixCaretEvent,
+  HelixCollapseEvent,
   HelixCompleteEvent,
   HelixConnectEvent,
   HelixConsoleEvent,
@@ -1837,6 +1985,7 @@ const registry = {
   HelixDismissEvent,
   HelixFacetEvent,
   HelixFilterEvent,
+  HelixFilteredEvent,
   HelixGraphFilterEvent,
   HelixGraphLayoutEvent,
   HelixGraphPanEvent,
@@ -1855,20 +2004,25 @@ const registry = {
   HelixMoveEvent,
   HelixNavigateEvent,
   HelixNextEvent,
+  HelixPinEvent,
   HelixPreviousEvent,
   HelixReadEvent,
   HelixReconnectEvent,
   HelixRelabelEvent,
   HelixRemoveEvent,
   HelixReorderEvent,
+  HelixReorderedEvent,
+  HelixResizedEvent,
   HelixResizeEvent,
   HelixSampleEndEvent,
   HelixSampleStartEvent,
   HelixScrolledEvent,
   HelixSelectEvent,
+  HelixSelectedEvent,
   HelixSendEvent,
   HelixShortcutEvent,
   HelixSortEvent,
+  HelixSortedEvent,
   HelixTourAskEvent,
 } as const
 

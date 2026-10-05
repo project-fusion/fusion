@@ -1,6 +1,7 @@
 import {
   customElement,
   fillTemplate,
+  HelixActivateEvent,
   HelixElement,
   HelixSelectEvent,
   hostAria,
@@ -74,6 +75,7 @@ const COUNT_OR_AUTO = {
  *
  * @slot - The slides.
  *
+ * @event {HelixActivateEvent} helix-activate - Fired after the slide in view changes, with the new index as a string in `detail.value`.
  * @event {HelixSelectEvent} helix-select - Fired before the slide in view changes, with the requested index. Cancelable: cancel it to keep the current slide. Nothing moves, and a drag returns to the slide the index still holds. See `handleScroll`.
  *
  * @csspart controls - The row of controls.
@@ -634,6 +636,20 @@ export class HelixHeadlessCarousel extends HelixElement {
     })
   }
 
+  /**
+   * Puts a requested slide in view, and says so.
+   *
+   * `helix-activate` is the notification after `helix-select`, the one Tour
+   * and Tabs send once a different member is current. A clamp in `holdIndex`
+   * sends neither, being a correction rather than a move anybody asked for.
+   */
+  private applyIndex(value: number): void {
+    const previous = this.index
+    this.indexState = value
+    this.requestUpdate('index', previous)
+    this.dispatchEvent(new HelixActivateEvent({ value: String(value) }))
+  }
+
   /** Moves to a slide. It wraps past either end only when `loop` is set. */
   goTo(index: number): void {
     if (this.slides.length === 0) {
@@ -648,11 +664,7 @@ export class HelixHeadlessCarousel extends HelixElement {
       return
     }
     requestChange({
-      apply: (value) => {
-        const previous = this.index
-        this.indexState = value
-        this.requestUpdate('index', previous)
-      },
+      apply: (value) => this.applyIndex(value),
       event: (value) => new HelixSelectEvent({ value: String(value) }),
       host: this,
       next,
@@ -951,11 +963,7 @@ export class HelixHeadlessCarousel extends HelixElement {
        `scrollToIndex` does. Left as it was, this was the one place in the
        library dispatching a cancelable event that nothing read. */
     const applied = requestChange({
-      apply: (value) => {
-        const previous = this.index
-        this.indexState = value
-        this.requestUpdate('index', previous)
-      },
+      apply: (value) => this.applyIndex(value),
       event: (value) => new HelixSelectEvent({ value: String(value) }),
       host: this,
       next: nearest,
