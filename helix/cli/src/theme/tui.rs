@@ -34,11 +34,16 @@ use fusion_helix_theme::derive::report::Outcome;
 use fusion_helix_theme::derive::theme::Theme;
 
 use super::report::{measured, rows, Counts, Filter, Order, Row};
+use super::scheme_name;
 
 /// What the screen is showing, which is all the state there is.
 struct View {
     counts: Counts,
     filter: Filter,
+    /// Which mode is on the screen, as an index into the themes, and its name
+    /// where there is a second mode to switch to.
+    mode: usize,
+    mode_name: Option<&'static str>,
     order: Order,
     /// The rows as currently filtered and ordered, rebuilt whenever either
     /// changes rather than re-derived on every frame: a draw runs on every
@@ -49,15 +54,32 @@ struct View {
 }
 
 impl View {
-    fn new(theme: &Theme, source: String) -> Self {
+    fn new(themes: &[Theme], source: String) -> Self {
+        let theme = &themes[0];
         Self {
             counts: Counts::of(&theme.pairings),
             filter: Filter::default(),
+            mode: 0,
+            mode_name: (themes.len() > 1).then(|| scheme_name(theme.intent.scheme)),
             order: Order::default(),
             rows: rows(&theme.pairings, Filter::default(), Order::default()),
             selected: 0,
             source,
         }
+    }
+
+    /// The other mode, where there is one. **The filter and the order carry
+    /// over**, so failures sorted worst first in light mode stay that way in
+    /// dark mode.
+    fn switch(&mut self, themes: &[Theme]) {
+        if themes.len() < 2 {
+            return;
+        }
+        self.mode = (self.mode + 1) % themes.len();
+        let theme = &themes[self.mode];
+        self.mode_name = Some(scheme_name(theme.intent.scheme));
+        self.counts = Counts::of(&theme.pairings);
+        self.refresh(theme);
     }
 
     /// Rebuild after a filter or an order change, keeping the selection in range.
@@ -90,10 +112,10 @@ impl View {
 ///
 /// Any terminal failure, which the caller reports as an internal fault: a
 /// terminal that cannot be put into raw mode is not something the reader wrote.
-pub fn run(theme: &Theme, source: &str) -> io::Result<()> {
+pub fn run(themes: &[Theme], source: &str) -> io::Result<()> {
     let mut terminal = enter()?;
-    let mut view = View::new(theme, source.to_owned());
-    let outcome = draw_loop(&mut terminal, &mut view, theme);
+    let mut view = View::new(themes, source.to_owned());
+    let outcome = draw_loop(&mut terminal, &mut view, themes);
     /* **Restored before the error is returned**, so a failure inside the loop
     does not leave the reader in a raw-mode alternate screen with no echo. That
     is the one thing a TUI can do that is worse than not running. */
@@ -104,7 +126,7 @@ pub fn run(theme: &Theme, source: &str) -> io::Result<()> {
 fn draw_loop(
     terminal: &mut Terminal<ratatui::backend::CrosstermBackend<Stdout>>,
     view: &mut View,
-    theme: &Theme,
+    themes: &[Theme],
 ) -> io::Result<()> {
     loop {
         terminal.draw(|frame| render(frame, view))?;
@@ -133,15 +155,16 @@ fn draw_loop(
                     Filter::All => Filter::Failing,
                     Filter::Failing => Filter::All,
                 };
-                view.refresh(theme);
+                view.refresh(&themes[view.mode]);
             }
             KeyCode::Char('s') => {
                 view.order = match view.order {
                     Order::Source => Order::Worst,
                     Order::Worst => Order::Source,
                 };
-                view.refresh(theme);
+                view.refresh(&themes[view.mode]);
             }
+            KeyCode::Char('m') => view.switch(themes),
             _ => {}
         }
     }
@@ -196,11 +219,15 @@ fn describe(view: &View) -> String {
         Order::Source => "in order",
         Order::Worst => "worst first",
     };
-    format!(
+    let shown = format!(
         "{} of {} shown, {filter}, {order}",
         view.rows.len(),
         view.counts.total()
-    )
+    );
+    match view.mode_name {
+        Some(mode) => format!("{mode}, {shown}"),
+        None => shown,
+    }
 }
 
 fn matrix(view: &View) -> Table<'_> {
@@ -260,10 +287,12 @@ fn footer(view: &View) -> Vec<Line<'_>> {
         "  {} passed, {} failed, {} unverifiable",
         counts.passed, counts.failed, counts.unverifiable
     ))];
-    lines.push(Line::styled(
-        "  j/k move   f failing only   s worst first   q quit",
-        Style::new().add_modifier(Modifier::DIM),
-    ));
+    let keys = if view.mode_name.is_some() {
+        "  j/k move   f failing only   s worst first   m other mode   q quit"
+    } else {
+        "  j/k move   f failing only   s worst first   q quit"
+    };
+    lines.push(Line::styled(keys, Style::new().add_modifier(Modifier::DIM)));
     lines
 }
 
@@ -296,6 +325,8 @@ mod tests {
         View {
             counts: Counts::of(&pairings),
             filter: Filter::default(),
+            mode: 0,
+            mode_name: None,
             order: Order::default(),
             rows: crate::theme::report::rows(&pairings, Filter::default(), Order::default()),
             selected: 0,
@@ -372,6 +403,16 @@ mod tests {
         for hint in ["j/k", "f ", "s ", "q quit"] {
             assert!(screen.contains(hint), "missing {hint} in\n{screen}");
         }
+    }
+
+    /// A second mode is named on the screen, with the key that switches to it.
+    #[test]
+    fn a_second_mode_is_named_with_its_key() {
+        let mut view = view();
+        view.mode_name = Some("dark");
+        let screen = drawn(&view, 100, 12);
+        assert!(screen.contains("dark, 3 of 3 shown"), "{screen}");
+        assert!(screen.contains("m other mode"), "{screen}");
     }
 
     /// **A screen too short to hold a row still draws**, which is the case a

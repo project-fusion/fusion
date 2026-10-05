@@ -35,7 +35,7 @@ pub fn run(args: &Init, from: &Path, json: bool) -> Outcome<Code> {
         .hint("helix theme init --force"));
     }
 
-    /* **A brand and nothing else, which is what the engine asks for.** A starter
+    /* **The brand and nothing else, or nothing at all, which is ink.** A starter
     file listing every field with its default in it teaches a reader that a theme
     is a hundred decisions, and it goes stale the first time a default moves: a
     written-out default is a value this file then owns.
@@ -46,7 +46,10 @@ pub fn run(args: &Init, from: &Path, json: bool) -> Outcome<Code> {
     that ignores the key. Serde's `deny_unknown_fields` does not compose with
     `flatten`, so allowing one key through costs the typo-catching that is the
     reason unknown keys are refused. Both halves land together or neither. */
-    let starter = format!("{{\n  \"brand\": \"{}\"\n}}\n", args.brand);
+    let starter = match &args.brand {
+        Some(brand) => format!("{{\n  \"brand\": \"{brand}\"\n}}\n"),
+        None => "{}\n".to_owned(),
+    };
     std::fs::write(&path, &starter).map_err(|failure| {
         Failure::input(
             format!("cannot write {}", path.display()),
@@ -61,6 +64,11 @@ pub fn run(args: &Init, from: &Path, json: bool) -> Outcome<Code> {
         );
     } else {
         eprintln!("helix: wrote {}", path.display());
+        if args.brand.is_none() {
+            eprintln!(
+                "  no brand, so the theme is ink: add \"brand\" with a hex color to change it"
+            );
+        }
         eprintln!("  try: helix theme audit");
     }
     Ok(Code::Ok)
