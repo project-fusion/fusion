@@ -32,6 +32,7 @@ import { styles } from './progress-root.css.js'
  * @cssproperty --progress-ring-width - Thickness of the ring's stroke.
  * @cssproperty --progress-size - Thickness of the bar.
  * @cssproperty --progress-track-color - Fill of the part that is not done.
+ * @cssproperty --progress-transition-duration - How long the fill takes to move to a new value. `0s` moves it at once.
  */
 @customElement('helix-progress')
 export class HelixProgress extends HelixHeadlessProgress {

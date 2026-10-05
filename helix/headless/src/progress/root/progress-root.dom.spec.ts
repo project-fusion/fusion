@@ -37,6 +37,34 @@ describe('the value shown', () => {
   })
 })
 
+/* React Aria's ProgressBar takes Intl `formatOptions`; a percentage was the
+   only thing this could write. */
+describe('format-options', () => {
+  test('writes the value in a unit, on the screen and when read out', async () => {
+    const bar = await progress(
+      `max="120" show-value value="45" locale="en" format-options='{"style":"unit","unit":"megabyte"}'`,
+    )
+    const words = new Intl.NumberFormat('en', { style: 'unit', unit: 'megabyte' }).format(45)
+    expect(bar.shadowRoot?.querySelector('[part="value"]')?.textContent?.trim()).toBe(words)
+    expect(bar.internals?.ariaValueText).toBe(words)
+  })
+
+  test('writes a share of the range for a percent, and says nothing extra while indeterminate', async () => {
+    const bar = await progress(
+      `show-value value="12.5" locale="en" format-options='{"style":"percent","minimumFractionDigits":1}'`,
+    )
+    expect(bar.shadowRoot?.querySelector('[part="value"]')?.textContent?.trim()).toBe('12.5%')
+    const busy = await progress(`indeterminate format-options='{"style":"percent"}'`)
+    expect(busy.internals?.ariaValueText).toBeNull()
+  })
+
+  test('absent writes a whole percentage and leaves the reading to the platform', async () => {
+    const bar = await progress('show-value value="62" locale="en"')
+    expect(bar.shadowRoot?.querySelector('[part="value"]')?.textContent?.trim()).toBe('62%')
+    expect(bar.internals?.ariaValueText).toBeNull()
+  })
+})
+
 describe('progress', () => {
   test('announces itself as a progress bar with a name, through internals', async () => {
     const bar = await progress()

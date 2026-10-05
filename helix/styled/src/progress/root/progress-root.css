@@ -74,7 +74,8 @@ slot[name="label"]::slotted(*) {
   inline-size: 100%;
   scale: var(--progress-fraction, 0) 1;
   transform-origin: left center;
-  transition: scale var(--helix-duration-normal) var(--helix-easing-decelerate);
+  transition: scale var(--progress-transition-duration, var(--helix-duration-normal))
+    var(--helix-easing-decelerate);
 }
 
 :host(:dir(rtl)) [part="indicator"] {
@@ -203,7 +204,8 @@ slot[name="label"]::slotted(*) {
   stroke: var(--progress-color, var(--helix-color-primary));
   stroke-dasharray: calc(var(--progress-fraction) * 100) 100;
   stroke-linecap: round;
-  transition: stroke-dasharray var(--helix-duration-normal) var(--helix-easing-decelerate);
+  transition: stroke-dasharray var(--progress-transition-duration, var(--helix-duration-normal))
+    var(--helix-easing-decelerate);
 }
 
 /* In the middle, where a dial puts its reading. */
