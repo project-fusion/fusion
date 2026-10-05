@@ -513,6 +513,31 @@ helix-button-group:not([variant="spaced"]) > [data-button]:not(:last-child) {
   border-start-end-radius: 0;
   border-end-end-radius: 0;
 }
+
+/* A native `<button>` in a group joins it the same way. Its corners are its own
+   `border-radius`, which no `--button-radius-*` hook reaches, and a `::slotted()`
+   rule in the group's sheet loses to any page rule that sets a radius, so the
+   page's layer is where this is said. Down a column, the block corners flatten
+   instead of the inline ones. */
+helix-button-group:not([variant="spaced"], [orientation="vertical"]) > button:not(:first-child) {
+  border-start-start-radius: 0;
+  border-end-start-radius: 0;
+}
+
+helix-button-group:not([variant="spaced"], [orientation="vertical"]) > button:not(:last-child) {
+  border-start-end-radius: 0;
+  border-end-end-radius: 0;
+}
+
+helix-button-group[orientation="vertical"]:not([variant="spaced"]) > button:not(:first-child) {
+  border-start-start-radius: 0;
+  border-start-end-radius: 0;
+}
+
+helix-button-group[orientation="vertical"]:not([variant="spaced"]) > button:not(:last-child) {
+  border-end-start-radius: 0;
+  border-end-end-radius: 0;
+}
 [data-button="ghost"] {
   background-color: var(--button-background-color, transparent);
   border-color: transparent;
@@ -739,7 +764,7 @@ helix-toggle[disabled]::part(item) {
      and in a taller bar the percentage still wins. */
   min-block-size: var(--helix-size-control-sm);
   border-radius: var(--helix-radii-sm);
-  color: var(--helix-color-foreground-muted);
+  color: var(--navigation-item-color, var(--helix-color-foreground-muted));
   display: inline-flex;
   font-size: var(--helix-text-sm);
   font-weight: var(--helix-weight-medium);
@@ -973,7 +998,7 @@ helix-toggle[disabled]::part(item) {
 
 /* No surface of its own. */
 :where([data-navigation-item], helix-navigation a)[aria-current="page"] {
-  color: var(--helix-color-foreground);
+  color: var(--navigation-item-current-color, var(--helix-color-foreground));
   font-weight: var(--helix-weight-semibold);
 }
 

@@ -214,6 +214,11 @@ struct Survey {
     /// be read only from another's sheet. This is the same pairing held to one
     /// package.
     touched_in: BTreeMap<String, BTreeSet<String>>,
+    /// The packages holding the token layer, whose reads answer for every
+    /// package: the layer is the page's stylesheet, loaded with the
+    /// components, and a rule there styling a component's slotted content is
+    /// that component's hook.
+    layer_packages: BTreeSet<String>,
     /// Hooks documented below the class block, each with the file saying it.
     ///
     /// The analyzer collects `@cssproperty` from the block the element is
@@ -282,6 +287,7 @@ fn survey(context: &Context) -> Survey {
         if directory.is_dir() && !roots.contains(&directory) {
             roots.push(directory);
         }
+        survey.layer_packages.insert(package_of(sheet));
     }
 
     for root in &roots {
@@ -662,10 +668,15 @@ fn elsewhere(survey: &Survey) -> Vec<Finding> {
     let mut findings = Vec::new();
     for (path, name) in survey.declared_at.keys() {
         let package = package_of(path);
-        let touched = survey
-            .touched_in
-            .get(name)
-            .is_some_and(|packages| packages.contains(&package));
+        /* The layer's own reads count for every package. A slotted link is
+        styled by the page's rules ahead of anything the shadow root says, so
+        a hook on it is read in the layer and published by the component. */
+        let touched = survey.touched_in.get(name).is_some_and(|packages| {
+            packages.contains(&package)
+                || packages
+                    .iter()
+                    .any(|one| survey.layer_packages.contains(one))
+        });
         let family = name.rfind('-').filter(|at| *at > 0).is_some_and(|at| {
             survey
                 .touched_family
