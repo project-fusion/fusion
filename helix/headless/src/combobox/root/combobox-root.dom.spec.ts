@@ -189,6 +189,97 @@ describe('combobox', () => {
   })
 })
 
+describe('the keys a combobox field keeps for its text', () => {
+  /* Dispatched as a reader's key would be, and asked whether the field kept
+     it: a press the list took is one whose default was prevented, which for a
+     printable key means nothing was typed. */
+  const kept = async (host: Updatable, key: string): Promise<boolean> => {
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key,
+    })
+    control(host).dispatchEvent(event)
+    await settle(host)
+    return !event.defaultPrevented
+  }
+
+  test('a space is typed, and chooses nothing', async () => {
+    /* Measured before this: "New" highlighted "New York", and the space chose
+       it and shut the panel, so a query of two words could not be typed. */
+    const host = await combobox()
+    await type(host, 'ru')
+    expect(await kept(host, ' ')).toBe(true)
+    expect((host as unknown as { value: string }).value).toBe('')
+    expect((host as unknown as { open: boolean }).open).toBe(true)
+  })
+
+  test('Home and End move the caret, not the highlight', async () => {
+    const host = await combobox()
+    await type(host, 'ru')
+    expect(await kept(host, 'Home')).toBe(true)
+    expect(await kept(host, 'End')).toBe(true)
+    expect(
+      options(host)
+        .find((option) => option.active)
+        ?.textContent?.trim(),
+    ).toBe('Rust')
+  })
+
+  test('Enter in a closed field chooses nothing, and is left to the form', async () => {
+    /* The highlight a reader rejected with Escape stayed on the list, and an
+       Enter in the closed field chose it and kept the form from submitting. */
+    const host = await combobox('default-value="go"')
+    await press(host, 'ArrowDown')
+    await press(host, 'ArrowDown')
+    await press(host, 'Escape')
+    expect((host as unknown as { open: boolean }).open).toBe(false)
+    expect(await kept(host, 'Enter')).toBe(true)
+    expect((host as unknown as { value: string }).value).toBe('go')
+  })
+
+  test('Down opens on the chosen option, with its words still in the field', async () => {
+    const host = await combobox('default-value="rb"')
+    await press(host, 'ArrowDown')
+    expect(
+      options(host)
+        .find((option) => option.active)
+        ?.textContent?.trim(),
+    ).toBe('Ruby')
+    expect(control(host).value).toBe('Ruby')
+  })
+
+  test('emptying the field and leaving it clears the choice', async () => {
+    const host = await combobox('default-value="rb"')
+    await type(host, '', 'deleteContentBackward')
+    await press(host, 'Tab')
+    expect((host as unknown as { value: string }).value).toBe('')
+    expect(formValue(host as HTMLElement)).toBeNull()
+  })
+
+  test('while Escape puts the choice back', async () => {
+    const host = await combobox('default-value="rb"')
+    await type(host, '', 'deleteContentBackward')
+    await press(host, 'Escape')
+    await press(host, 'Tab')
+    expect((host as unknown as { value: string }).value).toBe('rb')
+    expect(control(host).value).toBe('Ruby')
+  })
+
+  test('selectedIndex moves the value, the field and the form together', async () => {
+    const host = (await combobox('default-value="rb"')) as Updatable & {
+      selectedIndex: number
+      value: string
+    }
+    host.selectedIndex = 2
+    await settle(host)
+    expect(host.value).toBe('go')
+    expect(control(host).value).toBe('Go')
+    expect(formValue(host as HTMLElement)).toBe('go')
+  })
+})
+
 describe('combobox holding several', () => {
   const many = async (extra = ''): Promise<Updatable> => {
     document.body.innerHTML = `<helix-headless-combobox label="L" multiple name="c" ${extra}>
@@ -331,7 +422,7 @@ describe('combobox that takes an answer it was not given', () => {
   }
 
   const row = (host: Updatable): HTMLElement | null =>
-    (host as HTMLElement).shadowRoot?.querySelector<HTMLElement>('[part="create"]') ?? null
+    (host as HTMLElement).shadowRoot?.querySelector<HTMLElement>('[part~="create"]') ?? null
 
   test('the row is offered beside near misses, not only when nothing matches', async () => {
     /* A reader typing "Ruby on Rails" with "Ruby" in the list wants the one
@@ -400,6 +491,38 @@ describe('combobox that takes an answer it was not given', () => {
     await type(host, 'Rub')
     await press(host, 'Enter')
     expect((host as unknown as { value: string }).value).toBe('rb')
+  })
+
+  test('the arrows reach the row after the last option, and Enter there adds', async () => {
+    /* The row is a button outside the list, so the list's own keys never
+       reached it: with "Ruby" still matching "Ru", the keyboard could only pick
+       Ruby or Rust. */
+    const host = await open()
+    const heard: string[] = []
+    host.addEventListener('helix-create', (event) =>
+      heard.push((event as CustomEvent<{ value: string }>).detail.value),
+    )
+    await type(host, 'Ru')
+    await press(host, 'ArrowDown')
+    await press(host, 'ArrowDown')
+    expect(options(host).some((option) => option.active)).toBe(false)
+    expect(row(host)?.getAttribute('part')).toBe('create create-active')
+    await press(host, 'Enter')
+    expect(heard).toEqual(['Ru'])
+    expect((host as unknown as { value: string }).value).toBe('Ru')
+  })
+
+  test('and an arrow from the row goes back into the list', async () => {
+    const host = await open()
+    await type(host, 'Ru')
+    await press(host, 'ArrowUp')
+    expect(row(host)?.getAttribute('part')).toBe('create create-active')
+    await press(host, 'ArrowDown')
+    expect(
+      options(host)
+        .find((option) => option.active)
+        ?.textContent?.trim(),
+    ).toBe('Rust')
   })
 
   test('with several, a created answer joins the set rather than replacing it', async () => {
