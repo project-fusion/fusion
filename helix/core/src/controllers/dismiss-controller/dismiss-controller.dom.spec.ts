@@ -140,6 +140,53 @@ describe('Escape with more than one overlay open', () => {
   })
 })
 
+describe('Escape and the layer under the overlay', () => {
+  /* A native `<dialog>` takes Escape as a close request once every `keydown`
+     listener has run, and skips it when the `keydown` was canceled. So an
+     overlay that takes the key has to cancel it, or one press closes a select
+     and the dialog it sits in. */
+  test('is consumed by the overlay that takes it', () => {
+    document.body.innerHTML = ''
+    const one = overlay()
+    one.dismiss.activate()
+    const event = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' })
+    document.dispatchEvent(event)
+    expect(event.defaultPrevented).toBe(true)
+  })
+
+  /* happy-dom does not parse `:modal`, so the dialog says it is modal itself.
+     The key is pressed inside the dialog, and the overlay under it is inert. */
+  const modal = (): HTMLDialogElement => {
+    const dialog = document.createElement('dialog')
+    dialog.open = true
+    Object.assign(dialog, { matches: (selector: string): boolean => selector === ':modal' })
+    document.body.append(dialog)
+    return dialog
+  }
+
+  test('belongs to a modal dialog it was pressed in, over an overlay outside it', () => {
+    document.body.innerHTML = ''
+    const under = overlay()
+    under.dismiss.activate()
+    const dialog = modal()
+    const field = document.createElement('button')
+    dialog.append(field)
+    const event = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' })
+    field.dispatchEvent(event)
+    expect([under.asked, event.defaultPrevented]).toEqual([0, false])
+  })
+
+  test('and an overlay inside that dialog still takes it', () => {
+    document.body.innerHTML = ''
+    const dialog = modal()
+    const inside = overlay(dialog)
+    inside.dismiss.activate()
+    const event = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' })
+    inside.host.dispatchEvent(event)
+    expect([inside.asked, event.defaultPrevented]).toEqual([1, true])
+  })
+})
+
 describe('a press outside', () => {
   test('closes the overlay', () => {
     document.body.innerHTML = '<p id="elsewhere">elsewhere</p>'
