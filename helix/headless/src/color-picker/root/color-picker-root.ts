@@ -601,10 +601,22 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
   /** Takes a preset, in this picker's syntax rather than as the preset spelled it. */
   private readonly handleSwatch = (preset: string): void => {
     const parsed = parseColor(preset)
-    if (parsed) {
-      this.move(parsed)
-      this.settle()
+    if (!parsed) {
+      return
     }
+    /* Written from the preset's own numbers where its syntax has them, as a
+       channel field writes: through the model, `#00aa00` came out `#00ab00`,
+       the brightness being held as a whole percentage. */
+    const format = this.format ?? 'hex'
+    const fields = channelFields(preset, parsed, format, this.alpha)
+    const first = fields[0]
+    const exact = first && writeChannel(fields, format, this.alpha, first.channel, first.value)
+    if (exact) {
+      this.takeWritten(exact)
+    } else {
+      this.move(parsed)
+    }
+    this.settle()
   }
 
   /**
