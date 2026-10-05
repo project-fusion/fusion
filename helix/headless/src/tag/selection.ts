@@ -29,3 +29,18 @@ export const pressedValue = (mode: TagSelectionMode, value: string, pressed: str
   }
   return value
 }
+
+/**
+ * The `value` once a tag carrying `removed` has left, where `left` is what
+ * the tags still there stand for.
+ *
+ * Taken out only where no tag left still stands for it, so two tags with one
+ * value keep it while either remains. The rest is written back as it was.
+ */
+export const prunedValue = (value: string, removed: string, left: string[]): string => {
+  const now = commaList(value)
+  if (!now.includes(removed) || left.includes(removed)) {
+    return value
+  }
+  return now.filter((one) => one !== removed).join(', ')
+}

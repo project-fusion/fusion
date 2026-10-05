@@ -142,10 +142,18 @@ export class HelixHeadlessTag extends MixinDismissible(HelixElement) {
 
   /* What the group gives the tag, said through `ElementInternals` so nothing is
      written onto a host the consumer rendered. In `willUpdate`, which a server
-     calls too, so a served tag says what a hydrated one says. */
+     calls too, so a served tag says what a hydrated one says.
+
+     **A row is named by its words alone.** Named from its content, a row of a
+     tag called Open was "Open Remove Open", its remove button's name read
+     after its own; the button is still in the row, and says its name when a
+     reader reaches it. */
   protected override willUpdate(changed: PropertyValues<this>): void {
     super.willUpdate(changed)
-    hostAria(this.internals, { role: this.grouped ? 'row' : '' })
+    hostAria(this.internals, {
+      label: this.grouped ? this.words : '',
+      role: this.grouped ? 'row' : '',
+    })
     this.internals.ariaSelected = this.selected === undefined ? null : String(this.selected)
     this.internals.ariaDisabled = this.disabled ? 'true' : null
     this.toggleState('selected', this.selected === true)
@@ -190,7 +198,11 @@ export class HelixHeadlessTag extends MixinDismissible(HelixElement) {
     /* A cell only in a group, so a tag on its own renders exactly what it did:
        a grid row needs a cell to hold what it shows, and a lone tag is no row. */
     return this.grouped
-      ? html`<span part="cell" role="gridcell" tabindex=${this.focusable ? '0' : '-1'}
+      ? html`<span
+          aria-label=${this.words || nothing}
+          part="cell"
+          role="gridcell"
+          tabindex=${this.focusable ? '0' : '-1'}
           >${content}</span
         >`
       : content

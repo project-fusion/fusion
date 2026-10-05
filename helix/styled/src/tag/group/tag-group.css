@@ -5,3 +5,11 @@
   flex-wrap: wrap;
   gap: var(--tag-group-gap, var(--helix-space-2xs));
 }
+
+/* The empty part takes focus when the last tag is removed, and draws the ring
+   a tag draws round whatever the `empty` slot holds. */
+[part="empty"]:focus-visible {
+  border-radius: var(--helix-radii-sm);
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
