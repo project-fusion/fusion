@@ -64,3 +64,18 @@ describe('one speed dial action', () => {
     expect(part(host, 'label')?.querySelector('slot')?.hasAttribute('name')).toBe(false)
   })
 })
+
+describe('the action the keyboard is on', () => {
+  /* `Option` calls it `active`, and `selected` is kept for code that reads it. */
+  test('is active while it has focus, and selected still says the same', async () => {
+    const one = (await action()) as unknown as HTMLElement & {
+      active: boolean
+      focusItem(): void
+      selected: boolean
+    }
+    expect(one.active).toBe(false)
+    one.focusItem()
+    expect(one.active).toBe(true)
+    expect(one.selected).toBe(true)
+  })
+})

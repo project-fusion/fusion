@@ -1,4 +1,9 @@
-import { customElement, deepActiveElement, HelixElement, HelixSelectEvent } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  deepActiveElement,
+  HelixElement,
+  HelixSelectEvent,
+} from '@fusion.dev/helix-core'
 import { caretRight } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -147,22 +152,31 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
   }
 
   /**
-   * Whether this is the current row, which in a drill-down is the row with
-   * focus.
+   * Whether the row has focus, which makes it the row the keyboard is on.
    *
-   * A radio group's selection is an answer it holds; a page of rows has no
-   * answer, only the row a reader has walked to, so focus is the whole of what
-   * "the current one" can mean here. This is `Menu.Item`'s reading word for
-   * word, and the two are one pattern: a menu that drills and a drill-down are
-   * the same rows through the same controller.
+   * `Option` calls the same thing `active`. A page of rows holds no answer the
+   * way a radio group does, only the row a reader has walked to, so focus is
+   * the whole of what "the current one" can mean here. This is `Menu.Item`'s
+   * reading word for word, and the two are one pattern: a menu that drills and
+   * a drill-down are the same rows through the same controller.
    *
    * The focused node is found through every shadow root and asked whether it
    * is in this row's own, as `Menu.Item` does, so a drill-down inside another
    * component's shadow root still knows its current row.
    */
-  get selected(): boolean {
+  get active(): boolean {
     const active = deepActiveElement()
     return active !== null && active.getRootNode() === this.renderRoot
+  }
+
+  /**
+   * Whether the row has focus, the same as `active`.
+   *
+   * @deprecated Read `active`. Everywhere else in the library `selected` means
+   * chosen out of a set, and a drill-down row is never chosen that way.
+   */
+  get selected(): boolean {
+    return this.active
   }
 
   /** Fires `helix-select` for this row. */

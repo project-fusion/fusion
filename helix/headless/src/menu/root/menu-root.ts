@@ -318,7 +318,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
       return
     }
     const items = this.items
-    const at = items.findIndex((item) => item.selected)
+    const at = items.findIndex((item) => item.active)
     /* In is where a submenu's caret points and out is back along the line, so
        on a right-to-left page the left arrow opens and the right comes back. */
     const along = inlineStep(this, event.key)

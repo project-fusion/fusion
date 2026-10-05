@@ -120,3 +120,18 @@ describe('a row that opens a page', () => {
     expect(part(host, 'item')?.getAttribute('aria-haspopup')).toBe('menu')
   })
 })
+
+describe('the row the keyboard is on', () => {
+  /* `Option` calls it `active`, and `selected` is kept for code that reads it. */
+  test('is active while it has focus, and selected still says the same', async () => {
+    const one = (await row()) as unknown as HTMLElement & {
+      active: boolean
+      focusItem(): void
+      selected: boolean
+    }
+    expect(one.active).toBe(false)
+    one.focusItem()
+    expect(one.active).toBe(true)
+    expect(one.selected).toBe(true)
+  })
+})

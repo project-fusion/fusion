@@ -182,3 +182,18 @@ describe('choosing a row that can be ticked', () => {
     expect(found.map((one) => one.checked)).toEqual([false, true, true])
   })
 })
+
+describe('the row the keyboard is on', () => {
+  /* `Option` calls it `active`, and `selected` is kept for code that reads it. */
+  test('is active while it has focus, and selected still says the same', async () => {
+    const one = (await row()) as unknown as HTMLElement & {
+      active: boolean
+      focusItem(): void
+      selected: boolean
+    }
+    expect(one.active).toBe(false)
+    one.focusItem()
+    expect(one.active).toBe(true)
+    expect(one.selected).toBe(true)
+  })
+})

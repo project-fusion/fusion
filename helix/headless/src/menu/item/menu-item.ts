@@ -312,16 +312,16 @@ export class HelixHeadlessMenuItem extends HelixElement {
   }
 
   /**
-   * Whether the row has focus, which is what selected means in a menu.
+   * Whether the row has focus, which makes it the row the keyboard is on.
    *
-   * A radio group's selection is an answer it holds; a menu has no answer, only
-   * a row the reader has walked to, so focus is the whole of what "the current
-   * one" can mean here. Read from the shadow root rather than kept as state,
-   * because focus moves for reasons this element is not told about: a press, a
-   * Tab, the drilldown putting the reader on the first row of a page it has
-   * just opened.
+   * `Option` calls the same thing `active`. A menu holds no answer the way a
+   * radio group does, only a row the reader has walked to, so focus is the
+   * whole of what "the current one" can mean here. Read from the shadow root
+   * rather than kept as state, because focus moves for reasons this element is
+   * not told about: a press, a Tab, the drilldown putting the reader on the
+   * first row of a page it has just opened.
    */
-  get selected(): boolean {
+  get active(): boolean {
     /* The focused node itself, found through every shadow root, and asked
        whether it is in this row's own. `document.activeElement` stops at the
        outermost host, which is this row only while the menu is in the document
@@ -331,6 +331,16 @@ export class HelixHeadlessMenuItem extends HelixElement {
        was. */
     const active = deepActiveElement()
     return active !== null && active.getRootNode() === this.renderRoot
+  }
+
+  /**
+   * Whether the row has focus, the same as `active`.
+   *
+   * @deprecated Read `active`. Everywhere else in the library `selected` means
+   * chosen out of a set, and a menu row is never chosen that way.
+   */
+  get selected(): boolean {
+    return this.active
   }
 
   /**
