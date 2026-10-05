@@ -4,14 +4,16 @@ import {
   HostClickController,
   MixinSelectableItem,
 } from '@fusion.dev/helix-core'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
  * @summary One option in a toggle group.
  *
  * @description
- * Renders a `<button role="radio">` for use as a form control.
+ * Renders a `<button role="radio">` for use as a form control. In a group with
+ * `selection-mode="multiple"` it is a `<button>` that says whether it is
+ * pressed with `aria-pressed`.
  *
  * Do not use it for navigation. For navigation, use links marked with
  * `aria-current` and styled by the `data-navigation-item` recipe in the base
@@ -29,6 +31,7 @@ import { property } from 'lit/decorators.js'
  *
  * @csspart item - The radio button.
  *
+ * @cssstate pressed - The item is pressed, in a group where several can be.
  * @cssstate selected - The item is chosen.
  */
 @customElement('helix-headless-toggle')
@@ -86,6 +89,20 @@ export class HelixHeadlessToggle extends MixinSelectableItem(HelixElement) {
   focusable?: boolean
 
   /**
+   * Whether the item is pressed, in a group where several can be, and
+   * `undefined` in a group where one is chosen.
+   *
+   * Written by the group, like `selected`, so no attribute.
+   */
+  @property({ attribute: false })
+  pressed?: boolean | undefined
+
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    this.toggleState('pressed', this.pressed === true)
+  }
+
+  /**
    * Asks for the render that follows a hydration, so the stop stops being every
    * choice's.
    *
@@ -114,8 +131,9 @@ export class HelixHeadlessToggle extends MixinSelectableItem(HelixElement) {
     return html`<button
       part="item"
       type="button"
-      role="radio"
-      aria-checked=${this.selected ? 'true' : 'false'}
+      role=${this.pressed === undefined ? 'radio' : nothing}
+      aria-checked=${this.pressed === undefined ? (this.selected ? 'true' : 'false') : nothing}
+      aria-pressed=${this.pressed === undefined ? nothing : String(this.pressed)}
       ?disabled=${this.disabled}
       tabindex=${(this.focusable ?? this.selected) || !this.childrenKnown ? '0' : '-1'}
       @click=${() => this.select()}

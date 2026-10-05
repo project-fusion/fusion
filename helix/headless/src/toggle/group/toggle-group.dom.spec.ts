@@ -311,3 +311,68 @@ describe('toggle group edges', () => {
     expect(formValue(group)).toBeNull()
   })
 })
+
+describe('a group where several can be pressed', () => {
+  type Toolbar = Updatable & { updateComplete: Promise<unknown>; value: string; values: string[] }
+  const toolbar = async (): Promise<Toolbar> => {
+    const group =
+      (await mount(`<helix-headless-toggle-group label="Format" name="format" selection-mode="multiple" value="italic">
+      <helix-headless-toggle value="bold">Bold</helix-headless-toggle>
+      <helix-headless-toggle value="italic">Italic</helix-headless-toggle>
+      <helix-headless-toggle value="underline">Underline</helix-headless-toggle>
+    </helix-headless-toggle-group>`)) as Toolbar
+    await group.updateComplete
+    return group
+  }
+  const button = (item: HTMLElement): HTMLElement =>
+    item.shadowRoot?.querySelector('[part="item"]') as HTMLElement
+  const settle = async (group: Toolbar): Promise<void> => {
+    await new Promise((done) => queueMicrotask(() => done(undefined)))
+    await group.updateComplete
+    await Promise.all(items(group).map((item) => (item as unknown as Toolbar).updateComplete))
+  }
+
+  /* React Aria's ToggleButtonGroup with selectionMode multiple, Radix's
+     ToggleGroup type multiple: a toolbar of aria-pressed buttons. */
+  test('is a toolbar of buttons that say whether they are pressed', async () => {
+    const group = await toolbar()
+    await settle(group)
+    expect(role(group)).toBe('toolbar')
+    expect(items(group).map((item) => button(item).getAttribute('aria-pressed'))).toEqual([
+      'false',
+      'true',
+      'false',
+    ])
+    expect(button(items(group)[0] as HTMLElement).hasAttribute('role')).toBe(false)
+  })
+
+  test('a press presses or releases one item, in the order they are written', async () => {
+    const group = await toolbar()
+    button(items(group)[2] as HTMLElement).click()
+    await settle(group)
+    button(items(group)[0] as HTMLElement).click()
+    await settle(group)
+    expect(group.values).toEqual(['bold', 'italic', 'underline'])
+    button(items(group)[1] as HTMLElement).click()
+    await settle(group)
+    expect(group.value).toBe('bold,underline')
+    const sent = formValue(group) as unknown as FormData
+    expect(sent.getAll('format')).toEqual(['bold', 'underline'])
+  })
+
+  test('the arrow keys move without pressing', async () => {
+    const group = await toolbar()
+    group.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'End' }))
+    await settle(group)
+    expect(group.values).toEqual(['italic'])
+  })
+})
+
+describe('a vertical group', () => {
+  test('says its orientation to the accessibility tree', async () => {
+    const group = (await mount(
+      markup.replace('default-value="light"', 'default-value="light" orientation="vertical"'),
+    )) as Updatable & { internals: ElementInternals }
+    expect(group.internals.ariaOrientation).toBe('vertical')
+  })
+})
