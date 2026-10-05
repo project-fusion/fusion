@@ -202,3 +202,18 @@ describe('a copy button in a row of controls', () => {
     expect(button.getAttribute('tabindex')).toBe('-1')
   })
 })
+
+describe('a copy button named on the host', () => {
+  /* `aria-label="Copy invite link"` beside `label="Copy link"` was ignored, and
+     carried down as it is on Button it would cover "Copied". */
+  test('is named by aria-label before a copy, and says Copied after it', async () => {
+    clipboard('accept')
+    const el = (await mount(
+      '<helix-headless-copy-button value="x" label="Copy link" aria-label="Copy invite link"></helix-headless-copy-button>',
+    )) as Updatable
+    const button = el.shadowRoot?.querySelector('[part="button"]') as HTMLButtonElement
+    expect(button.getAttribute('aria-label')).toBe('Copy invite link')
+    await press(el)
+    expect(button.getAttribute('aria-label')).toBe('Copied')
+  })
+})

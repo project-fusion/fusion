@@ -127,6 +127,20 @@ describe('the route a write takes', () => {
   })
 })
 
+describe('focus around the deprecated route', () => {
+  /* The carrier takes focus to be copied from and then leaves the page, which
+     dropped a keyboard reader on the body. */
+  test('goes back to where it was', async () => {
+    routes({ legacy: true, modern: false })
+    const button = document.createElement('button')
+    document.body.append(button)
+    button.focus()
+    await new CopyController(host() as never).copy('ada')
+    expect(document.activeElement).toBe(button)
+    button.remove()
+  })
+})
+
 describe('a write that succeeded', () => {
   test('is confirmed, and the host is asked to show it', async () => {
     routes({ modern: true })

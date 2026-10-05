@@ -27,6 +27,9 @@ import { styles } from './icon-button-root.css.js'
  *
  * @csspart button - The inner button or anchor.
  *
+ * @cssproperty --icon-button-background-color - Fill behind the button, in every state.
+ * @cssproperty --icon-button-background-color-hover - Fill behind the button under the pointer. Without it, `--icon-button-background-color` also applies on hover.
+ * @cssproperty --icon-button-foreground-color - Icon color.
  * @cssproperty --icon-button-radius - Corner radius of the control, which a group flattens through `--button-radius-start` and `--button-radius-end`.
  * @cssproperty --icon-button-shadow - Shadow of a raised icon button.
  * @cssproperty --icon-button-size - Edge length of the control.

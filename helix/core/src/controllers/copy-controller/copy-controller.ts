@@ -1,5 +1,6 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
 import { HelixCopyEvent } from '../../events/events.js'
+import { deepActiveElement } from '../../utils/focusable-elements/focusable-elements.js'
 
 /** What a copy needs to know, asked for rather than assumed. */
 export interface CopyOptions {
@@ -39,6 +40,10 @@ const write = async (text: string): Promise<boolean> => {
     /* Fall through. There is nothing to report yet. */
   }
 
+  /* Focus goes back where it was. The carrier takes it to be copied from and
+     then leaves the page, which dropped a keyboard reader on the body and kept
+     a screen reader from hearing the button's name change to "Copied". */
+  const had = deepActiveElement()
   const carrier = document.createElement('textarea')
   carrier.value = text
   carrier.setAttribute('readonly', '')
@@ -57,6 +62,9 @@ const write = async (text: string): Promise<boolean> => {
     wrote = false
   }
   carrier.remove()
+  if (had instanceof HTMLElement || had instanceof SVGElement) {
+    had.focus({ preventScroll: true })
+  }
   return wrote
 }
 

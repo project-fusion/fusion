@@ -23,6 +23,12 @@ const CONFIRM = 1600
  * that is not focused, or after a gesture that does not qualify. A refused
  * write leaves the button unchanged.
  *
+ * It replaces Button's render and its press, so it never submits a form or
+ * sends a command: `type`, `command`, `commandfor` and the `form*` overrides
+ * have no effect, and the `start` and `end` slots and the `text` part are not
+ * rendered. An `aria-label` on the element names it before a copy, in place of
+ * `label`.
+ *
  * @since 0.1.0
  * @status stable
  * @category actions
@@ -71,12 +77,8 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
   /**
    * The text copied to the clipboard.
    *
-   * **Narrows `Button.value`, which is the submit value, and the two agree.**
-   * A copy button is `type="button"` and never submits, so the inherited
-   * meaning has nothing to act on; where a consumer changes the type, what it
-   * submits is what it copies, which is the reading anybody would expect of one
-   * property called `value`. Declared here rather than inherited because the
-   * clipboard is what this component is about and its own page should say so.
+   * It replaces `Button.value`, the submit value: a copy button never submits,
+   * whatever its `type`. Declared here so its own page says what it holds.
    */
   @property()
   override value = ''
@@ -92,7 +94,28 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
    * makes the announcement happen at all.
    */
   private get says(): string {
-    return this.copied ? this.copiedLabel : this.label
+    return this.copied ? this.copiedLabel : this.namedBy || this.label
+  }
+
+  /**
+   * @internal The host's `aria-label`, observed so a new one renders, as
+   * `MixinField` observes it. Not reflected: the attribute is the consumer's.
+   */
+  @property({ attribute: 'aria-label' })
+  protected namedBy: string | null = null
+
+  /**
+   * @internal The name is written here, from `aria-label` too, so it can
+   * change to `copiedLabel`: carried down as well, a host `aria-label` would
+   * cover the confirmation.
+   */
+  protected override get forwardsLabel(): boolean {
+    return false
+  }
+
+  /** @internal A copy button never submits, so it is no form's default button. */
+  protected override get submitsForm(): boolean {
+    return false
   }
 
   /**

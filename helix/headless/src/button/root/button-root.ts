@@ -58,9 +58,18 @@ export class HelixHeadlessButton extends HelixFormElement {
      the description and the accessibility tree exposed the inner control
      without it. */
   protected readonly aria = new AriaForwardController(this, {
-    label: true,
+    label: () => this.forwardsLabel,
     target: () => this.partNamed('button'),
   })
+
+  /**
+   * @internal Whether a host `aria-label` names the inner button. A subclass
+   * that writes the name itself, as `CopyButton` does while it confirms a
+   * copy, says no.
+   */
+  protected get forwardsLabel(): boolean {
+    return true
+  }
 
   /**
    * What to send when the button is activated, and what to send it to.

@@ -76,7 +76,7 @@
    changes. */
 [part="button"] {
   align-items: center;
-  background-color: transparent;
+  background-color: var(--icon-button-background-color, transparent);
   block-size: var(--_icon-button-size);
   border: var(--helix-border-thin) solid transparent;
   /*
@@ -104,7 +104,7 @@
     --button-radius-start,
     var(--icon-button-radius, var(--helix-radii-sm))
   );
-  color: var(--_icon-button-ink);
+  color: var(--icon-button-foreground-color, var(--_icon-button-ink));
   cursor: pointer;
   display: inline-flex;
   /* The UA gives a button its own font, so this one was drawing at 13.33px
@@ -130,8 +130,14 @@
  * in the base layer already makes for exactly this.
  */
 :host(:not(:disabled)) [part="button"]:hover {
-  background-color: color-mix(in oklab, var(--_icon-button-tone) 8%, transparent);
-  color: var(--_icon-button-ink-hover);
+  background-color: var(
+    --icon-button-background-color-hover,
+    var(
+      --icon-button-background-color,
+      color-mix(in oklab, var(--_icon-button-tone) 8%, transparent)
+    )
+  );
+  color: var(--icon-button-foreground-color, var(--_icon-button-ink-hover));
 }
 
 :host([shape="circle"]) [part="button"] {
@@ -166,13 +172,16 @@
  * own; written out it selects nothing and lands on the block above.
  */
 :host([emphasis="solid"]) [part="button"] {
-  background-color: var(--_icon-button-fill);
+  background-color: var(--icon-button-background-color, var(--_icon-button-fill));
   border-color: transparent;
-  color: var(--_icon-button-on-tone);
+  color: var(--icon-button-foreground-color, var(--_icon-button-on-tone));
 }
 :host(:not(:disabled)[emphasis="solid"]) [part="button"]:hover {
-  background-color: var(--_icon-button-fill-hover);
-  color: var(--_icon-button-on-tone);
+  background-color: var(
+    --icon-button-background-color-hover,
+    var(--icon-button-background-color, var(--_icon-button-fill-hover))
+  );
+  color: var(--icon-button-foreground-color, var(--_icon-button-on-tone));
 }
 
 /* Framed, for a control standing beside a field: the field paints itself, and a
@@ -185,24 +194,42 @@
  * kinds of control. A percentage of the ink is a step away from whatever it sits
  * on in either mode, where a fixed neutral is not. */
 :host([emphasis="outlined"]) [part="button"] {
-  background-color: color-mix(in oklab, var(--_icon-button-tone) 6%, transparent);
+  background-color: var(
+    --icon-button-background-color,
+    color-mix(in oklab, var(--_icon-button-tone) 6%, transparent)
+  );
   border-color: var(--_icon-button-edge);
-  color: var(--_icon-button-tone);
+  color: var(--icon-button-foreground-color, var(--_icon-button-tone));
 }
 :host(:not(:disabled)[emphasis="outlined"]) [part="button"]:hover {
-  background-color: color-mix(in oklab, var(--_icon-button-tone) 12%, transparent);
-  color: var(--_icon-button-tone);
+  background-color: var(
+    --icon-button-background-color-hover,
+    var(
+      --icon-button-background-color,
+      color-mix(in oklab, var(--_icon-button-tone) 12%, transparent)
+    )
+  );
+  color: var(--icon-button-foreground-color, var(--_icon-button-tone));
 }
 
 :host([emphasis="subtle"]) [part="button"] {
-  background-color: color-mix(in oklab, var(--_icon-button-tone) 14%, transparent);
+  background-color: var(
+    --icon-button-background-color,
+    color-mix(in oklab, var(--_icon-button-tone) 14%, transparent)
+  );
   border-color: transparent;
-  color: var(--_icon-button-tone);
+  color: var(--icon-button-foreground-color, var(--_icon-button-tone));
 }
 
 :host(:not(:disabled)[emphasis="subtle"]) [part="button"]:hover {
-  background-color: color-mix(in oklab, var(--_icon-button-tone) 22%, transparent);
-  color: var(--_icon-button-tone);
+  background-color: var(
+    --icon-button-background-color-hover,
+    var(
+      --icon-button-background-color,
+      color-mix(in oklab, var(--_icon-button-tone) 22%, transparent)
+    )
+  );
+  color: var(--icon-button-foreground-color, var(--_icon-button-tone));
 }
 
 /* `:host(:disabled)`, not `:host([disabled])`.
