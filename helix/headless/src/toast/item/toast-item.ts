@@ -1,4 +1,5 @@
 import {
+  CountdownController,
   customElement,
   drawDismiss,
   drawDismissGlyph,
@@ -136,13 +137,23 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
     )
   }
 
-  /** When the current run of the timer began, or nothing while it is paused. */
-  private startedAt: number | undefined
-
-  /** What is left of the duration, so resuming continues rather than restarts. */
-  private remaining: number | undefined
-
-  private timer: ReturnType<typeof setTimeout> | undefined
+  /**
+   * The dismiss timer, which pauses while a reader is on the message and
+   * continues from what was left.
+   *
+   * Paused is said on the host so the indicator can freeze with the clock. A
+   * `data-` attribute rather than a property, because it is written after
+   * upgrade from a pointer moving: nothing declares it and no server rendered
+   * it, which is the same reason `Carousel` names its slides from here.
+   */
+  private readonly countdown = new CountdownController(this, {
+    done: () => {
+      this.dismiss()
+    },
+    paused: (paused) => {
+      this.toggleAttribute('data-paused', paused)
+    },
+  })
 
   /**
    * The kind of message, which sets its mark and the mark's accessible name.
@@ -170,8 +181,7 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
     /* The clock stops either way. A timer left running on a message that has
        gone would fire into nothing, and would hold the item alive until it
        did. */
-    clearTimeout(this.timer)
-    this.timer = undefined
+    this.countdown.cancel()
     return requestChange({
       apply: () => {
         const previous = this.open
@@ -192,58 +202,25 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
 
   /** Pauses the dismiss timer and keeps the time that is left. */
   pause(): void {
-    if (this.timer === undefined || this.startedAt === undefined) {
-      return
-    }
-    clearTimeout(this.timer)
-    this.timer = undefined
-    this.remaining = Math.max((this.remaining ?? 0) - (Date.now() - this.startedAt), 0)
-    this.startedAt = undefined
-    /* Said on the host so the indicator can freeze with the clock. A `data-`
-       attribute rather than a property, because it is written after upgrade
-       from a pointer moving: nothing declares it and no server rendered it,
-       which is the same reason `Carousel` names its slides from here. */
-    this.toggleAttribute('data-paused', true)
+    this.countdown.pause()
   }
 
   /** Restarts the dismiss timer from where it paused. */
   resume(): void {
-    if (this.timer !== undefined || this.remaining === undefined || this.remaining <= 0) {
-      return
-    }
-    this.startedAt = Date.now()
-    this.toggleAttribute('data-paused', false)
-    this.timer = setTimeout(() => {
-      this.timer = undefined
-      this.dismiss()
-    }, this.remaining)
+    this.countdown.resume()
   }
 
   /* Arrows, so `this` is the item wherever the listener ends up. Lit does bind
      a template listener to its host, and relying on that puts a load-bearing
-     fact about a library in a place nobody reading this file would look. */
-  /**
-   * How many reasons there are to hold the clock, rather than whether there is
-   * one.
-   *
-   * Hover and focus stop the same timer, and the two are genuinely independent:
-   * a pointer can leave while focus stays, and focus can leave while the
-   * pointer stays. Uncounted, a reader who tabs into a message and then moves
-   * the pointer off it has the clock restarted underneath them, which is the
-   * case the pause exists for. Only the last one out starts it again.
-   */
-  private holds = 0
-
+     fact about a library in a place nobody reading this file would look. Hover
+     and focus are counted by the countdown, so only the last one out starts the
+     clock again. */
   private readonly handlePause = (): void => {
-    this.holds += 1
-    this.pause()
+    this.countdown.hold()
   }
 
   private readonly handleResume = (): void => {
-    this.holds = Math.max(this.holds - 1, 0)
-    if (this.holds === 0) {
-      this.resume()
-    }
+    this.countdown.release()
   }
 
   override connectedCallback(): void {
@@ -254,16 +231,6 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
     if (this.hasUpdated && this.open) {
       this.resume()
     }
-  }
-
-  override disconnectedCallback(): void {
-    super.disconnectedCallback()
-    /* Paused rather than cleared, so a move keeps the time already spent: a
-       message removed while its timer is running would otherwise fire into
-       nothing, and hold the item alive until it did. The holds go with it,
-       since a pointer or focus on a detached message never leaves it. */
-    this.pause()
-    this.holds = 0
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -308,10 +275,7 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
     super.firstUpdated(changed)
     /* Here rather than in `connectedCallback`, which the server never calls, and
        started only once: the clock belongs to this message's life on screen. */
-    if (this.duration !== undefined && this.duration > 0) {
-      this.remaining = this.duration
-      this.resume()
-    }
+    this.countdown.start(this.duration)
   }
 
   /**

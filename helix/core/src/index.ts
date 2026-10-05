@@ -21,6 +21,10 @@ export {
   type CopyOptions,
 } from './controllers/copy-controller/copy-controller.js'
 export {
+  CountdownController,
+  type CountdownOptions,
+} from './controllers/countdown-controller/countdown-controller.js'
+export {
   activeCue,
   adoptTrack,
   type Caption,
