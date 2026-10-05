@@ -158,3 +158,66 @@ export const seed = (
   visit(root, '', 0)
   return { branches, opened: open }
 }
+
+/**
+ * Where the active row goes once the rows have moved, as an index into `rows`.
+ *
+ * Onto `path` where it is still shown. Where a filter just hid it
+ * (`filtered`), onto the first match. Otherwise onto the nearest branch around
+ * it that is shown. With no path to keep, `cursor` held inside the rows.
+ */
+export const cursorFor = (
+  rows: readonly Row[],
+  path: string | undefined,
+  cursor: number,
+  filtered: boolean,
+): number => {
+  const at = (one: string): number => rows.findIndex((row) => row.path === one)
+  const own = path === undefined ? -1 : at(path)
+  if (own >= 0 || path === undefined) {
+    return own >= 0 ? own : Math.min(cursor, Math.max(0, rows.length - 1))
+  }
+  const match = filtered ? rows.findIndex((row) => row.match) : -1
+  const around = ancestorsOf(path)
+    .reverse()
+    .map(at)
+    .find((one) => one >= 0)
+  return match >= 0 ? match : (around ?? 0)
+}
+
+/**
+ * The open branches with every branch around each of `paths` opened too,
+ * where the value has that branch (`branches`).
+ */
+export const withAncestors = (
+  opened: ReadonlySet<string>,
+  branches: ReadonlySet<string>,
+  paths: Iterable<string>,
+): Set<string> => {
+  const next = new Set(opened)
+  for (const path of paths) {
+    for (const above of ancestorsOf(path)) {
+      if (branches.has(above)) {
+        next.add(above)
+      }
+    }
+  }
+  return next
+}
+
+/**
+ * The branches `*` opens from `row`: every branch at its depth under the same
+ * parent, itself included, that is not open yet.
+ */
+export const siblingBranches = (rows: readonly Row[], row: Row): string[] => {
+  const parent = row.path.slice(0, row.path.lastIndexOf('/'))
+  return rows
+    .filter(
+      (one) =>
+        one.branch &&
+        !one.open &&
+        one.depth === row.depth &&
+        one.path.slice(0, one.path.lastIndexOf('/')) === parent,
+    )
+    .map((one) => one.path)
+}

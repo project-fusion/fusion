@@ -140,6 +140,11 @@ export class HelixHeadlessListItem extends HelixElement {
     return this.childrenKnown ? slottedWords(this, ['']) : ''
   }
 
+  /** Whether something is slotted into `description`, or false where the children are not known yet. */
+  private get described(): boolean {
+    return this.childrenKnown && this.knownChildren.some((child) => child.slot === 'description')
+  }
+
   /** Whether a list with `selection-mode` holds this row, which makes it a row of a grid. */
   private get grouped(): boolean {
     return this.focusable !== undefined
@@ -234,12 +239,19 @@ export class HelixHeadlessListItem extends HelixElement {
        wrapper: a row with a leading icon put the icon 32px in instead of 16 and
        its supporting text beside the label instead of under it. */
     const content = html`${this.renderRail()}<slot name="start"></slot>
-      <slot></slot>
-      <slot name="description"></slot>`
+      <slot id="label"></slot>
+      <slot name="description" id="description"></slot>`
     /* A grid cell only in a list with `selection-mode`, so a row in a plain
        list renders exactly what it did. */
     const role = this.grouped ? 'gridcell' : nothing
     const tabindex = this.grouped ? (this.focusable ? '0' : '-1') : nothing
+    /* **The cell is named by the label and described by the description**, as
+       React Aria names a row by its text value. Named by its content, the cell
+       read the words of the controls in `end` too: "Quarterly report Edited
+       today Share". Only where the label has words, so a row whose words are
+       all in `start` keeps its name from its content. */
+    const labelledby = this.grouped && this.words !== '' ? 'label' : nothing
+    const describedby = this.grouped && this.described ? 'description' : nothing
 
     /* An anchor where there is somewhere to go, inside the same box either
        way. The host keeps `role="listitem"`, so the link is inside the item:
@@ -255,11 +267,15 @@ export class HelixHeadlessListItem extends HelixElement {
           part="row${this.current === undefined ? '' : ' row-current'}"
           role=${role}
           tabindex=${tabindex}
+          aria-labelledby=${labelledby}
+          aria-describedby=${describedby}
         >${content}<slot name="end"></slot></div>`
       : html`<div
           part="row${this.current === undefined ? '' : ' row-current'}"
           role=${role}
           tabindex=${tabindex}
+          aria-labelledby=${labelledby}
+          aria-describedby=${describedby}
         ><a
           part="link"
           href=${this.href}

@@ -16,7 +16,12 @@ import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixHeadlessListItem } from '../item/list-item.js'
 import { numbering } from '../numbering.js'
-import { type ListSelectionMode, pressedValue, rowStop } from '../selection.js'
+import {
+  choiceValue,
+  type ListSelectionBehavior,
+  type ListSelectionMode,
+  rowStop,
+} from '../selection.js'
 
 /** What inside a row takes a press of its own, so the row does not. */
 const PRESSABLE = 'a[href], button, input, label, select, textarea, [tabindex]'
@@ -29,15 +34,33 @@ const PRESSABLE = 'a[href], button, input, label, select, textarea, [tabindex]'
  * announces each one's position, such as "1 of 7".
  *
  * **`selection-mode` makes the list interactive**, in the way of a grid list:
- * a grid of rows that is one tab stop. Up and Down move between rows, Home
- * and End go to the first and the last, and a typed letter goes to the next
- * row starting with it. Left and Right move between the row and the controls
- * in its `end` slot. `single` selects one row at a time and `multiple` any
- * number, with Space or a press, and `value` holds the selected rows' values,
+ * a grid of rows that is one tab stop. `single` selects one row at a time and
+ * `multiple` any number, and `value` holds the selected rows' values,
  * separated by commas. A change asks with `helix-before-change` and tells
- * with `change`. Enter acts on the row: it follows the row's link, or sends
- * `helix-action` from the row. `none` selects nothing, so a press acts too. A
- * `disabled` row is passed over.
+ * with `change`. `none` selects nothing, so a press acts on the row. A
+ * `disabled` row is passed over. Each row is named by its label and described
+ * by its description, so the words of the controls in `end` are not read as
+ * part of its name.
+ *
+ * `selection-behavior` says what a press does to the rows already selected.
+ * `toggle`, the default, adds or takes out the row. `replace` selects the row
+ * alone, as a file list does, and the arrow keys carry the selection with
+ * them. Control or Command with a press then adds or takes out one row.
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Down, Up | Moves to the next or the previous row. Under `replace`, selects it. |
+ * | Home, End | Moves to the first or the last row. Under `replace`, selects it. |
+ * | A letter or a word | Moves to the next row whose words start with what you typed. |
+ * | Left, Right | Moves between the row and the controls in its `end` slot. |
+ * | Space | Selects the row, or lets it go. |
+ * | Shift with Down, Up, Home, End or Space | Selects every row from the last one pressed, in `multiple`. |
+ * | Control or Command with Down, Up, Home or End | Moves without selecting, under `replace`. |
+ * | Control or Command with A | Selects every row, in `multiple`. |
+ * | Enter | Acts on the row: follows its link, or sends `helix-action` from it. |
+ *
+ * A press with Shift selects every row from the last one pressed, and a press
+ * with Control or Command adds or takes out one row under `replace`.
  *
  * **Leave `selection-mode` unset for a list a reader reads**, and set it for
  * one a reader chooses from or acts on. The rows of an interactive list are
@@ -107,6 +130,14 @@ export class HelixHeadlessList extends HelixElement {
   reversed = false
 
   /**
+   * What a press does to the rows already selected, in a list that selects:
+   * `toggle` adds or takes out the row, and `replace` selects it alone and
+   * lets the arrow keys carry the selection.
+   */
+  @property({ attribute: 'selection-behavior' })
+  selectionBehavior: ListSelectionBehavior = 'toggle'
+
+  /**
    * Makes the list interactive: `single` selects one row, `multiple` any
    * number, and `none` moves and acts without selecting. Unset is a list a
    * reader reads, with no tab stop of its own.
@@ -146,6 +177,15 @@ export class HelixHeadlessList extends HelixElement {
 
   /** The row the reader was last on, which keeps the tab stop. */
   private last: HelixHeadlessListItem | undefined
+
+  /** The value of the row a Shift range runs from: the last row pressed. */
+  private anchor: string | undefined
+
+  /**
+   * Shift and Control or Command on the key that is moving focus, read when
+   * focus arrives on a row and cleared once the key has been answered.
+   */
+  private moving: { extend: boolean; toggle: boolean } | undefined
 
   /**
    * Up, Down, Home, End and typed letters, moving focus and choosing nothing,
@@ -229,13 +269,11 @@ export class HelixHeadlessList extends HelixElement {
   }
 
   /**
-   * Selects the row, or lets it go, asking first. `helix-before-change`
-   * carries the `value` the press would leave, and `change` follows once it
-   * has moved.
+   * Selects what a press or a key leaves, asking first. `helix-before-change`
+   * carries the `value` it would leave, and `change` follows once it has moved.
    */
-  protected press(row: HelixHeadlessListItem): void {
-    const mode = this.selectionMode
-    if (mode === undefined || mode === 'none' || row.disabled) {
+  private choose(next: string | null): void {
+    if (next === null) {
       return
     }
     requestChange({
@@ -245,8 +283,60 @@ export class HelixHeadlessList extends HelixElement {
       },
       event: (value) => new HelixBeforeChangeEvent({ value }),
       host: this,
-      next: pressedValue(mode, this.value, this.valueFor(row)),
+      next,
     })
+  }
+
+  /** What `choiceValue` needs of this list for a row. */
+  private choice(row: HelixHeadlessListItem, extend: boolean, toggle: boolean, arrived: boolean) {
+    return {
+      anchor: this.anchor,
+      arrived,
+      behavior: this.selectionBehavior,
+      extend,
+      mode: this.selectionMode ?? 'none',
+      pressed: this.valueFor(row),
+      shown: this.reachable.map((one) => this.valueFor(one)),
+      toggle,
+      value: this.value,
+    }
+  }
+
+  /**
+   * Selects the row, or lets it go, by `selection-behavior`: Shift takes in
+   * the rows from the last one pressed, and Control or Command toggles one row
+   * under `replace`. The row is where the next range runs from.
+   */
+  protected press(row: HelixHeadlessListItem, extend = false, toggle = false): void {
+    const mode = this.selectionMode
+    if (mode === undefined || mode === 'none' || row.disabled) {
+      return
+    }
+    const next = choiceValue(this.choice(row, extend, toggle, false))
+    if (!extend) {
+      this.anchor = this.valueFor(row)
+    }
+    this.choose(next)
+  }
+
+  /**
+   * A key moved focus onto the row: under `replace` it is selected alone, and
+   * with Shift the rows from the anchor are taken in, from `from` where
+   * nothing was pressed yet.
+   */
+  private arrive(row: HelixHeadlessListItem, from: HelixHeadlessListItem | undefined): void {
+    const moving = this.moving
+    if (!moving || this.selectionMode === undefined || this.selectionMode === 'none') {
+      return
+    }
+    if (moving.extend && this.anchor === undefined && from) {
+      this.anchor = this.valueFor(from)
+    }
+    const next = choiceValue(this.choice(row, moving.extend, moving.toggle, true))
+    if (!moving.extend && next !== null) {
+      this.anchor = this.valueFor(row)
+    }
+    this.choose(next)
   }
 
   /** Acts on the row: follows its link, or says it was acted on. */
@@ -277,12 +367,23 @@ export class HelixHeadlessList extends HelixElement {
     stops[rowStop(stops.length, at, step)]?.focus()
   }
 
+  /**
+   * Notes the modifiers of a key before the keyboard controller moves focus
+   * with it, which happens first, in the same dispatch.
+   */
+  private readonly handleKeyCapture = (event: KeyboardEvent): void => {
+    this.moving = { extend: event.shiftKey, toggle: event.ctrlKey || event.metaKey }
+  }
+
   private readonly handleKeydown = (event: KeyboardEvent): void => {
+    /* Focus has arrived wherever this key sent it, so what it carried is spent. */
+    this.moving = undefined
     const row = this.interactive ? this.rowOf(event) : undefined
-    if (!row || row.disabled || event.altKey || event.ctrlKey || event.metaKey) {
+    if (!row || row.disabled || event.altKey) {
       return
     }
-    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+    const toggle = event.ctrlKey || event.metaKey
+    if (!toggle && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) {
       this.moveInRow(row, event)
       return
     }
@@ -291,12 +392,17 @@ export class HelixHeadlessList extends HelixElement {
     if (event.composedPath()[0] !== row.cell) {
       return
     }
-    if (event.key === 'Enter') {
+    if (toggle && event.key.toLowerCase() === 'a' && this.selectionMode === 'multiple') {
+      event.preventDefault()
+      const every = this.reachable.map((one) => this.valueFor(one)).join(', ')
+      this.choose(every === this.value ? null : every)
+    } else if (event.key === 'Enter' && !toggle) {
       event.preventDefault()
       this.act(row)
-    } else if (event.key === ' ') {
+    } else if (event.key === ' ' && !event.defaultPrevented) {
+      /* A Space the typeahead took as part of a word is not a press. */
       event.preventDefault()
-      this.press(row)
+      this.press(row, event.shiftKey, toggle)
     }
   }
 
@@ -320,7 +426,7 @@ export class HelixHeadlessList extends HelixElement {
     if (this.selectionMode === 'none') {
       this.act(row)
     } else {
-      this.press(row)
+      this.press(row, event.shiftKey, event.ctrlKey || event.metaKey)
     }
   }
 
@@ -328,13 +434,18 @@ export class HelixHeadlessList extends HelixElement {
   private readonly handleFocusin = (event: FocusEvent): void => {
     const row = this.interactive ? this.rowOf(event) : undefined
     if (row && row !== this.last) {
+      const from = this.last
       this.last = row
+      if (event.composedPath()[0] === row.cell) {
+        this.arrive(row, from)
+      }
       this.sync()
     }
   }
 
   override connectedCallback(): void {
     super.connectedCallback()
+    this.addEventListener('keydown', this.handleKeyCapture, true)
     this.addEventListener('keydown', this.handleKeydown)
     this.addEventListener('click', this.handleClick)
     this.addEventListener('focusin', this.handleFocusin)
@@ -342,6 +453,7 @@ export class HelixHeadlessList extends HelixElement {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    this.removeEventListener('keydown', this.handleKeyCapture, true)
     this.removeEventListener('keydown', this.handleKeydown)
     this.removeEventListener('click', this.handleClick)
     this.removeEventListener('focusin', this.handleFocusin)

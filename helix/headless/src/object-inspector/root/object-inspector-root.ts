@@ -9,6 +9,8 @@ import {
   formatNumbers,
   HelixActivateEvent,
   HelixBeforeActivateEvent,
+  HelixBeforeCloseEvent,
+  HelixBeforeOpenEvent,
   HelixElement,
   HelixFilterEvent,
   HelixFilteredEvent,
@@ -22,10 +24,20 @@ import {
 import { caretDown, caretRight } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { repeat } from 'lit/directives/repeat.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html as staticHtml } from 'lit/static-html.js'
 import '../../copy-button/index.js'
-import { ancestorsOf, entries, flatten, type Row, search, seed } from '../rows.js'
+import {
+  cursorFor,
+  entries,
+  flatten,
+  type Row,
+  search,
+  seed,
+  siblingBranches,
+  withAncestors,
+} from '../rows.js'
 
 /**
  * @summary A structured value shown as a tree, where you can close branches,
@@ -40,13 +52,29 @@ import { ancestorsOf, entries, flatten, type Row, search, seed } from '../rows.j
  * works with server rendering and with React hydration, which skips object
  * properties. `value` wins when both are set.
  *
- * The tree is one tab stop. Up and Down move between rows, Right opens a branch
- * or moves into it, Left closes it or moves to its parent, and Home and End
- * move to the first and last rows. Typing moves to the next row whose key
- * starts with what was typed, and `*` opens every branch beside the active
- * row. Focus stays on the tree, and `aria-activedescendant` marks the active
- * row. Each row carries its real level, position, and set size, including in
- * a windowed tree.
+ * **Keyboard.** The tree is one tab stop, and focus moves from row to row.
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Down, Up | Moves to the next or the previous row. |
+ * | Right | Opens a closed branch, or moves into an open one. Left on a right-to-left page. |
+ * | Left | Closes an open branch, or moves to the parent. Right on a right-to-left page. |
+ * | Home, End | Moves to the first or the last row. |
+ * | Enter, Space | Opens or closes a branch. |
+ * | `*` | Opens every branch beside the active row. |
+ * | A letter or a word | Moves to the next row whose key starts with what you typed. |
+ * | Command+C, Control+C | Copies the active row, where no text is selected. |
+ *
+ * The tree is a `treegrid`, as React Aria's Tree is: each entry is a `row` with
+ * one cell, and carries its real level, position, and set size, including in a
+ * windowed tree. Nothing in it is chosen, so no row carries `aria-selected`,
+ * and a focused row is not announced as selected.
+ *
+ * A reader opening or closing a branch sends `helix-before-open` or
+ * `helix-before-close`, which you can cancel, and then `toggle` with
+ * `newState` and `oldState`, as `<details>` does. The branch is the active
+ * row, and `expanded` holds every open branch. `*` asks once for all the
+ * branches it opens. A script writing `expanded` or `active` sends nothing.
  *
  * `active` is the active row's path, written the way a JSON Pointer writes it:
  * the empty string for the root and `/meta/tags/0` for an entry under it.
@@ -85,9 +113,12 @@ import { ancestorsOf, entries, flatten, type Row, search, seed } from '../rows.j
  *
  * @event {HelixActivateEvent} helix-activate - The active row moved, by a key or a click. The detail's `value` is its path.
  * @event {HelixBeforeActivateEvent} helix-before-activate - The active row is about to move, with its new path. Cancelable: cancel it to keep the row where it is.
+ * @event {HelixBeforeCloseEvent} helix-before-close - A reader is about to close the active branch. Cancelable: cancel it to keep the branch open.
+ * @event {HelixBeforeOpenEvent} helix-before-open - A reader is about to open the active branch, or `*` the branches beside it. Cancelable: cancel it to keep them closed.
  * @event {HelixCopyEvent} helix-copy - A value was put on the clipboard, from the copy button or the keyboard.
  * @event {HelixFilterEvent} helix-filter - Text was typed in the filter field, with what it now holds. Cancelable: cancel it to keep the filter as it was.
  * @event {HelixFilteredEvent} helix-filtered - The filter field changed `filter`, which now holds the text.
+ * @event {ToggleEvent} toggle - A reader opened or closed a branch, with `newState` and `oldState`. `expanded` holds every open branch.
  *
  * @csspart after - The space the rows below the drawn rows would take, when `windowed` is set.
  * @csspart before - The space the rows above the drawn rows would take, when `windowed` is set.
@@ -115,14 +146,14 @@ import { ancestorsOf, entries, flatten, type Row, search, seed } from '../rows.j
  * @csspart live - How many entries a filter matched, in a region that screen readers announce when it changes. Drawn from the first filter on. Visually hidden in the styled tier.
  * @csspart null - A `null`.
  * @csspart number - A number.
- * @csspart row - One entry, as a tree item.
- * @csspart row-active - The entry the keyboard is on. Set alongside `row`.
+ * @csspart row - One entry, as a row of the tree grid, which takes focus.
+ * @csspart row-active - The entry the keyboard is on, which holds the tab stop. Set alongside `row`.
  * @csspart row-match - An entry whose key or value holds the filter. Set alongside `row`.
  * @csspart search-field - The field that sets `filter`, with `filterable`.
  * @csspart string - A string, in quotes.
  * @csspart summary - The brackets that stand for a branch's contents.
  * @csspart toggle - The caret on a branch. It points down when the branch is open and sideways when it is closed.
- * @csspart tree - The tree, which is the element that receives focus.
+ * @csspart tree - The tree grid that holds the rows.
  *
  * @cssproperty --object-inspector-level - How deep a row is, from 0 at the root, for indenting it.
  */
@@ -322,6 +353,12 @@ export class HelixHeadlessObjectInspector extends HelixElement {
   /** Set by a keyboard move, so the next render brings the active row into view. */
   private revealing = false
 
+  /** Set by a reader's move, so the next render moves focus to the active row. */
+  private focusing = false
+
+  /** Whether a row held focus as this update began, so a row the render moved gets it back. */
+  private hadFocus = false
+
   /** What has been typed toward a key, and when the last letter came. */
   private typed = { at: 0, text: '' }
 
@@ -393,19 +430,12 @@ export class HelixHeadlessObjectInspector extends HelixElement {
 
   /** Opens the branches around each path, where the value has them. */
   private openAround(paths: Iterable<string>): void {
-    const opened = new Set(this.opened)
-    for (const path of paths) {
-      for (const above of ancestorsOf(path)) {
-        if (this.branches.has(above)) {
-          opened.add(above)
-        }
-      }
-    }
-    this.opened = opened
+    this.opened = withAncestors(this.opened, this.branches, paths)
   }
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    this.hadFocus = this.hasFocusedRow()
     /* First, so a value read from `for` is in the rows this update works out,
        and so in the first render. Resolved through `getRootNode()`, so an
        inspector inside another component's shadow root names a script in that
@@ -443,31 +473,11 @@ export class HelixHeadlessObjectInspector extends HelixElement {
       ['active', 'defaultDepth', 'expanded', 'filter', 'opened'].some((name) => changed.has(name))
     ) {
       this.rows = flatten(this.root, this.opened, this.found)
-      this.cursor = this.place(wanted ?? was, changed.has('filter'))
+      this.cursor = cursorFor(this.rows, wanted ?? was, this.cursor, changed.has('filter'))
     }
     if (changed.has('filter') && this.hasUpdated) {
       this.tell()
     }
-  }
-
-  /**
-   * Where the active row goes once the rows have moved: onto `path` where it
-   * is still shown, onto the first match where a filter just hid it, and
-   * otherwise onto the nearest branch around it that is.
-   */
-  private place(path: string | undefined, filtered: boolean): number {
-    const rows = this.rows
-    const at = (one: string): number => rows.findIndex((row) => row.path === one)
-    const own = path === undefined ? -1 : at(path)
-    if (own >= 0 || path === undefined) {
-      return own >= 0 ? own : Math.min(this.cursor, Math.max(0, rows.length - 1))
-    }
-    const match = filtered ? rows.findIndex((row) => row.match) : -1
-    const around = ancestorsOf(path)
-      .reverse()
-      .map(at)
-      .find((one) => one >= 0)
-    return match >= 0 ? match : (around ?? 0)
   }
 
   /** Says how many entries the filter matched, and nothing for an empty one. */
@@ -493,6 +503,30 @@ export class HelixHeadlessObjectInspector extends HelixElement {
     if (this.revealing) {
       this.revealing = false
       this.reveal()
+    }
+    /* **A focused row the render moved has lost focus**, because moving a
+       node takes focus from it: a window that jumps past the focused row can
+       put it before rows it followed. Given back, where nothing else took it. */
+    const lost =
+      this.hadFocus &&
+      !this.hasFocusedRow() &&
+      this.ownerDocument.activeElement === this.ownerDocument.body
+    if (this.focusing || lost) {
+      this.focusing = false
+      this.focusActive()
+    }
+  }
+
+  /**
+   * Moves focus to the active row, once it is drawn.
+   *
+   * After a reader's move only, so a script writing `active` does not take
+   * focus from wherever the reader is.
+   */
+  private focusActive(): void {
+    const row = this.partNamed('tree')?.querySelector<HTMLElement>(`[data-index="${this.cursor}"]`)
+    if (row && this.shadowRoot?.activeElement !== row) {
+      row.focus({ preventScroll: true })
     }
   }
 
@@ -537,7 +571,10 @@ export class HelixHeadlessObjectInspector extends HelixElement {
     )
     tree.scrollTop += (this.cursor - from) * height
     this.virtualize.measure()
-    void this.updateComplete.then(() => this.reveal(attempts - 1))
+    void this.updateComplete.then(() => {
+      this.reveal(attempts - 1)
+      this.focusActive()
+    })
   }
 
   /** What copying takes: a branch as indented JSON, a string as itself. */
@@ -551,14 +588,57 @@ export class HelixHeadlessObjectInspector extends HelixElement {
     return JSON.stringify(row.value, null, 2) ?? String(row.value)
   }
 
-  private toggle(row: Row, open = !row.open): void {
-    const opened = new Set(this.opened)
-    if (open) {
-      opened.add(row.path)
-    } else {
-      opened.delete(row.path)
+  /**
+   * Asks to open or close branches, and then does and says so:
+   * `helix-before-open` or `helix-before-close`, which a listener can cancel,
+   * then `toggle`. A reader's act only. Returns whether they moved.
+   */
+  private requestOpen(paths: readonly string[], open: boolean): boolean {
+    if (paths.length === 0) {
+      return false
     }
-    this.opened = opened
+    const applied = requestChange({
+      apply: () => {
+        const opened = new Set(this.opened)
+        for (const path of paths) {
+          if (open) {
+            opened.add(path)
+          } else {
+            opened.delete(path)
+          }
+        }
+        this.opened = opened
+      },
+      event: (next) => (next ? new HelixBeforeOpenEvent() : new HelixBeforeCloseEvent()),
+      host: this,
+      next: open,
+    })
+    if (applied) {
+      this.announceToggle(open)
+    }
+    return applied
+  }
+
+  /**
+   * Says a branch opened or closed under the platform's own name and in its
+   * shape: `toggle` with `newState` and `oldState`, not bubbling, as
+   * `<details>` sends it and as the open mixin does for the families whose
+   * open state it owns. A real `ToggleEvent` where the platform has one, and a
+   * plain event carrying the same two fields where it does not.
+   */
+  private announceToggle(open: boolean): void {
+    const states = { newState: open ? 'open' : 'closed', oldState: open ? 'closed' : 'open' }
+    if (typeof ToggleEvent === 'function') {
+      this.dispatchEvent(new ToggleEvent('toggle', states))
+      return
+    }
+    const event = new Event('toggle', { bubbles: false, cancelable: false, composed: false })
+    Object.assign(event, states)
+    this.dispatchEvent(event)
+  }
+
+  private toggle(row: Row, open = !row.open): void {
+    this.requestOpen([row.path], open)
   }
 
   /**
@@ -586,6 +666,7 @@ export class HelixHeadlessObjectInspector extends HelixElement {
       this.dispatchEvent(new HelixActivateEvent({ value: path }))
     }
     this.revealing = true
+    this.focusing = true
     return true
   }
 
@@ -646,7 +727,7 @@ export class HelixHeadlessObjectInspector extends HelixElement {
         }
         break
       case '*':
-        this.openSiblings(row)
+        this.requestOpen(siblingBranches(rows, row), true)
         break
       default:
         if (event.key.length !== 1 || event.altKey || event.ctrlKey || event.metaKey) {
@@ -655,22 +736,6 @@ export class HelixHeadlessObjectInspector extends HelixElement {
         this.typeahead(event.key)
     }
     event.preventDefault()
-  }
-
-  /** Opens every branch at the active row's level under the same parent, as `*` asks. */
-  private openSiblings(row: Row): void {
-    const parent = row.path.slice(0, row.path.lastIndexOf('/'))
-    const opened = new Set(this.opened)
-    for (const one of this.rows) {
-      if (
-        one.branch &&
-        one.depth === row.depth &&
-        one.path.slice(0, one.path.lastIndexOf('/')) === parent
-      ) {
-        opened.add(one.path)
-      }
-    }
-    this.opened = opened
   }
 
   /**
@@ -723,11 +788,13 @@ export class HelixHeadlessObjectInspector extends HelixElement {
     }
   }
 
-  /** Down from the filter field goes to the tree, where the matches are. */
+  /** Down from the filter field goes to the active row, where the matches are. */
   private readonly handleFilterKeydown = (event: KeyboardEvent): void => {
-    if (event.key === 'ArrowDown') {
+    if (event.key === 'ArrowDown' && this.rows.length > 0) {
       event.preventDefault()
-      this.partNamed('tree')?.focus()
+      this.revealing = true
+      this.focusing = true
+      this.requestUpdate()
     }
   }
 
@@ -779,34 +846,36 @@ export class HelixHeadlessObjectInspector extends HelixElement {
    *
    * **`row-active` and no attribute beside it.** Which row the keys are on is
    * drawn by a sheet and by nothing else: the accessibility tree hears it from
-   * `aria-activedescendant` on the tree, which points at this row's id, so an
-   * attribute would be a second spelling with no reader. The name is the one a
-   * consumer can reach, nothing being able to follow `::part()` with an
-   * attribute selector.
+   * focus, which the row holds, so an attribute would be a second spelling with
+   * no reader. The name is the one a consumer can reach, nothing being able to
+   * follow `::part()` with an attribute selector.
    *
-   * **`aria-selected="false"` on every row**, because nothing here is chosen.
-   * Chromium takes the active descendant of a single-selection tree as selected
-   * when no row says otherwise, so every arrow press was also announced as a
-   * selection. An explicit false is the one thing that turns that off.
+   * **A `row` of a `treegrid` with one cell, focused itself, and no
+   * `aria-selected`**, because nothing here is chosen. Chromium takes the
+   * focused item of a single-selection `tree` as selected, by focus or by
+   * `aria-activedescendant` (measured), so every arrow press was also announced
+   * as a selection, and `aria-selected="false"` on every row was the one way to
+   * turn it off. A row of a tree grid is not selected by focus, which is why
+   * React Aria's Tree is one. The cell is `display: contents`, so the row lays
+   * out its text as it did.
    */
   private renderRow(row: Row, index: number): TemplateResult {
     const active = index === this.cursor
     return html`<div
       part="row${active ? ' row-active' : ''}${row.match ? ' row-match' : ''}"
-      role="treeitem"
+      role="row"
       id=${`row-${index}`}
       data-index=${index}
+      tabindex=${active ? '0' : '-1'}
       aria-level=${row.depth + 1}
       aria-posinset=${row.position}
-      aria-selected="false"
       aria-setsize=${row.siblings}
       aria-expanded=${row.branch ? String(row.open) : nothing}
       style=${`--object-inspector-level: ${row.depth}`}
       @click=${() => this.handleRowClick(index, row)}
-    >
-      ${
-        row.branch
-          ? html`<svg
+    ><div role="gridcell" style="display: contents">${
+      row.branch
+        ? html`<svg
               part="toggle"
               ?data-mirror=${!row.open}
               fill="currentColor"
@@ -815,9 +884,35 @@ export class HelixHeadlessObjectInspector extends HelixElement {
             >
               ${unsafeSVG((row.open ? caretDown : caretRight).content)}
             </svg>`
-          : nothing
-      }${row.key === undefined ? nothing : html`<span part="key">${row.key}</span>: `}${this.renderValue(row)}
+        : nothing
+    }${row.key === undefined ? nothing : html`<span part="key">${row.key}</span>: `}${this.renderValue(row)}</div>
     </div>`
+  }
+
+  /** Whether a row of the tree holds focus. */
+  private hasFocusedRow(): boolean {
+    /* No `instanceof HTMLElement`: this is asked before every render, a
+       server's included, where there is no such class. */
+    const focused = this.shadowRoot?.activeElement as Element | null | undefined
+    return focused?.getAttribute?.('role') === 'row'
+  }
+
+  /**
+   * A row that takes focus some other way than the keys, from a script or a
+   * screen reader, becomes the active row, so focus and the keys agree.
+   */
+  private readonly handleFocusIn = (event: FocusEvent): void => {
+    const index = Number((event.target as HTMLElement).dataset?.index)
+    if (Number.isInteger(index) && index !== this.cursor) {
+      this.move(index)
+    }
+  }
+
+  /** A row kept drawn for focus is let go once focus leaves it. */
+  private readonly handleFocusOut = (): void => {
+    if (this.windowed) {
+      this.requestUpdate()
+    }
   }
 
   /** The copy button, behind the seam Code Block's uses, so each tier renders its own. */
@@ -836,10 +931,21 @@ export class HelixHeadlessObjectInspector extends HelixElement {
 
   protected override render(): TemplateResult {
     const rows = this.rows
-    const { after, before, first, last } = this.windowed
-      ? this.virtualize.window
-      : { after: 0, before: 0, first: 0, last: rows.length }
-    const shown = rows.slice(first, last)
+    const { first, last } = this.windowed ? this.virtualize.window : { first: 0, last: rows.length }
+    /* The row holding focus stays drawn when it scrolls out of the window,
+       beside it on its side, and the spacer there gives up its room. */
+    const kept =
+      this.windowed && (this.cursor < first || this.cursor >= last) && this.hasFocusedRow()
+        ? this.cursor
+        : undefined
+    const { after, before } = this.windowed
+      ? this.virtualize.spacers(kept)
+      : { after: 0, before: 0 }
+    const shown = rows.slice(first, last).map((row, at): [Row, number] => [row, first + at])
+    const keptRow = kept === undefined ? undefined : rows[kept]
+    if (kept !== undefined && keptRow) {
+      shown.splice(kept < first ? 0 : shown.length, 0, [keptRow, kept])
+    }
     return html`${
       this.label ? html`<div part="header"><span part="label">${this.label}</span></div>` : nothing
     }${
@@ -861,16 +967,25 @@ export class HelixHeadlessObjectInspector extends HelixElement {
         <div
           part="tree"
           id="tree"
-          role="tree"
-          tabindex="0"
+          role="treegrid"
           ?data-scroller=${this.windowed}
           aria-label=${this.label || this.treeLabel}
-          aria-activedescendant=${rows.length > 0 ? `row-${this.cursor}` : nothing}
           @keydown=${this.handleKeydown}
+          @focusin=${this.handleFocusIn}
+          @focusout=${this.handleFocusOut}
           @scroll=${() => this.virtualize.measure()}
         >
           ${this.windowed ? html`<div part="before" role="presentation" style="block-size: ${before}px"></div>` : nothing}
-          ${shown.map((row, at) => this.renderRow(row, first + at))}
+          ${
+            /* Keyed by path, so the element of a row is the same element while
+               the row is shown: focus stays on the row it is on as branches
+               open above it and as the window moves. */
+            repeat(
+              shown,
+              ([row]) => row.path,
+              ([row, at]) => this.renderRow(row, at),
+            )
+          }
           ${this.windowed ? html`<div part="after" role="presentation" style="block-size: ${after}px"></div>` : nothing}
         </div>
         ${this.noCopy ? nothing : this.renderCopyButton(rows[this.cursor])}
