@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -391,5 +391,97 @@ describe('swiping it away', () => {
     const still = await swipe(off, 200)
     expect(still.style.getPropertyValue('--drawer-swipe-x')).toBe('')
     release(200, 3000)
+  })
+})
+
+describe('the close control', () => {
+  test('is drawn only on a dismissible drawer', async () => {
+    const drawer = await mount(markup)
+    expect(part(drawer, 'dismiss')).toBeNull()
+  })
+
+  test('is a button named by `dismiss-label`, last in the panel, holding the dismiss-icon slot', async () => {
+    const drawer = await mount(
+      markup.replace(
+        '<helix-headless-drawer',
+        '<helix-headless-drawer dismissible dismiss-label="Schließen"',
+      ),
+    )
+    const dismiss = part(drawer, 'dismiss') as HTMLButtonElement
+    expect(dismiss.localName).toBe('button')
+    expect(dismiss.getAttribute('aria-label')).toBe('Schließen')
+    expect(part(drawer, 'panel')?.lastElementChild).toBe(dismiss)
+    expect(dismiss.querySelector('slot')?.getAttribute('name')).toBe('dismiss-icon')
+    expect(part(drawer, 'dismiss-mark')).not.toBeNull()
+  })
+
+  test('closes the drawer through the request, which a listener can refuse', async () => {
+    const drawer = (await mount(
+      markup.replace('<helix-headless-drawer', '<helix-headless-drawer dismissible'),
+    )) as Drawer
+    drawer.show()
+    await drawer.updateComplete
+    const refuse = (event: Event): void => event.preventDefault()
+    drawer.addEventListener('helix-before-close', refuse)
+    ;(part(drawer, 'dismiss') as HTMLButtonElement).click()
+    await drawer.updateComplete
+    expect(drawer.open).toBe(true)
+    drawer.removeEventListener('helix-before-close', refuse)
+    ;(part(drawer, 'dismiss') as HTMLButtonElement).click()
+    await drawer.updateComplete
+    expect(drawer.open).toBe(false)
+  })
+})
+
+describe('the snap point it rests at', () => {
+  type Snapping = Drawer & { snapTo(point: number): void }
+  const sheet = async (): Promise<Snapping> => {
+    const drawer = (await mount(
+      `<helix-headless-drawer label="Sheet" placement="bottom" snap-points="0.5 1">
+        <button id="top">Top</button>
+        <button id="low">Low</button>
+      </helix-headless-drawer>`,
+    )) as Snapping
+    drawer.show()
+    await drawer.updateComplete
+    return drawer
+  }
+
+  test('is on the panel, and the host says when it is short of the whole panel', async () => {
+    const drawer = await sheet()
+    const panel = part(drawer, 'panel') as HTMLElement
+    expect(panel.style.getPropertyValue('--drawer-snap')).toBe('0.5')
+    expect(hasState(drawer, 'snapped')).toBe(true)
+    drawer.snapTo(0.9)
+    expect(panel.style.getPropertyValue('--drawer-snap')).toBe('1')
+    expect(hasState(drawer, 'snapped')).toBe(false)
+    drawer.close()
+    await drawer.updateComplete
+    expect(panel.style.getPropertyValue('--drawer-snap')).toBe('')
+  })
+
+  test('is not written on a drawer without snap points', async () => {
+    const drawer = (await mount(markup)) as Drawer
+    drawer.show()
+    await drawer.updateComplete
+    expect((part(drawer, 'panel') as HTMLElement).style.getPropertyValue('--drawer-snap')).toBe('')
+    expect(hasState(drawer, 'snapped')).toBe(false)
+  })
+
+  test('opens to the largest when focus moves to a control past the window’s edge', async () => {
+    const drawer = await sheet()
+    const low = drawer.querySelector('#low') as HTMLElement
+    low.getBoundingClientRect = () =>
+      ({
+        bottom: window.innerHeight + 40,
+        left: 0,
+        right: 80,
+        top: window.innerHeight + 8,
+      }) as DOMRect
+    ;(drawer.querySelector('#top') as HTMLElement).focus()
+    expect(hasState(drawer, 'snapped')).toBe(true)
+    low.focus()
+    expect(hasState(drawer, 'snapped')).toBe(false)
+    expect((part(drawer, 'panel') as HTMLElement).style.getPropertyValue('--drawer-snap')).toBe('1')
   })
 })

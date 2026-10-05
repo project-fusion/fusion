@@ -19,9 +19,14 @@ import { styles } from './drawer-root.css.js'
  * @documentation https://fusion.dev/helix/components/drawer
  *
  * @slot - The drawer's content.
+ * @slot dismiss-icon - Replaces the glyph inside the close control.
+ * @slot footer - Content pinned below the scrolling area, such as the drawer's actions.
  * @slot header - Content pinned above the scrolling area.
  *
  * @csspart content - The scrolling content region.
+ * @csspart dismiss - The close control, drawn when the drawer is `dismissible`, in the corner by the title.
+ * @csspart dismiss-mark - The glyph on the close control, where none is slotted.
+ * @csspart footer - The footer region.
  * @csspart header - The header region.
  * @csspart panel - The sliding panel.
  *
