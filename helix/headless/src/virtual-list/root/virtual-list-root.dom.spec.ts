@@ -250,3 +250,246 @@ describe('placing rows by what they came to', () => {
     )
   })
 })
+
+/** A list fed through `items`, with the template given, or none. */
+const fed = async (
+  items: unknown[],
+  template = '<template><div><span data-field="name"></span></div></template>',
+): Promise<HTMLElement & Updatable & Record<string, unknown>> => {
+  document.body.innerHTML = `<helix-headless-virtual-list estimate="32" label="Rows">${template}</helix-headless-virtual-list>`
+  const host = document.body.firstElementChild as HTMLElement & Updatable & Record<string, unknown>
+  host.items = items
+  await settle(host)
+  return host
+}
+
+const named = (count: number) =>
+  Array.from({ length: count }, (_, at) => ({ name: `Row ${at + 1}` }))
+
+describe('items given as a property', () => {
+  test('draws the rows from the array, with no script', async () => {
+    const host = await fed(named(500))
+    expect(drawn(host)[0]?.textContent?.trim()).toBe('Row 1')
+    expect(drawn(host)[0]?.getAttribute('aria-setsize')).toBe('500')
+  })
+
+  test('draws a new array when it is replaced', async () => {
+    const host = await fed(named(500))
+    host.items = [{ name: 'Only' }]
+    await settle(host)
+    expect(drawn(host)).toHaveLength(1)
+    expect(drawn(host)[0]?.textContent?.trim()).toBe('Only')
+    expect(drawn(host)[0]?.getAttribute('aria-setsize')).toBe('1')
+  })
+
+  test('wins over a script named by for', async () => {
+    document.body.innerHTML = `<helix-headless-virtual-list for="rows" label="Rows">
+        <template><div data-field="name"></div></template>
+      </helix-headless-virtual-list>
+      <script id="rows" type="application/json">[{"name":"From the script"}]</script>`
+    const host = document.body.firstElementChild as HTMLElement &
+      Updatable &
+      Record<string, unknown>
+    host.items = [{ name: 'From the property' }]
+    await settle(host)
+    expect(drawn(host).map((row) => row.textContent?.trim())).toEqual(['From the property'])
+  })
+
+  test('writes attributes from fields, and follows a path of keys', async () => {
+    const host = await fed(
+      [
+        { author: { name: 'Ada' }, open: true, url: '/a' },
+        { author: { name: 'Grace' }, open: false },
+      ],
+      `<template><a data-field="author.name" data-field-href="url" data-field-data-open="open"></a></template>`,
+    )
+    const [first, second] = drawn(host)
+    expect(first?.textContent).toBe('Ada')
+    expect(first?.getAttribute('href')).toBe('/a')
+    expect(first?.getAttribute('data-open')).toBe('')
+    expect(second?.textContent).toBe('Grace')
+    expect(second?.hasAttribute('href')).toBe(false)
+    expect(second?.hasAttribute('data-open')).toBe(false)
+  })
+})
+
+describe('items drawn by a function', () => {
+  test('draws what renderItem returns into a row of its own', async () => {
+    document.body.innerHTML =
+      '<helix-headless-virtual-list label="Rows"></helix-headless-virtual-list>'
+    const host = document.body.firstElementChild as HTMLElement &
+      Updatable &
+      Record<string, unknown>
+    host.renderItem = (item: { name: string }, index: number) => `${index + 1}. ${item.name}`
+    host.items = named(300)
+    await settle(host)
+    const first = drawn(host)[0]
+    expect(first?.tagName).toBe('DIV')
+    expect(first?.textContent).toContain('1. Row 1')
+    expect(first?.getAttribute('role')).toBe('listitem')
+    expect(first?.getAttribute('aria-posinset')).toBe('1')
+    expect(first?.getAttribute('aria-setsize')).toBe('300')
+  })
+
+  test('draws again with a new function, and takes a DOM node', async () => {
+    document.body.innerHTML =
+      '<helix-headless-virtual-list label="Rows"></helix-headless-virtual-list>'
+    const host = document.body.firstElementChild as HTMLElement &
+      Updatable &
+      Record<string, unknown>
+    host.items = named(3)
+    host.renderItem = (item: { name: string }) => item.name
+    await settle(host)
+    host.renderItem = (item: { name: string }) => {
+      const strong = document.createElement('strong')
+      strong.textContent = item.name.toUpperCase()
+      return strong
+    }
+    await settle(host)
+    expect(drawn(host)[0]?.querySelector('strong')?.textContent).toBe('ROW 1')
+    expect(drawn(host)).toHaveLength(3)
+  })
+
+  test('wins over a row template', async () => {
+    const host = await fed(named(2))
+    host.renderItem = () => 'drawn'
+    await settle(host)
+    expect(drawn(host).map((row) => row.textContent)).toEqual(['drawn', 'drawn'])
+  })
+})
+
+describe('the keyboard', () => {
+  const press = async (host: Updatable, key: string): Promise<void> => {
+    ;(document.activeElement as HTMLElement).dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key }),
+    )
+    await settle(host)
+  }
+
+  test('one row holds the tab stop', async () => {
+    const host = await fed(named(50))
+    const stops = drawn(host).map((row) => row.getAttribute('tabindex'))
+    expect(stops[0]).toBe('0')
+    expect(stops.slice(1).every((stop) => stop === '-1')).toBe(true)
+  })
+
+  test('reaches an item that is not drawn, and focuses it', async () => {
+    const host = await fed(named(5000))
+    ;(host.querySelector('[data-index="0"]') as HTMLElement).focus()
+    expect(host.querySelector('[data-index="4999"]')).toBeNull()
+    await press(host, 'End')
+    expect((document.activeElement as HTMLElement).dataset.index).toBe('4999')
+    expect(document.activeElement?.getAttribute('tabindex')).toBe('0')
+    await press(host, 'ArrowUp')
+    expect((document.activeElement as HTMLElement).dataset.index).toBe('4998')
+    await press(host, 'Home')
+    expect((document.activeElement as HTMLElement).dataset.index).toBe('0')
+    await press(host, 'ArrowDown')
+    expect((document.activeElement as HTMLElement).dataset.index).toBe('1')
+  })
+
+  test("leaves keys pressed in a row's own controls alone", async () => {
+    const host = await fed(
+      named(50),
+      '<template><div><input data-field-value="name"></div></template>',
+    )
+    const field = host.querySelector('[data-index="3"] input') as HTMLInputElement
+    field.focus()
+    const event = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Home' })
+    field.dispatchEvent(event)
+    await settle(host)
+    expect(event.defaultPrevented).toBe(false)
+    expect(document.activeElement).toBe(field)
+    // Focus inside the row moved the tab stop to it.
+    expect(host.querySelector('[data-index="3"]')?.getAttribute('tabindex')).toBe('0')
+  })
+
+  test("takes the other rows' links out of the tab order, and gives them back", async () => {
+    const host = await fed(
+      named(50),
+      '<template><div><a href="#" data-field="name"></a></div></template>',
+    )
+    const link = (at: number) => host.querySelector(`[data-index="${at}"] a`) as HTMLElement
+    expect(link(0).hasAttribute('tabindex')).toBe(false)
+    expect(link(1).getAttribute('tabindex')).toBe('-1')
+    link(1).focus()
+    await settle(host)
+    expect(link(1).hasAttribute('tabindex')).toBe(false)
+    expect(link(0).getAttribute('tabindex')).toBe('-1')
+    expect(host.querySelector('[data-index="1"]')?.getAttribute('tabindex')).toBe('0')
+  })
+
+  test('moves the tab stop to the first row on screen when its row scrolls away', async () => {
+    const host = await fed(named(500))
+    const viewport = part(host, 'viewport') as HTMLElement
+    viewport.scrollTop = 3_200
+    viewport.dispatchEvent(new Event('scroll'))
+    await settle(host)
+    expect(host.querySelector('[tabindex="0"]')?.getAttribute('data-index')).toBe('100')
+  })
+})
+
+describe('taking a reader to an item', () => {
+  test('scrollToIndex scrolls the item into view and draws it', async () => {
+    const host = await fed(named(5000))
+    ;(host as unknown as { scrollToIndex: (at: number, options?: object) => void }).scrollToIndex(
+      300,
+      { align: 'start' },
+    )
+    await settle(host)
+    expect((part(host, 'viewport') as HTMLElement).scrollTop).toBe(300 * 32)
+    expect(host.querySelector('[data-index="300"]')).not.toBeNull()
+  })
+})
+
+describe('what is on screen, and the end of the set', () => {
+  /* happy-dom lays nothing out, so the box is given the height a stylesheet
+     would give it. */
+  const tall = (host: HTMLElement): HTMLElement => {
+    const viewport = part(host, 'viewport') as HTMLElement
+    Object.defineProperty(viewport, 'clientHeight', { configurable: true, value: 192 })
+    return viewport
+  }
+
+  const scrollTo = async (host: Updatable, viewport: HTMLElement, top: number): Promise<void> => {
+    viewport.scrollTop = top
+    viewport.dispatchEvent(new Event('scroll'))
+    await settle(host)
+  }
+
+  test('reports the items on screen as they change', async () => {
+    const host = await fed(named(500))
+    const viewport = tall(host)
+    let heard = 0
+    host.addEventListener('helix-range-change', () => {
+      heard += 1
+    })
+    await scrollTo(host, viewport, 330)
+    expect(heard).toBe(1)
+    // Row 10 at the top, and row 16 cut by the bottom edge.
+    expect((host as unknown as { range: unknown }).range).toEqual({ first: 10, last: 17 })
+    // The same rows at either edge: nothing moved.
+    await scrollTo(host, viewport, 340)
+    expect(heard).toBe(1)
+  })
+
+  test('asks for more within a screen of the end, once for each length', async () => {
+    const host = await fed(named(20))
+    const viewport = tall(host)
+    let asked = 0
+    host.addEventListener('helix-load-more', () => {
+      asked += 1
+    })
+    await scrollTo(host, viewport, 0)
+    expect(asked).toBe(0)
+    // 640 of rows, 192 on screen: from 256 down, less than a screen is left.
+    await scrollTo(host, viewport, 300)
+    expect(asked).toBe(1)
+    await scrollTo(host, viewport, 400)
+    expect(asked).toBe(1)
+    host.items = named(40)
+    await settle(host)
+    await scrollTo(host, viewport, 1_000)
+    expect(asked).toBe(2)
+  })
+})

@@ -511,3 +511,157 @@ describe('an item a host has to show that is outside the window', () => {
     expect(controller.sizeOf(4)).toBe(32)
   })
 })
+
+describe('what a reader sees, as opposed to what is drawn', () => {
+  const scroller = (scrollTop: number, clientHeight: number) =>
+    ({
+      addEventListener: () => {},
+      clientHeight,
+      removeEventListener: () => {},
+      scrollTop,
+    }) as unknown as HTMLElement
+
+  test('the visible span has no overscan, and slices like an array', () => {
+    const controller = new VirtualizeController(host(), {
+      container: () => scroller(3200, 320),
+      count: () => 10_000,
+      estimate: () => 32,
+    })
+    controller.measure()
+    // Rows 100 to 109 show; the window draws four more either side.
+    expect(controller.visible()).toEqual({ first: 100, last: 110 })
+    expect(controller.window.first).toBe(96)
+  })
+
+  test('a row cut by the bottom edge counts as visible', () => {
+    const controller = new VirtualizeController(host(), {
+      container: () => scroller(16, 320),
+      count: () => 10_000,
+      estimate: () => 32,
+    })
+    expect(controller.visible()).toEqual({ first: 0, last: 11 })
+  })
+
+  test('an empty set or a box with no height shows nothing', () => {
+    const empty = new VirtualizeController(host(), {
+      container: () => scroller(0, 320),
+      count: () => 0,
+      estimate: () => 32,
+    })
+    expect(empty.visible()).toEqual({ first: 0, last: 0 })
+    const flat = new VirtualizeController(host(), {
+      container: () => scroller(0, 0),
+      count: () => 50,
+      estimate: () => 32,
+    })
+    expect(flat.visible()).toEqual({ first: 0, last: 0 })
+  })
+
+  test('measured rows are read by what they came to', () => {
+    const row = { getBoundingClientRect: () => ({ height: 160 }) } as unknown as HTMLElement
+    const controller = new VirtualizeController(host(), {
+      container: () => scroller(0, 320),
+      count: () => 100,
+      estimate: () => 32,
+      rows: () => [{ element: row, index: 0 }],
+    })
+    controller.hostUpdated()
+    // One row of 160, then five of 32 fill the rest of 320.
+    expect(controller.visible()).toEqual({ first: 0, last: 6 })
+  })
+
+  test('says how much of the set is below the box', () => {
+    const controller = new VirtualizeController(host(), {
+      container: () => scroller(1000, 320),
+      count: () => 100,
+      estimate: () => 32,
+    })
+    expect(controller.remaining()).toBe(3200 - 1320)
+    const end = new VirtualizeController(host(), {
+      container: () => scroller(2880, 320),
+      count: () => 100,
+      estimate: () => 32,
+    })
+    expect(end.remaining()).toBe(0)
+  })
+})
+
+describe('the spacers around a row kept for focus', () => {
+  const controllerAt = (scrollTop: number) => {
+    const controller = new VirtualizeController(host(), {
+      container: () =>
+        ({
+          addEventListener: () => {},
+          clientHeight: 320,
+          removeEventListener: () => {},
+          scrollTop,
+        }) as unknown as HTMLElement,
+      count: () => 1000,
+      estimate: () => 32,
+    })
+    controller.measure()
+    return controller
+  }
+
+  test("are the window's own when nothing is kept, or the kept row is inside it", () => {
+    const controller = controllerAt(3200)
+    const { after, before } = controller.window
+    expect(controller.spacers()).toEqual({ after, before })
+    expect(controller.spacers(100)).toEqual({ after, before })
+  })
+
+  test("give up the kept row's room on its side", () => {
+    const controller = controllerAt(3200)
+    const { after, before } = controller.window
+    expect(controller.spacers(2)).toEqual({ after, before: before - 32 })
+    expect(controller.spacers(900)).toEqual({ after: after - 32, before })
+  })
+})
+
+describe('taking a reader to an item', () => {
+  const scroller = (scrollTop: number, clientHeight: number) =>
+    ({
+      addEventListener: () => {},
+      clientHeight,
+      removeEventListener: () => {},
+      scrollTop,
+    }) as unknown as HTMLElement
+
+  const at = (container: HTMLElement) =>
+    new VirtualizeController(host(), {
+      container: () => container,
+      count: () => 10_000,
+      estimate: () => 32,
+    })
+
+  test('puts the item at the start, the center or the end of the box', () => {
+    const container = scroller(0, 320)
+    const controller = at(container)
+    controller.reveal(500, 0, { align: 'start' })
+    expect(container.scrollTop).toBe(500 * 32)
+    controller.reveal(500, 0, { align: 'end' })
+    expect(container.scrollTop).toBe(501 * 32 - 320)
+    controller.reveal(500, 0, { align: 'center' })
+    expect(container.scrollTop).toBe(500 * 32 - (320 - 32) / 2)
+  })
+
+  test('never scrolls above the top of the set', () => {
+    const container = scroller(400, 320)
+    at(container).reveal(0, 0, { align: 'center' })
+    expect(container.scrollTop).toBe(0)
+  })
+
+  test('hands a smooth scroll to the platform', () => {
+    const asked: ScrollToOptions[] = []
+    const container = {
+      ...scroller(0, 320),
+      scrollTo: (options: ScrollToOptions) => asked.push(options),
+    } as unknown as HTMLElement
+    at(container).reveal(10, 0, { align: 'start', behavior: 'smooth' })
+    expect(asked).toEqual([{ behavior: 'smooth', top: 320 }])
+  })
+
+  test('says where an item starts', () => {
+    expect(at(scroller(0, 320)).offsetOf(7)).toBe(224)
+  })
+})
