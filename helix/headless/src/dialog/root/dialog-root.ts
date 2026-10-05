@@ -45,7 +45,7 @@ import { property } from 'lit/decorators.js'
  * @event {Event} close - Sent from the host after the dialog closes, because the native `close` event does not leave the shadow root.
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before it closes, and cancelable.
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired before it opens, and cancelable.
- * @event {Event} toggle - Sent when the dialog opens or closes, with `newState` and `oldState`.
+ * @event {ToggleEvent} toggle - Sent when the dialog opens or closes, with `newState` and `oldState`.
  *
  * @csspart dialog - The native dialog element.
  *

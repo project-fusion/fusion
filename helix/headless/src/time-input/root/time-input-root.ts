@@ -67,7 +67,7 @@ import '../../time-picker/index.js'
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the list closes. Cancelable: canceling it keeps the list open and leaves the decision to you.
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the list opens. Cancelable: canceling it keeps the list closed and leaves the decision to you.
  * @event {Event} input - Fired after the value changes.
- * @event {Event} toggle - Fired after the list opens or closes, with `newState` and `oldState`.
+ * @event {ToggleEvent} toggle - Fired after the list opens or closes, with `newState` and `oldState`.
  *
  * @csspart control - The text input.
  * @csspart feedback - The message that says what is wrong with the value.

@@ -61,7 +61,7 @@ import '../../listbox/index.js'
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the list opens. Cancelable: canceling it keeps the list closed and leaves the decision to you.
  * @event {HelixFilterEvent} helix-filter - Fired as the user types in the filter field of a `filterable` select, with the text the list is filtered by. Cancelable: cancel it to leave the list unfiltered and filter the options yourself.
  * @event {Event} input - Fired after the value changes.
- * @event {Event} toggle - Fired after the list opens or closes, with `newState` and `oldState`.
+ * @event {ToggleEvent} toggle - Fired after the list opens or closes, with `newState` and `oldState`.
  *
  * @csspart feedback - The message that says what is wrong with the value.
  * @csspart hint - Help under the trigger.

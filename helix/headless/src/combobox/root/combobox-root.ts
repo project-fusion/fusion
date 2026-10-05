@@ -90,7 +90,7 @@ const isInsertion = (event: Event): boolean =>
  * @event {HelixCreateEvent} helix-create - Fired when the user adds a value that is not in the list. Cancelable.
  * @event {HelixFilterEvent} helix-filter - Fired as the user types, with the text the list is filtered by. Cancelable: cancel it to leave the list unfiltered and do the filtering yourself.
  * @event {Event} input - Fired after the value changes.
- * @event {Event} toggle - Fired when the panel opens or closes, with `newState` and `oldState`.
+ * @event {ToggleEvent} toggle - Fired when the panel opens or closes, with `newState` and `oldState`.
  *
  * @csspart control - The text field itself.
  * @csspart create - The row offering to add what was typed.

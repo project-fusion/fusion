@@ -5,6 +5,12 @@ import type { Plugin } from '../types.js'
 /** Type names the generator emits: `HelixOpenChangeEvent`, and friends. */
 const HELIX_TYPE = /\bHelix[A-Za-z0-9]*\b/g
 
+/** Comments, which name types in prose and import nothing. */
+const COMMENTS = /\/\*[\s\S]*?\*\/|\/\/[^\n]*/g
+
+/** Every identifier written outside a comment. */
+const IDENTIFIER = /\b[A-Za-z_$][\w$]*\b/g
+
 export interface JsxImportsOptions {
   /** File the JSX generator wrote, relative to the package root. */
   fileName?: string
@@ -60,21 +66,30 @@ export const jsxImports = ({ fileName = 'jsx.d.ts', packageName }: JsxImportsOpt
       [...source.matchAll(/^(?:export )?type (\w+)/gm)].map((match) => match[1] as string),
     )
 
-    const missing = [...new Set(source.match(HELIX_TYPE) ?? [])]
+    /* **Read with the comments taken out, and the import itself.** A
+       description saying "other Helix components" imported `Helix`, and a
+       method signature quoted in one imported `HelixHeadlessSplitter`, neither
+       of which the package exports: 159 errors for a consumer without
+       `skipLibCheck`. The generator also imports every export of a module the
+       file names, `FAILED_LABEL` and `pointsOf` among them, whether the file
+       uses it or not, so an import is kept only where the body uses it. */
+    const body = source.replace(importMatch[0], '').replace(COMMENTS, '')
+    const used = new Set(body.match(IDENTIFIER) ?? [])
+
+    const missing = [...new Set(body.match(HELIX_TYPE) ?? [])]
       .filter((name) => !imported.has(name) && !declared.has(name))
       .sort()
+    const kept = [...imported].filter((name) => used.has(name))
 
-    if (missing.length === 0) {
+    if (missing.length === 0 && kept.length === imported.size) {
       return
     }
 
-    const merged = [...imported, ...missing].sort()
+    const merged = [...kept, ...missing].sort()
+    const names = merged.length === 0 ? '' : `\n  ${merged.join(',\n  ')},\n`
     writeFileSync(
       path,
-      source.replace(
-        importMatch[0],
-        `import type {\n  ${merged.join(',\n  ')},\n} from '${packageName}'`,
-      ),
+      source.replace(importMatch[0], `import type {${names}} from '${packageName}'`),
     )
   },
 })

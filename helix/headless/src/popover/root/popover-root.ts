@@ -48,7 +48,7 @@ import { property } from 'lit/decorators.js'
  *
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before it closes, and cancelable.
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired before it opens, and cancelable.
- * @event {Event} toggle - Fired after the panel opens or closes, with `newState` and `oldState`.
+ * @event {ToggleEvent} toggle - Fired after the panel opens or closes, with `newState` and `oldState`.
  *
  * @csspart content - The scrolling region inside the panel.
  * @csspart popover - The panel.

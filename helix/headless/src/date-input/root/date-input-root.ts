@@ -77,7 +77,7 @@ const dates = (value: string): string[] =>
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the calendar closes. Cancelable: call `preventDefault()` to keep it open.
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the calendar opens. Cancelable: call `preventDefault()` to keep it closed.
  * @event {Event} input - Fired after the value changes.
- * @event {Event} toggle - Fired when the calendar opens or closes, with `newState` and `oldState`.
+ * @event {ToggleEvent} toggle - Fired when the calendar opens or closes, with `newState` and `oldState`.
  *
  * @csspart control - The text input.
  * @csspart date - One held date, as a tag, in `multiple`.

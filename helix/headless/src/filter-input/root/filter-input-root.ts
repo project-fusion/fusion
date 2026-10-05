@@ -128,7 +128,7 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * @event {HelixFacetEvent} helix-facet - Fired when a filter changes, whether it was typed, picked, or removed. Cancelable: call `preventDefault()` to leave the text and the chip as they were.
  * @event {HelixSelectEvent} helix-select - Fired by an option in `suggestions` when it is chosen, and bubbles out of the field. Cancelable: call `preventDefault()` to stop other listeners acting on it. The field takes no action on a choice; you decide what it does.
  * @event {Event} input - Fired when the text changes.
- * @event {Event} toggle - Fired when the suggestions panel opens or closes, with `newState` and `oldState`.
+ * @event {ToggleEvent} toggle - Fired when the suggestions panel opens or closes, with `newState` and `oldState`.
  *
  * @csspart clear - The button that empties the field.
  * @csspart control - The input itself.

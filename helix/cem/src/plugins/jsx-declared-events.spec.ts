@@ -12,11 +12,27 @@ import { jsxDeclaredEvents } from './jsx-declared-events.js'
  * by `analyze`, so asserting against it would test whether somebody had run the
  * build. This asserts the transform.
  */
-const scene = (source: string, events: string[], fileName = 'jsx.d.ts'): string => {
+const scene = (
+  source: string,
+  events: (string | { name: string; type: string })[],
+  fileName = 'jsx.d.ts',
+): string => {
   const dir = mkdtempSync(join(tmpdir(), 'jsx-declared-'))
   writeFileSync(join(dir, fileName), source)
   const manifest = {
-    modules: [{ declarations: [{ events: events.map((name) => ({ name })) }] }],
+    modules: [
+      {
+        declarations: [
+          {
+            events: events.map((event) =>
+              typeof event === 'string'
+                ? { name: event }
+                : { name: event.name, type: { text: event.type } },
+            ),
+          },
+        ],
+      },
+    ],
   }
   const was = process.cwd()
   process.chdir(dir)
@@ -35,6 +51,26 @@ describe('handlers for events the manifest declares', () => {
   test('adds one the generator does not emit', () => {
     const next = scene(BAG, ['toggle'])
     expect(next).toContain('onToggle?: (event: Event & { currentTarget: T }) => void;')
+  })
+
+  /* `onToggle={(event) => event.newState}` did not compile, the handler taking
+     a bare `Event` while every element sends a `ToggleEvent`. */
+  test('takes the platform type every element declares', () => {
+    const next = scene(BAG, [
+      { name: 'toggle', type: 'ToggleEvent' },
+      { name: 'toggle', type: 'ToggleEvent' },
+    ])
+    expect(next).toContain('onToggle?: (event: ToggleEvent & { currentTarget: T }) => void;')
+  })
+
+  test('falls back to Event where elements disagree, or the type is not the platform one', () => {
+    const mixed = scene(BAG, [
+      { name: 'toggle', type: 'ToggleEvent' },
+      { name: 'toggle', type: 'Event' },
+    ])
+    expect(mixed).toContain('onToggle?: (event: Event & { currentTarget: T }) => void;')
+    const own = scene(BAG, [{ name: 'close', type: 'HelixCloseEvent' }])
+    expect(own).toContain('onClose?: (event: Event & { currentTarget: T }) => void;')
   })
 
   test('leaves a handler the generator already emits alone', () => {
