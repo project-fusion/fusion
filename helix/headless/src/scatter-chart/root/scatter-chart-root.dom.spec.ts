@@ -201,7 +201,7 @@ describe('reading by key', () => {
       new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key: 'End' }),
     )
     await (host as HTMLElement & { updateComplete: Promise<boolean> }).updateComplete
-    expect(part(host, 'live')?.textContent).toBe('E: Spend 5, Revenue 10')
+    expect(part(host, 'live')?.textContent).toBe('E: Spend 5, Revenue 10 (5 of 5)')
     expect(part(host, 'tooltip-label')?.textContent).toBe('E')
     expect(part(host, 'point-active')).not.toBeNull()
   })

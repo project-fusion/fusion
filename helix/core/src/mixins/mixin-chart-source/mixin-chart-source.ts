@@ -149,12 +149,21 @@ export declare class MixinChartSourceInterface {
    */
   locale: string
   /**
+   * Where a reading the keys moved to stands among the readings, said after
+   * it. `{position}` and `{count}` are replaced with the numbers, written in
+   * `locale`.
+   *
+   * Set it to the words of the page's language, such as `{position} von
+   * {count}`, or to nothing to say no position.
+   */
+  positionLabel: string
+  /**
    * The table's columns, one series each. Empty when there is no table.
    */
   get series(): Series[]
   /**
-   * The chart's name: `label` when it is set, and the table's caption
-   * otherwise.
+   * The chart's name: an `aria-label` written on the chart, then `label`,
+   * then the table's caption.
    */
   get named(): string
   /**
@@ -253,6 +262,52 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
     locale = ''
 
     /**
+     * Where a reading the keys moved to stands among the readings, said after
+     * it. `{position}` and `{count}` are replaced with the numbers, written in
+     * `locale`.
+     *
+     * Set it to the words of the page's language, such as `{position} von
+     * {count}`, or to nothing to say no position. A slice or a series a
+     * legend hid is not counted.
+     */
+    @property({ attribute: 'position-label' })
+    positionLabel = '{position} of {count}'
+
+    /**
+     * Hears an `aria-label` written on the chart, which no property mirrors,
+     * so a page that names the chart that way names its plot.
+     *
+     * Lit observes the attributes of its own properties only, and `ariaLabel`
+     * belongs to the platform.
+     *
+     * Read through `Reflect.get` with this class as the receiver, which is
+     * what `super.observedAttributes` means: Lit's getter finalizes whichever
+     * class it is asked on, and asked on the base it would finalize the base
+     * and leave a subclass without its styles. A mixin's base has no static
+     * side TypeScript can see, so `super` cannot be written here.
+     */
+    static get observedAttributes(): string[] {
+      // biome-ignore lint/complexity/noThisInStatic: the receiver must be the subclass being defined, so a styled chart keeps its own attributes and styles, where the class name would read the base's
+      const inherited = Reflect.get(Base, 'observedAttributes', this) as string[] | undefined
+      return [...(inherited ?? []), 'aria-label']
+    }
+
+    /**
+     * Called by the browser when an observed attribute changes. A new
+     * `aria-label` asks for an update, because it names the plot.
+     */
+    override attributeChangedCallback(
+      name: string,
+      old: string | null,
+      value: string | null,
+    ): void {
+      super.attributeChangedCallback(name, old, value)
+      if (name === 'aria-label') {
+        this.requestUpdate()
+      }
+    }
+
+    /**
      * Re-resolves when the chart is pointed at a different table.
      *
      * `SourceController` watches whatever it resolved on connect, and nothing
@@ -277,16 +332,26 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
     }
 
     /**
-     * The chart's name: `label` when it is set, and the table's caption
-     * otherwise.
+     * The chart's name: an `aria-label` written on the chart, then `label`,
+     * then the table's caption.
      *
      * The fallback is the reason this is shared rather than copied: a caption is
      * already written, already the right words, and already the thing a reader
      * of the table sees. A chart that made the consumer say it twice would be
      * asking for the second one to drift.
+     *
+     * **An `aria-label` on the chart comes first**, because it is how a page
+     * names an element, and the chart is a generic around its plot: written
+     * on the host, the name reached nobody. The plot takes it, as Heatmap's
+     * strip always did.
      */
     get named(): string {
-      return this.label || this.source.element?.querySelector('caption')?.textContent?.trim() || ''
+      return (
+        this.getAttribute?.('aria-label') ||
+        this.label ||
+        this.source.element?.querySelector('caption')?.textContent?.trim() ||
+        ''
+      )
     }
 
     /**

@@ -284,7 +284,7 @@ describe('reading by key', () => {
     expect(part(host, 'live')?.textContent).toBe('')
     press(host, 'ArrowRight')
     await (host as HTMLElement & { updateComplete: Promise<boolean> }).updateComplete
-    expect(part(host, 'live')?.textContent).toBe('Q1: Revenue $100k')
+    expect(part(host, 'live')?.textContent).toBe('Q1: Revenue $100k (1 of 3)')
     expect(part(host, 'tooltip-label')?.textContent).toBe('Q1')
   })
 })
@@ -322,6 +322,6 @@ describe('a series a legend hid', () => {
     await (host as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
     /* One series is left, so the down arrow walks the readings, as it does on
        a chart of one series, and never rests on the hidden one. */
-    expect(part(host, 'live')?.textContent).toBe('Mar: Referral 9')
+    expect(part(host, 'live')?.textContent).toBe('Mar: Referral 9 (2 of 2)')
   })
 })

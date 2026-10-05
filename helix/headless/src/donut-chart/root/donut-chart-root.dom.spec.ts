@@ -357,7 +357,7 @@ describe('reading by key', () => {
       )
     }
     await (host as HTMLElement & { updateComplete: Promise<boolean> }).updateComplete
-    expect(part(host, 'live')?.textContent).toBe('Search: Share 30')
+    expect(part(host, 'live')?.textContent).toBe('Search: Share 30 (30%) (2 of 3)')
     expect(segments(host).map((one) => one.getAttribute('part'))).toEqual([
       'segment',
       'segment segment-active',
