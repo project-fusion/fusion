@@ -24,6 +24,39 @@ describe('icon rendering', () => {
     expect(svg(icon)).toBeNull()
   })
 
+  /* A typo drew nothing and said nothing, while the styled host kept its
+     box: a blank gap with no clue why. */
+  test('and says so, once for each name it cannot find', async () => {
+    const icon = (await mount(
+      '<helix-headless-icon name="check"></helix-headless-icon>',
+    )) as HTMLElement & { name: string; updateComplete: Promise<unknown> }
+    let heard = 0
+    icon.addEventListener('error', () => {
+      heard += 1
+    })
+    icon.name = 'not-a-real-icon'
+    await icon.updateComplete
+    icon.setAttribute('mirror', '')
+    await icon.updateComplete
+    expect(heard).toBe(1)
+    icon.name = 'check'
+    await icon.updateComplete
+    expect(svg(icon)).not.toBeNull()
+    expect(heard).toBe(1)
+  })
+
+  /* `label` was the only way in, so an `aria-label` written on the element,
+     the way a page names anything, left a generic element and a hidden glyph. */
+  test('an `aria-label` on the element makes it an image with that name', async () => {
+    const icon = (await mount(
+      '<helix-headless-icon name="x" aria-label="Delete"></helix-headless-icon>',
+    )) as HTMLElement & { internals?: ElementInternals; updateComplete: Promise<unknown> }
+    expect(icon.internals?.role).toBe('img')
+    icon.removeAttribute('aria-label')
+    await icon.updateComplete
+    expect(icon.internals?.role ?? null).toBeNull()
+  })
+
   test('is decoration by default, and hidden from assistive technology', async () => {
     const icon = await mount('<helix-headless-icon name="x"></helix-headless-icon>')
     expect(svg(icon)?.getAttribute('aria-hidden')).toBe('true')

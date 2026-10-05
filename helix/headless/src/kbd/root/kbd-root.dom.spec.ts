@@ -172,6 +172,74 @@ describe('a key that binds', () => {
     expect(heard).toBe(0)
   })
 
+  /* `?` arrives as `?` with Shift held, since Shift is how it is typed, and
+     the matcher refused Shift unless the chord named it: the web's most common
+     help shortcut could not be bound. */
+  test('a symbol typed with Shift answers its own chord', async () => {
+    const host = await kbd('keys="?" within="control"')
+    let heard = 0
+    host.addEventListener('helix-shortcut', () => {
+      heard += 1
+    })
+    press(host.parentElement as EventTarget, '?', { shiftKey: true })
+    expect(heard).toBe(1)
+  })
+
+  test('while a letter still tells Shift apart', async () => {
+    const host = await kbd('keys="a" within="control"')
+    let heard = 0
+    host.addEventListener('helix-shortcut', () => {
+      heard += 1
+    })
+    press(host.parentElement as EventTarget, 'A', { shiftKey: true })
+    expect(heard).toBe(0)
+  })
+
+  /* With `mod` in the chord both the Control and Command checks passed
+     whatever was held, so Control and Command together answered `mod+k`. */
+  test('mod is one modifier, and the other platform key is a near miss', async () => {
+    for (const [agent, extra] of [
+      [APPLE_AGENT, { ctrlKey: true, metaKey: true }],
+      [OTHER_AGENT, { ctrlKey: true, metaKey: true }],
+    ] as const) {
+      await onPlatform(agent, async () => {
+        const host = await kbd('keys="mod+k" within="control"')
+        let heard = 0
+        host.addEventListener('helix-shortcut', () => {
+          heard += 1
+        })
+        press(host.parentElement as EventTarget, 'k', extra)
+        press(
+          host.parentElement as EventTarget,
+          'k',
+          agent === APPLE_AGENT ? { metaKey: true } : { ctrlKey: true },
+        )
+        expect(heard).toBe(1)
+      })
+    }
+  })
+
+  /* `shift+?` is a question mark typed into a field, and bound to the
+     document it took every one a reader typed on the page. */
+  test('a shifted character bound to the document leaves the typing alone too', async () => {
+    const host = await kbd('keys="shift+?" within="document"')
+    const field = document.createElement('textarea')
+    ;(host.parentElement as HTMLElement).append(field)
+    let heard = 0
+    host.addEventListener('helix-shortcut', () => {
+      heard += 1
+    })
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key: '?',
+      shiftKey: true,
+    })
+    field.dispatchEvent(event)
+    expect({ heard, tookTheKey: event.defaultPrevented }).toEqual({ heard: 0, tookTheKey: false })
+  })
+
   test('a consumer that refuses it leaves the keystroke alone', async () => {
     /* The escape for the cases a label cannot know about: a dialog is over the
        control, the moment is wrong, the reader is somewhere else. Refused, the

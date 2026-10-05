@@ -1,6 +1,6 @@
-import { customElement, HelixElement } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
 import { type HelixIcon, icons } from '@fusion.dev/helix-icons'
-import { html, nothing, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
@@ -21,17 +21,21 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * a dark background. Shapes that set their own `fill` or `stroke` are
  * unaffected.
  *
- * A name with no match renders nothing.
+ * A name with no match renders nothing, and the element fires `error`, so a
+ * typo in a name can be heard.
  *
  * An icon is decorative by default and hidden from assistive technology. Set
  * `label` only when the icon is the only carrier of meaning, such as in a
- * button with no text.
+ * button with no text. An `aria-label` on the element works too: the element
+ * is then an image with that name.
  *
  * @since 0.1.0
  * @status stable
  * @category media
  * @aliases Glyph, Symbol
  * @documentation https://fusion.dev/helix/components/icon
+ *
+ * @event {Event} error - `name` matches no icon in the set, so nothing is drawn.
  *
  * @csspart svg - The rendered SVG.
  */
@@ -84,6 +88,50 @@ export class HelixHeadlessIcon extends HelixElement {
    */
   @property()
   name = ''
+
+  /**
+   * Hears an `aria-label` written on the element, which no property mirrors.
+   *
+   * Lit observes the attributes of its own properties only, and `ariaLabel`
+   * belongs to the platform.
+   */
+  static override get observedAttributes(): string[] {
+    return [...super.observedAttributes, 'aria-label']
+  }
+
+  override attributeChangedCallback(name: string, old: string | null, value: string | null): void {
+    super.attributeChangedCallback(name, old, value)
+    if (name === 'aria-label') {
+      this.requestUpdate()
+    }
+  }
+
+  /** The name the last `error` was fired for, so it fires once per name. */
+  private missed = ''
+
+  /* **An `aria-label` on the element names it.** The glyph is hidden unless
+     `label` is set, so an `aria-label` written on the host, the way a page
+     names anything, left a generic element with a name nobody heard. The host
+     takes the image role then, and its own attribute is its name. */
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    const named = this.label === '' && (this.getAttribute?.('aria-label') ?? '') !== ''
+    hostAria(this.internals, { role: named ? 'img' : '' })
+  }
+
+  /* Said once per name, after the render that drew nothing. A server runs no
+     `updated`, so nothing fires there. */
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    if (this.icon === undefined && this.name !== '' && !Object.hasOwn(icons, this.name)) {
+      if (this.missed !== this.name) {
+        this.missed = this.name
+        this.dispatchEvent(new Event('error', { bubbles: false, cancelable: false, composed: false }))
+      }
+    } else {
+      this.missed = ''
+    }
+  }
 
   protected override render(): TemplateResult | typeof nothing {
     /* Own keys only. A truthiness check on a plain-object index lets an

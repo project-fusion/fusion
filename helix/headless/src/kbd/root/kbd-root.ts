@@ -116,11 +116,16 @@ const onApple = (): boolean =>
 @customElement('helix-headless-kbd')
 export class HelixHeadlessKbd extends HelixElement {
   /**
-   * The key or chord to show, such as `mod+k`, `shift+?`, or `/`.
+   * The key or chord to show, such as `mod+k`, `?`, or `/`.
    *
    * `mod` is the platform's own command modifier, which is the reason to write
    * a chord here rather than a glyph: it is the one token whose right answer
    * differs per reader.
+   *
+   * A symbol such as `?` or `!` is written as itself, without `shift`. It is
+   * matched whether or not Shift was held to type it, since that depends on
+   * the keyboard layout. Bound to the document, a chord that types a character
+   * is not taken from a field a reader is typing in.
    */
   @property()
   keys = ''
@@ -246,18 +251,24 @@ export class HelixHeadlessKbd extends HelixElement {
   }
 
   /**
-   * Whether this chord is one bare character, and so indistinguishable from
+   * Whether this chord types a character, and so is indistinguishable from
    * typing.
    *
-   * A single part means no modifier, and one code point means a character
-   * rather than a name: `/` and `?` are printable, `escape` and `enter` are not.
+   * One code point means a character rather than a name: `/` and `?` are
+   * printable, `escape` and `enter` are not. **Shift is allowed beside it**,
+   * because Shift is how a character is typed: `shift+?` and `shift+a` are a
+   * question mark and a capital A in a field, and taking them ate every one
+   * a reader typed on the page.
    */
   private get printable(): boolean {
     const parts = this.keys
       .split('+')
-      .map((part) => part.trim())
+      .map((part) => part.trim().toLowerCase())
       .filter((part) => part !== '')
-    return parts.length === 1 && [...(parts[0] ?? '')].length === 1
+    const key = parts.at(-1) ?? ''
+    return (
+      [...key].length === 1 && parts.slice(0, -1).every((modifier) => modifier === 'shift')
+    )
   }
 
   /** Whether a press is this chord, modifiers and all. */
@@ -271,21 +282,27 @@ export class HelixHeadlessKbd extends HelixElement {
     }
     const wanted = parts[parts.length - 1] ?? ''
     const modifiers = new Set(parts.slice(0, -1))
-    const mod = onApple() ? press.metaKey : press.ctrlKey
+    const apple = onApple()
+    /* `mod` is one key, the platform's: Command on Apple devices and Control
+       elsewhere. The other one is then checked like any modifier the chord
+       does not name, so Control and Command together do not answer `mod+k`. */
+    const ctrl = modifiers.has('ctrl') || (modifiers.has('mod') && !apple)
+    const meta = modifiers.has('cmd') || modifiers.has('meta') || (modifiers.has('mod') && apple)
+    /* **A symbol is typed with Shift, so Shift says nothing about it.** On a US
+       layout `?` arrives as `?` with `shiftKey` set, and a chord of `?` that
+       refused Shift could never be pressed at all: the web's most common help
+       shortcut, unbindable except as `shift+?`. A letter has a shifted form of
+       its own, so `a` still refuses Shift and `shift+a` still asks for it. */
+    const symbol = wanted.toLowerCase() === wanted.toUpperCase() && [...wanted].length === 1
     /* Every modifier is checked in both directions, so `mod+k` is not answered
        by `shift+mod+k`: a chord a reader did not press is a chord that should
        go to whatever did want it. */
     return (
       press.key.toLowerCase() === wanted &&
-      (modifiers.has('mod') ? mod : true) &&
-      (modifiers.has('shift') ? press.shiftKey : !press.shiftKey) &&
+      (modifiers.has('shift') ? press.shiftKey : symbol || !press.shiftKey) &&
       (modifiers.has('alt') || modifiers.has('opt') ? press.altKey : !press.altKey) &&
-      (modifiers.has('ctrl') ? press.ctrlKey : modifiers.has('mod') ? true : !press.ctrlKey) &&
-      (modifiers.has('cmd') || modifiers.has('meta')
-        ? press.metaKey
-        : modifiers.has('mod')
-          ? true
-          : !press.metaKey)
+      (ctrl ? press.ctrlKey : !press.ctrlKey) &&
+      (meta ? press.metaKey : !press.metaKey)
     )
   }
 
