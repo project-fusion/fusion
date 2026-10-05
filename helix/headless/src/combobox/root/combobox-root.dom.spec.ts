@@ -892,3 +892,33 @@ describe('what opens a combobox', () => {
     expect(host.open).toBe(true)
   })
 })
+
+describe('a combobox the browser restores', () => {
+  /* What a form brought back from the back-forward cache or by autofill
+     hands the element: the state it last reported. The field shows the
+     option's words, and the form sends its value again. */
+  test('takes the value back, shows its words, and reports it', async () => {
+    const host = (await combobox()) as Updatable & {
+      formStateRestoreCallback: (state: string | null, mode: string) => void
+      value: string
+    }
+    host.formStateRestoreCallback('rb', 'restore')
+    await settle(host)
+    expect(host.value).toBe('rb')
+    expect(control(host).value).toBe('Ruby')
+    expect(formValue(host as unknown as HTMLElement)).toBe('rb')
+    host.formStateRestoreCallback('go', 'autocomplete')
+    await settle(host)
+    expect(control(host).value).toBe('Go')
+  })
+
+  test('several restore as several entries', async () => {
+    const host = (await combobox('multiple')) as Updatable & {
+      formStateRestoreCallback: (state: string | null, mode: string) => void
+      value: string
+    }
+    host.formStateRestoreCallback('rs,go', 'restore')
+    await settle(host)
+    expect(host.value).toBe('rs,go')
+  })
+})
