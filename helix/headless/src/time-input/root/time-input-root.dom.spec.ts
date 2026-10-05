@@ -245,3 +245,48 @@ describe('a time input with seconds and a clock of its own', () => {
     expect(picker.seconds).toBe(false)
   })
 })
+
+describe('segmented', () => {
+  const segments = (host: HTMLElement): HTMLElement[] => [
+    ...(host.shadowRoot?.querySelectorAll<HTMLElement>('[part~="segment"]') ?? []),
+  ]
+  const press = async (host: InputTime, at: HTMLElement, key: string): Promise<void> => {
+    at.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key }),
+    )
+    await host.updateComplete
+  }
+
+  test('the field is a segment for each part of the time, on the clock asked for', async () => {
+    const host = await field(
+      'segmented locale="en-US" hour-cycle="h23" seconds default-value="14:05:09"',
+    )
+    expect(part(host, 'control')).toBeNull()
+    expect(segments(host).map((one) => one.dataset.segment)).toEqual(['hour', 'minute', 'second'])
+    expect(segments(host).map((one) => one.textContent?.trim())).toEqual(['14', '05', '09'])
+  })
+
+  test('a twelve hour locale has a segment for the half of the day', async () => {
+    const host = await field('segmented locale="en-US" default-value="14:30"')
+    expect(segments(host).map((one) => one.textContent?.trim())).toEqual(['2', '30', 'PM'])
+    await press(host, segments(host)[2] as HTMLElement, 'ArrowUp')
+    expect(host.value).toBe('02:30')
+  })
+
+  test('a time from the list is what the segments show', async () => {
+    const host = await field('segmented locale="en-GB" default-value="09:30"')
+    ;(part(host, 'picker') as unknown as { requestValue(next: string): boolean }).requestValue(
+      '11:15',
+    )
+    await host.updateComplete
+    expect(host.value).toBe('11:15')
+    expect(segments(host).map((one) => one.textContent?.trim())).toEqual(['11', '15'])
+  })
+
+  test('a time the field bars is invalid', async () => {
+    const host = await field('segmented locale="en-GB" disable-times="10:00" default-value="09:00"')
+    await press(host, segments(host)[0] as HTMLElement, 'ArrowUp')
+    expect(host.value).toBe('10:00')
+    expect(internals(host).validity.valid).toBe(false)
+  })
+})

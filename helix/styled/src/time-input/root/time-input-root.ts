@@ -7,6 +7,7 @@ import '../../tag/index.js'
 import '../../time-picker/index.js'
 import { styles as fieldStyles } from '../../shared/field/field.css.js'
 import { styles as fieldFrameStyles } from '../../shared/field/field-frame.css.js'
+import { styles as fieldSegmentsStyles } from '../../shared/field/field-segments.css.js'
 import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
 import { styles as floatingEntranceStyles } from '../../shared/floating/entrance.css.js'
 import { styles as floatingPanelStyles } from '../../shared/floating/panel.css.js'
@@ -36,6 +37,14 @@ import { styles } from './time-input-root.css.js'
  * @cssproperty --time-input-border-width - Width of the panel's edge. Defaults to
  *   `--helix-border-floating`, which is `0`, so the panel stands out by its shadow unless
  *   your theme sets a width.
+ * @cssproperty --time-input-segment-focus-background-color - The fill behind the
+ *   segment with focus, in `segmented`. It follows `--helix-color-primary`.
+ * @cssproperty --time-input-segment-focus-color - The text of the segment with
+ *   focus, in `segmented`.
+ * @cssproperty --time-input-segment-literal-color - The text the locale writes
+ *   between two segments, in `segmented`.
+ * @cssproperty --time-input-segment-placeholder-color - The dashes of a segment
+ *   with nothing in it, in `segmented`. It matches the text field's placeholder.
  * @cssproperty --time-input-shadow - Shadow under the panel. Defaults to
  *   `--helix-shadow-floating`, because the panel can sit over any content.
  */
@@ -47,6 +56,7 @@ export class HelixTimeInput extends HelixHeadlessTimeInput {
     fieldStyles,
     fieldFrameStyles,
     fieldStackedStyles,
+    fieldSegmentsStyles,
     tagRowStyles,
     floatingPanelStyles,
     floatingEntranceStyles,
