@@ -11,7 +11,7 @@
     --code-background-color,
     color-mix(in oklab, var(--helix-color-foreground) 6%, transparent)
   );
-  border-radius: var(--helix-radii-sm);
+  border-radius: var(--code-radius, var(--helix-radii-sm));
   /* Never a syntax color: a colored word in running text reads as a link.
      `foreground-muted` alone is too far back at 5.27 light and 7.42 dark where
      the prose runs at 21; mixed 30% it measures 9.98 and 10.20. */
@@ -19,7 +19,7 @@
     --code-foreground-color,
     color-mix(in oklab, var(--helix-color-foreground) 30%, var(--helix-color-foreground-muted))
   );
-  font-family: var(--helix-font-mono);
+  font-family: var(--code-font-family, var(--helix-font-mono));
   /* A ratio, not a rung: a fixed 13px inside a 32px heading is 0.41 of it and
      sits on the line like a footnote. `sm` over `md` leaves body text unchanged
      to the pixel, and naming two tokens is what `tokens` requires of a fallback. */

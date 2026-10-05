@@ -21,7 +21,9 @@ import { styles } from './blockquote-root.css.js'
  * @cssproperty --blockquote-attribution-size - The font size of the attribution.
  * @cssproperty --blockquote-color - The color of the quoted passage.
  * @cssproperty --blockquote-font-family - The typeface of the quoted passage, the display face by default.
+ * @cssproperty --blockquote-font-weight - The weight of the quoted passage, medium by default.
  * @cssproperty --blockquote-gap - The space between the passage and its attribution.
+ * @cssproperty --blockquote-line-height - The line height of the quoted passage, the tight leading by default.
  * @cssproperty --blockquote-size - The font size of the quoted passage.
  */
 @customElement('helix-blockquote')

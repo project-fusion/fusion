@@ -20,6 +20,11 @@ import { property, state } from 'lit/decorators.js'
  * reader entering it hears its name; an unnamed one has no role, since a group
  * with no name only adds "group" to what a reader says.
  *
+ * Each region's slot is a part of the same name, `body` for the main content,
+ * as Web Awesome's card names its regions. A slot draws no box, so a part
+ * passes inherited properties to what is slotted, and a page wanting a box
+ * there gives it one with `display`.
+ *
  * `header-actions` and `footer-actions` hold controls at the end of the
  * header's and the footer's line, as Web Awesome's card does. While one holds
  * something, its line is a `header-row` or `footer-row` part; otherwise there
@@ -39,8 +44,14 @@ import { property, state } from 'lit/decorators.js'
  * @slot header-actions - Controls for the whole card at the end of the header's line, such as a menu.
  * @slot media - Image, video, or chart that runs edge to edge, outside the inset.
  *
+ * @csspart body - The slot the main content arrives through. A slot draws no box, so it passes inherited properties, such as color and font, to the content; `display: block` gives it one.
+ * @csspart footer - The slot the footer arrives through, drawing no box, as `body` does.
+ * @csspart footer-actions - The slot the footer's controls arrive through, drawing no box, as `body` does.
  * @csspart footer-row - The line holding `footer` and `footer-actions`, drawn only while `footer-actions` holds something.
+ * @csspart header - The slot the header arrives through, drawing no box, as `body` does.
+ * @csspart header-actions - The slot the header's controls arrive through, drawing no box, as `body` does.
  * @csspart header-row - The line holding `header` and `header-actions`, drawn only while `header-actions` holds something.
+ * @csspart media - The slot the media arrives through, drawing no box, as `body` does.
  */
 @customElement('helix-headless-card')
 export class HelixHeadlessCard extends HelixElement {
@@ -120,14 +131,25 @@ export class HelixHeadlessCard extends HelixElement {
     //
     // A line with actions is the one wrapper, drawn only while the actions slot
     // holds something, so a card without actions renders what it always did.
-    const header = html`<slot name="header"></slot
-      ><slot name="header-actions" @slotchange=${this.readActions}></slot>`
-    const footer = html`<slot name="footer"></slot
-      ><slot name="footer-actions" @slotchange=${this.readActions}></slot>`
+    //
+    // Each slot is a part, which draws no box either: a part on a slot is a
+    // name a page reaches it by, and the slot stays `display: contents`.
+    const header = html`<slot name="header" part="header"></slot
+      ><slot
+        name="header-actions"
+        part="header-actions"
+        @slotchange=${this.readActions}
+      ></slot>`
+    const footer = html`<slot name="footer" part="footer"></slot
+      ><slot
+        name="footer-actions"
+        part="footer-actions"
+        @slotchange=${this.readActions}
+      ></slot>`
     return html`
-      <slot name="media"></slot>
+      <slot name="media" part="media"></slot>
       ${this.headerActions ? html`<div part="header-row">${header}</div>` : header}
-      <slot></slot>
+      <slot part="body"></slot>
       ${this.footerActions ? html`<div part="footer-row">${footer}</div>` : footer}
     `
   }

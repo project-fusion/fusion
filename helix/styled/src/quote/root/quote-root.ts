@@ -17,7 +17,9 @@ import { styles } from './quote-root.css.js'
  * @documentation https://fusion.dev/helix/components/quote
  *
  * @cssproperty --quote-color - Color of the quoted text.
+ * @cssproperty --quote-font-family - The typeface of the quoted text, the paragraph's own by default.
  * @cssproperty --quote-font-style - The slant of the quoted text, `italic` by default. Set `normal` for a face whose italic is too loud, or `oblique` for one with no italic of its own.
+ * @cssproperty --quote-font-weight - The weight of the quoted text, the paragraph's own by default.
  */
 @customElement('helix-quote')
 export class HelixQuote extends HelixHeadlessQuote {

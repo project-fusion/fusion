@@ -72,6 +72,18 @@ describe('blockquote', () => {
 })
 
 describe('blockquote hooks', () => {
+  /* Radix Themes' Blockquote takes a weight; the leading follows a face a
+     page swaps in. */
+  test('the passage takes a weight and a line height that fall back to today', () => {
+    const passage = rule('slot:not([name])')
+    expect(passage).toContain(
+      'font-weight: var(--blockquote-font-weight, var(--helix-weight-medium))',
+    )
+    expect(passage).toContain(
+      'line-height: var(--blockquote-line-height, var(--helix-leading-tight))',
+    )
+  })
+
   test('the attribution takes a color and a gap that fall back to today', () => {
     const attribution = rule('[part="attribution"]')
     expect(attribution).toContain(

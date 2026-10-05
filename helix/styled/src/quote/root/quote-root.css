@@ -13,7 +13,11 @@
      skip. */
   color: var(--quote-color, var(--helix-color-foreground-muted));
   font: inherit;
+  /* The paragraph's face and weight until a page names others, such as the
+     display face for a pull quote set inline. */
+  font-family: var(--quote-font-family, inherit);
   font-style: var(--quote-font-style, italic);
+  font-weight: var(--quote-font-weight, inherit);
 }
 
 /* Print: the marks and the slant, with no fill behind them.

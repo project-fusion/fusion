@@ -18,10 +18,12 @@ import { styles } from './code-root.css.js'
  *
  * @cssproperty --code-background-color - Fill behind the fragment. Defaults to the
  * foreground color at 6%, which looks the same on a light page and a dark one.
+ * @cssproperty --code-font-family - The fragment's typeface. Defaults to the mono face.
  * @cssproperty --code-foreground-color - Color of the fragment's text. Defaults to the
  * foreground color mixed toward `foreground-muted`.
  * @cssproperty --code-padding - Space either side of the fragment. Defaults to half of
  * `space-2xs`, so a bracket next to the fragment sits close to it.
+ * @cssproperty --code-radius - Corner radius of the wash. Defaults to `radii-sm`.
  * @cssproperty --code-size - The fragment's size. Defaults to `text-sm`.
  */
 @customElement('helix-code')

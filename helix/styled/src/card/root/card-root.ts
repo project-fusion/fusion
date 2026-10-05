@@ -37,8 +37,14 @@ import { styles } from './card-root.css.js'
  * @slot header-actions - Controls for the whole card at the end of the header's line, such as a menu.
  * @slot media - Image, video, or chart that runs edge to edge, outside the inset.
  *
+ * @csspart body - The slot the main content arrives through. A slot draws no box, so it passes inherited properties, such as color and font, to the content; `display: block` gives it one.
+ * @csspart footer - The slot the footer arrives through, drawing no box, as `body` does.
+ * @csspart footer-actions - The slot the footer's controls arrive through, drawing no box, as `body` does.
  * @csspart footer-row - The line holding `footer` and `footer-actions`, drawn only while `footer-actions` holds something.
+ * @csspart header - The slot the header arrives through, drawing no box, as `body` does.
+ * @csspart header-actions - The slot the header's controls arrive through, drawing no box, as `body` does.
  * @csspart header-row - The line holding `header` and `header-actions`, drawn only while `header-actions` holds something.
+ * @csspart media - The slot the media arrives through, drawing no box, as `body` does.
  *
  * @cssproperty --card-align - How the regions pack when the card is stretched
  *   taller than its content. `start` by default, so the slack is at the bottom;

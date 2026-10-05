@@ -12,8 +12,18 @@ describe('card server output', () => {
        the empty inset band this arrangement exists to avoid, and the detection
        that would let a wrapper hide itself does not exist. */
     const markup = ssr(html`<helix-headless-card></helix-headless-card>`)
-    expect(servedParts(markup)).toEqual([])
-    expect(rendered(markup, TAG)).toContain('<slot name="media">')
+    /* Each slot is a part, Web Awesome's card's region names, and still a
+       slot: no wrapper is served. */
+    expect(servedParts(markup).sort()).toEqual([
+      'body',
+      'footer',
+      'footer-actions',
+      'header',
+      'header-actions',
+      'media',
+    ])
+    expect(rendered(markup, TAG)).toContain('<slot name="media" part="media">')
+    expect(rendered(markup, TAG)).not.toContain('<div')
   })
 
   test('`media-placement` reflects, which is the only way the sheet can reach it', () => {
