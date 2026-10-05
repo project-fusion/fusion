@@ -97,6 +97,17 @@ describe('select', () => {
     expect(listbox?.getAttribute('aria-label')).toBe('L')
     expect(listbox?.hasAttribute('label')).toBe(false)
   })
+
+  test('a select named by `aria-label` names its list with it too', async () => {
+    /* An inline select has no visible label and is named by `aria-label`, and
+       its list opened unnamed, which the missing-name warning reported. */
+    const host = await mount(
+      `<helix-headless-select aria-label="Sort by" name="c">
+        <helix-headless-option value="one">Alpha</helix-headless-option>
+      </helix-headless-select>`,
+    )
+    expect(part(host, 'listbox')?.getAttribute('aria-label')).toBe('Sort by')
+  })
 })
 
 if (hasLayout()) {
