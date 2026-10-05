@@ -1,5 +1,5 @@
 import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { html, type PropertyValues, type ReactiveElement, type TemplateResult } from 'lit'
 
 /**
  * @summary One row of a table.
@@ -56,8 +56,22 @@ export class HelixHeadlessTableRow extends HelixElement {
     hostAria(this.internals, { role: 'row' })
   }
 
+  /**
+   * Asks each cell to read its role again once the cells change.
+   *
+   * A `header` cell heads its row when a value sits beside it, and a cell that
+   * upgrades while its row is still being parsed has no value beside it yet.
+   */
+  private readonly handleSlotChange = (): void => {
+    for (const cell of this.children) {
+      if ('isTableCell' in cell) {
+        ;(cell as unknown as ReactiveElement).requestUpdate()
+      }
+    }
+  }
+
   protected override render(): TemplateResult {
-    return html`<slot></slot>`
+    return html`<slot @slotchange=${this.handleSlotChange}></slot>`
   }
 }
 

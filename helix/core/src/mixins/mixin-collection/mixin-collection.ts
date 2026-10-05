@@ -23,9 +23,14 @@ export declare class CollectionElement {
   /**
    * The status line, or nothing where the collection has content to show.
    *
-   * Rendered by the component wherever its rows would be.
+   * Rendered by the component wherever its rows would be. `cell` makes the line
+   * a row holding one cell of that role, for a table or a grid, whose children
+   * may only be rows.
    */
-  protected renderStatus(hasContent: boolean): TemplateResult | typeof nothing
+  protected renderStatus(
+    hasContent: boolean,
+    cell?: 'cell' | 'gridcell',
+  ): TemplateResult | typeof nothing
 
   /**
    * The same words for a screen reader, in a region that is always there.
@@ -192,14 +197,22 @@ export const MixinCollection = <T extends Constructor<HelixElement>>(Base: T) =>
      * empty, and saying so is the most common version of this fault: the reader
      * is told there is nothing a moment before there is something.
      */
-    protected renderStatus(hasContent: boolean): TemplateResult | typeof nothing {
-      if (this.loading) {
-        return html`<p part="loading">${this.loadingText}</p>`
-      }
-      if (hasContent) {
+    protected renderStatus(
+      hasContent: boolean,
+      cell?: 'cell' | 'gridcell',
+    ): TemplateResult | typeof nothing {
+      if (!this.loading && hasContent) {
         return nothing
       }
-      return html`<p part="empty">${this.emptyText}</p>`
+      const text = this.loading ? this.loadingText : this.emptyText
+      /* **A table owns rows and nothing else.** A paragraph inside `role="table"`
+         is a child the role does not allow, so in a table the line is a row
+         with one cell, and the inline span inside it draws nothing of its own. */
+      const words = cell ? html`<span role=${cell}>${text}</span>` : text
+      const row = cell ? 'row' : nothing
+      return this.loading
+        ? html`<p part="loading" role=${row}>${words}</p>`
+        : html`<p part="empty" role=${row}>${words}</p>`
     }
 
     /**

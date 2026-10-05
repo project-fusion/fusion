@@ -413,3 +413,108 @@ describe('a table with a column hidden', () => {
     })
   }
 })
+
+const sortable = `
+  <helix-headless-table label="Services">
+    <helix-headless-table-column>Service</helix-headless-table-column>
+    <helix-headless-table-column sortable field="count">Count</helix-headless-table-column>
+    <helix-headless-table-row id="web">
+      <helix-headless-table-cell header>web-app</helix-headless-table-cell>
+      <helix-headless-table-cell>1,204</helix-headless-table-cell>
+    </helix-headless-table-row>
+    <helix-headless-table-row id="billing">
+      <helix-headless-table-cell header>billing-api</helix-headless-table-cell>
+      <helix-headless-table-cell>980</helix-headless-table-cell>
+    </helix-headless-table-row>
+  </helix-headless-table>`
+
+type Sorting = Updating & { sort: string }
+
+const drawn = (host: HTMLElement): string[] => slotted(host).map((row) => row.id)
+
+/**
+ * A sortable column in a table of markup.
+ *
+ * **The button it draws has to do something.** It announced a sortable column
+ * and changed nothing, because only `DataTable` listened for it. The table
+ * draws the rows in the new order by assigning them, and the markup stays as
+ * it was written.
+ */
+describe('a table sorted by a column', () => {
+  const press = (host: HTMLElement): void => {
+    const column = host.querySelector('[field="count"]') as HTMLElement
+    ;(part(column, 'sort') as HTMLElement).click()
+  }
+
+  test('draws the rows in order of the column, numbers by their value', async () => {
+    const host = (await mount(sortable)) as Sorting
+    await settle(host)
+    expect(drawn(host)).toEqual(['web', 'billing'])
+    const asked: string[] = []
+    host.addEventListener('helix-sort', (event) => {
+      asked.push((event as CustomEvent<{ value: string }>).detail.value)
+    })
+
+    press(host)
+    await settle(host)
+    expect(host.sort).toBe('count:asc')
+    expect(drawn(host)).toEqual(['billing', 'web'])
+    expect([...host.querySelectorAll('helix-headless-table-row')].map((row) => row.id)).toEqual([
+      'web',
+      'billing',
+    ])
+    expect((part(host, 'live') as HTMLElement).textContent).toBe('Sorted by Count, ascending')
+
+    press(host)
+    await settle(host)
+    expect(drawn(host)).toEqual(['web', 'billing'])
+    press(host)
+    await settle(host)
+    expect(host.sort).toBe('')
+    expect(asked).toEqual(['count:asc', 'count:desc', ''])
+  })
+
+  test('keeps the order when the request is refused', async () => {
+    const host = (await mount(sortable)) as Sorting
+    await settle(host)
+    host.addEventListener('helix-sort', (event) => event.preventDefault())
+    press(host)
+    await settle(host)
+    expect(host.sort).toBe('')
+    expect(drawn(host)).toEqual(['web', 'billing'])
+  })
+
+  test('starts in the order `default-sort` names', async () => {
+    const host = (await mount(
+      sortable.replace('label="Services"', 'label="Services" default-sort="count:asc"'),
+    )) as Sorting
+    await settle(host)
+    expect(drawn(host)).toEqual(['billing', 'web'])
+  })
+})
+
+describe('a table named from outside', () => {
+  /* A table named by a heading beside it is the common case, and the name went
+     onto a generic wrapper while the table itself kept "Table". */
+  test('takes a host `aria-label` onto the table', async () => {
+    const host = (await mount(
+      '<helix-headless-table aria-label="Deployments"><helix-headless-table-row><helix-headless-table-cell>x</helix-headless-table-cell></helix-headless-table-row></helix-headless-table>',
+    )) as Updating
+    await settle(host)
+    expect((part(host, 'table') as HTMLElement).getAttribute('aria-label')).toBe('Deployments')
+  })
+})
+
+describe('an empty table', () => {
+  /* A table owns rows. A paragraph directly inside one is a child the role
+     does not allow. */
+  test('says so in a row of its own', async () => {
+    const host = (await mount(
+      '<helix-headless-table label="Empty"><helix-headless-table-column>A</helix-headless-table-column></helix-headless-table>',
+    )) as Updating
+    await settle(host)
+    const empty = part(host, 'empty') as HTMLElement
+    expect(empty.getAttribute('role')).toBe('row')
+    expect(empty.querySelector('[role="cell"]')?.textContent).toBe('Nothing to show')
+  })
+})

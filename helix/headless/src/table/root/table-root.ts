@@ -1,6 +1,16 @@
-import { customElement, HelixElement, MixinCollection, splitValues } from '@fusion.dev/helix-core'
+import {
+  AriaForwardController,
+  customElement,
+  fillTemplate,
+  HelixElement,
+  HelixSortEvent,
+  MixinCollection,
+  requestChange,
+  splitValues,
+} from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { property, state } from 'lit/decorators.js'
+import { cycle, type DataRow, format, parse, sort } from '../../data-table/root/order.js'
 import { edgeOf, type HelixHeadlessTableColumn } from '../column/table-column.js'
 import type { HelixHeadlessTableRow } from '../row/table-row.js'
 
@@ -82,8 +92,13 @@ const FLOOR = '14ch'
 const SAMPLE = 200
 
 /** An element's text as a reader sees it, with the markup's indentation folded away. */
-const lengthOf = (element: Element | undefined): number =>
-  (element?.textContent ?? '').replace(/\s+/g, ' ').trim().length
+const textOf = (element: Element | undefined): string =>
+  (element?.textContent ?? '').replace(/\s+/g, ' ').trim()
+
+const lengthOf = (element: Element | undefined): number => textOf(element).length
+
+/** A cell's text as a number, with the commas that group its digits taken out. */
+const numberOf = (value: string): number => Number(value.replaceAll(',', ''))
 
 /**
  * @summary A table of data, laid out on a grid.
@@ -95,8 +110,14 @@ const lengthOf = (element: Element | undefined): number =>
  * else.
  *
  * A grid of elements has no table structure for assistive technology, so the
- * roles are set explicitly: `table`, `row`, `cell`, and `columnheader`. Rows
- * are `display: contents`, so their cells become items of the one grid.
+ * roles are set explicitly: `table`, `row`, `cell`, `columnheader`, and
+ * `rowheader` for a `header` cell in a row of values. Rows are
+ * `display: contents`, so their cells become items of the one grid.
+ *
+ * A column with `sortable` and a `field` sorts the rows by the text of its
+ * cells, numbers by their value. Your markup is not reordered: the table draws
+ * the rows in the sorted order. `helix-sort` asks first, so you can refuse it
+ * and reorder the rows yourself.
  *
  * The CSS custom properties listed for this component are written by it and
  * read by the stylesheet that draws it. Do not set them. Each holds a number
@@ -110,6 +131,8 @@ const lengthOf = (element: Element | undefined): number =>
  * @documentation https://fusion.dev/helix/components/table
  *
  * @slot - The table's rows.
+ *
+ * @event {HelixSortEvent} helix-sort - A different sort order was requested, as `field:direction`, or empty for the order the rows were written in. Cancelable: cancel it to keep the current order.
  *
  * @csspart empty - The text shown when there are no rows.
  * @csspart head - The row that holds the column headings. It has `display: contents`, so it takes no space of its own.
@@ -154,11 +177,197 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
   @property()
   columns = ''
 
+  /** The word for an ascending sort, in `sorted-label`. */
+  @property({ attribute: 'ascending-label' })
+  ascendingLabel = 'ascending'
+
+  /**
+   * The starting sort order, used until `sort` is set.
+   */
+  @property({ attribute: 'default-sort' })
+  defaultSort = ''
+
+  /** The word for a descending sort, in `sorted-label`. */
+  @property({ attribute: 'descending-label' })
+  descendingLabel = 'descending'
+
   /**
    * Accessible name for the table.
+   *
+   * An `aria-label` or `aria-labelledby` on the host names the table too, and
+   * wins over this.
    */
   @property()
   label = ''
+
+  /**
+   * The sort order, as `field:direction`, where `field` is a sortable column's
+   * `field`.
+   *
+   * The rows are compared by the text of their cells in that column, numbers by
+   * their value. A reader's click on a sortable heading fires `helix-sort`
+   * first, and refusing it leaves the order as it was. `default-sort` seeds an
+   * order this element then owns.
+   */
+  @property()
+  get sort(): string {
+    return this.sortState ?? this.defaultSort
+  }
+
+  set sort(next: string) {
+    const previous = this.sort
+    this.sortState = next
+    this.requestUpdate('sort', previous)
+  }
+
+  /**
+   * What screen readers hear when the table is sorted. `{column}` is the
+   * column's heading and `{order}` is `ascending-label` or `descending-label`.
+   */
+  @property({ attribute: 'sorted-label' })
+  sortedLabel = 'Sorted by {column}, {order}'
+
+  /** What screen readers hear when the table stops being sorted. */
+  @property({ attribute: 'unsorted-label' })
+  unsortedLabel = 'Not sorted'
+
+  @state()
+  private sortState: string | undefined = undefined
+
+  /**
+   * Carries a host `aria-label` and `aria-labelledby` to the grid, which is
+   * the element with the `table` role.
+   *
+   * A heading the table is named by is the consumer's markup, beside the
+   * host, and an IDREF on the host named a generic wrapper while the table
+   * itself kept its default name.
+   */
+  protected readonly aria = new AriaForwardController(this, {
+    label: true,
+    target: () => this.partNamed('table'),
+  })
+
+  /**
+   * Asks for a different order, and reports whether the request stood.
+   */
+  private requestSort(next: string): boolean {
+    return requestChange({
+      apply: (value) => {
+        const previous = this.sort
+        this.sortState = value
+        this.requestUpdate('sort', previous)
+      },
+      event: (value) => new HelixSortEvent({ value }),
+      host: this,
+      next,
+    })
+  }
+
+  /**
+   * Cycles the sort order of one column, as a click on its heading does.
+   *
+   * Ascending, descending, then the order the rows were written in.
+   */
+  toggleSort(field: string): boolean {
+    return this.requestSort(format(cycle(parse(this.sort), field)))
+  }
+
+  /**
+   * The rows in the order they are drawn: sorted by `sort`, and as written
+   * where there is no sort.
+   *
+   * **Drawn in order by assignment.** A manually assigned slot draws its nodes
+   * in the order they were assigned, so the rows move on screen and in the
+   * accessibility tree while the consumer's markup stays as it was written,
+   * which is what a framework holding those rows needs.
+   */
+  private get arrangedRows(): Element[] {
+    const rows = this.slotted
+    const spec = parse(this.sort)
+    const declared = this.tableColumns
+    const index = spec
+      ? declared.findIndex((column) => column.canSort && column.field === spec.field)
+      : -1
+    if (!spec || index < 0) {
+      return rows
+    }
+    const records = rows.map((element) => ({ element, value: textOf(element.children[index]) }))
+    /* A column of numbers compares as numbers, so `980` comes before `1,204`
+       and a negative sorts below zero. A column with any word in it collates
+       as text, digits by their value. */
+    const numeric = records.every(({ value }) => value === '' || Number.isFinite(numberOf(value)))
+    const order = numeric
+      ? (row: DataRow): unknown => (row.value === '' ? '' : numberOf(row.value as string))
+      : (row: DataRow): unknown => row.value
+    const sorted = sort(records, spec, [{ field: spec.field, order }]) as unknown as typeof records
+    return sorted.map((record) => record.element)
+  }
+
+  /** The sort last heard, so a render that changed nothing says nothing. */
+  private heardSort: string | undefined = undefined
+
+  /**
+   * What the table says after a sort, once, in the collection's live region.
+   *
+   * A reader on a heading's button is not told that `aria-sort` moved, so the
+   * new order is said. Not on the first render, which is the table arriving.
+   */
+  private news(): string {
+    const current = this.sort
+    let said = this.announced
+    if (this.hasUpdated && current !== this.heardSort) {
+      const parsed = parse(current)
+      const column = parsed
+        ? this.tableColumns.find((one) => one.field === parsed.field)
+        : undefined
+      said = parsed
+        ? fillTemplate(this.sortedLabel, {
+            column: column?.textContent?.trim() || parsed.field,
+            order: parsed.direction === 'asc' ? this.ascendingLabel : this.descendingLabel,
+          })
+        : this.unsortedLabel
+    }
+    this.heardSort = current
+    return said
+  }
+
+  /**
+   * Tells each column which way it is ordered, if it is the one.
+   *
+   * The table owns the sort and the column carries `aria-sort`, the same
+   * arrangement `DataTable` has.
+   */
+  private markSorted(): void {
+    const current = parse(this.sort)
+    for (const column of this.tableColumns) {
+      column.sorted =
+        current && column.canSort && column.field === current.field
+          ? current.direction === 'asc'
+            ? 'ascending'
+            : 'descending'
+          : undefined
+    }
+  }
+
+  /**
+   * A click on a sortable heading's button.
+   *
+   * Enter and Space arrive here too, as the click the button makes of them.
+   * Only the button sorts: a click on a column's separator is a resize.
+   */
+  private readonly handleHeadClick = (event: Event): void => {
+    const path = event.composedPath()
+    if (!path.some((node) => node instanceof Element && node.getAttribute('part') === 'sort')) {
+      return
+    }
+    const columns = this.tableColumns
+    const column = path.find((node): node is HelixHeadlessTableColumn =>
+      columns.includes(node as HelixHeadlessTableColumn),
+    )
+    if (column?.canSort) {
+      this.toggleSort(column.field)
+    }
+  }
 
   /** The columns declared as children, in the order they are written. */
   get tableColumns(): HelixHeadlessTableColumn[] {
@@ -273,12 +482,14 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     super.connectedCallback()
     this.watcher = new MutationObserver(() => this.requestUpdate())
     this.watcher.observe(this, { characterData: true, childList: true, subtree: true })
+    this.addEventListener('click', this.handleHeadClick)
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.watcher?.disconnect()
     this.watcher = undefined
+    this.removeEventListener('click', this.handleHeadClick)
   }
 
   /**
@@ -325,7 +536,7 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
       return
     }
     head.assign(...this.tableColumns)
-    body.assign(...this.slotted)
+    body.assign(...this.arrangedRows)
   }
 
   /**
@@ -393,10 +604,16 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     }
   }
 
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    this.announced = this.news()
+  }
+
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.assign()
     this.alignCells()
+    this.markSorted()
   }
 
   protected override render(): TemplateResult {
@@ -415,7 +632,7 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
           this.handleSlotChange()
         }}
       ></slot>
-      ${this.renderStatus(this.hasRows)}
+      ${this.renderStatus(this.hasRows, 'cell')}
     </div>${this.renderLive(this.hasRows)}`
   }
 }
