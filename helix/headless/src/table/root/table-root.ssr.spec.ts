@@ -41,7 +41,8 @@ describe('table server output', () => {
         ssr(html`<helix-headless-table label="T"></helix-headless-table>`),
         'helix-headless-table',
       ),
-    ).toContain('<div part="head" role="row"><slot name="columns"></slot></div>')
+      /* Lit's markers stand where the checkbox heading of a selectable table goes. */
+    ).toMatch(/<div part="head" role="row">(<!--[^>]*-->)*<slot name="columns"><\/slot><\/div>/)
     expect(
       rendered(
         ssr(html`<helix-headless-table-row></helix-headless-table-row>`),
@@ -94,5 +95,23 @@ describe('table column server output', () => {
       </helix-headless-table>`,
     )
     expect(withoutStyles(markup)).not.toContain('--table-template')
+  })
+})
+
+describe('a table with a caption, on the server', () => {
+  test('serves the caption slot ahead of the grid', () => {
+    const served = rendered(
+      ssr(html`<helix-headless-table label="T"></helix-headless-table>`),
+      'helix-headless-table',
+    )
+    expect(served).toMatch(/<slot name="caption"><\/slot>(<!--[^>]*-->)*<div\s+part="table"/)
+  })
+
+  test('serves a selectable table its checkbox heading', () => {
+    const served = rendered(
+      ssr(html`<helix-headless-table label="T" selectable></helix-headless-table>`),
+      'helix-headless-table',
+    )
+    expect(served).toMatch(/<span part="select-all" role="columnheader"/)
   })
 })

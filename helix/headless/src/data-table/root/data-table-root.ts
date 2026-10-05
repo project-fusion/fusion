@@ -172,11 +172,11 @@ const isControl = (element: HTMLElement): boolean =>
  * @slot footer - Content below the grid. It replaces the built-in pagination.
  * @slot toolbar - Content above the grid, such as a search field or actions.
  *
- * @event {Event} helix-expand - Fired after a row opens or closes. `expanded` holds the open rows.
  * @event {HelixActivateEvent} helix-activate - Fired after the page changes, with the new page as a string in `detail.value`.
+ * @event {Event} helix-expand - Fired after a row opens or closes. `expanded` holds the open rows.
  * @event {HelixFilterEvent} helix-filter - The search query is about to change. Cancelable: cancel it to keep the current query.
- * @event {Event} helix-load-more - Fired when a reader asks for more rows, by the `load-more` row's button or by scrolling a `windowed` table near its end.
  * @event {HelixFilteredEvent} helix-filtered - Fired after the search query changes, with the new query.
+ * @event {Event} helix-load-more - Fired when a reader asks for more rows, by the `load-more` row's button or by scrolling a `windowed` table near its end.
  * @event {HelixNavigateEvent} helix-navigate - Another page was requested. Cancelable: cancel it to stay on the current page.
  * @event {HelixReorderEvent} helix-reorder - The columns are about to move. The event carries every field in the new order. Cancelable: cancel it to keep the current order.
  * @event {HelixReorderedEvent} helix-reordered - Fired after the columns move, with every field in the new order.
@@ -232,8 +232,8 @@ const isControl = (element: HTMLElement): boolean =>
  * @csspart toggle-open - Added to `toggle` while its row is open.
  * @csspart toolbar - The region above the grid.
  *
- * @cssproperty --data-table-level - How deep a row is in a tree grid, from 1. The component writes it on each row header cell, and the stylesheet indents by it.
  * @cssproperty --data-table-cell-align - The alignment of the cell's column: `start`, `center`, or `end`. Unset when the column sets none. The component writes it on each cell it draws, and the stylesheet reads it. `Table` sets `--table-cell-align` for the same purpose.
+ * @cssproperty --data-table-level - How deep a row is in a tree grid, from 1. The component writes it on each row header cell, and the stylesheet indents by it.
  * @cssproperty --data-table-template - The column track list, worked out from the columns. The component writes it inline on the element that reads it, so setting it has no effect. Set a column's `width` to change it.
  */
 @customElement('helix-headless-data-table')
