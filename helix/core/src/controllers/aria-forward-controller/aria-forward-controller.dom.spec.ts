@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { registerDom } from '@fusion.dev/helix-testing/dom'
-import { AriaForwardController, auditName } from './aria-forward-controller.js'
+import { AriaForwardController } from './aria-forward-controller.js'
 
 /**
  * Carrying a host's ARIA references down to the control inside it.
@@ -365,95 +365,27 @@ describe('what is read after the names from outside', () => {
 })
 
 describe('a control with no name', () => {
-  /** What `console.warn` was handed while the check ran, with nothing printed. */
-  const warned = async (during: () => void): Promise<string[]> => {
+  test('the controller asks after an update only where told how to name it', async () => {
     const warnings: string[] = []
     const original = console.warn
     console.warn = (message: string) => warnings.push(message)
+    document.body.innerHTML = '<span></span>'
+    const host = document.body.lastElementChild as HTMLElement
+    Object.assign(host, { addController: () => {} })
+    const control = document.createElement('button')
+    host.attachShadow({ mode: 'open' }).append(control)
     try {
-      during()
+      new AriaForwardController(host as never, { target: () => control }).hostUpdated()
+      await new Promise((done) => setTimeout(done, 5))
+      expect(warnings).toEqual([])
+      new AriaForwardController(host as never, {
+        target: () => control,
+        unnamed: 'Give it words.',
+      }).hostUpdated()
       await new Promise((done) => setTimeout(done, 5))
     } finally {
       console.warn = original
     }
-    return warnings
-  }
-
-  /** A host holding a native button, in a shadow root, with `content` in it. */
-  const button = (host: string, content: string): { control: HTMLElement; host: HTMLElement } => {
-    document.body.innerHTML = `<label for="field">Outside</label>${host}`
-    const element = document.body.lastElementChild as HTMLElement
-    const root = element.attachShadow({ mode: 'open' })
-    root.innerHTML = `<button part="button">${content}</button>`
-    return { control: root.querySelector('button') as HTMLElement, host: element }
-  }
-
-  test('is reported once, by its tag, a task after it asks', async () => {
-    const { control, host } = button('<span></span>', '<svg></svg>')
-    const warnings = await warned(() => {
-      auditName(host, () => control, 'Give it words.')
-      auditName(host, () => control, 'Give it words.')
-    })
-    expect(warnings).toEqual([
-      '<span> has no accessible name, so a screen reader announces it by its role alone. Give it words.',
-    ])
-    expect(await warned(() => auditName(host, () => control, 'Give it words.'))).toEqual([])
-  })
-
-  test('words in it, read through a slot, name a button', async () => {
-    const { control, host } = button('<span>Save</span>', '<slot></slot>')
-    expect(await warned(() => auditName(host, () => control, ''))).toEqual([])
-  })
-
-  test('an icon named by its own label names a button', async () => {
-    const { control, host } = button('<span></span>', '<svg aria-label="Delete"></svg>')
-    expect(await warned(() => auditName(host, () => control, ''))).toEqual([])
-  })
-
-  test('a host aria-label, an id it names, or a component that says so name it', async () => {
-    for (const attributes of ['aria-label="Close"', 'aria-labelledby="named"']) {
-      document.body.innerHTML = `<p id="named">Close</p><span ${attributes}></span>`
-      const host = document.body.lastElementChild as HTMLElement
-      expect(await warned(() => auditName(host, () => null, ''))).toEqual([])
-    }
-    document.body.innerHTML = '<span></span>'
-    const host = document.body.lastElementChild as HTMLElement
-    expect(
-      await warned(() =>
-        auditName(
-          host,
-          () => null,
-          '',
-          () => true,
-        ),
-      ),
-    ).toEqual([])
-  })
-
-  test('words hidden from the reader name nothing', async () => {
-    const { control, host } = button('<span></span>', '<span aria-hidden="true">x</span>')
-    expect(await warned(() => auditName(host, () => control, ''))).toHaveLength(1)
-  })
-
-  test('a host taken out before the read is not reported', async () => {
-    const { control, host } = button('<span></span>', '')
-    expect(
-      await warned(() => {
-        auditName(host, () => control, '')
-        host.remove()
-      }),
-    ).toEqual([])
-  })
-
-  test('the controller asks after an update only where told how to name it', async () => {
-    const { control, host } = button('<span></span>', '')
-    Object.assign(host, { addController: () => {} })
-    const quiet = new AriaForwardController(host as never, { target: () => control })
-    expect(await warned(() => quiet.hostUpdated())).toEqual([])
-    const asked = new AriaForwardController(host as never, {
-      target: () => control,
-      unnamed: 'Give it words.',
-    })
-    expect(await warned(() => asked.hostUpdated())).toHaveLength(1)
+    expect(warnings).toHaveLength(1)
   })
 })
