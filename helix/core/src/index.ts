@@ -1,3 +1,6 @@
+/* The missing-name warning, which a production build resolves to a function
+   that does nothing. See `utils/audit-name`. */
+export { auditName } from '#audit-name'
 export {
   AriaForwardController,
   type AriaForwardOptions,

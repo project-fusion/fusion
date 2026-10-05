@@ -1,5 +1,6 @@
 import {
   AriaForwardController,
+  auditName,
   CommandController,
   customElement,
   drawDismiss,
@@ -398,6 +399,21 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
       return
     }
     if (this.open && !dialog.open) {
+      /* Asked once the dialog first opens, since a closed dialog is no one's
+         to hear: a modal with no name is announced as "dialog" alone. */
+      auditName(
+        this,
+        () => null,
+        'Give it a `label`, or a heading in the `header` slot.',
+        () =>
+          this.label !== '' ||
+          this.namedByHeader ||
+          headingsIn(
+            this.renderRoot
+              .querySelector<HTMLSlotElement>('slot[name="header"]')
+              ?.assignedElements({ flatten: true }) ?? [],
+          ).length > 0,
+      )
       /* **After the slotted elements have rendered, or the modal focuses
          itself.** `showModal()` moves focus to the first focusable descendant,
          and a custom element that has not rendered its shadow yet has none: the

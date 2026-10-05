@@ -238,7 +238,7 @@ export function ComponentBrowser({
            *                 `--helix-size-button`, so the halves are equal rather than sized
            *                 by how long their words happen to be.
            */}
-          <helix-button-group class="siteActions">
+          <helix-button-group class="siteActions" label="Get started">
             {/* An icon each, and neither of them an arrow. An arrow says
                   "onward" and nothing else, which is what the button's own
                   position already says; put one on a hero button and it is

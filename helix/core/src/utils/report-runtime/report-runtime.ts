@@ -23,8 +23,6 @@ export type RuntimeKind =
   | 'duplicate-registration'
   /** The browser refused fullscreen, usually for a frame without the permission. */
   | 'fullscreen-refused'
-  /** An Avatar Group's `max` is past the number the fold is written for. */
-  | 'max-past-fold'
   /** A rating's `min` is no score between 0 and its `max`. */
   | 'min-out-of-range'
   /** A Stat was given one of Trend's directions, `up`, `down` or `neutral`, which lay nothing out. */
@@ -68,6 +66,8 @@ export type RuntimeKind =
   | 'too-many-rows'
   /** A filter field marks more than one operator as its default. */
   | 'two-default-operators'
+  /** A Quote's text starts or ends with a quotation mark, so the browser's marks double it. */
+  | 'typed-marks'
   /** A React handler prop names an event nothing dispatches. */
   | 'unknown-event'
   /** An Icon's `name` is in no icon set it can read, so it draws nothing. */
