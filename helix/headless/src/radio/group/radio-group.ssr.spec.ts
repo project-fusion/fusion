@@ -42,4 +42,13 @@ describe('radio group server output', () => {
     expect(hasPart(markup, 'hint')).toBe(false)
     expect(hasPart(markup, 'feedback')).toBe(false)
   })
+  test('a group showing feedback renders on a server, where it has no items to point at', () => {
+    /* Feedback sets a custom validity, which asks the group where focus would
+       land, and the server has no children to answer from. It threw there,
+       and every example with feedback failed to serve. */
+    const markup = ssr(
+      html`<helix-headless-radio-group feedback="Choose one to continue" label="L"></helix-headless-radio-group>`,
+    )
+    expect(rendered(markup, 'helix-headless-radio-group')).toContain('Choose one to continue')
+  })
 })

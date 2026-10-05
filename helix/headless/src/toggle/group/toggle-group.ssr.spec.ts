@@ -47,4 +47,13 @@ describe('toggle group server output', () => {
        it. `Tabs` records the same arrangement. */
     expect(hostAttributes(ssr(group), 'helix-headless-toggle')).toEqual(['value'])
   })
+  test('a group showing feedback renders on a server, where it has no items to point at', () => {
+    /* Feedback sets a custom validity, which asks the group where focus would
+       land, and the server has no children to answer from. It threw there,
+       and every example with feedback failed to serve. */
+    const markup = ssr(
+      html`<helix-headless-toggle-group feedback="Choose one to continue" label="L"></helix-headless-toggle-group>`,
+    )
+    expect(rendered(markup, 'helix-headless-toggle-group')).toContain('Choose one to continue')
+  })
 })

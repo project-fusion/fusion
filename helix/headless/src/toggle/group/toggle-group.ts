@@ -199,7 +199,8 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
   })
 
   private get items(): HelixHeadlessToggle[] {
-    return [...this.children].filter(
+    // Empty on the server, which has no tree, so `focusTarget` can ask while it renders.
+    return [...(this.children ?? [])].filter(
       (child): child is HelixHeadlessToggle => child instanceof HelixHeadlessToggle,
     )
   }

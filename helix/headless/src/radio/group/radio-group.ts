@@ -102,7 +102,8 @@ export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(Hel
 
   /** The radios, in light-DOM order. Client only: the server has no tree. */
   get items(): HelixHeadlessRadio[] {
-    return [...this.children].filter(
+    // Empty on the server, which has no tree, so `focusTarget` can ask while it renders.
+    return [...(this.children ?? [])].filter(
       (child): child is HelixHeadlessRadio => child instanceof HelixHeadlessRadio,
     )
   }
