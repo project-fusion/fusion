@@ -1,10 +1,16 @@
 import {
   customElement,
   HelixElement,
+  hostAria,
+  isRtl,
   MixinDismissible,
   requestChange,
+  SwipeController,
+  settleSwipe,
+  swipeEdge,
   type ToneMark,
   toneMark,
+  towardEdge,
 } from '@fusion.dev/helix-core'
 import { x } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -21,6 +27,16 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * **Each item runs its own timer.** A timer held by the region would restart
  * with each new message, and the last of three messages would stay for nine
  * seconds.
+ *
+ * **Each message is an `alertdialog` named by its words**, which is how a reader
+ * who moves into the stack hears which message they are on. A `danger` message
+ * is its own assertive live region, so it is announced at once; every other one
+ * is announced politely by the region.
+ *
+ * A touch or a pen swipes a message toward the end of the line, and past
+ * halfway, or quickly, dismisses it through the same `helix-dismiss` as its
+ * control. While it moves, the distance is on the `item` part as
+ * `--toast-swipe-x`.
  *
  * **Messages are inverted by default.** The item flips `color-scheme`, so a new
  * message stands out from the page without using a color that carries meaning.
@@ -49,6 +65,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @csspart timer - The bar showing how long is left, where a duration was given.
  *
  * @cssproperty --toast-duration - How long this message stays, in milliseconds, for a progress hint.
+ * @cssproperty --toast-swipe-x - How far a swipe has moved the message across, in pixels, toward the right.
  */
 @customElement('helix-headless-toast-item')
 export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
@@ -84,6 +101,38 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
     const previous = this.open
     this.openState = next
     this.requestUpdate('open', previous)
+  }
+
+  /* Swiped toward the end of the line to dismiss. Touch and pen only: a
+     mouse drags to select the message's text. */
+  protected readonly swipes = new SwipeController(this, {
+    axis: () => (this.open ? 'x' : undefined),
+    end: (dx, _dy, vx) => {
+      const edge = swipeEdge('end', isRtl(this))
+      const width = this.partNamed('item')?.getBoundingClientRect().width ?? 0
+      const shown = settleSwipe({
+        points: [1],
+        size: width,
+        travel: Math.max(0, towardEdge(edge, dx, 0)),
+        velocity: towardEdge(edge, vx, 0),
+      })
+      if (shown === 0 && this.dismiss()) {
+        return
+      }
+      this.slide(0)
+    },
+    move: (dx) => this.slide(Math.max(0, towardEdge(swipeEdge('end', isRtl(this)), dx, 0))),
+    start: (_target, event) => event.pointerType !== 'mouse',
+    surface: () => this.partNamed('item'),
+  })
+
+  /** Writes how far a swipe has moved the message toward the end of the line. */
+  private slide(travel: number): void {
+    const physical = isRtl(this) ? -travel : travel
+    this.partNamed('item')?.style.setProperty(
+      '--toast-swipe-x',
+      travel === 0 ? '' : `${Math.round(physical)}px`,
+    )
   }
 
   /** When the current run of the timer began, or nothing while it is paused. */
@@ -238,6 +287,20 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
        `display: grid` unconditionally so the author rule beats the UA sheet,
        and the exit still animates its row down from `1fr`. */
     this.toggleAttribute('hidden', !this.open)
+    /* A dialog a reader can move into, named by its words, and assertive when
+       it is a danger message. Through internals, so nothing is written onto
+       the consumer's element. */
+    hostAria(this.internals, { role: 'alertdialog' })
+    this.internals.ariaModal = 'false'
+    this.internals.ariaLive = this.tone === 'danger' ? 'assertive' : null
+  }
+
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    const words = this.partNamed('content')
+    if (words) {
+      hostAria(this.internals, { labelledBy: [words] })
+    }
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
