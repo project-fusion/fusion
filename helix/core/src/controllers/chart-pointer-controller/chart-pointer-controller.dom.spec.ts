@@ -584,3 +584,19 @@ describe('the keyboard and the pointer together', () => {
     expect(one.point.at).toBe(-1)
   })
 })
+
+describe('a page of readings by key', () => {
+  test('is a tenth of a row of readings, and four columns of a grid', () => {
+    const row = keyed(40)
+    row.press('Home')
+    row.press('PageDown')
+    expect(row.point.at).toBe(4)
+    const grid = keyed(70)
+    grid.point.grid = 7
+    grid.press('Home')
+    grid.press('PageDown')
+    expect(grid.point.at).toBe(28)
+    grid.press('PageUp')
+    expect(grid.point.at).toBe(0)
+  })
+})
