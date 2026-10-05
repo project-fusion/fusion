@@ -34,10 +34,17 @@ import '../../tooltip/index.js'
  * and 43px in a wide one, and SVG has no setting that keeps text at one size
  * the way `vector-effect` does for strokes.
  *
- * The table is the accessible representation, and the drawing is `aria-hidden`,
- * so screen reader users get the numbers themselves. The `summary` part names
+ * The table is the accessible representation, and the drawing is hidden from
+ * screen readers, so they get the numbers themselves. The `summary` part names
  * the chart, from `label` or the table's caption, and gives each series' highest
  * reading.
+ *
+ * **The plot is read by key.** It takes focus, named by `label` or the caption.
+ * The arrows along the categories move from one to the next, which is left and
+ * right for columns and up and down for `orientation="horizontal"`. Home and
+ * End go to the first and the last, and the other pair of arrows moves among
+ * the series of a category. The tooltip follows, the `live` part says the
+ * reading in words, and Escape puts the tooltip away.
  *
  * The component writes the custom properties below with numbers it computes,
  * and the stylesheet that draws the chart reads them. Do not set them yourself.
@@ -60,8 +67,9 @@ import '../../tooltip/index.js'
  * @csspart label - One category's name.
  * @csspart labels - The row of category names.
  * @csspart line - A series drawn as a line, named in `lines`.
+ * @csspart live - The readout: a polite live region that says the reading the keys moved to. Hide it visually.
  * @csspart mark - The invisible point the tooltip is anchored to.
- * @csspart plot - The drawing.
+ * @csspart plot - The drawing, which takes focus to be read by key.
  * @csspart summary - The chart's name and each series' highest reading, written as a sentence for screen readers. Hide it visually.
  * @csspart svg - The drawing surface the bars and lines sit on.
  * @csspart tick - One number on an axis.
@@ -74,6 +82,7 @@ import '../../tooltip/index.js'
  * @csspart tooltip-arrow-top - The arrow while the bubble is above the reading, on the bubble's bottom edge. Set together with `tooltip-arrow`.
  * @csspart tooltip-bottom - The bubble while it is below the reading. Set together with `tooltip`.
  * @csspart tooltip-cell - One column's name and value inside the tooltip.
+ * @csspart tooltip-cell-current - The cell the series keys rest on, while they rest there. Set alongside `tooltip-cell`.
  * @csspart tooltip-label - The reading's category name inside the tooltip.
  * @csspart tooltip-left - The bubble while it is left of the reading. Set together with `tooltip`.
  * @csspart tooltip-name - A column's name inside the tooltip.
@@ -344,7 +353,7 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
       return [`${one.name} ${top.label} ${text}`]
     })
     const named = this.named ? `${this.named}. ` : ''
-    return html`<p part="summary">${named}${this.highestLabel}: ${highest.join('; ')}.</p>`
+    return html`<p id="helix-chart-summary" part="summary">${named}${this.highestLabel}: ${highest.join('; ')}.</p>`
   }
 
   /**
@@ -449,11 +458,16 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
     }
 
     return html`<div
-      aria-hidden="true"
+      aria-describedby=${this.named ? 'helix-chart-summary' : nothing}
+      aria-label=${this.named || nothing}
+      aria-labelledby=${this.named ? nothing : 'helix-chart-summary'}
       id=${CHART_PLOT}
       part="plot"
+      role="application"
+      tabindex="0"
     >
       <svg part="svg"
+        aria-hidden="true"
         data-mirror
         preserveAspectRatio="none"
         viewBox="0 0 ${PLOT_WIDTH} ${PLOT_HEIGHT}"
@@ -713,7 +727,14 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
     const at = this.pointer.at
     const series = this.series
     if (at < 0 || series.length === 0) {
-      return drawTooltip(this.sourceRows, at, this.tag('tooltip'))
+      return drawTooltip(
+        this.sourceRows,
+        at,
+        this.tag('tooltip'),
+        undefined,
+        undefined,
+        this.pointer,
+      )
     }
     /* Off the far end of the tallest bar in the group, so the box never covers
        the columns it is describing. Horizontal bars grow away from their names,
@@ -742,6 +763,7 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
         y: sideways ? `${across}%` : `${far}%`,
       },
       (cell) => this.seriesOf(cell),
+      this.pointer,
     )
   }
 }

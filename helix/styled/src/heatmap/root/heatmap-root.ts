@@ -29,9 +29,11 @@ import '../../tooltip/index.js'
  * @slot summary - Below the strip, in the middle.
  *
  * @csspart cell - One reading.
+ * @csspart cell-active - The cell the pointer or the keys rest on, ringed as a hovered cell is. Set alongside `cell`.
  * @csspart footer - The three-slot row under the strip.
+ * @csspart live - The readout, a polite live region the sheet hides visually.
  * @csspart mark - The invisible point the tooltip is anchored to.
- * @csspart strip - The grid of cells.
+ * @csspart strip - The grid of cells, which takes focus to be read by key.
  * @csspart tooltip - The bubble, forwarded from `Tooltip`.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
  * @csspart tooltip-arrow - The bubble's point, forwarded from `Tooltip`.
@@ -41,6 +43,7 @@ import '../../tooltip/index.js'
  * @csspart tooltip-arrow-top - The point while the bubble is above the reading, on its bottom edge. Set alongside `tooltip-arrow`.
  * @csspart tooltip-bottom - The bubble while it is below the reading. Set alongside `tooltip`.
  * @csspart tooltip-cell - One column's name and value inside the tooltip.
+ * @csspart tooltip-cell-current - The cell the series keys rest on, in the charts whose readings hold several series. A strip draws one, so it is never set here.
  * @csspart tooltip-label - The reading's own name inside the tooltip.
  * @csspart tooltip-left - The bubble while it is left of the reading. Set alongside `tooltip`.
  * @csspart tooltip-name - A column's name inside the tooltip.

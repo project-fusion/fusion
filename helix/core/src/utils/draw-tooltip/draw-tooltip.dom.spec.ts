@@ -206,3 +206,49 @@ describe('a reading that is not there', () => {
     expect(drawTooltip([], 0, unsafeStatic(TAG))).toBe(nothing)
   })
 })
+
+/* The readout: a polite region in the plot from the first drawing, which says
+   the reading in words when a key moved it and is empty otherwise. A region
+   arriving with its words is read inconsistently, so it is there before them. */
+describe('the readout', () => {
+  const read = (at: number, reading: { column?: number; keyed: boolean }): HTMLElement => {
+    const into = document.createElement('div')
+    render(
+      drawTooltip(ROWS, at, unsafeStatic(TAG), undefined, undefined, {
+        column: reading.column,
+        keyed: reading.keyed,
+      }),
+      into,
+    )
+    return into
+  }
+
+  test('is a polite region, there and empty while nothing is read', () => {
+    const live = read(-1, { keyed: false }).querySelector('[part="live"]')
+    expect(live?.getAttribute('aria-live')).toBe('polite')
+    expect(live?.getAttribute('role')).toBe('status')
+    expect(live?.textContent).toBe('')
+  })
+
+  test('stays quiet while the pointer moves the reading', () => {
+    expect(read(0, { keyed: false }).querySelector('[part="live"]')?.textContent).toBe('')
+  })
+
+  test('says the whole reading, as the table writes it, when a key moved it', () => {
+    expect(read(0, { keyed: true }).querySelector('[part="live"]')?.textContent).toBe(
+      'March: Revenue $128k, Note Outage',
+    )
+  })
+
+  test('says the one cell the series keys rest on, and marks it in the bubble', () => {
+    const into = read(0, { column: 1, keyed: true })
+    expect(into.querySelector('[part="live"]')?.textContent).toBe('March, Note Outage')
+    expect(
+      [...into.querySelectorAll('[part~="tooltip-cell"]')].map((one) => one.getAttribute('part')),
+    ).toEqual(['tooltip-cell', 'tooltip-cell tooltip-cell-current'])
+  })
+
+  test('is not drawn for a caller that passes no reading', () => {
+    expect(drawn(0).querySelector('[part="live"]')).toBeNull()
+  })
+})

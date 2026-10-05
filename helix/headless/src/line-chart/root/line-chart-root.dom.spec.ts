@@ -243,7 +243,12 @@ describe('line chart', () => {
 
   test('the drawing is hidden, because the table it read is the readable one', async () => {
     const host = await chart(SESSIONS, 'for="sessions"')
-    expect(part(host, 'plot')?.getAttribute('aria-hidden')).toBe('true')
+    const plot = part(host, 'plot')
+    expect(plot?.querySelector('svg')?.getAttribute('aria-hidden')).toBe('true')
+    expect([plot?.getAttribute('role'), plot?.getAttribute('aria-label')]).toEqual([
+      'application',
+      'Sessions a month',
+    ])
   })
 
   /* **No chart carries `title` on its plot.** On an element that is
@@ -340,6 +345,44 @@ describe('the summary', () => {
     const host = await chart(table, 'for="ended" label="Sessions"')
     expect(part(host, 'summary')?.textContent?.trim()).toBe(
       'Sessions, Feb: Direct 20; Jan: Referral 4.',
+    )
+  })
+})
+
+/* The plot is read by key: it takes focus, the arrows move the reading the
+   tooltip shows, and the readout says it in words. No peer charting library
+   ships this, so it is asserted per chart rather than assumed from the
+   controller. */
+describe('reading by key', () => {
+  const press = (host: HTMLElement, key: string): void => {
+    part(host, 'plot')?.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key }),
+    )
+  }
+
+  test('the arrows move the reading, and the readout says it', async () => {
+    const host = await chart(CHANNELS, 'for="channels"')
+    expect(part(host, 'live')?.textContent).toBe('')
+    press(host, 'End')
+    await (host as HTMLElement & { updateComplete: Promise<boolean> }).updateComplete
+    expect(part(host, 'live')?.textContent).toBe('Feb: Direct 20, Referral 8')
+    expect(part(host, 'tooltip-label')?.textContent).toBe('Feb')
+  })
+})
+
+describe('reading one series by key', () => {
+  test('the down arrow rests on a series, and the readout says that cell alone', async () => {
+    const host = await chart(CHANNELS, 'for="channels"')
+    const plot = part(host, 'plot')
+    for (const key of ['ArrowRight', 'ArrowDown', 'ArrowDown']) {
+      plot?.dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key }),
+      )
+    }
+    await (host as HTMLElement & { updateComplete: Promise<boolean> }).updateComplete
+    expect(part(host, 'live')?.textContent).toBe('Jan, Referral 4')
+    expect(part(host, 'tooltip-cell-current')?.textContent?.replace(/\s+/g, ' ').trim()).toBe(
+      'Referral 4',
     )
   })
 })

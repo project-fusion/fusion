@@ -153,8 +153,9 @@ describe('gridlines', () => {
 describe('what a reader is told', () => {
   test('the drawing is hidden and the summary is not', async () => {
     const host = await chart(SPEND, 'for="spend"')
-    expect(part(host, 'plot')?.getAttribute('aria-hidden')).toBe('true')
+    expect(part(host, 'svg')?.getAttribute('aria-hidden')).toBe('true')
     expect(part(host, 'summary')?.hasAttribute('aria-hidden')).toBe(false)
+    expect(part(host, 'plot')?.getAttribute('aria-label')).toBe('Spend and revenue')
   })
 
   test('how strongly each series relates, and how many points it rests on', async () => {
@@ -190,5 +191,18 @@ describe('the tooltip', () => {
       seriesOf: (cell: number) => number | undefined
     }
     expect(host.seriesOf(0)).toBeUndefined()
+  })
+})
+
+describe('reading by key', () => {
+  test("the arrows walk the rows, and the tooltip sits on that row's point", async () => {
+    const host = await chart(SPEND, 'for="spend"')
+    part(host, 'plot')?.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key: 'End' }),
+    )
+    await (host as HTMLElement & { updateComplete: Promise<boolean> }).updateComplete
+    expect(part(host, 'live')?.textContent).toBe('E: Spend 5, Revenue 10')
+    expect(part(host, 'tooltip-label')?.textContent).toBe('E')
+    expect(part(host, 'point-active')).not.toBeNull()
   })
 })

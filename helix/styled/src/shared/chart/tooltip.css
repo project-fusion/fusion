@@ -54,7 +54,7 @@
 }
 
 /* Three columns, where this was a flex row pushed apart. */
-[part="tooltip-cell"] {
+[part~="tooltip-cell"] {
   align-items: baseline;
   column-gap: var(--helix-space-sm);
   display: grid;
@@ -82,11 +82,44 @@
    `--chart-series` onto the cell beside `data-series`, the way the legend and
    every mark carry theirs, and `series.css` says why a count belongs to the
    tier that can count. */
-[part="tooltip-cell"][data-series]::before {
+[part~="tooltip-cell"][data-series]::before {
   background-color: var(--chart-series);
   block-size: 0.5em;
   border-radius: var(--helix-radii-full);
   content: "";
   grid-column: 1;
   inline-size: 0.5em;
+}
+
+/* The cell the series keys rest on, while they rest there: its name at the
+   number's strength and both at the label's weight, so the bubble shows which
+   reading the readout is saying. Matched with `~=` above for this reason, an
+   exact match failing for exactly as long as the second name is worth drawing. */
+[part~="tooltip-cell-current"] {
+  font-weight: var(--helix-weight-medium);
+}
+
+[part~="tooltip-cell-current"] [part="tooltip-name"] {
+  opacity: 1;
+}
+
+/*
+ * **The plot takes focus, so it draws the ring.** Outside, the default
+ * situation: a plot is a box in the chart with room around it.
+ */
+[part="plot"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* The readout is for screen readers, and the bubble is what a sighted reader
+   reads. */
+[part="live"] {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  margin: var(--helix-space-none);
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
 }

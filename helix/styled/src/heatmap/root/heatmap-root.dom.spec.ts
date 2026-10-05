@@ -31,8 +31,11 @@ const strip = async (attributes = '') => {
 }
 
 describe('the styled heatmap', () => {
-  test('its strip is still a named picture', async () => {
-    expect(part(await strip(), 'strip')?.getAttribute('role')).toBe('img')
+  /* A strip with cells is read by key, as every chart's plot is. */
+  test('its strip takes focus to be read by key', async () => {
+    const element = await strip()
+    expect(part(element, 'strip')?.getAttribute('role')).toBe('application')
+    expect(part(element, 'strip')?.getAttribute('tabindex')).toBe('0')
   })
 
   /* The styled class reads the base's observed attributes, so a host
@@ -44,7 +47,7 @@ describe('the styled heatmap', () => {
 
   test('a cell per reading, each carrying its tone', async () => {
     const element = await strip()
-    const cells = [...(element.shadowRoot?.querySelectorAll('[part="cell"]') ?? [])]
+    const cells = [...(element.shadowRoot?.querySelectorAll('[part~="cell"]') ?? [])]
     expect(cells).toHaveLength(2)
     expect(cells.map((cell) => cell.getAttribute('data-tone'))).toEqual(['success', 'danger'])
   })
@@ -64,7 +67,7 @@ describe('the styled heatmap', () => {
    */
   test('a cell names a heatmap hook and never a token', async () => {
     const element = await strip()
-    const cells = [...(element.shadowRoot?.querySelectorAll('[part="cell"]') ?? [])]
+    const cells = [...(element.shadowRoot?.querySelectorAll('[part~="cell"]') ?? [])]
     for (const cell of cells) {
       const declared = cell.getAttribute('style') ?? ''
       expect(declared).toContain('--heatmap-tone: var(--heatmap-tone-')

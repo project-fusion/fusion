@@ -80,9 +80,15 @@ export interface AreaStack {
  * bands show each part's share. Use it to see which part grew. The default
  * shows whether the total grew.
  *
- * The drawing is `aria-hidden`. The text summary gives the latest reading's
- * total and each part's share of it, and the table beside the chart has every
- * number.
+ * The drawing is hidden from screen readers. The text summary gives the latest
+ * reading's total and each part's share of it, and the table beside the chart
+ * has every number.
+ *
+ * **The plot is read by key.** It takes focus, named by `label` or the caption.
+ * The left and right arrows move from reading to reading, Home and End go to
+ * the first and the last, and the up and down arrows move among the series of
+ * a reading. The tooltip follows, the `live` part says the reading in words,
+ * and Escape puts the tooltip away.
  *
  * Every numeric column is a part, so leave a total column out of the table the
  * chart reads, or it is counted twice. A negative reading is drawn as zero.
@@ -100,8 +106,9 @@ export interface AreaStack {
  * @csspart label - One reading's name.
  * @csspart labels - The row of reading names.
  * @csspart line - The top edge of one part's band.
+ * @csspart live - The readout: a polite live region that says the reading the keys moved to. Hide it visually.
  * @csspart mark - The invisible point the tooltip is anchored to.
- * @csspart plot - The drawing.
+ * @csspart plot - The drawing, which takes focus to be read by key.
  * @csspart summary - The total and each part's share at the latest reading, written as a sentence for screen readers.
  * @csspart svg - The drawing surface the bands sit on.
  * @csspart tooltip - The bubble, forwarded from `Tooltip`.
@@ -113,6 +120,7 @@ export interface AreaStack {
  * @csspart tooltip-arrow-top - The point while the bubble is above the reading, so on its bottom edge, beside `tooltip-arrow`.
  * @csspart tooltip-bottom - The bubble while it is below the reading, beside `tooltip`.
  * @csspart tooltip-cell - One column's name and value inside the tooltip.
+ * @csspart tooltip-cell-current - The cell the up and down arrows rest on, while they rest there. Set alongside `tooltip-cell`.
  * @csspart tooltip-label - The reading's own name inside the tooltip.
  * @csspart tooltip-left - The bubble while it is left of the reading, beside `tooltip`.
  * @csspart tooltip-name - A column's name inside the tooltip.
@@ -298,8 +306,17 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
     domain: [number, number],
   ): TemplateResult {
     const order = stack.layers.map((_, depth) => depth).reverse()
-    return html`<div aria-hidden="true" id=${CHART_PLOT} part="plot">
+    return html`<div
+      aria-describedby=${this.named ? 'helix-chart-summary' : nothing}
+      aria-label=${this.named || nothing}
+      aria-labelledby=${this.named ? nothing : 'helix-chart-summary'}
+      id=${CHART_PLOT}
+      part="plot"
+      role="application"
+      tabindex="0"
+    >
       <svg part="svg"
+        aria-hidden="true"
         data-mirror
         preserveAspectRatio="none"
         viewBox="0 0 ${PLOT_WIDTH} ${PLOT_HEIGHT}"
@@ -412,7 +429,7 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
         `${name} ${percentIn(this.locale).format(total > 0 ? (stack.values[depth]?.[last] ?? 0) / total : 0)}`,
     )
     const named = this.named ? `${this.named}, ` : ''
-    return html`<p part="summary">
+    return html`<p id="helix-chart-summary" part="summary">
       ${named}${rows[last]?.label ?? ''}: ${this.totalLabel} ${format(total)}; ${shares.join(', ')}.
     </p>`
   }
@@ -452,7 +469,7 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
     const at = this.pointer.at
     const rows = this.tallied(this.sourceRows, stack)
     if (at < 0) {
-      return drawTooltip(rows, at, this.tag('tooltip'))
+      return drawTooltip(rows, at, this.tag('tooltip'), undefined, undefined, this.pointer)
     }
     const slot = 100 / rows.length
     return drawTooltip(
@@ -465,6 +482,7 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
         y: `${y(stack.layers.at(-1)?.[at] ?? 0)}%`,
       },
       (cell) => this.seriesOf(cell),
+      this.pointer,
     )
   }
 }

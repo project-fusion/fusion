@@ -42,9 +42,15 @@ import '../../tooltip/index.js'
  * `<svg>` that fills its box scales with the box, so the same `font-size` can
  * render at 10px in a narrow chart and 43px in a wide one.
  *
- * The table is the accessible representation, and the drawing is `aria-hidden`.
- * Screen reader users get the numbers. The `summary` part names the chart, from
+ * The table is the accessible representation, and the drawing is hidden from
+ * screen readers, who get the numbers. The `summary` part names the chart, from
  * `label` or the table's caption, and gives each series' latest reading.
+ *
+ * **The plot is read by key.** It takes focus, named by `label` or the caption.
+ * The left and right arrows move from reading to reading, Home and End go to
+ * the first and the last, and the up and down arrows move among the series of
+ * a reading. The tooltip follows, the `live` part says the reading in words,
+ * and Escape puts the tooltip away.
  *
  * @since 0.1.0
  * @status stable
@@ -60,8 +66,9 @@ import '../../tooltip/index.js'
  * @csspart label - One reading's name.
  * @csspart labels - The row of reading names.
  * @csspart line - The line for one series.
+ * @csspart live - The readout: a polite live region that says the reading the keys moved to. Hide it visually.
  * @csspart mark - The invisible point the tooltip is anchored to.
- * @csspart plot - The drawing.
+ * @csspart plot - The drawing, which takes focus to be read by key.
  * @csspart summary - The chart's name and each series' latest reading, written as a sentence for screen readers. Hide it visually.
  * @csspart svg - The drawing surface the lines and areas sit on.
  * @csspart terminus - The mark on one series' last reading.
@@ -74,6 +81,7 @@ import '../../tooltip/index.js'
  * @csspart tooltip-arrow-top - The point while the bubble is above the reading, so on its bottom edge, beside `tooltip-arrow`.
  * @csspart tooltip-bottom - The bubble while it is below the reading, beside `tooltip`.
  * @csspart tooltip-cell - One column's name and value inside the tooltip.
+ * @csspart tooltip-cell-current - The cell the up and down arrows rest on, while they rest there. Set alongside `tooltip-cell`.
  * @csspart tooltip-label - The reading's own name inside the tooltip.
  * @csspart tooltip-left - The bubble while it is left of the reading, beside `tooltip`.
  * @csspart tooltip-name - A column's name inside the tooltip.
@@ -304,7 +312,7 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
       ? `${latest[0]?.label ?? ''}: ${latest.map((one) => one.reading).join(', ')}`
       : latest.map((one) => `${one.label}: ${one.reading}`).join('; ')
     const named = this.named ? `${this.named}, ` : ''
-    return html`<p part="summary">${named}${body}.</p>`
+    return html`<p id="helix-chart-summary" part="summary">${named}${body}.</p>`
   }
 
   /**
@@ -340,12 +348,17 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
         : undefined
 
     return html`<div
-      aria-hidden="true"
+      aria-describedby=${this.named ? 'helix-chart-summary' : nothing}
+      aria-label=${this.named || nothing}
+      aria-labelledby=${this.named ? nothing : 'helix-chart-summary'}
       id=${CHART_PLOT}
       part="plot"
+      role="application"
+      tabindex="0"
       style=${holes ? `--_line-chart-holes: ${holes}` : nothing}
     >
       <svg part="svg"
+        aria-hidden="true"
         data-mirror
         preserveAspectRatio="none"
         viewBox="0 0 ${PLOT_WIDTH} ${PLOT_HEIGHT}"
@@ -541,7 +554,14 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
     const at = this.pointer.at
     const series = this.series
     if (at < 0 || series.length === 0) {
-      return drawTooltip(this.sourceRows, at, this.tag('tooltip'))
+      return drawTooltip(
+        this.sourceRows,
+        at,
+        this.tag('tooltip'),
+        undefined,
+        undefined,
+        this.pointer,
+      )
     }
     /* Above the topmost series at that reading, so the box never covers the
        line it is describing. `y` counts down in the drawing, so the smallest is
@@ -564,6 +584,7 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
         y: `${tops.length > 0 ? Math.min(...tops) : 0}%`,
       },
       (cell) => this.seriesOf(cell),
+      this.pointer,
     )
   }
 }

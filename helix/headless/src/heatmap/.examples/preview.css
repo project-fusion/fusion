@@ -130,3 +130,18 @@ helix-headless-heatmap::part(empty) {
   margin: 0;
   text-align: center;
 }
+
+helix-headless-heatmap::part(live) {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  margin: 0;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
+helix-headless-heatmap::part(strip):focus-visible {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: 2px;
+}

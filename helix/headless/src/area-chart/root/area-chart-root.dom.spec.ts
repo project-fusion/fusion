@@ -130,8 +130,9 @@ describe('stacking', () => {
 describe('what a reader is told', () => {
   test('the drawing is hidden and the summary is not', async () => {
     const host = await chart(SOURCES, 'for="sources"')
-    expect(part(host, 'plot')?.getAttribute('aria-hidden')).toBe('true')
+    expect(part(host, 'svg')?.getAttribute('aria-hidden')).toBe('true')
     expect(part(host, 'summary')?.hasAttribute('aria-hidden')).toBe(false)
+    expect(part(host, 'plot')?.getAttribute('aria-describedby')).toBe('helix-chart-summary')
   })
 
   test('the summary is the latest total and each part’s share of it', async () => {
@@ -189,5 +190,16 @@ describe('what a reader is told', () => {
       null,
     ])
     expect(all(host, 'area').map((band) => band.getAttribute('data-series'))).toEqual(['2', '1'])
+  })
+})
+
+describe('reading by key', () => {
+  test('the readout says the reading with its total, as the tooltip does', async () => {
+    const host = await chart(SOURCES, 'for="sources"')
+    part(host, 'plot')?.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key: 'End' }),
+    )
+    await (host as HTMLElement & { updateComplete: Promise<boolean> }).updateComplete
+    expect(part(host, 'live')?.textContent).toBe('Mar: Search 25, Direct 15, Social 10, Total 50')
   })
 })
