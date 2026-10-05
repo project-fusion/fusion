@@ -100,6 +100,11 @@ export class HelixHeadlessIcon extends HelixElement {
     return [...super.observedAttributes, 'aria-label']
   }
 
+  /**
+   * Called by the browser when an observed attribute changes. A new
+   * `aria-label` asks for an update, because the element takes the image role
+   * while one names it.
+   */
   override attributeChangedCallback(name: string, old: string | null, value: string | null): void {
     super.attributeChangedCallback(name, old, value)
     if (name === 'aria-label') {

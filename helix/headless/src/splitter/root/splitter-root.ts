@@ -70,7 +70,7 @@ const STACK_BELOW = 512
  * @event {HelixBeforeCollapseEvent} helix-before-collapse - Fired before a pane shuts or reopens, whether or not the resize that caused it was allowed. It carries its own position, because a shut pane sits at `collapsed-size`. Cancelable: canceling it leaves the pane as it was and the divider where the gesture put it.
  * @event {HelixBeforeResizeEvent} helix-before-resize - Fired before the divider settles, and only when the gesture moved it. A press that moved nothing, a drag that came back, an arrow key with no room left, and a corner that moved only the other divider do not fire it. Cancelable: canceling it leaves the position to you and keeps the rest of the gesture, so a collapse the gesture reached still fires `helix-before-collapse`, which you can also cancel. A dragged divider stays where it was dropped until you set your own `position`.
  * @event {HelixCollapseEvent} helix-collapse - Fired after a pane shuts or reopens, with the side that is shut, or empty where both are open.
- * @event {HelixResizedEvent} helix-resized - Fired after the divider settles somewhere new, with the new position. A refused resize sends nothing.
+ * @event {HelixResizedEvent} helix-resized - Fired after the divider settles somewhere new, with the new position.
  *
  * @csspart corner - The handle where two dividers cross, added on the client.
  * @csspart end - The box that holds the second pane.

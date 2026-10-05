@@ -336,4 +336,17 @@ describe('indeterminate', () => {
     expect(box.indeterminate).toBe(false)
     expect(box.hasAttribute('indeterminate')).toBe(true)
   })
+
+  /* The attribute stays where the consumer wrote it and says nothing once the
+     element resolves it, so a stylesheet reads the state. */
+  test('is the `indeterminate` state while it holds, set from the attribute or a script', async () => {
+    const box = await checkbox('indeterminate')
+    expect(hasState(box, 'indeterminate')).toBe(true)
+    control(box).click()
+    await box.updateComplete
+    expect(hasState(box, 'indeterminate')).toBe(false)
+    box.indeterminate = true
+    await box.updateComplete
+    expect(hasState(box, 'indeterminate')).toBe(true)
+  })
 })

@@ -68,7 +68,7 @@
 /* No color, which is the same rule the segmented control's thumb follows: color
    is reserved for state, and being ticked is not state, it is an answer. */
 :host(:state(checked)) [part="control"],
-:host([indeterminate]) [part="control"] {
+:host(:state(indeterminate)) [part="control"] {
   border-color: var(
     --checkbox-border-color,
     var(--checkbox-checked-color, var(--helix-color-foreground))
@@ -97,14 +97,14 @@
 }
 
 :host(:state(checked)) [part~="mark"],
-:host([indeterminate]) [part~="mark"] {
+:host(:state(indeterminate)) [part~="mark"] {
   scale: 1;
 }
 
 /* Indeterminate wins where both are set, because a box that is both is showing a
    mixed set and the dash is what says so.
 
-   **`mark-dash`, which outlasts `[indeterminate]`.** The box leaves
+   **`mark-dash`, which outlasts `:state(indeterminate)`.** The box leaves
    indeterminate before the mark finishes shrinking, and a rule on the host
    swapped the dash for the tick at the first frame of the exit, so emptying a
    mixed set flashed a tick. The element keeps `mark-dash` until the box is
@@ -128,7 +128,7 @@
 /* Color appears here and only here, because this is the one thing about a
    checkbox that is state. */
 :host(:state(invalid):state(checked)) [part="control"],
-:host(:state(invalid)[indeterminate]) [part="control"] {
+:host(:state(invalid):state(indeterminate)) [part="control"] {
   border-color: var(--helix-color-danger);
 }
 

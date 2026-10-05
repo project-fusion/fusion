@@ -1043,6 +1043,27 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
     </slot>`
   }
 
+  /**
+   * The row offering to add what was typed, after the list.
+   *
+   * Written out twice rather than bound through `part=${…}`: a part is read
+   * from the template as a literal, so a bound one is a `::part(create)` the
+   * checks cannot pair with its `@csspart`. The keyboard arriving swaps the
+   * element, and `linkActive` runs after the render that swaps it.
+   */
+  private renderCreate(): TemplateResult | typeof nothing {
+    if (this.creation === '') {
+      return nothing
+    }
+    return this.onCreate
+      ? html`<button part="create create-active" id="create" type="button" @click=${() => this.create()}>
+          ${this.createLabel} "${this.creation}"
+        </button>`
+      : html`<button part="create" id="create" type="button" @click=${() => this.create()}>
+          ${this.createLabel} "${this.creation}"
+        </button>`
+  }
+
   protected override render(): TemplateResult {
     return html`${this.renderLabel()}
       <div part="field" @click=${this.handleFieldClick}>
@@ -1080,18 +1101,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
       </div>
       <div part="surface" popover="manual" ?hidden=${!this.open}>
         ${this.renderListbox()}
-        ${
-          this.creation === ''
-            ? nothing
-            : html`<button
-                part=${this.onCreate ? 'create create-active' : 'create'}
-                id="create"
-                type="button"
-                @click=${() => this.create()}
-              >
-                ${this.createLabel} "${this.creation}"
-              </button>`
-        }
+        ${this.renderCreate()}
       </div>
       ${this.renderHint()}${this.renderFeedback()}`
   }

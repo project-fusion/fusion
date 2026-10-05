@@ -56,6 +56,7 @@ import { property } from 'lit/decorators.js'
  *
  * @cssstate checked - While the box is checked.
  * @cssstate has-label - The label slot has content, so the label is drawn.
+ * @cssstate indeterminate - While the box shows the dash, neither checked nor unchecked.
  * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
  */
 @customElement('helix-headless-checkbox')
@@ -78,7 +79,8 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
    * Presentation only. It never submits, and the first change resolves it.
    *
    * Not reflected, as no state is: the element resolves it itself, and a
-   * reflected one removed the attribute the consumer wrote.
+   * reflected one removed the attribute the consumer wrote. A stylesheet
+   * reads it as `:state(indeterminate)`.
    */
   @property({ type: Boolean })
   indeterminate = false
@@ -147,6 +149,7 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     this.internals.ariaRequired = this.required ? 'true' : null
+    this.toggleState('indeterminate', this.indeterminate)
     if (this.indeterminate) {
       this.dashed = true
     } else if (this.checked) {
