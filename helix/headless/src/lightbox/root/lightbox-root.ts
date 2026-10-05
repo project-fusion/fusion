@@ -1,6 +1,8 @@
 import {
   CommandController,
   customElement,
+  deepActiveElement,
+  deepContains,
   FullscreenController,
   fillTemplate,
   HelixElement,
@@ -34,8 +36,10 @@ import { HelixHeadlessLightboxItem } from '../item/lightbox-item.js'
  * focus stays in the dialog.
  *
  * The chrome hides when there is no input, through `IdleController`, and comes
- * back on a pointer move or a focus. `fullscreen` uses `FullscreenController`,
- * as `Video` does.
+ * back on a pointer move, a key press, or a focus. It stays while focus is on a
+ * control in the header or the footer, so a keyboard reader is never left on
+ * a control that has gone. `fullscreen` uses `FullscreenController`, as `Video`
+ * does. While the viewer is open, the page behind it does not scroll.
  *
  * @since 0.100.0
  * @status stable
@@ -90,8 +94,8 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
   loop = false
 
   /**
-   * The status text that says which item is shown, with `{index}` and `{count}`
-   * filled in.
+   * The status text that says which item is shown, with `{index}`, `{count}`
+   * and the item's `{label}` filled in.
    *
    * Announced rather than only drawn, because the picture changing under a
    * reader who cannot see it is otherwise silent. A consumer who has their own
@@ -120,9 +124,24 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
     this,
     () => this.idleDelay,
     (resting) => {
-      this.resting = resting
+      this.resting = resting && !this.chromeHasFocus()
     },
   )
+
+  /**
+   * Whether focus is on something in the header or the footer.
+   *
+   * The styled tier hides both with `visibility: hidden` while idle, which
+   * takes focus off a control in them and drops it on the body, where the
+   * arrow keys no longer reach this element.
+   */
+  private chromeHasFocus(): boolean {
+    const active = deepActiveElement()
+    return this.knownChildren.some(
+      (child) =>
+        (child.slot === 'header' || child.slot === 'footer') && deepContains(child, active),
+    )
+  }
 
   /* Opened, walked and closed from anywhere on the page without a line of
      script, which is what a lightbox's chrome is made of: a close button and
@@ -250,6 +269,8 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
    * a reader having no way to know which one this component thinks it is.
    */
   private readonly handleKeydown = (event: KeyboardEvent): void => {
+    /* Any key is the reader being there, as a pointer move is. */
+    this.idle.stir()
     /* Not a press the viewer's content answers, or one that is a chord. A
        caption field or a slider in the chrome keeps its own arrows, Home and
        End, and Alt with an arrow is the browser's back and forward. */
@@ -321,9 +342,19 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
     this.say(changed)
   }
 
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    unlockScroll(this)
+  }
+
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.mark()
+    if (this.open) {
+      lockScroll(this)
+    } else {
+      unlockScroll(this)
+    }
 
     /* After render and only on a difference: `showModal()` on an open dialog
        throws, and `close()` on a shut one fires a second `close` event. */
@@ -379,7 +410,13 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
     const current = resolveActiveItem(this.active, items)
     const at = current ? items.indexOf(current) : -1
     this.announcement =
-      at === -1 ? '' : fillTemplate(this.statusLabel, { count: items.length, index: at + 1 })
+      at === -1 || !current
+        ? ''
+        : fillTemplate(this.statusLabel, {
+            count: items.length,
+            index: at + 1,
+            label: current.label,
+          })
   }
 
   protected override render(): TemplateResult {
@@ -411,6 +448,51 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
       <span part="live" role="status" aria-live="polite">${this.announcement || nothing}</span>
     </dialog>`
   }
+}
+
+/**
+ * The modal surfaces holding the page still, on `globalThis` under the key
+ * `Dialog` and `Drawer` use, so they share one count with this viewer.
+ */
+interface ScrollLock {
+  holders: Set<Element>
+  overflow: string
+  gutter: string
+}
+const SCROLL_LOCK = Symbol.for('fusion.helix.scroll-lock')
+
+/**
+ * Stops the page behind the viewer from scrolling. See `lockScroll` in
+ * `Dialog`, which this matches line for line.
+ */
+const lockScroll = (holder: Element): void => {
+  const globals = globalThis as unknown as Record<symbol, ScrollLock | undefined>
+  const root = document.documentElement
+  globals[SCROLL_LOCK] ??= { gutter: '', holders: new Set(), overflow: '' }
+  const lock = globals[SCROLL_LOCK]
+  if (lock.holders.has(holder)) {
+    return
+  }
+  if (lock.holders.size === 0) {
+    lock.overflow = root.style.overflow
+    lock.gutter = root.style.scrollbarGutter
+    if (window.innerWidth > root.clientWidth) {
+      root.style.scrollbarGutter = 'stable'
+    }
+    root.style.overflow = 'hidden'
+  }
+  lock.holders.add(holder)
+}
+
+/** Lets go of the page, and gives it back once nothing else holds it. */
+const unlockScroll = (holder: Element): void => {
+  const lock = (globalThis as unknown as Record<symbol, ScrollLock | undefined>)[SCROLL_LOCK]
+  if (!lock?.holders.delete(holder) || lock.holders.size > 0) {
+    return
+  }
+  const root = document.documentElement
+  root.style.overflow = lock.overflow
+  root.style.scrollbarGutter = lock.gutter
 }
 
 declare global {

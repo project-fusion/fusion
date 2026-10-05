@@ -199,3 +199,56 @@ describe('lightbox', () => {
     expect(shown(host)).toBe('one')
   })
 })
+
+describe('the chrome and a keyboard reader', () => {
+  /* Only the pointer and focus counted as activity, and the styled tier hides
+     the chrome with `visibility: hidden`, so a keyboard reader on a control in
+     it lost focus to the body and the arrow keys stopped working. */
+  test('a key press counts as being there', async () => {
+    const host = await lightbox('open idle-delay="10"')
+    await host.updateComplete
+    await new Promise((resolve) => setTimeout(resolve, 30))
+    await host.updateComplete
+    const rested = hasState(host, 'idle')
+    const dialog = part(host, 'dialog') as HTMLElement
+    dialog.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Shift' }))
+    await host.updateComplete
+    expect([rested, hasState(host, 'idle')]).toEqual([true, false])
+  })
+
+  test('and the chrome stays while focus is on a control in it', async () => {
+    const host = (await mount(
+      `<helix-headless-lightbox label="Photos" open idle-delay="10">
+        <div slot="header"><button>Close</button></div>
+        <helix-headless-lightbox-item value="one" label="A harbour"></helix-headless-lightbox-item>
+      </helix-headless-lightbox>`,
+    )) as Lightbox
+    await host.updateComplete
+    host.querySelector('button')?.focus()
+    await new Promise((resolve) => setTimeout(resolve, 30))
+    await host.updateComplete
+    expect(hasState(host, 'idle')).toBe(false)
+  })
+})
+
+describe('the reading', () => {
+  test('can name the item, as its `label` says', async () => {
+    const host = await lightbox('open status-label="{label}, {index} of {count}"')
+    await host.updateComplete
+    host.next()
+    await host.updateComplete
+    expect((part(host, 'live') as HTMLElement).textContent?.trim()).toBe('A hill, 2 of 3')
+  })
+})
+
+describe('the page behind an open viewer', () => {
+  test('does not scroll, and scrolls again once it closes', async () => {
+    const root = document.documentElement
+    const host = await lightbox('open')
+    await host.updateComplete
+    const held = root.style.overflow
+    host.close()
+    await host.updateComplete
+    expect([held, root.style.overflow]).toEqual(['hidden', ''])
+  })
+})
