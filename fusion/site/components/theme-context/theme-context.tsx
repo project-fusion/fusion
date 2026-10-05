@@ -18,7 +18,7 @@ import {
   THEME_RESET_EVENT,
   writeSiteTheme,
 } from '@/utils/site-theme/site-theme'
-import { accentFrom, INITIAL } from '@/utils/theme-defaults/theme-defaults'
+import { accentFrom, INITIAL, SITE_BRAND } from '@/utils/theme-defaults/theme-defaults'
 import { THEME_ENGINE } from '@/utils/theme-engine/theme-engine'
 import styles from './theme-context.module.css'
 
@@ -93,10 +93,12 @@ const derive = (
   /**
    * **Every field the builder passes, not the six this control moves.**
    */
-  const accent = accentFrom(settings.accentHue)
+  /* An empty brand is no brand, which the engine reads as ink. Handed over as
+     an empty string, it is a color the engine cannot read, and it throws. */
+  const accent = settings.brand ? accentFrom(settings.accentHue) : undefined
   const theme = engine.derive({
     ...(accent ? { accent } : {}),
-    brand: settings.brand,
+    ...(settings.brand ? { brand: settings.brand } : {}),
     chroma: { scale: settings.chromaScale / 100 },
     contrastTarget: INITIAL.contrastTarget,
     density: settings.density / 100,
@@ -234,7 +236,7 @@ export const ThemeScope = ({ children }: { children: ReactNode }) => {
   const [engine, setEngine] = useState<ThemeEngine | null>(null)
   const [derived, setDerived] = useState<Derived | null>(null)
 
-  const [brand, setBrand] = useState(INITIAL.brand)
+  const [brand, setBrand] = useState(SITE_BRAND)
   const [chromaScale, setChromaScale] = useState(INITIAL.chromaScale)
   const [accentHue, setAccentHue] = useState(INITIAL.accentHue)
   const [radius, setRadius] = useState(INITIAL.radius)
@@ -367,7 +369,7 @@ export const ThemeScope = ({ children }: { children: ReactNode }) => {
       if (scope.current) {
         clearSiteThemeFrom(scope.current)
       }
-      setBrand(INITIAL.brand)
+      setBrand(SITE_BRAND)
       setChromaScale(INITIAL.chromaScale)
       setAccentHue(INITIAL.accentHue)
       setRadius(INITIAL.radius)

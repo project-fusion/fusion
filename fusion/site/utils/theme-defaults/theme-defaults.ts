@@ -73,6 +73,13 @@ export const INITIAL: Settings = {
   translucency: 100,
 }
 
+/**
+ * The brand the site wears, which its own theme panel starts from and goes back
+ * to. **Its own constant, apart from `INITIAL`**: the builder starts from ink,
+ * the palette Helix ships, and the site is Fusion's, which is blue.
+ */
+export const SITE_BRAND = '#3b82f6'
+
 /** The stack a face becomes, so a fetch that has not landed still reads. */
 const stack = (family: string, fallback: string): string =>
   family ? `"${family}", ${fallback}` : ''
