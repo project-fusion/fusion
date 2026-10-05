@@ -164,6 +164,21 @@ describe('grid', () => {
     expect(width(wide)).toBe(width(narrow) * 2)
   })
 
+  /* What the description now says, held so the words stay true: a span the
+     grid cannot fit adds empty columns, and `full` always fits. */
+  laid('a span wider than a `min` grid adds columns of no width, and `full` fits', async () => {
+    const grid = await mount(
+      `<helix-grid min="200px" style="inline-size: 300px">
+        <span data-grid-span="3">A</span><span data-grid-span="full">B</span>
+      </helix-grid>`,
+    )
+    expect(getComputedStyle(grid).gridTemplateColumns).toBe('300px 0px 0px')
+    const [wide, full] = [...grid.children] as HTMLElement[]
+    expect(Math.round(full?.getBoundingClientRect().width ?? 0)).toBe(
+      Math.round(wide?.getBoundingClientRect().width ?? 0),
+    )
+  })
+
   laid(
     'rows and named areas come from their hooks, and stay on the grid that set them',
     async () => {

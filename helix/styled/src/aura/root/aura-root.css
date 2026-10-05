@@ -54,6 +54,15 @@
   column-rule-color: var(--aura-peak, var(--helix-color-primary-active));
   outline-color: var(--_aura-ground);
   text-decoration-color: var(--_aura-haze);
+
+  /* **A change to any of the five ends a transition the script hears**, so a
+     hook set while the loop is stopped, for a reader who asked for no motion,
+     still paints a frame in the new colors. On the fast duration, which the
+     token layer shortens to `0.01ms` for that reader and never to nothing, so
+     the end still fires. A running loop reads the colors every frame, so the
+     shader eases across the same span as the gradient's stops jump. */
+  transition-duration: var(--helix-duration-fast);
+  transition-property: caret-color, color, column-rule-color, outline-color, text-decoration-color;
 }
 
 /* **Over the field and covering it, so it changes nothing about the aura's
