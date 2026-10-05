@@ -4,12 +4,14 @@ import {
   customElement,
   edgeOffset,
   HelixElement,
+  headingsIn,
   isRtl,
   lockScroll,
   MixinControllerOpen,
   OpenPhaseController,
   onUnlessFalse,
   parseSnapPoints,
+  reflectElements,
   SwipeController,
   type SwipeEdge,
   settleSwipe,
@@ -395,21 +397,17 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
    * reflection keeps the fallback name.
    */
   private nameByHeader(): void {
-    const panel = this.panel as
-      | (HTMLDialogElement & { ariaLabelledByElements?: Element[] | null })
-      | null
-    if (!panel || !('ariaLabelledByElements' in panel)) {
-      return
-    }
     const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="header"]')
-    const heading = this.label || this.hasAttribute('aria-labelledby') ? [] : headingsIn(slot)
-    if (heading.length > 0) {
-      panel.ariaLabelledByElements = heading
-      this.namedByHeader = true
-    } else if (this.namedByHeader) {
-      panel.ariaLabelledByElements = null
-      this.namedByHeader = false
-    }
+    const heading =
+      this.label || this.hasAttribute('aria-labelledby')
+        ? []
+        : headingsIn(slot?.assignedElements({ flatten: true }) ?? [])
+    this.namedByHeader = reflectElements(
+      this.panel,
+      'ariaLabelledByElements',
+      heading,
+      this.namedByHeader,
+    )
   }
 
   override disconnectedCallback(): void {
@@ -477,19 +475,6 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
       <div part="footer"><slot name="footer"></slot></div>
     </dialog>`
   }
-}
-
-/**
- * The headings among a slot's elements, or the elements themselves when none
- * is a heading or holds one. The same reading `Dialog` makes of its header.
- */
-const headingsIn = (slot: HTMLSlotElement | null): Element[] => {
-  const assigned = slot?.assignedElements({ flatten: true }) ?? []
-  const heading = 'h1, h2, h3, h4, h5, h6, [role="heading"]'
-  const found = assigned.flatMap((one) =>
-    one.matches(heading) ? [one] : [...one.querySelectorAll(heading)].slice(0, 1),
-  )
-  return found.length > 0 ? found.slice(0, 1) : assigned
 }
 
 /** Whether the browser knows `<dialog closedby>`, which a non-modal drawer's Escape rests on. */

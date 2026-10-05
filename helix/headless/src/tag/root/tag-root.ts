@@ -1,14 +1,14 @@
 import {
   customElement,
+  drawDismiss,
+  drawDismissGlyph,
   HelixElement,
   hostAria,
   MixinDismissible,
   slottedWords,
 } from '@fusion.dev/helix-core'
-import { x } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
 /**
  * @summary A short label that adds metadata to content.
@@ -215,20 +215,13 @@ export class HelixHeadlessTag extends MixinDismissible(HelixElement) {
 
   /** The remove button, behind a seam a tier can move. */
   protected renderDismiss(): TemplateResult {
-    return html`<button
-      aria-label=${this.removeName}
-      ?disabled=${this.disabled}
-      part="dismiss"
-      tabindex=${this.grouped ? '-1' : nothing}
-      type="button"
-      @click=${() => this.dismiss()}
-    >
-      <slot name="dismiss-icon"
-        ><svg part="dismiss-mark" fill="currentColor" viewBox=${x.viewBox} aria-hidden="true">
-          ${unsafeSVG(x.content)}
-        </svg></slot
-      >
-    </button>`
+    return drawDismiss({
+      disabled: this.disabled,
+      label: this.removeName,
+      mark: html`<slot name="dismiss-icon">${drawDismissGlyph()}</slot>`,
+      onDismiss: () => this.dismiss(),
+      tabindex: this.grouped ? '-1' : undefined,
+    })
   }
 }
 
