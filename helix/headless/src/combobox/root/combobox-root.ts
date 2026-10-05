@@ -222,6 +222,31 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   placeholder = ''
 
   /**
+   * Whether the choice is locked. A read-only combobox still submits its value.
+   *
+   * The field can be read and focused, the list does not open, and the tags of
+   * a `multiple` combobox cannot be dismissed.
+   */
+  @property({ attribute: 'readonly', reflect: true, type: Boolean })
+  readOnly = false
+
+  /** Requests a new value. While `readOnly` is set, nothing changes. */
+  override requestValue(next: string): boolean {
+    if (this.readOnly) {
+      return false
+    }
+    return super.requestValue(next)
+  }
+
+  /** Requests the list open or closed. While `readOnly` is set, it does not open. */
+  override requestOpen(next: boolean): boolean {
+    if (next && this.readOnly) {
+      return false
+    }
+    return super.requestOpen(next)
+  }
+
+  /**
    * The name of the control that removes one chosen option, with `{name}`
    * filled in.
    *
@@ -672,6 +697,26 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   }
 
   /**
+   * Enter in a closed field submits the form, as it does in a native text
+   * field.
+   *
+   * The field is in a shadow root and has no form owner, so the platform never
+   * runs implicit submission for it. On `keypress`, which a prevented
+   * `keydown` suppresses, so an Enter that chose an option or created one
+   * submits nothing.
+   */
+  private readonly handleKeypress = (event: KeyboardEvent): void => {
+    if (event.key === 'Enter' && !this.open && !event.defaultPrevented) {
+      this.submitImplicitly()
+    }
+  }
+
+  /** @internal A single line of text counts against implicit submission. */
+  protected override get blocksImplicitSubmission(): boolean {
+    return true
+  }
+
+  /**
    * Tells the input which option is highlighted.
    *
    * **The input is where focus stays**, so it is what a screen reader asks.
@@ -974,7 +1019,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
       exportparts="dismiss: tag-dismiss, dismiss-mark: tag-dismiss-mark, label: tag-label, start: tag-start"
                     data-value=${option.value}
                     dismiss-label=${fillTemplate(this.removeLabel, { name: option.text })}
-                    ?dismissible=${!this.isDisabled}
+                    ?dismissible=${!this.isDisabled && !this.readOnly}
                     @helix-dismiss=${this.handleDismiss}
                     >${option.text}</${this.tag('tag')}
                   >`
@@ -1023,9 +1068,11 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
           aria-invalid=${this.invalidity ?? nothing}
           placeholder=${(this.chosen.length > 0 || this.unresolved ? '' : this.placeholder) || nothing}
           ?disabled=${this.isDisabled}
+          ?readonly=${this.readOnly}
           .value=${this.fieldText}
           @input=${this.handleInput}
           @keydown=${this.handleKeydown}
+          @keypress=${this.handleKeypress}
         />
         <slot name="end"></slot>
         ${this.renderIndicator()}

@@ -747,3 +747,12 @@ describe('the first day of the week', () => {
     expect(firstHeader(cal)).toBe('Sun')
   })
 })
+
+describe('a read-only grid', () => {
+  test('says so, so a reader knows the dates cannot be changed', async () => {
+    const cal = await calendar('readonly default-month="2026-08"')
+    expect(cal.shadowRoot?.querySelector('[part="grid"]')?.getAttribute('aria-readonly')).toBe(
+      'true',
+    )
+  })
+})

@@ -963,6 +963,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
         part="grid"
         role="grid"
         aria-label=${heading.format(month)}
+        aria-readonly=${this.readOnly ? 'true' : nothing}
         data-unset=${this.value === '' ? '' : nothing}
       >
         <div part="week" role="row">

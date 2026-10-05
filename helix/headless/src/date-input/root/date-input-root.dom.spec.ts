@@ -811,3 +811,21 @@ describe('the calendar a date input opens', () => {
     )
   })
 })
+
+describe('Enter in a date input', () => {
+  test('submits a form with no button and no other field', async () => {
+    document.body.innerHTML =
+      '<form><helix-headless-date-input name="d" label="Starts"></helix-headless-date-input></form>'
+    const host = document.querySelector('helix-headless-date-input') as InputDate
+    await host.updateComplete
+    let submitted = 0
+    document.querySelector('form')?.addEventListener('submit', (event) => {
+      event.preventDefault()
+      submitted += 1
+    })
+    control(host).dispatchEvent(
+      new KeyboardEvent('keypress', { bubbles: true, cancelable: true, key: 'Enter' }),
+    )
+    expect(submitted).toBe(1)
+  })
+})

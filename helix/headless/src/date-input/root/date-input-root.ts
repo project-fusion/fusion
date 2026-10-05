@@ -735,6 +735,7 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
           @focus=${this.handleFocus}
           @input=${this.handleInput}
           @keydown=${this.handleDraftKey}
+          @keypress=${this.handleKeypress}
         />
         <button
           part="trigger"
