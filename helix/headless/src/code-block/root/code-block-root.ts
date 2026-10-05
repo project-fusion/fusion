@@ -84,6 +84,18 @@ export class HelixHeadlessCodeBlock extends HelixElement {
   diff = false
 
   /**
+   * The copy button's name and tooltip text after a copy.
+   */
+  @property({ attribute: 'copied-label' })
+  copiedLabel = 'Copied'
+
+  /**
+   * The copy button's name and tooltip text before a copy.
+   */
+  @property({ attribute: 'copy-label' })
+  copyLabel = 'Copy code'
+
+  /**
    * The block's name, usually a file name or a language.
    *
    * In a diff, each file is named from the patch, and this names a patch that
@@ -170,6 +182,29 @@ export class HelixHeadlessCodeBlock extends HelixElement {
       .join('')
   }
 
+  /**
+   * Watches the code for edits that change no slot assignment.
+   *
+   * A framework updating one string child writes the text node's data in
+   * place, which React does, and that fires no `slotchange`. The block showed
+   * the new code while its button copied the old, and a diff edited that way
+   * was not redrawn.
+   */
+  private observer: MutationObserver | undefined
+
+  override connectedCallback(): void {
+    super.connectedCallback()
+    if (typeof MutationObserver !== 'undefined') {
+      this.observer ??= new MutationObserver(() => this.requestUpdate())
+      this.observer.observe(this, { characterData: true, childList: true, subtree: true })
+    }
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    this.observer?.disconnect()
+  }
+
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
     this.finishHydration()
@@ -228,7 +263,8 @@ export class HelixHeadlessCodeBlock extends HelixElement {
         tooltip-arrow-left: copy-tooltip-arrow-left, tooltip-arrow-right: copy-tooltip-arrow-right,
         tooltip-arrow-top: copy-tooltip-arrow-top, tooltip-bottom: copy-tooltip-bottom,
         tooltip-left: copy-tooltip-left, tooltip-right: copy-tooltip-right, tooltip-top: copy-tooltip-top"
-      label="Copy code"
+      copied-label=${this.copiedLabel}
+      label=${this.copyLabel}
       .value=${value}
     ></${this.tag('copy-button')}>`
   }

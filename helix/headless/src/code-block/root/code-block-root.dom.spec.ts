@@ -42,6 +42,37 @@ describe('code block', () => {
 
 /* In the header it stands over nothing; beside the code it stands over the
    block, which then has to keep room for it. */
+/* React updates a single string child by writing the text node's data, which
+   fires no `slotchange`. The block showed the new code while the button kept
+   copying the old. */
+describe('code edited in place', () => {
+  test('is what the button copies', async () => {
+    const el = (await mount(
+      '<helix-headless-code-block>echo one</helix-headless-code-block>',
+    )) as Updatable
+    await el.updateComplete
+    ;(el.firstChild as Text).data = 'echo two'
+    await new Promise((done) => setTimeout(done, 0))
+    await el.updateComplete
+    const copy = el.shadowRoot?.querySelector('helix-headless-copy-button') as HTMLElement & {
+      value: string
+    }
+    expect(copy.value).toBe('echo two')
+  })
+})
+
+/* The button's words were fixed English, with no way to translate them. */
+describe('the copy button', () => {
+  test('takes its words from the block', async () => {
+    const el = (await mount(
+      '<helix-headless-code-block copy-label="Code kopieren" copied-label="Kopiert">x</helix-headless-code-block>',
+    )) as Updatable
+    const copy = el.shadowRoot?.querySelector('helix-headless-copy-button')
+    expect(copy?.getAttribute('label')).toBe('Code kopieren')
+    expect(copy?.getAttribute('copied-label')).toBe('Kopiert')
+  })
+})
+
 describe('where the copy button stands', () => {
   test('in the header, after the name, when there is a name', async () => {
     const el = (await mount(
