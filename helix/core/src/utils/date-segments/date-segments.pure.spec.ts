@@ -3,6 +3,7 @@ import {
   isPartial,
   isTwelveHourLayout,
   type SegmentSlot,
+  segmentKey,
   segmentLayout,
   segmentName,
   segmentRange,
@@ -134,5 +135,59 @@ describe('what a segment shows and is called', () => {
   test('a name from Intl', () => {
     expect(segmentName('month', 'en-US').toLowerCase()).toBe('month')
     expect(segmentName('month', 'de-DE')).toBe('Monat')
+  })
+})
+
+describe('what an editing key does to a segment', () => {
+  const at = (kind: 'day' | 'dayPeriod' | 'hour' | 'month', segments = {}, typed = '') => ({
+    kind,
+    locale: 'en-US',
+    segments,
+    twelve: true,
+    typed,
+  })
+
+  test('the arrows step and wrap, and Home and End go to the ends', () => {
+    expect(segmentKey('ArrowUp', at('month', { month: 12 }))).toEqual({
+      advance: false,
+      segments: { month: 1 },
+      typed: '',
+    })
+    expect(segmentKey('ArrowDown', at('month', { month: 1 }))?.segments).toEqual({ month: 12 })
+    expect(segmentKey('Home', at('day', { day: 9 }))?.segments).toEqual({ day: 1 })
+    expect(segmentKey('End', at('day', { day: 9, month: 2, year: 2026 }))?.segments.day).toBe(28)
+  })
+
+  test('Backspace and Delete empty it', () => {
+    expect(segmentKey('Backspace', at('month', { day: 4, month: 8 }))?.segments).toEqual({ day: 4 })
+    expect(segmentKey('Delete', at('month', { month: 8 }))?.segments).toEqual({})
+  })
+
+  test('a digit is typed, and says when the segment is full', () => {
+    expect(segmentKey('1', at('month'))).toEqual({
+      advance: false,
+      segments: { month: 1 },
+      typed: '1',
+    })
+    expect(segmentKey('2', at('month', { month: 1 }, '1'))).toEqual({
+      advance: true,
+      segments: { month: 12 },
+      typed: '',
+    })
+  })
+
+  test('a letter picks the half of the day whose word starts with it', () => {
+    expect(segmentKey('p', at('dayPeriod', { hour: 9 }))?.segments).toEqual({
+      dayPeriod: 1,
+      hour: 21,
+    })
+    expect(segmentKey('a', at('dayPeriod', { hour: 21 }))?.segments.hour).toBe(9)
+    expect(segmentKey('x', at('dayPeriod', { hour: 21 }))).toBeNull()
+  })
+
+  test('a digit on the meridiem and any other key edit nothing', () => {
+    expect(segmentKey('1', at('dayPeriod'))).toBeNull()
+    expect(segmentKey('Enter', at('month'))).toBeNull()
+    expect(segmentKey('x', at('month'))).toBeNull()
   })
 })
