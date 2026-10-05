@@ -78,14 +78,16 @@ press `Escape` again.
 
 A modal overlay keeps `Tab` inside itself while it is open, and it returns focus
 to the element that opened it. `Dialog` does this, and so does `Drawer` unless
-you set `modal="false"`. The page behind a modal `Dialog` or `Drawer` does not
+you set `modal="false"`. Set `dismissible` on either to draw a close control in
+the corner by the title. The page behind a modal `Dialog` or `Drawer` does not
 scroll while it is open.
 
 Opening a `Popover` moves focus to the first control in its panel, or to the
 panel where it holds none, and closing it from inside gives focus back to the
-trigger. It does not trap focus unless you set `modal`, which keeps `Tab` in the
-panel until it closes. When focus moves out of its trigger and its panel, the
-popover closes.
+trigger, however it closes, setting `open` included. It does not trap focus
+unless you set `modal`, which keeps `Tab` in the panel until it closes and hides
+the rest of the page from screen readers meanwhile. When focus moves out of its
+trigger and its panel, the popover closes.
 
 Press F8 to move focus to the `Toast` stack, and press it again to go back.
 Set `hotkey` on the stack to use another key. The stack's name says which key
@@ -109,6 +111,9 @@ names it with `for`. A Helix trigger is described as soon as it has rendered.
 A plain element in your markup is described the first time a reader points at
 it or focuses it, so the link is never written into markup your server sent.
 Write `aria-describedby` yourself to have the link in the server's markup.
+The pointer can move onto a tooltip's bubble and the bubble stays, so a reader
+can read it under a magnifier. Set `hoverable="false"` to hide it once the
+pointer reaches it.
 
 ## Keep an overlay open
 
@@ -143,7 +148,10 @@ finished. Select on them to draw an entrance or an exit of your own.
 A touch or a pen swipes a `Drawer` toward the edge it came from, and a `Toast`
 message toward the end of the line. A swipe past halfway, or a quick one, closes
 it through the same cancelable request as its close control. A `Drawer` with
-`snap-points` comes to rest at the nearest point, such as half open. In a
+`snap-points` comes to rest at the nearest point, such as half open, and
+`:state(snapped)` holds while it rests short of the whole panel. Moving focus
+with `Tab` to a control past the edge of the window opens it the rest of the
+way, and `snapTo()` moves it from script. In a
 `Lightbox`, a swipe across the viewer shows the next or the previous item. A
 mouse never swipes, because dragging with a mouse selects text.
 
