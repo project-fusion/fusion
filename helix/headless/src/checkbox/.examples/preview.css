@@ -65,7 +65,7 @@ helix-headless-checkbox::part(mark-indeterminate) {
 }
 
 helix-headless-checkbox:state(checked)::part(control),
-helix-headless-checkbox[indeterminate]::part(control) {
+helix-headless-checkbox:state(indeterminate)::part(control) {
   border-color: var(--_gray-strong);
 }
 
