@@ -1,4 +1,5 @@
 import {
+  commaList,
   customElement,
   DisabledCascadeController,
   HelixFormElement,
@@ -7,11 +8,11 @@ import {
   KeyboardNavigationController,
   MixinControllerValue,
   MixinField,
+  toggleValue,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixHeadlessToggle } from '../root/toggle-root.js'
-import { pressedValues, toggledValues } from '../selection.js'
 
 /**
  * @summary A row of options with the selection marked by a moving indicator.
@@ -303,7 +304,7 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
       const value = (event as CustomEvent<{ value: string }>).detail.value
       this.requestValue(
         this.multiple
-          ? toggledValues(
+          ? toggleValue(
               this.values,
               value,
               this.items.map((item) => item.value),
@@ -424,7 +425,7 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
    */
   @property({ attribute: false })
   get values(): string[] {
-    return this.multiple ? pressedValues(this.value) : this.value === '' ? [] : [this.value]
+    return this.multiple ? commaList(this.value) : this.value === '' ? [] : [this.value]
   }
 
   set values(next: string[]) {

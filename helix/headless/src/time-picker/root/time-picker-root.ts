@@ -1,5 +1,6 @@
 import {
   clockLocale,
+  commaList,
   customElement,
   dayPeriod,
   elementById,
@@ -327,10 +328,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
 
   /** The times held, which is a list whether or not a mode is set. */
   private get held(): string[] {
-    return this.value
-      .split(',')
-      .map((one) => one.trim())
-      .filter(Boolean)
+    return commaList(this.value)
   }
 
   /**

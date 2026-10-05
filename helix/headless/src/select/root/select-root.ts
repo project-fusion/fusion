@@ -1,5 +1,6 @@
 import {
   AriaForwardController,
+  afterLinkFollowed,
   customElement,
   HelixFormElement,
   hostAria,
@@ -18,7 +19,6 @@ import { html } from 'lit/static-html.js'
 import type { HelixHeadlessListbox } from '../../listbox/root/listbox-root.js'
 import { type HelixHeadlessOption, optionsAmong } from '../../option/root/option-root.js'
 import '../../listbox/index.js'
-import { afterLinkFollowed } from '../../listbox/links.js'
 
 /**
  * @summary A control that opens a list of options to choose from.

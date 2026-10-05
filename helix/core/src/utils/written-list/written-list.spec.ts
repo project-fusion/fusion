@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { writtenList, writtenNumbers } from './written-list.js'
+import { commaList, toggleValue, writtenList, writtenNumbers } from './written-list.js'
 
 /**
  * A list a consumer wrote into an attribute.
@@ -76,5 +76,35 @@ describe('the same list read as numbers', () => {
 
   test('the order written is the order kept, since a threshold list is read in it', () => {
     expect(writtenNumbers('6 3 1 0')).toEqual([6, 3, 1, 0])
+  })
+})
+
+describe('a value list', () => {
+  test('is split on commas only, trimmed, its empty entries dropped', () => {
+    expect(commaList(' New York, ,Paris ,')).toEqual(['New York', 'Paris'])
+    expect(commaList('2026-08-04, 2026-08-05')).toEqual(['2026-08-04', '2026-08-05'])
+    expect(commaList('')).toEqual([])
+    expect(commaList(' , ')).toEqual([])
+  })
+})
+
+describe('a value toggled in a list', () => {
+  test('is added at the end, or taken out', () => {
+    expect(toggleValue(['a', 'b'], 'c')).toEqual(['a', 'b', 'c'])
+    expect(toggleValue(['a', 'b', 'c'], 'b')).toEqual(['a', 'c'])
+    expect(toggleValue([], 'a')).toEqual(['a'])
+  })
+
+  test('takes out every copy, and leaves the list it was given alone', () => {
+    const list = ['a', 'b', 'a']
+    expect(toggleValue(list, 'a')).toEqual(['b'])
+    expect(list).toEqual(['a', 'b', 'a'])
+  })
+
+  test('in a given order, keeping only what the order holds', () => {
+    const order = ['bold', 'italic', 'underline']
+    expect(toggleValue(['underline'], 'bold', order)).toEqual(['bold', 'underline'])
+    expect(toggleValue(['underline', 'bold'], 'underline', order)).toEqual(['bold'])
+    expect(toggleValue(['gone'], 'italic', order)).toEqual(['italic'])
   })
 })

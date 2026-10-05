@@ -3,7 +3,6 @@ import {
   addDays,
   addMonths,
   barredBy,
-  datesIn,
   localToday,
   monthOf,
   monthOut,
@@ -26,10 +25,6 @@ describe('the calendar arithmetic', () => {
 
   test('today is the local date', () => {
     expect(localToday(new Date(2026, 7, 4, 23, 30))).toBe('2026-08-04')
-  })
-
-  test('a value splits into its dates', () => {
-    expect(datesIn(' 2026-08-04, ,2026-08-05 ')).toEqual(['2026-08-04', '2026-08-05'])
   })
 
   test('a locale starts its week where its week starts, or on Sunday', () => {

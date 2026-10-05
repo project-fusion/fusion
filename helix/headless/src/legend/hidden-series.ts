@@ -1,28 +1,20 @@
+import { commaList, seriesKey } from '@fusion.dev/helix-core'
+
 /**
  * The names in a Legend's `hidden-series`, and what a toggle leaves there.
  *
  * Pure and beside the family's `index.ts`, because what a press does to the
  * list is a fact about lists and not about the legend's template.
- */
-
-/**
- * The names in a `hidden-series` list.
  *
- * **Commas only**, because a column's heading may hold a space: split on
- * whitespace, `Direct sales` would hide a series called `Direct` and one
- * called `sales`. This is the value rule `writtenList` describes, and not its
- * own.
+ * **Commas only**, through `commaList`, because a column's heading may hold a
+ * space: split on whitespace, `Direct sales` would hide a series called
+ * `Direct` and one called `sales`.
  */
-export const hiddenNames = (list: string): string[] =>
-  list
-    .split(',')
-    .map((one) => one.trim())
-    .filter((one) => one !== '')
 
 /** Whether a name is in the list, matched without regard to case, as a heading is. */
 export const isHidden = (list: string, name: string): boolean => {
-  const key = name.trim().toLowerCase()
-  return hiddenNames(list).some((one) => one.toLowerCase() === key)
+  const key = seriesKey(name)
+  return commaList(list).some((one) => seriesKey(one) === key)
 }
 
 /**
@@ -31,10 +23,10 @@ export const isHidden = (list: string, name: string): boolean => {
  * space, as a person writes a list.
  */
 export const toggledNames = (list: string, name: string): string => {
-  const key = name.trim().toLowerCase()
-  const now = hiddenNames(list)
+  const key = seriesKey(name)
+  const now = commaList(list)
   const next = isHidden(list, name)
-    ? now.filter((one) => one.toLowerCase() !== key)
+    ? now.filter((one) => seriesKey(one) !== key)
     : [...now, name.trim()]
   return next.join(', ')
 }
