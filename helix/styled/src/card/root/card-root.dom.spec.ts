@@ -41,3 +41,42 @@ describe('card body text', () => {
     })
   }
 })
+
+/* The lines that hold actions, and the one gap hook every space in the card
+   follows. */
+describe('card actions and gap', () => {
+  const sheet = (): string => {
+    const card = customElements.get('helix-card') as unknown as {
+      elementStyles: Array<{ cssText: string }>
+    }
+    return card.elementStyles.map((style) => style.cssText).join('\n')
+  }
+
+  test('a line with actions lays its two ends out side by side', () => {
+    expect(sheet()).toMatch(/\[part="header-row"\],\s*\[part="footer-row"\] \{[^}]*display: flex/)
+    expect(sheet()).toMatch(
+      /\[part="footer-row"\] slot\[name="footer-actions"\]::slotted\(\*\) \{\s*margin-inline-start: auto/,
+    )
+  })
+
+  test('the gap is a hook that falls back to the step it always was', () => {
+    expect(sheet()).toContain('gap: var(--card-gap, var(--helix-space-sm))')
+  })
+
+  if (hasLayout()) {
+    test('header actions sit at the end of the header line', async () => {
+      const card = (await mount(
+        '<helix-card style="inline-size: 320px"><h3 slot="header">Storage</h3><button slot="header-actions">Menu</button>Body</helix-card>',
+      )) as Updatable
+      await card.updateComplete
+      const heading = card.querySelector('h3') as Element
+      const menu = card.querySelector('button') as Element
+      expect(Math.round(menu.getBoundingClientRect().top)).toBeLessThan(
+        Math.round(heading.getBoundingClientRect().bottom),
+      )
+      expect(menu.getBoundingClientRect().left).toBeGreaterThan(
+        heading.getBoundingClientRect().left,
+      )
+    })
+  }
+})
