@@ -41,15 +41,10 @@ export const BrandPicker = () => {
     if (!el) {
       return
     }
-    /* A gray leaves the page in ink. Moving the hue of a gray hands back the
-       same gray, and the engine makes a mid gray of a gray brand, so the page
-       would change color with nothing chosen. */
-    const sync = () => {
-      if (!c.brand && isGray(el.value)) {
-        return
-      }
-      c.setBrand(el.value)
-    }
+    /* **A gray is no brand, so a gray pick puts the page back in ink**, which
+       is how the engine reads black and white. Set as a brand, a gray turned
+       the page a mid gray. */
+    const sync = () => c.setBrand(isGray(el.value) ? '' : el.value)
     el.addEventListener('input', sync)
     el.addEventListener('change', sync)
     return () => {
@@ -60,13 +55,20 @@ export const BrandPicker = () => {
 
   /* The element owns its own value once mounted, so this only writes when the
      two have actually drifted: without the guard, echoing the value back on
-     every render fights a reader mid-drag. */
+     every render fights a reader mid-drag.
+
+     **A gray the reader picked stays in the picker until a reset.** It is what
+     put the page in ink, and a value written from outside resets the picker's
+     drag, so writing the ink over it moved the mark out from under a drag
+     through the grays. For the same reason this is the only writer: the element
+     has no `value` prop, which React would write whatever this guard said. */
   useEffect(() => {
     const el = picker.current
-    if (el && el.value !== shown) {
-      el.value = shown
+    if (!el || el.value === shown || (c.touched && !c.brand && isGray(el.value))) {
+      return
     }
-  }, [shown])
+    el.value = shown
+  }, [c.brand, c.touched, shown])
 
   return (
     /* The swatch says whether the picker is open, which the popover cannot say
@@ -90,7 +92,6 @@ export const BrandPicker = () => {
         no-value
         ref={picker}
         swatches="#3b82f6, #0b6e4f, #c2410c, #7c3aed, #be123c, #0f766e"
-        value={shown}
       ></helix-color-picker>
     </helix-popover>
   )
