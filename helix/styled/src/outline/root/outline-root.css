@@ -12,7 +12,10 @@
    over it has to cover a box edge exactly, and `overflow` clips the border area
    away. */
 [part="nav"] {
-  background-image: linear-gradient(var(--helix-color-border), var(--helix-color-border));
+  background-image: linear-gradient(
+    var(--outline-rule-color, var(--helix-color-border)),
+    var(--outline-rule-color, var(--helix-color-border))
+  );
   /* Logical, like everything else about this gutter. */
   background-position: calc((var(--outline-rail) - var(--helix-border-thin)) / 2) 0;
   background-repeat: repeat-y;
@@ -28,7 +31,7 @@
 [part="indicator"] {
   --_mark-width: var(--helix-border-thin);
 
-  background-color: var(--helix-color-primary);
+  background-color: var(--outline-indicator-color, var(--helix-color-primary));
   block-size: var(--indicator-block-size, 0);
   border-radius: var(--helix-radii-full);
   inline-size: var(--_mark-width);
@@ -74,18 +77,18 @@
 
 /* The links, back here from the base layer. */
 ::slotted(a) {
-  border-radius: var(--helix-radii-sm);
-  color: var(--helix-color-foreground-muted);
+  border-radius: var(--outline-link-radius, var(--helix-radii-sm));
+  color: var(--outline-link-color, var(--helix-color-foreground-muted));
   /* One step down from the prose it sits beside. */
-  font-size: var(--helix-text-xs);
+  font-size: var(--outline-link-font-size, var(--helix-text-xs));
   /* A step up from body weight even at rest. */
   font-weight: var(--helix-weight-medium);
   line-height: var(--helix-leading-normal);
   /* Margin rather than more padding, so the hover fill starts after the rail
      instead of covering it. */
   margin-inline-start: var(--outline-rail, var(--helix-border-thick));
-  padding-block: var(--helix-space-2xs);
-  padding-inline: var(--helix-space-sm);
+  padding-block: var(--outline-link-padding-block, var(--helix-space-2xs));
+  padding-inline: var(--outline-link-padding-inline, var(--helix-space-sm));
   text-decoration: none;
   transition:
     background-color var(--helix-duration-fast) var(--helix-easing-standard),
@@ -93,24 +96,30 @@
 }
 
 ::slotted(a):hover {
-  background-color: color-mix(in oklab, var(--helix-color-foreground) 5%, transparent);
-  color: var(--helix-color-foreground);
+  background-color: var(
+    --outline-link-hover-background-color,
+    color-mix(in oklab, var(--helix-color-foreground) 5%, transparent)
+  );
+  color: var(--outline-link-hover-color, var(--helix-color-foreground));
   text-decoration: none;
 }
 
 ::slotted(a[aria-current]) {
-  color: var(--helix-color-foreground);
+  color: var(--outline-link-current-color, var(--helix-color-foreground));
   /* One step above the rest. */
-  font-weight: var(--helix-weight-semibold);
+  font-weight: var(--outline-link-current-weight, var(--helix-weight-semibold));
 }
 
 ::slotted(a[data-level="2"]) {
-  padding-inline-start: calc(var(--helix-space-sm) + var(--outline-indent, var(--helix-space-sm)));
+  padding-inline-start: calc(
+    var(--outline-link-padding-inline, var(--helix-space-sm)) +
+    var(--outline-indent, var(--helix-space-sm))
+  );
 }
 
 ::slotted(a[data-level="3"]) {
   padding-inline-start: calc(
-    var(--helix-space-sm) +
+    var(--outline-link-padding-inline, var(--helix-space-sm)) +
     2 *
     var(--outline-indent, var(--helix-space-sm))
   );
@@ -118,7 +127,7 @@
 
 ::slotted(a[data-level="4"]) {
   padding-inline-start: calc(
-    var(--helix-space-sm) +
+    var(--outline-link-padding-inline, var(--helix-space-sm)) +
     3 *
     var(--outline-indent, var(--helix-space-sm))
   );
@@ -126,7 +135,7 @@
 
 ::slotted(a[data-level="5"]) {
   padding-inline-start: calc(
-    var(--helix-space-sm) +
+    var(--outline-link-padding-inline, var(--helix-space-sm)) +
     4 *
     var(--outline-indent, var(--helix-space-sm))
   );
@@ -134,7 +143,7 @@
 
 ::slotted(a[data-level="6"]) {
   padding-inline-start: calc(
-    var(--helix-space-sm) +
+    var(--outline-link-padding-inline, var(--helix-space-sm)) +
     5 *
     var(--outline-indent, var(--helix-space-sm))
   );
@@ -144,13 +153,16 @@
    lined up with theirs past the rail. Its own margins go, since a heading's
    are the page's rhythm and this one sits in a rail. */
 ::slotted([slot="heading"]) {
-  color: var(--helix-color-foreground);
+  color: var(--outline-heading-color, var(--helix-color-foreground));
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-semibold);
   line-height: var(--helix-leading-normal);
   margin-block: 0 var(--helix-space-xs);
   margin-inline: 0;
-  padding-inline-start: calc(var(--outline-rail) + var(--helix-space-sm));
+  padding-inline-start: calc(
+    var(--outline-rail) +
+    var(--outline-link-padding-inline, var(--helix-space-sm))
+  );
 }
 
 /* Print: a table of contents, which is what paper invented. */

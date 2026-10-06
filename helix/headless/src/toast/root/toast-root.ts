@@ -1,5 +1,6 @@
 import {
   customElement,
+  DelayController,
   deepActiveElement,
   deepContains,
   FocusScopeController,
@@ -10,8 +11,9 @@ import {
   scrollHolders,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { property, state } from 'lit/decorators.js'
 import { matchesHotkey, parseHotkey } from '../hotkey.js'
+import { messageWords } from '../words.js'
 
 /**
  * @summary The region that holds toast messages, and the only element that announces them.
@@ -22,10 +24,15 @@ import { matchesHotkey, parseHotkey } from '../hotkey.js'
  * announce a region that arrives already holding its message. `Radio.Group` is
  * part of its family for the same reason.
  *
- * **The region is a landmark named by `label`, and a polite live region.** A
- * `danger` message is announced assertively, and every other one politely.
- * Each message is an `alertdialog` named by its words, so a reader who moves
- * into the stack hears which message they are on.
+ * **The region is a landmark named by `label`, and it says each message once
+ * as it arrives**: a `danger` message assertively, and every other one
+ * politely. It says the word for the tone, the heading, the description and
+ * the text, and not the actions, through two live regions of its own, the
+ * `live` parts, which it empties again a moment later. The stack itself is not
+ * a live region, so a message is never said twice, and changing the words of a
+ * message already showing says nothing. Each message is an `alertdialog` named
+ * by its words, so a reader who moves into the stack hears which message they
+ * are on.
  *
  * **`hotkey` takes focus to the stack and back**, F8 unless you set it, and
  * `label` says which key: `{hotkey}` in it is filled in, so the default name
@@ -67,6 +74,7 @@ import { matchesHotkey, parseHotkey } from '../hotkey.js'
  *
  * @event {HelixDismissEvent} helix-dismiss - A message is being dismissed, by its control or by its timer. The message sends it, and you can listen for it on the region. Cancelable: canceling it keeps the message.
  *
+ * @csspart live - The two regions that say each message as it arrives, a polite `status` and an assertive `alert`, inside the stack. Empty at rest, and hide them with the standard clip, never `display: none`.
  * @csspart region - The stack the messages are in. It is in the top layer while a message shows, and takes focus from `hotkey` where no message holds a control.
  */
 @customElement('helix-headless-toast')
@@ -127,20 +135,78 @@ export class HelixHeadlessToast extends HelixElement {
        written onto the host as an attribute a server's markup never had. */
     /* A landmark, so a reader finds the stack among the page's regions, and a
        live region as well, which a region may be. */
+    /* **A landmark and not a live region.** The stack was a polite one and a
+       `danger` message an assertive one inside it, so a danger message was
+       news to both and could be said twice. The two `live` parts say each
+       arrival once instead, in the voice its tone asks for. */
     hostAria(this.internals, {
       label: fillTemplate(this.label, { hotkey: this.hotkey }),
       role: 'region',
     })
-    this.internals.ariaLive = 'polite'
-    /* Additions are what a reader needs; a message going away is not news, and
-       announcing removals means every dismissal is read out. */
-    this.internals.ariaRelevant = 'additions'
-    /* `role="status"` carries an implicit `aria-atomic="true"`, which means the
-       whole region is re-read whenever any part of it changes. With a stack of
-       four, the fifth arrival announces all five. `additions` alone does not
-       help: it says which mutations count, not how much is read out when one
-       does. Both are needed, and only one was here. */
-    this.internals.ariaAtomic = 'false'
+  }
+
+  /** What the polite region is saying. */
+  @state()
+  private said = ''
+
+  /** What the assertive region is saying. */
+  @state()
+  private urgent = ''
+
+  /* The regions are emptied a moment after they speak, so a reader moving
+     through the stack meets each message once, in the message. */
+  private readonly hush = new DelayController(this, { renders: false })
+
+  /**
+   * Says messages that have just arrived, each once, `danger` ones assertively.
+   *
+   * Emptied first and filled a frame later, so a message with the same words
+   * as the one before is still a change, and so a region the stack has just
+   * shown is in the accessibility tree before its words land.
+   */
+  private announce(arrived: readonly HTMLElement[]): void {
+    const urgent = arrived.filter(isDanger).map(messageWords).join(' ')
+    const said = arrived
+      .filter((one) => !isDanger(one))
+      .map(messageWords)
+      .join(' ')
+    if (said.trim() === '' && urgent.trim() === '') {
+      return
+    }
+    this.said = ''
+    this.urgent = ''
+    const fill = (): void => {
+      this.said = said
+      this.urgent = urgent
+      this.hush.start(1000, () => {
+        this.said = ''
+        this.urgent = ''
+      })
+    }
+    if (typeof requestAnimationFrame === 'function') {
+      requestAnimationFrame(fill)
+    } else {
+      fill()
+    }
+  }
+
+  /**
+   * Says the messages that have just arrived: through the regions, or through
+   * `ariaNotify` where a modal dialog has made them inert.
+   */
+  private tell(added: readonly Node[]): void {
+    const showing = this.showing
+    const arrived = added.filter(
+      (one): one is HTMLElement => one instanceof HTMLElement && showing.includes(one),
+    )
+    if (arrived.length === 0) {
+      return
+    }
+    if (this.blocked()) {
+      this.notify(arrived)
+    } else {
+      this.announce(arrived)
+    }
   }
 
   /** The element focus came from when it entered the stack. */
@@ -284,9 +350,6 @@ export class HelixHeadlessToast extends HelixElement {
     if (!open || blocked) {
       region.showPopover()
     }
-    if (blocked) {
-      this.notify(arrived)
-    }
   }
 
   /**
@@ -332,14 +395,16 @@ export class HelixHeadlessToast extends HelixElement {
    * as it did before.
    */
   private notify(arrived: readonly HTMLElement[]): void {
-    const speaker = document as Document & { ariaNotify?: (announcement: string) => void }
+    const speaker = document as Document & {
+      ariaNotify?: (announcement: string, options?: { priority?: 'high' | 'normal' }) => void
+    }
     if (typeof speaker.ariaNotify !== 'function') {
       return
     }
     for (const one of arrived) {
-      const words = (one.textContent ?? '').replace(/\s+/gu, ' ').trim()
+      const words = messageWords(one)
       if (words !== '') {
-        speaker.ariaNotify(words)
+        speaker.ariaNotify(words, { priority: isDanger(one) ? 'high' : 'normal' })
       }
     }
   }
@@ -405,7 +470,9 @@ export class HelixHeadlessToast extends HelixElement {
     this.addEventListener('helix-dismiss', this.handleDismiss)
     document.addEventListener('keydown', this.handleHotkey)
     this.watcher = new MutationObserver((records) => {
-      this.place(records.flatMap((record) => [...record.addedNodes]))
+      const added = records.flatMap((record) => [...record.addedNodes])
+      this.place(added)
+      this.tell(added)
       this.sweep()
     })
     this.watcher.observe(this, {
@@ -434,9 +501,15 @@ export class HelixHeadlessToast extends HelixElement {
   }
 
   protected override render(): TemplateResult {
-    return html`<div part="region" popover="manual" tabindex="-1"><slot></slot></div>`
+    /* The regions inside the stack, so they are in the top layer with it and
+       take no place on the page. */
+    return html`<div part="region" popover="manual" tabindex="-1"><slot></slot><span part="live" role="status">${this.said}</span><span part="live" role="alert">${this.urgent}</span></div>`
   }
 }
+
+/** Whether a message is a `danger` one, which is said assertively. */
+const isDanger = (item: HTMLElement): boolean =>
+  ((item as HTMLElement & { tone?: string }).tone ?? item.getAttribute('tone')) === 'danger'
 
 /** Whether a popover is showing, asked where the selector may not parse. */
 const popoverOpen = (region: HTMLElement): boolean => {

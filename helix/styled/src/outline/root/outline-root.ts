@@ -28,8 +28,20 @@ import { styles } from './outline-root.css.js'
  * @aliases Table of contents, On this page, Outline
  * @documentation https://fusion.dev/helix/components/outline
  *
+ * @cssproperty --outline-heading-color - The color of the heading in the `heading` slot.
  * @cssproperty --outline-indent - How far each level is inset from the one above.
+ * @cssproperty --outline-indicator-color - The color of the mark that moves to the section in view.
+ * @cssproperty --outline-link-color - The color of a link.
+ * @cssproperty --outline-link-current-color - The color of the link to the section in view.
+ * @cssproperty --outline-link-current-weight - The weight of the link to the section in view.
+ * @cssproperty --outline-link-font-size - The size of a link's text.
+ * @cssproperty --outline-link-hover-background-color - The fill behind a link under the pointer.
+ * @cssproperty --outline-link-hover-color - The color of a link under the pointer.
+ * @cssproperty --outline-link-padding-block - The space above and below a link's text.
+ * @cssproperty --outline-link-padding-inline - The space either side of a link's text, before any indent.
+ * @cssproperty --outline-link-radius - The corner radius of a link's hover fill.
  * @cssproperty --outline-rail - The width of the gutter that holds the line and the moving mark.
+ * @cssproperty --outline-rule-color - The color of the line down the leading edge.
  */
 @customElement('helix-outline')
 export class HelixOutline extends HelixHeadlessOutline {

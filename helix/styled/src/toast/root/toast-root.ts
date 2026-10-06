@@ -1,6 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessToast } from '@fusion.dev/helix-headless/toast'
 import type { CSSResultGroup } from 'lit'
+import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './toast-root.css.js'
 
 /**
@@ -31,7 +32,7 @@ export class HelixToast extends HelixHeadlessToast {
      headless message. */
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [liveStyles, styles]
 }
 
 declare global {
