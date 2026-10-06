@@ -39,7 +39,12 @@
   background-color: transparent;
   box-sizing: border-box;
   cursor: col-resize;
+  /* A grid, so a slotted handle sits at the middle of the line whichever way
+     the line runs. The line and the grip are drawn by pseudo-elements, which
+     are positioned and take no cell. */
+  display: grid;
   flex: none;
+  place-items: center;
   inline-size: var(--splitter-target, var(--helix-space-xs));
   margin-inline: calc(var(--splitter-target, var(--helix-space-xs)) / -2);
   position: relative;
@@ -57,10 +62,10 @@
 [part="separator"]::before {
   background-color: var(--splitter-color, var(--helix-color-border));
   content: "";
-  inline-size: var(--helix-border-thin);
+  inline-size: var(--splitter-thickness, var(--helix-border-thin));
   inset-block: 0;
   inset-inline-start: 50%;
-  margin-inline-start: calc(var(--helix-border-thin) / -2);
+  margin-inline-start: calc(var(--splitter-thickness, var(--helix-border-thin)) / -2);
   position: absolute;
   transition:
     background-color var(--helix-duration-fast) var(--helix-easing-standard),
@@ -76,11 +81,11 @@
 }
 
 :host(:is([orientation="vertical"], [data-axis="vertical"])) [part="separator"]::before {
-  block-size: var(--helix-border-thin);
+  block-size: var(--splitter-thickness, var(--helix-border-thin));
   inline-size: auto;
   inset-block-start: 50%;
   inset-inline: 0;
-  margin-block-start: calc(var(--helix-border-thin) / -2);
+  margin-block-start: calc(var(--splitter-thickness, var(--helix-border-thin)) / -2);
   transition:
     background-color var(--helix-duration-fast) var(--helix-easing-standard),
     block-size var(--helix-duration-fast) var(--helix-easing-standard);
@@ -112,7 +117,7 @@
 :host(:not([variant="grip"])) [part="separator"]:focus-visible::before,
 :host(:not([variant="grip"])) [part="separator"][data-dragging]::before {
   background-color: var(--splitter-hover-color, var(--helix-color-foreground-muted));
-  inline-size: var(--helix-border-thick);
+  inline-size: var(--splitter-hover-thickness, var(--helix-border-thick));
 }
 
 /* *And a divider that is actually moving goes primary.** Hover is a question and
@@ -127,7 +132,7 @@
   [part="separator"]:focus-visible::before,
 :host(:is([orientation="vertical"], [data-axis="vertical"]):not([variant="grip"]))
   [part="separator"][data-dragging]::before {
-  block-size: var(--helix-border-thick);
+  block-size: var(--splitter-hover-thickness, var(--helix-border-thick));
   inline-size: auto;
 }
 
@@ -207,16 +212,24 @@
 :host([variant="grip"]:not(:is([orientation="vertical"], [data-axis="vertical"])))
 [part="separator"]::after {
   block-size: var(--splitter-grip-length, 2rem);
-  inline-size: var(--helix-border-thick);
+  inline-size: var(--splitter-grip-thickness, var(--helix-border-thick));
   inset-block-start: calc(50% - var(--splitter-grip-length, 2rem) / 2);
-  inset-inline-start: calc(50% - var(--helix-border-thick) - var(--helix-space-2xs));
+  inset-inline-start: calc(
+    50% -
+    var(--splitter-grip-thickness, var(--helix-border-thick)) -
+    var(--helix-space-2xs)
+  );
 }
 
 :host([variant="grip"]:is([orientation="vertical"], [data-axis="vertical"]))
   [part="separator"]::after {
-  block-size: var(--helix-border-thick);
+  block-size: var(--splitter-grip-thickness, var(--helix-border-thick));
   inline-size: var(--splitter-grip-length, 2rem);
-  inset-block-start: calc(50% - var(--helix-border-thick) - var(--helix-space-2xs));
+  inset-block-start: calc(
+    50% -
+    var(--splitter-grip-thickness, var(--helix-border-thick)) -
+    var(--helix-space-2xs)
+  );
   inset-inline-start: calc(50% - var(--splitter-grip-length, 2rem) / 2);
 }
 
@@ -232,6 +245,14 @@
    pair to read as one gesture. */
 :host([variant="grip"]) [part="separator"][data-dragging]::after {
   background-color: var(--splitter-drag-color, var(--helix-color-primary));
+}
+
+/* A mark the page slots at the middle of the line, such as a grip icon. Above
+   the line, and no target of its own: the press is the divider's. */
+::slotted([slot="handle"]) {
+  color: var(--splitter-handle-color, var(--helix-color-foreground-muted));
+  pointer-events: none;
+  position: relative;
 }
 
 /* Out of the pointer's way while the divider moves. */

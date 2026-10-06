@@ -42,8 +42,12 @@ import { styles } from './splitter-root.css.js'
  * @cssproperty --splitter-drag-color - Color of the line while it is being moved.
  * @cssproperty --splitter-grip-color - Color of the grip beside the line, when the grip is shown.
  * @cssproperty --splitter-grip-length - How far the grip runs along the divider.
+ * @cssproperty --splitter-grip-thickness - How thick the grip is, across the divider.
+ * @cssproperty --splitter-handle-color - Color of a mark slotted into `handle`.
  * @cssproperty --splitter-hover-color - Color of the divider's target under the pointer.
+ * @cssproperty --splitter-hover-thickness - How thick the line is under the pointer, with focus and while it moves.
  * @cssproperty --splitter-target - Width of the area you can drag.
+ * @cssproperty --splitter-thickness - How thick the line is at rest.
  */
 @customElement('helix-splitter')
 export class HelixSplitter extends HelixHeadlessSplitter {

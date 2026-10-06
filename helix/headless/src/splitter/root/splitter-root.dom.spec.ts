@@ -805,6 +805,19 @@ describe('splitter under a consumer that owns the position', () => {
     expect(heard).toEqual(['input 30', 'resized 30'])
   })
 
+  /* A range input sends `input` for a key as well; a keyboard step sent only
+     `helix-resized`, so a page laying out with the panes missed every key. */
+  test('says a key step and a double click as input, before the settling', async () => {
+    const host = await splitter('default-position="50" step="5"')
+    const heard: string[] = []
+    host.addEventListener('input', () => heard.push(`input ${host.position}`))
+    host.addEventListener('helix-resized', () => heard.push(`resized ${host.position}`))
+    await press(host, 'ArrowRight')
+    separator(host).dispatchEvent(new MouseEvent('dblclick', { bubbles: true }))
+    await host.updateComplete
+    expect(heard).toEqual(['input 55', 'resized 55', 'input 50', 'resized 50'])
+  })
+
   test('a splitter whose markup declared a position can still be dragged', async () => {
     /* A declared `position` is a seed, not a claim of ownership: there is
        nothing to defer to, and the drag applies like any other change.
@@ -1230,5 +1243,26 @@ describe('the channel between two splitters', () => {
     )) as HTMLElement & Record<string, unknown>
     expect(host.cross).toBeUndefined()
     expect(host.uncross).toBeUndefined()
+  })
+})
+
+/* Only `dragging` was a state; a shut pane and a turned axis were attributes,
+   and `auto` turning said so only through `data-axis`. */
+describe('splitter states and handle', () => {
+  test('says a shut pane and a column of panes as states', async () => {
+    const host = await splitter('default-collapsed="start" orientation="vertical"')
+    expect([hasState(host, 'collapsed'), hasState(host, 'vertical')]).toEqual([true, true])
+    const open = await splitter()
+    expect([hasState(open, 'collapsed'), hasState(open, 'vertical')]).toEqual([false, false])
+  })
+
+  /* Web Awesome's split panel takes a slotted handle on its divider. */
+  test('draws a slotted handle inside the divider, where a press on it is a press on the divider', async () => {
+    const host = (await mount(`<helix-headless-splitter>
+      <div slot="start">one</div><div slot="end">two</div><span slot="handle">grip</span>
+    </helix-headless-splitter>`)) as Splitter
+    await host.updateComplete
+    const slot = separator(host).querySelector('slot[name="handle"]') as HTMLSlotElement
+    expect(slot.assignedElements().map((one) => one.textContent)).toEqual(['grip'])
   })
 })

@@ -30,4 +30,22 @@ describe('splitter appearance', () => {
     expect(interest).toBeGreaterThan(-1)
     expect(accent).toBeGreaterThan(interest)
   })
+
+  /* The line's thickness at rest and under interest, the grip's, and a slotted
+     handle's color were fixed values. */
+  test('the line, the grip and the handle read their hooks', () => {
+    const declared = (customElements.get('helix-splitter') as unknown as { styles: unknown }).styles
+    const sheet = (Array.isArray(declared) ? declared : [declared])
+      .flat(Number.POSITIVE_INFINITY)
+      .map((one) => String((one as { cssText?: string }).cssText ?? ''))
+      .join('\n')
+    for (const hook of [
+      '--splitter-grip-thickness',
+      '--splitter-handle-color',
+      '--splitter-hover-thickness',
+      '--splitter-thickness',
+    ]) {
+      expect(sheet).toMatch(new RegExp(`var\\(\\s*${hook},`))
+    }
+  })
 })
