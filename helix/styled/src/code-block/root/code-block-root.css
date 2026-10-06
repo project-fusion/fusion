@@ -8,7 +8,11 @@
      as far from the end as from the top. At `size-control` and a `2xs` inset it
      sat 2.25px below that line and filled a one-line block to within 2px of
      either edge. */
-  --_code-block-line: calc(var(--helix-text-sm) * var(--helix-leading-normal));
+  /* The code's type, which the gutter's numbers share so they stay level. */
+  --_code-block-size: var(--code-block-font-size, var(--helix-text-sm));
+  --_code-block-leading: var(--code-block-line-height, var(--helix-leading-normal));
+  --_code-block-face: var(--code-block-font-family, var(--helix-font-mono));
+  --_code-block-line: calc(var(--_code-block-size) * var(--_code-block-leading));
   --_code-block-copy-inset: calc(
     var(--helix-space-sm) +
     (var(--_code-block-line) - var(--helix-size-control-sm)) /
@@ -62,7 +66,7 @@
    below is the only thing here that is code. A long path wraps rather than
    pushing the copy button off the end of the bar. */
 [part="label"] {
-  color: var(--helix-color-foreground-muted);
+  color: var(--code-block-label-color, var(--helix-color-foreground-muted));
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-medium);
@@ -125,10 +129,10 @@
 }
 
 [part="code"] {
-  color: var(--helix-color-foreground);
-  font-family: var(--helix-font-mono);
-  font-size: var(--helix-text-sm);
-  line-height: var(--helix-leading-normal);
+  color: var(--code-block-color, var(--helix-color-foreground));
+  font-family: var(--_code-block-face);
+  font-size: var(--_code-block-size);
+  line-height: var(--_code-block-leading);
 }
 
 /* **The code scrolls, not the block.** Scrolled by the `<pre>`, a long line ran
@@ -191,10 +195,10 @@
 
 [part="gutter"] {
   color: var(--code-block-gutter-color, var(--helix-color-foreground-subtle));
-  font-family: var(--helix-font-mono);
-  font-size: var(--helix-text-sm);
+  font-family: var(--_code-block-face);
+  font-size: var(--_code-block-size);
   font-variant-numeric: tabular-nums;
-  line-height: var(--helix-leading-normal);
+  line-height: var(--_code-block-leading);
   text-align: end;
   user-select: none;
 }
@@ -308,7 +312,7 @@
 [part="added"] {
   background-color: color-mix(
     in srgb,
-    var(--helix-color-success) 14%,
+    var(--code-block-added-color, var(--helix-color-success)) 14%,
     var(--code-block-background-color, var(--helix-color-background))
   );
 }
@@ -316,7 +320,7 @@
 [part="removed"] {
   background-color: color-mix(
     in srgb,
-    var(--helix-color-danger) 14%,
+    var(--code-block-removed-color, var(--helix-color-danger)) 14%,
     var(--code-block-background-color, var(--helix-color-background))
   );
 }
@@ -330,11 +334,19 @@
    page and no further, so on its own wash the `+` measured 4.5:1 against a 4.5
    target; mixed toward the foreground it stays the tone and clears the floor. */
 [part="added"] [part="marker"] {
-  color: color-mix(in oklab, var(--helix-color-success) 55%, var(--helix-color-foreground));
+  color: color-mix(
+    in oklab,
+    var(--code-block-added-color, var(--helix-color-success)) 55%,
+    var(--helix-color-foreground)
+  );
 }
 
 [part="removed"] [part="marker"] {
-  color: color-mix(in oklab, var(--helix-color-danger) 55%, var(--helix-color-foreground));
+  color: color-mix(
+    in oklab,
+    var(--code-block-removed-color, var(--helix-color-danger)) 55%,
+    var(--helix-color-foreground)
+  );
 }
 
 /* *One line tall, which its content cannot make it.** A filler holds only the
