@@ -13,7 +13,7 @@ import {
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { matchesHotkey, parseHotkey } from '../hotkey.js'
-import { messageWords } from '../words.js'
+import { joinSaid, messageWords } from '../words.js'
 
 /**
  * @summary The region that holds toast messages, and the only element that announces them.
@@ -158,26 +158,45 @@ export class HelixHeadlessToast extends HelixElement {
   private readonly hush = new DelayController(this, { renders: false })
 
   /**
+   * Words waiting for the next frame: the polite ones and the urgent ones.
+   *
+   * Collected rather than written straight in, because the accessibility tree
+   * is built once a frame: two messages that arrive in separate tasks of one
+   * frame would otherwise each overwrite the region, and only the second
+   * would be heard.
+   */
+  private readonly pending: { said: string[]; urgent: string[] } = { said: [], urgent: [] }
+
+  /** Whether a frame is already coming to say what is pending. */
+  private filling = false
+
+  /**
    * Says messages that have just arrived, each once, `danger` ones assertively.
    *
    * Emptied first and filled a frame later, so a message with the same words
    * as the one before is still a change, and so a region the stack has just
-   * shown is in the accessibility tree before its words land.
+   * shown is in the accessibility tree before its words land. Every message
+   * that arrives before that frame is said in it, each as its own sentence.
    */
   private announce(arrived: readonly HTMLElement[]): void {
-    const urgent = arrived.filter(isDanger).map(messageWords).join(' ')
-    const said = arrived
-      .filter((one) => !isDanger(one))
-      .map(messageWords)
-      .join(' ')
-    if (said.trim() === '' && urgent.trim() === '') {
+    for (const one of arrived) {
+      const words = messageWords(one)
+      if (words !== '') {
+        ;(isDanger(one) ? this.pending.urgent : this.pending.said).push(words)
+      }
+    }
+    if (this.filling || (this.pending.said.length === 0 && this.pending.urgent.length === 0)) {
       return
     }
+    this.filling = true
     this.said = ''
     this.urgent = ''
     const fill = (): void => {
-      this.said = said
-      this.urgent = urgent
+      this.filling = false
+      this.said = joinSaid(this.pending.said)
+      this.urgent = joinSaid(this.pending.urgent)
+      this.pending.said = []
+      this.pending.urgent = []
       this.hush.start(1000, () => {
         this.said = ''
         this.urgent = ''
