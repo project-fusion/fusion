@@ -274,22 +274,7 @@ export class HelixHeadlessFormatDate extends HelixElement {
 
   /** Every `Intl.DateTimeFormat` option a consumer set, and none they did not. */
   private get options(): Intl.DateTimeFormatOptions {
-    return formatOptions({
-      dateOnly: this.dateOnly,
-      dateStyle: this.dateStyle,
-      day: this.day,
-      era: this.era,
-      hour: this.hour,
-      hourCycle: this.hourCycle,
-      minute: this.minute,
-      month: this.month,
-      second: this.second,
-      timeStyle: this.timeStyle,
-      timeZone: this.timeZone,
-      timeZoneName: this.timeZoneName,
-      weekday: this.weekday,
-      year: this.year,
-    })
+    return formatOptions(this, this.dateOnly)
   }
 
   /** Whether the reading is how long ago rather than the date. */

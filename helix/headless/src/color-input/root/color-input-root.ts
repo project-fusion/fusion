@@ -119,6 +119,8 @@ import '../../color-picker/index.js'
  * @csspart picker-swatch - One preset.
  * @csspart picker-swatches - The row of presets.
  * @csspart picker-value - The text field that holds the color. It accepts a typed or pasted color.
+ * @csspart picker-wheel - The hue ring round the square, with `wheel`.
+ * @csspart picker-wheel-hue - The range input behind the hue ring.
  * @csspart preview - The chip showing the color, inside the trigger.
  * @csspart surface - The floating panel.
  * @csspart trigger - The control that opens the panel.
@@ -261,6 +263,13 @@ export class HelixHeadlessColorInput extends MixinPickerField(
    */
   @property({ reflect: true })
   variant?: 'swatch'
+
+  /**
+   * Draws the panel's hue as a wheel around the square, in place of the hue
+   * ramp. See Color Picker's `wheel`.
+   */
+  @property({ reflect: true, type: Boolean })
+  wheel = false
 
   /**
    * The last value that was a color.
@@ -462,10 +471,12 @@ export class HelixHeadlessColorInput extends MixinPickerField(
         format-button: picker-format-button, format-live: picker-format-live, format-text: picker-format-text, grid: picker-grid,
         grid-brightness: picker-grid-brightness, grid-handle: picker-grid-handle,
         grid-saturation: picker-grid-saturation, icon: picker-icon, sample: picker-sample,
-        swatch: picker-swatch, swatches: picker-swatches, value: picker-value"
+        swatch: picker-swatch, swatches: picker-swatches, value: picker-value,
+        wheel: picker-wheel, wheel-hue: picker-wheel-hue"
       ?invalid=${this.resolvedFeedback !== ''}
       .feedback=${this.resolvedFeedback}
       ?alpha=${this.alpha}
+      ?wheel=${this.wheel}
       ?channel-fields=${this.channelFields}
       ?no-format=${this.noFormat}
       ?no-value=${this.variant !== 'swatch'}

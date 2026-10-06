@@ -48,6 +48,8 @@ import { styles } from './color-picker-root.css.js'
  * @cssproperty --color-picker-padding - The inset of the rows under the square and of the picker's bottom edge.
  * @cssproperty --color-picker-sample-size - The width and height of the chip that copies the value.
  * @cssproperty --color-picker-swatch-size - The width and height of one preset.
+ * @cssproperty --color-picker-wheel-size - The widest the hue ring draws, with `wheel`. The picker's width by default.
+ * @cssproperty --color-picker-wheel-thickness - The width of the hue ring's band, with `wheel`.
  */
 @customElement('helix-color-picker')
 export class HelixColorPicker extends HelixHeadlessColorPicker {
