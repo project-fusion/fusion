@@ -18,8 +18,17 @@ const sheet = (): string => {
     .join('\n')
 }
 
-/** The declarations of the first rule written for `selector`. */
-const rule = (selector: string): string => sheet().split(`${selector} {`)[1]?.split('}')[0] ?? ''
+/** The declarations of the first rule whose selector list names `selector`. */
+const rule = (selector: string): string => {
+  for (const block of sheet().split('}')) {
+    const pieces = block.split('{')
+    const head = pieces.at(-2) ?? ''
+    if (head.split(',').some((one) => one.trim() === selector)) {
+      return pieces.at(-1) ?? ''
+    }
+  }
+  return ''
+}
 
 describe('trend', () => {
   test('draws the arrow through the shared glyph sheet, which arrives with this one', async () => {
@@ -51,6 +60,21 @@ describe('trend', () => {
       '--_trend-color: var(--trend-worse-color, var(--helix-color-danger))',
     )
     expect(sheet()).not.toContain('[direction=')
+  })
+
+  /* A served page has this sheet before the script runs and no state yet, so
+     a served trend that was good news drew gray and turned green on
+     hydration. The attribute pairs stand in until the element is defined. */
+  test('a served trend is judged by its attributes before the element upgrades', () => {
+    const better = '--_trend-color: var(--trend-better-color, var(--helix-color-success))'
+    const worse = '--_trend-color: var(--trend-worse-color, var(--helix-color-danger))'
+    expect(rule(':host(:not(:defined)[good="up"][movement="up"])')).toContain(better)
+    expect(rule(':host(:not(:defined)[good="down"][movement="down"])')).toContain(better)
+    expect(rule(':host(:not(:defined)[good="up"][movement="down"])')).toContain(worse)
+    expect(rule(':host(:not(:defined)[good="down"][movement="up"])')).toContain(worse)
+    for (const selector of sheet().match(/:host\([^{,]*\[good=[^{,]*\)/g) ?? []) {
+      expect(selector).toContain(':not(:defined)')
+    }
   })
 
   test('the direction word is out of sight and still in the tree', () => {

@@ -3,6 +3,7 @@ import { arrowDown, arrowUp, minus } from '@fusion.dev/helix-icons'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
+import { figureOf, movementOf } from '../figure.js'
 
 /**
  * The three ways a measurement can have moved, how each is drawn, and the
@@ -47,6 +48,12 @@ const readDirection = (value: string | undefined): (typeof DIRECTIONS)[Direction
  * `worse-label`, so a page in another language can set its own. The arrow and
  * any glyph slotted in its place are hidden from screen readers.
  *
+ * **Or give the change as a number.** `value` is the signed change, such as
+ * `0.12` or `-8`: its sign is the movement, and its size is written as the
+ * metric with `Intl.NumberFormat`, in `locale` and with `format-options`,
+ * such as `{"style":"percent"}` for `12%`. `movement` still wins when it is
+ * written. Without `value` the metric is what the page slots.
+ *
  * Slot one glyph per movement into `up-icon`, `down-icon` and `neutral-icon`,
  * and the trend shows the one that matches; a glyph in `icon` stands in for
  * all three. Inside a `Stat`, put the trend in the stat's `trend` slot so it is
@@ -62,7 +69,7 @@ const readDirection = (value: string | undefined): (typeof DIRECTIONS)[Direction
  * @aliases Delta, Change, Movement
  * @documentation https://fusion.dev/helix/components/trend
  *
- * @slot - The metric that moved.
+ * @slot - The metric that moved. Not needed with `value`, which writes it.
  * @slot down-icon - Replaces the arrow while `movement` is `down`. Hidden from screen readers.
  * @slot icon - Replaces the arrow for every movement, such as with a glyph of your own set. Hidden from screen readers, since the movement is also a word.
  * @slot label - The period the metric moved over.
@@ -71,6 +78,7 @@ const readDirection = (value: string | undefined): (typeof DIRECTIONS)[Direction
  *
  * @csspart direction - The movement as a word, for people who cannot see the arrow.
  * @csspart icon - The arrow.
+ * @csspart value - The change written from `value`, hidden while `value` is no number.
  *
  * @cssstate better - The trend moved the way `good` names.
  * @cssstate worse - The trend moved against the way `good` names.
@@ -100,6 +108,22 @@ export class HelixHeadlessTrend extends HelixElement {
   downLabel = 'Down'
 
   /**
+   * `Intl.NumberFormat` options `value` is written with, as React Aria's
+   * NumberField takes them: a percent, a currency, a unit or a number of
+   * decimals. Written as JSON in the attribute.
+   *
+   * ```html
+   * <helix-trend value="-0.084" format-options='{"style":"percent","maximumFractionDigits":1}'></helix-trend>
+   * ```
+   *
+   * The example says "Down 8.4%". The size is written without a sign, since
+   * the arrow and the word say which way; set `signDisplay` for one. Absent
+   * writes the number as the locale writes any number.
+   */
+  @property({ attribute: 'format-options', type: Object })
+  formatOptions?: Intl.NumberFormatOptions
+
+  /**
    * Which movement counts as an improvement for this metric.
    *
    * Absent states the movement without judging it, which is the honest default:
@@ -109,6 +133,15 @@ export class HelixHeadlessTrend extends HelixElement {
    */
   @property({ reflect: true })
   good?: 'down' | 'up'
+
+  /**
+   * The locale `value` is written in, such as `de` for `1.234,5`.
+   *
+   * Absent uses the runtime's own. Set it on a page rendered on a server, so
+   * the server and the browser write the figure alike.
+   */
+  @property()
+  locale = ''
 
   /**
    * Which way the measurement moved.
@@ -134,6 +167,18 @@ export class HelixHeadlessTrend extends HelixElement {
    */
   @property({ attribute: 'up-label' })
   upLabel = 'Up'
+
+  /**
+   * The change as a signed number, such as `0.12` or `-8`, which sets the
+   * movement by its sign and is written as the metric.
+   *
+   * Above zero is up, below is down, and zero is neutral; `movement` wins when
+   * both are written. The size is written in the `value` part with
+   * `format-options` and `locale`, in place of a slotted metric. Absent leaves
+   * the movement to `movement` and the metric to the slot.
+   */
+  @property({ type: Number })
+  value?: number
 
   /**
    * The word read out after the direction when the move is a setback.
@@ -172,9 +217,9 @@ export class HelixHeadlessTrend extends HelixElement {
     >`
   }
 
-  /** The movement, read from `movement` and then from the old `direction`. */
+  /** The movement, read from `movement`, then from the old `direction`, then from the sign of `value`. */
   private get moved(): 'down' | 'neutral' | 'up' | undefined {
-    return this.movement ?? this.direction
+    return this.movement ?? this.direction ?? movementOf(this.value)
   }
 
   /** Better or worse, or neither when `good` is unset or nothing moved. */
@@ -218,9 +263,23 @@ export class HelixHeadlessTrend extends HelixElement {
        Lit SSR writes a `<!--lit-part-->` marker around every binding, and two
        bindings put a pair of comments between "Up" and ", worse" in the served
        markup, which a spec then cannot assert in one string. */
+    /* The figure before the slot the metric arrives through, where a slotted
+       one would be, and hidden without a number, so a trend with none draws
+       what it always did.
+
+       **Always rendered, and hidden, rather than rendered only for a
+       number.** A conditional is a child part, and Lit marks one with a
+       comment; Chromium leaves the space out of a name where a comment
+       stands between the space and the next element, so a trend inside a
+       button was named "Down, worse8.4%". */
+    const value = this.value
+    const figure =
+      value === undefined || !Number.isFinite(value)
+        ? ''
+        : figureOf(value, this.locale, this.formatOptions)
     return html`${glyph}
       <span part="direction">${`${this[direction.word]}${judgment}`}</span>
-      <slot></slot>
+      <span part="value" ?hidden=${figure === ''}>${figure}</span><slot></slot>
       <slot name="label"></slot>`
   }
 }

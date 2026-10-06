@@ -206,3 +206,70 @@ describe('an icon per movement', () => {
     expect(arrow(await trend('movement="down"'))).toBe('arrow-down')
   })
 })
+
+/* RAC's NumberField and Meter take a number and `formatOptions`; a trend took
+   only a word for the movement and a metric the page wrote out. */
+describe('value', () => {
+  type Trend = Updatable & {
+    formatOptions?: Intl.NumberFormatOptions
+    internals: ElementInternals
+    locale: string
+    value?: number
+  }
+  const figure = (host: HTMLElement): string | null => {
+    const shown = part(host, 'value') as HTMLElement | null
+    return shown && !shown.hidden ? (shown.textContent ?? '') : null
+  }
+
+  test('sets the movement by its sign, and writes its size as the metric', async () => {
+    const up = await mount(
+      `<helix-headless-trend value="0.12" format-options='{"style":"percent"}' locale="en-US"></helix-headless-trend>`,
+    )
+    expect(word(up)).toBe('Up')
+    expect(arrow(up)).toBe('arrow-up')
+    expect(figure(up)).toBe('12%')
+    const down = await mount(
+      '<helix-headless-trend value="-8" good="up" locale="en-US"></helix-headless-trend>',
+    )
+    expect(word(down)).toBe('Down, worse')
+    expect(figure(down)).toBe('8')
+    expect((down as Trend).internals.states.has('worse')).toBe(true)
+    const flat = await mount(
+      '<helix-headless-trend value="0" locale="en-US"></helix-headless-trend>',
+    )
+    expect(word(flat)).toBe('Unchanged')
+    expect(figure(flat)).toBe('0')
+  })
+
+  test('follows the locale and the options as they change', async () => {
+    const host = (await mount(
+      '<helix-headless-trend value="-1234.5" locale="de-DE"></helix-headless-trend>',
+    )) as Trend
+    expect(figure(host)).toBe('1.234,5')
+    host.locale = 'en-US'
+    host.formatOptions = { currency: 'USD', style: 'currency' }
+    await host.updateComplete
+    expect(figure(host)).toBe('$1,234.50')
+    host.value = 3
+    await host.updateComplete
+    expect(word(host)).toBe('Up')
+    expect(figure(host)).toBe('$3.00')
+  })
+
+  test('yields the movement to movement, and draws nothing without a number', async () => {
+    const host = await mount(
+      '<helix-headless-trend value="-0.5" movement="up" locale="en-US"></helix-headless-trend>',
+    )
+    expect(word(host)).toBe('Up')
+    expect(figure(host)).toBe('0.5')
+    expect(figure(await trend('movement="up"'))).toBeNull()
+    expect(
+      figure(await mount('<helix-headless-trend value="x"></helix-headless-trend>')),
+    ).toBeNull()
+  })
+
+  test('does not reflect a movement it worked out, so the host keeps the markup it was given', async () => {
+    const host = await mount('<helix-headless-trend value="2"></helix-headless-trend>')
+    expect(host.hasAttribute('movement')).toBe(false)
+  })
+})
