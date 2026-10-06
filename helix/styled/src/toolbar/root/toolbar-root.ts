@@ -27,6 +27,7 @@ import { styles } from './toolbar-root.css.js'
  * @cssproperty --toolbar-gap - The space between controls.
  * @cssproperty --toolbar-padding - The space between the toolbar's edge and its controls.
  * @cssproperty --toolbar-radius - The corner radius of the toolbar's fill.
+ * @cssproperty --toolbar-separator-gap - Extra space either side of a `Divider` between controls, along the toolbar's axis. None unless set.
  */
 @customElement('helix-toolbar')
 export class HelixToolbar extends HelixHeadlessToolbar {
