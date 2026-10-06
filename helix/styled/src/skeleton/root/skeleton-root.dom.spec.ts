@@ -18,8 +18,17 @@ const sheet = (): string => {
     .join('\n')
 }
 
-/** The declarations of the first rule written for `selector`. */
-const rule = (selector: string): string => sheet().split(`${selector} {`)[1]?.split('}')[0] ?? ''
+/** The declarations of the first rule whose selector list names `selector`. */
+const rule = (selector: string): string => {
+  for (const block of sheet().split('}')) {
+    const pieces = block.split('{')
+    const head = pieces.at(-2) ?? ''
+    if (head.split(',').some((one) => one.trim() === selector)) {
+      return pieces.at(-1) ?? ''
+    }
+  }
+  return ''
+}
 
 describe('skeleton', () => {
   test('draws the surface the base tier renders, and shape reflects, resting on a block', async () => {
@@ -92,8 +101,27 @@ describe('skeleton around content', () => {
   /* `:empty` counts a line break as content, so a skeleton written across two
      lines took the wrapper's layout around nothing and drew a 0 by 0 box. The
      sheet asks the base tier's state, which is the script's own test. */
-  test('tells a wrapper from a placeholder by the state, never by :empty', () => {
-    expect(sheet()).not.toContain(':empty')
+  test('tells a wrapper from a placeholder by the state once defined', () => {
+    for (const selector of sheet().match(/:host\([^{,]*:empty[^{,]*\)/g) ?? []) {
+      expect(selector).toContain(':not(:defined)')
+    }
+  })
+
+  /* A served page has the shadow root and this sheet before the script runs,
+     and no state yet, so a served skeleton around a 300 by 240 card drew the
+     placeholder's 40px band and the page moved 200px on hydration. Until the
+     element is defined, content the server wrote stands in for the state. */
+  test('a served skeleton around content takes its size before the element upgrades', () => {
+    const served = ':host(:not(:defined):not(:empty))'
+    expect(rule(served)).toContain('inline-size: fit-content')
+    expect(rule(`${served} [part="skeleton"]`)).toContain('position: absolute')
+    expect(rule(`${served} [part="content"]`)).toContain('display: block')
+    expect(rule(':host([loading]:not(:defined):not(:empty)) [part="content"]')).toContain(
+      'visibility: hidden',
+    )
+    expect(rule(':host(:not(:defined):not(:empty):not([loading])) [part="skeleton"]')).toContain(
+      'display: none',
+    )
   })
 
   test('the fill, the sheen, the corner and the pace are hooks that rest on the old values', () => {
