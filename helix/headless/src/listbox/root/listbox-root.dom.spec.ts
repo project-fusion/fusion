@@ -938,3 +938,55 @@ describe('a list that asks for more', () => {
     expect(asked).toBe(2)
   })
 })
+
+/**
+ * Runs a mount against a stated platform rather than the one running the suite,
+ * as Kbd's spec does: this file also runs in a browser, on the host's own agent.
+ */
+const onPlatform = async <T>(agent: string, run: () => Promise<T>): Promise<T> => {
+  const original = Object.getOwnPropertyDescriptor(navigator, 'userAgent')
+  Object.defineProperty(navigator, 'userAgent', { configurable: true, value: agent })
+  try {
+    return await run()
+  } finally {
+    if (original === undefined) {
+      delete (navigator as { userAgent?: string }).userAgent
+    } else {
+      Object.defineProperty(navigator, 'userAgent', original)
+    }
+  }
+}
+
+describe('a filterable list heard through VoiceOver', () => {
+  const into = async (host: Updatable, key: string): Promise<void> => {
+    field(host).dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, composed: true, key }))
+    await settle(host)
+  }
+  const said = (host: Updatable): string | undefined => part(host, 'live')?.textContent?.trim()
+
+  /* React Aria's combobox on Apple devices: VoiceOver does not read the
+     option `aria-activedescendant` points to from a text field. */
+  test('says the option the arrows reach from the field, and whether it is chosen', async () => {
+    await onPlatform('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)', async () => {
+      const host = await list('filterable value="two"')
+      field(host).focus()
+      expect(said(host)).toBe('')
+      await into(host, 'ArrowUp')
+      expect(said(host)).toBe('Alpha')
+      await into(host, 'ArrowDown')
+      expect(said(host)).toBe('Beta, selected')
+      type(host, 'al')
+      await settle(host)
+      expect(said(host)).toBe('1 result')
+    })
+  })
+
+  test('and says nothing new elsewhere, where screen readers follow the field', async () => {
+    await onPlatform('Mozilla/5.0 (Windows NT 10.0; Win64; x64)', async () => {
+      const host = await list('filterable')
+      field(host).focus()
+      await into(host, 'ArrowDown')
+      expect(said(host)).toBe('')
+    })
+  })
+})

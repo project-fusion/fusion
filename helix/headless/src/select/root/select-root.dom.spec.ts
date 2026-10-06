@@ -362,6 +362,29 @@ describe('the keyboard in a select', () => {
     expect(host.open).toBe(false)
   })
 
+  test('Enter or a press on the option already chosen closes the list, as a native select does', async () => {
+    /* Measured before this: the list saw no change, so nothing closed it. */
+    const host = (await select('value="two"')) as Select
+    key(trigger(host), 'Enter')
+    await settle(host)
+    expect(host.open).toBe(true)
+    key(list(host), 'Enter')
+    await settle(host)
+    expect(host.open).toBe(false)
+    expect(host.value).toBe('two')
+    /* A press reaches the list through a slot, which happy-dom does not
+       propagate from slotted content: the browser run checks it. */
+    if (hasLayout()) {
+      host.open = true
+      await settle(host)
+      ;(host as unknown as HTMLElement)
+        .querySelector<HTMLElement & { select(): void }>('[value="two"]')
+        ?.select()
+      await settle(host)
+      expect(host.open).toBe(false)
+    }
+  })
+
   test('Tab closes the list and leaves focus to move on', async () => {
     const host = (await select('open')) as Select
     const event = key(list(host), 'Tab')

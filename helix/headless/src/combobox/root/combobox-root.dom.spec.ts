@@ -827,6 +827,18 @@ describe('a combobox that waits for typing to rest', () => {
   })
 })
 
+describe('choosing the option already chosen', () => {
+  test('closes the list, as choosing any other does', async () => {
+    /* Measured before this: the list saw no change, so the panel stayed open. */
+    const host = (await combobox('value="rb"')) as Updatable & { open: boolean; value: string }
+    await press(host, 'ArrowDown')
+    expect(host.open).toBe(true)
+    await press(host, 'Enter')
+    expect(host.open).toBe(false)
+    expect(host.value).toBe('rb')
+  })
+})
+
 describe('the statuses a combobox hands its list', () => {
   const list = (host: Updatable): HTMLElement => part(host as HTMLElement, 'listbox') as HTMLElement
 
@@ -862,6 +874,22 @@ describe('the statuses a combobox hands its list', () => {
     await settle(list(host) as unknown as Updatable)
     await settle(host)
     expect(states(host).has('no-results')).toBe(false)
+  })
+
+  /* WA's combobox styles its loading and empty states from the host. */
+  test('`loading` and `blank` are states of the host', async () => {
+    const states = (host: Updatable) =>
+      (host as unknown as { internals: ElementInternals }).internals.states
+    const loading = await combobox('loading')
+    await settle(list(loading) as unknown as Updatable)
+    await settle(loading)
+    expect(states(loading).has('loading')).toBe(true)
+    expect(states(loading).has('blank')).toBe(true)
+    const chosen = await combobox('value="rs"')
+    await settle(list(chosen) as unknown as Updatable)
+    await settle(chosen)
+    expect(states(chosen).has('loading')).toBe(false)
+    expect(states(chosen).has('blank')).toBe(false)
   })
 
   test('a slotted no-results is handed on only while there is one', async () => {
@@ -941,5 +969,64 @@ describe('a combobox the browser restores', () => {
     host.formStateRestoreCallback('rs,go', 'restore')
     await settle(host)
     expect(host.value).toBe('rs,go')
+  })
+})
+
+/**
+ * Runs a mount against a stated platform rather than the one running the suite,
+ * as Kbd's spec does: this file also runs in a browser, on the host's own agent.
+ */
+const onPlatform = async <T>(agent: string, run: () => Promise<T>): Promise<T> => {
+  const original = Object.getOwnPropertyDescriptor(navigator, 'userAgent')
+  Object.defineProperty(navigator, 'userAgent', { configurable: true, value: agent })
+  try {
+    return await run()
+  } finally {
+    if (original === undefined) {
+      delete (navigator as { userAgent?: string }).userAgent
+    } else {
+      Object.defineProperty(navigator, 'userAgent', original)
+    }
+  }
+}
+
+describe('a combobox heard through VoiceOver', () => {
+  /* The region fills a frame after it is drawn, so that a reader hears it. */
+  const said = async (host: Updatable): Promise<string | undefined> => {
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+    await settle(host)
+    return part(host as HTMLElement, 'live')?.textContent?.trim()
+  }
+  const settled = async (host: Updatable): Promise<void> => {
+    await settle(part(host as HTMLElement, 'listbox') as unknown as Updatable)
+    await settle(host)
+  }
+
+  /* React Aria's combobox on Apple devices: VoiceOver does not read the
+     option `aria-activedescendant` points to from a text field. */
+  test('says the count as the list opens, the highlight as it moves, and a choice', async () => {
+    await onPlatform('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)', async () => {
+      const host = await combobox('value="rb"')
+      await press(host, 'ArrowDown')
+      await settled(host)
+      expect(await said(host)).toBe('3 results. Ruby, selected')
+      await press(host, 'ArrowDown')
+      await settled(host)
+      expect(await said(host)).toBe('Go')
+      await press(host, 'Enter')
+      await settled(host)
+      expect(await said(host)).toBe('Go, selected')
+    })
+  })
+
+  test('and draws no region elsewhere, where screen readers follow the field', async () => {
+    await onPlatform('Mozilla/5.0 (Windows NT 10.0; Win64; x64)', async () => {
+      const host = await combobox()
+      await press(host, 'ArrowDown')
+      await settled(host)
+      await press(host, 'ArrowDown')
+      await settled(host)
+      expect(part(host as HTMLElement, 'live')).toBeNull()
+    })
   })
 })
