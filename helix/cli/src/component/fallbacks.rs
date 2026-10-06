@@ -14,7 +14,8 @@
 //! **A bare property fallback is not this, and is allowed.**
 //! `<slot>${this.label}</slot>` is the content-property rule: the property *is*
 //! the fallback, there is no markup to restyle, and no tier wants to override a
-//! string. Only fallbacks containing elements are asked about.
+//! string. Only fallbacks containing elements are asked about, so words with no
+//! tag, the `+` of a zoom button, pass as well.
 //!
 //! **A call is not a property, and neither is a getter.** Two spellings of the
 //! same fault, both found after the first version let them through on the shape
@@ -54,6 +55,10 @@ static SLOT: LazyLock<Regex> =
 /// A fallback that is nothing but property references and whitespace.
 static ONLY_PROPERTIES: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"^(\$\{[^{}()]*\}|\s)+$").expect("a literal pattern compiles"));
+
+/// One interpolation, whatever it holds.
+static INTERPOLATION: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"\$\{[^{}]*\}").expect("a literal pattern compiles"));
 
 /// A `${this.name}` inside a fallback, whose name might be a getter.
 static REFERENCED: LazyLock<Regex> =
@@ -128,8 +133,14 @@ pub fn run(context: &Context) -> Report {
                     continue;
                 }
                 /* A property or two and nothing else is the content-property
-                rule, not markup a tier would want to draw differently. */
-                if ONLY_PROPERTIES.is_match(body)
+                rule, not markup a tier would want to draw differently. Words
+                with no tag in them, a `+` on a zoom button, are the same: there
+                is no element to restyle. */
+                let wording = !body.contains('<')
+                    && INTERPOLATION
+                        .find_iter(body)
+                        .all(|one| ONLY_PROPERTIES.is_match(one.as_str()));
+                if (wording || ONLY_PROPERTIES.is_match(body))
                     && !REFERENCED
                         .captures_iter(body)
                         .any(|one| getters.contains(&one[1]))

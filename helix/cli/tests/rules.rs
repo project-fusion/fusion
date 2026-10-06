@@ -1143,6 +1143,35 @@ fn fallbacks() {
     );
 }
 
+/// Words with no tag in them are a fallback no tier restyles, wherever they sit;
+/// the same words in an element are markup again.
+#[test]
+fn fallbacks_words() {
+    let card = |plus: &str| {
+        format!(
+            r#"export class HelixCard extends LitElement {{
+  protected renderBadge() {{
+    return html`<slot name="badge"><span class="dot"></span></slot>`;
+  }}
+  protected override render() {{
+    return html`<slot name="plus">{plus}</slot><slot name="count">${{this.count}} more</slot>`;
+  }}
+}}
+"#
+        )
+    };
+    plant_in(
+        "fallbacks-words",
+        "fallbacks",
+        &[("helix.json", TIERS), ("src/card/card.ts", &card("+"))],
+        |tree| {
+            tree.write("src/card/card.ts", &card("<span>+</span>"));
+        },
+        "a slot's fallback draws markup inside `render`",
+        "src/card/card.ts:6",
+    );
+}
+
 /// The meta rule reads what the source rules counted, so `--only floors` alone
 /// measures nothing and passes vacuously. It is judged beside one source rule,
 /// and the fault is that rule counting zero.
