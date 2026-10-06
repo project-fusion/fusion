@@ -29,6 +29,18 @@ The prop is `on` followed by the exact event name. `onHelixOpen` and `onOpen` do
 not work. React 19 passes an unknown `on*` prop to `addEventListener` with the
 name as written, so use the event's own casing.
 
+In a development build, an element prints a warning once when one of its `on`
+props can never run:
+
+- a misspelled event name, such as `onhelix-opne`
+- an event that a different element sends
+- Solid's `on:` syntax
+- a callback property that was removed, such as `onCheckedChange`
+
+TypeScript does not check a JSX prop whose name has a hyphen, so the console is
+the only place these show. Vite and webpack use the `development` export
+condition while you develop. A production build carries none of the check.
+
 ## The hydration bridge
 
 While React hydrates, it skips everything it would have to apply imperatively.
