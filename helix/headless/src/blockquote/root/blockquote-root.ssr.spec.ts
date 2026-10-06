@@ -26,7 +26,9 @@ describe('blockquote server output', () => {
       html`<helix-headless-blockquote attribution="Maria Lopez">Said so.</helix-headless-blockquote>`,
     )
     expect(partTag(markup, 'figure')).toContain('role="figure"')
-    expect(rendered(markup, 'helix-headless-blockquote')).toMatch(/<span>(<!--[^>]*-->)*Maria Lopez/)
+    expect(rendered(markup, 'helix-headless-blockquote')).toMatch(
+      /<span>(<!--[^>]*-->)*Maria Lopez/,
+    )
   })
 
   test('the host carries nothing the consumer did not write', () => {
