@@ -3,6 +3,7 @@ import {
   deepActiveElement,
   HelixElement,
   HelixSelectEvent,
+  slotFilled,
 } from '@fusion.dev/helix-core'
 import { caretRight } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -22,6 +23,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * - On the page that is showing, it renders its row.
  * - When its own page is showing, it renders only that page's rows. Its row
  *   belongs to the page above.
+ * - When a page further down its own is showing, it renders its page's slot
+ *   alone, so the rows below reach the page.
  * - Otherwise it renders nothing. The rows stay in the light DOM untouched, so
  *   there is no state to keep.
  *
@@ -32,6 +35,10 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * `aria-haspopup`, the same way `Menu` marks a row with a submenu. The server
  * render leaves both out, because the server cannot see the children.
  *
+ * The row is named by its label alone. Words in `description`, a line under
+ * the label, and in `end` describe it instead, through `aria-describedby`, as
+ * `Menu.Item` does: a reader hears "Theme", then "Dark".
+ *
  * @since 0.1.0
  * @status stable
  * @aliases Panel item, Drill row
@@ -39,7 +46,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @slot - The row's label.
  * @slot chevron - Replaces the caret of a row that opens a page, such as with your own icon.
- * @slot end - Content after the label, usually an icon or a count.
+ * @slot description - A line under the label that describes the row. It describes the row to a screen reader and is not part of its name.
+ * @slot end - Content after the label, such as the setting a page holds or a count. It describes the row and is not part of its name.
  * @slot page - The rows of the page this row opens.
  * @slot start - Content before the label, usually an icon.
  *
@@ -89,6 +97,13 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
   onPage = true
 
   /**
+   * @internal Whether the page showing is below this row's own, deeper than one
+   * level. Written by the stack.
+   */
+  @property({ attribute: false })
+  onPath = false
+
+  /**
    * @internal Whether this row's own page is the one showing. Written by the
    * stack.
    */
@@ -112,6 +127,14 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
   @state()
   private page = false
 
+  /** Whether anything is slotted under the label, read the way `page` is. */
+  @state()
+  private description = false
+
+  /** Whether anything is slotted after the label, read the way `page` is. */
+  @state()
+  private end = false
+
   /**
    * Reads the children before each render, where they can be known.
    *
@@ -122,7 +145,11 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     if (this.childrenKnown) {
-      this.page = this.knownChildren.some((child) => child.slot === 'page')
+      const named = (name: string): boolean =>
+        this.knownChildren.some((child) => child.slot === name)
+      this.page = named('page')
+      this.description = named('description')
+      this.end = named('end')
     }
   }
 
@@ -144,6 +171,22 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
   private readonly readPage = (): void => {
     const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="page"]')
     this.page = (slot?.assignedElements().length ?? 0) > 0
+  }
+
+  /** Re-reads whether the line under the label or the words after it are filled. */
+  private readonly readWords = (): void => {
+    const slot = (name: string): HTMLSlotElement | null =>
+      this.renderRoot.querySelector<HTMLSlotElement>(`slot[name="${name}"]`)
+    this.description = slotFilled(slot('description'))
+    this.end = slotFilled(slot('end'))
+  }
+
+  /** What describes the row: the line under its label and the words after it. */
+  private get describedBy(): string | typeof nothing {
+    const ids = [this.description ? 'description' : '', this.end ? 'end' : '']
+      .filter((id) => id !== '')
+      .join(' ')
+    return ids === '' ? nothing : ids
   }
 
   /** Moves focus onto the row itself. */
@@ -200,7 +243,10 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
   }
 
   protected override render(): TemplateResult | typeof nothing {
-    if (this.showingPage) {
+    /* A row above the page showing passes its page through as well: the row
+       that opens the page showing is one of its page's rows, so without the
+       slot it and every row below it leave the flat tree. */
+    if (this.showingPage || this.onPath) {
       return html`<slot name="page" @slotchange=${this.readPage}></slot>`
     }
     if (!this.onPage) {
@@ -223,19 +269,33 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
      * The page's slot stays while the row shows, in a hidden box, so a page
      * that arrives later is heard and the caret follows it. Nothing in it
      * paints: its rows are not on the page showing and draw nothing, and
-     * anything else in it is hidden with the box. */
+     * anything else in it is hidden with the box.
+     *
+     * The description and the `end` words are hidden from the row's name and
+     * named by its `aria-describedby`, which reads them all the same. The
+     * description takes no box while it is empty, so a row without one lays
+     * out as it did; `data-empty` says which it is. */
     return html`<button
       part="item"
       type="button"
       role="menuitem"
+      aria-describedby=${this.describedBy}
       aria-disabled=${this.disabled ? 'true' : nothing}
       aria-haspopup=${this.page ? 'menu' : nothing}
       tabindex=${this.focusable ? '0' : '-1'}
+      ?data-described=${this.description}
       @click=${() => this.select()}
     >
       <slot name="start"></slot>
       <span part="label"><slot></slot></span>
-      <slot name="end"></slot>
+      <slot
+        id="description"
+        name="description"
+        aria-hidden="true"
+        ?data-empty=${!this.description}
+        @slotchange=${this.readWords}
+      ></slot>
+      <slot id="end" name="end" aria-hidden="true" @slotchange=${this.readWords}></slot>
       ${this.page ? this.renderMark() : nothing}
     </button>
     <div hidden><slot name="page" @slotchange=${this.readPage}></slot></div>`
