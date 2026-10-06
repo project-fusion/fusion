@@ -827,6 +827,40 @@ describe('a combobox that waits for typing to rest', () => {
   })
 })
 
+describe('a combobox a browser can autofill', () => {
+  const hidden = (host: Updatable): HTMLSelectElement | null =>
+    (host as HTMLElement).shadowRoot?.querySelector('select') ?? null
+
+  test('keeps a hidden native select with the same options, and takes what is filled', async () => {
+    /* React Aria's combobox fills through a hidden field; the text field is
+       the filter and stays off, so a browser fills the answer. */
+    const host = (await combobox('autocomplete="cc-exp-year"')) as Updatable & { value: string }
+    const field = hidden(host) as HTMLSelectElement
+    expect(field.getAttribute('autocomplete')).toBe('cc-exp-year')
+    expect(field.getAttribute('aria-hidden')).toBe('true')
+    expect([...field.options].map((option) => option.value)).toEqual(['', 'rs', 'rb', 'go'])
+    expect(control(host).getAttribute('autocomplete')).toBe('off')
+    field.value = 'go'
+    field.dispatchEvent(new Event('change', { bubbles: true }))
+    await settle(host)
+    expect(host.value).toBe('go')
+    expect(control(host).value).toBe('Go')
+    expect(formValue(host as unknown as HTMLElement)).toBe('go')
+  })
+
+  test('leaves the token on the text field where the words are the answer', async () => {
+    const host = await combobox('autocomplete="address-level2" allows-custom-value')
+    expect(hidden(host)).toBeNull()
+    expect(control(host).getAttribute('autocomplete')).toBe('address-level2')
+  })
+
+  test('draws nothing by default', async () => {
+    const host = await combobox()
+    expect(hidden(host)).toBeNull()
+    expect(control(host).getAttribute('autocomplete')).toBe('off')
+  })
+})
+
 describe('choosing the option already chosen', () => {
   test('closes the list, as choosing any other does', async () => {
     /* Measured before this: the list saw no change, so the panel stayed open. */
