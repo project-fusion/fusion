@@ -285,6 +285,35 @@ describe('a code as a file', () => {
     expect(markup).toContain('fill="#ffffff"')
   })
 
+  /* `download()` saved a PNG whatever it was asked for, so a page offering
+     a print-ready vector had to build the file itself. */
+  test('is saved as an SVG for a name ending in .svg', async () => {
+    const code = (await mount(
+      '<helix-headless-qr-code value="https://fusion.dev"></helix-headless-qr-code>',
+    )) as Code & { download: (filename?: string, size?: number) => Promise<void> }
+    await code.updateComplete
+    const made: Blob[] = []
+    const saved: string[] = []
+    const create = URL.createObjectURL
+    const click = HTMLAnchorElement.prototype.click
+    URL.createObjectURL = (file: Blob | MediaSource): string => {
+      made.push(file as Blob)
+      return 'blob:qr'
+    }
+    HTMLAnchorElement.prototype.click = function (this: HTMLAnchorElement): void {
+      saved.push(this.download)
+    }
+    try {
+      await code.download('menu.svg', 256)
+    } finally {
+      URL.createObjectURL = create
+      HTMLAnchorElement.prototype.click = click
+    }
+    expect(saved).toEqual(['menu.svg'])
+    expect(made[0]?.type).toBe('image/svg+xml')
+    expect(await made[0]?.text()).toBe(code.toSvg(256))
+  })
+
   test('is nothing where no code is drawn', async () => {
     const code = (await mount('<helix-headless-qr-code></helix-headless-qr-code>')) as Code
     await code.updateComplete

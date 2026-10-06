@@ -1,4 +1,4 @@
-import { customElement, HelixElement, rgbOf } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, rgbOf, slotFilled } from '@fusion.dev/helix-core'
 import {
   html,
   nothing,
@@ -153,7 +153,8 @@ const pathFor = (
  * `toSvg()`, `toPng()` and `download()` give the drawn code as a file of its
  * own, in the colors it is drawn in, with a slotted image or SVG logo where
  * it sits, for a page that offers it to save or print, as Zag's download
- * trigger does.
+ * trigger does. `download()` saves an SVG for a name ending in `.svg`, and a
+ * PNG for any other.
  *
  * @since 0.1.0
  * @status stable
@@ -391,17 +392,19 @@ export class HelixHeadlessQrCode extends HelixElement {
   }
 
   /**
-   * Saves the code as a PNG named `filename`, `size` pixels square.
+   * Saves the code as a file named `filename`, `size` pixels square: an SVG
+   * where the name ends in `.svg`, and a PNG otherwise.
    *
    * Call it from a press, since a browser lets a page start a download only
    * in answer to one. Does nothing where no code is drawn.
    */
   async download(filename = 'qr-code.png', size = 512): Promise<void> {
-    const png = await this.toPng(size)
-    if (!png) {
+    const svg = /\.svg$/i.test(filename) ? this.toSvg(size) : ''
+    const file = svg ? new Blob([svg], { type: 'image/svg+xml' }) : await this.toPng(size)
+    if (!file) {
       return
     }
-    const url = URL.createObjectURL(png)
+    const url = URL.createObjectURL(file)
     const link = document.createElement('a')
     link.href = url
     link.download = filename
@@ -468,7 +471,7 @@ export class HelixHeadlessQrCode extends HelixElement {
       <slot
         name="logo"
         @slotchange=${(event: Event) => {
-          const next = (event.target as HTMLSlotElement).assignedNodes().length > 0
+          const next = slotFilled(event.target as HTMLSlotElement)
           if (next !== this.logo) {
             this.logo = next
             this.requestUpdate()
