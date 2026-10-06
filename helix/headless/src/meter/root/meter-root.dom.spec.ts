@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import { hasState, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -347,5 +347,50 @@ describe('a visible label', () => {
   test('is a bare slot, so without one nothing new is drawn', async () => {
     const host = (await mount('<helix-headless-meter value="40"></helix-headless-meter>')) as Host
     expect(host.shadowRoot?.querySelector('slot[name="label"]')?.parentNode).toBe(host.shadowRoot)
+  })
+})
+
+/* Only the fill carried the band, and a meter whose reading moved while a
+   reader was on it said nothing: React Aria's Meter has no live option. */
+describe('the band on the host', () => {
+  test('is a custom state, beside over and under', async () => {
+    const host = await meter('low="25" high="50" optimum="0" value="60"')
+    expect(['good', 'fair', 'poor'].filter((name) => hasState(host, name))).toEqual(['poor'])
+    const over = await meter('value="140"')
+    expect([hasState(over, 'over'), hasState(over, 'under')]).toEqual([true, false])
+  })
+})
+
+describe('live', () => {
+  const frame = (): Promise<void> => new Promise((done) => requestAnimationFrame(() => done()))
+  type Meter = HTMLElement & { updateComplete: Promise<unknown>; value: number }
+
+  test('says the reading and its band when it moves into another band', async () => {
+    const host = (await meter('live low="25" high="50" optimum="0" value="10"')) as Meter
+    expect(part(host, 'live')).toBeNull()
+    host.value = 20
+    await host.updateComplete
+    expect(part(host, 'live')).toBeNull()
+    host.value = 92
+    await host.updateComplete
+    await frame()
+    await host.updateComplete
+    const live = part(host, 'live')
+    expect([live?.getAttribute('role'), live?.textContent]).toEqual(['status', '92%, Poor'])
+  })
+
+  test('takes the band words from `band-labels`, and says nothing without `live`', async () => {
+    const named = (await meter(
+      `live band-labels='{"fair":"Filling up"}' low="25" high="50" optimum="0" value="10"`,
+    )) as Meter
+    named.value = 30
+    await named.updateComplete
+    await frame()
+    await named.updateComplete
+    expect(part(named, 'live')?.textContent).toBe('30%, Filling up')
+    const quiet = (await meter('low="25" high="50" optimum="0" value="10"')) as Meter
+    quiet.value = 92
+    await quiet.updateComplete
+    expect(part(quiet, 'live')).toBeNull()
   })
 })

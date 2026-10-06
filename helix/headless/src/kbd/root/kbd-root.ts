@@ -8,9 +8,11 @@ import {
   matchesChord,
   onApple,
   printableChord,
+  wordsConverter,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { type KeyNames, keyNames } from '../keys.js'
 import { claimShortcut, releaseShortcut } from '../shortcut.js'
 
 /**
@@ -44,54 +46,6 @@ const UNTYPED = new Set([
 ])
 
 /**
- * How each name in a chord is drawn, per platform.
- *
- * Apple keyboards label their modifiers with glyphs and print no separator
- * between them, so `⌘K` is the whole of it. Everywhere else the words are the
- * label and the plus is part of the convention rather than prose, which is why
- * it is the one separator this component supplies.
- */
-const APPLE: Record<string, string> = {
-  alt: '⌥',
-  backspace: '⌫',
-  cmd: '⌘',
-  ctrl: '⌃',
-  del: '⌦',
-  down: '↓',
-  enter: '↵',
-  esc: 'Esc',
-  left: '←',
-  meta: '⌘',
-  mod: '⌘',
-  opt: '⌥',
-  right: '→',
-  shift: '⇧',
-  space: 'Space',
-  tab: '⇥',
-  up: '↑',
-}
-
-const ELSEWHERE: Record<string, string> = {
-  alt: 'Alt',
-  backspace: 'Backspace',
-  cmd: 'Win',
-  ctrl: 'Ctrl',
-  del: 'Del',
-  down: '↓',
-  enter: 'Enter',
-  esc: 'Esc',
-  left: '←',
-  meta: 'Win',
-  mod: 'Ctrl',
-  opt: 'Alt',
-  right: '→',
-  shift: 'Shift',
-  space: 'Space',
-  tab: 'Tab',
-  up: '↑',
-}
-
-/**
  * @summary A keyboard key or chord, set inline with text.
  *
  * @description
@@ -117,7 +71,13 @@ const ELSEWHERE: Record<string, string> = {
  * `caps` draws a chord as a key per key: each is a `key` part and the `+`
  * between two a `separator` part, so a sheet can draw a cap for each.
  * `key-labels` renames any key, on every platform, such as
- * `key-labels='{"mod":"Command"}'`.
+ * `key-labels='{"mod":"Command"}'`. On an Apple keyboard a word joins the
+ * next key with a hyphen, as in `Command-K`.
+ *
+ * **`activate` makes the shortcut work the control `for` names**, with no
+ * script: `activate="focus"` moves focus to it, as `/` does to a search
+ * field, and `activate="click"` presses it. It acts once `helix-shortcut` has
+ * gone out and no listener canceled it, and only where `within` listens.
  *
  * @since 0.1.0
  * @status stable
@@ -131,10 +91,21 @@ const ELSEWHERE: Record<string, string> = {
  *
  * @csspart kbd - The key, or the chord under `keys`.
  * @csspart key - One key of a chord under `keys` and `caps`, such as `Ctrl` in `Ctrl+K`.
- * @csspart separator - The `+` between two keys of a chord under `keys` and `caps`, drawn where the platform writes one: on Windows and Linux. An Apple keyboard writes none.
+ * @csspart separator - The `+` between two keys of a chord under `keys` and `caps`, drawn where the platform writes one: on Windows and Linux. An Apple keyboard writes none between glyphs, and a hyphen between words from `key-labels`.
  */
 @customElement('helix-headless-kbd')
 export class HelixHeadlessKbd extends HelixElement {
+  /**
+   * What the chord does to the control `for` names once it is pressed:
+   * `focus` moves focus to the control and `click` presses it.
+   *
+   * Unset, the chord sends `helix-shortcut` and does nothing else, for a page
+   * that acts on the event itself. It acts only where `within` listens, after
+   * `helix-shortcut`, and not when a listener cancels that event.
+   */
+  @property()
+  activate?: 'click' | 'focus'
+
   /**
    * Draws a chord under `keys` as one key per key, each a `key` part with a
    * `separator` part between two where the platform writes a `+`, as GitHub
@@ -168,8 +139,8 @@ export class HelixHeadlessKbd extends HelixElement {
    * changes: the chord written onto `aria-keyshortcuts` keeps the names a
    * screen reader knows.
    */
-  @property({ attribute: 'key-labels', type: Object })
-  keyLabels?: Record<string, string>
+  @property({ attribute: 'key-labels', converter: wordsConverter })
+  keyLabels: Record<string, string> = {}
 
   /**
    * The key or chord to show, such as `mod+k`, `?`, or `/`.
@@ -266,15 +237,8 @@ export class HelixHeadlessKbd extends HelixElement {
    * ask and serves the words, and a render that differs is a text Lit records
    * and never writes, so a Mac kept Ctrl. The update after hydration asks.
    */
-  private get label(): { keys: string[]; separator: string } {
-    const apple = !this.hydrating && onApple()
-    const names = apple ? APPLE : ELSEWHERE
-    const own = this.keyLabels ?? {}
-    const keys = chordParts(this.keys).map((part) => {
-      const name = part.toLowerCase()
-      return own[name] ?? names[name] ?? (part.length === 1 ? part.toUpperCase() : part)
-    })
-    return { keys, separator: apple ? '' : '+' }
+  private get label(): KeyNames {
+    return keyNames(chordParts(this.keys), !this.hydrating && onApple(), this.keyLabels ?? {})
   }
 
   private listen(): void {
@@ -340,8 +304,23 @@ export class HelixHeadlessKbd extends HelixElement {
        goes on to whatever would have had it wherever this is prevented. */
     const shortcut = new HelixShortcutEvent({ keys: this.keys })
     this.dispatchEvent(shortcut)
-    if (!shortcut.defaultPrevented) {
-      press.preventDefault()
+    if (shortcut.defaultPrevented) {
+      return
+    }
+    press.preventDefault()
+    this.act()
+  }
+
+  /** Focuses or presses the control `for` names, as `activate` says. */
+  private act(): void {
+    const control = this.activate && this.for !== '' ? elementById(this, this.for) : null
+    if (!(control instanceof HTMLElement)) {
+      return
+    }
+    if (this.activate === 'click') {
+      control.click()
+    } else {
+      control.focus()
     }
   }
 

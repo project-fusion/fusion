@@ -1,9 +1,15 @@
-import { customElement, HelixElement, hostAria, reportRuntime } from '@fusion.dev/helix-core'
+import {
+  auditName,
+  customElement,
+  HelixElement,
+  hostAria,
+  reportRuntime,
+} from '@fusion.dev/helix-core'
 import type { HelixIcon } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
-import { resolveIcon, watchIcons } from '../registry.js'
+import { iconMutator, resolveIcon, watchIcons } from '../registry.js'
 import { afterPageSettles } from '../settle.js'
 
 /**
@@ -40,6 +46,11 @@ import { afterPageSettles } from '../settle.js'
  * `label` only when the icon is the only carrier of meaning, such as in a
  * button with no text. An `aria-label` on the element works too: the element
  * is then an image with that name.
+ *
+ * **A decorative icon that is all a control holds is reported.** In a
+ * development build, a button or a link whose only content is an icon with no
+ * `label`, and which has no name of its own, warns `missing-name` once,
+ * through the runtime channel every Helix warning uses.
  *
  * @since 0.1.0
  * @status stable
@@ -193,6 +204,10 @@ export class HelixHeadlessIcon extends HelixElement {
      nothing. A server runs no `updated`, so nothing fires there. */
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    if (this.drawn !== undefined) {
+      this.mutate()
+      this.auditControl()
+    }
     if (this.arrived === this.name && this.drawn !== undefined) {
       this.dispatchEvent(new Event('load', { bubbles: false, cancelable: false, composed: false }))
     }
@@ -204,6 +219,41 @@ export class HelixHeadlessIcon extends HelixElement {
       }
     } else {
       this.missed = ''
+    }
+  }
+
+  /** Hands the drawn `<svg>` to the mutator of the library `name` asks, where it has one. */
+  private mutate(): void {
+    const svg = this.renderRoot.querySelector('svg')
+    const mutator = this.icon === undefined ? iconMutator(this.name) : undefined
+    if (svg && mutator) {
+      mutator(svg)
+    }
+  }
+
+  /**
+   * Asks the button or link a decorative icon sits in whether it has a name.
+   * Its content is this icon alone where it has none, and the audit says so
+   * once, in a development build only. A Helix button reports its own name.
+   */
+  private auditControl(): void {
+    if (this.label !== '' || this.hasAttribute('aria-label')) {
+      return
+    }
+    const control = this.closest<HTMLElement>(
+      'a[href], button, summary, [role="button"], [role="link"]',
+    )
+    if (control) {
+      /* Words or a named picture beside the icon name the control from its
+         content, which the audit reads for a button and not for a link. */
+      auditName(
+        control,
+        () => null,
+        `Its only content is <${this.localName}>, which is decorative: give the icon a \`label\`, or the control an \`aria-label\`.`,
+        () =>
+          (control.textContent ?? '').trim() !== '' ||
+          control.querySelector('[alt]:not([alt=""]), [aria-label]:not([aria-label=""])') !== null,
+      )
     }
   }
 

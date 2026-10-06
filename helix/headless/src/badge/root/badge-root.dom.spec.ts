@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -192,5 +192,72 @@ describe('a counted label', () => {
     badge.value = 12
     await badge.updateComplete
     expect(part(badge, 'indicator')?.getAttribute('aria-label')).toBe('9+ unread')
+  })
+})
+
+/* A badge wrapped around a control was a status beside it, so focusing the
+   button announced "Inbox" and nothing of the count. Web Awesome puts the
+   badge inside the button for the same effect. */
+describe('a badge around a control', () => {
+  type Badge = HTMLElement & { updateComplete: Promise<unknown>; value: number | string }
+  const wrap = async (inner: string, attributes = 'value="8" label="{count} unread"') => {
+    const badge = (await mount(
+      `<helix-headless-badge ${attributes}>${inner}</helix-headless-badge>`,
+    )) as Badge
+    await badge.updateComplete
+    return badge
+  }
+  const internals = (host: HTMLElement): ElementInternals =>
+    (host as unknown as { internals: ElementInternals }).internals
+  /* happy-dom has no element reflection, so the description is read where an
+     engine has it: the browser harness. */
+  const reflects = 'ariaDescribedByElements' in HTMLElement.prototype
+
+  test.if(reflects)('describes the control with its words, which follow the count', async () => {
+    const badge = await wrap('<button>Inbox</button>')
+    const button = badge.querySelector('button') as HTMLButtonElement
+    expect(button.ariaDescribedByElements?.[0]).toBe(badge)
+    expect(internals(badge).ariaLabel).toBe('8 unread')
+    badge.value = 9
+    await badge.updateComplete
+    expect(internals(badge).ariaLabel).toBe('9 unread')
+  })
+
+  test.if(reflects)(
+    'takes the description back when the count is cleared or the badge leaves',
+    async () => {
+      const badge = await wrap('<button>Inbox</button>')
+      const button = badge.querySelector('button') as HTMLButtonElement
+      badge.value = 0
+      await badge.updateComplete
+      expect([button.ariaDescribedByElements ?? null, internals(badge).ariaLabel]).toEqual([
+        null,
+        null,
+      ])
+      badge.value = 3
+      await badge.updateComplete
+      badge.remove()
+      expect(button.ariaDescribedByElements ?? null).toBeNull()
+    },
+  )
+
+  test('leaves a control the page described, and an element that takes no focus', async () => {
+    const own = await wrap('<button aria-describedby="note">Inbox</button><p id="note">New</p>')
+    expect(own.querySelector('button')?.ariaDescribedByElements?.[0]).not.toBe(own)
+    const image = await wrap('<img alt="Ada">')
+    expect(internals(image).ariaLabel).toBeNull()
+  })
+})
+
+describe('the mark as states', () => {
+  test('says when the count is capped, a dot or blank', async () => {
+    const capped = await mount('<helix-headless-badge max="9" value="42"></helix-headless-badge>')
+    const dot = await mount('<helix-headless-badge></helix-headless-badge>')
+    const blank = await mount('<helix-headless-badge value="0"></helix-headless-badge>')
+    expect(
+      [capped, dot, blank].map((one) =>
+        ['blank', 'capped', 'dot'].filter((name) => hasState(one, name)),
+      ),
+    ).toEqual([['capped'], ['dot'], ['blank']])
   })
 })

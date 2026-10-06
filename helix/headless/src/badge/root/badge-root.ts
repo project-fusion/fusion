@@ -1,5 +1,5 @@
 import { customElement, fillTemplate, HelixElement } from '@fusion.dev/helix-core'
-import { html, nothing, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
@@ -20,11 +20,12 @@ import { property } from 'lit/decorators.js'
  * fuller name, such as `4 unread`. A dot needs a `label`. Without one, the dot
  * is a colored circle that screen readers do not announce.
  *
- * **A badge wrapped around a control is not part of the control's name.** It
- * is a status of its own, read when it changes and when a reader moves to it,
- * so focusing a button inside a badge announces the button's name alone. A
- * reference from the control to the count would point into the badge's shadow
- * root, which the platform does not allow.
+ * **A badge wrapped around a control describes it.** The control is the first
+ * element in the badge that takes focus, and its description is the badge's
+ * words, so focusing `<helix-badge value="8" label="{count} unread"><button>Inbox
+ * </button></helix-badge>` announces "Inbox, button, 8 unread", current as the
+ * count changes. A control that already has a description keeps its own. The
+ * count is also a status of its own, read when it changes.
  *
  * **Put the badge inside the control to have its count read with the
  * control's name**, as Web Awesome and Shoelace do: `<button>Inbox
@@ -41,6 +42,10 @@ import { property } from 'lit/decorators.js'
  * @slot - The element being decorated.
  *
  * @csspart indicator - The count, or the dot when there is no value.
+ *
+ * @cssstate blank - The value is zero, so there is no mark.
+ * @cssstate capped - The count is past `max`, so the mark shows `{max}+`.
+ * @cssstate dot - There is no value, so the mark is a dot.
  */
 @customElement('helix-headless-badge')
 export class HelixHeadlessBadge extends HelixElement {
@@ -90,13 +95,107 @@ export class HelixHeadlessBadge extends HelixElement {
     return this.given.trim() !== '' && Number(this.given) === 0
   }
 
+  /** Whether the count is past `max`, which the mark shows as `{max}+`. */
+  private get capped(): boolean {
+    const count = Number(this.given)
+    return this.max !== undefined && Number.isFinite(count) && count > this.max
+  }
+
   /** What the indicator reads, once the cap has been applied. */
   private get text(): string {
-    const count = Number(this.given)
-    if (this.max !== undefined && Number.isFinite(count) && count > this.max) {
-      return `${this.max}+`
+    return this.capped ? `${this.max}+` : this.given
+  }
+
+  /** What a reader hears for the mark, or nothing for a blank or unnamed one. */
+  private get words(): string {
+    const text = this.text
+    if (this.blank || (text === '' && this.label === '')) {
+      return ''
     }
-    return this.given
+    return fillTemplate(this.label, { count: text }) || text
+  }
+
+  /** The control the badge describes, while it describes one. */
+  private described: HTMLElement | undefined
+
+  /**
+   * The first element the badge wraps that takes focus: one with a tab stop,
+   * or a component that hands its focus on.
+   */
+  private wrapped(): HTMLElement | undefined {
+    return this.renderRoot
+      .querySelector<HTMLSlotElement>('slot:not([name])')
+      ?.assignedElements({ flatten: true })
+      .find(
+        (element): element is HTMLElement =>
+          element instanceof HTMLElement &&
+          (element.tabIndex >= 0 || element.shadowRoot?.delegatesFocus === true),
+      )
+  }
+
+  /**
+   * Points the wrapped control's description at the badge, which carries its
+   * words as its own label, or takes the pointer back.
+   *
+   * **The badge itself and not the count**, because a reference from the
+   * control into the badge's shadow root is one the platform drops, and the
+   * badge is in the control's own tree. A control the page described is left
+   * alone.
+   */
+  private describe(): void {
+    const words = this.words
+    const control = words === '' ? undefined : this.wrapped()
+    if (this.described && this.described !== control) {
+      this.undescribe()
+    }
+    if (!control || !('ariaDescribedByElements' in control)) {
+      return
+    }
+    const own = control.getAttribute('aria-describedby') || control.ariaDescribedByElements?.length
+    if (control !== this.described && own) {
+      return
+    }
+    this.internals.ariaLabel = words
+    control.ariaDescribedByElements = [this]
+    this.described = control
+  }
+
+  private undescribe(): void {
+    if (this.described?.ariaDescribedByElements?.includes(this)) {
+      this.described.ariaDescribedByElements = null
+    }
+    this.described = undefined
+    this.internals.ariaLabel = null
+  }
+
+  private readonly handleSlotchange = (): void => {
+    this.describe()
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    this.undescribe()
+  }
+
+  override connectedCallback(): void {
+    super.connectedCallback()
+    if (this.hasUpdated) {
+      this.describe()
+    }
+  }
+
+  /* What the mark shows, as states a page styles without reading the value:
+     `willUpdate`, which a server calls too. */
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    this.toggleState('capped', this.capped)
+    this.toggleState('dot', this.given.trim() === '')
+    this.toggleState('blank', this.blank)
+  }
+
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    this.describe()
   }
 
   protected override render(): TemplateResult {
@@ -141,7 +240,7 @@ export class HelixHeadlessBadge extends HelixElement {
     // `single` is what lets a one-character mark be a circle. Whether the text
     // fits inside the square is a fact about the string, and CSS cannot count
     // characters.
-    return html`<slot></slot>
+    return html`<slot @slotchange=${this.handleSlotchange}></slot>
       <span
         part="indicator"
         data-blank=${blank ? '' : nothing}

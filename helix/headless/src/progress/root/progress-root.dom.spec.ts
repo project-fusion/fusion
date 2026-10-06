@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasState, mount, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -186,5 +186,54 @@ describe('a visible label', () => {
       '<helix-headless-progress value="40"></helix-headless-progress>',
     )) as Host
     expect(host.shadowRoot?.querySelector('slot[name="label"]')?.parentNode).toBe(host.shadowRoot)
+  })
+})
+
+/* React Aria's ProgressBar says nothing when the work is done, and neither
+   did this: a reader waiting on an upload heard no end to it. */
+describe('reaching max', () => {
+  const frame = (): Promise<void> => new Promise((done) => requestAnimationFrame(() => done()))
+
+  test('says `complete-label`, sends `helix-complete`, and sets the `complete` state', async () => {
+    const bar = await progress('value="90" max="120"')
+    const heard: string[] = []
+    bar.addEventListener('helix-complete', (event) =>
+      heard.push((event as CustomEvent<{ value: string }>).detail.value),
+    )
+    bar.value = 120
+    await bar.updateComplete
+    await frame()
+    await bar.updateComplete
+    const live = bar.shadowRoot?.querySelector('[part="live"]')
+    expect([heard, live?.getAttribute('role'), live?.textContent]).toEqual([
+      ['120'],
+      'status',
+      'Complete',
+    ])
+    expect(hasState(bar, 'complete')).toBe(true)
+  })
+
+  test('says nothing for a bar that starts full, or under an empty label', async () => {
+    const full = await progress('value="100"')
+    let heard = 0
+    full.addEventListener('helix-complete', () => {
+      heard += 1
+    })
+    full.value = 100
+    await full.updateComplete
+    expect([heard, full.shadowRoot?.querySelector('[part="live"]')]).toEqual([0, null])
+    const quiet = await progress('value="10" complete-label=""')
+    quiet.addEventListener('helix-complete', () => {
+      heard += 1
+    })
+    quiet.value = 100
+    await quiet.updateComplete
+    await frame()
+    expect([heard, quiet.shadowRoot?.querySelector('[part="live"]')]).toEqual([1, null])
+  })
+
+  test('is not complete while indeterminate', async () => {
+    const busy = await progress('indeterminate value="100"')
+    expect(hasState(busy, 'complete')).toBe(false)
   })
 })

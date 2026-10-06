@@ -33,7 +33,16 @@ export const initialsOf = (name: string): string => {
  * a person's name does not describe what the avatar stands for.
  *
  * `load` and `error` are re-dispatched from the host, because they are not
- * composed and would otherwise stop at the shadow boundary.
+ * composed and would otherwise stop at the shadow boundary. `status` says
+ * which of the two happened, for a listener that arrives after it, and the
+ * `loading`, `loaded` and `error` custom states say the same to a stylesheet.
+ *
+ * **On a server the avatar sends the picture's place**, an `<img>` that the
+ * browser fetches while it reads the page. The initials stand in only on the
+ * client: at once where the picture failed before the page hydrated, and after
+ * `fallback-delay` where it is still on its way. `load` or `error` for a
+ * picture that settled before hydration is sent a task after the avatar
+ * hydrates, so a page's own scripts are listening by then.
  *
  * @since 0.1.0
  * @status stable
@@ -48,6 +57,10 @@ export const initialsOf = (name: string): string => {
  *
  * @csspart image - The image, when one is loading or loaded.
  * @csspart initials - The initials shown when there is no usable image.
+ *
+ * @cssstate error - The picture failed, or there is none, and the initials show.
+ * @cssstate loaded - The picture arrived.
+ * @cssstate loading - The picture is on its way.
  */
 @customElement('helix-headless-avatar')
 export class HelixHeadlessAvatar extends HelixElement {
@@ -63,6 +76,27 @@ export class HelixHeadlessAvatar extends HelixElement {
    */
   @property({ attribute: 'fallback-delay', type: Number })
   fallbackDelay?: number
+
+  /**
+   * The letters shown where no picture loaded, such as `GH`, in place of the
+   * ones taken from `name`.
+   *
+   * For a name whose initials are not its first and last letters, or an
+   * entity with a short mark of its own. Absent, the first letters of the
+   * first and last words of `name` are shown.
+   */
+  @property()
+  initials?: string
+
+  /**
+   * When the browser fetches the picture: `lazy` waits until it is near the
+   * screen, as an `<img loading="lazy">` does, and `eager` fetches it at once.
+   *
+   * Absent is the browser's own default, which is `eager`. `lazy` suits a long
+   * list of people, most of them off screen.
+   */
+  @property()
+  loading?: 'eager' | 'lazy'
 
   /**
    * Name of the person or entity.
@@ -146,6 +180,9 @@ export class HelixHeadlessAvatar extends HelixElement {
       label: this.name,
       role: this.name === '' ? '' : 'img',
     })
+    this.toggleState('error', this.status === 'error')
+    this.toggleState('loaded', this.status === 'loaded')
+    this.toggleState('loading', this.status === 'loading')
   }
 
   /* **An image a server sent was fetched while the page was parsed**, and its
@@ -214,6 +251,7 @@ export class HelixHeadlessAvatar extends HelixElement {
           part="image"
           src=${this.src}
           alt=""
+          loading=${this.loading ?? nothing}
           ?hidden=${standIn}
           @error=${this.handleError}
           @load=${this.handleLoad}
@@ -233,7 +271,7 @@ export class HelixHeadlessAvatar extends HelixElement {
    */
   protected renderInitials(): TemplateResult {
     return html`<slot>
-      <span part="initials" aria-hidden="true">${initialsOf(this.name)}</span>
+      <span part="initials" aria-hidden="true">${this.initials ?? initialsOf(this.name)}</span>
     </slot>`
   }
 }

@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, role, slotted } from '@fusion.dev/helix-testing/dom'
+import { hasState, mount, part, registerDom, role, slotted } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -212,5 +212,41 @@ describe('fallback delay', () => {
     await avatar.updateComplete
     expect(part(avatar, 'initials')).toBeNull()
     expect((part(avatar, 'image') as HTMLImageElement).hidden).toBe(false)
+  })
+})
+
+/* Web Awesome's avatar takes its initials and a lazy picture; this one could
+   only take the letters from the name and fetched every picture at once. */
+describe('initials and loading', () => {
+  test('`initials` stands in for the letters taken from the name', async () => {
+    const avatar = await mount(
+      '<helix-headless-avatar name="Grace Brewster Hopper" initials="GBH"></helix-headless-avatar>',
+    )
+    expect(part(avatar, 'initials')?.textContent?.trim()).toBe('GBH')
+  })
+
+  test('`loading` reaches the picture, and is absent unless asked', async () => {
+    const lazy = await mount(
+      '<helix-headless-avatar name="Ada" src="/ada.avif" loading="lazy"></helix-headless-avatar>',
+    )
+    const plain = await mount(
+      '<helix-headless-avatar name="Ada" src="/ada.avif"></helix-headless-avatar>',
+    )
+    expect([
+      part(lazy, 'image')?.getAttribute('loading'),
+      part(plain, 'image')?.hasAttribute('loading'),
+    ]).toEqual(['lazy', false])
+  })
+
+  test('the status is a custom state as well', async () => {
+    const avatar = (await mount(
+      '<helix-headless-avatar name="Ada" src="/ada.avif"></helix-headless-avatar>',
+    )) as Updatable
+    expect(hasState(avatar, 'loading')).toBe(true)
+    part(avatar, 'image')?.dispatchEvent(new Event('load'))
+    await avatar.updateComplete
+    expect(['error', 'loaded', 'loading'].filter((name) => hasState(avatar, name))).toEqual([
+      'loaded',
+    ])
   })
 })
