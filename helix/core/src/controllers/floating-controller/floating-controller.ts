@@ -183,6 +183,19 @@ export interface FloatingOptions {
 }
 
 /**
+ * How wide a panel that matches its anchor is drawn: the anchor's width, no
+ * wider than the room the panel has inside the window's margins.
+ *
+ * **A trigger as wide as the window gave a list as wide as the window**, and
+ * `shift` keeps a margin it then cannot keep: a Select spanning a phone with no
+ * gutter opened its list 8 pixels past the end edge, on both sides of the
+ * window at once. The room is Floating UI's `availableWidth` after the shift,
+ * so a panel that fits is the anchor's width exactly, as before.
+ */
+export const matchedInlineSize = (anchor: number, room: number): number =>
+  Math.round(Math.max(0, Math.min(anchor, room)))
+
+/**
  * Places one element against another, and keeps it there.
  *
  * Positioning is `@floating-ui/dom` rather than arithmetic written here. Two
@@ -208,7 +221,7 @@ export interface FloatingOptions {
  * package and none of them is private. the `hooks` rule pairs a documented
  * hook with a rule that reads one, in both directions.
  *
- * @cssproperty --floating-anchor-inline-size - The anchor's width, for a panel that matches it.
+ * @cssproperty --floating-anchor-inline-size - The anchor's width, for a panel that matches it, and never wider than the room the panel has inside the window's margins.
  * @cssproperty --floating-arrow-x - Where the arrow meets the anchor, from the panel's left edge in both text directions.
  * @cssproperty --floating-arrow-y - Where the arrow meets the anchor, from the panel's top edge.
  * @cssproperty --floating-available-block-size - How much room is left below, for a panel that scrolls.
@@ -407,7 +420,7 @@ export class FloatingController implements ReactiveController {
                resolving against something the CSS could not see. */
             elements.floating.style.setProperty(
               '--floating-anchor-inline-size',
-              `${Math.round(rects.reference.width)}px`,
+              `${matchedInlineSize(rects.reference.width, availableWidth)}px`,
             )
           },
           padding: 8,
