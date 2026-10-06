@@ -1,5 +1,6 @@
 // Re-exported from the headless family's entry, which registers the whole set.
 export {
+  type IconLibraryOptions,
   type IconResolver,
   registerIconLibrary,
   registerIcons,

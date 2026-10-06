@@ -51,6 +51,18 @@ slot[name="label"]::slotted(*) {
   text-align: end;
 }
 
+/* Said and not shown: the filled bar is the picture of it. Out of sight and in
+   the accessibility tree, the recipe the charts use for their summary. */
+[part="live"] {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  margin: var(--helix-space-none);
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
 /* The whole length the work is measured against, and it is always fully drawn: a
    track that only appears where the fill has not reached leaves the bar without
    a total, and a proportion needs both halves to be read as one. */

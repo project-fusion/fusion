@@ -23,11 +23,23 @@ import type { HelixIcon } from '@fusion.dev/helix-icons'
 /** What a library gives for a name: a glyph, a glyph later, or nothing. */
 export type IconResolver = (name: string) => HelixIcon | Promise<HelixIcon | undefined> | undefined
 
+/** How a library's glyphs are drawn, beside the names it resolves. */
+export interface IconLibraryOptions {
+  /**
+   * Changes each drawn `<svg>` of the library's glyphs, as Web Awesome's
+   * `mutator` does: a stroke width, a fill, an attribute the set leaves out.
+   * Called after every render that draws one of them.
+   */
+  mutator?: (svg: SVGSVGElement) => void
+}
+
 interface Registry {
   /** What each library gave for a written name, so a name asks once. */
   answers: Map<string, HelixIcon | Promise<HelixIcon | undefined> | undefined>
   glyphs: Map<string, HelixIcon>
   libraries: Map<string, IconResolver>
+  /** Each library's mutator, by prefix. Absent from a registry an older bundle made. */
+  mutators?: Map<string, (svg: SVGSVGElement) => void>
   watchers: Set<() => void>
 }
 
@@ -75,10 +87,34 @@ export const registerIcons = (glyphs: Record<string, HelixIcon> | readonly Helix
  * The resolver may answer at once or with a promise; an element waiting on a
  * promise draws the glyph when it arrives and fires `load`. Each written name
  * is asked once, and a prefix registered again is asked afresh.
+ *
+ * A sprite sheet is a library whose glyphs point into it, so the sheet is
+ * fetched once and cached:
+ *
+ * ```js
+ * registerIconLibrary('sprite', (name) => ({
+ *   content: `<use href="/icons.svg#${name}"></use>`,
+ *   name,
+ *   viewBox: '0 0 24 24',
+ * }))
+ * ```
+ *
+ * `mutator` changes each drawn `<svg>` of the library, such as
+ * `(svg) => svg.setAttribute('stroke-width', '1.5')`.
  */
-export const registerIconLibrary = (prefix: string, resolve: IconResolver): void => {
+export const registerIconLibrary = (
+  prefix: string,
+  resolve: IconResolver,
+  options: IconLibraryOptions = {},
+): void => {
   const held = registry()
   held.libraries.set(prefix, resolve)
+  held.mutators ??= new Map()
+  if (options.mutator) {
+    held.mutators.set(prefix, options.mutator)
+  } else {
+    held.mutators.delete(prefix)
+  }
   for (const name of held.answers.keys()) {
     if (name.startsWith(`${prefix}:`)) {
       held.answers.delete(name)
@@ -98,6 +134,12 @@ export const watchIcons = (watcher: () => void): (() => void) => {
   return () => {
     held.watchers.delete(watcher)
   }
+}
+
+/** The mutator of the library a written name asks, or `undefined`. */
+export const iconMutator = (name: string): ((svg: SVGSVGElement) => void) | undefined => {
+  const split = name.indexOf(':')
+  return split > 0 ? registry().mutators?.get(name.slice(0, split)) : undefined
 }
 
 /** The registered glyph of this name, or `undefined`. */

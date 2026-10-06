@@ -1,9 +1,12 @@
 import {
   customElement,
+  drawStatus,
   formatNumber,
   HelixElement,
   hostAria,
+  StatusController,
   slottedWords,
+  wordsConverter,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -13,6 +16,9 @@ const WHOLE_PERCENT: Intl.NumberFormatOptions = { maximumFractionDigits: 0, styl
 
 /** Which band a value falls in, once `optimum` has said which end is good. */
 export type MeterBand = 'fair' | 'good' | 'poor'
+
+/** The words a band is said with under `live`, where `band-labels` gives none. */
+const BAND_WORDS: Readonly<Record<MeterBand, string>> = { fair: 'Fair', good: 'Good', poor: 'Poor' }
 
 /**
  * @summary A measurement in a known range, with optional bands that mark it good, fair, or poor.
@@ -27,6 +33,15 @@ export type MeterBand = 'fair' | 'good' | 'poor'
  * `low` and `high` divide the range into a low band, a middle band, and a high
  * band. `optimum` sets the preferred band. The band next to it is fair, and the
  * band two away is poor.
+ *
+ * The band is a custom state on the meter, `good`, `fair` or `poor`, beside
+ * `over` and `under` for a value past an end, so a page styles the meter
+ * around the fill as well as the fill.
+ *
+ * **`live` says the reading when it moves into another band**, such as "92%,
+ * Poor", in a polite region, for a meter whose value changes while a reader is
+ * on the page: a disk filling or a battery draining. The band's word comes from
+ * `band-labels`.
  *
  * @since 0.1.0
  * @status stable
@@ -43,6 +58,7 @@ export type MeterBand = 'fair' | 'good' | 'poor'
  * @csspart indicator-over - The fill while the value is above `max`. Set alongside `indicator`.
  * @csspart indicator-poor - The fill while the reading is two bands from the good band. Set alongside `indicator`.
  * @csspart indicator-under - The fill while the value is below `min`. Set alongside `indicator`.
+ * @csspart live - A polite region that says the reading as it moves into another band, under `live`, rendered from the first time it does. Hide it visually.
  * @csspart tick - A mark at `low` or at `high`.
  * @csspart track - The whole range, or the drawing in `ring` and `arc`.
  * @csspart value - The reading as text, shown when `show-value` is set.
@@ -51,6 +67,12 @@ export type MeterBand = 'fair' | 'good' | 'poor'
  * @cssproperty --meter-at - Where a bound sits on a linear track, as a percentage.
  * @cssproperty --meter-fraction - The value as a fraction of the range, 0 to 1.
  * @cssproperty --meter-sweep - How much of the circle the arc covers, as a path length.
+ *
+ * @cssstate fair - The reading is in a band next to the good band.
+ * @cssstate good - The reading is in the good band.
+ * @cssstate over - The value is above `max`.
+ * @cssstate poor - The reading is two bands from the good band.
+ * @cssstate under - The value is below `min`.
  */
 @customElement('helix-headless-meter')
 export class HelixHeadlessMeter extends HelixElement {
@@ -87,6 +109,15 @@ export class HelixHeadlessMeter extends HelixElement {
   band?: MeterBand
 
   /**
+   * The words each band is said with under `live`, by its name, written as
+   * JSON in the attribute: `band-labels='{"poor":"Almost full"}'`.
+   *
+   * A band left out keeps its default: "Good", "Fair" or "Poor".
+   */
+  @property({ attribute: 'band-labels', converter: wordsConverter })
+  bandLabels: Partial<Record<MeterBand, string>> = {}
+
+  /**
    * `Intl.NumberFormat` options the reading is written with, as React Aria's
    * Meter and ProgressBar take them: a unit, a currency, or a number of
    * decimals. Written as JSON in the attribute.
@@ -119,6 +150,17 @@ export class HelixHeadlessMeter extends HelixElement {
    */
   @property()
   label = 'Meter'
+
+  /**
+   * Says the reading in a polite `live` region each time it moves into
+   * another band, with the band's word, such as "92%, Poor".
+   *
+   * For a meter whose value changes while it is on screen. Off by default,
+   * because a meter that reads a fixed level has nothing new to say. A meter
+   * with no bands says nothing.
+   */
+  @property({ type: Boolean })
+  live = false
 
   /**
    * The locale the percentage is written in, such as `fr` for `72 %`.
@@ -209,6 +251,15 @@ export class HelixHeadlessMeter extends HelixElement {
    */
   @property({ attribute: 'value-text' })
   valueText = ''
+
+  /** The region `live` speaks in, rendered from the first time it does. */
+  private readonly status = new StatusController(this)
+
+  /**
+   * The band at the last update, so a move into another one is heard once:
+   * an empty string for none, and undefined before the first update.
+   */
+  private lastBand: MeterBand | '' | undefined
 
   /** The range, clamped so `max` is never at or below `min`. */
   private get span(): { max: number; min: number } {
@@ -335,6 +386,26 @@ export class HelixHeadlessMeter extends HelixElement {
        Under `format-options` the words shown are the words said. */
     this.internals.ariaValueText =
       this.valueText || this.formatOptions !== undefined || this.beyond ? this.text : null
+    const band = this.computedBand
+    const beyond = this.beyond
+    this.toggleState('fair', band === 'fair')
+    this.toggleState('good', band === 'good')
+    this.toggleState('poor', band === 'poor')
+    this.toggleState('over', beyond === 'over')
+    this.toggleState('under', beyond === 'under')
+  }
+
+  /* A band the reading moved into is said under `live`. The first update
+     only records where it stands, since a meter that arrives in a band has
+     not moved. */
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    const band = this.computedBand
+    const moved = this.lastBand !== undefined && band !== undefined && band !== this.lastBand
+    this.lastBand = band ?? ''
+    if (moved && this.live) {
+      this.status.say(`${this.text}, ${this.bandLabels[band] ?? BAND_WORDS[band]}`)
+    }
   }
 
   /**
@@ -425,7 +496,7 @@ export class HelixHeadlessMeter extends HelixElement {
             ></div>
           </div>`
     }
-      ${this.showValue ? html`<span part="value">${this.text}</span>` : nothing}`
+      ${this.showValue ? html`<span part="value">${this.text}</span>` : nothing}${drawStatus(this.status)}`
   }
 }
 

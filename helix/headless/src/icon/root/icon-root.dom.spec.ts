@@ -284,3 +284,61 @@ describe('a name the page registered', () => {
     expect(errors).toBe(1)
   })
 })
+
+/* Web Awesome's libraries take a `mutator` that changes each drawn `<svg>`. */
+describe('a library with a mutator', () => {
+  test('hands each drawn glyph of the library to it', async () => {
+    const { registerIconLibrary } = await import('../index.js')
+    registerIconLibrary(
+      'spec-thin',
+      (name) => ({ content: '<path d="M0 0h1"></path>', name, viewBox: '0 0 24 24' }),
+      { mutator: (drawn) => drawn.setAttribute('stroke-width', '1.5') },
+    )
+    const icon = await mount('<helix-headless-icon name="spec-thin:line"></helix-headless-icon>')
+    const plain = await mount('<helix-headless-icon name="check"></helix-headless-icon>')
+    expect([
+      svg(icon)?.getAttribute('stroke-width'),
+      svg(plain)?.hasAttribute('stroke-width'),
+    ]).toEqual(['1.5', false])
+  })
+})
+
+/* An unnamed icon that is all a button holds left a button with no name, and
+   nothing said so. The warning is in development builds only: the package's
+   `test:dom` passes `--conditions helix-development`. */
+describe('a decorative icon alone in a control', () => {
+  const warnedOn = async (markup: string): Promise<string[]> => {
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      await mount(markup)
+      await new Promise((done) => setTimeout(done, 5))
+    } finally {
+      console.warn = original
+    }
+    return warnings.filter((one) => one.includes('accessible name'))
+  }
+
+  test('warns that the control has no name', async () => {
+    const warnings = await warnedOn(
+      '<button><helix-headless-icon name="check"></helix-headless-icon></button>',
+    )
+    expect(warnings.length).toBe(1)
+    expect(warnings[0]).toContain('<button>')
+  })
+
+  test('and says nothing where the icon or the control is named, or words name it', async () => {
+    expect([
+      ...(await warnedOn(
+        '<button><helix-headless-icon name="check" label="Done"></helix-headless-icon></button>',
+      )),
+      ...(await warnedOn(
+        '<button aria-label="Done"><helix-headless-icon name="check"></helix-headless-icon></button>',
+      )),
+      ...(await warnedOn(
+        '<a href="#"><helix-headless-icon name="check"></helix-headless-icon> Done</a>',
+      )),
+    ]).toEqual([])
+  })
+})

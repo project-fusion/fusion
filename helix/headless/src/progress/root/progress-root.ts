@@ -1,8 +1,11 @@
 import {
   customElement,
+  drawStatus,
   formatNumber,
+  HelixCompleteEvent,
   HelixElement,
   hostAria,
+  StatusController,
   slottedWords,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
@@ -26,6 +29,13 @@ const WHOLE_PERCENT: Intl.NumberFormatOptions = { maximumFractionDigits: 0, styl
  *
  * The fill is a fraction of the track, written as a custom property.
  *
+ * **Reaching `max` is said and sent.** When the value arrives at `max` from
+ * below, the bar says `complete-label`, "Complete" by default, in a polite
+ * `live` region and sends `helix-complete`, so a reader hears that the work is
+ * done and a page can move on. A bar that starts full says nothing, and an
+ * empty `complete-label` keeps it quiet. The `complete` custom state is set
+ * while the bar is full.
+ *
  * @since 0.1.0
  * @status stable
  * @category feedback
@@ -34,15 +44,30 @@ const WHOLE_PERCENT: Intl.NumberFormatOptions = { maximumFractionDigits: 0, styl
  *
  * @slot label - A visible label. Its words name the progress bar in place of `label`.
  *
+ * @event {HelixCompleteEvent} helix-complete - The value reached `max` from below. Its `value` is `max`. Not sent for a bar that starts full.
+ *
  * @csspart groove - The unfilled circle under the ring's filled arc.
  * @csspart indicator - The filled part that shows the work done.
+ * @csspart live - A polite region that says `complete-label` when the work is done, rendered from that moment. Hide it visually.
  * @csspart track - The full length the work is measured against.
  * @csspart value - The value shown beside the bar when `show-value` is set.
  *
  * @cssproperty --progress-fraction - The value as a fraction of the range, 0 to 1. Pinned to 1 while indeterminate.
+ *
+ * @cssstate complete - The value is at `max` and the bar is not indeterminate.
  */
 @customElement('helix-headless-progress')
 export class HelixHeadlessProgress extends HelixElement {
+  /**
+   * The words a screen reader hears when the value reaches `max`, such as
+   * "Upload complete".
+   *
+   * Said once, politely, as the work finishes. Empty says nothing, for a bar
+   * whose page announces the result itself.
+   */
+  @property({ attribute: 'complete-label' })
+  completeLabel = 'Complete'
+
   /**
    * `Intl.NumberFormat` options the reading is written with, as React Aria's
    * Meter and ProgressBar take them: a unit, a currency, or a number of
@@ -160,6 +185,17 @@ export class HelixHeadlessProgress extends HelixElement {
   @property({ attribute: 'value-text' })
   valueText = ''
 
+  /** The region the bar says `complete-label` in, rendered from the first time it does. */
+  private readonly status = new StatusController(this)
+
+  /** Whether the bar was full at the last update, or unknown before the first. */
+  private wasComplete: boolean | undefined
+
+  /** Whether the work is done: determinate and at `max`. */
+  private get complete(): boolean {
+    return !this.indeterminate && this.fraction >= 1
+  }
+
   /** The range the value is measured in, with a top above its bottom. */
   private get range(): { max: number; min: number } {
     const min = Number.isFinite(this.min) ? this.min : 0
@@ -209,6 +245,23 @@ export class HelixHeadlessProgress extends HelixElement {
       : String(Math.min(Math.max(this.value || min, min), max))
     this.internals.ariaValueText =
       this.valueText || (this.formatOptions !== undefined && !this.indeterminate ? this.text : null)
+    this.toggleState('complete', this.complete)
+  }
+
+  /* Arriving at `max` from below is news; starting there is not, so the first
+     update only records where the bar stands. */
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    const complete = this.complete
+    const arrived = complete && this.wasComplete === false
+    this.wasComplete = complete
+    if (!arrived) {
+      return
+    }
+    if (this.completeLabel !== '') {
+      this.status.say(this.completeLabel)
+    }
+    this.dispatchEvent(new HelixCompleteEvent({ value: String(this.range.max) }))
   }
 
   /**
@@ -275,7 +328,7 @@ export class HelixHeadlessProgress extends HelixElement {
               >${this.text}</span
             >`
           : ''
-      }`
+      }${drawStatus(this.status)}`
   }
 }
 
