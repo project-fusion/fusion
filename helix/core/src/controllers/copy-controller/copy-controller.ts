@@ -10,9 +10,16 @@ export interface CopyOptions {
    * On a timer rather than on the pointer leaving, so it survives a hand that
    * has already moved on: the press and the reading of it are two moments, and
    * a mark that vanishes with the cursor is one a fast reader never sees.
+   *
+   * A function is read at each copy, for a host whose duration is a property
+   * a page can change, as other controllers' options are.
    */
-  after?: number
+  after?: number | (() => number)
 }
+
+/** An option given as a value or as a function read when it is needed. */
+const read = (option: number | (() => number) | undefined): number | undefined =>
+  typeof option === 'function' ? option() : option
 
 /**
  * Writes to the clipboard, by whichever of the two routes this context allows.
@@ -143,7 +150,7 @@ export class CopyController implements ReactiveController {
       this.copied = false
       this.failed = false
       this.host.requestUpdate()
-    }, this.options.after ?? 1200)
+    }, read(this.options.after) ?? 1200)
     return wrote
   }
 

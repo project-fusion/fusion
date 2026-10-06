@@ -550,6 +550,7 @@ export {
   Typeahead,
   type TypeaheadBy,
   typeaheadBy,
+  typeaheadByWords,
   typesCharacter,
 } from './utils/typeahead/typeahead.js'
 export {

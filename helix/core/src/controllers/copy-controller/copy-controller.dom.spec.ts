@@ -172,6 +172,20 @@ describe('a write that succeeded', () => {
     expect(copy.copied).toBe(false)
   })
 
+  /* Copy Button's `feedback-duration` is a property a page changes, and the
+     button made the option live with a getter on a plain object. */
+  test('read at each copy where the caller gives a function', async () => {
+    routes({ modern: true })
+    let after = 10
+    const copy = new CopyController(host() as never, { after: () => after })
+    after = 60
+    await copy.copy('ada')
+    await new Promise((done) => setTimeout(done, 25))
+    expect(copy.copied).toBe(true)
+    await new Promise((done) => setTimeout(done, 50))
+    expect(copy.copied).toBe(false)
+  })
+
   /* On a timer rather than on the pointer leaving, so it survives a hand that
      has already moved on: the press and the reading of it are two moments, and
      a mark that vanishes with the cursor is one a fast reader never sees. */

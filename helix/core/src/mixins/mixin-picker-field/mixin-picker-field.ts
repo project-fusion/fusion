@@ -5,9 +5,12 @@ import type { HelixFormElement } from '../../helix-form-element/helix-form-eleme
 import { submitImplicitly } from '../../utils/implicit-submit/implicit-submit.js'
 import { reportValues } from '../../utils/report-values/report-values.js'
 import { tabStops } from '../../utils/tab-stops/tab-stops.js'
+import { type PickerVerdict, verdictFlags } from '../../utils/verdict-flags/verdict-flags.js'
 import type { MixinControllerOpenInterface } from '../mixin-controller-open/mixin-controller-open.js'
 import type { MixinControllerValueInterface } from '../mixin-controller-value/mixin-controller-value.js'
 import type { MixinFieldInterface } from '../mixin-field/mixin-field.js'
+
+export type { PickerVerdict } from '../../utils/verdict-flags/verdict-flags.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
 type Constructor<T> = new (...args: any[]) => T
@@ -127,25 +130,6 @@ export declare class MixinPickerFieldInterface {
    * platform's own verdict stands.
    */
   protected validate(): PickerVerdict
-}
-
-/**
- * What a picker field finds wrong: a message, reported as `badInput`, or the
- * validity flag to set and its message. Empty means nothing is wrong.
- */
-export type PickerVerdict = string | readonly [flag: keyof ValidityStateFlags, message: string]
-
-/**
- * A verdict as the flags and the message `setValidity` takes, or `null` where
- * there is nothing wrong.
- */
-export const verdictFlags = (
-  verdict: PickerVerdict,
-): [flags: ValidityStateFlags, message: string] | null => {
-  if (typeof verdict === 'string') {
-    return verdict === '' ? null : [{ badInput: true }, verdict]
-  }
-  return [{ [verdict[0]]: true }, verdict[1]]
 }
 
 /**

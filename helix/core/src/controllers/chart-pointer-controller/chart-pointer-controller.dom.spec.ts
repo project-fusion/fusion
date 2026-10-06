@@ -600,3 +600,38 @@ describe('a page of readings by key', () => {
     expect(grid.point.at).toBe(0)
   })
 })
+
+/* Said beside the reading, such as "2 of 4", so a reader moving by key knows
+   where the reading stands. Covered until now only through Bar Chart. */
+describe('where a reading stands', () => {
+  test('is the host’s words, filled with its place among the readings', () => {
+    const one = scene(4)
+    Object.assign(one.host, { positionLabel: '{position} of {count}' })
+    expect(one.point.position).toBe('')
+    move(one, 71, 100)
+    expect(one.point.position).toBe('2 of 4')
+  })
+
+  test('counted among the shown readings, so a hidden one is not one of the count', () => {
+    const one = scene(4)
+    Object.assign(one.host, {
+      positionLabel: '{position} of {count}',
+      showsReading: (at: number) => at !== 0,
+    })
+    move(one, 121, 100)
+    expect(one.point.position).toBe('2 of 3')
+  })
+
+  test('in the host’s locale', () => {
+    const one = scene(4)
+    Object.assign(one.host, { locale: 'ar-EG', positionLabel: '{position} / {count}' })
+    move(one, 219, 100)
+    expect(one.point.position).toBe('٤ / ٤')
+  })
+
+  test('nothing where the host gives no words', () => {
+    const one = scene(4)
+    move(one, 71, 100)
+    expect(one.point.position).toBe('')
+  })
+})

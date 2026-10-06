@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { Typeahead, typeaheadBy, typesCharacter } from './typeahead.js'
+import { Typeahead, typeaheadBy, typeaheadByWords, typesCharacter } from './typeahead.js'
 
 describe('Typeahead', () => {
   test('starts a new word after a pause', () => {
@@ -26,6 +26,13 @@ describe('a typeahead for a set', () => {
     one.search.match('c', ['Canada'], -1)
     expect(one.search.typing()).toBe(true)
     expect(two.search.typing()).toBe(false)
+  })
+
+  /* List, Tag Group and Drilldown each cast their items to read `words`. */
+  test('reads an item’s own words, and none where it has none', () => {
+    const typeahead = typeaheadByWords()
+    expect(typeahead.words({ words: 'Canada' })).toBe('Canada')
+    expect(typeahead.words({})).toBe('')
   })
 })
 

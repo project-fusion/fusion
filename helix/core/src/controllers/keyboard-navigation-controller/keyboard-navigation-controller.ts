@@ -22,6 +22,11 @@ export interface NavigableItem {
   select(): void
   /** Whether the item is the current one, which is where movement starts. */
   selected: boolean
+  /**
+   * The words a reader types the start of, for a set that types ahead with
+   * `typeaheadByWords`.
+   */
+  readonly words?: string
 }
 
 /** Where a move starts from: the item that has focus, or the chosen item. */

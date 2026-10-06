@@ -8,14 +8,18 @@ import type { TemplateResult } from 'lit'
  */
 type Probe = HTMLElement & { form: HTMLFormElement | null; updateComplete: Promise<boolean> }
 
+let defaultButton: typeof import('./implicit-submit.js').defaultButton
 let submitImplicitly: typeof import('./implicit-submit.js').submitImplicitly
 let submits: typeof import('./implicit-submit.js').submits
+let submitsOnEnter: typeof import('./implicit-submit.js').submitsOnEnter
 
 beforeAll(async () => {
   registerDom()
   const { html } = await import('lit')
   const { HelixFormElement } = await import('../../helix-form-element/helix-form-element.js')
-  ;({ submitImplicitly, submits } = await import('./implicit-submit.js'))
+  ;({ defaultButton, submitImplicitly, submits, submitsOnEnter } = await import(
+    './implicit-submit.js'
+  ))
   customElements.define(
     'probe-submit-control',
     class extends HelixFormElement {
@@ -112,5 +116,32 @@ describe('a submit button', () => {
       true,
       false,
     ])
+  })
+})
+
+describe('the default button', () => {
+  test('is the first control in the form that submits it', async () => {
+    document.body.innerHTML =
+      '<form><button type="button">Back</button><input id="first" type="image" /><button type="submit">Send</button></form>'
+    const form = document.querySelector('form') as HTMLFormElement
+    expect(defaultButton(form) === document.getElementById('first')).toBe(true)
+  })
+
+  test('is none in a form with no submit button', () => {
+    document.body.innerHTML = '<form><button type="button">Back</button><input /></form>'
+    expect(defaultButton(document.querySelector('form') as HTMLFormElement)).toBeUndefined()
+  })
+})
+
+describe('Enter in a native field', () => {
+  test('submits from a text field of the form, which the platform does itself', () => {
+    document.body.innerHTML =
+      '<form><input id="text" /><input id="box" type="checkbox" /></form><input id="outside" form="other" />'
+    const form = document.querySelector('form') as HTMLFormElement
+    const field = (id: string) => document.getElementById(id) ?? undefined
+    expect(submitsOnEnter(field('text'), form)).toBe(true)
+    expect(submitsOnEnter(field('box'), form)).toBe(false)
+    expect(submitsOnEnter(field('outside'), form)).toBe(false)
+    expect(submitsOnEnter(undefined, form)).toBe(false)
   })
 })
