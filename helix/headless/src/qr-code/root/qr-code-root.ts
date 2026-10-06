@@ -9,7 +9,7 @@ import {
 } from 'lit'
 import { property } from 'lit/decorators.js'
 import { encode } from 'uqr'
-import { type QrBox, type QrLogo, qrSvg } from '../export.js'
+import { boxIn, logoBox, type QrLogo, qrSvg } from '../export.js'
 
 /** How much of the code can be lost and still read. */
 export type QrCorrection = 'H' | 'L' | 'M' | 'Q'
@@ -336,15 +336,8 @@ export class HelixHeadlessQrCode extends HelixElement {
     if (!holder || holder.hidden || !mark || area.width === 0) {
       return undefined
     }
-    const scale = box / area.width
-    const at = (rect: DOMRect): QrBox => [
-      (rect.left - area.left) * scale,
-      (rect.top - area.top) * scale,
-      rect.width * scale,
-      rect.height * scale,
-    ]
-    const frame = at(holder.getBoundingClientRect())
-    if (frame[0] < 0 || frame[1] < 0 || frame[0] + frame[2] > box || frame[1] + frame[3] > box) {
+    const frame = logoBox(holder.getBoundingClientRect(), area, box)
+    if (!frame) {
       return undefined
     }
     const fill = getComputedStyle(holder).backgroundColor
@@ -352,7 +345,7 @@ export class HelixHeadlessQrCode extends HelixElement {
     const logo = {
       frame,
       ground: ground ? background : rgbOf(fill),
-      mark: at(mark.getBoundingClientRect()),
+      mark: boxIn(mark.getBoundingClientRect(), area, box),
     }
     if (mark instanceof HTMLImageElement) {
       return { ...logo, href: pixelsOf(mark) }

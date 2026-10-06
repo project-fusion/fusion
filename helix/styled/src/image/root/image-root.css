@@ -61,15 +61,21 @@
   inline-size: 100%;
 }
 
+/* The fallback's own hooks, resting on the placeholder's ground and the
+   subtle ink it always had, so a page can tell a failure from a wait. */
 [part="fallback"] {
-  background-color: var(--image-placeholder-color, var(--helix-color-surface-sunken));
-  color: var(--helix-color-foreground-subtle);
+  background-color: var(
+    --image-fallback-background-color,
+    var(--image-placeholder-color, var(--helix-color-surface-sunken))
+  );
+  color: var(--image-fallback-color, var(--helix-color-foreground-subtle));
 }
 
 /* Arriving rather than appearing. */
 [part="image"] {
   opacity: 0;
-  transition: opacity var(--helix-duration-normal) var(--helix-easing-standard);
+  transition: opacity var(--image-fade-duration, var(--helix-duration-normal))
+    var(--helix-easing-standard);
 }
 
 :host([data-status="loaded"]) [part="image"] {

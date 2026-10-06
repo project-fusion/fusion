@@ -43,6 +43,40 @@ export interface QrLogo {
   svg?: string
 }
 
+/** A rectangle the page measured, as `getBoundingClientRect` gives one. */
+export interface QrRect {
+  readonly height: number
+  readonly left: number
+  readonly top: number
+  readonly width: number
+}
+
+/**
+ * A rectangle measured on the page as a place in the drawing: `area` is the
+ * drawn code's own rectangle and `box` the side of its `viewBox`, so a logo
+ * set over the code by a stylesheet lands where it was drawn.
+ */
+export const boxIn = (rect: QrRect, area: QrRect, box: number): QrBox => {
+  const scale = box / area.width
+  return [
+    (rect.left - area.left) * scale,
+    (rect.top - area.top) * scale,
+    rect.width * scale,
+    rect.height * scale,
+  ]
+}
+
+/**
+ * The logo's box in the drawing, or nothing where any of it falls outside the
+ * code, such as a logo the headless tier sets beside the code rather than
+ * over it, which a file of the code alone has no place for.
+ */
+export const logoBox = (rect: QrRect, area: QrRect, box: number): QrBox | undefined => {
+  const frame = boxIn(rect, area, box)
+  const [x, y, width, height] = frame
+  return x < 0 || y < 0 || x + width > box || y + height > box ? undefined : frame
+}
+
 /** Escapes a value for a double-quoted XML attribute. */
 const attribute = (value: string): string =>
   value.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;')

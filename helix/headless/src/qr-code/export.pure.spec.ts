@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { qrLogo, qrSvg } from './export.js'
+import { boxIn, logoBox, qrLogo, qrSvg } from './export.js'
 
 const drawing = {
   background: 'rgb(255, 255, 255)',
@@ -73,5 +73,29 @@ describe('qrLogo', () => {
     const markup = qrSvg({ ...drawing, logo: { frame, ground: '#fff', href: 'a.png', mark } }, 64)
     expect(markup.indexOf('<image')).toBeGreaterThan(markup.lastIndexOf('<path'))
     expect(qrSvg(drawing, 64)).not.toContain('<image')
+  })
+})
+
+/* The arithmetic `logoDrawing` did inline: a measured rectangle into the
+   code's own units, and whether the logo is over the code at all. */
+describe('boxIn and logoBox', () => {
+  const area = { height: 200, left: 100, top: 50, width: 200 }
+
+  test("scale a measured rectangle into the viewBox, from the code's corner", () => {
+    expect(boxIn({ height: 40, left: 180, top: 130, width: 40 }, area, 41)).toEqual([
+      16.4, 16.4, 8.2, 8.2,
+    ])
+  })
+
+  test('keep a logo over the code, and drop one beside or past it', () => {
+    expect(logoBox({ height: 40, left: 180, top: 130, width: 40 }, area, 41)).toEqual([
+      16.4, 16.4, 8.2, 8.2,
+    ])
+    expect(logoBox({ height: 40, left: 310, top: 130, width: 40 }, area, 41)).toBeUndefined()
+    expect(logoBox({ height: 40, left: 90, top: 130, width: 40 }, area, 41)).toBeUndefined()
+    expect(logoBox({ height: 40, left: 180, top: 230, width: 40 }, area, 41)).toBeUndefined()
+    expect(logoBox({ height: 200, left: 100, top: 50, width: 200 }, area, 41)).toEqual([
+      0, 0, 41, 41,
+    ])
   })
 })
