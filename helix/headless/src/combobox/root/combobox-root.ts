@@ -136,7 +136,9 @@ const isInsertion = (event: Event): boolean =>
  * @csspart tag-start - The category before the label.
  * @csspart tags - The row of chosen options, when `multiple` is set.
  *
+ * @cssstate error - While `load-error` is set.
  * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
+ * @cssstate no-results - What was typed hid every option of a list that has some.
  * @cssstate open - While the list is open.
  */
 @customElement('helix-headless-combobox')
@@ -514,6 +516,29 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   }
 
   /**
+   * The list's `error` and `no-results` states on the host too, so a page
+   * styles the whole control from them, as WA's combobox and its status slots
+   * allow. The list keeps its own, which only a stylesheet inside this shadow
+   * root could reach.
+   *
+   * Read once the list has drawn the filter, since `hidden` is what the
+   * filter writes onto an option: a filter that hid every option of a list
+   * that has some, with nothing loading.
+   */
+  private markStatus(): void {
+    const list = this.listbox
+    this.toggleState('error', this.loadError !== '')
+    this.toggleState(
+      'no-results',
+      list !== null &&
+        !this.loading &&
+        list.filter !== '' &&
+        list.options.length > 0 &&
+        !this.showing,
+    )
+  }
+
+  /**
    * What the create row would add, or nothing where there is nothing to add.
    *
    * Empty where the words already name an option exactly, case aside: offering
@@ -742,7 +767,10 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
        the filter has run. */
     if (this.dispatchEvent(narrowing)) {
       this.listbox?.requestFilter(typed)
-      void this.listbox?.updateComplete.then(() => this.linkActive())
+      void this.listbox?.updateComplete.then(() => {
+        this.linkActive()
+        this.markStatus()
+      })
     }
     this.suggestion = this.suggest && inserted ? this.completionFor(typed) : ''
   }
@@ -1084,6 +1112,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
     super.updated?.(changed)
     this.sync()
     this.linkActive()
+    void (this.listbox?.updateComplete ?? Promise.resolve()).then(() => this.markStatus())
     /* After the render, not during it: the input's value is a binding, so
        selecting a range of it before Lit has written it selects a range of the
        previous value.

@@ -156,7 +156,9 @@ const rangeFor = (root: Element, needle: string): Range[] => {
  * highlighted option, Shift with an arrow adds the option it moves to, Shift
  * with Home or End adds every option from the highlight to that end, and
  * Control+A or Command+A chooses every option, or none where all are chosen.
- * In a filter field, Space, Home, End and letters edit the text.
+ * In a filter field, Space, Home, End and letters edit the text, and with
+ * `multiple`, Control with Shift and Home or End adds every option from the
+ * highlight to that end.
  *
  * An option with `href` is a link: Enter or a press follows it and selects
  * nothing, and moving onto it with the arrows does not follow it.
@@ -695,7 +697,18 @@ export class HelixHeadlessListbox extends MixinCollection(
       }
       return
     }
-    if (!(typing ? FIELD_MOVES : MOVES).has(event.key)) {
+    /* In a filterable list the field keeps Home and End, with Shift or
+       without, for its caret and its text. Control with Shift and either is
+       the list's: in a one-line field it selects what Shift alone does, so the
+       field loses nothing, and the range APG's multiple-selection listbox
+       takes from those keys is reachable from the field too. */
+    const fieldRange =
+      typing &&
+      this.multiple &&
+      event.shiftKey &&
+      (event.ctrlKey || event.metaKey) &&
+      (event.key === 'Home' || event.key === 'End')
+    if (!fieldRange && !(typing ? FIELD_MOVES : MOVES).has(event.key)) {
       return
     }
     event.preventDefault()
@@ -726,7 +739,7 @@ export class HelixHeadlessListbox extends MixinCollection(
          from the highlight to that end, which is APG's multiple-selection
          listbox. */
       const ranged = event.key === 'Home' || event.key === 'End'
-      if (this.multiple && !typing && event.shiftKey && ranged) {
+      if (this.multiple && (!typing || fieldRange) && event.shiftKey && ranged) {
         const taken = rangeAdd(
           this.values,
           shown.map((option) => option.value),

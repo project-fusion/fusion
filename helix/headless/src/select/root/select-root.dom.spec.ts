@@ -506,3 +506,26 @@ describe('a select with an option that is a link', () => {
     expect(host.open).toBe(true)
   })
 })
+
+describe('a list opened over its trigger', () => {
+  /* The geometry is `align.pure.spec.ts`'s and the browser's; this is that the
+     select places the list itself, as a floating panel is placed, and takes it
+     back on close. */
+  test('is placed by the select, on no side of the trigger, and released on close', async () => {
+    const host = (await select('position="item-aligned" default-value="two"')) as Updatable & {
+      open: boolean
+    }
+    host.open = true
+    await settle(host)
+    await settle(part(host as unknown as HTMLElement, 'listbox') as unknown as Updatable)
+    await settle(host)
+    const surface = part(host as unknown as HTMLElement, 'surface') as HTMLElement
+    expect(surface.hasAttribute('data-placed')).toBe(true)
+    expect(surface.hasAttribute('data-placement')).toBe(false)
+    expect(surface.style.position).toBe('fixed')
+    expect(surface.style.translate).toMatch(/px .*px$/)
+    host.open = false
+    await settle(host)
+    expect(surface.hasAttribute('data-placed')).toBe(false)
+  })
+})

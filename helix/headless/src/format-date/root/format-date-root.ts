@@ -38,6 +38,7 @@ const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/
  * **The text refreshes on one timer shared by the page.** Each element
  * schedules an update for when its current reading expires, and an element
  * showing a date schedules none, so a long feed left open costs almost nothing.
+ * `frozen` draws the reading once and leaves it.
  *
  * **The output is always `<time datetime>`**, so copy and paste and scripts
  * parsing the page get the exact instant, whatever the visible text says. A
@@ -108,6 +109,21 @@ export class HelixHeadlessFormatDate extends HelixElement {
    */
   @property()
   era?: 'long' | 'narrow' | 'short'
+
+  /**
+   * Draws an `elapsed` or `relative` reading once and leaves it, where it
+   * would otherwise move on as it goes stale.
+   *
+   * For a reading that describes a moment the page itself is about, such as
+   * "3 hours ago" in a report generated then, or a list a reader compares
+   * line by line while it should not change under them. The reading is taken
+   * when the element draws, and again whenever `date` or another option
+   * changes. Turned off, the reading catches up and moves on again.
+   * `sl-relative-time` and `wa-relative-time` keep still unless `sync` is
+   * set; this keeps moving unless `frozen` is.
+   */
+  @property({ type: Boolean })
+  frozen = false
 
   /**
    * How the hour is written, where a time of day is shown.
@@ -217,7 +233,12 @@ export class HelixHeadlessFormatDate extends HelixElement {
   private readonly clock = new RelativeClockController(this, {
     expires: (now) => {
       const moment = this.moment
-      return moment && this.reading ? this.readingAt(moment, now).next : undefined
+      if (!moment || !this.reading) {
+        return undefined
+      }
+      /* Drawn against now, and never woken: the clock schedules nothing for
+         a reading that does not expire. */
+      return this.frozen ? Number.POSITIVE_INFINITY : this.readingAt(moment, now).next
     },
   })
 
@@ -318,6 +339,7 @@ export class HelixHeadlessFormatDate extends HelixElement {
     if (
       changed.has('date') ||
       changed.has('elapsed') ||
+      changed.has('frozen') ||
       changed.has('locale') ||
       changed.has('numeric') ||
       changed.has('relative')

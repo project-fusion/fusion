@@ -776,6 +776,28 @@ describe('ranges from the keyboard', () => {
     await settle(host)
     expect(host.value.split(',').sort()).toEqual(['one', 'three', 'two'])
   })
+
+  /* The field keeps Home and End, and Shift with them, for its text. Measured
+     before this: Control with Shift and End did nothing from the field. */
+  test('from a filter field, Control and Shift with End or Home', async () => {
+    const host = (await list('multiple filterable')) as Updatable & { value: string }
+    const send = async (init: KeyboardEventInit): Promise<boolean> => {
+      const event = new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        ...init,
+      })
+      field(host).dispatchEvent(event)
+      await settle(host)
+      return event.defaultPrevented
+    }
+    await send({ key: 'ArrowDown' })
+    expect(await send({ key: 'End', shiftKey: true })).toBe(false)
+    expect(host.value).toBe('')
+    expect(await send({ ctrlKey: true, key: 'End', shiftKey: true })).toBe(true)
+    expect(host.value.split(',').sort()).toEqual(['one', 'three', 'two'])
+  })
 })
 
 describe('an option that is a link', () => {
