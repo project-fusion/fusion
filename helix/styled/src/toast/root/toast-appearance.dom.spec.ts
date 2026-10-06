@@ -235,6 +235,64 @@ if (hasLayout()) {
       expect(getComputedStyle(toast).colorScheme).toBe('dark')
     })
 
+    /* Each visual decision is a hook named after the family, resting on the
+       value it replaced, so setting none of them draws what was drawn. */
+    test('every hook rests on the value it replaced, and a page moves it', async () => {
+      const host = (await mount(
+        `<helix-toast label="N"><helix-toast-item tone="danger" dismissible duration="9000">
+           <span slot="heading">Saved</span><span slot="description">Kept</span>
+         </helix-toast-item></helix-toast>`,
+      )) as HTMLElement
+      const item = host.querySelector('helix-toast-item') as Item
+      await item.updateComplete
+      const look = (): string[] => {
+        const box = getComputedStyle(part(item, 'item') as HTMLElement)
+        const heading = getComputedStyle(item.querySelector('[slot="heading"]') as HTMLElement)
+        const detail = getComputedStyle(item.querySelector('[slot="description"]') as HTMLElement)
+        const timer = getComputedStyle(part(item, 'timer') as HTMLElement)
+        return [
+          box.backgroundColor,
+          box.borderTopLeftRadius,
+          box.color,
+          box.fontSize,
+          heading.fontWeight,
+          detail.color,
+          getComputedStyle(part(item, 'dismiss') as HTMLElement).color,
+          getComputedStyle(part(item, 'icon') as HTMLElement).color,
+          timer.backgroundColor,
+          timer.height,
+        ]
+      }
+      const before = look()
+      for (const [name, value] of [
+        ['--toast-background', 'rgb(1, 1, 1)'],
+        ['--toast-radius', '9px'],
+        ['--toast-color', 'rgb(2, 2, 2)'],
+        ['--toast-font-size', '19px'],
+        ['--toast-heading-weight', '300'],
+        ['--toast-description-color', 'rgb(3, 3, 3)'],
+        ['--toast-dismiss-color', 'rgb(4, 4, 4)'],
+        ['--toast-tone-color', 'rgb(5, 5, 5)'],
+        ['--toast-timer-size', '7px'],
+      ] as const) {
+        item.style.setProperty(name, value)
+      }
+      expect(look()).toEqual([
+        'rgb(1, 1, 1)',
+        '9px',
+        'rgb(2, 2, 2)',
+        '19px',
+        '300',
+        'rgb(3, 3, 3)',
+        'rgb(4, 4, 4)',
+        'rgb(5, 5, 5)',
+        'rgb(5, 5, 5)',
+        '7px',
+      ])
+      item.removeAttribute('style')
+      expect(look()).toEqual(before)
+    })
+
     test('a toast is dense, so its controls are one height', async () => {
       /* A toast is dense by nature, so a control slotted into one has to come
          out at the dense height rather than the full one. */

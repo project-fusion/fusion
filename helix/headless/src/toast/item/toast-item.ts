@@ -28,7 +28,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * **Each item runs its own timer.** A timer held by the region would restart
  * with each new message, and the last of three messages would stay for nine
- * seconds.
+ * seconds. It pauses while the pointer or focus is on the message, and while
+ * the page is hidden, so a message is not spent in a background tab.
  *
  * **Each message is an `alertdialog` named by its words**, which is how a reader
  * who moves into the stack hears which message they are on. Give it a
@@ -144,8 +145,10 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
   }
 
   /**
-   * The dismiss timer, which pauses while a reader is on the message and
-   * continues from what was left.
+   * The dismiss timer, which pauses while a reader is on the message, and
+   * while the page is hidden, and continues from what was left. A message that
+   * arrives in a background tab waits for the reader to come back, as React
+   * Aria's toast queue does.
    *
    * Paused is said on the host so the indicator can freeze with the clock. A
    * `data-` attribute rather than a property, because it is written after
@@ -156,6 +159,7 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
     done: () => {
       this.dismiss()
     },
+    holdWhileHidden: true,
     paused: (paused) => {
       this.toggleAttribute('data-paused', paused)
     },

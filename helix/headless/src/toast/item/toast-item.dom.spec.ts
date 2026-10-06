@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
@@ -7,6 +7,14 @@ beforeAll(async () => {
 })
 
 type Item = HTMLElement & { open: boolean; updateComplete: Promise<boolean> }
+
+/** Puts back a global a case replaced. */
+let restore: (() => void) | undefined
+
+afterEach(() => {
+  restore?.()
+  restore = undefined
+})
 
 const message = async (attributes = ''): Promise<Item> =>
   (await mount(
@@ -87,6 +95,29 @@ describe('one toast message', () => {
     expect(timed?.getAttribute('style')).toContain('--toast-duration: 4000ms')
     expect(timed?.getAttribute('aria-hidden')).toBe('true')
     expect(part(await message(), 'timer')).toBeNull()
+  })
+
+  /* A message that arrives in a background tab waits for the reader to come
+     back, as React Aria's toast queue does: spent while hidden, it was gone
+     before anyone could read it. */
+  test('holds its clock while the page is hidden, and runs it again once shown', async () => {
+    let hidden = false
+    Object.defineProperty(document, 'hidden', { configurable: true, get: () => hidden })
+    restore = () => {
+      delete (document as unknown as { hidden?: boolean }).hidden
+    }
+    const item = await message('duration="60"')
+    hidden = true
+    document.dispatchEvent(new Event('visibilitychange'))
+    await new Promise((resolve) => setTimeout(resolve, 160))
+    expect([item.open, item.hasAttribute('data-paused')]).toEqual([true, true])
+    hidden = false
+    document.dispatchEvent(new Event('visibilitychange'))
+    const until = Date.now() + 1200
+    while (Date.now() < until && item.open) {
+      await new Promise((resolve) => setTimeout(resolve, 20))
+    }
+    expect(item.open).toBe(false)
   })
 
   test('a message moved in the page still goes when its time is up', async () => {

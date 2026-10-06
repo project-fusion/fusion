@@ -1,4 +1,5 @@
 import {
+  animationsFinished,
   customElement,
   DelayController,
   deepActiveElement,
@@ -317,11 +318,7 @@ export class HelixHeadlessToast extends HelixElement {
         continue
       }
       this.made.delete(one)
-      const running =
-        typeof one.getAnimations === 'function' ? one.getAnimations({ subtree: true }) : []
-      void Promise.allSettled(running.map((animation) => animation.finished)).then(() =>
-        one.remove(),
-      )
+      void animationsFinished(one).then(() => one.remove())
     }
   }
 
@@ -376,9 +373,7 @@ export class HelixHeadlessToast extends HelixElement {
    * leaving. Hidden at once, the stack would cut the exit short.
    */
   private lowerWhenStill(region: HTMLElement): void {
-    const running =
-      typeof this.getAnimations === 'function' ? this.getAnimations({ subtree: true }) : []
-    void Promise.allSettled(running.map((one) => one.finished)).then(() => {
+    void animationsFinished(this).then(() => {
       if (this.showing.length === 0 && popoverOpen(region)) {
         region.hidePopover()
       }
