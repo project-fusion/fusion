@@ -183,6 +183,8 @@ describe('a lone dismissed element the listener removes', () => {
     return lone
   }
 
+  const frame = (): Promise<unknown> => new Promise((done) => requestAnimationFrame(done))
+
   /* A lone Callout dropped focus to the body, and a keyboard reader started
      the page again from the top. */
   test('hands focus to the tab stop after it', async () => {
@@ -190,6 +192,7 @@ describe('a lone dismissed element the listener removes', () => {
       '<button id="before">Before</button><probe-removable></probe-removable><button id="after">After</button>',
     )
     lone.dismiss()
+    await frame()
     expect(document.activeElement?.id).toBe('after')
   })
 
@@ -198,6 +201,7 @@ describe('a lone dismissed element the listener removes', () => {
       '<button id="before">Before</button><probe-removable></probe-removable>',
     )
     lone.dismiss()
+    await frame()
     expect(document.activeElement?.id).toBe('before')
   })
 
@@ -205,6 +209,25 @@ describe('a lone dismissed element the listener removes', () => {
     const lone = await page('<probe-removable></probe-removable><button id="after">After</button>')
     lone.addEventListener('helix-dismiss', (event) => event.preventDefault())
     lone.dismiss()
+    await frame()
     expect(document.activeElement?.id).not.toBe('after')
+  })
+
+  /* A Tag Group whose last tag went focuses its empty part in a microtask, and
+     the hand-off had already taken focus out of the group. */
+  test('after a container that settles focus itself', async () => {
+    const lone = await page(
+      '<div id="set"><probe-removable></probe-removable><p id="empty" tabindex="-1">None</p></div><button id="after">After</button>',
+    )
+    lone.addEventListener('helix-dismiss', () => {
+      queueMicrotask(() => {
+        if (document.activeElement === document.body) {
+          ;(document.getElementById('empty') as HTMLElement).focus()
+        }
+      })
+    })
+    lone.dismiss()
+    await frame()
+    expect(document.activeElement?.id).toBe('empty')
   })
 })

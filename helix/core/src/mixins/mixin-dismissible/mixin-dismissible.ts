@@ -157,9 +157,16 @@ export const MixinDismissible = <T extends Constructor<LitElement>>(Base: T) => 
     /**
      * Moves focus to a neighbor's dismiss control if removing this element
      * dropped it, or, with no neighbor, to the tab stop beside where it was.
+     *
+     * **The tab stop beside waits a frame.** A container that owns its
+     * members' focus settles it in a microtask after the event: a Tag Group
+     * whose last tag goes focuses its `empty` part. Handed on at once, focus
+     * left the group before the group could look, and its reader never heard
+     * that the set was empty. A neighbor of the same kind is still taken at
+     * once, because no container puts focus anywhere better.
      */
     private keepFocus(neighbors: HTMLElement[], beside?: HTMLElement): void {
-      const settle = (): void => {
+      const settle = (late: boolean): void => {
         const active = document.activeElement
         if (this.isConnected || (active !== null && active !== document.body)) {
           return
@@ -176,12 +183,12 @@ export const MixinDismissible = <T extends Constructor<LitElement>>(Base: T) => 
             }
           }
         }
-        if (beside?.isConnected) {
+        if (late && beside?.isConnected) {
           beside.focus()
         }
       }
-      settle()
-      requestAnimationFrame(settle)
+      settle(false)
+      requestAnimationFrame(() => settle(true))
     }
   }
 
