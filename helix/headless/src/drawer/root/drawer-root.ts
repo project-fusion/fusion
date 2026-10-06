@@ -430,8 +430,9 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
             ?.querySelector<HTMLSlotElement>(name ? `slot[name="${name}"]` : 'slot:not([name])')
             ?.assignedElements({ flatten: true }) ?? [],
       ),
-      /* And the close control the drawer draws itself. */
-      ...(this.partNamed('dismiss') ? [this.partNamed('dismiss') as Element] : []),
+      /* And the close control the drawer draws itself, the one control the
+         panel holds besides its slots. */
+      ...[...(this.panel?.children ?? [])].filter((one) => one.localName === 'button'),
     ],
     surface: () => this.panel,
   })
