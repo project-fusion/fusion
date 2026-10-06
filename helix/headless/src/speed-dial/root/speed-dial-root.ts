@@ -2,8 +2,10 @@ import {
   anchorElement,
   customElement,
   drawIcon,
+  focusTarget,
   HelixElement,
   KeyboardNavigationController,
+  linkDescription,
   MixinControllerOpen,
   type NavigableItem,
   type Placement,
@@ -11,6 +13,7 @@ import {
   slottedWords,
   tellDisclosure,
   typeaheadByWords,
+  unlinkDescription,
 } from '@fusion.dev/helix-core'
 import { plus } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -77,8 +80,9 @@ const navigable = (item: HelixHeadlessSpeedDialItem): NavigableItem => ({
  * the trigger is the trigger's own, such as composing a message, and holding it
  * for half a second opens the dial, as React Aria's menu trigger does with
  * `trigger="longPress"`. Alt+Down or Alt+Up opens it from the keyboard, and
- * the drawn trigger says so in its description, `long-press-label`. A press
- * that has opened the dial does not also do the trigger's action.
+ * the trigger says so in its description, `long-press-label`, the drawn one
+ * and a slotted one alike. A press that has opened the dial does not also do
+ * the trigger's action.
  *
  * @since 0.1.0
  * @status stable
@@ -108,8 +112,13 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
   label = 'Actions'
 
   /**
-   * The description the drawn trigger gives under `open-on="long-press"`,
-   * saying how its actions are reached.
+   * The description the trigger gives under `open-on="long-press"`, saying how
+   * its actions are reached.
+   *
+   * A slotted trigger is described by the dial, which carries the words as
+   * its own label for that: a Helix button's inner control at once, and a
+   * plain element of yours once a reader reaches it, after hydration, unless
+   * you described or labeled it yourself.
    */
   @property({ attribute: 'long-press-label' })
   longPressLabel = 'Long press or press Alt+Down to show the actions'
@@ -336,6 +345,11 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    if (this.described) {
+      unlinkDescription(this.described, this)
+      this.described = undefined
+      this.internals.ariaLabel = null
+    }
     this.removeEventListener('helix-select', this.handleSelect)
     this.removeEventListener('keydown', this.handleKeydown)
     this.removeEventListener('click', this.handleHeldClick, true)
@@ -372,9 +386,56 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
     tellDisclosure(trigger, this.open, 'menu')
   }
 
+  /** The control the dial has described, so the description can be taken back. */
+  private described: Element | undefined
+
+  /**
+   * Describes a slotted trigger by `long-press-label` under
+   * `open-on="long-press"`, as the drawn one is, or takes it back.
+   *
+   * **By the host, which carries the words as its label.** The drawn
+   * trigger's description is in this shadow root, and a reference from the
+   * consumer's trigger, or from the button inside a Helix one, cannot point
+   * in; it can point out, to the host. Core's `linkDescription` says where
+   * that is safe: inside a component's shadow root always, and on the
+   * consumer's own element only once `light` says a reader has acted, which
+   * is after hydration. React Aria's long press describes whatever trigger it
+   * is given.
+   *
+   * @param light A reader has just reached the trigger.
+   */
+  private describeTrigger(light = false): void {
+    const trigger = this.trigger
+    const slotted = this.pressHeld && trigger !== this && trigger !== this.partNamed('trigger')
+    const control = slotted ? focusTarget(trigger) : undefined
+    if (this.described && this.described !== control) {
+      unlinkDescription(this.described, this)
+      this.described = undefined
+    }
+    if (control && control !== this.described && linkDescription(control, this, light)) {
+      this.described = control
+    }
+    this.internals.ariaLabel = this.described ? this.longPressLabel : null
+  }
+
+  /** A reader reaching a slotted trigger, which is late enough to describe a plain one. */
+  private readonly handleTriggerFocusIn = (): void => {
+    if (this.pressHeld) {
+      this.describeTrigger(true)
+    }
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    /* A Helix trigger draws its control after this first look, so the dial
+       looks again a frame later, as Badge does. */
+    requestAnimationFrame(() => this.describeTrigger())
+  }
+
   protected override updated(changed: PropertyValues): void {
     super.updated?.(changed)
     this.announce()
+    this.describeTrigger()
     if (this.open && this.focusOnOpen) {
       this.focusOnOpen = false
       /* On the first action, which is where a reader who opened this with the
@@ -415,10 +476,12 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
       name="trigger"
       @click=${this.handleTriggerClick}
       @contextmenu=${this.handleTriggerContextMenu}
+      @focusin=${this.handleTriggerFocusIn}
       @pointercancel=${this.handleTriggerPointerCancel}
       @pointerdown=${this.handleTriggerPointerDown}
       @pointermove=${this.handleTriggerPointerMove}
       @pointerup=${this.handleTriggerPointerUp}
+      @slotchange=${() => this.describeTrigger()}
     >
       <button
         part="trigger"
