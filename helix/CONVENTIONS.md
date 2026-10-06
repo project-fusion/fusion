@@ -112,6 +112,22 @@ an `overflow` they had no way of knowing was missing.
 - **Mixins add API, controllers add behavior.** If it introduces a property or
   method a consumer uses, it is a mixin. If it only reacts to lifecycle, it is a
   controller.
+- **Transitions are pure, and effects key off the change.** A family whose keys
+  or effects depend on a mode writes its transitions as a pure function beside
+  `index.ts`. The function takes the state and the event, and returns the next
+  state, or `null` where nothing changes. A pure spec covers it. Effects belong
+  to controllers and key off the change of state, never off the method that
+  caused it.
+
+  `tour/back.ts` and `checkbox-group/select-all.ts` have the shape, and each
+  fixed a defect that its pure spec now holds. Popover's focus return follows
+  the last sentence: `willUpdate` reads `changed.get('open')`, so focus comes
+  back however the panel closes, where a return written into `hide()` missed
+  a close through `open`. A typed state-machine helper, with a table of states,
+  effects that end when their state is left, and requests through
+  `requestChange`, sits unexported in `core/src/controllers/machine-controller/`.
+  Its pilot on Tour passed every bar except bytes, and it waits for a family
+  with more modes, where the table replaces more code than it adds.
 - **One folder per part**: `card/root/card-root.{ts,css,dom.spec.ts}`. The
   folder is what the composition plugin reads. **A helper the family owns and
   no one part does sits at family level**, beside `index.ts`, and is named for
