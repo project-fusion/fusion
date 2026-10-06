@@ -1024,6 +1024,32 @@ const onPlatform = async <T>(agent: string, run: () => Promise<T>): Promise<T> =
   }
 }
 
+describe('a list opened with focus elsewhere', () => {
+  /* Chromium's `select()` focuses the input it selects in, so selecting the
+     chosen words on every open moved focus into the field. */
+  test('leaves focus where the reader had it, opened by a script', async () => {
+    const host = await combobox('value="rb"')
+    const outside = document.createElement('button')
+    document.body.append(outside)
+    outside.focus()
+    ;(host as HTMLElement & { open: boolean }).open = true
+    await settle(host)
+    expect(document.activeElement).toBe(outside)
+  })
+
+  test('and served open, takes no focus at all', async () => {
+    const host = await combobox('value="rb" open')
+    expect((host as HTMLElement).shadowRoot?.activeElement ?? null).toBeNull()
+  })
+
+  test('opened from the field, still selects the chosen words', async () => {
+    const host = await combobox('value="rb"')
+    control(host).focus()
+    await press(host, 'ArrowDown')
+    expect([control(host).selectionStart, control(host).selectionEnd]).toEqual([0, 4])
+  })
+})
+
 describe('a combobox heard through VoiceOver', () => {
   /* The region fills a frame after it is drawn, so that a reader hears it. */
   const said = async (host: Updatable): Promise<string | undefined> => {

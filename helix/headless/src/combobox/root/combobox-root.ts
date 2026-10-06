@@ -1259,13 +1259,21 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
     } else if (changed.has('open')) {
       /* Opened by an arrow, the highlight goes where the arrow says. Opened
          with the chosen words in the field, they are selected, so the first
-         letter typed replaces them. */
+         letter typed replaces them. Only with focus in the field: Chromium's
+         `select()` focuses the input, so a list a script opened, or a page
+         served open, took focus from wherever the reader was. */
       if (this.opening !== undefined) {
         this.listbox?.highlight(this.opening)
         this.opening = undefined
         void this.listbox?.updateComplete.then(() => this.linkActive())
       }
-      if (control && !this.editing && !this.multiple && control.value !== '') {
+      if (
+        control &&
+        !this.editing &&
+        !this.multiple &&
+        control.value !== '' &&
+        (this.renderRoot as ShadowRoot).activeElement === control
+      ) {
         control.select()
       }
     }
