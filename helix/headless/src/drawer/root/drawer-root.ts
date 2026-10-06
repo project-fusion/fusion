@@ -11,6 +11,7 @@ import {
   isRtl,
   lockScroll,
   MixinControllerOpen,
+  nearest,
   OpenPhaseController,
   onUnlessFalse,
   parseSnapPoints,
@@ -355,10 +356,10 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
       return
     }
     const points = parseSnapPoints(this.snapPoints)
-    const nearest = points.reduce((best, one) =>
-      Math.abs(one - point) < Math.abs(best - point) ? one : best,
-    )
-    this.restAt(nearest)
+    const at = nearest(points, point)
+    if (at !== undefined) {
+      this.restAt(at)
+    }
   }
 
   /**

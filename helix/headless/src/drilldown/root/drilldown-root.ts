@@ -9,7 +9,7 @@ import {
   MixinCollection,
   type NavigableItem,
   slottedWords,
-  typeaheadBy,
+  typeaheadByWords,
 } from '@fusion.dev/helix-core'
 import { caretLeft } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -176,7 +176,7 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
       })),
     reserved: () => ['ArrowLeft', 'ArrowRight'],
     selects: () => false,
-    typeahead: typeaheadBy((item) => (item as NavigableItem & { words: string }).words),
+    typeahead: typeaheadByWords(),
   })
 
   /**

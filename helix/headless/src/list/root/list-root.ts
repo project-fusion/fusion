@@ -10,7 +10,8 @@ import {
   type NavigableItem,
   requestChange,
   rovingStop,
-  typeaheadBy,
+  selectsAll,
+  typeaheadByWords,
   whenHydrated,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -200,7 +201,7 @@ export class HelixHeadlessList extends HelixElement {
     origin: 'focus',
     reserved: () => ['ArrowLeft', 'ArrowRight'],
     selects: () => false,
-    typeahead: typeaheadBy((item) => (item as NavigableItem & { words: string }).words),
+    typeahead: typeaheadByWords(),
     wrap: false,
   })
 
@@ -419,7 +420,7 @@ export class HelixHeadlessList extends HelixElement {
     if (event.composedPath()[0] !== row.cell) {
       return
     }
-    if (toggle && event.key.toLowerCase() === 'a' && this.selectionMode === 'multiple') {
+    if (selectsAll(event) && this.selectionMode === 'multiple') {
       event.preventDefault()
       const every = this.reachable.map((one) => this.valueFor(one)).join(', ')
       this.choose(every === this.value ? null : every)
