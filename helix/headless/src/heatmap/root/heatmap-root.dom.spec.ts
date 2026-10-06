@@ -518,6 +518,25 @@ describe('selecting cells', () => {
     expect(element.value).toBe('Mon, Wed')
   })
 
+  /* The count says how many; the readout says which. A selected cell read the
+     same as any other, so a reader could not find the days in the selection. */
+  test('the readout says a cell is selected, in the consumer’s words', async () => {
+    const element = (await strip('selection-mode="multiple"', WEEK)) as Selecting
+    key(element, 'Home')
+    key(element, ' ')
+    await element.updateComplete
+    expect(part(element, 'live')?.textContent).toBe('Mon: 1 (1 of 4, selected)')
+    key(element, 'ArrowRight')
+    await element.updateComplete
+    expect(part(element, 'live')?.textContent).toBe('Tue: 2 (2 of 4)')
+    key(element, 'ArrowLeft')
+    await element.updateComplete
+    expect(part(element, 'live')?.textContent).toBe('Mon: 1 (1 of 4, selected)')
+    element.setAttribute('selected-label', 'gewählt')
+    await element.updateComplete
+    expect(part(element, 'live')?.textContent).toBe('Mon: 1 (1 of 4, gewählt)')
+  })
+
   test('selects nothing without `selection-mode`', async () => {
     const element = (await strip('', WEEK)) as Selecting
     key(element, 'Home')

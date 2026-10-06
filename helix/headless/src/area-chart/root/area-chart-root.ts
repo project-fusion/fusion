@@ -462,9 +462,11 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
         : [],
     )
     const named = this.named ? `${this.named}, ` : ''
-    return html`<p id="helix-chart-summary" part="summary">
-      ${named}${rows[last]?.label ?? ''}: ${this.totalLabel} ${format(total)}; ${shares.join(', ')}.
-    </p>`
+    /* One string and one text node: a space standing alone between two
+       bindings is a text node of its own, which Chromium's description drops,
+       and the summary was read as "Total14". */
+    const words = `${named}${rows[last]?.label ?? ''}: ${this.totalLabel} ${format(total)}; ${shares.join(', ')}.`
+    return html`<p id="helix-chart-summary" part="summary">${words}</p>`
   }
 
   /**

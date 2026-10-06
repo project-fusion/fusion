@@ -25,6 +25,9 @@ import { property, state } from 'lit/decorators.js'
 import '../../tooltip/index.js'
 import { fits, monthPage, overviewOf, type Reading, toneOf } from './buckets.js'
 
+/** What the readout reads a cell from: the pointer, or one standing in for it. */
+type ReadingCursor = NonNullable<Parameters<typeof drawTooltip>[5]>
+
 /**
  * @summary A strip of cells, each colored by its reading, for uptime, contributions, or activity.
  *
@@ -187,6 +190,14 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
    */
   @property({ type: Number })
   rows = 1
+
+  /**
+   * What the readout adds for a selected cell, under `selection-mode`, after
+   * where the cell stands: "Day 1: 0 (1 of 14, selected)". Empty adds
+   * nothing.
+   */
+  @property({ attribute: 'selected-label' })
+  selectedLabel = 'selected'
 
   /**
    * What the `selection` part says after the selection changes, with `{count}` for
@@ -770,8 +781,31 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
         y: `${row * (cell + gap)}px`,
       },
       undefined,
-      this.pointer,
+      this.reading(at),
     )
+  }
+
+  /**
+   * The readout's cursor: the pointer, with the selected word after where a
+   * selected cell stands, so a reader moving through the strip hears which
+   * cells are in the selection and not only how many.
+   */
+  private reading(at: number): ReadingCursor {
+    const pointer = this.pointer
+    const key = this.keysOf(this.drawn)[at] ?? ''
+    if (!this.selectionMode || key === '' || this.selectedLabel === '') {
+      return pointer
+    }
+    if (!commaList(this.value).includes(key)) {
+      return pointer
+    }
+    const position = pointer.position
+    return {
+      column: pointer.column,
+      keyed: pointer.keyed,
+      position: position === '' ? this.selectedLabel : `${position}, ${this.selectedLabel}`,
+      shows: (cell) => pointer.shows(cell),
+    }
   }
 
   /**
