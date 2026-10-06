@@ -28,8 +28,17 @@ describe('divider server output', () => {
     expect(line).toContain('aria-orientation="horizontal"')
   })
 
-  test('a plain rule is decoration, and says so', () => {
+  test('a plain rule is a separator in the served markup', () => {
     const line = partTag(ssr(html`<helix-headless-divider></helix-headless-divider>`), 'line')
+    expect(line).toContain('role="separator"')
+    expect(line).toContain('aria-orientation="horizontal"')
+  })
+
+  test('a decorative rule is served as decoration', () => {
+    const line = partTag(
+      ssr(html`<helix-headless-divider decorative></helix-headless-divider>`),
+      'line',
+    )
     expect(line).toContain('role="presentation"')
     expect(line).not.toContain('aria-orientation')
   })

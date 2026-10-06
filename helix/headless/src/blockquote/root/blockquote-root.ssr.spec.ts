@@ -14,6 +14,8 @@ describe('blockquote server output', () => {
       html`<helix-headless-blockquote>Said so.<span slot="attribution">A</span></helix-headless-blockquote>`,
     )
     expect(partTag(markup, 'figure')).toContain('aria-labelledby="attribution"')
+    expect(partTag(markup, 'figure')).toContain('role="figure"')
+    expect(partTag(markup, 'figure')).toMatch(/^<div\s/)
     expect(partTag(markup, 'attribution')).toContain('id="attribution"')
   })
 

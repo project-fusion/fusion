@@ -6,13 +6,16 @@ import { property } from 'lit/decorators.js'
  * @summary A passage set off from the prose around it.
  *
  * @description
- * Renders a `<figure>` holding the `<blockquote>` and a `<figcaption>` for the
+ * Renders a figure holding the `<blockquote>` and a caption for the
  * attribution, the structure the HTML spec describes. The attribution sits
  * outside the quotation because it is about the quotation, and it names the
  * figure, so a screen reader reads the source as the figure's caption.
  *
- * The figure keeps the browser's default margins on this tier. Set
- * `::part(figure) { margin: 0 }` where they are unwanted.
+ * **The figure is a `<div role="figure">`**, so the headless tier draws no
+ * space around the quotation. A `<figure>` takes a 40px indent and a line of
+ * space above and below from the browser's own sheet, which every page had to
+ * reset. The `<blockquote>` keeps its own margins, as a bare one does. A
+ * screen reader meets the same figure, named by its caption.
  *
  * For a quotation inside a sentence, use `Quote`.
  *
@@ -25,9 +28,9 @@ import { property } from 'lit/decorators.js'
  * @slot - The quoted passage.
  * @slot attribution - Who said it, and where.
  *
- * @csspart attribution - The `<figcaption>` carrying the source.
+ * @csspart attribution - The caption carrying the source.
  * @csspart blockquote - The quotation.
- * @csspart figure - The `<figure>` holding the quotation and its attribution.
+ * @csspart figure - The figure holding the quotation and its attribution, a `<div>` with `role="figure"`.
  */
 @customElement('helix-headless-blockquote')
 export class HelixHeadlessBlockquote extends HelixElement {
@@ -63,9 +66,9 @@ export class HelixHeadlessBlockquote extends HelixElement {
   }
 
   protected override render(): TemplateResult {
-    /* The attribution is a bare slot inside a real `<figcaption>`: the element
-       is the semantics and cannot be omitted, while an unfilled slot inside it
-       is `display: contents` and generates no box. Beside the `<blockquote>`,
+    /* The attribution is a bare slot inside the caption: the caption is the
+       name and cannot be omitted, while an unfilled slot inside it is
+       `display: contents` and generates no box. Beside the `<blockquote>`,
        because the HTML spec puts attribution outside it: inside, it was read as
        part of the quotation. Re-marked on `slotchange`, so an attribution that
        arrives after the first render is shown.
@@ -75,12 +78,15 @@ export class HelixHeadlessBlockquote extends HelixElement {
        words through the slot, so the figure came out unnamed. The reference
        is inside one shadow root and resolves; the caption holds the slot, so
        the words are the consumer's, and an empty caption names nothing. */
-    return html`<figure aria-labelledby="attribution" part="figure">
+    /* **A role on a `<div>`, where a `<figure>` drew the browser's margins.**
+       The tree is the same, a figure named by its caption, and the caption is a
+       `<div>` too, since a `<figcaption>` belongs only in a `<figure>`. */
+    return html`<div aria-labelledby="attribution" part="figure" role="figure">
       <blockquote part="blockquote" cite=${this.cite || nothing}><slot></slot></blockquote>
-      <figcaption id="attribution" part="attribution"
+      <div id="attribution" part="attribution"
         ><slot name="attribution" @slotchange=${() => this.markEmpty()}></slot
-      ></figcaption>
-    </figure>`
+      ></div>
+    </div>`
   }
 }
 
