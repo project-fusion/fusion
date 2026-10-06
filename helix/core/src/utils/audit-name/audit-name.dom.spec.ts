@@ -24,13 +24,18 @@ describe('the name estimate', () => {
     return root.firstElementChild as HTMLElement
   }
 
-  test('reads an aria-label, a title, a placeholder and a label in the same tree', () => {
+  test('reads an aria-label, a title and a label in the same tree', () => {
     expect(hasName(inShadow('<input aria-label="Email">'))).toBe(true)
     expect(hasName(inShadow('<input title="Email">'))).toBe(true)
-    expect(hasName(inShadow('<input placeholder="Email">'))).toBe(true)
     expect(hasName(inShadow('<input id="i"><label for="i">Email</label>'))).toBe(true)
     expect(hasName(inShadow('<input aria-labelledby="l"><span id="l">Email</span>'))).toBe(true)
     expect(hasName(inShadow('<input aria-labelledby="l"><span id="l"></span>'))).toBe(false)
+  })
+
+  /* A Color Input with no label was named "#000000" by its placeholder, and
+     the audit took that for a name. */
+  test('takes no name from a placeholder, which is gone once a person types', () => {
+    expect(hasName(inShadow('<input placeholder="Email">'))).toBe(false)
   })
 
   test('takes no words from the part that shows the value', () => {
@@ -122,6 +127,17 @@ describe('the warning', () => {
     control.setAttribute('aria-labelledby', 'value')
     const value = () => control.querySelector('[part="value"]')
     expect(await warned(() => auditName(host, () => control, '', undefined, value))).toHaveLength(1)
+  })
+
+  test('a control named only by its placeholder is reported as that', async () => {
+    document.body.innerHTML = '<span></span>'
+    const host = document.body.lastElementChild as HTMLElement
+    const root = host.attachShadow({ mode: 'open' })
+    root.innerHTML = '<input placeholder="#000000">'
+    const control = root.querySelector('input') as HTMLElement
+    expect(await warned(() => auditName(host, () => control, 'Give it a label.'))).toEqual([
+      '<span> is named only by its placeholder, which is gone once a person types. Give it a label.',
+    ])
   })
 
   test('words hidden from the reader name nothing', async () => {

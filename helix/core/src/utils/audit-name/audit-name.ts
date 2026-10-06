@@ -29,8 +29,13 @@ const NAMED_BY_CONTENT = new Set([
 
 /**
  * Whether an element has an accessible name, by the routes a page names a
- * control: its own `aria-label`, `aria-labelledby` or `title`, a `<label>`, a
- * `placeholder`, and its content where its role is named by its content.
+ * control: its own `aria-label`, `aria-labelledby` or `title`, a `<label>`,
+ * and its content where its role is named by its content.
+ *
+ * **A `placeholder` counts for no route.** A browser names a control by it
+ * where nothing else does, and it is gone from the screen once a person
+ * types, so a field named by it alone loses its label as it is filled.
+ * React Aria's fields warn on the same terms.
  *
  * **An estimate, cheap on purpose.** It answers whether any route holds words,
  * which is what the warning is about, and leaves the order the routes win in
@@ -42,7 +47,7 @@ const NAMED_BY_CONTENT = new Set([
  * placeholder, "Choose", which says nothing about what is being chosen.
  */
 export const hasName = (element: HTMLElement, shown?: Element | null): boolean => {
-  for (const attribute of ['aria-label', 'title', 'placeholder']) {
+  for (const attribute of ['aria-label', 'title']) {
     if (element.getAttribute(attribute)?.trim()) {
       return true
     }
@@ -128,9 +133,12 @@ export const auditName = (
     if (also?.() || hasName(host) || (inner !== null && hasName(inner, value))) {
       return
     }
+    const placeholder = [host, inner].some((one) => one?.getAttribute('placeholder')?.trim())
     reportRuntime({
       kind: 'missing-name',
-      message: `<${host.localName}> has no accessible name, so a screen reader announces it by its role alone. ${fix}`,
+      message: placeholder
+        ? `<${host.localName}> is named only by its placeholder, which is gone once a person types. ${fix}`
+        : `<${host.localName}> has no accessible name, so a screen reader announces it by its role alone. ${fix}`,
       tag: host.localName,
     })
   })
