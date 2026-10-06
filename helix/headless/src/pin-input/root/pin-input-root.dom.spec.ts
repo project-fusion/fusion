@@ -23,224 +23,254 @@ const pin = async (attrs = ''): Promise<Pin> => {
   return host
 }
 
-const cells = (host: HTMLElement): HTMLInputElement[] => [
-  ...(host.shadowRoot?.querySelectorAll<HTMLInputElement>('[part="cell"]') ?? []),
+const control = (host: HTMLElement): HTMLInputElement => part(host, 'control') as HTMLInputElement
+
+const cells = (host: HTMLElement): HTMLElement[] => [
+  ...(host.shadowRoot?.querySelectorAll<HTMLElement>('[part~="cell"]') ?? []),
 ]
 
-/**
- * A reader entering the row and typing into a box, which is what arrives in one
- * whether it was typed, pasted, or filled by the browser.
- *
- * **The `focusin` is not decoration.** The component takes its commit baseline
- * when focus arrives from outside the row, so a helper that types without
- * arriving leaves the component's own focus move (it advances a box per
- * character) as the first `focusin` it ever sees, and the baseline lands on the
- * text that was just typed. That is not what a browser does, where the reader's
- * click or tab is the first one.
- */
-const arrive = async (host: Pin, at: number, text: string): Promise<void> => {
-  const cell = cells(host)[at] as HTMLInputElement
-  cell.dispatchEvent(new FocusEvent('focusin', { bubbles: true, relatedTarget: null }))
-  cell.value = text
-  cell.dispatchEvent(new Event('input', { bubbles: true }))
+/** What each box draws, in order. */
+const boxes = (host: HTMLElement): string[] =>
+  cells(host).map((cell) => cell.textContent?.trim() ?? '')
+
+/** The box the caret is drawn in, or -1. */
+const activeBox = (host: HTMLElement): number =>
+  cells(host).findIndex((cell) => (cell.getAttribute('part') ?? '').includes('cell-active'))
+
+const settle = async (host: Pin): Promise<void> => {
   await host.updateComplete
   await host.updateComplete
 }
 
-/** What a paste or an autofill drops into one box. */
-const paste = async (host: Pin, at: number, text: string): Promise<void> => {
+/** Focus arriving in the field, which takes the commit baseline and draws the caret. */
+const arrive = async (host: Pin): Promise<void> => {
+  control(host).dispatchEvent(new FocusEvent('focus'))
+  await settle(host)
+}
+
+/**
+ * What the platform leaves in the one field after a keystroke, an autofill or
+ * a deletion: its text and the caret, then `input`.
+ */
+const edit = async (host: Pin, text: string, caret = text.length): Promise<void> => {
+  const field = control(host)
+  field.value = text
+  field.setSelectionRange(caret, caret)
+  field.dispatchEvent(new Event('input', { bubbles: true }))
+  await settle(host)
+}
+
+/** A paste, over the field's selection. */
+const paste = async (host: Pin, text: string): Promise<ClipboardEvent> => {
   const event = new Event('paste', { bubbles: true, cancelable: true }) as ClipboardEvent
   Object.defineProperty(event, 'clipboardData', { value: { getData: () => text } })
-  cells(host)[at]?.dispatchEvent(event)
-  await host.updateComplete
-  await host.updateComplete
+  control(host).dispatchEvent(event)
+  await settle(host)
+  return event
+}
+
+const press = async (host: Pin, key: string): Promise<KeyboardEvent> => {
+  const event = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key })
+  control(host).dispatchEvent(event)
+  await settle(host)
+  return event
 }
 
 describe('input pin', () => {
-  test('one box per character', async () => {
+  test('one box per character, drawn from one field', async () => {
     const host = await pin('length="4"')
     expect(cells(host)).toHaveLength(4)
+    expect(host.shadowRoot?.querySelectorAll('input')).toHaveLength(1)
   })
 
-  test('the code is one value to the form, not six', async () => {
-    // The boxes are inside a shadow root and submit nothing on their own.
+  /* Web Awesome keeps one real input and draws the boxes over it, so a screen
+     reader meets one field and the code never sits in six. */
+  test('the boxes are hidden from a screen reader, and the field is named by the label', async () => {
+    const host = await pin('length="4"')
+    expect(cells(host).every((cell) => cell.getAttribute('aria-hidden') === 'true')).toBe(true)
+    const label = part(host, 'label')
+    expect(label?.localName).toBe('label')
+    expect(label?.getAttribute('for')).toBe(control(host).id)
+    expect(part(host, 'field')?.hasAttribute('role')).toBe(false)
+  })
+
+  test('the code is one value to the form', async () => {
     const host = await pin('default-value="1234" length="4" name="code"')
     expect(formValue(host)).toBe('1234')
+    expect(control(host).hasAttribute('name')).toBe(false)
   })
 
   test('typing fills the box and moves on', async () => {
     const host = await pin('length="4"')
-    await arrive(host, 0, '7')
+    await arrive(host)
+    await edit(host, '7')
     expect(host.value).toBe('7')
-    expect(cells(host)[0]?.value).toBe('7')
+    expect(boxes(host)).toEqual(['7', '', '', ''])
+    expect(activeBox(host)).toBe(1)
   })
 
-  test('a paste into an empty field fills from the start, wherever it landed', async () => {
-    /* A code has no holes in it. Writing from box three of an empty field puts
-       "4321" in the value and draws it in boxes one to four, so the boxes and
-       the value disagree about where the reader typed. Pasting a code while the
-       caret happens to sit in the middle means "fill this in", which is what
-       clamping to the end of what is there gives. */
+  test('a filled box selects its character, so typing replaces it', async () => {
+    const host = await pin('length="4" default-value="123"')
+    await arrive(host)
+    await press(host, 'Home')
+    expect([control(host).selectionStart, control(host).selectionEnd]).toEqual([0, 1])
+    await edit(host, '923', 1)
+    expect(host.value).toBe('923')
+    expect(activeBox(host)).toBe(1)
+    expect([control(host).selectionStart, control(host).selectionEnd]).toEqual([1, 2])
+  })
+
+  test('a paste into an empty field fills from the start', async () => {
     const host = await pin('length="6"')
-    await paste(host, 2, '4321')
+    await arrive(host)
+    await paste(host, '4321')
     expect(host.value).toBe('4321')
-    expect(cells(host).map((one) => one.value)).toEqual(['4', '3', '2', '1', '', ''])
+    expect(boxes(host)).toEqual(['4', '3', '2', '1', '', ''])
   })
 
-  test('and into a part-filled one carries on from the end', async () => {
-    const host = await pin('default-value="12" length="6"')
-    await paste(host, 2, '99')
-    expect(host.value).toBe('1299')
+  test('and over a filled box replaces from there, leaving the rest', async () => {
+    const host = await pin('default-value="123456" length="6"')
+    await arrive(host)
+    control(host).setSelectionRange(2, 3)
+    await paste(host, '99')
+    expect(host.value).toBe('129956')
   })
 
-  test('and so does an autofill, which lands as one long input', async () => {
-    /* A browser filling an SMS code drops the whole thing into whichever box is
-       focused, and so does a password manager. A per-cell `maxlength` would have
-       truncated it to the first character and lost the rest, silently. */
+  test('and over a wider selection replaces it', async () => {
+    const host = await pin('default-value="123456" length="6"')
+    await arrive(host)
+    control(host).setSelectionRange(0, 6)
+    await paste(host, '78')
+    expect(host.value).toBe('78')
+  })
+
+  test('an autofill lands as one long input and fills every box', async () => {
     const host = await pin('length="6"')
-    await arrive(host, 0, '135790')
-    expect(cells(host).map((one) => one.value)).toEqual(['1', '3', '5', '7', '9', '0'])
+    await arrive(host)
+    await edit(host, '135790')
+    expect(boxes(host)).toEqual(['1', '3', '5', '7', '9', '0'])
     expect(host.value).toBe('135790')
   })
 
   test('a numeric code refuses anything that is not a digit', async () => {
-    // Letting a letter into a box a reader cannot submit is a mistake they have
-    // to find and undo themselves.
     const host = await pin('length="4"')
-    await arrive(host, 0, 'a1b2')
+    await edit(host, 'a1b2')
     expect(host.value).toBe('12')
+    expect(control(host).value).toBe('12')
   })
 
   test('and `text` takes them', async () => {
     const host = await pin('length="4" type="text"')
-    await arrive(host, 0, 'a1b2')
+    await edit(host, 'a1b2')
     expect(host.value).toBe('a1b2')
   })
 
-  test('`alphanumeric` takes letters and digits and refuses the rest', async () => {
-    /* The mode between the other two: `numeric` drops a letter, `text` keeps a
-       hyphen, and a code that is letters and digits wants neither. */
-    const host = await pin('length="6" type="alphanumeric"')
-    await arrive(host, 0, 'a1-b2!')
-    expect(host.value).toBe('a1b2')
-  })
-
-  test('`alphanumeric` is ASCII, and `text` is where a marked letter goes', async () => {
-    /* Narrower than the word is in general, and deliberately: a code off a
-       keypad, an SMS or an authenticator does not carry `é`, so accepting one
-       admits a character the service on the other end will reject. */
-    const strict = await pin('length="4" type="alphanumeric"')
-    await arrive(strict, 0, 'éa9')
-    expect(strict.value).toBe('a9')
-
+  test('`alphanumeric` takes ASCII letters and digits and refuses the rest', async () => {
+    const strict = await pin('length="6" type="alphanumeric"')
+    await edit(strict, 'éa1-b2!')
+    expect(strict.value).toBe('a1b2')
     const loose = await pin('length="4" type="text"')
-    await arrive(loose, 0, 'éa9')
+    await edit(loose, 'éa9')
     expect(loose.value).toBe('éa9')
   })
 
   test('anything past the last box is dropped rather than wrapping', async () => {
     const host = await pin('length="4"')
-    await arrive(host, 0, '123456789')
+    await edit(host, '123456789')
     expect(host.value).toBe('1234')
   })
 
-  test('the first box asks for the code, and only the first', async () => {
-    // It is a hint about the field as a whole, and repeating it offers a browser
-    // six places to put one code.
+  test('the field asks for the code and offers the keyboard its type wants', async () => {
     const host = await pin('length="4"')
-    const hints = cells(host).map((one) => one.getAttribute('autocomplete'))
-    expect(hints).toEqual(['one-time-code', 'off', 'off', 'off'])
+    expect(control(host).getAttribute('autocomplete')).toBe('one-time-code')
+    expect(control(host).getAttribute('inputmode')).toBe('numeric')
+    const text = await pin('type="text"')
+    expect(control(text).getAttribute('inputmode')).toBe('text')
   })
 
-  test('every box says which one it is', async () => {
-    const host = await pin('length="3"')
-    expect(cells(host).map((one) => one.getAttribute('aria-label'))).toEqual([
-      'Character 1 of 3',
-      'Character 2 of 3',
-      'Character 3 of 3',
-    ])
+  /* Web Awesome draws `--mask-char` in place of a masked character, so the code
+     is never drawn as text. */
+  test('masking makes it a password field and draws the mask character in each filled box', async () => {
+    const host = await pin('length="4" mask default-value="12"')
+    expect(control(host).getAttribute('type')).toBe('password')
+    expect(boxes(host)).toEqual(['•', '•', '', ''])
+    const starred = await pin('length="4" mask mask-character="*" default-value="12"')
+    expect(boxes(starred)).toEqual(['*', '*', '', ''])
   })
 
-  test('masking makes them password boxes', async () => {
-    const host = await pin('length="4" mask')
-    expect(cells(host).map((one) => one.getAttribute('type'))).toEqual([
-      'password',
-      'password',
-      'password',
-      'password',
-    ])
+  test('an empty box draws the placeholder, except the one the caret is in', async () => {
+    const host = await pin('length="3" placeholder="0"')
+    expect(host.shadowRoot?.querySelectorAll('[part="placeholder"]')).toHaveLength(3)
+    await arrive(host)
+    expect(host.shadowRoot?.querySelectorAll('[part="placeholder"]')).toHaveLength(2)
+    expect(cells(host)[0]?.querySelector('[part="caret"]')).not.toBeNull()
   })
 
   test('clearing empties every box', async () => {
     const host = await pin('default-value="1234" length="4"')
     host.clear()
-    await host.updateComplete
-    await host.updateComplete
+    await settle(host)
     expect(host.value).toBe('')
-    expect(cells(host).every((one) => one.value === '')).toBe(true)
+    expect(boxes(host)).toEqual(['', '', '', ''])
   })
 })
 
 describe('input pin deletion', () => {
-  test('emptying a box removes that character and the rest close up', async () => {
-    /* A Backspace in a *filled* box is the browser's own: the keydown handler
-       leaves it alone, the character goes, and `input` arrives carrying "". A
-       write path that returns early on empty lets the repaint put the character
-       straight back, so Backspace on a full code does nothing at all. */
+  /* The field's own Backspace and Delete: a filled box's character is selected,
+     so either removes it and the rest close up, and the empty place after the
+     code makes Backspace remove the one before. */
+  test('removing a box’s character closes the rest up, and the caret stays', async () => {
     const host = await pin('default-value="123456"')
-    await arrive(host, 2, '')
+    await arrive(host)
+    await edit(host, '12456', 2)
     expect(host.value).toBe('12456')
-    expect(cells(host).map((one) => one.value)).toEqual(['1', '2', '4', '5', '6', ''])
+    expect(boxes(host)).toEqual(['1', '2', '4', '5', '6', ''])
+    expect(activeBox(host)).toBe(2)
   })
 
-  test('emptying the last box just shortens it', async () => {
-    const host = await pin('default-value="123456"')
-    await arrive(host, 5, '')
-    expect(host.value).toBe('12345')
+  test('Backspace after the code removes the last character and moves back', async () => {
+    const host = await pin('default-value="123" length="4"')
+    await arrive(host)
+    expect(activeBox(host)).toBe(3)
+    await edit(host, '12', 2)
+    expect(host.value).toBe('12')
+    expect(activeBox(host)).toBe(2)
   })
 
-  test('and a code can be emptied one box at a time', async () => {
-    const host = await pin('default-value="12"')
-    await arrive(host, 1, '')
-    await arrive(host, 0, '')
-    expect(host.value).toBe('')
+  test('Backspace and Delete are the field’s own, and not taken', async () => {
+    const host = await pin('default-value="123" length="4"')
+    await arrive(host)
+    expect((await press(host, 'Backspace')).defaultPrevented).toBe(false)
+    expect((await press(host, 'Delete')).defaultPrevented).toBe(false)
   })
 })
 
 describe('input pin keyboard', () => {
-  const press = async (host: Pin, at: number, key: string): Promise<KeyboardEvent> => {
-    const event = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key })
-    cells(host)[at]?.dispatchEvent(event)
-    await host.updateComplete
-    await host.updateComplete
-    return event
-  }
-
-  test('Backspace in an empty box goes back and clears the one it lands in', async () => {
-    // What makes a code correctable without the reader hunting for the box they
-    // meant.
-    const host = await pin('default-value="123" length="4"')
-    await press(host, 3, 'Backspace')
-    expect(host.value).toBe('12')
-  })
-
-  test('and in a full box does what it always does', async () => {
-    const host = await pin('default-value="123" length="4"')
-    const event = await press(host, 2, 'Backspace')
-    expect(event.defaultPrevented).toBe(false)
-    expect(host.value).toBe('123')
-  })
-
   test('the arrows move between boxes and are taken', async () => {
-    const host = await pin('length="4"')
-    const event = await press(host, 1, 'ArrowLeft')
+    const host = await pin('length="4" default-value="12"')
+    await arrive(host)
+    expect(activeBox(host)).toBe(2)
+    const event = await press(host, 'ArrowLeft')
     expect(event.defaultPrevented).toBe(true)
-    expect(host.shadowRoot?.activeElement).toBe(cells(host)[0] as HTMLInputElement)
+    expect(activeBox(host)).toBe(1)
+    await press(host, 'ArrowRight')
+    await press(host, 'ArrowRight')
+    // Never past the end of the code, since a code has no holes in it.
+    expect(activeBox(host)).toBe(2)
+  })
+
+  test('Home goes to the first box and End to the end of the code', async () => {
+    const host = await pin('length="4" default-value="12"')
+    await arrive(host)
+    await press(host, 'Home')
+    expect(activeBox(host)).toBe(0)
+    await press(host, 'End')
+    expect(activeBox(host)).toBe(2)
   })
 
   /* A code reads left to right on every page, the way a phone number does, so
      the row keeps its order on a right-to-left page and the right arrow still
-     moves on. It ran from the right there, with the left arrow moving on. */
+     moves on. */
   describe('on a right-to-left page', () => {
     afterEach(() => {
       document.documentElement.removeAttribute('dir')
@@ -256,74 +286,75 @@ describe('input pin keyboard', () => {
 
     test('the right arrow is the next box and the left the one before', async () => {
       document.documentElement.dir = 'rtl'
-      const host = await pin('length="4"')
-      await press(host, 1, 'ArrowRight')
-      expect(host.shadowRoot?.activeElement).toBe(cells(host)[2] as HTMLInputElement)
-      await press(host, 2, 'ArrowLeft')
-      expect(host.shadowRoot?.activeElement).toBe(cells(host)[1] as HTMLInputElement)
+      const host = await pin('length="4" default-value="123"')
+      await arrive(host)
+      await press(host, 'Home')
+      await press(host, 'ArrowRight')
+      expect(activeBox(host)).toBe(1)
+      await press(host, 'ArrowLeft')
+      expect(activeBox(host)).toBe(0)
     })
 
     /* Where the boxes are, which needs a browser: happy-dom lays nothing out. */
     const laid = hasLayout() ? test : (): void => {}
-    const left = (cell: HTMLInputElement | undefined): number =>
+    const left = (cell: HTMLElement | undefined): number =>
       cell?.getBoundingClientRect().left ?? Number.NaN
-
-    laid('the first character typed is in the leftmost box', async () => {
-      document.documentElement.dir = 'rtl'
-      const host = await pin('length="4"')
-      await arrive(host, 0, '7')
-      const boxes = cells(host)
-      const leftmost = [...boxes].sort((a, b) => left(a) - left(b))[0]
-      expect(leftmost?.value).toBe('7')
-      expect(left(boxes[0])).toBeLessThan(left(boxes[1]))
-    })
 
     laid('a paste fills from the left, a character a box', async () => {
       document.documentElement.dir = 'rtl'
       const host = await pin('length="4"')
-      await paste(host, 0, '4821')
-      const boxes = [...cells(host)].sort((a, b) => left(a) - left(b))
-      expect(boxes.map((one) => one.value)).toEqual(['4', '8', '2', '1'])
+      await arrive(host)
+      await paste(host, '4821')
+      const sorted = [...cells(host)].sort((a, b) => left(a) - left(b))
+      expect(sorted.map((one) => one.textContent?.trim())).toEqual(['4', '8', '2', '1'])
     })
   })
 
-  test('a read-only field refuses to move', async () => {
+  test('a read-only field draws no caret, moves nothing, and keeps Backspace from the page', async () => {
     const host = await pin('default-value="123" length="4" readonly')
-    await press(host, 3, 'Backspace')
+    await arrive(host)
+    expect(activeBox(host)).toBe(-1)
+    expect((await press(host, 'ArrowLeft')).defaultPrevented).toBe(false)
+    expect((await press(host, 'Backspace')).defaultPrevented).toBe(true)
     expect(host.value).toBe('123')
   })
 })
 
-describe('input pin completion', () => {
-  test('says so when the last box is filled', async () => {
-    /* The moment a code entry exists for: a consumer watching `helix-change`
-       would have to know the length and compare it on every keystroke. */
-    const host = await pin('length="4"')
-    let completed = ''
-    host.addEventListener('helix-complete', (event) => {
-      completed = (event as CustomEvent<{ value: string }>).detail.value
-    })
-    await arrive(host, 0, '9876')
-    expect(completed).toBe('9876')
-  })
+describe('a press on a box', () => {
+  const click = async (host: Pin, at: number): Promise<MouseEvent> => {
+    const down = new MouseEvent('mousedown', { bubbles: true, cancelable: true, composed: true })
+    cells(host)[at]?.dispatchEvent(down)
+    cells(host)[at]?.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+    await settle(host)
+    return down
+  }
 
-  test('and not before', async () => {
+  test('keeps focus in the field, and puts the caret there or after the code', async () => {
+    const host = await pin('length="4" default-value="12"')
+    const down = await click(host, 0)
+    expect(down.defaultPrevented).toBe(true)
+    expect(host.shadowRoot?.activeElement).toBe(control(host))
+    expect(activeBox(host)).toBe(0)
+    await click(host, 3)
+    expect(activeBox(host)).toBe(2)
+  })
+})
+
+describe('input pin completion', () => {
+  test('says so when the last box is filled, and not before', async () => {
     const host = await pin('length="4"')
-    let fired = false
-    host.addEventListener('helix-complete', () => {
-      fired = true
+    const completed: string[] = []
+    host.addEventListener('helix-complete', (event) => {
+      completed.push((event as CustomEvent<{ value: string }>).detail.value)
     })
-    await arrive(host, 0, '987')
-    expect(fired).toBe(false)
+    await edit(host, '987')
+    expect(completed).toEqual([])
+    await edit(host, '9876')
+    expect(completed).toEqual(['9876'])
   })
 })
 
 describe('input pin commit', () => {
-  /** Leaving a box, for wherever focus is going. */
-  const leave = (host: Pin, at: number, to: HTMLElement | null = null): void => {
-    cells(host)[at]?.dispatchEvent(new FocusEvent('focusout', { bubbles: true, relatedTarget: to }))
-  }
-
   const commits = (host: Pin): string[] => {
     const seen: string[] = []
     host.addEventListener('change', () => {
@@ -332,25 +363,21 @@ describe('input pin commit', () => {
     return seen
   }
 
-  /** Focus arriving from outside, which is what takes the baseline. */
-  const enter = (host: Pin, at = 0): void => {
-    cells(host)[at]?.dispatchEvent(
-      new FocusEvent('focusin', { bubbles: true, relatedTarget: null }),
-    )
+  const leave = async (host: Pin): Promise<void> => {
+    control(host).dispatchEvent(new FocusEvent('blur'))
+    await settle(host)
   }
 
   test('a value the consumer assigned is not announced as one the reader entered', async () => {
     /* Measured in Chromium against a native input: a script assigns while the
        field is unfocused, the reader visits and edits nothing, and native stays
-       silent. `change` on a field is read by `MixinField` as "the reader has had
-       a go at this", so announcing here would tell a consumer their own
-       assignment was the reader's answer. */
+       silent. */
     const host = await pin('length="4"')
     const seen = commits(host)
     host.value = '1234'
     await host.updateComplete
-    enter(host)
-    leave(host, 0)
+    await arrive(host)
+    await leave(host)
     expect(seen).toEqual([])
   })
 
@@ -359,55 +386,37 @@ describe('input pin commit', () => {
     const seen = commits(host)
     host.value = '12'
     await host.updateComplete
-    await arrive(host, 2, '3')
-    leave(host, 2)
+    await arrive(host)
+    await edit(host, '123')
+    await leave(host)
     expect(seen).toEqual(['123'])
   })
 
-  test('an edited code commits when focus leaves the row', async () => {
-    const host = await pin('length="4"')
-    const seen = commits(host)
-    await arrive(host, 0, '12')
-    leave(host, 2)
-    expect(seen).toEqual(['12'])
-  })
-
-  test('and moving from one box to the next is not leaving', async () => {
-    /* Every character moves focus along, so a per-cell blur would commit on
-       every keystroke. */
-    const host = await pin('length="4"')
-    const seen = commits(host)
-    await arrive(host, 0, '12')
-    leave(host, 2, cells(host)[3] as HTMLElement)
-    expect(seen).toEqual([])
-  })
-
-  test('and leaving without having edited says nothing', async () => {
+  test('leaving without having edited says nothing', async () => {
     const host = await pin('default-value="12" length="4"')
     const seen = commits(host)
-    leave(host, 0)
+    await arrive(host)
+    await leave(host)
     expect(seen).toEqual([])
   })
 
   test('a filled code commits once, and leaving it does not commit again', async () => {
     const host = await pin('length="4"')
     const seen = commits(host)
-    await arrive(host, 0, '1234')
-    leave(host, 3)
+    await arrive(host)
+    await edit(host, '1234')
+    await leave(host)
     expect(seen).toEqual(['1234'])
   })
 
   test('so a half-entered code says what is wrong with it once it is left', async () => {
-    /* The whole point of the commit: `MixinField` shows nothing until the
-       reader has had a go, and completion alone counting as one leaves a code
-       abandoned at two of four answered with silence. */
     const host = await pin('length="4"')
-    await arrive(host, 0, '12')
+    await arrive(host)
+    await edit(host, '12')
     expect(part(host, 'feedback')).toBeNull()
-    leave(host, 2)
-    await host.updateComplete
-    await host.updateComplete
+    await leave(host)
     expect(part(host, 'feedback')?.textContent?.trim()).toBe('Please enter all 4 characters.')
+    expect(control(host).getAttribute('aria-invalid')).toBe('true')
   })
 })
 
@@ -417,45 +426,24 @@ describe('input pin validity', () => {
 
   test('a half-entered code is too short, in the platform’s words', async () => {
     const host = await pin('length="6"')
-    await arrive(host, 0, '123')
+    await edit(host, '123')
     expect(internals(host).validity.tooShort).toBe(true)
   })
 
-  test('a required code that is empty is missing', async () => {
+  test('a required code that is empty is missing, and the field says it is required', async () => {
     const host = await pin('length="4" required')
     expect(internals(host).validity.valueMissing).toBe(true)
+    expect(control(host).getAttribute('aria-required')).toBe('true')
   })
 
   test('and a full one is valid', async () => {
     const host = await pin('length="4" required')
-    await arrive(host, 0, '1234')
+    await edit(host, '1234')
     expect(internals(host).validity.valid).toBe(true)
   })
-
-  test('the message points at a box, not at the host', async () => {
-    // Without the anchor the validity bubble points at a wrapper with no text
-    // in it. Same reason `Input` passes its control.
-    const host = await pin('length="4" required')
-    expect(part(host, 'cell')).not.toBeNull()
-    expect(internals(host).validationMessage).not.toBe('')
-  })
 })
 
-describe('the row of cells', () => {
-  test('is named by the label, resolved in its own tree', async () => {
-    /* The row is a group of its own inside the template, and it had no name:
-       each cell said "Character 1 of 6" and nothing said of what. */
-    const host = await pin()
-    const row = host.shadowRoot?.querySelector('[part="field"]')
-    const named = row?.getAttribute('aria-labelledby') ?? ''
-    const scope = row?.getRootNode() as ShadowRoot
-    expect(scope.getElementById(named)?.textContent?.trim()).toBe('Code')
-  })
-})
-
-describe('Enter in a box', () => {
-  /* Each box is in a shadow root and has no form owner, so the platform never
-     ran implicit submission for one. */
+describe('Enter in the field', () => {
   test('submits a form with no button and no other field', async () => {
     document.body.innerHTML =
       '<form><helix-headless-pin-input name="code" label="Code"></helix-headless-pin-input></form>'
@@ -466,7 +454,7 @@ describe('Enter in a box', () => {
       event.preventDefault()
       submitted += 1
     })
-    cells(host)[0]?.dispatchEvent(
+    control(host).dispatchEvent(
       new KeyboardEvent('keypress', { bubbles: true, cancelable: true, key: 'Enter' }),
     )
     expect(submitted).toBe(1)
@@ -474,11 +462,10 @@ describe('Enter in a box', () => {
 })
 
 describe('a read-only code', () => {
-  /* A paste event fires on a focused read-only box, and the handler wrote the
-     clipboard into the code while the keys beside it were refused. */
   test('refuses a paste', async () => {
     const host = await pin('length="4" readonly default-value="1234"')
-    await paste(host, 0, '9999')
+    const event = await paste(host, '9999')
+    expect(event.defaultPrevented).toBe(true)
     expect(host.value).toBe('1234')
   })
 })
@@ -486,7 +473,7 @@ describe('a read-only code', () => {
 describe('a code completed and refused', () => {
   /* An auto-submit wired to `helix-complete` submitted a code the field did not
      hold, because the event was sent with what was proposed. */
-  test('sends no helix-complete for the code it refused', async () => {
+  test('sends no helix-complete for the code it refused, and puts the field back', async () => {
     const host = await pin('length="4"')
     host.addEventListener('helix-before-change', (event) => {
       if ((event as CustomEvent<{ value: string }>).detail.value.length === 4) {
@@ -497,9 +484,11 @@ describe('a code completed and refused', () => {
     host.addEventListener('helix-complete', (event) => {
       completed.push((event as CustomEvent<{ value: string }>).detail.value)
     })
-    await paste(host, 0, '1234')
+    await paste(host, '1234')
     expect(completed).toEqual([])
     expect(host.value).toBe('')
+    await edit(host, '1234')
+    expect(control(host).value).toBe('')
   })
 
   test('and sends it for a code it took', async () => {
@@ -508,42 +497,12 @@ describe('a code completed and refused', () => {
     host.addEventListener('helix-complete', (event) => {
       completed.push((event as CustomEvent<{ value: string }>).detail.value)
     })
-    await paste(host, 0, '1234')
+    await paste(host, '1234')
     expect(completed).toEqual(['1234'])
   })
 })
 
-describe('Home and End', () => {
-  const press = (host: Pin, at: number, key: string): void => {
-    cells(host)[at]?.dispatchEvent(
-      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key }),
-    )
-  }
-
-  test('Home goes to the first box', async () => {
-    const host = await pin('length="4" default-value="12"')
-    press(host, 2, 'Home')
-    expect(host.shadowRoot?.activeElement).toBe(cells(host)[0] ?? null)
-  })
-
-  test('End goes to the end of the code', async () => {
-    const host = await pin('length="4" default-value="12"')
-    press(host, 0, 'End')
-    expect(host.shadowRoot?.activeElement).toBe(cells(host)[2] ?? null)
-  })
-})
-
 describe('the gaps Zag and Web Awesome close', () => {
-  /* Zag maps Delete: the character in the box goes, and the rest of the code
-     moves back one. */
-  test('Delete removes the character in the focused box and pulls the rest back', async () => {
-    const host = await pin('length="4" value="1234"')
-    cells(host)[1]?.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Delete' }))
-    await host.updateComplete
-    expect(host.value).toBe('134')
-  })
-
-  /* Web Awesome's autosubmit, Radix's autoSubmit. */
   test('autosubmit submits the form once a code it took fills the last box', async () => {
     document.body.innerHTML =
       '<form><helix-headless-pin-input label="Code" length="4" autosubmit></helix-headless-pin-input></form>'
@@ -554,10 +513,9 @@ describe('the gaps Zag and Web Awesome close', () => {
     form.requestSubmit = () => {
       submitted += 1
     }
-    await paste(host, 0, '12')
+    await paste(host, '12')
     expect(submitted).toBe(0)
-    await paste(host, 2, '34')
-    await host.updateComplete
+    await paste(host, '34')
     expect([host.value, submitted]).toEqual(['1234', 1])
   })
 
@@ -571,20 +529,22 @@ describe('the gaps Zag and Web Awesome close', () => {
     expect(part(await pin(), 'separator')).toBeNull()
   })
 
-  /* Web Awesome's OTP input has case, for a code a service reads in one case. */
   test('case writes typed and pasted letters in the case asked for', async () => {
     const host = await pin('length="4" type="alphanumeric" case="upper"')
-    await paste(host, 0, 'ab3x')
+    await paste(host, 'ab3x')
     expect(host.value).toBe('AB3X')
     const lower = await pin('length="4" type="alphanumeric" case="lower"')
-    await arrive(lower, 0, 'Q')
+    await edit(lower, 'Q')
     expect(lower.value).toBe('q')
   })
 
-  test('says it is complete once every box holds a character', async () => {
+  test('says it is complete once every box holds a character, and marks the filled boxes', async () => {
     const host = await pin('length="4"')
     expect(hasState(host, 'complete')).toBe(false)
-    await paste(host, 0, '1234')
+    await paste(host, '1234')
     expect(hasState(host, 'complete')).toBe(true)
+    expect(cells(host).every((cell) => cell.getAttribute('part')?.includes('cell-filled'))).toBe(
+      true,
+    )
   })
 })

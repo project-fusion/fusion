@@ -36,31 +36,41 @@ helix-headless-pin-input::part(field) {
 }
 
 helix-headless-pin-input::part(cell) {
-  appearance: none;
+  align-items: center;
   background-color: var(--_gray-subtle);
   block-size: 2.5rem;
   border: 1px solid var(--_gray-edge);
   border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-strong);
+  cursor: text;
+  display: flex;
   font: inherit;
   font-size: 1.125rem;
   font-variant-numeric: tabular-nums;
   font-weight: 500;
   inline-size: 2.5rem;
-  margin: 0;
-  padding: 0;
-  text-align: center;
+  justify-content: center;
 }
 
 helix-headless-pin-input::part(cell):hover {
   border-color: var(--_gray-muted);
 }
 
-helix-headless-pin-input::part(cell):focus-visible {
+helix-headless-pin-input::part(cell-active) {
   border-color: var(--_gray-strong);
   outline: 2px solid var(--_gray-mark);
   outline-offset: 0;
+}
+
+helix-headless-pin-input::part(caret) {
+  background-color: currentcolor;
+  block-size: 1em;
+  inline-size: 1px;
+}
+
+helix-headless-pin-input::part(placeholder) {
+  color: var(--_gray-mark);
 }
 
 helix-headless-pin-input::part(hint),

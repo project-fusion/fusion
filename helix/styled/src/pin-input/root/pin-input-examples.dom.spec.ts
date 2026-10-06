@@ -13,15 +13,17 @@ beforeAll(async () => {
 /* Browser only: happy-dom does not run a script inserted by script. */
 const run = hasLayout() ? test : (): void => {}
 
-/* A reader arrives in the first box and types a character a box, which is what
-   moves the component's own focus along the row. */
+/* A reader arrives in the field and types a character at a time, which is
+   what the one field holds after each keystroke. */
 const enter = async (host: HTMLElement, text: string): Promise<void> => {
-  const cells = [...(host.shadowRoot?.querySelectorAll<HTMLInputElement>('[part~="cell"]') ?? [])]
-  cells[0]?.dispatchEvent(new FocusEvent('focusin', { bubbles: true, relatedTarget: null }))
-  for (const [at, character] of [...text].entries()) {
-    const cell = cells[at] as HTMLInputElement
-    cell.value = character
-    cell.dispatchEvent(new Event('input', { bubbles: true }))
+  const field = host.shadowRoot?.querySelector<HTMLInputElement>('[part~="control"]')
+  field?.dispatchEvent(new FocusEvent('focus'))
+  for (const at of [...text].keys()) {
+    if (field) {
+      field.value = text.slice(0, at + 1)
+      field.setSelectionRange(at + 1, at + 1)
+      field.dispatchEvent(new Event('input', { bubbles: true }))
+    }
     await idle()
   }
 }
