@@ -16,7 +16,11 @@ afterEach(() => {
 
 /* A host that is a real element, so the pointer events reach it, with the one
    hook the controller asks of a Lit host. */
-const setup = (axis: 'x' | 'y' | 'off' = 'x', start?: (target: Element) => boolean) => {
+const setup = (
+  axis: 'x' | 'y' | 'off' = 'x',
+  start?: (target: Element) => boolean,
+  slop?: number,
+) => {
   const host = document.createElement('div') as unknown as HTMLElement & ReactiveControllerHost
   const surface = document.createElement('div')
   const button = document.createElement('button')
@@ -37,6 +41,7 @@ const setup = (axis: 'x' | 'y' | 'off' = 'x', start?: (target: Element) => boole
     end: (dx, dy, vx, vy) => ends.push([dx, dy, vx, vy]),
     move: (dx, dy) => moves.push([dx, dy]),
     ...(start ? { start } : {}),
+    ...(slop === undefined ? {} : { slop }),
     surface: () => surface,
   })
   controller?.hostConnected?.()
@@ -71,6 +76,15 @@ describe('a swipe', () => {
     expect(ends[0]?.slice(0, 2)).toEqual([60, 2])
     expect(ends[0]?.[2]).toBeCloseTo(2)
     expect(surface.hasAttribute('data-swiping')).toBe(false)
+  })
+
+  /* Carousel's mouse drag takes over at 4 pixels and kept code of its own
+     for it. */
+  test('starts as soon as the host asks', () => {
+    const { moves, surface } = setup('x', undefined, 4)
+    surface.dispatchEvent(pointer('pointerdown', 100, 100, 0))
+    window.dispatchEvent(pointer('pointermove', 105, 100, 10))
+    expect(moves).toEqual([[5, 0]])
   })
 
   test('a drag across the axis is left to the page', () => {

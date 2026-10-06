@@ -12,6 +12,7 @@ const tag = 'probe-chart'
 
 type Module = typeof import('./mixin-chart-source.js')
 let PALETTE: Module['PALETTE']
+let POSITION_LABEL: Module['POSITION_LABEL']
 let seriesIndex: Module['seriesIndex']
 
 interface Chart extends HTMLElement {
@@ -38,7 +39,7 @@ beforeAll(async () => {
   registerDom()
   const { HelixElement } = await import('../../helix-element/helix-element.js')
   const source = await import('./mixin-chart-source.js')
-  ;({ PALETTE, seriesIndex } = source)
+  ;({ PALETTE, POSITION_LABEL, seriesIndex } = source)
   customElements.define(
     tag,
     class extends source.MixinChartSource(HelixElement) {
@@ -179,6 +180,13 @@ describe('what a chart is called', () => {
     await one.updateComplete
     expect(one.named).toBe('Revenue, first quarter')
     expect(one.renders).toBeGreaterThan(before)
+  })
+})
+
+describe('the words for a reading’s place', () => {
+  test('are the shared default until the page sets its own', async () => {
+    const one = (await chart()) as Chart & { positionLabel: string }
+    expect(one.positionLabel).toBe(POSITION_LABEL)
   })
 })
 

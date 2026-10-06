@@ -201,6 +201,14 @@ export declare class MixinChartSourceInterface {
 }
 
 /**
+ * The words a chart says a reading's place in by default, such as "2 of 12":
+ * every chart's `position-label`, and Sparkline's, which is no chart source.
+ * The property keeps the words written out, which is what its reference page
+ * shows as the default; a spec holds the two together.
+ */
+export const POSITION_LABEL = '{position} of {count}'
+
+/**
  * The half of a chart that is about finding its numbers rather than drawing.
  *
  * **A mixin rather than a controller**, by the rule the tier notes give: it
