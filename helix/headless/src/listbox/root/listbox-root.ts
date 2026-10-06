@@ -314,6 +314,9 @@ export class HelixHeadlessListbox extends MixinCollection(
 
   /**
    * Whether more than one option can be chosen.
+   *
+   * A press then toggles the option pressed, and Shift with a press adds every
+   * option from the one last chosen to it, as React Aria's list does.
    */
   @property({ reflect: true, type: Boolean })
   multiple = false
@@ -364,8 +367,17 @@ export class HelixHeadlessListbox extends MixinCollection(
    */
   private parked = false
 
-  /** The option last chosen, which Shift with Space extends from. */
+  /**
+   * The option last chosen, which Shift with Space or with a press extends
+   * from.
+   */
   private anchor = ''
+
+  /**
+   * Whether Shift was held for the press being handled, read off the click on
+   * its way down to the option, which is where React Aria extends a range.
+   */
+  private shifted = false
 
   /** The letters typed at the list, which move the highlight to a match. */
   private readonly typeahead = new Typeahead()
@@ -675,17 +687,28 @@ export class HelixHeadlessListbox extends MixinCollection(
     if (event.defaultPrevented) {
       return
     }
-    this.activeValue = event.detail.value
-    this.choose(event.detail.value)
+    const { value } = event.detail
+    this.activeValue = value
+    if (this.multiple && this.shifted) {
+      this.extend(value)
+    } else {
+      this.choose(value)
+    }
+    this.shifted = false
   }
 
   /**
    * Adds every option a reader can reach from the one last chosen to `to`,
-   * APG's Shift with Space. With none chosen yet, it adds `to` alone.
+   * APG's Shift with Space and React Aria's Shift with a press. With none
+   * chosen yet, it adds `to` alone and the next range starts there.
    */
   private extend(to: string): void {
     const reach = this.shown.filter((option) => !option.disabled).map((option) => option.value)
-    const taken = rangeAdd(this.values, reach, reach.indexOf(this.anchor), reach.indexOf(to))
+    const from = reach.indexOf(this.anchor)
+    if (from < 0 && reach.includes(to)) {
+      this.anchor = to
+    }
+    const taken = rangeAdd(this.values, reach, from, reach.indexOf(to))
     if (taken) {
       this.requestValue(taken.join(','))
     }
@@ -705,6 +728,10 @@ export class HelixHeadlessListbox extends MixinCollection(
    * a combobox or a command palette chose the highlighted option and closed the
    * panel, so a query of two words could not be typed.
    */
+  private readonly handleClick = (event: MouseEvent): void => {
+    this.shifted = event.shiftKey
+  }
+
   private readonly handleKeydown = (event: KeyboardEvent): void => {
     const shown = this.shown.filter((option) => !option.disabled)
     if (shown.length === 0) {
@@ -1052,12 +1079,14 @@ export class HelixHeadlessListbox extends MixinCollection(
     super.connectedCallback()
     this.addEventListener('helix-select', this.handleSelection as EventListener)
     this.addEventListener('keydown', this.handleKeydown)
+    this.addEventListener('click', this.handleClick, true)
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('helix-select', this.handleSelection as EventListener)
     this.removeEventListener('keydown', this.handleKeydown)
+    this.removeEventListener('click', this.handleClick, true)
     /* Its marks go with it. The registry is the document's and outlives this
        element, so a list removed while filtered would leave ranges over text
        that is no longer on the page. */
