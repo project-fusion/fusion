@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import { label, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -24,7 +24,7 @@ describe('announcement', () => {
     }
     const live = part(announcement, 'live') as HTMLElement
     expect(live.getAttribute('role')).toBe('status')
-    expect(role(announcement)).toBeNull()
+    expect(role(announcement)).toBe('region')
     expect(announcement.hasAttribute('role')).toBe(false)
   })
 
@@ -223,5 +223,70 @@ describe('the old `icon` slot', () => {
     }
     expect(warnings).toHaveLength(1)
     expect(warnings[0]).toContain('dismiss-icon')
+  })
+})
+
+describe('the region and its key', () => {
+  type Host = HTMLElement & { updateComplete: Promise<unknown> }
+  const press = (from: Element, key = 'F6'): KeyboardEvent => {
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key,
+    })
+    from.dispatchEvent(event)
+    return event
+  }
+  const frame = (): Promise<void> => new Promise((done) => requestAnimationFrame(() => done()))
+
+  /* Nothing named the band, so a reader listing the page's regions never
+     found it. */
+  test('is a landmark named by `label`, and none where `label` is empty', async () => {
+    const named = await mount('<helix-headless-announcement>Hi</helix-headless-announcement>')
+    expect([role(named), label(named)]).toEqual(['region', 'Announcement'])
+    const own = await mount(
+      '<helix-headless-announcement label="Service status">Hi</helix-headless-announcement>',
+    )
+    expect(label(own)).toBe('Service status')
+    const none = await mount(
+      '<helix-headless-announcement label="">Hi</helix-headless-announcement>',
+    )
+    expect(role(none)).toBeNull()
+  })
+
+  /* A reader deep in the page had to walk back up to the top to reach the
+     band's action. */
+  test('the key moves focus to the first control and back', async () => {
+    document.body.innerHTML =
+      '<helix-headless-announcement dismissible>Trial ending<a href="#plans" slot="actions">Plans</a></helix-headless-announcement><button id="away">Away</button>'
+    const band = document.body.firstElementChild as Host
+    await band.updateComplete
+    const away = document.getElementById('away') as HTMLButtonElement
+    away.focus()
+    expect(press(away).defaultPrevented).toBe(true)
+    expect(document.activeElement).toBe(band.querySelector('a'))
+    expect(press(band.querySelector('a') as Element).defaultPrevented).toBe(true)
+    expect(document.activeElement).toBe(away)
+    /* Another key, or a band with no control, leaves the press to the page. */
+    expect(press(away, 'F7').defaultPrevented).toBe(false)
+    document.body.innerHTML =
+      '<helix-headless-announcement>News</helix-headless-announcement><button id="away">Away</button>'
+    await (document.body.firstElementChild as Host).updateComplete
+    expect(press(document.getElementById('away') as Element).defaultPrevented).toBe(false)
+  })
+
+  test('a band the key moved focus into, removed with focus inside, gives focus back', async () => {
+    document.body.innerHTML =
+      '<helix-headless-announcement dismissible>Trial ending</helix-headless-announcement><button id="away">Away</button>'
+    const band = document.body.firstElementChild as Host
+    await band.updateComplete
+    const away = document.getElementById('away') as HTMLButtonElement
+    away.focus()
+    press(away)
+    expect(band.shadowRoot?.activeElement).toBe(part(band, 'dismiss'))
+    band.remove()
+    await frame()
+    expect(document.activeElement).toBe(away)
   })
 })
