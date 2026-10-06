@@ -2,6 +2,8 @@ import {
   AriaForwardController,
   countLabel,
   customElement,
+  type DataOption,
+  type DataOptionItem,
   DelayController,
   DisabledCascadeController,
   drawAutofill,
@@ -16,6 +18,7 @@ import {
   MixinControllerValue,
   MixinField,
   markMatches,
+  OptionWindowController,
   onApple,
   pageRows,
   rangeAdd,
@@ -47,6 +50,12 @@ const MOVES = new Set([...FIELD_MOVES, 'End', 'Home'])
 
 /** How many rows a page key moves where the list has no height to measure. */
 const PAGE = 10
+
+/**
+ * One option as the list reads it: an element of the consumer's, or a record
+ * of `items`, which is never a link.
+ */
+type Entry = HelixHeadlessOption | (DataOption & { href?: undefined })
 
 /**
  * @summary A list of options, from which you choose one or several.
@@ -235,6 +244,33 @@ export class HelixHeadlessListbox extends MixinCollection(
   filterLabel = 'Filter'
 
   /**
+   * The options as data, for a list too long to draw whole: each a value,
+   * which is also its words, or a record with a `value`, a `label` and
+   * `disabled`. Set, the list draws only the options in sight, and the ones
+   * you write as children are not read.
+   *
+   * **Every option is still reachable.** The keyboard, the typeahead, the
+   * filter and the value work over the whole set, and the option the keyboard
+   * is on is drawn wherever it is, so a screen reader is told about it. Each
+   * drawn option says its place in the set (`aria-posinset`, `aria-setsize`).
+   * React Aria virtualizes a `ListBox` with its `Virtualizer`; this is core's
+   * `VirtualizeController`.
+   *
+   * **The list needs a height to scroll in**: the styled tier's
+   * `--listbox-max-block-size`, or a `max-block-size` on `::part(items)` in the
+   * headless tier. Import the Option family as well, whose elements are drawn.
+   * A server sends the list empty, and the options are drawn once it hydrates.
+   */
+  @property({ attribute: false })
+  items: readonly DataOptionItem[] | undefined = undefined
+
+  /** Draws `items` a window at a time. See core's `OptionWindowController`. */
+  private readonly data = new OptionWindowController(this, {
+    current: () => this.currentValue,
+    items: () => this.items,
+  })
+
+  /**
    * What the list says when its options could not be loaded, such as after a
    * request to a server fails. Empty, null or no attribute is no error, so
    * removing the attribute clears it.
@@ -371,11 +407,11 @@ export class HelixHeadlessListbox extends MixinCollection(
    * that can.
    */
   get selectedIndex(): number {
-    return this.options.findIndex((option) => option.selected)
+    return this.entries.findIndex((option) => option.selected)
   }
 
   set selectedIndex(at: number) {
-    const option = this.options[at]
+    const option = this.entries[at]
     this.value = option?.value ?? ''
   }
 
@@ -447,7 +483,7 @@ export class HelixHeadlessListbox extends MixinCollection(
     ) {
       return
     }
-    const active = this.options.find((option) => option.value === this.activeValue)
+    const active = this.entries.find((option) => option.value === this.activeValue)
     if (active) {
       this.announced = active.selected
         ? fillTemplate(this.selectedLabel, { name: active.text })
@@ -553,9 +589,19 @@ export class HelixHeadlessListbox extends MixinCollection(
     return this.among((node) => node.localName.endsWith('-option-group'), this.children)
   }
 
+  /** Every option the list reads: the records of `items`, or the elements. */
+  private get entries(): Entry[] {
+    return this.data.records ?? this.options
+  }
+
+  /** The option elements on the page: the ones drawn for `items`, or the children. */
+  private get elements(): HelixHeadlessOption[] {
+    return this.data.records ? (this.data.drawn as HelixHeadlessOption[]) : this.options
+  }
+
   /** The options a filter has left showing. */
-  private get shown(): HelixHeadlessOption[] {
-    return this.options.filter((option) => !option.hidden)
+  private get shown(): Entry[] {
+    return this.entries.filter((option) => !option.hidden)
   }
 
   /** The chosen values, as an array whether or not `multiple` is set. */
@@ -636,7 +682,7 @@ export class HelixHeadlessListbox extends MixinCollection(
            nothing to one, as Space on an anchor does nothing. */
         event.preventDefault()
         if (event.key === 'Enter') {
-          link.select(event)
+          ;(link as HelixHeadlessOption).select(event)
         }
       } else if (this.activeValue !== '') {
         event.preventDefault()
@@ -748,7 +794,7 @@ export class HelixHeadlessListbox extends MixinCollection(
     this.activeValue = value
     /* Nor a link, which is followed by Enter or a press and never on the way
        past: moving onto a link must not leave the page. */
-    const link = this.options.some((option) => option.value === value && Boolean(option.href))
+    const link = this.entries.some((option) => option.value === value && Boolean(option.href))
     if (!this.multiple && !this.manual && !this.forwarded && !link) {
       this.choose(value)
     }
@@ -762,7 +808,7 @@ export class HelixHeadlessListbox extends MixinCollection(
    */
   private pageSize(): number {
     const items = this.partNamed('items')
-    const row = this.shown[0]?.getBoundingClientRect().height ?? 0
+    const row = this.elements.find((option) => !option.hidden)?.getBoundingClientRect().height ?? 0
     const height = items?.clientHeight ?? 0
     return row > 0 && height > 0 ? pageRows(height, row) : PAGE
   }
@@ -812,6 +858,12 @@ export class HelixHeadlessListbox extends MixinCollection(
    * rects and moving by the difference needs no such assumption.
    */
   reveal(): void {
+    /* A list of `items` scrolls by the arithmetic: the chosen option may not
+       be drawn to measure. */
+    if (this.data.records) {
+      this.data.center(this.values[0] ?? '')
+      return
+    }
     const items = this.partNamed('items')
     const chosen = this.options.find((option) => option.selected && !option.hidden)
     if (!items || !chosen) {
@@ -844,7 +896,7 @@ export class HelixHeadlessListbox extends MixinCollection(
     this.forgetRemoved()
     const needle = this.filter.trim().toLowerCase()
     const chosen = new Set(this.values)
-    for (const option of this.options) {
+    for (const option of this.entries) {
       option.hidden = needle !== '' && !option.text.toLowerCase().includes(needle)
       option.selected = chosen.has(option.value)
     }
@@ -888,7 +940,7 @@ export class HelixHeadlessListbox extends MixinCollection(
     if (rescue && !shown.some((option) => option.value === this.activeValue)) {
       this.activeValue = shown.find((option) => !option.disabled)?.value ?? ''
     }
-    for (const option of this.options) {
+    for (const option of this.entries) {
       option.active = option.value === this.activeValue
     }
 
@@ -926,7 +978,7 @@ export class HelixHeadlessListbox extends MixinCollection(
     if (this.owned) {
       return
     }
-    const present = new Set(this.options.map((option) => option.value))
+    const present = new Set(this.entries.map((option) => option.value))
     const gone = this.values.filter((value) => this.seen.has(value) && !present.has(value))
     this.seen = present
     if (gone.length > 0) {
@@ -935,8 +987,19 @@ export class HelixHeadlessListbox extends MixinCollection(
   }
 
   /** Scrolls the active option into view, which needs the rendered list to scroll. */
-  private followActive(): void {
-    const active = this.shown.find((option) => option.value === this.activeValue)
+  private followActive(changed: PropertyValues): void {
+    /* A list of `items` scrolls to the highlight when it or the filter moved,
+       and once the window holds it, the drawn option is scrolled to as a child
+       is. See `OptionWindowController.follow`. */
+    if (
+      this.data.records &&
+      !this.data.follow(changed.has('activeValue') || changed.has('filter'))
+    ) {
+      return
+    }
+    const active = this.elements.find(
+      (option) => !option.hidden && option.value === this.activeValue,
+    )
     if (active) {
       const items = this.partNamed('items')
       scrollItemIntoView(active, { padding: 4, ...(items ? { scroller: items } : {}) })
@@ -1078,7 +1141,7 @@ export class HelixHeadlessListbox extends MixinCollection(
     if (!list || !('ariaActiveDescendantElement' in list)) {
       return
     }
-    const active = this.options.find((option) => option.value === this.currentValue)
+    const active = this.elements.find((option) => option.value === this.currentValue)
     ;(
       list as Element & { ariaActiveDescendantElement: Element | null }
     ).ariaActiveDescendantElement = active ?? null
@@ -1086,7 +1149,7 @@ export class HelixHeadlessListbox extends MixinCollection(
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    this.followActive()
+    this.followActive(changed)
     this.sync()
     this.linkActive()
     /* And the marks, from the same needle that did the hiding, on the options
@@ -1094,7 +1157,7 @@ export class HelixHeadlessListbox extends MixinCollection(
        can show a match it does not mark. See core's `markMatches`. */
     markMatches(
       this,
-      this.options.filter((option) => !option.hidden),
+      this.elements.filter((option) => !option.hidden),
       this.filter.trim(),
     )
   }
@@ -1147,7 +1210,7 @@ export class HelixHeadlessListbox extends MixinCollection(
    */
   private readonly handleScroll = (event: Event): void => {
     const items = event.currentTarget as HTMLElement
-    const count = this.options.length
+    const count = this.entries.length
     if (
       this.loading ||
       !endInSight({
@@ -1282,7 +1345,7 @@ export class HelixHeadlessListbox extends MixinCollection(
   private get showsOptions(): boolean {
     return this.counted && !this.loading
       ? this.filter === ''
-        ? this.options.length > 0
+        ? this.entries.length > 0
         : this.hasMatches
       : true
   }
@@ -1327,7 +1390,7 @@ export class HelixHeadlessListbox extends MixinCollection(
       this.counted &&
       !this.loading &&
       this.filter !== '' &&
-      this.options.length > 0 &&
+      this.entries.length > 0 &&
       !this.hasMatches
     )
   }
@@ -1395,7 +1458,11 @@ export class HelixHeadlessListbox extends MixinCollection(
         tabindex=${this.filterable ? nothing : this.isDisabled ? -1 : 0}
         @scroll=${this.handleScroll}
       >
-        <slot @slotchange=${() => this.requestUpdate()}></slot>
+        ${
+          /* A list of `items` draws a window of them, and otherwise the
+             children. */
+          this.data.render() ?? html`<slot @slotchange=${() => this.requestUpdate()}></slot>`
+        }
         ${
           /* Loading and empty come from the shared mixin; what is local is what
              counts as content. A list with a filter that matched nothing is
@@ -1414,7 +1481,7 @@ export class HelixHeadlessListbox extends MixinCollection(
               disabled: this.isDisabled,
               multiple: this.multiple,
               onFill: (value) => this.requestValue(value),
-              options: this.childrenKnown ? this.options : [],
+              options: this.childrenKnown ? this.entries : [],
               value: this.value,
             })
       }`

@@ -92,6 +92,10 @@ export {
   type OpenPhaseOptions,
 } from './controllers/open-phase-controller/open-phase-controller.js'
 export {
+  OptionWindowController,
+  type OptionWindowOptions,
+} from './controllers/option-window-controller/option-window-controller.js'
+export {
   MAX_FRAME_STEP,
   PaintGateController,
   type PaintGateOptions,
@@ -408,6 +412,13 @@ export {
   definedTags,
   duplicateRegistrations,
 } from './utils/custom-element/custom-element.js'
+export {
+  type DataOption,
+  type DataOptionItem,
+  dataOptions,
+  drawOptions,
+  windowOf,
+} from './utils/data-options/data-options.js'
 export { segmentName } from './utils/date-segments/date-segments.js'
 export {
   type DrawDismissOptions,

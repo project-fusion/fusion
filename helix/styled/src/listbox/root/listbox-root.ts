@@ -31,6 +31,9 @@ import { styles } from './listbox-root.css.js'
  */
 @customElement('helix-listbox')
 export class HelixListbox extends HelixHeadlessListbox {
+  /* The options drawn for `items` are this tier's. */
+  static override tier = 'helix-'
+
   static override styles: CSSResultGroup = [
     liveStyles,
     collectionStateStyles,

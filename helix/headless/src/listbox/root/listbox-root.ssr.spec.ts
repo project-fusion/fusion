@@ -98,4 +98,15 @@ describe('listbox server output', () => {
     )
     expect(hostAttributes(markup, TAG)).toEqual(['label', 'name'])
   })
+
+  test('a list of items ships its box and draws its options once it hydrates', () => {
+    /* The window is measured from the box, which a server has none of. */
+    const markup = ssr(
+      html`<helix-headless-listbox label="Owner" .items=${['Ross', 'Sam']}></helix-headless-listbox>`,
+    )
+    expect(partTag(markup, 'items')).toContain('role="listbox"')
+    expect(rendered(markup, TAG)).toContain('<div data-rows>')
+    expect(rendered(markup, TAG)).not.toContain('helix-headless-option')
+    expect(hostAttributes(markup, TAG)).toEqual(['label'])
+  })
 })
