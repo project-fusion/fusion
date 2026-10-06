@@ -98,6 +98,11 @@ export interface HelixMember extends Documented {
      * member whose behavior comes from something a reader may not have met.
      */
     references?: { label: string; url: string }[]
+    /**
+     * Whether `@words` makes it a word property, one a page can register
+     * words for by locale with `registerWords`.
+     */
+    words?: boolean
   }
   /** Initial value, as source text. Absent where there is no default. */
   default?: string

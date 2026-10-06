@@ -13,6 +13,7 @@ import { jsxNumericAttributes } from './plugins/jsx-numeric-attributes.js'
 import { jsxOptionalUndefined } from './plugins/jsx-optional-undefined.js'
 import { jsxReactRef } from './plugins/jsx-react-ref.js'
 import { svelteTypes } from './plugins/svelte-types.js'
+import { wordsTypes } from './plugins/words-types.js'
 import type { HelixContext, HelixManifest, HelixMetadata, Plugin } from './types.js'
 
 export interface HelixCemOptions {
@@ -128,6 +129,9 @@ export const afterManifest = ({
               }),
             ]
           : []),
+        /* What `registerWords` takes for each family, from the word
+             properties the manifest marks. */
+        wordsTypes({ outFile: `${TYPES}/words.d.ts` }),
         /* After both generators, which type an attribute as its property,
              and before `jsxOptionalUndefined`, so the string form it admits
              is wrapped in the same `| undefined`. */
@@ -277,4 +281,5 @@ export {
   jsxOptionalUndefined,
   jsxReactRef,
   svelteTypes,
+  wordsTypes,
 }
