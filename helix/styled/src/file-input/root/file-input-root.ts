@@ -41,9 +41,13 @@ import { styles } from './file-input-root.css.js'
  * @cssproperty --file-input-file-padding-inline - Padding at each side of each chosen file.
  * @cssproperty --file-input-file-radius - Corner radius of each chosen file.
  * @cssproperty --file-input-padding - Padding inside the field.
+ * @cssproperty --file-input-progress-color - The filled part of a file's upload bar.
+ * @cssproperty --file-input-progress-track-color - The unfilled part of a file's upload bar.
  * @cssproperty --file-input-radius - Corner radius of the field.
  * @cssproperty --file-input-remove-color - The remove button's icon at rest.
  * @cssproperty --file-input-remove-color-hover - The remove button's icon under the pointer.
+ * @cssproperty --file-input-status-color - The words beside a file's upload bar.
+ * @cssproperty --file-input-status-color-error - The words beside a file whose upload failed.
  */
 @customElement('helix-file-input')
 export class HelixFileInput extends HelixHeadlessFileInput {
