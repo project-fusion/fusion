@@ -76,4 +76,15 @@ describe('the hidden select a browser fills', () => {
     select.dispatchEvent(new Event('change'))
     expect(filled).toEqual(['05,06'])
   })
+
+  test('keeps its own input event to itself', () => {
+    /* Measured in Chromium before this: the select's composed `input` reached
+       the page ahead of the host's own, carrying the old value. */
+    const { box } = drawn()
+    const heard: string[] = []
+    box.addEventListener('input', (event) => heard.push(event.type))
+    const select = box.querySelector('select') as HTMLSelectElement
+    select.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+    expect(heard).toEqual([])
+  })
 })

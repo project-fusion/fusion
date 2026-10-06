@@ -25,13 +25,19 @@ const HIDDEN = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;point
 
 /**
  * A native `<select>` that a browser's autofill can fill, holding the same
- * options as the custom select beside it. Select and Combobox draw it under
- * `autocomplete`.
+ * options as the custom select beside it. Select, Combobox and Listbox draw it
+ * under `autocomplete`.
  *
  * **A browser fills native fields only.** It reads `autocomplete`, picks an
  * option by its value or its words, and sends `change`, which `onFill` turns
  * into the custom select's value. Chromium fills a select inside a shadow root
  * when its host is inside the form being filled.
+ *
+ * **The select's own `input` stops here.** It is composed, so it crossed the
+ * shadow root and reached the host before `change` did, with the host's value
+ * still the old one: measured in Chromium, a fill sent a page's `input`
+ * listener two events, the first carrying the old value. The host sends its
+ * own `input` and `change` once the value is taken.
  *
  * **Hidden from everyone but the browser**: clipped to a pixel, `aria-hidden`,
  * and out of the tab order, with no `name`, so the form still receives the
@@ -57,9 +63,10 @@ export const drawAutofill = ({
         .filter(Boolean)
         .join(','),
     )
+  const stop = (event: Event): void => event.stopPropagation()
   /* No `selected` on the empty option: a single select with none chosen
      shows its first, which is the empty one. */
-  return html`<select aria-hidden="true" autocomplete=${autocomplete} style=${HIDDEN} tabindex="-1" ?disabled=${disabled} ?multiple=${multiple} @change=${fill}><option value=""></option>${options.map(
+  return html`<select aria-hidden="true" autocomplete=${autocomplete} style=${HIDDEN} tabindex="-1" ?disabled=${disabled} ?multiple=${multiple} @change=${fill} @input=${stop}><option value=""></option>${options.map(
     (option) =>
       html`<option value=${option.value} ?selected=${chosen.includes(option.value)}>${option.text}</option>`,
   )}</select>`
