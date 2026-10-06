@@ -315,13 +315,14 @@ export class HelixHeadlessListbox extends MixinCollection(
 
   /**
    * What the list says when its options could not be loaded, such as after a
-   * request to a server fails. Empty is no error.
+   * request to a server fails. Empty, null or no attribute is no error, so
+   * removing the attribute clears it.
    *
    * Set, it shows under any options there are, in place of `empty-text` and
    * `loading-text`, and a screen reader hears it. Clear it when you ask again.
    */
   @property({ attribute: 'load-error' })
-  loadError = ''
+  loadError: string | null = ''
 
   /**
    * Stops the arrow keys from choosing each option they move to. Enter, Space
@@ -1099,7 +1100,7 @@ export class HelixHeadlessListbox extends MixinCollection(
        empty line is drawn from. */
     this.toggleState('empty', !this.showsOptions)
     this.toggleState('loading', this.loading)
-    this.toggleState('error', this.loadError !== '')
+    this.toggleState('error', this.failed)
     this.toggleState('no-results', this.noResults)
   }
 
@@ -1379,7 +1380,7 @@ export class HelixHeadlessListbox extends MixinCollection(
    * the live region still says it.
    */
   protected override renderStatus(hasContent: boolean): TemplateResult | typeof nothing {
-    if (this.loadError !== '') {
+    if (this.failed) {
       return html`<p part="error"><slot name="error">${this.loadError}</slot></p>`
     }
     if (!this.loading && hasContent) {
@@ -1413,6 +1414,11 @@ export class HelixHeadlessListbox extends MixinCollection(
       this.options.length > 0 &&
       !this.hasMatches
     )
+  }
+
+  /** Whether `load-error` holds words, which a removed attribute does not. */
+  private get failed(): boolean {
+    return Boolean(this.loadError)
   }
 
   /** The error, or what a filter that hid everything says, before the shared words. */

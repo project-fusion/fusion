@@ -117,11 +117,12 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
 
   /**
    * What the list says when its commands could not be loaded, such as after a
-   * request to a server fails. Empty is no error. Passed to the list, which
-   * shows it under any commands there are and tells screen readers.
+   * request to a server fails. Empty, null or no attribute is no error, so
+   * removing the attribute clears it. Passed to the list, which shows it
+   * under any commands there are and tells screen readers.
    */
   @property({ attribute: 'load-error' })
-  loadError = ''
+  loadError: string | null = ''
 
   /**
    * Whether the commands are still loading, for a palette that asks a server

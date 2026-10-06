@@ -265,11 +265,12 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
 
   /**
    * What the list says when its options could not be loaded, such as after a
-   * request to a server fails. Empty is no error. Passed to the list, which
-   * shows it under any options there are and tells screen readers.
+   * request to a server fails. Empty, null or no attribute is no error, so
+   * removing the attribute clears it. Passed to the list, which shows it
+   * under any options there are and tells screen readers.
    */
   @property({ attribute: 'load-error' })
-  loadError = ''
+  loadError: string | null = ''
 
   /**
    * Whether the options are still loading.
@@ -579,7 +580,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
     const list = this.listbox
     this.toggleState('blank', this.value === '')
     this.toggleState('loading', this.loading)
-    this.toggleState('error', this.loadError !== '')
+    this.toggleState('error', Boolean(this.loadError))
     this.toggleState(
       'no-results',
       list !== null &&
