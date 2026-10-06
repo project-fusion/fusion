@@ -1,3 +1,5 @@
+import { deepContains } from '@fusion.dev/helix-core'
+
 /** What is never hidden: what draws nothing, and what announces. */
 const KEEP =
   'script, style, template, link, meta, [aria-live], [role="alert"], [role="log"], [role="status"]'
@@ -17,7 +19,7 @@ const KEEP =
  */
 export const hideOutside = (kept: readonly Element[]): (() => void) => {
   const hidden: Element[] = []
-  const holds = (element: Element): boolean => kept.some((one) => composedContains(element, one))
+  const holds = (element: Element): boolean => kept.some((one) => deepContains(element, one))
   const seen = new Set<Node>()
   for (const start of kept) {
     let node: Node | null = start
@@ -48,18 +50,4 @@ export const hideOutside = (kept: readonly Element[]): (() => void) => {
     }
     hidden.length = 0
   }
-}
-
-/** Whether `inner` is `outer` or inside it, through the shadow roots between them. */
-const composedContains = (outer: Element, inner: Element): boolean => {
-  for (
-    let node: Node | null = inner;
-    node;
-    node = node instanceof ShadowRoot ? node.host : node.parentNode
-  ) {
-    if (node === outer) {
-      return true
-    }
-  }
-  return false
 }

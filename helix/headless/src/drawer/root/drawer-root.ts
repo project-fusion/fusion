@@ -5,6 +5,7 @@ import {
   drawDismiss,
   drawDismissGlyph,
   edgeOffset,
+  FocusScopeController,
   HelixElement,
   headingsIn,
   isRtl,
@@ -38,7 +39,8 @@ import { startsSwipe } from '../swipe-start.js'
  *
  * The drawer is modal by default, which means four things:
  *
- * - focus is trapped inside
+ * - focus is trapped inside: `Tab` from the last control goes to the first,
+ *   and `Shift+Tab` from the first to the last, as in `Dialog`
  * - Escape and a press outside close it
  * - the page behind is covered
  * - the page behind does not scroll
@@ -414,6 +416,25 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
     event.preventDefault()
     this.requestOpen(false)
   }
+
+  /* `Tab` from the last control goes to the first, and `Shift+Tab` from the
+     first to the last, while a modal drawer is open. A native modal lets `Tab`
+     past its last control out to the browser's own controls, which takes a
+     keyboard reader out of the page; `Dialog` wraps the same way. */
+  protected readonly scope = new FocusScopeController(this, {
+    contain: () => this.open && this.modal,
+    contents: () => [
+      ...['header', '', 'footer'].flatMap(
+        (name) =>
+          this.renderRoot
+            ?.querySelector<HTMLSlotElement>(name ? `slot[name="${name}"]` : 'slot:not([name])')
+            ?.assignedElements({ flatten: true }) ?? [],
+      ),
+      /* And the close control the drawer draws itself. */
+      ...(this.partNamed('dismiss') ? [this.partNamed('dismiss') as Element] : []),
+    ],
+    surface: () => this.panel,
+  })
 
   /** The panel, which is a real `<dialog>`. */
   private get panel(): HTMLDialogElement | null {
