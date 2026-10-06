@@ -2,6 +2,7 @@ import {
   byRow,
   CHART_PLOT,
   type Curve,
+  commaList,
   customElement,
   drawTooltip,
   extent,
@@ -14,6 +15,7 @@ import {
   type Point,
   type Series,
   seriesIndex,
+  seriesKey,
   ticks,
   unbroken,
 } from '@fusion.dev/helix-core'
@@ -33,6 +35,10 @@ import '../../tooltip/index.js'
  * length is its value. Set `zero` when the distance from zero is the point.
  *
  * Every series shares one scale, as in the bar chart.
+ *
+ * `dashed` names the series drawn as a dashed line, such as a forecast or a
+ * target beside the readings: `dashed="Forecast"`. Each takes a
+ * `line-dashed` part beside `line`.
  *
  * `area` fills each series down to the floor on its own, so the fills overlap.
  * For a total made of parts, use `Area Chart`, which stacks the series so the
@@ -66,6 +72,7 @@ import '../../tooltip/index.js'
  * @csspart label - One reading's name.
  * @csspart labels - The row of reading names.
  * @csspart line - The line for one series.
+ * @csspart line-dashed - A `line` whose series `dashed` names. Set alongside `line`.
  * @csspart live - The readout: a polite live region that says the reading the keys moved to. Hide it visually.
  * @csspart mark - The invisible point the tooltip is anchored to.
  * @csspart marker - The mark on one reading, under `markers`, and on a reading with a blank on either side. Placed with `inset-inline-start` and `inset-block-start`, and carries its series color as `--chart-series`.
@@ -135,6 +142,17 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
    */
   @property({ reflect: true })
   curve?: Curve
+
+  /**
+   * The series drawn as a dashed line, by their headings, separated by
+   * commas: `dashed="Forecast, Target"`.
+   *
+   * For a series that is not a reading, such as a forecast or a goal, drawn
+   * beside the ones that are. Each takes a `line-dashed` part beside `line`,
+   * which a stylesheet draws dashed. Absent, every line is solid.
+   */
+  @property()
+  dashed = ''
 
   /**
    * Which rules are drawn across the plot, if any.
@@ -538,6 +556,12 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
     )}`
   }
 
+  /** Whether `dashed` names this series, matched as a heading is. */
+  private dashes(name: string): boolean {
+    const key = seriesKey(name)
+    return this.dashed !== '' && commaList(this.dashed).some((one) => seriesKey(one) === key)
+  }
+
   /**
    * One series, its wash first so the line is drawn over its own fill.
    *
@@ -590,7 +614,7 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
       d=${path}
       data-series=${index}
       fill="none"
-      part="line"
+      part="line${this.dashes(one.name) ? ' line-dashed' : ''}"
       style="--chart-series: var(--chart-series-${index})"
     />`
   }

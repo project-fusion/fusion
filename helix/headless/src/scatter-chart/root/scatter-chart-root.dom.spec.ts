@@ -229,3 +229,24 @@ describe('trend', () => {
     expect([line?.getAttribute('y1'), line?.getAttribute('y2')]).toEqual(['100', '0'])
   })
 })
+
+/* Web Awesome Pro's scatter takes a third measure as each point's size; this
+   one drew every point one size. */
+describe('size', () => {
+  /* Rate across, p50 up, and p95 as the size, so p50 is the only series. */
+  test('takes the named column out of the series and sizes each point by area', async () => {
+    const host = await chart(LOAD, 'for="load" size="p95"')
+    const points = all(host, 'point')
+    expect(points.map((one) => one.getAttribute('data-series'))).toEqual(['1', '1', '1'])
+    expect(
+      points.map((one) => one.style.getPropertyValue('--chart-point-weight') || 'none'),
+    ).toEqual([String(Math.sqrt(30 / 60)), 'none', '1'])
+  })
+
+  test('draws every point one size where nothing names a size', async () => {
+    const host = await chart(LOAD, 'for="load"')
+    expect(
+      all(host, 'point').every((one) => one.style.getPropertyValue('--chart-point-weight') === ''),
+    ).toBe(true)
+  })
+})

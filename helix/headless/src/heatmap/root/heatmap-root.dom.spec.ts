@@ -418,7 +418,7 @@ describe('the overview', () => {
       ['Tue', 1200],
       ['Wed', 40],
     ])
-    expect(part(element, 'overview')?.textContent).toBe('Busiest: Tue 1200; Total 1,243.')
+    expect(part(element, 'overview')?.textContent).toBe('Busiest: Tue, 1200; Total 1,243.')
     expect(part(element, 'strip')?.getAttribute('aria-describedby')).toBe('helix-chart-summary')
     expect(part(element, 'overview')?.id).toBe('helix-chart-summary')
   })
@@ -428,7 +428,7 @@ describe('the overview', () => {
       ['Mo', 1500],
       ['Di', 2],
     ])
-    expect(part(element, 'overview')?.textContent).toBe('Höchster: Mo 1500; Summe 1.502.')
+    expect(part(element, 'overview')?.textContent).toBe('Höchster: Mo, 1500; Summe 1.502.')
   })
 
   test('is not there while the strip has nothing to read', async () => {
@@ -448,5 +448,81 @@ describe('a page of cells by key', () => {
     }
     await element.updateComplete
     expect(part(element, 'live')?.textContent).toBe('Day 29: 28 (29 of 70)')
+  })
+})
+
+/* No peer ships a heatmap, and this one could only be read: a reader could
+   not pick a day or a range, which every other set of items here allows. */
+describe('selecting cells', () => {
+  type Selecting = Strip & { value: string }
+  const key = (element: HTMLElement, name: string, shiftKey = false): KeyboardEvent => {
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key: name,
+      shiftKey,
+    })
+    part(element, 'strip')?.dispatchEvent(event)
+    return event
+  }
+  const WEEK: Array<[string, number]> = [
+    ['Mon', 1],
+    ['Tue', 2],
+    ['Wed', 3],
+    ['Thu', 4],
+  ]
+  const selected = (element: HTMLElement): string[] =>
+    cells(element)
+      .filter((one) => (one.getAttribute('part') ?? '').includes('cell-selected'))
+      .map((one) => one.getAttribute('data-index') ?? '')
+
+  test('Space selects the cell the keys rest on, asking first and telling after', async () => {
+    const element = (await strip('selection-mode="single"', WEEK)) as Selecting
+    const heard: string[] = []
+    element.addEventListener('helix-before-change', (event) =>
+      heard.push(`before ${(event as CustomEvent<{ value: string }>).detail.value}`),
+    )
+    element.addEventListener('change', () => heard.push(`change ${element.value}`))
+    key(element, 'Home')
+    key(element, 'ArrowRight')
+    expect(key(element, ' ').defaultPrevented).toBe(true)
+    await element.updateComplete
+    expect([element.value, heard, selected(element)]).toEqual([
+      'Tue',
+      ['before Tue', 'change Tue'],
+      ['1'],
+    ])
+  })
+
+  test('Shift with an arrow takes in a range under `multiple`, and the count is said', async () => {
+    const element = (await strip('selection-mode="multiple"', WEEK)) as Selecting
+    key(element, 'Home')
+    key(element, ' ')
+    key(element, 'ArrowRight', true)
+    key(element, 'ArrowRight', true)
+    await element.updateComplete
+    await new Promise((done) => requestAnimationFrame(() => done(undefined)))
+    await element.updateComplete
+    expect(element.value).toBe('Mon, Tue, Wed')
+    expect(part(element, 'selection')?.textContent).toBe('3 selected')
+  })
+
+  test('a press selects the cell under it, and a refused change keeps the selection', async () => {
+    const element = (await strip('selection-mode="multiple" value="Mon"', WEEK)) as Selecting
+    ;(cells(element)[2] as HTMLElement).click()
+    await element.updateComplete
+    expect(element.value).toBe('Mon, Wed')
+    element.addEventListener('helix-before-change', (event) => event.preventDefault())
+    ;(cells(element)[0] as HTMLElement).click()
+    expect(element.value).toBe('Mon, Wed')
+  })
+
+  test('selects nothing without `selection-mode`', async () => {
+    const element = (await strip('', WEEK)) as Selecting
+    key(element, 'Home')
+    expect(key(element, ' ').defaultPrevented).toBe(false)
+    ;(cells(element)[1] as HTMLElement).click()
+    expect(element.value).toBe('')
   })
 })

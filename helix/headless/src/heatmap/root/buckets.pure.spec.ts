@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { fits, toneOf } from './buckets.js'
+import { fits, overviewOf, toneOf } from './buckets.js'
 
 /**
  * The two calculations a picture cannot check.
@@ -105,5 +105,18 @@ describe('fits', () => {
 
   test('no minimum means no dropping', () => {
     expect(fits(90, 100, 0, 2)).toBe(90)
+  })
+})
+
+describe('what the drawn readings come to', () => {
+  test('the busiest by place, the first where several tie, and the total', () => {
+    expect(overviewOf([{ value: 3 }, { value: undefined }, { value: 9 }, { value: 9 }])).toEqual({
+      busiest: 2,
+      total: 21,
+    })
+  })
+
+  test('no busiest reading among blanks, and nothing in total', () => {
+    expect(overviewOf([{ value: undefined }])).toEqual({ busiest: -1, total: 0 })
   })
 })

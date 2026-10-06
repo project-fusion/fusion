@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { isHidden, toggledNames } from './hidden-series.js'
+import { isHidden, namesIn, toggledNames } from './hidden-series.js'
 
 describe('a hidden-series list', () => {
   /* A heading may hold a space, so only a comma separates two names. */
@@ -22,5 +22,14 @@ describe('a toggle', () => {
 
   test('shows a hidden one again, however it was written', () => {
     expect(toggledNames('Partner, DIRECT', 'Direct')).toBe('Partner')
+  })
+})
+
+/* React hands an array to `hiddenSeries`, and the list was read as a string. */
+describe('a list given as an array', () => {
+  test('holds the same names as the written list', () => {
+    expect(namesIn([' Direct sales ', '', 'Partner'])).toEqual(namesIn('Direct sales, Partner'))
+    expect(isHidden(['Direct sales'], 'direct sales')).toBe(true)
+    expect(toggledNames(['Direct sales'], 'Partner')).toBe('Direct sales, Partner')
   })
 })

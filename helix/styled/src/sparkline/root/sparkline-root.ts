@@ -39,6 +39,8 @@ import { styles } from './sparkline-root.css.js'
  * @cssproperty --sparkline-mark-color - Color of the dot on the reading a pointer or a key rests on, and of the `marks` dots. Without it, the line's color.
  * @cssproperty --sparkline-mark-ring-color - Color of the ring round the dot on the reading a pointer or a key rests on, which matches the page. Change it when the sparkline sits on another surface.
  * @cssproperty --sparkline-mark-size - Size of the dot on the reading a pointer or a key rests on, and of the `marks` dots.
+ * @cssproperty --sparkline-range-color - Fill of the band `range` draws. Without it, the line's color.
+ * @cssproperty --sparkline-range-opacity - Opacity of the band `range` draws.
  * @cssproperty --sparkline-readout-background-color - Ground of the reading written above the dot.
  * @cssproperty --sparkline-readout-color - Color of the reading written above the dot.
  * @cssproperty --sparkline-readout-font-size - Size of the reading written above the dot.

@@ -2,13 +2,20 @@ import {
   AriaForwardController,
   byRow,
   CHART_PLOT,
+  commaList,
   customElement,
   drawTooltip,
+  fillTemplate,
   formatNumbers,
+  HelixBeforeChangeEvent,
   HelixElement,
   HelixResizeEvent,
   MixinChartSource,
   markRegion,
+  pressedValue,
+  rangeAdd,
+  requestChange,
+  StatusController,
   searchableById,
   writtenList,
   writtenNumbers,
@@ -16,7 +23,7 @@ import {
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import '../../tooltip/index.js'
-import { fits, type Reading, toneOf } from './buckets.js'
+import { fits, overviewOf, type Reading, toneOf } from './buckets.js'
 
 /**
  * @summary A strip of cells, each colored by its reading, for uptime, contributions, or activity.
@@ -50,9 +57,18 @@ import { fits, type Reading, toneOf } from './buckets.js'
  * weeks with `rows="7"`.
  *
  * **The strip describes itself.** The `overview` part says the busiest
- * reading and the total of the readings drawn, "Busiest: 11 Jun 12; Total
+ * reading and the total of the readings drawn, "Busiest: 11 Jun, 12; Total
  * 84", and the strip is described by it, as every chart is by its summary.
  * Hide it visually. The `summary` slot is still yours, for words of your own.
+ *
+ * **`selection-mode` lets a reader select cells**: `single` one at a time and
+ * `multiple` any number. Space, Enter or a press selects the cell the keys or
+ * the pointer rest on, or lets it go, and under `multiple` Shift with an arrow,
+ * Home, End, PageUp or PageDown takes in every cell from the last one pressed
+ * to where the key went. `value` holds the selected days, by the names their
+ * rows have in the table, separated by commas. A change asks with
+ * `helix-before-change` and tells with `change`, and the `selection` part says
+ * how many are selected, in `selection-label`.
  *
  * @since 0.1.0
  * @status stable
@@ -64,16 +80,20 @@ import { fits, type Reading, toneOf } from './buckets.js'
  * @slot start - Below the strip, at the leading edge: usually the oldest date.
  * @slot summary - Below the strip, in the middle: a summary of the range shown.
  *
+ * @event {Event} change - Fired once a press or a key has changed which cells are selected.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired before a press or a key changes which cells are selected, with the `value` it would leave. Cancelable.
  * @event {HelixResizeEvent} helix-resize - Fired when the number of cells drawn changes, with the new number.
  *
  * @csspart cell - One reading.
  * @csspart cell-active - The cell the pointer or the keys rest on. Set alongside `cell`.
+ * @csspart cell-selected - A cell that is selected, under `selection-mode`. Set alongside `cell`.
  * @csspart empty - Shown when the table has no readings. It stays hidden until the table can be read: on the server and during hydration, there is no document to resolve `for` in.
  * @csspart end - The trailing slot's box.
  * @csspart footer - The three-slot row under the strip.
  * @csspart live - The readout: a polite live region that says the cell the keys moved to. Hide it visually.
  * @csspart mark - The invisible point the tooltip is anchored to.
  * @csspart overview - The busiest reading and the total of the readings drawn, written as a sentence for screen readers, which describes the strip. Rendered once there are cells. Hide it visually.
+ * @csspart selection - A polite region that says how many cells are selected after a change, rendered from the first change. Hide it visually.
  * @csspart start - The leading slot's box.
  * @csspart strip - The grid of cells, which takes focus to be read by key. It is named by the host's `aria-labelledby` or `aria-label`, then by `label`, then by the caption of the table.
  * @csspart summary - The middle slot's box.
@@ -168,6 +188,21 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
   rows = 1
 
   /**
+   * What the `selection` part says after the selection changes, with `{count}` for
+   * how many cells are selected.
+   */
+  @property({ attribute: 'selection-label' })
+  selectionLabel = '{count} selected'
+
+  /**
+   * How many cells a reader can select: `single` or `multiple`.
+   *
+   * Absent selects nothing, and a press or Space does what it did.
+   */
+  @property({ attribute: 'selection-mode' })
+  selectionMode?: 'multiple' | 'single'
+
+  /**
    * Lower bounds for the tone buckets, in the order the tones are given.
    *
    * `thresholds="1 3 6 9"` with `tones="1 2 3 4"` puts 1 and 2 in the ramp's
@@ -198,6 +233,16 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
    */
   @property({ attribute: 'total-label' })
   totalLabel = 'Total'
+
+  /**
+   * The selected cells, by the names their rows have in the table, such as
+   * `2026-06-11`, separated by commas.
+   *
+   * Set it to start with cells selected. Written by a press or a key under
+   * `selection-mode`.
+   */
+  @property()
+  value = ''
 
   /**
    * How many cells are actually drawn.
@@ -258,6 +303,86 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
   private observer: ResizeObserver | undefined = undefined
 
   private announced: number | undefined = undefined
+
+  /** Where a range taken in with Shift starts: the cell last pressed, or none. */
+  private anchor = -1
+
+  /** The region a change of selection is said in, rendered from the first change. */
+  private readonly status = new StatusController(this)
+
+  /** The name each drawn cell stands for in `value`: its row's name in the table. */
+  private keysOf(cells: readonly Reading[]): string[] {
+    const offset = this.points.length - cells.length
+    const rows = this.sourceRows
+    return cells.map((_, index) => rows[offset + index]?.label ?? '')
+  }
+
+  /**
+   * Moves `value` to `next`, asking first: `helix-before-change` carries it,
+   * a listener that refuses keeps the selection, and `change` follows, with
+   * the count said in the `selection` part.
+   */
+  private choose(next: string): void {
+    if (next === this.value) {
+      return
+    }
+    requestChange({
+      apply: (value) => {
+        this.value = value
+        this.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
+        this.status.say(fillTemplate(this.selectionLabel, { count: commaList(value).length }))
+      },
+      event: (value) => new HelixBeforeChangeEvent({ value }),
+      host: this,
+      next,
+    })
+  }
+
+  /** Selects the drawn cell at `index`, or lets it go, as `selection-mode` says. */
+  private press(index: number): void {
+    const mode = this.selectionMode
+    const key = this.keysOf(this.drawn)[index]
+    if (!mode || key === undefined || key === '') {
+      return
+    }
+    this.anchor = index
+    this.choose(pressedValue(mode, this.value, key))
+  }
+
+  /**
+   * Space and Enter select the cell the keys rest on, and Shift with a key
+   * that moved them takes in the range from the anchor. After the pointer
+   * controller, which has already moved `at` for an arrow.
+   */
+  private readonly onKeydown = (event: KeyboardEvent): void => {
+    const at = this.pointer.at
+    if (!this.selectionMode || at < 0 || event.altKey || event.ctrlKey || event.metaKey) {
+      return
+    }
+    if (event.key === ' ' || event.key === 'Enter') {
+      event.preventDefault()
+      this.press(at)
+      return
+    }
+    const moves = /^(Arrow|Page|Home$|End$)/.test(event.key)
+    if (!event.shiftKey || !moves || this.selectionMode !== 'multiple') {
+      return
+    }
+    const keys = this.keysOf(this.drawn)
+    const added = rangeAdd(commaList(this.value), keys, this.anchor < 0 ? at : this.anchor, at)
+    if (added) {
+      this.choose(added.join(', '))
+    }
+  }
+
+  /** A press on a cell selects it, under `selection-mode`. */
+  private readonly onClick = (event: MouseEvent): void => {
+    const cell = (event.target as Element | null)?.closest?.('[part~="cell"]')
+    const index = Number(cell?.getAttribute('data-index') ?? -1)
+    if (cell && Number.isInteger(index) && index >= 0) {
+      this.press(index)
+    }
+  }
 
   /**
    * Every row in the table, oldest first, as the table is written, with its
@@ -419,6 +544,7 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
 
   override connectedCallback(): void {
     super.connectedCallback()
+    this.addEventListener('keydown', this.onKeydown)
     /* Guarded because Lit SSR provides no `ResizeObserver`, and a component that
        measures itself to render has to render without the measurement first. */
     if (typeof ResizeObserver !== 'undefined') {
@@ -434,6 +560,7 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    this.removeEventListener('keydown', this.onKeydown)
     this.observer?.disconnect()
     this.observer = undefined
   }
@@ -500,6 +627,8 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
        the days, a column at a time across, and the readout says each one. An
        empty strip has nothing to read and stays a picture. */
     const readable = cells.length > 0
+    const keys = this.selectionMode ? this.keysOf(cells) : []
+    const chosen = new Set(this.selectionMode ? commaList(this.value) : [])
     return html`<div
         aria-describedby=${readable ? 'helix-chart-summary' : nothing}
         aria-label=${this.named || 'Heatmap'}
@@ -508,6 +637,7 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
         role=${readable ? 'application' : 'img'}
         style="--heatmap-rows: ${this.rowCount}"
         tabindex=${readable ? '0' : nothing}
+        @click=${this.onClick}
         @pointerover=${this.onPointerOver}
         @pointerleave=${this.onPointerLeave}
       >
@@ -525,13 +655,14 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
                    set. An untoned cell came out transparent rather than taking
                    the quiet ground the sheet has for it. */
                 const active = this.pointer.at === index
+                const picked = chosen.has(keys[index] ?? '')
                 return tone === undefined
                   ? html`<span
-                      part="cell${active ? ' cell-active' : ''}"
+                      part="cell${active ? ' cell-active' : ''}${picked ? ' cell-selected' : ''}"
                       data-index=${index}
                     ></span>`
                   : html`<span
-                part="cell${active ? ' cell-active' : ''}"
+                part="cell${active ? ' cell-active' : ''}${picked ? ' cell-selected' : ''}"
                 data-index=${index}
                 data-tone=${tone}
                 style="--heatmap-tone: var(--heatmap-tone-${tone})"
@@ -545,7 +676,11 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
         <span part="start"><slot name="start"></slot></span>
         <span part="summary"><slot name="summary"></slot></span>
         <span part="end"><slot name="end"></slot></span>
-      </div>${readable ? this.renderOverview(cells) : nothing}`
+      </div>${readable ? this.renderOverview(cells) : nothing}${
+        this.status.spoken
+          ? html`<span part="selection" role="status">${this.status.said}</span>`
+          : nothing
+      }`
   }
 
   /**
@@ -558,21 +693,11 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
     const rows = this.sourceRows
     const offset = this.points.length - cells.length
     const column = this.plottedColumns[0] ?? -1
-    let busiest = -1
-    let total = 0
-    cells.forEach((cell, index) => {
-      if (cell.value === undefined) {
-        return
-      }
-      total += cell.value
-      if (busiest < 0 || cell.value > (cells[busiest]?.value ?? 0)) {
-        busiest = index
-      }
-    })
+    const { busiest, total } = overviewOf(cells)
     const row = rows[offset + busiest]
-    const most = row
-      ? `${this.busiestLabel}: ${row.label} ${row.cells[column]?.text ?? ''}`.trim()
-      : ''
+    /* The day and its count apart, so "Jan 6, 12" is not heard as one date. */
+    const text = row?.cells[column]?.text ?? ''
+    const most = row ? `${this.busiestLabel}: ${row.label}${text === '' ? '' : `, ${text}`}` : ''
     const sum = `${this.totalLabel} ${formatNumbers(this.locale)(total)}`
     return html`<p id="helix-chart-summary" part="overview">${most ? `${most}; ${sum}` : sum}.</p>`
   }

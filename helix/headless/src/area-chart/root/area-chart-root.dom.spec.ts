@@ -75,6 +75,17 @@ describe('stacking', () => {
     expect(all(smooth, 'line').some((line) => line.getAttribute('d')?.includes('C'))).toBe(true)
   })
 
+  /* Web Awesome Pro's area chart draws its series overlapping; this one could
+     only stack them, so no part could be compared with another by height. */
+  test('`overlap` draws each band from zero, its height its own amount, the scale fit to the largest', async () => {
+    const host = await chart(SOURCES, 'for="sources" overlap')
+    const [search, direct, social] = edges(host)
+    /* Measured from zero to the largest part, Search's 25. */
+    expect(search?.map(([, y]) => y)).toEqual([60, 20, 0])
+    expect(direct?.map(([, y]) => y)).toEqual([76, 52, 40])
+    expect(social?.map(([, y]) => y)).toEqual([84, 68, 60])
+  })
+
   test('`share` draws every reading as the whole, so the top edge is flat', async () => {
     const host = await chart(SOURCES, 'for="sources" share')
     const top = edges(host).at(-1)

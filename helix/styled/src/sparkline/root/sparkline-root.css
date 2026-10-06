@@ -84,6 +84,13 @@
   --_sparkline-weight: 0.18em;
 }
 
+/* The band `range` draws behind the line: a tint of the line's own color, so
+   a normal range reads as belonging to the reading it frames. */
+[part="range"] {
+  fill: var(--sparkline-range-color, currentColor);
+  fill-opacity: var(--sparkline-range-opacity, 0.12);
+}
+
 /* A column per reading, under `plot="bar"`. */
 [part="bar"] {
   fill: currentColor;
@@ -152,6 +159,7 @@
    the component in percentages of the box. */
 [part="cursor"],
 [part="high"],
+[part="lone"],
 [part="low"] {
   background-color: var(--sparkline-mark-color, currentColor);
   block-size: var(--sparkline-mark-size, 5px);
@@ -189,10 +197,24 @@
    of its reading and is brought back the other way, as the terminus is. */
 :host(:dir(rtl)) [part="cursor"],
 :host(:dir(rtl)) [part="high"],
+:host(:dir(rtl)) [part="lone"],
 :host(:dir(rtl)) [part="low"] {
   translate: 50% -50%;
 }
 
 :host(:dir(rtl)) [part="readout"] {
   translate: 50% calc(-100% - var(--sparkline-mark-size, 5px));
+}
+
+/* Said and not shown: the dot and the readout are the picture of it. Out of
+   sight and in the accessibility tree, the recipe the charts use for their
+   summary. */
+[part="live"] {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  margin: var(--helix-space-none);
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
 }

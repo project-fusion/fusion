@@ -480,3 +480,20 @@ describe('markers', () => {
     expect(marks(host)[0]?.getAttribute('style')).toContain('inset-inline-start: 70%')
   })
 })
+
+/* A forecast beside its readings could only be told apart by color; no line
+   took a hook of its own. */
+describe('dashed', () => {
+  const drawn = (host: HTMLElement): Element[] => [
+    ...(host.shadowRoot?.querySelectorAll('[part~="line"]') ?? []),
+  ]
+  test('marks the lines of the series it names, matched as a heading is', async () => {
+    const host = await chart(CHANNELS, 'for="channels" dashed=" referral "')
+    expect(drawn(host).map((one) => one.getAttribute('part'))).toEqual(['line', 'line line-dashed'])
+  })
+
+  test('marks none where it names nothing', async () => {
+    const host = await chart(CHANNELS, 'for="channels"')
+    expect(drawn(host).every((one) => one.getAttribute('part') === 'line')).toBe(true)
+  })
+})

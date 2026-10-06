@@ -12,6 +12,7 @@ import {
 import { html, nothing, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import '../../tooltip/index.js'
+import { sliceLabelAt } from '../slice-label.js'
 
 /* Built once per locale and kept, `Intl.NumberFormat` being expensive to
    construct and cheap to call. */
@@ -405,16 +406,22 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
    */
   protected renderSliceLabels(shares: DonutShare[]): TemplateResult {
     const half = this.sweep === 'half'
-    const top = half ? CENTER - EDGE : 0
-    const tall = half ? EDGE + this.thickness / 2 : PLOT_HEIGHT
+    const ring = {
+      center: CENTER,
+      origin: this.origin,
+      radius: this.radius,
+      span: this.span,
+      tall: half ? EDGE + this.thickness / 2 : PLOT_HEIGHT,
+      top: half ? CENTER - EDGE : 0,
+      width: PLOT_WIDTH,
+    }
     const format = percentIn(this.locale)
     return html`${shares.map((share, index) => {
-      if (share.fraction < 0.05) {
+      const place = sliceLabelAt(share, ring)
+      if (!place) {
         return nothing
       }
-      const angle = (share.start + share.fraction / 2) * 2 * Math.PI * this.span + this.origin
-      const x = ((CENTER + Math.cos(angle) * this.radius) / PLOT_WIDTH) * 100
-      const y = ((CENTER + Math.sin(angle) * this.radius - top) / tall) * 100
+      const { x, y } = place
       return html`<span
         aria-hidden="true"
         data-series=${seriesIndex(index)}

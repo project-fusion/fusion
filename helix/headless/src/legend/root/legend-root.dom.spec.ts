@@ -102,6 +102,19 @@ describe('chart legend', () => {
 
   /* A page of several charts had several unnamed lists, and nothing said which
      chart each one keyed. */
+  /* The toggles were one tab stop in an unnamed list, and nothing said the
+     arrows moved between them. A toolbar of toggle buttons says so. */
+  test('under `toggles` the list is a named toolbar, and its items carry no role', async () => {
+    const host = await legend(TRAFFIC, 'for="traffic" toggles label="Channels"')
+    const list = part(host, 'list')
+    const items = [...(host.shadowRoot?.querySelectorAll('[part~="entry"]') ?? [])]
+    expect([list?.getAttribute('role'), list?.getAttribute('aria-label')]).toEqual([
+      'toolbar',
+      'Channels',
+    ])
+    expect(items.every((item) => item.getAttribute('role') === 'none')).toBe(true)
+  })
+
   test('the list is named by the caption of the table, or by `label`', async () => {
     const list = (host: HTMLElement) => part(host, 'list')?.getAttribute('aria-label')
     expect(list(await legend(PLANS, 'for="plans" entries="categories"'))).toBe('Accounts by plan')
@@ -176,6 +189,21 @@ describe('toggling a series', () => {
         one.getAttribute('part'),
       ),
     ).toEqual(['entry', 'entry entry-hidden', 'entry'])
+  })
+
+  /* `hiddenSeries={['Search']}` from React was read as a string and threw. */
+  test('takes an array of names on the property, as a written list', async () => {
+    const host = (await legend(TRAFFIC, 'for="traffic" toggles')) as HTMLElement & {
+      hiddenSeries: string | string[]
+      updateComplete: Promise<unknown>
+    }
+    host.hiddenSeries = ['Search']
+    await host.updateComplete
+    expect(toggles(host).map((one) => one.getAttribute('aria-pressed'))).toEqual([
+      'true',
+      'false',
+      'true',
+    ])
   })
 
   test('hides a series on a press, asking first and telling after', async () => {
