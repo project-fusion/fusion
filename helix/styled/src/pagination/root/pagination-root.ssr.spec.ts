@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import { hasPart, hostAttributes, partTag, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
+import { styles } from './pagination-root.css.js'
 
 const buttons = html`<helix-pagination default-page="7" pages="12"></helix-pagination>`
 const links = html`<helix-pagination
@@ -73,5 +74,31 @@ describe('pagination server output', () => {
     const compact = html`<helix-pagination compact default-page="7" pages="24"></helix-pagination>`
     expect(hasPart(ssr(compact), 'list')).toBe(false)
     expect(rendered(ssr(compact), 'helix-pagination')).toContain('7 of 24')
+  })
+})
+
+/* Four hooks covered the fill, the gap and the box; the text, the radius, the
+   current page's edge and weight, the spent controls and the marks were fixed. */
+describe('pagination hooks', () => {
+  test('every visual decision in the row is a hook the sheet reads', () => {
+    const text = styles.cssText
+    for (const hook of [
+      '--pagination-current-border-color',
+      '--pagination-current-font-weight',
+      '--pagination-current-foreground-color',
+      '--pagination-disabled-foreground-color',
+      '--pagination-disabled-opacity',
+      '--pagination-ellipsis-foreground-color',
+      '--pagination-font-size',
+      '--pagination-font-weight',
+      '--pagination-foreground-color',
+      '--pagination-hover-foreground-color',
+      '--pagination-icon-size',
+      '--pagination-padding',
+      '--pagination-radius',
+      '--pagination-status-foreground-color',
+    ]) {
+      expect(text).toMatch(new RegExp(`var\\(\\s*${hook},`))
+    }
   })
 })

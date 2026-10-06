@@ -23,6 +23,9 @@ import { styles } from './pagination-size.css.js'
  * @documentation https://fusion.dev/helix/components/pagination
  *
  * @csspart control - The select.
+ *
+ * @cssproperty --pagination-size - Height of the select's trigger, the same hook that sizes every control in the page row.
+ * @cssproperty --pagination-size-gap - Space between the label and the select.
  */
 @customElement('helix-pagination-size')
 export class HelixPaginationSize extends HelixHeadlessPaginationSize {

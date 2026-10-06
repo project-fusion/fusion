@@ -26,7 +26,7 @@
 [part="control"] {
   align-items: center;
   flex-direction: row;
-  gap: var(--helix-space-xs);
+  gap: var(--pagination-size-gap, var(--helix-space-xs));
 }
 
 /* The stacked sheet gives a label four pixels of padding under its text, so it
@@ -44,5 +44,5 @@
    a footer it stands beside controls a step smaller, so it takes their height
    and only as much width as the widest number in it needs. */
 [part="control"]::part(trigger) {
-  block-size: var(--helix-size-control-tight);
+  block-size: var(--pagination-size, var(--helix-size-control-tight));
 }

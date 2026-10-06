@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import { hostAttributes, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
+import { styles } from './pagination-summary.css.js'
 
 describe('pagination summary server output', () => {
   test('the reading is in the served markup, not worked out on hydration', () => {
@@ -35,5 +36,13 @@ describe('pagination summary server output', () => {
       'page-size',
       'total',
     ])
+  })
+})
+
+describe('pagination summary hooks', () => {
+  test('the hooks the docs name are what the sheet reads', () => {
+    for (const hook of ['--pagination-font-size', '--pagination-summary-foreground-color']) {
+      expect(styles.cssText).toMatch(new RegExp(`var\\(\\s*${hook},`))
+    }
   })
 })
