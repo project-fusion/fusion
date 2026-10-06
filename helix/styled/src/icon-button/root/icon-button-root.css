@@ -304,18 +304,18 @@
 }
 
 /* **Pending: the icon stays where it is, unseen, and a ring turns over it**,
-   as on `Button`. The ring is the control's own `::after`, so the headless
-   tier renders nothing for it. */
+   as on `Button`. The ring is the `spinner` part, rendered only while
+   pending. */
 :host(:state(pending)) [part="button"] {
   cursor: progress;
   position: relative;
 }
 
-:host(:state(pending)) [part="button"] > * {
+:host(:state(pending)) [part="button"] > :not([part="spinner"]) {
   visibility: hidden;
 }
 
-:host(:state(pending)) [part="button"]::after {
+[part="spinner"] {
   animation: helix-icon-button-turn var(--icon-button-spinner-duration, var(--_icon-button-turn))
     linear infinite;
   block-size: var(--icon-button-spinner-size, 1.15em);
@@ -324,7 +324,6 @@
   border-block-start-color: var(--icon-button-spinner-color, currentColor);
   border-radius: var(--helix-radii-full);
   box-sizing: border-box;
-  content: "";
   inline-size: var(--icon-button-spinner-size, 1.15em);
   inset: 0;
   margin: auto;
@@ -339,7 +338,7 @@
 
 /* Slowed rather than stopped, as `Loader` does. */
 @media (prefers-reduced-motion: reduce) {
-  :host(:state(pending)) [part="button"]::after {
+  [part="spinner"] {
     animation-duration: calc(var(--helix-duration-slow) * 12);
   }
 }

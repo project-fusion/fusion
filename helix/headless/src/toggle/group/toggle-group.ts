@@ -357,14 +357,12 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
     if (this.value === '') {
       return false
     }
-    if (this.multiple) {
-      return this.children === undefined || this.values.length > 0
-    }
     if (this.children === undefined) {
       return true
     }
-    const items = this.items
-    return items.length === 0 || items.some((item) => item.value === this.value)
+    return this.multiple
+      ? this.values.length > 0
+      : this.items.length === 0 || this.chosenItem !== undefined
   }
 
   override connectedCallback(): void {
@@ -537,28 +535,22 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
     const inside = this.labelPlacement === 'start'
     const label = this.renderGroupLabel()
 
-    return html`${inside ? nothing : label}
-      <div part="row">
-        <slot name="start"></slot>
-        <div part="track">
-        ${inside ? label : nothing}
-        <div part="indicator" aria-hidden="true"></div>
-        <slot
-          @slotchange=${() => {
-            /* Items that arrive after the first render, which is every item on
-               a page the parser is still reading. Outside an update here, so
-               taking the declaration schedules one rather than warning. */
-            this.adopt()
-            this.sync()
-            this.indicator.place()
-            // And the form, which a removed answer no longer holds.
-            this.requestUpdate()
-          }}
-          ></slot>
-        </div>
-        <slot name="end"></slot>
-      </div>
-      ${this.renderHint()}${this.renderFeedback()}`
+    return html`${inside ? nothing : label}<div part="row"><slot name="start"></slot><div part="track">${
+      inside ? label : nothing
+    }<div part="indicator" aria-hidden="true"></div><slot @slotchange=${this.handleItems}></slot></div><slot name="end"></slot></div>${this.renderHint()}${this.renderFeedback()}`
+  }
+
+  /**
+   * Items that arrive after the first render, which is every item on a page
+   * the parser is still reading. Outside an update here, so taking the
+   * declaration schedules one rather than warning, and the update reports the
+   * form, which a removed answer no longer holds.
+   */
+  private readonly handleItems = (): void => {
+    this.adopt()
+    this.sync()
+    this.indicator.place()
+    this.requestUpdate()
   }
 }
 

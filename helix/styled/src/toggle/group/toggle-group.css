@@ -59,6 +59,8 @@
   /* And no groove either, which decides the thumb's color. */
   --_indicator-surface: var(--helix-color-surface-raised);
   display: inline-flex;
+  /* It grows inside the row, which is always what holds it. */
+  flex: 1 1 auto;
   position: relative;
 
   /* *It wraps, because the alternative is a segment nobody can reach.** The
@@ -98,9 +100,7 @@
   /* The border joins the padding in what the row has to give back. */
   --_toggle-height: calc(
     var(--helix-size-control) -
-    var(--helix-space-2xs) *
-    2 -
-    var(--helix-border-thin) *
+    (var(--helix-space-2xs) + var(--helix-border-thin)) *
     2
   );
   /* A groove, so the thumb is over it rather than on it. */
@@ -108,7 +108,6 @@
   background-color: var(--toggle-group-background-color, var(--helix-color-surface-sunken));
   border: var(--helix-border-thin) solid var(--toggle-group-border-color, var(--helix-color-border));
   border-radius: var(--toggle-group-radius, var(--helix-radii-sm));
-  padding: var(--helix-space-2xs);
 }
 
 /* The segments share what is left over, and each label keeps the same space
@@ -122,15 +121,21 @@
   flex: 1 1 auto;
 }
 
-/* One marker that travels. */
-[part="indicator"] {
-  /* Whichever the separation declared, because the two look different for a
-     reason: the token is decided by what is behind the thumb, and `plain` has no
-     track behind it. */
+/* The marker's look, which a pressed item shares under
+   `selection-mode="multiple"`, since one marker cannot travel to two places.
+   Whichever surface the separation declared, because the two look different
+   for a reason: the token is decided by what is behind the thumb, and `plain`
+   has no track behind it. */
+[part="indicator"],
+:host([selection-mode="multiple"]) ::slotted(helix-toggle:state(pressed)) {
   background-color: var(--toggle-group-indicator-color, var(--_indicator-surface));
-  block-size: var(--indicator-block-size, 0);
   border-radius: var(--_toggle-radius, var(--helix-radii-sm));
   box-shadow: var(--toggle-group-indicator-shadow, var(--helix-shadow-sm));
+}
+
+/* One marker that travels. */
+[part="indicator"] {
+  block-size: var(--indicator-block-size, 0);
   inline-size: var(--indicator-inline-size, 0);
   inset-block-start: 0;
   inset-inline-start: 0;
@@ -166,19 +171,6 @@
   align-items: center;
   display: flex;
   gap: var(--helix-space-sm);
-}
-
-[part="row"] [part="track"] {
-  flex: 1 1 auto;
-}
-
-/* **Several pressed at once: each pressed item carries the marker's fill**,
-   since one marker cannot travel to two places. The same surface, radius and
-   shadow the marker draws, so a pressed item looks like the chosen one does. */
-:host([selection-mode="multiple"]) ::slotted(helix-toggle:state(pressed)) {
-  background-color: var(--toggle-group-indicator-color, var(--_indicator-surface));
-  border-radius: var(--_toggle-radius, var(--helix-radii-sm));
-  box-shadow: var(--toggle-group-indicator-shadow, var(--helix-shadow-sm));
 }
 
 /* A column: the items stack at their own height and the track does not wrap. */

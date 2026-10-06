@@ -32,6 +32,7 @@ import { styles } from './button-root.css.js'
  *
  * @csspart button - The inner control.
  * @csspart live - The live region that says `pending-label` when the button becomes pending under focus. It is clipped out of view and still read.
+ * @csspart spinner - The ring a pending button turns over its words, sized and colored by the `--button-spinner-*` hooks.
  *
  * @cssproperty --button-background-color - Fill behind the button, in every state.
  * @cssproperty --button-background-color-hover - Fill behind the button under the pointer. Without it, `--button-background-color` also applies on hover.

@@ -70,6 +70,7 @@ import { submitAs } from '../submitter.js'
  *
  * @csspart button - The inner control.
  * @csspart live - The live region that says `pending-label` when the button becomes pending under focus. It is rendered from the first time the button is pending, and the styled button clips it out of view.
+ * @csspart spinner - The ring a pending button turns, an empty element the styled button draws over the words. It is rendered only while the button is pending.
  * @csspart text - The button's words, which the styled button trims to their capitals and baseline so the letters sit at the middle in any font.
  *
  * @cssstate pending - The button is pending: `pending` is set.
@@ -581,8 +582,16 @@ export class HelixHeadlessButton extends HelixFormElement {
       @keydown=${this.notePress}
       @pointerdown=${this.notePress}
     >
-      ${label}
+      ${label}${this.renderSpinner()}
     </button>${this.renderLive()}`
+  }
+
+  /**
+   * The ring a pending button turns, behind a seam a tier can move: an empty
+   * element, hidden from a screen reader, which hears `pending-label` instead.
+   */
+  protected renderSpinner(): TemplateResult | typeof nothing {
+    return this.pending ? html`<span part="spinner" aria-hidden="true"></span>` : nothing
   }
 }
 
