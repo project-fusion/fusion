@@ -555,11 +555,14 @@ describe('canvas moves', () => {
     const before = (host as unknown as { view: { x: number } }).view.x
     box.dispatchEvent(pointer('pointerdown', { x: 200, y: 150 }))
     viewport.dispatchEvent(pointer('pointermove', { x: 399, y: 150 }))
+    // Where the hand alone took it, at whatever zoom the board is drawn.
+    const handed = card(host, 'c').x
+    expect(handed).toBeGreaterThan(130)
     await new Promise((done) => setTimeout(done, 120))
     await host.updateComplete
-    // From 130 by the hand's 199, and further by however far the board moved.
+    // Further, by however far the board moved under the still hand.
     const moved = card(host, 'c').x
-    expect(moved).toBeGreaterThan(329)
+    expect(moved).toBeGreaterThan(handed)
     expect((host as unknown as { view: { x: number } }).view.x).toBeGreaterThan(before)
     viewport.dispatchEvent(pointer('pointerup', { x: 399, y: 150 }))
     await new Promise((done) => setTimeout(done, 80))
