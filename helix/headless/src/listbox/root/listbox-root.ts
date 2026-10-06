@@ -1,5 +1,7 @@
 import {
   AriaForwardController,
+  centerInView,
+  columnStep,
   countLabel,
   customElement,
   type DataOption,
@@ -14,6 +16,7 @@ import {
   HelixLoadMoreEvent,
   type HelixSelectEvent,
   hostAria,
+  inlineStep,
   MixinCollection,
   MixinControllerValue,
   MixinField,
@@ -81,13 +84,15 @@ type Entry = HelixHeadlessOption | (DataOption & { href?: undefined })
  *
  * | Key | What it does |
  * |---|---|
- * | Down, Up | Moves the highlight to the next or the previous option, round from the last to the first. |
+ * | Down, Up | Moves the highlight to the next or the previous option, round from the last to the first. With `layout="grid"`, to the option below or above, stopping at the edge. |
+ * | Right, Left | With `layout="grid"`, moves to the next or the previous option, mirrored right to left. In a filter field, moves the caret. |
  * | Home, End | Moves to the first or the last option. In a filter field, moves the caret. |
  * | Page Down, Page Up | Moves by as many options as the list shows at once. |
  * | A letter or a word | Moves to the next option whose words start with what you typed. In a filter field, types it. |
  * | Enter | Chooses the highlighted option, or follows it where it is a link. |
  * | Space | Chooses the highlighted option, or with `multiple` toggles it. In a filter field, types a space. |
  * | Shift with Down or Up | With `multiple`, adds the option the highlight moves to. In a filter field, moves the highlight and leaves the value. |
+ * | Shift with Space | With `multiple`, adds every option from the one last chosen to the highlighted one. In a filter field, types a space. |
  * | Shift with Home or End | With `multiple`, adds every option from the highlight to that end. In a filter field, hold Control as well. |
  * | Control or Command with A | With `multiple`, chooses every option, or none where all are chosen. In a filter field, selects the text. |
  * | Escape | In a filter field, clears the filter. |
@@ -264,6 +269,21 @@ export class HelixHeadlessListbox extends MixinCollection(
   @property({ attribute: false })
   items: readonly DataOptionItem[] | undefined = undefined
 
+  /**
+   * How the options are laid out, which the arrow keys follow: `stack`, one
+   * under another, or `grid`, in rows and columns, as React Aria's `ListBox`
+   * lays out cards or photos. With `grid`, Up and Down move within a column,
+   * and Left and Right along the list, mirrored right to left.
+   *
+   * The columns are the stylesheet's: the styled tier draws them at
+   * `--listbox-column-min-inline-size` or wider, and a headless list lays out
+   * `::part(items)` as it likes, since the keys read where each option is
+   * drawn. A list of `items` stays a stack. Left out, the list is a stack,
+   * and the host carries no attribute for it.
+   */
+  @property({ reflect: true })
+  layout?: 'grid' | 'stack'
+
   /** Draws `items` a window at a time. See core's `OptionWindowController`. */
   private readonly data = new OptionWindowController(this, {
     current: () => this.currentValue,
@@ -343,6 +363,9 @@ export class HelixHeadlessListbox extends MixinCollection(
    * it back on the first match.
    */
   private parked = false
+
+  /** The option last chosen, which Shift with Space extends from. */
+  private anchor = ''
 
   /** The letters typed at the list, which move the highlight to a match. */
   private readonly typeahead = new Typeahead()
@@ -617,6 +640,9 @@ export class HelixHeadlessListbox extends MixinCollection(
    */
   private choose(value: string): void {
     const chosen = this.values
+    if (!chosen.includes(value)) {
+      this.anchor = value
+    }
     const next = this.multiple
       ? chosen.includes(value)
         ? chosen.filter((each) => each !== value)
@@ -654,6 +680,18 @@ export class HelixHeadlessListbox extends MixinCollection(
   }
 
   /**
+   * Adds every option a reader can reach from the one last chosen to `to`,
+   * APG's Shift with Space. With none chosen yet, it adds `to` alone.
+   */
+  private extend(to: string): void {
+    const reach = this.shown.filter((option) => !option.disabled).map((option) => option.value)
+    const taken = rangeAdd(this.values, reach, reach.indexOf(this.anchor), reach.indexOf(to))
+    if (taken) {
+      this.requestValue(taken.join(','))
+    }
+  }
+
+  /**
    * Moves the keyboard, and chooses with it only where that is the pattern.
    *
    * Space and Enter are how a multi-select list chooses, and they are also how
@@ -673,6 +711,11 @@ export class HelixHeadlessListbox extends MixinCollection(
       return
     }
     const typing = this.forwarded || event.composedPath()[0] === this.partNamed('search-field')
+    if (this.multiple && event.key === ' ' && event.shiftKey && !typing) {
+      event.preventDefault()
+      this.extend(this.activeValue)
+      return
+    }
     if (event.key === 'Enter' || (event.key === ' ' && !typing && !this.typeahead.typing())) {
       /* Only where there is something to choose, so an Enter over a list with
          no highlight is left to the page, which may submit a form with it. */
@@ -724,7 +767,9 @@ export class HelixHeadlessListbox extends MixinCollection(
       event.shiftKey &&
       (event.ctrlKey || event.metaKey) &&
       (event.key === 'Home' || event.key === 'End')
-    if (!fieldRange && !(typing ? FIELD_MOVES : MOVES).has(event.key)) {
+    const grid = this.layout === 'grid' && !this.data.records
+    const along = grid && !typing ? inlineStep(this, event.key) : 0
+    if (!fieldRange && !along && !(typing ? FIELD_MOVES : MOVES).has(event.key)) {
       return
     }
     event.preventDefault()
@@ -734,7 +779,15 @@ export class HelixHeadlessListbox extends MixinCollection(
     const at = shown.findIndex((option) => option.value === from)
     const last = shown.length - 1
     let next = at
-    if (event.key === 'ArrowDown') {
+    if (along) {
+      next = Math.min(Math.max(at + along, 0), last)
+    } else if (grid && at >= 0 && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) {
+      next = columnStep(
+        shown.map((option) => (option as HelixHeadlessOption).getBoundingClientRect().left),
+        at,
+        event.key === 'ArrowDown' ? 1 : -1,
+      )
+    } else if (event.key === 'ArrowDown') {
       next = at < 0 ? 0 : (at + 1) % shown.length
     } else if (event.key === 'ArrowUp') {
       next = at < 0 ? last : (at - 1 + shown.length) % shown.length
@@ -852,42 +905,18 @@ export class HelixHeadlessListbox extends MixinCollection(
    * read as a dial rather than scanned as a list, which is what Time Picker's
    * wheels do with three of these.
    *
-   * A delta from the two boxes rather than `offsetTop`. An option is a slotted
-   * light DOM child, so its `offsetParent` is whatever is positioned above it,
-   * which is not this list and is not guaranteed to be anything: measuring both
-   * rects and moving by the difference needs no such assumption.
+   * Measured by core's `centerInView`, or, for a list of `items`, by the
+   * arithmetic, since the chosen option may not be drawn.
    */
   reveal(): void {
-    /* A list of `items` scrolls by the arithmetic: the chosen option may not
-       be drawn to measure. */
     if (this.data.records) {
       this.data.center(this.values[0] ?? '')
       return
     }
     const items = this.partNamed('items')
     const chosen = this.options.find((option) => option.selected && !option.hidden)
-    if (!items || !chosen) {
-      return
-    }
-    /* Twice, and the second pass is not superstition. The first delta is
-       computed against whatever layout is current when this is called, and
-       inside a panel that has just been revealed it is a frame behind: measured,
-       one call landed a whole row short, 672 where 704 was wanted, and calling
-       it again from a settled layout put it exactly on center. Reading a rect
-       forces layout, so the second pass sees the result of the first and
-       corrects the remainder. It stops as soon as there is nothing left to
-       correct, so the usual case is one pass and a cheap check. */
-    for (let pass = 0; pass < 2; pass += 1) {
-      const box = items.getBoundingClientRect()
-      const row = chosen.getBoundingClientRect()
-      if (box.height === 0 || row.height === 0) {
-        return
-      }
-      const off = row.top + row.height / 2 - (box.top + box.height / 2)
-      if (Math.abs(off) < 1) {
-        return
-      }
-      items.scrollTop += off
+    if (items && chosen) {
+      centerInView(items, chosen)
     }
   }
 

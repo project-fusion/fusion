@@ -1099,3 +1099,99 @@ describe('a listbox a browser can autofill', () => {
     expect(heard).toEqual(['two'])
   })
 })
+
+describe('extending a choice from the one last chosen', () => {
+  const key = async (
+    host: Updatable,
+    name: string,
+    init: KeyboardEventInit = {},
+  ): Promise<void> => {
+    host.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: name, ...init }),
+    )
+    await settle(host)
+  }
+
+  test('Shift with Space adds every option from it to the highlight, APG`s optional key', async () => {
+    /* Measured before this: Shift with Space toggled the highlighted option alone. */
+    const host = (await list('multiple')) as Updatable & { value: string }
+    await key(host, 'ArrowDown')
+    await key(host, ' ')
+    await key(host, 'ArrowDown')
+    await key(host, 'ArrowDown')
+    await key(host, ' ', { shiftKey: true })
+    expect(host.value).toBe('one,two,three')
+  })
+
+  test('and a plain press toggles one option, as before', async () => {
+    const host = (await list('multiple default-value="one"')) as Updatable & { value: string }
+    await Promise.all(
+      options(host).map((option) => (option as unknown as Updatable).updateComplete),
+    )
+    ;(options(host)[2]?.shadowRoot?.querySelector('[part~="item"]') as HTMLElement).click()
+    await settle(host)
+    expect(host.value).toBe('one,three')
+  })
+})
+
+describe('a list laid out in a grid', () => {
+  const key = async (host: Updatable, name: string): Promise<void> => {
+    host.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: name }))
+    await settle(host)
+  }
+
+  test('Right and Left move along the list, and stop at its ends', async () => {
+    const host = (await list('layout="grid" default-value="one"')) as Updatable & { value: string }
+    await key(host, 'ArrowRight')
+    expect(host.value).toBe('two')
+    await key(host, 'ArrowRight')
+    await key(host, 'ArrowRight')
+    expect(host.value).toBe('three')
+    await key(host, 'ArrowLeft')
+    expect(host.value).toBe('two')
+  })
+
+  test('mirrored right to left', async () => {
+    const host = (await list('layout="grid" dir="rtl" default-value="one"')) as Updatable & {
+      value: string
+    }
+    await key(host, 'ArrowLeft')
+    expect(host.value).toBe('two')
+  })
+
+  test('a stack leaves Left and Right to the page', async () => {
+    const host = (await list('default-value="one"')) as Updatable & { value: string }
+    await key(host, 'ArrowRight')
+    expect(host.value).toBe('one')
+  })
+})
+
+/* Only in a real engine, which lays the options out in columns. */
+if (hasLayout()) {
+  describe('a grid in a browser', () => {
+    test('Down and Up move within a column, and stop at its ends', async () => {
+      document.body.innerHTML = `<style>
+          helix-headless-listbox::part(items) { display: grid; grid-template-columns: repeat(3, 80px) }
+        </style>
+        <helix-headless-listbox label="L" layout="grid" default-value="b">
+          ${['a', 'b', 'c', 'd', 'e', 'f', 'g'].map((value) => `<helix-headless-option value="${value}">${value}</helix-headless-option>`).join('')}
+        </helix-headless-listbox>`
+      const host = document.querySelector('helix-headless-listbox') as unknown as Updatable & {
+        value: string
+      }
+      await settle(host)
+      const move = async (name: string): Promise<void> => {
+        host.dispatchEvent(
+          new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: name }),
+        )
+        await settle(host)
+      }
+      await move('ArrowDown')
+      expect(host.value).toBe('e')
+      await move('ArrowDown')
+      expect(host.value).toBe('e')
+      await move('ArrowUp')
+      expect(host.value).toBe('b')
+    })
+  })
+}
