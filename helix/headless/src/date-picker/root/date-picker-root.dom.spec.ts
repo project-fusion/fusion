@@ -86,6 +86,15 @@ describe('date picker', () => {
     expect(days(cal).filter((day) => day.getAttribute('tabindex') === '0')).toHaveLength(1)
   })
 
+  /* Measured before this: with no value the stop sat on the 1st of the
+     month, where the APG date picker and React Aria put it on today. */
+  test('with nothing chosen, the stop is on today, and on the 1st of a month without it', async () => {
+    const today = new Date()
+    const named = new Intl.DateTimeFormat('en-US', { day: 'numeric', month: 'long' }).format(today)
+    expect(stop(await calendar('locale="en-US"'))).toContain(named)
+    expect(stop(await calendar('locale="en-US" default-month="2001-03"'))).toContain('March 1')
+  })
+
   test('arrows move by day and by week', async () => {
     const cal = await calendar()
     await press(cal, 'ArrowRight')

@@ -405,7 +405,10 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
    * is a stack overflow.
    */
   private get derivedMonth(): Date {
-    const from = asDate(this.selected[0] ?? '') ?? new Date()
+    /* Today as the reader's calendar has it, not as UTC does: at 8 PM on
+       October 31 in Los Angeles it is November in UTC, and a calendar with no
+       value opened on a month with no today in it. */
+    const from = asDate(this.selected[0] ?? '') ?? asDate(localToday()) ?? new Date()
     return firstOf(from.getUTCFullYear(), from.getUTCMonth())
   }
 
@@ -419,12 +422,19 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
    *
    * Each candidate is tested in turn rather than the first one winning
    * outright. Where the last date focused is in some other month, the selected
-   * date still holds the stop, and only with neither in view does it fall to
-   * the first of the month.
+   * date still holds the stop, then today, as the APG date picker and React
+   * Aria's calendar put it, and only with none of them in view does it fall
+   * to the first of the month. Measured before today was a candidate: a
+   * calendar with no value opened on October 5 with its stop on "Thursday,
+   * October 1".
    */
   private get anchor(): Date {
     const shown = this.shown
-    for (const candidate of [asDate(this.focused), asDate(this.selected[0] ?? '')]) {
+    for (const candidate of [
+      asDate(this.focused),
+      asDate(this.selected[0] ?? ''),
+      asDate(localToday()),
+    ]) {
       if (candidate && sameMonth(candidate, shown)) {
         return candidate
       }
