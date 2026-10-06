@@ -21,8 +21,11 @@ import { styles } from './announcement-root.css.js'
  *
  * @cssproperty --announcement-background-color - The band's fill, in place of the one its separation gives it. A tone's tint still paints over it, so a band that sets this usually carries no tone.
  * @cssproperty --announcement-block-size - The band's minimum height, so adding a control to it does not move the page down. A message long enough to wrap makes the band taller.
+ * @cssproperty --announcement-font-size - The size of the message's text.
  * @cssproperty --announcement-foreground-color - The message's color, to pair with a fill set through the background hook.
  * @cssproperty --announcement-inset - The inline padding, matched to the page.
+ * @cssproperty --announcement-text-align - Where the message sits in the band. Centered by default; `start` lines it up with the page under it.
+ * @cssproperty --announcement-tone-color - The color a toned band's tint and outline are mixed from, in place of the tone's.
  */
 @customElement('helix-announcement')
 export class HelixAnnouncement extends HelixHeadlessAnnouncement {
