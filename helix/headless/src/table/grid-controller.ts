@@ -16,6 +16,15 @@ import type { HelixHeadlessTableCell } from './cell/table-cell.js'
 import type { HelixHeadlessTableColumn } from './column/table-column.js'
 import type { HelixHeadlessTableRow } from './row/table-row.js'
 
+/**
+ * A column the table draws before the consumer's cells: the grips of a
+ * `reorderable` table, and the checkboxes of a `selectable` one.
+ */
+export type LeadColumn = 'grip' | 'select'
+
+/** The part each leading column's heading has in the table, and its cells in a row. */
+const HEADS: Record<LeadColumn, string> = { grip: 'grip-head', select: 'select-all' }
+
 /** A place in the grid with the element that holds focus there. */
 export interface GridCell extends GridPlace {
   cell: HTMLElement
@@ -29,14 +38,14 @@ export interface TableGridOptions {
   activate: (place: GridCell, event: KeyboardEvent) => boolean
   /** The headings that are drawn, in order. */
   columns: () => HelixHeadlessTableColumn[]
+  /** The columns the table draws before the consumer's cells, in order. */
+  lead: () => readonly LeadColumn[]
   /** The element in the table's own shadow root holding a part of that name. */
   part: (name: string) => HTMLElement | null
   /** The rows in the order they are drawn. */
   rows: () => Element[]
   /** Selects every row for Control or Command with A, and says whether it did. */
   selectAll: () => boolean
-  /** Whether a checkbox column leads. */
-  selectable: () => boolean
   /** Whether the table is a grid now. */
   on: () => boolean
 }
@@ -130,14 +139,14 @@ export class TableGridController implements ReactiveController {
     this.focusRow = undefined
   }
 
-  /** How many columns lead the consumer's cells: the checkbox column, where there is one. */
+  /** How many columns lead the consumer's cells: the grips and the checkboxes, where there are any. */
   private get offset(): number {
-    return this.options.selectable() ? 1 : 0
+    return this.options.lead().length
   }
 
   /** The first row: the headings where there are any, and the first row of cells otherwise. */
   private get top(): number {
-    return this.options.columns().length > 0 || this.options.selectable() ? -1 : 0
+    return this.options.columns().length > 0 || this.offset > 0 ? -1 : 0
   }
 
   /** A row's cells that are drawn, in order. */
@@ -154,15 +163,15 @@ export class TableGridController implements ReactiveController {
 
   /** The element that takes focus at a place, or nothing where there is none. */
   cellAt({ column, row }: GridPlace): HTMLElement | null {
-    const lead = column < this.offset
+    const lead = this.options.lead()[column]
     if (row === -1) {
       return lead
-        ? this.options.part('select-all')
+        ? this.options.part(HEADS[lead])
         : (this.options.columns()[column - this.offset]?.cellBox ?? null)
     }
     const line = this.options.rows()[row]
     if (lead) {
-      return line?.shadowRoot?.querySelector<HTMLElement>('[part~="select"]') ?? null
+      return line?.shadowRoot?.querySelector<HTMLElement>(`[part~="${lead}"]`) ?? null
     }
     return this.cellsOf(line)[column - this.offset] ?? null
   }
@@ -203,12 +212,14 @@ export class TableGridController implements ReactiveController {
         return cell ? { cell, column: heading + this.offset, row: -1 } : undefined
       }
       const part = node.getAttribute('part') ?? ''
-      if (part === 'select-all' && node.getRootNode() === this.host.shadowRoot) {
-        return { cell: node, column: 0, row: -1 }
-      }
       const root = node.getRootNode() as ShadowRoot
-      if (part.split(' ').includes('select') && rows.includes(root.host)) {
-        return { cell: node, column: 0, row: rows.indexOf(root.host) }
+      for (const [column, lead] of this.options.lead().entries()) {
+        if (part === HEADS[lead] && root === this.host.shadowRoot) {
+          return { cell: node, column, row: -1 }
+        }
+        if (part.split(' ').includes(lead) && rows.includes(root.host)) {
+          return { cell: node, column, row: rows.indexOf(root.host) }
+        }
       }
       const parent = node.parentElement
       if (parent && rows.includes(parent) && shown(node)) {
@@ -235,6 +246,7 @@ export class TableGridController implements ReactiveController {
   mark(): void {
     const on = this.options.on()
     const at = this.current()
+    const lead = this.options.lead()
     this.stopIndex = Math.max(0, at.row)
     const columns = this.options.columns()
     for (const [index, column] of columns.entries()) {
@@ -244,9 +256,11 @@ export class TableGridController implements ReactiveController {
     for (const [index, line] of this.options.rows().entries()) {
       const row = line as Row
       if (row.isTableRow) {
+        const here = on && at.row === index
         whenHydrated(row, () => {
           row.gridCell = on
-          row.selectStop = on && at.row === index && at.column === 0 && this.offset === 1
+          row.gripStop = here && lead[at.column] === 'grip'
+          row.selectStop = here && lead[at.column] === 'select'
         })
       }
       for (const [place, cell] of this.cellsOf(line).entries()) {

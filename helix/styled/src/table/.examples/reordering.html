@@ -1,0 +1,34 @@
+<!-- @summary A grip on each row that moves it, by dragging or with the arrow keys after you press it. -->
+<helix-table
+  id="queue"
+  reorderable
+>
+  <h3 slot="heading">Print queue</h3>
+  <helix-table-column width="14rem">Document</helix-table-column>
+  <helix-table-column>Pages</helix-table-column>
+
+  <helix-table-row value="report">
+    <helix-table-cell header>Annual report</helix-table-cell>
+    <helix-table-cell>48</helix-table-cell>
+  </helix-table-row>
+  <helix-table-row value="brochure">
+    <helix-table-cell header>Spring brochure</helix-table-cell>
+    <helix-table-cell>12</helix-table-cell>
+  </helix-table-row>
+  <helix-table-row value="contract">
+    <helix-table-cell header>Lease contract</helix-table-cell>
+    <helix-table-cell>6</helix-table-cell>
+  </helix-table-row>
+</helix-table>
+
+<script type="module">
+  const queue = document.getElementById('queue')
+
+  // The table moves no row itself. Put the rows in the order the event carries.
+  queue.addEventListener('helix-reorder', (event) => {
+    const rows = new Map(
+      [...queue.querySelectorAll('helix-table-row')].map((row) => [row.getAttribute('value'), row]),
+    )
+    queue.append(...event.detail.keys.map((key) => rows.get(key)))
+  })
+</script>

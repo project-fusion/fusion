@@ -315,6 +315,16 @@ describe('what a host leaves to the controller', () => {
     expect(said).toEqual(['B at 1'])
   })
 
+  test('without say, it writes the words to the host’s announced, where it has one', () => {
+    const { rows } = setup(false, { current, say: undefined })
+    const host = rows[0]?.parentElement as HTMLElement & { announced?: string }
+    key(rows[0] as Element, 'ArrowDown', { altKey: true })
+    expect(host.announced).toBeUndefined()
+    host.announced = ''
+    key(rows[0] as Element, 'ArrowDown', { altKey: true })
+    expect(host.announced).toBe('A moved to position 2 of 3')
+  })
+
   test('gives focus back to the moved item where the page’s move sent it to the body', () => {
     const refocused: string[] = []
     let page = (): void => {}

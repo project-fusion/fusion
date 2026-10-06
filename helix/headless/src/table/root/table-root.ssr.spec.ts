@@ -114,4 +114,23 @@ describe('a table with a heading, on the server', () => {
     )
     expect(served).toMatch(/<span part="select-all" role="columnheader"/)
   })
+
+  /* The rows learn they draw a grip once the table knows them, which a server
+     does not, as they learn of their checkboxes: the heading is the table's
+     own and is served, ahead of the checkbox heading. */
+  test('serves a reorderable table its grip heading, named, and its rows no grip', () => {
+    const markup = ssr(html`<helix-headless-table label="T" reorderable selectable>
+      <helix-headless-table-row value="a"><helix-headless-table-cell>A</helix-headless-table-cell></helix-headless-table-row>
+    </helix-headless-table>`)
+    const served = rendered(markup, 'helix-headless-table')
+    expect(served).toMatch(
+      /<span\s+part="grip-head"\s+role="columnheader"\s+aria-label="Move rows"[^>]*>(<!--[^>]*-->)*<\/span>(<!--[^>]*-->)*<span part="select-all"/,
+    )
+    expect(rendered(markup, 'helix-headless-table-row')).not.toContain('part="grip"')
+    expect(hostAttributes(markup, 'helix-headless-table')).toEqual([
+      'label',
+      'reorderable',
+      'selectable',
+    ])
+  })
 })
