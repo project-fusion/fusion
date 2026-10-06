@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -87,6 +87,40 @@ describe('waiting for the picture', () => {
     video.dispatchEvent(new Event('loadstart'))
     await host.updateComplete
     expect(part(host, 'failure')).toBeNull()
+  })
+
+  test('says where playback is as custom states, so a page styles it with no script', async () => {
+    const { host, video } = await media()
+    const states = (): string[] =>
+      ['ended', 'error', 'muted', 'paused', 'playing', 'waiting'].filter((name) =>
+        hasState(host, name),
+      )
+    expect(states()).toEqual(['paused'])
+    const set = (name: string, value: boolean): void => {
+      Object.defineProperty(video, name, { configurable: true, value })
+    }
+    set('paused', false)
+    video.dispatchEvent(new Event('play'))
+    await host.updateComplete
+    expect(states()).toEqual(['playing'])
+    video.dispatchEvent(new Event('waiting'))
+    await host.updateComplete
+    expect(states()).toEqual(['playing', 'waiting'])
+    set('paused', true)
+    set('ended', true)
+    video.dispatchEvent(new Event('ended'))
+    await host.updateComplete
+    expect(states()).toEqual(['ended', 'paused'])
+    /* A seek back from the end fires none of the play events. */
+    set('ended', false)
+    video.dispatchEvent(new Event('timeupdate'))
+    await host.updateComplete
+    expect(hasState(host, 'ended')).toBe(false)
+    set('muted', true)
+    video.dispatchEvent(new Event('volumechange'))
+    video.dispatchEvent(new Event('error'))
+    await host.updateComplete
+    expect(states()).toEqual(['error', 'muted', 'paused'])
   })
 
   test('nothing spins before anybody asks for playback', async () => {
