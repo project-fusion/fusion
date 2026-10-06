@@ -56,7 +56,7 @@
      against a 32px control instead of sitting on their own line. */
   display: grid;
   grid-template-columns: auto 1fr;
-  background-color: var(--toast-background, var(--helix-color-surface-overlay));
+  background-color: var(--toast-background-color, var(--helix-color-surface-overlay));
   border-radius: var(--toast-radius, var(--helix-radii-sm));
   border: var(--toast-border-width, var(--helix-border-floating)) solid
     var(--toast-border-color, var(--helix-color-border));
