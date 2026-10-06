@@ -25,26 +25,23 @@ describe('divider server output', () => {
     )
   })
 
-  test('a plain rule is presentation, and an announced one a separator with its axis', () => {
-    expect(partTag(ssr(html`<helix-divider></helix-divider>`), 'line')).toContain(
+  test('a plain rule is a separator, and a decorative one presentation', () => {
+    const plain = partTag(ssr(html`<helix-divider orientation="vertical"></helix-divider>`), 'line')
+    expect(plain).toContain('role="separator"')
+    expect(plain).toContain('aria-orientation="vertical"')
+    expect(partTag(ssr(html`<helix-divider decorative></helix-divider>`), 'line')).toContain(
       'role="presentation"',
     )
-    const announced = partTag(
-      ssr(html`<helix-divider announced orientation="vertical"></helix-divider>`),
-      'line',
-    )
-    expect(announced).toContain('role="separator"')
-    expect(announced).toContain('aria-orientation="vertical"')
   })
 
   test('the host carries only what the consumer wrote', () => {
     expect(hostAttributes(ssr(html`<helix-divider></helix-divider>`), 'helix-divider')).toEqual([])
     expect(
       hostAttributes(
-        ssr(html`<helix-divider announced orientation="vertical"></helix-divider>`),
+        ssr(html`<helix-divider decorative orientation="vertical"></helix-divider>`),
         'helix-divider',
       ),
-    ).toEqual(['announced', 'orientation'])
+    ).toEqual(['decorative', 'orientation'])
   })
 
   test('declarative shadow DOM carries the styles', () => {
