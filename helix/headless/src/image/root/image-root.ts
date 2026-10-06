@@ -18,6 +18,17 @@ import { property, state } from 'lit/decorators.js'
  * its own. The fallback is read once the picture fails, after the picture's
  * `alt`, so a reader hears that it did not load, as a sighted reader sees.
  *
+ * **An image with no `alt` says so.** At its first render it reports a
+ * `missing-alt` warning, printed in the console and counted by
+ * `@fusion.dev/helix-diagnostics`, which names the fix: describe the picture
+ * in `alt`, or write `alt=""` for one that is decoration. An image hidden with
+ * `aria-hidden="true"` needs neither and is not reported.
+ *
+ * A sheet of yours reads the state as `:state(loading)`, `:state(loaded)`,
+ * `:state(error)`, and `:state(waiting)`, the last while `placeholder-delay`
+ * holds the placeholder back. It can also read `data-status` on the host once
+ * the picture has loaded or failed.
+ *
  * @since 0.1.0
  * @status stable
  * @category media
