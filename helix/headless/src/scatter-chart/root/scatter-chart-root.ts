@@ -11,13 +11,13 @@ import {
   PLOT_HEIGHT,
   PLOT_WIDTH,
   seriesIndex,
-  seriesKey,
   ticks,
 } from '@fusion.dev/helix-core'
 import { html, nothing, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import '../../tooltip/index.js'
 import { correlation, leastSquares } from '../fit.js'
+import { bubbleWeights, type Measures, measuresOf } from '../measures.js'
 
 /** How near a pointer has to be to a point to be asking about it, in pixels. */
 const REACH = 24
@@ -263,18 +263,8 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
    * The numeric columns by what they measure: the first across, the column
    * `size-by` names as the size, and every other one up, as a series.
    */
-  protected get measures(): {
-    across: number | undefined
-    size: number | undefined
-    ups: number[]
-  } {
-    const key = seriesKey(this.sizeBy)
-    const size =
-      key === ''
-        ? undefined
-        : this.plottedColumns.find((column) => seriesKey(this.columnName(column)) === key)
-    const [across, ...ups] = this.plottedColumns.filter((column) => column !== size)
-    return { across, size, ups }
+  protected get measures(): Measures {
+    return measuresOf(this.plottedColumns, (column) => this.columnName(column), this.sizeBy)
   }
 
   /** Whether the levels across are ruled. */
@@ -315,14 +305,10 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
     const y = nice(extent(all.length > 0 ? all.map(([, one]) => one) : [0]))
     const along = linear(x, [0, PLOT_WIDTH])
     const up = linear(y, [PLOT_HEIGHT, 0])
-    /* By area, so a point twice the measure is twice the ink: the square root
-       of its share of the largest. A size below zero is none. */
-    const sizes = rows.map((row) => (size === undefined ? undefined : row.cells[size]?.value))
-    const largest = Math.max(0, ...sizes.map((one) => one ?? 0))
-    const weight = (row: number): number | undefined => {
-      const one = sizes[row]
-      return one === undefined || largest <= 0 ? undefined : Math.sqrt(Math.max(0, one) / largest)
-    }
+    /* By area, so a point twice the measure is twice the ink. */
+    const weights = bubbleWeights(
+      rows.map((row) => (size === undefined ? undefined : row.cells[size]?.value)),
+    )
     return {
       pairs: pairs.map((series) => series.map(([one, two]) => [one, two] as [number, number])),
       points: pairs.flatMap((series, depth) =>
@@ -330,7 +316,7 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
           ? series.map(([one, two, row]) => ({
               depth,
               row,
-              weight: weight(row),
+              weight: weights[row],
               x: along(one),
               y: up(two),
             }))
