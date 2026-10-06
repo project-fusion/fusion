@@ -206,6 +206,7 @@ interface Frame extends HTMLElement {
   drawn?(whole?: boolean): void
   gestureMode?: ViewportGestureMode
   laidOut?(positions: Record<string, GraphPoint>): void
+  moved?(): void
   links?: readonly { label?: string | undefined; source: string; target: string }[]
   nodes?: readonly (NoteFacts & {
     id: string
@@ -654,12 +655,15 @@ export const connectGraph = (
     const inline = (to === 'end' ? 1 : to === 'start' ? -1 : 0) * (isRtl(frame) ? -1 : 1)
     const block = to === 'down' ? 1 : to === 'up' ? -1 : 0
     driver.panBy(inline * width * by, block * height * by, !still())
+    /* Moved as the reader asked, which the frame says. */
+    graph.moved?.()
   }
 
   const handleZoom = (event: Event): void => {
     const { by } = (event as CustomEvent<ViewportZoomDetail>).detail
     if (by !== 0) {
       driver.zoomBy(by > 0 ? 1 : -1, !still())
+      graph.moved?.()
     }
   }
 

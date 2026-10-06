@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import {
   adjacencyOf,
+  cursorAfter,
   entriesOf,
   groupsOf,
   nameOf,
@@ -155,5 +156,26 @@ describe('withoutGroups', () => {
 
   test('leaves nothing out where no group is hidden', () => {
     expect(withoutGroups(grouped, undefined, [])).toBeUndefined()
+  })
+})
+
+describe('cursorAfter', () => {
+  const rows = (...ids: string[]) => ids.map((id) => ({ node: { id } }))
+
+  test('follows the note the cursor was on to its new row', () => {
+    expect(cursorAfter(rows('a', 'n', 'b', 'c'), 'b', 1)).toBe(2)
+  })
+
+  test('stays on the row of a note taken away, which the next note now holds', () => {
+    expect(cursorAfter(rows('a', 'c', 'd'), 'b', 1)).toBe(1)
+  })
+
+  test('goes to the last row where the note taken away was last', () => {
+    expect(cursorAfter(rows('a', 'b'), 'c', 2)).toBe(1)
+  })
+
+  test('is the first row of an empty list, and where it was on no note', () => {
+    expect(cursorAfter([], 'a', 3)).toBe(0)
+    expect(cursorAfter(rows('a', 'b'), undefined, 0)).toBe(0)
   })
 })

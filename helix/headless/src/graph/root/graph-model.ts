@@ -176,6 +176,25 @@ export const entriesOf = (
   return [...first, ...neighbors, ...rest]
 }
 
+/**
+ * The row the keyboard stays on once the rows are read again from changed
+ * notes or links: the row of the note it was on, `id`, wherever that note now
+ * is, or, where the note was taken away, the row at `at` that took its place,
+ * the last row where the list grew shorter than that.
+ *
+ * **The reader stays where they were.** A graph a page feeds as things happen
+ * changes its notes every few seconds, and a cursor sent to the top on each
+ * change threw a reader moving through the list back to its first row.
+ */
+export const cursorAfter = (
+  entries: readonly Entry[],
+  id: string | undefined,
+  at: number,
+): number => {
+  const found = id === undefined ? -1 : entries.findIndex((entry) => entry.node.id === id)
+  return found >= 0 ? found : Math.max(0, Math.min(at, entries.length - 1))
+}
+
 /** The notes in the order of their names, as the page's language orders words. */
 export const sortedOf = (nodes: readonly GraphNode[], lang?: string): GraphNode[] => {
   const collator = new Intl.Collator(lang || undefined, { numeric: true, sensitivity: 'base' })

@@ -257,6 +257,22 @@ describe('connectGraph', () => {
     expect(asked.panned).toHaveLength(1)
   })
 
+  test('tells the frame once the drawing has moved, which the frame says', async () => {
+    const host = await frame()
+    const { driver } = recording()
+    connectGraph(host, driver)
+    await settled(host)
+    const live = () => part(host, 'live')?.textContent
+    ;(part(host, 'region') as HTMLElement).dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, composed: true, key: 'ArrowRight' }),
+    )
+    await settled(host)
+    expect(live()).toBe('Moved right')
+    ;(part(host, 'zoom-in') as HTMLElement).click()
+    await settled(host)
+    expect(live()).toBe('Zoomed in')
+  })
+
   test('a press in the drawing selects the note without moving it, and a choice in the list centers it', async () => {
     const host = await frame()
     const recorder = recording()
