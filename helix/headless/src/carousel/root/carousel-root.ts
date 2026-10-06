@@ -1,4 +1,5 @@
 import {
+  ChildrenController,
   capturePointer,
   customElement,
   fillTemplate,
@@ -1244,16 +1245,15 @@ export class HelixHeadlessCarousel extends HelixElement {
    * that changes an assignment is this component calling `assign`, so a slide
    * appended by a consumer would reach no slot, render nowhere and be counted by
    * nothing. A default slot needs no watcher, taking whatever is there; a manual
-   * one does. `Chat` watches for the same reason.
+   * one does. `Chat` watches for the same reason, through the same core
+   * controller.
    */
-  private watcher: MutationObserver | undefined = undefined
+  protected readonly childWatch = new ChildrenController(this)
 
   override connectedCallback(): void {
     super.connectedCallback()
     this.addEventListener('focusin', this.pause)
     this.addEventListener('pointerenter', this.pause)
-    this.watcher = new MutationObserver(() => this.requestUpdate())
-    this.watcher.observe(this, { childList: true })
     /* A move in the DOM runs this and schedules no update, so a watch dropped on
        the way out is only rebuilt here. The panes outlive the move, being in the
        shadow root, so there is one to watch already. */
@@ -1275,8 +1275,6 @@ export class HelixHeadlessCarousel extends HelixElement {
     }
     this.removeEventListener('focusin', this.pause)
     this.removeEventListener('pointerenter', this.pause)
-    this.watcher?.disconnect()
-    this.watcher = undefined
     this.sizes?.disconnect()
     this.sizes = undefined
     this.watched = undefined

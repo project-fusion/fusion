@@ -1,4 +1,10 @@
-import { customElement, HelixElement, hostAria, slotFilled } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  HelixElement,
+  hostAria,
+  slotFilled,
+  slotNamed,
+} from '@fusion.dev/helix-core'
 import { caretRight } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -112,7 +118,7 @@ export class HelixHeadlessBreadcrumb extends HelixElement {
    * writes the resting answer and the first client update corrects it.
    */
   private markEnd(): void {
-    this.toggleState('end', slotFilled(this.renderRoot?.querySelector('slot[name="end"]')))
+    this.toggleState('end', slotFilled(slotNamed(this.renderRoot, 'end')))
   }
 
   /* Content arriving in the light DOM changes no property here, so nothing

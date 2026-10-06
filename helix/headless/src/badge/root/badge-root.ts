@@ -1,4 +1,10 @@
-import { customElement, fillTemplate, formatNumber, HelixElement } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  fillTemplate,
+  focusTarget,
+  formatNumber,
+  HelixElement,
+} from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -164,11 +170,9 @@ export class HelixHeadlessBadge extends HelixElement {
     /* **A component that hands its focus on is described at the control it
        hands it to**, such as the button inside `helix-button`: its host is a
        generic nobody lands on. A reference from inside its shadow root out to
-       this badge is one the platform keeps. */
-    const inner = found?.shadowRoot?.delegatesFocus
-      ? found.shadowRoot.querySelector<HTMLElement>('a[href], button, input, select, textarea')
-      : null
-    return inner ?? found
+       this badge is one the platform keeps. Core's `focusTarget`, which
+       Tooltip reads too, follows a nested component down. */
+    return found && (focusTarget(found) as HTMLElement)
   }
 
   /* A wrapped component renders its control after this badge's first look,

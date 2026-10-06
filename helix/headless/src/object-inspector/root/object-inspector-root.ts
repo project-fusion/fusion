@@ -15,9 +15,11 @@ import {
   HelixFilterEvent,
   HelixFilteredEvent,
   inlineStep,
+  pageRows,
   requestChange,
   StatusController,
   scrollItemIntoView,
+  scrollRoom,
   searchableById,
   Typeahead,
   treeArrow,
@@ -709,10 +711,10 @@ export class HelixHeadlessObjectInspector extends HelixElement {
         this.move(rows.length - 1)
         break
       case 'PageDown':
-        this.move(this.cursor + this.pageRows())
+        this.move(this.cursor + this.pageStep())
         break
       case 'PageUp':
-        this.move(this.cursor - this.pageRows())
+        this.move(this.cursor - this.pageStep())
         break
       case 'ArrowRight':
       case 'ArrowLeft':
@@ -779,12 +781,11 @@ export class HelixHeadlessObjectInspector extends HelixElement {
    * box, or in the window where the box does not scroll, less one, so the row
    * at one edge lands at the other.
    */
-  private pageRows(): number {
-    const tree = this.partNamed('tree')
-    const room =
-      tree && tree.scrollHeight > tree.clientHeight + 1 ? tree.clientHeight : window.innerHeight
-    const tall = this.virtualize.sizeOf(this.cursor) || HelixHeadlessObjectInspector.ESTIMATE
-    return Math.max(1, Math.floor(room / tall) - 1)
+  private pageStep(): number {
+    return pageRows(
+      scrollRoom(this.partNamed('tree')),
+      this.virtualize.sizeOf(this.cursor) || HelixHeadlessObjectInspector.ESTIMATE,
+    )
   }
 
   /** A press opens or closes the row it lands on, once that row is the active one. */

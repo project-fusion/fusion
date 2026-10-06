@@ -1,9 +1,9 @@
 /**
  * Where a key moves focus in a table read as a grid, as arithmetic over places.
  *
- * Pure and beside the family's `index.ts`, so a spec holds the keyboard map
- * without a page. The table finds the cells and focuses them; this says which
- * place a key reaches from which.
+ * Pure, so a spec holds the keyboard map without a page, and in core because
+ * Table's `grid` and Data Table both read it: each finds its cells and focuses
+ * them, and this says which place a key reaches from which.
  */
 
 /**
