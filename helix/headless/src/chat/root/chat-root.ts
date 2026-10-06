@@ -12,6 +12,7 @@ import {
   requestChange,
   VirtualizeController,
   whenHydrated,
+  wordsConverter,
 } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -78,13 +79,19 @@ const SECOND_NAMES = {
 } as const
 
 /**
- * The names `key` adds from `table`, as the tail of an `exportparts` list.
- *
- * Own keys only: `author` is free text, and a turn by `constructor` would
- * otherwise forward the source of a function.
+ * What `table` holds under `key`. Own keys only: `author` is free text, and a
+ * turn by `constructor` would otherwise read the source of a function.
  */
-const secondNames = (table: Readonly<Record<string, string>>, key: string | undefined): string =>
-  key !== undefined && Object.hasOwn(table, key) ? `, ${table[key]}` : ''
+const ownEntry = (
+  table: Readonly<Record<string, string>>,
+  key: string | undefined,
+): string | undefined => (key !== undefined && Object.hasOwn(table, key) ? table[key] : undefined)
+
+/** The names `key` adds from `table`, as the tail of an `exportparts` list. */
+const secondNames = (table: Readonly<Record<string, string>>, key: string | undefined): string => {
+  const names = ownEntry(table, key)
+  return names === undefined ? '' : `, ${names}`
+}
 
 /** A turn as the announcer reads it, whichever way it was handed over. */
 interface Heard {
@@ -160,7 +167,11 @@ const spoken = (message: Element): string =>
  * the forwarded `message-*` parts. A turn by `me` also gets each part with
  * `-mine` added, and the turn's state adds `message-meta-failed`,
  * `message-content-sending`, and `message-content-streaming`. To style each
- * participant differently, pass the turns as children.
+ * participant differently, give `author-styles` the declarations for each
+ * author, such as `{"ada": "--chat-message-background-color: …"}`: the message
+ * drawn for each of their turns takes them as its `style`, so the message's
+ * custom properties change for that author alone. Turns passed as children are
+ * styled by their `author`, such as `helix-chat-message[author="ada"]`.
  *
  * @since 0.1.0
  * @status stable
@@ -234,6 +245,18 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
 
   /** How tall a turn is assumed to be before it has been drawn, in pixels. */
   static readonly ESTIMATE = 72
+
+  /**
+   * Declarations for the turns from `turns` by each author, keyed by `author`,
+   * as JSON in the attribute: `{"ada": "--chat-message-background-color: …"}`.
+   *
+   * The message drawn for each turn by that author takes them as its `style`,
+   * so the custom properties a message reads, its fill, text color, radius and
+   * padding, change for that author alone. A turn by an author with no entry
+   * takes none, and looks as it did. JSON that does not parse is no entries.
+   */
+  @property({ attribute: 'author-styles', converter: wordsConverter })
+  authorStyles: Record<string, string> = {}
 
   /**
    * Whether the transcript opens pinned to the bottom, when `pinned` is not
@@ -993,6 +1016,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
               author=${turn.author ?? nothing}
               author-label=${turn.authorLabel ?? nothing}
               at=${turn.at ?? nothing}
+              style=${ownEntry(this.authorStyles, turn.author) ?? nothing}
               .turnWords=${this.words}
               state=${turn.state ?? nothing}
             >${turn.text}</${message}>
