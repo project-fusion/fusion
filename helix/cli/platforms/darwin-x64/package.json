@@ -1,7 +1,7 @@
 {
   "name": "@fusion.dev/helix-cli-darwin-x64",
   "description": "The `helix` binary for macOS on Intel. Installed by `@fusion.dev/helix-cli`, which runs it.",
-  "version": "0.142.0",
+  "version": "0.142.1",
   "license": "MIT",
   "author": "Ross Sheppard <ross.sheppard@fusion.dev>",
   "repository": {
