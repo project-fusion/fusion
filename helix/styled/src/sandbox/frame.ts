@@ -125,7 +125,8 @@ const drawn = (child: Element): DOMRect[] => {
  * - Writes each `helix-preview-render` into the root: the markup, the
  *   stylesheet, the direction, the layout and the color mode. Scripts in the
  *   markup run.
- * - Posts every console call and uncaught error as `helix-preview-console`.
+ * - Posts every console call and uncaught error as `helix-preview-console`,
+ *   an uncaught one marked `uncaught`, which marks the preview `failed`.
  * - Posts `helix-preview-size` whenever what was drawn changes height.
  * - Posts `helix-preview-press` on every press, so menus outside close.
  *
@@ -159,7 +160,7 @@ export const servePreview = (options: ServePreviewOptions = {}): (() => void) =>
   }
 
   const failed = (event: ErrorEvent): void => {
-    post({ level: 'error', text: event.message, type: 'helix-preview-console' })
+    post({ level: 'error', text: event.message, type: 'helix-preview-console', uncaught: true })
   }
 
   /* The children's own extent, top of the highest to bottom of the lowest,
