@@ -1,5 +1,6 @@
 import {
   AriaForwardController,
+  assignSlots,
   commaList,
   customElement,
   cycle,
@@ -901,16 +902,15 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
       }
       return
     }
-    const head = this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="columns"]')
-    const body = this.renderRoot?.querySelector<HTMLSlotElement>('slot:not([name])')
-    if (!head || !body) {
-      return
-    }
-    head.assign(...this.tableColumns)
-    body.assign(...this.arrangedRows)
-    this.renderRoot
-      ?.querySelector<HTMLSlotElement>('slot[name="heading"]')
-      ?.assign(...this.headings)
+    /* The rows in the order they are drawn, which is the order the default
+       slot is given them in. */
+    const columns = new Set<Element>(this.tableColumns)
+    const headings = new Set<Element>(this.headings)
+    assignSlots(
+      this.renderRoot as ParentNode | undefined,
+      [...columns, ...headings, ...this.arrangedRows],
+      (child) => (columns.has(child) ? 'columns' : headings.has(child) ? 'heading' : ''),
+    )
   }
 
   /**

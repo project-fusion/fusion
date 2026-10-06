@@ -1,12 +1,15 @@
-import { customElement, followLink, HelixElement, hostAria } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  followLink,
+  HelixElement,
+  hostAria,
+  pressedOwnControl,
+} from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type ReactiveElement, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 /* `static-html`'s `html`, because the checkbox's tag is interpolated. */
 import { html } from 'lit/static-html.js'
 import '../../checkbox/index.js'
-
-/** What inside a row takes a press of its own, so the row's link does not. */
-const PRESSABLE = 'a[href], button, input, label, select, summary, textarea, [tabindex]'
 
 /**
  * @summary One row of a table.
@@ -170,13 +173,15 @@ export class HelixHeadlessTableRow extends HelixElement {
     if (this.href === '' || event.button !== 0 || event.defaultPrevented) {
       return
     }
-    const path = event.composedPath()
-    const inner = path.slice(0, Math.max(0, path.indexOf(this)))
-    /* A cell of the row's own is not a control of it, though a `grid` table
+    /* Asked inside the cell the press landed in, where it landed in one: a
+       cell of the row's own is not a control of it, though a `grid` table
        gives every cell a `tabindex`. */
-    const own = (node: EventTarget): boolean =>
-      node instanceof Element && node.parentElement === this && 'isTableCell' in node
-    if (inner.some((node) => node instanceof Element && node.matches(PRESSABLE) && !own(node))) {
+    const cell = event
+      .composedPath()
+      .find(
+        (node) => node instanceof Element && node.parentElement === this && 'isTableCell' in node,
+      )
+    if (pressedOwnControl(event, cell ?? this)) {
       return
     }
     if (globalThis.getSelection?.()?.toString()) {
