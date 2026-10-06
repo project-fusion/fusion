@@ -12,6 +12,15 @@ describe('empty view server output', () => {
     expect(rendered(markup, 'helix-headless-empty')).toMatch(/<slot\s*><\/slot>/)
   })
 
+  test('a heading from words is served as a heading', () => {
+    const markup = rendered(
+      ssr(html`<helix-headless-empty heading="No projects yet"></helix-headless-empty>`),
+      'helix-headless-empty',
+    )
+    expect(markup).toMatch(/<div aria-level="3" part="heading" role="heading">/)
+    expect(markup).toContain('No projects yet')
+  })
+
   test('the host carries only what the consumer wrote', () => {
     const markup = ssr(html`<helix-headless-empty no-announce>x</helix-headless-empty>`)
     expect(hostAttributes(markup, 'helix-headless-empty')).toEqual(['no-announce'])
