@@ -101,6 +101,7 @@ pub mod tier;
 pub mod token_defaults;
 pub mod tokens;
 pub mod vocabulary;
+pub mod words;
 
 use std::collections::BTreeMap;
 use std::fs;
@@ -850,6 +851,12 @@ pub fn all() -> Vec<Rule> {
             name: "vocabulary",
             run: Runner::Source(vocabulary::run),
             summary: "one spelling for each role a part name or a slot name can play",
+        },
+        Rule {
+            fix: None,
+            name: "words",
+            run: Runner::Source(words::run),
+            summary: "every built-in English default is a word property a page can translate",
         },
     ]
 }
