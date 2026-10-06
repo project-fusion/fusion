@@ -19,7 +19,7 @@ export const helixEventNames: ReadonlySet<string> = new Set(
   (
     'action activate aura-fallback band before-activate before-change before-close ' +
     'before-collapse before-edit before-move before-open before-panel-resize before-pin ' +
-    'before-reconnect before-relabel before-resize before-split before-toggle ' +
+    'before-reconnect before-relabel before-reorder before-resize before-split before-toggle ' +
     'canvas-edit canvas-pan canvas-view canvas-zoom caret clear collapse complete ' +
     'connect console copy copy-error create dismiss edit end expand facet filter ' +
     'filtered graph-filter graph-layout graph-pan graph-part-change graph-ready ' +

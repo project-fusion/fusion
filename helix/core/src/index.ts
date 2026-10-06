@@ -114,6 +114,13 @@ export {
   type RemoteReport,
 } from './controllers/remote-playback-controller/remote-playback-controller.js'
 export {
+  ReorderController,
+  type ReorderMove,
+  type ReorderOptions,
+  type ReorderWords,
+  requestReorder,
+} from './controllers/reorder-controller/reorder-controller.js'
+export {
   SourceController,
   type SourceHost,
 } from './controllers/source-controller/source-controller.js'
@@ -171,6 +178,7 @@ export {
   HelixBeforePinEvent,
   HelixBeforeReconnectEvent,
   HelixBeforeRelabelEvent,
+  HelixBeforeReorderEvent,
   HelixBeforeResizeEvent,
   HelixBeforeSplitEvent,
   HelixBeforeToggleEvent,
@@ -262,6 +270,7 @@ export {
   type RejectDetail,
   type RelabelDetail,
   type RemoveDetail,
+  type ReorderDetail,
   type ResizeDetail,
   type ScrolledDetail,
   type SelectDetail,
@@ -528,6 +537,19 @@ export {
   type RelativeOptions,
   relativeTime,
 } from './utils/relative-time/relative-time.js'
+export {
+  centersOf,
+  dropMark,
+  edgeSpeed,
+  passedCount,
+  placeKey,
+  type ReorderAxis,
+  type ReorderHold,
+  type ReorderInput,
+  type ReorderState,
+  reorderKey,
+  reorderStep,
+} from './utils/reorder/reorder.js'
 export { measuring, RENDER_SLOT, reportRender } from './utils/report-render/report-render.js'
 export {
   RUNTIME_LOG,

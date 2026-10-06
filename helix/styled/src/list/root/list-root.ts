@@ -2,6 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessList } from '@fusion.dev/helix-headless/list'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
+import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './list-root.css.js'
 
 /**
@@ -49,7 +50,7 @@ export class HelixList extends HelixHeadlessList {
   @property({ reflect: true })
   marker?: 'rail'
 
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [liveStyles, styles]
 }
 
 declare global {
