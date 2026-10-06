@@ -34,7 +34,12 @@ import { styles } from './chat-message.css.js'
  * @cssproperty --chat-message-background-color - Fill behind a turn.
  * @cssproperty --chat-message-background-color-me - Fill behind turns by `me`.
  * @cssproperty --chat-message-color - Text color in a turn.
+ * @cssproperty --chat-message-color-me - Text color in turns by `me`.
  * @cssproperty --chat-message-measure - Maximum width of a turn before its text wraps.
+ * @cssproperty --chat-message-meta-color - Color of the line under a turn, with its time and state.
+ * @cssproperty --chat-message-padding-block - Space above and below a turn's content inside its bubble.
+ * @cssproperty --chat-message-padding-inline - Space either side of a turn's content inside its bubble.
+ * @cssproperty --chat-message-radius - Corner radius of a turn's bubble.
  */
 @customElement('helix-chat-message')
 export class HelixChatMessage extends HelixHeadlessChatMessage {
