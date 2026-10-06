@@ -1,4 +1,4 @@
-import { type CSSResultOrNative, css, LitElement, type PropertyValues } from 'lit'
+import { type CSSResultOrNative, LitElement, type PropertyValues, unsafeCSS } from 'lit'
 import { type StaticValue, unsafeStatic } from 'lit/static-html.js'
 import { measuring, reportRender } from '../utils/report-render/report-render.js'
 import { noteVersion, reportUsage } from '../utils/report-usage/report-usage.js'
@@ -14,13 +14,7 @@ import {
  * border-box on both sides of the shadow boundary. The light DOM gets the same
  * rule from `@fusion.dev/helix-styles/base.css`.
  */
-const BOX_SIZING = css`
-  *,
-  ::before,
-  ::after {
-    box-sizing: border-box;
-  }
-`
+const BOX_SIZING = '*,::before,::after{box-sizing:border-box}'
 
 /**
  * Makes `hidden` work, which it does not otherwise.
@@ -54,11 +48,7 @@ const BOX_SIZING = css`
  * laid out while hidden should be able to say so, and none of them can if this
  * is unanswerable.
  */
-const HIDDEN = css`
-  :host([hidden]:not([hidden='until-found'])) {
-    display: none;
-  }
-`
+const HIDDEN = ":host([hidden]:not([hidden='until-found'])){display:none}"
 
 /**
  * Makes an element a scroll container, where a component says it is one.
@@ -112,11 +102,7 @@ const HIDDEN = css`
  * `helix/headless`, which is the case this rule exists for. Marking them is the
  * fix, and `Megamenu` above is why it is measured rather than assumed.
  */
-const SCROLLER = css`
-  [data-scroller] {
-    overflow: auto;
-  }
-`
+const SCROLLER = '[data-scroller]{overflow:auto}'
 
 /**
  * A box whose rows are drawn and taken away as it scrolls, which
@@ -130,11 +116,7 @@ const SCROLLER = css`
  * list reported four ranges for one scroll. The window already keeps the rows
  * where they belong, so anchoring has nothing left to do here but move them.
  */
-const VIRTUAL = css`
-  [data-virtual] {
-    overflow-anchor: none;
-  }
-`
+const VIRTUAL = '[data-virtual]{overflow-anchor:none}'
 
 /**
  * Turns a drawing that runs along the line of text, or a glyph that points
@@ -182,11 +164,7 @@ const VIRTUAL = css`
  * A glyph for playing media is left unmarked too, a tape running one way
  * whatever the script, and so is a picture of a key.
  */
-const MIRROR = css`
-  :host(:dir(rtl)) [data-mirror] {
-    scale: -1 1;
-  }
-`
+const MIRROR = ':host(:dir(rtl)) [data-mirror]{scale:-1 1}'
 
 /**
  * Stops a component animating its own arrival.
@@ -242,12 +220,19 @@ const MIRROR = css`
  * construction. Pagination reached the same conclusion for `:state(empty)` and
  * says so in its own sheet.
  */
-const SETTLED = css`
-  :host(:not(:state(settled))),
-  :host(:not(:state(settled))) * {
-    transition: none !important;
-  }
-`
+const SETTLED =
+  ':host(:not(:state(settled))),:host(:not(:state(settled))) *{transition:none!important}'
+
+/**
+ * The rules above as one sheet, prepended to every component's styles.
+ *
+ * **Plain strings joined into one sheet.** Written as six `css` blocks, each
+ * shipped its indentation and became a constructed sheet of its own: six
+ * adopted sheets in every shadow root for six declarations, and 181 bytes
+ * gzip more in Format Date under Rollup. The order is the same, so the
+ * cascade is too.
+ */
+const BASE = unsafeCSS(BOX_SIZING + HIDDEN + SCROLLER + VIRTUAL + MIRROR + SETTLED)
 
 /**
  * How long an element keeps looking for React's props, and how often.
@@ -637,15 +622,7 @@ export class HelixElement extends LitElement {
   protected static override finalizeStyles(
     styles?: CSSResultOrNative | CSSResultOrNative[],
   ): CSSResultOrNative[] {
-    return [
-      BOX_SIZING,
-      HIDDEN,
-      SCROLLER,
-      VIRTUAL,
-      MIRROR,
-      SETTLED,
-      ...LitElement.finalizeStyles(styles),
-    ]
+    return [BASE, ...LitElement.finalizeStyles(styles)]
   }
 
   /**

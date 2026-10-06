@@ -17,6 +17,8 @@
  * any diagnostics can have started.
  */
 
+import { callListener } from '../call-listener/call-listener.js'
+
 /** What went wrong, stable across versions, so it can be counted. */
 export type RuntimeKind =
   /** Another class asked for a tag that is already registered: two copies of Helix. */
@@ -112,9 +114,6 @@ export const RUNTIME_LOG = Symbol.for('fusion.dev/helix/runtime-log')
 /** How many events the log keeps: the first ones, which happened before anyone listened. */
 const KEPT = 200
 
-/** Whether a listener's failure has been printed, so a failing listener prints once. */
-let told = false
-
 /**
  * Reports one event: to the log, to the listener where there is one, and to
  * the console unless the listener prints it itself.
@@ -129,21 +128,7 @@ export const reportRuntime = (event: RuntimeEvent): void => {
     log.push(event)
   }
   store[RUNTIME_LOG] = log
-  let quiet = false
-  const listener = store[RUNTIME_SLOT]
-  if (typeof listener === 'function') {
-    try {
-      quiet = listener(event) === true
-    } catch (error) {
-      if (!told) {
-        told = true
-        console.error(
-          'helix: a runtime listener threw, and the warning is printed here. Later failures are not printed.',
-          error,
-        )
-      }
-    }
-  }
+  const quiet = callListener(RUNTIME_SLOT, 'runtime', 'the warning is printed here', event) === true
   if (quiet) {
     return
   }
