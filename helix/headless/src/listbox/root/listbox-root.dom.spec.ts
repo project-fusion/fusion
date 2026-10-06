@@ -613,6 +613,30 @@ describe('choosing several from the keyboard', () => {
     expect(host.value).toBe('one,two')
   })
 
+  test('and from a filter field moves the highlight and leaves the value', async () => {
+    /* The field keeps Shift with an arrow for its text, as the keyboard table
+       says: the highlight moves and nothing is added. */
+    const host = (await list('multiple filterable default-value="two"')) as Updatable & {
+      value: string
+    }
+    const down = async (shiftKey: boolean): Promise<void> => {
+      field(host).dispatchEvent(
+        new KeyboardEvent('keydown', {
+          bubbles: true,
+          cancelable: true,
+          composed: true,
+          key: 'ArrowDown',
+          shiftKey,
+        }),
+      )
+      await settle(host)
+    }
+    await down(false)
+    await down(true)
+    expect(options(host).map((option) => option.active)).toEqual([true, false, false])
+    expect(host.value).toBe('two')
+  })
+
   test('Control+A chooses every option, and again takes them all back', async () => {
     const host = (await list('multiple')) as Updatable & { value: string }
     await key(host, 'a', { ctrlKey: true })
@@ -1058,5 +1082,20 @@ describe('a listbox a browser can autofill', () => {
   test('draws nothing at `off`, the default', async () => {
     expect(hidden(await list())).toBeNull()
     expect(hidden(await list('autocomplete="off"'))).toBeNull()
+  })
+
+  test('sends the page one input, with the filled value', async () => {
+    /* A fill as Chromium sends it: the select's composed `input`, then its
+       `change`. Measured before this, the page heard `input` twice, the
+       first with the old value. */
+    const host = (await list('autocomplete="country"')) as Updatable & { value: string }
+    const heard: string[] = []
+    ;(host as unknown as HTMLElement).addEventListener('input', () => heard.push(host.value))
+    const field = hidden(host) as HTMLSelectElement
+    field.value = 'two'
+    field.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+    field.dispatchEvent(new Event('change', { bubbles: true }))
+    await settle(host)
+    expect(heard).toEqual(['two'])
   })
 })
