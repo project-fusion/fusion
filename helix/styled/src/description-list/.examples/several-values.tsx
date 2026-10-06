@@ -7,7 +7,10 @@ export function Example() {
       <helix-description-list-item label="Title">
         Notes on the Analytical Engine
       </helix-description-list-item>
-      <helix-description-list-item label="Authors">
+      <helix-description-list-item
+        label="Authors"
+        several
+      >
         <dd>Ada Lovelace</dd>
         <dd>Luigi Menabrea</dd>
       </helix-description-list-item>

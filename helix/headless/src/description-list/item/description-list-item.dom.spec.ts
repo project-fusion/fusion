@@ -82,3 +82,18 @@ describe('a pair with several values', () => {
     expect(part(host, 'value')?.localName).toBe('dd')
   })
 })
+
+describe('controls on a value', () => {
+  test('go after the value, inside its description', async () => {
+    const host = await item('label="Id"', 'a1b2<button slot="actions">Copy</button>')
+    const value = part(host, 'value') as HTMLElement
+    const slots = [...value.querySelectorAll('slot')]
+    expect(slots.map((slot) => slot.name)).toEqual(['', 'actions'])
+    expect(slots[1]?.assignedElements().map((one) => one.textContent)).toEqual(['Copy'])
+  })
+
+  test('several said up front draws no description of its own, before any value arrives', async () => {
+    const host = await item('label="Authors" several', '')
+    expect(part(host, 'value')).toBeNull()
+  })
+})

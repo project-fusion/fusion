@@ -6,22 +6,22 @@
   display: grid;
   grid-column: 1 / -1;
   grid-template-columns: subgrid;
-  row-gap: var(--helix-space-2xs);
+  row-gap: var(--description-list-item-gap, var(--helix-space-2xs));
 }
 
 /* *`muted`, not `subtle`, because a label is content*, the reason `Stat` gives
    for its own label: `subtle` falls under the contrast a small label needs. */
 [part="label"] {
-  color: var(--helix-color-foreground-muted);
-  font-size: var(--helix-text-sm);
-  font-weight: var(--helix-weight-medium);
+  color: var(--description-list-label-color, var(--helix-color-foreground-muted));
+  font-size: var(--description-list-label-font-size, var(--helix-text-sm));
+  font-weight: var(--description-list-label-weight, var(--helix-weight-medium));
   margin: 0;
 }
 
 /* The value takes the text around it, and breaks anywhere rather than
    overflowing: an id, a hash or an address has no spaces to wrap at. */
 [part="value"] {
-  color: var(--helix-color-foreground);
+  color: var(--description-list-value-color, var(--helix-color-foreground));
   font-variant-numeric: var(--_description-list-value-figures, normal);
   justify-self: var(--_description-list-value-align, stretch);
   margin: 0;
@@ -34,7 +34,7 @@
    value is, and each in the values' column, where auto-placement would put the
    second under the label. */
 ::slotted(dd) {
-  color: var(--helix-color-foreground);
+  color: var(--description-list-value-color, var(--helix-color-foreground));
   font-variant-numeric: var(--_description-list-value-figures, normal);
   grid-column: -2 / -1;
   justify-self: var(--_description-list-value-align, stretch);
@@ -42,6 +42,13 @@
   min-inline-size: 0;
   overflow-wrap: anywhere;
   text-align: var(--_description-list-value-align, start);
+}
+
+/* Controls after the value, on its line where they fit, with a little room
+   between the two. */
+::slotted([slot="actions"]) {
+  margin-inline-start: var(--description-list-actions-gap, var(--helix-space-xs));
+  vertical-align: middle;
 }
 
 /* Print: a label never ends one page with its value starting the next, which

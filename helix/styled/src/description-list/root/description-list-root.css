@@ -15,7 +15,7 @@
 /* Beside: the labels take the width of the longest one and the values the rest,
    which is what makes the column of labels scannable. */
 :host([direction="row"]) [part="list"] {
-  column-gap: var(--helix-space-lg);
+  column-gap: var(--description-list-column-gap, var(--helix-space-lg));
   grid-template-columns: max-content minmax(0, 1fr);
   row-gap: var(--description-list-gap, var(--helix-space-sm));
 }
