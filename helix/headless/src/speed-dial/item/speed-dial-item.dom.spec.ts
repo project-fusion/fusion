@@ -98,7 +98,6 @@ describe('an action with a shortcut', () => {
   test('carries it as aria-keyshortcuts, and draws what is slotted after the name', async () => {
     const one = await action('value="save" shortcut="ctrl+s"')
     expect(part(one, 'item')?.getAttribute('aria-keyshortcuts')).toBe('Control+S')
-    expect((part(one, 'shortcut') as HTMLElement).hidden).toBe(true)
     const key = document.createElement('kbd')
     key.slot = 'shortcut'
     key.textContent = 'Ctrl+S'
@@ -108,5 +107,27 @@ describe('an action with a shortcut', () => {
     const box = part(one, 'shortcut') as HTMLElement
     expect([box.hidden, box.getAttribute('aria-hidden')]).toEqual([false, 'true'])
     expect(part(await action(), 'item')?.hasAttribute('aria-keyshortcuts')).toBe(false)
+  })
+})
+
+/* A shortcut drew nothing until the page slotted a Kbd, where Menu draws its
+   rows' shortcuts from `shortcut` alone. */
+describe('a shortcut with nothing slotted', () => {
+  const drawn = (host: HTMLElement): string =>
+    (part(host, 'shortcut')?.querySelector('slot[name="shortcut"]')?.textContent ?? '').trim()
+
+  test('is drawn after the name in the platform words, as Kbd draws a chord', async () => {
+    const one = await action('value="save" shortcut="mod+shift+s"')
+    const box = part(one, 'shortcut') as HTMLElement
+    expect(box.hidden).toBe(false)
+    expect(box.getAttribute('aria-hidden')).toBe('true')
+    // happy-dom is no Apple keyboard, so `mod` is Control and keys join with `+`.
+    expect(drawn(one)).toBe('Ctrl+Shift+S')
+  })
+
+  test('draws nothing and keeps the box hidden without one', async () => {
+    const none = await action()
+    expect((part(none, 'shortcut') as HTMLElement).hidden).toBe(true)
+    expect(drawn(none)).toBe('')
   })
 })

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { formatNumber, parseNumber, readingText } from './number-format.js'
+import { formatNumber, formatPercent, parseNumber, readingText } from './number-format.js'
 
 describe('formatting a number', () => {
   test('writes the locale and the options', () => {
@@ -63,5 +63,21 @@ describe('a reading in words', () => {
 
   test('or the value itself in another style', () => {
     expect(readingText(42, 0.426, 'en', { style: 'unit', unit: 'kilobyte' })).toBe('42 kB')
+  })
+})
+
+/* Splitter wrote its own percentage formatter beside Meter's and Progress's
+   readings. */
+describe('formatPercent', () => {
+  test('writes a share as a whole percentage in the locale', () => {
+    expect(formatPercent(0.4, 'en')).toBe('40%')
+    expect(formatPercent(0.426, 'en')).toBe('43%')
+    expect(formatPercent(0.4, 'fr').replace(/\s/gu, ' ')).toBe('40 %')
+  })
+
+  test("the runtime's locale where none is given, as a reading's is", () => {
+    expect(formatPercent(0.25)).toBe(
+      formatNumber(0.25, '', { maximumFractionDigits: 0, style: 'percent' }),
+    )
   })
 })
