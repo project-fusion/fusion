@@ -101,7 +101,13 @@ export const relativeTime = (
          re-armed inside the callback that fired it. The shared ticker's own
          `Math.max(1000, ...)` hides this from the two readers that go through
          it. */
-      return { next: Math.max(1000, 60_000 - size), text: found.format(0, 'second') }
+      /* A zero that keeps its sign: `format(0, 'second')` is "in 0 seconds"
+         where `numeric` is `always`, so a moment ago read as the future. `-0`
+         is "0 seconds ago", and both are "now" where `numeric` is `auto`. */
+      return {
+        next: Math.max(1000, 60_000 - size),
+        text: found.format(elapsed > 0 ? 0 : -0, 'second'),
+      }
     }
 
     let chosen = UNITS[1] as { ms: number; unit: Intl.RelativeTimeFormatUnit }

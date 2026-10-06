@@ -93,4 +93,12 @@ describe('the reading, written another way', () => {
     expect(relativeTime('en')(at(-86_400_000), now).text).toBe('yesterday')
     expect(relativeTime('en', { numeric: 'always' })(at(-86_400_000), now).text).toBe('1 day ago')
   })
+
+  test('with a number, under a minute keeps its side of now', () => {
+    const always = relativeTime('en', { numeric: 'always' })
+    expect(always(at(-57_000), now).text).toBe('0 seconds ago')
+    expect(always(now, now).text).toBe('0 seconds ago')
+    expect(always(at(57_000), now).text).toBe('in 0 seconds')
+    expect(relativeTime('en')(at(57_000), now).text).toBe('now')
+  })
 })
