@@ -39,3 +39,9 @@
     color-mix(in oklab, var(--helix-color-foreground) 5%, transparent)
   );
 }
+
+/* The checkbox cell takes focus in a `grid` table, inset as a cell's ring is. */
+[part~="select"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}

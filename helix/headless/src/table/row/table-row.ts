@@ -25,7 +25,8 @@ const PRESSABLE = 'a[href], button, input, label, select, summary, textarea, [ta
  * of the row's own, and Control, Command or Shift open it the way they open a
  * link. A drag that selects text follows nothing. A row in a table is not a
  * stop of its own, so put the same link in a cell, usually the row header,
- * which is what the keyboard and a screen reader reach.
+ * which is what the keyboard and a screen reader reach. In a `grid` table,
+ * Enter on any cell of the row follows it as well.
  *
  * @since 0.1.0
  * @status stable
@@ -99,6 +100,21 @@ export class HelixHeadlessTableRow extends HelixElement {
   @state()
   selectLabel = ''
 
+  /**
+   * @internal Whether the row is a row of a `grid` table, written by that
+   * table. Not a consumer's to set. The checkbox cell is then a `gridcell`
+   * that takes focus, and the row says whether it is selected.
+   */
+  @state()
+  gridCell = false
+
+  /**
+   * @internal Whether the checkbox cell holds the grid's one tab stop, written
+   * by the table that sets `gridCell`. Not a consumer's to set.
+   */
+  @state()
+  selectStop = false
+
   /** The table's rules this row holds, so the next ones replace them rather than pile up. */
   private columnRules: CSSStyleSheet | undefined = undefined
 
@@ -128,6 +144,10 @@ export class HelixHeadlessTableRow extends HelixElement {
     //
     // Set in `willUpdate`, which the server does call, unlike `connectedCallback`.
     hostAria(this.internals, { role: 'row' })
+    /* `aria-selected` in a grid only, where the row is what a reader moves
+       through: in a plain table a row is not a thing that can be selected,
+       and its checkbox already says so. */
+    this.internals.ariaSelected = this.gridCell && this.selectable ? String(this.selected) : null
     this.toggleState('selected', this.selectable && this.selected)
     this.toggleState('link', this.href !== '')
   }
@@ -152,7 +172,11 @@ export class HelixHeadlessTableRow extends HelixElement {
     }
     const path = event.composedPath()
     const inner = path.slice(0, Math.max(0, path.indexOf(this)))
-    if (inner.some((node) => node instanceof Element && node.matches(PRESSABLE))) {
+    /* A cell of the row's own is not a control of it, though a `grid` table
+       gives every cell a `tabindex`. */
+    const own = (node: EventTarget): boolean =>
+      node instanceof Element && node.parentElement === this && 'isTableCell' in node
+    if (inner.some((node) => node instanceof Element && node.matches(PRESSABLE) && !own(node))) {
       return
     }
     if (globalThis.getSelection?.()?.toString()) {
@@ -188,8 +212,15 @@ export class HelixHeadlessTableRow extends HelixElement {
       return nothing
     }
     const checkbox = this.tag('checkbox')
-    return html`<span part="select${this.selected ? ' select-selected' : ''}" role="cell"
+    const grid = this.gridCell
+    /* In a grid the cell takes focus and the checkbox leaves the tab order,
+       which has one stop: Space on the cell ticks it. */
+    return html`<span
+      part="select${this.selected ? ' select-selected' : ''}"
+      role=${grid ? 'gridcell' : 'cell'}
+      tabindex=${grid ? (this.selectStop ? '0' : '-1') : nothing}
       ><${checkbox}
+        tabindex=${grid ? '-1' : nothing}
         part="checkbox"
         exportparts="box: checkbox-box, control: checkbox-control, feedback: checkbox-feedback,
           field: checkbox-field, hint: checkbox-hint, label: checkbox-label, mark: checkbox-mark,

@@ -69,3 +69,10 @@
 :host([header]) {
   font-weight: var(--helix-weight-medium);
 }
+
+/* In a `grid` table the cell takes focus itself. Inset, so the table's
+   scrolling box does not clip the ring. */
+:host(:focus-visible) {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}
