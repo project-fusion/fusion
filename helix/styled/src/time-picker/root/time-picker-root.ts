@@ -24,6 +24,7 @@ import { styles } from './time-picker-root.css.js'
  * @aliases Time, TimeList
  * @documentation https://fusion.dev/helix/components/time-picker
  *
+ * @cssproperty --time-picker-feedback-color - The color of the message under the times, while `feedback` is set.
  * @cssproperty --time-picker-list-block-size - How tall the list is before it scrolls.
  * @cssproperty --time-picker-range-color - Fill behind the times inside a range.
  * @cssproperty --time-picker-row-size - Height and minimum width of one row in a wheel.

@@ -28,6 +28,7 @@ import { styles } from './date-picker-root.css.js'
  *
  * @cssproperty --date-picker-columns - Months per row. Two unless there is only one.
  * @cssproperty --date-picker-day-size - Width and height of a day.
+ * @cssproperty --date-picker-feedback-color - The color of the message under the calendar, while `feedback` is set.
  * @cssproperty --date-picker-period-size - Height of a month or a year in the months and years views, where `max-view` is set.
  * @cssproperty --date-picker-range-color - Band behind the days in a range.
  * @cssproperty --date-picker-row-size - Height of a week row.

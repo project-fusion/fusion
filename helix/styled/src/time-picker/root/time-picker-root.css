@@ -168,7 +168,9 @@
 }
 /* Wrong, and the mark says so. */
 :host([invalid]) [part~="option"]:state(selected)::part(item),
-:host([invalid]) [part="column"] [part~="option"]:state(selected)::part(label) {
+:host([invalid]) [part="column"] [part~="option"]:state(selected)::part(label),
+:host(:state(invalid)) [part~="option"]:state(selected)::part(item),
+:host(:state(invalid)) [part="column"] [part~="option"]:state(selected)::part(label) {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-danger);
   outline-offset: var(--helix-size-focus-offset);
 }
@@ -177,10 +179,22 @@
    length: `required` and unanswered is the commonest invalid a picker has, and
    there is no row to ring. */
 :host([invalid]) [part="list"][data-unset],
-:host([invalid]) [part="columns"][data-unset] {
+:host([invalid]) [part="columns"][data-unset],
+:host(:state(invalid)) [part="list"][data-unset],
+:host(:state(invalid)) [part="columns"][data-unset] {
   border-radius: var(--helix-radii-sm);
   outline: var(--helix-size-focus-ring) solid var(--helix-color-danger);
   outline-offset: var(--helix-size-focus-offset);
+}
+
+/* The message, under the times, in the danger ink and the size a field's
+   feedback takes. Only with `feedback`, which also marks the picker invalid
+   as `:state(invalid)`, beside the `invalid` attribute the rules above read. */
+[part="feedback"] {
+  color: var(--time-picker-feedback-color, var(--helix-color-danger));
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  margin: var(--helix-space-sm) var(--helix-space-none) var(--helix-space-none);
 }
 
 /* Print: a control prints the value it holds, and the state has to survive. */

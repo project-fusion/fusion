@@ -15,6 +15,7 @@ import {
   localeOf,
   localToday,
   MixinControllerValue,
+  MixinPickerFeedback,
   monthOf,
   monthOut,
   periodCells,
@@ -112,6 +113,7 @@ const firstOf = (year: number, month: number): Date =>
  * @csspart day-outside - A day from a neighboring month, filling the grid out, beside `day`.
  * @csspart day-selected - The chosen day, or either end of a chosen range, beside `day`.
  * @csspart day-today - Today, beside `day`.
+ * @csspart feedback - The message under the calendar, while `feedback` is set.
  * @csspart grid - The grid of days.
  * @csspart header - The month name and its controls.
  * @csspart heading - The month and year being shown.
@@ -132,9 +134,13 @@ const firstOf = (year: number, month: number): Date =>
  * @csspart weekday - A column header naming a day of the week.
  *
  * @cssproperty --date-picker-column-count - How many month columns are drawn, capped at two. `--date-picker-columns` overrides it.
+ *
+ * @cssstate invalid - While `invalid` is set or `feedback` says what is wrong.
  */
 @customElement('helix-headless-date-picker')
-export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormElement) {
+export class HelixHeadlessDatePicker extends MixinPickerFeedback(
+  MixinControllerValue(HelixFormElement),
+) {
   /**
    * The validation message for a value that is not a date.
    *
@@ -187,12 +193,6 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
    */
   @property({ attribute: 'first-day-of-week', type: Number })
   firstDayOfWeek?: number
-
-  /**
-   * Whether the current selection fails validation.
-   */
-  @property({ reflect: true, type: Boolean })
-  invalid = false
 
   /**
    * A rule for which dates cannot be chosen: a function given the date as
@@ -1016,7 +1016,6 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
        property says nothing about it. Writing `disabled` here also overwrote
        the answer `HelixFormElement.willUpdate` had just computed. */
     this.internals.ariaDisabled = this.isDisabled ? 'true' : null
-    this.internals.ariaInvalid = this.invalid ? 'true' : null
     this.report()
   }
 
@@ -1371,8 +1370,9 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   protected override render(): TemplateResult {
     if (this.view !== 'day') {
       return html`<div part="months" style="--date-picker-column-count: 1">
-        ${this.renderPeriods()}
-      </div>`
+          ${this.renderPeriods()}
+        </div>
+        ${this.renderPickerFeedback()}`
     }
     const shown = this.shown
     const count = this.monthCount
@@ -1385,7 +1385,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
       ${Array.from({ length: count }, (_, index) =>
         this.renderMonth(addMonths(shown, index), index),
       )}
-    </div>`
+    </div>${this.renderPickerFeedback()}`
   }
 
   /**
