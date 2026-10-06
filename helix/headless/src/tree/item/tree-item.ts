@@ -5,10 +5,13 @@ import {
   HelixSelectEvent,
   MixinControllerOpen,
 } from '@fusion.dev/helix-core'
-import { caretDown, check, minus } from '@fusion.dev/helix-icons'
+import { caretDown, check, dotsThreeVertical, minus } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
+
+/** Where an item stands in a move: the item being moved, or the one the drop indicator is beside. */
+export type TreeItemMove = 'dragging' | 'drop-after' | 'drop-before'
 
 /**
  * @summary One node in a tree.
@@ -40,6 +43,11 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * sends `helix-load`, the row says it is busy, and the children you add appear
  * in it. Remove `lazy` once they are in.
  *
+ * **In a `reorderable` tree, the row has a grip** at its far end, which a
+ * pointer drags to move the item among its siblings. The tree says which item
+ * is moving and where the drop indicator is, with the `dragging`,
+ * `drop-before`, and `drop-after` states.
+ *
  * @since 0.1.0
  * @status stable
  * @aliases TreeNode, Branch, Leaf
@@ -60,6 +68,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @csspart checkbox - The check mark's box, in a tree with `selection-mode="multiple"`.
  * @csspart checkbox-checked - The check mark's box while the item is checked.
  * @csspart checkbox-mixed - The check mark's box while some of a branch's items are checked.
+ * @csspart grip - The handle a pointer drags to move the item, in a `reorderable` tree. Hidden from screen readers, which move the item with Alt and an arrow.
+ * @csspart grip-mark - The icon on the grip.
  * @csspart group - The container for nested items.
  * @csspart item - The node, and the focus target unless `href` moves it to the row.
  * @csspart label - The label text.
@@ -69,6 +79,9 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @cssproperty --tree-level - How deep this row sits, counting from one as `aria-level` does, for the indent.
  *
  * @cssstate checked - While it is checked, in a tree with `selection-mode="multiple"`.
+ * @cssstate dragging - The item is being moved, in a `reorderable` tree.
+ * @cssstate drop-after - The item being moved goes after this one when it is dropped.
+ * @cssstate drop-before - The item being moved goes before this one when it is dropped.
  * @cssstate loading - While a `lazy` item is open and its children have not arrived.
  * @cssstate mixed - While some of a branch's items are checked, in a tree with `selection-mode="multiple"`.
  * @cssstate open - While its children are shown.
@@ -96,6 +109,13 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
    */
   @property({ reflect: true, type: Boolean })
   disabled = false
+
+  /**
+   * @internal Whether the row draws a grip, written by a `reorderable` tree.
+   * No attribute: it is coordination between elements, as `focusable` is.
+   */
+  @property({ attribute: false })
+  grip = false
 
   /**
    * @internal Set by the tree: whether a branch heads the list under it, as
@@ -147,6 +167,13 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
    */
   @property({ attribute: false, type: Number })
   level?: number
+
+  /**
+   * @internal Where the item stands in a move, written by a `reorderable`
+   * tree: the item being moved, or the one the drop indicator is beside.
+   */
+  @property({ attribute: false })
+  move?: TreeItemMove | undefined
 
   /**
    * The link's `rel` value, which describes how the linked page relates to this
@@ -246,9 +273,20 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
        calls `scrollItemIntoView` on the next line precisely to avoid that, and
        without this the careful call arrives after the thing it exists to
        prevent has already happened. */
-    this.renderRoot
-      .querySelector<HTMLElement>(this.href === '' ? '[part="item"]' : '[part="row"]')
-      ?.focus({ preventScroll: true })
+    this.focusTarget?.focus({ preventScroll: true })
+  }
+
+  /** @internal The element that takes focus for this node, read by the tree. */
+  get focusTarget(): HTMLElement | null | undefined {
+    return this.renderRoot?.querySelector<HTMLElement>(
+      this.href === '' ? '[part="item"]' : '[part="row"]',
+    )
+  }
+
+  /** @internal Whether an event passed through this row's grip, read by the tree. */
+  fromGrip(event: Event): boolean {
+    const grip = this.renderRoot?.querySelector('[part="grip"]')
+    return Boolean(grip) && event.composedPath().includes(grip as Element)
   }
 
   /** Selects this node and sends `helix-select`. A disabled node sends nothing. */
@@ -347,6 +385,12 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
   }
 
   private readonly handleRowClick = (event: MouseEvent): void => {
+    /* A press on the grip is the tree's, which picks the item up: it neither
+       chooses the row nor follows its link. */
+    if (this.fromGrip(event)) {
+      event.preventDefault()
+      return
+    }
     /* A press that landed on a link is that link's, whichever branch of this
        runs, and the test has to be made on both sides. A row can hold a link in
        its `end` slot, and asked on one side only, pressing that link collapses
@@ -418,7 +462,15 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
     return html`${this.isBranch ? this.renderToggle() : nothing}${this.renderCheckbox()}
       <slot name="start"></slot>
       <span part="label"><slot></slot></span>
-      <slot name="end"></slot>`
+      <slot name="end"></slot>${
+        this.grip && !this.disabled
+          ? html`<span part="grip" aria-hidden="true"
+              ><svg part="grip-mark" fill="currentColor" viewBox=${dotsThreeVertical.viewBox}>
+                ${unsafeSVG(dotsThreeVertical.content)}
+              </svg></span
+            >`
+          : nothing
+      }`
   }
 
   /**
@@ -442,6 +494,9 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
     this.toggleState('checked', this.checkable && this.checked === true)
     this.toggleState('mixed', this.checkable && this.checked === 'mixed')
     this.toggleState('loading', this.open && this.lazy)
+    this.toggleState('dragging', this.move === 'dragging')
+    this.toggleState('drop-after', this.move === 'drop-after')
+    this.toggleState('drop-before', this.move === 'drop-before')
     if (this.childrenKnown) {
       this.branch = this.knownChildren.some((child) => child.slot === 'children')
     }

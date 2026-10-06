@@ -2,6 +2,7 @@ import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, idle, logged, part, registerDom } from '@fusion.dev/helix-testing/dom'
 import controlled from '../.examples/controlled.html' with { type: 'text' }
 import events from '../.examples/events.html' with { type: 'text' }
+import reordering from '../.examples/reordering.html' with { type: 'text' }
 
 beforeAll(async () => {
   registerDom()
@@ -52,4 +53,31 @@ describe('the controlled example', () => {
     await idle()
     expect(tree.active).toBe(other?.getAttribute('value') ?? '')
   })
+})
+
+describe('the reordering example', () => {
+  run(
+    'Alt with Down moves the first chapter under Basics, and the page puts it there',
+    async () => {
+      await example(reordering)
+      await idle()
+      const install = document.querySelector('helix-tree-item[value="install"]') as HTMLElement
+      ;(part(install, 'item') as HTMLElement).dispatchEvent(
+        new KeyboardEvent('keydown', {
+          altKey: true,
+          bubbles: true,
+          cancelable: true,
+          composed: true,
+          key: 'ArrowDown',
+        }),
+      )
+      await idle()
+      const basics = document.querySelector('helix-tree-item[value="basics"]') as HTMLElement
+      expect([...basics.children].map((item) => item.getAttribute('value'))).toEqual([
+        'first-page',
+        'install',
+        'theming',
+      ])
+    },
+  )
 })
