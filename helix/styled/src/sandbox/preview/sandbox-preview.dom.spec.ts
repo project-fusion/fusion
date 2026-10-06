@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -55,5 +55,25 @@ describe('the preview pane', () => {
 
     const named = await preview('src="/frame.html" label="Card, live"')
     expect((part(named, 'frame') as HTMLIFrameElement).getAttribute('title')).toBe('Card, live')
+  })
+})
+
+/* A page shows its own spinner beside the frame, and needs to know when: the
+   frame is another document, so nothing in the page can see it load. */
+describe('the preview state', () => {
+  const from = (frame: HTMLIFrameElement, data: unknown): MessageEvent =>
+    new MessageEvent('message', { data, origin: 'null', source: frame.contentWindow })
+
+  test('is `loading` from a `src` until the frame loads, and again on `reload`', async () => {
+    expect(hasState(await preview(''), 'loading')).toBe(false)
+    const host = (await preview()) as Preview & { reload: () => void }
+    expect(hasState(host, 'loading')).toBe(true)
+    const frame = part(host, 'frame') as HTMLIFrameElement
+    frame.dispatchEvent(new Event('load'))
+    expect(hasState(host, 'loading')).toBe(false)
+    host.reload()
+    expect(hasState(host, 'loading')).toBe(true)
+    window.dispatchEvent(from(frame, { type: 'helix-preview-ready' }))
+    expect(hasState(host, 'loading')).toBe(false)
   })
 })

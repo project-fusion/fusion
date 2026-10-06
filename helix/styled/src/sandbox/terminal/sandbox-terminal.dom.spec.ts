@@ -158,16 +158,23 @@ describe('sandbox terminal', () => {
       heard.push(`before ${(event as CustomEvent<{ value: string }>).detail.value}`)
     })
     term.addEventListener('change', () => heard.push(`change ${term.level}`))
+    term.addEventListener('input', () => heard.push(`input ${term.level}`))
     const filter = part(term, 'filter') as HTMLSelectElement
-    filter.value = 'error'
-    filter.dispatchEvent(new Event('change'))
+    /* A select sends a composed `input` before its `change`, which would leave
+       the terminal before it asked and whatever the answer: it stops at the
+       select. */
+    const choose = (level: string): void => {
+      filter.value = level
+      filter.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+      filter.dispatchEvent(new Event('change', { bubbles: true }))
+    }
+    choose('error')
     await term.updateComplete
     expect(heard).toEqual(['before error', 'change error'])
 
     const refuse = (event: Event): void => event.preventDefault()
     term.addEventListener('helix-before-change', refuse)
-    filter.value = 'log'
-    filter.dispatchEvent(new Event('change'))
+    choose('log')
     await term.updateComplete
     expect(term.level).toBe('error')
     expect(filter.value).toBe('error')

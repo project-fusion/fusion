@@ -15,7 +15,7 @@ const kindOf = (text: string): string | undefined => {
 }
 
 // `split` puts each captured piece at an odd index, between the plain text.
-const highlight = (source: string): SandboxToken[] =>
+const tokenize = (source: string): SandboxToken[] =>
   source
     .split(PIECES)
     .map((text, at) => ({ kind: at % 2 ? kindOf(text) : undefined, text }))
@@ -24,8 +24,8 @@ const highlight = (source: string): SandboxToken[] =>
 export function Example() {
   return (
     <helix-sandbox-source
-      highlight={highlight}
       name="html"
+      tokenize={tokenize}
       value='<p class="lead">Edited here, colored as you type.</p>'
     />
   )

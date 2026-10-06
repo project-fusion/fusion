@@ -3,20 +3,26 @@
   block-size: 100%;
 }
 
+/* Every metric that places a character, on the field and on the colored
+   copy `tokenize` draws under it, so the two match. */
+[part="highlight"],
 [part="source"] {
-  background-color: var(--sandbox-source-background-color, var(--helix-color-background));
-  block-size: 100%;
   border: none;
   color: var(--helix-color-foreground-muted);
-  display: block;
   font-family: var(--helix-font-mono);
   font-size: var(--helix-text-xs);
   inline-size: 100%;
   line-height: var(--helix-leading-normal);
   min-block-size: var(--sandbox-source-min-block-size, 12rem);
   padding: var(--helix-space-sm);
-  resize: none;
   tab-size: 2;
+}
+
+[part="source"] {
+  background-color: var(--sandbox-source-background-color, var(--helix-color-background));
+  block-size: 100%;
+  display: block;
+  resize: none;
 }
 
 /*
@@ -27,11 +33,10 @@
   outline: none;
 }
 
-/* **Under `highlight`, the field is drawn transparent over a colored copy of
+/* **Under `tokenize`, the field is drawn transparent over a colored copy of
    its own text.** Both sit in one grid cell of a box that scrolls, so the
    copy is as tall as the text and the field stretches to it: neither scrolls
-   on its own, and the two never drift. Every metric that places a character
-   is set on both.
+   on its own, and the two never drift.
 
    The row is at least as tall as the text, and fills the box beyond that. An
    `auto` row in a box of fixed height grows only into the room the box has,
@@ -48,26 +53,12 @@
   background-color: var(--helix-color-surface);
 }
 
-[part="field"] > [part="highlight"],
-[part="field"] > [part="source"] {
-  border: none;
-  box-sizing: border-box;
-  font-family: var(--helix-font-mono);
-  font-size: var(--helix-text-xs);
+[part="field"] > [part] {
   grid-area: 1 / 1;
-  inline-size: 100%;
   letter-spacing: normal;
-  line-height: var(--helix-leading-normal);
   margin: 0;
-  min-block-size: var(--sandbox-source-min-block-size, 12rem);
   overflow-wrap: break-word;
-  padding: var(--helix-space-sm);
-  tab-size: 2;
   white-space: pre-wrap;
-}
-
-[part="field"] > [part="highlight"] {
-  color: var(--helix-color-foreground-muted);
 }
 
 [part="field"] > [part="source"],

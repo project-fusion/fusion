@@ -11,12 +11,12 @@ export interface SandboxToken {
 }
 
 /**
- * Splits a pane's source into runs, for `SandboxSource.highlight`.
+ * Splits a pane's source into runs, for `SandboxSource.tokenize`.
  *
  * Takes the source and the pane's `name`, such as `html` or `css`, so one
  * function can serve every pane.
  */
-export type SandboxHighlight = (source: string, name: string) => readonly SandboxToken[]
+export type SandboxTokenizer = (source: string, name: string) => readonly SandboxToken[]
 
 /** A run as the pane draws it: its text, and its kind as an attribute holds it. */
 export interface DrawnRun {

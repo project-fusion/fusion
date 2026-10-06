@@ -28,8 +28,8 @@ const wrapConverter = {
  * `gap` takes a space token name, so spacing stays on the scale. `row-gap`
  * and `column-gap` set one axis each and win over `gap` on theirs.
  *
- * `layout` sets up one of three common patterns, and any attribute you also
- * write wins over the pattern's own value:
+ * `layout` sets up a common pattern, and any attribute you also write wins
+ * over the pattern's own value:
  *
  * - `cluster`: items in a wrapping row, centered on one line, such as tags.
  * - `split`: the first item at the start, the last at the end, and any between
