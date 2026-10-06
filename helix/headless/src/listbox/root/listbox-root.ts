@@ -26,6 +26,7 @@ import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { HelixHeadlessOptionGroup } from '../../option/group/option-group.js'
 import { HelixHeadlessOption } from '../../option/root/option-root.js'
+import { HelixHeadlessOptionSeparator } from '../../option/separator/option-separator.js'
 
 /** The keys that move within a list, which is every key that moves at all. */
 const MOVES = new Set(['ArrowDown', 'ArrowUp', 'End', 'Home', 'PageDown', 'PageUp'])
@@ -564,10 +565,15 @@ export class HelixHeadlessListbox extends MixinCollection(
 
   /** The groups, found the same way and for the same reason. */
   private get groups(): HelixHeadlessOptionGroup[] {
-    const found: HelixHeadlessOptionGroup[] = []
+    return this.among(HelixHeadlessOptionGroup)
+  }
+
+  /** The elements of one kind in the list, looking through slots. */
+  private among<T extends Element>(kind: abstract new (...args: never[]) => T): T[] {
+    const found: T[] = []
     const walk = (nodes: Iterable<Element>): void => {
       for (const node of nodes) {
-        if (node instanceof HelixHeadlessOptionGroup) {
+        if (node instanceof kind) {
           found.push(node)
         }
         if (node instanceof HTMLSlotElement) {
@@ -889,6 +895,11 @@ export class HelixHeadlessListbox extends MixinCollection(
     for (const group of this.groups) {
       const inside = this.collect(group.children)
       group.hidden = inside.length > 0 && inside.every((option) => option.hidden)
+    }
+    /* And a rule while anything is filtered: between two runs of which only
+       some options are left, it separates nothing. */
+    for (const rule of this.among(HelixHeadlessOptionSeparator)) {
+      rule.hidden = needle !== ''
     }
 
     /* The keyboard cannot sit on something the filter has hidden, so it moves
