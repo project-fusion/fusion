@@ -105,6 +105,10 @@
      rather than from a percentage: the panel is positioned `fixed`, so `100%`
      would be the viewport rather than the field. */
   inline-size: var(--floating-anchor-inline-size, 100%);
+  /* Never past the screen's edges, which the panel is kept inside of by the
+     same margin either way it opens: a trigger as wide as a phone's screen
+     opened a list that ran past its end edge. */
+  max-inline-size: calc(100vw - var(--helix-space-xs) * 2);
   min-inline-size: max-content;
   /* Never taller than the room under the trigger, for the same reason as the
      width: the space is measured, not declared. */
