@@ -52,6 +52,61 @@ slot[name="chevron"]::slotted(*) {
   inline-size: var(--helix-size-icon-tight);
 }
 
+/* A line under the label, in the label's column. Only where there is one, so a
+   row without it keeps its single line and its height. */
+slot[name="description"] {
+  color: var(--drilldown-item-description-color, var(--helix-color-foreground-subtle));
+  display: block;
+  font-size: var(--helix-text-xs);
+  grid-column: 2;
+  grid-row: 2;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+slot[name="description"][data-empty] {
+  display: none;
+}
+
+/* A row with a description is two lines: the label over it, and the start
+   content, the `end` words and the caret centered across both. No gap, which
+   an empty track would still take: the row's gap is a margin on what is
+   there. */
+[part="item"][data-described] {
+  block-size: auto;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  min-block-size: var(--drilldown-item-block-size, var(--helix-size-control-tight));
+  gap: var(--helix-space-none);
+  padding-block: var(--helix-space-2xs);
+}
+
+[part="item"][data-described] slot[name="start"]::slotted(*) {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  margin-inline-end: var(--helix-space-xs);
+}
+
+[part="item"][data-described] [part="label"] {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+[part="item"][data-described] slot[name="end"]::slotted(*) {
+  grid-column: 3;
+  grid-row: 1 / span 2;
+  margin-inline-start: var(--helix-space-xs);
+}
+
+[part="item"][data-described] [part="mark"],
+[part="item"][data-described] slot[name="chevron"]::slotted(*) {
+  grid-column: 4;
+  grid-row: 1 / span 2;
+  margin-inline-start: var(--helix-space-xs);
+}
+
 :host(:not([disabled])) [part="item"]:hover {
   background-color: var(
     --drilldown-item-hover-color,

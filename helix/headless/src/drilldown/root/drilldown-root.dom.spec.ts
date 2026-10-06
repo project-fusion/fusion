@@ -328,6 +328,62 @@ describe('the way back out of a page', () => {
   })
 })
 
+describe('a page inside a page', () => {
+  /* Three levels: the top row's page holds a row whose own page holds Dark. The
+     top row drew nothing once its page was no longer the one showing, so its
+     `page` slot went with it, and the middle row and every row below it fell
+     out of the flat tree: a titled menu with no rows in it, and focus on the
+     body. */
+  const deep = async (): Promise<Stack> =>
+    (await mount(
+      `<helix-headless-drilldown label="Settings">
+        <helix-headless-drilldown-item value="appearance">Appearance
+          <helix-headless-drilldown-item slot="page" value="theme">Theme
+            <helix-headless-drilldown-item slot="page" value="dark">Dark</helix-headless-drilldown-item>
+          </helix-headless-drilldown-item>
+        </helix-headless-drilldown-item>
+      </helix-headless-drilldown>`,
+    )) as Stack
+
+  /** Waits for the stack and for every row it rewrote. */
+  const settle = async (host: Stack): Promise<void> => {
+    await host.updateComplete
+    for (const item of host.querySelectorAll('helix-headless-drilldown-item')) {
+      await (item as unknown as Stack).updateComplete
+    }
+  }
+
+  test('shows its rows, reached through the pages above it', async () => {
+    const host = await deep()
+    await press(host, host.querySelector('[value="appearance"]') as Element)
+    await settle(host)
+    const theme = host.querySelector('[value="theme"]') as HTMLElement
+    await press(host, theme)
+    await settle(host)
+    expect(showing(host)).toEqual(['dark'])
+    const dark = host.querySelector('[value="dark"]') as HTMLElement
+    const passed = (row: Element | null): Element[] =>
+      row?.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="page"]')?.assignedElements() ?? []
+    expect(passed(host.querySelector('[value="appearance"]'))).toContain(theme)
+    expect(passed(theme)).toContain(dark)
+    expect(part(dark, 'item')).not.toBeNull()
+  })
+
+  test('and the way back returns through each of them', async () => {
+    const host = await deep()
+    await press(host, host.querySelector('[value="appearance"]') as Element)
+    await settle(host)
+    await press(host, host.querySelector('[value="theme"]') as Element)
+    await settle(host)
+    expect(host.back()).toBe(true)
+    await host.updateComplete
+    expect(showing(host)).toEqual(['theme'])
+    expect(host.back()).toBe(true)
+    await host.updateComplete
+    expect(showing(host)).toEqual(['appearance'])
+  })
+})
+
 /* What this family says where there is nothing in it, and while it is fetching.
  *
  * **The words, the moment they appear and which of the two beats the other

@@ -378,6 +378,7 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
   ): void {
     item.onPage = onPage
     item.showingPage = item === page
+    item.onPath = page !== null && item !== page && item.contains(page)
     for (const child of item.children) {
       if (child instanceof HelixHeadlessDrilldownItem && child.slot === 'page') {
         this.mark(child, page, item === page)

@@ -113,21 +113,10 @@ slot[name="back-icon"]::slotted(*) {
 
 /* The instant swap. A reader who has asked for less motion still gets the header
    and the title saying where they are, which is the part that carries the
-   meaning. */
+   meaning. `[data-direction]` weighs the same as `[data-direction="forward"]`
+   and comes after it, so the one rule answers both moves. */
 @media (prefers-reduced-motion: reduce) {
   :host([data-direction]) [part="page"] {
-    animation: none;
-  }
-}
-
-/* Named one selector at a time, because a reduce rule written looser than the
-   rule it answers loses on specificity and does nothing. */
-@media (prefers-reduced-motion: reduce) {
-  :host([data-direction="forward"]) [part="page"] {
-    animation: none;
-  }
-
-  :host([data-direction="back"]) [part="page"] {
     animation: none;
   }
 }

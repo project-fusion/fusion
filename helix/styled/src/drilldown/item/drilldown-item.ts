@@ -17,6 +17,7 @@ import { styles } from './drilldown-item.css.js'
  *
  * @cssproperty --drilldown-item-block-size - Height of a row.
  * @cssproperty --drilldown-item-color - Color of a row's words.
+ * @cssproperty --drilldown-item-description-color - Color of the line under a row's label.
  * @cssproperty --drilldown-item-disabled-opacity - How faint a disabled row is drawn.
  * @cssproperty --drilldown-item-font-size - Size of a row's words.
  * @cssproperty --drilldown-item-hover-color - Fill when a row is under the pointer.
