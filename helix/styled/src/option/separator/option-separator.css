@@ -1,0 +1,14 @@
+/* A hairline across the panel, in the border color every row and frame in a
+   list already uses, with a little air either side so the runs it parts read
+   as two. The full width of the panel, as the rows run: a rule inset from
+   rows that are not would read as belonging to one of them. */
+:host {
+  border-block-start: var(--option-separator-thickness, var(--helix-border-thin)) solid
+    var(--option-separator-color, var(--helix-color-border));
+  display: block;
+  margin-block: var(--option-separator-space, var(--helix-space-2xs));
+}
+
+:host([hidden]) {
+  display: none;
+}

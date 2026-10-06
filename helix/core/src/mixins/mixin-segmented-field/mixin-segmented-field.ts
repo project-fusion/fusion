@@ -20,6 +20,7 @@ import {
   shownValue,
 } from '../../utils/date-segments/date-segments.js'
 import { inlineStep } from '../../utils/inline-step/inline-step.js'
+import { appleTouch } from '../../utils/platform/platform.js'
 import { verdictFlags } from '../../utils/verdict-flags/verdict-flags.js'
 import type { MixinControllerOpenInterface } from '../mixin-controller-open/mixin-controller-open.js'
 import type { MixinControllerValueInterface } from '../mixin-controller-value/mixin-controller-value.js'
@@ -133,6 +134,16 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
 
     /** Whether the value is moving because a segment moved it. */
     private own = false
+
+    /**
+     * Whether this is an iPhone or an iPad, read once on the client, where a
+     * segment is a `textbox` and not a `spinbutton`: VoiceOver on iOS cannot
+     * focus a spin button, which React Aria's date segments and Number Input
+     * answer the same way. A server has no navigator and draws spin buttons.
+     */
+    private readonly touchApple = appleTouch(
+      typeof navigator === 'undefined' ? undefined : navigator,
+    )
 
     /** The value when focus came into the segments, so leaving them says `change` once. */
     private entered: string | undefined = undefined
@@ -399,21 +410,25 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
           /* Named with the field's label after its own, "month, Starts", as
              React Aria names a segment: VoiceOver on iOS does not read a
              group's name, so a segment named "month" alone left the reader
-             unsure which date it was in. */
+             unsure which date it was in. **And invalid on each segment**,
+             where the reader is: a group's `aria-invalid` is announced by no
+             screen reader as focus moves between the parts inside it. */
+          const spin = !this.touchApple
           return html`<span
             part="segment${empty ? ' segment-placeholder' : ''}"
             id=${id}
             data-segment=${kind}
-            role="spinbutton"
+            role=${spin ? 'spinbutton' : 'textbox'}
             tabindex=${this.isDisabled ? '-1' : '0'}
             inputmode=${kind === 'dayPeriod' ? nothing : 'numeric'}
             enterkeyhint=${editable ? 'next' : nothing}
             aria-label=${this.labeled ? `${segmentName(kind, locale)},` : segmentName(kind, locale)}
             aria-labelledby=${this.labeled ? `${id} ${this.labelId}` : nothing}
-            aria-valuemin=${min}
-            aria-valuemax=${max}
-            aria-valuenow=${shown ?? nothing}
-            aria-valuetext=${empty ? this.emptySegmentLabel : segmentValueText(kind, this.parts, twelve, locale)}
+            aria-invalid=${this.invalidity ?? nothing}
+            aria-valuemin=${spin ? min : nothing}
+            aria-valuemax=${spin ? max : nothing}
+            aria-valuenow=${spin ? (shown ?? nothing) : nothing}
+            aria-valuetext=${spin ? (empty ? this.emptySegmentLabel : segmentValueText(kind, this.parts, twelve, locale)) : nothing}
             aria-disabled=${this.isDisabled ? 'true' : nothing}
             aria-readonly=${(this as { readOnly?: boolean }).readOnly ? 'true' : nothing}
             @keydown=${this.handleSegmentKeydown}

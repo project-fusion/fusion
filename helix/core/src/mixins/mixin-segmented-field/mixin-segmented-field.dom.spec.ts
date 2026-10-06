@@ -113,6 +113,39 @@ describe('a row of segments', () => {
     expect(host.shadowRoot?.querySelector('[part="control"]')).toBeNull()
   })
 
+  /* React Aria's answer to VoiceOver on iOS, which cannot focus a spin
+     button. Measured before this: a spinbutton there too. */
+  test('is a row of text boxes with no value range on an iPhone or an iPad', async () => {
+    const agent = Object.getOwnPropertyDescriptor(navigator, 'userAgent')
+    Object.defineProperty(navigator, 'userAgent', {
+      configurable: true,
+      value: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)',
+    })
+    try {
+      const host = await mount('value="2026-08-04"')
+      const month = segment(host, 'month')
+      expect(month.getAttribute('role')).toBe('textbox')
+      expect(month.hasAttribute('aria-valuenow')).toBe(false)
+      expect(month.hasAttribute('aria-valuetext')).toBe(false)
+      expect(month.getAttribute('inputmode')).toBe('numeric')
+    } finally {
+      if (agent) {
+        Object.defineProperty(navigator, 'userAgent', agent)
+      } else {
+        delete (navigator as unknown as Record<string, unknown>).userAgent
+      }
+    }
+  })
+
+  /* A group's `aria-invalid` is announced as focus moves inside it by no
+     screen reader; React Aria marks each segment. */
+  test('marks each segment invalid while the field shows an error', async () => {
+    const host = await mount('value="2026-08-04" feedback="Pick a weekday"')
+    expect(segments(host).every((one) => one.getAttribute('aria-invalid') === 'true')).toBe(true)
+    const fine = await mount('value="2026-08-04"')
+    expect(segments(fine).some((one) => one.hasAttribute('aria-invalid'))).toBe(false)
+  })
+
   test('follows the locale, German writing the day first', async () => {
     const host = await mount('value="2026-08-04" locale="de-DE"')
     expect(segments(host).map((one) => one.dataset.segment)).toEqual(['day', 'month', 'year'])
