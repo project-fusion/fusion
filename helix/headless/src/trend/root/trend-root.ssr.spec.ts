@@ -27,6 +27,27 @@ describe('trend server output', () => {
     expect(rendered(markup, 'helix-headless-trend')).toContain('Unchanged')
   })
 
+  test('a value is moved and written on the server', () => {
+    const markup = rendered(
+      ssr(
+        html`<helix-headless-trend
+          value="-0.084"
+          locale="en-US"
+          good="down"
+          format-options='{"style":"percent","maximumFractionDigits":1}'
+        ></helix-headless-trend>`,
+      ),
+      'helix-headless-trend',
+    )
+    expect(markup).toContain('Down, better')
+    expect(markup).toMatch(/<span part="value"\s*>(<!--lit-part-->)?8\.4%/)
+    const without = rendered(
+      ssr(html`<helix-headless-trend movement="up"></helix-headless-trend>`),
+      'helix-headless-trend',
+    )
+    expect(without).toMatch(/<span part="value"\s+hidden\s*>/)
+  })
+
   test('the host carries nothing the consumer did not write', () => {
     expect(
       hostAttributes(
