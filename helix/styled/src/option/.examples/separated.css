@@ -1,0 +1,4 @@
+/* A list on a page brings the width a panel would give it. */
+.listbox {
+  max-inline-size: 20rem;
+}
