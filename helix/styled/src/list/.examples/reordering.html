@@ -1,0 +1,34 @@
+<!-- @summary Rows you move by dragging a grip, or with the arrow keys after you press it. -->
+<helix-list
+  divided
+  id="steps"
+  label="Release steps"
+  reorderable
+>
+  <helix-list-item value="freeze">
+    Freeze the branch
+    <span slot="description">Stop merging new work</span>
+  </helix-list-item>
+  <helix-list-item value="notes">
+    Write the release notes
+    <span slot="description">One line for each change</span>
+  </helix-list-item>
+  <helix-list-item value="tag">
+    Tag the release
+    <span slot="description">The version from the changelog</span>
+  </helix-list-item>
+  <helix-list-item value="announce">
+    Announce the release
+    <span slot="description">In the changelog and the newsletter</span>
+  </helix-list-item>
+</helix-list>
+
+<script type="module">
+  const steps = document.getElementById('steps')
+
+  // The list moves no row itself. Put the rows in the order the event carries.
+  steps.addEventListener('helix-reorder', (event) => {
+    const rows = new Map([...steps.children].map((row) => [row.getAttribute('value'), row]))
+    steps.append(...event.detail.keys.map((key) => rows.get(key)))
+  })
+</script>

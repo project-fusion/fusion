@@ -1,5 +1,14 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, type Updatable } from '@fusion.dev/helix-testing/dom'
+import {
+  example,
+  hasLayout,
+  idle,
+  mount,
+  part,
+  registerDom,
+  type Updatable,
+} from '@fusion.dev/helix-testing/dom'
+import reordering from '../.examples/reordering.html' with { type: 'text' }
 
 beforeAll(async () => {
   registerDom()
@@ -188,4 +197,36 @@ describe('a reorderable list', () => {
     expect(part(host, 'live')?.textContent).toBe('Picked up One')
     host.remove()
   })
+})
+
+/* Browser only: happy-dom does not run a script inserted by script. */
+const run = hasLayout() ? test : (): void => {}
+
+describe('the reordering example', () => {
+  run(
+    'a click picks up the first step, Down moves it, and a second click drops it there',
+    async () => {
+      await example(reordering)
+      await idle()
+      const steps = document.getElementById('steps') as HTMLElement
+      const grip = part(steps.children[0] as HTMLElement, 'grip') as HTMLElement
+      grip.click()
+      grip.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          bubbles: true,
+          cancelable: true,
+          composed: true,
+          key: 'ArrowDown',
+        }),
+      )
+      grip.click()
+      await idle()
+      expect([...steps.children].map((row) => row.getAttribute('value'))).toEqual([
+        'notes',
+        'freeze',
+        'tag',
+        'announce',
+      ])
+    },
+  )
 })
