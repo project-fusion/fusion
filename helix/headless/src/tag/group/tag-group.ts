@@ -43,12 +43,14 @@ export type TagSelectionMode = SelectionMode
  * that is removed leaves `value`, which then sends `change`.
  *
  * Name the set with `label`. Each tag is named by its words alone, without
- * its remove button.
+ * its remove button. `value` takes an array of values on the property as
+ * well, as React sets `value={['Apple']}`; a press writes it back as a
+ * string.
  *
  * **Removing the last tag keeps focus in the group.** With no tags left the
  * set is a `group`, and focus moves to its `empty` part,
  * which holds the `empty` slot: put words there such as "No filters" for a
- * reader to hear.
+ * reader to hear. With nothing slotted it says `empty-label`, "No tags".
  *
  * @since 0.1.0
  * @status stable
@@ -56,7 +58,7 @@ export type TagSelectionMode = SelectionMode
  * @documentation https://fusion.dev/helix/components/tag
  *
  * @slot - The tags, in the order they are read.
- * @slot empty - Shown in place of the tags while there are none, such as "No filters".
+ * @slot empty - Shown in place of the tags while there are none, such as "No filters". Its fallback is `empty-label`.
  *
  * @event {Event} change - Fired once a press has changed which tags are selected.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired before a press changes which tags are selected, with the `value` it would leave. Cancelable.
@@ -66,6 +68,13 @@ export type TagSelectionMode = SelectionMode
  */
 @customElement('helix-headless-tag-group')
 export class HelixHeadlessTagGroup extends HelixElement {
+  /**
+   * The words the group shows and says once its last tag is removed, where
+   * nothing is in the `empty` slot.
+   */
+  @property({ attribute: 'empty-label' })
+  emptyLabel = 'No tags'
+
   /**
    * The name of the set, such as "Filters", which a screen reader announces
    * before its tags.
@@ -89,7 +98,7 @@ export class HelixHeadlessTagGroup extends HelixElement {
    * words where it has none.
    */
   @property()
-  value = ''
+  value: string | readonly string[] = ''
 
   /** The tag the reader was last on, which keeps the tab stop. */
   private last: HelixHeadlessTag | undefined
@@ -107,6 +116,19 @@ export class HelixHeadlessTagGroup extends HelixElement {
     typeahead: typeaheadBy((item) => (item as NavigableItem & { words: string }).words),
     wrap: false,
   })
+
+  /**
+   * `value` as one written list, separated by commas, however it was set:
+   * an array of values is joined.
+   */
+  private get written(): string {
+    return typeof this.value === 'string'
+      ? this.value
+      : this.value
+          .map((one) => String(one).trim())
+          .filter((one) => one !== '')
+          .join(', ')
+  }
 
   /** The tags the group holds, in order. */
   get tags(): HelixHeadlessTag[] {
@@ -150,7 +172,7 @@ export class HelixHeadlessTagGroup extends HelixElement {
    */
   private sync(): void {
     const mode = this.selectionMode ?? 'none'
-    const chosen = new Set(commaList(this.value))
+    const chosen = new Set(commaList(this.written))
     const tags = this.tags
     const items = tags.map((tag) => ({
       disabled: tag.disabled,
@@ -196,7 +218,7 @@ export class HelixHeadlessTagGroup extends HelixElement {
       },
       event: (value) => new HelixBeforeChangeEvent({ value }),
       host: this,
-      next: pressedValue(mode, this.value, this.valueFor(tag)),
+      next: pressedValue(mode, this.written, this.valueFor(tag)),
     })
   }
 
@@ -259,8 +281,8 @@ export class HelixHeadlessTagGroup extends HelixElement {
         return
       }
       const left = this.tags.map((one) => this.valueFor(one))
-      const pruned = prunedValue(this.value, this.valueFor(tag), left)
-      if (pruned !== this.value) {
+      const pruned = prunedValue(this.written, this.valueFor(tag), left)
+      if (pruned !== this.written) {
         this.value = pruned
         this.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
       }
@@ -334,7 +356,7 @@ export class HelixHeadlessTagGroup extends HelixElement {
        set is empty. The `empty` part only while it is, so a set of tags
        renders what it did. */
     const empty = this.empty
-      ? html`<div part="empty" tabindex="-1"><slot name="empty"></slot></div>`
+      ? html`<div part="empty" tabindex="-1"><slot name="empty">${this.emptyLabel}</slot></div>`
       : nothing
     return html`<slot @slotchange=${this.handleSlotchange}></slot>${empty}`
   }

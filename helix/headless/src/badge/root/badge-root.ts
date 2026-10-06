@@ -1,4 +1,4 @@
-import { customElement, fillTemplate, HelixElement } from '@fusion.dev/helix-core'
+import { customElement, fillTemplate, formatNumber, HelixElement } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -15,6 +15,10 @@ import { property } from 'lit/decorators.js'
  * - No `value` shows a dot.
  * - Any other value shows the value. Above `max`, the indicator shows `{max}+`,
  *   so its width stays the same as the count grows.
+ *
+ * `format-options` writes a count with `Intl.NumberFormat`, in `locale`:
+ * `format-options='{"notation":"compact"}'` shows 1,200 as `1.2K`. Absent, the
+ * count is shown as it was given.
  *
  * A count is announced from its own text, and `label` replaces that with a
  * fuller name, such as `4 unread`. A dot needs a `label`. Without one, the dot
@@ -50,6 +54,16 @@ import { property } from 'lit/decorators.js'
 @customElement('helix-headless-badge')
 export class HelixHeadlessBadge extends HelixElement {
   /**
+   * `Intl.NumberFormat` options a count is written with, such as
+   * `{"notation":"compact"}` for `1.2K`, written as JSON in the attribute.
+   *
+   * Absent, a count is shown as it was given. Text that is not a number is
+   * shown as it is either way.
+   */
+  @property({ attribute: 'format-options', type: Object })
+  formatOptions?: Intl.NumberFormatOptions
+
+  /**
    * The badge's name, read by screen readers.
    *
    * Required for a dot, which has no text to read. `{count}` is replaced with
@@ -58,6 +72,14 @@ export class HelixHeadlessBadge extends HelixElement {
    */
   @property()
   label = ''
+
+  /**
+   * The locale a count is written in under `format-options`, such as `de`.
+   *
+   * Absent uses the runtime's own.
+   */
+  @property()
+  locale = ''
 
   /**
    * The largest number the badge shows.
@@ -103,7 +125,15 @@ export class HelixHeadlessBadge extends HelixElement {
 
   /** What the indicator reads, once the cap has been applied. */
   private get text(): string {
-    return this.capped ? `${this.max}+` : this.given
+    const write = (count: number): string =>
+      this.formatOptions ? formatNumber(count, this.locale, this.formatOptions) : String(count)
+    if (this.capped) {
+      return `${write(this.max as number)}+`
+    }
+    const count = Number(this.given)
+    return this.formatOptions && this.given.trim() !== '' && Number.isFinite(count)
+      ? write(count)
+      : this.given
   }
 
   /** What a reader hears for the mark, or nothing for a blank or unnamed one. */
@@ -123,7 +153,7 @@ export class HelixHeadlessBadge extends HelixElement {
    * or a component that hands its focus on.
    */
   private wrapped(): HTMLElement | undefined {
-    return this.renderRoot
+    const found = this.renderRoot
       .querySelector<HTMLSlotElement>('slot:not([name])')
       ?.assignedElements({ flatten: true })
       .find(
@@ -131,6 +161,22 @@ export class HelixHeadlessBadge extends HelixElement {
           element instanceof HTMLElement &&
           (element.tabIndex >= 0 || element.shadowRoot?.delegatesFocus === true),
       )
+    /* **A component that hands its focus on is described at the control it
+       hands it to**, such as the button inside `helix-button`: its host is a
+       generic nobody lands on. A reference from inside its shadow root out to
+       this badge is one the platform keeps. */
+    const inner = found?.shadowRoot?.delegatesFocus
+      ? found.shadowRoot.querySelector<HTMLElement>('a[href], button, input, select, textarea')
+      : null
+    return inner ?? found
+  }
+
+  /* A wrapped component renders its control after this badge's first look,
+     and a definition may arrive later still, so the badge looks again once
+     the frame after it has rendered. */
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    requestAnimationFrame(() => this.describe())
   }
 
   /**
