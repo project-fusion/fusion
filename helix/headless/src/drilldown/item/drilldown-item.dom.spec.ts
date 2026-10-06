@@ -140,3 +140,27 @@ describe('the row the keyboard is on', () => {
     expect(one.selected).toBe(true)
   })
 })
+
+describe('the words around a row’s label', () => {
+  /* Menu Item's reading: the label names the row, and a line under it or the
+     setting after it describes it. In `end` the setting was part of the name,
+     so a reader heard "Theme Dark" as the row's name. */
+  test('describe the row, and leave its name to the label', async () => {
+    const host = (await mount(
+      `<helix-headless-drilldown-item value="theme">Theme<span slot="description">Light or dark</span><span slot="end">Dark</span></helix-headless-drilldown-item>`,
+    )) as Row
+    const item = part(host, 'item') as HTMLElement
+    expect(item.getAttribute('aria-describedby')).toBe('description end')
+    const root = host.shadowRoot as ShadowRoot
+    expect(root.getElementById('description')?.getAttribute('aria-hidden')).toBe('true')
+    expect(root.getElementById('end')?.getAttribute('aria-hidden')).toBe('true')
+    expect(item.hasAttribute('data-described')).toBe(true)
+  })
+
+  test('a row with neither is described by nothing, and draws no second line', async () => {
+    const item = part(await row(), 'item') as HTMLElement
+    expect(item.hasAttribute('aria-describedby')).toBe(false)
+    expect(item.hasAttribute('data-described')).toBe(false)
+    expect(item.querySelector('slot[name="description"]')?.hasAttribute('data-empty')).toBe(true)
+  })
+})
