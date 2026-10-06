@@ -1,3 +1,4 @@
+import { isRtl } from '@fusion.dev/helix-core'
 import type {
   DrawnLink,
   DrawnNode,
@@ -213,7 +214,7 @@ interface HoverData {
  * surface, a soft shadow, a small radius.
  */
 const hoverOf =
-  (looks: GraphLooks) =>
+  (looks: GraphLooks, rightToLeft: () => boolean) =>
   (
     context: CanvasRenderingContext2D,
     data: HoverData,
@@ -225,7 +226,8 @@ const hoverOf =
     const size = settings.labelSize
     context.font = `${settings.labelWeight} ${size}px ${settings.labelFont}`
     const width = context.measureText(data.label).width
-    const x = data.x + data.size + 2
+    /* After the note in reading order: to its left on a right-to-left page. */
+    const x = rightToLeft() ? data.x - data.size - 2 - width : data.x + data.size + 2
     const height = size + 8
     context.save()
     context.shadowBlur = 8
@@ -236,6 +238,8 @@ const hoverOf =
     context.fill()
     context.restore()
     context.fillStyle = looks.ink
+    /* From its left edge, whichever way the page reads: see `nameStart`. */
+    context.textAlign = 'left'
     context.fillText(data.label, x, data.y + size / 3)
   }
 
@@ -288,6 +292,8 @@ const labelOf =
     context.lineJoin = 'round'
     context.lineWidth = 3
     context.strokeStyle = looks.ground
+    /* From its left edge, whichever way the page reads: see `nameStart`. */
+    context.textAlign = 'left'
     context.strokeText(data.label, x, y)
     context.fillStyle = strong ? looks.ink : looks.quiet
     context.fillText(data.label, x, y)
@@ -387,9 +393,12 @@ export const sigmaDriver = <G extends SigmaGraph>(
     }
     return free || must
   }
+  /* Whether the page reads right to left, read once a frame for every name drawn in it. */
+  let rightToLeft = false
   const clear = (): void => {
     /* The frame's controls first, so no name is drawn under them. */
     taken = chromeOver(container)
+    rightToLeft = isRtl(container)
   }
   sigma.on('beforeRender', clear)
   const held = gesturesHeld(container)
@@ -539,10 +548,13 @@ export const sigmaDriver = <G extends SigmaGraph>(
       sigma.setSetting(
         'defaultDrawNodeLabel',
         labelOf(looks, claim, (at, width, box) =>
-          nameStart(at, width, box, taken, container.clientWidth),
+          nameStart(at, width, box, taken, container.clientWidth, rightToLeft),
         ),
       )
-      sigma.setSetting('defaultDrawNodeHover', hoverOf(looks))
+      sigma.setSetting(
+        'defaultDrawNodeHover',
+        hoverOf(looks, () => rightToLeft),
+      )
       sigma.setSetting('nodeReducer', (node: string, data: Record<string, unknown>) => {
         const look = looks.node(node)
         /* The selected note half again its size, so it reads as the one, and
