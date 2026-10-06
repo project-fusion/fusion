@@ -54,4 +54,15 @@ describe('list server output', () => {
     expect(partTag(plain, 'row')).not.toContain('gridcell')
     expect(partTag(plain, 'row')).not.toContain('tabindex')
   })
+
+  /* The grips are written by the list once it knows its rows, which a server
+     does not, so a reorderable list serves what a plain one does. */
+  test('a reorderable list serves no grip and no live region, and no attribute of its own', () => {
+    const markup = ssr(
+      html`<helix-headless-list reorderable><helix-headless-list-item>x</helix-headless-list-item></helix-headless-list>`,
+    )
+    expect(rendered(markup, 'helix-headless-list-item')).not.toContain('part="grip"')
+    expect(rendered(markup, 'helix-headless-list')).not.toContain('part="live"')
+    expect(hostAttributes(markup, 'helix-headless-list')).toEqual(['reorderable'])
+  })
 })

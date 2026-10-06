@@ -81,6 +81,7 @@ import { HelixBeforePanelResizeEvent } from './before-panel-resize.js'
 import { HelixBeforePinEvent } from './before-pin.js'
 import { HelixBeforeReconnectEvent } from './before-reconnect.js'
 import { HelixBeforeRelabelEvent } from './before-relabel.js'
+import { HelixBeforeReorderEvent } from './before-reorder.js'
 import { HelixBeforeResizeEvent } from './before-resize.js'
 import { HelixBeforeSplitEvent } from './before-split.js'
 import { HelixBeforeToggleEvent } from './before-toggle.js'
@@ -192,6 +193,7 @@ export type {
   RejectDetail,
   RelabelDetail,
   RemoveDetail,
+  ReorderDetail,
   ResizeDetail,
   ScrolledDetail,
   SelectDetail,
@@ -223,6 +225,7 @@ export {
   HelixBeforePinEvent,
   HelixBeforeReconnectEvent,
   HelixBeforeRelabelEvent,
+  HelixBeforeReorderEvent,
   HelixBeforeResizeEvent,
   HelixBeforeSplitEvent,
   HelixBeforeToggleEvent,
@@ -325,6 +328,7 @@ const registry = {
   HelixBeforePinEvent,
   HelixBeforeReconnectEvent,
   HelixBeforeRelabelEvent,
+  HelixBeforeReorderEvent,
   HelixBeforeResizeEvent,
   HelixBeforeSplitEvent,
   HelixBeforeToggleEvent,

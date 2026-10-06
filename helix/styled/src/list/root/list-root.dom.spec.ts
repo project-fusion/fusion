@@ -144,3 +144,48 @@ describe('list', () => {
     expect(rule('helix-list-item', '[part~="row"]:focus-visible')).toContain('outline')
   })
 })
+
+describe('a reorderable list', () => {
+  test('clips its live region out of sight and keeps it in the accessibility tree', () => {
+    expect(rule('helix-list', '[part="live"]')).toContain('clip-path: inset(50%)')
+  })
+
+  test('puts the grip in a track of its own after end, which takes no room without one', () => {
+    expect(rule('helix-list-item', '[part~="row"]')).toContain(
+      'grid-template-columns: auto auto 1fr auto auto',
+    )
+    const grip = rule('helix-list-item', '[part="grip"]')
+    expect(grip).toContain('grid-column: 5')
+    expect(grip).toContain('cursor: grab')
+    expect(grip).toContain('touch-action: none')
+    /* First, so it resets the button and none of the declarations after it. */
+    expect(grip.trim().startsWith('all: unset')).toBe(true)
+  })
+
+  test('fades the row being moved and draws a line where it lands, through the family hooks', () => {
+    expect(rule('helix-list-item', ':host(:state(dragging)) [part~="row"]')).toContain(
+      'opacity: var(--list-item-dragging-opacity, 0.5)',
+    )
+    expect(rule('helix-list-item', ':host(:state(drop-before)) [part~="row"]')).toContain(
+      'var(--list-item-drop-indicator-color, var(--helix-color-primary))',
+    )
+    expect(rule('helix-list-item', ':host(:state(drop-after)) [part~="row"]')).toContain('* -1)')
+  })
+
+  test('draws the grip and says each step in the styled tier too', async () => {
+    const host = (await mount(
+      '<helix-list label="Steps" reorderable><helix-list-item value="a">One</helix-list-item><helix-list-item value="b">Two</helix-list-item></helix-list>',
+    )) as Updatable & { rows: (Updatable & HTMLElement)[] }
+    for (let round = 0; round < 3; round += 1) {
+      await host.updateComplete
+      await Promise.all(host.rows.map((row) => row.updateComplete))
+    }
+    const grip = part(host.rows[0] as HTMLElement, 'grip') as HTMLElement
+    expect(grip.getAttribute('aria-label')).toBe('Move One')
+    grip.click()
+    await new Promise((done) => requestAnimationFrame(() => done(undefined)))
+    await host.updateComplete
+    expect(part(host, 'live')?.textContent).toBe('Picked up One')
+    host.remove()
+  })
+})
