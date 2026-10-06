@@ -1,4 +1,5 @@
 import {
+  assignSlots,
   type CanvasView,
   capturePointer,
   customElement,
@@ -3466,24 +3467,9 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       }
       return
     }
-    const root = this.renderRoot
-    const rest: Element[] = []
-    const named = new Map<string, Element[]>()
-    for (const child of this.knownChildren) {
-      const name = placed.get(child) ?? child.getAttribute('slot') ?? undefined
-      if (name === undefined) {
-        rest.push(child)
-      } else {
-        named.set(name, [...(named.get(name) ?? []), child])
-      }
-    }
-    for (const slot of root?.querySelectorAll?.<HTMLSlotElement>('slot') ?? []) {
-      const wanted = slot.name === '' ? rest : (named.get(slot.name) ?? [])
-      const had = slot.assignedNodes()
-      if (had.length !== wanted.length || had.some((one, at) => one !== wanted[at])) {
-        slot.assign?.(...wanted)
-      }
-    }
+    assignSlots(this.renderRoot as ParentNode | undefined, this.knownChildren, (child) =>
+      placed.get(child),
+    )
   }
 
   /**

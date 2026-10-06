@@ -3,6 +3,7 @@ import {
   focusableElements,
   inlineStep,
   scrollingAncestor,
+  scrollRoom,
   selectsAll,
   whenHydrated,
 } from '@fusion.dev/helix-core'
@@ -284,8 +285,7 @@ export class TableGridController implements ReactiveController {
 
   /** How many rows a Page key moves from a cell. */
   private pageFrom(cell: HTMLElement): number {
-    const box = scrollingAncestor(cell, { axis: 'y', overflowing: true })
-    const room = box ? box.clientHeight : window.innerHeight
+    const room = scrollRoom(scrollingAncestor(cell, { axis: 'y', overflowing: true }))
     return pageRows(room, cell.getBoundingClientRect().height)
   }
 
