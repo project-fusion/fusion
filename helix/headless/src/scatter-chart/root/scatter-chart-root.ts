@@ -281,11 +281,6 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
     return { across, size, ups }
   }
 
-  /* The size column is a measure, so the up and down keys do not stop on it. */
-  override showsColumn(cell: number): boolean {
-    return cell !== this.measures.size && super.showsColumn(cell)
-  }
-
   /** Whether the levels across are ruled. */
   protected get rulesX(): boolean {
     return this.gridlines !== undefined && this.gridlines !== 'y'

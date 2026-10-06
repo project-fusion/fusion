@@ -153,6 +153,19 @@ describe('what a reader is told', () => {
     )
   })
 
+  /* A space alone between two bindings is a text node of its own, which
+     Chromium's description computation drops: the summary was read as
+     "Total50". The words are one text node. */
+  test('the summary is one run of text, so its description keeps its spaces', async () => {
+    const host = await chart(SOURCES, 'for="sources"')
+    const text = [...(part(host, 'summary')?.childNodes ?? [])].filter(
+      (node) => node.nodeType === 3 && (node.textContent ?? '') !== '',
+    )
+    expect(text.map((node) => node.textContent)).toEqual([
+      'Visits by source, Mar: Total 50; Search 50%, Direct 30%, Social 20%.',
+    ])
+  })
+
   /* The percentages and the total were written in the runtime's locale, with
      no way to ask for the page's. */
   test('and its numbers are written in `locale`', async () => {

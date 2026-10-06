@@ -243,6 +243,32 @@ describe('size-by', () => {
     ).toEqual([String(Math.sqrt(30 / 60)), 'none', '1'])
   })
 
+  /* The size is a measure the picture draws, so the readout says it as the
+     bubble does. It is no series, so the series keys pass over it. A row with
+     no size says none. */
+  test('says the sized measure in the readout, and the series keys pass over it', async () => {
+    const host = await chart(LOAD, 'for="load" size-by="p95"')
+    const key = (name: string): void => {
+      part(host, 'plot')?.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          bubbles: true,
+          cancelable: true,
+          composed: true,
+          key: name,
+        }),
+      )
+    }
+    key('Home')
+    await host.updateComplete
+    expect(part(host, 'live')?.textContent).toBe('1: Rate 100, p50 10, p95 30 (1 of 3)')
+    key('ArrowRight')
+    await host.updateComplete
+    expect(part(host, 'live')?.textContent).toBe('2: Rate 200, p50 12 (2 of 3)')
+    expect((host as Chart & { seriesOf(cell: number): number | undefined }).seriesOf(3)).toBe(
+      undefined,
+    )
+  })
+
   test('draws every point one size where nothing names a size', async () => {
     const host = await chart(LOAD, 'for="load"')
     expect(
