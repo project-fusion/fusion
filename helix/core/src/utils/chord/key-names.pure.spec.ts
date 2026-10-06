@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { keyNames } from './keys.js'
+import { keyNames } from './key-names.js'
 
 describe('keyNames', () => {
   test('gives the platform glyphs on an Apple keyboard, run together', () => {

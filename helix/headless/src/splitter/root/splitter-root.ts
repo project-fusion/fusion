@@ -4,6 +4,7 @@ import {
   closestInstance,
   commaList,
   customElement,
+  formatPercent,
   HelixBeforeCollapseEvent,
   HelixBeforeResizeEvent,
   HelixCollapseEvent,
@@ -30,17 +31,6 @@ import { snapTo } from '../snap.js'
  * component doing what it was asked.
  */
 const STACK_BELOW = 512
-
-/**
- * A position as a reader's locale writes a percentage, `40%` or `40 %`, for
- * `aria-valuetext`: a bare `aria-valuenow` is read as a number with no unit.
- * The runtime's own locale, and made once.
- */
-let percent: Intl.NumberFormat | undefined
-const asPercent = (value: number): string => {
-  percent ??= new Intl.NumberFormat(undefined, { maximumFractionDigits: 0, style: 'percent' })
-  return percent.format(value / 100)
-}
 
 /** What a nested splitter tells the one it crosses. */
 interface Crossed {
@@ -1294,7 +1284,7 @@ export class HelixHeadlessSplitter extends HelixElement {
             ? this.collapsedLabel
             : this.hydrating
               ? nothing
-              : asPercent(Math.round(position))
+              : formatPercent(Math.round(position) / 100)
         }
         ?data-dragging=${this.dragging}
         ?data-flush=${this.flush}
@@ -1320,7 +1310,7 @@ export class HelixHeadlessSplitter extends HelixElement {
           aria-valuemax="100"
           aria-valuemin="0"
           aria-valuenow=${Math.round(crossing.at)}
-          aria-valuetext=${asPercent(Math.round(crossing.at))}
+          aria-valuetext=${formatPercent(Math.round(crossing.at) / 100)}
           data-cross=${index}
           style="--splitter-corner-at: ${crossing.at}%; --splitter-position: ${position}%"
           @dblclick=${this.handleCornerDoubleClick}

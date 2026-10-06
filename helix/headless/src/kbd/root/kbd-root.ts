@@ -5,6 +5,8 @@ import {
   elementById,
   HelixElement,
   HelixShortcutEvent,
+  type KeyNames,
+  keyNames,
   matchesChord,
   onApple,
   printableChord,
@@ -12,7 +14,6 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-import { type KeyNames, keyNames } from '../keys.js'
 import { claimShortcut, releaseShortcut } from '../shortcut.js'
 
 /**

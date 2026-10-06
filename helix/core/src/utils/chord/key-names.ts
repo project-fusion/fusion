@@ -1,8 +1,9 @@
 /**
  * The words and glyphs a chord is drawn with, per platform.
  *
- * Beside the family's `index.ts`, because which label a key gets is a table
- * and a rule, and not the key's template.
+ * In core beside `ariaChord`, which says a chord to a reader as this draws it
+ * for the eye: Kbd draws a chord with it, and Speed Dial draws an action's
+ * shortcut with it where nothing is slotted, without importing Kbd.
  */
 
 /**
