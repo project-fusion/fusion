@@ -73,6 +73,33 @@ describe('CountdownController', () => {
     countdown.cancel()
   })
 
+  /* An Announcement whose page refused `helix-dismiss` sent it again one
+     duration after every hover: the spent clock still held its whole time. */
+  test('once spent, a hold and a release run nothing again', async () => {
+    let done = 0
+    const countdown = new CountdownController(host(), { done: () => (done += 1) })
+    countdown.start(10)
+    await wait(30)
+    expect(done).toBe(1)
+    countdown.hold()
+    countdown.release()
+    expect(countdown.running).toBe(false)
+    await wait(30)
+    expect(done).toBe(1)
+  })
+
+  test('nor once cancelled, until it is started again', () => {
+    const countdown = new CountdownController(host(), { done: () => {} })
+    countdown.start(5000)
+    countdown.cancel()
+    countdown.hold()
+    countdown.release()
+    expect(countdown.running).toBe(false)
+    countdown.start(5000)
+    expect(countdown.running).toBe(true)
+    countdown.cancel()
+  })
+
   test('leaving the page pauses it and drops the holds', () => {
     const owner = host()
     const countdown = new CountdownController(owner, { done: () => {} })

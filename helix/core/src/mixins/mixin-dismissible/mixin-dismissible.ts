@@ -166,6 +166,7 @@ export const MixinDismissible = <T extends Constructor<LitElement>>(Base: T) => 
      * once, because no container puts focus anywhere better.
      */
     private keepFocus(neighbors: HTMLElement[], beside?: HTMLElement): void {
+      this.forgetFocus?.()
       const settle = (late: boolean): void => {
         const active = document.activeElement
         if (this.isConnected || (active !== null && active !== document.body)) {
@@ -189,6 +190,35 @@ export const MixinDismissible = <T extends Constructor<LitElement>>(Base: T) => 
       }
       settle(false)
       requestAnimationFrame(() => settle(true))
+      /* **And again when it leaves, where that is later.** A page that plays
+         an exit animation removes the element after it, more than a frame on,
+         and focus dropped to the body. The hand-off waits for the element to
+         go, until focus moves anywhere first. */
+      if (this.isConnected) {
+        const forget = (): void => {
+          this.handOff = undefined
+          this.forgetFocus = undefined
+          document.removeEventListener('focusin', forget, true)
+        }
+        this.handOff = settle
+        this.forgetFocus = forget
+        document.addEventListener('focusin', forget, true)
+      }
+    }
+
+    /** The hand-off waiting for this element to leave, if one is. */
+    private handOff: ((late: boolean) => void) | undefined = undefined
+
+    /** Stops waiting for the hand-off, once focus has moved anywhere. */
+    private forgetFocus: (() => void) | undefined = undefined
+
+    override disconnectedCallback(): void {
+      super.disconnectedCallback()
+      const settle = this.handOff
+      if (settle) {
+        this.forgetFocus?.()
+        requestAnimationFrame(() => settle(true))
+      }
     }
   }
 

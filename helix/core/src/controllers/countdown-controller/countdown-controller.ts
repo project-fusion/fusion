@@ -88,15 +88,22 @@ export class CountdownController implements ReactiveController {
     this.startedAt = Date.now()
     this.options.paused?.(false)
     this.timer = setTimeout(() => {
-      this.timer = undefined
+      /* Spent, so nothing is left to resume: a page that refused the
+         dismissal heard it again one duration after every hover. */
+      this.cancel()
       this.options.done()
     }, this.remaining)
   }
 
-  /** Stops the clock where it is, as a dismissal does. */
+  /**
+   * Stops the clock for good, as a dismissal does: nothing is left to resume
+   * until the next `start`, so a hold and a release after it run nothing.
+   */
   cancel(): void {
     clearTimeout(this.timer)
     this.timer = undefined
+    this.remaining = undefined
+    this.startedAt = undefined
   }
 
   /** One more reason to hold the clock, such as a pointer arriving. */

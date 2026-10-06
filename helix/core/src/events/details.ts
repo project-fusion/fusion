@@ -382,6 +382,12 @@ export interface PressDetail {
   pointerType: PressPointerType
 }
 
+/** Detail carried by `helix-band`. */
+export interface BandDetail {
+  /** The band the reading is in now, or `''` where it is in none. */
+  band: '' | 'fair' | 'good' | 'poor'
+}
+
 /** Detail carried by `helix-tour-status`. */
 export interface TourStatusDetail {
   /** The stop it happened at, counting from 0. */

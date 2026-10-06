@@ -132,6 +132,7 @@ export { eventsForTag, registerElementEvents } from './events/element-events.js'
 export {
   type ActivateDetail,
   type AuraFallbackDetail,
+  type BandDetail,
   type CanvasView,
   type CaretDetail,
   type ChangeDetail,
@@ -150,6 +151,7 @@ export {
   HelixActionEvent,
   HelixActivateEvent,
   HelixAuraFallbackEvent,
+  HelixBandEvent,
   HelixBeforeActivateEvent,
   HelixBeforeChangeEvent,
   HelixBeforeCloseEvent,
@@ -443,6 +445,7 @@ export {
   type MediaCopy,
   sameCopies,
 } from './utils/media-copy/media-copy.js'
+export { nameText } from './utils/name-text/name-text.js'
 export { formatNumber, parseNumber } from './utils/number-format/number-format.js'
 export { onUnlessFalse } from './utils/on-unless-false/on-unless-false.js'
 export { plainClick } from './utils/plain-click/plain-click.js'

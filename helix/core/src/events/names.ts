@@ -11,92 +11,24 @@
  * bundle: a Badge shipped all eighty of them. As strings, a family ships the
  * classes it dispatches and no others. `events.pure.spec.ts` holds this list to
  * the classes, so a class added without its name here fails.
+ *
+ * **Without the shared `helix-`, and separated by spaces.** Every element carries this
+ * list, and as quoted strings each paid its quotes, its comma and the prefix.
  */
-export const helixEventNames: ReadonlySet<string> = new Set([
-  'helix-action',
-  'helix-activate',
-  'helix-aura-fallback',
-  'helix-before-activate',
-  'helix-before-change',
-  'helix-before-close',
-  'helix-before-collapse',
-  'helix-before-edit',
-  'helix-before-move',
-  'helix-before-open',
-  'helix-before-panel-resize',
-  'helix-before-pin',
-  'helix-before-reconnect',
-  'helix-before-relabel',
-  'helix-before-resize',
-  'helix-before-split',
-  'helix-before-toggle',
-  'helix-canvas-edit',
-  'helix-canvas-pan',
-  'helix-canvas-view',
-  'helix-canvas-zoom',
-  'helix-caret',
-  'helix-clear',
-  'helix-collapse',
-  'helix-complete',
-  'helix-connect',
-  'helix-console',
-  'helix-copy',
-  'helix-copy-error',
-  'helix-create',
-  'helix-dismiss',
-  'helix-edit',
-  'helix-end',
-  'helix-expand',
-  'helix-facet',
-  'helix-filter',
-  'helix-filtered',
-  'helix-graph-filter',
-  'helix-graph-layout',
-  'helix-graph-pan',
-  'helix-graph-part-change',
-  'helix-graph-ready',
-  'helix-graph-signal',
-  'helix-graph-zoom',
-  'helix-history',
-  'helix-load',
-  'helix-load-more',
-  'helix-map-cluster',
-  'helix-map-pan',
-  'helix-map-part-change',
-  'helix-map-ready',
-  'helix-map-rotate',
-  'helix-map-tilt',
-  'helix-map-zoom',
-  'helix-move',
-  'helix-navigate',
-  'helix-next',
-  'helix-panel-resize',
-  'helix-pin',
-  'helix-press',
-  'helix-preview',
-  'helix-previous',
-  'helix-range-change',
-  'helix-read',
-  'helix-reconnect',
-  'helix-reject',
-  'helix-relabel',
-  'helix-remove',
-  'helix-reorder',
-  'helix-reordered',
-  'helix-resize',
-  'helix-resized',
-  'helix-sample-end',
-  'helix-sample-start',
-  'helix-scrolled',
-  'helix-select',
-  'helix-selected',
-  'helix-send',
-  'helix-shortcut',
-  'helix-sort',
-  'helix-sorted',
-  'helix-split',
-  'helix-toggle',
-  'helix-tour-ask',
-  'helix-tour-status',
-  'helix-typing',
-])
+export const helixEventNames: ReadonlySet<string> = new Set(
+  (
+    'action activate aura-fallback band before-activate before-change before-close ' +
+    'before-collapse before-edit before-move before-open before-panel-resize before-pin ' +
+    'before-reconnect before-relabel before-resize before-split before-toggle ' +
+    'canvas-edit canvas-pan canvas-view canvas-zoom caret clear collapse complete ' +
+    'connect console copy copy-error create dismiss edit end expand facet filter ' +
+    'filtered graph-filter graph-layout graph-pan graph-part-change graph-ready ' +
+    'graph-signal graph-zoom history load load-more map-cluster map-pan map-part-change ' +
+    'map-ready map-rotate map-tilt map-zoom move navigate next panel-resize pin press ' +
+    'preview previous range-change read reconnect reject relabel remove reorder ' +
+    'reordered resize resized sample-end sample-start scrolled select selected send ' +
+    'shortcut sort sorted split toggle tour-ask tour-status typing'
+  )
+    .split(' ')
+    .map((name) => `helix-${name}`),
+)

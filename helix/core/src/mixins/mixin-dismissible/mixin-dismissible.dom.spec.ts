@@ -173,12 +173,15 @@ describe('a lone dismissed element the listener removes', () => {
     Element.prototype.getClientRects = original
   })
 
-  const page = async (markup: string): Promise<Removable> => {
+  /** The page, with a listener that removes the element `after` milliseconds on. */
+  const page = async (markup: string, after?: number): Promise<Removable> => {
     Element.prototype.getClientRects = (): DOMRectList => [{}] as unknown as DOMRectList
     document.body.innerHTML = markup
     const lone = document.querySelector('probe-removable') as Removable
     await lone.updateComplete
-    lone.addEventListener('helix-dismiss', () => lone.remove())
+    lone.addEventListener('helix-dismiss', () =>
+      after === undefined ? lone.remove() : setTimeout(() => lone.remove(), after),
+    )
     ;(lone.shadowRoot?.querySelector('[part="dismiss"]') as HTMLElement | null)?.focus()
     return lone
   }
@@ -211,6 +214,31 @@ describe('a lone dismissed element the listener removes', () => {
     lone.dismiss()
     await frame()
     expect(document.activeElement?.id).not.toBe('after')
+  })
+
+  /* A page that plays an exit animation removes the element after it, and
+     focus dropped to the body. */
+  test('and when it leaves later, after an exit animation', async () => {
+    const lone = await page(
+      '<button id="before">Before</button><probe-removable></probe-removable><button id="after">After</button>',
+      40,
+    )
+    lone.dismiss()
+    await new Promise((done) => setTimeout(done, 60))
+    await frame()
+    expect(document.activeElement?.id).toBe('after')
+  })
+
+  test('unless focus moved somewhere first', async () => {
+    const lone = await page(
+      '<button id="before">Before</button><probe-removable></probe-removable><button id="after">After</button>',
+      40,
+    )
+    lone.dismiss()
+    ;(document.getElementById('before') as HTMLElement).focus()
+    await new Promise((done) => setTimeout(done, 60))
+    await frame()
+    expect(document.activeElement?.id).toBe('before')
   })
 
   /* A Tag Group whose last tag went focuses its empty part in a microtask, and
