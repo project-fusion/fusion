@@ -192,6 +192,13 @@
   position: absolute;
 }
 
+/* A finger's reach on touch, as a card's points take once it has focus. */
+@media (pointer: coarse) {
+  [part="edge-end"]::after {
+    inset: calc((2.75rem - 100%) / -2);
+  }
+}
+
 /* While something a click picked up follows the pointer, the board says it is
    in hand until the next press puts it down. */
 :host(:state(holding)) [part="viewport"] {

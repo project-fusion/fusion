@@ -224,7 +224,8 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  * card's connection point, or the end of a selected connection to pick it up.
  * It follows the pointer with no button held, and the next click puts it down
  * where a drag would have. On touch, the next tap sets where it lands. Escape,
- * or a press outside the board, puts it back.
+ * or a press outside the board, puts it back. So a finger connects two cards
+ * with three taps: the card, one of its points, and the card to connect to.
  *
  * Connecting and removing dispatch requests, and your code applies them:
  * - Drawing from a card's handle to another card, or pressing C on one card and

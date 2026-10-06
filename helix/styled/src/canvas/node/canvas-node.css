@@ -300,6 +300,17 @@
   position: absolute;
 }
 
+/* **On touch, a finger's reach**, 44 pixels across, once the card has focus
+   and shows its points: a tap on the card, then a tap on a point, then a tap
+   on the card to connect to. Not before, or a tap near the edge of a card
+   nobody had chosen would start a connection instead of choosing it. */
+@media (pointer: coarse) {
+  :host(:focus-within) [part~="handle"]::after,
+  :host(:focus-within) [part~="grip"]::after {
+    inset: calc((2.75rem - 100%) / -2);
+  }
+}
+
 /* Physical, as the handles are: a corner is where it is on every page. */
 [part~="grip-top-left"] {
   cursor: nwse-resize;

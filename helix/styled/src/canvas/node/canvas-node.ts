@@ -14,6 +14,9 @@ import { styles } from './canvas-node.css.js'
  * Before the board places it, the card sits in normal flow. Without JavaScript,
  * the page shows the cards' text in the order it was written.
  *
+ * On a touch screen, the points and corners of the card with focus take a
+ * reach 44 pixels across, so a finger can start a connection from one.
+ *
  * @since 0.100.0
  * @status experimental
  * @category media
