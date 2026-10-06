@@ -135,12 +135,26 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
     )
   }
 
+  /**
+   * Puts focus on the trigger, the slotted one or the button drawn in its
+   * place, as a `focus()` on a native control would. The host itself takes no
+   * focus, so a page focusing it after a dialog closes landed nowhere.
+   */
+  override focus(options?: FocusOptions): void {
+    const trigger = this.trigger
+    if (trigger === this) {
+      super.focus(options)
+      return
+    }
+    trigger.focus(options)
+  }
+
   /** Shuts it and puts the reader back on the trigger. */
   private close(): void {
     if (!this.requestOpen(false)) {
       return
     }
-    this.trigger.focus()
+    this.focus()
   }
 
   private readonly handleTriggerClick = (): void => {

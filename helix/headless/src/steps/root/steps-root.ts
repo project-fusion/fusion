@@ -1,5 +1,6 @@
 import {
   customElement,
+  fillTemplate,
   HelixElement,
   hostAria,
   MixinControllerActive,
@@ -39,7 +40,9 @@ import type { HelixHeadlessStep } from '../step/step.js'
  * its stages that are `complete`. The `progress` part carries it as a
  * `progressbar` and as `--steps-progress`, and is hidden until a stylesheet
  * gives it a `display`, so a bar of your own costs nothing until you draw it.
- * The sequence is `:state(complete)` once every stage is.
+ * A screen reader hears it as `progress-label` says, "33% complete" unless
+ * set, as Ark UI's steps write it. The sequence is `:state(complete)` once
+ * every stage is.
  *
  * The sequence is a list named by `label`, and each step a list item. The
  * current stage's button says `aria-current="step"`, and a finished stage's
@@ -80,6 +83,13 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
    */
   @property({ reflect: true, type: Boolean })
   linear = false
+
+  /**
+   * What the `progress` part says to a screen reader, with `{percent}` filled
+   * in with `progress`.
+   */
+  @property({ attribute: 'progress-label' })
+  progressLabel = '{percent}% complete'
 
   /**
    * Which way the steps run.
@@ -319,6 +329,7 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
         aria-valuemin="0"
         aria-valuemax="100"
         aria-valuenow=${progress}
+        aria-valuetext=${fillTemplate(this.progressLabel, { percent: String(progress) })}
         style="--steps-progress: ${progress}%"
         hidden
       ></div>`
