@@ -1,5 +1,15 @@
-import { describe, expect, test } from 'bun:test'
-import { createSheet } from './create-sheet.js'
+import { beforeAll, describe, expect, test } from 'bun:test'
+import { registerDom } from '@fusion.dev/helix-testing/dom'
+import type * as Subject from './create-sheet.js'
+
+/* The page first, then the module: `lit` reads `document` once, as it loads,
+   and a DOM spec later in the same run renders through it. */
+let createSheet: typeof Subject.createSheet
+
+beforeAll(async () => {
+  registerDom()
+  ;({ createSheet } = await import('./create-sheet.js'))
+})
 
 /**
  * One line wrapping `unsafeCSS`, and the test is that it stays that way.

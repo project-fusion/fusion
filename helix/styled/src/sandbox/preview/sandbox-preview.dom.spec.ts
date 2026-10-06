@@ -107,8 +107,12 @@ describe('the preview states', () => {
   test('stays `failed` for every throwing source, not only the first, and sends once a burst', async () => {
     const host = (await preview()) as Preview & { source: string }
     const frame = part(host, 'frame') as HTMLIFrameElement
-    const target = frame.contentWindow as Window
-    const real = target.postMessage
+    /* A window of the page's own stands in for the frame's. The frame is on an
+       opaque origin, so in a browser its `postMessage` cannot be replaced. */
+    const stand = document.createElement('iframe')
+    document.body.append(stand)
+    const target = stand.contentWindow as Window
+    Object.defineProperty(frame, 'contentWindow', { configurable: true, value: target })
     const sent: string[] = []
     let held = ''
     target.postMessage = ((message: { source: string }) => {
@@ -131,7 +135,8 @@ describe('the preview states', () => {
       }
     }) as Window['postMessage']
     restore = () => {
-      target.postMessage = real
+      delete (frame as { contentWindow?: Window | null }).contentWindow
+      stand.remove()
     }
     const settle = async (): Promise<void> => {
       await host.updateComplete
