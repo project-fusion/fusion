@@ -223,6 +223,27 @@ describe('a badge around a control', () => {
     expect(internals(badge).ariaLabel).toBe('9 unread')
   })
 
+  /* A component's host is a generic nobody lands on, so the description goes
+     to the control it hands its focus to. */
+  test.if(reflects)('describes the control a component hands its focus to', async () => {
+    if (!customElements.get('probe-focus-button')) {
+      customElements.define(
+        'probe-focus-button',
+        class extends HTMLElement {
+          constructor() {
+            super()
+            this.attachShadow({ delegatesFocus: true, mode: 'open' }).innerHTML =
+              '<button>Inbox</button>'
+          }
+        },
+      )
+    }
+    const badge = await wrap('<probe-focus-button></probe-focus-button>')
+    await new Promise((done) => requestAnimationFrame(() => done(undefined)))
+    const inner = badge.querySelector('probe-focus-button')?.shadowRoot?.querySelector('button')
+    expect(inner?.ariaDescribedByElements?.[0]).toBe(badge)
+  })
+
   test.if(reflects)(
     'takes the description back when the count is cleared or the badge leaves',
     async () => {
@@ -259,5 +280,32 @@ describe('the mark as states', () => {
         ['blank', 'capped', 'dot'].filter((name) => hasState(one, name)),
       ),
     ).toEqual([['capped'], ['dot'], ['blank']])
+  })
+})
+
+/* Web Awesome counts with `Intl`; this one could only show the text given. */
+describe('format-options', () => {
+  test('writes the count, and the cap, in `Intl.NumberFormat`', async () => {
+    const compact = await mount(
+      `<helix-headless-badge locale="en" format-options='{"notation":"compact"}' value="1200"></helix-headless-badge>`,
+    )
+    const capped = await mount(
+      `<helix-headless-badge locale="de" format-options='{}' max="9999" value="12000"></helix-headless-badge>`,
+    )
+    expect([
+      part(compact, 'indicator')?.textContent?.trim(),
+      part(capped, 'indicator')?.textContent?.trim(),
+    ]).toEqual(['1.2K', '9.999+'])
+  })
+
+  test('leaves the count as given without it, and text that is no number either way', async () => {
+    const plain = await mount('<helix-headless-badge value="1200"></helix-headless-badge>')
+    const word = await mount(
+      `<helix-headless-badge format-options='{"notation":"compact"}' value="New"></helix-headless-badge>`,
+    )
+    expect([
+      part(plain, 'indicator')?.textContent?.trim(),
+      part(word, 'indicator')?.textContent?.trim(),
+    ]).toEqual(['1200', 'New'])
   })
 })
