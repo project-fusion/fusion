@@ -1,18 +1,15 @@
 import {
   customElement,
   drawStatus,
-  formatNumber,
   HelixElement,
   hostAria,
+  readingText,
   StatusController,
   slottedWords,
   wordsConverter,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-
-/** A whole percentage, which a reading is written as where nothing else is asked. */
-const WHOLE_PERCENT: Intl.NumberFormatOptions = { maximumFractionDigits: 0, style: 'percent' }
 
 /** Which band a value falls in, once `optimum` has said which end is good. */
 export type MeterBand = 'fair' | 'good' | 'poor'
@@ -356,16 +353,14 @@ export class HelixHeadlessMeter extends HelixElement {
    * anything else.
    */
   private get text(): string {
-    const options = this.formatOptions
     return (
       this.valueText ||
-      (options && options.style !== 'percent'
-        ? formatNumber(
-            Number.isFinite(this.value) ? this.value : this.span.min,
-            this.locale,
-            options,
-          )
-        : formatNumber(this.ratio, this.locale, options ?? WHOLE_PERCENT))
+      readingText(
+        Number.isFinite(this.value) ? this.value : this.span.min,
+        this.ratio,
+        this.locale,
+        this.formatOptions,
+      )
     )
   }
 

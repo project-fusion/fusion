@@ -8,6 +8,8 @@
  * screenshot of a strip.
  */
 
+import { extremesOf } from '@fusion.dev/helix-core'
+
 /** A reading, reduced to what the bucketing needs. */
 export interface Reading {
   tone?: string | undefined
@@ -112,18 +114,11 @@ export interface Overview {
  * strip's `overview`. A blank cell is passed over.
  */
 export const overviewOf = (cells: readonly Reading[]): Overview => {
-  let busiest = -1
-  let total = 0
-  cells.forEach((cell, index) => {
-    if (cell.value === undefined) {
-      return
-    }
-    total += cell.value
-    if (busiest < 0 || cell.value > (cells[busiest]?.value ?? 0)) {
-      busiest = index
-    }
-  })
-  return { busiest, total }
+  const values = cells.map((cell) => cell.value)
+  return {
+    busiest: extremesOf(values).high ?? -1,
+    total: values.reduce<number>((sum, value) => sum + (value ?? 0), 0),
+  }
 }
 
 /** A date written `YYYY-MM-DD`, at the start of a `datetime`, as a day count, or undefined. */
