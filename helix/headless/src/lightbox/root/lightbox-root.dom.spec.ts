@@ -444,6 +444,63 @@ describe('zooming into the shown item', () => {
     await host.updateComplete
     expect(zoom(host)).toBe('')
   })
+
+  test('with `controls`, zoom-out and zoom-in controls zoom, and say when they can go no further', async () => {
+    const host = await opened('max-zoom="2.25" controls')
+    const zoomIn = part(host, 'zoom-in') as HTMLButtonElement
+    const zoomOut = part(host, 'zoom-out') as HTMLButtonElement
+    /* A task on first: a swipe in an earlier case holds the next click for
+       one task, as it does after a real swipe. */
+    await new Promise((done) => setTimeout(done, 0))
+    const press = (control: HTMLElement): void => {
+      control.click()
+    }
+    expect(zoomIn.getAttribute('aria-label')).toBe('Zoom in')
+    expect(zoomOut.getAttribute('aria-disabled')).toBe('true')
+    press(zoomIn)
+    await host.updateComplete
+    expect(zoom(host)).toBe('1.5')
+    expect(zoomOut.hasAttribute('aria-disabled')).toBe(false)
+    press(zoomIn)
+    await host.updateComplete
+    expect(zoom(host)).toBe('2.25')
+    expect(zoomIn.getAttribute('aria-disabled')).toBe('true')
+    press(zoomOut)
+    await host.updateComplete
+    expect(zoom(host)).toBe('1.5')
+  })
+
+  test('the zoom controls are drawn only where a reader can zoom', async () => {
+    const host = await opened('controls')
+    expect(part(host, 'zoom-in')).toBeNull()
+    expect(part(host, 'zoom-out')).toBeNull()
+  })
+
+  test('the live region says the scale once a reader stops zooming, and not when the item changes', async () => {
+    const host = await opened('max-zoom="3"')
+    const live = (): string => part(host, 'live')?.textContent?.trim() ?? ''
+    host.zoomTo(1.5)
+    host.zoomTo(2)
+    await host.updateComplete
+    expect(live()).not.toContain('Zoomed')
+    await new Promise((done) => setTimeout(done, 450))
+    await host.updateComplete
+    expect(live()).toBe('Zoomed to 200%')
+    host.next()
+    await host.updateComplete
+    await new Promise((done) => setTimeout(done, 450))
+    await host.updateComplete
+    expect(live()).toBe('2 of 3')
+  })
+})
+
+describe('the header and the footer', () => {
+  test('are parts on their bare slots, so a page can give each a box', async () => {
+    const host = await lightbox()
+    expect(part(host, 'header')?.tagName.toLowerCase()).toBe('slot')
+    expect(part(host, 'header')?.getAttribute('name')).toBe('header')
+    expect(part(host, 'footer')?.getAttribute('name')).toBe('footer')
+  })
 })
 
 describe('the counter', () => {
