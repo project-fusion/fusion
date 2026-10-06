@@ -27,6 +27,9 @@ import { styles } from './listbox-root.css.js'
  * @cssproperty --listbox-background-color - The panel's fill. Set it to `transparent` when the list is already inside a panel.
  * @cssproperty --listbox-border - The panel's border, as a shorthand. Set it to `none` when the list is already inside a panel.
  * @cssproperty --listbox-column-min-inline-size - How narrow a column may be with `layout="grid"`. As many columns as fit are drawn. Defaults to `8rem`.
+ * @cssproperty --listbox-dragging-opacity - The opacity of an option being dragged, in a `reorderable` list with `@fusion.dev/helix/listbox/reorder` imported.
+ * @cssproperty --listbox-drop-indicator-color - The color of the line where a dragged option would land.
+ * @cssproperty --listbox-drop-indicator-size - The thickness of the line where a dragged option would land.
  * @cssproperty --listbox-error-color - The color of the line shown while `load-error` is set.
  * @cssproperty --listbox-max-block-size - Maximum height of the list before it scrolls.
  */

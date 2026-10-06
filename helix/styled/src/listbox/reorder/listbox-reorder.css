@@ -1,0 +1,41 @@
+/* What a reorderable listbox adopts into each option while it reorders, so a
+   list that never moves options carries none of it. The hooks are set on the
+   list and reach each option by inheritance. Written on the option's host
+   and on whatever it draws, rather than on its parts, since it is handed to
+   every option whatever it draws. */
+
+/* A whole option is what a pointer drags, so it says so anywhere in it. A
+   disabled option keeps the cursor its own sheet gives it. */
+* {
+  cursor: grab;
+}
+
+:host(:state(dragging)) {
+  opacity: var(--listbox-dragging-opacity, 0.5);
+}
+
+/* The line where the option would land, drawn over the option so its fill
+   does not hide it, and laid over the edge so nothing moves. */
+:host(:state(drop-before)),
+:host(:state(drop-after)) {
+  position: relative;
+}
+
+:host(:state(drop-before))::before,
+:host(:state(drop-after))::before {
+  background-color: var(--listbox-drop-indicator-color, var(--helix-color-primary));
+  block-size: var(--listbox-drop-indicator-size, var(--helix-border-thick));
+  content: "";
+  inset-inline: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 1;
+}
+
+:host(:state(drop-before))::before {
+  inset-block-start: 0;
+}
+
+:host(:state(drop-after))::before {
+  inset-block-end: 0;
+}
