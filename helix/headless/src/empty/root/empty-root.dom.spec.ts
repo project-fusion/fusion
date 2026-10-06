@@ -108,6 +108,56 @@ describe('empty view', () => {
     expect(part(await mount('<helix-headless-empty></helix-headless-empty>'), 'heading')).toBeNull()
   })
 
+  /* A `<span slot="heading">` was no heading in the outline, and nothing
+     said so. */
+  test('reads a slotted element that is no heading as one, and leaves a heading alone', async () => {
+    const loose = await mount(
+      '<helix-headless-empty heading-level="2"><span slot="heading">No results</span>Try another word.</helix-headless-empty>',
+    )
+    const wrapper = part(loose, 'heading') as HTMLElement
+    expect(wrapper.getAttribute('role')).toBe('heading')
+    expect(wrapper.getAttribute('aria-level')).toBe('2')
+    expect(wrapper.querySelector('slot[name="heading"]')).not.toBeNull()
+    const kept = await mount(
+      '<helix-headless-empty><div slot="heading"><h4>No results</h4></div>Try.</helix-headless-empty>',
+    )
+    expect(part(kept, 'heading')).toBeNull()
+    const own = await mount(
+      '<helix-headless-empty><h3 slot="heading">No results</h3>Try.</helix-headless-empty>',
+    )
+    expect(part(own, 'heading')).toBeNull()
+  })
+
+  test('sets a heading slotted later as the slot changes', async () => {
+    const empty = (await mount(
+      '<helix-headless-empty><h3 slot="heading">No results</h3>Try.</helix-headless-empty>',
+    )) as HTMLElement & { updateComplete: Promise<boolean> }
+    const span = document.createElement('span')
+    span.slot = 'heading'
+    span.textContent = 'Nothing yet'
+    empty.querySelector('h3')?.replaceWith(span)
+    await new Promise((done) => setTimeout(done, 0))
+    await empty.updateComplete
+    expect(part(empty, 'heading')?.getAttribute('aria-level')).toBe('3')
+  })
+
+  /* While the live copy holds the words, the heading around a loose one is
+     what is hidden, as the slot is for a heading element. */
+  test('hides a loose heading with its wrapper while the copy holds it', async () => {
+    document.body.innerHTML =
+      '<helix-headless-empty><span slot="heading">Nothing here</span><p>No results.</p></helix-headless-empty>'
+    const empty = document.body.firstElementChild as HTMLElement & {
+      updateComplete: Promise<boolean>
+    }
+    await empty.updateComplete
+    await new Promise((done) => requestAnimationFrame(() => done(undefined)))
+    await empty.updateComplete
+    expect(part(empty, 'heading')?.getAttribute('aria-hidden')).toBe('true')
+    expect(
+      empty.shadowRoot?.querySelector('slot[name="heading"]')?.hasAttribute('aria-hidden'),
+    ).toBe(false)
+  })
+
   test('announces the drawn heading with the message', async () => {
     document.body.innerHTML =
       '<helix-headless-empty heading="Nothing here"><p>No results.</p></helix-headless-empty>'

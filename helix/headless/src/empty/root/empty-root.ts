@@ -2,10 +2,11 @@ import {
   ArrivalController,
   customElement,
   HelixElement,
+  headingIn,
   headingLevel,
   slottedWords,
 } from '@fusion.dev/helix-core'
-import { html, nothing, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
@@ -32,6 +33,13 @@ import { property } from 'lit/decorators.js'
  * rendering from data or on a server gets a heading a reader finds in the
  * outline without writing the element. A heading slotted in replaces it.
  *
+ * **Whatever is slotted into `heading` is read as a heading.** An element that
+ * is no heading, such as a `<span>` or a `<p>`, is set inside the `heading`
+ * part at `heading-level`, so a screen reader still finds it in the outline.
+ * A heading element, or an element holding one, keeps its own level. A server
+ * cannot see the slotted element, so a served `<span>` becomes a heading once
+ * the script runs.
+ *
  * @since 0.1.0
  * @status stable
  * @category feedback
@@ -40,10 +48,10 @@ import { property } from 'lit/decorators.js'
  *
  * @slot - The message: why the region is empty, and what to do about it.
  * @slot actions - The action that would put something in the region.
- * @slot heading - The heading, which names what is missing. Slot a heading element, such as an `<h3>`, so a reader can find it in the page's outline. Replaces the one `heading` draws.
+ * @slot heading - The heading, which names what is missing. A heading element, such as an `<h3>`, keeps its level; any other element is read as a heading at `heading-level`. Replaces the one `heading` draws.
  * @slot icon - An icon above the heading.
  *
- * @csspart heading - The heading `heading` draws, a heading at `heading-level`. Drawn only while `heading` holds words and nothing is slotted into `heading`.
+ * @csspart heading - The heading at `heading-level`: the one `heading` draws while nothing is slotted into `heading`, or the one around a slotted element that is no heading.
  * @csspart live - A copy of the heading and the message, in a live region that screen readers announce when the view appears. Visually hidden in the styled tier.
  */
 @customElement('helix-headless-empty')
@@ -76,6 +84,27 @@ export class HelixHeadlessEmpty extends HelixElement {
   @property({ attribute: 'no-announce', reflect: true, type: Boolean })
   noAnnounce = false
 
+  /**
+   * Whether the `heading` slot holds elements and none of them is or holds a
+   * heading, read from the children before each render.
+   */
+  private looseHeading = false
+
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    if (this.childrenKnown) {
+      const slotted = this.knownChildren.filter((child) => child.slot === 'heading')
+      this.looseHeading = slotted.length > 0 && headingIn(slotted) === null
+    }
+  }
+
+  /* A served view rendered no wrapper, having no children to read, and the
+     hydrating render matched it; this one reads them. */
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.finishHydration()
+  }
+
   /* Filled a frame after the view appears, when it appears after the page has
      loaded, as `Announcement`'s band is; at once, and silently, when it came
      with the page. A page a framework served without declarative shadow DOM is
@@ -99,18 +128,33 @@ export class HelixHeadlessEmpty extends HelixElement {
    * hides them from readers until it empties.
    */
   protected renderHeading(hidden: boolean): TemplateResult {
-    return html`<slot
-      aria-hidden=${hidden ? 'true' : nothing}
+    const level = headingLevel(this.headingLevel)
+    const slot = html`<slot
+      aria-hidden=${hidden && !this.looseHeading ? 'true' : nothing}
       name="heading"
-      @slotchange=${() => this.arrival.say()}
+      @slotchange=${() => {
+        this.arrival.say()
+        this.requestUpdate()
+      }}
       >${
         this.heading.trim()
-          ? html`<div aria-level=${headingLevel(this.headingLevel)} part="heading" role="heading">
+          ? html`<div aria-level=${level} part="heading" role="heading">
               ${this.heading}
             </div>`
           : nothing
       }</slot
     >`
+    /* **A slotted element that is no heading is set inside one**, the part
+       `heading` draws, so the outline has it at `heading-level`. A role cannot
+       be written onto the page's own element. */
+    return this.looseHeading
+      ? html`<div
+          aria-hidden=${hidden ? 'true' : nothing}
+          aria-level=${level}
+          part="heading"
+          role="heading"
+        >${slot}</div>`
+      : slot
   }
 
   protected override render(): TemplateResult {
