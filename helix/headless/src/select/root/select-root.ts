@@ -2,6 +2,7 @@ import {
   AriaForwardController,
   afterLinkFollowed,
   customElement,
+  drawStatus,
   HelixFormElement,
   hostAria,
   hostWords,
@@ -9,8 +10,10 @@ import {
   MixinControllerOpen,
   MixinControllerValue,
   MixinField,
+  onApple,
   PopoverController,
   reportValues,
+  StatusController,
   typesCharacter,
 } from '@fusion.dev/helix-core'
 import { caretDown } from '@fusion.dev/helix-icons'
@@ -22,6 +25,7 @@ import type { HelixHeadlessListbox } from '../../listbox/root/listbox-root.js'
 import { type HelixHeadlessOption, optionsAmong } from '../../option/root/option-root.js'
 import '../../listbox/index.js'
 import { over } from '../align.js'
+import { drawAutofill } from '../autofill.js'
 
 /**
  * @summary A control that opens a list of options to choose from.
@@ -47,7 +51,13 @@ import { over } from '../align.js'
  * ArrowDown, Enter and Space open the list on the chosen option, ArrowUp opens
  * it on the chosen or last option, Home and End open it on the first or last,
  * and typed letters choose the option whose words start with them, as a native
- * `<select>` does.
+ * `<select>` does. ArrowLeft and ArrowRight choose the option before or after
+ * the chosen one without opening, as React Aria's Select does, in either
+ * direction of text. A choice made on the closed trigger is said aloud on Apple
+ * devices, where VoiceOver does not read the trigger's new name.
+ *
+ * Set `autocomplete` to let a browser's autofill choose, as a native `<select>`
+ * with the same attribute would.
  *
  * @since 0.1.0
  * @status stable
@@ -89,6 +99,7 @@ import { over } from '../align.js'
  * @csspart listbox-loading - The text shown while the options load.
  * @csspart listbox-search - The region that holds the filter field.
  * @csspart listbox-search-field - The filter field.
+ * @csspart live - The region a screen reader announces a choice made on the closed trigger from, drawn once there is one to say. Visually hidden in the styled tier.
  * @csspart surface - The floating panel.
  * @csspart trigger - The closed control, which shows the chosen value.
  * @csspart value - The chosen option's text inside the trigger.
@@ -115,6 +126,21 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
     },
     target: () => this.partNamed('trigger'),
   })
+
+  /** The region a choice made on the closed trigger is said from. */
+  private readonly status = new StatusController(this)
+
+  /**
+   * What a browser's autofill may fill in, as a platform token such as
+   * `country` or `cc-exp-month`, as on a native `<select>`.
+   *
+   * Set, the select keeps a hidden native `<select>` with the same options for
+   * the browser to fill, as React Aria's `HiddenSelect` does, and takes the
+   * option the browser picks, by its value or its words, as the value. Empty
+   * draws no hidden select, and a browser fills nothing.
+   */
+  @property()
+  autocomplete = ''
 
   /**
    * The text shown when no options match the filter.
@@ -550,7 +576,8 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
    * Aria's Select do, so a reader who knows the answer types it. A Space in the
    * middle of those letters is one of them. With `multiple`, a letter opens the
    * list on the match instead, because adding to a set is a choice the reader
-   * makes in the list.
+   * makes in the list. ArrowLeft and ArrowRight choose the option before and
+   * after the chosen one.
    */
   private readonly handleTriggerKeydown = (event: KeyboardEvent): void => {
     const listbox = this.listbox
@@ -564,7 +591,22 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
         this.opening = 'selected'
         this.requestOpen(true)
       } else {
-        this.requestValue(match)
+        this.choose(match)
+      }
+      return
+    }
+    /* The option before or after the chosen one, as React Aria's Select and a
+       native select on Windows step. The same way round in either direction
+       of text, since the list they step through runs down the page. */
+    const step = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0
+    if (step !== 0 && !this.multiple && !(event.altKey || event.ctrlKey || event.metaKey)) {
+      event.preventDefault()
+      const reachable =
+        listbox?.options.filter((option) => !option.hidden && !option.disabled) ?? []
+      const next =
+        reachable[Math.max(0, reachable.findIndex((one) => one.value === this.value) + step)]
+      if (next) {
+        this.choose(next.value)
       }
       return
     }
@@ -584,6 +626,22 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
       this.openAt(
         where === 'last' && event.key === 'ArrowUp' && this.value !== '' ? 'selected' : where,
       )
+    }
+  }
+
+  /**
+   * Chooses from the closed trigger, and says the choice on Apple devices.
+   *
+   * The trigger is named by the label and the chosen words, so a choice made
+   * on it renames the control in focus. VoiceOver does not read a name that
+   * changes under focus, so a reader there heard nothing as a letter or an
+   * arrow changed the answer. The words are said in a live region, as React
+   * Aria says a combobox's choice for VoiceOver alone, since other screen
+   * readers read the new name.
+   */
+  private choose(value: string): void {
+    if (this.requestValue(value) && onApple()) {
+      this.status.say(String(this.display))
     }
   }
 
@@ -828,7 +886,15 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
       <div part="surface" popover="manual" ?hidden=${!this.open}>
         ${this.renderListbox()}
       </div>
-      ${this.renderHint()}${this.renderFeedback()}`
+      ${this.renderHint()}${this.renderFeedback()}${drawStatus(this.status)}
+      ${drawAutofill({
+        autocomplete: this.autocomplete,
+        disabled: this.isDisabled,
+        multiple: this.multiple,
+        onFill: (value) => this.requestValue(value),
+        options: optionsAmong(this.knownChildren),
+        value: this.value,
+      })}`
   }
 }
 
