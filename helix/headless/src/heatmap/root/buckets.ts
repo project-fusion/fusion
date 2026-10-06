@@ -125,3 +125,45 @@ export const overviewOf = (cells: readonly Reading[]): Overview => {
   })
   return { busiest, total }
 }
+
+/** A date written `YYYY-MM-DD`, at the start of a `datetime`, as a day count, or undefined. */
+const dayOf = (when: string | undefined): number | undefined => {
+  const found = /^(\d{4})-(\d{2})-(\d{2})/.exec(when ?? '')
+  return found
+    ? Date.UTC(Number(found[1]), Number(found[2]) - 1, Number(found[3])) / 86_400_000
+    : undefined
+}
+
+/**
+ * Where a page of a calendar goes from the reading at `at`: the same day a
+ * month on, or a month back, by the dates the readings carry, written
+ * `YYYY-MM-DD` as a `<time datetime>` gives them. A day the month lacks,
+ * such as the 31st, is the month's last. Where that day has no reading, the
+ * nearest one past it in the direction of travel, and the last or the first
+ * reading past the end. Undefined where the reading at `at` carries no date.
+ */
+export const monthPage = (
+  whens: readonly (string | undefined)[],
+  at: number,
+  forward: boolean,
+): number | undefined => {
+  const from = dayOf(whens[at])
+  if (from === undefined) {
+    return undefined
+  }
+  const date = new Date(from * 86_400_000)
+  const month = date.getUTCMonth() + (forward ? 1 : -1)
+  const last = new Date(Date.UTC(date.getUTCFullYear(), month + 1, 0)).getUTCDate()
+  const target =
+    Date.UTC(date.getUTCFullYear(), month, Math.min(date.getUTCDate(), last)) / 86_400_000
+  const days = whens.map(dayOf)
+  const order = days.map((_, index) => index)
+  const past = (forward ? order : order.reverse()).find((index) => {
+    const day = days[index]
+    return day !== undefined && (forward ? day >= target : day <= target)
+  })
+  if (past !== undefined) {
+    return past
+  }
+  return forward ? whens.length - 1 : 0
+}

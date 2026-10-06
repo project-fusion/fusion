@@ -56,6 +56,8 @@ describe("the key's hooks", () => {
         return sheet.cssText ?? Array.from(sheet.cssRules ?? [], (rule) => rule.cssText).join('\n')
       })
       .join('\n')
+      /* A formatter breaks a long fallback after `var(`. */
+      .replace(/\(\s+/g, '(')
     for (const hook of [
       '--kbd-block-size',
       '--kbd-color',
