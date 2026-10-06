@@ -18,8 +18,17 @@ const sheet = (): string => {
     .join('\n')
 }
 
-/** The declarations of the first rule written for `selector`. */
-const rule = (selector: string): string => sheet().split(`${selector} {`)[1]?.split('}')[0] ?? ''
+/** The declarations of the first rule whose selector list names `selector`. */
+const rule = (selector: string): string => {
+  for (const block of sheet().split('}')) {
+    const pieces = block.split('{')
+    const head = pieces.at(-2) ?? ''
+    if (head.split(',').some((one) => one.trim() === selector)) {
+      return pieces.at(-1) ?? ''
+    }
+  }
+  return ''
+}
 
 describe('empty', () => {
   test('stacks and centers what it is given, with room around it', () => {
@@ -39,6 +48,11 @@ describe('empty', () => {
     expect(heading).toContain('var(--helix-color-foreground))')
     expect(heading).toContain('var(--helix-text-lg)')
     expect(rule('slot:not([name])')).toContain('var(--helix-color-foreground-muted)')
+  })
+
+  test('a heading drawn from words is set as a slotted one is', () => {
+    expect(rule('[part="heading"]')).toBe(rule('slot[name="heading"]::slotted(*)'))
+    expect(rule('[part="heading"]')).toContain('var(--helix-text-lg)')
   })
 
   test('the explanation runs to a measure a centered line can be read at', () => {

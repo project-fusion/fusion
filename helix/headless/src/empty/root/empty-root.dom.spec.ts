@@ -91,4 +91,32 @@ describe('empty view', () => {
     expect(slotted(empty, 'heading')[0]?.textContent).toBe('Nothing here')
     expect(slotted(empty, 'actions')[0]?.textContent).toBe('go')
   })
+
+  /* A page rendering from data had to write a heading element to get one,
+     and a `<p slot="heading">` was no heading in the outline at all. */
+  test('draws a heading from words, at the level asked, and yields it to a slotted one', async () => {
+    const drawn = await mount(
+      '<helix-headless-empty heading="No results" heading-level="2">Try another word.</helix-headless-empty>',
+    )
+    const heading = part(drawn, 'heading') as HTMLElement
+    expect(heading.getAttribute('role')).toBe('heading')
+    expect(heading.getAttribute('aria-level')).toBe('2')
+    expect(heading.textContent?.trim()).toBe('No results')
+    expect(heading.parentElement?.getAttribute('name')).toBe('heading')
+    const resting = await mount('<helix-headless-empty heading="Nothing"></helix-headless-empty>')
+    expect(part(resting, 'heading')?.getAttribute('aria-level')).toBe('3')
+    expect(part(await mount('<helix-headless-empty></helix-headless-empty>'), 'heading')).toBeNull()
+  })
+
+  test('announces the drawn heading with the message', async () => {
+    document.body.innerHTML =
+      '<helix-headless-empty heading="Nothing here"><p>No results.</p></helix-headless-empty>'
+    const empty = document.body.firstElementChild as HTMLElement & {
+      updateComplete: Promise<boolean>
+    }
+    await empty.updateComplete
+    await new Promise((done) => requestAnimationFrame(() => done(undefined)))
+    await empty.updateComplete
+    expect(part(empty, 'live')?.textContent?.trim()).toBe('Nothing here No results.')
+  })
 })
