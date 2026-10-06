@@ -269,6 +269,26 @@ describe('a button group with selection-mode', () => {
     expect(buttonsOf(group).map((button) => button.focusable)).toEqual([true, true, true])
   })
 
+  test('removing the attribute leaves it the same way, as a group of plain buttons', async () => {
+    /* Lit sets a removed attribute's property to null, not undefined. Measured
+       before this: the group stayed a toolbar with aria-orientation, while
+       every button was its own tab stop and the arrow keys did nothing. */
+    const group = await mountGroup(view.replace('label=', 'orientation="vertical" label='))
+    const internals = (group as Group & { internals?: ElementInternals }).internals
+    expect(internals?.ariaOrientation).toBe('vertical')
+    group.removeAttribute('selection-mode')
+    await flush(group)
+    expect(group.selectionMode).toBeNull()
+    expect(role(group)).toBe('group')
+    expect(internals?.ariaOrientation).toBeNull()
+    expect(pressedOf(group)).toEqual([null, null, null])
+    expect(buttonsOf(group).map((button) => button.focusable)).toEqual([true, true, true])
+    group.setAttribute('selection-mode', 'single')
+    await flush(group)
+    expect(role(group)).toBe('toolbar')
+    expect(buttonsOf(group).map((button) => button.focusable)).toEqual([false, true, false])
+  })
+
   test('a button that leaves the group is put back', async () => {
     const group = await mountGroup(view)
     const [day] = buttonsOf(group)

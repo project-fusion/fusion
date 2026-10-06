@@ -166,9 +166,12 @@ export class HelixHeadlessButtonGroup extends HelixElement {
   /**
    * Whether the group holds the tab stop and the arrow keys: in a selection
    * mode, and not inside a toolbar, whose own keys walk the buttons.
+   *
+   * Truthiness, as `buttons` reads it: a removed attribute leaves the property
+   * null, which is no selection mode.
    */
   private get roving(): boolean {
-    return this.selectionMode !== undefined && toolbarAround(this) === null
+    return Boolean(this.selectionMode) && toolbarAround(this) === null
   }
 
   /** Whether a button is pressed: its value is among the group's. */
@@ -372,7 +375,7 @@ export class HelixHeadlessButtonGroup extends HelixElement {
     /* A toolbar in a selection mode, as React Aria's ToggleButtonGroup is, and
        a group of the toolbar around it otherwise, since a toolbar inside a
        toolbar is a reader's dead end. */
-    const toolbar = this.selectionMode !== undefined && toolbarAround(this) === null
+    const toolbar = this.roving
     hostAria(this.internals, { label: this.label, role: toolbar ? 'toolbar' : 'group' })
     this.internals.ariaOrientation = toolbar ? (this.orientation ?? null) : null
   }
