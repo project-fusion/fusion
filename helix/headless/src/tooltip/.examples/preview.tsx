@@ -2,8 +2,18 @@ import './preview.css'
 
 export function Example() {
   return (
-    <helix-headless-tooltip content="Save your changes to the file">
-      <helix-headless-button>Save changes</helix-headless-button>
-    </helix-headless-tooltip>
+    <>
+      <helix-headless-button
+        aria-describedby="save-tip"
+        id="save"
+      >
+        Save changes
+      </helix-headless-button>
+      <helix-headless-tooltip
+        content="Save your changes to the file"
+        for="save"
+        id="save-tip"
+      ></helix-headless-tooltip>
+    </>
   )
 }
