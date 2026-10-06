@@ -2351,18 +2351,32 @@ mixins and controllers that register nothing. This page said `headless` had none
 until September 2, 2026, against every file calling `@customElement` and a
 manifest that had always been right.
 
-**The missing-name warning ships in development builds only, and it is the one
-that does.** Core imports it as `#audit-name`, a subpath in its own
-`package.json` `imports` that resolves to the audit under the `development`
-export condition and to a function that does nothing otherwise: the mechanism
-Lit uses for its dev-mode warnings, without a second build of core. Vite and
-webpack ask for `development` while a page is developed, a production build
-does not, and so every field and Button stops carrying about 450 bytes gzip for
-a sentence meant for whoever writes the page. `nameText`, which
+**Two audits ship in development builds only: the missing-name warning and the
+missing-table warning.** Core imports them as `#audit-name` and
+`#audit-source`, subpaths in its own `package.json` `imports` that resolve to
+the audit under the `development` export condition and to a function that does
+nothing otherwise, without a second build of core. A production build does not
+ask for `development`, and so every field and Button stops carrying about 450
+bytes gzip for a sentence meant for whoever writes the page. `nameText`, which
 `AriaForwardController` needs at runtime to decide where a label goes, is a
-module of its own and stays in every build. The repository's specs run with
-`--conditions helix-development`, which the map reads as it reads `development`
-without also switching Lit to its development build, whose class-field check
-throws on classes a spec defines. Core's add `--conditions helix-source`, which
-resolves to the source files, since its specs run before `dist` exists. Every
-other runtime warning still reports in every build.
+module of its own and stays in every build.
+
+**The published modules import each audit by the package's own name.** Vite's
+dev server bundles a dependency with esbuild before serving it, and esbuild
+resolves a `#` import with its own conditions, which have no `development`.
+Measured on Vite 7.3.7 with Helix installed in `node_modules`: neither audit
+printed anything under `vite` dev until October 6, 2026. A bare import of the
+package's own subpath is resolved by Vite under Vite's conditions, so once `tsc`
+has written `dist`, `scripts/development-imports.mjs` rewrites each `#`
+specifier in a module or a declaration to the subpath `exports` publishes for
+the same files (`#audit-name` is `@fusion.dev/helix-core/audits/name`). The
+`imports` targets are the source files, which this repository's specs,
+typecheck and source bundles read, and which `exports` cannot name because
+`files` does not pack `src`. A new development-only module takes an `imports`
+entry and an `exports` subpath for the same files, and
+`development-imports.pure.spec.ts` holds the two together.
+
+The repository's specs run with `--conditions helix-development`, which both
+maps read as they read `development` without also switching Lit to its
+development build, whose class-field check throws on classes a spec defines.
+Every other runtime warning still reports in every build.

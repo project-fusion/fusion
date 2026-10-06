@@ -17,6 +17,18 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./audits/name": {
+      "types": "./dist/utils/audit-name/audit-name.d.ts",
+      "development": "./dist/utils/audit-name/audit-name.js",
+      "helix-development": "./dist/utils/audit-name/audit-name.js",
+      "default": "./dist/utils/audit-name/audit-name-off.js"
+    },
+    "./audits/source": {
+      "types": "./dist/utils/audit-source/audit-source.d.ts",
+      "development": "./dist/utils/audit-source/audit-source.js",
+      "helix-development": "./dist/utils/audit-source/audit-source.js",
+      "default": "./dist/utils/audit-source/audit-source-off.js"
+    },
     "./custom-elements.json": "./custom-elements.json"
   },
   "files": [
@@ -27,8 +39,8 @@
   "sideEffects": false,
   "scripts": {
     "analyze": "bun --bun helix-cem",
-    "build": "tsc -p tsconfig.build.json && tsc -p tsconfig.types.json",
-    "test": "bun test src --conditions helix-source --conditions helix-development",
+    "build": "tsc -p tsconfig.build.json && tsc -p tsconfig.types.json && bun scripts/development-imports.mjs",
+    "test": "bun test src --conditions helix-development",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "bugs": "https://github.com/project-fusion/fusion/issues",
@@ -45,26 +57,14 @@
   "homepage": "https://fusion.dev",
   "imports": {
     "#audit-name": {
-      "helix-source": {
-        "development": "./src/utils/audit-name/audit-name.ts",
-        "helix-development": "./src/utils/audit-name/audit-name.ts",
-        "default": "./src/utils/audit-name/audit-name-off.ts"
-      },
-      "types": "./dist/utils/audit-name/audit-name.d.ts",
-      "development": "./dist/utils/audit-name/audit-name.js",
-      "helix-development": "./dist/utils/audit-name/audit-name.js",
-      "default": "./dist/utils/audit-name/audit-name-off.js"
+      "development": "./src/utils/audit-name/audit-name.ts",
+      "helix-development": "./src/utils/audit-name/audit-name.ts",
+      "default": "./src/utils/audit-name/audit-name-off.ts"
     },
     "#audit-source": {
-      "helix-source": {
-        "development": "./src/utils/audit-source/audit-source.ts",
-        "helix-development": "./src/utils/audit-source/audit-source.ts",
-        "default": "./src/utils/audit-source/audit-source-off.ts"
-      },
-      "types": "./dist/utils/audit-source/audit-source.d.ts",
-      "development": "./dist/utils/audit-source/audit-source.js",
-      "helix-development": "./dist/utils/audit-source/audit-source.js",
-      "default": "./dist/utils/audit-source/audit-source-off.js"
+      "development": "./src/utils/audit-source/audit-source.ts",
+      "helix-development": "./src/utils/audit-source/audit-source.ts",
+      "default": "./src/utils/audit-source/audit-source-off.ts"
     }
   },
   "keywords": [
