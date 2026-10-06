@@ -1,0 +1,8 @@
+/* A conversation has to be given a height and a ground by whatever holds it,
+   which is the page's job here. */
+.authors {
+  --chat-max-block-size: 18rem;
+  background-color: var(--helix-color-surface);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-lg);
+}

@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, idle, registerDom } from '@fusion.dev/helix-testing/dom'
 import choosing from '../.examples/choosing.html' with { type: 'text' }
+import grid from '../.examples/grid.html' with { type: 'text' }
 import loadingMore from '../.examples/loading-more.html' with { type: 'text' }
 import preview from '../.examples/preview.html' with { type: 'text' }
 
@@ -59,4 +60,29 @@ describe('the choosing example', () => {
     await press('ArrowDown', { shiftKey: true })
     expect(list.value).toBe('p1,p2,p3,p4')
   })
+})
+
+describe('the grid example', () => {
+  run(
+    'draws four cells to a line, and the arrow keys move along a line and down a column',
+    async () => {
+      await example(grid)
+      await idle()
+      const list = document.getElementById('swatches') as HTMLElement
+      const cell = (at: number) => list.querySelector(`[data-index="${at}"]`) as HTMLElement
+      const top = (at: number) => Math.round(cell(at).getBoundingClientRect().top)
+      expect(top(3)).toBe(top(0))
+      expect(top(4)).toBeGreaterThan(top(0))
+      cell(0).focus()
+      const press = async (key: string) => {
+        ;(document.activeElement as HTMLElement).dispatchEvent(
+          new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key }),
+        )
+        await idle()
+      }
+      await press('ArrowRight')
+      await press('ArrowDown')
+      expect((document.activeElement as HTMLElement).dataset.index).toBe('5')
+    },
+  )
 })
