@@ -49,5 +49,7 @@ describe('tooltip hooks', () => {
     expect(sheet).toContain('var(--tooltip-font-size, var(--helix-text-xs))')
     expect(sheet).toContain('var(--tooltip-padding, var(--helix-space-2xs) var(--helix-space-xs))')
     expect(sheet).toContain('var(--tooltip-radius, var(--helix-radii-sm))')
+    expect(sheet).toContain('var(--tooltip-gap, var(--helix-space-2xs))')
+    expect(sheet).toContain('var(--tooltip-border-color, var(--helix-color-border))')
   })
 })

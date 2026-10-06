@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -690,5 +690,29 @@ describe('the knobs on what shows it', () => {
     await second?.updateComplete
     expect(second?.open).toBe(false)
     second?.dispatchEvent(new Event('pointerleave'))
+  })
+})
+
+describe('entering and exiting', () => {
+  /* Polls until neither phase holds, rather than sleeping a fixed time. */
+  const settled = async (host: HTMLElement): Promise<void> => {
+    const until = Date.now() + 1500
+    do {
+      await new Promise((resolve) => setTimeout(resolve, 10))
+    } while ((hasState(host, 'entering') || hasState(host, 'exiting')) && Date.now() < until)
+  }
+
+  test('the bubble showing is entering until it settles, and one hiding is exiting', async () => {
+    const host = await tooltip()
+    host.show()
+    await host.updateComplete
+    expect(hasState(host, 'entering')).toBe(true)
+    await settled(host)
+    expect(hasState(host, 'entering')).toBe(false)
+    host.hide()
+    await host.updateComplete
+    expect(hasState(host, 'exiting')).toBe(true)
+    await settled(host)
+    expect(hasState(host, 'exiting')).toBe(false)
   })
 })

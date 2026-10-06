@@ -7,6 +7,7 @@ import {
   hostAria,
   linkDescription,
   MixinControllerOpen,
+  OpenPhaseController,
   onUnlessFalse,
   type Placement,
   PopoverController,
@@ -106,6 +107,8 @@ const warmth = (): Warmth => {
  * @csspart tooltip-right - Added to `tooltip` while the bubble is right of its trigger.
  * @csspart tooltip-top - Added to `tooltip` while the bubble is above its trigger.
  *
+ * @cssstate entering - From the moment the bubble shows until its entrance has finished.
+ * @cssstate exiting - From the moment the bubble hides until its exit has finished.
  * @cssstate open - While the tooltip shows.
  * @cssstate placed-bottom - While the bubble sits below its trigger.
  * @cssstate placed-left - While the bubble sits to the left of its trigger.
@@ -391,6 +394,17 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
   private get enclosure(): Element | null {
     return this.within === '' ? null : elementById(this, this.within)
   }
+
+  /* On its way in or out, for a sheet that draws the journey: `:state(open)`
+     turns at once, which is too early for an exit to know it is one. */
+  protected readonly phases = new OpenPhaseController(this, {
+    mark: {
+      entering: (on) => this.toggleState('entering', on),
+      exiting: (on) => this.toggleState('exiting', on),
+    },
+    open: () => this.open,
+    surface: () => this.partNamed('tooltip'),
+  })
 
   private get bubble(): HTMLElement | null {
     return this.partNamed('tooltip')

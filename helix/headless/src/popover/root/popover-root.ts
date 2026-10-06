@@ -9,6 +9,7 @@ import {
   HelixElement,
   headingIn,
   MixinControllerOpen,
+  OpenPhaseController,
   type Placement,
   PopoverController,
   reflectElements,
@@ -88,6 +89,8 @@ import { hideOutside } from '../hide-outside.js'
  * @csspart content - The scrolling region inside the panel.
  * @csspart popover - The panel.
  *
+ * @cssstate entering - From the moment the panel shows until its entrance has finished.
+ * @cssstate exiting - From the moment the panel hides until its exit has finished.
  * @cssstate open - While the popover is open.
  * @cssstate placed-bottom - While the panel sits below its trigger.
  * @cssstate placed-left - While the panel sits to the left of its trigger.
@@ -146,6 +149,17 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
    * popover API's own IDL attribute and a field of that name shadows it with
    * something of a different type. TypeScript objects; what it would have done
    * at runtime is break the API this is built on. */
+  /* On its way in or out, for a sheet that draws the journey: `:state(open)`
+     turns at once, which is too early for an exit to know it is one. */
+  protected readonly phases = new OpenPhaseController(this, {
+    mark: {
+      entering: (on) => this.toggleState('entering', on),
+      exiting: (on) => this.toggleState('exiting', on),
+    },
+    open: () => this.open,
+    surface: () => this.partNamed('popover'),
+  })
+
   private readonly panel = new PopoverController(this, {
     anchor: () => this.trigger,
     arrow: () => this.partNamed('arrow'),
