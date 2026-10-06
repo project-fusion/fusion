@@ -21,6 +21,8 @@ import { callListener } from '../call-listener/call-listener.js'
 
 /** What went wrong, stable across versions, so it can be counted. */
 export type RuntimeKind =
+  /** A Blockquote's `cite` holds words, where it takes the source's URL. */
+  | 'cite-not-url'
   /** A deprecated property, attribute or slot was used; the message names what replaces it. */
   | 'deprecated'
   /** Another class asked for a tag that is already registered: two copies of Helix. */

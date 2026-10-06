@@ -38,6 +38,10 @@ import { typedMarks } from '../../quote/marks.js'
  * passage. A passage under `marks` that starts with a mark typed into the text
  * would show two, and warns once, with the runtime kind `typed-marks`.
  *
+ * **`cite` is the source's URL**, which the browser keeps and does not show.
+ * Words in it, such as the author's name, warn once, with the runtime kind
+ * `cite-not-url`.
+ *
  * For a quotation inside a sentence, use `Quote`.
  *
  * @since 0.1.0
@@ -81,7 +85,9 @@ export class HelixHeadlessBlockquote extends HelixElement {
   attribution = ''
 
   /**
-   * The URL of the source the passage came from.
+   * The URL of the source the passage came from. Who said it goes in
+   * `attribution`: a `cite` with words in it warns once, with the runtime kind
+   * `cite-not-url`.
    */
   @property()
   cite = ''
@@ -95,6 +101,9 @@ export class HelixHeadlessBlockquote extends HelixElement {
 
   /** Whether this blockquote has said its passage starts with a typed mark, so it says so once. */
   private warned = false
+
+  /** Whether this blockquote has said its `cite` holds words, so it says so once. */
+  private citeWarned = false
 
   /**
    * Says on the caption whether there is an attribution in it.
@@ -155,6 +164,23 @@ export class HelixHeadlessBlockquote extends HelixElement {
     })
   }
 
+  /**
+   * Reads `cite` for words where the source's URL belongs, the common mistake
+   * of naming the author there. A URL holds no spaces, so words with a space
+   * between them are enough to tell.
+   */
+  private readCite(): void {
+    if (this.citeWarned || !/\S\s+\S/.test(this.cite || '')) {
+      return
+    }
+    this.citeWarned = true
+    reportRuntime({
+      kind: 'cite-not-url',
+      message: `<${this.localName} cite="${this.cite}"> holds words, and \`cite\` takes the URL of the source. Put who said it in \`attribution\`.`,
+      tag: this.localName,
+    })
+  }
+
   /* On the shadow root rather than in the template, so the served markup is
      the `<blockquote>` and its slot and nothing else. */
   protected override firstUpdated(changed: PropertyValues): void {
@@ -167,6 +193,9 @@ export class HelixHeadlessBlockquote extends HelixElement {
     this.markEmpty()
     if (changed.has('marks')) {
       this.readPassage()
+    }
+    if (changed.has('cite')) {
+      this.readCite()
     }
   }
 
