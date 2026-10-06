@@ -10,7 +10,7 @@ import {
   parse,
   sort,
   window_,
-} from './order.js'
+} from './row-order.js'
 
 /**
  * The pass, and mostly the one bug it exists to prevent.

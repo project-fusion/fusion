@@ -1,10 +1,16 @@
 import {
+  type Arranged,
+  type Axis,
+  arranged,
   commaList,
   countLabel,
   customElement,
+  cycle,
+  type DataRow,
   deepActiveElement,
   deepContains,
   fillTemplate,
+  format,
   formatNumbers,
   HelixActivateEvent,
   type HelixBeforeToggleEvent,
@@ -25,6 +31,8 @@ import {
   isRtl,
   MixinCollection,
   markRegion,
+  ordered,
+  parse,
   rangeAdd,
   reportRuntime,
   requestChange,
@@ -33,6 +41,8 @@ import {
   treeArrow,
   typesCharacter,
   VirtualizeController,
+  valueAt,
+  window_,
   writtenList,
 } from '@fusion.dev/helix-core'
 import { caretDown, caretRight } from '@fusion.dev/helix-icons'
@@ -46,22 +56,11 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
    text, which renders an element called `lit$…$` that lays out as nothing.
    Measured: the styled spec read `localName` as `lit$640177303$`. */
 import { html } from 'lit/static-html.js'
-import { at, edgeOf, type HelixHeadlessTableColumn } from '../../table/column/table-column.js'
+import { edgeOf, type HelixHeadlessTableColumn } from '../../table/column/table-column.js'
 import '../../checkbox/index.js'
 import '../../pagination/index.js'
 import { anchorAt, inRowOrder, toggledOpen } from '../keys.js'
 import { type Grown, grow } from '../tree.js'
-import {
-  type Arranged,
-  type Axis,
-  arranged,
-  cycle,
-  type DataRow,
-  format,
-  ordered,
-  parse,
-  window_,
-} from './order.js'
 
 /** What makes an element a control the grid moves focus into, whatever its tab index. */
 const CONTROL = [
@@ -957,7 +956,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     if (!this.rowKey) {
       return String(index)
     }
-    const value = at(row, this.rowKey)
+    const value = valueAt(row, this.rowKey)
     return value === undefined || value === null ? String(index) : String(value)
   }
 
@@ -1323,7 +1322,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    */
   private keyOf(row: DataRow, place: number): string {
     if (this.rowKey) {
-      const value = at(row, this.rowKey)
+      const value = valueAt(row, this.rowKey)
       return value === undefined || value === null ? String(place) : String(value)
     }
     if (this.selectable && !this.warnedAboutKey && typeof window !== 'undefined') {
@@ -1501,7 +1500,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       return /[",\r\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text
     }
     const head = columns.map((column) => quote(column.textContent?.trim() || column.field))
-    const body = rows.map((row) => columns.map((column) => quote(at(row, column.field))))
+    const body = rows.map((row) => columns.map((column) => quote(valueAt(row, column.field))))
     return [head, ...body].map((line) => line.join(',')).join('\r\n')
   }
 
