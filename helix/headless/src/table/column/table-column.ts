@@ -10,7 +10,7 @@ import {
   requestChange,
   valueAt,
 } from '@fusion.dev/helix-core'
-import { dotsThreeVertical } from '@fusion.dev/helix-icons'
+import { dotsSixVertical } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type ReactiveElement, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
@@ -611,8 +611,8 @@ export class HelixHeadlessTableColumn extends HelixElement {
     >${
       this.movable
         ? html`<button part="grip" type="button" tabindex=${control} aria-label=${fillTemplate(this.moveLabel, { name: name || 'column' })}>
-            <svg aria-hidden="true" fill="currentColor" part="grip-mark" viewBox=${dotsThreeVertical.viewBox}>
-              ${unsafeSVG(dotsThreeVertical.content)}
+            <svg aria-hidden="true" fill="currentColor" part="grip-mark" viewBox=${dotsSixVertical.viewBox}>
+              ${unsafeSVG(dotsSixVertical.content)}
             </svg>
           </button>`
         : nothing

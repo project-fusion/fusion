@@ -57,7 +57,7 @@ import {
   window_,
   writtenList,
 } from '@fusion.dev/helix-core'
-import { caretDown, caretRight, dotsThreeVertical } from '@fusion.dev/helix-icons'
+import { caretDown, caretRight, dotsSixVertical } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { repeat } from 'lit/directives/repeat.js'
@@ -2311,7 +2311,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         tabindex="-1"
         aria-label=${fillTemplate(this.moveRowLabel, { row: name })}
         aria-disabled=${still ? 'true' : nothing}
-      ><svg aria-hidden="true" fill="currentColor" part="row-grip-mark" viewBox=${dotsThreeVertical.viewBox}>${unsafeSVG(dotsThreeVertical.content)}</svg></button
+      ><svg aria-hidden="true" fill="currentColor" part="row-grip-mark" viewBox=${dotsSixVertical.viewBox}>${unsafeSVG(dotsSixVertical.content)}</svg></button
     ></span>`
   }
 
