@@ -141,4 +141,15 @@ describe('servePreview', () => {
       console.info = original
     }
   })
+
+  test('marks an error the example did not catch, so the preview can say it failed', () => {
+    serve()
+    window.dispatchEvent(new ErrorEvent('error', { message: 'Boom' }))
+    expect(posted.at(-1)).toEqual({
+      level: 'error',
+      text: 'Boom',
+      type: 'helix-preview-console',
+      uncaught: true,
+    })
+  })
 })

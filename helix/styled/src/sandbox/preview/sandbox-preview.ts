@@ -40,6 +40,8 @@ export interface PreviewConsole {
   level: 'log' | 'info' | 'warn' | 'error'
   text: string
   type: 'helix-preview-console'
+  /** Set for an error the example threw and did not catch, which marks the preview `failed`. */
+  uncaught?: boolean
 }
 
 /**
@@ -87,10 +89,12 @@ export type PreviewMessage =
  * let a document on the same origin remove its own sandbox, which is the same
  * as having none.
  *
- * **A preview says when it is loading.** It is `:state(loading)` from the
- * moment it has a `src` until that document can take the example, and again
- * through `reload()`, so a page can draw its own spinner, such as a sibling
- * shown by `helix-sandbox-preview:state(loading) + .spinner`.
+ * **A preview says where it is.** It is `:state(loading)` from the moment it
+ * has a `src` until that document can take the example, and again through
+ * `reload()`. It is `:state(failed)` once the example throws an error it does
+ * not catch, until the next source is sent, which a frame on `servePreview`
+ * reports. A page draws its own spinner or message from either, such as a
+ * sibling shown by `helix-sandbox-preview:state(failed) + .message`.
  *
  * @since 0.1.0
  * @status stable
@@ -102,6 +106,7 @@ export type PreviewMessage =
  *
  * @csspart frame - The iframe.
  *
+ * @cssstate failed - Since the example threw an error it did not catch, until the next source is sent.
  * @cssstate loading - While the frame's document loads, until it can take the example.
  */
 @customElement('helix-sandbox-preview')
@@ -241,6 +246,9 @@ export class HelixSandboxPreview extends HelixElement {
     }
     if (event.data?.type === 'helix-preview-console') {
       this.dispatchEvent(new HelixConsoleEvent({ level: event.data.level, text: event.data.text }))
+      if (event.data.uncaught) {
+        this.toggleState('failed', true)
+      }
     }
     /* **A press in the frame, put back into the page as a press.**
      *
@@ -300,7 +308,11 @@ export class HelixSandboxPreview extends HelixElement {
    * short enough to read as immediate when the typing stops.
    */
   private scheduleSend(): void {
-    this.settle.start(SETTLE, () => this.send())
+    this.settle.start(SETTLE, () => {
+      // A new example has not failed yet.
+      this.toggleState('failed', false)
+      this.send()
+    })
   }
 
   /** Sends the current source to the frame, once it is listening. */
@@ -352,9 +364,10 @@ export class HelixSandboxPreview extends HelixElement {
     frame.src = this.src
   }
 
-  /** A new document is on its way, so nothing is sent until it listens. */
+  /** A new document is on its way, so nothing is sent until it listens, and nothing has failed in it. */
   private unready(): void {
     this.ready = false
+    this.toggleState('failed', false)
     this.toggleState('loading', this.src !== '')
   }
 

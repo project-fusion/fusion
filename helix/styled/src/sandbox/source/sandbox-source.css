@@ -74,27 +74,27 @@
 
 /* The syntax tokens the editor uses, so a highlighter's kinds read the same
    colors in both, each behind a hook of its own. */
-[part="token"][data-kind="callable"] {
+[data-kind="callable"] {
   color: var(--sandbox-source-callable-color, var(--helix-color-syntax-callable));
 }
-[part="token"][data-kind="comment"] {
+[data-kind="comment"] {
   color: var(--sandbox-source-comment-color, var(--helix-color-syntax-comment));
 }
-[part="token"][data-kind="constant"] {
+[data-kind="constant"] {
   color: var(--sandbox-source-constant-color, var(--helix-color-syntax-constant));
 }
-[part="token"][data-kind="invalid"] {
+[data-kind="invalid"] {
   color: var(--sandbox-source-invalid-color, var(--helix-color-syntax-invalid));
 }
-[part="token"][data-kind="keyword"] {
+[data-kind="keyword"] {
   color: var(--sandbox-source-keyword-color, var(--helix-color-syntax-keyword));
 }
-[part="token"][data-kind="name"] {
+[data-kind="name"] {
   color: var(--sandbox-source-name-color, var(--helix-color-syntax-name));
 }
-[part="token"][data-kind="string"] {
+[data-kind="string"] {
   color: var(--sandbox-source-string-color, var(--helix-color-syntax-string));
 }
-[part="token"][data-kind="tag"] {
+[data-kind="tag"] {
   color: var(--sandbox-source-tag-color, var(--helix-color-syntax-tag));
 }

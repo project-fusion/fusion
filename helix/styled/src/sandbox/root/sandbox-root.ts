@@ -454,9 +454,7 @@ export class HelixSandbox extends HelixElement {
   }
 
   /**
-   * Asks for a divider to settle here, and moves it unless refused: the
-   * panes' divider as `split`, a share, and the panel's as `panelSize`, in
-   * pixels, each with a `before` event and an `after` one of its own.
+   * Asks for the panes' divider to settle here, and moves it unless refused.
    *
    * When it settles, not while it moves. A drag is a stream of positions and
    * only the one it ends at is a preference; announcing each would ask whoever
@@ -483,23 +481,34 @@ export class HelixSandbox extends HelixElement {
    * moved.** Both dividers are this element's, so `composedPath()[0]` is the same
    * host for either and the event name is the only thing that can separate them.
    */
-  private request(
-    key: 'panelSize' | 'split',
-    next: number,
-    before: new (detail: { value: string }) => Event,
-    after: new (detail: { value: string }) => Event,
-  ): void {
-    const was = this[key]
+  private requestSplit(next: number): void {
+    const was = this.split
     const accepted = requestChange({
-      apply: (value: number) => {
-        this[key] = value
+      apply: (value) => {
+        this.split = value
       },
-      event: (value) => new before({ value: String(value) }),
+      event: (value) => new HelixBeforeSplitEvent({ value: String(value) }),
       host: this,
       next,
     })
-    if (accepted && this[key] !== was) {
-      this.dispatchEvent(new after({ value: String(this[key]) }))
+    if (accepted && this.split !== was) {
+      this.dispatchEvent(new HelixSplitEvent({ value: String(this.split) }))
+    }
+  }
+
+  /** As `requestSplit`, for the panel, whose value is pixels rather than a share. */
+  private requestPanelSize(next: number): void {
+    const was = this.panelSize
+    const accepted = requestChange({
+      apply: (value) => {
+        this.panelSize = value
+      },
+      event: (value) => new HelixBeforePanelResizeEvent({ value: String(value) }),
+      host: this,
+      next,
+    })
+    if (accepted && this.panelSize !== was) {
+      this.dispatchEvent(new HelixPanelResizeEvent({ value: String(this.panelSize) }))
     }
   }
 
@@ -551,7 +560,7 @@ export class HelixSandbox extends HelixElement {
     if (value === undefined) {
       return
     }
-    this.request('split', Number(value), HelixBeforeSplitEvent, HelixSplitEvent)
+    this.requestSplit(Number(value))
     this.answer(event.currentTarget, this.split)
   }
 
@@ -566,11 +575,8 @@ export class HelixSandbox extends HelixElement {
          panel is the rest of it, and `panelFloor` is where the rest of it stops:
          a drag past the end asks for a panel of nothing and gets the sliver
          `panel-collapsed-size` says to leave showing. */
-      this.request(
-        'panelSize',
+      this.requestPanelSize(
         Math.max(this.panelFloor, ((100 - Number(value)) / 100) * this.bodyHeight),
-        HelixBeforePanelResizeEvent,
-        HelixPanelResizeEvent,
       )
     }
     this.answer(event.currentTarget, this.panelPosition)
