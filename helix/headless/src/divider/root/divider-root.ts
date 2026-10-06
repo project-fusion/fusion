@@ -11,8 +11,12 @@ import { property } from 'lit/decorators.js'
  * rendered element. The semantics are then in the server-rendered markup, with
  * no attribute written by script after the element connects.
  *
- * Set `announced` for a line that divides one thing from another, and it is
- * read as a separator, named by any content set into it.
+ * **The line is a separator**, as `<hr>` is, and as Radix Separator, React
+ * Aria Separator, and Web Awesome's divider are. It is named by any content
+ * set into it, so a screen reader says "Or, separator" where you wrote "Or" on
+ * the line. Set `decorative` on a rule that separates nothing, such as one
+ * under a heading or between the facts of a byline, and it leaves the
+ * accessibility tree.
  *
  * Use `orientation="vertical"` between items on one line, such as inside a
  * toolbar. A vertical divider stretches to fit its flex parent and sets no
@@ -32,21 +36,26 @@ import { property } from 'lit/decorators.js'
 @customElement('helix-headless-divider')
 export class HelixHeadlessDivider extends HelixElement {
   /**
-   * Whether screen readers announce the line as a separator.
+   * Whether screen readers announce the line as a separator, which they now do
+   * by default.
    *
-   * Off by default, and out of the accessibility tree. Most rules on a page
-   * separate nothing: they underline a heading or close a section that space
-   * had already closed, and announcing every one as a separator is noise a
-   * screen-reader user has to walk past.
-   *
-   * An opt-in, not a `decorative` opt-out, because a boolean attribute cannot
-   * be turned off: `decorative="false"` parses as `true`, which would put the
-   * quiet default out of reach from HTML and leave it settable only as a
-   * property. An opt-in is absent by default, which every reflected property
-   * here has to be.
+   * It dates from when the line was decorative by default. It is still read,
+   * and it wins over `decorative`, so a divider written with it stays a
+   * separator.
    */
   @property({ reflect: true, type: Boolean })
   announced = false
+
+  /**
+   * Takes the line out of the accessibility tree, for a rule that separates
+   * nothing: one under a heading, or between the facts of a byline.
+   *
+   * Absent, the line is a separator, as `<hr>` is. Radix Separator's opt-out
+   * has the same name. It turns the role off because a boolean attribute that
+   * is on by default cannot be turned off from HTML.
+   */
+  @property({ reflect: true, type: Boolean })
+  decorative = false
 
   /**
    * The direction the line runs: `horizontal` or `vertical`.
@@ -82,9 +91,9 @@ export class HelixHeadlessDivider extends HelixElement {
   protected override render(): TemplateResult {
     /* Two rules and a slot between them, always.
      *
-     * `role="presentation"` is the honest default; `announced` is for the rule
-     * that genuinely divides one thing from another rather than just drawing a
-     * line under it.
+     * A separator unless `decorative` says the rule only draws a line, as
+     * `<hr>` is; `announced`, from when the default was the other way, keeps
+     * a page's separator a separator whatever else it says.
      *
      * **Both halves are always rendered and the semantics stay on the first.**
      * A rule with nothing set into it is one line with a zero-width slot and a
@@ -96,15 +105,16 @@ export class HelixHeadlessDivider extends HelixElement {
      * The role is not repeated on the second half. Two separators where a reader
      * crossed one line is the announcement saying twice what happened once, and
      * the content between them is not a boundary of its own. */
-    /* **An announced line is named by what is set into it**, so a reader
+    /* **A separator is named by what is set into it**, so a reader
        hears "Or, separator" where the page wrote "Or" on the line. By id, in
        one shadow root, which reads the slotted words where a name taken from
        the line's own content would not; an empty content names nothing. */
+    const separator = this.announced || !this.decorative
     return html`<div
       part="line"
-      role=${this.announced ? 'separator' : 'presentation'}
-      aria-labelledby=${this.announced ? 'content' : nothing}
-      aria-orientation=${this.announced ? (this.orientation ?? 'horizontal') : nothing}
+      role=${separator ? 'separator' : 'presentation'}
+      aria-labelledby=${separator ? 'content' : nothing}
+      aria-orientation=${separator ? (this.orientation ?? 'horizontal') : nothing}
     ></div>
       <span id="content" part="content"><slot @slotchange=${() => this.markEmpty()}></slot></span>
       <div part="line" role="presentation"></div>`

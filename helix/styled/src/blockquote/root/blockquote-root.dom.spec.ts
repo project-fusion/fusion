@@ -44,7 +44,7 @@ describe('blockquote', () => {
 
   test('an attribution nobody wrote takes no room, and one that was keeps its caption', async () => {
     /* The base tier marks the caption empty; this sheet is what takes the box
-       out, since a `<figcaption>` with nothing in it is still a gap under the quote.
+       out, since a caption with nothing in it is still a gap under the quote.
        Both halves are needed for the gap to close. */
     const bare = await mount('<helix-blockquote>Said so.</helix-blockquote>')
     expect(part(bare, 'attribution')?.hasAttribute('data-empty')).toBe(true)

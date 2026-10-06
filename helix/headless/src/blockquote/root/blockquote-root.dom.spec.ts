@@ -17,7 +17,6 @@ describe('blockquote', () => {
     const blockquote = part(quote, 'blockquote')
     const attribution = part(quote, 'attribution')
     expect(blockquote?.tagName).toBe('BLOCKQUOTE')
-    expect(attribution?.tagName).toBe('FIGCAPTION')
     expect(attribution?.parentElement).toBe(part(quote, 'figure') as HTMLElement)
     expect(blockquote?.contains(attribution as Node)).toBe(false)
     expect(slotted(quote, 'attribution')[0]?.textContent).toBe('A')
@@ -49,6 +48,16 @@ describe('blockquote', () => {
     quote.append(late)
     await new Promise((done) => setTimeout(done, 0))
     expect((part(quote, 'attribution') as HTMLElement | null)?.hidden).toBe(false)
+  })
+
+  /* A `<figure>` took a 40px indent and a line above and below from the
+     browser's sheet, on a tier that ships no sheet to take them away. */
+  test('the figure is a role on an element the browser draws no margins on', async () => {
+    const quote = await mount('<helix-headless-blockquote>x</helix-headless-blockquote>')
+    const figure = part(quote, 'figure')
+    expect(figure?.tagName).toBe('DIV')
+    expect(figure?.getAttribute('role')).toBe('figure')
+    expect(part(quote, 'attribution')?.tagName).toBe('DIV')
   })
 
   test('a source is carried through to cite', async () => {
