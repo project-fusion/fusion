@@ -1,0 +1,15 @@
+<!-- @summary The three effects: the sweep at rest, `pulse` for a dense list, and `none` for a placeholder that sits still. -->
+<helix-flex
+  direction="column"
+  gap="sm"
+>
+  <helix-skeleton shape="text"></helix-skeleton>
+  <helix-skeleton
+    effect="pulse"
+    shape="text"
+  ></helix-skeleton>
+  <helix-skeleton
+    effect="none"
+    shape="text"
+  ></helix-skeleton>
+</helix-flex>
