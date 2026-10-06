@@ -132,6 +132,20 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
   filterable = false
 
   /**
+   * Whether the trigger holds its group's tab stop.
+   *
+   * A toolbar keeps one tab stop across its controls, and writing `tabindex`
+   * onto this element would change markup the consumer rendered, which a React
+   * consumer's hydration reports. A toolbar sets this property instead, and
+   * the stop moves on the trigger inside the shadow root, as Button's does.
+   *
+   * No attribute, because it is coordination between elements rather than
+   * anything a consumer sets.
+   */
+  @property({ attribute: false })
+  focusable = true
+
+  /**
    * The open list's name where nothing names the Select, read by screen
    * readers. The list has no visible name.
    *
@@ -472,6 +486,11 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
     this.requestOpen(true)
   }
 
+  /** Puts focus on the trigger, which is what a toolbar moving its stop here asks. */
+  override focus(options?: FocusOptions): void {
+    this.partNamed('trigger')?.focus(options)
+  }
+
   /** Closes the list and puts focus back where it came from. */
   private close(): void {
     if (!this.open) {
@@ -782,6 +801,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
         aria-expanded=${this.open ? 'true' : 'false'}
         aria-describedby=${this.describedBy ?? nothing}
         aria-invalid=${this.invalidity ?? nothing}
+        tabindex=${this.focusable ? nothing : '-1'}
         ?disabled=${this.isDisabled}
         @click=${() => this.toggleOpen()}
         @keydown=${this.handleTriggerKeydown}

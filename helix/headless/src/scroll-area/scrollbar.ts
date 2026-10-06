@@ -1,5 +1,5 @@
 import { clamp } from '@fusion.dev/helix-core'
-/**
+/*
  * The arithmetic behind the scrollbars a scroll area draws under `scrollbars`.
  *
  * Every length here is along one axis and counted from that axis' start, which
