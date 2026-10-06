@@ -45,6 +45,7 @@ corners-out
 cortex
 cube
 dots-nine
+dots-six-vertical
 dots-three
 dots-three-vertical
 download

@@ -1,6 +1,6 @@
 # @fusion.dev/helix-icons
 
-The Helix icon set: 125 marks, 120 resolved from
+The Helix icon set: 126 marks, 121 resolved from
 [Phosphor](https://phosphoricons.com) at build time and 5 of our own.
 
 ```sh

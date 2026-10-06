@@ -5,7 +5,7 @@ import {
   HelixSelectEvent,
   MixinControllerOpen,
 } from '@fusion.dev/helix-core'
-import { caretDown, check, dotsThreeVertical, minus } from '@fusion.dev/helix-icons'
+import { caretDown, check, dotsSixVertical, minus } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
@@ -460,8 +460,8 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
       <slot name="end"></slot>${
         this.grip && !this.disabled
           ? html`<span part="grip" aria-hidden="true"
-              ><svg part="grip-mark" fill="currentColor" viewBox=${dotsThreeVertical.viewBox}>
-                ${unsafeSVG(dotsThreeVertical.content)}
+              ><svg part="grip-mark" fill="currentColor" viewBox=${dotsSixVertical.viewBox}>
+                ${unsafeSVG(dotsSixVertical.content)}
               </svg></span
             >`
           : nothing
