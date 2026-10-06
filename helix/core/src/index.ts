@@ -424,6 +424,7 @@ export {
 } from './utils/element-by-id/element-by-id.js'
 export { exportParts } from './utils/export-parts/export-parts.js'
 export { fillTemplate, labelWith } from './utils/fill-template/fill-template.js'
+export { FILTER_MARK, markMatches, rangeOf } from './utils/filter-marks/filter-marks.js'
 export { focusTarget } from './utils/focus-target/focus-target.js'
 export {
   deepActiveElement,

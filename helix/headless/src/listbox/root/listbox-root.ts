@@ -15,6 +15,7 @@ import {
   MixinCollection,
   MixinControllerValue,
   MixinField,
+  markMatches,
   onApple,
   pageRows,
   rangeAdd,
@@ -46,86 +47,6 @@ const MOVES = new Set([...FIELD_MOVES, 'End', 'Home'])
 
 /** How many rows a page key moves where the list has no height to measure. */
 const PAGE = 10
-
-/**
- * The ranges each filtering list has matched, so the union can be rebuilt when
- * any one of them changes.
- *
- * `CSS.highlights` is one registry for the whole document, keyed by name, so a
- * second list writing under the same name would erase the first one's marks.
- * Keyed by element and rebuilt from every entry, two filtered lists on a page
- * both stay marked. A `Map` rather than a `WeakMap` because the union has to be
- * walked and a `WeakMap` cannot be, which is why a list takes itself out on
- * disconnect.
- */
-const matched = new Map<Element, Range[]>()
-
-/** What the marks are called in `CSS.highlights`, and in `preview.css`. */
-const HIGHLIGHT = 'helix-filter-match'
-
-/*
- * Marks what the filter matched, without touching what it matched it in.
- *
- * The words are the consumer's own light DOM, slotted through as many as two
- * shadow roots, and wrapping the matched part in a `<mark>` would mean this
- * element rewriting their content: markup they wrote would come back changed.
- * The Custom Highlight API paints a range instead. Nothing is inserted and
- * nothing is removed, so an option holding a link or an icon is marked as
- * readily as one holding a bare word.
- *
- * The rule that paints it lives in `preview.css` rather than in a component's
- * styles, which is not a choice either: a highlight is styled from the tree its
- * text lives in, and that text lives in the consumer's document.
- */
-/**
- * Whether this environment can paint a highlight at all.
- *
- * Asked before the ranges are built rather than after: a server, a test
- * environment and an older browser all take that path, and walking every shown
- * option's text nodes for an API that is not there is work with no output.
- */
-const paintable = (): boolean => globalThis.CSS?.highlights !== undefined
-
-const paintMatches = (): void => {
-  if (!paintable()) {
-    return
-  }
-  const all = [...matched.values()].flat()
-  if (all.length === 0) {
-    CSS.highlights.delete(HIGHLIGHT)
-    return
-  }
-  CSS.highlights.set(HIGHLIGHT, new Highlight(...all))
-}
-
-/**
- * Where a needle sits inside an element, as a range over its text nodes.
- *
- * Walked rather than measured off `textContent`, because the words may be split
- * across several nodes and wrapped in elements of the consumer's, and a match
- * can begin in one node and end in another. The offsets are mapped back onto
- * the nodes they came from, so the range covers the real text either way.
- */
-const rangeFor = (root: Element, needle: string): Range[] => {
-  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT)
-  const nodes: [Node, number][] = []
-  let whole = ''
-  for (let node = walker.nextNode(); node !== null; node = walker.nextNode()) {
-    nodes.push([node, whole.length])
-    whole += node.nodeValue
-  }
-  const at = whole.toLowerCase().indexOf(needle)
-  if (at < 0) {
-    return []
-  }
-  const range = new Range()
-  const [start, before] = nodes.findLast(([, from]) => from <= at) as [Node, number]
-  range.setStart(start, at - before)
-  const end = at + needle.length
-  const [last, under] = nodes.findLast(([, from]) => from < end) as [Node, number]
-  range.setEnd(last, end - under)
-  return [range]
-}
 
 /**
  * @summary A list of options, from which you choose one or several.
@@ -971,18 +892,6 @@ export class HelixHeadlessListbox extends MixinCollection(
       option.active = option.value === this.activeValue
     }
 
-    /* And the marks, from the same needle that did the hiding: the two answers
-       have to come from one place or a list can show a match it does not mark. */
-    if (needle === '' || !paintable()) {
-      matched.delete(this)
-    } else {
-      matched.set(
-        this,
-        shown.flatMap((option) => rangeFor(option, needle)),
-      )
-    }
-    paintMatches()
-
     this.hasMatches = shown.length > 0
     this.counted = true
   }
@@ -1060,8 +969,7 @@ export class HelixHeadlessListbox extends MixinCollection(
     /* Its marks go with it. The registry is the document's and outlives this
        element, so a list removed while filtered would leave ranges over text
        that is no longer on the page. */
-    matched.delete(this)
-    paintMatches()
+    markMatches(this, [], '')
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -1181,6 +1089,14 @@ export class HelixHeadlessListbox extends MixinCollection(
     this.followActive()
     this.sync()
     this.linkActive()
+    /* And the marks, from the same needle that did the hiding, on the options
+       it left showing: the two answers have to come from one place or a list
+       can show a match it does not mark. See core's `markMatches`. */
+    markMatches(
+      this,
+      this.options.filter((option) => !option.hidden),
+      this.filter.trim(),
+    )
   }
 
   /**
