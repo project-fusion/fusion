@@ -1,9 +1,12 @@
-import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
+import { customElement, followLink, HelixElement, hostAria } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type ReactiveElement, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 /* `static-html`'s `html`, because the checkbox's tag is interpolated. */
 import { html } from 'lit/static-html.js'
 import '../../checkbox/index.js'
+
+/** What inside a row takes a press of its own, so the row's link does not. */
+const PRESSABLE = 'a[href], button, input, label, select, summary, textarea, [tabindex]'
 
 /**
  * @summary One row of a table.
@@ -16,6 +19,13 @@ import '../../checkbox/index.js'
  *
  * In a `selectable` table the row draws a checkbox cell before its own cells,
  * and `value` is the key the table's `selected` lists it by.
+ *
+ * **`href` makes the whole row a link**, as a row action does in React Aria's
+ * table: a press anywhere on the row follows it, except on a link or a control
+ * of the row's own, and Control, Command or Shift open it the way they open a
+ * link. A drag that selects text follows nothing. A row in a table is not a
+ * stop of its own, so put the same link in a cell, usually the row header,
+ * which is what the keyboard and a screen reader reach.
  *
  * @since 0.1.0
  * @status stable
@@ -38,6 +48,7 @@ import '../../checkbox/index.js'
  * @csspart select - The cell that holds the row's checkbox, in a `selectable` table.
  * @csspart select-selected - Added to `select` while the row is selected.
  *
+ * @cssstate link - While the row has `href`, so a press on it follows the link.
  * @cssstate selected - While the row is selected, in a `selectable` table.
  */
 @customElement('helix-headless-table-row')
@@ -47,6 +58,21 @@ export class HelixHeadlessTableRow extends HelixElement {
    * finds its columns. Not a consumer's to read or set.
    */
   readonly isTableRow = true
+
+  /**
+   * The URL a press on the row follows, which makes the whole row a link.
+   * Empty, the default, leaves presses to the row's cells.
+   */
+  @property()
+  href = ''
+
+  /** The `rel` of the row's link. You set it yourself, as on an anchor. */
+  @property()
+  rel = ''
+
+  /** Where the row's link opens, such as `_blank`. */
+  @property()
+  target = ''
 
   /**
    * The key the table's `selected` lists this row by. Left empty, the row is
@@ -103,6 +129,36 @@ export class HelixHeadlessTableRow extends HelixElement {
     // Set in `willUpdate`, which the server does call, unlike `connectedCallback`.
     hostAria(this.internals, { role: 'row' })
     this.toggleState('selected', this.selectable && this.selected)
+    this.toggleState('link', this.href !== '')
+  }
+
+  override connectedCallback(): void {
+    super.connectedCallback()
+    this.addEventListener('click', this.handleClick)
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    this.removeEventListener('click', this.handleClick)
+  }
+
+  /**
+   * A press on the row follows `href`, unless it landed on a link or control
+   * of the row's own, or ended a drag that selected text.
+   */
+  private readonly handleClick = (event: MouseEvent): void => {
+    if (this.href === '' || event.button !== 0 || event.defaultPrevented) {
+      return
+    }
+    const path = event.composedPath()
+    const inner = path.slice(0, Math.max(0, path.indexOf(this)))
+    if (inner.some((node) => node instanceof Element && node.matches(PRESSABLE))) {
+      return
+    }
+    if (globalThis.getSelection?.()?.toString()) {
+      return
+    }
+    followLink(this.ownerDocument, { href: this.href, rel: this.rel, target: this.target }, event)
   }
 
   /**

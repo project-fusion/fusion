@@ -1,5 +1,5 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
+import { hasState, mount, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -34,5 +34,52 @@ describe('one table row', () => {
     const host = await row()
     expect(host.shadowRoot?.querySelector('[role]')).toBeNull()
     expect(host.shadowRoot?.querySelector('slot')).not.toBeNull()
+  })
+})
+
+describe('a row with href', () => {
+  /* Each followed link is a click on an anchor the row adds for the moment,
+     heard here and stopped, so nothing navigates. */
+  const followed: string[] = []
+  const hear = (event: Event): void => {
+    const anchor = event.target
+    if (anchor instanceof HTMLAnchorElement && anchor.hidden) {
+      followed.push(anchor.getAttribute('href') ?? '')
+      event.preventDefault()
+    }
+  }
+  afterEach(() => {
+    document.removeEventListener('click', hear, true)
+    followed.length = 0
+  })
+
+  const linked = async (): Promise<HTMLElement & { updateComplete: Promise<unknown> }> => {
+    document.addEventListener('click', hear, true)
+    const host = (await mount(
+      '<helix-headless-table-row href="/runs/7"><helix-headless-table-cell>Run 7</helix-headless-table-cell><helix-headless-table-cell><button>Retry</button></helix-headless-table-cell></helix-headless-table-row>',
+    )) as HTMLElement & { updateComplete: Promise<unknown> }
+    await host.updateComplete
+    return host
+  }
+
+  test('follows its link from a press on any cell, and says it is a link', async () => {
+    const host = await linked()
+    expect(hasState(host, 'link')).toBe(true)
+    ;(host.querySelector('helix-headless-table-cell') as HTMLElement).click()
+    expect(followed).toEqual(['/runs/7'])
+  })
+
+  test('leaves a press on a control of its own to that control', async () => {
+    const host = await linked()
+    ;(host.querySelector('button') as HTMLElement).click()
+    expect(followed).toEqual([])
+  })
+
+  test('without href is no link, and a press follows nothing', async () => {
+    document.addEventListener('click', hear, true)
+    const host = await row()
+    host.click()
+    expect(hasState(host, 'link')).toBe(false)
+    expect(followed).toEqual([])
   })
 })
