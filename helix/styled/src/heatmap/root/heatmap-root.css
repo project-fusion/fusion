@@ -188,6 +188,13 @@
   outline-offset: calc(var(--helix-border-thin) * -1);
 }
 
+/* A selected cell, under `selection-mode`: an inset ring in the selection
+   color, so it reads over any tone and beside the active cell's outline. */
+[part~="cell-selected"] {
+  box-shadow: inset 0 0 0 var(--heatmap-selected-width, var(--helix-border-thick))
+    var(--heatmap-selected-color, var(--helix-color-primary));
+}
+
 /* The strip takes focus once it has cells to read, so it draws the ring:
    outside, the default situation. */
 [part="strip"]:focus-visible {
@@ -203,7 +210,8 @@
 /* The readout and the overview are for screen readers, and the bubble and
    the footer are what a sighted reader reads. */
 [part="live"],
-[part="overview"] {
+[part="overview"],
+[part="selection"] {
   block-size: 1px;
   clip-path: inset(50%);
   inline-size: 1px;

@@ -1,5 +1,4 @@
 import {
-  commaList,
   customElement,
   HelixBeforeChangeEvent,
   HelixElement,
@@ -13,7 +12,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
-import { isHidden, toggledNames } from '../hidden-series.js'
+import { isHidden, namesIn, toggledNames } from '../hidden-series.js'
 
 /**
  * @summary A list of the series in a chart, each name beside the color it is drawn in.
@@ -36,9 +35,10 @@ import { isHidden, toggledNames } from '../hidden-series.js'
  * **`toggles` makes each entry a button that hides its series.** Every chart
  * reading the same table draws without a hidden series and fits its scale to
  * the rest, and the series keeps its color. The button says whether its
- * series is shown with `aria-pressed`. The buttons are one tab stop: the
- * arrow keys move between them, Home and End go to the first and the last,
- * and a typed letter goes to the next name starting with it.
+ * series is shown with `aria-pressed`. The buttons are a `toolbar`, named
+ * as the list is, and one tab stop: the arrow keys move between them, Home
+ * and End go to the first and the last, and a typed letter goes to the next
+ * name starting with it.
  * `hidden-series` holds the hidden names,
  * so a page can start with some hidden or read which are. Two legends on one
  * table show the same hidden series: the list written last wins, and the
@@ -57,7 +57,7 @@ import { isHidden, toggledNames } from '../hidden-series.js'
  * `::part(entry)::before` in your stylesheet. The entry holds its series color
  * as `--chart-series`, and this tier ships no CSS.
  * @csspart entry-hidden - An entry whose series is hidden. Set alongside `entry`.
- * @csspart list - The list of entries.
+ * @csspart list - The list of entries, a `toolbar` under `toggles`.
  * @csspart name - One series name.
  * @csspart toggle - The button around a name under `toggles`, which hides or shows its series.
  */
@@ -104,10 +104,12 @@ export class HelixHeadlessLegend extends HelixElement {
    *
    * Set it to start with series hidden. Every chart reading the same table
    * draws without them. Commas only, because a column's heading may hold a
-   * space. For a ring the names are the rows.
+   * space. For a ring the names are the rows. An array of names set on the
+   * property works too, as React sets `hiddenSeries={['Direct']}`; a toggle
+   * writes the list back as a string.
    */
   @property({ attribute: 'hidden-series' })
-  hiddenSeries = ''
+  hiddenSeries: string | readonly string[] = ''
 
   /**
    * The name of the list, which a screen reader announces before its entries.
@@ -194,8 +196,9 @@ export class HelixHeadlessLegend extends HelixElement {
     const table = this.source.element
     const asked =
       changed.has('hiddenSeries') &&
-      !(changed.get('hiddenSeries') === undefined && this.hiddenSeries === '')
-    this.writes = asked || (table !== null && table !== this.wroteTo && this.hiddenSeries !== '')
+      !(changed.get('hiddenSeries') === undefined && namesIn(this.hiddenSeries).length === 0)
+    this.writes =
+      asked || (table !== null && table !== this.wroteTo && namesIn(this.hiddenSeries).length > 0)
     if (!this.writes && table !== null) {
       this.follow()
     }
@@ -210,7 +213,7 @@ export class HelixHeadlessLegend extends HelixElement {
    */
   private follow(): void {
     const hidden = this.source.hidden
-    const now = commaList(this.hiddenSeries)
+    const now = namesIn(this.hiddenSeries)
     const next = this.names().filter((name) => hidden.has(seriesKey(name)))
     const same =
       next.length === now.length &&
@@ -234,7 +237,7 @@ export class HelixHeadlessLegend extends HelixElement {
     super.updated(changed)
     if (this.writes) {
       this.writes = false
-      this.wroteTo = this.source.hide(commaList(this.hiddenSeries), this.names()) ?? this.wroteTo
+      this.wroteTo = this.source.hide(namesIn(this.hiddenSeries), this.names()) ?? this.wroteTo
     }
   }
 
@@ -300,19 +303,48 @@ export class HelixHeadlessLegend extends HelixElement {
     const named = this.label || this.source.element?.querySelector('caption')?.textContent?.trim()
     const names = this.names()
     const stop = Math.min(this.stop, names.length - 1)
-    return html`<ul aria-label=${named || nothing} part="list" role="list">
+    /* **Toggles are a toolbar**, the role that says the arrows move among
+       its buttons; a list of pressed buttons said nothing of the one tab
+       stop. Its items then carry no role of their own. */
+    const toolbar = this.toggles
+    return html`<ul
+      aria-label=${named || nothing}
+      part="list"
+      role=${toolbar ? 'toolbar' : 'list'}
+    >
       ${names.map((name, index) => {
         const off = isHidden(this.hiddenSeries, name)
         return html`<li
           data-series=${seriesIndex(index)}
           part="entry${off ? ' entry-hidden' : ''}"
           style="--chart-series: var(--chart-series-${seriesIndex(index)})"
-          role="listitem"
+          role=${toolbar ? 'none' : 'listitem'}
         >
-          ${this.toggles ? this.renderToggle(name, off, index, index === stop) : html`<span part="name">${name}</span>`}
+          ${this.renderSwatch(name, index)}${toolbar ? this.renderToggle(name, off, index, index === stop) : this.renderName(name, index)}
         </li>`
       })}
     </ul>`
+  }
+
+  /**
+   * What an entry shows before its name, behind a seam a tier can fill.
+   *
+   * Nothing on this tier, which ships no CSS: the styled tier and a page draw
+   * the swatch with `::part(entry)::before`, from the entry's `--chart-series`.
+   * A tier that draws its swatch as an element, or a mark per series, returns
+   * it here, and `index` says which palette slot the series takes.
+   */
+  protected renderSwatch(_name: string, _index: number): TemplateResult | typeof nothing {
+    return nothing
+  }
+
+  /**
+   * An entry's name, behind a seam a tier can move: a value beside the name,
+   * or the name in other words. `index` is the series' place among the
+   * entries. A toggle holds the same name inside its button.
+   */
+  protected renderName(name: string, _index: number): TemplateResult {
+    return html`<span part="name">${name}</span>`
   }
 
   /**
@@ -334,7 +366,7 @@ export class HelixHeadlessLegend extends HelixElement {
         this.stop = index
       }}
     >
-      <span part="name">${name}</span>
+      ${this.renderName(name, index)}
     </button>`
   }
 }

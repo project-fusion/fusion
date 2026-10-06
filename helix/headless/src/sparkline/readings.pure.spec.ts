@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { extremesOf, readingWords } from './readings.js'
+import { areaPath, extremesOf, overviewWords, readingWords, slotsOf } from './readings.js'
 
 describe('the highest and the lowest reading', () => {
   test('are found by place, the first where several tie', () => {
@@ -26,5 +26,65 @@ describe('a reading in words', () => {
 
   test('is the row alone where its cell is blank', () => {
     expect(readingWords('Tue', '', '2 of 7')).toBe('Tue (2 of 7)')
+  })
+})
+
+describe('the readings in their places', () => {
+  test('put each value at its place, with a blank where none was read', () => {
+    expect(
+      slotsOf(
+        [
+          { at: 0, value: 4 },
+          { at: 2, value: 6 },
+          { at: 9, value: 1 },
+        ],
+        3,
+      ),
+    ).toEqual([4, undefined, 6])
+  })
+})
+
+describe('the wash under the line', () => {
+  test('closes each run down to the floor', () => {
+    expect(
+      areaPath(
+        [
+          {
+            path: 'M0,4L10,2',
+            run: [
+              [0, 4],
+              [10, 2],
+            ],
+          },
+          {
+            path: 'M30,1L40,3',
+            run: [
+              [30, 1],
+              [40, 3],
+            ],
+          },
+        ],
+        32,
+      ),
+    ).toBe('M0,4L10,2L10,32L0,32ZM30,1L40,3L40,32L30,32Z')
+  })
+
+  test('is nothing without a run', () => {
+    expect(areaPath([], 32)).toBe('')
+  })
+})
+
+describe('what the readings come to', () => {
+  const words = (slots: (number | undefined)[]) =>
+    overviewWords('From {first} to {last}, highest {high}, lowest {low}', slots, (at) =>
+      String(slots[at]),
+    )
+
+  test('says the first, the last, the highest and the lowest reading', () => {
+    expect(words([undefined, 12, 30, 8, 20])).toBe('From 12 to 20, highest 30, lowest 8')
+  })
+
+  test('says nothing of a single reading', () => {
+    expect(words([undefined, 5, undefined])).toBe('')
   })
 })

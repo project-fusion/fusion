@@ -11,6 +11,7 @@ import {
   PLOT_HEIGHT,
   PLOT_WIDTH,
   seriesIndex,
+  seriesKey,
   ticks,
 } from '@fusion.dev/helix-core'
 import { html, nothing, svg, type TemplateResult } from 'lit'
@@ -43,6 +44,11 @@ const coefficientIn = (locale: string): Intl.NumberFormat => {
 export interface ScatterPoint {
   depth: number
   row: number
+  /**
+   * How large the point is drawn under `size`, from 0 to 1: the square root
+   * of its share of the largest size, so its area follows the measure.
+   */
+  weight?: number | undefined
   x: number
   y: number
 }
@@ -91,6 +97,11 @@ const nice = ([low, high]: [number, number]): [number, number] => {
  *
  * `trend` draws each series' line of best fit, by least squares, across the
  * plot in the series' color.
+ *
+ * **`size` names a third measure, drawn as each point's size**, as a bubble
+ * chart does: `size="Population"` takes that column out of the series and
+ * gives each point an area in proportion to its row's number there. The
+ * tooltip and the table still say the number.
  *
  * The summary gives each series' correlation coefficient and its number of
  * points. The table has every number, and the drawing is hidden from screen
@@ -151,6 +162,7 @@ const nice = ([low, high]: [number, number]): [number, number] => {
  * @csspart y-name - The name of the vertical measure.
  * @csspart y-tick - One labeled value on the vertical axis.
  *
+ * @cssproperty --chart-point-weight - How large a point is drawn under `size`, from 0 to 1, by area. The component writes it, and the stylesheet that sizes the point reads it.
  * @cssproperty --chart-point-x - A point's horizontal position, as a percentage. The component writes it.
  * @cssproperty --chart-point-y - A point's vertical position, as a percentage from the top. The component writes it.
  * @cssproperty --chart-tick - A tick's position along its axis, as a percentage. The component writes it.
@@ -179,6 +191,17 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
    */
   @property({ attribute: 'points-label' })
   pointsLabel = 'points'
+
+  /**
+   * The heading of a column whose numbers size the points, such as
+   * `Population`, which makes the chart a bubble chart.
+   *
+   * That column is then a measure and no series: it draws no points of its
+   * own, and each point's area follows its row's number in it. Absent, every
+   * point is one size.
+   */
+  @property()
+  size = ''
 
   /**
    * Draws each series' line of best fit across the plot, by least squares, in
@@ -232,8 +255,35 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
    * which is where a reader is told what it is.
    */
   override seriesOf(cell: number): number | undefined {
-    const depth = this.plottedColumns.indexOf(cell)
-    return depth < 1 ? undefined : seriesIndex(depth - 1)
+    const depth = this.measures.ups.indexOf(cell)
+    return depth < 0 ? undefined : seriesIndex(depth)
+  }
+
+  /**
+   * The numeric columns by what they measure: the first across, the column
+   * `size` names as the size, and every other one up, as a series.
+   */
+  protected get measures(): {
+    across: number | undefined
+    size: number | undefined
+    ups: number[]
+  } {
+    const rows = this.sourceRows
+    const key = seriesKey(this.size)
+    const size =
+      key === ''
+        ? undefined
+        : this.plottedColumns.find(
+            (column) =>
+              seriesKey(rows.find((row) => row.cells[column])?.cells[column]?.name ?? '') === key,
+          )
+    const [across, ...ups] = this.plottedColumns.filter((column) => column !== size)
+    return { across, size, ups }
+  }
+
+  /* The size column is a measure, so the up and down keys do not stop on it. */
+  override showsColumn(cell: number): boolean {
+    return cell !== this.measures.size && super.showsColumn(cell)
   }
 
   /** Whether the levels across are ruled. */
@@ -256,8 +306,7 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
    */
   protected get field(): ScatterField {
     const rows = this.sourceRows
-    const columns = this.plottedColumns
-    const [across, ...ups] = columns
+    const { across, size, ups } = this.measures
     const name = (column: number | undefined): string =>
       column === undefined ? '' : (rows.find((row) => row.cells[column])?.cells[column]?.name ?? '')
     const pairs = ups.map((column) =>
@@ -275,11 +324,25 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
     const y = nice(extent(all.length > 0 ? all.map(([, one]) => one) : [0]))
     const along = linear(x, [0, PLOT_WIDTH])
     const up = linear(y, [PLOT_HEIGHT, 0])
+    /* By area, so a point twice the measure is twice the ink: the square root
+       of its share of the largest. A size below zero is none. */
+    const sizes = rows.map((row) => (size === undefined ? undefined : row.cells[size]?.value))
+    const largest = Math.max(0, ...sizes.map((one) => one ?? 0))
+    const weight = (row: number): number | undefined => {
+      const one = sizes[row]
+      return one === undefined || largest <= 0 ? undefined : Math.sqrt(Math.max(0, one) / largest)
+    }
     return {
       pairs: pairs.map((series) => series.map(([one, two]) => [one, two] as [number, number])),
       points: pairs.flatMap((series, depth) =>
         shown[depth]
-          ? series.map(([one, two, row]) => ({ depth, row, x: along(one), y: up(two) }))
+          ? series.map(([one, two, row]) => ({
+              depth,
+              row,
+              weight: weight(row),
+              x: along(one),
+              y: up(two),
+            }))
           : [],
       ),
       x,
@@ -367,7 +430,7 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
           data-series=${index}
           ?data-active=${point.row === at}
           part="point${point.row === at ? ' point-active' : ''}"
-          style=${`--chart-series: var(--chart-series-${index}); --chart-point-x: ${point.x}%; --chart-point-y: ${point.y}%`}
+          style=${`--chart-series: var(--chart-series-${index}); --chart-point-x: ${point.x}%; --chart-point-y: ${point.y}%${point.weight === undefined ? '' : `; --chart-point-weight: ${point.weight}`}`}
         ></span>`
       })}
       ${this.renderTooltip()}

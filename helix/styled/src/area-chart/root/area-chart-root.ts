@@ -41,6 +41,7 @@ import '../../tooltip/index.js'
  * @cssproperty --area-chart-fill-strength - How much of its series' color a band takes, as a percentage mixed toward the page.
  * @cssproperty --area-chart-gap - Space between the drawing and its labels.
  * @cssproperty --area-chart-gridline-color - Color of the rules drawn across the plot under `gridlines`.
+ * @cssproperty --area-chart-overlap-opacity - How much of each band shows under `overlap`, where the bands in front let the ones behind show through.
  * @cssproperty --area-chart-width - Thickness of a band's top edge. Overrides `--chart-stroke`.
  * @cssproperty --chart-stroke - Thickness of a band's top edge. Area Chart, Line Chart, and Bar Chart's `lines` all read this one property. `--area-chart-width` overrides it here.
  */

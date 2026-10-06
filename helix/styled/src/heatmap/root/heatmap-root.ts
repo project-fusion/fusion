@@ -56,6 +56,8 @@ import '../../tooltip/index.js'
  * @cssproperty --heatmap-cell-radius - How far a cell's corners are rounded.
  * @cssproperty --heatmap-cell-size - The size of a cell on both axes, used where neither axis has its own size set.
  * @cssproperty --heatmap-gap - Space between cells. Zero draws one continuous field.
+ * @cssproperty --heatmap-selected-color - The color of the ring on a selected cell, under `selection-mode`.
+ * @cssproperty --heatmap-selected-width - How thick the ring on a selected cell is.
  * @cssproperty --heatmap-tone-1 - The weakest step of the magnitude ramp, used by `tones="1 …"`.
  * @cssproperty --heatmap-tone-2 - The second step of the magnitude ramp.
  * @cssproperty --heatmap-tone-3 - The third step of the magnitude ramp.

@@ -37,7 +37,7 @@
  * the same drawing renders a hairline in a narrow slot and a heavy rule in a
  * wide one. `vector-effect` takes the stroke out of that transform. It does not
  * take *geometry* out of it, which is why nothing here is a circle. */
-[part="line"] {
+[part~="line"] {
   stroke-linecap: round;
   stroke-linejoin: round;
   /* The width every chart's line is, from the shared series sheet, with the
@@ -95,7 +95,7 @@
    and measured, `::part(bar)[data-series="2"]` is dropped at parse time.
    `data-series` stays, being what a spec asserts and what a document rule
    reaching through the light DOM would use. */
-[part="line"] {
+[part~="line"] {
   stroke: var(--chart-series);
 }
 
@@ -177,7 +177,7 @@
  * path some three hundred long. Every line rendered as four dashes with gaps
  * between them, which looked like a chart with missing data.
  */
-[part="line"] {
+[part~="line"] {
   stroke-dasharray: 1000;
   transition:
     d var(--helix-duration-normal) var(--helix-easing-decelerate),
@@ -185,8 +185,20 @@
 }
 
 @starting-style {
-  [part="line"] {
+  [part~="line"] {
     stroke-dashoffset: 1000;
+  }
+}
+
+/* A series `dashed` names, such as a forecast: dashes in place of the solid
+   line, and none of the drawing-on, which would slide the dashes along. */
+[part~="line-dashed"] {
+  stroke-dasharray: var(--line-chart-dash, 6 4);
+}
+
+@starting-style {
+  [part~="line-dashed"] {
+    stroke-dashoffset: 0;
   }
 }
 
@@ -243,7 +255,7 @@
  *    A line chart's mark sits on the page, so it would be the worse half of that
  *    trade. Weight moves instead, and the color stays the series'.
  */
-:host([emphasis="subtle"]) [part="line"] {
+:host([emphasis="subtle"]) [part~="line"] {
   stroke: color-mix(in oklab, var(--chart-series) 45%, var(--helix-color-background));
 }
 
@@ -268,7 +280,7 @@
  *    is the thing translucency is for on a chart rather than decoration, and a line
  *    chart is where it costs the least, the marks being thin already.
  */
-:host([material="glass"]) [part="line"] {
+:host([material="glass"]) [part~="line"] {
   stroke-opacity: calc(0.62 * var(--helix-material-opacity));
 }
 /* `frosted` admits less, which on a mark is more ink rather than more ground.
@@ -276,7 +288,7 @@
    `material-translucent` at 60% against `material-translucent-strong` at 88%,
    so a chart and a card mean the same thing by the word. Absent is still fully
    opaque, so the three points read glass, frosted, then no attribute at all. */
-:host([material="frosted"]) [part="line"] {
+:host([material="frosted"]) [part~="line"] {
   stroke-opacity: calc(0.88 * var(--helix-material-opacity));
 }
 

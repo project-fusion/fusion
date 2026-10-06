@@ -11,10 +11,23 @@ import { commaList, seriesKey } from '@fusion.dev/helix-core'
  * `Direct` and one called `sales`.
  */
 
+/** A list as it may be given: names separated by commas, or an array of names. */
+export type NameList = string | readonly string[]
+
+/**
+ * The names in a list, written either way: split on commas from a string,
+ * trimmed and without blanks from an array, which is what a framework hands
+ * over for `hiddenSeries={['Direct']}`.
+ */
+export const namesIn = (list: NameList): string[] =>
+  typeof list === 'string'
+    ? commaList(list)
+    : list.map((name) => String(name).trim()).filter((name) => name !== '')
+
 /** Whether a name is in the list, matched without regard to case, as a heading is. */
-export const isHidden = (list: string, name: string): boolean => {
+export const isHidden = (list: NameList, name: string): boolean => {
   const key = seriesKey(name)
-  return commaList(list).some((one) => seriesKey(one) === key)
+  return namesIn(list).some((one) => seriesKey(one) === key)
 }
 
 /**
@@ -22,9 +35,9 @@ export const isHidden = (list: string, name: string): boolean => {
  * with it at the end where it was shown. Written back with a comma and a
  * space, as a person writes a list.
  */
-export const toggledNames = (list: string, name: string): string => {
+export const toggledNames = (list: NameList, name: string): string => {
   const key = seriesKey(name)
-  const now = commaList(list)
+  const now = namesIn(list)
   const next = isHidden(list, name)
     ? now.filter((one) => seriesKey(one) !== key)
     : [...now, name.trim()]

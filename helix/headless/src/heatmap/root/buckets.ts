@@ -98,3 +98,30 @@ export const fits = (
   const columns = Math.max(1, Math.floor((width + gap) / (minimum + gap)))
   return Math.min(total, columns * Math.max(1, rows))
 }
+
+/** What the drawn readings come to: where the busiest stands, and their total. */
+export interface Overview {
+  /** The place of the busiest reading, the first where several tie, or -1 with none. */
+  busiest: number
+  /** The sum of every reading, blanks counting nothing. */
+  total: number
+}
+
+/**
+ * The busiest reading among `cells` and the total of them all, for the
+ * strip's `overview`. A blank cell is passed over.
+ */
+export const overviewOf = (cells: readonly Reading[]): Overview => {
+  let busiest = -1
+  let total = 0
+  cells.forEach((cell, index) => {
+    if (cell.value === undefined) {
+      return
+    }
+    total += cell.value
+    if (busiest < 0 || cell.value > (cells[busiest]?.value ?? 0)) {
+      busiest = index
+    }
+  })
+  return { busiest, total }
+}

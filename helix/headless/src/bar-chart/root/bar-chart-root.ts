@@ -14,13 +14,14 @@ import {
   type Series,
   type SeriesPoint,
   seriesIndex,
+  seriesKey,
   seriesNames,
   ticks,
   unbroken,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-import { stackEnds, stackSpans } from '../stack.js'
+import { stackEnds, stackedReadings, stackSpans } from '../stack.js'
 import '../../tooltip/index.js'
 
 /**
@@ -273,7 +274,7 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
        rather than per series, because two series drawn to different scales are
        two charts sharing a picture. */
     const scaled = this.scaled
-    const own = (one: Series): boolean => scaled.has(one.name.trim().toLowerCase())
+    const own = (one: Series): boolean => scaled.has(seriesKey(one.name))
     /* Two extents where a series asked for its own, and the primary is taken
        over the series that did *not*: measuring the primary over everything
        would stretch it to hold numbers no column is drawn against, which is the
@@ -287,19 +288,10 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
     /* Stacked, a scale holds the stacks: the lines' own readings and the top
        and foot of each category's columns. */
     const lined = this.lined
-    const readingsOf = (group: Series[]): number[] => {
-      if (!this.stacked) {
-        return group.flatMap((one) => one.points.map((point) => point.value))
-      }
-      const columns = group.filter((one) => !lined.has(one.name.trim().toLowerCase()))
-      const slots = columns.map((one) => byRow(one, categories.length))
-      return [
-        ...group
-          .filter((one) => lined.has(one.name.trim().toLowerCase()))
-          .flatMap((one) => one.points.map((point) => point.value)),
-        ...stackEnds(categories.map((_, at) => slots.map((one) => one[at]?.value))),
-      ]
-    }
+    const readingsOf = (group: Series[]): number[] =>
+      this.stacked
+        ? stackedReadings(group, categories.length, (one) => lined.has(seriesKey(one.name)))
+        : group.flatMap((one) => one.points.map((point) => point.value))
     const on = (which: (one: Series) => boolean): number[] => {
       const found = readingsOf(shown.filter(which))
       return found.length > 0 ? found : values.length > 0 ? values : [0]
@@ -423,7 +415,7 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
        paints three columns in the first three colors and the line in the third
        one as well. */
     const scaled = this.scaled
-    const own = (one: Series): boolean => scaled.has(one.name.trim().toLowerCase())
+    const own = (one: Series): boolean => scaled.has(seriesKey(one.name))
     /* The scale a series is measured against, resolved once per series rather
        than per point. `z` is absent unless `secondary` named something, so the
        ordinary chart takes exactly the path it took before this existed. */
@@ -432,7 +424,7 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
     const columns = series
       .map((one, index) => ({ one, slots: byRow(one, categories.length), tone: index }))
       /* A series a legend hid takes no room in the slot, and keeps its tone. */
-      .filter(({ one }) => !lined.has(one.name.trim().toLowerCase()) && this.showsSeries(one.name))
+      .filter(({ one }) => !lined.has(seriesKey(one.name)) && this.showsSeries(one.name))
     /* **The stride is what the columns share and the thickness is what they
        draw.** Back to back, two columns meet on one coordinate and each one's
        edge is the other's: an outlined chart then shows a single line between
@@ -578,7 +570,7 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
              category and a line crosses all of them, so it belongs to the plot
              rather than to any one slot. */
           series.map((one) =>
-            lined.has(one.name.trim().toLowerCase()) && this.showsSeries(one.name)
+            lined.has(seriesKey(one.name)) && this.showsSeries(one.name)
               ? this.renderLine(one, series.indexOf(one), slot, against(one), sideways)
               : nothing,
           )
@@ -820,12 +812,9 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
       .filter((one): one is number => one !== undefined)
     /* Stacked, the far end is the top of the stack. */
     const values = this.stacked ? stackEnds([reached]) : reached
+    const lined = this.lined
     const all = this.stacked
-      ? stackEnds(
-          Array.from({ length: this.readings }, (_, row) =>
-            shown.map((one) => byRow(one, this.readings)[row]?.value),
-          ),
-        )
+      ? stackedReadings(shown, this.readings, (one) => lined.has(seriesKey(one.name)))
       : shown.flatMap((one) => one.points.map((point) => point.value))
     const [low, high] = extent(all.length > 0 ? all : [0])
     const domain: [number, number] = [Math.min(0, low), Math.max(0, high)]

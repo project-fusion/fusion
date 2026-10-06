@@ -324,3 +324,72 @@ describe('reading a sparkline', () => {
     expect(d).toContain('M75,')
   })
 })
+
+/* Named, a sparkline said its name and nothing of what the readings came to;
+   the other charts' summaries say it. */
+describe('what a named sparkline says of itself', () => {
+  const svgOf = (host: HTMLElement): Element | null => part(host, 'svg')
+
+  test('describes the drawing with the first, the last, the highest and the lowest reading', async () => {
+    const host = await spark('label="Sessions" values="12 30 8 20"')
+    const overview = part(host, 'overview') as HTMLElement
+    expect([
+      svgOf(host)?.getAttribute('aria-describedby'),
+      overview.id,
+      overview.hidden,
+      overview.textContent,
+    ]).toEqual([
+      'sparkline-overview',
+      'sparkline-overview',
+      true,
+      'From 12 to 20, highest 30, lowest 8',
+    ])
+  })
+
+  test('says nothing more where it is decorative, or `overview-label` is empty', async () => {
+    const plain = await spark('values="12 30 8 20"')
+    const quiet = await spark('label="Sessions" overview-label="" values="12 30 8 20"')
+    expect([part(plain, 'overview'), part(quiet, 'overview')]).toEqual([null, null])
+    expect(svgOf(quiet)?.hasAttribute('aria-describedby')).toBe(false)
+  })
+
+  /* Every chart is named by an `aria-label` on it; a sparkline took `label` alone. */
+  test('is named by an `aria-label` on it, as `label` names it', async () => {
+    const host = (await spark('aria-label="Sessions" values="12 30"')) as HTMLElement & {
+      updateComplete: Promise<unknown>
+    }
+    expect([svgOf(host)?.getAttribute('aria-label'), svgOf(host)?.getAttribute('role')]).toEqual([
+      'Sessions',
+      'application',
+    ])
+    host.setAttribute('aria-label', 'Visits')
+    await host.updateComplete
+    expect(svgOf(host)?.getAttribute('aria-label')).toBe('Visits')
+  })
+})
+
+describe('range', () => {
+  test('draws a band between two values, and the scale holds it', async () => {
+    const host = await spark('values="5 6 7" range="0 10"')
+    const band = part(host, 'range')
+    expect([band?.getAttribute('y'), band?.getAttribute('height')]).toEqual(['0', '32'])
+    expect(part(await spark('values="5 6 7"'), 'range')).toBeNull()
+  })
+})
+
+/* Line Chart draws a dot on a reading between two blanks; a sparkline drew
+   nothing there. */
+describe('a lone reading', () => {
+  test('takes a `lone` mark where a blank is on each side', async () => {
+    await mount(
+      `<table id="lone"><tbody><tr><th>Mon</th><td>4</td></tr><tr><th>Tue</th><td></td></tr><tr><th>Wed</th><td>6</td></tr><tr><th>Thu</th><td></td></tr><tr><th>Fri</th><td>5</td></tr><tr><th>Sat</th><td>7</td></tr></tbody></table><helix-headless-sparkline for="lone"></helix-headless-sparkline>`,
+    )
+    const host = document.querySelector('helix-headless-sparkline') as HTMLElement & {
+      updateComplete: Promise<unknown>
+    }
+    await host.updateComplete
+    await new Promise((done) => setTimeout(done, 0))
+    await host.updateComplete
+    expect(host.shadowRoot?.querySelectorAll('[part="lone"]').length).toBe(2)
+  })
+})
