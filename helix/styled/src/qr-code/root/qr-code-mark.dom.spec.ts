@@ -107,6 +107,18 @@ if (hasLayout()) {
       expect(drawn).toEqual(expected('hello', 'L'))
     })
 
+    /* Placed by an inline start of 50% and a translate of -50%, the box sat a
+       whole width off center in a right-to-left page, over modules a scanner
+       reads. */
+    test('the box sits at the center in a right-to-left page', async () => {
+      const host = await code(`<div dir="rtl">${withLogo}</div>`)
+      const qr = host.querySelector('helix-qr-code') as Code
+      await qr.updateComplete
+      const box = (part(qr, 'logo') as HTMLElement).getBoundingClientRect()
+      const square = qr.getBoundingClientRect()
+      expect(Math.abs(box.x + box.width / 2 - (square.x + square.width / 2))).toBeLessThan(1)
+    })
+
     test('the box is drawn only when something is in it', async () => {
       const bare = await code('<helix-qr-code value="hello"></helix-qr-code>')
       expect((part(bare, 'logo') as HTMLElement).hidden).toBe(true)
