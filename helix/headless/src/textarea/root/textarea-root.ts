@@ -1,5 +1,6 @@
 import {
   AriaForwardController,
+  applyOwnRule,
   customElement,
   drawIcon,
   HelixClearEvent,
@@ -8,6 +9,7 @@ import {
   isRtl,
   MixinControllerValue,
   MixinField,
+  type OwnRule,
   restoreValue,
 } from '@fusion.dev/helix-core'
 import { x } from '@fusion.dev/helix-icons'
@@ -381,11 +383,7 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
     // The platform's verdict, copied rather than recomputed, with the control as
     // the anchor so a validity bubble points at the text and not at the host.
     this.copyValidity(control)
-    const own = control.validity.valid ? this.validate?.(this.value) : undefined
-    const message = Array.isArray(own) ? own.join(' ') : typeof own === 'string' ? own : ''
-    if (message !== '') {
-      this.internals.setValidity({ customError: true }, message, control)
-    }
+    applyOwnRule(this.internals, control, this.validate, this.value)
     this.refreshFeedback()
   }
 
@@ -485,7 +483,7 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
    * invalid, and `true`, `null`, or nothing to accept the value.
    */
   @property({ attribute: false })
-  validate?: (value: string) => string | string[] | true | null | undefined
+  validate?: OwnRule
 
   /**
    * How the browser wraps the text, and whether the breaks are submitted with

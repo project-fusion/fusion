@@ -1,5 +1,6 @@
 import {
   AriaForwardController,
+  applyOwnRule,
   customElement,
   drawIcon,
   HelixClearEvent,
@@ -7,6 +8,7 @@ import {
   holdCaret,
   MixinControllerValue,
   MixinField,
+  type OwnRule,
   restoreValue,
   submitImplicitly,
 } from '@fusion.dev/helix-core'
@@ -403,11 +405,7 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
        without it the validity bubble points at the host, which is a box with no
        text in it. */
     this.copyValidity(control)
-    const own = control.validity.valid ? this.validate?.(this.value) : undefined
-    const message = Array.isArray(own) ? own.join(' ') : typeof own === 'string' ? own : ''
-    if (message !== '') {
-      this.internals.setValidity({ customError: true }, message, control)
-    }
+    applyOwnRule(this.internals, control, this.validate, this.value)
     // Straight after, because validity moved without any property moving.
     this.refreshFeedback()
   }
@@ -515,7 +513,7 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
    * invalid, and `true`, `null`, or nothing to accept the value.
    */
   @property({ attribute: false })
-  validate?: (value: string) => string | string[] | true | null | undefined
+  validate?: OwnRule
 
   /** The cross on the clear button, behind a seam a tier can move. */
   protected renderClearIcon(): TemplateResult {
