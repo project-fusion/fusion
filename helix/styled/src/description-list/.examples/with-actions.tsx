@@ -5,7 +5,7 @@ export function Example() {
       label="Deployment"
     >
       <helix-description-list-item label="Id">
-        dpl_4127
+        dpl_4127{' '}
         <helix-copy-button
           emphasis="ghost"
           label="Copy the id"
@@ -14,7 +14,7 @@ export function Example() {
         ></helix-copy-button>
       </helix-description-list-item>
       <helix-description-list-item label="Commit">
-        8ee57b9a2
+        8ee57b9a2{' '}
         <helix-copy-button
           emphasis="ghost"
           label="Copy the commit"
