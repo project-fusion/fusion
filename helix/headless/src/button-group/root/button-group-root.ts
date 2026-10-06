@@ -6,6 +6,7 @@ import {
   hostAria,
   inlineStep,
   pressedValue,
+  reportRuntime,
   requestValue,
   rovingStop,
   toolbarAround,
@@ -61,7 +62,9 @@ const isGroupButton = (child: Element): child is GroupButton =>
  * root, so the markup you rendered is never changed and a framework hydrating
  * it sees what its server sent. That is also why only Helix buttons are
  * toggles: a native `<button>` or a button without a `value` stays a plain
- * action button in the group. The inner control also carries
+ * action button in the group, and a native one without its own
+ * `aria-pressed` warns once, with the runtime kind `untold-toggle`. The inner
+ * control also carries
  * `--button-group-pressed`, `1` or `0`, for a `::part(button)` rule of yours.
  *
  * Use Toggle Group instead for a choice that belongs in a form, or one where
@@ -219,12 +222,36 @@ export class HelixHeadlessButtonGroup extends HelixElement {
       }
     }
     /* A button whose definition has not loaded is no button yet, so it is
-       read again once it is. */
+       read again once it is. A native one is told it cannot be a toggle. */
     for (const child of this.selectionMode && this.children ? this.children : []) {
       if (child.localName.includes('-') && !isGroupButton(child)) {
         void customElements.whenDefined(child.localName).then(() => this.sync())
+      } else if (child.localName === 'button' && !child.hasAttribute('aria-pressed')) {
+        this.warn(child)
       }
     }
+  }
+
+  /** Whether this group has said a native button in it cannot be a toggle, so it says so once. */
+  private warned = false
+
+  /**
+   * Says once that a native `<button>` in a selection mode stays an action
+   * button, since its pressed state would be an attribute on the page's markup.
+   * One with its own `aria-pressed` is the page's to say, and is not reported.
+   */
+  private warn(button: Element): void {
+    if (this.warned) {
+      return
+    }
+    this.warned = true
+    reportRuntime({
+      kind: 'untold-toggle',
+      message:
+        `<${this.localName}> cannot press a native <button>: its state would be written onto your ` +
+        'markup. Slot a Helix button with a `value`, or set `aria-pressed` on the button yourself.',
+      tag: button.localName,
+    })
   }
 
   /**

@@ -88,6 +88,8 @@ export type RuntimeKind =
   | 'unscannable-logo'
   /** A virtualized list's box has no height of its own, so its window never settles. */
   | 'unsettled-window'
+  /** A native button in a Button Group with `selection-mode`, which cannot be told it is pressed. */
+  | 'untold-toggle'
   /** A slotted trigger is a plain element, which cannot be told it opens something. */
   | 'untold-trigger'
   /** A tooltip wraps its trigger, so its text reaches no screen reader. */

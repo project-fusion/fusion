@@ -197,5 +197,25 @@ describe('button group', () => {
         ['8px', '8px', '8px', '8px'],
       ])
     })
+
+    test('in a browser, anchors styled as buttons join down a column by their block corners', async () => {
+      const host = await mount(`<helix-button-group label="Export" orientation="vertical">
+          <a data-button href="#csv">CSV</a><a data-button href="#json">JSON</a><a data-button href="#copy">Copy</a>
+        </helix-button-group>`)
+      const flat = [...host.querySelectorAll('a')].map((anchor) => {
+        const style = getComputedStyle(anchor)
+        return [
+          style.borderStartStartRadius,
+          style.borderStartEndRadius,
+          style.borderEndStartRadius,
+          style.borderEndEndRadius,
+        ].map((corner) => corner === '0px')
+      })
+      expect(flat).toEqual([
+        [false, false, true, true],
+        [true, true, true, true],
+        [true, true, false, false],
+      ])
+    })
   }
 })

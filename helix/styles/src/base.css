@@ -501,16 +501,41 @@ helix-text[tone="warning"]:is([emphasis="muted"], [emphasis="subtle"]) {
 }
 
 /* A group of a consumer's own anchors is one shape, so the inner corners go flat
-   and the outer ones keep their radius. */
-helix-button-group:not([variant="spaced"]) > :not(:first-child) [data-button],
-helix-button-group:not([variant="spaced"]) > [data-button]:not(:first-child) {
+   and the outer ones keep their radius. Down a column, the block corners
+   flatten instead of the inline ones, as for a native `<button>` below. */
+helix-button-group:not([variant="spaced"], [orientation="vertical"])
+  > :not(:first-child)
+  [data-button],
+helix-button-group:not([variant="spaced"], [orientation="vertical"])
+  > [data-button]:not(:first-child) {
   border-start-start-radius: 0;
   border-end-start-radius: 0;
 }
 
-helix-button-group:not([variant="spaced"]) > :not(:last-child) [data-button],
-helix-button-group:not([variant="spaced"]) > [data-button]:not(:last-child) {
+helix-button-group:not([variant="spaced"], [orientation="vertical"])
+  > :not(:last-child)
+  [data-button],
+helix-button-group:not([variant="spaced"], [orientation="vertical"])
+  > [data-button]:not(:last-child) {
   border-start-end-radius: 0;
+  border-end-end-radius: 0;
+}
+
+helix-button-group[orientation="vertical"]:not([variant="spaced"])
+  > :not(:first-child)
+  [data-button],
+helix-button-group[orientation="vertical"]:not([variant="spaced"])
+  > [data-button]:not(:first-child) {
+  border-start-start-radius: 0;
+  border-start-end-radius: 0;
+}
+
+helix-button-group[orientation="vertical"]:not([variant="spaced"])
+  > :not(:last-child)
+  [data-button],
+helix-button-group[orientation="vertical"]:not([variant="spaced"])
+  > [data-button]:not(:last-child) {
+  border-end-start-radius: 0;
   border-end-end-radius: 0;
 }
 
