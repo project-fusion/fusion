@@ -27,6 +27,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html } from 'lit/static-html.js'
 import type { HelixHeadlessListbox } from '../../listbox/root/listbox-root.js'
 import { optionsAmong } from '../../option/root/option-root.js'
+import { drawAutofill } from '../../select/autofill.js'
 import { HelixHeadlessTag } from '../../tag/root/tag-root.js'
 /* Relative, so this registers the base listbox and the styled file's identical
    import registers the styled one. `tier` picks which the template asks for. */
@@ -74,6 +75,8 @@ const isInsertion = (event: Event): boolean =>
  * to, the field says it in a live region as the highlight moves, says how many
  * options there are as the list opens, and says a choice once it is made, as
  * React Aria's combobox does there.
+ *
+ * Set `autocomplete` to let a browser's autofill choose an option.
  *
  * With `multiple`, each chosen option is a tag in the field with its own remove
  * control. The panel stays open and the filter clears after each choice, so the
@@ -188,12 +191,19 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   allowsCustomValue = false
 
   /**
-   * What the browser may autofill in the text field, as a platform token.
+   * What the browser may autofill, as a platform token such as `country`.
    *
    * **Defaults to `off`, which is not the platform's default and is the
    * point.** The field filters a list rather than collecting a value, so a
    * browser offering to fill it with a saved address is competing for the same
    * keystrokes as the listbox. A consumer who wants autofill can still ask.
+   *
+   * Set, a combobox whose answer is one of its options keeps a hidden native
+   * `<select>` with the same options for the browser to fill, as React Aria's
+   * combobox and Select do, and the option the browser picks, by its value or
+   * its words, becomes the value. The text field itself stays `off`, so the
+   * browser fills the answer and not the filter. With `allows-custom-value`
+   * the token goes on the text field, whose words are the answer.
    */
   @property()
   autocomplete = 'off'
@@ -1402,7 +1412,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
           id=${this.controlId}
           type="text"
           role="combobox"
-          autocomplete=${this.autocomplete || nothing}
+          autocomplete=${(this.fills ? 'off' : this.autocomplete) || nothing}
           spellcheck="false"
           aria-controls="listbox"
           aria-autocomplete=${this.suggest ? 'both' : 'list'}
@@ -1425,7 +1435,20 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
         ${this.renderListbox()}
         ${this.renderCreate()}
       </div>
-      ${this.renderHint()}${this.renderFeedback()}${drawStatus(this.status)}`
+      ${this.renderHint()}${this.renderFeedback()}${drawStatus(this.status)}
+      ${drawAutofill({
+        autocomplete: this.fills ? this.autocomplete : '',
+        disabled: this.isDisabled || this.readOnly,
+        multiple: this.multiple,
+        onFill: (value) => this.requestValue(value),
+        options: optionsAmong(this.knownChildren),
+        value: this.value,
+      })}`
+  }
+
+  /** Whether a browser's autofill fills the hidden select, rather than the text field. */
+  private get fills(): boolean {
+    return !this.allowsCustomValue && this.autocomplete !== 'off' && this.autocomplete !== ''
   }
 }
 
