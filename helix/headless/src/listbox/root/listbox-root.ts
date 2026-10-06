@@ -159,7 +159,7 @@ const rangeFor = (root: Element, needle: string): Range[] => {
  * | Space | Chooses the highlighted option, or with `multiple` toggles it. In a filter field, types a space. |
  * | Shift with Down or Up | With `multiple`, adds the option the highlight moves to. |
  * | Shift with Home or End | With `multiple`, adds every option from the highlight to that end. In a filter field, hold Control as well. |
- * | Control or Command with A | With `multiple`, chooses every option, or none where all are chosen. |
+ * | Control or Command with A | With `multiple`, chooses every option, or none where all are chosen. In a filter field, selects the text. |
  * | Escape | In a filter field, clears the filter. |
  *
  * **ARIA.** The `items` part is the `listbox`, named by the label and
