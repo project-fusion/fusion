@@ -102,4 +102,15 @@ describe('content placement', () => {
     )
     expect(content).toContain('margin-inline: var(--divider-content-gap, var(--helix-space-sm))')
   })
+
+  /* The word set into the line was fixed at the sans face and the `xs` step,
+     so a section label in a form could not match the labels around it. */
+  test("the content's face, size and weight are hooks on what they were", () => {
+    const content = rule('[part="content"]')
+    expect(content).toContain(
+      'font-family: var(--divider-content-font-family, var(--helix-font-sans))',
+    )
+    expect(content).toContain('font-size: var(--divider-content-font-size, var(--helix-text-xs))')
+    expect(content).toContain('font-weight: var(--divider-content-font-weight, inherit)')
+  })
 })

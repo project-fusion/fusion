@@ -27,6 +27,9 @@ import { styles } from './divider-root.css.js'
  *
  * @cssproperty --divider-color - The color of the line.
  * @cssproperty --divider-content-color - The color of the content set into the line.
+ * @cssproperty --divider-content-font-family - The typeface of the content set into the line. The sans face by default.
+ * @cssproperty --divider-content-font-size - The size of the content set into the line. The `xs` step by default.
+ * @cssproperty --divider-content-font-weight - The weight of the content set into the line. The weight around the divider by default.
  * @cssproperty --divider-content-gap - The space either side of the content set into the line.
  * @cssproperty --divider-content-offset - The length of line before the content under `content-placement="start"`, or after it under `end`.
  * @cssproperty --divider-length - The length of a vertical line. A horizontal line takes the divider's width.

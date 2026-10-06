@@ -19,8 +19,9 @@
   margin-inline: var(--divider-content-gap, var(--helix-space-sm));
   display: inline-flex;
   flex: 0 0 auto;
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-xs);
+  font-family: var(--divider-content-font-family, var(--helix-font-sans));
+  font-size: var(--divider-content-font-size, var(--helix-text-xs));
+  font-weight: var(--divider-content-font-weight, inherit);
   line-height: var(--helix-leading-tight);
 }
 
