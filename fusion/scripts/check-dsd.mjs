@@ -133,6 +133,14 @@ const FIXTURES = [
     name: 'carousel',
   },
   {
+    check: `const divider = host.querySelector('helix-divider')
+      const across = divider.shadowRoot.querySelector('[part="line"]').getAttribute('aria-orientation')
+      return across === 'vertical' && divider.matches(':state(vertical)') ? null : 'runs its divider ' + across`,
+    markup:
+      '<helix-toolbar label="Format"><helix-button>Bold</helix-button><helix-divider></helix-divider><helix-button>Italic</helix-button></helix-toolbar>',
+    name: 'toolbar-divider',
+  },
+  {
     check: `const offered = Boolean(host.shadowRoot.querySelector('[part="eyedropper"]'))
       return offered === 'EyeDropper' in window ? null : (offered ? 'offers' : 'withholds') + ' the eyedropper'`,
     markup: '<helix-color-picker label="Accent" value="#3366ff"></helix-color-picker>',

@@ -57,7 +57,12 @@ if (hasLayout()) {
 
          The two only diverge far enough to fail on a wide trigger: at a 200px
          control the scaled box is 8px short and the assertion still holds. */
-      expect(surface.offsetWidth).toBeGreaterThanOrEqual(trigger.offsetWidth)
+      /* No wider than the window less its 8px margins, which a trigger as
+         wide as the window is: the list then stays inside its edges, as the
+         next case holds. */
+      expect(surface.offsetWidth).toBeGreaterThanOrEqual(
+        Math.min(trigger.offsetWidth, window.innerWidth - 16),
+      )
     })
 
     test('a trigger as wide as the screen opens a list that stays inside its edges', async () => {
