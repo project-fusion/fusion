@@ -49,6 +49,15 @@ describe('the name estimate', () => {
     expect(hasName(trigger, value)).toBe(true)
   })
 
+  /* Icon reports an unnamed decorative icon that is all a link or a summary
+     holds, and asks the same question of them. */
+  test('takes a link’s and a summary’s content, as a button’s', () => {
+    expect(hasName(inShadow('<a href="/home"><slot></slot></a>'))).toBe(true)
+    expect(hasName(inShadow('<summary><slot></slot></summary>'))).toBe(true)
+    expect(hasName(inShadow('<a><slot></slot></a>'))).toBe(false)
+    expect(hasName(inShadow('<a href="/home"><svg></svg></a>'))).toBe(false)
+  })
+
   test('takes content only where the role is named by it', () => {
     expect(hasName(inShadow('<button><slot></slot></button>'))).toBe(true)
     expect(hasName(inShadow('<div role="switch"><slot></slot></div>'))).toBe(true)

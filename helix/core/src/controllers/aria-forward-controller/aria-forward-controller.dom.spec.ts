@@ -91,6 +91,44 @@ describe('a reference a consumer wrote on the host', () => {
   })
 })
 
+/* A Badge wrapped around a Helix button describes it with element references
+   set on the host, and they stayed there, on a node the tree reports as
+   generic. */
+describe('elements a script set on the host', () => {
+  test('reach the control where the host has no ids', () => {
+    const { control, forward, host } = scene('')
+    Object.defineProperty(host, 'ariaDescribedByElements', {
+      value: [document.getElementById('also')],
+      writable: true,
+    })
+    forward.forward()
+    expect(held(control, 'ariaDescribedByElements')).toEqual(['also'])
+  })
+
+  test('and the ids win where the host has both', () => {
+    const { control, forward, host } = scene('aria-describedby="tip"')
+    Object.defineProperty(host, 'ariaDescribedByElements', {
+      value: [document.getElementById('also')],
+      writable: true,
+    })
+    forward.forward()
+    expect(held(control, 'ariaDescribedByElements')).toEqual(['tip'])
+  })
+
+  test('and are taken back off the control with the host’s', () => {
+    const { control, forward, host } = scene('')
+    Object.defineProperty(host, 'ariaDescribedByElements', {
+      value: [document.getElementById('also')],
+      writable: true,
+    })
+    forward.forward()
+    ;(host as unknown as { ariaDescribedByElements: Element[] | null }).ariaDescribedByElements =
+      null
+    forward.forward()
+    expect(held(control, 'ariaDescribedByElements')).toBeNull()
+  })
+})
+
 describe('an id that resolves to nothing', () => {
   test('is dropped rather than passed on', () => {
     const { control, forward } = scene('aria-describedby="tip gone"')

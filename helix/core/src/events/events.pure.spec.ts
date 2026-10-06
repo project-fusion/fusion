@@ -52,7 +52,8 @@ describe('the names this library dispatches', () => {
       )
       const built = await Bun.build({ entrypoints: [entry], format: 'esm', target: 'browser' })
       const code = await built.outputs[0]?.text()
-      expect(code).toContain('helix-before-open')
+      /* Written without their shared `helix-`, which the module puts back. */
+      expect(code).toContain('before-open')
       expect(code).not.toContain('extends CustomEvent')
       expect(code).not.toContain('extends Event')
     } finally {

@@ -264,9 +264,15 @@ export class AriaForwardController implements ReactiveController {
         continue
       }
       const ids = (this.host.getAttribute(attribute) ?? '').split(/\s+/).filter(Boolean)
-      const referenced = ids
-        .map((id) => elementById(this.host, id))
-        .filter((element): element is HTMLElement => element !== null)
+      /* **Or the elements a script set on the host**, where it wrote no ids: a
+         Badge describes the control it wraps that way, and the platform keeps
+         them on the host, where they reached nobody. */
+      const referenced =
+        ids.length > 0
+          ? ids
+              .map((id) => elementById(this.host, id))
+              .filter((element): element is HTMLElement => element !== null)
+          : [...((this.host as unknown as Record<string, Element[] | null>)[property] ?? [])]
       const elements =
         referenced.length === 0 && attribute === 'aria-labelledby'
           ? this.hostLabels(target)

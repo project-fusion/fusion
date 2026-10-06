@@ -69,6 +69,7 @@
 import { HelixActionEvent } from './action.js'
 import { HelixActivateEvent } from './activate.js'
 import { HelixAuraFallbackEvent } from './aura-fallback.js'
+import { HelixBandEvent } from './band.js'
 import { HelixBeforeActivateEvent } from './before-activate.js'
 import { HelixBeforeChangeEvent } from './before-change.js'
 import { HelixBeforeCloseEvent } from './before-close.js'
@@ -156,6 +157,7 @@ import { HelixTypingEvent } from './typing.js'
 export type {
   ActivateDetail,
   AuraFallbackDetail,
+  BandDetail,
   CanvasView,
   CaretDetail,
   ChangeDetail,
@@ -209,6 +211,7 @@ export {
   HelixActionEvent,
   HelixActivateEvent,
   HelixAuraFallbackEvent,
+  HelixBandEvent,
   HelixBeforeActivateEvent,
   HelixBeforeChangeEvent,
   HelixBeforeCloseEvent,
@@ -310,6 +313,7 @@ const registry = {
   HelixActionEvent,
   HelixActivateEvent,
   HelixAuraFallbackEvent,
+  HelixBandEvent,
   HelixBeforeActivateEvent,
   HelixBeforeChangeEvent,
   HelixBeforeCloseEvent,

@@ -64,8 +64,20 @@ export const hasName = (element: HTMLElement, shown?: Element | null): boolean =
   if ([...(labels ?? [])].some((label) => nameText(label).trim() !== '')) {
     return true
   }
-  const role = element.getAttribute('role') ?? (element.localName === 'button' ? 'button' : '')
+  const role = element.getAttribute('role') ?? implicitRole(element)
   return NAMED_BY_CONTENT.has(role) && nameText(element, shown).trim() !== ''
+}
+
+/**
+ * The role an element's tag gives it, among those named by their content: a
+ * button, a `<summary>`, which a browser exposes as one, and a link with an
+ * `href`.
+ */
+const implicitRole = (element: HTMLElement): string => {
+  if (element.localName === 'button' || element.localName === 'summary') {
+    return 'button'
+  }
+  return element.localName === 'a' && element.hasAttribute('href') ? 'link' : ''
 }
 
 /** The elements whose name has been read, so each is warned about once. */

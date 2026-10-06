@@ -16,8 +16,11 @@
  */
 const held = new Map<string, Intl.RelativeTimeFormat>()
 
-/** How long each unit lasts, in milliseconds, largest last. */
-const UNITS: Array<{ ms: number; unit: Intl.RelativeTimeFormatUnit }> = [
+/**
+ * How long each unit lasts, in milliseconds, largest last. `elapsedTime`
+ * reads its minute, hour and day from here.
+ */
+export const UNITS: Array<{ ms: number; unit: Intl.RelativeTimeFormatUnit }> = [
   { ms: 1000, unit: 'second' },
   { ms: 60_000, unit: 'minute' },
   { ms: 3_600_000, unit: 'hour' },
