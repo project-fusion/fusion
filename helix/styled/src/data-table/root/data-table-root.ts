@@ -67,6 +67,7 @@ import '../../table/index.js'
  * @cssproperty --data-table-toggle-color - The color of the mark that opens and closes a row of a tree grid.
  * @cssproperty --data-table-toggle-gap - The space between the mark that opens a row of a tree grid and the row's name, also kept by a row with no children.
  * @cssproperty --data-table-toggle-size - The size of the mark that opens and closes a row of a tree grid, and of the room a row with no children keeps for it.
+ * @cssproperty --data-table-toolbar-gap - The space between the toolbar and the grid below it.
  */
 @customElement('helix-data-table')
 export class HelixDataTable extends HelixHeadlessDataTable {
