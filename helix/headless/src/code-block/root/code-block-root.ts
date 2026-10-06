@@ -85,7 +85,7 @@ import { type DiffFile, type DiffHunk, type DiffLine, pairLines, parsePatch } fr
  * @csspart gutter - The line numbers beside the code, shown when `line-numbers` is set.
  * @csspart header - The bar that holds the name and the copy button, shown when there is a name.
  * @csspart hunk - In a diff, a `@@` line saying where the lines under it are.
- * @csspart label - The file name or language, where one is given.
+ * @csspart label - The block's name: its `label`, or its `language` where it has no label.
  * @csspart marker - In a diff, the `+`, `-`, or space that starts a line.
  * @csspart new - In a split diff, the new version's `<pre>`.
  * @csspart number - In a diff, a line number.
@@ -173,10 +173,11 @@ export class HelixHeadlessCodeBlock extends HelixElement {
   highlight?: (code: string, language: string) => string
 
   /**
-   * The block's name, usually a file name or a language.
+   * The block's name, usually a file name, drawn in the header.
    *
-   * In a diff, each file is named from the patch, and this names a patch that
-   * carries no name of its own.
+   * Absent, the block is named by `language` where there is one. In a diff,
+   * each file is named from the patch, and this names a patch that carries no
+   * name of its own.
    */
   @property()
   label = ''
@@ -185,8 +186,9 @@ export class HelixHeadlessCodeBlock extends HelixElement {
    * The language the code is written in, such as `ts` or `css`, handed to
    * `highlight` as its second argument.
    *
-   * Absent hands it an empty string. It draws nothing of its own: the block's
-   * name is `label`.
+   * A block with no `label` is named by it, in the header and on the copy
+   * button, as a docs site names a snippet by its language. Absent hands
+   * `highlight` an empty string and names nothing.
    */
   @property()
   language = ''
@@ -389,10 +391,11 @@ export class HelixHeadlessCodeBlock extends HelixElement {
     const gutter = this.lineNumbers
       ? html`<span part="gutter" aria-hidden="true">${lines === 0 ? nothing : gutterNumbers(lines)}</span>`
       : nothing
-    return html`${this.renderHeader(this.label)}
+    const name = this.label || this.language
+    return html`${this.renderHeader(name)}
       <div part="frame">
         <pre id="block" part="block">${gutter}${code}</pre>
-        ${this.label ? nothing : this.renderCopy()}
+        ${name ? nothing : this.renderCopy()}
       </div>${this.renderExpand()}`
   }
 
@@ -457,7 +460,10 @@ export class HelixHeadlessCodeBlock extends HelixElement {
    * @param value The text the button copies.
    * @param name The name of what it copies, which its label carries.
    */
-  protected renderCopyButton(value: string = this.text, name = this.label): TemplateResult {
+  protected renderCopyButton(
+    value: string = this.text,
+    name = this.label || this.language,
+  ): TemplateResult {
     return html`<${this.tag('copy-button')}
       part="copy"
       exportparts="button: copy-button, text: copy-text, mark: copy-mark, live: copy-live, spinner: copy-spinner, tooltip: copy-tooltip,

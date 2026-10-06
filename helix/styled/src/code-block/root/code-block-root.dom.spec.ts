@@ -47,11 +47,45 @@ describe('wrap, height and line numbers', () => {
       'grid-template-columns: auto minmax(0, 1fr)',
     )
     const gutter = rule('[part="gutter"]')
-    expect(gutter).toContain('font-family: var(--helix-font-mono)')
-    expect(gutter).toContain('line-height: var(--helix-leading-normal)')
+    expect(gutter).toContain('font-family: var(--_code-block-face)')
+    expect(gutter).toContain('font-size: var(--_code-block-size)')
+    expect(gutter).toContain('line-height: var(--_code-block-leading)')
     expect(gutter).toContain('user-select: none')
     expect(gutter).toContain(
       'color: var(--code-block-gutter-color, var(--helix-color-foreground-subtle))',
+    )
+  })
+})
+
+/* The code's color and type, the name's color and a diff's two tints were
+   fixed, so a block on a page with its own code face could not take it. */
+describe('hooks', () => {
+  test('the code and its numbers share one type, each part a hook on the token it was', () => {
+    const host = rule(':host')
+    expect(host).toContain('--_code-block-size: var(--code-block-font-size, var(--helix-text-sm))')
+    expect(host).toContain(
+      '--_code-block-leading: var(--code-block-line-height, var(--helix-leading-normal))',
+    )
+    expect(host).toContain(
+      '--_code-block-face: var(--code-block-font-family, var(--helix-font-mono))',
+    )
+    expect(host).toContain(
+      '--_code-block-line: calc(var(--_code-block-size) * var(--_code-block-leading))',
+    )
+    const code = rule('[part="code"]')
+    expect(code).toContain('color: var(--code-block-color, var(--helix-color-foreground))')
+    expect(code).toContain('font-family: var(--_code-block-face)')
+  })
+
+  test("the name and a diff's two tints are hooks on the colors they were", () => {
+    expect(rule('[part="label"]')).toContain(
+      'color: var(--code-block-label-color, var(--helix-color-foreground-muted))',
+    )
+    expect(rule('[part="added"]')).toContain(
+      'var(--code-block-added-color, var(--helix-color-success)) 14%',
+    )
+    expect(rule('[part="removed"]')).toContain(
+      'var(--code-block-removed-color, var(--helix-color-danger)) 14%',
     )
   })
 })

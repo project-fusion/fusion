@@ -29,14 +29,21 @@ import '../../copy-button/index.js'
  * @category typography
  * @documentation https://fusion.dev/helix/components/code-block
  *
+ * @cssproperty --code-block-added-color - The color a diff's added lines are tinted in and their `+` is drawn in. The success color by default.
  * @cssproperty --code-block-backdrop - A backdrop filter for the block and its header, for a translucent background.
  * @cssproperty --code-block-background-color - The background behind the code. Set it for a block that sits on a surface other than the page background.
  * @cssproperty --code-block-border-color - The line around the block and its header.
+ * @cssproperty --code-block-color - The color of the code. A highlighter's own colors win on the tokens it colors.
  * @cssproperty --code-block-expand-color - The color of the button under a capped block that shows every line.
+ * @cssproperty --code-block-font-family - The typeface of the code and its line numbers. The mono face by default.
+ * @cssproperty --code-block-font-size - The size of the code and its line numbers.
  * @cssproperty --code-block-gutter-color - The color of the line numbers.
  * @cssproperty --code-block-header-background-color - The background behind the name. The default is `surface-raised`.
+ * @cssproperty --code-block-label-color - The color of the name in the header.
+ * @cssproperty --code-block-line-height - The line height of the code and its line numbers.
  * @cssproperty --code-block-max-block-size - The tallest the code grows before it scrolls, or until `expandable`'s button shows every line. The default is no limit.
  * @cssproperty --code-block-radius - The corner radius of the header's top and the block's bottom, which form one shape.
+ * @cssproperty --code-block-removed-color - The color a diff's removed lines are tinted in and their `-` is drawn in. The danger color by default.
  */
 @customElement('helix-code-block')
 export class HelixCodeBlock extends HelixHeadlessCodeBlock {

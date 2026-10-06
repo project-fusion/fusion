@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, registerDom, type Updatable } from '@fusion.dev/helix-testing/dom'
+import { mount, part, registerDom, type Updatable } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -232,6 +232,20 @@ describe('line numbers and a highlighter', () => {
       await el.updateComplete
     }
     expect([...new Set(asked)]).toEqual(['ts:a', ':a'])
+  })
+
+  /* `language` drew nothing, so a block a docs page named only by its
+     language showed no name and its button said only "Copy code". */
+  test('names a block with no label by its language, in the header and on the button', async () => {
+    const block = await mount(
+      '<helix-headless-code-block language="ts">const a = 1</helix-headless-code-block>',
+    )
+    expect(part(block, 'label')?.textContent).toBe('ts')
+    expect(part(block, 'copy')?.getAttribute('label')).toBe('Copy code, ts')
+    const named = await mount(
+      '<helix-headless-code-block label="a.ts" language="ts">const a = 1</helix-headless-code-block>',
+    )
+    expect(part(named, 'label')?.textContent).toBe('a.ts')
   })
 
   test('is not asked about empty code', async () => {
