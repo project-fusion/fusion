@@ -4,12 +4,14 @@ import preview from '../.examples/preview.html' with { type: 'text' }
 import several from '../.examples/several-values.html' with { type: 'text' }
 import stacked from '../.examples/stacked.html' with { type: 'text' }
 import totals from '../.examples/totals.html' with { type: 'text' }
+import withActions from '../.examples/with-actions.html' with { type: 'text' }
 
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
   await import('../../tag/index.js')
   await import('../../format-date/index.js')
+  await import('../../copy-button/index.js')
 })
 
 /* Browser only: happy-dom lays nothing out. */
@@ -140,4 +142,23 @@ describe('the several-values example', () => {
     }
     expect((values[1] as DOMRect).top).toBeGreaterThanOrEqual((values[0] as DOMRect).bottom)
   })
+})
+
+describe('the with actions example', () => {
+  run(
+    'draws each copy button after its value, on the value’s line, inside its description',
+    async () => {
+      await example(withActions)
+      await idle()
+      const item = document.querySelector('helix-description-list-item') as HTMLElement
+      const value = part(item, 'value') as HTMLElement
+      const button = item.querySelector('[slot="actions"]') as HTMLElement
+      const slot = button.assignedSlot as HTMLSlotElement
+      expect(value.contains(slot)).toBe(true)
+      const text = value.getBoundingClientRect()
+      const control = button.getBoundingClientRect()
+      expect(control.left).toBeGreaterThan(text.left)
+      expect(control.top).toBeLessThan(text.bottom)
+    },
+  )
 })

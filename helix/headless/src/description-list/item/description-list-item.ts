@@ -18,13 +18,21 @@ import { property } from 'lit/decorators.js'
  * the authors of a paper. The item then puts your `<dd>` elements after its
  * `<dt>` in place of its own, so a screen reader hears one term and each of
  * its descriptions, as in a native `<dl>`. A server cannot see your elements,
- * so the served item wraps them in its own `<dd>` until it runs.
+ * so set `several` as well, and the served item leaves them unwrapped too.
+ * Without it, the served item wraps them in its own `<dd>` until it runs.
+ *
+ * **Controls that act on the value**, such as a copy button, go in the
+ * `actions` slot, drawn after the value inside its `<dd>`, as Radix Themes'
+ * data list puts an icon button beside a value. A screen reader hears them as
+ * part of the description they act on. With several values, put each control
+ * inside the `<dd>` it acts on.
  *
  * @since 0.1.0
  * @status stable
  * @documentation https://fusion.dev/helix/components/description-list
  *
  * @slot - The value, or several `<dd>` elements for several values.
+ * @slot actions - Controls that act on the value, such as a copy button, after it inside its `<dd>`.
  * @slot label - The label, when it is more than text. Falls back to `label`.
  *
  * @csspart label - The `<dt>`, holding the label.
@@ -43,12 +51,20 @@ export class HelixHeadlessDescriptionListItem extends HelixElement {
   label = ''
 
   /**
-   * Whether the values are the consumer's own `<dd>` elements, which the item
-   * then does not wrap. Unknown on a server and while hydrating, where the
-   * item draws its own.
+   * Says the values are several `<dd>` elements of your own, so the item
+   * draws no `<dd>` of its own around them, on the server too. Without it the
+   * item finds them once it runs, and the served markup wraps them until then.
    */
-  private get several(): boolean {
-    return this.knownChildren.some((child) => child.localName === 'dd')
+  @property({ type: Boolean })
+  several = false
+
+  /**
+   * Whether the values are the consumer's own `<dd>` elements, which the item
+   * then does not wrap: `several`, or `<dd>` children found once it runs.
+   * Unknown on a server and while hydrating, where `several` decides.
+   */
+  private get ownValues(): boolean {
+    return this.several || this.knownChildren.some((child) => child.localName === 'dd')
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
@@ -60,10 +76,10 @@ export class HelixHeadlessDescriptionListItem extends HelixElement {
     const label = html`<dt part="label"><slot name="label">${this.label}</slot></dt>`
     /* The same slot either way, so a value changing from text to `<dd>`
        elements moves nothing but the wrapper. */
-    return this.several
+    return this.ownValues
       ? html`${label}<slot @slotchange=${this.handleSlotChange}></slot>`
       : html`${label}
-          <dd part="value"><slot @slotchange=${this.handleSlotChange}></slot></dd>`
+          <dd part="value"><slot @slotchange=${this.handleSlotChange}></slot><slot name="actions"></slot></dd>`
   }
 
   /** A value arriving or leaving can change whether the item wraps them. */
