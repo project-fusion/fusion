@@ -48,3 +48,28 @@ describe('outline hooks', () => {
     },
   )
 })
+
+/* A shadow sheet reaches only the slotted list, so a nested list's links were
+   drawn as the page's plain links: bullets, an indent and the body size. */
+describe('an outline written as nested lists', () => {
+  geometry('draws its links as the flat run draws them, and reads the same hooks', async () => {
+    const look = (link: HTMLElement): string[] => {
+      const style = getComputedStyle(link)
+      return [style.fontSize, style.paddingInlineStart, style.textDecorationLine, style.display]
+    }
+    const flat = look((await outline()).querySelector('a') as HTMLElement)
+    const nested = (await mount(
+      `<helix-outline style="--outline-link-color: rgb(2, 2, 2)"><ul><li><a href="#one">One</a><ul><li><a href="#two">Two</a></li></ul></li></ul></helix-outline>`,
+    )) as HTMLElement & Updatable
+    await settle(nested)
+    const [one, two] = [...nested.querySelectorAll('a')] as HTMLElement[]
+    expect(look(one as HTMLElement)).toEqual(flat)
+    expect(getComputedStyle(one as HTMLElement).color).toBe('rgb(2, 2, 2)')
+    expect(getComputedStyle(nested.querySelector('ul') as HTMLElement).listStyleType).toBe('none')
+    // The inner list is indented by one step, as a second level is.
+    const inner =
+      (two as HTMLElement).getBoundingClientRect().left -
+      (one as HTMLElement).getBoundingClientRect().left
+    expect(inner).toBe(12)
+  })
+})

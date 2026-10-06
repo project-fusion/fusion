@@ -793,6 +793,49 @@ helix-toggle[disabled]::part(item) {
   color: var(--navigation-item-hover-color, var(--helix-color-foreground));
 }
 
+/* **An outline written as nested lists**, `<ul><li><a>`, styled as the flat
+   run is. A shadow sheet reaches only what is slotted, the outer list, so its
+   items and their links are the page's to style, and these rules read the
+   outline's own hooks. At no specificity, so any rule of the page's wins. */
+:where(helix-outline) :where(ul, ol) {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+:where(helix-outline) :where(ul, ol) :where(ul, ol) {
+  padding-inline-start: var(--outline-indent, var(--helix-space-sm));
+}
+
+:where(helix-outline) :where(li) > :where(a) {
+  border-radius: var(--outline-link-radius, var(--helix-radii-sm));
+  color: var(--outline-link-color, var(--helix-color-foreground-muted));
+  display: block;
+  font-size: var(--outline-link-font-size, var(--helix-text-xs));
+  font-weight: var(--helix-weight-medium);
+  line-height: var(--helix-leading-normal);
+  margin-inline-start: var(--outline-rail, var(--helix-space-2xs));
+  padding-block: var(--outline-link-padding-block, var(--helix-space-2xs));
+  padding-inline: var(--outline-link-padding-inline, var(--helix-space-sm));
+  text-decoration: none;
+  transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+:where(helix-outline) :where(li) > :where(a):hover {
+  background-color: var(
+    --outline-link-hover-background-color,
+    color-mix(in oklab, var(--helix-color-foreground) 5%, transparent)
+  );
+  color: var(--outline-link-hover-color, var(--helix-color-foreground));
+}
+
+:where(helix-outline) :where(li) > :where(a[aria-current]) {
+  color: var(--outline-link-current-color, var(--helix-color-foreground));
+  font-weight: var(--outline-link-current-weight, var(--helix-weight-semibold));
+}
+
 /* Pinned to a corner, which is a fact about the page and not about the control.
    **A recipe rather than a component, and `Toast` is the contrast that makes the
    line clear.** Toast owns its own placement, because a stack of messages has no

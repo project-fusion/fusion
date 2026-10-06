@@ -15,10 +15,11 @@ import { styles } from './outline-root.css.js'
  * `data-level` is at the top level. The outline does not read heading levels
  * from the document, because the headings are not always in the document.
  *
- * Links in a nested `<ul>` take their indentation from your own stylesheet:
- * the outline's styles reach the elements slotted into it and nothing inside
- * them. Write the links flat with `data-level` for the indentation drawn here,
- * and screen readers still hear them as nested lists.
+ * Links in a nested `<ul>` are styled by `helix.css`, since the outline's own
+ * styles reach the elements slotted into it and nothing inside them: the lists
+ * lose their bullets, each inner list is inset by `--outline-indent`, and the
+ * links read the same hooks as flat ones. Those rules have no specificity, so
+ * any rule of yours wins. Screen readers hear the levels either way.
  *
  * A heading slotted into `heading` is set above the links, lined up with them.
  *
