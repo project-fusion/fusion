@@ -75,6 +75,29 @@ export const scrollingAncestor = (
   return null
 }
 
+/** What `scrollRoom` takes off a box that scrolls. */
+export interface ScrollRoomOptions {
+  /**
+   * How much of the box its own content covers while it scrolls, a sticky row
+   * of headings, in pixels. Defaults to `0`.
+   */
+  covered?: number
+}
+
+/**
+ * How much of a list a reader sees at once, for Page Up and Page Down: the
+ * box's own height where it scrolls, less what covers it, and the window's
+ * where it does not and the page scrolls instead.
+ *
+ * **A pixel of slack**, since a box whose content rounds to one pixel more
+ * than its height does not scroll, and was paging by the window's height.
+ */
+export const scrollRoom = (
+  box: Element | null | undefined,
+  { covered = 0 }: ScrollRoomOptions = {},
+): number =>
+  box && box.scrollHeight > box.clientHeight + 1 ? box.clientHeight - covered : window.innerHeight
+
 /** Where `scrollingAncestor` looks, and what it takes for a scroller. */
 export interface ScrollerOptions {
   /** The axis whose overflow counts, or either where absent. */

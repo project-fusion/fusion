@@ -1,7 +1,12 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { registerDom } from '@fusion.dev/helix-testing/dom'
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
-import { animationsSettled, type OpenPhase, OpenPhaseController } from './open-phase-controller.js'
+import {
+  animationsFinished,
+  animationsSettled,
+  type OpenPhase,
+  OpenPhaseController,
+} from './open-phase-controller.js'
 
 beforeAll(() => {
   registerDom()
@@ -108,5 +113,50 @@ describe('animationsSettled', () => {
   test('resolves where there is no element to ask', async () => {
     await animationsSettled(null)
     expect(true).toBe(true)
+  })
+})
+
+describe('waiting for animations already running', () => {
+  test('resolves once each running animation has finished, a canceled one included', async () => {
+    let finish: () => void = () => {}
+    const finished = new Promise<void>((resolve) => {
+      finish = resolve
+    })
+    const canceled = Promise.reject(new DOMException('canceled', 'AbortError'))
+    canceled.catch(() => {})
+    const element = document.createElement('div')
+    const asked: unknown[] = []
+    element.getAnimations = ((options?: unknown) => {
+      asked.push(options)
+      return [{ finished }, { finished: canceled }] as unknown as Animation[]
+    }) as typeof element.getAnimations
+    let done = false
+    const waiting = animationsFinished(element).then(() => {
+      done = true
+    })
+    await Promise.resolve()
+    expect(asked).toEqual([{ subtree: true }])
+    expect(done).toBe(false)
+    finish()
+    await waiting
+    expect(done).toBe(true)
+  })
+
+  test('with nothing running, or no element, it resolves without waiting for a frame', async () => {
+    const element = document.createElement('div')
+    element.getAnimations = (() => []) as typeof element.getAnimations
+    const frame = globalThis.requestAnimationFrame
+    let frames = 0
+    globalThis.requestAnimationFrame = ((callback: FrameRequestCallback) => {
+      frames += 1
+      return frame(callback)
+    }) as typeof requestAnimationFrame
+    try {
+      await animationsFinished(element)
+      await animationsFinished(null)
+      expect(frames).toBe(0)
+    } finally {
+      globalThis.requestAnimationFrame = frame
+    }
   })
 })

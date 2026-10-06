@@ -2,6 +2,7 @@ import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { registerDom } from '@fusion.dev/helix-testing/dom'
 import { typeaheadBy } from '../../utils/typeahead/typeahead.js'
 import {
+  focusItemOf,
   KeyboardNavigationController,
   type KeyboardNavigationOptions,
   type NavigableItem,
@@ -429,5 +430,45 @@ describe('a host that has left', () => {
     keys.hostDisconnected()
     press(host, 'ArrowDown')
     expect(asked).toEqual([])
+  })
+})
+
+describe('an item that is only focused', () => {
+  test('owns itself and what is inside it, focuses itself, and chooses nothing', () => {
+    const button = document.createElement('button')
+    const inner = document.createElement('span')
+    button.append(inner)
+    document.body.replaceChildren(button)
+    const item = focusItemOf(button)
+    expect(item.contains(button)).toBe(true)
+    expect(item.contains(inner)).toBe(true)
+    expect(item.contains(document.body)).toBe(false)
+    expect(item.disabled).toBe(false)
+    expect(item.selected).toBe(false)
+    expect('words' in item).toBe(false)
+    item.select()
+    item.focusItem()
+    expect(document.activeElement).toBe(button)
+  })
+
+  test('takes its own focus, ownership, disabled state and words where given', () => {
+    const section = document.createElement('section')
+    const panel = document.createElement('div')
+    section.append(panel)
+    let focused = 0
+    const item = focusItemOf(section, {
+      disabled: true,
+      focus: () => {
+        focused += 1
+      },
+      owns: (node) => node === section,
+      words: 'Shipping',
+    })
+    expect(item.contains(panel)).toBe(false)
+    expect(item.contains(section)).toBe(true)
+    expect(item.disabled).toBe(true)
+    expect(item.words).toBe('Shipping')
+    item.focusItem()
+    expect(focused).toBe(1)
   })
 })

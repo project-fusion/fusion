@@ -24,6 +24,7 @@ interface Chart extends HTMLElement {
   series: { name: string; points: { label: string; value: number }[] }[]
   renders: number
   showsColumn(cell: number): boolean
+  columnName(cell: number): string
   updateComplete: Promise<boolean>
 }
 
@@ -265,5 +266,23 @@ describe('a chart inside another component', () => {
     await one.updateComplete
     expect(one.named).toBe('The component’s')
     expect(one.sourceRows.map((row) => row.label)).toEqual(['Right'])
+  })
+})
+
+describe('the heading of a column', () => {
+  test('is the name its cells carry, and empty past the last column', async () => {
+    const one = await chart()
+    const headings = one.sourceRows[0]?.cells.map((cell) => cell.name) ?? []
+    expect(one.columnName(headings.indexOf('Revenue'))).toBe('Revenue')
+    expect(one.columnName(99)).toBe('')
+  })
+
+  test('is read from the first row that has the cell, where the first row is short', async () => {
+    const one = await chart(`
+      ${TABLE('first', 'Short first row', '<tr><th scope="row">March</th><td data-value="1">1</td></tr><tr><th scope="row">April</th><td data-value="2">2</td><td>Late</td></tr>')}
+      <${tag} for="first"></${tag}>`)
+    const last = (one.sourceRows[1]?.cells.length ?? 0) - 1
+    expect(one.sourceRows[0]?.cells[last]).toBeUndefined()
+    expect(one.columnName(last)).toBe('Note')
   })
 })

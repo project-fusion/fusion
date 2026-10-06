@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { requestChange } from './request-change.js'
+import { requestChange, requestValue } from './request-change.js'
 
 /**
  * The one path every stateful change in the library runs through.
@@ -75,5 +75,42 @@ describe('announcing before applying', () => {
       next: 'moved',
     })
     expect(state).toBe('moved')
+  })
+})
+
+describe('a value a reader moves', () => {
+  test('asks with helix-before-change, applies, then sends a bubbling, composed change', () => {
+    const host = new EventTarget()
+    const heard: string[] = []
+    let value = 'a'
+    host.addEventListener('helix-before-change', (event) => {
+      heard.push(`before ${(event as CustomEvent<{ value: string }>).detail.value}, value ${value}`)
+    })
+    host.addEventListener('change', (event) => {
+      heard.push(`change ${event.bubbles} ${event.composed}, value ${value}`)
+    })
+    expect(
+      requestValue(host, 'a, b', (next) => {
+        value = next
+      }),
+    ).toBe(true)
+    expect(heard).toEqual(['before a, b, value a', 'change true true, value a, b'])
+  })
+
+  test('a refusal leaves the value and sends no change', () => {
+    const host = new EventTarget()
+    let changes = 0
+    host.addEventListener('helix-before-change', (event) => event.preventDefault())
+    host.addEventListener('change', () => {
+      changes += 1
+    })
+    let value = 'a'
+    expect(
+      requestValue(host, 'b', (next) => {
+        value = next
+      }),
+    ).toBe(false)
+    expect(value).toBe('a')
+    expect(changes).toBe(0)
   })
 })

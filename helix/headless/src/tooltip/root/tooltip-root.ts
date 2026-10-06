@@ -3,6 +3,7 @@ import {
   arrowReach,
   customElement,
   elementById,
+  focusTarget,
   HelixElement,
   hostAria,
   linkDescription,
@@ -18,7 +19,6 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
-import { focusTarget } from '../focus-target.js'
 
 /** Tags that exist to hold something, and say nothing when they hold nothing. */
 const GENERIC = new Set(['div', 'p', 'section', 'span'])

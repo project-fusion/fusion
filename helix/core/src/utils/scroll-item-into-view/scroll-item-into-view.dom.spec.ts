@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { registerDom } from '@fusion.dev/helix-testing/dom'
-import { scrollItemIntoView, scrollingAncestor } from './scroll-item-into-view.js'
+import { scrollItemIntoView, scrollingAncestor, scrollRoom } from './scroll-item-into-view.js'
 
 /**
  * Bringing an item into its own scroller, and moving nothing else.
@@ -266,5 +266,26 @@ describe('the box an item scrolls in', () => {
   test('short of where it is told to stop', () => {
     const { inner, item } = nested()
     expect(scrollingAncestor(item, { axis: 'y', stop: inner })).toBeNull()
+  })
+})
+
+describe('the room a page key moves by', () => {
+  /** A box whose scroll and client heights are what a layout would give it. */
+  const box = (scroll: number, client: number): HTMLElement => {
+    const element = document.createElement('div')
+    Object.defineProperty(element, 'scrollHeight', { value: scroll })
+    Object.defineProperty(element, 'clientHeight', { value: client })
+    return element
+  }
+
+  test('a box that scrolls pages by its own height, less what covers it', () => {
+    expect(scrollRoom(box(900, 300))).toBe(300)
+    expect(scrollRoom(box(900, 300), { covered: 40 })).toBe(260)
+  })
+
+  test('a box that does not scroll, or one a pixel over from rounding, pages by the window', () => {
+    expect(scrollRoom(box(300, 300), { covered: 40 })).toBe(window.innerHeight)
+    expect(scrollRoom(box(301, 300))).toBe(window.innerHeight)
+    expect(scrollRoom(null)).toBe(window.innerHeight)
   })
 })

@@ -17,6 +17,35 @@ const NATIVE_FOCUSABLE = [
 ].join(',')
 
 /**
+ * What takes a press of its own inside a row or an item that is pressable as a
+ * whole: a link, a control, a label, a disclosure's summary, or anything a page
+ * gave a `tabindex`.
+ */
+export const PRESSABLE = 'a[href], button, input, label, select, summary, textarea, [tabindex]'
+
+/**
+ * Whether a press landed on a control of the item's own, before `boundary` in
+ * its path, so the item leaves the press to that control.
+ *
+ * **The composed path, so a control inside a component counts**: the `<button>`
+ * in a slotted Helix button's shadow root is on the path and matches, where the
+ * event's retargeted `target` is only the host. The boundary itself and
+ * everything past it is not asked, so a row that is a `[tabindex]` stop does
+ * not count as its own control.
+ */
+export const pressedOwnControl = (
+  event: Event,
+  boundary: EventTarget,
+  pressable: string = PRESSABLE,
+): boolean => {
+  const path = event.composedPath()
+  const end = path.indexOf(boundary)
+  return path
+    .slice(0, end < 0 ? 0 : end)
+    .some((node) => node instanceof Element && node.matches(pressable))
+}
+
+/**
  * Everything inside `root` the reader can reach with Tab, in document order.
  *
  * Roving tabindex, arrow-key navigation and "focus the first thing" all need

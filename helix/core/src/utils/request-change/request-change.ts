@@ -1,3 +1,5 @@
+import { HelixBeforeChangeEvent } from '../../events/before-change.js'
+
 /**
  * Announces a change, then applies it unless a listener refused.
  *
@@ -50,3 +52,28 @@ export const requestChange = <T>({
   apply(next)
   return true
 }
+
+/**
+ * Asks before a reader's press moves a value, then applies it and says so:
+ * `helix-before-change` with the value it would leave, which a listener may
+ * cancel, and `change` once it has moved.
+ *
+ * **The order every selectable set in the library keeps**, so a page reads the
+ * same pair from a list, a tag group, a heatmap or a legend: the cancelable
+ * question first, the platform's `change` after, bubbling and composed as a
+ * native control's does. Returns whether the value moved.
+ */
+export const requestValue = (
+  host: EventTarget,
+  next: string,
+  apply: (value: string) => void,
+): boolean =>
+  requestChange({
+    apply: (value) => {
+      apply(value)
+      host.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
+    },
+    event: (value) => new HelixBeforeChangeEvent({ value }),
+    host,
+    next,
+  })

@@ -72,6 +72,8 @@ export {
   type IndicatorOptions,
 } from './controllers/indicator-controller/indicator-controller.js'
 export {
+  type FocusItemOptions,
+  focusItemOf,
   KeyboardNavigationController,
   type KeyboardNavigationOptions,
   type KeyboardOrigin,
@@ -83,6 +85,7 @@ export {
   SKIP_SECONDS,
 } from './controllers/media-session-controller/media-session-controller.js'
 export {
+  animationsFinished,
   animationsSettled,
   type OpenPhase,
   OpenPhaseController,
@@ -414,11 +417,15 @@ export {
   elementById,
   searchableById,
 } from './utils/element-by-id/element-by-id.js'
-export { fillTemplate } from './utils/fill-template/fill-template.js'
+export { exportParts } from './utils/export-parts/export-parts.js'
+export { fillTemplate, labelWith } from './utils/fill-template/fill-template.js'
+export { focusTarget } from './utils/focus-target/focus-target.js'
 export {
   deepActiveElement,
   deepContains,
   focusableElements,
+  PRESSABLE,
+  pressedOwnControl,
 } from './utils/focusable-elements/focusable-elements.js'
 export {
   afterLinkFollowed,
@@ -506,6 +513,7 @@ export { type ReportValuesOptions, reportValues } from './utils/report-values/re
 export {
   type ChangeRequestOptions,
   requestChange,
+  requestValue,
 } from './utils/request-change/request-change.js'
 export {
   type ActivatableItem,
@@ -534,11 +542,13 @@ export { ticks } from './utils/scale/ticks.js'
 export {
   type ScrollerOptions,
   type ScrollItemOptions,
+  type ScrollRoomOptions,
   scrollItemIntoView,
   scrollingAncestor,
+  scrollRoom,
 } from './utils/scroll-item-into-view/scroll-item-into-view.js'
 export { lockScroll, scrollHolders, unlockScroll } from './utils/scroll-lock/scroll-lock.js'
-export { slotFilled } from './utils/slot-filled/slot-filled.js'
+export { slotFilled, slotNamed } from './utils/slot-filled/slot-filled.js'
 export { SlottedGlyph } from './utils/slotted-glyph/slotted-glyph.js'
 export { slottedWords } from './utils/slotted-words/slotted-words.js'
 export { splitValues } from './utils/split-values/split-values.js'

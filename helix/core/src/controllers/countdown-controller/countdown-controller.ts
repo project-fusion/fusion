@@ -4,6 +4,13 @@ import type { ReactiveController, ReactiveControllerHost } from 'lit'
 export interface CountdownOptions {
   /** Runs once the time is spent. */
   done: () => void
+  /**
+   * Whether a hidden page holds the clock, as a pointer on the message does,
+   * so a timed message is not spent in a background tab. Counted as one hold
+   * however often the page hides, and a clock started while the page is
+   * hidden waits for it to show. Defaults to `false`.
+   */
+  holdWhileHidden?: boolean
   /** Runs with `true` when the clock stops partway and `false` when it runs again. */
   paused?: (paused: boolean) => void
 }
@@ -25,7 +32,10 @@ export interface CountdownOptions {
  * **Leaving the page pauses it**, keeping the time already spent, and drops
  * the holds, since a pointer or focus on a detached element never leaves it.
  * Coming back does not resume on its own: the host says whether it should,
- * such as only while it is still showing. `DelayController` is the other wait
+ * such as only while it is still showing.
+ *
+ * **A hidden page holds it too, where the host asks** with `holdWhileHidden`:
+ * RAC's toast queue stops its timers while the window is in the background. `DelayController` is the other wait
  * in core, for a wait that starts over and forgets itself on leaving.
  */
 export class CountdownController implements ReactiveController {
@@ -40,6 +50,22 @@ export class CountdownController implements ReactiveController {
   /** How many reasons there are to hold the clock. */
   private holds = 0
 
+  /** Whether a hidden page is one of the holds, with `holdWhileHidden`. */
+  private hidden = false
+
+  /** Holds the clock as the page hides, and lets it go as the page shows. */
+  private readonly handleVisibility = (): void => {
+    if (document.hidden === this.hidden) {
+      return
+    }
+    this.hidden = document.hidden
+    if (this.hidden) {
+      this.hold()
+    } else {
+      this.release()
+    }
+  }
+
   constructor(
     host: ReactiveControllerHost,
     private readonly options: CountdownOptions,
@@ -52,11 +78,20 @@ export class CountdownController implements ReactiveController {
     return this.timer !== undefined
   }
 
-  hostConnected(): void {}
+  hostConnected(): void {
+    if (this.options.holdWhileHidden && typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', this.handleVisibility)
+      this.handleVisibility()
+    }
+  }
 
   hostDisconnected(): void {
     this.pause()
     this.holds = 0
+    this.hidden = false
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('visibilitychange', this.handleVisibility)
+    }
   }
 
   /** Starts the clock at `ms`. Nothing, zero or less starts nothing. */
@@ -82,7 +117,12 @@ export class CountdownController implements ReactiveController {
 
   /** Runs the clock again from where it stopped. */
   resume(): void {
-    if (this.timer !== undefined || this.remaining === undefined || this.remaining <= 0) {
+    if (
+      this.hidden ||
+      this.timer !== undefined ||
+      this.remaining === undefined ||
+      this.remaining <= 0
+    ) {
       return
     }
     this.startedAt = Date.now()
