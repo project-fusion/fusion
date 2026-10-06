@@ -1017,6 +1017,14 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
     ) {
       return
     }
+    /* After the list has drawn what was typed, never before. Typing opens the
+       list in the same task that narrows it, and this element updates first:
+       measured before this, typing "g" said "4 results. Go" over a list
+       showing one option, which the list itself said as "1 result". */
+    if (this.listbox?.isUpdatePending) {
+      void this.listbox.updateComplete.then(() => this.linkActive())
+      return
+    }
     if (this.told === undefined) {
       this.counted = countLabel(
         this.reachable.length,

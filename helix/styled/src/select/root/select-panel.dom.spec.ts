@@ -46,7 +46,7 @@ if (hasLayout()) {
       const trigger = part(host, 'trigger') as HTMLElement
       await placed(surface)
       const style = getComputedStyle(surface)
-      expect(style.minInlineSize).toBe('max-content')
+      expect(style.inlineSize).not.toBe('auto')
       expect(style.paddingInline).toBe('0px')
       /* `offsetWidth`, not `getBoundingClientRect`. The panel opens with
          `scale: 0.96` transitioning to `1`, and `data-placed` is set when that
@@ -76,6 +76,40 @@ if (hasLayout()) {
         await placed(surface)
         expect(surface.offsetWidth).toBeLessThanOrEqual(window.innerWidth - 16)
       }
+    })
+
+    test('an option whose words are wider than the screen leaves the list inside its edges', async () => {
+      /* Measured before this: on a 375 pixel screen a full-width Select with one
+         option of 120 characters opened a list from 8 to 656, because
+         `min-inline-size: max-content` won over the cap. The row is cut with an
+         ellipsis instead. */
+      const words = 'A very long option whose words run on and on '.repeat(12)
+      for (const position of ['floating', 'item-aligned']) {
+        document.body.innerHTML = `<helix-select label="L" open position="${position}" style="inline-size: 100vw">
+          <helix-option value="a">Apple</helix-option>
+          <helix-option value="b">${words}</helix-option>
+        </helix-select>`
+        const host = document.body.firstElementChild as Updatable
+        await settle(host)
+        const surface = part(host as unknown as HTMLElement, 'surface') as HTMLElement
+        await placed(surface)
+        const box = surface.getBoundingClientRect()
+        expect(surface.offsetWidth).toBeLessThanOrEqual(window.innerWidth - 16)
+        expect(box.right).toBeLessThanOrEqual(window.innerWidth)
+      }
+    })
+
+    test('a list whose content is wider than a narrow trigger takes the content width', async () => {
+      /* The floor is the trigger and the content wins over it, as before. */
+      document.body.innerHTML = `<helix-select label="L" open style="inline-size: 80px">
+        <helix-option value="a">An option a good deal wider than its trigger</helix-option>
+      </helix-select>`
+      const host = document.body.firstElementChild as Updatable
+      await settle(host)
+      const surface = part(host as unknown as HTMLElement, 'surface') as HTMLElement
+      await placed(surface)
+      expect(surface.offsetWidth).toBeGreaterThan(80)
+      expect(surface.scrollWidth).toBeLessThanOrEqual(surface.offsetWidth)
     })
   })
 }
