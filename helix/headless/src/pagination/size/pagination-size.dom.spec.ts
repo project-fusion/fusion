@@ -77,6 +77,24 @@ describe('pagination size', () => {
     expect(label.getAttribute('for')).toBe(trigger.id)
   })
 
+  /* `<label for>` reached the host and stopped there: the select inside was
+     still named "Per page", whatever the page called it. */
+  test('the page’s name for it names the select, in place of its own label', async () => {
+    const host = (await mount(
+      '<helix-headless-pagination-size aria-label="Rows per page"></helix-headless-pagination-size>',
+    )) as Size
+    await host.updateComplete
+    expect(control(host).getAttribute('aria-label')).toBe('Rows per page')
+    expect(control(host).getAttribute('label')).toBe('')
+
+    const plain = (await mount(
+      '<helix-headless-pagination-size></helix-headless-pagination-size>',
+    )) as Size
+    await plain.updateComplete
+    expect(control(plain).hasAttribute('aria-label')).toBe(false)
+    expect(control(plain).getAttribute('label')).toBe('Per page')
+  })
+
   test('moves itself when nothing declared the value', async () => {
     const it = (await mount(
       '<helix-headless-pagination-size default-value="10" sizes="10,25"></helix-headless-pagination-size>',
