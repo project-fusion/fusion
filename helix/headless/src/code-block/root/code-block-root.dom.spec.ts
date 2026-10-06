@@ -155,7 +155,7 @@ describe('the no-copy attribute follows the property', () => {
 /* Expressive Code's line numbers and Shiki's or Prism's highlighting, with the
    code itself left in the slot so a copy is the code as written. */
 describe('line numbers and a highlighter', () => {
-  type Block = Updatable & { highlight?: (code: string) => string }
+  type Block = Updatable & { highlight?: (code: string, language: string) => string }
   const copyValue = (el: Element): string =>
     (
       el.shadowRoot?.querySelector('helix-headless-copy-button') as
@@ -211,6 +211,27 @@ describe('line numbers and a highlighter', () => {
     expect(el.shadowRoot?.querySelector('[part="code"] [tabindex]')).toBeNull()
     expect(el.shadowRoot?.querySelectorAll('[part="code"] .line')).toHaveLength(2)
     expect(copyValue(el)).toBe('one\ntwo')
+  })
+
+  /* "Bind the language in the function you pass" meant one function per
+     block; Shiki and Prism each take the language beside the code. */
+  test("hands the highlighter the block's language, so one function serves every block", async () => {
+    const asked: string[] = []
+    const highlight = (code: string, language: string): string => {
+      asked.push(`${language}:${code}`)
+      return code
+    }
+    for (const markup of [
+      '<helix-headless-code-block language="ts"></helix-headless-code-block>',
+      '<helix-headless-code-block></helix-headless-code-block>',
+    ]) {
+      const el = (await mount(markup)) as Block
+      el.highlight = highlight
+      el.textContent = 'a'
+      await new Promise((resolve) => setTimeout(resolve, 0))
+      await el.updateComplete
+    }
+    expect([...new Set(asked)]).toEqual(['ts:a', ':a'])
   })
 
   test('is not asked about empty code', async () => {

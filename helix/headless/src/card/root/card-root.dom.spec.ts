@@ -192,3 +192,36 @@ describe('card region parts', () => {
     ])
   })
 })
+
+/* Web Awesome's card writes `with-header`, `with-footer` and `with-media`, so a
+   sheet draws a card by what it holds. Here they are states, so the card's
+   markup is the page's alone. */
+describe('card region states', () => {
+  type Held = HTMLElement & { internals: ElementInternals; updateComplete: Promise<boolean> }
+  const held = (card: Held): string[] =>
+    ['has-media', 'has-header', 'has-footer'].filter((name) => card.internals.states.has(name))
+
+  test('say which regions hold something', async () => {
+    expect(held((await mount('<helix-headless-card>Body</helix-headless-card>')) as Held)).toEqual(
+      [],
+    )
+    const full = (await mount(
+      '<helix-headless-card><img slot="media" alt=""><h3 slot="header">Title</h3>Body<button slot="footer-actions">Save</button></helix-headless-card>',
+    )) as Held
+    expect(held(full)).toEqual(['has-media', 'has-header', 'has-footer'])
+  })
+
+  test('follow a region filled or emptied later', async () => {
+    const card = (await mount('<helix-headless-card>Body</helix-headless-card>')) as Held
+    const header = document.createElement('h3')
+    header.slot = 'header'
+    card.append(header)
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await card.updateComplete
+    expect(held(card)).toEqual(['has-header'])
+    header.remove()
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await card.updateComplete
+    expect(held(card)).toEqual([])
+  })
+})

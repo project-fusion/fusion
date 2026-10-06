@@ -33,6 +33,12 @@ import { property, state } from 'lit/decorators.js'
  * is no wrapper and every region is a bare slot. A server cannot see slotted
  * content, so served actions sit on their own line until the script runs.
  *
+ * **The card says which regions it holds**, as `:state(has-media)`,
+ * `:state(has-header)` and `:state(has-footer)`, so a sheet can draw a card
+ * with a header differently, as Web Awesome's `with-header` does, with no
+ * attribute written onto the card. Read in the browser, so a served card
+ * carries none until the script runs.
+ *
  * @since 0.1.0
  * @status stable
  * @category layout
@@ -54,6 +60,10 @@ import { property, state } from 'lit/decorators.js'
  * @csspart header-actions - The slot the header's controls arrive through, drawing no box, as `body` does.
  * @csspart header-row - The line holding `header` and `header-actions`, drawn only while `header-actions` holds something.
  * @csspart media - The slot the media arrives through, drawing no box, as `body` does.
+ *
+ * @cssstate has-footer - Something is slotted into `footer` or `footer-actions`.
+ * @cssstate has-header - Something is slotted into `header` or `header-actions`.
+ * @cssstate has-media - Something is slotted into `media`.
  */
 @customElement('helix-headless-card')
 export class HelixHeadlessCard extends HelixElement {
@@ -117,16 +127,29 @@ export class HelixHeadlessCard extends HelixElement {
      slot was filled before any listener was bound and sends no change. */
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    this.readActions()
+    this.readRegions()
+  }
+
+  /* One listener for every region's slot: `slotchange` bubbles inside the
+     shadow root, and a binding on each slot would write a marker into the
+     served markup beside every one of them. */
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.renderRoot.addEventListener('slotchange', this.readRegions)
   }
 
   /* Content arriving in the light DOM changes no property, so the slots are
-     read here. Bound to the slots, because `slotchange` is not composed. */
-  private readonly readActions = (): void => {
+     read here. Bound to the slots, because `slotchange` is not composed. The
+     actions decide the rows; every region says whether it is filled as a
+     state, written out one call apiece so each pairs with its `@cssstate`. */
+  private readonly readRegions = (): void => {
     const filled = (name: string): boolean =>
       slotFilled(this.renderRoot?.querySelector<HTMLSlotElement>(`slot[name="${name}"]`))
     this.headerActions = filled('header-actions')
     this.footerActions = filled('footer-actions')
+    this.toggleState('has-media', filled('media'))
+    this.toggleState('has-header', this.headerActions || filled('header'))
+    this.toggleState('has-footer', this.footerActions || filled('footer'))
   }
 
   protected override render(): TemplateResult {
@@ -150,13 +173,13 @@ export class HelixHeadlessCard extends HelixElement {
       ><slot
         name="header-actions"
         part="header-actions"
-        @slotchange=${this.readActions}
+        @slotchange=${this.readRegions}
       ></slot>`
     const footer = html`<slot name="footer" part="footer"></slot
       ><slot
         name="footer-actions"
         part="footer-actions"
-        @slotchange=${this.readActions}
+        @slotchange=${this.readRegions}
       ></slot>`
     return html`
       <slot name="media" part="media"></slot>
