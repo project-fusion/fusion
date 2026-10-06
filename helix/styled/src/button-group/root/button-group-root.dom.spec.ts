@@ -88,7 +88,45 @@ describe('button group', () => {
     expect(raised).toContain('z-index: var(--helix-layer-raised)')
   })
 
+  /* WA and Shoelace size each button; a group of buttons all one size had to
+     say it on every button or reach for `data-density`. */
+  test('size reflects, rests on nothing, and declares the density steps for every button', async () => {
+    const host = (await mount(group)) as Updatable & { size?: string }
+    expect(host.hasAttribute('size')).toBe(false)
+    host.size = 'sm'
+    await host.updateComplete
+    expect(host.getAttribute('size')).toBe('sm')
+    expect(rule(':host([size="sm"])')).toContain(
+      '--helix-size-control: var(--helix-size-control-sm)',
+    )
+    expect(rule(':host([size="lg"])')).toContain(
+      '--helix-size-control: var(--helix-size-control-lg)',
+    )
+    expect(rule(':host([size])')).toContain(
+      '--helix-size-control-tight: calc(var(--helix-size-control) * 0.8)',
+    )
+  })
+
   if (hasLayout()) {
+    test('in a browser, size sets the height of every button in the group', async () => {
+      const height = async (size: string): Promise<number[]> => {
+        const host = await mount(`<helix-button-group label="Export" ${size}>
+            <helix-button>CSV</helix-button><helix-button>JSON</helix-button>
+          </helix-button-group>`)
+        return [...host.querySelectorAll('helix-button')].map(
+          (button) => button.getBoundingClientRect().height,
+        )
+      }
+      const [small, medium, large] = [
+        await height('size="sm"'),
+        await height(''),
+        await height('size="lg"'),
+      ]
+      expect(small[0]).toBeLessThan(medium[0] as number)
+      expect(large[0]).toBeGreaterThan(medium[0] as number)
+      expect(small[0]).toBe(small[1] as number)
+    })
+
     /* The page's base layer joins a native button, since its corners are its
        own radius and a page rule setting one beats any `::slotted()` rule. */
     test('in a browser, native buttons join too, even under a page rule with a radius', async () => {

@@ -16,8 +16,9 @@ import { styles } from './button-group-root.css.js'
  * shadow root, where this component's styles cannot reach. The same rule works
  * for your own anchor styled as a button.
  *
- * The buttons take their height from the region, so set `data-density` on the
- * group to make every button in it smaller or larger together.
+ * The buttons take their height from the region, so `size` makes every
+ * button in the group smaller or larger together, as `data-density` on the
+ * group does, and a button's own size still wins.
  *
  * @since 0.1.0
  * @status stable
@@ -46,6 +47,14 @@ export class HelixButtonGroup extends HelixHeadlessButtonGroup {
    */
   @property({ reflect: true })
   variant?: 'joined' | 'spaced'
+
+  /**
+   * The size of every button in the group: their height, text, padding and
+   * icons, from the density steps. Unset, the buttons take the size of the
+   * region around the group.
+   */
+  @property({ reflect: true })
+  size?: 'sm' | 'md' | 'lg'
 }
 
 declare global {
