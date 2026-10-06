@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -74,6 +74,16 @@ describe('a pair with several values', () => {
     ])
   })
 
+  test('says so as a custom state, and only while the values are its own', async () => {
+    const host = await item('label="Authors"', '<dd>Ada Lovelace</dd>')
+    await host.updateComplete
+    expect(hasState(host, 'several')).toBe(true)
+    host.replaceChildren(document.createTextNode('Ada Lovelace'))
+    await host.updateComplete
+    await host.updateComplete
+    expect(hasState(host, 'several')).toBe(false)
+  })
+
   test('takes its own `<dd>` back when the values are text again', async () => {
     const host = await item('label="Authors"', '<dd>Ada Lovelace</dd>')
     host.replaceChildren(document.createTextNode('Ada Lovelace'))
@@ -90,6 +100,13 @@ describe('controls on a value', () => {
     const slots = [...value.querySelectorAll('slot')]
     expect(slots.map((slot) => slot.name)).toEqual(['', 'actions'])
     expect(slots[1]?.assignedElements().map((one) => one.textContent)).toEqual(['Copy'])
+  })
+
+  test('sit in their own part, so a page styles the box apart from the value', async () => {
+    const host = await item('label="Id"', 'a1b2<button slot="actions">Copy</button>')
+    const actions = part(host, 'actions') as HTMLElement
+    expect(actions.parentElement).toBe(part(host, 'value') as HTMLElement)
+    expect(actions.querySelector('slot')?.name).toBe('actions')
   })
 
   test('several said up front draws no description of its own, before any value arrives', async () => {
