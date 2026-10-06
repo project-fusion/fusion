@@ -26,7 +26,7 @@ export function Example() {
         </helix-headless-menu-item>
       </helix-headless-menu-item>
 
-      <helix-headless-divider announced></helix-headless-divider>
+      <helix-headless-divider></helix-headless-divider>
 
       <helix-headless-menu-item
         checkable

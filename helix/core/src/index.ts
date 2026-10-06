@@ -574,6 +574,7 @@ export {
   type ToneMark,
   toneMark,
 } from './utils/tone-marks/tone-marks.js'
+export { toolbarAround, toolbarAxis } from './utils/toolbar-around/toolbar-around.js'
 export { type TreeArrow, type TreeArrowRow, treeArrow } from './utils/tree-arrow/tree-arrow.js'
 export {
   Typeahead,
