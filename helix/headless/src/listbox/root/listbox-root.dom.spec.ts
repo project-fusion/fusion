@@ -990,3 +990,53 @@ describe('a filterable list heard through VoiceOver', () => {
     })
   })
 })
+
+describe('a listbox a browser can autofill', () => {
+  /* React Aria's HiddenSelect: a browser fills native fields only. Measured
+     before this, `autocomplete` went on the filter field, and a list with no
+     filter gave the browser nothing to fill. */
+  const hidden = (host: Updatable): HTMLSelectElement | null =>
+    (host as HTMLElement).shadowRoot?.querySelector('select') ?? null
+
+  test('keeps a hidden native select with the same options, and takes what is filled', async () => {
+    const host = (await list('autocomplete="country"')) as Updatable & { value: string }
+    const field = hidden(host) as HTMLSelectElement
+    expect(field.getAttribute('autocomplete')).toBe('country')
+    expect(field.getAttribute('aria-hidden')).toBe('true')
+    expect(field.tabIndex).toBe(-1)
+    expect(field.hasAttribute('name')).toBe(false)
+    expect([...field.options].map((option) => [option.value, option.text])).toEqual([
+      ['', ''],
+      ['one', 'Alpha'],
+      ['two', 'Beta'],
+      ['three', 'Gamma'],
+    ])
+    field.value = 'two'
+    field.dispatchEvent(new Event('change', { bubbles: true }))
+    await settle(host)
+    expect(host.value).toBe('two')
+    expect(formValue(host as unknown as HTMLElement)).toBe('two')
+  })
+
+  test('takes every option filled in, with multiple', async () => {
+    const host = (await list('autocomplete="country" multiple')) as Updatable & { value: string }
+    const field = hidden(host) as HTMLSelectElement
+    for (const option of field.options) {
+      option.selected = option.value === 'one' || option.value === 'three'
+    }
+    field.dispatchEvent(new Event('change', { bubbles: true }))
+    await settle(host)
+    expect(host.value).toBe('one,three')
+  })
+
+  test('never offers the filter field to the browser', async () => {
+    const host = await list('autocomplete="country" filterable')
+    const filter = part(host as HTMLElement, 'search-field') as HTMLInputElement
+    expect(filter.getAttribute('autocomplete')).toBe('off')
+  })
+
+  test('draws nothing at `off`, the default', async () => {
+    expect(hidden(await list())).toBeNull()
+    expect(hidden(await list('autocomplete="off"'))).toBeNull()
+  })
+})

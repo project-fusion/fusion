@@ -45,16 +45,33 @@ import { over } from '../align.js'
  * Set `valueContent` to draw the trigger's content from the chosen options,
  * and several chosen options are written as a list in the reader's language.
  *
- * In the open list the arrow keys, Home, End, PageUp, PageDown and typed
- * letters move the highlight, and Enter, Space or a click chooses it and
- * closes the list. Tab closes the list and moves on. On the closed trigger,
- * ArrowDown, Enter and Space open the list on the chosen option, ArrowUp opens
- * it on the chosen or last option, Home and End open it on the first or last,
- * and typed letters choose the option whose words start with them, as a native
- * `<select>` does. ArrowLeft and ArrowRight choose the option before or after
- * the chosen one without opening, as React Aria's Select does, in either
- * direction of text. A choice made on the closed trigger is said aloud on Apple
- * devices, where VoiceOver does not read the trigger's new name.
+ * **Keyboard.** On the closed trigger:
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Down, Enter, Space | Opens the list on the chosen option, or the first. |
+ * | Up | Opens the list on the chosen option, or the last. |
+ * | Home, End | Opens the list on the first or the last option. |
+ * | Left, Right | Chooses the option before or after the chosen one without opening, as React Aria's Select does, in either direction of text. |
+ * | A letter or a word | Chooses the option whose words start with what you typed, as a native `<select>` does. With `multiple`, opens the list on it. |
+ *
+ * In the open list, which is a `Listbox`:
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Down, Up, Home, End, Page Down, Page Up | Moves the highlight. |
+ * | A letter or a word | Moves the highlight to the next option whose words start with what you typed. |
+ * | Enter, Space | Chooses the highlighted option and closes the list. With `multiple`, toggles it and leaves the list open. |
+ * | Escape | Closes the list and puts focus back on the trigger. |
+ * | Tab | Closes the list and moves on. |
+ *
+ * A choice made on the closed trigger is said aloud on Apple devices, where
+ * VoiceOver does not read the trigger's new name.
+ *
+ * **ARIA.** The trigger is a `button` with `aria-haspopup="listbox"` and
+ * `aria-expanded`, named by the label and then the chosen words, as a native
+ * `<select>` is. The list is the listbox `Listbox` describes, named by the
+ * label, or by `list-label` where there is none.
  *
  * Set `autocomplete` to let a browser's autofill choose, as a native `<select>`
  * with the same attribute would.
