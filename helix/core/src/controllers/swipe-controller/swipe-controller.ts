@@ -55,7 +55,10 @@ interface Sample {
  * axis.** Before that it is still a press, so a tap on a button inside the
  * surface is a tap, and a drag across the axis, a reader scrolling, is left to
  * the page. Once it is a swipe, the click that ends it is swallowed, so a
- * swipe that started on a button does not also press it.
+ * swipe that started on a button does not also press it. The swallow is held on
+ * the window for one task after the release, so a spec that swipes and then
+ * presses a control in the same task sees that press swallowed: wait a task
+ * between them, as a reader's next press always does.
  *
  * The move and the release are heard on the window, so a pointer that leaves
  * the surface mid-swipe is still followed.

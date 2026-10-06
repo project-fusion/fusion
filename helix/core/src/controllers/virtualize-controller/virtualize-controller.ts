@@ -1,4 +1,5 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
+import { endInSight } from '../../utils/load-more/load-more.js'
 import { reportRuntime } from '../../utils/report-runtime/report-runtime.js'
 import { Heights } from './heights.js'
 
@@ -451,13 +452,16 @@ export class VirtualizeController implements ReactiveController {
    * new items that the filter hides still let it ask again.
    */
   endInSight(length = Math.max(0, this.options.count())): boolean {
-    const screen = this.options.container()?.clientHeight ?? 0
+    /* The rule is core's `endInSight`, which Listbox asks of its own scroll,
+       so the two lists ask on the same terms. */
     if (
-      length === 0 ||
-      screen <= 0 ||
-      this.askedAt === length ||
       this.options.count() <= 0 ||
-      this.remaining() > screen
+      !endInSight({
+        askedAt: this.askedAt,
+        count: length,
+        remaining: this.remaining(),
+        screen: this.options.container()?.clientHeight ?? 0,
+      })
     ) {
       return false
     }

@@ -10,6 +10,14 @@ import { styles } from './megamenu-root.css.js'
  * Styles the trigger and lays out the panel it opens as a grid of columns. What
  * opens and closes the panel comes from the base class.
  *
+ * **The panel's contents are laid out by `helix.css`**, through attributes you
+ * write on your own markup: `data-megamenu-group` on each column,
+ * `data-megamenu-heading` on a column's heading, and `data-megamenu-item` on a
+ * link that carries a title in `<strong>` and a line of description in `<span>`
+ * or `<p>`, with an icon before them. A plain `<a>` in a group is drawn as a
+ * navigation item. Without the attributes the panel holds your markup as you
+ * styled it.
+ *
  * @since 0.1.0
  * @status stable
  * @category navigation

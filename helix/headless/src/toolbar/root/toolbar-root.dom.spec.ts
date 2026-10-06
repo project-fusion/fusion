@@ -7,6 +7,7 @@ beforeAll(async () => {
   await import('../../button/index.js')
   await import('../../divider/index.js')
   await import('../../menu/index.js')
+  await import('../../select/index.js')
   await import('../../toggle/index.js')
 })
 
@@ -415,5 +416,24 @@ describe('a toggle group of pressed buttons in a toolbar', () => {
     }
     expect(order).toEqual(['bold', 'italic', 'b3', 'b1'])
     expect(group.focusable).toBe(false)
+  })
+})
+
+/* A Select had no `focusable`, so the toolbar wrote `tabindex` on the host,
+   markup a React consumer's hydration reports. */
+describe('a select in a toolbar', () => {
+  test('gives up its stop by its own property, and nothing is written on the host', async () => {
+    const toolbar = await mount(`
+      <helix-headless-toolbar label="Format">
+        <helix-headless-button>Bold</helix-headless-button>
+        <helix-headless-select label="Size"><helix-headless-option value="s">Small</helix-headless-option></helix-headless-select>
+      </helix-headless-toolbar>`)
+    await settle(toolbar)
+    const select = toolbar.querySelector('helix-headless-select') as HTMLElement & Updatable
+    await select.updateComplete
+    expect([
+      select.hasAttribute('tabindex'),
+      part(select, 'trigger')?.getAttribute('tabindex'),
+    ]).toEqual([false, '-1'])
   })
 })
