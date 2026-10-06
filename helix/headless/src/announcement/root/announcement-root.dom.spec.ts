@@ -201,3 +201,27 @@ describe('announcement', () => {
     expect(await glyph('')).toBe('none')
   })
 })
+
+describe('the old `icon` slot', () => {
+  /* It is still drawn, and a page slotting it was never told it has a replacement. */
+  test('is reported once as deprecated, and `dismiss-icon` is not', async () => {
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    const settle = (): Promise<void> => new Promise((done) => setTimeout(done, 0))
+    try {
+      await mount(
+        '<helix-headless-announcement dismissible>Hi<span slot="icon">x</span></helix-headless-announcement>',
+      )
+      await settle()
+      await mount(
+        '<helix-headless-announcement dismissible>Hi<span slot="dismiss-icon">x</span></helix-headless-announcement>',
+      )
+      await settle()
+    } finally {
+      console.warn = original
+    }
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0]).toContain('dismiss-icon')
+  })
+})

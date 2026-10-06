@@ -245,6 +245,26 @@ describe('line numbers and a highlighter', () => {
     expect(asked).toBe(0)
     expect(el.shadowRoot?.querySelector('slot:not([name])')?.hasAttribute('hidden')).toBe(false)
   })
+
+  /* A highlighter that threw took the whole render with it, and the block went blank. */
+  test('that throws draws the code plain and reports the error', async () => {
+    const reported: unknown[] = []
+    const original = globalThis.reportError
+    globalThis.reportError = (error: unknown) => reported.push(error)
+    try {
+      const el = (await mount(
+        '<helix-headless-code-block>const a = 1</helix-headless-code-block>',
+      )) as Block
+      el.highlight = () => {
+        throw new Error('no grammar')
+      }
+      await el.updateComplete?.catch(() => undefined)
+      const slot = el.shadowRoot?.querySelector('[part="code"] slot:not([name])')
+      expect([slot?.hasAttribute('hidden'), reported.length]).toEqual([false, 1])
+    } finally {
+      globalThis.reportError = original
+    }
+  })
 })
 
 describe('the copy button of a named block', () => {
@@ -334,4 +354,14 @@ describe('an expandable block', () => {
     await el.updateComplete
     expect(expand(el)).toBeNull()
   })
+})
+
+/* Button gained a `spinner` part, and a page reached it on a code block's copy
+   button through nothing. */
+test("forwards the copy button's pending ring as `copy-spinner`", async () => {
+  const el = (await mount(
+    '<helix-headless-code-block>one</helix-headless-code-block>',
+  )) as Updatable
+  const copy = el.shadowRoot?.querySelector('[part="copy"]')
+  expect(copy?.getAttribute('exportparts')).toContain('spinner: copy-spinner')
 })

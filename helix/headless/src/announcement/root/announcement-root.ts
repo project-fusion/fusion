@@ -5,6 +5,7 @@ import {
   HelixElement,
   MixinDismissible,
   markRegion,
+  reportRuntime,
   slottedWords,
 } from '@fusion.dev/helix-core'
 import { x } from '@fusion.dev/helix-icons'
@@ -182,6 +183,15 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
        screen. */
     this.countdown.start(this.duration)
     this.handleVisibility()
+    /* Said once for an element that slots the old `icon`, which is still
+       drawn but has a replacement. */
+    if (this.querySelector(':scope > [slot="icon"]')) {
+      reportRuntime({
+        kind: 'deprecated',
+        message: `<${this.localName}>'s \`icon\` slot is deprecated: slot the glyph as \`dismiss-icon\`, the name Callout uses.`,
+        tag: this.localName,
+      })
+    }
   }
 
   protected override updated(changed: PropertyValues): void {

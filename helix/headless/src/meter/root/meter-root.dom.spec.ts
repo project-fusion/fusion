@@ -394,3 +394,37 @@ describe('live', () => {
     expect(part(quiet, 'live')).toBeNull()
   })
 })
+
+/* The band moved only on the host's states and, under `live`, in words: a
+   page that recolors something else had to watch the states. */
+describe('helix-band', () => {
+  type Meter = HTMLElement & { updateComplete: Promise<unknown>; value: number }
+
+  test('is sent once for each band the reading moves into, and not on the first render', async () => {
+    const host = (await meter('low="25" high="50" optimum="0" value="10"')) as Meter
+    const bands: string[] = []
+    host.addEventListener('helix-band', (event) => {
+      bands.push((event as CustomEvent<{ band: string }>).detail.band)
+    })
+    host.value = 20
+    await host.updateComplete
+    host.value = 30
+    await host.updateComplete
+    host.value = 92
+    await host.updateComplete
+    host.value = 95
+    await host.updateComplete
+    expect(bands).toEqual(['fair', 'poor'])
+  })
+
+  test('says no band where the meter has none', async () => {
+    const host = (await meter('band="good" value="10"')) as Meter
+    let sent: unknown
+    host.addEventListener('helix-band', (event) => {
+      sent = (event as CustomEvent).detail
+    })
+    host.removeAttribute('band')
+    await host.updateComplete
+    expect(sent).toEqual({ band: '' })
+  })
+})

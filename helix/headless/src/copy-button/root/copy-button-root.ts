@@ -69,6 +69,10 @@ import '../../tooltip/index.js'
  *
  * @cssstate copied - The moment after a successful copy, while `copied-label` names the button.
  * @cssstate failed - The moment after a press that put nothing on the clipboard, while `error-label` names the button.
+ *
+ * @withheld csspart text - Button's words, which this does not render: the label is the icon's name.
+ * @withheld slot end - Button's, which this does not render.
+ * @withheld slot start - Button's, which this does not render.
  */
 @customElement('helix-headless-copy-button')
 export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
@@ -217,11 +221,8 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
    * can run before there is a timer to clear), and registers itself so the timer
    * is released without an override here.
    */
-  /* A getter, so the controller reads `feedback-duration` at each press. */
-  private readonly clipboard = new CopyController(
-    this,
-    Object.defineProperty({}, 'after', { get: () => this.feedbackDuration }),
-  )
+  /* A function, so the controller reads `feedback-duration` at each press. */
+  private readonly clipboard = new CopyController(this, { after: () => this.feedbackDuration })
 
   private get copied(): boolean {
     return this.clipboard.copied

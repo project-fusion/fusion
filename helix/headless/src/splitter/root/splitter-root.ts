@@ -96,6 +96,8 @@ const channel = new WeakMap<HelixHeadlessSplitter, Crossed>()
  *
  * @cssproperty --splitter-corner-at - Where a nested splitter crosses this one, as a percentage.
  * @cssproperty --splitter-position - Where the divider sits, as a percentage of the box.
+ *
+ * @cssstate dragging - While the pointer or a corner holds the divider.
  */
 /*
  * How a corner is drawn, which is not a consumer's business and is worth
@@ -1226,6 +1228,9 @@ export class HelixHeadlessSplitter extends HelixElement {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    /* A custom state, which no server markup carries, so the host can say it
+       where a `data-` attribute could not. */
+    this.toggleState('dragging', this.dragging)
   }
 
   protected override render(): TemplateResult {

@@ -597,3 +597,11 @@ describe('an object inspector with a filter field', () => {
     expect(host.shadowRoot?.activeElement === active(host)).toBe(true)
   })
 })
+
+/* Button gained a `spinner` part, and a page reached it on a row's copy button
+   through nothing. */
+test("forwards the copy button's pending ring as `copy-spinner`", async () => {
+  const host = await inspector()
+  const copy = host.shadowRoot?.querySelector('[part~="copy"]')
+  expect(copy?.getAttribute('exportparts')).toContain('spinner: copy-spinner')
+})

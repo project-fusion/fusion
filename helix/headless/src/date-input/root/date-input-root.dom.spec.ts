@@ -1018,3 +1018,10 @@ describe('a date input in a page written in another language', () => {
     expect(part(host, 'picker')?.getAttribute('locale')).toBe('de-DE')
   })
 })
+
+/* Date Picker gained a `feedback` part, and a page reached it inside a date
+   input through nothing. */
+test("forwards the calendar's own message as `picker-feedback`", async () => {
+  const host = await field()
+  expect(picker(host)?.getAttribute('exportparts')).toContain('feedback: picker-feedback')
+})

@@ -60,6 +60,7 @@ import '../../button/index.js'
  * @csspart label - The step's name, which is a control.
  * @csspart label-button - The button inside the label.
  * @csspart label-live - The live region inside that button, rendered only from the first time the button is pending.
+ * @csspart label-spinner - The ring that button turns while it is pending.
  * @csspart label-text - The words on that button, trimmed to their capitals and baseline.
  * @csspart live - The live region that says a stage was completed, rendered from the first time one is.
  * @csspart mark - The glyph inside the marker: a tick, a dot, or an empty ring.
@@ -203,7 +204,7 @@ export class HelixHeadlessStep extends HelixElement {
   protected renderLabel(): TemplateResult {
     return html`<${this.tag('button')}
       part="label"
-      exportparts="button: label-button, live: label-live, text: label-text"
+      exportparts="button: label-button, live: label-live, spinner: label-spinner, text: label-text"
       emphasis="ghost"
       aria-current=${this.current ? 'step' : nothing}
       aria-describedby=${this.complete ? 'state' : nothing}

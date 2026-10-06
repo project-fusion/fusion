@@ -66,6 +66,7 @@ import { type DiffFile, type DiffHunk, type DiffLine, pairLines, parsePatch } fr
  * @csspart copy-button - The inner button.
  * @csspart copy-live - The copy button's live region, which speaks while the button is pending.
  * @csspart copy-mark - The clipboard icon, and the check mark that replaces it after a copy.
+ * @csspart copy-spinner - The ring the copy button turns while it is pending.
  * @csspart copy-text - The words on that button, trimmed to their capitals and baseline.
  * @csspart copy-tooltip - The copy button's tooltip.
  * @csspart copy-tooltip-arrow - The tooltip's arrow, which points at the copy button.
@@ -354,10 +355,18 @@ export class HelixHeadlessCodeBlock extends HelixElement {
       return this.renderDiff(files)
     }
     const text = this.text
-    const highlighted =
-      this.highlight && text !== ''
-        ? highlightedLines(this.highlight(text, this.language))
-        : undefined
+    /* A throw is the page's fault and must not cost the reader the code, so it
+       is reported as uncaught and the code is drawn plain, as Sandbox Source
+       draws its source. */
+    let highlighted: string | undefined
+    try {
+      highlighted =
+        this.highlight && text !== ''
+          ? highlightedLines(this.highlight(text, this.language))
+          : undefined
+    } catch (error) {
+      globalThis.reportError?.(error)
+    }
     /* The slot stays either way, hidden under highlighted markup, so a change
        to the code still reaches `slotchange` and the code stays the page's. */
     const code =
@@ -451,7 +460,7 @@ export class HelixHeadlessCodeBlock extends HelixElement {
   protected renderCopyButton(value: string = this.text, name = this.label): TemplateResult {
     return html`<${this.tag('copy-button')}
       part="copy"
-      exportparts="button: copy-button, text: copy-text, mark: copy-mark, live: copy-live, tooltip: copy-tooltip,
+      exportparts="button: copy-button, text: copy-text, mark: copy-mark, live: copy-live, spinner: copy-spinner, tooltip: copy-tooltip,
         tooltip-arrow: copy-tooltip-arrow, tooltip-arrow-bottom: copy-tooltip-arrow-bottom,
         tooltip-arrow-left: copy-tooltip-arrow-left, tooltip-arrow-right: copy-tooltip-arrow-right,
         tooltip-arrow-top: copy-tooltip-arrow-top, tooltip-bottom: copy-tooltip-bottom,

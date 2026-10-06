@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, slotted } from '@fusion.dev/helix-testing/dom'
+import { hasState, mount, part, registerDom, slotted } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -456,6 +456,17 @@ describe('splitter while it moves', () => {
     expect(bar.hasAttribute('data-dragging')).toBe(true)
     await grab(host, bar, 'pointerup')
     expect(separator(host).hasAttribute('data-dragging')).toBe(false)
+  })
+
+  /* A part on the divider was all a page could select, so a sandbox that
+     forwards a splitter as a part had nothing to say a drag with. */
+  test('the host says so as `:state(dragging)`', async () => {
+    const host = await splitter()
+    const bar = separator(host)
+    await grab(host, bar, 'pointerdown')
+    const during = hasState(host, 'dragging')
+    await grab(host, bar, 'pointerup')
+    expect([during, hasState(host, 'dragging')]).toEqual([true, false])
   })
 
   test('a keyboard move never reads as a drag', async () => {

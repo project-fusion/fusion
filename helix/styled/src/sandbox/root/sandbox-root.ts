@@ -73,11 +73,11 @@ const PANEL_MAX = 0.8
  * @event {HelixResizeEvent} helix-resize - Fired by the preview pane when the height of the frame's content changes, with the new height.
  * @event {HelixSplitEvent} helix-split - Fired after the panes' divider settled somewhere new, with the lead pane's share.
  *
- * @csspart body - The splitter holding the panes above the panel.
+ * @csspart body - The splitter holding the panes above the panel. `::part(body):state(dragging)` matches while its divider is held.
  * @csspart corner - The handle where the two dividers cross.
  * @csspart pane - Either pane.
  * @csspart panel - The box that holds the slotted panel.
- * @csspart panes - The splitter holding the source and preview panes.
+ * @csspart panes - The splitter holding the source and preview panes. `::part(panes):state(dragging)` matches while its divider is held.
  * @csspart separator - Either divider.
  *
  * @cssproperty --sandbox-grab - The invisible width of a divider's drag target.
