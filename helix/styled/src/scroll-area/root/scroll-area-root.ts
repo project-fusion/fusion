@@ -28,10 +28,10 @@ import { styles } from './scroll-area-root.css.js'
  * @cssproperty --scroll-area-fade-inline-start - The depth of the fade at the inline start, or `0` to remove it.
  * @cssproperty --scroll-area-scrollbar - The scrollbar width, as a `scrollbar-width` keyword.
  * @cssproperty --scroll-area-scrollbar-size - The thickness of each scrollbar drawn under `scrollbars`, and the size of the corner.
- * @cssproperty --scroll-area-thumb-color - The color of the scrollbar's thumb.
- * @cssproperty --scroll-area-thumb-hover-color - The color of a thumb drawn under `scrollbars` while the pointer is over it.
+ * @cssproperty --scroll-area-thumb-color - The color of the scrollbar's thumb. Defaults to `--helix-scrollbar-thumb-color`.
+ * @cssproperty --scroll-area-thumb-hover-color - The color of the browser's thumb while the pointer is over the scroll area, and of a thumb drawn under `scrollbars` while the pointer is over it. Defaults to `--helix-scrollbar-thumb-hover-color`.
  * @cssproperty --scroll-area-thumb-min-size - The shortest a thumb drawn under `scrollbars` gets, however long the content.
- * @cssproperty --scroll-area-track-color - The color of the scrollbar's track.
+ * @cssproperty --scroll-area-track-color - The color of the scrollbar's track. Defaults to `--helix-scrollbar-track-color`.
  */
 @customElement('helix-scroll-area')
 export class HelixScrollArea extends HelixHeadlessScrollArea {

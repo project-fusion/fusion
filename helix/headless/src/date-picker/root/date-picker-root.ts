@@ -4,7 +4,9 @@ import {
   valueAsDate as asDate,
   barredBy,
   type CalendarView,
+  calendarLocale,
   customElement,
+  type DateCalendar,
   fillTemplate,
   dateAsValue as fromDate,
   HelixFormElement,
@@ -67,6 +69,10 @@ const firstOf = (year: number, month: number): Date =>
  *
  * **Dates are `YYYY-MM-DD` strings, and every calculation is in UTC**, because
  * a local-time `Date` shifts across a time zone or daylight-saving boundary.
+ *
+ * **The days are the Gregorian calendar's**, written in `calendar`: the
+ * locale's own where its months are the Gregorian months, as `th-TH` writes
+ * 2569 for 2026, and `gregory` where they are not, as for `fa-IR`.
  *
  * `month` sets which month the grid shows, separately from `value`, so paging
  * selects nothing and you can control the view. When unset, it follows the
@@ -150,6 +156,20 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
    */
   @property({ attribute: 'bad-input-message' })
   badInputMessage?: string
+
+  /**
+   * The calendar the heading, the days, and the months are written in:
+   * `gregory`, `buddhist`, `japanese`, `roc`, or `iso8601`, the five whose
+   * months are the Gregorian months.
+   *
+   * Absent is the locale's own where it is one of the five, such as
+   * `buddhist` for `th-TH` or `japanese` for `ja-JP-u-ca-japanese`, and
+   * `gregory` for every other, such as `persian` for `fa-IR`, so the heading
+   * names the Gregorian month the grid shows. The value is `YYYY-MM-DD` in
+   * every calendar.
+   */
+  @property()
+  calendar?: DateCalendar
 
   /**
    * What each day shows, in place of its number: a function given the date as
@@ -1073,13 +1093,13 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
    * The three date formatters, built once per locale rather than per render.
    *
    * `Intl.DateTimeFormat` costs about a quarter of a millisecond to construct
-   * and these depend on nothing but `locale`, so building them inside the
-   * per-month render is three constructions for every month on show, on every
-   * update: a two-month calendar rebuilds six each time an arrow key moves the
-   * anchor.
+   * and these depend on nothing but `locale` and `calendar`, so building them
+   * inside the per-month render is three constructions for every month on
+   * show, on every update: a two-month calendar rebuilds six each time an
+   * arrow key moves the anchor.
    *
-   * Keyed on the locale so a change to it is picked up, which a plain lazy
-   * field would not do.
+   * Keyed on the locale with its calendar, so a change to either is picked
+   * up, which a plain lazy field would not do.
    */
   private cachedFormats:
     | {
@@ -1101,19 +1121,21 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
     weekday: Intl.DateTimeFormat
     year: Intl.DateTimeFormat
   } {
-    const language = this.language
+    const language = calendarLocale(this.language, this.calendar)
     if (this.cachedFormats?.locale === language) {
       return this.cachedFormats
     }
-    const locale = language || undefined
+    /* In UTC, as every date here is. */
+    const utc = (options: Intl.DateTimeFormatOptions): Intl.DateTimeFormat =>
+      new Intl.DateTimeFormat(language || undefined, { ...options, timeZone: 'UTC' })
     const built = {
-      full: new Intl.DateTimeFormat(locale, { dateStyle: 'full', timeZone: 'UTC' }),
-      heading: new Intl.DateTimeFormat(locale, { month: 'long', timeZone: 'UTC', year: 'numeric' }),
+      full: utc({ dateStyle: 'full' }),
+      heading: utc({ month: 'long', year: 'numeric' }),
       locale: language,
-      long: new Intl.DateTimeFormat(locale, { dateStyle: 'long', timeZone: 'UTC' }),
-      monthName: new Intl.DateTimeFormat(locale, { month: 'short', timeZone: 'UTC' }),
-      weekday: new Intl.DateTimeFormat(locale, { timeZone: 'UTC', weekday: 'short' }),
-      year: new Intl.DateTimeFormat(locale, { timeZone: 'UTC', year: 'numeric' }),
+      long: utc({ dateStyle: 'long' }),
+      monthName: utc({ month: 'short' }),
+      weekday: utc({ weekday: 'short' }),
+      year: utc({ year: 'numeric' }),
     }
     this.cachedFormats = built
     return built
@@ -1149,7 +1171,9 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
   }
 
   private renderMonth(month: Date, index: number): TemplateResult {
-    const { full, heading, weekday } = this.formats
+    const { full, heading: named, weekday } = this.formats
+    /* The month's name, which is the heading and the grid's name both. */
+    const heading = named.format(month)
     const weeks = this.weeksOf(month)
     const anchor = fromDate(this.anchor)
     /* Today, marked with `aria-current="date"` in the accessibility tree and as
@@ -1186,7 +1210,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
           ''
         }
         <span part="heading" aria-live="polite"
-          >${this.renderHeadingText(heading.format(month), this.monthViewLabel)}</span
+          >${this.renderHeadingText(heading, this.monthViewLabel)}</span
         >
         ${
           last
@@ -1205,7 +1229,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
       <div
         part="grid"
         role="grid"
-        aria-label=${heading.format(month)}
+        aria-label=${heading}
         aria-readonly=${this.readOnly ? 'true' : nothing}
         data-unset=${this.value === '' ? '' : nothing}
       >

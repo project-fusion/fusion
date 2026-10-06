@@ -28,6 +28,9 @@ import { styles } from './virtual-list-root.css.js'
  * @cssproperty --virtual-list-block-size - How tall the scrolling box is.
  * @cssproperty --virtual-list-loading-color - The color of the text in the row drawn while `loading` is set.
  * @cssproperty --virtual-list-loading-padding - The space around the text in the row drawn while `loading` is set.
+ * @cssproperty --virtual-list-scrollbar-thumb-color - The thumb of the list's scrollbar. Defaults to `--helix-scrollbar-thumb-color`.
+ * @cssproperty --virtual-list-scrollbar-thumb-hover-color - The thumb while the pointer is over the list. Defaults to `--helix-scrollbar-thumb-hover-color`.
+ * @cssproperty --virtual-list-scrollbar-track-color - The track of the list's scrollbar. Defaults to `--helix-scrollbar-track-color`.
  * @cssproperty --virtual-list-selected-background-color - The fill behind a chosen row, in a list with `selection-mode`.
  */
 @customElement('helix-virtual-list')

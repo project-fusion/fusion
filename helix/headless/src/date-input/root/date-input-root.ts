@@ -2,7 +2,9 @@ import {
   AriaForwardController,
   valueAsDate as asDate,
   barredBy,
+  calendarLocale,
   customElement,
+  type DateCalendar,
   fillTemplate,
   dateAsValue as fromDate,
   type HelixBeforeChangeEvent,
@@ -169,6 +171,19 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
    */
   @property()
   autocomplete = ''
+
+  /**
+   * The calendar the written date and the calendar's days are in: `gregory`,
+   * `buddhist`, `japanese`, `roc`, or `iso8601`.
+   *
+   * Absent is the locale's own where it is one of the five, and `gregory` for
+   * every other, as Date Picker's `calendar` is. The value is `YYYY-MM-DD` in
+   * every calendar, and a focused field is ISO in every calendar. In
+   * `segmented`, the segments are the Gregorian day, month, and year, in the
+   * order the locale writes them, or ISO order for `iso8601`.
+   */
+  @property()
+  calendar?: DateCalendar
 
   /**
    * The name of the calendar's grid of days, read by screen readers.
@@ -351,10 +366,10 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    /* A different count or a different language is a different width, so what
+    /* A different count, language or calendar is a different width, so what
        was measured no longer answers and every month is shown to be measured
        again at the next placement. */
-    if (changed.has('months') || changed.has('locale')) {
+    if (changed.has('months') || changed.has('locale') || changed.has('calendar')) {
       this.fitted = undefined
       this.wide = undefined
     }
@@ -491,8 +506,14 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
     return 'date'
   }
 
+  /**
+   * The segments are the Gregorian day, month and year, which is what they
+   * hold, in ISO order where the calendar is `iso8601`. A year shown as 2569
+   * or Reiwa 8 would be a year the segment does not hold.
+   */
   protected override get segmentLocale(): string {
-    return this.language
+    const tag = calendarLocale(this.language, this.calendar)
+    return tag.includes('-ca-iso8601') ? tag : calendarLocale(tag, 'gregory')
   }
 
   /** One date, written the way `dateStyle` asks for. */
@@ -506,7 +527,7 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
     const at = new Date(`${date}T00:00:00Z`)
     return Number.isNaN(at.getTime())
       ? date
-      : new Intl.DateTimeFormat(this.language || undefined, {
+      : new Intl.DateTimeFormat(calendarLocale(this.language, this.calendar) || undefined, {
           dateStyle: this.dateStyle,
           timeZone: 'UTC',
         }).format(at)
@@ -749,6 +770,7 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
       mode=${this.mode ?? nothing}
       months=${this.fitted ?? this.months}
       .value=${this.picked}
+      calendar=${this.calendar ?? nothing}
       disable-dates=${this.disableDates || nothing}
       disable-days=${this.disableDays || nothing}
       first-day-of-week=${this.firstDayOfWeek ?? nothing}

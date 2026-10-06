@@ -41,12 +41,14 @@
  *    on for one: `thin` rather than a width in pixels, because the two engines that
  *    implement it disagree about what a number means, and the color is the part
  *    worth setting. A default bar inside a rounded panel is the one piece of the
- *    platform this component would otherwise let through.
+ *    platform this component would otherwise let through. The colors are the
+ *    shared scrollbar tokens, after this family's own hooks.
  */
 [part="log"] {
   display: flex;
   flex-direction: column;
-  scrollbar-color: var(--helix-color-border) transparent;
+  scrollbar-color: var(--chat-scrollbar-thumb-color, var(--helix-scrollbar-thumb-color))
+    var(--chat-scrollbar-track-color, var(--helix-scrollbar-track-color));
   scrollbar-width: thin;
   gap: var(--chat-gap, var(--helix-space-md));
   overflow-y: auto;
@@ -65,6 +67,12 @@
  * a 20rem box with six turns: 0 pixels of scroll against 302 with `safe`.
  */
   justify-content: safe flex-end;
+}
+
+/* The hover step, which a browser's thin bar has no way to draw on the thumb. */
+[part="log"]:hover {
+  scrollbar-color: var(--chat-scrollbar-thumb-hover-color, var(--helix-scrollbar-thumb-hover-color))
+    var(--chat-scrollbar-track-color, var(--helix-scrollbar-track-color));
 }
 
 /*

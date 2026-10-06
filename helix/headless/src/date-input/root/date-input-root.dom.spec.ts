@@ -1025,3 +1025,50 @@ test("forwards the calendar's own message as `picker-feedback`", async () => {
   const host = await field()
   expect(picker(host)?.getAttribute('exportparts')).toContain('feedback: picker-feedback')
 })
+
+describe('a date input in a calendar other than the Gregorian', () => {
+  const segments = (host: HTMLElement): HTMLElement[] => [
+    ...(host.shadowRoot?.querySelectorAll<HTMLElement>('[part~="segment"]') ?? []),
+  ]
+  const long = (locale: string): string =>
+    new Intl.DateTimeFormat(locale, { dateStyle: 'long', timeZone: 'UTC' }).format(
+      new Date('2026-10-06T00:00:00Z'),
+    )
+
+  /* Measured before this: in fa-IR the field read 14 Mehr 1405 and the month
+     segment was heard as Mehr, over a calendar of Gregorian days. */
+  test('a calendar with months of its own is written in Gregorian', async () => {
+    const host = await inLang<InputDate>(
+      'fa-IR',
+      '<helix-headless-date-input label="Date" default-value="2026-10-06"></helix-headless-date-input>',
+    )
+    expect(control(host).value).toBe(long('fa-IR-u-ca-gregory'))
+    const parts = await inLang<InputDate>(
+      'en-US-u-ca-islamic-umalqura',
+      '<helix-headless-date-input label="Date" segmented default-value="2026-10-06"></helix-headless-date-input>',
+    )
+    const month = segments(parts).find((one) => one.textContent?.trim() === '10')
+    expect(month?.getAttribute('aria-valuetext')).toBe('10 – October')
+  })
+
+  test('`calendar` writes the date in one of the five and hands it to the calendar', async () => {
+    const host = (await field(
+      'calendar="buddhist" default-value="2026-10-06" locale="en-US"',
+    )) as InputDate & { calendar?: string }
+    expect(control(host).value).toBe(long('en-US-u-ca-buddhist'))
+    expect(control(host).value).toContain('2569')
+    expect(picker(host).getAttribute('calendar')).toBe('buddhist')
+    expect(host.value).toBe('2026-10-06')
+  })
+
+  test('the segments hold the Gregorian year, in ISO order for `iso8601`', async () => {
+    const thai = await field(
+      'segmented calendar="buddhist" default-value="2026-10-06" locale="th-TH"',
+    )
+    expect(segments(thai).map((one) => one.textContent?.trim())).toEqual(['06', '10', '2026'])
+    const iso = await field(
+      'segmented calendar="iso8601" default-value="2026-10-06" locale="en-US"',
+    )
+    expect(segments(iso).map((one) => one.textContent?.trim())).toEqual(['2026', '10', '06'])
+  })
+})
