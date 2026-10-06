@@ -1133,6 +1133,53 @@ describe('extending a choice from the one last chosen', () => {
     await settle(host)
     expect(host.value).toBe('one,three')
   })
+
+  test('Shift with Space on an option it added alone extends from there next time', async () => {
+    /* Measured before this: the second Shift with Space gave `one,three`,
+       because the option the first one added was not where the next range
+       started. APG and React Aria give all three. */
+    const host = (await list('multiple')) as Updatable & { value: string }
+    await key(host, 'ArrowDown')
+    await key(host, ' ', { shiftKey: true })
+    expect(host.value).toBe('one')
+    await key(host, 'ArrowDown')
+    await key(host, 'ArrowDown')
+    await key(host, ' ', { shiftKey: true })
+    expect(host.value).toBe('one,two,three')
+  })
+
+  const pressRow = async (host: Updatable, at: number, shiftKey = false): Promise<void> => {
+    await Promise.all(
+      options(host).map((option) => (option as unknown as Updatable).updateComplete),
+    )
+    const row = options(host)[at]?.shadowRoot?.querySelector('[part~="item"]') as HTMLElement
+    row.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true, shiftKey }))
+    await settle(host)
+  }
+
+  test('Shift with a press adds every option from the one last chosen, as React Aria does', async () => {
+    /* Measured before this: Shift with a press toggled the pressed option
+       alone, and the value was `one,three`. */
+    const host = (await list('multiple')) as Updatable & { value: string }
+    await pressRow(host, 0)
+    await pressRow(host, 2, true)
+    expect(host.value).toBe('one,two,three')
+    expect(options(host).map((option) => option.active)).toEqual([false, false, true])
+  })
+
+  test('and a press after it, without Shift, toggles one option again', async () => {
+    const host = (await list('multiple')) as Updatable & { value: string }
+    await pressRow(host, 0)
+    await pressRow(host, 2, true)
+    await pressRow(host, 1)
+    expect(host.value).toBe('one,three')
+  })
+
+  test('where one can be chosen, Shift with a press chooses the one pressed', async () => {
+    const host = (await list('default-value="one"')) as Updatable & { value: string }
+    await pressRow(host, 2, true)
+    expect(host.value).toBe('three')
+  })
 })
 
 describe('a list laid out in a grid', () => {
