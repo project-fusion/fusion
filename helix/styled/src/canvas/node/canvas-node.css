@@ -32,12 +32,12 @@
   block-size: var(--_canvas-card-block-size);
   box-shadow: var(--canvas-node-shadow, none);
   border: var(--helix-border-thin) solid var(--_canvas-card-color);
-  border-radius: var(--helix-radii-sm);
+  border-radius: var(--canvas-node-radius, var(--helix-radii-sm));
   box-sizing: border-box;
   color: var(--helix-color-foreground);
   display: block;
   font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-sm);
+  font-size: var(--canvas-node-font-size, var(--helix-text-sm));
   inline-size: var(--_canvas-card-inline-size);
   /* **Physical, as the document's coordinates are.** A card's `x` runs from
      the plane's left edge in any language; placed from the inline start, the
@@ -90,9 +90,12 @@
   --_canvas-handle-color: var(--canvas-node-color, var(--helix-color-foreground-muted));
 }
 
-:host(:state(selected)),
+:host(:state(selected)) {
+  --_canvas-handle-color: var(--canvas-selected-color, var(--helix-color-accent));
+}
+
 :host(:state(target)) {
-  --_canvas-handle-color: var(--helix-color-accent);
+  --_canvas-handle-color: var(--canvas-connect-color, var(--helix-color-accent));
 }
 
 /* **Separation says how a card stands off the board**, the axis `Card` takes,
@@ -216,7 +219,7 @@
    gap rather than on a line. The focus ring is inside the box, so a card that
    is both still says both. */
 :host(:state(selected)) {
-  outline: var(--helix-border-thick) solid var(--helix-color-accent);
+  outline: var(--helix-border-thick) solid var(--canvas-selected-color, var(--helix-color-accent));
   outline-offset: calc(var(--helix-border-thin) * -1);
 }
 
@@ -225,7 +228,7 @@
    accent: a line dragged over cards that all looked the same gave no way to
    tell where letting go would land. */
 :host(:state(target)) {
-  box-shadow: 0 0 0 var(--helix-border-thick) var(--helix-color-accent);
+  box-shadow: 0 0 0 var(--helix-border-thick) var(--canvas-connect-color, var(--helix-color-accent));
 }
 
 :host(:state(target)) [part~="handle"] {
@@ -286,7 +289,7 @@
 [part~="grip"] {
   background-color: var(--helix-color-surface);
   block-size: var(--canvas-grip-size, 0.5rem);
-  border: var(--helix-border-thin) solid var(--helix-color-accent);
+  border: var(--helix-border-thin) solid var(--canvas-selected-color, var(--helix-color-accent));
   box-sizing: border-box;
   inline-size: var(--canvas-grip-size, 0.5rem);
   position: absolute;
@@ -368,7 +371,7 @@
 }
 
 [part~="move"]:hover {
-  color: var(--helix-color-accent);
+  color: var(--canvas-selected-color, var(--helix-color-accent));
 }
 
 /* **A shape with no corner keeps it at the top middle**, inside the curve or

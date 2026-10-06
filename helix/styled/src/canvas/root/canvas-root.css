@@ -7,7 +7,7 @@
   background-color: var(--canvas-background-color, var(--helix-color-surface-sunken));
   block-size: var(--canvas-block-size, 30rem);
   border: var(--helix-border-thin) solid var(--canvas-border-color, var(--helix-color-border));
-  border-radius: var(--helix-radii-sm);
+  border-radius: var(--canvas-radius, var(--helix-radii-sm));
   box-sizing: border-box;
   display: grid;
   grid-template-rows: auto 1fr auto;
@@ -130,7 +130,7 @@
 
 [part="edge"] {
   stroke: var(--_canvas-edge-color, var(--canvas-edge-color, var(--helix-color-border)));
-  stroke-width: var(--helix-border-thick);
+  stroke-width: var(--canvas-edge-width, var(--helix-border-thick));
 }
 
 /* **The painted line takes no pointer, and the target over it takes all of
@@ -163,7 +163,7 @@
 
 [part="edge-target"]:focus-visible + [part="edge"] {
   stroke: var(--helix-color-focus-ring);
-  stroke-width: calc(var(--helix-border-thick) * 2);
+  stroke-width: calc(var(--canvas-edge-width, var(--helix-border-thick)) * 2);
 }
 
 /* **The ends of a selected connection**, which a press picks up, a click as
@@ -171,7 +171,7 @@
    arrives at, and filled, so it reads as the connection's rather than the
    card's hollow point under it. */
 [part="edge-end"] {
-  background-color: var(--helix-color-accent);
+  background-color: var(--canvas-selected-color, var(--helix-color-accent));
   block-size: var(--canvas-handle-size, 0.625rem);
   border: var(--helix-border-thick) solid var(--helix-color-surface);
   border-radius: var(--helix-radii-full);
@@ -239,9 +239,13 @@
 
 /* **The box a Shift-drag draws**, on the plane with the cards it selects. */
 [part="marquee"] {
-  background-color: color-mix(in oklab, var(--helix-color-accent) 10%, transparent);
+  background-color: color-mix(
+    in oklab,
+    var(--canvas-selected-color, var(--helix-color-accent)) 10%,
+    transparent
+  );
   block-size: var(--_canvas-marquee-block-size);
-  border: var(--helix-border-thin) dashed var(--helix-color-accent);
+  border: var(--helix-border-thin) dashed var(--canvas-selected-color, var(--helix-color-accent));
   box-sizing: border-box;
   inline-size: var(--_canvas-marquee-inline-size);
   left: var(--_canvas-marquee-x);
@@ -254,7 +258,7 @@
 /* The connection being drawn, dashed until it is asked for. */
 [part="draft"] {
   pointer-events: none;
-  stroke: var(--helix-color-accent);
+  stroke: var(--canvas-connect-color, var(--helix-color-accent));
   stroke-dasharray: 6 4;
   stroke-width: var(--helix-border-thick);
 }
@@ -302,8 +306,8 @@
    the tones, which match as closely: before them, a connection with a tone
    kept it when selected and only grew heavier. */
 [part="edge"][data-selected] {
-  stroke: var(--helix-color-accent);
-  stroke-width: calc(var(--helix-border-thick) * 2);
+  stroke: var(--canvas-selected-color, var(--helix-color-accent));
+  stroke-width: calc(var(--canvas-edge-width, var(--helix-border-thick)) * 2);
 }
 
 /* A weaker or optional connection, drawn broken. Dotted is a dash of nothing
@@ -322,9 +326,9 @@
    out. Centered on the line's middle, on the plane, under the cards. */
 [part="label"] {
   background-color: var(--canvas-background-color, var(--helix-color-surface-sunken));
-  color: var(--helix-color-foreground-subtle);
+  color: var(--canvas-label-color, var(--helix-color-foreground-subtle));
   font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-xs);
+  font-size: var(--canvas-label-font-size, var(--helix-text-xs));
   left: var(--_canvas-label-x);
   line-height: 1;
   padding: var(--helix-space-2xs);

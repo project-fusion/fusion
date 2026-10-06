@@ -30,7 +30,9 @@ import { styles } from './canvas-node.css.js'
  * @cssproperty --canvas-move-inset - The distance between the move handle and the card's corner.
  * @cssproperty --canvas-node-background-color - The card's background.
  * @cssproperty --canvas-node-color - A color for the card that carries no meaning, such as a hex color from a document. Use it when no tone fits.
+ * @cssproperty --canvas-node-font-size - The size of the card's text.
  * @cssproperty --canvas-node-padding - The space between the card's edge and its content.
+ * @cssproperty --canvas-node-radius - The card's corners. A `shape` draws its own.
  * @cssproperty --canvas-node-shadow - The shadow under the card, set by `separation="elevated"`.
  */
 @customElement('helix-canvas-node')
