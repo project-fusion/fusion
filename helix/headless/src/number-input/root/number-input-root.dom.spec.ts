@@ -502,6 +502,60 @@ describe('a formatted number', () => {
     await type(plain, '1,234')
     expect(control(plain).getAttribute('aria-valuenow')).toBe('1234')
   })
+
+  /* A script's `blur()` sends the field's `change` and `blur` in one task, so
+     both settle before the render. The text typed was the format itself, which
+     was also the text last rendered while editing, so the render skipped its
+     write and the field kept the raw number the settle had written. */
+  test('shows its format again after a script blur, when the typed text was the format', async () => {
+    const host = await field(
+      `locale="en-US" value="5" step="0.01" format-options='{"style":"currency","currency":"USD"}'`,
+    )
+    control(host).dispatchEvent(new Event('focus'))
+    await host.updateComplete
+    await type(host, '$5.00')
+    control(host).dispatchEvent(new Event('change'))
+    control(host).dispatchEvent(new Event('blur'))
+    await host.updateComplete
+    expect(host.value).toBe('5')
+    expect(control(host).value).toBe('$5.00')
+  })
+
+  /* React Aria keeps the fraction the format shows when no step is given. A
+     step of 1 by default rounded a typed $1,500.25 to $1,500.00 on blur. */
+  test('keeps the fraction its format shows when no step is set', async () => {
+    const host = await field(
+      `locale="en-US" format-options='{"style":"currency","currency":"USD"}'`,
+    )
+    await type(host, '$1,500.25')
+    control(host).dispatchEvent(new Event('change'))
+    control(host).dispatchEvent(new Event('blur'))
+    await host.updateComplete
+    expect(host.value).toBe('1500.25')
+    expect(control(host).value).toBe('$1,500.25')
+    expect((host as unknown as { internals: ElementInternals }).internals.validity.valid).toBe(true)
+    await type(host, '1.234')
+    control(host).dispatchEvent(new Event('blur'))
+    await host.updateComplete
+    expect(host.value).toBe('1.23')
+  })
+
+  test('steps a percent by one percent when no step is set, and by one otherwise', async () => {
+    const percent = await field(`locale="en-US" value="0.25" format-options='{"style":"percent"}'`)
+    percent.stepUp()
+    await percent.updateComplete
+    expect(percent.value).toBe('0.26')
+    const money = await field(
+      `locale="en-US" value="2.5" format-options='{"style":"currency","currency":"USD"}'`,
+    )
+    money.stepUp()
+    await money.updateComplete
+    expect(money.value).toBe('3.5')
+    const plain = await field('value="2"')
+    expect((plain as unknown as { step?: number }).step).toBeUndefined()
+    plain.stepUp()
+    expect(plain.value).toBe('3')
+  })
 })
 
 describe('the wheel', () => {
