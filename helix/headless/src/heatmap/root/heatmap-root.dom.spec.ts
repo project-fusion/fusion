@@ -526,3 +526,26 @@ describe('selecting cells', () => {
     expect(element.value).toBe('')
   })
 })
+
+/* APG's date grid moves a month with PageUp and PageDown; the strip moved
+   four weeks, landing on another day of the month. */
+describe('a month by key', () => {
+  test('PageDown goes to the same day a month on where the rows carry dates', async () => {
+    const rows = Array.from({ length: 70 }, (_, day) => {
+      const date = new Date(Date.UTC(2026, 0, 1 + day)).toISOString().slice(0, 10)
+      return `<tr><th scope="row"><time datetime="${date}">${date}</time></th><td>${day}</td></tr>`
+    }).join('')
+    const host = (await mount(
+      `<div><table id="days"><tbody>${rows}</tbody></table><helix-headless-heatmap for="days" rows="7" min-cell="0"></helix-headless-heatmap></div>`,
+    )) as HTMLElement
+    const element = host.querySelector('helix-headless-heatmap') as Strip
+    await element.updateComplete
+    for (const key of ['Home', 'ArrowDown', 'PageDown']) {
+      part(element, 'strip')?.dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key }),
+      )
+    }
+    await element.updateComplete
+    expect(part(element, 'live')?.textContent).toBe('2026-02-02: 32 (33 of 70)')
+  })
+})

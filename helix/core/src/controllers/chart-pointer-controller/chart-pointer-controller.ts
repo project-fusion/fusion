@@ -56,6 +56,12 @@ export interface ChartPointerHost extends ReactiveControllerHost, HTMLElement {
    */
   showsReading?(at: number): boolean
   /**
+   * Where PageUp or PageDown goes from the reading at `at`, by place among the
+   * readings, for a chart whose page is no fixed count: a calendar's month.
+   * Undefined keeps the fixed page.
+   */
+  pageFrom?(at: number, forward: boolean): number | undefined
+  /**
    * The words for where a reading stands among them, with `{position}` and
    * `{count}` to fill. Absent or empty, no position is said.
    */
@@ -390,6 +396,22 @@ export class ChartPointerController implements ReactiveController {
       if (this.at >= 0) {
         event.preventDefault()
         this.clear()
+      }
+      return
+    }
+    /* A page the host measures itself, such as a month of days, where it
+       measures one from here. */
+    const paged =
+      (event.key === 'PageDown' || event.key === 'PageUp') && this.at >= 0
+        ? this.host.pageFrom?.(this.at, event.key === 'PageDown')
+        : undefined
+    if (paged !== undefined && shown.includes(paged)) {
+      event.preventDefault()
+      if (paged !== this.at) {
+        this.at = paged
+        this.keyed = true
+        this.moved = true
+        this.host.requestUpdate()
       }
       return
     }

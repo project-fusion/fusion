@@ -134,6 +134,8 @@ describe("the meter's hooks", () => {
         return sheet.cssText ?? Array.from(sheet.cssRules ?? [], (rule) => rule.cssText).join('\n')
       })
       .join('\n')
+      /* A formatter breaks a long fallback after `var(`. */
+      .replace(/\(\s+/g, '(')
     for (const hook of ['--meter-value-color', '--meter-value-gap', '--meter-value-size']) {
       expect(text).toContain(`var(${hook},`)
     }

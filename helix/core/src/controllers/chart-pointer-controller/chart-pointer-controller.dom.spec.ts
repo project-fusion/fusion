@@ -599,6 +599,23 @@ describe('a page of readings by key', () => {
     grid.press('PageUp')
     expect(grid.point.at).toBe(0)
   })
+
+  /* A calendar's page is a month, which no fixed count is: the host says
+     where it goes from each reading. */
+  test('is where the host says, where it measures a page itself', () => {
+    const month = keyed(90)
+    Object.assign(month.host, {
+      pageFrom: (at: number, forward: boolean) => (forward ? at + 31 : Math.max(0, at - 28)),
+    })
+    month.press('Home')
+    month.press('PageDown')
+    expect(month.point.at).toBe(31)
+    month.press('PageUp')
+    expect(month.point.at).toBe(3)
+    Object.assign(month.host, { pageFrom: () => undefined })
+    month.press('PageDown')
+    expect(month.point.at).toBe(12)
+  })
 })
 
 /* Said beside the reading, such as "2 of 4", so a reader moving by key knows

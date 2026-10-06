@@ -23,7 +23,7 @@ import {
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import '../../tooltip/index.js'
-import { fits, overviewOf, type Reading, toneOf } from './buckets.js'
+import { fits, monthPage, overviewOf, type Reading, toneOf } from './buckets.js'
 
 /**
  * @summary A strip of cells, each colored by its reading, for uptime, contributions, or activity.
@@ -53,8 +53,9 @@ import { fits, overviewOf, type Reading, toneOf } from './buckets.js'
  * down arrows move a cell, the left and right arrows move a column, which is a
  * week with `rows="7"`, and Home and End go to the first and the last. The
  * tooltip follows, the `live` part says the cell's row in words, and Escape
- * puts the tooltip away. PageUp and PageDown move four columns, which is four
- * weeks with `rows="7"`.
+ * puts the tooltip away. PageUp and PageDown move a month, to the same day,
+ * where each row's header carries its date as a `<time datetime>`, and four
+ * columns otherwise, which is four weeks with `rows="7"`.
  *
  * **The strip describes itself.** The `overview` part says the busiest
  * reading and the total of the readings drawn, "Busiest: 11 Jun, 12; Total
@@ -540,6 +541,20 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
   protected override willUpdate(changed: PropertyValues<this>): void {
     super.willUpdate(changed)
     this.pointer.grid = this.rowCount
+  }
+
+  /**
+   * Where PageUp or PageDown goes from the drawn cell at `at`: the same day a
+   * month on or back, by the dates the rows' headers carry. Undefined where
+   * they carry none, and the keys move four columns.
+   */
+  pageFrom(at: number, forward: boolean): number | undefined {
+    const offset = this.points.length - this.drawn.length
+    return monthPage(
+      this.sourceRows.slice(offset).map((row) => row.when),
+      at,
+      forward,
+    )
   }
 
   override connectedCallback(): void {

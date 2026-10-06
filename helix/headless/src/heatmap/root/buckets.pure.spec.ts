@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { fits, overviewOf, toneOf } from './buckets.js'
+import { fits, monthPage, overviewOf, toneOf } from './buckets.js'
 
 /**
  * The two calculations a picture cannot check.
@@ -118,5 +118,35 @@ describe('what the drawn readings come to', () => {
 
   test('no busiest reading among blanks, and nothing in total', () => {
     expect(overviewOf([{ value: undefined }])).toEqual({ busiest: -1, total: 0 })
+  })
+})
+
+/* PageUp and PageDown moved four weeks in a calendar, where APG's date grid
+   moves a month. */
+describe('a page of a calendar', () => {
+  const days = (from: string, count: number): string[] =>
+    Array.from({ length: count }, (_, index) => {
+      const date = new Date(`${from}T00:00:00Z`)
+      date.setUTCDate(date.getUTCDate() + index)
+      return date.toISOString().slice(0, 10)
+    })
+
+  test('is the same day a month on, or back', () => {
+    const whens = days('2026-01-01', 120)
+    expect(whens[monthPage(whens, 14, true) ?? -1]).toBe('2026-02-15')
+    expect(whens[monthPage(whens, 45, false) ?? -1]).toBe('2026-01-15')
+  })
+
+  test('is the month’s last day where it lacks the day, and stops at the ends', () => {
+    const whens = days('2026-01-01', 70)
+    expect(whens[monthPage(whens, 30, true) ?? -1]).toBe('2026-02-28')
+    expect(monthPage(whens, 60, true)).toBe(69)
+    expect(monthPage(whens, 3, false)).toBe(0)
+  })
+
+  test('is the nearest reading past a blank day, and nothing without dates', () => {
+    const whens: (string | undefined)[] = ['2026-01-10', undefined, '2026-02-12']
+    expect(monthPage(whens, 0, true)).toBe(2)
+    expect(monthPage(['Mon', 'Tue'], 0, true)).toBeUndefined()
   })
 })
