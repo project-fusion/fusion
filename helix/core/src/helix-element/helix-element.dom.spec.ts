@@ -590,3 +590,32 @@ describe('version', () => {
     expect(listed).toEqual([VERSION])
   })
 })
+
+describe('a composed tag', () => {
+  test('is the value unsafeStatic makes, so a static template renders the element of the tier', async () => {
+    const { HelixElement } = await import('./helix-element.js')
+    const { html, unsafeStatic } = await import('lit/static-html.js')
+    const { render } = await import('lit')
+    class Composer extends HelixElement {
+      static override tier = 'helix-'
+      composed(name: string) {
+        return this.tag(name)
+      }
+    }
+    customElements.define('probe-composer', Composer)
+    const composer = document.createElement('probe-composer') as Composer
+    const value = composer.composed('select')
+    expect(value).toEqual(unsafeStatic('helix-select'))
+    const into = document.createElement('div')
+    render(html`<${value} id="made"></${value}>`, into)
+    expect(into.querySelector('#made')?.localName).toBe('helix-select')
+  })
+
+  /* The bundle half of the same promise: a runtime import of
+     `lit/static-html.js` here keeps its `withStatic` calls in every family. */
+  test('is made without importing static-html at run time', async () => {
+    const source = await Bun.file(new URL('./helix-element.ts', import.meta.url)).text()
+    const imports = source.split('\n').filter((line) => line.includes("'lit/static-html.js'"))
+    expect(imports).toEqual(["import type { StaticValue } from 'lit/static-html.js'"])
+  })
+})

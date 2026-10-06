@@ -1,5 +1,5 @@
 import { type CSSResultOrNative, LitElement, type PropertyValues, unsafeCSS } from 'lit'
-import { type StaticValue, unsafeStatic } from 'lit/static-html.js'
+import type { StaticValue } from 'lit/static-html.js'
 import { measuring, reportRender } from '../utils/report-render/report-render.js'
 import { noteVersion, reportUsage } from '../utils/report-usage/report-usage.js'
 import {
@@ -311,13 +311,25 @@ export class HelixElement extends LitElement {
   /**
    * One composed tag, as a static value a template can interpolate.
    *
-   * `unsafeStatic` is safe by construction: the name is a literal in our own
-   * source and the prefix is one of two strings this class defines. Called per
-   * render and not cached, which costs nothing, because `static-html` keys its
-   * template cache on the joined string rather than on the object.
+   * What `unsafeStatic` returns, safe by construction: the name is a literal in
+   * our own source and the prefix is one of two strings this class defines.
+   * Called per render and not cached, which costs nothing, because
+   * `static-html` keys its template cache on the joined string rather than on
+   * the object.
+   *
+   * **Written out rather than imported, for every element that never renders
+   * one.** `lit/static-html.js` declares no side effects, so importing
+   * `unsafeStatic` alone kept the module's three `withStatic` calls in every
+   * bundle: about 210 bytes gzipped on each of the families that compose no
+   * tag, Divider and Badge among them. The value is lit's cross-copy protocol,
+   * keyed by `Symbol.for('')` so that two copies of lit on a page read each
+   * other's, and a spec holds it equal to `unsafeStatic`'s.
    */
   protected tag(name: string): StaticValue {
-    return unsafeStatic(`${(this.constructor as typeof HelixElement).tier}${name}`)
+    return {
+      _$litStatic$: `${(this.constructor as typeof HelixElement).tier}${name}`,
+      r: Symbol.for(''),
+    } as unknown as StaticValue
   }
 
   /**
