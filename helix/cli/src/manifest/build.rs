@@ -32,7 +32,8 @@ use crate::manifest::inherit;
 use crate::manifest::inherit::INHERITS;
 use crate::manifest::parse;
 use crate::manifest::parse::{
-    declarations, exports, Declared, Exported, Origin, Parameter, Readonly, Superclass, Written,
+    declarations, exports, Declared, Exported, Member, Origin, Parameter, Readonly, Superclass,
+    Written,
 };
 use crate::manifest::unions;
 
@@ -109,6 +110,20 @@ const LISTS: [(&str, &str); 5] = [
     ("event", "events"),
     ("slot", "slots"),
 ];
+
+/// The members a class keeps to itself, by their `@internal` tag.
+///
+/// **A name the library keeps to itself, dropped where the framework's are.**
+/// The analyzer publishes it and a plugin of ours removes it, which is after
+/// the list exists: a class whose body holds nothing else still has the key,
+/// and it leads rather than trailing what inheritance adds.
+fn hidden_of(members: &[Member]) -> BTreeSet<String> {
+    members
+        .iter()
+        .filter(|two| two.documented.tags.iter().any(|(tag, _)| tag == "internal"))
+        .map(|two| two.name.clone())
+        .collect()
+}
 
 /// What a doc block's tags say, as the lists the manifest carries.
 ///
@@ -1201,16 +1216,7 @@ fn declaration_of(
         fields.insert("mixins".to_owned(), json!(wrapped));
     }
     if !one.members.is_empty() {
-        /* **A name the library keeps to itself, dropped where the framework's
-        are.** The analyzer publishes it and a plugin of ours removes it, which
-        is after the list exists: a class whose body holds nothing else still
-        has the key, and it leads rather than trailing what inheritance adds. */
-        let hidden: BTreeSet<String> = one
-            .members
-            .iter()
-            .filter(|two| two.documented.tags.iter().any(|(tag, _)| tag == "internal"))
-            .map(|two| two.name.clone())
-            .collect();
+        let hidden = hidden_of(&one.members);
         let written: Vec<Option<Written>> =
             one.members.iter().map(|two| two.written.clone()).collect();
         let members: Vec<Value> = one.members.into_iter().map(member_of).collect();
