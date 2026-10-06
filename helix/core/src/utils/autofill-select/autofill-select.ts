@@ -25,7 +25,8 @@ const HIDDEN = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;point
 
 /**
  * A native `<select>` that a browser's autofill can fill, holding the same
- * options as the custom select beside it.
+ * options as the custom select beside it. Select and Combobox draw it under
+ * `autocomplete`.
  *
  * **A browser fills native fields only.** It reads `autocomplete`, picks an
  * option by its value or its words, and sends `change`, which `onFill` turns

@@ -153,11 +153,8 @@ export class HelixHeadlessSpeedDialItem extends HelixElement {
   protected override render(): TemplateResult {
     /* In this reader's platform's words, and in the server's while hydrating
        what one sent, which has no keyboard to ask. */
-    const apple = !this.hydrating && onApple()
-    const keys = this.shortcut === '' ? nothing : ariaChord(this.shortcut, apple)
-    /* Drawn as Kbd draws a chord, from the same table, as the slot's fallback,
-       so a `Kbd` slotted in replaces it. */
-    const drawn = keyNames(chordParts(this.shortcut), apple)
+    const keys =
+      this.shortcut === '' ? nothing : ariaChord(this.shortcut, !this.hydrating && onApple())
     return html`<button
       part="item"
       role="menuitem"
@@ -173,11 +170,19 @@ export class HelixHeadlessSpeedDialItem extends HelixElement {
           part="shortcut"
           aria-hidden="true"
           ?hidden=${!this.hasShortcut && this.shortcut === ''}
-        ><slot name="shortcut" @slotchange=${this.readShortcut}
-          >${drawn.keys.join(drawn.separator)}</slot
-        ></span
+        >${this.renderShortcut()}</span
       ></span>
     </button>`
+  }
+
+  /**
+   * The `shortcut` slot, holding the shortcut drawn after the name as Kbd
+   * draws a chord and from the same table: the slot's fallback, so a `Kbd`
+   * slotted in replaces it.
+   */
+  protected renderShortcut(): TemplateResult {
+    const drawn = keyNames(chordParts(this.shortcut), !this.hydrating && onApple())
+    return html`<slot name="shortcut" @slotchange=${this.readShortcut}>${drawn.keys.join(drawn.separator)}</slot>`
   }
 
   /* The server had no keyboard to name, so a shortcut is said again in this
