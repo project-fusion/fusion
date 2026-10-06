@@ -231,6 +231,83 @@ describe('graph frame', () => {
     expect(zoomed.length).toBe(1)
   })
 
+  test('says which way the drawing went once it has moved, and nothing before', async () => {
+    const host = (await graph()) as Graph & { moved(): void }
+    const region = part(host, 'region') as HTMLElement
+    const live = () => part(host, 'live')?.textContent
+    key(region, 'ArrowRight')
+    await settle(host)
+    expect(live()).toBe('')
+    host.moved()
+    await settle(host)
+    expect(live()).toBe('Moved right')
+    /* The same words again, which a region only reads when its text changes. */
+    key(region, 'ArrowRight')
+    host.moved()
+    await settle(host)
+    expect(live()).toBe('Moved right\u00a0')
+    key(region, 'ArrowUp')
+    host.moved()
+    await settle(host)
+    expect(live()).toBe('Moved up')
+    ;(part(host, 'zoom-out') as HTMLElement).click()
+    host.moved()
+    await settle(host)
+    expect(live()).toBe('Zoomed out')
+    key(region, '=')
+    host.moved()
+    await settle(host)
+    expect(live()).toBe('Zoomed in')
+    /* A move nobody asked for is not said. */
+    host.moved()
+    await settle(host)
+    expect(live()).toBe('Zoomed in')
+  })
+
+  test('a note arriving keeps the keys on the note they were on', async () => {
+    const host = await graph()
+    const current = () =>
+      host.shadowRoot
+        ?.getElementById(list(host).getAttribute('aria-activedescendant') ?? '')
+        ?.querySelector('[part="note-name"]')?.textContent
+    key(list(host), 'ArrowDown')
+    key(list(host), 'ArrowDown')
+    await settle(host)
+    expect(current()).toBe('Charlie')
+    host.nodes = [...nodes, { id: 'aa', label: 'Able' }]
+    host.links = [...links, { source: 'aa', target: 'b' }]
+    await settle(host)
+    expect(names(host)[3]).toBe('Charlie')
+    expect(current()).toBe('Charlie')
+  })
+
+  test('a note taken away leaves the keys on the row that took its place', async () => {
+    const host = await graph()
+    const current = () =>
+      host.shadowRoot
+        ?.getElementById(list(host).getAttribute('aria-activedescendant') ?? '')
+        ?.querySelector('[part="note-name"]')?.textContent
+    key(list(host), 'ArrowDown')
+    key(list(host), 'ArrowDown')
+    await settle(host)
+    host.nodes = nodes.filter((node) => node.id !== 'c')
+    await settle(host)
+    expect(current()).toBe('Delta')
+    host.nodes = nodes.filter((node) => node.id === 'a')
+    await settle(host)
+    expect(current()).toBe('Alpha')
+  })
+
+  test('a new selection still reads the list from its top', async () => {
+    const host = await graph()
+    key(list(host), 'End')
+    await settle(host)
+    host.active = 'c'
+    await settle(host)
+    expect(list(host).getAttribute('aria-activedescendant')).toBe('note-0')
+    expect(names(host)[0]).toBe('Charlie')
+  })
+
   test('a search keeps the notes whose names hold it, and says how many', async () => {
     const host = await graph()
     const field = part(host, 'search-field') as HTMLInputElement
@@ -316,10 +393,13 @@ describe('graph frame', () => {
     expect([...(host.shown ?? [])].sort()).toEqual(['b', 'd'])
     expect(work()?.getAttribute('aria-pressed')).toBe('false')
     expect(work()?.getAttribute('part')).toBe('legend-item legend-item-hidden')
+    /* How many notes are left, which the list no longer says on its own. */
+    expect(part(host, 'live')?.textContent).toBe('2 notes')
     work()?.click()
     await settle(host)
     expect(host.hiddenGroups).toEqual([])
     expect(names(host).length).toBe(4)
+    expect(part(host, 'live')?.textContent).toBe('4 notes')
   })
 
   test('a page that cancels the filter keeps every group as it was', async () => {
@@ -428,5 +508,94 @@ describe('graph frame', () => {
     expect(rows(host).length).toBeLessThan(100)
     expect(rows(host)[0]?.getAttribute('aria-setsize')).toBe('10000')
     expect(part(host, 'count')?.textContent).toBe('10,000 notes')
+  })
+})
+
+/**
+ * What the console was warned while `markup` mounted and settled. The
+ * warning is in development builds only: `test:dom` passes
+ * `--conditions helix-development`, which core's `#audit-name` reads.
+ */
+const warnedOn = async (markup: string): Promise<string[]> => {
+  const warnings: string[] = []
+  const original = console.warn
+  console.warn = (message: string) => warnings.push(message)
+  try {
+    await mount(markup)
+    await new Promise((done) => setTimeout(done, 5))
+  } finally {
+    console.warn = original
+  }
+  return warnings
+}
+
+describe('a graph with no name', () => {
+  test('is reported once, by its tag', async () => {
+    const warnings = (await warnedOn('<helix-headless-graph></helix-headless-graph>')).filter(
+      (warning) => warning.includes('accessible name'),
+    )
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0]).toContain('<helix-headless-graph> has no accessible name')
+  })
+
+  test('and one named by `label` or `aria-label` is not', async () => {
+    for (const markup of [
+      '<helix-headless-graph label="Research notes"></helix-headless-graph>',
+      '<helix-headless-graph aria-label="Research notes"></helix-headless-graph>',
+    ]) {
+      const warnings = await warnedOn(markup)
+      expect([
+        markup,
+        ...warnings.filter((warning) => warning.includes('accessible name')),
+      ]).toEqual([markup])
+    }
+  })
+})
+
+describe('the events a graph sends', () => {
+  /* The names Graph keeps, which follow Map's. A rename fails here before it
+     reaches a page listening for the old name. */
+  test('keep their names, and only the requests and news for a page leave the frame', async () => {
+    const grouped: GraphNode[] = [
+      { group: 'work', id: 'a', label: 'Alpha' },
+      { group: 'home', id: 'b', label: 'Bravo' },
+    ]
+    const host = (await graph('legend', grouped)) as Graph & {
+      laidOut(positions: Record<string, { x: number; y: number }>): void
+      signal(from: string, to: string): void
+    }
+    const sent: [string, boolean, boolean, boolean][] = []
+    const kinds = [
+      'helix-graph-filter',
+      'helix-graph-layout',
+      'helix-graph-pan',
+      'helix-graph-part-change',
+      'helix-graph-ready',
+      'helix-graph-signal',
+      'helix-graph-zoom',
+    ]
+    for (const name of kinds) {
+      host.addEventListener(name, (event) => {
+        sent.push([event.type, event.bubbles, event.composed, event.cancelable])
+        event.preventDefault()
+      })
+    }
+    part(host, 'legend')?.querySelector('button')?.click()
+    host.laidOut({ a: { x: 0, y: 0 } })
+    key(part(host, 'region') as HTMLElement, 'ArrowRight')
+    host.links = []
+    await settle(host)
+    host.drawn()
+    host.signal('a', 'b')
+    ;(part(host, 'zoom-in') as HTMLElement).click()
+    expect(sent).toEqual([
+      ['helix-graph-filter', true, true, true],
+      ['helix-graph-layout', true, true, false],
+      ['helix-graph-pan', true, true, false],
+      ['helix-graph-part-change', false, false, false],
+      ['helix-graph-ready', true, true, false],
+      ['helix-graph-signal', false, false, false],
+      ['helix-graph-zoom', true, true, false],
+    ])
   })
 })

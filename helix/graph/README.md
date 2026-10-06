@@ -66,7 +66,8 @@ first.
   and the labels in the theme's face, and draws them again when the theme
   changes.
 - Answers the frame's pan and zoom buttons and keys, and tells the renderer which
-  gestures the frame's `gestures` lets it take.
+  gestures the frame's `gestures` lets it take. Once the drawing has moved, it
+  calls the frame's `moved()`, and screen readers hear which way it went.
 - Draws only what changed when the page hands the frame new notes or links, and
   draws the frame's `signal()`s.
 - Fades out a snapshot drawn on the server by `graphSnapshot` once the renderer
