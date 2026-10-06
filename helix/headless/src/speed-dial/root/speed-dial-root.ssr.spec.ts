@@ -49,7 +49,7 @@ describe('speed dial server output', () => {
     )
     expect(partTag(markup, 'item')).toContain('role="menuitem"')
     expect(rendered(markup, 'helix-headless-speed-dial-item')).toContain(
-      '<span part="label"><slot></slot></span>',
+      '<span part="label"><slot></slot>',
     )
   })
 

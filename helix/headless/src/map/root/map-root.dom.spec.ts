@@ -423,3 +423,27 @@ describe('map controls on a right-to-left page', () => {
     )
   })
 })
+
+describe('map frame, states', () => {
+  test('says it is turned, tilted and has its layers open as custom states', async () => {
+    const host = (await map('controls="layers"')) as Map & { bearing: number; pitch: number }
+    host.append(
+      Object.assign(document.createElement('helix-headless-map-route'), { label: 'Route' }),
+    )
+    await host.updateComplete
+    const states = (): string[] =>
+      ['layers-open', 'rotated', 'tilted'].filter((name) => hasState(host, name))
+    expect(states()).toEqual([])
+    host.bearing = 359.8
+    host.pitch = 0.2
+    await host.updateComplete
+    expect(states()).toEqual([])
+    host.bearing = 90
+    host.pitch = 45
+    await host.updateComplete
+    expect(states()).toEqual(['rotated', 'tilted'])
+    control(host, 'layers-toggle')?.click()
+    await host.updateComplete
+    expect(hasState(host, 'layers-open')).toBe(true)
+  })
+})

@@ -25,9 +25,19 @@ import { styles } from './map-root.css.js'
  * @aliases Map frame, Map container, Geo
  * @documentation https://fusion.dev/helix/components/map
  *
+ * @cssproperty --map-attribution-border-color - The rule above the map credit, under the map.
+ * @cssproperty --map-attribution-color - The color of the map credit.
+ * @cssproperty --map-attribution-font-size - The size of the map credit's text.
  * @cssproperty --map-background-color - The color behind the map while tiles load.
  * @cssproperty --map-block-size - The frame's height, as a length. Ignored with `fill`, where the container decides it.
  * @cssproperty --map-border-color - The frame's border color.
+ * @cssproperty --map-chosen-color - The fill of the pressed 3D button and the ring around the chosen map type and each shown layer in the layers menu.
+ * @cssproperty --map-layers-menu-gap - The space between the map types and the layers in the layers menu.
+ * @cssproperty --map-layers-menu-inline-size - The width of the layers menu.
+ * @cssproperty --map-layers-menu-padding - The space inside the edge of the layers menu.
+ * @cssproperty --map-needle-north-color - The north half of the compass needle.
+ * @cssproperty --map-needle-south-color - The south half of the compass needle.
+ * @cssproperty --map-radius - The frame's corners.
  * @cssproperty --viewport-control-background-color - The background of the pan and zoom buttons. Canvas uses the same property.
  */
 @customElement('helix-map')
