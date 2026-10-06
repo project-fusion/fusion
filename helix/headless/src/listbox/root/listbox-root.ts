@@ -1421,6 +1421,14 @@ export class HelixHeadlessListbox extends MixinCollection(
     return super.renderLive(hasContent)
   }
 
+  /* The list's `tabindex` takes `isDisabled`, matching the filter input
+     above it: on `disabled` alone, a listbox in a disabled fieldset keeps its
+     tab stop and takes arrow keys while its own filter is correctly out.
+
+     No tab stop at all with a filter, whose field is the one stop: the field
+     announces the highlight and forwards the arrows. A second stop on the
+     list was one where the arrows chose as they moved, so in a command palette
+     a Tab and an arrow ran a command. */
   protected override render(): TemplateResult {
     const shown = this.showsOptions
     /* One tab stop for the whole list, which is what a listbox is in the tab
@@ -1460,17 +1468,6 @@ export class HelixHeadlessListbox extends MixinCollection(
         aria-labelledby=${this.labeled ? this.labelId : nothing}
         aria-multiselectable=${this.multiple ? 'true' : nothing}
         aria-required=${this.required ? 'true' : nothing}
-        ${
-          /* `isDisabled`, matching the filter input above it: on `disabled`
-             alone, a listbox in a disabled fieldset keeps its tab stop and
-             takes arrow keys while its own filter is correctly out.
-
-             No tab stop at all with a filter, whose field is the one stop: the
-             field announces the highlight and forwards the arrows. A second
-             stop on the list was one where the arrows chose as they moved, so
-             in a command palette a Tab and an arrow ran a command. */
-          ''
-        }
         tabindex=${this.filterable ? nothing : this.isDisabled ? -1 : 0}
         @scroll=${this.handleScroll}
       >

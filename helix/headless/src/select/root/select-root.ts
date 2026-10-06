@@ -362,7 +362,6 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
    * the commit creates the text node it needs.
    */
   private get display(): string | typeof nothing {
-    const chosen = new Set(this.value === '' ? [] : this.value.split(','))
     const words = this.chosenOptions.map((option) => option.text)
     if (words.length > 0) {
       /* A list in the reader's language, as React Aria writes one: `unit` and
@@ -372,7 +371,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
         words,
       )
     }
-    return chosen.size > 0 && !this.childrenKnown ? nothing : this.placeholder
+    return this.value !== '' && !this.childrenKnown ? nothing : this.placeholder
   }
 
   /** The chosen options, in the order they appear. None on a server or while hydrating. */
@@ -767,6 +766,9 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
    * template.
    */
   protected renderListbox(): TemplateResult {
+    /* An option arriving or leaving changes no property, so the slot's
+       `slotchange` is what schedules the update that rereads the trigger's
+       words. A comment here and not in the template, which would ship it. */
     return html`<${this.tag('listbox')}
       empty-text=${this.emptyText}
       loading-text=${this.loadingText}
@@ -787,8 +789,6 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
       @change=${this.stopInner}
       @input=${this.stopInner}
     >
-      <!-- An option arriving or leaving changes no property, so this is what
-           schedules the update that rereads the trigger's words. -->
       <slot @slotchange=${() => this.requestUpdate()}></slot>
     </${this.tag('listbox')}>`
   }
@@ -850,6 +850,14 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
   }
 
   protected override render(): TemplateResult {
+    /* `end` before the indicator, not after it. The caret is the affordance
+       saying the control opens, so it stays the last thing in the trigger
+       whatever else is put in front of it.
+
+       The indicator slot has a fallback: without one a select written without
+       a hand-slotted icon draws no mark at all saying it opens. A caret is the
+       mark, and slotting anything replaces it, which is this library's rule
+       for a content property. */
     return html`${this.renderLabel()}
       <button
         part="trigger"
@@ -867,20 +875,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
       >
         <slot name="start"></slot>
         <span part="value" id="value">${this.renderValue()}</span>
-        ${
-          /* Before the indicator, not after it. The caret is the affordance
-             saying the control opens, so it stays the last thing in the trigger
-             whatever else is put in front of it. */
-          ''
-        }
         <slot name="end"></slot>
-        ${
-          /* The slot has a fallback: without one a select written without a
-             hand-slotted icon draws no mark at all saying it opens. A caret is
-             the mark, and slotting anything replaces it, which is this
-             library's rule for a content property. */
-          ''
-        }
         ${this.renderIndicator()}
       </button>
 

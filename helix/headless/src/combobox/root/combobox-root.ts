@@ -1291,6 +1291,21 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
    * one from the same template.
    */
   protected renderListbox(): TemplateResult {
+    /* Comments here and not in the template, which would ship them.
+
+       The field's words are read off the options, and on the first render
+       there are none: the slot has not been assigned yet, so a combobox with a
+       value comes up empty. Assignment changes no property, so the default
+       slot's `slotchange` is what schedules the update that fixes it.
+
+       `empty`, `loading` and `error` are handed on to the list's own, with the
+       text as each slot's fallback: a slot passed into another is assigned
+       there whether or not anything fills it, so the list's fallback would
+       never show.
+
+       `no-results` is handed on only while something fills it: an assigned
+       slot hides the list's own fallback, which is no-results-text or
+       empty-text. */
     return html`<${this.tag('listbox')}
       part="listbox"
       id="listbox"
@@ -1314,20 +1329,10 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
       @helix-filter=${this.stopInner}
       @input=${this.stopInner}
     >
-      <!-- The field's words are read off the options, and on the first
-           render there are none: the slot has not been assigned yet, so a
-           combobox with a value comes up empty. Assignment changes no
-           property, so nothing else would schedule the update that fixes
-           it. -->
       <slot @slotchange=${() => this.requestUpdate()}></slot>
-      <!-- Handed on to the list's own, with the text as this slot's fallback:
-           a slot passed into another is assigned there whether or not anything
-           fills it, so the list's fallback would never show. -->
       <slot name="empty" slot="empty">${this.emptyText}</slot>
       <slot name="loading" slot="loading">${this.loadingText}</slot>
       <slot name="error" slot="error">${this.loadError}</slot>
-      <!-- Handed on only while something fills it: an assigned slot hides the
-           list's own fallback, which is no-results-text or empty-text. -->
       <slot
         name="no-results"
         slot=${this.querySelector?.(':scope > [slot="no-results"]') ? 'no-results' : nothing}
