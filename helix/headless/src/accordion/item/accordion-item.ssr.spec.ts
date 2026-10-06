@@ -49,7 +49,7 @@ describe('accordion server output', () => {
        inlined stylesheet names both attributes and `toContain` would pass on a
        selector. */
     const closed = ssr(
-      html`<helix-headless-accordion-item><span slot="summary">S</span>Body</helix-headless-accordion-item>`,
+      html`<helix-headless-accordion-item hidden-until-found="false"><span slot="summary">S</span>Body</helix-headless-accordion-item>`,
     )
     expect(partTag(closed, 'content')).toContain('hidden')
     expect(partTag(closed, 'content')).toContain('inert')
@@ -64,7 +64,7 @@ describe('accordion server output', () => {
   test('the region is named by its trigger, inside one shadow root', () => {
     // IDREFs do not cross a shadow boundary, so both ids have to live together.
     const markup = ssr(
-      html`<helix-headless-accordion-item><span slot="summary">S</span>x</helix-headless-accordion-item>`,
+      html`<helix-headless-accordion-item default-open><span slot="summary">S</span>x</helix-headless-accordion-item>`,
     )
     expect(partTag(markup, 'trigger')).toContain('aria-controls="content"')
     expect(partTag(markup, 'content')).toContain('aria-labelledby="trigger"')
@@ -73,9 +73,10 @@ describe('accordion server output', () => {
 
   test('a closed section find in page searches is served with no landmark', () => {
     const markup = ssr(
-      html`<helix-headless-accordion-item hidden-until-found><span slot="summary">S</span>x</helix-headless-accordion-item>`,
+      html`<helix-headless-accordion-item><span slot="summary">S</span>x</helix-headless-accordion-item>`,
     )
     expect(partTag(markup, 'content')).toContain('hidden="until-found"')
+    expect(partTag(markup, 'content')).not.toContain('inert')
     expect(partTag(markup, 'content')).not.toContain('role=')
     expect(partTag(markup, 'content')).not.toContain('aria-labelledby')
   })
