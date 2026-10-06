@@ -14,7 +14,9 @@ slot[name="icon"]::slotted(*) {
   color: var(--empty-icon-color, var(--helix-color-foreground-subtle));
 }
 
-slot[name="heading"]::slotted(*) {
+/* The heading `heading` draws is set as a slotted one is. */
+slot[name="heading"]::slotted(*),
+[part="heading"] {
   color: var(--empty-heading-color, var(--helix-color-foreground));
   font-size: var(--empty-heading-size, var(--helix-text-lg));
   font-weight: var(--helix-weight-semibold);

@@ -2,6 +2,7 @@ import {
   ArrivalController,
   customElement,
   HelixElement,
+  headingLevel,
   slottedWords,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type TemplateResult } from 'lit'
@@ -26,6 +27,11 @@ import { property } from 'lit/decorators.js'
  * `empty-state-actions` element: assign your own heading and actions to the
  * slots.
  *
+ * **Or give the heading as words.** `heading` draws them in a `heading` part
+ * that is a heading at `heading-level`, 3 where it is not set, so a page
+ * rendering from data or on a server gets a heading a reader finds in the
+ * outline without writing the element. A heading slotted in replaces it.
+ *
  * @since 0.1.0
  * @status stable
  * @category feedback
@@ -34,13 +40,32 @@ import { property } from 'lit/decorators.js'
  *
  * @slot - The message: why the region is empty, and what to do about it.
  * @slot actions - The action that would put something in the region.
- * @slot heading - The heading, which names what is missing. Slot a heading element, such as an `<h3>`, so a reader can find it in the page's outline.
+ * @slot heading - The heading, which names what is missing. Slot a heading element, such as an `<h3>`, so a reader can find it in the page's outline. Replaces the one `heading` draws.
  * @slot icon - An icon above the heading.
  *
+ * @csspart heading - The heading `heading` draws, a heading at `heading-level`. Drawn only while `heading` holds words and nothing is slotted into `heading`.
  * @csspart live - A copy of the heading and the message, in a live region that screen readers announce when the view appears. Visually hidden in the styled tier.
  */
 @customElement('helix-headless-empty')
 export class HelixHeadlessEmpty extends HelixElement {
+  /**
+   * The heading as words, such as "No results", drawn as a heading when
+   * nothing is slotted into `heading`.
+   *
+   * Absent draws none, and the `heading` slot is the only heading.
+   */
+  @property()
+  heading = ''
+
+  /**
+   * The level of the heading `heading` draws, from 1 to 6.
+   *
+   * Absent is 3, the level of a heading inside a page's section. Set it to fit
+   * the outline the empty view sits in. A slotted heading keeps its own.
+   */
+  @property({ attribute: 'heading-level', type: Number })
+  headingLevel?: number
+
   /**
    * Whether the state is announced when it appears.
    *
@@ -58,8 +83,25 @@ export class HelixHeadlessEmpty extends HelixElement {
      spoke over the page as it opened. */
   protected readonly arrival = new ArrivalController(this, {
     arriving: () => !this.serverRendered && document.readyState === 'complete',
-    text: () => slottedWords(this, ['heading', '']),
+    text: () =>
+      [slottedWords(this, ['heading']) || this.heading.trim(), slottedWords(this, [''])]
+        .filter(Boolean)
+        .join(' '),
   })
+
+  /**
+   * The heading `heading` draws, as the `heading` slot's fallback, so one
+   * slotted in replaces it; nothing while `heading` holds no words.
+   *
+   * A method, so a tier above can draw its own, as the slot lets a page.
+   */
+  protected renderHeading(): TemplateResult | typeof nothing {
+    return this.heading.trim()
+      ? html`<div aria-level=${headingLevel(this.headingLevel)} part="heading" role="heading">
+          ${this.heading}
+        </div>`
+      : nothing
+  }
 
   protected override render(): TemplateResult {
     const say = () => this.arrival.say()
@@ -69,7 +111,9 @@ export class HelixHeadlessEmpty extends HelixElement {
        they are back. The actions are never hidden. */
     const copied = this.arrival.said !== '' && !this.noAnnounce ? 'true' : nothing
     return html`<slot name="icon"></slot>
-      <slot aria-hidden=${copied} name="heading" @slotchange=${say}></slot>
+      <slot aria-hidden=${copied} name="heading" @slotchange=${say}
+        >${this.renderHeading()}</slot
+      >
       <slot aria-hidden=${copied} @slotchange=${say}></slot>
       <slot name="actions"></slot>
       ${
