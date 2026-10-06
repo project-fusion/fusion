@@ -65,6 +65,12 @@ A property that holds content, such as a tooltip's text, is the fallback content
 for a slot of the same name. Helix never renders both.
 
 ```html
+<!-- The trigger, which names the tooltip in aria-describedby -->
+<helix-button
+  aria-describedby="save-tip"
+  id="save"
+>Save</helix-button>
+
 <!-- The property -->
 <helix-tooltip
   content="Save"

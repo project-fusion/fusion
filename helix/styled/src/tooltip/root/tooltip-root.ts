@@ -8,6 +8,15 @@ import { styles } from './tooltip-root.css.js'
  * @summary A short text that appears next to an element on hover and focus.
  *
  * @description
+ * Place the tooltip beside its trigger, name the trigger with `for`, and name
+ * the tooltip in the trigger's `aria-describedby`, so the trigger is described
+ * in the server's markup and at rest:
+ *
+ * ```html
+ * <helix-button aria-describedby="save-tip" id="save">Save</helix-button>
+ * <helix-tooltip content="Save your work" for="save" id="save-tip"></helix-tooltip>
+ * ```
+ *
  * The bubble is in the top layer, so it needs no `z-index` and no container
  * clips it.
  *

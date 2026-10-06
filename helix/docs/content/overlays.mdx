@@ -106,13 +106,30 @@ The fields with a panel behave the same way:
 **A tooltip never takes focus.** A tooltip only describes a control, so it
 cannot contain a button. For something with a button in it, use a `Popover`.
 
-A tooltip describes its trigger by itself, whether it wraps the trigger or
-names it with `for`. A Helix trigger is described as soon as it has rendered.
-A plain element in your markup is described the first time a reader points at
-it or focuses it, so the link is never written into markup your server sent.
-Write `aria-describedby` yourself to have the link in the server's markup.
-In the `for` form, the tooltip itself is out of the accessibility tree while
-its bubble is down, so a reader meets its words once, as the description.
+**Name the tooltip in its trigger's `aria-describedby`.** Place the tooltip
+beside its trigger, name the trigger with `for`, and give the trigger an
+`aria-describedby` with the tooltip's id. The description is then in the
+markup your server sends, so a screen reader meets it at rest, in reading mode
+too:
+
+```html
+<helix-button
+  aria-describedby="save-tip"
+  id="save"
+>Save</helix-button>
+<helix-tooltip
+  content="Save your work"
+  for="save"
+  id="save-tip"
+></helix-tooltip>
+```
+
+Without the attribute, a tooltip links itself. A Helix trigger is described as
+soon as it has rendered. A plain element that `for` names is described the
+first time you point at it or focus it, so the link is never written into
+markup your server sent. In the `for` form, the tooltip itself is out of the
+accessibility tree while its bubble is down, so you meet its words once, as the
+description.
 The pointer can move onto a tooltip's bubble and the bubble stays, so a reader
 can read it under a magnifier. Set `hoverable="false"` to hide it once the
 pointer reaches it.
