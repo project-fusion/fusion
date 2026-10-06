@@ -32,6 +32,27 @@ export const formatNumber = (
   options?: Intl.NumberFormatOptions,
 ): string => formatter(locale, options).format(value)
 
+/** A share written as a whole percentage, which a reading says by default. */
+const WHOLE_PERCENT: Intl.NumberFormatOptions = { maximumFractionDigits: 0, style: 'percent' }
+
+/**
+ * A reading in words: `value` written with `options` where they say another
+ * style, and otherwise `share`, from 0 to 1, as a percentage, whole unless
+ * `options` say more.
+ *
+ * Meter and Progress each wrote this, with the value each holds to its range
+ * and the share of it that is filled.
+ */
+export const readingText = (
+  value: number,
+  share: number,
+  locale = '',
+  options?: Intl.NumberFormatOptions,
+): string =>
+  options && options.style !== 'percent'
+    ? formatNumber(value, locale, options)
+    : formatNumber(share, locale, options ?? WHOLE_PERCENT)
+
 /**
  * Whether the group separators in a number stand where a locale puts them:
  * one to three digits, then groups of three, up to the decimal separator.

@@ -127,6 +127,36 @@ export const everyState = (
   return { checked, indeterminate: count > 0 && !checked }
 }
 
+/**
+ * `keys` in the order the rows are, which is `order`: the keys of the whole
+ * set. A key the set does not hold, a selected row a search has hidden say,
+ * keeps its place after them in the order it was given.
+ *
+ * So a selection reads in row order whatever order its rows were chosen in:
+ * Data Table's, and Table's and Virtual List's, which wrote it in press order
+ * or wrote this again.
+ */
+export const inRowOrder = (keys: Iterable<string>, order: readonly string[]): string[] => {
+  const wanted = new Set(keys)
+  const placed = order.filter((key) => wanted.has(key))
+  const seen = new Set(placed)
+  return [...placed, ...[...wanted].filter((key) => !seen.has(key))]
+}
+
+/**
+ * Where a Shift range runs from, as an index into `keys`: the row last chosen
+ * while it is among them, and otherwise the row the reader is on, `from`,
+ * which becomes the one to run from.
+ */
+export const anchorAt = (
+  keys: readonly string[],
+  anchorKey: string | undefined,
+  from: number,
+): { anchor: number; anchorKey: string | undefined } => {
+  const anchor = anchorKey === undefined ? -1 : keys.indexOf(anchorKey)
+  return anchor < 0 ? { anchor: from, anchorKey: keys[from] } : { anchor, anchorKey }
+}
+
 /** How many items a set lets a reader select: Tag Group's and List's `selection-mode`. */
 export type SelectionMode = 'multiple' | 'none' | 'single'
 

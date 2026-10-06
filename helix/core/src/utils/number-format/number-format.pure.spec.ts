@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { formatNumber, parseNumber } from './number-format.js'
+import { formatNumber, parseNumber, readingText } from './number-format.js'
 
 describe('formatting a number', () => {
   test('writes the locale and the options', () => {
@@ -46,5 +46,22 @@ describe('reading a number', () => {
     for (const text of ['', 'abc', '1.2.3x', '--1']) {
       expect(parseNumber(text, 'en-US')).toBeNull()
     }
+  })
+})
+
+/* Meter's and Progress's reading, which each wrote. */
+describe('a reading in words', () => {
+  test('is the share as a whole percentage by default', () => {
+    expect(readingText(42, 0.426, 'en')).toBe('43%')
+  })
+
+  test('or with the digits the percent options ask for', () => {
+    expect(readingText(42, 0.426, 'en', { maximumFractionDigits: 1, style: 'percent' })).toBe(
+      '42.6%',
+    )
+  })
+
+  test('or the value itself in another style', () => {
+    expect(readingText(42, 0.426, 'en', { style: 'unit', unit: 'kilobyte' })).toBe('42 kB')
   })
 })

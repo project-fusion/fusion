@@ -275,6 +275,7 @@ export {
   PALETTE,
   PLOT_HEIGHT,
   PLOT_WIDTH,
+  POSITION_LABEL,
   seriesIndex,
   seriesNames,
 } from './mixins/mixin-chart-source/mixin-chart-source.js'
@@ -449,7 +450,7 @@ export {
 } from './utils/media-copy/media-copy.js'
 export { nameText } from './utils/name-text/name-text.js'
 export { nearest } from './utils/nearest/nearest.js'
-export { formatNumber, parseNumber } from './utils/number-format/number-format.js'
+export { formatNumber, parseNumber, readingText } from './utils/number-format/number-format.js'
 export { onUnlessFalse } from './utils/on-unless-false/on-unless-false.js'
 export { plainClick } from './utils/plain-click/plain-click.js'
 export { appleTouch, onAndroid, onApple, type Platform } from './utils/platform/platform.js'
@@ -458,6 +459,8 @@ export { rangeAdd } from './utils/range-add/range-add.js'
 export { type ColorBytes, readColor, rgbOf } from './utils/read-color/read-color.js'
 export {
   byRow,
+  type Extremes,
+  extremesOf,
   type Row,
   type RowCell,
   readRows,
@@ -580,8 +583,10 @@ export { watchTheme } from './utils/watch-theme/watch-theme.js'
 export { wordsConverter } from './utils/words-converter/words-converter.js'
 export { writeClock, writeTime } from './utils/write-time/write-time.js'
 export {
+  anchorAt,
   commaList,
   everyState,
+  inRowOrder,
   pressedValue,
   prunedValue,
   type SelectionMode,

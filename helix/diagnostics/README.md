@@ -240,6 +240,7 @@ diagnostics counts it by kind and tag. None fails a CI job.
 
 | Kind | Means |
 | --- | --- |
+| `deprecated` | A deprecated property, attribute or slot was used; the message names what replaces it |
 | `duplicate-registration` | Two copies of Helix are on the page. Also the finding of the same name |
 | `fullscreen-refused` | The browser refused fullscreen, usually in a frame without `allow="fullscreen"` |
 | `min-out-of-range` | A rating's `min` is not a score between 0 and its `max` |

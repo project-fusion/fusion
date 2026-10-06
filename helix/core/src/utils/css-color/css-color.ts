@@ -1,5 +1,3 @@
-import { clamp } from '../clamp/clamp.js'
-
 /**
  * Reading and writing the color syntaxes a field is allowed to hold.
  *
@@ -34,6 +32,8 @@ import { clamp } from '../clamp/clamp.js'
  * It is core's choice now instead of the picker's, and a caller wanting another
  * shape formats it itself.
  */
+
+import { clamp } from '../clamp/clamp.js'
 
 /** A color as the panel holds it. Alpha and the two percentages are 0 to 100. */
 export interface Color {

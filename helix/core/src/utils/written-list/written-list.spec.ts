@@ -1,7 +1,9 @@
 import { describe, expect, test } from 'bun:test'
 import {
+  anchorAt,
   commaList,
   everyState,
+  inRowOrder,
   pressedValue,
   prunedValue,
   toggleEvery,
@@ -181,5 +183,27 @@ describe('everyState', () => {
   test('is neither for none, or for an empty set', () => {
     expect(everyState([], ['a', 'b'])).toEqual({ checked: false, indeterminate: false })
     expect(everyState(['a'], [])).toEqual({ checked: false, indeterminate: false })
+  })
+})
+
+/* Data Table wrote these, and Table and Virtual List needed them too. */
+describe('a selection in row order', () => {
+  test('follows the rows, whatever order the keys were chosen in', () => {
+    expect(inRowOrder(['c', 'a'], ['a', 'b', 'c'])).toEqual(['a', 'c'])
+  })
+
+  test('keeps a key the rows do not hold, after them', () => {
+    expect(inRowOrder(['hidden', 'b'], ['a', 'b'])).toEqual(['b', 'hidden'])
+  })
+})
+
+describe('where a Shift range runs from', () => {
+  test('is the row last chosen while it is on the page', () => {
+    expect(anchorAt(['a', 'b', 'c'], 'b', 2)).toEqual({ anchor: 1, anchorKey: 'b' })
+  })
+
+  test('or the row the reader is on, which becomes the one to run from', () => {
+    expect(anchorAt(['a', 'b', 'c'], 'gone', 2)).toEqual({ anchor: 2, anchorKey: 'c' })
+    expect(anchorAt(['a', 'b'], undefined, 0)).toEqual({ anchor: 0, anchorKey: 'a' })
   })
 })

@@ -1,7 +1,7 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
 import type { SwipeAxis } from '../../utils/swipe/swipe.js'
 
-/** How far a press has to travel before it is a swipe, in pixels. */
+/** How far a press has to travel before it is a swipe, in pixels, by default. */
 const SLOP = 8
 
 export interface SwipeOptions {
@@ -16,6 +16,13 @@ export interface SwipeOptions {
 
   /** Called as the pointer moves, with how far it has gone from the press. */
   move: (dx: number, dy: number) => void
+
+  /**
+   * How far a press travels before it is a swipe, in pixels: 8 where this is
+   * not given. A mouse drag that takes over sooner, such as Carousel's at 4,
+   * says so here.
+   */
+  slop?: number
 
   /**
    * Whether a press may start a swipe, given the element it landed on. Every
@@ -121,7 +128,7 @@ export class SwipeController implements ReactiveController {
     if (!this.swiping) {
       const along = Math.abs(axis === 'x' ? dx : dy)
       const across = Math.abs(axis === 'x' ? dy : dx)
-      if (Math.max(along, across) < SLOP) {
+      if (Math.max(along, across) < (this.options.slop ?? SLOP)) {
         return
       }
       if (across >= along) {

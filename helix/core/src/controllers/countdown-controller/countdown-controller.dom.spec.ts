@@ -88,7 +88,7 @@ describe('CountdownController', () => {
     expect(done).toBe(1)
   })
 
-  test('nor once cancelled, until it is started again', () => {
+  test('nor once canceled, until it is started again', () => {
     const countdown = new CountdownController(host(), { done: () => {} })
     countdown.start(5000)
     countdown.cancel()
