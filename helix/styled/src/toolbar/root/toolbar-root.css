@@ -19,7 +19,9 @@
 }
 
 [part="toolbar"] {
-  align-items: center;
+  /* Across the toolbar's axis: centered, or \`stretch\` for a column of controls
+     as wide as the toolbar. */
+  align-items: var(--toolbar-align, center);
   background-color: var(--toolbar-background-color, transparent);
   border: var(--toolbar-border-width, 0) solid var(--toolbar-border-color, transparent);
   border-radius: var(--toolbar-radius, var(--helix-radii-none));

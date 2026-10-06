@@ -20,6 +20,7 @@ import { styles } from './toolbar-root.css.js'
  *
  * @csspart toolbar - The toolbar container.
  *
+ * @cssproperty --toolbar-align - How the controls line up across the toolbar's axis. Centered unless set; `stretch` makes a vertical toolbar's controls as wide as it is.
  * @cssproperty --toolbar-background-color - The fill behind the controls. Transparent unless set.
  * @cssproperty --toolbar-border-color - The color of the toolbar's edge, once it has a width.
  * @cssproperty --toolbar-border-width - The width of the toolbar's edge. None unless set.

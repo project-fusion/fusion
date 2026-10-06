@@ -322,3 +322,98 @@ describe('a group of buttons in a toolbar', () => {
     expect(document.activeElement).toBe(bold)
   })
 })
+
+describe('a toolbar inside a toolbar', () => {
+  const press = (from: Element, key: string): KeyboardEvent => {
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key,
+    })
+    from.dispatchEvent(event)
+    return event
+  }
+
+  /* React Aria demotes a nested toolbar to a group. Helix kept the role and the
+     keys, so ArrowRight into the inner toolbar stayed there and the outer
+     toolbar's later controls were reachable only by Tab. */
+  test('is a group of the outer one, whose arrows walk through it and on', async () => {
+    const outer = await mount(`
+      <helix-headless-toolbar label="Format">
+        <helix-headless-button id="o1">Bold</helix-headless-button>
+        <helix-headless-toolbar label="Nested">
+          <helix-headless-button id="n1">Left</helix-headless-button>
+          <helix-headless-button id="n2">Right</helix-headless-button>
+        </helix-headless-toolbar>
+        <helix-headless-button id="o2">Link</helix-headless-button>
+      </helix-headless-toolbar>`)
+    await settle(outer)
+    const inner = outer.querySelector('helix-headless-toolbar') as HTMLElement
+    await settle(inner)
+    expect(part(outer, 'toolbar')?.getAttribute('role')).toBe('toolbar')
+    expect(part(inner, 'toolbar')?.getAttribute('role')).toBe('group')
+    expect(part(inner, 'toolbar')?.hasAttribute('aria-orientation')).toBe(false)
+
+    const order: string[] = []
+    let at = outer.querySelector('#o1') as HTMLElement
+    for (let step = 0; step < 3; step += 1) {
+      press(at, 'ArrowRight')
+      at = document.activeElement as HTMLElement
+      order.push(at.id)
+    }
+    expect(order).toEqual(['n1', 'n2', 'o2'])
+  })
+})
+
+describe('a toggle group of pressed buttons in a toolbar', () => {
+  type Stop = HTMLElement & { focusable: boolean; updateComplete: Promise<unknown> }
+
+  const press = (from: Element, key: string): KeyboardEvent => {
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key,
+    })
+    from.dispatchEvent(event)
+    return event
+  }
+
+  /* React Aria's toolbar walks its toggle buttons one by one. Helix passed a
+     multiple group as one stop, so its second toggle was reached only by the
+     arrows across the toolbar. */
+  test('walks through each toggle, and the group holds the stop only while the toolbar does', async () => {
+    const toolbar = await mount(`
+      <helix-headless-toolbar label="Format">
+        <helix-headless-button id="b1">Link</helix-headless-button>
+        <helix-headless-toggle-group label="Style" selection-mode="multiple">
+          <helix-headless-toggle id="bold" value="bold">Bold</helix-headless-toggle>
+          <helix-headless-toggle id="italic" value="italic">Italic</helix-headless-toggle>
+        </helix-headless-toggle-group>
+        <helix-headless-button id="b3">Code</helix-headless-button>
+      </helix-headless-toolbar>`)
+    await settle(toolbar)
+    const group = toolbar.querySelector('helix-headless-toggle-group') as Stop
+    await settle(group)
+    expect(group.focusable).toBe(false)
+
+    const order: string[] = []
+    let at = toolbar.querySelector('#b1') as HTMLElement
+    for (let step = 0; step < 4; step += 1) {
+      const event = press(at, 'ArrowRight')
+      expect(event.defaultPrevented).toBe(true)
+      at = document.activeElement as HTMLElement
+      /* The focus a browser reports on its own, which happy-dom does not. */
+      at.dispatchEvent(new FocusEvent('focusin', { bubbles: true, composed: true }))
+      await settle(group)
+      order.push(at.id)
+      if (at.id === 'italic') {
+        expect(group.focusable).toBe(true)
+        expect((at as Stop).focusable).toBe(true)
+      }
+    }
+    expect(order).toEqual(['bold', 'italic', 'b3', 'b1'])
+    expect(group.focusable).toBe(false)
+  })
+})
