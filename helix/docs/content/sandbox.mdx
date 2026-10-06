@@ -126,7 +126,7 @@ for the reason under "How the preview is isolated":
 
 ```ts
 // frame.ts, bundled to /frame.js as a classic script
-import '@fusion.dev/helix'
+import '@fusion.dev/helix' // registers every family, because an example can use any of them
 import { servePreview } from '@fusion.dev/helix/sandbox'
 
 servePreview()
