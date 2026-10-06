@@ -40,3 +40,21 @@ describe('the styled tag group', () => {
     expect(tag).toContain(':host(:state(selected))')
   })
 })
+
+/* Every visual decision is a hook named after the family, defaulting to what
+   was drawn before the hook existed. */
+describe("the tag's hooks", () => {
+  test('are read by the sheet, each with the old value as its fallback', () => {
+    const declared = (customElements.get('helix-tag') as unknown as { styles: unknown }).styles
+    const text = (Array.isArray(declared) ? declared : [declared])
+      .flat(Number.POSITIVE_INFINITY)
+      .map((one) => {
+        const sheet = one as { cssRules?: ArrayLike<{ cssText: string }>; cssText?: string }
+        return sheet.cssText ?? Array.from(sheet.cssRules ?? [], (rule) => rule.cssText).join('\n')
+      })
+      .join('\n')
+    for (const hook of ['--tag-font-weight', '--tag-gap']) {
+      expect(text).toContain(`var(${hook},`)
+    }
+  })
+})

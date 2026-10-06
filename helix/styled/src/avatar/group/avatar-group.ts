@@ -21,6 +21,9 @@ import { styles } from './avatar-group.css.js'
  * @aliases Avatar stack, Facepile
  * @documentation https://fusion.dev/helix/components/avatar
  *
+ * @cssproperty --avatar-group-overflow-background-color - The fill of the count of avatars past `max`.
+ * @cssproperty --avatar-group-overflow-color - The color of the count of avatars past `max`.
+ * @cssproperty --avatar-group-overflow-font-size - The type size of the count of avatars past `max`.
  * @cssproperty --avatar-group-overlap - How far each avatar sits over the one before it.
  * @cssproperty --avatar-group-ring-color - Color of the ring that separates one avatar from the next.
  */

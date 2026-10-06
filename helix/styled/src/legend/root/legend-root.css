@@ -16,9 +16,9 @@
 
 [part~="entry"] {
   align-items: center;
-  color: var(--helix-color-foreground-muted);
+  color: var(--legend-color, var(--helix-color-foreground-muted));
   display: flex;
-  font-size: var(--helix-text-sm);
+  font-size: var(--legend-font-size, var(--helix-text-sm));
   gap: var(--legend-entry-gap, var(--helix-space-2xs));
   line-height: var(--helix-leading-tight);
 }

@@ -28,11 +28,15 @@ import { styles } from './progress-root.css.js'
  * @cssproperty --progress-label-color - Color of a slotted label.
  * @cssproperty --progress-label-gap - Space between a slotted label and the bar.
  * @cssproperty --progress-label-size - Type size of a slotted label.
+ * @cssproperty --progress-radius - How far the ends of the bar are rounded.
  * @cssproperty --progress-ring-size - Diameter of the ring.
  * @cssproperty --progress-ring-width - Thickness of the ring's stroke.
  * @cssproperty --progress-size - Thickness of the bar.
  * @cssproperty --progress-track-color - Fill of the part that is not done.
  * @cssproperty --progress-transition-duration - How long the fill takes to move to a new value. `0s` moves it at once.
+ * @cssproperty --progress-value-color - The color of the value shown under `show-value`.
+ * @cssproperty --progress-value-gap - The space between the bar and the value under `show-value`.
+ * @cssproperty --progress-value-size - The type size of the value shown under `show-value`.
  */
 @customElement('helix-progress')
 export class HelixProgress extends HelixHeadlessProgress {
