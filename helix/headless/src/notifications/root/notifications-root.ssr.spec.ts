@@ -84,4 +84,18 @@ describe('notifications server output', () => {
   test('the mark-all control is not served, because nothing could count the items', () => {
     expect(withoutStyles(markup)).not.toContain('Mark all as read')
   })
+
+  /* A failure is a fact the page knows before any script runs, so the server
+     says it, in the part and in the live region, with the slot for richer
+     content around the words. */
+  test('a load error is served, around a slot for richer content', () => {
+    const failed = rendered(
+      ssr(
+        html`<helix-headless-notifications label="Activity" load-error="Could not load"></helix-headless-notifications>`,
+      ),
+      'helix-headless-notifications',
+    )
+    expect(failed).toMatch(/<p part="error"><slot name="error">(<!--[^>]*-->)*Could not load/)
+    expect(failed).toMatch(/<span part="live" role="status">(<!--[^>]*-->)*Could not load/)
+  })
 })
