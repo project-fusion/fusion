@@ -843,6 +843,27 @@ describe('the statuses a combobox hands its list', () => {
     expect(part(list2, 'empty')?.textContent?.trim()).toBe('Nothing like it')
   })
 
+  /* Measured before this: only the list inside had them, which no page
+     stylesheet reaches. */
+  test('`error` and `no-results` are states of the host as well', async () => {
+    const states = (host: Updatable) =>
+      (host as unknown as { internals: ElementInternals }).internals.states
+    const failing = await combobox('load-error="Offline"')
+    await settle(failing)
+    expect(states(failing).has('error')).toBe(true)
+    const host = await combobox()
+    expect(states(host).has('no-results')).toBe(false)
+    await type(host, 'zzz')
+    await settle(list(host) as unknown as Updatable)
+    await settle(host)
+    expect(states(host).has('no-results')).toBe(true)
+    expect(states(host).has('error')).toBe(false)
+    await type(host, 'r')
+    await settle(list(host) as unknown as Updatable)
+    await settle(host)
+    expect(states(host).has('no-results')).toBe(false)
+  })
+
   test('a slotted no-results is handed on only while there is one', async () => {
     const bare = await combobox()
     const forward = (host: Updatable) =>
