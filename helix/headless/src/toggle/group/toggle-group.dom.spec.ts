@@ -411,6 +411,41 @@ describe('a group where several can be pressed', () => {
     ])
   })
 
+  test('a value holding a comma comes back whole when the browser restores the form', async () => {
+    /* The browser hands back the state the group saved. Saved as the values
+       joined with commas, `b,1` came back as two values and pressed nothing. */
+    const group =
+      (await mount(`<helix-headless-toggle-group label="Format" name="tg" selection-mode="multiple">
+      <helix-headless-toggle value="b,1">Bold</helix-headless-toggle>
+      <helix-headless-toggle value="i">Italic</helix-headless-toggle>
+      <helix-headless-toggle value="u">Under</helix-headless-toggle>
+    </helix-headless-toggle-group>`)) as Toolbar
+    const internals = (group as unknown as { internals: ElementInternals }).internals
+    const report = internals.setFormValue.bind(internals)
+    let saved: string | File | FormData | null | undefined
+    internals.setFormValue = (value, state) => {
+      saved = state
+      report(value, state)
+    }
+    button(items(group)[0] as HTMLElement).click()
+    button(items(group)[1] as HTMLElement).click()
+    await settle(group)
+    expect(group.values).toEqual(['b,1', 'i'])
+    const state = saved ?? null
+    group.values = []
+    await settle(group)
+    ;(
+      group as unknown as { formStateRestoreCallback(state: unknown): void }
+    ).formStateRestoreCallback(state)
+    await settle(group)
+    expect(group.values).toEqual(['b,1', 'i'])
+    expect(items(group).map((item) => button(item).getAttribute('aria-pressed'))).toEqual([
+      'true',
+      'true',
+      'false',
+    ])
+  })
+
   test('the arrow keys move without pressing', async () => {
     const group = await toolbar()
     group.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'End' }))
