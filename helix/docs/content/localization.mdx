@@ -1,5 +1,5 @@
 ---
-description: Set the locale of date, time, and number controls, translate component strings, and lay out pages right to left.
+description: Set the locale of date, time, and number controls, translate the built-in words, and lay out pages right to left.
 section: Essentials
 title: Localization and RTL
 ---
@@ -112,10 +112,12 @@ The first day of the week comes from `Intl.Locale`'s week information, which
 Firefox does not provide. There, and where you set no `locale`, the week starts
 on Sunday. Set `first-day-of-week` to choose the day yourself.
 
-`locale` formats dates, times, and numbers. It does not translate the words a
-control speaks, such as "Previous month" on a calendar. Set those through their
-properties, such as `previous-label` and `next-label` on Date Picker and Date
-Input. A time wheel's name, such as "Hour", comes from the locale.
+`locale` formats dates, times, and numbers. On a family that reads the words
+registry, it also picks the words. On the others, set the words a control
+speaks through their properties, such as `previous-label` and `next-label` on
+Date Picker and Date Input. See
+[Translate the built-in words](#translate-the-built-in-words). A time wheel's
+name, such as "Hour", comes from the locale.
 
 Formatting uses `Intl`, so Helix bundles no locale data, and you have nothing to
 keep up to date.
@@ -153,11 +155,118 @@ The value is `YYYY-MM-DD` in every calendar. In a `segmented` Date Input, the
 segments hold the Gregorian day, month, and year, so a Buddhist date is typed
 with the year 2026.
 
-## Translate component strings
+## Translate the built-in words
 
-More than a hundred properties in the headless tier set text that your users
-see. Examples include `pan-up-label` on a map and `remove-label` on a combobox's
-selected tags. Properties that combine values are format templates:
+Components have English words built in: the names a screen reader hears, the
+sentences a live region says, and the text on buttons such as "Load more".
+Register the words for a language once, and every element in that language
+speaks them:
+
+```js
+import { registerWords } from '@fusion.dev/helix'
+
+registerWords('pl', {
+  'helix-combobox': {
+    emptyText: 'Brak wyników',
+    resultsLabel:
+      '{count, plural, one {# wynik} few {# wyniki} many {# wyników} other {# wyniku}}',
+  },
+  'helix-data-table': {
+    nextLabel: 'Następna strona',
+    previousLabel: 'Poprzednia strona',
+  },
+})
+```
+
+Each family's words are keyed by its tag, such as `helix-combobox`, and then
+by the property name. The headless and styled tiers share one key. To type the
+keys, import the generated types once:
+
+```ts
+import type {} from '@fusion.dev/helix/words'
+```
+
+Combobox and Data Table read the registry. The other families take their words
+as properties, as described in
+[Set the words of other families](#set-the-words-of-other-families), and move
+to the registry one family at a time.
+
+### Which words an element uses
+
+1. **A value you set on the element**, as an attribute or a property. The
+   English counts as a value, so `empty-text="No matches"` keeps the English
+   on every page.
+2. The words registered for the element's locale.
+3. The English.
+
+Set the property to `null`, or remove the attribute, to return to the
+registered words. Reading the property gives the word the element uses, in its
+locale.
+
+### Which locale an element speaks
+
+1. The element's `locale` property.
+2. The nearest `lang` attribute, read through shadow roots, such as
+   `<html lang="pl">`.
+3. The browser's language.
+
+The same locale picks the words, the plural forms, and the way numbers are
+written, so one sentence never mixes two languages.
+
+A word that a language does not have falls back one key at a time, through
+the regional, script, and language forms of the tag and then to English. A
+`de-CH` page uses a `de-CH` word, then a `de` word, then the English. Hong Kong
+(`zh-HK`) reaches a `zh-Hant` word before a `zh` word. Name a set of words by
+its full tag where a language has regional forms, such as `pt-BR`, `pt-PT`, and
+`es-419`.
+
+When you register words, or change the `lang` of the `<html>` element, every
+element on the page updates once. When you change the `lang` of another
+element, call `refreshWords()`.
+
+### Write a message
+
+Words are messages in a small part of the ICU MessageFormat syntax, which
+translation tools read:
+
+| Syntax | What it does |
+|---|---|
+| `{name}` | Puts in a value. A number is written in the locale, such as `1.200` in German. |
+| `{p, number, percent}` | Writes a number as a percentage, with the sign where the locale puts it. `{n, number, integer}` rounds. |
+| `{count, plural, one {# wynik} few {# wyniki} other {# wyniku}}` | Picks a form by the language's plural rules. `#` is the number. `=0 {...}` matches one exact number, and `offset:1` counts from one. |
+| `{n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}` | Picks a form for a position. |
+| `{direction, select, ascending {...} descending {...} other {...}}` | Picks a whole sentence by a value, so a language can phrase each one its own way. |
+| `''` and `'{'` | Write one apostrophe, and a brace as text. A single apostrophe is text, so `L'élément` needs no escaping. |
+
+Each property's reference entry names its placeholders. A message that does
+not parse shows as written, so a typo appears on the page where you can see it.
+
+`formatMessage(message, values, locale)` formats a message for your own
+elements, and `wordsLocale(element)` gives the locale an element speaks.
+
+### Server rendering
+
+A server knows the element's own attributes and the words your server code
+registered. It does not know the page around the element. So on a server, and
+in the first render while an element hydrates, a word uses the element's
+`locale`, then its own `lang`, then the locale you set with
+`setDefaultWordsLocale`, then English. After hydration, the element reads the
+nearest `lang` and updates once if its words change.
+
+- Register the same words on the server and in the browser, before the
+  elements are defined, so the two renders agree.
+- A server that renders one language calls `setDefaultWordsLocale('pl')` once.
+- A server that renders several languages sets `lang` or `locale` on the
+  elements.
+
+The registry holds no current language, so two requests in two languages in
+one process do not affect each other.
+
+### Set the words of other families
+
+Families that do not read the registry yet take their words as properties.
+Examples include `pan-up-label` on a map. Properties that combine values are
+format templates:
 
 ```html
 <helix-pagination-summary
@@ -211,9 +320,8 @@ Aria's `@react-stately/color` translates, so you can reuse that table.
 ></helix-color-picker>
 ```
 
-**Pass these strings from your own translation system.** Helix ships English
-defaults and no translation tools. If Helix had its own string catalog, you
-would have to keep two catalogs in step.
+Helix ships English words and no translations. Pass the words from your own
+translation system, either to `registerWords` or to the properties.
 
 ## What to check when you add a language
 
@@ -245,9 +353,9 @@ would have to keep two catalogs in step.
 
 Helix does not include:
 
-- a message catalog
-- a pluralization helper
+- translations of its words into other languages
+- a message catalog for your own application's text
 - a date-range formatter, beyond what the controls format themselves
 
-These belong to your application's i18n layer. You can set every translatable
-property from that layer.
+These belong to your application's i18n layer. You can register every word,
+and set every translatable property, from that layer.
