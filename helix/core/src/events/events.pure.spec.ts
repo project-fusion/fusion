@@ -1,5 +1,21 @@
-import { describe, expect, test } from 'bun:test'
-import { HelixRejectEvent, helixEventNames } from './events.js'
+import { beforeAll, describe, expect, test } from 'bun:test'
+import { registerDom } from '@fusion.dev/helix-testing/dom'
+
+type Module = typeof import('./events.js')
+
+let HelixRejectEvent: Module['HelixRejectEvent']
+let helixEventNames: Module['helixEventNames']
+
+/* Imported after registration, because the event classes capture whichever
+   `Event` is global when the module is evaluated. Specs share one module cache,
+   and this file can run before any DOM spec has registered happy-dom. A static
+   import here gave every later DOM spec classes that extend bun's built-in
+   `Event`, and happy-dom refused their instances with "parameter 1 is not of
+   type 'Event'". */
+beforeAll(async () => {
+  registerDom()
+  ;({ HelixRejectEvent, helixEventNames } = await import('./events.js'))
+})
 
 describe('the event a file field sends for the files it refused', () => {
   test('is helix-reject, bubbling out of the shadow root, and cannot be canceled', () => {
