@@ -158,6 +158,13 @@
   color: var(--helix-color-syntax-name);
 }
 
+/* A key on a matched row takes the foreground ink. In the default theme the
+   name ink measures 4.27:1 on the match ground, under the 4.5:1 that text
+   needs. */
+[part~="row-match"] [part="key"] {
+  color: var(--helix-color-foreground);
+}
+
 [part="string"] {
   color: var(--helix-color-syntax-string);
 }
