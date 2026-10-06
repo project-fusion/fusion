@@ -332,3 +332,33 @@ export const readRows = (table: Element): Row[] => {
  * name is written, in `lines`, `hidden-series` and `hide()` alike.
  */
 export const seriesKey = (name: string): string => name.trim().toLowerCase()
+
+/** Where the highest and the lowest readings are, by place, or none. */
+export interface Extremes {
+  /** The place of the highest reading, the first where several tie. */
+  high?: number
+  /** The place of the lowest reading, the first where several tie. */
+  low?: number
+}
+
+/**
+ * Where the highest and the lowest readings stand. A blank slot is passed
+ * over, and a list with nothing in it has neither.
+ *
+ * Sparkline's overview and Heatmap's busiest place each looked for these.
+ */
+export const extremesOf = (slots: readonly (number | undefined)[]): Extremes => {
+  const found: Extremes = {}
+  slots.forEach((value, at) => {
+    if (value === undefined) {
+      return
+    }
+    if (found.high === undefined || value > (slots[found.high] as number)) {
+      found.high = at
+    }
+    if (found.low === undefined || value < (slots[found.low] as number)) {
+      found.low = at
+    }
+  })
+  return found
+}
