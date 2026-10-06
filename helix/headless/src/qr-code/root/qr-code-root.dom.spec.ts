@@ -102,17 +102,30 @@ describe('qr code', () => {
 
   test('it is an image, and its name is what the code is for', async () => {
     // Describing the pattern would tell a reader nothing. Where nothing is
-    // passed the value is the name, and a value is almost always a URL.
+    // passed a web address is said after the word for a code.
     const host = await code(
       '<helix-headless-qr-code value="https://fusion.dev"></helix-headless-qr-code>',
     )
     expect(svgOf(host).getAttribute('role')).toBe('img')
-    expect(svgOf(host).getAttribute('aria-label')).toBe('https://fusion.dev')
+    expect(svgOf(host).getAttribute('aria-label')).toBe('QR code, https://fusion.dev')
 
     const named = await code(
       '<helix-headless-qr-code label="Our site" value="https://fusion.dev"></helix-headless-qr-code>',
     )
     expect(svgOf(named).getAttribute('aria-label')).toBe('Our site')
+  })
+
+  /* The raw value was the name, so a code setting up an authenticator read
+     its secret aloud. */
+  test("never reads out a value that is no web address, and says the word in the page's language", async () => {
+    const secret = await code(
+      '<helix-headless-qr-code value="otpauth://totp/Acme:ada?secret=JBSWY3DPEHPK3PXP"></helix-headless-qr-code>',
+    )
+    expect(svgOf(secret).getAttribute('aria-label')).toBe('QR code')
+    const french = await code(
+      '<helix-headless-qr-code code-label="Code QR" value="WIFI:T:WPA;S:Bureau;P:secret;;"></helix-headless-qr-code>',
+    )
+    expect(svgOf(french).getAttribute('aria-label')).toBe('Code QR')
   })
 
   test('correction is `M` unless asked otherwise', async () => {
