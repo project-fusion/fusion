@@ -18,6 +18,10 @@
      it, so a raised ground that only moved the color would be invisible
      under any tone. */
   --_announcement-ground: var(--helix-color-background);
+  /* The tone's color, or a color of the page's own through the hook, which
+     the tint and the outline are mixed from. Resolved here, after whichever
+     tone rule set `--_announcement-color`. */
+  --_announcement-tint: var(--announcement-tone-color, var(--_announcement-color));
 
   align-items: center;
   background-color: var(--announcement-background-color, var(--helix-color-surface-sunken));
@@ -26,7 +30,7 @@
      a second statement of the same edge. */
   color: var(--announcement-foreground-color, var(--helix-color-foreground));
   display: flex;
-  font-size: var(--helix-text-sm);
+  font-size: var(--announcement-font-size, var(--helix-text-sm));
   /* A step up from body weight, on the host beside the size for the same
      reason: a band is chrome rather than prose, it is read in passing, and at
      regular weight small text across the full width of a page recedes into the
@@ -115,12 +119,12 @@
   background-image: linear-gradient(
     to right,
     light-dark(
-      color-mix(in oklab, var(--_announcement-color) 18%, var(--_announcement-ground)),
-      color-mix(in oklab, var(--_announcement-color) 32%, var(--_announcement-ground))
+      color-mix(in oklab, var(--_announcement-tint) 18%, var(--_announcement-ground)),
+      color-mix(in oklab, var(--_announcement-tint) 32%, var(--_announcement-ground))
     ),
     light-dark(
-      color-mix(in oklab, var(--_announcement-color) 10%, var(--_announcement-ground)),
-      color-mix(in oklab, var(--_announcement-color) 20%, var(--_announcement-ground))
+      color-mix(in oklab, var(--_announcement-tint) 10%, var(--_announcement-ground)),
+      color-mix(in oklab, var(--_announcement-tint) 20%, var(--_announcement-ground))
     )
   );
 }
@@ -158,7 +162,7 @@
 :host([separation="outlined"][tone]:not([tone="neutral"])) {
   border-block-end-color: color-mix(
     in oklab,
-    var(--_announcement-color) 40%,
+    var(--_announcement-tint) 40%,
     var(--_announcement-ground)
   );
 }
@@ -173,7 +177,7 @@
 [part="content"] {
   flex: 1 1 auto;
   min-inline-size: 0;
-  text-align: center;
+  text-align: var(--announcement-text-align, center);
 }
 
 /* **Clear of the dismiss, on both sides so the middle stays the middle.** The

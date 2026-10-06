@@ -1,9 +1,15 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+})
+
+/* The hidden page a spec stands in for is the document's own property, so
+   the prototype's answer comes back after each spec. */
+afterEach(() => {
+  delete (document as unknown as { hidden?: boolean }).hidden
 })
 
 describe('announcement', () => {
@@ -145,5 +151,53 @@ describe('announcement', () => {
     announcement.addEventListener('helix-dismiss', () => asked.push('dismiss'))
     await new Promise((resolve) => setTimeout(resolve, 40))
     expect(asked).toEqual([])
+  })
+
+  /* A held clock had no state a sheet could draw, and a timed message ran
+     out in a background tab where nobody saw it. */
+  test('says when its clock is held, by a reader or by a hidden page', async () => {
+    const asked: string[] = []
+    const announcement = (await mount(
+      '<helix-headless-announcement duration="40">Trial ends Friday</helix-headless-announcement>',
+    )) as HTMLElement & { internals: ElementInternals }
+    announcement.addEventListener('helix-dismiss', () => asked.push('dismiss'))
+    expect(announcement.internals.states.has('paused')).toBe(false)
+    announcement.dispatchEvent(new Event('focusin'))
+    expect(announcement.internals.states.has('paused')).toBe(true)
+    announcement.dispatchEvent(new Event('focusout'))
+    expect(announcement.internals.states.has('paused')).toBe(false)
+
+    let away = true
+    Object.defineProperty(document, 'hidden', { configurable: true, get: () => away })
+    document.dispatchEvent(new Event('visibilitychange'))
+    expect(announcement.internals.states.has('paused')).toBe(true)
+    await new Promise((resolve) => setTimeout(resolve, 80))
+    expect(asked).toEqual([])
+    away = false
+    document.dispatchEvent(new Event('visibilitychange'))
+    expect(announcement.internals.states.has('paused')).toBe(false)
+    await new Promise((resolve) => setTimeout(resolve, 80))
+    expect(asked).toEqual(['dismiss'])
+  })
+
+  /* Callout named this slot `dismiss-icon` and Announcement named it `icon`. */
+  test('takes the glyph from dismiss-icon, as Callout does, and still from icon', async () => {
+    const glyph = async (slotted: string): Promise<string> => {
+      const announcement = await mount(
+        `<helix-headless-announcement dismissible>${slotted}</helix-headless-announcement>`,
+      )
+      const button = part(announcement, 'dismiss') as HTMLElement
+      for (const name of ['dismiss-icon', 'icon']) {
+        const slot = button.querySelector(`slot[name="${name}"]`) as HTMLSlotElement | null
+        const shown = slot?.assignedElements() ?? []
+        if (shown.length > 0) {
+          return `${name}:${shown[0]?.textContent}`
+        }
+      }
+      return 'none'
+    }
+    expect(await glyph('<span slot="dismiss-icon">a</span>')).toBe('dismiss-icon:a')
+    expect(await glyph('<span slot="icon">b</span>')).toBe('icon:b')
+    expect(await glyph('')).toBe('none')
   })
 })

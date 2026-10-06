@@ -1,0 +1,22 @@
+export function Example() {
+  return (
+    <helix-flex
+      direction="column"
+      gap="sm"
+    >
+      <helix-callout
+        data-density="sm"
+        tone="info"
+      >
+        A tight callout, for a dense settings page.
+      </helix-callout>
+      <helix-callout tone="info">The resting callout, at the control step.</helix-callout>
+      <helix-callout
+        data-density="lg"
+        tone="info"
+      >
+        A loose callout, for a page with room around it.
+      </helix-callout>
+    </helix-flex>
+  )
+}
