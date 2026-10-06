@@ -295,8 +295,16 @@ export class HelixSandboxPreview extends HelixElement {
    */
   private static readonly target = '*'
 
-  /** Holds a coalesced send, so only one is ever queued, and drops it on disconnect. */
-  private readonly settle = new DelayController(this)
+  /**
+   * Holds a coalesced send, so only one is ever queued, and drops it on
+   * disconnect.
+   *
+   * **It renders nothing**, so it asks for no update when its wait starts or
+   * ends. One that did sent the source at once from that update, ahead of the
+   * wait, and the send at the end of the wait then cleared `failed` after the
+   * error it should have reported.
+   */
+  private readonly settle = new DelayController(this, { renders: false })
 
   /**
    * Sends once the typing stops, replacing anything already waiting.
@@ -393,7 +401,11 @@ export class HelixSandboxPreview extends HelixElement {
       this.scheduleSend()
       return
     }
-    this.send()
+    /* Only for a setting, so an update for anything else, a new `label` or a
+       state, does not run the example again. */
+    if (changed.has('colorMode') || changed.has('direction') || changed.has('layout')) {
+      this.send()
+    }
   }
 
   protected override render(): TemplateResult {

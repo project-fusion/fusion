@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
@@ -7,6 +7,14 @@ beforeAll(async () => {
 })
 
 type Preview = HTMLElement & { updateComplete: Promise<boolean> }
+
+/** Puts back a method a case replaced. */
+let restore: (() => void) | undefined
+
+afterEach(() => {
+  restore?.()
+  restore = undefined
+})
 
 const preview = async (attributes = 'src="/frame.html"'): Promise<Preview> =>
   (await mount(`<helix-sandbox-preview ${attributes}></helix-sandbox-preview>`)) as Preview
@@ -91,5 +99,57 @@ describe('the preview states', () => {
     await host.updateComplete
     await new Promise((resolve) => setTimeout(resolve, 150))
     expect(hasState(host, 'failed')).toBe(false)
+  })
+
+  /* The frame runs what it is sent and reports what it throws, and skips a
+     source it already holds. A source sent ahead of the wait was run at once,
+     and the send at the end of the wait cleared the `failed` it caused. */
+  test('stays `failed` for every throwing source, not only the first, and sends once a burst', async () => {
+    const host = (await preview()) as Preview & { source: string }
+    const frame = part(host, 'frame') as HTMLIFrameElement
+    const target = frame.contentWindow as Window
+    const real = target.postMessage
+    const sent: string[] = []
+    let held = ''
+    target.postMessage = ((message: { source: string }) => {
+      sent.push(message.source)
+      if (message.source === held) {
+        return
+      }
+      held = message.source
+      if (message.source.includes('throw')) {
+        queueMicrotask(() =>
+          window.dispatchEvent(
+            from(frame, {
+              level: 'error',
+              text: 'Uncaught Error',
+              type: 'helix-preview-console',
+              uncaught: true,
+            }),
+          ),
+        )
+      }
+    }) as Window['postMessage']
+    restore = () => {
+      target.postMessage = real
+    }
+    const settle = async (): Promise<void> => {
+      await host.updateComplete
+      await new Promise((resolve) => setTimeout(resolve, 200))
+      await host.updateComplete
+    }
+    frame.dispatchEvent(new Event('load'))
+    /* Past any load of the frame's own, which sends the source again. */
+    await settle()
+    for (const source of ['<script>throw 1</script>', '<p>Fixed</p>', '<script>throw 2</script>']) {
+      sent.length = 0
+      host.source = source
+      await settle()
+      expect(sent).toEqual([source])
+    }
+    expect(hasState(host, 'failed')).toBe(true)
+    host.source = '<script>throw 3</script>'
+    await settle()
+    expect(hasState(host, 'failed')).toBe(true)
   })
 })
