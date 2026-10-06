@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { type ExhaustiveMachine, type Machine, step } from './machine-controller.js'
+import { type ExhaustiveMachine, type Machine, step } from './machine.js'
 
 type Light = 'off' | 'on' | 'broken'
 type Press = { type: 'PRESS' } | { type: 'BREAK' } | { type: 'SET'; to: number }
