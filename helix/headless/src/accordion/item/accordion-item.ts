@@ -217,14 +217,24 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
   /**
    * Opens the section find in page has matched in, before the match is shown.
    *
-   * The browser removes `hidden` itself. A refusal puts it back, so the trigger
-   * and the region still agree.
+   * A refusal puts `hidden` back, so the trigger and the region still agree.
+   * The browser removes the attribute after this event's listeners have
+   * returned, and after the microtasks they queued, so writing it here or in a
+   * microtask is undone at once. A mutation observer hears the removal itself
+   * and runs before the next paint or key press.
    */
   private readonly handleBeforeMatch = (event: Event): void => {
     if (this.open || this.requestOpen(true)) {
       return
     }
-    ;(event.currentTarget as HTMLElement).setAttribute('hidden', 'until-found')
+    const content = event.currentTarget as HTMLElement
+    const observer = new MutationObserver(() => {
+      observer.disconnect()
+      if (!this.open && !this.closing && !content.hasAttribute('hidden')) {
+        content.setAttribute('hidden', 'until-found')
+      }
+    })
+    observer.observe(content, { attributeFilter: ['hidden'] })
   }
 
   /** Whether the item was open at the last update, and `undefined` before one. */
