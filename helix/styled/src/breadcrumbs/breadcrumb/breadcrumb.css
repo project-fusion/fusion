@@ -154,9 +154,122 @@ a[part="link"]:hover {
   color: var(--breadcrumbs-current-color, var(--helix-color-foreground));
 }
 
+/* The library's ring, which `::slotted(a:focus-visible)` draws for a slotted
+   anchor and nothing drew for this one. Measured, the browser's own `auto`
+   ring showed instead, so a switcher's two halves had two different rings. */
+a[part="link"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
 /* The page the reader is on reads as where they are, not as somewhere to go. */
 :host([current]) [part="link"] {
   color: var(--breadcrumbs-current-color, var(--helix-color-foreground));
+}
+
+/* **A crumb with something in `end` is a split control: the label and the
+ * trigger are two halves of one button.** The vocabulary is `ButtonGroup`'s
+ * joined set. The halves touch, the inner corners are square, and the outer
+ * corners keep the crumb's radius. Each half fills itself under the pointer,
+ * and the two fills meet edge to edge.
+ *
+ * What tells the halves apart is the trail's `separation`, which reaches this
+ * crumb as two values: a light fill across both halves while either is under
+ * the pointer, under the default `plain`, and a hairline between them under
+ * `outlined`. Both are below.
+ *
+ * At rest the pair is text and a glyph, the way every other crumb is text. A
+ * box drawn around one crumb in a trail of words would make that step look
+ * like the current one.
+ *
+ * The space between the word and the chevron is split across the seam: `2xs`
+ * at the end of the label and the trigger's own inset after it. The chevron is
+ * `1.15em`, the size `Button` gives an end icon. Measured before: a 20px caret
+ * 19.75px from the word, standing apart from the crumb. */
+:host(:state(end)) [part="link"],
+:host(:state(end)) ::slotted(a) {
+  border-end-end-radius: var(--helix-radii-none);
+  border-start-end-radius: var(--helix-radii-none);
+  padding-inline-end: var(--helix-space-2xs);
+}
+
+/* The trigger half. The slot draws a box so the host's gap can be taken back
+ * and the halves touch. The hooks reach a `Button` or an `IconButton` however
+ * deep it sits: the start corners go square, the outer ones take the crumb's
+ * radius, and the hover fill is the crumb's own.
+ *
+ * **Its focus ring is drawn inside it.** Outside, the ring stood 4px off the
+ * trigger's edge, which is the whole of the label's end padding, so it reached
+ * the last letter of the word. The offset token is set to the ring's own width
+ * turned inward, which at the default sizes is the 2px inset a row's ring takes
+ * in `Notification` and `DataTable`. It cannot be written as the offset token
+ * turned inward, because the declaration would then read itself. */
+:host(:state(end)) slot[name="end"] {
+  --button-radius: var(--breadcrumbs-radius, var(--helix-radii-sm));
+  --button-radius-start: var(--helix-radii-none);
+  --helix-size-focus-offset: calc(var(--helix-size-focus-ring) * -1);
+  --icon-button-background-color-hover: var(
+    --breadcrumbs-hover-color,
+    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)
+  );
+  --icon-button-radius: var(--breadcrumbs-radius, var(--helix-radii-sm));
+  --icon-size: 1.15em;
+
+  align-items: center;
+  display: inline-flex;
+  margin-inline-start: calc(var(--breadcrumbs-gap, var(--helix-space-xs)) * -1);
+}
+
+/* The label half's ring, drawn inside it for the same reason. */
+:host(:state(end)) a[part="link"]:focus-visible,
+:host(:state(end)) ::slotted(a:focus-visible) {
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}
+
+/* A focused half draws above its neighbor, as `ButtonGroup` raises a focused
+   button, so nothing beside it paints over the ring. */
+:host(:state(end)) [part="link"]:focus-visible,
+:host(:state(end)) ::slotted(a:focus-visible),
+:host(:state(end)) slot[name="end"]:focus-within {
+  position: relative;
+  z-index: var(--helix-layer-raised);
+}
+
+/* **`plain`: the pair takes a light fill while either half is under the
+ * pointer**, and the half under it takes the full hover fill over that. Each
+ * half paints its own fill, so the stronger one is the crumb's hover color
+ * exactly and the two never stack. The fill is lighter than the hover by half,
+ * so the hovered half still reads as the target. */
+:host(:state(end)) [part="link"]:hover ~ slot[name="end"] {
+  --icon-button-background-color: var(--_breadcrumbs-split-fill, transparent);
+}
+
+:host(:state(end)) [part="link"]:has(~ slot[name="end"]:hover),
+:host(:state(end)) [part="link"]:has(~ slot[name="end"]:hover) ::slotted(a) {
+  background-color: var(--_breadcrumbs-split-fill, transparent);
+}
+
+/* **`outlined`: a hairline between the halves, at rest as well**, because an
+   outlined surface keeps its edge at rest. It is the border every outlined
+   surface draws, at its hairline width, and it stands 60% of the pair's
+   height, which is the rule `ToggleGroup` draws inside a control. It stands
+   just past the seam, on the trigger's side: a focused label's ring is inside
+   the label and the rule stays clear of it, and a focused trigger is raised,
+   so its ring covers the rule. Drawn from the label's box, which is
+   positioned, so it paints above the trigger's fill. Under `plain` its color
+   is transparent. */
+:host(:state(end)) [part="link"] {
+  position: relative;
+}
+
+:host(:state(end)) [part="link"]::after {
+  background-color: var(--_breadcrumbs-split-rule, transparent);
+  content: "";
+  inline-size: var(--helix-border-thin);
+  inset-block: 20%;
+  inset-inline-end: calc(var(--helix-border-thin) * -1);
+  pointer-events: none;
+  position: absolute;
 }
 
 /* A hidden crumb takes no room. */
