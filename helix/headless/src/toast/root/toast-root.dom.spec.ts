@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { mount, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
@@ -56,6 +56,14 @@ const region = async (items = ''): Promise<HTMLElement> =>
   (await mount(
     `<helix-headless-toast label="Notifications">${items}</helix-headless-toast>`,
   )) as HTMLElement
+
+/** Puts back a global a case replaced. */
+let restore: (() => void) | undefined
+
+afterEach(() => {
+  restore?.()
+  restore = undefined
+})
 
 describe('toast region', () => {
   test('is a landmark, and not itself a live region', async () => {
@@ -116,6 +124,48 @@ describe('toast region', () => {
     await frame()
     await add.updateComplete
     expect(words()).toEqual(['', ''])
+  })
+
+  test('says messages added in one task as separate sentences', async () => {
+    const host = (await region()) as HTMLElement & {
+      add(message: string): HTMLElement
+      updateComplete: Promise<unknown>
+    }
+    const [polite] = [...(host.shadowRoot?.querySelectorAll('[part="live"]') ?? [])]
+    host.add('Saved to drafts')
+    host.add('Upload finished')
+    await new Promise((done) => setTimeout(done, 40))
+    await host.updateComplete
+    expect(polite?.textContent).toBe('Saved to drafts. Upload finished')
+  })
+
+  test('says every message that arrives before the frame, from separate tasks', async () => {
+    /* The accessibility tree is built once a frame, so a second arrival in a
+       later task of the same frame must add to the words and not replace them. */
+    const frames: FrameRequestCallback[] = []
+    const real = globalThis.requestAnimationFrame
+    restore = () => {
+      globalThis.requestAnimationFrame = real
+    }
+    globalThis.requestAnimationFrame = (callback: FrameRequestCallback): number => {
+      frames.push(callback)
+      return frames.length
+    }
+    const host = (await region()) as HTMLElement & {
+      add(message: string, options?: { tone?: string }): HTMLElement
+      updateComplete: Promise<unknown>
+    }
+    const [polite, urgent] = [...(host.shadowRoot?.querySelectorAll('[part="live"]') ?? [])]
+    host.add('First')
+    await new Promise((done) => setTimeout(done, 0))
+    host.add('Second')
+    host.add('Gone', { tone: 'danger' })
+    await new Promise((done) => setTimeout(done, 0))
+    for (const callback of frames.splice(0)) {
+      callback(0)
+    }
+    await host.updateComplete
+    expect([polite?.textContent, urgent?.textContent]).toEqual(['First. Second', 'Error. Gone'])
   })
 
   test('the name is on the host through internals, not as an attribute', async () => {
