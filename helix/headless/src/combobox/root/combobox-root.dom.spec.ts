@@ -1083,6 +1083,24 @@ describe('a combobox heard through VoiceOver', () => {
     })
   })
 
+  test('counts what the typing left, when typing opens the list', async () => {
+    /* Measured before this: typing "g" said "3 results. Go" over a list showing
+       one option, and after two Escapes typing "r" said "Rust" with no count. */
+    await onPlatform('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)', async () => {
+      const host = await combobox()
+      control(host).focus()
+      await type(host, 'g')
+      await settled(host)
+      expect(await said(host)).toBe('1 result. Go')
+      await press(host, 'Escape')
+      await press(host, 'Escape')
+      await settled(host)
+      await type(host, 'r')
+      await settled(host)
+      expect(await said(host)).toBe('2 results. Rust')
+    })
+  })
+
   test('and draws no region elsewhere, where screen readers follow the field', async () => {
     await onPlatform('Mozilla/5.0 (Windows NT 10.0; Win64; x64)', async () => {
       const host = await combobox()
