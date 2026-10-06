@@ -4,6 +4,7 @@ import {
   capturePointer,
   customElement,
   fillTemplate,
+  formatNumbers,
   HelixBeforeMoveEvent,
   HelixBeforeReconnectEvent,
   HelixBeforeRelabelEvent,
@@ -34,7 +35,9 @@ import {
 import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { HelixHeadlessCanvasEdge } from '../edge/canvas-edge.js'
+import { EdgePan } from '../edge-pan.js'
 import { HelixHeadlessCanvasNode } from '../node/canvas-node.js'
+import { snapBox, snapTo, stepTo } from '../snap.js'
 import {
   type CanvasDocument,
   type CanvasEdge,
@@ -212,13 +215,24 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  * keep every card in place, such as on a published board. Set `readonly` on one
  * card or connection to keep only that one in place.
  *
+ * Set `snap` to a length in the document's units, such as `32`, and a card
+ * that is moved or resized lands on a multiple of it. Carrying a card, a
+ * corner, a connection, or the selection box near the edge of the board moves
+ * the board under it, so a card can be taken to a place off screen in one
+ * drag.
+ *
  * Keyboard behavior:
  * - One card holds the board's tab stop.
  * - The arrow keys move through the cards in reading order. The card you land
  *   on scrolls into view, and its connections are announced with it.
- * - Shift with an arrow key moves the card.
+ * - Shift with an arrow key moves the card: by 16 units, or to the next
+ *   multiple of `snap` where it is set. Alt with an arrow key resizes it from
+ *   its bottom right corner the same way.
  * - The connections leaving a card are stops of their own, straight after it.
  *   Enter on one moves to the card it arrives at.
+ * - What a key changes that a reader cannot see is said: where a card moved
+ *   to, its new size, how many cards are selected, and the zoom. A selected
+ *   card or connection says so when a reader arrives on it.
  *
  * Every drag also works with clicks, as WCAG 2.5.7 requires for a pointer that
  * cannot hold a button down. Click a selected card's move handle, a corner, a
@@ -372,6 +386,17 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   leadsToLabel = 'leads to {cards}'
 
   /**
+   * What screen readers hear after a key moves a card, with `{name}` for the
+   * card and `{x}` and `{y}` for where it now is, in the document's units.
+   *
+   * **A move a reader cannot see has to be said.** Shift with an arrow moved
+   * the card and said nothing, so a reader moving one by keys could not tell
+   * whether it had moved, or how far.
+   */
+  @property({ attribute: 'moved-label' })
+  movedLabel = '{name} moved to {x}, {y}'
+
+  /**
    * The order the arrow keys and screen readers move through the cards:
    * `spatial` or `edges`.
    *
@@ -418,6 +443,14 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     'Moving the end of the connection from {from} to {to}. Move to a card and press Enter, or Escape to stop.'
 
   /**
+   * What screen readers hear after a key resizes a card, with `{name}` for the
+   * card and `{width}` and `{height}` for its new size, in the document's
+   * units.
+   */
+  @property({ attribute: 'resized-label' })
+  resizedLabel = '{name} resized to {width} by {height}'
+
+  /**
    * The names of the selected cards and connections, comma separated. Empty
    * when nothing is selected.
    *
@@ -442,6 +475,41 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   selected = ''
 
   /**
+   * What a selected card or connection adds to what screen readers hear on
+   * it, before its tone and its connections. Empty adds nothing.
+   *
+   * A card is an article and a connection a button, and neither has a selected
+   * state for `aria-selected` to carry, so the state is said in words.
+   */
+  @property({ attribute: 'selected-label' })
+  selectedLabel = 'selected'
+
+  /**
+   * What screen readers hear after the selection grows or shrinks, with
+   * `{count}` for how many cards and connections are selected: by Space, a
+   * click with Shift, Command or Control, Command or Control with A, a box
+   * drawn across the board, or Escape.
+   *
+   * A selection of one made by arriving on a card or clicking it is not said,
+   * since the card is.
+   */
+  @property({ attribute: 'selection-label' })
+  selectionLabel = '{count} selected'
+
+  /**
+   * Snaps the cards a reader moves or resizes to a multiple of this many of the
+   * document's units, such as `32` to land on the lines `grid` draws.
+   *
+   * **A drag lets go on the nearest line and a key goes to the next one.**
+   * Shift with an arrow moves a card to the next line that way, rather than
+   * by its step of 16, and Alt with an arrow moves its bottom right corner
+   * the same way. A group moves with what it carries, so a card inside one
+   * keeps its place in it. Absent, cards land where they are let go.
+   */
+  @property({ type: Number })
+  snap?: number
+
+  /**
    * A label being edited in place: whose, and what it said before.
    */
   @state()
@@ -463,6 +531,13 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    */
   @property({ attribute: 'tone-labels', converter: wordsConverter })
   toneLabels: Partial<Record<CanvasTone, string>> = {}
+
+  /**
+   * What screen readers hear after a zoom button or key, with `{zoom}` for the
+   * zoom as a percentage, written the way the page's language writes one.
+   */
+  @property({ attribute: 'zoomed-label' })
+  zoomedLabel = 'Zoom {zoom}'
 
   /** The card or connection that holds the board's one tab stop, by its key. */
   @state()
@@ -504,9 +579,27 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       }
     | undefined
 
-  /** What the live region says, which is only ever about a connection being made. */
+  /**
+   * What the live region says: a connection being made, and what a key did
+   * that a reader cannot see, a move, a resize, the selection, the zoom.
+   */
   @state()
   private said = ''
+
+  /**
+   * Says something in the live region.
+   *
+   * The same words twice would change nothing in the region and be heard
+   * once, so a second "2 selected" differs by a space no reader says.
+   */
+  private say(words: string): void {
+    this.said = words !== '' && words === this.said ? `${words}\u00a0` : words
+  }
+
+  /** Numbers as the page's language writes them. */
+  private get numbers(): (value: number) => string {
+    return formatNumbers(this.closest('[lang]')?.getAttribute('lang') ?? '')
+  }
 
   /**
    * Where focus goes once something a reader removed has gone.
@@ -862,6 +955,14 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     this.direct = false
     this.touched = true
     this.zoomAbout(by > 0 ? 1.25 : 1 / 1.25, { x: this.box.width / 2, y: this.box.height / 2 })
+    const lang = this.closest('[lang]')?.getAttribute('lang') || undefined
+    this.say(
+      fillTemplate(this.zoomedLabel, {
+        zoom: new Intl.NumberFormat(lang, { maximumFractionDigits: 0, style: 'percent' }).format(
+          this.at.zoom,
+        ),
+      }),
+    )
     super.zoom(by)
   }
 
@@ -1528,7 +1629,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    * Selects stops, or nothing, and says so: `helix-select`, which a page can
    * refuse, with the names as its value.
    */
-  private choose(keys: string | readonly string[] | undefined): void {
+  private choose(keys: string | readonly string[] | undefined, said = false): void {
     const list = keys === undefined ? [] : typeof keys === 'string' ? [keys] : [...new Set(keys)]
     const value = list.map((one) => this.publicName(one)).join(',')
     if (value === this.selected) {
@@ -1536,13 +1637,16 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     }
     if (this.dispatchEvent(new HelixSelectEvent({ value }))) {
       this.selected = value
+      if (said) {
+        this.say(fillTemplate(this.selectionLabel, { count: this.numbers(list.length) }))
+      }
     }
   }
 
   /** Adds a stop to the selection, or takes it out where it was in. */
   private toggle(key: string): void {
     const picked = this.picked
-    this.choose(picked.includes(key) ? picked.filter((one) => one !== key) : [...picked, key])
+    this.choose(picked.includes(key) ? picked.filter((one) => one !== key) : [...picked, key], true)
   }
 
   /** The cards in the selection. */
@@ -1582,6 +1686,55 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     }
     this.requestUpdate()
     return true
+  }
+
+  /**
+   * Moves the view while a pointer carries something near its edge, and
+   * carries it along: a card, a corner, a connection being drawn, the box that
+   * selects.
+   */
+  private readonly edgePan = new EdgePan(
+    () => this.partNamed('viewport')?.getBoundingClientRect(),
+    (by) => this.panCarrying(by),
+    () => {
+      if (!this.dragging) {
+        this.direct = false
+      }
+    },
+  )
+
+  /** The last pointer move of a carry, which a frame of `edgePan` moves on from. */
+  private carryPointer: PointerEvent | undefined
+
+  /**
+   * One frame of moving the view under something carried to its edge: the
+   * board moves by `by` and what is in hand stays under the pointer, so a card
+   * goes on moving over the board while the hand is still.
+   */
+  private panCarrying(by: { x: number; y: number }): void {
+    const last = this.carryPointer
+    if (!last) {
+      this.edgePan.stop()
+      return
+    }
+    this.touched = true
+    this.direct = true
+    this.at = { ...this.at, x: this.at.x - by.x, y: this.at.y - by.y }
+    /* A carry and a resize measure from where the press began on screen, so
+       the board moving under them is the press having begun that much further
+       back. A connection and the box read the board itself. */
+    for (const gesture of [this.carrying, this.sizing]) {
+      if (gesture) {
+        gesture.from = { x: gesture.from.x - by.x, y: gesture.from.y - by.y }
+      }
+    }
+    this.handlePointerMove(last)
+  }
+
+  /** Follows a pointer carrying something, which moves the view at an edge. */
+  private carryOn(event: PointerEvent): void {
+    this.carryPointer = event
+    this.edgePan.follow({ x: event.clientX, y: event.clientY })
   }
 
   /**
@@ -1811,11 +1964,17 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     }
     const sizing = this.sizing
     if (sizing && (sizing.held || sizing.pointer === event.pointerId)) {
-      const box = this.resized(
+      const box = snapBox(
+        this.resized(
+          sizing.start,
+          sizing.corner,
+          (event.clientX - sizing.from.x) / this.at.zoom,
+          (event.clientY - sizing.from.y) / this.at.zoom,
+        ),
         sizing.start,
         sizing.corner,
-        (event.clientX - sizing.from.x) / this.at.zoom,
-        (event.clientY - sizing.from.y) / this.at.zoom,
+        this.snap,
+        { height: MIN_HEIGHT, width: MIN_WIDTH },
       )
       const detail: MoveDetail = { nodes: [{ name: sizing.card.name, ...box }] }
       this.touched = true
@@ -1823,10 +1982,12 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       if (this.requestMove(detail)) {
         sizing.moved = detail
       }
+      this.carryOn(event)
       return
     }
     if (this.marquee?.pointer === event.pointerId) {
       this.marquee = { ...this.marquee, to: this.toDocument(event) }
+      this.carryOn(event)
       return
     }
     if (this.linking && (this.linking.held || this.linking.pointer === event.pointerId)) {
@@ -1848,6 +2009,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
         to,
         toSide: to !== undefined && over ? sideNear(over, at) : undefined,
       }
+      this.carryOn(event)
       return
     }
     const carry = this.carrying
@@ -1865,17 +2027,26 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       /* The pointer moves in screen pixels and the card in the document's
          units, which differ by the zoom: unscaled, a card on a board zoomed
          out ran ahead of the hand that was holding it. */
+      /* **The card in hand lands on a line, and the rest keep their places
+         around it**, so a group and what it carries, or a selection, move as
+         one rather than each card jumping to its own nearest line. */
+      const lead = carry.cards.find(({ card }) => card.name === carry.pressed) ?? carry.cards[0]
+      const shift = (from: number | undefined, by: number): number =>
+        from === undefined ? by : snapTo(from + by, this.snap) - from
+      const right = shift(lead?.x, across / this.at.zoom)
+      const lower = shift(lead?.y, down / this.at.zoom)
       const detail: MoveDetail = {
         nodes: carry.cards.map(({ card, x, y }) => ({
           name: card.name,
-          x: Math.round(x + across / this.at.zoom),
-          y: Math.round(y + down / this.at.zoom),
+          x: Math.round(x + right),
+          y: Math.round(y + lower),
         })),
       }
       carry.asked = true
       if (this.requestMove(detail)) {
         carry.moved = detail
       }
+      this.carryOn(event)
       return
     }
     const drag = this.dragging
@@ -1916,6 +2087,8 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     if (finger && !owner && this.fingers.size > 0) {
       return
     }
+    this.edgePan.stop()
+    this.carryPointer = undefined
     this.pressing = false
     const pointing = this.pointing
     this.pointing = false
@@ -1935,7 +2108,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     if (marquee?.pointer === event.pointerId) {
       this.marquee = undefined
       if (event.type !== 'pointercancel') {
-        this.choose([...marquee.base, ...this.within(marquee)])
+        this.choose([...marquee.base, ...this.within(marquee)], true)
       }
       return
     }
@@ -2118,6 +2291,8 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
 
   /** Stops listening for the press or the key that ends a hold. */
   private letGo(): void {
+    this.edgePan.stop()
+    this.carryPointer = undefined
     this.holding = false
     this.toggleState('holding', false)
     document.removeEventListener('keydown', this.handleHeldKey, true)
@@ -2239,15 +2414,27 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       if (this.fixed(card)) {
         return
       }
+      /* To the next line that way where the board snaps, and a step of
+         `NUDGE` where it does not; what the card carries keeps its place. */
+      const step = this.snap
+      const right = step ? stepTo(card.x, along, step) - card.x : along * NUDGE
+      const lower = step ? stepTo(card.y, down, step) - card.y : down * NUDGE
       const detail: MoveDetail = {
         nodes: this.carriedAll(card).map((one) => ({
           name: one.name,
-          x: one.x + along * NUDGE,
-          y: one.y + down * NUDGE,
+          x: one.x + right,
+          y: one.y + lower,
         })),
       }
       if (this.requestMove(detail)) {
         this.dispatchEvent(new HelixMoveEvent(detail))
+        this.say(
+          fillTemplate(this.movedLabel, {
+            name: this.nameOf(card.name),
+            x: this.numbers(card.x),
+            y: this.numbers(card.y),
+          }),
+        )
       }
       void this.updateComplete.then(() => this.reveal(card.name))
       return
@@ -2259,15 +2446,24 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       if (this.fixed(card)) {
         return
       }
+      const step = this.snap
+      const edge = { x: card.x + card.width, y: card.y + card.height }
       const box = this.resized(
         { height: card.height, width: card.width, x: card.x, y: card.y },
         'bottom-right',
-        along * NUDGE,
-        down * NUDGE,
+        step ? stepTo(edge.x, along, step) - edge.x : along * NUDGE,
+        step ? stepTo(edge.y, down, step) - edge.y : down * NUDGE,
       )
       const detail: MoveDetail = { nodes: [{ name: card.name, ...box }] }
       if (this.requestMove(detail)) {
         this.dispatchEvent(new HelixMoveEvent(detail))
+        this.say(
+          fillTemplate(this.resizedLabel, {
+            height: this.numbers(box.height),
+            name: this.nameOf(card.name),
+            width: this.numbers(box.width),
+          }),
+        )
       }
       return
     }
@@ -2280,7 +2476,10 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     }
     if ((event.metaKey || event.ctrlKey) && (event.key === 'a' || event.key === 'A')) {
       event.preventDefault()
-      this.choose(this.walk.map((one) => one.key))
+      this.choose(
+        this.walk.map((one) => one.key),
+        true,
+      )
       return
     }
     if (event.key === 'Escape') {
@@ -2292,7 +2491,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
         this.focusStop(back)
         return
       }
-      this.choose(undefined)
+      this.choose(undefined, true)
       this.partNamed('region')?.focus()
       return
     }
@@ -3146,6 +3345,8 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     if (this.held) {
       this.putBack()
     }
+    this.edgePan.stop()
+    this.carryPointer = undefined
     this.sizes?.disconnect()
     this.watched = undefined
     this.words?.disconnect()
@@ -3240,6 +3441,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       card.meaning = card.tone ? (this.toneLabels[card.tone] ?? '') : ''
       card.current = card.name === stop
       card.selected = picked.has(card.name)
+      card.status = card.selected ? this.selectedLabel : ''
       card.resizable = alone === card.name && !this.fixed(card)
       card.movable = picked.has(card.name) && !this.fixed(card)
       card.connectable = !this.fixed(card)
@@ -3405,7 +3607,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
        so a press lands on the target under it. */
     return svg`<path
         part="edge-target"
-        aria-description=${[element?.tone ? this.toneLabels[element.tone] : undefined, edge.label].filter(Boolean).join(', ') || nothing}
+        aria-description=${[pickedKeys.has(key) ? this.selectedLabel : undefined, element?.tone ? this.toneLabels[element.tone] : undefined, edge.label].filter(Boolean).join(', ') || nothing}
         aria-label=${fillTemplate(this.connectionLabel, { from: this.textOf(from), to: this.textOf(to) })}
         d=${drawn.d}
         data-edge=${key}

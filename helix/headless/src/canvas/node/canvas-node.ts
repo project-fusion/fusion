@@ -202,6 +202,18 @@ export class HelixHeadlessCanvasNode extends HelixElement {
   shape?: 'circle' | 'diamond' | 'pill' | 'square'
 
   /**
+   * @internal What the card's state adds to what it says, in the page's words,
+   * written by the board: its `selected-label` while it is selected. Read
+   * first, before what the tone means.
+   *
+   * **A selection a reader cannot see has to be said.** A card is an article,
+   * and an article has no selected state for `aria-selected` to carry, so a
+   * reader who selected three cards heard nothing on any of them.
+   */
+  @state()
+  status = ''
+
+  /**
    * @internal Whether this is the card the reader selected, written by the
    * board. Kept apart from focus, so a reader who clicks a button beside the
    * board to act on the selection has not cleared it by clicking.
@@ -295,8 +307,8 @@ export class HelixHeadlessCanvasNode extends HelixElement {
   }
 
   /**
-   * The card, and the sentence that says what its tone means and where it
-   * leads.
+   * The card, and the sentence that says whether it is selected, what its
+   * tone means and where it leads.
    *
    * **`aria-describedby` at a hidden element, which is allowed and is the
    * point.** A description is computed from its target whether or not the
@@ -314,7 +326,7 @@ export class HelixHeadlessCanvasNode extends HelixElement {
         : nothing
     }<div
       part="node"
-      aria-describedby=${this.meaning || this.links ? 'about' : nothing}
+      aria-describedby=${this.status || this.meaning || this.links ? 'about' : nothing}
       aria-label=${this.label || nothing}
       aria-labelledby=${this.label || this.group ? nothing : 'content'}
       aria-keyshortcuts=${this.connectable ? 'Enter F2 Space Shift+ArrowRight Shift+ArrowDown Alt+ArrowRight Alt+ArrowDown C Delete' : nothing}
@@ -323,7 +335,7 @@ export class HelixHeadlessCanvasNode extends HelixElement {
     >
       <slot id="content"></slot>
       <slot name="description"></slot>
-      <span id="about" hidden>${[this.meaning, this.links].filter(Boolean).join(', ')}</span>
+      <span id="about" hidden>${[this.status, this.meaning, this.links].filter(Boolean).join(', ')}</span>
     </div>
     ${
       /* **Written out, four times, because a part name behind an interpolation
