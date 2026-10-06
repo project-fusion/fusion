@@ -55,6 +55,7 @@ import '../../tooltip/index.js'
  * @csspart button - The inner button.
  * @csspart live - The live region that says `pending-label` when the button becomes pending under focus. It is rendered from the first time the button is pending.
  * @csspart mark - The clipboard icon, and the confirmation icon that replaces it.
+ * @csspart spinner - The ring a pending button turns, an empty element the styled button draws over the icon. It is rendered only while the button is pending.
  * @csspart tooltip - The tooltip bubble, forwarded from the tooltip inside the button.
  * @csspart tooltip-arrow - The tooltip's arrow, which points at the button.
  * @csspart tooltip-arrow-bottom - The arrow while the bubble is below the button, on the bubble's top edge. Set together with `tooltip-arrow`.
@@ -295,7 +296,7 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
       @keydown=${this.notePress}
       @pointerdown=${this.notePress}
     >
-      ${this.renderCopiedIcon()} ${this.renderFailedIcon()} ${this.renderCopyIcon()}
+      ${this.renderCopiedIcon()} ${this.renderFailedIcon()} ${this.renderCopyIcon()}${this.renderSpinner()}
       </button>`,
     )}${this.renderLive()}`
   }

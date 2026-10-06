@@ -117,6 +117,7 @@ const SCRUB_FINE = 16
  * @csspart label - The label above the field. It is also the grip you drag when `scrub` is set.
  *
  * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
+ * @cssstate scrubbing - The label is being dragged to change the value, under `scrub`, as Zag's scrubber says while it is held.
  */
 @customElement('helix-headless-number-input')
 export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(HelixFormElement)) {
@@ -522,6 +523,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     this.scrubFrom = event.clientX
     this.scrubValue = this.numeric ?? this.min ?? 0
     this.scrubStart = this.value
+    this.toggleState('scrubbing', true)
     event.preventDefault()
   }
 
@@ -571,6 +573,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
       return
     }
     grip.releasePointerCapture(event.pointerId)
+    this.toggleState('scrubbing', false)
     if (this.value !== this.scrubStart) {
       this.announceChange()
     }

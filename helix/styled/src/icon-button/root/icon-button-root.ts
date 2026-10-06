@@ -28,6 +28,7 @@ import { styles } from './icon-button-root.css.js'
  *
  * @csspart button - The inner button.
  * @csspart live - The live region that says `pending-label` when the button becomes pending under focus. It is clipped out of view and still read.
+ * @csspart spinner - The ring a pending button turns over its icon, sized and colored by the `--icon-button-spinner-*` hooks.
  *
  * @cssproperty --icon-button-background-color - Fill behind the button, in every state.
  * @cssproperty --icon-button-background-color-active - Fill behind the button while it is pressed. Without it, a press shows the fill of the state under it.

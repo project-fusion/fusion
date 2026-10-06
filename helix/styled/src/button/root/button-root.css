@@ -247,8 +247,8 @@
 
 /* **Pending: the words stay where they are, unseen, and a ring turns over
    them**, so the button keeps its width and nothing beside it moves. The ring
-   is the control's own `::after`, so the headless tier renders nothing for it.
-   The cursor says the press is held. */
+   is the `spinner` part, an empty element the headless tier renders only while
+   pending. The cursor says the press is held. */
 :host(:state(pending)) [part="button"] {
   cursor: progress;
   position: relative;
@@ -258,7 +258,7 @@
   visibility: hidden;
 }
 
-:host(:state(pending)) [part="button"]::after {
+[part="spinner"] {
   animation: helix-button-turn var(--button-spinner-duration, var(--_button-turn)) linear infinite;
   block-size: var(--button-spinner-size, 1.15em);
   border: var(--helix-border-thick) solid
@@ -266,7 +266,6 @@
   border-block-start-color: var(--button-spinner-color, currentColor);
   border-radius: var(--helix-radii-full);
   box-sizing: border-box;
-  content: "";
   inline-size: var(--button-spinner-size, 1.15em);
   inset: 0;
   margin: auto;
@@ -282,7 +281,7 @@
 /* Slowed rather than stopped, as `Loader` does: a ring that holds still reads
    as broken, and the wait is still the thing to show. */
 @media (prefers-reduced-motion: reduce) {
-  :host(:state(pending)) [part="button"]::after {
+  [part="spinner"] {
     animation-duration: calc(var(--helix-duration-slow) * 12);
   }
 }

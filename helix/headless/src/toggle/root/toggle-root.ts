@@ -132,14 +132,12 @@ export class HelixHeadlessToggle extends MixinSelectableItem(HelixElement) {
       part="item"
       type="button"
       role=${this.pressed === undefined ? 'radio' : nothing}
-      aria-checked=${this.pressed === undefined ? (this.selected ? 'true' : 'false') : nothing}
+      aria-checked=${this.pressed === undefined ? String(this.selected) : nothing}
       aria-pressed=${this.pressed === undefined ? nothing : String(this.pressed)}
       ?disabled=${this.disabled}
       tabindex=${(this.focusable ?? this.selected) || !this.childrenKnown ? '0' : '-1'}
       @click=${() => this.select()}
-    >
-      <slot></slot>
-    </button>`
+    ><slot></slot></button>`
   }
 }
 

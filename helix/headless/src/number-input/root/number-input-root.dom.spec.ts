@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { formValue, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { formValue, hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -313,6 +313,25 @@ describe('number input scrub', () => {
     )
     await drag(host, 40)
     expect((host as HTMLElement & { value: string }).value).toBe('10')
+  })
+
+  /* Zag's number input has a scrubber part a stylesheet can mark while it is
+     held; here the label is the grip, and the host says it is being dragged. */
+  test('says it is being dragged as a state, from the press to the release', async () => {
+    const host = await scrubField('default-value="10" step="1"')
+    const grip = part(host, 'label') as HTMLElement
+    let held = false
+    grip.setPointerCapture = () => {
+      held = true
+    }
+    grip.hasPointerCapture = () => held
+    grip.releasePointerCapture = () => {
+      held = false
+    }
+    grip.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, clientX: 0, pointerId: 1 }))
+    expect(hasState(host, 'scrubbing')).toBe(true)
+    grip.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, clientX: 0, pointerId: 1 }))
+    expect(hasState(host, 'scrubbing')).toBe(false)
   })
 
   test('four pixels is one step', async () => {
