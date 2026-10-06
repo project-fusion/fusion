@@ -4,44 +4,15 @@ import {
   deepContains,
   focusableElements,
   HelixElement,
+  KeyboardNavigationController,
   MixinControllerOpen,
+  type NavigableItem,
   PopoverController,
   tellDisclosure,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
-
-/**
- * The panel showing now, so opening one closes the last.
- *
- * A page has one of these open at a time: a nav bar whose Products panel is
- * still down while Solutions opens is a nav bar with two panels over the page.
- * Module scope rather than a coordinating parent, because there is nothing to
- * coordinate through: these sit in whatever container the consumer used, which
- * is usually `Navigation` and is not required to be. `Video` holds the media
- * session the same way and for the same reason.
- */
-let showing: HelixHeadlessMegamenu | undefined
-
-/**
- * Every megamenu on the page, so a press on another one's trigger counts as
- * moving along the bar. Closing on that press would close this panel before the
- * other opens, and the hand-over would have no direction.
- */
-const connected = new Set<HelixHeadlessMegamenu>()
-
-/**
- * The megamenu a pointer is pressing, from the press until the click that ends
- * it. A press moves focus before the click opens anything, and the open panel
- * must not close on that focus move, or the hand-over has no direction.
- */
-let pressed: HelixHeadlessMegamenu | undefined
-
-const release = (): void => {
-  setTimeout(() => {
-    pressed = undefined
-  })
-}
+import { HandOver, type Motion } from '../hand-over.js'
 
 /**
  * @summary A section of a navigation with a trigger that opens a panel of links.
@@ -78,8 +49,17 @@ const release = (): void => {
  * navigation menu publishes the same pair from its shared viewport, so a
  * stylesheet can grow or shrink one panel into the next.
  *
- * Put megamenus in a `Navigation` with `arrows` and the arrow keys move
- * between their triggers. Down Arrow on the trigger of an open panel moves
+ * The panel's default slot is the `columns` part and draws no box, so a sheet
+ * can give the columns one of their own. While a panel is open, an
+ * `indicator` slot is rendered beside its trigger, as Radix's indicator
+ * marks the open one: slot a mark of your own, such as a bar or an arrow
+ * pointing at the panel, and it shows only while the panel is open. The styled
+ * tier rests it on the trigger's bottom edge.
+ *
+ * Left and Right Arrow move between the triggers of the megamenus beside this
+ * one, and Home and End go to the first and the last, as Radix's navigation
+ * menu does. In a `Navigation`, which holds them in a slot, the arrows are the
+ * navigation's, and move between its destinations under its `arrows`. Down Arrow on the trigger of an open panel moves
  * focus to the panel's first link, Escape closes the panel and returns focus
  * to its trigger, and Tab moves through the panel's links and closes it on the
  * way out. The trigger says `aria-expanded`, and the panel is a group named by
@@ -92,12 +72,15 @@ const release = (): void => {
  * @documentation https://fusion.dev/helix/components/megamenu
  *
  * @slot - The panel's contents, such as your own lists of links and their headings.
+ * @slot indicator - A mark for the open trigger, shown while the panel is open, such as a bar or an arrow pointing at the panel.
  * @slot trigger - The control that opens the panel. When it is empty, a button named by `label` is shown.
  *
  * @event {HelixBeforeCloseEvent} helix-before-close - The panel is about to close. Cancelable.
  * @event {HelixBeforeOpenEvent} helix-before-open - The panel is about to open. Cancelable.
  * @event {ToggleEvent} toggle - The panel opened or closed. Carries `newState` and `oldState`.
  *
+ * @csspart columns - The panel's default slot. It draws no box until a sheet gives it a `display`.
+ * @csspart indicator - The `indicator` slot, rendered while the panel is open.
  * @csspart surface - The floating panel that opens.
  * @csspart trigger - The default trigger button, shown when the `trigger` slot is empty.
  *
@@ -116,6 +99,11 @@ const release = (): void => {
  */
 @customElement('helix-headless-megamenu')
 export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
+  /** The bar's one open panel, shared by every megamenu on the page. */
+  private static readonly bar = new HandOver<HelixHeadlessMegamenu>((megamenu, to) =>
+    megamenu.motion(to),
+  )
+
   /**
    * The page width, in pixels, below which a card panel is shown as a band. At
    * zero, it never is.
@@ -230,7 +218,7 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
        the click that toggles it. `Menu` says the same about its own. Every
        other megamenu too: a press on one of them opens it, and opening it
        closes this one with a direction. */
-    boundary: () => [...connected],
+    boundary: () => [...HelixHeadlessMegamenu.bar.connected],
     onDismiss: () => this.close(),
     open: () => this.open,
     place: () => !this.banded,
@@ -267,6 +255,38 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
   get navigationControl(): HTMLElement {
     return this.trigger
   }
+
+  /**
+   * The arrows along a bar of megamenus that no component holds in a slot.
+   *
+   * Each megamenu's trigger is one stop, and a press counts only from a
+   * trigger, so an arrow among an open panel's links stays with the panel.
+   * Down and Up are reserved: Down enters an open panel. A megamenu whose
+   * parent is a component, and so holds it in a slot, passes no stops, so a
+   * `Navigation` around it decides the arrows, on or off, for every
+   * destination at once.
+   */
+  protected readonly keys = new KeyboardNavigationController(this, {
+    items: () =>
+      !this.parentElement?.shadowRoot
+        ? HelixHeadlessMegamenu.bar.alongside(this).map(
+            (megamenu): NavigableItem => ({
+              contains: (node) => {
+                const control = megamenu.trigger
+                return node === control || control.contains(node)
+              },
+              disabled: false,
+              focusItem: () => megamenu.trigger.focus(),
+              select: () => {},
+              selected: false,
+            }),
+          )
+        : [],
+    origin: 'focus',
+    reserved: () => ['ArrowDown', 'ArrowUp'],
+    selects: () => false,
+    wrap: false,
+  })
 
   /**
    * Down Arrow on the trigger of an open panel moves focus to the panel's first
@@ -412,9 +432,7 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
 
   private readonly handlePointerDown = (event: PointerEvent): void => {
     this.pointer = event.pointerType
-    pressed = this
-    window.addEventListener('pointerup', release, { capture: true, once: true })
-    window.addEventListener('pointercancel', release, { capture: true, once: true })
+    HelixHeadlessMegamenu.bar.press(this)
   }
 
   private readonly handlePointerEnter = (event: PointerEvent): void => {
@@ -426,6 +444,7 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
     }
     /* No wait when a panel is already down: the bar is open, and the reader
        moving along it is choosing, not passing through. */
+    const showing = HelixHeadlessMegamenu.bar.showing
     this.schedule(showing && showing !== this ? 0 : HelixHeadlessMegamenu.OPEN_DELAY, () => {
       this.requestOpen(true)
     })
@@ -457,6 +476,7 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
       return
     }
     /* A press on another megamenu opens that one, which closes this one. */
+    const pressed = HelixHeadlessMegamenu.bar.pressed
     if (pressed !== undefined && pressed !== this && deepContains(pressed, next)) {
       return
     }
@@ -536,7 +556,7 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
   override connectedCallback(): void {
     super.connectedCallback()
     this.watchWidth()
-    connected.add(this)
+    HelixHeadlessMegamenu.bar.add(this)
     /* On the window and capturing, so a band over a scrolling panel hears that
        too rather than only the page's own scrolling. Passive: this measures and
        never prevents. */
@@ -560,11 +580,8 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
     this.removeEventListener('pointerleave', this.handlePointerLeave)
     this.removeEventListener('focusout', this.handleFocusOut)
     this.removeEventListener('keydown', this.handleKeyDown)
-    connected.delete(this)
+    HelixHeadlessMegamenu.bar.remove(this)
     this.stop()
-    if (showing === this) {
-      showing = undefined
-    }
   }
 
   /**
@@ -572,9 +589,8 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
    *
    * Before the render rather than after it, because the popover controller
    * raises the panel from its own `hostUpdated`, which runs before `updated`:
-   * settled there, the two would be up together for a frame. The other closes
-   * through `requestOpen`, so a consumer holding it open is asked rather than
-   * overruled.
+   * settled there, the two would be up together for a frame. The bookkeeping
+   * is `HandOver`'s.
    */
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
@@ -582,52 +598,11 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
       return
     }
     if (this.open) {
-      const previous = showing && showing !== this ? showing : undefined
-      /* Which way the reader moved along the bar: toward the end where this
-         one comes after the one closing. Radix pairs them the same way: the
-         one opening enters from the side the reader moved toward, and the one
-         closing leaves toward the side they came from. */
-      const forward =
-        previous !== undefined &&
-        (previous.compareDocumentPosition(this) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0
-      this.motion(previous ? (forward ? 'from-end' : 'from-start') : undefined)
-      this.from = previous?.size
-      HelixHeadlessMegamenu.settle(this, previous)
-      if (previous) {
-        previous.motion(forward ? 'to-start' : 'to-end')
-        previous.handedOver = true
-        if (!previous.requestOpen(false)) {
-          previous.handedOver = false
-          previous.motion(undefined)
-        }
-      }
-      showing = this
+      this.from = HelixHeadlessMegamenu.bar.open(this)?.size
       return
     }
-    if (showing === this) {
-      showing = undefined
-    }
-    /* Closed on its own, so it moved nowhere, and neither did any other. */
-    if (!this.handedOver) {
-      HelixHeadlessMegamenu.settle()
-    }
-    this.handedOver = false
+    HelixHeadlessMegamenu.bar.close(this)
   }
-
-  /**
-   * Clears the direction of every panel but the two in a hand-over, so only
-   * the latest move is ever described.
-   */
-  private static settle(...moving: (HelixHeadlessMegamenu | undefined)[]): void {
-    for (const megamenu of connected) {
-      if (!moving.includes(megamenu)) {
-        megamenu.motion(undefined)
-      }
-    }
-  }
-
-  /** Whether the panel is closing because another one opened in its place. */
-  private handedOver = false
 
   /** The panel's size the last time it was open, in pixels. */
   private size: { block: number; inline: number } | undefined
@@ -662,7 +637,7 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
    * Says which way the reader moved when one panel took over from another.
    * Nothing clears all four, for a panel opened or closed on its own.
    */
-  private motion(to: 'from-end' | 'from-start' | 'to-end' | 'to-start' | undefined): void {
+  private motion(to: Motion | undefined): void {
     this.toggleState('from-end', to === 'from-end')
     this.toggleState('from-start', to === 'from-start')
     this.toggleState('to-end', to === 'to-end')
@@ -743,12 +718,24 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
     </slot>`
   }
 
+  /**
+   * The mark under the trigger, while the panel is open. Rendered only then,
+   * so a mark of your own needs no rule to hide it while the panel is closed,
+   * and hidden from the accessibility tree: the trigger's `aria-expanded`
+   * already says the panel is open.
+   */
+  protected renderIndicator(): TemplateResult | typeof nothing {
+    return this.open
+      ? html`<slot name="indicator" part="indicator" aria-hidden="true"></slot>`
+      : nothing
+  }
+
   protected override render(): TemplateResult {
     /* The listeners sit on the host rather than the trigger, so the panel counts
        as inside it: the top layer changes where the panel is painted and not
        where it is in the tree, so a pointer moving off the trigger and onto the
        panel has not left this element and fires no leave. */
-    return html`${this.renderTrigger()}
+    return html`${this.renderTrigger()}${this.renderIndicator()}
       <div
         part="surface"
         id="panel"
@@ -757,7 +744,7 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
         role="group"
         ?hidden=${!this.open}
       >
-        <slot></slot>
+        <slot part="columns"></slot>
       </div>`
   }
 }
