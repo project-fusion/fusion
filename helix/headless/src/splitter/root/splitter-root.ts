@@ -31,6 +31,17 @@ import { snapTo } from '../snap.js'
  */
 const STACK_BELOW = 512
 
+/**
+ * A position as a reader's locale writes a percentage, `40%` or `40 %`, for
+ * `aria-valuetext`: a bare `aria-valuenow` is read as a number with no unit.
+ * The runtime's own locale, and made once.
+ */
+let percent: Intl.NumberFormat | undefined
+const asPercent = (value: number): string => {
+  percent ??= new Intl.NumberFormat(undefined, { maximumFractionDigits: 0, style: 'percent' })
+  return percent.format(value / 100)
+}
+
 /** What a nested splitter tells the one it crosses. */
 interface Crossed {
   /** Records that `by` crosses this splitter at `at` percent along it. */
@@ -58,8 +69,9 @@ const channel = new WeakMap<HelixHeadlessSplitter, Crossed>()
  * added at `firstUpdated` and is not in the server markup. Before it appears,
  * both dividers work on their own.
  *
- * The divider has `role="separator"` and `aria-valuenow`, and `aria-controls`
- * names the start pane. Drag it with a pointer or move it with the arrow keys,
+ * The divider has `role="separator"` and `aria-valuenow`, with
+ * `aria-valuetext` saying the start pane's share as a percentage in the
+ * reader's locale, and `aria-controls` names the start pane. Drag it with a pointer or move it with the arrow keys,
  * press `Home` or `End` to move it to its bounds, and press `Enter` to collapse
  * the start pane and open it again. A drag in progress is tracked as a state, so both dividers a
  * corner moves stay lit for as long as they move.
@@ -1195,6 +1207,9 @@ export class HelixHeadlessSplitter extends HelixElement {
     super.firstUpdated(changed)
     this.watchWidth()
     this.findOuter()
+    /* The server wrote its own locale's percentage, which this reader's may
+       write differently. */
+    this.finishHydration()
   }
 
   /** Keeps the corner in step while this divider moves under it. */
@@ -1275,7 +1290,13 @@ export class HelixHeadlessSplitter extends HelixElement {
         aria-valuemax=${this.collapsed ? 100 : this.clamp(this.maxPercent)}
         aria-valuemin=${this.collapsed ? 0 : this.clamp(this.minPercent)}
         aria-valuenow=${Math.round(position)}
-        aria-valuetext=${this.collapsed ? this.collapsedLabel : nothing}
+        aria-valuetext=${
+          this.collapsed
+            ? this.collapsedLabel
+            : this.hydrating
+              ? nothing
+              : asPercent(Math.round(position))
+        }
         ?data-dragging=${this.dragging}
         ?data-flush=${this.flush}
         @dblclick=${this.handleDoubleClick}
@@ -1300,6 +1321,7 @@ export class HelixHeadlessSplitter extends HelixElement {
           aria-valuemax="100"
           aria-valuemin="0"
           aria-valuenow=${Math.round(crossing.at)}
+          aria-valuetext=${asPercent(Math.round(crossing.at))}
           data-cross=${index}
           style="--splitter-corner-at: ${crossing.at}%; --splitter-position: ${position}%"
           @dblclick=${this.handleCornerDoubleClick}
