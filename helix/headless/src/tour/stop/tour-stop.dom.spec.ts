@@ -196,3 +196,14 @@ describe('the stop’s title and description', () => {
     expect((part(host, 'bubble') as HTMLElement | null)?.hidden).toBe(true)
   })
 })
+
+/* Button gained a `spinner` part, and a page reached it on a stop's three
+   buttons through nothing. */
+test("forwards each button's pending ring under the button's own name", async () => {
+  const host = await stop()
+  expect(
+    ['skip', 'back', 'next'].map((name) =>
+      part(host, name)?.getAttribute('exportparts')?.includes(`spinner: ${name}-spinner`),
+    ),
+  ).toEqual([true, true, true])
+})

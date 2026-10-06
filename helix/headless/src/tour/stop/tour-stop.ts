@@ -77,6 +77,7 @@ import { stopNaming } from '../naming.js'
  * @csspart back - The control that goes to the previous stop.
  * @csspart back-button - The button inside `back`.
  * @csspart back-live - The live region inside `back`.
+ * @csspart back-spinner - The ring `back` turns while it is pending.
  * @csspart back-text - The words on that button, trimmed to their capitals and baseline.
  * @csspart bubble - The panel that points at the target.
  * @csspart content - The region holding the slotted content.
@@ -85,11 +86,13 @@ import { stopNaming } from '../naming.js'
  * @csspart next - The control that goes to the next stop, and finishes the tour on the last stop.
  * @csspart next-button - The button inside `next`.
  * @csspart next-live - The live region inside `next`.
+ * @csspart next-spinner - The ring `next` turns while it is pending.
  * @csspart next-text - The words on that button, trimmed to their capitals and baseline.
  * @csspart progress - The stop's place in the tour, such as "2 of 5". It describes the panel, and is shown when the tour has `progress`.
  * @csspart skip - The control that ends the tour early.
  * @csspart skip-button - The button inside `skip`.
  * @csspart skip-live - The live region inside `skip`.
+ * @csspart skip-spinner - The ring `skip` turns while it is pending.
  * @csspart skip-text - The words on that button, trimmed to their capitals and baseline.
  *
  * @cssstate placed-bottom - The panel sits below its target.
@@ -316,7 +319,7 @@ export class HelixHeadlessTourStop extends HelixElement {
     return html`<slot name="actions">
       <${this.tag('button')}
         part="skip"
-      exportparts="button: skip-button, live: skip-live, text: skip-text" emphasis="ghost" @click=${() => this.ask('skip')}>
+      exportparts="button: skip-button, live: skip-live, spinner: skip-spinner, text: skip-text" emphasis="ghost" @click=${() => this.ask('skip')}>
         ${this.skipLabel}
       </${this.tag('button')}>
       ${
@@ -324,7 +327,7 @@ export class HelixHeadlessTourStop extends HelixElement {
           ? ''
           : html`<${this.tag('button')}
               part="back"
-      exportparts="button: back-button, live: back-live, text: back-text"
+      exportparts="button: back-button, live: back-live, spinner: back-spinner, text: back-text"
               emphasis="outlined"
               @click=${() => this.ask('back')}
             >
@@ -333,7 +336,7 @@ export class HelixHeadlessTourStop extends HelixElement {
       }
       <${this.tag('button')}
         part="next"
-      exportparts="button: next-button, live: next-live, text: next-text"
+      exportparts="button: next-button, live: next-live, spinner: next-spinner, text: next-text"
         emphasis="solid"
         tone="primary"
         @click=${() => this.ask('next')}

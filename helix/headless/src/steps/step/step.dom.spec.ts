@@ -84,3 +84,10 @@ describe('one step', () => {
     expect(host.hasAttribute('complete')).toBe(false)
   })
 })
+
+/* Button gained a `spinner` part, and a page reached it on a step's label
+   through nothing. */
+test("forwards the label button's pending ring as `label-spinner`", async () => {
+  const host = await step()
+  expect(part(host, 'label')?.getAttribute('exportparts')).toContain('spinner: label-spinner')
+})

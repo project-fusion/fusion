@@ -1,4 +1,4 @@
-import { customElement, HelixElement } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, reportRuntime } from '@fusion.dev/helix-core'
 import { arrowDown, arrowUp, minus } from '@fusion.dev/helix-icons'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -229,6 +229,21 @@ export class HelixHeadlessTrend extends HelixElement {
       return undefined
     }
     return this.good === moved ? 'better' : 'worse'
+  }
+
+  /* Said once for an element that writes the old `direction`, which reads on
+     but has a replacement. A server runs no `updated`, so nothing is said there. */
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    if (changed.has('direction') && this.direction && changed.get('direction') === undefined) {
+      reportRuntime({
+        kind: 'deprecated',
+        message:
+          `<${this.localName} direction="${this.direction}"> is deprecated: write ` +
+          `movement="${this.direction}", which says the same. \`direction\` is a layout on Stat and Flex.`,
+        tag: this.localName,
+      })
+    }
   }
 
   protected override willUpdate(changed: PropertyValues): void {

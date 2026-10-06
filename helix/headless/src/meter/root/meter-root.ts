@@ -1,6 +1,7 @@
 import {
   customElement,
   drawStatus,
+  HelixBandEvent,
   HelixElement,
   hostAria,
   readingText,
@@ -47,6 +48,8 @@ const BAND_WORDS: Readonly<Record<MeterBand, string>> = { fair: 'Fair', good: 'G
  * @documentation https://fusion.dev/helix/components/meter
  *
  * @slot label - A visible label. Its words name the meter in place of `label`.
+ *
+ * @event {HelixBandEvent} helix-band - Fired when the reading moves into another band, with the band it is in now, or `''` where it is in none. Not on the first render, and not cancelable.
  *
  * @csspart groove - The unfilled circle, in `ring` and `arc`.
  * @csspart indicator - The part of the track the value fills.
@@ -390,15 +393,19 @@ export class HelixHeadlessMeter extends HelixElement {
     this.toggleState('under', beyond === 'under')
   }
 
-  /* A band the reading moved into is said under `live`. The first update
-     only records where it stands, since a meter that arrives in a band has
-     not moved. */
+  /* A band the reading moved into is sent as `helix-band`, and said under
+     `live`. The first update only records where it stands, since a meter that
+     arrives in a band has not moved. */
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     const band = this.computedBand
-    const moved = this.lastBand !== undefined && band !== undefined && band !== this.lastBand
+    const moved = this.lastBand !== undefined && (band ?? '') !== this.lastBand
     this.lastBand = band ?? ''
-    if (moved && this.live) {
+    if (!moved) {
+      return
+    }
+    this.dispatchEvent(new HelixBandEvent({ band: band ?? '' }))
+    if (band && this.live) {
       this.status.say(`${this.text}, ${this.bandLabels[band] ?? BAND_WORDS[band]}`)
     }
   }
