@@ -18,6 +18,35 @@
   display: inline-flex;
 }
 
+/* A larger toolbar says so once as well, with every step it moves and the
+   steps derived from them, for the reason the base layer records: a derived
+   step resolves where it is declared. */
+:host([size="md"]) {
+  --helix-size-checkbox: var(--helix-size-checkbox-md);
+  --helix-size-checkbox-loose: calc(var(--helix-size-checkbox) * 1.2);
+  --helix-size-checkbox-tight: calc(var(--helix-size-checkbox) * 0.8);
+  --helix-size-icon: var(--helix-size-icon-md);
+  --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
+  --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
+  --helix-size-control: var(--helix-size-control-md);
+  --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
+  --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
+  --helix-size-tag: var(--helix-size-tag-md);
+}
+
+:host([size="lg"]) {
+  --helix-size-checkbox: var(--helix-size-checkbox-lg);
+  --helix-size-checkbox-loose: calc(var(--helix-size-checkbox) * 1.2);
+  --helix-size-checkbox-tight: calc(var(--helix-size-checkbox) * 0.8);
+  --helix-size-icon: var(--helix-size-icon-lg);
+  --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
+  --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
+  --helix-size-control: var(--helix-size-control-lg);
+  --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
+  --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
+  --helix-size-tag: var(--helix-size-tag-lg);
+}
+
 [part="toolbar"] {
   /* Across the toolbar's axis: centered, or \`stretch\` for a column of controls
      as wide as the toolbar. */

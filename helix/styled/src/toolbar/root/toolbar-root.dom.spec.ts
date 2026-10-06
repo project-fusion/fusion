@@ -70,6 +70,24 @@ describe('toolbar', () => {
     expect(rule('[part="toolbar"]')).toContain('gap: var(--toolbar-gap, var(--helix-space-2xs))')
   })
 
+  /* Dense was the only answer; a toolbar of larger controls had to restate
+     every step on a wrapper. */
+  test('size makes every control larger together, and rests on nothing', async () => {
+    const host = (await mount(bar)) as HTMLElement & {
+      size?: string
+      updateComplete: Promise<unknown>
+    }
+    expect(host.hasAttribute('size')).toBe(false)
+    host.size = 'lg'
+    await host.updateComplete
+    expect(host.getAttribute('size')).toBe('lg')
+    for (const size of ['md', 'lg']) {
+      const block = rule(`:host([size="${size}"])`)
+      expect(block).toContain(`--helix-size-control: var(--helix-size-control-${size})`)
+      expect(block).toContain('--helix-size-control-tight: calc(var(--helix-size-control) * 0.8)')
+    }
+  })
+
   test('carries no attribute of its own', async () => {
     expect((await mount(bar)).getAttributeNames()).toEqual(['label'])
   })
