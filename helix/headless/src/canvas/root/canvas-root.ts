@@ -46,6 +46,7 @@ import {
   type CanvasTone,
   colorOf,
   connector,
+  distanceTo,
   ends,
   extent,
   inside,
@@ -131,6 +132,15 @@ const ruling = (zoom: number): number =>
  * click nudged the card it landed on by a pixel or two.
  */
 const SLOP = 3
+
+/**
+ * How near a card, in pixels on screen, a connection let go arrives at it.
+ *
+ * **A card's edge is a line a hand overshoots**, a finger most of all: a
+ * connection let go a few pixels off a card was pulled off as though it had
+ * been dropped on nothing. React Flow's `connectionRadius` is the same 20.
+ */
+const REACH = 20
 
 /** Whether an end carries an arrowhead, the format defaulting the two differently. */
 const heads = (edge: CanvasEdge): { start: boolean; end: boolean } => ({
@@ -219,7 +229,9 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  * that is moved or resized lands on a multiple of it. Carrying a card, a
  * corner, a connection, or the selection box near the edge of the board moves
  * the board under it, so a card can be taken to a place off screen in one
- * drag.
+ * drag. A connection let go within 20 pixels of a card arrives at it. A
+ * double click on the empty board zooms in about that point, and Shift with a
+ * double click zooms out.
  *
  * Keyboard behavior:
  * - One card holds the board's tab stop.
@@ -1145,10 +1157,11 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
 
   /**
    * The card under a point, the smallest where they overlap, so a card inside
-   * a group is found before the group around it.
+   * a group is found before the group around it. Where none is, the nearest
+   * within `reach`, in the document's units.
    */
-  private cardAt(point: { x: number; y: number }): CanvasNode | undefined {
-    return this.nodes
+  private cardAt(point: { x: number; y: number }, reach = 0): CanvasNode | undefined {
+    const under = this.nodes
       .filter(
         (one) =>
           point.x >= one.x &&
@@ -1157,6 +1170,13 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
           point.y <= one.y + one.height,
       )
       .sort((a, b) => a.width * a.height - b.width * b.height)[0]
+    if (under || reach <= 0) {
+      return under
+    }
+    return this.nodes
+      .map((one) => ({ away: distanceTo(one, point), one }))
+      .filter(({ away }) => away <= reach)
+      .sort((a, b) => a.away - b.away)[0]?.one
   }
 
   /** What a card is called, by id, for what the live region says. */
@@ -1999,7 +2019,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
         capturePointer(this, event.pointerId)
       }
       const at = this.toDocument(event)
-      const over = this.cardAt(at)
+      const over = this.cardAt(at, REACH / this.at.zoom)
       const to = this.arrival(over?.id)
       this.linking = {
         ...this.linking,
@@ -2691,7 +2711,10 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     this.dispatchEvent(new HelixCanvasEditEvent({ name: card.name }))
   }
 
-  /** A double-click on a card or a connection edits it, the pointer's F2. */
+  /**
+   * A double-click on a card or a connection edits it, the pointer's F2, and
+   * one on the empty board zooms in about where it landed.
+   */
   private readonly handleDoubleClick = (event: MouseEvent): void => {
     const path = event.composedPath()
     if (path.some((one) => one instanceof Element && one.matches(INTERACTIVE))) {
@@ -2707,7 +2730,39 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     if (key !== undefined) {
       event.preventDefault()
       this.editStop(key)
+      return
     }
+    /* **A double click on the empty board zooms in about it**, and with Shift
+       out, as a map does: the one zoom a pointer with no wheel and no second
+       finger has, short of the buttons. */
+    const viewport = this.partNamed('viewport')
+    if (!viewport || !this.gestureAllowed(event)) {
+      return
+    }
+    /* **Where it landed, not what it landed on**: the press before it pans
+       the board and captures the pointer, so the double click is sent to the
+       host and its path holds no part at all. A control is never captured, so
+       its path still says so. */
+    const box = viewport.getBoundingClientRect()
+    const inside =
+      event.clientX >= box.left &&
+      event.clientX <= box.right &&
+      event.clientY >= box.top &&
+      event.clientY <= box.bottom
+    const onControls = path.some(
+      (one) =>
+        one instanceof Element && (one.getAttribute('part') ?? '').split(' ').includes('controls'),
+    )
+    if (!inside || onControls) {
+      return
+    }
+    event.preventDefault()
+    this.touched = true
+    this.direct = false
+    this.zoomAbout(event.shiftKey ? 1 / 2 : 2, {
+      x: event.clientX - box.left,
+      y: event.clientY - box.top,
+    })
   }
 
   /**

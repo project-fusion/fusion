@@ -630,6 +630,67 @@ describe('canvas connections and removal', () => {
     expect(part(host, 'draft')).toBeNull()
   })
 
+  test('a connection let go just off a card arrives at it, and one let go far off arrives nowhere', async () => {
+    const host = await canvas()
+    const asked: unknown[] = []
+    host.addEventListener('helix-connect', (event) => asked.push((event as CustomEvent).detail))
+    const pointer = (type: string, at: [number, number]) =>
+      new PointerEvent(type, {
+        bubbles: true,
+        button: 0,
+        clientX: at[0],
+        clientY: at[1],
+        composed: true,
+        pointerId: 4,
+      })
+    const draw = async (to: [number, number]): Promise<void> => {
+      const handle = card(host, 'a').shadowRoot?.querySelector('[part~="handle-right"]') as Element
+      handle.dispatchEvent(pointer('pointerdown', [0, 0]))
+      host.dispatchEvent(pointer('pointermove', to))
+      await host.updateComplete
+      host.dispatchEvent(pointer('pointerup', to))
+      await host.updateComplete
+    }
+    // Third is at 130..330, 300..400: 12 below its bottom edge, then 60 below it.
+    await draw(onScreen(host, 230, 412))
+    expect(asked).toEqual([{ from: 'a', fromSide: 'right', to: 'c', toSide: 'bottom' }])
+    await draw(onScreen(host, 230, 460))
+    expect(asked).toHaveLength(1)
+  })
+
+  test('a double click on the empty board zooms in about it, and with Shift out', async () => {
+    const host = await canvas()
+    const zoom = (): number => (host as unknown as { view: { zoom: number } }).view.zoom
+    const viewport = part(host, 'viewport') as HTMLElement
+    /* happy-dom measures nothing, so the box is given: the double click is
+       placed by where it lands, since a browser sends it to the host. */
+    viewport.getBoundingClientRect = () =>
+      ({ bottom: 300, height: 300, left: 0, right: 400, top: 0, width: 400, x: 0, y: 0 }) as DOMRect
+    const before = zoom()
+    viewport.dispatchEvent(
+      new MouseEvent('dblclick', { bubbles: true, clientX: 5, clientY: 5, composed: true }),
+    )
+    await host.updateComplete
+    expect(zoom()).toBeCloseTo(before * 2)
+    viewport.dispatchEvent(
+      new MouseEvent('dblclick', {
+        bubbles: true,
+        clientX: 5,
+        clientY: 5,
+        composed: true,
+        shiftKey: true,
+      }),
+    )
+    await host.updateComplete
+    expect(zoom()).toBeCloseTo(before)
+    // On a control, it is the control's.
+    part(host, 'zoom-in')?.dispatchEvent(
+      new MouseEvent('dblclick', { bubbles: true, clientX: 5, clientY: 5, composed: true }),
+    )
+    await host.updateComplete
+    expect(zoom()).toBeCloseTo(before)
+  })
+
   test('dragging a connection by its end moves that end, and the board rewrites it', async () => {
     const host = await canvas()
     const said: unknown[] = []

@@ -358,6 +358,19 @@ export const ends = (
 }
 
 /**
+ * How far a point is from a card's box, in the document's units: nothing
+ * inside it, and the shortest way to its edge outside.
+ */
+export const distanceTo = (
+  node: { x: number; y: number; width: number; height: number },
+  point: Point,
+): number =>
+  Math.hypot(
+    Math.max(node.x - point.x, 0, point.x - (node.x + node.width)),
+    Math.max(node.y - point.y, 0, point.y - (node.y + node.height)),
+  )
+
+/**
  * The side of a card nearest a point, which is where a connection a reader is
  * holding arrives.
  *
