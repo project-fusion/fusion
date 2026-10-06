@@ -1,9 +1,16 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { registerDom } from '@fusion.dev/helix-testing/dom'
-import { type Machine, MachineController } from './machine-controller.js'
+import type { Machine } from './machine.js'
+import type * as Subject from './machine-controller.js'
 
-beforeAll(() => {
+/* The page first, then the module: `requestChange` loads an event class that
+   extends the `CustomEvent` it finds as it loads, and a DOM spec later in the
+   same run dispatches it. */
+let MachineController: typeof Subject.MachineController
+
+beforeAll(async () => {
   registerDom()
+  ;({ MachineController } = await import('./machine-controller.js'))
 })
 
 type Door = 'open' | 'shut'
