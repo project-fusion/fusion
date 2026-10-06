@@ -586,10 +586,19 @@ Each control's glyph is a slot, so the controls can use the same icon set as
 the rest of your page. An icon you slot in is sized like the glyph it replaces:
 
 ```html
-<helix-map controls="layers zoom compass fullscreen" label="Our stores">
+<helix-map
+  controls="layers zoom compass fullscreen"
+  label="Our stores"
+>
   <div id="map"></div>
-  <svg slot="zoom-in-icon" viewBox="0 0 16 16"><path d="M7 2h2v5h5v2H9v5H7V9H2V7h5Z" /></svg>
-  <svg slot="zoom-out-icon" viewBox="0 0 16 16"><path d="M2 7h12v2H2Z" /></svg>
+  <svg
+    slot="zoom-in-icon"
+    viewBox="0 0 16 16"
+  ><path d="M7 2h2v5h5v2H9v5H7V9H2V7h5Z"/></svg>
+  <svg
+    slot="zoom-out-icon"
+    viewBox="0 0 16 16"
+  ><path d="M2 7h12v2H2Z"/></svg>
 </helix-map>
 ```
 

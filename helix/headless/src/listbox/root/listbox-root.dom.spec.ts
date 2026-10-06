@@ -1128,7 +1128,8 @@ describe('extending a choice from the one last chosen', () => {
     await Promise.all(
       options(host).map((option) => (option as unknown as Updatable).updateComplete),
     )
-    ;(options(host)[2]?.shadowRoot?.querySelector('[part~="item"]') as HTMLElement).click()
+    const third = options(host)[2]?.shadowRoot?.querySelector('[part~="item"]') as HTMLElement
+    third.click()
     await settle(host)
     expect(host.value).toBe('one,three')
   })
