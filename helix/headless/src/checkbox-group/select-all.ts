@@ -25,3 +25,19 @@ export const selectAllState = (
   const checked = counted.length > 0 && ticked === counted.length
   return { checked, indeterminate: ticked > 0 && !checked }
 }
+
+/**
+ * What a press on the select-all box does to each box, in the set's order:
+ * every enabled box checked, or every one cleared once all of them are, with a
+ * disabled box keeping its state. A set with no enabled box stays as it is.
+ *
+ * **By box and not by value**, so boxes that share a value, such as boxes
+ * written with none, which all submit `on`, are each moved on their own: by
+ * value, one checked box made every box with its value count as checked, and
+ * the press cleared the set where it should have filled it.
+ */
+export const selectAllPress = (boxes: readonly SetBox[]): boolean[] => {
+  const enabled = boxes.filter((box) => !box.disabled)
+  const every = enabled.length > 0 && enabled.every((box) => box.checked)
+  return boxes.map((box) => (box.disabled ? box.checked : !every))
+}
