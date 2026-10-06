@@ -5,6 +5,7 @@ import {
   HelixElement,
   inlineStep,
   keyClaimed,
+  toolbarAround,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -131,6 +132,10 @@ interface Control {
  * three toolbars take three presses of Tab to pass. Any element the browser can
  * focus counts as a control, including your own elements. A child that takes no
  * focus, such as a divider, is skipped. A menu is reached at its trigger.
+ *
+ * A Divider in the toolbar is a separator across the toolbar's axis, as React
+ * Aria's is: vertical in a horizontal toolbar and horizontal in a vertical
+ * one, without an `orientation` of its own.
  *
  * Controls inside a plain wrapper, such as a `Button Group`, are each a stop
  * of the toolbar's own, as React Aria's toolbar flattens a group: the arrows
@@ -432,10 +437,7 @@ export class HelixHeadlessToolbar extends HelixElement {
     if (!parent) {
       return false
     }
-    return (
-      closestInstance(parent, HelixHeadlessToolbar) !== null ||
-      parent.closest('[role="toolbar"]') !== null
-    )
+    return closestInstance(parent, HelixHeadlessToolbar) !== null || toolbarAround(this) !== null
   }
 
   /**
@@ -555,6 +557,14 @@ export class HelixHeadlessToolbar extends HelixElement {
     this.toggleState('nested', this.nested)
     this.toggleState('horizontal', this.axis === 'horizontal')
     this.toggleState('vertical', this.axis === 'vertical')
+    /* A divider in the toolbar runs across its axis, so a turned toolbar asks
+       its children to read it again. After the first render only: a child's
+       first render reads the toolbar for itself. */
+    if (this.hasUpdated && changed.has('orientation')) {
+      for (const child of this.children) {
+        ;(child as Partial<HelixElement>).requestUpdate?.()
+      }
+    }
   }
 
   protected override render(): TemplateResult {
