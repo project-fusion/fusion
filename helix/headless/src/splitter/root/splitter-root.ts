@@ -87,6 +87,7 @@ const channel = new WeakMap<HelixHeadlessSplitter, Crossed>()
  * @event {HelixBeforeResizeEvent} helix-before-resize - Fired before the divider settles, and only when the gesture moved it. A press that moved nothing, a drag that came back, an arrow key with no room left, and a corner that moved only the other divider do not fire it. Cancelable: canceling it leaves the position to you and keeps the rest of the gesture, so a collapse the gesture reached still fires `helix-before-collapse`, which you can also cancel. A dragged divider stays where it was dropped until you set your own `position`.
  * @event {HelixCollapseEvent} helix-collapse - Fired after a pane shuts or reopens, with the side that is shut, or empty where both are open.
  * @event {HelixResizedEvent} helix-resized - Fired after the divider settles somewhere new, with the new position.
+ * @event {Event} input - Fired each time a drag moves the divider, before it settles, as a range input does while it is dragged. Read `position` for where it is now.
  *
  * @csspart corner - The handle where two dividers cross, added on the client.
  * @csspart end - The box that holds the second pane.
@@ -618,6 +619,9 @@ export class HelixHeadlessSplitter extends HelixElement {
        the settling below is what announces either. */
     this.collapsedState = 'none'
     this.requestUpdate('position', previous)
+    /* Each step of a drag, for a page that lays something out with the panes
+       as they move (Ark's `onResize`). The settling is `helix-resized`'s. */
+    this.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
   }
 
   /**
