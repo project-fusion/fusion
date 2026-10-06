@@ -16,7 +16,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { x } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
 /**
@@ -56,6 +56,14 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * the key moved focus into is removed with focus still inside, focus goes
  * back to where it was before the key.
  *
+ * **Set `queued` to show several announcements one at a time.** A queued
+ * announcement waits while a queued announcement before it in the same parent
+ * is still there, and shows when that one is removed: its message is then
+ * read out, and its `duration` starts. While it waits it renders nothing,
+ * is no region, and carries `:state(waiting)`. A server cannot see the
+ * announcements beside it, so a served page shows every one until the script
+ * runs.
+ *
  * Set `duration` to dismiss it after a time. The clock stops while the pointer
  * or focus is on the announcement, and continues from what was left, so a
  * reader partway through is not cut off. It stops while the page is hidden too,
@@ -84,6 +92,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @csspart live - A copy of the message in a live region, read by screen readers when the announcement appears after the page has loaded, and emptied seven seconds later. Visually hidden in the styled tier.
  *
  * @cssstate paused - The clock `duration` started is stopped, while the pointer or focus is on the announcement or the page is hidden.
+ * @cssstate waiting - The announcement is `queued` behind another, and renders nothing until that one is removed.
  */
 @customElement('helix-headless-announcement')
 export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
@@ -117,6 +126,15 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
   label = 'Announcement'
 
   /**
+   * Whether the announcement waits its turn behind the queued announcements
+   * before it in the same parent, showing when the last of them is removed.
+   *
+   * Off by default, so every announcement on a page shows at once.
+   */
+  @property({ reflect: true, type: Boolean })
+  queued = false
+
+  /**
    * The band's color.
    *
    * Paint only: unlike `Callout`, no value here draws a mark, changes the label,
@@ -141,11 +159,34 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
   @property({ reflect: true })
   tone?: 'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'
 
+  /** Whether a queued announcement before this one is still there. */
+  @state()
+  private waiting = false
+
+  /** Watches the parent for the announcements before this one leaving. */
+  private queue: MutationObserver | undefined
+
+  /** Whether a queued announcement comes before this one in its parent. */
+  private behind(): boolean {
+    /* A server's markup is hydrated as it was served, every announcement
+       shown; the update after it asks again. */
+    if (!this.queued || (this.shadowRoot !== null && !this.hasUpdated)) {
+      return false
+    }
+    for (let at = this.previousElementSibling; at; at = at.previousElementSibling) {
+      if (at instanceof HelixHeadlessAnnouncement && at.queued) {
+        return true
+      }
+    }
+    return false
+  }
+
   /* Filled a frame after the band appears, when it appears after the page has
-     loaded; at once, and silently, when it came with the page. */
+     loaded; at once, and silently, when it came with the page. A waiting
+     announcement has no words yet, so they are news when its turn comes. */
   protected readonly arrival = new ArrivalController(this, {
     arriving: () => !this.serverRendered && document.readyState === 'complete',
-    text: () => slottedWords(this, ['']),
+    text: () => (this.waiting ? '' : slottedWords(this, [''])),
   })
 
   /** The time `duration` gives it, held while a reader is on it. */
@@ -205,7 +246,10 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     /* Through internals, so nothing is written onto the host. */
-    hostAria(this.internals, { label: this.label, role: this.label.trim() ? 'region' : '' })
+    hostAria(this.internals, {
+      label: this.label,
+      role: this.label.trim() && !this.waiting ? 'region' : '',
+    })
     if ('ariaKeyShortcuts' in this.internals) {
       this.internals.ariaKeyShortcuts = ariaChord(this.hotkey, onApple()) || null
     }
@@ -241,7 +285,11 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
   }
 
   override connectedCallback(): void {
+    /* Before the controllers hear of the connection, so the arrival hears no
+       words from an announcement that is waiting. */
+    this.waiting = this.behind()
     super.connectedCallback()
+    this.watchQueue()
     this.addEventListener('mouseenter', this.handleHold)
     this.addEventListener('mouseleave', this.handleRelease)
     this.addEventListener('focusin', this.handleHold)
@@ -263,6 +311,7 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
     this.removeEventListener('focusout', this.handleRelease)
     document.removeEventListener('visibilitychange', this.handleVisibility)
     document.removeEventListener('keydown', this.handleHotkey)
+    this.queue?.disconnect()
     /* The countdown lets every hold go as the host leaves. */
     this.heldHidden = false
     /* Removed with focus inside, after the key moved it in: focus goes back
@@ -287,7 +336,12 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
     /* Here rather than in `connectedCallback`, which the server never calls,
        and started only once: the clock belongs to this announcement's life on
        screen. */
-    this.countdown.start(this.duration)
+    /* Asked again here, where every attribute has been read, so a clock is
+       never started for an announcement that turns out to be waiting. */
+    this.watchQueue()
+    if (!this.waiting) {
+      this.countdown.start(this.duration)
+    }
     this.handleVisibility()
     /* Said once for an element that slots the old `icon`, which is still
        drawn but has a replacement. */
@@ -303,6 +357,31 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.markEmpty()
+    if (changed.has('queued')) {
+      this.watchQueue()
+    }
+    this.toggleState('waiting', this.waiting)
+    if (changed.has('waiting') && this.waiting) {
+      /* The words it heard as it hydrated are forgotten, so they are news
+         when its turn comes. */
+      this.arrival.say()
+    } else if (changed.get('waiting') === true) {
+      /* Its turn: the clock starts now, as it would have on arrival. */
+      this.countdown.start(this.duration)
+    }
+  }
+
+  /* A queued announcement asks again whenever its parent's children change,
+     which is how one before it leaves. */
+  private watchQueue(): void {
+    this.queue?.disconnect()
+    this.waiting = this.behind()
+    if (this.queued && this.parentElement && typeof MutationObserver !== 'undefined') {
+      this.queue ??= new MutationObserver(() => {
+        this.waiting = this.behind()
+      })
+      this.queue.observe(this.parentElement, { childList: true })
+    }
   }
 
   /**
@@ -348,7 +427,10 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
     >`
   }
 
-  protected override render(): TemplateResult {
+  protected override render(): TemplateResult | typeof nothing {
+    if (this.waiting) {
+      return nothing
+    }
     /* **The message is in the tree once.** While the live copy holds it, the
        message itself is hidden from readers; when the copy empties, it is
        back. */

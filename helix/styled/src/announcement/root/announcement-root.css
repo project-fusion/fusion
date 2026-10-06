@@ -259,6 +259,11 @@
   display: none;
 }
 
+/* Waiting behind another queued announcement: no band at all. */
+:host(:state(waiting)) {
+  display: none;
+}
+
 /* Print: a line across the page, and its fill is the part a printer fights.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
