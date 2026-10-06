@@ -14,6 +14,8 @@ import {
   MixinControllerActive,
   MixinViewport,
   scrollItemIntoView,
+  scrollRoom,
+  Typeahead,
   type ViewportGestureLabels,
   type ViewportPanDetail,
   type ViewportZoomDetail,
@@ -38,9 +40,6 @@ import {
   within,
   withoutGroups,
 } from './graph-model.js'
-
-/** How many rows a Page Up or Page Down moves through the list. */
-const PAGE = 10
 
 /**
  * @summary A frame around a graph of notes drawn by another library, and the list that makes it readable.
@@ -131,9 +130,14 @@ const PAGE = 10
  * @csspart zoom-in - The zoom in button.
  * @csspart zoom-out - The zoom out button.
  *
+ * @cssstate empty - The list holds no notes: the graph has none, or a search or the groups hid them all.
  * @cssstate fullscreen - The graph fills the screen.
  * @cssstate idle - The user has been still long enough for the header and footer to fade.
+ * @cssstate local - The drawing shows the selected note's local graph, with `depth`.
+ * @cssstate panel-open - A graph with `no-panel` has the search and the list open over the drawing.
  * @cssstate ready - The graph has been drawn whole, after `helix-graph-ready`.
+ * @cssstate searching - The search field holds words, and the list holds only the notes they find.
+ * @cssstate selected - A note is selected, in the list or in the drawing.
  * @cssstate sharing - The page keeps the plain wheel and one finger, with `gestures="cooperative"` or while a graph with `gestures="activate"` waits to be pressed.
  * @cssstate using - A graph with `gestures="activate"` has been pressed and has the gestures.
  */
@@ -319,6 +323,9 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
     super.willUpdate(changed)
     this.toggleState('fullscreen', this.filled)
     this.toggleState('idle', this.resting)
+    this.toggleState('panel-open', this.noPanel && this.panelOpen)
+    this.toggleState('searching', this.query.trim() !== '')
+    this.toggleState('selected', this.active !== '')
     if (changed.has('links')) {
       this.adjacency = adjacencyOf(this.links)
     }
@@ -337,6 +344,7 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
           ? within(this.adjacency, this.active, Math.max(0, this.depth))
           : undefined
       this.kept = withoutGroups(this.nodes, local, this.hiddenGroups)
+      this.toggleState('local', local !== undefined)
     }
     if (
       ['nodes', 'links', 'active', 'depth', 'hiddenGroups', 'query'].some((name) =>
@@ -344,6 +352,7 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
       )
     ) {
       this.entries = entriesOf(this.sorted, this.adjacency, this.active, this.query, this.kept)
+      this.toggleState('empty', this.entries.length === 0)
       /* A new order is a list read from its top, the selected note first. */
       this.cursor = 0
       const list = this.partNamed('list')
@@ -531,8 +540,8 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
       ArrowUp: this.cursor - 1,
       End: this.entries.length - 1,
       Home: 0,
-      PageDown: this.cursor + PAGE,
-      PageUp: this.cursor - PAGE,
+      PageDown: this.cursor + this.pageRows(),
+      PageUp: this.cursor - this.pageRows(),
     }
     if (event.key in moves) {
       event.preventDefault()
@@ -553,31 +562,34 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
     }
   }
 
-  /** What has been typed toward a note's name, and when the last letter came. */
-  private typed = { at: 0, text: '' }
+  /** What has been typed toward a note's name. */
+  private readonly typed = new Typeahead()
 
   /**
-   * Moves to the next note whose name starts with what was typed, as a
-   * listbox does. Letters within half a second of each other run together,
-   * and a repeated letter steps through the names that start with it.
+   * Moves to the next note whose name starts with what was typed, through
+   * core's `Typeahead`, as a listbox does: letters within half a second run
+   * together, and a repeated letter steps through the names that start with it.
    */
   private typeahead(letter: string): void {
-    const now = Date.now()
-    const text = now - this.typed.at < 500 ? this.typed.text + letter : letter
-    this.typed = { at: now, text }
-    const wanted = text.toLocaleLowerCase()
-    const repeated = [...wanted].every((one) => one === wanted[0])
-    const prefix = repeated ? (wanted[0] ?? '') : wanted
-    const entries = this.entries
-    const start = repeated ? this.cursor + 1 : this.cursor
-    for (let step = 0; step < entries.length; step += 1) {
-      const at = (start + step) % entries.length
-      const entry = entries[at]
-      if (entry && nameOf(entry.node).toLocaleLowerCase().startsWith(prefix)) {
-        this.moveTo(at)
-        return
-      }
+    const at = this.typed.match(
+      letter,
+      this.entries.map((entry) => nameOf(entry.node)),
+      this.cursor,
+    )
+    if (at >= 0) {
+      this.moveTo(at)
     }
+  }
+
+  /**
+   * How many rows Page Down and Page Up move: the rows that fit in the list's
+   * box, or in the window where the list does not scroll, less one, so the
+   * row at one edge lands at the other.
+   */
+  private pageRows(): number {
+    const room = scrollRoom(this.partNamed('list'))
+    const tall = this.virtualize.sizeOf(this.cursor) || 32
+    return Math.max(1, Math.floor(room / tall) - 1)
   }
 
   /**

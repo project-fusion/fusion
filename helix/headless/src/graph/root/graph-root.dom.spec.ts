@@ -1,5 +1,12 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, part, registerDom, settle } from '@fusion.dev/helix-testing/dom'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
+import {
+  hasLayout,
+  hasState,
+  mount,
+  part,
+  registerDom,
+  settle,
+} from '@fusion.dev/helix-testing/dom'
 import type { GraphLink, GraphNode } from './graph-model.js'
 
 /**
@@ -132,7 +139,18 @@ describe('graph frame', () => {
   /* The list draws a window of its rows. End and Page Down pointed the active
      descendant at rows that were not drawn, wherever rows were not the 32
      pixels the window guessed, so a screen reader heard nothing. */
+  const tall = Object.getOwnPropertyDescriptor(window, 'innerHeight')
+  afterEach(() => {
+    if (tall) {
+      Object.defineProperty(window, 'innerHeight', tall)
+    }
+  })
+
   test('the row the keys are on is drawn wherever the window is', async () => {
+    /* A page is the rows that fit, less one. happy-dom lays nothing out, so
+       the list does not scroll, the window is the room, and a row is the
+       32 pixel estimate: eleven fit in 352, and a page is ten. */
+    Object.defineProperty(window, 'innerHeight', { configurable: true, value: 352 })
     const many = Array.from({ length: 500 }, (_, at) => ({ id: `n${at}`, label: `Note ${at}` }))
     const host = await graph('', many, [])
     const scope = host.shadowRoot as ShadowRoot
@@ -142,9 +160,27 @@ describe('graph frame', () => {
       const id = list(host).getAttribute('aria-activedescendant') ?? ''
       expect(scope.getElementById(id)).not.toBeNull()
     }
-    expect(list(host).getAttribute('aria-activedescendant')).toBe('note-30')
+    if (!hasLayout()) {
+      expect(list(host).getAttribute('aria-activedescendant')).toBe('note-30')
+    }
     const spacers = ['before', 'after'].map((name) => part(host, name)?.getAttribute('role'))
     expect(spacers).toEqual(['presentation', 'presentation'])
+  })
+
+  test('says what it shows as custom states: selected, local, searching and empty', async () => {
+    const host = await graph()
+    const states = (): string[] =>
+      ['empty', 'local', 'searching', 'selected'].filter((name) => hasState(host, name))
+    expect(states()).toEqual([])
+    host.active = 'a'
+    host.depth = 1
+    await settle(host)
+    expect(states()).toEqual(['local', 'selected'])
+    const field = part(host, 'search-field') as HTMLInputElement
+    field.value = 'zzz'
+    field.dispatchEvent(new InputEvent('input', { bubbles: true, composed: true }))
+    await settle(host)
+    expect(states()).toEqual(['empty', 'local', 'searching', 'selected'])
   })
 
   test('a letter moves to the next note whose name starts with it', async () => {
@@ -299,10 +335,12 @@ describe('graph frame', () => {
     await settle(host)
     expect(panel.hidden).toBe(false)
     expect(toggle.getAttribute('aria-expanded')).toBe('true')
+    expect(hasState(host, 'panel-open')).toBe(true)
     expect(host.shadowRoot?.activeElement).toBe(part(host, 'search-field'))
     key(part(host, 'search-field') as HTMLElement, 'Escape')
     await settle(host)
     expect(panel.hidden).toBe(true)
+    expect(hasState(host, 'panel-open')).toBe(false)
     expect(host.shadowRoot?.activeElement).toBe(toggle)
   })
 
