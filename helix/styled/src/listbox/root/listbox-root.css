@@ -42,6 +42,16 @@
   padding-inline: var(--helix-space-none);
 }
 
+/* In rows and columns, each column at least the hook's width, as many as fit.
+   The keys read where each option is drawn, so the columns are this rule's. */
+:host([layout="grid"]) [part="items"] {
+  display: grid;
+  grid-template-columns: repeat(
+      auto-fill,
+      minmax(min(var(--listbox-column-min-inline-size, 8rem), 100%), 1fr)
+    );
+}
+
 [part="items"]:focus-visible {
   border-color: var(--helix-color-primary);
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);

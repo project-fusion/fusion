@@ -370,6 +370,7 @@ export {
   yearPageOf,
 } from './utils/calendar/calendar.js'
 export { capturePointer } from './utils/capture-pointer/capture-pointer.js'
+export { centerInView } from './utils/center-in-view/center-in-view.js'
 export {
   ariaChord,
   type ChordPress,
@@ -396,6 +397,7 @@ export {
 } from './utils/clock/clock.js'
 export { closestInstance } from './utils/closest-instance/closest-instance.js'
 export { type ColorWords, colorName, hueName } from './utils/color-name/color-name.js'
+export { columnStep } from './utils/column-step/column-step.js'
 export { countLabel } from './utils/count-label/count-label.js'
 export { createSheet } from './utils/create-sheet/create-sheet.js'
 export {
