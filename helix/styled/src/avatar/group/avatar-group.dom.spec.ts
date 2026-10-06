@@ -299,6 +299,8 @@ describe("the count past `max`'s hooks", () => {
         return sheet.cssText ?? Array.from(sheet.cssRules ?? [], (rule) => rule.cssText).join('\n')
       })
       .join('\n')
+      /* A formatter breaks a long fallback after `var(`. */
+      .replace(/\(\s+/g, '(')
     for (const hook of [
       '--avatar-group-overflow-background-color',
       '--avatar-group-overflow-color',
