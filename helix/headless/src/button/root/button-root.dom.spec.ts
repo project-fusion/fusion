@@ -363,6 +363,19 @@ describe('a pending button', () => {
     expect(hasState(button, 'pending')).toBe(false)
   })
 
+  /* Web Awesome's button has a spinner part. The ring was the control's own
+     `::after`, which no page's stylesheet can reach. */
+  test('renders its ring as a part, hidden from a reader, only while pending', async () => {
+    const button = (await mount(
+      '<helix-headless-button pending>Save</helix-headless-button>',
+    )) as Pending
+    expect(part(button, 'spinner')?.getAttribute('aria-hidden')).toBe('true')
+    expect(part(button, 'spinner')?.parentElement).toBe(control(button) as HTMLElement)
+    button.pending = false
+    await button.updateComplete
+    expect(part(button, 'spinner')).toBeNull()
+  })
+
   test('a press reaches no listener and submits nothing', async () => {
     document.body.innerHTML =
       '<form><helix-headless-button type="submit" pending>Send</helix-headless-button></form>'
