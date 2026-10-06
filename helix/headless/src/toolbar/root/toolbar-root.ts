@@ -33,6 +33,14 @@ const NATIVE =
 const TABBABLE = NATIVE.replace('[tabindex]', '[tabindex]:not([tabindex="-1"])')
 
 /**
+ * The control inside a custom element that its tab stop was written on, by
+ * host. Remembered, because `tabindex="-1"` takes an element that is focusable
+ * only by its `tabindex` out of `TABBABLE`, and the host would then look like
+ * no control at all.
+ */
+const innerStops = new WeakMap<HTMLElement, HTMLElement>()
+
+/**
  * Whether an element takes focus itself: natively, by owning a tab stop, or
  * through a shadow root that holds something focusable.
  *
@@ -52,8 +60,37 @@ const takesFocus = (node: Element): boolean => {
     node.matches(NATIVE) ||
     ownsTabStop(node) ||
     node.shadowRoot?.delegatesFocus === true ||
-    node.shadowRoot?.querySelector(TABBABLE) != null
+    node.shadowRoot?.querySelector(TABBABLE) != null ||
+    innerStops.get(node)?.isConnected === true
   )
+}
+
+/**
+ * Where the tab stop of a control that offers no `focusable` is written.
+ *
+ * A custom element's own control, inside its open shadow root, where one is
+ * there to find: the host is markup the consumer rendered, and an attribute
+ * written on it is one a React consumer's hydration reports and does not patch
+ * up. A native element, a host that already has a `tabindex`, or a host whose
+ * shadow root is closed or holds nothing the browser tabs to takes it on
+ * itself.
+ */
+const stopOf = (node: HTMLElement): HTMLElement => {
+  if (node.hasAttribute('tabindex')) {
+    return node
+  }
+  const held = innerStops.get(node)
+  if (held?.isConnected && held.getRootNode() === node.shadowRoot) {
+    return held
+  }
+  const inner = node.localName.includes('-')
+    ? node.shadowRoot?.querySelector<HTMLElement>(TABBABLE)
+    : null
+  if (!inner) {
+    return node
+  }
+  innerStops.set(node, inner)
+  return inner
 }
 
 /**
@@ -103,6 +140,28 @@ interface Control {
  * The arrows wrap from the last control to the first. Set `stop-at-ends` to
  * keep them at the ends, as Radix's `loop` set to false does.
  *
+ * **Keyboard.** Tab enters the toolbar on the control that last had focus, the
+ * first control at the start, and the next Tab leaves it.
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Right | Moves to the next control in a horizontal toolbar, from the last back to the first. |
+ * | Left | Moves to the control before in a horizontal toolbar, from the first round to the last. |
+ * | Down, Up | The same in a vertical toolbar. |
+ * | Home, End | Moves to the first or the last control. |
+ *
+ * Left and Right swap on a right-to-left page, where the first control is on
+ * the right. The arrows across the toolbar's axis are left to the control that
+ * has focus, so a radio-style toggle group or a select answers them itself.
+ * The toolbar is `role="toolbar"` with `aria-orientation`, named by `label`.
+ *
+ * The stop moves through a control's own `focusable` property where it has
+ * one, as Button, Select and Toggle Group do. A control without one has
+ * `tabindex` written on the element that takes focus: a native element
+ * itself, or the control inside a custom element's open shadow root, so the
+ * host keeps the markup you rendered. Only a custom element whose shadow root
+ * is closed takes it on the host.
+ *
  * A toggle group of pressed buttons, `selection-mode="multiple"`, is walked
  * through the same way, each toggle a stop on the toolbar's axis, as React
  * Aria's toolbar walks its toggle buttons. Another nested composite, such as a
@@ -127,6 +186,10 @@ interface Control {
  * @slot - The toolbar's controls.
  *
  * @csspart toolbar - The toolbar container.
+ *
+ * @cssstate horizontal - The controls run along a row, which is the default.
+ * @cssstate nested - The toolbar is a group inside another toolbar, which owns the keys and the tab stop.
+ * @cssstate vertical - The controls run down a column, under `orientation="vertical"`.
  */
 @customElement('helix-headless-toolbar')
 export class HelixHeadlessToolbar extends HelixElement {
@@ -285,7 +348,7 @@ export class HelixHeadlessToolbar extends HelixElement {
       if (ownsTabStop(element)) {
         element.focusable = stop
       } else if (foreign || this.wroteForeign) {
-        element.tabIndex = stop ? 0 : -1
+        stopOf(element).tabIndex = stop ? 0 : -1
       }
     }
   }
@@ -351,7 +414,7 @@ export class HelixHeadlessToolbar extends HelixElement {
         return element.focusable
       }
       /* A composite that cannot give up its stop always holds one. */
-      return composite || element.tabIndex === 0
+      return composite || stopOf(element).tabIndex === 0
     })
     if (controls.length > 0 && !held) {
       this.setTabStop(controls[0], false)
@@ -447,8 +510,10 @@ export class HelixHeadlessToolbar extends HelixElement {
     const element = target ? this.entry(target) : undefined
     if (element && 'focusItem' in element && typeof element.focusItem === 'function') {
       element.focusItem()
-    } else {
-      element?.focus()
+    } else if (element) {
+      /* The element the stop was written on, which for a custom element is
+         its own control: its host takes no focus without a `tabindex`. */
+      ;(ownsTabStop(element) ? element : stopOf(element)).focus()
     }
   }
 
@@ -483,6 +548,13 @@ export class HelixHeadlessToolbar extends HelixElement {
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
     void this.claimTabStop()
+  }
+
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    this.toggleState('nested', this.nested)
+    this.toggleState('horizontal', this.axis === 'horizontal')
+    this.toggleState('vertical', this.axis === 'vertical')
   }
 
   protected override render(): TemplateResult {
