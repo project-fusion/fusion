@@ -1503,6 +1503,38 @@ property name to derive its attribute rather than dash-casing it, so
 `@property({ attribute: 'remove-label' })`. Nothing warns: the attribute a
 consumer would guess simply does nothing.
 
+## Built-in words are word properties
+
+A page translates a component with `registerWords(locale, { 'helix-select':
+{ placeholder: '...' } })`, which reaches a property only where `@words`
+declares it. So every English default a component ships is a word property, and
+`helix component`'s `words` rule holds a family on the registry to that.
+
+- **The headless class names its key**, the family's styled tag:
+  `static words = 'helix-select'`. The styled class inherits it, so both tiers
+  share one key, and a renamed or scoped tag keeps its words.
+- **`@words` sits above `@property`**, which still declares the attribute, so
+  every rule that reads `@property` reads a word property the same way. The
+  initializer is the English. Reading the property gives the word in the
+  element's locale: a value the page set, then the registry, then the English.
+- **A sentence is formatted with `formatWords(this, 'name', values)`.** Numbers
+  go in as numbers, and the message writes them in the element's locale.
+  `fillTemplate`, `labelWith` and `countLabel` are for families that have not
+  moved yet.
+- **A count is one plural message**, `{count, plural, one {# result} other
+  {# results}}`. A singular property such as `result-label` stays as a
+  deprecated `@property` with no default, read only where a page sets it.
+- **A word spliced into a sentence becomes a `select`**, so each choice is a
+  whole sentence: `{direction, select, ascending {...} descending {...} other
+  {...}}`. The old fragment stays, deprecated, for a page sentence that writes
+  it. A plain template literal joining a word property with other text is
+  refused.
+- **One locale rule.** Every `Intl` call that reads words, plural forms or the
+  numbers in a sentence takes `wordsLocale(this)`: the `locale` property, the
+  nearest `lang`, then the runtime's locale, and only the element's own
+  attributes on a server and while hydrating. A child that reads only its own
+  `lang` or `locale` is handed `handedLocale(this)`.
+
 ## A refusable event has a reader
 
 Everything above says what an event is called and what its description has to
