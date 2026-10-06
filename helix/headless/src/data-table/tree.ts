@@ -13,8 +13,8 @@
  * **Sorted among siblings.** A sort orders each parent's rows and leaves every
  * row under its parent, which is the only order a tree can be read in.
  */
-import { at } from '../table/column/table-column.js'
-import { type Axis, type DataRow, filter, parse, sort } from './root/order.js'
+
+import { type Axis, type DataRow, filter, parse, sort, valueAt } from '@fusion.dev/helix-core'
 
 /** Where a row sits in the tree. */
 export interface Placement {
@@ -46,7 +46,7 @@ export interface Grown {
 
 /** The rows under `row`, read from `field`: an array, or none. */
 export const childrenOf = (row: DataRow, field: string): DataRow[] => {
-  const value = at(row, field)
+  const value = valueAt(row, field)
   return Array.isArray(value) ? (value as DataRow[]) : []
 }
 

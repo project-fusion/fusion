@@ -2,7 +2,10 @@ import {
   AriaForwardController,
   commaList,
   customElement,
+  cycle,
+  type DataRow,
   fillTemplate,
+  format,
   type HelixBeforeToggleEvent,
   HelixElement,
   HelixSelectEvent,
@@ -10,8 +13,10 @@ import {
   HelixSortEvent,
   HelixSortedEvent,
   MixinCollection,
+  parse,
   reflectElements,
   requestChange,
+  sort,
   splitValues,
   toggleEvery,
   whenHydrated,
@@ -21,7 +26,6 @@ import { property, state } from 'lit/decorators.js'
 /* `static-html`'s `html`, because the checkbox's tag is interpolated. */
 import { html } from 'lit/static-html.js'
 import '../../checkbox/index.js'
-import { cycle, type DataRow, format, parse, sort } from '../../data-table/root/order.js'
 import { edgeOf, type HelixHeadlessTableColumn } from '../column/table-column.js'
 import type { HelixHeadlessTableRow } from '../row/table-row.js'
 

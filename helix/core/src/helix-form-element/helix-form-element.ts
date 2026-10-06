@@ -1,6 +1,7 @@
 import type { PropertyValues } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { HelixElement } from '../helix-element/helix-element.js'
+import { watchLabels } from '../utils/watch-labels/watch-labels.js'
 
 /** The flags a validity carries, read by name because a `ValidityState` keeps them on its prototype. */
 const VALIDITY_FLAGS = [
@@ -474,16 +475,25 @@ export class HelixFormElement extends HelixElement {
     }
   }
 
+  /** Stops listening for the labels in this control's tree. */
+  private unwatchLabels: (() => void) | undefined
+
   override connectedCallback(): void {
     super.connectedCallback()
     this.addEventListener('click', this.focusFromLabel)
     this.addEventListener('invalid', this.refreshAnchor)
+    /* A `<label for>` a framework renders after the control names it through
+       `labels`, which tells nobody: an update is what lets the control inside
+       be named by it at once, through `AriaForwardController`. */
+    this.unwatchLabels = watchLabels(this, () => this.requestUpdate())
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('click', this.focusFromLabel)
     this.removeEventListener('invalid', this.refreshAnchor)
+    this.unwatchLabels?.()
+    this.unwatchLabels = undefined
   }
 
   /**

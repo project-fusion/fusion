@@ -1,4 +1,3 @@
-export { HelixHeadlessDataTable } from './root/data-table-root.js'
 export {
   type Axis,
   cycle,
@@ -10,4 +9,5 @@ export {
   type Sort,
   sort,
   window_,
-} from './root/order.js'
+} from '@fusion.dev/helix-core'
+export { HelixHeadlessDataTable } from './root/data-table-root.js'
