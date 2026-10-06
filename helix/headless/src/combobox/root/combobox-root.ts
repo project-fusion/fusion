@@ -1008,7 +1008,13 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
       this.told = undefined
       return
     }
-    if ((active ?? null) === this.told || !onApple()) {
+    /* Only to a reader in the field: a list opened by a script, with focus
+       elsewhere, says nothing. */
+    if (
+      (active ?? null) === this.told ||
+      !onApple() ||
+      (this.renderRoot as ShadowRoot).activeElement !== this.partNamed('control')
+    ) {
       return
     }
     if (this.told === undefined) {
