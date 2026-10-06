@@ -14,15 +14,14 @@
  * elements on a page would read as the slowest.
  */
 
+import { callListener } from '../call-listener/call-listener.js'
+
 /** The key the listener is kept under. `@fusion.dev/helix-diagnostics` names the same string. */
 export const RENDER_SLOT = Symbol.for('fusion.dev/helix/render')
 
 /** Whether anything is measuring, read before each first update. */
 export const measuring = (): boolean =>
   typeof (globalThis as Record<symbol, unknown>)[RENDER_SLOT] === 'function'
-
-/** Whether a listener's failure has been printed, so a failing listener prints once. */
-let told = false
 
 /**
  * Tells the listener, where there is one, how long `element`'s first update
@@ -33,19 +32,5 @@ let told = false
  * once.
  */
 export const reportRender = (element: HTMLElement, start: number, duration: number): void => {
-  const listener = (globalThis as Record<symbol, unknown>)[RENDER_SLOT]
-  if (typeof listener !== 'function') {
-    return
-  }
-  try {
-    listener(element, { duration, start })
-  } catch (error) {
-    if (!told) {
-      told = true
-      console.error(
-        'helix: a render listener threw, and the element rendered as usual. Later failures are not printed.',
-        error,
-      )
-    }
-  }
+  callListener(RENDER_SLOT, 'render', 'the element rendered as usual', element, { duration, start })
 }
