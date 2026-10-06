@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import type { DataRow } from './root/order.js'
+import type { DataRow } from '@fusion.dev/helix-core'
 import { childrenOf, grow } from './tree.js'
 
 const axes = [{ field: 'name', order: (row: DataRow) => row.name }]

@@ -2,7 +2,6 @@ import type { ReactiveController, ReactiveControllerHost } from 'lit'
 import { auditName } from '#audit-name'
 import { elementById } from '../../utils/element-by-id/element-by-id.js'
 import { nameText } from '../../utils/name-text/name-text.js'
-import { watchLabels } from '../../utils/watch-labels/watch-labels.js'
 
 /** What the controller needs to know: which element inside is the control. */
 export interface AriaForwardOptions {
@@ -141,8 +140,8 @@ const STATES = [
  * and the host is a generic the reader never lands on, so a `<label for>` or a
  * wrapping `<label>` left the textbox unnamed. The labels travel the same way a
  * forwarded `aria-labelledby` does, as element references, and are read again
- * whenever a label in the host's tree changes (`watchLabels`), since a label
- * can be added without the host hearing.
+ * on every update, which a form control asks for whenever a label in its tree
+ * changes (`watchLabels`), and as focus arrives.
  */
 export class AriaForwardController implements ReactiveController {
   private readonly host: ReactiveControllerHost & HTMLElement
@@ -298,7 +297,6 @@ export class AriaForwardController implements ReactiveController {
   }
 
   hostConnected(): void {
-    this.unwatchLabels = watchLabels(this.host, this.refresh)
     this.observer = new MutationObserver(() => this.forward())
     this.observer.observe(this.host, {
       attributeFilter: [
@@ -315,15 +313,10 @@ export class AriaForwardController implements ReactiveController {
   hostDisconnected(): void {
     this.observer?.disconnect()
     this.observer = undefined
-    this.unwatchLabels?.()
-    this.unwatchLabels = undefined
     this.host.removeEventListener('focusin', this.refresh)
   }
 
-  /** Stops watching the labels in the host's tree. */
-  private unwatchLabels: (() => void) | undefined
-
-  /** Forwards again when a label in the host's tree changes, or focus arrives. */
+  /** Forwards again as focus arrives. */
   private readonly refresh = (): void => {
     this.forward()
   }

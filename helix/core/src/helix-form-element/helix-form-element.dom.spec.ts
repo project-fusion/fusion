@@ -22,6 +22,7 @@ type Probe = HTMLElement & {
   validationAnchor(anchor?: HTMLElement): HTMLElement | undefined
   validationMessage: string
   validity: ValidityState
+  requestUpdate(...args: unknown[]): void
   willValidate: boolean
 }
 
@@ -167,5 +168,24 @@ describe('a fieldset that disabled the control', () => {
     host.disabled = false
     await host.updateComplete
     expect(host.isDisabled).toBe(false)
+  })
+})
+
+describe('a label that arrives after the control', () => {
+  /* A framework renders the `<label for>` after the field, and the platform
+     tells the host nothing, so the control inside stayed unnamed until it
+     took focus. An update is what lets AriaForwardController name it. */
+  test('asks the control to update, so the label can name what is inside it', async () => {
+    const host = await mount('<probe-form-control id="late"></probe-form-control>')
+    let asked = 0
+    const original = host.requestUpdate.bind(host)
+    host.requestUpdate = (...args: Parameters<typeof original>) => {
+      asked += 1
+      return original(...args)
+    }
+    document.body.insertAdjacentHTML('afterbegin', '<label for="late">Email</label>')
+    await new Promise((done) => setTimeout(done, 0))
+    expect(asked).toBeGreaterThan(0)
+    host.remove()
   })
 })

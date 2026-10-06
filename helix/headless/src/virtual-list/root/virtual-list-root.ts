@@ -14,11 +14,12 @@ import {
   toggleValue,
   typesCharacter,
   VirtualizeController,
+  valueAt,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, render, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { holdControls, releaseControls } from '../controls.js'
-import { fillHoles, textOf, valueAt } from '../fill.js'
+import { fillHoles, textOf } from '../fill.js'
 import { stepIndex } from '../keys.js'
 import { drawPlan, stopAfter } from '../plan.js'
 

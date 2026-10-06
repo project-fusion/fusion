@@ -12,30 +12,7 @@
  * A field is a key, or a path of keys joined by dots (`author.name`).
  */
 
-/**
- * The value at `path` in `item`, or `undefined` where the path leads nowhere.
- *
- * A dot separates keys, so `author.name` reads `item.author.name`. A key that
- * holds a dot itself is read whole first, which keeps a flat record with a key
- * such as `"v1.2"` working.
- */
-export const valueAt = (item: unknown, path: string): unknown => {
-  if (item === null || typeof item !== 'object') {
-    return undefined
-  }
-  const record = item as Record<string, unknown>
-  if (path in record) {
-    return record[path]
-  }
-  let value: unknown = record
-  for (const key of path.split('.')) {
-    if (value === null || typeof value !== 'object') {
-      return undefined
-    }
-    value = (value as Record<string, unknown>)[key]
-  }
-  return value
-}
+import { valueAt } from '@fusion.dev/helix-core'
 
 /**
  * The text a value takes in a row.

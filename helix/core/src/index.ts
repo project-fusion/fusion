@@ -494,6 +494,22 @@ export {
 } from './utils/resolve-active-item/resolve-active-item.js'
 export { holdCaret, restoreValue } from './utils/restore-value/restore-value.js'
 export { type RovingOptions, rovingStop } from './utils/roving-stop/roving-stop.js'
+export { valueAt } from './utils/row-data/row-data.js'
+export {
+  type Arranged,
+  type Axis,
+  arranged,
+  cycle,
+  type DataRow,
+  filter,
+  format,
+  type Ordered,
+  ordered,
+  parse,
+  type Sort,
+  sort,
+  window_,
+} from './utils/row-order/row-order.js'
 export { extent, linear, type Scale } from './utils/scale/scale.js'
 export { ticks } from './utils/scale/ticks.js'
 export {

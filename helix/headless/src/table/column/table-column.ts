@@ -8,6 +8,7 @@ import {
   inlineStep,
   isRtl,
   requestChange,
+  valueAt,
 } from '@fusion.dev/helix-core'
 import { dotsThreeVertical } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type ReactiveElement, type TemplateResult } from 'lit'
@@ -24,32 +25,6 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * `undefined` falls back to the field.
  */
 export type CellReader = (row: Readonly<Record<string, unknown>>) => unknown
-
-/**
- * A dot path resolved against a row.
- *
- * Written here rather than taken from a library, because the whole of what is
- * needed is "walk the keys and stop at the first thing that is not an object".
- * Returns `undefined` for a path that does not resolve, which the table renders
- * as an empty cell: a missing key is a hole in the data and drawing `undefined`
- * into a table tells a reader the software is broken rather than the row is.
- */
-export const at = (row: Readonly<Record<string, unknown>>, path: string): unknown => {
-  if (path === '') {
-    return undefined
-  }
-  if (!path.includes('.')) {
-    return row[path]
-  }
-  let cursor: unknown = row
-  for (const key of path.split('.')) {
-    if (cursor === null || typeof cursor !== 'object') {
-      return undefined
-    }
-    cursor = (cursor as Record<string, unknown>)[key]
-  }
-  return cursor
-}
 
 /** The edges a column's `text-align` may name. */
 const EDGES = new Set(['center', 'end', 'start'])
@@ -407,7 +382,7 @@ export class HelixHeadlessTableColumn extends HelixElement {
    */
   read(row: Readonly<Record<string, unknown>>): unknown {
     const rendered = this.cell?.(row)
-    return rendered === undefined ? at(row, this.field) : rendered
+    return rendered === undefined ? valueAt(row, this.field) : rendered
   }
 
   /**
@@ -416,7 +391,7 @@ export class HelixHeadlessTableColumn extends HelixElement {
    */
   order(row: Readonly<Record<string, unknown>>): unknown {
     const compared = this.compare?.(row)
-    return compared === undefined ? at(row, this.field) : compared
+    return compared === undefined ? valueAt(row, this.field) : compared
   }
 
   protected override willUpdate(changed: PropertyValues): void {
