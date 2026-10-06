@@ -1,9 +1,10 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  await import('../../toolbar/index.js')
 })
 
 const line = (host: HTMLElement): Element | null => part(host, 'line')
@@ -52,5 +53,81 @@ describe('divider semantics', () => {
   test('an announced separator with no orientation is horizontal', async () => {
     const divider = await mount('<helix-headless-divider announced></helix-headless-divider>')
     expect(line(divider)?.getAttribute('aria-orientation')).toBe('horizontal')
+  })
+})
+
+/* React Aria's separator inside a toolbar takes the toolbar's other axis. A
+   divider in a horizontal toolbar was a horizontal separator, and drew as one,
+   unless the page wrote `orientation="vertical"` on it. */
+describe('inside a toolbar', () => {
+  const inside = async (
+    toolbar: string,
+    divider = '<helix-headless-divider></helix-headless-divider>',
+  ) => {
+    const host = await mount(toolbar.replace('><', `>${divider}<`))
+    const found = host.querySelector('helix-headless-divider') as HTMLElement & {
+      updateComplete: Promise<unknown>
+    }
+    await found.updateComplete
+    return found
+  }
+
+  test('runs across a horizontal toolbar, as a vertical separator', async () => {
+    const divider = await inside('<helix-headless-toolbar></helix-headless-toolbar>')
+    expect(line(divider)?.getAttribute('role')).toBe('separator')
+    expect(line(divider)?.getAttribute('aria-orientation')).toBe('vertical')
+    expect(hasState(divider, 'vertical')).toBe(true)
+    expect(divider.hasAttribute('orientation')).toBe(false)
+  })
+
+  test('runs across a vertical toolbar, as a horizontal separator', async () => {
+    const divider = await inside(
+      '<helix-headless-toolbar orientation="vertical"></helix-headless-toolbar>',
+    )
+    expect(line(divider)?.getAttribute('aria-orientation')).toBe('horizontal')
+    expect(hasState(divider, 'vertical')).toBe(false)
+  })
+
+  test("in the page's own toolbar role, by its `aria-orientation`", async () => {
+    expect(line(await inside('<div role="toolbar"></div>'))?.getAttribute('aria-orientation')).toBe(
+      'vertical',
+    )
+    const across = await inside('<div role="toolbar" aria-orientation="vertical"></div>')
+    expect(line(across)?.getAttribute('aria-orientation')).toBe('horizontal')
+  })
+
+  test('an `orientation` the page wrote still wins', async () => {
+    const divider = await inside(
+      '<helix-headless-toolbar></helix-headless-toolbar>',
+      '<helix-headless-divider orientation="horizontal"></helix-headless-divider>',
+    )
+    expect(line(divider)?.getAttribute('aria-orientation')).toBe('horizontal')
+    expect(hasState(divider, 'vertical')).toBe(false)
+  })
+
+  test('turns again when the toolbar turns', async () => {
+    const divider = await inside('<helix-headless-toolbar></helix-headless-toolbar>')
+    const toolbar = divider.parentElement as HTMLElement & { updateComplete: Promise<unknown> }
+    toolbar.setAttribute('orientation', 'vertical')
+    await toolbar.updateComplete
+    await (divider as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    expect(line(divider)?.getAttribute('aria-orientation')).toBe('horizontal')
+  })
+
+  test('reads the toolbar again when it moves into one', async () => {
+    const divider = await mount('<helix-headless-divider></helix-headless-divider>')
+    expect(hasState(divider, 'vertical')).toBe(false)
+    const toolbar = document.createElement('helix-headless-toolbar')
+    document.body.append(toolbar)
+    toolbar.append(divider)
+    await (divider as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    expect(hasState(divider, 'vertical')).toBe(true)
+  })
+
+  test('a vertical divider outside a toolbar has the state too', async () => {
+    const divider = await mount(
+      '<helix-headless-divider orientation="vertical"></helix-headless-divider>',
+    )
+    expect(hasState(divider, 'vertical')).toBe(true)
   })
 })

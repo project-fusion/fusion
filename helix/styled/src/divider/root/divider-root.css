@@ -54,7 +54,7 @@
   );
 }
 
-:host([orientation="vertical"]) {
+:host(:state(vertical)) {
   padding-block-end: var(--divider-padding-end, var(--divider-padding, var(--helix-space-none)));
   padding-block-start: var(
     --divider-padding-start,
@@ -66,13 +66,13 @@
 /* Stretches to the flex or grid parent rather than declaring a height, so a
    divider between toolbar items matches the items without being told how tall
    they are. */
-:host([orientation="vertical"]) {
+:host(:state(vertical)) {
   align-self: stretch;
   display: inline-flex;
   flex-direction: column;
 }
 
-:host([orientation="vertical"]) [part="content"] {
+:host(:state(vertical)) [part="content"] {
   margin-block: var(--divider-content-gap, var(--helix-space-sm));
   margin-inline: var(--helix-space-none);
 }
@@ -83,8 +83,7 @@
 
 /* `flex: 1` rather than `inline-size: 100%`, so the two halves share whatever is
    left after the content instead of each demanding the whole width. */
-:host(:not([orientation])) [part="line"],
-:host([orientation="horizontal"]) [part="line"] {
+:host(:not(:state(vertical))) [part="line"] {
   block-size: var(--_divider-thickness);
   flex: 1 1 0;
 }
@@ -97,11 +96,11 @@
  * the height of the text, not of the tallest thing beside it. Measured on the
  * insight byline, 28px against a 14px line.
  */
-:host([orientation="vertical"]) {
+:host(:state(vertical)) {
   block-size: var(--divider-length, auto);
 }
 
-:host([orientation="vertical"]) [part="line"] {
+:host(:state(vertical)) [part="line"] {
   flex: 1 1 0;
   inline-size: var(--_divider-thickness);
   /* A stretched parent may resolve to zero height, in which case the rule would

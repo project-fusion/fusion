@@ -1,4 +1,10 @@
-import { customElement, HelixElement, markRegion } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  HelixElement,
+  markRegion,
+  toolbarAround,
+  toolbarAxis,
+} from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -18,9 +24,15 @@ import { property } from 'lit/decorators.js'
  * under a heading or between the facts of a byline, and it leaves the
  * accessibility tree.
  *
- * Use `orientation="vertical"` between items on one line, such as inside a
- * toolbar. A vertical divider stretches to fit its flex parent and sets no
- * height of its own.
+ * Use `orientation="vertical"` between items on one line. A vertical divider
+ * stretches to fit its flex parent and sets no height of its own.
+ *
+ * **Inside a toolbar it runs across the toolbar** without being told: vertical
+ * in a horizontal toolbar and horizontal in a vertical one, with
+ * `aria-orientation` to match, as React Aria's separator does inside a
+ * toolbar. Inside means a child of Toolbar or of the page's own
+ * `role="toolbar"`. An `orientation` you write still wins. A server cannot see
+ * the toolbar, so the turn arrives with hydration, inside the shadow root.
  *
  * @since 0.1.0
  * @status stable
@@ -32,6 +44,8 @@ import { property } from 'lit/decorators.js'
  *
  * @csspart content - The content set into the line.
  * @csspart line - The line, or each half of it when content is set into it.
+ *
+ * @cssstate vertical - The line runs vertically: `orientation="vertical"`, or no `orientation` inside a horizontal toolbar.
  */
 @customElement('helix-headless-divider')
 export class HelixHeadlessDivider extends HelixElement {
@@ -59,9 +73,32 @@ export class HelixHeadlessDivider extends HelixElement {
 
   /**
    * The direction the line runs: `horizontal` or `vertical`.
+   *
+   * Unset is horizontal, or across the toolbar the divider sits in.
    */
   @property({ reflect: true })
   orientation?: 'horizontal' | 'vertical'
+
+  /**
+   * The direction the line is drawn and announced in: `orientation`, else
+   * across the toolbar around it, else horizontal.
+   *
+   * The toolbar is read only where the tree is known, never while hydrating
+   * what a server sent, whose render has to be the server's.
+   */
+  private get drawn(): 'horizontal' | 'vertical' {
+    const toolbar = this.orientation || this.hydrating ? null : toolbarAround(this)
+    if (toolbar) {
+      return toolbarAxis(toolbar) === 'vertical' ? 'horizontal' : 'vertical'
+    }
+    return this.orientation ?? 'horizontal'
+  }
+
+  /** Reads the toolbar again when the divider moves into or out of one. */
+  override connectedCallback(): void {
+    super.connectedCallback()
+    this.requestUpdate()
+  }
 
   /**
    * Marks the middle region when nothing has been set into it.
@@ -81,6 +118,16 @@ export class HelixHeadlessDivider extends HelixElement {
        stay, since `[hidden]` is a UA rule and a sheet setting `display` on this
        part outranks it. */
     markRegion(this.renderRoot, 'content', [''])
+  }
+
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    this.toggleState('vertical', this.drawn === 'vertical')
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.finishHydration()
   }
 
   protected override updated(changed: PropertyValues): void {
@@ -114,7 +161,7 @@ export class HelixHeadlessDivider extends HelixElement {
       part="line"
       role=${separator ? 'separator' : 'presentation'}
       aria-labelledby=${separator ? 'content' : nothing}
-      aria-orientation=${separator ? (this.orientation ?? 'horizontal') : nothing}
+      aria-orientation=${separator ? this.drawn : nothing}
     ></div>
       <span id="content" part="content"><slot @slotchange=${() => this.markEmpty()}></slot></span>
       <div part="line" role="presentation"></div>`

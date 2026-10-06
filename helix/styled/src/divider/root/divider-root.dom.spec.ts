@@ -48,7 +48,26 @@ describe('divider', () => {
     // are; in a byline the hook says how long, and a floor keeps it visible.
     expect(sheet()).toContain('align-self: stretch')
     expect(sheet()).toContain('block-size: var(--divider-length, auto)')
-    expect(rule(':host([orientation="vertical"]) [part="line"]')).toContain('min-block-size: 1em')
+    expect(rule(':host(:state(vertical)) [part="line"]')).toContain('min-block-size: 1em')
+  })
+
+  /* A divider in a horizontal toolbar is vertical without an `orientation` of
+     its own, so the sheet draws on the state the base tier sets, never on the
+     attribute alone. */
+  test('draws vertical on the state, which a toolbar sets as well as `orientation`', async () => {
+    expect(sheet()).not.toContain('[orientation="vertical"]')
+    expect(rule(':host(:not(:state(vertical))) [part="line"]')).toContain(
+      'block-size: var(--_divider-thickness)',
+    )
+    await import('../../toolbar/index.js')
+    const toolbar = await mount(
+      '<helix-toolbar label="Format"><helix-divider></helix-divider></helix-toolbar>',
+    )
+    const divider = toolbar.querySelector('helix-divider') as HTMLElement & {
+      updateComplete: Promise<unknown>
+    }
+    await divider.updateComplete
+    expect(part(divider, 'line')?.getAttribute('aria-orientation')).toBe('vertical')
   })
 
   test('the inset comes off the ends of the rule, one hook for both and a pair for each', () => {

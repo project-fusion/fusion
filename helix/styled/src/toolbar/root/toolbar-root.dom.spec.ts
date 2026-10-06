@@ -70,6 +70,14 @@ describe('toolbar', () => {
     expect(rule('[part="toolbar"]')).toContain('gap: var(--toolbar-gap, var(--helix-space-2xs))')
   })
 
+  /* A divider in a column turns horizontal, and a horizontal line is as long
+     as its box: centered in the column, it was 0px wide. */
+  test('a divider across a column stretches to its width', () => {
+    expect(rule(':host([orientation="vertical"]) ::slotted(helix-divider)')).toContain(
+      'align-self: stretch',
+    )
+  })
+
   /* Dense was the only answer; a toolbar of larger controls had to restate
      every step on a wrapper. */
   test('size makes every control larger together, and rests on nothing', async () => {

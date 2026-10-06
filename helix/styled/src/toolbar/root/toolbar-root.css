@@ -69,7 +69,11 @@
   margin-inline: var(--toolbar-separator-gap, 0);
 }
 
+/* Across a column the divider is horizontal, and a horizontal line is as long
+   as its box, which a column of controls centered on its axis shrank to
+   nothing. */
 :host([orientation="vertical"]) ::slotted(helix-divider) {
+  align-self: stretch;
   margin-block: var(--toolbar-separator-gap, 0);
   margin-inline: 0;
 }

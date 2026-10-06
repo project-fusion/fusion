@@ -24,7 +24,7 @@ export function Example() {
         </helix-menu-item>
       </helix-menu-item>
 
-      <helix-divider announced></helix-divider>
+      <helix-divider></helix-divider>
 
       <helix-menu-item
         checkable

@@ -52,8 +52,8 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
  * onto your element after it upgrades causes a hydration mismatch.
  *
  * Group rows under a heading with `Menu.Section`, which is a `group` named by
- * its heading. Between runs of rows, a `<helix-divider announced>` is a
- * separator a screen reader announces.
+ * its heading. Between runs of rows, a `<helix-divider>` is a separator a
+ * screen reader announces.
  *
  * Keys: Enter, Space or Down Arrow on the trigger opens the menu on its first
  * row, and Up Arrow on its last. In the menu, Up and Down Arrow move between

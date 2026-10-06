@@ -11,6 +11,7 @@ import {
   reportValues,
   rovingStop,
   toggleValue,
+  toolbarAround,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -410,9 +411,7 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
     if (!this.multiple) {
       return 'radiogroup'
     }
-    return this.parentElement?.closest('[role=toolbar],helix-toolbar,helix-headless-toolbar')
-      ? 'group'
-      : 'toolbar'
+    return toolbarAround(this) ? 'group' : 'toolbar'
   }
 
   protected override willUpdate(changed: PropertyValues): void {

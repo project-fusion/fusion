@@ -18,7 +18,7 @@ export function Example() {
         </helix-menu-item>
       </helix-menu-section>
 
-      <helix-divider announced></helix-divider>
+      <helix-divider></helix-divider>
 
       <helix-menu-section label="Clipboard">
         <helix-menu-item
