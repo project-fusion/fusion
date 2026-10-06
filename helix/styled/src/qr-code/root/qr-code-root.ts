@@ -22,11 +22,14 @@ import { styles } from './qr-code-root.css.js'
  *
  * @cssproperty --qr-code-background-color - The fill behind the modules, including the quiet zone and the logo's box.
  * @cssproperty --qr-code-color - Color of the dark modules. Defaults to the dark media ink, which is the same in both color schemes so the code scans.
+ * @cssproperty --qr-code-fallback-padding - The space around the fallback inside the square.
  * @cssproperty --qr-code-finder-color - Color of the three corner squares. Defaults
  * to the color of the modules.
  * @cssproperty --qr-code-logo-padding - The clear space around the center logo.
+ * @cssproperty --qr-code-logo-radius - The corner radius of the logo's box.
  * @cssproperty --qr-code-logo-size - How much of the center a logo can cover.
  * Defaults to `27%`, which `H` correction allows, because it can lose thirty percent.
+ * @cssproperty --qr-code-radius - The corner radius of the square.
  * @cssproperty --qr-code-size - How wide the square is. Defaults to `12rem`.
  */
 @customElement('helix-qr-code')

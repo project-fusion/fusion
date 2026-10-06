@@ -5,7 +5,7 @@
   /* Ink on paper, which is the media pair the other way up. */
   background-color: var(--qr-code-background-color, var(--helix-color-foreground-media));
   block-size: var(--_qr-size);
-  border-radius: var(--helix-radii-sm);
+  border-radius: var(--qr-code-radius, var(--helix-radii-sm));
   color: var(--qr-code-color, var(--helix-color-surface-media));
   display: block;
   inline-size: var(--_qr-size);
@@ -27,7 +27,7 @@
   display: flex;
   justify-content: center;
   overflow-wrap: anywhere;
-  padding: var(--helix-space-md);
+  padding: var(--qr-code-fallback-padding, var(--helix-space-md));
   text-align: center;
 }
 
@@ -43,7 +43,7 @@
      surface flips to near black in the dark, and drew a dark square in the
      middle of a white code. */
   background-color: var(--qr-code-background-color, var(--helix-color-foreground-media));
-  border-radius: var(--helix-radii-sm);
+  border-radius: var(--qr-code-logo-radius, var(--helix-radii-sm));
   /* A quiet zone of its own. */
   box-sizing: border-box;
   display: flex;
@@ -57,6 +57,13 @@
   padding: var(--qr-code-logo-padding, 6%);
   position: absolute;
   translate: -50% -50%;
+}
+
+/* *The inline start is the right edge in a right-to-left page**, so the box
+   moves back the other way. With the same translate it sat a whole width off
+   center, over modules a scanner reads. */
+:host(:dir(rtl)) [part="logo"] {
+  translate: 50% -50%;
 }
 
 /* Whatever is in it is fitted to the room it has, so a consumer's mark of any
