@@ -1,5 +1,6 @@
 import {
   customElement,
+  focusItemOf,
   HelixElement,
   KeyboardNavigationController,
   type NavigableItem,
@@ -25,13 +26,12 @@ import { HelixHeadlessAccordionItem } from '../item/accordion-item.js'
  * Arriving chooses nothing, since a trigger is not a choice. A disabled item
  * is skipped, its trigger being a disabled button that cannot take focus.
  */
-const navigable = (item: HelixHeadlessAccordionItem): NavigableItem => ({
-  contains: (node) => node === item,
-  disabled: item.disabled,
-  focusItem: () => item.focusTrigger(),
-  select: () => {},
-  selected: false,
-})
+const navigable = (item: HelixHeadlessAccordionItem): NavigableItem =>
+  focusItemOf(item, {
+    disabled: item.disabled,
+    focus: () => item.focusTrigger(),
+    owns: (node) => node === item,
+  })
 
 /**
  * @summary A group of collapsible sections.

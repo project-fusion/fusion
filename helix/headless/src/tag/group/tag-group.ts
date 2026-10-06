@@ -3,14 +3,14 @@ import {
   customElement,
   deepActiveElement,
   deepContains,
-  HelixBeforeChangeEvent,
+  focusItemOf,
   HelixElement,
   hostAria,
   KeyboardNavigationController,
   type NavigableItem,
   pressedValue,
   prunedValue,
-  requestChange,
+  requestValue,
   rovingStop,
   type SelectionMode,
   slottedWords,
@@ -143,15 +143,12 @@ export class HelixHeadlessTagGroup extends HelixElement {
   }
 
   /** A tag as the keyboard controller sees it: an item it moves focus to and never chooses. */
-  private navigable(tag: HelixHeadlessTag): NavigableItem & { words: string } {
-    return {
-      contains: (node) => tag.contains(node),
+  private navigable(tag: HelixHeadlessTag): NavigableItem {
+    return focusItemOf(tag, {
       disabled: tag.disabled,
-      focusItem: () => tag.focusItem(),
-      select: () => {},
-      selected: false,
+      focus: () => tag.focusItem(),
       words: tag.words,
-    }
+    })
   }
 
   /**
@@ -211,14 +208,8 @@ export class HelixHeadlessTagGroup extends HelixElement {
     if (mode === 'none' || tag.disabled) {
       return
     }
-    requestChange({
-      apply: (value) => {
-        this.value = value
-        this.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
-      },
-      event: (value) => new HelixBeforeChangeEvent({ value }),
-      host: this,
-      next: pressedValue(mode, this.written, this.valueFor(tag)),
+    requestValue(this, pressedValue(mode, this.written, this.valueFor(tag)), (value) => {
+      this.value = value
     })
   }
 

@@ -14,6 +14,7 @@ import {
   fillTemplate,
   format,
   formatNumbers,
+  gridMove,
   HelixActivateEvent,
   type HelixBeforeToggleEvent,
   HelixElement,
@@ -36,10 +37,12 @@ import {
   markRegion,
   onAndroid,
   ordered,
+  pageRows,
   parse,
   rangeAdd,
   reportRuntime,
   requestChange,
+  scrollRoom,
   selectsAll,
   Typeahead,
   toggleEvery,
@@ -2309,11 +2312,10 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
 
   /** How many rows Page Up and Page Down move: those that fit in view, less one. */
   private pageStep(cell: HTMLElement): number {
-    const box = this.partNamed('table')
-    const tall = cell.getBoundingClientRect().height || this.estimate
-    const scrolls = box !== null && box.scrollHeight > box.clientHeight + 1
-    const room = scrolls ? box.clientHeight - this.headHeight() : window.innerHeight
-    return Math.max(1, Math.floor(room / tall) - 1)
+    return pageRows(
+      scrollRoom(this.partNamed('table'), { covered: this.headHeight() }),
+      cell.getBoundingClientRect().height || this.estimate,
+    )
   }
 
   /** How tall the headings are, which stick over the rows in a windowed table. */
@@ -2440,8 +2442,6 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       return
     }
     const last = this.drawnPage.length - 1 + (this.moreDrawn ? 1 : 0)
-    const edge = this.width - 1
-    const control = event.ctrlKey || event.metaKey
     if (!event.shiftKey && selectsAll(event) && this.selectable) {
       event.preventDefault()
       this.requestSelected(new Set([...this.chosen, ...this.everyKey]))
@@ -2457,43 +2457,28 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       }
       return
     }
-    let { column, row } = place
-    switch (event.key) {
-      case 'ArrowUp':
-        row = Math.max(-1, row - 1)
-        break
-      case 'ArrowDown':
-        row = Math.min(last, row + 1)
-        break
-      case 'ArrowLeft':
-      case 'ArrowRight':
-        if (this.treeKey(event, place)) {
-          return
-        }
-        column = Math.max(0, Math.min(edge, column + inlineStep(this, event.key)))
-        break
-      case 'Home':
-        row = control ? -1 : row
-        column = 0
-        break
-      case 'End':
-        row = control ? Math.max(row, last) : row
-        column = edge
-        break
-      case 'PageUp':
-        row = Math.max(-1, row - this.pageStep(place.cell))
-        break
-      case 'PageDown':
-        row = Math.min(last, row + this.pageStep(place.cell))
-        break
-      case 'Enter':
-      case ' ':
-      case 'F2':
-        this.activate(event, place)
-        return
-      default:
-        return
+    if (event.key === 'Enter' || event.key === ' ' || event.key === 'F2') {
+      this.activate(event, place)
+      return
     }
+    if ((event.key === 'ArrowLeft' || event.key === 'ArrowRight') && this.treeKey(event, place)) {
+      return
+    }
+    /* The map Table's `grid` reads, with the row of headings always on top. */
+    const to = gridMove(
+      event.key,
+      place,
+      { last, top: -1, width: this.width },
+      {
+        control: event.ctrlKey || event.metaKey,
+        page: event.key.startsWith('Page') ? this.pageStep(place.cell) : 1,
+        step: inlineStep(this, event.key),
+      },
+    )
+    if (!to) {
+      return
+    }
+    const { column, row } = to
     event.preventDefault()
     /* Shift with Up or Down takes the rows it crosses into the selection. */
     if (

@@ -2,6 +2,7 @@ import {
   AriaForwardController,
   customElement,
   focusableElements,
+  focusItemOf,
   HelixElement,
   IndicatorController,
   KeyboardNavigationController,
@@ -25,16 +26,13 @@ const navigable = (item: HTMLElement): NavigableItem => {
   const control = (): HTMLElement | undefined =>
     (item as HTMLElement & { navigationControl?: HTMLElement }).navigationControl ??
     (item.matches(FOCUSABLE) ? item : focusableElements(item)[0])
-  return {
-    contains: (node) => {
+  return focusItemOf(item, {
+    focus: () => control()?.focus(),
+    owns: (node) => {
       const target = control()
       return target !== undefined && node !== null && (node === target || target.contains(node))
     },
-    disabled: false,
-    focusItem: () => control()?.focus(),
-    select: () => {},
-    selected: false,
-  }
+  })
 }
 
 /**

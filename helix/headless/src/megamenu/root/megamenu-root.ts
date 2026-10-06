@@ -3,6 +3,7 @@ import {
   customElement,
   deepContains,
   focusableElements,
+  focusItemOf,
   HelixElement,
   KeyboardNavigationController,
   MixinControllerOpen,
@@ -269,18 +270,9 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
   protected readonly keys = new KeyboardNavigationController(this, {
     items: () =>
       !this.parentElement?.shadowRoot
-        ? HelixHeadlessMegamenu.bar.alongside(this).map(
-            (megamenu): NavigableItem => ({
-              contains: (node) => {
-                const control = megamenu.trigger
-                return node === control || control.contains(node)
-              },
-              disabled: false,
-              focusItem: () => megamenu.trigger.focus(),
-              select: () => {},
-              selected: false,
-            }),
-          )
+        ? HelixHeadlessMegamenu.bar
+            .alongside(this)
+            .map((megamenu): NavigableItem => focusItemOf(megamenu.trigger))
         : [],
     origin: 'focus',
     reserved: () => ['ArrowDown', 'ArrowUp'],

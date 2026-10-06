@@ -1,4 +1,5 @@
 import {
+  ChildrenController,
   customElement,
   fillTemplate,
   HelixBeforePinEvent,
@@ -399,8 +400,18 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
    */
   private words: TurnWords = TURN_WORDS
 
-  /** Watches for turns arriving, since a manual slot hears nothing about them. */
-  private watcher: MutationObserver | undefined = undefined
+  /**
+   * Watches for turns arriving, since a manual slot hears nothing about them.
+   *
+   * **A turn that arrives after first paint reaches nothing on its own.**
+   * Slots are assigned by hand here, so appending a child assigns it to
+   * nothing, fires no `slotchange`, and schedules no render: the transcript
+   * went on showing "Nothing to show" over six children it already had, and
+   * the one thing a conversation does is grow. Measured with
+   * `assignedElements()` at zero against `children` at nine. Children only,
+   * never a turn's own text, which a streaming turn rewrites every frame.
+   */
+  protected readonly childWatch = new ChildrenController(this, () => this.handleSlotChange())
 
   /** Watches the turns' own `state`, which is when one of them settles. */
   private settling: MutationObserver | undefined = undefined
@@ -826,19 +837,6 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
 
   override connectedCallback(): void {
     super.connectedCallback()
-    /* **A turn that arrives after first paint reaches nothing on its own.**
-       Slots are assigned by hand here, so appending a child assigns it to
-       nothing, fires no `slotchange`, and schedules no render: the transcript
-       went on showing "Nothing to show" over six children it already had, and
-       the one thing a conversation does is grow. Measured with `assignedElements()`
-       at zero against `children` at nine.
-
-       `childList` and not `subtree`, which is the difference between watching a
-       conversation and watching every token of it: a streaming turn rewrites its
-       own text on every frame, and a subtree observer would re-render the whole
-       transcript each time for a change inside a child that owns it. */
-    this.watcher = new MutationObserver(this.handleSlotChange)
-    this.watcher.observe(this, { childList: true })
     /* The one thing inside a turn worth hearing about, and `attributeFilter`
        keeps it to that: a subtree watch of `state` alone never sees a token. */
     this.settling = new MutationObserver(this.handleSettle)
@@ -865,8 +863,6 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
-    this.watcher?.disconnect()
-    this.watcher = undefined
     this.settling?.disconnect()
     this.settling = undefined
     this.grower?.disconnect()

@@ -225,9 +225,7 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
        bubble disagreed about which column is which is the fault that made it
        shared. */
     const columns = this.plottedColumns
-    const names = columns.map(
-      (column) => rows.find((row) => row.cells[column])?.cells[column]?.name ?? '',
-    )
+    const names = columns.map((column) => this.columnName(column))
     /* A part a legend hid is none of the total, so its band closes and the
        top edge is the sum of the parts still drawn. It keeps its place, and so
        its color. */

@@ -8,6 +8,7 @@ import {
   HelixBeforeChangeEvent,
   HelixFormElement,
   HelixRejectEvent,
+  labelWith,
   MixinField,
   requestChange,
   restoreValue,
@@ -24,14 +25,6 @@ import { barOf, type FileStatus, saysStatus } from '../status.js'
 export type { FileStatus } from '../status.js'
 
 import '../../tag/index.js'
-
-/**
- * A label with the file's name in it: where `{name}` says, or after the label
- * where it says nothing, which is how a `remove-label` written before the
- * placeholder existed was always read.
- */
-const named = (label: string, name: string): string =>
-  label.includes('{name}') ? fillTemplate(label, { name }) : `${label} ${name}`
 
 /**
  * A file's size, at the largest unit that leaves a number worth reading.
@@ -797,7 +790,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
               part="progress"
               max="1"
               value=${bar === 'unmeasured' ? nothing : bar}
-              aria-label=${named(this.progressLabel, file.name)}
+              aria-label=${labelWith(this.progressLabel, 'name', file.name)}
             ></progress>`
       }${status.text ? html`<span part="status-text">${status.text}</span>` : nothing}</span
     >`
@@ -869,7 +862,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
                   <button
                     part="remove"
                     type="button"
-                    aria-label=${named(this.removeLabel, file.name)}
+                    aria-label=${labelWith(this.removeLabel, 'name', file.name)}
                     data-at=${at}
                     ?disabled=${this.isDisabled}
                     @click=${this.handleRemove}

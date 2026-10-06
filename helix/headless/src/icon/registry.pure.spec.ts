@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import {
+  iconMutator,
   registeredIcon,
   registerIconLibrary,
   registerIcons,
@@ -102,5 +103,31 @@ describe('the entries', () => {
     for (const path of ['root/index.ts', 'root/icon-root.ts', 'registry.ts']) {
       expect(carriesTheSet(read(path))).toBe(false)
     }
+  })
+})
+
+/* Only Icon's dom spec reached the mutator, so nothing held which written
+   names ask a library for theirs. */
+describe('a library mutator', () => {
+  const mark = (svg: SVGSVGElement): void => {
+    svg.setAttribute('data-spec', '')
+  }
+
+  test('is the mutator of the library a prefixed name asks', () => {
+    registerIconLibrary('spec-mut', () => undefined, { mutator: mark })
+    expect(iconMutator('spec-mut:arrow')).toBe(mark)
+  })
+
+  test('is nothing for a name with no prefix, or a prefix nothing registered', () => {
+    registerIconLibrary('spec-mut', () => undefined, { mutator: mark })
+    expect(iconMutator('arrow')).toBeUndefined()
+    expect(iconMutator(':arrow')).toBeUndefined()
+    expect(iconMutator('spec-none:arrow')).toBeUndefined()
+  })
+
+  test('is gone once the library registers again without one', () => {
+    registerIconLibrary('spec-mut', () => undefined, { mutator: mark })
+    registerIconLibrary('spec-mut', () => undefined)
+    expect(iconMutator('spec-mut:arrow')).toBeUndefined()
   })
 })

@@ -1,7 +1,10 @@
 import {
   deepContains,
   focusableElements,
+  type GridPlace,
+  gridMove,
   inlineStep,
+  pageRows,
   scrollingAncestor,
   scrollRoom,
   selectsAll,
@@ -10,7 +13,6 @@ import {
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
 import type { HelixHeadlessTableCell } from './cell/table-cell.js'
 import type { HelixHeadlessTableColumn } from './column/table-column.js'
-import { type GridPlace, gridMove, pageRows } from './grid.js'
 import type { HelixHeadlessTableRow } from './row/table-row.js'
 
 /** A place in the grid with the element that holds focus there. */

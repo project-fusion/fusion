@@ -1,4 +1,5 @@
 import {
+  animationsFinished,
   closestInstance,
   customElement,
   HelixElement,
@@ -205,13 +206,11 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
    * to date first, so a transition the close starts is among them.
    */
   private finishClosing(): void {
-    const running = this.partNamed('content')?.getAnimations?.({ subtree: true }) ?? []
-    const done = (): void => {
+    void animationsFinished(this.partNamed('content')).then(() => {
       if (!this.open) {
         this.closing = false
       }
-    }
-    Promise.all(running.map((animation) => animation.finished)).then(done, done)
+    })
   }
 
   /**

@@ -4,6 +4,7 @@ import {
   HelixElement,
   HelixSelectEvent,
   slotFilled,
+  slotNamed,
 } from '@fusion.dev/helix-core'
 import { caretRight } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -175,10 +176,8 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
 
   /** Re-reads whether the line under the label or the words after it are filled. */
   private readonly readWords = (): void => {
-    const slot = (name: string): HTMLSlotElement | null =>
-      this.renderRoot.querySelector<HTMLSlotElement>(`slot[name="${name}"]`)
-    this.description = slotFilled(slot('description'))
-    this.end = slotFilled(slot('end'))
+    this.description = slotFilled(slotNamed(this.renderRoot, 'description'))
+    this.end = slotFilled(slotNamed(this.renderRoot, 'end'))
   }
 
   /** What describes the row: the line under its label and the words after it. */

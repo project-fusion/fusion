@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { gridMove, pageRows } from './grid.js'
+import { gridMove, pageRows } from './grid-move.js'
 
 const bounds = { last: 9, top: -1, width: 4 }
 const keys = { control: false, page: 3, step: 0 } as const

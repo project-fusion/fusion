@@ -268,15 +268,11 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
     size: number | undefined
     ups: number[]
   } {
-    const rows = this.sourceRows
     const key = seriesKey(this.sizeBy)
     const size =
       key === ''
         ? undefined
-        : this.plottedColumns.find(
-            (column) =>
-              seriesKey(rows.find((row) => row.cells[column])?.cells[column]?.name ?? '') === key,
-          )
+        : this.plottedColumns.find((column) => seriesKey(this.columnName(column)) === key)
     const [across, ...ups] = this.plottedColumns.filter((column) => column !== size)
     return { across, size, ups }
   }
@@ -303,7 +299,7 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
     const rows = this.sourceRows
     const { across, size, ups } = this.measures
     const name = (column: number | undefined): string =>
-      column === undefined ? '' : (rows.find((row) => row.cells[column])?.cells[column]?.name ?? '')
+      column === undefined ? '' : this.columnName(column)
     const pairs = ups.map((column) =>
       rows.flatMap((row, index) => {
         const x = across === undefined ? undefined : row.cells[across]?.value

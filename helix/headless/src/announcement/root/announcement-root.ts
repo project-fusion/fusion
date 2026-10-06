@@ -194,6 +194,9 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
     done: () => {
       this.dismiss()
     },
+    /* A hidden page holds the clock as a pointer does, so a timed message is
+       not spent in a background tab. */
+    holdWhileHidden: true,
     paused: (paused) => {
       this.toggleState('paused', paused)
     },
@@ -255,22 +258,6 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
     }
   }
 
-  /** Whether the page being hidden is one of the reasons the clock is held. */
-  private heldHidden = false
-
-  /* A hidden page holds the clock as a pointer does, so a timed message is
-     not spent in a background tab. Counted once, however often the page
-     hides. */
-  private readonly handleVisibility = (): void => {
-    if (document.hidden && !this.heldHidden) {
-      this.heldHidden = true
-      this.countdown.hold()
-    } else if (!document.hidden && this.heldHidden) {
-      this.heldHidden = false
-      this.countdown.release()
-    }
-  }
-
   /* Hover and focus hold the clock, counted by the countdown. On the host,
      because the announcement's regions are its children, with no box around
      them all. */
@@ -294,12 +281,10 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
     this.addEventListener('mouseleave', this.handleRelease)
     this.addEventListener('focusin', this.handleHold)
     this.addEventListener('focusout', this.handleRelease)
-    document.addEventListener('visibilitychange', this.handleVisibility)
     document.addEventListener('keydown', this.handleHotkey)
     /* The clock again after a move, from what was left of it. */
     if (this.hasUpdated) {
       this.countdown.resume()
-      this.handleVisibility()
     }
   }
 
@@ -309,12 +294,10 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
     this.removeEventListener('mouseleave', this.handleRelease)
     this.removeEventListener('focusin', this.handleHold)
     this.removeEventListener('focusout', this.handleRelease)
-    document.removeEventListener('visibilitychange', this.handleVisibility)
     document.removeEventListener('keydown', this.handleHotkey)
     this.queue?.disconnect()
-    /* The countdown lets every hold go as the host leaves. */
-    this.heldHidden = false
-    /* Removed with focus inside, after the key moved it in: focus goes back
+    /* The countdown lets every hold go as the host leaves, the hidden page's
+       among them. Removed with focus inside, after the key moved it in: focus goes back
        where the key found it, a frame later, so a neighbor the dismissal
        handed focus to keeps it. A removal fires no `focusout`, so `focused`
        still says where focus was. */
@@ -342,7 +325,6 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
     if (!this.waiting) {
       this.countdown.start(this.duration)
     }
-    this.handleVisibility()
     /* Said once for an element that slots the old `icon`, which is still
        drawn but has a replacement. */
     if (this.querySelector(':scope > [slot="icon"]')) {

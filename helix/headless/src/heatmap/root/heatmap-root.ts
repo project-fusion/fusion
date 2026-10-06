@@ -7,7 +7,6 @@ import {
   drawTooltip,
   fillTemplate,
   formatNumbers,
-  HelixBeforeChangeEvent,
   HelixElement,
   HelixResizeEvent,
   MixinChartSource,
@@ -15,7 +14,7 @@ import {
   pressedValue,
   type ReadingCursor,
   rangeAdd,
-  requestChange,
+  requestValue,
   StatusController,
   searchableById,
   writtenList,
@@ -336,15 +335,9 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
     if (next === this.value) {
       return
     }
-    requestChange({
-      apply: (value) => {
-        this.value = value
-        this.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
-        this.status.say(fillTemplate(this.selectionLabel, { count: commaList(value).length }))
-      },
-      event: (value) => new HelixBeforeChangeEvent({ value }),
-      host: this,
-      next,
+    requestValue(this, next, (value) => {
+      this.value = value
+      this.status.say(fillTemplate(this.selectionLabel, { count: commaList(value).length }))
     })
   }
 
