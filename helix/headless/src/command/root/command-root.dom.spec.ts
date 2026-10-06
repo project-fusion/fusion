@@ -99,6 +99,15 @@ describe('command', () => {
     expect(host.open).toBe(false)
   })
 
+  /* Core's chord: a symbol is typed with Shift, so Shift says nothing about
+     it. Measured before this: `?` never opened, since it arrives shifted. */
+  test('a symbol opens it however the layout types it', async () => {
+    const host = await palette(markup.replace('hotkey="mod+k"', 'hotkey="?"'))
+    press('?', { shiftKey: true })
+    await settle(host)
+    expect(host.open).toBe(true)
+  })
+
   test('an empty hotkey leaves the keyboard alone entirely', async () => {
     // For a consumer who opens it from a button, or who owns their own
     // shortcut handling and does not want two things fighting over one key.

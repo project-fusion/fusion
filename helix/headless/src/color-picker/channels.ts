@@ -1,4 +1,4 @@
-import { type Color, type ColorFormat, toHsl, toRgb } from '@fusion.dev/helix-core'
+import { type Color, type ColorFormat, clamp, toHsl, toRgb } from '@fusion.dev/helix-core'
 
 /** One number a color is written with, in the syntax the picker writes. */
 export type ChannelName = 'alpha' | 'blue' | 'green' | 'hue' | 'lightness' | 'red' | 'saturation'
@@ -10,9 +10,6 @@ export interface ChannelField {
   min: number
   value: number
 }
-
-const clamp = (value: number, low: number, high: number): number =>
-  Math.min(high, Math.max(low, value))
 
 /** An opacity token, `0.5` or `50%`, as a percentage. */
 const percent = (token: string | undefined): number => {

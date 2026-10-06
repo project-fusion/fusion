@@ -17,6 +17,7 @@ import {
   reportValues,
   requestChange,
   scrollItemIntoView,
+  selectsAll,
   Typeahead,
   typesCharacter,
 } from '@fusion.dev/helix-core'
@@ -26,7 +27,6 @@ import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { HelixHeadlessOptionGroup } from '../../option/group/option-group.js'
 import { HelixHeadlessOption } from '../../option/root/option-root.js'
-import { HelixHeadlessOptionSeparator } from '../../option/separator/option-separator.js'
 
 /** The keys that move within a list, which is every key that moves at all. */
 const MOVES = new Set(['ArrowDown', 'ArrowUp', 'End', 'Home', 'PageDown', 'PageUp'])
@@ -537,11 +537,12 @@ export class HelixHeadlessListbox extends MixinCollection(
    * exactly as it moves through a flat one.
    */
   get options(): HelixHeadlessOption[] {
-    return this.collect(this.children)
+    return this.among((node) => node instanceof HelixHeadlessOption, this.children)
   }
 
   /**
-   * Walks the tree, and walks *through* a slot when it meets one.
+   * The elements of one kind in the list: its options, its groups or its
+   * rules. Walks the tree, and walks *through* a slot when it meets one.
    *
    * Through a slot because that is how this gets composed. `Select` renders a
    * listbox in its own shadow root with a slot inside it, so the options are
@@ -549,15 +550,20 @@ export class HelixHeadlessListbox extends MixinCollection(
    * `querySelectorAll` finds the slot and no options at all, and the whole
    * component comes up empty.
    */
-  private collect(nodes: Iterable<Element>): HelixHeadlessOption[] {
-    const found: HelixHeadlessOption[] = []
+  private among<T extends Element>(is: (node: Element) => boolean, nodes: Iterable<Element>): T[] {
+    const found: T[] = []
     for (const node of nodes) {
-      if (node instanceof HelixHeadlessOption) {
-        found.push(node)
-      } else if (node instanceof HTMLSlotElement) {
-        found.push(...this.collect(node.assignedElements({ flatten: true })))
+      if (is(node)) {
+        found.push(node as T)
       } else {
-        found.push(...this.collect(node.children))
+        found.push(
+          ...this.among<T>(
+            is,
+            node instanceof HTMLSlotElement
+              ? node.assignedElements({ flatten: true })
+              : node.children,
+          ),
+        )
       }
     }
     return found
@@ -565,26 +571,7 @@ export class HelixHeadlessListbox extends MixinCollection(
 
   /** The groups, found the same way and for the same reason. */
   private get groups(): HelixHeadlessOptionGroup[] {
-    return this.among(HelixHeadlessOptionGroup)
-  }
-
-  /** The elements of one kind in the list, looking through slots. */
-  private among<T extends Element>(kind: abstract new (...args: never[]) => T): T[] {
-    const found: T[] = []
-    const walk = (nodes: Iterable<Element>): void => {
-      for (const node of nodes) {
-        if (node instanceof kind) {
-          found.push(node)
-        }
-        if (node instanceof HTMLSlotElement) {
-          walk(node.assignedElements({ flatten: true }))
-        } else {
-          walk(node.children)
-        }
-      }
-    }
-    walk(this.children)
-    return found
+    return this.among((node) => node instanceof HelixHeadlessOptionGroup, this.children)
   }
 
   /** The options a filter has left showing. */
@@ -682,13 +669,7 @@ export class HelixHeadlessListbox extends MixinCollection(
     /* Control+A, or Command+A, chooses every option a reader can reach, and
        takes them all back where all are chosen already, which is APG's
        multiple-selection listbox. Not in a field, where it selects the text. */
-    if (
-      this.multiple &&
-      !typing &&
-      event.key.toLowerCase() === 'a' &&
-      (event.ctrlKey || event.metaKey) &&
-      !event.altKey
-    ) {
+    if (this.multiple && !typing && selectsAll(event)) {
       event.preventDefault()
       const reachable = shown.map((option) => option.value)
       const all = reachable.every((value) => this.values.includes(value))
@@ -893,12 +874,20 @@ export class HelixHeadlessListbox extends MixinCollection(
        knows which. Left showing, the picture was a heading over nothing, which
        reads as a group whose contents failed to render. */
     for (const group of this.groups) {
-      const inside = this.collect(group.children)
+      const inside = this.among<HelixHeadlessOption>(
+        (node) => node instanceof HelixHeadlessOption,
+        group.children,
+      )
       group.hidden = inside.length > 0 && inside.every((option) => option.hidden)
     }
     /* And a rule while anything is filtered: between two runs of which only
-       some options are left, it separates nothing. */
-    for (const rule of this.among(HelixHeadlessOptionSeparator)) {
+       some options are left, it separates nothing. Found by its name rather
+       than its class, so a list that holds no rule does not carry the rule's
+       code: either tier's tag ends the same way. */
+    for (const rule of this.among<HTMLElement>(
+      (node) => node.localName.endsWith('-option-separator'),
+      this.children,
+    )) {
       rule.hidden = needle !== ''
     }
 
