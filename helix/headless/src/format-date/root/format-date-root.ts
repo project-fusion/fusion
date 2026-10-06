@@ -8,7 +8,8 @@ import {
   relativeTime,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property, state } from 'lit/decorators.js'
+import { property } from 'lit/decorators.js'
+import { drawFields } from '../fields.js'
 import { formatOptions } from '../options.js'
 
 /** A date with no time of day, `YYYY-MM-DD`, which names a day rather than an instant. */
@@ -41,6 +42,12 @@ const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/
  * showing a date schedules none, so a long feed left open costs almost nothing.
  * `frozen` draws the reading once and leaves it.
  *
+ * **`fields` draws each field of a date as a part of its own**, such as
+ * `day`, `month` and `year`, so a stylesheet can set the year in a lighter ink
+ * or the weekday in capitals with `::part()`. The text between the fields is
+ * the locale's own and has no part. An `elapsed` or `relative` reading is one
+ * phrase, with no parts inside it.
+ *
  * **The output is always `<time datetime>`**, so copy and paste and scripts
  * parsing the page get the exact instant, whatever the visible text says. A
  * screen reader reads the text, so an `elapsed` reading is named in full, such
@@ -57,7 +64,17 @@ const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/
  * @aliases RelativeTime, Timestamp, TimeAgo
  * @documentation https://fusion.dev/helix/components/format-date
  *
+ * @csspart day - The day of the month, with `fields`.
+ * @csspart day-period - AM or PM, or the locale's word for the part of the day, with `fields`.
+ * @csspart era - The era, such as AD, with `fields` and `era`.
+ * @csspart hour - The hour, with `fields`.
+ * @csspart minute - The minute, with `fields`.
+ * @csspart month - The month, with `fields`.
+ * @csspart second - The second, with `fields`.
  * @csspart time - The `<time>` element that holds the formatted text.
+ * @csspart time-zone-name - The time zone's name, with `fields`, where `time-zone-name` or a `long` or `full` `time-style` shows it.
+ * @csspart weekday - The day of the week, with `fields`.
+ * @csspart year - The year, with `fields`.
  *
  * @cssstate future - An `elapsed` or `relative` reading of a moment still to come, such as "in 3 hours".
  * @cssstate past - An `elapsed` or `relative` reading of a moment gone, such as "3 hours ago".
@@ -113,6 +130,18 @@ export class HelixHeadlessFormatDate extends HelixElement {
    */
   @property()
   era?: 'long' | 'narrow' | 'short'
+
+  /**
+   * Draws each field of a date in a part of its own: `weekday`, `day`,
+   * `month`, `year`, `era`, `hour`, `minute`, `second`, `day-period` and
+   * `time-zone-name`, so `::part(year)` can set the year apart.
+   *
+   * Off by default, which draws the date as one run of text, as Shoelace and
+   * Web Awesome do. An `elapsed` or `relative` reading is one phrase either
+   * way.
+   */
+  @property({ type: Boolean })
+  fields?: boolean
 
   /**
    * Draws an `elapsed` or `relative` reading once and leaves it, where it
@@ -248,26 +277,28 @@ export class HelixHeadlessFormatDate extends HelixElement {
       }
       /* Drawn against now, and never woken: the clock schedules nothing for
          a reading that does not expire. */
-      return this.frozen ? Number.POSITIVE_INFINITY : this.readingAt(moment, now).next
+      return this.frozen ? Infinity : this.readingAt(moment, now).next
     },
   })
 
   /**
    * The date read out of the light DOM, where no attribute carried one.
+   *
+   * Not a reactive state: `read` asks for the update itself, which keeps the
+   * `state` decorator out of this element's bundle.
    */
-  @state()
   private written = ''
 
-  private watching: MutationObserver | undefined = undefined
+  private watching?: MutationObserver
 
   /** Whether the timestamp is a day with no time, which is formatted in UTC. */
   private get dateOnly(): boolean {
-    return DATE_ONLY.test((this.date || this.written).trim())
+    return DATE_ONLY.test(this.source)
   }
 
   /** The timestamp, or nothing where there is not one to read. */
   private get moment(): Date | undefined {
-    const source = this.date || this.written
+    const source = this.source
     if (source === '') {
       return undefined
     }
@@ -275,9 +306,9 @@ export class HelixHeadlessFormatDate extends HelixElement {
     return Number.isNaN(parsed.getTime()) ? undefined : parsed
   }
 
-  /** Every `Intl.DateTimeFormat` option a consumer set, and none they did not. */
-  private get options(): Intl.DateTimeFormatOptions {
-    return formatOptions(this, this.dateOnly)
+  /** The timestamp as written, in the attribute or in the light DOM. */
+  private get source(): string {
+    return (this.date || this.written).trim()
   }
 
   /** Whether the reading is how long ago rather than the date. */
@@ -313,7 +344,6 @@ export class HelixHeadlessFormatDate extends HelixElement {
     /* It outlives the element otherwise, and a page that mounts and unmounts a
        feed leaks one every time it opens. The clock stops itself. */
     this.watching?.disconnect()
-    this.watching = undefined
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
@@ -332,21 +362,16 @@ export class HelixHeadlessFormatDate extends HelixElement {
       this.read()
     }
     if (
-      changed.has('date') ||
-      changed.has('elapsed') ||
-      changed.has('frozen') ||
-      changed.has('locale') ||
-      changed.has('numeric') ||
-      changed.has('relative')
+      ['date', 'elapsed', 'frozen', 'locale', 'numeric', 'relative'].some((key) => changed.has(key))
     ) {
       this.clock.tick()
     }
     /* Which side of now a reading is on, so a page can mark what is overdue
        or still to come from CSS. Read against the clock the text is drawn
        against, so the two cannot disagree. */
-    const moment = this.reading ? this.moment : undefined
-    this.toggleState('past', moment !== undefined && moment.getTime() <= this.clock.now)
-    this.toggleState('future', moment !== undefined && moment.getTime() > this.clock.now)
+    const ahead = this.reading ? (this.moment?.getTime() ?? NaN) - this.clock.now : NaN
+    this.toggleState('past', ahead <= 0)
+    this.toggleState('future', ahead > 0)
   }
 
   /** The light DOM's own text, which is the other way to write the value. */
@@ -357,6 +382,7 @@ export class HelixHeadlessFormatDate extends HelixElement {
     const written = this.textContent?.trim() ?? ''
     if (written !== this.written) {
       this.written = written
+      this.requestUpdate()
       this.clock.tick()
     }
   }
@@ -372,35 +398,44 @@ export class HelixHeadlessFormatDate extends HelixElement {
     if (!moment) {
       return nothing
     }
-    const datetime = this.dateOnly ? (this.date || this.written).trim() : moment.toISOString()
+    const datetime = this.dateOnly ? this.source : moment.toISOString()
     if (!this.reading) {
-      const text = new Intl.DateTimeFormat(this.language || undefined, this.options).format(moment)
-      return html`<time part="time" datetime=${datetime}>${text}</time>`
+      /* Every `Intl` option a consumer set, and none they did not. One text
+         node unless `fields` asks for a part to each field: in Chromium a
+         date split into nodes is set a fraction of a pixel wider, so the
+         split is not made where nobody styles the parts. */
+      const format = new Intl.DateTimeFormat(
+        this.language || undefined,
+        formatOptions(this, this.dateOnly),
+      )
+      return html`<time part="time" datetime=${datetime}>${this.fields ? drawFields(format.formatToParts(moment)) : format.format(moment)}</time>`
     }
     /* The compact reading is what a feed shows, and "3h" is what a screen
        reader read for it, with the instant in `datetime` exposed to nobody. So
        the reading is named in full, "3 hours ago", and the whole date is its
        title. `time` is a role that takes a name. */
     const now = new Date(this.clock.now)
-    const zone = this.timeZone || (this.dateOnly ? 'UTC' : undefined)
-    const whole = new Intl.DateTimeFormat(this.language || undefined, {
-      dateStyle: 'long',
-      ...(this.dateOnly ? {} : { timeStyle: 'short' }),
-      ...(this.hourCycle ? { hourCycle: this.hourCycle } : {}),
-      ...(zone ? { timeZone: zone } : {}),
-    }).format(moment)
+    /* The whole date in the locale's long pattern, through the same options
+       as a date reading, so its clock and its zone are the reading's. */
+    const whole = new Intl.DateTimeFormat(
+      this.language || undefined,
+      formatOptions(
+        {
+          dateStyle: 'long',
+          hourCycle: this.hourCycle,
+          timeStyle: this.dateOnly ? undefined : 'short',
+          timeZone: this.timeZone,
+        },
+        this.dateOnly,
+      ),
+    ).format(moment)
     /* Named in full whatever is shown, so "3h ago" at `narrow` is heard as
        "3 hours ago", with the same choice of word or number. */
     const spoken = relativeTime(this.language, { numeric: this.numeric ?? 'auto' })(
       moment,
       now,
     ).text
-    return html`<time
-      part="time"
-      datetime=${datetime}
-      aria-label=${spoken}
-      title=${whole}
-    >${this.readingAt(moment, now).text}</time>`
+    return html`<time part="time" datetime=${datetime} aria-label=${spoken} title=${whole}>${this.readingAt(moment, now).text}</time>`
   }
 }
 
