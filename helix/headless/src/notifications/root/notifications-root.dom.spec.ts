@@ -372,6 +372,33 @@ describe('an empty feed', () => {
     expect(hasState(host, 'empty')).toBe(false)
   })
 
+  test('says a page that could not load, under its rows and in place of empty', async () => {
+    type Feed = HTMLElement & { loadError: string; updateComplete: Promise<unknown> }
+    const host = (await mount(
+      `<helix-headless-notifications label="Activity" load-error="Could not load">
+        <div slot="error" id="retry">Could not load. <button>Try again</button></div>
+      </helix-headless-notifications>`,
+    )) as Feed
+    await host.updateComplete
+    expect(hasState(host, 'error')).toBe(true)
+    expect(hasState(host, 'empty')).toBe(false)
+    expect(part(host, 'empty')).toBeNull()
+    const error = part(host, 'error')?.querySelector('slot') as HTMLSlotElement
+    expect(error.assignedElements()[0] === host.querySelector('#retry')).toBe(true)
+    expect(part(host, 'live')?.textContent).toBe('Could not load')
+    const row = document.createElement('helix-headless-notification')
+    row.textContent = 'One'
+    host.append(row)
+    await new Promise((done) => setTimeout(done, 0))
+    await host.updateComplete
+    expect(part(host, 'error')).not.toBeNull()
+    host.loadError = ''
+    await host.updateComplete
+    expect(hasState(host, 'error')).toBe(false)
+    expect(part(host, 'error')).toBeNull()
+    expect(part(host, 'live')?.textContent).toBe('')
+  })
+
   test('is not empty once a notification is in it', async () => {
     const host = (await mount(
       `<helix-headless-notifications label="Activity">
@@ -380,6 +407,77 @@ describe('an empty feed', () => {
     )) as HTMLElement & { updateComplete: Promise<unknown> }
     await host.updateComplete
     expect(hasState(host, 'empty')).toBe(false)
+  })
+})
+
+describe('a row that arrives after the render', () => {
+  /* The list slot is assigned by hand, so a row appended later sends no
+     `slotchange`. It has to be drawn, counted, and clear the empty state all
+     the same, with no property changing on the feed. */
+  const settle = async (host: Feed): Promise<void> => {
+    await new Promise((done) => setTimeout(done, 0))
+    await host.updateComplete
+  }
+  /* What a slot draws, read from the slot: the test DOM leaves `assignedSlot`
+     unset for a slot assigned by hand. */
+  const drawn = (host: Element, name: string): Element[] =>
+    (host.shadowRoot?.querySelector<HTMLSlotElement>(`slot[name="${name}"]`)?.assignedElements() ??
+      []) as Element[]
+
+  test('is drawn in the list and counted', async () => {
+    const host = await feed()
+    const row = document.createElement('helix-headless-notification')
+    row.textContent = 'Four'
+    host.append(row)
+    await settle(host)
+    expect(drawn(host, 'items').includes(row)).toBe(true)
+    expect(host.unread).toBe(3)
+    expect(host.getAttribute('unread')).toBe('3')
+  })
+
+  test('clears the empty state of a feed that was emptied', async () => {
+    const host = await feed()
+    for (const row of [...host.children]) {
+      row.remove()
+    }
+    await settle(host)
+    expect(hasState(host, 'empty')).toBe(true)
+    const row = document.createElement('helix-headless-notification')
+    row.textContent = 'Back'
+    host.append(row)
+    await settle(host)
+    expect(hasState(host, 'empty')).toBe(false)
+    expect(part(host, 'empty')).toBeNull()
+    expect(drawn(host, 'items').length === 1 && drawn(host, 'items')[0] === row).toBe(true)
+  })
+
+  test('in a group, is drawn by the group and counted by the feed', async () => {
+    const host = await feed(`
+      <helix-headless-notifications label="Activity">
+        <helix-headless-notification-group label="Today">
+          <helix-headless-notification>One</helix-headless-notification>
+        </helix-headless-notification-group>
+      </helix-headless-notifications>`)
+    const group = host.querySelector('helix-headless-notification-group') as HTMLElement
+    const row = document.createElement('helix-headless-notification')
+    row.textContent = 'Two'
+    group.append(row)
+    await settle(host)
+    await (group as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    const rows = group.shadowRoot?.querySelector<HTMLSlotElement>('slot:not([name])')
+    expect(rows?.assignedElements().includes(row)).toBe(true)
+    expect(host.unread).toBe(2)
+    expect(host.getAttribute('unread')).toBe('2')
+  })
+
+  test('a header added later is drawn in the header', async () => {
+    const host = await feed()
+    const title = document.createElement('h2')
+    title.slot = 'header'
+    title.textContent = 'Activity'
+    host.append(title)
+    await settle(host)
+    expect(drawn(host, 'header')[0] === title).toBe(true)
   })
 })
 

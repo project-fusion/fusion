@@ -1,4 +1,11 @@
-import { customElement, HelixElement, hostAria, MixinControllerOpen } from '@fusion.dev/helix-core'
+import {
+  assignSlots,
+  ChildrenController,
+  customElement,
+  HelixElement,
+  hostAria,
+  MixinControllerOpen,
+} from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import type { HelixHeadlessNotification } from '../notification/notification.js'
@@ -198,14 +205,28 @@ export class HelixHeadlessNotificationGroup extends MixinControllerOpen(HelixEle
       }
       return
     }
-    slot.assign(...showing)
-    const action = this.renderRoot?.querySelector?.<HTMLSlotElement>('slot[name="actions"]')
-    action?.assign?.(
-      ...[...this.children].filter((child) => child.getAttribute('slot') === 'actions'),
-    )
-    const label = this.renderRoot?.querySelector?.<HTMLSlotElement>('slot[name="label"]')
-    label?.assign?.(...[...this.children].filter((child) => child.getAttribute('slot') === 'label'))
+    /* The rows the group shows to the list, and a folded row, or a child that
+       is no row and names no slot, to a name no slot has; the label and the
+       actions to theirs. Through core's `assignSlots`. */
+    assignSlots(this.renderRoot, this.children, (child) => {
+      const row = child as HelixHeadlessNotification
+      if (showing.includes(row)) {
+        return ''
+      }
+      return items.includes(row) || !child.hasAttribute('slot') ? 'folded' : undefined
+    })
   }
+
+  /**
+   * Hears a row arrive after the render. The slot is assigned by hand, so a
+   * new row is in no slot and sends no `slotchange` to say it came. The feed
+   * the group is in is asked to update as well, since it counts the group's
+   * rows and does not watch inside the group.
+   */
+  protected readonly childWatch = new ChildrenController(this, () => {
+    this.requestUpdate()
+    ;(this.parentElement as Partial<Pick<HelixElement, 'requestUpdate'>> | null)?.requestUpdate?.()
+  })
 
   private readonly handleToggle = (): void => {
     this.toggleOpen()
