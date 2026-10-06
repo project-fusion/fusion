@@ -673,3 +673,16 @@ describe('a time picker in a page written in another language', () => {
     expect(hour?.getAttribute('aria-label')).toBe('Stunde')
   })
 })
+
+describe('a time picker’s own message', () => {
+  test('`feedback` is shown under it, is its verdict, and marks it and its list invalid', async () => {
+    const host = (await picker('value="09:15" feedback="Pick a time after lunch"')) as Time & {
+      internals: ElementInternals
+      validationMessage: string
+    }
+    expect(part(host, 'feedback')?.textContent).toBe('Pick a time after lunch')
+    expect(host.validationMessage).toBe('Pick a time after lunch')
+    expect(host.internals.states.has('invalid')).toBe(true)
+    expect(part(host, 'list')?.getAttribute('aria-invalid')).toBe('true')
+  })
+})

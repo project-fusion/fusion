@@ -20,6 +20,7 @@ import {
   KeyboardNavigationController,
   localeOf,
   MixinControllerValue,
+  MixinPickerFeedback,
   parseColor,
   rovingStop,
   splitValues,
@@ -157,7 +158,9 @@ interface EyeDropperConstructor {
  * @cssstate invalid - While `invalid` is set or `feedback` says what is wrong.
  */
 @customElement('helix-headless-color-picker')
-export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElement) {
+export class HelixHeadlessColorPicker extends MixinPickerFeedback(
+  MixinControllerValue(HelixFormElement),
+) {
   /**
    * Whether the color carries an alpha channel.
    *
@@ -249,17 +252,6 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
   eyedropperLabel = 'Sample a color from the screen'
 
   /**
-   * A message under the picker, such as what is wrong with the color.
-   *
-   * While set, the picker is invalid and does not submit, as a field's
-   * `feedback` is, and the square and the value text are described by it.
-   * Color Input shows its own message here, so a reader in the open panel
-   * still sees it.
-   */
-  @property()
-  feedback = ''
-
-  /**
    * The syntax the value is written in: `hex`, `rgb`, or `hsl`.
    *
    * Only what is written. Everything is read whatever this says, so a picker on
@@ -285,18 +277,6 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
    */
   @property({ attribute: 'hue-label' })
   hueLabel = 'Hue'
-
-  /**
-   * Whether the current selection fails validation.
-   *
-   * A flag rather than a message, the split Date Picker also draws. A flat
-   * picker has no room of its own for a sentence: the field that wraps one owns
-   * the label, the hint and the feedback, and a second message inside the panel
-   * would be the same error said twice. What is left for the picker is the one
-   * thing the field cannot draw from outside, the mark on the answer itself.
-   */
-  @property({ reflect: true, type: Boolean })
-  invalid = false
 
   /**
    * What the lightness channel's field is called, in `channel-fields` with
@@ -865,24 +845,6 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
   }
 
   /**
-   * Whether a reader is told the color is wrong: `invalid` is set, or
-   * `feedback` says why.
-   *
-   * Both, because `feedback` is the message a field shows and a message that
-   * says the color is wrong while every control reports it valid is half the
-   * answer. Read from Chromium's tree before this, a picker with `feedback`
-   * set had `customError` in its validity and `invalid: false` on its square.
-   */
-  private get marked(): boolean {
-    return this.invalid || this.feedback !== ''
-  }
-
-  /** @internal `feedback` marks the picker invalid, as a field's does. */
-  protected override get validityFeedback(): string {
-    return this.feedback
-  }
-
-  /**
    * Reports "required and empty", or clears it.
    *
    * Anchored on the square, which is where a reader would go to answer: it is
@@ -1149,8 +1111,6 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
      tree, an invalid picker's sliders and value all reported `invalid: false`. */
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    this.internals.ariaInvalid = this.marked ? 'true' : null
-    this.toggleState('invalid', this.marked)
     /* A group only where a page's `<label for>` names the picker, so the
        name has somewhere to be read. Unlabeled, the host stays without a
        role, as it is inside Color Input. */
@@ -1407,7 +1367,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
       </div>
 
       ${this.presets.length === 0 ? nothing : this.renderSwatches(painted)}
-      ${this.feedback === '' ? nothing : html`<p part="feedback" id="feedback">${this.feedback}</p>`}`
+      ${this.renderPickerFeedback()}`
   }
 }
 

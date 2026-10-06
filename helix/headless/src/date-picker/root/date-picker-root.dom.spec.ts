@@ -986,3 +986,17 @@ describe('a date picker in a page written in another language', () => {
     expect(days(own)[0]?.getAttribute('aria-label')).toContain('July 26, 2026')
   })
 })
+
+describe('a date picker’s own message', () => {
+  /* Measured before this: a calendar standing alone had a flag and no way to
+     say why, so a form showed nothing a reader could act on. */
+  test('`feedback` is shown under it, is its verdict, and marks it invalid', async () => {
+    const host = (await calendar(
+      'default-month="2026-08" default-value="2026-08-15" feedback="Pick a weekday"',
+    )) as DatePicker & { internals: ElementInternals; validationMessage: string }
+    expect(part(host, 'feedback')?.textContent).toBe('Pick a weekday')
+    expect(host.validationMessage).toBe('Pick a weekday')
+    expect(host.internals.ariaInvalid).toBe('true')
+    expect(host.internals.states.has('invalid')).toBe(true)
+  })
+})

@@ -12,6 +12,7 @@ import {
   isTwelveHour,
   localeOf,
   MixinControllerValue,
+  MixinPickerFeedback,
   nearestTime,
   offeredTimes,
   reportValues,
@@ -89,6 +90,7 @@ import '../../option/index.js'
  * @csspart column-search - The region that holds the filter field.
  * @csspart column-search-field - The filter field.
  * @csspart columns - The row of columns, in `wheels`.
+ * @csspart feedback - The message under the times, while `feedback` is set.
  * @csspart list - The listbox holding the times, in `list`.
  * @csspart list-empty - The text shown when the filter hides every option.
  * @csspart list-error - The list's `error` part, which Time Picker never sets: its times do not load.
@@ -110,9 +112,13 @@ import '../../option/index.js'
  * @csspart option-item-selected - The row of a chosen time: the one time, or either end of a range.
  * @csspart option-label - The time's label.
  * @csspart option-text - The label and the caption, as one column.
+ *
+ * @cssstate invalid - While `invalid` is set or `feedback` says what is wrong.
  */
 @customElement('helix-headless-time-picker')
-export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormElement) {
+export class HelixHeadlessTimePicker extends MixinPickerFeedback(
+  MixinControllerValue(HelixFormElement),
+) {
   /**
    * The validation message for a value that is not a time.
    *
@@ -157,18 +163,6 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
    */
   @property({ attribute: 'hour-label' })
   hourLabel?: string
-
-  /**
-   * Whether the current selection fails validation.
-   *
-   * A flag rather than a message, the same split Date Picker draws. A flat
-   * picker has no room of its own for a sentence: the field that wraps one owns
-   * the label, the hint and the feedback, and a second message inside the panel
-   * would be the same error said twice. What is left for the picker is the one
-   * thing the field cannot draw from outside, the mark on the answer itself.
-   */
-  @property({ reflect: true, type: Boolean })
-  invalid = false
 
   /**
    * Accessible name for the list, which has no visible one of its own.
@@ -820,7 +814,6 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    this.internals.ariaInvalid = this.invalid ? 'true' : null
     /* Here rather than in `updated`, which is where `DatePicker` reports from
        too: the value is known before the render and a form read between the two
        should not see the previous one. */
@@ -873,7 +866,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
     return html`<${this.tag('listbox')}
       part="column"
       data-column=${part}
-      aria-invalid=${this.invalid ? 'true' : nothing}
+      aria-invalid=${this.marked ? 'true' : nothing}
       exportparts="empty: column-empty, error: column-error, feedback: column-feedback, filter-icon: column-filter-icon,
         filter-mark: column-filter-mark, hint: column-hint, items: column-items, label: column-label,
         live: column-live, loading: column-loading, search: column-search, search-field: column-search-field"
@@ -1001,7 +994,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
   protected renderList(): TemplateResult {
     return html`<${this.tag('listbox')}
       part="list"
-      aria-invalid=${this.invalid ? 'true' : nothing}
+      aria-invalid=${this.marked ? 'true' : nothing}
       exportparts="empty: list-empty, error: list-error, feedback: list-feedback, filter-icon: list-filter-icon,
         filter-mark: list-filter-mark, hint: list-hint, items: list-items, label: list-label,
         live: list-live, loading: list-loading, search: list-search, search-field: list-search-field"
@@ -1037,9 +1030,9 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
        range on wheels is two sets of wheels and a multiple is a set, which a
        wheel cannot hold. */
     if (this.variant === 'wheels' && this.mode === undefined) {
-      return this.renderSpinner()
+      return html`${this.renderSpinner()}${this.renderPickerFeedback()}`
     }
-    return html`${this.renderList()}`
+    return html`${this.renderList()}${this.renderPickerFeedback()}`
   }
 
   /**
