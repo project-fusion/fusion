@@ -8,6 +8,7 @@ beforeAll(async () => {
 
 type Inspector = HTMLElement & {
   defaultDepth: number
+  requestUpdate: () => void
   updateComplete: Promise<unknown>
   value: unknown
 }

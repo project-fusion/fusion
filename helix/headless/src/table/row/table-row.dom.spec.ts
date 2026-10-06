@@ -69,6 +69,14 @@ describe('a row with href', () => {
     expect(followed).toEqual(['/runs/7'])
   })
 
+  test('follows it from a cell a grid table gave a tab index', async () => {
+    const host = await linked()
+    const cell = host.querySelector('helix-headless-table-cell') as HTMLElement
+    cell.tabIndex = -1
+    cell.click()
+    expect(followed).toEqual(['/runs/7'])
+  })
+
   test('leaves a press on a control of its own to that control', async () => {
     const host = await linked()
     ;(host.querySelector('button') as HTMLElement).click()

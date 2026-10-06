@@ -6,6 +6,7 @@ import {
   type DataRow,
   everyState,
   fillTemplate,
+  followLink,
   format,
   type HelixBeforeToggleEvent,
   HelixElement,
@@ -30,6 +31,7 @@ import { property, state } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
 import '../../checkbox/index.js'
 import { edgeOf, type HelixHeadlessTableColumn } from '../column/table-column.js'
+import { type GridCell, TableGridController } from '../grid-controller.js'
 import type { HelixHeadlessTableRow } from '../row/table-row.js'
 
 /** A row as the table reads it: the consumer's element, a table row where it is one. */
@@ -168,9 +170,28 @@ const numberOf = (value: string): number => Number(value.replaceAll(',', ''))
  * 4. A chosen row takes `:state(selected)`, and a screen reader hears
  *    `selected-label` ("2 selected") from a polite region.
  *
- * Tab reaches each checkbox, and Space ticks it. For a grid a reader moves
- * through with the arrow keys, with typeahead and range selection, use
- * `DataTable`. To act on one row, put a link or a button in a cell.
+ * Tab reaches each checkbox, and Space ticks it. To act on one row, put a
+ * link or a button in a cell, or give the row an `href`.
+ *
+ * **A grid.** `grid` makes the table one tab stop that the arrow keys move
+ * through cell by cell, the headings included, as React Aria's table is. The
+ * table is then a `grid` and each value a `gridcell`, and the table gives
+ * every cell a `tabindex` so focus can rest on it: set `grid` only where the
+ * cells may carry one. For typeahead and range selection, use `DataTable`.
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Right, Left | Moves one cell along the row. Left moves on, on a right-to-left page. |
+ * | Down, Up | Moves one row, the headings included. |
+ * | Home, End | Moves to the first or the last cell of the row. |
+ * | Control with Home or End | Moves to the first or the last cell of the table. |
+ * | Page Down, Page Up | Moves by the rows that fit in view. |
+ * | Enter, F2 | Moves into the cell's links and controls. Escape or F2 moves back to the cell, and Tab moves between the controls of one cell. |
+ * | Enter on a cell of a row with `href` | Follows the row's link. |
+ * | Enter, Space on a sortable heading | Sorts by the column. |
+ * | Space on a row, Enter or Space on its checkbox cell | Selects the row, in a `selectable` table. |
+ * | Control or Command with A | Selects every row, in a `selectable` table. |
+ * | Tab | Leaves the table. |
  *
  * The CSS custom properties listed for this component are written by it and
  * read by the stylesheet that draws it. Do not set them. Each holds a number
@@ -203,6 +224,8 @@ const numberOf = (value: string): number => Number(value.replaceAll(',', ''))
  * @csspart checkbox-mark-dash - Added to `checkbox-mark` while it draws the dash, which it keeps until its box is checked.
  * @csspart checkbox-mark-indeterminate - Added to `checkbox-mark` while only some rows are selected.
  * @csspart empty - The text shown when there are no rows.
+ * @csspart grid-end - An empty box after the rows, in a `grid` table. Tab focuses it on its way out of the table, so the key leaves from the end.
+ * @csspart grid-start - An empty box before the rows, in a `grid` table. Shift with Tab focuses it on its way out of the table.
  * @csspart head - The row that holds the column headings. It has `display: contents`, so it takes no space of its own.
  * @csspart live - A live region that repeats the empty and loading text, so screen readers announce it when it changes. Visually hidden in the styled tier.
  * @csspart loading - The text shown while the rows are loading.
@@ -266,6 +289,18 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
   /** The word for a descending sort, in `sorted-label`. */
   @property({ attribute: 'descending-label' })
   descendingLabel = 'descending'
+
+  /**
+   * Makes the table a grid: one tab stop, and the arrow keys, Home, End and the
+   * Page keys move focus between its cells, the headings included. Enter moves
+   * into a cell's controls, and Tab leaves the table.
+   *
+   * Off by default, where the table is a static `table` and Tab reaches each
+   * link and control in it. On, the table writes a `tabindex` onto each of its
+   * cells, which is the one way a cell of your markup can take focus.
+   */
+  @property({ type: Boolean })
+  grid = false
 
   /**
    * Accessible name for the table.
@@ -370,6 +405,17 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
   protected readonly aria = new AriaForwardController(this, {
     label: true,
     target: () => this.partNamed('table'),
+  })
+
+  /** The keyboard of a `grid` table, in `grid-controller.ts`. */
+  private readonly gridKeys = new TableGridController(this, {
+    activate: (place, event) => this.activate(place, event),
+    columns: () => this.tableColumns.filter((column) => column.shown),
+    on: () => this.grid,
+    part: (name) => this.partNamed(name),
+    rows: () => (this.childrenKnown ? this.arrangedRows : []),
+    selectAll: () => this.selectable && this.requestSelected(new Set(this.everyKey)),
+    selectable: () => this.selectable,
   })
 
   /**
@@ -514,17 +560,9 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
       return
     }
     const root = origin.getRootNode()
-    const keys = this.chosen
     if (root === this.renderRoot) {
       event.preventDefault()
-      this.requestSelected(
-        new Set(
-          toggleEvery(
-            keys,
-            this.keyed.map(({ key }) => key),
-          ),
-        ),
-      )
+      this.chooseAll()
       return
     }
     const found = this.keyed.find(({ row }) => row.shadowRoot === root)
@@ -532,12 +570,63 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
       return
     }
     event.preventDefault()
-    if (event.detail.checked) {
-      keys.add(found.key)
+    this.chooseRow(found.key, event.detail.checked)
+  }
+
+  /** Every row's key, in the order the rows are written. */
+  private get everyKey(): string[] {
+    return this.keyed.map(({ key }) => key)
+  }
+
+  /** The checkbox in the heading: every row, or none where every row is chosen. */
+  private chooseAll(): void {
+    this.requestSelected(new Set(toggleEvery(this.chosen, this.everyKey)))
+  }
+
+  /** One row's checkbox, ticked or not. */
+  private chooseRow(key: string, on: boolean): void {
+    const keys = this.chosen
+    if (on) {
+      keys.add(key)
     } else {
-      keys.delete(found.key)
+      keys.delete(key)
     }
     this.requestSelected(keys)
+  }
+
+  /**
+   * Enter, Space or F2 on a cell of a `grid` table, and whether it did
+   * anything. Left alone, Enter and F2 move into the cell's controls.
+   */
+  private activate(place: GridCell, event: KeyboardEvent): boolean {
+    const lead = this.selectable && place.column === 0
+    if (event.key === 'F2') {
+      return false
+    }
+    if (place.row === -1) {
+      if (lead) {
+        this.chooseAll()
+        return true
+      }
+      const shown = this.tableColumns.filter((one) => one.shown)
+      const column = shown[place.column - (this.selectable ? 1 : 0)]
+      if (column?.canSort) {
+        this.toggleSort(column.field)
+        return true
+      }
+      return false
+    }
+    const row = this.arrangedRows[place.row] as Row | undefined
+    const found = this.keyed.find((one) => one.row === row)
+    if (this.selectable && found && (event.key === ' ' || lead)) {
+      this.chooseRow(found.key, !this.chosen.has(found.key))
+      return true
+    }
+    if (event.key === 'Enter' && row?.href) {
+      followLink(this.ownerDocument, { href: row.href, rel: row.rel, target: row.target }, event)
+      return true
+    }
+    return false
   }
 
   /**
@@ -901,6 +990,10 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     this.markSorted()
     this.markSelected()
     this.nameByHeading()
+    if (this.childrenKnown) {
+      this.gridKeys.mark()
+      this.gridKeys.place()
+    }
   }
 
   /** The heading of the checkbox column, which selects every row. */
@@ -914,9 +1007,12 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     const every = this.childrenKnown ? this.keyed.map(({ key }) => key) : []
     const { checked, indeterminate } = everyState(this.chosen, every)
     const checkbox = this.tag('checkbox')
+    const grid = this.grid
     return html`<span part="select-all" role="columnheader"
+      tabindex=${grid ? (this.gridKeys.isStop({ column: 0, row: -1 }) ? '0' : '-1') : nothing}
       ><${checkbox}
         part="checkbox"
+        tabindex=${grid ? '-1' : nothing}
         exportparts="box: checkbox-box, control: checkbox-control, feedback: checkbox-feedback,
           field: checkbox-field, hint: checkbox-hint, label: checkbox-label, mark: checkbox-mark,
           mark-checked: checkbox-mark-checked, mark-dash: checkbox-mark-dash,
@@ -930,9 +1026,14 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
 
   protected override render(): TemplateResult {
     const template = this.template
-    return html`<slot name="heading"></slot><div
+    const grid = this.grid
+    /* The two ends a Tab leaves the grid by, each focused for a moment so the
+       key goes on from there. Empty, so they take no room. */
+    const edge = (name: string) => (grid ? html`<span part=${name} tabindex="-1"></span>` : nothing)
+    return html`<slot name="heading"></slot>${edge('grid-start')}<div
       part="table"
-      role="table"
+      role=${grid ? 'grid' : 'table'}
+      aria-multiselectable=${grid && this.selectable ? 'true' : nothing}
       aria-busy=${this.loading ? 'true' : nothing}
       aria-label=${this.label || 'Table'}
       style=${template ? `--table-template: ${template}` : ''}
@@ -944,8 +1045,8 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
           this.handleSlotChange()
         }}
       ></slot>
-      ${this.renderStatus(this.hasRows, 'cell')}
-    </div>${this.renderLive(this.hasRows)}`
+      ${this.renderStatus(this.hasRows, grid ? 'gridcell' : 'cell')}
+    </div>${edge('grid-end')}${this.renderLive(this.hasRows)}`
   }
 }
 

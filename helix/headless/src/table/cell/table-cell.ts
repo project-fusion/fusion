@@ -1,6 +1,6 @@
 import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { property, state } from 'lit/decorators.js'
 
 /**
  * @summary One cell of a table.
@@ -16,7 +16,9 @@ import { property } from 'lit/decorators.js'
  *   table with no `TableColumn` heads its columns with.
  *
  * The role is on the host so the cell stays a child of its row in the flat
- * tree, which keeps the table structure intact.
+ * tree, which keeps the table structure intact. In a `grid` table a value is
+ * a `gridcell`, and the table gives the cell a `tabindex` so focus can rest on
+ * it.
  *
  * @since 0.1.0
  * @status stable
@@ -37,6 +39,13 @@ export class HelixHeadlessTableCell extends HelixElement {
    */
   @property({ reflect: true, type: Boolean })
   header = false
+
+  /**
+   * @internal Whether the cell is a cell of a `grid` table, which moves focus
+   * between its cells, written by that table. Not a consumer's to set.
+   */
+  @state()
+  gridCell = false
 
   /**
    * @internal Read by the row and by the cells beside it, to tell a header
@@ -67,7 +76,7 @@ export class HelixHeadlessTableCell extends HelixElement {
     super.willUpdate(changed)
     // In `willUpdate`, which the server does call, unlike `connectedCallback`.
     const header = this.headsRow ? 'rowheader' : 'columnheader'
-    hostAria(this.internals, { role: this.header ? header : 'cell' })
+    hostAria(this.internals, { role: this.header ? header : this.gridCell ? 'gridcell' : 'cell' })
   }
 
   protected override updated(changed: PropertyValues): void {

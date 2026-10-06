@@ -1,0 +1,34 @@
+export function Example() {
+  return (
+    <helix-table
+      grid
+      label="Recent runs"
+    >
+      <helix-table-column
+        field="run"
+        sortable
+        width="8rem"
+      >
+        Run
+      </helix-table-column>
+      <helix-table-column>Branch</helix-table-column>
+      <helix-table-column>Result</helix-table-column>
+
+      <helix-table-row href="#run-412">
+        <helix-table-cell header>412</helix-table-cell>
+        <helix-table-cell>main</helix-table-cell>
+        <helix-table-cell>Passed</helix-table-cell>
+      </helix-table-row>
+      <helix-table-row href="#run-411">
+        <helix-table-cell header>411</helix-table-cell>
+        <helix-table-cell>fix/menu-focus</helix-table-cell>
+        <helix-table-cell>Failed</helix-table-cell>
+      </helix-table-row>
+      <helix-table-row href="#run-410">
+        <helix-table-cell header>410</helix-table-cell>
+        <helix-table-cell>main</helix-table-cell>
+        <helix-table-cell>Passed</helix-table-cell>
+      </helix-table-row>
+    </helix-table>
+  )
+}
