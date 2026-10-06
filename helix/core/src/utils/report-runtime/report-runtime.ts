@@ -33,7 +33,7 @@ export type RuntimeKind =
   | 'min-out-of-range'
   /** A Stat was given one of Trend's directions, `up`, `down` or `neutral`, which lay nothing out. */
   | 'misread-direction'
-  /** A React handler prop names an event the element never dispatches itself. */
+  /** A React handler prop names an event the element never dispatches itself. Development builds only. */
   | 'misplaced-handler'
   /** An Image has no `alt`, so a screen reader announces its file name. */
   | 'missing-alt'
@@ -62,9 +62,12 @@ export type RuntimeKind =
   | 'picture-in-picture-refused'
   /** A Grid's `min` is no length it can write, so the grid lays out by its column count. */
   | 'refused-length'
-  /** A React handler prop is a removed callback, which never ran from JSX. */
+  /** A React handler prop is a removed callback, which never ran from JSX. Development builds only. */
   | 'removed-callback'
-  /** A React handler prop uses Solid's `on:`, which React reads as another event's name. */
+  /**
+   * A React handler prop uses Solid's `on:`, which React reads as another event's name.
+   * Development builds only.
+   */
   | 'solid-handler-syntax'
   /** A stencil's regions went unused: no named parts, or parts too small. */
   | 'stencil-regions-unused'
@@ -76,7 +79,7 @@ export type RuntimeKind =
   | 'two-default-operators'
   /** A Quote's text starts or ends with a quotation mark, so the browser's marks double it. */
   | 'typed-marks'
-  /** A React handler prop names an event nothing dispatches. */
+  /** A React handler prop names an event nothing dispatches. Development builds only. */
   | 'unknown-event'
   /** An Icon's `name` is in no icon set it can read, so it draws nothing. */
   | 'unknown-icon'

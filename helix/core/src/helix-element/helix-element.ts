@@ -1,13 +1,9 @@
 import { type CSSResultOrNative, LitElement, type PropertyValues, unsafeCSS } from 'lit'
 import type { StaticValue } from 'lit/static-html.js'
+import { auditReactProps } from '#react-audit'
 import { measuring, reportRender } from '../utils/report-render/report-render.js'
 import { noteVersion, reportUsage } from '../utils/report-usage/report-usage.js'
-import {
-  applyReactProperties,
-  auditReactProps,
-  bindReactHandler,
-  reactPropsOf,
-} from './react-bridge.js'
+import { applyReactProperties, bindReactHandler, reactPropsOf } from './react-bridge.js'
 
 /**
  * Applied to every Helix component's shadow root so component CSS can rely on
@@ -685,11 +681,12 @@ export class HelixElement extends LitElement {
          there was no bag to read above and there may be none for a frame or two
          yet. See `LOOK_EVERY`.
 
-         **Audited here as well as at dispatch, and this is the half that catches
-         the real mistake.** From inside `dispatchEvent` alone, an element holding
-         a handler prop and sending nothing is never looked at, and a prop on the
-         wrong element is exactly the case where that element has no reason to
-         dispatch. Once per element either way: the audit holds its own set. */
+         **Audited here as well as at dispatch, in a development build, and this
+         is the half that catches the real mistake.** From inside `dispatchEvent`
+         alone, an element holding a handler prop and sending nothing is never
+         looked at, and a prop on the wrong element is exactly the case where
+         that element has no reason to dispatch. Once per element either way:
+         the audit holds its own set. */
       let waited = 0
       const look = (): void => {
         const props = reactPropsOf(this)

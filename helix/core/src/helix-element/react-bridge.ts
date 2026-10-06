@@ -1,18 +1,20 @@
 import type { LitElement } from 'lit'
-import { eventsForTag } from '../events/element-events.js'
-import { helixEventNames } from '../events/names.js'
-import { reportRuntime } from '../utils/report-runtime/report-runtime.js'
+import { auditReactProps } from '#react-audit'
 
 /*
  * What a Helix element does about React's hydration, kept out of the base class.
  *
- * Three call sites in `HelixElement` and everything they need is here: the
- * handler a prop holds is bound before an event is announced, the object and
- * function properties React never applied are assigned after the first update,
- * and the props bag is audited for a handler attached to nothing. The argument
- * for each is with the code it explains, and the whole of it should go the day
- * facebook/react#35446 is fixed, which is easier to see from one file than
- * from three hundred lines inside the base class.
+ * Two call sites in `HelixElement` and everything they need is here: the
+ * handler a prop holds is bound before an event is announced, and the object and
+ * function properties React never applied are assigned after the first update.
+ * The argument for each is with the code it explains, and the whole of it should
+ * go the day facebook/react#35446 is fixed, which is easier to see from one file
+ * than from three hundred lines inside the base class.
+ *
+ * **The audit of the props bag is not here**, because it is a warning and this
+ * is what makes React work. It is `#react-audit`, which a development build
+ * resolves to `react-audit.ts` and every other build to a function that does
+ * nothing, as `#audit-name` is. See `react-audit.ts`.
  *
  * `fusion workspace audit`'s `react-bridge` reads `REACT_PROPS` out of whichever
  * file declares it and holds the installed `react-dom` to the version the
@@ -68,101 +70,6 @@ export const reactPropsOf = (node: EventTarget): Record<string, unknown> | undef
   }
   reactPropsKey = found
   return stash[found] as Record<string, unknown>
-}
-
-/** Elements whose handler props have been read once. */
-const audited = new WeakSet<EventTarget>()
-
-/**
- * Removed callback properties, named so a consumer who wrote one is told.
- *
- * They are events now. Removing a property is silent in a way removing an event
- * is not, so these are worth warning about for a release or two.
- */
-const REMOVED = new Set(['onActiveChange', 'onCheckedChange', 'onOpenChange', 'onValueChange'])
-
-/**
- * Says so when a handler prop is attached to nothing.
- *
- * **TypeScript will not catch any of this, and that is not our tooling's
- * fault.** A JSX attribute whose name is not a valid identifier is exempt from
- * checking on an intrinsic element, and every one of ours carries a hyphen. So
- * `onhelix-opne` type-checks, `on:helix-open` type-checks, and a made-up
- * `totally-invented` prop type-checks, all against fully generated types that
- * do reject a wrong *value* on a normal attribute. Measured with `tsc`.
- *
- * That leaves runtime as the only place a typo can be caught, and React's props
- * bag as the only place to look, which the binding above already reads. Once per
- * element, because a warning that repeats on every keystroke is one a consumer
- * silences.
- *
- * `on:helix-open` gets its own message because it is not a mistake so much as
- * the wrong dialect. It is what the Solid types offer, correctly, and React
- * binds it as an event named `:helix-open`.
- */
-export const auditReactProps = (host: EventTarget, props: Record<string, unknown>): void => {
-  if (audited.has(host)) {
-    return
-  }
-  audited.add(host)
-  const tag = host instanceof Element ? `<${host.localName}>` : 'A Helix element'
-  const element = host instanceof Element ? host.localName : undefined
-  for (const key of Object.keys(props)) {
-    if (key.startsWith('on:')) {
-      reportRuntime({
-        kind: 'solid-handler-syntax',
-        message:
-          `${tag} was given \`${key}\`, which is Solid's syntax. React binds the name after \`on\` ` +
-          `verbatim, so this listens for an event called \`${key.slice(2)}\`. Write \`on${key.slice(3)}\`.`,
-        tag: element,
-      })
-      continue
-    }
-    if (REMOVED.has(key)) {
-      reportRuntime({
-        kind: 'removed-callback',
-        message:
-          `${tag} was given \`${key}\`, which was removed. It never worked from JSX, because React ` +
-          `binds any \`on\` prop as an event of that name. Listen for the element's change event instead.`,
-        tag: element,
-      })
-      continue
-    }
-    if (!key.startsWith('on') || !key.includes('-')) {
-      continue
-    }
-    const name = key.slice(2)
-    if (!helixEventNames.has(name)) {
-      reportRuntime({
-        kind: 'unknown-event',
-        message:
-          `${tag} was given \`${key}\`, and nothing dispatches \`${name}\`. TypeScript cannot ` +
-          `check a hyphenated JSX prop, so this is the only place it shows up.`,
-        tag: element,
-      })
-      continue
-    }
-    /* **A real name on the element that does not send it**, which is the mistake
-       made while writing a *correct* event and so the one the name check could
-       never see. The event usually does reach this element, being composed and
-       bubbling, but React binds an `on` prop by reading it as the element itself
-       dispatches: one merely passing through never calls this host's own
-       `dispatchEvent`, so the prop is recorded and never wired.
-
-       Silent when nothing registered the tag, which is a component from outside
-       this library or a package built before the map existed. */
-    const mine = host instanceof Element ? eventsForTag(host.localName) : undefined
-    if (mine && !mine.has(name)) {
-      reportRuntime({
-        kind: 'misplaced-handler',
-        message:
-          `${tag} was given \`${key}\`, but it dispatches ${[...mine].map((one) => `\`${one}\``).join(', ')}. ` +
-          `\`${name}\` is sent by a different element, and React only wires an \`on\` prop on the ` +
-          'element that dispatches, so this handler will never run. Put it on that element.',
-        tag: element,
-      })
-    }
-  }
 }
 
 /*
@@ -305,8 +212,8 @@ const lowercasePropFor = (event: Event): string | undefined =>
  *
  * Called by the host as it dispatches, which is the first moment it knows the
  * event's name. A host React does not render holds no props, and nothing is
- * bound. The props are audited on the way, so a handler attached to nothing
- * warns.
+ * bound. In a development build the props are audited on the way, so a
+ * handler attached to nothing warns; see `react-audit.ts`.
  */
 export const bindReactHandler = (host: EventTarget, event: Event): void => {
   const props = reactPropsOf(host)

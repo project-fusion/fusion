@@ -30,10 +30,15 @@ const published = (target: Record<string, string>): Record<string, string> =>
 describe('the development-only audits in the published files', () => {
   test('each `#` import has an export that publishes the same files', () => {
     const exported = pkg.exports as unknown as Record<string, Record<string, string>>
-    expect(Object.keys(pkg.imports).sort()).toEqual(['#audit-name', '#audit-source'])
+    expect(Object.keys(pkg.imports).sort()).toEqual([
+      '#audit-name',
+      '#audit-source',
+      '#react-audit',
+    ])
     for (const [key, subpath] of [
       ['#audit-name', './audits/name'],
       ['#audit-source', './audits/source'],
+      ['#react-audit', './audits/react'],
     ] as const) {
       const target = pkg.imports[key]
       const { types, ...runtime } = exported[subpath] ?? {}
@@ -59,7 +64,7 @@ describe('the development-only audits in the published files', () => {
       )
       writeFileSync(
         join(dist, 'mixins', 'field.js'),
-        'import { auditName } from "#audit-name";\nimport { auditSource } from \'#audit-source\';\n',
+        'import { auditReactProps } from "#react-audit";\nimport { auditSource } from \'#audit-source\';\n',
       )
       writeFileSync(join(dist, 'index.d.ts'), "export { auditName } from '#audit-name';\n")
       writeFileSync(join(dist, 'notes.md'), "'#audit-name'\n")
@@ -73,7 +78,7 @@ describe('the development-only audits in the published files', () => {
           "export const id = '#audit-name-not';\n",
       )
       expect(readFileSync(join(dist, 'mixins', 'field.js'), 'utf8')).toBe(
-        'import { auditName } from "@fusion.dev/helix-core/audits/name";\n' +
+        'import { auditReactProps } from "@fusion.dev/helix-core/audits/react";\n' +
           "import { auditSource } from '@fusion.dev/helix-core/audits/source';\n",
       )
       // A consumer's TypeScript reads the declarations the export names.
