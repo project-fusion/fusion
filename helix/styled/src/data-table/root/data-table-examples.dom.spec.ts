@@ -2,6 +2,7 @@ import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, idle, logged, registerDom } from '@fusion.dev/helix-testing/dom'
 import events from '../.examples/events.html' with { type: 'text' }
 import loadingMore from '../.examples/loading-more.html' with { type: 'text' }
+import movingRows from '../.examples/moving-rows.html' with { type: 'text' }
 import nestedRows from '../.examples/nested-rows.html' with { type: 'text' }
 import paging from '../.examples/paging.html' with { type: 'text' }
 import preview from '../.examples/preview.html' with { type: 'text' }
@@ -187,4 +188,30 @@ describe('the nested-rows example', () => {
     expect(tree.expanded).toBe('src,src/utils')
     expect(rows(tree)).toHaveLength(7)
   })
+})
+
+describe('the moving rows example', () => {
+  run(
+    'a key picks up the first job, Down moves it, and the drop sets the rows in that order',
+    async () => {
+      await example(movingRows)
+      await idle()
+      const queue = document.getElementById('queue') as HTMLElement
+      const grip = queue.shadowRoot?.querySelector('[part="row-grip"]') as HTMLElement
+      grip.focus()
+      const press = (key: string): void => {
+        grip.dispatchEvent(
+          new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key }),
+        )
+      }
+      press(' ')
+      press('ArrowDown')
+      press(' ')
+      await idle()
+      expect(first(queue)).toBe('Spring brochure')
+      expect(rows(queue)[1]?.querySelector('[part~="cell"]')?.textContent?.trim()).toBe(
+        'Invoice 1042',
+      )
+    },
+  )
 })
