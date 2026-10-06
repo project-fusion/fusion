@@ -299,3 +299,26 @@ describe('a link tag in a group', () => {
     expect(followed).toBe(1)
   })
 })
+
+/* React hands `value={['Apple']}` over as an array, and an emptied group with
+   nothing in its `empty` slot said nothing at all. */
+describe('a group as a page sets it', () => {
+  test('takes an array of values as the written list', async () => {
+    const one = await group('selection-mode="multiple"', FRUIT)
+    ;(one.group as unknown as { value: string[] }).value = ['Apple', 'Plum']
+    await settle(one)
+    expect(one.tags.map((tag) => tag.selected)).toEqual([true, false, true])
+  })
+
+  test('says `empty-label` once emptied, where nothing is slotted', async () => {
+    const one = await group('', '<helix-headless-tag dismissible>Apple</helix-headless-tag>')
+    one.group.addEventListener('helix-dismiss', (event) => (event.target as Tag).remove())
+    const apple = one.tags[0] as Tag
+    cell(apple).focus()
+    press(apple, 'Delete')
+    await new Promise((done) => requestAnimationFrame(() => done(undefined)))
+    await one.group.updateComplete
+    const slot = part(one.group, 'empty')?.querySelector('slot')
+    expect(slot?.textContent).toBe('No tags')
+  })
+})
