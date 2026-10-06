@@ -48,7 +48,7 @@
   gap: var(--helix-space-sm);
   justify-content: space-between;
   padding-block: var(--helix-space-sm);
-  padding-inline: var(--notifications-padding-inline, var(--helix-space-md));
+  padding-inline: var(--notifications-padding-inline, var(--helix-space-lg));
 }
 
 /*
@@ -68,7 +68,7 @@
   border-block-start: var(--helix-border-thin) solid
     var(--notifications-rule, var(--helix-color-border));
   padding-block: var(--helix-space-sm);
-  padding-inline: var(--notifications-padding-inline, var(--helix-space-md));
+  padding-inline: var(--notifications-padding-inline, var(--helix-space-lg));
 }
 
 /* The last item's rule and the footer's rule are the same line drawn twice,

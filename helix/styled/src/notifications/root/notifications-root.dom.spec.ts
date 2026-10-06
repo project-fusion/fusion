@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, hasState, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 /* The styled tier, which is paint over the headless behavior.
  *
@@ -40,5 +40,25 @@ describe('the styled feed', () => {
   test('the count reaches the host, so a badge can read it without counting', async () => {
     const element = await mount(markup)
     expect(element.getAttribute('unread')).toBe('1')
+  })
+})
+
+/* Browser only: happy-dom computes no style from a shadow sheet. */
+const geometry = hasLayout() ? test : (): void => {}
+
+describe('the row controls', () => {
+  geometry('fade in where they rest, so the dismiss control holds still', async () => {
+    const element = await mount(`
+      <helix-notifications label="Activity">
+        <helix-notification dismissible>One</helix-notification>
+      </helix-notifications>`)
+    const item = element.querySelector('helix-notification') as HTMLElement
+    const controls = part(item, 'controls') as Element
+    expect(getComputedStyle(controls).translate).toBe('none')
+    // Focus within the row swaps the controls in, as the pointer does.
+    const dismiss = part(item, 'dismiss') as HTMLElement
+    dismiss.focus()
+    expect(item.matches(':focus-within')).toBe(true)
+    expect(getComputedStyle(controls).translate).toBe('none')
   })
 })
