@@ -1,6 +1,9 @@
 import {
   commaList,
   customElement,
+  deepActiveElement,
+  drawStatus,
+  fillTemplate,
   focusItemOf,
   HelixActionEvent,
   HelixElement,
@@ -8,9 +11,15 @@ import {
   inlineStep,
   KeyboardNavigationController,
   type NavigableItem,
+  placeKey,
   pressedOwnControl,
+  ReorderController,
+  type ReorderMove,
+  requestReorder,
   requestValue,
   rovingStop,
+  StatusController,
+  scrollingAncestor,
   scrollRoom,
   selectsAll,
   typeaheadByWords,
@@ -72,6 +81,23 @@ import {
  * in `end` `tabindex="-1"` to leave it to the arrow keys and out of the tab
  * order.
  *
+ * **`reorderable` lets you move rows.** Each row gets a grip after its `end`
+ * slot, named by `move-label`. Drag a grip to move its row, and the list
+ * scrolls near an edge. Or press a grip with Space, Enter, or a click to pick
+ * up its row, move it with the arrow keys, and press the grip again to drop
+ * it. A click on another row drops it there, and Escape puts it back. The list
+ * says each step in its `live` region. A drop sends `helix-before-reorder`,
+ * which you can refuse, and then `helix-reorder`, whose `keys` hold every
+ * row's value in the new order. **You move the rows**: the list moves no
+ * element of yours, so your framework keeps the order it rendered.
+ *
+ * | Key, on a held row's grip | What it does |
+ * |---|---|
+ * | Down, Up | Moves the row one place. |
+ * | Home, End | Moves the row to the top or the bottom. |
+ * | Space, Enter | Drops the row. |
+ * | Escape | Puts the row back where it was. |
+ *
  * `start` and `reversed` number an ordered list as `<ol>` does. The list
  * writes where the numbers start and which way they run as `--list-first` and
  * `--list-step` on its slot, which the styled tier counts from. Reversed with
@@ -89,12 +115,27 @@ import {
  * @event {Event} change - Fired once a press has changed which rows are selected.
  * @event {HelixActionEvent} helix-action - Sent from a row when the reader acts on it: Enter, or a press in a list that selects nothing. Read the row from `target`. A row with `href` follows its link instead.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired before a press changes which rows are selected, with the `value` it would leave. Cancelable.
+ * @event {HelixBeforeReorderEvent} helix-before-reorder - Fired when a row is dropped at a new place, in a `reorderable` list, with every row's value in the new order. Cancelable: cancel it to keep the row where it is.
+ * @event {HelixReorderEvent} helix-reorder - Fired after `helix-before-reorder` when nobody canceled it. Move your rows to the order in `keys`. Cancelable: cancel it to say the move did not happen.
+ *
+ * @csspart live - The region that says each step of a move to screen readers, in a `reorderable` list. Drawn from the first move. Visually hidden in the styled tier.
  *
  * @cssproperty --list-first - The number of the first row, written where `start` or `reversed` moves it.
  * @cssproperty --list-step - What each row adds to the number before it: `1`, or `-1` where `reversed`.
  */
 @customElement('helix-headless-list')
 export class HelixHeadlessList extends HelixElement {
+  /**
+   * What screen readers hear when a held row is put back, or a move is
+   * refused, in a `reorderable` list.
+   */
+  @property({ attribute: 'canceled-label' })
+  canceledLabel = 'Canceled'
+
+  /** What screen readers hear when a row is dropped, in a `reorderable` list. */
+  @property({ attribute: 'dropped-label' })
+  droppedLabel = 'Dropped'
+
   /**
    * The kind of list, which follows from the content.
    *
@@ -125,6 +166,35 @@ export class HelixHeadlessList extends HelixElement {
    */
   @property()
   label = ''
+
+  /**
+   * What screen readers hear each time an arrow key moves a held row, in a
+   * `reorderable` list. `{name}` is the row's words, `{position}` the place it
+   * would go, counting from 1, and `{count}` the number of rows.
+   */
+  @property({ attribute: 'moved-label' })
+  movedLabel = '{name} moved to position {position} of {count}'
+
+  /**
+   * The name of each row's grip, in a `reorderable` list. `{name}` is
+   * replaced with the row's words.
+   */
+  @property({ attribute: 'move-label' })
+  moveLabel = 'Move {name}'
+
+  /**
+   * What screen readers hear when a key or a click picks up a row, in a
+   * `reorderable` list. `{name}` is the row's words.
+   */
+  @property({ attribute: 'picked-up-label' })
+  pickedUpLabel = 'Picked up {name}'
+
+  /**
+   * Lets you move rows by dragging a grip, or with the keys. The list moves no
+   * row itself: you move your data on `helix-reorder`.
+   */
+  @property({ type: Boolean })
+  reorderable = false
 
   /**
    * Numbers an ordered list downward, so the count falls row by row and ends at
@@ -204,6 +274,47 @@ export class HelixHeadlessList extends HelixElement {
     wrap: false,
   })
 
+  /** The region that says each step of a move. */
+  private readonly status = new StatusController(this)
+
+  /** The value of a row just moved, whose grip takes focus back once the page has moved it. */
+  private moved: string | undefined
+
+  /**
+   * Moving rows by their grips, in a `reorderable` list. The rows are the
+   * page's, so a drop asks the page to move them.
+   */
+  private readonly reorder = new ReorderController(this, {
+    axis: 'block',
+    box: (key) => this.rowFor(key)?.getBoundingClientRect(),
+    drop: (move) => this.requestMove(move),
+    enabled: () => this.reorderable,
+    grip: (event) => {
+      const row = this.rowOf(event)
+      const element = row?.gripElement
+      return row && element && event.composedPath().includes(element)
+        ? { element, key: this.valueFor(row) }
+        : undefined
+    },
+    item: (event) => {
+      const row = this.rowOf(event)
+      return row ? this.valueFor(row) : undefined
+    },
+    keys: () => this.rows.map((row) => this.valueFor(row)),
+    name: (key) => this.rowFor(key)?.words || key,
+    say: (words) => this.status.say(words),
+    scroller: () => {
+      const first = this.rows[0]
+      return first ? scrollingAncestor(first, { axis: 'y', overflowing: true }) : null
+    },
+    words: () => ({
+      canceled: this.canceledLabel,
+      dropped: this.droppedLabel,
+      moved: this.movedLabel,
+      pickedUp: this.pickedUpLabel,
+    }),
+  })
+
   /** Whether the list is a grid a reader moves through. */
   private get interactive(): boolean {
     return this.selectionMode !== undefined
@@ -234,6 +345,79 @@ export class HelixHeadlessList extends HelixElement {
   private valueFor(row: HelixHeadlessListItem): string {
     return row.value || row.words
   }
+
+  /** The row that stands for a value. */
+  private rowFor(key: string): HelixHeadlessListItem | undefined {
+    return this.rows.find((row) => this.valueFor(row) === key)
+  }
+
+  /**
+   * Asks the page to move a row: `helix-before-reorder`, which can refuse it,
+   * then `helix-reorder`. Reports whether it stood.
+   */
+  private requestMove({ from, key, to }: ReorderMove): boolean {
+    const old = this.rows.map((row) => this.valueFor(row))
+    const keys = placeKey(old, old, key, to)
+    const stood = requestReorder(this, {
+      from,
+      key,
+      keys,
+      kind: 'item',
+      to: keys.indexOf(key),
+      value: keys.join(','),
+    })
+    this.moved = stood ? key : undefined
+    this.rowsChanged = false
+    return stood
+  }
+
+  /**
+   * Tells every row whether it has a grip and where it stands in a move. Through
+   * `whenHydrated`, as `sync` is.
+   */
+  private syncMoves(): void {
+    const held = this.reorder.held
+    const mark = this.reorder.mark
+    for (const row of this.rows) {
+      const key = this.valueFor(row)
+      whenHydrated(row, () => {
+        /* A disabled row stays where it is, and the others move past it. */
+        row.grip =
+          this.reorderable && !row.disabled
+            ? fillTemplate(this.moveLabel, { name: row.words || key })
+            : undefined
+        row.move =
+          held?.key === key
+            ? 'dragging'
+            : mark?.key === key
+              ? (`drop-${mark.edge}` as const)
+              : undefined
+      })
+    }
+  }
+
+  /**
+   * Gives focus back to the grip of a row the page has just moved, where moving
+   * the row took focus to the body.
+   *
+   * The page moves its rows when it likes, in the same task or a render later,
+   * so this waits for the rows to change. Focus that went anywhere but the body
+   * is where you put it, and is left there.
+   */
+  private refocus(): void {
+    const row = this.moved === undefined ? undefined : this.rowFor(this.moved)
+    if (!row || !this.rowsChanged) {
+      return
+    }
+    const active = deepActiveElement()
+    if (active === null || active === document.body) {
+      row.gripElement?.focus()
+    }
+    this.moved = undefined
+  }
+
+  /** Whether the rows changed since the last move asked for one, for `refocus`. */
+  private rowsChanged = false
 
   /**
    * Tells every row its place: whether it holds the one tab stop and whether
@@ -489,6 +673,10 @@ export class HelixHeadlessList extends HelixElement {
     if (this.interactive || changed.get('selectionMode') !== undefined) {
       this.sync()
     }
+    if (this.reorderable || changed.get('reorderable') !== undefined) {
+      this.syncMoves()
+      this.refocus()
+    }
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -520,10 +708,11 @@ export class HelixHeadlessList extends HelixElement {
   protected override render(): TemplateResult {
     /* A row arriving or leaving changes who holds the stop and how many rows
        a reversed list counts down from. */
-    return html`<slot style=${this.numbers} @slotchange=${this.handleSlotChange}></slot>`
+    return html`<slot style=${this.numbers} @slotchange=${this.handleSlotChange}></slot>${drawStatus(this.status)}`
   }
 
   private readonly handleSlotChange = (): void => {
+    this.rowsChanged = true
     this.requestUpdate()
   }
 }

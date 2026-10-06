@@ -10,11 +10,12 @@
 [part~="row"] {
   align-items: center;
   display: grid;
-  /* Four tracks, and the first holds the rail. `auto` rather than a width, so
-     that a list which has not asked for a rail gets a track with nothing in it,
-     which is `0`: the cell below is `display: none` until a list turns it on,
-     and an `auto` track with no items takes no space. */
-  grid-template-columns: auto auto 1fr auto;
+  /* Five tracks, and the first holds the rail and the last the grip. `auto`
+     rather than a width, so that a list which has not asked for a rail gets a
+     track with nothing in it, which is `0`: the cell below is `display: none`
+     until a list turns it on, and an `auto` track with no items takes no space.
+     The grip's track is the same: a list that does not reorder draws no grip. */
+  grid-template-columns: auto auto 1fr auto auto;
   padding: var(--list-item-padding, var(--helix-space-sm) var(--helix-space-md));
 }
 
@@ -141,6 +142,53 @@ slot[name="end"]::slotted(*) {
 :host(:state(selected)) [part~="row"] {
   background-color: var(--list-item-selected-background-color, var(--helix-color-primary-subtle));
   border-radius: var(--helix-radii-sm);
+}
+
+/* The grip, in a `reorderable` list: after `end`, quiet until held, as a data
+   table's column grip is. `touch-action: none` so a drag on a phone moves the
+   row and does not scroll the page. */
+[part="grip"] {
+  all: unset;
+  align-items: center;
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  color: var(--list-item-grip-color, var(--helix-color-foreground-muted));
+  cursor: grab;
+  display: inline-flex;
+  grid-column: 5;
+  grid-row: 1 / span 2;
+  margin-inline-start: var(--helix-space-sm);
+  touch-action: none;
+}
+
+[part="grip"]:active {
+  cursor: grabbing;
+}
+
+[part="grip"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+[part="grip-mark"] {
+  block-size: 1em;
+  inline-size: 1em;
+}
+
+/* The row being moved, faded where it was, and the line where it would land:
+   an inset shadow on the edge it goes past, which moves nothing around it. */
+:host(:state(dragging)) [part~="row"] {
+  opacity: var(--list-item-dragging-opacity, 0.5);
+}
+
+:host(:state(drop-before)) [part~="row"] {
+  box-shadow: inset 0 var(--list-item-drop-indicator-size, var(--helix-border-thick)) 0 0
+    var(--list-item-drop-indicator-color, var(--helix-color-primary));
+}
+
+:host(:state(drop-after)) [part~="row"] {
+  box-shadow: inset 0 calc(var(--list-item-drop-indicator-size, var(--helix-border-thick)) * -1) 0 0
+    var(--list-item-drop-indicator-color, var(--helix-color-primary));
 }
 
 /* Out of reach, and drawn so: the platform's own disabled step. */

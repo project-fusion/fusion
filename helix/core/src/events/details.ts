@@ -281,6 +281,40 @@ export interface ChangeDetail {
   value: string
 }
 
+/**
+ * Detail carried by `helix-before-reorder`, `helix-reorder`, and
+ * `helix-reordered`: one row, item, or column moved to a new place.
+ *
+ * `from` and `to` count from 0 in the old order and in `keys`. Where your
+ * array holds every key in the same order, `rows.splice(to, 0,
+ * ...rows.splice(from, 1))` makes the same move.
+ *
+ * **`kind` is a field because one element sends both.** A data table moves its
+ * rows and its columns, and both are `helix-reorder` from the same host.
+ */
+export interface ReorderDetail extends ChangeDetail {
+  /** Where the key was before the move, counting from 0 in the old order. */
+  from: number
+
+  /** The key of what moved: a row's key, an item's value, or a column's field. */
+  key: string
+
+  /** Every key in the new order. */
+  keys: string[]
+
+  /** What moved: a column of a data table, an item of a list, or a row of a data table. */
+  kind: 'column' | 'item' | 'row'
+
+  /** Where the key is after the move, counting from 0 in `keys`. */
+  to: number
+
+  /**
+   * The new order as one string: fields separated by spaces for columns, which
+   * is what `order` takes, and keys separated by commas for rows and items.
+   */
+  value: string
+}
+
 /** Detail carried by `helix-activate`: the value after the move, and the one before it. */
 export interface ActivateDetail extends ChangeDetail {
   /** The value that was current before the move, where the set knows it. */

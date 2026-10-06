@@ -1,12 +1,17 @@
 import { customElement, HelixElement, hostAria, slottedWords } from '@fusion.dev/helix-core'
+import { dotsThreeVertical } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
 /** What a control in the `end` slot can be, which Left and Right move between. */
 const CONTROL = 'a[href], button, input, select, textarea, [tabindex]'
 
 /** The values `current` takes, which are `aria-current`'s. */
 export type ListItemCurrent = 'date' | 'location' | 'page' | 'step' | 'time' | 'true'
+
+/** Where a row stands in a move: the row being moved, or the one the drop indicator is beside. */
+export type ListItemMove = 'dragging' | 'drop-after' | 'drop-before'
 
 /**
  * @summary One row of a list.
@@ -41,6 +46,11 @@ export type ListItemCurrent = 'date' | 'location' | 'page' | 'step' | 'time' | '
  * selects, whether it is selected. Its link leaves the tab order there, and
  * Enter follows it from the row.
  *
+ * **In a `reorderable` list, the row has a grip** after its `end` slot, named
+ * by the list's `move-label`. The list says which row is moving and where the
+ * drop indicator is, with the `dragging`, `drop-before`, and `drop-after`
+ * states.
+ *
  * @since 0.1.0
  * @status stable
  * @aliases Row, Entry
@@ -53,10 +63,15 @@ export type ListItemCurrent = 'date' | 'location' | 'page' | 'step' | 'time' | '
  *
  * @event {HelixActionEvent} helix-action - The reader pressed Enter on the row, or pressed the row in a list that selects nothing, in a list with `selection-mode`. Read the row from `target`. A row with `href` follows its link instead.
  *
+ * @csspart grip - The button that moves the row, in a `reorderable` list.
+ * @csspart grip-mark - The icon on the grip.
  * @csspart link - The link, when the row has `href`. It holds every region except `end`.
  * @csspart row - The row's layout. It sits inside the host so the host can carry a list marker. In a list with `selection-mode` it is the grid cell that takes focus.
  * @csspart row-current - Added to `row` while the row is `current`.
  *
+ * @cssstate dragging - The row is being moved, in a `reorderable` list.
+ * @cssstate drop-after - The row being moved goes after this one when it is dropped.
+ * @cssstate drop-before - The row being moved goes before this one when it is dropped.
  * @cssstate selected - The row is selected, in a list that selects.
  */
 @customElement('helix-headless-list-item')
@@ -96,6 +111,15 @@ export class HelixHeadlessListItem extends HelixElement {
   focusable?: boolean | undefined
 
   /**
+   * The name of the row's grip, written by a `reorderable` list from its
+   * `move-label`, and unset in a list that does not reorder, which draws no
+   * grip. No attribute: it is coordination between elements, as `focusable`
+   * is.
+   */
+  @property({ attribute: false })
+  grip?: string | undefined
+
+  /**
    * The URL the row links to. Leave it empty for a row that is not a link.
    *
    * Empty rather than optional, and unset by default: a list is not always a
@@ -104,6 +128,13 @@ export class HelixHeadlessListItem extends HelixElement {
    */
   @property()
   href = ''
+
+  /**
+   * Where the row stands in a move, written by a `reorderable` list: the row
+   * being moved, or the one the drop indicator is beside. Unset otherwise.
+   */
+  @property({ attribute: false })
+  move?: ListItemMove | undefined
 
   /**
    * The link's `rel` value. You set it yourself. It is not derived from
@@ -162,14 +193,23 @@ export class HelixHeadlessListItem extends HelixElement {
    */
   get controls(): HTMLElement[] {
     const slot = this.renderRoot?.querySelector?.<HTMLSlotElement>('slot[name="end"]')
-    return (slot?.assignedElements({ flatten: true }) ?? [])
-      .flatMap((element) => [element, ...element.querySelectorAll('*')])
-      .filter(
-        (element): element is HTMLElement =>
-          element instanceof HTMLElement &&
-          element.matches(CONTROL) &&
-          !element.matches(':disabled'),
-      )
+    const grip = this.gripElement
+    return [
+      ...(slot?.assignedElements({ flatten: true }) ?? [])
+        .flatMap((element) => [element, ...element.querySelectorAll('*')])
+        .filter(
+          (element): element is HTMLElement =>
+            element instanceof HTMLElement &&
+            element.matches(CONTROL) &&
+            !element.matches(':disabled'),
+        ),
+      ...(grip ? [grip] : []),
+    ]
+  }
+
+  /** @internal The grip that moves the row, in a `reorderable` list. */
+  get gripElement(): HTMLElement | null {
+    return this.renderRoot?.querySelector?.<HTMLElement>('[part="grip"]') ?? null
   }
 
   /** Moves focus to the row's cell, in a list with `selection-mode`. */
@@ -195,6 +235,24 @@ export class HelixHeadlessListItem extends HelixElement {
     this.internals.ariaCurrent =
       this.current !== undefined && this.href === '' ? this.current : null
     this.toggleState('selected', this.selected === true)
+    this.toggleState('dragging', this.move === 'dragging')
+    this.toggleState('drop-after', this.move === 'drop-after')
+    this.toggleState('drop-before', this.move === 'drop-before')
+  }
+
+  /**
+   * The grip, after `end`, in a `reorderable` list. A tab stop of its own in a
+   * list a reader reads, and reached with Left and Right in a list with
+   * `selection-mode`, as a control in `end` is.
+   */
+  private renderGrip(): TemplateResult | typeof nothing {
+    return this.grip === undefined
+      ? nothing
+      : html`<button part="grip" type="button" tabindex=${this.grouped ? '-1' : nothing} aria-label=${this.grip}>
+          <svg aria-hidden="true" fill="currentColor" part="grip-mark" viewBox=${dotsThreeVertical.viewBox}>
+            ${unsafeSVG(dotsThreeVertical.content)}
+          </svg>
+        </button>`
   }
 
   /**
@@ -269,7 +327,7 @@ export class HelixHeadlessListItem extends HelixElement {
           tabindex=${tabindex}
           aria-labelledby=${labelledby}
           aria-describedby=${describedby}
-        >${content}<slot name="end"></slot></div>`
+        >${content}<slot name="end"></slot>${this.renderGrip()}</div>`
       : html`<div
           part="row${this.current === undefined ? '' : ' row-current'}"
           role=${role}
@@ -284,7 +342,7 @@ export class HelixHeadlessListItem extends HelixElement {
           aria-current=${this.current ?? nothing}
           tabindex=${this.grouped ? '-1' : nothing}
           >${content}</a
-        ><slot name="end"></slot></div>`
+        ><slot name="end"></slot>${this.renderGrip()}</div>`
   }
 }
 
