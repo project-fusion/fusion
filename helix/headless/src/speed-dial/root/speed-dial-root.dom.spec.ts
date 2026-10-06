@@ -419,4 +419,78 @@ describe('a speed dial opened by a long press', () => {
     const id = trigger.getAttribute('aria-describedby') ?? ''
     expect(host.shadowRoot?.getElementById(id)?.textContent).toContain('Alt+Down')
   })
+
+  /* Only the drawn trigger was described, where the recommended trigger is a
+     slotted icon button: a reader on it heard nothing of the long press. */
+  describe('a slotted trigger', () => {
+    type Described = Element & { ariaDescribedByElements?: Element[] | null }
+    /* happy-dom has no ARIA element reflection, so the property is given to
+       the one control the dial writes it on, where a browser has it. */
+    const reflecting = (element: Element): Described => {
+      if (!('ariaDescribedByElements' in element)) {
+        let held: Element[] | null = null
+        Object.defineProperty(element, 'ariaDescribedByElements', {
+          configurable: true,
+          get: () => held,
+          set: (value: Element[] | null) => {
+            held = value
+          },
+        })
+      }
+      return element as Described
+    }
+    /* By identity: a deep comparison walks the whole document from an element. */
+    const describedBy = (element: Described, host: Element): boolean =>
+      element.ariaDescribedByElements?.length === 1 && element.ariaDescribedByElements[0] === host
+    const labelOf = (host: Element): string | null =>
+      (host as unknown as { internals: ElementInternals }).internals.ariaLabel
+
+    test('is described by the host, which carries `long-press-label`', async () => {
+      const host = (await mount(
+        `<helix-headless-speed-dial label="Compose" open-on="long-press">
+          <helix-headless-button slot="trigger">Write</helix-headless-button>
+        </helix-headless-speed-dial>`,
+      )) as Dial & { longPressLabel: string; openOn: string }
+      const button = host.querySelector('helix-headless-button') as unknown as Dial
+      await button.updateComplete
+      /* Nor does it keep `delegatesFocus`, by which the dial finds the control
+         inside a Helix trigger. */
+      Object.defineProperty(button.shadowRoot, 'delegatesFocus', { value: true })
+      const inner = reflecting(button.shadowRoot?.querySelector('button') as Element)
+      host.longPressLabel = 'Hold to see more'
+      await host.updateComplete
+      expect(describedBy(inner, host)).toBe(true)
+      expect(labelOf(host)).toBe('Hold to see more')
+      host.openOn = 'click'
+      await host.updateComplete
+      expect(inner.ariaDescribedByElements ?? []).toHaveLength(0)
+      expect(labelOf(host)).toBeNull()
+    })
+
+    test('a plain one is described once a reader reaches it, unless the page described it', async () => {
+      const host = (await mount(
+        `<helix-headless-speed-dial label="Compose" open-on="long-press">
+          <button slot="trigger">Write</button>
+        </helix-headless-speed-dial>`,
+      )) as Dial
+      const plain = reflecting(host.querySelector('button') as Element)
+      await host.updateComplete
+      /* Not before: the markup may be a framework's, still hydrating. */
+      expect(plain.ariaDescribedByElements ?? []).toHaveLength(0)
+      triggerSlot(host).dispatchEvent(new FocusEvent('focusin', { bubbles: true, composed: true }))
+      await host.updateComplete
+      expect(describedBy(plain, host)).toBe(true)
+
+      const own = (await mount(
+        `<helix-headless-speed-dial label="Compose" open-on="long-press">
+          <button slot="trigger" aria-describedby="mine">Write</button>
+        </helix-headless-speed-dial>`,
+      )) as Dial
+      const described = reflecting(own.querySelector('button') as Element)
+      triggerSlot(own).dispatchEvent(new FocusEvent('focusin', { bubbles: true, composed: true }))
+      await own.updateComplete
+      expect(described.ariaDescribedByElements ?? []).toHaveLength(0)
+      expect(labelOf(own)).toBeNull()
+    })
+  })
 })
