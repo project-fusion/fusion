@@ -321,6 +321,27 @@ describe('turns handed over as data', () => {
     )
   })
 
+  test('take the declarations author-styles holds for their author, and only theirs', async () => {
+    const element = await fed([
+      { author: 'Ada', key: 'a', text: 'Looking now.' },
+      { author: 'me', key: 'b', text: 'Thanks.' },
+      { author: 'constructor', key: 'c', text: 'Hi' },
+    ])
+    element.setAttribute(
+      'author-styles',
+      '{"Ada": "--chat-message-background-color: rgb(1, 2, 3)", "me": 4}',
+    )
+    await settle(element)
+    expect(drawn(element).map((message) => message.getAttribute('style'))).toEqual([
+      '--chat-message-background-color: rgb(1, 2, 3)',
+      null,
+      null,
+    ])
+    element.setAttribute('author-styles', 'not JSON')
+    await settle(element)
+    expect(drawn(element)[0]?.getAttribute('style')).toBe(null)
+  })
+
   browser(
     'a document rule on a second name reaches the reader’s own turn and no other',
     async () => {

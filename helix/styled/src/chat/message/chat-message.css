@@ -163,13 +163,13 @@
     --chat-message-background-color,
     color-mix(in oklab, var(--helix-color-foreground) 14%, transparent)
   );
-  border-radius: var(--helix-radii-md);
+  border-radius: var(--chat-message-radius, var(--helix-radii-md));
   color: var(--chat-message-color, var(--helix-color-foreground));
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
   line-height: var(--helix-leading-normal);
-  padding-block: var(--helix-space-xs);
-  padding-inline: var(--helix-space-sm);
+  padding-block: var(--chat-message-padding-block, var(--helix-space-xs));
+  padding-inline: var(--chat-message-padding-inline, var(--helix-space-sm));
 }
 
 /* *The brand, as a wash and not as an absolute color.** Do not reach for
@@ -210,6 +210,7 @@
     --chat-message-background-color-me,
     color-mix(in oklab, var(--helix-color-primary) 28%, transparent)
   );
+  color: var(--chat-message-color-me, var(--chat-message-color, var(--helix-color-foreground)));
 }
 
 /* *Centered, because this line holds two things of different heights.** It is
@@ -220,7 +221,7 @@
    314. */
 [part="meta"] {
   align-items: center;
-  color: var(--helix-color-foreground-muted);
+  color: var(--chat-message-meta-color, var(--helix-color-foreground-muted));
   display: flex;
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
