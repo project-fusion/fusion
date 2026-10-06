@@ -21,6 +21,7 @@ import {
   reorderKey,
   reorderStep,
 } from '../../utils/reorder/reorder.js'
+import { scrollingAncestor } from '../../utils/scroll-item-into-view/scroll-item-into-view.js'
 
 /** How far a press on a grip travels before it is a drag, in pixels. */
 const SLOP = 4
@@ -69,7 +70,7 @@ export interface ReorderOptions {
    * stood: `false` where a listener refused it.
    *
    * Where this is not given, the controller asks the page itself, from the
-   * host: `helix-before-reorder`, then `helix-reorder`, with `kind` `item` and
+   * host: `helix-before-reorder`, then `helix-reorder`, with `kind` and
    * every key of `all` in the new order, joined by commas in `value`. A key a
    * filter hides keeps its place, as `placeKey` says.
    */
@@ -112,6 +113,9 @@ export interface ReorderOptions {
    */
   item?: (event: Event) => string | undefined
 
+  /** What a drop the controller asks for itself moves: `item`, the default, or `row`. */
+  kind?: ReorderDetail['kind']
+
   /**
    * The keys of the items the item with that key moves among, in the order
    * they are drawn: every item of a list, or the item's siblings in a tree.
@@ -129,12 +133,19 @@ export interface ReorderOptions {
    */
   refocus?: (key: string) => void
 
-  /** Speaks words in the host's live region. Nothing is said where this is not given. */
+  /**
+   * Speaks words in the host's live region. Where this is not given, the
+   * words go to the host's `announced`, the region a collection draws, where
+   * it has one, and nowhere otherwise.
+   */
   say?: (words: string) => void
 
   /**
    * The box to scroll while a dragged item nears one of its edges, or `null`
-   * for the window. Nothing scrolls where this is not given.
+   * for the window. Where this is not given, rows down the block axis scroll
+   * the nearest box around the host's first child that scrolls that way and
+   * has more to show, or the window, and items along the inline axis scroll
+   * nothing.
    */
   scroller?: () => HTMLElement | null
 
@@ -226,6 +237,15 @@ export class ReorderController implements ReactiveController {
     return at && key !== undefined ? { edge: at.edge, key } : undefined
   }
 
+  /**
+   * Where the item with that key stands in a move, for the host to mark it:
+   * the item held, the item the drop indicator is before or after, or nothing.
+   */
+  moveOf(key: string): 'dragging' | 'drop-after' | 'drop-before' | undefined {
+    const mark = this.mark
+    return this.held?.key === key ? 'dragging' : mark?.key === key ? `drop-${mark.edge}` : undefined
+  }
+
   hostConnected(): void {
     this.host.addEventListener('pointerdown', this.handleDown)
     this.host.addEventListener('click', this.handleClick, true)
@@ -311,7 +331,7 @@ export class ReorderController implements ReactiveController {
     return requestReorder(this.host, {
       ...move,
       keys,
-      kind: 'item',
+      kind: this.options.kind ?? 'item',
       to: keys.indexOf(key),
       value: keys.join(','),
     })
@@ -319,7 +339,16 @@ export class ReorderController implements ReactiveController {
 
   /** Says one of the words, with the item's name and place filled in. */
   private speak(which: keyof ReorderWords, key: string, to?: number): void {
-    const { name, say, words } = this.options
+    const { name, words } = this.options
+    const host = this.host as unknown as { announced?: string }
+    const say =
+      this.options.say ??
+      ('announced' in host
+        ? (said: string): void => {
+            host.announced = said
+            this.host.requestUpdate()
+          }
+        : undefined)
     if (!say) {
       return
     }
@@ -478,7 +507,16 @@ export class ReorderController implements ReactiveController {
 
   /** Scrolls the box while the dragged item is near one of its edges, a frame at a time. */
   private scroll(): void {
-    const scroller = this.options.scroller
+    const block = this.options.axis === 'block'
+    const scroller =
+      this.options.scroller ??
+      (block
+        ? () =>
+            scrollingAncestor((this.host.firstElementChild as HTMLElement | null) ?? this.host, {
+              axis: 'y',
+              overflowing: true,
+            })
+        : undefined)
     if (!scroller || this.frame || typeof requestAnimationFrame !== 'function') {
       return
     }
@@ -489,7 +527,6 @@ export class ReorderController implements ReactiveController {
         return
       }
       const box = scroller()
-      const block = this.options.axis === 'block'
       const edges = box
         ? box.getBoundingClientRect()
         : { bottom: innerHeight, left: 0, right: innerWidth, top: 0 }

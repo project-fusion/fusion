@@ -45,3 +45,76 @@
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }
+
+/* The grip cell of a reorderable table: the checkbox cell's box, before it,
+   with room at its start for the grip's focus ring, which the table's
+   scrolling box would otherwise cut. */
+[part~="grip"] {
+  align-items: center;
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  box-sizing: border-box;
+  display: flex;
+  min-block-size: var(--helix-size-control);
+  padding-inline: var(--helix-space-2xs) var(--helix-space-sm);
+}
+
+[part~="grip"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}
+
+/* The grip itself, quiet until a pointer holds it, as Data Table's is.
+   `touch-action: none` so a drag on a phone moves the row and does not scroll
+   the page. While a sort decides the order, it does nothing and says so. */
+[part="grip-button"] {
+  all: unset;
+  align-items: center;
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  color: var(--table-grip-color, var(--helix-color-foreground-muted));
+  cursor: grab;
+  display: inline-flex;
+  touch-action: none;
+}
+
+[part="grip-button"]:active {
+  cursor: grabbing;
+}
+
+[part="grip-button"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+[part="grip-button"][aria-disabled="true"] {
+  cursor: default;
+  opacity: var(--table-grip-disabled-opacity, 0.4);
+}
+
+[part="grip-mark"] {
+  block-size: 1em;
+  inline-size: 1em;
+}
+
+/* The row being moved, faded where it was, and the line where it would land:
+   an inset shadow on the edge it goes past, on every cell, since the row has no
+   box of its own. It moves nothing around it. */
+:host(:state(dragging)) [part~="grip"],
+:host(:state(dragging)) [part~="select"],
+:host(:state(dragging)) ::slotted(*) {
+  opacity: var(--table-dragging-opacity, 0.5);
+}
+
+:host(:state(drop-before)) [part~="grip"],
+:host(:state(drop-before)) [part~="select"],
+:host(:state(drop-before)) ::slotted(*) {
+  box-shadow: inset 0 var(--table-drop-indicator-size, var(--helix-border-thick)) 0 0
+    var(--table-drop-indicator-color, var(--helix-color-primary));
+}
+
+:host(:state(drop-after)) [part~="grip"],
+:host(:state(drop-after)) [part~="select"],
+:host(:state(drop-after)) ::slotted(*) {
+  box-shadow: inset 0 calc(var(--table-drop-indicator-size, var(--helix-border-thick)) * -1) 0 0
+    var(--table-drop-indicator-color, var(--helix-color-primary));
+}

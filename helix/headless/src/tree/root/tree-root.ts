@@ -10,7 +10,6 @@ import {
   MixinControllerActive,
   ReorderController,
   scrollItemIntoView,
-  scrollingAncestor,
   selectsAll,
   slottedWords,
   Typeahead,
@@ -20,6 +19,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { fromGrip } from '../grip.js'
 import { HelixHeadlessTreeItem } from '../item/tree-item.js'
 import { type CheckableRow, checkedState, pressRow } from '../selection.js'
 
@@ -151,7 +151,7 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
     current: (event) => this.keyAt(event),
     grip: (event) => {
       const item = this.itemOf(event)
-      const element = item?.fromGrip(event) && item.focusTarget
+      const element = fromGrip(event) && item?.focusTarget
       return item && element ? { element, key: this.keyOf(item) } : undefined
     },
     item: (event) => this.keyAt(event),
@@ -161,11 +161,6 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
       return (item && slottedWords(item, [''])) || key
     },
     refocus: (key) => this.focusOn(this.itemFor(key)),
-    say: (words) => {
-      this.announced = words
-      this.requestUpdate()
-    },
-    scroller: () => scrollingAncestor(this.items[0] ?? this, { axis: 'y', overflowing: true }),
   })
 
   /** The key an item is moved by: its `value`, or its words where it has none. */
@@ -412,8 +407,6 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
     const heads = this.nesting === 'heading' || this.selectionMode === 'leaf'
     const multiple = this.multiple
     const checked = new Set(this.values)
-    const moving = this.reorder.held
-    const mark = this.reorder.mark
 
     for (const item of this.items) {
       const key = this.keyOf(item)
@@ -444,8 +437,7 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
         item.heads = heads
         /* A disabled item draws no grip, and the others move past it. */
         item.grip = this.reorderable
-        item.move =
-          moving?.key === key ? 'dragging' : mark?.key === key ? `drop-${mark.edge}` : undefined
+        item.move = this.reorder.moveOf(key)
       })
     }
   }
