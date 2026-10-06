@@ -34,3 +34,14 @@ export const appleTouch = (platform: Platform | undefined): boolean => {
 export const onApple = (
   platform: Platform | undefined = typeof navigator === 'undefined' ? undefined : navigator,
 ): boolean => platform !== undefined && /mac|iphone|ipad|ipod/i.test(platform.userAgent ?? '')
+
+/**
+ * Whether the browser runs on Android, where TalkBack reads no `aria-sort`.
+ *
+ * React Aria's table header describes its sort order in words there for the
+ * same reason, so a reader who cannot hear the state still hears which way a
+ * column is sorted. From the user agent; `false` on a server.
+ */
+export const onAndroid = (
+  platform: Platform | undefined = typeof navigator === 'undefined' ? undefined : navigator,
+): boolean => platform !== undefined && /android/i.test(platform.userAgent ?? '')
