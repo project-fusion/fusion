@@ -1,7 +1,22 @@
 /* A box, unlike `Menu`: `Navigation` measures its marker against every slotted
-   element, and `display: contents` generates none. */
+   element, and `display: contents` generates none. Positioned, so the
+   indicator hangs off it. */
 :host {
   display: inline-flex;
+  position: relative;
+}
+
+/* The mark of an open trigger: out of the row, centered on the trigger and
+   resting on its bottom edge, which the panel hangs from, so the panel never
+   covers it. It draws nothing until a mark is slotted. */
+[part="indicator"] {
+  align-items: flex-end;
+  display: flex;
+  inset-block: 0;
+  inset-inline: 0;
+  justify-content: center;
+  pointer-events: none;
+  position: absolute;
 }
 
 /* The base layer's link shape by hand: a `::part` reaches exactly one boundary

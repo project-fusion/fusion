@@ -440,6 +440,34 @@ describe('a megamenu', () => {
   })
 })
 
+describe('the regions a sheet reaches', () => {
+  /* Radix's indicator marks the open trigger. Rendered only while the panel is
+     open, so a mark of your own needs no rule to hide it, and out of the
+     accessibility tree, the trigger's `aria-expanded` saying it already. */
+  test('the indicator is there while the panel is open, and only then', async () => {
+    const host = await section()
+    expect(part(host, 'indicator')).toBeNull()
+    host.open = true
+    await host.updateComplete
+    const indicator = part(host, 'indicator')
+    expect(indicator?.localName).toBe('slot')
+    expect(indicator?.getAttribute('name')).toBe('indicator')
+    expect(indicator?.getAttribute('aria-hidden')).toBe('true')
+    host.open = false
+    await host.updateComplete
+    expect(part(host, 'indicator')).toBeNull()
+  })
+
+  /* The columns were reachable only through the base layer's recipes. A part
+     on the bare slot draws no box, so nothing moves until a sheet asks. */
+  test('the columns are a part on the panel’s default slot', async () => {
+    const columns = part(await section(), 'columns')
+    expect(columns?.localName).toBe('slot')
+    expect(columns?.hasAttribute('name')).toBe(false)
+    expect(columns?.parentElement?.getAttribute('part')).toBe('surface')
+  })
+})
+
 describe('a megamenu whose trigger the consumer slotted', () => {
   const slotted = async (): Promise<Section> => {
     const host = (await mount(
@@ -536,6 +564,67 @@ describe('a megamenu whose trigger the consumer slotted', () => {
        noticing, since nothing about the markup looks wrong. */
     const host = await slotted()
     expect(own(host).hasAttribute('aria-controls')).toBe(false)
+  })
+})
+
+describe('the arrows along a bar of megamenus', () => {
+  const key = (from: HTMLElement, name: string): KeyboardEvent => {
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key: name,
+    })
+    from.dispatchEvent(event)
+    return event
+  }
+
+  /* Radix moves along its list with the arrows. A bar of megamenus in a plain
+     `<nav>` had none unless a `Navigation` with `arrows` held it. */
+  test('move between the triggers beside each other, and stop at the ends', async () => {
+    document.body.innerHTML = `<nav>
+      <helix-headless-megamenu label="Products"><a href="/a">A</a></helix-headless-megamenu>
+      <helix-headless-megamenu label="Solutions"><a href="/b">B</a></helix-headless-megamenu>
+      <helix-headless-megamenu label="Docs"><a href="/c">C</a></helix-headless-megamenu>
+    </nav>`
+    const bar = [...document.querySelectorAll('helix-headless-megamenu')] as Section[]
+    await Promise.all(bar.map((one) => one.updateComplete))
+    const [first, second, third] = bar.map(trigger)
+    expect(key(first as HTMLElement, 'ArrowRight').defaultPrevented).toBe(true)
+    expect((bar[1] as Section).shadowRoot?.activeElement).toBe(second)
+    key(second as HTMLElement, 'End')
+    expect((bar[2] as Section).shadowRoot?.activeElement).toBe(third)
+    key(third as HTMLElement, 'ArrowRight')
+    expect((bar[2] as Section).shadowRoot?.activeElement).toBe(third)
+    key(third as HTMLElement, 'Home')
+    expect((bar[0] as Section).shadowRoot?.activeElement).toBe(first)
+  })
+
+  /* A component holding the megamenus in a slot decides, as `Navigation`
+     does with `arrows`, and its readers may scroll with the keys. */
+  test('are left to a component that holds the megamenu in a slot', async () => {
+    await import('../../navigation/index.js')
+    document.body.innerHTML = `<helix-headless-navigation>
+      <helix-headless-megamenu label="Products"><a href="/a">A</a></helix-headless-megamenu>
+      <helix-headless-megamenu label="Solutions"><a href="/b">B</a></helix-headless-megamenu>
+    </helix-headless-navigation>`
+    const bar = [...document.querySelectorAll('helix-headless-megamenu')] as Section[]
+    await (document.body.firstElementChild as Section).updateComplete
+    await Promise.all(bar.map((one) => one.updateComplete))
+    expect(key(trigger(bar[0] as Section), 'ArrowRight').defaultPrevented).toBe(false)
+  })
+
+  test('and an arrow among an open panel’s links stays with the panel', async () => {
+    document.body.innerHTML = `<nav>
+      <helix-headless-megamenu label="Products"><a href="/a">A</a></helix-headless-megamenu>
+      <helix-headless-megamenu label="Solutions"><a href="/b">B</a></helix-headless-megamenu>
+    </nav>`
+    const bar = [...document.querySelectorAll('helix-headless-megamenu')] as Section[]
+    await Promise.all(bar.map((one) => one.updateComplete))
+    ;(bar[0] as Section).open = true
+    await (bar[0] as Section).updateComplete
+    const link = (bar[0] as Section).querySelector('a') as HTMLElement
+    expect(key(link, 'ArrowRight').defaultPrevented).toBe(false)
   })
 })
 
