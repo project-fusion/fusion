@@ -24,13 +24,15 @@ import '../notification/notification.js'
  * @documentation https://fusion.dev/helix/components/notifications
  *
  * @slot - The notifications.
+ * @slot empty - Replaces the words of `empty-text` in the `empty` part, such as a picture and a line of your own.
  * @slot footer - Below the list, for a link to everything.
  * @slot header - Above the list, for a title and the mark-all control.
+ * @slot loading - Replaces the words of `loading-text` in the `loading` part, such as a loader.
  *
  * @csspart list - The list itself.
  * @csspart live - A copy of the empty and loading messages, in a live region that screen readers announce when they change. Visually hidden in the styled tier.
  * @csspart mark-all - The control that marks everything read.
- * @csspart more - The button after the list that asks for more, while `load-more` is set and the feed is not loading.
+ * @csspart more - The button after the list that asks for more, while `load-more` is set. It stays while the feed is loading, in a lighter color and `aria-disabled`, so focus stays on it.
  *
  * @cssproperty --notifications-max-block-size - How tall the feed may get before the list scrolls.
  * @cssproperty --notifications-media-column - Width of the media column that every item keeps when any item in the feed has media.
