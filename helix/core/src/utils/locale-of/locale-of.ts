@@ -2,6 +2,15 @@
 let runtime: Intl.Locale | undefined
 
 /**
+ * The runtime's own locale: in a browser, the language its interface is set
+ * to, which is what every `Intl` call given no locale uses.
+ */
+export const runtimeLocale = (): string => {
+  runtime ??= new Intl.Locale(new Intl.DateTimeFormat().resolvedOptions().locale)
+  return runtime.toString()
+}
+
+/**
  * A `lang` as a locale to format in: empty where the runtime's own locale
  * already speaks it, or where it is no tag `Intl` takes.
  *
@@ -16,8 +25,10 @@ let runtime: Intl.Locale | undefined
 const usable = (lang: string): string => {
   try {
     const asked = new Intl.Locale(lang)
-    runtime ??= new Intl.Locale(new Intl.DateTimeFormat().resolvedOptions().locale)
-    return asked.region === undefined && asked.language === runtime.language ? '' : asked.toString()
+    runtimeLocale()
+    return asked.region === undefined && asked.language === runtime?.language
+      ? ''
+      : asked.toString()
   } catch {
     return ''
   }

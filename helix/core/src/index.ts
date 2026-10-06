@@ -491,7 +491,7 @@ export { isRtl } from './utils/is-rtl/is-rtl.js'
 export { keyClaimed } from './utils/key-claimed/key-claimed.js'
 export { type Curve, linePath, type Point } from './utils/line-path/line-path.js'
 export { type EndInSight, endInSight } from './utils/load-more/load-more.js'
-export { localeOf } from './utils/locale-of/locale-of.js'
+export { localeOf, runtimeLocale } from './utils/locale-of/locale-of.js'
 export { markRegion, type RegionOptions } from './utils/mark-region/mark-region.js'
 export {
   copiesOf,
@@ -671,3 +671,21 @@ export {
   writtenNumbers,
 } from './utils/written-list/written-list.js'
 export { VERSION } from './version.js'
+export {
+  formatMessage,
+  type Message,
+  type MessageOptions,
+  type MessageTable,
+  type MessageValues,
+} from './words/message.js'
+export {
+  clearWords,
+  type HelixWords,
+  localeChain,
+  refreshWords,
+  registerWords,
+  setDefaultWordsLocale,
+  type Words,
+} from './words/registry.js'
+export { formatWords, words } from './words/words.js'
+export { handedLocale, wordsLocale } from './words/words-locale.js'

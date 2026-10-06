@@ -1,12 +1,9 @@
-import type { ReactiveController, ReactiveControllerHost } from 'lit'
+import type { ReactiveController, ReactiveControllerHost, ReactiveElement } from 'lit'
 import { HelixBeforeReorderEvent } from '../../events/before-reorder.js'
 import type { ReorderDetail } from '../../events/details.js'
 import { HelixReorderEvent } from '../../events/reorder.js'
-import { fillTemplate } from '../../utils/fill-template/fill-template.js'
 import { deepActiveElement } from '../../utils/focusable-elements/focusable-elements.js'
-import { formatNumbers } from '../../utils/format-numbers/format-numbers.js'
 import { isRtl } from '../../utils/is-rtl/is-rtl.js'
-import { localeOf } from '../../utils/locale-of/locale-of.js'
 import {
   centersOf,
   dropMark,
@@ -22,6 +19,9 @@ import {
   reorderStep,
 } from '../../utils/reorder/reorder.js'
 import { scrollingAncestor } from '../../utils/scroll-item-into-view/scroll-item-into-view.js'
+import { formatMessage } from '../../words/message.js'
+import { formatWords } from '../../words/words.js'
+import { wordsLocale } from '../../words/words-locale.js'
 
 /** How far a press on a grip travels before it is a drag, in pixels. */
 const SLOP = 4
@@ -40,9 +40,6 @@ export interface ReorderWords {
   /** Said when a key or a click takes hold of the item. */
   pickedUp: string
 }
-
-/** The words as a family declares them: one property for each, named after it. */
-type ReorderLabels = { [Word in keyof ReorderWords as `${Word}Label`]: string }
 
 /** A move a drop asks for, counted from 0 in the order the items are drawn. */
 export interface ReorderMove {
@@ -352,16 +349,17 @@ export class ReorderController implements ReactiveController {
     if (!say) {
       return
     }
-    const number = formatNumbers(localeOf(this.host))
+    /* Numbers go in as numbers, so the message writes them in the host's
+       locale and a translation can pick a plural form by them. */
+    const values = {
+      count: this.options.keys(key).length,
+      name: name ? name(key) : key,
+      position: (to ?? 0) + 1,
+    }
     say(
-      fillTemplate(
-        words ? words()[which] : (this.host as unknown as ReorderLabels)[`${which}Label`],
-        {
-          count: number(this.options.keys(key).length),
-          name: name ? name(key) : key,
-          position: number((to ?? 0) + 1),
-        },
-      ),
+      words
+        ? formatMessage(words()[which], values, wordsLocale(this.host))
+        : formatWords(this.host as unknown as ReactiveElement, `${which}Label`, values),
     )
   }
 
