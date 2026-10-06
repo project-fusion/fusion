@@ -141,6 +141,15 @@
   padding: 0;
 }
 
+/* **An icon a page slots in is sized like the glyph it replaces**, so an icon
+   set swapped in leaves every button its size. */
+[part="controls"] button ::slotted(*) {
+  --icon-size: var(--helix-size-icon-sm);
+
+  block-size: var(--helix-size-icon-sm);
+  inline-size: var(--helix-size-icon-sm);
+}
+
 /* **The ring goes where the focus is, which is the button.** The frame wore one
    on `:focus-within` and it was two lines that never met: the region carries its
    own border, so an inset ring drew a second edge inside the first with a gap

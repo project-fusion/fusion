@@ -80,7 +80,14 @@ import {
  * @slot - The renderer's box, which the drawing is made in.
  * @slot filter-icon - The icon in the search field. Defaults to a magnifying glass.
  * @slot footer - Content below the graph.
+ * @slot fullscreen-icon - Replaces the glyph inside the fullscreen button.
  * @slot header - Content above the graph.
+ * @slot pan-down-icon - Replaces the glyph inside the pan down button.
+ * @slot pan-end-icon - Replaces the glyph inside the button that pans toward the end of a line of text.
+ * @slot pan-start-icon - Replaces the glyph inside the button that pans toward the start of a line of text.
+ * @slot pan-up-icon - Replaces the glyph inside the pan up button.
+ * @slot zoom-in-icon - Replaces the glyph inside the zoom-in button.
+ * @slot zoom-out-icon - Replaces the glyph inside the zoom-out button.
  *
  * @event {HelixActivateEvent} helix-activate - A note was selected, in the list or in the drawing. The detail's `value` is its `id`.
  * @event {HelixBeforeActivateEvent} helix-before-activate - A note is about to be selected. Cancelable: cancel it to keep the selection in your own state.

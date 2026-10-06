@@ -280,7 +280,14 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  * @slot - The board's `helix-canvas-node` and `helix-canvas-edge` elements, drawn on the plane.
  * @slot empty - Content shown when the document has no nodes.
  * @slot footer - Content below the board.
+ * @slot fullscreen-icon - Replaces the glyph inside the fullscreen button.
  * @slot header - Content above the board.
+ * @slot pan-down-icon - Replaces the glyph inside the pan down button.
+ * @slot pan-end-icon - Replaces the glyph inside the button that pans toward the end of a line of text.
+ * @slot pan-start-icon - Replaces the glyph inside the button that pans toward the start of a line of text.
+ * @slot pan-up-icon - Replaces the glyph inside the pan up button.
+ * @slot zoom-in-icon - Replaces the glyph inside the zoom-in button.
+ * @slot zoom-out-icon - Replaces the glyph inside the zoom-out button.
  *
  * @event {HelixBeforeMoveEvent} helix-before-move - Cards are about to move. Cancelable: cancel it to keep the positions in your own state.
  * @event {HelixBeforeReconnectEvent} helix-before-reconnect - A connection's end is about to move to another card or side. Cancelable: cancel it to keep connections in your own state.
