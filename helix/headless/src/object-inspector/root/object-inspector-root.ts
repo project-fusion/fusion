@@ -669,8 +669,13 @@ export class HelixHeadlessObjectInspector extends HelixElement {
       }
       this.dispatchEvent(new HelixActivateEvent({ value: path }))
     }
+    /* **Asked for an update even where the row stays, so the focus is spent
+       now.** A key that does not move the row (Up on the first, Page Down on
+       the last) requested none, so the flag waited for whatever updated next,
+       the focusout of a Tab away included, and pulled focus back to the row. */
     this.revealing = true
     this.focusing = true
+    this.requestUpdate()
     return true
   }
 
