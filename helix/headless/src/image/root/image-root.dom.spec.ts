@@ -357,6 +357,52 @@ describe('placeholder delay and states', () => {
   })
 })
 
+/* Between the two answers there was no state, so a sheet drew the wait as
+   `:not(:state(loaded)):not(:state(error))`, and the delay before the
+   placeholder had no name at all. */
+describe('the states before an answer', () => {
+  const states = (host: HTMLElement): ElementInternals['states'] =>
+    (host as unknown as { internals: ElementInternals }).internals.states
+  /* The browser's own answers are kept from the component, so a picture stays
+     on its way until the spec dispatches one. */
+  const stillLoading = (host: Picture): Picture => {
+    for (const type of ['error', 'load']) {
+      host.shadowRoot?.addEventListener(
+        type,
+        (event) => {
+          if (event.isTrusted) {
+            event.stopImmediatePropagation()
+          }
+        },
+        { capture: true },
+      )
+    }
+    return host
+  }
+
+  test('says loading until the picture loads or fails', async () => {
+    const host = stillLoading(await image('src="/pier.avif"'))
+    expect(states(host).has('loading')).toBe(true)
+    img(host).dispatchEvent(new Event('load'))
+    await host.updateComplete
+    expect(states(host).has('loading')).toBe(false)
+    const failed = stillLoading(await image('src="/gone.avif"'))
+    expect(states(failed).has('loading')).toBe(true)
+    img(failed).dispatchEvent(new Event('error'))
+    await failed.updateComplete
+    expect(states(failed).has('loading')).toBe(false)
+  })
+
+  test('says waiting while the delay holds the placeholder back, and not after', async () => {
+    const host = stillLoading(await image('src="/pier.avif" placeholder-delay="30"'))
+    expect(states(host).has('waiting')).toBe(true)
+    await new Promise((resolve) => setTimeout(resolve, 60))
+    await host.updateComplete
+    expect(states(host).has('waiting')).toBe(false)
+    expect(states(await image('src="/pier.avif"')).has('waiting')).toBe(false)
+  })
+})
+
 describe('an image with no alt', () => {
   test('is reported once, and one with an alt or hidden from the reader is not', async () => {
     const warnings: string[] = []

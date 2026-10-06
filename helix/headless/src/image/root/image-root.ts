@@ -36,6 +36,8 @@ import { property, state } from 'lit/decorators.js'
  *
  * @cssstate error - The image failed to load, and the fallback shows.
  * @cssstate loaded - The image loaded.
+ * @cssstate loading - The image is on its way, so neither `loaded` nor `error` is true yet.
+ * @cssstate waiting - The image is on its way and `placeholder-delay` still holds the placeholder back.
  */
 @customElement('helix-headless-image')
 export class HelixHeadlessImage extends HelixElement {
@@ -144,6 +146,11 @@ export class HelixHeadlessImage extends HelixElement {
    *
    * `loading` writes nothing, because it is where every image starts and the
    * resting state of a mirror is the attribute's absence.
+   *
+   * **Kept beside the custom states, and what the styled tier draws from.** An
+   * engine without `CustomStateSet`, Safari before 17.4 and Firefox before
+   * 126, records no state, and a picture faded in by `:state(loaded)` alone
+   * would stay transparent there for good. A sheet of your own can read either.
    */
   @property({ attribute: false })
   status: 'error' | 'loaded' | 'loading' = 'loading'
@@ -308,10 +315,19 @@ export class HelixHeadlessImage extends HelixElement {
         this.setAttribute('data-status', this.status)
       }
       /* And as custom states, which a stylesheet reaches without an attribute
-         on the consumer's markup: `:state(loaded)`, `:state(error)`. */
+         on the consumer's markup: `:state(loaded)`, `:state(error)`, and
+         `:state(loading)` for the time between, which the mirror leaves
+         unwritten. */
       this.toggleState('loaded', this.status === 'loaded')
       this.toggleState('error', this.status === 'error')
+      this.toggleState('loading', this.status === 'loading')
     }
+    this.toggleState('waiting', this.waiting)
+  }
+
+  /** Whether the picture is on its way and the wait still holds the placeholder back. */
+  private get waiting(): boolean {
+    return this.status === 'loading' && this.placeholderDelay > 0 && !this.wait.elapsed
   }
 
   /* Client only, from `updated`, so a server serves the placeholder hidden
@@ -392,7 +408,7 @@ export class HelixHeadlessImage extends HelixElement {
       <span
         part="placeholder"
         aria-hidden="true"
-        ?hidden=${this.status !== 'loading' || (this.placeholderDelay > 0 && !this.wait.elapsed)}
+        ?hidden=${this.status !== 'loading' || this.waiting}
         ><slot name="placeholder"></slot
       ></span>
       <span

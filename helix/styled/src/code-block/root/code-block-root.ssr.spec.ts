@@ -37,7 +37,7 @@ describe('code-block diff server output', () => {
        the shadow root empty. The claim is the slot inside the code element,
        which is what sends the patch as code rather than as parsed rows. */
     expect(rendered(markup, 'helix-code-block')).toMatch(
-      /<pre part="block">(?:<!--[^>]*-->)*<code part="code">(?:<!--[^>]*-->)?<slot\s*><\/slot><\/code>(?:<!--[^>]*-->)*<\/pre>/,
+      /<pre id="block" part="block">(?:<!--[^>]*-->)*<code part="code">(?:<!--[^>]*-->)?<slot\s*><\/slot><\/code>(?:<!--[^>]*-->)*<\/pre>/,
     )
   })
 })

@@ -30,8 +30,9 @@ import { type DiffFile, type DiffHunk, type DiffLine, pairLines, parsePatch } fr
  * Set `expandable` on a block whose height is capped, such as by
  * `--code-block-max-block-size`, and a button under it shows every line and
  * then fewer again, as a docs site's long example does. The button is drawn
- * only while the cap hides something, says whether the block is expanded, and
- * the block carries `:state(expanded)` while it is.
+ * only while the cap hides something, says whether the block is expanded with
+ * `aria-expanded`, names the block it opens with `aria-controls`, and the block
+ * carries `:state(expanded)` while it is.
  *
  * Set `diff` to show a change. Put a unified diff, the output of `git diff` or
  * `diff -u`, in the same slot, and the block draws the lines it added and
@@ -358,7 +359,7 @@ export class HelixHeadlessCodeBlock extends HelixElement {
       : nothing
     return html`${this.renderHeader(this.label)}
       <div part="frame">
-        <pre part="block">${gutter}${code}</pre>
+        <pre id="block" part="block">${gutter}${code}</pre>
         ${this.label ? nothing : this.renderCopy()}
       </div>${this.renderExpand()}`
   }
@@ -372,7 +373,11 @@ export class HelixHeadlessCodeBlock extends HelixElement {
     if (!this.expandable || !(this.capped || this.expanded)) {
       return nothing
     }
+    /* `aria-controls` names the block it opens, by an id in this shadow root,
+       where the button is too, so a reader can go from the button to the
+       lines it showed. */
     return html`<button
+      aria-controls="block"
       aria-expanded=${this.expanded ? 'true' : 'false'}
       part="expand"
       type="button"

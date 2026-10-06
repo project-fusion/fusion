@@ -270,6 +270,20 @@ describe('an expandable block', () => {
     expect(expand(el)?.getAttribute('aria-expanded')).toBe('false')
   })
 
+  /* `aria-expanded` said the button opened something and never said what. */
+  test('names the block it opens', async () => {
+    const el = (await mount(
+      '<helix-headless-code-block expandable>one\ntwo</helix-headless-code-block>',
+    )) as Block
+    capped(el)
+    el.requestUpdate()
+    await el.updateComplete
+    await el.updateComplete
+    const controls = expand(el)?.getAttribute('aria-controls') ?? ''
+    expect(controls).not.toBe('')
+    expect(el.shadowRoot?.getElementById(controls)?.getAttribute('part')).toBe('block')
+  })
+
   test('shows every line, says so, and shows fewer again', async () => {
     const el = (await mount(
       '<helix-headless-code-block expandable collapse-label="Less" expand-label="More">one\ntwo</helix-headless-code-block>',
