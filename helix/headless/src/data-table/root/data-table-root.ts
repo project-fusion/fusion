@@ -11,9 +11,8 @@ import {
   deepActiveElement,
   deepContains,
   everyState,
-  fillTemplate,
   format,
-  formatNumbers,
+  formatWords,
   gridMove,
   HelixActivateEvent,
   type HelixBeforeToggleEvent,
@@ -29,6 +28,7 @@ import {
   HelixSelectedEvent,
   HelixSortEvent,
   HelixSortedEvent,
+  handedLocale,
   hostAria,
   inlineStep,
   inRowOrder,
@@ -55,6 +55,8 @@ import {
   VirtualizeController,
   valueAt,
   window_,
+  words,
+  wordsLocale,
   writtenList,
 } from '@fusion.dev/helix-core'
 import { caretDown, caretRight, dotsSixVertical } from '@fusion.dev/helix-icons'
@@ -300,7 +302,20 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     slotAssignment: 'manual',
   }
 
-  /** The word for an ascending sort, in `sorted-label`. */
+  /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-data-table': { nextLabel: 'Nächste Seite' } })`.
+   */
+  static words = 'helix-data-table'
+
+  /**
+   * The word for an ascending sort, in a `sorted-label` that writes `{order}`.
+   *
+   * @deprecated Write the whole sentence for each order in `sorted-label`, with
+   * `{direction, select, ascending {...} descending {...} other {...}}`.
+   * Removed in the next major version.
+   */
+  @words
   @property({ attribute: 'ascending-label' })
   ascendingLabel = 'ascending'
 
@@ -308,6 +323,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * What screen readers hear when a held row is put back, or a move is
    * refused, with `reorderable-rows`.
    */
+  @words
   @property({ attribute: 'canceled-label' })
   canceledLabel = 'Canceled'
 
@@ -365,11 +381,19 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   @property({ attribute: 'default-sort' })
   defaultSort = ''
 
-  /** The word for a descending sort, in `sorted-label`. */
+  /**
+   * The word for a descending sort, in a `sorted-label` that writes `{order}`.
+   *
+   * @deprecated Write the whole sentence for each order in `sorted-label`, with
+   * `{direction, select, ascending {...} descending {...} other {...}}`.
+   * Removed in the next major version.
+   */
+  @words
   @property({ attribute: 'descending-label' })
   descendingLabel = 'descending'
 
   /** What screen readers hear when a row is dropped, with `reorderable-rows`. */
+  @words
   @property({ attribute: 'dropped-label' })
   droppedLabel = 'Dropped'
 
@@ -422,6 +446,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * The built-in pagination's name for a gap in its run of pages. `{page}` is
    * replaced with the page it jumps to.
    */
+  @words
   @property({ attribute: 'gap-label' })
   gapLabel = 'Skip to page {page}'
 
@@ -442,8 +467,17 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   loadMore = false
 
   /** The words on the button in the `more` row. */
+  @words
   @property({ attribute: 'load-more-label' })
   loadMoreLabel = 'Load more'
+
+  /**
+   * The locale the words, plural forms, and numbers are in, as a BCP 47 tag
+   * such as `pl`. Empty reads the nearest `lang`, then the browser's
+   * language. The built-in pagination speaks it too.
+   */
+  @property()
+  locale = ''
 
   /**
    * Where filtering, sorting, and paging happen. `client` does them in the
@@ -464,6 +498,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * `reorderable-rows`. `{name}` is the row's name, `{position}` the place it
    * would go, counting from 1, and `{count}` the number of rows on the page.
    */
+  @words
   @property({ attribute: 'moved-label' })
   movedLabel = '{name} moved to position {position} of {count}'
 
@@ -471,10 +506,12 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * The name of a row's grip, with `reorderable-rows`. `{row}` is replaced with
    * the row's name.
    */
+  @words
   @property({ attribute: 'move-row-label' })
   moveRowLabel = 'Move {row}'
 
   /** The built-in pagination's name for the button that moves forward a page. */
+  @words
   @property({ attribute: 'next-label' })
   nextLabel = 'Next page'
 
@@ -521,6 +558,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * The built-in pagination's name for one page. `{page}` and `{pages}` are
    * replaced with the page number and the page count.
    */
+  @words
   @property({ attribute: 'page-label' })
   pageLabel = 'Page {page}'
 
@@ -564,6 +602,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /** The name of the built-in pagination's navigation landmark. */
+  @words
   @property({ attribute: 'pagination-label' })
   paginationLabel = 'Pagination'
 
@@ -571,10 +610,12 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * What screen readers hear when a key or a click picks up a row, with
    * `reorderable-rows`. `{name}` is the row's name.
    */
+  @words
   @property({ attribute: 'picked-up-label' })
   pickedUpLabel = 'Picked up {name}'
 
   /** The built-in pagination's name for the button that moves back a page. */
+  @words
   @property({ attribute: 'previous-label' })
   previousLabel = 'Previous page'
 
@@ -594,18 +635,28 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   @property({ attribute: 'reorderable-rows', type: Boolean })
   reorderableRows = false
 
-  /** What screen readers hear when a search leaves one row. `{count}` is the count. */
+  /**
+   * What screen readers hear when a search leaves one row, where
+   * `results-label` should not say it. `{count}` is the count.
+   *
+   * @deprecated Write every form in `results-label`, as `{count, plural, one
+   * {# result} other {# results}}`. Removed in the next major version.
+   */
   @property({ attribute: 'result-label' })
-  resultLabel = '{count} result'
+  resultLabel?: string
 
   /**
-   * What screen readers hear when a search leaves any other number of rows.
-   * `{count}` is the count.
+   * What screen readers hear when a search narrows the rows. `{count}` is how
+   * many rows are left, written in the locale, and each language writes the
+   * forms it has: `{count, plural, one {# wiersz} few {# wiersze} many
+   * {# wierszy} other {# wiersza}}`.
    */
+  @words
   @property({ attribute: 'results-label' })
-  resultsLabel = '{count} results'
+  resultsLabel = '{count, plural, one {# result} other {# results}}'
 
   /** The name of the heading over the row grips, with `reorderable-rows`. */
+  @words
   @property({ attribute: 'row-grips-label' })
   rowGripsLabel = 'Move rows'
 
@@ -650,6 +701,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   selectable = false
 
   /** The name of the checkbox in the heading that selects every row. */
+  @words
   @property({ attribute: 'select-all-label' })
   selectAllLabel = 'Select every row'
 
@@ -675,8 +727,11 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
 
   /**
    * What screen readers hear when the chosen rows change. `{count}` is how many
-   * rows are chosen.
+   * rows are chosen, written in the locale, and a language that needs plural
+   * forms writes them: `{count, plural, one {# wybrany} few {# wybrane} many
+   * {# wybranych} other {# wybranego}}`.
    */
+  @words
   @property({ attribute: 'selected-label' })
   selectedLabel = '{count} selected'
 
@@ -684,6 +739,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * The name of a row's checkbox. `{row}` is replaced with the row's value in
    * the first column that has a field, or with its key.
    */
+  @words
   @property({ attribute: 'select-row-label' })
   selectRowLabel = 'Select {row}'
 
@@ -708,10 +764,14 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
 
   /**
    * What screen readers hear when the table is sorted. `{column}` is the
-   * column's heading and `{order}` is `ascending-label` or `descending-label`.
+   * column's heading and `{direction}` is `ascending` or `descending`, so each
+   * order has its whole sentence. `{order}` is the deprecated
+   * `ascending-label` or `descending-label`.
    */
+  @words
   @property({ attribute: 'sorted-label' })
-  sortedLabel = 'Sorted by {column}, {order}'
+  sortedLabel =
+    '{direction, select, ascending {Sorted by {column}, ascending} descending {Sorted by {column}, descending} other {Sorted by {column}}}'
 
   /**
    * The number of rows in the whole result, for when the table cannot count
@@ -726,6 +786,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   total = 0
 
   /** What screen readers hear when the table stops being sorted. */
+  @words
   @property({ attribute: 'unsorted-label' })
   unsortedLabel = 'Not sorted'
 
@@ -887,19 +948,13 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       const row = this.drawnPage[this.pagePlaces().get(key) ?? -1]
       return row ? this.rowName(row, key) : key
     },
-    say: (words) => this.say(words),
+    say: (said) => this.say(said),
     scroller: () => {
       const table = this.partNamed('table')
       return table && table.scrollHeight > table.clientHeight + 1
         ? table
         : scrollingAncestor(this, { axis: 'y', overflowing: true })
     },
-    words: () => ({
-      canceled: this.canceledLabel,
-      dropped: this.droppedLabel,
-      moved: this.movedLabel,
-      pickedUp: this.pickedUpLabel,
-    }),
   })
 
   /** Said once, so a table that re-renders does not repeat it. */
@@ -1885,6 +1940,18 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   private heardFilter: string | undefined = undefined
 
   /**
+   * The sentence a sort is said in: `sorted-label` with the column, and the
+   * order both as `{direction}` and as the deprecated `{order}` word.
+   */
+  private sortSaid(column: string, direction: 'ascending' | 'descending'): string {
+    return formatWords(this, 'sortedLabel', {
+      column,
+      direction,
+      order: direction === 'ascending' ? this.ascendingLabel : this.descendingLabel,
+    })
+  }
+
+  /**
    * What the table says after a sort or a change to the chosen rows.
    *
    * **The state changed and nothing said so.** A sort moved `aria-sort` on the
@@ -1905,21 +1972,21 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         ? this.tableColumns.find((one) => one.field === parsed.field)
         : undefined
       said = parsed
-        ? fillTemplate(this.sortedLabel, {
-            column: column?.textContent?.trim() || parsed.field,
-            order: parsed.direction === 'asc' ? this.ascendingLabel : this.descendingLabel,
-          })
+        ? this.sortSaid(
+            column?.textContent?.trim() || parsed.field,
+            parsed.direction === 'asc' ? 'ascending' : 'descending',
+          )
         : this.unsortedLabel
     } else if (this.hasUpdated && selected !== this.heardSelected) {
-      said = fillTemplate(this.selectedLabel, {
-        count: formatNumbers(this.lang)(this.chosen.size),
-      })
+      said = formatWords(this, 'selectedLabel', { count: this.chosen.size })
     } else if (this.hasUpdated && this.filter !== this.heardFilter) {
       /* A search narrows the rows under a reader who is in the search field,
          so how many it left is said. None left is the empty text, which the
          region says in place of this. */
       const count = this.mode === 'server' ? Math.max(this.total, this.rows.length) : this.matched
-      said = countLabel(count, this.resultLabel, this.resultsLabel, this.lang)
+      said = this.resultLabel
+        ? countLabel(count, this.resultLabel, this.resultsLabel, wordsLocale(this))
+        : formatWords(this, 'resultsLabel', { count })
     }
     this.heardSort = sort
     this.heardSelected = selected
@@ -2031,10 +2098,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
          says it, as React Aria's column header does. */
       column.sortWords =
         android && column.sorted
-          ? fillTemplate(this.sortedLabel, {
-              column: column.textContent?.trim() || column.field,
-              order: column.sorted === 'ascending' ? this.ascendingLabel : this.descendingLabel,
-            })
+          ? this.sortSaid(column.textContent?.trim() || column.field, column.sorted)
           : ''
     }
   }
@@ -2200,7 +2264,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
                   tabindex=${stop(this.selectAt) ? '0' : '-1'}
                   data-column=${this.selectAt}
                   >${this.renderCheckbox(
-                    fillTemplate(this.selectRowLabel, { row: this.rowName(row, key) }),
+                    formatWords(this, 'selectRowLabel', { row: this.rowName(row, key) }),
                     picked,
                     false,
                     (event) => this.toggleRow(key, event),
@@ -2309,7 +2373,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         part="row-grip-button"
         type="button"
         tabindex="-1"
-        aria-label=${fillTemplate(this.moveRowLabel, { row: name })}
+        aria-label=${formatWords(this, 'moveRowLabel', { row: name })}
         aria-disabled=${still ? 'true' : nothing}
       ><svg aria-hidden="true" fill="currentColor" part="row-grip-mark" viewBox=${dotsSixVertical.viewBox}>${unsafeSVG(dotsSixVertical.content)}</svg></button
     ></span>`
@@ -2435,6 +2499,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
               page-size=${this.pageSize || 1}
               total=${countKnown ? matched : nothing}
               label=${this.paginationLabel}
+              locale=${handedLocale(this) || nothing}
               gap-label=${this.gapLabel}
               next-label=${this.nextLabel}
               page-label=${this.pageLabel}
