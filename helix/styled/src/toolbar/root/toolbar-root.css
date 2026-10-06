@@ -34,6 +34,17 @@
   flex-direction: column;
 }
 
+/* A divider between controls, and the space either side of it along the
+   toolbar's axis. None unless set: the toolbar's gap already parts them. */
+::slotted(helix-divider) {
+  margin-inline: var(--toolbar-separator-gap, 0);
+}
+
+:host([orientation="vertical"]) ::slotted(helix-divider) {
+  margin-block: var(--toolbar-separator-gap, 0);
+  margin-inline: 0;
+}
+
 /* Print: not at all. A row of controls is ink spent on actions a page cannot
  * take.
  *
