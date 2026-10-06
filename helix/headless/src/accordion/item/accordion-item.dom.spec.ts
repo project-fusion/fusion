@@ -31,7 +31,7 @@ describe('one accordion section', () => {
      alone leaves the region unreachable, unannounced, and every pixel still
      painted. */
   test('is closed in its markup, not in a stylesheet', async () => {
-    const host = await item()
+    const host = await item('hidden-until-found="false"')
     const content = part(host, 'content')
     expect(content?.hasAttribute('hidden')).toBe(true)
     expect(content?.hasAttribute('inert')).toBe(true)
@@ -41,7 +41,7 @@ describe('one accordion section', () => {
   /* And the same three move together when it opens, which is what makes the
      first assertion a contract rather than a description of a resting state. */
   test('gives all three up together when the reader opens it', async () => {
-    const host = await item()
+    const host = await item('hidden-until-found="false"')
     ;(part(host, 'trigger') as HTMLElement).click()
     await host.updateComplete
 
@@ -56,7 +56,7 @@ describe('one accordion section', () => {
      inside this one shadow root, which is the only place such a pair can
      resolve: an IDREF does not cross a shadow boundary. */
   test('ties its region and its trigger together inside its own root', async () => {
-    const host = await item()
+    const host = await item('default-open')
     const trigger = part(host, 'trigger')
     const content = part(host, 'content')
     expect(trigger?.getAttribute('aria-controls')).toBe(content?.id)
@@ -76,7 +76,7 @@ describe('a section find in page can search', () => {
   /* React Aria's disclosure: a closed section is searched, and a match opens
      it. Without it, text in a closed FAQ answer was invisible to Control+F. */
   test('is hidden until found and not inert while closed, and a match opens it', async () => {
-    const host = await item('hidden-until-found')
+    const host = await item()
     const content = part(host, 'content') as HTMLElement
     expect(content.getAttribute('hidden')).toBe('until-found')
     expect(content.hasAttribute('inert')).toBe(false)
@@ -90,7 +90,7 @@ describe('a section find in page can search', () => {
   /* `content-visibility` hides the content and leaves the region's own box in
      the tree, so every closed section was listed as an empty landmark. */
   test('is no landmark while closed, and the region again once open', async () => {
-    const host = await item('hidden-until-found')
+    const host = await item()
     const content = part(host, 'content') as HTMLElement
     expect(content.hasAttribute('role')).toBe(false)
     expect(content.hasAttribute('aria-labelledby')).toBe(false)
@@ -101,7 +101,7 @@ describe('a section find in page can search', () => {
   })
 
   test('a refused opening puts the region back to hidden until found', async () => {
-    const host = await item('hidden-until-found')
+    const host = await item()
     host.addEventListener('helix-before-open', (event) => event.preventDefault())
     const content = part(host, 'content') as HTMLElement
     content.removeAttribute('hidden')
@@ -111,15 +111,54 @@ describe('a section find in page can search', () => {
     expect(content.getAttribute('hidden')).toBe('until-found')
   })
 
-  test('an accordion turns it on for every section', async () => {
-    document.body.innerHTML = `<helix-headless-accordion hidden-until-found>
+  test('an accordion turns it off for every section, and a section turns it back on', async () => {
+    document.body.innerHTML = `<helix-headless-accordion hidden-until-found="false">
       <helix-headless-accordion-item><span slot="summary">A</span>Body</helix-headless-accordion-item>
+      <helix-headless-accordion-item hidden-until-found><span slot="summary">B</span>Body</helix-headless-accordion-item>
     </helix-headless-accordion>`
-    const section = document.querySelector('helix-headless-accordion-item') as Item
+    const [off, on] = document.querySelectorAll(
+      'helix-headless-accordion-item',
+    ) as unknown as Item[]
     await (document.body.firstElementChild as Item).updateComplete
     await new Promise((resolve) => setTimeout(resolve))
-    await section.updateComplete
-    expect(part(section, 'content')?.getAttribute('hidden')).toBe('until-found')
+    await off?.updateComplete
+    await on?.updateComplete
+    expect(part(off as Item, 'content')?.getAttribute('hidden')).toBe('')
+    expect(part(off as Item, 'content')?.hasAttribute('inert')).toBe(true)
+    expect(part(on as Item, 'content')?.getAttribute('hidden')).toBe('until-found')
+  })
+
+  /* `content-visibility` empties the box at once, which an author's `display`
+     does not undo, so a section a sheet shrinks closed showed an empty box for
+     the length of the shrink. The content stays drawn, and inert, until what
+     animates the content part has finished. */
+  test('a closing section keeps its content drawn until its motion ends', async () => {
+    const host = await item('default-open')
+    const content = part(host, 'content') as HTMLElement
+    let end = (): void => {}
+    const finished = new Promise<unknown>((resolve) => {
+      end = () => resolve(undefined)
+    })
+    content.getAnimations = () => [{ finished } as unknown as Animation]
+    host.open = false
+    await host.updateComplete
+    expect(content.hasAttribute('hidden')).toBe(false)
+    expect(content.hasAttribute('inert')).toBe(true)
+    end()
+    await finished
+    await new Promise((resolve) => setTimeout(resolve))
+    await host.updateComplete
+    expect(content.getAttribute('hidden')).toBe('until-found')
+    expect(content.hasAttribute('inert')).toBe(false)
+  })
+
+  test('and nothing running hides it at once', async () => {
+    const host = await item('default-open')
+    host.open = false
+    await host.updateComplete
+    await new Promise((resolve) => setTimeout(resolve))
+    await host.updateComplete
+    expect(part(host, 'content')?.getAttribute('hidden')).toBe('until-found')
   })
 })
 

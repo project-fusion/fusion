@@ -4,10 +4,11 @@ import {
   HelixElement,
   headingLevel,
   MixinControllerOpen,
+  onUnlessFalse,
 } from '@fusion.dev/helix-core'
 import { caretDown } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { HelixHeadlessAccordion } from '../root/accordion-root.js'
 
@@ -36,19 +37,21 @@ const TRIGGER_ID = 'trigger'
  * accordion's, then 3.
  *
  * Content stays mounted when the item is closed, so it can animate and its text
- * is present in server-rendered HTML. Closed content has both `hidden` and
- * `inert`. `hidden` collapses it when no stylesheet is loaded. `inert` keeps it
- * out of the tab order and the accessibility tree after the styled tier's
- * `display` overrides `hidden`.
+ * is present in server-rendered HTML.
+ *
+ * The browser's find in page searches a closed section, and a match opens it,
+ * with `helix-before-open` first, as React Aria's disclosure does. Closed
+ * content is `hidden="until-found"`, which hides it with no stylesheet loaded
+ * and keeps it out of the tab order and the accessibility tree. A section
+ * that closes keeps its content drawn until the content part's animations and
+ * transitions end, so a sheet that animates the section closed shows the
+ * content shrinking rather than an empty box. Set `hidden-until-found="false"`
+ * and a closed section is `hidden` and `inert` instead, and find in page skips
+ * it.
  *
  * While it is open, the content part carries the content's height as
  * `--accordion-content-height`, as Radix's accordion does, for a stylesheet
  * that animates the section open with keyframes of its own.
- *
- * Set `hidden-until-found` and the browser's find in page searches a closed
- * section too: a match opens it, with `helix-before-open` first, as React
- * Aria's disclosure does. The content is then `hidden="until-found"` while
- * closed, and not `inert`, since an inert region is never searched.
  *
  * @since 0.1.0
  * @status stable
@@ -126,7 +129,7 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
    * for the reason `groupHeadingLevel` is a property.
    */
   @property({ attribute: false })
-  groupHiddenUntilFound = false
+  groupHiddenUntilFound = true
 
   /**
    * The level of the heading around the trigger, from 1 to 6.
@@ -141,13 +144,12 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
    * Whether find in page searches the section while it is closed, and opens it
    * on a match.
    *
-   * Off by default. A closed section is then `hidden="until-found"`, which
-   * hides through `content-visibility`, so a stylesheet that animates the
-   * section closed shows an empty box for the length of that animation. The
-   * accordion's own `hidden-until-found` turns it on for every section.
+   * Unset takes the accordion's `hidden-until-found`, which is on. Write
+   * `hidden-until-found="false"` to keep find in page out of this section: a
+   * closed section is then `hidden` and `inert`.
    */
-  @property({ attribute: 'hidden-until-found', type: Boolean })
-  hiddenUntilFound = false
+  @property({ attribute: 'hidden-until-found', converter: onUnlessFalse })
+  hiddenUntilFound?: boolean
 
   /**
    * A group name. Opening an item closes the other items with the same name,
@@ -174,7 +176,42 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
 
   /** Whether find in page searches this section while it is closed. */
   private get findable(): boolean {
-    return this.hiddenUntilFound || this.groupHiddenUntilFound
+    return this.hiddenUntilFound ?? this.groupHiddenUntilFound
+  }
+
+  /**
+   * Whether the section has closed and its content is still drawn, until the
+   * content part's animations end.
+   *
+   * `hidden="until-found"` hides through `content-visibility`, which an
+   * author's `display` does not override, so writing it the moment the section
+   * closes empties the box a sheet is still shrinking. `inert` holds the
+   * content meanwhile.
+   */
+  @state()
+  private closing = false
+
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    if (changed.has('open')) {
+      this.closing = !this.open && changed.get('open') === true && this.findable
+    }
+  }
+
+  /**
+   * Hides the content of a section that closed, once whatever animates the
+   * content part has finished. Nothing running, as under reduced motion or
+   * with no stylesheet, hides it at once. `getAnimations` brings the styles up
+   * to date first, so a transition the close starts is among them.
+   */
+  private finishClosing(): void {
+    const running = this.partNamed('content')?.getAnimations?.({ subtree: true }) ?? []
+    const done = (): void => {
+      if (!this.open) {
+        this.closing = false
+      }
+    }
+    Promise.all(running.map((animation) => animation.finished)).then(done, done)
   }
 
   /**
@@ -289,6 +326,9 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
     if (this.wasOpen === false && this.open) {
       this.closePeers()
     }
+    if (changed.has('closing') && this.closing) {
+      this.finishClosing()
+    }
     this.wasOpen = this.open
     this.measure()
   }
@@ -336,13 +376,13 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
    * part outranks it and the transition runs exactly as before. Measured on
    * both tiers.
    *
-   * **`hidden="until-found"` only where it was asked for.** It hides through
+   * **`hidden="until-found"` unless it is turned off.** It hides through
    * `content-visibility` rather than `display`, which an author `display` does
-   * not override, so a section a sheet animates closed shows an empty box while
-   * it shrinks. `beforematch` sets `open`, so find in page never reveals text
-   * under a trigger that still reports collapsed.
+   * not override, so it is written only once the section's closing motion has
+   * ended (`closing`). `beforematch` sets `open`, so find in page never reveals
+   * text under a trigger that still reports collapsed.
    *
-   * `inert` stays, except under `until-found`. `hidden` answers the reader who
+   * `inert` only where `until-found` is not. `hidden` answers the reader who
    * can see and `inert` answers the one tabbing through, and wherever a sheet
    * overrides `display`, `inert` is the only one of the two still in force.
    * `content-visibility: hidden` keeps skipped content out of the tab order and
@@ -352,9 +392,10 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
    */
   protected override render(): TemplateResult {
     const open = this.open
+    const shown = open || this.closing
     /* A closed findable section is skipped content, and an empty landmark
        named by its trigger would still be listed among the page's regions. */
-    const landmark = open || !this.findable
+    const landmark = shown || !this.findable
     const level = headingLevel(this.headingLevel ?? this.groupHeadingLevel)
     return html`
       <div part="container">
@@ -377,8 +418,8 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
           id=${CONTENT_ID}
           aria-labelledby=${landmark ? TRIGGER_ID : nothing}
           part="content"
-          hidden=${open ? nothing : this.findable ? 'until-found' : ''}
-          ?inert=${!open && !this.findable}
+          hidden=${shown ? nothing : this.findable ? 'until-found' : ''}
+          ?inert=${!open && (this.closing || !this.findable)}
           role=${landmark ? 'region' : nothing}
           @beforematch=${this.handleBeforeMatch}
         >
