@@ -246,3 +246,18 @@ describe('pagination size in a form', () => {
     expect(control(it).hasAttribute('disabled')).toBe(true)
   })
 })
+
+/* Select draws a `live` part for a choice made on its closed trigger, and a
+   `::part(control-live)` reached nothing. */
+describe('pagination size parts', () => {
+  test('forwards the select live region as control-live', async () => {
+    const host = (await mount(
+      '<helix-headless-pagination-size></helix-headless-pagination-size>',
+    )) as Size
+    await host.updateComplete
+    const forwarded = (control(host).getAttribute('exportparts') ?? '')
+      .split(',')
+      .map((pair) => pair.trim())
+    expect(forwarded).toContain('live: control-live')
+  })
+})

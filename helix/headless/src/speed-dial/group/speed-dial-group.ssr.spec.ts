@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, partTag, ssr } from '@fusion.dev/helix-testing/ssr'
+import { hostAttributes, partTag, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -10,7 +10,7 @@ describe('speed dial group server output', () => {
     )
     expect(partTag(served, 'group')).toContain('role="group"')
     expect(partTag(served, 'group')).toContain('aria-labelledby="label"')
-    expect(served).toContain('Share')
+    expect(rendered(served, 'helix-headless-speed-dial-group')).toContain('Share')
   })
 
   test('the host carries only what the consumer wrote', () => {

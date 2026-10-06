@@ -1,7 +1,7 @@
 import { DelayController } from '@fusion.dev/helix-core'
 import type { ReactiveControllerHost } from 'lit'
 
-/**
+/*
  * A press held still until it means "show me the rest", as React Aria's menu
  * trigger reads `trigger="longPress"`: a quick press is the trigger's own
  * action, and a held one opens what it holds.

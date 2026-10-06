@@ -12,7 +12,7 @@ import { styles } from './speed-dial-group.css.js'
  * space between two groups is the space between two actions.
  *
  * @since 0.141.0
- * @status experimental
+ * @status stable
  * @category actions
  * @aliases Speed dial section, Action group
  * @documentation https://fusion.dev/helix/components/speed-dial
