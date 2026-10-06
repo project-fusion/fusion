@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { stackEnds, stackSpans } from './stack.js'
+import { stackEnds, stackedReadings, stackSpans } from './stack.js'
 
 describe('a stack of columns', () => {
   test('stands each positive reading on the ones before it', () => {
@@ -40,5 +40,21 @@ describe('a stack of columns', () => {
         ]),
       ),
     ).toBe(-2)
+  })
+})
+
+describe('the readings a stacked scale holds', () => {
+  const series = (name: string, values: (number | undefined)[]) => ({
+    name,
+    points: values.flatMap((value, at) => (value === undefined ? [] : [{ at, label: '', value }])),
+  })
+
+  /* The plot held the lines' readings and the tooltip did not, so a bubble
+     over a stack with a line in it sat at the wrong height. */
+  test('are the lines as read and the ends of each category stack of the rest', () => {
+    const group = [series('A', [2, -1]), series('B', [3, 4]), series('Target', [9, 1])]
+    expect(stackedReadings(group, 2, (one) => one.name === 'Target').sort((a, b) => a - b)).toEqual(
+      [-1, 1, 2, 4, 5, 9],
+    )
   })
 })

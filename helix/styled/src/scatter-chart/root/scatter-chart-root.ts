@@ -38,6 +38,7 @@ import '../../tooltip/index.js'
  * @documentation https://fusion.dev/helix/components/scatter-chart
  *
  * @cssproperty --scatter-chart-block-size - Height of the drawing.
+ * @cssproperty --scatter-chart-bubble-size - Diameter of the largest point under `size`. The smallest is `--scatter-chart-point-size`.
  * @cssproperty --scatter-chart-gap - Space between the drawing and its axes.
  * @cssproperty --scatter-chart-gridline-color - Color of the gridlines across the plot, drawn when `gridlines` is set.
  * @cssproperty --scatter-chart-point-opacity - Opacity of a point, so a cluster looks darker where it is denser.

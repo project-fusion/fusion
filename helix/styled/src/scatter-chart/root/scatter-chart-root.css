@@ -65,14 +65,23 @@
 /* A dot in its series' color with a ring of the page around it, so where two
    points overlap each keeps its own edge rather than merging into a blot. The
    fill stops short of opaque for the same reason: a cluster reads darker
-   where it is denser, which is what a reader is looking at a scatter for. */
+   where it is denser, which is what a reader is looking at a scatter for.
+
+   **Under `size` a point's diameter runs from the point size to the bubble
+   size** by the weight the component writes, already a square root so the
+   area follows the measure. With no weight it is the point size. */
 [part~="point"] {
+  --_scatter-chart-diameter: calc(
+    var(--scatter-chart-point-size, 8px) +
+    var(--chart-point-weight, 0) *
+    (var(--scatter-chart-bubble-size, 40px) - var(--scatter-chart-point-size, 8px))
+  );
   background-color: var(--chart-series);
-  block-size: var(--scatter-chart-point-size, 8px);
+  block-size: var(--_scatter-chart-diameter);
   border-radius: var(--helix-radii-full);
   box-shadow: 0 0 0 var(--helix-border-thin)
     var(--scatter-chart-point-ring-color, var(--helix-color-background));
-  inline-size: var(--scatter-chart-point-size, 8px);
+  inline-size: var(--_scatter-chart-diameter);
   inset-block-start: var(--chart-point-y);
   inset-inline-start: var(--chart-point-x);
   opacity: var(--scatter-chart-point-opacity, 0.8);

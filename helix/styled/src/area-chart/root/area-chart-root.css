@@ -34,6 +34,15 @@
   stroke: none;
 }
 
+/* **Under `overlap` the bands let each other through**, being drawn from zero
+   one in front of another: an opaque band in front would hide every smaller
+   one behind it. Each takes its series' color thinned, so where two meet reads
+   as both. */
+:host([overlap]) [part="area"] {
+  fill: var(--chart-series);
+  fill-opacity: var(--area-chart-overlap-opacity, 0.3);
+}
+
 /* The top edge of each band at the series' full color, so where one part ends
    and the next begins is drawn rather than left to two pale fills meeting. */
 [part="line"] {

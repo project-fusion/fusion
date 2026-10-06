@@ -18,7 +18,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-import { extremesOf, readingWords } from '../readings.js'
+import { areaPath, extremesOf, overviewWords, readingWords, slotsOf } from '../readings.js'
 
 /**
  * How tall the strip is drawn, which is the one coordinate this family states.
@@ -48,10 +48,16 @@ const STRIP_HEIGHT = 32
  * the last, Escape puts the reading away, and the `live` part says each
  * reading with where it stands, such as "Mon: 12 (3 of 7)".
  *
+ * **A named sparkline describes itself.** Beside its name, a screen reader
+ * hears what the readings come to, the first and the last, the highest and
+ * the lowest, in `overview-label`: "From 12 to 20, highest 30, lowest 8". An
+ * `aria-label` on the element names it as `label` does.
+ *
  * A pointer resting on the drawing shows the reading under it: the `cursor`
  * part marks it and the `readout` part writes it. `marks` adds a mark on the
- * highest and the lowest reading. A blank cell in a `for` table is a gap in
- * the line.
+ * highest and the lowest reading, and `range` draws a band between two values,
+ * such as a normal range. A blank cell in a `for` table is a gap in the line,
+ * and a reading alone between two blanks is a `lone` mark.
  *
  * Place it beside a `Stat`, because a change beside a figure is a second fact,
  * as `Stat`'s own spec says. `Trend` is composed the same way.
@@ -73,7 +79,10 @@ const STRIP_HEIGHT = 32
  * @csspart high - The mark on the highest reading, under `marks="high"`. Placed as `cursor` is.
  * @csspart line - The line's path.
  * @csspart live - A polite region that says the reading a key moved to, rendered only with a `label`. Hide it visually.
+ * @csspart lone - The mark on a reading no line reaches, with a blank or an end on each side. Placed as `cursor` is.
  * @csspart low - The mark on the lowest reading, under `marks="low"`. Placed as `cursor` is.
+ * @csspart overview - What the readings come to, in `overview-label`, which describes the drawing. Rendered `hidden` with a name, since it is read through the description and not shown.
+ * @csspart range - The band between the two values of `range`, drawn behind the line.
  * @csspart readout - The reading a pointer or a key rests on, as the table or `values` writes it, rendered only while there is one. Placed as `cursor` is.
  * @csspart svg - The drawing, which takes focus to be read by key where there is a `label`.
  * @csspart terminus - The mark on the last value.
@@ -161,6 +170,17 @@ export class HelixHeadlessSparkline extends HelixElement {
   marks = ''
 
   /**
+   * What the readings come to, said after the name: `{first}` and `{last}`
+   * for the first and the last reading, `{high}` and `{low}` for the highest
+   * and the lowest, each written as the readout writes it.
+   *
+   * Set it to the words of the page's language, or to nothing to say no
+   * more than the name. Said only where the sparkline is named.
+   */
+  @property({ attribute: 'overview-label' })
+  overviewLabel = 'From {first} to {last}, highest {high}, lowest {low}'
+
+  /**
    * What the readings are drawn as.
    *
    * Absent is `area`, a line with the region beneath it washed. `line` is the
@@ -204,6 +224,16 @@ export class HelixHeadlessSparkline extends HelixElement {
   positionLabel = '{position} of {count}'
 
   /**
+   * Two values a band is drawn between, behind the line, separated by a
+   * space: `range="60 100"` marks a normal range.
+   *
+   * The scale stretches to hold the band where the readings do not reach it.
+   * Absent draws none.
+   */
+  @property()
+  range = ''
+
+  /**
    * The numbers, separated by whitespace or by commas.
    *
    * An array assigned to the property works too, which is what React 19 does
@@ -223,6 +253,36 @@ export class HelixHeadlessSparkline extends HelixElement {
    * chart, so a sparkline is read the way they are.
    */
   readonly pointer = new ChartPointerController(this)
+
+  /**
+   * Hears an `aria-label` written on the sparkline, which no property mirrors,
+   * because it names the drawing as `label` does, as on every chart.
+   */
+  static override get observedAttributes(): string[] {
+    // biome-ignore lint/complexity/noThisInStatic: super runs Lit's getter with the subclass as this, so a styled sparkline keeps its own attributes
+    return [...super.observedAttributes, 'aria-label']
+  }
+
+  /** Called by the browser when an observed attribute changes; a new `aria-label` renames the drawing. */
+  override attributeChangedCallback(name: string, old: string | null, value: string | null): void {
+    super.attributeChangedCallback(name, old, value)
+    if (name === 'aria-label') {
+      this.requestUpdate()
+    }
+  }
+
+  /** The drawing's name: an `aria-label` written on the sparkline, then `label`. */
+  get named(): string {
+    return this.getAttribute?.('aria-label') || this.label
+  }
+
+  /** The two values of `range`, lower first, or none. */
+  private get band(): [number, number] | undefined {
+    const [one, two] = writtenNumbers(this.range)
+    return one === undefined || two === undefined
+      ? undefined
+      : [Math.min(one, two), Math.max(one, two)]
+  }
 
   protected override willUpdate(changed: PropertyValues<this>): void {
     if (changed.has('for')) {
@@ -279,13 +339,9 @@ export class HelixHeadlessSparkline extends HelixElement {
 
   protected override render(): TemplateResult {
     const { count, series } = this.drawn()
-    const slots: (number | undefined)[] = Array.from({ length: count }, () => undefined)
-    for (const point of series.points) {
-      if (point.at >= 0 && point.at < count) {
-        slots[point.at] = point.value
-      }
-    }
+    const slots = slotsOf(series.points, count)
     const points = slots.filter((value): value is number => value !== undefined)
+    const band = this.band
     /* Two points minimum, because one is not a trend and zero is not a line.
        An `<svg>` given a `d` of `M NaN,NaN` draws nothing and reports nothing,
        so the empty case is stated here rather than left to look like a bug. */
@@ -301,7 +357,7 @@ export class HelixHeadlessSparkline extends HelixElement {
 
        The zero is included at both ends, so a series that goes negative gets a
        baseline inside the box and its columns hang below it. */
-    const [low, high] = extent(points.length > 0 ? points : [0])
+    const [low, high] = extent(points.length > 0 ? [...points, ...(band ?? [])] : [0])
     const y =
       this.plot === 'bar'
         ? linear([Math.min(0, low), Math.max(0, high)], [STRIP_HEIGHT, 0])
@@ -328,15 +384,7 @@ export class HelixHeadlessSparkline extends HelixElement {
        arrangement is not the plainest thing, so the test has to answer true for
        the value nobody set, and `=== 'area'` would answer false. */
     const area =
-      this.plot !== 'bar' && this.plot !== 'line' && path !== ''
-        ? runs
-            .map((one) => {
-              const first = one.run[0] as Point
-              const last = one.run.at(-1) as Point
-              return `${one.path}L${last[0]},${STRIP_HEIGHT}L${first[0]},${STRIP_HEIGHT}Z`
-            })
-            .join('')
-        : ''
+      this.plot !== 'bar' && this.plot !== 'line' && path !== '' ? areaPath(runs, STRIP_HEIGHT) : ''
 
     /* One column per reading, inset so neighbors do not touch.
      *
@@ -396,15 +444,20 @@ export class HelixHeadlessSparkline extends HelixElement {
         (y(value) / STRIP_HEIGHT) * 100
       }%`
     }
-    const named = this.label !== ''
+    const name = this.named
+    const named = name !== ''
+    const overview = named
+      ? overviewWords(this.overviewLabel, slots, (index) => this.reading(index, slots[index]).text)
+      : ''
 
     /* **Named, the drawing is read by key**, as every chart's plot is: an
        `application` so a screen reader passes the arrows through, one tab
        stop, the readings walked by `pointer`. Decorative, it is hidden and
        takes no stop. */
     return html`<svg
+        aria-describedby=${overview === '' ? nothing : 'sparkline-overview'}
         aria-hidden=${named ? nothing : 'true'}
-        aria-label=${named ? this.label : nothing}
+        aria-label=${named ? name : nothing}
         data-mirror
         id=${CHART_PLOT}
         part="svg"
@@ -427,6 +480,17 @@ export class HelixHeadlessSparkline extends HelixElement {
               <stop offset="1" part="wash-end" />
             </linearGradient>
           </defs>`
+        }
+        ${
+          band === undefined
+            ? nothing
+            : svg`<rect
+                height=${Math.abs(y(band[0]) - y(band[1]))}
+                part="range"
+                width=${PLOT_WIDTH}
+                x="0"
+                y=${Math.min(y(band[0]), y(band[1]))}
+              />`
         }
         ${
           /* `svg` and not `html`, because a nested template is parsed on its
@@ -468,9 +532,34 @@ export class HelixHeadlessSparkline extends HelixElement {
         points.length < 2 || this.plot === 'bar'
           ? nothing
           : html`<span aria-hidden="true" part="terminus" style=${end ?? nothing}></span>`
-      }${this.renderMarks(slots, at)}${this.renderReading(slots, at)}${
+      }${this.renderLone(points.length < 2 ? undefined : series, at)}${this.renderMarks(slots, at)}${this.renderReading(slots, at)}${
         named && count > 0 ? this.renderLive(slots) : nothing
+      }${
+        overview === ''
+          ? nothing
+          : html`<span hidden id="sparkline-overview" part="overview">${overview}</span>`
       }`
+  }
+
+  /**
+   * A mark on each reading with a blank on either side, which no line can
+   * reach, so a line and an area show it as `LineChart` does. Not on a bar
+   * plot, whose column already shows it.
+   */
+  protected renderLone(
+    series: Series | undefined,
+    at: (index: number, value: number) => string,
+  ): TemplateResult | typeof nothing {
+    if (!series || this.plot === 'bar') {
+      return nothing
+    }
+    const alone = unbroken(series).filter((run) => run.length === 1)
+    return alone.length === 0
+      ? nothing
+      : html`${alone.map(
+          ([point]) =>
+            html`<span aria-hidden="true" part="lone" style=${at(point?.at ?? 0, point?.value ?? 0)}></span>`,
+        )}`
   }
 
   /** The marks `marks` asks for, on the highest and the lowest reading. */

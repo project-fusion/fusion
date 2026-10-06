@@ -41,7 +41,10 @@ const percentIn = (locale: string): Intl.NumberFormat => {
 export interface AreaStack {
   /** The table's columns that hold numbers, by their place among its cells. */
   columns: number[]
-  /** Each column's running sum at each reading, the top edge of its band. */
+  /**
+   * Each column's top edge at each reading: its running sum, or its own
+   * reading under `overlap`.
+   */
   layers: number[][]
   /** Each column's heading. */
   names: string[]
@@ -79,6 +82,11 @@ export interface AreaStack {
  * `share` draws each reading as 100 percent, so the top edge is flat and the
  * bands show each part's share. Use it to see which part grew. The default
  * shows whether the total grew.
+ *
+ * `overlap` draws every band from zero, one in front of another, so each
+ * part's own amount is its height: the first column is in front. Use it to
+ * compare the parts with each other; the scale then fits the largest part
+ * rather than the total.
  *
  * The drawing is hidden from screen readers. The text summary gives the latest
  * reading's total and each part's share of it, and the table beside the chart
@@ -163,6 +171,17 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
   gridlines?: 'both' | 'category' | 'value'
 
   /**
+   * Draws every band from zero, in front of the next, so a band's height is
+   * its own part's amount and not its place in a stack.
+   *
+   * Absent stacks the parts, so the top edge is the total. Set, the first
+   * column is in front and the scale fits the largest part. Reflected, because
+   * the styled tier lets the bands behind show through the ones in front.
+   */
+  @property({ reflect: true, type: Boolean })
+  overlap = false
+
+  /**
    * Draws each reading as a hundred percent, so each band shows its share of
    * the total.
    *
@@ -238,7 +257,7 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
     const layers: number[][] = []
     let running = rows.map(() => 0)
     for (const column of drawn) {
-      running = running.map((sum, index) => sum + (column[index] ?? 0))
+      running = this.overlap ? column : running.map((sum, index) => sum + (column[index] ?? 0))
       layers.push(running)
     }
     return {
@@ -283,7 +302,11 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
     if (rows.length === 0 || stack.columns.length === 0) {
       return html`<div id=${CHART_PLOT} part="plot"></div>`
     }
-    const top = this.share ? 1 : Math.max(0, ...stack.totals)
+    const top = this.overlap
+      ? Math.max(0, ...stack.layers.flat())
+      : this.share
+        ? 1
+        : Math.max(0, ...stack.totals)
     const domain: [number, number] = [0, top > 0 ? top : 1]
     const y = linear(domain, [PLOT_HEIGHT, 0])
     /* In the middle of each reading's slot, for the reason `LineChart` gives:
@@ -489,7 +512,7 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
       {
         placement: 'top',
         x: `${at * slot + slot / 2}%`,
-        y: `${y(stack.layers.at(-1)?.[at] ?? 0)}%`,
+        y: `${y(Math.max(0, ...stack.layers.map((layer) => layer[at] ?? 0)))}%`,
       },
       (cell) => this.seriesOf(cell),
       this.pointer,
