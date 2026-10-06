@@ -236,6 +236,15 @@ const clock = (seconds: number): string => {
  * @cssproperty --video-intrinsic-ratio - The media's own aspect ratio, once it is known. `--video-aspect-ratio` overrides it.
  * @cssproperty --video-level - The current volume, 0 to 1.
  * @cssproperty --video-progress - How far playback has reached, as a fraction of the duration.
+ *
+ * @cssstate ended - Playback reached the end, until it starts again or the source changes.
+ * @cssstate error - The source could not be played, and `failure` shows.
+ * @cssstate fullscreen - The player fills the screen.
+ * @cssstate idle - The video plays and the user has been still for `idle-delay`, so the bar hides.
+ * @cssstate muted - The sound is off.
+ * @cssstate paused - Playback is paused, which is where every player starts.
+ * @cssstate playing - Playback runs, waiting for data included.
+ * @cssstate waiting - Playback stopped to wait for more data, and `loading` shows.
  */
 @customElement('helix-headless-video')
 export class HelixHeadlessVideo extends HelixElement {
@@ -613,6 +622,10 @@ export class HelixHeadlessVideo extends HelixElement {
 
   @state()
   private playing = false
+
+  /** Whether playback reached the end, for `:state(ended)`. */
+  @state()
+  private finished = false
 
   @state()
   private position = 0
@@ -1026,6 +1039,9 @@ export class HelixHeadlessVideo extends HelixElement {
 
   private readonly handleTime = (): void => {
     this.position = this.video?.currentTime ?? 0
+    /* A seek back from the end clears `ended` and fires none of the play
+       events, so the time is where that is heard. */
+    this.finished = this.video?.ended ?? false
   }
 
   private readonly handleWaiting = (): void => {
@@ -1060,7 +1076,8 @@ export class HelixHeadlessVideo extends HelixElement {
   private readonly handleState = (event: Event): void => {
     const video = this.video
     this.playing = video ? !video.paused : false
-    if (event.type === 'emptied' || event.type === 'pause') {
+    this.finished = video?.ended ?? false
+    if (event.type === 'emptied' || event.type === 'ended' || event.type === 'pause') {
       this.buffering = false
     }
     if (event.type === 'play') {
@@ -1387,6 +1404,18 @@ export class HelixHeadlessVideo extends HelixElement {
        "playing, and nobody has moved for a while" instead of "playing and the
        pointer is not on it this instant". */
     this.toggleAttribute('data-idle', this.idle && this.playing)
+    /* **The same facts as custom states, and the rest of what a page styles
+       by**, so a rule can say `:state(waiting)` or `:state(ended)` without a
+       script listening for the media events. States are not in the DOM, so
+       these are safe from the first update, `paused` included. */
+    this.toggleState('ended', this.finished)
+    this.toggleState('error', this.failed)
+    this.toggleState('fullscreen', this.full)
+    this.toggleState('idle', this.idle && this.playing)
+    this.toggleState('muted', this.silent)
+    this.toggleState('paused', !this.playing)
+    this.toggleState('playing', this.playing)
+    this.toggleState('waiting', this.buffering)
     /* A media element decides what to play once, when it is created or when it
        is told to look again. Copies that arrive after that are markup it has
        already walked past. */
