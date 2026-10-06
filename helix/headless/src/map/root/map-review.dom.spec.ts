@@ -142,6 +142,60 @@ describe('the marker walk', () => {
     await settle(lead as Marker)
     expect(lead?.shadowRoot?.activeElement).not.toBeNull()
   })
+
+  /* Measured in Chromium with MapLibre drawing tiles: removing the focused
+     marker left `document.activeElement` on the body. */
+  const city = async (): Promise<{ host: Element; markers: Marker[] }> => {
+    const host = await mount(`<helix-headless-map label="City">
+      <helix-headless-map-marker label="Capitol" lat="30.27" lng="-97.74"></helix-headless-map-marker>
+      <helix-headless-map-marker label="Library" lat="30.26" lng="-97.75"></helix-headless-map-marker>
+      <helix-headless-map-marker label="Bridge" lat="30.25" lng="-97.74"></helix-headless-map-marker>
+    </helix-headless-map>`)
+    await settle(host as Updatable)
+    return { host, markers: [...host.querySelectorAll('helix-headless-map-marker')] as Marker[] }
+  }
+  const focusIn = (one: Element | undefined): boolean =>
+    one?.shadowRoot?.activeElement !== null && one?.shadowRoot?.activeElement !== undefined
+
+  test('hands focus to the next place when the page takes the focused one away', async () => {
+    const { host, markers } = await city()
+    const [, library, bridge] = markers as [Marker, Marker, Marker]
+    ;(library as unknown as HTMLElement).focus()
+    ;(library as unknown as HTMLElement).remove()
+    await settle(host as Updatable)
+    expect(focusIn(bridge as unknown as Element)).toBe(true)
+    expect(bridge.current).toBe(true)
+  })
+
+  test('to the one before where the last was taken away, and to the map where none is left', async () => {
+    const { host, markers } = await city()
+    const [capitol, library, bridge] = markers as [Marker, Marker, Marker]
+    ;(bridge as unknown as HTMLElement).focus()
+    ;(bridge as unknown as HTMLElement).remove()
+    await settle(host as Updatable)
+    expect(focusIn(library as unknown as Element)).toBe(true)
+    ;(capitol as unknown as HTMLElement).remove()
+    ;(library as unknown as HTMLElement).remove()
+    await settle(host as Updatable)
+    expect(host.shadowRoot?.activeElement).toBe(region(host))
+  })
+
+  test('leaves focus where the reader put it when a marker they left is taken away', async () => {
+    const { host, markers } = await city()
+    const [capitol, library] = markers as [Marker, Marker, Marker]
+    const after = document.createElement('button')
+    document.body.append(after)
+    try {
+      ;(library as unknown as HTMLElement).focus()
+      after.focus()
+      ;(library as unknown as HTMLElement).remove()
+      await settle(host as Updatable)
+      expect(document.activeElement).toBe(after)
+      expect(focusIn(capitol as unknown as Element)).toBe(false)
+    } finally {
+      after.remove()
+    }
+  })
 })
 
 describe('imagery of the ground', () => {
