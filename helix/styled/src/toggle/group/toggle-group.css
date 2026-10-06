@@ -129,7 +129,8 @@
 [part="indicator"],
 :host([selection-mode="multiple"]) ::slotted(helix-toggle:state(pressed)) {
   background-color: var(--toggle-group-indicator-color, var(--_indicator-surface));
-  border-radius: var(--_toggle-radius, var(--helix-radii-sm));
+  /* The track always sets it, and the marker and the items inherit it there. */
+  border-radius: var(--_toggle-radius);
   box-shadow: var(--toggle-group-indicator-shadow, var(--helix-shadow-sm));
 }
 
@@ -139,7 +140,6 @@
   inline-size: var(--indicator-inline-size, 0);
   inset-block-start: 0;
   inset-inline-start: 0;
-  opacity: 0;
   position: absolute;
   translate: var(--indicator-x, 0) var(--indicator-y, 0);
   /* Width is a layout property and the rule is transform and opacity only. */
@@ -152,8 +152,8 @@
 
 /* Hidden until it has somewhere to be, so it fades in rather than sliding from a
    wrong place on first paint. */
-[part="indicator"][data-placed] {
-  opacity: 1;
+[part="indicator"]:not([data-placed]) {
+  opacity: 0;
 }
 
 /* Wrong, and the strip says so. */

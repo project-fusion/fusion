@@ -6,7 +6,8 @@
    the host box and the focus ring, which a document rule cannot reach into a
    shadow root to declare. */
 :host {
-  block-size: 100%;
+  /* No height of its own: the group's `::slotted()` rule gives it the row's,
+     and that rule wins over this sheet's. */
   display: inline-flex;
   /* Above the indicator, which sits behind every item. */
   position: relative;

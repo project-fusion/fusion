@@ -409,7 +409,7 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
     if (!this.multiple) {
       return 'radiogroup'
     }
-    return this.parentElement?.closest('[role="toolbar"], helix-toolbar, helix-headless-toolbar')
+    return this.parentElement?.closest('[role=toolbar],helix-toolbar,helix-headless-toolbar')
       ? 'group'
       : 'toolbar'
   }
@@ -503,7 +503,8 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
       super.formStateRestoreCallback(state)
       return
     }
-    this.values = state.getAll(this.name).filter((one): one is string => typeof one === 'string')
+    // The group writes strings only, so every entry it saved is one.
+    this.values = state.getAll(this.name) as string[]
   }
 
   /**
