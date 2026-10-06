@@ -49,21 +49,51 @@ export interface ScrollItemOptions {
  * null is the honest answer: the caller no-ops rather than taking the address
  * bar with it.
  */
-const scrollingAncestor = (item: HTMLElement): HTMLElement | null => {
-  const stop = item.ownerDocument.body
+export const scrollingAncestor = (
+  item: HTMLElement,
+  options: ScrollerOptions = {},
+): HTMLElement | null => {
+  const { axis, overflowing = false, stop = item.ownerDocument.body } = options
   let node: HTMLElement | null = climb(item)
   while (node && node !== stop) {
     const style = getComputedStyle(node)
-    /* Both axes, since the caller may need either, and `overlay` because a
-       scroller styled with it scrolls exactly as `auto` does. `clip` and
-       `hidden` are deliberately not here: they cut the content off and are not
-       something a reader can move. */
-    if (/\b(auto|scroll|overlay)\b/.test(`${style.overflowX} ${style.overflowY}`)) {
+    /* Both axes unless one is asked for, since the caller may need either, and
+       `overlay` because a scroller styled with it scrolls exactly as `auto`
+       does. `clip` and `hidden` are deliberately not here: they cut the
+       content off and are not something a reader can move. */
+    const overflow =
+      axis === 'x'
+        ? style.overflowX
+        : axis === 'y'
+          ? style.overflowY
+          : `${style.overflowX} ${style.overflowY}`
+    if (/\b(auto|scroll|overlay)\b/.test(overflow) && (!overflowing || overflows(node, axis))) {
       return node
     }
     node = climb(node)
   }
   return null
+}
+
+/** Where `scrollingAncestor` looks, and what it takes for a scroller. */
+export interface ScrollerOptions {
+  /** The axis whose overflow counts, or either where absent. */
+  readonly axis?: 'x' | 'y'
+  /**
+   * Only a box whose content is larger than it, along `axis`: one that can
+   * scroll now, rather than one that would once it fills. Outline asks this of
+   * the box its links and its sections scroll in.
+   */
+  readonly overflowing?: boolean
+  /** Where the walk stops, unread: the document's body where absent. */
+  readonly stop?: Element | null
+}
+
+/** Whether a box's content is larger than the box, along `axis` or either. */
+const overflows = (node: HTMLElement, axis?: 'x' | 'y'): boolean => {
+  const tall = node.scrollHeight > node.clientHeight
+  const wide = node.scrollWidth > node.clientWidth
+  return axis === 'x' ? wide : axis === 'y' ? tall : tall || wide
 }
 
 /** Up one, through a shadow root where that is what is above. */
