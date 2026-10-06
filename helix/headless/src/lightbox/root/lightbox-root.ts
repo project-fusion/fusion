@@ -1,6 +1,7 @@
 import {
   CommandController,
   customElement,
+  DelayController,
   deepActiveElement,
   deepContains,
   drawDismiss,
@@ -22,12 +23,12 @@ import {
   unlockScroll,
   whenHydrated,
 } from '@fusion.dev/helix-core'
-import { caretLeft, caretRight } from '@fusion.dev/helix-icons'
+import { caretLeft, caretRight, minus, plus } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { HelixHeadlessLightboxItem } from '../item/lightbox-item.js'
-import type { Offset } from '../zoom.js'
+import { type Offset, percentOf } from '../zoom.js'
 import { ZoomController } from '../zoom-controller.js'
 
 /**
@@ -59,7 +60,11 @@ import { ZoomController } from '../zoom-controller.js'
  * about. `+` and `-` zoom in and out from the keyboard, and `0` puts it back.
  * The scale and the offset are on the `viewport` part as `--lightbox-zoom`,
  * `--lightbox-pan-x` and `--lightbox-pan-y`, written only while zoomed, and a
- * swipe moves to the next item only while the item is at its own size.
+ * swipe moves to the next item only while the item is at its own size. With
+ * `controls`, the viewer also draws zoom-out and zoom-in controls, for a
+ * pointer with no wheel and no second finger. Once a reader stops zooming, the
+ * live region says the new scale in the words of `zoom-status-label`, such as
+ * "Zoomed to 150%".
  *
  * Each item is a slide: a `group` with the role description in
  * `slide-role-label`, named by its `label` or by `slide-label`. A touch or a pen
@@ -84,6 +89,8 @@ import { ZoomController } from '../zoom-controller.js'
  * @slot header - Content above the item, such as a title and a close button.
  * @slot next-icon - Replaces the glyph inside the next control.
  * @slot previous-icon - Replaces the glyph inside the previous control.
+ * @slot zoom-in-icon - Replaces the glyph inside the zoom-in control.
+ * @slot zoom-out-icon - Replaces the glyph inside the zoom-out control.
  *
  * @event {Event} close - Fired when the viewer closes. The component dispatches it again from the host, because the dialog's own event does not leave the shadow root.
  * @event {HelixActivateEvent} helix-activate - Fired after the shown item changes, when the element already holds the new item.
@@ -96,12 +103,18 @@ import { ZoomController } from '../zoom-controller.js'
  * @csspart dialog - The native dialog element.
  * @csspart dismiss - The close control, drawn with `controls`.
  * @csspart dismiss-mark - The glyph on the close control, where none is slotted.
- * @csspart live - The live region that announces which item is shown.
+ * @csspart footer - The slot the footer is in. It draws no box until you give it one.
+ * @csspart header - The slot the header is in. It draws no box until you give it one.
+ * @csspart live - The live region that announces which item is shown, and the scale once a reader has zoomed.
  * @csspart next - The control that shows the next item, drawn with `controls`.
  * @csspart next-mark - The glyph on the next control, where none is slotted.
  * @csspart previous - The control that shows the previous item, drawn with `controls`.
  * @csspart previous-mark - The glyph on the previous control, where none is slotted.
  * @csspart viewport - The box the current item is shown in.
+ * @csspart zoom-in - The control that zooms in by half again, drawn with `controls` where `max-zoom` allows zooming.
+ * @csspart zoom-in-mark - The glyph on the zoom-in control, where none is slotted.
+ * @csspart zoom-out - The control that zooms back out, drawn with `controls` where `max-zoom` allows zooming.
+ * @csspart zoom-out-mark - The glyph on the zoom-out control, where none is slotted.
  *
  * @cssproperty --lightbox-pan-x - How far the zoomed item is moved across from the middle of the viewport, in pixels, toward the right. Written only while zoomed.
  * @cssproperty --lightbox-pan-y - How far the zoomed item is moved down from the middle of the viewport, in pixels. Written only while zoomed.
@@ -118,12 +131,14 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
   MixinControllerOpen(HelixElement),
 ) {
   /**
-   * Draws the viewer's own previous, next and close controls over the picture.
+   * Draws the viewer's own previous, next and close controls over the picture,
+   * and zoom-out and zoom-in controls where `max-zoom` allows zooming.
    *
    * Off by default, for a viewer whose chrome you compose in the `header` and
    * `footer` slots. The controls hide with the rest of the chrome while the
-   * reader is idle, and the previous and next ones say they are unavailable at
-   * either end of a set that does not `loop`.
+   * reader is idle, the previous and next ones say they are unavailable at
+   * either end of a set that does not `loop`, and the zoom ones at either end
+   * of the scale.
    */
   @property({ reflect: true, type: Boolean })
   controls = false
@@ -212,6 +227,25 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
   @property({ attribute: 'status-label' })
   statusLabel = '{index} of {count}'
 
+  /**
+   * The zoom-in control's accessible name.
+   */
+  @property({ attribute: 'zoom-in-label' })
+  zoomInLabel = 'Zoom in'
+
+  /**
+   * The zoom-out control's accessible name.
+   */
+  @property({ attribute: 'zoom-out-label' })
+  zoomOutLabel = 'Zoom out'
+
+  /**
+   * What the live region says once a reader has stopped zooming, with the
+   * scale as a whole `{percent}` filled in. Empty it to say nothing.
+   */
+  @property({ attribute: 'zoom-status-label' })
+  zoomStatusLabel = 'Zoomed to {percent}%'
+
   /** Whether the reader has been still long enough to hide the chrome. */
   @state()
   private resting = false
@@ -223,6 +257,17 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
   /** What the live region is currently saying. */
   @state()
   private announcement = ''
+
+  /** The scale the shown item is drawn at, which the zoom controls read. */
+  @state()
+  private zoomScale = 1
+
+  /* The scale is said once a reader stops zooming, and not at every step of
+     a pinch. */
+  private readonly zoomSaid = new DelayController(this, { renders: false })
+
+  /** Whether the zoom is being put back because the item changed, which says nothing. */
+  private quietZoom = false
 
   /* A swipe across the viewer, read by `swipeStep` as next or previous. The
      whole viewer, since the picture may be far smaller than the screen. */
@@ -260,6 +305,21 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
     viewport?.style.setProperty('--lightbox-pan-y', zoomed ? `${Math.round(pan.y)}px` : '')
     this.toggleState('zoomed', zoomed)
     this.idle.stir()
+    if (scale !== this.zoomScale) {
+      this.zoomScale = scale
+      this.sayZoom()
+    }
+  }
+
+  /** Says the new scale in the live region, a moment after the last change. */
+  private sayZoom(): void {
+    if (this.quietZoom || !this.open || this.zoomStatusLabel === '') {
+      this.zoomSaid.cancel()
+      return
+    }
+    this.zoomSaid.start(400, () => {
+      this.announcement = fillTemplate(this.zoomStatusLabel, { percent: percentOf(this.zoomScale) })
+    })
   }
 
   /**
@@ -292,7 +352,7 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
   private chromeHasFocus(): boolean {
     const active = deepActiveElement()
     const own = this.shadowRoot?.activeElement?.matches(
-      '[part="previous"], [part="next"], [part="dismiss"]',
+      '[part="previous"], [part="next"], [part="dismiss"], [part="zoom-in"], [part="zoom-out"]',
     )
     return (
       own === true ||
@@ -462,17 +522,26 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
     if (this.maxZoom <= 1) {
       return false
     }
-    const scale = this.zoomer.scale
     if (key === '+' || key === '=') {
-      this.zoomer.zoomTo(scale * 1.5)
+      this.zoomIn()
     } else if (key === '-') {
-      this.zoomer.zoomTo(scale / 1.5)
+      this.zoomOut()
     } else if (key === '0') {
       this.zoomer.reset()
     } else {
       return false
     }
     return true
+  }
+
+  /** Zooms in by half again, as `+` and the zoom-in control do. */
+  private zoomIn(): void {
+    this.zoomer.zoomTo(this.zoomer.scale * 1.5)
+  }
+
+  /** Zooms out by as much, as `-` and the zoom-out control do. */
+  private zoomOut(): void {
+    this.zoomer.zoomTo(this.zoomer.scale / 1.5)
   }
 
   /** Home and End, which are an index rather than a step. */
@@ -521,7 +590,9 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
     this.toggleState('zoomable', this.maxZoom > 1)
     /* Every item starts at its own size, and a closed viewer keeps no zoom. */
     if (changed.has('active') || (changed.has('open') && !this.open)) {
+      this.quietZoom = true
       this.zoomer.reset()
+      this.quietZoom = false
     }
     /* Before render and not after, or the region renders one move behind: the
        reading is this element's own state, so computing it in `updated` puts it
@@ -657,11 +728,11 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
       @pointerleave=${this.idle.leave}
       @pointermove=${this.idle.stir}
     >
-      <slot name="header"></slot>
+      <slot name="header" part="header"></slot>
       <div part="viewport">
         <slot></slot>
       </div>
-      <slot name="footer"></slot>
+      <slot name="footer" part="footer"></slot>
       ${this.controls ? this.renderControls() : nothing}
       ${this.counter ? html`<span part="counter" aria-hidden="true">${this.place()}</span>` : nothing}
       <span part="live" role="status" aria-live="polite">${this.announcement || nothing}</span>
@@ -702,11 +773,47 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
           </svg>
         </slot>
       </button>
+      ${this.maxZoom > 1 ? this.renderZoomControls() : nothing}
       ${drawDismiss({
         label: this.dismissLabel,
         mark: html`<slot name="dismiss-icon">${drawDismissGlyph()}</slot>`,
         onDismiss: () => this.close(),
       })}`
+  }
+
+  /**
+   * Zoom out and zoom in, for a pointer with no wheel and no second finger.
+   *
+   * Out before in, so they read as a scale runs. `aria-disabled` at either
+   * limit, as the previous and next controls are at the ends.
+   */
+  protected renderZoomControls(): TemplateResult {
+    return html`<button
+        part="zoom-out"
+        type="button"
+        aria-label=${this.zoomOutLabel}
+        aria-disabled=${this.zoomScale <= 1 ? 'true' : nothing}
+        @click=${() => this.zoomOut()}
+      >
+        <slot name="zoom-out-icon">
+          <svg part="zoom-out-mark" fill="currentColor" viewBox=${minus.viewBox} aria-hidden="true">
+            ${unsafeSVG(minus.content)}
+          </svg>
+        </slot>
+      </button>
+      <button
+        part="zoom-in"
+        type="button"
+        aria-label=${this.zoomInLabel}
+        aria-disabled=${this.zoomScale >= this.maxZoom ? 'true' : nothing}
+        @click=${() => this.zoomIn()}
+      >
+        <slot name="zoom-in-icon">
+          <svg part="zoom-in-mark" fill="currentColor" viewBox=${plus.viewBox} aria-hidden="true">
+            ${unsafeSVG(plus.content)}
+          </svg>
+        </slot>
+      </button>`
   }
 }
 

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { between, clampPan, clampScale, spread, zoomAt } from './zoom.js'
+import { between, clampPan, clampScale, percentOf, spread, zoomAt } from './zoom.js'
 
 describe('zoom', () => {
   test('a scale stays between the item’s own size and the most it may grow', () => {
@@ -27,5 +27,12 @@ describe('zoom', () => {
   test('two fingers are as far apart as they are, and meet halfway', () => {
     expect(spread({ x: 0, y: 0 }, { x: 30, y: 40 })).toBe(50)
     expect(between({ x: 0, y: 0 }, { x: 30, y: 40 })).toEqual({ x: 15, y: 20 })
+  })
+
+  test('a scale is heard as a whole percent', () => {
+    expect(percentOf(1)).toBe(100)
+    expect(percentOf(1.5)).toBe(150)
+    expect(percentOf(2.25)).toBe(225)
+    expect(percentOf(1.3333)).toBe(133)
   })
 })

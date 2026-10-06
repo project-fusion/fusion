@@ -38,3 +38,6 @@ export const between = (a: Offset, b: Offset): Offset => ({
   x: (a.x + b.x) / 2,
   y: (a.y + b.y) / 2,
 })
+
+/** A scale as a whole percent, which is how a reader hears it: 1.5 is 150. */
+export const percentOf = (scale: number): number => Math.round(scale * 100)

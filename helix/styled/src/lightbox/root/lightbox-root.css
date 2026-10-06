@@ -66,6 +66,18 @@
   background-color: var(--lightbox-scrim, var(--_lightbox-scrim));
 }
 
+/* **The header and the footer each hold a row, filled or not.** A bare slot
+   draws no box, so an unfilled header left the viewport in the first row and
+   the picture at the top of the screen, over an empty `1fr`. As boxes, the
+   three regions take the three rows in order whatever is slotted, and two
+   elements slotted into the header stack inside its row rather than taking
+   the picture's. */
+[part="header"],
+[part="footer"] {
+  display: grid;
+  gap: var(--lightbox-gap, var(--helix-space-sm));
+}
+
 [part="viewport"] {
   align-items: center;
   display: flex;
@@ -107,7 +119,9 @@
    of one. */
 [part="previous"],
 [part="next"],
-[part="dismiss"] {
+[part="dismiss"],
+[part="zoom-in"],
+[part="zoom-out"] {
   all: unset;
   /* `all: unset` takes the `border-box` every shadow root is given with it. */
   box-sizing: border-box;
@@ -146,9 +160,30 @@
   inset-inline-end: var(--lightbox-padding, var(--helix-space-md));
 }
 
+/* Zoom out and zoom in, in the bottom corner at the end of the line, under the
+   close control: out first, so the pair reads as a scale does. */
+[part="zoom-in"],
+[part="zoom-out"] {
+  inset-block-end: var(--lightbox-padding, var(--helix-space-md));
+}
+
+[part="zoom-in"] {
+  inset-inline-end: var(--lightbox-padding, var(--helix-space-md));
+}
+
+[part="zoom-out"] {
+  inset-inline-end: calc(
+    var(--lightbox-padding, var(--helix-space-md)) +
+    var(--lightbox-control-size, var(--helix-size-control)) +
+    var(--helix-space-xs)
+  );
+}
+
 [part="previous"] svg,
 [part="next"] svg,
-[part="dismiss"] svg {
+[part="dismiss"] svg,
+[part="zoom-in"] svg,
+[part="zoom-out"] svg {
   block-size: var(--helix-size-icon);
   inline-size: var(--helix-size-icon);
 }
@@ -157,7 +192,9 @@
    not change the control. */
 [part="previous"] ::slotted(*),
 [part="next"] ::slotted(*),
-[part="dismiss"] ::slotted(*) {
+[part="dismiss"] ::slotted(*),
+[part="zoom-in"] ::slotted(*),
+[part="zoom-out"] ::slotted(*) {
   --icon-size: var(--helix-size-icon);
 
   block-size: var(--helix-size-icon);
@@ -181,21 +218,27 @@
 
 [part="previous"]:hover,
 [part="next"]:hover,
-[part="dismiss"]:hover {
+[part="dismiss"]:hover,
+[part="zoom-in"]:hover,
+[part="zoom-out"]:hover {
   background-color: var(--helix-color-surface-sunken);
 }
 
 [part="previous"]:focus-visible,
 [part="next"]:focus-visible,
-[part="dismiss"]:focus-visible {
+[part="dismiss"]:focus-visible,
+[part="zoom-in"]:focus-visible,
+[part="zoom-out"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* At either end of a set that does not loop. Still focusable, so a control that
-   has just shown the last picture keeps the reader on it. */
+/* At either end of a set that does not loop, or of the scale. Still focusable,
+   so a control that has just shown the last picture keeps the reader on it. */
 [part="previous"][aria-disabled="true"],
-[part="next"][aria-disabled="true"] {
+[part="next"][aria-disabled="true"],
+[part="zoom-in"][aria-disabled="true"],
+[part="zoom-out"][aria-disabled="true"] {
   cursor: default;
   opacity: 0.4;
 }
@@ -224,7 +267,9 @@
 :host(:state(idle)) [part="counter"],
 :host(:state(idle)) [part="previous"],
 :host(:state(idle)) [part="next"],
-:host(:state(idle)) [part="dismiss"] {
+:host(:state(idle)) [part="dismiss"],
+:host(:state(idle)) [part="zoom-in"],
+:host(:state(idle)) [part="zoom-out"] {
   opacity: 0;
   visibility: hidden;
 }
@@ -233,7 +278,9 @@
   [part="counter"],
   [part="previous"],
   [part="next"],
-  [part="dismiss"] {
+  [part="dismiss"],
+  [part="zoom-in"],
+  [part="zoom-out"] {
     transition: none;
   }
 }
