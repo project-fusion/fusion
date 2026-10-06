@@ -1,7 +1,7 @@
 export function Example() {
   return (
     <helix-button>
-      Inbox
+      Inbox{' '}
       <helix-badge
         label="8 unread"
         placement="inline"
