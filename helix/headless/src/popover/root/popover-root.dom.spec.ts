@@ -458,3 +458,27 @@ describe('the page around a modal popover', () => {
     expect(page.querySelector('#beside')?.hasAttribute('aria-hidden')).toBe(false)
   })
 })
+
+describe('entering and exiting', () => {
+  /* Polls until neither phase holds, rather than sleeping a fixed time. */
+  const settled = async (host: HTMLElement): Promise<void> => {
+    const until = Date.now() + 1500
+    do {
+      await new Promise((resolve) => setTimeout(resolve, 10))
+    } while ((hasState(host, 'entering') || hasState(host, 'exiting')) && Date.now() < until)
+  }
+
+  test('the panel showing is entering until it settles, and one hiding is exiting', async () => {
+    const host = await popover()
+    host.show()
+    await host.updateComplete
+    expect(hasState(host, 'entering')).toBe(true)
+    await settled(host)
+    expect(hasState(host, 'entering')).toBe(false)
+    host.hide()
+    await host.updateComplete
+    expect(hasState(host, 'exiting')).toBe(true)
+    await settled(host)
+    expect(hasState(host, 'exiting')).toBe(false)
+  })
+})

@@ -14,7 +14,7 @@
   overflow: visible;
   align-items: center;
   display: flex;
-  gap: var(--helix-space-2xs);
+  gap: var(--tooltip-gap, var(--helix-space-2xs));
 
   background-color: var(--tooltip-background-color, var(--helix-color-surface-inverse));
   border: none;
@@ -82,7 +82,7 @@
 
 :host([material="frosted"]) [part~="tooltip"],
 :host([material="glass"]) [part~="tooltip"] {
-  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border: var(--helix-border-thin) solid var(--tooltip-border-color, var(--helix-color-border));
   color: var(--tooltip-color, var(--helix-color-foreground));
 }
 
