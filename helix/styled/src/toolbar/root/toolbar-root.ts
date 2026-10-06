@@ -1,6 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessToolbar } from '@fusion.dev/helix-headless/toolbar'
 import type { CSSResultGroup } from 'lit'
+import { property } from 'lit/decorators.js'
 import { styles } from './toolbar-root.css.js'
 
 /**
@@ -9,6 +10,10 @@ import { styles } from './toolbar-root.css.js'
  * @description
  * The toolbar draws no frame of its own, so it does not add a second frame
  * inside whatever already frames the bar.
+ *
+ * Its controls are the small size, since a toolbar is dense by nature, and a
+ * control added later takes it without being told. `size="md"` or `"lg"`
+ * makes every control in it larger together.
  *
  * @since 0.1.0
  * @status stable
@@ -32,6 +37,13 @@ import { styles } from './toolbar-root.css.js'
 @customElement('helix-toolbar')
 export class HelixToolbar extends HelixHeadlessToolbar {
   static override styles: CSSResultGroup = styles
+
+  /**
+   * The size of every control in the toolbar: their height, icons, boxes and
+   * tags. Unset is the small size, as a toolbar is dense by nature.
+   */
+  @property({ reflect: true })
+  size?: 'sm' | 'md' | 'lg'
 }
 
 declare global {

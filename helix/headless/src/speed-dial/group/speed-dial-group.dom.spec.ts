@@ -25,9 +25,8 @@ describe('a speed dial group', () => {
     )
     const inner = part(host, 'group') as HTMLElement
     expect(inner.getAttribute('role')).toBe('group')
-    expect(host.shadowRoot?.getElementById(inner.getAttribute('aria-labelledby') ?? '')).toBe(
-      part(host, 'label'),
-    )
+    const named = host.shadowRoot?.getElementById(inner.getAttribute('aria-labelledby') ?? '')
+    expect(named === part(host, 'label')).toBe(true)
     expect((part(host, 'label') as HTMLElement).hidden).toBe(false)
   })
 
