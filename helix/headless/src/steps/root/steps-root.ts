@@ -85,13 +85,6 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
   linear = false
 
   /**
-   * What the `progress` part says to a screen reader, with `{percent}` filled
-   * in with `progress`.
-   */
-  @property({ attribute: 'progress-label' })
-  progressLabel = '{percent}% complete'
-
-  /**
    * Which way the steps run.
    *
    * Absent is a row, which is what a form header wants, with each name under
@@ -106,6 +99,13 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
    */
   @property({ reflect: true })
   orientation?: 'vertical'
+
+  /**
+   * What the `progress` part says to a screen reader, with `{percent}` filled
+   * in with `progress`.
+   */
+  @property({ attribute: 'progress-label' })
+  progressLabel = '{percent}% complete'
 
   /**
    * A function that answers whether a stage is valid, asked about the stage a
