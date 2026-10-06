@@ -419,6 +419,7 @@ export { formatNumbers } from './utils/format-numbers/format-numbers.js'
 export { headingIn, headingsIn } from './utils/heading-in/heading-in.js'
 export { headingLevel } from './utils/heading-level/heading-level.js'
 export { type HostAria, hostAria } from './utils/host-aria/host-aria.js'
+export { hostWords } from './utils/host-words/host-words.js'
 export {
   defaultButton,
   submitImplicitly,
@@ -434,6 +435,8 @@ export { inlineStep } from './utils/inline-step/inline-step.js'
 export { isRtl } from './utils/is-rtl/is-rtl.js'
 export { keyClaimed } from './utils/key-claimed/key-claimed.js'
 export { type Curve, linePath, type Point } from './utils/line-path/line-path.js'
+export { type EndInSight, endInSight } from './utils/load-more/load-more.js'
+export { localeOf } from './utils/locale-of/locale-of.js'
 export { markRegion, type RegionOptions } from './utils/mark-region/mark-region.js'
 export {
   copiesOf,
@@ -443,7 +446,7 @@ export {
 export { formatNumber, parseNumber } from './utils/number-format/number-format.js'
 export { onUnlessFalse } from './utils/on-unless-false/on-unless-false.js'
 export { plainClick } from './utils/plain-click/plain-click.js'
-export { appleTouch, onApple, type Platform } from './utils/platform/platform.js'
+export { appleTouch, onAndroid, onApple, type Platform } from './utils/platform/platform.js'
 export { pressType, type RecentPress } from './utils/press-type/press-type.js'
 export { rangeAdd } from './utils/range-add/range-add.js'
 export { type ColorBytes, readColor, rgbOf } from './utils/read-color/read-color.js'
