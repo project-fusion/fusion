@@ -431,9 +431,38 @@ leaves removing it to your framework.
 - In the search field, Down moves into the list, and Escape empties the search.
   With `no-panel`, Escape on an empty search closes the list.
 - Screen readers read the selected note first, then how each other note links
-  to it, such as "Linked from Roadmap", and the count as a search narrows it.
+  to it, such as "Linked from Roadmap". They hear the count when a search or
+  the legend changes it.
+- After the arrow keys, plus, minus, or the buttons move the drawing, screen
+  readers hear which way it went, such as "Moved right" or "Zoomed in".
+  `connectGraph` tells the frame once the drawing has moved. If you answer
+  `helix-graph-pan` and `helix-graph-zoom` yourself, call `frame.moved()` once
+  your view has moved.
+- When you change `nodes` or `links`, the list keeps the note the keys are on.
+  When that note is removed, the keys move to the note that took its row.
 - Change the words with `search-label`, `count-label`, `selected-label`,
-  `links-to-label`, `linked-from-label`, and `linked-both-label`.
+  `links-to-label`, `linked-from-label`, `linked-both-label`,
+  `moved-up-label`, `moved-down-label`, `moved-left-label`,
+  `moved-right-label`, `zoomed-in-label`, and `zoomed-out-label`.
+
+## Events
+
+The frame sends these events. Their names follow Map's: `helix-graph-pan`,
+`helix-graph-zoom`, `helix-graph-ready`, and `helix-graph-part-change` match
+`helix-map-pan`, `helix-map-zoom`, `helix-map-ready`, and
+`helix-map-part-change`. These are the names Graph keeps.
+
+| Event | Sent when | Cancelable | Who listens |
+|---|---|---|---|
+| `helix-before-activate` | A note is about to be selected | Yes | You, to keep the selection in your own state |
+| `helix-activate` | A note was selected, in the list or the drawing | No | You |
+| `helix-graph-filter` | A group in the legend was pressed, before its notes are shown or hidden | Yes | You, to set `hiddenGroups` yourself |
+| `helix-graph-layout` | A layout settled, with where it put each note | No | You, to keep the positions |
+| `helix-graph-ready` | The graph has been drawn whole | No | You, to show the graph once it is finished |
+| `helix-graph-pan` | An arrow key or a pan button asked the drawing to move | No | `connectGraph`, or your own renderer |
+| `helix-graph-zoom` | Plus, minus, or a zoom button asked the drawing to zoom | No | `connectGraph`, or your own renderer |
+| `helix-graph-part-change` | The notes, links, selection, depth, or gestures changed | No | `connectGraph` only. It stays on the frame. |
+| `helix-graph-signal` | `signal()` was called | No | `connectGraph` only. It stays on the frame. |
 
 ## Write a driver
 

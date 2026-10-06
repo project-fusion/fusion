@@ -1,4 +1,5 @@
 import {
+  auditName,
   customElement,
   fillTemplate,
   formatNumbers,
@@ -29,6 +30,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import {
   type Adjacency,
   adjacencyOf,
+  cursorAfter,
   type Entry,
   entriesOf,
   type GraphGroupEntry,
@@ -93,11 +95,11 @@ import {
  * @event {HelixBeforeActivateEvent} helix-before-activate - A note is about to be selected. Cancelable: cancel it to keep the selection in your own state.
  * @event {HelixGraphFilterEvent} helix-graph-filter - A group in the legend was pressed, to show or hide its notes. The detail's `hidden` is every group that would be hidden. Cancelable: cancel it to keep the groups as they were, or to set `hiddenGroups` yourself.
  * @event {HelixGraphLayoutEvent} helix-graph-layout - A layout settled, with where it put each note, sent by `laidOut()`. Keep the positions and pass them back as each note's `x` and `y`, and `z` where a renderer draws in three dimensions.
- * @event {HelixGraphPanEvent} helix-graph-pan - A pan button or arrow key was pressed. `connectGraph` moves the drawing.
+ * @event {HelixGraphPanEvent} helix-graph-pan - A pan button or arrow key was pressed. `connectGraph` moves the drawing, then calls `moved()`.
  * @event {HelixGraphPartChangeEvent} helix-graph-part-change - The notes, the links, the selection, the depth or the gestures changed. Used by `connectGraph`; pages do not need to listen for it.
  * @event {HelixGraphReadyEvent} helix-graph-ready - The graph has been drawn whole, laid out and settled. Sent each time `drawn()` says it is drawn after it was not.
  * @event {HelixGraphSignalEvent} helix-graph-signal - Something passed between two notes, sent by `signal()`. Used by `connectGraph`; pages do not need to listen for it.
- * @event {HelixGraphZoomEvent} helix-graph-zoom - A zoom button or key was pressed. `connectGraph` zooms the drawing.
+ * @event {HelixGraphZoomEvent} helix-graph-zoom - A zoom button or key was pressed. `connectGraph` zooms the drawing, then calls `moved()`.
  *
  * @csspart after - The room the notes after those drawn would take, so the list scrolls its whole length.
  * @csspart before - The room the notes before those drawn would take.
@@ -116,7 +118,7 @@ import {
  * @csspart legend-item-hidden - A group in the legend whose notes are hidden.
  * @csspart legend-swatch - The mark in a group's color, before its name.
  * @csspart list - The list of notes, which draws only the rows in view.
- * @csspart live - What screen readers hear when a search changes how many notes there are.
+ * @csspart live - What screen readers hear: how many notes there are when a search or the legend changes it, and which way the drawing went after a key or a control moved it.
  * @csspart note - One note in the list.
  * @csspart note-cursor - The note the keyboard is on in the list.
  * @csspart note-linked - A note linked to or from the selected one.
@@ -199,6 +201,22 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
   @property({ attribute: 'links-to-label' })
   linksToLabel = 'Links to {note}'
 
+  /** What screen readers hear once the drawing has moved down, after `moved()`. */
+  @property({ attribute: 'moved-down-label' })
+  movedDownLabel = 'Moved down'
+
+  /** What screen readers hear once the drawing has moved left, after `moved()`. */
+  @property({ attribute: 'moved-left-label' })
+  movedLeftLabel = 'Moved left'
+
+  /** What screen readers hear once the drawing has moved right, after `moved()`. */
+  @property({ attribute: 'moved-right-label' })
+  movedRightLabel = 'Moved right'
+
+  /** What screen readers hear once the drawing has moved up, after `moved()`. */
+  @property({ attribute: 'moved-up-label' })
+  movedUpLabel = 'Moved up'
+
   /** The notes. A property, never an attribute. */
   @property({ attribute: false })
   nodes: readonly GraphNode[] = []
@@ -222,6 +240,14 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
   /** How the selected note is described in the list. */
   @property({ attribute: 'selected-label' })
   selectedLabel = 'Selected'
+
+  /** What screen readers hear once the drawing has zoomed in, after `moved()`. */
+  @property({ attribute: 'zoomed-in-label' })
+  zoomedInLabel = 'Zoomed in'
+
+  /** What screen readers hear once the drawing has zoomed out, after `moved()`. */
+  @property({ attribute: 'zoomed-out-label' })
+  zoomedOutLabel = 'Zoomed out'
 
   /** What the search field holds. */
   @state()
@@ -257,8 +283,18 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
   /** Whether the graph has been drawn whole, which `drawn()` says. */
   private whole = false
 
-  /** How many notes there were when the count was last said. */
+  /** What the live region says now. */
+  @state()
   private said = ''
+
+  /**
+   * Which way a reader last asked the drawing to go, by a key or a control,
+   * until `moved()` says it went: a side, `in` or `out`.
+   */
+  private asked: string | undefined
+
+  /** Whether the next change of the list's rows is one a reader asked for by the legend, whose count is then said. */
+  private countAsked = false
 
   private readonly virtualize = new VirtualizeController(this, {
     container: () => this.partNamed('list'),
@@ -326,6 +362,54 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
     this.dispatchEvent(new HelixGraphSignalEvent({ from, to, tone: options.tone }))
   }
 
+  /**
+   * Says the drawing moved the way a reader asked, by a key or a control:
+   * the live region says "Moved right" or "Zoomed in" in the frame's words.
+   * Called by `connectGraph` once the renderer has moved; a page answering
+   * `helix-graph-pan` and `helix-graph-zoom` itself calls it once its view
+   * has moved.
+   *
+   * **Said once the drawing has moved, and only then.** The frame asks and
+   * the renderer moves, so a frame with nothing to answer it says nothing: a
+   * move said that never happened is worse than silence.
+   */
+  moved(): void {
+    const asked = this.asked
+    this.asked = undefined
+    const words: Record<string, string> = {
+      down: this.movedDownLabel,
+      in: this.zoomedInLabel,
+      left: this.movedLeftLabel,
+      out: this.zoomedOutLabel,
+      right: this.movedRightLabel,
+      up: this.movedUpLabel,
+    }
+    if (asked !== undefined) {
+      this.say(words[asked] ?? '')
+    }
+  }
+
+  /**
+   * Puts words in the live region. **The same words twice differ by a space
+   * no reader hears**, since a region whose text does not change is not read
+   * again, and a second "Moved left" is news as much as the first.
+   */
+  private say(words: string): void {
+    this.said = words !== '' && words === this.said ? `${words}\u00a0` : words
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    /* A graph with no name is read as "Graph", which says nothing of what it
+       holds. Development builds only. */
+    auditName(
+      this,
+      () => null,
+      'Give it a `label` that says what the notes are, such as "Research notes".',
+      () => this.label !== '',
+    )
+  }
+
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     this.toggleState('fullscreen', this.filled)
@@ -358,13 +442,32 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
         changed.has(name),
       )
     ) {
+      const was = this.entries[this.cursor]?.node.id
       this.entries = entriesOf(this.sorted, this.adjacency, this.active, this.query, this.kept)
       this.toggleState('empty', this.entries.length === 0)
-      /* A new order is a list read from its top, the selected note first. */
-      this.cursor = 0
       const list = this.partNamed('list')
-      if (list) {
-        list.scrollTop = 0
+      if (
+        ['active', 'depth', 'hiddenGroups', 'query'].some((name) => changed.has(name)) ||
+        !this.hasUpdated
+      ) {
+        /* A new selection or a narrower list is a list read from its top,
+           the selected note first. */
+        this.cursor = 0
+        if (list) {
+          list.scrollTop = 0
+        }
+      } else {
+        /* New notes or links keep the reader on the note they were on. */
+        this.cursor = cursorAfter(this.entries, was, this.cursor)
+        if (list && this.shadowRoot?.activeElement === list) {
+          void this.updateComplete.then(() => this.revealCursor())
+        }
+      }
+      /* The count said when a search or the legend changes it, which is when
+         a reader who cannot see the list needs to know how much it holds. */
+      if ((changed.has('query') && changed.get('query') !== undefined) || this.countAsked) {
+        this.countAsked = false
+        this.say(this.countText())
       }
     }
   }
@@ -380,18 +483,17 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
     } else if (changed.has('active') || changed.has('depth') || changed.has('hiddenGroups')) {
       this.dispatchEvent(new HelixGraphPartChangeEvent({ kind: 'focus' }))
     }
-    /* The count said when a search changes it, which is when a reader who
-       cannot see the list needs to know how much it holds. */
-    if (changed.has('query') && changed.get('query') !== undefined) {
-      this.said = this.countText()
-    }
   }
 
+  /** The pan request, and the side it goes to, which `moved()` then says. */
   protected override panEvent(detail: ViewportPanDetail): Event {
+    this.asked = this.sideOf(detail.to)
     return new HelixGraphPanEvent(detail)
   }
 
+  /** The zoom request, and which way it goes, which `moved()` then says. */
   protected override zoomEvent(detail: ViewportZoomDetail): Event {
+    this.asked = detail.by > 0 ? 'in' : detail.by < 0 ? 'out' : undefined
     return new HelixGraphZoomEvent(detail)
   }
 
@@ -449,6 +551,7 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
       : [...this.hiddenGroups, name]
     if (this.dispatchEvent(new HelixGraphFilterEvent({ hidden }))) {
       this.hiddenGroups = hidden
+      this.countAsked = true
     }
   }
 
