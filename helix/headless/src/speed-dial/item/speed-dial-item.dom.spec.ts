@@ -121,8 +121,10 @@ describe('a shortcut with nothing slotted', () => {
     const box = part(one, 'shortcut') as HTMLElement
     expect(box.hidden).toBe(false)
     expect(box.getAttribute('aria-hidden')).toBe('true')
-    // happy-dom is no Apple keyboard, so `mod` is Control and keys join with `+`.
-    expect(drawn(one)).toBe('Ctrl+Shift+S')
+    // `⌘⇧S` on an Apple keyboard, `Ctrl+Shift+S` elsewhere, as Kbd draws it,
+    // and on the platform `aria-keyshortcuts` names.
+    const apple = part(one, 'item')?.getAttribute('aria-keyshortcuts')?.startsWith('Meta')
+    expect(drawn(one)).toBe(apple ? '⌘⇧S' : 'Ctrl+Shift+S')
   })
 
   test('draws nothing and keeps the box hidden without one', async () => {
