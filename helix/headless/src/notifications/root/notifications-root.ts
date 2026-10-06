@@ -112,13 +112,14 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
 
   /**
    * What the feed says when a page of it could not be loaded, such as after a
-   * request to a server fails. Empty is no error.
+   * request to a server fails. Empty, null or no attribute is no error, so
+   * removing the attribute clears it.
    *
    * Set, it shows under the rows there are, in place of `empty-text` and
    * `loading-text`, and a screen reader hears it. Clear it when you ask again.
    */
   @property({ attribute: 'load-error' })
-  loadError = ''
+  loadError: string | null = ''
 
   /**
    * Whether to draw a button after the list that asks for the next page, by
@@ -433,7 +434,7 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     hostAria(this.internals, { label: this.label || 'Notifications', role: 'region' })
-    const failed = this.loadError !== ''
+    const failed = this.failed
     this.toggleState('error', failed)
     this.toggleState('loading', this.loading)
     this.toggleState(
@@ -449,7 +450,7 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
    * a feed that holds some.
    */
   protected override renderStatus(hasContent: boolean): TemplateResult | typeof nothing {
-    if (this.loadError !== '') {
+    if (this.failed) {
       return html`<p part="error"><slot name="error">${this.loadError}</slot></p>`
     }
     if (!this.loading && hasContent) {
@@ -460,11 +461,27 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
       : html`<p part="empty"><slot name="empty">${this.emptyText}</slot></p>`
   }
 
-  /** The error before the shared words, which it wins over. */
+  /**
+   * The error before the shared words, which it wins over.
+   *
+   * **One region whose words change**, as the shared one is. The error was a
+   * second template, so setting it put a new region in the tree with its
+   * words already in it, which a reader may not hear.
+   */
   protected override renderLive(hasContent: boolean): TemplateResult {
-    return this.loadError === ''
-      ? super.renderLive(hasContent)
-      : html`<span part="live" role="status">${this.loadError}</span>`
+    const said = this.failed
+      ? this.loadError
+      : this.loading
+        ? this.loadingText
+        : hasContent
+          ? this.announced
+          : this.emptyText
+    return html`<span part="live" role="status">${said}</span>`
+  }
+
+  /** Whether `load-error` holds words, which a removed attribute does not. */
+  private get failed(): boolean {
+    return Boolean(this.loadError)
   }
 
   /**
