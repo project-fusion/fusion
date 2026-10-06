@@ -5,6 +5,7 @@ import {
   part,
   registerDom,
   role,
+  type Updatable,
 } from '@fusion.dev/helix-testing/dom'
 
 /* The data table after hydration.
@@ -229,6 +230,41 @@ describe('sorting', () => {
     expect(element.sort).toBe('')
     expect(cells(element)[0]).toBe('delta')
     remove()
+  })
+
+  /* TalkBack reads no `aria-sort`, so on Android a sorted column said nothing
+     about its order: React Aria describes the header there. */
+  test("on Android the sorted column's button says the order, and nowhere else", async () => {
+    const said = async (): Promise<(string | null)[]> => {
+      const { element, remove } = await mount(SCHEMA)
+      heading(element).click()
+      await settled(element)
+      const columns = [
+        ...element.querySelectorAll('helix-headless-table-column'),
+      ] as unknown as Updatable[]
+      await Promise.all(columns.map((column) => column.updateComplete))
+      const words = columns.map(
+        (column) =>
+          column.shadowRoot?.querySelector('[part="sort"]')?.getAttribute('aria-description') ??
+          null,
+      )
+      remove()
+      return words
+    }
+    Object.defineProperty(navigator, 'userAgent', {
+      configurable: true,
+      value: 'Mozilla/5.0 (Linux; Android 14; Pixel 8) Chrome/129.0 Mobile',
+    })
+    let android: (string | null)[]
+    try {
+      android = await said()
+    } finally {
+      Reflect.deleteProperty(navigator, 'userAgent')
+    }
+    expect([android, await said()]).toEqual([
+      ['Sorted by Name, ascending', null],
+      [null, null],
+    ])
   })
 
   test('a column that is not sortable does nothing when clicked', async () => {
