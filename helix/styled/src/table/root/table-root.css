@@ -42,6 +42,12 @@
   padding-inline: var(--helix-space-none) var(--helix-space-md);
 }
 
+/* The checkbox heading takes focus in a `grid` table, inset as a cell's ring is. */
+[part="select-all"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}
+
 /* What a collection says instead of rows is `shared/collection/state`'s. */
 
 /* Rows that are already there stay, and dim, while a new set arrives. */
