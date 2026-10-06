@@ -2,9 +2,9 @@ import {
   AriaForwardController,
   afterLinkFollowed,
   customElement,
-  elementById,
   HelixFormElement,
   hostAria,
+  hostWords,
   isRtl,
   MixinControllerOpen,
   MixinControllerValue,
@@ -730,9 +730,9 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
   }
 
   /**
-   * What names the list once it opens: the `label`, the host's `aria-label`,
-   * or the words of what names the host from outside, its `aria-labelledby`
-   * or a `<label>` for it.
+   * What names the list once it opens, read through core's `hostWords` in
+   * the order a browser names the host: its `aria-labelledby`, its
+   * `aria-label`, the `label`, then a `<label>` for it.
    *
    * **Words rather than a reference**, because the list is inside another
    * element's shadow root and neither an IDREF nor the host's labels reach it.
@@ -742,16 +742,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
    * with no name, which the missing-name warning reported.
    */
   private get listName(): string {
-    const own = this.label || this.getAttribute('aria-label')
-    if (own) {
-      return own
-    }
-    const ids = (this.getAttribute('aria-labelledby') ?? '').split(/\s+/).filter(Boolean)
-    const named = ids.length > 0 ? ids.map((id) => elementById(this, id)) : [...(this.labels ?? [])]
-    return named
-      .map((one) => (one?.textContent ?? '').replace(/\s+/g, ' ').trim())
-      .filter(Boolean)
-      .join(' ')
+    return hostWords(this, this.label)
   }
 
   /**

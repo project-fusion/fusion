@@ -2,6 +2,7 @@ import {
   customElement,
   elapsedTime,
   HelixElement,
+  localeOf,
   type Relative,
   RelativeClockController,
   relativeTime,
@@ -144,10 +145,16 @@ export class HelixHeadlessFormatDate extends HelixElement {
   /**
    * The locale to format the timestamp in.
    *
-   * Empty is the runtime's own.
+   * Absent is the page's: the `lang` of the nearest element with one, as
+   * Shoelace and Web Awesome read it, then the runtime's own.
    */
   @property()
   locale = ''
+
+  /** The locale the words are written in: `locale`, or the page's `lang`. */
+  private get language(): string {
+    return localeOf(this, this.locale)
+  }
 
   /**
    * How the minute is written, where a time of day is shown.
@@ -293,8 +300,8 @@ export class HelixHeadlessFormatDate extends HelixElement {
   /** What the reading says now, and when it stops being true. */
   private readingAt(moment: Date, now: Date): Relative {
     return this.elapsed
-      ? elapsedTime(this.locale)(moment, now)
-      : relativeTime(this.locale, {
+      ? elapsedTime(this.language)(moment, now)
+      : relativeTime(this.language, {
           numeric: this.numeric ?? 'auto',
           style: this.relative ?? 'long',
         })(moment, now)
@@ -373,7 +380,7 @@ export class HelixHeadlessFormatDate extends HelixElement {
     }
     const datetime = this.dateOnly ? (this.date || this.written).trim() : moment.toISOString()
     if (!this.reading) {
-      const text = new Intl.DateTimeFormat(this.locale || undefined, this.options).format(moment)
+      const text = new Intl.DateTimeFormat(this.language || undefined, this.options).format(moment)
       return html`<time part="time" datetime=${datetime}>${text}</time>`
     }
     /* The compact reading is what a feed shows, and "3h" is what a screen
@@ -382,7 +389,7 @@ export class HelixHeadlessFormatDate extends HelixElement {
        title. `time` is a role that takes a name. */
     const now = new Date(this.clock.now)
     const zone = this.timeZone || (this.dateOnly ? 'UTC' : undefined)
-    const whole = new Intl.DateTimeFormat(this.locale || undefined, {
+    const whole = new Intl.DateTimeFormat(this.language || undefined, {
       dateStyle: 'long',
       ...(this.dateOnly ? {} : { timeStyle: 'short' }),
       ...(this.hourCycle ? { hourCycle: this.hourCycle } : {}),
@@ -390,7 +397,10 @@ export class HelixHeadlessFormatDate extends HelixElement {
     }).format(moment)
     /* Named in full whatever is shown, so "3h ago" at `narrow` is heard as
        "3 hours ago", with the same choice of word or number. */
-    const spoken = relativeTime(this.locale, { numeric: this.numeric ?? 'auto' })(moment, now).text
+    const spoken = relativeTime(this.language, { numeric: this.numeric ?? 'auto' })(
+      moment,
+      now,
+    ).text
     return html`<time
       part="time"
       datetime=${datetime}

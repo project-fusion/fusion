@@ -17,6 +17,7 @@ import {
   hueName,
   isRtl,
   KeyboardNavigationController,
+  localeOf,
   MixinControllerValue,
   parseColor,
   rovingStop,
@@ -1176,7 +1177,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
           type="button"
           role="option"
           tabindex=${index === stop ? '0' : '-1'}
-          aria-label=${parsed ? colorName(parsed, this.colorWords, this.lang) : preset}
+          aria-label=${parsed ? colorName(parsed, this.colorWords, localeOf(this)) : preset}
           aria-selected=${chosen[index] ? 'true' : 'false'}
           style="--color-picker-swatch: ${preset}"
           ?disabled=${this.isDisabled}
@@ -1197,7 +1198,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
     /* And then the color's name, which is what the two numbers make: "Saturation
        100%, Brightness 100%" says where the handle is and "vibrant red" says
        what a sighted reader sees there, which is React Aria's reading. */
-    const named = colorName(color, this.colorWords, this.lang)
+    const named = colorName(color, this.colorWords, localeOf(this))
     const both = `${this.saturationLabel} ${color.saturation}%, ${this.brightnessLabel} ${color.brightness}%, ${named}`
     const reversed = `${this.brightnessLabel} ${color.brightness}%, ${this.saturationLabel} ${color.saturation}%, ${named}`
     /* The hue ramp names the hue at full strength, which is what the ramp
@@ -1206,7 +1207,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
     const hue = hueName(
       { alpha: 100, brightness: 100, hue: color.hue, saturation: 100 },
       this.colorWords,
-      this.lang,
+      localeOf(this),
     )
     /* The square's two inputs are named with the picker's own name where it
        has one, as React Aria's color area names its own: "Brand, Saturation"
@@ -1284,7 +1285,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
                   /* A percentage in the reader's language, "50%" or "50 %",
                      React Aria's reading of an alpha slider: the bare number
                      did not say what it counted. */
-                  formatNumber(color.alpha / 100, this.lang, { style: 'percent' }),
+                  formatNumber(color.alpha / 100, localeOf(this), { style: 'percent' }),
                 )
               : nothing
           }

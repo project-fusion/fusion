@@ -5,7 +5,6 @@ export function Example() {
       placeholder="Add a filter"
     >
       <helix-headless-filter-chip
-        dismiss-label="Remove the owner filter"
         dismissible
         label="Owner"
         name="owner"
@@ -14,7 +13,6 @@ export function Example() {
         Ada
       </helix-headless-filter-chip>
       <helix-headless-filter-chip
-        dismiss-label="Remove the env filter"
         dismissible
         label="Env"
         name="env"
@@ -23,7 +21,6 @@ export function Example() {
         Staging
       </helix-headless-filter-chip>
       <helix-headless-filter-chip
-        dismiss-label="Remove the status filter"
         dismissible
         label="Status"
         name="status"
@@ -32,7 +29,6 @@ export function Example() {
         Open
       </helix-headless-filter-chip>
       <helix-headless-filter-chip
-        dismiss-label="Remove the area filter"
         dismissible
         label="Area"
         name="area"

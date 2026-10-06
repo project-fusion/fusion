@@ -62,7 +62,8 @@ describe('filter chip server output', () => {
       </helix-headless-filter-chip>`,
     )
     expect(partTag(markup, 'dismiss')).toMatch(/^<button\b/)
-    expect(partTag(markup, 'dismiss')).toContain('aria-label="Remove filter"')
+    // The field from its property; the values join once the children are read.
+    expect(partTag(markup, 'dismiss')).toContain('aria-label="Remove filter Disposition"')
     expect(servedParts(markup)).toEqual(['dismiss', 'dismiss-mark', 'field', 'values'])
   })
 

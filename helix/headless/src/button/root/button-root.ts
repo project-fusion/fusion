@@ -15,6 +15,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { submitAs } from '../submitter.js'
 
 /**
  * @summary Triggers an action, submits a form, or navigates.
@@ -34,13 +35,12 @@ import { property } from 'lit/decorators.js'
  *
  * The inner control is always `type="button"`, because a
  * `<button type="submit">` inside a shadow root cannot submit a form outside
- * it. To submit, the button calls `requestSubmit()` on its form, which runs
- * validation, unlike `submit()`.
- *
- * A `submit` listener reads `event.submitter` as `null`, because the platform
- * accepts only a native submit button there. The button's `name` and `value`
- * are in the form data, so read them from `new FormData(form)` to tell two
- * submit buttons apart.
+ * it. To submit, the button puts a hidden native submit button carrying its
+ * `name`, `value` and `form*` overrides into the form, calls
+ * `requestSubmit()` with it, which runs validation, unlike `submit()`, and
+ * takes it out again, as Shoelace and Web Awesome do. A `submit` listener
+ * reads that button as `event.submitter`, so `event.submitter.value` and
+ * `new FormData(form, event.submitter)` tell two submit buttons apart.
  *
  * As the first submit button in its form, it is the form's default button:
  * Enter in a text field of the form presses it, as it presses a native one.
@@ -173,18 +173,13 @@ export class HelixHeadlessButton extends HelixFormElement {
   /**
    * Where this button's submission goes, overriding the form's own.
    *
-   * **The five `form*` overrides work by writing the form and putting it back**,
-   * which is the only mechanism available and is closer to the platform than it
-   * sounds. `requestSubmit(submitter)` is how a native submitter carries these,
-   * and it refuses ours twice over: the inner `<button>` is `type="button"` so
-   * it is not a submit button, and it sits in this shadow root so its form owner
-   * is not the consumer's form. Both throw. So the submission is started with no
-   * submitter and the overrides are applied to the form for the duration of it.
-   *
-   * The whole submit algorithm runs synchronously inside `requestSubmit()`, so
-   * the window is one call and a `finally` closes it whether or not a listener
-   * refused. What a `submit` handler observes during that window is the form a
-   * native submitter would have given it, which is the point.
+   * **The five `form*` overrides ride on a native submit button that stands in
+   * for this one**, because `requestSubmit(submitter)` refuses the inner
+   * `<button>` twice over: it is `type="button"`, and it sits in this shadow
+   * root, so its form owner is not the consumer's form. The stand-in is a
+   * hidden `<button type="submit">` in the form for the one synchronous call,
+   * so the platform applies the overrides to that submission alone and leaves
+   * the form as it was. See `submitAs`.
    */
   @property({ attribute: 'formaction' })
   formAction = ''
@@ -396,13 +391,10 @@ export class HelixHeadlessButton extends HelixFormElement {
    * The value this button submits under its own `name`, as a native submit
    * button does.
    *
-   * **Reported for exactly the submission this button starts and not otherwise.**
+   * **Sent with exactly the submission this button starts and not otherwise.**
    * A native submit button contributes `name=value` only when it is the one
-   * that submitted, and every other button on the form contributes nothing. A
-   * form-associated element reporting a value continuously would contribute on
-   * every submission whoever started it, which is a different feature wearing
-   * the same name, so `submit` below sets it, submits, and clears it inside one
-   * synchronous call.
+   * that submitted, and every other button on the form contributes nothing,
+   * which is what the native button standing in for this one at submit does.
    *
    * `CopyButton` has a `value` of its own meaning the text to put on the
    * clipboard, which is not this and is why it is declared there rather than
@@ -412,55 +404,11 @@ export class HelixHeadlessButton extends HelixFormElement {
   value = ''
 
   /**
-   * Submits the form as this button, for the length of one call.
-   *
-   * Everything a native submitter carries is written onto the form, the
-   * submission is started, and everything is put back. See `formAction` for why
-   * `requestSubmit(submitter)` is not available to a control inside a shadow
-   * root.
-   *
-   * `novalidate` is in the same list rather than reached by `form.submit()`,
-   * which looks like the shortcut and is not: `submit()` skips the `submit`
-   * event as well as the validation, so a consumer's handler would stop running
-   * the moment somebody wrote `formnovalidate`. Turning the flag on and calling
-   * `requestSubmit()` skips the validation alone, which is what the attribute
-   * means.
+   * Submits the form as this button, through a native submit button carrying
+   * its name, value and overrides. See `formAction`.
    */
   private submit(form: HTMLFormElement): void {
-    const undo: (() => void)[] = []
-    const override = (attribute: string, value: string | null): void => {
-      if (value === null) {
-        return
-      }
-      const had = form.getAttribute(attribute)
-      form.setAttribute(attribute, value)
-      undo.push(() => {
-        if (had === null) {
-          form.removeAttribute(attribute)
-        } else {
-          form.setAttribute(attribute, had)
-        }
-      })
-    }
-    override('action', this.formAction || null)
-    override('enctype', this.formEnctype || null)
-    override('method', this.formMethod || null)
-    override('novalidate', this.formNoValidate ? '' : null)
-    override('target', this.formTarget || null)
-    const reports = this.name !== ''
-    if (reports) {
-      this.internals.setFormValue(this.value)
-    }
-    try {
-      form.requestSubmit()
-    } finally {
-      for (const put of undo) {
-        put()
-      }
-      if (reports) {
-        this.internals.setFormValue(null)
-      }
-    }
+    submitAs(form, this)
   }
 
   /**

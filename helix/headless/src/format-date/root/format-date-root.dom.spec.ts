@@ -222,3 +222,28 @@ describe('a reading under a minute old', () => {
     expect(part(words, 'time')?.textContent).toBe('now')
   })
 })
+
+/** An element inside a page section written in `lang`, which names no locale of its own. */
+const inLang = async <T extends HTMLElement>(lang: string, markup: string): Promise<T> => {
+  document.body.innerHTML = `<div lang="${lang}">${markup}</div>`
+  const element = document.body.firstElementChild?.firstElementChild as T & {
+    updateComplete: Promise<unknown>
+  }
+  await element.updateComplete
+  return element
+}
+
+describe('a date in a page written in another language', () => {
+  test('is written in that language, unless `locale` says otherwise', async () => {
+    const host = await inLang(
+      'de-DE',
+      '<helix-headless-format-date date="2026-08-04" month="long" day="numeric" year="numeric"></helix-headless-format-date>',
+    )
+    expect(part(host, 'time')?.textContent).toBe('4. August 2026')
+    const own = await inLang(
+      'de-DE',
+      '<helix-headless-format-date locale="en-US" date="2026-08-04" month="long" day="numeric" year="numeric"></helix-headless-format-date>',
+    )
+    expect(part(own, 'time')?.textContent).toBe('August 4, 2026')
+  })
+})

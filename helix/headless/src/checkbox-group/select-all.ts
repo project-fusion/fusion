@@ -25,14 +25,3 @@ export const selectAllState = (
   const checked = counted.length > 0 && ticked === counted.length
   return { checked, indeterminate: ticked > 0 && !checked }
 }
-
-/**
- * The values a press on the select-all box leaves, in the set's order: every
- * enabled box checked, or every enabled box clear once all of them are
- * checked. A disabled box keeps its state either way.
- */
-export const selectAllPress = (boxes: readonly SetBox[]): string[] => {
-  const enabled = boxes.filter((box) => !box.disabled)
-  const every = enabled.length > 0 && enabled.every((box) => box.checked)
-  return boxes.filter((box) => (box.disabled ? box.checked : !every)).map((box) => box.value)
-}

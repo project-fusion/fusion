@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, registerDom, type Updatable } from '@fusion.dev/helix-testing/dom'
+import { hasState, mount, registerDom, type Updatable } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -65,6 +65,22 @@ describe('copy button', () => {
     await (el as Updatable).updateComplete
     expect(button.hasAttribute('data-copied')).toBe(false)
     expect(button.getAttribute('aria-label')).toBe('Copy')
+  })
+
+  /* The moment after a press was drawn from `data-copied` inside the shadow
+     root, which a page's stylesheet cannot reach. The host says it as a state,
+     as WA's copy button says `success` and `error`. */
+  test('says the confirmation as a state on the host, for as long as it stands', async () => {
+    clipboard('accept')
+    const el = await mount(
+      '<helix-headless-copy-button feedback-duration="30" value="one"></helix-headless-copy-button>',
+    )
+    expect(hasState(el, 'copied')).toBe(false)
+    await press(el)
+    expect([hasState(el, 'copied'), hasState(el, 'failed')]).toEqual([true, false])
+    await new Promise((done) => setTimeout(done, 60))
+    await (el as Updatable).updateComplete
+    expect(hasState(el, 'copied')).toBe(false)
   })
 
   test('announces what it copied, after the write', async () => {
@@ -257,6 +273,7 @@ describe('a press that copies nothing', () => {
     expect(heard).toEqual(['helix-copy-error'])
     expect(button.getAttribute('aria-label')).toBe('Not copied')
     expect(button.hasAttribute('data-failed')).toBe(true)
+    expect(hasState(el, 'failed')).toBe(true)
     expect(el.shadowRoot?.querySelector('slot[name="failed"]')?.hasAttribute('hidden')).toBe(false)
   })
 

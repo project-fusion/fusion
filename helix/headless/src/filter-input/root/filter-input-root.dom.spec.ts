@@ -217,6 +217,14 @@ describe('the clear button', () => {
     ;(part(filter, 'clear') as HTMLButtonElement).click()
     expect(heard).toEqual(['input', 'change'])
   })
+
+  test('draws its cross in a slot a glyph of your own replaces', async () => {
+    const filter = await mount(
+      '<helix-headless-filter-input label="Filter rows" clearable default-value="deploy"><svg slot="clear-icon"></svg></helix-headless-filter-input>',
+    )
+    const slot = part(filter, 'clear')?.querySelector<HTMLSlotElement>('slot[name="clear-icon"]')
+    expect(slot?.assignedElements()).toHaveLength(1)
+  })
 })
 
 describe('the suggestions list', () => {

@@ -1,4 +1,4 @@
-import { customElement, HelixElement, MixinDismissible } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, MixinDismissible, slottedWords } from '@fusion.dev/helix-core'
 import { x } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -30,6 +30,11 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * dismissal, which is also how you take control of the interaction for one
  * press. `requestChange` documents the pattern.
  *
+ * The remove button is named `dismiss-label` followed by the chip's words,
+ * such as "Remove filter Status is not open", so a row of chips says which
+ * filter each button removes. Write `{label}` in `dismiss-label` to put the
+ * words elsewhere.
+ *
  * To let the user change the operator, slot a menu trigger into `operator`.
  * With the text fallback, the operator is a label. The chip does not interpret
  * operators: their meaning belongs to your domain, as `FilterOperator`
@@ -60,8 +65,9 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 export class HelixHeadlessFilterChip extends MixinDismissible(HelixElement) {
   /* "Remove filter" rather than the mixin's "Dismiss", for the reason `Tag`
      gives its own override: the control's name is what a screen-reader user
-     hears, and taking a filter out of a set is not closing a message. A page
-     with several chips should say which, and `dismiss-label` is how. */
+     hears, and taking a filter out of a set is not closing a message. The
+     chip's own words follow it, so several chips are told apart: see
+     `removeName`. */
   override dismissLabel = 'Remove filter'
 
   /**
@@ -117,8 +123,34 @@ export class HelixHeadlessFilterChip extends MixinDismissible(HelixElement) {
   @property({ attribute: 'operator-label' })
   operatorLabel = ''
 
+  /**
+   * The remove button's name: `dismissLabel` with the chip's words, its field,
+   * its comparison and its values, such as "Remove filter Status is not open".
+   *
+   * **Named for its chip**, as File Input names each remove button for its
+   * file: a row of buttons each called "Remove filter" says nothing about
+   * which filter each one takes away. `{label}` in `dismiss-label` says where
+   * the words go, and without it they follow the label.
+   *
+   * Each word is read from what is slotted and otherwise from `label` and
+   * `operator-label`, which is all a server and a hydrating render can read,
+   * so the values join the update after.
+   */
+  private get removeName(): string {
+    const read = (slot: string, fallback: string): string =>
+      (this.childrenKnown && slottedWords(this, [slot])) || fallback
+    const words = [read('field', this.label), read('operator', this.operatorLabel), read('', '')]
+      .filter(Boolean)
+      .join(' ')
+    const label = this.dismissLabel
+    return label.includes('{label}') ? label.replace('{label}', words) : `${label} ${words}`.trim()
+  }
+
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
+    /* On the root, so new values rename the remove button: a `slotchange`
+       bubbles to it from any of the three slots. */
+    this.renderRoot.addEventListener('slotchange', () => this.requestUpdate())
     this.finishHydration()
   }
 
@@ -161,7 +193,7 @@ export class HelixHeadlessFilterChip extends MixinDismissible(HelixElement) {
           ? html`<button
               part="dismiss"
               type="button"
-              aria-label=${this.dismissLabel}
+              aria-label=${this.removeName}
               @click=${() => this.dismiss()}
             >
               <svg part="dismiss-mark" fill="currentColor" viewBox=${x.viewBox} aria-hidden="true">

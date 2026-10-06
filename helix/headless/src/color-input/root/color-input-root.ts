@@ -6,6 +6,7 @@ import {
   customElement,
   type HelixBeforeChangeEvent,
   HelixFormElement,
+  localeOf,
   MixinControllerOpen,
   MixinControllerValue,
   MixinField,
@@ -308,7 +309,7 @@ export class HelixHeadlessColorInput extends MixinPickerField(
     if (!parsed) {
       return this.value || this.triggerLabel
     }
-    return `${colorName(parsed, this.colorWords, this.lang)} ${this.value}`
+    return `${colorName(parsed, this.colorWords, localeOf(this))} ${this.value}`
   }
 
   /** What the trigger's swatch paints, which is only ever a color. */

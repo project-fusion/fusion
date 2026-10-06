@@ -36,12 +36,22 @@ import { grownHeight, lineMetrics } from '../grow.js'
  * every change once the browser finds nothing wrong, as React Aria's
  * TextField `validate` does.
  *
+ * **Keyboard.** The field's own keys are the platform's, and Enter starts a
+ * new line. The clear button under `clearable` is a tab stop of its own after
+ * the field.
+ *
+ * The inner textarea is named by `label`, or by a host `aria-label`,
+ * `aria-labelledby` or `<label for>`, and is described by the hint and the
+ * message, with `aria-invalid` while a message shows. The clear button is
+ * named `clear-label`.
+ *
  * @since 0.1.0
  * @status stable
  * @category forms
  * @aliases Multiline, TextArea
  * @documentation https://fusion.dev/helix/components/textarea
  *
+ * @slot clear-icon - Replaces the cross on the clear button, under `clearable`.
  * @slot end - After the text, for an icon or an action beside it.
  * @slot feedback - The message that says what is wrong, for content richer than a string. It shows while there is a message.
  * @slot hint - Help under the control, for content richer than the `hint` text.
@@ -484,6 +494,11 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
   @property()
   wrap: 'hard' | 'off' | 'soft' = 'soft'
 
+  /** The cross on the clear button, behind a seam a tier can move. */
+  protected renderClearIcon(): TemplateResult {
+    return html`<slot name="clear-icon">${drawIcon(x)}</slot>`
+  }
+
   protected override render(): TemplateResult {
     return html`${this.renderLabel()}
     <div part="field">
@@ -517,7 +532,7 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
               aria-label=${this.clearLabel}
               @click=${this.handleClear}
             >
-              ${drawIcon(x)}
+              ${this.renderClearIcon()}
             </button>`
           : nothing
       }

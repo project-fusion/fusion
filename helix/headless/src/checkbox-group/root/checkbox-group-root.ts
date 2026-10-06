@@ -7,13 +7,14 @@ import {
   HelixFormElement,
   hostAria,
   MixinField,
+  toggleEvery,
 } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type ReactiveController, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
 import { HelixHeadlessCheckbox } from '../../checkbox/root/checkbox-root.js'
 import '../../checkbox/index.js'
-import { type SetBox, selectAllPress, selectAllState } from '../select-all.js'
+import { type SetBox, selectAllState } from '../select-all.js'
 
 /**
  * @summary A group of related checkboxes under one label, with one value for the set.
@@ -440,7 +441,14 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
   private readonly handleSelectAll = (event: Event): void => {
     event.preventDefault()
     event.stopPropagation()
-    const next = selectAllPress(this.setBoxes())
+    /* Every enabled box checked, or every one cleared once all are, with a
+       disabled box keeping its state, in the set's order. */
+    const boxes = this.setBoxes()
+    const next = toggleEvery(
+      boxes.filter((box) => box.checked).map((box) => box.value),
+      boxes.filter((box) => !box.disabled).map((box) => box.value),
+      boxes.map((box) => box.value),
+    )
     if (!this.dispatchEvent(new HelixBeforeChangeEvent({ value: next.join(',') }))) {
       return
     }

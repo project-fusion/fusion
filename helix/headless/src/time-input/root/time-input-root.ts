@@ -9,6 +9,7 @@ import {
   HelixFormElement,
   type HourCycle,
   isClockValue,
+  localeOf,
   MixinControllerOpen,
   MixinControllerValue,
   MixinField,
@@ -190,10 +191,16 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
   /**
    * Language tag the times are written in.
    *
-   * Absent uses the runtime's own.
+   * Absent is the page's: the `lang` of the nearest element with one, as
+   * Shoelace and Web Awesome read it, then the runtime's own.
    */
   @property()
   locale = ''
+
+  /** The locale the words are written in: `locale`, or the page's `lang`. */
+  private get language(): string {
+    return localeOf(this, this.locale)
+  }
 
   /**
    * Latest time that can be chosen, as `HH:mm`.
@@ -322,7 +329,7 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
   }
 
   protected override get segmentLocale(): string {
-    return this.locale
+    return this.language
   }
 
   protected override get segmentOptions(): { hourCycle?: HourCycle | undefined; seconds: boolean } {
@@ -338,7 +345,7 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
   private written(at: string): string {
     return this.timeStyle === 'iso' || !this.isTime(at)
       ? at
-      : writeClock(at, clockLocale(this.locale, this.hourCycle), this.seconds)
+      : writeClock(at, clockLocale(this.language, this.hourCycle), this.seconds)
   }
 
   /** What the field shows: the value while it is being edited, a reading when not. */
@@ -510,7 +517,7 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
       return [
         'rangeUnderflow',
         fillTemplate(this.rangeUnderflowMessage || 'Choose a time at or after {min}.', {
-          min: writeClock(this.min, clockLocale(this.locale, this.hourCycle), this.seconds),
+          min: writeClock(this.min, clockLocale(this.language, this.hourCycle), this.seconds),
         }),
       ]
     }
@@ -518,7 +525,7 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
       return [
         'rangeOverflow',
         fillTemplate(this.rangeOverflowMessage || 'Choose a time at or before {max}.', {
-          max: writeClock(this.max, clockLocale(this.locale, this.hourCycle), this.seconds),
+          max: writeClock(this.max, clockLocale(this.language, this.hourCycle), this.seconds),
         }),
       ]
     }
@@ -594,7 +601,7 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
       manual
       label=${this.label || 'Time'}
       hour-cycle=${this.hourCycle ?? nothing}
-      locale=${this.locale || nothing}
+      locale=${this.language || nothing}
       max=${this.max}
       min=${this.min}
       ?seconds=${this.seconds}

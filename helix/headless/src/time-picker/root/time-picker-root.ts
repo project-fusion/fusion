@@ -3,13 +3,14 @@ import {
   commaList,
   customElement,
   dayPeriod,
-  elementById,
   fillTemplate,
   type HelixBeforeChangeEvent,
   HelixFormElement,
   type HourCycle,
+  hostWords,
   inlineStep,
   isTwelveHour,
+  localeOf,
   MixinControllerValue,
   nearestTime,
   offeredTimes,
@@ -178,12 +179,18 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
   label = 'Time'
 
   /**
-   * Language tag the times are written in.
+   * Language tag the times and the wheels' names are written in.
    *
-   * Absent uses the runtime's own.
+   * Absent is the page's: the `lang` of the nearest element with one, as
+   * Shoelace and Web Awesome read it, then the runtime's own.
    */
   @property()
   locale = ''
+
+  /** The locale the words are written in: `locale`, or the page's `lang`. */
+  private get language(): string {
+    return localeOf(this, this.locale)
+  }
 
   /**
    * Stops the arrow keys in the list from choosing each time they move to.
@@ -277,7 +284,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
 
   /** The locale with the clock `hour-cycle` asks for. */
   private get clock(): string {
-    return clockLocale(this.locale, this.hourCycle)
+    return clockLocale(this.language, this.hourCycle)
   }
 
   /** A time as the value writes it, to the second where `seconds` asks. */
@@ -781,20 +788,15 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
      control through `AriaForwardController`. */
   /**
    * The list's name: the host's `aria-labelledby` read out, then its
-   * `aria-label`, then `label`.
+   * `aria-label`, then `label`, through core's `hostWords`, which Select reads
+   * its list's name through too.
    *
    * Read out as words, because the list is inside two shadow roots and an id on
    * the page reaches neither. Measured before this: `<helix-time-picker
    * aria-label="Slot">` was a listbox named "Time".
    */
   private get listName(): string {
-    const named = (this.getAttribute('aria-labelledby') ?? '')
-      .split(/\s+/)
-      .filter(Boolean)
-      .map((id) => elementById(this, id)?.textContent?.trim() ?? '')
-      .filter(Boolean)
-      .join(' ')
-    return named || this.getAttribute('aria-label') || this.label
+    return hostWords(this, this.label)
   }
 
   /**
@@ -945,7 +947,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
     >
       ${this.renderColumn(
         'hour',
-        this.hourLabel ?? wheelName('hour', this.locale),
+        this.hourLabel ?? wheelName('hour', this.language),
         hours.map(String),
         (one) => (twelve ? one : one.padStart(2, '0')),
         String(shown),
@@ -953,7 +955,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
       )}
       ${this.renderColumn(
         'minute',
-        this.minuteLabel ?? wheelName('minute', this.locale),
+        this.minuteLabel ?? wheelName('minute', this.language),
         this.minutes.map(String),
         (one) => one.padStart(2, '0'),
         String(minute),
@@ -963,7 +965,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
         this.seconds
           ? this.renderColumn(
               'second',
-              this.secondLabel ?? wheelName('second', this.locale),
+              this.secondLabel ?? wheelName('second', this.language),
               this.secondsShown.map(String),
               (one) => one.padStart(2, '0'),
               String(second),
@@ -975,7 +977,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
         twelve
           ? this.renderColumn(
               'meridiem',
-              this.meridiemLabel ?? wheelName('dayPeriod', this.locale),
+              this.meridiemLabel ?? wheelName('dayPeriod', this.language),
               ['AM', 'PM'],
               (one) => dayPeriod(one as 'AM' | 'PM', this.clock),
               meridiem,

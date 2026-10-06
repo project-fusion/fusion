@@ -28,6 +28,21 @@ describe('the locale an element speaks', () => {
     expect(localeOf(root.querySelector('#inside') as Element)).toBe('de')
   })
 
+  /* `lang="en"` says English; a reader set to British English reads their
+     own English better than the United States one `en` stands for. */
+  test('is the runtime’s own for a bare language the runtime speaks, and a named region', () => {
+    const own = new Intl.Locale(new Intl.DateTimeFormat().resolvedOptions().locale)
+    document.body.innerHTML = `<div lang="${own.language}"><span id="at"></span></div>`
+    expect(localeOf(document.querySelector('#at') as Element)).toBe('')
+    document.body.innerHTML = `<div lang="${own.language}-AQ"><span id="at"></span></div>`
+    expect(localeOf(document.querySelector('#at') as Element)).toBe(`${own.language}-AQ`)
+  })
+
+  test('is empty for a tag `Intl` refuses, which every formatter would throw on', () => {
+    document.body.innerHTML = '<div lang="not a tag"><span id="at"></span></div>'
+    expect(localeOf(document.querySelector('#at') as Element)).toBe('')
+  })
+
   test('is empty where nothing says, or the page says it does not know', () => {
     document.body.innerHTML = '<span id="at"></span>'
     expect(localeOf(document.querySelector('#at') as Element)).toBe('')
