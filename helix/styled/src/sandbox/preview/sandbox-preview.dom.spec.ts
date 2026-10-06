@@ -58,9 +58,10 @@ describe('the preview pane', () => {
   })
 })
 
-/* A page shows its own spinner beside the frame, and needs to know when: the
-   frame is another document, so nothing in the page can see it load. */
-describe('the preview state', () => {
+/* A page shows its own spinner or message beside the frame, and needs to know
+   when: the frame is another document, so nothing in the page can see it load
+   or fail. */
+describe('the preview states', () => {
   const from = (frame: HTMLIFrameElement, data: unknown): MessageEvent =>
     new MessageEvent('message', { data, origin: 'null', source: frame.contentWindow })
 
@@ -75,5 +76,20 @@ describe('the preview state', () => {
     expect(hasState(host, 'loading')).toBe(true)
     window.dispatchEvent(from(frame, { type: 'helix-preview-ready' }))
     expect(hasState(host, 'loading')).toBe(false)
+  })
+
+  test('is `failed` after an uncaught error, until the next source is sent', async () => {
+    const host = (await preview()) as Preview & { source: string }
+    const frame = part(host, 'frame') as HTMLIFrameElement
+    frame.dispatchEvent(new Event('load'))
+    const line = { level: 'error', text: 'Boom', type: 'helix-preview-console' }
+    window.dispatchEvent(from(frame, line))
+    expect(hasState(host, 'failed')).toBe(false)
+    window.dispatchEvent(from(frame, { ...line, uncaught: true }))
+    expect(hasState(host, 'failed')).toBe(true)
+    host.source = '<p>Fixed</p>'
+    await host.updateComplete
+    await new Promise((resolve) => setTimeout(resolve, 150))
+    expect(hasState(host, 'failed')).toBe(false)
   })
 })
