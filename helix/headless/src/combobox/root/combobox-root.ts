@@ -1,8 +1,10 @@
 import {
   AriaForwardController,
   afterLinkFollowed,
+  countLabel,
   customElement,
   DelayController,
+  drawStatus,
   fillTemplate,
   type HelixBeforeChangeEvent,
   HelixCreateEvent,
@@ -12,8 +14,10 @@ import {
   MixinControllerValue,
   MixinField,
   MixinTokens,
+  onApple,
   PopoverController,
   reportValues,
+  StatusController,
   submitImplicitly,
 } from '@fusion.dev/helix-core'
 import { caretDown } from '@fusion.dev/helix-icons'
@@ -65,6 +69,11 @@ const isInsertion = (event: Event): boolean =>
  * a closed field is left to the form. Emptying the field and leaving it clears
  * a single choice; Escape puts the chosen words back, and a second Escape on
  * the closed field clears the choice.
+ *
+ * On Apple devices, where VoiceOver does not read the option the field points
+ * to, the field says it in a live region as the highlight moves, says how many
+ * options there are as the list opens, and says a choice once it is made, as
+ * React Aria's combobox does there.
  *
  * With `multiple`, each chosen option is a tag in the field with its own remove
  * control. The panel stays open and the filter clears after each choice, so the
@@ -124,6 +133,7 @@ const isInsertion = (event: Event): boolean =>
  * @csspart listbox-loading - Shown while the options are loading.
  * @csspart listbox-search - The region holding the field that narrows the list.
  * @csspart listbox-search-field - The filter field inside that region.
+ * @csspart live - The region VoiceOver hears the highlight, the count and a choice from on Apple devices, drawn once there is one to say. Visually hidden in the styled tier.
  * @csspart rest - The count of choices held beyond `max-tags`. A `<button>` with `expandable`, a `<span>` without it.
  * @csspart surface - The floating panel.
  * @csspart tag - One chosen option.
@@ -135,8 +145,10 @@ const isInsertion = (event: Event): boolean =>
  * @csspart tag-start - The category before the label.
  * @csspart tags - The row of chosen options, when `multiple` is set.
  *
+ * @cssstate blank - While nothing is chosen.
  * @cssstate error - While `load-error` is set.
  * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
+ * @cssstate loading - While `loading` is set.
  * @cssstate no-results - What was typed hid every option of a list that has some.
  * @cssstate open - While the list is open.
  */
@@ -152,6 +164,15 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   protected readonly aria = new AriaForwardController(this, {
     target: () => this.partNamed('control'),
   })
+
+  /** The region VoiceOver hears the highlight, the count and a choice from. */
+  private readonly status = new StatusController(this)
+
+  /**
+   * The option, or the create row, the region last said: `null` for none,
+   * and `undefined` until it has spoken since the list opened.
+   */
+  private told: Element | null | undefined = undefined
 
   /**
    * Whether text that names no option is taken as the value, as React Aria's
@@ -335,6 +356,13 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
    */
   @property({ attribute: 'results-label' })
   resultsLabel = '{count} results'
+
+  /**
+   * What VoiceOver hears for a chosen option, as the highlight reaches it and
+   * once it is chosen, on Apple devices. `{name}` is the option's words.
+   */
+  @property({ attribute: 'selected-label' })
+  selectedLabel = '{name}, selected'
 
   /**
    * Whether the field completes the word as the user types.
@@ -526,6 +554,8 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
    */
   private markStatus(): void {
     const list = this.listbox
+    this.toggleState('blank', this.value === '')
+    this.toggleState('loading', this.loading)
     this.toggleState('error', this.loadError !== '')
     this.toggleState(
       'no-results',
@@ -938,18 +968,65 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
    */
   private linkActive(): void {
     const control = this.partNamed('control')
-    if (!control || !('ariaActiveDescendantElement' in control)) {
-      return
-    }
     const active = !this.open
       ? undefined
       : this.onCreate
         ? this.partNamed('create')
         : (this.listbox?.options ?? []).find((option) => option.active && !option.hidden)
+    this.tell(active)
+    if (!control || !('ariaActiveDescendantElement' in control)) {
+      return
+    }
     ;(
       control as Element & { ariaActiveDescendantElement: Element | null }
     ).ariaActiveDescendantElement = active ?? null
   }
+
+  /**
+   * Says the highlight, and the count as the list opens, where VoiceOver
+   * would not.
+   *
+   * **VoiceOver does not read the option `aria-activedescendant` points to**
+   * while focus is in a text field, so on Apple devices the arrows moved
+   * through the list in silence. React Aria says the option there, with
+   * "selected" where it is chosen, and how many there are as the list opens.
+   * Only when the highlight moves to another option, so an update that leaves
+   * it where it was says nothing.
+   */
+  private tell(active: Element | null | undefined): void {
+    if (!this.open) {
+      this.told = undefined
+      return
+    }
+    if ((active ?? null) === this.told || !onApple()) {
+      return
+    }
+    if (this.told === undefined) {
+      this.counted = countLabel(
+        this.reachable.length,
+        this.resultLabel,
+        this.resultsLabel,
+        this.lang,
+      )
+    }
+    this.told = active ?? null
+    const option = active as (Element & { selected?: boolean; text?: string }) | undefined
+    const words =
+      option?.text === undefined
+        ? (active?.textContent?.trim() ?? '')
+        : option.selected
+          ? fillTemplate(this.selectedLabel, { name: option.text })
+          : option.text
+    /* The count goes with the first option said, which the highlight often
+       reaches in the update after the one that opened the list. */
+    this.status.say([this.counted, words].filter(Boolean).join('. '))
+    if (active) {
+      this.counted = ''
+    }
+  }
+
+  /** How many options there are, said as the list opens, until an option is said with it. */
+  private counted = ''
 
   /**
    * Takes what the list announced and stops it there.
@@ -971,6 +1048,10 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
        it had been taken. */
     if (!this.requestValue(value)) {
       return
+    }
+    const chosen = this.listbox?.options.find((option) => option.value === value)
+    if (chosen && onApple()) {
+      this.status.say(fillTemplate(this.selectedLabel, { name: chosen.text }))
     }
     // Either way the search is spent: it found what it was for.
     this.emptied = false
@@ -1217,6 +1298,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
       ?loading=${this.loading}
       ?multiple=${this.multiple}
       .value=${this.value}
+      .chosenAgain=${() => this.close()}
       @helix-before-change=${this.handleChange}
       @change=${this.stopInner}
       @helix-filter=${this.stopInner}
@@ -1343,7 +1425,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
         ${this.renderListbox()}
         ${this.renderCreate()}
       </div>
-      ${this.renderHint()}${this.renderFeedback()}`
+      ${this.renderHint()}${this.renderFeedback()}${drawStatus(this.status)}`
   }
 }
 

@@ -782,6 +782,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
       manual
       aria-label=${this.listName || this.listLabel || nothing}
       @keydown=${this.handleListKeydown}
+      .chosenAgain=${() => this.close()}
       @helix-before-change=${this.handleChange}
       @change=${this.stopInner}
       @input=${this.stopInner}

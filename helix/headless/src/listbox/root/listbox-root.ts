@@ -5,6 +5,7 @@ import {
   DelayController,
   DisabledCascadeController,
   endInSight,
+  fillTemplate,
   HelixFilterEvent,
   HelixFormElement,
   HelixLoadMoreEvent,
@@ -13,12 +14,14 @@ import {
   MixinCollection,
   MixinControllerValue,
   MixinField,
+  onApple,
   rangeAdd,
   reportValues,
   requestChange,
   scrollItemIntoView,
   selectsAll,
   Typeahead,
+  toggleEvery,
   typesCharacter,
 } from '@fusion.dev/helix-core'
 import { magnifyingGlass } from '@fusion.dev/helix-icons'
@@ -357,6 +360,13 @@ export class HelixHeadlessListbox extends MixinCollection(
   resultsLabel = '{count} results'
 
   /**
+   * What VoiceOver hears as the highlight reaches a chosen option from the
+   * filter field, on Apple devices. `{name}` is the option's words.
+   */
+  @property({ attribute: 'selected-label' })
+  selectedLabel = '{name}, selected'
+
+  /**
    * Which option the keyboard is on, which is not what is chosen.
    */
   @state()
@@ -477,7 +487,11 @@ export class HelixHeadlessListbox extends MixinCollection(
    * which the region says in place of this.
    */
   private tell(changed: PropertyValues): void {
-    if (!changed.has('filter') || !this.hasUpdated) {
+    if (!this.hasUpdated) {
+      return
+    }
+    if (!changed.has('filter')) {
+      this.tellActive(changed)
       return
     }
     const count = this.shown.length
@@ -486,6 +500,33 @@ export class HelixHeadlessListbox extends MixinCollection(
       return
     }
     this.announced = countLabel(count, this.resultLabel, this.resultsLabel, this.lang)
+  }
+
+  /**
+   * Says the option the arrows reached from the filter field, on Apple devices.
+   *
+   * **VoiceOver does not read the option `aria-activedescendant` points to**
+   * while focus is in a text field, so a filterable list moved its highlight
+   * in silence there. React Aria's combobox says the option on Apple devices,
+   * with "selected" where it is chosen; the field here is the same pattern.
+   * Only while the field has focus, so a highlight placed as the list opens
+   * or seeded from the value says nothing until the reader moves it.
+   */
+  private tellActive(changed: PropertyValues): void {
+    if (
+      !changed.has('activeValue') ||
+      !this.filterable ||
+      !onApple() ||
+      (this.renderRoot as ShadowRoot).activeElement?.getAttribute('part') !== 'search-field'
+    ) {
+      return
+    }
+    const active = this.options.find((option) => option.value === this.activeValue)
+    if (active) {
+      this.announced = active.selected
+        ? fillTemplate(this.selectedLabel, { name: active.text })
+        : active.text
+    }
   }
 
   /**
@@ -512,6 +553,14 @@ export class HelixHeadlessListbox extends MixinCollection(
     this.activeValue = target.value
     return target.value
   }
+
+  /**
+   * @internal Called when the option already chosen is chosen again, which
+   * changes nothing here and answers the question for the control that opened
+   * the list. Select and Combobox close their panel on it, as a native
+   * `<select>` closes when its own answer is pressed.
+   */
+  chosenAgain: (() => void) | undefined = undefined
 
   /** @internal Whether letters typed in the last moment are still one search. */
   get typing(): boolean {
@@ -599,6 +648,7 @@ export class HelixHeadlessListbox extends MixinCollection(
       : [value]
     const joined = next.join(',')
     if (joined === this.value) {
+      this.chosenAgain?.()
       return
     }
     /* Through the mixin rather than hand-rolled: writing `value` is how a
@@ -671,10 +721,12 @@ export class HelixHeadlessListbox extends MixinCollection(
        multiple-selection listbox. Not in a field, where it selects the text. */
     if (this.multiple && !typing && selectsAll(event)) {
       event.preventDefault()
-      const reachable = shown.map((option) => option.value)
-      const all = reachable.every((value) => this.values.includes(value))
-      const kept = this.values.filter((value) => !reachable.includes(value))
-      this.requestValue((all ? kept : [...kept, ...reachable]).join(','))
+      this.requestValue(
+        toggleEvery(
+          this.values,
+          shown.map((option) => option.value),
+        ).join(','),
+      )
       return
     }
     if (!typing && typesCharacter(event)) {
