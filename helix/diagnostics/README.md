@@ -240,6 +240,7 @@ diagnostics counts it by kind and tag. None fails a CI job.
 
 | Kind | Means |
 | --- | --- |
+| `cite-not-url` | A blockquote's `cite` holds words, where it takes the URL of the source |
 | `deprecated` | A deprecated property, attribute or slot was used; the message names what replaces it |
 | `duplicate-registration` | Two copies of Helix are on the page. Also the finding of the same name |
 | `fullscreen-refused` | The browser refused fullscreen, usually in a frame without `allow="fullscreen"` |

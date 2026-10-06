@@ -159,3 +159,42 @@ describe('a blockquote with marks', () => {
     ).toEqual([])
   })
 })
+
+describe('a blockquote whose `cite` holds words', () => {
+  const warnedOn = async (markup: string): Promise<string[]> => {
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      await mount(markup)
+      await new Promise((done) => setTimeout(done, 5))
+    } finally {
+      console.warn = original
+    }
+    return warnings
+  }
+
+  /* The common mistake: the author's name where the source's URL belongs,
+     which the browser keeps as a URL and no reader is shown. */
+  test('is reported once, by its tag', async () => {
+    const warnings = await warnedOn(
+      '<helix-headless-blockquote cite="Maria Lopez, operations manager">x</helix-headless-blockquote>',
+    )
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0]).toContain(
+      '<helix-headless-blockquote cite="Maria Lopez, operations manager"> holds words',
+    )
+  })
+
+  test('a URL, a path or no `cite` is not reported', async () => {
+    expect(
+      await warnedOn(
+        '<helix-headless-blockquote cite="https://example.com/source">x</helix-headless-blockquote>',
+      ),
+    ).toEqual([])
+    expect(
+      await warnedOn('<helix-headless-blockquote cite="/talks/2026">x</helix-headless-blockquote>'),
+    ).toEqual([])
+    expect(await warnedOn('<helix-headless-blockquote>x</helix-headless-blockquote>')).toEqual([])
+  })
+})
