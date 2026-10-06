@@ -399,6 +399,39 @@ describe('an empty feed', () => {
     expect(part(host, 'live')?.textContent).toBe('')
   })
 
+  /* Removing the attribute is how markup and most frameworks clear it, and
+     gives the property null, which the feed read as an error with no words:
+     the state stayed on, the error part stayed drawn and empty never came
+     back. */
+  test('clears the error when the attribute is removed or the property set to null', async () => {
+    type Feed = HTMLElement & { loadError: string | null; updateComplete: Promise<unknown> }
+    const host = (await mount(
+      '<helix-headless-notifications label="Activity"></helix-headless-notifications>',
+    )) as Feed
+    await host.updateComplete
+    const live = part(host, 'live')
+    host.setAttribute('load-error', 'Offline')
+    await host.updateComplete
+    expect(hasState(host, 'error')).toBe(true)
+    /* The region is the one that was there, and only its words change. */
+    expect(part(host, 'live') === live).toBe(true)
+    expect(live?.textContent).toBe('Offline')
+    host.removeAttribute('load-error')
+    await host.updateComplete
+    expect(hasState(host, 'error')).toBe(false)
+    expect(part(host, 'error')).toBeNull()
+    expect(hasState(host, 'empty')).toBe(true)
+    expect(part(host, 'empty')).not.toBeNull()
+    expect(part(host, 'live') === live).toBe(true)
+    expect(live?.textContent).toBe('Nothing to show')
+    host.loadError = 'Offline'
+    await host.updateComplete
+    host.loadError = null
+    await host.updateComplete
+    expect(hasState(host, 'error')).toBe(false)
+    expect(part(host, 'error')).toBeNull()
+  })
+
   test('is not empty once a notification is in it', async () => {
     const host = (await mount(
       `<helix-headless-notifications label="Activity">
