@@ -113,6 +113,7 @@ import '../../option/index.js'
  * @csspart option-label - The time's label.
  * @csspart option-text - The label and the caption, as one column.
  *
+ * @cssstate blank - While no time is chosen.
  * @cssstate invalid - While `invalid` is set or `feedback` says what is wrong.
  */
 @customElement('helix-headless-time-picker')
@@ -818,6 +819,7 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
        too: the value is known before the render and a form read between the two
        should not see the previous one. */
     this.report()
+    this.toggleState('blank', this.value === '')
   }
 
   protected override updated(changed: PropertyValues): void {
@@ -866,6 +868,7 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
     return html`<${this.tag('listbox')}
       part="column"
       data-column=${part}
+      aria-describedby=${this.feedback === '' ? nothing : 'feedback'}
       aria-invalid=${this.marked ? 'true' : nothing}
       exportparts="empty: column-empty, error: column-error, feedback: column-feedback, filter-icon: column-filter-icon,
         filter-mark: column-filter-mark, hint: column-hint, items: column-items, label: column-label,
@@ -994,6 +997,7 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
   protected renderList(): TemplateResult {
     return html`<${this.tag('listbox')}
       part="list"
+      aria-describedby=${this.feedback === '' ? nothing : 'feedback'}
       aria-invalid=${this.marked ? 'true' : nothing}
       exportparts="empty: list-empty, error: list-error, feedback: list-feedback, filter-icon: list-filter-icon,
         filter-mark: list-filter-mark, hint: list-hint, items: list-items, label: list-label,

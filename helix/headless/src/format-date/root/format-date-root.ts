@@ -58,6 +58,9 @@ const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/
  * @documentation https://fusion.dev/helix/components/format-date
  *
  * @csspart time - The `<time>` element that holds the formatted text.
+ *
+ * @cssstate future - An `elapsed` or `relative` reading of a moment still to come, such as "in 3 hours".
+ * @cssstate past - An `elapsed` or `relative` reading of a moment gone, such as "3 hours ago".
  */
 @customElement('helix-headless-format-date')
 export class HelixHeadlessFormatDate extends HelixElement {
@@ -338,6 +341,12 @@ export class HelixHeadlessFormatDate extends HelixElement {
     ) {
       this.clock.tick()
     }
+    /* Which side of now a reading is on, so a page can mark what is overdue
+       or still to come from CSS. Read against the clock the text is drawn
+       against, so the two cannot disagree. */
+    const moment = this.reading ? this.moment : undefined
+    this.toggleState('past', moment !== undefined && moment.getTime() <= this.clock.now)
+    this.toggleState('future', moment !== undefined && moment.getTime() > this.clock.now)
   }
 
   /** The light DOM's own text, which is the other way to write the value. */

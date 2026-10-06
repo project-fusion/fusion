@@ -24,12 +24,18 @@ import { styles } from './time-picker-root.css.js'
  * @aliases Time, TimeList
  * @documentation https://fusion.dev/helix/components/time-picker
  *
+ * @cssproperty --time-picker-columns-gap - The space between the wheels. None by default.
  * @cssproperty --time-picker-feedback-color - The color of the message under the times, while `feedback` is set.
+ * @cssproperty --time-picker-hover-background-color - Fill on a wheel's row under the pointer or the keyboard.
+ * @cssproperty --time-picker-invalid-color - The ring around the chosen time, or around the times while nothing is chosen, while the picker is invalid.
  * @cssproperty --time-picker-list-block-size - How tall the list is before it scrolls.
+ * @cssproperty --time-picker-mark-radius - The corners of the mark on a wheel's row.
  * @cssproperty --time-picker-range-color - Fill behind the times inside a range.
  * @cssproperty --time-picker-row-size - Height and minimum width of one row in a wheel.
  * @cssproperty --time-picker-selected-color - Fill on the chosen row of a wheel.
+ * @cssproperty --time-picker-selected-foreground-color - Ink on the chosen row of a wheel.
  * @cssproperty --time-picker-wheel-block-size - How tall a wheel is. Five rows by default.
+ * @cssproperty --time-picker-wheel-mask - The mask that fades a wheel toward its ends, as a `mask-image`. Set `none` for no fade.
  */
 @customElement('helix-time-picker')
 export class HelixTimePicker extends HelixHeadlessTimePicker {

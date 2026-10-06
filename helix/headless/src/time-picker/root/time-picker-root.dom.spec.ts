@@ -674,6 +674,17 @@ describe('a time picker in a page written in another language', () => {
   })
 })
 
+describe('a time picker’s states', () => {
+  test('`blank` while no time is chosen', async () => {
+    const states = (host: Time) =>
+      (host as unknown as { internals: ElementInternals }).internals.states
+    const empty = await picker()
+    expect(states(empty).has('blank')).toBe(true)
+    const chosen = await picker('value="09:15"')
+    expect(states(chosen).has('blank')).toBe(false)
+  })
+})
+
 describe('a time picker’s own message', () => {
   test('`feedback` is shown under it, is its verdict, and marks it and its list invalid', async () => {
     const host = (await picker('value="09:15" feedback="Pick a time after lunch"')) as Time & {
@@ -684,5 +695,20 @@ describe('a time picker’s own message', () => {
     expect(host.validationMessage).toBe('Pick a time after lunch')
     expect(host.internals.states.has('invalid')).toBe(true)
     expect(part(host, 'list')?.getAttribute('aria-invalid')).toBe('true')
+  })
+
+  test('and describes the list a reader is in, and each wheel, by the message', async () => {
+    /* Measured before this: the list was marked invalid and said nothing of
+       why, where RAC describes the field it marks. */
+    const host = await picker('value="09:15" feedback="Pick a time after lunch"')
+    expect(part(host, 'list')?.getAttribute('aria-describedby')).toBe('feedback')
+    const wheels = await picker('variant="wheels" value="09:15" feedback="Too early"')
+    const columns = [...(wheels.shadowRoot?.querySelectorAll('[part="column"]') ?? [])]
+    expect(columns.length).toBeGreaterThan(1)
+    for (const column of columns) {
+      expect(column.getAttribute('aria-describedby')).toBe('feedback')
+    }
+    const plain = await picker('value="09:15"')
+    expect(part(plain, 'list')?.hasAttribute('aria-describedby')).toBe(false)
   })
 })
