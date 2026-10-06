@@ -309,6 +309,10 @@ export {
   type MixinPickerEditingInterface,
 } from './mixins/mixin-picker-editing/mixin-picker-editing.js'
 export {
+  MixinPickerFeedback,
+  type MixinPickerFeedbackInterface,
+} from './mixins/mixin-picker-feedback/mixin-picker-feedback.js'
+export {
   MixinPickerField,
   type MixinPickerFieldInterface,
 } from './mixins/mixin-picker-field/mixin-picker-field.js'
