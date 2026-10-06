@@ -51,6 +51,7 @@ const FAMILIES = [
   'input',
   'listbox',
   'number-input',
+  'pin-input',
   'rating',
   'select',
   'slider',
@@ -92,20 +93,6 @@ describe('a field showing a message', () => {
       expect(invalid(host)).toEqual([])
     })
   }
-
-  /* A row of cells is a group, which `aria-invalid` does not apply to, so the
-     group is described and each cell, a textbox, is the one marked. */
-  test('pin-input: every cell says it is invalid', async () => {
-    const host = await field('pin-input')
-    const cells = [...(host.shadowRoot?.querySelectorAll('[part="cell"]') ?? [])]
-    expect(cells.length).toBeGreaterThan(0)
-    for (const cell of cells) {
-      expect(cell.getAttribute('aria-invalid')).toBe('true')
-    }
-    host.feedback = ''
-    await settle(host)
-    expect(invalid(host)).toEqual([])
-  })
 })
 
 /**

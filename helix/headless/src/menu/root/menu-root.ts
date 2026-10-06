@@ -98,6 +98,9 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
  * @csspart surface - The floating panel the menu is drawn on.
  * @csspart title - The name of the submenu that is showing.
  *
+ * @cssproperty --floating-anchor-inline-size - The trigger's width, written on the panel while it is open, as in `min-inline-size: var(--floating-anchor-inline-size)`. Read it; a value set here is written over.
+ * @cssproperty --floating-available-block-size - The room between the panel and the edge of the screen it opens toward, written on the panel while it is open. Read it; a value set here is written over.
+ *
  * @cssstate drilled - A submenu's page is showing, so content that is not a row can hide with the top page.
  * @cssstate mark - A row on the current page has a checkbox or a link, so every row keeps the trailing column.
  * @cssstate open - While the menu is open.

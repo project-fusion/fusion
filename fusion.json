@@ -129,7 +129,7 @@
       "planned": {},
       "sheets": ["helix/styles/src/primitives.css", "helix/styles/src/tokens.css"]
     },
-    "shared": ["chart", "viewport"],
+    "shared": ["chart", "floating", "viewport"],
     "tiers": ["helix/core/src", "helix/headless/src", "helix/sandbox/src", "helix/styled/src"],
     "unresolved": {
       "body": "Steps: a step's name and description together, which is a summary rather than a body."

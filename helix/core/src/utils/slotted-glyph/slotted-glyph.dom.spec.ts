@@ -40,4 +40,15 @@ describe('a slotted glyph', () => {
     glyph.read(slot)
     expect(glyph.copyFor(0)).not.toBe(first)
   })
+
+  /* A first render reads the host's children before any `slotchange`. */
+  test('takes a child given to it, and none, as a slot read would', () => {
+    const glyph = new SlottedGlyph()
+    const star = document.createElement('svg')
+    star.id = 'star'
+    glyph.take(star)
+    expect((glyph.copyFor(0) as Element).id).toBe('star')
+    glyph.take(undefined)
+    expect([glyph.slotted, glyph.copyFor(0)]).toEqual([false, undefined])
+  })
 })

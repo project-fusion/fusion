@@ -93,6 +93,9 @@ import { over } from '../align.js'
  * @csspart trigger - The closed control, which shows the chosen value.
  * @csspart value - The chosen option's text inside the trigger.
  *
+ * @cssproperty --floating-anchor-inline-size - The trigger's width, written on the panel while it is open, as in `min-inline-size: var(--floating-anchor-inline-size)`. Read it; a value set here is written over.
+ * @cssproperty --floating-available-block-size - The room between the panel and the edge of the screen it opens toward, written on the panel while it is open. Read it; a value set here is written over.
+ *
  * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
  * @cssstate open - While the list is open.
  */
