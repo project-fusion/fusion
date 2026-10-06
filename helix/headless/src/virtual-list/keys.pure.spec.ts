@@ -31,3 +31,36 @@ describe('stepIndex', () => {
     expect(stepIndex('ArrowUp', 40, 10, 5)).toBe(8)
   })
 })
+
+describe('stepIndex in a grid', () => {
+  /* Ten items, four to a line: 0-3, 4-7, 8-9. */
+  const grid = { across: 4 }
+
+  test('moves a line with the vertical arrows, in the same column', () => {
+    expect(stepIndex('ArrowDown', 1, 10, 2, grid)).toBe(5)
+    expect(stepIndex('ArrowUp', 5, 10, 2, grid)).toBe(1)
+    expect(stepIndex('ArrowUp', 2, 10, 2, grid)).toBe(2)
+  })
+
+  test('goes to the last item from above a shorter last line, and stays on the last line', () => {
+    expect(stepIndex('ArrowDown', 7, 10, 2, grid)).toBe(9)
+    expect(stepIndex('ArrowDown', 9, 10, 2, grid)).toBe(9)
+  })
+
+  test('moves one item along the line with Left and Right, and turns them on a right-to-left page', () => {
+    expect(stepIndex('ArrowRight', 3, 10, 2, grid)).toBe(4)
+    expect(stepIndex('ArrowLeft', 4, 10, 2, grid)).toBe(3)
+    expect(stepIndex('ArrowLeft', 0, 10, 2, grid)).toBe(0)
+    expect(stepIndex('ArrowLeft', 3, 10, 2, { ...grid, forward: 'ArrowLeft' })).toBe(4)
+  })
+
+  test('leaves Left and Right to the row in a list', () => {
+    expect(stepIndex('ArrowRight', 3, 10, 2)).toBeUndefined()
+  })
+
+  test('moves a page of lines, at least one, held to the set', () => {
+    expect(stepIndex('PageDown', 1, 10, 1, grid)).toBe(5)
+    expect(stepIndex('PageDown', 1, 10, 5, grid)).toBe(9)
+    expect(stepIndex('PageUp', 9, 10, 5, grid)).toBe(1)
+  })
+})
