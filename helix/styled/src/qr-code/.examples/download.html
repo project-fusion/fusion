@@ -1,0 +1,20 @@
+<!-- @summary A QR code saved as a PNG with `download()`, called from a press, as Zag's download trigger does. -->
+<helix-flex
+  align-items="center"
+  direction="column"
+  gap="sm"
+>
+  <helix-qr-code
+    id="code"
+    label="Documentation website"
+    value="https://fusion.dev/helix"
+  ></helix-qr-code>
+  <helix-button id="save">Download the code</helix-button>
+</helix-flex>
+
+<script type="module">
+  const code = document.getElementById('code')
+  document.getElementById('save').addEventListener('click', () => {
+    code.download('helix-docs.png')
+  })
+</script>
