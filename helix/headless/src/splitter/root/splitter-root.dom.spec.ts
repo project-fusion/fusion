@@ -780,6 +780,20 @@ describe('splitter under a consumer that owns the position', () => {
     expect(host.position).toBe(40)
   })
 
+  /* Ark's onResize: a page laying something out with the panes heard nothing
+     until the drag ended. */
+  test('says each step of a drag as input, and the settling once', async () => {
+    const host = await splitter('position="50"')
+    Object.defineProperty(host, 'getBoundingClientRect', {
+      value: () => ({ bottom: 100, height: 100, left: 0, right: 200, top: 0, width: 200 }),
+    })
+    const heard: string[] = []
+    host.addEventListener('input', () => heard.push(`input ${host.position}`))
+    host.addEventListener('helix-resized', () => heard.push(`resized ${host.position}`))
+    await drag(host, 0.5, 0.3)
+    expect(heard).toEqual(['input 30', 'resized 30'])
+  })
+
   test('a splitter whose markup declared a position can still be dragged', async () => {
     /* A declared `position` is a seed, not a claim of ownership: there is
        nothing to defer to, and the drag applies like any other change.

@@ -56,8 +56,8 @@ export class HelixHeadlessSpeedDialItem extends HelixElement {
   readonly isSpeedDialItem = true
 
   /** Puts focus on the control inside the item. */
-  override focus(): void {
-    this.partNamed('item')?.focus()
+  override focus(options?: FocusOptions): void {
+    this.partNamed('item')?.focus(options)
   }
 
   /**

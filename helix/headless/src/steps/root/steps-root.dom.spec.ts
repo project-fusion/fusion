@@ -392,6 +392,19 @@ describe('how far through a sequence is', () => {
     expect(bar.getAttribute('aria-valuenow')).toBe('100')
     expect(hasState(host, 'complete')).toBe(true)
   })
+
+  /* Ark writes "33% complete" as the value text. A bare number was read as
+     "33" with nothing to say what of. */
+  test('is said in words a page can change', async () => {
+    const host = await steps()
+    await new Promise((resolve) => setTimeout(resolve))
+    await host.updateComplete
+    const bar = part(host, 'progress') as HTMLElement
+    expect(bar.getAttribute('aria-valuetext')).toBe('33% complete')
+    host.setAttribute('progress-label', '{percent} percent done')
+    await host.updateComplete
+    expect(bar.getAttribute('aria-valuetext')).toBe('33 percent done')
+  })
 })
 
 describe('a finished stage', () => {

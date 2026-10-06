@@ -148,6 +148,23 @@ describe('a speed dial', () => {
     expect(trigger.getAttribute('aria-expanded')).toBe('false')
   })
 
+  /* The host takes no focus of its own, so a page focusing the dial, after a
+     dialog closes for one, left focus on the body. */
+  test('focusing the dial focuses its trigger, slotted or drawn', async () => {
+    const { host } = await dial()
+    host.focus()
+    expect(document.activeElement).toBe(host.querySelector('[slot="trigger"]'))
+
+    const drawn = (await mount(
+      `<helix-headless-speed-dial label="Actions">
+        <helix-headless-speed-dial-item value="share">Share</helix-headless-speed-dial-item>
+      </helix-headless-speed-dial>`,
+    )) as Dial
+    await drawn.updateComplete
+    drawn.focus()
+    expect(drawn.shadowRoot?.activeElement).toBe(part(drawn, 'trigger'))
+  })
+
   test('opening from the trigger lands on the first action, which is where a keyboard expects it', async () => {
     const { actions, host } = await dial()
     pressTrigger(host)
