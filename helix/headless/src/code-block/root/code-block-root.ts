@@ -24,8 +24,10 @@ import { type DiffFile, type DiffHunk, type DiffLine, pairLines, parsePatch } fr
  * Set `line-numbers` to number the lines in a gutter beside the code, hidden
  * from the accessibility tree and left out of a copy. Set `highlight` to a
  * function that turns the code into highlighted markup, such as one wrapping
- * Shiki or Prism, and the block draws what it returns; the code stays in the
- * slot, so the copy button and the page's own text are the code as written.
+ * Shiki or Prism, and the block draws what it returns; it is handed the
+ * block's `language`, so one function serves every block. The code stays in
+ * the slot, so the copy button and the page's own text are the code as
+ * written.
  *
  * Set `expandable` on a block whose height is capped, such as by
  * `--code-block-max-block-size`, and a button under it shows every line and
@@ -147,18 +149,27 @@ export class HelixHeadlessCodeBlock extends HelixElement {
    * Turns the code into highlighted markup, which the block draws in place of
    * the plain text.
    *
-   * Called with the code as written and returning HTML, such as the output of
-   * Shiki's `codeToHtml` or Prism's `highlight`. **The markup is drawn as
-   * given**, so it has to escape the code it was handed, which those
-   * highlighters do. A `<pre>` and `<code>` around the whole of it, which
-   * Shiki writes, are taken off, so the lines sit level with the gutter's
-   * numbers and the block keeps one tab stop. Bind the language in the function you pass. The code
-   * stays in the slot, so the copy button copies it as written and a reader
-   * without the script still has it. Not called on a server, which has no code
-   * to read, nor for a diff.
+   * Called with the code as written and the block's `language`, and returning
+   * HTML, such as the output of Shiki's `codeToHtml` or Prism's `highlight`.
+   * One function serves every block on a page, each block saying its own
+   * language:
+   *
+   * ```js
+   * for (const block of document.querySelectorAll('helix-code-block')) {
+   *   block.highlight = (code, lang) => codeToHtml(code, { lang, theme: 'github-light' })
+   * }
+   * ```
+   *
+   * **The markup is drawn as given**, so it has to escape the code it was
+   * handed, which those highlighters do. A `<pre>` and `<code>` around the
+   * whole of it, which Shiki writes, are taken off, so the lines sit level
+   * with the gutter's numbers and the block keeps one tab stop. The code stays
+   * in the slot, so the copy button copies it as written and a reader without
+   * the script still has it. Not called on a server, which has no code to
+   * read, nor for a diff.
    */
   @property({ attribute: false })
-  highlight?: (code: string) => string
+  highlight?: (code: string, language: string) => string
 
   /**
    * The block's name, usually a file name or a language.
@@ -168,6 +179,16 @@ export class HelixHeadlessCodeBlock extends HelixElement {
    */
   @property()
   label = ''
+
+  /**
+   * The language the code is written in, such as `ts` or `css`, handed to
+   * `highlight` as its second argument.
+   *
+   * Absent hands it an empty string. It draws nothing of its own: the block's
+   * name is `label`.
+   */
+  @property()
+  language = ''
 
   /**
    * Whether the lines are numbered in a gutter beside the code.
@@ -334,7 +355,9 @@ export class HelixHeadlessCodeBlock extends HelixElement {
     }
     const text = this.text
     const highlighted =
-      this.highlight && text !== '' ? highlightedLines(this.highlight(text)) : undefined
+      this.highlight && text !== ''
+        ? highlightedLines(this.highlight(text, this.language))
+        : undefined
     /* The slot stays either way, hidden under highlighted markup, so a change
        to the code still reaches `slotchange` and the code stays the page's. */
     const code =
