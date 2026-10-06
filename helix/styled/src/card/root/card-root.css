@@ -9,7 +9,7 @@
   --_card-media: var(--card-media-size, 12rem);
   /* The ink a `helix-text` heading anywhere in the card takes, where the body
      around it is muted. */
-  --_heading-ink: var(--helix-color-foreground);
+  --_heading-ink: var(--card-heading-color, var(--helix-color-foreground));
   background-color: var(--card-background-color, var(--helix-color-surface));
   border: var(--card-border-width, var(--helix-border-surface)) solid
     var(--card-border-color, var(--helix-color-border));
@@ -18,7 +18,7 @@
   /* A hook rather than a value, so something outside can lift the card without
      reaching into the shadow root. */
   box-shadow: var(--card-shadow, var(--helix-shadow-surface));
-  color: var(--helix-color-foreground-muted);
+  color: var(--card-color, var(--helix-color-foreground-muted));
   /* *Packed at the top, with the slack at the bottom.** `align-content` computes
      to `stretch` on a grid, and a stretched grid with `auto` rows gives every
      row an equal share of the free space. A card is stretched whenever it sits
@@ -33,7 +33,7 @@
   display: grid;
   gap: var(--card-gap, var(--helix-space-sm));
   grid-template-columns: minmax(0, 1fr);
-  line-height: var(--helix-leading-normal);
+  line-height: var(--card-line-height, var(--helix-leading-normal));
   /* Clips the media to the corner radius, so a full-bleed image needs no corner
      handling of its own. */
   overflow: hidden;
@@ -81,7 +81,7 @@ slot[name="media"]::slotted(*) {
   inline-size: calc(100% + var(--_card-inset) * 2);
   margin: calc(var(--_card-inset) * -1);
   margin-block-end: 0;
-  object-fit: cover;
+  object-fit: var(--card-media-fit, cover);
 }
 
 /* The same region against the other edge. */
@@ -93,7 +93,7 @@ slot[name="media"]::slotted(*) {
 
 /* The header reads as the card's own voice rather than as body copy. */
 slot[name="header"]::slotted(*) {
-  color: var(--helix-color-foreground);
+  color: var(--_heading-ink);
 }
 
 /* Trailing actions sit at the end of the line instead of stretching across it,

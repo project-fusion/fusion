@@ -420,3 +420,25 @@ describe('an image with no alt', () => {
     expect(warnings[0]).toContain('alt=""')
   })
 })
+
+describe('an image with no `alt`', () => {
+  /* The warning had no case, so nothing held the three answers apart: no
+     `alt` is reported, an empty one is decoration, and a hidden picture needs
+     neither. */
+  test('is reported once, and an empty or hidden one is not', async () => {
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      await mount('<helix-headless-image src="/pier.jpg"></helix-headless-image>')
+      await mount('<helix-headless-image alt="" src="/pier.jpg"></helix-headless-image>')
+      await mount(
+        '<helix-headless-image aria-hidden="true" src="/pier.jpg"></helix-headless-image>',
+      )
+    } finally {
+      console.warn = original
+    }
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0]).toContain('alt=""')
+  })
+})

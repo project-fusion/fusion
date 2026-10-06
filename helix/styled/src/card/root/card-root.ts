@@ -56,10 +56,14 @@ import { styles } from './card-root.css.js'
  * @cssproperty --card-border-width - Width of the surface's edge. Follows
  *   `--helix-border-surface`, which is a hairline unless your theme sets another width.
  *   The edge is what sets the surface apart.
+ * @cssproperty --card-color - Color of the card's text. Muted by default, so the header reads as the card's own voice.
  * @cssproperty --card-gap - Space between the regions, and between a header or footer and its actions.
+ * @cssproperty --card-heading-color - Color of the header, and of a `Text` heading anywhere in the card. The foreground by default.
+ * @cssproperty --card-line-height - Line height of the card's text. The normal leading by default.
  * @cssproperty --card-media-block-size - Height of the media region. Defaults to
  *   `auto`, which follows an image's own proportions. A chart has no height of its own,
  *   so set one here for a chart.
+ * @cssproperty --card-media-fit - How a slotted picture fills the media region, as `object-fit`. `cover` by default; `contain` shows all of a logo or a screenshot.
  * @cssproperty --card-media-size - Width of the media column when horizontal.
  * @cssproperty --card-padding - Inset applied to each region.
  * @cssproperty --card-radius - Corner radius of the surface.

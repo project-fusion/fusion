@@ -59,6 +59,21 @@ describe('card actions and gap', () => {
     )
   })
 
+  /* The body's muted ink, the heading ink, the leading and how a picture
+     fills the media were fixed, so a card on a colored ground could not
+     change them without reaching past the component. */
+  test('the text, heading, leading and media fit are hooks on the values they had', () => {
+    expect(sheet()).toContain('color: var(--card-color, var(--helix-color-foreground-muted))')
+    expect(sheet()).toContain(
+      '--_heading-ink: var(--card-heading-color, var(--helix-color-foreground))',
+    )
+    expect(sheet()).toMatch(
+      /slot\[name="header"\]::slotted\(\*\) \{\s*color: var\(--_heading-ink\)/,
+    )
+    expect(sheet()).toContain('line-height: var(--card-line-height, var(--helix-leading-normal))')
+    expect(sheet()).toContain('object-fit: var(--card-media-fit, cover)')
+  })
+
   test('the gap is a hook that falls back to the step it always was', () => {
     expect(sheet()).toContain('gap: var(--card-gap, var(--helix-space-sm))')
   })
