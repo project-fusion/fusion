@@ -308,6 +308,61 @@ describe('moving between stops', () => {
   })
 })
 
+describe('the arrow keys', () => {
+  const press = (tour: Tour, key: string, from?: Element): KeyboardEvent => {
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key,
+    })
+    ;(from ?? (tour.stops[tour.index] as Element)).dispatchEvent(event)
+    return event
+  }
+
+  test('go on and back from inside a stop, and never past either end', async () => {
+    const tour = await run()
+    expect(press(tour, 'ArrowLeft').defaultPrevented).toBe(false)
+    expect(tour.index).toBe(0)
+    expect(press(tour, 'ArrowRight').defaultPrevented).toBe(true)
+    await tour.updateComplete
+    expect(tour.index).toBe(1)
+    press(tour, 'ArrowRight')
+    await tour.updateComplete
+    expect(tour.index).toBe(2)
+    /* The last stop: the arrow does not finish the tour. */
+    expect(press(tour, 'ArrowRight').defaultPrevented).toBe(false)
+    await tour.updateComplete
+    expect(tour.open).toBe(true)
+    press(tour, 'ArrowLeft')
+    await tour.updateComplete
+    expect(tour.index).toBe(1)
+  })
+
+  test('turn round on a right-to-left page', async () => {
+    const tour = await run()
+    tour.parentElement?.setAttribute('dir', 'rtl')
+    press(tour, 'ArrowLeft')
+    await tour.updateComplete
+    expect(tour.index).toBe(1)
+    press(tour, 'ArrowRight')
+    await tour.updateComplete
+    expect(tour.index).toBe(0)
+  })
+
+  test('leave a text field in a stop its own arrows, and do nothing while closed', async () => {
+    const tour = await run()
+    const field = document.createElement('input')
+    tour.stops[0]?.append(field)
+    expect(press(tour, 'ArrowRight', field).defaultPrevented).toBe(false)
+    expect(tour.index).toBe(0)
+    tour.open = false
+    await tour.updateComplete
+    press(tour, 'ArrowRight')
+    expect(tour.index).toBe(0)
+  })
+})
+
 describe('a tour whose stop the consumer owns', () => {
   /* Declaring `index` seeds the tour rather than claiming it. Control is an
      action: the move applies, and a consumer refuses it by taking the decision.

@@ -10,6 +10,8 @@ import {
   HelixElement,
   HelixTourStatusEvent,
   hostAria,
+  inlineStep,
+  keyClaimed,
   MixinControllerOpen,
   requestChange,
   whenHydrated,
@@ -57,6 +59,12 @@ import { onPage, waitFor } from '../wait.js'
  * tour puts focus back on the element that had it when the tour opened, unless
  * you have moved it somewhere else on the page. A stop does not trap focus, so
  * you can still `Tab` out to the element it describes.
+ *
+ * **The arrow keys move between stops** while focus is in one: the arrow that
+ * points the way the line runs goes on, and the other goes back, so on a
+ * right-to-left page `ArrowLeft` goes on. Neither finishes the tour at the last
+ * stop, and a text field in a stop keeps its own arrows. `Escape` skips the
+ * tour.
  *
  * @since 0.1.0
  * @status stable
@@ -290,6 +298,36 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
     }
   }
 
+  /**
+   * The arrow along the line, from inside a stop: on, or back.
+   *
+   * A move and never a finish, so a reader walking the stops with the arrows
+   * cannot end the tour by going one too far; that is Next on the last stop.
+   */
+  private readonly handleArrows = (event: KeyboardEvent): void => {
+    if (!this.open || keyClaimed(event) || event.altKey || event.ctrlKey || event.metaKey) {
+      return
+    }
+    const along = inlineStep(this, event.key)
+    if (along === 1 && this.index < this.length - 1) {
+      event.preventDefault()
+      this.next()
+    } else if (along === -1 && this.canGoBack) {
+      event.preventDefault()
+      this.back()
+    }
+  }
+
+  /** Whether `back()` would move, there being a stop that shows before this one. */
+  private get canGoBack(): boolean {
+    return (
+      stopBefore(
+        this.stops.map((stop) => stop.type),
+        this.index,
+      ) !== undefined
+    )
+  }
+
   private readonly handleKeydown = (event: KeyboardEvent): void => {
     /* Not an Escape something inside a stop already answered: a menu or a
        select closing itself is the press, and the tour ending with it was two
@@ -316,6 +354,7 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
        for a reason that is not the component's. `Megamenu` moved its own
        listener to the host for exactly this. */
     this.addEventListener('helix-tour-ask', this.handleAsk)
+    this.addEventListener('keydown', this.handleArrows)
     document.addEventListener('keydown', this.handleKeydown)
     window.addEventListener('resize', this.handleViewport, { passive: true })
     window.addEventListener('scroll', this.handleViewport, { capture: true, passive: true })
@@ -330,6 +369,7 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('helix-tour-ask', this.handleAsk)
+    this.removeEventListener('keydown', this.handleArrows)
     document.removeEventListener('keydown', this.handleKeydown)
     window.removeEventListener('resize', this.handleViewport)
     window.removeEventListener('scroll', this.handleViewport, { capture: true })
