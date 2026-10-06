@@ -157,7 +157,7 @@ const rangeFor = (root: Element, needle: string): Range[] => {
  * | A letter or a word | Moves to the next option whose words start with what you typed. In a filter field, types it. |
  * | Enter | Chooses the highlighted option, or follows it where it is a link. |
  * | Space | Chooses the highlighted option, or with `multiple` toggles it. In a filter field, types a space. |
- * | Shift with Down or Up | With `multiple`, adds the option the highlight moves to. |
+ * | Shift with Down or Up | With `multiple`, adds the option the highlight moves to. In a filter field, moves the highlight and leaves the value. |
  * | Shift with Home or End | With `multiple`, adds every option from the highlight to that end. In a filter field, hold Control as well. |
  * | Control or Command with A | With `multiple`, chooses every option, or none where all are chosen. In a filter field, selects the text. |
  * | Escape | In a filter field, clears the filter. |

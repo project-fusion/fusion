@@ -683,4 +683,19 @@ describe('a select a browser can autofill', () => {
     const host = await select()
     expect(hidden(host)).toBeNull()
   })
+
+  test('sends the page one input, with the filled value', async () => {
+    /* A fill as Chromium sends it: the select's composed `input`, then its
+       `change`. Measured before this, the page heard `input` twice, the
+       first with the old value. */
+    const host = (await select('autocomplete="country"')) as Updatable & { value: string }
+    const heard: string[] = []
+    ;(host as unknown as HTMLElement).addEventListener('input', () => heard.push(host.value))
+    const field = hidden(host) as HTMLSelectElement
+    field.value = 'two'
+    field.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+    field.dispatchEvent(new Event('change', { bubbles: true }))
+    await settle(host)
+    expect(heard).toEqual(['two'])
+  })
 })
