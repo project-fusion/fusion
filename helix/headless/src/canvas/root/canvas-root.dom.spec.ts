@@ -512,6 +512,59 @@ describe('canvas moves', () => {
     expect(event.defaultPrevented).toBe(false)
     expect(card(host, 'a').x).toBe(0)
   })
+
+  test('with `snap`, a dragged card lets go on the nearest line, and what it carries keeps its place', async () => {
+    const host = await canvas('snap="32"')
+    await drag(host, 'c', { x: 40, y: 20 })
+    // From 130, 300 by 40, 20 is 170, 320, and the nearest lines are 160 and 320.
+    expect([card(host, 'c').x, card(host, 'c').y]).toEqual([160, 320])
+    await drag(host, 'pair', { x: 10, y: 0 })
+    // The group from -20 by 10 to the line at 0, and its cards 20 to the right with it.
+    expect([card(host, 'pair').x, card(host, 'a').x, card(host, 'b').x]).toEqual([0, 20, 280])
+  })
+
+  test('with `snap`, Shift and an arrow goes to the next line, and Alt and an arrow moves the corner there', async () => {
+    const host = await canvas('snap="32"')
+    press(card(host, 'c'), 'ArrowRight', true)
+    await host.updateComplete
+    expect(card(host, 'c').x).toBe(160)
+    press(card(host, 'c'), 'ArrowRight', true)
+    press(card(host, 'c'), 'ArrowUp', true)
+    await host.updateComplete
+    expect([card(host, 'c').x, card(host, 'c').y]).toEqual([192, 288])
+    const alt = new KeyboardEvent('keydown', {
+      altKey: true,
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key: 'ArrowRight',
+    })
+    card(host, 'c').shadowRoot?.querySelector('[part="node"]')?.dispatchEvent(alt)
+    await host.updateComplete
+    // The right edge from 392 to the line at 416.
+    expect((card(host, 'c') as Card & { width: number }).width).toBe(224)
+  })
+
+  test('a card carried to the edge of the board moves the board under it, until it is let go', async () => {
+    const host = await canvas()
+    const viewport = part(host, 'viewport') as HTMLElement
+    /* happy-dom measures nothing, so the box is given. */
+    viewport.getBoundingClientRect = () =>
+      ({ bottom: 300, height: 300, left: 0, right: 400, top: 0, width: 400, x: 0, y: 0 }) as DOMRect
+    const box = card(host, 'c').shadowRoot?.querySelector('[part="node"]') as HTMLElement
+    const before = (host as unknown as { view: { x: number } }).view.x
+    box.dispatchEvent(pointer('pointerdown', { x: 200, y: 150 }))
+    viewport.dispatchEvent(pointer('pointermove', { x: 399, y: 150 }))
+    await new Promise((done) => setTimeout(done, 120))
+    await host.updateComplete
+    // From 130 by the hand's 199, and further by however far the board moved.
+    const moved = card(host, 'c').x
+    expect(moved).toBeGreaterThan(329)
+    expect((host as unknown as { view: { x: number } }).view.x).toBeGreaterThan(before)
+    viewport.dispatchEvent(pointer('pointerup', { x: 399, y: 150 }))
+    await new Promise((done) => setTimeout(done, 80))
+    expect(card(host, 'c').x).toBe(moved)
+  })
 })
 
 /**
@@ -922,6 +975,86 @@ describe('canvas api', () => {
     await host.updateComplete
     await host.updateComplete
     expect(hasState(card(host, 'c'), 'target')).toBe(false)
+  })
+})
+
+/**
+ * What a key changes that a reader cannot see, said in the live region, and
+ * a selection said on what is selected.
+ */
+describe('canvas says what a key did', () => {
+  type Said = Canvas & { selected: string; zoom(by: number): void }
+
+  const said = (host: Canvas): string =>
+    (part(host, 'live')?.textContent ?? '').replace(/ /g, '').trim()
+
+  const key = (on: Card, init: KeyboardEventInit): void => {
+    on.shadowRoot
+      ?.querySelector('[part="node"]')
+      ?.dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, ...init }),
+      )
+  }
+
+  test('a card moved by keys says where it is now, and one resized says its size', async () => {
+    const host = await canvas()
+    press(card(host, 'c'), 'ArrowRight', true)
+    await host.updateComplete
+    expect(said(host)).toBe('Third moved to 146, 300')
+    key(card(host, 'c'), { altKey: true, key: 'ArrowDown' })
+    await host.updateComplete
+    expect(said(host)).toBe('Third resized to 200 by 116')
+  })
+
+  test('a move the page refuses is not said', async () => {
+    const host = await canvas()
+    host.addEventListener('helix-before-move', (event) => event.preventDefault())
+    press(card(host, 'c'), 'ArrowRight', true)
+    await host.updateComplete
+    expect(said(host)).toBe('')
+  })
+
+  test('the selection is counted when it grows or shrinks, and not when a key lands on a card', async () => {
+    const host = (await canvas()) as Said
+    card(host, 'a').focus()
+    await host.updateComplete
+    expect(host.selected).toBe('a')
+    expect(said(host)).toBe('')
+    press(card(host, 'b'), ' ')
+    await host.updateComplete
+    expect(said(host)).toBe('2 selected')
+    key(card(host, 'b'), { ctrlKey: true, key: 'a' })
+    await host.updateComplete
+    expect(said(host)).toBe('6 selected')
+    press(card(host, 'b'), 'Escape')
+    await host.updateComplete
+    expect(said(host)).toBe('0 selected')
+  })
+
+  test('a selected card and a selected connection say so when a reader arrives', async () => {
+    const host = (await canvas('selected-label="chosen"')) as Said
+    host.selected = 'a,e2'
+    await host.updateComplete
+    await host.updateComplete
+    const about = card(host, 'a').shadowRoot?.querySelector('#about')
+    expect(about?.textContent).toBe('chosen, leads to Second')
+    expect(
+      card(host, 'a').shadowRoot?.querySelector('[part="node"]')?.getAttribute('aria-describedby'),
+    ).toBe('about')
+    expect(connection(host, 'edge:e2').getAttribute('aria-description')).toBe('chosen, then')
+    expect(card(host, 'b').shadowRoot?.querySelector('#about')?.textContent).toBe(
+      'leads to Third; from First',
+    )
+  })
+
+  test('a zoom from a key or a button says the zoom as a percentage', async () => {
+    const host = (await canvas()) as Said
+    host.zoom(1)
+    await host.updateComplete
+    expect(said(host)).toBe('Zoom 125%')
+    host.zoom(-1)
+    await host.updateComplete
+    expect(said(host)).toBe('Zoom 100%')
   })
 })
 
