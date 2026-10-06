@@ -13,6 +13,7 @@ export {
   ChartPointerController,
   type ChartPointerHost,
 } from './controllers/chart-pointer-controller/chart-pointer-controller.js'
+export { ChildrenController } from './controllers/children-controller/children-controller.js'
 export {
   CommandController,
   type CommandOptions,
@@ -336,6 +337,7 @@ export {
 } from './mixins/mixin-viewport/mixin-viewport.js'
 export { anchorElement } from './utils/anchor-element/anchor-element.js'
 export { arrowReach, sideOf } from './utils/arrow/arrow.js'
+export { assignSlots } from './utils/assign-slots/assign-slots.js'
 export {
   addDays,
   addMonths,
@@ -500,7 +502,7 @@ export {
   USAGE_SLOT,
   VERSIONS_SLOT,
 } from './utils/report-usage/report-usage.js'
-export { reportValues } from './utils/report-values/report-values.js'
+export { type ReportValuesOptions, reportValues } from './utils/report-values/report-values.js'
 export {
   type ChangeRequestOptions,
   requestChange,

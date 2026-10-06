@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import type { Placement as FloatingPlacement } from '@floating-ui/dom'
-import { FloatingController, type Placement } from './floating-controller.js'
+import { FloatingController, matchedInlineSize, type Placement } from './floating-controller.js'
 
 /** A host standing in for a Lit element, which only has to collect controllers. */
 const host = () => {
@@ -91,5 +91,19 @@ describe('the placements this controller takes', () => {
       'top-start': 'top-start',
     }
     expect(Object.keys(EVERY)).toHaveLength(12)
+  })
+})
+
+describe('the width of a panel that matches its anchor', () => {
+  test('is the width of the anchor wherever the panel has the room', () => {
+    expect(matchedInlineSize(300.4, 792)).toBe(300)
+  })
+
+  test('is the room where the anchor is wider, so the list of a full-width trigger keeps the margins', () => {
+    expect(matchedInlineSize(900, 884)).toBe(884)
+  })
+
+  test('is never below nothing, where the window leaves no room', () => {
+    expect(matchedInlineSize(300, -20)).toBe(0)
   })
 })
