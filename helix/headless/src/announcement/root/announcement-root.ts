@@ -267,7 +267,15 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
   }
 
   private readonly handleRelease = (event: Event): void => {
-    this.focused &&= event.type !== 'focusout'
+    /* Asked a moment later, once focus has landed. Chromium 151 sends
+       `focusout` to a band being removed with focus inside, before its
+       `disconnectedCallback`, which then thought focus had already left and
+       gave none back. */
+    if (event.type === 'focusout') {
+      queueMicrotask(() => {
+        this.focused = this.matches(':focus-within')
+      })
+    }
     this.countdown.release()
   }
 
@@ -299,8 +307,8 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
     /* The countdown lets every hold go as the host leaves, the hidden page's
        among them. Removed with focus inside, after the key moved it in: focus goes back
        where the key found it, a frame later, so a neighbor the dismissal
-       handed focus to keeps it. A removal fires no `focusout`, so `focused`
-       still says where focus was. */
+       handed focus to keeps it. `focused` still says where focus was, since
+       a `focusout` the removal sends is read only after this. */
     const origin = this.focused ? this.origin : undefined
     this.focused = false
     this.origin = undefined
