@@ -1,0 +1,32 @@
+export function Example() {
+  return (
+    <helix-breadcrumbs
+      aria-label="Breadcrumb"
+      separation="outlined"
+    >
+      <helix-breadcrumb href="#acme">acme</helix-breadcrumb>
+
+      {/* The label is a link. The button in the `end` slot opens a menu of projects. */}
+      <helix-breadcrumb href="#design-system">
+        design-system
+        <helix-menu
+          label="Switch project"
+          slot="end"
+        >
+          <helix-icon-button
+            emphasis="ghost"
+            label="Switch project"
+            slot="trigger"
+          >
+            <helix-icon name="caret-down"></helix-icon>
+          </helix-icon-button>
+          <helix-menu-item href="#design-system">design-system</helix-menu-item>
+          <helix-menu-item href="#marketing-site">marketing-site</helix-menu-item>
+          <helix-menu-item href="#docs">docs</helix-menu-item>
+        </helix-menu>
+      </helix-breadcrumb>
+
+      <helix-breadcrumb current>Settings</helix-breadcrumb>
+    </helix-breadcrumbs>
+  )
+}

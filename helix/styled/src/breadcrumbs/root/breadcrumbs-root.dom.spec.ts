@@ -90,6 +90,8 @@ describe('breadcrumbs', () => {
     // A fallback written across lines keeps its line breaks in the sheet.
     expect(sheet('helix-breadcrumbs')).toMatch(/var\(\s*--breadcrumbs-gap,/)
     expect(sheet('helix-breadcrumbs')).toMatch(/var\(\s*--breadcrumbs-font-size,/)
+    expect(sheet('helix-breadcrumbs')).toMatch(/var\(\s*--breadcrumbs-split-divider-color,/)
+    expect(sheet('helix-breadcrumbs')).toMatch(/var\(\s*--breadcrumbs-split-fill,/)
     for (const hook of [
       '--breadcrumbs-control-padding-inline',
       '--breadcrumbs-control-size',

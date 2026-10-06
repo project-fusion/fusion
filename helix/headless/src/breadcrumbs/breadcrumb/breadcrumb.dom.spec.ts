@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasState, mount, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -70,5 +70,33 @@ describe('the end slot, and why it is where it is', () => {
     const box = el.shadowRoot?.querySelector('[part="link"]')
     expect(box?.querySelector('slot[name="end"]')).toBeNull()
     expect(el.shadowRoot?.querySelector('slot[name="end"]')).not.toBeNull()
+  })
+})
+
+/* The state a stylesheet joins the two halves of a switcher on. */
+describe('the end state', () => {
+  test('is on while end holds something', async () => {
+    const el = await mount(
+      '<helix-headless-breadcrumb href="/a">Home<button slot="end">Switch</button></helix-headless-breadcrumb>',
+    )
+    expect(hasState(el, 'end')).toBe(true)
+  })
+
+  test('is off on a crumb with nothing after its label', async () => {
+    const el = await mount('<helix-headless-breadcrumb href="/a">Home</helix-headless-breadcrumb>')
+    expect(hasState(el, 'end')).toBe(false)
+  })
+
+  test('follows content that arrives after the first render', async () => {
+    const el = (await mount(
+      '<helix-headless-breadcrumb href="/a">Home</helix-headless-breadcrumb>',
+    )) as HTMLElement & { updateComplete: Promise<boolean> }
+    const later = document.createElement('button')
+    later.slot = 'end'
+    later.textContent = 'Switch'
+    el.append(later)
+    await el.updateComplete
+    await new Promise((resolve) => setTimeout(resolve))
+    expect(hasState(el, 'end')).toBe(true)
   })
 })
