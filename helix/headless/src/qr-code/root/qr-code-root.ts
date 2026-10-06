@@ -177,6 +177,13 @@ const pathFor = (
 @customElement('helix-headless-qr-code')
 export class HelixHeadlessQrCode extends HelixElement {
   /**
+   * The words a code with no `label` is named by, followed by its value where
+   * the value is a web address.
+   */
+  @property({ attribute: 'code-label' })
+  codeLabel = 'QR code'
+
+  /**
    * The error correction level, which sets how much of the code can be lost
    * and still scan.
    *
@@ -188,13 +195,6 @@ export class HelixHeadlessQrCode extends HelixElement {
    */
   @property({ attribute: 'correction' })
   correction?: QrCorrection
-
-  /**
-   * The words a code with no `label` is named by, followed by its value where
-   * the value is a web address.
-   */
-  @property({ attribute: 'code-label' })
-  codeLabel = 'QR code'
 
   /**
    * The image's accessible name: what the code is for, such as "Open the
