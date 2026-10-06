@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { partTag, ssr } from '@fusion.dev/helix-testing/ssr'
+import { partTag, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -27,8 +27,11 @@ describe('combobox server output', () => {
   test('a combobox answered by its options ships the hidden select a browser fills', () => {
     /* The text field is the filter, so it stays off, and the token goes on a
        hidden native select served with the page, before any script runs. */
-    const markup = ssr(
-      html`<helix-headless-combobox label="Country" autocomplete="country"></helix-headless-combobox>`,
+    const markup = rendered(
+      ssr(
+        html`<helix-headless-combobox label="Country" autocomplete="country"></helix-headless-combobox>`,
+      ),
+      'helix-headless-combobox',
     )
     expect(partTag(markup, 'control')).toContain('autocomplete="off"')
     expect(markup).toMatch(/<select[^>]*autocomplete="country"/)
