@@ -28,12 +28,26 @@ import { styles } from './description-list-root.css.js'
  * @aliases Data list, Key-value list, Details, Properties
  * @documentation https://fusion.dev/helix/components/description-list
  *
+ * **For a rule between pairs, set `divided`.** The rule sits in the middle of
+ * the gap, so the pairs keep the same room on either side of it.
+ *
  * @cssproperty --description-list-column-gap - The space between the column of labels and the column of values, with `direction="row"`.
+ * @cssproperty --description-list-divider-color - The color of the rule between pairs, with `divided`.
+ * @cssproperty --description-list-divider-width - The thickness of the rule between pairs, with `divided`.
  * @cssproperty --description-list-gap - Space between one pair and the next. The default is smaller with `direction="row"` than when stacked. Setting this property replaces both defaults.
+ * @cssproperty --description-list-label-width - The width of the column of labels, with `direction="row"`. Defaults to the width of the longest label; set a length such as `10rem` to line up several lists.
  */
 @customElement('helix-description-list')
 export class HelixDescriptionList extends HelixHeadlessDescriptionList {
   static override styles: CSSResultGroup = styles
+
+  /**
+   * Draws a rule between one pair and the next, in the middle of the gap, as
+   * a details panel with many rows often does. Off by default, where space
+   * alone separates the pairs.
+   */
+  @property({ reflect: true, type: Boolean })
+  divided = false
 
   /**
    * Where the values sit, beside their labels.
