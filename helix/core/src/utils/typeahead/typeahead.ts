@@ -102,3 +102,11 @@ export const typeaheadBy = <Item>(words: (item: Item) => string): TypeaheadBy<It
   search: new Typeahead(),
   words,
 })
+
+/**
+ * Turns on typeahead for a set whose items carry their own `words`, as List's
+ * rows, Tag Group's tags and Drilldown's items do. An item with none is
+ * passed over.
+ */
+export const typeaheadByWords = (): TypeaheadBy<{ readonly words?: string }> =>
+  typeaheadBy((item) => item.words ?? '')

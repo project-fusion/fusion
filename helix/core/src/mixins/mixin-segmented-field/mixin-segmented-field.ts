@@ -20,13 +20,11 @@ import {
   shownValue,
 } from '../../utils/date-segments/date-segments.js'
 import { inlineStep } from '../../utils/inline-step/inline-step.js'
+import { verdictFlags } from '../../utils/verdict-flags/verdict-flags.js'
 import type { MixinControllerOpenInterface } from '../mixin-controller-open/mixin-controller-open.js'
 import type { MixinControllerValueInterface } from '../mixin-controller-value/mixin-controller-value.js'
 import type { MixinFieldInterface } from '../mixin-field/mixin-field.js'
-import {
-  type MixinPickerFieldInterface,
-  verdictFlags,
-} from '../mixin-picker-field/mixin-picker-field.js'
+import type { MixinPickerFieldInterface } from '../mixin-picker-field/mixin-picker-field.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
 type Constructor<T> = new (...args: any[]) => T

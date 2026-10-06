@@ -259,8 +259,11 @@ export const reactPropFor = (event: Event): string | undefined => {
  * names are the ones `Video` relays from its inner `<video>`; `scrollend` is
  * `Scroll Area`'s. A single word needs no entry: its first letter is the whole
  * of the rule.
+ *
+ * `@fusion.dev/helix-cem` keeps the same table for the typings it writes, and
+ * its spec holds that copy to this one.
  */
-const REACT_CASING: Readonly<Record<string, string>> = {
+export const REACT_CASING: Readonly<Record<string, string>> = {
   canplay: 'onCanPlay',
   canplaythrough: 'onCanPlayThrough',
   durationchange: 'onDurationChange',

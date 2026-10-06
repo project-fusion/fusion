@@ -38,9 +38,10 @@ const platformType = (types: Set<string> | undefined): string => {
  * **The same table as `reactNativeProp` in core**, which is what the element
  * binds on a hydrated page, so the typings offer the prop that is bound. Kept
  * here as well because this package is a build tool core depends on, and the
- * dependency cannot run the other way. Each side's spec lists the names.
+ * dependency cannot run the other way. This package's spec reads core's table
+ * from its source and holds the two to each other.
  */
-const REACT_CASING: Readonly<Record<string, string>> = {
+export const REACT_CASING: Readonly<Record<string, string>> = {
   canplay: 'onCanPlay',
   canplaythrough: 'onCanPlayThrough',
   durationchange: 'onDurationChange',

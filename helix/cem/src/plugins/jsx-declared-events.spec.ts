@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { jsxDeclaredEvents } from './jsx-declared-events.js'
+import { jsxDeclaredEvents, REACT_CASING } from './jsx-declared-events.js'
 
 /**
  * The plugin rewrites a file the generator wrote, so the test writes one.
@@ -120,5 +120,16 @@ describe('handlers for events the manifest declares', () => {
     const next = scene(BAG, ['play', 'ended', 'close'])
     const order = ['onClose', 'onEnded', 'onPlay'].map((name) => next.indexOf(name))
     expect(order).toEqual([...order].sort((a, b) => a - b))
+  })
+})
+
+/* The element binds the prop core's table names on a hydrated page, so the
+   typings must offer the same one. Core is read from its source by path: this
+   package is a build tool core depends on, so it cannot import core. */
+describe('the React casing', () => {
+  test('is the table core binds by', async () => {
+    const bridge = join(import.meta.dir, '../../../core/src/helix-element/react-bridge.ts')
+    const core = (await import(bridge)) as { REACT_CASING: Record<string, string> }
+    expect(REACT_CASING).toEqual(core.REACT_CASING)
   })
 })
