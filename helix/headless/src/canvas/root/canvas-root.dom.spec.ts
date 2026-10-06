@@ -906,6 +906,70 @@ describe('canvas connections and removal', () => {
     }
     expect(card(host, 'c').current).toBe(true)
   })
+})
+
+/**
+ * A card the page takes away while a reader is on it, outside the Delete flow:
+ * a filter, another person's edit, an undo. Map refocuses a neighbor the same
+ * way. Measured before this: focus fell to the page's body.
+ */
+describe('a focused card the page removes', () => {
+  const turns = async (host: Canvas): Promise<void> => {
+    for (let turn = 0; turn < 4; turn++) {
+      await new Promise((settle) => setTimeout(settle, 0))
+      await host.updateComplete
+    }
+  }
+
+  test('hands focus to the next card', async () => {
+    const host = await canvas()
+    card(host, 'b').focus()
+    expect(document.activeElement).toBe(card(host, 'b'))
+    card(host, 'b').remove()
+    await turns(host)
+    expect(document.activeElement).toBe(card(host, 'c'))
+    expect(card(host, 'c').current).toBe(true)
+  })
+
+  test('to the one before where it was the last', async () => {
+    const host = await canvas()
+    card(host, 'c').focus()
+    card(host, 'c').remove()
+    await turns(host)
+    expect(document.activeElement).toBe(card(host, 'b'))
+  })
+
+  test('and to the board where none is left', async () => {
+    const host = await canvas(
+      '',
+      '<helix-headless-canvas-node name="a" x="0" y="0" width="200" height="100">First</helix-headless-canvas-node>',
+    )
+    card(host, 'a').focus()
+    card(host, 'a').remove()
+    await turns(host)
+    expect(document.activeElement).toBe(host)
+    expect(host.shadowRoot?.activeElement).toBe(part(host, 'region'))
+  })
+
+  test('leaves focus where it is when the reader had already gone elsewhere', async () => {
+    const host = await canvas()
+    const elsewhere = document.createElement('button')
+    document.body.append(elsewhere)
+    card(host, 'b').focus()
+    elsewhere.focus()
+    card(host, 'b').remove()
+    await turns(host)
+    expect(document.activeElement).toBe(elsewhere)
+    elsewhere.remove()
+  })
+
+  test('and a card removed while another has focus moves nothing', async () => {
+    const host = await canvas()
+    card(host, 'a').focus()
+    card(host, 'c').remove()
+    await turns(host)
+    expect(document.activeElement).toBe(card(host, 'a'))
+  })
 
   test('a read-only board asks for nothing and draws no handles', async () => {
     const host = await canvas('readonly')
