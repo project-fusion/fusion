@@ -1,18 +1,15 @@
 import {
   customElement,
   drawStatus,
-  formatNumber,
   HelixCompleteEvent,
   HelixElement,
   hostAria,
+  readingText,
   StatusController,
   slottedWords,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-
-/** A whole percentage, which a reading is written as where nothing else is asked. */
-const WHOLE_PERCENT: Intl.NumberFormatOptions = { maximumFractionDigits: 0, style: 'percent' }
 
 /**
  * @summary A bar or ring that shows how far along a task is.
@@ -270,16 +267,14 @@ export class HelixHeadlessProgress extends HelixElement {
    * anything else.
    */
   private get text(): string {
-    const options = this.formatOptions
     return (
       this.valueText ||
-      (options && options.style !== 'percent'
-        ? formatNumber(
-            Math.min(Math.max(this.value, this.range.min), this.range.max),
-            this.locale,
-            options,
-          )
-        : formatNumber(this.fraction, this.locale, options ?? WHOLE_PERCENT))
+      readingText(
+        Math.min(Math.max(this.value, this.range.min), this.range.max),
+        this.fraction,
+        this.locale,
+        this.formatOptions,
+      )
     )
   }
 

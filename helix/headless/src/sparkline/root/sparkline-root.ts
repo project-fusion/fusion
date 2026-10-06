@@ -4,6 +4,7 @@ import {
   type Curve,
   customElement,
   extent,
+  extremesOf,
   formatNumbers,
   HelixElement,
   linear,
@@ -18,7 +19,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-import { areaPath, extremesOf, overviewWords, readingWords, slotsOf } from '../readings.js'
+import { areaPath, overviewWords, readingWords, slotsOf } from '../readings.js'
 
 /**
  * How tall the strip is drawn, which is the one coordinate this family states.

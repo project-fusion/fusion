@@ -1,19 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { areaPath, extremesOf, overviewWords, readingWords, slotsOf } from './readings.js'
-
-describe('the highest and the lowest reading', () => {
-  test('are found by place, the first where several tie', () => {
-    expect(extremesOf([3, 9, 1, 9, 1])).toEqual({ high: 1, low: 2 })
-  })
-
-  test('pass over a blank slot', () => {
-    expect(extremesOf([undefined, 4, undefined, 2])).toEqual({ high: 1, low: 3 })
-  })
-
-  test('are none in a list with nothing in it', () => {
-    expect(extremesOf([undefined])).toEqual({})
-  })
-})
+import { areaPath, overviewWords, readingWords, slotsOf } from './readings.js'
 
 describe('a reading in words', () => {
   test('is the row, the reading and where it stands', () => {
