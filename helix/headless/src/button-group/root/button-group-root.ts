@@ -12,7 +12,9 @@ import { property } from 'lit/decorators.js'
  *
  * The group does not manage focus, so each button keeps its own tab stop. For
  * one tab stop with arrow keys between the buttons, the APG toolbar pattern,
- * use Toolbar.
+ * use Toolbar. For buttons that stay pressed, one of a set or several, use
+ * Toggle Group, which is a `radiogroup` or a set of `aria-pressed` buttons and
+ * takes part in a form.
  *
  * Buttons are slotted, so they stay your own elements and keep their own
  * appearance and size.
