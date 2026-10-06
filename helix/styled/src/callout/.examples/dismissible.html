@@ -1,0 +1,21 @@
+<!-- @summary A dismissible callout sends `helix-dismiss`, and the page removes it. Focus moves on to the next control. -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-callout
+    dismissible
+    id="tip"
+    tone="neutral"
+  >
+    <span slot="heading">Tip</span>
+    Press the slash key to search from anywhere.
+  </helix-callout>
+  <helix-button>Open settings</helix-button>
+</helix-flex>
+
+<script type="module">
+  document.getElementById('tip').addEventListener('helix-dismiss', (event) => {
+    event.currentTarget.remove()
+  })
+</script>

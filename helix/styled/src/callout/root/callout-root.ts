@@ -19,8 +19,10 @@ import { styles } from './callout-root.css.js'
  * bar, `outlined` an edge with no fill, and `plain` the bar and the mark alone.
  *
  * The inset and the type follow `data-density`, as the controls around a
- * callout do: set it on a region for tighter or looser callouts, or set
- * `--callout-padding` and `--callout-font-size` on one.
+ * callout do: set it on a region for tighter or looser callouts, or on one
+ * callout itself, as `<helix-callout data-density="sm">`. That is how one
+ * callout is sized, and there is no `size` beside it. `--callout-padding` and
+ * `--callout-font-size` set either to a value of your own.
  *
  * @since 0.1.0
  * @status stable

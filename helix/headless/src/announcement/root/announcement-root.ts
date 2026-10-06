@@ -42,8 +42,11 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * Set `duration` to dismiss it after a time. The clock stops while the pointer
  * or focus is on the announcement, and continues from what was left, so a
- * reader partway through is not cut off. When the time runs out it sends
- * `helix-dismiss`, as the button does.
+ * reader partway through is not cut off. It stops while the page is hidden too,
+ * in another tab or a minimized window, so the message is not spent where
+ * nobody can see it. While the clock is stopped the announcement carries
+ * `:state(paused)`. When the time runs out it sends `helix-dismiss`, as the
+ * button does.
  *
  * @since 0.1.0
  * @status stable
@@ -53,15 +56,18 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @slot - The message.
  * @slot actions - Actions for the message, usually a link or a button.
- * @slot icon - Replaces the icon inside the dismiss button.
+ * @slot dismiss-icon - Replaces the cross inside the dismiss button, as `Callout`'s slot of the same name does.
+ * @slot icon - Replaces the cross inside the dismiss button. Deprecated: use `dismiss-icon`, which is read first.
  *
  * @event {HelixDismissEvent} helix-dismiss - The dismiss button was pressed, or `duration` ran out. The announcement does not remove itself, so remove it in response. Cancelable.
  *
  * @csspart actions - The region after the message that holds the actions.
  * @csspart content - The region that holds the message.
  * @csspart dismiss - The button that dismisses the announcement.
- * @csspart dismiss-mark - The icon on the dismiss button, shown when the `icon` slot is empty.
+ * @csspart dismiss-mark - The cross on the dismiss button, shown when the `dismiss-icon` and `icon` slots are empty.
  * @csspart live - A copy of the message in a live region, read by screen readers when the announcement appears after the page has loaded, and emptied seven seconds later. Visually hidden in the styled tier.
+ *
+ * @cssstate paused - The clock `duration` started is stopped, while the pointer or focus is on the announcement or the page is hidden.
  */
 @customElement('helix-headless-announcement')
 export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
@@ -112,7 +118,26 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
     done: () => {
       this.dismiss()
     },
+    paused: (paused) => {
+      this.toggleState('paused', paused)
+    },
   })
+
+  /** Whether the page being hidden is one of the reasons the clock is held. */
+  private heldHidden = false
+
+  /* A hidden page holds the clock as a pointer does, so a timed message is
+     not spent in a background tab. Counted once, however often the page
+     hides. */
+  private readonly handleVisibility = (): void => {
+    if (document.hidden && !this.heldHidden) {
+      this.heldHidden = true
+      this.countdown.hold()
+    } else if (!document.hidden && this.heldHidden) {
+      this.heldHidden = false
+      this.countdown.release()
+    }
+  }
 
   /* Hover and focus hold the clock, counted by the countdown. On the host,
      because the announcement's regions are its children, with no box around
@@ -131,9 +156,11 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
     this.addEventListener('mouseleave', this.handleRelease)
     this.addEventListener('focusin', this.handleHold)
     this.addEventListener('focusout', this.handleRelease)
+    document.addEventListener('visibilitychange', this.handleVisibility)
     /* The clock again after a move, from what was left of it. */
     if (this.hasUpdated) {
       this.countdown.resume()
+      this.handleVisibility()
     }
   }
 
@@ -143,6 +170,9 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
     this.removeEventListener('mouseleave', this.handleRelease)
     this.removeEventListener('focusin', this.handleHold)
     this.removeEventListener('focusout', this.handleRelease)
+    document.removeEventListener('visibilitychange', this.handleVisibility)
+    /* The countdown lets every hold go as the host leaves. */
+    this.heldHidden = false
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
@@ -151,6 +181,7 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
        and started only once: the clock belongs to this announcement's life on
        screen. */
     this.countdown.start(this.duration)
+    this.handleVisibility()
   }
 
   protected override updated(changed: PropertyValues): void {
@@ -190,11 +221,15 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
    * draws a tone mark. An announcement has no tone mark at all.
    */
   protected renderDismissIcon(): TemplateResult {
-    return html`<slot name="icon">
-      <svg part="dismiss-mark" viewBox=${x.viewBox} fill="currentColor" aria-hidden="true">
-        ${unsafeSVG(x.content)}
-      </svg>
-    </slot>`
+    /* `dismiss-icon` first, `Callout`'s name for the same slot, and the old
+       `icon` inside it, so a page that slots either gets its glyph. */
+    return html`<slot name="dismiss-icon"
+      ><slot name="icon">
+        <svg part="dismiss-mark" viewBox=${x.viewBox} fill="currentColor" aria-hidden="true">
+          ${unsafeSVG(x.content)}
+        </svg>
+      </slot></slot
+    >`
   }
 
   protected override render(): TemplateResult {
