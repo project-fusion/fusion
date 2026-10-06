@@ -483,24 +483,35 @@ describe('the active row as a path', () => {
 /* A windowed tree whose active row is out of the window drew no row with
    `tabindex="0"`, so Tab back into it found no row to land on. */
 describe('a windowed tree whose active row is not drawn', () => {
+  /* The tree gets a height of its own, so a browser draws a window of a few
+     rows, as happy-dom does without layout: unbounded, a browser lays out
+     every row and the active one is always drawn. */
   test('is a stop itself, and hands focus on to the active row', async () => {
-    const host = (await inspector(
-      'windowed',
-      Array.from({ length: 2000 }, (_, at) => at),
-    )) as Pathed
-    host.active = '/1500'
-    await host.updateComplete
-    await host.updateComplete
-    expect(rows(host).some((row) => row.dataset.index === '1501')).toBe(false)
-    expect(tree(host).getAttribute('tabindex')).toBe('0')
-    tree(host).focus()
-    for (let turn = 0; turn < 10; turn++) {
+    const sheet = document.createElement('style')
+    sheet.textContent =
+      'helix-headless-object-inspector::part(tree) { block-size: 200px; overflow: auto }'
+    document.head.append(sheet)
+    try {
+      const host = (await inspector(
+        'windowed',
+        Array.from({ length: 2000 }, (_, at) => at),
+      )) as Pathed
+      host.active = '/1500'
       await host.updateComplete
-      await new Promise((done) => setTimeout(done, 0))
+      await host.updateComplete
+      expect(rows(host).some((row) => row.dataset.index === '1501')).toBe(false)
+      expect(tree(host).getAttribute('tabindex')).toBe('0')
+      tree(host).focus()
+      for (let turn = 0; turn < 10; turn++) {
+        await host.updateComplete
+        await new Promise((done) => setTimeout(done, 0))
+      }
+      const focused = host.shadowRoot?.activeElement as HTMLElement | null
+      expect(focused?.dataset.index).toBe('1501')
+      expect(tree(host).hasAttribute('tabindex')).toBe(false)
+    } finally {
+      sheet.remove()
     }
-    const focused = host.shadowRoot?.activeElement as HTMLElement | null
-    expect(focused?.dataset.index).toBe('1501')
-    expect(tree(host).hasAttribute('tabindex')).toBe(false)
   })
 
   test('is not a stop while the active row is drawn', async () => {
