@@ -1,11 +1,12 @@
 import {
   AriaForwardController,
+  closestInstance,
   customElement,
   HelixElement,
   inlineStep,
   keyClaimed,
 } from '@fusion.dev/helix-core'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /** Keys the toolbar handles, per the APG toolbar pattern. */
@@ -55,10 +56,24 @@ const takesFocus = (node: Element): boolean => {
   )
 }
 
+/**
+ * A composite whose members the toolbar walks one by one: a toggle group of
+ * pressed buttons, whose stop follows focus. A radio group stays one stop,
+ * its arrows choosing as they move.
+ */
+const flattens = (node: HTMLElement): node is HTMLElement & { focusable: boolean } =>
+  ownsTabStop(node) &&
+  (node as HTMLElement & { selectionMode?: unknown }).selectionMode === 'multiple'
+
 /** What the toolbar moves to for one of its children. */
 interface Control {
-  /** The child itself, which is what the toolbar holds. */
+  /**
+   * The child itself, which is what the toolbar holds, or one member of a
+   * group the toolbar walks through.
+   */
   child: HTMLElement
+  /** The group a walked-through member belongs to, which holds its stop. */
+  group?: HTMLElement & { focusable: boolean }
   /**
    * The elements inside the child that take focus. One for a control or for a
    * wrapper such as a menu around its trigger, and more than one for a nested
@@ -88,11 +103,20 @@ interface Control {
  * The arrows wrap from the last control to the first. Set `stop-at-ends` to
  * keep them at the ends, as Radix's `loop` set to false does.
  *
- * A nested composite, such as a toggle group, is one stop on the toolbar's
- * axis: the toolbar's arrows move past it, and the arrows across the toolbar
- * move inside it. A composite with a `focusable` property, as Toggle Group
- * has, gives up its own tab stop while the toolbar's is elsewhere, so Tab
- * stops once in the toolbar. A composite without one keeps its own tab stop.
+ * A toggle group of pressed buttons, `selection-mode="multiple"`, is walked
+ * through the same way, each toggle a stop on the toolbar's axis, as React
+ * Aria's toolbar walks its toggle buttons. Another nested composite, such as a
+ * radio-style toggle group, is one stop on the toolbar's axis: the toolbar's
+ * arrows move past it, and the arrows across the toolbar move inside it. A
+ * composite with a `focusable` property, as Toggle Group has, gives up its own
+ * tab stop while the toolbar's is elsewhere, so Tab stops once in the
+ * toolbar. A composite without one keeps its own tab stop.
+ *
+ * A toolbar inside another toolbar, a Helix one or the page's own
+ * `role="toolbar"`, is a `group` of the outer one, as React Aria's is: the
+ * outer toolbar's arrows walk through its controls and on past them, and it
+ * takes no keys and no tab stop of its own. A server renders it as a toolbar,
+ * having no parent to read, until it upgrades.
  *
  * @since 0.1.0
  * @status stable
@@ -164,7 +188,14 @@ export class HelixHeadlessToolbar extends HelixElement {
         continue
       }
       if (takesFocus(child)) {
-        controls.push({ child, stops: this.inside(child) })
+        const stops = this.inside(child)
+        if (stops.length > 1 && flattens(child)) {
+          for (const stop of stops) {
+            controls.push({ child: stop, group: child, stops: [stop] })
+          }
+          continue
+        }
+        controls.push({ child, stops })
         continue
       }
       /* A wrapper that takes no focus, a button group or a menu around its
@@ -234,6 +265,13 @@ export class HelixHeadlessToolbar extends HelixElement {
       this.wroteForeign = true
     }
     for (const control of this.controls) {
+      /* A walked-through group's own roving decides which member holds the
+         stop, following focus, so the toolbar only says whether it is the
+         group's. */
+      if (control.group) {
+        control.group.focusable = control.group === active?.group
+        continue
+      }
       if (control.stops.length !== 1) {
         /* A nested composite that owns its tab stop gives it up while the
            toolbar's is elsewhere. One that does not keeps its own. */
@@ -260,6 +298,9 @@ export class HelixHeadlessToolbar extends HelixElement {
    * write the very attribute this exists to avoid.
    */
   private async claimTabStop(): Promise<void> {
+    if (this.nested) {
+      return
+    }
     const pending = [...new Set([...this.children].map((child) => child.localName))].filter(
       (name) => name.includes('-'),
     )
@@ -273,6 +314,9 @@ export class HelixHeadlessToolbar extends HelixElement {
   }
 
   private readonly handleFocusIn = (event: FocusEvent): void => {
+    if (this.nested) {
+      return
+    }
     const control = this.origin(event)
     if (control) {
       this.setTabStop(control)
@@ -293,8 +337,14 @@ export class HelixHeadlessToolbar extends HelixElement {
    * the stop hands it to the first one left.
    */
   private readonly restoreTabStop = (): void => {
+    if (this.nested) {
+      return
+    }
     const controls = this.controls
     const held = controls.some((control) => {
+      if (control.group) {
+        return control.group.focusable
+      }
       const composite = control.stops.length !== 1
       const element = composite ? control.child : (control.stops[0] as HTMLElement)
       if (ownsTabStop(element)) {
@@ -306,6 +356,23 @@ export class HelixHeadlessToolbar extends HelixElement {
     if (controls.length > 0 && !held) {
       this.setTabStop(controls[0], false)
     }
+  }
+
+  /**
+   * Whether this toolbar sits inside another, which then owns the keys and the
+   * tab stop: a toolbar inside a toolbar held the reader's arrows inside it.
+   * Read when it renders and when it connects, there being no parent on a
+   * server.
+   */
+  private get nested(): boolean {
+    const parent = this.parentElement
+    if (!parent) {
+      return false
+    }
+    return (
+      closestInstance(parent, HelixHeadlessToolbar) !== null ||
+      parent.closest('[role="toolbar"]') !== null
+    )
   }
 
   /**
@@ -327,8 +394,11 @@ export class HelixHeadlessToolbar extends HelixElement {
    * move inside the composite.
    */
   private readonly handleCompositeKeydown = (event: KeyboardEvent): void => {
+    if (this.nested) {
+      return
+    }
     const control = this.origin(event)
-    if (!control || control.stops.length === 1) {
+    if (!control || (control.stops.length === 1 && !control.group)) {
       return
     }
     this.handleKeydown(event)
@@ -338,7 +408,7 @@ export class HelixHeadlessToolbar extends HelixElement {
   }
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {
-    if (!KEYS.has(event.key) || keyClaimed(event)) {
+    if (this.nested || !KEYS.has(event.key) || keyClaimed(event)) {
       return
     }
     /* Along the line on a horizontal toolbar, so the forward key is the left on
@@ -384,6 +454,8 @@ export class HelixHeadlessToolbar extends HelixElement {
 
   override connectedCallback(): void {
     super.connectedCallback()
+    /* Moved into or out of another toolbar, so the role is read again. */
+    this.requestUpdate()
     this.addEventListener('keydown', this.handleCompositeKeydown, true)
     this.addEventListener('keydown', this.handleKeydown)
     this.addEventListener('focusin', this.handleFocusIn)
@@ -414,7 +486,13 @@ export class HelixHeadlessToolbar extends HelixElement {
   }
 
   protected override render(): TemplateResult {
-    return html`<div part="toolbar" role="toolbar" aria-label=${this.label} aria-orientation=${this.axis}>
+    const nested = this.nested
+    return html`<div
+      part="toolbar"
+      role=${nested ? 'group' : 'toolbar'}
+      aria-label=${this.label}
+      aria-orientation=${nested ? nothing : this.axis}
+    >
       <slot @slotchange=${() => this.claimTabStop()}></slot>
     </div>`
   }
