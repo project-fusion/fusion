@@ -6,6 +6,7 @@
  * carries the glyphs it uses. The family's entry registers the whole set.
  */
 export {
+  type IconLibraryOptions,
   type IconResolver,
   registerIconLibrary,
   registerIcons,

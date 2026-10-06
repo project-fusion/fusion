@@ -123,7 +123,24 @@ describe('key-labels', () => {
     expect(await onPlatform(OTHER_AGENT, async () => label(await kbd(attrs)))).toBe(
       'Command+Return',
     )
-    expect(await onPlatform(APPLE_AGENT, async () => label(await kbd(attrs)))).toBe('CommandReturn')
+    expect(await onPlatform(APPLE_AGENT, async () => label(await kbd(attrs)))).toBe(
+      'Command-Return',
+    )
+  })
+
+  /* On an Apple keyboard the keys ran together, glyph or word, so a word
+     from the page read "CommandK key". */
+  test('joins a word to the next key with a hyphen on an Apple keyboard', async () => {
+    const attrs = `key-labels='{"mod":"Command","k":"K key"}' keys="mod+k"`
+    expect(await onPlatform(APPLE_AGENT, async () => label(await kbd(attrs)))).toBe('Command-K key')
+    expect(await onPlatform(APPLE_AGENT, async () => label(await kbd('keys="mod+shift+p"')))).toBe(
+      '⌘⇧P',
+    )
+  })
+
+  test('takes labels that do not parse as none', async () => {
+    const host = await onPlatform(OTHER_AGENT, () => kbd(`key-labels='{"mod":' keys="mod+k"`))
+    expect(label(host)).toBe('Ctrl+K')
   })
 })
 
@@ -191,6 +208,42 @@ describe('a key that binds', () => {
 
   test('and the same chord bound to the document leaves the typing alone', async () => {
     expect((await inField('keys="/" within="document"')).heard).toBe(0)
+  })
+
+  /* A shortcut that only told the page it was pressed: focusing the search
+     field `/` stands for took a script on every page. */
+  test('activate focuses or presses the control `for` names', async () => {
+    const host = await kbd('keys="/" within="control" for="search" activate="focus"')
+    const field = document.createElement('input')
+    field.id = 'search'
+    const button = document.createElement('button')
+    button.id = 'open'
+    ;(host.parentElement as HTMLElement).append(field, button)
+    press(host.parentElement as EventTarget, '/')
+    expect(document.activeElement).toBe(field)
+    let pressed = 0
+    button.addEventListener('click', () => {
+      pressed += 1
+    })
+    host.setAttribute('for', 'open')
+    host.setAttribute('activate', 'click')
+    await host.updateComplete
+    press(host.parentElement as EventTarget, '/')
+    expect(pressed).toBe(1)
+  })
+
+  test('and acts on nothing where a listener canceled the shortcut', async () => {
+    const host = await kbd('keys="/" within="control" for="open" activate="click"')
+    const button = document.createElement('button')
+    button.id = 'open'
+    ;(host.parentElement as HTMLElement).append(button)
+    let pressed = 0
+    button.addEventListener('click', () => {
+      pressed += 1
+    })
+    host.addEventListener('helix-shortcut', (event) => event.preventDefault())
+    press(host.parentElement as EventTarget, '/')
+    expect(pressed).toBe(0)
   })
 
   test('a chord a reader did not press goes to whoever wanted it', async () => {

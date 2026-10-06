@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 /* A set of tags as one control: a grid of rows with one tab stop, moved through
@@ -7,6 +7,13 @@ import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+})
+
+/* A spec that patches a prototype puts it back here. */
+let restore: (() => void) | undefined
+afterEach(() => {
+  restore?.()
+  restore = undefined
 })
 
 type Tag = HTMLElement & {
@@ -216,6 +223,34 @@ describe('a tag removed from a group', () => {
     expect(one.group.shadowRoot?.activeElement).toBe(empty)
     const internals = (one.group as unknown as { internals: ElementInternals }).internals
     expect(internals.role).toBe('group')
+  })
+
+  /* The core hand-off to the tab stop beside a lone dismissed element took
+     focus out of the group first, so the `empty` part was reached only on a
+     page with no other stop. happy-dom draws no boxes, so every element is
+     given one here for the hand-off to find the buttons. */
+  test('as the last one keeps focus in the group between other stops on the page', async () => {
+    const rects = HTMLElement.prototype.getClientRects
+    HTMLElement.prototype.getClientRects = function (this: HTMLElement) {
+      const drawn = rects.call(this)
+      return drawn.length > 0 ? drawn : ([{}] as unknown as DOMRectList)
+    }
+    restore = () => {
+      HTMLElement.prototype.getClientRects = rects
+    }
+    document.body.innerHTML =
+      '<button id="before">Before</button><helix-headless-tag-group label="Filters"><helix-headless-tag dismissible>Open</helix-headless-tag><span slot="empty">No filters</span></helix-headless-tag-group><button id="after">After</button>'
+    const host = document.querySelector('helix-headless-tag-group') as Group
+    await host.updateComplete
+    const open = host.querySelector('helix-headless-tag') as Tag
+    await open.updateComplete
+    host.addEventListener('helix-dismiss', (event) => (event.target as Tag).remove())
+    cell(open).focus()
+    press(open, 'Backspace')
+    await frame()
+    await host.updateComplete
+    expect(document.activeElement?.localName).toBe('helix-headless-tag-group')
+    expect(host.shadowRoot?.activeElement).toBe(part(host, 'empty'))
   })
 
   test('renders no `empty` part while there are tags', async () => {
