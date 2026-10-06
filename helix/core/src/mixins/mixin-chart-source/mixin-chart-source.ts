@@ -191,6 +191,11 @@ export declare class MixinChartSourceInterface {
    */
   showsColumn(cell: number): boolean
   /**
+   * The heading of the column at this place in a row, read from the first row
+   * that has a cell there, or `''` where none has.
+   */
+  columnName(cell: number): string
+  /**
    * The number of readings, which the pointer position maps onto.
    */
   get readings(): number
@@ -439,6 +444,15 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
     showsColumn(cell: number): boolean {
       const name = this.sourceRows[0]?.cells[cell]?.name
       return name === undefined || this.showsSeries(name)
+    }
+
+    /**
+     * The heading of the column at this place in a row: a cell's name is its
+     * column's heading, read from the first row that has a cell there, so a
+     * short first row does not lose the heading. `''` where no row has one.
+     */
+    columnName(cell: number): string {
+      return this.sourceRows.find((row) => row.cells[cell])?.cells[cell]?.name ?? ''
     }
 
     /** The number of readings, which the pointer position maps onto. */

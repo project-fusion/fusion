@@ -25,3 +25,18 @@ export const slotFilled = (slot: HTMLSlotElement | null | undefined): boolean =>
   (slot?.assignedNodes({ flatten: true }) ?? []).some(
     (node) => node.nodeType === Node.ELEMENT_NODE || node.textContent?.trim() !== '',
   )
+
+/**
+ * The slot of a name in a shadow root, or its default slot for `''`.
+ *
+ * `slot[name=""]` matches nothing, since the default slot has no `name`
+ * attribute at all, which is the one thing every hand-written lookup had to
+ * remember.
+ */
+export const slotNamed = (
+  root: ParentNode | null | undefined,
+  name: string,
+): HTMLSlotElement | null =>
+  root?.querySelector?.<HTMLSlotElement>(
+    name === '' ? 'slot:not([name])' : `slot[name="${name}"]`,
+  ) ?? null

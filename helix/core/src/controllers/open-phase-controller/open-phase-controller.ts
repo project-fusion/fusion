@@ -20,6 +20,22 @@ export interface OpenPhaseOptions {
 }
 
 /**
+ * Resolves once every animation running on an element and inside it has
+ * finished, or at once where none is running.
+ *
+ * **Asked now, with no frame waited first**, for an exit that is already
+ * running when the caller asks: a section closing, a message leaving. A
+ * canceled animation counts as finished. `animationsSettled` waits two frames
+ * first, for an entrance that has not started yet.
+ */
+export const animationsFinished = async (element: Element | null | undefined): Promise<void> => {
+  if (!element || typeof element.getAnimations !== 'function') {
+    return
+  }
+  await Promise.allSettled(element.getAnimations({ subtree: true }).map((one) => one.finished))
+}
+
+/**
  * Resolves once an element's animations have finished, or two frames on where
  * it has none.
  *
@@ -39,10 +55,7 @@ export const animationsSettled = async (element: Element | null | undefined): Pr
     })
   await frame()
   await frame()
-  if (!element || typeof element.getAnimations !== 'function') {
-    return
-  }
-  await Promise.allSettled(element.getAnimations({ subtree: true }).map((one) => one.finished))
+  await animationsFinished(element)
 }
 
 /**

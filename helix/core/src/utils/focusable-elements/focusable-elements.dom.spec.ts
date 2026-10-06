@@ -151,3 +151,60 @@ describe('focusableElements', () => {
     expect(ids(root)).toBe('a')
   })
 })
+
+describe('a press on a control of the item its own', () => {
+  /** A row holding a link and some text, clicked on the given node. */
+  const pressOn = async (pick: (row: HTMLElement) => Element) => {
+    const { pressedOwnControl } = await import('./focusable-elements.js')
+    const row = document.createElement('div')
+    row.tabIndex = 0
+    row.innerHTML =
+      '<span>Plain <b>text</b></span><a href="#x"><em>Link</em></a><summary>More</summary>'
+    document.body.replaceChildren(row)
+    let answer: boolean | undefined
+    row.addEventListener('click', (event) => {
+      answer = pressedOwnControl(event, row)
+    })
+    pick(row).dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+    return answer
+  }
+
+  test('inside a link, a summary or a control, the press belongs to that control', async () => {
+    expect(await pressOn((row) => row.querySelector('em') as Element)).toBe(true)
+    expect(await pressOn((row) => row.querySelector('summary') as Element)).toBe(true)
+  })
+
+  test('on plain content, or on the row itself though it is a tabindex stop, the press belongs to the row', async () => {
+    expect(await pressOn((row) => row.querySelector('b') as Element)).toBe(false)
+    expect(await pressOn((row) => row)).toBe(false)
+  })
+
+  test('a control inside a component counts through the composed path', async () => {
+    const { pressedOwnControl } = await import('./focusable-elements.js')
+    const row = document.createElement('div')
+    const host = document.createElement('span')
+    row.append(host)
+    document.body.replaceChildren(row)
+    const button = document.createElement('button')
+    host.attachShadow({ mode: 'open' }).append(button)
+    let answer: boolean | undefined
+    row.addEventListener('click', (event) => {
+      answer = pressedOwnControl(event, row)
+    })
+    button.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+    expect(answer).toBe(true)
+  })
+
+  test('a narrower selector from the caller is read in place of the default', async () => {
+    const { pressedOwnControl } = await import('./focusable-elements.js')
+    const row = document.createElement('div')
+    row.innerHTML = '<span tabindex="0">Stop</span>'
+    document.body.replaceChildren(row)
+    const answers: boolean[] = []
+    row.addEventListener('click', (event) => {
+      answers.push(pressedOwnControl(event, row), pressedOwnControl(event, row, 'a[href], button'))
+    })
+    row.querySelector('span')?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    expect(answers).toEqual([true, false])
+  })
+})
