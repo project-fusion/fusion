@@ -318,6 +318,61 @@ slot[name="chevron"]::slotted(*) {
   inline-size: 80%;
 }
 
+/* The grip, in a `reorderable` tree: at the far end of the row, after `end`
+   and after a chevron placed at the end, in the subtle ink the chevron has.
+   `touch-action: none`, so a drag on a phone moves the item and does not
+   scroll the page. */
+[part="grip"] {
+  align-items: center;
+  color: var(--tree-grip-color, var(--helix-color-foreground-subtle));
+  cursor: grab;
+  display: inline-flex;
+  flex: 0 0 auto;
+  order: 3;
+  touch-action: none;
+}
+
+[part="grip"]:active {
+  cursor: grabbing;
+}
+
+[part="grip-mark"] {
+  block-size: var(--_tree-chevron);
+  inline-size: var(--_tree-chevron);
+}
+
+/* The item being moved, faded where it was with everything under it, and the
+   line where it would land, drawn over the rows so a row's fill does not hide
+   it and laid over the edge so nothing moves. On the node rather than the row,
+   so an open branch lands before or after all of its children. */
+:host(:state(dragging)) [part="item"] {
+  opacity: var(--tree-dragging-opacity, 0.5);
+}
+
+:host(:state(drop-before)) [part="item"],
+:host(:state(drop-after)) [part="item"] {
+  position: relative;
+}
+
+:host(:state(drop-before)) [part="item"]::before,
+:host(:state(drop-after)) [part="item"]::after {
+  background-color: var(--tree-drop-indicator-color, var(--helix-color-primary));
+  block-size: var(--tree-drop-indicator-size, var(--helix-border-thick));
+  content: "";
+  inset-inline: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 1;
+}
+
+:host(:state(drop-before)) [part="item"]::before {
+  inset-block-start: 0;
+}
+
+:host(:state(drop-after)) [part="item"]::after {
+  inset-block-end: 0;
+}
+
 /* A row out of play is seen and reached, and does nothing under the pointer. */
 :host([disabled]) [part="row"] {
   cursor: not-allowed;

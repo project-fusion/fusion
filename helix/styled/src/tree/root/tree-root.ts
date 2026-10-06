@@ -23,7 +23,7 @@ import { styles } from './tree-root.css.js'
  *
  * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. The item sends it, and you can listen for it on the tree. Cancelable: canceling it changes nothing.
  *
- * @csspart live - A copy of the empty and loading messages, in a live region that announces them when they change. Visually hidden in the styled tier.
+ * @csspart live - A copy of the empty and loading messages, and each step of a move in a `reorderable` tree, in a live region that announces them when they change. Visually hidden in the styled tier.
  * @csspart tree - The tree container.
  *
  * @cssproperty --tree-chevron-gap - The space before the chevron. Set from `chevron-placement`.

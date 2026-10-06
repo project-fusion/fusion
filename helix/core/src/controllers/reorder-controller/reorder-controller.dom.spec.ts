@@ -2,7 +2,7 @@ import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { registerDom } from '@fusion.dev/helix-testing/dom'
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
 import type { ReorderDetail } from '../../events/details.js'
-import type { ReorderMove } from './reorder-controller.js'
+import type { ReorderMove, ReorderOptions } from './reorder-controller.js'
 
 type Module = typeof import('./reorder-controller.js')
 
@@ -33,7 +33,10 @@ const WORDS = {
 
 /* Three rows, each a button grip in a row 20 pixels tall, in a host with the
    one hook the controller asks of a Lit host. */
-const setup = (refuse = false) => {
+/* Options a spec sets or takes away, `undefined` included. */
+type More = { [Option in keyof ReorderOptions]?: ReorderOptions[Option] | undefined }
+
+const setup = (refuse = false, more: More = {}) => {
   const host = document.createElement('div') as unknown as HTMLElement & ReactiveControllerHost
   const keys = ['a', 'b', 'c']
   const rows = keys.map((key, index) => {
@@ -82,6 +85,7 @@ const setup = (refuse = false) => {
     name: (key) => key.toUpperCase(),
     say: (words) => said.push(words),
     words: () => WORDS,
+    ...(more as Partial<ReorderOptions>),
   })
   controller?.hostConnected?.()
   const grips = rows.map((row) => row.querySelector('button') as HTMLButtonElement)
@@ -200,6 +204,143 @@ describe('a key or a click on a grip', () => {
     const down = key(grips[0] as Element, 'ArrowDown')
     expect(down.defaultPrevented).toBe(false)
     expect(reorder.held).toBeUndefined()
+  })
+})
+
+describe('Alt with an arrow', () => {
+  /* The item a key stands for is the one with focus, here the row the key was
+     pressed in. */
+  const current = (event: KeyboardEvent): string | undefined =>
+    event
+      .composedPath()
+      .find((node): node is HTMLElement => node instanceof HTMLElement && 'key' in node.dataset)
+      ?.dataset.key
+
+  test('moves the item a key stands for a place at once, and says where it went', () => {
+    const { drops, reorder, rows, said } = setup(false, { current })
+    const down = key(rows[0] as Element, 'ArrowDown', { altKey: true })
+    expect(down.defaultPrevented).toBe(true)
+    expect(drops).toEqual([{ from: 0, key: 'a', to: 1 }])
+    expect(said).toEqual(['A moved to position 2 of 3'])
+    expect(reorder.held).toBeUndefined()
+    key(rows[2] as Element, 'Home', { altKey: true })
+    expect(drops.at(-1)).toEqual({ from: 2, key: 'c', to: 0 })
+  })
+
+  test('keeps the key at an end and moves nothing', () => {
+    const { drops, rows, said } = setup(false, { current })
+    const up = key(rows[0] as Element, 'ArrowUp', { altKey: true })
+    expect(up.defaultPrevented).toBe(true)
+    expect(drops).toEqual([])
+    expect(said).toEqual([])
+  })
+
+  test('a refused move is said as canceled', () => {
+    const { rows, said } = setup(true, { current })
+    key(rows[1] as Element, 'ArrowDown', { altKey: true })
+    expect(said).toEqual(['Canceled'])
+  })
+
+  test('leaves the key alone without current, with Shift, and while disabled', () => {
+    const plain = setup()
+    expect(key(plain.rows[0] as Element, 'ArrowDown', { altKey: true }).defaultPrevented).toBe(
+      false,
+    )
+    const shifted = setup(false, { current })
+    expect(
+      key(shifted.rows[0] as Element, 'ArrowDown', { altKey: true, shiftKey: true })
+        .defaultPrevented,
+    ).toBe(false)
+    const off = setup(false, { current, enabled: () => false })
+    expect(key(off.rows[0] as Element, 'ArrowDown', { altKey: true }).defaultPrevented).toBe(false)
+    expect([...plain.drops, ...shifted.drops, ...off.drops]).toEqual([])
+  })
+
+  test('moves an item among the keys asked for it, as a tree moves one among its siblings', () => {
+    const asked: string[] = []
+    const { drops, rows, said } = setup(false, {
+      current,
+      keys: (one) => {
+        asked.push(one)
+        return ['b', 'c']
+      },
+    })
+    key(rows[1] as Element, 'ArrowDown', { altKey: true })
+    expect(asked.every((one) => one === 'b')).toBe(true)
+    expect(drops).toEqual([{ from: 0, key: 'b', to: 1 }])
+    expect(said).toEqual(['B moved to position 2 of 2'])
+  })
+})
+
+describe('what a host leaves to the controller', () => {
+  const current = (event: KeyboardEvent): string | undefined =>
+    event
+      .composedPath()
+      .find((node): node is HTMLElement => node instanceof HTMLElement && 'key' in node.dataset)
+      ?.dataset.key
+
+  test('without drop, it asks the page itself, and a key a filter hides keeps its place', () => {
+    const { rows } = setup(false, { all: () => ['a', 'x', 'b', 'c'], current, drop: undefined })
+    const host = rows[0]?.parentElement as HTMLElement
+    const heard: unknown[] = []
+    host.addEventListener('helix-before-reorder', (event) => heard.push(event.type))
+    host.addEventListener('helix-reorder', (event) => heard.push(event.detail))
+    key(rows[0] as Element, 'ArrowDown', { altKey: true })
+    expect(heard).toEqual([
+      'helix-before-reorder',
+      { from: 0, key: 'a', keys: ['x', 'b', 'a', 'c'], kind: 'item', to: 2, value: 'x,b,a,c' },
+    ])
+  })
+
+  test('without enabled, it reads the host’s reorderable', () => {
+    const { drops, rows } = setup(false, { current })
+    const host = rows[0]?.parentElement as HTMLElement & { reorderable?: boolean }
+    host.reorderable = false
+    key(rows[0] as Element, 'ArrowDown', { altKey: true })
+    expect(drops).toEqual([])
+    host.reorderable = true
+    key(rows[0] as Element, 'ArrowDown', { altKey: true })
+    expect(drops).toHaveLength(1)
+  })
+
+  test('without words, it reads the host’s own labels', () => {
+    const { rows, said } = setup(false, { current, words: undefined })
+    Object.assign(rows[0]?.parentElement as HTMLElement, {
+      canceledLabel: 'No',
+      droppedLabel: 'Down',
+      movedLabel: '{name} at {position}',
+      pickedUpLabel: 'Up',
+    })
+    key(rows[1] as Element, 'ArrowUp', { altKey: true })
+    expect(said).toEqual(['B at 1'])
+  })
+
+  test('gives focus back to the moved item where the page’s move sent it to the body', () => {
+    const refocused: string[] = []
+    let page = (): void => {}
+    const { grips, rows } = setup(false, {
+      current,
+      drop: () => {
+        page()
+        return true
+      },
+      refocus: (one) => {
+        refocused.push(one)
+        grips[1]?.focus()
+      },
+    })
+    page = () => rows[0]?.parentElement?.append(rows[0] as Element)
+    ;(grips[0] as HTMLElement).focus()
+    key(grips[0] as Element, 'ArrowDown', { altKey: true })
+    expect(refocused).toEqual(['a'])
+  })
+
+  test('a click on an item the held one does not move among drops nothing', () => {
+    const { drops, grips, rows } = setup(false, { keys: () => ['a', 'b'] })
+    click(grips[0] as Element)
+    const there = click(rows[2] as Element)
+    expect(there.defaultPrevented).toBe(false)
+    expect(drops).toEqual([])
   })
 })
 

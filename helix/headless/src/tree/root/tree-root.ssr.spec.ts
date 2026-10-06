@@ -55,4 +55,14 @@ describe('tree server output', () => {
   test('no row claims a depth, because a server cannot count ancestors', () => {
     expect(withoutStyles(ssr(tree))).not.toContain('aria-level')
   })
+
+  /* The grips are written by the tree once it knows its items, which a server
+     does not, so a reorderable tree serves what a plain one does. */
+  test('a reorderable tree serves no grip, and no attribute of its own', () => {
+    const served = ssr(html`<helix-headless-tree label="Repository" reorderable>
+      <helix-headless-tree-item value="helix">helix</helix-headless-tree-item>
+    </helix-headless-tree>`)
+    expect(servedParts(served)).not.toContain('grip')
+    expect(hostAttributes(served, 'helix-headless-tree')).toEqual(['label', 'reorderable'])
+  })
 })

@@ -13,6 +13,7 @@ import {
   edgeSpeed,
   IDLE,
   passedCount,
+  placeKey,
   type ReorderAxis,
   type ReorderHold,
   type ReorderInput,
@@ -39,6 +40,9 @@ export interface ReorderWords {
   pickedUp: string
 }
 
+/** The words as a family declares them: one property for each, named after it. */
+type ReorderLabels = { [Word in keyof ReorderWords as `${Word}Label`]: string }
+
 /** A move a drop asks for, counted from 0 in the order the items are drawn. */
 export interface ReorderMove {
   from: number
@@ -47,6 +51,13 @@ export interface ReorderMove {
 }
 
 export interface ReorderOptions {
+  /**
+   * Every key the item with that key moves among, the ones a filter hides
+   * included, for a drop the controller asks for itself. `keys` where this is
+   * not given.
+   */
+  all?: (key: string) => readonly string[]
+
   /** Which way the items run: rows down the block axis, or columns along the inline one. */
   axis: ReorderAxis
 
@@ -56,10 +67,27 @@ export interface ReorderOptions {
   /**
    * Called when an item is let go at a new place. Returns whether the move
    * stood: `false` where a listener refused it.
+   *
+   * Where this is not given, the controller asks the page itself, from the
+   * host: `helix-before-reorder`, then `helix-reorder`, with `kind` `item` and
+   * every key of `all` in the new order, joined by commas in `value`. A key a
+   * filter hides keeps its place, as `placeKey` says.
    */
-  drop: (move: ReorderMove) => boolean
+  drop?: (move: ReorderMove) => boolean
 
-  /** Whether a grip may be taken hold of now. Every grip may where this is not given. */
+  /**
+   * The key of the item a key pressed in the host stands for: the one with
+   * focus, or the one `aria-activedescendant` names. Alt with Up or Down then
+   * moves that item a place at once, and Alt with Home or End to either end,
+   * as the rearrangeable listbox of the APG does, with no grip and nothing
+   * held. Alt with an arrow moves nothing where this is not given.
+   */
+  current?: (event: KeyboardEvent) => string | undefined
+
+  /**
+   * Whether an item may be moved now. Where this is not given, the host's own
+   * `reorderable` says, and every item may on a host without one.
+   */
   enabled?: () => boolean
 
   /**
@@ -71,7 +99,9 @@ export interface ReorderOptions {
   /**
    * Whether a key or a click holds the item for the arrow keys. `true` where
    * this is not given. Data Table's columns move a place for each arrow on the
-   * grip and say `false`, so they are only dragged.
+   * grip and say `false`, so they are only dragged. A listbox's options say
+   * `false` too: the whole option is what a pointer drags, and a click on it
+   * still chooses it.
    */
   holds?: boolean
 
@@ -82,11 +112,22 @@ export interface ReorderOptions {
    */
   item?: (event: Event) => string | undefined
 
-  /** The keys of the items, in the order they are drawn. */
-  keys: () => readonly string[]
+  /**
+   * The keys of the items the item with that key moves among, in the order
+   * they are drawn: every item of a list, or the item's siblings in a tree.
+   */
+  keys: (key: string) => readonly string[]
 
   /** An item's name, for the words. */
   name?: (key: string) => string
+
+  /**
+   * Gives focus back to the item with that key, called after a move made from
+   * the keyboard stood, once the page has moved the item and focus went to the
+   * body with it. Focus the page put anywhere else is left there. Focus is left
+   * alone where this is not given.
+   */
+  refocus?: (key: string) => void
 
   /** Speaks words in the host's live region. Nothing is said where this is not given. */
   say?: (words: string) => void
@@ -97,7 +138,11 @@ export interface ReorderOptions {
    */
   scroller?: () => HTMLElement | null
 
-  /** The words a screen reader hears. */
+  /**
+   * The words a screen reader hears. Where this is not given, they are the
+   * host's own `canceledLabel`, `droppedLabel`, `movedLabel`, and
+   * `pickedUpLabel`, which is what a family declares them as.
+   */
   words?: () => ReorderWords
 }
 
@@ -127,6 +172,10 @@ export const requestReorder = (host: HTMLElement, detail: ReorderDetail): boolea
  *   and End move it to either end, Enter, Space, or a second click drops it,
  *   and Escape puts it back. A click on another item drops it there, so one
  *   pointer can move an item without dragging, as WCAG 2.5.7 asks.
+ * - **Alt with an arrow** moves the item focus is on a place at once, where
+ *   the host says which item that is with `current`. A collection whose own
+ *   keys are the arrows, Enter, and Space, such as a listbox or a tree, moves
+ *   its items this way.
  *
  * **It moves nothing.** A drop calls `drop`, and the host asks its page,
  * which owns the items, to move them. The host reads `held` and `mark` when
@@ -173,7 +222,7 @@ export class ReorderController implements ReactiveController {
   get mark(): { edge: 'after' | 'before'; key: string } | undefined {
     const held = this.held
     const at = held && dropMark(held.from, held.to)
-    const key = at && this.options.keys()[at.index]
+    const key = at && held && this.options.keys(held.key)[at.index]
     return at && key !== undefined ? { edge: at.edge, key } : undefined
   }
 
@@ -190,6 +239,7 @@ export class ReorderController implements ReactiveController {
     this.host.removeEventListener('keydown', this.handleKey, true)
     this.host.removeEventListener('focusout', this.handleFocusOut)
     this.listen(false)
+    this.awaiting?.disconnect()
     this.state = IDLE
     this.holder = null
   }
@@ -230,8 +280,11 @@ export class ReorderController implements ReactiveController {
       this.listen(false)
       this.holder = null
       const moved = next.to !== next.from
-      const stood = !moved || this.options.drop({ from: next.from, key: next.key, to: next.to })
+      const stood = !moved || this.drop({ from: next.from, key: next.key, to: next.to })
       this.speak(stood ? 'dropped' : 'canceled', next.key)
+      if (moved && stood && next.by === 'keyboard') {
+        this.follow(next.key)
+      }
       this.send({ type: 'settle' })
       return
     }
@@ -247,19 +300,39 @@ export class ReorderController implements ReactiveController {
     }
   }
 
+  /** Asks for a move: through `drop`, or of the page where the host gives none. */
+  private drop(move: ReorderMove): boolean {
+    if (this.options.drop) {
+      return this.options.drop(move)
+    }
+    const { key, to } = move
+    const shown = this.options.keys(key)
+    const keys = placeKey(this.options.all?.(key) ?? shown, shown, key, to)
+    return requestReorder(this.host, {
+      ...move,
+      keys,
+      kind: 'item',
+      to: keys.indexOf(key),
+      value: keys.join(','),
+    })
+  }
+
   /** Says one of the words, with the item's name and place filled in. */
   private speak(which: keyof ReorderWords, key: string, to?: number): void {
     const { name, say, words } = this.options
-    if (!say || !words) {
+    if (!say) {
       return
     }
     const number = formatNumbers(localeOf(this.host))
     say(
-      fillTemplate(words()[which], {
-        count: number(this.options.keys().length),
-        name: name ? name(key) : key,
-        position: number((to ?? 0) + 1),
-      }),
+      fillTemplate(
+        words ? words()[which] : (this.host as unknown as ReorderLabels)[`${which}Label`],
+        {
+          count: number(this.options.keys(key).length),
+          name: name ? name(key) : key,
+          position: number((to ?? 0) + 1),
+        },
+      ),
     )
   }
 
@@ -268,7 +341,7 @@ export class ReorderController implements ReactiveController {
     const block = this.options.axis === 'block'
     const reversed = !block && isRtl(this.host)
     const spans = this.options
-      .keys()
+      .keys(key)
       .filter((one) => one !== key)
       .map((one) => {
         const box = this.options.box(one)
@@ -280,7 +353,40 @@ export class ReorderController implements ReactiveController {
   }
 
   private enabled(): boolean {
-    return this.options.enabled?.() ?? true
+    return this.options.enabled?.() ?? (this.host as { reorderable?: boolean }).reorderable ?? true
+  }
+
+  /** The page's own watch for the move it was asked for, while one is awaited. */
+  private awaiting: MutationObserver | undefined = undefined
+
+  /**
+   * Gives focus back to a moved item once the page has moved it, where moving
+   * it sent focus to the body. A page that moves the item as it hears
+   * `helix-reorder` has done so already; one that renders later changes the
+   * host's children first.
+   */
+  private follow(key: string): void {
+    const refocus = this.options.refocus
+    this.awaiting?.disconnect()
+    const lost = (): boolean => {
+      const active = deepActiveElement()
+      return !active || active === document.body
+    }
+    if (!refocus) {
+      return
+    }
+    if (lost()) {
+      refocus(key)
+      return
+    }
+    const watch = new MutationObserver(() => {
+      watch.disconnect()
+      if (lost()) {
+        refocus(key)
+      }
+    })
+    watch.observe(this.host, { childList: true, subtree: true })
+    this.awaiting = watch
   }
 
   private readonly handleDown = (event: PointerEvent): void => {
@@ -292,7 +398,7 @@ export class ReorderController implements ReactiveController {
       return
     }
     const grip = this.options.grip(event)
-    const from = grip ? this.options.keys().indexOf(grip.key) : -1
+    const from = grip ? this.options.keys(grip.key).indexOf(grip.key) : -1
     if (!grip || from < 0) {
       return
     }
@@ -416,7 +522,7 @@ export class ReorderController implements ReactiveController {
     const state = this.state
     const grip = this.options.grip(event)
     if (state.phase === 'idle') {
-      const from = grip ? this.options.keys().indexOf(grip.key) : -1
+      const from = grip ? this.options.keys(grip.key).indexOf(grip.key) : -1
       if (grip && from >= 0) {
         this.take(grip.element, { from, key: grip.key, type: 'pick' })
       }
@@ -426,7 +532,8 @@ export class ReorderController implements ReactiveController {
       return
     }
     const on = grip?.key ?? this.options.item?.(event)
-    if (on === undefined) {
+    const keys = this.options.keys(state.key)
+    if (on === undefined || !keys.includes(on)) {
       return
     }
     event.preventDefault()
@@ -438,9 +545,7 @@ export class ReorderController implements ReactiveController {
     /* A pointer's click lands by where it was, and a click from a key or a
        screen reader, which has no place, on the item it was sent to. */
     const to =
-      event.detail > 0
-        ? this.placeAt(state.key, event.clientX, event.clientY)
-        : this.options.keys().indexOf(on)
+      event.detail > 0 ? this.placeAt(state.key, event.clientX, event.clientY) : keys.indexOf(on)
     this.send({ to: Math.max(0, to), type: 'target' })
   }
 
@@ -463,16 +568,25 @@ export class ReorderController implements ReactiveController {
    * here.
    */
   private readonly handleKey = (event: KeyboardEvent): void => {
-    if (this.options.holds === false || event.altKey || event.ctrlKey || event.metaKey) {
+    if (event.ctrlKey || event.metaKey) {
       return
     }
     const state = this.state
+    if (event.altKey) {
+      if (state.phase === 'idle' && !event.shiftKey) {
+        this.nudge(event)
+      }
+      return
+    }
+    if (this.options.holds === false) {
+      return
+    }
     const origin = event.composedPath()[0]
     const native = origin instanceof HTMLButtonElement
     const press = event.key === 'Enter' || event.key === ' '
     if (state.phase === 'idle') {
       const grip = press && !native && this.enabled() ? this.options.grip(event) : undefined
-      const from = grip ? this.options.keys().indexOf(grip.key) : -1
+      const from = grip ? this.options.keys(grip.key).indexOf(grip.key) : -1
       if (grip && from >= 0) {
         event.preventDefault()
         event.stopPropagation()
@@ -499,7 +613,7 @@ export class ReorderController implements ReactiveController {
     }
     const to = reorderKey(event.key, {
       axis: this.options.axis,
-      count: this.options.keys().length,
+      count: this.options.keys(state.key).length,
       rtl: isRtl(this.host),
       to: state.to,
     })
@@ -507,6 +621,38 @@ export class ReorderController implements ReactiveController {
       event.preventDefault()
       event.stopPropagation()
       this.send({ to, type: 'step' })
+    }
+  }
+
+  /**
+   * Alt with an arrow, Home, or End: moves the item the key stands for at
+   * once, with nothing held, and says where it went. A move the page refuses
+   * is said as canceled. At an end the key is kept and nothing moves.
+   */
+  private nudge(event: KeyboardEvent): void {
+    const key = this.enabled() ? this.options.current?.(event) : undefined
+    const keys = key === undefined ? [] : this.options.keys(key)
+    const from = key === undefined ? -1 : keys.indexOf(key)
+    const to =
+      key === undefined || from < 0
+        ? null
+        : reorderKey(event.key, {
+            axis: this.options.axis,
+            count: keys.length,
+            rtl: isRtl(this.host),
+            to: from,
+          })
+    if (key === undefined || to === null) {
+      return
+    }
+    event.preventDefault()
+    event.stopPropagation()
+    if (to !== from) {
+      const stood = this.drop({ from, key, to })
+      this.speak(stood ? 'moved' : 'canceled', key, to)
+      if (stood) {
+        this.follow(key)
+      }
     }
   }
 
