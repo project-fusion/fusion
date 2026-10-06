@@ -8,7 +8,9 @@ import {
   keyClaimed,
   MixinCollection,
   MixinControllerActive,
+  ReorderController,
   scrollItemIntoView,
+  scrollingAncestor,
   selectsAll,
   slottedWords,
   Typeahead,
@@ -68,6 +70,19 @@ const KEYS = new Set([
  * tree of check marks, Control+A (Command+A on an Apple keyboard) checks every
  * item or clears them all, and Shift with Up or Down Arrow moves and checks.
  *
+ * **`reorderable` lets you move items among their siblings.** Alt with Up or
+ * Down moves the focused item a place, and Alt with Home or End to the first
+ * or the last place among its siblings, as the APG's rearrangeable listbox
+ * does. Each row gets a grip at its far end: drag it to move the item, and the
+ * tree scrolls near an edge. A click on a grip picks the item up and a click on
+ * one of its siblings drops it there, which needs no drag. The arrows move an
+ * item picked up that way, Enter or Space drops it, and Escape puts it back.
+ * The tree says each step in its `live` region. A drop sends
+ * `helix-before-reorder`, which you can refuse, and then `helix-reorder`, whose
+ * `keys` hold the siblings in the new order. **You move the items**: the tree
+ * moves no element of yours, and focus follows the moved item once you have.
+ * Moving an item into another branch is not part of this.
+ *
  * @since 0.1.0
  * @status stable
  * @category navigation
@@ -78,15 +93,28 @@ const KEYS = new Set([
  *
  * @event {HelixActivateEvent} helix-activate - Fired after the current node changes, so the tree already holds the new one.
  * @event {HelixBeforeActivateEvent} helix-before-activate - Fired before the current node changes, and cancelable. Canceling it is the only way to stop the change.
+ * @event {HelixBeforeReorderEvent} helix-before-reorder - Fired when an item is dropped at a new place among its siblings, in a `reorderable` tree, with the siblings' keys in the new order. Cancelable: cancel it to keep the item where it is.
+ * @event {HelixReorderEvent} helix-reorder - Fired after `helix-before-reorder` when nobody canceled it. Move your items to the order in `keys`, each an item's `value`, or its words where it has none. Cancelable: cancel it to say the move did not happen.
  * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. The item sends it, and you can listen for it on the tree. Cancelable: canceling it changes nothing.
  *
  * @csspart empty - Shown when there are no rows to show.
- * @csspart live - A copy of the empty and loading messages, in a live region that announces them when they change. Visually hidden in the styled tier.
+ * @csspart live - A copy of the empty and loading messages, and each step of a move in a `reorderable` tree, in a live region that announces them when they change. Visually hidden in the styled tier.
  * @csspart loading - Shown while the rows load.
  * @csspart tree - The tree container.
  */
 @customElement('helix-headless-tree')
 export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(HelixElement)) {
+  /**
+   * What screen readers hear when a held item is put back, or a move is
+   * refused, in a `reorderable` tree.
+   */
+  @property({ attribute: 'canceled-label' })
+  canceledLabel = 'Canceled'
+
+  /** What screen readers hear when a held item is dropped, in a `reorderable` tree. */
+  @property({ attribute: 'dropped-label' })
+  droppedLabel = 'Dropped'
+
   /**
    * Accessible name for the tree.
    *
@@ -96,6 +124,14 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
   @property()
   label = 'Tree'
 
+  /**
+   * What screen readers hear each time an item moves, in a `reorderable`
+   * tree. `{name}` is the item's words, `{position}` its place among its
+   * siblings, counting from 1, and `{count}` the number of siblings.
+   */
+  @property({ attribute: 'moved-label' })
+  movedLabel = '{name} moved to position {position} of {count}'
+
   /** Carries a host `aria-label` and `aria-labelledby` to the tree. */
   protected readonly aria = new AriaForwardController(this, {
     label: true,
@@ -104,6 +140,72 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
 
   /** The letters typed so far, for moving to an item by its name. */
   private readonly typeahead = new Typeahead()
+
+  /**
+   * Moving items among their siblings, in a `reorderable` tree. The items are
+   * the page's, so a drop asks the page to move them.
+   */
+  private readonly reorder = new ReorderController(this, {
+    axis: 'block',
+    box: (key) => this.itemFor(key)?.getBoundingClientRect(),
+    current: (event) => this.keyAt(event),
+    grip: (event) => {
+      const item = this.itemOf(event)
+      const element = item?.fromGrip(event) && item.focusTarget
+      return item && element ? { element, key: this.keyOf(item) } : undefined
+    },
+    item: (event) => this.keyAt(event),
+    keys: (key) => this.siblingKeys(key),
+    name: (key) => {
+      const item = this.itemFor(key)
+      return (item && slottedWords(item, [''])) || key
+    },
+    refocus: (key) => this.focusOn(this.itemFor(key)),
+    say: (words) => {
+      this.announced = words
+      this.requestUpdate()
+    },
+    scroller: () => scrollingAncestor(this.items[0] ?? this, { axis: 'y', overflowing: true }),
+  })
+
+  /** The key an item is moved by: its `value`, or its words where it has none. */
+  private keyOf(item: HelixHeadlessTreeItem): string {
+    return item.value || slottedWords(item, [''])
+  }
+
+  /** The item that stands for a key. */
+  private itemFor(key: string): HelixHeadlessTreeItem | undefined {
+    return this.items.find((item) => this.keyOf(item) === key)
+  }
+
+  /** The innermost item an event came from. */
+  private itemOf(event: Event): HelixHeadlessTreeItem | undefined {
+    const item = closestInstance(event.composedPath()[0] as Element, HelixHeadlessTreeItem)
+    return item && this.items.includes(item) ? item : undefined
+  }
+
+  /** The key of the innermost item an event came from, unless it is disabled. */
+  private keyAt(event: Event): string | undefined {
+    const item = this.itemOf(event)
+    return item && !item.disabled ? this.keyOf(item) : undefined
+  }
+
+  /** An item and the items beside it, under the same parent, in order. */
+  private siblingsOf(item: HelixHeadlessTreeItem): HelixHeadlessTreeItem[] {
+    return [...(item.parentElement?.children ?? [])].filter(
+      (node): node is HelixHeadlessTreeItem =>
+        node instanceof HelixHeadlessTreeItem && node.slot === item.slot,
+    )
+  }
+
+  /**
+   * The keys of the items a key's item moves among: its siblings, a disabled
+   * one included, which stays where it is while the others move past it.
+   */
+  private siblingKeys(key: string): string[] {
+    const item = this.itemFor(key)
+    return item ? this.siblingsOf(item).map((one) => this.keyOf(one)) : []
+  }
 
   /**
    * What a deeper level means: `peer` for no change, `subordinate` for a lower
@@ -143,6 +245,21 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
    */
   @property({ reflect: true })
   nesting?: 'heading' | 'peer' | 'subordinate'
+
+  /**
+   * What screen readers hear when a click on a grip picks up an item, in a
+   * `reorderable` tree. `{name}` is the item's words.
+   */
+  @property({ attribute: 'picked-up-label' })
+  pickedUpLabel = 'Picked up {name}'
+
+  /**
+   * Lets you move items among their siblings, by dragging a grip or with Alt
+   * and an arrow. The tree moves no item itself: you move your data on
+   * `helix-reorder`.
+   */
+  @property({ type: Boolean })
+  reorderable = false
 
   /**
    * Whether a reader can check many items, or choose only the items at the
@@ -295,8 +412,11 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
     const heads = this.nesting === 'heading' || this.selectionMode === 'leaf'
     const multiple = this.multiple
     const checked = new Set(this.values)
+    const moving = this.reorder.held
+    const mark = this.reorder.mark
 
     for (const item of this.items) {
+      const key = this.keyOf(item)
       const selected = !multiple && item.value !== '' && item.value === this.active
       const state = multiple ? checkedState(this.rowOf(item), checked) : false
       const focusable = item === stop
@@ -322,6 +442,10 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
         item.focusable = focusable
         item.level = level
         item.heads = heads
+        /* A disabled item draws no grip, and the others move past it. */
+        item.grip = this.reorderable
+        item.move =
+          moving?.key === key ? 'dragging' : mark?.key === key ? `drop-${mark.edge}` : undefined
       })
     }
   }
@@ -355,11 +479,7 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
       return false
     }
     if (event.key === '*') {
-      const siblings = [...(current.parentElement?.children ?? [])].filter(
-        (node): node is HelixHeadlessTreeItem =>
-          node instanceof HelixHeadlessTreeItem && node.slot === current.slot,
-      )
-      for (const sibling of siblings) {
+      for (const sibling of this.siblingsOf(current)) {
         if (sibling.isBranch && !sibling.open) {
           sibling.requestOpen(true)
         }
@@ -569,7 +689,13 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    if (changed.has('active') || changed.has('nesting') || changed.has('selectionMode')) {
+    if (
+      changed.has('active') ||
+      changed.has('nesting') ||
+      changed.has('selectionMode') ||
+      this.reorderable ||
+      changed.has('reorderable')
+    ) {
       this.syncItems()
     }
   }

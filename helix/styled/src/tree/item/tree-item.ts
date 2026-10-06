@@ -28,6 +28,8 @@ import { styles } from './tree-item.css.js'
  * @csspart checkbox - The check mark's box, in a tree with `selection-mode="multiple"`.
  * @csspart checkbox-checked - The check mark's box while the item is checked.
  * @csspart checkbox-mixed - The check mark's box while some of a branch's items are checked.
+ * @csspart grip - The handle a pointer drags to move the item, in a `reorderable` tree.
+ * @csspart grip-mark - The icon on the grip.
  * @csspart group - The container for nested items.
  * @csspart item - The node, and the focus target.
  * @csspart label - The label text.
@@ -40,7 +42,11 @@ import { styles } from './tree-item.css.js'
  *   branch.
  * @cssproperty --tree-checkbox-size - Size of the check mark's box. Follows the chevron's size.
  * @cssproperty --tree-chevron-size - Size of the chevron, and the gutter a leaf reserves.
+ * @cssproperty --tree-dragging-opacity - The opacity of an item being moved, in a `reorderable` tree.
+ * @cssproperty --tree-drop-indicator-color - The color of the line where a moved item would land.
+ * @cssproperty --tree-drop-indicator-size - The thickness of the line where a moved item would land.
  * @cssproperty --tree-gap - Space between rows.
+ * @cssproperty --tree-grip-color - The color of the grip, in a `reorderable` tree.
  * @cssproperty --tree-indent - Indent added per level.
  * @cssproperty --tree-row-checked-background-color - Fill of a checked row, in a tree with `selection-mode="multiple"`. Unset, the box alone marks it.
  * @cssproperty --tree-row-checked-color - Text color of a checked row, in a tree with `selection-mode="multiple"`.
