@@ -9,6 +9,7 @@ import {
   settle,
   type Updatable,
 } from '@fusion.dev/helix-testing/dom'
+import eachAuthor from '../.examples/each-author.html' with { type: 'text' }
 import events from '../.examples/events.html' with { type: 'text' }
 import historySheet from '../.examples/history.css' with { type: 'text' }
 import history from '../.examples/history.html' with { type: 'text' }
@@ -144,5 +145,20 @@ describe('the transcript example', () => {
     await idle()
     expect(drawn().length).toBeLessThan(60)
     expect(drawn().at(-1)?.textContent?.trim()).toBe('Continue from step 2000.')
+  })
+})
+
+describe('the each author example', () => {
+  run('draws Ada and Grace each in a fill of their own, and the reader in theirs', async () => {
+    await example(eachAuthor)
+    await idle()
+    const chat = document.getElementById('release') as HTMLElement
+    const drawn = [...(chat.shadowRoot?.querySelectorAll('[part="turn"] > *') ?? [])]
+    const fill = (at: number): string =>
+      getComputedStyle(drawn[at]?.shadowRoot?.querySelector('[part="content"]') as HTMLElement)
+        .backgroundColor
+    expect(drawn).toHaveLength(4)
+    expect(fill(0)).toBe(fill(3))
+    expect(new Set([fill(0), fill(1), fill(2)]).size).toBe(3)
   })
 })

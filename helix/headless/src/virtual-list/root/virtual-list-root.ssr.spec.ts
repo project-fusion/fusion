@@ -1,5 +1,11 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostAttributes, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import {
+  hasPart,
+  hostAttributes,
+  rendered,
+  ssr,
+  withoutStyles,
+} from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -55,14 +61,17 @@ describe('virtual list server output', () => {
   })
 
   test('serves the grid a list with columns lays its items in, and none for a list', () => {
-    const grid = withoutStyles(
+    const tag = 'helix-headless-virtual-list'
+    const grid = rendered(
       ssr(
         html`<helix-headless-virtual-list columns="3" label="Photos"></helix-headless-virtual-list>`,
       ),
+      tag,
     )
     expect(grid).toContain('display: grid; grid-template-columns: repeat(3, minmax(0, 1fr))')
-    const plain = withoutStyles(
+    const plain = rendered(
       ssr(html`<helix-headless-virtual-list label="Rows"></helix-headless-virtual-list>`),
+      tag,
     )
     expect(plain).not.toContain('grid-template-columns')
   })

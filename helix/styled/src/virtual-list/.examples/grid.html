@@ -1,0 +1,39 @@
+<!-- @summary Three thousand swatches four to a line, windowed a line at a time, with the arrow keys moving along a line and down a column. -->
+
+<helix-virtual-list
+  columns="4"
+  estimate="72"
+  id="swatches"
+  label="Swatches"
+>
+  <template>
+    <div class="swatchCell">
+      <span class="swatchChip"></span>
+      <span data-field="name"></span>
+    </div>
+  </template>
+</helix-virtual-list>
+
+<script>
+  /* Each item draws one cell, and the padding inside it is the space between
+     cells, which the list measures with the line. */
+  document.getElementById('swatches').items = Array.from({ length: 3000 }, (_, index) => ({
+    name: `Swatch ${index + 1}`,
+  }))
+</script>
+
+<style>
+  .swatchCell {
+    block-size: 72px;
+    box-sizing: border-box;
+    display: grid;
+    gap: var(--helix-space-2xs);
+    grid-template-rows: 1fr auto;
+    padding: var(--helix-space-2xs);
+  }
+
+  .swatchChip {
+    background-color: color-mix(in oklab, var(--helix-color-primary) 18%, transparent);
+    border-radius: var(--helix-radii-sm);
+  }
+</style>
