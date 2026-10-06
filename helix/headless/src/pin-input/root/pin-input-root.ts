@@ -6,62 +6,84 @@ import {
   HelixFormElement,
   MixinControllerValue,
   MixinField,
+  restoreValue,
   submitImplicitly,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
-import { cleanCode } from '../code.js'
+import { property, state } from 'lit/decorators.js'
+import {
+  type CodeEdit,
+  cleanCode,
+  overwriteCode,
+  type PinCase,
+  type PinType,
+  readTyped,
+} from '../code.js'
 import { separatorsAfter } from '../format.js'
 
-/** What a cell accepts, which decides the keyboard a phone offers. */
-export type PinType = 'alphanumeric' | 'numeric' | 'text'
+export type { PinCase, PinType } from '../code.js'
 
-/** How typed letters are cased: as typed, or turned upper or lower case. */
-export type PinCase = 'lower' | 'preserve' | 'upper'
+/**
+ * The one field, out of sight and out of the way of the pointer, written on the
+ * element because the headless tier ships no stylesheet. Sixteen pixels of
+ * type, because a phone zooms the page into a field whose text is smaller.
+ */
+const UNSEEN = 'position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;font-size:16px'
+
+/**
+ * Keeps focus where it is through a press on a box: a box is no control, and
+ * focus leaving the field for the moment of the press would commit the code.
+ */
+const keepFocus = (event: Event): void => event.preventDefault()
 
 /**
  * @summary A field for a short code, with one box for each character.
  *
  * @description
- * Each cell is its own `<input>`, so every box has a real focus ring, caret,
- * and tab stop.
+ * One real `<input>` holds the code, and the boxes are drawn from it, as Web
+ * Awesome's OTP input does. A screen reader meets one field, named by the
+ * label, and the code never sits in a row of separate fields. The boxes are
+ * hidden from it.
  *
- * Input longer than one character is treated as a paste, in any cell. This
- * covers pasting, a browser autofilling an SMS code, and a password manager,
- * which all put the whole code into the focused box. A six-character code that
- * arrives in cell three fills from cell three.
+ * The caret is drawn in the box it is in, and the box is marked with
+ * `cell-active` while the field has focus. A filled box selects its character,
+ * so typing replaces it and moves on.
  *
- * The code is one value to a form. The cells are in a shadow root and submit
- * nothing. The host is form-associated and submits the joined string, which
- * also carries validity and responds to a form reset.
+ * Input longer than one character is treated as a paste. This covers pasting,
+ * a browser autofilling an SMS code, and a password manager. A six-character
+ * code pasted into an empty field fills from the first box.
  *
- * Only the first cell has `autocomplete="one-time-code"`, because the hint
- * applies to the whole field.
+ * The code is one value to a form. The field is in a shadow root and submits
+ * nothing. The host is form-associated and submits the code, which also
+ * carries validity and responds to a form reset. The field carries
+ * `autocomplete="one-time-code"`, which lets a phone offer the code from a
+ * message.
  *
  * `autosubmit` submits the form once the last box is filled, through the form's
  * default button where there is one. `format` draws separators between the
- * boxes, such as the dash in `###-###`, as text a screen reader skips. Delete
- * removes the character in the focused box and pulls the rest of the code
- * back, as Backspace removes the one before it.
+ * boxes, such as the dash in `###-###`, as text a screen reader skips. `mask`
+ * makes the field a password field and draws `mask-character` in each filled
+ * box, so the code is never drawn as text.
  *
- * The row of cells always runs left to right, with `dir="ltr"`, including in
+ * The row of boxes always runs left to right, with `dir="ltr"`, including in
  * Arabic and Hebrew. The first box is the leftmost, a paste fills to the right,
  * and the right arrow moves to the next box. The label, hint, and feedback
  * follow the page's direction.
  *
- * **Keyboard.** Each box is a tab stop of its own, as each is a real input.
+ * **Keyboard.** The field is one tab stop.
  *
  * | Key | What it does |
  * |---|---|
  * | A character | Fills the box and moves to the next one. A longer run is read as a paste. |
  * | Left, Right | Moves to the box before or after. |
  * | Home, End | Moves to the first box, or to the box after the last character. |
- * | Backspace | In an empty box, clears the box before it and moves there. |
+ * | Backspace | Removes the character in the box, or in an empty box the one before it, and moves there. |
  * | Delete | Removes the character in the box and pulls the rest of the code back. |
  * | Enter | Submits the form. |
  *
- * The row has `role="group"` and the field's name, and each box is named by
- * `cell-label`, such as "Character 2 of 6". `helix-complete` is a
+ * The field is a text field, or a password field under `mask`, named by the
+ * label and described by the hint and the message, with `aria-invalid` while
+ * a message shows and `aria-required` under `required`. `helix-complete` is a
  * `HelixCompleteEvent` sent once the last box is filled.
  *
  * @since 0.1.0
@@ -79,11 +101,16 @@ export type PinCase = 'lower' | 'preserve' | 'upper'
  * @event {HelixCompleteEvent} helix-complete - The last box was filled.
  * @event {Event} input - The code changed.
  *
+ * @csspart caret - The caret, drawn in the empty box it is in while the field has focus.
  * @csspart cell - One box.
+ * @csspart cell-active - The box the caret is in, while the field has focus. Set together with `cell`.
+ * @csspart cell-filled - A box that holds a character. Set together with `cell`.
+ * @csspart control - The one field that holds the code, out of sight: the boxes are drawn from it.
  * @csspart feedback - The message that says what is wrong with the code.
  * @csspart field - The row of boxes, ordered left to right in every language.
  * @csspart hint - The help under the boxes, shown while there is no feedback.
  * @csspart label - The label above the boxes.
+ * @csspart placeholder - The `placeholder` text in an empty box.
  * @csspart separator - The text `format` draws between two boxes.
  *
  * @cssstate complete - Every box holds a character.
@@ -91,33 +118,20 @@ export type PinCase = 'lower' | 'preserve' | 'upper'
  */
 @customElement('helix-headless-pin-input')
 export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(HelixFormElement)) {
-  /* A consumer's `aria-describedby` names ids in their own tree and the control
+  /* A consumer's `aria-describedby` names ids in their own tree and the field
      is in this shadow root, so the reference has to be carried down as an
-     element rather than copied as an id. See `AriaForwardController`: measured
-     in Chrome's own tree, the host held the description and the control the
-     reader is actually on was exposed without it. */
+     element rather than copied as an id. See `AriaForwardController`. */
   protected readonly aria = new AriaForwardController(this, {
-    /* The group, which names the row. Forwarded to the first box, a host
-       `aria-labelledby` replaced that box's "Character 1 of 4" and left the
-       group and every other box without the field's name. */
-    target: () => this.partNamed('field'),
+    target: () => this.control,
   })
 
-  /** @internal The element a missing name is checked on: the row of cells, so the name of one cell does not count as the name of the field. */
-  protected override get namedControl(): HTMLElement | null {
-    return this.partNamed('field')
-  }
-
-  /** Typed or dragged, so every edit is announced. See `announcesInput`. */
+  /** Typed or pasted, so every edit is announced. See `announcesInput`. */
   protected override readonly announcesInput = true
 
   /**
-   * The autofill hint for the browser, set on the first box only.
-   *
-   * `one-time-code` is why this defaults to anything at all: it is the token
-   * that lets a phone offer the code out of a message. Later cells stay `off`
-   * for the reason in the class comment above, that six cells each offering
-   * the same code is one offer made six times.
+   * The autofill hint for the browser. `one-time-code` is why this defaults to
+   * anything at all: it is the token that lets a phone offer the code out of a
+   * message.
    */
   @property()
   autocomplete = 'one-time-code'
@@ -139,7 +153,11 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
   case: PinCase = 'preserve'
 
   /**
-   * Accessible name for one box, with `{index}` and `{length}` filled in.
+   * The name each box once had, with `{index}` and `{length}` filled in.
+   *
+   * @deprecated No longer read. The boxes are drawn from one field, which is
+   * named by `label`, and a screen reader does not meet the boxes. Removed in
+   * the next breaking release.
    */
   @property({ attribute: 'cell-label' })
   cellLabel = 'Character {index} of {length}'
@@ -159,27 +177,29 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
   length = 6
 
   /**
-   * Whether the characters are hidden, the way a password is.
+   * Whether the characters are hidden, the way a password is. The field is a
+   * password field, and each filled box draws `mask-character`.
    */
   @property({ reflect: true, type: Boolean })
   mask = false
 
   /**
-   * What an empty box shows, usually a single dot.
-   *
-   * The platform's own placeholder, on each cell, rather than a character
-   * drawn behind the field: it clears the moment anything is typed, it is
-   * already excluded from the accessible value, and it works the same under
-   * `mask`, where the cell is a password input and a hand-drawn glyph would
-   * have to know that.
-   *
-   * Empty by default, because a row of boxes already reads as a row of boxes.
+   * What a filled box draws under `mask`, in place of its character, as Web
+   * Awesome's `--mask-char`.
+   */
+  @property({ attribute: 'mask-character' })
+  maskCharacter = '•'
+
+  /**
+   * What an empty box shows, usually a single dot. It is not shown in the box
+   * the caret is in. Empty by default, because a row of boxes already reads as
+   * a row of boxes.
    */
   @property()
   placeholder = ''
 
   /**
-   * Whether the boxes block input. A read-only code still submits its value.
+   * Whether the field blocks input. A read-only code still submits its value.
    */
   @property({ attribute: 'readonly', reflect: true, type: Boolean })
   readOnly = false
@@ -209,8 +229,7 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
    *
    * **Not reflected**: nothing selects on it, so reflecting only writes
    * `type="numeric"` onto every `<helix-headless-pin-input>` ever rendered, an
-   * attribute no consumer's markup had. The area rules carry the sentence
-   * "reflect only what CSS selects on". The real inputs take it as a binding,
+   * attribute no consumer's markup had. The field takes it as `inputmode`,
    * which is what makes the keyboard follow.
    */
   @property()
@@ -222,196 +241,183 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
     delegatesFocus: true,
   }
 
+  /**
+   * The box the caret is in while the field has focus, and -1 while it does
+   * not or while the field is read-only, where there is nothing to type into.
+   */
+  @state()
+  private active = -1
+
+  /** The box a press asked for, taken when the focus it starts arrives. */
+  private pressedAt: number | undefined = undefined
+
   /** How many boxes there are, clamped once so every reader agrees. */
   private get count(): number {
     return Math.max(1, Math.floor(this.length) || 1)
   }
 
-  private get cells(): HTMLInputElement[] {
-    return [...this.renderRoot.querySelectorAll<HTMLInputElement>('[part="cell"]')]
+  private get control(): HTMLInputElement | null {
+    return this.partNamed<HTMLInputElement>('control')
   }
 
-  /** The code as characters, padded to the row so every box has one to show. */
-  private get characters(): string[] {
-    return Array.from({ length: this.count }, (_, at) => this.value[at] ?? '')
+  /** The furthest box the caret can be in: after the code, and the last box at most. */
+  private get end(): number {
+    return Math.min(this.value.length, this.count - 1)
   }
 
-  /** Everything this box would accept, with the rest dropped and cased. */
-  private clean(text: string): string {
-    return cleanCode(text, this.type, this.case)
+  /** The box the caret is drawn in, kept within the code a script may have shortened. */
+  private get caretBox(): number {
+    return this.active < 0 ? -1 : Math.min(this.active, this.end)
   }
 
   /**
-   * Writes a run of characters from one box onward.
+   * Takes a code the field was edited to, and moves the caret to `caret`.
    *
    * The single path for typing, pasting and autofill alike, because they are
-   * the same act at different lengths and splitting them is how the three
-   * disagree about trimming, about the cursor, and about what happens at the
-   * end.
+   * the same act at different lengths. Through `requestValue`, so a consumer
+   * who owns the code can refuse it, and a refused edit puts the field back.
    */
-  private write(from: number, text: string): void {
-    const cleaned = this.clean(text)
-    if (cleaned === '') {
-      return
+  private take({ caret, code }: CodeEdit): void {
+    const applied = this.requestValue(code)
+    const control = this.control
+    if (control) {
+      restoreValue(control, this.value)
     }
-    /* **A code has no holes in it**, so a character cannot land past the end of
-       what is already there. Clamped rather than allowed, because the value is
-       one compact string and a gap in the middle of it does not exist: unclamped,
-       the boxes and the value disagree about where the reader typed.
-
-       It reads correctly in both directions. Pasting a whole code while the
-       caret happens to sit in box three fills from the start, which is what a
-       reader pasting a code means. Pasting two characters into box three of a
-       field with two already in it fills from box three, because that is where
-       the end was. */
-    const start = Math.min(from, this.value.length)
-    const characters = this.characters
-    for (let at = 0; at < cleaned.length && start + at < this.count; at += 1) {
-      characters[start + at] = cleaned[at] as string
+    if (this.active >= 0 && applied) {
+      this.active = caret
     }
-    const next = characters.join('')
-    const filled = Math.min(this.count - 1, start + cleaned.length)
-    const applied = this.requestValue(next)
-    this.updateComplete.then(() => {
-      this.paint()
-      this.cells[filled]?.focus()
-      this.cells[filled]?.select()
-      /* Only a code the element took. A refused last character left the
-         shorter code in place, and announcing the refused one sent an
-         auto-submit a code the field does not hold. */
-      if (applied && this.value === next && next.length === this.count) {
-        this.dispatchEvent(new HelixCompleteEvent({ value: next }))
-        /* And a native `change`, because a filled code is this control's
-           commit. There is no inner control to relay one from: six boxes each
-           fire their own, and none of them means the code is entered. */
-        this.commit()
-        if (this.autosubmit) {
-          submitImplicitly(this.form)
-        }
+    this.placeCaret(true)
+    /* Only a code the element took. A refused last character left the shorter
+       code in place, and announcing the refused one sent an auto-submit a code
+       the field does not hold. */
+    if (applied && this.value === code && code.length === this.count) {
+      this.dispatchEvent(new HelixCompleteEvent({ value: code }))
+      /* And a native `change`, because a filled code is this control's commit:
+         the field's own `change` waits for it to lose focus. */
+      this.commit()
+      if (this.autosubmit) {
+        submitImplicitly(this.form)
       }
-    })
+    }
   }
 
   /**
-   * Puts the value back into the boxes.
+   * Puts the field's selection on the box the caret is in: the character
+   * there, so typing replaces it, or the empty place after the code.
    *
-   * The cells are uncontrolled between renders, because Lit will not rewrite an
-   * input's `.value` when the bound string has not changed, and a refused
-   * keystroke leaves the box holding a character the element rejected. This is
-   * the same put-back `Input` does with `restoreValue`, once per box.
+   * Left alone while the reader holds a wider selection of their own, such as
+   * everything after Control+A, unless `force` says the caret moved.
    */
-  private paint(): void {
-    const characters = this.characters
-    for (const [at, cell] of this.cells.entries()) {
-      const want = characters[at] ?? ''
-      if (cell.value !== want) {
-        cell.value = want
-      }
+  private placeCaret(force = false): void {
+    const control = this.control
+    const at = this.caretBox
+    if (!control || at < 0) {
+      return
     }
+    const start = control.selectionStart ?? 0
+    const end = control.selectionEnd ?? start
+    if (!force && end - start > 1) {
+      return
+    }
+    control.setSelectionRange(at, at < this.value.length ? at + 1 : at)
   }
 
   private readonly handleInput = (event: Event): void => {
     // Stopped for the reason `Input.handleInput` gives: the inner control's own
     // `input` is composed and would reach a consumer beside this element's.
     event.stopPropagation()
-    const cell = event.target as HTMLInputElement
-    const at = this.cells.indexOf(cell)
-    if (at === -1) {
-      return
-    }
-    /* **An emptied box is a deletion, and without this branch it is
-       unreachable.** A Backspace in a *filled* box is the browser's own: the
-       keydown handler leaves it alone, the character goes, and `input` arrives
-       carrying "". That falls through to `write`, which returns early on empty,
-       and then `paint` puts the character straight back. Only real keystrokes
-       reproduce it: dispatched events do not, which is why the specs pass over
-       it.
-
-       The rest collapse left, which is what the model already requires and what
-       a single text field does: "123456" with the 2 deleted is "13456", not a
-       hole. Focus stays where the reader was, so the box under the caret now
-       holds what followed. */
-    if (cell.value === '') {
-      const characters = this.characters
-      characters[at] = ''
-      this.requestValue(characters.join(''))
-      this.updateComplete.then(() => {
-        this.paint()
-        this.cells[at]?.focus()
-      })
-      return
-    }
-    /* Longer than one character is a paste or an autofill, whichever box it
-       landed in. A per-cell `maxlength` would have silently truncated it to the
-       first character and lost the rest. */
-    this.write(at, cell.value)
-    // And put the box back, in case what arrived was refused or filtered.
-    this.updateComplete.then(() => this.paint())
-  }
-
-  private readonly handlePaste = (event: ClipboardEvent): void => {
-    const cell = event.target as HTMLInputElement
-    const at = this.cells.indexOf(cell)
-    // A read-only box still takes a paste event, and the keys are guarded too.
-    if (at === -1 || this.isDisabled || this.readOnly) {
-      return
-    }
-    // Taken here rather than left to `input`, so the browser does not first put
-    // the whole string into one box and fire a change we then have to undo.
-    event.preventDefault()
-    this.write(at, event.clipboardData?.getData('text') ?? '')
+    const control = event.target as HTMLInputElement
+    this.take(
+      readTyped(
+        control.value,
+        control.selectionStart ?? control.value.length,
+        this.type,
+        this.case,
+        this.count,
+      ),
+    )
   }
 
   /**
-   * The keys that move between boxes, and the one that clears backwards.
-   *
-   * Backspace in an empty box goes back and clears the one it lands in, which
-   * is what makes a code correctable without the reader hunting for the box
-   * they meant. In a full box it does what it always does and is left alone.
+   * A paste writes over the boxes from the caret on, rather than into the
+   * field's text, so a code pasted into box three of a full code replaces the
+   * characters there instead of pushing them along.
+   */
+  private readonly handlePaste = (event: ClipboardEvent): void => {
+    event.preventDefault()
+    const control = this.control
+    if (!control || this.isDisabled || this.readOnly) {
+      return
+    }
+    const text = cleanCode(event.clipboardData?.getData('text') ?? '', this.type, this.case)
+    if (text === '') {
+      return
+    }
+    const start = control.selectionStart ?? this.end
+    const end = control.selectionEnd ?? start
+    /* A wider selection is replaced, as pasting over a selection does. */
+    const kept = end - start > 1 ? this.value.slice(0, start) + this.value.slice(end) : this.value
+    this.take(overwriteCode(kept, start, text, this.count))
+  }
+
+  /**
+   * The keys that move between boxes. Backspace and Delete are the field's
+   * own: the selection on a filled box makes them remove its character, and
+   * the empty place after the code makes Backspace remove the one before.
    *
    * Home goes to the first box and End to the end of the code, the box after
    * its last character, which is where the caret goes in a single text field.
    */
   private readonly handleKeydown = (event: KeyboardEvent): void => {
-    const cell = event.target as HTMLInputElement
-    const at = this.cells.indexOf(cell)
-    if (at === -1 || this.isDisabled || this.readOnly) {
+    if (event.isComposing || this.isDisabled) {
+      return
+    }
+    if (this.readOnly) {
+      /* WebKit reads a Backspace a read-only field does not take as going
+         back a page. */
+      if (event.key === 'Backspace' || event.key === 'Delete') {
+        event.preventDefault()
+      }
       return
     }
     /* Not `inlineStep`: the row is left to right whatever the page, so the key
        pointing right is the one that moves on in every script. */
-    const step = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0
     const to =
-      event.key === 'Home'
-        ? 0
-        : event.key === 'End'
-          ? Math.min(this.value.length, this.count - 1)
-          : at + step
-    if (event.key === 'Delete' && at < this.value.length) {
-      /* The character in this box goes and the rest of the code moves back
-         one, the way Delete works in one text field. */
-      const characters = this.characters
-      characters.splice(at, 1)
-      this.requestValue(characters.join('').replace(/\s+$/, ''))
-      this.updateComplete.then(() => {
-        this.paint()
-        this.cells[at]?.focus()
-      })
-    } else if (event.key === 'Backspace' && cell.value === '' && at > 0) {
-      const characters = this.characters
-      characters[at - 1] = ''
-      this.requestValue(characters.join('').replace(/\s+$/, ''))
-      this.updateComplete.then(() => {
-        this.paint()
-        this.cells[at - 1]?.focus()
-      })
-    } else if (to !== at && to >= 0 && to < this.count) {
-      this.cells[to]?.focus()
-      this.cells[to]?.select()
-    } else {
+      event.key === 'ArrowRight'
+        ? this.caretBox + 1
+        : event.key === 'ArrowLeft'
+          ? this.caretBox - 1
+          : event.key === 'Home'
+            ? 0
+            : event.key === 'End'
+              ? this.end
+              : undefined
+    if (to === undefined) {
       return
     }
     event.preventDefault()
+    this.active = Math.max(0, Math.min(to, this.end))
+    this.placeCaret(true)
+  }
+
+  /** A press on a box puts the caret there, or after the code where the box is past it. */
+  private readonly handlePress = (event: MouseEvent): void => {
+    const control = this.control
+    if (!control || this.isDisabled) {
+      return
+    }
+    const boxes = [...this.renderRoot.querySelectorAll('[part~="cell"]')]
+    const box = (event.target as Element).closest('[part~="cell"]')
+    const at = box ? boxes.indexOf(box) : this.end
+    if (this.shadowRoot?.activeElement === control) {
+      if (!this.readOnly) {
+        this.active = Math.min(at, this.end)
+        this.placeCaret(true)
+      }
+      return
+    }
+    this.pressedAt = at
+    control.focus()
   }
 
   /**
@@ -430,77 +436,34 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
    * | types a character and deletes it | silent | silent | silent |
    *
    * One row differed and it is the one that matters: a consumer who assigns
-   * `value` and then has a reader tab through the row was told the reader had
+   * `value` and then has a reader tab through the field was told the reader had
    * entered a code. `change` on a field means "the reader had a go at this",
    * `MixinField` treats it as exactly that, and announcing a value the consumer
    * set themselves is a false positive rather than the safe half of a trade.
    *
-   * **The narrower divergence that is left** is a script assigning while the row
-   * is focused, where the platform stays silent because no user edit happened
-   * and this commits on the way out. Closing it needs a dirty flag set from real
-   * cell input rather than a baseline, which is more machinery than the case has
-   * earned: a consumer writing to a field the reader is inside is already in a
-   * fight with them.
-   *
    * Seeded in `firstUpdated`, a code in the markup being committed by whoever
-   * wrote it, and re-taken on every arrival from outside the row.
+   * wrote it, and re-taken on every arrival.
    */
   private committed = ''
 
-  /** Selecting on focus, so typing replaces rather than appending. */
-  private readonly handleFocus = (event: FocusEvent): void => {
-    ;(event.target as HTMLInputElement).select()
-  }
-
-  /**
-   * Whether focus is currently somewhere inside the row.
-   *
-   * **The arrival is a transition, not a `relatedTarget` reading**, which is
-   * what the exit still does. `relatedTarget` does not work on the way in for
-   * two reasons and the second decides it. Every character moves focus to the
-   * next box, so an unguarded `focusin` re-baselines on each keystroke and the
-   * row can never report anything: measured, the three commit specs went silent
-   * at once. And `focusin` carries `relatedTarget` in a browser and not in
-   * happy-dom, so a guard written on it holds in production and not in the
-   * specs, which is the worse half. This flag needs neither: entering is
-   * `focusin` while it is `false`, and nothing else is.
-   */
-  private within = false
-
-  /**
-   * Takes the baseline when focus arrives from outside the row.
-   *
-   * The value at arrival is what the platform compares against, and the table
-   * on `committed` is why.
-   */
-  private readonly handleFocusIn = (): void => {
-    if (this.within) {
-      return
-    }
-    this.within = true
+  /** Takes the baseline, and puts the caret in the box pressed or after the code. */
+  private readonly handleFocus = (): void => {
     this.committed = this.value
+    this.active = this.readOnly ? -1 : Math.min(this.pressedAt ?? this.end, this.end)
+    this.pressedAt = undefined
+    this.placeCaret(true)
   }
 
   /**
-   * Commits when focus leaves the row.
+   * Commits when focus leaves the field.
    *
    * `change` is one of the two events `MixinField` reads as "the reader has had
    * a go at this", so without this a code that was never completed is never
    * `touched` and its own `tooShort` message cannot show: two boxes of four
-   * filled and tabbed away from is answered with nothing at all. `Input` gets
-   * this for free by relaying its control's own `change`; here the cells each
-   * fire one, none of them means the code is entered, and neither does any
-   * single one of them mean the reader has left.
-   *
-   * **Focus leaving the row, and not a cell.** Every character moves focus to
-   * the next box, so a per-cell blur would commit on every keystroke, which is
-   * the fault this exists to fix pointed the other way.
+   * filled and tabbed away from is answered with nothing at all.
    */
-  private readonly handleFocusOut = (event: FocusEvent): void => {
-    if (this.cells.includes(event.relatedTarget as HTMLInputElement)) {
-      return
-    }
-    this.within = false
+  private readonly handleBlur = (): void => {
+    this.active = -1
     this.commit()
   }
 
@@ -508,13 +471,13 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
    * Announces the code as entered, from whichever moment reached it first.
    *
    * **One writer, because the fact has two moments and only one meaning.** A
-   * filled code and a row being left are both "the reader is done with this".
+   * filled code and a field being left are both "the reader is done with this".
    * Dispatching from either site directly is how a moment gets added that fires
    * without baselining.
    *
    * Silent when nothing moved since the baseline, which is what makes it safe
    * to call from both: completing a code that is already the committed one, or
-   * leaving a row nobody edited, says nothing.
+   * leaving a field nobody edited, says nothing.
    *
    * `composed: false`, like the native event this stands in for. It is
    * dispatched on the host, so a consumer hears it.
@@ -543,27 +506,22 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
    * | typed `1234` | valid | valid |
    *
    * So `required` decides whether *nothing* is acceptable, and the length rule
-   * applies to anything that is not nothing. That is the right split for a code
-   * as well: two of four characters is not an optional code omitted, it is a
-   * code got wrong, and submitting it would send a fragment. The gate on the
-   * message is `touched` rather than `required`, which is what stops a reader
-   * being told off before they have had a go.
-   *
-   * `execCommand('insertText')` is not enough to measure this: `tooShort`
-   * applies only to a value the user edited, and the first run of the probe
-   * reported every case valid because nothing had set that flag.
+   * applies to anything that is not nothing. Two of four characters is not an
+   * optional code omitted, it is a code got wrong, and submitting it would send
+   * a fragment. The gate on the message is `touched` rather than `required`,
+   * which is what stops a reader being told off before they have had a go.
    */
   private sync(): void {
     this.internals.setFormValue(this.value)
-    const first = this.cells[0]
-    if (!first) {
+    const control = this.control
+    if (!control) {
       return
     }
     if (this.required && this.value === '') {
       this.internals.setValidity(
         { valueMissing: true },
         this.valueMissingMessage || 'Please fill in this field.',
-        first,
+        control,
       )
     } else if (this.value !== '' && this.value.length < this.count) {
       this.internals.setValidity(
@@ -571,10 +529,10 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
         fillTemplate(this.tooShortMessage || 'Please enter all {length} characters.', {
           length: this.count,
         }),
-        first,
+        control,
       )
     } else {
-      this.internals.setValidity({}, '', first)
+      this.internals.setValidity({}, '', control)
     }
     // Straight after, because validity moved without any property moving.
     this.refreshFeedback()
@@ -582,18 +540,18 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
 
   /** Puts the caret in the first empty box. */
   override focus(options?: FocusOptions): void {
-    const cells = this.cells
-    const at = Math.min(this.value.length, cells.length - 1)
-    cells[at]?.focus(options)
+    this.control?.focus(options)
   }
 
-  /** Empties every box and moves focus to the first. */
+  /** Empties every box and puts the caret in the first. */
   clear(): void {
     this.requestValue('')
-    this.updateComplete.then(() => {
-      this.paint()
-      this.cells[0]?.focus()
-    })
+    const control = this.control
+    if (control) {
+      restoreValue(control, this.value)
+      this.pressedAt = 0
+      control.focus()
+    }
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
@@ -604,8 +562,8 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.toggleState('complete', this.value.length >= this.count)
-    this.paint()
     this.sync()
+    this.placeCaret()
   }
 
   /**
@@ -625,48 +583,63 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
     return true
   }
 
+  /** What one box draws: its character, the mask, the caret, or the placeholder. */
+  private renderBox(character: string, at: number): TemplateResult {
+    const caret = at === this.caretBox
+    const content =
+      character !== ''
+        ? this.mask
+          ? this.maskCharacter
+          : character
+        : caret
+          ? html`<span part="caret"></span>`
+          : this.placeholder
+            ? html`<span part="placeholder">${this.placeholder}</span>`
+            : nothing
+    return html`<div
+      part="cell${caret ? ' cell-active' : ''}${character === '' ? '' : ' cell-filled'}"
+      aria-hidden="true"
+    >${content}</div>`
+  }
+
   protected override render(): TemplateResult {
-    const characters = this.characters
     const separators = separatorsAfter(this.format, this.count)
-    /* `renderGroupLabel` and not `renderLabel`, which is what every other
-       grouped control here uses. `renderLabel` emits `for="control"` and no
-       element in this template carries that id, because a pin input is a row of
-       cells and not one control: the visible label pointed at nothing, so
-       pressing it focused nothing and the group had no accessible name at all.
-       The row is named by the group label instead, which is in this tree. */
-    return html`${this.renderGroupLabel()}
+    /* `renderLabel`, a real `<label for>`, because the field is one control
+       now: pressing the words focuses it, and it is named by them. */
+    return html`${this.renderLabel()}
       <div
         dir="ltr"
         part="field"
-        role="group"
-        aria-describedby=${this.describedBy ?? nothing}
-        aria-labelledby=${this.labeled ? this.labelId : nothing}
-        @focusin=${this.handleFocusIn}
-        @focusout=${this.handleFocusOut}
+        @click=${this.handlePress}
+        @mousedown=${keepFocus}
       >
-        ${characters.map(
-          (character, at) => html`<input
-            part="cell"
-            .value=${character}
-            type=${this.mask ? 'password' : 'text'}
-            placeholder=${this.placeholder || nothing}
-            inputmode=${this.type === 'numeric' ? 'numeric' : 'text'}
-            autocomplete=${at === 0 ? this.autocomplete || nothing : 'off'}
-            aria-label=${fillTemplate(this.cellLabel, { index: at + 1, length: this.count })}
-            aria-invalid=${this.invalidity ?? nothing}
-            ?disabled=${this.isDisabled}
-            ?readonly=${this.readOnly}
-            @focus=${this.handleFocus}
-            @input=${this.handleInput}
-            @keydown=${this.handleKeydown}
-            @keypress=${this.handleKeypress}
-            @paste=${this.handlePaste}
-          />${
-            separators[at]
-              ? html`<span part="separator" aria-hidden="true">${separators[at]}</span>`
+        <input
+          part="control"
+          id=${this.controlId}
+          style=${UNSEEN}
+          .value=${this.value}
+          type=${this.mask ? 'password' : 'text'}
+          inputmode=${this.type === 'numeric' ? 'numeric' : 'text'}
+          autocomplete=${this.autocomplete || nothing}
+          aria-describedby=${this.describedBy ?? nothing}
+          aria-invalid=${this.invalidity ?? nothing}
+          aria-required=${this.required ? 'true' : nothing}
+          ?disabled=${this.isDisabled}
+          ?readonly=${this.readOnly}
+          @blur=${this.handleBlur}
+          @focus=${this.handleFocus}
+          @input=${this.handleInput}
+          @keydown=${this.handleKeydown}
+          @keypress=${this.handleKeypress}
+          @paste=${this.handlePaste}
+        />${Array.from({ length: this.count }, (_, at) => {
+          const separator = separators[at]
+          return html`${this.renderBox(this.value[at] ?? '', at)}${
+            separator
+              ? html`<span part="separator" aria-hidden="true">${separator}</span>`
               : nothing
-          }`,
-        )}
+          }`
+        })}
       </div>
       ${this.renderHint()}${this.renderFeedback()}`
   }
