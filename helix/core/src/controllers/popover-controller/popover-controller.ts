@@ -196,7 +196,11 @@ export class PopoverController implements ReactiveController {
    */
   show(): void {
     const surface = this.options.surface()
-    if (this.shown || !surface) {
+    /* Not while the surface is out of the page: `showPopover` throws there,
+       and a host removed with an update still pending, such as one served
+       open and replaced at once, ran it. Reconnected, the host updates again
+       and shows it then. */
+    if (this.shown || !surface?.isConnected) {
       return
     }
     this.shown = true

@@ -114,6 +114,20 @@ describe('showing a surface', () => {
     popover.show()
     expect(popover.open).toBe(false)
   })
+
+  /* `showPopover` throws on a surface out of the page, and a combobox served
+     open and replaced at once still ran its pending update: fourteen uncaught
+     errors in its browser specs. */
+  test('and not while the surface is out of the page, until it is back', () => {
+    const one = scene()
+    one.surface.remove()
+    one.popover.show()
+    expect(one.asked.filter((call) => call === 'show')).toHaveLength(0)
+    expect(one.popover.open).toBe(false)
+    document.body.append(one.surface)
+    one.popover.show()
+    expect(one.asked.filter((call) => call === 'show')).toHaveLength(1)
+  })
 })
 
 describe('a surface that is not one', () => {
