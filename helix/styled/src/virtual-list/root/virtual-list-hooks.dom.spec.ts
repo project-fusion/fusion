@@ -7,8 +7,8 @@ import {
   type Updatable,
 } from '@fusion.dev/helix-testing/dom'
 
-/* What the hooks change, which only a browser computes. Run them with
-   `bun run specs:browser virtual-list`. */
+/* What the hooks change, and the viewport's own scrollbar, which only a browser
+   computes. Run them with `bun run specs:browser virtual-list`. */
 
 beforeAll(async () => {
   registerDom()
@@ -49,5 +49,14 @@ describe('virtual list hooks', () => {
     const row = host.shadowRoot?.querySelector('[part="loading"]') as HTMLElement
     expect(getComputedStyle(row).color).toBe('rgb(4, 5, 6)')
     expect(getComputedStyle(row).paddingTop).toBe('7px')
+  })
+})
+
+describe('the viewport', () => {
+  geometry('draws the thin scrollbar Scroll Area and Chat draw, with no track', async () => {
+    const host = await list()
+    const viewport = host.shadowRoot?.querySelector('[part="viewport"]') as HTMLElement
+    expect(getComputedStyle(viewport).scrollbarWidth).toBe('thin')
+    expect(getComputedStyle(viewport).scrollbarColor).toMatch(/ (transparent|rgba\(0, 0, 0, 0\))$/)
   })
 })

@@ -22,6 +22,15 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   padding-inline: var(--helix-size-focus-reach);
+  /* **The scrollbar `ScrollArea` and `Chat` draw: `thin`, a thumb in the border
+     color, and no track.** With nothing set, a platform that always shows
+     scrollbars, such as macOS with a mouse attached, drew its classic bar: a
+     15px gray track with a rule down each side and no end caps. Against a
+     borderless box the track stopped dead at the top and bottom edges, and the
+     thumb at the start of two thousand rows was a 10px stub against that edge,
+     so the bar read as clipped. */
+  scrollbar-color: var(--helix-color-border) transparent;
+  scrollbar-width: thin;
 }
 
 /* Inset, so the viewport's clipping leaves all four sides of it. */
