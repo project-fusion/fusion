@@ -2965,6 +2965,71 @@ fn vocabulary() {
     );
 }
 
+/// A family on the words registry declares every English default `@words`: the
+/// clean class has one word property, and the fault adds a second without it.
+#[test]
+fn words() {
+    let combobox = |extra: &str| {
+        format!(
+            "export class Combobox extends HTMLElement {{
+  static words = 'helix-combobox'
+
+  @words
+  @property({{ attribute: 'empty-text' }})
+  emptyText = 'No matches'
+{extra}}}
+"
+        )
+    };
+    plant(
+        "words",
+        &[
+            ("helix.json", TIERS),
+            ("src/combobox/combobox.ts", &combobox("")),
+        ],
+        |tree| {
+            tree.write(
+                "src/combobox/combobox.ts",
+                &combobox("\n  @property({ attribute: 'list-label' })\n  listLabel = 'Options'\n"),
+            );
+        },
+        "`listLabel` defaults to English and is not a word property",
+        "src/combobox/combobox.ts:9",
+    );
+}
+
+/// A sentence built in code from a word property cannot be reordered by a
+/// translation, so a plain template literal joining one with text is refused.
+#[test]
+fn words_joined() {
+    let tag = |body: &str| {
+        format!(
+            "export class Tag extends HTMLElement {{
+  static words = 'helix-tag'
+
+  @words
+  @property({{ attribute: 'dismiss-label' }})
+  dismissLabel = 'Remove {{name}}'
+
+  name(words: string) {{
+    return {body}
+  }}
+}}
+"
+        )
+    };
+    plant_in(
+        "words-joined",
+        "words",
+        &[("helix.json", TIERS), ("src/tag/tag.ts", &tag("words"))],
+        |tree| {
+            tree.write("src/tag/tag.ts", &tag("`${this.dismissLabel} ${words}`"));
+        },
+        "a template literal joins `this.dismissLabel` with other text",
+        "src/tag/tag.ts:9",
+    );
+}
+
 /// A slot name is held to its own registry, read from what the manifest
 /// documents: `heading` is the word, and `title`, which Callout published for the
 /// same thing, is refused in its favor.
