@@ -7,6 +7,7 @@ import {
   HelixSelectEvent,
   onApple,
   requestChange,
+  slotFilled,
 } from '@fusion.dev/helix-core'
 import { caretRight, check } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -307,19 +308,19 @@ export class HelixHeadlessMenuItem extends HelixElement {
    */
   private readonly readStart = (): void => {
     const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="start"]')
-    this.start = (slot?.assignedNodes().length ?? 0) > 0
+    this.start = slotFilled(slot)
   }
 
   /** Re-reads whether anything is after the label, as `readStart` does before it. */
   private readonly readEnd = (): void => {
     const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="end"]')
-    this.end = (slot?.assignedNodes().length ?? 0) > 0
+    this.end = slotFilled(slot)
   }
 
   /** Re-reads whether anything is under the label, as `readStart` does before it. */
   private readonly readDescription = (): void => {
     const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="description"]')
-    this.description = (slot?.assignedNodes().length ?? 0) > 0
+    this.description = slotFilled(slot)
   }
 
   /**

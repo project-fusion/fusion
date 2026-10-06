@@ -1,4 +1,4 @@
-import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
+import { customElement, fillTemplate, HelixElement, hostAria } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { repeat } from 'lit/directives/repeat.js'
@@ -150,7 +150,7 @@ export class HelixHeadlessBreadcrumbs extends HelixElement {
             ><button
               part="expand"
               type="button"
-              aria-label=${this.expandLabel.replace('{count}', String(folded))}
+              aria-label=${fillTemplate(this.expandLabel, { count: String(folded) })}
               @click=${this.expand}
             >
               …

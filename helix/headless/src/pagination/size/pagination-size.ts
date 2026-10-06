@@ -3,6 +3,7 @@ import {
   formatNumbers,
   HelixBeforeChangeEvent,
   HelixFormElement,
+  hostWords,
   requestChange,
 } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -24,6 +25,11 @@ import '../../select/index.js'
  * footer, both open and closed. The caret is `Select`'s, so it follows
  * `currentColor`, and the label is a real `<label for>` pointing at the
  * trigger's id.
+ *
+ * A `<label for>` pointing at this element, or its own `aria-label` or
+ * `aria-labelledby`, names the select in place of `label`, so a reader hears
+ * the page's words for it, and the select draws no label of its own beside
+ * the page's.
  *
  * The label sits on the same row as the select. `Select`'s host is a column,
  * and an outer-tree rule overrides a `:host` rule, so the row layout needs no
@@ -250,6 +256,9 @@ export class HelixHeadlessPaginationSize extends HelixFormElement {
   protected renderSelect(): TemplateResult {
     const select = this.tag('select')
     const option = this.tag('option')
+    /* The page's name for this element, which the select's own trigger cannot
+       reach from inside this shadow root. A server has no labels to read. */
+    const named = this.isConnected ? hostWords(this) : ''
     return html`<${select}
       part="control"
       exportparts="feedback: control-feedback, hint: control-hint, indicator: control-indicator,
@@ -260,7 +269,8 @@ export class HelixHeadlessPaginationSize extends HelixFormElement {
         listbox-live: control-listbox-live, listbox-loading: control-listbox-loading, listbox-search: control-listbox-search,
         listbox-search-field: control-listbox-search-field, surface: control-surface,
         trigger: control-trigger, value: control-value"
-      label=${this.label}
+      label=${named ? '' : this.label}
+      aria-label=${named || nothing}
       ?disabled=${this.isDisabled}
       .value=${String(this.current)}
       @helix-before-change=${this.handleChange}

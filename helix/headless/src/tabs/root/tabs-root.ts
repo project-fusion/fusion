@@ -32,9 +32,11 @@ import { HelixHeadlessTab } from '../tab/tab.js'
  * between tabs either way.
  *
  * A tab with an `href` is a link, for tabs that are pages of a site. Pressing
- * it follows the link, and the arrow keys move focus without choosing, so
- * arrowing past a tab never leaves the page. Mark the tab of the page you are
- * on with `selected`, or set `active` to its value.
+ * it follows the link. Where any tab is a link, the arrow keys move focus
+ * without choosing on every tab of the list, as under `manual`, so arrowing
+ * past a tab never leaves the page and the list answers the keys one way.
+ * Mark the tab of the page you are on with `selected`, or set `active` to its
+ * value.
  *
  * Each tab says which panel it controls through `aria-controls`, set as an
  * element reference to the panel's host, where the engine has reflection.
