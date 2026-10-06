@@ -1,4 +1,10 @@
-import { customElement, HelixElement, rgbOf, slotFilled } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  HelixElement,
+  reportRuntime,
+  rgbOf,
+  slotFilled,
+} from '@fusion.dev/helix-core'
 import {
   html,
   nothing,
@@ -143,7 +149,8 @@ const pathFor = (
  * `correction` sets how much of the code can be lost. At `H` a code can lose
  * thirty percent and still scan, so a mark in the center slot is safe. At `L`
  * the same mark makes the code unscannable. The default is `M`, and `H` when the
- * `logo` slot is filled.
+ * `logo` slot is filled. A code that holds a logo at a `correction` below `H`
+ * warns once with the kind `unscannable-logo`.
  *
  * A higher level holds fewer characters, so a value that fits at `M` can be too
  * long once a logo raises the level to `H`. A value too long for the level
@@ -258,6 +265,26 @@ export class HelixHeadlessQrCode extends HelixElement {
     return this.correction ?? (this.logo ? 'H' : 'M')
   }
 
+  /** Whether this code has warned that its logo may keep it from scanning. */
+  private toldLogo = false
+
+  /**
+   * Warns once when a logo covers a code whose level was set below `H`, where
+   * the cover can take more than the level can lose. A level the code chose
+   * itself is `H` already.
+   */
+  private auditLogo(): void {
+    if (this.toldLogo || !this.logo || (this.correction ?? 'H') === 'H') {
+      return
+    }
+    this.toldLogo = true
+    reportRuntime({
+      kind: 'unscannable-logo',
+      message: `<${this.localName}> holds a logo at correction "${this.correction}", which may keep it from scanning. Set \`correction\` to "H", or leave it unset.`,
+      tag: this.localName,
+    })
+  }
+
   /** The value and level that did not fit, so `error` fires once for each. */
   private overflowed = ''
 
@@ -285,6 +312,7 @@ export class HelixHeadlessQrCode extends HelixElement {
     super.updated(changed)
     /* Told once per value and level, after the render that drew nothing, as an
        image says it failed. Not on a server, which runs no `updated`. */
+    this.auditLogo()
     const key = `${this.level}:${this.value}`
     const overflow = this.value !== '' && this.encoded() === undefined
     this.toggleState('overflow', overflow)

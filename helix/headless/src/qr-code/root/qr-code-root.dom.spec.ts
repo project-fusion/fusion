@@ -321,3 +321,47 @@ describe('a code as a file', () => {
     expect(await code.toPng()).toBeNull()
   })
 })
+
+/* A logo over a code set to `L` made it unscannable, and nothing said so. */
+describe('a logo at a level below H', () => {
+  const warned = async (markup: string): Promise<string[]> => {
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      const host = await code(markup)
+      host.setAttribute('value', 'https://fusion.dev/next')
+      await host.updateComplete
+    } finally {
+      console.warn = original
+    }
+    return warnings.filter((one) => one.includes('logo'))
+  }
+
+  test('warns once, naming the level and the fix', async () => {
+    const warnings = await warned(
+      '<helix-headless-qr-code value="https://fusion.dev" correction="L"><svg slot="logo"></svg></helix-headless-qr-code>',
+    )
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0]).toContain('correction "L"')
+    expect(warnings[0]).toContain('"H"')
+  })
+
+  test('says nothing at H, at the level the code chose, or without a logo', async () => {
+    expect(
+      await warned(
+        '<helix-headless-qr-code value="https://fusion.dev" correction="H"><svg slot="logo"></svg></helix-headless-qr-code>',
+      ),
+    ).toEqual([])
+    expect(
+      await warned(
+        '<helix-headless-qr-code value="https://fusion.dev"><svg slot="logo"></svg></helix-headless-qr-code>',
+      ),
+    ).toEqual([])
+    expect(
+      await warned(
+        '<helix-headless-qr-code value="https://fusion.dev" correction="L"></helix-headless-qr-code>',
+      ),
+    ).toEqual([])
+  })
+})

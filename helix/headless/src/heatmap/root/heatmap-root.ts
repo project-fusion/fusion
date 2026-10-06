@@ -13,6 +13,7 @@ import {
   MixinChartSource,
   markRegion,
   pressedValue,
+  type ReadingCursor,
   rangeAdd,
   requestChange,
   StatusController,
@@ -24,9 +25,6 @@ import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import '../../tooltip/index.js'
 import { fits, monthPage, overviewOf, type Reading, toneOf } from './buckets.js'
-
-/** What the readout reads a cell from: the pointer, or one standing in for it. */
-type ReadingCursor = NonNullable<Parameters<typeof drawTooltip>[5]>
 
 /**
  * @summary A strip of cells, each colored by its reading, for uptime, contributions, or activity.
@@ -799,12 +797,12 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
     if (!commaList(this.value).includes(key)) {
       return pointer
     }
-    const position = pointer.position
     return {
       column: pointer.column,
       keyed: pointer.keyed,
-      position: position === '' ? this.selectedLabel : `${position}, ${this.selectedLabel}`,
+      position: pointer.position,
       shows: (cell) => pointer.shows(cell),
+      state: this.selectedLabel,
     }
   }
 

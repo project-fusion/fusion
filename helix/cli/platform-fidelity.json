@@ -44,9 +44,6 @@
       "label": "The visible text is slotted, so the component renders whatever is given rather than a string it holds.",
       "text": "Slotted, as `label` is."
     },
-    "helix-select": {
-      "autocomplete": "Renders a `<button>` and a listbox rather than a `<select>`, so autofill has no control to write into. Real capability the platform has and this cannot offer."
-    },
     "helix-switch": {
       "indeterminate": "A switch is binary by definition. A third state is a checkbox."
     },

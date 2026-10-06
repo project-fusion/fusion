@@ -10,15 +10,18 @@ import type { Row } from '../read-series/read-series.js'
  * false for, which is a series a legend hid.
  *
  * `position` follows in brackets, such as "2 of 12", where the chart gives
- * one: last, so the reading is heard before where it stands.
+ * one: last, so the reading is heard before where it stands. `state`, a word
+ * such as "selected", follows it in the same brackets, "2 of 12, selected".
  */
 export const spokenReading = (
   row: Row,
   column?: number,
   shows: (cell: number) => boolean = () => true,
   position = '',
+  state = '',
 ): string => {
-  const after = position === '' ? '' : ` (${position})`
+  const bracket = [position, state].filter((word) => word !== '').join(', ')
+  const after = bracket === '' ? '' : ` (${bracket})`
   const cell = column === undefined ? undefined : row.cells[column]
   if (cell) {
     return `${`${row.label}, ${cell.name} ${cell.text}`.trim()}${after}`
