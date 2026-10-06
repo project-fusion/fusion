@@ -1,9 +1,11 @@
 import {
   ariaChord,
+  chordParts,
   customElement,
   deepActiveElement,
   HelixElement,
   HelixSelectEvent,
+  keyNames,
   onApple,
   reportRuntime,
   slotFilled,
@@ -27,9 +29,10 @@ let toldSelected = false
  * translated like other text.
  *
  * `shortcut` gives the action's keyboard shortcut as a chord, such as `mod+s`,
- * the grammar Menu's rows use, and the action carries it as
- * `aria-keyshortcuts`. Put a `Kbd` with the same keys in the `shortcut` slot
- * to draw it after the name, as Menu draws its rows' shortcuts; the dial
+ * the grammar Menu's rows use. The action carries it as `aria-keyshortcuts`
+ * and draws it after the name in the platform's glyphs or words, `⌘S` on an
+ * Apple keyboard and `Ctrl+S` elsewhere, as Menu draws its rows' shortcuts.
+ * Put a `Kbd` in the `shortcut` slot to draw it as keys instead; the dial
  * imports no `Kbd` of its own. Showing a shortcut does not bind it.
  *
  * @since 0.1.0
@@ -40,14 +43,14 @@ let toldSelected = false
  *
  * @slot - The action's name.
  * @slot icon - The action's icon, the main way the action is recognized.
- * @slot shortcut - The action's keyboard shortcut, drawn after its name, such as a `Kbd`. It is hidden from the name, which `aria-keyshortcuts` carries instead.
+ * @slot shortcut - The action's keyboard shortcut, drawn after its name, such as a `Kbd`. It replaces the text drawn for `shortcut`, and is hidden from the name, which `aria-keyshortcuts` carries instead.
  *
  * @event {HelixSelectEvent} helix-select - The action was chosen. Cancelable: cancel it to keep the dial open.
  *
  * @csspart icon - The box that holds the icon.
  * @csspart item - The control for the action.
  * @csspart label - The action's name, beside the icon.
- * @csspart shortcut - The box after the name that holds the `shortcut` slot, shown while something is in it.
+ * @csspart shortcut - The box after the name that holds the shortcut, shown while `shortcut` is set or something is in the `shortcut` slot.
  */
 @customElement('helix-headless-speed-dial-item')
 export class HelixHeadlessSpeedDialItem extends HelixElement {
@@ -59,8 +62,8 @@ export class HelixHeadlessSpeedDialItem extends HelixElement {
 
   /**
    * The action's keyboard shortcut as a chord, such as `mod+s`, carried as
-   * `aria-keyshortcuts`. `mod` is Command on an Apple keyboard and Control
-   * elsewhere. Showing a shortcut does not bind it.
+   * `aria-keyshortcuts` and drawn after the name. `mod` is Command on an Apple
+   * keyboard and Control elsewhere. Showing a shortcut does not bind it.
    */
   @property()
   shortcut = ''
@@ -150,8 +153,11 @@ export class HelixHeadlessSpeedDialItem extends HelixElement {
   protected override render(): TemplateResult {
     /* In this reader's platform's words, and in the server's while hydrating
        what one sent, which has no keyboard to ask. */
-    const keys =
-      this.shortcut === '' ? nothing : ariaChord(this.shortcut, !this.hydrating && onApple())
+    const apple = !this.hydrating && onApple()
+    const keys = this.shortcut === '' ? nothing : ariaChord(this.shortcut, apple)
+    /* Drawn as Kbd draws a chord, from the same table, as the slot's fallback,
+       so a `Kbd` slotted in replaces it. */
+    const drawn = keyNames(chordParts(this.shortcut), apple)
     return html`<button
       part="item"
       role="menuitem"
@@ -166,8 +172,10 @@ export class HelixHeadlessSpeedDialItem extends HelixElement {
       <span part="label"><slot></slot><span
           part="shortcut"
           aria-hidden="true"
-          ?hidden=${!this.hasShortcut}
-        ><slot name="shortcut" @slotchange=${this.readShortcut}></slot></span
+          ?hidden=${!this.hasShortcut && this.shortcut === ''}
+        ><slot name="shortcut" @slotchange=${this.readShortcut}
+          >${drawn.keys.join(drawn.separator)}</slot
+        ></span
       ></span>
     </button>`
   }

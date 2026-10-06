@@ -370,6 +370,7 @@ export {
   printableChord,
   selectsAll,
 } from './utils/chord/chord.js'
+export { type KeyNames, keyNames } from './utils/chord/key-names.js'
 export { clamp } from './utils/clamp/clamp.js'
 export {
   clockLocale,
@@ -463,7 +464,12 @@ export {
 } from './utils/media-copy/media-copy.js'
 export { nameText } from './utils/name-text/name-text.js'
 export { nearest } from './utils/nearest/nearest.js'
-export { formatNumber, parseNumber, readingText } from './utils/number-format/number-format.js'
+export {
+  formatNumber,
+  formatPercent,
+  parseNumber,
+  readingText,
+} from './utils/number-format/number-format.js'
 export { onUnlessFalse } from './utils/on-unless-false/on-unless-false.js'
 export { applyOwnRule, type OwnRule } from './utils/own-rule/own-rule.js'
 export { plainClick } from './utils/plain-click/plain-click.js'

@@ -36,6 +36,15 @@ export const formatNumber = (
 const WHOLE_PERCENT: Intl.NumberFormatOptions = { maximumFractionDigits: 0, style: 'percent' }
 
 /**
+ * A share, from 0 to 1, as a locale writes a whole percentage: `40%`, or
+ * `40 %` in French. For `aria-valuetext`, since a bare `aria-valuenow` is read
+ * as a number with no unit. Splitter's position and Meter's and Progress's
+ * readings are written with it.
+ */
+export const formatPercent = (share: number, locale = ''): string =>
+  formatNumber(share, locale, WHOLE_PERCENT)
+
+/**
  * A reading in words: `value` written with `options` where they say another
  * style, and otherwise `share`, from 0 to 1, as a percentage, whole unless
  * `options` say more.
