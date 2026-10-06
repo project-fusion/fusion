@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, type Updatable } from '@fusion.dev/helix-testing/dom'
+import { hasState, mount, part, registerDom, type Updatable } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -435,5 +435,71 @@ describe('a select in a toolbar', () => {
       select.hasAttribute('tabindex'),
       part(select, 'trigger')?.getAttribute('tabindex'),
     ]).toEqual([false, '-1'])
+  })
+})
+
+/* A custom control with no `focusable` had `tabindex` written on its host,
+   markup the consumer rendered and a React consumer's hydration reports. */
+describe('a custom control in a toolbar', () => {
+  test('takes the stop on the control inside it, and the arrows reach that control', async () => {
+    if (!customElements.get('x-tool')) {
+      customElements.define(
+        'x-tool',
+        class extends HTMLElement {
+          constructor() {
+            super()
+            this.attachShadow({ mode: 'open' }).innerHTML = '<button>Tool</button>'
+          }
+        },
+      )
+    }
+    const toolbar = await mount(`
+      <helix-headless-toolbar label="Format">
+        <helix-headless-button id="first">Bold</helix-headless-button>
+        <x-tool></x-tool>
+      </helix-headless-toolbar>`)
+    await settle(toolbar)
+    const first = toolbar.querySelector('#first') as HTMLElement
+    const tool = toolbar.querySelector('x-tool') as HTMLElement
+    const inner = tool.shadowRoot?.querySelector('button') as HTMLButtonElement
+    first.dispatchEvent(new FocusEvent('focusin', { bubbles: true, composed: true }))
+    expect([tool.hasAttribute('tabindex'), inner.getAttribute('tabindex')]).toEqual([false, '-1'])
+
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key: 'ArrowRight',
+    })
+    first.dispatchEvent(event)
+    expect(event.defaultPrevented).toBe(true)
+    expect(tool.shadowRoot?.activeElement).toBe(inner)
+    expect([tool.hasAttribute('tabindex'), inner.getAttribute('tabindex')]).toEqual([false, '0'])
+  })
+})
+
+/* RAC writes `data-orientation`; the toolbar said its axis only through an
+   attribute that is absent by default, and nothing said it was nested. */
+describe('the states a toolbar sets', () => {
+  test('says its axis, and whether it is a group inside another toolbar', async () => {
+    const toolbar = await mount(`
+      <helix-headless-toolbar label="Format">
+        <helix-headless-button>Bold</helix-headless-button>
+        <helix-headless-toolbar label="Nested" orientation="vertical">
+          <helix-headless-button>Left</helix-headless-button>
+        </helix-headless-toolbar>
+      </helix-headless-toolbar>`)
+    const inner = toolbar.querySelector('helix-headless-toolbar') as HTMLElement & Updatable
+    await inner.updateComplete
+    expect(['horizontal', 'vertical', 'nested'].map((name) => hasState(toolbar, name))).toEqual([
+      true,
+      false,
+      false,
+    ])
+    expect(['horizontal', 'vertical', 'nested'].map((name) => hasState(inner, name))).toEqual([
+      false,
+      true,
+      true,
+    ])
   })
 })
