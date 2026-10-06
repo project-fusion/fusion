@@ -67,6 +67,23 @@ The eight syntax roles for code are `callable`, `comment`, `constant`,
 `invalid`, `keyword`, `name`, `string`, and `tag`. A full editor theme has more
 roles. Helix has fewer because code in documentation only needs to be read.
 
+### Scrollbars
+
+`Scroll Area`, `Chat`, and `Virtual List` color their scrollbars with three
+tokens:
+
+- `--helix-scrollbar-thumb-color` is the thumb at rest. It is a mid gray that
+  measures at least 3:1 against the page and every surface, in both modes.
+- `--helix-scrollbar-thumb-hover-color` is the thumb while the pointer is over
+  its scroller. It is `foreground-subtle`.
+- `--helix-scrollbar-track-color` is the track behind the thumb. It is
+  `transparent`, so the scroller's own ground shows through.
+
+Each of the three reads its own hook first, such as `--scroll-area-thumb-color`
+or `--chat-scrollbar-thumb-color`, so you can recolor one scroller and leave
+the rest. Set the tokens to recolor all three. Other families that scroll keep
+the browser's own scrollbar.
+
 ## Why colors use OKLCH
 
 Every Helix color is written in OKLCH. In sRGB, equal numeric steps do not look

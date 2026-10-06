@@ -355,6 +355,8 @@ export {
   type Barring,
   barredBy,
   type CalendarView,
+  calendarLocale,
+  type DateCalendar,
   localToday,
   monthOf,
   monthOut,

@@ -101,3 +101,29 @@ describe('calendar as a form control, on the server', () => {
     ).toBe(true)
   })
 })
+
+describe('a calendar served in a calendar other than the Gregorian', () => {
+  const heading = (locale: string): string =>
+    new Intl.DateTimeFormat(locale, { month: 'long', timeZone: 'UTC', year: 'numeric' }).format(
+      new Date('2026-10-01T00:00:00Z'),
+    )
+
+  test('the heading names the month the grid draws', () => {
+    expect(
+      rendered(
+        ssr(
+          html`<helix-headless-date-picker locale="fa-IR" default-month="2026-10"></helix-headless-date-picker>`,
+        ),
+        TAG,
+      ),
+    ).toContain(heading('fa-IR-u-ca-gregory'))
+    expect(
+      rendered(
+        ssr(
+          html`<helix-headless-date-picker locale="en-US" calendar="japanese" default-month="2026-10"></helix-headless-date-picker>`,
+        ),
+        TAG,
+      ),
+    ).toContain(heading('en-US-u-ca-japanese'))
+  })
+})

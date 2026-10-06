@@ -1000,3 +1000,66 @@ describe('a date picker’s own message', () => {
     expect(host.internals.states.has('invalid')).toBe(true)
   })
 })
+
+describe('a date picker in a calendar other than the Gregorian', () => {
+  const heading = (cal: DatePicker): string => part(cal, 'heading')?.textContent?.trim() ?? ''
+  const written = (locale: string, iso: string, options: Intl.DateTimeFormatOptions): string =>
+    new Intl.DateTimeFormat(locale, { ...options, timeZone: 'UTC' }).format(
+      new Date(`${iso}T00:00:00Z`),
+    )
+
+  /* Measured before this: in fa-IR the heading read Mehr 1405 over the days of
+     October 2026, and the cell showing 26 was named Mehr 4. */
+  test('a calendar with months of its own is written in Gregorian, so heading and days agree', async () => {
+    for (const lang of ['fa-IR', 'en-US-u-ca-islamic-umalqura', 'he-IL-u-ca-hebrew']) {
+      const cal = await inLang<DatePicker>(
+        lang,
+        '<helix-headless-date-picker label="Date" default-month="2026-10"></helix-headless-date-picker>',
+      )
+      const gregorian = calendarOf(lang)
+      expect(heading(cal)).toBe(
+        written(gregorian, '2026-10-01', { month: 'long', year: 'numeric' }),
+      )
+      const sixth = days(cal).find((cell) => cell.textContent?.trim() === '6')
+      expect(sixth?.getAttribute('aria-label')).toBe(
+        written(gregorian, '2026-10-06', { dateStyle: 'full' }),
+      )
+    }
+  })
+
+  test('a calendar whose months are the Gregorian months is kept', async () => {
+    const thai = await inLang<DatePicker>(
+      'th-TH',
+      '<helix-headless-date-picker label="Date" default-month="2026-10"></helix-headless-date-picker>',
+    )
+    expect(heading(thai)).toContain('2569')
+    const era = await inLang<DatePicker>(
+      'ja-JP-u-ca-japanese',
+      '<helix-headless-date-picker label="Date" default-month="2026-10"></helix-headless-date-picker>',
+    )
+    expect(heading(era)).toContain('令和8年')
+  })
+
+  test('`calendar` picks one of the five, and the value stays ISO', async () => {
+    const cal = (await calendar(
+      'locale="en-US" calendar="buddhist" default-month="2026-10" default-value="2026-10-06"',
+    )) as DatePicker & { calendar?: string; updateComplete: Promise<unknown> }
+    expect(heading(cal)).toBe(
+      written('en-US-u-ca-buddhist', '2026-10-01', { month: 'long', year: 'numeric' }),
+    )
+    expect(heading(cal)).toContain('2569')
+    expect(cal.value).toBe('2026-10-06')
+    cal.calendar = 'roc'
+    await cal.updateComplete
+    expect(heading(cal)).toContain('115')
+    const thai = await inLang<DatePicker>(
+      'th-TH',
+      '<helix-headless-date-picker label="Date" calendar="gregory" default-month="2026-10"></helix-headless-date-picker>',
+    )
+    expect(heading(thai)).toContain('2026')
+  })
+})
+
+/** A locale written in the Gregorian calendar. */
+const calendarOf = (lang: string): string =>
+  new Intl.Locale(lang, { calendar: 'gregory' }).toString()

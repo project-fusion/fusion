@@ -312,3 +312,30 @@ describe('a date drawn field by field', () => {
     expect(part(element, 'year')).toBeNull()
   })
 })
+
+describe('a date in a calendar', () => {
+  const long = (locale: string): string =>
+    new Intl.DateTimeFormat(locale, { dateStyle: 'long', timeZone: 'UTC' }).format(
+      new Date('2026-10-06T00:00:00Z'),
+    )
+
+  /* Measured before this: inside lang="fa-IR" the date read 14 Mehr 1405,
+     where a Date Picker beside it drew October 2026. */
+  test('a page whose calendar has months of its own reads it in Gregorian', async () => {
+    document.body.innerHTML =
+      '<div lang="fa-IR"><helix-headless-format-date date="2026-10-06" date-style="long"></helix-headless-format-date></div>'
+    const element = document.body.querySelector('helix-headless-format-date') as Stamp
+    await element.updateComplete
+    expect(part(element, 'time')?.textContent).toBe(long('fa-IR-u-ca-gregory'))
+  })
+
+  test('`calendar` changes the calendar it is written in', async () => {
+    const element = (await stamp(
+      '<helix-headless-format-date locale="en-US" calendar="roc" date="2026-10-06" date-style="long"></helix-headless-format-date>',
+    )) as Stamp & { calendar?: string }
+    expect(part(element, 'time')?.textContent).toBe(long('en-US-u-ca-roc'))
+    element.calendar = 'gregory'
+    await element.updateComplete
+    expect(part(element, 'time')?.textContent).toBe('October 6, 2026')
+  })
+})
