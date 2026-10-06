@@ -1,9 +1,14 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { registerDom } from '@fusion.dev/helix-testing/dom'
-import { hideOutside } from './hide-outside.js'
 
-beforeAll(() => {
+/* Imported after `registerDom()`: a static import loads core before the page
+   exists, and every spec file after this one in the same run met a core that
+   had read no DOM. */
+let hideOutside: typeof import('./hide-outside.js').hideOutside
+
+beforeAll(async () => {
   registerDom()
+  ;({ hideOutside } = await import('./hide-outside.js'))
 })
 
 afterEach(() => {

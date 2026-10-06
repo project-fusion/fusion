@@ -232,8 +232,13 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
     const filled = slotFilled(slot)
     /* A name that is not shown is no label to leave room for. Content the
        consumer wrote wins over the host's `aria-label`, as it does in the
-       platform's own `<label>`, so the clip only holds while the slot is empty. */
-    const hidden = this.label === '' && Boolean(this.getAttribute('aria-label')) && !filled
+       platform's own `<label>`, so the clip only holds while the slot is empty.
+       The consumer's own nodes, unflattened: flattened, a browser counts the
+       fallback, which is the `aria-label` itself, and the clip never held. */
+    const written = (slot?.assignedNodes() ?? []).some(
+      (node) => node.nodeType === Node.ELEMENT_NODE || node.textContent?.trim() !== '',
+    )
+    const hidden = this.label === '' && Boolean(this.getAttribute('aria-label')) && !written
     this.partNamed('label')?.toggleAttribute('data-hidden', hidden)
     this.toggleState('has-label', filled && !hidden)
     /* And `hidden` on the region itself, because the state is on the host and
