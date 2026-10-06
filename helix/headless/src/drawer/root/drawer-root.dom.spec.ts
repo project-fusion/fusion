@@ -485,3 +485,49 @@ describe('the snap point it rests at', () => {
     expect(drawer.snap).toBe(1)
   })
 })
+
+describe('Tab at either end of a modal drawer', () => {
+  type Opening = HTMLElement & { modal: boolean; show(): void; updateComplete: Promise<unknown> }
+  const press = (from: Element, shiftKey = false): KeyboardEvent => {
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key: 'Tab',
+      shiftKey,
+    })
+    from.dispatchEvent(event)
+    return event
+  }
+  const opened = async (extra = ''): Promise<Opening> => {
+    const host = (await mount(
+      `<helix-headless-drawer label="Filters" dismissible ${extra}>
+        <input id="query" aria-label="Query">
+        <button id="apply" slot="footer">Apply</button>
+      </helix-headless-drawer>`,
+    )) as Opening
+    host.show()
+    await host.updateComplete
+    return host
+  }
+
+  test('wraps to the other end, the close control included, rather than leaving the page', async () => {
+    const host = await opened()
+    const dismiss = part(host, 'dismiss') as HTMLElement
+    dismiss.focus()
+    expect(press(dismiss).defaultPrevented).toBe(true)
+    expect(document.activeElement?.id).toBe('query')
+    const query = host.querySelector('#query') as HTMLElement
+    expect(press(query, true).defaultPrevented).toBe(true)
+    expect(host.shadowRoot?.activeElement).toBe(dismiss)
+    query.focus()
+    expect(press(query).defaultPrevented).toBe(false)
+  })
+
+  test('lets Tab go on where the drawer is not modal', async () => {
+    const host = await opened('modal="false"')
+    const dismiss = part(host, 'dismiss') as HTMLElement
+    dismiss.focus()
+    expect(press(dismiss).defaultPrevented).toBe(false)
+  })
+})

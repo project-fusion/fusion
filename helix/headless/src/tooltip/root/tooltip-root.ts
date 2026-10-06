@@ -65,6 +65,9 @@ const warmth = (): Warmth => {
  * `aria-describedby` pointing at the tooltip yourself to have the link in the
  * server's markup. Where the browser has no element references, write it
  * yourself; the tooltip warns once on first open if nothing links the two.
+ * In the `for` form the tooltip itself is out of the accessibility tree while
+ * its bubble is down, so a reader walking the page meets its words once, as
+ * the trigger's description.
  *
  * The tooltip shows on hover and on focus. It hides on pointer leave, on blur,
  * on Escape, and when the trigger is activated. The pointer can move from the
@@ -944,6 +947,13 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
        * whether it wraps the trigger or sits beside it. */
       label: this.describedText,
     })
+    /* **Out of the tree while it is down, in the `for` form.** The host is a
+       box with no role that names itself only so the trigger's reference has
+       words to read, and a reader walking the page met it as a stray copy of
+       the tooltip beside its trigger. A reference reads the words of an element
+       hidden this way all the same. The wrapping form holds its trigger, so it
+       cannot hide, and an open bubble is a `tooltip` a reader can find. */
+    this.internals.ariaHidden = this.for !== '' && !this.open ? 'true' : null
   }
 
   protected override render(): TemplateResult {

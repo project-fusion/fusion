@@ -4,14 +4,14 @@
 }
 
 [part="dialog"] {
-  background-color: var(--helix-color-surface-overlay);
+  background-color: var(--dialog-background-color, var(--helix-color-surface-overlay));
   border: var(--dialog-border-width, var(--helix-border-floating)) solid
     var(--dialog-border-color, var(--helix-color-border));
   /* The house radius. */
-  border-radius: var(--helix-radii-sm);
+  border-radius: var(--dialog-radius, var(--helix-radii-sm));
   box-shadow: var(--dialog-shadow, var(--helix-shadow-floating));
   box-sizing: border-box;
-  color: var(--helix-color-foreground);
+  color: var(--dialog-color, var(--helix-color-foreground));
   display: flex;
   flex-direction: column;
   gap: var(--helix-space-md);
