@@ -22,6 +22,7 @@ interface Chart extends HTMLElement {
   sourceRows: { cells: { name: string; text: string; value?: number }[]; label: string }[]
   series: { name: string; points: { label: string; value: number }[] }[]
   renders: number
+  showsColumn(cell: number): boolean
   updateComplete: Promise<boolean>
 }
 
@@ -165,6 +166,35 @@ describe('what a chart is called', () => {
     one.for = 'absent'
     await one.updateComplete
     expect(one.named).toBe('')
+  })
+
+  /* How a page names an element, and the chart is a generic around its plot:
+     written on the host, the name reached nobody until the plot took it. */
+  test('is an `aria-label` written on the chart before anything else, and repaints', async () => {
+    const one = await chart()
+    one.label = 'Q1'
+    await one.updateComplete
+    const before = one.renders
+    one.setAttribute('aria-label', 'Revenue, first quarter')
+    await one.updateComplete
+    expect(one.named).toBe('Revenue, first quarter')
+    expect(one.renders).toBeGreaterThan(before)
+  })
+})
+
+describe('a column a legend hid', () => {
+  test('is passed over by the keys and the readout, by its heading', async () => {
+    const one = await chart()
+    const headings = one.sourceRows[0]?.cells.map((cell) => cell.name) ?? []
+    const revenue = headings.indexOf('Revenue')
+    expect(one.showsColumn(revenue)).toBe(true)
+    ;(one as unknown as { source: { hide(names: string[]): void } }).source.hide(['revenue'])
+    expect(one.showsColumn(revenue)).toBe(false)
+    expect(one.showsColumn(headings.indexOf('Note'))).toBe(true)
+  })
+
+  test('is shown where the row has no such cell', async () => {
+    expect((await chart()).showsColumn(99)).toBe(true)
   })
 })
 
