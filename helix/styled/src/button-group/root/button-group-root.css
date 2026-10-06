@@ -39,6 +39,34 @@
   --helix-text-control: var(--helix-text-md);
 }
 
+/* A native button takes the size too, which reaches a Helix button through
+   the steps above and never reached a native one: measured 27px in a large
+   group. Only under `size`, so a group without one leaves it as it was. */
+:host([size]) ::slotted(button) {
+  block-size: var(--helix-size-control);
+  font-size: var(--helix-text-control);
+}
+
+/* The look of a pressed button, in a selection mode: the solid fill. The
+   pressed state is on the control inside each button, where no rule in here
+   can select it, so the group writes these onto that control as the button's
+   own hooks. Resolved here, so a hook set on the group or above it reaches
+   every button. */
+:host([selection-mode]) {
+  --_button-group-pressed-background: var(
+    --button-group-pressed-background-color,
+    var(--helix-color-foreground)
+  );
+  --_button-group-pressed-border: var(
+    --button-group-pressed-border-color,
+    var(--_button-group-pressed-background)
+  );
+  --_button-group-pressed-foreground: var(
+    --button-group-pressed-color,
+    var(--helix-color-background)
+  );
+}
+
 /* Each button after the first is pulled onto its neighbor's border, so the two
    share one line rather than drawing two against each other. */
 :host(:not([variant="spaced"])) ::slotted(*:not(:first-child)) {
