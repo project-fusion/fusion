@@ -38,6 +38,18 @@ const isFragment = (element: Element): element is HTMLAnchorElement =>
  * In a contents rail with a scrollbar of its own, `follow` keeps the link of
  * the section in view showing as the reader scrolls the page.
  *
+ * **Keyboard.** The links are your anchors, in the tab order as you wrote
+ * them, so the outline adds no keys of its own: Tab moves through the links
+ * and Enter follows one. Following a link moves focus to its section, so the
+ * next Tab goes on from the heading, also with `behavior` set.
+ *
+ * **What a screen reader hears.** A navigation landmark named by `label`, "On
+ * this page", or by the slotted heading. The links are lists, nested by level,
+ * so a reader hears how many links a level holds and where each one is. The
+ * link to the section in view carries `aria-current="location"`, read as
+ * "current location", and it moves as the page scrolls without announcing,
+ * which would interrupt the reading it follows.
+ *
  * The current section is decided by the headings' positions. An
  * `IntersectionObserver` with a band near the top fails both ways: when
  * headings are far apart, none is in the band and no section is marked, and

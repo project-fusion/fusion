@@ -24,7 +24,9 @@ describe('toast server output', () => {
        renders with no children. */
     expect(
       rendered(ssr(html`<helix-headless-toast></helix-headless-toast>`), 'helix-headless-toast'),
-    ).toContain('<div part="region" popover="manual" tabindex="-1"><slot></slot></div>')
+    ).toMatch(
+      /<div part="region" popover="manual" tabindex="-1"><slot><\/slot><span part="live" role="status">(<!--lit-part-->)?(<!--\/lit-part-->)?<\/span><span part="live" role="alert">(<!--lit-part-->)?(<!--\/lit-part-->)?<\/span><\/div>/,
+    )
     expect(
       rendered(
         ssr(html`<helix-headless-toast-item tone="success"></helix-headless-toast-item>`),

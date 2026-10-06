@@ -49,6 +49,18 @@ helix-headless-toast::part(region) {
   position: fixed;
 }
 
+/* The two regions that say each message as it arrives are heard and not
+   drawn: clipped, never `display: none`, which would take them out of the
+   accessibility tree too. */
+helix-headless-toast::part(live) {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
 helix-headless-toast-item {
   display: grid;
   inline-size: 22rem;

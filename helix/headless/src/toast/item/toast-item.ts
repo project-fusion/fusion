@@ -33,9 +33,9 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * **Each message is an `alertdialog` named by its words**, which is how a reader
  * who moves into the stack hears which message they are on. Give it a
  * `heading` and a `description`, and the heading names it and the description
- * describes it, for a message with a title and a line of detail. A `danger` message
- * is its own assertive live region, so it is announced at once; every other one
- * is announced politely by the region.
+ * describes it, for a message with a title and a line of detail. The region
+ * says each message once as it arrives, a `danger` one assertively, so a
+ * message is never a live region of its own.
  *
  * A touch or a pen swipes a message toward the end of the line, and past
  * halfway, or quickly, dismisses it through the same `helix-dismiss` as its
@@ -261,12 +261,11 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
        `display: grid` unconditionally so the author rule beats the UA sheet,
        and the exit still animates its row down from `1fr`. */
     this.toggleAttribute('hidden', !this.open)
-    /* A dialog a reader can move into, named by its words, and assertive when
-       it is a danger message. Through internals, so nothing is written onto
-       the consumer's element. */
+    /* A dialog a reader can move into, named by its words. Through internals,
+       so nothing is written onto the consumer's element. Not a live region:
+       the region says the message as it arrives, in the voice of its tone. */
     hostAria(this.internals, { role: 'alertdialog' })
     this.internals.ariaModal = 'false'
-    this.internals.ariaLive = this.tone === 'danger' ? 'assertive' : null
   }
 
   protected override updated(changed: PropertyValues): void {
