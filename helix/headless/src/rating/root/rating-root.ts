@@ -11,11 +11,12 @@ import {
   MixinControllerValue,
   MixinField,
   type NavigableItem,
+  nearest,
   reportRuntime,
+  SlottedGlyph,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
-import { nearestStep } from '../steps.js'
 
 /**
  * @summary A row of marks, such as stars, for giving or showing a score.
@@ -238,10 +239,9 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
    * each of its own options. Anything past the first slotted element is
    * ignored.
    */
-  @state()
-  private markSource: Element | undefined = undefined
+  private readonly mark = new SlottedGlyph()
 
-  /** Whether `markSource` has had its first answer from the children. */
+  /** Whether `mark` has had its first answer from the children. */
   private markRead = false
 
   /**
@@ -328,44 +328,26 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
   private dragging: number | undefined = undefined
 
   /**
-   * One clone per place a mark goes, kept so a render does not remake them.
+   * The shape for one place, or nothing when the stylesheet is drawing it.
    *
-   * A drag renders on every pointer move, and handing Lit a fresh node each
-   * time would swap every mark in the row on every frame of a gesture whose
-   * whole point is that only the fill moves.
+   * One copy per place, kept so a render does not remake them: a drag renders
+   * on every pointer move, and handing Lit a fresh node each time would swap
+   * every mark in the row on every frame of a gesture whose whole point is
+   * that only the fill moves.
    */
-  private readonly clones = new Map<string, Node>()
-
-  /** The shape for one place, or nothing when the stylesheet is drawing it. */
   private markFor(layer: string, index: number): Node | undefined {
-    const source = layer === 'track' ? (this.emptySource ?? this.markSource) : this.markSource
-    if (!source) {
-      return undefined
-    }
-    const key = `${layer}:${index}`
-    const held = this.clones.get(key)
-    if (held) {
-      return held
-    }
-    const clone = source.cloneNode(true)
-    this.clones.set(key, clone)
-    return clone
+    const glyph = layer === 'track' && this.empty.slotted ? this.empty : this.mark
+    return glyph.copyFor(`${layer}:${index}`)
   }
 
   private readonly handleMarkSlot = (event: Event): void => {
     const slot = event.target as HTMLSlotElement
-    const source = slot.assignedElements({ flatten: true })[0]
-    this.clones.clear()
-    if (slot.name === 'empty-mark') {
-      this.emptySource = source
-    } else {
-      this.markSource = source
-    }
+    ;(slot.name === 'empty-mark' ? this.empty : this.mark).read(slot)
+    this.requestUpdate()
   }
 
   /** The element slotted into `empty-mark`, which the track copies. */
-  @state()
-  private emptySource: Element | undefined = undefined
+  private readonly empty = new SlottedGlyph()
 
   /**
    * The step under a point on the row, or the nearest one to it.
@@ -380,7 +362,7 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
    * a pointer in the half-gap outside the first mark still answers.
    */
   private scoreAt(clientX: number): string | undefined {
-    let nearest: string | undefined
+    let closest: string | undefined
     let best = Number.POSITIVE_INFINITY
     for (const option of this.renderRoot?.querySelectorAll<HTMLElement>('[part="option"]') ?? []) {
       const box = option.getBoundingClientRect()
@@ -390,10 +372,10 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
       const away = clientX < box.left ? box.left - clientX : clientX - box.right
       if (away < best) {
         best = away
-        nearest = option.dataset.score
+        closest = option.dataset.score
       }
     }
-    return nearest
+    return closest
   }
 
   /**
@@ -601,8 +583,8 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
     super.willUpdate(changed)
     if (!this.markRead && this.childrenKnown) {
       this.markRead = true
-      this.markSource = this.knownChildren.find((child) => child.slot === 'mark')
-      this.emptySource = this.knownChildren.find((child) => child.slot === 'empty-mark')
+      this.mark.take(this.knownChildren.find((child) => child.slot === 'mark'))
+      this.empty.take(this.knownChildren.find((child) => child.slot === 'empty-mark'))
     }
   }
 
@@ -628,7 +610,7 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
     if (!answered) {
       return first
     }
-    return nearestStep(this.steps, this.score) ?? first
+    return nearest(this.steps, this.score) ?? first
   }
 
   protected override render(): TemplateResult {
@@ -679,7 +661,7 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
       aria-describedby=${this.describedBy ?? nothing}
       aria-invalid=${this.invalidity ?? nothing}
       aria-required=${this.required && !this.readOnly ? 'true' : nothing}
-      data-slotted=${this.markSource ? '' : nothing}
+      data-slotted=${this.mark.slotted ? '' : nothing}
       style=${`--rating-full: ${Math.floor(showing)}; --rating-part: ${showing - Math.floor(showing)}; --rating-steps: ${this.positions.length}`}
       @pointercancel=${this.handleDragCancel}
       @keydown=${this.handleClearKey}
@@ -702,7 +684,7 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
       <span
         part="track"
         aria-hidden="true"
-        data-slotted=${this.emptySource ? '' : nothing}
+        data-slotted=${this.empty.slotted ? '' : nothing}
         >${marksIn('track')}</span
       >
       <span

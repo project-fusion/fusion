@@ -4,6 +4,7 @@ import {
   customElement,
   cycle,
   type DataRow,
+  everyState,
   fillTemplate,
   format,
   type HelixBeforeToggleEvent,
@@ -12,6 +13,7 @@ import {
   HelixSelectedEvent,
   HelixSortEvent,
   HelixSortedEvent,
+  inRowOrder,
   MixinCollection,
   onAndroid,
   parse,
@@ -491,7 +493,12 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
       },
       event: (value) => new HelixSelectEvent({ value }),
       host: this,
-      next: [...keys].join(','),
+      /* In row order, as Data Table writes it, whatever order the rows were
+         pressed in. */
+      next: inRowOrder(
+        keys,
+        this.keyed.map(({ key }) => key),
+      ).join(','),
     })
   }
 
@@ -905,8 +912,7 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
        what one sent draws the box the server drew. Read from the rows there,
        the box's mixed state was primed as committed and never drawn. */
     const every = this.childrenKnown ? this.keyed.map(({ key }) => key) : []
-    const keys = this.chosen
-    const count = every.filter((key) => keys.has(key)).length
+    const { checked, indeterminate } = everyState(this.chosen, every)
     const checkbox = this.tag('checkbox')
     return html`<span part="select-all" role="columnheader"
       ><${checkbox}
@@ -916,8 +922,8 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
           mark-checked: checkbox-mark-checked, mark-dash: checkbox-mark-dash,
           mark-indeterminate: checkbox-mark-indeterminate"
         aria-label=${this.selectAllLabel}
-        .checked=${every.length > 0 && count === every.length}
-        .indeterminate=${count > 0 && count < every.length}
+        .checked=${checked}
+        .indeterminate=${indeterminate}
       ></${checkbox}
     ></span>`
   }

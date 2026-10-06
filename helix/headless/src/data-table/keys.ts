@@ -3,25 +3,10 @@
  * over comma-separated lists.
  *
  * Pure and beside the family's `index.ts`, so a spec holds the rules without a
- * page: the order a list of keys is written in, which rows a toggle leaves
- * open, and where a Shift range runs from.
+ * page: which rows a toggle leaves open. The order a list of keys is written
+ * in and where a Shift range runs from are core's `inRowOrder` and `anchorAt`.
  */
-import { commaList } from '@fusion.dev/helix-core'
-
-/**
- * `keys` in the order the rows are, which is `order`: the keys of the whole
- * result. A key the result does not hold, a selected row a search has hidden
- * say, keeps its place after them in the order it was given.
- *
- * So `selected` and `expanded`, and the events that carry them, read in row
- * order whatever order the rows were chosen in.
- */
-export const inRowOrder = (keys: Iterable<string>, order: readonly string[]): string[] => {
-  const wanted = new Set(keys)
-  const placed = order.filter((key) => wanted.has(key))
-  const seen = new Set(placed)
-  return [...placed, ...[...wanted].filter((key) => !seen.has(key))]
-}
+import { commaList, inRowOrder } from '@fusion.dev/helix-core'
 
 /**
  * The `expanded` a toggle of row `key` leaves, in row order, or `undefined`
@@ -44,18 +29,4 @@ export const toggledOpen = (
     keys.delete(key)
   }
   return inRowOrder(keys, order).join(',')
-}
-
-/**
- * Where a Shift range runs from, as an index into the page's `keys`: the row
- * last chosen while it is on the page, and otherwise the row the reader is on,
- * `from`, which becomes the one to run from.
- */
-export const anchorAt = (
-  keys: readonly string[],
-  anchorKey: string | undefined,
-  from: number,
-): { anchor: number; anchorKey: string | undefined } => {
-  const anchor = anchorKey === undefined ? -1 : keys.indexOf(anchorKey)
-  return anchor < 0 ? { anchor: from, anchorKey: keys[from] } : { anchor, anchorKey }
 }

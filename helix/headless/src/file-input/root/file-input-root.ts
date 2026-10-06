@@ -11,6 +11,7 @@ import {
   MixinField,
   requestChange,
   restoreValue,
+  SlottedGlyph,
   StatusController,
 } from '@fusion.dev/helix-core'
 import { trash } from '@fusion.dev/helix-icons'
@@ -418,26 +419,17 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
     })
   }
 
-  /** The element slotted into `remove-icon`, which each remove button copies. */
-  @state()
-  private removeIcon: Element | undefined = undefined
-
-  /** One copy of `removeIcon` per row, kept so a render does not replace it. */
-  private readonly removeIcons = new Map<number, Node>()
+  /** The element slotted into `remove-icon`, one copy per row's remove button. */
+  private readonly removeIcon = new SlottedGlyph()
 
   private readonly handleRemoveIcon = (event: Event): void => {
-    this.removeIcons.clear()
-    this.removeIcon = (event.target as HTMLSlotElement).assignedElements({ flatten: true })[0]
+    this.removeIcon.read(event.target as HTMLSlotElement)
+    this.requestUpdate()
   }
 
   /** The icon on one row's remove button: a copy of `remove-icon`, or the bin. */
   private removeMark(at: number): unknown {
-    if (!this.removeIcon) {
-      return drawIcon(trash)
-    }
-    const held = this.removeIcons.get(at) ?? this.removeIcon.cloneNode(true)
-    this.removeIcons.set(at, held)
-    return held
+    return this.removeIcon.copyFor(at) ?? drawIcon(trash)
   }
 
   /** Takes files pasted onto the field, as a drop takes them. */

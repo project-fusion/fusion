@@ -12,6 +12,7 @@ import {
   rangeAdd,
   requestChange,
   searchableById,
+  selectsAll,
   Typeahead,
   toggleValue,
   typesCharacter,
@@ -579,7 +580,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
     }
     const toggle = event.ctrlKey || event.metaKey
     if (this.selectionMode && !event.altKey) {
-      if (toggle && event.key.toLowerCase() === 'a' && this.selectionMode === 'multiple') {
+      if (selectsAll(event) && this.selectionMode === 'multiple') {
         event.preventDefault()
         this.choose(this.keys().join(','))
         return

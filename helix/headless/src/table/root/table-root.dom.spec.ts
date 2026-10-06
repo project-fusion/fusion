@@ -638,13 +638,14 @@ describe('a selectable table', () => {
     })
     ask(rows(host)[0]?.shadowRoot?.querySelector('[part="checkbox"]'), true)
     await settle(host)
-    expect(host.selected).toBe('billing,web')
-    expect(heard).toEqual(['billing,web'])
+    /* In row order, as Data Table writes it: the first row was pressed last. */
+    expect(host.selected).toBe('web,billing')
+    expect(heard).toEqual(['web,billing'])
     expect((part(host, 'live') as HTMLElement).textContent).toBe('2 selected')
     host.addEventListener('helix-select', (event) => event.preventDefault())
     ask(rows(host)[0]?.shadowRoot?.querySelector('[part="checkbox"]'), false)
     await settle(host)
-    expect(host.selected).toBe('billing,web')
+    expect(host.selected).toBe('web,billing')
   })
 
   test('the heading selects every row, and then none', async () => {

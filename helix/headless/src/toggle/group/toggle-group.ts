@@ -8,6 +8,7 @@ import {
   KeyboardNavigationController,
   MixinControllerValue,
   MixinField,
+  reportValues,
   rovingStop,
   toggleValue,
 } from '@fusion.dev/helix-core'
@@ -431,26 +432,15 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
     this.internals.ariaOrientation = this.orientation ?? null
     // `null` rather than an empty string when nothing is chosen, which is the
     // difference between a control that submits nothing and one that submits a
-    // blank.
-    this.internals.setFormValue(this.formValue())
-  }
-
-  /**
-   * What the form receives: the value, or under `selection-mode="multiple"`
-   * one entry per pressed value, as a native `<select multiple>` sends.
-   */
-  private formValue(): FormData | string | null {
+    // blank. Under `selection-mode="multiple"`, one entry per pressed value, as
+    // a native `<select multiple>` sends, through core's `reportValues`.
     if (!this.answered) {
-      return null
+      this.internals.setFormValue(null)
+    } else if (this.multiple) {
+      reportValues(this.internals, this.name, this.values)
+    } else {
+      this.internals.setFormValue(this.value)
     }
-    if (!this.multiple || this.name === '') {
-      return this.value
-    }
-    const data = new FormData()
-    for (const value of this.values) {
-      data.append(this.name, value)
-    }
-    return data
   }
 
   /**

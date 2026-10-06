@@ -1,6 +1,7 @@
 import {
   type Arranged,
   type Axis,
+  anchorAt,
   arranged,
   commaList,
   countLabel,
@@ -9,6 +10,7 @@ import {
   type DataRow,
   deepActiveElement,
   deepContains,
+  everyState,
   fillTemplate,
   format,
   formatNumbers,
@@ -28,6 +30,7 @@ import {
   HelixSortedEvent,
   hostAria,
   inlineStep,
+  inRowOrder,
   isRtl,
   MixinCollection,
   markRegion,
@@ -37,6 +40,7 @@ import {
   rangeAdd,
   reportRuntime,
   requestChange,
+  selectsAll,
   Typeahead,
   toggleEvery,
   treeArrow,
@@ -60,7 +64,7 @@ import { html } from 'lit/static-html.js'
 import { edgeOf, type HelixHeadlessTableColumn } from '../../table/column/table-column.js'
 import '../../checkbox/index.js'
 import '../../pagination/index.js'
-import { anchorAt, inRowOrder, toggledOpen } from '../keys.js'
+import { toggledOpen } from '../keys.js'
 import { type Grown, grow } from '../tree.js'
 
 /** What makes an element a control the grid moves focus into, whatever its tab index. */
@@ -2020,20 +2024,13 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
 
   /** The heading of the checkbox column, which selects the whole result. */
   private renderSelectAll(stop: boolean): TemplateResult {
-    const every = this.everyKey
-    const keys = this.chosen
-    const count = every.filter((key) => keys.has(key)).length
+    const { checked, indeterminate } = everyState(this.chosen, this.everyKey)
     return html`<span
       part="select-all"
       role="columnheader"
       tabindex=${stop ? '0' : '-1'}
       data-column="0"
-    >${this.renderCheckbox(
-      this.selectAllLabel,
-      every.length > 0 && count === every.length,
-      count > 0 && count < every.length,
-      this.toggleAll,
-    )}</span>`
+    >${this.renderCheckbox(this.selectAllLabel, checked, indeterminate, this.toggleAll)}</span>`
   }
 
   /**
@@ -2445,7 +2442,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     const last = this.drawnPage.length - 1 + (this.moreDrawn ? 1 : 0)
     const edge = this.width - 1
     const control = event.ctrlKey || event.metaKey
-    if (control && !event.shiftKey && event.key.toLowerCase() === 'a' && this.selectable) {
+    if (!event.shiftKey && selectsAll(event) && this.selectable) {
       event.preventDefault()
       this.requestSelected(new Set([...this.chosen, ...this.everyKey]))
       return

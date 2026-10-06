@@ -14,7 +14,7 @@ import {
   rovingStop,
   type SelectionMode,
   slottedWords,
-  typeaheadBy,
+  typeaheadByWords,
   whenHydrated,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -113,7 +113,7 @@ export class HelixHeadlessTagGroup extends HelixElement {
     items: () => this.reachable.map((tag) => this.navigable(tag)),
     origin: 'focus',
     selects: () => false,
-    typeahead: typeaheadBy((item) => (item as NavigableItem & { words: string }).words),
+    typeahead: typeaheadByWords(),
     wrap: false,
   })
 

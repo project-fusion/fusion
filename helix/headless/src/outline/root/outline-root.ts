@@ -7,6 +7,7 @@ import {
   plainClick,
   reflectElements,
   scrollItemIntoView,
+  scrollingAncestor,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -353,16 +354,9 @@ export class HelixHeadlessOutline extends HelixElement {
    */
   private reveal(link: HTMLElement): void {
     const sections = this.scroller
-    const page = this.page
-    for (let node = link.parentElement; node && node !== page; node = node.parentElement) {
-      const { overflowY } = getComputedStyle(node)
-      if (!/auto|scroll|overlay/.test(overflowY) || node.scrollHeight <= node.clientHeight) {
-        continue
-      }
-      if (node !== sections && !node.contains(sections)) {
-        scrollItemIntoView(link, { scroller: node })
-      }
-      return
+    const node = scrollingAncestor(link, { axis: 'y', overflowing: true, stop: this.page })
+    if (node && node !== sections && !node.contains(sections)) {
+      scrollItemIntoView(link, { scroller: node })
     }
   }
 
@@ -411,19 +405,8 @@ export class HelixHeadlessOutline extends HelixElement {
    * and a press on `install` marked it for a moment and snapped back.
    */
   private get scroller(): Element {
-    const doc = globalThis.document
-    const first = this.sections[0]?.target
-    for (
-      let node = first?.parentElement;
-      node && node !== doc.body && node !== doc.documentElement;
-      node = node.parentElement
-    ) {
-      const { overflowY } = getComputedStyle(node)
-      if (/auto|scroll|overlay/.test(overflowY) && node.scrollHeight > node.clientHeight) {
-        return node
-      }
-    }
-    return this.page
+    const first = this.sections[0]?.target as HTMLElement | undefined
+    return (first && scrollingAncestor(first, { axis: 'y', overflowing: true })) || this.page
   }
 
   /** The frame a mark is already scheduled for, so a scroll asks for one. */

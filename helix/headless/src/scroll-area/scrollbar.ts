@@ -1,3 +1,4 @@
+import { clamp } from '@fusion.dev/helix-core'
 /**
  * The arithmetic behind the scrollbars a scroll area draws under `scrollbars`.
  *
@@ -32,9 +33,6 @@ export interface Extent {
   /** The whole length of the content, `scrollHeight` or `scrollWidth`. */
   scroll: number
 }
-
-const clamp = (value: number, low: number, high: number): number =>
-  Math.min(Math.max(value, low), high)
 
 /**
  * The share of the track the thumb covers, from 0 to 1: how much of the content
