@@ -130,8 +130,10 @@ export class HelixHeadlessSpeedDialItem extends HelixElement {
   @state()
   private hasShortcut = false
 
-  private readonly readShortcut = (event: Event): void => {
-    this.hasShortcut = slotFilled(event.target as HTMLSlotElement)
+  private readonly readShortcut = (): void => {
+    this.hasShortcut = slotFilled(
+      this.renderRoot.querySelector<HTMLSlotElement>('slot[name="shortcut"]'),
+    )
   }
 
   private choose(): void {
@@ -174,6 +176,9 @@ export class HelixHeadlessSpeedDialItem extends HelixElement {
      reader's words once hydration is over. */
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
+    /* A key slotted before the first render is assigned without a
+       `slotchange` everywhere, so it is read once here as well. */
+    this.readShortcut()
     if (this.shortcut !== '') {
       this.finishHydration()
     }
