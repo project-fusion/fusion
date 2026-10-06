@@ -10,7 +10,7 @@
   align-items: center;
   display: flex;
   flex-wrap: wrap;
-  font-size: var(--helix-text-sm);
+  font-size: var(--pagination-font-size, var(--helix-text-sm));
   gap: var(--pagination-gap, var(--helix-space-2xs));
 }
 
@@ -52,16 +52,16 @@
   background-color: transparent;
   block-size: var(--pagination-size, var(--helix-size-control-tight));
   border: var(--helix-border-thin) solid transparent;
-  border-radius: var(--helix-radii-sm);
-  color: var(--helix-color-foreground-muted);
+  border-radius: var(--pagination-radius, var(--helix-radii-sm));
+  color: var(--pagination-foreground-color, var(--helix-color-foreground-muted));
   cursor: pointer;
   display: inline-flex;
   font: inherit;
   font-variant-numeric: tabular-nums;
-  font-weight: var(--helix-weight-medium);
+  font-weight: var(--pagination-font-weight, var(--helix-weight-medium));
   justify-content: center;
   min-inline-size: var(--pagination-size, var(--helix-size-control-tight));
-  padding-inline: var(--helix-space-2xs);
+  padding-inline: var(--pagination-padding, var(--helix-space-2xs));
   text-decoration: none;
   transition:
     background-color var(--helix-duration-fast) var(--helix-easing-standard),
@@ -75,7 +75,7 @@
 [part="previous"]:hover,
 [part="next"]:hover {
   background-color: var(--pagination-hover-color, var(--helix-color-surface-sunken));
-  color: var(--helix-color-foreground);
+  color: var(--pagination-hover-foreground-color, var(--helix-color-foreground));
 }
 
 [part="first"]:focus-visible,
@@ -101,9 +101,9 @@
 [part~="page"][aria-current="page"],
 [part~="page"][aria-current="page"]:hover {
   background-color: var(--pagination-current-color, var(--helix-color-surface-raised));
-  border-color: var(--helix-color-border);
-  color: var(--helix-color-foreground);
-  font-weight: var(--helix-weight-semibold);
+  border-color: var(--pagination-current-border-color, var(--helix-color-border));
+  color: var(--pagination-current-foreground-color, var(--helix-color-foreground));
+  font-weight: var(--pagination-current-font-weight, var(--helix-weight-semibold));
 }
 
 /* Both shapes of spent step, and they need both selectors: the button form
@@ -117,9 +117,9 @@
 [part="last"][aria-disabled="true"],
 [part="previous"][aria-disabled="true"],
 [part="next"][aria-disabled="true"] {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--pagination-disabled-foreground-color, var(--helix-color-foreground-subtle));
   cursor: default;
-  opacity: 0.5;
+  opacity: var(--pagination-disabled-opacity, 0.5);
   pointer-events: none;
 }
 
@@ -137,8 +137,8 @@
 ::slotted([slot="last-icon"]),
 ::slotted([slot="previous-icon"]),
 ::slotted([slot="next-icon"]) {
-  block-size: var(--helix-size-icon-tight);
-  inline-size: var(--helix-size-icon-tight);
+  block-size: var(--pagination-icon-size, var(--helix-size-icon-tight));
+  inline-size: var(--pagination-icon-size, var(--helix-size-icon-tight));
 }
 
 /* An icon put in one of the slots turns on a right-to-left page as the caret
@@ -160,7 +160,7 @@
    so aligning the em boxes is the whole of the job and the shared box does that
    already. */
 [part="gap"] {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--pagination-ellipsis-foreground-color, var(--helix-color-foreground-subtle));
   user-select: none;
 }
 
@@ -172,9 +172,9 @@
 }
 
 [part="status"] {
-  color: var(--helix-color-foreground-muted);
+  color: var(--pagination-status-foreground-color, var(--helix-color-foreground-muted));
   font-variant-numeric: tabular-nums;
-  font-weight: var(--helix-weight-medium);
+  font-weight: var(--pagination-font-weight, var(--helix-weight-medium));
   padding-inline: var(--helix-space-xs);
 }
 

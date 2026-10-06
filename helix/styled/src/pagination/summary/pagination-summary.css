@@ -4,9 +4,9 @@
    in this family has them, that a count changing under the pointer should not
    shuffle the words around it. */
 :host {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--pagination-summary-foreground-color, var(--helix-color-foreground-subtle));
   display: inline-block;
   font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-sm);
+  font-size: var(--pagination-font-size, var(--helix-text-sm));
   font-variant-numeric: tabular-nums;
 }

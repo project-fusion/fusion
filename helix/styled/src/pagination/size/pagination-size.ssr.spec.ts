@@ -8,6 +8,7 @@ import {
 } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
+import { styles } from './pagination-size.css.js'
 
 describe('pagination size server output', () => {
   test('the select and its options ship, rather than appearing on hydration', () => {
@@ -41,5 +42,13 @@ describe('pagination size server output', () => {
   test('the host stays exactly as the consumer wrote it', () => {
     const it = html`<helix-pagination-size sizes="10,25"></helix-pagination-size>`
     expect(hostAttributes(ssr(it), 'helix-pagination-size')).toEqual(['sizes'])
+  })
+})
+
+describe('pagination size hooks', () => {
+  test('the hooks the docs name are what the sheet reads', () => {
+    for (const hook of ['--pagination-size', '--pagination-size-gap']) {
+      expect(styles.cssText).toMatch(new RegExp(`var\\(\\s*${hook},`))
+    }
   })
 })

@@ -14,6 +14,9 @@ import { styles } from './pagination-summary.css.js'
  * @status stable
  * @aliases Result count, Range
  * @documentation https://fusion.dev/helix/components/pagination
+ *
+ * @cssproperty --pagination-font-size - Size of the text, the same hook that sizes the page numbers.
+ * @cssproperty --pagination-summary-foreground-color - Color of the text.
  */
 @customElement('helix-pagination-summary')
 export class HelixPaginationSummary extends HelixHeadlessPaginationSummary {
