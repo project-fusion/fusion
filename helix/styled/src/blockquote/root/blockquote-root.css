@@ -14,6 +14,26 @@
   margin: var(--helix-space-none);
 }
 
+/* **Under `marks`, one large opening mark beside the passage's first lines**,
+   in the language of the element, as a pull quote sets it. Floated, so the
+   passage wraps beside it whether it is text or paragraphs, and a mark that
+   sits low, such as German „, stays clear of the words. Drawn and not read,
+   and closed at the end without a mark, so a `Quote` after the passage takes
+   the outer marks again. */
+:host([marks]) [part="blockquote"]::before {
+  color: var(--blockquote-mark-color, var(--helix-color-foreground-subtle));
+  content: open-quote / "";
+  float: inline-start;
+  font-family: var(--blockquote-font-family, var(--helix-font-display));
+  font-size: var(--blockquote-mark-size, var(--helix-text-3xl));
+  line-height: 1;
+  margin-inline-end: var(--helix-space-xs);
+}
+
+:host([marks]) [part="blockquote"]::after {
+  content: no-close-quote;
+}
+
 /* On the slot, not on what was slotted into it. */
 slot:not([name]) {
   /* A step back from full strength. */
@@ -21,7 +41,7 @@ slot:not([name]) {
   font-family: var(--blockquote-font-family, var(--helix-font-display));
   font-size: var(--blockquote-size, var(--helix-text-xl));
   font-weight: var(--blockquote-font-weight, var(--helix-weight-medium));
-  letter-spacing: var(--helix-tracking-tight);
+  letter-spacing: var(--blockquote-letter-spacing, var(--helix-tracking-tight));
   line-height: var(--blockquote-line-height, var(--helix-leading-tight));
 }
 
@@ -31,7 +51,9 @@ slot:not([name])::slotted(*) {
 
 [part="attribution"] {
   color: var(--blockquote-attribution-color, var(--helix-color-foreground-muted));
+  font-family: var(--blockquote-attribution-font-family, inherit);
   font-size: var(--blockquote-attribution-size, var(--helix-text-sm));
+  font-weight: var(--blockquote-attribution-font-weight, inherit);
   /* Room to be a separate thing. */
   margin-block-start: var(--blockquote-gap, var(--helix-space-sm));
 }

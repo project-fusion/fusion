@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, partTag, ssr } from '@fusion.dev/helix-testing/ssr'
+import { hostAttributes, partTag, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -17,6 +17,16 @@ describe('blockquote server output', () => {
     expect(partTag(markup, 'figure')).toContain('role="figure"')
     expect(partTag(markup, 'figure')).toMatch(/^<div\s/)
     expect(partTag(markup, 'attribution')).toContain('id="attribution"')
+  })
+
+  /* A server cannot see a slotted attribution, so words are what it can name
+     the figure by before any script runs. */
+  test('serves `attribution` as words in the caption that names the figure', () => {
+    const markup = ssr(
+      html`<helix-headless-blockquote attribution="Maria Lopez">Said so.</helix-headless-blockquote>`,
+    )
+    expect(partTag(markup, 'figure')).toContain('role="figure"')
+    expect(rendered(markup, 'helix-headless-blockquote')).toMatch(/<span>(<!--[^>]*-->)*Maria Lopez/)
   })
 
   test('the host carries nothing the consumer did not write', () => {
