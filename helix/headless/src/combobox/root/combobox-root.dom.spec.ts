@@ -889,6 +889,31 @@ describe('the statuses a combobox hands its list', () => {
     expect(part(list2, 'empty')?.textContent?.trim()).toBe('Nothing like it')
   })
 
+  /* Removing the attribute gives the property null, which the combobox read
+     as an error: its own `error` state stayed on. */
+  test('removing `load-error`, or setting it to null, clears the error state', async () => {
+    const states = (host: Updatable) =>
+      (host as unknown as { internals: ElementInternals }).internals.states
+    const host = (await combobox('load-error="Offline"')) as Updatable & {
+      loadError: string | null
+    }
+    await settle(host)
+    expect(states(host).has('error')).toBe(true)
+    ;(host as unknown as HTMLElement).removeAttribute('load-error')
+    await settle(host)
+    await settle(list(host) as unknown as Updatable)
+    expect(states(host).has('error')).toBe(false)
+    expect(part(list(host), 'error')).toBeNull()
+    host.loadError = 'Offline'
+    await settle(host)
+    expect(states(host).has('error')).toBe(true)
+    host.loadError = null
+    await settle(host)
+    await settle(list(host) as unknown as Updatable)
+    expect(states(host).has('error')).toBe(false)
+    expect(part(list(host), 'error')).toBeNull()
+  })
+
   /* Measured before this: only the list inside had them, which no page
      stylesheet reaches. */
   test('`error` and `no-results` are states of the host as well', async () => {
