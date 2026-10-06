@@ -32,8 +32,8 @@
   color: var(--tag-foreground-color, var(--_tag-label));
   display: inline-flex;
   font-size: var(--_tag-text);
-  font-weight: var(--helix-weight-medium);
-  gap: var(--helix-space-2xs);
+  font-weight: var(--tag-font-weight, var(--helix-weight-medium));
+  gap: var(--tag-gap, var(--helix-space-2xs));
   line-height: var(--helix-leading-tight);
   padding-inline: var(--_tag-inset);
   white-space: nowrap;
@@ -212,7 +212,7 @@ slot[name="start"]::slotted(*) {
   border-radius: inherit;
   cursor: default;
   display: inline-flex;
-  gap: var(--helix-space-2xs);
+  gap: var(--tag-gap, var(--helix-space-2xs));
   margin-inline: calc(var(--_tag-inset) * -1);
   min-inline-size: 0;
   padding-inline: var(--_tag-inset);

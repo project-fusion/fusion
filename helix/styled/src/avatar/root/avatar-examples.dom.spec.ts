@@ -31,3 +31,21 @@ describe('the events example', () => {
     expect(missing.shadowRoot?.textContent).toContain('GH')
   })
 })
+
+/* Every visual decision of the initials is a hook named after the family,
+   defaulting to what was drawn before the hook existed. */
+describe("the avatar's hooks", () => {
+  test('are read by the sheet, each with the old value as its fallback', () => {
+    const declared = (customElements.get('helix-avatar') as unknown as { styles: unknown }).styles
+    const text = (Array.isArray(declared) ? declared : [declared])
+      .flat(Number.POSITIVE_INFINITY)
+      .map((one) => {
+        const sheet = one as { cssRules?: ArrayLike<{ cssText: string }>; cssText?: string }
+        return sheet.cssText ?? Array.from(sheet.cssRules ?? [], (rule) => rule.cssText).join('\n')
+      })
+      .join('\n')
+    for (const hook of ['--avatar-color', '--avatar-font-weight']) {
+      expect(text).toContain(`var(${hook},`)
+    }
+  })
+})

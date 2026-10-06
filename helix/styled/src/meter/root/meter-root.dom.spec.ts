@@ -121,3 +121,21 @@ describe('a slotted label', () => {
     expect(label).toContain('margin-block-end: var(--meter-label-gap, var(--helix-space-2xs))')
   })
 })
+
+/* Every visual decision is a hook named after the family, defaulting to what
+   was drawn before the hook existed. */
+describe("the meter's hooks", () => {
+  test('are read by the sheet, each with the old value as its fallback', () => {
+    const declared = (customElements.get('helix-meter') as unknown as { styles: unknown }).styles
+    const text = (Array.isArray(declared) ? declared : [declared])
+      .flat(Number.POSITIVE_INFINITY)
+      .map((one) => {
+        const sheet = one as { cssRules?: ArrayLike<{ cssText: string }>; cssText?: string }
+        return sheet.cssText ?? Array.from(sheet.cssRules ?? [], (rule) => rule.cssText).join('\n')
+      })
+      .join('\n')
+    for (const hook of ['--meter-value-color', '--meter-value-gap', '--meter-value-size']) {
+      expect(text).toContain(`var(${hook},`)
+    }
+  })
+})

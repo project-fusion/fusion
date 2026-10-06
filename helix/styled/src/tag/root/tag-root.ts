@@ -29,7 +29,9 @@ import { styles } from './tag-root.css.js'
  * @cssproperty --tag-background-color - The fill behind the tag.
  * @cssproperty --tag-border-color - The color of the tag's edge.
  * @cssproperty --tag-disabled-opacity - How strongly a `disabled` tag is drawn.
+ * @cssproperty --tag-font-weight - The weight of the label.
  * @cssproperty --tag-foreground-color - The label color.
+ * @cssproperty --tag-gap - The space between the category, the label and the remove button.
  * @cssproperty --tag-radius - The corner radius of the tag.
  */
 @customElement('helix-tag')

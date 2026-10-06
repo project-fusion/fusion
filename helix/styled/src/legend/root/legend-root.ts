@@ -29,8 +29,10 @@ import { styles } from './legend-root.css.js'
  * @aliases Key, Series Key
  * @documentation https://fusion.dev/helix/components/legend
  *
+ * @cssproperty --legend-color - The color of the series names.
  * @cssproperty --legend-direction - The direction the entries run: `row`, which wraps, or `column`.
  * @cssproperty --legend-entry-gap - The space between a swatch and its name.
+ * @cssproperty --legend-font-size - The type size of the series names.
  * @cssproperty --legend-gap - The space between entries.
  * @cssproperty --legend-hidden-opacity - How strongly a hidden series' entry is drawn, under `toggles`.
  * @cssproperty --legend-swatch-radius - The corner of the color swatch.

@@ -285,3 +285,26 @@ describe('max reaches the host, because the fold is a rule and not code', () => 
     group.remove()
   })
 })
+
+/* Every visual decision is a hook named after the family, defaulting to what
+   was drawn before the hook existed. */
+describe("the count past `max`'s hooks", () => {
+  test('are read by the sheet, each with the old value as its fallback', () => {
+    const declared = (customElements.get('helix-avatar-group') as unknown as { styles: unknown })
+      .styles
+    const text = (Array.isArray(declared) ? declared : [declared])
+      .flat(Number.POSITIVE_INFINITY)
+      .map((one) => {
+        const sheet = one as { cssRules?: ArrayLike<{ cssText: string }>; cssText?: string }
+        return sheet.cssText ?? Array.from(sheet.cssRules ?? [], (rule) => rule.cssText).join('\n')
+      })
+      .join('\n')
+    for (const hook of [
+      '--avatar-group-overflow-background-color',
+      '--avatar-group-overflow-color',
+      '--avatar-group-overflow-font-size',
+    ]) {
+      expect(text).toContain(`var(${hook},`)
+    }
+  })
+})

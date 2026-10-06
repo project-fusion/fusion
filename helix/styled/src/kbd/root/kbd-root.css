@@ -2,9 +2,9 @@
   /* Relative to the surrounding text, because a key inside a heading has to be
      key-sized in that heading. 0.85 rather than 0.75: three quarters of 13px is
      a 9.75px glyph, and an arrow that small in the mono face is a smudge. */
-  --_kbd-size: 0.85em;
-  --_kbd-height: 1.5em;
-  --_kbd-inset: 0.4em;
+  --_kbd-size: var(--kbd-font-size, 0.85em);
+  --_kbd-height: var(--kbd-block-size, 1.5em);
+  --_kbd-inset: var(--kbd-padding-inline, 0.4em);
   display: inline-flex;
   font: inherit;
   /* Measured, not chosen: `baseline` hangs the box a descender low and `middle`
@@ -19,19 +19,19 @@
   background-color: var(--kbd-background-color, var(--helix-color-surface-sunken));
   block-size: var(--_kbd-height);
   border: var(--helix-border-thin) solid var(--kbd-border-color, var(--helix-color-border));
-  border-radius: var(--helix-radii-sm);
+  border-radius: var(--kbd-radius, var(--helix-radii-sm));
   /* One edge rather than a drop shadow: a key is pressed into the page. */
   box-shadow: inset 0 -1px 0 0 var(--kbd-border-color, var(--helix-color-border));
-  color: var(--helix-color-foreground-muted);
+  color: var(--kbd-color, var(--helix-color-foreground-muted));
   display: inline-flex;
-  font-family: var(--helix-font-mono);
+  font-family: var(--kbd-font-family, var(--helix-font-mono));
   /* A key label is literal: `<-` and `=>` must not become arrows. */
   font-feature-settings:
     "liga" 0,
     "calt" 0;
   font-size: var(--_kbd-size);
   font-variant-ligatures: none;
-  font-weight: var(--helix-weight-medium);
+  font-weight: var(--kbd-font-weight, var(--helix-weight-medium));
   justify-content: center;
   line-height: 1;
   /* Square at minimum, so one character is not a narrow sliver. */
@@ -61,7 +61,7 @@
   background-color: var(--kbd-background-color, var(--helix-color-surface-sunken));
   block-size: var(--_kbd-height);
   border: var(--helix-border-thin) solid var(--kbd-border-color, var(--helix-color-border));
-  border-radius: var(--helix-radii-sm);
+  border-radius: var(--kbd-radius, var(--helix-radii-sm));
   box-shadow: inset 0 -1px 0 0 var(--kbd-border-color, var(--helix-color-border));
   display: inline-flex;
   justify-content: center;

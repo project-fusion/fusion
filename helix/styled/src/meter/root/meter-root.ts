@@ -55,6 +55,9 @@ import { styles } from './meter-root.css.js'
  * @cssproperty --meter-tick-color - The color of the mark at each threshold.
  * @cssproperty --meter-track-color - The color of the groove behind the fill.
  * @cssproperty --meter-transition-duration - How long the fill takes to move to a new reading, and to change its color. `0s` moves it at once.
+ * @cssproperty --meter-value-color - The color of the reading shown under `show-value`.
+ * @cssproperty --meter-value-gap - The space between the bar and the reading under `show-value`.
+ * @cssproperty --meter-value-size - The type size of the reading shown under `show-value`.
  */
 @customElement('helix-meter')
 export class HelixMeter extends HelixHeadlessMeter {
