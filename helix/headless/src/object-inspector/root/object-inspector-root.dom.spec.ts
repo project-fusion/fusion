@@ -269,7 +269,11 @@ describe('an object inspector read by its keys', () => {
       }
     })
 
-    test('moves a window of rows with Page Down and Page Up, less one', async () => {
+    /* happy-dom only: it lays nothing out, so a row is the estimate and the
+       window is what this sets. A browser measures the rows, and an unstyled
+       headless row in the harness is not a row's height. */
+    const unlaid = hasLayout() ? (): void => {} : test
+    unlaid('moves a window of rows with Page Down and Page Up, less one', async () => {
       // A window ten rows tall, so a page is nine rows.
       Object.defineProperty(window, 'innerHeight', { configurable: true, value: 240 })
       const many = Object.fromEntries(Array.from({ length: 30 }, (_, at) => [`k${at}`, at]))

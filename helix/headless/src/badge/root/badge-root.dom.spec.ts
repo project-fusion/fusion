@@ -211,9 +211,10 @@ describe('a badge around a control', () => {
     (host as unknown as { internals: ElementInternals }).internals
   /* happy-dom has no element reflection, so the description is read where an
      engine has it: the browser harness. */
-  const reflects = 'ariaDescribedByElements' in HTMLElement.prototype
+  /* A named helper rather than `test.if`, which the browser harness has not. */
+  const reflecting = 'ariaDescribedByElements' in HTMLElement.prototype ? test : (): void => {}
 
-  test.if(reflects)('describes the control with its words, which follow the count', async () => {
+  reflecting('describes the control with its words, which follow the count', async () => {
     const badge = await wrap('<button>Inbox</button>')
     const button = badge.querySelector('button') as HTMLButtonElement
     expect(button.ariaDescribedByElements?.[0]).toBe(badge)
@@ -225,7 +226,7 @@ describe('a badge around a control', () => {
 
   /* A component's host is a generic nobody lands on, so the description goes
      to the control it hands its focus to. */
-  test.if(reflects)('describes the control a component hands its focus to', async () => {
+  reflecting('describes the control a component hands its focus to', async () => {
     if (!customElements.get('probe-focus-button')) {
       customElements.define(
         'probe-focus-button',
@@ -244,7 +245,7 @@ describe('a badge around a control', () => {
     expect(inner?.ariaDescribedByElements?.[0]).toBe(badge)
   })
 
-  test.if(reflects)(
+  reflecting(
     'takes the description back when the count is cleared or the badge leaves',
     async () => {
       const badge = await wrap('<button>Inbox</button>')

@@ -45,7 +45,7 @@ export interface ScatterPoint {
   depth: number
   row: number
   /**
-   * How large the point is drawn under `size`, from 0 to 1: the square root
+   * How large the point is drawn under `size-by`, from 0 to 1: the square root
    * of its share of the largest size, so its area follows the measure.
    */
   weight?: number | undefined
@@ -98,8 +98,8 @@ const nice = ([low, high]: [number, number]): [number, number] => {
  * `trend` draws each series' line of best fit, by least squares, across the
  * plot in the series' color.
  *
- * **`size` names a third measure, drawn as each point's size**, as a bubble
- * chart does: `size="Population"` takes that column out of the series and
+ * **`size-by` names a third measure, drawn as each point's size**, as a bubble
+ * chart does: `size-by="Population"` takes that column out of the series and
  * gives each point an area in proportion to its row's number there. The
  * tooltip and the table still say the number.
  *
@@ -162,7 +162,7 @@ const nice = ([low, high]: [number, number]): [number, number] => {
  * @csspart y-name - The name of the vertical measure.
  * @csspart y-tick - One labeled value on the vertical axis.
  *
- * @cssproperty --chart-point-weight - How large a point is drawn under `size`, from 0 to 1, by area. The component writes it, and the stylesheet that sizes the point reads it.
+ * @cssproperty --chart-point-weight - How large a point is drawn under `size-by`, from 0 to 1, by area. The component writes it, and the stylesheet that sizes the point reads it.
  * @cssproperty --chart-point-x - A point's horizontal position, as a percentage. The component writes it.
  * @cssproperty --chart-point-y - A point's vertical position, as a percentage from the top. The component writes it.
  * @cssproperty --chart-tick - A tick's position along its axis, as a percentage. The component writes it.
@@ -200,8 +200,8 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
    * own, and each point's area follows its row's number in it. Absent, every
    * point is one size.
    */
-  @property()
-  size = ''
+  @property({ attribute: 'size-by' })
+  sizeBy = ''
 
   /**
    * Draws each series' line of best fit across the plot, by least squares, in
@@ -261,7 +261,7 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
 
   /**
    * The numeric columns by what they measure: the first across, the column
-   * `size` names as the size, and every other one up, as a series.
+   * `size-by` names as the size, and every other one up, as a series.
    */
   protected get measures(): {
     across: number | undefined
@@ -269,7 +269,7 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
     ups: number[]
   } {
     const rows = this.sourceRows
-    const key = seriesKey(this.size)
+    const key = seriesKey(this.sizeBy)
     const size =
       key === ''
         ? undefined

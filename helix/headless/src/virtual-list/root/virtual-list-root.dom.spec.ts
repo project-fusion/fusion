@@ -750,7 +750,8 @@ describe('a grid', () => {
     host.columns = 4
     await settle(host)
     expect(slot().style.display).toBe('grid')
-    expect(slot().style.gridTemplateColumns).toBe('repeat(4, minmax(0, 1fr))')
+    /* A browser writes the zero back with its unit. */
+    expect(slot().style.gridTemplateColumns.replace('0px', '0')).toBe('repeat(4, minmax(0, 1fr))')
     // Every item still says its place in the whole set.
     expect(drawn(host).map((row) => row.getAttribute('aria-posinset'))).toEqual(
       Array.from({ length: 10 }, (_, at) => String(at + 1)),
