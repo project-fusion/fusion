@@ -87,7 +87,9 @@ const channel = new WeakMap<HelixHeadlessSplitter, Crossed>()
  * @event {HelixBeforeResizeEvent} helix-before-resize - Fired before the divider settles, and only when the gesture moved it. A press that moved nothing, a drag that came back, an arrow key with no room left, and a corner that moved only the other divider do not fire it. Cancelable: canceling it leaves the position to you and keeps the rest of the gesture, so a collapse the gesture reached still fires `helix-before-collapse`, which you can also cancel. A dragged divider stays where it was dropped until you set your own `position`.
  * @event {HelixCollapseEvent} helix-collapse - Fired after a pane shuts or reopens, with the side that is shut, or empty where both are open.
  * @event {HelixResizedEvent} helix-resized - Fired after the divider settles somewhere new, with the new position.
- * @event {Event} input - Fired each time a drag moves the divider, before it settles, as a range input does while it is dragged. Read `position` for where it is now.
+ * @event {Event} input - Fired each time the divider moves, as a range input does: on each step of a drag, and before `helix-resized` for a key, a double click or a corner. Read `position` for where it is now.
+ *
+ * @slot handle - A mark drawn at the middle of the divider, such as a grip icon. It takes no focus and no pointer of its own: a press on it is a press on the divider.
  *
  * @csspart corner - The handle where two dividers cross, added on the client.
  * @csspart end - The box that holds the second pane.
@@ -97,7 +99,9 @@ const channel = new WeakMap<HelixHeadlessSplitter, Crossed>()
  * @cssproperty --splitter-corner-at - Where a nested splitter crosses this one, as a percentage.
  * @cssproperty --splitter-position - Where the divider sits, as a percentage of the box.
  *
+ * @cssstate collapsed - While a pane is shut. `data-collapsed` on the host says which.
  * @cssstate dragging - While the pointer or a corner holds the divider.
+ * @cssstate vertical - While the panes are one above the other, whether `orientation` says so or `auto` turned them.
  */
 /*
  * How a corner is drawn, which is not a consumer's business and is worth
@@ -735,6 +739,12 @@ export class HelixHeadlessSplitter extends HelixElement {
         const previous = this.position
         this.positionState = value
         this.requestUpdate('position', previous)
+        /* A drag said each step as it went, and its settling moves nothing
+           more. A key, a double click and a corner move here, so they say
+           it here, as a range input sends `input` for a key too. */
+        if (value !== previous) {
+          this.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+        }
         this.dispatchEvent(new HelixResizedEvent({ value: String(value) }))
       },
       event: (value) => new HelixBeforeResizeEvent({ value: String(value) }),
@@ -1231,6 +1241,8 @@ export class HelixHeadlessSplitter extends HelixElement {
     /* A custom state, which no server markup carries, so the host can say it
        where a `data-` attribute could not. */
     this.toggleState('dragging', this.dragging)
+    this.toggleState('collapsed', this.collapsed !== undefined)
+    this.toggleState('vertical', this.vertical)
   }
 
   protected override render(): TemplateResult {
@@ -1272,7 +1284,9 @@ export class HelixHeadlessSplitter extends HelixElement {
         @pointerdown=${this.handlePointerDown}
         @pointermove=${this.handlePointerMove}
         @pointerup=${this.handlePointerUp}
-      ></div>
+      >
+        <slot name="handle"></slot>
+      </div>
       <div part="end" ?data-dragging=${this.dragging}>
         <slot name="end"></slot>
       </div>
