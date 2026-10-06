@@ -18,6 +18,10 @@ import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
 import { type RefusedFile, screenFiles } from '../screen.js'
+import { barOf, type FileStatus, saysStatus } from '../status.js'
+
+export type { FileStatus } from '../status.js'
+
 import '../../tag/index.js'
 
 /**
@@ -136,6 +140,9 @@ const kind = (file: File): string => {
  * @csspart feedback - The message that says what is wrong.
  * @csspart field - The box you press or drop files on.
  * @csspart file - One chosen file.
+ * @csspart file-done - A file whose upload `setFileStatus` says is done. Set together with `file`.
+ * @csspart file-error - A file whose upload `setFileStatus` says failed. Set together with `file`.
+ * @csspart file-uploading - A file whose upload `setFileStatus` says is under way. Set together with `file`.
  * @csspart hint - Help under the field, while nothing is wrong.
  * @csspart kind - A file's type.
  * @csspart kind-cell - The grid cell around the tag, rendered only when the tag sits in a `Tag.Group`.
@@ -149,6 +156,7 @@ const kind = (file: File): string => {
  * @csspart live - The live region that says `added-text`, `rejected-text`, and `removed-text`. It is rendered from the first time it has something to say.
  * @csspart meta - The row that holds a file's size and type.
  * @csspart name - A file's name.
+ * @csspart progress - A file's upload bar, a `<progress>`, while `setFileStatus` gives it a measure or says it is under way.
  * @csspart remove - The control that removes a file.
  * @csspart size - A file's size.
  * @csspart size-cell - The grid cell around the tag, rendered only when the tag sits in a `Tag.Group`.
@@ -157,6 +165,8 @@ const kind = (file: File): string => {
  * @csspart size-label - The label, trimmed to its capitals and baseline.
  * @csspart size-link - The link around the label, when the tag has an `href`.
  * @csspart size-start - The category before the label.
+ * @csspart status - How a file's upload is going, from `setFileStatus`: the bar and the words.
+ * @csspart status-text - The words `setFileStatus` gives a file, such as the reason it failed.
  * @csspart trigger - The label that opens the picker.
  *
  * @cssstate dropping - Files are being dragged over the field.
@@ -232,6 +242,13 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
   multiple = false
 
   /**
+   * The name of a file's progress bar, read by screen readers, with `{name}`
+   * filled in. A label with no `{name}` has it added after it.
+   */
+  @property({ attribute: 'progress-label' })
+  progressLabel = 'Uploading {name}'
+
+  /**
    * What a reader hears when files are refused, with `{count}` and `{names}`
    * filled in.
    */
@@ -287,6 +304,32 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
 
   /** The live region, rendered from the first time it has something to say. */
   private readonly status = new StatusController(this)
+
+  /** What the page has said of each file's upload, by file. */
+  private readonly statuses = new WeakMap<File, FileStatus>()
+
+  /**
+   * Shows how a file's upload is going, in its row: a bar for `progress`,
+   * from 0 to 1, or a bar without a measure while `state` is `uploading`, and
+   * `text` beside it. `state` names the row `file-uploading`, `file-done` or
+   * `file-error` beside `file`, and a reader hears `text` when the state
+   * becomes `done` or `error`. `null` clears it.
+   *
+   * The field uploads nothing, as Zag's file upload does not: your page sends
+   * the file and says here how it is going.
+   */
+  setFileStatus(file: File, status: FileStatus | null): void {
+    const was = this.statuses.get(file)
+    if (status) {
+      this.statuses.set(file, status)
+      if (saysStatus(status, was)) {
+        this.status.say(status.text ?? '')
+      }
+    } else {
+      this.statuses.delete(file)
+    }
+    this.requestUpdate()
+  }
 
   /**
    * Screens arriving files and commits what is taken, after the files the
@@ -744,6 +787,30 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
       exportparts="cell: kind-cell, dismiss: kind-dismiss, dismiss-mark: kind-dismiss-mark, label: kind-label, link: kind-link, start: kind-start">${kind(file)}</${this.tag('tag')}>`
   }
 
+  /**
+   * How a file's upload is going, from `setFileStatus`, behind a seam a tier
+   * can move: a `<progress>` named by `progress-label` and the status words.
+   */
+  protected renderFileStatus(file: File): TemplateResult | typeof nothing {
+    const status = this.statuses.get(file)
+    if (!status) {
+      return nothing
+    }
+    const bar = barOf(status)
+    return html`<span part="status"
+      >${
+        bar === undefined
+          ? nothing
+          : html`<progress
+              part="progress"
+              max="1"
+              value=${bar === 'unmeasured' ? nothing : bar}
+              aria-label=${named(this.progressLabel, file.name)}
+            ></progress>`
+      }${status.text ? html`<span part="status-text">${status.text}</span>` : nothing}</span
+    >`
+  }
+
   protected override render(): TemplateResult {
     const files = this.files
     return html`${this.renderLabel()}
@@ -787,8 +854,16 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
         files.length === 0
           ? nothing
           : html`<ul part="list">
-              ${files.map(
-                (file, at) => html`<li part="file">
+              ${files.map((file, at) => {
+                const state = this.statuses.get(file)?.state
+                const done = state === 'done'
+                const failed = state === 'error'
+                const sending = state === 'uploading'
+                return html`<li
+                  part="file${done ? ' file-done' : ''}${failed ? ' file-error' : ''}${
+                    sending ? ' file-uploading' : ''
+                  }"
+                >
                   <span part="detail">
                     ${
                       this.renderFile
@@ -797,7 +872,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
                           <span part="meta">
                             ${this.renderMeta(file)}
                           </span>`
-                    }
+                    }${this.renderFileStatus(file)}
                   </span>
                   <button
                     part="remove"
@@ -809,8 +884,8 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
                   >
                     ${this.removeMark(at)}
                   </button>
-                </li>`,
-              )}
+                </li>`
+              })}
             </ul>`
       }`
   }

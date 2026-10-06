@@ -614,3 +614,60 @@ describe('your own rows and your own step', () => {
     expect(hasState(host, 'has-files')).toBe(true)
   })
 })
+
+/* Zag's file upload leaves the upload to the page and draws no progress; a
+   page drawing one wrote its own row through `renderFile`. */
+describe('how a file’s upload is going', () => {
+  type Reporting = InputFile & {
+    setFileStatus(file: File, status: Record<string, unknown> | null): void
+  }
+  const rows = (host: InputFile): HTMLElement[] => [
+    ...(host.shadowRoot?.querySelectorAll<HTMLElement>('[part~="file"]') ?? []),
+  ]
+
+  test('draws a bar named for its file, and the words, in the row', async () => {
+    const host = (await field('multiple')) as Reporting
+    await choose(host, 'a.png', 'b.png')
+    const [first] = host.files
+    host.setFileStatus(first as File, { progress: 0.25, state: 'uploading', text: 'Sending' })
+    await host.updateComplete
+    const bar = rows(host)[0]?.querySelector('[part="progress"]') as HTMLProgressElement
+    expect(bar.getAttribute('value')).toBe('0.25')
+    expect(bar.getAttribute('aria-label')).toBe('Uploading a.png')
+    expect(rows(host)[0]?.querySelector('[part="status-text"]')?.textContent).toBe('Sending')
+    expect(rows(host)[0]?.getAttribute('part')).toBe('file file-uploading')
+    expect(rows(host)[1]?.querySelector('[part="status"]')).toBeNull()
+  })
+
+  test('a bar without a measure while under way, and none once done', async () => {
+    const host = (await field()) as Reporting
+    await choose(host, 'a.png')
+    const [file] = host.files
+    host.setFileStatus(file as File, { state: 'uploading' })
+    await host.updateComplete
+    expect(part(host, 'progress')?.hasAttribute('value')).toBe(false)
+    host.setFileStatus(file as File, { state: 'done', text: 'Uploaded' })
+    await host.updateComplete
+    expect(part(host, 'progress')).toBeNull()
+    expect(rows(host)[0]?.getAttribute('part')).toBe('file file-done')
+    host.setFileStatus(file as File, null)
+    await host.updateComplete
+    expect(part(host, 'status')).toBeNull()
+    expect(rows(host)[0]?.getAttribute('part')).toBe('file')
+  })
+
+  test('says a finish or a failure, and not the progress', async () => {
+    const host = (await field()) as Reporting
+    await choose(host, 'a.png')
+    const [file] = host.files
+    host.setFileStatus(file as File, { progress: 0.5, state: 'uploading', text: 'Half' })
+    await new Promise((done) => setTimeout(done, 40))
+    await host.updateComplete
+    expect(part(host, 'live')).toBeNull()
+    host.setFileStatus(file as File, { state: 'error', text: 'a.png is too large for the server' })
+    await new Promise((done) => setTimeout(done, 40))
+    await host.updateComplete
+    expect(part(host, 'live')?.textContent).toBe('a.png is too large for the server')
+    expect(rows(host)[0]?.getAttribute('part')).toBe('file file-error')
+  })
+})
