@@ -235,6 +235,27 @@ describe('a button group with selection-mode', () => {
     expect(group.value).toBe('')
   })
 
+  test('a native button in a selection mode is reported once, and one with its own aria-pressed is not', async () => {
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      await mountGroup(`<helix-headless-button-group label="Text" selection-mode="multiple">
+        <button type="button">Bold</button><button type="button">Italic</button>
+      </helix-headless-button-group>`)
+      await mountGroup(`<helix-headless-button-group label="Text" selection-mode="multiple">
+        <button type="button" aria-pressed="false">Bold</button>
+      </helix-headless-button-group>`)
+      await mountGroup(`<helix-headless-button-group label="Text">
+        <button type="button">Bold</button>
+      </helix-headless-button-group>`)
+    } finally {
+      console.warn = original
+    }
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0]).toContain('<helix-headless-button-group> cannot press a native <button>')
+  })
+
   test('without selection-mode the buttons are untouched, and leaving it puts them back', async () => {
     const plain = await mountGroup(view.replace(' selection-mode="single"', ''))
     expect(role(plain)).toBe('group')
