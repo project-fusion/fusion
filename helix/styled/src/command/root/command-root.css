@@ -68,7 +68,6 @@ helix-listbox::part(search-field) {
   --_command-row: var(--helix-space-md);
 }
 
-
 /* The keys a reader can press, under the list. */
 [part="footer"] {
   align-items: center;

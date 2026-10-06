@@ -182,8 +182,7 @@
       calc(var(--_color-picker-mark-half) - var(--helix-border-thick))
       var(--_color-picker-mark-half),
     color-mix(in oklab, var(--helix-color-surface-media) 60%, transparent)
-      var(--_color-picker-mark-half)
-      calc(var(--_color-picker-mark-half) + var(--helix-border-thin)),
+      var(--_color-picker-mark-half) calc(var(--_color-picker-mark-half) + var(--helix-border-thin)),
     transparent calc(var(--_color-picker-mark-half) + var(--helix-border-thin))
   );
   content: "";
@@ -197,9 +196,7 @@
    square below it between its corners and the band. */
 [part="wheel"] [part="grid"] {
   aspect-ratio: 1;
-  inline-size: calc(
-    (100% - var(--_color-picker-ring) * 2 - var(--helix-space-sm) * 2) * 0.7071
-  );
+  inline-size: calc((100% - var(--_color-picker-ring) * 2 - var(--helix-space-sm) * 2) * 0.7071);
 }
 
 [part="wheel-hue"] {

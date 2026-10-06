@@ -7,17 +7,17 @@ const turns = [
   { author: 'Ada', authorLabel: 'Ada', key: '4', text: 'Tagging it now.' },
 ]
 
-/* The attribute holds JSON, as the HTML example writes it. */
-const authorStyles = JSON.stringify({
+/* An object as the property, where the HTML example writes it as JSON. */
+const authorStyles = {
   Ada: '--chat-message-background-color: color-mix(in oklab, var(--helix-color-success) 24%, transparent)',
   Grace:
     '--chat-message-background-color: color-mix(in oklab, var(--helix-color-warning) 24%, transparent)',
-})
+}
 
 export function Example() {
   return (
     <helix-chat
-      author-styles={authorStyles}
+      authorStyles={authorStyles}
       className="authors"
       label="Release"
       turns={turns}
