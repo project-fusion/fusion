@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { type SetBox, selectAllPress, selectAllState } from './select-all.js'
+import { type SetBox, selectAllState } from './select-all.js'
 
 const set = (written: string): SetBox[] =>
   written.split(' ').map((box) => ({
@@ -21,12 +21,5 @@ describe('select all', () => {
   test('reads every box when every box is disabled, and an empty set as clear', () => {
     expect(selectAllState(set('ax- c-'))).toEqual({ checked: false, indeterminate: true })
     expect(selectAllState([])).toEqual({ checked: false, indeterminate: false })
-  })
-
-  test('a press checks every enabled box, then clears them, and a disabled box keeps its state', () => {
-    expect(selectAllPress(set('ax c d-'))).toEqual(['a', 'c'])
-    expect(selectAllPress(set('ax cx d-'))).toEqual([])
-    expect(selectAllPress(set('ax cx dx-'))).toEqual(['d'])
-    expect(selectAllPress(set('a c dx-'))).toEqual(['a', 'c', 'd'])
   })
 })

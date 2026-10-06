@@ -365,6 +365,19 @@ describe('select all', () => {
     expect(heard).toEqual(['design,mind', '', 'design,mind', 'design,mind,energy', ''])
   })
 
+  /* A press leaves a disabled box as it is, checked or clear, which the
+     select-all helper used to say on its own and core's `toggleEvery` says
+     now. */
+  test('leaves a checked disabled box checked, both ways round', async () => {
+    const g = (await group('label="Verticals" select-all value="energy"')) as Selecting
+    ;(g.boxes[2] as unknown as { disabled: boolean }).disabled = true
+    await settle(g)
+    await press(g)
+    expect(g.values).toEqual(['design', 'mind', 'energy'])
+    await press(g)
+    expect(g.values).toEqual(['energy'])
+  })
+
   test('a refused change leaves every box as it was', async () => {
     const g = (await group('label="Verticals" select-all value="design"')) as Selecting
     await settle(g)

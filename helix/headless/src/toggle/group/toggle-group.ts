@@ -42,6 +42,23 @@ import { HelixHeadlessToggle } from '../root/toggle-root.js'
  * `orientation="vertical"` runs the items down a column, says so to the
  * accessibility tree, and the up and down arrows move between them.
  *
+ * **Keyboard.** The group is one tab stop: the chosen item, or the first that
+ * can be chosen, as in a radio group, and in a multiple group the item focus
+ * was last on.
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Right, Down | Moves to the next item, from the last back to the first. In a single group, chooses it. |
+ * | Left, Up | Moves to the item before, from the first round to the last. In a single group, chooses it. |
+ * | Home, End | Moves to the first or the last item. In a single group, chooses it. |
+ * | Space, Enter | Chooses the focused item, or presses or releases it in a multiple group. |
+ *
+ * Left and Right swap on a right-to-left page, and a disabled item is passed
+ * over. A single group is a `radiogroup` of items with `role="radio"` and
+ * `aria-checked`. A multiple group is a `toolbar` of buttons with
+ * `aria-pressed`, or a `group` inside a toolbar. The group is named by
+ * `label` and carries `aria-orientation` under `orientation`.
+ *
  * @since 0.1.0
  * @status stable
  * @aliases SegmentedControl, Segmented, Navigation, Switcher
@@ -135,7 +152,7 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
      * That fallback is right where it came from. A tab set always shows a panel,
      * so something has to be current; a group that reports a form value has the
      * honest option of reporting none. */
-    const active = this.multiple ? undefined : this.items.find((item) => item.value === this.value)
+    const active = this.chosenItem
     const pressed = new Set(this.values)
     const entry = this.focusable ? this.entry() : undefined
     for (const item of this.items) {
@@ -164,7 +181,7 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
         selected: (item) => item.pressed === true,
       })
     }
-    const active = items.find((item) => item.value === this.value)
+    const active = this.chosenItem
     return active && !active.disabled ? active : items.find((item) => !item.disabled)
   }
 
@@ -172,11 +189,19 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
   private lastFocused: HelixHeadlessToggle | undefined = undefined
 
   private readonly noteFocus = (event: FocusEvent): void => {
-    const item = this.items.find((one) => one === event.target)
-    if (this.multiple && item && item !== this.lastFocused) {
+    const item = event.target as HelixHeadlessToggle
+    if (this.multiple && item !== this.lastFocused && this.items.includes(item)) {
       this.lastFocused = item
       this.sync()
     }
+  }
+
+  /**
+   * The item whose value is the group's, in a single group: the exact match,
+   * so nothing chosen marks nothing. A multiple group has none.
+   */
+  private get chosenItem(): HelixHeadlessToggle | undefined {
+    return this.multiple ? undefined : this.items.find((item) => item.value === this.value)
   }
 
   /** Whether several items can be pressed at once. */
@@ -251,8 +276,7 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
   private readonly indicator = new IndicatorController(this, {
     // The same exact match `sync` makes: nothing chosen means nothing marked,
     // and the controller takes the mark away rather than parking it on item one.
-    active: () =>
-      this.multiple ? undefined : this.items.find((item) => item.value === this.value),
+    active: () => this.chosenItem,
     indicator: () => this.partNamed('indicator'),
     /* Per item, not only the host, which the controller watches on its own. An
        item can change width inside a track that keeps its size, and the host

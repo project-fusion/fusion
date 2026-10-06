@@ -958,3 +958,31 @@ describe('the months and the years', () => {
     expect(cal.view).toBe('month')
   })
 })
+
+/** An element inside a page section written in `lang`, which names no locale of its own. */
+const inLang = async <T extends HTMLElement>(lang: string, markup: string): Promise<T> => {
+  document.body.innerHTML = `<div lang="${lang}">${markup}</div>`
+  const element = document.body.firstElementChild?.firstElementChild as T & {
+    updateComplete: Promise<unknown>
+  }
+  await element.updateComplete
+  return element
+}
+
+describe('a date picker in a page written in another language', () => {
+  /* Measured before this: inside lang="de" the calendar named its days in
+     English and started its weeks on Sunday. */
+  test('names its days in that language and starts the week where it does', async () => {
+    const host = await inLang<DatePicker>(
+      'de-DE',
+      '<helix-headless-date-picker label="Datum" default-month="2026-08"></helix-headless-date-picker>',
+    )
+    /* August 1 2026 is a Saturday: the grid opens on Monday, July 27. */
+    expect(days(host)[0]?.getAttribute('aria-label')).toContain('27. Juli 2026')
+    const own = await inLang<DatePicker>(
+      'de-DE',
+      '<helix-headless-date-picker label="Date" locale="en-US" default-month="2026-08"></helix-headless-date-picker>',
+    )
+    expect(days(own)[0]?.getAttribute('aria-label')).toContain('July 26, 2026')
+  })
+})

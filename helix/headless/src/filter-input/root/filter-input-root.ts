@@ -145,6 +145,7 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * @aliases SearchField, FacetInput, TokenInput
  * @documentation https://fusion.dev/helix/components/filter-input
  *
+ * @slot clear-icon - Replaces the cross on the clear button, under `clearable`.
  * @slot end - Content after the text, such as a count or a control.
  * @slot feedback - The message that says what is wrong, for content richer than a string. It shows while there is a message.
  * @slot hint - Help under the control, for content richer than the `hint` text.
@@ -247,21 +248,17 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
    * under `filter-suggestions`, and shows again the ones it hid before.
    */
   private narrow(): void {
-    const slot = this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="suggestions"]')
     const term = this.filterSuggestions
       ? currentTerm(this.value, this.control?.selectionStart ?? this.value.length)
       : ''
-    for (const node of slot?.assignedElements({ flatten: true }) ?? []) {
-      const options = isOption(node) ? [node] : [...node.children].filter(isOption)
-      for (const option of options) {
-        const hide = !suggests(option.textContent ?? '', term)
-        if (hide && !option.hidden) {
-          option.hidden = true
-          this.narrowed.add(option)
-        } else if (!hide && this.narrowed.has(option)) {
-          option.hidden = false
-          this.narrowed.delete(option)
-        }
+    for (const option of this.options) {
+      const hide = !suggests(option.textContent ?? '', term)
+      if (hide && !option.hidden) {
+        option.hidden = true
+        this.narrowed.add(option)
+      } else if (!hide && this.narrowed.has(option)) {
+        option.hidden = false
+        this.narrowed.delete(option)
       }
     }
   }
@@ -412,20 +409,18 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
    * and one that pretends it was never there.
    */
   private get suggestions(): SuggestionOption[] {
+    return this.options.filter((option) => !option.disabled && !option.hidden)
+  }
+
+  /**
+   * Every option slotted into `suggestions`, and every option one level inside
+   * a group slotted there, hidden or not.
+   */
+  private get options(): SuggestionOption[] {
     const slot = this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="suggestions"]')
-    const found: SuggestionOption[] = []
-    for (const node of slot?.assignedElements({ flatten: true }) ?? []) {
-      if (isOption(node)) {
-        found.push(node)
-        continue
-      }
-      for (const child of node.children) {
-        if (isOption(child)) {
-          found.push(child)
-        }
-      }
-    }
-    return found.filter((option) => !option.disabled && !option.hidden)
+    return (slot?.assignedElements({ flatten: true }) ?? []).flatMap((node) =>
+      isOption(node) ? [node] : [...node.children].filter(isOption),
+    )
   }
 
   /**
@@ -969,6 +964,11 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
     this.control?.focus(options)
   }
 
+  /** The cross on the clear button, behind a seam a tier can move. */
+  protected renderClearIcon(): TemplateResult {
+    return html`<slot name="clear-icon">${drawIcon(x)}</slot>`
+  }
+
   protected override render(): TemplateResult {
     /* The row is always rendered, unlike Combobox's, because a slot that is not
        in the tree assigns nothing: guarding it on a count would mean the count
@@ -1011,7 +1011,7 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
               aria-label=${this.clearLabel}
               @click=${this.handleClear}
             >
-              ${drawIcon(x)}
+              ${this.renderClearIcon()}
             </button>`
           : nothing
       }

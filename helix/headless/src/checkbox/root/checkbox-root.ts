@@ -5,6 +5,7 @@ import {
   HostClickController,
   MixinControllerChecked,
   MixinField,
+  slotFilled,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -205,7 +206,7 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
    */
   private readonly handleMarkChange = (event: Event): void => {
     const slot = event.target as HTMLSlotElement
-    const filled = slot.assignedNodes().length > 0
+    const filled = slotFilled(slot)
     if (slot.name === 'dash') {
       this.toggleState('has-dash', filled)
     } else {
@@ -228,16 +229,11 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
    */
   private syncLabelPresence(): void {
     const slot = this.renderRoot.querySelector<HTMLSlotElement>('[part="label"] slot')
-    const meaningful = (node: Node): boolean =>
-      node.textContent?.trim() !== '' || node.nodeType === Node.ELEMENT_NODE
-    const filled = (slot?.assignedNodes({ flatten: true }) ?? []).some(meaningful)
+    const filled = slotFilled(slot)
     /* A name that is not shown is no label to leave room for. Content the
        consumer wrote wins over the host's `aria-label`, as it does in the
        platform's own `<label>`, so the clip only holds while the slot is empty. */
-    const hidden =
-      this.label === '' &&
-      Boolean(this.getAttribute('aria-label')) &&
-      !(slot?.assignedNodes() ?? []).some(meaningful)
+    const hidden = this.label === '' && Boolean(this.getAttribute('aria-label')) && !filled
     this.partNamed('label')?.toggleAttribute('data-hidden', hidden)
     this.toggleState('has-label', filled && !hidden)
     /* And `hidden` on the region itself, because the state is on the host and

@@ -84,7 +84,6 @@
     const chip = held ?? document.createElement('helix-filter-chip')
     chip.slot = 'tags'
     chip.dismissible = true
-    chip.dismissLabel = `Remove the ${label.toLowerCase()} filter`
     chip.label = label
     /* Set the attribute so the lookup above finds a chip made moments earlier.
        A reflected property updates on the next render. */

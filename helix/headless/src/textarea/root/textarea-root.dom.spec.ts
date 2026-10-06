@@ -141,6 +141,15 @@ describe('clearing, your own rule, and an empty field', () => {
     expect(part(host, 'clear')).toBeNull()
   })
 
+  test('the clear button draws its cross in a slot a glyph of your own replaces', async () => {
+    const host = (await mount(
+      `<helix-headless-textarea label="Notes" clearable value="x"><svg slot="clear-icon"></svg></helix-headless-textarea>`,
+    )) as HTMLElement
+    const slot = part(host, 'clear')?.querySelector<HTMLSlotElement>('slot[name="clear-icon"]')
+    expect(slot?.assignedElements()).toHaveLength(1)
+    expect(slot?.querySelector('svg[data-glyph]')).not.toBeNull()
+  })
+
   test('validate runs on every change and its message is the verdict', async () => {
     const host = (await mount(
       '<helix-headless-textarea label="Note" value="Hi"></helix-headless-textarea>',

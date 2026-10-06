@@ -12,6 +12,7 @@ import {
   hostAria,
   inlineStep,
   commaList as list,
+  localeOf,
   localToday,
   MixinControllerValue,
   monthOf,
@@ -212,12 +213,18 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   label = 'Date Picker'
 
   /**
-   * Locale for month and day names.
+   * Locale for month and day names, and the day a week starts on.
    *
-   * Absent uses the runtime's own.
+   * Absent is the page's: the `lang` of the nearest element with one, as
+   * Shoelace and Web Awesome read it, then the runtime's own.
    */
   @property()
   locale = ''
+
+  /** The locale the words are written in: `locale`, or the page's `lang`. */
+  private get language(): string {
+    return localeOf(this, this.locale)
+  }
 
   /**
    * Latest selectable date, as `YYYY-MM-DD`.
@@ -357,7 +364,8 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
     if (this.firstDayOfWeek !== undefined && Number.isFinite(this.firstDayOfWeek)) {
       return ((Math.floor(this.firstDayOfWeek) % 7) + 7) % 7
     }
-    return this.locale === '' ? 0 : weekStartOf(this.locale)
+    const language = this.language
+    return language === '' ? 0 : weekStartOf(language)
   }
 
   /**
@@ -1094,14 +1102,15 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
     weekday: Intl.DateTimeFormat
     year: Intl.DateTimeFormat
   } {
-    if (this.cachedFormats?.locale === this.locale) {
+    const language = this.language
+    if (this.cachedFormats?.locale === language) {
       return this.cachedFormats
     }
-    const locale = this.locale || undefined
+    const locale = language || undefined
     const built = {
       full: new Intl.DateTimeFormat(locale, { dateStyle: 'full', timeZone: 'UTC' }),
       heading: new Intl.DateTimeFormat(locale, { month: 'long', timeZone: 'UTC', year: 'numeric' }),
-      locale: this.locale,
+      locale: language,
       long: new Intl.DateTimeFormat(locale, { dateStyle: 'long', timeZone: 'UTC' }),
       monthName: new Intl.DateTimeFormat(locale, { month: 'short', timeZone: 'UTC' }),
       weekday: new Intl.DateTimeFormat(locale, { timeZone: 'UTC', weekday: 'short' }),

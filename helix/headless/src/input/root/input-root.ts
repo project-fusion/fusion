@@ -39,16 +39,30 @@ export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'te
  * Aria's TextField `validate` does. What it returns is the message the field
  * shows once the user has edited it, and the message a submit raises.
  *
+ * **Keyboard.** The field's own keys are the platform's. Enter submits the
+ * form through its default button, as in a native field. The clear button
+ * under `clearable` and the reveal button under `reveal` are tab stops of
+ * their own after the field, so a keyboard reaches them.
+ *
+ * The inner input is named by `label`, or by a host `aria-label`,
+ * `aria-labelledby` or `<label for>`, and is described by the hint and the
+ * message, with `aria-invalid` while a message shows. The clear button is
+ * named `clear-label`, and the reveal button `reveal-label` with
+ * `aria-pressed` while the password shows.
+ *
  * @since 0.1.0
  * @status stable
  * @category forms
  * @aliases TextField, Field, TextInput
  * @documentation https://fusion.dev/helix/components/input
  *
+ * @slot clear-icon - Replaces the cross on the clear button, under `clearable`.
+ * @slot conceal-icon - Replaces the crossed-out eye on the reveal button while the password shows, under `reveal`.
  * @slot end - After the text, for an icon or a unit.
  * @slot feedback - The message that says what is wrong, for content richer than a string. It shows while there is a message.
  * @slot hint - Help under the control, for content richer than the `hint` text.
  * @slot label - The label, for content richer than the `label` text.
+ * @slot reveal-icon - Replaces the eye on the reveal button while the password is hidden, under `reveal`.
  * @slot start - Before the text, for an icon or a prefix.
  *
  * @event {Event} change - Sent when the user finishes changing the value. Relayed from the native input.
@@ -503,6 +517,21 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
   @property({ attribute: false })
   validate?: (value: string) => string | string[] | true | null | undefined
 
+  /** The cross on the clear button, behind a seam a tier can move. */
+  protected renderClearIcon(): TemplateResult {
+    return html`<slot name="clear-icon">${drawIcon(x)}</slot>`
+  }
+
+  /**
+   * The eye on the reveal button, behind a seam a tier can move: open while
+   * the password is hidden, and crossed out while it shows.
+   */
+  protected renderRevealIcon(): TemplateResult {
+    return this.revealed
+      ? html`<slot name="conceal-icon">${drawIcon(eyeSlash)}</slot>`
+      : html`<slot name="reveal-icon">${drawIcon(eye)}</slot>`
+  }
+
   protected override render(): TemplateResult {
     /* Label, field, and one line under it.
        The hint and the feedback share that line rather than stacking, so a
@@ -551,7 +580,7 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
               aria-label=${this.clearLabel}
               @click=${this.handleClear}
             >
-              ${drawIcon(x)}
+              ${this.renderClearIcon()}
             </button>`
           : nothing
       }
@@ -567,7 +596,7 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
                 this.revealed = !this.revealed
               }}
             >
-              ${drawIcon(this.revealed ? eyeSlash : eye)}
+              ${this.renderRevealIcon()}
             </button>`
           : nothing
       }

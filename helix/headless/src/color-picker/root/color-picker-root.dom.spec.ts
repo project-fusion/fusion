@@ -916,3 +916,25 @@ describe('a preset taken', () => {
     expect(rgb.value).toBe('rgba(0, 170, 0, 0.5)')
   })
 })
+
+/** An element inside a page section written in `lang`, which names no locale of its own. */
+const inLang = async <T extends HTMLElement>(lang: string, markup: string): Promise<T> => {
+  document.body.innerHTML = `<div lang="${lang}">${markup}</div>`
+  const element = document.body.firstElementChild?.firstElementChild as T & {
+    updateComplete: Promise<unknown>
+  }
+  await element.updateComplete
+  return element
+}
+
+describe('a color picker in a page written in another language', () => {
+  test('speaks its percentages in the page’s language', async () => {
+    const host = await inLang(
+      'de',
+      '<helix-headless-color-picker alpha default-value="#ff000080"></helix-headless-color-picker>',
+    )
+    expect(
+      host.shadowRoot?.querySelector('[data-channel="alpha"]')?.getAttribute('value-text'),
+    ).toBe('50\u00a0%')
+  })
+})

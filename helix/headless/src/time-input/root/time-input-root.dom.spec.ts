@@ -318,3 +318,23 @@ describe('the panel of a time input takes content of your own', () => {
     expect(slots[1]?.assignedElements()[0]?.textContent).toBe('Reset')
   })
 })
+
+/** An element inside a page section written in `lang`, which names no locale of its own. */
+const inLang = async <T extends HTMLElement>(lang: string, markup: string): Promise<T> => {
+  document.body.innerHTML = `<div lang="${lang}">${markup}</div>`
+  const element = document.body.firstElementChild?.firstElementChild as T & {
+    updateComplete: Promise<unknown>
+  }
+  await element.updateComplete
+  return element
+}
+
+describe('a time input in a page written in another language', () => {
+  test('hands the language to its picker', async () => {
+    const host = await inLang(
+      'de-DE',
+      '<helix-headless-time-input label="Beginn"></helix-headless-time-input>',
+    )
+    expect(part(host, 'picker')?.getAttribute('locale')).toBe('de-DE')
+  })
+})

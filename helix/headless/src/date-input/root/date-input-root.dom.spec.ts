@@ -993,3 +993,28 @@ describe('the panel of a date input takes content of your own', () => {
     expect(slots[1]?.assignedElements()[0]?.textContent).toBe('Reset')
   })
 })
+
+/** An element inside a page section written in `lang`, which names no locale of its own. */
+const inLang = async <T extends HTMLElement>(lang: string, markup: string): Promise<T> => {
+  document.body.innerHTML = `<div lang="${lang}">${markup}</div>`
+  const element = document.body.firstElementChild?.firstElementChild as T & {
+    updateComplete: Promise<unknown>
+  }
+  await element.updateComplete
+  return element
+}
+
+describe('a date input in a page written in another language', () => {
+  test('orders its segments that way and hands the language to its calendar', async () => {
+    const host = await inLang<InputDate>(
+      'de-DE',
+      '<helix-headless-date-input label="Beginn" segmented default-value="2026-08-04"></helix-headless-date-input>',
+    )
+    expect(
+      [...(host.shadowRoot?.querySelectorAll('[part~="segment"]') ?? [])].map((one) =>
+        one.textContent?.trim(),
+      ),
+    ).toEqual(['04', '08', '2026'])
+    expect(part(host, 'picker')?.getAttribute('locale')).toBe('de-DE')
+  })
+})

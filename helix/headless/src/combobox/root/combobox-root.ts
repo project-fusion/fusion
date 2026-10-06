@@ -21,7 +21,6 @@ import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html } from 'lit/static-html.js'
-import { renderListStatus } from '../../listbox/forward.js'
 import type { HelixHeadlessListbox } from '../../listbox/root/listbox-root.js'
 import { optionsAmong } from '../../option/root/option-root.js'
 import { HelixHeadlessTag } from '../../tag/root/tag-root.js'
@@ -1229,13 +1228,19 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
            property, so nothing else would schedule the update that fixes
            it. -->
       <slot @slotchange=${() => this.requestUpdate()}></slot>
-      ${renderListStatus({
-        emptyText: this.emptyText,
-        host: this,
-        loadError: this.loadError,
-        loadingText: this.loadingText,
-        refill: () => this.requestUpdate(),
-      })}
+      <!-- Handed on to the list's own, with the text as this slot's fallback:
+           a slot passed into another is assigned there whether or not anything
+           fills it, so the list's fallback would never show. -->
+      <slot name="empty" slot="empty">${this.emptyText}</slot>
+      <slot name="loading" slot="loading">${this.loadingText}</slot>
+      <slot name="error" slot="error">${this.loadError}</slot>
+      <!-- Handed on only while something fills it: an assigned slot hides the
+           list's own fallback, which is no-results-text or empty-text. -->
+      <slot
+        name="no-results"
+        slot=${this.querySelector?.(':scope > [slot="no-results"]') ? 'no-results' : nothing}
+        @slotchange=${() => this.requestUpdate()}
+      ></slot>
     </${this.tag('listbox')}>`
   }
 
