@@ -6,11 +6,12 @@ import {
   DelayController,
   drawAutofill,
   drawStatus,
-  fillTemplate,
+  formatWords,
   type HelixBeforeChangeEvent,
   HelixCreateEvent,
   HelixFilterEvent,
   HelixFormElement,
+  handedLocale,
   MixinControllerOpen,
   MixinControllerValue,
   MixinField,
@@ -20,6 +21,8 @@ import {
   reportValues,
   StatusController,
   submitImplicitly,
+  words,
+  wordsLocale,
 } from '@fusion.dev/helix-core'
 import { caretDown } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -172,6 +175,12 @@ const isInsertion = (event: Event): boolean =>
 export class HelixHeadlessCombobox extends MixinControllerOpen(
   MixinTokens(MixinControllerValue(MixinField(HelixFormElement))),
 ) {
+  /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-combobox': { emptyText: 'Keine Treffer' } })`.
+   */
+  static words = 'helix-combobox'
+
   /* A consumer's `aria-describedby` names ids in their own tree and the control
      is in this shadow root, so the reference has to be carried down as an
      element rather than copied as an id. See `AriaForwardController`: measured
@@ -234,14 +243,19 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   creatable = false
 
   /**
-   * The text of the create row, shown before the typed words it adds.
+   * The text of the create row. `{value}` is what was typed.
+   *
+   * A sentence without `{value}`, such as `Create`, is followed by what was
+   * typed in quotes, as before `{value}` existed.
    */
+  @words
   @property({ attribute: 'create-label' })
-  createLabel = 'Add'
+  createLabel = 'Add "{value}"'
 
   /**
    * Text shown when the filter hides every option.
    */
+  @words
   @property({ attribute: 'empty-text' })
   emptyText = 'No matches'
 
@@ -260,6 +274,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   /**
    * The list's name, read by screen readers. The list has no visible name.
    */
+  @words
   @property({ attribute: 'list-label' })
   listLabel = 'Options'
 
@@ -284,8 +299,17 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   /**
    * Text the list shows while the options load.
    */
+  @words
   @property({ attribute: 'loading-text' })
   loadingText = 'Loading'
+
+  /**
+   * The locale the words, plural forms, and numbers are in, as a BCP 47 tag
+   * such as `pl`. Empty reads the nearest `lang`, then the browser's
+   * language.
+   */
+  @property()
+  locale = ''
 
   /**
    * Whether more than one option can be chosen.
@@ -363,28 +387,35 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
    * **The name goes in**, so a row of them is heard as which one each
    * removes rather than as "Remove" said once per chosen option.
    */
+  @words
   @property({ attribute: 'remove-label' })
   removeLabel = 'Remove {name}'
 
   /**
-   * What a screen reader hears when typing leaves one option. `{count}` is
-   * the count.
+   * What a screen reader hears when typing leaves one option, where
+   * `results-label` should not say it. `{count}` is the count.
+   *
+   * @deprecated Write every form in `results-label`, as `{count, plural, one
+   * {# result} other {# results}}`. Removed in the next major version.
    */
   @property({ attribute: 'result-label' })
-  resultLabel = '{count} result'
+  resultLabel?: string
 
   /**
-   * What a screen reader hears when typing leaves any other number of
-   * options. `{count}` is the count, and `Intl.PluralRules` picks between the
-   * two.
+   * What a screen reader hears when typing narrows the list. `{count}` is how
+   * many options are left, written in the locale, and each language writes
+   * the forms it has: `{count, plural, one {# wynik} few {# wyniki} many
+   * {# wyników} other {# wyniku}}`.
    */
+  @words
   @property({ attribute: 'results-label' })
-  resultsLabel = '{count} results'
+  resultsLabel = '{count, plural, one {# result} other {# results}}'
 
   /**
    * What VoiceOver hears for a chosen option, as the highlight reaches it and
    * once it is chosen, on Apple devices. `{name}` is the option's words.
    */
+  @words
   @property({ attribute: 'selected-label' })
   selectedLabel = '{name}, selected'
 
@@ -1040,12 +1071,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
       return
     }
     if (this.told === undefined) {
-      this.counted = countLabel(
-        this.reachable.length,
-        this.resultLabel,
-        this.resultsLabel,
-        this.lang,
-      )
+      this.counted = this.countSaid(this.reachable.length)
     }
     this.told = active ?? null
     const option = active as (Element & { selected?: boolean; text?: string }) | undefined
@@ -1053,7 +1079,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
       option?.text === undefined
         ? (active?.textContent?.trim() ?? '')
         : option.selected
-          ? fillTemplate(this.selectedLabel, { name: option.text })
+          ? formatWords(this, 'selectedLabel', { name: option.text })
           : option.text
     /* The count goes with the first option said, which the highlight often
        reaches in the update after the one that opened the list. */
@@ -1065,6 +1091,16 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
 
   /** How many options there are, said as the list opens, until an option is said with it. */
   private counted = ''
+
+  /**
+   * How many options are left, in `results-label`, or in the deprecated
+   * `result-label` for one where a page still sets it.
+   */
+  private countSaid(count: number): string {
+    return this.resultLabel
+      ? countLabel(count, this.resultLabel, this.resultsLabel, wordsLocale(this))
+      : formatWords(this, 'resultsLabel', { count })
+  }
 
   /**
    * Takes what the list announced and stops it there.
@@ -1089,7 +1125,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
     }
     const chosen = this.listbox?.options.find((option) => option.value === value)
     if (chosen && onApple()) {
-      this.status.say(fillTemplate(this.selectedLabel, { name: chosen.text }))
+      this.status.say(formatWords(this, 'selectedLabel', { name: chosen.text }))
     }
     // Either way the search is spent: it found what it was for.
     this.emptied = false
@@ -1354,7 +1390,8 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
       load-error=${this.loadError}
       loading-text=${this.loadingText}
       no-results-text=${this.noResultsText ?? nothing}
-      result-label=${this.resultLabel}
+      lang=${handedLocale(this) || nothing}
+      result-label=${this.resultLabel ?? ''}
       results-label=${this.resultsLabel}
       ?loading=${this.loading}
       ?multiple=${this.multiple}
@@ -1391,7 +1428,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
                     part="tag"
       exportparts="cell: tag-cell, dismiss: tag-dismiss, dismiss-mark: tag-dismiss-mark, label: tag-label, link: tag-link, start: tag-start"
                     data-value=${option.value}
-                    dismiss-label=${fillTemplate(this.removeLabel, { name: option.text })}
+                    dismiss-label=${formatWords(this, 'removeLabel', { name: option.text })}
                     ?dismissible=${!this.isDisabled && !this.readOnly}
                     @helix-dismiss=${this.handleDismiss}
                     >${option.text}</${this.tag('tag')}
@@ -1427,12 +1464,17 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
     if (this.creation === '') {
       return nothing
     }
+    /* A page's sentence without `{value}` is followed by the value in
+       quotes, which is how the row read before the sentence held it. */
+    const words = this.createLabel.includes('{value}')
+      ? formatWords(this, 'createLabel', { value: this.creation })
+      : html`${this.createLabel} "${this.creation}"`
     return this.onCreate
       ? html`<button part="create create-active" id="create" type="button" @click=${() => this.create()}>
-          ${this.createLabel} "${this.creation}"
+          ${words}
         </button>`
       : html`<button part="create" id="create" type="button" @click=${() => this.create()}>
-          ${this.createLabel} "${this.creation}"
+          ${words}
         </button>`
   }
 
