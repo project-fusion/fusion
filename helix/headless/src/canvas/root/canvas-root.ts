@@ -36,6 +36,7 @@ import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'li
 import { property, state } from 'lit/decorators.js'
 import { HelixHeadlessCanvasEdge } from '../edge/canvas-edge.js'
 import { EdgePan } from '../edge-pan.js'
+import { neighborOf } from '../neighbor.js'
 import { HelixHeadlessCanvasNode } from '../node/canvas-node.js'
 import { snapBox, snapTo, stepTo } from '../snap.js'
 import {
@@ -259,6 +260,11 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  *   Enter on another, dispatches `helix-connect`.
  * - Delete on a card or a connection dispatches `helix-remove`. The event names
  *   every connection that removing the card would leave without an end.
+ *
+ * Once your page removes what Delete asked for, focus moves to the next stop,
+ * to the one before where it was the last, and to the board where none is
+ * left. A focused card your page removes for its own reasons hands focus on
+ * the same way, unless the reader has already moved focus somewhere else.
  *
  * The board applies a move itself, because the card already exists. A
  * connection is a new element, and React discards an element the board adds to
@@ -629,6 +635,19 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    * or, for a page that declines, off one that stays.
    */
   private refocus: { gone: string[]; next: string | undefined } | undefined
+
+  /**
+   * The card focus is on, while it is.
+   *
+   * **Kept so a card the page takes away hands focus on**, as Delete does: a
+   * filter, an undo or another person's edit removed the card a reader was on,
+   * and the browser dropped focus to the page's body, putting the reader back
+   * at its top with nothing said. Map does the same for its markers.
+   */
+  private focusedCard: HelixHeadlessCanvasNode | undefined
+
+  /** The stops in the order the arrows walked them on the last update. */
+  private walked: Stop[] = []
 
   /**
    * Where the plane's corner was on the last render, in the document's units.
@@ -1400,13 +1419,12 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     /* The next stop after the first one going that is not going too, or the
        one before where nothing after it is left. */
     const at = Math.min(...asked.map((one) => walk.findIndex((stop) => stop.key === one)))
-    const next =
-      walk.slice(at + 1).find((one) => !gone.has(one.key)) ??
-      walk
-        .slice(0, Math.max(at, 0))
-        .reverse()
-        .find((one) => !gone.has(one.key))
-    this.refocus = { gone: [...gone], next: next?.key }
+    const next = neighborOf(
+      walk.map((one) => one.key),
+      at,
+      (key) => !gone.has(key),
+    )
+    this.refocus = { gone: [...gone], next }
     this.dispatchEvent(new HelixRemoveEvent(detail))
   }
 
@@ -2621,6 +2639,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       return
     }
     this.refocus = undefined
+    this.focusedCard = card
     this.stop = edge ?? card?.name
     /* A keyboard landing selects what it lands on, keeping a selection it
        lands inside; a pointer's selection is its press's and its release's. */
@@ -2657,6 +2676,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    */
   private readonly handleFocusOut = (event: FocusEvent): void => {
     const next = event.relatedTarget
+    this.forget(this.cardOf(event), next)
     const linking = this.linking
     if (
       !linking ||
@@ -2670,6 +2690,56 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     }
     this.linking = undefined
     this.said = this.stoppedLabel
+  }
+
+  /**
+   * Forgets the card focus left, unless the page took it away.
+   *
+   * Focus leaving for nothing is a press on the page or the card removed, and
+   * which one is known once the removal has finished: a card still on the
+   * board was left, and one gone is owed a place for focus to land.
+   */
+  private forget(card: HelixHeadlessCanvasNode | undefined, to: EventTarget | null): void {
+    if (!card || card !== this.focusedCard) {
+      return
+    }
+    if (to) {
+      this.focusedCard = undefined
+      return
+    }
+    queueMicrotask(() => {
+      if (card.isConnected && this.focusedCard === card) {
+        this.focusedCard = undefined
+      }
+    })
+  }
+
+  /**
+   * Gives focus on from a card the page took away with focus in it: to the
+   * next stop, the one before where it was the last, and the board where none
+   * is left. Not where the reader has gone somewhere else already.
+   */
+  private handOn(): void {
+    const gone = this.focusedCard
+    if (!gone || this.cards.includes(gone)) {
+      return
+    }
+    this.focusedCard = undefined
+    const active = this.ownerDocument.activeElement
+    if (active !== null && active !== this.ownerDocument.body) {
+      return
+    }
+    const keys = new Set(this.walk.map((one) => one.key))
+    const next = neighborOf(
+      this.walked.map((one) => one.key),
+      this.walked.findIndex((one) => one.key === gone.name),
+      (key) => keys.has(key),
+    )
+    if (next === undefined) {
+      this.partNamed('region')?.focus()
+    } else {
+      this.focusStop(next)
+    }
   }
 
   /** Brings a card into view, where it is not already whole in it. */
@@ -3275,6 +3345,8 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
         )
       }
     }
+    this.handOn()
+    this.walked = this.walk
     this.watchBox()
     if (!this.touched) {
       this.fitInto(true)
