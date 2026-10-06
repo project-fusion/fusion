@@ -87,6 +87,25 @@ describe('the windowed example', () => {
     expect(focused?.getAttribute('tabindex')).toBe('0')
   })
 
+  /* A jump kept the row it went to drawn beside the window, after it, and
+     scrolled to that place: the focused row sat below the box. */
+  run('a jump leaves the focused row inside the box', async () => {
+    await example(windowed)
+    await idle()
+    rows()[0]?.focus()
+    for (const key of ['PageDown', 'PageDown', 'PageDown', 'End']) {
+      await press(key)
+      await idle()
+      await idle()
+      const focused = inspector().shadowRoot?.activeElement as HTMLElement
+      const box = tree().getBoundingClientRect()
+      const row = focused.getBoundingClientRect()
+      expect(focused.getAttribute('part')).toContain('row-active')
+      expect(row.top).toBeGreaterThanOrEqual(box.top - 2)
+      expect(row.bottom).toBeLessThanOrEqual(box.bottom + 2)
+    }
+  })
+
   run('keeps the focused row drawn when it scrolls out of the window', async () => {
     await example(windowed)
     await idle()
