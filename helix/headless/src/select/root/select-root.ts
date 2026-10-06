@@ -5,6 +5,7 @@ import {
   elementById,
   HelixFormElement,
   hostAria,
+  isRtl,
   MixinControllerOpen,
   MixinControllerValue,
   MixinField,
@@ -20,6 +21,7 @@ import { html } from 'lit/static-html.js'
 import type { HelixHeadlessListbox } from '../../listbox/root/listbox-root.js'
 import { type HelixHeadlessOption, optionsAmong } from '../../option/root/option-root.js'
 import '../../listbox/index.js'
+import { over } from '../align.js'
 
 /**
  * @summary A control that opens a list of options to choose from.
@@ -168,6 +170,20 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
   placeholder = 'Choose'
 
   /**
+   * Where the list opens: `floating`, under the trigger and above it where
+   * there is no room, or `item-aligned`, over the trigger with the chosen
+   * option where the trigger is, as a native select does on macOS and Radix
+   * Select does by default.
+   *
+   * Over the trigger, a reader's eye stays on the answer as the list opens
+   * round it, and a short move reaches the options either side. Near an edge
+   * of the screen the list moves to stay on it, so the option may sit beside
+   * the trigger rather than on it. It follows the page as it scrolls.
+   */
+  @property()
+  position: 'floating' | 'item-aligned' = 'floating'
+
+  /**
    * What the trigger shows for the chosen options: a function given them, in
    * the order they appear, that returns text, an element or a Lit template.
    *
@@ -257,6 +273,9 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
     offset: () => 4,
     onDismiss: () => this.close(),
     open: () => this.open,
+    /* Placed here instead where the list opens over the trigger, which is
+       no side of it. */
+    place: () => this.position !== 'item-aligned',
     placement: 'bottom-start',
     surface: () => this.partNamed('surface'),
   })
@@ -372,11 +391,76 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    this.stopAligning()
     this.removeEventListener('helix-select', this.handleLinkFollowed)
     for (const watcher of this.watchers) {
       watcher.disconnect()
     }
     this.watchers = []
+  }
+
+  /**
+   * Puts the open list over the trigger, with the option it opened on where
+   * the trigger is, for `position="item-aligned"`.
+   *
+   * Measured once the list has drawn and scrolled to that option, and again as
+   * the page scrolls or the window changes size. The offset of the option in
+   * the list is read from the boxes on screen and divided by the list's scale,
+   * since a styled list opens from a little under full size. Written as the
+   * floating controller writes a position, so the same entrance runs and the
+   * controller takes it back on close.
+   */
+  private readonly alignOver = (): void => {
+    const surface = this.partNamed('surface')
+    const trigger = this.partNamed('trigger')
+    if (!this.open || this.position !== 'item-aligned' || !surface || !trigger) {
+      return
+    }
+    const margin = 8
+    const at = trigger.getBoundingClientRect()
+    surface.style.setProperty('--floating-anchor-inline-size', `${Math.round(at.width)}px`)
+    surface.style.setProperty(
+      '--floating-available-block-size',
+      `${Math.max(0, window.innerHeight - margin * 2)}px`,
+    )
+    /* The option the list opened on, kept, so a page scrolled while the
+       reader arrows through the list does not move it under them. */
+    const shown = optionsAmong(this.knownChildren).filter((option) => !option.hidden)
+    this.alignedTo ??= shown.find((one) => one.active) ?? this.chosenOptions[0] ?? shown[0]
+    const option = this.alignedTo
+    const box = surface.getBoundingClientRect()
+    const scale = surface.offsetHeight > 0 ? box.height / surface.offsetHeight : 1
+    const row = option?.getBoundingClientRect()
+    const { left, top } = over({
+      margin,
+      option: row
+        ? { height: row.height / scale, top: (row.top - box.top) / scale }
+        : { height: 0, top: 0 },
+      panel: { height: surface.offsetHeight, width: surface.offsetWidth },
+      rtl: isRtl(this),
+      trigger: at,
+      viewport: { height: window.innerHeight, width: window.innerWidth },
+    })
+    for (const [edge, value] of [
+      ['bottom', 'auto'],
+      ['left', '0'],
+      ['right', 'auto'],
+      ['top', '0'],
+    ] as const) {
+      surface.style.setProperty(edge, value, 'important')
+    }
+    surface.style.position = 'fixed'
+    surface.style.translate = `${left}px ${top}px`
+    surface.setAttribute('data-placed', '')
+  }
+
+  /** The option the open list was put over the trigger by. */
+  private alignedTo: HelixHeadlessOption | undefined = undefined
+
+  /** Stops following the page, once the list over the trigger closes. */
+  private stopAligning(): void {
+    window.removeEventListener('resize', this.alignOver)
+    window.removeEventListener('scroll', this.alignOver, { capture: true })
   }
 
   /** Opens the list with the highlight where the opening key says. */
@@ -575,8 +659,15 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
         this.listbox?.highlight(this.opening)
         this.opening = 'selected'
         this.listbox?.focus()
+        if (this.position === 'item-aligned') {
+          this.alignedTo = undefined
+          void this.listbox?.updateComplete.then(() => this.alignOver())
+          window.addEventListener('resize', this.alignOver)
+          window.addEventListener('scroll', this.alignOver, { capture: true, passive: true })
+        }
       }
     } else {
+      this.stopAligning()
       /* The filter goes with a close. Without this a filterable select reopens
          still narrowed by the old needle, with `hidden` still written on the
          options it ruled out, so the second use of the control starts from the

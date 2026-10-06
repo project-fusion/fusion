@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 /* The reading, after hydration. What is asserted here is what the element
@@ -122,5 +122,103 @@ describe('an elapsed reading to a screen reader', () => {
     const time = part(element, 'time')
     expect(time?.getAttribute('aria-label')).toBe('42 minutes ago')
     expect(time?.getAttribute('title')).toContain(String(new Date(at).getFullYear()))
+  })
+})
+
+/* The ticker keeps its state under a global symbol, so a spec outside core can
+   hold it stopped, as the clock controller's own spec does, and move it on by
+   hand. `Date.now` is held too, since the clock reads the time from it: a
+   wall-clock wait for the words to go stale is a flaky spec. */
+const TICKER = Symbol.for('helix.ticker')
+const shared = globalThis as unknown as Record<symbol, unknown>
+const realNow = Date.now
+let heldTicker: unknown
+
+afterEach(() => {
+  Date.now = realNow
+  shared[TICKER] = heldTicker
+})
+
+/** A clock that moves only when told, under both the ticker and `Date.now`. */
+const stopped = () => {
+  heldTicker = shared[TICKER]
+  let now = realNow()
+  let pending: { at: number; run: () => void } | undefined
+  shared[TICKER] = {
+    clock: {
+      clearTimer: () => {
+        pending = undefined
+      },
+      now: () => now,
+      setTimer: (run: () => void, wait: number) => {
+        pending = { at: now + wait, run }
+        return 1
+      },
+    },
+    timer: undefined,
+    waiting: new Set(),
+  }
+  Date.now = () => now
+  return {
+    advance: (ms: number) => {
+      now += ms
+      if (pending && pending.at <= now) {
+        const due = pending
+        pending = undefined
+        due.run()
+      }
+    },
+    now: () => now,
+  }
+}
+
+describe('a reading left on the page', () => {
+  test('moves on by itself when its words go stale, and not before', async () => {
+    const clock = stopped()
+    const moment = new Date(clock.now() - 42 * 60_000 - 30_000).toISOString()
+    const element = await stamp(
+      `<helix-headless-format-date elapsed locale="en-US" date="${moment}"></helix-headless-format-date>`,
+    )
+    expect(part(element, 'time')?.textContent).toBe('42m')
+    clock.advance(20_000)
+    await element.updateComplete
+    expect(part(element, 'time')?.textContent).toBe('42m')
+    clock.advance(10_000)
+    await element.updateComplete
+    expect(part(element, 'time')?.textContent).toBe('43m')
+    expect(part(element, 'time')?.getAttribute('aria-label')).toBe('43 minutes ago')
+  })
+})
+
+describe('a frozen reading', () => {
+  test('stays as it was drawn, and catches up once it is not frozen', async () => {
+    const clock = stopped()
+    const moment = new Date(clock.now() - 42 * 60_000 - 30_000).toISOString()
+    const element = (await stamp(
+      `<helix-headless-format-date elapsed frozen locale="en-US" date="${moment}"></helix-headless-format-date>`,
+    )) as Stamp & { frozen: boolean }
+    expect(part(element, 'time')?.textContent).toBe('42m')
+    clock.advance(5 * 60_000)
+    await element.updateComplete
+    expect(part(element, 'time')?.textContent).toBe('42m')
+    element.frozen = false
+    await element.updateComplete
+    expect(part(element, 'time')?.textContent).toBe('47m')
+  })
+})
+
+describe('a reading under a minute old', () => {
+  /* Measured before this: "in 0 seconds", a moment ago read as the future. */
+  test('is in the past where every number is written', async () => {
+    const clock = stopped()
+    const moment = new Date(clock.now() - 57_000).toISOString()
+    const element = await stamp(
+      `<helix-headless-format-date relative="long" numeric="always" locale="en-US" date="${moment}"></helix-headless-format-date>`,
+    )
+    expect(part(element, 'time')?.textContent).toBe('0 seconds ago')
+    const words = await stamp(
+      `<helix-headless-format-date relative="long" locale="en-US" date="${moment}"></helix-headless-format-date>`,
+    )
+    expect(part(words, 'time')?.textContent).toBe('now')
   })
 })
