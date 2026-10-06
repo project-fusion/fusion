@@ -849,6 +849,12 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
      * **Written out rather than generated**, because a part name behind an
      * interpolation is a part the manifest cannot see: a loop would publish
      * `pan-` and a consumer's `::part(pan-up)` would match nothing.
+     *
+     * **Each glyph is the fallback of a slot named for its button**, the names
+     * `Map` gave its own (`pan-up-icon`, `zoom-in-icon`, `fullscreen-icon`), so
+     * a page with an icon set of its own swaps a glyph without drawing the
+     * controls again. Text rather than markup, so no family has a fallback the
+     * tier above cannot reach.
      */
     protected renderControls(): TemplateResult | typeof nothing {
       const pan = this.drawsControls('pan')
@@ -862,26 +868,26 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
         ${
           pan
             ? html`<button part="pan-up" aria-label=${this.panLabel('up')} type="button" @click=${() => this.pan('up')}>
-                  ${this.panGlyph('up')}
+                  <slot name="pan-up-icon">${this.panGlyph('up')}</slot>
                 </button>
                 <button part="pan-start" aria-label=${this.panLabel('start')} type="button" @click=${() => this.pan('start')}>
-                  ${this.panGlyph('start')}
+                  <slot name="pan-start-icon">${this.panGlyph('start')}</slot>
                 </button>
                 <button part="pan-end" aria-label=${this.panLabel('end')} type="button" @click=${() => this.pan('end')}>
-                  ${this.panGlyph('end')}
+                  <slot name="pan-end-icon">${this.panGlyph('end')}</slot>
                 </button>
                 <button part="pan-down" aria-label=${this.panLabel('down')} type="button" @click=${() => this.pan('down')}>
-                  ${this.panGlyph('down')}
+                  <slot name="pan-down-icon">${this.panGlyph('down')}</slot>
                 </button>`
             : nothing
         }
         ${
           zoom
             ? html`<button part="zoom-in" aria-label=${this.zoomInLabel} type="button" @click=${() => this.zoom(1)}>
-                  +
+                  <slot name="zoom-in-icon">+</slot>
                 </button>
                 <button part="zoom-out" aria-label=${this.zoomOutLabel} type="button" @click=${() => this.zoom(-1)}>
-                  −
+                  <slot name="zoom-out-icon">−</slot>
                 </button>`
             : nothing
         }
@@ -895,7 +901,7 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
                 type="button"
                 @click=${this.toggleFullscreen}
               >
-                ⤢
+                <slot name="fullscreen-icon">⤢</slot>
               </button>`
             : nothing
         }

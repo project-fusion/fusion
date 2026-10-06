@@ -69,6 +69,28 @@ const key = (target: Element, name: string): void => {
 }
 
 describe('graph frame', () => {
+  test('every control’s glyph is a slot a page fills with its own icon, and the glyph stays where it does not', async () => {
+    const host = await graph('controls="pan zoom fullscreen"')
+    const plus = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+    plus.setAttribute('slot', 'zoom-in-icon')
+    host.append(plus)
+    await settle(host)
+    for (const name of [
+      'fullscreen',
+      'pan-down',
+      'pan-end',
+      'pan-start',
+      'pan-up',
+      'zoom-in',
+      'zoom-out',
+    ]) {
+      expect(part(host, name)?.querySelector(`slot[name="${name}-icon"]`)).not.toBeNull()
+    }
+    const zoomIn = part(host, 'zoom-in')?.querySelector('slot') as HTMLSlotElement
+    expect(zoomIn.assignedElements()).toEqual([plus as Element])
+    expect(part(host, 'zoom-out')?.textContent?.trim()).toBe('−')
+  })
+
   test('is a named region with a named list of every note', async () => {
     const host = await graph()
     expect(part(host, 'region')?.getAttribute('aria-label')).toBe('Research notes')
