@@ -4,7 +4,8 @@ import { writtenList } from '../written-list/written-list.js'
 /*
  * The calendar arithmetic Date Picker and Date Input share: days and months in
  * UTC, the week a locale starts on, which dates are barred, and the pages of
- * months and years the month and year views show.
+ * months and years the month and year views show. Format Date takes the
+ * calendar they write dates in from here too.
  *
  * **Every date is midnight UTC**, because a local-time `Date` shifts across a
  * time zone or a daylight-saving boundary, and a date is the same date
@@ -44,6 +45,53 @@ export const weekStartOf = (locale: string): number => {
   } catch {
     return 0
   }
+}
+
+/**
+ * The calendars a date family draws and writes: those whose months are the
+ * Gregorian months, so a grid of Gregorian days is one of their months.
+ *
+ * `buddhist` is Thailand's (2569 for 2026), `japanese` the Japanese eras
+ * (Reiwa 8), and `roc` Taiwan's Minguo years (115). They differ from
+ * `gregory` in the year alone, and `iso8601` in the order the parts are
+ * written.
+ */
+export type DateCalendar = 'buddhist' | 'gregory' | 'iso8601' | 'japanese' | 'roc'
+
+const DRAWN: readonly string[] = ['buddhist', 'gregory', 'iso8601', 'japanese', 'roc']
+
+const tagged = new Map<string, string>()
+
+/**
+ * The language tag a date family formats with: `locale`, with the calendar it
+ * writes dates in.
+ *
+ * That is `calendar` where it is one of the five `DateCalendar` names, then
+ * the locale's own calendar where its months are the Gregorian months, then
+ * `gregory`. **A calendar with months of its own, such as `persian` for `fa-IR`
+ * or `islamic-umalqura` for `ar-SA` in some engines, is written as `gregory`.**
+ * The arithmetic is Gregorian, so a heading in Mehr 1405 over the days of
+ * October 2026 named a month the grid did not show.
+ *
+ * `locale` unchanged where nothing moves, so a page in a Gregorian locale
+ * formats exactly as it did. Empty is the runtime's own locale. A tag `Intl`
+ * refuses throws, as every formatter given one does. Remembered per locale and
+ * calendar, since reading a locale's calendar builds a formatter.
+ */
+export const calendarLocale = (locale: string, calendar = ''): string => {
+  const key = `${locale} ${calendar}`
+  let tag = tagged.get(key)
+  if (tag === undefined) {
+    const own = new Intl.DateTimeFormat(locale || undefined).resolvedOptions()
+    const wanted = DRAWN.includes(calendar)
+      ? calendar
+      : DRAWN.includes(own.calendar)
+        ? ''
+        : 'gregory'
+    tag = wanted ? `${new Intl.Locale(locale || own.locale, { calendar: wanted })}` : locale
+    tagged.set(key, tag)
+  }
+  return tag
 }
 
 /** A month as `YYYY-MM`. */

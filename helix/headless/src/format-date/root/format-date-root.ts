@@ -1,5 +1,7 @@
 import {
+  calendarLocale,
   customElement,
+  type DateCalendar,
   elapsedTime,
   HelixElement,
   localeOf,
@@ -58,6 +60,11 @@ const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/
  * Picker format their dates, so a reader west of UTC sees August 4 and not
  * August 3.
  *
+ * **A date is written in a calendar Date Picker draws**: the locale's own
+ * where its months are the Gregorian months, as `th-TH` writes 2569 for 2026,
+ * and `gregory` where they are not, as for `fa-IR`. `calendar` picks one of
+ * the five.
+ *
  * @since 0.1.0
  * @status stable
  * @category typography
@@ -81,6 +88,18 @@ const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/
  */
 @customElement('helix-headless-format-date')
 export class HelixHeadlessFormatDate extends HelixElement {
+  /**
+   * The calendar a date is written in: `gregory`, `buddhist`, `japanese`,
+   * `roc`, or `iso8601`, the calendars Date Picker and Date Input draw.
+   *
+   * Absent is the locale's own where it is one of the five, such as
+   * `buddhist` for `th-TH`, and `gregory` for every other, such as `persian`
+   * for `fa-IR`, so a date written here reads as the same date a Date Picker
+   * beside it shows.
+   */
+  @property()
+  calendar?: DateCalendar
+
   /**
    * The timestamp, in any format `Date` can parse.
    *
@@ -183,9 +202,12 @@ export class HelixHeadlessFormatDate extends HelixElement {
   @property()
   locale = ''
 
-  /** The locale the words are written in: `locale`, or the page's `lang`. */
+  /**
+   * The locale the words are written in, `locale` or the page's `lang`, with
+   * the calendar.
+   */
   private get language(): string {
-    return localeOf(this, this.locale)
+    return calendarLocale(localeOf(this, this.locale), this.calendar)
   }
 
   /**

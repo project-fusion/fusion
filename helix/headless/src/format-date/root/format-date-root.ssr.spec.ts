@@ -201,3 +201,39 @@ describe('format-date options a reader can see on the server', () => {
     expect(served).toContain('15:30')
   })
 })
+
+describe('format-date in a calendar, on the server', () => {
+  const served = (markup: ReturnType<typeof html>): string => rendered(ssr(markup), TAG)
+  const long = (locale: string): string =>
+    new Intl.DateTimeFormat(locale, { dateStyle: 'long', timeZone: 'UTC' }).format(
+      new Date('2026-10-06T00:00:00Z'),
+    )
+
+  /* Measured before this: fa-IR wrote 14 Mehr 1405 beside a Date Picker
+     drawing October 2026. */
+  test('a calendar with months of its own is written in Gregorian', () => {
+    expect(
+      served(
+        html`<helix-headless-format-date locale="fa-IR" date="2026-10-06" date-style="long"></helix-headless-format-date>`,
+      ),
+    ).toContain(long('fa-IR-u-ca-gregory'))
+    expect(
+      served(
+        html`<helix-headless-format-date locale="he-IL-u-ca-hebrew" date="2026-10-06" date-style="long"></helix-headless-format-date>`,
+      ),
+    ).toContain(long('he-IL-u-ca-gregory'))
+  })
+
+  test('`calendar` writes it in one of the five, and the locale’s own is kept', () => {
+    expect(
+      served(
+        html`<helix-headless-format-date locale="ja-JP" calendar="japanese" date="2026-10-06" date-style="long"></helix-headless-format-date>`,
+      ),
+    ).toContain('令和8年10月6日')
+    expect(
+      served(
+        html`<helix-headless-format-date locale="th-TH" date="2026-10-06" date-style="long"></helix-headless-format-date>`,
+      ),
+    ).toContain('2569')
+  })
+})

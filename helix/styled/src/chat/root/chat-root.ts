@@ -42,6 +42,9 @@ import '../message/chat-message.js'
  * @cssproperty --chat-resume-border-width - Width of the edge around the resume control, which sits over content.
  * @cssproperty --chat-resume-shadow - Shadow under the resume control, which floats over the transcript.
  * @cssproperty --chat-rule - The hairline under the header.
+ * @cssproperty --chat-scrollbar-thumb-color - The thumb of the transcript's scrollbar. Defaults to `--helix-scrollbar-thumb-color`.
+ * @cssproperty --chat-scrollbar-thumb-hover-color - The thumb while the pointer is over the transcript. Defaults to `--helix-scrollbar-thumb-hover-color`.
+ * @cssproperty --chat-scrollbar-track-color - The track of the transcript's scrollbar. Defaults to `--helix-scrollbar-track-color`.
  * @cssproperty --chat-typing-color - The color of the dots and the words that say who is typing.
  * @cssproperty --chat-typing-gap - The space between the dots and the words that say who is typing.
  */

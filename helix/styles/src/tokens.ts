@@ -522,6 +522,37 @@ export const TOKENS: Token[] = [
   ['color-success-surface-hover', 'var(--_helix-success-700)'],
   ['color-warning-surface', 'var(--_helix-warning-600)'],
   ['color-warning-surface-hover', 'var(--_helix-warning-700)'],
+  /* ======================================================== scrollbar === */
+  /* A scrollbar the library colors has to clear 3:1 against what it sits on.
+     The browser's own thumb is exempt from WCAG 1.4.11 as a user-agent
+     control, and a thumb an author colors is not. Scroll Area, Chat, and
+     Virtual List drew theirs in `color-border`, measured in Chromium at 1.23:1
+     on the light page and 1.30:1 on the dark one, fainter than the browser's
+     own gray at 3.94 and 5.36.
+
+     The thumb is the step of the gray ramp that clears 3:1 on every ground a
+     scroller sits on, measured in Chromium. In light, `neutral-500` measures
+     3.95 on the page, 3.78 on `surface`, and 3.62 on `surface-raised`. In dark,
+     `neutral-600` clears the page and `surface` and measures 2.96 on
+     `surface-raised` and `surface-overlay`, the ground of a menu or a popover,
+     so the dark thumb is `neutral-550`: 4.00 on the page, 3.57 on `surface`,
+     and 3.38 on the raised and overlay rungs.
+
+     The hover step is the thumb while the pointer is over its scroller, the
+     subtle foreground at 5.25 and 7.01 on the page. The track is clear, so the
+     scroller's own ground shows behind the thumb. Each family reads its own
+     hook first, so one scroller can differ without moving these. */
+  [
+    'scrollbar-thumb-color',
+    'light-dark(var(--_helix-neutral-500), var(--_helix-neutral-550))',
+    'The thumb of a scrollbar Helix colors, at rest.',
+  ],
+  [
+    'scrollbar-thumb-hover-color',
+    'var(--helix-color-foreground-subtle)',
+    'The thumb while the pointer is over its scroller.',
+  ],
+  ['scrollbar-track-color', 'transparent', 'The track behind the thumb.'],
   /* ======================================================== space ======= */
   ['space-none', 'var(--_helix-scale-0)'],
   ['space-2xs', 'var(--_helix-scale-1)'],

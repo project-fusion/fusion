@@ -3,6 +3,7 @@ import {
   addDays,
   addMonths,
   barredBy,
+  calendarLocale,
   localToday,
   monthOf,
   monthOut,
@@ -36,6 +37,35 @@ describe('the calendar arithmetic', () => {
   test('a locale starts its week where its week starts, or on Sunday', () => {
     expect(weekStartOf('not a tag')).toBe(0)
     expect([0, 1]).toContain(weekStartOf('en-GB'))
+  })
+})
+
+describe('calendarLocale', () => {
+  test('a calendar with months of its own is written as Gregorian', () => {
+    expect(calendarLocale('fa-IR')).toBe('fa-IR-u-ca-gregory')
+    expect(calendarLocale('en-US-u-ca-islamic-umalqura')).toBe('en-US-u-ca-gregory')
+    expect(calendarLocale('he-IL-u-ca-hebrew')).toBe('he-IL-u-ca-gregory')
+    expect(calendarLocale('zh-CN-u-ca-chinese')).toBe('zh-CN-u-ca-gregory')
+  })
+
+  test('a calendar whose months are the Gregorian months is kept', () => {
+    expect(calendarLocale('en-US')).toBe('en-US')
+    expect(calendarLocale('th-TH')).toBe('th-TH')
+    expect(calendarLocale('ja-JP-u-ca-japanese')).toBe('ja-JP-u-ca-japanese')
+    expect(calendarLocale('zh-TW-u-ca-roc')).toBe('zh-TW-u-ca-roc')
+  })
+
+  test('a calendar asked for wins where it is one of the five, and is ignored where not', () => {
+    expect(calendarLocale('fa-IR', 'japanese')).toBe('fa-IR-u-ca-japanese')
+    expect(calendarLocale('th-TH', 'gregory')).toBe('th-TH-u-ca-gregory')
+    expect(calendarLocale('en-US-u-ca-islamic', 'roc')).toBe('en-US-u-ca-roc')
+    expect(calendarLocale('en-US', 'persian')).toBe('en-US')
+    expect(calendarLocale('fa-IR', 'persian')).toBe('fa-IR-u-ca-gregory')
+  })
+
+  test('the runtime locale takes a calendar too, and a tag Intl refuses throws as a formatter does', () => {
+    expect(calendarLocale('', 'buddhist')).toEndWith('-u-ca-buddhist')
+    expect(() => calendarLocale('not a tag')).toThrow(RangeError)
   })
 })
 
