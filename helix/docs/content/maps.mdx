@@ -580,6 +580,26 @@ group, and shows or hides every layer in it. Keep labels short, such as
 "Walking route", and put the rest in `description`, which screen readers read
 after the label.
 
+## Use your own icons in the controls
+
+Each control's glyph is a slot, so the controls can use the same icon set as
+the rest of your page. An icon you slot in is sized like the glyph it replaces:
+
+```html
+<helix-map controls="layers zoom compass fullscreen" label="Our stores">
+  <div id="map"></div>
+  <svg slot="zoom-in-icon" viewBox="0 0 16 16"><path d="M7 2h2v5h5v2H9v5H7V9H2V7h5Z" /></svg>
+  <svg slot="zoom-out-icon" viewBox="0 0 16 16"><path d="M2 7h12v2H2Z" /></svg>
+</helix-map>
+```
+
+The slots are `fullscreen-icon`, `layers-icon`, `tilt-icon`, `zoom-in-icon`,
+`zoom-out-icon`, `rotate-left-icon`, `rotate-right-icon`, `pan-up-icon`,
+`pan-down-icon`, `pan-start-icon`, `pan-end-icon`, and `face-north-icon`. The
+compass sets `--map-needle-turn` to the angle that points north, so an icon in
+`face-north-icon` turns with the map when its style is
+`rotate: var(--map-needle-turn)`.
+
 ## Keyboard and screen readers
 
 - The frame is one tab stop. Arrow keys pan the map, and the plus and minus keys
@@ -588,7 +608,9 @@ after the label.
   Keys with Control, Command, or Alt are left to the browser, so page zoom and
   Back still work with focus on the map.
 - The markers are one tab stop. Arrow keys move between them in the order you
-  wrote them. The map pans to show a marker that is off screen.
+  wrote them. The map pans to show a marker that is off screen. If your page
+  removes the marker that has focus, focus moves to the next marker, or to the
+  one before when it was the last.
 - A points layer is one tab stop over the points and counts in view. Arrow keys
   move top to bottom and along each line. Enter on a count zooms in to it.
 - Screen readers find the map's shown layers in a list inside the frame, named
