@@ -330,7 +330,7 @@ describe('a logo at a level below H', () => {
     console.warn = (message: string) => warnings.push(message)
     try {
       const host = await code(markup)
-      host.setAttribute('value', 'https://fusion.dev/next')
+      host.setAttribute('value', 'https://example.com/next')
       await host.updateComplete
     } finally {
       console.warn = original

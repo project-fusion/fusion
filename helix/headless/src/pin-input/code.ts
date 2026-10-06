@@ -1,3 +1,5 @@
+import { fillTemplate, type PickerVerdict } from '@fusion.dev/helix-core'
+
 /** What a box accepts, which decides the keyboard a phone offers. */
 export type PinType = 'alphanumeric' | 'numeric' | 'text'
 
@@ -72,4 +74,57 @@ export const overwriteCode = (code: string, at: number, text: string, count: num
     characters[start + offset] = text[offset] as string
   }
   return { caret: Math.min(count - 1, start + text.length), code: characters.join('') }
+}
+
+/** The messages a code's verdict is written with, where the page set its own. */
+export interface CodeMessages {
+  /** For a code with no characters in a required field. */
+  missing?: string | undefined
+  /** For a code with fewer characters than boxes; `{length}` is how many. */
+  short?: string | undefined
+}
+
+/**
+ * What is wrong with a code, as a picker field reports it: a required field
+ * with nothing in it is missing, a code with fewer characters than boxes is
+ * too short, and anything else is fine (`''`). The platform's own words where
+ * the page set none.
+ */
+export const codeVerdict = (
+  code: string,
+  count: number,
+  required: boolean,
+  messages: CodeMessages,
+): PickerVerdict => {
+  if (required && code === '') {
+    return ['valueMissing', messages.missing || 'Please fill in this field.']
+  }
+  if (code !== '' && code.length < count) {
+    return [
+      'tooShort',
+      fillTemplate(messages.short || 'Please enter all {length} characters.', { length: count }),
+    ]
+  }
+  return ''
+}
+
+/**
+ * The box a caret key moves to from `caret`, kept within the boxes up to
+ * `end`, or `undefined` for a key that moves nothing.
+ *
+ * Not `inlineStep`: the row is left to right whatever the page, so the key
+ * pointing right is the one that moves on in every script.
+ */
+export const caretTo = (key: string, caret: number, end: number): number | undefined => {
+  const to =
+    key === 'ArrowRight'
+      ? caret + 1
+      : key === 'ArrowLeft'
+        ? caret - 1
+        : key === 'Home'
+          ? 0
+          : key === 'End'
+            ? end
+            : undefined
+  return to === undefined ? undefined : Math.max(0, Math.min(to, end))
 }

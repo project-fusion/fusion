@@ -1,19 +1,21 @@
 import {
   AriaForwardController,
   customElement,
-  fillTemplate,
   HelixCompleteEvent,
   HelixFormElement,
   MixinControllerValue,
   MixinField,
   restoreValue,
   submitImplicitly,
+  verdictFlags,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import {
   type CodeEdit,
+  caretTo,
   cleanCode,
+  codeVerdict,
   overwriteCode,
   type PinCase,
   type PinType,
@@ -380,23 +382,12 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
       }
       return
     }
-    /* Not `inlineStep`: the row is left to right whatever the page, so the key
-       pointing right is the one that moves on in every script. */
-    const to =
-      event.key === 'ArrowRight'
-        ? this.caretBox + 1
-        : event.key === 'ArrowLeft'
-          ? this.caretBox - 1
-          : event.key === 'Home'
-            ? 0
-            : event.key === 'End'
-              ? this.end
-              : undefined
+    const to = caretTo(event.key, this.caretBox, this.end)
     if (to === undefined) {
       return
     }
     event.preventDefault()
-    this.active = Math.max(0, Math.min(to, this.end))
+    this.active = to
     this.placeCaret(true)
   }
 
@@ -517,23 +508,13 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
     if (!control) {
       return
     }
-    if (this.required && this.value === '') {
-      this.internals.setValidity(
-        { valueMissing: true },
-        this.valueMissingMessage || 'Please fill in this field.',
-        control,
-      )
-    } else if (this.value !== '' && this.value.length < this.count) {
-      this.internals.setValidity(
-        { tooShort: true },
-        fillTemplate(this.tooShortMessage || 'Please enter all {length} characters.', {
-          length: this.count,
-        }),
-        control,
-      )
-    } else {
-      this.internals.setValidity({}, '', control)
-    }
+    const found = verdictFlags(
+      codeVerdict(this.value, this.count, this.required, {
+        missing: this.valueMissingMessage,
+        short: this.tooShortMessage,
+      }),
+    )
+    this.internals.setValidity(found?.[0] ?? {}, found?.[1] ?? '', control)
     // Straight after, because validity moved without any property moving.
     this.refreshFeedback()
   }
