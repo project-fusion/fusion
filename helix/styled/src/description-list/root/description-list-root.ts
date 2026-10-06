@@ -28,6 +28,7 @@ import { styles } from './description-list-root.css.js'
  * @aliases Data list, Key-value list, Details, Properties
  * @documentation https://fusion.dev/helix/components/description-list
  *
+ * @cssproperty --description-list-column-gap - The space between the column of labels and the column of values, with `direction="row"`.
  * @cssproperty --description-list-gap - Space between one pair and the next. The default is smaller with `direction="row"` than when stacked. Setting this property replaces both defaults.
  */
 @customElement('helix-description-list')

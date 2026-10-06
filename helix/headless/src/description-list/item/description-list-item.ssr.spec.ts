@@ -44,4 +44,32 @@ describe('description list item server output', () => {
     )
     expect(hostAttributes(markup, 'helix-headless-description-list-item')).toEqual([])
   })
+
+  test('several values of your own are served unwrapped, where `several` says so', () => {
+    const tag = 'helix-headless-description-list-item'
+    const own = ssr(
+      html`<helix-headless-description-list-item label="Authors" several
+        ><dd>Ada</dd><dd>Grace</dd></helix-headless-description-list-item
+      >`,
+    )
+    expect(partTag(own, 'value')).toBe('')
+    expect(rendered(own, tag)).toMatch(/<\/dt>(<!--[^>]*-->)*<slot/)
+    const unsaid = ssr(
+      html`<helix-headless-description-list-item label="Authors"
+        ><dd>Ada</dd><dd>Grace</dd></helix-headless-description-list-item
+      >`,
+    )
+    expect(partTag(unsaid, 'value')).toMatch(/^<dd\b/)
+  })
+
+  test('the controls slot sits inside the value, after it', () => {
+    const markup = ssr(
+      html`<helix-headless-description-list-item label="Id"
+        >a1b2<button slot="actions">Copy</button></helix-headless-description-list-item
+      >`,
+    )
+    expect(rendered(markup, 'helix-headless-description-list-item')).toMatch(
+      /<dd part="value">((?!<\/dd>)[\s\S])*<slot\s*><\/slot>((?!<\/dd>)[\s\S])*<slot name="actions">/,
+    )
+  })
 })
