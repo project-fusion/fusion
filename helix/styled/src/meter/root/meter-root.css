@@ -10,7 +10,7 @@
 
 :host([show-value]) {
   align-items: center;
-  column-gap: var(--helix-space-sm);
+  column-gap: var(--meter-value-gap, var(--helix-space-sm));
   display: grid;
   grid-template-columns: 1fr auto;
   /* Between a slotted label and the row under it, the only two rows there are. */
@@ -58,9 +58,9 @@ slot[name="label"]::slotted(*) {
    `Progress` gives: `100%` is wider than `9%` and a reading that changes should
    not shuffle the words around it. */
 [part="value"] {
-  color: var(--helix-color-foreground-muted);
+  color: var(--meter-value-color, var(--helix-color-foreground-muted));
   font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-xs);
+  font-size: var(--meter-value-size, var(--helix-text-xs));
   font-variant-numeric: tabular-nums;
   min-inline-size: 3ch;
   text-align: end;

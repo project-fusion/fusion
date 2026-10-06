@@ -24,6 +24,8 @@ import { styles } from './avatar-root.css.js'
  * @csspart initials - The initials shown when there is no usable image.
  *
  * @cssproperty --avatar-background-color - Fill behind the initials.
+ * @cssproperty --avatar-color - The color of the initials.
+ * @cssproperty --avatar-font-weight - The weight of the initials.
  * @cssproperty --avatar-size - Edge length of the avatar.
  */
 @customElement('helix-avatar')

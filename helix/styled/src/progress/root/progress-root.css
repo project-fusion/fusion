@@ -7,7 +7,7 @@
 
 :host([show-value]) {
   align-items: center;
-  column-gap: var(--helix-space-sm);
+  column-gap: var(--progress-value-gap, var(--helix-space-sm));
   display: grid;
   grid-template-columns: 1fr auto;
   /* Between a slotted label and the row under it, the only two rows there are. */
@@ -43,9 +43,9 @@ slot[name="label"]::slotted(*) {
    and proportional ones make the whole reading shuffle. Right-aligned with a
    floor under it for the same reason, since `100%` is wider than `9%`. */
 [part="value"] {
-  color: var(--helix-color-foreground-muted);
+  color: var(--progress-value-color, var(--helix-color-foreground-muted));
   font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-xs);
+  font-size: var(--progress-value-size, var(--helix-text-xs));
   font-variant-numeric: tabular-nums;
   min-inline-size: 3ch;
   text-align: end;
@@ -69,7 +69,7 @@ slot[name="label"]::slotted(*) {
 [part="track"] {
   background-color: var(--progress-track-color, var(--helix-color-surface-sunken));
   block-size: var(--progress-size, var(--helix-size-progress));
-  border-radius: var(--helix-radii-full);
+  border-radius: var(--progress-radius, var(--helix-radii-full));
   inline-size: 100%;
   /* The fill is a child with a radius of its own, and at low values its trailing
      corners would otherwise round outside the track. */

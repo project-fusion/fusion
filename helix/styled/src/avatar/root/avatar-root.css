@@ -10,7 +10,7 @@
   background-color: var(--avatar-background-color, var(--helix-color-surface-raised));
   block-size: var(--_avatar-size);
   border-radius: var(--helix-radii-full);
-  color: var(--helix-color-foreground);
+  color: var(--avatar-color, var(--helix-color-foreground));
   display: inline-flex;
   flex: 0 0 auto;
   inline-size: var(--_avatar-size);
@@ -48,7 +48,7 @@
    including a custom `--avatar-size`. */
 [part="initials"] {
   font-size: calc(var(--_avatar-size) * 0.4);
-  font-weight: var(--helix-weight-medium);
+  font-weight: var(--avatar-font-weight, var(--helix-weight-medium));
   letter-spacing: var(--helix-tracking-wide);
   line-height: 1;
   user-select: none;

@@ -41,15 +41,18 @@
 [part="overflow"] {
   align-items: center;
   margin-inline-start: calc(-1 * var(--avatar-group-overlap, var(--helix-space-sm)));
-  background-color: var(--helix-color-surface-sunken);
+  background-color: var(
+    --avatar-group-overflow-background-color,
+    var(--helix-color-surface-sunken)
+  );
   block-size: var(--avatar-size, var(--helix-size-control-md));
   border-radius: var(--helix-radii-full);
   box-shadow: 0 0 0 var(--helix-border-thick) var(--_avatar-group-ring);
-  color: var(--helix-color-foreground-muted);
+  color: var(--avatar-group-overflow-color, var(--helix-color-foreground-muted));
   display: inline-flex;
   flex: 0 0 auto;
   font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-xs);
+  font-size: var(--avatar-group-overflow-font-size, var(--helix-text-xs));
   font-weight: var(--helix-weight-medium);
   inline-size: var(--avatar-size, var(--helix-size-control-md));
   justify-content: center;

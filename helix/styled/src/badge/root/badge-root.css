@@ -28,7 +28,7 @@
      because in light the two happen to land the same way round. */
   background-color: var(--badge-background-color, var(--_badge-fill));
   block-size: var(--_badge-size);
-  border-radius: var(--helix-radii-full);
+  border-radius: var(--badge-radius, var(--helix-radii-full));
   /* A ring in the page's own color, so the mark stays separate from whatever it
      overlaps rather than merging into it. `border-thick`, not a literal 2: the
      separating ring is a rule like any other and a theme that thickens its
@@ -38,7 +38,7 @@
   color: var(--badge-color, var(--_badge-on));
   display: inline-flex;
   font-size: var(--_badge-text);
-  font-weight: var(--helix-weight-semibold);
+  font-weight: var(--badge-font-weight, var(--helix-weight-semibold));
   /*
  *  Pinned to the corner, then pulled back along both axes.
  *
