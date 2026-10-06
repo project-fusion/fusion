@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -702,5 +702,36 @@ describe('lead', () => {
     const slot = sandbox.shadowRoot?.querySelector('[data-pane="preview"] slot') as HTMLSlotElement
     expect(slot.name).toBe('preview')
     expect(slot.assignedElements().map((node) => node.textContent)).toEqual(['shown'])
+  })
+})
+
+/* A page styles the sandbox around what it is doing, which the light DOM
+   cannot say: whether the panel is shut. A custom state, so nothing is written
+   where a framework reconciles. */
+describe('sandbox states', () => {
+  test('`panel-collapsed` follows the panel and its height', async () => {
+    const bare = (await mount(wired)) as Updatable & { panelSize: number }
+    bare.panelSize = 0
+    await bare.updateComplete
+    expect(hasState(bare, 'panel-collapsed')).toBe(false)
+
+    const full = (await mount(withPanel)) as Updatable & { panelSize: number }
+    await full.updateComplete
+    expect(hasState(full, 'panel-collapsed')).toBe(false)
+    full.panelSize = 0
+    await full.updateComplete
+    expect(hasState(full, 'panel-collapsed')).toBe(true)
+
+    const tabs = (await mount(
+      withPanel.replace(
+        '<helix-sandbox>',
+        '<helix-sandbox panel-collapsed-size="40" panel-size="40">',
+      ),
+    )) as Updatable & { panelSize: number }
+    await tabs.updateComplete
+    expect(hasState(tabs, 'panel-collapsed')).toBe(true)
+    tabs.panelSize = 41
+    await tabs.updateComplete
+    expect(hasState(tabs, 'panel-collapsed')).toBe(false)
   })
 })

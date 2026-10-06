@@ -40,11 +40,8 @@
 }
 
 /* The panel's divider with no panel under it draws nothing and takes nothing. */
+[part="body"]:not([data-panel])::part(corner),
 [part="body"]:not([data-panel])::part(separator) {
-  display: none;
-}
-
-[part="body"]:not([data-panel])::part(corner) {
   display: none;
 }
 

@@ -47,12 +47,10 @@ describe('sandbox source server output', () => {
   })
 
   test('a highlighted pane serves its colors, so the first paint is colored', () => {
-    const highlight = (text: string) => [{ kind: 'keyword', text }]
+    const tokenize = (text: string) => [{ kind: 'keyword', text }]
     expect(
       servedParts(
-        ssr(
-          html`<helix-sandbox-source .highlight=${highlight} value="let"></helix-sandbox-source>`,
-        ),
+        ssr(html`<helix-sandbox-source .tokenize=${tokenize} value="let"></helix-sandbox-source>`),
       ),
     ).toEqual(['field', 'highlight', 'source', 'token'])
   })

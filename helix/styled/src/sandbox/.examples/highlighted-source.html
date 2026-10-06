@@ -21,7 +21,7 @@
   }
 
   // `split` puts each captured piece at an odd index, between the plain text.
-  document.getElementById('colored').highlight = (source) =>
+  document.getElementById('colored').tokenize = (source) =>
     source
       .split(PIECES)
       .map((text, at) => ({ kind: at % 2 ? kindOf(text) : undefined, text }))

@@ -102,18 +102,12 @@
   padding-inline: var(--helix-space-2xs);
 }
 
-[part="entry"][data-level="warn"] {
-  color: var(--helix-color-warning);
-}
-
+[part="entry"][data-level="warn"],
 [part="entry"][data-level="warn"] [part="level"] {
   color: var(--helix-color-warning);
 }
 
-[part="entry"][data-level="error"] {
-  color: var(--helix-color-danger);
-}
-
+[part="entry"][data-level="error"],
 [part="entry"][data-level="error"] [part="level"] {
   color: var(--helix-color-danger);
 }

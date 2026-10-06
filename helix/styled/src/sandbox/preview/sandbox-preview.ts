@@ -1,5 +1,6 @@
 import {
   customElement,
+  DelayController,
   HelixConsoleEvent,
   HelixElement,
   HelixResizeEvent,
@@ -86,6 +87,11 @@ export type PreviewMessage =
  * let a document on the same origin remove its own sandbox, which is the same
  * as having none.
  *
+ * **A preview says when it is loading.** It is `:state(loading)` from the
+ * moment it has a `src` until that document can take the example, and again
+ * through `reload()`, so a page can draw its own spinner, such as a sibling
+ * shown by `helix-sandbox-preview:state(loading) + .spinner`.
+ *
  * @since 0.1.0
  * @status stable
  * @aliases Result, Output
@@ -95,6 +101,8 @@ export type PreviewMessage =
  * @event {HelixResizeEvent} helix-resize - Fired when the height of the frame's content changes, with the new height.
  *
  * @csspart frame - The iframe.
+ *
+ * @cssstate loading - While the frame's document loads, until it can take the example.
  */
 @customElement('helix-sandbox-preview')
 export class HelixSandboxPreview extends HelixElement {
@@ -175,7 +183,9 @@ export class HelixSandboxPreview extends HelixElement {
   }
 
   /**
-   * The frame's document has finished loading, so its listener exists.
+   * The frame's document has finished loading, so its listener exists, the
+   * example is sent and the preview is no longer `loading`. The frame saying
+   * `helix-preview-ready` lands here too.
    *
    * **The announcement is one shot and the parent can miss it.** The frame posts
    * `helix-preview-ready` at the end of its own module evaluation and never
@@ -202,6 +212,7 @@ export class HelixSandboxPreview extends HelixElement {
    */
   private readonly handleFrameLoad = (): void => {
     this.ready = true
+    this.toggleState('loading', false)
     this.send()
   }
 
@@ -225,8 +236,7 @@ export class HelixSandboxPreview extends HelixElement {
       return
     }
     if (event.data?.type === 'helix-preview-ready') {
-      this.ready = true
-      this.send()
+      this.handleFrameLoad()
       return
     }
     if (event.data?.type === 'helix-preview-console') {
@@ -277,8 +287,8 @@ export class HelixSandboxPreview extends HelixElement {
    */
   private static readonly target = '*'
 
-  /** Set while a coalesced send is waiting, so only one is ever queued. */
-  private pending: ReturnType<typeof setTimeout> | undefined
+  /** Holds a coalesced send, so only one is ever queued, and drops it on disconnect. */
+  private readonly settle = new DelayController(this)
 
   /**
    * Sends once the typing stops, replacing anything already waiting.
@@ -290,11 +300,7 @@ export class HelixSandboxPreview extends HelixElement {
    * short enough to read as immediate when the typing stops.
    */
   private scheduleSend(): void {
-    clearTimeout(this.pending)
-    this.pending = setTimeout(() => {
-      this.pending = undefined
-      this.send()
-    }, SETTLE)
+    this.settle.start(SETTLE, () => this.send())
   }
 
   /** Sends the current source to the frame, once it is listening. */
@@ -320,8 +326,6 @@ export class HelixSandboxPreview extends HelixElement {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
-    clearTimeout(this.pending)
-    this.pending = undefined
     window.removeEventListener('message', this.handleMessage)
   }
 
@@ -344,15 +348,21 @@ export class HelixSandboxPreview extends HelixElement {
     if (!frame) {
       return
     }
-    this.ready = false
+    this.unready()
     frame.src = this.src
+  }
+
+  /** A new document is on its way, so nothing is sent until it listens. */
+  private unready(): void {
+    this.ready = false
+    this.toggleState('loading', this.src !== '')
   }
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     // A new document has to say it is listening again before anything is sent.
     if (changed.has('src')) {
-      this.ready = false
+      this.unready()
       return
     }
     /* Typing is coalesced; a setting is not.
