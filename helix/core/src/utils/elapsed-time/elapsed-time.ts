@@ -1,4 +1,4 @@
-import type { Relative } from '../relative-time/relative-time.js'
+import { type Relative, UNITS as TIME_UNITS } from '../relative-time/relative-time.js'
 
 /**
  * A timestamp read the way a feed reads one: short, and a date once short stops
@@ -24,14 +24,11 @@ import type { Relative } from '../relative-time/relative-time.js'
 const held = new Map<string, Intl.NumberFormat[]>()
 const dated = new Map<string, Intl.DateTimeFormat[]>()
 
-/** The units the compact form covers, largest last. `week` is deliberately not
-    among them: past six days this returns a date instead, which is both shorter
-    to read and the only reading that cannot be mistaken for minutes. */
-const UNITS: Array<{ ms: number; unit: 'day' | 'hour' | 'minute' }> = [
-  { ms: 60_000, unit: 'minute' },
-  { ms: 3_600_000, unit: 'hour' },
-  { ms: 86_400_000, unit: 'day' },
-]
+/** The units the compact form covers, largest last: `relativeTime`'s minute,
+    hour and day. `week` is deliberately not among them: past six days this
+    returns a date instead, which is both shorter to read and the only reading
+    that cannot be mistaken for minutes. */
+const UNITS = TIME_UNITS.slice(1, 4) as Array<{ ms: number; unit: 'day' | 'hour' | 'minute' }>
 
 /** Where the compact form gives out, in milliseconds. Seven days. */
 const HORIZON = 604_800_000
