@@ -236,8 +236,8 @@ const SETTLES = 400
  * @cssstate layers-open - The layers menu is open.
  * @cssstate ready - The map has been drawn whole, after `helix-map-ready`.
  * @cssstate rotated - The map is turned away from north, by `bearing`.
- * @cssstate tilted - The map is tilted, by `pitch`, rather than looking straight down.
  * @cssstate sharing - The page keeps the plain wheel and one finger, with `gestures="cooperative"` or while a map with `gestures="activate"` waits to be pressed.
+ * @cssstate tilted - The map is tilted by `pitch`, so it no longer looks straight down.
  * @cssstate using - A map with `gestures="activate"` has been pressed and has the gestures.
  */
 @customElement('helix-headless-map')

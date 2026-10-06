@@ -22,14 +22,14 @@ import { styles } from './description-list-root.css.js'
  * wide as its widest pair, labels sit on the start edge, and values sit on the
  * end edge in tabular figures, as in a set of totals.
  *
+ * **For a rule between pairs, set `divided`.** The rule sits in the middle of
+ * the gap, so the pairs keep the same room on either side of it.
+ *
  * @since 0.1.0
  * @status stable
  * @category data
  * @aliases Data list, Key-value list, Details, Properties
  * @documentation https://fusion.dev/helix/components/description-list
- *
- * **For a rule between pairs, set `divided`.** The rule sits in the middle of
- * the gap, so the pairs keep the same room on either side of it.
  *
  * @cssproperty --description-list-column-gap - The space between the column of labels and the column of values, with `direction="row"`.
  * @cssproperty --description-list-divider-color - The color of the rule between pairs, with `divided`.

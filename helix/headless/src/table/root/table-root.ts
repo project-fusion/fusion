@@ -1029,8 +1029,9 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     const grid = this.grid
     /* The two ends a Tab leaves the grid by, each focused for a moment so the
        key goes on from there. Empty, so they take no room. */
-    const edge = (name: string) => (grid ? html`<span part=${name} tabindex="-1"></span>` : nothing)
-    return html`<slot name="heading"></slot>${edge('grid-start')}<div
+    const start = grid ? html`<span part="grid-start" tabindex="-1"></span>` : nothing
+    const end = grid ? html`<span part="grid-end" tabindex="-1"></span>` : nothing
+    return html`<slot name="heading"></slot>${start}<div
       part="table"
       role=${grid ? 'grid' : 'table'}
       aria-multiselectable=${grid && this.selectable ? 'true' : nothing}
@@ -1046,7 +1047,7 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
         }}
       ></slot>
       ${this.renderStatus(this.hasRows, grid ? 'gridcell' : 'cell')}
-    </div>${edge('grid-end')}${this.renderLive(this.hasRows)}`
+    </div>${end}${this.renderLive(this.hasRows)}`
   }
 }
 
