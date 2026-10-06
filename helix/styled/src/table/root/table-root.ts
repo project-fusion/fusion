@@ -21,7 +21,7 @@ import '../../checkbox/index.js'
  * @slot - The table's rows.
  * @slot heading - Words that name the table, shown above it in the weight of a heading.
  *
- * @csspart live - A live region that repeats the empty and loading text, so screen readers announce it when it changes. Visually hidden in the styled tier.
+ * @csspart live - A live region that repeats the empty and loading text, and says each step of a move, so screen readers announce it when it changes. Visually hidden in the styled tier.
  * @csspart table - The grid.
  *
  * @cssproperty --table-columns - Track list for the columns. It overrides the track list worked out from the columns.

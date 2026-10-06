@@ -43,6 +43,15 @@
 }
 
 /* The checkbox heading takes focus in a `grid` table, inset as a cell's ring is. */
+/* The heading over the grips of a reorderable table: the checkbox heading's
+   box, before it, with nothing in it but a name for screen readers. */
+[part="grip-head"] {
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  box-sizing: border-box;
+  min-block-size: var(--helix-size-control-loose);
+}
+
+[part="grip-head"]:focus-visible,
 [part="select-all"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: calc(var(--helix-size-focus-offset) * -1);

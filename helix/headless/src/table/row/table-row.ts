@@ -5,11 +5,16 @@ import {
   hostAria,
   pressedOwnControl,
 } from '@fusion.dev/helix-core'
+import { dotsThreeVertical } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type ReactiveElement, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 /* `static-html`'s `html`, because the checkbox's tag is interpolated. */
 import { html } from 'lit/static-html.js'
 import '../../checkbox/index.js'
+
+/** Where a row stands in a move: the row being moved, or the one the drop indicator is beside. */
+export type TableRowMove = 'dragging' | 'drop-after' | 'drop-before'
 
 /**
  * @summary One row of a table.
@@ -22,6 +27,12 @@ import '../../checkbox/index.js'
  *
  * In a `selectable` table the row draws a checkbox cell before its own cells,
  * and `value` is the key the table's `selected` lists it by.
+ *
+ * In a `reorderable` table the row draws a grip cell before those, holding a
+ * button named by the table's `move-row-label`, and `value` is the key
+ * `helix-reorder` lists it by. The table says which row is moving and where
+ * the drop indicator is, with the `dragging`, `drop-before`, and `drop-after`
+ * states.
  *
  * **`href` makes the whole row a link**, as a row action does in React Aria's
  * table: a press anywhere on the row follows it, except on a link or a control
@@ -49,9 +60,15 @@ import '../../checkbox/index.js'
  * @csspart checkbox-mark-checked - Added to `checkbox-mark` while its box is checked.
  * @csspart checkbox-mark-dash - Added to `checkbox-mark` while it draws the dash, which it keeps until its box is checked.
  * @csspart checkbox-mark-indeterminate - Added to `checkbox-mark` while only some rows are selected.
+ * @csspart grip - The cell that holds the row's grip, in a `reorderable` table.
+ * @csspart grip-button - The button that moves the row.
+ * @csspart grip-mark - The icon on the grip.
  * @csspart select - The cell that holds the row's checkbox, in a `selectable` table.
  * @csspart select-selected - Added to `select` while the row is selected.
  *
+ * @cssstate dragging - The row is being moved, in a `reorderable` table.
+ * @cssstate drop-after - The row being moved goes after this one when it is dropped.
+ * @cssstate drop-before - The row being moved goes before this one when it is dropped.
  * @cssstate link - While the row has `href`, so a press on it follows the link.
  * @cssstate selected - While the row is selected, in a `selectable` table.
  */
@@ -104,6 +121,35 @@ export class HelixHeadlessTableRow extends HelixElement {
   selectLabel = ''
 
   /**
+   * @internal The name of the row's grip, written by a `reorderable` table, and
+   * empty in a table that does not reorder, which draws no grip. Not a
+   * consumer's to set.
+   */
+  @state()
+  gripLabel = ''
+
+  /**
+   * @internal Whether the grip does nothing for now, as while the table is
+   * sorted, written by the table. Not a consumer's to set.
+   */
+  @state()
+  gripStill = false
+
+  /**
+   * @internal Whether the grip cell holds the grid's one tab stop, written by
+   * the table that sets `gridCell`. Not a consumer's to set.
+   */
+  @state()
+  gripStop = false
+
+  /**
+   * @internal Where the row stands in a move, written by a `reorderable` table.
+   * Not a consumer's to set.
+   */
+  @state()
+  move: TableRowMove | undefined = undefined
+
+  /**
    * @internal Whether the row is a row of a `grid` table, written by that
    * table. Not a consumer's to set. The checkbox cell is then a `gridcell`
    * that takes focus, and the row says whether it is selected.
@@ -153,6 +199,9 @@ export class HelixHeadlessTableRow extends HelixElement {
     this.internals.ariaSelected = this.gridCell && this.selectable ? String(this.selected) : null
     this.toggleState('selected', this.selectable && this.selected)
     this.toggleState('link', this.href !== '')
+    this.toggleState('dragging', this.move === 'dragging')
+    this.toggleState('drop-after', this.move === 'drop-after')
+    this.toggleState('drop-before', this.move === 'drop-before')
   }
 
   override connectedCallback(): void {
@@ -237,8 +286,33 @@ export class HelixHeadlessTableRow extends HelixElement {
     ></span>`
   }
 
+  /**
+   * The grip cell, in a `reorderable` table: a cell of the row's own before the
+   * checkbox cell, holding the button that moves the row. In a grid the cell
+   * takes focus and Space or Enter on it picks the row up, and the button
+   * leaves the tab order. `aria-disabled` while a sort decides the order.
+   */
+  protected renderGrip(): TemplateResult | typeof nothing {
+    if (!this.gripLabel) {
+      return nothing
+    }
+    const grid = this.gridCell
+    return html`<span
+      part="grip"
+      role=${grid ? 'gridcell' : 'cell'}
+      tabindex=${grid ? (this.gripStop ? '0' : '-1') : nothing}
+      ><button
+        part="grip-button"
+        type="button"
+        tabindex=${grid ? '-1' : nothing}
+        aria-label=${this.gripLabel}
+        aria-disabled=${this.gripStill ? 'true' : nothing}
+      ><svg aria-hidden="true" fill="currentColor" part="grip-mark" viewBox=${dotsThreeVertical.viewBox}>${unsafeSVG(dotsThreeVertical.content)}</svg></button
+    ></span>`
+  }
+
   protected override render(): TemplateResult {
-    return html`${this.renderSelect()}<slot @slotchange=${this.handleSlotChange}></slot>`
+    return html`${this.renderGrip()}${this.renderSelect()}<slot @slotchange=${this.handleSlotChange}></slot>`
   }
 }
 

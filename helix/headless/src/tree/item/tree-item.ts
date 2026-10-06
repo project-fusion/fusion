@@ -9,6 +9,7 @@ import { caretDown, check, dotsThreeVertical, minus } from '@fusion.dev/helix-ic
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
+import { fromGrip } from '../grip.js'
 
 /** Where an item stands in a move: the item being moved, or the one the drop indicator is beside. */
 export type TreeItemMove = 'dragging' | 'drop-after' | 'drop-before'
@@ -283,12 +284,6 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
     )
   }
 
-  /** @internal Whether an event passed through this row's grip, read by the tree. */
-  fromGrip(event: Event): boolean {
-    const grip = this.renderRoot?.querySelector('[part="grip"]')
-    return Boolean(grip) && event.composedPath().includes(grip as Element)
-  }
-
   /** Selects this node and sends `helix-select`. A disabled node sends nothing. */
   select(): void {
     if (this.disabled) {
@@ -387,7 +382,7 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
   private readonly handleRowClick = (event: MouseEvent): void => {
     /* A press on the grip is the tree's, which picks the item up: it neither
        chooses the row nor follows its link. */
-    if (this.fromGrip(event)) {
+    if (fromGrip(event)) {
       event.preventDefault()
       return
     }
