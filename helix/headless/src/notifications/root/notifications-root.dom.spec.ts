@@ -348,6 +348,39 @@ describe('an empty feed', () => {
     expect(part(host, 'loading')?.textContent?.trim()).toBe('Still fetching')
     expect(part(host, 'empty')).toBeNull()
   })
+
+  test('takes a page’s own empty and loading content in slots of those names', async () => {
+    type Feed = HTMLElement & { loading: boolean; updateComplete: Promise<unknown> }
+    const host = (await mount(
+      `<helix-headless-notifications label="Activity">
+        <div slot="empty" id="calm">All caught up</div>
+        <div slot="loading" id="wait">Fetching</div>
+      </helix-headless-notifications>`,
+    )) as Feed
+    await host.updateComplete
+    const empty = part(host, 'empty')?.querySelector('slot') as HTMLSlotElement
+    expect(empty.getAttribute('name')).toBe('empty')
+    expect(empty.assignedElements()).toEqual([host.querySelector('#calm') as Element])
+    /* Neither is a notification, so the feed is still empty. */
+    expect(hasState(host, 'empty')).toBe(true)
+    expect(hasState(host, 'loading')).toBe(false)
+    host.loading = true
+    await host.updateComplete
+    const loading = part(host, 'loading')?.querySelector('slot') as HTMLSlotElement
+    expect(loading.assignedElements()).toEqual([host.querySelector('#wait') as Element])
+    expect(hasState(host, 'loading')).toBe(true)
+    expect(hasState(host, 'empty')).toBe(false)
+  })
+
+  test('is not empty once a notification is in it', async () => {
+    const host = (await mount(
+      `<helix-headless-notifications label="Activity">
+        <helix-headless-notification>One</helix-headless-notification>
+      </helix-headless-notifications>`,
+    )) as HTMLElement & { updateComplete: Promise<unknown> }
+    await host.updateComplete
+    expect(hasState(host, 'empty')).toBe(false)
+  })
 })
 
 describe('focus after marking everything read', () => {
