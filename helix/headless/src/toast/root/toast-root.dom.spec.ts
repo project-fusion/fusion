@@ -58,14 +58,14 @@ const region = async (items = ''): Promise<HTMLElement> =>
   )) as HTMLElement
 
 describe('toast region', () => {
-  test('is a landmark, and a polite live region', async () => {
-    /* A region, so a reader finds the stack among the page's landmarks. Polite,
-       because `role="alert"` interrupts whatever a reader is being told; a
-       danger message says so on its own. */
+  test('is a landmark, and not itself a live region', async () => {
+    /* A region, so a reader finds the stack among the page's landmarks. Not
+       live: a polite stack holding an assertive danger message made that
+       message news to both. The `live` parts say each arrival once. */
     const host = await region()
     const internals = (host as unknown as { internals?: ElementInternals }).internals
     expect(internals?.role).toBe('region')
-    expect(internals?.ariaLive).toBe('polite')
+    expect(internals?.ariaLive ?? null).toBeNull()
   })
 
   test('says its hotkey in its name, in the consumer’s words', async () => {
@@ -81,12 +81,41 @@ describe('toast region', () => {
     )
   })
 
-  test('announces arrivals and says nothing when one goes', async () => {
-    // A dismissal read aloud is every removal narrated.
+  test('says an arrival once, politely, and a danger one assertively, and nothing when one goes', async () => {
     const host = await region()
-    expect((host as unknown as { internals?: ElementInternals }).internals?.ariaRelevant).toBe(
-      'additions',
-    )
+    const [polite, urgent] = [...(host.shadowRoot?.querySelectorAll('[part="live"]') ?? [])]
+    expect(polite?.getAttribute('role')).toBe('status')
+    expect(urgent?.getAttribute('role')).toBe('alert')
+    const frame = (): Promise<void> => new Promise((done) => setTimeout(done, 40))
+    const words = (): string[] => [polite?.textContent ?? '', urgent?.textContent ?? '']
+    const add = host as HTMLElement & {
+      add(
+        message: string,
+        options?: { action?: Element; heading?: string; tone?: string },
+      ): HTMLElement
+      updateComplete: Promise<unknown>
+    }
+    const undo = document.createElement('button')
+    undo.textContent = 'Undo'
+    const saved = add.add('Your changes are kept.', {
+      action: undo,
+      heading: 'Draft saved',
+    }) as Item
+    await frame()
+    await add.updateComplete
+    expect(words()).toEqual(['Draft saved. Your changes are kept.', ''])
+    add.add('Could not reach the server', { tone: 'danger' })
+    await frame()
+    await add.updateComplete
+    expect(words()).toEqual(['', 'Error. Could not reach the server'])
+    await new Promise((done) => setTimeout(done, 1100))
+    await add.updateComplete
+    expect(words()).toEqual(['', ''])
+    /* A dismissal read aloud is every removal narrated. */
+    saved.dismiss()
+    await frame()
+    await add.updateComplete
+    expect(words()).toEqual(['', ''])
   })
 
   test('the name is on the host through internals, not as an attribute', async () => {

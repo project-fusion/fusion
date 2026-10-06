@@ -107,7 +107,7 @@ describe('what a message is to a screen reader', () => {
   const internalsOf = (one: Element) =>
     (one as unknown as { internals: ElementInternals }).internals
 
-  test('an alertdialog, polite unless it is danger', async () => {
+  test('an alertdialog, and never a live region of its own', async () => {
     const plain = (await mount(
       '<helix-headless-toast-item>Saved</helix-headless-toast-item>',
     )) as Item
@@ -118,7 +118,8 @@ describe('what a message is to a screen reader', () => {
       '<helix-headless-toast-item tone="danger">Failed</helix-headless-toast-item>',
     )) as Item
     await danger.updateComplete
-    expect(internalsOf(danger).ariaLive).toBe('assertive')
+    /* The region says it, assertively, once. */
+    expect(internalsOf(danger).ariaLive ?? null).toBeNull()
   })
 
   test('named by its words, where it has no heading', async () => {

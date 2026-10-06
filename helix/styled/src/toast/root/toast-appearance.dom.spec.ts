@@ -322,16 +322,13 @@ if (hasLayout()) {
       return found
     }
 
-    test('the region is not atomic, so an arrival is not the whole stack', async () => {
-      /* `role="status"` implies `aria-atomic="true"`, which re-reads the entire
-         region whenever any part of it changes: with four messages up, the
-         fifth announces all five. `aria-relevant="additions"` does not help,
-         because it says which mutations count and not how much is read when one
-         does. Both are needed and only one was set. */
+    test('the stack is not a live region, so an arrival is not the whole stack', async () => {
+      /* A live stack re-read itself, or a danger message inside it, when a
+         message arrived. The `live` parts say the one that arrived. */
       const host = await region()
-      expect((host as unknown as { internals?: ElementInternals }).internals?.ariaAtomic).toBe(
-        'false',
-      )
+      expect(
+        (host as unknown as { internals?: ElementInternals }).internals?.ariaLive ?? null,
+      ).toBeNull()
     })
 
     test('two reasons to hold the clock take two releases', async () => {
