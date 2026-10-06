@@ -41,6 +41,17 @@ describe('a reading in words', () => {
     )
   })
 
+  /* Heatmap wrapped the chart's pointer to say "selected" inside the
+     position, since nothing else could carry a state word. */
+  test('says a state word after the position, in the same brackets', () => {
+    expect(spokenReading(ROW, 0, undefined, '2 of 12', 'selected')).toBe(
+      'March, Revenue $128k (2 of 12, selected)',
+    )
+    expect(spokenReading({ cells: [], label: 'Q1' }, undefined, undefined, '', 'selected')).toBe(
+      'Q1 (selected)',
+    )
+  })
+
   test('leaves out a heading the table does not have', () => {
     expect(spokenReading({ cells: [{ name: '', text: '7' }], label: 'Mon' })).toBe('Mon: 7')
   })

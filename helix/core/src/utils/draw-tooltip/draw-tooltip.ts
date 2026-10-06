@@ -88,10 +88,15 @@ export interface TooltipAt {
 /**
  * What the keyboard is reading, which `drawTooltip` says aloud and marks.
  *
- * The chart's `pointer` is one, and is what every chart passes.
+ * The chart's `pointer` is one, and is what every chart passes. A chart whose
+ * readings can be chosen passes one with `state` as well, a word such as
+ * "selected" said after where the reading stands.
  */
 export type ReadingCursor = Pick<ChartPointerController, 'column' | 'keyed'> &
-  Partial<Pick<ChartPointerController, 'position' | 'shows'>>
+  Partial<Pick<ChartPointerController, 'position' | 'shows'>> & {
+    /** A word said after the reading's position, such as "selected", or nothing. */
+    state?: string
+  }
 
 /**
  * What a pointer resting on a reading shows, as `Tooltip` pointed at a mark.
@@ -157,6 +162,7 @@ export const drawTooltip = (
                 reading.column,
                 (cell) => reading.shows?.(cell) !== false,
                 reading.position,
+                reading.state,
               )
             : ''
         }</span>`

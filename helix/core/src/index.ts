@@ -342,6 +342,10 @@ export { anchorElement } from './utils/anchor-element/anchor-element.js'
 export { arrowReach, sideOf } from './utils/arrow/arrow.js'
 export { assignSlots } from './utils/assign-slots/assign-slots.js'
 export {
+  type DrawAutofillOptions,
+  drawAutofill,
+} from './utils/autofill-select/autofill-select.js'
+export {
   addDays,
   addMonths,
   type Barring,
@@ -411,7 +415,7 @@ export {
   drawDismissGlyph,
 } from './utils/draw-dismiss/draw-dismiss.js'
 export { type DrawIconOptions, drawIcon } from './utils/draw-icon/draw-icon.js'
-export { CHART_PLOT, drawTooltip } from './utils/draw-tooltip/draw-tooltip.js'
+export { CHART_PLOT, drawTooltip, type ReadingCursor } from './utils/draw-tooltip/draw-tooltip.js'
 export { elapsedTime } from './utils/elapsed-time/elapsed-time.js'
 export {
   type ElementByIdOptions,
