@@ -1192,10 +1192,14 @@ describe('a divider beside a shut pane', () => {
     expect(divider.getAttribute('aria-valuetext')).toBe('Replié')
   })
 
-  test('and an open one reports its own bounds and no words', async () => {
-    const host = await splitter('min="20"')
+  /* A bare `aria-valuenow` is read as a number with no unit; the rubric's
+     value text is localized and formatted. */
+  test('and an open one reports its own bounds, and its share as a percentage', async () => {
+    const host = await splitter('min="20" default-position="40"')
     expect(separator(host).getAttribute('aria-valuemin')).toBe('20')
-    expect(separator(host).hasAttribute('aria-valuetext')).toBe(false)
+    expect(separator(host).getAttribute('aria-valuetext')).toBe(
+      new Intl.NumberFormat(undefined, { style: 'percent' }).format(0.4),
+    )
   })
 })
 
