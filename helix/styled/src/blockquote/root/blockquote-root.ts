@@ -8,8 +8,9 @@ import { styles } from './blockquote-root.css.js'
  *
  * @description
  * Set in the display face, larger than body text, to mark a change of voice. No
- * quotation marks are drawn, because the size and spacing already set the
- * passage apart.
+ * quotation marks are drawn by default, because the size and spacing already
+ * set the passage apart. `marks` draws one large opening mark over the passage,
+ * as a pull quote sets it, in the element's language.
  *
  * @since 0.1.0
  * @status stable
@@ -18,12 +19,17 @@ import { styles } from './blockquote-root.css.js'
  * @documentation https://fusion.dev/helix/components/blockquote
  *
  * @cssproperty --blockquote-attribution-color - The color of the attribution.
+ * @cssproperty --blockquote-attribution-font-family - The typeface of the attribution, the page's by default.
+ * @cssproperty --blockquote-attribution-font-weight - The weight of the attribution, the page's by default.
  * @cssproperty --blockquote-attribution-size - The font size of the attribution.
  * @cssproperty --blockquote-color - The color of the quoted passage.
  * @cssproperty --blockquote-font-family - The typeface of the quoted passage, the display face by default.
  * @cssproperty --blockquote-font-weight - The weight of the quoted passage, medium by default.
  * @cssproperty --blockquote-gap - The space between the passage and its attribution.
+ * @cssproperty --blockquote-letter-spacing - The letter spacing of the quoted passage, the tight tracking by default.
  * @cssproperty --blockquote-line-height - The line height of the quoted passage, the tight leading by default.
+ * @cssproperty --blockquote-mark-color - The color of the mark `marks` draws, the subtle foreground by default.
+ * @cssproperty --blockquote-mark-size - The font size of the mark `marks` draws.
  * @cssproperty --blockquote-size - The font size of the quoted passage.
  */
 @customElement('helix-blockquote')

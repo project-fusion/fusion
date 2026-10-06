@@ -1,6 +1,14 @@
-import { customElement, HelixElement, markRegion } from '@fusion.dev/helix-core'
-import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { customElement, HelixElement, markRegion, reportRuntime } from '@fusion.dev/helix-core'
+import {
+  type CSSResultGroup,
+  css,
+  html,
+  nothing,
+  type PropertyValues,
+  type TemplateResult,
+} from 'lit'
 import { property } from 'lit/decorators.js'
+import { typedMarks } from '../../quote/marks.js'
 
 /**
  * @summary A passage set off from the prose around it.
@@ -17,6 +25,19 @@ import { property } from 'lit/decorators.js'
  * reset. The `<blockquote>` keeps its own margins, as a bare one does. A
  * screen reader meets the same figure, named by its caption.
  *
+ * **A figure only while there is an attribution.** With nothing in the caption
+ * the figure has no name and nothing to say, so the role and its name are
+ * dropped and a reader meets the quotation alone. A server cannot see what is
+ * slotted, so it serves the figure, and the client drops it after hydration;
+ * an `attribution` written as words is served exactly.
+ *
+ * **Quotation marks follow the language**, under `marks`. The opening mark is
+ * the one the browser sets for a `<q>` in the element's language, „ under
+ * `lang="de"` and « under `lang="fr"`, and a `Quote` inside the passage takes
+ * the inner marks. The mark is drawn, not read: a screen reader hears the
+ * passage. A passage under `marks` that starts with a mark typed into the text
+ * would show two, and warns once, with the runtime kind `typed-marks`.
+ *
  * For a quotation inside a sentence, use `Quote`.
  *
  * @since 0.1.0
@@ -26,19 +47,54 @@ import { property } from 'lit/decorators.js'
  * @documentation https://fusion.dev/helix/components/blockquote
  *
  * @slot - The quoted passage.
- * @slot attribution - Who said it, and where.
+ * @slot attribution - Who said it, and where. Replaces the words of `attribution`.
  *
  * @csspart attribution - The caption carrying the source.
  * @csspart blockquote - The quotation.
- * @csspart figure - The figure holding the quotation and its attribution, a `<div>` with `role="figure"`.
+ * @csspart figure - The figure holding the quotation and its attribution, a `<div>` with `role="figure"` while the attribution has words.
  */
 @customElement('helix-headless-blockquote')
 export class HelixHeadlessBlockquote extends HelixElement {
+  /* The mark is content, as a `<q>`'s is, so it is drawn in this tier too.
+     `open-quote` takes the mark for the element's language from the browser,
+     and the empty alternative keeps it out of what a reader hears. Closed at
+     the end without a mark, so the quotation depth after the passage is what
+     it was before it. */
+  static override styles: CSSResultGroup = css`
+    :host([marks]) [part='blockquote']::before {
+      content: open-quote / '';
+    }
+
+    :host([marks]) [part='blockquote']::after {
+      content: no-close-quote;
+    }
+  `
+
+  /**
+   * Who said it, and where, as words, such as "Maria Lopez, operations
+   * manager". The `attribution` slot replaces them, for markup such as a link.
+   *
+   * Words are served with the figure they name, where a server cannot see a
+   * slotted attribution.
+   */
+  @property()
+  attribution = ''
+
   /**
    * The URL of the source the passage came from.
    */
   @property()
   cite = ''
+
+  /**
+   * Whether to draw an opening quotation mark before the passage, in the
+   * element's language. Leave the marks out of the text.
+   */
+  @property({ reflect: true, type: Boolean })
+  marks = false
+
+  /** Whether this blockquote has said its passage starts with a typed mark, so it says so once. */
+  private warned = false
 
   /**
    * Says on the caption whether there is an attribution in it.
@@ -57,12 +113,61 @@ export class HelixHeadlessBlockquote extends HelixElement {
        is a gap a consumer cannot close without knowing to look for it. Both
        stay, since `[hidden]` is a UA rule and a sheet setting `display` on this
        part outranks it. */
-    markRegion(this.renderRoot, 'attribution', ['attribution'])
+    markRegion(this.renderRoot, 'attribution', ['attribution'], {
+      occupied: 'slot[name="attribution"] > *',
+    })
+    /* **A figure only while the caption has words.** Written here rather than
+       bound, since only the client can see what is slotted: a server serves
+       the figure, and the first look after hydration takes it away where the
+       caption is empty. */
+    const named = !this.partNamed('attribution')?.hasAttribute('data-empty')
+    const figure = this.partNamed('figure')
+    if (named) {
+      figure?.setAttribute('role', 'figure')
+      figure?.setAttribute('aria-labelledby', 'attribution')
+    } else {
+      figure?.removeAttribute('role')
+      figure?.removeAttribute('aria-labelledby')
+    }
+  }
+
+  /**
+   * Reads the passage for a mark typed at its start, which `marks` would
+   * double. Only the start: the mark drawn is an opening one.
+   */
+  private readonly readPassage = (): void => {
+    if (!this.marks || this.warned) {
+      return
+    }
+    const text = [...this.childNodes]
+      .filter((node) => !(node instanceof Element) || !node.slot)
+      .map((node) => node.textContent ?? '')
+      .join('')
+      .trim()
+    if (!typedMarks(text.charAt(0))) {
+      return
+    }
+    this.warned = true
+    reportRuntime({
+      kind: 'typed-marks',
+      message: `<${this.localName} marks> starts with a typed quotation mark, and the element draws its own, so the mark shows twice. Take the typed mark out.`,
+      tag: this.localName,
+    })
+  }
+
+  /* On the shadow root rather than in the template, so the served markup is
+     the `<blockquote>` and its slot and nothing else. */
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.renderRoot.addEventListener('slotchange', this.readPassage)
   }
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.markEmpty()
+    if (changed.has('marks')) {
+      this.readPassage()
+    }
   }
 
   protected override render(): TemplateResult {
@@ -83,10 +188,21 @@ export class HelixHeadlessBlockquote extends HelixElement {
        `<div>` too, since a `<figcaption>` belongs only in a `<figure>`. */
     return html`<div aria-labelledby="attribution" part="figure" role="figure">
       <blockquote part="blockquote" cite=${this.cite || nothing}><slot></slot></blockquote>
-      <div id="attribution" part="attribution"
-        ><slot name="attribution" @slotchange=${() => this.markEmpty()}></slot
-      ></div>
+      ${this.renderAttribution()}
     </div>`
+  }
+
+  /**
+   * The caption, with the words of `attribution` as its slot's fallback,
+   * behind a seam a tier can move. The words are in an element, so the region
+   * counts them as its own.
+   */
+  protected renderAttribution(): TemplateResult {
+    return html`<div id="attribution" part="attribution"
+      ><slot name="attribution" @slotchange=${() => this.markEmpty()}
+        >${this.attribution ? html`<span>${this.attribution}</span>` : nothing}</slot
+      ></div
+    >`
   }
 }
 
