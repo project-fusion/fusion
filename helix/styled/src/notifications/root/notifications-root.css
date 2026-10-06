@@ -153,6 +153,18 @@
   --_collection-inset-inline: var(--helix-space-md);
 }
 
+/* A page that could not be fetched says so on a line set like the empty one,
+   in the danger ink: of the three lines, it is the one that is a fault. */
+[part="error"] {
+  color: var(--notifications-error-color, var(--helix-color-danger));
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  margin: var(--helix-space-none);
+  padding-block: var(--helix-space-lg);
+  padding-inline: var(--helix-space-md);
+  text-align: center;
+}
+
 @media print {
   :host {
     max-block-size: none;

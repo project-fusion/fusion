@@ -1,4 +1,6 @@
 import {
+  assignSlots,
+  ChildrenController,
   customElement,
   deepContains,
   focusableElements,
@@ -49,6 +51,11 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
  * nothing more. While the feed is loading the button stays, so focus stays on
  * it, and it is `aria-disabled` and sends nothing.
  *
+ * **`load-error` says a page could not be fetched**, such as "Could not load
+ * notifications": it shows under the rows there are, in the `error` part, in
+ * place of the empty and loading lines, and a screen reader hears it. Clear it
+ * when you ask again.
+ *
  * @since 0.1.0
  * @status stable
  * @category feedback
@@ -57,6 +64,7 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
  *
  * @slot - The notifications.
  * @slot empty - Replaces the words of `empty-text` in the `empty` part, such as a picture and a line of your own. The live region still says `empty-text`.
+ * @slot error - Replaces the words of `load-error` in the `error` part, such as a line with a retry button. The live region still says `load-error`.
  * @slot footer - Below the list, for a link to everything.
  * @slot header - Above the list, for a title and the mark-all control.
  * @slot loading - Replaces the words of `loading-text` in the `loading` part, such as a loader. The live region still says `loading-text`.
@@ -66,15 +74,17 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
  * @event {HelixReadEvent} helix-read - Fired by an item when it is marked read or unread, and by the feed when everything is marked read. Cancelable.
  *
  * @csspart empty - Shown when there is nothing in the feed.
+ * @csspart error - Shown while `load-error` is set, under any rows there are, in place of the empty and loading lines.
  * @csspart footer - The region below the list.
  * @csspart header - The region above the list.
  * @csspart list - The list itself.
- * @csspart live - A copy of the empty and loading messages, in a live region that screen readers announce when they change. Visually hidden in the styled tier.
+ * @csspart live - A copy of the empty, loading and error messages, in a live region that screen readers announce when they change. Visually hidden in the styled tier.
  * @csspart loading - Shown while the feed is loading.
  * @csspart mark-all - The control that marks everything read.
  * @csspart more - The button after the list that asks for more, while `load-more` is set. It is `aria-disabled` while the feed is loading.
  *
- * @cssstate empty - While the feed holds no notification and is not loading. Never on the server, which cannot count the rows.
+ * @cssstate empty - While the feed holds no notification and is not loading, and `load-error` is not set. Never on the server, which cannot count the rows.
+ * @cssstate error - While `load-error` is set.
  * @cssstate loading - While `loading` is set.
  * @cssstate media - While a notification in the list holds something in its media slot, so every row keeps that column.
  */
@@ -99,6 +109,16 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
    */
   @property()
   label = ''
+
+  /**
+   * What the feed says when a page of it could not be loaded, such as after a
+   * request to a server fails. Empty is no error.
+   *
+   * Set, it shows under the rows there are, in place of `empty-text` and
+   * `loading-text`, and a screen reader hears it. Clear it when you ask again.
+   */
+  @property({ attribute: 'load-error' })
+  loadError = ''
 
   /**
    * Whether to draw a button after the list that asks for the next page, by
@@ -273,6 +293,14 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
   }
 
   /**
+   * Hears a row arrive after the render. The list slot is assigned by hand, so
+   * a new row is in no slot and sends no `slotchange`: without this it was
+   * drawn nowhere and an emptied feed kept saying it was empty. A row added to
+   * a group is the group's to hear, and the group asks the feed to count again.
+   */
+  protected readonly childWatch = new ChildrenController(this, this.handleSlotChange)
+
+  /**
    * An item's own read event, heard on the way past, so the count follows.
    *
    * `unread` is derived from the items and nothing about an item changing tells
@@ -301,11 +329,13 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
       }
       return
     }
-    list.assign(...this.rows)
-    for (const name of ['header', 'footer', 'empty', 'loading']) {
-      const slot = root?.querySelector?.<HTMLSlotElement>(`slot[name="${name}"]`)
-      slot?.assign?.(...[...this.children].filter((child) => child.getAttribute('slot') === name))
-    }
+    /* Each row to the list and every other child to the slot it names, though
+       never to the list, through core's `assignSlots`, which leaves a slot
+       alone that already holds what it would be given. */
+    const rows = this.rows
+    assignSlots(root, this.children, (child) =>
+      rows.includes(child) ? 'items' : child.getAttribute('slot') === 'items' ? '' : undefined,
+    )
   }
 
   /** The row `Tab` stops on, once a reader has been to one. */
@@ -403,21 +433,38 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     hostAria(this.internals, { label: this.label || 'Notifications', role: 'region' })
+    const failed = this.loadError !== ''
+    this.toggleState('error', failed)
     this.toggleState('loading', this.loading)
-    this.toggleState('empty', !this.loading && this.childrenKnown && this.items.length === 0)
+    this.toggleState(
+      'empty',
+      !this.loading && !failed && this.childrenKnown && this.items.length === 0,
+    )
   }
 
   /**
-   * The empty or the loading line, each around a slot of the same name whose
-   * fallback is the words, so a page can put its own in.
+   * The error, the empty or the loading line, each around a slot of the same
+   * name whose fallback is the words, so a page can put its own in. The error
+   * shows under the rows there are, since a page that failed is news even to
+   * a feed that holds some.
    */
   protected override renderStatus(hasContent: boolean): TemplateResult | typeof nothing {
+    if (this.loadError !== '') {
+      return html`<p part="error"><slot name="error">${this.loadError}</slot></p>`
+    }
     if (!this.loading && hasContent) {
       return nothing
     }
     return this.loading
       ? html`<p part="loading"><slot name="loading">${this.loadingText}</slot></p>`
       : html`<p part="empty"><slot name="empty">${this.emptyText}</slot></p>`
+  }
+
+  /** The error before the shared words, which it wins over. */
+  protected override renderLive(hasContent: boolean): TemplateResult {
+    return this.loadError === ''
+      ? super.renderLive(hasContent)
+      : html`<span part="live" role="status">${this.loadError}</span>`
   }
 
   /**
