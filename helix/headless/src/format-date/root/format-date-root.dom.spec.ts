@@ -207,6 +207,29 @@ describe('a frozen reading', () => {
   })
 })
 
+describe('which side of now a reading is on', () => {
+  test('is a state a page can style, and a date is on neither side', async () => {
+    const states = (element: Stamp) =>
+      (element as unknown as { internals: ElementInternals }).internals.states
+    const ago = await stamp(
+      `<helix-headless-format-date relative="long" date="${at}"></helix-headless-format-date>`,
+    )
+    expect(states(ago).has('past')).toBe(true)
+    expect(states(ago).has('future')).toBe(false)
+    const ahead = new Date(Date.now() + 3 * 3_600_000).toISOString()
+    const soon = await stamp(
+      `<helix-headless-format-date elapsed date="${ahead}"></helix-headless-format-date>`,
+    )
+    expect(states(soon).has('future')).toBe(true)
+    expect(states(soon).has('past')).toBe(false)
+    const date = await stamp(
+      `<helix-headless-format-date date="${at}"></helix-headless-format-date>`,
+    )
+    expect(states(date).has('past')).toBe(false)
+    expect(states(date).has('future')).toBe(false)
+  })
+})
+
 describe('a reading under a minute old', () => {
   /* Measured before this: "in 0 seconds", a moment ago read as the future. */
   test('is in the past where every number is written', async () => {

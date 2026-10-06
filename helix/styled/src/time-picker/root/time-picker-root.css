@@ -63,6 +63,7 @@
 /* Three columns, each scrolling on its own, read as a dial rather than a list. */
 [part="columns"] {
   display: flex;
+  gap: var(--time-picker-columns-gap, var(--helix-space-none));
 }
 
 /* Shorter than the single list, which is a different job: a list is read down
@@ -89,7 +90,10 @@
   /* In percentages rather than lengths, so the fade stays proportional to a
      column whose height is a published hook: at a fixed inset a short wheel is
      almost entirely faded and a tall one barely is. */
-  mask-image: linear-gradient(to bottom, transparent, black 25%, black 75%, transparent);
+  mask-image: var(
+    --time-picker-wheel-mask,
+    linear-gradient(to bottom, transparent, black 25%, black 75%, transparent)
+  );
   padding-block: calc((var(--listbox-max-block-size) - var(--_time-row)) / 2);
   scroll-snap-type: y mandatory;
   /* No scrollbar. */
@@ -131,7 +135,7 @@
   block-size: var(--_time-row);
   /* `sm`, not `full`, which the calendar's own note argues: a pill is a shape
      for a word, and a grid of circles reads as beads rather than as numbers. */
-  border-radius: var(--helix-radii-sm);
+  border-radius: var(--time-picker-mark-radius, var(--helix-radii-sm));
   display: inline-flex;
   justify-content: center;
   min-inline-size: var(--_time-row);
@@ -142,7 +146,7 @@
 /* Hover on the mark rather than the row, which has no ground of its own. */
 [part="column"] [part~="option"]:not([disabled]):hover::part(label),
 [part="column"] [part~="option"]:state(active)::part(label) {
-  background-color: var(--helix-color-surface-sunken);
+  background-color: var(--time-picker-hover-background-color, var(--helix-color-surface-sunken));
 }
 
 /* And the answer is the calendar's solid mark, which this now actually is.
@@ -159,7 +163,7 @@
  * and `foreground-inverse` is the ink solved against it. */
 [part="column"] [part~="option"]:state(selected)::part(label) {
   background-color: var(--time-picker-selected-color, var(--helix-color-surface-inverse));
-  color: var(--helix-color-foreground-inverse);
+  color: var(--time-picker-selected-foreground-color, var(--helix-color-foreground-inverse));
 }
 
 /* No tick. */
@@ -171,7 +175,8 @@
 :host([invalid]) [part="column"] [part~="option"]:state(selected)::part(label),
 :host(:state(invalid)) [part~="option"]:state(selected)::part(item),
 :host(:state(invalid)) [part="column"] [part~="option"]:state(selected)::part(label) {
-  outline: var(--helix-size-focus-ring) solid var(--helix-color-danger);
+  outline: var(--helix-size-focus-ring) solid
+    var(--time-picker-invalid-color, var(--helix-color-danger));
   outline-offset: var(--helix-size-focus-offset);
 }
 
@@ -183,7 +188,8 @@
 :host(:state(invalid)) [part="list"][data-unset],
 :host(:state(invalid)) [part="columns"][data-unset] {
   border-radius: var(--helix-radii-sm);
-  outline: var(--helix-size-focus-ring) solid var(--helix-color-danger);
+  outline: var(--helix-size-focus-ring) solid
+    var(--time-picker-invalid-color, var(--helix-color-danger));
   outline-offset: var(--helix-size-focus-offset);
 }
 
