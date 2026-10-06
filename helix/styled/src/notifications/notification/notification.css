@@ -10,6 +10,14 @@
      two come apart. */
   --_notifications-pad-block: var(--notifications-padding-block, var(--helix-space-xs));
   --_notifications-unread: var(--notifications-unread-block-size, var(--helix-space-xs));
+  /* **`lg`, because the start of the row is the unread dot's lane.** The dot is
+     `xs` across and stands in this padding, so `lg` gives it `xs` of space to the
+     row's edge and `xs` to the media. At `md` it had 4px on either side: on a
+     filled row it sat against the row's own border and touched the avatar's
+     edge. The end takes the same padding, and so do the feed's header and
+     footer and a group's header, so a title still starts where the media
+     column starts. */
+  --_notifications-pad-inline: var(--notifications-padding-inline, var(--helix-space-lg));
 
   /* The row reflows on how much room the row was given, which is a fact about
      this box and about nothing else: a feed in a 320 pixel side panel is narrow
@@ -39,7 +47,7 @@
   display: grid;
   grid-template-columns: minmax(var(--notifications-media-column, 0px), auto) minmax(0, 1fr) auto;
   padding-block: var(--_notifications-pad-block);
-  padding-inline: var(--notifications-padding-inline, var(--helix-space-md));
+  padding-inline: var(--_notifications-pad-inline);
   /* The containing block for the unread mark, which is placed against the row
      rather than flowing in it. */
   position: relative;
@@ -87,7 +95,18 @@
       2
     )
   );
-  inset-inline-start: var(--notifications-unread-inset, var(--helix-space-2xs));
+  /* Centered in the start padding, so the dot keeps equal space on both sides
+     whatever padding the row is given. */
+  inset-inline-start: var(
+    --notifications-unread-inset,
+    calc(
+      (
+        var(--_notifications-pad-inline) -
+        var(--notifications-unread-inline-size, var(--_notifications-unread))
+      ) /
+      2
+    )
+  );
   position: absolute;
 }
 
@@ -301,10 +320,8 @@ slot[name="detail"]::slotted(*) {
    the controls did not arrive so much as appear, which on a feed is a row that
    flickers as the pointer travels down it.
 
-   `duration-normal` gives the eye something to follow, and the small inline
-   movement is what makes it a swap rather than two unrelated fades: the time
-   leaves towards the edge it sits against and the controls come in from the same
-   side, so the pair read as one thing turning over. `translate` and not
+   `duration-normal` gives the eye something to follow, and the time leaves
+   towards the edge it sits against while it fades. `translate` and not
    `margin`, because it must not move anything else in the row while it runs. */
 [part="trailing"] > * {
   grid-area: swap;
@@ -340,15 +357,15 @@ slot[name="detail"]::slotted(*) {
   translate: calc(var(--helix-space-2xs) * var(--_notifications-swap)) 0;
 }
 
-/* Held just outside its resting place, so it arrives rather than appears. The
-   offset is spent on the way in and given back on the way out, which is what
-   makes the pair read as one thing turning over instead of two fades that
-   happen to overlap. */
+/* **The controls fade in where they rest, and they do not travel.** They used to
+   slide in by `2xs` from the trailing edge. A pointer that arrives at the
+   dismiss control from that edge arrives before the slide has finished, so the
+   x moved 4px under the pointer that was reaching for it. A target stays still
+   while it can be pressed. */
 [part="controls"] {
   align-items: center;
   display: flex;
   opacity: var(--_notifications-swap);
-  translate: calc(var(--helix-space-2xs) * (1 - var(--_notifications-swap))) 0;
 }
 
 /* Only where there is something to swap to. */
