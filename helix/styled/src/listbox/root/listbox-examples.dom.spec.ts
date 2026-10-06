@@ -2,6 +2,7 @@ import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, idle, logged, part, registerDom } from '@fusion.dev/helix-testing/dom'
 import controlled_filter from '../.examples/controlled-filter.html' with { type: 'text' }
 import events from '../.examples/events.html' with { type: 'text' }
+import long_list from '../.examples/long-list.html' with { type: 'text' }
 
 beforeAll(async () => {
   registerDom()
@@ -58,5 +59,33 @@ describe('the controlled-filter example', () => {
       (one) => !one.hidden,
     )
     expect(shown.map((one) => one.getAttribute('value'))).toEqual(['berlin'])
+  })
+})
+
+describe('the long-list example', () => {
+  /* Ten thousand options handed over as data: a screenful is drawn, and the
+     filter field's arrows reach the last one, which is then drawn too. */
+  run('draws what is in sight, and the keyboard reaches the last option', async () => {
+    await example(long_list)
+    const accounts = document.getElementById('accounts') as HTMLElement
+    const drawn = (): HTMLElement[] => [
+      ...(accounts.shadowRoot?.querySelectorAll<HTMLElement>('helix-option') ?? []),
+    ]
+    await idle()
+    expect(drawn().length).toBeGreaterThan(0)
+    expect(drawn().length).toBeLessThan(50)
+    const search = part(accounts, 'search-field') as HTMLInputElement
+    search.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        key: 'ArrowUp',
+      }),
+    )
+    await idle()
+    const last = drawn().find((one) => one.getAttribute('aria-posinset') === '10000')
+    expect(last?.textContent).toBe('Account 10000')
+    expect(last?.getAttribute('aria-setsize')).toBe('10000')
   })
 })
