@@ -210,6 +210,23 @@
   margin-block-start: calc(-1 * var(--helix-space-2xs));
 }
 
+/* **A glyph a page slots in is sized like the one it replaces**, so an icon
+   set swapped in leaves every button its size. The compass's own is the
+   needle's size. */
+[part="controls"] button ::slotted(*) {
+  --icon-size: var(--helix-size-icon-sm);
+
+  block-size: var(--helix-size-icon-sm);
+  inline-size: var(--helix-size-icon-sm);
+}
+
+[part="controls"] [part="face-north"] ::slotted(*) {
+  --icon-size: var(--helix-size-icon-md);
+
+  block-size: var(--helix-size-icon-md);
+  inline-size: var(--helix-size-icon-md);
+}
+
 [part="tilt"] {
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-semibold);
