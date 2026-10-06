@@ -1,4 +1,4 @@
-import type { ViewportGestureMode } from '@fusion.dev/helix-core'
+import { isRtl, type ViewportGestureMode } from '@fusion.dev/helix-core'
 import type { GraphGroup } from '../connect-graph/connect-graph.js'
 import { type GraphLooks, mixRgb, rgbOf } from '../connect-graph/looks.js'
 
@@ -484,9 +484,15 @@ export const clearOf = (box: Box, others: readonly Box[]): boolean =>
   )
 
 /**
- * Where a note's name starts, along the line: after the note, or before it
- * where after it would run under the frame's controls or off the drawing.
- * `box` gives the name's box for a start.
+ * Where a note's name starts, its left edge on screen: after the note in
+ * reading order, or before it where after it would run under the frame's
+ * controls or off the drawing. `box` gives the name's box for a start.
+ *
+ * **After is to the left on a right-to-left page**, `rightToLeft`, as a
+ * reader there looks for what follows a mark. The name is drawn from its left
+ * edge either way, with `textAlign` set to `left`: a canvas aligns text to its
+ * start by default, which on a right-to-left page is the right, so a name
+ * given its left edge was drawn ending there, over its own note.
  */
 export const nameStart = (
   at: { radius: number; x: number },
@@ -494,8 +500,11 @@ export const nameStart = (
   box: (start: number) => Box,
   avoid: readonly Box[],
   room: number,
+  rightToLeft = false,
 ): number => {
-  const after = at.x + at.radius + 4
+  const right = at.x + at.radius + 4
+  const left = at.x - at.radius - 4 - width
+  const [after, before] = rightToLeft ? [left, right] : [right, left]
   const fits = (start: number): boolean => {
     const placed = box(start)
     return placed.left >= 0 && placed.right <= room && clearOf(placed, avoid)
@@ -503,7 +512,6 @@ export const nameStart = (
   if (fits(after)) {
     return after
   }
-  const before = at.x - at.radius - 4 - width
   return fits(before) ? before : after
 }
 
@@ -534,6 +542,8 @@ export const namesOver = (container: HTMLElement, onScreen: OnScreen) => {
       }
       /* The frame's controls first, so no name is drawn under them. */
       taken = chromeOver(container)
+      const rightToLeft = isRtl(container)
+      context.textAlign = 'left'
       for (const { id, name, strong } of named) {
         const at = onScreen(id)
         if (!at || looks.node(id).hidden) {
@@ -548,7 +558,7 @@ export const namesOver = (container: HTMLElement, onScreen: OnScreen) => {
           right: start + width + 2,
           top: y - 13,
         })
-        const x = nameStart(at, width, boxAt, taken, container.clientWidth)
+        const x = nameStart(at, width, boxAt, taken, container.clientWidth, rightToLeft)
         const box = boxAt(x)
         if (!clearOf(box, taken) && !strong) {
           continue

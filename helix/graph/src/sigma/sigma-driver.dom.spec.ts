@@ -137,6 +137,12 @@ const rendererOf = () => {
       }
     },
     container,
+    /** Sends a renderer event with no payload, as Sigma sends `beforeRender`. */
+    emit: (type: string) => {
+      for (const listener of of(type)) {
+        listener({ node: '' })
+      }
+    },
     graph,
     settings,
     sigma,
@@ -256,6 +262,57 @@ describe('sigmaDriver', () => {
     expect(named()).toEqual(['a', null, null])
     expect(named('hubs')).toEqual(['a', null, 'e'])
     expect(named('all')).toEqual(['a', 'd', 'e'])
+  })
+
+  test('draws a name from its left edge, after its note in reading order, on either page', () => {
+    /* Where each name and its hover box were drawn, and how they were aligned. */
+    const drawn = (direction: 'ltr' | 'rtl') => {
+      const renderer = rendererOf()
+      renderer.container.style.direction = direction
+      sigmaDriver(renderer.sigma).look(looks)
+      renderer.emit('beforeRender')
+      const calls: [string, number, string][] = []
+      const context = {
+        beginPath: () => {},
+        fill: () => {},
+        fillStyle: '',
+        fillText(_text: string, x: number) {
+          calls.push(['fill', x, this.textAlign])
+        },
+        font: '',
+        lineJoin: '',
+        lineWidth: 0,
+        measureText: () => ({ width: 40 }),
+        restore: () => {},
+        roundRect: () => {},
+        save: () => {},
+        shadowBlur: 0,
+        shadowColor: '',
+        strokeStyle: '',
+        strokeText(_text: string, x: number) {
+          calls.push(['stroke', x, this.textAlign])
+        },
+        textAlign: 'start',
+      }
+      const data = { forceLabel: true, label: 'Alpha', size: 4, strong: true, x: 100, y: 100 }
+      const settings = { labelFont: 'Inter', labelSize: 13, labelWeight: '500' }
+      const label = renderer.settings.get('defaultDrawNodeLabel') as (...args: unknown[]) => void
+      const hover = renderer.settings.get('defaultDrawNodeHover') as (...args: unknown[]) => void
+      label(context, data, settings)
+      hover(context, data, settings)
+      renderer.container.remove()
+      return calls
+    }
+    expect(drawn('ltr')).toEqual([
+      ['stroke', 108, 'left'],
+      ['fill', 108, 'left'],
+      ['fill', 106, 'left'],
+    ])
+    expect(drawn('rtl')).toEqual([
+      ['stroke', 52, 'left'],
+      ['fill', 52, 'left'],
+      ['fill', 54, 'left'],
+    ])
   })
 
   test('names each group over its notes on a canvas of its own, unless asked not to', () => {

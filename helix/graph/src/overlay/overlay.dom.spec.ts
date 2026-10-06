@@ -97,6 +97,12 @@ describe('nameStart', () => {
   test('puts a name before its note where after it would run off the drawing', () => {
     expect(overlay.nameStart({ radius: 4, x: 380 }, 40, box, [], 400)).toBe(332)
   })
+
+  test('puts a name after its note in reading order, which is its left on a right-to-left page', () => {
+    expect(overlay.nameStart({ radius: 4, x: 100 }, 40, box, [], 400, true)).toBe(52)
+    /* And to its right where the left would run off the drawing. */
+    expect(overlay.nameStart({ radius: 4, x: 30 }, 40, box, [], 400, true)).toBe(38)
+  })
 })
 
 describe('colors', () => {
