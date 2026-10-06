@@ -18,6 +18,7 @@
  */
 
 import { VERSION } from '../../version.js'
+import { callListener } from '../call-listener/call-listener.js'
 
 /** The key the listener is kept under. `@fusion.dev/helix-diagnostics` names the same string. */
 export const USAGE_SLOT = Symbol.for('fusion.dev/helix/usage')
@@ -44,9 +45,6 @@ export const noteVersion = (): void => {
   store[VERSIONS_SLOT] = listed
 }
 
-/** Whether a listener's failure has been printed, so a failing listener prints once. */
-let told = false
-
 /**
  * Tells the listener, where there is one, that `element` has rendered for the
  * first time.
@@ -59,19 +57,5 @@ let told = false
  * should fail somebody's tests.
  */
 export const reportUsage = (element: HTMLElement): void => {
-  const listener = (globalThis as Record<symbol, unknown>)[USAGE_SLOT]
-  if (typeof listener !== 'function') {
-    return
-  }
-  try {
-    listener(element)
-  } catch (error) {
-    if (!told) {
-      told = true
-      console.error(
-        'helix: a usage listener threw, and the element rendered as usual. Later failures are not printed.',
-        error,
-      )
-    }
-  }
+  callListener(USAGE_SLOT, 'usage', 'the element rendered as usual', element)
 }
