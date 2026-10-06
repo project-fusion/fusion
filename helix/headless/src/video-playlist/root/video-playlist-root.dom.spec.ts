@@ -105,6 +105,19 @@ describe('a video playlist', () => {
     expect(heard).toEqual([{ previous: 'one', value: 'two' }])
   })
 
+  test('hands a listener the entry it moved to, with its clip', async () => {
+    const host = await list()
+    await host.updateComplete
+    const heard: (string | undefined)[] = []
+    host.addEventListener('helix-activate', () => {
+      const entry = (host as Playlist & { currentEntry?: Entry & { src: string } }).currentEntry
+      heard.push(entry?.src)
+    })
+    expect((host as Playlist & { currentEntry?: Entry }).currentEntry?.value).toBe('one')
+    host.requestActive('two')
+    expect(heard).toEqual(['/two.mp4'])
+  })
+
   test('only one entry is current, and it says so with aria-current', async () => {
     /* `aria-current` and not `aria-selected`, which belongs to the roles that
        have a selection. What is true of this row is that the player is on it. */

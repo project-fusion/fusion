@@ -225,6 +225,21 @@ describe('a control the platform has already refused', () => {
   })
 })
 
+describe('the full set of controls', () => {
+  test('full draws every control that acts on the video by itself, in its order', async () => {
+    const host = await player(
+      '<helix-headless-video extra-controls="full" label="A clip" src="/clip.mp4"></helix-headless-video>',
+    )
+    for (const name of ['rewind', 'forward', 'speed']) {
+      expect(part(host, name)).not.toBeNull()
+    }
+    // A set the player cannot see, and a file, are each named where wanted.
+    for (const name of ['previous', 'next', 'download']) {
+      expect(part(host, name)).toBeNull()
+    }
+  })
+})
+
 describe('asking for another item in a set', () => {
   const skipper = async () =>
     player(
