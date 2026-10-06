@@ -19,6 +19,7 @@
  */
 import { readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { join, relative, sep } from 'node:path'
+import { joinLines } from '@fusion.dev/scripts/join-lines'
 import { template } from '@fusion.dev/scripts/literal'
 
 /* `.examples` holds the sandbox's own files, `<slug>.html` and `<slug>.css`.
@@ -105,15 +106,13 @@ const stripComments = (css) => {
     out += c
     i += 1
   }
-  /* Indentation and blank runs only. Whitespace inside a line is left alone,
+  /* Indentation and blank lines. Whitespace inside a line is left alone,
      because that is where the descendant combinator lives. */
-  return out
+  const lines = out
     .split('\n')
-    .map((line) => line.trimEnd())
-    .filter((line, n, all) => line.trim() !== '' || (n > 0 && all[n - 1].trim() !== ''))
-    .map((line) => line.replace(/^\s+/, ''))
-    .join('\n')
-    .trim()
+    .map((line) => line.trim())
+    .filter((line) => line !== '')
+  return joinLines(lines)
 }
 
 const root = process.argv[2] ?? process.cwd()
