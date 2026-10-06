@@ -307,3 +307,114 @@ describe('a speed dial and the keys around it', () => {
     expect(focused(at(actions, 0))).toBe(at(actions, 2))
   })
 })
+
+/* Menu has sections; a dial's actions were one flat list. */
+describe('a speed dial with groups', () => {
+  test('names each group, and the arrows walk through every group in order', async () => {
+    const host = (await mount(
+      `<helix-headless-speed-dial label="Actions">
+        <button slot="trigger">Open</button>
+        <helix-headless-speed-dial-group label="Share">
+          <helix-headless-speed-dial-item value="mail">Mail</helix-headless-speed-dial-item>
+          <helix-headless-speed-dial-item value="link">Link</helix-headless-speed-dial-item>
+        </helix-headless-speed-dial-group>
+        <helix-headless-speed-dial-item value="delete">Delete</helix-headless-speed-dial-item>
+      </helix-headless-speed-dial>`,
+    )) as Dial
+    await host.updateComplete
+    const group = host.querySelector('helix-headless-speed-dial-group') as Dial
+    await group.updateComplete
+    const inner = part(group, 'group') as HTMLElement
+    expect([inner.getAttribute('role'), inner.getAttribute('aria-labelledby')]).toEqual([
+      'group',
+      'label',
+    ])
+    expect(part(group, 'label')?.textContent?.trim()).toBe('Share')
+
+    pressTrigger(host)
+    await host.updateComplete
+    await host.updateComplete
+    const order: string[] = []
+    for (let step = 0; step < 3; step += 1) {
+      const from = host.ownerDocument.activeElement as HTMLElement
+      from.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          bubbles: true,
+          cancelable: true,
+          composed: true,
+          key: 'ArrowDown',
+        }),
+      )
+      order.push((host.ownerDocument.activeElement as Action).value)
+    }
+    expect(order).toEqual(['link', 'delete', 'mail'])
+  })
+})
+
+/* React Aria's menu trigger takes `trigger="longPress"`: a press is the
+   trigger's own action and a held one opens the menu. */
+describe('a speed dial opened by a long press', () => {
+  const triggerSlot = (host: Dial): HTMLElement =>
+    host.shadowRoot?.querySelector('slot[name="trigger"]') as HTMLElement
+
+  test('leaves a quick press to the trigger, and opens on a held one without the press', async () => {
+    const { host } = await dial(' open-on="long-press"')
+    const own: string[] = []
+    host.querySelector('[slot="trigger"]')?.addEventListener('click', () => own.push('own'))
+    const slot = triggerSlot(host)
+    const pointer = (type: string) =>
+      slot.dispatchEvent(
+        new PointerEvent(type, {
+          bubbles: true,
+          button: 0,
+          clientX: 5,
+          clientY: 5,
+          composed: true,
+        }),
+      )
+
+    pointer('pointerdown')
+    pointer('pointerup')
+    pressTrigger(host)
+    await host.updateComplete
+    expect(host.open).toBe(false)
+
+    pointer('pointerdown')
+    await new Promise((resolve) => setTimeout(resolve, 560))
+    await host.updateComplete
+    expect(host.open).toBe(true)
+    pointer('pointerup')
+    /* The click the release makes is the long press's: neither the dial's
+       toggle nor the page's own handler on the trigger runs. */
+    slot.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, composed: true }))
+    await host.updateComplete
+    expect(host.open).toBe(true)
+  })
+
+  test('opens on Alt+Down from the keyboard, which a plain arrow does not', async () => {
+    const { host } = await dial(' open-on="long-press"')
+    press(host, 'ArrowDown')
+    await host.updateComplete
+    expect(host.open).toBe(false)
+    host.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        altKey: true,
+        bubbles: true,
+        cancelable: true,
+        key: 'ArrowDown',
+      }),
+    )
+    await host.updateComplete
+    expect(host.open).toBe(true)
+  })
+
+  test('the drawn trigger says how its actions are reached', async () => {
+    const host = (await mount(
+      `<helix-headless-speed-dial label="Compose" open-on="long-press"></helix-headless-speed-dial>`,
+    )) as Dial
+    await host.updateComplete
+    const trigger = part(host, 'trigger') as HTMLElement
+    const id = trigger.getAttribute('aria-describedby') ?? ''
+    expect(host.shadowRoot?.getElementById(id)?.textContent).toContain('Alt+Down')
+  })
+})

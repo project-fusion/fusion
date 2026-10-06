@@ -37,6 +37,7 @@
 }
 
 [part="actions"][data-placement$="-start"] {
+  --_speed-dial-align: flex-start;
   --_speed-dial-row: row;
 
   align-items: flex-start;

@@ -7,7 +7,7 @@
   background-color: var(--map-background-color, var(--helix-color-surface-sunken));
   block-size: var(--map-block-size, 24rem);
   border: var(--helix-border-thin) solid var(--map-border-color, var(--helix-color-border));
-  border-radius: var(--helix-radii-sm);
+  border-radius: var(--map-radius, var(--helix-radii-sm));
   box-sizing: border-box;
   display: grid;
   grid-template-rows: auto 1fr auto auto;
@@ -84,13 +84,14 @@
      color, and subtle text on a busy map reads as part of the map it is
      crediting. The header takes none, because what a consumer slots there is
      theirs and a rule we drew would fight their own. */
-  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
-  color: var(--helix-color-foreground-subtle);
+  border-block-start: var(--helix-border-thin) solid
+    var(--map-attribution-border-color, var(--helix-color-border));
+  color: var(--map-attribution-color, var(--helix-color-foreground-subtle));
   /* **A block, whatever was slotted**, so the hairline is the strip's width.
      A credit is written in a `helix-text` or a `<small>`, both inline, and
      an inline box's border ran under the words and stopped. */
   display: block;
-  font-size: var(--helix-text-xs);
+  font-size: var(--map-attribution-font-size, var(--helix-text-xs));
   padding: var(--helix-space-2xs) var(--helix-space-xs);
 }
 
@@ -119,7 +120,7 @@
   background-color: var(--helix-material-translucent);
   border-block-start: none;
   border-radius: var(--helix-radii-sm);
-  color: var(--helix-color-foreground-muted);
+  color: var(--map-attribution-color, var(--helix-color-foreground-muted));
   overflow: hidden;
   padding: var(--helix-space-none) var(--helix-space-xs);
   text-overflow: ellipsis;
@@ -217,8 +218,8 @@
 /* **Pressed while the map is tilted**, in the brand's fill, so the one
    toggle among the buttons says which view is showing. */
 [part="tilt"][aria-pressed="true"] {
-  background-color: var(--helix-color-primary-surface);
-  border-color: var(--helix-color-primary-surface);
+  background-color: var(--map-chosen-color, var(--helix-color-primary-surface));
+  border-color: var(--map-chosen-color, var(--helix-color-primary-surface));
   color: var(--helix-color-foreground-on-primary);
 }
 
@@ -278,10 +279,10 @@
   transform: rotate(var(--map-needle-turn, 0deg));
 }
 [part="needle"] [data-end="north"] {
-  fill: var(--helix-color-danger);
+  fill: var(--map-needle-north-color, var(--helix-color-danger));
 }
 [part="needle"] [data-end="south"] {
-  fill: var(--helix-color-foreground-muted);
+  fill: var(--map-needle-south-color, var(--helix-color-foreground-muted));
 }
 
 /* ========================================================= layers menu === */
@@ -296,8 +297,11 @@
   box-shadow: var(--helix-shadow-floating);
   color: var(--helix-color-foreground);
   display: grid;
-  gap: var(--helix-space-sm);
-  inline-size: min(calc(var(--helix-size-control-lg) * 6), 70vw);
+  gap: var(--map-layers-menu-gap, var(--helix-space-sm));
+  inline-size: var(
+    --map-layers-menu-inline-size,
+    min(calc(var(--helix-size-control-lg) * 6), 70vw)
+  );
   inset-block-start: 0;
   inset-inline-end: calc(100% + var(--helix-space-2xs));
   /* **No taller than the map, and scrolled past that.** The frame clips what
@@ -305,7 +309,7 @@
      off, and they stayed focusable where nobody could see them. */
   max-block-size: calc(var(--map-block-size, 24rem) - var(--helix-space-sm) * 2);
   overflow-y: auto;
-  padding: var(--helix-space-sm);
+  padding: var(--map-layers-menu-padding, var(--helix-space-sm));
   position: absolute;
 }
 
@@ -371,7 +375,7 @@
 }
 
 [part="map-type"]:has(input:checked) [part="map-type-preview"] {
-  border-color: var(--helix-color-primary-surface);
+  border-color: var(--map-chosen-color, var(--helix-color-primary-surface));
 }
 
 [part="map-type"]:has(input:focus-visible) [part="map-type-preview"] {
@@ -427,7 +431,7 @@
 }
 
 [part="layer-choice"][aria-pressed="true"] [part="layer-icon"] {
-  border-color: var(--helix-color-primary-surface);
+  border-color: var(--map-chosen-color, var(--helix-color-primary-surface));
 }
 
 [part="layer-choice"]:focus-visible [part="layer-icon"] {

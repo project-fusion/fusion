@@ -1,6 +1,7 @@
 import {
   customElement,
   fillTemplate,
+  focusItemOf,
   formatNumbers,
   HelixActivateEvent,
   HelixBeforeChangeEvent,
@@ -17,7 +18,6 @@ import {
   hostAria,
   KeyboardNavigationController,
   MixinViewport,
-  type NavigableItem,
   requestChange,
   type ViewportControlsPlacement,
   type ViewportGestureLabels,
@@ -233,7 +233,10 @@ const SETTLES = 400
  *
  * @cssstate fullscreen - The map fills the screen.
  * @cssstate idle - The user has been still long enough for the header and footer to fade.
+ * @cssstate layers-open - The layers menu is open.
  * @cssstate ready - The map has been drawn whole, after `helix-map-ready`.
+ * @cssstate rotated - The map is turned away from north, by `bearing`.
+ * @cssstate tilted - The map is tilted, by `pitch`, rather than looking straight down.
  * @cssstate sharing - The page keeps the plain wheel and one finger, with `gestures="cooperative"` or while a map with `gestures="activate"` waits to be pressed.
  * @cssstate using - A map with `gestures="activate"` has been pressed and has the gestures.
  */
@@ -657,13 +660,8 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
      frame's region, so a press on a marker walks rather than pans. */
   protected readonly keys = new KeyboardNavigationController(this, {
     items: () =>
-      this.markers.map(
-        (marker, at): NavigableItem => ({
-          /* The marker itself, as a browser retargets a press from its
-             shadow root to it, or a node inside that root, as an engine that
-             does not retarget reports it. */
-          contains: (node) =>
-            node !== null && (marker.contains(node) || marker.shadowRoot?.contains(node) === true),
+      this.markers.map((marker, at) =>
+        focusItemOf(marker, {
           /* Hidden inside a cluster, which the walk reaches instead, or with
              no place to stand, which a stylesheet cannot show: a walk that
              stopped there moved the stop to a marker nothing could focus. */
@@ -672,12 +670,15 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
              arrive: a focus event from inside a marker's own shadow root is
              one an engine can fail to carry out to the frame, and the stop
              is the walk's to keep. */
-          focusItem: () => {
+          focus: () => {
             this.stop = at
             marker.focus()
           },
-          select: () => {},
-          selected: false,
+          /* The marker itself, as a browser retargets a press from its
+             shadow root to it, or a node inside that root, as an engine that
+             does not retarget reports it. */
+          owns: (node) =>
+            node !== null && (marker.contains(node) || marker.shadowRoot?.contains(node) === true),
         }),
       ),
     origin: 'focus',
@@ -1148,6 +1149,11 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     hostAria(this.internals, { label: this.label })
     this.toggleState('fullscreen', this.filled)
     this.toggleState('idle', this.resting)
+    this.toggleState('layers-open', this.layersOpen)
+    /* Whole degrees, as the readout says them: a map settling a hair off
+       north is facing north to a reader, and to a stylesheet. */
+    this.toggleState('rotated', Math.round(this.bearing) % 360 !== 0)
+    this.toggleState('tilted', Math.round(this.pitch) !== 0)
   }
 
   /**

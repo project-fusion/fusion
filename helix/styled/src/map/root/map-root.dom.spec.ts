@@ -69,3 +69,26 @@ describe('map frame', () => {
     })
   }
 })
+
+describe('map frame hooks', () => {
+  /* Browser only: happy-dom computes no styles from a shadow sheet. */
+  const run = hasLayout() ? test : (): void => {}
+
+  run('the frame, the credit, the needle and the layers menu take their hooks', async () => {
+    const frame = (await mount(
+      `<helix-map label="A" controls="zoom tilt compass layers" pitch="30" style="--map-radius: 3px; --map-attribution-color: rgb(1, 2, 3); --map-attribution-font-size: 17px; --map-needle-north-color: rgb(7, 8, 9); --map-layers-menu-padding: 5px; --map-chosen-color: rgb(13, 14, 15)">
+        <canvas></canvas><span slot="attribution">Credit</span>
+        <helix-map-route label="Route"></helix-map-route>
+      </helix-map>`,
+    )) as Frame
+    await frame.updateComplete
+    const style = (name: string): CSSStyleDeclaration =>
+      getComputedStyle(frame.shadowRoot?.querySelector(name) as Element)
+    const credit = getComputedStyle(frame.querySelector('[slot="attribution"]') as Element)
+    expect(style('[part="region"]').borderTopLeftRadius).toBe('3px')
+    expect([credit.color, credit.fontSize]).toEqual(['rgb(1, 2, 3)', '17px'])
+    expect(style('[part="needle"] [data-end="north"]').fill).toBe('rgb(7, 8, 9)')
+    expect(style('[part~="tilt"]').backgroundColor).toBe('rgb(13, 14, 15)')
+    expect(style('[part="layers-menu"]').padding).toBe('5px')
+  })
+})

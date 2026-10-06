@@ -25,6 +25,7 @@ import { styles } from './speed-dial-item.css.js'
  * @cssproperty --speed-dial-label-background-color - Fill of the chip holding the action's name.
  * @cssproperty --speed-dial-label-color - Color of the action's name.
  * @cssproperty --speed-dial-label-font-size - Size of the action's name.
+ * @cssproperty --speed-dial-shortcut-color - Color of the shortcut drawn after the action's name.
  */
 @customElement('helix-speed-dial-item')
 export class HelixSpeedDialItem extends HelixHeadlessSpeedDialItem {
