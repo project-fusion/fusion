@@ -322,7 +322,9 @@ describe('a speed dial with groups', () => {
       </helix-headless-speed-dial>`,
     )) as Dial
     await host.updateComplete
-    const group = host.querySelector('helix-headless-speed-dial-group') as Dial
+    const group = host.querySelector('helix-headless-speed-dial-group') as HTMLElement & {
+      updateComplete: Promise<boolean>
+    }
     await group.updateComplete
     const inner = part(group, 'group') as HTMLElement
     expect([inner.getAttribute('role'), inner.getAttribute('aria-labelledby')]).toEqual([
