@@ -56,8 +56,10 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
  * @documentation https://fusion.dev/helix/components/notifications
  *
  * @slot - The notifications.
+ * @slot empty - Replaces the words of `empty-text` in the `empty` part, such as a picture and a line of your own. The live region still says `empty-text`.
  * @slot footer - Below the list, for a link to everything.
  * @slot header - Above the list, for a title and the mark-all control.
+ * @slot loading - Replaces the words of `loading-text` in the `loading` part, such as a loader. The live region still says `loading-text`.
  *
  * @event {HelixDismissEvent} helix-dismiss - Fired when the user dismisses a row. The row dispatches it, and you can listen for it on the feed. Cancelable: cancel it to keep the row.
  * @event {HelixLoadMoreEvent} helix-load-more - Fired when a reader presses the `load-more` button, asking for the next page of the feed.
@@ -72,6 +74,8 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
  * @csspart mark-all - The control that marks everything read.
  * @csspart more - The button after the list that asks for more, while `load-more` is set. It is `aria-disabled` while the feed is loading.
  *
+ * @cssstate empty - While the feed holds no notification and is not loading. Never on the server, which cannot count the rows.
+ * @cssstate loading - While `loading` is set.
  * @cssstate media - While a notification in the list holds something in its media slot, so every row keeps that column.
  */
 @customElement('helix-headless-notifications')
@@ -289,7 +293,8 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
       return
     }
     /* Hydrating a server's root, which routes by name: each row is sent to
-       the list, and the header and footer already name theirs. */
+       the list, and the header, the footer and the two status lines already
+       name theirs. */
     if (this.assignsByName) {
       for (const row of this.rows) {
         this.route(row, 'items')
@@ -297,7 +302,7 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
       return
     }
     list.assign(...this.rows)
-    for (const name of ['header', 'footer']) {
+    for (const name of ['header', 'footer', 'empty', 'loading']) {
       const slot = root?.querySelector?.<HTMLSlotElement>(`slot[name="${name}"]`)
       slot?.assign?.(...[...this.children].filter((child) => child.getAttribute('slot') === name))
     }
@@ -398,6 +403,21 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     hostAria(this.internals, { label: this.label || 'Notifications', role: 'region' })
+    this.toggleState('loading', this.loading)
+    this.toggleState('empty', !this.loading && this.childrenKnown && this.items.length === 0)
+  }
+
+  /**
+   * The empty or the loading line, each around a slot of the same name whose
+   * fallback is the words, so a page can put its own in.
+   */
+  protected override renderStatus(hasContent: boolean): TemplateResult | typeof nothing {
+    if (!this.loading && hasContent) {
+      return nothing
+    }
+    return this.loading
+      ? html`<p part="loading"><slot name="loading">${this.loadingText}</slot></p>`
+      : html`<p part="empty"><slot name="empty">${this.emptyText}</slot></p>`
   }
 
   /**
