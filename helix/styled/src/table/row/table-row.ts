@@ -18,6 +18,8 @@ import '../../checkbox/index.js'
  * @documentation https://fusion.dev/helix/components/table
  *
  * @slot - The row's cells.
+ *
+ * @cssproperty --table-row-hover-background-color - The wash across the cells of a row with `href` under the pointer.
  */
 @customElement('helix-table-row')
 export class HelixTableRow extends HelixHeadlessTableRow {

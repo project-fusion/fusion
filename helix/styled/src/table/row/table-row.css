@@ -26,3 +26,16 @@
     var(--helix-color-background)
   );
 }
+
+/* A row with `href` is a link across every cell: the pointer says so, and the
+   cells take a wash under it, since the row has no box of its own. */
+:host(:state(link)) ::slotted(*) {
+  cursor: pointer;
+}
+
+:host(:state(link):hover) ::slotted(*) {
+  background-color: var(
+    --table-row-hover-background-color,
+    color-mix(in oklab, var(--helix-color-foreground) 5%, transparent)
+  );
+}
