@@ -380,3 +380,21 @@ describe('the toggles as one tab stop', () => {
     expect(host.shadowRoot?.activeElement).toBe(buttons(host)[0])
   })
 })
+
+/* A legend whose `for` named nothing drew no keys and said nothing. */
+describe('a legend whose `for` names no table', () => {
+  test('is reported once in development, by its tag and the id', async () => {
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      await mount('<helix-headless-legend for="nowhere"></helix-headless-legend>')
+      await new Promise((done) => setTimeout(done, 5))
+    } finally {
+      console.warn = original
+    }
+    expect(warnings.filter((one) => one.includes('names no table'))).toEqual([
+      expect.stringContaining('<helix-headless-legend for="nowhere">'),
+    ])
+  })
+})

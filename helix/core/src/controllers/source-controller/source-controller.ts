@@ -1,4 +1,5 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
+import { auditSource } from '#audit-source'
 import { elementById } from '../../utils/element-by-id/element-by-id.js'
 import {
   type Row,
@@ -255,6 +256,8 @@ export class SourceController implements ReactiveController {
 
   hostConnected(): void {
     this.watch()
+    /* A `for` that names nothing once the page loaded, said in development. */
+    auditSource(this.host, () => this.resolve())
   }
 
   /* The drawing a hydrating render left out, asked for once it is done. */

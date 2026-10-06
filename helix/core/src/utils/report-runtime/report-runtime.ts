@@ -46,6 +46,8 @@ export type RuntimeKind =
   | 'missing-row-key'
   /** A stencil names parts the shape does not have. */
   | 'missing-stencil-parts'
+  /** A chart, a legend or a sparkline names no table with `for`. Development builds only. */
+  | 'missing-table'
   /** A Skip Link's `href` names no element in its tree, so a press moves focus nowhere. */
   | 'missing-target'
   /** A tooltip's `for` names no element in its own tree. */
