@@ -101,15 +101,20 @@
   /* Square rows, because they run the full width of the panel. */
   --option-radius: var(--helix-radii-none);
 
-  /* The trigger's width, with the content as the floor. From the controller
-     rather than from a percentage: the panel is positioned `fixed`, so `100%`
-     would be the viewport rather than the field. */
-  inline-size: var(--floating-anchor-inline-size, 100%);
+  /* As wide as its content, with the trigger's width as the floor. The width
+     comes from the controller rather than from a percentage: the panel is
+     positioned `fixed`, so `100%` would be the viewport rather than the field. */
+  inline-size: max-content;
   /* Never past the screen's edges, which the panel is kept inside of by the
-     same margin either way it opens: a trigger as wide as a phone's screen
-     opened a list that ran past its end edge. */
+     same margin either way it opens. The floor is capped as well, because CSS
+     lets a minimum win over a maximum: a trigger as wide as a phone's screen,
+     or an option whose words are wider than it, opened a list that ran past
+     its end edge. A row too long for the room is cut with an ellipsis. */
   max-inline-size: calc(100vw - var(--helix-space-xs) * 2);
-  min-inline-size: max-content;
+  min-inline-size: min(
+    var(--floating-anchor-inline-size, 100%),
+    calc(100vw - var(--helix-space-xs) * 2)
+  );
   /* Never taller than the room under the trigger, for the same reason as the
      width: the space is measured, not declared. */
   max-block-size: var(--floating-available-block-size, none);
