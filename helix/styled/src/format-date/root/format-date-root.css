@@ -1,9 +1,7 @@
 /* A timestamp is a piece of text and takes the text around it: no family, no
-   size, no color. What a design system has to add here is one thing the reader
-   would otherwise see going wrong. */
-:host {
-  display: inline;
-}
+   size, no color, and the inline display every element starts with, which is
+   why no rule here sets one. What a design system has to add here is one thing
+   the reader would otherwise see going wrong. */
 
 /* Tabular figures, but only where the reading changes under the reader.
  *

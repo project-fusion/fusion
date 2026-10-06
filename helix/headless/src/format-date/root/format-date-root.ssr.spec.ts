@@ -59,6 +59,31 @@ describe('format-date server output', () => {
     expect(rendered(markup, TAG)).toContain('Jan 1, 2020')
   })
 
+  test('with `fields`, each field of the date is a part the server drew', () => {
+    const markup = ssr(
+      html`<helix-headless-format-date
+        date=${at}
+        day="numeric"
+        fields
+        locale="en-US"
+        month="long"
+        time-zone="UTC"
+        year="numeric"
+      ></helix-headless-format-date>`,
+    )
+    const drawn = rendered(markup, TAG)
+    expect(drawn).toContain('part="month"')
+    expect(drawn).toContain('part="day"')
+    expect(drawn).toContain('part="year"')
+  })
+
+  test('without it, the date is one run of text', () => {
+    const markup = ssr(
+      html`<helix-headless-format-date date=${at} locale="en-US" time-zone="UTC" year="numeric"></helix-headless-format-date>`,
+    )
+    expect(rendered(markup, TAG)).not.toContain('part="year"')
+  })
+
   test('the two options a time of day adds reach the formatter as well', () => {
     /* Every option here is handed to `Intl.DateTimeFormat` and read nowhere
        else, so the only way to tell one that is wired from one that is not is

@@ -19,8 +19,6 @@ import { styles } from './format-date-root.css.js'
  */
 @customElement('helix-format-date')
 export class HelixFormatDate extends HelixHeadlessFormatDate {
-  static override tier = 'helix-'
-
   static override styles: CSSResultGroup = styles
 }
 

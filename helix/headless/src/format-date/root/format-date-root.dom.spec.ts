@@ -270,3 +270,45 @@ describe('a date in a page written in another language', () => {
     expect(part(own, 'time')?.textContent).toBe('August 4, 2026')
   })
 })
+
+describe('a date drawn field by field', () => {
+  /* Shoelace and Web Awesome draw a date as one run of text. With `fields`
+     each field here is a part, so a page can set the year apart with
+     `::part(year)`; measured before this, `part(element, 'year')` was null. */
+  test('puts each field in a part of its own, and the words are the same', async () => {
+    const element = await stamp(
+      `<helix-headless-format-date fields locale="en-US" weekday="long" month="long" day="numeric"
+        year="numeric" time-zone="UTC" date="2020-01-01T00:00:00.000Z"></helix-headless-format-date>`,
+    )
+    expect(part(element, 'weekday')?.textContent).toBe('Wednesday')
+    expect(part(element, 'month')?.textContent).toBe('January')
+    expect(part(element, 'day')?.textContent).toBe('1')
+    expect(part(element, 'year')?.textContent).toBe('2020')
+    expect(part(element, 'time')?.textContent).toBe('Wednesday, January 1, 2020')
+  })
+
+  test('and a time of day the same way', async () => {
+    const element = await stamp(
+      `<helix-headless-format-date fields locale="en-US" hour="numeric" minute="2-digit" hour-cycle="h12"
+        time-zone="UTC" date="2020-01-01T15:30:00.000Z"></helix-headless-format-date>`,
+    )
+    expect(part(element, 'hour')?.textContent).toBe('3')
+    expect(part(element, 'minute')?.textContent).toBe('30')
+    expect(part(element, 'day-period')?.textContent).toBe('PM')
+  })
+
+  test('but a reading in words is one phrase, with no parts inside it', async () => {
+    const element = await stamp(
+      `<helix-headless-format-date fields relative="long" date="${at}"></helix-headless-format-date>`,
+    )
+    expect(part(element, 'time')?.children.length).toBe(0)
+  })
+
+  test('and without `fields` a date is one run of text, as it was', async () => {
+    const element = await stamp(
+      `<helix-headless-format-date locale="en-US" year="numeric" date="2020-06-01"></helix-headless-format-date>`,
+    )
+    expect(part(element, 'time')?.childNodes.length).toBeLessThanOrEqual(3)
+    expect(part(element, 'year')).toBeNull()
+  })
+})
