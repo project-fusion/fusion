@@ -103,6 +103,23 @@ describe('an object inspector', () => {
     expect(active(host)).toBe(rows(host)[0])
   })
 
+  test('a key that leaves the row where it is does not pull focus back later', async () => {
+    const host = await inspector()
+    rows(host)[0]?.focus()
+    const outside = document.createElement('button')
+    document.body.append(outside)
+    for (const key of ['ArrowUp', 'Home', 'PageUp']) {
+      await press(host, key)
+      expect(host.shadowRoot?.activeElement === rows(host)[0]).toBe(true)
+      outside.focus()
+      host.requestUpdate()
+      await host.updateComplete
+      expect(document.activeElement === outside).toBe(true)
+      rows(host)[0]?.focus()
+    }
+    outside.remove()
+  })
+
   test('the row the keys are on is a part of its own, and the name moves with it', async () => {
     const host = await inspector()
     const named = (): HTMLElement[] =>
