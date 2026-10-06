@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { cleanCode, overwriteCode, readTyped } from './code.js'
+import { caretTo, cleanCode, codeVerdict, overwriteCode, readTyped } from './code.js'
 
 describe('the characters a code keeps', () => {
   test('are the digits of a numeric code, trimmed', () => {
@@ -48,5 +48,57 @@ describe('a run written over the code', () => {
 
   test('drops what runs past the last box', () => {
     expect(overwriteCode('12', 2, '345678', 4)).toEqual({ caret: 3, code: '1234' })
+  })
+})
+
+/* The verdict and the caret keys were written inside the component, so only a
+   page could hold them. */
+describe('codeVerdict', () => {
+  const messages = { missing: '', short: '' }
+
+  test('a required field with nothing in it is missing', () => {
+    expect(codeVerdict('', 6, true, messages)).toEqual([
+      'valueMissing',
+      'Please fill in this field.',
+    ])
+    expect(codeVerdict('', 6, false, messages)).toBe('')
+  })
+
+  test('a code with fewer characters than boxes is too short', () => {
+    expect(codeVerdict('123', 6, false, messages)).toEqual([
+      'tooShort',
+      'Please enter all 6 characters.',
+    ])
+    expect(codeVerdict('123456', 6, true, messages)).toBe('')
+  })
+
+  test("in the page's words where it set them", () => {
+    expect(codeVerdict('', 4, true, { missing: 'Enter the code', short: '' })).toEqual([
+      'valueMissing',
+      'Enter the code',
+    ])
+    expect(codeVerdict('1', 4, false, { missing: '', short: '{length} digits, please' })).toEqual([
+      'tooShort',
+      '4 digits, please',
+    ])
+  })
+})
+
+describe('caretTo', () => {
+  test('moves one box with the arrows, left to right whatever the page', () => {
+    expect(caretTo('ArrowRight', 2, 5)).toBe(3)
+    expect(caretTo('ArrowLeft', 2, 5)).toBe(1)
+  })
+
+  test('goes to the ends with Home and End, and stays inside them', () => {
+    expect(caretTo('Home', 3, 5)).toBe(0)
+    expect(caretTo('End', 0, 5)).toBe(5)
+    expect(caretTo('ArrowLeft', 0, 5)).toBe(0)
+    expect(caretTo('ArrowRight', 5, 5)).toBe(5)
+  })
+
+  test('moves nothing for any other key', () => {
+    expect(caretTo('a', 2, 5)).toBeUndefined()
+    expect(caretTo('ArrowUp', 2, 5)).toBeUndefined()
   })
 })

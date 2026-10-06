@@ -34,7 +34,7 @@ import { property, state } from 'lit/decorators.js'
 import { live } from 'lit/directives/live.js'
 import { html } from 'lit/static-html.js'
 import { type ChannelName, channelFields, writeChannel } from '../channels.js'
-import { hueAt } from '../wheel.js'
+import { areaAt, hueAt } from '../wheel.js'
 /* Relative, so this registers the base slider and the styled file's identical
    import registers the styled one. `tier` picks which the template asks for. */
 import '../../button/index.js'
@@ -740,14 +740,9 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
     if (box.width === 0 || box.height === 0) {
       return
     }
-    /* Saturation runs along the line, the way the two ramps under the square
-       do, being native ranges: on a right-to-left page it grows toward the
-       left. The pointer is physical, so it is turned here, where the handle and
-       the saturation range are logical already. */
-    const fromLeft = Math.min(1, Math.max(0, (event.clientX - box.left) / box.width))
-    const across = isRtl(grid) ? 1 - fromLeft : fromLeft
-    const down = Math.min(1, Math.max(0, (event.clientY - box.top) / box.height))
-    this.move({ brightness: Math.round((1 - down) * 100), saturation: Math.round(across * 100) })
+    /* The pointer is physical, so the line is turned here, where the handle
+       and the saturation range are logical already. */
+    this.move(areaAt(event.clientX, event.clientY, box, isRtl(grid)))
   }
 
   /**

@@ -1,12 +1,7 @@
-import {
-  customElement,
-  fillTemplate,
-  focusTarget,
-  formatNumber,
-  HelixElement,
-} from '@fusion.dev/helix-core'
+import { customElement, focusTarget, HelixElement } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { badgeBlank, badgeCapped, badgeText, badgeWords } from '../count.js'
 
 /**
  * @summary A count or a dot pinned to the corner of another element.
@@ -120,35 +115,22 @@ export class HelixHeadlessBadge extends HelixElement {
 
   /** Whether the value counts nothing, in which case there is no mark. */
   private get blank(): boolean {
-    return this.given.trim() !== '' && Number(this.given) === 0
+    return badgeBlank(this.given)
   }
 
   /** Whether the count is past `max`, which the mark shows as `{max}+`. */
   private get capped(): boolean {
-    const count = Number(this.given)
-    return this.max !== undefined && Number.isFinite(count) && count > this.max
+    return badgeCapped(this.given, this.max)
   }
 
   /** What the indicator reads, once the cap has been applied. */
   private get text(): string {
-    const write = (count: number): string =>
-      this.formatOptions ? formatNumber(count, this.locale, this.formatOptions) : String(count)
-    if (this.capped) {
-      return `${write(this.max as number)}+`
-    }
-    const count = Number(this.given)
-    return this.formatOptions && this.given.trim() !== '' && Number.isFinite(count)
-      ? write(count)
-      : this.given
+    return badgeText(this.given, this.max, this.locale, this.formatOptions)
   }
 
   /** What a reader hears for the mark, or nothing for a blank or unnamed one. */
   private get words(): string {
-    const text = this.text
-    if (this.blank || (text === '' && this.label === '')) {
-      return ''
-    }
-    return fillTemplate(this.label, { count: text }) || text
+    return badgeWords(this.text, this.label, this.blank)
   }
 
   /** The control the badge describes, while it describes one. */
@@ -296,7 +278,7 @@ export class HelixHeadlessBadge extends HelixElement {
         data-blank=${blank ? '' : nothing}
         data-single=${text.length <= 1 ? '' : nothing}
         role="status"
-        aria-label=${announced ? fillTemplate(this.label, { count: text }) || text : nothing}
+        aria-label=${announced ? this.words : nothing}
         >${blank ? html`<span aria-hidden="true">${text}</span>` : text}</span
       >`
   }

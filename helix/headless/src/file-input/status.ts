@@ -1,3 +1,5 @@
+import { clamp } from '@fusion.dev/helix-core'
+
 /**
  * How one file's upload is going, as a page reports it to File Input. The
  * field does not upload anything: the page does, and says how it is going.
@@ -19,7 +21,7 @@ export interface FileStatus {
 export const barOf = (status: FileStatus): number | 'unmeasured' | undefined => {
   const { progress, state } = status
   if (typeof progress === 'number' && Number.isFinite(progress)) {
-    return Math.min(1, Math.max(0, progress))
+    return clamp(progress, 0, 1)
   }
   return state === 'uploading' ? 'unmeasured' : undefined
 }

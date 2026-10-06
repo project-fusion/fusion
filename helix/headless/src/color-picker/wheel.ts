@@ -1,3 +1,5 @@
+import { clamp } from '@fusion.dev/helix-core'
+
 /** A box on the screen, as `getBoundingClientRect` gives one. */
 export interface WheelBox {
   height: number
@@ -20,4 +22,25 @@ export const hueAt = (x: number, y: number, box: WheelBox): number => {
   const down = y - (box.top + box.height / 2)
   const degrees = Math.round((Math.atan2(across, -down) * 180) / Math.PI)
   return (degrees + 360) % 360
+}
+
+/**
+ * The saturation and brightness at a point in the color square, 0 to 100:
+ * brightness falls downward, and saturation runs along the line, the way the
+ * two ramps under the square do, being native ranges. On a right-to-left page
+ * (`rtl`) it grows toward the left. A point outside the square is held to its
+ * edge.
+ */
+export const areaAt = (
+  x: number,
+  y: number,
+  box: WheelBox,
+  rtl: boolean,
+): { brightness: number; saturation: number } => {
+  const fromLeft = clamp((x - box.left) / box.width, 0, 1)
+  const down = clamp((y - box.top) / box.height, 0, 1)
+  return {
+    brightness: Math.round((1 - down) * 100),
+    saturation: Math.round((rtl ? 1 - fromLeft : fromLeft) * 100),
+  }
 }
