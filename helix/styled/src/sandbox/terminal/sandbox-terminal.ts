@@ -29,6 +29,9 @@ interface Entry extends ConsoleDetail {
 /** How many lines are kept. Older ones fall off the top. */
 const LIMIT = 200
 
+/** Keeps an event inside the shadow root it started in. */
+const stop = (event: Event): void => event.stopPropagation()
+
 /**
  * @summary A panel that shows what the previewed example wrote to the console.
  *
@@ -181,6 +184,10 @@ export class HelixSandboxTerminal extends HelixElement {
    * Takes the level the reader chose in the filter, unless a listener
    * refused it, and then says so with the select's own `change`, which stops
    * at the shadow root otherwise. A refusal puts the select back.
+   *
+   * The select's `input` is stopped where it starts, as Pagination's is. It is
+   * composed and comes first, so it left this element before
+   * `helix-before-change` and still left it when the change was refused.
    */
   private readonly handleLevel = (event: Event): void => {
     const field = event.target as HTMLSelectElement
@@ -205,7 +212,7 @@ export class HelixSandboxTerminal extends HelixElement {
       return nothing
     }
     return html`<div part="controls">
-      <select part="filter" aria-label=${this.levelLabel} @change=${this.handleLevel}>
+      <select part="filter" aria-label=${this.levelLabel} @change=${this.handleLevel} @input=${stop}>
         ${LEVELS.map(
           (one) =>
             html`<option value=${one} ?selected=${(this.level ?? 'log') === one}>

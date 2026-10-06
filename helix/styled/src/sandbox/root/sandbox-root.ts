@@ -83,6 +83,8 @@ const PANEL_MAX = 0.8
  * @cssproperty --sandbox-grab - The invisible width of a divider's drag target.
  * @cssproperty --sandbox-min-block-size - Minimum height of the sandbox.
  * @cssproperty --sandbox-separator-color - Color of the divider.
+ *
+ * @cssstate panel-collapsed - While there is a panel and it is no taller than `panel-collapsed-size`.
  */
 @customElement('helix-sandbox')
 export class HelixSandbox extends HelixElement {
@@ -238,13 +240,17 @@ export class HelixSandbox extends HelixElement {
           this.requestUpdate()
         })
 
-  /** The panel as a share of the body, which is what the splitter takes. */
-  private get panelShare(): number {
-    const size = Number.isFinite(this.panelSize) ? this.panelSize : DEFAULT_PANEL
+  /**
+   * A panel height as a share of the body, which is what the splitter takes,
+   * held to what the panel may have. A height that is no number is the
+   * default one.
+   */
+  private shareOf(size: number): number {
     if (this.bodyHeight <= 0) {
       return 0
     }
-    return Math.min(PANEL_MAX * 100, Math.max(0, (size / this.bodyHeight) * 100))
+    const panel = Number.isFinite(size) ? size : DEFAULT_PANEL
+    return Math.min(PANEL_MAX * 100, Math.max(0, (panel / this.bodyHeight) * 100))
   }
 
   /**
@@ -255,16 +261,12 @@ export class HelixSandbox extends HelixElement {
    * that case, because a boundary needs two sides.
    */
   private get panelPosition(): number {
-    return this.hasPanel ? 100 - this.panelShare : 100
+    return this.hasPanel ? 100 - this.shareOf(this.panelSize) : 100
   }
 
   /** Where the panel divider goes on a reset, in the splitter's own units. */
   private get homePanelPosition(): number {
-    const panel = Number.isFinite(this.defaultPanelSize) ? this.defaultPanelSize : DEFAULT_PANEL
-    if (!this.hasPanel || this.bodyHeight <= 0) {
-      return 100
-    }
-    return 100 - Math.min(PANEL_MAX * 100, Math.max(0, (panel / this.bodyHeight) * 100))
+    return this.hasPanel ? 100 - this.shareOf(this.defaultPanelSize) : 100
   }
 
   /** `panel-collapsed-size` in the units the splitter works in. */
@@ -452,7 +454,9 @@ export class HelixSandbox extends HelixElement {
   }
 
   /**
-   * Asks for the panes' divider to settle here, and moves it unless refused.
+   * Asks for a divider to settle here, and moves it unless refused: the
+   * panes' divider as `split`, a share, and the panel's as `panelSize`, in
+   * pixels, each with a `before` event and an `after` one of its own.
    *
    * When it settles, not while it moves. A drag is a stream of positions and
    * only the one it ends at is a preference; announcing each would ask whoever
@@ -479,37 +483,38 @@ export class HelixSandbox extends HelixElement {
    * moved.** Both dividers are this element's, so `composedPath()[0]` is the same
    * host for either and the event name is the only thing that can separate them.
    */
-  private requestSplit(next: number): boolean {
-    const was = this.split
+  private request(
+    key: 'panelSize' | 'split',
+    next: number,
+    before: new (detail: { value: string }) => Event,
+    after: new (detail: { value: string }) => Event,
+  ): void {
+    const was = this[key]
     const accepted = requestChange({
-      apply: (value) => {
-        this.split = value
+      apply: (value: number) => {
+        this[key] = value
       },
-      event: (value) => new HelixBeforeSplitEvent({ value: String(value) }),
+      event: (value) => new before({ value: String(value) }),
       host: this,
       next,
     })
-    if (accepted && this.split !== was) {
-      this.dispatchEvent(new HelixSplitEvent({ value: String(this.split) }))
+    if (accepted && this[key] !== was) {
+      this.dispatchEvent(new after({ value: String(this[key]) }))
     }
-    return accepted
   }
 
-  /** As `requestSplit`, for the panel, whose value is pixels rather than a share. */
-  private requestPanelSize(next: number): boolean {
-    const was = this.panelSize
-    const accepted = requestChange({
-      apply: (value) => {
-        this.panelSize = value
-      },
-      event: (value) => new HelixBeforePanelResizeEvent({ value: String(value) }),
-      host: this,
-      next,
-    })
-    if (accepted && this.panelSize !== was) {
-      this.dispatchEvent(new HelixPanelResizeEvent({ value: String(this.panelSize) }))
+  /**
+   * Takes a request a splitter of this sandbox made for itself, stopped and
+   * refused, and gives its value. Gives nothing for one that came up from
+   * something slotted into a pane, which passes through untouched.
+   */
+  private claim(event: Event): string | undefined {
+    if (event.target !== event.currentTarget) {
+      return undefined
     }
-    return accepted
+    event.stopPropagation()
+    event.preventDefault()
+    return (event as HelixBeforeResizeEvent).detail.value
   }
 
   /**
@@ -542,31 +547,30 @@ export class HelixSandbox extends HelixElement {
    * anyway.
    */
   private readonly handlePanesChange = (event: Event): void => {
-    if (event.target !== event.currentTarget) {
+    const value = this.claim(event)
+    if (value === undefined) {
       return
     }
-    const { value } = (event as HelixBeforeResizeEvent).detail
-    event.stopPropagation()
-    event.preventDefault()
-    this.requestSplit(Number(value))
+    this.request('split', Number(value), HelixBeforeSplitEvent, HelixSplitEvent)
     this.answer(event.currentTarget, this.split)
   }
 
   private readonly handlePanelChange = (event: Event): void => {
-    if (event.target !== event.currentTarget) {
+    const value = this.claim(event)
+    if (value === undefined) {
       return
     }
-    const { value } = (event as HelixBeforeResizeEvent).detail
-    event.stopPropagation()
-    event.preventDefault()
     if (this.bodyHeight > 0) {
       /* Back into pixels, which is what this element promises and what a
          consumer stored. The divider's position is the panes' share, so the
          panel is the rest of it, and `panelFloor` is where the rest of it stops:
          a drag past the end asks for a panel of nothing and gets the sliver
          `panel-collapsed-size` says to leave showing. */
-      this.requestPanelSize(
+      this.request(
+        'panelSize',
         Math.max(this.panelFloor, ((100 - Number(value)) / 100) * this.bodyHeight),
+        HelixBeforePanelResizeEvent,
+        HelixPanelResizeEvent,
       )
     }
     this.answer(event.currentTarget, this.panelPosition)
@@ -603,11 +607,7 @@ export class HelixSandbox extends HelixElement {
    * and `panel-collapsed-size` was inert with it.
    */
   private readonly handleCollapse = (event: Event): void => {
-    if (event.target !== event.currentTarget) {
-      return
-    }
-    event.stopPropagation()
-    event.preventDefault()
+    this.claim(event)
   }
 
   /**
@@ -676,6 +676,8 @@ export class HelixSandbox extends HelixElement {
     if (!this.hasUpdated && this.childrenKnown) {
       this.readPanel()
     }
+    /* A custom state, which is in no DOM, so hydration has nothing to compare. */
+    this.toggleState('panel-collapsed', this.hasPanel && this.panelSize <= this.panelCollapsedSize)
     if (!this.hasUpdated || typeof this.renderRoot?.querySelector !== 'function') {
       return
     }
@@ -731,40 +733,22 @@ export class HelixSandbox extends HelixElement {
     const first = this.lead === 'preview' ? 'preview' : 'source'
     const second = first === 'preview' ? 'source' : 'preview'
     const split = Number.isFinite(this.split) ? this.split : DEFAULT_SPLIT
+    /* The slot names swap with the panes, so each pane keeps its own
+       `data-pane` and the stylesheet needs to know nothing about the order.
+       Rendering both slots in both positions would be two elements answering
+       to one name, and an assignment goes to the first. */
+    const home = Number.isFinite(this.defaultSplit) ? this.defaultSplit : DEFAULT_SPLIT
+    const label =
+      this.separatorLabel || (first === 'preview' ? 'Resize preview pane' : 'Resize source pane')
     return html`<slot name="toolbar"></slot>
-      <helix-splitter
-        part="body"
-        ?data-panel=${this.hasPanel}
-        exportparts="separator, corner"
-        orientation="vertical"
-        collapsed-size=${this.panelSliver}
-        corner-label=${this.cornerLabel}
-        label=${this.panelLabel}
-        default-position=${this.homePanelPosition}
-        min=${100 - PANEL_MAX * 100}
-        .position=${this.panelPosition}
-        @helix-before-collapse=${this.handleCollapse}
-        @helix-before-resize=${this.handlePanelChange}
-      >
-        <helix-splitter
-          slot="start"
-          part="panes"
-          exportparts="separator"
-          default-position=${Number.isFinite(this.defaultSplit) ? this.defaultSplit : DEFAULT_SPLIT}
-          label=${this.separatorLabel || (first === 'preview' ? 'Resize preview pane' : 'Resize source pane')}
-          orientation=${vertical ? 'vertical' : 'horizontal'}
-          .position=${split}
-          @helix-before-collapse=${this.handleCollapse}
-          @helix-before-resize=${this.handlePanesChange}
-        >
-          ${
-            /* The slot names swap with the panes, so each pane keeps its own
-               `data-pane` and the stylesheet needs to know nothing about the
-               order. Rendering both slots in both positions would be two
-               elements answering to one name, and an assignment goes to the
-               first. */
-            ''
-          }
+      <helix-splitter part="body" ?data-panel=${this.hasPanel} exportparts="separator, corner"
+        orientation="vertical" collapsed-size=${this.panelSliver} corner-label=${this.cornerLabel}
+        label=${this.panelLabel} default-position=${this.homePanelPosition}
+        min=${100 - PANEL_MAX * 100} .position=${this.panelPosition}
+        @helix-before-collapse=${this.handleCollapse} @helix-before-resize=${this.handlePanelChange}>
+        <helix-splitter slot="start" part="panes" exportparts="separator" default-position=${home}
+          label=${label} orientation=${vertical ? 'vertical' : 'horizontal'} .position=${split}
+          @helix-before-collapse=${this.handleCollapse} @helix-before-resize=${this.handlePanesChange}>
           <div part="pane" data-pane=${first} slot="start"><slot name=${first} @slotchange=${this.seed}></slot></div>
           <div part="pane" data-pane=${second} slot="end"><slot name=${second} @slotchange=${this.seed}></slot></div>
         </helix-splitter>

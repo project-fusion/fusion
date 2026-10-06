@@ -1,9 +1,14 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+})
+
+const reportError = globalThis.reportError
+afterEach(() => {
+  globalThis.reportError = reportError
 })
 
 type Source = HTMLElement & { value: string; updateComplete: Promise<boolean> }
@@ -229,13 +234,13 @@ describe('the source pane reporting its cursor', () => {
   /* A highlighter is the consumer's, so the pane takes runs of text rather
      than markup, and draws them as text: nothing a highlighter returns is
      parsed as HTML. */
-  test('`highlight` draws the runs under the field, each with its kind', async () => {
+  test('`tokenize` draws the runs under the field, each with its kind', async () => {
     const host = (await source('value="<p>Hi</p>"')) as Source & {
-      highlight?: (source: string, name: string) => { kind?: string; text: string }[]
+      tokenize?: (source: string, name: string) => { kind?: string; text: string }[]
     }
     expect(part(host, 'field')).toBeNull()
     const asked: string[] = []
-    host.highlight = (text, name) => {
+    host.tokenize = (text, name) => {
       asked.push(name)
       return text
         .split(/(<\/?|>)/)
@@ -258,20 +263,38 @@ describe('the source pane reporting its cursor', () => {
 
   test('runs that do not add up to the source draw it plain, so the caret stays on its text', async () => {
     const host = (await source('value="a b"')) as Source & {
-      highlight?: () => { kind?: string; text: string }[]
+      tokenize?: () => { kind?: string; text: string }[]
     }
-    host.highlight = () => [{ kind: 'name', text: 'a' }]
+    host.tokenize = () => [{ kind: 'name', text: 'a' }]
     await host.updateComplete
     const drawn = part(host, 'highlight') as HTMLElement
     expect(drawn.textContent).toBe('a b\n')
     expect(drawn.querySelector('[part="token"]')).toBeNull()
   })
 
+  test('a `tokenize` that throws leaves the source plain and the field in place', async () => {
+    /* The page's function, and so the page's fault, but the reader is the one
+       who loses the field: a Prism lookup for a pane it has no grammar for
+       throws this way. The error still reaches the page as an uncaught one. */
+    const reported: unknown[] = []
+    globalThis.reportError = (error: unknown) => {
+      reported.push(error)
+    }
+    const host = (await source('value="abc"')) as Source & { tokenize?: () => never }
+    host.tokenize = () => {
+      throw new Error('no grammar')
+    }
+    await host.updateComplete
+    expect(part(host, 'source')).not.toBeNull()
+    expect(part(host, 'highlight')?.textContent).toBe('abc\n')
+    expect(reported.map((error) => (error as Error).message)).toEqual(['no grammar'])
+  })
+
   test('an edit draws the new source in color', async () => {
     const host = (await source('value="a"')) as Source & {
-      highlight?: (text: string) => { kind?: string; text: string }[]
+      tokenize?: (text: string) => { kind?: string; text: string }[]
     }
-    host.highlight = (text) => [{ kind: 'keyword', text }]
+    host.tokenize = (text) => [{ kind: 'keyword', text }]
     await host.updateComplete
     const field = part(host, 'source') as HTMLTextAreaElement
     field.value = 'ab'
