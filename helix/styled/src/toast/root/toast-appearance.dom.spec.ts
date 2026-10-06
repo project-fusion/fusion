@@ -265,7 +265,7 @@ if (hasLayout()) {
       }
       const before = look()
       for (const [name, value] of [
-        ['--toast-background', 'rgb(1, 1, 1)'],
+        ['--toast-background-color', 'rgb(1, 1, 1)'],
         ['--toast-radius', '9px'],
         ['--toast-color', 'rgb(2, 2, 2)'],
         ['--toast-font-size', '19px'],
@@ -277,6 +277,9 @@ if (hasLayout()) {
       ] as const) {
         item.style.setProperty(name, value)
       }
+      /* Past the dismiss mark's color transition, which reads halfway at once. */
+      const still = (): Promise<void> => new Promise((done) => setTimeout(done, 400))
+      await still()
       expect(look()).toEqual([
         'rgb(1, 1, 1)',
         '9px',
@@ -290,6 +293,7 @@ if (hasLayout()) {
         '7px',
       ])
       item.removeAttribute('style')
+      await still()
       expect(look()).toEqual(before)
     })
 

@@ -15,7 +15,7 @@ import { styles } from './toast-item.css.js'
  * @status stable
  * @documentation https://fusion.dev/helix/components/toast
  *
- * @cssproperty --toast-background - The panel's color. Follows `--helix-color-surface-overlay`.
+ * @cssproperty --toast-background-color - The panel's color. Follows `--helix-color-surface-overlay`.
  * @cssproperty --toast-border-color - Color of the panel's edge.
  * @cssproperty --toast-border-width - Width of the panel's edge. Follows
  *   `--helix-border-floating`, which is `0`, so the panel stands out by its shadow unless your

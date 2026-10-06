@@ -401,11 +401,7 @@ export class HelixSandboxPreview extends HelixElement {
       this.scheduleSend()
       return
     }
-    /* Only for a setting, so an update for anything else, a new `label` or a
-       state, does not run the example again. */
-    if (changed.has('colorMode') || changed.has('direction') || changed.has('layout')) {
-      this.send()
-    }
+    this.send()
   }
 
   protected override render(): TemplateResult {
