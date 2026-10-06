@@ -96,3 +96,42 @@ export const rowStop = (count: number, at: number, step: -1 | 1): number => {
   }
   return next < 0 ? count - 1 : next
 }
+
+/** Where a row sits along the list, in pixels, as the page keys measure it. */
+export interface RowEdges {
+  /** The row's top edge. */
+  top: number
+  /** The row's bottom edge. */
+  bottom: number
+}
+
+/**
+ * Where Page Down (`step` 1) or Page Up (`step` -1) goes from row `at`: the
+ * farthest row that fits whole in `room` pixels together with row `at`, so the
+ * row at one edge of the box lands at the other, and at least the next row.
+ *
+ * Measured rather than counted, because a list's rows differ in height. Rows of
+ * one height `h` move `floor(room / h) - 1` rows, which is what Data Table and
+ * Virtual List move. At either end it stays on row `at`.
+ */
+export const pageReach = (
+  rows: readonly RowEdges[],
+  at: number,
+  room: number,
+  step: -1 | 1,
+): number => {
+  const from = rows[at]
+  if (!from) {
+    return at
+  }
+  let reach = at
+  for (let next = at + step; next >= 0 && next < rows.length; next += step) {
+    const row = rows[next] as RowEdges
+    const span = step === 1 ? row.bottom - from.top : from.bottom - row.top
+    if (span > room && next !== at + step) {
+      break
+    }
+    reach = next
+  }
+  return reach
+}

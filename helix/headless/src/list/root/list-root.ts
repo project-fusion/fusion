@@ -21,6 +21,7 @@ import {
   choiceValue,
   type ListSelectionBehavior,
   type ListSelectionMode,
+  pageReach,
   rowStop,
 } from '../selection.js'
 
@@ -52,12 +53,14 @@ const PRESSABLE = 'a[href], button, input, label, select, textarea, [tabindex]'
  * |---|---|
  * | Down, Up | Moves to the next or the previous row. Under `replace`, selects it. |
  * | Home, End | Moves to the first or the last row. Under `replace`, selects it. |
+ * | Page Down, Page Up | Moves a box's height of rows, so the row at one edge lands at the other. Under `replace`, selects the row it lands on. |
  * | A letter or a word | Moves to the next row whose words start with what you typed. |
  * | Left, Right | Moves between the row and the controls in its `end` slot. |
  * | Space | Selects the row, or lets it go. |
- * | Shift with Down, Up, Home, End or Space | Selects every row from the last one pressed, in `multiple`. |
- * | Control or Command with Down, Up, Home or End | Moves without selecting, under `replace`. |
+ * | Shift with Down, Up, Home, End, Page Down, Page Up or Space | Selects every row from the last one pressed, in `multiple`. |
+ * | Control or Command with Down, Up, Home, End, Page Down or Page Up | Moves without selecting, under `replace`. |
  * | Control or Command with A | Selects every row, in `multiple`. |
+ * | Escape | Lets go of every selected row, asking first, and keeps the key from the dialog or menu around the list. With nothing selected, the key goes on to them. |
  * | Enter | Acts on the row: follows its link, or sends `helix-action` from it. |
  *
  * A press with Shift selects every row from the last one pressed, and a press
@@ -340,6 +343,24 @@ export class HelixHeadlessList extends HelixElement {
     this.choose(next)
   }
 
+  /**
+   * Page Down or Page Up from the row: focus moves a box's height of rows, the
+   * list's own where it scrolls and the window's where it does not, and lands
+   * the way an arrow does, so `replace` and Shift choose as they do there.
+   */
+  private page(row: HelixHeadlessListItem, step: -1 | 1): void {
+    const rows = this.reachable
+    const edges = rows.map((one) => {
+      const box = one.getBoundingClientRect()
+      return { bottom: box.bottom, top: box.top }
+    })
+    const room = this.scrollHeight > this.clientHeight + 1 ? this.clientHeight : window.innerHeight
+    const target = rows[pageReach(edges, rows.indexOf(row), room, step)]
+    if (target && target !== row) {
+      target.focusItem()
+    }
+  }
+
   /** Acts on the row: follows its link, or says it was acted on. */
   protected act(row: HelixHeadlessListItem): void {
     if (row.disabled) {
@@ -377,9 +398,14 @@ export class HelixHeadlessList extends HelixElement {
   }
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {
+    const row = this.interactive ? this.rowOf(event) : undefined
+    if (row && !row.disabled && !event.altKey && /^Page(Down|Up)$/.test(event.key)) {
+      /* Before the modifiers are spent, so the row focus lands on reads them. */
+      event.preventDefault()
+      this.page(row, event.key === 'PageDown' ? 1 : -1)
+    }
     /* Focus has arrived wherever this key sent it, so what it carried is spent. */
     this.moving = undefined
-    const row = this.interactive ? this.rowOf(event) : undefined
     if (!row || row.disabled || event.altKey) {
       return
     }
@@ -397,6 +423,12 @@ export class HelixHeadlessList extends HelixElement {
       event.preventDefault()
       const every = this.reachable.map((one) => this.valueFor(one)).join(', ')
       this.choose(every === this.value ? null : every)
+    } else if (event.key === 'Escape' && this.value !== '' && this.selectionMode !== 'none') {
+      /* React Aria's GridList clears on Escape too, and keeps the key from
+         closing what holds the list only where there was something to clear. */
+      event.preventDefault()
+      event.stopPropagation()
+      this.choose('')
     } else if (event.key === 'Enter' && !toggle) {
       event.preventDefault()
       this.act(row)

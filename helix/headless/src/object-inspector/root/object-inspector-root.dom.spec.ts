@@ -261,6 +261,31 @@ describe('an object inspector read by its keys', () => {
     expect(active(host)?.textContent).toContain('target')
   })
 
+  describe('by the page', () => {
+    const tall = Object.getOwnPropertyDescriptor(window, 'innerHeight')
+    afterEach(() => {
+      if (tall) {
+        Object.defineProperty(window, 'innerHeight', tall)
+      }
+    })
+
+    test('moves a window of rows with Page Down and Page Up, less one', async () => {
+      // A window ten rows tall, so a page is nine rows.
+      Object.defineProperty(window, 'innerHeight', { configurable: true, value: 240 })
+      const many = Object.fromEntries(Array.from({ length: 30 }, (_, at) => [`k${at}`, at]))
+      const host = await inspector('', many)
+      await press(host, 'PageDown')
+      expect(active(host)?.textContent).toContain('k8')
+      await press(host, 'PageDown')
+      expect(active(host)?.textContent).toContain('k17')
+      await press(host, 'PageUp')
+      expect(active(host)?.textContent).toContain('k8')
+      await press(host, 'End')
+      await press(host, 'PageDown')
+      expect(active(host)?.textContent).toContain('k29')
+    })
+  })
+
   test('opens every branch beside the active row with `*`', async () => {
     const host = await inspector()
     await press(host, 'ArrowDown')

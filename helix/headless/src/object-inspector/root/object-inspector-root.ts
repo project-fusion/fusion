@@ -19,6 +19,7 @@ import {
   StatusController,
   scrollItemIntoView,
   searchableById,
+  Typeahead,
   treeArrow,
   VirtualizeController,
 } from '@fusion.dev/helix-core'
@@ -61,6 +62,7 @@ import {
  * | Right | Opens a closed branch, or moves into an open one. Left on a right-to-left page. |
  * | Left | Closes an open branch, or moves to the parent. Right on a right-to-left page. |
  * | Home, End | Moves to the first or the last row. |
+ * | Page Down, Page Up | Moves a box's height of rows, so the row at one edge lands at the other. |
  * | Enter, Space | Opens or closes a branch. |
  * | `*` | Opens every branch beside the active row. |
  * | A letter or a word | Moves to the next row whose key starts with what you typed. |
@@ -361,7 +363,7 @@ export class HelixHeadlessObjectInspector extends HelixElement {
   private hadFocus = false
 
   /** What has been typed toward a key, and when the last letter came. */
-  private typed = { at: 0, text: '' }
+  private readonly typed = new Typeahead()
 
   /** The branches of the last value seen, by path, so a new value can tell old ones from new. */
   private branches = new Set<string>()
@@ -700,6 +702,12 @@ export class HelixHeadlessObjectInspector extends HelixElement {
       case 'End':
         this.move(rows.length - 1)
         break
+      case 'PageDown':
+        this.move(this.cursor + this.pageRows())
+        break
+      case 'PageUp':
+        this.move(this.cursor - this.pageRows())
+        break
       case 'ArrowRight':
       case 'ArrowLeft':
         /* In is where a shut row's caret points, along the line, so it is the
@@ -744,28 +752,33 @@ export class HelixHeadlessObjectInspector extends HelixElement {
   }
 
   /**
-   * Moves to the next row whose key starts with what was typed.
-   *
-   * Letters typed within half a second of each other run together, so `me`
-   * finds `meta` past `message`. A repeated single letter cycles through the
-   * keys that start with it.
+   * Moves to the next row whose key starts with what was typed, through core's
+   * `Typeahead`: letters within half a second run together, so `me` finds
+   * `meta` past `message`, and a repeated letter cycles through the keys that
+   * start with it.
    */
   private typeahead(letter: string): void {
-    const now = Date.now()
-    const text = now - this.typed.at < 500 ? this.typed.text + letter : letter
-    this.typed = { at: now, text }
-    const wanted = text.toLocaleLowerCase()
-    const repeated = [...wanted].every((one) => one === wanted[0])
-    const rows = this.rows
-    const start = wanted.length === 1 || repeated ? this.cursor + 1 : this.cursor
-    for (let step = 0; step < rows.length; step += 1) {
-      const at = (start + step) % rows.length
-      const key = rows[at]?.key?.toLocaleLowerCase()
-      if (key?.startsWith(repeated ? (wanted[0] ?? '') : wanted)) {
-        this.move(at)
-        return
-      }
+    const at = this.typed.match(
+      letter,
+      this.rows.map((row) => row.key ?? ''),
+      this.cursor,
+    )
+    if (at >= 0) {
+      this.move(at)
     }
+  }
+
+  /**
+   * How many rows Page Down and Page Up move: the rows that fit in the tree's
+   * box, or in the window where the box does not scroll, less one, so the row
+   * at one edge lands at the other.
+   */
+  private pageRows(): number {
+    const tree = this.partNamed('tree')
+    const room =
+      tree && tree.scrollHeight > tree.clientHeight + 1 ? tree.clientHeight : window.innerHeight
+    const tall = this.virtualize.sizeOf(this.cursor) || HelixHeadlessObjectInspector.ESTIMATE
+    return Math.max(1, Math.floor(room / tall) - 1)
   }
 
   /** A press opens or closes the row it lands on, once that row is the active one. */

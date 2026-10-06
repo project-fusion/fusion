@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { choiceValue, rowStop } from './selection.js'
+import { choiceValue, pageReach, rowStop } from './selection.js'
 
 describe('Left and Right inside a row', () => {
   test('move from the cell through the controls and back to the cell', () => {
@@ -61,5 +61,34 @@ describe('what a press or a key leaves selected', () => {
       choiceValue({ ...base, anchor: 'a', extend: true, mode: 'single', pressed: 'c', value: 'a' }),
     ).toBe('c')
     expect(choiceValue({ ...base, mode: 'none', pressed: 'c' })).toBe(null)
+  })
+})
+
+describe('Page Up and Page Down', () => {
+  /* Ten rows of 20 pixels, then one of 100. */
+  const rows = [
+    ...Array.from({ length: 10 }, (_, at) => ({ bottom: at * 20 + 20, top: at * 20 })),
+    { bottom: 300, top: 200 },
+  ]
+
+  test('move by the rows that fit in the box, less one, where rows are one height', () => {
+    expect(pageReach(rows, 0, 100, 1)).toBe(4)
+    expect(pageReach(rows, 9, 100, -1)).toBe(5)
+  })
+
+  test('measure each row, so a tall one counts for its height', () => {
+    expect(pageReach(rows, 8, 100, 1)).toBe(9)
+    expect(pageReach(rows, 10, 140, -1)).toBe(8)
+  })
+
+  test('move at least one row, even past one taller than the box', () => {
+    expect(pageReach(rows, 9, 50, 1)).toBe(10)
+    expect(pageReach(rows, 10, 50, -1)).toBe(9)
+  })
+
+  test('stay put at either end and for a row that is not there', () => {
+    expect(pageReach(rows, 10, 100, 1)).toBe(10)
+    expect(pageReach(rows, 0, 100, -1)).toBe(0)
+    expect(pageReach([], 0, 100, 1)).toBe(0)
   })
 })
