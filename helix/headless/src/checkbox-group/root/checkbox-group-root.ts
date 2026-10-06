@@ -7,14 +7,13 @@ import {
   HelixFormElement,
   hostAria,
   MixinField,
-  toggleEvery,
 } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type ReactiveController, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
 import { HelixHeadlessCheckbox } from '../../checkbox/root/checkbox-root.js'
 import '../../checkbox/index.js'
-import { type SetBox, selectAllState } from '../select-all.js'
+import { type SetBox, selectAllPress, selectAllState } from '../select-all.js'
 
 /**
  * @summary A group of related checkboxes under one label, with one value for the set.
@@ -136,14 +135,32 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
   }
 
   set values(next: string[]) {
+    this.choose(next)
+  }
+
+  /**
+   * Writes the set the boxes are given at the next update: by value, or, for
+   * a set a press decided, by box.
+   */
+  private choose(next: readonly string[], boxes?: readonly HelixHeadlessCheckbox[]): void {
     const previous = this.value
     this.declared = [...next]
+    this.checking = boxes ? new Set(boxes) : undefined
     this.pending = true
     this.requestUpdate('value', previous)
   }
 
   /** The values last written, which the boxes are given at the next update. */
   private declared: string[] = []
+
+  /**
+   * The boxes to check at the next update, where a press on a box or on the
+   * select-all box decided the set.
+   *
+   * **By box, since boxes can share a value.** Boxes written with no `value`
+   * all submit `on`, and pushed by value, a press on one checked every one.
+   */
+  private checking: Set<HelixHeadlessCheckbox> | undefined = undefined
 
   /**
    * Whether `declared` has yet to reach the boxes.
@@ -249,8 +266,10 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
     }
     this.pending = false
     const wanted = new Set(this.declared)
+    const checking = this.checking
+    this.checking = undefined
     for (const box of boxes) {
-      box.checked = wanted.has(box.value)
+      box.checked = checking ? checking.has(box) : wanted.has(box.value)
     }
   }
 
@@ -301,15 +320,14 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
        A refusal here refuses the box's own request too, which it reads once
        this listener returns: the group's value is read from the boxes, so a
        box that moved anyway would carry the refused set into it. */
-    const next = this.boxes
-      .filter((box) => (box === changed ? wanted : box.checked))
-      .map((box) => box.value)
+    const checking = this.boxes.filter((box) => (box === changed ? wanted : box.checked))
+    const next = checking.map((box) => box.value)
 
     if (!this.dispatchEvent(new HelixBeforeChangeEvent({ value: next.join(',') }))) {
       event.preventDefault()
       return
     }
-    this.values = next
+    this.choose(next, checking)
     /* Under the platform's own name, after the value has moved, so a consumer
        binding `onChange` reads the group's new value off the target.
 
@@ -443,16 +461,14 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
     event.stopPropagation()
     /* Every enabled box checked, or every one cleared once all are, with a
        disabled box keeping its state, in the set's order. */
-    const boxes = this.setBoxes()
-    const next = toggleEvery(
-      boxes.filter((box) => box.checked).map((box) => box.value),
-      boxes.filter((box) => !box.disabled).map((box) => box.value),
-      boxes.map((box) => box.value),
-    )
+    const boxes = this.boxes
+    const pressed = selectAllPress(this.setBoxes())
+    const checking = boxes.filter((_, at) => pressed[at])
+    const next = checking.map((box) => box.value)
     if (!this.dispatchEvent(new HelixBeforeChangeEvent({ value: next.join(',') }))) {
       return
     }
-    this.values = next
+    this.choose(next, checking)
     this.announceInput()
     this.announceChange()
   }

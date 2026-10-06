@@ -366,8 +366,7 @@ describe('select all', () => {
   })
 
   /* A press leaves a disabled box as it is, checked or clear, which the
-     select-all helper used to say on its own and core's `toggleEvery` says
-     now. */
+     select-all helper's `selectAllPress` says, box by box. */
   test('leaves a checked disabled box checked, both ways round', async () => {
     const g = (await group('label="Verticals" select-all value="energy"')) as Selecting
     ;(g.boxes[2] as unknown as { disabled: boolean }).disabled = true
@@ -385,5 +384,47 @@ describe('select all', () => {
     await press(g)
     expect(g.values).toEqual(['design'])
     expect(box(g).checked).toBe(false)
+  })
+})
+
+/* Boxes written with no `value` all submit `on`. The set is moved box by box,
+   so a press on one moves that one, and select-all fills a set with one box
+   already checked. */
+describe('boxes with no value', () => {
+  const plain = async (attrs = '') =>
+    (await mount(`<helix-headless-checkbox-group label="Novalue" name="cg" ${attrs}>
+      <helix-headless-checkbox>One</helix-headless-checkbox>
+      <helix-headless-checkbox>Two</helix-headless-checkbox>
+      <helix-headless-checkbox>Three</helix-headless-checkbox>
+    </helix-headless-checkbox-group>`)) as Group
+
+  test('a press on one checks that one only', async () => {
+    const g = await plain()
+    await settle(g)
+    await tick(g, 0)
+    await settle(g)
+    expect(g.boxes.map((box) => box.checked)).toEqual([true, false, false])
+    await tick(g, 2)
+    await settle(g)
+    expect(g.boxes.map((box) => box.checked)).toEqual([true, false, true])
+    await tick(g, 0)
+    await settle(g)
+    expect(g.boxes.map((box) => box.checked)).toEqual([false, false, true])
+  })
+
+  test('select all checks every box where one was checked, then clears them', async () => {
+    const g = await plain('select-all')
+    await settle(g)
+    await tick(g, 1)
+    await settle(g)
+    const all = part(g, 'select-all') as HTMLElement & { updateComplete: Promise<unknown> }
+    await all.updateComplete
+    all.shadowRoot?.querySelector<HTMLElement>('[part="control"]')?.click()
+    await settle(g)
+    expect(g.boxes.map((box) => box.checked)).toEqual([true, true, true])
+    await all.updateComplete
+    all.shadowRoot?.querySelector<HTMLElement>('[part="control"]')?.click()
+    await settle(g)
+    expect(g.boxes.map((box) => box.checked)).toEqual([false, false, false])
   })
 })
