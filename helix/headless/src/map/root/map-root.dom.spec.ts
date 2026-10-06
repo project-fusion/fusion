@@ -250,6 +250,50 @@ describe('map controls a consumer keeps or drops', () => {
     expect(control(await map('controls="pan"'), 'pan-up')).not.toBeNull()
   })
 
+  test('every control’s glyph is a slot a page fills with its own icon, and the glyph stays where it does not', async () => {
+    const host = (await mount(
+      `<helix-headless-map label="Edinburgh" controls="fullscreen tilt zoom compass pan rotate">
+        <canvas></canvas>
+        <svg slot="zoom-in-icon" id="plus"></svg>
+      </helix-headless-map>`,
+    )) as Map
+    await host.updateComplete
+    const slots: Record<string, string> = {
+      'face-north': 'face-north-icon',
+      fullscreen: 'fullscreen-icon',
+      'pan-down': 'pan-down-icon',
+      'pan-end': 'pan-end-icon',
+      'pan-start': 'pan-start-icon',
+      'pan-up': 'pan-up-icon',
+      'rotate-left': 'rotate-left-icon',
+      'rotate-right': 'rotate-right-icon',
+      tilt: 'tilt-icon',
+      'zoom-in': 'zoom-in-icon',
+      'zoom-out': 'zoom-out-icon',
+    }
+    for (const [name, slot] of Object.entries(slots)) {
+      expect(control(host, name)?.querySelector(`slot[name="${slot}"]`)).not.toBeNull()
+    }
+    const zoomIn = control(host, 'zoom-in')?.querySelector('slot') as HTMLSlotElement
+    expect(zoomIn.assignedElements()).toEqual([host.querySelector('#plus') as Element])
+    expect(control(host, 'zoom-out')?.textContent?.trim()).toBe('−')
+    expect(control(host, 'face-north')?.querySelector('[part="needle"]')).not.toBeNull()
+  })
+
+  test('the layers button’s glyph is a slot too', async () => {
+    const host = (await mount(
+      `<helix-headless-map label="Edinburgh" controls="layers">
+        <canvas></canvas>
+        <helix-headless-map-route label="Walk" points="55.95,-3.19 55.94,-3.18"></helix-headless-map-route>
+      </helix-headless-map>`,
+    )) as Map
+    await host.updateComplete
+    await host.updateComplete
+    expect(
+      control(host, 'layers-toggle')?.querySelector('slot[name="layers-icon"] svg'),
+    ).not.toBeNull()
+  })
+
   test('the pan pad without the zoom, which is the MapLibre case', async () => {
     const host = await map('controls="pan fullscreen"')
     expect(control(host, 'pan-up')).not.toBeNull()

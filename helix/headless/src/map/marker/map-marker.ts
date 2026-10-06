@@ -29,7 +29,8 @@ const BOOKKEEPING = new Set<PropertyKey>([
  * `name`, or its `label` if it has no name.
  *
  * All the markers in a map share one tab stop. The arrow keys move between
- * them in the order they are written.
+ * them in the order they are written. Taking away the marker that has focus
+ * moves focus to the next one, or to the one before where it was the last.
  *
  * @since 0.105.0
  * @status experimental

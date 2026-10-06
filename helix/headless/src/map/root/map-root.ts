@@ -178,8 +178,20 @@ const SETTLES = 400
  *
  * @slot - The element your renderer draws the map in, and the map's markers, routes, areas, positions, and points layers.
  * @slot attribution - The map credit, which most tile licenses require.
+ * @slot face-north-icon - Replaces the compass needle. It inherits `--map-needle-turn`, so `rotate: var(--map-needle-turn)` keeps it pointing north.
  * @slot footer - Content below the map, such as a legend or a scale.
+ * @slot fullscreen-icon - Replaces the glyph inside the fullscreen button.
  * @slot header - Content above the map, such as a title or a search field.
+ * @slot layers-icon - Replaces the glyph inside the layers button.
+ * @slot pan-down-icon - Replaces the glyph inside the pan down button.
+ * @slot pan-end-icon - Replaces the glyph inside the button that pans toward the end of a line of text.
+ * @slot pan-start-icon - Replaces the glyph inside the button that pans toward the start of a line of text.
+ * @slot pan-up-icon - Replaces the glyph inside the pan up button.
+ * @slot rotate-left-icon - Replaces the glyph inside the rotate left button.
+ * @slot rotate-right-icon - Replaces the glyph inside the rotate right button.
+ * @slot tilt-icon - Replaces the "3D" inside the 3D button.
+ * @slot zoom-in-icon - Replaces the glyph inside the zoom-in button.
+ * @slot zoom-out-icon - Replaces the glyph inside the zoom-out button.
  *
  * @event {Event} change - The layers menu changed the map type, which `map-type` now holds.
  * @event {HelixActivateEvent} helix-activate - A marker was pressed. The value is the marker's `name`, or its `label` if it has no name. A cluster sends `helix-map-cluster` instead.
@@ -695,12 +707,68 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
       )
   }
 
+  /**
+   * The marker focus is on, while it is.
+   *
+   * **Kept so a marker the page takes away hands focus on.** A delivery done
+   * or a filter changed removes a marker, and the one a reader was on went
+   * with focus still in it: the browser dropped focus to the page, and the
+   * reader was put back at its top with nothing said.
+   */
+  private focused: HelixHeadlessMapMarker | undefined
+
   /** Moves the tab stop to the marker focus arrived at. */
   private readonly handleFocusIn = (event: FocusEvent): void => {
     const marker = this.markerOf(event)
     const at = marker ? this.markers.indexOf(marker) : -1
+    this.focused = at === -1 ? undefined : marker
     if (at !== -1) {
       this.stop = at
+    }
+  }
+
+  /**
+   * Forgets the marker focus left, unless the page took it away.
+   *
+   * Focus leaving for nothing is a press on the page or the marker removed,
+   * and which one is known once the removal has finished: a marker still in
+   * the page was left, and one gone is owed a place for focus to land.
+   */
+  private readonly handleFocusOut = (event: FocusEvent): void => {
+    const marker = this.markerOf(event)
+    if (!marker || marker !== this.focused) {
+      return
+    }
+    if (event.relatedTarget) {
+      this.focused = undefined
+      return
+    }
+    queueMicrotask(() => {
+      if (marker.isConnected && this.focused === marker) {
+        this.focused = undefined
+      }
+    })
+  }
+
+  /**
+   * Gives focus to the marker that took the stop of one the page took away
+   * with focus on it: the next, the last where it was the last, its cluster
+   * where it is gathered, and the region where none is left.
+   */
+  private refocus(stop: HelixHeadlessMapMarker | undefined): void {
+    const gone = this.focused
+    if (!gone || this.markers.includes(gone)) {
+      return
+    }
+    this.focused = undefined
+    const active = document.activeElement
+    if (active !== null && active !== document.body) {
+      return
+    }
+    if (stop) {
+      stop.focus()
+    } else {
+      this.partNamed('region')?.focus()
     }
   }
 
@@ -773,6 +841,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     this.addEventListener(HelixMapPartChangeEvent.eventName, this.handlePartChange)
     this.addEventListener('click', this.handleClick)
     this.addEventListener('focusin', this.handleFocusIn)
+    this.addEventListener('focusout', this.handleFocusOut)
     this.addEventListener('keydown', this.handleMarkerKeydown)
     this.addEventListener('keyup', this.handleMarkerKeyup)
     this.hiding = new MutationObserver(() => this.requestUpdate())
@@ -788,6 +857,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     this.removeEventListener(HelixMapPartChangeEvent.eventName, this.handlePartChange)
     this.removeEventListener('click', this.handleClick)
     this.removeEventListener('focusin', this.handleFocusIn)
+    this.removeEventListener('focusout', this.handleFocusOut)
     this.removeEventListener('keydown', this.handleMarkerKeydown)
     this.removeEventListener('keyup', this.handleMarkerKeyup)
   }
@@ -836,6 +906,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     for (const marker of markers) {
       marker.current = marker === stop
     }
+    this.refocus(stop)
     /* Asked of the connector as a place is: the next placing gathers or lets go. */
     if (changed.has('cluster')) {
       this.dispatchEvent(new HelixMapPartChangeEvent({ kind: 'place' }))
@@ -871,7 +942,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
    * order they are written, with its picture and name, pressed while it is
    * shown. A group's tile is pressed while any of its layers is shown.
    */
-  private renderLayersMenu(): TemplateResult | typeof nothing {
+  protected renderLayersMenu(): TemplateResult | typeof nothing {
     const layers = this.layers
     if (!this.drawsControls('layers') || layers.length === 0) {
       return nothing
@@ -892,9 +963,11 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
         }}
         @keydown=${this.handleMenuKeydown}
       >
-        <svg aria-hidden="true" fill="currentColor" height="16" viewBox=${stack.viewBox} width="16">
-          ${unsafeSVG(stack.content)}
-        </svg>
+        <slot name="layers-icon">
+          <svg aria-hidden="true" fill="currentColor" height="16" viewBox=${stack.viewBox} width="16">
+            ${unsafeSVG(stack.content)}
+          </svg>
+        </slot>
       </button>
       <div
         part="layers-menu"
@@ -968,53 +1041,55 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
    * arrows around it are the way to move and turn the map without dragging,
    * which a pointer otherwise needs.
    */
-  private renderCompass(pan: boolean, rotate: boolean): TemplateResult {
+  protected renderCompass(pan: boolean, rotate: boolean): TemplateResult {
     return html`<div part="compass">
       ${
         rotate
           ? html`<button part="rotate-left" aria-label=${this.rotateLeftLabel} type="button" @click=${() => this.rotate(-ROTATE_STEP)}>
-              ↺
+              <slot name="rotate-left-icon">↺</slot>
             </button>`
           : nothing
       }
       ${
         pan
           ? html`<button part="pan-up" aria-label=${this.panLabel('up')} type="button" @click=${() => this.pan('up')}>
-              ${this.panGlyph('up')}
+              <slot name="pan-up-icon">${this.panGlyph('up')}</slot>
             </button>`
           : nothing
       }
       ${
         rotate
           ? html`<button part="rotate-right" aria-label=${this.rotateRightLabel} type="button" @click=${() => this.rotate(ROTATE_STEP)}>
-              ↻
+              <slot name="rotate-right-icon">↻</slot>
             </button>`
           : nothing
       }
       ${
         pan
           ? html`<button part="pan-start" aria-label=${this.panLabel('start')} type="button" @click=${() => this.pan('start')}>
-              ${this.panGlyph('start')}
+              <slot name="pan-start-icon">${this.panGlyph('start')}</slot>
             </button>`
           : nothing
       }
       <button part="face-north" aria-label=${this.faceNorthLabel} type="button" style=${`--map-needle-turn: ${-this.bearing}deg`} @click=${() => this.faceNorth()}>
-        <svg part="needle" aria-hidden="true" viewBox="0 0 16 16">
-          <path data-end="north" d="M8 1.5 10.5 8h-5Z" />
-          <path data-end="south" d="M8 14.5 5.5 8h5Z" />
-        </svg>
+        <slot name="face-north-icon">
+          <svg part="needle" aria-hidden="true" viewBox="0 0 16 16">
+            <path data-end="north" d="M8 1.5 10.5 8h-5Z" />
+            <path data-end="south" d="M8 14.5 5.5 8h5Z" />
+          </svg>
+        </slot>
       </button>
       ${
         pan
           ? html`<button part="pan-end" aria-label=${this.panLabel('end')} type="button" @click=${() => this.pan('end')}>
-              ${this.panGlyph('end')}
+              <slot name="pan-end-icon">${this.panGlyph('end')}</slot>
             </button>`
           : nothing
       }
       ${
         pan
           ? html`<button part="pan-down" aria-label=${this.panLabel('down')} type="button" @click=${() => this.pan('down')}>
-              ${this.panGlyph('down')}
+              <slot name="pan-down-icon">${this.panGlyph('down')}</slot>
             </button>`
           : nothing
       }
@@ -1050,7 +1125,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
               type="button"
               @click=${this.toggleFullscreen}
             >
-              ⤢
+              <slot name="fullscreen-icon">⤢</slot>
             </button>`
           : nothing
       }
@@ -1064,17 +1139,17 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
               type="button"
               @click=${() => this.tiltTo(this.pitch > 0 ? 0 : TILTED)}
             >
-              3D
+              <slot name="tilt-icon">3D</slot>
             </button>`
           : nothing
       }
       ${
         zoom
           ? html`<button part="zoom-in" aria-label=${this.zoomInLabel} type="button" @click=${() => this.zoom(1)}>
-                +
+                <slot name="zoom-in-icon">+</slot>
               </button>
               <button part="zoom-out" aria-label=${this.zoomOutLabel} type="button" @click=${() => this.zoom(-1)}>
-                −
+                <slot name="zoom-out-icon">−</slot>
               </button>`
           : nothing
       }
