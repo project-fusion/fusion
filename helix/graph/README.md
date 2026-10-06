@@ -398,3 +398,8 @@ Sigma 3 is a peer dependency.
 bun run --filter @fusion.dev/helix-graph build
 bun run --filter @fusion.dev/helix-graph test
 ```
+
+The specs in `src/sigma/sigma-scene.dom.spec.ts` draw with Sigma in WebGL, so
+they run in a browser only, with `bun run specs:browser graph`. They check that
+the drawing frames and rings the note chosen in the list, and moves with the
+frame's keys.
