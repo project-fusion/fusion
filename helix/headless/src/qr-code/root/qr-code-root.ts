@@ -10,6 +10,7 @@ import {
 import { property } from 'lit/decorators.js'
 import { encode } from 'uqr'
 import { boxIn, logoBox, type QrLogo, qrSvg } from '../export.js'
+import { qrName } from '../name.js'
 
 /** How much of the code can be lost and still read. */
 export type QrCorrection = 'H' | 'L' | 'M' | 'Q'
@@ -128,9 +129,12 @@ const pathFor = (
  * thousand modules, and an element for each would be a thousand nodes for one
  * image.
  *
- * The element has `role="img"` and an accessible name. Set the name to what the
- * code is for. When you pass no name, the value is the name. Most codes hold a
- * URL, and a URL read aloud gives the destination.
+ * The element has `role="img"` and an accessible name. Set `label` to what
+ * the code is for, such as "Open the menu". With no `label`, a code is named
+ * by `code-label`, "QR code", followed by its value where the value is a web
+ * address, which a URL read aloud makes a destination. Any other value is
+ * never read out: a code that sets up an authenticator or joins a network
+ * carries a secret in it.
  *
  * The quiet zone of four modules is required by the specification, and a
  * scanner rejects a code cropped to its edge. It is drawn inside the `viewBox`,
@@ -186,10 +190,20 @@ export class HelixHeadlessQrCode extends HelixElement {
   correction?: QrCorrection
 
   /**
-   * The image's accessible name.
+   * The words a code with no `label` is named by, followed by its value where
+   * the value is a web address.
+   */
+  @property({ attribute: 'code-label' })
+  codeLabel = 'QR code'
+
+  /**
+   * The image's accessible name: what the code is for, such as "Open the
+   * menu".
    *
-   * Falling back to the value is deliberate: a code almost always holds a URL,
-   * and a URL is a better name than "QR code" for a reader who cannot see it.
+   * Absent names it by `code-label` and, for a web address, the address,
+   * which is what a reader who cannot scan it needs. Any other value is left
+   * out of the name, since it may hold a secret, such as an authenticator's
+   * key or a network's password.
    */
   @property()
   label = ''
@@ -421,7 +435,7 @@ export class HelixHeadlessQrCode extends HelixElement {
       viewBox="0 0 ${box} ${box}"
       xmlns="http://www.w3.org/2000/svg"
       role="img"
-      aria-label=${this.label || this.value}
+      aria-label=${qrName(this.label, this.value, this.codeLabel)}
       shape-rendering="crispEdges"
     >
       <path
