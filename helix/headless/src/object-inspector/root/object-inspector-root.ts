@@ -130,6 +130,7 @@ import {
  * @csspart copy-button - The button inside the copy control.
  * @csspart copy-live - The live region inside the copy button, which says its `pending-label` when the copy becomes pending under focus.
  * @csspart copy-mark - The clipboard icon, and the confirmation icon that replaces it.
+ * @csspart copy-spinner - The ring the copy button turns while it is pending.
  * @csspart copy-text - The words on that button, trimmed to their capitals and baseline.
  * @csspart copy-tooltip - The tooltip, forwarded from the copy button's tooltip.
  * @csspart copy-tooltip-arrow - The tooltip's arrow, pointing at the copy button.
@@ -937,7 +938,7 @@ export class HelixHeadlessObjectInspector extends HelixElement {
   protected renderCopyButton(row: Row | undefined): TemplateResult {
     return staticHtml`<${this.tag('copy-button')}
       part="copy"
-      exportparts="button: copy-button, live: copy-live, text: copy-text, mark: copy-mark, tooltip: copy-tooltip,
+      exportparts="button: copy-button, live: copy-live, spinner: copy-spinner, text: copy-text, mark: copy-mark, tooltip: copy-tooltip,
         tooltip-arrow: copy-tooltip-arrow, tooltip-arrow-bottom: copy-tooltip-arrow-bottom,
         tooltip-arrow-left: copy-tooltip-arrow-left, tooltip-arrow-right: copy-tooltip-arrow-right,
         tooltip-arrow-top: copy-tooltip-arrow-top, tooltip-bottom: copy-tooltip-bottom,

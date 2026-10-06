@@ -273,3 +273,22 @@ describe('value', () => {
     expect(host.hasAttribute('movement')).toBe(false)
   })
 })
+
+describe('the old `direction`', () => {
+  /* It still reads, and a page writing it was never told it has a replacement. */
+  test('is reported once as deprecated, and `movement` is not', async () => {
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      const old = (await trend('direction="up"')) as HTMLElement & Updatable & { direction: string }
+      old.direction = 'down'
+      await old.updateComplete
+      await trend('movement="up"')
+    } finally {
+      console.warn = original
+    }
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0]).toContain('movement="up"')
+  })
+})

@@ -338,3 +338,10 @@ describe('a time input in a page written in another language', () => {
     expect(part(host, 'picker')?.getAttribute('locale')).toBe('de-DE')
   })
 })
+
+/* Time Picker gained a `feedback` part, and a page reached it inside a time
+   input through nothing. */
+test("forwards the picker's own message as `picker-feedback`", async () => {
+  const host = await field()
+  expect(part(host, 'picker')?.getAttribute('exportparts')).toContain('feedback: picker-feedback')
+})
