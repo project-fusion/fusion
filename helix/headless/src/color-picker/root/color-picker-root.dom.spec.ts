@@ -938,3 +938,27 @@ describe('a color picker in a page written in another language', () => {
     ).toBe('50\u00a0%')
   })
 })
+
+describe('a color picker with a hue wheel', () => {
+  test('turns the hue on a ring round the square, in place of the ramp', async () => {
+    const host = await picker('wheel aria-label="Brand" value="#ff0000"')
+    const ring = part(host, 'wheel') as HTMLElement
+    expect(ring.contains(part(host, 'grid'))).toBe(true)
+    expect(host.shadowRoot?.querySelector('[data-channel="hue"]')).toBeNull()
+    const hue = part(host, 'wheel-hue') as HTMLInputElement
+    expect(hue.getAttribute('aria-label')).toBe('Brand, Hue')
+    expect(hue.getAttribute('aria-valuetext')).toMatch(/^0, /)
+    expect(hue.getAttribute('dir')).toBe('ltr')
+    hue.value = '120'
+    hue.dispatchEvent(new Event('input', { bubbles: true }))
+    await host.updateComplete
+    expect(host.value).toBe('#00ff00')
+    expect(hue.getAttribute('aria-valuetext')).toMatch(/^120, /)
+  })
+
+  test('keeps its ramp without `wheel`', async () => {
+    const host = await picker('value="#ff0000"')
+    expect(part(host, 'wheel')).toBeNull()
+    expect(host.shadowRoot?.querySelector('[data-channel="hue"]')).not.toBeNull()
+  })
+})

@@ -4,6 +4,7 @@ import {
   HelixElement,
   HelixSelectEvent,
   MixinControllerOpen,
+  matchesChord,
 } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -13,23 +14,6 @@ import type { HelixHeadlessListbox } from '../../listbox/root/listbox-root.js'
    imports register the styled pair. `tier` picks which the template asks for. */
 import '../../dialog/index.js'
 import '../../listbox/index.js'
-
-/**
- * A hotkey, as the pieces a `keydown` can be compared against.
- *
- * `mod` is the platform's own: Command on a Mac and Control everywhere else,
- * which is what every application means by it and what a consumer would
- * otherwise have to detect and write twice.
- */
-const parse = (hotkey: string) => {
-  const parts = hotkey.toLowerCase().split('+')
-  return {
-    alt: parts.includes('alt'),
-    key: parts.at(-1) ?? '',
-    mod: parts.includes('mod'),
-    shift: parts.includes('shift'),
-  }
-}
 
 /**
  * @summary A command palette: a list of commands that opens from anywhere on the page and filters as you type.
@@ -114,7 +98,9 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
   filterDelay = 0
 
   /**
-   * The key that opens the palette, written as `mod+k`, `shift+p`, or `k`.
+   * The key that opens the palette, written as `mod+k`, `shift+p`, or `k`,
+   * in Kbd's chord spelling: `mod` is Command or Control, `ctrl`, `cmd`,
+   * `alt` and `shift` the keys they name.
    *
    * Empty turns it off, for a consumer who opens the palette from a button or
    * from their own shortcut handler. There is no list of defaults to fight
@@ -213,17 +199,9 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
    * palette the reader never sees.
    */
   private readonly handleHotkey = (event: KeyboardEvent): void => {
-    if (this.hotkey === '') {
-      return
-    }
-    const wanted = parse(this.hotkey)
-    const mod = event.metaKey || event.ctrlKey
-    if (
-      event.key.toLowerCase() !== wanted.key ||
-      mod !== wanted.mod ||
-      event.shiftKey !== wanted.shift ||
-      event.altKey !== wanted.alt
-    ) {
+    /* Core's chord, read both ways, so `mod` is Command or Control on any
+       keyboard: a palette summoned by the habit of either platform. */
+    if (!matchesChord(event, this.hotkey, true) && !matchesChord(event, this.hotkey, false)) {
       return
     }
     event.preventDefault()

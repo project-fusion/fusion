@@ -51,6 +51,11 @@ helix-listbox::part(search-field) {
 /* Room to read, because a palette is scanned rather than filled in. */
 :host {
   --_command-row: var(--helix-space-sm);
+  /* Set on the host, not reached for through a part. They are not parts of
+     anything here, so `::part(option)` matched nothing at all: measured, the
+     rows kept the select's 2xs and the rule did nothing. Read through the
+     row size below, which the density rules move. */
+  --option-block-padding: var(--_command-row);
 }
 
 :host([data-density="sm"]),
@@ -63,12 +68,6 @@ helix-listbox::part(search-field) {
   --_command-row: var(--helix-space-md);
 }
 
-/* Set on the host, not reached for through a part. They are not parts of
-   anything here, so `::part(option)` matched nothing at all: measured, the rows
-   kept the select's 2xs and the rule did nothing. */
-:host {
-  --option-block-padding: var(--_command-row);
-}
 
 /* The keys a reader can press, under the list. */
 [part="footer"] {

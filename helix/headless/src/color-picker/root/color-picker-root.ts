@@ -4,6 +4,7 @@ import {
   type ColorWords,
   CopyController,
   capturePointer,
+  clamp,
   colorName,
   customElement,
   drawIcon,
@@ -31,6 +32,7 @@ import { property, state } from 'lit/decorators.js'
 import { live } from 'lit/directives/live.js'
 import { html } from 'lit/static-html.js'
 import { type ChannelName, channelFields, writeChannel } from '../channels.js'
+import { hueAt } from '../wheel.js'
 /* Relative, so this registers the base slider and the styled file's identical
    import registers the styled one. `tier` picks which the template asks for. */
 import '../../button/index.js'
@@ -140,6 +142,8 @@ interface EyeDropperConstructor {
  * @csspart swatch - One preset, an option in the `swatches` listbox.
  * @csspart swatches - The row of presets, a listbox.
  * @csspart value - The text field that holds the color. It accepts a typed or pasted color.
+ * @csspart wheel - The hue ring round the square, with `wheel`. Draw the ring and its mark from `--color-picker-hue`.
+ * @csspart wheel-hue - The range input behind the ring, which a reader turns with the keys.
  *
  * @cssproperty --color-picker-brightness - The chosen brightness, 0 to 100, as a percentage.
  * @cssproperty --color-picker-hue - The chosen hue, 0 to 360, unitless.
@@ -433,6 +437,18 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
    */
   @property({ attribute: 'value-missing-message' })
   valueMissingMessage?: string
+
+  /**
+   * Draws the hue as a wheel around the square, in place of the hue ramp, as
+   * React Aria's ColorWheel sits round its ColorArea.
+   *
+   * The ring is one stop, a slider a reader turns with the arrow keys, Home
+   * and End, the same way round in either writing direction, and a press or a
+   * drag on it takes the hue in that direction. Off, the picker keeps its
+   * ramp.
+   */
+  @property({ reflect: true, type: Boolean })
+  wheel = false
 
   /**
    * The color the reader has moved to, or nothing while they have moved none.
@@ -750,6 +766,35 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
     this.move({ brightness: Math.round((1 - down) * 100), saturation: Math.round(across * 100) })
   }
 
+  /**
+   * A press or a drag on the hue wheel: the hue in that direction from its
+   * center. A press in the square inside it is the square's.
+   */
+  private readonly handleWheelPointer = (event: PointerEvent): void => {
+    const wheel = event.currentTarget as HTMLElement
+    const grid = this.partNamed('grid')
+    if (this.isDisabled || (grid && event.composedPath().includes(grid))) {
+      return
+    }
+    if (event.type === 'pointerup' || event.type === 'pointercancel') {
+      if (wheel.hasPointerCapture(event.pointerId)) {
+        this.settle()
+      }
+      return
+    }
+    if (event.type === 'pointerdown') {
+      capturePointer(wheel, event.pointerId)
+      this.partNamed('wheel-hue')?.focus()
+    } else if (!wheel.hasPointerCapture(event.pointerId)) {
+      return
+    }
+    event.preventDefault()
+    const box = wheel.getBoundingClientRect()
+    if (box.width > 0 && box.height > 0) {
+      this.move({ hue: hueAt(event.clientX, event.clientY, box) })
+    }
+  }
+
   protected override firstUpdated(changed: import('lit').PropertyValues): void {
     super.firstUpdated(changed)
     this.finishHydration()
@@ -797,14 +842,14 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
     }
     const color = this.color
     const along = isRtl(this) ? -1 : 1
-    const clamp = (at: number): number => Math.min(100, Math.max(0, at))
+    const held = (at: number): number => clamp(at, 0, 100)
     const moves: Record<string, Partial<Color>> = {
-      ArrowDown: { brightness: clamp(color.brightness - 1) },
-      ArrowLeft: { saturation: clamp(color.saturation - along) },
-      ArrowRight: { saturation: clamp(color.saturation + along) },
-      ArrowUp: { brightness: clamp(color.brightness + 1) },
-      PageDown: { brightness: clamp(color.brightness - 10) },
-      PageUp: { brightness: clamp(color.brightness + 10) },
+      ArrowDown: { brightness: held(color.brightness - 1) },
+      ArrowLeft: { saturation: held(color.saturation - along) },
+      ArrowRight: { saturation: held(color.saturation + along) },
+      ArrowUp: { brightness: held(color.brightness + 1) },
+      PageDown: { brightness: held(color.brightness - 10) },
+      PageUp: { brightness: held(color.brightness + 10) },
     }
     const next = moves[event.key]
     if (!next) {
@@ -1035,7 +1080,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
    * unless it is stopped: a consumer dragging the area receives the range's
    * event and not this component's.
    */
-  private takeArea(axis: 'brightness' | 'saturation', event: Event): void {
+  private takeArea(axis: 'brightness' | 'hue' | 'saturation', event: Event): void {
     event.stopPropagation()
     const control = event.target as HTMLInputElement
     if (this.readOnly) {
@@ -1214,7 +1259,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
        says which picker on a page with two. */
     const owner = this.getAttribute('aria-label')?.trim()
     const axisName = (channel: string): string => (owner ? `${owner}, ${channel}` : channel)
-    return html`<div
+    const area = html`<div
         part="grid"
         style="--color-picker-hue: ${color.hue}; --color-picker-saturation: ${color.saturation}%; --color-picker-brightness: ${color.brightness}%"
         @pointerdown=${this.handleGridPointer}
@@ -1258,7 +1303,41 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
           @input=${(event: Event) => this.takeArea('brightness', event)}
           @change=${() => this.settle()}
         />
-      </div>
+      </div>`
+    return html`${
+      this.wheel
+        ? html`<div
+            part="wheel"
+            style="--color-picker-hue: ${color.hue}"
+            @pointerdown=${this.handleWheelPointer}
+            @pointermove=${this.handleWheelPointer}
+            @pointerup=${this.handleWheelPointer}
+            @pointercancel=${this.handleWheelPointer}
+          >
+            ${
+              /* Left to right whatever the page's direction: a ring has no
+                 line of text, and the arrows turn it the same way round. */
+              ''
+            }
+            <input
+              part="wheel-hue"
+              type="range"
+              min="0"
+              max="360"
+              dir="ltr"
+              aria-label=${axisName(this.hueLabel)}
+              aria-describedby=${this.feedback === '' ? nothing : 'feedback'}
+              aria-valuetext=${`${color.hue}, ${hue}`}
+              aria-invalid=${this.marked ? 'true' : nothing}
+              .value=${String(color.hue)}
+              ?disabled=${this.isDisabled}
+              @input=${(event: Event) => this.takeArea('hue', event)}
+              @change=${() => this.settle()}
+            />
+            ${area}
+          </div>`
+        : area
+    }
 
       <div part="controls" style="--color-picker-hue: ${color.hue}; --color-picker-swatch: ${painted}">
         <button
@@ -1274,7 +1353,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
           @click=${() => this.copier.copy(this.value)}
         ></button>
         <div part="channels">
-          ${this.renderChannel('hue', this.hueLabel, 360, color.hue, `{value}, ${hue}`)}
+          ${this.wheel ? nothing : this.renderChannel('hue', this.hueLabel, 360, color.hue, `{value}, ${hue}`)}
           ${
             this.alpha
               ? this.renderChannel(

@@ -130,6 +130,93 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
+/*
+ *  The hue as a ring round the square, with `wheel`: React Aria's ColorWheel
+ *  round its ColorArea. A circle the picker's width, the ring painted on a
+ *  layer under the square and cut to a band by a mask, so the square in the
+ *  middle stays a plain child, centered.
+ */
+[part="wheel"] {
+  --_color-picker-ring: var(--color-picker-wheel-thickness, var(--helix-space-lg));
+  aspect-ratio: 1;
+  border-radius: var(--helix-radii-full);
+  cursor: crosshair;
+  display: grid;
+  margin-inline: auto;
+  max-inline-size: var(--color-picker-wheel-size, 100%);
+  place-items: center;
+  position: relative;
+  touch-action: none;
+}
+
+[part="wheel"]::before {
+  background-image: conic-gradient(
+    hsl(0 100% 50%),
+    hsl(60 100% 50%),
+    hsl(120 100% 50%),
+    hsl(180 100% 50%),
+    hsl(240 100% 50%),
+    hsl(300 100% 50%),
+    hsl(360 100% 50%)
+  );
+  border-radius: inherit;
+  content: "";
+  inset: 0;
+  mask-image: radial-gradient(
+    farthest-side,
+    transparent calc(100% - var(--_color-picker-ring)),
+    #000 calc(100% - var(--_color-picker-ring) + 0.5px)
+  );
+  position: absolute;
+}
+
+/* The mark on the ring, the square's mark in the same media tokens: a layer
+   the size of the wheel, turned by the hue, with the mark painted at its top
+   in the middle of the band. Nothing measures the ring's radius. */
+[part="wheel"]::after {
+  --_color-picker-mark-half: calc(var(--helix-size-icon-tight) / 2);
+  background-image: radial-gradient(
+    circle at 50% calc(var(--_color-picker-ring) / 2),
+    transparent calc(var(--_color-picker-mark-half) - var(--helix-border-thick)),
+    var(--helix-color-foreground-media)
+      calc(var(--_color-picker-mark-half) - var(--helix-border-thick))
+      var(--_color-picker-mark-half),
+    color-mix(in oklab, var(--helix-color-surface-media) 60%, transparent)
+      var(--_color-picker-mark-half)
+      calc(var(--_color-picker-mark-half) + var(--helix-border-thin)),
+    transparent calc(var(--_color-picker-mark-half) + var(--helix-border-thin))
+  );
+  content: "";
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  rotate: calc(var(--color-picker-hue, 0) * 1deg);
+}
+
+/* The square inside the ring, square, with the gap a ramp keeps from the
+   square below it between its corners and the band. */
+[part="wheel"] [part="grid"] {
+  aspect-ratio: 1;
+  inline-size: calc(
+    (100% - var(--_color-picker-ring) * 2 - var(--helix-space-sm) * 2) * 0.7071
+  );
+}
+
+[part="wheel-hue"] {
+  appearance: none;
+  background: none;
+  inset: 0;
+  margin: var(--helix-space-none);
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+[part="wheel"]:has([part="wheel-hue"]:focus-visible) {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
 [part="controls"] {
   align-items: center;
   display: flex;

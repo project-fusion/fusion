@@ -1,9 +1,8 @@
 /**
  * What a Format Date was asked for, in its own spelling: the `Intl` options a
- * consumer set, and whether the timestamp is a day with no time of day.
+ * consumer set. The element itself is one, so it passes itself.
  */
 export interface Asked {
-  dateOnly: boolean
   dateStyle?: 'full' | 'long' | 'medium' | 'short' | undefined
   day?: 'numeric' | '2-digit' | undefined
   era?: 'long' | 'narrow' | 'short' | undefined
@@ -40,11 +39,11 @@ const FIELDS = [
  * given beside `month` or `hour`, so the fields are left out wherever a style
  * is set. `hourCycle` and `timeZone` go with either.
  *
- * **A day with no time is read in UTC** unless a zone is given. Parsed, it is
+ * **A day with no time, `dateOnly`, is read in UTC** unless a zone is given. Parsed, it is
  * midnight UTC, and read in a zone west of it that is the day before: measured
  * before this, `2026-08-04` read "August 3, 2026" in Los Angeles.
  */
-export const formatOptions = (asked: Asked): Intl.DateTimeFormatOptions => {
+export const formatOptions = (asked: Asked, dateOnly = false): Intl.DateTimeFormatOptions => {
   const options: Intl.DateTimeFormatOptions = {}
   const styled = asked.dateStyle !== undefined || asked.timeStyle !== undefined
   if (styled) {
@@ -67,7 +66,7 @@ export const formatOptions = (asked: Asked): Intl.DateTimeFormatOptions => {
   }
   if (asked.timeZone) {
     options.timeZone = asked.timeZone
-  } else if (asked.dateOnly) {
+  } else if (dateOnly) {
     options.timeZone = 'UTC'
   }
   return options
