@@ -1,10 +1,16 @@
 import {
   ArrivalController,
+  ariaChord,
   CountdownController,
   customElement,
+  deepActiveElement,
+  FocusScopeController,
   HelixElement,
+  hostAria,
   MixinDismissible,
   markRegion,
+  matchesChord,
+  onApple,
   reportRuntime,
   slottedWords,
 } from '@fusion.dev/helix-core'
@@ -40,6 +46,15 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * moves to the dismiss button of the announcement beside it. With no other
  * announcement beside it, move focus yourself, for example to the page's main
  * heading.
+ *
+ * **The announcement is a landmark region**, named by `label`, "Announcement"
+ * unless you set it, so a screen reader lists it among the page's regions.
+ * `hotkey`, F6 unless you set it, moves focus to the announcement's first
+ * control, an action or the dismiss button, and pressed there moves focus
+ * back to where it was, as React Aria's toast region does. An announcement
+ * with no control leaves the key to the browser. When an announcement that
+ * the key moved focus into is removed with focus still inside, focus goes
+ * back to where it was before the key.
  *
  * Set `duration` to dismiss it after a time. The clock stops while the pointer
  * or focus is on the announcement, and continues from what was left, so a
@@ -83,6 +98,25 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
   duration?: number
 
   /**
+   * The key that moves focus to the announcement's first control, and back
+   * to where it was, written as keys joined by `+`, such as `F6` or `Alt+A`.
+   *
+   * F6 by default, the key React Aria's regions answer to. Empty turns it
+   * off. With several announcements, the first one in the page takes focus.
+   */
+  @property()
+  hotkey = 'F6'
+
+  /**
+   * The name of the announcement's region, which screen readers list among
+   * the page's landmarks. Translate it with the rest of your interface.
+   *
+   * Empty leaves the announcement no region.
+   */
+  @property()
+  label = 'Announcement'
+
+  /**
    * The band's color.
    *
    * Paint only: unlike `Callout`, no value here draws a mark, changes the label,
@@ -124,6 +158,59 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
     },
   })
 
+  /* Where `hotkey` takes focus: the actions and the dismiss button. */
+  private readonly scope = new FocusScopeController(this, {
+    contents: () => [
+      ...(this.renderRoot
+        ?.querySelector<HTMLSlotElement>('slot[name="actions"]')
+        ?.assignedElements({ flatten: true }) ?? []),
+      ...[...(this.renderRoot?.querySelectorAll('[part="dismiss"]') ?? [])],
+    ],
+    surface: () => null,
+  })
+
+  /** Where focus was when `hotkey` moved it in. */
+  private origin: HTMLElement | undefined
+
+  /** Whether focus is inside the announcement, kept as it moves. */
+  private focused = false
+
+  /* On the document, since the key is pressed anywhere in the page. Pressed
+     inside another announcement, it is that one's to answer. */
+  private readonly handleHotkey = (event: KeyboardEvent): void => {
+    if (event.defaultPrevented || !matchesChord(event, this.hotkey, onApple())) {
+      return
+    }
+    if (this.scope.holdsFocus) {
+      /* Back only where the key found focus; a reader who tabbed in has
+         nowhere to go back to, and the key stays the browser's. */
+      if (this.scope.leave()) {
+        event.preventDefault()
+      }
+      this.origin = undefined
+      return
+    }
+    const other = event
+      .composedPath()
+      .some((node) => node !== this && node instanceof HelixHeadlessAnnouncement)
+    if (other || this.scope.controls.length === 0) {
+      return
+    }
+    event.preventDefault()
+    const active = deepActiveElement()
+    this.origin = active instanceof HTMLElement ? active : undefined
+    this.scope.enter()
+  }
+
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    /* Through internals, so nothing is written onto the host. */
+    hostAria(this.internals, { label: this.label, role: this.label.trim() ? 'region' : '' })
+    if ('ariaKeyShortcuts' in this.internals) {
+      this.internals.ariaKeyShortcuts = ariaChord(this.hotkey, onApple()) || null
+    }
+  }
+
   /** Whether the page being hidden is one of the reasons the clock is held. */
   private heldHidden = false
 
@@ -143,11 +230,13 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
   /* Hover and focus hold the clock, counted by the countdown. On the host,
      because the announcement's regions are its children, with no box around
      them all. */
-  private readonly handleHold = (): void => {
+  private readonly handleHold = (event: Event): void => {
+    this.focused ||= event.type === 'focusin'
     this.countdown.hold()
   }
 
-  private readonly handleRelease = (): void => {
+  private readonly handleRelease = (event: Event): void => {
+    this.focused &&= event.type !== 'focusout'
     this.countdown.release()
   }
 
@@ -158,6 +247,7 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
     this.addEventListener('focusin', this.handleHold)
     this.addEventListener('focusout', this.handleRelease)
     document.addEventListener('visibilitychange', this.handleVisibility)
+    document.addEventListener('keydown', this.handleHotkey)
     /* The clock again after a move, from what was left of it. */
     if (this.hasUpdated) {
       this.countdown.resume()
@@ -172,8 +262,24 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
     this.removeEventListener('focusin', this.handleHold)
     this.removeEventListener('focusout', this.handleRelease)
     document.removeEventListener('visibilitychange', this.handleVisibility)
+    document.removeEventListener('keydown', this.handleHotkey)
     /* The countdown lets every hold go as the host leaves. */
     this.heldHidden = false
+    /* Removed with focus inside, after the key moved it in: focus goes back
+       where the key found it, a frame later, so a neighbor the dismissal
+       handed focus to keeps it. A removal fires no `focusout`, so `focused`
+       still says where focus was. */
+    const origin = this.focused ? this.origin : undefined
+    this.focused = false
+    this.origin = undefined
+    if (origin) {
+      requestAnimationFrame(() => {
+        const active = deepActiveElement()
+        if (origin.isConnected && (active === null || active === document.body)) {
+          origin.focus({ preventScroll: true })
+        }
+      })
+    }
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
