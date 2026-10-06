@@ -179,10 +179,9 @@
    which is the solid fill a button stands on and would make a column of chosen
    rows read as an alarm; this is the primary at the strength Tag rests at. */
 [part="row"][aria-selected="true"] > * {
-  background-color: color-mix(
-    in srgb,
-    var(--helix-color-primary) 10%,
-    var(--helix-color-background)
+  background-color: var(
+    --data-table-selected-background-color,
+    color-mix(in srgb, var(--helix-color-primary) 10%, var(--helix-color-background))
   );
 }
 
@@ -197,7 +196,7 @@
 }
 
 [part="toolbar"] {
-  padding-block-end: var(--helix-space-sm);
+  padding-block-end: var(--data-table-toolbar-gap, var(--helix-space-sm));
 }
 
 /* **A row across the table's width, not a block the controls sit at the left
@@ -215,8 +214,8 @@
   align-items: center;
   display: flex;
   flex-wrap: wrap;
-  gap: var(--helix-space-md);
-  padding-block-start: var(--helix-space-sm);
+  gap: var(--data-table-footer-item-gap, var(--helix-space-md));
+  padding-block-start: var(--data-table-footer-gap, var(--helix-space-sm));
 }
 
 /* **The end, whether or not anything is slotted beside it**, which is what makes
@@ -242,7 +241,7 @@
 :host([child-field]) [part~="cell-header"] {
   --_data-table-gutter: calc(
     var(--data-table-toggle-size, var(--helix-size-icon-tight)) +
-    var(--helix-space-2xs)
+    var(--data-table-toggle-gap, var(--helix-space-2xs))
   );
   padding-inline-start: calc(
     (var(--data-table-level, 1) - 1) *
@@ -268,7 +267,7 @@
   display: inline-flex;
   inline-size: var(--data-table-toggle-size, var(--helix-size-icon-tight));
   justify-content: center;
-  margin-inline-end: var(--helix-space-2xs);
+  margin-inline-end: var(--data-table-toggle-gap, var(--helix-space-2xs));
   padding: 0;
   vertical-align: middle;
 }
@@ -299,8 +298,8 @@
   cursor: pointer;
   font-family: var(--helix-font-sans);
   font-size: var(--data-table-text, var(--helix-text-sm));
-  padding-block: var(--helix-space-2xs);
-  padding-inline: var(--helix-space-sm);
+  padding-block: var(--data-table-more-padding-block, var(--helix-space-2xs));
+  padding-inline: var(--data-table-more-padding-inline, var(--helix-space-sm));
 }
 
 [part="more-button"]:hover {
