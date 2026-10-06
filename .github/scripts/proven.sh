@@ -15,7 +15,9 @@
 # would also fail the gate, and a run that verified everything must not go red
 # because the shortcut was unavailable.
 #
-# Reads: TREE, REPOSITORY, GH_TOKEN. Writes: `proven` on GITHUB_OUTPUT.
+# Reads: TREE, REPOSITORY, GH_TOKEN. Writes `proven` on GITHUB_OUTPUT, and
+# `run` beside it when it is true: the run that verified the tree, whose
+# artifacts the `telemetry` job sends.
 set -uo pipefail
 
 no() {
@@ -41,6 +43,7 @@ for run in $runs; do
   if [ "$event" = pull_request ] && [ "$conclusion" = success ] \
     && [ "${path%%@*}" = .github/workflows/verify.yml ]; then
     echo 'proven=true' >> "$GITHUB_OUTPUT"
+    echo "run=$run" >> "$GITHUB_OUTPUT"
     echo "Run $run verified tree $TREE on a pull request, so this push runs nothing again." \
       >> "$GITHUB_STEP_SUMMARY"
     exit 0
