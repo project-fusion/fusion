@@ -1,5 +1,18 @@
-import { describe, expect, test } from 'bun:test'
-import { createSheet } from './create-sheet.js'
+import { beforeAll, describe, expect, test } from 'bun:test'
+import { registerDom } from '@fusion.dev/helix-testing/dom'
+
+let createSheet: typeof import('./create-sheet.js')['createSheet']
+
+/* Imported after registration, because `create-sheet.js` loads Lit, and Lit
+   captures whichever `document` is global when it is evaluated. Specs share one
+   module cache, and this file can run before any DOM spec has registered
+   happy-dom. A static import here gave every later DOM spec a Lit that holds
+   a placeholder document, and their renders failed with "l.createComment is
+   not a function". */
+beforeAll(async () => {
+  registerDom()
+  ;({ createSheet } = await import('./create-sheet.js'))
+})
 
 /**
  * One line wrapping `unsafeCSS`, and the test is that it stays that way.
