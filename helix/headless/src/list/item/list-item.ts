@@ -1,5 +1,5 @@
 import { customElement, HelixElement, hostAria, slottedWords } from '@fusion.dev/helix-core'
-import { dotsThreeVertical } from '@fusion.dev/helix-icons'
+import { dotsSixVertical } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
@@ -249,8 +249,8 @@ export class HelixHeadlessListItem extends HelixElement {
     return this.grip === undefined
       ? nothing
       : html`<button part="grip" type="button" tabindex=${this.grouped ? '-1' : nothing} aria-label=${this.grip}>
-          <svg aria-hidden="true" fill="currentColor" part="grip-mark" viewBox=${dotsThreeVertical.viewBox}>
-            ${unsafeSVG(dotsThreeVertical.content)}
+          <svg aria-hidden="true" fill="currentColor" part="grip-mark" viewBox=${dotsSixVertical.viewBox}>
+            ${unsafeSVG(dotsSixVertical.content)}
           </svg>
         </button>`
   }
