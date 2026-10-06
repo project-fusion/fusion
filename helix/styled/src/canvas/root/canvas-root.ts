@@ -27,11 +27,17 @@ import { styles } from './canvas-root.css.js'
  * @cssproperty --canvas-background-color - The background behind the board.
  * @cssproperty --canvas-block-size - The height of the frame.
  * @cssproperty --canvas-border-color - The color of the frame's edge.
+ * @cssproperty --canvas-connect-color - The color of a connection being drawn, and of the card it will arrive at and that card's points.
  * @cssproperty --canvas-edge-color - The color of a connection with no tone. Set it in one edge's `style` to color only that edge.
  * @cssproperty --canvas-edge-target-width - The width of the area a pointer can press on a connection, which is wider than the drawn line.
+ * @cssproperty --canvas-edge-width - The width of a connection's line. A selected or focused connection is drawn at twice it.
  * @cssproperty --canvas-grid-size - The spacing of the grid lines or dots, in the document's units, so it scales with the zoom.
  * @cssproperty --canvas-handle-size - The size of the ends of a selected connection. A card's connection points use the same property.
+ * @cssproperty --canvas-label-color - The color of the label on a connection.
  * @cssproperty --canvas-label-editor-inline-size - The width of the field for editing a label.
+ * @cssproperty --canvas-label-font-size - The size of the label on a connection.
+ * @cssproperty --canvas-radius - The frame's corners.
+ * @cssproperty --canvas-selected-color - The color of what is selected: a card's outline, its corners and its move handle, a connection and its ends, and the box drawn to select.
  * @cssproperty --viewport-control-background-color - The background of the pan and zoom buttons. `Map` uses the same property.
  */
 @customElement('helix-canvas')
