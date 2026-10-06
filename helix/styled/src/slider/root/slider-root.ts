@@ -31,6 +31,8 @@ import { styles } from './slider-root.css.js'
  * @cssproperty --slider-thumb-radius - The thumb's corner radius. It is fully round by default, so a thumb with two different dimensions is a capsule unless you change it.
  * @cssproperty --slider-thumb-ring-color - The color of the ring between the thumb and the track. Set it for a slider that sits on a surface other than the page background.
  * @cssproperty --slider-thumb-size - The thumb's size across the track. It equals the length by default, which makes the thumb round.
+ * @cssproperty --slider-tooltip-background-color - The fill of the bubble each thumb shows its value in, under `tooltip`.
+ * @cssproperty --slider-tooltip-color - The color of the value in a thumb's bubble, under `tooltip`.
  * @cssproperty --slider-track-color - The color of the unfilled part of the track.
  * @cssproperty --slider-track-image - An image for the whole track, such as a gradient for a slider whose value is a color.
  * @cssproperty --slider-track-size - The thickness of the track. It matches the progress bar's size by default.

@@ -87,7 +87,10 @@ import { property } from 'lit/decorators.js'
  * @csspart marker-label - The value a mark stands at, when `marker-labels` is set.
  * @csspart markers - The row of marks along the track.
  * @csspart output - The current value, shown beside the track.
+ * @csspart tooltip - One thumb's value in a bubble beside it, under `tooltip`. It carries `data-thumb` on a range, `start` or `end`, and `--slider-at`, where its thumb is as a fraction of the track.
+ * @csspart tooltips - The layer over the track that holds the bubbles, under `tooltip`.
  *
+ * @cssproperty --slider-at - Where a bubble's thumb is, as a fraction of the track, 0 to 1. Set on each `tooltip` part.
  * @cssproperty --slider-fraction - The value as a fraction of the range, 0 to 1.
  * @cssproperty --slider-from - Where the filled span starts, as a fraction of the track, 0 to 1: a range's lower thumb, or a single thumb's `origin`.
  * @cssproperty --slider-marker-at - Where one marker sits, as a percentage of the track.
@@ -244,6 +247,15 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   /** How far one press of an arrow key moves the thumb. */
   @property({ type: Number })
   step = 1
+
+  /**
+   * Whether each thumb shows its value in a bubble beside it, as Web
+   * Awesome's `with-tooltip`. The styled slider shows the bubbles while the
+   * slider is under the pointer or holds focus. They repeat what each thumb
+   * already reports, so a screen reader skips them.
+   */
+  @property({ type: Boolean })
+  tooltip = false
 
   /**
    * How many characters the readout has to be able to hold, widest case.
@@ -551,6 +563,32 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   @property({ attribute: 'value-text' })
   valueText = ''
 
+  /**
+   * A bubble for each thumb, under `tooltip`, saying its value where it is.
+   * After the thumbs, so a stylesheet can reach a bubble from a focused
+   * thumb, and hidden from the accessibility tree for the reason the readout
+   * is: each thumb already reports its value.
+   */
+  protected renderTooltips(start: number, end: number): TemplateResult | typeof nothing {
+    if (!this.tooltip) {
+      return nothing
+    }
+    const bubble = (fraction: number, text: string, thumb?: 'end' | 'start'): TemplateResult =>
+      html`<span part="tooltip" data-thumb=${thumb ?? nothing} style="--slider-at: ${fraction}"
+        >${text}</span
+      >`
+    return html`<div part="tooltips" aria-hidden="true">
+      ${
+        this.range
+          ? [
+              bubble(this.along(start), this.said(start), 'start'),
+              bubble(this.along(end), this.said(end), 'end'),
+            ]
+          : bubble(this.fraction, this.said(this.value))
+      }
+    </div>`
+  }
+
   protected override render(): TemplateResult {
     /* The range's bounds are written before its value below, and that order is
        the whole of this element's correctness on a wide scale. Lit commits
@@ -636,6 +674,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
       part="field"
       data-markers=${this.markerValues.length > 0 ? '' : nothing}
       data-range=${this.range ? '' : nothing}
+      data-tooltip=${this.tooltip ? '' : nothing}
       style="--slider-fraction: ${this.fraction}; --slider-from: ${this.along(start)}; --slider-to: ${this.along(end)}"
     >
       ${this.range ? thumb('start', start) : nothing}
@@ -680,6 +719,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
             </div>`
           : nothing
       }
+      ${this.renderTooltips(start, end)}
       ${
         /* Hidden from the accessibility tree, like the markers above it.
          *

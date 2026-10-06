@@ -560,6 +560,93 @@
   margin-inline: 0;
 }
 
+/*
+ *  A bubble for each thumb, under `tooltip`.
+ *
+ * In the control's own cell, as the marks are, so a bubble is placed against
+ * the track the thumb travels and takes no room in the row. Inset by half a
+ * thumb at each end, because that is where a thumb's center stops. Shown while
+ * the slider is under the pointer or holds focus, as Web Awesome's are.
+ */
+[part="field"][data-tooltip] {
+  display: grid;
+  grid-template-columns: 1fr auto;
+}
+
+[part="field"][data-tooltip] [part="control"],
+[part="tooltips"] {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+[part="field"][data-tooltip] [part="output"] {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+[part="tooltips"] {
+  align-self: center;
+  block-size: var(--_slider-track);
+  margin-inline: calc(var(--_slider-thumb-length) / 2);
+  pointer-events: none;
+  position: relative;
+  z-index: var(--helix-layer-overlay);
+}
+
+[part="tooltip"] {
+  background-color: var(--slider-tooltip-background-color, var(--helix-color-surface-inverse));
+  border-radius: var(--helix-radii-sm);
+  color: var(--slider-tooltip-color, var(--helix-color-foreground-inverse));
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  font-variant-numeric: tabular-nums;
+  inset-block-end: calc(50% + var(--_slider-thumb) / 2 + var(--helix-space-2xs));
+  inset-inline-start: calc(var(--slider-at, 0) * 100%);
+  opacity: 0;
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+  position: absolute;
+  transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+  translate: -50% 0;
+  white-space: nowrap;
+}
+
+:host(:dir(rtl)) [part="tooltip"] {
+  translate: 50% 0;
+}
+
+:host(:hover) [part="tooltip"],
+:host(:focus-within) [part="tooltip"] {
+  opacity: 1;
+}
+
+/* Standing up, the bubbles sit beside the track and climb it from the foot. */
+:host([orientation="vertical"]) [part="field"][data-tooltip] {
+  grid-template-columns: none;
+  grid-template-rows: 1fr auto;
+}
+
+:host([orientation="vertical"]) [part="field"][data-tooltip] [part="output"] {
+  grid-column: 1;
+  grid-row: 2;
+  /* Under the track, where the flex column puts it without bubbles. */
+  justify-self: center;
+}
+
+:host([orientation="vertical"]) [part="tooltips"] {
+  align-self: stretch;
+  block-size: auto;
+  inline-size: var(--_slider-track);
+  justify-self: center;
+  margin-block: calc(var(--_slider-thumb) / 2);
+  margin-inline: 0;
+}
+
+:host([orientation="vertical"]) [part="tooltip"] {
+  inset-block-end: calc(var(--slider-at, 0) * 100%);
+  inset-inline-start: calc(50% + var(--_slider-thumb) / 2 + var(--helix-space-2xs));
+  translate: 0 50%;
+}
+
 /* Print: a control prints the value it holds, and here the value is the fill, so
  * a track printed without it is a document saying nothing was set.
  *

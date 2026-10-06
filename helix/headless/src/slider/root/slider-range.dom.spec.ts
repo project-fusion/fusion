@@ -214,3 +214,31 @@ describe('the bounds each thumb announces', () => {
     expect(end?.hasAttribute('aria-valuemax')).toBe(false)
   })
 })
+
+/* Web Awesome's slider has `with-tooltip`: each thumb's value in a bubble
+   beside it. Here only the readout beside the track said the value. */
+describe('a bubble for each thumb', () => {
+  const bubbles = (host: Slider): HTMLElement[] => [
+    ...(host.shadowRoot as ShadowRoot).querySelectorAll<HTMLElement>('[part="tooltip"]'),
+  ]
+
+  test('is drawn only under `tooltip`, hidden from a reader', async () => {
+    expect(bubbles(await slider('default-value="40"'))).toHaveLength(0)
+    const host = await slider('tooltip default-value="40"')
+    expect(bubbles(host).map((one) => one.textContent?.trim())).toEqual(['40'])
+    expect(part(host, 'tooltips')?.getAttribute('aria-hidden')).toBe('true')
+    expect(part(host, 'field')?.hasAttribute('data-tooltip')).toBe(true)
+    expect(bubbles(host)[0]?.getAttribute('style')).toContain('--slider-at: 0.4')
+  })
+
+  test('says each thumb of a range where it is, and follows a move', async () => {
+    const host = await slider('range tooltip default-value="20,70"')
+    expect(bubbles(host).map((one) => [one.dataset.thumb, one.textContent?.trim()])).toEqual([
+      ['start', '20'],
+      ['end', '70'],
+    ])
+    await move(host, 'end', '60')
+    expect(bubbles(host)[1]?.textContent?.trim()).toBe('60')
+    expect(bubbles(host)[1]?.getAttribute('style')).toContain('--slider-at: 0.6')
+  })
+})
