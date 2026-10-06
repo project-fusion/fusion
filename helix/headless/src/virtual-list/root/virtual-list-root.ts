@@ -1,16 +1,18 @@
 import {
   AriaForwardController,
+  anchorAt,
   commaList,
   customElement,
   elementById,
-  HelixBeforeChangeEvent,
   HelixElement,
   HelixLoadMoreEvent,
   HelixRangeChangeEvent,
+  inRowOrder,
   isRtl,
+  pressedOwnControl,
   type Rendered,
   rangeAdd,
-  requestChange,
+  requestValue,
   searchableById,
   selectsAll,
   Typeahead,
@@ -641,8 +643,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
     const now = commaList(this.value)
     if (extend && mode === 'multiple') {
       const keys = this.keys()
-      const from = this.anchor === undefined ? -1 : keys.indexOf(this.anchor)
-      const range = rangeAdd(now, keys, from, at)
+      const range = rangeAdd(now, keys, anchorAt(keys, this.anchor, at).anchor, at)
       if (range) {
         this.choose(this.inOrder(range))
       }
@@ -658,10 +659,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
 
   /** Keys in the order of the set, a key it no longer holds kept after them. */
   private inOrder(keys: readonly string[]): string {
-    const wanted = new Set(keys)
-    const ordered = this.keys().filter((key) => wanted.has(key))
-    const placed = new Set(ordered)
-    return [...ordered, ...keys.filter((key) => !placed.has(key))].join(',')
+    return inRowOrder(keys, this.keys()).join(',')
   }
 
   /** Asks for a new `value`, and says so once it has moved. */
@@ -669,14 +667,8 @@ export class HelixHeadlessVirtualList extends HelixElement {
     if (next === this.value) {
       return
     }
-    requestChange({
-      apply: (value) => {
-        this.value = value
-        this.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
-      },
-      event: (value) => new HelixBeforeChangeEvent({ value }),
-      host: this,
-      next,
+    requestValue(this, next, (value) => {
+      this.value = value
     })
   }
 
@@ -696,12 +688,13 @@ export class HelixHeadlessVirtualList extends HelixElement {
     if (at === undefined) {
       return
     }
-    const inner = path.slice(0, path.indexOf(row as HTMLElement))
+    /* Narrower than core's: a row's own controls are held at `tabindex="-1"`
+       and still count by their tag, and nothing else with a `tabindex` does. */
     if (
-      inner.some(
-        (node) =>
-          node instanceof HTMLElement &&
-          node.matches('a[href], button, input, select, textarea, label'),
+      pressedOwnControl(
+        event,
+        row as HTMLElement,
+        'a[href], button, input, select, textarea, label',
       )
     ) {
       return

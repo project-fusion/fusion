@@ -439,6 +439,13 @@ export {
   type LinkTarget,
 } from './utils/follow-link/follow-link.js'
 export { formatNumbers } from './utils/format-numbers/format-numbers.js'
+export {
+  type GridBounds,
+  type GridKeys,
+  type GridPlace,
+  gridMove,
+  pageRows,
+} from './utils/grid-move/grid-move.js'
 export { headingIn, headingsIn } from './utils/heading-in/heading-in.js'
 export { headingLevel } from './utils/heading-level/heading-level.js'
 export { type HostAria, hostAria } from './utils/host-aria/host-aria.js'

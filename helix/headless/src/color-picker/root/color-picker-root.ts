@@ -9,6 +9,7 @@ import {
   customElement,
   drawIcon,
   fillTemplate,
+  focusItemOf,
   formatColor,
   formatNumber,
   HelixFormElement,
@@ -638,16 +639,15 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
       [
         ...(this.renderRoot?.querySelectorAll<HTMLElement>('[part="swatches"] [part="swatch"]') ??
           []),
-      ].map((swatch, index) => ({
-        contains: (node: Node | null) => swatch === node,
-        disabled: false,
-        focusItem: () => {
-          this.swatchAt = index
-          swatch.focus()
-        },
-        select: () => {},
-        selected: false,
-      })),
+      ].map((swatch, index) =>
+        focusItemOf(swatch, {
+          focus: () => {
+            this.swatchAt = index
+            swatch.focus()
+          },
+          owns: (node) => node === swatch,
+        }),
+      ),
     origin: 'focus',
     selects: () => false,
     wrap: false,

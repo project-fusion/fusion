@@ -1,4 +1,10 @@
-import { customElement, HelixElement, MixinDismissible, slottedWords } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  HelixElement,
+  labelWith,
+  MixinDismissible,
+  slottedWords,
+} from '@fusion.dev/helix-core'
 import { x } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -146,8 +152,7 @@ export class HelixHeadlessFilterChip extends MixinDismissible(HelixElement) {
     const words = [read('field', this.label), read('operator', this.operatorLabel), read('', '')]
       .filter(Boolean)
       .join(' ')
-    const label = this.dismissLabel
-    return label.includes('{label}') ? label.replace('{label}', words) : `${label} ${words}`.trim()
+    return labelWith(this.dismissLabel, 'label', words)
   }
 
   protected override firstUpdated(changed: PropertyValues): void {

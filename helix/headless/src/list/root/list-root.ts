@@ -1,15 +1,17 @@
 import {
   commaList,
   customElement,
+  focusItemOf,
   HelixActionEvent,
-  HelixBeforeChangeEvent,
   HelixElement,
   hostAria,
   inlineStep,
   KeyboardNavigationController,
   type NavigableItem,
-  requestChange,
+  pressedOwnControl,
+  requestValue,
   rovingStop,
+  scrollRoom,
   selectsAll,
   typeaheadByWords,
   whenHydrated,
@@ -25,9 +27,6 @@ import {
   pageReach,
   rowStop,
 } from '../selection.js'
-
-/** What inside a row takes a press of its own, so the row does not. */
-const PRESSABLE = 'a[href], button, input, label, select, textarea, [tabindex]'
 
 /**
  * @summary A set of rows, announced as a list.
@@ -223,15 +222,12 @@ export class HelixHeadlessList extends HelixElement {
   }
 
   /** A row as the keyboard controller sees it: an item it moves focus to and never chooses. */
-  private navigable(row: HelixHeadlessListItem): NavigableItem & { words: string } {
-    return {
-      contains: (node) => row.contains(node),
+  private navigable(row: HelixHeadlessListItem): NavigableItem {
+    return focusItemOf(row, {
       disabled: row.disabled,
-      focusItem: () => row.focusItem(),
-      select: () => {},
-      selected: false,
+      focus: () => row.focusItem(),
       words: row.words,
-    }
+    })
   }
 
   /** What a row stands for in `value`: its own `value`, or its words. */
@@ -281,14 +277,8 @@ export class HelixHeadlessList extends HelixElement {
     if (next === null) {
       return
     }
-    requestChange({
-      apply: (value) => {
-        this.value = value
-        this.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
-      },
-      event: (value) => new HelixBeforeChangeEvent({ value }),
-      host: this,
-      next,
+    requestValue(this, next, (value) => {
+      this.value = value
     })
   }
 
@@ -355,8 +345,7 @@ export class HelixHeadlessList extends HelixElement {
       const box = one.getBoundingClientRect()
       return { bottom: box.bottom, top: box.top }
     })
-    const room = this.scrollHeight > this.clientHeight + 1 ? this.clientHeight : window.innerHeight
-    const target = rows[pageReach(edges, rows.indexOf(row), room, step)]
+    const target = rows[pageReach(edges, rows.indexOf(row), scrollRoom(this), step)]
     if (target && target !== row) {
       target.focusItem()
     }
@@ -450,11 +439,8 @@ export class HelixHeadlessList extends HelixElement {
     }
     /* What was pressed inside the row, before its cell, or before the row
        itself where a slotted control's path does not pass the cell. */
-    const path = event.composedPath()
     const cell = row.cell
-    const end = cell && path.includes(cell) ? path.indexOf(cell) : path.indexOf(row)
-    const inner = path.slice(0, Math.max(0, end))
-    if (inner.some((node) => node instanceof HTMLElement && node.matches(PRESSABLE))) {
+    if (pressedOwnControl(event, cell && event.composedPath().includes(cell) ? cell : row)) {
       return
     }
     if (this.selectionMode === 'none') {

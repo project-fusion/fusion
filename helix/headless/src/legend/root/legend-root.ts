@@ -1,9 +1,9 @@
 import {
   customElement,
-  HelixBeforeChangeEvent,
+  focusItemOf,
   HelixElement,
   KeyboardNavigationController,
-  requestChange,
+  requestValue,
   type Series,
   SourceController,
   seriesIndex,
@@ -152,14 +152,7 @@ export class HelixHeadlessLegend extends HelixElement {
     items: () =>
       this.toggles
         ? [...this.renderRoot.querySelectorAll<HTMLButtonElement>('[part="toggle"]')].map(
-            (button) => ({
-              contains: (node: Node | null) => button.contains(node),
-              disabled: false,
-              focusItem: () => button.focus(),
-              select: () => {},
-              selected: false,
-              words: button.textContent?.trim() ?? '',
-            }),
+            (button) => focusItemOf(button, { words: button.textContent?.trim() ?? '' }),
           )
         : [],
     origin: 'focus',
@@ -259,14 +252,8 @@ export class HelixHeadlessLegend extends HelixElement {
    * once the series is hidden or shown.
    */
   protected toggle(name: string): void {
-    requestChange({
-      apply: (value) => {
-        this.hiddenSeries = value
-        this.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
-      },
-      event: (value) => new HelixBeforeChangeEvent({ value }),
-      host: this,
-      next: toggledNames(this.hiddenSeries, name),
+    requestValue(this, toggledNames(this.hiddenSeries, name), (value) => {
+      this.hiddenSeries = value
     })
   }
 
