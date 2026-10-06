@@ -44,31 +44,33 @@ const warmth = (): Warmth => {
  * @summary A short text that appears next to an element on hover and focus.
  *
  * @description
- * The trigger is slotted and stays your own element. The bubble renders in the
+ * The trigger stays your own element. The bubble renders in the
  * top layer through the popover API, so an ancestor with `overflow: hidden`
  * does not clip it and no `z-index` is needed. `FloatingController` positions
  * it and flips it to another side when the preferred side does not fit.
  *
- * **The tooltip describes its trigger itself, in both forms.** Wrap the
- * trigger, or place the tooltip beside it and name the trigger with `for`:
+ * **Place the tooltip beside its trigger, name the trigger with `for`, and
+ * name the tooltip in the trigger's `aria-describedby`.** The description is
+ * then in your own markup, so it is in the server's HTML and in the
+ * accessibility tree at rest, in every browser, before anyone points at the
+ * trigger or focuses it:
  *
  * ```html
- * <helix-headless-button id="save">Save</helix-headless-button>
- * <helix-headless-tooltip for="save" content="Save your work"></helix-headless-tooltip>
+ * <helix-headless-button aria-describedby="save-tip" id="save">Save</helix-headless-button>
+ * <helix-headless-tooltip content="Save your work" for="save" id="save-tip"></helix-headless-tooltip>
  * ```
  *
- * The link is an element reference on the control that takes focus, and it is
- * never written into your markup before a reader has acted. A trigger that is a
- * Helix component is described at once, inside its own shadow root. A plain
- * element in your markup is described when a reader first points at it or
- * focuses it, which is after any hydration, and only where you have written no
- * `aria-describedby` or `aria-labelledby` of your own. Write
- * `aria-describedby` pointing at the tooltip yourself to have the link in the
- * server's markup. Where the browser has no element references, write it
- * yourself; the tooltip warns once on first open if nothing links the two.
- * In the `for` form the tooltip itself is out of the accessibility tree while
- * its bubble is down, so a reader walking the page meets its words once, as
- * the trigger's description.
+ * Without the attribute, the tooltip links itself through an element reference
+ * on the control that takes focus, and it never writes into your markup before
+ * you act, so hydration stays intact. A trigger that is a Helix component is
+ * described at once, inside its own shadow root. A plain element in your
+ * markup is described when you first point at it or focus it, so a screen
+ * reader in reading mode meets it with no description until then. Where the
+ * browser has no element references, nothing links the two, and the tooltip
+ * warns once on first open. The tooltip can also wrap its trigger, which
+ * describes a Helix component and leaves a plain element undescribed. In the
+ * `for` form the tooltip itself is out of the accessibility tree while its
+ * bubble is down, so you meet its words once, as the trigger's description.
  *
  * The tooltip shows on hover and on focus. It hides on pointer leave, on blur,
  * on Escape, and when the trigger is activated. The pointer can move from the
@@ -161,6 +163,14 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
    *
    * Names an element in the same tree, so a tooltip inside another component's
    * shadow root points at one in that root rather than one in the document.
+   *
+   * Give the tooltip an `id` and name it in the trigger's `aria-describedby`,
+   * so the trigger is described in the server's markup and at rest:
+   *
+   * ```html
+   * <button aria-describedby="save-tip" id="save">Save</button>
+   * <helix-headless-tooltip content="Save your work" for="save" id="save-tip"></helix-headless-tooltip>
+   * ```
    *
    * **In React this arrives as a property and not as an attribute**, which is
    * worth knowing before someone reads the DOM and thinks it did not take.
