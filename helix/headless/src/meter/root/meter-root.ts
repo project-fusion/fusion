@@ -49,7 +49,7 @@ const BAND_WORDS: Readonly<Record<MeterBand, string>> = { fair: 'Fair', good: 'G
  *
  * @slot label - A visible label. Its words name the meter in place of `label`.
  *
- * @event {HelixBandEvent} helix-band - Fired when the reading moves into another band, with the band it is in now, or `''` where it is in none. Not on the first render, and not cancelable.
+ * @event {HelixBandEvent} helix-band - Fired when the reading moves into another band, with the band it is in now, or `''` where it is in none. Not sent on the first render, since a meter that arrives in a band has not moved.
  *
  * @csspart groove - The unfilled circle, in `ring` and `arc`.
  * @csspart indicator - The part of the track the value fills.

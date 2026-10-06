@@ -324,6 +324,14 @@ export class HelixHeadlessTableColumn extends HelixElement {
   @state()
   tabStop = false
 
+  /**
+   * @internal The sort said in words on the sort button, written by the table
+   * on Android, where TalkBack reads no `aria-sort`. Empty elsewhere. Not a
+   * consumer's to set: the table's `sorted-label` holds the words.
+   */
+  @state()
+  sortWords = ''
+
   /** How wide the heading drew, for the separator to report. */
   @state()
   private drawn = 0
@@ -610,7 +618,7 @@ export class HelixHeadlessTableColumn extends HelixElement {
         : nothing
     }${
       this.canSort
-        ? html`<button part="sort" type="button" tabindex=${control}><slot></slot></button>`
+        ? html`<button part="sort" type="button" tabindex=${control} aria-description=${this.sortWords || nothing}><slot></slot></button>`
         : html`<slot></slot>`
     }${
       this.resizable

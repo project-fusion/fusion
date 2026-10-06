@@ -13,6 +13,7 @@ import {
   HelixSortEvent,
   HelixSortedEvent,
   MixinCollection,
+  onAndroid,
   parse,
   reflectElements,
   requestChange,
@@ -586,6 +587,7 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
    */
   private markSorted(): void {
     const current = parse(this.sort)
+    const android = onAndroid()
     for (const column of this.tableColumns) {
       column.sorted =
         current && column.canSort && column.field === current.field
@@ -593,6 +595,15 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
             ? 'ascending'
             : 'descending'
           : undefined
+      /* TalkBack reads no `aria-sort`, so on Android the sorted column's button
+         says it, as React Aria's column header does. */
+      column.sortWords =
+        android && column.sorted
+          ? fillTemplate(this.sortedLabel, {
+              column: column.textContent?.trim() || column.field,
+              order: column.sorted === 'ascending' ? this.ascendingLabel : this.descendingLabel,
+            })
+          : ''
     }
   }
 

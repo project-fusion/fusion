@@ -31,6 +31,7 @@ import {
   isRtl,
   MixinCollection,
   markRegion,
+  onAndroid,
   ordered,
   parse,
   rangeAdd,
@@ -1738,6 +1739,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     const stop = this.currentRow(this.drawnPage) === -1 ? this.currentColumn : -1
     const offset = this.selectable ? 1 : 0
     const shown = this.shownColumns
+    const android = onAndroid()
     for (const column of this.tableColumns) {
       /* Whether a reader may move it, pushed down for the same reason: the order
          is the table's, and the grip is drawn by the column. */
@@ -1751,6 +1753,15 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
             ? 'ascending'
             : 'descending'
           : undefined
+      /* TalkBack reads no `aria-sort`, so on Android the sorted column's button
+         says it, as React Aria's column header does. */
+      column.sortWords =
+        android && column.sorted
+          ? fillTemplate(this.sortedLabel, {
+              column: column.textContent?.trim() || column.field,
+              order: column.sorted === 'ascending' ? this.ascendingLabel : this.descendingLabel,
+            })
+          : ''
     }
   }
 

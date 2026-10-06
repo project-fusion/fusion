@@ -72,7 +72,10 @@ fn declared(body: &str) -> BTreeSet<String> {
 fn reaches(selector: &str, prefix: &str) -> Option<(String, String)> {
     let tag_pattern = Regex::new(&format!(r"{}[a-z0-9-]+", regex::escape(prefix))).ok()?;
     let compact = selector.split_whitespace().collect::<Vec<&str>>().join(" ");
-    let parts: Vec<&str> = compact.split(',').map(str::trim).collect();
+    let parts: Vec<&str> = top_level(&compact, |one| one == ',')
+        .into_iter()
+        .map(str::trim)
+        .collect();
     /* One decision written for a plain element and for the component. */
     if parts.iter().any(|one| one.contains("data-")) {
         return None;
@@ -87,6 +90,41 @@ fn reaches(selector: &str, prefix: &str) -> Option<(String, String)> {
         return Some((past_compound(&one[tag.end()..]), tag.as_str().to_owned()));
     }
     None
+}
+
+/// The pieces of `text` between the characters `split` picks out, outside any
+/// parentheses, so `:where(ul, ol)` stays one piece.
+fn top_level(text: &str, split: impl Fn(char) -> bool) -> Vec<&str> {
+    let mut pieces = Vec::new();
+    let (mut depth, mut start) = (0_usize, 0);
+    for (at, one) in text.char_indices() {
+        match one {
+            '(' => depth += 1,
+            ')' => depth = depth.saturating_sub(1),
+            _ if depth == 0 && split(one) => {
+                pieces.push(&text[start..at]);
+                start = at + one.len_utf8();
+            }
+            _ => {}
+        }
+    }
+    pieces.push(&text[start..]);
+    pieces
+}
+
+/// Whether what follows the host names an element below one of its children.
+///
+/// **Only a child is slotted**, so `li > a` or `ul ul` past the tag selects
+/// an element inside a slotted one, which no `::slotted()` rule reaches, and a
+/// document rule for it overrules nothing the component says.
+fn below_children(rest: &str) -> bool {
+    top_level(rest, |one| {
+        one.is_whitespace() || matches!(one, '>' | '+' | '~')
+    })
+    .into_iter()
+    .filter(|one| !one.trim().is_empty())
+    .count()
+        > 1
 }
 
 /// What a selector reaches past the tag's own compound, empty for the host.
@@ -195,7 +233,10 @@ pub fn run(context: &Context) -> Report {
         }
 
         let where_ = context.relative(&sheet);
-        for rule in documents.iter().filter(|one| one.tag == tag) {
+        for rule in documents
+            .iter()
+            .filter(|one| one.tag == tag && !below_children(&one.rest))
+        {
             let owned = if rule.rest.is_empty() {
                 &host
             } else {
@@ -235,7 +276,27 @@ pub fn run(context: &Context) -> Report {
 
 #[cfg(test)]
 mod tests {
-    use super::{past_compound, reaches};
+    use super::{below_children, past_compound, reaches};
+
+    #[test]
+    fn an_element_inside_a_child_is_below_the_slots() {
+        assert!(!below_children(""));
+        assert!(!below_children("a"));
+        assert!(!below_children("> span"));
+        assert!(!below_children(":where(ul, ol)"));
+        assert!(below_children(":where(ul, ol) :where(ul, ol)"));
+        assert!(below_children(":where(li) > :where(a)"));
+        assert_eq!(
+            reaches(
+                ":where(helix-outline) :where(ul, ol) :where(ul, ol)",
+                "helix-"
+            ),
+            Some((
+                ":where(ul, ol) :where(ul, ol)".to_owned(),
+                "helix-outline".to_owned()
+            ))
+        );
+    }
 
     #[test]
     fn a_compound_on_the_tag_is_the_host() {

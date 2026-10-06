@@ -493,6 +493,37 @@ describe('a table sorted by a column', () => {
   })
 })
 
+/* TalkBack reads no `aria-sort`, so on Android a sorted column said nothing
+   about its order: React Aria describes the header there. */
+describe('a table sorted on Android', () => {
+  const described = async (agent: string | undefined): Promise<(string | null)[]> => {
+    if (agent) {
+      Object.defineProperty(navigator, 'userAgent', { configurable: true, value: agent })
+    }
+    try {
+      const host = (await mount(
+        sortable.replace('label="Services"', 'label="Services" default-sort="count:desc"'),
+      )) as Sorting
+      await settle(host)
+      const columns = [...host.querySelectorAll('helix-headless-table-column')] as Updating[]
+      await Promise.all(columns.map((column) => column.updateComplete))
+      return columns.map((column) => part(column, 'sort')?.getAttribute('aria-description') ?? null)
+    } finally {
+      Reflect.deleteProperty(navigator, 'userAgent')
+    }
+  }
+
+  test("says the order on the sorted column's button", async () => {
+    expect(await described('Mozilla/5.0 (Linux; Android 14; Pixel 8) Chrome/129.0 Mobile')).toEqual(
+      [null, 'Sorted by Count, descending'],
+    )
+  })
+
+  test('says nothing more anywhere else', async () => {
+    expect(await described(undefined)).toEqual([null, null])
+  })
+})
+
 describe('a table named from outside', () => {
   /* A table named by a heading beside it is the common case, and the name went
      onto a generic wrapper while the table itself kept "Table". */
