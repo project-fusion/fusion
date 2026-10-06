@@ -1,3 +1,5 @@
+import { FIELD } from './fields.js'
+
 /**
  * What a Format Date was asked for, in its own spelling: the `Intl` options a
  * consumer set. The element itself is one, so it passes itself.
@@ -18,21 +20,16 @@ export interface Asked {
   year?: 'numeric' | '2-digit' | undefined
 }
 
-/** The fields a style stands in for, which `Intl` refuses beside one. */
-const FIELDS = [
-  'day',
-  'era',
-  'hour',
-  'minute',
-  'month',
-  'second',
-  'timeZoneName',
-  'weekday',
-  'year',
-] as const
+/**
+ * The fields a style stands in for, which `Intl` refuses beside one: every
+ * field a date is drawn in, as `fields.ts` names them. `dayPeriod` is among
+ * them and is never an option, so it is never copied.
+ */
+const FIELDS = Object.keys(FIELD) as (keyof Asked)[]
 
 /**
- * The `Intl.DateTimeFormat` options for what was asked, and none that was not.
+ * The `Intl.DateTimeFormat` options for what was asked, and none that was not:
+ * an option not asked for is `undefined`, which `Intl` reads as absent.
  *
  * **A style wins over the fields.** `dateStyle` and `timeStyle` are each
  * locale's own whole pattern, and `Intl` throws a `TypeError` when one is
@@ -44,30 +41,15 @@ const FIELDS = [
  * before this, `2026-08-04` read "August 3, 2026" in Los Angeles.
  */
 export const formatOptions = (asked: Asked, dateOnly = false): Intl.DateTimeFormatOptions => {
-  const options: Intl.DateTimeFormatOptions = {}
-  const styled = asked.dateStyle !== undefined || asked.timeStyle !== undefined
-  if (styled) {
-    if (asked.dateStyle) {
-      options.dateStyle = asked.dateStyle
-    }
-    if (asked.timeStyle) {
-      options.timeStyle = asked.timeStyle
-    }
-  } else {
-    for (const field of FIELDS) {
-      const value = asked[field]
-      if (value) {
-        ;(options as Record<string, string>)[field] = value
-      }
-    }
+  /* An option left `undefined` is one `Intl` reads as absent, so each is
+     copied as it stands, set or not. */
+  const options: Record<string, string | undefined> = {
+    hourCycle: asked.hourCycle,
+    timeZone: asked.timeZone || (dateOnly ? 'UTC' : undefined),
   }
-  if (asked.hourCycle) {
-    options.hourCycle = asked.hourCycle
-  }
-  if (asked.timeZone) {
-    options.timeZone = asked.timeZone
-  } else if (dateOnly) {
-    options.timeZone = 'UTC'
+  const styled = asked.dateStyle || asked.timeStyle
+  for (const field of styled ? (['dateStyle', 'timeStyle'] as const) : FIELDS) {
+    options[field] = asked[field]
   }
   return options
 }
