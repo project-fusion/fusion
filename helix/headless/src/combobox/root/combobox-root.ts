@@ -63,13 +63,26 @@ const isInsertion = (event: Event): boolean =>
  * reopened combobox starts from the whole list.
  *
  * Focus stays in the text field. The arrow keys move through the list with the
- * listbox's public `navigate` method. `role="combobox"` is on the input itself.
- * ArrowDown and ArrowUp open the list on the chosen option, and Enter chooses
- * the highlighted one. As typing narrows the list, a screen reader hears how
- * many options are left, such as "3 results". Space, Home, End and letters edit the text, and Enter in
- * a closed field is left to the form. Emptying the field and leaving it clears
- * a single choice; Escape puts the chosen words back, and a second Escape on
- * the closed field clears the choice.
+ * listbox's public `navigate` method. As typing narrows the list, a screen
+ * reader hears how many options are left, such as "3 results". Emptying the
+ * field and leaving it clears a single choice.
+ *
+ * **Keyboard.**
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Down, Up | On a closed field, opens the list on the chosen option, or the first or the last. In the open list, moves the highlight, round from the last option to the first. |
+ * | Page Down, Page Up | In the open list, moves the highlight by as many options as the list shows at once. |
+ * | Enter | Chooses the highlighted option. With nothing left in the list, creates what was typed with `creatable`, or takes it with `allows-custom-value`. On a closed field, submits the form. |
+ * | Escape | Closes the list and puts the chosen words back. On a closed field, a second Escape clears a single choice. |
+ * | Tab | Closes the list and moves on. |
+ * | Backspace | With `multiple`, on an empty field, removes the last tag. |
+ * | Space, Home, End, letters | Edit the text. |
+ *
+ * **ARIA.** The input is the `combobox`, named by the label, with
+ * `aria-expanded`, `aria-controls` naming the list, `aria-autocomplete`
+ * (`both` with `suggest`, `list` otherwise) and `aria-activedescendant` on
+ * the highlighted option. The list is the listbox `Listbox` describes.
  *
  * On Apple devices, where VoiceOver does not read the option the field points
  * to, the field says it in a live region as the highlight moves, says how many

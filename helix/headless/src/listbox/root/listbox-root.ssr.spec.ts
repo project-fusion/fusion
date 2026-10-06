@@ -76,18 +76,20 @@ describe('listbox server output', () => {
     expect(partTag(markup, 'search-field')).toContain('placeholder="Narrow these"')
   })
 
-  test('the filter takes its own autofill token, which a list of options wants off', () => {
+  test('the filter field ships with autofill off, which a list of options wants', () => {
     /* It is a plain text input to the browser, so autofill offers it names and
-       addresses over a list that is being narrowed. The token is read off the
-       parsed markup, so forwarding it after the upgrade is forwarding it late. */
+       addresses over a list that is being narrowed. Off in the served markup,
+       so it is off before the upgrade. A token on the list is the hidden
+       select's, never the field's. */
     const markup = ssr(
       html`<helix-headless-listbox
         filterable
-        autocomplete="off"
+        autocomplete="country"
         label="Owner"
       ></helix-headless-listbox>`,
     )
     expect(partTag(markup, 'search-field')).toContain('autocomplete="off"')
+    expect(rendered(markup, TAG)).toContain('<select aria-hidden="true" autocomplete="country"')
   })
 
   test('the host carries only what the consumer wrote', () => {

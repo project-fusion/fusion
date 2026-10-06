@@ -4,6 +4,7 @@ import {
   customElement,
   DelayController,
   DisabledCascadeController,
+  drawAutofill,
   endInSight,
   fillTemplate,
   HelixFilterEvent,
@@ -15,6 +16,7 @@ import {
   MixinControllerValue,
   MixinField,
   onApple,
+  pageRows,
   rangeAdd,
   reportValues,
   requestChange,
@@ -28,11 +30,7 @@ import { magnifyingGlass } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
-import { HelixHeadlessOptionGroup } from '../../option/group/option-group.js'
 import { HelixHeadlessOption } from '../../option/root/option-root.js'
-
-/** The keys that move within a list, which is every key that moves at all. */
-const MOVES = new Set(['ArrowDown', 'ArrowUp', 'End', 'Home', 'PageDown', 'PageUp'])
 
 /**
  * The keys that move the list from a text field the reader is typing in.
@@ -42,6 +40,9 @@ const MOVES = new Set(['ArrowDown', 'ArrowUp', 'End', 'Home', 'PageDown', 'PageU
  * own editing keys for a combobox.
  */
 const FIELD_MOVES = new Set(['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp'])
+
+/** The keys that move within a list, which is every key that moves at all. */
+const MOVES = new Set([...FIELD_MOVES, 'End', 'Home'])
 
 /** How many rows a page key moves where the list has no height to measure. */
 const PAGE = 10
@@ -83,8 +84,7 @@ const HIGHLIGHT = 'helix-filter-match'
  * environment and an older browser all take that path, and walking every shown
  * option's text nodes for an API that is not there is work with no output.
  */
-const paintable = (): boolean =>
-  typeof CSS !== 'undefined' && 'highlights' in CSS && typeof Highlight !== 'undefined'
+const paintable = (): boolean => globalThis.CSS?.highlights !== undefined
 
 const paintMatches = (): void => {
   if (!paintable()) {
@@ -108,32 +108,23 @@ const paintMatches = (): void => {
  */
 const rangeFor = (root: Element, needle: string): Range[] => {
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT)
-  const nodes: Text[] = []
+  const nodes: [Node, number][] = []
   let whole = ''
   for (let node = walker.nextNode(); node !== null; node = walker.nextNode()) {
-    nodes.push(node as Text)
-    whole += node.nodeValue ?? ''
+    nodes.push([node, whole.length])
+    whole += node.nodeValue
   }
   const at = whole.toLowerCase().indexOf(needle)
   if (at < 0) {
     return []
   }
-  const range = document.createRange()
-  let seen = 0
-  let started = false
-  for (const node of nodes) {
-    const length = node.nodeValue?.length ?? 0
-    if (!started && at < seen + length) {
-      range.setStart(node, at - seen)
-      started = true
-    }
-    if (started && at + needle.length <= seen + length) {
-      range.setEnd(node, at + needle.length - seen)
-      return [range]
-    }
-    seen += length
-  }
-  return []
+  const range = new Range()
+  const [start, before] = nodes.findLast(([, from]) => from <= at) as [Node, number]
+  range.setStart(start, at - before)
+  const end = at + needle.length
+  const [last, under] = nodes.findLast(([, from]) => from < end) as [Node, number]
+  range.setEnd(last, end - under)
+  return [range]
 }
 
 /**
@@ -154,16 +145,29 @@ const rangeFor = (root: Element, needle: string): Range[] => {
  * active option is where the keyboard is: the arrow keys move it, and
  * `aria-activedescendant` points to it while focus stays on the list.
  *
- * The arrow keys, Home, End, PageUp and PageDown move the highlight, and typed
- * letters move it to the next option whose words start with them. In a
- * single-choice list the highlight is the choice unless `manual` is set; then
- * Enter, Space or a click chooses. With `multiple`, Space toggles the
- * highlighted option, Shift with an arrow adds the option it moves to, Shift
- * with Home or End adds every option from the highlight to that end, and
- * Control+A or Command+A chooses every option, or none where all are chosen.
- * In a filter field, Space, Home, End and letters edit the text, and with
- * `multiple`, Control with Shift and Home or End adds every option from the
- * highlight to that end.
+ * **Keyboard.** The list is one tab stop, or its filter field is where there
+ * is one. In a single-choice list the highlight is the choice unless `manual`
+ * is set; then Enter, Space or a click chooses.
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Down, Up | Moves the highlight to the next or the previous option, round from the last to the first. |
+ * | Home, End | Moves to the first or the last option. In a filter field, moves the caret. |
+ * | Page Down, Page Up | Moves by as many options as the list shows at once. |
+ * | A letter or a word | Moves to the next option whose words start with what you typed. In a filter field, types it. |
+ * | Enter | Chooses the highlighted option, or follows it where it is a link. |
+ * | Space | Chooses the highlighted option, or with `multiple` toggles it. In a filter field, types a space. |
+ * | Shift with Down or Up | With `multiple`, adds the option the highlight moves to. |
+ * | Shift with Home or End | With `multiple`, adds every option from the highlight to that end. In a filter field, hold Control as well. |
+ * | Control or Command with A | With `multiple`, chooses every option, or none where all are chosen. |
+ * | Escape | In a filter field, clears the filter. |
+ *
+ * **ARIA.** The `items` part is the `listbox`, named by the label and
+ * described by the hint and the message, with `aria-multiselectable` under
+ * `multiple`, `aria-required`, `aria-invalid`, and `aria-busy` while loading.
+ * Each option is an `option` with `aria-selected`. The list, or its filter
+ * field, points `aria-activedescendant` at the highlighted option; the field
+ * is `aria-autocomplete="list"` and controls the list.
  *
  * An option with `href` is a link: Enter or a press follows it and selects
  * nothing, and moving onto it with the arrows does not follow it.
@@ -227,12 +231,16 @@ export class HelixHeadlessListbox extends MixinCollection(
   })
 
   /**
-   * What the browser may autofill in the text field, as a platform token.
+   * What a browser's autofill may choose, as a platform token such as
+   * `country` or `cc-exp-month`, as a native `<select>` takes it.
    *
-   * **Defaults to `off`, which is not the platform's default and is the
-   * point.** The field filters a list rather than collecting a value, so a
-   * browser offering to fill it with a saved address is competing for the same
-   * keystrokes as the listbox. A consumer who wants autofill can still ask.
+   * Set, the list draws a hidden native `<select>` with the same options for
+   * the browser to fill, as React Aria's `HiddenSelect` does, and a fill
+   * chooses the option. `off`, the default, draws none.
+   *
+   * **The filter field is never filled.** It narrows the list rather than
+   * collecting a value, so a browser offering it a saved address competes
+   * with the reader for the same keystrokes: it is always `off`.
    */
   @property()
   autocomplete = 'off'
@@ -404,8 +412,10 @@ export class HelixHeadlessListbox extends MixinCollection(
    * markup, so the hiding is done to them in `willUpdate` and the render reads
    * the answer it left here. Counted during render instead, a filter matching
    * nothing left an empty box with no message in it.
+   *
+   * Plain rather than reactive: `place` writes it inside an update, which
+   * draws it, and a slot change asks for that update.
    */
-  @state()
   private hasMatches = true
 
   /**
@@ -415,9 +425,8 @@ export class HelixHeadlessListbox extends MixinCollection(
    * count: without this the list shipped "Nothing to show" over markup that was
    * about to have options in it, which is the one thing an empty state must
    * never do. `place` does not run on the server, so this is false exactly
-   * when the answer is unknown.
+   * when the answer is unknown. Plain, for the reason `hasMatches` is.
    */
-  @state()
   private counted = false
 
   /* Stated once, and the group never thinks about it again. See the
@@ -460,16 +469,12 @@ export class HelixHeadlessListbox extends MixinCollection(
     const shown = this.shown.filter((option) => !option.disabled)
     this.typeahead.reset()
     this.parked = where === 'none'
-    if (where === 'none') {
-      this.activeValue = ''
-    } else if (where === 'first') {
-      this.activeValue = shown[0]?.value ?? ''
-    } else if (where === 'last') {
-      this.activeValue = shown.at(-1)?.value ?? ''
-    } else {
-      const chosen = shown.find((option) => this.values.includes(option.value))
-      this.activeValue = (chosen ?? shown[0])?.value ?? ''
-    }
+    const chosen =
+      where === 'selected' ? shown.find((option) => this.values.includes(option.value)) : undefined
+    this.activeValue =
+      where === 'none'
+        ? ''
+        : ((where === 'last' ? shown.at(-1) : (chosen ?? shown[0]))?.value ?? '')
     if (this.childrenKnown) {
       this.place()
     }
@@ -495,11 +500,10 @@ export class HelixHeadlessListbox extends MixinCollection(
       return
     }
     const count = this.shown.length
-    if (this.filter.trim() === '' || count === 0) {
-      this.announced = ''
-      return
-    }
-    this.announced = countLabel(count, this.resultLabel, this.resultsLabel, this.lang)
+    this.announced =
+      this.filter.trim() && count
+        ? countLabel(count, this.resultLabel, this.resultsLabel, this.lang)
+        : ''
   }
 
   /**
@@ -618,9 +622,13 @@ export class HelixHeadlessListbox extends MixinCollection(
     return found
   }
 
-  /** The groups, found the same way and for the same reason. */
-  private get groups(): HelixHeadlessOptionGroup[] {
-    return this.among((node) => node instanceof HelixHeadlessOptionGroup, this.children)
+  /**
+   * The groups, found the same way and for the same reason, and by their
+   * name rather than their class, as the rules are: a list that holds no group
+   * does not carry the group's code, and either tier's tag ends the same way.
+   */
+  private get groups(): HTMLElement[] {
+    return this.among((node) => node.localName.endsWith('-option-group'), this.children)
   }
 
   /** The options a filter has left showing. */
@@ -834,7 +842,7 @@ export class HelixHeadlessListbox extends MixinCollection(
     const items = this.partNamed('items')
     const row = this.shown[0]?.getBoundingClientRect().height ?? 0
     const height = items?.clientHeight ?? 0
-    return row > 0 && height > 0 ? Math.max(1, Math.floor(height / row) - 1) : PAGE
+    return row > 0 && height > 0 ? pageRows(height, row) : PAGE
   }
 
   /**
@@ -974,10 +982,7 @@ export class HelixHeadlessListbox extends MixinCollection(
     }
     paintMatches()
 
-    const anyShown = shown.length > 0
-    if (anyShown !== this.hasMatches) {
-      this.hasMatches = anyShown
-    }
+    this.hasMatches = shown.length > 0
     this.counted = true
   }
 
@@ -1412,13 +1417,10 @@ export class HelixHeadlessListbox extends MixinCollection(
 
   /** The error, or what a filter that hid everything says, before the shared words. */
   protected override renderLive(hasContent: boolean): TemplateResult {
-    if (this.loadError !== '') {
-      return html`<span part="live" role="status">${this.loadError}</span>`
-    }
-    if (this.noResults && this.noResultsText !== undefined) {
-      return html`<span part="live" role="status">${this.noResultsText}</span>`
-    }
-    return super.renderLive(hasContent)
+    const words = this.loadError || (this.noResults ? this.noResultsText : undefined)
+    return words === undefined
+      ? super.renderLive(hasContent)
+      : html`<span part="live" role="status">${words}</span>`
   }
 
   /* The list's `tabindex` takes `isDisabled`, matching the filter input
@@ -1444,7 +1446,7 @@ export class HelixHeadlessListbox extends MixinCollection(
               <input
                 part="search-field"
                 type="text"
-                autocomplete=${this.autocomplete || nothing}
+                autocomplete="off"
                 spellcheck="false"
                 .value=${this.filter}
                 placeholder=${this.filterLabel}
@@ -1471,7 +1473,7 @@ export class HelixHeadlessListbox extends MixinCollection(
         tabindex=${this.filterable ? nothing : this.isDisabled ? -1 : 0}
         @scroll=${this.handleScroll}
       >
-        <slot @slotchange=${() => this.place()}></slot>
+        <slot @slotchange=${() => this.requestUpdate()}></slot>
         ${
           /* Loading and empty come from the shared mixin; what is local is what
              counts as content. A list with a filter that matched nothing is
@@ -1480,7 +1482,20 @@ export class HelixHeadlessListbox extends MixinCollection(
           this.renderStatus(shown)
         }
       </div>
-      ${this.renderLive(shown)}${this.renderHint()}${this.renderFeedback()}`
+      ${this.renderLive(shown)}${this.renderHint()}${this.renderFeedback()}${
+        /* The options as far as they are known: none on a server or while
+           hydrating, as Select's hidden select holds them. */
+        this.autocomplete === 'off'
+          ? nothing
+          : drawAutofill({
+              autocomplete: this.autocomplete,
+              disabled: this.isDisabled,
+              multiple: this.multiple,
+              onFill: (value) => this.requestValue(value),
+              options: this.childrenKnown ? this.options : [],
+              value: this.value,
+            })
+      }`
   }
 }
 
