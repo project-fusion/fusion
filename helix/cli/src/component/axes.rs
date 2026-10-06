@@ -127,8 +127,7 @@ pub const AXES: [(&str, &[&str]); 9] = [
     (
         "shape",
         &[
-            "arc", "circle", "diamond", "dots", "pill", "pin", "ring", "rounded", "square",
-            "text",
+            "arc", "circle", "diamond", "dots", "pill", "pin", "ring", "rounded", "square", "text",
         ],
     ),
     ("size", &["full", "lg", "md", "sm"]),
