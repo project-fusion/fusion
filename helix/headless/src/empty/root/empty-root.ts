@@ -90,17 +90,27 @@ export class HelixHeadlessEmpty extends HelixElement {
   })
 
   /**
-   * The heading `heading` draws, as the `heading` slot's fallback, so one
-   * slotted in replaces it; nothing while `heading` holds no words.
+   * The `heading` slot, with the heading `heading` draws as its fallback, so
+   * one slotted in replaces it; no fallback while `heading` holds no words.
    *
    * A method, so a tier above can draw its own, as the slot lets a page.
+   *
+   * @param hidden Whether the live copy holds the heading's words, which
+   * hides them from readers until it empties.
    */
-  protected renderHeading(): TemplateResult | typeof nothing {
-    return this.heading.trim()
-      ? html`<div aria-level=${headingLevel(this.headingLevel)} part="heading" role="heading">
-          ${this.heading}
-        </div>`
-      : nothing
+  protected renderHeading(hidden: boolean): TemplateResult {
+    return html`<slot
+      aria-hidden=${hidden ? 'true' : nothing}
+      name="heading"
+      @slotchange=${() => this.arrival.say()}
+      >${
+        this.heading.trim()
+          ? html`<div aria-level=${headingLevel(this.headingLevel)} part="heading" role="heading">
+              ${this.heading}
+            </div>`
+          : nothing
+      }</slot
+    >`
   }
 
   protected override render(): TemplateResult {
@@ -109,12 +119,10 @@ export class HelixHeadlessEmpty extends HelixElement {
        heading and the message it copies are hidden from readers, so a reader
        moving through the page meets them in one place; when the copy empties,
        they are back. The actions are never hidden. */
-    const copied = this.arrival.said !== '' && !this.noAnnounce ? 'true' : nothing
+    const held = this.arrival.said !== '' && !this.noAnnounce
     return html`<slot name="icon"></slot>
-      <slot aria-hidden=${copied} name="heading" @slotchange=${say}
-        >${this.renderHeading()}</slot
-      >
-      <slot aria-hidden=${copied} @slotchange=${say}></slot>
+      ${this.renderHeading(held)}
+      <slot aria-hidden=${held ? 'true' : nothing} @slotchange=${say}></slot>
       <slot name="actions"></slot>
       ${
         this.noAnnounce
