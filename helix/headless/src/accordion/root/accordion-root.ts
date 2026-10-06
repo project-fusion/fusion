@@ -3,6 +3,7 @@ import {
   HelixElement,
   KeyboardNavigationController,
   type NavigableItem,
+  onUnlessFalse,
   whenHydrated,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
@@ -58,6 +59,9 @@ const navigable = (item: HelixHeadlessAccordionItem): NavigableItem => ({
  * in a screen reader's list of headings. An open section is a region named by
  * its trigger. Set the level that fits the page's outline.
  *
+ * Find in page searches the closed sections too, and opens the one it matches
+ * in. `hidden-until-found="false"` turns that off.
+ *
  * @since 0.1.0
  * @status stable
  * @category layout
@@ -78,11 +82,14 @@ export class HelixHeadlessAccordion extends HelixElement {
 
   /**
    * Whether find in page searches every closed section, and opens the one it
-   * matches in. Each item's own `hidden-until-found` turns it on for that item
-   * alone.
+   * matches in.
+   *
+   * On by default, as in React Aria's disclosure. Write
+   * `hidden-until-found="false"` to turn it off for every section; an item's
+   * own `hidden-until-found` wins for that item.
    */
-  @property({ attribute: 'hidden-until-found', type: Boolean })
-  hiddenUntilFound = false
+  @property({ attribute: 'hidden-until-found', converter: onUnlessFalse })
+  hiddenUntilFound = true
 
   /**
    * How many sections may be open at once.
