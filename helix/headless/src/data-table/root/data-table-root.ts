@@ -32,16 +32,20 @@ import {
   hostAria,
   inlineStep,
   inRowOrder,
-  isRtl,
   MixinCollection,
   markRegion,
   onAndroid,
   ordered,
   pageRows,
   parse,
+  placeKey,
+  ReorderController,
+  type ReorderMove,
   rangeAdd,
   reportRuntime,
   requestChange,
+  requestReorder,
+  scrollingAncestor,
   scrollRoom,
   selectsAll,
   Typeahead,
@@ -53,7 +57,7 @@ import {
   window_,
   writtenList,
 } from '@fusion.dev/helix-core'
-import { caretDown, caretRight } from '@fusion.dev/helix-icons'
+import { caretDown, caretRight, dotsThreeVertical } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { repeat } from 'lit/directives/repeat.js'
@@ -175,6 +179,19 @@ const isControl = (element: HTMLElement): boolean =>
  * is written to `order` as a list of fields. Your markup is not rewritten: the
  * table assigns the headings to its header in that order.
  *
+ * **`reorderable-rows` lets people move rows.** A column of grips leads each
+ * row, named by `move-row-label`. Drag a grip to move its row, and the table
+ * scrolls near an edge. Or press Space or Enter on a grip, or click it, to pick
+ * up its row, move it with Down and Up, Home and End, and press Space or Enter
+ * again to drop it. A click on another row drops it there, and Escape puts it
+ * back. The table says each step in its `live` region. A drop sends
+ * `helix-before-reorder`, which you can refuse, and then `helix-reorder` with
+ * `kind` set to `row`, whose `keys` hold every key of `rows` in the new order.
+ * **You move the rows**: set `rows` to the new order, and the table draws it.
+ * Set `row-key`, so a row is known by its key once it has moved. The grips do
+ * nothing while a `sort` is set, since the sort decides the order, and a tree
+ * grid draws none.
+ *
  * `csv()` returns the result as text: every row that passes the filter, in the
  * order and the columns on screen. Saving the file is up to you.
  *
@@ -195,12 +212,13 @@ const isControl = (element: HTMLElement): boolean =>
  * @slot toolbar - Content above the grid, such as a search field or actions.
  *
  * @event {HelixActivateEvent} helix-activate - Fired after the page changes, with the new page as a string in `detail.value`.
+ * @event {HelixBeforeReorderEvent} helix-before-reorder - A row is about to move, with `reorderable-rows`. The event carries every row's key in the new order. Cancelable: cancel it to keep the row where it is.
  * @event {HelixExpandEvent} helix-expand - Fired after a row opens or closes, with every open row's key, separated by commas, which `expanded` also holds.
  * @event {HelixFilterEvent} helix-filter - The search query is about to change. Cancelable: cancel it to keep the current query.
  * @event {HelixFilteredEvent} helix-filtered - Fired after the search query changes, with the new query.
  * @event {HelixLoadMoreEvent} helix-load-more - Fired when a reader asks for more rows, by the `load-more` row's button or by scrolling a `windowed` table near its end.
  * @event {HelixNavigateEvent} helix-navigate - Another page was requested. Cancelable: cancel it to stay on the current page.
- * @event {HelixReorderEvent} helix-reorder - The columns are about to move. The event carries every field in the new order. Cancelable: cancel it to keep the current order.
+ * @event {HelixReorderEvent} helix-reorder - The columns are about to move, with `kind` set to `column` and every field in the new order. Cancelable: cancel it to keep the current order. For a row, with `kind` set to `row`, it follows `helix-before-reorder`, and you set `rows` to the order in `keys`.
  * @event {HelixReorderedEvent} helix-reordered - Fired after the columns move, with every field in the new order.
  * @event {HelixSelectEvent} helix-select - The selection is about to change. The event carries every selected key, separated by commas. Cancelable: cancel it to keep the current selection.
  * @event {HelixSelectedEvent} helix-selected - Fired after the selection changes, with every selected key, separated by commas.
@@ -225,6 +243,7 @@ const isControl = (element: HTMLElement): boolean =>
  * @csspart checkbox-mark-indeterminate - Added to `checkbox-mark` while only some rows are selected.
  * @csspart empty - Shown when there are no rows, because none arrived or the filter matches none. While rows are loading, the `loading` part is shown in its place.
  * @csspart footer - The region below the grid.
+ * @csspart grip-head - The heading over the row grips, with `reorderable-rows`.
  * @csspart head - The row that holds the column headings. It is `display: contents`, so it takes no space.
  * @csspart live - A copy of the empty and loading messages, which screen readers announce when they change. Visually hidden in the styled tier.
  * @csspart loading - Shown while the rows are loading.
@@ -245,6 +264,12 @@ const isControl = (element: HTMLElement): boolean =>
  * @csspart pagination-previous - The pagination's button that goes back one page.
  * @csspart pagination-status - The pagination's text that says which page is shown, in `compact`.
  * @csspart row - One row of data.
+ * @csspart row-dragging - Added to `row` while it is being moved.
+ * @csspart row-drop-after - Added to `row` when the row being moved goes after it.
+ * @csspart row-drop-before - Added to `row` when the row being moved goes before it.
+ * @csspart row-grip - The cell that holds a row's grip, with `reorderable-rows`.
+ * @csspart row-grip-button - The button that moves a row.
+ * @csspart row-grip-mark - The icon on a row's grip.
  * @csspart select - The cell that holds a row's checkbox.
  * @csspart select-all - The heading that holds the checkbox that selects every row.
  * @csspart select-selected - Added to `select` in a selected row.
@@ -278,6 +303,13 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   /** The word for an ascending sort, in `sorted-label`. */
   @property({ attribute: 'ascending-label' })
   ascendingLabel = 'ascending'
+
+  /**
+   * What screen readers hear when a held row is put back, or a move is
+   * refused, with `reorderable-rows`.
+   */
+  @property({ attribute: 'canceled-label' })
+  canceledLabel = 'Canceled'
 
   /**
    * The field that holds a row's child rows, as an array. Set it, and `row-key`,
@@ -336,6 +368,10 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   /** The word for a descending sort, in `sorted-label`. */
   @property({ attribute: 'descending-label' })
   descendingLabel = 'descending'
+
+  /** What screen readers hear when a row is dropped, with `reorderable-rows`. */
+  @property({ attribute: 'dropped-label' })
+  droppedLabel = 'Dropped'
 
   /**
    * The estimated height of a row before it is drawn, in pixels.
@@ -422,6 +458,21 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    */
   @property()
   mode: 'client' | 'server' = 'client'
+
+  /**
+   * What screen readers hear each time a key moves a held row, with
+   * `reorderable-rows`. `{name}` is the row's name, `{position}` the place it
+   * would go, counting from 1, and `{count}` the number of rows on the page.
+   */
+  @property({ attribute: 'moved-label' })
+  movedLabel = '{name} moved to position {position} of {count}'
+
+  /**
+   * The name of a row's grip, with `reorderable-rows`. `{row}` is replaced with
+   * the row's name.
+   */
+  @property({ attribute: 'move-row-label' })
+  moveRowLabel = 'Move {row}'
 
   /** The built-in pagination's name for the button that moves forward a page. */
   @property({ attribute: 'next-label' })
@@ -516,6 +567,13 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   @property({ attribute: 'pagination-label' })
   paginationLabel = 'Pagination'
 
+  /**
+   * What screen readers hear when a key or a click picks up a row, with
+   * `reorderable-rows`. `{name}` is the row's name.
+   */
+  @property({ attribute: 'picked-up-label' })
+  pickedUpLabel = 'Picked up {name}'
+
   /** The built-in pagination's name for the button that moves back a page. */
   @property({ attribute: 'previous-label' })
   previousLabel = 'Previous page'
@@ -529,6 +587,13 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   @property({ type: Boolean })
   reorderable = false
 
+  /**
+   * Lets people move rows, by a grip that leads each row. The table moves no
+   * row itself: set `rows` to the order `helix-reorder` carries.
+   */
+  @property({ attribute: 'reorderable-rows', type: Boolean })
+  reorderableRows = false
+
   /** What screen readers hear when a search leaves one row. `{count}` is the count. */
   @property({ attribute: 'result-label' })
   resultLabel = '{count} result'
@@ -539,6 +604,10 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    */
   @property({ attribute: 'results-label' })
   resultsLabel = '{count} results'
+
+  /** The name of the heading over the row grips, with `reorderable-rows`. */
+  @property({ attribute: 'row-grips-label' })
+  rowGripsLabel = 'Move rows'
 
   /**
    * The field that identifies each row.
@@ -751,12 +820,87 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     rows: undefined,
   }
 
-  /** The order while a grip is being dragged, before anybody has been asked. */
-  @state()
-  private dragOrder: string[] | undefined = undefined
+  /**
+   * A column dragged by its grip. The headings follow the pointer and the
+   * order is asked for once it lets go, so a consumer hears one order and not
+   * the dozen a drag passes through. The arrow keys on a grip move a column a
+   * place each, which `handleGripKey` does, so this only drags.
+   */
+  private readonly columnMoves = new ReorderController(this, {
+    axis: 'inline',
+    box: (field) =>
+      this.tableColumns
+        .find((column) => column.field === field)
+        ?.shadowRoot?.querySelector('[part="column"]')
+        ?.getBoundingClientRect(),
+    drop: ({ key, to }) => {
+      const shown = this.shownFields
+      const wanted = placeKey(this.fields, shown, key, to)
+      return wanted.join(' ') === this.fields.join(' ') || this.requestOrder(wanted, key)
+    },
+    enabled: () => this.reorderable,
+    grip: (event) => {
+      const column = this.partIn(event, 'grip') ? this.columnFrom(event) : undefined
+      return column?.field ? { element: column, key: column.field } : undefined
+    },
+    holds: false,
+    keys: () => this.shownFields,
+  })
 
-  /** The column a grip is dragging, and the pointer doing it. */
-  private dragging: { field: string; pointer: number } | undefined
+  /**
+   * A row moved by its grip, with `reorderable-rows`. The rows are the page's,
+   * so a drop asks the page to set them in the new order.
+   */
+  private readonly rowMoves = new ReorderController(this, {
+    axis: 'block',
+    box: (key) => {
+      const index = this.pagePlaces().get(key)
+      const { first, last } = this.virtualize.window
+      /* A row outside the window has no box, and the one kept drawn beside it
+         for the tab stop has a box that is not where the row belongs. */
+      if (index === undefined || (this.windowed && (index < first || index >= last))) {
+        return undefined
+      }
+      const line = this.renderRoot?.querySelector?.(`[part~="row"][data-row="${index}"]`)
+      /* A row is `display: contents`, so its box is its cells'. */
+      return line?.firstElementChild?.getBoundingClientRect()
+    },
+    drop: (move) => this.requestRowMove(move),
+    enabled: () => this.rowGrips && !parse(this.sort),
+    grip: (event) => {
+      const cell = event
+        .composedPath()
+        .find(
+          (node): node is HTMLElement =>
+            node instanceof HTMLElement && node.getAttribute('part') === 'row-grip',
+        )
+      const row = cell ? this.drawnPage[Number(cell.parentElement?.dataset.row)] : undefined
+      return cell && row ? { element: cell, key: this.moveKeyOf(row) } : undefined
+    },
+    item: (event) => {
+      const place = this.placeOf(event)
+      const row = place && place.row >= 0 ? this.drawnPage[place.row] : undefined
+      return row ? this.moveKeyOf(row) : undefined
+    },
+    keys: () => this.drawnPage.map((row) => this.moveKeyOf(row)),
+    name: (key) => {
+      const row = this.drawnPage[this.pagePlaces().get(key) ?? -1]
+      return row ? this.rowName(row, key) : key
+    },
+    say: (words) => this.say(words),
+    scroller: () => {
+      const table = this.partNamed('table')
+      return table && table.scrollHeight > table.clientHeight + 1
+        ? table
+        : scrollingAncestor(this, { axis: 'y', overflowing: true })
+    },
+    words: () => ({
+      canceled: this.canceledLabel,
+      dropped: this.droppedLabel,
+      moved: this.movedLabel,
+      pickedUp: this.pickedUpLabel,
+    }),
+  })
 
   /** Said once, so a table that re-renders does not repeat it. */
   private warnedAboutKey = false
@@ -800,7 +944,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
        offset back, and the window swung between two places until the
        controller gave up and blamed the box. A cell is a grid item, stretched
        to its row. */
-    return [...this.renderRoot.querySelectorAll<HTMLElement>('[part="row"][data-index]')].flatMap(
+    return [...this.renderRoot.querySelectorAll<HTMLElement>('[part~="row"][data-index]')].flatMap(
       (row) => {
         const cell = row.firstElementChild
         return cell instanceof HTMLElement
@@ -988,9 +1132,24 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     return Math.min(asked, rows.length - 1 + (this.moreDrawn ? 1 : 0))
   }
 
-  /** How many cells a row has: the checkbox and every drawn column. */
+  /** How many cells a row has: the grip, the checkbox and every drawn column. */
   private get width(): number {
-    return this.shownColumns.length + (this.selectable ? 1 : 0)
+    return this.shownColumns.length + this.lead
+  }
+
+  /** Whether each row leads with a grip: `reorderable-rows`, in a table that is not a tree. */
+  private get rowGrips(): boolean {
+    return this.reorderableRows && !this.childField
+  }
+
+  /** The column the checkboxes are in: the first, or the one after the grips. */
+  private get selectAt(): number {
+    return this.rowGrips ? 1 : 0
+  }
+
+  /** How many cells lead each row ahead of the columns: the grips and the checkboxes. */
+  private get lead(): number {
+    return (this.rowGrips ? 1 : 0) + (this.selectable ? 1 : 0)
   }
 
   /** The column holding the tab stop, held to the row's width. */
@@ -1017,8 +1176,21 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * where it was written: it has nothing to be named by.
    */
   get orderedColumns(): HelixHeadlessTableColumn[] {
+    const columns = this.arrangeColumns(writtenList(this.order))
+    /* While a grip is dragged, the headings follow the pointer. */
+    const held = this.columnMoves.held
+    if (held?.by !== 'pointer') {
+      return columns
+    }
+    const fields = columns.filter((column) => column.field !== '')
+    const shown = fields.filter((column) => column.shown).map((column) => column.field)
+    const all = fields.map((column) => column.field)
+    return this.arrangeColumns(placeKey(all, shown, held.key, held.to))
+  }
+
+  /** The columns put in an order of fields, with the ones it does not name after them. */
+  private arrangeColumns(wanted: readonly string[]): HelixHeadlessTableColumn[] {
     const columns = this.tableColumns
-    const wanted = this.dragOrder ?? writtenList(this.order)
     if (wanted.length === 0) {
       return columns
     }
@@ -1052,6 +1224,11 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     return this.orderedColumns.filter((column) => column.field !== '').map((column) => column.field)
   }
 
+  /** The fields of the columns drawn, in the order on screen: what a grip moves among. */
+  private get shownFields(): string[] {
+    return this.shownColumns.filter((column) => column.field !== '').map((column) => column.field)
+  }
+
   /** The columns reduced to what the ordering needs. */
   private get axes(): Axis[] {
     return this.tableColumns
@@ -1066,8 +1243,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       return ''
     }
     const tracks = declared.map((column) => column.track).join(' ')
-    /* The checkboxes take what they need and no more, ahead of everything. */
-    return this.selectable ? `max-content ${tracks}` : tracks
+    /* The grips and the checkboxes take what they need and no more, ahead of
+       everything. */
+    return [...Array.from({ length: this.lead }, () => 'max-content'), tracks].join(' ')
   }
 
   /**
@@ -1287,16 +1465,31 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     })
   }
 
-  /** Asks for the columns in a different order, as every field in the new one. */
-  private requestOrder(fields: readonly string[]): boolean {
+  /**
+   * Asks for the columns in a different order, as every field in the new one,
+   * with `field` the one that moved.
+   */
+  private requestOrder(fields: readonly string[], field: string): boolean {
+    const detail = (value: string) => {
+      const keys = writtenList(value)
+      return {
+        from: this.fields.indexOf(field),
+        key: field,
+        keys,
+        kind: 'column' as const,
+        to: keys.indexOf(field),
+        value,
+      }
+    }
     return requestChange({
       apply: (value) => {
+        const moved = detail(value)
         const previous = this.order
         this.orderState = value
         this.requestUpdate('order', previous)
-        this.dispatchEvent(new HelixReorderedEvent({ value }))
+        this.dispatchEvent(new HelixReorderedEvent(moved))
       },
-      event: (value) => new HelixReorderEvent({ value }),
+      event: (value) => new HelixReorderEvent(detail(value)),
       host: this,
       next: fields.join(' '),
     })
@@ -1369,6 +1562,83 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       return
     }
     this.chooseRow(key, event.detail.checked)
+  }
+
+  /**
+   * What a row is known by when it moves: its `row-key`, or its place in
+   * `rows`, which is the order `helix-reorder` gives back.
+   */
+  private moveKeyOf(row: DataRow): string {
+    const value = this.rowKey ? valueAt(row, this.rowKey) : undefined
+    if (value !== undefined && value !== null) {
+      return String(value)
+    }
+    if (this.rowPlaces?.rows !== this.rows) {
+      this.rowPlaces = { places: new Map(this.rows.map((one, at) => [one, at])), rows: this.rows }
+    }
+    return String(this.rowPlaces.places.get(row) ?? -1)
+  }
+
+  /** Each row's place in `rows`, kept while `rows` is the same array, for `moveKeyOf`. */
+  private rowPlaces: { places: Map<DataRow, number>; rows: readonly DataRow[] } | undefined
+
+  /**
+   * Each drawn row's place in the page by its key, kept while the page is the
+   * same array, so a drag asks for a row's box without a search per row.
+   */
+  private pagePlaces(): Map<string, number> {
+    if (this.pageKeyed?.page !== this.drawnPage) {
+      this.pageKeyed = {
+        page: this.drawnPage,
+        places: new Map(this.drawnPage.map((row, at) => [this.moveKeyOf(row), at])),
+      }
+    }
+    return this.pageKeyed.places
+  }
+
+  /** What `pagePlaces` keeps. */
+  private pageKeyed: { page: readonly DataRow[]; places: Map<string, number> } | undefined
+
+  /** A row's name: its row header's value, or its key where it has none. */
+  private rowName(row: DataRow, key: string): string {
+    const value = this.headerColumn?.order(row)
+    return value === undefined || value === null ? key : String(value)
+  }
+
+  /**
+   * Asks the page to move a row: `helix-before-reorder`, which can refuse it,
+   * then `helix-reorder`, with every key of `rows` in the new order. A row a
+   * search hides keeps its place among the rest. Reports whether it stood.
+   */
+  private requestRowMove({ key, to }: ReorderMove): boolean {
+    const all = this.rows.map((row) => this.moveKeyOf(row))
+    const keys = placeKey(
+      all,
+      this.drawnPage.map((row) => this.moveKeyOf(row)),
+      key,
+      to,
+    )
+    return requestReorder(this, {
+      from: all.indexOf(key),
+      key,
+      keys,
+      kind: 'row',
+      to: keys.indexOf(key),
+      value: keys.join(','),
+    })
+  }
+
+  /**
+   * Says a step of a move in the live region. Emptied first, so the same
+   * words twice are heard twice, and filled a frame later.
+   */
+  private say(words: string): void {
+    this.announced = ''
+    this.requestUpdate()
+    requestAnimationFrame(() => {
+      this.announced = words
+      this.requestUpdate()
+    })
   }
 
   /** The keys of the rows on the page, in the order they are drawn. */
@@ -1462,20 +1732,17 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * order and nothing on screen. A hidden column keeps its place among the rest.
    */
   private moveColumn(field: string, by: number): boolean {
-    const drawn = this.shownColumns.filter((column) => column.field !== '')
-    const from = drawn.findIndex((column) => column.field === field)
+    const drawn = this.shownFields
+    const from = drawn.indexOf(field)
     const past = drawn[from + by]
-    if (from < 0 || !past) {
+    if (from < 0 || past === undefined) {
       return false
     }
-    return this.requestOrder(this.placed(field, past.field, by > 0))
-  }
-
-  /** Every field in order, with one taken out and put back beside another. */
-  private placed(field: string, beside: string, after: boolean): string[] {
+    /* Beside the heading it moved past, so a hidden column between the two
+       stays on the side it was. */
     const fields = this.fields.filter((one) => one !== field)
-    fields.splice(fields.indexOf(beside) + (after ? 1 : 0), 0, field)
-    return fields
+    fields.splice(fields.indexOf(past) + (by > 0 ? 1 : 0), 0, field)
+    return this.requestOrder(fields, field)
   }
 
   /**
@@ -1744,7 +2011,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   private announceSort(): void {
     const current = parse(this.sort)
     const stop = this.currentRow(this.drawnPage) === -1 ? this.currentColumn : -1
-    const offset = this.selectable ? 1 : 0
+    const offset = this.lead
     const shown = this.shownColumns
     const android = onAndroid()
     for (const column of this.tableColumns) {
@@ -1894,7 +2161,11 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     const named = this.headerColumn
     const stopRow = this.currentRow(page)
     const stopColumn = this.currentColumn
-    const offset = this.selectable ? 1 : 0
+    const offset = this.lead
+    const grips = this.rowGrips
+    const held = grips ? this.rowMoves.held : undefined
+    const mark = held ? this.rowMoves.mark : undefined
+    const still = grips && Boolean(parse(this.sort))
     return html`${repeat(
       rows,
       ({ index, row }) => this.rowKeyOf(row, index),
@@ -1907,8 +2178,10 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
            its cells for a stylesheet: the row is `display: contents`, so the
            cells are what a selection is painted on, and nothing outside can
            reach a cell by the row it sits in. */
+        const moveKey = grips ? this.moveKeyOf(row) : ''
+        const marked = mark?.key === moveKey ? mark.edge : undefined
         return html`<div
-          part="row"
+          part="row${held?.key === moveKey ? ' row-dragging' : ''}${marked === 'before' ? ' row-drop-before' : ''}${marked === 'after' ? ' row-drop-after' : ''}"
           role="row"
           aria-rowindex=${this.rowIndex(index)}
           aria-selected=${chosen ? String(picked) : nothing}
@@ -1919,17 +2192,15 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
           data-index=${this.windowed ? index : nothing}
           data-row=${index}
         >
-          ${
+          ${grips ? this.renderGrip(this.rowName(row, moveKey), stop(0), still) : nothing}${
             chosen
               ? html`<span
                   part="select${picked ? ' select-selected' : ''}"
                   role="gridcell"
-                  tabindex=${stop(0) ? '0' : '-1'}
-                  data-column="0"
+                  tabindex=${stop(this.selectAt) ? '0' : '-1'}
+                  data-column=${this.selectAt}
                   >${this.renderCheckbox(
-                    fillTemplate(this.selectRowLabel, {
-                      row: named ? String(named.order(row) ?? key) : key,
-                    }),
+                    fillTemplate(this.selectRowLabel, { row: this.rowName(row, key) }),
                     picked,
                     false,
                     (event) => this.toggleRow(key, event),
@@ -2025,6 +2296,36 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     }
   }
 
+  /**
+   * The cell that leads a row with its grip, with `reorderable-rows`.
+   *
+   * The cell takes focus, as every cell of the grid does, and Space or Enter
+   * on it picks up the row. The button inside is what a pointer and a screen
+   * reader press. `aria-disabled` while a sort decides the order.
+   */
+  private renderGrip(name: string, stop: boolean, still: boolean): TemplateResult {
+    return html`<span part="row-grip" role="gridcell" tabindex=${stop ? '0' : '-1'} data-column="0"
+      ><button
+        part="row-grip-button"
+        type="button"
+        tabindex="-1"
+        aria-label=${fillTemplate(this.moveRowLabel, { row: name })}
+        aria-disabled=${still ? 'true' : nothing}
+      ><svg aria-hidden="true" fill="currentColor" part="row-grip-mark" viewBox=${dotsThreeVertical.viewBox}>${unsafeSVG(dotsThreeVertical.content)}</svg></button
+    ></span>`
+  }
+
+  /** The heading over the row grips, named by `row-grips-label`. */
+  private renderGripHead(stop: boolean): TemplateResult {
+    return html`<span
+      part="grip-head"
+      role="columnheader"
+      tabindex=${stop ? '0' : '-1'}
+      aria-label=${this.rowGripsLabel}
+      data-column="0"
+    ></span>`
+  }
+
   /** The heading of the checkbox column, which selects the whole result. */
   private renderSelectAll(stop: boolean): TemplateResult {
     const { checked, indeterminate } = everyState(this.chosen, this.everyKey)
@@ -2032,7 +2333,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       part="select-all"
       role="columnheader"
       tabindex=${stop ? '0' : '-1'}
-      data-column="0"
+      data-column=${this.selectAt}
     >${this.renderCheckbox(this.selectAllLabel, checked, indeterminate, this.toggleAll)}</span>`
   }
 
@@ -2090,7 +2391,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
        where they sat, so a windowed or paged result never said how long it
        was. Written in `updated`, the internals being no part of the render. */
     this.counts = {
-      columns: columns.length ? columns.length + (this.selectable ? 1 : 0) : undefined,
+      columns: columns.length ? columns.length + this.lead : undefined,
       rows: countKnown ? counted + 1 + (this.moreDrawn ? 1 : 0) : undefined,
     }
     return html`<div part="toolbar"><slot name="toolbar"></slot></div>
@@ -2102,7 +2403,11 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         @scroll=${this.handleScroll}
       >
         <div part="head" role="row" aria-rowindex="1">
-          ${this.selectable ? this.renderSelectAll(headStop && this.currentColumn === 0) : nothing}${
+          ${this.rowGrips ? this.renderGripHead(headStop && this.currentColumn === 0) : nothing}${
+            this.selectable
+              ? this.renderSelectAll(headStop && this.currentColumn === this.selectAt)
+              : nothing
+          }${
             this.assignsByName && !this.hydrating
               ? this.orderedColumns.map(
                   (_, index) =>
@@ -2170,7 +2475,6 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     this.renderRoot.addEventListener('focusin', this.handleFocusIn as EventListener)
     this.addEventListener('keydown', this.handleGridKey)
     this.addEventListener('keydown', this.handleGripKey)
-    this.addEventListener('pointerdown', this.handleGripDown)
     this.addEventListener('helix-before-resize', this.handleResize)
   }
 
@@ -2183,9 +2487,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     this.renderRoot.removeEventListener('focusin', this.handleFocusIn as EventListener)
     this.removeEventListener('keydown', this.handleGridKey)
     this.removeEventListener('keydown', this.handleGripKey)
-    this.removeEventListener('pointerdown', this.handleGripDown)
     this.removeEventListener('helix-before-resize', this.handleResize)
-    this.stopDrag()
   }
 
   /**
@@ -2218,24 +2520,25 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * column 0.
    */
   private cellAt(row: number, column: number): HTMLElement | null {
-    const offset = this.selectable ? 1 : 0
+    const offset = this.lead
     if (row === -1) {
-      return column < offset
-        ? this.partNamed('select-all')
-        : (this.shownColumns[column - offset]?.cellBox ?? null)
+      if (column >= offset) {
+        return this.shownColumns[column - offset]?.cellBox ?? null
+      }
+      return this.partNamed(this.rowGrips && column === 0 ? 'grip-head' : 'select-all')
     }
     if (this.moreDrawn && row === this.drawnPage.length) {
       /* One cell spans the row, so every column lands on it. */
       return this.partNamed('more-cell')
     }
-    const line = this.renderRoot.querySelector(`[part="row"][data-row="${row}"]`)
+    const line = this.renderRoot.querySelector(`[part~="row"][data-row="${row}"]`)
     return line?.querySelector<HTMLElement>(`:scope > [data-column="${column}"]`) ?? null
   }
 
   /** The cell an event came from or through, and its place in the grid. */
   private placeOf(event: Event): { cell: HTMLElement; column: number; row: number } | undefined {
     const columns = this.shownColumns
-    const offset = this.selectable ? 1 : 0
+    const offset = this.lead
     for (const node of event.composedPath()) {
       if (node === this) {
         break
@@ -2270,7 +2573,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * what Tab moves between while focus is in the cell.
    */
   private controlsIn(place: { cell: HTMLElement; column: number; row: number }): HTMLElement[] {
-    const offset = this.selectable ? 1 : 0
+    const offset = this.lead
     if (place.row === -1 && place.column >= offset) {
       return this.shownColumns[place.column - offset]?.controls ?? []
     }
@@ -2282,7 +2585,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * grid stays one tab stop. They are reached with Enter or F2.
    */
   private quietControls(): void {
-    const offset = this.selectable ? 1 : 0
+    const offset = this.lead
     const drawn = this.shownColumns
     const read = new Set(drawn.flatMap((column, place) => (column.cell ? [place + offset] : [])))
     if (read.size === 0) {
@@ -2510,7 +2813,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     if (!this.childField || !row || !header) {
       return false
     }
-    if (place.column !== this.shownColumns.indexOf(header) + (this.selectable ? 1 : 0)) {
+    if (place.column !== this.shownColumns.indexOf(header) + this.lead) {
       return false
     }
     const placed = this.tree().placed.get(row)
@@ -2538,7 +2841,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     event: KeyboardEvent,
     place: { cell: HTMLElement; column: number; row: number },
   ): void {
-    const offset = this.selectable ? 1 : 0
+    const offset = this.lead
     const heading = place.row === -1 ? this.shownColumns[place.column - offset] : undefined
     if (this.moreDrawn && place.row === this.drawnPage.length && event.key !== 'F2') {
       event.preventDefault()
@@ -2551,7 +2854,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         this.toggleSort(heading.field)
         return
       }
-      if (this.selectable && place.column === 0 && place.row === -1) {
+      if (this.selectable && place.column === this.selectAt && place.row === -1) {
         event.preventDefault()
         this.chooseAll()
         return
@@ -2617,80 +2920,6 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       event.preventDefault()
       this.moveColumn(column.field, by)
     }
-  }
-
-  /**
-   * A grip taken hold of: the headings follow the pointer and the order is asked
-   * for once it lets go.
-   *
-   * Previewed without an event, because a drag passes through a dozen orders on
-   * its way to the one the reader meant, and a consumer should hear the one.
-   */
-  private readonly handleGripDown = (event: PointerEvent): void => {
-    if (event.button !== 0 || !this.partIn(event, 'grip')) {
-      return
-    }
-    const column = this.columnFrom(event)
-    if (!column?.field) {
-      return
-    }
-    this.dragging = { field: column.field, pointer: event.pointerId }
-    this.dragOrder = this.fields
-    window.addEventListener('pointermove', this.handleGripMove)
-    window.addEventListener('pointerup', this.handleGripUp)
-    window.addEventListener('pointercancel', this.handleGripCancel)
-  }
-
-  private readonly handleGripMove = (event: PointerEvent): void => {
-    const dragging = this.dragging
-    if (!dragging || event.pointerId !== dragging.pointer || !this.dragOrder) {
-      return
-    }
-    const rtl = isRtl(this)
-    /* Only the drawn ones: a hidden heading has no box, and its zero rect sat
-       left of every pointer, so it counted as passed wherever it was. */
-    const others = this.shownColumns.filter(
-      (column) => column.field !== '' && column.field !== dragging.field,
-    )
-    /* How many of the other headings the pointer has passed, reading in the
-       writing direction: the dragged one goes after the last of them, or ahead
-       of the first where it has passed none. */
-    const place = others.filter((column) => {
-      const box = column.shadowRoot?.querySelector('[part="column"]')?.getBoundingClientRect()
-      if (!box) {
-        return false
-      }
-      const middle = box.left + box.width / 2
-      return rtl ? event.clientX < middle : event.clientX > middle
-    }).length
-    const beside = others[place - 1] ?? others[0]
-    if (!beside) {
-      return
-    }
-    const next = this.placed(dragging.field, beside.field, place > 0)
-    if (next.join(' ') !== this.dragOrder.join(' ')) {
-      this.dragOrder = next
-    }
-  }
-
-  private readonly handleGripUp = (): void => {
-    const wanted = this.dragOrder
-    this.stopDrag()
-    if (wanted && wanted.join(' ') !== this.fields.join(' ')) {
-      this.requestOrder(wanted)
-    }
-  }
-
-  private readonly handleGripCancel = (): void => {
-    this.stopDrag()
-  }
-
-  private stopDrag(): void {
-    this.dragging = undefined
-    this.dragOrder = undefined
-    window.removeEventListener('pointermove', this.handleGripMove)
-    window.removeEventListener('pointerup', this.handleGripUp)
-    window.removeEventListener('pointercancel', this.handleGripCancel)
   }
 
   /**

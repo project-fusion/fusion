@@ -46,8 +46,13 @@ import '../../table/index.js'
  * short result keeps the full box with space below it.
  * @cssproperty --data-table-color - The text color of a cell.
  * @cssproperty --data-table-columns - The grid track list for the columns. It overrides the list worked out from the columns.
+ * @cssproperty --data-table-dragging-opacity - The opacity of a row being moved, with `reorderable-rows`.
+ * @cssproperty --data-table-drop-indicator-color - The color of the line where a moved row would land.
+ * @cssproperty --data-table-drop-indicator-size - The thickness of the line where a moved row would land.
  * @cssproperty --data-table-footer-gap - The space between the grid and the footer below it.
  * @cssproperty --data-table-footer-item-gap - The space between the pieces of the footer, such as a summary and the pagination.
+ * @cssproperty --data-table-grip-color - The color of a row's grip, with `reorderable-rows`.
+ * @cssproperty --data-table-grip-disabled-opacity - The opacity of a row's grip while a sort decides the order.
  * @cssproperty --data-table-heading-background-color - The fill behind a heading while `windowed`.
  * It is opaque, because rows scroll under the sticky heading. Unset otherwise.
  * @cssproperty --data-table-heading-color - The text color of a heading.
