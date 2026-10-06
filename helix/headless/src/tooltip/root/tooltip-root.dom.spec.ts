@@ -237,6 +237,20 @@ describe('tooltip for', () => {
     expect(tip.internals?.ariaLabel).toBe('Writes the file to disk')
   })
 
+  test('the host is out of the accessibility tree while the bubble is down, and back while it shows', async () => {
+    /* A named box with no role beside every trigger was a stray copy of the
+       tooltip to a reader walking the page. The trigger's reference still
+       reads its name. */
+    const { tip } = await pair()
+    expect(tip.internals?.ariaHidden).toBe('true')
+    tip.show()
+    await tip.updateComplete
+    expect(tip.internals?.ariaHidden ?? null).toBeNull()
+    tip.hide()
+    await tip.updateComplete
+    expect(tip.internals?.ariaHidden).toBe('true')
+  })
+
   test('slotted content is named by its text, flattened', async () => {
     const host = await mount(
       `<div><button id="target" aria-describedby="tip">Save</button>` +
@@ -555,6 +569,11 @@ describe('the wrapping form', () => {
     }
     return warnings
   }
+
+  test('stays in the accessibility tree, since it holds its trigger', async () => {
+    const tip = await tooltip()
+    expect(tip.internals?.ariaHidden ?? null).toBeNull()
+  })
 
   test('warns where the tooltip says what the trigger’s name does not', async () => {
     const warnings = await warned(

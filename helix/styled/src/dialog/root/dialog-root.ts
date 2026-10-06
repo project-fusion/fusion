@@ -18,13 +18,16 @@ import { styles } from './dialog-root.css.js'
  * @aliases Modal, Sheet
  * @documentation https://fusion.dev/helix/components/dialog
  *
+ * @cssproperty --dialog-background-color - The panel's fill. Follows `--helix-color-surface-overlay`.
  * @cssproperty --dialog-border-color - Color of the panel's edge.
  * @cssproperty --dialog-border-width - Width of the panel's edge. Follows
  *   `--helix-border-floating`, which is `0`, so the panel stands out by its shadow unless your
  *   theme sets a border.
+ * @cssproperty --dialog-color - Color of the words in the panel. Follows `--helix-color-foreground`.
  * @cssproperty --dialog-icon-size - How big the mark above the title is.
  * @cssproperty --dialog-inline-size - Width of the panel.
  * @cssproperty --dialog-padding - Padding inside the panel.
+ * @cssproperty --dialog-radius - The panel's corner radius. Follows `--helix-radii-sm`.
  * @cssproperty --dialog-rise - How far the panel rises as it opens. Follows
  *   `--helix-space-lg`.
  * @cssproperty --dialog-scrim - The tint over the page behind the dialog. Set it on the host, because a `var()` written inside `::backdrop` cannot read a token.
