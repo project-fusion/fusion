@@ -1043,8 +1043,18 @@ fn member_of(member: crate::manifest::parse::Member) -> Value {
     if member.reflects {
         at.insert("reflects".to_owned(), json!(true));
     }
+    let mut helix = serde_json::Map::new();
     if !references.is_empty() {
-        at.insert("helix".to_owned(), json!({ "references": references }));
+        helix.insert("references".to_owned(), json!(references));
+    }
+    /* **A word property says so**, so the typings of `registerWords` can be
+    generated from the manifest: its key is the class's `words` and its
+    English is the default above. */
+    if member.words {
+        helix.insert("words".to_owned(), json!(true));
+    }
+    if !helix.is_empty() {
+        at.insert("helix".to_owned(), Value::Object(helix));
     }
     if !member.parameters.is_empty() {
         at.insert(

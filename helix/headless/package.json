@@ -25,7 +25,8 @@
     "./jsx": "./types/jsx.d.ts",
     "./lint.json": "./lint.json",
     "./svelte": "./types/svelte.d.ts",
-    "./vue": "./types/vue.d.ts"
+    "./vue": "./types/vue.d.ts",
+    "./words": "./types/words.d.ts"
   },
   "files": [
     "custom-elements.json",

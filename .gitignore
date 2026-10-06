@@ -58,6 +58,7 @@ helix/*/lint.json
 jsx.d.ts
 svelte.d.ts
 vue.d.ts
+helix/*/types/words.d.ts
 
 # Served by the dev server, generated or scratch. Ignored rather than tracked
 # because `biome ci` lints what it can see, and a generated page failing lint

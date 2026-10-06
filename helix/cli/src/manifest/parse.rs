@@ -140,6 +140,10 @@ pub struct Written {
 }
 
 /// One entry in a class body.
+///
+/// Its flags are four independent facts the manifest writes one key each for,
+/// so they stay four fields.
+#[allow(clippy::struct_excessive_bools)]
 #[derive(Debug, Default)]
 pub struct Member {
     /// `field` or `method`, which is the manifest's vocabulary for these.
@@ -176,6 +180,9 @@ pub struct Member {
     pub attribute: Option<String>,
     /// Whether the property writes itself back onto the host.
     pub reflects: bool,
+    /// Whether `@words` makes it a word property, one a page can register
+    /// words for by locale.
+    pub words: bool,
 }
 
 /// Every doc block in a source, by the offset of what it is written above.
@@ -707,6 +714,7 @@ fn field_of(
     assigned: &BTreeMap<String, String>,
 ) -> Member {
     let (attribute, reflects) = attribute_of(&property.decorators, &name);
+    let words = has_words(&property.decorators);
     let written = property
         .value
         .as_ref()
@@ -750,6 +758,7 @@ fn field_of(
         },
         reflects,
         returns: None,
+        words,
         /* **An optional property says `| undefined` out loud.** `name?: string`
         can hold one, and the manifest describes what a reader may find there
         rather than what the declaration looks like, so the `?` is written
@@ -811,6 +820,7 @@ fn method_of(
         assigned: false,
         attribute,
         reflects,
+        words: accessor && has_words(&method.decorators),
         default: None,
         documented,
         is_static: method.r#static,
@@ -974,6 +984,22 @@ fn tag_of(class: &Class<'_>) -> Option<String> {
         }
     }
     None
+}
+
+/// Whether a field is a word property: decorated `@words`, bare or called.
+///
+/// **`@words` sits above `@property`**, which still declares the attribute, so
+/// every rule that reads `@property` reads a word property the same way.
+fn has_words(decorators: &oxc_allocator::Vec<'_, Decorator<'_>>) -> bool {
+    decorators
+        .iter()
+        .any(|decorator| match &decorator.expression {
+            Expression::Identifier(name) => name.name == "words",
+            Expression::CallExpression(call) => {
+                matches!(&call.callee, Expression::Identifier(name) if name.name == "words")
+            }
+            _ => false,
+        })
 }
 
 /// What a `@property` decorator says about the attribute behind a field.

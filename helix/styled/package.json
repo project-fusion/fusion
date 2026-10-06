@@ -29,7 +29,8 @@
       "default": "./dist/rehype.js"
     },
     "./svelte": "./types/svelte.d.ts",
-    "./vue": "./types/vue.d.ts"
+    "./vue": "./types/vue.d.ts",
+    "./words": "./types/words.d.ts"
   },
   "files": [
     "custom-elements.json",
