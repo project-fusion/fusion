@@ -393,8 +393,8 @@ describe('a legend whose `for` names no table', () => {
     } finally {
       console.warn = original
     }
-    expect(warnings.filter((one) => one.includes('names no table'))).toEqual([
-      expect.stringContaining('<helix-headless-legend for="nowhere">'),
-    ])
+    const said = warnings.filter((one) => one.includes('names no table'))
+    expect(said).toHaveLength(1)
+    expect(said[0]).toContain('<helix-headless-legend for="nowhere">')
   })
 })

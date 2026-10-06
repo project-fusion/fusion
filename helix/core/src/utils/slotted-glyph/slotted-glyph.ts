@@ -24,7 +24,16 @@ export class SlottedGlyph {
    * through any slot it is forwarded by. The copies made of the last one go.
    */
   read(slot: HTMLSlotElement): void {
-    this.source = slot.assignedElements({ flatten: true })[0]
+    this.take(slot.assignedElements({ flatten: true })[0])
+  }
+
+  /**
+   * Takes `source` as the glyph, or none, as `read` does from a slot: the
+   * copies made of the last one go. For the first render, which reads the
+   * host's children before any `slotchange` answers.
+   */
+  take(source: Element | undefined): void {
+    this.source = source
     this.copies.clear()
   }
 

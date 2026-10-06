@@ -9,6 +9,7 @@ import {
   MixinCollection,
   MixinControllerActive,
   scrollItemIntoView,
+  selectsAll,
   slottedWords,
   Typeahead,
   treeArrow,
@@ -387,7 +388,7 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
    * Returns whether the press was one of those.
    */
   private handleMultiple(current: HelixHeadlessTreeItem, event: KeyboardEvent): boolean {
-    if ((event.ctrlKey || event.metaKey) && !event.altKey && event.key.toLowerCase() === 'a') {
+    if (selectsAll(event)) {
       const leaves = this.items
         .filter((item) => !this.holds(item) && !item.disabled && item.value !== '')
         .map((item) => item.value)
