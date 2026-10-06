@@ -1,5 +1,22 @@
 :host {
+  /* How a split crumb tells its halves apart, handed to every crumb in the
+     trail. A crumb draws a shared fill and a divider from these two and
+     decides nothing itself, so the trail's `separation` is the one place the
+     choice is made. `plain` is the resting value: a fill and no line. */
+  --_breadcrumbs-split-fill: var(
+    --breadcrumbs-split-fill,
+    color-mix(in oklab, var(--helix-color-foreground) 4%, transparent)
+  );
+  --_breadcrumbs-split-rule: transparent;
+
   display: block;
+}
+
+/* A line between the halves, and no shared fill. The line is the border every
+   outlined surface draws, at its hairline width. */
+:host([separation="outlined"]) {
+  --_breadcrumbs-split-fill: transparent;
+  --_breadcrumbs-split-rule: var(--breadcrumbs-split-divider-color, var(--helix-color-border));
 }
 
 [part="list"] {

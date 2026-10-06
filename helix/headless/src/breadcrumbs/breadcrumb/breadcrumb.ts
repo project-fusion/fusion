@@ -1,4 +1,4 @@
-import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, hostAria, slotFilled } from '@fusion.dev/helix-core'
 import { caretRight } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -41,6 +41,9 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @csspart link - The crumb itself, which is an `<a>` where `href` is set.
  * @csspart separator - The separator preceding the item.
  * @csspart separator-mark - The chevron between crumbs, shown when no separator is slotted.
+ *
+ * @cssstate end - While the `end` slot holds something, so a stylesheet can join
+ * the label and what follows it into one control.
  */
 @customElement('helix-headless-breadcrumb')
 export class HelixHeadlessBreadcrumb extends HelixElement {
@@ -95,6 +98,30 @@ export class HelixHeadlessBreadcrumb extends HelixElement {
     this.internals.ariaCurrent = this.current ? 'page' : null
   }
 
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    this.markEnd()
+  }
+
+  /**
+   * Says whether anything sits after the label.
+   *
+   * A switcher's trigger in `end` makes the crumb a split control, and its
+   * label is drawn as the first half of it. No selector can ask a slot what was
+   * assigned to it, so this is script. Answered from a DOM, so the server
+   * writes the resting answer and the first client update corrects it.
+   */
+  private markEnd(): void {
+    this.toggleState('end', slotFilled(this.renderRoot?.querySelector('slot[name="end"]')))
+  }
+
+  /* Content arriving in the light DOM changes no property here, so nothing
+     would schedule the re-read. Bound to the slot, because `slotchange` is not
+     composed and stops at the shadow root that owns the slot. */
+  private readonly handleEnd = (): void => {
+    this.markEnd()
+  }
+
   /**
    * The mark between one crumb and the next.
    *
@@ -145,7 +172,7 @@ export class HelixHeadlessBreadcrumb extends HelixElement {
               >${label}</a
             >`
           : html`<span part="link">${label}</span>`
-      }<slot name="end"></slot>`
+      }<slot name="end" @slotchange=${this.handleEnd}></slot>`
   }
 }
 
