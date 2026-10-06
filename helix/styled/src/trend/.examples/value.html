@@ -1,0 +1,31 @@
+<!-- @summary Trends given the change as a number in `value`, which sets the movement by its sign and writes the figure with `format-options`. -->
+
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-trend
+    format-options='{"style":"percent","maximumFractionDigits":1}'
+    good="up"
+    locale="en-US"
+    value="0.124"
+  >
+    <span slot="label">Revenue</span>
+  </helix-trend>
+  <helix-trend
+    format-options='{"style":"percent","maximumFractionDigits":1}'
+    good="down"
+    locale="en-US"
+    value="-0.004"
+  >
+    <span slot="label">Churn</span>
+  </helix-trend>
+  <helix-trend
+    format-options='{"style":"currency","currency":"USD","maximumFractionDigits":0}'
+    good="up"
+    locale="en-US"
+    value="-1250"
+  >
+    <span slot="label">Average order</span>
+  </helix-trend>
+</helix-flex>

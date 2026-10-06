@@ -43,12 +43,22 @@ slot[name$="icon"]::slotted(*) {
  *
  * Read from the base tier's states rather than from four attribute pairs,
  * which named `direction` and so missed a trend written with `movement`.
- * Neutral is neither and stays gray, as does any trend with no `good` set. */
-:host(:state(better)) {
+ * Neutral is neither and stays gray, as does any trend with no `good` set.
+ *
+ * **And from the two attributes until the element upgrades.** A served page
+ * has this sheet before the script runs and no state yet, so a served trend
+ * that is good news drew gray and turned green on hydration. The pairs stand
+ * in for the states until the element is defined, and then the states alone
+ * decide. A trend moved by `value` alone is judged once the script runs. */
+:host(:state(better)),
+:host(:not(:defined)[good="up"][movement="up"]),
+:host(:not(:defined)[good="down"][movement="down"]) {
   --_trend-color: var(--trend-better-color, var(--helix-color-success));
 }
 
-:host(:state(worse)) {
+:host(:state(worse)),
+:host(:not(:defined)[good="up"][movement="down"]),
+:host(:not(:defined)[good="down"][movement="up"]) {
   --_trend-color: var(--trend-worse-color, var(--helix-color-danger));
 }
 
