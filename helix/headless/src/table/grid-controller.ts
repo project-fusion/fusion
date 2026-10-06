@@ -1,4 +1,5 @@
 import {
+  deepActiveElement,
   deepContains,
   focusableElements,
   type GridPlace,
@@ -72,6 +73,12 @@ export class TableGridController implements ReactiveController {
   /** The column holding the stop. */
   private stopColumn = 0
 
+  /** Where the stop's row was drawn when last marked, for the row that takes over when it goes. */
+  private stopIndex = 0
+
+  /** The row focus is in, while it is in the grid's rows. */
+  private focusRow: Element | undefined = undefined
+
   /** Whether the next update focuses the stop, after a key moved it. */
   private focusWanted = false
 
@@ -90,13 +97,37 @@ export class TableGridController implements ReactiveController {
   hostConnected(): void {
     this.host.addEventListener('keydown', this.handleKeydown)
     this.host.addEventListener('focusin', this.handleFocusIn)
+    this.host.addEventListener('focusout', this.handleFocusOut)
     this.host.addEventListener('pointerdown', this.handlePointerDown)
   }
 
   hostDisconnected(): void {
     this.host.removeEventListener('keydown', this.handleKeydown)
     this.host.removeEventListener('focusin', this.handleFocusIn)
+    this.host.removeEventListener('focusout', this.handleFocusOut)
     this.host.removeEventListener('pointerdown', this.handlePointerDown)
+  }
+
+  /**
+   * A row taken away while it held the stop hands it to the row drawn in its
+   * place, or to the row before where it was the last, at the same column.
+   * Where focus was in that row and went with it, focus follows the stop, as
+   * React Aria's collections move it to a neighbor; focus that had already
+   * left the grid is left where it is. Before the render, so the cells the
+   * table draws itself are drawn with the stop where it now is.
+   */
+  hostUpdate(): void {
+    const gone = this.stopRow
+    const rows = this.options.rows()
+    if (!(gone instanceof Element) || rows.includes(gone)) {
+      return
+    }
+    this.stopRow = rows[Math.min(this.stopIndex, rows.length - 1)]
+    const active = deepActiveElement()
+    if (this.focusRow === gone && (!active || active === document.body)) {
+      this.focusWanted = true
+    }
+    this.focusRow = undefined
   }
 
   /** How many columns lead the consumer's cells: the checkbox column, where there is one. */
@@ -204,6 +235,7 @@ export class TableGridController implements ReactiveController {
   mark(): void {
     const on = this.options.on()
     const at = this.current()
+    this.stopIndex = Math.max(0, at.row)
     const columns = this.options.columns()
     for (const [index, column] of columns.entries()) {
       column.gridCell = on
@@ -393,9 +425,18 @@ export class TableGridController implements ReactiveController {
         return
       }
     }
+    this.focusRow = place.row === -1 ? undefined : this.options.rows()[place.row]
     const at = this.current()
     if (at.row !== place.row || at.column !== place.column) {
       this.moveTo(place, false)
+    }
+  }
+
+  /** Focus leaving for somewhere outside the grid's host is no longer in a row. */
+  private readonly handleFocusOut = (event: FocusEvent): void => {
+    const to = event.relatedTarget
+    if (to instanceof Node && !deepContains(this.host, to)) {
+      this.focusRow = undefined
     }
   }
 

@@ -192,6 +192,45 @@ describe('a grid table', () => {
     expect(host.selected).toBe('web,api')
   })
 
+  /* The stop and focus were on a row that went, so focus fell to the page and
+     the stop to the first heading. React Aria moves both to a neighbor. */
+  test('hands focus to the next row, at the same column, when the focused row goes', async () => {
+    const host = await table()
+    const [, , apiName] = cells(host)
+    const web = host.querySelector('[value="web"]') as HTMLElement
+    cells(host)[1]?.focus()
+    await settle(host)
+    web.remove()
+    await settle(host)
+    expect(focused(host)).toBe(cells(host)[1] as HTMLElement)
+    expect(cells(host)[1]?.getAttribute('tabindex')).toBe('0')
+    expect(apiName?.getAttribute('tabindex')).toBe('-1')
+  })
+
+  test('hands focus to the row before when the last row goes', async () => {
+    const host = await table()
+    cells(host)[2]?.focus()
+    await settle(host)
+    host.querySelector('[value="api"]')?.remove()
+    await settle(host)
+    expect(focused(host)).toBe(cells(host)[0] as HTMLElement)
+  })
+
+  test('moves the stop and leaves focus alone when the row goes while focus is elsewhere', async () => {
+    const host = await table()
+    const outside = document.createElement('button')
+    document.body.append(outside)
+    cells(host)[3]?.focus()
+    await settle(host)
+    outside.focus()
+    await settle(host)
+    host.querySelector('[value="api"]')?.remove()
+    await settle(host)
+    expect(document.activeElement).toBe(outside)
+    expect(cells(host)[1]?.getAttribute('tabindex')).toBe('0')
+    outside.remove()
+  })
+
   test('takes the stops back when it stops being a grid', async () => {
     const host = await table()
     host.grid = false
