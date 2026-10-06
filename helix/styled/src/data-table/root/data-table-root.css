@@ -74,7 +74,7 @@
    every row, so a wrapper that generated a box would take one cell and put every
    heading inside it. The data rows are the same. */
 [part="head"],
-[part="row"] {
+[part~="row"] {
   display: contents;
 }
 
@@ -115,7 +115,7 @@
  *    for instead is dropping their own bottom border and letting this rule stand in
  *    for it, which is a different box's border doing this one's job.
  */
-[part="row"]:last-of-type [part~="cell"] {
+[part~="row"]:last-of-type [part~="cell"] {
   border-block-end-color: transparent;
 }
 
@@ -153,14 +153,19 @@
 [part~="cell"]:focus-visible,
 [part="more-cell"]:focus-visible,
 [part~="select"]:focus-visible,
-[part="select-all"]:focus-visible {
+[part="select-all"]:focus-visible,
+[part="row-grip"]:focus-visible,
+[part="grip-head"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }
 
-/* The checkbox column: the same box as a cell, the box centered in it. */
+/* The checkbox column and the grip column: the same box as a cell, the box
+   or the grip centered in it. */
 [part~="select"],
-[part="select-all"] {
+[part="select-all"],
+[part="row-grip"],
+[part="grip-head"] {
   align-items: center;
   border-block-end: var(--helix-border-thin) solid
     var(--data-table-rule-color, var(--helix-color-border));
@@ -170,7 +175,8 @@
   padding-inline: var(--data-table-padding-inline, var(--helix-space-sm));
 }
 
-[part="row"]:last-of-type [part~="select"] {
+[part~="row"]:last-of-type [part~="select"],
+[part~="row"]:last-of-type [part="row-grip"] {
   border-block-end-color: transparent;
 }
 
@@ -178,11 +184,56 @@
    the row has no box of its own to fill. A wash rather than the tone's surface,
    which is the solid fill a button stands on and would make a column of chosen
    rows read as an alarm; this is the primary at the strength Tag rests at. */
-[part="row"][aria-selected="true"] > * {
+[part~="row"][aria-selected="true"] > * {
   background-color: var(
     --data-table-selected-background-color,
     color-mix(in srgb, var(--helix-color-primary) 10%, var(--helix-color-background))
   );
+}
+
+/* A row's grip, with `reorderable-rows`: quiet until held, as a column's grip
+   is. `touch-action: none` so a drag on a phone moves the row and does not
+   scroll the table. While a sort decides the order, it does nothing and says so. */
+[part="row-grip-button"] {
+  all: unset;
+  align-items: center;
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  color: var(--data-table-grip-color, var(--helix-color-foreground-muted));
+  cursor: grab;
+  display: inline-flex;
+  touch-action: none;
+}
+
+[part="row-grip-button"]:active {
+  cursor: grabbing;
+}
+
+[part="row-grip-button"][aria-disabled="true"] {
+  cursor: default;
+  opacity: var(--data-table-grip-disabled-opacity, 0.4);
+}
+
+[part="row-grip-mark"] {
+  block-size: 1em;
+  inline-size: 1em;
+}
+
+/* The row being moved, faded where it was, and the line where it would land:
+   an inset shadow on the edge it goes past, on every cell, since the row has no
+   box of its own. It moves nothing around it. */
+[part~="row"][part~="row-dragging"] > * {
+  opacity: var(--data-table-dragging-opacity, 0.5);
+}
+
+[part~="row"][part~="row-drop-before"] > * {
+  box-shadow: inset 0 var(--data-table-drop-indicator-size, var(--helix-border-thick)) 0 0
+    var(--data-table-drop-indicator-color, var(--helix-color-primary));
+}
+
+[part~="row"][part~="row-drop-after"] > * {
+  box-shadow: inset 0 calc(var(--data-table-drop-indicator-size, var(--helix-border-thick)) * -1) 0
+    0 var(--data-table-drop-indicator-color, var(--helix-color-primary));
 }
 
 /*
@@ -355,7 +406,8 @@
 }
 
 /* The checkbox heading is this sheet's own box, and sticks beside them. */
-:host([windowed]) [part="select-all"] {
+:host([windowed]) [part="select-all"],
+:host([windowed]) [part="grip-head"] {
   background-color: var(--data-table-heading-background-color, var(--helix-color-background));
   inset-block-start: 0;
   position: sticky;

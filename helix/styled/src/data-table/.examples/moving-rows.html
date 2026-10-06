@@ -1,0 +1,32 @@
+<!-- @summary Rows you move by a grip, with the new order set back on the table. -->
+<helix-data-table
+  id="queue"
+  label="Print queue"
+  reorderable-rows
+  row-key="id"
+>
+  <helix-table-column field="name">Document</helix-table-column>
+  <helix-table-column
+    field="pages"
+    text-align="end"
+  >Pages</helix-table-column>
+</helix-data-table>
+
+<script type="module">
+  const queue = document.getElementById('queue')
+
+  const jobs = [
+    { id: 'invoice', name: 'Invoice 1042', pages: 2 },
+    { id: 'brochure', name: 'Spring brochure', pages: 12 },
+    { id: 'contract', name: 'Lease contract', pages: 9 },
+    { id: 'labels', name: 'Shipping labels', pages: 4 },
+  ]
+  queue.rows = jobs
+
+  // The table moves no row itself. Set `rows` to the order the event carries.
+  queue.addEventListener('helix-reorder', (event) => {
+    if (event.detail.kind === 'row') {
+      queue.rows = event.detail.keys.map((key) => jobs.find((job) => job.id === key))
+    }
+  })
+</script>
