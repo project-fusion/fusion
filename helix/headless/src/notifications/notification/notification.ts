@@ -72,6 +72,16 @@ import '../../format-date/index.js'
  * @csspart label - What happened, on the first line.
  * @csspart media - The leading slot's box.
  * @csspart time - When it happened, formatted for people to read.
+ * @csspart time-day - Format Date's `day`, forwarded for a time drawn as fields. An elapsed time draws none.
+ * @csspart time-day-period - Format Date's `day-period`, forwarded for a time drawn as fields. An elapsed time draws none.
+ * @csspart time-era - Format Date's `era`, forwarded for a time drawn as fields. An elapsed time draws none.
+ * @csspart time-hour - Format Date's `hour`, forwarded for a time drawn as fields. An elapsed time draws none.
+ * @csspart time-minute - Format Date's `minute`, forwarded for a time drawn as fields. An elapsed time draws none.
+ * @csspart time-month - Format Date's `month`, forwarded for a time drawn as fields. An elapsed time draws none.
+ * @csspart time-second - Format Date's `second`, forwarded for a time drawn as fields. An elapsed time draws none.
+ * @csspart time-time-zone-name - Format Date's `time-zone-name`, forwarded for a time drawn as fields. An elapsed time draws none.
+ * @csspart time-weekday - Format Date's `weekday`, forwarded for a time drawn as fields. An elapsed time draws none.
+ * @csspart time-year - Format Date's `year`, forwarded for a time drawn as fields. An elapsed time draws none.
  * @csspart trailing - The column holding the time and the controls.
  *
  * @cssstate actions - While the actions slot holds something, so the words above make room for it.
@@ -317,12 +327,15 @@ export class HelixHeadlessNotification extends MixinDismissible(HelixElement) {
    * already named for its role: the child publishes `time`, the role here is
    * `time`, and naming both would leave `::part(time)` matching two elements.
    * What a consumer wants to reach is the `<time>`, so that is what the name
-   * reaches.
+   * reaches. Format Date's field parts go on under `time-`, as every composed
+   * child's do, though an elapsed time draws no fields.
    */
   private renderTime(): TemplateResult {
     const stamp = this.tag('format-date')
     return html`<${stamp}
-      exportparts="time"
+      exportparts="time, day: time-day, day-period: time-day-period, era: time-era, hour: time-hour,
+        minute: time-minute, month: time-month, second: time-second,
+        time-zone-name: time-time-zone-name, weekday: time-weekday, year: time-year"
       elapsed
       date=${this.at}
       locale=${this.locale}
