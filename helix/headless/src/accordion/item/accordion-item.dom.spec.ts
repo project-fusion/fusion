@@ -100,12 +100,17 @@ describe('a section find in page can search', () => {
     expect(content.getAttribute('aria-labelledby')).toBe('trigger')
   })
 
+  /* In the browser's order: the event, its listeners and their microtasks, and
+     only then the removal of `hidden`. Putting it back in the listener left a
+     closed section drawn, read and reachable by Tab. */
   test('a refused opening puts the region back to hidden until found', async () => {
     const host = await item()
     host.addEventListener('helix-before-open', (event) => event.preventDefault())
     const content = part(host, 'content') as HTMLElement
-    content.removeAttribute('hidden')
     content.dispatchEvent(new Event('beforematch'))
+    await Promise.resolve()
+    content.removeAttribute('hidden')
+    await new Promise((resolve) => setTimeout(resolve))
     await host.updateComplete
     expect(host.open).toBe(false)
     expect(content.getAttribute('hidden')).toBe('until-found')
