@@ -916,10 +916,22 @@ export class HelixHeadlessObjectInspector extends HelixElement {
 
   /** Whether a row of the tree holds focus. */
   private hasFocusedRow(): boolean {
+    return this.focusedIndex() !== undefined
+  }
+
+  /** Where the row holding focus is among the visible rows, or nothing while none does. */
+  private focusedIndex(): number | undefined {
     /* No `instanceof HTMLElement`: this is asked before every render, a
        server's included, where there is no such class. */
-    const focused = this.shadowRoot?.activeElement as Element | null | undefined
-    return focused?.getAttribute?.('role') === 'row'
+    const focused = this.shadowRoot?.activeElement as HTMLElement | null | undefined
+    return focused?.getAttribute?.('role') === 'row' ? Number(focused.dataset.index) : undefined
+  }
+
+  /** Focus on the tree itself, its stop while the active row is not drawn, goes on to that row. */
+  private readonly handleTreeFocus = (): void => {
+    this.revealing = true
+    this.focusing = true
+    this.requestUpdate()
   }
 
   /**
@@ -958,10 +970,17 @@ export class HelixHeadlessObjectInspector extends HelixElement {
     const rows = this.rows
     const { first, last } = this.windowed ? this.virtualize.window : { first: 0, last: rows.length }
     /* The row holding focus stays drawn when it scrolls out of the window,
-       beside it on its side, and the spacer there gives up its room. */
+       beside it on its side, and the spacer there gives up its room.
+
+       **The row holding focus, which is not always the active row.** Between
+       a jump and the focus that follows it, focus is still on the row the key
+       was pressed on. Keeping the active row instead drew it beside the
+       window, far from where it belongs, and the reveal scrolled to that
+       place: after Page Down the row had focus below the box. */
+    const focused = this.focusedIndex()
     const kept =
-      this.windowed && (this.cursor < first || this.cursor >= last) && this.hasFocusedRow()
-        ? this.cursor
+      this.windowed && focused !== undefined && (focused < first || focused >= last)
+        ? focused
         : undefined
     const { after, before } = this.windowed
       ? this.virtualize.spacers(kept)
@@ -971,6 +990,10 @@ export class HelixHeadlessObjectInspector extends HelixElement {
     if (kept !== undefined && keptRow) {
       shown.splice(kept < first ? 0 : shown.length, 0, [keptRow, kept])
     }
+    /* **The tree is the stop while the active row is not drawn.** A window
+       that scrolled away from it left no row with `tabindex="0"`, so Tab back
+       in landed nowhere a key could move from. The tree hands focus on. */
+    const stopless = rows.length > 0 && !shown.some(([, at]) => at === this.cursor)
     return html`${
       this.label ? html`<div part="header"><span part="label">${this.label}</span></div>` : nothing
     }${
@@ -994,8 +1017,10 @@ export class HelixHeadlessObjectInspector extends HelixElement {
           id="tree"
           role="treegrid"
           ?data-scroller=${this.windowed}
+          tabindex=${stopless ? '0' : nothing}
           aria-label=${this.label || this.treeLabel}
           @keydown=${this.handleKeydown}
+          @focus=${this.handleTreeFocus}
           @focusin=${this.handleFocusIn}
           @focusout=${this.handleFocusOut}
           @scroll=${() => this.virtualize.measure()}
