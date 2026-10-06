@@ -753,6 +753,26 @@ describe('the no-results and error lines', () => {
     expect(part(host, 'error')).toBeNull()
     expect(hasState(host, 'error')).toBe(false)
   })
+
+  /* Removing the attribute gives the property null, which the list read as
+     an error with no words: the state stayed on and the error part stayed
+     drawn, empty. */
+  test('removing `load-error`, or setting it to null, clears the error', async () => {
+    const host = (await list('load-error="Could not load people"')) as Updatable & {
+      loadError: string | null
+    }
+    host.removeAttribute('load-error')
+    await settle(host)
+    expect(part(host, 'error')).toBeNull()
+    expect(hasState(host, 'error')).toBe(false)
+    host.loadError = 'Offline'
+    await settle(host)
+    expect(hasState(host, 'error')).toBe(true)
+    host.loadError = null
+    await settle(host)
+    expect(part(host, 'error')).toBeNull()
+    expect(hasState(host, 'error')).toBe(false)
+  })
 })
 
 describe('ranges from the keyboard', () => {
