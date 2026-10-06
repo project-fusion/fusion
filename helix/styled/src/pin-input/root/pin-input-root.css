@@ -20,9 +20,13 @@
 /* Square at the control height, so the row reads as boxes rather than as short
    fields. `all: unset` takes `box-sizing` with it, back to `content-box`, and
    the `border-box` every shadow root is given comes from a rule this one
-   outranks. */
-[part="cell"] {
+   outranks.
+
+   A drawn box, so the character is centered by the grid where a text field
+   centered it itself, and the pointer is the text one a field shows. */
+[part~="cell"] {
   all: unset;
+  align-items: center;
   background-color: var(--pin-input-cell-background-color, var(--helix-color-well));
   block-size: var(--pin-input-cell-size, var(--helix-size-control));
   border: var(--helix-border-thin) solid
@@ -30,6 +34,8 @@
   border-radius: var(--pin-input-cell-radius, var(--helix-radii-sm));
   box-sizing: border-box;
   color: var(--pin-input-cell-color, var(--helix-color-foreground));
+  cursor: text;
+  display: flex;
   font-family: var(--helix-font-sans);
   font-size: var(--pin-input-cell-font-size, var(--helix-text-lg));
   /* Tabular, so a 1 takes the same room as an 8 and the row does not breathe as
@@ -37,6 +43,7 @@
   font-variant-numeric: tabular-nums;
   font-weight: var(--helix-weight-medium);
   inline-size: var(--pin-input-cell-size, var(--helix-size-control));
+  justify-content: center;
   text-align: center;
   transition: border-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
@@ -44,7 +51,7 @@
 /* `:host(:not(:disabled))`, not `[disabled]`. The pseudo-class also matches an
    ancestor `<fieldset disabled>`, where the attribute selector only ever sees
    the element's own. */
-:host(:not(:disabled)) [part="cell"]:hover {
+:host(:not(:disabled)) [part~="cell"]:hover {
   border-color: var(--helix-color-foreground-muted);
 }
 
@@ -57,7 +64,7 @@
    offset draws the same color twice with a gap between. It matters more on this
    component than on any other, because the cells sit a few pixels apart and a
    ring standing off one of them reaches toward its neighbors. */
-[part="cell"]:focus-visible {
+[part~="cell-active"] {
   border-color: var(--pin-input-cell-border-color-focus, var(--helix-color-primary));
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: 0;
@@ -67,11 +74,11 @@
    interaction with the element it is on, and the reader interacts with an input
    in the shadow root. `MixinField` mirrors the flag onto the host. `Input`
    carries the measurement. */
-:host(:state(invalid)) [part="cell"] {
+:host(:state(invalid)) [part~="cell"] {
   border-color: var(--helix-color-danger);
 }
 
-:host(:disabled) [part="cell"] {
+:host(:disabled) [part~="cell"] {
   cursor: not-allowed;
   opacity: 0.5;
 }
@@ -84,13 +91,13 @@
  * color: no fill, the ground showing through, distinct from the resting state on
  * every ground and needing no token to stay that way.
  */
-:host([readonly]) [part="cell"] {
+:host([readonly]) [part~="cell"] {
   background-color: transparent;
 }
 
 /* A masked box shows a dot rather than a character, and the dot wants the room a
-   character had: `password` renders a bullet that sits high in a small box. */
-:host([mask]) [part="cell"] {
+   character had: a bullet sits high in a small box. */
+:host([mask]) [part~="cell"] {
   font-size: var(--helix-text-xl);
 }
 
@@ -102,12 +109,19 @@
   font-size: var(--helix-text-lg);
 }
 
-/* Quieter than a typed character, and it has to be said here because a cell is
-   an `<input>` and the UA gives its placeholder a color of its own. Subtle
-   rather than muted: this is a hint at the shape of the field, sitting under
-   nothing, where muted is for text somebody is meant to read. */
-[part="cell"]::placeholder {
-  color: var(--helix-color-foreground-subtle);
+/* Quieter than a typed character. Subtle rather than muted: this is a hint at
+   the shape of the field, sitting under nothing, where muted is for text
+   somebody is meant to read. */
+[part="placeholder"] {
+  color: var(--pin-input-placeholder-color, var(--helix-color-foreground-subtle));
+}
+
+/* The caret the field would draw, drawn in the box it is in: the field itself
+   is out of sight. A bar the height of the type. */
+[part="caret"] {
+  background-color: var(--pin-input-caret-color, currentcolor);
+  block-size: 1em;
+  inline-size: var(--helix-border-thin);
 }
 
 /*

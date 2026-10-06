@@ -12,8 +12,8 @@ import { styles } from './pin-input-root.css.js'
  * Square boxes at the control height, with space between them so the code reads
  * as separate characters.
  *
- * The focus ring is on the current box, so you can see which character comes
- * next.
+ * The focus ring is on the box the caret is in, so you can see which character
+ * comes next, and the caret is drawn there while it is empty.
  *
  * Figures are tabular, so every digit takes the same width and the row does not
  * shift as you type.
@@ -24,18 +24,24 @@ import { styles } from './pin-input-root.css.js'
  * @aliases PinField, OTP, One-time code, Verification code, InputPin
  * @documentation https://fusion.dev/helix/components/pin-input
  *
+ * @csspart caret - The caret, drawn in the empty box it is in while the field has focus.
  * @csspart cell - One box.
+ * @csspart cell-active - The box the caret is in, while the field has focus. Set together with `cell`.
+ * @csspart cell-filled - A box that holds a character. Set together with `cell`.
  * @csspart field - The row of boxes.
+ * @csspart placeholder - The `placeholder` text in an empty box.
  * @csspart separator - The text `format` draws between two boxes.
  *
+ * @cssproperty --pin-input-caret-color - The color of the caret drawn in an empty box. Without it, the character color applies.
  * @cssproperty --pin-input-cell-background-color - Fill behind each box.
  * @cssproperty --pin-input-cell-border-color - Edge of each box at rest. Hover, focus and an error still draw their own.
- * @cssproperty --pin-input-cell-border-color-focus - Edge of the box holding focus.
+ * @cssproperty --pin-input-cell-border-color-focus - Edge of the box the caret is in.
  * @cssproperty --pin-input-cell-color - The color of a typed character.
  * @cssproperty --pin-input-cell-font-size - The size of a typed character.
  * @cssproperty --pin-input-cell-radius - Corner radius of each box.
  * @cssproperty --pin-input-cell-size - Width and height of each box.
  * @cssproperty --pin-input-gap - The space between one box and the next.
+ * @cssproperty --pin-input-placeholder-color - The color of the `placeholder` text in an empty box.
  * @cssproperty --pin-input-separator-color - The color of the text `format` draws between boxes.
  */
 @customElement('helix-pin-input')
