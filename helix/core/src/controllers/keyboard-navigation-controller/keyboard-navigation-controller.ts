@@ -29,6 +29,43 @@ export interface NavigableItem {
   readonly words?: string
 }
 
+/** What `focusItemOf` reads of an element, where its defaults do not fit. */
+export interface FocusItemOptions {
+  /** Whether the item is skipped. Defaults to `false`. */
+  disabled?: boolean
+  /** Moves focus to the item. Defaults to the element's own `focus()`. */
+  focus?: () => void
+  /**
+   * Whether a node is the item, for `origin: 'focus'`. Defaults to the element
+   * and anything inside it; an item whose children are content of their own,
+   * an accordion section's panel, answers for itself alone.
+   */
+  owns?: (node: Node | null) => boolean
+  /** The words a reader types the start of. */
+  words?: string
+}
+
+/**
+ * An item that is only ever focused: arrows move between such items and
+ * nothing is chosen on arrival, the shape of a toolbar, a megamenu bar or a
+ * legend.
+ *
+ * Eight families wrote the same object literal by hand, `select` a no-op and
+ * `selected` false, and an item that forgot one of them type-checked
+ * wherever its `contains` came from an element.
+ */
+export const focusItemOf = (
+  element: HTMLElement,
+  options: FocusItemOptions = {},
+): NavigableItem => ({
+  contains: options.owns ?? ((node) => element.contains(node)),
+  disabled: options.disabled ?? false,
+  focusItem: options.focus ?? (() => element.focus()),
+  select: () => {},
+  selected: false,
+  ...(options.words === undefined ? {} : { words: options.words }),
+})
+
 /** Where a move starts from: the item that has focus, or the chosen item. */
 export type KeyboardOrigin = 'focus' | 'selection'
 

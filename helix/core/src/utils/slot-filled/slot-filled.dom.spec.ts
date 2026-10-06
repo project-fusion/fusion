@@ -68,3 +68,16 @@ describe('what counts as filled', () => {
    `helix/core` has no browser lane: `build-specs.mjs` bundles families out of
    `helix/headless` and `helix/styled`. Covering this properly means a component
    spec in one of those, which is where the behavior is consumed anyway. */
+
+describe('the slot of a name', () => {
+  test('a name finds its slot, and the empty name the default slot, which has no name attribute', async () => {
+    const { slotNamed } = await import('./slot-filled.js')
+    const host = document.createElement('div')
+    const root = host.attachShadow({ mode: 'open' })
+    root.innerHTML = '<slot name="header"></slot><slot id="default"></slot>'
+    expect(slotNamed(root, 'header')?.name).toBe('header')
+    expect(slotNamed(root, '')?.id).toBe('default')
+    expect(slotNamed(root, 'footer')).toBeNull()
+    expect(slotNamed(null, '')).toBeNull()
+  })
+})

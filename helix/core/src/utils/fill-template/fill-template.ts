@@ -17,3 +17,16 @@ export const fillTemplate = (template: string, values: Record<string, string | n
     (out, [key, value]) => out.replaceAll(`{${key}}`, () => String(value)),
     template,
   )
+
+/**
+ * A name made from a template and the words of what it acts on: `{key}` in
+ * the template filled with the words, or the words after the template where it
+ * has no `{key}`.
+ *
+ * The shape of every "Remove {label}" a page can override: written either way,
+ * "Remove" alone still names which one, as "Remove Draft".
+ */
+export const labelWith = (template: string, key: string, words: string): string =>
+  template.includes(`{${key}}`)
+    ? fillTemplate(template, { [key]: words })
+    : `${template} ${words}`.trim()

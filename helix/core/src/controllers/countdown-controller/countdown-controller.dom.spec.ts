@@ -17,9 +17,27 @@ const host = (): ReactiveControllerHost & { controllers: ReactiveController[] } 
 const now = Date.now
 let clock = 0
 
+const realDocument = globalThis.document
+
 afterEach(() => {
   Date.now = now
+  globalThis.document = realDocument
 })
+
+/** A page whose visibility a case sets, standing in for `document`. */
+const page = () => {
+  const target = new EventTarget() as EventTarget & {
+    hidden: boolean
+    show: (hidden: boolean) => void
+  }
+  target.hidden = false
+  target.show = (hidden) => {
+    target.hidden = hidden
+    target.dispatchEvent(new Event('visibilitychange'))
+  }
+  globalThis.document = target as unknown as Document
+  return target
+}
 
 const wait = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -109,5 +127,67 @@ describe('CountdownController', () => {
     countdown.resume()
     expect(countdown.running).toBe(true)
     countdown.cancel()
+  })
+
+  test('with holdWhileHidden, a hidden page holds the clock once, however often it hides', () => {
+    const shown = page()
+    const paused: boolean[] = []
+    const owner = host()
+    const countdown = new CountdownController(owner, {
+      done: () => {},
+      holdWhileHidden: true,
+      paused: (on) => paused.push(on),
+    })
+    for (const one of owner.controllers) {
+      one.hostConnected?.()
+    }
+    countdown.start(1000)
+    shown.show(true)
+    shown.show(true)
+    expect(countdown.running).toBe(false)
+    countdown.hold()
+    shown.show(false)
+    expect(countdown.running).toBe(false)
+    countdown.release()
+    expect(countdown.running).toBe(true)
+    expect(paused).toEqual([false, true, false])
+    countdown.cancel()
+  })
+
+  test('with holdWhileHidden, a clock started on a hidden page waits for it to show', () => {
+    const shown = page()
+    shown.hidden = true
+    const owner = host()
+    const countdown = new CountdownController(owner, { done: () => {}, holdWhileHidden: true })
+    for (const one of owner.controllers) {
+      one.hostConnected?.()
+    }
+    countdown.start(1000)
+    expect(countdown.running).toBe(false)
+    countdown.resume()
+    expect(countdown.running).toBe(false)
+    shown.show(false)
+    expect(countdown.running).toBe(true)
+    countdown.cancel()
+  })
+
+  test('with holdWhileHidden, leaving the page stops listening, and without it the page is never read', () => {
+    const shown = page()
+    const owner = host()
+    const countdown = new CountdownController(owner, { done: () => {}, holdWhileHidden: true })
+    for (const one of owner.controllers) {
+      one.hostConnected?.()
+      one.hostDisconnected?.()
+    }
+    countdown.start(1000)
+    shown.show(true)
+    expect(countdown.running).toBe(true)
+    countdown.cancel()
+    const plain = new CountdownController(host(), { done: () => {} })
+    plain.hostConnected()
+    plain.start(1000)
+    shown.show(true)
+    expect(plain.running).toBe(true)
+    plain.cancel()
   })
 })
