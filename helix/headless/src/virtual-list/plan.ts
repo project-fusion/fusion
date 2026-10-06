@@ -29,6 +29,11 @@ export interface DrawInput {
   drawn: readonly number[]
   /** Whether every drawn row is drawn again from nothing, as for a new way of drawing. */
   redraw?: boolean
+  /**
+   * How many items a line holds, in a grid. The kept item brings its whole
+   * line, so the columns of the lines around it stay where they are.
+   */
+  across?: number
 }
 
 /**
@@ -38,6 +43,7 @@ export interface DrawInput {
  * when everything is drawn again. A wanted item with no row left is drawn new.
  */
 export const drawPlan = ({
+  across = 1,
   count,
   drawn,
   first,
@@ -50,7 +56,11 @@ export const drawPlan = ({
     wanted.push(at)
   }
   if (kept !== undefined && !wanted.includes(kept)) {
-    wanted.push(kept)
+    const width = Math.max(1, across)
+    const start = kept - (kept % width)
+    for (let at = start; at < Math.min(start + width, count); at += 1) {
+      wanted.push(at)
+    }
     wanted.sort((a, b) => a - b)
   }
   const keep = new Set(wanted)
@@ -79,3 +89,19 @@ export const stopAfter = (
   wanted.includes(active)
     ? active
     : Math.max(Math.min(onScreen, Math.min(last, count) - 1), first, 0)
+
+/**
+ * The items a span of lines holds, `across` items to a line: what a window of
+ * lines draws, or which items a reader sees.
+ */
+export const itemsOf = (
+  lines: { first: number; last: number },
+  across: number,
+  count: number,
+): { first: number; last: number } => {
+  const width = Math.max(1, across)
+  return {
+    first: Math.min(lines.first * width, count),
+    last: Math.min(lines.last * width, count),
+  }
+}

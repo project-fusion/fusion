@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { drawPlan, stopAfter } from './plan.js'
+import { drawPlan, itemsOf, stopAfter } from './plan.js'
 
 describe('drawPlan', () => {
   test('draws the window, held to the set', () => {
@@ -45,5 +45,19 @@ describe('stopAfter', () => {
     expect(stopAfter(3, [], { count: 5, first: 0, last: 18, onScreen: 9 })).toBe(4)
     expect(stopAfter(3, [], { count: 0, first: 0, last: 0, onScreen: 0 })).toBe(0)
     expect(stopAfter(3, [], { count: 500, first: 20, last: 30, onScreen: 2 })).toBe(20)
+  })
+})
+
+describe('a grid', () => {
+  test('draws the kept item with its whole line, held to the set', () => {
+    const plan = drawPlan({ across: 4, count: 10, drawn: [], first: 0, kept: 9, last: 4 })
+    expect(plan.wanted).toEqual([0, 1, 2, 3, 8, 9])
+    const above = drawPlan({ across: 4, count: 100, drawn: [], first: 40, kept: 5, last: 44 })
+    expect(above.wanted).toEqual([4, 5, 6, 7, 40, 41, 42, 43])
+  })
+
+  test('reads a span of lines as the items they hold', () => {
+    expect(itemsOf({ first: 2, last: 5 }, 4, 18)).toEqual({ first: 8, last: 18 })
+    expect(itemsOf({ first: 2, last: 5 }, 1, 18)).toEqual({ first: 2, last: 5 })
   })
 })

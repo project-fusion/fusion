@@ -732,3 +732,75 @@ describe('choosing items', () => {
     expect(part(host, 'viewport')?.hasAttribute('aria-multiselectable')).toBe(false)
   })
 })
+
+describe('a grid', () => {
+  const press = async (host: Updatable, key: string, init: KeyboardEventInit = {}) => {
+    ;(document.activeElement as HTMLElement).dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key, ...init }),
+    )
+    await settle(host)
+  }
+  const focusedAt = (): string | undefined => (document.activeElement as HTMLElement).dataset.index
+
+  test('lays the items out in equal columns, and a list in none', async () => {
+    const host = await fed(named(10))
+    const slot = (): HTMLSlotElement =>
+      part(host, 'viewport')?.querySelector('slot:not([name])') as HTMLSlotElement
+    expect(slot().getAttribute('style')).toBe(null)
+    host.columns = 4
+    await settle(host)
+    expect(slot().style.display).toBe('grid')
+    expect(slot().style.gridTemplateColumns).toBe('repeat(4, minmax(0, 1fr))')
+    // Every item still says its place in the whole set.
+    expect(drawn(host).map((row) => row.getAttribute('aria-posinset'))).toEqual(
+      Array.from({ length: 10 }, (_, at) => String(at + 1)),
+    )
+  })
+
+  test('windows the set a line at a time, and reports the items on screen', async () => {
+    const host = await fed(named(4000))
+    host.columns = 4
+    await settle(host)
+    const viewport = part(host, 'viewport') as HTMLElement
+    Object.defineProperty(viewport, 'clientHeight', { configurable: true, value: 192 })
+    viewport.scrollTop = 320
+    viewport.dispatchEvent(new Event('scroll'))
+    await settle(host)
+    // Line 10 at the top, six lines on screen at 32 pixels a line.
+    expect((host as unknown as { range: unknown }).range).toEqual({ first: 40, last: 64 })
+    const indices = drawn(host).map((row) => Number((row as HTMLElement).dataset.index))
+    expect(indices[0]).toBe((indices[0] as number) - ((indices[0] as number) % 4))
+    expect(indices.length % 4).toBe(0)
+    expect(indices.length).toBeLessThan(4000)
+  })
+
+  test('moves along a line with Left and Right, and down a column with Down', async () => {
+    const host = await fed(named(4000))
+    host.columns = 4
+    await settle(host)
+    ;(host.querySelector('[data-index="0"]') as HTMLElement).focus()
+    await press(host, 'ArrowRight')
+    expect(focusedAt()).toBe('1')
+    await press(host, 'ArrowDown')
+    expect(focusedAt()).toBe('5')
+    await press(host, 'ArrowLeft')
+    expect(focusedAt()).toBe('4')
+    await press(host, 'End')
+    expect(focusedAt()).toBe('3999')
+    await press(host, 'ArrowUp')
+    expect(focusedAt()).toBe('3995')
+  })
+
+  test('takes in a range along the line with Shift, in a list that selects', async () => {
+    const host = await fed(named(40))
+    host.columns = 4
+    host.selectionMode = 'multiple'
+    host.keyField = 'name'
+    await settle(host)
+    ;(host.querySelector('[data-index="0"]') as HTMLElement).focus()
+    await press(host, ' ')
+    await press(host, 'ArrowRight', { shiftKey: true })
+    await press(host, 'ArrowDown', { shiftKey: true })
+    expect(host.value).toBe('Row 1,Row 2,Row 3,Row 4,Row 5,Row 6')
+  })
+})

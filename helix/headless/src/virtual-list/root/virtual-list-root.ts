@@ -7,6 +7,8 @@ import {
   HelixElement,
   HelixLoadMoreEvent,
   HelixRangeChangeEvent,
+  isRtl,
+  type Rendered,
   rangeAdd,
   requestChange,
   searchableById,
@@ -14,14 +16,13 @@ import {
   toggleValue,
   typesCharacter,
   VirtualizeController,
-  valueAt,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, render, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { holdControls, releaseControls } from '../controls.js'
-import { fillHoles, textOf } from '../fill.js'
+import { fillHoles, keyOf, textsOf } from '../fill.js'
 import { stepIndex } from '../keys.js'
-import { drawPlan, stopAfter } from '../plan.js'
+import { drawPlan, itemsOf, stopAfter } from '../plan.js'
 
 /**
  * Draws one item into its row, for a list given `renderItem`.
@@ -72,13 +73,20 @@ export interface VirtualListRange {
  *
  * Rows are your markup in the light DOM, so your stylesheet styles them.
  *
+ * **A grid.** `columns` lays the items out that many to a line, as a grid of
+ * equal columns, and windows the set a line at a time, as React Aria's grid
+ * layout does. Each item draws one element, a cell of the grid, and
+ * `estimate` is the height of a line. Space the items with padding inside
+ * each one, which the list measures with the line.
+ *
  * **Keyboard.** The list is one tab stop.
  *
  * | Key | What it does |
  * |---|---|
- * | Down, Up | Moves to the next or the previous item. |
+ * | Down, Up | Moves to the next or the previous item, or in a grid to the item in the same column on the next or the previous line. |
+ * | Right, Left | In a grid, moves to the next or the previous item along the line, the other way round on a right-to-left page. |
  * | Home, End | Moves to the first or the last item. |
- * | Page Down, Page Up | Moves by the number of items on screen. |
+ * | Page Down, Page Up | Moves by the number of items, or of lines in a grid, on screen. |
  * | A letter or a word | Moves to the next item whose text starts with what you typed. |
  * | Tab | Moves into the focused row's own links and buttons, then out of the list. |
  *
@@ -94,7 +102,7 @@ export interface VirtualListRange {
  *
  * **Selecting.** `selection-mode` makes the list a list box a reader chooses
  * from: `single` selects one item and `multiple` any number. Space or a press
- * selects an item, Shift with Space, Up, Down, Home, End or a press takes in
+ * selects an item, Shift with Space, an arrow, Home, End or a press takes in
  * the items from the last one chosen, and Control or Command with A selects
  * them all, in `multiple`. `value` holds the chosen items' keys, separated by
  * commas, in the order of the set: `key-field` names each item's key, and a
@@ -143,6 +151,14 @@ export interface VirtualListRange {
  */
 @customElement('helix-headless-virtual-list')
 export class HelixHeadlessVirtualList extends HelixElement {
+  /**
+   * How many items a line holds. One, the default, is a list; more lays the
+   * items out as a grid of that many equal columns, windowed a line at a
+   * time, with Left and Right moving along a line.
+   */
+  @property({ type: Number })
+  columns = 1
+
   /**
    * The height of one row, in pixels, used to find the row at a scroll offset.
    *
@@ -309,12 +325,13 @@ export class HelixHeadlessVirtualList extends HelixElement {
   /* No `overscan` property. The controller's four is a frame of fast scrolling
      at a 32 pixel row, which is a fact about the platform rather than a
      preference. */
+  /* Windowed by lines, which are the items themselves in a list. */
   private readonly virtualize = new VirtualizeController(this, {
     container: () => this.partNamed('viewport'),
-    count: () => this.data.length,
+    count: () => Math.ceil(this.data.length / this.across),
     estimate: () => this.estimate,
     measured: () => this.measured,
-    rows: () => this.drawn(),
+    rows: () => this.lines(),
   })
 
   /**
@@ -324,7 +341,17 @@ export class HelixHeadlessVirtualList extends HelixElement {
    * box to measure.
    */
   get range(): VirtualListRange {
-    return this.virtualize.visible()
+    return this.itemsOn(this.virtualize.visible())
+  }
+
+  /** How many items a line holds: `columns`, at least one. */
+  private get across(): number {
+    return Math.max(1, Math.trunc(this.columns) || 1)
+  }
+
+  /** The items a span of lines holds. */
+  private itemsOn(lines: { first: number; last: number }): VirtualListRange {
+    return itemsOf(lines, this.across, this.data.length)
   }
 
   /**
@@ -339,7 +366,8 @@ export class HelixHeadlessVirtualList extends HelixElement {
     if (count === 0 || !Number.isFinite(index)) {
       return
     }
-    this.virtualize.reveal(Math.max(0, Math.min(Math.trunc(index), count - 1)), 0, options)
+    const at = Math.max(0, Math.min(Math.trunc(index), count - 1))
+    this.virtualize.reveal(Math.floor(at / this.across), 0, options)
     this.virtualize.measure()
   }
 
@@ -357,11 +385,25 @@ export class HelixHeadlessVirtualList extends HelixElement {
    * would record the right heights against the wrong items every time the
    * window moved.
    */
-  private drawn(): { element: HTMLElement; index: number }[] {
+  private drawn(): Rendered[] {
     return [...this.querySelectorAll<HTMLElement>(':scope > [data-index]')].map((element) => ({
       element,
       index: Number(element.dataset.index),
     }))
+  }
+
+  /**
+   * The drawn lines, for the controller to measure: each row in a list, and
+   * the first item of each line in a grid, whose cell is as tall as its line.
+   */
+  private lines(): Rendered[] {
+    const across = this.across
+    const drawn = this.drawn()
+    return across === 1
+      ? drawn
+      : drawn
+          .filter(({ index }) => index % across === 0)
+          .map(({ element, index }) => ({ element, index: index / across }))
   }
 
   /**
@@ -474,7 +516,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
    * has not been laid out yet asks for nothing.
    */
   private report(): void {
-    const { first, last } = this.virtualize.visible()
+    const { first, last } = this.range
     if (first !== this.said.first || last !== this.said.last) {
       this.said = { first, last }
       this.dispatchEvent(new HelixRangeChangeEvent({ first, last }))
@@ -495,11 +537,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
         ?.content.querySelector('[data-field]')
         ?.getAttribute('data-field') ||
       ''
-    return this.data.map((item) =>
-      field === '' || item === null || typeof item !== 'object'
-        ? textOf(item)
-        : textOf(valueAt(item, field)),
-    )
+    return textsOf(this.data, field)
   }
 
   /** The item a row element drew, for an element that is one of the rows. */
@@ -557,7 +595,10 @@ export class HelixHeadlessVirtualList extends HelixElement {
       return
     }
     const { first, last } = this.virtualize.visible()
-    const next = stepIndex(event.key, at, this.data.length, last - first - 1)
+    const next = stepIndex(event.key, at, this.data.length, last - first - 1, {
+      across: this.across,
+      forward: isRtl(this) ? 'ArrowLeft' : 'ArrowRight',
+    })
     if (next === undefined) {
       return
     }
@@ -571,11 +612,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
 
   /** The key of item `at` in `value`. See `keyField`. */
   private keyAt(at: number): string {
-    const item = this.data[at]
-    if (this.keyField !== '' && item !== null && typeof item === 'object') {
-      return textOf(valueAt(item, this.keyField))
-    }
-    return typeof item === 'string' || typeof item === 'number' ? String(item) : String(at)
+    return keyOf(this.data[at], at, this.keyField)
   }
 
   /** Every item's key, in the order of the set. */
@@ -681,7 +718,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
        window can stop short of a row once the rows it measured turn out
        shorter: in Chromium, End on 5000 rows of 18px drew 4983 to 4996. */
     this.focusing = index
-    this.virtualize.reveal(index)
+    this.virtualize.reveal(Math.floor(index / this.across))
     this.virtualize.measure()
     this.requestUpdate()
     try {
@@ -734,7 +771,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
   /** The item drawn outside the window to keep focus, or to take it, if there is one. */
   private keptIndex(): number | undefined {
     const index = this.focusing ?? this.focusedIndex()
-    const { first, last } = this.virtualize.window
+    const { first, last } = this.itemsOn(this.virtualize.window)
     return index !== undefined && index < this.data.length && (index < first || index >= last)
       ? index
       : undefined
@@ -812,13 +849,14 @@ export class HelixHeadlessVirtualList extends HelixElement {
       return
     }
     const count = this.data.length
-    const { first, last } = this.virtualize.window
+    const { first, last } = this.itemsOn(this.virtualize.window)
     /* A child given a slot of its own, such as `loading`, is the consumer's. */
     const children = [...this.children].filter(
       (child): child is HTMLElement =>
         child !== template && child instanceof HTMLElement && !child.hasAttribute('slot'),
     )
     const plan = drawPlan({
+      across: this.across,
       count,
       drawn: children.map((child) => Number(child.dataset.index)),
       first,
@@ -862,7 +900,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
       count,
       first,
       last,
-      onScreen: this.virtualize.visible().first,
+      onScreen: this.range.first,
     })
     const chosen = this.chosen
     for (const [at, group] of drawn) {
@@ -881,10 +919,12 @@ export class HelixHeadlessVirtualList extends HelixElement {
   }
 
   protected override render(): TemplateResult {
-    /* The row kept for focus takes its own room out of the spacer on its side. */
+    /* The line kept for focus takes its own room out of the spacer on its side. */
+    const kept = this.hasUpdated ? this.keptIndex() : undefined
     const { after, before } = this.virtualize.spacers(
-      this.hasUpdated ? this.keptIndex() : undefined,
+      kept === undefined ? undefined : Math.floor(kept / this.across),
     )
+    const across = this.across
     return html`<div
       data-scroller
       part="viewport"
@@ -898,7 +938,13 @@ export class HelixHeadlessVirtualList extends HelixElement {
       }}
     >
       <div part="before" style="block-size: ${before}px"></div>
-      <slot></slot>
+      <slot
+        style=${
+          across === 1
+            ? nothing
+            : `display: grid; grid-template-columns: repeat(${across}, minmax(0, 1fr))`
+        }
+      ></slot>
       <div part="after" style="block-size: ${after}px"></div>
       ${
         /* An item of the list that is not one of the set, so it carries no

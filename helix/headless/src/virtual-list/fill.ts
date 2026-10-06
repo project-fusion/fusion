@@ -53,3 +53,26 @@ export const fillHoles = (root: Element, item: unknown): void => {
     }
   }
 }
+
+/**
+ * The key of item `at` in a selecting list's `value`: its `keyField` where it
+ * is an object and one is named, a string or a number item itself, and its
+ * place in the set otherwise.
+ */
+export const keyOf = (item: unknown, at: number, keyField: string): string => {
+  if (keyField !== '' && item !== null && typeof item === 'object') {
+    return textOf(valueAt(item, keyField))
+  }
+  return typeof item === 'string' || typeof item === 'number' ? String(item) : String(at)
+}
+
+/**
+ * The text typing matches for each item: its `field`, or a string or number
+ * item itself, and nothing where an object has no `field` to read.
+ */
+export const textsOf = (data: readonly unknown[], field: string): string[] =>
+  data.map((item) =>
+    field === '' || item === null || typeof item !== 'object'
+      ? textOf(item)
+      : textOf(valueAt(item, field)),
+  )

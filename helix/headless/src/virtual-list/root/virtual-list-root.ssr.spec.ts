@@ -53,4 +53,17 @@ describe('virtual list server output', () => {
     expect(markup).not.toContain('aria-posinset')
     expect(markup).not.toContain('tabindex')
   })
+
+  test('serves the grid a list with columns lays its items in, and none for a list', () => {
+    const grid = withoutStyles(
+      ssr(
+        html`<helix-headless-virtual-list columns="3" label="Photos"></helix-headless-virtual-list>`,
+      ),
+    )
+    expect(grid).toContain('display: grid; grid-template-columns: repeat(3, minmax(0, 1fr))')
+    const plain = withoutStyles(
+      ssr(html`<helix-headless-virtual-list label="Rows"></helix-headless-virtual-list>`),
+    )
+    expect(plain).not.toContain('grid-template-columns')
+  })
 })
