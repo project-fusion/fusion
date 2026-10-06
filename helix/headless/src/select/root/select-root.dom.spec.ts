@@ -378,6 +378,34 @@ describe('the keyboard in a select', () => {
     expect(host.open).toBe(false)
   })
 
+  test('ArrowRight and ArrowLeft choose the next and the previous option, closed', async () => {
+    /* React Aria's Select, and a native select on Windows. Nothing chosen,
+       either arrow takes the first; at either end the choice stays. */
+    const host = (await select()) as Select
+    key(trigger(host), 'ArrowRight')
+    await settle(host)
+    expect(host.value).toBe('one')
+    key(trigger(host), 'ArrowRight')
+    await settle(host)
+    expect(host.value).toBe('two')
+    expect(host.open).toBe(false)
+    key(trigger(host), 'ArrowRight')
+    await settle(host)
+    expect(host.value).toBe('two')
+    key(trigger(host), 'ArrowLeft')
+    await settle(host)
+    expect(host.value).toBe('one')
+    expect(shown(host)).toBe('Alpha')
+  })
+
+  test('and choose nothing with multiple, where a choice is made in the list', async () => {
+    const host = (await select('multiple')) as Select
+    const event = key(trigger(host), 'ArrowRight')
+    await settle(host)
+    expect(host.value).toBe('')
+    expect(event.defaultPrevented).toBe(false)
+  })
+
   test('ArrowUp opens the list on the last option where none is chosen', async () => {
     const host = (await select()) as Select
     key(trigger(host), 'ArrowUp')
@@ -527,5 +555,109 @@ describe('a list opened over its trigger', () => {
     host.open = false
     await settle(host)
     expect(surface.hasAttribute('data-placed')).toBe(false)
+  })
+})
+
+/**
+ * Runs a mount against a stated platform rather than the one running the suite,
+ * as Kbd's spec does: this file also runs in a browser, on the host's own agent.
+ */
+const onPlatform = async <T>(agent: string, run: () => Promise<T>): Promise<T> => {
+  const original = Object.getOwnPropertyDescriptor(navigator, 'userAgent')
+  Object.defineProperty(navigator, 'userAgent', { configurable: true, value: agent })
+  try {
+    return await run()
+  } finally {
+    if (original === undefined) {
+      delete (navigator as { userAgent?: string }).userAgent
+    } else {
+      Object.defineProperty(navigator, 'userAgent', original)
+    }
+  }
+}
+
+describe('a choice made on the closed trigger', () => {
+  const press = (host: Updatable, name: string): void => {
+    trigger(host).dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key: name }),
+    )
+  }
+  const said = async (host: Updatable): Promise<string | undefined> => {
+    /* The region fills a frame after it is drawn, so that a reader hears it. */
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+    await settle(host)
+    return part(host as HTMLElement, 'live')?.textContent?.trim()
+  }
+
+  test('is said aloud on an Apple device, where VoiceOver does not read the new name', async () => {
+    await onPlatform('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)', async () => {
+      const host = await select()
+      press(host, 'b')
+      expect(await said(host)).toBe('Beta')
+      press(host, 'ArrowLeft')
+      expect(await said(host)).toBe('Alpha')
+    })
+  })
+
+  test('and draws no region elsewhere, where screen readers read the new name', async () => {
+    await onPlatform('Mozilla/5.0 (Windows NT 10.0; Win64; x64)', async () => {
+      const host = await select()
+      press(host, 'b')
+      await settle(host)
+      expect((host as unknown as { value: string }).value).toBe('two')
+      expect(part(host as HTMLElement, 'live')).toBeNull()
+    })
+  })
+})
+
+describe('a select a browser can autofill', () => {
+  const hidden = (host: Updatable): HTMLSelectElement | null =>
+    (host as HTMLElement).shadowRoot?.querySelector('select') ?? null
+
+  test('keeps a hidden native select with the same options, and takes what is filled', async () => {
+    /* React Aria's HiddenSelect: a browser fills native fields only. */
+    const host = (await select('autocomplete="country"')) as Updatable & { value: string }
+    const field = hidden(host) as HTMLSelectElement
+    expect(field.getAttribute('autocomplete')).toBe('country')
+    expect(field.getAttribute('aria-hidden')).toBe('true')
+    expect(field.tabIndex).toBe(-1)
+    expect(field.hasAttribute('name')).toBe(false)
+    expect([...field.options].map((option) => [option.value, option.text])).toEqual([
+      ['', ''],
+      ['one', 'Alpha'],
+      ['two', 'Beta'],
+    ])
+    field.value = 'two'
+    field.dispatchEvent(new Event('change', { bubbles: true }))
+    await settle(host)
+    expect(host.value).toBe('two')
+    expect(shown(host)).toBe('Beta')
+    expect(formValue(host as unknown as HTMLElement)).toBe('two')
+  })
+
+  test('follows the value chosen in the list', async () => {
+    const host = (await select('autocomplete="country"')) as Updatable & { value: string }
+    host.value = 'two'
+    await settle(host)
+    expect(hidden(host)?.value).toBe('two')
+  })
+
+  test('takes every option filled in, with multiple', async () => {
+    const host = (await select('autocomplete="country" multiple')) as Updatable & {
+      value: string
+    }
+    const field = hidden(host) as HTMLSelectElement
+    expect(field.multiple).toBe(true)
+    for (const option of field.options) {
+      option.selected = option.value !== ''
+    }
+    field.dispatchEvent(new Event('change', { bubbles: true }))
+    await settle(host)
+    expect(host.value).toBe('one,two')
+  })
+
+  test('draws nothing without autocomplete', async () => {
+    const host = await select()
+    expect(hidden(host)).toBeNull()
   })
 })

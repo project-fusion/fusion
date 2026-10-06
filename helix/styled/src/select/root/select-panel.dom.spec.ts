@@ -59,5 +59,18 @@ if (hasLayout()) {
          control the scaled box is 8px short and the assertion still holds. */
       expect(surface.offsetWidth).toBeGreaterThanOrEqual(trigger.offsetWidth)
     })
+
+    test('a trigger as wide as the screen opens a list that stays inside its edges', async () => {
+      /* Measured before this: a full-width trigger 900 wide opened a list from
+         8 to 908, past the end edge, either way it opens. */
+      for (const position of ['floating', 'item-aligned']) {
+        const host = (await select(
+          `open position="${position}" style="inline-size: 100vw"`,
+        )) as unknown as HTMLElement
+        const surface = part(host, 'surface') as HTMLElement
+        await placed(surface)
+        expect(surface.offsetWidth).toBeLessThanOrEqual(window.innerWidth - 16)
+      }
+    })
   })
 }

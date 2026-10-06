@@ -13,6 +13,20 @@ describe('select server output', () => {
     expect(trigger).toContain('aria-expanded="false"')
   })
 
+  test('a select a browser can autofill ships its hidden native select', () => {
+    /* Served with the page, so the field is in the form a browser parses
+       before any script runs. The options arrive with the client render, a
+       server not seeing the light DOM. */
+    const markup = ssr(
+      html`<helix-headless-select label="Country" autocomplete="country"></helix-headless-select>`,
+    )
+    expect(markup).toMatch(/<select[^>]*autocomplete="country"/)
+    expect(markup).toMatch(/<select[^>]*aria-hidden="true"/)
+    expect(ssr(html`<helix-headless-select label="Region"></helix-headless-select>`)).not.toContain(
+      '<select',
+    )
+  })
+
   test('the surface ships hidden rather than not at all', () => {
     // Present and hidden, so opening it after hydration is an attribute coming
     // off rather than a subtree arriving. `Combobox` serves its own the same way.
