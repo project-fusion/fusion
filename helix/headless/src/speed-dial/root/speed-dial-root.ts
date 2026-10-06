@@ -5,16 +5,32 @@ import {
   HelixElement,
   KeyboardNavigationController,
   MixinControllerOpen,
+  type NavigableItem,
   type Placement,
   PopoverController,
   slottedWords,
   tellDisclosure,
-  typeaheadBy,
+  typeaheadByWords,
 } from '@fusion.dev/helix-core'
 import { plus } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import type { HelixHeadlessSpeedDialItem } from '../item/speed-dial-item.js'
+import { LongPress } from '../long-press.js'
+
+/**
+ * An action as the keyboard controller moves through it. The current one is
+ * the one with focus, read as `active`, so the deprecated `selected` is read by
+ * nobody but a page.
+ */
+const navigable = (item: HelixHeadlessSpeedDialItem): NavigableItem => ({
+  contains: (node) => item.contains(node),
+  disabled: item.disabled,
+  focusItem: () => item.focusItem(),
+  select: () => item.select(),
+  selected: item.active,
+  words: slottedWords(item, ['']),
+})
 
 /**
  * @summary A floating button that opens a short list of the main actions on a screen.
@@ -39,6 +55,30 @@ import type { HelixHeadlessSpeedDialItem } from '../item/speed-dial-item.js'
  * behavior of the keyboard controller. Typing a letter moves to the next
  * action whose name starts with it. The actions are one tab stop, and Tab
  * closes the dial and moves on.
+ *
+ * **Keyboard.** On the trigger, Enter, Space or a press opens the dial on its
+ * first action. With the dial open:
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Down, Right | Moves to the next action, from the last back to the first. |
+ * | Up, Left | Moves to the action before, from the first round to the last. |
+ * | Home, End | Moves to the first or the last action. |
+ * | A letter | Moves to the next action whose name starts with it. |
+ * | Enter, Space | Chooses the action, and the dial closes. |
+ * | Escape | Closes the dial and puts focus back on the trigger. |
+ * | Tab | Closes the dial and moves on. |
+ *
+ * **Groups.** Put actions in `Speed Dial.Group`, named by its `label`, to set
+ * them apart as Menu's sections do: each is a `group` of the menu, and the
+ * arrow keys walk through every group's actions in order.
+ *
+ * **A trigger with its own action.** With `open-on="long-press"`, a press on
+ * the trigger is the trigger's own, such as composing a message, and holding it
+ * for half a second opens the dial, as React Aria's menu trigger does with
+ * `trigger="longPress"`. Alt+Down or Alt+Up opens it from the keyboard, and
+ * the drawn trigger says so in its description, `long-press-label`. A press
+ * that has opened the dial does not also do the trigger's action.
  *
  * @since 0.1.0
  * @status stable
@@ -68,10 +108,25 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
   label = 'Actions'
 
   /**
+   * The description the drawn trigger gives under `open-on="long-press"`,
+   * saying how its actions are reached.
+   */
+  @property({ attribute: 'long-press-label' })
+  longPressLabel = 'Long press or press Alt+Down to show the actions'
+
+  /**
    * Space between the trigger and the actions, in pixels.
    */
   @property({ type: Number })
   offset = 12
+
+  /**
+   * What opens the dial. `click` opens it on a press of the trigger. Under
+   * `long-press`, a press is the trigger's own action, and the dial opens on a
+   * press held for half a second, or on Alt+Down or Alt+Up.
+   */
+  @property({ attribute: 'open-on' })
+  openOn: 'click' | 'long-press' = 'click'
 
   /**
    * The direction the actions open in. They move to another side if that side
@@ -88,9 +143,9 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
      and a set of choices. */
   protected readonly keys = new KeyboardNavigationController(this, {
     // None while closed, when the actions are hidden and cannot take focus.
-    items: () => (this.open ? this.items : []),
+    items: () => (this.open ? this.items.map(navigable) : []),
     selects: () => false,
-    typeahead: typeaheadBy((item) => slottedWords(item as HelixHeadlessSpeedDialItem, [''])),
+    typeahead: typeaheadByWords(),
   })
 
   /**
@@ -126,13 +181,34 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
     )
   }
 
-  /** The actions, which are this element's own rows and nothing else slotted. */
+  /**
+   * The actions, in order: this element's own rows, and the rows of each group
+   * slotted beside them, and nothing else slotted.
+   */
   private get items(): HelixHeadlessSpeedDialItem[] {
     const slot = this.renderRoot?.querySelector<HTMLSlotElement>('slot:not([name])')
-    return (slot?.assignedElements?.() ?? []).filter(
-      (one): one is HelixHeadlessSpeedDialItem =>
-        (one as HelixHeadlessSpeedDialItem).isSpeedDialItem === true,
+    const isItem = (one: Element): one is HelixHeadlessSpeedDialItem =>
+      (one as HelixHeadlessSpeedDialItem).isSpeedDialItem === true
+    return (slot?.assignedElements?.() ?? []).flatMap((one) =>
+      isItem(one)
+        ? [one]
+        : (one as Element & { isSpeedDialGroup?: boolean }).isSpeedDialGroup === true
+          ? [...one.children].filter(isItem)
+          : [],
     )
+  }
+
+  /** Watches the trigger for a held press, under `open-on="long-press"`. */
+  private readonly longPress = new LongPress(this, {
+    onLongPress: () => {
+      if (!this.open) {
+        this.focusOnOpen = this.requestOpen(true)
+      }
+    },
+  })
+
+  private get pressHeld(): boolean {
+    return this.openOn === 'long-press'
   }
 
   /**
@@ -162,7 +238,49 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
       this.requestOpen(false)
       return
     }
+    /* Under a long press, a click is the trigger's own action. */
+    if (this.pressHeld) {
+      return
+    }
     this.focusOnOpen = this.requestOpen(true)
+  }
+
+  /**
+   * Takes the click a held press ends in, ahead of the trigger's own
+   * listeners, so a press that opened the dial does not also do the trigger's
+   * action. In capture, on the host, which is above a slotted trigger.
+   */
+  private readonly handleHeldClick = (event: MouseEvent): void => {
+    if (this.pressHeld && this.longPress.takeClick()) {
+      event.stopImmediatePropagation()
+      event.preventDefault()
+    }
+  }
+
+  private readonly handleTriggerPointerDown = (event: PointerEvent): void => {
+    if (this.pressHeld && !this.open) {
+      this.longPress.down(event)
+    }
+  }
+
+  private readonly handleTriggerPointerMove = (event: PointerEvent): void => {
+    this.longPress.move(event)
+  }
+
+  private readonly handleTriggerPointerUp = (): void => {
+    this.longPress.up()
+  }
+
+  private readonly handleTriggerPointerCancel = (): void => {
+    this.longPress.cancel()
+  }
+
+  /* A touch held on the trigger is also the browser's own menu, which would
+     cover the actions as they open. */
+  private readonly handleTriggerContextMenu = (event: Event): void => {
+    if (this.pressHeld) {
+      event.preventDefault()
+    }
   }
 
   /* Chosen, so the dial shuts behind it. An action that leaves the fan standing
@@ -182,8 +300,17 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {
     /* Closed, a key is not this element's, so Escape reaches a dialog around
-       the dial. */
+       the dial, except the one a long-press trigger opens with: Alt with Down
+       or Up, as React Aria's menu trigger takes it. */
     if (!this.open) {
+      if (
+        this.pressHeld &&
+        event.altKey &&
+        (event.key === 'ArrowDown' || event.key === 'ArrowUp')
+      ) {
+        event.preventDefault()
+        this.focusOnOpen = this.requestOpen(true)
+      }
       return
     }
     if (event.key === 'Tab') {
@@ -204,12 +331,14 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
     super.connectedCallback()
     this.addEventListener('helix-select', this.handleSelect)
     this.addEventListener('keydown', this.handleKeydown)
+    this.addEventListener('click', this.handleHeldClick, true)
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('helix-select', this.handleSelect)
     this.removeEventListener('keydown', this.handleKeydown)
+    this.removeEventListener('click', this.handleHeldClick, true)
   }
 
   /**
@@ -281,10 +410,20 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
    * change it would be to reimplement the template, panel and all.
    */
   protected renderTrigger(): TemplateResult {
-    return html`<slot name="trigger" @click=${this.handleTriggerClick}>
+    const held = this.pressHeld
+    return html`<slot
+      name="trigger"
+      @click=${this.handleTriggerClick}
+      @contextmenu=${this.handleTriggerContextMenu}
+      @pointercancel=${this.handleTriggerPointerCancel}
+      @pointerdown=${this.handleTriggerPointerDown}
+      @pointermove=${this.handleTriggerPointerMove}
+      @pointerup=${this.handleTriggerPointerUp}
+    >
       <button
         part="trigger"
         type="button"
+        aria-describedby=${held ? 'long-press' : nothing}
         aria-expanded=${this.open ? 'true' : 'false'}
         aria-haspopup="menu"
         aria-label=${this.label}
@@ -297,6 +436,7 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
         }
         ${drawIcon(plus)}
       </button>
+      ${held ? html`<span id="long-press" hidden>${this.longPressLabel}</span>` : nothing}
     </slot>`
   }
 

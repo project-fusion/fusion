@@ -73,9 +73,40 @@ describe('the action the keyboard is on', () => {
       focusItem(): void
       selected: boolean
     }
-    expect(one.active).toBe(false)
-    one.focusItem()
-    expect(one.active).toBe(true)
-    expect(one.selected).toBe(true)
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      expect(one.active).toBe(false)
+      one.focusItem()
+      expect(one.active).toBe(true)
+      expect(one.selected).toBe(true)
+      expect(one.selected).toBe(true)
+    } finally {
+      console.warn = original
+    }
+    /* Read by a page only, the dial moving from the action that has focus, so
+       a page reading it is told once that `active` replaces it. */
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0]).toContain('active')
+  })
+})
+
+/* Menu's rows carry `aria-keyshortcuts` and draw their key; a dial's action
+   could say neither. */
+describe('an action with a shortcut', () => {
+  test('carries it as aria-keyshortcuts, and draws what is slotted after the name', async () => {
+    const one = await action('value="save" shortcut="ctrl+s"')
+    expect(part(one, 'item')?.getAttribute('aria-keyshortcuts')).toBe('Control+S')
+    expect((part(one, 'shortcut') as HTMLElement).hidden).toBe(true)
+    const key = document.createElement('kbd')
+    key.slot = 'shortcut'
+    key.textContent = 'Ctrl+S'
+    one.append(key)
+    await new Promise((resolve) => setTimeout(resolve))
+    await (one as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    const box = part(one, 'shortcut') as HTMLElement
+    expect([box.hidden, box.getAttribute('aria-hidden')]).toEqual([false, 'true'])
+    expect(part(await action(), 'item')?.hasAttribute('aria-keyshortcuts')).toBe(false)
   })
 })
