@@ -30,6 +30,10 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * dismissal, which is also how you take control of the interaction for one
  * press. `requestChange` documents the pattern.
  *
+ * **Keyboard.** The remove button is a tab stop of its own, and Enter or Space
+ * on it asks to remove the filter. In a `FilterInput`, Backspace in the empty
+ * field asks to remove the last chip.
+ *
  * The remove button is named `dismiss-label` followed by the chip's words,
  * such as "Remove filter Status is not open", so a row of chips says which
  * filter each button removes. Write `{label}` in `dismiss-label` to put the
