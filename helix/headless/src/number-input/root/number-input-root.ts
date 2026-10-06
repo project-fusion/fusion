@@ -18,6 +18,7 @@ import { minus, plus } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
+import { decimals, formatGrain, strideOf } from '../grain.js'
 
 /**
  * How far a pointer travels for one step of the value, in pixels.
@@ -259,9 +260,15 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
   /**
    * How far one step moves. A value off the step grid, counted from `min`, is
    * invalid, as it is in a native number field.
+   *
+   * Unset, a step moves by one, or by one percent under a percent format, and
+   * a typed number is rounded to the smallest amount `format-options` shows
+   * rather than to whole steps, as React Aria's NumberField does: a field
+   * showing dollars keeps the cents typed into it. Without `format-options`
+   * the grid is whole numbers, as in a native number field.
    */
   @property({ type: Number })
-  step = 1
+  step?: number
 
   /**
    * The message the browser shows when the number is off the step grid, with
@@ -345,9 +352,36 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     return parseNumber(text, this.locale, this.formatOptions)
   }
 
+  /** The grain last read off the format, with the locale and options it was read for. */
+  private grainOf?: [string, Intl.NumberFormatOptions, number]
+
+  /** How far one press moves: `step`, or the stride the format implies. */
+  private get stride(): number {
+    return Math.abs(this.step ?? 0) || strideOf(this.formatOptions)
+  }
+
+  /**
+   * The grid a typed number is rounded to: `step` where it is set, and
+   * otherwise the smallest amount the format shows, or whole numbers.
+   */
+  private get grid(): number {
+    const step = Math.abs(this.step ?? 0)
+    const options = this.formatOptions
+    if (step || !options) {
+      return step || 1
+    }
+    const [locale, read, grain] = this.grainOf ?? []
+    if (locale === this.locale && read === options && grain !== undefined) {
+      return grain
+    }
+    const fresh = formatGrain(this.locale, options)
+    this.grainOf = [this.locale, options, fresh]
+    return fresh
+  }
+
   /** Whether `value` is on the step grid, counted from `min`. */
   private onStep(value: number): boolean {
-    const step = Math.abs(this.step) || 1
+    const step = this.grid
     const anchor = this.min ?? 0
     const steps = (value - anchor) / step
     // To the precision the grid is written in, so 0.1 + 0.2 is on a 0.1 grid.
@@ -363,7 +397,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
    * `0.30000000000000004` and puts it in the field.
    */
   private clamp(value: number): number {
-    const step = Math.abs(this.step) || 1
+    const step = this.grid
     const anchor = this.min ?? 0
     const stepped = anchor + Math.round((value - anchor) / step) * step
     const floored = this.min === undefined ? stepped : Math.max(this.min, stepped)
@@ -386,7 +420,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     if (this.isDisabled || this.readOnly) {
       return
     }
-    const step = Math.abs(this.step) || 1
+    const step = this.stride
     const from = this.numeric ?? this.min ?? 0
     const next = this.clamp(this.numeric === null ? from : from + steps * step)
     this.land(String(next))
@@ -408,7 +442,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     const applied = this.requestValue(next)
     const control = this.control
     if (control) {
-      restoreValue(control, this.value)
+      restoreValue(control, this.shown)
     }
     if (applied && this.value !== before) {
       this.announceChange()
@@ -505,7 +539,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     if (!grip.hasPointerCapture(event.pointerId)) {
       return
     }
-    const step = Math.abs(this.step) || 1
+    const step = this.stride
     const unit = event.shiftKey ? (this.largeStep ?? 10) * step : step
     const pitch = event.altKey ? SCRUB_FINE : SCRUB_PITCH
     const steps = Math.round((event.clientX - this.scrubFrom) / pitch)
@@ -520,7 +554,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     this.requestValue(next)
     const control = this.control
     if (control) {
-      restoreValue(control, this.value)
+      restoreValue(control, this.shown)
     }
   }
 
@@ -555,7 +589,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     event.stopPropagation()
     const control = event.target as HTMLInputElement
     this.requestValue(control.value)
-    restoreValue(control, this.value)
+    restoreValue(control, this.shown)
   }
 
   /**
@@ -594,7 +628,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     }
     const before = this.value
     this.requestValue(String(this.clamp(parsed)))
-    restoreValue(control, this.value)
+    restoreValue(control, this.shown)
     return this.value !== before
   }
 
@@ -701,7 +735,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
         control,
       )
     } else if (parsed !== null && !this.onStep(parsed)) {
-      const step = Math.abs(this.step) || 1
+      const step = this.grid
       const anchor = this.min ?? 0
       const below = this.clamp(anchor + Math.floor((parsed - anchor) / step) * step)
       const above = this.clamp(anchor + Math.ceil((parsed - anchor) / step) * step)
@@ -880,23 +914,6 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
   set valueAsNumber(count: number) {
     this.value = fromNumber(count)
   }
-}
-
-/**
- * How many decimal places a number is written with.
- *
- * Read off the string rather than computed, because the question is about how
- * the consumer wrote the step and not about what the binary can represent.
- * `1e-7` is handled separately: its string form has no dot at all, so counting
- * after one would say zero and round every result to a whole number.
- */
-const decimals = (value: number): number => {
-  const text = String(value)
-  const exponent = /e-(\d+)$/.exec(text)
-  if (exponent) {
-    return Number(exponent[1])
-  }
-  return (text.split('.')[1] ?? '').length
 }
 
 declare global {
