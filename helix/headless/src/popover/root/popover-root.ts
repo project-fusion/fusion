@@ -89,6 +89,9 @@ import { hideOutside } from '../hide-outside.js'
  * @csspart content - The scrolling region inside the panel.
  * @csspart popover - The panel.
  *
+ * @cssproperty --floating-anchor-inline-size - The trigger's width, written on the panel while it is open, as in `min-inline-size: var(--floating-anchor-inline-size)`. Read it; a value set here is written over.
+ * @cssproperty --floating-available-block-size - The room between the panel and the edge of the screen it opens toward, written on the panel while it is open. Read it; a value set here is written over.
+ *
  * @cssstate entering - From the moment the panel shows until its entrance has finished.
  * @cssstate exiting - From the moment the panel hides until its exit has finished.
  * @cssstate open - While the popover is open.
