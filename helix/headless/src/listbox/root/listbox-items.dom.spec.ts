@@ -155,3 +155,23 @@ describe('a list of options handed over as data', () => {
     expect(part(host as HTMLElement, 'empty')).not.toBeNull()
   })
 })
+
+/* Only in a real engine, which lays the rows out and scrolls them. */
+if (hasLayout()) {
+  describe('a list of data in a browser', () => {
+    test('a list that grows keeps its reader where they were', async () => {
+      /* Measured before this: a scroll offset of 5000 became 2813 when the
+         page handed over a longer array, the row height put back at its
+         estimate. */
+      const host = await long()
+      const items = part(host as HTMLElement, 'items') as HTMLElement
+      items.scrollTop = 3000
+      await new Promise((done) => setTimeout(done, 100))
+      await settle(host)
+      host.items = [...(host.items ?? []), ...Array.from({ length: 500 }, (_, at) => `More ${at}`)]
+      await settle(host)
+      await new Promise((done) => setTimeout(done, 100))
+      expect(items.scrollTop).toBe(3000)
+    })
+  })
+}

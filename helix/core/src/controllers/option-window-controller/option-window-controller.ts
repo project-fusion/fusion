@@ -97,7 +97,10 @@ export class OptionWindowController implements ReactiveController {
     if (items !== this.source) {
       this.source = items
       this.built = items && dataOptions(items)
-      this.virtualize?.forget()
+      /* No `forget`: the window is a straight line whose slope is a row's
+         height, which a new set does not change. Forgetting it put the line
+         back at the estimate, and a list that grew moved its reader: in
+         Chromium, a scroll offset of 5000 became 2813. */
       if (items) {
         this.virtualize ??= new VirtualizeController(this.host, {
           container: () => this.box()?.parentElement,
