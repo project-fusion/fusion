@@ -16,11 +16,22 @@ describe('combobox server output', () => {
         html`<helix-headless-combobox
           label="City"
           autocomplete="address-level2"
+          allows-custom-value
         ></helix-headless-combobox>`,
       ),
       'control',
     )
     expect(markup).toContain('autocomplete="address-level2"')
+  })
+
+  test('a combobox answered by its options ships the hidden select a browser fills', () => {
+    /* The text field is the filter, so it stays off, and the token goes on a
+       hidden native select served with the page, before any script runs. */
+    const markup = ssr(
+      html`<helix-headless-combobox label="Country" autocomplete="country"></helix-headless-combobox>`,
+    )
+    expect(partTag(markup, 'control')).toContain('autocomplete="off"')
+    expect(markup).toMatch(/<select[^>]*autocomplete="country"/)
   })
 
   test('the list is named and told what to say, through the element that says it', () => {
