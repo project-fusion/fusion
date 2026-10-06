@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { registerDom } from '@fusion.dev/helix-testing/dom'
-import { scrollItemIntoView } from './scroll-item-into-view.js'
+import { scrollItemIntoView, scrollingAncestor } from './scroll-item-into-view.js'
 
 /**
  * Bringing an item into its own scroller, and moving nothing else.
@@ -227,5 +227,44 @@ describe('animating the scroll', () => {
     } finally {
       globalThis.matchMedia = real
     }
+  })
+})
+
+/* Outline walked up to the box its links scroll in twice, by hand. */
+describe('the box an item scrolls in', () => {
+  const nested = (): { inner: HTMLElement; item: HTMLElement; outer: HTMLElement } => {
+    document.body.innerHTML =
+      '<div id="outer" style="overflow-y: auto"><div id="inner" style="overflow-x: auto"><span></span></div></div>'
+    const outer = document.getElementById('outer') as HTMLElement
+    const inner = document.getElementById('inner') as HTMLElement
+    return { inner, item: inner.firstElementChild as HTMLElement, outer }
+  }
+
+  const sized = (node: HTMLElement, scroll: number, client: number): void => {
+    Object.defineProperty(node, 'scrollHeight', { configurable: true, value: scroll })
+    Object.defineProperty(node, 'clientHeight', { configurable: true, value: client })
+  }
+
+  test('is the nearest that scrolls along either axis', () => {
+    const { inner, item } = nested()
+    expect(scrollingAncestor(item)).toBe(inner)
+  })
+
+  test('or along the one asked for', () => {
+    const { item, outer } = nested()
+    expect(scrollingAncestor(item, { axis: 'y' })).toBe(outer)
+  })
+
+  test('and, where asked, only one whose content is larger than it', () => {
+    const { item, outer } = nested()
+    sized(outer, 100, 100)
+    expect(scrollingAncestor(item, { axis: 'y', overflowing: true })).toBeNull()
+    sized(outer, 400, 100)
+    expect(scrollingAncestor(item, { axis: 'y', overflowing: true })).toBe(outer)
+  })
+
+  test('short of where it is told to stop', () => {
+    const { inner, item } = nested()
+    expect(scrollingAncestor(item, { axis: 'y', stop: inner })).toBeNull()
   })
 })

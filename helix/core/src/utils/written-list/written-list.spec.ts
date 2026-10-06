@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import {
   commaList,
+  everyState,
   pressedValue,
   prunedValue,
   toggleEvery,
@@ -164,5 +165,21 @@ describe('every one of a set at once', () => {
 
   test('changes nothing for an empty set', () => {
     expect(toggleEvery(['a'], [])).toEqual(['a'])
+  })
+})
+
+/* Checkbox Group's select-all box and Table's and Data Table's header boxes. */
+describe('everyState', () => {
+  test('is checked when every value is chosen', () => {
+    expect(everyState(['a', 'b', 'c'], ['a', 'b'])).toEqual({ checked: true, indeterminate: false })
+  })
+
+  test('is mixed when some are', () => {
+    expect(everyState(['a'], ['a', 'b'])).toEqual({ checked: false, indeterminate: true })
+  })
+
+  test('is neither for none, or for an empty set', () => {
+    expect(everyState([], ['a', 'b'])).toEqual({ checked: false, indeterminate: false })
+    expect(everyState(['a'], [])).toEqual({ checked: false, indeterminate: false })
   })
 })

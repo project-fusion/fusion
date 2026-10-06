@@ -358,7 +358,9 @@ export {
   chordParts,
   matchesChord,
   printableChord,
+  selectsAll,
 } from './utils/chord/chord.js'
+export { clamp } from './utils/clamp/clamp.js'
 export {
   clockLocale,
   dayPeriod,
@@ -446,6 +448,7 @@ export {
   sameCopies,
 } from './utils/media-copy/media-copy.js'
 export { nameText } from './utils/name-text/name-text.js'
+export { nearest } from './utils/nearest/nearest.js'
 export { formatNumber, parseNumber } from './utils/number-format/number-format.js'
 export { onUnlessFalse } from './utils/on-unless-false/on-unless-false.js'
 export { plainClick } from './utils/plain-click/plain-click.js'
@@ -519,8 +522,10 @@ export {
 export { extent, linear, type Scale } from './utils/scale/scale.js'
 export { ticks } from './utils/scale/ticks.js'
 export {
+  type ScrollerOptions,
   type ScrollItemOptions,
   scrollItemIntoView,
+  scrollingAncestor,
 } from './utils/scroll-item-into-view/scroll-item-into-view.js'
 export { lockScroll, scrollHolders, unlockScroll } from './utils/scroll-lock/scroll-lock.js'
 export { slotFilled } from './utils/slot-filled/slot-filled.js'
@@ -576,6 +581,7 @@ export { wordsConverter } from './utils/words-converter/words-converter.js'
 export { writeClock, writeTime } from './utils/write-time/write-time.js'
 export {
   commaList,
+  everyState,
   pressedValue,
   prunedValue,
   type SelectionMode,

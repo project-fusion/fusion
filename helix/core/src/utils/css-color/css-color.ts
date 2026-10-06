@@ -1,3 +1,5 @@
+import { clamp } from '../clamp/clamp.js'
+
 /**
  * Reading and writing the color syntaxes a field is allowed to hold.
  *
@@ -43,10 +45,6 @@ export interface Color {
 
 /** The syntaxes a value can be written in. */
 export type ColorFormat = 'hex' | 'hsl' | 'rgb'
-
-/** Keeps a number inside a range, since every channel here has one. */
-const clamp = (value: number, low: number, high: number): number =>
-  Math.min(high, Math.max(low, value))
 
 /** `50%` and `0.5` mean the same thing wherever an alpha is accepted. */
 const toAlpha = (token: string | undefined): number => {

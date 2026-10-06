@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { ariaChord, chordParts, matchesChord, printableChord } from './chord.js'
+import { ariaChord, chordParts, matchesChord, printableChord, selectsAll } from './chord.js'
 
 const press = (
   key: string,
@@ -64,5 +64,29 @@ describe('a press that is the chord', () => {
 
   test('no keys is no chord', () => {
     expect(matchesChord(press('k'), '', false)).toBe(false)
+  })
+})
+
+describe('the press that selects every item', () => {
+  const press = (
+    key: string,
+    held: Partial<Record<'altKey' | 'ctrlKey' | 'metaKey', boolean>>,
+  ) => ({
+    altKey: false,
+    ctrlKey: false,
+    key,
+    metaKey: false,
+    ...held,
+  })
+
+  test('is Control or Command with A, in either case', () => {
+    expect(selectsAll(press('a', { ctrlKey: true }))).toBe(true)
+    expect(selectsAll(press('A', { metaKey: true }))).toBe(true)
+  })
+
+  test('is not A alone, nor with Alt held, nor another letter', () => {
+    expect(selectsAll(press('a', {}))).toBe(false)
+    expect(selectsAll(press('a', { altKey: true, ctrlKey: true }))).toBe(false)
+    expect(selectsAll(press('s', { ctrlKey: true }))).toBe(false)
   })
 })

@@ -109,6 +109,24 @@ export const toggleEvery = (
   return order ? order.filter((value) => next.has(value)) : [...next]
 }
 
+/**
+ * What a select-all box shows for `values`: checked when every one is
+ * chosen, mixed when some are, and neither for none or an empty set.
+ *
+ * Checkbox Group's select-all box and the header boxes of Table and Data
+ * Table each worked this out. A set that does not count its disabled boxes
+ * passes only the enabled values.
+ */
+export const everyState = (
+  chosen: Iterable<string>,
+  values: readonly string[],
+): { checked: boolean; indeterminate: boolean } => {
+  const held = new Set(chosen)
+  const count = values.filter((value) => held.has(value)).length
+  const checked = values.length > 0 && count === values.length
+  return { checked, indeterminate: count > 0 && !checked }
+}
+
 /** How many items a set lets a reader select: Tag Group's and List's `selection-mode`. */
 export type SelectionMode = 'multiple' | 'none' | 'single'
 

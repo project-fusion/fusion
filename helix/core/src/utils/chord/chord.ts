@@ -112,3 +112,18 @@ export const matchesChord = (press: ChordPress, keys: string, apple: boolean): b
     (meta ? press.metaKey : !press.metaKey)
   )
 }
+
+/**
+ * Whether a key press is Control+A, or Command+A on an Apple keyboard: the
+ * press that selects every item of a multiple selection.
+ *
+ * List, Tree, Listbox, Data Table and Virtual List each wrote the test. Either
+ * modifier counts on any platform, as they did, and Alt held is another
+ * shortcut.
+ */
+export const selectsAll = (press: {
+  readonly altKey: boolean
+  readonly ctrlKey: boolean
+  readonly key: string
+  readonly metaKey: boolean
+}): boolean => (press.ctrlKey || press.metaKey) && !press.altKey && press.key.toLowerCase() === 'a'
