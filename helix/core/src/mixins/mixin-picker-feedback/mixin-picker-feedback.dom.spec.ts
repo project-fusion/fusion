@@ -49,6 +49,11 @@ describe('a picker’s feedback', () => {
     expect(host.shadowRoot?.querySelector('[part="answer"]')?.getAttribute('aria-invalid')).toBe(
       'true',
     )
+    const described = (host.internals as ElementInternals & { ariaDescribedByElements?: Element[] })
+      .ariaDescribedByElements
+    if (described !== undefined) {
+      expect(described?.[0]?.textContent).toBe('Pick a weekday')
+    }
   })
 
   test('marks the picker as `invalid` does, and both go with it', async () => {

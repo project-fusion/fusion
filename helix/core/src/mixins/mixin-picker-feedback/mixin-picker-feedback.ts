@@ -1,6 +1,7 @@
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import type { HelixFormElement } from '../../helix-form-element/helix-form-element.js'
+import { hostAria } from '../../utils/host-aria/host-aria.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
 type Constructor<T> = new (...args: any[]) => T
@@ -88,6 +89,16 @@ export const MixinPickerFeedback = <T extends Constructor<HelixFormElement>>(Bas
       super.willUpdate(changed)
       this.internals.ariaInvalid = this.marked ? 'true' : null
       this.toggleState('invalid', this.marked)
+    }
+
+    /* And the host described by the line, for a picker whose host is the
+       group a reader is in: Date Picker's grid of months, or a picker named
+       by a `<label>`. Through `ElementInternals`, since the line is in this
+       shadow root and an IDREF from the host cannot reach it. */
+    protected override updated(changed: PropertyValues): void {
+      super.updated(changed)
+      const line = this.partNamed('feedback')
+      hostAria(this.internals, { describedBy: line ? [line] : [] })
     }
 
     /** The `feedback` line, or nothing while there is none. */
