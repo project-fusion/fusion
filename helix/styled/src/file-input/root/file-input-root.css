@@ -87,7 +87,7 @@
    uniform scale is a card popping toward the reader, which is what a panel over
    a page does; this is a row joining a stack, and the stack is growing downward.
    0.9 rather than the 0.96 the panels use. */
-[part="file"] {
+[part~="file"] {
   align-items: center;
   background-color: var(--file-input-file-background-color, var(--helix-color-surface));
   border: var(--helix-border-thin) solid
@@ -106,7 +106,7 @@
 }
 
 @starting-style {
-  [part="file"] {
+  [part~="file"] {
     opacity: 0;
     scale: 1 0.9;
   }
@@ -155,6 +155,45 @@
   overflow-wrap: anywhere;
 }
 
+/* How the upload is going, under the name and the tags: a hairline bar that
+   fills from the start, and the words beside it in the quieter type the tags
+   use, in the danger color once it failed. */
+[part="status"] {
+  align-items: center;
+  color: var(--file-input-status-color, var(--helix-color-foreground-muted));
+  display: flex;
+  flex: 1 1 100%;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  gap: var(--helix-space-xs);
+}
+
+[part~="file-error"] [part="status"] {
+  color: var(--file-input-status-color-error, var(--helix-color-danger));
+}
+
+[part="progress"] {
+  appearance: none;
+  background-color: var(--file-input-progress-track-color, var(--helix-color-border));
+  block-size: var(--helix-border-thick);
+  border: 0;
+  border-radius: var(--helix-radii-full);
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+
+[part="progress"]::-webkit-progress-bar {
+  background-color: transparent;
+}
+
+[part="progress"]::-webkit-progress-value {
+  background-color: var(--file-input-progress-color, var(--helix-color-primary));
+}
+
+[part="progress"]::-moz-progress-bar {
+  background-color: var(--file-input-progress-color, var(--helix-color-primary));
+}
+
 /* A trash can rather than a cross, and from the icon set rather than drawn as a
    stencil here. */
 [part="remove"] {
@@ -196,7 +235,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   [part="field"],
-  [part="file"],
+  [part~="file"],
   [part="remove"] {
     transition: none;
   }
@@ -204,7 +243,7 @@
   /* The card still has to arrive, so the starting style goes rather than the
      card: without this it is inserted at 0.9 and stays there, which is a
      shrunken card rather than a still one. */
-  [part="file"] {
+  [part~="file"] {
     opacity: 1;
     scale: 1 1;
   }
