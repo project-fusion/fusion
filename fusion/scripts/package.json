@@ -17,6 +17,7 @@
     "./format-open-tags": "./lib/format-open-tags.mjs",
     "./formatted": "./lib/formatted.mjs",
     "./frontmatter": "./lib/frontmatter.mjs",
+    "./join-lines": "./lib/join-lines.mjs",
     "./literal": "./lib/literal.mjs",
     "./models": "./lib/models.mjs",
     "./paint": "./lib/paint.mjs",

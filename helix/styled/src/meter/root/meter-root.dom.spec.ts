@@ -82,8 +82,8 @@ describe('meter', () => {
     expect(round).toContain('stroke-dasharray: var(--meter-along) 100')
     // Twelve o'clock for a ring, where an SVG circle starts at three; an arc
     // starts at one end of its own opening, so the gap is where the reading goes.
-    expect(sheet()).toContain(':host([shape="ring"]) [part="track"] {\nrotate: -90deg')
-    expect(sheet()).toContain(':host([shape="arc"]) [part="track"] {\nrotate: 135deg')
+    expect(sheet()).toContain(':host([shape="ring"]) [part="track"] {rotate: -90deg')
+    expect(sheet()).toContain(':host([shape="arc"]) [part="track"] {rotate: 135deg')
   })
 
   test('subtle is a wash of whichever color the band chose', () => {
