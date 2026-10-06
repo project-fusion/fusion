@@ -35,7 +35,11 @@
       "helix-development": "./dist/utils/audit-source/audit-source.js",
       "default": "./dist/utils/audit-source/audit-source-off.js"
     },
-    "./custom-elements.json": "./custom-elements.json"
+    "./custom-elements.json": "./custom-elements.json",
+    "./words": {
+      "types": "./dist/words/index.d.ts",
+      "default": "./dist/words/index.js"
+    }
   },
   "files": [
     "custom-elements.json",
