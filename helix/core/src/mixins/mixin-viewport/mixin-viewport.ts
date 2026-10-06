@@ -853,8 +853,8 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
      * **Each glyph is the fallback of a slot named for its button**, the names
      * `Map` gave its own (`pan-up-icon`, `zoom-in-icon`, `fullscreen-icon`), so
      * a page with an icon set of its own swaps a glyph without drawing the
-     * controls again. Text rather than markup, so no family has a fallback the
-     * tier above cannot reach.
+     * controls again. The fallbacks are words with no element in them, and
+     * `panGlyph` is where a tier above draws other arrows.
      */
     protected renderControls(): TemplateResult | typeof nothing {
       const pan = this.drawsControls('pan')
@@ -864,20 +864,23 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
       if (!pan && !zoom && !fullscreen && more === nothing) {
         return nothing
       }
+      const [up, start, end, down] = (['up', 'start', 'end', 'down'] as const).map((way) =>
+        this.panGlyph(way),
+      )
       return html`<div part="controls" role="group" aria-label=${this.controlsLabel ?? this.restingControlsLabel}>
         ${
           pan
             ? html`<button part="pan-up" aria-label=${this.panLabel('up')} type="button" @click=${() => this.pan('up')}>
-                  <slot name="pan-up-icon">${this.panGlyph('up')}</slot>
+                  <slot name="pan-up-icon">${up}</slot>
                 </button>
                 <button part="pan-start" aria-label=${this.panLabel('start')} type="button" @click=${() => this.pan('start')}>
-                  <slot name="pan-start-icon">${this.panGlyph('start')}</slot>
+                  <slot name="pan-start-icon">${start}</slot>
                 </button>
                 <button part="pan-end" aria-label=${this.panLabel('end')} type="button" @click=${() => this.pan('end')}>
-                  <slot name="pan-end-icon">${this.panGlyph('end')}</slot>
+                  <slot name="pan-end-icon">${end}</slot>
                 </button>
                 <button part="pan-down" aria-label=${this.panLabel('down')} type="button" @click=${() => this.pan('down')}>
-                  <slot name="pan-down-icon">${this.panGlyph('down')}</slot>
+                  <slot name="pan-down-icon">${down}</slot>
                 </button>`
             : nothing
         }
