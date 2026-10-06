@@ -338,7 +338,11 @@ export class HelixHeadlessVideo extends HelixElement {
    * that cannot work is worse than one that is not there.
    *
    * The names are `speed`, `pip`, `remote`, `download`, `rewind`, `forward`,
-   * `previous` and `next`.
+   * `previous` and `next`. `full` stands for `rewind`, `forward`, `speed`,
+   * `pip` and `remote` in that order, the controls that act on the video by
+   * themselves, as Web Awesome's `full` preset does, and a name it already
+   * holds is drawn once. `extra-controls="full"` is the whole bar, and
+   * `overflow-controls="full"` puts all of it behind one button.
    *
    * **`previous` and `next` do nothing to the video, and are offered anyway.**
    * They announce `helix-previous` and `helix-next` and stop there, so what

@@ -70,9 +70,29 @@ export const offers = (one: string, player: Conditions): boolean => {
   return one === 'speed'
 }
 
+/**
+ * What `full` stands for in a list of controls: every control that does
+ * something to the video by itself, as Web Awesome's `full` preset adds speed
+ * and picture in picture to its standard bar.
+ *
+ * `download`, `previous` and `next` are left out. Offering the file is a
+ * decision about the content, and the other two move a set the player cannot
+ * see, so each is named where it is wanted.
+ */
+export const FULL_CONTROLS = ['rewind', 'forward', 'speed', 'pip', 'remote'] as const
+
+/** The names in a written list, with `full` read as the controls it stands for, each once. */
+export const controlNames = (written: string): string[] => [
+  ...new Set(
+    writtenList(written).flatMap((one): readonly string[] =>
+      one === 'full' ? FULL_CONTROLS : [one],
+    ),
+  ),
+]
+
 /** The extras asked for, in order, and only the ones this platform can do. */
 export const barControls = (written: string, player: Conditions): string[] =>
-  writtenList(written).filter((one) => offers(one, player))
+  controlNames(written).filter((one) => offers(one, player))
 
 /**
  * The controls asked for behind the overflow button, in order.
@@ -86,7 +106,7 @@ export const menuControls = (
   player: Conditions,
 ): string[] => {
   const bar = new Set(onBar)
-  return writtenList(written).filter((one) => !bar.has(one) && offers(one, player))
+  return controlNames(written).filter((one) => !bar.has(one) && offers(one, player))
 }
 
 /**

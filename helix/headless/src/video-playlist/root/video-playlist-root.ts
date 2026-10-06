@@ -67,7 +67,7 @@ type Player = HTMLElement & {
  * @slot - The entries.
  * @slot player - The player that plays the entries.
  *
- * @event {HelixActivateEvent} helix-activate - The current entry changed. The playlist already holds the new entry when this is sent, and `detail.previous` is the entry it left.
+ * @event {HelixActivateEvent} helix-activate - The current entry changed. The playlist already holds the new entry when this is sent, and `detail.previous` is the entry it left. `currentEntry` is the entry itself, with its `src`, `poster` and name.
  * @event {HelixBeforeActivateEvent} helix-before-activate - The current entry is about to change. Cancelable: cancel it to keep the current entry.
  * @event {HelixEndEvent} helix-end - The last entry finished playing, and the playlist stopped there. Not sent while `repeat` is set.
  *
@@ -212,6 +212,18 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
     }
     player.currentTime = 0
     void Promise.resolve(player.play()).catch(() => {})
+  }
+
+  /**
+   * The entry that is current, with the `src`, `poster`, `value` and name the
+   * player was given, or `undefined` in an empty playlist.
+   *
+   * Read it in a `helix-activate` listener for the clip the playlist moved to,
+   * which Web Awesome's change event carries: the event says which entry by
+   * value, and this is the entry.
+   */
+  get currentEntry(): HelixHeadlessVideoPlaylistItem | undefined {
+    return this.resolveActive(this.items)
   }
 
   /**

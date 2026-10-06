@@ -12,15 +12,17 @@
 
   align-items: center;
   background-color: var(--video-playlist-item-background-color, transparent);
-  border-radius: var(--helix-radii-sm);
+  border-radius: var(--video-playlist-item-radius, var(--helix-radii-sm));
   cursor: pointer;
   display: flex;
-  gap: var(--helix-space-sm);
+  gap: var(--video-playlist-item-gap, var(--helix-space-sm));
   inline-size: 100%;
   /* Room down the leading edge for the mark below, so it has a margin to sit in
      rather than being pressed against the thumbnail. */
-  padding: var(--helix-space-2xs) var(--helix-space-2xs) var(--helix-space-2xs)
-    var(--helix-space-sm);
+  padding: var(--video-playlist-item-padding-block, var(--helix-space-2xs))
+    var(--video-playlist-item-padding-inline-end, var(--helix-space-2xs))
+    var(--video-playlist-item-padding-block, var(--helix-space-2xs))
+    var(--video-playlist-item-padding-inline-start, var(--helix-space-sm));
   position: relative;
   text-align: start;
   transition:
@@ -32,7 +34,10 @@
    button records: a playlist sits on a page, a card or a panel, and an absolute
    neutral is a step away from exactly one of them. */
 :host(:not([disabled])) [part~="item"]:hover {
-  background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
+  background-color: var(
+    --video-playlist-item-hover-background-color,
+    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)
+  );
 }
 
 /*
@@ -52,12 +57,15 @@
  *  The one playing, and it stays marked under the pointer.
  */
 [part~="item"][aria-current="true"] {
-  background-color: color-mix(in oklab, var(--helix-color-foreground) 6%, transparent);
+  background-color: var(
+    --video-playlist-item-current-background-color,
+    color-mix(in oklab, var(--helix-color-foreground) 6%, transparent)
+  );
   color: var(--helix-color-foreground);
 }
 
 [part~="item"][aria-current="true"]::before {
-  background-color: var(--helix-color-primary);
+  background-color: var(--video-playlist-item-current-mark-color, var(--helix-color-primary));
   border-radius: var(--helix-radii-full);
   content: "";
   inline-size: var(--helix-border-thick);
@@ -77,8 +85,8 @@
  *    the same note.
  */
 [part="media"] {
-  aspect-ratio: 16 / 9;
-  border-radius: var(--helix-radii-sm);
+  aspect-ratio: var(--video-playlist-media-aspect-ratio, 16 / 9);
+  border-radius: var(--video-playlist-media-radius, var(--helix-radii-sm));
   flex: 0 0 auto;
   inline-size: var(--video-playlist-media-size, 5rem);
   overflow: hidden;
@@ -98,7 +106,7 @@
 }
 
 [part="label"] {
-  color: var(--helix-color-foreground);
+  color: var(--video-playlist-item-color, var(--helix-color-foreground));
   display: flex;
   flex-direction: column;
   font-family: var(--helix-font-sans);
@@ -110,7 +118,7 @@
 }
 
 [part="label"] ::slotted([slot="meta"]) {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--video-playlist-item-meta-color, var(--helix-color-foreground-subtle));
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-regular);
 }

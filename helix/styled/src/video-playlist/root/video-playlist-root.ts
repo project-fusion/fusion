@@ -16,6 +16,8 @@ import { styles } from './video-playlist-root.css.js'
  * @aliases Playlist, Queue, Up next
  * @documentation https://fusion.dev/helix/components/video-playlist
  *
+ * @cssproperty --video-playlist-gap - The space between the player and the list.
+ * @cssproperty --video-playlist-items-gap - The space between the entries.
  * @cssproperty --video-playlist-layout - The grid columns for the player and the list.
  * @cssproperty --video-playlist-size - The height the list reaches before it scrolls.
  */
