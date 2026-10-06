@@ -19,7 +19,7 @@
   display: flex;
   gap: var(--helix-space-xs);
   padding-block: var(--helix-space-xs);
-  padding-inline: var(--notifications-padding-inline, var(--helix-space-md));
+  padding-inline: var(--notifications-padding-inline, var(--helix-space-lg));
 }
 
 /* **Quieter than a row's title, and it has to be.** A feed cut into five days
