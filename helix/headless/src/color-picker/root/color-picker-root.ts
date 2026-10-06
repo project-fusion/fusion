@@ -9,13 +9,14 @@ import {
   drawIcon,
   fillTemplate,
   formatColor,
+  formatNumber,
   HelixFormElement,
   HelixSampleEndEvent,
   HelixSampleStartEvent,
   hostAria,
   hueName,
-  inlineStep,
   isRtl,
+  KeyboardNavigationController,
   MixinControllerValue,
   parseColor,
   rovingStop,
@@ -29,7 +30,6 @@ import { property, state } from 'lit/decorators.js'
 import { live } from 'lit/directives/live.js'
 import { html } from 'lit/static-html.js'
 import { type ChannelName, channelFields, writeChannel } from '../channels.js'
-import { swatchMove } from '../swatches.js'
 /* Relative, so this registers the base slider and the styled file's identical
    import registers the styled one. `tier` picks which the template asks for. */
 import '../../button/index.js'
@@ -144,6 +144,8 @@ interface EyeDropperConstructor {
  * @cssproperty --color-picker-hue - The chosen hue, 0 to 360, unitless.
  * @cssproperty --color-picker-saturation - The chosen saturation, 0 to 100, as a percentage.
  * @cssproperty --color-picker-swatch - The color a chip shows: the current color on the sample, and the preset's color on each preset.
+ *
+ * @cssstate invalid - While `invalid` is set or `feedback` says what is wrong.
  */
 @customElement('helix-headless-color-picker')
 export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElement) {
@@ -623,20 +625,32 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
   /**
    * The arrows, Home and End in the presets: focus moves, and nothing is
    * chosen until Enter, Space or a press, as in React Aria's swatch picker.
+   *
+   * Core's roving set, as Legend's toggles are: the arrows follow the line of
+   * text, so the row reverses in a right-to-left page, Up and Down are the
+   * previous and the next since the row wraps onto lines, and focus stops at
+   * the ends, since a row of colors is no ring. A press from anywhere else in
+   * the picker is not the row's to move.
    */
-  private readonly handleSwatchKeydown = (event: KeyboardEvent): void => {
-    const row = [
-      ...(this.renderRoot.querySelectorAll<HTMLElement>('[part="swatches"] [part="swatch"]') ?? []),
-    ]
-    const at = row.indexOf(event.target as HTMLElement)
-    const next = swatchMove(event.key, inlineStep(this, event.key), at, row.length)
-    if (at < 0 || next === null) {
-      return
-    }
-    event.preventDefault()
-    this.swatchAt = next
-    row[next]?.focus()
-  }
+  protected readonly swatchKeys = new KeyboardNavigationController(this, {
+    items: () =>
+      [
+        ...(this.renderRoot?.querySelectorAll<HTMLElement>('[part="swatches"] [part="swatch"]') ??
+          []),
+      ].map((swatch, index) => ({
+        contains: (node: Node | null) => swatch === node,
+        disabled: false,
+        focusItem: () => {
+          this.swatchAt = index
+          swatch.focus()
+        },
+        select: () => {},
+        selected: false,
+      })),
+    origin: 'focus',
+    selects: () => false,
+    wrap: false,
+  })
 
   /** Walks the format on, and rewrites the value in it. */
   private readonly handleFormat = (): void => {
@@ -798,6 +812,19 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
     event.preventDefault()
     this.move(next)
     this.settle()
+  }
+
+  /**
+   * Whether a reader is told the color is wrong: `invalid` is set, or
+   * `feedback` says why.
+   *
+   * Both, because `feedback` is the message a field shows and a message that
+   * says the color is wrong while every control reports it valid is half the
+   * answer. Read from Chromium's tree before this, a picker with `feedback`
+   * set had `customError` in its validity and `invalid: false` on its square.
+   */
+  private get marked(): boolean {
+    return this.invalid || this.feedback !== ''
   }
 
   /** @internal `feedback` marks the picker invalid, as a field's does. */
@@ -967,7 +994,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
         hint: channel-hint, label: channel-label, marker: channel-marker,
         marker-label: channel-marker-label, markers: channel-markers, output: channel-output"
       data-channel=${channel}
-      aria-invalid=${this.invalid ? 'true' : nothing}
+      aria-invalid=${this.marked ? 'true' : nothing}
       label=${label}
       max=${max}
       min="0"
@@ -1071,7 +1098,8 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
      tree, an invalid picker's sliders and value all reported `invalid: false`. */
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    this.internals.ariaInvalid = this.invalid ? 'true' : null
+    this.internals.ariaInvalid = this.marked ? 'true' : null
+    this.toggleState('invalid', this.marked)
     /* A group only where a page's `<label for>` names the picker, so the
        name has somewhere to be read. Unlabeled, the host stays without a
        role, as it is inside Color Input. */
@@ -1140,7 +1168,6 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
       role="listbox"
       aria-label=${this.presetsLabel}
       aria-orientation="horizontal"
-      @keydown=${this.handleSwatchKeydown}
     >
       ${presets.map((preset, index) => {
         const parsed = parseColor(preset)
@@ -1203,7 +1230,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
           aria-label=${axisName(this.saturationLabel)}
           aria-describedby=${this.feedback === '' ? nothing : 'feedback'}
           aria-valuetext=${both}
-          aria-invalid=${this.invalid ? 'true' : nothing}
+          aria-invalid=${this.marked ? 'true' : nothing}
           .value=${String(color.saturation)}
           ?disabled=${this.isDisabled}
           @input=${(event: Event) => this.takeArea('saturation', event)}
@@ -1224,7 +1251,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
           aria-label=${axisName(this.brightnessLabel)}
           aria-describedby=${this.feedback === '' ? nothing : 'feedback'}
           aria-valuetext=${reversed}
-          aria-invalid=${this.invalid ? 'true' : nothing}
+          aria-invalid=${this.marked ? 'true' : nothing}
           .value=${String(color.brightness)}
           ?disabled=${this.isDisabled}
           @input=${(event: Event) => this.takeArea('brightness', event)}
@@ -1257,9 +1284,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
                   /* A percentage in the reader's language, "50%" or "50 %",
                      React Aria's reading of an alpha slider: the bare number
                      did not say what it counted. */
-                  new Intl.NumberFormat(this.lang || undefined, { style: 'percent' }).format(
-                    color.alpha / 100,
-                  ),
+                  formatNumber(color.alpha / 100, this.lang, { style: 'percent' }),
                 )
               : nothing
           }
@@ -1280,7 +1305,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
                 type="text"
                 aria-label=${this.valueLabel}
                 aria-describedby=${this.feedback === '' ? nothing : 'feedback'}
-                aria-invalid=${this.invalid ? 'true' : nothing}
+                aria-invalid=${this.marked ? 'true' : nothing}
                 autocomplete=${this.autocomplete || nothing}
                 spellcheck="false"
                 .value=${this.value}

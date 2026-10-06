@@ -127,6 +127,19 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
   filterable = false
 
   /**
+   * The open list's name where nothing names the Select, read by screen
+   * readers. The list has no visible name.
+   *
+   * A Select named by `label`, `aria-label`, `aria-labelledby` or a `<label>`
+   * gives its list that name, and this is not used. Unnamed, the Select is
+   * reported once by the missing-name warning, and its list is not reported a
+   * second time for a name the page never wrote: the list is this element's,
+   * and so is the fallback. Combobox calls its list the same.
+   */
+  @property({ attribute: 'list-label' })
+  listLabel = 'Options'
+
+  /**
    * Whether the options are still loading.
    *
    * Passed straight to the list, which is where the rows are and so where the
@@ -596,7 +609,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
       ?multiple=${this.multiple}
       ?filterable=${this.filterable}
       manual
-      aria-label=${this.listName || nothing}
+      aria-label=${this.listName || this.listLabel || nothing}
       @keydown=${this.handleListKeydown}
       @helix-before-change=${this.handleChange}
       @change=${this.stopInner}

@@ -8,6 +8,7 @@ import {
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
+import { renderListStatus } from '../../listbox/forward.js'
 import type { HelixHeadlessListbox } from '../../listbox/root/listbox-root.js'
 /* Relative, so this registers the base pair and the styled file's identical
    imports register the styled pair. `tier` picks which the template asks for. */
@@ -441,18 +442,13 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
         @input=${this.stopInner}
       >
         <slot></slot>
-        <!-- Handed on with the text as the fallback, for the reason Combobox
-             gives: the list's own fallback never shows behind a passed slot. -->
-        <slot name="empty" slot="empty">${this.emptyText}</slot>
-        <slot name="loading" slot="loading">${this.loadingText}</slot>
-        <slot name="error" slot="error">${this.loadError}</slot>
-        <!-- Handed on only while something fills it: an assigned slot hides the
-             list's own fallback, which is no-results-text or empty-text. -->
-        <slot
-          name="no-results"
-          slot=${this.querySelector?.(':scope > [slot="no-results"]') ? 'no-results' : nothing}
-          @slotchange=${() => this.requestUpdate()}
-        ></slot>
+        ${renderListStatus({
+          emptyText: this.emptyText,
+          host: this,
+          loadError: this.loadError,
+          loadingText: this.loadingText,
+          refill: () => this.requestUpdate(),
+        })}
       </${this.tag('listbox')}>
       <div ?hidden=${!this.footed} part="footer" slot="footer">
         <slot

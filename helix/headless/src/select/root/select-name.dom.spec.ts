@@ -72,3 +72,44 @@ describe('a select trigger', () => {
     })
   }
 })
+
+/**
+ * What the console was warned while `markup` mounted and settled, with nothing
+ * printed. The warning is in development builds only, so this needs
+ * `bun test --conditions helix-development`, which the package's scripts pass.
+ */
+const warnedOn = async (markup: string): Promise<string[]> => {
+  const warnings: string[] = []
+  const original = console.warn
+  console.warn = (message: string) => warnings.push(message)
+  try {
+    await mount(markup)
+    await new Promise((done) => setTimeout(done, 5))
+  } finally {
+    console.warn = original
+  }
+  return warnings
+}
+
+describe('an unnamed select', () => {
+  /* Measured before this: two warnings, the second for the list inside, which
+     the page never wrote and cannot name. */
+  test('is reported once, for itself and not for its list', async () => {
+    const warnings = await warnedOn(
+      '<helix-headless-select><helix-headless-option value="a">Alpha</helix-headless-option></helix-headless-select>',
+    )
+    expect(warnings.filter((one) => one.includes('no accessible name'))).toHaveLength(1)
+    expect(warnings.some((one) => one.includes('<helix-headless-select>'))).toBe(true)
+  })
+
+  test('names its list by `list-label`, which a name for the select replaces', async () => {
+    const host = await mount(
+      `<helix-headless-select list-label="Fruits">${OPTIONS}</helix-headless-select>`,
+    )
+    expect(part(host, 'listbox')?.getAttribute('aria-label')).toBe('Fruits')
+    const named = await mount(
+      `<helix-headless-select aria-label="Fruit" list-label="Fruits">${OPTIONS}</helix-headless-select>`,
+    )
+    expect(part(named, 'listbox')?.getAttribute('aria-label')).toBe('Fruit')
+  })
+})

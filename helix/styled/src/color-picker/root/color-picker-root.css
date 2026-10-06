@@ -311,10 +311,14 @@
    library rather than onto the square, which is a picture of a color space and
    not an answer. Hover and focus named as well, so the border cannot be taken
    back to gray by the pointer or to blue by the caret: one edge, one color,
-   the arrangement Input records. */
+   the arrangement Input records. The attribute as well as the state, which
+   `feedback` sets too, because a server draws the attribute and no state. */
 :host([invalid]) [part="value"],
 :host([invalid]) [part="value"]:hover,
-:host([invalid]) [part="value"]:focus-visible {
+:host([invalid]) [part="value"]:focus-visible,
+:host(:state(invalid)) [part="value"],
+:host(:state(invalid)) [part="value"]:hover,
+:host(:state(invalid)) [part="value"]:focus-visible {
   border-color: var(--helix-color-danger);
   outline-color: var(--helix-color-danger);
 }

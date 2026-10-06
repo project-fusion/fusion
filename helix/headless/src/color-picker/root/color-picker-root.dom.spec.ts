@@ -877,6 +877,20 @@ describe('the message under a color picker', () => {
     expect(internals.validationMessage).toBe('Pick a darker red')
   })
 
+  test('marks the picker invalid to a reader and to CSS, as a field’s `feedback` does', async () => {
+    const host = await picker('value="#ff0000" feedback="Pick a darker red"')
+    const internals = (host as unknown as { internals: ElementInternals }).internals
+    expect(part(host, 'grid-saturation')?.getAttribute('aria-invalid')).toBe('true')
+    expect(part(host, 'grid-brightness')?.getAttribute('aria-invalid')).toBe('true')
+    expect(part(host, 'value')?.getAttribute('aria-invalid')).toBe('true')
+    expect(internals.ariaInvalid).toBe('true')
+    expect(internals.states.has('invalid')).toBe(true)
+    ;(host as unknown as { feedback: string }).feedback = ''
+    await host.updateComplete
+    expect(part(host, 'grid-saturation')?.hasAttribute('aria-invalid')).toBe(false)
+    expect(internals.states.has('invalid')).toBe(false)
+  })
+
   test('is not drawn while there is none', async () => {
     const host = await picker('value="#ff0000"')
     expect(host.shadowRoot?.querySelector('[part="feedback"]')).toBeNull()
