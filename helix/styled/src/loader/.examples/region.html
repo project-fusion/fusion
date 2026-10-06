@@ -1,0 +1,16 @@
+<!-- @summary A loader that names the region it loads with `for`, which is marked `aria-busy` while the loader is on the page. -->
+<helix-flex
+  direction="column"
+  gap="sm"
+>
+  <helix-loader
+    for="orders"
+    label="Loading orders"
+  ></helix-loader>
+  <section
+    aria-label="Orders"
+    id="orders"
+  >
+    <helix-text variant="body">Orders appear here once they load.</helix-text>
+  </section>
+</helix-flex>
