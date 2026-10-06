@@ -96,6 +96,7 @@ type Entry = HelixHeadlessOption | (DataOption & { href?: undefined })
  * | Shift with Home or End | With `multiple`, adds every option from the highlight to that end. In a filter field, hold Control as well. |
  * | Control or Command with A | With `multiple`, chooses every option, or none where all are chosen. In a filter field, selects the text. |
  * | Escape | In a filter field, clears the filter. |
+ * | Alt with Up or Down | In a `reorderable` list, moves the highlighted option a place. Alt with Home or End moves it to either end. |
  *
  * **ARIA.** The `items` part is the `listbox`, named by the label and
  * described by the hint and the message, with `aria-multiselectable` under
@@ -110,6 +111,26 @@ type Entry = HelixHeadlessOption | (DataOption & { href?: undefined })
  * As a filter narrows the list, a screen reader hears how many options are
  * left, such as "3 results", from `result-label` and `results-label`. A filter
  * that leaves none says `empty-text`.
+ *
+ * **Moving options** is a separate import, `@fusion.dev/helix/listbox/reorder`,
+ * so a list that never moves options carries none of its code. With it
+ * imported, `reorderable` lets a reader move options:
+ *
+ * - Alt with Up or Down moves the highlighted option a place, and Alt with
+ *   Home or End moves it to either end, as the APG's rearrangeable listbox
+ *   does. The highlight stays on it.
+ * - A pointer drags an option, with a drop indicator, and the list scrolls near
+ *   an edge. A press that does not travel still chooses the option.
+ * - A drop sends `helix-before-reorder`, which you can refuse, and then
+ *   `helix-reorder`, whose `keys` hold every value in the new order. **You
+ *   move the options**, or set `items` in the new order: the list moves no
+ *   element of yours.
+ * - The list says each move in its `live` region. The words are the
+ *   `moved-label`, `canceled-label`, `dropped-label`, and `picked-up-label`
+ *   attributes, which the import reads.
+ * - An option in a group moves within its group. Options do not move while a
+ *   filter narrows the list, under `layout="grid"`, or while the list is
+ *   disabled.
  *
  * @since 0.1.0
  * @status stable
@@ -129,8 +150,10 @@ type Entry = HelixHeadlessOption | (DataOption & { href?: undefined })
  *
  * @event {Event} change - Fired after the value changes.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the value is about to change, and cancelable.
+ * @event {HelixBeforeReorderEvent} helix-before-reorder - Fired when an option is dropped at a new place, in a `reorderable` list with `@fusion.dev/helix/listbox/reorder` imported, with every value in the new order. Cancelable: cancel it to keep the option where it is.
  * @event {HelixFilterEvent} helix-filter - Fired before the list is filtered, and cancelable.
  * @event {HelixLoadMoreEvent} helix-load-more - Fired once the list is scrolled within a screen of its end, once for each number of options, and not while `loading` is set. Add the next page of options and set `loading` while you fetch it.
+ * @event {HelixReorderEvent} helix-reorder - Fired after `helix-before-reorder` when nobody canceled it. Move your options, or your `items`, to the order in `keys`. Cancelable: cancel it to say the move did not happen.
  * @event {Event} input - Fired after the value changes.
  *
  * @csspart empty - The text shown when the list has no options to show, or the filter hides every one. `:state(no-results)` is set for the second.
@@ -141,7 +164,7 @@ type Entry = HelixHeadlessOption | (DataOption & { href?: undefined })
  * @csspart hint - Help under the list.
  * @csspart items - The list of options.
  * @csspart label - The label above the list.
- * @csspart live - A copy of the empty and loading text, and how many options a filter left, in a region that screen readers announce when it changes. Visually hidden in the styled tier.
+ * @csspart live - A copy of the empty and loading text, how many options a filter left, and each move in a `reorderable` list, in a region that screen readers announce when it changes. Visually hidden in the styled tier.
  * @csspart loading - The text shown while the options load.
  * @csspart search - The region that holds the filter field.
  * @csspart search-field - The filter field.
@@ -329,6 +352,17 @@ export class HelixHeadlessListbox extends MixinCollection(
    */
   @property({ attribute: 'no-results-text' })
   noResultsText?: string
+
+  /**
+   * Lets a reader move options, once `@fusion.dev/helix/listbox/reorder` (or
+   * `@fusion.dev/helix-headless/listbox/reorder`) is imported: Alt with an
+   * arrow moves the highlighted option, and a pointer drags one. The list
+   * moves no option itself: you move your options, or your `items`, on
+   * `helix-reorder`. Without that import it does nothing, so a list that never
+   * moves options carries none of the code.
+   */
+  @property({ type: Boolean })
+  reorderable = false
 
   /**
    * What a screen reader hears when a filter leaves one option. `{count}` is
