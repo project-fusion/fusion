@@ -330,6 +330,28 @@ describe('canvas', () => {
     expect(padded.shadowRoot?.querySelector('[part="pan-up"]')).not.toBeNull()
   })
 
+  test('every control’s glyph is a slot a page fills with its own icon, and the glyph stays where it does not', async () => {
+    const host = await canvas(
+      'controls="pan zoom fullscreen"',
+      `${BOARD}<svg slot="zoom-in-icon" id="plus"></svg>`,
+    )
+    for (const name of [
+      'fullscreen',
+      'pan-down',
+      'pan-end',
+      'pan-start',
+      'pan-up',
+      'zoom-in',
+      'zoom-out',
+    ]) {
+      expect(part(host, name)?.querySelector(`slot[name="${name}-icon"]`)).not.toBeNull()
+    }
+    const zoomIn = part(host, 'zoom-in')?.querySelector('slot') as HTMLSlotElement
+    expect(zoomIn.assignedElements()).toEqual([host.querySelector('#plus') as Element])
+    expect(part(host, 'zoom-out')?.textContent?.trim()).toBe('−')
+    expect(part(host, 'pan-up')?.textContent?.trim()).toBe('↑')
+  })
+
   test('choosing a card brings the board to it', async () => {
     const host = await canvas()
     const before = (part(host, 'viewport') as HTMLElement).getAttribute('style')
