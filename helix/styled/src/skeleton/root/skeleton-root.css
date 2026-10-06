@@ -104,29 +104,40 @@
  * The state rather than `:empty`, which counts a line break as content: a
  * skeleton written across two lines took this layout around nothing and drew
  * a 0 by 0 box. The state is the script's test, which ignores whitespace.
+ *
+ * Before the element upgrades there is no state, but a served page already has
+ * the shadow root and this sheet. So until then `:not(:empty)` stands in for
+ * it, and a served skeleton around a card is the card's size from the first
+ * paint rather than the placeholder's, which moved the page on hydration. Once
+ * defined, the state alone decides.
  */
-:host(:state(wrapping)) {
+:host(:state(wrapping)),
+:host(:not(:defined):not(:empty)) {
   block-size: auto;
   inline-size: fit-content;
   max-inline-size: 100%;
   position: relative;
 }
 
-:host(:state(wrapping)) [part="content"] {
+:host(:state(wrapping)) [part="content"],
+:host(:not(:defined):not(:empty)) [part="content"] {
   display: block;
 }
 
-:host(:state(wrapping)) [part="skeleton"] {
+:host(:state(wrapping)) [part="skeleton"],
+:host(:not(:defined):not(:empty)) [part="skeleton"] {
   block-size: auto;
   inset: 0;
   position: absolute;
 }
 
-:host(:state(wrapping):not([loading])) [part="skeleton"] {
+:host(:state(wrapping):not([loading])) [part="skeleton"],
+:host(:not(:defined):not(:empty):not([loading])) [part="skeleton"] {
   display: none;
 }
 
-:host([loading]:state(wrapping)) [part="content"] {
+:host([loading]:state(wrapping)) [part="content"],
+:host([loading]:not(:defined):not(:empty)) [part="content"] {
   visibility: hidden;
 }
 
