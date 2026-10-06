@@ -1779,7 +1779,8 @@ element, so `onhelix-opne`, `on:helix-open` and an invented `totally-made-up`
 all compile clean against the generated types, which do reject a wrong *value*
 on a normal attribute. Measured with `tsc`. `HelixElement` therefore reads the
 props React is holding and warns, once per element, about an `on` prop attached
-to nothing. That is the only place it can be caught.
+to nothing. That is the only place it can be caught, and it is caught in a
+development build only (see the development-only audits below).
 
 **Register once, in a client component.** A custom element registers as a side
 effect of importing its module, and that import has to be in the client graph to
@@ -2351,21 +2352,26 @@ mixins and controllers that register nothing. This page said `headless` had none
 until September 2, 2026, against every file calling `@customElement` and a
 manifest that had always been right.
 
-**Two audits ship in development builds only: the missing-name warning and the
-missing-table warning.** Core imports them as `#audit-name` and
-`#audit-source`, subpaths in its own `package.json` `imports` that resolve to
-the audit under the `development` export condition and to a function that does
-nothing otherwise, without a second build of core. A production build does not
-ask for `development`, and so every field and Button stops carrying about 450
-bytes gzip for a sentence meant for whoever writes the page. `nameText`, which
-`AriaForwardController` needs at runtime to decide where a label goes, is a
-module of its own and stays in every build.
+**Three audits ship in development builds only: the missing-name warning, the
+missing-table warning and the React prop audit.** Core imports them as
+`#audit-name`, `#audit-source` and `#react-audit`, subpaths in its own
+`package.json` `imports` that resolve to the audit under the `development`
+export condition and to a function that does nothing otherwise, without a
+second build of core. A production build does not ask for `development`, and so
+every field and Button stops carrying about 450 bytes gzip for a sentence meant
+for whoever writes the page, and every element about 920 for the React prop
+audit's four sentences and the list of every event name it checks against.
+`nameText`, which `AriaForwardController` needs at runtime to decide where a
+label goes, is a module of its own and stays in every build, and so does
+everything in `react-bridge.ts`: binding the handlers React holds and assigning
+the properties it dropped is what makes React work, where the audit only
+reports.
 
 **The published modules import each audit by the package's own name.** Vite's
 dev server bundles a dependency with esbuild before serving it, and esbuild
 resolves a `#` import with its own conditions, which have no `development`.
-Measured on Vite 7.3.7 with Helix installed in `node_modules`: neither audit
-printed anything under `vite` dev until October 6, 2026. A bare import of the
+Measured on Vite 7.3.7 with Helix installed in `node_modules`: neither of the
+first two audits printed anything under `vite` dev until October 6, 2026. A bare import of the
 package's own subpath is resolved by Vite under Vite's conditions, so once `tsc`
 has written `dist`, `scripts/development-imports.mjs` rewrites each `#`
 specifier in a module or a declaration to the subpath `exports` publishes for

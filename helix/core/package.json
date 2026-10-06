@@ -29,6 +29,12 @@
       "helix-development": "./dist/utils/audit-source/audit-source.js",
       "default": "./dist/utils/audit-source/audit-source-off.js"
     },
+    "./audits/react": {
+      "types": "./dist/helix-element/react-audit.d.ts",
+      "development": "./dist/helix-element/react-audit.js",
+      "helix-development": "./dist/helix-element/react-audit.js",
+      "default": "./dist/helix-element/react-audit-off.js"
+    },
     "./custom-elements.json": "./custom-elements.json"
   },
   "files": [
@@ -65,6 +71,11 @@
       "development": "./src/utils/audit-source/audit-source.ts",
       "helix-development": "./src/utils/audit-source/audit-source.ts",
       "default": "./src/utils/audit-source/audit-source-off.ts"
+    },
+    "#react-audit": {
+      "development": "./src/helix-element/react-audit.ts",
+      "helix-development": "./src/helix-element/react-audit.ts",
+      "default": "./src/helix-element/react-audit-off.ts"
     }
   },
   "keywords": [

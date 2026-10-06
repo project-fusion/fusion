@@ -245,7 +245,7 @@ diagnostics counts it by kind and tag. None fails a CI job.
 | `duplicate-registration` | Two copies of Helix are on the page. Also the finding of the same name |
 | `fullscreen-refused` | The browser refused fullscreen, usually in a frame without `allow="fullscreen"` |
 | `min-out-of-range` | A rating's `min` is not a score between 0 and its `max` |
-| `misplaced-handler` | A React `on` prop names an event that another element dispatches |
+| `misplaced-handler` | A React `on` prop names an event that another element dispatches. Development builds only (the `development` export condition) |
 | `misread-direction` | A stat was given `up`, `down` or `neutral`, which are Trend's directions and lay nothing out |
 | `missing-alt` | An image has no `alt`, so a screen reader announces its file name |
 | `missing-layout` | The three.js graph driver could not load `d3-force-3d` |
@@ -259,14 +259,14 @@ diagnostics counts it by kind and tag. None fails a CI job.
 | `not-a-graph` | `connectGraph` was given an element that is not a graph frame |
 | `picture-in-picture-refused` | The browser refused picture in picture |
 | `refused-length` | A grid's `min` is not a length it can write, so it lays out by `columns` |
-| `removed-callback` | A React prop is a callback that was removed and never ran from JSX |
-| `solid-handler-syntax` | A React prop uses Solid's `on:` syntax |
+| `removed-callback` | A React prop is a callback that was removed and never ran from JSX. Development builds only (the `development` export condition) |
+| `solid-handler-syntax` | A React prop uses Solid's `on:` syntax. Development builds only (the `development` export condition) |
 | `stencil-regions-unused` | A graph stencil's regions could not be used |
 | `stencil-without-inside` | A graph stencil has no inside to place the notes in |
 | `too-many-rows` | A data table is drawing more rows at once than it stays responsive to |
 | `two-default-operators` | A filter field marks more than one operator as its default |
 | `typed-marks` | A quote's text starts or ends with a typed quotation mark, which the browser's marks double |
-| `unknown-event` | A React `on` prop names an event that no element dispatches |
+| `unknown-event` | A React `on` prop names an event that no element dispatches. Development builds only (the `development` export condition) |
 | `unknown-icon` | An icon's `name` is not in the Helix set, so it draws nothing |
 | `unlinked-trigger` | A tooltip's trigger does not name it in `aria-describedby` |
 | `unreachable-label` | A text is rendered as a label, a deprecated value that labels no control |
