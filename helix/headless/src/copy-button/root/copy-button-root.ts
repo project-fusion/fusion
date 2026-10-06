@@ -1,6 +1,6 @@
 import { CopyController, customElement, HelixCopyErrorEvent } from '@fusion.dev/helix-core'
 import { check, copy, x } from '@fusion.dev/helix-icons'
-import { nothing, type TemplateResult } from 'lit'
+import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html } from 'lit/static-html.js'
@@ -33,6 +33,12 @@ import '../../tooltip/index.js'
  * rendered. An `aria-label` on the element names it before a copy, in place of
  * `label`.
  *
+ * **Keyboard.** Enter and Space copy, as they press a native button.
+ *
+ * The button is named `label`, or the host's `aria-label`, and its name
+ * changes to `copied-label` or `error-label` for the moment after a press,
+ * which is what a screen reader on it hears. The tooltip shows the same words.
+ *
  * @since 0.1.0
  * @status stable
  * @category actions
@@ -59,6 +65,9 @@ import '../../tooltip/index.js'
  * @csspart tooltip-left - The bubble while it is left of the button. Set together with `tooltip`.
  * @csspart tooltip-right - The bubble while it is right of the button. Set together with `tooltip`.
  * @csspart tooltip-top - The bubble while it is above the button. Set together with `tooltip`.
+ *
+ * @cssstate copied - The moment after a successful copy, while `copied-label` names the button.
+ * @cssstate failed - The moment after a press that put nothing on the clipboard, while `error-label` names the button.
  */
 @customElement('helix-headless-copy-button')
 export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
@@ -180,6 +189,12 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
    */
   protected override get forwardsLabel(): boolean {
     return false
+  }
+
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    this.toggleState('copied', this.copied)
+    this.toggleState('failed', this.failed)
   }
 
   /** @internal A copy button never submits, so it is no form's default button. */

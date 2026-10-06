@@ -47,8 +47,8 @@ describe('icon button', () => {
     expect(part(button, 'button')?.getAttribute('aria-expanded')).toBe('true')
 
     let action: string | null = null
-    form.requestSubmit = () => {
-      action = form.getAttribute('action')
+    form.requestSubmit = (submitter?: HTMLElement | null) => {
+      action = submitter?.getAttribute('formaction') ?? null
     }
     ;(part(button, 'button') as HTMLElement).click()
     expect<string | null>(action).toBe('/elsewhere')

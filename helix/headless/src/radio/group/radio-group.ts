@@ -40,6 +40,21 @@ import { HelixHeadlessRadio } from '../root/radio-root.js'
  * `helix-select`. A native radio sends `input` and `change` in the same task as
  * the click.
  *
+ * **Keyboard.** The group is one tab stop: the chosen radio, or the first that
+ * can be chosen.
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Right, Down | Chooses the next radio, from the last back to the first. |
+ * | Left, Up | Chooses the radio before, from the first round to the last. |
+ * | Home, End | Chooses the first or the last radio. |
+ * | Space, Enter | Chooses the focused radio. |
+ *
+ * Left and Right swap on a right-to-left page, and a disabled radio is passed
+ * over. Under `readonly` the arrows move focus and choose nothing. The group
+ * is a `radiogroup` named by `label`, and each radio is a `role="radio"`
+ * button with `aria-checked`.
+ *
  * @since 0.1.0
  * @status stable
  * @aliases RadioButtons, Choice group

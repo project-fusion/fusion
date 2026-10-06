@@ -8,6 +8,7 @@ import {
   type HelixBeforeChangeEvent,
   HelixFormElement,
   isDateValue,
+  localeOf,
   MixinControllerOpen,
   MixinControllerValue,
   MixinField,
@@ -245,10 +246,19 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
   isDateUnavailable?: ((date: string) => boolean) | undefined
 
   /**
-   * The language tag for the names of months and days in the calendar.
+   * The language tag for the field's order and words, and for the names of
+   * months and days in the calendar.
+   *
+   * Absent is the page's: the `lang` of the nearest element with one, as
+   * Shoelace and Web Awesome read it, then the runtime's own.
    */
   @property()
   locale = ''
+
+  /** The locale the words are written in: `locale`, or the page's `lang`. */
+  private get language(): string {
+    return localeOf(this, this.locale)
+  }
 
   /**
    * The latest date that can be chosen, as `YYYY-MM-DD`.
@@ -481,7 +491,7 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
   }
 
   protected override get segmentLocale(): string {
-    return this.locale
+    return this.language
   }
 
   /** One date, written the way `dateStyle` asks for. */
@@ -495,7 +505,7 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
     const at = new Date(`${date}T00:00:00Z`)
     return Number.isNaN(at.getTime())
       ? date
-      : new Intl.DateTimeFormat(this.locale || undefined, {
+      : new Intl.DateTimeFormat(this.language || undefined, {
           dateStyle: this.dateStyle,
           timeZone: 'UTC',
         }).format(at)
@@ -742,7 +752,7 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
       disable-days=${this.disableDays || nothing}
       first-day-of-week=${this.firstDayOfWeek ?? nothing}
       label=${this.calendarLabel}
-      locale=${this.locale || nothing}
+      locale=${this.language || nothing}
       max=${this.max || nothing}
       max-view=${this.maxView ?? nothing}
       min=${this.min || nothing}

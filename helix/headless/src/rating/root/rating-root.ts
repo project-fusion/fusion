@@ -34,6 +34,20 @@ import { nearestStep } from '../steps.js'
  * With `clearable`, pressing the chosen score again, or Backspace or Delete on
  * the marks, takes the rating back to unrated and sends `helix-clear`.
  *
+ * **Keyboard.** The marks are one tab stop, on the chosen score or the first.
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Right, Down | Chooses the next score up, and stops at the highest. |
+ * | Left, Up | Chooses the next score down, and stops at the lowest. |
+ * | Home, End | Chooses the lowest or the highest score. |
+ * | Space, Enter | Chooses the focused score, or clears it under `clearable` when it is already chosen. |
+ * | Backspace, Delete | Clears the rating, under `clearable`. |
+ *
+ * Left and Right swap on a right-to-left page. The marks are a `radiogroup`
+ * named by `label`, and each score is a `radio` named by `option-label`, such
+ * as "3 out of 5". A read-only rating is one `img` named by its score.
+ *
  * @since 0.1.0
  * @status stable
  * @category forms

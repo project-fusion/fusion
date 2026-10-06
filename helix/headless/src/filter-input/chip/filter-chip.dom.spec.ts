@@ -90,8 +90,32 @@ describe('asking for a filter to go', () => {
   })
 
   test('the control says what it removes, so several chips are told apart', async () => {
-    const el = await chip('label="Disposition" dismissible dismiss-label="Remove disposition"')
-    expect(part(el, 'dismiss')?.getAttribute('aria-label')).toBe('Remove disposition')
+    const el = await chip('label="Disposition" dismissible dismiss-label="Take out"')
+    expect(part(el, 'dismiss')?.getAttribute('aria-label')).toBe('Take out Disposition refunded')
+  })
+
+  /* Every chip's button was "Remove filter", so a row of them was a list of
+     identical buttons. File Input names each remove button for its file. */
+  test('the control is named for its chip by default', async () => {
+    const el = await chip('label="Status" operator-label="is not" dismissible', 'open')
+    expect(part(el, 'dismiss')?.getAttribute('aria-label')).toBe('Remove filter Status is not open')
+    const slotted = (await mount(
+      `<helix-headless-filter-chip label="Category" dismissible>
+         <span slot="field">Kind</span><button slot="operator">is none of</button>Services
+       </helix-headless-filter-chip>`,
+    )) as HTMLElement
+    expect(part(slotted, 'dismiss')?.getAttribute('aria-label')).toBe(
+      'Remove filter Kind is none of Services',
+    )
+  })
+
+  test('the words go where `{label}` says, and follow new values', async () => {
+    const el = await chip('label="Status" dismissible dismiss-label="{label} entfernen"', 'open')
+    expect(part(el, 'dismiss')?.getAttribute('aria-label')).toBe('Status open entfernen')
+    el.append(document.createTextNode(' or closed'))
+    el.shadowRoot?.dispatchEvent(new Event('slotchange'))
+    await (el as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    expect(part(el, 'dismiss')?.getAttribute('aria-label')).toBe('Status open or closed entfernen')
   })
 })
 

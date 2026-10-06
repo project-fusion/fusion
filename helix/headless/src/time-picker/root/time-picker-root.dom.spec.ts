@@ -652,3 +652,24 @@ describe('a clock and a precision of your choosing', () => {
     expect(past.defaultPrevented).toBe(false)
   })
 })
+
+/** An element inside a page section written in `lang`, which names no locale of its own. */
+const inLang = async <T extends HTMLElement>(lang: string, markup: string): Promise<T> => {
+  document.body.innerHTML = `<div lang="${lang}">${markup}</div>`
+  const element = document.body.firstElementChild?.firstElementChild as T & {
+    updateComplete: Promise<unknown>
+  }
+  await element.updateComplete
+  return element
+}
+
+describe('a time picker in a page written in another language', () => {
+  test('names its wheels in that language', async () => {
+    const host = await inLang<Time>(
+      'de-DE',
+      '<helix-headless-time-picker variant="wheels"></helix-headless-time-picker>',
+    )
+    const hour = host.shadowRoot?.querySelector('[data-column="hour"]')
+    expect(hour?.getAttribute('aria-label')).toBe('Stunde')
+  })
+})

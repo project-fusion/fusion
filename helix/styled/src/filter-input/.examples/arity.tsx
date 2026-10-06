@@ -88,7 +88,6 @@ export function Example() {
 
       {chips.map((chip) => (
         <helix-filter-chip
-          dismiss-label={`Remove the ${chip.label.toLowerCase()} filter`}
           dismissible
           key={chip.field}
           label={chip.label}

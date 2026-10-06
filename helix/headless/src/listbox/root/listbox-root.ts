@@ -4,6 +4,7 @@ import {
   customElement,
   DelayController,
   DisabledCascadeController,
+  endInSight,
   HelixFilterEvent,
   HelixFormElement,
   HelixLoadMoreEvent,
@@ -1166,19 +1167,26 @@ export class HelixHeadlessListbox extends MixinCollection(
 
   /**
    * Asks for more once the reader is within a screen of the end, React Aria's
-   * `onLoadMore`: once for each number of options, so a scroll that goes on
-   * asks again only after the next page arrived, and never while loading.
+   * `onLoadMore`, by core's `endInSight`, the rule Virtual List asks too: once
+   * for each number of options, so a scroll that goes on asks again only after
+   * the next page arrived, and never while loading.
    */
   private readonly handleScroll = (event: Event): void => {
     const items = event.currentTarget as HTMLElement
     const count = this.options.length
-    if (this.loading || count === this.askedAt || items.clientHeight === 0) {
+    if (
+      this.loading ||
+      !endInSight({
+        askedAt: this.askedAt,
+        count,
+        remaining: items.scrollHeight - items.scrollTop - items.clientHeight,
+        screen: items.clientHeight,
+      })
+    ) {
       return
     }
-    if (items.scrollHeight - items.scrollTop - items.clientHeight <= items.clientHeight) {
-      this.askedAt = count
-      this.dispatchEvent(new HelixLoadMoreEvent())
-    }
+    this.askedAt = count
+    this.dispatchEvent(new HelixLoadMoreEvent())
   }
 
   /** Requests a new filter, and returns whether the request went through. */

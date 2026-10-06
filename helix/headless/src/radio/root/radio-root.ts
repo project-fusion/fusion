@@ -3,6 +3,7 @@ import {
   HelixElement,
   HostClickController,
   MixinSelectableItem,
+  slotFilled,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -157,10 +158,7 @@ export class HelixHeadlessRadio extends MixinSelectableItem(HelixElement) {
         ><slot
           name="indicator"
           @slotchange=${(event: Event) =>
-            this.toggleState(
-              'has-indicator',
-              (event.target as HTMLSlotElement).assignedNodes().length > 0,
-            )}
+            this.toggleState('has-indicator', slotFilled(event.target as HTMLSlotElement))}
         ></slot
       ></span>
       <slot name="icon"></slot>

@@ -105,79 +105,75 @@ describe('button form participation', () => {
   })
 })
 
-/* The five submission overrides, and the one window they are true in.
+/* The five submission overrides, the name and the value, and the submitter.
  *
- * `requestSubmit(submitter)` refuses this control twice over, so the overrides
- * are written onto the form, the submission is started, and they are put back
- * inside one synchronous call. Everything about that is invisible from outside:
- * the properties read back whatever was set whether or not they ever reach the
- * form, and the form looks untouched before and after. What a `submit` handler
- * sees during the call is the whole of the behavior, so that is where these
- * read. */
+ * `requestSubmit(submitter)` refuses the inner control twice over, so a hidden
+ * native submit button carrying all of them stands in for this one, for one
+ * synchronous call. A `submit` handler reads it as `event.submitter`, which
+ * was `null` before: a page could not tell which of two buttons submitted
+ * without reading the form data. */
 describe('button submission overrides', () => {
   const submitter = async (
     attributes: string,
-  ): Promise<{ button: Updatable; during: Record<string, string | null> }> => {
+  ): Promise<{ form: HTMLFormElement; stand: HTMLButtonElement | undefined }> => {
     document.body.innerHTML = `<form action="/base" method="get"><helix-headless-button type="submit" ${attributes}>Send</helix-headless-button></form>`
     const form = document.querySelector('form') as HTMLFormElement
     const button = document.querySelector('helix-headless-button') as Updatable
     await button.updateComplete
 
-    const during: Record<string, string | null> = {}
-    form.requestSubmit = () => {
-      for (const name of ['action', 'enctype', 'method', 'novalidate', 'target']) {
-        during[name] = form.getAttribute(name)
-      }
+    const seen: { stand?: HTMLButtonElement } = {}
+    form.requestSubmit = (stand?: HTMLElement | null) => {
+      expect(stand?.parentElement).toBe(form)
+      seen.stand = stand as HTMLButtonElement
     }
     ;(control(button) as HTMLElement).click()
-    return { button, during }
+    return { form, stand: seen.stand }
   }
 
-  test('each override is on the form for the submission it starts', async () => {
-    const { during } = await submitter(
+  test('each override is on the submitter for the submission it starts', async () => {
+    const { stand } = await submitter(
       'formaction="/elsewhere" formenctype="multipart/form-data" formmethod="post" formnovalidate formtarget="_blank"',
     )
-    expect(during.action).toBe('/elsewhere')
-    expect(during.enctype).toBe('multipart/form-data')
-    expect(during.method).toBe('post')
-    expect(during.novalidate).toBe('')
-    expect(during.target).toBe('_blank')
+    expect(stand?.type).toBe('submit')
+    expect(stand?.hidden).toBe(true)
+    expect(stand?.getAttribute('formaction')).toBe('/elsewhere')
+    expect(stand?.getAttribute('formenctype')).toBe('multipart/form-data')
+    expect(stand?.getAttribute('formmethod')).toBe('post')
+    expect(stand?.formNoValidate).toBe(true)
+    expect(stand?.getAttribute('formtarget')).toBe('_blank')
   })
 
   test('and the form is exactly as it was afterwards', async () => {
-    /* The overrides belong to one press. A form left holding them would send
-       the next submission, started by anything at all, to the destination this
-       button alone asked for. */
-    await submitter('formaction="/elsewhere" formmethod="post" formnovalidate formtarget="_blank"')
-    const form = document.querySelector('form') as HTMLFormElement
+    /* The overrides belong to one press. A form left holding them, or the
+       button that carried them, would send the next submission, started by
+       anything at all, where this button alone asked. */
+    const { form } = await submitter(
+      'formaction="/elsewhere" formmethod="post" formnovalidate formtarget="_blank"',
+    )
     expect(form.getAttribute('action')).toBe('/base')
     expect(form.getAttribute('method')).toBe('get')
     expect(form.hasAttribute('novalidate')).toBe(false)
-    expect(form.hasAttribute('target')).toBe(false)
+    expect(form.querySelector('button')).toBeNull()
   })
 
-  test('a button that overrides nothing leaves the form saying what it said', async () => {
+  test('a button that overrides nothing writes no override', async () => {
     // An override written at its empty default would send every submission to
     // `action=""`, which is the current page.
-    const { during } = await submitter('')
-    expect(during.action).toBe('/base')
-    expect(during.method).toBe('get')
-    expect(during.novalidate).toBe(null)
-    expect(during.target).toBe(null)
+    const { stand } = await submitter('')
+    expect(stand?.hasAttribute('formaction')).toBe(false)
+    expect(stand?.hasAttribute('formmethod')).toBe(false)
+    expect(stand?.formNoValidate).toBe(false)
+    expect(stand?.hasAttribute('name')).toBe(false)
   })
 
-  test('a named button reports its value for its own submission and clears it', async () => {
+  test('a named button submits its value through the submitter and reports none itself', async () => {
     /* What a native submitter contributes, and the reason this cannot be a
        standing report: a form-associated element that reported continuously
-       would contribute `name=value` on every submission whoever started it,
-       which is a different feature wearing the same name. */
-    const { button, during } = await submitter('name="action" value="publish"')
-    expect(during.action).toBe('/base')
-    expect(formValue(button)).toBe(null)
-  })
-
-  test('an unnamed button contributes nothing at all, the way a native one does not', async () => {
-    const { button } = await submitter('value="publish"')
+       would contribute `name=value` on every submission whoever started it. */
+    const { stand } = await submitter('name="action" value="publish"')
+    expect(stand?.name).toBe('action')
+    expect(stand?.value).toBe('publish')
+    const button = document.querySelector('helix-headless-button') as HTMLElement
     expect(formValue(button)).toBe(undefined)
   })
 })
