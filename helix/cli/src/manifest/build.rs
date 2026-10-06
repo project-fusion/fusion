@@ -125,6 +125,42 @@ fn hidden_of(members: &[Member]) -> BTreeSet<String> {
         .collect()
 }
 
+/// What a class keeps back of the lists it inherits, by the field each name
+/// is kept from, or `None` where it keeps nothing.
+///
+/// **Held on the declaration until inheritance has read it.** A member the
+/// class redeclares `@internal` takes the parent's published row with it,
+/// which only the inheritance step can do, so the names travel under a key
+/// `withheld` strips once every round is over.
+///
+/// **A slot or a part the parent documents and this class never renders.**
+/// Copy Button replaces Button's render and draws neither the `start` and
+/// `end` slots nor the `text` part, and inheritance published all three on its
+/// page. `@withheld slot start` takes the parent's row out of the class's
+/// list, the way an `@internal` member takes the parent's member. The tag is
+/// the list's own tag and the name, and the rest after ` - ` is a reason for
+/// the reader of the source, which nothing publishes.
+fn withheld_lists(documented: &Documented, hidden: &BTreeSet<String>) -> Option<Value> {
+    let mut found: BTreeMap<&'static str, BTreeSet<String>> = BTreeMap::new();
+    if !hidden.is_empty() {
+        found.insert("members", hidden.clone());
+    }
+    for (_, text) in documented
+        .tags
+        .iter()
+        .filter(|(name, _)| name == "withheld")
+    {
+        let mut parts = text.splitn(2, char::is_whitespace);
+        let tag = parts.next().unwrap_or_default();
+        let Some((_, field)) = LISTS.iter().find(|(one, _)| *one == tag) else {
+            continue;
+        };
+        let name = entry(parts.next().unwrap_or_default()).name;
+        found.entry(field).or_default().insert(name);
+    }
+    (!found.is_empty()).then(|| json!(found))
+}
+
 /// What a doc block's tags say, as the lists the manifest carries.
 ///
 /// In the order they are written. The analyzer sorts the modules of a manifest
@@ -1155,6 +1191,10 @@ fn declaration_of(
     for (field, entries) in tagged(&one.documented) {
         fields.insert(field.to_owned(), entries);
     }
+    let hidden = hidden_of(&one.members);
+    if let Some(held) = withheld_lists(&one.documented, &hidden) {
+        fields.insert(inherit::WITHHELD.to_owned(), held);
+    }
     if !one.dispatched.is_empty() {
         fields.insert(
             "events".to_owned(),
@@ -1216,20 +1256,11 @@ fn declaration_of(
         fields.insert("mixins".to_owned(), json!(wrapped));
     }
     if !one.members.is_empty() {
-        let hidden = hidden_of(&one.members);
         let written: Vec<Option<Written>> =
             one.members.iter().map(|two| two.written.clone()).collect();
         let members: Vec<Value> = one.members.into_iter().map(member_of).collect();
         let mut attributes = attributes_of(&members, &written);
         unnamed(&mut attributes, &hidden);
-        /* **What the class keeps to itself, held until inheritance has read
-        it.** A member the class redeclares `@internal` takes the parent's
-        published row with it, which only the inheritance step can do, so the
-        names travel on the declaration under a key `withheld` strips once
-        every round is over. */
-        if !hidden.is_empty() {
-            fields.insert(inherit::WITHHELD.to_owned(), json!(hidden));
-        }
         if !attributes.is_empty() {
             fields.insert("attributes".to_owned(), json!(attributes));
         }
@@ -1459,4 +1490,36 @@ fn published_by(text: &str, path: &str) -> Vec<Value> {
             json!({ "kind": kind, "name": name, "declaration": points })
         })
         .collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use std::collections::BTreeSet;
+
+    use serde_json::json;
+
+    use super::withheld_lists;
+    use crate::manifest::jsdoc::read;
+
+    /* Copy Button's page listed Button's `start` and `end` slots and its
+    `text` part, which it does not render. */
+    #[test]
+    fn a_withheld_tag_names_a_list_and_an_entry_in_it() {
+        let block = read(
+            "/**\n * @withheld slot end\n * @withheld slot start - Button's, not rendered here.\n * @withheld csspart text\n * @withheld nonsense thing\n */",
+        );
+        assert_eq!(
+            withheld_lists(&block, &BTreeSet::new()),
+            Some(json!({ "cssParts": ["text"], "slots": ["end", "start"] }))
+        );
+        let hidden: BTreeSet<String> = ["type".to_owned()].into();
+        assert_eq!(
+            withheld_lists(&block, &hidden).and_then(|one| one.get("members").cloned()),
+            Some(json!(["type"]))
+        );
+        assert_eq!(
+            withheld_lists(&read("/** Nothing. */"), &BTreeSet::new()),
+            None
+        );
+    }
 }

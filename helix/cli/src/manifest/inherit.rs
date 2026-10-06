@@ -56,9 +56,15 @@ pub const INHERITS: [&str; 7] = [
     "cssStates",
 ];
 
-/// The key a declaration carries the names it redeclares `@internal` under,
-/// from the first pass until inheritance is over.
+/// The key a declaration carries what it keeps back of its parent's lists
+/// under, from the first pass until inheritance is over: by list, the members
+/// it redeclares `@internal` under `members`, and the slots, parts, custom
+/// properties, states and events its `@withheld` tags name under each list's
+/// own field.
 pub const WITHHELD: &str = "_withheld";
+
+/// What a declaration keeps back, by list.
+pub type Withheld = BTreeMap<String, BTreeSet<String>>;
 
 /// Takes the withheld names off every declaration, once nothing reads them.
 pub fn withheld(declared: &mut [Vec<Value>]) {
@@ -76,16 +82,22 @@ pub fn withheld(declared: &mut [Vec<Value>]) {
 /// came back through inheritance, so Copy Button published Button's `type`,
 /// `command` and form overrides, which it never uses. The member goes, and the
 /// attribute it declares goes with it, matched by the field it names.
-fn kept_back(entry: &Value, list: &str, names: &BTreeSet<String>) -> bool {
-    let key = match list {
-        "members" => "name",
-        "attributes" => "fieldName",
-        _ => return false,
+///
+/// **A slot, part, custom property, state or event goes by its name**, where
+/// the child's class doc names it with `@withheld`: Copy Button's `start` and
+/// `end` slots and its `text` part, which it does not render.
+fn kept_back(entry: &Value, list: &str, withheld: &Withheld) -> bool {
+    let (from, key) = match list {
+        "members" => ("members", "name"),
+        "attributes" => ("members", "fieldName"),
+        other => (other, "name"),
     };
-    entry
-        .get(key)
-        .and_then(Value::as_str)
-        .is_some_and(|name| names.contains(name))
+    withheld.get(from).is_some_and(|names| {
+        entry
+            .get(key)
+            .and_then(Value::as_str)
+            .is_some_and(|name| names.contains(name))
+    })
 }
 
 /// Manifests of other packages, by the package name a specifier names them by.
@@ -312,7 +324,7 @@ fn joined(
     mine: Option<&Value>,
     theirs: Option<&Value>,
     link: &Link<'_>,
-    withheld: &BTreeSet<String>,
+    withheld: &Withheld,
 ) -> Option<Value> {
     let Link { from, list, .. } = *link;
     let theirs: Vec<Value> = theirs
@@ -501,12 +513,20 @@ pub fn apply(
     changes how an entry reaching it is read. The base class is the last link
     and anything before it is a mixin this class applied. */
     let wrapped = heritage.len() > 1;
-    let withheld: BTreeSet<String> = declaration
+    let withheld: Withheld = declaration
         .get(WITHHELD)
-        .and_then(Value::as_array)
+        .and_then(Value::as_object)
         .into_iter()
         .flatten()
-        .filter_map(|one| one.as_str().map(str::to_owned))
+        .map(|(list, names)| {
+            let names = names
+                .as_array()
+                .into_iter()
+                .flatten()
+                .filter_map(|one| one.as_str().map(str::to_owned))
+                .collect();
+            (list.clone(), names)
+        })
         .collect();
     for (name, specifier) in heritage {
         /* **A relative import, or none at all, is this package's own.** Both
@@ -636,15 +656,13 @@ fn wrote(entry: &Value, link: &Link<'_>) -> Option<(usize, usize)> {
 
 #[cfg(test)]
 mod tests {
-    use std::collections::BTreeSet;
-
     use serde_json::json;
 
-    use super::{kept_back, withheld, WITHHELD};
+    use super::{kept_back, withheld, Withheld, WITHHELD};
 
     #[test]
     fn a_member_redeclared_internal_keeps_its_row_and_its_attribute_back() {
-        let names: BTreeSet<String> = ["type".to_owned()].into();
+        let names: Withheld = [("members".to_owned(), ["type".to_owned()].into())].into();
         assert!(kept_back(&json!({ "name": "type" }), "members", &names));
         assert!(kept_back(
             &json!({ "name": "type", "fieldName": "type" }),
@@ -662,9 +680,27 @@ mod tests {
         assert!(!kept_back(&json!({ "name": "type" }), "slots", &names));
     }
 
+    /* Copy Button published Button's `start` and `end` slots and `text`
+    part, which it does not render. */
+    #[test]
+    fn a_withheld_slot_or_part_keeps_only_that_list_back() {
+        let names: Withheld = [
+            ("slots".to_owned(), ["start".to_owned()].into()),
+            ("cssParts".to_owned(), ["text".to_owned()].into()),
+        ]
+        .into();
+        assert!(kept_back(&json!({ "name": "start" }), "slots", &names));
+        assert!(kept_back(&json!({ "name": "text" }), "cssParts", &names));
+        assert!(!kept_back(&json!({ "name": "end" }), "slots", &names));
+        assert!(!kept_back(&json!({ "name": "start" }), "cssParts", &names));
+        assert!(!kept_back(&json!({ "name": "text" }), "members", &names));
+    }
+
     #[test]
     fn the_withheld_names_are_taken_off_once_inheritance_is_over() {
-        let mut declared = vec![vec![json!({ "name": "A", WITHHELD: ["type"] })]];
+        let mut declared = vec![vec![
+            json!({ "name": "A", WITHHELD: { "members": ["type"] } }),
+        ]];
         withheld(&mut declared);
         assert_eq!(declared[0][0], json!({ "name": "A" }));
     }

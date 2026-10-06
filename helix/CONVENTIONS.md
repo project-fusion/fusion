@@ -1284,6 +1284,12 @@ for the tier and whether to publish typings, and finds everything else.
   and an `@internal` block: `declare` writes no field, so the parent's member
   still runs, and the manifest drops the member and the attribute it declares.
   The analyzer did not do this; it is the one place the generator says less.
+  **A slot, part, custom property, state or event the parent documents and the
+  class does not render is withheld in the class doc**: `@withheld slot start`,
+  `@withheld csspart text`, the list's own tag and the name, with an optional
+  ` - reason` that nothing publishes, at the end of the block. Copy Button,
+  which replaces Button's render, has Button's `start` and `end` slots and its
+  `text` part to withhold.
 - **Document mixin members on the mixin's inner class**, not only on the
   exported `declare class`. The interface is what TypeScript reads; the inner
   class is what the manifest reads.
