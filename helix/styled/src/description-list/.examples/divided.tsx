@@ -1,0 +1,14 @@
+export function Example() {
+  return (
+    <helix-description-list
+      direction="row"
+      divided
+      label="Server"
+    >
+      <helix-description-list-item label="Name">api-eu-2</helix-description-list-item>
+      <helix-description-list-item label="Region">eu-west</helix-description-list-item>
+      <helix-description-list-item label="Size">4 vCPU, 16 GB</helix-description-list-item>
+      <helix-description-list-item label="Created">March 1, 2026</helix-description-list-item>
+    </helix-description-list>
+  )
+}

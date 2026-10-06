@@ -35,8 +35,11 @@ import { property } from 'lit/decorators.js'
  * @slot actions - Controls that act on the value, such as a copy button, after it inside its `<dd>`.
  * @slot label - The label, when it is more than text. Falls back to `label`.
  *
+ * @csspart actions - The box after the value inside its `<dd>`, holding the `actions` slot.
  * @csspart label - The `<dt>`, holding the label.
  * @csspart value - The `<dd>`, holding the value.
+ *
+ * @cssstate several - The values are several `<dd>` elements of your own, so the item draws no `value` part.
  */
 @customElement('helix-headless-description-list-item')
 export class HelixHeadlessDescriptionListItem extends HelixElement {
@@ -72,6 +75,11 @@ export class HelixHeadlessDescriptionListItem extends HelixElement {
     this.finishHydration()
   }
 
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    this.toggleState('several', this.ownValues)
+  }
+
   protected override render(): TemplateResult {
     const label = html`<dt part="label"><slot name="label">${this.label}</slot></dt>`
     /* The same slot either way, so a value changing from text to `<dd>`
@@ -79,7 +87,9 @@ export class HelixHeadlessDescriptionListItem extends HelixElement {
     return this.ownValues
       ? html`${label}<slot @slotchange=${this.handleSlotChange}></slot>`
       : html`${label}
-          <dd part="value"><slot @slotchange=${this.handleSlotChange}></slot><slot name="actions"></slot></dd>`
+          <dd part="value"><slot @slotchange=${this.handleSlotChange}></slot><span part="actions"
+              ><slot name="actions"></slot></span
+          ></dd>`
   }
 
   /** A value arriving or leaving can change whether the item wraps them. */

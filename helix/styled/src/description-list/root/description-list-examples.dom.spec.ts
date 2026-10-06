@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, idle, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import divided from '../.examples/divided.html' with { type: 'text' }
 import preview from '../.examples/preview.html' with { type: 'text' }
 import several from '../.examples/several-values.html' with { type: 'text' }
 import stacked from '../.examples/stacked.html' with { type: 'text' }
@@ -161,4 +162,19 @@ describe('the with actions example', () => {
       expect(control.top).toBeLessThan(text.bottom)
     },
   )
+})
+
+describe('the divided example', () => {
+  run('draws a rule above every pair but the first, midway between two pairs', async () => {
+    await example(divided)
+    await idle()
+    const items = [...document.querySelectorAll('helix-description-list-item')] as HTMLElement[]
+    const rules = items.map((item) => getComputedStyle(item).borderTopWidth)
+    expect(rules[0]).toBe('0px')
+    expect(rules.slice(1).every((width) => width !== '0px')).toBe(true)
+    const [first, second] = items.map((item) => item.getBoundingClientRect())
+    const value = (part(items[1] as HTMLElement, 'value') as HTMLElement).getBoundingClientRect()
+    const above = (second as DOMRect).top - (first as DOMRect).bottom
+    expect(Math.round(value.top - (second as DOMRect).top - 1)).toBe(Math.round(above))
+  })
 })

@@ -2,7 +2,7 @@
    two when it sets labels beside values. The item reads the list's tracks rather
    than its attribute, so the arrangement is decided in one place. */
 :host {
-  align-items: baseline;
+  align-items: var(--description-list-item-align, baseline);
   display: grid;
   grid-column: 1 / -1;
   grid-template-columns: subgrid;
