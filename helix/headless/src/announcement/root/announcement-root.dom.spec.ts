@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { label, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import { hasState, label, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -288,5 +288,42 @@ describe('the region and its key', () => {
     band.remove()
     await frame()
     expect(document.activeElement).toBe(away)
+  })
+})
+
+describe('a queue', () => {
+  type Host = HTMLElement & { updateComplete: Promise<unknown> }
+  const settle = async (bands: Host[]): Promise<void> => {
+    await new Promise((done) => setTimeout(done, 0))
+    await Promise.all(bands.map((band) => band.updateComplete))
+  }
+
+  /* Several banners stacked at once, each with its own clock, where React
+     Aria's toast queue shows them in turn. */
+  test('shows queued announcements one at a time, in order, as each is removed', async () => {
+    document.body.innerHTML = `<div>
+      <helix-headless-announcement queued>One</helix-headless-announcement>
+      <helix-headless-announcement queued duration="40">Two</helix-headless-announcement>
+      <helix-headless-announcement queued>Three</helix-headless-announcement>
+      <helix-headless-announcement>Loose</helix-headless-announcement>
+    </div>`
+    const bands = [...document.querySelectorAll('helix-headless-announcement')] as Host[]
+    await settle(bands)
+    const [one, two, three, loose] = bands as [Host, Host, Host, Host]
+    expect(bands.map((band) => hasState(band, 'waiting'))).toEqual([false, true, true, false])
+    expect([part(two, 'content'), role(two)]).toEqual([null, null])
+    expect(role(loose)).toBe('region')
+    const dismissed: string[] = []
+    two.addEventListener('helix-dismiss', () => dismissed.push('two'))
+    /* Its clock waits for its turn. */
+    await new Promise((done) => setTimeout(done, 60))
+    expect(dismissed).toEqual([])
+    one.remove()
+    await settle(bands)
+    expect([hasState(two, 'waiting'), hasState(three, 'waiting')]).toEqual([false, true])
+    expect(part(two, 'content')).not.toBeNull()
+    expect(role(two)).toBe('region')
+    await new Promise((done) => setTimeout(done, 60))
+    expect(dismissed).toEqual(['two'])
   })
 })
