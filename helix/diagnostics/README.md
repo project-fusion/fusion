@@ -251,6 +251,7 @@ diagnostics counts it by kind and tag. None fails a CI job.
 | `missing-name` | A button, form control, button group or open dialog has no accessible name. Development builds only (the `development` export condition) |
 | `missing-row-key` | A selectable data table has no `row-key`, so it knows each row by its place |
 | `missing-stencil-parts` | A graph stencil names parts its shape does not have |
+| `missing-table` | A chart, legend or sparkline's `for` names no table once the page has loaded. Development builds only (the `development` export condition) |
 | `missing-target` | A skip link's `href` names no element on the page |
 | `missing-trigger` | A tooltip's `for` names no element in its own tree |
 | `negative-value` | An area chart was given a negative number, which it draws as none |
