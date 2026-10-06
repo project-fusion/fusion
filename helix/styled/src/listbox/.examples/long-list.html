@@ -1,0 +1,18 @@
+<!-- @summary Ten thousand options given as data, of which only those in sight are drawn. -->
+<helix-listbox
+  filter-label="Search accounts"
+  filterable
+  id="accounts"
+  label="Account"
+  name="account"
+></helix-listbox>
+
+<script>
+  /* `items` takes the options as data: a value, or a record with a `value`,
+     a `label` and `disabled`. The keyboard, the filter and the value reach
+     every one of them, and only those in sight are drawn. */
+  document.getElementById('accounts').items = Array.from({ length: 10000 }, (_, index) => ({
+    label: `Account ${String(index + 1).padStart(5, '0')}`,
+    value: `account-${index + 1}`,
+  }))
+</script>
