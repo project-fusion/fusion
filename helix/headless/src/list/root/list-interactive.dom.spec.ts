@@ -282,6 +282,59 @@ describe('ranges and replacing', () => {
     expect(changes).toEqual(['a, b, d, e'])
   })
 
+  test('Page Down and Page Up move a box of rows, and Shift takes them in', async () => {
+    const list = await rows5()
+    const [a, , , , e] = list.rows as [Row, Row, Row, Row, Row]
+    cell(a).focus()
+    // happy-dom lays nothing out, so every row fits in the box.
+    key(cell(a), 'PageDown', { shiftKey: true })
+    await settle(list)
+    expect(focused(list)).toBe(cell(e))
+    expect(list.value).toBe('a, b, d, e')
+    key(cell(e), 'PageUp')
+    await settle(list)
+    expect(focused(list)).toBe(cell(a))
+    expect(list.value).toBe('a, b, d, e')
+  })
+
+  test('Page Down under replace selects the row it lands on', async () => {
+    const list = await rows5('selection-behavior="replace"')
+    const [a, , , , e] = list.rows as [Row, Row, Row, Row, Row]
+    cell(a).focus()
+    key(cell(a), 'PageDown')
+    await settle(list)
+    expect(focused(list)).toBe(cell(e))
+    expect(list.value).toBe('e')
+  })
+
+  test('Escape lets go of the selection, asking first, and only then keeps the key', async () => {
+    const list = await rows5('value="a, d"')
+    const outside: string[] = []
+    const listen = (event: KeyboardEvent): void => {
+      outside.push(event.key)
+    }
+    document.body.addEventListener('keydown', listen)
+    const refuse = (event: Event): void => event.preventDefault()
+    list.addEventListener('helix-before-change', refuse)
+    const first = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key: 'Escape',
+    })
+    cell(list.rows[0] as Row).dispatchEvent(first)
+    await settle(list)
+    expect(list.value).toBe('a, d')
+    list.removeEventListener('helix-before-change', refuse)
+    key(cell(list.rows[0] as Row), 'Escape')
+    await settle(list)
+    expect(list.value).toBe('')
+    expect(outside).toEqual([])
+    key(cell(list.rows[0] as Row), 'Escape')
+    document.body.removeEventListener('keydown', listen)
+    expect(outside).toEqual(['Escape'])
+  })
+
   test('replace selects a pressed row alone, and the keys carry the selection', async () => {
     const list = await rows5('selection-behavior="replace"')
     const [a, b, , d] = list.rows as [Row, Row, Row, Row]
