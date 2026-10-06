@@ -210,6 +210,13 @@ skipped run takes nothing from it. What a skipped run would have left behind is
 the caches a pull request cannot share, which `seed` writes on `main` when they
 are missing.
 
+**The examples' diagnostics follow the tree to `main` the same way.** Each
+browser shard keeps its runs as an artifact, and on a push to `main` the
+`telemetry` job sends them to the console: from the pull request's run that
+`proven` names, or from this run when it verified the tree itself. It sends
+nothing without the `HELIX_TELEMETRY_KEY` secret and the `HELIX_TELEMETRY_URL`
+variable, and the gate does not wait on it.
+
 ## One context to require
 
 **The job names are not stable enough to require directly.** A branch protection

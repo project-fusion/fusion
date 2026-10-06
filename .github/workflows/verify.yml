@@ -64,6 +64,7 @@ jobs:
       contents: read
     outputs:
       proven: ${{ steps.look.outputs.proven }}
+      run: ${{ steps.look.outputs.run }}
     steps:
       - name: Check out the script
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -654,6 +655,22 @@ jobs:
           path: ${{ runner.temp }}/cost
           retention-days: 14
 
+      # **The examples' diagnostics, kept from every run for the console.**
+      # `check:spec:visual` writes a shard's runs to `.local/diagnostics`, and
+      # the `telemetry` job sends them once the tree is on `main`: usually from
+      # the pull request's run, since `main` runs nothing again for a tree a
+      # pull request verified. Only the shards that picture examples write one,
+      # which `ignore` covers.
+      - name: Keep the examples' diagnostics
+        if: always()  # dialect:quoted, GitHub's own function
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          if-no-files-found: ignore
+          include-hidden-files: true
+          name: diagnostics-${{ matrix.id }}
+          path: .local/diagnostics/examples.json
+          retention-days: 14
+
       - name: Upload the visual diffs
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -668,6 +685,77 @@ jobs:
             helix/styled/src/*/.examples/*.parity.png
             .local/dsd/diff/*.png
             .local/diagnostics/*.json
+
+  # **The examples' diagnostics, sent to the console when a tree lands on
+  # `main`**, where each finding becomes an issue with a state: stage 8 of the
+  # diagnostics plan.
+  #
+  # **From the run that verified the tree.** A push whose tree a pull request
+  # verified runs nothing again, so the runs come from that pull request's
+  # artifacts, which `proven` names. Otherwise this push ran the browser jobs
+  # itself, and they come from here.
+  #
+  # **Never a failure of the build.** Not in the gate's `needs`, and
+  # `continue-on-error`: a console that is down, or a key that was revoked, is
+  # no reason to call a verified tree unverified. Without the
+  # `HELIX_TELEMETRY_KEY` secret and the `HELIX_TELEMETRY_URL` variable it
+  # sends nothing and says so. The address is a variable because the console is
+  # internal, and this repository is public.
+  telemetry:
+    needs: [proven, browser]
+    if: always() && github.event_name == 'push'  # dialect:quoted, GitHub's own function
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    continue-on-error: true
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - name: Fetch the diagnostics from the pull request's run
+        if: needs.proven.outputs.proven == 'true'
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          github-token: ${{ github.token }}
+          path: diagnostics
+          pattern: diagnostics-*
+          run-id: ${{ needs.proven.outputs.run }}
+
+      - name: Fetch the diagnostics from this run
+        if: needs.proven.outputs.proven != 'true'
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          path: diagnostics
+          pattern: diagnostics-*
+
+      - name: Send them to the console
+        env:
+          HELIX_TELEMETRY_KEY: ${{ secrets.HELIX_TELEMETRY_KEY }}
+          HELIX_TELEMETRY_URL: ${{ vars.HELIX_TELEMETRY_URL }}
+        run: |
+          if [ -z "$HELIX_TELEMETRY_KEY" ] || [ -z "$HELIX_TELEMETRY_URL" ]; then
+            echo "No HELIX_TELEMETRY_KEY secret or HELIX_TELEMETRY_URL variable, so no diagnostics were sent." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          shopt -s nullglob
+          files=(diagnostics/*/examples.json)
+          if [ "${#files[@]}" -eq 0 ]; then
+            echo "No shard pictured an example, so there were no diagnostics to send." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          # Every file is sent whatever the one before it did, and the step
+          # fails at the end where any was refused, so a refusal shows.
+          failed=0
+          for file in "${files[@]}"; do
+            if ! answer=$(curl --fail-with-body --silent --show-error \
+              --header "Authorization: Bearer $HELIX_TELEMETRY_KEY" \
+              --header 'Content-Type: application/json' \
+              --data-binary "@$file" \
+              "$HELIX_TELEMETRY_URL" 2>&1); then
+              failed=1
+            fi
+            echo "$file: $answer" >> "$GITHUB_STEP_SUMMARY"
+          done
+          exit "$failed"
 
   # The one required context, because the shard counts are arguments and the
   # job names move with them. `always()` is load-bearing:
