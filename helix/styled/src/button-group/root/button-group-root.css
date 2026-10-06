@@ -6,14 +6,11 @@
    button in it inherits them, as `data-density` on the group does. The
    relative pair is declared again with each step, for the reason the base
    layer records: it resolves where it is declared. */
-:host([size]) {
+:host([size="sm"]) {
   --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
   --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
   --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
   --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
-}
-
-:host([size="sm"]) {
   --helix-size-control: var(--helix-size-control-sm);
   --helix-size-icon: var(--helix-size-icon-sm);
   --helix-space-control: var(--helix-space-sm);
@@ -21,6 +18,10 @@
 }
 
 :host([size="md"]) {
+  --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
+  --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
+  --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
+  --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
   --helix-size-control: var(--helix-size-control-md);
   --helix-size-icon: var(--helix-size-icon-md);
   --helix-space-control: var(--helix-space-md);
@@ -28,6 +29,10 @@
 }
 
 :host([size="lg"]) {
+  --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
+  --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
+  --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
+  --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
   --helix-size-control: var(--helix-size-control-lg);
   --helix-size-icon: var(--helix-size-icon-lg);
   --helix-space-control: var(--helix-space-lg);

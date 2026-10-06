@@ -1,5 +1,5 @@
 import { customElement, HelixElement, slotFilled } from '@fusion.dev/helix-core'
-import { html, nothing, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
 /**
@@ -15,7 +15,7 @@ import { property, state } from 'lit/decorators.js'
  * Anything else slotted here is drawn and is not an action.
  *
  * @since 0.141.0
- * @status experimental
+ * @status stable
  * @category actions
  * @aliases Speed dial section, Action group
  * @documentation https://fusion.dev/helix/components/speed-dial
@@ -45,8 +45,17 @@ export class HelixHeadlessSpeedDialGroup extends HelixElement {
   @state()
   private labelSlotted = false
 
-  private readonly readLabel = (event: Event): void => {
-    this.labelSlotted = slotFilled(event.target as HTMLSlotElement)
+  private readonly readLabel = (): void => {
+    this.labelSlotted = slotFilled(
+      this.renderRoot.querySelector<HTMLSlotElement>('slot[name="label"]'),
+    )
+  }
+
+  /* A name slotted before the first render is assigned without a
+     `slotchange` everywhere, so it is read once here as well. */
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.readLabel()
   }
 
   protected override render(): TemplateResult {

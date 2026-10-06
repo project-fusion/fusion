@@ -93,6 +93,7 @@ const channel = new WeakMap<HelixHeadlessSplitter, Crossed>()
  * @documentation https://fusion.dev/helix/components/splitter
  *
  * @slot end - The pane after the divider.
+ * @slot handle - A mark drawn at the middle of the divider, such as a grip icon. It takes no focus and no pointer of its own: a press on it is a press on the divider.
  * @slot start - The pane before the divider.
  *
  * @event {HelixBeforeCollapseEvent} helix-before-collapse - Fired before a pane shuts or reopens, whether or not the resize that caused it was allowed. It carries its own position, because a shut pane sits at `collapsed-size`. Cancelable: canceling it leaves the pane as it was and the divider where the gesture put it.
@@ -100,8 +101,6 @@ const channel = new WeakMap<HelixHeadlessSplitter, Crossed>()
  * @event {HelixCollapseEvent} helix-collapse - Fired after a pane shuts or reopens, with the side that is shut, or empty where both are open.
  * @event {HelixResizedEvent} helix-resized - Fired after the divider settles somewhere new, with the new position.
  * @event {Event} input - Fired each time the divider moves, as a range input does: on each step of a drag, and before `helix-resized` for a key, a double click or a corner. Read `position` for where it is now.
- *
- * @slot handle - A mark drawn at the middle of the divider, such as a grip icon. It takes no focus and no pointer of its own: a press on it is a press on the divider.
  *
  * @csspart corner - The handle where two dividers cross, added on the client.
  * @csspart end - The box that holds the second pane.

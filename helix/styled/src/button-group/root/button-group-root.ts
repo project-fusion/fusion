@@ -35,6 +35,14 @@ export class HelixButtonGroup extends HelixHeadlessButtonGroup {
   static override styles: CSSResultGroup = styles
 
   /**
+   * The size of every button in the group: their height, text, padding and
+   * icons, from the density steps. Unset, the buttons take the size of the
+   * region around the group.
+   */
+  @property({ reflect: true })
+  size?: 'sm' | 'md' | 'lg'
+
+  /**
    * Whether the buttons are one bar or a spaced row.
    *
    * Joined by default: one control made of parts, sharing borders, reading as a
@@ -47,14 +55,6 @@ export class HelixButtonGroup extends HelixHeadlessButtonGroup {
    */
   @property({ reflect: true })
   variant?: 'joined' | 'spaced'
-
-  /**
-   * The size of every button in the group: their height, text, padding and
-   * icons, from the density steps. Unset, the buttons take the size of the
-   * region around the group.
-   */
-  @property({ reflect: true })
-  size?: 'sm' | 'md' | 'lg'
 }
 
 declare global {
