@@ -3,21 +3,21 @@
    host empty: stretched into a 118px row beside a card, the snippet draws 82px
    of itself and 36px of nothing. */
 :host {
-  /* Where the copy button stands in a block with no header: centered on the
-     first line of code, which is the block's padding and half a line down, and
-     as far from the end as from the top. At `size-control` and a `2xs` inset it
-     sat 2.25px below that line and filled a one-line block to within 2px of
-     either edge. */
   /* The code's type, which the gutter's numbers share so they stay level. */
   --_code-block-size: var(--code-block-font-size, var(--helix-text-sm));
   --_code-block-leading: var(--code-block-line-height, var(--helix-leading-normal));
   --_code-block-face: var(--code-block-font-family, var(--helix-font-mono));
-  --_code-block-line: calc(var(--_code-block-size) * var(--_code-block-leading));
-  --_code-block-copy-inset: calc(
-    var(--helix-space-sm) +
-    (var(--_code-block-line) - var(--helix-size-control-sm)) /
-    2
-  );
+  /* Where the copy button stands in a block with no header: centered on the
+     first line of code, which is the block's padding and half a line down, and
+     as far from the end as from the top. At `size-control` and a `2xs` inset it
+     sat 2.25px below that line and filled a one-line block to within 2px of
+     either edge.
+
+     **A line is `1lh`, read inside the frame**, which sets the code's size and
+     leading. Multiplied out as size times leading, the line was a number only:
+     `--code-block-line-height: 28px` made the product invalid, and the button
+     fell below a one-line block with the block's end padding gone. */
+  --_code-block-copy-inset: calc(var(--helix-space-sm) + (1lh - var(--helix-size-control-sm)) / 2);
   --_code-block-gutter: calc(var(--helix-size-control-sm) + var(--_code-block-copy-inset) * 2);
   display: flex;
   flex-direction: column;
@@ -25,6 +25,17 @@
 
 [part="frame"] {
   flex: 1;
+}
+
+/* The code's size and leading, so `1lh` here and in everything inside is one
+   line of code, a number or a length alike. Nothing in a code frame draws text
+   in the frame's own type: the code and the gutter restate theirs, and the
+   block holds only boxes. A diff's block holds its code inline, on a line the
+   block's own type would heighten, so a diff reads its line on the code and
+   the button instead. */
+:host(:not([diff])) [part="frame"] {
+  font-size: var(--_code-block-size);
+  line-height: var(--_code-block-leading);
 }
 
 /* The name, over the code rather than floating on it. */
@@ -93,9 +104,13 @@
   margin-inline-start: auto;
 }
 
+/* In the code's type, so its `1lh` is a line of code: the button is a flex
+   box sized by its token, so the type moves nothing in it. */
 [part="frame"] > [part="copy"] {
+  font-size: var(--_code-block-size);
   inset-block-start: var(--_code-block-copy-inset);
   inset-inline-end: var(--_code-block-copy-inset);
+  line-height: var(--_code-block-leading);
   position: absolute;
 }
 
@@ -238,11 +253,14 @@
 
 /* **With no header, the button stands in a band above the first hunk.** An end
    gutter keeps nothing clear in a diff, whose block scrolls and whose washes
-   run to the edge: the lines slide under anything standing beside them. */
+   run to the edge: the lines slide under anything standing beside them. The
+   band is the code's margin, where `1lh` is a line of code; the block's own
+   line is not. */
 :host([diff]:not([no-copy]))
   [part="frame"]:not([part="header"] + *)
-  :is([part="block"], [part="old"], [part="new"]) {
-  padding-block-start: var(--_code-block-gutter);
+  :is([part="block"], [part="old"], [part="new"])
+  > [part="code"] {
+  margin-block-start: var(--_code-block-gutter);
 }
 
 /* Under a header, as code's block does. Restated because the rule above sets the
@@ -279,8 +297,11 @@
   }
 
   /* Stacked, the button's band is the old version's alone, at the top. */
-  :host([diff]:not([no-copy])) [part="frame"]:not([part="header"] + *) [part="new"] {
-    padding-block-start: var(--helix-space-none);
+  :host([diff]:not([no-copy]))
+    [part="frame"]:not([part="header"] + *)
+    [part="new"]
+    > [part="code"] {
+    margin-block-start: var(--helix-space-none);
   }
 }
 

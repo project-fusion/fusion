@@ -40,7 +40,7 @@ import '../../copy-button/index.js'
  * @cssproperty --code-block-gutter-color - The color of the line numbers.
  * @cssproperty --code-block-header-background-color - The background behind the name. The default is `surface-raised`.
  * @cssproperty --code-block-label-color - The color of the name in the header.
- * @cssproperty --code-block-line-height - The line height of the code and its line numbers.
+ * @cssproperty --code-block-line-height - The line height of the code and its line numbers, as a number or a length.
  * @cssproperty --code-block-max-block-size - The tallest the code grows before it scrolls, or until `expandable`'s button shows every line. The default is no limit.
  * @cssproperty --code-block-radius - The corner radius of the header's top and the block's bottom, which form one shape.
  * @cssproperty --code-block-removed-color - The color a diff's removed lines are tinted in and their `-` is drawn in. The danger color by default.

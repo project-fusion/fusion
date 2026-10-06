@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, mount, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -69,12 +69,29 @@ describe('hooks', () => {
     expect(host).toContain(
       '--_code-block-face: var(--code-block-font-family, var(--helix-font-mono))',
     )
-    expect(host).toContain(
-      '--_code-block-line: calc(var(--_code-block-size) * var(--_code-block-leading))',
-    )
     const code = rule('[part="code"]')
     expect(code).toContain('color: var(--code-block-color, var(--helix-color-foreground))')
     expect(code).toContain('font-family: var(--_code-block-face)')
+  })
+
+  /* The line was the size times the leading, so a length for the leading made
+     the product invalid: the button fell below a one-line block, 368px from
+     the end, and the block's end padding was gone. */
+  test('the line height takes a length as well as a number', () => {
+    expect(sheet()).not.toContain('var(--_code-block-size) * var(--_code-block-leading)')
+    expect(rule(':host')).toContain('(1lh - var(--helix-size-control-sm))')
+    /* `1lh` is a line of code only where the code's type is set. */
+    for (const framed of [
+      rule(':host(:not([diff])) [part="frame"]'),
+      rule('[part="frame"] > [part="copy"]'),
+    ]) {
+      expect(framed).toContain('font-size: var(--_code-block-size)')
+      expect(framed).toContain('line-height: var(--_code-block-leading)')
+    }
+    /* A diff's band is the code's margin, where `1lh` is the code's line. */
+    expect(sheet()).toMatch(
+      /\[part="new"\]\)\s*> \[part="code"\] \{\s*margin-block-start: var\(--_code-block-gutter\)/,
+    )
   })
 
   test("the name and a diff's two tints are hooks on the colors they were", () => {
@@ -89,3 +106,25 @@ describe('hooks', () => {
     )
   })
 })
+
+/* Where the line height is a length, the copy button still stands on the
+   first line, as far from the end as from the top, and the block keeps the
+   gutter it stands in. */
+if (hasLayout()) {
+  describe('a line height given as a length', () => {
+    test('places the copy button on the first line and keeps its gutter', async () => {
+      const host = (await mount(
+        '<helix-code-block style="width: 400px; --code-block-line-height: 28px">const a = 1</helix-code-block>',
+      )) as HTMLElement & { updateComplete: Promise<boolean> }
+      await host.updateComplete
+      const root = host.shadowRoot as ShadowRoot
+      const copy = (root.querySelector('[part="copy"]') as HTMLElement).getBoundingClientRect()
+      const block = root.querySelector('[part="block"]') as HTMLElement
+      const edge = host.getBoundingClientRect()
+      /* 12px of padding and half of 28 less half of a 32px button. */
+      expect(Math.round(copy.top - edge.top)).toBe(10)
+      expect(Math.round(edge.right - copy.right)).toBe(10)
+      expect(getComputedStyle(block).paddingInlineEnd).toBe('52px')
+    })
+  })
+}
