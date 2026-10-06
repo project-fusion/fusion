@@ -442,7 +442,13 @@ mod tests {
     /// A player relays every media event, and a scroll area its scrolling.
     #[test]
     fn media_and_scroll_events_are_relayed_under_their_native_names() {
-        for name in ["timeupdate", "volumechange", "loadedmetadata", "scroll", "scrollend"] {
+        for name in [
+            "timeupdate",
+            "volumechange",
+            "loadedmetadata",
+            "scroll",
+            "scrollend",
+        ] {
             assert!(
                 said(&json!({ "events": [{ "description": "x", "name": name }] })).is_empty(),
                 "{name}"
