@@ -3,7 +3,7 @@
  */
 :host {
   display: grid;
-  gap: var(--helix-space-md);
+  gap: var(--video-playlist-gap, var(--helix-space-md));
   grid-template-columns: var(--video-playlist-layout, 1fr);
 }
 
@@ -14,7 +14,7 @@
 [part="items"] {
   display: flex;
   flex-direction: column;
-  gap: var(--helix-space-2xs);
+  gap: var(--video-playlist-items-gap, var(--helix-space-2xs));
   max-block-size: var(--video-playlist-size, 26rem);
   overflow-y: auto;
 }
