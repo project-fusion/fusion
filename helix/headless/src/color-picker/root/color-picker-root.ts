@@ -116,11 +116,14 @@ interface EyeDropperConstructor {
  * @csspart channel-marker-label - The value a mark stands at, when `marker-labels` is set.
  * @csspart channel-markers - The row of marks along the track.
  * @csspart channel-output - The current value, shown beside the track.
+ * @csspart channel-tooltip - A ramp's value in a bubble, where a ramp shows one.
+ * @csspart channel-tooltips - The layer over a ramp's track that holds its bubble.
  * @csspart channels - The ramps beside the sample.
  * @csspart controls - The row under the square.
  * @csspart eyedropper - The control that samples a color from the screen.
  * @csspart eyedropper-button - The button inside `eyedropper`.
  * @csspart eyedropper-live - The live region of the button inside `eyedropper`, which says its pending label.
+ * @csspart eyedropper-spinner - The ring the eyedropper button turns while it is pending.
  * @csspart eyedropper-text - The words on the button inside `eyedropper`, trimmed to their capitals and baseline.
  * @csspart feedback - The message under the picker, while `feedback` is set.
  * @csspart field - One channel's number field with its label, in `channel-fields`.
@@ -131,6 +134,7 @@ interface EyeDropperConstructor {
  * @csspart format - The control that changes the syntax the value is written in.
  * @csspart format-button - The button inside `format`.
  * @csspart format-live - The live region of the button inside `format`, which says its pending label.
+ * @csspart format-spinner - The ring the syntax button turns while it is pending.
  * @csspart format-text - The words on the button inside `format`, trimmed to their capitals and baseline.
  * @csspart grid - The saturation and brightness square. Draw the mark that shows
  * where the color sits with `::part(grid)::after` in your stylesheet. The
@@ -1038,7 +1042,8 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
       part="channel"
       exportparts="control: channel-control, feedback: channel-feedback, field: channel-field,
         hint: channel-hint, label: channel-label, marker: channel-marker,
-        marker-label: channel-marker-label, markers: channel-markers, output: channel-output"
+        marker-label: channel-marker-label, markers: channel-markers, output: channel-output,
+        tooltip: channel-tooltip, tooltips: channel-tooltips"
       data-channel=${channel}
       aria-invalid=${this.marked ? 'true' : nothing}
       label=${label}
@@ -1171,7 +1176,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
                   this.sampling && !this.noEyedropper
                     ? html`<${this.tag('button')}
                         part="eyedropper"
-      exportparts="button: eyedropper-button, live: eyedropper-live, text: eyedropper-text"
+      exportparts="button: eyedropper-button, live: eyedropper-live, spinner: eyedropper-spinner, text: eyedropper-text"
                         label=${this.eyedropperLabel}
                         ?disabled=${this.isDisabled}
                         @click=${this.handleEyeDropper}
@@ -1185,7 +1190,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
                     ? nothing
                     : html`<${this.tag('button')}
                         part="format"
-      exportparts="button: format-button, live: format-live, text: format-text"
+      exportparts="button: format-button, live: format-live, spinner: format-spinner, text: format-text"
                         label=${fillTemplate(this.formatLabel, { format: this.format ?? 'hex' })}
                         ?disabled=${this.isDisabled}
                         @click=${this.handleFormat}
