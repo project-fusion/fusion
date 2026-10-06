@@ -2,11 +2,13 @@ import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { registerDom } from '@fusion.dev/helix-testing/dom'
 import { readColor, rgbOf } from './read-color.js'
 
+/* Read once the page exists: a spec that runs first finds no `document` at import. */
+let create: typeof document.createElement
+
 beforeAll(() => {
   registerDom()
+  create = document.createElement.bind(document)
 })
-
-const create = document.createElement.bind(document)
 
 afterEach(() => {
   document.createElement = create

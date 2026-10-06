@@ -1,10 +1,21 @@
-import { describe, expect, test } from 'bun:test'
-import { requestChange, requestValue } from './request-change.js'
+import { beforeAll, describe, expect, test } from 'bun:test'
+import { registerDom } from '@fusion.dev/helix-testing/dom'
+import type * as Subject from './request-change.js'
+
+/* The page first, then the module: its event class extends the `CustomEvent`
+   it finds as it loads, and a DOM spec later in the same run dispatches it. */
+let requestChange: typeof Subject.requestChange
+let requestValue: typeof Subject.requestValue
+
+beforeAll(async () => {
+  registerDom()
+  ;({ requestChange, requestValue } = await import('./request-change.js'))
+})
 
 /**
  * The one path every stateful change in the library runs through.
  *
- * No DOM: this takes an `EventTarget` and a pair of callbacks, and what it
+ * No elements: this takes an `EventTarget` and a pair of callbacks, and what it
  * decides is an order and a verdict. A plain `EventTarget` is enough to ask
  * both.
  *
