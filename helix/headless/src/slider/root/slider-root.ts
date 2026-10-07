@@ -674,15 +674,20 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
    * room in the row.
    */
   protected renderThumbs(start: number, end: number): TemplateResult {
-    const box = (fraction: number, name: 'thumb' | 'thumb-end', thumb?: 'end' | 'start') =>
+    /* The slot names written out, so the manifest's slot check can read them. */
+    const slot = (end: boolean): TemplateResult =>
+      end
+        ? html`<slot name="thumb-end" @slotchange=${this.handleThumbSlot}></slot>`
+        : html`<slot name="thumb" @slotchange=${this.handleThumbSlot}></slot>`
+    const box = (fraction: number, end: boolean, thumb?: 'end' | 'start'): TemplateResult =>
       html`<span part="thumb" data-thumb=${thumb ?? nothing} style="--slider-at: ${fraction}"
-        ><slot name=${name} @slotchange=${this.handleThumbSlot}></slot
-      ></span>`
+        >${slot(end)}</span
+      >`
     return html`<div part="thumbs" aria-hidden="true" ?hidden=${!this.thumbContent}>
       ${
         this.range
-          ? [box(this.along(start), 'thumb', 'start'), box(this.along(end), 'thumb-end', 'end')]
-          : box(this.fraction, 'thumb')
+          ? [box(this.along(start), false, 'start'), box(this.along(end), true, 'end')]
+          : box(this.fraction, false)
       }
     </div>`
   }
