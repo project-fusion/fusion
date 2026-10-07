@@ -49,7 +49,7 @@ const fetched = (): Fetched => {
 export const readIconFile = (text: string, name: string): HelixIcon | undefined => {
   const parsed = new DOMParser().parseFromString(text, 'image/svg+xml')
   const root = parsed.documentElement
-  if (!root || root.localName !== 'svg' || parsed.getElementsByTagName('parsererror').length > 0) {
+  if (root?.localName !== 'svg' || parsed.getElementsByTagName('parsererror').length > 0) {
     return undefined
   }
   for (const unsafe of [...root.querySelectorAll('script, foreignObject')]) {
