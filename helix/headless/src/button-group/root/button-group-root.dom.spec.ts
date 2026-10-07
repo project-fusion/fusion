@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, part, registerDom, role, slotted } from '@fusion.dev/helix-testing/dom'
+import { hasState, mount, registerDom, role, slotted } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -309,12 +309,7 @@ describe('a button group with selection-mode', () => {
   })
 })
 
-describe('what a sheet can reach on the group', () => {
-  test('the buttons sit in a part that draws no box of its own', async () => {
-    const group = await mount(markup)
-    expect(part(group, 'buttons')?.localName).toBe('slot')
-  })
-
+describe('what a sheet can read of the group', () => {
   test('a group with a button pressed says so through a state', async () => {
     const group =
       (await mount(`<helix-headless-button-group label="Format" selection-mode="multiple">

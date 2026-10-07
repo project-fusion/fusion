@@ -73,6 +73,8 @@ export interface BreadcrumbItem {
  * @csspart crumb - Each crumb drawn from `items`.
  * @csspart crumb-collapsed - The crumb that holds the folded middle of a trail longer than `max-items`.
  * @csspart crumb-current - The crumb drawn from `items` for the current page.
+ * @csspart crumb-expand - The fold button a crumb draws after the first crumb of a folded slotted trail. A trail drawn from `items` draws its fold as a crumb of its own, `crumb-collapsed`, so this one is never drawn there.
+ * @csspart crumb-fold-separator - The chevron before that button.
  * @csspart crumb-link - The link, or the current page's words, of a crumb drawn from `items`.
  * @csspart crumb-separator - The separator before a crumb drawn from `items`.
  * @csspart crumb-separator-mark - The chevron before a crumb drawn from `items`.
@@ -228,7 +230,7 @@ export class HelixHeadlessBreadcrumbs extends HelixElement {
         ? nothing
         : html`<${crumb}
             part="crumb crumb-collapsed"
-            exportparts="link: crumb-link, separator: crumb-separator, separator-mark: crumb-separator-mark"
+            exportparts="expand: crumb-expand, fold-separator: crumb-fold-separator, link: crumb-link, separator: crumb-separator, separator-mark: crumb-separator-mark"
             ><button
               part="expand"
               type="button"
@@ -242,7 +244,7 @@ export class HelixHeadlessBreadcrumbs extends HelixElement {
     const rest = shown.slice(1)
     const draw = ({ index, item }: { index: number; item: BreadcrumbItem }) => html`<${crumb}
         part="crumb${index === last ? ' crumb-current' : ''}"
-        exportparts="link: crumb-link, separator: crumb-separator, separator-mark: crumb-separator-mark"
+        exportparts="expand: crumb-expand, fold-separator: crumb-fold-separator, link: crumb-link, separator: crumb-separator, separator-mark: crumb-separator-mark"
         href=${index === last ? nothing : (item.href ?? nothing)}
         rel=${item.rel ?? nothing}
         target=${item.target ?? nothing}
