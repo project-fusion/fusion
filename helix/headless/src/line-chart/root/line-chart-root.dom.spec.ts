@@ -497,3 +497,37 @@ describe('dashed', () => {
     expect(drawn(host).every((one) => one.getAttribute('part') === 'line')).toBe(true)
   })
 })
+
+/* A page could not hear which reading a reader was on, or that one was pressed. */
+describe('the reading, heard by the page', () => {
+  test('is sent as it moves, and when Enter presses it', async () => {
+    const host = (await chart(CHANNELS, 'for="channels"')) as HTMLElement & {
+      updateComplete: Promise<unknown>
+    }
+    const heard: string[] = []
+    for (const name of ['helix-reading-change', 'helix-reading-press']) {
+      host.addEventListener(name, (event) => {
+        const { index, label, pointerType } = (event as CustomEvent).detail
+        heard.push(`${name} ${index} ${label} ${pointerType}`)
+      })
+    }
+    const key = (name: string): void => {
+      part(host, 'plot')?.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          bubbles: true,
+          cancelable: true,
+          composed: true,
+          key: name,
+        }),
+      )
+    }
+    key('End')
+    await host.updateComplete
+    key('Enter')
+    const at = heard[0]?.split(' ')[1] ?? ''
+    expect(heard).toEqual([
+      `helix-reading-change ${at} Feb keyboard`,
+      `helix-reading-press ${at} Feb keyboard`,
+    ])
+  })
+})

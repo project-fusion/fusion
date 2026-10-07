@@ -12,6 +12,7 @@ export {
 export {
   ChartPointerController,
   type ChartPointerHost,
+  type ReadingHeard,
 } from './controllers/chart-pointer-controller/chart-pointer-controller.js'
 export { ChildrenController } from './controllers/children-controller/children-controller.js'
 export {
@@ -229,6 +230,8 @@ export {
   HelixPreviousEvent,
   HelixRangeChangeEvent,
   HelixReadEvent,
+  HelixReadingChangeEvent,
+  HelixReadingPressEvent,
   HelixReconnectEvent,
   HelixRejectEvent,
   HelixRelabelEvent,
@@ -264,6 +267,7 @@ export {
   type PressPointerType,
   type RangeDetail,
   type ReadDetail,
+  type ReadingDetail,
   type ReconnectDetail,
   type Refusal,
   type RefusedFile,

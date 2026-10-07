@@ -1,4 +1,5 @@
 import type { ReactiveController, ReactiveControllerHost, ReactiveElement } from 'lit'
+import type { ReadingDetail } from '../../events/details.js'
 import { isRtl } from '../../utils/is-rtl/is-rtl.js'
 import { formatWords } from '../../words/words.js'
 import { stepReading } from './reading-step.js'
@@ -70,7 +71,14 @@ export interface ChartPointerHost extends ReactiveControllerHost, HTMLElement {
    * the nearest `lang`, then the runtime's own, as `wordsLocale` does.
    */
   readonly locale?: string
+  /** The table's rows, whose headings name a reading in `onReading`. */
+  readonly sourceRows?: ReadonlyArray<{ readonly label: string }>
+  /** The heading of the column at this place in a row, which names a series in `onReading`. */
+  columnName?(cell: number): string
 }
+
+/** What `onReading` is told: the reading moved, or it was pressed. */
+export type ReadingHeard = 'change' | 'press'
 
 /**
  * Which reading a pointer is nearest, for a chart that draws no markers.
@@ -90,11 +98,13 @@ export interface ChartPointerHost extends ReactiveControllerHost, HTMLElement {
  * depending on which line the pointer drifted toward, which is a tooltip that
  * changes its mind while the reader holds still.
  *
- * **Coarse pointers get nothing.** A touch has no hover, so a tooltip driven by
- * one appears where a finger already covers it and stays after the finger
- * lifts. The table underneath is the readable version and is what a phone
- * should be given, so this listens for `pointermove` and ignores anything whose
- * `pointerType` is not fine.
+ * **A touch has no hover, so it moves nothing by passing over.** A tooltip
+ * driven by a finger dragging across would appear under the finger. So this
+ * listens for `pointermove` and ignores anything whose `pointerType` is not
+ * fine. **A tap is the touch reader's hover**, for a chart that hears its
+ * readings through `onReading`: it shows the reading tapped, as Chart.js does,
+ * and keeps it until a tap lands elsewhere, outside the chart or on another
+ * reading. A drag that scrolls the page is no tap and shows nothing.
  *
  * **The keyboard moves the same reading, which is what makes it the reading
  * and not the pointer's.** A chart's plot takes focus (`tabindex="0"` on the
@@ -157,6 +167,26 @@ export class ChartPointerController implements ReactiveController {
    */
   axis: 'block' | 'inline' | 'none' = 'inline'
 
+  /**
+   * Hears the reading: `change` each time it moves or is put away, and
+   * `press` when it is clicked, tapped, or pressed with Enter or Space.
+   *
+   * Set by a chart that sends `helix-reading-change` and
+   * `helix-reading-press`, which it does from here so the event classes are
+   * constructed in the chart that declares them. A chart that hears its
+   * readings also shows one on a tap.
+   */
+  onReading: ((heard: ReadingHeard, detail: ReadingDetail) => void) | undefined
+
+  /** What last moved the reading, which `onReading` is told. */
+  private by: ReadingDetail['pointerType'] = 'mouse'
+
+  /** The reading and the series `onReading` was last told of. */
+  private said = { at: -1, series: -1 }
+
+  /** Whether a tap shows the reading, which stays until a tap lands elsewhere. */
+  private tapped = false
+
   constructor(host: ChartPointerHost) {
     this.host = host
     host.addController(this)
@@ -168,6 +198,8 @@ export class ChartPointerController implements ReactiveController {
     this.host.addEventListener('keydown', this.key)
     this.host.addEventListener('focusin', this.arrive)
     this.host.addEventListener('focusout', this.depart)
+    this.host.addEventListener('pointerup', this.tap)
+    this.host.addEventListener('click', this.press)
   }
 
   hostDisconnected(): void {
@@ -176,9 +208,13 @@ export class ChartPointerController implements ReactiveController {
     this.host.removeEventListener('keydown', this.key)
     this.host.removeEventListener('focusin', this.arrive)
     this.host.removeEventListener('focusout', this.depart)
+    this.host.removeEventListener('pointerup', this.tap)
+    this.host.removeEventListener('click', this.press)
+    this.untap()
     this.at = -1
     this.series = -1
     this.keyed = false
+    this.said = { at: -1, series: -1 }
   }
 
   /**
@@ -277,6 +313,7 @@ export class ChartPointerController implements ReactiveController {
    * position until the render that follows.
    */
   hostUpdated(): void {
+    this.announce()
     if (!this.moved) {
       return
     }
@@ -284,6 +321,106 @@ export class ChartPointerController implements ReactiveController {
     this.host.renderRoot
       .querySelector<HTMLElement & { reposition?: () => void }>('[part="tooltip-anchor"]')
       ?.reposition?.()
+  }
+
+  /**
+   * Tells `onReading` the reading moved, once for each move.
+   *
+   * After the update, from `hostUpdated`, so a listener reading the chart
+   * finds it already showing the reading it was told of.
+   */
+  private announce(): void {
+    if (!this.onReading || (this.at === this.said.at && this.series === this.said.series)) {
+      return
+    }
+    this.said = { at: this.at, series: this.series }
+    this.onReading('change', this.detail())
+  }
+
+  /** The reading as `onReading` is told it. */
+  private detail(): ReadingDetail {
+    const at = this.at
+    const column = this.column
+    return {
+      index: at,
+      label: at < 0 ? '' : (this.host.sourceRows?.[at]?.label ?? ''),
+      pointerType: this.keyed ? 'keyboard' : this.by,
+      series: at < 0 || column === undefined ? '' : (this.host.columnName?.(column) ?? ''),
+    }
+  }
+
+  /**
+   * Shows the reading at `at` for a tap, and keeps it until a tap lands
+   * outside the chart. Public for a chart that finds the reading under a
+   * finger itself, a scatter's nearest point.
+   */
+  tapTo(at: number): void {
+    if (at < 0) {
+      return
+    }
+    this.by = 'touch'
+    if (!this.tapped) {
+      this.tapped = true
+      this.host.ownerDocument.addEventListener('pointerdown', this.away, true)
+    }
+    if (at !== this.at || this.keyed) {
+      this.at = at
+      this.keyed = false
+      this.series = -1
+      this.moved = true
+      this.host.requestUpdate()
+    }
+  }
+
+  /** Stops waiting for a tap elsewhere. */
+  private untap(): void {
+    if (this.tapped) {
+      this.tapped = false
+      this.host.ownerDocument.removeEventListener('pointerdown', this.away, true)
+    }
+  }
+
+  /** A press outside the chart puts a tapped reading away. */
+  private readonly away = (event: Event): void => {
+    if (!event.composedPath().includes(this.host)) {
+      this.clear()
+    }
+  }
+
+  private readonly tap = (event: PointerEvent): void => {
+    if (event.pointerType !== 'touch' || !this.onReading || this.axis === 'none') {
+      return
+    }
+    const at = this.resolve(event)
+    if (at !== undefined) {
+      this.tapTo(at)
+    }
+  }
+
+  /**
+   * Tells `onReading` a reading was clicked or tapped, where the press landed
+   * on the plot and a reading is shown.
+   */
+  private readonly press = (event: MouseEvent): void => {
+    if (!this.onReading || this.at < 0) {
+      return
+    }
+    const onPlot = event
+      .composedPath()
+      .some(
+        (node) =>
+          node instanceof Element &&
+          node.id === CHART_PLOT &&
+          node.getRootNode() === this.host.renderRoot,
+      )
+    if (!onPlot) {
+      return
+    }
+    const type = (event as PointerEvent).pointerType
+    this.onReading('press', {
+      ...this.detail(),
+      pointerType: type === 'touch' || type === 'pen' || type === 'mouse' ? type : this.by,
+    })
   }
 
   /**
@@ -351,6 +488,8 @@ export class ChartPointerController implements ReactiveController {
 
   /** Puts the pointer on a reading, for a chart that resolves it some other way. */
   set(at: number): void {
+    this.untap()
+    this.by = 'mouse'
     if (at !== this.at) {
       this.at = at
       this.keyed = false
@@ -378,6 +517,7 @@ export class ChartPointerController implements ReactiveController {
 
   /** Puts the reading away, as Escape and leaving the plot both do. */
   private clear(): void {
+    this.untap()
     const was = this.at
     this.at = -1
     this.series = -1
@@ -400,6 +540,14 @@ export class ChartPointerController implements ReactiveController {
       if (this.at >= 0) {
         event.preventDefault()
         this.clear()
+      }
+      return
+    }
+    /* A press of the reading the keys rest on, for a chart that hears one. */
+    if ((event.key === 'Enter' || event.key === ' ') && this.onReading) {
+      if (this.at >= 0) {
+        event.preventDefault()
+        this.onReading('press', { ...this.detail(), pointerType: 'keyboard' })
       }
       return
     }
@@ -485,15 +633,16 @@ export class ChartPointerController implements ReactiveController {
     }
   }
 
-  private readonly move = (event: PointerEvent): void => {
-    if (this.axis === 'none' || !this.accepts(event)) {
-      return
-    }
+  /**
+   * The reading a pointer is over, by the slot it is in along `axis`, or
+   * `undefined` with nothing to measure.
+   */
+  private resolve(event: PointerEvent): number | undefined {
     const box = this.box()
     const count = this.host.readings
     const along = this.axis === 'block' ? box?.height : box?.width
     if (!box || !along || count === 0) {
-      return
+      return undefined
     }
     /* The same slot arithmetic the charts draw with: reading `i` sits in the
        middle of the `i`th of `count` equal slots, so the nearest is the slot
@@ -510,7 +659,19 @@ export class ChartPointerController implements ReactiveController {
           ? box.right - event.clientX
           : event.clientX - box.left
     const slot = Math.floor((from / along) * count)
-    const next = Math.min(Math.max(slot, 0), count - 1)
+    return Math.min(Math.max(slot, 0), count - 1)
+  }
+
+  private readonly move = (event: PointerEvent): void => {
+    if (this.axis === 'none' || !this.accepts(event)) {
+      return
+    }
+    const next = this.resolve(event)
+    if (next === undefined) {
+      return
+    }
+    this.untap()
+    this.by = event.pointerType === 'pen' ? 'pen' : 'mouse'
     if (next !== this.at) {
       this.at = next
       this.keyed = false
@@ -523,7 +684,7 @@ export class ChartPointerController implements ReactiveController {
   /* A reading the keyboard chose stays when the pointer leaves, so a reader who
      nudged the mouse while reading by key does not lose their place. */
   private readonly leave = (): void => {
-    if (this.at !== -1 && !this.keyed) {
+    if (this.at !== -1 && !this.keyed && !this.tapped) {
       this.at = -1
       this.host.requestUpdate()
     }

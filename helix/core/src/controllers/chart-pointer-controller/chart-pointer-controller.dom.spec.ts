@@ -652,3 +652,80 @@ describe('where a reading stands', () => {
     expect(one.point.position).toBe('')
   })
 })
+
+/* A chart had no channel at all: a page could not hear which reading a reader
+   was on, or that one was pressed, and a phone was shown no reading. */
+describe('a chart that hears its readings', () => {
+  type Heard = [string, { index: number; label: string; pointerType: string; series: string }]
+
+  const hearing = (readings: number): Keyed & { heard: Heard[] } => {
+    const one = keyed(readings, { columns: [0, 1] }) as Keyed & { heard: Heard[] }
+    one.heard = []
+    Object.assign(one.host, {
+      columnName: (cell: number) => ['Visits', 'Sales'][cell] ?? '',
+      sourceRows: Array.from({ length: readings }, (_, at) => ({ label: `Q${at + 1}` })),
+    })
+    one.point.onReading = (heard, detail) => one.heard.push([heard, { ...detail }])
+    return one
+  }
+
+  const tap = (one: Scene, x: number, y: number): void => {
+    const event = new Event('pointerup', { bubbles: true })
+    Object.assign(event, { clientX: x, clientY: y, pointerType: 'touch' })
+    one.host.dispatchEvent(event)
+  }
+
+  test('shows the reading a tap lands on, and keeps it until a tap lands outside', () => {
+    const one = hearing(4)
+    tap(one, 121, 100)
+    expect(one.point.at).toBe(2)
+    one.host.dispatchEvent(new Event('pointerleave'))
+    expect(one.point.at).toBe(2)
+    document.body.dispatchEvent(new Event('pointerdown', { bubbles: true }))
+    expect(one.point.at).toBe(-1)
+  })
+
+  test('while a chart that does not hear them shows nothing on a tap, as before', () => {
+    const one = scene(4)
+    tap(one, 121, 100)
+    expect(one.point.at).toBe(-1)
+  })
+
+  test('is told each move once, after the update, with the reading and what moved it', () => {
+    const one = hearing(4)
+    move(one, 121, 100)
+    one.point.hostUpdated()
+    move(one, 125, 100)
+    one.point.hostUpdated()
+    one.press('ArrowDown')
+    one.point.hostUpdated()
+    one.host.dispatchEvent(new Event('pointerleave'))
+    one.point.hostUpdated()
+    expect(one.heard).toEqual([
+      ['change', { index: 2, label: 'Q3', pointerType: 'mouse', series: '' }],
+      ['change', { index: 2, label: 'Q3', pointerType: 'keyboard', series: 'Visits' }],
+    ])
+  })
+
+  test('is told of a press: a click on the plot, and Enter or Space on a reading', () => {
+    const one = hearing(4)
+    move(one, 71, 100)
+    one.plot.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+    one.press('End')
+    const enter = one.press('Enter')
+    one.press(' ')
+    expect(enter.defaultPrevented).toBe(true)
+    expect(one.heard.filter(([heard]) => heard === 'press')).toEqual([
+      ['press', { index: 1, label: 'Q2', pointerType: 'mouse', series: '' }],
+      ['press', { index: 3, label: 'Q4', pointerType: 'keyboard', series: '' }],
+      ['press', { index: 3, label: 'Q4', pointerType: 'keyboard', series: '' }],
+    ])
+  })
+
+  test('and of no press where no reading is shown', () => {
+    const one = hearing(4)
+    one.plot.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+    expect(one.press('Enter').defaultPrevented).toBe(false)
+    expect(one.heard).toEqual([])
+  })
+})

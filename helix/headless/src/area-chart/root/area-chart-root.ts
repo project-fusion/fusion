@@ -6,6 +6,8 @@ import {
   formatNumbers,
   formatWords,
   HelixElement,
+  HelixReadingChangeEvent,
+  HelixReadingPressEvent,
   linear,
   linePath,
   MixinChartSource,
@@ -104,11 +106,19 @@ export interface AreaStack {
  * Every numeric column is a part, so leave a total column out of the table the
  * chart reads, or it is counted twice. A negative reading is drawn as zero.
  *
+ * **A tap shows the reading under it**, and keeps it until a tap lands
+ * elsewhere. `helix-reading-change` says each move of the reading, by pointer,
+ * tap or key, and `helix-reading-press` says a reading was clicked, tapped, or
+ * pressed with Enter or Space, for a page that opens what a reading stands for.
+ *
  * @since 0.1.0
  * @status stable
  * @category charts
  * @aliases Stacked Area Chart, Composition Chart, Banded Chart
  * @documentation https://fusion.dev/helix/components/area-chart
+ *
+ * @event {HelixReadingChangeEvent} helix-reading-change - The reading shown moved, or was put away: `index` is the row, or `-1` for none, with its `label`, the `series` the keys rest on, and the `pointerType` that moved it.
+ * @event {HelixReadingPressEvent} helix-reading-press - A reading was clicked, tapped, or pressed with Enter or Space, with the same detail as `helix-reading-change`.
  *
  * @csspart area - One part's band.
  * @csspart baseline - The rule at zero, which is the floor of the drawing.
@@ -146,6 +156,22 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
    * `registerWords('de', { 'helix-area-chart': { totalLabel: 'Summe' } })`.
    */
   static words = 'helix-area-chart'
+
+  /**
+   * Sends the reading's moves and presses as `helix-reading-change` and
+   * `helix-reading-press`, which the pointer hears. Here and not in a
+   * constructor, where the manifest's analyzer reads the assignment as a
+   * member of this class.
+   */
+  override connectedCallback(): void {
+    super.connectedCallback()
+    this.pointer.onReading = (heard, detail) =>
+      this.dispatchEvent(
+        heard === 'press'
+          ? new HelixReadingPressEvent(detail)
+          : new HelixReadingChangeEvent(detail),
+      )
+  }
 
   /**
    * How a band's edge gets from one reading to the next.

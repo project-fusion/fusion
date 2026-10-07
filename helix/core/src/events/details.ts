@@ -416,6 +416,21 @@ export interface PressDetail {
   pointerType: PressPointerType
 }
 
+/** Detail carried by `helix-reading-change` and `helix-reading-press`. */
+export interface ReadingDetail {
+  /** The reading's place among the table's rows, counting from 0, or `-1` once no reading is shown. */
+  index: number
+  /** The reading's name, its row's heading, such as `March`. Empty with no reading. */
+  label: string
+  /** What moved to the reading or pressed it. */
+  pointerType: 'keyboard' | 'mouse' | 'pen' | 'touch'
+  /**
+   * The heading of the series the up and down keys rest on within the
+   * reading, or `''` while the whole reading is read.
+   */
+  series: string
+}
+
 /** Detail carried by `helix-band`. */
 export interface BandDetail {
   /** The band the reading is in now, or `''` where it is in none. */

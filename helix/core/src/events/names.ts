@@ -25,7 +25,8 @@ export const helixEventNames: ReadonlySet<string> = new Set(
     'filtered graph-filter graph-layout graph-pan graph-part-change graph-ready ' +
     'graph-signal graph-zoom history load load-more map-cluster map-pan map-part-change ' +
     'map-ready map-rotate map-tilt map-zoom move navigate next panel-resize pin press ' +
-    'preview previous range-change read reconnect reject relabel remove reorder ' +
+    'preview previous range-change read reading-change reading-press reconnect reject ' +
+    'relabel remove reorder ' +
     'reordered resize resized sample-end sample-start scrolled select selected send ' +
     'shortcut sort sorted split toggle tour-ask tour-status typing'
   )

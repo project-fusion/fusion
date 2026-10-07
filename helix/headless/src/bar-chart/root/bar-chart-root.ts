@@ -7,6 +7,8 @@ import {
   formatNumbers,
   formatWords,
   HelixElement,
+  HelixReadingChangeEvent,
+  HelixReadingPressEvent,
   linear,
   linePath,
   MixinChartSource,
@@ -55,11 +57,19 @@ import '../../tooltip/index.js'
  * The component writes the custom properties below with numbers it computes,
  * and the stylesheet that draws the chart reads them. Do not set them yourself.
  *
+ * **A tap shows the reading under it**, and keeps it until a tap lands
+ * elsewhere. `helix-reading-change` says each move of the reading, by pointer,
+ * tap or key, and `helix-reading-press` says a reading was clicked, tapped, or
+ * pressed with Enter or Space, for a page that opens what a reading stands for.
+ *
  * @since 0.1.0
  * @status stable
  * @category charts
  * @aliases Column Chart, Categorical Chart
  * @documentation https://fusion.dev/helix/components/bar-chart
+ *
+ * @event {HelixReadingChangeEvent} helix-reading-change - The reading shown moved, or was put away: `index` is the row, or `-1` for none, with its `label`, the `series` the keys rest on, and the `pointerType` that moved it.
+ * @event {HelixReadingPressEvent} helix-reading-press - A reading was clicked, tapped, or pressed with Enter or Space, with the same detail as `helix-reading-change`.
  *
  * @csspart axis - The numbers of one scale, drawn only when `secondary` splits the chart into two scales.
  * @csspart band - The category band under the pointer.
@@ -109,6 +119,22 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
    * `registerWords('de', { 'helix-bar-chart': { highestLabel: 'Höchster Wert' } })`.
    */
   static words = 'helix-bar-chart'
+
+  /**
+   * Sends the reading's moves and presses as `helix-reading-change` and
+   * `helix-reading-press`, which the pointer hears. Here and not in a
+   * constructor, where the manifest's analyzer reads the assignment as a
+   * member of this class.
+   */
+  override connectedCallback(): void {
+    super.connectedCallback()
+    this.pointer.onReading = (heard, detail) =>
+      this.dispatchEvent(
+        heard === 'press'
+          ? new HelixReadingPressEvent(detail)
+          : new HelixReadingChangeEvent(detail),
+      )
+  }
 
   /**
    * Which gridlines are drawn across the plot, if any.
