@@ -3,6 +3,7 @@ import {
   deepActiveElement,
   HelixElement,
   HelixSelectEvent,
+  hostAria,
   slotFilled,
   slotNamed,
 } from '@fusion.dev/helix-core'
@@ -97,6 +98,13 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
   focusable = false
 
   /**
+   * @internal Whether the row is a list item of a drilldown with
+   * `navigation`. Written by the stack.
+   */
+  @property({ attribute: false })
+  listed = false
+
+  /**
    * The URL the row links to. Setting it renders the row as a link, unless the
    * row opens a page or is disabled.
    */
@@ -178,6 +186,11 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
    */
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    /* A list item only where its row shows. A row that holds the page showing
+       passes that page's rows through, and a row off the page draws nothing,
+       so neither is an item of the list. */
+    const item = this.listed && this.onPage && !this.showingPage && !this.onPath
+    hostAria(this.internals, { role: item ? 'listitem' : '' })
     if (this.childrenKnown) {
       const named = (name: string): boolean =>
         this.knownChildren.some((child) => child.slot === name)
@@ -359,7 +372,7 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
           target=${this.target || nothing}
           rel=${this.rel || nothing}
           ?download=${this.download}
-          role="menuitem"
+          role=${this.listed ? nothing : 'menuitem'}
           aria-describedby=${this.describedBy}
           tabindex=${this.focusable ? '0' : '-1'}
           ?data-described=${this.description}
@@ -369,10 +382,10 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
       : html`<button
           part="item"
           type="button"
-          role="menuitem"
+          role=${this.listed ? nothing : 'menuitem'}
           aria-describedby=${this.describedBy}
           aria-disabled=${this.disabled ? 'true' : nothing}
-          aria-haspopup=${this.page ? 'menu' : nothing}
+          aria-haspopup=${this.page && !this.listed ? 'menu' : nothing}
           tabindex=${this.focusable ? '0' : '-1'}
           ?data-described=${this.description}
           @click=${this.handleClick}

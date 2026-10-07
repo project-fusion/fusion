@@ -482,3 +482,59 @@ describe('the icons a drilldown draws', () => {
     ).not.toBeNull()
   })
 })
+
+/* The APG's disclosure navigation, and Radix's NavigationMenu, keep places to
+   go in a list of links. Menu roles are for commands. */
+describe('a drilldown with navigation', () => {
+  const site = async (): Promise<Stack> =>
+    (await mount(
+      `<helix-headless-drilldown label="Site" navigation>
+        <helix-headless-drilldown-item value="docs">Docs
+          <helix-headless-drilldown-item slot="page" value="intro" href="/docs/intro">Introduction</helix-headless-drilldown-item>
+        </helix-headless-drilldown-item>
+        <helix-headless-drilldown-item value="blog" href="/blog">Blog</helix-headless-drilldown-item>
+      </helix-headless-drilldown>`,
+    )) as Stack
+  const internalRole = (element: Element): string | null =>
+    (element as unknown as { internals: ElementInternals }).internals.role ?? null
+
+  test('is a navigation landmark named by its label, whose page is a list of items', async () => {
+    const host = await site()
+    expect(internalRole(host)).toBe('navigation')
+    expect((host as unknown as { internals: ElementInternals }).internals.ariaLabel).toBe('Site')
+    const page = part(host, 'page')
+    expect(page?.getAttribute('role')).toBe('list')
+    const [docs, blog] = [...host.children] as HTMLElement[]
+    await (blog as unknown as Stack).updateComplete
+    expect(internalRole(docs as HTMLElement)).toBe('listitem')
+    expect(internalRole(blog as HTMLElement)).toBe('listitem')
+    const link = part(blog as HTMLElement, 'item')
+    expect(link?.tagName).toBe('A')
+    expect(link?.hasAttribute('role')).toBe(false)
+    const opener = part(docs as HTMLElement, 'item')
+    expect(opener?.hasAttribute('role')).toBe(false)
+    expect(opener?.hasAttribute('aria-haspopup')).toBe(false)
+  })
+
+  test('the rows of a page below are the list, and the rows above take no place in it', async () => {
+    const host = await site()
+    await press(host, host.querySelector('[value="docs"]') as Element)
+    await host.updateComplete
+    const docs = host.querySelector('[value="docs"]') as Stack
+    const intro = host.querySelector('[value="intro"]') as Stack
+    const blog = host.querySelector('[value="blog"]') as Stack
+    await Promise.all([docs.updateComplete, intro.updateComplete, blog.updateComplete])
+    expect(internalRole(docs)).toBeNull()
+    expect(internalRole(blog)).toBeNull()
+    expect(internalRole(intro)).toBe('listitem')
+  })
+
+  test('without it, the host is no landmark and the rows are menu items', async () => {
+    const host = await stack()
+    expect(internalRole(host)).toBeNull()
+    const row = host.querySelector('[value="about"]') as Stack
+    await row.updateComplete
+    expect(internalRole(row)).toBeNull()
+    expect(part(row, 'item')?.getAttribute('role')).toBe('menuitem')
+  })
+})
