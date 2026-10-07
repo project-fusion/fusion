@@ -282,6 +282,19 @@
   );
 }
 
+/* The range a reader is about to choose, from the end they chose to the day
+   under the pointer or the focus: the band, lighter. After the band of a
+   chosen range, which its first end also carries, so this one wins there. */
+[part~="cell"][data-range-preview]:is([data-range-start], [data-range-middle], [data-range-end]) {
+  background-color: var(
+    --date-picker-range-preview-color,
+    light-dark(
+      color-mix(in oklab, var(--helix-color-foreground) 5%, transparent),
+      color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)
+    )
+  );
+}
+
 [part~="cell"][aria-selected]:not([data-range-start]):not([data-range-middle]):not([data-range-end])
   [part~="day"] {
   box-shadow: 0 0 0 calc((var(--_calendar-row) - var(--_calendar-day)) / 2)

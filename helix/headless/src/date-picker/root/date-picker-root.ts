@@ -87,7 +87,14 @@ const firstOf = (year: number, month: number): Date =>
  *
  * `mode` sets how many dates are held. Unset holds one, `range` holds two and
  * marks the dates between them, and `multiple` toggles each date. All three
- * read and write the same comma-separated `value`.
+ * read and write the same comma-separated `value`. With a `mode`, the grid
+ * carries `aria-multiselectable`. While a range holds one end, the grid draws
+ * the range to the day under the pointer or the focus, marking those cells
+ * `data-range-preview`.
+ *
+ * The chosen date, range, or count of dates is the grid's description, in a
+ * region screen readers announce when it changes, as React Aria's calendars
+ * do. `selection-label` words it.
  *
  * `max-view` makes the heading a button that steps back to the months of the
  * year, and with `year` to a page of years, as Zag's date picker does. The
@@ -120,7 +127,7 @@ const firstOf = (year: number, month: number): Date =>
  * @event {Event} input - Fired after the value changes.
  *
  * @csspart cell - One column of a week row. A range is painted on the cells.
- * @csspart cell-range-end - The cell of a range's last day, beside `cell`.
+ * @csspart cell-range-end - The cell of a range's last day, beside `cell`, or of the day a waiting range is drawn to.
  * @csspart cell-range-middle - A cell between a range's ends, beside `cell`.
  * @csspart cell-range-start - The cell of a range's first day, beside `cell`.
  * @csspart day - The shape inside a cell. A single chosen date is painted on it.
@@ -146,12 +153,16 @@ const firstOf = (year: number, month: number): Date =>
  * @csspart periods - The grid of months or years.
  * @csspart previous - The control that moves to the previous month.
  * @csspart previous-mark - The glyph on the previous month control, where none is slotted.
+ * @csspart selection - The chosen date or range in words, which screen readers hear when it changes. Drawn for screen readers only.
  * @csspart week - One row of days.
  * @csspart weekday - A column header naming a day of the week. It shows the short name and says the full one.
  *
  * @cssproperty --date-picker-column-count - How many month columns are drawn, capped at two. `--date-picker-columns` overrides it.
  *
  * @cssstate invalid - While `invalid` is set, `feedback` says what is wrong, the picker holds a date outside `min` and `max` or one it bars, or it is `required`, holds no date, and the reader has answered once or a form has refused it.
+ * @cssstate month-view - While the months of a year are shown, where `max-view` is set.
+ * @cssstate range-pending - While a `range` holds its first end and waits for the second.
+ * @cssstate year-view - While a page of years is shown, where `max-view` is `year`.
  */
 @customElement('helix-headless-date-picker')
 export class HelixHeadlessDatePicker extends MixinPickerFeedback(
@@ -454,6 +465,52 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
     return first <= second ? [first, second] : [second, first]
   }
 
+  /**
+   * The day a reader points at or moves to while a range holds one end, which
+   * the grid draws the range to before it is chosen.
+   */
+  @state()
+  private previewed = ''
+
+  /** Whether a range holds its first end and waits for the second. */
+  private get pending(): boolean {
+    return this.mode === 'range' && this.selected.length === 1
+  }
+
+  /**
+   * The range the grid draws: the chosen one, or, while one end waits for
+   * the other, the run to the day under the pointer or the focus.
+   */
+  private get drawnRange(): { ends: [string, string]; preview: boolean } | null {
+    const range = this.range
+    if (range) {
+      return { ends: range, preview: false }
+    }
+    const end = this.previewed || this.focused
+    const start = this.selected[0]
+    if (
+      !this.pending ||
+      start === undefined ||
+      end === '' ||
+      end === start ||
+      asDate(end) === null
+    ) {
+      return null
+    }
+    return { ends: start <= end ? [start, end] : [end, start], preview: true }
+  }
+
+  /** Draws a waiting range to the day the pointer is on. */
+  private preview(iso: string): void {
+    if (this.pending && iso !== this.previewed) {
+      this.previewed = iso
+    }
+  }
+
+  private readonly handleGridLeave = (): void => {
+    this.previewed = ''
+  }
+
   private isSelected(iso: string): boolean {
     const range = this.range
     if (range) {
@@ -619,6 +676,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
   private moveTo(wanted: Date): void {
     const date = this.clamp(wanted)
     this.focused = fromDate(date)
+    this.previewed = ''
     this.show(date)
     this.updateComplete.then(() => {
       this.renderRoot.querySelector<HTMLElement>('[part~="cell"][tabindex="0"]')?.focus()
@@ -657,6 +715,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
        roving tab stop is about where they are rather than about what is
        chosen. The selection is the part that can be refused. */
     this.focused = iso
+    this.previewed = ''
 
     /* Announced before it is written, so a listener calling `preventDefault()`
        refuses a date that has not been chosen yet. `requestChange` is the one
@@ -962,6 +1021,49 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
   required = false
 
   /**
+   * What a screen reader hears about the chosen dates: the grid's
+   * description, said again whenever the dates change. `{kind}` is `date`,
+   * `start` while a range holds one end, `range`, or `dates` for `multiple`.
+   * `{start}` and `{end}` are dates written in `locale`, and `{count}` is how
+   * many dates are chosen.
+   */
+  @words
+  @property({ attribute: 'selection-label' })
+  selectionLabel =
+    '{kind, select, date {Selected date: {start}} start {Range starts {start}. Choose the day it ends.} range {Selected range: {start} to {end}} other {{count, plural, one {# date selected} other {# dates selected}}}}'
+
+  /**
+   * `selectionLabel` for the dates chosen now, or nothing while there are none.
+   *
+   * React Aria's calendars describe the grid by the chosen date or range and
+   * announce it when it changes. Measured before this: a range of seven days
+   * was seven cells with `aria-selected` in a grid that said nothing of a
+   * range, and choosing its end was heard as one more selected cell.
+   */
+  private get selectionWords(): string {
+    const dates = this.selected.map((one) => asDate(one))
+    const first = dates[0]
+    if (!first || dates.some((one) => one === null)) {
+      return ''
+    }
+    const { long } = this.formats
+    const range = this.range
+    const kind = range
+      ? 'range'
+      : this.pending
+        ? 'start'
+        : this.mode === 'multiple'
+          ? 'dates'
+          : 'date'
+    return formatWords(this, 'selectionLabel', {
+      count: dates.length,
+      end: range ? long.format(asDate(range[1]) as Date) : '',
+      kind,
+      start: long.format(range ? (asDate(range[0]) as Date) : first),
+    })
+  }
+
+  /**
    * How far apart the selectable dates are, in days.
    *
    * `<input type="date" step>`'s own unit, counted from `min` where there is
@@ -1152,6 +1254,9 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
        property says nothing about it. Writing `disabled` here also overwrote
        the answer `HelixFormElement.willUpdate` had just computed. */
     this.internals.ariaDisabled = this.isDisabled ? 'true' : null
+    this.toggleState('range-pending', this.pending)
+    this.toggleState('month-view', this.view === 'month')
+    this.toggleState('year-view', this.view === 'year')
     this.report()
   }
 
@@ -1304,7 +1409,9 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
        `day-today` on the day, so a consumer can add a mark from CSS. Computed
        once per month rather than per cell. */
     const today = todayIn(this.timeZone)
-    const range = this.range
+    const drawn = this.drawnRange
+    const range = drawn?.ends ?? null
+    const preview = drawn?.preview === true
     const weekend = this.weekend
 
     // One set of controls across the whole run: back on the first month,
@@ -1355,8 +1462,11 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
         part="grid"
         role="grid"
         aria-label=${heading}
+        aria-describedby=${this.selectionWords === '' ? nothing : 'selection'}
+        aria-multiselectable=${this.mode === undefined ? nothing : 'true'}
         aria-readonly=${this.readOnly ? 'true' : nothing}
         data-unset=${this.value === '' ? '' : nothing}
+        @pointerleave=${this.handleGridLeave}
       >
         <div part="week" role="row">
           ${weeks[0]?.map(
@@ -1406,11 +1516,13 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
                 data-outside=${outside ? '' : nothing}
                 data-range-end=${end ? '' : nothing}
                 data-range-middle=${middle ? '' : nothing}
+                data-range-preview=${preview && (start || middle || end) ? '' : nothing}
                 data-range-start=${start ? '' : nothing}
                 data-today=${iso === today ? '' : nothing}
                 data-weekend=${weekend.includes(date.getUTCDay()) ? '' : nothing}
                 tabindex=${!outside && iso === anchor && !this.isDisabled ? '0' : '-1'}
                 @click=${outside ? nothing : () => this.select(date)}
+                @pointerenter=${outside ? nothing : () => this.preview(iso)}
                 ><span
                   part="day${!outside && selected && !middle ? ' day-selected' : ''}${iso === today ? ' day-today' : ''}${outside ? ' day-outside' : ''}${disabled ? ' day-disabled' : ''}${weekend.includes(date.getUTCDay()) ? ' day-weekend' : ''}"
                   >${this.renderDay(date, outside)}</span
@@ -1545,6 +1657,9 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
           this.renderMonth(this.system.add(shown, index), index),
         )}
       </div>
+      <span part="selection" id="selection" data-spoken aria-live="polite"
+        >${this.selectionWords}</span
+      >
       <slot name="footer"></slot>${this.renderPickerFeedback()}`
   }
 

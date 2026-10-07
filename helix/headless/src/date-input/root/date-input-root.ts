@@ -161,6 +161,7 @@ const dates = (value: string): string[] =>
  * @csspart picker-periods - The grid of months or years.
  * @csspart picker-previous - The control that moves to the previous month.
  * @csspart picker-previous-mark - The icon on the previous month control.
+ * @csspart picker-selection - The chosen date or range in words, which screen readers hear when it changes. Drawn for screen readers only.
  * @csspart picker-week - One row of days.
  * @csspart picker-weekday - A column header naming a day of the week.
  * @csspart rest - The count of dates beyond the ones shown. It is a `<button>` with `expandable` and a `<span>` without it.
@@ -513,6 +514,16 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
   removeLabel = 'Remove {name}'
 
   /**
+   * What a screen reader hears about the dates chosen in the calendar, with
+   * `{kind}`, `{start}`, `{end}` and `{count}` filled in as Date Picker's
+   * `selection-label` says.
+   */
+  @words
+  @property({ attribute: 'selection-label' })
+  selectionLabel =
+    '{kind, select, date {Selected date: {start}} start {Range starts {start}. Choose the day it ends.} range {Selected range: {start} to {end}} other {{count, plural, one {# date selected} other {# dates selected}}}}'
+
+  /**
    * How far apart the selectable dates are, in days.
    *
    * `<input type="date" step>`'s own unit, handed to the calendar this renders
@@ -826,7 +837,7 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
         period-disabled: picker-period-disabled, period-row: picker-period-row,
         period-selected: picker-period-selected, periods: picker-periods,
         previous: picker-previous, previous-mark: picker-previous-mark,
-        week: picker-week, weekday: picker-weekday"
+        selection: picker-selection, week: picker-week, weekday: picker-weekday"
       ?invalid=${this.resolvedFeedback !== ''}
       mode=${this.mode ?? nothing}
       months=${this.fitted ?? this.months}
@@ -847,6 +858,7 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
       previous-label=${this.previousLabel}
       previous-year-label=${this.previousYearLabel}
       previous-years-label=${this.previousYearsLabel}
+      selection-label=${this.selectionLabel}
       step=${this.step}
       year-view-label=${this.yearViewLabel}
       .dayContent=${this.dayContent}
