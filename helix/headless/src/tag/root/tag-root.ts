@@ -2,10 +2,12 @@ import {
   customElement,
   drawDismiss,
   drawDismissGlyph,
+  formatMessage,
   HelixElement,
   hostAria,
   MixinDismissible,
   slottedWords,
+  wordsLocale,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -62,8 +64,9 @@ import { property } from 'lit/decorators.js'
 export class HelixHeadlessTag extends MixinDismissible(HelixElement) {
   /* "Remove" rather than the mixin's "Dismiss". A tag is taken out of a set,
      which is a different act from closing a message, and the control's name is
-     what a screen-reader user hears. */
-  override dismissLabel = 'Remove'
+     what a screen-reader user hears. One sentence with the tag's words in it,
+     `{label}`, so a translation puts them where its language does. */
+  override dismissLabel = 'Remove {label}'
 
   /**
    * Takes the tag out of reach: its link and its remove button stop
@@ -175,7 +178,7 @@ export class HelixHeadlessTag extends MixinDismissible(HelixElement) {
   private get removeName(): string {
     const words = this.words
     if (this.dismissLabel.includes('{label}')) {
-      return this.dismissLabel.replace('{label}', words).trim()
+      return formatMessage(this.dismissLabel, { label: words }, wordsLocale(this)).trim()
     }
     return words === '' || this.dismissLabel.includes(words)
       ? this.dismissLabel

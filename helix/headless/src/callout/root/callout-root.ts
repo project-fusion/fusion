@@ -7,16 +7,15 @@ import {
   MixinDismissible,
   TONE_MARKS,
   toneMark,
+  words,
+  wordsConverter,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
-/**
- * The mark for a `neutral` callout, which reports no status: the information
- * mark, named for what the passage is.
- */
-const NOTE = { icon: TONE_MARKS.info.icon, label: 'Note' }
+/** The tones a callout takes. */
+type CalloutTone = 'danger' | 'info' | 'neutral' | 'success' | 'warning'
 
 /**
  * @summary A passage set apart as a note, information, a warning, or an error.
@@ -60,6 +59,12 @@ const NOTE = { icon: TONE_MARKS.info.icon, label: 'Note' }
  */
 @customElement('helix-headless-callout')
 export class HelixHeadlessCallout extends MixinDismissible(HelixElement) {
+  /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-callout': { toneLabels: { danger: 'Fehler' } } })`.
+   */
+  static words = 'helix-callout'
+
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     // On the host, since the host is the box.
@@ -80,11 +85,24 @@ export class HelixHeadlessCallout extends MixinDismissible(HelixElement) {
   /**
    * What a screen reader is told the tone is, such as "Fehler".
    *
-   * Absent is the English for the tone: "Error", "Information", "Note",
-   * "Success" or "Warning".
+   * Absent is the tone's words in `tone-labels`, "Error", "Information",
+   * "Note", "Success" or "Warning" in English.
    */
   @property({ attribute: 'tone-label' })
   toneLabel = ''
+
+  /**
+   * What a screen reader is told each tone is, by the tone's name, written as
+   * JSON in the attribute: `tone-labels='{"danger":"Fehler"}'`. A tone left
+   * out keeps its English, and `tone-label` wins over both.
+   *
+   * `danger` is said as "Error", the word a reader understands, and
+   * `neutral` as "Note", for what the passage is.
+   */
+  // biome-ignore format: the words audit reads a table's English from the line it starts on
+  @words
+  @property({ attribute: 'tone-labels', converter: wordsConverter })
+  toneLabels: Partial<Record<'danger' | 'info' | 'neutral' | 'success' | 'warning', string>> = { danger: 'Error', info: 'Information', neutral: 'Note', success: 'Success', warning: 'Warning' }
 
   /**
    * The mark for the callout's tone, behind a seam.
@@ -123,14 +141,17 @@ export class HelixHeadlessCallout extends MixinDismissible(HelixElement) {
        is therefore always *about* something. `Toast.Item` takes the same lookup
        and draws nothing instead, since a message is just the next thing that
        happened. Same vocabulary, two honest answers to an absent tone. */
-    const { icon, label } =
-      this.tone === 'neutral' ? NOTE : (toneMark(this.tone) ?? TONE_MARKS.info)
+    /* A `neutral` callout reports no status: it takes the information mark,
+       named for what the passage is. */
+    const tone: CalloutTone =
+      this.tone === 'neutral' ? 'neutral' : toneMark(this.tone) ? (this.tone ?? 'info') : 'info'
+    const { icon } = toneMark(tone) ?? TONE_MARKS.info
 
     /* **The name is on the region, so it survives a slotted icon.** It was on
        the fallback glyph, and a consumer's own icon replaced the glyph and the
        tone's name with it, which left the color as the only thing saying
        "Error". */
-    const named = this.toneLabel || label
+    const named = this.toneLabel || (this.toneLabels[tone] ?? '')
     return html`<span part="icon" role="img" aria-label=${named}>${this.renderIcon(icon, named)}</span>
       <div part="content">
         <slot name="heading"></slot>

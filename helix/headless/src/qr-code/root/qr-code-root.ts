@@ -1,9 +1,11 @@
 import {
   customElement,
+  formatWords,
   HelixElement,
   reportRuntime,
   rgbOf,
   slotFilled,
+  words,
 } from '@fusion.dev/helix-core'
 import {
   html,
@@ -185,9 +187,24 @@ const pathFor = (
 @customElement('helix-headless-qr-code')
 export class HelixHeadlessQrCode extends HelixElement {
   /**
-   * The words a code with no `label` is named by, followed by its value where
-   * the value is a web address.
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-qr-code': { codeLabel: 'QR-Code' } })`.
    */
+  static words = 'helix-qr-code'
+
+  /**
+   * The name of a code with no `label` whose value is a web address.
+   * `{code}` is `code-label` and `{address}` the address.
+   */
+  @words
+  @property({ attribute: 'address-label' })
+  addressLabel = '{code}, {address}'
+
+  /**
+   * The words a code with no `label` is named by, with its value where the
+   * value is a web address, as `address-label` says.
+   */
+  @words
   @property({ attribute: 'code-label' })
   codeLabel = 'QR code'
 
@@ -466,7 +483,9 @@ export class HelixHeadlessQrCode extends HelixElement {
       viewBox="0 0 ${box} ${box}"
       xmlns="http://www.w3.org/2000/svg"
       role="img"
-      aria-label=${qrName(this.label, this.value, this.codeLabel)}
+      aria-label=${qrName(this.label, this.value, this.codeLabel, (address) =>
+        formatWords(this, 'addressLabel', { address, code: this.codeLabel }),
+      )}
       shape-rendering="crispEdges"
     >
       <path

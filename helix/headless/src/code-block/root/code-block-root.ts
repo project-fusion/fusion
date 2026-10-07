@@ -1,4 +1,4 @@
-import { customElement, HelixElement } from '@fusion.dev/helix-core'
+import { customElement, formatWords, HelixElement, words } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeHTML } from 'lit/directives/unsafe-html.js'
@@ -99,14 +99,22 @@ import { type DiffFile, type DiffHunk, type DiffLine, pairLines, parsePatch } fr
 @customElement('helix-headless-code-block')
 export class HelixHeadlessCodeBlock extends HelixElement {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-code-block': { copyLabel: 'Code kopieren' } })`.
+   */
+  static words = 'helix-code-block'
+
+  /**
    * The expand button's words while the block shows every line.
    */
+  @words
   @property({ attribute: 'collapse-label' })
   collapseLabel = 'Show fewer lines'
 
   /**
    * The copy button's name and tooltip text after a copy.
    */
+  @words
   @property({ attribute: 'copied-label' })
   copiedLabel = 'Copied'
 
@@ -114,11 +122,20 @@ export class HelixHeadlessCodeBlock extends HelixElement {
    * The copy button's name and tooltip text before a copy.
    *
    * Where the block has a name, the button says it too, such as "Copy code,
-   * app.ts", so each copy button on a page with several blocks is told apart.
-   * In a diff, that is each file's own name.
+   * app.ts", as `copy-name-label` puts it, so each copy button on a page with
+   * several blocks is told apart. In a diff, that is each file's own name.
    */
+  @words
   @property({ attribute: 'copy-label' })
   copyLabel = 'Copy code'
+
+  /**
+   * The copy button's name and tooltip text before a copy, where the block
+   * has a name. `{copy}` is `copy-label` and `{name}` the block's name.
+   */
+  @words
+  @property({ attribute: 'copy-name-label' })
+  copyNameLabel = '{copy}, {name}'
 
   /**
    * Whether the content is a unified diff, drawn as the lines it changed.
@@ -143,6 +160,7 @@ export class HelixHeadlessCodeBlock extends HelixElement {
   /**
    * The expand button's words while the cap hides lines.
    */
+  @words
   @property({ attribute: 'expand-label' })
   expandLabel = 'Show all lines'
 
@@ -472,7 +490,7 @@ export class HelixHeadlessCodeBlock extends HelixElement {
         tooltip-arrow-top: copy-tooltip-arrow-top, tooltip-bottom: copy-tooltip-bottom,
         tooltip-left: copy-tooltip-left, tooltip-right: copy-tooltip-right, tooltip-top: copy-tooltip-top"
       copied-label=${this.copiedLabel}
-      label=${name ? `${this.copyLabel}, ${name}` : this.copyLabel}
+      label=${name ? formatWords(this, 'copyNameLabel', { copy: this.copyLabel, name }) : this.copyLabel}
       .value=${value}
     ></${this.tag('copy-button')}>`
   }

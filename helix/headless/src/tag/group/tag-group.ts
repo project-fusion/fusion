@@ -16,6 +16,7 @@ import {
   slottedWords,
   typeaheadByWords,
   whenHydrated,
+  words,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -69,9 +70,16 @@ export type TagSelectionMode = SelectionMode
 @customElement('helix-headless-tag-group')
 export class HelixHeadlessTagGroup extends HelixElement {
   /**
+   * The key this part's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-tag-group': { emptyLabel: 'Keine Schlagwörter' } })`.
+   */
+  static words = 'helix-tag-group'
+
+  /**
    * The words the group shows and says once its last tag is removed, where
    * nothing is in the `empty` slot.
    */
+  @words
   @property({ attribute: 'empty-label' })
   emptyLabel = 'No tags'
 
