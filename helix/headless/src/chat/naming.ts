@@ -1,4 +1,4 @@
-import { fillTemplate } from '@fusion.dev/helix-core'
+import { formatMessage } from '@fusion.dev/helix-core'
 
 /*
  * What a screen reader calls a turn, as arithmetic over its author and its
@@ -48,5 +48,5 @@ export const authorWords = (
  */
 export const turnName = (author: string, time: string, words: TurnWords): string =>
   author !== '' && time !== ''
-    ? fillTemplate(words.sentence, { author, time })
+    ? formatMessage(words.sentence, { author, time }, '')
     : author || time || words.turn

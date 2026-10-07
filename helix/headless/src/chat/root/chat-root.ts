@@ -1,7 +1,7 @@
 import {
   ChildrenController,
   customElement,
-  fillTemplate,
+  formatWords,
   HelixBeforePinEvent,
   HelixElement,
   HelixHistoryEvent,
@@ -13,6 +13,7 @@ import {
   requestChange,
   VirtualizeController,
   whenHydrated,
+  words,
   wordsConverter,
 } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -22,7 +23,7 @@ import { repeat } from 'lit/directives/repeat.js'
 /* `static-html`'s `html`, because a turn fed as data is drawn with the tier's
    own message tag, and an interpolated tag is a static value. */
 import { html } from 'lit/static-html.js'
-import { FAILED_LABEL, type HelixHeadlessChatMessage } from '../message/chat-message.js'
+import type { HelixHeadlessChatMessage } from '../message/chat-message.js'
 import { TURN_WORDS, type TurnWords } from '../naming.js'
 
 /**
@@ -231,6 +232,12 @@ const spoken = (message: Element): string =>
 @customElement('helix-headless-chat')
 export class HelixHeadlessChat extends MixinCollection(HelixElement) {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-chat': { typingLabel: '{author} schreibt' } })`.
+   */
+  static words = 'helix-chat'
+
+  /**
    * Slots are assigned manually, so only the turns go into the log.
    *
    * The messages are ordinary children a consumer writes with no `slot`, and a
@@ -259,6 +266,11 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
   @property({ attribute: 'author-styles', converter: wordsConverter })
   authorStyles: Record<string, string> = {}
 
+  /** The conversation's name, read by screen readers, where `label` is empty. */
+  @words
+  @property({ attribute: 'conversation-label' })
+  conversationLabel = 'Conversation'
+
   /**
    * Whether the transcript opens pinned to the bottom, when `pinned` is not
    * set.
@@ -269,6 +281,23 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
    */
   @property({ attribute: 'default-pinned', converter: onUnlessFalse })
   defaultPinned = true
+
+  /**
+   * What a turn from `turns` that did not send says, and what a screen reader
+   * hears before its words. A turn you write as a child says its own
+   * `failed-label`.
+   */
+  @words
+  @property({ attribute: 'failed-label' })
+  failedLabel = 'Not sent'
+
+  /**
+   * What a screen reader hears for a turn that did not send. `{failed}` is the
+   * turn's `failed-label` and `{text}` is its words.
+   */
+  @words
+  @property({ attribute: 'failed-turn-label' })
+  failedTurnLabel = '{failed}: {text}'
 
   /**
    * Whether there are older turns to load, and whether they are loading.
@@ -284,6 +313,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
   /**
    * The text shown while older turns load.
    */
+  @words
   @property({ attribute: 'history-text' })
   historyText = 'Loading earlier messages'
 
@@ -296,6 +326,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
   /**
    * The word a screen reader says for `me` when it names a turn.
    */
+  @words
   @property({ attribute: 'me-label' })
   meLabel = 'You'
 
@@ -304,6 +335,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
    * `{author}` is who wrote it and `{time}` is when, as the turn shows it. A
    * turn with only one of the two is named by that one.
    */
+  @words
   @property({ attribute: 'message-label' })
   messageLabel = '{author}, {time}'
 
@@ -352,6 +384,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
    * The name a screen reader gives a turn with neither an author it can say
    * nor a time: a turn by `them` with no `author-label`, say.
    */
+  @words
   @property({ attribute: 'turn-label' })
   turnLabel = 'Message'
 
@@ -381,6 +414,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
    * What the status band says while someone is typing. `{author}` is the
    * name in `typing`.
    */
+  @words
   @property({ attribute: 'typing-label' })
   typingLabel = '{author} is typing'
 
@@ -538,7 +572,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
     if (this.fed) {
       return this.turns.map((turn) => ({
         author: turn.author,
-        failed: FAILED_LABEL,
+        failed: this.failedLabel,
         id: this.identity(turn),
         state: turn.state,
         text: turn.text,
@@ -780,7 +814,9 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
   }
 
   private phrase(turn: Heard): string {
-    return turn.state === 'failed' ? `${turn.failed}: ${turn.text}` : turn.text
+    return turn.state === 'failed'
+      ? formatWords(this, 'failedTurnLabel', { failed: turn.failed, text: turn.text })
+      : turn.text
   }
 
   /** Watches what is drawn for size, re-observing only when that changed. */
@@ -871,7 +907,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    hostAria(this.internals, { label: this.label || 'Conversation', role: 'region' })
+    hostAria(this.internals, { label: this.label || this.conversationLabel, role: 'region' })
     if (changed.has('meLabel') || changed.has('messageLabel') || changed.has('turnLabel')) {
       this.words = { me: this.meLabel, sentence: this.messageLabel, turn: this.turnLabel }
     }
@@ -1014,6 +1050,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
               at=${turn.at ?? nothing}
               style=${ownEntry(this.authorStyles, turn.author) ?? nothing}
               .turnWords=${this.words}
+              .failedLabel=${this.failedLabel}
               state=${turn.state ?? nothing}
             >${turn.text}</${message}>
           </div>`,
@@ -1038,7 +1075,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
         part="log"
         role="log"
         aria-live="off"
-        aria-label=${this.label || 'Conversation'}
+        aria-label=${this.label || this.conversationLabel}
         aria-busy=${busy ? 'true' : nothing}
         ?data-windowed=${fed}
         @scroll=${this.handleScroll}
@@ -1062,7 +1099,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
             ? nothing
             : html`<span part="typing"
                 ><span part="indicator" aria-hidden="true"></span
-                >${fillTemplate(this.typingLabel, { author: this.typing })}</span
+                >${formatWords(this, 'typingLabel', { author: this.typing })}</span
               >`
         }
       </div>
