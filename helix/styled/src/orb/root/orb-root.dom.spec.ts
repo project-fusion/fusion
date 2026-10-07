@@ -1,5 +1,8 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import type { readColor as ReadColor } from '@fusion.dev/helix-core'
+import type {
+  readColor as ReadColor,
+  readColorAlpha as ReadColorAlpha,
+} from '@fusion.dev/helix-core'
 import {
   at,
   framesBooked,
@@ -31,9 +34,10 @@ import {
    the globals it finds when it is evaluated, and a static import of it breaks
    six of these when the file runs alone. */
 let readColor: typeof ReadColor
+let readColorAlpha: typeof ReadColorAlpha
 beforeAll(async () => {
   registerDom()
-  ;({ readColor } = await import('@fusion.dev/helix-core'))
+  ;({ readColor, readColorAlpha } = await import('@fusion.dev/helix-core'))
   await import('../index.js')
 })
 
@@ -490,6 +494,35 @@ describe('reading a color the engine resolved but did not convert', () => {
     test('and still answers the grounds it paints over', () => {
       expect(readColor('#000000')).toEqual([0, 0, 0])
       expect(readColor('#ffffff')).toEqual([255, 255, 255])
+    })
+
+    /* A see-through `--orb-color` drew mid gray: painted over black and over
+       white it read back two ways, and was refused as if it did not parse. */
+    test('reads a see-through color with its alpha', () => {
+      const read = readColorAlpha('rgb(255 0 0 / 50%)')
+      expect(read?.slice(0, 3)).toEqual([255, 0, 0])
+      expect(Math.abs((read?.[3] ?? 0) - 0.5) < 0.01).toBe(true)
+      expect(readColorAlpha('rgb(12, 34, 56)')).toEqual([12, 34, 56, 1])
+      expect(readColorAlpha('not-a-color')).toBeUndefined()
+    })
+
+    test('an orb in a see-through ink draws in that ink', async () => {
+      const host = (await mount(
+        '<helix-orb state="idle" style="--orb-color: rgb(255 0 0 / 50%); --orb-ground: rgb(255 0 0 / 50%)"></helix-orb>',
+      )) as Upgraded
+      await readyToMove(host)
+      const canvas = host.shadowRoot?.querySelector('canvas') as HTMLCanvasElement
+      const pixels = canvas.getContext('2d')?.getImageData(0, 0, canvas.width, canvas.height).data
+      let red = 0
+      let other = 0
+      for (let index = 0; index < (pixels?.length ?? 0); index += 4) {
+        if ((pixels?.[index + 3] ?? 0) > 0) {
+          red += pixels?.[index] ?? 0
+          other += (pixels?.[index + 1] ?? 0) + (pixels?.[index + 2] ?? 0)
+        }
+      }
+      expect(red).toBeGreaterThan(0)
+      expect(other).toBe(0)
     })
   }
 })

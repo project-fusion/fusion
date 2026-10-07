@@ -1,6 +1,6 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { registerDom } from '@fusion.dev/helix-testing/dom'
-import { readColor, rgbOf } from './read-color.js'
+import { paintedColor, readColor, rgbOf } from './read-color.js'
 
 /* Read once the page exists: a spec that runs first finds no `document` at import. */
 let create: typeof document.createElement
@@ -59,5 +59,46 @@ describe('a computed color read as bytes', () => {
         ? ({ getContext: () => null } as unknown as HTMLCanvasElement)
         : create(tag)) as typeof document.createElement
     expect(readColor('oklch(0.5 0.1 120)')).toBeUndefined()
+  })
+})
+
+/**
+ * A context that parses what `colors` holds, ignores anything else as a real
+ * one does, and reads back `bytes` for the pixel.
+ */
+const context = (colors: string[], bytes: number[]): CanvasRenderingContext2D => {
+  let style = '#000000'
+  return {
+    clearRect: () => {},
+    fillRect: () => {},
+    get fillStyle() {
+      return style
+    },
+    set fillStyle(value: string) {
+      if (colors.includes(value) || value.startsWith('#')) {
+        style = value
+      }
+    },
+    getImageData: () => ({ data: Uint8ClampedArray.from(bytes) }),
+  } as unknown as CanvasRenderingContext2D
+}
+
+/* A see-through color was painted over black and over white, read back two
+   ways, and refused as if it did not parse: Orb drew it gray. */
+describe('a computed color painted onto a clear pixel', () => {
+  test('keeps its alpha where it is see-through', () => {
+    expect(
+      paintedColor(context(['rgb(255 0 0 / 50%)'], [255, 0, 0, 128]), 'rgb(255 0 0 / 50%)'),
+    ).toEqual([255, 0, 0, 0.502])
+  })
+
+  test('is opaque where it is', () => {
+    expect(paintedColor(context(['lab(100 0 0)'], [255, 255, 255, 255]), 'lab(100 0 0)')).toEqual([
+      255, 255, 255, 1,
+    ])
+  })
+
+  test('is refused where the engine does not parse it', () => {
+    expect(paintedColor(context([], [0, 0, 0, 255]), 'not-a-color')).toBeUndefined()
   })
 })
