@@ -3,6 +3,7 @@ import {
   HelixElement,
   hostAria,
   reportRuntime,
+  slotFilled,
   slottedWords,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
@@ -27,6 +28,13 @@ import { property } from 'lit/decorators.js'
  * attribute; a stat with no label has no role. Put a `Trend` in the `trend`
  * slot to have it read inside the group, after the figure it qualifies.
  *
+ * **Each slot is a part of the same name**, and `value` for the figure, so a
+ * page reaches the label, the unit and the trend from outside. A slot draws no
+ * box, so a part passes inherited properties to what is slotted. **The stat
+ * says which pieces it holds**, as `:state(has-label)`, `:state(has-unit)` and
+ * `:state(has-trend)`, read in the browser, so a served stat carries none
+ * until the script runs.
+ *
  * @since 0.1.0
  * @status stable
  * @category data
@@ -38,7 +46,14 @@ import { property } from 'lit/decorators.js'
  * @slot trend - How the value moved, usually a `Trend`, read after the value inside the stat's group.
  * @slot unit - The unit, shown beside the value.
  *
+ * @csspart label - The slot the label arrives through, drawing no box, as `value` does.
+ * @csspart trend - The slot the trend arrives through, drawing no box, as `value` does.
+ * @csspart unit - The slot the unit arrives through, drawing no box, as `value` does.
  * @csspart value - The slot the value is written in. A slot draws no box, so it takes the inherited properties, such as color and font, and passes them to the value.
+ *
+ * @cssstate has-label - Something is slotted into `label`.
+ * @cssstate has-trend - Something is slotted into `trend`.
+ * @cssstate has-unit - Something is slotted into `unit`.
  */
 @customElement('helix-headless-stat')
 export class HelixHeadlessStat extends HelixElement {
@@ -100,6 +115,7 @@ export class HelixHeadlessStat extends HelixElement {
      `updated`, so nothing is said there. */
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    this.readPieces()
     const given = this.direction as string | undefined
     if (changed.has('direction') && (given === 'up' || given === 'down' || given === 'neutral')) {
       reportRuntime({
@@ -113,13 +129,23 @@ export class HelixHeadlessStat extends HelixElement {
     }
   }
 
+  /** Says which pieces the stat holds, one call apiece so each pairs with its `@cssstate`. */
+  private readonly readPieces = (): void => {
+    const filled = (name: string): boolean =>
+      slotFilled(this.renderRoot?.querySelector<HTMLSlotElement>(`slot[name="${name}"]`))
+    this.toggleState('has-label', filled('label'))
+    this.toggleState('has-unit', filled('unit'))
+    this.toggleState('has-trend', filled('trend'))
+  }
+
   protected override render(): TemplateResult {
     /* The label's slot asks for the update that names the group, since a
-       label arriving later changes no property. */
-    return html`<slot name="label" @slotchange=${() => this.requestUpdate()}></slot>
+       label arriving later changes no property; that update reads the
+       pieces, and the unit's and the trend's slots read them directly. */
+    return html`<slot name="label" part="label" @slotchange=${() => this.requestUpdate()}></slot>
       <slot part="value"></slot>
-      <slot name="unit"></slot>
-      <slot name="trend"></slot>`
+      <slot name="unit" part="unit" @slotchange=${this.readPieces}></slot>
+      <slot name="trend" part="trend" @slotchange=${this.readPieces}></slot>`
   }
 }
 
