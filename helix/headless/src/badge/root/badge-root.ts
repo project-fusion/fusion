@@ -42,8 +42,7 @@ import { badgeBlank, badgeCapped, badgeText, badgeWords } from '../count.js'
  * as Web Awesome's badge takes one at its start. With no `value` the icon is
  * the whole mark, such as a check on an avatar, drawn where the dot would be.
  * The icon is hidden from screen readers: the count and `label` are what the
- * mark says. A server cannot see the slotted icon, so a served badge with an
- * icon and no value is a dot until the script runs.
+ * mark says.
  *
  * @since 0.1.0
  * @status stable
@@ -55,7 +54,7 @@ import { badgeBlank, badgeCapped, badgeText, badgeWords } from '../count.js'
  * @slot icon - An icon inside the mark, before the count, or the whole mark when there is no value. Hidden from screen readers.
  *
  * @csspart icon - The slot the icon arrives through, inside the indicator. A slot draws no box, so it passes inherited properties, such as color, to the icon.
- * @csspart indicator - The count, or the dot when there is no value and no icon.
+ * @csspart indicator - The count, or the dot when there is no value. Carries `data-dot` when there is no value, `data-single` when the count is one character, and `data-blank` when the value is zero.
  *
  * @cssstate blank - The value is zero, so there is no mark.
  * @cssstate capped - The count is past `max`, so the mark shows `{max}+`.
@@ -280,9 +279,7 @@ export class HelixHeadlessBadge extends HelixElement {
      * button holding the badge, measured. */
     const announced = !blank && (text !== '' || this.label !== '')
 
-    // The indicator holds the text and nothing else, so an absent value leaves
-    // it empty and `[part="indicator"]:empty` is what draws the dot. Lit's
-    // marker comments do not affect `:empty`, but a whitespace text node does,
+    // The indicator holds the icon's slot and the text, and no whitespace,
     // which is why the tags close the way they do.
     //
     // **A status from the start, whatever it shows.** It gained the role only
@@ -300,26 +297,25 @@ export class HelixHeadlessBadge extends HelixElement {
     // fits inside the square is a fact about the string, and CSS cannot count
     // characters.
     //
-    // **The icon's slot is inside the mark only while it holds an icon**, so a
-    // dot is still an indicator with nothing in it. Until then the slot waits
-    // outside, hidden, to hear an icon arrive.
-    const icon = this.hasIcon
-      ? html`<slot
+    // **Every marker is read off the value alone**, and the icon's slot is in
+    // the mark whether or not it holds an icon, because a server cannot see
+    // the icon: a marker that turned on it would draw one mark served and
+    // another once hydrated. `data-dot` is a mark with no value, which the
+    // styled tier sizes to fit an icon where one is slotted.
+    return html`<slot @slotchange=${this.handleSlotchange}></slot>
+      <span
+        part="indicator"
+        data-blank=${blank ? '' : nothing}
+        data-dot=${this.given.trim() === '' ? '' : nothing}
+        data-single=${text.length <= 1 ? '' : nothing}
+        role="status"
+        aria-label=${announced ? this.words : nothing}
+        ><slot
           aria-hidden="true"
           name="icon"
           part="icon"
           @slotchange=${this.readIcon}
-        ></slot>`
-      : nothing
-    return html`<slot @slotchange=${this.handleSlotchange}></slot>
-      ${this.hasIcon ? nothing : html`<slot hidden name="icon" @slotchange=${this.readIcon}></slot>`}
-      <span
-        part="indicator"
-        data-blank=${blank ? '' : nothing}
-        data-single=${text.length + (this.hasIcon ? 1 : 0) <= 1 ? '' : nothing}
-        role="status"
-        aria-label=${announced ? this.words : nothing}
-        >${icon}${blank ? html`<span aria-hidden="true">${text}</span>` : text}</span
+        ></slot>${blank ? html`<span aria-hidden="true">${text}</span>` : text}</span
       >`
   }
 }
