@@ -134,6 +134,11 @@ const nice = ([low, high]: [number, number]): [number, number] => {
  * tap or key, and `helix-reading-press` says a reading was clicked, tapped, or
  * pressed with Enter or Space, for a page that opens what a reading stands for.
  *
+ * **`data` takes the readings as data** where the page has no table to point
+ * `for` at, in a table's shape: the column headings, then one row per reading
+ * with its label first. A table is still the better source where the page can
+ * show one, since it reads before any script runs.
+ *
  * **A chart with nothing to draw says so.** A table with no readings shows
  * `empty-text`, "No readings", in the plot, and `loading` shows `loading-text`
  * there until readings arrive. The `empty` and `loading` slots take markup in

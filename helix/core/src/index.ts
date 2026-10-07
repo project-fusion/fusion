@@ -529,6 +529,12 @@ export {
   rgbOf,
 } from './utils/read-color/read-color.js'
 export {
+  type ChartData,
+  type ChartDatum,
+  rowsFromData,
+  seriesFromData,
+} from './utils/read-data/read-data.js'
+export {
   byRow,
   type Extremes,
   extremesOf,

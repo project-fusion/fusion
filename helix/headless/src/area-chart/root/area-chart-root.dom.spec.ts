@@ -344,3 +344,51 @@ describe('with nothing to draw', () => {
     expect(part(refreshing, 'svg') ?? part(refreshing, 'plot')?.querySelector('svg')).not.toBeNull()
   })
 })
+
+/* A chart read only a table by id, where a page whose numbers arrive as data
+   had to write a table to draw one. */
+describe('from data', () => {
+  const DATA = {
+    caption: 'Sessions by channel',
+    columns: ['Month', 'Direct', 'Referral'],
+    rows: [
+      ['Jan', 10, 4],
+      ['Feb', 20, 8],
+      ['Mar', 15, 6],
+    ],
+  }
+
+  test('draws the readings, named by the caption, where no table is named', async () => {
+    const chart = (await mount(
+      '<helix-headless-area-chart></helix-headless-area-chart>',
+    )) as HTMLElement & {
+      data: unknown
+      readings: number
+      updateComplete: Promise<boolean>
+    }
+    chart.data = DATA
+    await chart.updateComplete
+    expect(chart.readings).toBe(3)
+    expect(part(chart, 'plot')?.getAttribute('aria-label')).toBe('Sessions by channel')
+    expect(part(chart, 'summary')?.textContent).toContain('Sessions by channel')
+    expect(part(chart, 'empty')).toBeNull()
+    chart.data = { columns: ['Month', 'Direct', 'Referral'], rows: [] }
+    await chart.updateComplete
+    expect(part(chart, 'empty')?.textContent?.trim()).toBe('No readings')
+  })
+
+  test('a table named by for wins over data', async () => {
+    await mount(
+      `<div><table id="t"><caption>From the table</caption><thead><tr><th>Month</th><th>Direct</th></tr></thead><tbody><tr><th>Jan</th><td>3</td></tr></tbody></table><helix-headless-area-chart for="t"></helix-headless-area-chart></div>`,
+    )
+    const chart = document.querySelector('helix-headless-area-chart') as HTMLElement & {
+      data: unknown
+      readings: number
+      updateComplete: Promise<boolean>
+    }
+    chart.data = DATA
+    await chart.updateComplete
+    expect(chart.readings).toBe(1)
+    expect(part(chart, 'plot')?.getAttribute('aria-label')).toBe('From the table')
+  })
+})

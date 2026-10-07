@@ -1,16 +1,15 @@
 import { html, nothing, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import type { HelixElement } from '../../helix-element/helix-element.js'
-import { searchableById } from '../../utils/element-by-id/element-by-id.js'
 import { words } from '../../words/words.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
 type Constructor<T> = new (...args: any[]) => T
 
-/** A chart that names the table it reads with `for`. */
+/** A chart that reads a table or data, and knows whether it has looked yet. */
 interface ChartHost extends HelixElement {
-  /** The id of the table the chart reads. */
-  for: string
+  /** Whether the readings have been looked for, which a server never does. */
+  readonly readingsKnown: boolean
 }
 
 /**
@@ -53,10 +52,11 @@ export declare class MixinChartStatusInterface {
  * the same pair, `empty-text` and `loading-text` with `empty` and `loading`
  * slots for markup, such as a link to add the first reading.
  *
- * **Nothing at all while the table cannot be read**, which is a server render
- * and the hydrating one after it: there is no document to resolve `for` in, so
- * "No readings" there would be a claim about a table nobody has looked at.
- * `Heatmap` keeps the same rule for its own `empty-text`.
+ * **Nothing at all while the readings cannot be looked for**, which is a
+ * server render and the hydrating one after it: there is no document to
+ * resolve `for` in and `data` is drawn on the client only, so "No readings"
+ * there would be a claim about readings nobody has looked at. `Heatmap` keeps
+ * the same rule for its own `empty-text`.
  *
  * Applied by the four charts that draw on axes. The slots and parts are
  * documented on each of them, a class-level tag on a mixin reaching no
@@ -111,12 +111,11 @@ export const MixinChartStatus = <T extends Constructor<ChartHost>>(
       if (this.loading) {
         return html`<p dir="auto" part="loading"><slot name="loading">${this.loadingText}</slot></p>`
       }
-      const known = this.for === '' || (!this.hydrating && searchableById(this))
-      return known
+      return this.readingsKnown
         ? html`<p dir="auto" part="empty"><slot name="empty">${this.emptyText}</slot></p>`
         : nothing
     }
   }
 
-  return ChartStatusElement as T & Constructor<MixinChartStatusInterface>
+  return ChartStatusElement as unknown as T & Constructor<MixinChartStatusInterface>
 }

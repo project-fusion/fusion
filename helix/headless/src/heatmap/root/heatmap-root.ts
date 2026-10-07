@@ -15,7 +15,6 @@ import {
   rangeAdd,
   requestValue,
   StatusController,
-  searchableById,
   words,
   writtenList,
   writtenNumbers,
@@ -458,15 +457,12 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
    * in a browser is still known, and still empty: a `for` naming no table
    * should say so rather than sit blank, which is why this asks
    * `searchableById` and not `elementById`.
+   *
+   * `readingsKnown` asks it for every chart, and for `data` too, which a
+   * server does not draw.
    */
   private get sourceKnown(): boolean {
-    if (this.for === '') {
-      return true
-    }
-    if (this.hydrating) {
-      return false
-    }
-    return searchableById(this)
+    return this.readingsKnown
   }
 
   /**

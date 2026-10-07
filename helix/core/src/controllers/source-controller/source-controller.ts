@@ -1,6 +1,7 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
 import { auditSource } from '#audit-source'
-import { elementById } from '../../utils/element-by-id/element-by-id.js'
+import { elementById, searchableById } from '../../utils/element-by-id/element-by-id.js'
+import { type ChartData, rowsFromData, seriesFromData } from '../../utils/read-data/read-data.js'
 import {
   type Row,
   readRows,
@@ -8,9 +9,14 @@ import {
   type Series,
   seriesKey,
 } from '../../utils/read-series/read-series.js'
+import { wordsLocale } from '../../words/words-locale.js'
 
 /** A parse, and the table and edit it was made from. */
 interface Parsed<T> {
+  /**
+   * The data it was read from, where there was no table.
+   */
+  data: ChartData | undefined
   /**
    * The table it was read from, or null where there was none.
    */
@@ -47,6 +53,14 @@ export interface SourceHost extends ReactiveControllerHost, HTMLElement {
    * The id of the table or grid to read.
    */
   for: string
+  /**
+   * Readings given as data, read where `for` names nothing.
+   */
+  data?: ChartData | undefined
+  /**
+   * The locale numbers in `data` are written in.
+   */
+  locale?: string
 }
 
 /**
@@ -118,11 +132,49 @@ export class SourceController implements ReactiveController {
    * a template Lit throws on. The update after it, which this asks for, draws.
    */
   get element(): Element | null {
-    if ((this.host as unknown as { hydrating?: boolean }).hydrating === true) {
-      this.deferred = this.host.for !== ''
+    if (this.hydrating) {
+      this.deferred = this.host.for !== '' || this.host.data !== undefined
       return null
     }
     return this.resolve()
+  }
+
+  /** Whether the host is hydrating what a server sent. */
+  private get hydrating(): boolean {
+    return (this.host as unknown as { hydrating?: boolean }).hydrating === true
+  }
+
+  /**
+   * The host's `data`, where it is read: on the client, after hydration, and
+   * where `for` names no table.
+   *
+   * **Never on the server**, so a chart given data serves the frame, as one
+   * reading a table does, and the drawing arrives on hydration. A server's
+   * element shim has no `closest`, which is how one is told apart, Lit's
+   * `isServer` being true in any test runner that resolves its `node` build.
+   */
+  private get data(): ChartData | undefined {
+    const host = this.host as Partial<Element> & SourceHost
+    if (host.data === undefined || typeof host.closest !== 'function' || this.hydrating) {
+      return undefined
+    }
+    return host.data
+  }
+
+  /**
+   * Whether what the chart reads has been looked at: a table resolved or
+   * looked for, or data read. False on the server and while hydrating, where
+   * neither is, so a chart there says nothing about its readings.
+   */
+  get known(): boolean {
+    const host = this.host as Partial<Element> & SourceHost
+    if (host.for === '' && host.data === undefined) {
+      return true
+    }
+    if (typeof host.closest !== 'function' || this.hydrating) {
+      return false
+    }
+    return host.for === '' || searchableById(host)
   }
 
   /**
@@ -173,23 +225,35 @@ export class SourceController implements ReactiveController {
    * compare by identity.
    */
   get series(): Series[] {
-    this.heldSeries = this.parsed(this.heldSeries, (table) => (table ? readSeries(table) : []))
+    this.heldSeries = this.parsed(this.heldSeries, (table, data) =>
+      table ? readSeries(table) : data ? seriesFromData(data, wordsLocale(this.host)) : [],
+    )
     return this.heldSeries.value
   }
 
   /** Every row it holds, text and number alike, or none. Held the way `series` is. */
   get rows(): Row[] {
-    this.heldRows = this.parsed(this.heldRows, (table) => (table ? readRows(table) : []))
+    this.heldRows = this.parsed(this.heldRows, (table, data) =>
+      table ? readRows(table) : data ? rowsFromData(data, wordsLocale(this.host)) : [],
+    )
     return this.heldRows.value
   }
 
-  /** A held parse where it still describes the table, or a fresh one. */
-  private parsed<T>(held: Parsed<T> | undefined, read: (table: Element | null) => T): Parsed<T> {
+  /**
+   * A held parse where it still describes the table or the data, or a fresh
+   * one. `data` is held by identity, so a new object is read again and an
+   * object changed in place is not, as a Lit property is.
+   */
+  private parsed<T>(
+    held: Parsed<T> | undefined,
+    read: (table: Element | null, data: ChartData | undefined) => T,
+  ): Parsed<T> {
     const element = this.element
-    if (held && held.element === element && held.version === this.version) {
+    const data = element ? undefined : this.data
+    if (held && held.element === element && held.data === data && held.version === this.version) {
       return held
     }
-    return { element, value: read(element), version: this.version }
+    return { data, element, value: read(element, data), version: this.version }
   }
 
   /**
@@ -256,7 +320,8 @@ export class SourceController implements ReactiveController {
 
   hostConnected(): void {
     this.watch()
-    /* A `for` that names nothing once the page loaded, said in development. */
+    /* A `for` that names nothing once the page loaded, said in development.
+       A chart given data and no `for` reads no table, and is not asked. */
     auditSource(this.host, () => this.resolve())
   }
 
