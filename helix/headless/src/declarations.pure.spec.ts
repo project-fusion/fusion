@@ -59,3 +59,24 @@ describe('the default slot', () => {
     expect(rendering()).toContain('card/root/card-root.ts')
   })
 })
+
+describe('the label slot', () => {
+  /** The modules whose template draws a field's label, which `MixinField` renders as `<slot name="label">`. */
+  const labeling = (): string[] =>
+    modules().filter(
+      (path) =>
+        read(path).includes('MixinField(') &&
+        /\$\{this\.render(Group)?Label\(\)\}/.test(read(path)),
+    )
+
+  /* Color Input, Date Input and Time Input rendered the slot, and a slotted
+     label named the field, with no `label` slot in the manifest of either tier. */
+  test('is declared by every field that renders one', () => {
+    const undeclared = labeling().filter((path) => !read(path).includes(' * @slot label - '))
+    expect(undeclared).toEqual([])
+  })
+
+  test('finds the fields that render one', () => {
+    expect(labeling()).toContain('input/root/input-root.ts')
+  })
+})

@@ -71,6 +71,7 @@ import '../../time-picker/index.js'
  *
  * @slot feedback - The message that says what is wrong with the value.
  * @slot hint - Help under the field.
+ * @slot label - The label, for content richer than the `label` text.
  * @slot panel-footer - Content in the panel under the times, such as a note or an action.
  * @slot panel-header - Content in the panel above the times, such as a heading or a shortcut.
  * @slot trigger - The icon on the field that shows a list opens.

@@ -80,6 +80,7 @@ const dates = (value: string): string[] =>
  *
  * @slot feedback - The error message under the field.
  * @slot hint - The help text under the field.
+ * @slot label - The label, for content richer than the `label` text.
  * @slot next-icon - The icon on the calendar's next month control.
  * @slot panel-footer - Content in the panel under the calendar, such as a note or an action.
  * @slot panel-header - Content in the panel above the calendar, such as a heading or a shortcut.
