@@ -713,9 +713,13 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
   /**
    * A route or area renamed, or its description changed, which the list says
    * and a slot change does not report.
+   *
+   * Not the map's own `gestures` news, which it sends from `updated` and which
+   * changes nothing it draws: an update asked for there ran every map's
+   * update twice, and Lit's development build warned about it.
    */
   private readonly handlePartChange = (event: HelixMapPartChangeEvent): void => {
-    if (event.detail.kind !== 'place') {
+    if (event.detail.kind !== 'place' && event.detail.kind !== 'gestures') {
       this.requestUpdate()
     }
   }
