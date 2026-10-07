@@ -61,12 +61,11 @@ export default async function Page() {
      * stacking context and paint behind *its* background, which is opaque, and
      * the field would disappear. */
     /* **Inside `ThemeScope`, which is the ancestor the landing page has and this
-       one did not.** That wrapper paints an opaque `--helix-color-background`
-       and declares the scope's `color-scheme`, so everything under it resolves
-       its `light-dark()` against a stated scheme and composites against a stated
-       ground. Without it the panels' glass and the field behind them were being
-       resolved and composited against whatever the document happened to be, and
-       the two pages did not match however closely their own declarations did. */
+       one did not.** That wrapper paints an opaque `--helix-color-background`,
+       so everything under it composites against a stated ground. Without it
+       the panels' glass and the field behind them were being composited
+       against whatever the document happened to be, and the two pages did not
+       match however closely their own declarations did. */
     <ThemeScope>
       <div className={styles.servicesField}>
         <helix-aura

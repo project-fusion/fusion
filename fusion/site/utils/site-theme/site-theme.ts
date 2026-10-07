@@ -108,7 +108,7 @@ export const writeSiteTheme = (theme: Omit<StoredTheme, 'version'>): void => {
  * draw: a full-viewport field at light-mode brightness under chrome that is
  * already dark.
  */
-export const clearSiteThemeFrom = (node: HTMLElement): void => {
+const clearSiteThemeFrom = (node: HTMLElement): void => {
   for (const name of [...node.style]) {
     if (name.startsWith(OWNED)) {
       node.style.removeProperty(name)
@@ -119,15 +119,13 @@ export const clearSiteThemeFrom = (node: HTMLElement): void => {
 }
 
 /**
- * **The root is one of two elements the palette is painted onto.**
+ * **The root is the only element the palette is painted onto.**
  *
- * `paintRoot` writes it to the document root, for the aura and the wordmark,
- * which read tokens from outside any scope a page can set. `applyScope` writes
- * the same palette onto the scope element the page itself lives in. Clearing
- * only the root put the storage, the root and the controls back and left the
- * page wearing the palette regardless: measured after a reset, the root held no
- * `--helix-*` at all and the scope still held 41, so the hero stayed in the
- * reader's color while every control said it had gone.
+ * `paintRoot` writes it there, and the page's scope inherits it, as do the aura
+ * and the wordmark, which sit outside any scope a page can set. So clearing the
+ * root clears the page. Keep it the only one: a second copy on the scope once
+ * outlived a reset, and the hero stayed in the reader's color while every
+ * control said it had gone.
  */
 export const clearSiteThemeFromRoot = (): void => {
   const root = document.documentElement

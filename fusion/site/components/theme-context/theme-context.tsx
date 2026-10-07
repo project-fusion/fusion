@@ -1,18 +1,9 @@
 'use client'
 
 import { initTheme, type ThemeEngine } from '@fusion.dev/helix-theme'
-import {
-  createContext,
-  type ReactNode,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
+import { createContext, type ReactNode, useContext, useEffect, useMemo, useState } from 'react'
 import {
   BRAND_FLAG,
-  clearSiteThemeFrom,
   clearSiteThemeFromRoot,
   OWNED,
   readSiteTheme,
@@ -163,32 +154,14 @@ const readSiteScheme = (): 'dark' | 'light' => {
 }
 
 /**
- * Writes an already-derived theme onto the scope.
- */
-const applyScope = (
-  node: HTMLElement,
-  theme: Derived['theme'],
-  scheme: Controls['scheme'],
-): void => {
-  /* Set before the values, because a `var()` inside a custom property is
-     substituted on the element the property is declared on: a seed written on a
-     plain element is read by nothing until this attribute re-runs those
-     declarations. */
-  node.dataset.helixTheme = ''
-  /* Not `--helix-*`: that prefix belongs to the design system, and squatting on
-     it made the `tokens` rule read this as one of its tokens, renamed or
-     mistyped. It is a page-local flag. */
-  node.style.setProperty('--preview-color-scheme', scheme)
-  for (const token of theme.tokens) {
-    node.style.setProperty(`--helix-${token.name}`, token.hex)
-  }
-  for (const [name, value] of Object.entries(theme.seeds)) {
-    node.style.setProperty(`--helix-${name}`, value)
-  }
-}
-
-/**
- * Pushes the same palette onto the document root.
+ * Paints the palette onto the document root, and only there.
+ *
+ * **The scope inherits the palette from the root.** Every token is a custom
+ * property, and custom properties inherit, so a palette on the root reaches the
+ * page without being written twice. The scope used to be marked
+ * `data-helix-theme` and handed the same values: the mark made the stylesheet
+ * declare its default tokens on the scope again, which hid the root's, and the
+ * copy was there to win them back.
  */
 const paintRoot = (
   theme: { seeds: Record<string, string>; tokens: readonly { hex: string; name: string }[] },
@@ -239,7 +212,6 @@ const clearRoot = (): void => {
  * arrival, which is the one thing that makes the comparison worthless.
  */
 export const ThemeScope = ({ children }: { children: ReactNode }) => {
-  const scope = useRef<HTMLDivElement | null>(null)
   const [engine, setEngine] = useState<ThemeEngine | null>(null)
   const [derived, setDerived] = useState<Derived | null>(null)
 
@@ -332,19 +304,17 @@ export const ThemeScope = ({ children }: { children: ReactNode }) => {
   }, [chosen])
 
   useEffect(() => {
-    const node = scope.current
-    if (!engine || !node) {
+    if (!engine) {
       return
     }
-    /* One derivation, two destinations. Deriving twice would run the search
-       twice for one keystroke and risk the two drifting apart. */
+    /* One derivation, for the controls and the root. Deriving twice would run
+       the search twice for one keystroke and risk the two drifting apart. */
     const report = derive(engine, { accentHue, brand, chromaScale, density, radius, scheme })
     setDerived(report)
     /* The report is for the controls and can exist from the first frame. The
        page itself still waits, so it opens in exactly what the stylesheet
        ships. */
     if (touched) {
-      applyScope(node, report.theme, scheme)
       paintRoot(report.theme, scheme, brand)
       /* **Stored at the same moment it is painted, and storing the same
          thing.** The alternative was to save on a control's change handler,
@@ -367,15 +337,8 @@ export const ThemeScope = ({ children }: { children: ReactNode }) => {
    */
   useEffect(() => {
     const forget = () => {
-      /* **The scope is this component's to clear, and nothing else clears it.**
-         `forgetSiteTheme` takes the palette off the root and out of storage,
-         which is everything it can reach: the scope element is a ref in here.
-         Without this the reset put the controls back and left the page painted,
-         because `applyScope` only runs while `touched` and `touched` is about to
-         go false. */
-      if (scope.current) {
-        clearSiteThemeFrom(scope.current)
-      }
+      /* Nothing to clear here. `forgetSiteTheme` has already taken the palette
+         off the root, and the scope only ever inherited it from there. */
       setBrand(SITE_BRAND)
       setChromaScale(INITIAL.chromaScale)
       setAccentHue(INITIAL.accentHue)
@@ -437,9 +400,7 @@ export const ThemeScope = ({ children }: { children: ReactNode }) => {
     <ThemeControls.Provider value={value}>
       {/* Paints its own ground rather than inheriting the site's: see
           `.themedScope` for the light-on-dark failure that put it there. */}
-      <div className={styles.themedScope} ref={scope}>
-        {children}
-      </div>
+      <div className={styles.themedScope}>{children}</div>
     </ThemeControls.Provider>
   )
 }
