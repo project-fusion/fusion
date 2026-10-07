@@ -243,6 +243,8 @@ const NAMED = new Set([...STATUS, 'heading'])
  * | Enter, Space on a sortable heading | Sorts by the column. |
  * | Space on a row, Enter or Space on its checkbox cell | Selects the row, in a `selectable` table. |
  * | Enter or Space on a disclosure cell | Shows or hides the rows under the row, in a table whose rows nest. |
+ * | Right on a disclosure cell | Shows the rows under a shut row, and otherwise moves one cell along the row. Left does, on a right-to-left page. |
+ * | Left on a disclosure cell | Hides the rows under an open row. On any other row it moves to the row this one sits under where the disclosure cells are the first column, and otherwise one cell back along the row. |
  * | Enter or Space on a grip cell | Picks the row up, or drops it, in a `reorderable` table. Up, Down, Home, and End move a row picked up, and Escape puts it back. |
  * | Down, Up, Page Down, Page Up under `selection-behavior="replace"` | Selects the row it moves to alone. Control or Command with the key moves without selecting. |
  * | Shift with Down or Up | Selects the rows it moves across, in a `selectable` table. |
@@ -709,6 +711,7 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
       }
     },
     columns: () => this.tableColumns.filter((column) => column.shown),
+    disclose: (at, forward) => this.disclose(at, forward),
     lead: () => this.lead,
     on: () => this.grid,
     part: (name) => this.partNamed(name),
@@ -1142,6 +1145,31 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
       keys.delete(key)
     }
     this.requestSelected(keys)
+  }
+
+  /**
+   * Right or Left on a disclosure cell, as on a tree's item: on to open a
+   * shut row, back to shut an open one. Back on a row that is shut, or has
+   * no rows under it, moves to the row it sits under where the disclosure
+   * cells are the first column, since the key moves nowhere there. Anything
+   * else moves along the row.
+   */
+  private disclose(at: number, forward: boolean): boolean | number {
+    const rows = this.arrangedRows
+    const row = rows[at] as Row | undefined
+    const found = this.keyed.find((one) => one.row === row)
+    if (!(row && found)) {
+      return false
+    }
+    if (row.branch && this.open.has(found.key) !== forward) {
+      this.toggleRow(found.key)
+      return true
+    }
+    if (forward || this.lead.length > 1) {
+      return false
+    }
+    const parent = rows.indexOf(this.rowFor(row.parent ?? '') as Row)
+    return parent >= 0 ? parent : false
   }
 
   /**

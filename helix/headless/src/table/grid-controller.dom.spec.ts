@@ -355,3 +355,79 @@ describe('a grid table', () => {
     expect(heading(host, 0).hasAttribute('tabindex')).toBe(false)
   })
 })
+
+/* Right and Left moved along a nested row and never opened or shut it, so a
+   reader on the keyboard reached the rows under a folder only by Enter. */
+describe('a grid table whose rows nest', () => {
+  type Nesting = Updating & { expanded: string }
+
+  const nested = (attributes = ''): string => `
+    <helix-headless-table label="Files" grid ${attributes}>
+      <helix-headless-table-column>Name</helix-headless-table-column>
+      <helix-headless-table-row value="src"><helix-headless-table-cell>src</helix-headless-table-cell></helix-headless-table-row>
+      <helix-headless-table-row value="a" parent="src"><helix-headless-table-cell>a.ts</helix-headless-table-cell></helix-headless-table-row>
+      <helix-headless-table-row value="readme"><helix-headless-table-cell>README</helix-headless-table-cell></helix-headless-table-row>
+    </helix-headless-table>`
+
+  const table = async (attributes?: string): Promise<Nesting> => {
+    const host = (await mount(nested(attributes))) as Nesting
+    await settle(host)
+    await settle(host)
+    return host
+  }
+
+  const disclosure = (host: HTMLElement, value: string): HTMLElement =>
+    host
+      .querySelector(`[value="${value}"]`)
+      ?.shadowRoot?.querySelector('[part~="expand"]') as HTMLElement
+
+  const deepest = (): Element | null => {
+    let active = document.activeElement
+    while (active?.shadowRoot?.activeElement) {
+      active = active.shadowRoot.activeElement
+    }
+    return active
+  }
+
+  const press = async (host: Nesting, key: string): Promise<boolean> => {
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key,
+    })
+    ;(deepest() as HTMLElement).dispatchEvent(event)
+    await settle(host)
+    await settle(host)
+    return event.defaultPrevented
+  }
+
+  test('opens a shut row with Right, moves on along an open one, and shuts it with Left', async () => {
+    const host = await table()
+    disclosure(host, 'src').focus()
+    expect(await press(host, 'ArrowRight')).toBe(true)
+    expect(host.expanded).toBe('src')
+    expect(deepest()).toBe(disclosure(host, 'src'))
+    await press(host, 'ArrowRight')
+    expect(deepest()).toBe(host.querySelector('[value="src"] helix-headless-table-cell'))
+    await press(host, 'ArrowLeft')
+    expect(deepest()).toBe(disclosure(host, 'src'))
+    expect(await press(host, 'ArrowLeft')).toBe(true)
+    expect(host.expanded).toBe('')
+  })
+
+  test('moves from a row with none under it to the row it sits under with Left', async () => {
+    const host = await table('default-expanded="src"')
+    disclosure(host, 'a').focus()
+    expect(await press(host, 'ArrowLeft')).toBe(true)
+    expect(deepest()).toBe(disclosure(host, 'src'))
+    expect(host.expanded).toBe('src')
+  })
+
+  test('opens with Left on a right-to-left page', async () => {
+    const host = await table('dir="rtl"')
+    disclosure(host, 'src').focus()
+    expect(await press(host, 'ArrowLeft')).toBe(true)
+    expect(host.expanded).toBe('src')
+  })
+})

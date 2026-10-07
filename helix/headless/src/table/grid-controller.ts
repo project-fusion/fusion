@@ -68,6 +68,13 @@ export interface TableGridOptions {
    * carry the selection selects the row there.
    */
   arrive?: (to: number, control: boolean) => void
+  /**
+   * Right or Left on the disclosure cell of drawn row `row`, `forward` for
+   * the key that moves on along the line. Says that it opened or shut the
+   * row, names the drawn row to move to, or says it did neither, which moves
+   * along the row as the key does on any cell.
+   */
+  disclose?: (row: number, forward: boolean) => boolean | number
   /** Whether the table is a grid now. */
   on: () => boolean
 }
@@ -418,6 +425,22 @@ export class TableGridController implements ReactiveController {
       }
       return
     }
+    const step = inlineStep(this.host, event.key)
+    if (
+      step !== 0 &&
+      place.row >= 0 &&
+      !(event.shiftKey || event.ctrlKey || event.metaKey) &&
+      this.options.lead()[place.column] === 'expand'
+    ) {
+      const done = this.options.disclose?.(place.row, step > 0) ?? false
+      if (done !== false) {
+        event.preventDefault()
+        if (typeof done === 'number') {
+          this.moveTo({ column: place.column, row: done })
+        }
+        return
+      }
+    }
     const to = gridMove(
       event.key,
       place,
@@ -425,7 +448,7 @@ export class TableGridController implements ReactiveController {
       {
         control: event.ctrlKey || event.metaKey,
         page: event.key.startsWith('Page') ? this.pageFrom(place.cell) : 1,
-        step: inlineStep(this.host, event.key),
+        step,
       },
     )
     if (!to) {
