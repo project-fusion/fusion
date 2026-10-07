@@ -750,6 +750,15 @@ describe('a time picker’s states', () => {
     const chosen = await picker('value="09:15"')
     expect(states(chosen).has('blank')).toBe(false)
   })
+
+  test('`range-pending` while a range holds one time', async () => {
+    const states = (host: Time) =>
+      (host as unknown as { internals: ElementInternals }).internals.states
+    expect(states(await picker('mode="range" value="09:15"')).has('range-pending')).toBe(true)
+    expect(states(await picker('mode="range" value="09:15,10:00"')).has('range-pending')).toBe(
+      false,
+    )
+  })
 })
 
 describe('a time picker’s own message', () => {

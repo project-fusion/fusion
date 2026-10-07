@@ -150,6 +150,7 @@ import '../../option/index.js'
  *
  * @cssstate blank - While no time is chosen.
  * @cssstate invalid - While `invalid` is set, `feedback` says what is wrong, or the list carries `aria-invalid`.
+ * @cssstate range-pending - While a `range` holds its first time and waits for the second.
  */
 @customElement('helix-headless-time-picker')
 export class HelixHeadlessTimePicker extends MixinPickerFeedback(
@@ -951,6 +952,7 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
        should not see the previous one. */
     this.report()
     this.toggleState('blank', this.value === '')
+    this.toggleState('range-pending', this.mode === 'range' && this.held.length === 1)
   }
 
   /* A list of times with no name reads as times with nothing saying what
