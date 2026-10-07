@@ -8,6 +8,8 @@ import {
   relativeTime,
   requestChange,
   TONE_MARKS,
+  words,
+  wordsLocale,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -17,8 +19,8 @@ import { authorWords, TURN_WORDS, turnName } from '../naming.js'
 /**
  * What a turn that did not send is called, where nobody said otherwise.
  *
- * Exported because the transcript says it too: a failure is announced in the
- * words the turn shows, and two defaults for one phrase are two phrases.
+ * @deprecated The English of `failed-label`, which is now a word property:
+ * register its words with `registerWords`. Removed in the next major version.
  */
 export const FAILED_LABEL = 'Not sent'
 
@@ -72,6 +74,12 @@ export const FAILED_LABEL = 'Not sent'
 @customElement('helix-headless-chat-message')
 export class HelixHeadlessChatMessage extends HelixElement {
   /**
+   * The key this part's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-chat-message': { retryLabel: 'Erneut versuchen' } })`.
+   */
+  static words = 'helix-chat-message'
+
+  /**
    * The turn's time, in any format `Date` parses.
    */
   @property()
@@ -107,13 +115,13 @@ export class HelixHeadlessChatMessage extends HelixElement {
   /**
    * Label for a message that did not send.
    */
+  @words
   @property({ attribute: 'failed-label' })
-  failedLabel = FAILED_LABEL
+  failedLabel = 'Not sent'
 
   /**
-   * Locale for the timestamp.
-   *
-   * Empty is the runtime's own.
+   * The locale the timestamp and the words are in, as a BCP 47 tag such as
+   * `de`. Empty reads the nearest `lang`, then the browser's language.
    */
   @property()
   locale = ''
@@ -121,12 +129,14 @@ export class HelixHeadlessChatMessage extends HelixElement {
   /**
    * Label for the retry button on a failed message.
    */
+  @words
   @property({ attribute: 'retry-label' })
   retryLabel = 'Try again'
 
   /**
    * The label shown while the message is sending.
    */
+  @words
   @property({ attribute: 'sending-label' })
   sendingLabel = 'Sending'
 
@@ -162,7 +172,7 @@ export class HelixHeadlessChatMessage extends HelixElement {
   private readonly clock = new RelativeClockController(this, {
     expires: (now) => {
       const moment = this.moment
-      return moment ? relativeTime(this.locale)(moment, now).next : undefined
+      return moment ? relativeTime(wordsLocale(this))(moment, now).next : undefined
     },
   })
 
@@ -204,7 +214,7 @@ export class HelixHeadlessChatMessage extends HelixElement {
   /** The time as it reads now, or nothing where the turn has none. */
   private get reading(): string {
     const moment = this.moment
-    return moment ? relativeTime(this.locale)(moment, new Date(this.clock.now)).text : ''
+    return moment ? relativeTime(wordsLocale(this))(moment, new Date(this.clock.now)).text : ''
   }
 
   /**

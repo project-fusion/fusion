@@ -6,6 +6,7 @@ import {
   HelixTypingEvent,
   hostAria,
   markRegion,
+  words,
 } from '@fusion.dev/helix-core'
 import { arrowElbowDownLeft } from '@fusion.dev/helix-icons'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
@@ -62,8 +63,15 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 @customElement('helix-headless-chat-composer')
 export class HelixHeadlessChatComposer extends HelixFormElement {
   /**
+   * The key this part's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-chat-composer': { sendLabel: 'Senden' } })`.
+   */
+  static words = 'helix-chat-composer'
+
+  /**
    * The field's name, read by screen readers.
    */
+  @words
   @property()
   label = 'Message'
 
@@ -84,6 +92,7 @@ export class HelixHeadlessChatComposer extends HelixFormElement {
   /**
    * Label for the send button.
    */
+  @words
   @property({ attribute: 'send-label' })
   sendLabel = 'Send'
 
