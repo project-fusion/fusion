@@ -12,7 +12,7 @@ beforeAll(async () => {
 })
 
 interface Stamp extends HTMLElement {
-  date: string
+  date: Date | number | string
   elapsed: boolean
   locale: string
   updateComplete: Promise<unknown>
@@ -394,5 +394,37 @@ describe('every option Intl takes for a date', () => {
       `<helix-headless-format-date locale="en-US" date="${at}" time-zone="America/Los_Angeles" hour="numeric" day-period="long"></helix-headless-format-date>`,
     )
     expect(part(period, 'time')?.textContent).toBe(written({ dayPeriod: 'long', hour: 'numeric' }))
+  })
+})
+
+/* Assigning a `Date` threw, since only a string has `trim`. Shoelace and Web
+   Awesome take a `Date`, and a number is what `Date.now()` hands over. */
+describe('a date given as a Date or a number', () => {
+  const instant = '2026-01-02T00:00:00.000Z'
+
+  test('a Date is read as its instant', async () => {
+    const element = await stamp(
+      '<helix-headless-format-date locale="en-US" time-zone="UTC"></helix-headless-format-date>',
+    )
+    element.date = new Date(instant)
+    await element.updateComplete
+    expect(part(element, 'time')?.getAttribute('datetime')).toBe(instant)
+    expect(part(element, 'time')?.textContent).toContain('2026')
+  })
+
+  test('and so is a number of milliseconds', async () => {
+    const element = await stamp(
+      '<helix-headless-format-date locale="en-US" time-zone="UTC"></helix-headless-format-date>',
+    )
+    element.date = Date.parse(instant)
+    await element.updateComplete
+    expect(part(element, 'time')?.getAttribute('datetime')).toBe(instant)
+  })
+
+  test('an invalid Date renders nothing, as an unreadable string does', async () => {
+    const element = await stamp('<helix-headless-format-date></helix-headless-format-date>')
+    element.date = new Date(Number.NaN)
+    await element.updateComplete
+    expect(part(element, 'time')?.textContent ?? '').toBe('')
   })
 })
