@@ -61,7 +61,10 @@ export function Example() {
           slot="source"
           value="<p>Hello</p>"
         />
-        <helix-sandbox-preview slot="preview" />
+        <helix-sandbox-preview
+          slot="preview"
+          src="/sandbox/frame.html"
+        />
         <helix-sandbox-terminal slot="panel" />
       </helix-sandbox>
 
