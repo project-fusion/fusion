@@ -27,7 +27,9 @@ describe('callout server output', () => {
 
   test('the default icon ships as slot fallback, so a replacement needs no JavaScript', () => {
     const markup = withoutStyles(ssr(html`<helix-headless-callout>x</helix-headless-callout>`))
-    expect(rendered(markup, 'helix-headless-callout')).toContain('<slot name="icon">')
+    expect(rendered(markup, 'helix-headless-callout')).toMatch(
+      /<slot\s+name="icon"\s+aria-hidden="true"\s*>/,
+    )
     expect(rendered(markup, 'helix-headless-callout')).toContain('<svg')
   })
 })

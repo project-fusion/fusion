@@ -2,9 +2,11 @@ import {
   customElement,
   drawDismiss,
   drawDismissGlyph,
+  formatWords,
   HelixElement,
   hostAria,
   MixinDismissible,
+  slottedWords,
   TONE_MARKS,
   toneMark,
   words,
@@ -72,6 +74,19 @@ export class HelixHeadlessCallout extends MixinDismissible(HelixElement) {
   }
 
   /**
+   * The dismiss button's name, read by screen readers, with `{label}` for
+   * what the callout is called: its heading, or the tone's name where it has
+   * none.
+   *
+   * "Dismiss Scheduled maintenance" says which of several callouts the button
+   * takes away, where every button was "Dismiss". A label without `{label}` is
+   * read as written.
+   */
+  @words
+  @property({ attribute: 'dismiss-label' })
+  override dismissLabel = 'Dismiss {label}'
+
+  /**
    * What kind of attention the passage needs.
    *
    * `tone` is the axis for what a thing means, and this is a subset of it: a
@@ -123,7 +138,9 @@ export class HelixHeadlessCallout extends MixinDismissible(HelixElement) {
    * place for the fallback to disagree with the tone around it.
    */
   protected renderIcon(icon: { content: string; viewBox: string }, _label: string): TemplateResult {
-    return html`<slot name="icon">
+    /* `aria-hidden` on the slot, so an icon a page slots is drawn and not
+       read: Chromium read an unnamed image beside the tone's name. */
+    return html`<slot name="icon" aria-hidden="true">
       <svg part="icon-mark" fill="currentColor" viewBox=${icon.viewBox} aria-hidden="true">
         ${unsafeSVG(icon.content)}
       </svg>
@@ -139,6 +156,26 @@ export class HelixHeadlessCallout extends MixinDismissible(HelixElement) {
     return html`<slot name="dismiss-icon">
       ${drawDismissGlyph()}
     </slot>`
+  }
+
+  /**
+   * The dismiss button's name: `dismissLabel` with the heading's words, or the
+   * tone's name.
+   *
+   * The heading is read from the children, so a server and a hydrating render
+   * name the button for the tone, and the update after names it for the
+   * heading.
+   */
+  private dismissName(tone: string): string {
+    const heading = this.childrenKnown ? slottedWords(this, ['heading']) : ''
+    return this.dismissLabel.includes('{label}')
+      ? formatWords(this, 'dismissLabel', { label: heading || tone }).trim()
+      : this.dismissLabel
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.finishHydration()
   }
 
   protected override render(): TemplateResult {
@@ -159,14 +196,14 @@ export class HelixHeadlessCallout extends MixinDismissible(HelixElement) {
     const named = this.toneLabel || (this.toneLabels[tone] ?? '')
     return html`<span part="icon" role="img" aria-label=${named}>${this.renderIcon(icon, named)}</span>
       <div part="content">
-        <slot name="heading"></slot>
+        <slot name="heading" @slotchange=${() => this.requestUpdate()}></slot>
         <slot></slot>
       </div>${
         /* A plain `<button>`, as `Announcement` draws its own, so the styled
            tier reaches the control itself through `[part="dismiss"]`. */
         this.dismissible
           ? drawDismiss({
-              label: this.dismissLabel,
+              label: this.dismissName(named),
               mark: this.renderDismissIcon(),
               onDismiss: () => this.dismiss(),
             })
