@@ -1,4 +1,5 @@
 import {
+  auditName,
   CommandController,
   customElement,
   DelayController,
@@ -6,6 +7,7 @@ import {
   deepContains,
   drawDismiss,
   drawDismissGlyph,
+  FocusScopeController,
   FullscreenController,
   formatWords,
   HelixElement,
@@ -71,6 +73,25 @@ import { ZoomController } from '../zoom-controller.js'
  * `slide-role-label`, named by its `label` or by `slide-label`. A touch or a pen
  * swiped across the picture shows the next or the previous item, the way the
  * line of text runs.
+ *
+ * A press on the empty area around the item closes the viewer, as a press on
+ * the backdrop does. Under `max-zoom`, a press beside the item zooms on a
+ * double press and closes nothing, and only the space outside the viewport
+ * closes the viewer. A press that dragged closes nothing.
+ *
+ * **Keyboard.** Opening moves focus to the viewer itself, which a screen
+ * reader names.
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Right, Down | Shows the next item. On a right-to-left page, Left does. While the item is zoomed, the arrows move about it instead. |
+ * | Left, Up | Shows the previous item. |
+ * | Home, End | Shows the first or the last item. |
+ * | `+`, `-`, `0` | Zooms in, zooms out, and puts the item back at its own size, where `max-zoom` allows zooming. |
+ * | Tab, Shift+Tab | Moves through the controls in the viewer, from the last round to the first and from the first round to the last. |
+ * | Escape | Closes the viewer. A `helix-before-close` listener can refuse. |
+ *
+ * A development build warns when a viewer opens with no `label`.
  *
  * The chrome hides when there is no input, through `IdleController`, and comes
  * back on a pointer move, a key press, or a focus. It stays while focus is on a
@@ -313,6 +334,24 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
     surface: () => this.dialog,
   })
 
+  /* `Tab` from the last control goes to the first, and `Shift+Tab` from the
+     first to the last, as in `Dialog`. A native modal lets `Tab` past its last
+     control out to the browser's own controls. */
+  protected readonly scope = new FocusScopeController(this, {
+    contain: () => this.open,
+    contents: () => [
+      ...['header', '', 'footer'].flatMap(
+        (name) =>
+          this.renderRoot
+            ?.querySelector<HTMLSlotElement>(name ? `slot[name="${name}"]` : 'slot:not([name])')
+            ?.assignedElements({ flatten: true }) ?? [],
+      ),
+      /* And the controls the viewer draws itself. */
+      ...[...(this.dialog?.children ?? [])].filter((one) => one.localName === 'button'),
+    ],
+    surface: () => this.dialog,
+  })
+
   /* Pinch, double press and drag, about the viewport. */
   private readonly zoomer = new ZoomController(this, {
     max: () => (this.open ? this.maxZoom : 1),
@@ -524,7 +563,7 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
     if (keyClaimed(event) || event.altKey || event.ctrlKey || event.metaKey) {
       return
     }
-    if (this.zoomKey(event.key)) {
+    if (this.zoomKey(event.key) || this.panKey(event.key)) {
       event.preventDefault()
       return
     }
@@ -561,6 +600,30 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
     return true
   }
 
+  /**
+   * The arrow keys on a zoomed item, which move about it rather than to
+   * another item. Returns whether it was one.
+   */
+  private panKey(key: string): boolean {
+    if (this.zoomer.scale <= 1) {
+      return false
+    }
+    const box = this.partNamed('viewport')?.getBoundingClientRect()
+    const across = Math.max(40, (box?.width ?? 0) / 10)
+    const down = Math.max(40, (box?.height ?? 0) / 10)
+    const by = {
+      ArrowDown: { x: 0, y: -down },
+      ArrowLeft: { x: across, y: 0 },
+      ArrowRight: { x: -across, y: 0 },
+      ArrowUp: { x: 0, y: down },
+    }[key]
+    if (!by) {
+      return false
+    }
+    this.zoomer.panBy(by)
+    return true
+  }
+
   /** Zooms in by half again, as `+` and the zoom-in control do. */
   private zoomIn(): void {
     this.zoomer.zoomTo(this.zoomer.scale * 1.5)
@@ -585,28 +648,58 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
   }
 
   /**
-   * A press on the backdrop, which lands on the dialog element itself.
+   * A press on the backdrop or on the empty area around the item.
    *
-   * The point is compared against the panel's box rather than trusting the
-   * target alone, for the reason `Dialog` gives: a modal `<dialog>` attributes
-   * backdrop presses to itself, so any padding the styled tier gives the panel
-   * is a strip where a press on the panel looks like a press outside it.
+   * A modal `<dialog>` attributes backdrop presses to itself, and the styled
+   * tier draws the viewer over the whole screen, so a press beside the item
+   * lands on the dialog, the viewport, or the item's own box. Any of those is
+   * a reader done with the viewer, as a press on a dark room around a picture
+   * is. Not a press that dragged, which was a swipe or a pan.
    */
   private readonly handleBackdrop = (event: MouseEvent): void => {
-    const panel = this.dialog
-    if (!panel || event.target !== panel) {
-      return
-    }
-    const box = panel.getBoundingClientRect()
-    if (
-      event.clientX >= box.left &&
-      event.clientX <= box.right &&
-      event.clientY >= box.top &&
-      event.clientY <= box.bottom
-    ) {
+    if (this.dragged(event) || !this.onEmptyArea(event)) {
       return
     }
     this.requestOpen(false)
+  }
+
+  /** Where the last press began, so a press that dragged closes nothing. */
+  private pressedAt: { x: number; y: number } | undefined
+
+  private readonly handlePointerDown = (event: PointerEvent): void => {
+    this.pressedAt = { x: event.clientX, y: event.clientY }
+  }
+
+  /** Whether the press moved further than a click does, as a swipe or a pan does. */
+  private dragged(event: MouseEvent): boolean {
+    const from = this.pressedAt
+    this.pressedAt = undefined
+    return from !== undefined && Math.hypot(event.clientX - from.x, event.clientY - from.y) > 8
+  }
+
+  /**
+   * Whether a press landed on the empty area around the item: the viewer's
+   * own surface, the viewport, or an item's box beside what it holds. The
+   * last two not where `max-zoom` lets a reader zoom, since a double press
+   * there zooms.
+   */
+  private onEmptyArea(event: MouseEvent): boolean {
+    const pressed = event.composedPath()[0]
+    if (!(pressed instanceof Element)) {
+      return false
+    }
+    if (pressed === this.dialog) {
+      return true
+    }
+    if (this.maxZoom > 1) {
+      return false
+    }
+    const root = pressed.getRootNode()
+    const inItem =
+      root instanceof ShadowRoot &&
+      root.host instanceof HelixHeadlessLightboxItem &&
+      pressed.getAttribute('part') === 'item'
+    return inItem || pressed === this.partNamed('viewport')
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -648,6 +741,14 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
       return
     }
     if (this.open && !dialog.open) {
+      /* Asked once the viewer first opens, as `Dialog` asks: a viewer named
+         by `fallback-label` alone is announced as "Lightbox". */
+      auditName(
+        this,
+        () => null,
+        'Give it a `label`, such as "Project photos".',
+        () => this.label !== '',
+      )
       dialog.showModal()
       /* Said as well as marked, because `autofocus` on a dialog was honored
          when the markup opened it and not when a framework set `open` after
@@ -752,6 +853,7 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
       @close=${this.handleClose}
       @focusin=${this.idle.stir}
       @keydown=${this.handleKeydown}
+      @pointerdown=${this.handlePointerDown}
       @pointerleave=${this.idle.leave}
       @pointermove=${this.idle.stir}
     >

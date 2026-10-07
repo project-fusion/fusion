@@ -73,6 +73,19 @@ export class ZoomController implements ReactiveController {
     this.set(next, zoomAt(at, this.scale, next, this.pan))
   }
 
+  /**
+   * Moves a zoomed item by `by`, in pixels, never so far that an edge comes
+   * inside the box. Returns whether it moved.
+   */
+  panBy(by: Offset): boolean {
+    if (this.scale <= 1) {
+      return false
+    }
+    const before = this.pan
+    this.set(this.scale, { x: before.x + by.x, y: before.y + by.y })
+    return this.pan.x !== before.x || this.pan.y !== before.y
+  }
+
   /** Back to the item at its own size, in the middle. */
   reset(): void {
     if (this.scale !== 1 || this.pan.x !== 0 || this.pan.y !== 0) {
