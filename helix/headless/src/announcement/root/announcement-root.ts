@@ -13,6 +13,7 @@ import {
   onApple,
   reportRuntime,
   slottedWords,
+  words,
 } from '@fusion.dev/helix-core'
 import { x } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -97,6 +98,12 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 @customElement('helix-headless-announcement')
 export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-announcement': { label: 'Mitteilung' } })`.
+   */
+  static words = 'helix-announcement'
+
+  /**
    * How long the announcement stays, in milliseconds, before it sends
    * `helix-dismiss`. When it is not set, it stays until it is dismissed.
    *
@@ -122,6 +129,7 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
    *
    * Empty leaves the announcement no region.
    */
+  @words
   @property()
   label = 'Announcement'
 
