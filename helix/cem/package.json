@@ -36,6 +36,6 @@
     "@wc-toolkit/jsx-types": "^1.7.1"
   },
   "devDependencies": {
-    "@wc-toolkit/vuejs-types": "^1.0.1"
+    "@wc-toolkit/vuejs-types": "^1.0.3"
   }
 }
