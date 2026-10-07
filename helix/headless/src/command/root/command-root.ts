@@ -45,6 +45,9 @@ const says = (element: Element | null, state: string): boolean => {
  * palette is open. `mod` means Command on a Mac and Control elsewhere, so you
  * write one binding.
  *
+ * With `inline`, the palette is drawn in the page with no dialog, as a search
+ * over a list that is always shown.
+ *
  * The filter is cleared when the palette closes, so each opening starts from
  * the full list. Combobox and Select do the same. As typing narrows the list, a
  * screen reader hears how many commands are left, such as "3 commands".
@@ -54,16 +57,17 @@ const says = (element: Element | null, state: string): boolean => {
  *
  * | Key | What it does |
  * |---|---|
- * | `hotkey`, Command or Control with K by default | Opens the palette from anywhere on the page, or closes it. |
+ * | `hotkey`, Command or Control with K by default | Opens the palette from anywhere on the page, or closes it. With `inline`, puts focus in its filter field. |
  * | Down, Up | Moves the highlight to the next or the previous command, round from the last to the first. |
  * | Page Down, Page Up | Moves the highlight by as many commands as the list shows at once. |
  * | Home, End, Left, Right | Move the caret in the filter field. |
  * | Enter | Runs the highlighted command, or follows it where it is a link, and closes the palette. |
  * | Command or Control with Enter | Takes the highlighted command's `alternate` destination, where it has one. |
  * | Escape | Clears the filter. With the filter empty, closes the palette and puts focus back where it was. |
- * | Tab | Stays in the palette, which is modal. |
+ * | Tab | Stays in the palette, which is modal. With `inline`, moves on through the page. |
  *
- * **ARIA.** The palette is a modal `dialog` named by `label`. Inside it the
+ * **ARIA.** The palette is a modal `dialog` named by `label`, or with
+ * `inline` no dialog at all. Inside it the
  * filter field is a `combobox` with `aria-activedescendant` on the
  * highlighted command, and the commands are a `listbox` of `option`s. How
  * many commands typing left, the empty text and the loading text are said in
@@ -152,6 +156,17 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
    */
   @property()
   hotkey = 'mod+k'
+
+  /**
+   * Draws the palette in the page, where it stands, with no dialog: a search
+   * over a list of commands, as React Aria's Autocomplete is drawn.
+   *
+   * The list is always shown, and `hotkey` puts focus in its filter field.
+   * Choosing a command says `helix-select` and leaves the list where it is,
+   * and `open`, `toggle` and the dialog's parts do nothing.
+   */
+  @property({ reflect: true, type: Boolean })
+  inline = false
 
   /**
    * The commands as data, for a palette too long to draw whole: each a value,
@@ -271,7 +286,18 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
       return
     }
     event.preventDefault()
+    if (this.inline) {
+      this.searchField?.focus()
+      return
+    }
     this.requestOpen(!this.open)
+  }
+
+  /** The list's filter field, where a reader types. */
+  private get searchField(): HTMLInputElement | null {
+    return (
+      this.listbox?.renderRoot?.querySelector<HTMLInputElement>('[part="search-field"]') ?? null
+    )
   }
 
   /**
@@ -332,7 +358,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
    * stopped before the row announces its ordinary selection.
    */
   private readonly handleAlternate = (event: KeyboardEvent | MouseEvent): void => {
-    if (!(event.metaKey || event.ctrlKey) || !this.open) {
+    if (!(event.metaKey || event.ctrlKey) || !(this.open || this.inline)) {
       return
     }
     if (event instanceof KeyboardEvent && event.key !== 'Enter') {
@@ -473,9 +499,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
       /* The field takes focus as the palette arrives. A reader who pressed a
          key to summon a search expects to be typing in it, and the dialog would
          otherwise put focus on itself. */
-      this.partNamed<HelixHeadlessListbox>('listbox')
-        ?.renderRoot?.querySelector<HTMLInputElement>('[part="search-field"]')
-        ?.focus()
+      this.searchField?.focus()
     } else {
       this.listbox?.requestFilter('')
     }
@@ -503,7 +527,24 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
         }
       }}
     >
-      <${this.tag('listbox')}
+      ${this.renderListbox()}
+      <!-- Handed on only while something fills it, as the list's slots are,
+           so an empty header draws nothing in the dialog. -->
+      <slot
+        name="header"
+        slot=${this.fills('header') ? 'header' : nothing}
+        @slotchange=${() => this.requestUpdate()}
+      ></slot>
+      ${this.renderFooter('footer')}
+    </${this.tag('dialog')}>`
+  }
+
+  /**
+   * The filterable list of commands, which the dialog holds, or the page with
+   * `inline`, behind a seam the styled tier can move.
+   */
+  protected renderListbox(): TemplateResult {
+    return html`<${this.tag('listbox')}
         part="listbox"
         exportparts="empty: listbox-empty, error: listbox-error, feedback: listbox-feedback,
           filter-icon: listbox-filter-icon, filter-mark: listbox-filter-mark, hint: listbox-hint,
@@ -544,23 +585,19 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
           slot=${this.fills('filter-icon') ? 'filter-icon' : nothing}
           @slotchange=${() => this.requestUpdate()}
         ></slot>
-      </${this.tag('listbox')}>
-      <!-- Handed on only while something fills it, as above, so an empty
-           header draws nothing in the dialog. -->
+      </${this.tag('listbox')}>`
+  }
+
+  /** The row under the list, in the dialog's footer or, `inline`, under the list itself. */
+  private renderFooter(slot: string | typeof nothing): TemplateResult {
+    return html`<div ?hidden=${!this.footed} part="footer" slot=${slot}>
       <slot
-        name="header"
-        slot=${this.fills('header') ? 'header' : nothing}
-        @slotchange=${() => this.requestUpdate()}
+        name="footer"
+        @slotchange=${(event: Event) => {
+          this.footed = (event.target as HTMLSlotElement).assignedNodes().length > 0
+        }}
       ></slot>
-      <div ?hidden=${!this.footed} part="footer" slot="footer">
-        <slot
-          name="footer"
-          @slotchange=${(event: Event) => {
-            this.footed = (event.target as HTMLSlotElement).assignedNodes().length > 0
-          }}
-        ></slot>
-      </div>
-    </${this.tag('dialog')}>`
+    </div>`
   }
 
   protected override render(): TemplateResult {
@@ -569,6 +606,9 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
        the padding, rather than a host that is only a wrapper. `align` is not set
        here either, being a styled-tier property: where the panel sits is
        presentation, and this tier renders no CSS. */
+    if (this.inline) {
+      return html`<slot name="header"></slot>${this.renderListbox()}${this.renderFooter(nothing)}`
+    }
     return html`${this.renderDialog()}`
   }
 }
