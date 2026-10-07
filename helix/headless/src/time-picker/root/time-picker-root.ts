@@ -139,7 +139,7 @@ import '../../option/index.js'
  * @csspart list-loading - The text shown while the options load.
  * @csspart list-search - The region that holds the filter field.
  * @csspart list-search-field - The filter field.
- * @csspart option - One time in the list. It carries `data-between` inside a range.
+ * @csspart option - One time in the list. It carries `data-between` inside a range, and inside the run to the time under the pointer while a range waits for its second end.
  * @csspart option-between - A time inside a chosen range, excluding its ends, beside `option`.
  * @csspart option-description - The caption under the time's label, when there is one.
  * @csspart option-item - The row.
@@ -471,13 +471,41 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
     this.requestValue(added ?? '')
   }
 
-  /** Whether a time falls inside a range, which is what gets banded. */
+  /**
+   * The time under the pointer while a range holds one end, which the list
+   * bands the range to before it is chosen, as Date Picker does.
+   */
+  @state()
+  private previewed = ''
+
+  private readonly handleListHover = (event: PointerEvent): void => {
+    const option = event
+      .composedPath()
+      .find((one): one is HTMLElement => one instanceof HTMLElement && one.hasAttribute('value'))
+    const at = option?.getAttribute('value') ?? ''
+    if (this.mode === 'range' && this.held.length === 1 && at !== this.previewed) {
+      this.previewed = at
+    }
+  }
+
+  private readonly handleListLeave = (): void => {
+    this.previewed = ''
+  }
+
+  /**
+   * Whether a time falls inside a range, which is what gets banded: the
+   * chosen range, or while one end waits, the run to the time under the
+   * pointer.
+   */
   private between(at: string): boolean {
     if (this.mode !== 'range') {
       return false
     }
-    const [from, to] = this.held
-    return from !== undefined && to !== undefined && at > from && at < to
+    const [from, to = this.previewed] = this.held
+    if (from === undefined || to === '' || this.held.length > 2) {
+      return false
+    }
+    return at > (from < to ? from : to) && at < (from < to ? to : from)
   }
 
   /** The readings the wheels show, from the value or from `min`. */
@@ -951,6 +979,9 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
        too: the value is known before the render and a form read between the two
        should not see the previous one. */
     this.report()
+    if (changed.has('value')) {
+      this.previewed = ''
+    }
     this.toggleState('blank', this.value === '')
     this.toggleState('range-pending', this.mode === 'range' && this.held.length === 1)
   }
@@ -1169,6 +1200,8 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
       .value=${this.value}
       @helix-before-change=${this.handleChange}
       @input=${this.handleListInput}
+      @pointerleave=${this.handleListLeave}
+      @pointerover=${this.handleListHover}
     >
       ${this.times.map((seconds) => {
         const at = this.valueFor(seconds)

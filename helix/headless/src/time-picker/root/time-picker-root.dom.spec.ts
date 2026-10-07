@@ -553,6 +553,23 @@ describe('a time picker says when its time is wrong', () => {
   })
 })
 
+describe('a time range waiting for its end', () => {
+  /* As Date Picker draws a waiting range to the day under the pointer. */
+  test('bands the times up to the one under the pointer', async () => {
+    const host = await picker('mode="range" min="09:00" max="12:00" step="30" value="09:30"')
+    const row = options(host).find((one) => one.getAttribute('value') === '11:00') as HTMLElement
+    row.dispatchEvent(new PointerEvent('pointerover', { bubbles: true, composed: true }))
+    await host.updateComplete
+    const banded = options(host)
+      .filter((one) => one.hasAttribute('data-between'))
+      .map((one) => one.getAttribute('value'))
+    expect(banded).toEqual(['10:00', '10:30'])
+    host.shadowRoot?.querySelector('[part="list"]')?.dispatchEvent(new PointerEvent('pointerleave'))
+    await host.updateComplete
+    expect(options(host).some((one) => one.hasAttribute('data-between'))).toBe(false)
+  })
+})
+
 describe('the words on the wheels', () => {
   const column = (host: Time, which: string): HTMLElement =>
     host.shadowRoot?.querySelector(`[data-column="${which}"]`) as HTMLElement
