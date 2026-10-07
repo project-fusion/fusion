@@ -26,6 +26,12 @@ import {
   parsePatch,
 } from '../patch.js'
 
+/**
+ * Keeps the copy button's press inside the block. What the press did reaches
+ * the page as `helix-copy` or `helix-copy-error`, which the block declares.
+ */
+const stopPress = (event: Event): void => event.stopPropagation()
+
 /** Whether an element is a Code Block, of either tier, by its tag. */
 const isBlock = (element: Element | null): element is HelixHeadlessCodeBlock =>
   element?.localName.endsWith('code-block') === true
@@ -142,6 +148,8 @@ const nameOf = (block: Element): string => {
  * @slot copy-icon - The copy button's icon before a copy. Defaults to a clipboard.
  *
  * @event {Event} change - A file tab showed its file, whose name `file` now holds.
+ * @event {HelixCopyEvent} helix-copy - The copy button put the code on the clipboard, with the text in `detail.value`.
+ * @event {HelixCopyErrorEvent} helix-copy-error - A press on the copy button put nothing on the clipboard: the browser did not allow the write, or there was no code.
  * @event {HelixBeforeChangeEvent} helix-before-change - A file tab is about to show its file, with the file's name in `detail.value`. Cancelable: cancel it to keep the file shown.
  * @event {HelixBeforeToggleEvent} helix-before-toggle - The wrap button was pressed, with the `wrap` it asks for in `detail.checked`. Cancelable: cancel it to keep the lines as they are.
  * @event {HelixToggleEvent} helix-toggle - Fired after the wrap button changed `wrap`, with the new value in `detail.checked`.
@@ -1062,6 +1070,7 @@ export class HelixHeadlessCodeBlock extends HelixElement {
         tooltip-arrow-top: copy-tooltip-arrow-top, tooltip-bottom: copy-tooltip-bottom,
         tooltip-left: copy-tooltip-left, tooltip-right: copy-tooltip-right, tooltip-top: copy-tooltip-top"
       copied-label=${this.copiedLabel}
+      @helix-press=${stopPress}
       label=${name ? formatWords(this, 'copyNameLabel', { copy: this.copyLabel, name }) : this.copyLabel}
       .value=${value}
     >${this.renderCopyIcons()}</${this.tag('copy-button')}>`
