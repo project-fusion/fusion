@@ -87,3 +87,35 @@ describe('the rule between the marks', () => {
     })
   }
 })
+
+/* Down a column a closed stage's content collapses to no height. It held
+   controls that Tab reached and a screen reader read, at zero height. */
+describe('a closed stage down a column', () => {
+  test('keeps its content out of the tab order and the accessibility tree', async () => {
+    const host = await mount(
+      `<helix-steps label="Setup" orientation="vertical" default-active="two">
+        <helix-step value="one">One<button slot="content">First</button></helix-step>
+        <helix-step value="two">Two<button slot="content">Second</button></helix-step>
+        <helix-step value="three">Three<button slot="content">Third</button></helix-step>
+      </helix-steps>`,
+    )
+    const every = [...host.querySelectorAll('helix-step')] as Step[]
+    await Promise.all(every.map((one) => one.updateComplete))
+    if (hasLayout()) {
+      await new Promise((done) => setTimeout(done, 400))
+      const shown = [...host.querySelectorAll('button')].map(
+        (one) => getComputedStyle(one).visibility,
+      )
+      expect(shown).toEqual(['hidden', 'visible', 'hidden'])
+      return
+    }
+    /* happy-dom resolves no cascade, so the rule the element adopts is read. */
+    const declared = (customElements.get('helix-step') as unknown as { styles: unknown }).styles
+    const text = (Array.isArray(declared) ? declared : [declared])
+      .flat(Number.POSITIVE_INFINITY)
+      .map((one) => String((one as { cssText?: string }).cssText ?? ''))
+      .join('\n')
+    expect(text).toMatch(/\[part="content"\] > slot \{[^}]*visibility: hidden;/)
+    expect(text).toMatch(/:host\(\[current\]\) \[part="content"\] > slot \{visibility: visible;\}/)
+  })
+})

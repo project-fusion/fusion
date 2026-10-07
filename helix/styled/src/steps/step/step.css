@@ -222,8 +222,19 @@ slot[name="marker"]::slotted(*) {
   grid-template-rows: 1fr;
 }
 
+/* A closed stage's content is out of the tab order and the accessibility tree
+ * as well as out of sight: collapsed to no height, it still held controls that
+ * Tab reached and a screen reader read. `visibility` keeps it drawn until the
+ * collapse has finished, since a transition holds `visible` to the end, and
+ * shows it at once on the way open. */
 [part="content"] > slot {
   display: block;
   min-block-size: 0;
   overflow: hidden;
+  transition: visibility var(--helix-duration-normal) var(--helix-easing-standard);
+  visibility: hidden;
+}
+
+:host([current]) [part="content"] > slot {
+  visibility: visible;
 }
