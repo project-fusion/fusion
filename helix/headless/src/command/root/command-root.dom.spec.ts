@@ -475,3 +475,45 @@ describe('a palette of commands given as data', () => {
     expect(host.open).toBe(false)
   })
 })
+
+describe('a palette drawn in the page', () => {
+  /* The palette could only open in a dialog, where React Aria's Autocomplete
+     is a search over a list drawn where it stands. */
+  test('with `inline`, draws its list with no dialog, and stays as it is after a choice', async () => {
+    /* As data, because happy-dom does not flatten the second slot a child
+       command passes through; see `hasLayout` above. */
+    const host = (await palette(
+      '<helix-headless-command inline label="Commands"></helix-headless-command>',
+    )) as Palette & { items: string[] }
+    host.items = ['New file', 'Open recent']
+    await settle(host)
+    expect(host.shadowRoot?.querySelector('[part="listbox"]')).not.toBeNull()
+    expect(host.shadowRoot?.querySelector('helix-headless-dialog')).toBeNull()
+    const said: string[] = []
+    host.addEventListener('helix-select', (event) =>
+      said.push((event as CustomEvent<{ value: string }>).detail.value),
+    )
+    const field = listbox(host).shadowRoot?.querySelector('[part="search-field"]') as HTMLElement
+    for (const key of ['ArrowDown', 'Enter']) {
+      field.dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key }),
+      )
+      await settle(host)
+    }
+    expect(said).toEqual(['New file'])
+    expect(host.open).toBe(false)
+    expect(host.shadowRoot?.querySelector('[part="listbox"]')).not.toBeNull()
+  })
+
+  test('its hotkey puts focus in the filter field, and opens nothing', async () => {
+    const host = await palette(
+      markup.replace('<helix-headless-command ', '<helix-headless-command inline '),
+    )
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, ctrlKey: true, key: 'k' }),
+    )
+    await settle(host)
+    expect(host.open).toBe(false)
+    expect(listbox(host).shadowRoot?.activeElement?.getAttribute('part')).toBe('search-field')
+  })
+})

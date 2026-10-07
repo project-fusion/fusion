@@ -84,6 +84,18 @@ helix-listbox::part(search-field) {
   display: none;
 }
 
+/* In the page, the palette is its own surface: the list's fill, edge and
+   corners, which the dialog's box gives it everywhere else. Not floating, so
+   no shadow. */
+:host([inline]) {
+  background-color: var(--helix-color-surface);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  display: block;
+  inline-size: min(var(--command-size, 40rem), 100%);
+  overflow: hidden;
+}
+
 /* Not printed, being chrome. */
 @media print {
   :host {
