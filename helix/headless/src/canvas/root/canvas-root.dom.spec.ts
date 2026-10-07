@@ -576,6 +576,30 @@ describe('canvas moves', () => {
     expect(host.redo()).toBe(false)
   })
 
+  /* Selected cards could not leave the board: a copy took nothing. */
+  test('a copy with cards selected writes them and the connections between them as JSON Canvas', async () => {
+    const host = (await canvas()) as Canvas & { selected: string }
+    host.selected = 'a,b'
+    await host.updateComplete
+    const written: Record<string, string> = {}
+    const event = new Event('copy', { bubbles: true, cancelable: true, composed: true })
+    Object.defineProperty(event, 'clipboardData', {
+      value: {
+        setData: (type: string, value: string) => {
+          written[type] = value
+        },
+      },
+    })
+    card(host, 'a').shadowRoot?.querySelector('[part="node"]')?.dispatchEvent(event)
+    expect(event.defaultPrevented).toBe(true)
+    const copied = JSON.parse(written['text/plain'] ?? '{}') as {
+      edges: Array<{ fromNode: string; toNode: string }>
+      nodes: Array<{ id: string }>
+    }
+    expect(copied.nodes.map((node) => node.id)).toEqual(['a', 'b'])
+    expect(copied.edges.map((edge) => `${edge.fromNode}>${edge.toNode}`)).toEqual(['a>b'])
+  })
+
   test('an undo a page refuses moves nothing and stays to be undone', async () => {
     const host = (await canvas()) as Canvas & { undo(): boolean }
     press(card(host, 'c'), 'ArrowRight', true)
