@@ -2,6 +2,7 @@ import { beforeAll, describe, expect, test } from 'bun:test'
 import {
   hasLayout,
   mount,
+  part,
   registerDom,
   slotted,
   type Updatable,
@@ -33,6 +34,27 @@ describe('stat', () => {
   test('an omitted region costs nothing', async () => {
     const stat = await mount('<helix-headless-stat><span>42</span></helix-headless-stat>')
     expect(slotted(stat, 'unit')).toHaveLength(0)
+  })
+
+  /* The value was the one part, so the label, the unit and the trend were
+     reachable only as slotted light DOM, and no sheet could tell a stat with
+     a unit from one without. */
+  test('the label, the unit and the trend are parts, and the stat says which it holds', async () => {
+    const stat = (await mount(markup)) as Updatable & { internals: ElementInternals }
+    await stat.updateComplete
+    for (const name of ['label', 'value', 'unit', 'trend']) {
+      expect(part(stat, name)?.tagName).toBe('SLOT')
+    }
+    expect(stat.internals.states.has('has-label')).toBe(true)
+    expect(stat.internals.states.has('has-unit')).toBe(true)
+    expect(stat.internals.states.has('has-trend')).toBe(false)
+    const trend = document.createElement('span')
+    trend.slot = 'trend'
+    trend.textContent = 'Up 8%'
+    stat.append(trend)
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await stat.updateComplete
+    expect(stat.internals.states.has('has-trend')).toBe(true)
   })
 })
 
