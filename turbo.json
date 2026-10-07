@@ -1,5 +1,9 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  // **Off, because `AGENTS.md` changes only when someone edits it.** From 2.11,
+  // turbo writes its own rules block into the root `AGENTS.md` whenever it
+  // detects an AI agent, so every agent session left the file modified.
+  "agentGuidance": false,
   // The compiler options every package extends live at the root, where a
   // package's own inputs do not reach: an edit to one of these changed every
   // `dist` and invalidated no cache.
