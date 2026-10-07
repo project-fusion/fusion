@@ -587,9 +587,24 @@ describe('an answer the picker refuses', () => {
       'Enter a color, like #ff0000, rgb(255 0 0) or hsl(0 100% 50%).',
     )
     expect(field.getAttribute('aria-describedby')).toContain(message.id)
+    /* The text stays where the reader can correct it, and the value and the
+       form keep the last color, as a native number field keeps "12e". */
+    expect(field.value).toBe('nonsense')
+    expect(host.value).toBe('#3366ff')
+    expect(formValue(host)).toBe('#3366ff')
     await typeInto(host, '#00ff00', true)
     expect(internals(host).states.has('invalid')).toBe(false)
     expect(part(host, 'feedback')).toBeNull()
+  })
+
+  test('a form reset takes the text back to the color it resets to', async () => {
+    const host = await picker('name="brand" default-value="#3366ff"')
+    await typeInto(host, 'nonsense', true)
+    ;(host as unknown as { formResetCallback(): void }).formResetCallback()
+    await host.updateComplete
+    expect((part(host, 'value') as HTMLInputElement).value).toBe('#3366ff')
+    expect(internals(host).validity.valid).toBe(true)
+    expect(internals(host).states.has('invalid')).toBe(false)
   })
 
   test('a value set to text that is not a color is marked at once', async () => {

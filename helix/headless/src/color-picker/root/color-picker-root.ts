@@ -597,6 +597,19 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
   private typing = false
 
   /**
+   * Text in the value field that is not a color, or undefined while the field
+   * holds the value.
+   *
+   * **Kept in the field and out of the value**, as a native number field keeps
+   * "12e": the text stays where the reader can correct it, the value stays the
+   * last color, and the picker reports `badInput` until the text is a color or
+   * the value moves. Measured before this: typed "nonsense" became the value,
+   * so a form read `brand=nonsense` and the square had no color to show.
+   */
+  @state()
+  private draft: string | undefined = undefined
+
+  /**
    * A required picker with no color is missing, and text that is not a color
    * is refused, once the reader has finished typing it. See
    * `MixinPickerFeedback.marked`.
@@ -606,10 +619,13 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
    * the value field had no `aria-invalid`, and nothing was said.
    */
   protected override get failure(): PickerFailure | undefined {
+    if (this.draft !== undefined) {
+      return this.typing ? undefined : 'refused'
+    }
     if (this.value === '') {
       return this.required ? 'missing' : undefined
     }
-    return parseColor(this.value) === null && !this.typing ? 'refused' : undefined
+    return parseColor(this.value) === null ? 'refused' : undefined
   }
 
   /**
@@ -631,10 +647,20 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
         : ''
   }
 
-  /** A reset ends any typing, so the color it puts back is judged at once. */
+  /**
+   * A reset ends any typing and takes back text that was not a color, so the
+   * field shows the color the reset put back.
+   */
   override formResetCallback(): void {
     super.formResetCallback()
     this.typing = false
+    if (this.draft !== undefined) {
+      this.draft = undefined
+      const field = this.partNamed('value') as HTMLInputElement | null
+      if (field) {
+        field.value = this.value
+      }
+    }
   }
 
   /** The line `said` holds, or nothing while it is empty. */
@@ -736,6 +762,14 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
     const typed = (event.target as HTMLInputElement).value
     this.typing = true
     const parsed = parseColor(typed)
+    /* Text that is not a color stays in the field and out of the value. See
+       `draft`. Empty text is no color at all, which is a value. */
+    if (!parsed && typed.trim() !== '') {
+      this.draft = typed
+      this.sync()
+      return
+    }
+    this.draft = undefined
     if (parsed) {
       this.moved = parsed
       // Owned only where the value moves, for the reason `move` gives.
@@ -1051,6 +1085,14 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
    * states the result.
    */
   private reportRequired(): void {
+    if (this.draft !== undefined) {
+      this.internals.setValidity(
+        { badInput: true },
+        this.badInputMessage,
+        this.partNamed('value') ?? this.partNamed('grid') ?? undefined,
+      )
+      return
+    }
     if (this.required && this.value === '') {
       this.internals.setValidity(
         { valueMissing: true },
@@ -1311,6 +1353,11 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
      has no role and a reader is on a slider or the value: read from Chromium's
      tree, an invalid picker's sliders and value all reported `invalid: false`. */
   protected override willUpdate(changed: PropertyValues): void {
+    /* A value from anywhere replaces text that was not a color, before the
+       mixin reads `failure` to mark the picker. */
+    if (changed.has('value')) {
+      this.draft = undefined
+    }
     super.willUpdate(changed)
     /* A group only where a page's `<label for>` names the picker, so the
        name has somewhere to be read. Unlabeled, the host stays without a
