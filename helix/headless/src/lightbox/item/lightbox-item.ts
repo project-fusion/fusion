@@ -47,7 +47,11 @@ export class HelixHeadlessLightboxItem extends HelixElement {
    * The item's name. It names the item's group, and fills `{label}` in the
    * lightbox's `status-label`.
    */
-  @property()
+  @property({
+    /* Empty once the attribute is removed. Lit's default converter sets `null`,
+       which `{label}` wrote out as the word "null" in the item's name. */
+    converter: { fromAttribute: (value: string | null): string => value ?? '' },
+  })
   label = ''
 
   /**

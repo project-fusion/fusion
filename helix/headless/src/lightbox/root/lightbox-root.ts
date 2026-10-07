@@ -483,6 +483,39 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
     this.requestUpdate()
   }
 
+  /**
+   * Watches each item's `label` and `value`, which no slot reports.
+   *
+   * `value` decides which item `active` names, and `label` fills `{label}` in
+   * `status-label` and `slide-label`. A change to either left the old item
+   * shown, or the old words in the counter, until some unrelated property
+   * changed. `Select` watches its options for the same reason.
+   *
+   * The subtree, since an observer on the host sees no attribute on its
+   * children otherwise. Only changes on the items themselves count: a `<progress
+   * value>` inside an item, updated while a video plays, would otherwise render
+   * the viewer again on each update.
+   *
+   * Made on connection, there being no `MutationObserver` on a server.
+   */
+  private itemWatch: MutationObserver | undefined = undefined
+
+  override connectedCallback(): void {
+    super.connectedCallback()
+    this.itemWatch = new MutationObserver((records) => {
+      if (
+        records.some(
+          (record) =>
+            record.target instanceof HelixHeadlessLightboxItem &&
+            record.target.parentElement === this,
+        )
+      ) {
+        this.requestUpdate()
+      }
+    })
+    this.itemWatch.observe(this, { attributeFilter: ['label', 'value'], subtree: true })
+  }
+
   /** The native dialog, or nothing where there is no DOM to hold one. */
   private get dialog(): HTMLDialogElement | null {
     return this.renderRoot?.querySelector('dialog') ?? null
@@ -750,6 +783,8 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     unlockScroll(this)
+    this.itemWatch?.disconnect()
+    this.itemWatch = undefined
   }
 
   protected override updated(changed: PropertyValues): void {
