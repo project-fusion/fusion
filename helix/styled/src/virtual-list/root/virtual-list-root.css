@@ -60,6 +60,13 @@
   color: var(--virtual-list-selected-color, inherit);
 }
 
+/* A row `disabled-keys` names: the dimming a disabled List row takes, and no
+   press on it chooses anything. */
+::slotted([aria-disabled="true"]) {
+  cursor: not-allowed;
+  opacity: var(--virtual-list-disabled-opacity, 0.5);
+}
+
 /* The row after the last item while more are fetched: quiet, and centered
    under the rows, so it reads as the list's own state and not as an item. */
 [part="empty"] {

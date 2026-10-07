@@ -27,6 +27,7 @@ import { styles } from './virtual-list-root.css.js'
  * @csspart viewport - The scrolling box.
  *
  * @cssproperty --virtual-list-block-size - How tall the scrolling box is.
+ * @cssproperty --virtual-list-disabled-opacity - How faint a row `disabled-keys` names is drawn.
  * @cssproperty --virtual-list-empty-color - The color of the text in the row shown when there are no items.
  * @cssproperty --virtual-list-empty-padding - The space around the text in the row shown when there are no items.
  * @cssproperty --virtual-list-loading-color - The color of the text in the row drawn while `loading` is set.

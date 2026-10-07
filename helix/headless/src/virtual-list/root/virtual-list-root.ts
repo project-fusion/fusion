@@ -32,9 +32,10 @@ import { drawPlan, itemsOf, stopAfter } from '../plan.js'
  * Draws one item into its row, for a list given `renderItem`.
  *
  * Returns anything Lit renders: a template from `html`, a string, or a DOM
- * node the function built.
+ * node the function built. `Item` types the item, so a page writes
+ * `const row: VirtualListRenderer<Person> = (person) => person.name`.
  */
-export type VirtualListRenderer = (item: unknown, index: number) => unknown
+export type VirtualListRenderer<Item = unknown> = (item: Item, index: number) => unknown
 
 /** Where `scrollToIndex` puts an item, and how it gets there. */
 export interface VirtualListScrollOptions {
@@ -80,8 +81,8 @@ export interface VirtualListRange {
  * **A grid.** `columns` lays the items out that many to a line, as a grid of
  * equal columns, and windows the set a line at a time, as React Aria's grid
  * layout does. Each item draws one element, a cell of the grid, and
- * `estimate` is the height of a line. Space the items with padding inside
- * each one, which the list measures with the line.
+ * `estimate` is the height of a line. `gap` spaces the rows, and the columns
+ * of a grid, by a number of pixels the list counts in each row's place.
  *
  * **Keyboard.** The list is one tab stop.
  *
@@ -230,6 +231,15 @@ export class HelixHeadlessVirtualList extends HelixElement {
   for = ''
 
   /**
+   * The space between two rows, and between two columns in a grid, in
+   * pixels. The list counts it in each row's place, so a gap does not walk
+   * the rows away from the scroll position the way a margin on each row
+   * would.
+   */
+  @property({ type: Number })
+  gap = 0
+
+  /**
    * The items, as an array. Set it as a property.
    *
    * Each item is drawn by `renderItem`, or into the row `<template>` by its
@@ -296,7 +306,8 @@ export class HelixHeadlessVirtualList extends HelixElement {
    * and place in the set. Where it is unset, the row `<template>` is used.
    */
   @property({ attribute: false })
-  renderItem: VirtualListRenderer | undefined
+  // biome-ignore lint/suspicious/noExplicitAny: a renderer typed for any item is assignable here
+  renderItem: VirtualListRenderer<any> | undefined
 
   /**
    * Makes the list a list box a reader chooses from: `single` selects one
@@ -345,7 +356,8 @@ export class HelixHeadlessVirtualList extends HelixElement {
   private filledFrom: readonly unknown[] | undefined
 
   /** The function the drawn rows were filled by, so a new one draws them again. */
-  private filledBy: VirtualListRenderer | undefined
+  // biome-ignore lint/suspicious/noExplicitAny: whatever renderer `renderItem` held
+  private filledBy: VirtualListRenderer<any> | undefined
 
   /** The script the rows were read from, which the watcher follows. */
   private source: Element | null = null
@@ -412,6 +424,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
     container: () => this.partNamed('viewport'),
     count: () => Math.ceil(this.data.length / this.across),
     estimate: () => this.estimate,
+    gap: () => this.space,
     measured: () => this.measured,
     rows: () => this.lines(),
   })
@@ -424,6 +437,11 @@ export class HelixHeadlessVirtualList extends HelixElement {
    */
   get range(): VirtualListRange {
     return this.itemsOn(this.virtualize.visible())
+  }
+
+  /** The gap in pixels, none where it is not a positive number. */
+  private get space(): number {
+    return Number.isFinite(this.gap) && this.gap > 0 ? this.gap : 0
   }
 
   /** How many items a line holds: `columns`, at least one. */
@@ -643,8 +661,13 @@ export class HelixHeadlessVirtualList extends HelixElement {
     super.updated?.(changed)
     this.toggleState('empty', this.readFor !== undefined && this.data.length === 0)
     this.toggleState('loading', this.loading)
+    const was = this.virtualize.window
     this.virtualize.measure()
-    this.place()
+    /* A window the measure just moved has asked for the render that sizes its
+       spacers, and its rows go in with them, in `willUpdate`. */
+    if (this.virtualize.window === was) {
+      this.place()
+    }
     /* The rows are drawn here, after the controller's own measuring pass, so
        they are measured here too. */
     this.virtualize.settle()
@@ -1094,6 +1117,20 @@ export class HelixHeadlessVirtualList extends HelixElement {
     /* The row holding focus, so focus can go on to a neighbor if its item has
        left the set. */
     const holding = this.focusedIndex()
+    /* Read before anything moves. */
+    const onScreen = this.range.first
+    /* **The spacers move with the rows, before either is laid out.** Rows
+       placed ahead of the render that sizes the spacers left the content the
+       wrong length for as long as it took to get there, and anything that read
+       layout in between, a row's own controls being found say, had the box
+       pull its offset in to the shorter content. At the end of a list with a
+       gap, End then came to rest four rows short of the last. The render
+       writes the same sizes. */
+    if (this.hasUpdated) {
+      const spacers = this.spacerSizes()
+      this.partNamed<HTMLElement>('before')?.style.setProperty('block-size', `${spacers.before}px`)
+      this.partNamed<HTMLElement>('after')?.style.setProperty('block-size', `${spacers.after}px`)
+    }
     /* A child given a slot of its own, such as `loading`, is the consumer's. */
     const children = [...this.children].filter(
       (child): child is HTMLElement =>
@@ -1146,7 +1183,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
       count,
       first,
       last,
-      onScreen: this.range.first,
+      onScreen,
     })
     const chosen = this.chosen
     const off = this.disabled
@@ -1179,12 +1216,14 @@ export class HelixHeadlessVirtualList extends HelixElement {
     }
   }
 
-  protected override render(): TemplateResult {
-    /* The line kept for focus takes its own room out of the spacer on its side. */
+  /** The spacers' heights: the window's, with the line kept for focus taking its own room. */
+  private spacerSizes(): { after: number; before: number } {
     const kept = this.hasUpdated ? this.keptIndex() : undefined
-    const { after, before } = this.virtualize.spacers(
-      kept === undefined ? undefined : Math.floor(kept / this.across),
-    )
+    return this.virtualize.spacers(kept === undefined ? undefined : Math.floor(kept / this.across))
+  }
+
+  protected override render(): TemplateResult {
+    const { after, before } = this.spacerSizes()
     const across = this.across
     /* Only once the browser has read the source, so a server and a list whose
        items are on their way say nothing about an empty set. `readFor` is set
@@ -1210,9 +1249,15 @@ export class HelixHeadlessVirtualList extends HelixElement {
       <div part="before" style="block-size: ${before}px"></div>
       <slot
         style=${
+          /* A gap after the last drawn row as well, which the spacer below
+             counts as part of the row before it. */
           across === 1
-            ? nothing
-            : `display: grid; grid-template-columns: repeat(${across}, minmax(0, 1fr))`
+            ? this.space === 0
+              ? nothing
+              : `display: flex; flex-direction: column; row-gap: ${this.space}px; padding-block-end: ${this.space}px`
+            : `display: grid; grid-template-columns: repeat(${across}, minmax(0, 1fr))${
+                this.space === 0 ? '' : `; gap: ${this.space}px; padding-block-end: ${this.space}px`
+              }`
         }
       ></slot>
       <div part="after" style="block-size: ${after}px"></div>
