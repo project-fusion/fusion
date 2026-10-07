@@ -93,7 +93,7 @@ describe('turning, flipping and moving the glyph', () => {
     expect(rule(':host([animation="pulse"])')).toContain('helix-icon-pulse')
     expect(rule(':host([animation="beat"])')).toContain('helix-icon-beat')
     expect(sheet()).toMatch(
-      /prefers-reduced-motion: reduce\)\s*\{\s*:host\(\[animation\]\)\s*\{\s*animation: none/,
+      /prefers-reduced-motion: reduce\)\s*\{\s*:host\(\[animation="spin"\]\),\s*:host\(\[animation="pulse"\]\),\s*:host\(\[animation="beat"\]\)\s*\{\s*animation: none/,
     )
   })
 

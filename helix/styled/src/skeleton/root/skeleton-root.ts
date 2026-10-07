@@ -17,7 +17,7 @@ import { styles } from './skeleton-root.css.js'
  *
  * **`lines` draws a paragraph.** With `shape="text"` and `lines="3"`, one
  * element stands in for three lines of text: each line a `skeleton` part one
- * `em` tall, spaced a line height apart, and the last one shorter, as the end
+ * `em` tall, spaced a body line height apart, and the last one shorter, as the end
  * of a paragraph is.
  *
  * @since 0.1.0

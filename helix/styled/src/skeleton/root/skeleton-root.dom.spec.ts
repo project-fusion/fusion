@@ -171,7 +171,7 @@ describe('a paragraph of lines', () => {
     expect(rule(':host([shape="text"][lines]:not([lines="1"]):not([lines="0"]))')).toContain(
       'block-size: auto',
     )
-    expect(rule('[part="lines"]')).toContain('gap: calc(1lh - 1em)')
+    expect(rule('[part="lines"]')).toContain('gap: calc((var(--helix-leading-normal) - 1) * 1em)')
     expect(rule('[part~="line"]')).toContain('block-size: 1em')
     expect(rule('[part~="line"]:last-child:not(:first-child)')).toContain(
       'inline-size: var(--skeleton-last-line-size, 60%)',
