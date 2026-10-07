@@ -1,9 +1,12 @@
 import {
   customElement,
+  focusItemOf,
   formatWords,
   HelixElement,
   hostAria,
+  KeyboardNavigationController,
   MixinControllerActive,
+  type NavigableItem,
   whenHydrated,
   words,
 } from '@fusion.dev/helix-core'
@@ -11,6 +14,23 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { canReach, progressOf } from '../reach.js'
 import type { HelixHeadlessStep } from '../step/step.js'
+
+/**
+ * A stage as the arrow keys move through it: its name, which is the control.
+ * A press from what the stage holds is the stage's own, so the arrows keep
+ * moving the caret in a field there.
+ */
+const navigable = (step: HelixHeadlessStep): NavigableItem => {
+  const label = (): Element | null | undefined => step.shadowRoot?.querySelector('[part="label"]')
+  return focusItemOf(step, {
+    disabled: step.disabled || step.locked,
+    focus: () => step.focus(),
+    owns: (node) => {
+      const control = label()
+      return Boolean(control && node && (node === control || control.contains(node)))
+    },
+  })
+}
 
 /**
  * @summary A sequence of stages that shows which stage the user is on.
@@ -55,6 +75,13 @@ import type { HelixHeadlessStep } from '../step/step.js'
  * current stage's button says `aria-current="step"`, and a finished stage's
  * button is described by its `complete-label`.
  *
+ * **Keyboard.** Each stage's name is a button and its own tab stop, and Enter
+ * or Space goes to the stage. Set `arrows` and the arrow keys move focus
+ * between the names as well, as Ark UI's steps do: Left and Right along a row,
+ * Up and Down a column, Home and End to the first and the last. The arrows
+ * pass over a disabled stage and one a linear sequence holds out of reach,
+ * and they move focus without going to the stage.
+ *
  * @since 0.1.0
  * @status stable
  * @category navigation
@@ -80,6 +107,13 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
    * `registerWords('de', { 'helix-steps': { progressLabel: '{share, number, percent} erledigt' } })`.
    */
   static words = 'helix-steps'
+
+  /**
+   * Whether the arrow keys move focus between the stages' names, along the
+   * way the steps run. Off by default, so the arrows keep scrolling the page.
+   */
+  @property({ type: Boolean })
+  arrows = false
 
   /**
    * What marks a stage `complete`.
@@ -165,6 +199,17 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
    */
   @property({ reflect: true })
   variant?: 'numeric'
+
+  /* The arrows along the way the steps run, from where focus is, choosing
+     nothing and stopping at the ends, as Navigation's do. */
+  protected readonly keys = new KeyboardNavigationController(this, {
+    items: () => (this.arrows ? this.steps.map(navigable) : []),
+    origin: 'focus',
+    reserved: () =>
+      this.orientation === 'vertical' ? ['ArrowLeft', 'ArrowRight'] : ['ArrowDown', 'ArrowUp'],
+    selects: () => false,
+    wrap: false,
+  })
 
   /** The steps, in the order the consumer wrote them. */
   private get steps(): HelixHeadlessStep[] {
