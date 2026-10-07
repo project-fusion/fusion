@@ -128,6 +128,11 @@ export interface VirtualListRange {
  * shows nothing, since a list whose items have not arrived yet has not said
  * it has none.
  *
+ * The list takes the `empty` state while it has read its items and holds none,
+ * and the `loading` state while `loading` is set, so your stylesheet can
+ * change the box around it for either. A list with no name is reported once
+ * in a development build. Name it with `label` or `aria-label`.
+ *
  * **Row height.** Rows are placed by `estimate` until they are drawn. Then the
  * list reads the drawn rows' height once and places every row by it, so a
  * wrong estimate still reaches the last item. Set `measured` for rows of
@@ -162,6 +167,9 @@ export interface VirtualListRange {
  * @csspart empty - The row shown when there are no items and none are loading, where `empty-label` or the `empty` slot gives it content.
  * @csspart loading - The row after the last item while `loading` is set.
  * @csspart viewport - The scrolling box. On this tier, it needs only a block size.
+ *
+ * @cssstate empty - While the list has read its items and holds none.
+ * @cssstate loading - While `loading` is set.
  */
 @customElement('helix-headless-virtual-list')
 export class HelixHeadlessVirtualList extends HelixElement {
@@ -349,6 +357,9 @@ export class HelixHeadlessVirtualList extends HelixElement {
   protected readonly aria = new AriaForwardController(this, {
     label: true,
     target: () => this.partNamed('viewport'),
+    /* A list with no name is announced as a list and nothing more, and only a
+       window of its rows is there to say what it holds. Development builds only. */
+    unnamed: 'Give it a `label`, or an `aria-label` that says what the items are.',
   })
 
   /* No `overscan` property. The controller's four is a frame of fast scrolling
@@ -513,6 +524,8 @@ export class HelixHeadlessVirtualList extends HelixElement {
 
   protected override updated(changed: PropertyValues): void {
     super.updated?.(changed)
+    this.toggleState('empty', this.readFor !== undefined && this.data.length === 0)
+    this.toggleState('loading', this.loading)
     this.virtualize.measure()
     this.place()
     /* The rows are drawn here, after the controller's own measuring pass, so
