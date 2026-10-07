@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
@@ -57,5 +57,55 @@ describe('one timeline entry', () => {
     expect(part(host, 'rail')).not.toBeNull()
     expect(part(host, 'marker')).not.toBeNull()
     expect(part(host, 'connector')).toBeNull()
+  })
+})
+
+/* A timeline of recent events had to write "3 hours ago" itself, and the words
+   stayed as they were drawn for as long as the page was open. */
+describe('a relative time', () => {
+  interface Ticker {
+    waiting: Set<{ at: number; run: () => void }>
+  }
+  const ticker = () =>
+    (globalThis as unknown as Record<symbol, Ticker | undefined>)[Symbol.for('helix.ticker')]
+  const realNow = Date.now
+  const reading = (element: HTMLElement): string =>
+    part(element, 'time')?.querySelector('slot')?.textContent?.trim() ?? ''
+
+  afterEach(() => {
+    Date.now = realNow
+  })
+
+  test('is written from datetime where nothing is slotted, and moves on as it goes stale', async () => {
+    const said = Date.now() - 90_000
+    const element = await entry(
+      `lang="en" relative datetime="${new Date(said).toISOString()}"`,
+      'Shipped',
+    )
+    expect(part(element, 'time')?.tagName).toBe('TIME')
+    expect(reading(element)).toBe('1 minute ago')
+    const waiting = [...(ticker()?.waiting ?? [])]
+    expect(waiting.length).toBeGreaterThan(0)
+    Date.now = () => said + 125_000
+    for (const one of waiting) {
+      one.run()
+    }
+    await (element as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    expect(reading(element)).toBe('2 minutes ago')
+  })
+
+  test('takes the style it is given, and none without relative', async () => {
+    const at = new Date(Date.now() - 3 * 3_600_000).toISOString()
+    expect(reading(await entry(`lang="en" relative="narrow" datetime="${at}"`, 'Shipped'))).toBe(
+      '3h ago',
+    )
+    expect(reading(await entry(`lang="en" datetime="${at}"`, 'Shipped'))).toBe('')
+  })
+
+  test('an entry taken off the page stops asking', async () => {
+    const element = await entry(`relative datetime="${new Date().toISOString()}"`, 'Shipped')
+    const before = ticker()?.waiting.size ?? 0
+    element.remove()
+    expect(ticker()?.waiting.size ?? 0).toBeLessThan(before)
   })
 })

@@ -1,4 +1,12 @@
-import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  HelixElement,
+  hostAria,
+  type Relative,
+  RelativeClockController,
+  relativeTime,
+  wordsLocale,
+} from '@fusion.dev/helix-core'
 import { circle, record } from '@fusion.dev/helix-icons'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -11,6 +19,12 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * Given `datetime`, the label you write is wrapped in a `<time>` element, so a
  * machine-readable value such as "2026-08-19" travels with a label such as
  * "yesterday". Without `datetime`, the label is a `<span>`.
+ *
+ * **`relative` writes the time for you** as how long ago it was, such as "3
+ * hours ago", from `datetime`, where the `time` slot is empty. The words move
+ * on as they go stale, "3 hours ago" becoming "4 hours ago", with one wakeup
+ * shared by every reading on the page, as `FormatDate` keeps its own. They are
+ * in the language of the page, or of the nearest `lang`.
  *
  * Each entry draws the connector line that arrives at it and hides it when it
  * is the first entry, using `:host(:first-child)`. This needs no index, no
@@ -52,6 +66,37 @@ export class HelixHeadlessTimelineItem extends HelixElement {
   datetime = ''
 
   /**
+   * Writes the time as how long ago it was, or how long until it, from
+   * `datetime`, where the `time` slot is empty: `long` ("3 hours ago"),
+   * `short` ("3 hr. ago") or `narrow` ("3h ago"). Set with no value, it is
+   * `long`. The words move on as they go stale.
+   */
+  @property()
+  relative?: 'long' | 'narrow' | 'short'
+
+  /** The time the reading is drawn against, moved on when the words go stale. */
+  private readonly clock = new RelativeClockController(this, {
+    expires: (now) => {
+      const moment = this.moment
+      return moment ? this.readingAt(moment, now).next : undefined
+    },
+  })
+
+  /** The instant `datetime` names, where `relative` asks for a reading of it. */
+  private get moment(): Date | undefined {
+    if (this.relative === undefined || this.datetime === '') {
+      return undefined
+    }
+    const parsed = new Date(this.datetime)
+    return Number.isNaN(parsed.getTime()) ? undefined : parsed
+  }
+
+  /** What the reading says at `now`, and when it stops being true. */
+  private readingAt(moment: Date, now: Date): Relative {
+    return relativeTime(wordsLocale(this), { style: this.relative || 'long' })(moment, now)
+  }
+
+  /**
    * The kind of event. It sets the color of the mark and nothing else.
    */
   @property({ reflect: true })
@@ -59,6 +104,9 @@ export class HelixHeadlessTimelineItem extends HelixElement {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    if (['datetime', 'relative'].some((key) => changed.has(key))) {
+      this.clock.tick()
+    }
     hostAria(this.internals, { role: 'listitem' })
   }
 
@@ -90,7 +138,10 @@ export class HelixHeadlessTimelineItem extends HelixElement {
   }
 
   protected override render(): TemplateResult {
-    const when = html`<slot name="time"></slot>`
+    const moment = this.moment
+    const when = html`<slot name="time"
+      >${moment ? this.readingAt(moment, new Date(this.clock.now)).text : ''}</slot
+    >`
     /* The time is a sibling of the content rather than the first thing inside
        it, so the two are separate rows and the rail can align its mark to the
        second of them. Nested, the mark could only ever be a fixed distance from
