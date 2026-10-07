@@ -386,6 +386,23 @@ describe('the hotkey', () => {
     expect(key({ key: 'F8' }).defaultPrevented).toBe(false)
     expect(key({ ctrlKey: true, key: 'F8' }).defaultPrevented).toBe(false)
   })
+
+  /* Read as `Announcement` and `Command` read theirs: `mod` is Command on
+     Apple devices and Control elsewhere, the letter's case aside, with
+     exactly the modifiers written. */
+  test('reads keys as every hotkey in the library does, `mod` included', async () => {
+    const host = await mount(
+      `<helix-headless-toast label="Notifications" hotkey="mod+Shift+T">
+        <helix-headless-toast-item dismissible>Saved</helix-headless-toast-item>
+      </helix-headless-toast>`,
+    )
+    await (host.querySelector('helix-headless-toast-item') as Item).updateComplete
+    expect(key({ key: 't', shiftKey: true }).defaultPrevented).toBe(false)
+    expect(key({ altKey: true, ctrlKey: true, key: 't', shiftKey: true }).defaultPrevented).toBe(
+      false,
+    )
+    expect(key({ ctrlKey: true, key: 'T', shiftKey: true }).defaultPrevented).toBe(true)
+  })
 })
 
 describe('add()', () => {

@@ -9,12 +9,13 @@ import {
   formatWords,
   HelixElement,
   hostAria,
+  matchesChord,
+  onApple,
   scrollHolders,
   words,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
-import { matchesHotkey, parseHotkey } from '../hotkey.js'
 import { joinSaid, messageWords } from '../words.js'
 
 /**
@@ -90,7 +91,9 @@ export class HelixHeadlessToast extends HelixElement {
 
   /**
    * The key that takes focus to the stack and back, such as `F8` or `Alt+T`:
-   * keys joined by `+`, the last one the key. Empty turns it off.
+   * keys joined by `+`, the last one the key, as `Announcement`'s `hotkey`
+   * reads them: `mod` is Command on Apple devices and Control elsewhere.
+   * Empty turns it off.
    */
   @property()
   hotkey = 'F8'
@@ -256,7 +259,7 @@ export class HelixHeadlessToast extends HelixElement {
 
   /** Takes focus to the stack and back, on `hotkey`. */
   private readonly handleHotkey = (event: KeyboardEvent): void => {
-    if (event.defaultPrevented || !matchesHotkey(event, parseHotkey(this.hotkey))) {
+    if (event.defaultPrevented || !matchesChord(event, this.hotkey, onApple())) {
       return
     }
     if (this.scope.holdsFocus) {

@@ -8,10 +8,11 @@ const checked = new Map<string, string>()
 const tagOf = (written: string): string => {
   let found = checked.get(written)
   if (found === undefined) {
+    found = ''
     try {
       found = Intl.getCanonicalLocales(written)[0] ?? ''
     } catch {
-      found = ''
+      /* Not a tag: empty. */
     }
     checked.set(written, found)
   }
@@ -39,7 +40,7 @@ const tagOf = (written: string): string => {
  * Always a tag `Intl` takes.
  */
 export const wordsLocale = (element: Element & { locale?: string | undefined }): string => {
-  const own = typeof element.locale === 'string' ? tagOf(element.locale) : ''
+  const own = tagOf(element.locale || '')
   if (own) {
     return own
   }
