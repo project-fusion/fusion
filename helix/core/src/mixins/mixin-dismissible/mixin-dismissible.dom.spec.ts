@@ -33,6 +33,15 @@ beforeAll(async () => {
       }
     },
   )
+  /* Draws its control only while dismissible, as a Callout does. */
+  customElements.define(
+    'probe-optional',
+    class extends MixinDismissible(HelixElement) {
+      protected override render() {
+        return this.dismissible ? html`<button part="dismiss" type="button">x</button>` : html``
+      }
+    },
+  )
 })
 
 const item = async (markup = '', attrs = ''): Promise<Dismissible> => {
@@ -239,6 +248,25 @@ describe('a lone dismissed element the listener removes', () => {
     await new Promise((done) => setTimeout(done, 60))
     await frame()
     expect(document.activeElement?.id).toBe('before')
+  })
+
+  /* A dismissible Callout beside one that is not dropped focus to the body:
+     the neighbor of its kind had no control to take it, and the tab stop
+     beside was only looked for where there was no neighbor at all. */
+  test('past neighbors of its kind that have no control to take it', async () => {
+    Element.prototype.getClientRects = (): DOMRectList => [{}] as unknown as DOMRectList
+    document.body.innerHTML =
+      '<probe-optional dismissible></probe-optional><probe-optional></probe-optional><button id="after">After</button>'
+    const [first, second] = [...document.querySelectorAll('probe-optional')] as [
+      Removable,
+      Removable,
+    ]
+    await Promise.all([first.updateComplete, second.updateComplete])
+    first.addEventListener('helix-dismiss', () => first.remove())
+    first.shadowRoot?.querySelector<HTMLElement>('[part="dismiss"]')?.focus()
+    first.dismiss()
+    await frame()
+    expect(document.activeElement?.id).toBe('after')
   })
 
   /* A Tag Group whose last tag went focuses its empty part in a microtask, and
