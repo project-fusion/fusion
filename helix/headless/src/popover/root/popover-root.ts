@@ -16,6 +16,7 @@ import {
   type Side,
   sideOf,
   tellDisclosure,
+  words,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -103,6 +104,12 @@ import { hideOutside } from '../hide-outside.js'
 @customElement('helix-headless-popover')
 export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-popover': { fallbackLabel: 'Popup' } })`.
+   */
+  static words = 'helix-popover'
+
+  /**
    * Draws a point on the panel's edge facing the trigger.
    *
    * Off by default, which is the house style: a panel that opens from its
@@ -112,11 +119,19 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
   arrow = false
 
   /**
-   * The panel's name, read by screen readers. Left at `Popover`, the first
-   * heading in the panel names it instead.
+   * The panel's name where nothing else names it: no `label`, no heading in
+   * the panel, and no `aria-labelledby` on the host.
+   */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Popover'
+
+  /**
+   * The panel's name, read by screen readers. Left empty, the first heading in
+   * the panel names it, and then `fallback-label`.
    */
   @property()
-  label = 'Popover'
+  label = ''
 
   /**
    * Keeps `Tab` inside the panel while it is open, marks the panel
@@ -228,7 +243,7 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
    * reason `Dialog` gives.
    */
   private nameByHeading(): void {
-    const asked = this.label !== 'Popover' || this.hasAttribute('aria-labelledby')
+    const asked = this.label !== '' || this.hasAttribute('aria-labelledby')
     const heading = asked ? null : headingIn(this.slotted)
     this.namedByHeading = reflectElements(
       this.partNamed('popover'),
@@ -487,7 +502,7 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
         part="popover"
         popover="manual"
         role="dialog"
-        aria-label=${this.label}
+        aria-label=${this.label || this.fallbackLabel}
         aria-modal=${this.modal ? 'true' : nothing}
         tabindex="-1"
         ?hidden=${!this.open}

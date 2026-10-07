@@ -3,7 +3,7 @@ import {
   customElement,
   deepActiveElement,
   deepContains,
-  fillTemplate,
+  formatWords,
   HelixActivateEvent,
   HelixBeforeActivateEvent,
   HelixCompleteEvent,
@@ -15,6 +15,7 @@ import {
   MixinControllerOpen,
   requestChange,
   whenHydrated,
+  words,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, queryAssignedElements, state } from 'lit/decorators.js'
@@ -108,6 +109,13 @@ import { onPage, waitFor } from '../wait.js'
 @customElement('helix-headless-tour')
 export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-tour': { progressLabel: '{index} von {count}' } })`.
+   * A stop's own words are under `helix-tour-stop`.
+   */
+  static words = 'helix-tour'
+
+  /**
    * Label for the control that goes back, passed to every stop.
    */
   @property({ attribute: 'back-label' })
@@ -170,9 +178,10 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
   progress = false
 
   /**
-   * Each stop's place in the run, with `{index}` and `{count}` filled in.
-   * Translate it with the rest of your text.
+   * Each stop's place in the run, with `{index}` and `{count}` filled in and
+   * written in the locale. Translate it with the rest of your text.
    */
+  @words
   @property({ attribute: 'progress-label' })
   progressLabel = '{index} of {count}'
 
@@ -509,7 +518,7 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
         stop.current = this.open && index === at
         stop.first = index === 0
         stop.last = index === stops.length - 1
-        stop.position = fillTemplate(this.progressLabel, {
+        stop.position = formatWords(this, 'progressLabel', {
           count: stops.length,
           index: index + 1,
         })

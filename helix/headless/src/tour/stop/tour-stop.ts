@@ -9,6 +9,7 @@ import {
   reflectElements,
   type Side,
   sideOf,
+  words,
 } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -103,8 +104,15 @@ import { stopNaming } from '../naming.js'
 @customElement('helix-headless-tour-stop')
 export class HelixHeadlessTourStop extends HelixElement {
   /**
+   * The key this part's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-tour-stop': { nextLabel: 'Weiter' } })`.
+   */
+  static words = 'helix-tour-stop'
+
+  /**
    * Label for the control that goes back.
    */
+  @words
   @property({ attribute: 'back-label' })
   backLabel = 'Back'
 
@@ -123,6 +131,7 @@ export class HelixHeadlessTourStop extends HelixElement {
   /**
    * Label for the control that goes on from the last stop.
    */
+  @words
   @property({ attribute: 'done-label' })
   doneLabel = 'Done'
 
@@ -154,6 +163,7 @@ export class HelixHeadlessTourStop extends HelixElement {
   /**
    * Label for the control that goes on.
    */
+  @words
   @property({ attribute: 'next-label' })
   nextLabel = 'Next'
 
@@ -179,6 +189,7 @@ export class HelixHeadlessTourStop extends HelixElement {
   /**
    * Label for the control that leaves the tour.
    */
+  @words
   @property({ attribute: 'skip-label' })
   skipLabel = 'Skip'
 
