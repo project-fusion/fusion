@@ -206,6 +206,11 @@ slot[name="start"]::slotted(*) {
   justify-content: center;
 }
 
+/* At the start, the toggle leads the brand by the gap the actions keep. */
+[part="start"] > [part="toggle"] {
+  margin-inline-end: var(--helix-space-xs);
+}
+
 [part="toggle"] svg {
   block-size: var(--helix-size-icon);
   inline-size: var(--helix-size-icon);

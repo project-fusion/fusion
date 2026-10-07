@@ -227,6 +227,129 @@ describe('a header that folds', () => {
   })
 })
 
+describe('an open folded region', () => {
+  type Opening = HTMLElement & {
+    fold(width: number): void
+    open: boolean
+    requestOpen(next: boolean): boolean
+    toggleOpen(): boolean
+    updateComplete: Promise<unknown>
+  }
+  const folded = async (attrs = ''): Promise<Opening> => {
+    const header = (await mount(`
+      <helix-headless-app-header fold-below="640" ${attrs}>
+        <span slot="start">Fusion</span>
+        <a href="/work">Work</a>
+        <button slot="end">Sign in</button>
+      </helix-headless-app-header>
+      <button id="outside">Outside</button>
+    `)) as Opening
+    header.fold(400)
+    await header.updateComplete
+    return header
+  }
+
+  test('follows the toggle in focus order', async () => {
+    /* It opens below the row, and between the brand and the actions in the
+       markup Tab from the toggle left the header. */
+    const header = await folded()
+    const toggle = part(header, 'toggle') as HTMLElement
+    const content = part(header, 'content') as HTMLElement
+    expect(toggle.compareDocumentPosition(content) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(part(header, 'end')?.nextElementSibling).toBe(content)
+  })
+
+  test('sits between the brand and the actions while the bar is wide', async () => {
+    const header = await folded()
+    header.fold(900)
+    await header.updateComplete
+    expect(part(header, 'start')?.nextElementSibling).toBe(part(header, 'content'))
+  })
+
+  test('opens from the open attribute, and says so through the toggle', async () => {
+    const header = await folded('open')
+    expect(header.open).toBe(true)
+    expect((part(header, 'content') as HTMLElement).hidden).toBe(false)
+    expect(part(header, 'toggle')?.getAttribute('aria-expanded')).toBe('true')
+    expect(hasState(header, 'open')).toBe(true)
+  })
+
+  test('opens through requestOpen, which can be refused, and announces with toggle', async () => {
+    const header = await folded()
+    const heard: string[] = []
+    header.addEventListener('toggle', (event) => heard.push((event as ToggleEvent).newState))
+    const refuse = (event: Event): void => event.preventDefault()
+    header.addEventListener('helix-before-open', refuse)
+    expect(header.requestOpen(true)).toBe(false)
+    await header.updateComplete
+    expect((part(header, 'content') as HTMLElement).hidden).toBe(true)
+    header.removeEventListener('helix-before-open', refuse)
+    expect(header.toggleOpen()).toBe(true)
+    await header.updateComplete
+    expect((part(header, 'content') as HTMLElement).hidden).toBe(false)
+    expect(heard).toEqual(['open'])
+  })
+
+  test('closes when focus moves outside the header', async () => {
+    const header = await folded('open')
+    const link = header.querySelector('a') as HTMLElement
+    const outside = document.getElementById('outside') as HTMLElement
+    link.focus()
+    link.dispatchEvent(
+      new FocusEvent('focusout', { bubbles: true, composed: true, relatedTarget: outside }),
+    )
+    await header.updateComplete
+    expect(header.open).toBe(false)
+    expect((part(header, 'content') as HTMLElement).hidden).toBe(true)
+  })
+
+  test('stays open while focus moves inside the header', async () => {
+    const header = await folded('open')
+    const link = header.querySelector('a') as HTMLElement
+    link.dispatchEvent(
+      new FocusEvent('focusout', {
+        bubbles: true,
+        composed: true,
+        relatedTarget: part(header, 'toggle'),
+      }),
+    )
+    await header.updateComplete
+    expect(header.open).toBe(true)
+  })
+
+  test('closes on a press outside the header, and not on one inside it', async () => {
+    const header = await folded('open')
+    header
+      .querySelector('a')
+      ?.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true }))
+    await header.updateComplete
+    expect(header.open).toBe(true)
+    document
+      .getElementById('outside')
+      ?.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true }))
+    await header.updateComplete
+    expect(header.open).toBe(false)
+  })
+
+  test('closes when the bar widens past fold-below', async () => {
+    const header = await folded('open')
+    header.fold(900)
+    await header.updateComplete
+    expect(header.open).toBe(false)
+    header.fold(400)
+    await header.updateComplete
+    expect((part(header, 'content') as HTMLElement).hidden).toBe(true)
+  })
+
+  test('puts the toggle before the brand with toggle-placement="start"', async () => {
+    const header = await folded('toggle-placement="start"')
+    const toggle = part(header, 'toggle') as HTMLElement
+    expect(toggle.parentElement).toBe(part(header, 'start'))
+    expect(part(header, 'start')?.firstElementChild).toBe(toggle)
+    expect(part(header, 'end')?.querySelector('[part="toggle"]')).toBeNull()
+  })
+})
+
 describe('a header that hides on scroll', () => {
   type Hiding = HTMLElement & { follow(y: number): void; updateComplete: Promise<unknown> }
 

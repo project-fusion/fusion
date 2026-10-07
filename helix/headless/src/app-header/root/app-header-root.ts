@@ -6,6 +6,7 @@ import {
   HelixElement,
   HelixScrolledEvent,
   hostAria,
+  MixinControllerOpen,
   words,
 } from '@fusion.dev/helix-core'
 import { list } from '@fusion.dev/helix-icons'
@@ -40,12 +41,21 @@ import { inSectioningContent } from '../sectioning.js'
  *
  * **Set `fold-below` to fold the middle region on a narrow screen.** Below that
  * many pixels of the bar's own width, the middle region is hidden behind a
- * toggle at the end of the bar, named by `menu-label`. The toggle says whether
- * the region is open with `aria-expanded`, and the region opens below the row.
- * Escape closes it and puts focus back on the toggle. The custom state
- * `folded` is on the host while the bar is that narrow, and `open` while the
- * folded region is open. A server serves the bar unfolded, and the browser
- * folds it once it has measured it.
+ * toggle at the end of the bar, named by `menu-label`, or at its start with
+ * `toggle-placement="start"`. The toggle says whether the region is open with
+ * `aria-expanded`, and the region opens below the row. The region follows the
+ * toggle's region in focus order, so Tab from the toggle at the end goes into
+ * the open region. The custom state `folded` is on the host while the bar is
+ * that narrow, and `open` while the folded region is open. A server serves the
+ * bar unfolded, and the browser folds it once it has measured it.
+ *
+ * **`open` says whether the folded region is open, and setting it opens or
+ * closes the region.** `requestOpen(true)` and `requestOpen(false)` do the same
+ * and send `helix-before-open` or `helix-before-close` first, which you can
+ * cancel, and `toggleOpen()` asks for the opposite. `toggle` follows every
+ * change. The region closes on Escape, which puts focus back on the toggle,
+ * when focus moves to something outside the header, and on a press outside
+ * it. A bar that widens past `fold-below` closes its region.
  *
  * The host is the page's `banner` landmark. Placed inside `main`, `article`,
  * `aside`, `nav` or `section`, it is a plain box instead, as a native
@@ -67,11 +77,14 @@ import { inSectioningContent } from '../sectioning.js'
  * @slot menu-icon - Replaces the glyph inside the toggle that opens a folded middle region.
  * @slot start - Leading content, usually a wordmark.
  *
+ * @event {HelixBeforeCloseEvent} helix-before-close - The folded region is about to close. Cancelable: cancel it to keep it open.
+ * @event {HelixBeforeOpenEvent} helix-before-open - The folded region is about to open. Cancelable: cancel it to keep it closed.
  * @event {HelixScrolledEvent} helix-scrolled - Fired when the page crosses the
  * scroll threshold, with the new state. A custom state cannot be observed the
  * way an attribute can, so listen for this event to follow it. The event uses
  * the header's own threshold and hysteresis, so you do not need a second scroll
  * listener.
+ * @event {ToggleEvent} toggle - The folded region opened or closed. The event carries `newState` and `oldState`.
  *
  * @csspart content - The middle region.
  * @csspart end - The trailing region.
@@ -86,7 +99,7 @@ import { inSectioningContent } from '../sectioning.js'
  * @cssstate scrolled - While the page is scrolled down from the top, which is when the bar lifts off it.
  */
 @customElement('helix-headless-app-header')
-export class HelixHeadlessAppHeader extends HelixElement {
+export class HelixHeadlessAppHeader extends MixinControllerOpen(HelixElement) {
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-app-header': { menuLabel: 'Menü' } })`.
@@ -125,13 +138,24 @@ export class HelixHeadlessAppHeader extends HelixElement {
   @property({ attribute: 'hide-on-scroll', type: Boolean })
   hideOnScroll = false
 
+  /**
+   * Where the toggle that opens a folded middle region sits: at the end of the
+   * bar, after the trailing content, or with `start`, before the leading
+   * content.
+   *
+   * Optional, so the resting bar writes no attribute onto the host.
+   */
+  @property({ attribute: 'toggle-placement', reflect: true })
+  togglePlacement?: 'start'
+
   /** Whether the bar is narrower than `fold-below`, which only the observer sets. */
   @state()
   private folded = false
 
-  /** Whether the folded middle region is open. */
-  @state()
-  private unfolded = false
+  /** Whether the folded middle region is open and showing. */
+  private get unfolded(): boolean {
+    return this.folded && this.open
+  }
 
   /** Watches the bar's own width while `fold-below` is set. */
   private widths: ResizeObserver | undefined
@@ -157,18 +181,24 @@ export class HelixHeadlessAppHeader extends HelixElement {
     this.widths.observe(this)
   }
 
-  /** Folds the middle region where the bar is narrower than `fold-below`. */
+  /**
+   * Folds the middle region where the bar is narrower than `fold-below`. A bar
+   * that widens closes its region, so it starts closed when it folds again;
+   * one that narrows keeps an `open` you set.
+   */
   private fold(width: number): void {
     const folded = this.foldBelow !== undefined && width < this.foldBelow
     if (folded !== this.folded) {
       this.folded = folded
-      this.unfolded = false
+      if (!folded && this.open) {
+        this.open = false
+      }
     }
   }
 
   /** Opens or closes the folded middle region. */
   private readonly handleToggle = (): void => {
-    this.unfolded = !this.unfolded
+    this.toggleOpen()
   }
 
   /** Escape in the open region closes it and puts focus back on the toggle. */
@@ -177,8 +207,44 @@ export class HelixHeadlessAppHeader extends HelixElement {
       return
     }
     event.preventDefault()
-    this.unfolded = false
-    void this.updateComplete.then(() => this.partNamed('toggle')?.focus())
+    if (this.requestOpen(false)) {
+      void this.updateComplete.then(() => this.partNamed('toggle')?.focus())
+    }
+  }
+
+  /**
+   * Closes the open region when focus moves to something outside the header.
+   * Focus leaving the window has no `relatedTarget`, and closes nothing.
+   */
+  private readonly handleFocusOut = (event: FocusEvent): void => {
+    const next = event.relatedTarget
+    if (this.unfolded && next instanceof Node && !deepContains(this, next)) {
+      this.requestOpen(false)
+    }
+  }
+
+  /** Closes the open region on a press outside the header. */
+  private readonly handleOutsidePress = (event: PointerEvent): void => {
+    if (this.unfolded && !event.composedPath().includes(this)) {
+      this.requestOpen(false)
+    }
+  }
+
+  /** Whether the outside press is listened for, which is while the region is open. */
+  private pressing = false
+
+  /** Listens for a press outside while the folded region is open, and only then. */
+  private watchPresses(): void {
+    const want = this.unfolded && this.isConnected
+    if (want === this.pressing) {
+      return
+    }
+    this.pressing = want
+    if (want) {
+      document.addEventListener('pointerdown', this.handleOutsidePress, true)
+    } else {
+      document.removeEventListener('pointerdown', this.handleOutsidePress, true)
+    }
   }
 
   /** Whether the bar is out of the way, under `hide-on-scroll`. */
@@ -311,7 +377,9 @@ export class HelixHeadlessAppHeader extends HelixElement {
     // On the host, since the host is the banner.
     hostAria(this.internals, { role: this.landmark })
     this.toggleState('folded', this.folded)
-    this.toggleState('open', this.folded && this.unfolded)
+    /* After the mixin's, which records `open` whenever `open` is true: here
+       the state is the region showing, and a wide bar shows no folded region. */
+    this.toggleState('open', this.unfolded)
   }
 
   override connectedCallback(): void {
@@ -329,9 +397,11 @@ export class HelixHeadlessAppHeader extends HelixElement {
     // fresh load actually shows.
     this.listen()
     this.addEventListener('focusin', this.handleFocusIn)
+    this.addEventListener('focusout', this.handleFocusOut)
     this.addEventListener('keydown', this.handleKeydown)
     if (this.hasUpdated) {
       this.watchWidth()
+      this.watchPresses()
     }
   }
 
@@ -346,9 +416,11 @@ export class HelixHeadlessAppHeader extends HelixElement {
     this.source?.removeEventListener('scroll', this.handleScroll)
     this.source = undefined
     this.removeEventListener('focusin', this.handleFocusIn)
+    this.removeEventListener('focusout', this.handleFocusOut)
     this.removeEventListener('keydown', this.handleKeydown)
     this.widths?.disconnect()
     this.widths = undefined
+    this.watchPresses()
   }
 
   /** The `fold-below` the width watch was started for, so a change is measured at once. */
@@ -378,6 +450,7 @@ export class HelixHeadlessAppHeader extends HelixElement {
     if (changed.has('hideOnScroll') && !this.hideOnScroll) {
       this.hide(false)
     }
+    this.watchPresses()
   }
 
   /**
@@ -393,25 +466,37 @@ export class HelixHeadlessAppHeader extends HelixElement {
     </slot>`
   }
 
+  /**
+   * The row, with the middle region between the leading and the trailing
+   * content while the bar is wide, and after both while it is folded.
+   *
+   * **Folded, the region comes last in the markup**, because it opens below
+   * the row and focus order follows the markup. Between the two, as it is
+   * drawn on a wide bar, Tab from the toggle at the end left the header and
+   * the links it had just revealed were reached only by going back. The grid
+   * puts it on its own row either way.
+   */
   protected override render(): TemplateResult {
+    const toggle = this.folded
+      ? html`<button
+          part="toggle"
+          type="button"
+          aria-controls="content"
+          aria-expanded=${this.unfolded ? 'true' : 'false'}
+          aria-label=${this.menuLabel}
+          @click=${this.handleToggle}
+        >
+          ${this.renderMenuIcon()}
+        </button>`
+      : nothing
+    const first = this.togglePlacement === 'start'
+    const content = html`<div part="content" id="content" ?hidden=${this.folded && !this.unfolded}><slot></slot></div>`
     return html`
       <div part="row">
-        <div part="start"><slot name="start"></slot></div>
-        <div part="content" id="content" ?hidden=${this.folded && !this.unfolded}><slot></slot></div>
-        <div part="end"><slot name="end"></slot>${
-          this.folded
-            ? html`<button
-                part="toggle"
-                type="button"
-                aria-controls="content"
-                aria-expanded=${this.unfolded ? 'true' : 'false'}
-                aria-label=${this.menuLabel}
-                @click=${this.handleToggle}
-              >
-                ${this.renderMenuIcon()}
-              </button>`
-            : nothing
-        }</div>
+        <div part="start">${first ? toggle : nothing}<slot name="start"></slot></div>
+        ${this.folded ? nothing : content}
+        <div part="end"><slot name="end"></slot>${first ? nothing : toggle}</div>
+        ${this.folded ? content : nothing}
       </div>
     `
   }
