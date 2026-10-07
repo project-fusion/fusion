@@ -262,3 +262,37 @@ describe('the marks of your own', () => {
     expect(chevron?.getAttribute('aria-hidden')).toBe('true')
   })
 })
+
+describe('a menu row with no name', () => {
+  /* The missing-name warning is in development builds only, which the
+     package's `test:dom` script asks for with `--conditions helix-development`. */
+  const warnedOn = async (markup: string): Promise<string[]> => {
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      await mount(markup)
+      await new Promise((done) => setTimeout(done, 5))
+    } finally {
+      console.warn = original
+    }
+    return warnings
+  }
+
+  test('is reported by its tag', async () => {
+    const warnings = await warnedOn(
+      '<helix-headless-menu-item value="bold"><svg slot="start"></svg></helix-headless-menu-item>',
+    )
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0]).toContain('<helix-headless-menu-item> has no accessible name')
+  })
+
+  test('and a row with words, or an icon with a label, is not', async () => {
+    for (const named of [
+      '<helix-headless-menu-item value="bold">Bold</helix-headless-menu-item>',
+      '<helix-headless-menu-item value="bold"><svg slot="start" aria-label="Bold"></svg></helix-headless-menu-item>',
+    ]) {
+      expect([named, ...(await warnedOn(named))]).toEqual([named])
+    }
+  })
+})

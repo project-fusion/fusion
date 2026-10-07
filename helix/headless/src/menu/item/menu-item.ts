@@ -1,5 +1,6 @@
 import {
   ariaChord,
+  auditName,
   customElement,
   deepActiveElement,
   HelixBeforeToggleEvent,
@@ -50,6 +51,9 @@ import '../../kbd/index.js'
  * label, and in `end` describe it instead, through `aria-describedby`, as
  * React Aria's menu item does with its description: a reader hears "Copy",
  * then "Copies the selection".
+ *
+ * A development build warns when a row has no words to be named by, such as a
+ * row holding only an icon with no label.
  *
  * The check mark and the caret are the fallbacks of the `check` and `chevron`
  * slots, so a mark of your own replaces either by being slotted. Neither is
@@ -296,6 +300,19 @@ export class HelixHeadlessMenuItem extends HelixElement {
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
     this.finishHydration()
+  }
+
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    /* Once the row is first drawn, which for a submenu's row is when its page
+       first shows: until then there is no row to name. */
+    if (this.partNamed('item')) {
+      auditName(
+        this,
+        () => this.partNamed('item'),
+        'Give the row words in its default slot, or a label on the icon it holds.',
+      )
+    }
   }
 
   /**
