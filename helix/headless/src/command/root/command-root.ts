@@ -39,6 +39,26 @@ import '../../listbox/index.js'
  * the full list. Combobox and Select do the same. As typing narrows the list, a
  * screen reader hears how many commands are left, such as "3 commands".
  *
+ * **Keyboard.** Focus goes to the filter field as the palette opens, and the
+ * highlight moves through the commands while you type.
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | `hotkey`, Command or Control with K by default | Opens the palette from anywhere on the page, or closes it. |
+ * | Down, Up | Moves the highlight to the next or the previous command, round from the last to the first. |
+ * | Page Down, Page Up | Moves the highlight by as many commands as the list shows at once. |
+ * | Home, End, Left, Right | Move the caret in the filter field. |
+ * | Enter | Runs the highlighted command, or follows it where it is a link, and closes the palette. |
+ * | Command or Control with Enter | Takes the highlighted command's `alternate` destination, where it has one. |
+ * | Escape | Clears the filter. With the filter empty, closes the palette and puts focus back where it was. |
+ * | Tab | Stays in the palette, which is modal. |
+ *
+ * **ARIA.** The palette is a modal `dialog` named by `label`. Inside it the
+ * filter field is a `combobox` with `aria-activedescendant` on the
+ * highlighted command, and the commands are a `listbox` of `option`s. How
+ * many commands typing left, the empty text and the loading text are said in
+ * a polite live region.
+ *
  * @since 0.1.0
  * @status stable
  * @category navigation
@@ -48,7 +68,9 @@ import '../../listbox/index.js'
  * @slot - The commands, and any groups of them.
  * @slot empty - What the palette shows when typing matches no commands, for content richer than `empty-text`.
  * @slot error - What the palette shows while `load-error` is set, for content richer than its text.
+ * @slot filter-icon - Replaces the magnifying glass in the filter field.
  * @slot footer - Content under the list, such as the keys that work in the palette.
+ * @slot header - Content above the filter field, such as a title or the scope being searched. A heading here does not rename the palette, which `label` names.
  * @slot loading - What the palette shows while the commands load, for content richer than `loading-text`.
  * @slot no-results - What the palette shows when typing matches no commands, for content richer than `no-results-text`.
  *
@@ -80,6 +102,10 @@ import '../../listbox/index.js'
  * @csspart listbox-search - The region that holds the filter field.
  * @csspart listbox-search-field - The filter field.
  *
+ * @cssstate empty - The list shows no commands: there are none, or typing hid every one.
+ * @cssstate error - While `load-error` is set.
+ * @cssstate loading - While `loading` is set.
+ * @cssstate no-results - Typing hid every one of the commands, where there are some.
  * @cssstate open - While the palette is open.
  */
 @customElement('helix-headless-command')
@@ -370,8 +396,41 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
     this.finishHydration()
   }
 
+  /**
+   * The list's loading, error and empty states on the host too, so a page
+   * styles the whole palette from them, as Combobox does. Read once the list
+   * has drawn its filter, since `hidden` is what the filter writes onto a
+   * command.
+   */
+  private markStatus(): void {
+    const list = this.listbox
+    const options = list?.options ?? []
+    const shown = options.some((option) => !option.hidden)
+    const settled = list !== null && !this.loading
+    this.toggleState('loading', this.loading)
+    this.toggleState('error', Boolean(this.loadError))
+    this.toggleState('empty', settled && !shown)
+    this.toggleState('no-results', settled && list.filter !== '' && options.length > 0 && !shown)
+  }
+
+  /**
+   * After the list has filtered on what was typed. The event comes before the
+   * filter is applied, so the list's update is waited for a turn later.
+   */
+  private readonly handleFilter = (): void => {
+    void Promise.resolve()
+      .then(() => this.listbox?.updateComplete)
+      .then(() => this.markStatus())
+  }
+
+  /** Whether a child fills the named slot, so it is handed on to the dialog or the list. */
+  private fills(name: string): boolean {
+    return this.querySelector?.(`:scope > [slot="${name}"]`) != null
+  }
+
   protected override updated(changed: PropertyValues): void {
     super.updated?.(changed)
+    void (this.listbox?.updateComplete ?? Promise.resolve()).then(() => this.markStatus())
     /* On the change rather than on every update. Both of these reach into the
        listbox, and asking it to filter on a render it did not cause is how a
        render becomes a loop: the list updates, something it owns comes back
@@ -432,6 +491,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
         ?loading=${this.loading}
         filterable
         @helix-before-change=${this.handleChange}
+        @helix-filter=${this.handleFilter}
         @change=${this.stopInner}
         @input=${this.stopInner}
       >
@@ -445,10 +505,22 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
              list's own fallback, which is no-results-text or empty-text. -->
         <slot
           name="no-results"
-          slot=${this.querySelector?.(':scope > [slot="no-results"]') ? 'no-results' : nothing}
+          slot=${this.fills('no-results') ? 'no-results' : nothing}
+          @slotchange=${() => this.requestUpdate()}
+        ></slot>
+        <slot
+          name="filter-icon"
+          slot=${this.fills('filter-icon') ? 'filter-icon' : nothing}
           @slotchange=${() => this.requestUpdate()}
         ></slot>
       </${this.tag('listbox')}>
+      <!-- Handed on only while something fills it, as above, so an empty
+           header draws nothing in the dialog. -->
+      <slot
+        name="header"
+        slot=${this.fills('header') ? 'header' : nothing}
+        @slotchange=${() => this.requestUpdate()}
+      ></slot>
       <div ?hidden=${!this.footed} part="footer" slot="footer">
         <slot
           name="footer"
