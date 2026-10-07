@@ -278,6 +278,18 @@ export class HelixHeadlessListbox extends MixinCollection(
   filterDelay = 0
 
   /**
+   * Whether an option is kept by the filter: a function given the option's
+   * words and the filter, trimmed, that returns `true` to keep it showing, as
+   * React Aria's `Autocomplete` takes `filter`. For matching that ignores
+   * accents, matches the start of each word, or matches out of order.
+   *
+   * Absent, an option is kept where its words hold the filter, in any case. A
+   * property only, there being no way to write a function in markup.
+   */
+  @property({ attribute: false })
+  filterMatch?: ((text: string, filter: string) => boolean) | undefined
+
+  /**
    * Placeholder text for the filter field.
    */
   @words
@@ -1020,10 +1032,14 @@ export class HelixHeadlessListbox extends MixinCollection(
   /** Hides what the filter excludes, and writes the rest onto the options. */
   private place(): void {
     this.forgetRemoved()
-    const needle = this.filter.trim().toLowerCase()
+    const typed = this.filter.trim()
+    const needle = typed.toLowerCase()
+    const match = this.filterMatch
     const chosen = new Set(this.values)
     for (const option of this.entries) {
-      option.hidden = needle !== '' && !option.text.toLowerCase().includes(needle)
+      option.hidden =
+        needle !== '' &&
+        !(match ? match(option.text, typed) : option.text.toLowerCase().includes(needle))
       option.selected = chosen.has(option.value)
     }
 
