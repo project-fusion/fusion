@@ -29,6 +29,7 @@ import { styles } from './badge-root.css.js'
  * @cssproperty --badge-color - The color of the count, to pair with a fill set through `--badge-background-color`.
  * @cssproperty --badge-font-weight - The weight of the count.
  * @cssproperty --badge-gap - The space between the content and the count under `placement="inline"`.
+ * @cssproperty --badge-icon-size - The size of an icon in the `icon` slot. The count's own size by default.
  * @cssproperty --badge-offset - Pulls the mark in from the corner, along both axes.
  * @cssproperty --badge-radius - How far the indicator's corners are rounded.
  * @cssproperty --badge-ring-color - The color of the ring between the indicator and what is behind it.

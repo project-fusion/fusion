@@ -310,3 +310,68 @@ describe('format-options', () => {
     ]).toEqual(['1200', 'New'])
   })
 })
+
+/* Web Awesome's badge takes an icon at the start of its mark, and a badge here
+   could hold a count or nothing. */
+describe('a badge with an icon', () => {
+  type Badge = HTMLElement & {
+    internals: ElementInternals
+    updateComplete: Promise<boolean>
+    value: string
+  }
+
+  test('draws the icon inside the mark, before the count, hidden from readers', async () => {
+    const badge = (await mount(
+      '<helix-headless-badge value="3" label="{count} new"><span>x</span><i slot="icon">*</i></helix-headless-badge>',
+    )) as Badge
+    await badge.updateComplete
+    const indicator = part(badge, 'indicator')
+    const icon = indicator?.querySelector('slot[name="icon"]')
+    expect(icon?.getAttribute('part')).toBe('icon')
+    expect(icon?.getAttribute('aria-hidden')).toBe('true')
+    expect(indicator?.textContent).toBe('3')
+    expect(indicator?.getAttribute('aria-label')).toBe('3 new')
+    expect(indicator?.hasAttribute('data-single')).toBe(false)
+    expect(badge.internals.states.has('has-icon')).toBe(true)
+  })
+
+  test('with no value, the icon is the whole mark, and the mark is no dot', async () => {
+    const badge = (await mount(
+      '<helix-headless-badge label="Verified"><span>x</span><i slot="icon">*</i></helix-headless-badge>',
+    )) as Badge
+    await badge.updateComplete
+    const indicator = part(badge, 'indicator')
+    expect(indicator?.hasAttribute('data-single')).toBe(true)
+    expect(badge.internals.states.has('dot')).toBe(false)
+    expect(indicator?.getAttribute('aria-label')).toBe('Verified')
+  })
+
+  test('a badge with no icon keeps an indicator with nothing in it, which draws the dot', async () => {
+    const badge = (await mount(
+      '<helix-headless-badge><span>x</span></helix-headless-badge>',
+    )) as Badge
+    await badge.updateComplete
+    expect(part(badge, 'indicator')?.querySelector('slot')).toBeNull()
+    expect(badge.internals.states.has('dot')).toBe(true)
+    expect(badge.internals.states.has('has-icon')).toBe(false)
+  })
+
+  test('an icon slotted later moves into the mark, and out again when it goes', async () => {
+    const badge = (await mount(
+      '<helix-headless-badge><span>x</span></helix-headless-badge>',
+    )) as Badge
+    await badge.updateComplete
+    const icon = document.createElement('i')
+    icon.slot = 'icon'
+    badge.append(icon)
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await badge.updateComplete
+    expect(part(badge, 'indicator')?.querySelector('slot[name="icon"]')).not.toBeNull()
+    expect(badge.internals.states.has('dot')).toBe(false)
+    icon.remove()
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await badge.updateComplete
+    expect(part(badge, 'indicator')?.querySelector('slot')).toBeNull()
+    expect(badge.internals.states.has('dot')).toBe(true)
+  })
+})
