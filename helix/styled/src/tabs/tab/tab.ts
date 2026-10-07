@@ -17,8 +17,10 @@ import { styles } from './tab.css.js'
  * @documentation https://fusion.dev/helix/components/tabs
  *
  * @slot - The tab's label.
+ * @slot dismiss-icon - Replaces the glyph on the mark that closes a `dismissible` tab.
  *
  * @csspart dismiss - The mark a pointer presses to close a `dismissible` tab.
+ * @csspart dismiss-mark - The glyph on that mark, where none is slotted.
  * @csspart tab - The tab itself.
  *
  * @cssproperty --tabs-tab-block-size - The height of a tab. `segmented` sizes its tabs to the track and does not read it.

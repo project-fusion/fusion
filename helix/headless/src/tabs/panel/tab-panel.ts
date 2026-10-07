@@ -1,4 +1,10 @@
-import { customElement, focusableElements, HelixElement, hostAria } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  focusableElements,
+  HelixElement,
+  HelixLoadEvent,
+  hostAria,
+} from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
@@ -17,15 +23,24 @@ import { property, state } from 'lit/decorators.js'
  * the tab list lands on the panel's first link or control where there is one,
  * and on the panel itself where there is none.
  *
+ * **Set `lazy` for a panel that is expensive to draw.** Its content waits in a
+ * `<template>` inside it, and goes into the panel the first time the panel is
+ * shown, so it costs nothing until a reader opens that tab. Once in, it stays.
+ * The panel sends `helix-load` at the same moment, for content your code
+ * renders itself.
+ *
  * @since 0.1.0
  * @status stable
  * @aliases TabPanel
  * @documentation https://fusion.dev/helix/components/tabs
  *
- * @slot - The panel's content.
+ * @slot - The panel's content. Under `lazy`, a `<template>` holding it.
+ *
+ * @event {HelixLoadEvent} helix-load - Fired the first time a `lazy` panel is shown, once its template's content is in.
  *
  * @csspart panel - The panel container, which takes the focus while it holds nothing focusable.
  *
+ * @cssstate loaded - Once a `lazy` panel has been shown and its content is in.
  * @cssstate selected - While its tab is the one selected.
  */
 @customElement('helix-headless-tab-panel')
@@ -44,6 +59,34 @@ export class HelixHeadlessTabPanel extends HelixElement {
    */
   @property({ attribute: false })
   label = ''
+
+  /**
+   * Whether the panel's content waits in a `<template>` until the panel is
+   * first shown.
+   */
+  @property({ type: Boolean })
+  lazy = false
+
+  /** Whether a `lazy` panel has put its content in. */
+  private loaded = false
+
+  /**
+   * Puts a `lazy` panel's content in the first time the panel is shown: the
+   * content of each `<template>` it holds, in place of the template.
+   */
+  private load(): void {
+    if (!this.lazy || !this.selected || this.loaded) {
+      return
+    }
+    this.loaded = true
+    for (const template of [...this.children]) {
+      if (template instanceof HTMLTemplateElement) {
+        template.replaceWith(document.importNode(template.content, true))
+      }
+    }
+    this.toggleState('loaded', true)
+    this.dispatchEvent(new HelixLoadEvent())
+  }
 
   /**
    * Whether this panel is the visible one.
@@ -93,6 +136,9 @@ export class HelixHeadlessTabPanel extends HelixElement {
      has no box and so no stop. */
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    if (changed.has('selected') || changed.has('lazy')) {
+      this.load()
+    }
     if (changed.has('selected')) {
       this.readStops()
     }

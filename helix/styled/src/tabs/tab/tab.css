@@ -100,6 +100,12 @@
   inline-size: 1em;
 }
 
+slot[name="dismiss-icon"]::slotted(*) {
+  --icon-size: 1em;
+  block-size: 1em;
+  inline-size: 1em;
+}
+
 [part="dismiss"]:hover {
   background-color: color-mix(in oklab, var(--helix-color-foreground) 10%, transparent);
 }
