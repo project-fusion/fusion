@@ -21,7 +21,7 @@ describe('divider server output', () => {
        whatever the divider renders. The slot in the content region is what sets
        that text between the two rules. */
     expect(shadow).toMatch(
-      /<span id="content" part="content">(?:<!--[^>]*-->)?<slot\s*><\/slot><\/span>/,
+      /<span\s+id="content"\s+part="content"\s+aria-hidden="true"\s*>(?:<!--[^>]*-->)?<slot\s*><\/slot><\/span>/,
     )
   })
 

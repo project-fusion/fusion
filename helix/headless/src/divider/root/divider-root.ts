@@ -20,9 +20,10 @@ import { property } from 'lit/decorators.js'
  * **The line is a separator**, as `<hr>` is, and as Radix Separator, React
  * Aria Separator, and Web Awesome's divider are. It is named by any content
  * set into it, so a screen reader says "Or, separator" where you wrote "Or" on
- * the line. Set `decorative` on a rule that separates nothing, such as one
- * under a heading or between the facts of a byline, and it leaves the
- * accessibility tree.
+ * the line, and the words are read once, as that name. Set words into a
+ * separator and no controls, which are hidden with them. Set `decorative` on
+ * a rule that separates nothing, such as one under a heading or between the
+ * facts of a byline, and it leaves the accessibility tree.
  *
  * Use `orientation="vertical"` between items on one line. A vertical divider
  * stretches to fit its flex parent and sets no height of its own.
@@ -155,7 +156,11 @@ export class HelixHeadlessDivider extends HelixElement {
     /* **A separator is named by what is set into it**, so a reader
        hears "Or, separator" where the page wrote "Or" on the line. By id, in
        one shadow root, which reads the slotted words where a name taken from
-       the line's own content would not; an empty content names nothing. */
+       the line's own content would not; an empty content names nothing.
+       **And it is read once, as that name.** Left in the tree as well, "Or"
+       was read as the separator's name and again as text beside it. The
+       name is still computed from it, a reference reaching content that is
+       hidden. */
     const separator = this.announced || !this.decorative
     return html`<div
       part="line"
@@ -163,7 +168,7 @@ export class HelixHeadlessDivider extends HelixElement {
       aria-labelledby=${separator ? 'content' : nothing}
       aria-orientation=${separator ? this.drawn : nothing}
     ></div>
-      <span id="content" part="content"><slot @slotchange=${() => this.markEmpty()}></slot></span>
+      <span id="content" part="content" aria-hidden=${separator ? 'true' : nothing}><slot @slotchange=${() => this.markEmpty()}></slot></span>
       <div part="line" role="presentation"></div>`
   }
 }

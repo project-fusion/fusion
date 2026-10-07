@@ -116,6 +116,15 @@
   flex: 0 0 var(--divider-content-offset, var(--helix-space-lg));
 }
 
+/* Forced colors paint every background the page's Canvas color, so the line
+   vanished into the page. It keeps the text color, as an `<hr>` does there. */
+@media (forced-colors: active) {
+  [part="line"] {
+    background-color: CanvasText;
+    forced-color-adjust: none;
+  }
+}
+
 /* Print: a rule, which prints.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
