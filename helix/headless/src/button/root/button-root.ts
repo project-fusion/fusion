@@ -291,6 +291,14 @@ export class HelixHeadlessButton extends HelixFormElement {
   }
 
   /**
+   * @internal Says `words` in the button's live region, for a subclass with
+   * news of its own, as `CopyButton` says the result of a copy.
+   */
+  protected sayStatus(words: string): void {
+    this.status.say(words)
+  }
+
+  /**
    * @internal The live region a pending button speaks in, for a subclass that
    * replaces the template, as `CopyButton` does.
    */

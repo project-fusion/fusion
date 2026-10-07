@@ -311,3 +311,38 @@ describe('copying from another element', () => {
     expect(heard).toEqual(['helix-copy-error'])
   })
 })
+
+describe('the result of a copy', () => {
+  /* Only the focused button's new name said it, which a screen reader reads
+     only where it reads a name change at all. */
+  test('is said in a live region, the copy and the refusal alike', async () => {
+    const frame = async (): Promise<void> => {
+      await new Promise((done) => requestAnimationFrame(() => done(undefined)))
+    }
+    clipboard('accept')
+    const el = (await mount(
+      '<helix-headless-copy-button value="one"></helix-headless-copy-button>',
+    )) as Updatable
+    const live = (): string | undefined =>
+      el.shadowRoot?.querySelector('[part="live"]')?.textContent?.trim()
+    expect(live()).toBeUndefined()
+    await press(el)
+    await frame()
+    await el.updateComplete
+    expect(el.shadowRoot?.querySelector('[part="live"]')?.getAttribute('role')).toBe('status')
+    expect(live()).toBe('Copied')
+
+    clipboard('refuse')
+    ;(document as unknown as Record<string, unknown>).execCommand = () => false
+    const refused = (await mount(
+      '<helix-headless-copy-button value="one" error-label="Not copied"></helix-headless-copy-button>',
+    )) as Updatable
+    await press(refused)
+    delete (document as unknown as Record<string, unknown>).execCommand
+    await frame()
+    await refused.updateComplete
+    expect(refused.shadowRoot?.querySelector('[part="live"]')?.textContent?.trim()).toBe(
+      'Not copied',
+    )
+  })
+})
