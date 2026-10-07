@@ -492,7 +492,7 @@ describe('input date can be written out', () => {
   /* Picking hands focus back with the rendering showing, and a key that edited
      it wrote `August 5, 2027`, which no date can be read from. */
   test('after a pick, the first key that edits puts the value in the field first', async () => {
-    const host = await field('default-value="2026-08-04" locale="en-GB"')
+    const host = (await field('default-value="2026-08-04" locale="en-GB"')) as InputDate
     const control = part(host, 'control') as HTMLInputElement
     host.toggleOpen()
     await host.updateComplete
