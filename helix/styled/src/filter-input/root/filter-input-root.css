@@ -59,6 +59,13 @@
  * negative block margin takes the rule to the field's full height, which is what
  * makes it a seam rather than a short line floating in a row.
  *
+ * **The same inset on both sides of the control.** It was `2xs` before it and
+ * `xs` after it, and a ghost trigger's hover fill showed the difference:
+ * measured in the console at `0.875` density, 4px from the field's border and
+ * 7px from the seam, with 4px above and below. At `2xs` either side the fill is
+ * 3.5px from each edge and 4.3px from the top and the bottom, a control set in
+ * its box rather than pushed against one wall of it.
+ *
  * Hidden rather than absent when nothing is slotted, because a second template
  * branch would rebuild the slot inside it, and a rebuilt slot fires `slotchange`
  * on its way out with nothing assigned. `Menu.Item` records that trap.
@@ -71,7 +78,7 @@
   display: flex;
   margin-block: calc(var(--helix-space-2xs) * -1);
   margin-inline-start: calc(var(--helix-space-xs) * -1);
-  padding-inline: var(--helix-space-2xs) var(--helix-space-xs);
+  padding-inline: var(--helix-space-2xs);
 }
 
 /* Restated, because the rule above sets `display` and outranks the UA's. */
