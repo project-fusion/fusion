@@ -117,6 +117,17 @@ const FIXTURES = [
     name: 'data-table',
   },
   {
+    check: `if (host.shadowRoot.querySelector('[part="empty"]')) return 'says it is empty'
+      const head = [...host.shadowRoot.querySelectorAll('[part="head"] slot')].flatMap((slot) => slot.assignedElements())
+      if (head.map((column) => column.textContent.trim()).join('|') !== 'Name|Size') return 'heads its columns ' + JSON.stringify(head.map((column) => column.textContent.trim()))
+      const served = host.shadowRoot.querySelector('[part="table"] > slot:not([name])')?.assignedElements() ?? []
+      const words = served.map((row) => [...row.children].map((cell) => cell.textContent.trim()).join(' '))
+      return words.join('|') === 'alpha 30 B|bravo 4 B' ? null : 'shows the served rows as ' + JSON.stringify(words)`,
+    markup:
+      '<helix-data-table label="Files" page-size="2"><helix-table-column field="name">Name</helix-table-column><helix-table-column field="size" text-align="end">Size</helix-table-column><helix-table-row><helix-table-cell header>alpha</helix-table-cell><helix-table-cell>30 B</helix-table-cell></helix-table-row><helix-table-row><helix-table-cell header>bravo</helix-table-cell><helix-table-cell>4 B</helix-table-cell></helix-table-row></helix-data-table>',
+    name: 'data-table-served',
+  },
+  {
     check: `const list = host.shadowRoot.querySelector('slot[name="items"]')?.assignedElements() ?? []
       if (list.length !== 2) return 'lists ' + list.length + ' of 2 rows'
       const group = host.querySelector('helix-notification-group')
