@@ -122,6 +122,30 @@ describe('sandbox coordination', () => {
     expect(preview.styles).toBe('p { color: red }')
   })
 
+  /* Only `html` and `css` reached the preview, so a script had to be written
+     inside the markup pane, in a `<script>` element. */
+  test('a script pane reaches the preview as its script, and runs after the markup', async () => {
+    const sandbox = await mount(`
+      <helix-sandbox>
+        <helix-sandbox-source slot="source" name="html" value="<p>one</p>"></helix-sandbox-source>
+        <helix-sandbox-source slot="source" name="js" value="console.log(1)"></helix-sandbox-source>
+        <helix-sandbox-preview slot="preview"></helix-sandbox-preview>
+      </helix-sandbox>`)
+    const preview = sandbox.querySelector('helix-sandbox-preview') as Updatable & {
+      script: string
+      source: string
+    }
+    expect(preview.script).toBe('console.log(1)')
+    expect(preview.source).toBe('<p>one</p>')
+    const js = sandbox.querySelectorAll('helix-sandbox-source')[1] as Updatable
+    const field = js.shadowRoot?.querySelector('textarea') as HTMLTextAreaElement
+    field.value = 'console.log(2)'
+    field.dispatchEvent(new Event('input'))
+    await preview.updateComplete
+    expect(preview.script).toBe('console.log(2)')
+    expect(preview.source).toBe('<p>one</p>')
+  })
+
   test('and a preview given its own source keeps it until the first edit', async () => {
     const sandbox = await mount(`
       <helix-sandbox>

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { isRender, LAYOUT_RULES, loggedText, withoutStylesheets } from './frame.js'
+import { isRender, LAYOUT_RULES, loggedText, withoutStylesheets, withScript } from './frame.js'
 
 describe('the frame side of the preview protocol', () => {
   test('a render is an object whose type names it, and nothing else is', () => {
@@ -32,5 +32,12 @@ describe('the frame side of the preview protocol', () => {
     for (const rule of rules) {
       expect(rule).toContain('box-sizing: border-box')
     }
+  })
+
+  test('a script goes after the markup as a module, and no script adds nothing', () => {
+    expect(withScript('<p>Hi</p>', '')).toBe('<p>Hi</p>')
+    expect(withScript('<p>Hi</p>', 'go()')).toBe(
+      `<p>Hi</p><script type="module">go()${['<', 'script>'].join('/')}`,
+    )
   })
 })

@@ -316,6 +316,13 @@ export const servePreview = (options: ServePreviewOptions = {}): (() => void) =>
 let builtIn: string | undefined
 
 /**
+ * Markup with a script after it, run as a module once the markup is in: what
+ * a sandbox's `js` pane adds to its `html` pane.
+ */
+export const withScript = (source: string, script: string): string =>
+  script === '' ? source : `${source}<script type="module">${script}${SCRIPT_END}`
+
+/**
  * The tag that closes the built-in document's script, joined when it is used.
  *
  * **Never written whole in this module.** A page that inlines its bundle in a

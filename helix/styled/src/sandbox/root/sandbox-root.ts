@@ -35,6 +35,16 @@ const DEFAULT_PANEL = 160
 /** The most of the sandbox the panel may take, leaving the panes above it. */
 const PANEL_MAX = 0.8
 
+/** The preview property each pane name writes. */
+const PANE_KEYS = { css: 'styles', html: 'source', js: 'script' } as const
+
+/** A pane name the sandbox writes into its previews. */
+type PaneName = keyof typeof PANE_KEYS
+
+/** Whether a pane's name is one the sandbox writes into its previews. */
+const isPaneName = (name: unknown): name is PaneName =>
+  typeof name === 'string' && Object.hasOwn(PANE_KEYS, name)
+
 /**
  * @summary An editable source pane paired with a live preview.
  *
@@ -45,9 +55,10 @@ const PANEL_MAX = 0.8
  * alone.
  *
  * The event carries the pane's `name`, so one sandbox can hold several panes.
- * `html` sets the preview's markup and `css` sets its stylesheet. The sandbox
- * ignores a pane with any other name, so that pane can show content without
- * changing the preview.
+ * `html` sets the preview's markup, `css` sets its stylesheet, and `js` sets
+ * a script that runs as a module after the markup. The sandbox ignores a pane
+ * with any other name, so that pane can show content without changing the
+ * preview.
  *
  * **The dividers are two nested `helix-splitter` elements**, which handle the
  * pointer, the keyboard, and the corner. The inner splitter holds the panes and
@@ -351,7 +362,7 @@ export class HelixSandbox extends HelixElement {
        component as though it were markup. */
     const pane = event.composedPath()[0] as { name?: string }
     const name = pane?.name
-    if (name !== 'css' && name !== 'html') {
+    if (!isPaneName(name)) {
       return
     }
     /* **After the dispatch, and only if nobody refused.** This listener is
@@ -372,9 +383,9 @@ export class HelixSandbox extends HelixElement {
    * `seeding` writes only into a preview that has nothing yet, so a preview
    * given its own `source` keeps it until the first edit.
    */
-  private write(name: 'css' | 'html', value: string, seeding: boolean): void {
+  private write(name: PaneName, value: string, seeding: boolean): void {
     for (const preview of this.previews) {
-      const key = name === 'css' ? 'styles' : 'source'
+      const key = PANE_KEYS[name]
       if (!seeding || !preview[key]) {
         preview[key] = value
       }
@@ -393,7 +404,7 @@ export class HelixSandbox extends HelixElement {
     for (const pane of slot?.assignedElements({ flatten: true }) ?? []) {
       const { name, value } = pane as Element & { name?: unknown; value?: unknown }
       const text = typeof value === 'string' ? value : pane.getAttribute('value')
-      if ((name === 'css' || name === 'html') && text) {
+      if (isPaneName(name) && text) {
         this.write(name, text, true)
       }
     }
