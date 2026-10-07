@@ -50,7 +50,7 @@
      the same answer a textarea has always given. */
   field-sizing: content;
   font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-sm);
+  font-size: max(var(--helix-text-field-min), var(--helix-text-sm));
   line-height: var(--helix-leading-normal);
   max-block-size: var(--chat-composer-max-block-size, 12rem);
   padding-block: var(--helix-space-2xs);

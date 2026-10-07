@@ -373,7 +373,7 @@
   color: var(--helix-color-foreground);
   flex: 1 1 auto;
   font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-control);
+  font-size: max(var(--helix-text-field-min), var(--helix-text-control));
   font-weight: var(--helix-weight-medium);
   min-inline-size: 0;
   padding-inline: var(--helix-space-xs);
@@ -453,7 +453,7 @@
   box-sizing: border-box;
   color: var(--helix-color-foreground);
   font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-control);
+  font-size: max(var(--helix-text-field-min), var(--helix-text-control));
   font-variant-numeric: tabular-nums;
   font-weight: var(--helix-weight-medium);
   inline-size: 100%;

@@ -28,6 +28,23 @@ The type scale runs from `--helix-text-xs` to `--helix-text-3xl`.
 `--helix-text-control` sets the size of a control's own text. It follows the
 region's density and is separate from the type scale.
 
+**On a touch screen, text you type is at least 16px.** iOS Safari zooms the
+page into a focused input, textarea, or select whose text is smaller than
+16px. `--helix-text-field-min` is the smallest size a field's text can take:
+16px where the primary pointer is coarse, and 0 everywhere else. Every field
+sets its text to the larger of this token and its own size, so the desktop
+sizes do not change. To keep the desktop sizes on a touch screen as well, set
+the token in a stylesheet loaded after Helix's:
+
+```css
+:root {
+  --helix-text-field-min: 0px;
+}
+```
+
+Leave the viewport's `maximum-scale` and `user-scalable` alone. Setting
+either one to stop the zoom also stops a reader from zooming the page.
+
 **The base layer applies the scale to heading elements.**
 
 ```css

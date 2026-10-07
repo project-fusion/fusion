@@ -65,3 +65,18 @@
     --_helix-mode-inverted: light;
   }
 }
+
+/* **The pointer decides how small a field's text may be.** iOS Safari zooms
+   into a focused input, textarea or select whose text is under 16px, and the
+   page stays zoomed after the field loses focus. A coarse pointer raises the
+   floor to 16px; a fine one leaves every field at its own step.
+   `--helix-text-field-min` reads this. */
+:root {
+  --_helix-text-field-min: 0px;
+}
+
+@media (pointer: coarse) {
+  :root {
+    --_helix-text-field-min: 16px;
+  }
+}

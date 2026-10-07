@@ -77,14 +77,16 @@
    caption: the label above it is `text-sm` in `field.css`, and a value set at
    the label's size reads as a second caption in a box. Settled 14 Sep 2026
    from a split nothing had recorded a reason for, Input, Textarea and Filter
-   Input at `sm` and the four pickers at `md`. */
+   Input at `sm` and the four pickers at `md`. On a touch screen the type is
+   at least `--helix-text-field-min`, 16px, the size below which iOS Safari
+   zooms the page into a focused field. */
 [part="control"] {
   all: unset;
   box-sizing: border-box;
   color: var(--helix-color-foreground);
   flex: 1 1 auto;
   font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-md);
+  font-size: max(var(--helix-text-field-min), var(--helix-text-md));
   font-weight: var(--helix-weight-medium);
   min-inline-size: 0;
 }
