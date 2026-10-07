@@ -40,6 +40,17 @@ describe('placing items that are not the same height', () => {
     expect(h.record(1, 10)).toBe(false)
   })
 
+  test('keeps a height to the 64th of a pixel, the unit browsers lay out in', () => {
+    /* Rounded to a whole pixel, a row of 19.5 was kept as 20, and every one
+       that left the window for the spacer moved the rows below it by half a
+       pixel. */
+    const h = heights(10)
+    h.record(0, 19.5)
+    h.record(1, 19.51)
+    expect(h.at(0)).toBe(19.5)
+    expect(h.at(1)).toBe(19.515625)
+  })
+
   test('refuses a size that cannot be a height', () => {
     const h = heights(10)
     expect(h.record(0, 0)).toBe(false)

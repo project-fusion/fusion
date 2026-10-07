@@ -189,6 +189,90 @@ describe('a transcript fed as data', () => {
     expect(Math.abs(top(turnAt(element, key)) - before)).toBeLessThan(2)
   })
 
+  geometry(
+    'writes no scroll offset during a fling, and moves no turn under the reader',
+    async () => {
+      /* Driven a frame at a time, the way a phone's momentum drives it. The turns
+       are one line or three against an estimate of 72 pixels, so every turn the
+       fling draws above the reader is news, and putting the reader back by a
+       write to the scroll offset ends a fling on iOS. A turn moves in the
+       content only when something above it changed height and nothing made up
+       for it; what the transcript writes is counted apart from the fling. */
+      const element = await fed(2000)
+      const box = log(element)
+      box.scrollTop = Math.floor(box.scrollHeight / 2)
+      box.dispatchEvent(new Event('scroll'))
+      await frames(element, 8)
+      expect(element.pinned).toBe(false)
+      /* Longer than the controller waits before it squares its spacer. */
+      await new Promise((resolve) => setTimeout(resolve, 200))
+      const own = Object.getOwnPropertyDescriptor(
+        Element.prototype,
+        'scrollTop',
+      ) as PropertyDescriptor
+      let driving = false
+      let wrote = 0
+      Object.defineProperty(box, 'scrollTop', {
+        configurable: true,
+        get: () => own.get?.call(box),
+        set: (value: number) => {
+          const from = own.get?.call(box) as number
+          own.set?.call(box, value)
+          if (!driving) {
+            wrote += (own.get?.call(box) as number) - from
+          }
+        },
+      })
+      const offsets = (): Map<string, number> => {
+        const frame = box.getBoundingClientRect()
+        const found = new Map<string, number>()
+        for (const turn of drawn(element)) {
+          const rect = turn.getBoundingClientRect()
+          if (rect.bottom > frame.top && rect.top < frame.bottom) {
+            found.set(turn.dataset.index ?? '', rect.top - frame.top + box.scrollTop)
+          }
+        }
+        return found
+      }
+      try {
+        for (const speed of [-60, 60]) {
+          /* The spacer squared with the scroll offset while the log was still,
+           which is the one write this allows, is not the fling's. */
+          wrote = 0
+          let writes = 0
+          let shift = 0
+          let before = offsets()
+          let velocity = speed
+          for (let frame = 0; frame < 24; frame++) {
+            driving = true
+            box.scrollTop += velocity
+            driving = false
+            velocity *= 0.95
+            /* Read once the frame is painted. A turn's message draws itself after
+             the transcript, so its height is heard through a resize observer,
+             which runs after the animation frame callbacks and before paint. */
+            await new Promise((resolve) => requestAnimationFrame(resolve))
+            await new Promise((resolve) => setTimeout(resolve))
+            await element.updateComplete
+            const after = offsets()
+            const still = [...after].find(([index]) => before.has(index))
+            if (still) {
+              shift = Math.max(shift, Math.abs(still[1] - (before.get(still[0]) ?? 0) - wrote))
+            }
+            writes += wrote === 0 ? 0 : 1
+            wrote = 0
+            before = after
+          }
+          expect(writes).toBe(0)
+          expect(shift).toBeLessThan(1)
+          await new Promise((resolve) => setTimeout(resolve, 200))
+        }
+      } finally {
+        delete (box as { scrollTop?: number }).scrollTop
+      }
+    },
+  )
+
   geometry('places a turn scrolled to by what the turns above it measured', async () => {
     /* Row n is named n, so the name and the index are checked against each
        other: a window that drifted from its placement draws a name that does

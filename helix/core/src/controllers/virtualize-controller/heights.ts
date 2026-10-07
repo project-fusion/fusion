@@ -54,7 +54,11 @@ export class Heights {
     if (index < 0 || !Number.isFinite(size) || size <= 0) {
       return false
     }
-    const rounded = Math.round(size)
+    /* To the 64th of a pixel, which is the unit browsers lay out in. Rounded
+       to a whole pixel, a row of 19.5 pixels was recorded as 20, and each one
+       that left the window for the spacer moved the rows below it by half a
+       pixel: 7 pixels for the 14 rows of a Page Down in Object Inspector. */
+    const rounded = Math.round(size * 64) / 64
     if (this.seen.get(index) === rounded) {
       return false
     }
