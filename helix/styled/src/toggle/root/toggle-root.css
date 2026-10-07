@@ -19,6 +19,16 @@
   box-sizing: border-box;
 }
 
+/* An icon before the label, or a count after it, set off by a step. The slots
+   are bare, so a toggle with neither lays out as it did. */
+::slotted([slot="start"]) {
+  margin-inline-end: var(--helix-space-xs);
+}
+
+::slotted([slot="end"]) {
+  margin-inline-start: var(--helix-space-xs);
+}
+
 [part="item"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
