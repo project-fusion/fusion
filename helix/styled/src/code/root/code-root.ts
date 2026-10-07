@@ -14,6 +14,7 @@ import { styles } from './code-root.css.js'
  * @since 0.1.0
  * @status stable
  * @category typography
+ * @aliases Inline code
  * @documentation https://fusion.dev/helix/components/code
  *
  * @cssproperty --code-background-color - Fill behind the fragment. Defaults to the
