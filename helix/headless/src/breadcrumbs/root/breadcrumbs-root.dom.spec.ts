@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import { hasState, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -202,5 +202,89 @@ describe('a trail with no crumb marked current', () => {
 
   test('and leaves a trail that marks one alone', async () => {
     expect(await implied(trail)).toEqual([false, false, false])
+  })
+})
+
+describe('a long slotted trail', () => {
+  type Crumb = HTMLElement & { updateComplete: Promise<unknown> }
+  type Trail = HTMLElement & { updateComplete: Promise<unknown> }
+  const settle = async (host: Trail): Promise<Crumb[]> => {
+    const crumbs = [...host.children] as Crumb[]
+    for (let round = 0; round < 3; round += 1) {
+      await host.updateComplete
+      await Promise.all(crumbs.map((one) => one.updateComplete))
+    }
+    return crumbs
+  }
+  const long = `<helix-headless-breadcrumbs max-items="3">
+      <helix-headless-breadcrumb href="/">Home</helix-headless-breadcrumb>
+      <helix-headless-breadcrumb href="/docs">Docs</helix-headless-breadcrumb>
+      <helix-headless-breadcrumb href="/guides">Guides</helix-headless-breadcrumb>
+      <helix-headless-breadcrumb href="/forms">Forms</helix-headless-breadcrumb>
+      <helix-headless-breadcrumb current>Validation</helix-headless-breadcrumb>
+    </helix-headless-breadcrumbs>`
+
+  /* As a drawn trail folds: the first crumb, a button, and the last max-items
+     less one. The button follows the first crumb, so the trail reads in order. */
+  test('folds its middle under max-items, and the button shows the whole of it', async () => {
+    const host = (await mount(long)) as Trail
+    const crumbs = await settle(host)
+    expect(crumbs.map((one) => hasState(one, 'folded'))).toEqual([false, true, true, false, false])
+    const button = part(crumbs[0] as Crumb, 'expand') as HTMLButtonElement
+    expect(button.getAttribute('aria-label')).toBe('Show 2 more')
+    button.click()
+    await settle(host)
+    expect(crumbs.map((one) => hasState(one, 'folded'))).toEqual([
+      false,
+      false,
+      false,
+      false,
+      false,
+    ])
+    expect(part(crumbs[0] as Crumb, 'expand')).toBeNull()
+    expect(crumbs[1]?.shadowRoot?.activeElement).toBe(part(crumbs[1] as Crumb, 'link'))
+  })
+
+  test('and a trail no longer than max-items does not fold', async () => {
+    const host = (await mount(
+      trail.replace('<helix-headless-breadcrumbs>', '<helix-headless-breadcrumbs max-items="3">'),
+    )) as Trail
+    const crumbs = await settle(host)
+    expect(crumbs.some((one) => hasState(one, 'folded'))).toBe(false)
+    expect(part(crumbs[0] as Crumb, 'expand')).toBeNull()
+  })
+})
+
+describe('a crumb a reader presses', () => {
+  /* React Aria's onAction, for a router: the press is heard first, and a
+     refusal keeps the browser where it is. */
+  test('sends helix-select with its href, and a refusal keeps the browser from following', async () => {
+    const host = await mount(`<helix-headless-breadcrumbs>
+      <helix-headless-breadcrumb href="/docs">Docs</helix-headless-breadcrumb>
+      <helix-headless-breadcrumb current>Forms</helix-headless-breadcrumb>
+    </helix-headless-breadcrumbs>`)
+    const crumb = host.firstElementChild as HTMLElement & { updateComplete: Promise<unknown> }
+    await crumb.updateComplete
+    const heard: string[] = []
+    host.addEventListener('helix-select', (event) => {
+      heard.push((event as CustomEvent<{ value: string }>).detail.value)
+      event.preventDefault()
+    })
+    const click = new MouseEvent('click', {
+      bubbles: true,
+      button: 0,
+      cancelable: true,
+      composed: true,
+    })
+    part(crumb, 'link')?.dispatchEvent(click)
+    expect(heard).toEqual(['/docs'])
+    expect(click.defaultPrevented).toBe(true)
+  })
+
+  test('says it is the current page through a state a sheet can read', async () => {
+    const host = await mount(trail)
+    const crumbs = [...host.children] as Array<HTMLElement & { updateComplete: Promise<unknown> }>
+    await Promise.all(crumbs.map((one) => one.updateComplete))
+    expect(crumbs.map((one) => hasState(one, 'current'))).toEqual([false, false, true])
   })
 })
