@@ -45,10 +45,16 @@ import { HelixHeadlessDrilldownItem } from '../item/drilldown-item.js'
  * page, two moves the same way included. The styled tier slides the page and
  * swaps it at once under `prefers-reduced-motion`.
  *
- * Keys, on a row: Up and Down Arrow move between the rows, Home and End go to
- * the first and the last, and a typed letter moves to the next row whose name
- * starts with it. Enter, Space, or Right Arrow opens a row's page, and Left
- * Arrow or Escape goes back, the two arrows swapping on a right-to-left page.
+ * **Keyboard.** The drilldown is one tab stop, on the row last focused.
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Down Arrow, Up Arrow | Moves to the next or the previous row. |
+ * | Home, End | Moves to the first or the last row. |
+ * | A letter | Moves to the next row whose name starts with it. |
+ * | Enter, Space | Chooses the row: opens its page, follows its link, or sends `helix-select`. |
+ * | Right Arrow | Opens the row's page. Left Arrow on a right-to-left page. |
+ * | Left Arrow, Escape | Goes back one page, with focus on the row that opened it. Right Arrow on a right-to-left page. |
  *
  * The rows of the page showing are a `menu`, named by `label` on the top page
  * and by the page's title below it.
