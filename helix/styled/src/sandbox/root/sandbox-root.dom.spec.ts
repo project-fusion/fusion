@@ -7,7 +7,7 @@ beforeAll(async () => {
 })
 
 const wired = `
-  <helix-sandbox>
+  <helix-sandbox preview-delay="0">
     <helix-sandbox-source slot="source" name="html" value="<p>one</p>"></helix-sandbox-source>
     <helix-sandbox-preview slot="preview"></helix-sandbox-preview>
   </helix-sandbox>`
@@ -21,7 +21,7 @@ const withPanel = `
   </helix-sandbox>`
 
 const withCss = `
-  <helix-sandbox>
+  <helix-sandbox preview-delay="0">
     <helix-sandbox-source slot="source" name="html" value="<p>one</p>"></helix-sandbox-source>
     <helix-sandbox-source slot="source" name="css" value="p { color: red }"></helix-sandbox-source>
     <helix-sandbox-preview slot="preview"></helix-sandbox-preview>
@@ -126,7 +126,7 @@ describe('sandbox coordination', () => {
      inside the markup pane, in a `<script>` element. */
   test('a script pane reaches the preview as its script, and runs after the markup', async () => {
     const sandbox = await mount(`
-      <helix-sandbox>
+      <helix-sandbox preview-delay="0">
         <helix-sandbox-source slot="source" name="html" value="<p>one</p>"></helix-sandbox-source>
         <helix-sandbox-source slot="source" name="js" value="console.log(1)"></helix-sandbox-source>
         <helix-sandbox-preview slot="preview"></helix-sandbox-preview>
@@ -941,5 +941,77 @@ describe('several source panes are files', () => {
     await sandbox.updateComplete
     expect(part(sandbox, 'files')).toBeNull()
     expect(panes.map((pane) => pane.hasAttribute('hidden'))).toEqual([false, false, false])
+  })
+})
+
+describe('the preview while a reader types', () => {
+  /* Each keystroke re-ran the preview, which reloads its frame. */
+  test('waits for the typing to rest before it runs, and then runs the last text once', async () => {
+    const sandbox = await mount(`
+      <helix-sandbox preview-delay="40">
+        <helix-sandbox-source slot="source" name="html" value="<p>one</p>"></helix-sandbox-source>
+        <helix-sandbox-preview slot="preview"></helix-sandbox-preview>
+      </helix-sandbox>`)
+    const source = sandbox.querySelector('helix-sandbox-source') as Updatable
+    const preview = sandbox.querySelector('helix-sandbox-preview') as Updatable & { source: string }
+    const seen: string[] = []
+    let held = preview.source
+    Object.defineProperty(preview, 'source', {
+      configurable: true,
+      get: () => held,
+      set: (next: string) => {
+        held = next
+        seen.push(next)
+      },
+    })
+    const field = source.shadowRoot?.querySelector('textarea') as HTMLTextAreaElement
+    for (const text of ['<p>t</p>', '<p>tw</p>', '<p>two</p>']) {
+      field.value = text
+      field.dispatchEvent(new Event('input'))
+      await Promise.resolve()
+    }
+    expect(seen).toEqual([])
+    await new Promise((done) => setTimeout(done, 80))
+    expect(seen).toEqual(['<p>two</p>'])
+  })
+
+  test('waits 300 milliseconds by default', async () => {
+    const sandbox = (await mount('<helix-sandbox></helix-sandbox>')) as Updatable & {
+      previewDelay: number
+    }
+    expect(sandbox.previewDelay).toBe(300)
+  })
+})
+
+describe('a file with no name', () => {
+  const warnedOn = async (markup: string): Promise<string[]> => {
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      await mount(markup)
+      await new Promise((done) => setTimeout(done, 5))
+    } finally {
+      console.warn = original
+    }
+    return warnings
+  }
+
+  /* A source pane with no `label` and no `name` drew a file tab with no words. */
+  test('is reported, in a development build', async () => {
+    const warnings = await warnedOn(`<helix-sandbox>
+      <helix-sandbox-source slot="source" name="html"></helix-sandbox-source>
+      <helix-sandbox-source slot="source" name=""></helix-sandbox-source>
+    </helix-sandbox>`)
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0]).toContain('<helix-sandbox> has no accessible name')
+  })
+
+  test('and files with names are not', async () => {
+    const warnings = await warnedOn(`<helix-sandbox>
+      <helix-sandbox-source slot="source" name="html"></helix-sandbox-source>
+      <helix-sandbox-source slot="source" name="css" label="app.css"></helix-sandbox-source>
+    </helix-sandbox>`)
+    expect(warnings).toEqual([])
   })
 })

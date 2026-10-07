@@ -1,5 +1,7 @@
 import {
+  auditName,
   customElement,
+  DelayController,
   formatWords,
   type HelixBeforeEditEvent,
   HelixBeforePanelResizeEvent,
@@ -68,6 +70,10 @@ const fileOf = (pane: Element): string => {
  * preview do not reference each other, so you can replace either one or use it
  * alone.
  *
+ * The preview runs an edit once typing has rested for `preview-delay`, 300
+ * milliseconds by default, so it reloads once for a word rather than once for
+ * each letter. A pane's text when the sandbox starts reaches it at once.
+ *
  * The event carries the pane's `name`, so one sandbox can hold several panes.
  * `html` sets the preview's markup, `css` sets its stylesheet, and `js` sets
  * a script that runs as a module after the markup. The sandbox ignores a pane
@@ -91,6 +97,16 @@ const fileOf = (pane: Element): string => {
  * A wrapper around CodeMirror or Monaco sends one on each change and is a pane
  * like `helix-sandbox-source`, and the sandbox reads its `value` to seed the
  * preview. Dispatch `helix-caret` from it too for the status bar's position.
+ *
+ * Sandbox is styled only and has behavior, as `Aura` is. Its behavior is the
+ * hand-off from a source pane to a preview frame, which works with any pane
+ * that sends `helix-before-edit`, and what it draws is the layout around them:
+ * dividers, file tabs, and a panel. A page that wants another look slots its
+ * own panes and keeps the hand-off, so there is nothing for a headless version
+ * to hold.
+ *
+ * A development build warns about a source pane with no `label` and no `name`,
+ * whose file tab would have no words.
  *
  * On a focused divider, the arrow keys move it, and `Home` and `End` move it
  * to its ends. `Enter` on the panes divider shuts the lead pane, and pressed
@@ -252,6 +268,29 @@ export class HelixSandbox extends HelixElement {
    */
   @property({ attribute: 'panel-size', type: Number })
   panelSize = DEFAULT_PANEL
+
+  /**
+   * How long typing rests before the preview runs the new source, in
+   * milliseconds, as Sandpack's `recompileDelay` does: the preview reloads its
+   * frame on each run, so it runs once for a word rather than once for each
+   * letter. `0` runs it on every edit.
+   */
+  @property({ attribute: 'preview-delay', type: Number })
+  previewDelay = 300
+
+  /** The edits waiting out `previewDelay`, the last text of each pane. */
+  private readonly edits = new Map<PaneName, string>()
+
+  /** The wait before the edits reach the previews. */
+  private readonly resting = new DelayController(this, { renders: false })
+
+  /** Hands the waiting edits to the previews. */
+  private readonly runEdits = (): void => {
+    for (const [name, value] of this.edits) {
+      this.write(name, value, false)
+    }
+    this.edits.clear()
+  }
 
   /**
    * The name of the divider between the panes, read by screen readers.
@@ -510,8 +549,14 @@ export class HelixSandbox extends HelixElement {
        the source and still reached the preview. The dispatch is synchronous,
        so a microtask reads the final answer. */
     queueMicrotask(() => {
-      if (!event.defaultPrevented) {
-        this.write(name, value, false)
+      if (event.defaultPrevented) {
+        return
+      }
+      this.edits.set(name, value)
+      if (this.previewDelay > 0) {
+        this.resting.start(this.previewDelay, this.runEdits)
+      } else {
+        this.runEdits()
       }
     })
   }
@@ -975,6 +1020,19 @@ export class HelixSandbox extends HelixElement {
     super.updated(changed)
     if (changed.has('files') || changed.has('file')) {
       this.showFile()
+    }
+    /* A development build warns about a file tab with no words, a source pane
+       with no `label` and no `name`. Read on the first tab with none, or the
+       first tab where every one has words. */
+    if (this.files.length > 0) {
+      auditName(
+        this,
+        () => {
+          const tabs = [...this.renderRoot.querySelectorAll<HTMLElement>('[part="file"]')]
+          return tabs.find((tab) => !tab.textContent?.trim()) ?? tabs[0]
+        },
+        'Give each source pane a `label` or a `name`, which its file tab shows.',
+      )
     }
   }
 
