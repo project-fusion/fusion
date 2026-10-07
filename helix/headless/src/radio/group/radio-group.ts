@@ -368,7 +368,7 @@ export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(Hel
 }
 
 /** The group nearest around a radio, or nothing. */
-const nearestGroup = (radio: Element): HelixHeadlessRadioGroup | null => {
+function nearestGroup(radio: Element): HelixHeadlessRadioGroup | null {
   let parent = radio.parentElement
   while (parent && !(parent instanceof HelixHeadlessRadioGroup)) {
     parent = parent.parentElement

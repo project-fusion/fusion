@@ -568,7 +568,7 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
 }
 
 /** The group nearest around a toggle, or nothing. */
-const nearestGroup = (toggle: Element): HelixHeadlessToggleGroup | null => {
+function nearestGroup(toggle: Element): HelixHeadlessToggleGroup | null {
   let parent = toggle.parentElement
   while (parent && !(parent instanceof HelixHeadlessToggleGroup)) {
     parent = parent.parentElement
