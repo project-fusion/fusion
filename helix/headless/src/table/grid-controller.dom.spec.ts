@@ -232,6 +232,49 @@ describe('a grid table', () => {
     expect(host.selected).toBe('api,queue')
   })
 
+  /* A row a reader may see and not choose, as React Aria's `disabledKeys`. */
+  test('passes over a disabled row when selecting, and keeps its link shut', async () => {
+    const host = (await mount(
+      three.replace(
+        '<helix-headless-table-row value="api">',
+        '<helix-headless-table-row value="api" disabled href="#api">',
+      ),
+    )) as Gridded
+    await settle(host)
+    await settle(host)
+    const api = host.querySelector('[value="api"]') as HTMLElement
+    const internals = (api as unknown as { internals: ElementInternals }).internals
+    expect(internals.ariaDisabled).toBe('true')
+    expect((part(api, 'checkbox') as HTMLElement & { disabled: boolean }).disabled).toBe(true)
+
+    cells(host)[0]?.focus()
+    await press(host, 'a', { ctrlKey: true })
+    expect(host.selected).toBe('web,queue')
+    const all = part(host, 'checkbox') as HTMLElement & { checked: boolean }
+    expect(all.checked).toBe(true)
+
+    host.selected = ''
+    await settle(host)
+    await press(host, 'ArrowDown')
+    expect(focused(host)).toBe(cells(host)[1] as Element)
+    await press(host, ' ')
+    expect(host.selected).toBe('')
+    await press(host, 'ArrowUp')
+    await press(host, ' ')
+    await press(host, 'ArrowDown', { shiftKey: true })
+    await press(host, 'ArrowDown', { shiftKey: true })
+    expect(host.selected).toBe('web,queue')
+
+    let followed = false
+    host.ownerDocument.defaultView?.addEventListener('hashchange', () => {
+      followed = true
+    })
+    api.click()
+    await press(host, 'Enter')
+    expect(followed).toBe(false)
+    expect(location.hash).not.toBe('#api')
+  })
+
   /* The stop and focus were on a row that went, so focus fell to the page and
      the stop to the first heading. React Aria moves both to a neighbor. */
   test('hands focus to the next row, at the same column, when the focused row goes', async () => {

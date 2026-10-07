@@ -26,7 +26,8 @@ export type TableRowMove = 'dragging' | 'drop-after' | 'drop-before'
  * it, or make it interactive.
  *
  * In a `selectable` table the row draws a checkbox cell before its own cells,
- * and `value` is the key the table's `selected` lists it by.
+ * and `value` is the key the table's `selected` lists it by. `disabled` keeps
+ * the row out of the selection and out of its link.
  *
  * In a `reorderable` table the row draws a grip cell before those, holding a
  * button named by the table's `move-row-label`, and `value` is the key
@@ -69,7 +70,7 @@ export type TableRowMove = 'dragging' | 'drop-after' | 'drop-before'
  * @cssstate dragging - The row is being moved, in a `reorderable` table.
  * @cssstate drop-after - The row being moved goes after this one when it is dropped.
  * @cssstate drop-before - The row being moved goes before this one when it is dropped.
- * @cssstate link - While the row has `href`, so a press on it follows the link.
+ * @cssstate link - While the row has `href` and is not `disabled`, so a press on it follows the link.
  * @cssstate selected - While the row is selected, in a `selectable` table.
  */
 @customElement('helix-headless-table-row')
@@ -101,6 +102,17 @@ export class HelixHeadlessTableRow extends HelixElement {
    */
   @property()
   value = ''
+
+  /**
+   * Takes the row out of the table's selection and out of its link: the row's
+   * checkbox is disabled, Space, Shift ranges, and the checkbox in the heading
+   * pass over it, and a press does not follow `href`. A row already selected
+   * stays selected. A screen reader hears it as unavailable, and in a `grid`
+   * table the arrow keys still reach it, as a disabled cell in a grid is
+   * reached.
+   */
+  @property({ reflect: true, type: Boolean })
+  disabled = false
 
   /**
    * @internal Whether the table this row sits in is `selectable`, written by
@@ -197,8 +209,9 @@ export class HelixHeadlessTableRow extends HelixElement {
        through: in a plain table a row is not a thing that can be selected,
        and its checkbox already says so. */
     this.internals.ariaSelected = this.gridCell && this.selectable ? String(this.selected) : null
+    this.internals.ariaDisabled = this.disabled ? 'true' : null
     this.toggleState('selected', this.selectable && this.selected)
-    this.toggleState('link', this.href !== '')
+    this.toggleState('link', this.href !== '' && !this.disabled)
     this.toggleState('dragging', this.move === 'dragging')
     this.toggleState('drop-after', this.move === 'drop-after')
     this.toggleState('drop-before', this.move === 'drop-before')
@@ -219,7 +232,7 @@ export class HelixHeadlessTableRow extends HelixElement {
    * of the row's own, or ended a drag that selected text.
    */
   private readonly handleClick = (event: MouseEvent): void => {
-    if (this.href === '' || event.button !== 0 || event.defaultPrevented) {
+    if (this.disabled || this.href === '' || event.button !== 0 || event.defaultPrevented) {
       return
     }
     /* Asked inside the cell the press landed in, where it landed in one: a
@@ -281,6 +294,7 @@ export class HelixHeadlessTableRow extends HelixElement {
           mark-checked: checkbox-mark-checked, mark-dash: checkbox-mark-dash,
           mark-indeterminate: checkbox-mark-indeterminate"
         aria-label=${this.selectLabel}
+        ?disabled=${this.disabled}
         .checked=${this.selected}
       ></${checkbox}
     ></span>`

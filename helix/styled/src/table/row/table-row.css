@@ -27,6 +27,12 @@
   );
 }
 
+/* Out of reach, and drawn so, across every cell since the row has no box. */
+:host([disabled]) [part~="select"],
+:host([disabled]) ::slotted(*) {
+  opacity: var(--table-row-disabled-opacity, 0.5);
+}
+
 /* A row with `href` is a link across every cell: the pointer says so, and the
    cells take a wash under it, since the row has no box of its own. */
 :host(:state(link)) ::slotted(*) {
