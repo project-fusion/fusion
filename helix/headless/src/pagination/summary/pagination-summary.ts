@@ -26,7 +26,7 @@ import { property } from 'lit/decorators.js'
 export class HelixHeadlessPaginationSummary extends HelixElement {
   /**
    * The key this part's words are registered under, its styled tag:
-   * `registerWords('de', { 'helix-pagination-summary': { format: '{from}–{to} von {total}' } })`.
+   * `registerWords('de', { 'helix-pagination-summary': { format: '{from} bis {to} von {total}' } })`.
    */
   static words = 'helix-pagination-summary'
 

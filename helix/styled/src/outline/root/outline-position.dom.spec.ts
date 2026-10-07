@@ -118,9 +118,8 @@ if (hasLayout()) {
          Scrolled so the second heading sits 100px down: with no offset the
          reader is still in the first section, and with 200px of chrome above
          them they are already in the second. */
-      const two = document.getElementById('two') as HTMLElement
-
       const plain = await build()
+      const two = document.getElementById('two') as HTMLElement
       window.scrollTo(0, two.offsetTop - 100)
       await settle()
       expect(marked(plain)).toBe('#one')
