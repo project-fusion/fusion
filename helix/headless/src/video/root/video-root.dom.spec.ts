@@ -1049,3 +1049,66 @@ describe('the keys around the controls', () => {
     expect(more.getAttribute('aria-expanded')).toBe('true')
   })
 })
+
+describe('the keys a reader expects of a player, and what they hear', () => {
+  const press = (target: Element, key: string, init: KeyboardEventInit = {}): boolean =>
+    target.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        key,
+        ...init,
+      }),
+    )
+
+  const ready = async (): Promise<{ host: Player; stage: Element; video: HTMLVideoElement }> => {
+    const host = await player()
+    const video = part(host, 'video') as HTMLVideoElement
+    Object.defineProperty(video, 'duration', { configurable: true, value: 120 })
+    return { host, stage: part(host, 'stage') as Element, video }
+  }
+
+  const heard = async (host: Player): Promise<string> => {
+    await host.updateComplete
+    return (part(host, 'live')?.textContent ?? '').trim()
+  }
+
+  test('Home, End and the digits go to the start, the end and each tenth, and say where', async () => {
+    const { host, stage, video } = await ready()
+    press(stage, '5')
+    expect(video.currentTime).toBe(60)
+    expect(await heard(host)).toBe('1:00 of 2:00')
+    press(stage, 'End')
+    expect(video.currentTime).toBe(120)
+    press(stage, 'Home')
+    expect(video.currentTime).toBe(0)
+    expect(await heard(host)).toBe('0:00 of 2:00')
+  })
+
+  test('the volume and muting are said, being changes on a control the reader is not on', async () => {
+    const { host, stage, video } = await ready()
+    video.volume = 0.5
+    press(stage, 'ArrowUp')
+    expect(await heard(host)).toBe('Volume 60 percent')
+    press(stage, 'm')
+    expect(await heard(host)).toBe('Muted')
+    press(stage, 'm')
+    expect(await heard(host)).toBe('Unmuted')
+  })
+
+  test('a chord with Control, Command or Alt is left to the browser', async () => {
+    const { stage, video } = await ready()
+    video.currentTime = 30
+    expect(press(stage, 'ArrowLeft', { altKey: true })).toBe(true)
+    expect(press(stage, '1', { metaKey: true })).toBe(true)
+    expect(press(stage, 'k', { ctrlKey: true })).toBe(true)
+    expect(video.currentTime).toBe(30)
+  })
+
+  test('the player lists its keys for assistive technology', async () => {
+    const { stage } = await ready()
+    const keys = (stage.getAttribute('aria-keyshortcuts') ?? '').split(' ')
+    expect(keys).toEqual(expect.arrayContaining(['Space', 'K', 'M', 'C', 'Home', 'End', '5']))
+  })
+})
