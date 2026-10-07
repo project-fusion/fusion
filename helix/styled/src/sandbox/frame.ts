@@ -115,35 +115,35 @@ const drawn = (child: Element): DOMRect[] => {
     .filter((box) => box.width > 0 || box.height > 0)
 }
 
+/** What `serveWith` is given, so it reaches nothing outside its own body. */
+interface FrameTools {
+  drawn: typeof drawn
+  isRender: typeof isRender
+  layoutRules: string
+  loggedText: typeof loggedText
+  runScripts: typeof runScripts
+  withoutStylesheets: typeof withoutStylesheets
+}
+
 /**
- * Serves the frame side of a sandbox preview, in the document its `src` loads.
+ * The frame side of the protocol, with every helper passed in.
  *
- * Call it once from that document, after the elements your examples use are
- * defined. It does what the preview's protocol asks of a frame:
- *
- * - Posts `helix-preview-ready` once it listens.
- * - Writes each `helix-preview-render` into the root: the markup, the
- *   stylesheet, the direction, the layout and the color mode. Scripts in the
- *   markup run.
- * - Posts every console call and uncaught error as `helix-preview-console`,
- *   an uncaught one marked `uncaught`, which marks the preview `failed`.
- * - Posts `helix-preview-size` whenever what was drawn changes height.
- * - Posts `helix-preview-press` on every press, so menus outside close.
- *
- * Only a message from the parent window is rendered. Answers go to `*`, which
- * is the only target a sandboxed frame can name, and carry only what the
- * example itself wrote.
- *
- * @returns A function that stops serving and puts the console back.
+ * **Self-contained, because the default frame runs its source.** The document a
+ * preview loads without `src` is written as text, and its script is this
+ * function's own source, called with the helpers' sources. A function that
+ * named a helper from this module would name a binding the frame does not
+ * have, and a bundler renaming the module's bindings would rename them apart
+ * from that text.
  */
-export const servePreview = (options: ServePreviewOptions = {}): (() => void) => {
+const serveWith = (tools: FrameTools, options: ServePreviewOptions = {}): (() => void) => {
+  const { drawn, isRender, layoutRules, loggedText, runScripts, withoutStylesheets } = tools
   const root = options.root ?? document.getElementById('preview-root') ?? document.body
   root.toggleAttribute('data-preview-root', true)
   root.dataset.layout ??= 'padded'
 
   if (options.layouts !== false) {
     const rules = document.createElement('style')
-    rules.textContent = LAYOUT_RULES
+    rules.textContent = layoutRules
     document.head.prepend(rules)
   }
 
@@ -161,6 +161,21 @@ export const servePreview = (options: ServePreviewOptions = {}): (() => void) =>
 
   const failed = (event: ErrorEvent): void => {
     post({ level: 'error', text: event.message, type: 'helix-preview-console', uncaught: true })
+  }
+
+  /* **A promise rejected with nobody to catch it is uncaught too.** An example
+     that awaits a fetch and fails threw no `error` event, so the preview said
+     nothing and stayed unfailed while the console of the frame said "Uncaught
+     (in promise)". */
+  const refused = (event: PromiseRejectionEvent): void => {
+    const { reason } = event
+    const said = reason instanceof Error ? `${reason.name}: ${reason.message}` : loggedText(reason)
+    post({
+      level: 'error',
+      text: `Uncaught (in promise) ${said}`,
+      type: 'helix-preview-console',
+      uncaught: true,
+    })
   }
 
   /* The children's own extent, top of the highest to bottom of the lowest,
@@ -233,6 +248,7 @@ export const servePreview = (options: ServePreviewOptions = {}): (() => void) =>
 
   const press = (): void => post({ type: 'helix-preview-press' })
   window.addEventListener('error', failed)
+  window.addEventListener('unhandledrejection', refused)
   window.addEventListener('message', render)
   document.addEventListener('pointerdown', press, { capture: true, passive: true })
   post({ type: 'helix-preview-ready' })
@@ -244,7 +260,73 @@ export const servePreview = (options: ServePreviewOptions = {}): (() => void) =>
     watcher.disconnect()
     children.disconnect()
     window.removeEventListener('error', failed)
+    window.removeEventListener('unhandledrejection', refused)
     window.removeEventListener('message', render)
     document.removeEventListener('pointerdown', press, { capture: true })
   }
+}
+
+const TOOLS: FrameTools = {
+  drawn,
+  isRender,
+  layoutRules: LAYOUT_RULES,
+  loggedText,
+  runScripts,
+  withoutStylesheets,
+}
+
+/**
+ * Serves the frame side of a sandbox preview, in the document its `src` loads.
+ *
+ * Call it once from that document, after the elements your examples use are
+ * defined. It does what the preview's protocol asks of a frame:
+ *
+ * - Posts `helix-preview-ready` once it listens.
+ * - Writes each `helix-preview-render` into the root: the markup, the
+ *   stylesheet, the direction, the layout and the color mode. Scripts in the
+ *   markup run.
+ * - Posts every console call, uncaught error, and unhandled promise rejection
+ *   as `helix-preview-console`, an uncaught one marked `uncaught`, which marks
+ *   the preview `failed`.
+ * - Posts `helix-preview-size` whenever what was drawn changes height.
+ * - Posts `helix-preview-press` on every press, so menus outside close.
+ *
+ * Only a message from the parent window is rendered. Answers go to `*`, which
+ * is the only target a sandboxed frame can name, and carry only what the
+ * example itself wrote.
+ *
+ * @returns A function that stops serving and puts the console back.
+ */
+export const servePreview = (options: ServePreviewOptions = {}): (() => void) =>
+  serveWith(TOOLS, options)
+
+/**
+ * The document a preview loads where `src` is empty: the protocol, and nothing
+ * defined.
+ *
+ * **A sandbox renders with no document of your own.** HTML, CSS and scripts
+ * run as they would in a frame you serve, and the console, the height, and
+ * presses are reported the same way. No Helix element is defined in it, so an
+ * example that uses components needs a frame that imports them.
+ *
+ * `</` is written `<\/` throughout the script, so no text in it closes the
+ * element early. In a string, a template, or a regular expression the two are
+ * the same characters.
+ */
+let builtIn: string | undefined
+
+/**
+ * The tag that closes the built-in document's script, joined when it is used.
+ *
+ * **Never written whole in this module.** A page that inlines its bundle in a
+ * `<script>` of its own is closed at the first one, and a bundler turns an
+ * escaped slash back into a plain one: measured, Bun printed `\u002f` as `/`.
+ */
+const SCRIPT_END = ['<', 'script>'].join('/')
+export const defaultFrame = (): string => {
+  if (builtIn === undefined) {
+    const script = `(${serveWith})({drawn:${drawn},isRender:${isRender},layoutRules:${JSON.stringify(LAYOUT_RULES)},loggedText:${loggedText},runScripts:${runScripts},withoutStylesheets:${withoutStylesheets}})`
+    builtIn = `<!doctype html><html><head><meta charset="utf-8"><meta content="width=device-width" name="viewport"><style>:root{color-scheme:light dark;font-family:system-ui,sans-serif}body{margin:0}</style></head><body><div id="preview-root"></div><script>${script.replaceAll('</', '<\\/')}${SCRIPT_END}</body></html>`
+  }
+  return builtIn
 }

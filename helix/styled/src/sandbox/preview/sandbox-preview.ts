@@ -17,8 +17,9 @@ import {
 const SETTLE = 120
 
 import type { CSSResultGroup } from 'lit'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { defaultFrame } from '../frame.js'
 import { styles as sheet } from './sandbox-preview.css.js'
 
 /** The frame saying it has a listener, and where to answer it. */
@@ -78,6 +79,12 @@ export type PreviewMessage =
  * A sandboxed `<iframe>` that loads `src`, a document you provide. That
  * document imports what the examples need, listens for a render message, and
  * writes the markup into itself.
+ *
+ * **Without `src`, the frame loads a built-in document**, so a sandbox renders
+ * with nothing to host. It runs HTML, CSS, and scripts, and reports the
+ * console, uncaught errors, its height, and presses as a frame on
+ * `servePreview` does. It defines no element, so an example that uses Helix
+ * components needs a `src` that imports them.
  *
  * **Examples render in a frame**, so an example's styles and scripts do not
  * affect the page around the sandbox, and `position: fixed` stays inside the
@@ -178,6 +185,7 @@ export class HelixSandboxPreview extends HelixElement {
 
   /**
    * The document the frame loads. It provides the styles and the elements.
+   * Empty loads the built-in document, which defines no element.
    */
   @property()
   src = ''
@@ -190,6 +198,12 @@ export class HelixSandboxPreview extends HelixElement {
 
   /** Whether the frame has said it is listening. */
   private ready = false
+
+  /** The source the frame was last sent, which it holds and does not run again. */
+  private sentSource: string | undefined
+
+  /** The source the frame held when it last reported an uncaught error. */
+  private failedSource: string | undefined
 
   private get frame(): HTMLIFrameElement | null {
     return this.renderRoot.querySelector('iframe')
@@ -256,6 +270,7 @@ export class HelixSandboxPreview extends HelixElement {
     if (data?.type === 'helix-preview-console') {
       this.dispatchEvent(new HelixConsoleEvent({ level: data.level, text: data.text }))
       if (data.uncaught) {
+        this.failedSource = this.sentSource
         this.toggleState('failed', true)
       }
     }
@@ -326,8 +341,13 @@ export class HelixSandboxPreview extends HelixElement {
    */
   private scheduleSend(): void {
     this.settle.start(SETTLE, () => {
-      // A new example has not failed yet.
-      this.toggleState('failed', false)
+      /* A new example has not failed yet. **Only a new one**: the frame skips a
+         source it already holds, so the example that failed is not run again,
+         and clearing `failed` for it hid the failure. A frame that loads within
+         the wait, as the built-in one does, has already run it and failed. */
+      if (this.source !== this.failedSource) {
+        this.toggleState('failed', false)
+      }
       this.send()
     })
   }
@@ -346,6 +366,7 @@ export class HelixSandboxPreview extends HelixElement {
       type: 'helix-preview-render',
     }
     this.frame?.contentWindow?.postMessage(message, HelixSandboxPreview.target)
+    this.sentSource = this.source
   }
 
   override connectedCallback(): void {
@@ -378,14 +399,23 @@ export class HelixSandboxPreview extends HelixElement {
       return
     }
     this.unready()
+    if (this.src === '') {
+      frame.srcdoc = defaultFrame()
+      return
+    }
     frame.src = this.src
   }
 
-  /** A new document is on its way, so nothing is sent until it listens, and nothing has failed in it. */
+  /**
+   * A new document is on its way, so nothing is sent until it listens, and
+   * nothing has failed in it. The built-in document loads too.
+   */
   private unready(): void {
     this.ready = false
+    this.sentSource = undefined
+    this.failedSource = undefined
     this.toggleState('failed', false)
-    this.toggleState('loading', this.src !== '')
+    this.toggleState('loading', true)
   }
 
   protected override updated(changed: PropertyValues): void {
@@ -417,7 +447,8 @@ export class HelixSandboxPreview extends HelixElement {
     return html`<iframe
       part="frame"
       @load=${this.handleFrameLoad}
-      src=${this.src}
+      src=${this.src || nothing}
+      srcdoc=${this.src === '' ? defaultFrame() : nothing}
       title=${this.label}
       allow="clipboard-write *; fullscreen *"
       sandbox="allow-scripts allow-forms"
