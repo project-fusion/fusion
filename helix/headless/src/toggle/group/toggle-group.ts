@@ -53,7 +53,7 @@ import { HelixHeadlessToggle } from '../root/toggle-root.js'
  * | Right, Down | Moves to the next item, from the last back to the first. In a single group, chooses it. |
  * | Left, Up | Moves to the item before, from the first round to the last. In a single group, chooses it. |
  * | Home, End | Moves to the first or the last item. In a single group, chooses it. |
- * | Space, Enter | Chooses the focused item, or presses or releases it in a multiple group. |
+ * | Space, Enter | Chooses the focused item, or presses or releases it in a multiple group. With `allow-empty-selection`, takes back the chosen item. |
  *
  * Left and Right swap on a right-to-left page, and a disabled item is passed
  * over. A single group is a `radiogroup` of items with `role="radio"` and
@@ -225,6 +225,16 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
   }
 
   /**
+   * Whether a press on the chosen item, or Space or Enter on it, takes it
+   * back so nothing is chosen, as React Aria's `ToggleButtonGroup` and
+   * Radix's `ToggleGroup` do in a single group. Absent, a single group always
+   * keeps its choice once it has one, as a radio group does. A multiple group
+   * releases a pressed item either way.
+   */
+  @property({ attribute: 'allow-empty-selection', type: Boolean })
+  allowEmptySelection = false
+
+  /**
    * Whether the group holds a tab stop of its own.
    *
    * A toolbar is one tab stop, so a toolbar the group sits in sets this to
@@ -357,7 +367,10 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
       }
       const value = (event as CustomEvent<{ value: string }>).detail.value
       if (!this.multiple) {
-        this.requestValue(value)
+        /* A press on the chosen item takes it back, where the group allows
+           none. The arrow keys choose the item they reach, which is never
+           the chosen one. */
+        this.requestValue(this.allowEmptySelection && value === this.value ? '' : value)
         return
       }
       const next = toggleValue(
