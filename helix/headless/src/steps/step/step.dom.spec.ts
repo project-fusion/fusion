@@ -91,3 +91,24 @@ test("forwards the label button's pending ring as `label-spinner`", async () => 
   const host = await step()
   expect(part(host, 'label')?.getAttribute('exportparts')).toContain('spinner: label-spinner')
 })
+
+describe('a step with content', () => {
+  /* A form inside a stage was read with nothing saying which stage it was. */
+  test('makes the content a group named by the step', async () => {
+    const host = (await mount(
+      '<helix-headless-step value="one">Payment<div slot="content"><input aria-label="Card"></div></helix-headless-step>',
+    )) as Step & { updateComplete: Promise<unknown> }
+    await host.updateComplete
+    const content = part(host, 'content') as HTMLElement
+    const named = content.getAttribute('aria-labelledby') ?? ''
+    expect(content.getAttribute('role')).toBe('group')
+    expect(host.shadowRoot?.getElementById(named)).toBe(part(host, 'label'))
+  })
+
+  test('leaves an empty content region without a role', async () => {
+    const host = await step()
+    const content = part(host, 'content') as HTMLElement
+    expect(content.hasAttribute('role')).toBe(false)
+    expect(content.hasAttribute('aria-labelledby')).toBe(false)
+  })
+})
