@@ -54,7 +54,7 @@ import '../../menu/index.js'
 import { HelixHeadlessMenu } from '../../menu/root/menu-root.js'
 import { relayMedia } from '../media-events.js'
 import { barControls, type Conditions, menuControls, ownFile } from './extra-controls.js'
-import { takeKey } from './keys.js'
+import { PLAYER_KEYS, takeKey } from './keys.js'
 
 /**
  * Seconds as a clock, with an hour only when there is one.
@@ -105,7 +105,15 @@ const clock = (seconds: number): string => {
  * | Up, Down | Raises or lowers the volume by a tenth. |
  * | `m` | Mutes or unmutes. |
  * | `f` | Enters or leaves fullscreen. |
+ * | `c` | Turns captions on or off. |
+ * | Home, End | Goes to the start or the end. |
+ * | `0` to `9` | Goes to that tenth of the video: `5` is the middle. |
  * | Tab | Moves through the controls on the bar. |
+ *
+ * A key with Control, Command, or Alt held is left to the browser. The
+ * player lists its keys in `aria-keyshortcuts`, and a live region says what a
+ * key changed that is not on the focused control: playing or paused, muted,
+ * the volume, captions on or off, and where the video is after a seek.
  *
  * On the scrubber and the volume slider, the arrow keys, Page Up, Page Down,
  * Home, and End move the slider, as on any range input.
@@ -201,7 +209,7 @@ const clock = (seconds: number): string => {
  * @csspart forward - The button that skips forward ten seconds.
  * @csspart fullscreen - The button that enters and leaves fullscreen.
  * @csspart header - The region at the top left that holds the `header` slot.
- * @csspart live - A live region that repeats the loading text, so screen readers announce it when it changes. Visually hidden in the styled tier.
+ * @csspart live - A live region that says the loading text, and what a key changed, such as the volume. Visually hidden in the styled tier.
  * @csspart loading - The text shown while the video waits for more data. Draw the spinner
  * with `::part(loading)::before` in your stylesheet. This tier ships no CSS and renders
  * no extra box for it.
@@ -268,6 +276,13 @@ export class HelixHeadlessVideo extends HelixElement {
   autoplay = false
 
   /**
+   * What the live region says when `c` turns captions off.
+   */
+  @words
+  @property({ attribute: 'captions-hidden-label' })
+  captionsHiddenLabel = 'Captions off'
+
+  /**
    * The name of the captions control when the video has one track. The control
    * turns that track on and off.
    *
@@ -287,6 +302,12 @@ export class HelixHeadlessVideo extends HelixElement {
   @property({ attribute: 'captions-off-label' })
   captionsOffLabel = 'Off'
 
+  /**
+   * What the live region says when `c` turns captions on.
+   */
+  @words
+  @property({ attribute: 'captions-shown-label' })
+  captionsShownLabel = 'Captions on'
   /**
    * Whether the browser draws its native controls. When set, this element draws
    * no controls of its own.
@@ -451,6 +472,13 @@ export class HelixHeadlessVideo extends HelixElement {
   moreLabel = 'More controls'
 
   /**
+   * What the live region says when a key mutes the video.
+   */
+  @words
+  @property({ attribute: 'muted-label' })
+  mutedLabel = 'Muted'
+
+  /**
    * The name of the mute control. The control shows as pressed while the video
    * is muted.
    */
@@ -486,6 +514,13 @@ export class HelixHeadlessVideo extends HelixElement {
   overflowControls = ''
 
   /**
+   * What the live region says when a key pauses the video.
+   */
+  @words
+  @property({ attribute: 'paused-label' })
+  pausedLabel = 'Paused'
+
+  /**
    * The name of the play control while pressing it would pause the video.
    */
   @words
@@ -516,6 +551,12 @@ export class HelixHeadlessVideo extends HelixElement {
   @property({ attribute: 'player-label' })
   playerLabel = 'Video'
 
+  /**
+   * What the live region says when a key plays the video.
+   */
+  @words
+  @property({ attribute: 'playing-label' })
+  playingLabel = 'Playing'
   /**
    * The name of the play control while pressing it would start the video.
    */
@@ -633,6 +674,20 @@ export class HelixHeadlessVideo extends HelixElement {
   @property({ attribute: 'time-label' })
   timeLabel = '{position} of {duration}'
 
+  /**
+   * What the live region says when a key unmutes the video.
+   */
+  @words
+  @property({ attribute: 'unmuted-label' })
+  unmutedLabel = 'Unmuted'
+
+  /**
+   * What the live region says when a key changes the volume. `{percent}` is the
+   * volume from 0 to 100, written in the locale.
+   */
+  @words
+  @property({ attribute: 'volume-changed-label' })
+  volumeChangedLabel = 'Volume {percent} percent'
   /**
    * What the volume slider is called.
    */
@@ -1361,7 +1416,9 @@ export class HelixHeadlessVideo extends HelixElement {
     if (event.composedPath().some((node) => node instanceof HelixHeadlessMenu)) {
       return
     }
+    const paused = video.paused
     const taken = takeKey(event, video, {
+      captions: () => this.toggleCaptions(),
       fullscreen: () => void this.fullscreen.toggle(),
       seek: (seconds) => this.seek(seconds),
       skipBy: (seconds) => this.skipBy(seconds),
@@ -1369,7 +1426,55 @@ export class HelixHeadlessVideo extends HelixElement {
     })
     if (taken) {
       event.preventDefault()
+      this.sayKey(event.key, paused, video)
     }
+  }
+
+  /**
+   * What a reader hears after a key, which changed something they may not be
+   * looking at: the focus is on the player or a control, and the bar may be
+   * hidden.
+   *
+   * **Said from the video's state after the press**, except for playing,
+   * which starts on a promise: whether the video was paused before the press
+   * says which way it went. Nothing for fullscreen, which a reader sees and a
+   * screen reader reports as the window changing, nor for `c` where there are
+   * no captions to turn on.
+   */
+  private sayKey(key: string, paused: boolean, video: HTMLVideoElement): void {
+    if (key === ' ' || key === 'k') {
+      this.say(paused ? this.playingLabel : this.pausedLabel)
+    } else if (key === 'm') {
+      this.say(video.muted ? this.mutedLabel : this.unmutedLabel)
+    } else if (key === 'ArrowUp' || key === 'ArrowDown') {
+      this.say(formatWords(this, 'volumeChangedLabel', { percent: Math.round(video.volume * 100) }))
+    } else if (key === 'c') {
+      if (this.captions.length > 0) {
+        this.say(this.captioned ? this.captionsShownLabel : this.captionsHiddenLabel)
+      }
+    } else if (key !== 'f') {
+      this.say(
+        formatWords(this, 'timeLabel', {
+          duration: clock(video.duration),
+          position: clock(video.currentTime),
+        }),
+      )
+    }
+  }
+
+  /**
+   * What the live region says after a key, until the video waits for data,
+   * which it says over this.
+   */
+  @state()
+  private said = ''
+
+  /**
+   * Puts words in the live region. The same words twice differ by a space no
+   * reader hears, since a region whose text does not change is not read again.
+   */
+  private say(words: string): void {
+    this.said = words !== '' && words === this.said ? `${words}\u00a0` : words
   }
 
   /** The caption tracks among the copies, named as the menu names them. */
@@ -1936,6 +2041,7 @@ export class HelixHeadlessVideo extends HelixElement {
         tabindex=${this.controls ? nothing : '0'}
         role=${this.controls ? nothing : 'group'}
         aria-label=${this.controls ? nothing : this.label || this.playerLabel}
+        aria-keyshortcuts=${this.controls ? nothing : PLAYER_KEYS}
         @keydown=${this.handleKeydown}
         @pointermove=${this.idler.stir}
         @pointerleave=${this.idler.leave}
@@ -2022,7 +2128,7 @@ export class HelixHeadlessVideo extends HelixElement {
            best. */
         ''
       }
-      <span part="live" role="status">${this.buffering && !this.failed ? this.loadingLabel : ''}</span>
+      <span part="live" role="status">${this.buffering && !this.failed ? this.loadingLabel : this.said}</span>
       ${
         /* And the other thing a frozen frame can mean. `alert`, because nothing
            further is going to happen and a reader waiting politely for a video

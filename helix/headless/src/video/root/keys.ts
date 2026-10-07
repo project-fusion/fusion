@@ -3,8 +3,9 @@
  *
  * Separable because the table is a convention rather than a fact about this
  * element: Space and `k` play, the arrows scrub and change the volume, `m`
- * mutes, `f` fills the screen, and `j` and `l` jump the distance the bar's own
- * buttons jump. What it needs is the media element and four actions, which is
+ * mutes, `f` fills the screen, `c` turns captions on and off, Home, End and
+ * the digits go to the start, the end and each tenth, and `j` and `l` jump the
+ * distance the bar's own buttons jump. What it needs is the media element and four actions, which is
  * the same handful the media session hands to a headset. Whether the keys are
  * bound at all, and what a taken press does to the event, stay with the element.
  */
@@ -13,6 +14,7 @@ import { SKIP_SECONDS } from '@fusion.dev/helix-core'
 
 /** What a press asks the player for, which is all a key can do. */
 export interface KeyActions {
+  captions: () => void
   fullscreen: () => void
   seek: (seconds: number) => void
   skipBy: (seconds: number) => void
@@ -24,6 +26,10 @@ const PRESSED_BY_SPACE = new Set(['a', 'button', 'select', 'summary', 'textarea'
 
 /** Roles whose element Space activates, whatever its tag. */
 const PRESSED_ROLES = /^(button|checkbox|link|menuitem\w*|option|radio|switch|tab)$/
+
+/** The keys `takeKey` answers, as `aria-keyshortcuts` names them. */
+export const PLAYER_KEYS =
+  'Space K ArrowLeft ArrowRight Shift+ArrowLeft Shift+ArrowRight J L ArrowUp ArrowDown M F C Home End 0 1 2 3 4 5 6 7 8 9'
 
 /**
  * Answers one press, and says whether it was one of these.
@@ -42,7 +48,10 @@ export const takeKey = (
   video: HTMLVideoElement,
   actions: KeyActions,
 ): boolean => {
-  if (event.defaultPrevented) {
+  /* **A chord with Control, Command or Alt is the browser's or the page's.**
+     Alt with Left goes back a page and Command with a number picks a tab,
+     and the player took both as seeks and stopped them. */
+  if (event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey) {
     return false
   }
   /* The element the press began on, inside whatever shadow root holds it:
@@ -106,7 +115,25 @@ export const takeKey = (
       actions.fullscreen()
       break
     }
+    case 'c': {
+      actions.captions()
+      break
+    }
+    case 'Home': {
+      actions.seek(0)
+      break
+    }
+    case 'End': {
+      actions.seek(video.duration)
+      break
+    }
     default: {
+      /* A digit goes to that tenth of the video: 0 to the start, 5 to the
+         middle, 9 to nine tenths in, the way the common players do. */
+      if (/^[0-9]$/.test(event.key) && Number.isFinite(video.duration)) {
+        actions.seek((video.duration * Number(event.key)) / 10)
+        break
+      }
       return false
     }
   }
