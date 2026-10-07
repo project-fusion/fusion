@@ -69,12 +69,34 @@ describe('the preview pane', () => {
 /* A page shows its own spinner or message beside the frame, and needs to know
    when: the frame is another document, so nothing in the page can see it load
    or fail. */
+/* A sandbox with no frame document of its own rendered an empty box, and the
+   only way to see an example was to build and host one. */
+describe('the built-in frame document', () => {
+  test('loads where there is no `src`, and steps aside for one', async () => {
+    const own = part(await preview(''), 'frame') as HTMLIFrameElement
+    expect(own.hasAttribute('src')).toBe(false)
+    expect(own.getAttribute('srcdoc')).toContain('<div id="preview-root"></div>')
+    const hosted = part(await preview(), 'frame') as HTMLIFrameElement
+    expect(hosted.getAttribute('src')).toBe('/frame.html')
+    expect(hosted.hasAttribute('srcdoc')).toBe(false)
+  })
+
+  test('keeps the sandbox, with scripts and no origin of its own', async () => {
+    const own = part(await preview(''), 'frame') as HTMLIFrameElement
+    expect((own.getAttribute('sandbox') ?? '').split(/\s+/).sort()).toEqual([
+      'allow-forms',
+      'allow-scripts',
+    ])
+  })
+})
+
 describe('the preview states', () => {
   const from = (frame: HTMLIFrameElement, data: unknown): MessageEvent =>
     new MessageEvent('message', { data, origin: 'null', source: frame.contentWindow })
 
   test('is `loading` from a `src` until the frame loads, and again on `reload`', async () => {
-    expect(hasState(await preview(''), 'loading')).toBe(false)
+    // The built-in document loads too.
+    expect(hasState(await preview(''), 'loading')).toBe(true)
     const host = (await preview()) as Preview & { reload: () => void }
     expect(hasState(host, 'loading')).toBe(true)
     const frame = part(host, 'frame') as HTMLIFrameElement
@@ -99,6 +121,23 @@ describe('the preview states', () => {
     await host.updateComplete
     await new Promise((resolve) => setTimeout(resolve, 150))
     expect(hasState(host, 'failed')).toBe(false)
+  })
+
+  /* A frame that loads inside the wait, as the built-in document does, runs
+     the example at once, and the wait ending sends the same source again,
+     which the frame skips. Clearing `failed` there hid the failure. */
+  test('stays `failed` when the frame failed on the source the wait then sends', async () => {
+    const host = (await preview()) as Preview & { source: string }
+    const frame = part(host, 'frame') as HTMLIFrameElement
+    host.source = '<script>throw 1</script>'
+    await host.updateComplete
+    frame.dispatchEvent(new Event('load'))
+    window.dispatchEvent(
+      from(frame, { level: 'error', text: 'Boom', type: 'helix-preview-console', uncaught: true }),
+    )
+    expect(hasState(host, 'failed')).toBe(true)
+    await new Promise((resolve) => setTimeout(resolve, 200))
+    expect(hasState(host, 'failed')).toBe(true)
   })
 
   /* The frame runs what it is sent and reports what it throws, and skips a

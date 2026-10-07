@@ -85,7 +85,16 @@ hides the quieter lines.
 
 `helix-sandbox-preview` loads `src` into a sandboxed frame. You provide that
 document. It loads the styles and the elements your examples use, and it talks
-to the preview through `postMessage`:
+to the preview through `postMessage`.
+
+Without `src`, the preview loads a built-in document. It runs the example's
+HTML, CSS, and scripts, and reports the console, uncaught errors, the height,
+and presses, so a sandbox renders with nothing to host. It defines no element,
+so set `src` to a document of your own when your examples use Helix
+components. Its script is inline, so a page whose Content Security Policy
+refuses inline scripts needs a `src` too.
+
+The messages:
 
 | Message | Sent by | What it carries |
 |---|---|---|
@@ -106,8 +115,8 @@ it was given. The types are exported from `@fusion.dev/helix/sandbox` as
 `servePreview` from `@fusion.dev/helix/sandbox` is that protocol, written for
 you. Call it once in the frame document, after your elements are defined. It
 writes each render into `#preview-root`, runs the example's scripts, relays
-its console, reports its height and its presses, and adds the rules for the
-four layouts. A frame follows. `/helix.css` is the stylesheet from
+its console, its uncaught errors, and its unhandled promise rejections,
+reports its height and its presses, and adds the rules for the four layouts. A frame follows. `/helix.css` is the stylesheet from
 `@fusion.dev/helix-styles`, and `/frame.js` is a classic script you bundle,
 for the reason under "How the preview is isolated":
 

@@ -3,10 +3,11 @@ import { registerDom } from '@fusion.dev/helix-testing/dom'
 
 type Serve = typeof import('./frame.js').servePreview
 let servePreview: Serve
+let defaultFrame: typeof import('./frame.js').defaultFrame
 
 beforeAll(async () => {
   registerDom()
-  ;({ servePreview } = await import('./frame.js'))
+  ;({ defaultFrame, servePreview } = await import('./frame.js'))
 })
 
 /** What the frame posted to its parent, which in a page of its own is itself. */
@@ -148,6 +149,63 @@ describe('servePreview', () => {
     expect(posted.at(-1)).toEqual({
       level: 'error',
       text: 'Boom',
+      type: 'helix-preview-console',
+      uncaught: true,
+    })
+  })
+
+  /* An example that awaits something and fails rejects a promise, and the
+     page hears no `error` event for that: the preview stayed unfailed. */
+  test('marks a promise rejected with nobody to catch it, as the console says it', () => {
+    serve()
+    const refuse = (reason: unknown): void => {
+      window.dispatchEvent(Object.assign(new Event('unhandledrejection'), { reason }))
+    }
+    refuse(new TypeError('Failed to fetch'))
+    expect(posted.at(-1)).toEqual({
+      level: 'error',
+      text: 'Uncaught (in promise) TypeError: Failed to fetch',
+      type: 'helix-preview-console',
+      uncaught: true,
+    })
+    refuse({ code: 4 })
+    expect(posted.at(-1)?.text).toBe('Uncaught (in promise) {"code":4}')
+  })
+})
+
+/* The document a preview loads without `src`, whose script is the protocol's
+   own source. Run here as the frame runs it, so a helper it names and was not
+   given fails this instead of a reader's sandbox. */
+describe('the built-in frame document', () => {
+  const script = (): string => {
+    const page = defaultFrame()
+    const open = page.indexOf('<script>') + '<script>'.length
+    return page.slice(open, page.indexOf('</script>', open))
+  }
+
+  test('closes its script once, at its end', () => {
+    const page = defaultFrame()
+    expect(page.match(/<\/script>/g)?.length).toBe(1)
+    expect(page.endsWith('</script></body></html>')).toBe(true)
+    expect(page).toContain('<div id="preview-root"></div>')
+  })
+
+  test('serves the protocol from its script alone', () => {
+    window.postMessage = ((message: { type: string }) => {
+      posted.push(message)
+    }) as typeof window.postMessage
+    const root = document.createElement('div')
+    root.id = 'preview-root'
+    document.body.append(root)
+    stop = new Function(`return ${script()}`)() as () => void
+    expect(posted.map((message) => message.type)).toEqual(['helix-preview-ready'])
+    render({ layout: 'hug', source: '<p>Hi</p>', styles: 'p { color: red }' })
+    expect(root.innerHTML).toBe('<p>Hi</p>')
+    expect(root.dataset.layout).toBe('hug')
+    window.dispatchEvent(Object.assign(new Event('unhandledrejection'), { reason: 'no' }))
+    expect(posted.at(-1)).toEqual({
+      level: 'error',
+      text: 'Uncaught (in promise) no',
       type: 'helix-preview-console',
       uncaught: true,
     })
