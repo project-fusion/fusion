@@ -236,7 +236,9 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
     protected labelId = 'label'
 
     /**
-     * @internal The host's `aria-label`, observed so a new one renders.
+     * The name a screen reader says for the field where it shows no label, as
+     * the platform's `aria-label`. It is drawn as a label and clipped, so it
+     * names the control inside, and a new one renders at once.
      *
      * **An `aria-label` is read when the field renders, and nothing else would
      * render it again.** It is the platform's attribute and no property of this
