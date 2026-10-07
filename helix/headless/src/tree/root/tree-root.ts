@@ -3,6 +3,7 @@ import {
   closestInstance,
   commaList,
   customElement,
+  deepActiveElement,
   HelixElement,
   inlineStep,
   keyClaimed,
@@ -70,6 +71,9 @@ const KEYS = new Set([
  * or open, and the tree's one tab stop stays on the item last reached. In a
  * tree of check marks, Control+A (Command+A on an Apple keyboard) checks every
  * item or clears them all, and Shift with Up or Down Arrow moves and checks.
+ *
+ * Removing the item that has focus moves focus to the item after it among its
+ * siblings, or the one before, or its parent, so focus stays in the tree.
  *
  * **`reorderable` lets you move items among their siblings.** Alt with Up or
  * Down moves the focused item a place, and Alt with Home or End to the first
@@ -297,6 +301,60 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
   }
 
   private watcher: MutationObserver | undefined
+
+  /** The item that last had focus, so its removal can hand focus on. */
+  private focused: HelixHeadlessTreeItem | undefined
+
+  private readonly handleFocusIn = (event: FocusEvent): void => {
+    /* The innermost item on the path, which comes first: a nested item is
+       inside every branch above it. */
+    this.focused = event
+      .composedPath()
+      .find((node): node is HelixHeadlessTreeItem => node instanceof HelixHeadlessTreeItem)
+  }
+
+  /**
+   * Puts focus back in the tree where the item that had it was removed and
+   * focus fell to the page: on the item after it among its siblings, or the
+   * one before, or its parent. Read from the removal itself, which knows where
+   * the item stood.
+   */
+  private refocus(records: MutationRecord[]): void {
+    const gone = this.focused
+    if (!gone || this.items.includes(gone)) {
+      return
+    }
+    this.focused = undefined
+    const active = deepActiveElement()
+    if (active !== null && active !== document.body) {
+      return
+    }
+    const record = records.find((one) =>
+      [...one.removedNodes].some((node) => node === gone || node.contains(gone)),
+    )
+    const near = (
+      from: Node | null | undefined,
+      forward: boolean,
+    ): HelixHeadlessTreeItem | undefined => {
+      let node = from ?? null
+      while (node) {
+        if (node instanceof HelixHeadlessTreeItem && !node.disabled && node.isConnected) {
+          return node
+        }
+        node = forward ? node.nextSibling : node.previousSibling
+      }
+      return undefined
+    }
+    const parent = record ? closestInstance(record.target as Element, HelixHeadlessTreeItem) : null
+    const next =
+      near(record?.nextSibling, true) ??
+      near(record?.previousSibling, false) ??
+      (parent instanceof HelixHeadlessTreeItem && this.items.includes(parent)
+        ? parent
+        : undefined) ??
+      this.visibleItems.find((item) => !item.disabled)
+    this.focusOn(next)
+  }
 
   /**
    * Every item, in the order a reader moving down would meet them.
@@ -670,12 +728,16 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
     this.addEventListener('helix-select', this.handleSelection)
     this.addEventListener('toggle', this.handleBranch, true)
     this.addEventListener('keydown', this.handleKeydown)
+    this.addEventListener('focusin', this.handleFocusIn)
     /* Nested items arrive on a *branch's* slot, not on this element's, so the
        root's `slotchange` never fires for them: without this, a subtree
        rendered after first paint gets no `level`, no `selected` and no
        `focusable`, and sits at the wrong indent with no way into it. A
        framework filling a branch on demand is exactly that case. */
-    this.watcher = new MutationObserver(() => this.syncItems())
+    this.watcher = new MutationObserver((records) => {
+      this.syncItems()
+      this.refocus(records)
+    })
     this.watcher.observe(this, { childList: true, subtree: true })
   }
 
@@ -684,6 +746,7 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
     this.removeEventListener('helix-select', this.handleSelection)
     this.removeEventListener('toggle', this.handleBranch, true)
     this.removeEventListener('keydown', this.handleKeydown)
+    this.removeEventListener('focusin', this.handleFocusIn)
     this.watcher?.disconnect()
     this.watcher = undefined
   }
