@@ -53,6 +53,12 @@ const PANEL_MAX = 0.8
  * pointer, the keyboard, and the corner. The inner splitter holds the panes and
  * the outer one holds the panel, so the panel spans the full width.
  *
+ * On a focused divider, the arrow keys move it, and `Home` and `End` move it
+ * to its ends. `Enter` on the panes divider shuts the lead pane, and pressed
+ * again it opens the pane where it was. `Enter` on the panel divider shuts the
+ * panel to `panel-collapsed-size`, and pressed again it opens the panel to its
+ * last height.
+ *
  * @since 0.1.0
  * @status stable
  * @category tooling
@@ -627,6 +633,74 @@ export class HelixSandbox extends HelixElement {
     this.claim(event)
   }
 
+  /** Where the lead pane opens back to after `Enter` shut it. */
+  private reopenSplit?: number
+
+  /** Where the panel opens back to after `Enter` shut it, in pixels. */
+  private reopenPanel?: number
+
+  /**
+   * Shuts a pane on `Enter`, or opens it again, in this element's own units.
+   *
+   * The window splitter pattern's key. The splitter's own toggle asks for a
+   * collapse, which `handleCollapse` refuses, so the key is answered here: the
+   * panes divider moves `split` to zero and back, and the panel divider moves
+   * `panel-size` to `panel-collapsed-size` and back. Each goes through the same
+   * request a drag makes, so a consumer hears `helix-before-split` or
+   * `helix-before-panel-resize` and can refuse it.
+   *
+   * Only `Enter` on a divider of this sandbox's own splitters. The key comes up
+   * from the source pane too, and an `Enter` typed there is a new line.
+   */
+  private readonly handleDividerKey = (event: KeyboardEvent): void => {
+    const splitter = event.currentTarget as HTMLElement
+    const origin = event.composedPath()[0]
+    if (
+      event.key !== 'Enter' ||
+      !(origin instanceof Element) ||
+      origin.getAttribute('part') !== 'separator' ||
+      origin.getRootNode() !== splitter.shadowRoot
+    ) {
+      return
+    }
+    if (splitter.getAttribute('part') === 'panes') {
+      this.toggleLead(splitter)
+    } else {
+      this.togglePanel(splitter)
+    }
+  }
+
+  private toggleLead(splitter: EventTarget): void {
+    if (this.split > 0) {
+      const open = this.split
+      this.requestSplit(0)
+      if (this.split === 0) {
+        this.reopenSplit = open
+      }
+    } else {
+      const home = Number.isFinite(this.defaultSplit) && this.defaultSplit > 0
+      this.requestSplit(this.reopenSplit ?? (home ? this.defaultSplit : DEFAULT_SPLIT))
+    }
+    this.answer(splitter, this.split)
+  }
+
+  private togglePanel(splitter: EventTarget): void {
+    const floor = Number.isFinite(this.panelCollapsedSize)
+      ? Math.max(0, this.panelCollapsedSize)
+      : 0
+    if (this.panelSize > floor) {
+      const open = this.panelSize
+      this.requestPanelSize(floor)
+      if (this.panelSize === floor) {
+        this.reopenPanel = open
+      }
+    } else {
+      const home = Number.isFinite(this.defaultPanelSize) && this.defaultPanelSize > floor
+      this.requestPanelSize(this.reopenPanel ?? (home ? this.defaultPanelSize : DEFAULT_PANEL))
+    }
+    this.answer(splitter, this.panelPosition)
+  }
+
   /**
    * Puts a divider where this element says it is.
    *
@@ -761,10 +835,12 @@ export class HelixSandbox extends HelixElement {
         orientation="vertical" collapsed-size=${this.panelSliver} corner-label=${this.cornerLabel}
         label=${this.panelLabel} default-position=${this.homePanelPosition}
         min=${100 - PANEL_MAX * 100} .position=${this.panelPosition}
-        @helix-before-collapse=${this.handleCollapse} @helix-before-resize=${this.handlePanelChange}>
+        @helix-before-collapse=${this.handleCollapse} @helix-before-resize=${this.handlePanelChange}
+        @keydown=${this.handleDividerKey}>
         <helix-splitter slot="start" part="panes" exportparts="separator" default-position=${home}
           label=${label} orientation=${vertical ? 'vertical' : 'horizontal'} .position=${split}
-          @helix-before-collapse=${this.handleCollapse} @helix-before-resize=${this.handlePanesChange}>
+          @helix-before-collapse=${this.handleCollapse} @helix-before-resize=${this.handlePanesChange}
+          @keydown=${this.handleDividerKey}>
           <div part="pane" data-pane=${first} slot="start"><slot name=${first} @slotchange=${this.seed}></slot></div>
           <div part="pane" data-pane=${second} slot="end"><slot name=${second} @slotchange=${this.seed}></slot></div>
         </helix-splitter>
