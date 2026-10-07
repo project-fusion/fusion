@@ -3,6 +3,7 @@ import { html, nothing, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import type { HelixElement } from '../../helix-element/helix-element.js'
 import { drawIcon } from '../../utils/draw-icon/draw-icon.js'
+import { inlineStep } from '../../utils/inline-step/inline-step.js'
 import { formatWords, words } from '../../words/words.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
@@ -115,6 +116,15 @@ export declare class MixinTokensInterface {
    * of its selection, and a filter field takes a token out of its own list.
    */
   protected removeLastToken(): void
+
+  /**
+   * The tokens the arrow keys move between, in the order they are shown.
+   *
+   * Each is an element whose remove button is its `dismiss` part and whose
+   * `dismiss()` asks it to go, which `Tag` and `FilterInput.Chip` both are.
+   * None by default.
+   */
+  protected tokenElements(): HTMLElement[]
 }
 
 /**
@@ -212,6 +222,80 @@ export const MixinTokens = <T extends Constructor<HelixElement>>(Base: T) => {
       return html`<span part="tags">${content}${this.renderRest(over)}</span>`
     }
 
+    /* On the host, which hears a token's keys whether the token is in this
+       shadow root or slotted into it. */
+    override connectedCallback(): void {
+      super.connectedCallback()
+      this.addEventListener('keydown', this.handleTokenKeydown)
+    }
+
+    override disconnectedCallback(): void {
+      super.disconnectedCallback()
+      this.removeEventListener('keydown', this.handleTokenKeydown)
+    }
+
+    protected tokenElements(): HTMLElement[] {
+      return []
+    }
+
+    /** The remove button of each token shown that has one, in order. */
+    private tokenStops(): HTMLElement[] {
+      return this.tokenElements()
+        .filter((token) => !token.hidden)
+        .map((token) => token.shadowRoot?.querySelector<HTMLElement>('[part~="dismiss"]'))
+        .filter((stop): stop is HTMLElement => stop !== null && stop !== undefined)
+    }
+
+    /** The host's text field. */
+    private get tokenControl(): HTMLInputElement | null {
+      return this.renderRoot.querySelector<HTMLInputElement>('[part~="control"]')
+    }
+
+    /**
+     * The arrow keys between the tokens, and Delete or Backspace on one.
+     *
+     * The arrow toward the end of the line moves to the next token, and past
+     * the last into the text with the caret at its start. Delete or Backspace
+     * asks the focused token to go, as its remove button does, and focus that
+     * leaves with it comes back to the text.
+     */
+    private readonly handleTokenKeydown = (event: KeyboardEvent): void => {
+      if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) {
+        return
+      }
+      const stops = this.tokenStops()
+      const path = event.composedPath()
+      const at = stops.findIndex((stop) => path.includes(stop))
+      if (at < 0) {
+        return
+      }
+      const step = inlineStep(this, event.key)
+      if (step !== 0) {
+        event.preventDefault()
+        const next = stops[at + step]
+        if (next) {
+          next.focus()
+        } else if (step > 0) {
+          this.tokenControl?.focus()
+          this.tokenControl?.setSelectionRange(0, 0)
+        }
+        return
+      }
+      if (event.key !== 'Delete' && event.key !== 'Backspace') {
+        return
+      }
+      event.preventDefault()
+      const stop = stops[at]
+      const token = this.tokenElements().find((one) => one.shadowRoot?.contains(stop ?? null))
+      ;(token as { dismiss?: () => boolean } | undefined)?.dismiss?.()
+      /* After the token's own hand-off to a neighbor, a frame on. */
+      requestAnimationFrame(() => {
+        if (!this.matches(':focus-within')) {
+          this.tokenControl?.focus()
+        }
+      })
+    }
+
     /**
      * The count, as a control where the host asked for one and a word otherwise.
      *
@@ -273,6 +357,26 @@ export const MixinTokens = <T extends Constructor<HelixElement>>(Base: T) => {
     }
 
     protected tokenKeydown(event: KeyboardEvent, typed: string): boolean {
+      /* The arrow toward the start of the line, with the caret at the start of
+         the text, moves to the last token. */
+      const control = event.target as HTMLInputElement | null
+      if (
+        inlineStep(this, event.key) === -1 &&
+        !event.shiftKey &&
+        !event.altKey &&
+        !event.ctrlKey &&
+        !event.metaKey &&
+        control?.selectionStart === 0 &&
+        control.selectionEnd === 0
+      ) {
+        const last = this.tokenStops().at(-1)
+        if (last) {
+          event.preventDefault()
+          last.focus()
+          return true
+        }
+        return false
+      }
       if (event.key !== 'Backspace' || typed !== '') {
         return false
       }

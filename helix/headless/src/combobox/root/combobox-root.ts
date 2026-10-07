@@ -80,6 +80,9 @@ const isInsertion = (event: Event): boolean =>
  * | Escape | Closes the list and puts the chosen words back. On a closed field, a second Escape clears a single choice. |
  * | Tab | Closes the list and moves on. |
  * | Backspace | With `multiple`, on an empty field, removes the last tag. |
+ * | Left | With `multiple`, with the caret at the start of the text, moves to the last tag's remove button. Right on a right-to-left page. |
+ * | Left, Right on a tag | Move between the tags, and past the last back to the text. |
+ * | Delete, Backspace on a tag | Removes the tag. |
  * | Space, Home, End, letters | Edit the text. |
  *
  * **ARIA.** The input is the `combobox`, named by the label, with
@@ -95,7 +98,8 @@ const isInsertion = (event: Event): boolean =>
  * Set `autocomplete` to let a browser's autofill choose an option.
  *
  * With `multiple`, each chosen option is a tag in the field with its own remove
- * control. The panel stays open and the filter clears after each choice, so the
+ * control. The text is the field's one tab stop, and the arrow keys reach the
+ * tags from it. The panel stays open and the filter clears after each choice, so the
  * next choice starts from the whole list.
  *
  * With `creatable`, the combobox offers a create row and fires `helix-create`.
@@ -1200,6 +1204,19 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
     }
   }
 
+  /** The tags, which the arrow keys reach from the text. */
+  protected override tokenElements(): HTMLElement[] {
+    return [...this.renderRoot.querySelectorAll<HTMLElement>('[part="tag"]')]
+  }
+
+  /**
+   * Focus goes to the text field, the one tab stop, and never to a tag's remove
+   * button ahead of it, where Enter or Space would take a choice away.
+   */
+  protected override get focusTarget(): HTMLElement | null {
+    return this.partNamed('control') ?? super.focusTarget
+  }
+
   /** One tag asking to be taken out of the set. */
   private readonly handleDismiss = (event: Event): void => {
     event.stopPropagation()
@@ -1439,6 +1456,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
                     data-value=${option.value}
                     dismiss-label=${formatWords(this, 'removeLabel', { name: option.text })}
                     ?dismissible=${!this.isDisabled && !this.readOnly}
+                    .dismissTabStop=${false}
                     @helix-dismiss=${this.handleDismiss}
                     >${option.text}</${this.tag('tag')}
                   >`
@@ -1511,6 +1529,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
           aria-expanded=${this.open ? 'true' : 'false'}
           aria-describedby=${this.describedBy ?? nothing}
           aria-invalid=${this.invalidity ?? nothing}
+          aria-required=${this.required ? 'true' : nothing}
           placeholder=${(this.chosen.length > 0 || this.unresolved ? '' : this.placeholder) || nothing}
           ?disabled=${this.isDisabled}
           ?readonly=${this.readOnly}

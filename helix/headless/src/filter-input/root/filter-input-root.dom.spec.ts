@@ -302,3 +302,35 @@ describe('what the form receives', () => {
     ])
   })
 })
+
+describe('the arrow keys and the tokens', () => {
+  /* The tokens were reached only by Shift+Tab, one stop at a time. */
+  test('move from the text to the tokens and back, and Delete asks one to go', async () => {
+    const filter = await mount(WITH_TAGS)
+    filter.addEventListener('helix-dismiss', (event) => (event.target as HTMLElement).remove())
+    const tokens = (): HTMLElement[] => slotted(filter, 'tags') as HTMLElement[]
+    const dismiss = (token: HTMLElement | undefined): HTMLElement =>
+      token?.shadowRoot?.querySelector('[part~="dismiss"]') as HTMLElement
+    const key = (target: HTMLElement, name: string): void => {
+      target.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          bubbles: true,
+          cancelable: true,
+          composed: true,
+          key: name,
+        }),
+      )
+    }
+    const control = part(filter, 'control') as HTMLInputElement
+    control.focus()
+    key(control, 'ArrowLeft')
+    expect(document.activeElement === tokens()[2]).toBe(true)
+    key(dismiss(tokens()[2]), 'ArrowLeft')
+    expect(document.activeElement === tokens()[1]).toBe(true)
+    key(dismiss(tokens()[1]), 'Delete')
+    await settle(filter as Updatable)
+    expect(tokens().map((token) => token.textContent)).toEqual(['design', 'docs'])
+    key(dismiss(tokens()[1]), 'ArrowRight')
+    expect(filter.shadowRoot?.activeElement === control).toBe(true)
+  })
+})
