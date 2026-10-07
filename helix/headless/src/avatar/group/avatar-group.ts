@@ -1,9 +1,11 @@
 import {
   customElement,
-  fillTemplate,
+  formatWords,
   HelixElement,
   hostAria,
   whenHydrated,
+  words,
+  wordsLocale,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -47,6 +49,12 @@ export const FOLDS_UP_TO = 12
 @customElement('helix-headless-avatar-group')
 export class HelixHeadlessAvatarGroup extends HelixElement {
   /**
+   * The key this part's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-avatar-group': { overflowLabel: '…' } })`.
+   */
+  static words = 'helix-avatar-group'
+
+  /**
    * Accessible name for the set, such as "Reviewers".
    */
   @property()
@@ -74,14 +82,18 @@ export class HelixHeadlessAvatarGroup extends HelixElement {
   max?: number
 
   /**
-   * What a screen reader is told the count is, with `{count}` for the number
-   * and `{names}` for the people it stands for, by each avatar's `name`.
+   * What a screen reader is told the count is, with `{count}` for the number,
+   * written in the locale, and `{names}` for the people it stands for, by each
+   * avatar's `name`, listed as the locale lists. A language that needs plural
+   * forms writes them: `{count, plural, one {# osoba więcej: {names}} few
+   * {# osoby więcej: {names}} other {# osób więcej: {names}}}`.
    *
    * The count shows "+3", which reads as "plus three" and says nothing about
    * what was counted, nor who.
    */
+  @words
   @property({ attribute: 'overflow-label' })
-  overflowLabel = '{count} more: {names}'
+  overflowLabel = '{count, plural, one {# more: {names}} other {# more: {names}}}'
 
   /** The avatars this group hid, so it unhides only those. */
   private readonly folded = new WeakSet<HTMLElement>()
@@ -177,9 +189,12 @@ export class HelixHeadlessAvatarGroup extends HelixElement {
           ? html`<span
               part="overflow"
               role="img"
-              aria-label=${fillTemplate(this.overflowLabel, {
-                count: String(past),
-                names: this.foldedNames().join(', '),
+              aria-label=${formatWords(this, 'overflowLabel', {
+                count: past,
+                names: new Intl.ListFormat(wordsLocale(this), {
+                  style: 'short',
+                  type: 'unit',
+                }).format(this.foldedNames()),
               }).replace(/[\s:,]+$/, '')}
               >+${past}</span
             >`

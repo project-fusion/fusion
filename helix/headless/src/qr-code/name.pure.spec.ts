@@ -1,5 +1,9 @@
 import { describe, expect, test } from 'bun:test'
-import { qrName } from './name.js'
+import { qrName as named } from './name.js'
+
+/** The name, with the word and the address in one English sentence. */
+const qrName = (label: string, value: string, word: string): string =>
+  named(label, value, word, (address) => `${word}, ${address}`)
 
 describe('the name of a code', () => {
   test('is its label where it has one', () => {
