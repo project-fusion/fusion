@@ -49,14 +49,20 @@ export const MEASURED = JSON.parse(
  * that ride with the first shard of the specs: 14 seconds of them on run
  * 35052371545, against about 5 of build restore and browser start that every
  * shard of every check pays.
+ *
+ * **Visual was never measured until run 37557109520, and its estimate was a
+ * sixth of the truth.** At 0.33 a picture the plan put the corpus at 197
+ * seconds and gave it two jobs; the two took 637 and 671 seconds of pictures
+ * each, and on every run that pictured the corpus they were the last two jobs
+ * to finish, by six minutes. 1,258 seconds over 606 pictures is 2.08.
  */
 export const ESTIMATE = {
-  contrast: { per: 0.38 },
+  contrast: { per: 0.33 },
   dsd: { fixed: 15, per: 0.81 },
   parity: { per: 0.85 },
-  smoke: { per: 0.16 },
-  specs: { fixed: 14, per: 0.55 },
-  visual: { per: 0.33 },
+  smoke: { per: 0.14 },
+  specs: { fixed: 14, per: 1.08 },
+  visual: { per: 2.08 },
 }
 
 /** Every family a check was measured over, scaled to seconds on a runner. */
