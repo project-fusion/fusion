@@ -14,6 +14,9 @@ import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { type Branch, levelOf, nest } from '../levels.js'
 
+/** The named slots a child goes to, which make it no part of the links. */
+const OWN_SLOTS = new Set(['heading', 'indicator'])
+
 /** Whether an element is a link to a fragment on this page. */
 const isFragment = (element: Element): element is HTMLAnchorElement =>
   element instanceof HTMLAnchorElement && element.getAttribute('href')?.startsWith('#') === true
@@ -65,11 +68,15 @@ const isFragment = (element: Element): element is HTMLAnchorElement =>
  *
  * @slot - The links, as anchors with fragment hrefs, or lists holding them.
  * @slot heading - A heading above the links, such as "On this page". It names the navigation.
+ * @slot indicator - A mark of your own, drawn inside the `indicator` part, where `--indicator-x`, `--indicator-y`, `--indicator-inline-size` and `--indicator-block-size` reach it.
  *
  * @event {HelixActivateEvent} helix-activate - Fired when the section in view changes, with its id as the value. It reports the scroll position and cannot be prevented.
  *
  * @csspart heading - The box holding the `heading` slot, above the navigation.
- * @csspart indicator - The mark that moves to the section in view.
+ * @csspart indicator - The mark that moves to the link of the section in view. It carries that link's
+ *   place and size as `--indicator-x`, `--indicator-y`, `--indicator-inline-size` and
+ *   `--indicator-block-size`, and `data-placed` once it has been placed, for a mark you draw
+ *   and animate yourself.
  * @csspart nav - The navigation landmark.
  */
 @customElement('helix-headless-outline')
@@ -209,9 +216,9 @@ export class HelixHeadlessOutline extends HelixElement {
       )
   }
 
-  /** The children that are the content, which is all of them but the heading. */
+  /** The children that are the content, which is all of them but the heading and the mark. */
   private get content(): Element[] {
-    return this.knownChildren.filter((child) => child.slot !== 'heading')
+    return this.knownChildren.filter((child) => !OWN_SLOTS.has(child.slot))
   }
 
   /**
@@ -688,6 +695,9 @@ export class HelixHeadlessOutline extends HelixElement {
     const root = this.renderRoot as ShadowRoot | undefined
     const heading = root?.querySelector?.<HTMLSlotElement>('slot[name="heading"]')
     heading?.assign?.(...this.knownChildren.filter((child) => child.slot === 'heading'))
+    root
+      ?.querySelector?.<HTMLSlotElement>('slot[name="indicator"]')
+      ?.assign?.(...this.knownChildren.filter((child) => child.slot === 'indicator'))
     const run = this.run
     if (run) {
       for (const slot of root?.querySelectorAll?.<HTMLSlotElement>('slot[data-link]') ?? []) {
@@ -701,7 +711,7 @@ export class HelixHeadlessOutline extends HelixElement {
     const plain = root?.querySelector?.<HTMLSlotElement>('nav > slot:not([role])')
     plain?.assign?.(
       ...[...this.childNodes].filter((node): node is Element | Text =>
-        node instanceof Element ? node.slot !== 'heading' : node instanceof Text,
+        node instanceof Element ? !OWN_SLOTS.has(node.slot) : node instanceof Text,
       ),
     )
   }
@@ -754,7 +764,7 @@ export class HelixHeadlessOutline extends HelixElement {
     return html`<div part="heading"><slot name="heading" @slotchange=${this.nameByHeading}></slot></div>
       <nav part="nav" aria-label=${this.label} @slotchange=${this.handleSlotChange}>
       ${run ? this.renderList(nest(run.map((link) => levelOf(link.getAttribute('data-level'))))) : html`<slot></slot>`}
-      <span part="indicator" aria-hidden="true"></span>
+      <span part="indicator" aria-hidden="true"><slot name="indicator"></slot></span>
     </nav>`
   }
 
