@@ -35,10 +35,15 @@ const ROWS = [
 ]
 
 const tables: Table[] = []
-afterEach(() => {
+/* And a task, because a pointer's release swallows the click it raises until
+   the next one. A dispatched `pointerup` raises no click, so without the wait
+   the guard was still standing for the next spec's click, and a sortable
+   heading in `data-table-root.dom.spec.ts` did not sort. */
+afterEach(async () => {
   for (const one of tables.splice(0)) {
     one.remove()
   }
+  await new Promise((done) => setTimeout(done, 0))
 })
 
 const settle = async (element: Table): Promise<void> => {
