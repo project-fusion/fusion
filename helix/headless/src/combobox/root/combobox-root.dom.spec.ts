@@ -1205,3 +1205,25 @@ describe('a combobox heard through VoiceOver', () => {
     })
   })
 })
+
+describe('a combobox that sends the words', () => {
+  /* The form had the option's value and nothing else, where React Aria's
+     ComboBox takes `formValue="text"` for a server that wants the words. */
+  test('with form-value="text", the form is given the chosen option’s words', async () => {
+    const host = await combobox('form-value="text" default-value="rb"')
+    expect(formValue(host as HTMLElement)).toBe('Ruby')
+    expect((host as unknown as { value: string }).value).toBe('rb')
+  })
+
+  test('and one entry of words for each chosen option, with a typed answer as typed', async () => {
+    const host = await combobox(
+      'form-value="text" multiple allows-custom-value default-value="rs,go,Zig"',
+    )
+    expect((formValue(host as HTMLElement) as FormData).getAll('c')).toEqual(['Rust', 'Go', 'Zig'])
+  })
+
+  test('by default, the value', async () => {
+    const host = await combobox('default-value="rb"')
+    expect(formValue(host as HTMLElement)).toBe('rb')
+  })
+})
