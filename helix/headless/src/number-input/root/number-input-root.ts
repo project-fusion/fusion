@@ -981,6 +981,28 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     return true
   }
 
+  /**
+   * The step down button's icon, as the `decrement-icon` slot's fallback, so an
+   * icon of your own replaces it by being slotted, and a tier above by
+   * overriding this.
+   */
+  protected renderDecrementIcon(): TemplateResult {
+    return html`<slot name="decrement-icon" aria-hidden="true"
+      ><svg part="decrement-mark" fill="currentColor" viewBox=${minus.viewBox} aria-hidden="true">
+        ${unsafeSVG(minus.content)}
+      </svg></slot
+    >`
+  }
+
+  /** The step up button's icon, behind the same seam as `renderDecrementIcon`. */
+  protected renderIncrementIcon(): TemplateResult {
+    return html`<slot name="increment-icon" aria-hidden="true"
+      ><svg part="increment-mark" fill="currentColor" viewBox=${plus.viewBox} aria-hidden="true">
+        ${unsafeSVG(plus.content)}
+      </svg></slot
+    >`
+  }
+
   protected override render(): TemplateResult {
     const parsed = this.numeric
     const atMin = parsed !== null && this.min !== undefined && parsed <= this.min
@@ -999,11 +1021,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
           @pointerdown=${this.handleStepperDown}
           @pointerup=${this.stopRepeat}
         >
-          <slot name="decrement-icon" aria-hidden="true"
-            ><svg part="decrement-mark" fill="currentColor" viewBox=${minus.viewBox} aria-hidden="true">
-              ${unsafeSVG(minus.content)}
-            </svg></slot
-          >
+          ${this.renderDecrementIcon()}
         </button>
         <slot name="start"></slot>
         ${
@@ -1067,11 +1085,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
           @pointerdown=${this.handleStepperDown}
           @pointerup=${this.stopRepeat}
         >
-          <slot name="increment-icon" aria-hidden="true"
-            ><svg part="increment-mark" fill="currentColor" viewBox=${plus.viewBox} aria-hidden="true">
-              ${unsafeSVG(plus.content)}
-            </svg></slot
-          >
+          ${this.renderIncrementIcon()}
         </button>
       </div>
       ${this.renderHint()}${this.renderFeedback()}`
