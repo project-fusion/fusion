@@ -342,6 +342,8 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  * @csspart zoom-in - The button that zooms in.
  * @csspart zoom-out - The button that zooms out.
  *
+ * @cssproperty --canvas-zoom - The board's zoom, which the board writes: 1 at the document's own size, 0.5 at half. The cards inherit it, so a card's stylesheet can draw less when the board is far out, such as a border that stays one pixel wide at `calc(1px / var(--canvas-zoom))`.
+ *
  * @cssstate connecting - While you draw a connection.
  * @cssstate direct - The board moves without easing, while you drag it or while it settles into its box.
  * @cssstate empty - While the document has no nodes.
@@ -3987,7 +3989,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       </div>
       <div
         part="viewport"
-        style=${`--_canvas-x: ${this.at.x}px; --_canvas-y: ${this.at.y}px; --_canvas-zoom: ${this.at.zoom}; --_canvas-rule-x: ${this.at.x - origin.x * this.at.zoom}px; --_canvas-rule-y: ${this.at.y - origin.y * this.at.zoom}px; --_canvas-rule-zoom: ${ruling(this.at.zoom)}`}
+        style=${`--_canvas-x: ${this.at.x}px; --_canvas-y: ${this.at.y}px; --_canvas-zoom: ${this.at.zoom}; --canvas-zoom: ${this.at.zoom}; --_canvas-rule-x: ${this.at.x - origin.x * this.at.zoom}px; --_canvas-rule-y: ${this.at.y - origin.y * this.at.zoom}px; --_canvas-rule-zoom: ${ruling(this.at.zoom)}`}
         @wheel=${this.handleWheel}
       >
         <!-- **One shape, whatever the board holds**, which is what hydration
