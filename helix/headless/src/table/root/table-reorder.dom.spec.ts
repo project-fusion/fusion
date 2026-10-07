@@ -112,11 +112,32 @@ const follow = (host: Table): Detail[] => {
 const template = (host: HTMLElement): string =>
   (part(host, 'table') as HTMLElement).getAttribute('style') ?? ''
 
+/* A pointer event as a mouse sends it, where `y` says how far down. */
+const pointer = (target: EventTarget, type: string, y: number): void => {
+  target.dispatchEvent(
+    new PointerEvent(type, {
+      bubbles: true,
+      button: 0,
+      clientX: 5,
+      clientY: y,
+      composed: true,
+      pointerId: 1,
+    }),
+  )
+}
+
+const pressEscape = (): void => {
+  window.dispatchEvent(
+    new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' }),
+  )
+}
+
 describe('a table that does not reorder', () => {
-  test('draws no grip cell, no grip heading, and no track for them', async () => {
+  test('draws no grip cell, no grip heading, no track for them, and no drag preview', async () => {
     const host = await make('')
     expect(rowsOf(host).map((row) => gripCell(row))).toEqual([null, null, null])
     expect(part(host, 'grip-head')).toBeNull()
+    expect(part(host, 'drag-preview')).toBeNull()
     expect(template(host)).not.toContain(': max-content')
   })
 })
@@ -246,5 +267,44 @@ describe('a reorderable grid table', () => {
     press(cell, ' ')
     expect(await spoken(host)).toBe('Picked up Alpha')
     expect((host as unknown as { selected: string }).selected).toBe('')
+  })
+})
+
+describe('a pointer dragging a row by its grip', () => {
+  test('draws a copy of it in the drag-preview part, hidden from assistive technology, which follows the pointer until the drop', async () => {
+    const host = await make()
+    const beta = rowsOf(host)[1] as HTMLElement
+    /* Drawn by the template, empty and closed, until a pointer drags. */
+    expect(part(host, 'drag-preview')?.childElementCount).toBe(0)
+    pointer(button(beta), 'pointerdown', 5)
+    pointer(window, 'pointermove', 25)
+    const preview = part(host, 'drag-preview') as HTMLElement
+    expect(preview.getAttribute('aria-hidden')).toBe('true')
+    expect(preview.getAttribute('popover')).toBe('manual')
+    expect(preview.textContent).toContain('Beta')
+    expect(preview.style.getPropertyValue('translate')).toBe('0px 20px')
+    pointer(window, 'pointermove', 40)
+    expect(preview.style.getPropertyValue('translate')).toBe('0px 35px')
+    pointer(window, 'pointerup', 40)
+    expect(part(host, 'drag-preview')?.childElementCount ?? 0).toBe(0)
+  })
+
+  test('Escape takes the copy away and puts it back, and a move with the keys draws none', async () => {
+    const host = await make()
+    const beta = rowsOf(host)[1] as HTMLElement
+    let asked = 0
+    host.addEventListener('helix-before-reorder', () => {
+      asked += 1
+    })
+    pointer(button(beta), 'pointerdown', 5)
+    pointer(window, 'pointermove', 25)
+    pressEscape()
+    expect(part(host, 'drag-preview')?.childElementCount ?? 0).toBe(0)
+    pointer(window, 'pointerup', 25)
+    expect(asked).toBe(0)
+    click(button(beta))
+    press(button(beta), 'ArrowDown')
+    await settle(host)
+    expect(part(host, 'drag-preview')?.childElementCount ?? 0).toBe(0)
   })
 })

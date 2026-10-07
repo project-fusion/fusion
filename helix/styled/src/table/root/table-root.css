@@ -64,6 +64,19 @@
   opacity: 0.5;
 }
 
+/* The copy of a row a pointer drags, drawn in the top layer and raised over
+   the page while the row itself stays in place, faded. It has no transition, so
+   it follows the pointer with nothing animated, whatever the reader's motion
+   setting. */
+[part="drag-preview"] {
+  background-color: var(--table-drag-preview-background-color, var(--helix-color-surface-raised));
+  border: var(--table-drag-preview-border-width, var(--helix-border-floating)) solid
+    var(--table-drag-preview-border-color, var(--helix-color-border));
+  border-radius: var(--table-drag-preview-radius, var(--helix-radii-sm));
+  box-shadow: var(--table-drag-preview-shadow, var(--helix-shadow-floating));
+  opacity: var(--table-drag-preview-opacity, 0.9);
+}
+
 /* Print: rows of text, which print. The striping an earlier answer flattened is
    Data Table's, and nothing here draws a fill. */
 @media print {

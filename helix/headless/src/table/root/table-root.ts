@@ -248,6 +248,7 @@ const numberOf = (value: string): number => Number(value.replaceAll(',', ''))
  * @csspart checkbox-mark-checked - Added to `checkbox-mark` while its box is checked.
  * @csspart checkbox-mark-dash - Added to `checkbox-mark` while it draws the dash, which it keeps until its box is checked.
  * @csspart checkbox-mark-indeterminate - Added to `checkbox-mark` while only some rows are selected.
+ * @csspart drag-preview - A copy of the row a pointer drags by its grip, which follows the pointer in the top layer until the row is let go, in a `reorderable` table. Hidden from assistive technology.
  * @csspart empty - The text shown when there are no rows.
  * @csspart grid-end - An empty box after the rows, in a `grid` table. Tab focuses it on its way out of the table, so the key leaves from the end.
  * @csspart grid-start - An empty box before the rows, in a `grid` table. Shift with Tab focuses it on its way out of the table.
@@ -555,6 +556,7 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     keys: () => this.everyKey,
     kind: 'row',
     name: (key) => textOf(this.rowFor(key)?.children[0]) || key,
+    preview: (key) => this.rowFor(key),
     refocus: (key) => this.gripOf(this.rowFor(key))?.focus(),
   })
 
@@ -1241,7 +1243,7 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
         }}
       ></slot>
       ${this.renderStatus(this.hasRows, grid ? 'gridcell' : 'cell')}
-    </div>${end}${this.renderLive(this.hasRows)}`
+    </div>${end}${this.renderLive(this.hasRows)}${this.reorder.drawDragPreview()}`
   }
 }
 

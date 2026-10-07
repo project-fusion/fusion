@@ -109,3 +109,26 @@ describe('the reordering example', () => {
     },
   )
 })
+
+describe('the drag preview of a reorderable table', () => {
+  /* The copy a pointer drags is drawn in the table's own shadow root, so its
+     sheet gives it its look. Nothing in it is animated, so it follows the
+     pointer the same way whatever the reader's motion setting. */
+  test('raises the copy over the page through the family hooks', () => {
+    const preview = sheet('helix-table').split('[part="drag-preview"] {')[1]?.split('}')[0] ?? ''
+    expect(preview).toContain(
+      'background-color: var(--table-drag-preview-background-color, var(--helix-color-surface-raised))',
+    )
+    expect(preview).toContain(
+      'border: var(--table-drag-preview-border-width, var(--helix-border-floating)) solid',
+    )
+    expect(preview).toContain(
+      'border-radius: var(--table-drag-preview-radius, var(--helix-radii-sm))',
+    )
+    expect(preview).toContain(
+      'box-shadow: var(--table-drag-preview-shadow, var(--helix-shadow-floating))',
+    )
+    expect(preview).toContain('opacity: var(--table-drag-preview-opacity, 0.9)')
+    expect(preview).not.toContain('transition')
+  })
+})
