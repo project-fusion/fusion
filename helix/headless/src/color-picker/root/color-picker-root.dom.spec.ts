@@ -717,9 +717,9 @@ if (hasLayout()) {
 }
 
 describe('the square from the keyboard', () => {
-  const key = async (host: Color, name: string): Promise<void> => {
+  const key = async (host: Color, name: string, shiftKey = false): Promise<void> => {
     part(host, 'grid-saturation')?.dispatchEvent(
-      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: name }),
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: name, shiftKey }),
     )
     await host.updateComplete
   }
@@ -739,6 +739,21 @@ describe('the square from the keyboard', () => {
     expect(reading(host)).toEqual([saturation, brightness + 1])
     await key(host, 'ArrowRight')
     expect(reading(host)).toEqual([saturation + 1, brightness + 1])
+  })
+
+  /* Measured before this: Shift with an arrow moved one, and Home and End
+     were the saturation input's own, which put saturation at its ends. */
+  test('moves ten with Shift, and saturation ten with Home and End', async () => {
+    const host = await picker('default-value="hsl(0 50% 50%)"')
+    const [saturation, brightness] = reading(host)
+    await key(host, 'ArrowDown', true)
+    expect(reading(host)).toEqual([saturation, brightness - 10])
+    await key(host, 'ArrowLeft', true)
+    expect(reading(host)).toEqual([saturation - 10, brightness - 10])
+    await key(host, 'End')
+    expect(reading(host)).toEqual([saturation, brightness - 10])
+    await key(host, 'Home')
+    expect(reading(host)).toEqual([saturation - 10, brightness - 10])
   })
 
   test('is one tab stop', async () => {
