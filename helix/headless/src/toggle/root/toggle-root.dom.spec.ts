@@ -17,6 +17,14 @@ type Toggle = HTMLElement & {
 const toggle = async (attributes = 'value="a"'): Promise<Toggle> =>
   (await mount(`<helix-headless-toggle ${attributes}>Grid</helix-headless-toggle>`)) as Toggle
 
+/** A toggle as a group holds it: the group writes `focusable` on every item. */
+const held = async (attributes = 'value="a"'): Promise<Toggle> => {
+  const host = await toggle(attributes)
+  host.focusable = false
+  await host.updateComplete
+  return host
+}
+
 /**
  * One toggle, and the contract that is the toggle's rather than the group's.
  *
@@ -30,8 +38,8 @@ describe('one toggle', () => {
      here for the reason the roles differ: an unchecked radio is one of the
      answers, and a reader is told how many there are and which is chosen. */
   test('says it is unchecked as well as checked, because both are answers', async () => {
-    expect(part(await toggle(), 'item')?.getAttribute('aria-checked')).toBe('false')
-    expect(part(await toggle('value="a" selected'), 'item')?.getAttribute('aria-checked')).toBe(
+    expect(part(await held(), 'item')?.getAttribute('aria-checked')).toBe('false')
+    expect(part(await held('value="a" selected'), 'item')?.getAttribute('aria-checked')).toBe(
       'true',
     )
   })
@@ -57,15 +65,15 @@ describe('one toggle', () => {
      lending it to the first member, and it is a property with no attribute
      because `tabindex` written onto a host a React consumer rendered is exactly
      the change hydration reports and does not patch up. */
-  test('holds a tab stop when it is chosen, or when the group lends it one', async () => {
-    const host = await toggle()
+  test('holds a tab stop when the group lends it one, and on its own', async () => {
+    const host = await held()
     expect(part(host, 'item')?.getAttribute('tabindex')).toBe('-1')
 
     host.focusable = true
     await host.updateComplete
     expect(part(host, 'item')?.getAttribute('tabindex')).toBe('0')
 
-    expect(part(await toggle('value="a" selected'), 'item')?.getAttribute('tabindex')).toBe('0')
+    expect(part(await toggle(), 'item')?.getAttribute('tabindex')).toBe('0')
     expect(host.hasAttribute('tabindex')).toBe(false)
     expect(host.hasAttribute('focusable')).toBe(false)
   })
@@ -87,5 +95,47 @@ describe('one toggle', () => {
     })
     ;(part(host, 'item') as HTMLElement).click()
     expect(value).toBe('a')
+  })
+})
+
+describe('a toggle on its own', () => {
+  /* Outside a group it said `role="radio"` and `aria-checked="false"`, and a
+     press changed nothing, so there was no toggle button to use. */
+  test('is a toggle button that a press flips, saying so with aria-pressed', async () => {
+    document.body.innerHTML = '<helix-headless-toggle value="bold">Bold</helix-headless-toggle>'
+    const toggle = document.body.firstElementChild as HTMLElement & {
+      selected: boolean
+      updateComplete: Promise<unknown>
+    }
+    await toggle.updateComplete
+    await toggle.updateComplete
+    const button = toggle.shadowRoot?.querySelector('[part="item"]') as HTMLButtonElement
+    expect(button.hasAttribute('role')).toBe(false)
+    expect(button.getAttribute('aria-pressed')).toBe('false')
+    expect(button.getAttribute('tabindex')).toBe('0')
+    let changes = 0
+    toggle.addEventListener('change', () => changes++)
+    button.click()
+    await toggle.updateComplete
+    expect(toggle.selected).toBe(true)
+    expect(button.getAttribute('aria-pressed')).toBe('true')
+    expect(changes).toBe(1)
+    toggle.addEventListener('helix-select', (event) => event.preventDefault(), { once: true })
+    button.click()
+    await toggle.updateComplete
+    expect(toggle.selected).toBe(true)
+    expect(changes).toBe(1)
+  })
+
+  test('starts pressed where the markup says selected', async () => {
+    document.body.innerHTML =
+      '<helix-headless-toggle value="bold" selected>Bold</helix-headless-toggle>'
+    const toggle = document.body.firstElementChild as HTMLElement & {
+      updateComplete: Promise<unknown>
+    }
+    await toggle.updateComplete
+    expect(toggle.shadowRoot?.querySelector('[part="item"]')?.getAttribute('aria-pressed')).toBe(
+      'true',
+    )
   })
 })

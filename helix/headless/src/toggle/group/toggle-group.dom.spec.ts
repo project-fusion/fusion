@@ -481,3 +481,14 @@ describe('toggles inside a layout wrapper', () => {
     expect(formValue(group)).toBe('list')
   })
 })
+
+describe('a required toggle group', () => {
+  /* Validity said a choice was missing and the accessibility tree said the
+     group was optional. */
+  test('says so to the accessibility tree, as a radio group does', async () => {
+    const group = await mount(markup.replace('default-value="light"', 'required'))
+    expect((group as unknown as { internals: ElementInternals }).internals.ariaRequired).toBe(
+      'true',
+    )
+  })
+})
