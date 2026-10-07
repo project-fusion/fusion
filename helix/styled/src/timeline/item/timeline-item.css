@@ -51,7 +51,7 @@
 }
 
 /* The line to an event that has not happened yet is dashed: the way there is
-   drawn and not yet travelled. */
+   drawn and not yet traveled. */
 :host([pending]) [part="rail"]::before {
   background-color: transparent;
   background-image: repeating-linear-gradient(
