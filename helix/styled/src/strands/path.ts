@@ -56,28 +56,37 @@ const NARROW = 760
 const GLOW = { fan: 1, ribbon: 0.36, waves: 0.7 } as const
 
 /** The width of each form, as a share of the width, before `spread`. */
-const WIDTH = { fan: 0.07, ribbon: 0.24, waves: 0.06 } as const
+const WIDTH = { fan: 0.12, ribbon: 0.24, waves: 0.06 } as const
 
 /** Where a fan's bend sits across its box, when `at` is not given. */
 const FAN_AT = 0.4
+
+/** Where a fan's lower arm leaves it, below the bend, as a share of its height. */
+const FAN_EXIT = 0.62
 
 /**
  * A fan: a tight, bright bend with its arms opening toward the right.
  *
  * The bend sits at `at` across and at 58% of `height` down from `top`, and the
- * arms leave above and below it. The width narrows to almost nothing at the
- * bend, which is what makes the strands converge into one hot line there.
+ * arms leave above and below it. The width narrows at the bend, which is what
+ * makes the strands converge into one hot line there.
+ *
+ * **The lower arm leaves heading down**, at the ribbon's own width, to where a
+ * ribbon after it turns: an arm that ran out to the side and a ribbon that
+ * started back toward the middle met in a hook, and a strand a third of the
+ * ribbon's width met one three times as wide.
  */
 const fan = (top: number, height: number, at: number, narrow: boolean): PathPoint[] => {
   const x = narrow ? Math.max(at, 0.8) : at
   const y = top + height * 0.58
   const arm = narrow ? 0.12 : 0.15
+  const exit = narrow ? 0.12 : 0.33
   return [
     [x + 0.38, y - height * 0.73, WIDTH.fan, 0.2],
-    [x + arm, y - height * 0.3, WIDTH.fan * 0.5, 0.9],
-    [x, y, 0.005, GLOW.fan],
-    [x + arm, y + height * 0.3, WIDTH.fan * 0.5, 0.9],
-    [x + 0.45, y + height * 0.54, WIDTH.fan * 1.15, 0.7],
+    [x + arm, y - height * 0.3, WIDTH.fan * 0.6, 0.9],
+    [x, y, 0.012, GLOW.fan],
+    [x + arm, y + height * 0.3, WIDTH.fan * 0.6, 0.9],
+    [x + exit, y + height * FAN_EXIT, WIDTH.fan * 1.4, 0.55],
   ]
 }
 
@@ -87,11 +96,31 @@ const fan = (top: number, height: number, at: number, narrow: boolean): PathPoin
  *
  * `fromRight` says which side it enters from, so consecutive waves alternate
  * and the ribbon turns off screen between them.
+ *
+ * **A wave the ribbon leads into sweeps down across the page**, gathering from
+ * the ribbon's width on the side the ribbon is on, so the ribbon leans into it.
+ * A flat wave entered from off screen met a ribbon running down the page at a
+ * right angle.
  */
-const wave = (y: number, height: number, fromRight: boolean, narrow: boolean): PathPoint[] => {
+const wave = (
+  y: number,
+  height: number,
+  fromRight: boolean,
+  narrow: boolean,
+  joined = false,
+): PathPoint[] => {
   const w = narrow ? WIDTH.waves * 2 : WIDTH.waves
   const glow = narrow ? GLOW.waves * 0.65 : GLOW.waves
   const side = (share: number): number => (fromRight ? 1 - share : share)
+  if (joined) {
+    return [
+      [side(0.1), y - height * 0.32, WIDTH.ribbon * 0.5, glow * 0.55],
+      [side(0.38), y - height * 0.08, w, glow],
+      [side(0.68), y + height * 0.04, w, glow],
+      [side(0.96), y + height * 0.16, w, glow * 0.6],
+      [side(1.16), y + height * 0.4, w, 0],
+    ]
+  }
   return [
     [side(-0.15), y - height * 0.35, w, 0],
     [side(-0.05), y, w, glow * 0.6],
@@ -168,7 +197,8 @@ export const boxPath = (
  *
  * Each stop places its form at its target, in page order. Between two stops
  * the ribbon fills the gap with soft S-curves in `fill`'s place, except
- * between two waves, where it turns off screen so each wave reads alone.
+ * between two waves less than a screen and a half apart, where it turns off
+ * screen so each wave reads alone.
  * Without stops, `fill` runs the length of the page: a fan opens the page and
  * a ribbon follows it, waves cross every screen and a third, and a ribbon
  * meanders the whole way. After a last wave the ribbon does not come back, so
@@ -200,38 +230,53 @@ export const pagePath = (
   }
 
   const points: PathPoint[] = [[0.6, -height * 0.9, WIDTH.ribbon, 0]]
+  /* How far the ribbon's curve turns between two of its points. */
+  const turn = ((height * 0.55) / (1.7 * height)) * Math.PI
   let phase = 1.2
   let cursor = 0
   let fromRight = true
   let previous: StrandsVariant | undefined
+  /* Whether the last thing laid down was ribbon, which a wave then leans out of. */
+  let joined = false
 
   const gap = (to: number, next: StrandsVariant | undefined): void => {
     if (to - cursor < height * 0.7) {
       return
     }
-    if (previous === 'waves' && next === 'waves') {
+    /* Waves a screen or so apart read as a set, each alone. Across a longer
+       gap the ribbon comes back, so the page holds one strand from top to
+       bottom and the next wave does not arrive from nowhere. */
+    if (previous === 'waves' && next === 'waves' && to - cursor < height * 1.5) {
       return
     }
-    const stretch = ribbon(cursor + height * 0.2, to - height * 0.45, height, 0.5, phase, narrow)
+    const end = next === 'waves' ? to - height * 0.95 : to - height * 0.45
+    const stretch = ribbon(cursor + height * 0.2, end, height, 0.5, phase, narrow)
     phase = stretch.phase
     points.push(...stretch.points)
     const last = stretch.points.at(-1)
     if (last) {
       fromRight = last[0] > 0.5
+      joined = true
     }
   }
 
   for (const stop of placed) {
+    joined = false
     gap(stop.top, stop.variant)
     if (stop.variant === 'fan') {
       const span = Math.min(stop.height, height)
       points.push(...fan(stop.top, span, stop.at ?? FAN_AT, narrow))
-      cursor = stop.top + span * 1.12
+      cursor = stop.top + span * (0.58 + FAN_EXIT) + height * 0.1
+      /* The ribbon picks up at the crest of its curve on the right, where
+         the fan's lower arm is heading. */
+      phase = Math.PI / 2 - turn
       fromRight = true
     } else if (stop.variant === 'waves') {
-      points.push(...wave(stop.top, height, fromRight, narrow))
+      points.push(...wave(stop.top, height, fromRight, narrow, joined))
+      /* A ribbon after the wave comes back in on the side it left by. */
+      phase = (fromRight ? Math.PI * 1.5 : Math.PI / 2) - turn
       fromRight = !fromRight
-      cursor = stop.top + height * 0.35
+      cursor = stop.top + height * (joined ? 0.5 : 0.35)
     } else {
       const y = stop.top + Math.min(stop.height, height) / 2
       points.push([stop.at ?? 0.5, y, WIDTH.ribbon, GLOW.ribbon])
