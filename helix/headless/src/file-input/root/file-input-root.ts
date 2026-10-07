@@ -3,8 +3,7 @@ import {
   customElement,
   drawIcon,
   drawStatus,
-  fillTemplate,
-  formatNumbers,
+  formatWords,
   HelixBeforeChangeEvent,
   HelixFormElement,
   HelixRejectEvent,
@@ -14,6 +13,8 @@ import {
   restoreValue,
   SlottedGlyph,
   StatusController,
+  words,
+  wordsLocale,
 } from '@fusion.dev/helix-core'
 import { trash } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -37,23 +38,24 @@ import '../../tag/index.js'
  * `Intl.NumberFormat` for the number rather than `toFixed`, so a decimal comma
  * lands where a decimal comma belongs. The unit is not localized with it: `MB`
  * is written the same way in the places this ships, and `Intl`'s own byte units
- * carry no scale to pick from.
+ * carry no scale to pick from. A size under a kilobyte is a count of bytes,
+ * which `inBytes` writes in words.
  */
-const size = (bytes: number, locale?: string): string => {
-  const units = ['bytes', 'KB', 'MB', 'GB', 'TB']
+const size = (bytes: number, locale: string, inBytes: (count: number) => string): string => {
+  const units = ['', 'KB', 'MB', 'GB', 'TB']
   let value = bytes
   let step = 0
   while (value >= 1024 && step < units.length - 1) {
     value /= 1024
     step += 1
   }
-  const written = new Intl.NumberFormat(locale || undefined, {
-    maximumFractionDigits: step === 0 ? 0 : 1,
-  }).format(value)
-  // One byte is a byte. The plural is only wrong at exactly one and it is the
-  // size an empty-ish file has, so it is the one a reader sees while testing.
-  const unit = step === 0 && value === 1 ? 'byte' : units[step]
-  return `${written} ${unit}`
+  if (step === 0) {
+    return inBytes(value)
+  }
+  const written = new Intl.NumberFormat(locale || undefined, { maximumFractionDigits: 1 }).format(
+    value,
+  )
+  return `${written} ${units[step]}`
 }
 
 /**
@@ -169,6 +171,12 @@ const kind = (file: File): string => {
  */
 @customElement('helix-headless-file-input')
 export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
+  /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-file-input': { triggerLabel: 'Dateien auswählen' } })`.
+   */
+  static words = 'helix-file-input'
+
   /* A consumer's `aria-describedby` names ids in their own tree and the control
      is in this shadow root, so the reference has to be carried down as an
      element rather than copied as an id. See `AriaForwardController`: measured
@@ -192,8 +200,17 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
    * What a reader hears when a drop or a paste adds files, with `{names}` and
    * `{count}` filled in.
    */
+  @words
   @property({ attribute: 'added-text' })
   addedText = 'Added: {names}'
+
+  /**
+   * A file's size under a kilobyte. `{count}` is how many bytes, written in
+   * the locale, and each language writes the forms it has.
+   */
+  @words
+  @property({ attribute: 'bytes-label' })
+  bytesLabel = '{count, plural, one {# byte} other {# bytes}}'
 
   /**
    * Which camera or microphone a mobile picker should offer, if any.
@@ -209,9 +226,9 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
   directory = false
 
   /**
-   * Language tag the sizes are written in.
-   *
-   * Absent uses the runtime's own.
+   * The locale the words, the sizes, and the numbers and lists in sentences
+   * are in, as a BCP 47 tag such as `pl`. Empty reads the nearest `lang`, then
+   * the browser's language.
    */
   @property()
   locale = ''
@@ -239,6 +256,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
    * The name of a file's progress bar, read by screen readers, with `{name}`
    * filled in. A label with no `{name}` has it added after it.
    */
+  @words
   @property({ attribute: 'progress-label' })
   progressLabel = 'Uploading {name}'
 
@@ -246,12 +264,14 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
    * What a reader hears when files are refused, with `{count}` and `{names}`
    * filled in.
    */
+  @words
   @property({ attribute: 'rejected-text' })
   rejectedText = 'Not added: {names}'
 
   /**
    * What a reader hears when a file is removed, with `{name}` filled in.
    */
+  @words
   @property({ attribute: 'removed-text' })
   removedText = 'Removed: {name}'
 
@@ -263,6 +283,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
    * removes rather than as "Remove" said once per file. A label with no
    * `{name}` has it added after it.
    */
+  @words
   @property({ attribute: 'remove-label' })
   removeLabel = 'Remove {name}'
 
@@ -286,6 +307,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
   /**
    * The trigger's text when nothing is slotted into it.
    */
+  @words
   @property({ attribute: 'trigger-label' })
   triggerLabel = 'Choose files'
 
@@ -383,10 +405,10 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
        region that arrives with its words is read inconsistently. Cleared
        first, so the same words twice are said twice. */
     const words = [
-      applied && !picked && added.length > 0 ? this.listed(this.addedText, added) : '',
+      applied && !picked && added.length > 0 ? this.listed('addedText', added) : '',
       refused.length > 0
         ? this.listed(
-            this.rejectedText,
+            'rejectedText',
             refused.map((one) => one.file),
           )
         : '',
@@ -403,13 +425,23 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
    * list it always was: `unit` and `short` join with commas and no "and". The
    * count is written as the language writes a number.
    */
-  private listed(sentence: string, files: File[]): string {
-    return fillTemplate(sentence, {
-      count: formatNumbers(this.lang)(files.length),
-      names: new Intl.ListFormat(this.lang || undefined, { style: 'short', type: 'unit' }).format(
+  private listed(sentence: 'addedText' | 'rejectedText', files: File[]): string {
+    return formatWords(this, sentence, {
+      count: files.length,
+      names: new Intl.ListFormat(wordsLocale(this), { style: 'short', type: 'unit' }).format(
         files.map((file) => file.name),
       ),
     })
+  }
+
+  /**
+   * A name about one file: `{name}` filled in, or the file's name after a
+   * page's label that has no `{name}`.
+   */
+  private aboutFile(label: 'progressLabel' | 'removeLabel', name: string): string {
+    return this[label].includes('{name}')
+      ? formatWords(this, label, { name })
+      : labelWith(this[label], 'name', name)
   }
 
   /** The element slotted into `remove-icon`, one copy per row's remove button. */
@@ -495,7 +527,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
   removeAt(at: number): void {
     const gone = this.files[at]
     if (gone && this.commit(this.files.filter((_, index) => index !== at))) {
-      this.status.say(fillTemplate(this.removedText, { name: gone.name }))
+      this.status.say(formatWords(this, 'removedText', { name: gone.name }))
     }
   }
 
@@ -766,7 +798,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
    */
   protected renderMeta(file: File): TemplateResult {
     return html`<${this.tag('tag')} part="size"
-    exportparts="cell: size-cell, dismiss: size-dismiss, dismiss-mark: size-dismiss-mark, label: size-label, link: size-link, start: size-start">${size(file.size, this.locale)}</${this.tag('tag')}>
+    exportparts="cell: size-cell, dismiss: size-dismiss, dismiss-mark: size-dismiss-mark, label: size-label, link: size-link, start: size-start">${size(file.size, wordsLocale(this), (count) => formatWords(this, 'bytesLabel', { count }))}</${this.tag('tag')}>
       <${this.tag('tag')}
         part="kind"
       exportparts="cell: kind-cell, dismiss: kind-dismiss, dismiss-mark: kind-dismiss-mark, label: kind-label, link: kind-link, start: kind-start">${kind(file)}</${this.tag('tag')}>`
@@ -790,7 +822,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
               part="progress"
               max="1"
               value=${bar === 'unmeasured' ? nothing : bar}
-              aria-label=${labelWith(this.progressLabel, 'name', file.name)}
+              aria-label=${this.aboutFile('progressLabel', file.name)}
             ></progress>`
       }${status.text ? html`<span part="status-text">${status.text}</span>` : nothing}</span
     >`
@@ -862,7 +894,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
                   <button
                     part="remove"
                     type="button"
-                    aria-label=${labelWith(this.removeLabel, 'name', file.name)}
+                    aria-label=${this.aboutFile('removeLabel', file.name)}
                     data-at=${at}
                     ?disabled=${this.isDisabled}
                     @click=${this.handleRemove}

@@ -10,7 +10,7 @@ import {
   DisabledCascadeController,
   drawAutofill,
   endInSight,
-  fillTemplate,
+  formatWords,
   HelixFilterEvent,
   HelixFormElement,
   HelixLoadMoreEvent,
@@ -32,6 +32,7 @@ import {
   Typeahead,
   toggleEvery,
   typesCharacter,
+  wordsLocale,
 } from '@fusion.dev/helix-core'
 import { magnifyingGlass } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -365,22 +366,23 @@ export class HelixHeadlessListbox extends MixinCollection(
   reorderable = false
 
   /**
-   * What a screen reader hears when a filter leaves one option. `{count}` is
-   * the count.
+   * What a screen reader hears when a filter leaves one option, where
+   * `results-label` should not say it. `{count}` is the count.
+   *
+   * @deprecated Write every form in `results-label`, as `{count, plural, one
+   * {# result} other {# results}}`. Removed in the next major version.
    */
   @property({ attribute: 'result-label' })
-  resultLabel = '{count} result'
+  resultLabel?: string
 
   /**
-   * What a screen reader hears when a filter leaves any other number of
-   * options. `{count}` is the count.
-   *
-   * **Two sentences, chosen by `Intl.PluralRules`**, which is Data Table's
-   * pair: a language with more forms than two picks the one for its `one` and
-   * writes the rest here.
+   * What a screen reader hears when a filter narrows the list. `{count}` is
+   * how many options are left, written in the locale, and each language
+   * writes the forms it has: `{count, plural, one {# wynik} few {# wyniki}
+   * many {# wyników} other {# wyniku}}`.
    */
   @property({ attribute: 'results-label' })
-  resultsLabel = '{count} results'
+  resultsLabel = '{count, plural, one {# result} other {# results}}'
 
   /**
    * What VoiceOver hears as the highlight reaches a chosen option from the
@@ -529,7 +531,9 @@ export class HelixHeadlessListbox extends MixinCollection(
     const count = this.shown.length
     this.announced =
       this.filter.trim() && count
-        ? countLabel(count, this.resultLabel, this.resultsLabel, this.lang)
+        ? this.resultLabel
+          ? countLabel(count, this.resultLabel, this.resultsLabel, wordsLocale(this))
+          : formatWords(this, 'resultsLabel', { count })
         : ''
   }
 
@@ -555,7 +559,7 @@ export class HelixHeadlessListbox extends MixinCollection(
     const active = this.entries.find((option) => option.value === this.activeValue)
     if (active) {
       this.announced = active.selected
-        ? fillTemplate(this.selectedLabel, { name: active.text })
+        ? formatWords(this, 'selectedLabel', { name: active.text })
         : active.text
     }
   }

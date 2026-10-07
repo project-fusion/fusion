@@ -16,6 +16,8 @@ import {
   reportValues,
   StatusController,
   typesCharacter,
+  words,
+  wordsLocale,
 } from '@fusion.dev/helix-core'
 import { caretDown } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -131,6 +133,12 @@ import { over } from '../align.js'
 export class HelixHeadlessSelect extends MixinControllerOpen(
   MixinControllerValue(MixinField(HelixFormElement)),
 ) {
+  /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-select': { placeholder: 'Auswählen' } })`.
+   */
+  static words = 'helix-select'
+
   /* A consumer's `aria-describedby` names ids in their own tree and the control
      is in this shadow root, so the reference has to be carried down as an
      element rather than copied as an id. See `AriaForwardController`: measured
@@ -162,6 +170,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
   /**
    * The text shown when no options match the filter.
    */
+  @words
   @property({ attribute: 'empty-text' })
   emptyText = 'No matches'
 
@@ -198,6 +207,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
    * second time for a name the page never wrote: the list is this element's,
    * and so is the fallback. Combobox calls its list the same.
    */
+  @words
   @property({ attribute: 'list-label' })
   listLabel = 'Options'
 
@@ -214,6 +224,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
   /**
    * The text shown while the options load.
    */
+  @words
   @property({ attribute: 'loading-text' })
   loadingText = 'Loading'
 
@@ -226,6 +237,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
   /**
    * Shown on the trigger while nothing is chosen.
    */
+  @words
   @property()
   placeholder = 'Choose'
 
@@ -384,9 +396,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
       /* A list in the reader's language, as React Aria writes one: `unit` and
          `short` is "A, B, C" in English and each language's own separators in
          the rest. */
-      return new Intl.ListFormat(this.lang || undefined, { style: 'short', type: 'unit' }).format(
-        words,
-      )
+      return new Intl.ListFormat(wordsLocale(this), { style: 'short', type: 'unit' }).format(words)
     }
     return this.value !== '' && !this.childrenKnown ? nothing : this.placeholder
   }

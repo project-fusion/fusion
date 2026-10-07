@@ -5,6 +5,7 @@ import {
   HelixSelectEvent,
   MixinControllerOpen,
   matchesChord,
+  words,
 } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -84,8 +85,15 @@ import '../../listbox/index.js'
 @customElement('helix-headless-command')
 export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-command': { placeholder: 'Befehle suchen' } })`.
+   */
+  static words = 'helix-command'
+
+  /**
    * The text shown when the filter matches no commands.
    */
+  @words
   @property({ attribute: 'empty-text' })
   emptyText = 'No commands'
 
@@ -112,6 +120,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
   /**
    * Accessible name for the overlay, which has no visible heading.
    */
+  @words
   @property()
   label = 'Commands'
 
@@ -136,6 +145,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
   /**
    * The text shown while the commands load.
    */
+  @words
   @property({ attribute: 'loading-text' })
   loadingText = 'Loading'
 
@@ -149,23 +159,29 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
   /**
    * The text shown in the filter field before anything is typed.
    */
+  @words
   @property()
   placeholder = 'Search commands'
 
   /**
-   * What a screen reader hears when typing leaves one command. `{count}` is
-   * the count.
+   * What a screen reader hears when typing leaves one command, where
+   * `results-label` should not say it. `{count}` is the count.
+   *
+   * @deprecated Write every form in `results-label`, as `{count, plural, one
+   * {# command} other {# commands}}`. Removed in the next major version.
    */
   @property({ attribute: 'result-label' })
-  resultLabel = '{count} command'
+  resultLabel?: string
 
   /**
-   * What a screen reader hears when typing leaves any other number of
-   * commands. `{count}` is the count, and `Intl.PluralRules` picks between the
-   * two.
+   * What a screen reader hears when typing narrows the commands. `{count}` is
+   * how many are left, written in the locale, and each language writes the
+   * forms it has: `{count, plural, one {# polecenie} few {# polecenia} many
+   * {# poleceń} other {# polecenia}}`.
    */
+  @words
   @property({ attribute: 'results-label' })
-  resultsLabel = '{count} commands'
+  resultsLabel = '{count, plural, one {# command} other {# commands}}'
 
   /**
    * Whether the consumer put anything under the list.
@@ -411,7 +427,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
         load-error=${this.loadError}
         loading-text=${this.loadingText}
         no-results-text=${this.noResultsText ?? nothing}
-        result-label=${this.resultLabel}
+        result-label=${this.resultLabel ?? ''}
         results-label=${this.resultsLabel}
         ?loading=${this.loading}
         filterable
