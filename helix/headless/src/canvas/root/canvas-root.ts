@@ -253,6 +253,11 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  * - What a key changes that a reader cannot see is said: where a card moved
  *   to, its new size, how many cards are selected, and the zoom. A selected
  *   card or connection says so when a reader arrives on it.
+ * - Control or Command with Z undoes the last move or resize the board made,
+ *   and with Shift, or Control with Y, makes it again. `undo()` and `redo()`
+ *   do the same from a script. Each asks with `helix-before-move` and tells
+ *   with `helix-move`, as a move does, so a board that holds its positions in
+ *   your state is undone through your state.
  *
  * Every drag also works with clicks, as WCAG 2.5.7 requires for a pointer that
  * cannot hold a button down. Click a selected card's move handle, a corner, a
@@ -527,6 +532,16 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   @words
   @property({ attribute: 'resized-label' })
   resizedLabel = '{name} resized to {width} by {height}'
+
+  /** What screen readers hear after a move or a resize is made again. */
+  @words
+  @property({ attribute: 'redone-label' })
+  redoneLabel = 'Move made again'
+
+  /** What screen readers hear after a move or a resize is undone. */
+  @words
+  @property({ attribute: 'undone-label' })
+  undoneLabel = 'Move undone'
 
   /**
    * What a screen reader calls the board in place of its role, after its
@@ -1783,6 +1798,13 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     for (const { height, name, width, x, y } of detail.nodes) {
       const card = this.byName.get(name)
       if (card) {
+        /* Where the card stood before the gesture's first step, for undo. */
+        if (!this.replaying) {
+          this.moving ??= new Map()
+          if (!this.moving.has(name)) {
+            this.moving.set(name, { height: card.height, width: card.width, x: card.x, y: card.y })
+          }
+        }
         card.x = x
         card.y = y
         if (width !== undefined && height !== undefined) {
@@ -1793,6 +1815,113 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     }
     this.requestUpdate()
     return true
+  }
+
+  /**
+   * The moves and resizes the board made, oldest first, each as where its
+   * cards stood before and after, for `undo` to take back. At most 100.
+   */
+  private undoable: Array<{ after: MoveDetail; before: MoveDetail }> = []
+
+  /** The moves undone, most recent last, for `redo` to make again. */
+  private redoable: Array<{ after: MoveDetail; before: MoveDetail }> = []
+
+  /** Where the cards of the gesture in progress stood before its first step. */
+  private moving: Map<string, { height: number; width: number; x: number; y: number }> | undefined
+
+  /** Whether a move is an undo or a redo, which history does not record again. */
+  private replaying = false
+
+  /**
+   * Says a move is finished, and keeps it for `undo`: where its cards stood
+   * before the gesture, and where they stand now.
+   */
+  private finishMove(detail: MoveDetail): void {
+    const moving = this.moving
+    this.moving = undefined
+    if (moving && moving.size > 0) {
+      const place = (name: string) => {
+        const card = this.byName.get(name)
+        return card
+          ? { height: card.height, name, width: card.width, x: card.x, y: card.y }
+          : undefined
+      }
+      this.undoable.push({
+        after: {
+          nodes: [...moving.keys()]
+            .map(place)
+            .filter((one): one is NonNullable<typeof one> => one !== undefined),
+        },
+        before: { nodes: [...moving].map(([name, at]) => ({ name, ...at })) },
+      })
+      this.undoable = this.undoable.slice(-100)
+      this.redoable = []
+    }
+    this.dispatchEvent(new HelixMoveEvent(detail))
+  }
+
+  /**
+   * Puts the cards of the last move or resize back where they stood, asking
+   * with `helix-before-move` first. Returns whether anything moved: false
+   * with nothing to undo, or when the request was refused.
+   */
+  undo(): boolean {
+    return this.replay(this.undoable, this.redoable, 'before', this.undoneLabel)
+  }
+
+  /**
+   * Makes the last move or resize `undo` took back again, asking with
+   * `helix-before-move` first. Returns whether anything moved.
+   */
+  redo(): boolean {
+    return this.replay(this.redoable, this.undoable, 'after', this.redoneLabel)
+  }
+
+  /** Moves the cards of the last entry of `from` to its `side`, and files it in `to`. */
+  private replay(
+    from: Array<{ after: MoveDetail; before: MoveDetail }>,
+    to: Array<{ after: MoveDetail; before: MoveDetail }>,
+    side: 'after' | 'before',
+    words: string,
+  ): boolean {
+    const entry = from.pop()
+    if (!entry) {
+      return false
+    }
+    this.replaying = true
+    const applied = this.requestMove(entry[side])
+    this.replaying = false
+    if (!applied) {
+      from.push(entry)
+      return false
+    }
+    to.push(entry)
+    this.dispatchEvent(new HelixMoveEvent(entry[side]))
+    this.say(words)
+    return true
+  }
+
+  /**
+   * Control or Command with Z undoes, and with Shift, or Control with Y,
+   * redoes, from anywhere on the board but a field a card holds, where the
+   * keys are the field's.
+   */
+  private readonly handleHistoryKey = (event: KeyboardEvent): void => {
+    if (event.defaultPrevented || event.altKey || !(event.ctrlKey || event.metaKey)) {
+      return
+    }
+    const key = event.key.toLowerCase()
+    const again = (key === 'z' && event.shiftKey) || (key === 'y' && !event.shiftKey)
+    if (key !== 'z' && !again) {
+      return
+    }
+    const origin = event.composedPath()[0] as Element | undefined
+    if (origin?.closest?.(INTERACTIVE)) {
+      return
+    }
+    if (again ? this.redo() : this.undo()) {
+      event.preventDefault()
+    }
   }
 
   /**
@@ -2207,7 +2336,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       }
       this.sizing = undefined
       if (sizing.moved) {
-        this.dispatchEvent(new HelixMoveEvent(sizing.moved))
+        this.finishMove(sizing.moved)
       }
       return
     }
@@ -2261,7 +2390,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
         this.clicked(carry.pressed, event)
       }
       if (carry.moved) {
-        this.dispatchEvent(new HelixMoveEvent(carry.moved))
+        this.finishMove(carry.moved)
       }
       return
     }
@@ -2393,6 +2522,8 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       this.linking = undefined
       this.said = this.stoppedLabel
     }
+    /* Put back, so nothing moved that undo would take back. */
+    this.moving = undefined
     this.letGo()
   }
 
@@ -2534,7 +2665,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
         })),
       }
       if (this.requestMove(detail)) {
-        this.dispatchEvent(new HelixMoveEvent(detail))
+        this.finishMove(detail)
         this.say(
           formatWords(this, 'movedLabel', {
             name: this.nameOf(card.name),
@@ -2563,7 +2694,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       )
       const detail: MoveDetail = { nodes: [{ name: card.name, ...box }] }
       if (this.requestMove(detail)) {
-        this.dispatchEvent(new HelixMoveEvent(detail))
+        this.finishMove(detail)
         this.say(
           formatWords(this, 'resizedLabel', {
             height: box.height,
@@ -3558,6 +3689,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     this.addEventListener('focusin', this.handleFocusIn)
     this.addEventListener('focusout', this.handleFocusOut)
     this.addEventListener('keydown', this.handleStopKeydown)
+    this.addEventListener('keydown', this.handleHistoryKey)
     this.addEventListener('pointercancel', this.handlePointerUp)
     this.addEventListener('pointerdown', this.handlePointerDown)
     this.addEventListener('pointermove', this.handlePointerMove)
@@ -3581,6 +3713,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     this.removeEventListener('focusin', this.handleFocusIn)
     this.removeEventListener('focusout', this.handleFocusOut)
     this.removeEventListener('keydown', this.handleStopKeydown)
+    this.removeEventListener('keydown', this.handleHistoryKey)
     this.removeEventListener('pointercancel', this.handlePointerUp)
     this.removeEventListener('pointerdown', this.handlePointerDown)
     this.removeEventListener('pointermove', this.handlePointerMove)
