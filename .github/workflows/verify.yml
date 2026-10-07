@@ -499,14 +499,25 @@ jobs:
       # plugin's dependencies from cold and ran 42 to 54 seconds, one after the
       # other, on run 37556830567. `key` gives the entry a new name, because an
       # exact hit on the old one is never saved again.
+      #
+      # **Keyed on the toolchain this job installs, and not on the runner's
+      # own.** The action hashes every `rustc` it finds, and the image ships a
+      # stable one of its own: 1.99.0 on one image and 1.98.1 on the one before
+      # it. While GitHub rolled the new image out, runs alternated between two
+      # keys, and a run that drew the other one compiled from cold: 535 seconds
+      # on run 37569580156 against 176 on the run before. `1.96` in the prefix
+      # is the toolchain below, said again because a key cannot read a step's
+      # input.
       - name: Restore the Cargo cache
         uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
+          add-rust-environment-hash-key: false
           cache-directories: |
             fusion/plugins/example/target
             fusion/plugins/example/target-past
             fusion/plugins/example/target-escape
           key: example-plugin
+          prefix-key: v0-rust-1.96
       - name: Clippy
         run: bun run rs:check
       - name: Rust tests
@@ -548,8 +559,13 @@ jobs:
         uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable, 14 Sep 2026
         with:
           toolchain: 1.96
+      # Keyed on the toolchain as the Rust job's cache is, for the reason given
+      # there.
       - name: Restore the Cargo cache
         uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        with:
+          add-rust-environment-hash-key: false
+          prefix-key: v0-rust-1.96
       - name: Build
         run: bun run build
       # Ahead of the checks rather than left to the npm shim, so one compile
