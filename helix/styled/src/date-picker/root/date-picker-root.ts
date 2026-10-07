@@ -31,6 +31,7 @@ import { styles } from './date-picker-root.css.js'
  * @cssproperty --date-picker-feedback-color - The color of the message under the calendar, while `feedback` is set.
  * @cssproperty --date-picker-period-size - Height of a month or a year in the months and years views, where `max-view` is set.
  * @cssproperty --date-picker-range-color - Band behind the days in a range.
+ * @cssproperty --date-picker-range-preview-color - Band behind the days a waiting range is drawn to, before its second end is chosen.
  * @cssproperty --date-picker-row-size - Height of a week row.
  * @cssproperty --date-picker-selected-color - Fill behind a selected day.
  * @cssproperty --date-picker-track-size - Width of a column, which is what sets the space between days.

@@ -1181,3 +1181,95 @@ describe('a date picker drawing a calendar with months of its own', () => {
     expect((part(later, 'previous') as HTMLButtonElement | null)?.disabled).toBe(false)
   })
 })
+
+describe('a calendar holding several dates', () => {
+  type Live = DatePicker & {
+    internals: ElementInternals
+    updateComplete: Promise<unknown>
+  }
+  const grid = (cal: DatePicker): Element | null | undefined =>
+    cal.shadowRoot?.querySelector('[part="grid"]')
+  const selection = (cal: DatePicker): string =>
+    cal.shadowRoot?.querySelector('[part="selection"]')?.textContent?.trim() ?? ''
+  const cell = (cal: DatePicker, day: number): HTMLElement =>
+    days(cal).filter((one) => !one.hasAttribute('data-outside'))[day - 1] as HTMLElement
+
+  /* Measured before this: `mode="range"` with a week chosen drew seven cells
+     with `aria-selected` in a grid without `aria-multiselectable`, and said
+     nothing of a range. */
+  test('says it can hold several, and which range it holds', async () => {
+    const cal = await calendar(
+      'locale="en-US" mode="range" default-month="2026-08" default-value="2026-08-04,2026-08-10"',
+    )
+    expect(grid(cal)?.getAttribute('aria-multiselectable')).toBe('true')
+    expect(grid(cal)?.getAttribute('aria-describedby')).toBe('selection')
+    expect(selection(cal)).toBe('Selected range: August 4, 2026 to August 10, 2026')
+    const single = await calendar(
+      'locale="en-US" default-month="2026-08" default-value="2026-08-14"',
+    )
+    expect(grid(single)?.hasAttribute('aria-multiselectable')).toBe(false)
+    expect(selection(single)).toBe('Selected date: August 14, 2026')
+    const several = await calendar(
+      'locale="en-US" mode="multiple" default-month="2026-08" default-value="2026-08-04,2026-08-06"',
+    )
+    expect(grid(several)?.getAttribute('aria-multiselectable')).toBe('true')
+    expect(selection(several)).toBe('2 dates selected')
+  })
+
+  test('says nothing while nothing is chosen', async () => {
+    const cal = await calendar('mode="range" default-month="2026-08"')
+    expect(selection(cal)).toBe('')
+    expect(grid(cal)?.hasAttribute('aria-describedby')).toBe(false)
+  })
+
+  test('draws a waiting range to the day the pointer is on, before it is chosen', async () => {
+    const cal = (await calendar(
+      'locale="en-US" mode="range" default-month="2026-08" default-value="2026-08-04"',
+    )) as Live
+    expect(cal.internals.states.has('range-pending')).toBe(true)
+    expect(selection(cal)).toBe('Range starts August 4, 2026. Choose the day it ends.')
+    cell(cal, 8).dispatchEvent(new Event('pointerenter'))
+    await cal.updateComplete
+    const preview = days(cal).filter((one) => one.hasAttribute('data-range-preview'))
+    expect(preview).toHaveLength(5)
+    expect(preview[0]?.hasAttribute('data-range-start')).toBe(true)
+    expect(preview[4]?.hasAttribute('data-range-end')).toBe(true)
+    // Drawn, and not chosen: only the end already chosen is selected.
+    expect(preview.filter((one) => one.getAttribute('aria-selected') === 'true')).toHaveLength(1)
+    grid(cal)?.dispatchEvent(new Event('pointerleave'))
+    await cal.updateComplete
+    expect(days(cal).some((one) => one.hasAttribute('data-range-preview'))).toBe(false)
+    cell(cal, 8).click()
+    await cal.updateComplete
+    expect(cal.value).toBe('2026-08-04,2026-08-08')
+    expect(cal.internals.states.has('range-pending')).toBe(false)
+    expect(days(cal).some((one) => one.hasAttribute('data-range-preview'))).toBe(false)
+  })
+
+  test('and to the day the keys move to', async () => {
+    const cal = (await calendar(
+      'mode="range" default-month="2026-08" default-value="2026-08-04"',
+    )) as Live
+    await press(cal, 'ArrowRight')
+    await press(cal, 'ArrowRight')
+    await cal.updateComplete
+    expect(days(cal).filter((one) => one.hasAttribute('data-range-preview'))).toHaveLength(3)
+  })
+})
+
+describe('a calendar says which view it shows', () => {
+  test('as a state, for the months and for the years', async () => {
+    const cal = (await calendar('default-month="2026-08" max-view="year"')) as DatePicker & {
+      internals: ElementInternals
+      updateComplete: Promise<unknown>
+    }
+    expect(cal.internals.states.has('month-view')).toBe(false)
+    cal.shadowRoot?.querySelector<HTMLElement>('[part="heading-button"]')?.click()
+    await cal.updateComplete
+    expect(cal.internals.states.has('month-view')).toBe(true)
+    cal.shadowRoot?.querySelector<HTMLElement>('[part="heading-button"]')?.click()
+    await cal.updateComplete
+    expect(cal.internals.states.has('year-view')).toBe(true)
+    expect(cal.internals.states.has('month-view')).toBe(false)
+  })
+})
