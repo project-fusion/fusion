@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -31,4 +31,24 @@ describe('announcement hooks', () => {
     expect(sheet()).toMatch(/color-mix\(in oklab, var\(--_announcement-tint\) 18%/)
     expect(sheet()).not.toMatch(/color-mix\(\s*in oklab,\s*var\(--_announcement-color\)/)
   })
+})
+
+/* The dismiss button is out of flow and only the message was padded clear of
+   it, so a link in the actions ran under the cross. */
+describe('a dismissible announcement with actions', () => {
+  test('keeps the actions clear of the dismiss button', () => {
+    expect(sheet()).toContain(':host([dismissible]) [part="actions"]')
+  })
+
+  if (hasLayout()) {
+    test('draws the last action before the dismiss button starts', async () => {
+      const host = await mount(
+        '<helix-announcement dismissible style="inline-size: 700px">Trial ends soon<a slot="actions" href="#x">Upgrade</a></helix-announcement>',
+      )
+      await (host as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+      const link = host.querySelector('a')?.getBoundingClientRect()
+      const dismiss = part(host, 'dismiss')?.getBoundingClientRect()
+      expect((link?.right ?? 0) <= (dismiss?.left ?? 0)).toBe(true)
+    })
+  }
 })
