@@ -44,7 +44,8 @@ export class HelixHeadlessSkeleton extends HelixElement {
    * What is loading, read out as the placeholder's name, such as "Loading
    * profile".
    *
-   * Absent hides the placeholder from screen readers.
+   * Absent hides the placeholder from screen readers. Around content, the name
+   * is read while `loading` is set, and the loaded content is read as it is.
    */
   @property()
   label = ''
@@ -90,7 +91,10 @@ export class HelixHeadlessSkeleton extends HelixElement {
     const wraps = this.wraps
     this.toggleState('wrapping', wraps)
     this.internals.ariaBusy = this.loading ? 'true' : null
-    if (this.label) {
+    /* Loaded content is the page's own and is read as it is. The busy
+       indicator and its name belong to a placeholder or to content that is
+       still loading. */
+    if (this.label && (this.loading || !wraps)) {
       hostAria(this.internals, { label: this.label, role: 'progressbar' })
       this.internals.ariaHidden = null
     } else {
