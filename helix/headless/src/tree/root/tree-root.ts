@@ -158,15 +158,6 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
   label = 'Tree'
 
   /**
-   * What screen readers hear each time an item moves, in a `reorderable`
-   * tree. `{name}` is the item's words, `{position}` its place among its
-   * siblings, counting from 1, and `{count}` the number of siblings.
-   */
-  @words
-  @property({ attribute: 'moved-label' })
-  movedLabel = '{name} moved to position {position} of {count}'
-
-  /**
    * What screen readers hear when an item moves into another branch, in a
    * `reorderable` tree. `{name}` is the item's words, `{parent}` the words of
    * the branch it moved into, or the tree's `label` for the top level,
@@ -176,6 +167,15 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
   @words
   @property({ attribute: 'moved-into-label' })
   movedIntoLabel = '{name} moved into {parent}, position {position} of {count}'
+
+  /**
+   * What screen readers hear each time an item moves, in a `reorderable`
+   * tree. `{name}` is the item's words, `{position}` its place among its
+   * siblings, counting from 1, and `{count}` the number of siblings.
+   */
+  @words
+  @property({ attribute: 'moved-label' })
+  movedLabel = '{name} moved to position {position} of {count}'
 
   /** Carries a host `aria-label` and `aria-labelledby` to the tree. */
   protected readonly aria = new AriaForwardController(this, {

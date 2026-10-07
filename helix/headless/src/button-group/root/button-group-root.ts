@@ -100,8 +100,6 @@ const isGroupButton = (child: Element): child is GroupButton =>
  * @event {Event} change - Fired after a press changes `value`, in a selection mode.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired before a press changes `value`, with the value it would leave in `detail.value`. Cancelable: call `preventDefault()` to keep the buttons as they are.
  *
- * @csspart buttons - The slot the buttons are in. It draws no box, so the buttons lay out on the group itself; give it a `display` to hold them in a box of your own.
- *
  * @cssproperty --button-group-pressed - Written on the control inside each toggle button of a group with `selection-mode`: `1` while it is pressed and `0` while it is not. Read it in a `::part(button)` rule to draw the pressed look.
  *
  * @cssstate pressed - While a group with `selection-mode` has a button pressed.
@@ -403,7 +401,7 @@ export class HelixHeadlessButtonGroup extends HelixElement {
   }
 
   protected override render(): TemplateResult {
-    return html`<slot part="buttons"></slot>`
+    return html`<slot></slot>`
   }
 }
 
