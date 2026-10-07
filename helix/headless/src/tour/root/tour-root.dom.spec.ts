@@ -711,3 +711,83 @@ describe('the tour status', () => {
     expect(heard).toEqual([{ index: 1, status: 'waiting' }])
   })
 })
+
+describe('a target off screen', () => {
+  test('is scrolled into view, by the least distance, as its stop is shown', async () => {
+    const tour = await run(false)
+    const asked: [string, ScrollIntoViewOptions | boolean | undefined][] = []
+    for (const id of ['one', 'two', 'three']) {
+      const target = document.getElementById(id) as HTMLElement
+      target.scrollIntoView = (options?: ScrollIntoViewOptions | boolean) => {
+        asked.push([id, options])
+      }
+    }
+    tour.open = true
+    await tour.updateComplete
+    tour.next()
+    await tour.updateComplete
+    expect(asked).toEqual([
+      ['one', { block: 'nearest', inline: 'nearest' }],
+      ['two', { block: 'nearest', inline: 'nearest' }],
+    ])
+  })
+
+  test('is on screen once the tour opens on it', async () => {
+    if (!hasLayout()) {
+      return
+    }
+    const host = (await mount(
+      `<div>
+        <div style="block-size: 3000px"></div>
+        <button id="far">Far</button>
+        <helix-headless-tour label="Getting started">
+          <helix-headless-tour-stop for="far">Far away</helix-headless-tour-stop>
+        </helix-headless-tour>
+      </div>`,
+    )) as HTMLElement
+    const tour = host.querySelector('helix-headless-tour') as Tour
+    window.scrollTo(0, 0)
+    tour.open = true
+    await tour.updateComplete
+    const box = (host.querySelector('#far') as HTMLElement).getBoundingClientRect()
+    tour.open = false
+    await tour.updateComplete
+    host.remove()
+    window.scrollTo(0, 0)
+    expect(box.top >= 0 && box.bottom <= window.innerHeight).toBe(true)
+  })
+})
+
+describe('a tour with no name', () => {
+  /* The missing-name warning is in development builds only, which the
+     package's `test:dom` script asks for with `--conditions helix-development`. */
+  const warnedOn = async (markup: string): Promise<string[]> => {
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      await mount(markup)
+      await new Promise((done) => setTimeout(done, 5))
+    } finally {
+      console.warn = original
+    }
+    return warnings
+  }
+
+  test('is reported once it opens, by its tag', async () => {
+    const warnings = await warnedOn(
+      '<helix-headless-tour open><helix-headless-tour-stop>One</helix-headless-tour-stop></helix-headless-tour>',
+    )
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0]).toContain('<helix-headless-tour> has no accessible name')
+  })
+
+  test('and a tour with a label, or not yet open, is not', async () => {
+    for (const named of [
+      '<helix-headless-tour open label="Getting started"><helix-headless-tour-stop>One</helix-headless-tour-stop></helix-headless-tour>',
+      '<helix-headless-tour><helix-headless-tour-stop>One</helix-headless-tour-stop></helix-headless-tour>',
+    ]) {
+      expect([named, ...(await warnedOn(named))]).toEqual([named])
+    }
+  })
+})

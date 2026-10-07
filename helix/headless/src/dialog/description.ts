@@ -31,6 +31,45 @@ const isControl = (element: Element): boolean => {
 }
 
 /**
+ * The elements at the start of a list that hold words and no control, up to the
+ * first one that is or holds a control.
+ *
+ * `skip` is an element whose words are said elsewhere, such as the heading
+ * that names a panel. It is left out, and an element holding it is read for
+ * its other children, so a card's title names the panel and the card's text
+ * describes it.
+ */
+export const wordsAmong = (
+  elements: readonly Element[],
+  skip: Element | null = null,
+): Element[] => {
+  const words: Element[] = []
+  /* False once a control ends the leading run. */
+  const read = (list: readonly Element[]): boolean => {
+    for (const one of list) {
+      if (one === skip) {
+        continue
+      }
+      if (skip && one.contains(skip)) {
+        if (!read([...one.children])) {
+          return false
+        }
+        continue
+      }
+      if (isControl(one) || [...one.querySelectorAll('*')].some(isControl)) {
+        return false
+      }
+      if ((one.textContent ?? '').trim() !== '') {
+        words.push(one)
+      }
+    }
+    return true
+  }
+  read(elements)
+  return words
+}
+
+/**
  * The elements at the start of a slot that hold words and no control, up to the
  * first one that is or holds a control.
  *
@@ -38,15 +77,5 @@ const isControl = (element: Element): boolean => {
  * and the form does not: a description that read out every field label would
  * repeat what a reader hears again as they reach each field.
  */
-export const wordsIn = (slot: HTMLSlotElement | null): Element[] => {
-  const words: Element[] = []
-  for (const one of slot?.assignedElements({ flatten: true }) ?? []) {
-    if (isControl(one) || [...one.querySelectorAll('*')].some(isControl)) {
-      break
-    }
-    if ((one.textContent ?? '').trim() !== '') {
-      words.push(one)
-    }
-  }
-  return words
-}
+export const wordsIn = (slot: HTMLSlotElement | null): Element[] =>
+  wordsAmong(slot?.assignedElements({ flatten: true }) ?? [])
