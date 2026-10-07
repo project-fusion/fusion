@@ -790,3 +790,39 @@ describe('a table whose rows nest', () => {
     expect(row(host, 'src').internals.ariaExpanded).toBe('true')
   })
 })
+
+describe('a table that loads more', () => {
+  /* A long table could not ask for its next rows: it drew what it was given
+     and said nothing as a reader reached the end. */
+  browser('asks once its end comes near, once for each number of rows', async () => {
+    const rows = (from: number, count: number) =>
+      Array.from(
+        { length: count },
+        (_, at) =>
+          `<helix-headless-table-row><helix-headless-table-cell>Row ${from + at}</helix-headless-table-cell></helix-headless-table-row>`,
+      ).join('')
+    document.body.innerHTML = `<div style="block-size: 120px; overflow: auto">
+      <helix-headless-table label="Rows" load-more>
+        <helix-headless-table-column>Name</helix-headless-table-column>
+        ${rows(0, 40)}
+      </helix-headless-table>
+    </div>`
+    const host = document.querySelector('helix-headless-table') as Updating & { loading: boolean }
+    let asked = 0
+    host.addEventListener('helix-load-more', () => {
+      asked += 1
+    })
+    await settle(host)
+    await new Promise((resolve) => setTimeout(resolve, 50))
+    expect(asked).toBe(0)
+    const box = host.parentElement as HTMLElement
+    box.scrollTop = box.scrollHeight
+    await new Promise((resolve) => setTimeout(resolve, 100))
+    expect(asked).toBe(1)
+    box.scrollTop = 0
+    await new Promise((resolve) => setTimeout(resolve, 50))
+    box.scrollTop = box.scrollHeight
+    await new Promise((resolve) => setTimeout(resolve, 100))
+    expect(asked).toBe(1)
+  })
+})
