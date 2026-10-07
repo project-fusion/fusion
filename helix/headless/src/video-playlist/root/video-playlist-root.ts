@@ -6,6 +6,7 @@ import {
   HelixEndEvent,
   inlineStep,
   MixinControllerActive,
+  ReorderController,
   StatusController,
   words,
 } from '@fusion.dev/helix-core'
@@ -83,6 +84,21 @@ type Player = HTMLElement & {
  * the next or the previous entry. The player's previous and next controls
  * move through the entries in the same order the playlist does.
  *
+ * **Moving entries.** `reorderable` lets a reader change the order of the
+ * queue:
+ *
+ * - Alt with Up or Down moves the focused entry a place, and Alt with Home or
+ *   End moves it to either end, as the APG's rearrangeable listbox does.
+ *   Focus stays on it.
+ * - A pointer drags an entry, with a drop indicator, and the page scrolls near
+ *   an edge. A press that does not travel still plays the entry.
+ * - A drop sends `helix-before-reorder`, which you can refuse, and then
+ *   `helix-reorder`, whose `keys` hold every entry's `value` in the new order.
+ *   **You move the entries**: the playlist moves no element of yours, and the
+ *   next entry is the one after the current entry in the order you leave.
+ * - Each move is said in the live region, in words you can change:
+ *   `moved-label`, `dropped-label`, `canceled-label`, and `picked-up-label`.
+ *
  * **What a screen reader hears.** A list named by `label`, with a button for
  * each entry. When the playlist moves to another entry, by a press, by the
  * player's controls, or at the end of a clip, a live region says
@@ -100,6 +116,8 @@ type Player = HTMLElement & {
  *
  * @event {HelixActivateEvent} helix-activate - The current entry changed. The playlist already holds the new entry when this is sent, and `detail.previous` is the entry it left. `currentEntry` is the entry itself, with its `src`, `poster` and name.
  * @event {HelixBeforeActivateEvent} helix-before-activate - The current entry is about to change, and `detail.cause` says why: `press`, `next`, `previous`, `ended`, or `removed`. Cancelable: cancel it to keep the current entry.
+ * @event {HelixBeforeReorderEvent} helix-before-reorder - An entry was moved to a new place, in a `reorderable` playlist, with every entry's value in the new order in `detail.keys`. Cancelable: cancel it to keep the entry where it is.
+ * @event {HelixReorderEvent} helix-reorder - Fired after `helix-before-reorder` when nobody canceled it. Move your entries to the order in `keys`. Cancelable: cancel it to say the move did not happen.
  * @event {HelixEndEvent} helix-end - The last entry finished playing, and the playlist stopped there. Not sent while `repeat` is set.
  *
  * @csspart empty - The box that holds the `empty` slot, drawn while there are no entries.
@@ -123,6 +141,47 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
   @words
   @property({ attribute: 'empty-label' })
   emptyLabel = 'No videos'
+
+  /**
+   * What screen readers hear when a move is put back, in a `reorderable`
+   * playlist. `{name}` is the entry's words.
+   */
+  @words
+  @property({ attribute: 'canceled-label' })
+  canceledLabel = 'Canceled'
+
+  /**
+   * What screen readers hear when a moved entry is let go, in a `reorderable`
+   * playlist. `{name}` is the entry's words.
+   */
+  @words
+  @property({ attribute: 'dropped-label' })
+  droppedLabel = 'Dropped'
+
+  /**
+   * What screen readers hear each time a key moves an entry, in a
+   * `reorderable` playlist. `{name}` is the entry's words, `{position}` its
+   * new place, counting from 1, and `{count}` the number of entries.
+   */
+  @words
+  @property({ attribute: 'moved-label' })
+  movedLabel = '{name} moved to position {position} of {count}'
+
+  /**
+   * What screen readers hear when a pointer picks up an entry, in a
+   * `reorderable` playlist. `{name}` is the entry's words.
+   */
+  @words
+  @property({ attribute: 'picked-up-label' })
+  pickedUpLabel = 'Picked up {name}'
+
+  /**
+   * Lets a reader move the entries, with Alt and the arrow keys or by
+   * dragging one. The playlist moves no entry itself: you move your entries
+   * on `helix-reorder`.
+   */
+  @property({ reflect: true, type: Boolean })
+  reorderable = false
 
   /**
    * The list's name, read by screen readers.
@@ -153,6 +212,69 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
 
   /** The live region, rendered from the first move. */
   private readonly status = new StatusController(this)
+
+  /** The entry an event passed through, where it may move. */
+  private entryOf(event: Event): HelixHeadlessVideoPlaylistItem | undefined {
+    const items = this.items
+    return event
+      .composedPath()
+      .find(
+        (node): node is HelixHeadlessVideoPlaylistItem =>
+          items.includes(node as HelixHeadlessVideoPlaylistItem) &&
+          !(node as HelixHeadlessVideoPlaylistItem).disabled,
+      )
+  }
+
+  /** The entry with that value. */
+  private entryFor(value: string): HelixHeadlessVideoPlaylistItem | undefined {
+    return this.items.find((one) => one.value === value)
+  }
+
+  /**
+   * Moving the entries, as a listbox moves its options: Alt with the arrows
+   * on the focused entry, or a pointer dragging a whole entry, where a press
+   * that does not travel still plays it.
+   */
+  private readonly reorder = new ReorderController(this, {
+    axis: 'block',
+    box: (value) => this.entryFor(value)?.getBoundingClientRect(),
+    current: (event) => this.entryOf(event)?.value,
+    grip: (event) => {
+      const entry = this.entryOf(event)
+      return entry ? { element: entry, key: entry.value } : undefined
+    },
+    holds: false,
+    keys: () => this.items.map((one) => one.value),
+    name: (value) => this.entryFor(value)?.text || value,
+    refocus: (value) => this.entryFor(value)?.focus(),
+    say: (words) => this.status.say(words),
+  })
+
+  /** The entries marked last in a move, so a mark that moves is taken off where it was. */
+  private marked = new Set<HelixHeadlessVideoPlaylistItem>()
+
+  /**
+   * Puts each entry's place in a move on it, as states the styled tier draws:
+   * the entry dragged, and the one the drop indicator is before or after.
+   */
+  private markMoves(): void {
+    const marked = new Set<HelixHeadlessVideoPlaylistItem>()
+    for (const entry of this.items) {
+      const move = this.reorderable ? this.reorder.moveOf(entry.value) : undefined
+      if (move || this.marked.has(entry)) {
+        for (const state of ['dragging', 'drop-after', 'drop-before'] as const) {
+          ;(entry as unknown as { toggleState(name: string, on: boolean): void }).toggleState(
+            state,
+            state === move,
+          )
+        }
+      }
+      if (move) {
+        marked.add(entry)
+      }
+    }
+    this.marked = marked
+  }
 
   /**
    * What happens when an entry ends with no next one to go to. `one` plays the
@@ -592,6 +714,7 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
    */
   protected override updated(changed: PropertyValues): void {
     super.updated?.(changed)
+    this.markMoves()
     const items = this.items
     const current = this.resolveActive(items)
     for (const item of items) {

@@ -79,6 +79,37 @@
   opacity: 0.5;
 }
 
+/* A move in a `reorderable` playlist, as a reorderable listbox draws one: the
+   entry dragged is faded, and a line over the edge says where it would land,
+   laid over the row so nothing beside it moves. */
+:host(:state(dragging)) {
+  opacity: 0.5;
+}
+
+:host(:state(drop-before)),
+:host(:state(drop-after)) {
+  position: relative;
+}
+
+:host(:state(drop-before))::before,
+:host(:state(drop-after))::before {
+  background-color: var(--helix-color-primary);
+  block-size: var(--helix-border-thick);
+  content: "";
+  inset-inline: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 1;
+}
+
+:host(:state(drop-before))::before {
+  inset-block-start: 0;
+}
+
+:host(:state(drop-after))::before {
+  inset-block-end: 0;
+}
+
 /*
  *  A fixed column, so a set where one entry has a thumbnail and the rest do not
  *    still reads as one column of names. The mark's column in a menu row carries
