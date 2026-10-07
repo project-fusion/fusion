@@ -74,7 +74,7 @@ describe('a filterable menu', () => {
   test('puts the field beside a `menu` that holds the rows, and each row says its role from its host', async () => {
     const host = await opened()
     expect(part(host, 'surface')?.getAttribute('role')).toBeNull()
-    expect(part(host, 'items')?.getAttribute('role')).toBe('menu')
+    expect(host.shadowRoot?.querySelector('#items')?.getAttribute('role')).toBe('menu')
     expect(field(host).getAttribute('aria-controls')).toBe('items')
     expect(role(row(host, 'copy'))).toBe('menuitem')
     expect(
