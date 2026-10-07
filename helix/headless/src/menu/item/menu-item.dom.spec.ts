@@ -287,6 +287,15 @@ describe('a menu row with no name', () => {
     expect(warnings[0]).toContain('<helix-headless-menu-item> has no accessible name')
   })
 
+  /* Every menu with a submenu warned: the submenu's row drew once before its
+     parent took it off the page, and the read found no row and no name. */
+  test('and a row on a submenu page that is not showing is not', async () => {
+    for (const submenus of ['drill', 'flyout']) {
+      const markup = `<helix-headless-menu submenus="${submenus}"><button slot="trigger">A</button><helix-headless-menu-item>Share<helix-headless-menu-item slot="submenu">Mail</helix-headless-menu-item></helix-headless-menu-item></helix-headless-menu>`
+      expect([submenus, ...(await warnedOn(markup))]).toEqual([submenus])
+    }
+  })
+
   test('and a row with words, or an icon with a label, is not', async () => {
     for (const named of [
       '<helix-headless-menu-item value="bold">Bold</helix-headless-menu-item>',

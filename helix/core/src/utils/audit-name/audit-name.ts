@@ -115,6 +115,10 @@ const readWaiting = (): void => {
  * one channel, and a project that wants the console quiet tells
  * `@fusion.dev/helix-diagnostics` with `core.warnings: false`.
  *
+ * `control` returns the control inside the host, `null` where the host is the
+ * control, or `undefined` where the control is not drawn at the moment of the
+ * read: the host is then read again the next time it asks.
+ *
  * `also` answers for a name the component gave through its internals, which no
  * attribute shows. `fix` is the sentence that says how to name it. `shown` is
  * the part where the control shows its value or its placeholder, whose words
@@ -122,7 +126,7 @@ const readWaiting = (): void => {
  */
 export const auditName = (
   host: HTMLElement,
-  control: () => HTMLElement | null,
+  control: () => HTMLElement | null | undefined,
   fix: string,
   also?: () => boolean,
   shown?: () => Element | null,
@@ -139,8 +143,13 @@ export const auditName = (
     if (!host.isConnected) {
       return
     }
-    audited.add(host)
     const inner = control()
+    /* Not drawn now, such as a menu row whose page has closed: read again when
+       it is next drawn and asks. */
+    if (inner === undefined) {
+      return
+    }
+    audited.add(host)
     const value = shown?.()
     if (also?.() || hasName(host) || (inner !== null && hasName(inner, value))) {
       return
