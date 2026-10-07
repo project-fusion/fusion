@@ -172,6 +172,38 @@ describe('selecting tags', () => {
     expect(one.group.value).toBe('')
   })
 
+  /* React Aria's tag group extends a selection with Shift and selects every
+     tag with Control or Command and A; here a range took a press per tag. */
+  test('extends a range with Shift and an arrow, and selects all with Control or Command and A', async () => {
+    const one = await group(
+      'selection-mode="multiple"',
+      '<helix-headless-tag>Apple</helix-headless-tag><helix-headless-tag>Pear</helix-headless-tag><helix-headless-tag disabled>Fig</helix-headless-tag><helix-headless-tag>Plum</helix-headless-tag>',
+    )
+    const [apple, pear, , plum] = one.tags as [Tag, Tag, Tag, Tag]
+    const key = (tag: Tag, init: KeyboardEventInit): void => {
+      cell(tag).dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, ...init }),
+      )
+    }
+    cell(apple).focus()
+    key(apple, { key: ' ' })
+    await settle(one)
+    expect(one.group.value).toBe('Apple')
+    key(apple, { key: 'ArrowRight', shiftKey: true })
+    await settle(one)
+    expect(one.group.value).toBe('Apple, Pear')
+    key(pear, { key: 'ArrowRight', shiftKey: true })
+    await settle(one)
+    expect(one.group.value).toBe('Apple, Pear, Plum')
+    key(plum, { key: 'ArrowLeft', shiftKey: true })
+    await settle(one)
+    expect(one.group.value).toBe('Apple, Pear')
+    key(pear, { key: 'ArrowRight' })
+    key(plum, { ctrlKey: true, key: 'a' })
+    await settle(one)
+    expect(one.group.value).toBe('Apple, Pear, Plum')
+  })
+
   /* A press on a remove button is a press on that button, not on the tag. */
   test('does not take a press on the remove button for a selection', async () => {
     const one = await group('selection-mode="multiple"', FRUIT)
