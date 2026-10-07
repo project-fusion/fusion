@@ -59,6 +59,18 @@
 
 /* What a collection says instead of rows is `shared/collection/state`'s. */
 
+/* What the table says when its rows did not load: the same line, in the
+   foreground color, since it is news a reader acts on. */
+[part="error"] {
+  color: var(--table-error-color, var(--helix-color-foreground));
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  margin: var(--helix-space-none);
+  padding-block: var(--helix-space-md);
+  padding-inline: var(--helix-space-sm);
+  text-align: center;
+}
+
 /* Rows that are already there stay, and dim, while a new set arrives. */
 :host([loading]) [part="table"] {
   opacity: 0.5;
