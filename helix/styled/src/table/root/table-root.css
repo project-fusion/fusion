@@ -51,6 +51,15 @@
   min-block-size: var(--helix-size-control-loose);
 }
 
+/* The heading over the disclosure buttons of a table whose rows nest, with
+   nothing in it but a name for screen readers. */
+[part="expand-head"] {
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  box-sizing: border-box;
+  min-block-size: var(--helix-size-control-loose);
+}
+
+[part="expand-head"]:focus-visible,
 [part="grip-head"]:focus-visible,
 [part="select-all"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);

@@ -709,3 +709,84 @@ describe('a selectable table', () => {
     expect(host.selected).toBe('billing')
   })
 })
+
+/* Rows could not nest: a table of folders and files, or of a total and its
+   parts, had to flatten them or move to a tree, which has no columns. */
+describe('a table whose rows nest', () => {
+  type Nesting = Updating & { expanded: string; grid: boolean }
+
+  const nested = (attributes = ''): string => `
+    <helix-headless-table label="Files" ${attributes}>
+      <helix-headless-table-column>Name</helix-headless-table-column>
+      <helix-headless-table-row value="src"><helix-headless-table-cell>src</helix-headless-table-cell></helix-headless-table-row>
+      <helix-headless-table-row value="a" parent="src"><helix-headless-table-cell>a.ts</helix-headless-table-cell></helix-headless-table-row>
+      <helix-headless-table-row value="lib" parent="src"><helix-headless-table-cell>lib</helix-headless-table-cell></helix-headless-table-row>
+      <helix-headless-table-row value="b" parent="lib"><helix-headless-table-cell>b.ts</helix-headless-table-cell></helix-headless-table-row>
+      <helix-headless-table-row value="readme"><helix-headless-table-cell>README</helix-headless-table-cell></helix-headless-table-row>
+    </helix-headless-table>`
+
+  const drawn = (host: HTMLElement): string[] =>
+    slotted(host)
+      .filter((one) => one.localName === 'helix-headless-table-row')
+      .map((one) => one.getAttribute('value') ?? '')
+
+  const row = (host: HTMLElement, value: string) =>
+    host.querySelector(`[value="${value}"]`) as HTMLElement & {
+      internals: ElementInternals
+      updateComplete: Promise<boolean>
+    }
+
+  const button = (host: HTMLElement, value: string) =>
+    row(host, value).shadowRoot?.querySelector('[part="expand-button"]') as HTMLButtonElement | null
+
+  test('draws a shut row without the rows under it, and a disclosure button that opens it', async () => {
+    const host = (await mount(nested())) as Nesting
+    await settle(host)
+    expect(drawn(host)).toEqual(['src', 'readme'])
+    await row(host, 'src').updateComplete
+    expect(button(host, 'src')?.getAttribute('aria-expanded')).toBe('false')
+    expect(button(host, 'src')?.getAttribute('aria-label')).toBe('Expand src')
+    expect(button(host, 'readme')).toBeNull()
+    expect(part(host, 'expand-head')?.getAttribute('aria-label')).toBe('Expand')
+    button(host, 'src')?.click()
+    await settle(host)
+    expect(host.expanded).toBe('src')
+    expect(drawn(host)).toEqual(['src', 'a', 'lib', 'readme'])
+    await row(host, 'lib').updateComplete
+    button(host, 'lib')?.click()
+    await settle(host)
+    expect(drawn(host)).toEqual(['src', 'a', 'lib', 'b', 'readme'])
+  })
+
+  test('asks from the row before it opens, and tells once it has', async () => {
+    const host = (await mount(nested())) as Nesting
+    await settle(host)
+    await row(host, 'src').updateComplete
+    const said: string[] = []
+    row(host, 'src').addEventListener('helix-before-toggle', (event) =>
+      said.push(`ask ${(event as CustomEvent<{ checked: boolean }>).detail.checked}`),
+    )
+    host.addEventListener('helix-toggle', (event) =>
+      said.push(`told ${(event as CustomEvent<{ checked: boolean }>).detail.checked}`),
+    )
+    host.addEventListener('helix-before-toggle', (event) => event.preventDefault(), { once: true })
+    button(host, 'src')?.click()
+    await settle(host)
+    expect(host.expanded).toBe('')
+    button(host, 'src')?.click()
+    await settle(host)
+    expect(said).toEqual(['ask true', 'ask true', 'told true'])
+    expect(host.expanded).toBe('src')
+  })
+
+  test('in a grid, is a treegrid whose rows say their depth and whether they are open', async () => {
+    const host = (await mount(nested('grid default-expanded="src"'))) as Nesting
+    await settle(host)
+    await settle(host)
+    await row(host, 'lib').updateComplete
+    expect(part(host, 'table')?.getAttribute('role')).toBe('treegrid')
+    expect(row(host, 'lib').internals.ariaLevel).toBe('2')
+    expect(row(host, 'lib').internals.ariaExpanded).toBe('false')
+    expect(row(host, 'src').internals.ariaExpanded).toBe('true')
+  })
+})

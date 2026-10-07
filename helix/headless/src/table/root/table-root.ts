@@ -10,12 +10,13 @@ import {
   followLink,
   format,
   formatWords,
-  type HelixBeforeToggleEvent,
+  HelixBeforeToggleEvent,
   HelixElement,
   HelixSelectEvent,
   HelixSelectedEvent,
   HelixSortEvent,
   HelixSortedEvent,
+  HelixToggleEvent,
   inRowOrder,
   MixinCollection,
   onAndroid,
@@ -191,6 +192,18 @@ const NAMED = new Set([...STATUS, 'heading'])
  * without selecting. Shift with a press takes in the rows from the one last
  * chosen.
  *
+ * **Nesting rows.** A row with `parent` sits under the row of that key, as
+ * a file sits in a folder. The table then draws a column of disclosure
+ * buttons, under a heading named by `expand-column-label`: a row with rows
+ * under it has a button named by `expand-row-label` ("Expand {row}") that
+ * says with `aria-expanded` whether it is open, and the rows under a shut row
+ * are not drawn. `expanded` holds the open rows' keys, comma separated, and
+ * `default-expanded` is where it starts. A press asks with
+ * `helix-before-toggle` and tells with `helix-toggle`, both from the row, so
+ * you can refuse it or load the rows on the way. A sort orders the rows
+ * under each row among themselves, and in a `grid` table the table is a
+ * `treegrid` whose rows say their depth.
+ *
  * **Moving rows.** `reorderable` adds a column of grips before the checkboxes,
  * under a heading named by `row-grips-label`.
  *
@@ -227,6 +240,7 @@ const NAMED = new Set([...STATUS, 'heading'])
  * | Enter on a cell of a row with `href` | Follows the row's link. |
  * | Enter, Space on a sortable heading | Sorts by the column. |
  * | Space on a row, Enter or Space on its checkbox cell | Selects the row, in a `selectable` table. |
+ * | Enter or Space on a disclosure cell | Shows or hides the rows under the row, in a table whose rows nest. |
  * | Enter or Space on a grip cell | Picks the row up, or drops it, in a `reorderable` table. Up, Down, Home, and End move a row picked up, and Escape puts it back. |
  * | Down, Up, Page Down, Page Up under `selection-behavior="replace"` | Selects the row it moves to alone. Control or Command with the key moves without selecting. |
  * | Shift with Down or Up | Selects the rows it moves across, in a `selectable` table. |
@@ -258,11 +272,13 @@ const NAMED = new Set([...STATUS, 'heading'])
  * @slot loading - Content shown while the rows load, such as a spinner. Falls back to `loading-text`, which the live region still says.
  *
  * @event {HelixBeforeReorderEvent} helix-before-reorder - Fired when a row is dropped at a new place, in a `reorderable` table, with every row's key in the new order. Cancelable: cancel it to keep the row where it is.
+ * @event {HelixBeforeToggleEvent} helix-before-toggle - Fired from a row when its disclosure button is pressed, with whether it would be open in `detail.checked`. Cancelable: cancel it to keep the row as it is.
  * @event {HelixReorderEvent} helix-reorder - Fired after `helix-before-reorder` when nobody canceled it. Move your rows to the order in `keys`. Cancelable: cancel it to say the move did not happen.
  * @event {HelixSelectEvent} helix-select - The selection is about to change. The event carries every selected key, separated by commas. Cancelable: cancel it to keep the current selection.
  * @event {HelixSelectedEvent} helix-selected - Fired after the selection changes, with every selected key, separated by commas.
  * @event {HelixSortEvent} helix-sort - A different sort order was requested, as `field:direction`, or empty for the order the rows were written in. Cancelable: cancel it to keep the current order.
  * @event {HelixSortedEvent} helix-sorted - Fired after the sort order changes, with the new order.
+ * @event {HelixToggleEvent} helix-toggle - Fired from a row once the rows under it are shown or hidden, with whether it is open in `detail.checked`.
  *
  * @csspart checkbox - The checkbox in the heading that selects every row, in a `selectable` table.
  * @csspart checkbox-box - The box drawn for the checkbox's input.
@@ -278,6 +294,7 @@ const NAMED = new Set([...STATUS, 'heading'])
  * @csspart drag-preview - A copy of the row a pointer drags by its grip, which follows the pointer in the top layer until the row is let go, in a `reorderable` table. Hidden from assistive technology.
  * @csspart empty - The text shown when there are no rows.
  * @csspart error - The line shown after the rows while `error-text` is set, in place of the empty and loading text.
+ * @csspart expand-head - The heading over the disclosure buttons, in a table whose rows nest.
  * @csspart grid-end - An empty box after the rows, in a `grid` table. Tab focuses it on its way out of the table, so the key leaves from the end.
  * @csspart grid-start - An empty box before the rows, in a `grid` table. Shift with Tab focuses it on its way out of the table.
  * @csspart grip-head - The heading over the row grips, in a `reorderable` table.
@@ -354,6 +371,39 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
    */
   @property()
   columns = ''
+
+  /**
+   * The keys of the rows whose rows are shown at the start, separated by
+   * commas. Used until `expanded` is set.
+   */
+  @property({ attribute: 'default-expanded' })
+  defaultExpanded = ''
+
+  /**
+   * The keys of the rows whose rows are shown, separated by commas, in a table
+   * whose rows nest. A press on a row's disclosure button asks first, and
+   * `default-expanded` seeds what this element then owns.
+   */
+  @property()
+  get expanded(): string {
+    return this.expandedState ?? this.defaultExpanded
+  }
+
+  set expanded(next: string) {
+    const previous = this.expanded
+    this.expandedState = next
+    this.requestUpdate('expanded', previous)
+  }
+
+  /** The name of the heading over the disclosure buttons. */
+  @words
+  @property({ attribute: 'expand-column-label' })
+  expandColumnLabel = 'Expand'
+
+  /** The name of a row's disclosure button. `{row}` is the words of the row's first cell. */
+  @words
+  @property({ attribute: 'expand-row-label' })
+  expandRowLabel = 'Expand {row}'
 
   /**
    * The keys selected at the start, separated by commas. Used until `selected`
@@ -575,6 +625,50 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
   @state()
   private selectedState: string | undefined = undefined
 
+  @state()
+  private expandedState: string | undefined = undefined
+
+  /** Whether any row sits under another, which makes the table a tree. */
+  private get nests(): boolean {
+    return this.childrenKnown && this.keyed.some(({ row }) => (row.parent ?? '') !== '')
+  }
+
+  /** The keys of the rows whose rows are shown. */
+  private get open(): Set<string> {
+    return new Set(commaList(this.expanded))
+  }
+
+  /**
+   * Shows or hides the rows under the row of `key`, asking first from the row,
+   * and saying so from it once it stands.
+   */
+  private toggleRow(key: string): void {
+    const row = this.rowFor(key)
+    if (!row) {
+      return
+    }
+    const next = !this.open.has(key)
+    const applied = requestChange({
+      apply: (checked) => {
+        const keys = this.open
+        if (checked) {
+          keys.add(key)
+        } else {
+          keys.delete(key)
+        }
+        const previous = this.expanded
+        this.expandedState = inRowOrder(keys, this.everyKey).join(',')
+        this.requestUpdate('expanded', previous)
+      },
+      event: (checked) => new HelixBeforeToggleEvent({ checked }),
+      host: row,
+      next,
+    })
+    if (applied) {
+      row.dispatchEvent(new HelixToggleEvent({ checked: next }))
+    }
+  }
+
   /** Whether the heading names the table, so taking it away clears only this element's own name. */
   private headed = false
 
@@ -644,6 +738,7 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     return [
       ...(this.reorderable ? (['grip'] as const) : []),
       ...(this.selectable ? (['select'] as const) : []),
+      ...(this.nests ? (['expand'] as const) : []),
     ]
   }
 
@@ -703,19 +798,82 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     const index = spec
       ? declared.findIndex((column) => column.canSort && column.field === spec.field)
       : -1
-    if (!spec || index < 0) {
-      return rows
+    let ordered = rows
+    if (spec && index >= 0) {
+      const records = rows.map((element) => ({ element, value: textOf(element.children[index]) }))
+      /* A column of numbers compares as numbers, so `980` comes before `1,204`
+         and a negative sorts below zero. A column with any word in it collates
+         as text, digits by their value. */
+      const numeric = records.every(({ value }) => value === '' || Number.isFinite(numberOf(value)))
+      const order = numeric
+        ? (row: DataRow): unknown => (row.value === '' ? '' : numberOf(row.value as string))
+        : (row: DataRow): unknown => row.value
+      const sorted = sort(records, spec, [
+        { field: spec.field, order },
+      ]) as unknown as typeof records
+      ordered = sorted.map((record) => record.element)
     }
-    const records = rows.map((element) => ({ element, value: textOf(element.children[index]) }))
-    /* A column of numbers compares as numbers, so `980` comes before `1,204`
-       and a negative sorts below zero. A column with any word in it collates
-       as text, digits by their value. */
-    const numeric = records.every(({ value }) => value === '' || Number.isFinite(numberOf(value)))
-    const order = numeric
-      ? (row: DataRow): unknown => (row.value === '' ? '' : numberOf(row.value as string))
-      : (row: DataRow): unknown => row.value
-    const sorted = sort(records, spec, [{ field: spec.field, order }]) as unknown as typeof records
-    return sorted.map((record) => record.element)
+    return this.nests ? this.nested(ordered) : ordered
+  }
+
+  /**
+   * The rows of a tree in the order they are drawn: each row followed by the
+   * rows under it while it is open, at every depth, keeping the order `rows`
+   * is in among the rows under one row. A row under a key no row has is drawn
+   * at the top.
+   */
+  private nested(rows: Element[]): Element[] {
+    const keys = new Map(this.keyed.map(({ key, row }) => [row as Element, key]))
+    const present = new Set(keys.values())
+    const under = new Map<string, Element[]>()
+    for (const row of rows) {
+      const parent = (row as Row).parent ?? ''
+      const at = parent !== '' && present.has(parent) ? parent : ''
+      under.set(at, [...(under.get(at) ?? []), row])
+    }
+    const open = this.open
+    const drawn: Element[] = []
+    const seen = new Set<Element>()
+    const walk = (parent: string): void => {
+      for (const row of under.get(parent) ?? []) {
+        /* A row set under one of its own rows would walk for ever. */
+        if (seen.has(row)) {
+          continue
+        }
+        seen.add(row)
+        drawn.push(row)
+        const key = keys.get(row) ?? ''
+        if (open.has(key)) {
+          walk(key)
+        }
+      }
+    }
+    walk('')
+    return drawn
+  }
+
+  /** How deep each row sits, from 1, and whether rows sit under it, by key. */
+  private shape(): Map<string, { branch: boolean; level: number }> {
+    const parents = new Map(this.keyed.map(({ key, row }) => [key, row.parent ?? '']))
+    const shapes = new Map<string, { branch: boolean; level: number }>()
+    for (const key of parents.keys()) {
+      let level = 1
+      let at = parents.get(key) ?? ''
+      const passed = new Set([key])
+      while (at !== '' && parents.has(at) && !passed.has(at)) {
+        passed.add(at)
+        level += 1
+        at = parents.get(at) ?? ''
+      }
+      shapes.set(key, { branch: false, level })
+    }
+    for (const parent of parents.values()) {
+      const shape = shapes.get(parent)
+      if (shape) {
+        shape.branch = true
+      }
+    }
+    return shapes
   }
 
   /** The sort last heard, so a render that changed nothing says nothing. */
@@ -979,6 +1137,15 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     if (event.key === 'F2') {
       return false
     }
+    if (place.row >= 0 && leads[place.column] === 'expand') {
+      const row = this.arrangedRows[place.row] as Row | undefined
+      const found = this.keyed.find((one) => one.row === row)
+      if (found && row?.branch) {
+        this.toggleRow(found.key)
+        return true
+      }
+      return false
+    }
     if (place.row === -1) {
       if (lead) {
         this.chooseAll()
@@ -1020,6 +1187,9 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
   private markSelected(): void {
     const keys = this.chosen
     const still = Boolean(parse(this.sort))
+    const tree = this.nests
+    const shapes = tree ? this.shape() : undefined
+    const open = this.open
     for (const { key, row } of this.keyed) {
       if (!row.isTableRow) {
         continue
@@ -1032,6 +1202,8 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
          A server cannot tell a row it is in a selectable table, so it serves no
          checkbox cell, and one written into the hydrating render is a template
          where the server's markup has none, which Lit refuses. */
+      const shape = shapes?.get(key)
+      const expand = tree ? formatWords(this, 'expandRowLabel', { row: name }) : ''
       whenHydrated(row, () => {
         row.selectable = this.selectable
         row.selected = keys.has(key)
@@ -1039,6 +1211,11 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
         row.gripLabel = grip
         row.gripStill = still
         row.move = move
+        row.level = shape?.level ?? 0
+        row.branch = shape?.branch ?? false
+        row.open = open.has(key)
+        row.expandLabel = expand
+        row.expandWith = tree ? () => this.toggleRow(key) : undefined
       })
     }
   }
@@ -1413,6 +1590,19 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     ></span>`
   }
 
+  /** The heading over the disclosure buttons, in a table whose rows nest. */
+  private renderExpandHead(): TemplateResult | typeof nothing {
+    if (!this.nests) {
+      return nothing
+    }
+    return html`<span
+      part="expand-head"
+      role="columnheader"
+      aria-label=${this.expandColumnLabel}
+      tabindex=${this.grid ? (this.gridKeys.isStop({ column: this.lead.indexOf('expand'), row: -1 }) ? '0' : '-1') : nothing}
+    ></span>`
+  }
+
   /** The heading of the checkbox column, which selects every row. */
   private renderSelectAll(): TemplateResult | typeof nothing {
     if (!this.selectable) {
@@ -1458,13 +1648,13 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     const end = grid ? html`<span part="grid-end" tabindex="-1"></span>` : nothing
     return html`<slot name="heading"></slot>${start}<div
       part="table"
-      role=${grid ? 'grid' : 'table'}
+      role=${grid ? (this.nests ? 'treegrid' : 'grid') : 'table'}
       aria-multiselectable=${grid && this.selectable ? (this.single ? 'false' : 'true') : nothing}
       aria-busy=${this.loading ? 'true' : nothing}
       aria-label=${this.label || this.fallbackLabel}
       style=${template ? `--table-template: ${template}` : ''}
     >
-      <div part="head" role="row">${this.renderGripHead()}${this.renderSelectAll()}<slot name="columns"></slot></div>
+      <div part="head" role="row">${this.renderGripHead()}${this.renderSelectAll()}${this.renderExpandHead()}<slot name="columns"></slot></div>
       <slot
         @slotchange=${(event: Event) => {
           this.countRows(event)

@@ -22,10 +22,14 @@ import type { HelixHeadlessTableRow } from './row/table-row.js'
  * A column the table draws before the consumer's cells: the grips of a
  * `reorderable` table, and the checkboxes of a `selectable` one.
  */
-export type LeadColumn = 'grip' | 'select'
+export type LeadColumn = 'expand' | 'grip' | 'select'
 
 /** The part each leading column's heading has in the table, and its cells in a row. */
-const HEADS: Record<LeadColumn, string> = { grip: 'grip-head', select: 'select-all' }
+const HEADS: Record<LeadColumn, string> = {
+  expand: 'expand-head',
+  grip: 'grip-head',
+  select: 'select-all',
+}
 
 /** A place in the grid with the element that holds focus there. */
 export interface GridCell extends GridPlace {
@@ -282,6 +286,7 @@ export class TableGridController implements ReactiveController {
           row.gridCell = on
           row.gripStop = here && lead[at.column] === 'grip'
           row.selectStop = here && lead[at.column] === 'select'
+          row.expandStop = here && lead[at.column] === 'expand'
         })
       }
       for (const [place, cell] of this.cellsOf(line).entries()) {

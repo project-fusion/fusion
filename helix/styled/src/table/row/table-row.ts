@@ -22,8 +22,10 @@ import '../../checkbox/index.js'
  * @cssproperty --table-dragging-opacity - The opacity of a row being moved, in a `reorderable` table.
  * @cssproperty --table-drop-indicator-color - The color of the line where a moved row would land.
  * @cssproperty --table-drop-indicator-size - The thickness of the line where a moved row would land.
+ * @cssproperty --table-expand-color - The color of a row's disclosure button, in a table whose rows nest.
  * @cssproperty --table-grip-color - The color of a row's grip, in a `reorderable` table.
  * @cssproperty --table-grip-disabled-opacity - The opacity of a row's grip while a sort decides the order.
+ * @cssproperty --table-indent - How far each step of depth sets a nested row's disclosure cell in.
  * @cssproperty --table-row-disabled-opacity - The opacity of the cells of a `disabled` row.
  * @cssproperty --table-row-hover-background-color - The wash across the cells of a row with `href` under the pointer.
  */
