@@ -104,6 +104,14 @@
   white-space: nowrap;
 }
 
+/* The row a tree with nothing to show says so in: muted, in the sans face of
+   the words around the tree, at the inset of a top-level key. */
+[part="empty"] {
+  color: var(--helix-color-foreground-muted);
+  font-family: var(--helix-font-sans);
+  padding-inline: calc(var(--helix-space-sm) + 1em + var(--helix-space-2xs));
+}
+
 /* A branch spends its caret's width on the caret, where a leaf spends it on an
    indent, so every key at one depth starts on one line. */
 [part~="row"][aria-expanded] {
