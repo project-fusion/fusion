@@ -399,11 +399,6 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   @property({ attribute: 'connected-label' })
   connectedLabel = 'Asked to connect {from} to {to}.'
 
-  /** What screen readers hear after a copy, with `{count}` for the cards copied. */
-  @words
-  @property({ attribute: 'copied-label' })
-  copiedLabel = '{count, plural, one {# card copied} other {# cards copied}}'
-
   /**
    * The text announced when a connection is started, with `{from}` filled in.
    *
@@ -433,6 +428,11 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   @words
   @property({ attribute: 'controls-label' })
   override controlsLabel = 'Board controls'
+
+  /** What screen readers hear after a copy, with `{count}` for the cards copied. */
+  @words
+  @property({ attribute: 'copied-label' })
+  copiedLabel = '{count, plural, one {# card copied} other {# cards copied}}'
 
   /** The board's name where `label` is empty. */
   @words
