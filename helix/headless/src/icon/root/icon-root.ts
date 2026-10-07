@@ -9,6 +9,7 @@ import type { HelixIcon } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
+import { fetchIcon } from '../fetch.js'
 import { iconMutator, resolveIcon, watchIcons } from '../registry.js'
 import { afterPageSettles } from '../settle.js'
 
@@ -38,8 +39,16 @@ import { afterPageSettles } from '../settle.js'
  * a glyph that came later is drawn. A glyph registered after the element
  * rendered is drawn then.
  *
- * A name with no match renders nothing, and the element fires `error`, so a
- * typo in a name can be heard. It waits until the page has loaded and painted
+ * **Or point `src` at an SVG file**, such as `src="/icons/rocket.svg"`, and
+ * the element fetches it and draws its shapes in `currentColor` where the file
+ * does not color them. A file is fetched once a page, however many icons name
+ * it, and `load` fires when it is drawn. Scripts, event handlers and
+ * `javascript:` links in the file are taken out before it is drawn. A server
+ * fetches nothing, so a served icon with a `src` is drawn once the script
+ * runs.
+ *
+ * A name with no match, or a `src` that is no SVG, renders nothing, and the
+ * element fires `error`, so a typo in a name can be heard. It waits until the page has loaded and painted
  * first, so a library a later module registers is not taken for a typo.
  *
  * An icon is decorative by default and hidden from assistive technology. Set
@@ -58,8 +67,8 @@ import { afterPageSettles } from '../settle.js'
  * @aliases Glyph, Symbol
  * @documentation https://fusion.dev/helix/components/icon
  *
- * @event {Event} error - `name` matches no registered icon and no library answers it, so nothing is drawn.
- * @event {Event} load - A glyph a library gave later for `name` is drawn.
+ * @event {Event} error - `name` matches no registered icon and no library answers it, or `src` is no SVG, so nothing is drawn.
+ * @event {Event} load - A glyph a library gave later for `name`, or the file at `src`, is drawn.
  *
  * @csspart svg - The rendered SVG.
  */
@@ -118,6 +127,15 @@ export class HelixHeadlessIcon extends HelixElement {
   name = ''
 
   /**
+   * The URL of an SVG file to draw, fetched once a page and drawn in
+   * `currentColor` where the file does not color its shapes.
+   *
+   * Wins over `name`; `icon` wins over both. Absent draws `name`.
+   */
+  @property()
+  src = ''
+
+  /**
    * Hears an `aria-label` written on the element, which no property mirrors.
    *
    * Lit observes the attributes of its own properties only, and `ariaLabel`
@@ -155,12 +173,17 @@ export class HelixHeadlessIcon extends HelixElement {
   /** Stops listening to the registry. */
   private unwatch: (() => void) | undefined
 
+  /** What the glyph is asked for by: `src` where it is set, and `name` otherwise. */
+  private get asked(): string {
+    return this.src || this.name
+  }
+
   /* A glyph or a library registered after this element rendered may be the
      one its name was waiting for, so it looks again. */
   override connectedCallback(): void {
     super.connectedCallback()
     this.unwatch = watchIcons(() => {
-      if (this.icon === undefined && this.name !== '') {
+      if (this.icon === undefined && this.src === '' && this.name !== '') {
         this.requestUpdate()
       }
     })
@@ -172,17 +195,28 @@ export class HelixHeadlessIcon extends HelixElement {
     this.unwatch = undefined
   }
 
-  /** What the registry gives for `name` now, starting the wait for a late glyph. */
+  /**
+   * What `src` or the registry gives now, starting the wait for a late glyph.
+   * A file is fetched only where the page can be read: a server fetches
+   * nothing, and a hydrating render draws what the server sent.
+   */
   private lookup(): HelixIcon | undefined {
-    const found = this.name === '' ? undefined : resolveIcon(this.name)
-    this.waiting = found instanceof Promise
+    const asked = this.asked
+    const found =
+      this.src !== ''
+        ? this.childrenKnown
+          ? fetchIcon(this.src)
+          : undefined
+        : this.name === ''
+          ? undefined
+          : resolveIcon(this.name)
+    this.waiting = found instanceof Promise || (this.src !== '' && !this.childrenKnown)
     if (!(found instanceof Promise)) {
       return found
     }
-    const name = this.name
     void found.then(() => {
-      if (this.name === name && this.isConnected) {
-        this.arrived = name
+      if (this.asked === asked && this.isConnected) {
+        this.arrived = asked
         this.requestUpdate()
       }
     })
@@ -200,6 +234,15 @@ export class HelixHeadlessIcon extends HelixElement {
     this.drawn = this.icon ?? this.lookup()
   }
 
+  /* A hydrated element with a file to fetch asks for the render that fetches
+     it, since the hydrating one has to draw what the server sent. */
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    if (this.src !== '') {
+      this.finishHydration()
+    }
+  }
+
   /* Said once per name, once the page has settled after the render that drew
      nothing. A server runs no `updated`, so nothing fires there. */
   protected override updated(changed: PropertyValues): void {
@@ -208,13 +251,14 @@ export class HelixHeadlessIcon extends HelixElement {
       this.mutate()
       this.auditControl()
     }
-    if (this.arrived === this.name && this.drawn !== undefined) {
+    const asked = this.asked
+    if (this.arrived === asked && this.drawn !== undefined) {
       this.dispatchEvent(new Event('load', { bubbles: false, cancelable: false, composed: false }))
     }
     this.arrived = ''
-    if (this.drawn === undefined && this.name !== '' && !this.waiting) {
-      if (this.missed !== this.name && this.pending !== this.name) {
-        this.pending = this.name
+    if (this.drawn === undefined && asked !== '' && !this.waiting) {
+      if (this.missed !== asked && this.pending !== asked) {
+        this.pending = asked
         afterPageSettles(() => this.reportMissing())
       }
     } else {
@@ -225,7 +269,7 @@ export class HelixHeadlessIcon extends HelixElement {
   /** Hands the drawn `<svg>` to the mutator of the library `name` asks, where it has one. */
   private mutate(): void {
     const svg = this.renderRoot.querySelector('svg')
-    const mutator = this.icon === undefined ? iconMutator(this.name) : undefined
+    const mutator = this.icon === undefined && this.src === '' ? iconMutator(this.name) : undefined
     if (svg && mutator) {
       mutator(svg)
     }
@@ -268,19 +312,22 @@ export class HelixHeadlessIcon extends HelixElement {
    * still on its way.
    */
   private reportMissing(): void {
-    const name = this.pending
+    const asked = this.pending
     this.pending = ''
-    if (this.name !== name || this.drawn !== undefined || this.waiting || !this.isConnected) {
+    if (this.asked !== asked || this.drawn !== undefined || this.waiting || !this.isConnected) {
       return
     }
-    this.missed = name
+    this.missed = asked
     this.dispatchEvent(new Event('error', { bubbles: false, cancelable: false, composed: false }))
     reportRuntime({
       kind: 'unknown-icon',
       message:
-        `<${this.localName} name="${name}"> names no registered icon, so it draws ` +
-        'nothing. Check the name, register the glyph with `registerIcons`, or import it ' +
-        'and pass it as `icon`.',
+        this.src === ''
+          ? `<${this.localName} name="${asked}"> names no registered icon, so it draws ` +
+            'nothing. Check the name, register the glyph with `registerIcons`, or import it ' +
+            'and pass it as `icon`.'
+          : `<${this.localName} src="${asked}"> could not be fetched as an SVG file, so it ` +
+            'draws nothing. Check the URL, and that the file is an `<svg>`.',
       tag: this.localName,
     })
   }

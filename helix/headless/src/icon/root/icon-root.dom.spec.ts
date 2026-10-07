@@ -342,3 +342,68 @@ describe('a decorative icon alone in a control', () => {
     ]).toEqual([])
   })
 })
+
+/* Web Awesome's icon draws an SVG file from a URL, and here a glyph had to be
+   imported or registered before it could be drawn. */
+describe('an icon from a file', () => {
+  const original = globalThis.fetch
+  afterEach(() => {
+    globalThis.fetch = original
+  })
+
+  type Icon = HTMLElement & { src: string; updateComplete: Promise<unknown> }
+
+  test('fetches the file, draws its shapes, and fires load', async () => {
+    globalThis.fetch = (async () =>
+      new Response(
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M1 1h22"/></svg>',
+      )) as unknown as typeof fetch
+    const icon = (await mount('<helix-headless-icon></helix-headless-icon>')) as Icon
+    let loaded = 0
+    icon.addEventListener('load', () => {
+      loaded += 1
+    })
+    icon.src = '/drawn.svg'
+    await icon.updateComplete
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await icon.updateComplete
+    expect(svg(icon)?.getAttribute('viewBox')).toBe('0 0 24 24')
+    expect(svg(icon)?.querySelector('g[stroke="currentColor"] path')).not.toBeNull()
+    expect(loaded).toBe(1)
+  })
+
+  test('a src wins over a name', async () => {
+    globalThis.fetch = (async () =>
+      new Response(
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 9 9"><rect/></svg>',
+      )) as unknown as typeof fetch
+    const icon = (await mount(
+      '<helix-headless-icon name="check" src="/won.svg"></helix-headless-icon>',
+    )) as Icon
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await icon.updateComplete
+    expect(svg(icon)?.getAttribute('viewBox')).toBe('0 0 9 9')
+  })
+
+  test('a file that is no SVG draws nothing, and says so once the page settles', async () => {
+    globalThis.fetch = (async () => new Response('', { status: 404 })) as unknown as typeof fetch
+    const icon = (await mount('<helix-headless-icon></helix-headless-icon>')) as Icon
+    let heard = 0
+    icon.addEventListener('error', () => {
+      heard += 1
+    })
+    const warn = console.warn
+    console.warn = () => {}
+    try {
+      icon.src = '/not-there.svg'
+      await icon.updateComplete
+      await new Promise((resolve) => setTimeout(resolve, 0))
+      await icon.updateComplete
+      await settled()
+      expect(svg(icon)).toBeNull()
+      expect(heard).toBe(1)
+    } finally {
+      console.warn = warn
+    }
+  })
+})
