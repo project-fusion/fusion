@@ -52,7 +52,9 @@ import {
  * `multiple` any number, and `value` holds the selected rows' values,
  * separated by commas. A change asks with `helix-before-change` and tells
  * with `change`. `none` selects nothing, so a press acts on the row. A
- * `disabled` row is passed over. Each row is named by its label and described
+ * `disabled` row is passed over. With `disabled-behavior="selection"`, a
+ * `disabled` row cannot be selected, and is reached and acted on as any row
+ * is, as React Aria's GridList has it. Each row is named by its label and described
  * by its description, so the words of the controls in `end` are not read as
  * part of its name.
  *
@@ -278,6 +280,27 @@ export class HelixHeadlessList extends HelixElement {
   selectionBehavior: ListSelectionBehavior = 'toggle'
 
   /**
+   * What `disabled` takes from a row, in a list that selects: `all`, which
+   * passes over the row, or `selection`, which keeps the row out of the
+   * selection and lets the keys reach it and Enter or a press act on it, as
+   * React Aria's GridList takes `disabledBehavior`.
+   *
+   * Absent is `all`.
+   */
+  @property({ attribute: 'disabled-behavior' })
+  disabledBehavior?: 'all' | 'selection' | undefined
+
+  /** Whether the row is out of reach of the keys and of actions, past selection. */
+  private blocked(row: HelixHeadlessListItem): boolean {
+    return row.disabled && this.disabledBehavior !== 'selection'
+  }
+
+  /** The rows a key can land on that can also be selected. */
+  private get selectable(): HelixHeadlessListItem[] {
+    return this.reachable.filter((row) => !row.disabled)
+  }
+
+  /**
    * Makes the list interactive: `single` selects one row, `multiple` any
    * number, and `none` moves and acts without selecting. Unset is a list a
    * reader reads, with no tab stop of its own.
@@ -393,13 +416,13 @@ export class HelixHeadlessList extends HelixElement {
 
   /** The rows a key can land on, in an interactive list. */
   private get reachable(): HelixHeadlessListItem[] {
-    return this.interactive ? this.rows.filter((row) => !row.disabled) : []
+    return this.interactive ? this.rows.filter((row) => !this.blocked(row)) : []
   }
 
   /** A row as the keyboard controller sees it: an item it moves focus to and never chooses. */
   private navigable(row: HelixHeadlessListItem): NavigableItem {
     return focusItemOf(row, {
-      disabled: row.disabled,
+      disabled: this.blocked(row),
       focus: () => row.focusItem(),
       words: row.words,
     })
@@ -498,13 +521,14 @@ export class HelixHeadlessList extends HelixElement {
     this.placed = rows
     const holder = mode
       ? rovingStop(rows, this.last, {
-          disabled: (row) => row.disabled,
+          disabled: (row) => this.blocked(row),
           selected: (row) => chosen.has(this.valueFor(row)),
         })
       : undefined
     for (const row of rows) {
       whenHydrated(row, () => {
         row.focusable = mode ? row === holder : undefined
+        row.selectionOnly = this.disabledBehavior === 'selection'
         row.selected =
           mode === undefined || mode === 'none' ? undefined : chosen.has(this.valueFor(row))
       })
@@ -528,7 +552,8 @@ export class HelixHeadlessList extends HelixElement {
       return
     }
     const present = new Set(rows)
-    const reachable = (row: HelixHeadlessListItem): boolean => present.has(row) && !row.disabled
+    const reachable = (row: HelixHeadlessListItem): boolean =>
+      present.has(row) && !this.blocked(row)
     const next =
       this.placed.slice(at + 1).find(reachable) ??
       this.placed.slice(0, at).reverse().find(reachable)
@@ -571,7 +596,7 @@ export class HelixHeadlessList extends HelixElement {
       extend,
       mode: this.selectionMode ?? 'none',
       pressed: this.valueFor(row),
-      shown: this.reachable.map((one) => this.valueFor(one)),
+      shown: this.selectable.map((one) => this.valueFor(one)),
       toggle,
       value: this.value,
     }
@@ -601,7 +626,12 @@ export class HelixHeadlessList extends HelixElement {
    */
   private arrive(row: HelixHeadlessListItem, from: HelixHeadlessListItem | undefined): void {
     const moving = this.moving
-    if (!moving || this.selectionMode === undefined || this.selectionMode === 'none') {
+    if (
+      !moving ||
+      this.selectionMode === undefined ||
+      this.selectionMode === 'none' ||
+      row.disabled
+    ) {
       return
     }
     if (moving.extend && this.anchor === undefined && from) {
@@ -633,7 +663,7 @@ export class HelixHeadlessList extends HelixElement {
 
   /** Acts on the row: follows its link, or says it was acted on. */
   protected act(row: HelixHeadlessListItem): void {
-    if (row.disabled) {
+    if (this.blocked(row)) {
       return
     }
     if (row.href !== '') {
@@ -669,14 +699,14 @@ export class HelixHeadlessList extends HelixElement {
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {
     const row = this.interactive ? this.rowOf(event) : undefined
-    if (row && !row.disabled && !event.altKey && /^Page(Down|Up)$/.test(event.key)) {
+    if (row && !this.blocked(row) && !event.altKey && /^Page(Down|Up)$/.test(event.key)) {
       /* Before the modifiers are spent, so the row focus lands on reads them. */
       event.preventDefault()
       this.page(row, event.key === 'PageDown' ? 1 : -1)
     }
     /* Focus has arrived wherever this key sent it, so what it carried is spent. */
     this.moving = undefined
-    if (!row || row.disabled || event.altKey) {
+    if (!row || this.blocked(row) || event.altKey) {
       return
     }
     const toggle = event.ctrlKey || event.metaKey
@@ -691,7 +721,7 @@ export class HelixHeadlessList extends HelixElement {
     }
     if (selectsAll(event) && this.selectionMode === 'multiple') {
       event.preventDefault()
-      const every = this.reachable.map((one) => this.valueFor(one)).join(',')
+      const every = this.selectable.map((one) => this.valueFor(one)).join(',')
       this.choose(every === this.value ? null : every)
     } else if (event.key === 'Escape' && this.value !== '' && this.selectionMode !== 'none') {
       /* React Aria's GridList clears on Escape too, and keeps the key from
@@ -723,7 +753,9 @@ export class HelixHeadlessList extends HelixElement {
     if (pressedOwnControl(event, cell && event.composedPath().includes(cell) ? cell : row)) {
       return
     }
-    if (this.selectionMode === 'none') {
+    /* A row out of the selection alone is acted on, as in a list that
+       selects nothing. `act` passes over a row that is out of reach. */
+    if (this.selectionMode === 'none' || row.disabled) {
       this.act(row)
     } else {
       this.press(row, event.shiftKey, event.ctrlKey || event.metaKey)

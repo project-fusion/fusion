@@ -137,6 +137,36 @@ describe('the keys', () => {
     expect(hasState(third, 'focus-visible')).toBe(cell(third).matches(':focus-visible'))
   })
 
+  /* React Aria's GridList takes `disabledBehavior`, and a disabled row here
+     was always out of reach of the keys and of actions. */
+  test('under disabled-behavior="selection" a disabled row is reached and acted on, and never selected', async () => {
+    const list = await grid('multiple', 'disabled-behavior="selection"')
+    const [first, second] = list.rows as [Row, Row, Row]
+    expect(second.internals?.ariaDisabled ?? null).toBeNull()
+    cell(first).focus()
+    press(cell(first), 'ArrowDown')
+    expect(focused(list)).toBe(cell(second))
+    let acted = 0
+    second.addEventListener('helix-action', () => {
+      acted += 1
+    })
+    press(cell(second), 'Enter')
+    press(cell(second), ' ')
+    cell(second).click()
+    await settle(list)
+    expect(acted).toBe(2)
+    expect(list.value).toBe('')
+    const all = new KeyboardEvent('keydown', {
+      bubbles: true,
+      composed: true,
+      ctrlKey: true,
+      key: 'a',
+    })
+    cell(second).dispatchEvent(all)
+    await settle(list)
+    expect(list.value).toBe('a,c')
+  })
+
   test('Right goes to each control in the row and back to the row', async () => {
     const list = await grid()
     const first = list.rows[0] as Row
