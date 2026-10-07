@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 /** What a named slot was actually given, which is the only proof of assignment. */
 const assigned = (element: HTMLElement, name: string): Element[] =>
@@ -49,6 +49,29 @@ const chat = async (attributes = '') => {
 }
 
 describe('the transcript', () => {
+  /* Browser only, for a box that scrolls. Safari makes no scroller a tab stop,
+     so a keyboard there could not reach a long history. */
+  test.skipIf(!hasLayout())('the log is a tab stop while it scrolls, and only then', async () => {
+    const element = await chat('style="display: block; block-size: 160px"')
+    const log = part(element, 'log') as HTMLElement
+    log.style.blockSize = '100%'
+    log.style.overflow = 'auto'
+    for (let at = 0; at < 30; at += 1) {
+      const turn = document.createElement('helix-headless-chat-message')
+      turn.setAttribute('author', 'them')
+      turn.setAttribute('state', 'sent')
+      turn.textContent = `Line ${at}`
+      element.append(turn)
+    }
+    await new Promise((resolve) => setTimeout(resolve, 50))
+    await element.updateComplete
+    expect(log.scrollHeight).toBeGreaterThan(log.clientHeight)
+    expect(log.getAttribute('tabindex')).toBe('0')
+
+    const short = await chat()
+    expect(part(short, 'log')?.hasAttribute('tabindex')).toBe(false)
+  })
+
   test('the host is a named region, and the log is a log that says nothing itself', async () => {
     const element = await chat()
     expect(role(element)).toBe('region')
