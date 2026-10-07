@@ -286,6 +286,15 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
   @property({ attribute: 'notes-label' })
   notesLabel = 'Notes'
 
+  /**
+   * What a screen reader calls the graph in place of its role, after its
+   * name: "Research notes, graph". Said only where the graph has a name of its
+   * own, since the fallback name is the same word. Empty leaves the role.
+   */
+  @words
+  @property({ attribute: 'role-label' })
+  roleLabel = 'graph'
+
   /** The search field's name. */
   @words
   @property({ attribute: 'search-label' })
@@ -916,6 +925,7 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
       part="region"
       role="group"
       aria-label=${this.label || this.getAttribute?.('aria-label') || this.fallbackLabel}
+      aria-roledescription=${(this.label || this.getAttribute?.('aria-label')) && this.roleLabel ? this.roleLabel : nothing}
       aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight Plus Minus"
       tabindex="0"
       @focusin=${this.idle.stir}

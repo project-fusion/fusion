@@ -529,6 +529,15 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   resizedLabel = '{name} resized to {width} by {height}'
 
   /**
+   * What a screen reader calls the board in place of its role, after its
+   * name: "Release plan, canvas". Said only where the board has a name of its
+   * own, since the fallback name is the same word. Empty leaves the role.
+   */
+  @words
+  @property({ attribute: 'role-label' })
+  roleLabel = 'canvas'
+
+  /**
    * The names of the selected cards and connections, comma separated. Empty
    * when nothing is selected.
    *
@@ -3977,6 +3986,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       part="region"
       role="group"
       aria-label=${this.label || this.getAttribute?.('aria-label') || this.fallbackLabel}
+      aria-roledescription=${(this.label || this.getAttribute?.('aria-label')) && this.roleLabel ? this.roleLabel : nothing}
       aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight Plus Minus"
       tabindex="0"
       @focusin=${this.idle.stir}

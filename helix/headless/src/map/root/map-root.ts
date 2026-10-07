@@ -378,6 +378,15 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
   @property({ type: Number })
   pitch = 0
 
+  /**
+   * What a screen reader calls the map in place of its role, after its
+   * name: "Edinburgh, map". Said only where the map has a name of its
+   * own, since the fallback name is the same word. Empty leaves the role.
+   */
+  @words
+  @property({ attribute: 'role-label' })
+  roleLabel = 'map'
+
   /** The rotate left button's label. */
   @words
   @property({ attribute: 'rotate-left-label' })
@@ -1327,6 +1336,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
       part="region"
       role="group"
       aria-label=${this.label || this.getAttribute('aria-label') || this.fallbackLabel}
+      aria-roledescription=${(this.label || this.getAttribute('aria-label')) && this.roleLabel ? this.roleLabel : nothing}
       aria-keyshortcuts=${this.keyShortcuts}
       tabindex="0"
       @focusin=${this.idle.stir}
