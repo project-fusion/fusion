@@ -21,7 +21,21 @@
 #
 # `HELIX_BIN` is what `helix/cli/npm/bin.mjs` reads first, ahead of cargo, so a
 # job that also has a toolchain runs this binary rather than compiling a second
-# one from the same sources.
+# one from the same sources. Turbo passes it to the tasks it runs only because
+# `turbo.json` names it in `globalPassThroughEnv`.
+#
+# **Built with optimizations, because `analyze` runs it three times in a row.**
+# The core, headless and styled manifests each wait for the one before, and the
+# debug binary took 20 seconds over the styled tier on a laptop where the
+# optimized one took 3, for byte-identical output. On a runner the debug chain
+# was about two minutes of `warm` and `warm-browser`, the two jobs every other
+# job waits for. Link-time optimization stays off: it is for the binaries we
+# ship, and here it would only make a rebuild slower.
+#
+# **One Cargo cache for every job that builds it**, `shared-key` below, so the
+# optimized dependencies compiled once serve every job and every pull request.
+# `seed` in `verify.yml` builds it on `main` when it is missing there, which is
+# where a pull request reads it from.
 name: Put the helix binary on disk
 description: Restores the `helix` binary built from this tree, or builds and saves it, and points `HELIX_BIN` at it.
 
@@ -35,7 +49,7 @@ runs:
         # `1.96` is the toolchain below, said again because a key cannot read a
         # step's input. A bump there without one here would restore a binary
         # the new toolchain did not build.
-        key: helix-${{ runner.os }}-${{ runner.arch }}-1.96-${{ hashFiles('Cargo.lock', 'Cargo.toml', 'helix/cli/Cargo.toml', 'helix/cli/src/**', 'helix/theme/Cargo.toml', 'helix/theme/src/**', 'fusion/rules/Cargo.toml', 'fusion/rules/src/**') }}
+        key: helix-${{ runner.os }}-${{ runner.arch }}-1.96-release-${{ hashFiles('Cargo.lock', 'Cargo.toml', 'helix/cli/Cargo.toml', 'helix/cli/src/**', 'helix/theme/Cargo.toml', 'helix/theme/src/**', 'fusion/rules/Cargo.toml', 'fusion/rules/src/**') }}
         path: target/ci/helix
 
     - name: Install Rust
@@ -49,15 +63,19 @@ runs:
     - name: Restore the Cargo cache
       if: steps.restore.outputs.cache-hit != 'true'
       uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+      with:
+        shared-key: helix-release
 
     - name: Build the helix binary
       if: steps.restore.outputs.cache-hit != 'true'
       shell: bash
+      env:
+        CARGO_PROFILE_RELEASE_LTO: 'false'
       run: |
         set -euo pipefail
-        cargo build -p fusion-helix-cli --locked
+        cargo build -p fusion-helix-cli --locked --release
         mkdir -p target/ci
-        cp target/debug/helix target/ci/helix
+        cp target/release/helix target/ci/helix
 
     - name: Save the helix binary
       if: steps.restore.outputs.cache-hit != 'true'

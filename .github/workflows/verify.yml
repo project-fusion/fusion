@@ -84,11 +84,15 @@ jobs:
   # looked up first and fetched only when missing, so a hit costs the lookup.
   # Not in the gate's `needs`: it checks nothing, and a cache it could not write
   # is no reason to call a verified tree unverified.
+  #
+  # **The helix binary as well**, built with optimizations, and with it the
+  # Cargo cache every job that builds one shares. A pull request that changes
+  # the CLI then compiles its own crates and none of their dependencies.
   seed:
     needs: proven
     if: needs.proven.outputs.proven == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     continue-on-error: true
     steps:
       - name: Check out
@@ -121,6 +125,9 @@ jobs:
       - name: Install Chromium
         if: steps.browser.outputs.cache-hit != 'true'
         uses: ./.github/actions/browser
+      # A hit is one restore of the binary; a miss builds and saves it.
+      - name: Put the helix binary on disk
+        uses: ./.github/actions/helix
 
   # The shard counts live in one place each and the matrices are built from
   # them, so a matrix of six against `--of 8` cannot silently drop a third of

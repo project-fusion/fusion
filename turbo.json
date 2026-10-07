@@ -28,7 +28,15 @@
   // meaningful. `NODE_AUTH_TOKEN` was here too and nothing sets it: the
   // release publishes by OIDC, and RELEASING.md says its presence would stop
   // that exchange.
-  "globalPassThroughEnv": ["GITHUB_OUTPUT"],
+  //
+  // **`HELIX_BIN` is the binary every `analyze` runs, and strict mode dropped
+  // it.** A task sees only the variables named here, so the shim never saw the
+  // binary CI had restored for it. It ran `cargo build --workspace` instead,
+  // from cold on a runner whose toolchain the job had not installed: measured
+  // on run 37559800038, the first `analyze` took 153 seconds and the binary
+  // sat on disk unused. Passed through and kept out of the hash, because the
+  // binary is a function of the Rust sources `analyze` already hashes.
+  "globalPassThroughEnv": ["GITHUB_OUTPUT", "HELIX_BIN"],
   "tasks": {
     // `metrics` and `docs` run at the head of this build, so what they write is
     // build output and an undeclared one is what a cache hit does not restore.
@@ -511,6 +519,16 @@
     // `metrics.mdx` with last week's sizes and `check:gen:metrics` failed
     // against the fresh build. `bun.lock` is here because Lit is bundled into
     // every row.
+    //
+    // **The builds above carry those files into the key, so they are not
+    // listed again.** A task's hash holds the hashes of the tasks it depends
+    // on, and each build's hash holds its sources. Listing `dist`, `types` and
+    // `custom-elements.json` as well made the key depend on whether a build had
+    // run before turbo hashed, and turbo hashes every input when a run starts.
+    // A cold run hashed no files and a second run in the same job hashed all of
+    // them, so the key changed between the two with nothing changed. Measured
+    // on run 37556830567: `warm` wrote one key, and every job after it missed
+    // the other and measured the bundles again, 78 seconds each.
     // **`token-layer` as well as the styles' build**, which runs it too:
     // `check:cli:component` asks for `token-layer` by name, and a cache hit
     // restores `dist/tokens.json` while this reads it, so `metrics` parsed half
@@ -531,23 +549,12 @@
         "$TURBO_ROOT$/bun.lock",
         "$TURBO_ROOT$/fusion/scripts/build-metrics.mjs",
         "$TURBO_ROOT$/helix/core/package.json",
-        "$TURBO_ROOT$/helix/core/custom-elements.json",
-        "$TURBO_ROOT$/helix/core/dist/**",
         "$TURBO_ROOT$/helix/headless/package.json",
-        "$TURBO_ROOT$/helix/headless/custom-elements.json",
-        "$TURBO_ROOT$/helix/headless/dist/**",
-        "$TURBO_ROOT$/helix/headless/types/**",
         "$TURBO_ROOT$/helix/icons/package.json",
-        "$TURBO_ROOT$/helix/icons/dist/**",
         "$TURBO_ROOT$/helix/icons/raw/**",
         "$TURBO_ROOT$/helix/styled/package.json",
-        "$TURBO_ROOT$/helix/styled/custom-elements.json",
-        "$TURBO_ROOT$/helix/styled/dist/**",
-        "$TURBO_ROOT$/helix/styled/types/**",
         "$TURBO_ROOT$/helix/styles/package.json",
-        "$TURBO_ROOT$/helix/styles/dist/**",
         "$TURBO_ROOT$/helix/theme/package.json",
-        "$TURBO_ROOT$/helix/theme/dist/**",
         "$TURBO_ROOT$/helix/theme/wasm/**"
       ],
       "outputs": [
