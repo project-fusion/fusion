@@ -8,7 +8,7 @@
  * parent's rows means the rail is told, so the mark lands on the title and the
  * line above it covers exactly the gap. */
 :host {
-  column-gap: var(--helix-space-md);
+  column-gap: var(--timeline-column-gap, var(--helix-space-md));
   display: grid;
   /* Each `--_timeline-*` below is set by the timeline for a layout other than
      this column, and falls back to the column. */
@@ -37,7 +37,7 @@
    and the rail's first row is a cell whether or not anything is rendered into
    it. */
 [part="rail"]::before {
-  background-color: var(--helix-color-border);
+  background-color: var(--timeline-rail-color, var(--helix-color-border));
   block-size: 100%;
   content: "";
   display: var(--_timeline-arrive-display, block);
@@ -56,7 +56,7 @@
    thing it leaves rather than drawn across it. */
 [part="rail"]::after {
   align-self: var(--_timeline-leave-align, stretch);
-  background-color: var(--helix-color-border);
+  background-color: var(--timeline-rail-color, var(--helix-color-border));
   block-size: var(--_timeline-leave-block-size, auto);
   content: "";
   /* The column said as well as the row. Auto-placement puts two items that name
@@ -113,7 +113,7 @@
  * rather than as a record.
  */
   border-radius: var(--timeline-marker-radius, var(--helix-radii-full));
-  color: var(--_timeline-tone, var(--helix-color-foreground-subtle));
+  color: var(--_timeline-tone, var(--timeline-marker-color, var(--helix-color-foreground-subtle)));
   display: inline-flex;
   grid-column: 1;
   grid-row: var(--_timeline-marker-row, 2);
@@ -161,7 +161,7 @@
    not a decoration beside one, and `subtle` measures 3.95 on a light card where
    12px text wants 4.5. */
 [part="time"] {
-  color: var(--helix-color-foreground-muted);
+  color: var(--timeline-time-color, var(--helix-color-foreground-muted));
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-medium);
