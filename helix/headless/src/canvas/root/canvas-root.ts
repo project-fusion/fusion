@@ -3433,8 +3433,15 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     }
     this.handOn()
     this.walked = this.walk
+    /* **A board the observer has not reported yet is fitted by its first
+       report**, which arrives after layout and before paint. Fitting here
+       instead moved the view inside the update that drew it, so every board
+       drew twice as it loaded. Once it is watched, `willUpdate` has fitted the
+       board already and this finds nothing to move, unless the render changed
+       the box it fits into. */
+    const watching = this.watched !== undefined
     this.watchBox()
-    if (!this.touched) {
+    if (watching && !this.touched) {
       this.fitInto(true)
     }
   }
@@ -3604,6 +3611,9 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       }
     }
     this.origin = origin
+    if (this.watched && !this.touched) {
+      this.fitInto(true)
+    }
     hostAria(this.internals, { label: this.label })
     this.toggleState('connecting', this.drawing)
     this.toggleState('direct', this.direct)
