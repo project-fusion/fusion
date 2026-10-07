@@ -67,6 +67,7 @@ import '../../color-picker/index.js'
  * @slot end - Content at the trailing end, before the trigger.
  * @slot feedback - The message that says what is wrong with the value.
  * @slot hint - Help text under the field.
+ * @slot label - The label, for content richer than the `label` text.
  * @slot panel-footer - Content in the panel under the picker, such as a note or an action.
  * @slot panel-header - Content in the panel above the picker, such as a heading or a shortcut.
  * @slot start - Content at the leading end of the field, inside its border.
