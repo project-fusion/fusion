@@ -200,6 +200,17 @@ describe('a list that loads more', () => {
       expect(part(list, 'loading')).toBeNull()
     }))
 
+  test('watches its end again once moved in the page', () =>
+    watching(async () => {
+      const list = await settled(`<helix-headless-list label="Files" load-more>
+          <helix-headless-list-item>One</helix-headless-list-item>
+        </helix-headless-list>`)
+      list.remove()
+      expect(watchers.filter((one) => one.target)).toHaveLength(0)
+      document.body.append(list)
+      expect(watchers.filter((one) => one.target)).toHaveLength(1)
+    }))
+
   test('watches nothing and asks for nothing without load-more', () =>
     watching(async () => {
       const list = await settled(`<helix-headless-list label="Files">
