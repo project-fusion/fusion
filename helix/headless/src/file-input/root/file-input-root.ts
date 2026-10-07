@@ -25,7 +25,7 @@ import { barOf, type FileStatus, saysStatus } from '../status.js'
 
 export type { FileStatus } from '../status.js'
 
-import '../../tag/index.js'
+import '../../tag/root/index.js'
 
 /**
  * A file's size, at the largest unit that leaves a number worth reading.

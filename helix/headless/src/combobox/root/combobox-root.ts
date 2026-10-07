@@ -38,7 +38,7 @@ import { HelixHeadlessTag } from '../../tag/root/tag-root.js'
 import '../../listbox/index.js'
 /* And the tags, for the same reason: `multiple` renders one per chosen option
    and a custom element registers on import. */
-import '../../tag/index.js'
+import '../../tag/root/index.js'
 
 /**
  * Whether an edit added characters rather than taking them away.
