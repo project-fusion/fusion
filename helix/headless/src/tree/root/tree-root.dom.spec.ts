@@ -520,3 +520,37 @@ describe('removing the item that has focus', () => {
     expect(focused()).toBe('src')
   })
 })
+
+describe('a tree with no name of its own', () => {
+  /* The missing-name warning is in development builds only, which the
+     package's `test:dom` script asks for with `--conditions helix-development`. */
+  const warnedOn = async (markup: string): Promise<string[]> => {
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      await mount(markup)
+      await new Promise((done) => setTimeout(done, 5))
+    } finally {
+      console.warn = original
+    }
+    return warnings
+  }
+
+  test('warns once, since "Tree" says nothing of what it holds', async () => {
+    const warnings = await warnedOn(
+      '<helix-headless-tree><helix-headless-tree-item>Docs</helix-headless-tree-item></helix-headless-tree>',
+    )
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0]).toContain('<helix-headless-tree> has no accessible name')
+  })
+
+  test('and a tree named by label or aria-label does not', async () => {
+    for (const named of [
+      '<helix-headless-tree label="Files"><helix-headless-tree-item>Docs</helix-headless-tree-item></helix-headless-tree>',
+      '<helix-headless-tree aria-label="Files"><helix-headless-tree-item>Docs</helix-headless-tree-item></helix-headless-tree>',
+    ]) {
+      expect(await warnedOn(named)).toEqual([])
+    }
+  })
+})
