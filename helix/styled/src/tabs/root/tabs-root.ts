@@ -30,6 +30,8 @@ import { styles } from './tabs-root.css.js'
  *
  * @csspart indicator - The mark that moves to the selected tab. It carries the selected tab's place and size as `--indicator-x`, `--indicator-y`, `--indicator-inline-size` and `--indicator-block-size`.
  * @csspart panels - The panel container.
+ * @csspart scroll-end - The button that scrolls the strip toward its end, shown under `scroll-controls` while there is more that way. It holds to the end of the strip.
+ * @csspart scroll-start - The button that scrolls the strip toward its start, shown under `scroll-controls` while there is more that way. It holds to the start of the strip.
  * @csspart tabs - The tab list.
  *
  * @cssproperty --tabs-gap - The space between tabs.
@@ -38,6 +40,7 @@ import { styles } from './tabs-root.css.js'
  * @cssproperty --tabs-indicator-shadow - The shadow under the mark, which the pill and `segmented` draw.
  * @cssproperty --tabs-indicator-thickness - The height of the bar under `underlined`.
  * @cssproperty --tabs-rule-color - The color of the rule under the row in `underlined`.
+ * @cssproperty --tabs-scroll-background-color - The fill behind the scroll buttons, over the tabs that pass under them.
  */
 @customElement('helix-tabs')
 export class HelixTabs extends HelixHeadlessTabs {

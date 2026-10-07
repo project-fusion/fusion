@@ -575,3 +575,56 @@ describe('removing the selected tab', () => {
     ).toBe(true)
   })
 })
+
+describe('a strip with more tabs than fit', () => {
+  /* Web Awesome's scroll buttons. happy-dom lays nothing out, so the strip's
+     lengths are given to it. */
+  const overflowing = async (): Promise<{
+    host: Updatable
+    strip: HTMLElement
+    scrolled: number[]
+  }> => {
+    const host = (await mount(
+      markup.replace('<helix-headless-tabs', '<helix-headless-tabs scroll-controls'),
+    )) as Updatable
+    await host.updateComplete
+    const strip = part(host, 'tabs') as HTMLElement
+    const scrolled: number[] = []
+    Object.defineProperty(strip, 'clientWidth', { configurable: true, value: 200 })
+    Object.defineProperty(strip, 'scrollWidth', { configurable: true, value: 500 })
+    strip.scrollBy = ((options: ScrollToOptions) => {
+      scrolled.push(options.left ?? 0)
+    }) as typeof strip.scrollBy
+    strip.dispatchEvent(new Event('scroll'))
+    await host.updateComplete
+    return { host, scrolled, strip }
+  }
+
+  test('shows a button at each end it can scroll toward, hidden from screen readers', async () => {
+    const { host, strip } = await overflowing()
+    const start = part(host, 'scroll-start') as HTMLElement
+    const end = part(host, 'scroll-end') as HTMLElement
+    expect(start.hidden).toBe(true)
+    expect(end.hidden).toBe(false)
+    expect(end.getAttribute('aria-hidden')).toBe('true')
+    expect(end.getAttribute('tabindex')).toBe('-1')
+    Object.defineProperty(strip, 'scrollLeft', { configurable: true, value: 300 })
+    strip.dispatchEvent(new Event('scroll'))
+    await host.updateComplete
+    expect(start.hidden).toBe(false)
+    expect(end.hidden).toBe(true)
+  })
+
+  test('a press scrolls most of the strip toward that end', async () => {
+    const { host, scrolled } = await overflowing()
+    ;(part(host, 'scroll-end') as HTMLElement).click()
+    expect(scrolled).toEqual([150])
+  })
+
+  test('draws no buttons unless asked', async () => {
+    const host = (await mount(markup)) as Updatable
+    await host.updateComplete
+    expect(part(host, 'scroll-start')).toBeNull()
+    expect(part(host, 'scroll-end')).toBeNull()
+  })
+})

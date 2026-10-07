@@ -27,6 +27,59 @@
   overflow-x: auto;
 }
 
+/* The scroll buttons under `scroll-controls` hold to the ends of the strip as
+   it scrolls, over the tabs that pass under them. Hidden, they draw no box. */
+[part="scroll-start"],
+[part="scroll-end"] {
+  align-items: center;
+  background-color: var(--tabs-scroll-background-color, var(--helix-color-surface));
+  border: none;
+  color: var(--helix-color-foreground-subtle);
+  cursor: pointer;
+  display: inline-flex;
+  flex: none;
+  justify-content: center;
+  padding-inline: var(--helix-space-2xs);
+  position: sticky;
+  z-index: 1;
+}
+
+[part="scroll-start"] {
+  inset-inline-start: 0;
+}
+
+[part="scroll-end"] {
+  inset-inline-end: 0;
+}
+
+[part="scroll-start"][hidden],
+[part="scroll-end"][hidden] {
+  display: none;
+}
+
+[part="scroll-start"] svg,
+[part="scroll-end"] svg {
+  block-size: var(--helix-size-icon);
+  inline-size: var(--helix-size-icon);
+}
+
+[part="scroll-start"]:hover,
+[part="scroll-end"]:hover {
+  color: var(--helix-color-foreground);
+}
+
+:host([orientation="vertical"]) [part="scroll-start"] {
+  inset-block-start: 0;
+  inset-inline-start: auto;
+  padding-block: var(--helix-space-2xs);
+}
+
+:host([orientation="vertical"]) [part="scroll-end"] {
+  inset-block-end: 0;
+  inset-inline-end: auto;
+  padding-block: var(--helix-space-2xs);
+}
+
 /* Underlined. */
 :host([variant="underlined"]) {
   --_tabs-rule: linear-gradient(

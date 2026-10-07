@@ -1,12 +1,15 @@
 import {
   customElement,
+  HelixDismissEvent,
   HelixElement,
   MixinSelectableItem,
   plainClick,
   reflectElements,
 } from '@fusion.dev/helix-core'
+import { x } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
 /**
  * @summary One tab in a tab list.
@@ -19,6 +22,14 @@ import { property } from 'lit/decorators.js'
  * first, and canceling it keeps the browser from following, so a client-side
  * router follows it instead.
  *
+ * With `dismissible`, the tab can be closed, as Web Awesome's closable tab
+ * can: a press on its `dismiss` mark, or Delete or Backspace while the tab
+ * has focus, sends `helix-dismiss`. The tab does not remove itself, because
+ * your code owns the set, so remove the tab and its panel in your handler.
+ * The tab set then selects a tab that is left and keeps focus on the strip.
+ * The tab says the key through `aria-keyshortcuts`, and the mark is for the
+ * pointer, hidden from screen readers.
+ *
  * @since 0.1.0
  * @status stable
  * @aliases Tab
@@ -26,8 +37,10 @@ import { property } from 'lit/decorators.js'
  *
  * @slot - The tab's label.
  *
+ * @event {HelixDismissEvent} helix-dismiss - A `dismissible` tab was asked to close. The tab does not remove itself, so remove it and its panel in response. Cancelable.
  * @event {HelixSelectEvent} helix-select - Fired when the tab is chosen. Cancelable: canceling it stops the change and leaves the decision to you.
  *
+ * @csspart dismiss - The mark a pointer presses to close a `dismissible` tab.
  * @csspart tab - The tab itself.
  *
  * @cssstate selected - While it is the tab selected.
@@ -46,6 +59,13 @@ export class HelixHeadlessTab extends MixinSelectableItem(HelixElement) {
    */
   @property({ attribute: false })
   controls: Element | undefined = undefined
+
+  /**
+   * Whether the tab can be closed: it draws a mark that sends `helix-dismiss`,
+   * and Delete or Backspace send it too.
+   */
+  @property({ reflect: true, type: Boolean })
+  dismissible = false
 
   /**
    * The URL the tab links to. Setting it renders the tab as a link, for a set
@@ -72,6 +92,42 @@ export class HelixHeadlessTab extends MixinSelectableItem(HelixElement) {
    */
   override focus(options?: FocusOptions): void {
     this.partNamed('tab')?.focus(options)
+  }
+
+  /**
+   * Sends `helix-dismiss` for a `dismissible` tab, and returns `false` where a
+   * listener refused it. The tab stays where it is either way: removing it is
+   * yours.
+   */
+  dismiss(): boolean {
+    if (!this.dismissible || this.disabled) {
+      return false
+    }
+    return this.dispatchEvent(new HelixDismissEvent({ label: (this.textContent ?? '').trim() }))
+  }
+
+  /** A press on the mark closes the tab, and neither selects it nor follows its link. */
+  private readonly handleDismissPress = (event: Event): void => {
+    event.preventDefault()
+    event.stopPropagation()
+    this.dismiss()
+  }
+
+  private readonly handleKeydown = (event: KeyboardEvent): void => {
+    if (this.dismissible && (event.key === 'Delete' || event.key === 'Backspace')) {
+      event.preventDefault()
+      this.dismiss()
+    }
+  }
+
+  /** The mark that closes a `dismissible` tab, inside the control so it shares its box. */
+  protected renderDismiss(): TemplateResult | typeof nothing {
+    if (!this.dismissible) {
+      return nothing
+    }
+    return html`<span part="dismiss" aria-hidden="true" @click=${this.handleDismissPress}
+      ><svg fill="currentColor" viewBox=${x.viewBox} aria-hidden="true">${unsafeSVG(x.content)}</svg></span
+    >`
   }
 
   /**
@@ -130,6 +186,7 @@ export class HelixHeadlessTab extends MixinSelectableItem(HelixElement) {
      * uses in the same words, a server and the render that has to be its, so a
      * browser draws what it drew before. */
     const tabindex = this.selected || !this.childrenKnown ? '0' : '-1'
+    const shortcut = this.dismissible && !this.disabled ? 'Delete' : nothing
     /* A link with no `href` while it is disabled, so it goes nowhere, and
        `aria-disabled` in place of the `disabled` an anchor does not have. */
     if ((this.href ?? '') !== '') {
@@ -141,10 +198,12 @@ export class HelixHeadlessTab extends MixinSelectableItem(HelixElement) {
         rel=${this.rel || nothing}
         aria-selected=${this.selected ? 'true' : 'false'}
         aria-disabled=${this.disabled ? 'true' : nothing}
+        aria-keyshortcuts=${shortcut}
         tabindex=${this.disabled ? nothing : tabindex}
         @click=${this.handleLinkClick}
+        @keydown=${this.handleKeydown}
       >
-        <slot></slot>
+        <slot></slot>${this.renderDismiss()}
       </a>`
     }
     return html`<button
@@ -152,11 +211,13 @@ export class HelixHeadlessTab extends MixinSelectableItem(HelixElement) {
       role="tab"
       type="button"
       aria-selected=${this.selected ? 'true' : 'false'}
+      aria-keyshortcuts=${shortcut}
       ?disabled=${this.disabled}
       tabindex=${tabindex}
       @click=${() => this.select()}
+      @keydown=${this.handleKeydown}
     >
-      <slot></slot>
+      <slot></slot>${this.renderDismiss()}
     </button>`
   }
 }

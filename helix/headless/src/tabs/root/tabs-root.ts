@@ -5,13 +5,17 @@ import {
   HelixActivateEvent,
   HelixElement,
   IndicatorController,
+  isRtl,
   KeyboardNavigationController,
   MixinControllerActive,
+  scrollItemIntoView,
   whenHydrated,
   words,
 } from '@fusion.dev/helix-core'
+import { caretDown, caretLeft, caretRight, caretUp } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { property, state } from 'lit/decorators.js'
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { HelixHeadlessTabPanel } from '../panel/tab-panel.js'
 import { HelixHeadlessTab } from '../tab/tab.js'
 
@@ -64,6 +68,16 @@ import { HelixHeadlessTab } from '../tab/tab.js'
  * `active` says so, with `helix-activate`. Where the removed tab had focus,
  * focus moves to the tab now selected.
  *
+ * **More tabs than fit.** With `scroll-controls`, a strip that scrolls shows a
+ * button at each end it can scroll toward, as Web Awesome's tab group does,
+ * and a press scrolls it most of its own length. The buttons are for the
+ * pointer, so they are out of the tab order and hidden from screen readers;
+ * the arrow keys already reach every tab, and the strip scrolls the selected
+ * tab into view. A strip scrolls once a stylesheet gives the `tabs` part an
+ * `overflow`, as the styled tier does.
+ *
+ * A tab with `dismissible` can be closed: see `Tabs.Tab`.
+ *
  * The `indicator` part moves to the selected tab and carries its place and
  * size, so a mark of your own can be drawn there: style the part, or slot an
  * element into `indicator`, which sits inside the part and reads the same
@@ -88,6 +102,8 @@ import { HelixHeadlessTab } from '../tab/tab.js'
  *   `--indicator-block-size`, and `data-placed` once it has been placed, for a mark you draw
  *   and animate yourself.
  * @csspart panels - The panel container.
+ * @csspart scroll-end - The button that scrolls the strip toward its end, shown under `scroll-controls` while there is more that way.
+ * @csspart scroll-start - The button that scrolls the strip toward its start, shown under `scroll-controls` while there is more that way.
  * @csspart tabs - The tab list.
  */
 @customElement('helix-headless-tabs')
@@ -155,6 +171,13 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
   orientation?: 'horizontal' | 'vertical'
 
   /**
+   * Whether a strip with more tabs than fit shows a button at each end it can
+   * scroll toward.
+   */
+  @property({ attribute: 'scroll-controls', reflect: true, type: Boolean })
+  scrollControls = false
+
+  /**
    * How the row of tabs is drawn.
    *
    * Unset is a raised pill on the selected tab with nothing behind the row,
@@ -220,6 +243,48 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
       return
     }
     this.requestActive((event as CustomEvent<{ value: string }>).detail.value)
+  }
+
+  /** Which ends the strip can scroll toward, under `scroll-controls`. */
+  @state()
+  private more: { end: boolean; start: boolean } = { end: false, start: false }
+
+  /** Watches the strip's size for `scroll-controls`. */
+  private resizing: ResizeObserver | undefined
+
+  /** Reads which ends of the strip have more tabs past them. */
+  private readonly measure = (): void => {
+    const strip = this.partNamed('tabs')
+    if (!strip || !this.scrollControls) {
+      if (this.more.start || this.more.end) {
+        this.more = { end: false, start: false }
+      }
+      return
+    }
+    const down = this.orientation === 'vertical'
+    const along = Math.abs(down ? strip.scrollTop : strip.scrollLeft)
+    const length = down ? strip.clientHeight : strip.clientWidth
+    const whole = down ? strip.scrollHeight : strip.scrollWidth
+    const start = along > 1
+    const end = along + length < whole - 1
+    if (start !== this.more.start || end !== this.more.end) {
+      this.more = { end, start }
+    }
+  }
+
+  /**
+   * Scrolls the strip most of its own length toward one end, smoothly unless
+   * the reader asked for less motion.
+   */
+  private scrollStrip(toward: 1 | -1): void {
+    const strip = this.partNamed('tabs')
+    if (!strip) {
+      return
+    }
+    const down = this.orientation === 'vertical'
+    const by = (down ? strip.clientHeight : strip.clientWidth) * 0.75 * toward
+    const behavior = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+    strip.scrollBy(down ? { behavior, top: by } : { behavior, left: isRtl(this) ? -by : by })
   }
 
   /** The values of the tabs the last pairing read, to tell a removed tab from one not yet here. */
@@ -325,6 +390,8 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
     super.disconnectedCallback()
     this.removeEventListener('helix-select', this.handleSelection)
     this.removeEventListener('focusin', this.handleFocusIn)
+    this.resizing?.disconnect()
+    this.resizing = undefined
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
@@ -341,6 +408,30 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
        the origin the moment the page was looked at. */
     this.indicator.place()
     requestAnimationFrame(() => this.indicator.place())
+  }
+
+  /** Watches the strip's size while `scroll-controls` asks, and reads it. */
+  private watchStrip(): void {
+    const strip = this.partNamed('tabs')
+    if (this.scrollControls && strip && !this.resizing) {
+      this.resizing = new ResizeObserver(this.measure)
+      this.resizing.observe(strip)
+    }
+    if (!this.scrollControls && this.resizing) {
+      this.resizing.disconnect()
+      this.resizing = undefined
+    }
+    this.measure()
+  }
+
+  /** Brings the selected tab into the strip's view, and moves nothing else. */
+  private reveal(): void {
+    const strip = this.partNamed('tabs')
+    const tab = this.tabs.find((one) => one.selected)
+    if (strip && tab) {
+      /* Clear of a scroll button holding to the edge it comes in at. */
+      scrollItemIntoView(tab, { padding: this.scrollControls ? 40 : 0, scroller: strip })
+    }
   }
 
   /**
@@ -362,14 +453,45 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
     this.sync()
     this.indicator.place()
     this.refocus()
+    this.measure()
   }
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     if (changed.has('active')) {
       this.sync()
+      if (changed.get('active') !== undefined) {
+        void this.updateComplete.then(() => this.reveal())
+      }
+    }
+    if (changed.has('scrollControls') || changed.has('orientation')) {
+      this.watchStrip()
     }
     this.indicator.place()
+  }
+
+  /**
+   * One of the two scroll buttons, pointing the way it scrolls. A caret along
+   * the line is mirrored on a right-to-left page, and one down a column is not.
+   */
+  private renderScroll(toward: 1 | -1): TemplateResult | typeof nothing {
+    if (!this.scrollControls) {
+      return nothing
+    }
+    const down = this.orientation === 'vertical'
+    const icon = down ? (toward > 0 ? caretDown : caretUp) : toward > 0 ? caretRight : caretLeft
+    const glyph = html`<svg
+      data-mirror=${down ? nothing : ''}
+      aria-hidden="true"
+      fill="currentColor"
+      viewBox=${icon.viewBox}
+    >${unsafeSVG(icon.content)}</svg>`
+    const shown = toward > 0 ? this.more.end : this.more.start
+    /* A press scrolls and leaves focus on the tab it was on. */
+    const keepFocus = (event: Event): void => event.preventDefault()
+    return toward > 0
+      ? html`<button part="scroll-end" type="button" tabindex="-1" aria-hidden="true" ?hidden=${!shown} @mousedown=${keepFocus} @click=${() => this.scrollStrip(1)}>${glyph}</button>`
+      : html`<button part="scroll-start" type="button" tabindex="-1" aria-hidden="true" ?hidden=${!shown} @mousedown=${keepFocus} @click=${() => this.scrollStrip(-1)}>${glyph}</button>`
   }
 
   protected override render(): TemplateResult {
@@ -378,9 +500,12 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
         role="tablist"
         aria-label=${this.label}
         aria-orientation=${this.orientation === 'vertical' ? 'vertical' : nothing}
+        @scroll=${this.scrollControls ? this.measure : nothing}
       >
+        ${this.renderScroll(-1)}
         <slot @slotchange=${this.handleSlotChange}></slot>
         <span part="indicator" aria-hidden="true"><slot name="indicator"></slot></span>
+        ${this.renderScroll(1)}
       </div>
       <div part="panels"><slot name="panels" @slotchange=${this.handleSlotChange}></slot></div>`
   }
