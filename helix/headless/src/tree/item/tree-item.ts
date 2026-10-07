@@ -181,7 +181,7 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
    * by the tree for `aria-posinset`, for the reason `level` gives.
    */
   @property({ attribute: false, type: Number })
-  position?: number
+  position?: number | undefined
 
   /**
    * The link's `rel` value, which describes how the linked page relates to this
@@ -214,7 +214,7 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
    * tree for `aria-setsize`, for the reason `level` gives.
    */
   @property({ attribute: false, type: Number })
-  setSize?: number
+  setSize?: number | undefined
 
   /**
    * Where the link opens. Use it for a row that leaves the site.
