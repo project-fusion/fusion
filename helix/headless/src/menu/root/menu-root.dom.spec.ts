@@ -763,3 +763,142 @@ describe('a context menu', () => {
     expect(ask.defaultPrevented).toBe(false)
   })
 })
+
+/* A pointer event on an element in the light DOM, which reaches the host by
+   bubbling where happy-dom carries nothing through a slot. */
+const pointer = (target: Element, type: string, init: PointerEventInit = {}): void => {
+  target.dispatchEvent(
+    new PointerEvent(type, {
+      bubbles: true,
+      button: 0,
+      clientX: 30,
+      clientY: 50,
+      composed: true,
+      pointerType: 'touch',
+      ...init,
+    }),
+  )
+}
+const held = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 560))
+
+describe('a context menu held open', () => {
+  /* Radix's ContextMenu opens on its own touch long press, since iOS sends no
+     `contextmenu` for one. */
+  test('opens on a touch held still on the area, where the touch is', async () => {
+    const host = (await mount(`<helix-headless-menu context label="File">
+      <div slot="trigger" tabindex="0">Area</div>
+      <helix-headless-menu-item value="open">Open</helix-headless-menu-item>
+    </helix-headless-menu>`)) as Menu
+    const zone = host.querySelector('[slot="trigger"]') as HTMLElement
+    pointer(zone, 'pointerdown')
+    await held()
+    await host.updateComplete
+    expect(host.open).toBe(true)
+    expect(host.shadowRoot?.getElementById('point')?.getAttribute('style')).toContain(
+      'translate: 30px 50px',
+    )
+    pointer(zone, 'pointerup')
+  })
+
+  test('a touch that moves, or a mouse held down, does not open it', async () => {
+    const host = (await mount(`<helix-headless-menu context label="File">
+      <div slot="trigger" tabindex="0">Area</div>
+      <helix-headless-menu-item value="open">Open</helix-headless-menu-item>
+    </helix-headless-menu>`)) as Menu
+    const zone = host.querySelector('[slot="trigger"]') as HTMLElement
+    pointer(zone, 'pointerdown')
+    pointer(zone, 'pointermove', { clientX: 30, clientY: 80 })
+    pointer(zone, 'pointerdown', { pointerType: 'mouse' })
+    await held()
+    await host.updateComplete
+    expect(host.open).toBe(false)
+  })
+
+  test('opens on Shift+F10 from the area', async () => {
+    const host = (await mount(`<helix-headless-menu context label="File">
+      <div slot="trigger" tabindex="0">Area</div>
+      <helix-headless-menu-item value="open">Open</helix-headless-menu-item>
+    </helix-headless-menu>`)) as Menu
+    const zone = host.querySelector('[slot="trigger"]') as HTMLElement
+    const key = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key: 'F10',
+      shiftKey: true,
+    })
+    zone.dispatchEvent(key)
+    await host.updateComplete
+    expect(key.defaultPrevented).toBe(true)
+    expect(host.open).toBe(true)
+  })
+})
+
+/* React Aria's menu trigger takes `trigger="longPress"`: a press is the
+   trigger's own action and a held one opens the menu. */
+describe('a menu opened by a long press', () => {
+  const held_ = async (): Promise<{ host: Menu; trigger: HTMLButtonElement }> => {
+    const host = (await mount(`<helix-headless-menu label="Undo" open-on="long-press">
+      <button slot="trigger">Undo</button>
+      <helix-headless-menu-item value="one">Undo typing</helix-headless-menu-item>
+    </helix-headless-menu>`)) as Menu
+    return { host, trigger: host.querySelector('button') as HTMLButtonElement }
+  }
+
+  test('leaves a quick press to the trigger, and opens on a held one without its click', async () => {
+    const { host, trigger } = await held_()
+    const own: string[] = []
+    trigger.addEventListener('click', () => own.push('own'))
+
+    pointer(trigger, 'pointerdown', { pointerType: 'mouse' })
+    pointer(trigger, 'pointerup', { pointerType: 'mouse' })
+    trigger.click()
+    await host.updateComplete
+    expect(host.open).toBe(false)
+    expect(own).toEqual(['own'])
+
+    pointer(trigger, 'pointerdown', { pointerType: 'mouse' })
+    await held()
+    await host.updateComplete
+    expect(host.open).toBe(true)
+    pointer(trigger, 'pointerup', { pointerType: 'mouse' })
+    /* The click the release makes is the long press's. */
+    trigger.click()
+    await host.updateComplete
+    expect(host.open).toBe(true)
+    expect(own).toEqual(['own'])
+  })
+
+  test('opens on Alt+Down from the keyboard, which a plain arrow does not', async () => {
+    const { host, trigger } = await held_()
+    const key = (altKey: boolean) =>
+      trigger.dispatchEvent(
+        new KeyboardEvent('keydown', { altKey, bubbles: true, cancelable: true, key: 'ArrowDown' }),
+      )
+    key(false)
+    await host.updateComplete
+    expect(host.open).toBe(false)
+    key(true)
+    await host.updateComplete
+    expect(host.open).toBe(true)
+  })
+
+  test('describes a plain trigger once a reader reaches it, by the host and its words', async () => {
+    const { host, trigger } = await held_()
+    let described: Element[] | null = null
+    Object.defineProperty(trigger, 'ariaDescribedByElements', {
+      configurable: true,
+      get: () => described,
+      set: (value: Element[] | null) => {
+        described = value
+      },
+    })
+    await host.updateComplete
+    expect(described).toBeNull()
+    trigger.dispatchEvent(new FocusEvent('focusin', { bubbles: true, composed: true }))
+    expect(described?.[0] === host).toBe(true)
+    expect((host as unknown as { internals: ElementInternals }).internals.ariaLabel).toContain(
+      'Alt+Down',
+    )
+  })
+})

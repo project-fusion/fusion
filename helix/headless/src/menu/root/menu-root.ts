@@ -5,9 +5,11 @@ import {
   DrilldownController,
   deepActiveElement,
   deepContains,
+  focusTarget,
   HelixElement,
   inlineStep,
   KeyboardNavigationController,
+  linkDescription,
   MixinCollection,
   MixinControllerOpen,
   type Placement,
@@ -16,12 +18,14 @@ import {
   slottedWords,
   tellDisclosure,
   typeaheadBy,
+  unlinkDescription,
   words,
 } from '@fusion.dev/helix-core'
 import { caretLeft } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
+import { LongPress } from '../../speed-dial/long-press.js'
 import type { HelixHeadlessMenuItem } from '../item/menu-item.js'
 import type { HelixHeadlessMenuSection } from '../section/menu-section.js'
 
@@ -74,7 +78,14 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
  * right-click, a long press, Shift+F10 or the menu key over the area opens it
  * at the pointer, or at the area's corner from the keyboard, as Radix's context
  * menu does. A press on the area does not open it, and closing it returns focus
- * to where it was.
+ * to where it was. A touch or a pen held still on the area opens it too, on
+ * every browser, since iOS sends no `contextmenu` for one.
+ *
+ * **A trigger with its own action.** With `open-on="long-press"`, a press on
+ * the trigger is the trigger's own, and a press held for half a second opens
+ * the menu, as React Aria's `trigger="longPress"` does. Alt+Down or Alt+Up
+ * opens it from the keyboard, and the trigger is described by
+ * `long-press-label`, which says so.
  *
  * @since 0.1.0
  * @status stable
@@ -128,6 +139,49 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
    */
   @property({ reflect: true, type: Boolean })
   context = false
+
+  /**
+   * The description a trigger gives under `open-on="long-press"`, saying how
+   * to open the menu. Translate it with the rest of your interface.
+   */
+  @words
+  @property({ attribute: 'long-press-label' })
+  longPressLabel = 'Long press or press Alt+Down to show the menu'
+
+  /**
+   * What opens the menu from its trigger. `long-press` leaves a press to the
+   * trigger's own action and opens the menu on a press held for half a second,
+   * or on Alt+Down or Alt+Up.
+   */
+  @property({ attribute: 'open-on' })
+  openOn: 'click' | 'long-press' = 'click'
+
+  /** Whether the trigger opens the menu only on a held press. */
+  private get pressHeld(): boolean {
+    return !this.context && this.openOn === 'long-press'
+  }
+
+  /**
+   * Watches the trigger for a held press: under `open-on="long-press"`, and
+   * for a touch or a pen on a context menu's area.
+   */
+  private readonly longPress = new LongPress(this, {
+    onLongPress: () => {
+      if (this.context) {
+        const at = this.heldAt
+        if (at) {
+          this.openContextAt(at)
+        }
+        return
+      }
+      if (!this.open) {
+        this.show()
+      }
+    },
+  })
+
+  /** Where a held press on a context menu's area is, to open the menu there. */
+  private heldAt: { x: number; y: number } | undefined
 
   /**
    * Accessible name for the surface.
@@ -316,9 +370,19 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
       return
     }
     event.preventDefault()
+    /* The browser's own menu, after a touch held long enough for the area's
+       own long press to have opened this one already. */
+    if (this.open && this.longPress.takeClick()) {
+      return
+    }
     const box = this.trigger.getBoundingClientRect()
     const keyed = event.clientX === 0 && event.clientY === 0
-    this.point = keyed ? { x: box.left, y: box.top } : { x: event.clientX, y: event.clientY }
+    this.openContextAt(keyed ? { x: box.left, y: box.top } : { x: event.clientX, y: event.clientY })
+  }
+
+  /** Opens a context menu at a point in the viewport, or moves an open one there. */
+  private openContextAt(point: { x: number; y: number }): void {
+    this.point = point
     if (this.open) {
       this.requestUpdate()
       this.updateComplete.then(() => this.panel.reposition())
@@ -444,12 +508,20 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
    * while the menu is closed, so a dialog around the menu still closes on it.
    */
   private handleClosedKeydown(event: KeyboardEvent): void {
+    /* Shift+F10 on a context menu's area, bound here as well as left to the
+       browser's `contextmenu`, which not every platform sends for it. */
+    if (this.context && event.shiftKey && event.key === 'F10' && this.fromTrigger(event)) {
+      event.preventDefault()
+      const box = this.trigger.getBoundingClientRect()
+      this.openContextAt({ x: box.left, y: box.top })
+      return
+    }
     if (this.context || (event.key !== 'ArrowDown' && event.key !== 'ArrowUp')) {
       return
     }
-    const slot = this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]')
-    const triggers = slot?.assignedElements({ flatten: true }) ?? []
-    if (!event.composedPath().some((node) => triggers.includes(node as Element))) {
+    /* Under a held press, Alt with an arrow, since the arrows alone are the
+       page's to scroll with on a trigger whose press is its own. */
+    if (this.pressHeld !== event.altKey || !this.fromTrigger(event)) {
       return
     }
     event.preventDefault()
@@ -462,8 +534,84 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     }
     if (this.open) {
       this.hide()
-    } else {
+    } else if (!this.pressHeld) {
       this.show()
+    }
+  }
+
+  /** Whether an event came from the slotted trigger, or the area of a context menu. */
+  private fromTrigger(event: Event): boolean {
+    const slot = this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]')
+    const triggers = slot?.assignedElements({ flatten: true }) ?? []
+    return event.composedPath().some((node) => triggers.includes(node as Element))
+  }
+
+  /**
+   * A press on the trigger starting: the start of a held one under
+   * `open-on="long-press"`, or a touch or a pen held on a context menu's area.
+   */
+  private readonly handlePointerDown = (event: PointerEvent): void => {
+    if (this.open || !this.fromTrigger(event)) {
+      return
+    }
+    if (this.pressHeld || (this.context && event.pointerType !== 'mouse')) {
+      this.heldAt = { x: event.clientX, y: event.clientY }
+      this.longPress.down(event)
+    }
+  }
+
+  private readonly handlePointerMove = (event: PointerEvent): void => {
+    this.longPress.move(event)
+  }
+
+  private readonly handlePointerUp = (): void => {
+    this.longPress.up()
+  }
+
+  private readonly handlePointerCancel = (): void => {
+    this.longPress.cancel()
+  }
+
+  /**
+   * Takes the click a held press ends in, ahead of the trigger's own
+   * listeners, so a press that opened the menu does not also do the trigger's
+   * action. In capture, on the host, which is above a slotted trigger.
+   */
+  private readonly handleHeldClick = (event: MouseEvent): void => {
+    if (this.pressHeld && this.longPress.takeClick()) {
+      event.stopImmediatePropagation()
+      event.preventDefault()
+    }
+  }
+
+  /** The control the menu has described, so the description can be taken back. */
+  private described: Element | undefined
+
+  /**
+   * Describes the trigger by `long-press-label` under `open-on="long-press"`,
+   * or takes it back, by the host, which carries the words as its label, as
+   * `SpeedDial` does. On the consumer's own element only once a reader has
+   * reached it, which is after hydration.
+   */
+  private describeTrigger(light = false): void {
+    const slot = this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]')
+    const trigger = slot?.assignedElements({ flatten: true })[0]
+    const control =
+      this.pressHeld && trigger instanceof HTMLElement ? focusTarget(trigger) : undefined
+    if (this.described && this.described !== control) {
+      unlinkDescription(this.described, this)
+      this.described = undefined
+    }
+    if (control && control !== this.described && linkDescription(control, this, light)) {
+      this.described = control
+    }
+    this.internals.ariaLabel = this.described ? this.longPressLabel : null
+  }
+
+  /** A reader reaching the trigger, which is late enough to describe a plain one. */
+  private readonly handleTriggerFocusIn = (event: FocusEvent): void => {
+    if (this.pressHeld && this.fromTrigger(event)) {
+      this.describeTrigger(true)
     }
   }
 
@@ -478,6 +626,12 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     this.addEventListener('keydown', this.handleKeydown)
     this.addEventListener('focusin', this.handleFocusIn)
     this.addEventListener('contextmenu', this.handleContextMenu)
+    this.addEventListener('pointerdown', this.handlePointerDown)
+    this.addEventListener('pointermove', this.handlePointerMove)
+    this.addEventListener('pointerup', this.handlePointerUp)
+    this.addEventListener('pointercancel', this.handlePointerCancel)
+    this.addEventListener('click', this.handleHeldClick, true)
+    this.addEventListener('focusin', this.handleTriggerFocusIn)
   }
 
   override disconnectedCallback(): void {
@@ -486,6 +640,16 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     this.removeEventListener('keydown', this.handleKeydown)
     this.removeEventListener('focusin', this.handleFocusIn)
     this.removeEventListener('contextmenu', this.handleContextMenu)
+    this.removeEventListener('pointerdown', this.handlePointerDown)
+    this.removeEventListener('pointermove', this.handlePointerMove)
+    this.removeEventListener('pointerup', this.handlePointerUp)
+    this.removeEventListener('pointercancel', this.handlePointerCancel)
+    this.removeEventListener('click', this.handleHeldClick, true)
+    this.removeEventListener('focusin', this.handleTriggerFocusIn)
+    if (this.described) {
+      unlinkDescription(this.described, this)
+      this.described = undefined
+    }
   }
 
   protected override updated(changed: PropertyValues): void {
@@ -494,6 +658,9 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     // An area a context menu opens over is no button and is told nothing.
     if (!this.context) {
       this.tellTrigger()
+    }
+    if (changed.has('openOn') || changed.has('context') || this.described) {
+      this.describeTrigger()
     }
     // Every item shows or hides itself: which page is open is this element's
     // business, and where an item belongs is the item's. Set as a property, so
