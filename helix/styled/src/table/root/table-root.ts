@@ -21,10 +21,17 @@ import '../../checkbox/index.js'
  * @slot - The table's rows.
  * @slot heading - Words that name the table, shown above it in the weight of a heading.
  *
+ * @csspart drag-preview - A copy of the row a pointer drags by its grip, which follows the pointer in the top layer until the row is let go, in a `reorderable` table. Hidden from assistive technology.
  * @csspart live - A live region that repeats the empty and loading text, and says each step of a move, so screen readers announce it when it changes. Visually hidden in the styled tier.
  * @csspart table - The grid.
  *
  * @cssproperty --table-columns - Track list for the columns. It overrides the track list worked out from the columns.
+ * @cssproperty --table-drag-preview-background-color - The fill behind the copy of a row a pointer drags.
+ * @cssproperty --table-drag-preview-border-color - The color of the edge around the copy of a row a pointer drags.
+ * @cssproperty --table-drag-preview-border-width - The width of the edge around the copy of a row a pointer drags. None by default, where the shadow lifts it.
+ * @cssproperty --table-drag-preview-opacity - The opacity of the copy of a row a pointer drags.
+ * @cssproperty --table-drag-preview-radius - The corner radius of the copy of a row a pointer drags.
+ * @cssproperty --table-drag-preview-shadow - The shadow that raises the copy of a row a pointer drags over the page.
  * @cssproperty --table-title-color - The color of the words in the `heading` slot.
  * @cssproperty --table-title-gap - The space between the `heading` slot and the grid.
  * @cssproperty --table-title-text - The font size of the words in the `heading` slot.
