@@ -42,7 +42,7 @@
     "@fusion.dev/helix-testing": "workspace:*",
     "lit": "^3.2.1",
     "pixelmatch": "^7.2.0",
-    "playwright": "^1.62.1",
+    "playwright": "^1.63.0",
     "pngjs": "^7.0.0"
   }
 }
