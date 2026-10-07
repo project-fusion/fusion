@@ -828,12 +828,13 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
   /**
    * Each date, where `mode` holds several, sent one entry each.
    *
-   * One date that is text and no date, such as `August 5`, is sent as an empty
-   * entry, as a native date field sends a date it cannot read.
+   * Text that is no date, such as `August 5`, is sent as one empty entry, as
+   * a native date field sends a date it cannot read, in every mode.
    */
   protected override get answers(): readonly string[] | undefined {
     if (this.mode !== undefined) {
-      return dates(this.value)
+      const held = dates(this.value)
+      return held.every(isDateValue) ? held : ['']
     }
     const text = this.value.trim()
     return text === '' || isDateValue(text) ? undefined : ['']

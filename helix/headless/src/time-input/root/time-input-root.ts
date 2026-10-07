@@ -11,6 +11,7 @@ import {
   HelixFormElement,
   type HourCycle,
   handedLocale,
+  hostWords,
   isClockValue,
   MixinControllerOpen,
   MixinControllerValue,
@@ -20,6 +21,7 @@ import {
   MixinSegmentedField,
   MixinTokens,
   readWrittenTime,
+  slottedWords,
   timeFault,
   words,
   wordsLocale,
@@ -594,12 +596,14 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
   /**
    * Each time, where `mode` holds several, sent one entry each.
    *
-   * One time that is text and no time, such as `2:45 P`, is sent as an empty
-   * entry, as a native time field sends a time it cannot read.
+   * Text that is no time, such as `2:45 P`, is sent as one empty entry, as a
+   * native time field sends a time it cannot read. Measured before this: a
+   * range written `09:00/10:30` was invalid and submitted the text.
    */
   protected override get answers(): readonly string[] | undefined {
     if (this.mode !== undefined) {
-      return this.held
+      const held = this.held
+      return held.every((one) => this.isTime(one)) ? held : ['']
     }
     const text = this.value.trim()
     return text === '' || this.isTime(text) ? undefined : ['']
@@ -716,7 +720,7 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
       variant=${this.variant ?? nothing}
       disable-times=${this.disableTimes || nothing}
       manual
-      label=${this.label || 'Time'}
+      label=${hostWords(this, slottedWords(this, ['label']) || this.label) || 'Time'}
       hour-cycle=${this.hourCycle ?? nothing}
       locale=${handedLocale(this) || nothing}
       max=${this.max}
