@@ -253,6 +253,11 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  * - What a key changes that a reader cannot see is said: where a card moved
  *   to, its new size, how many cards are selected, and the zoom. A selected
  *   card or connection says so when a reader arrives on it.
+ * - Control or Command with C copies the selected cards, and the connections
+ *   between them, as a JSON Canvas document in text, which another board or
+ *   an app that reads the format takes. A paste is your page's: listen for
+ *   `paste` on the board, read the text with `fromJsonCanvas`, and add the
+ *   cards it holds.
  * - Control or Command with Z undoes the last move or resize the board made,
  *   and with Shift, or Control with Y, makes it again. `undo()` and `redo()`
  *   do the same from a script. Each asks with `helix-before-move` and tells
@@ -393,6 +398,11 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   @words
   @property({ attribute: 'connected-label' })
   connectedLabel = 'Asked to connect {from} to {to}.'
+
+  /** What screen readers hear after a copy, with `{count}` for the cards copied. */
+  @words
+  @property({ attribute: 'copied-label' })
+  copiedLabel = '{count, plural, one {# card copied} other {# cards copied}}'
 
   /**
    * The text announced when a connection is started, with `{from}` filled in.
@@ -1899,6 +1909,33 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     this.dispatchEvent(new HelixMoveEvent(entry[side]))
     this.say(words)
     return true
+  }
+
+  /**
+   * A copy on the board with cards selected writes them, and the connections
+   * between them, as a JSON Canvas document in text. Not from a field a card
+   * holds, nor over text a reader selected, which are the platform's to copy.
+   */
+  private readonly handleCopy = (event: ClipboardEvent): void => {
+    const origin = event.composedPath()[0] as Element | undefined
+    const text = globalThis.getSelection?.()?.toString() ?? ''
+    if (this.picked.length === 0 || !event.clipboardData || text !== '') {
+      return
+    }
+    if (origin?.closest?.(INTERACTIVE)) {
+      return
+    }
+    const picked = new Set(this.picked)
+    const whole = this.toJsonCanvas()
+    const copy: CanvasDocument = {
+      edges: (whole.edges ?? []).filter(
+        (edge) => picked.has(edge.fromNode) && picked.has(edge.toNode),
+      ),
+      nodes: (whole.nodes ?? []).filter((node) => picked.has(node.id)),
+    }
+    event.clipboardData.setData('text/plain', JSON.stringify(copy))
+    event.preventDefault()
+    this.say(formatWords(this, 'copiedLabel', { count: copy.nodes?.length ?? 0 }))
   }
 
   /**
@@ -3690,6 +3727,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     this.addEventListener('focusout', this.handleFocusOut)
     this.addEventListener('keydown', this.handleStopKeydown)
     this.addEventListener('keydown', this.handleHistoryKey)
+    this.addEventListener('copy', this.handleCopy)
     this.addEventListener('pointercancel', this.handlePointerUp)
     this.addEventListener('pointerdown', this.handlePointerDown)
     this.addEventListener('pointermove', this.handlePointerMove)
@@ -3714,6 +3752,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     this.removeEventListener('focusout', this.handleFocusOut)
     this.removeEventListener('keydown', this.handleStopKeydown)
     this.removeEventListener('keydown', this.handleHistoryKey)
+    this.removeEventListener('copy', this.handleCopy)
     this.removeEventListener('pointercancel', this.handlePointerUp)
     this.removeEventListener('pointerdown', this.handlePointerDown)
     this.removeEventListener('pointermove', this.handlePointerMove)
