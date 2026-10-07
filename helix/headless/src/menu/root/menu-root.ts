@@ -5,13 +5,16 @@ import {
   DrilldownController,
   deepActiveElement,
   deepContains,
+  filterKeeps,
   focusTarget,
   HelixElement,
+  HelixFilterEvent,
   inlineStep,
   KeyboardNavigationController,
   linkDescription,
   MixinCollection,
   MixinControllerOpen,
+  markMatches,
   onUnlessFalse,
   type Placement,
   PopoverController,
@@ -125,6 +128,21 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
  * opens it from the keyboard, and the trigger is described by
  * `long-press-label`, which says so.
  *
+ * **A filter field.** With `filterable`, the menu opens with focus in a field
+ * above its rows, and typing narrows the rows of the page the keys move in,
+ * as React Aria's `Autocomplete` around a `Menu` does. A row is kept where its
+ * words hold the filter, in any case, or where `filterMatch` says so. Each
+ * page starts unfiltered, and the filter is cleared as the menu closes. Where
+ * typing keeps no row, the menu shows `no-results-text`. Focus stays in the
+ * field: Up and Down Arrow move the highlight through the rows that are left,
+ * Enter chooses the highlighted row, Right Arrow opens its submenu, Left Arrow
+ * on a submenu goes back, and Escape clears the filter and then closes the
+ * menu. Home, End and the other keys move the caret and type. The field names
+ * the highlighted row with `aria-activedescendant`, and the rows are a `menu`
+ * after the field, `part="items"`. Cancel `helix-filter` to keep every row
+ * showing and narrow the rows yourself, such as by replacing them with rows
+ * from a server.
+ *
  * @since 0.1.0
  * @status stable
  * @category overlays
@@ -132,10 +150,12 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
  * @documentation https://fusion.dev/helix/components/menu
  *
  * @slot - The items.
+ * @slot no-results - What the menu shows when the filter keeps no rows, for content richer than `no-results-text`.
  * @slot trigger - The control that opens the menu, or with `context` the area a context menu opens over.
  *
  * @event {HelixBeforeCloseEvent} helix-before-close - The menu is about to close. Cancelable: cancel it to keep it open.
  * @event {HelixBeforeOpenEvent} helix-before-open - The menu is about to open. Cancelable: cancel it to keep it closed.
+ * @event {HelixFilterEvent} helix-filter - The text in the filter field changed, with the new text in `detail.value`. Cancelable: cancel it to keep every row showing and narrow the rows yourself.
  * @event {HelixSelectEvent} helix-select - An item was chosen. Cancelable: cancel it to keep the menu open.
  * @event {ToggleEvent} toggle - The menu opened or closed. The event carries `newState` and `oldState`.
  *
@@ -143,9 +163,11 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
  * @csspart back-mark - The glyph on the back control of a submenu.
  * @csspart empty - The text shown when the menu has no items.
  * @csspart header - The bar above a submenu, holding the way back and its name.
+ * @csspart items - With `filterable`, the `menu` that holds the rows, after the filter field.
  * @csspart live - A live region that repeats the empty and loading text, so screen readers announce it when it changes. Visually hidden in the styled tier.
  * @csspart loading - The text shown while the items are loading.
- * @csspart surface - The floating panel the menu is drawn on.
+ * @csspart search-field - With `filterable`, the field that narrows the rows.
+ * @csspart surface - The floating panel the menu is drawn on. It is the `menu` itself, and with `filterable` it holds the filter field and `items`.
  * @csspart title - The name of the submenu that is showing.
  *
  * @cssproperty --floating-anchor-inline-size - The trigger's width, written on the panel while it is open, as in `min-inline-size: var(--floating-anchor-inline-size)`. Read it; a value set here is written over.
@@ -191,6 +213,40 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
    */
   @property({ reflect: true, type: Boolean })
   context = false
+
+  /**
+   * The text the rows are filtered by, which the filter field holds.
+   *
+   * Cleared as the menu closes and as a submenu opens or closes, so each page
+   * starts with every row showing.
+   */
+  @property()
+  filter = ''
+
+  /**
+   * Whether the menu shows a field above its rows that narrows them as the
+   * reader types, with focus staying in the field.
+   */
+  @property({ type: Boolean })
+  filterable = false
+
+  /**
+   * The filter field's name and placeholder.
+   */
+  @words
+  @property({ attribute: 'filter-label' })
+  filterLabel = 'Filter'
+
+  /**
+   * Whether a row is kept by the filter: a function given the row's words and
+   * the filter, trimmed, that returns `true` to keep it showing, as React
+   * Aria's `Autocomplete` takes `filter`. See Listbox's `filterMatch`.
+   *
+   * Absent, a row is kept where its words hold the filter, in any case. A
+   * property only, there being no way to write a function in markup.
+   */
+  @property({ attribute: false })
+  filterMatch?: ((text: string, filter: string) => boolean) | undefined
 
   /**
    * Accessible name for the surface.
@@ -269,6 +325,13 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
   @words
   @property({ attribute: 'long-press-label' })
   longPressLabel = 'Long press or press Alt+Down to show the menu'
+
+  /**
+   * The text shown when the filter keeps no rows.
+   */
+  @words
+  @property({ attribute: 'no-results-text' })
+  noResultsText = 'No matches'
 
   /**
    * Space between the trigger and the surface, in pixels.
@@ -374,7 +437,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
   /** Carries a host `aria-label` and `aria-labelledby` to the surface. */
   protected readonly aria = new AriaForwardController(this, {
     label: true,
-    target: () => this.partNamed('surface'),
+    target: () => this.menuBox,
   })
 
   /** Where a context menu was asked for, in the viewport, while it is open. */
@@ -465,7 +528,93 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
      * every disabled item in the menu. `Drilldown` filters for the same
      * reason. */
     const rows = this.flies ? this.rowsOf(this.keyPage) : this.drilldown.rows
-    return rows.filter((row) => !row.disabled)
+    return rows.filter((row) => !row.disabled && this.kept(row))
+  }
+
+  /** The element that is the `menu`: the surface, or with `filterable` the box after the field. */
+  private get menuBox(): HTMLElement | null {
+    return this.partNamed(this.filterable ? 'items' : 'surface')
+  }
+
+  /** The filter field, with `filterable`. */
+  private get field(): HTMLInputElement | null {
+    return this.partNamed<HTMLInputElement>('search-field')
+  }
+
+  /** The submenu the filter narrows, or null for the top page. */
+  private filterPage: HelixHeadlessMenuItem | null = null
+
+  /** The filter a listener refused, which narrows nothing. */
+  private refused: string | undefined
+
+  /** Whether the filter is narrowing the rows. */
+  private get filtering(): boolean {
+    return this.filterable && this.filter.trim() !== '' && this.filter !== this.refused
+  }
+
+  /** Whether the filter keeps a row: one of another page, or one whose words it matches. */
+  private kept(row: HelixHeadlessMenuItem): boolean {
+    return (
+      !this.filtering ||
+      this.holderOf(row) !== this.filterPage ||
+      filterKeeps(slottedWords(row, ['']), this.filter.trim(), this.filterMatch)
+    )
+  }
+
+  /**
+   * Asks to filter by new text, which the field and `filter` then hold. A
+   * refusal keeps every row showing, for a page that narrows them itself.
+   */
+  private requestFilter(value: string): void {
+    if (value === this.filter) {
+      return
+    }
+    this.filterPage = this.flies ? this.keyPage : this.drilldown.page
+    this.refused = this.dispatchEvent(new HelixFilterEvent({ value })) ? undefined : value
+    this.filter = value
+  }
+
+  private readonly handleFilterInput = (event: Event): void => {
+    // Stopped for the reason `Input.handleInput` gives: the inner control's own
+    // `input` is composed and would reach a consumer beside this element's.
+    event.stopPropagation()
+    this.filterBy((event.target as HTMLInputElement).value)
+  }
+
+  /** Filters by what the reader typed, and highlights the first row kept. */
+  private filterBy(value: string): void {
+    this.requestFilter(value)
+    void this.updateComplete.then(() => this.reach(this.items[0]))
+  }
+
+  /** The row the keys reached while focus stays in the filter field. */
+  private highlighted: HelixHeadlessMenuItem | undefined
+
+  /**
+   * Moves the reader to a row: focus, or with `filterable` the highlight,
+   * which the field names with `aria-activedescendant`. An element reference,
+   * because the field is in this shadow root and the row in the tree around
+   * it, the one direction a reference crosses.
+   */
+  private reach(row: HelixHeadlessMenuItem | undefined): void {
+    if (!this.filterable) {
+      row?.focus()
+      return
+    }
+    if (this.highlighted && this.highlighted !== row) {
+      this.highlighted.highlighted = false
+    }
+    this.highlighted = row
+    const field = this.field as
+      | (HTMLInputElement & { ariaActiveDescendantElement?: Element | null })
+      | null
+    if (field && 'ariaActiveDescendantElement' in field) {
+      field.ariaActiveDescendantElement = row ?? null
+    }
+    if (row) {
+      row.highlighted = true
+      this.revealRow(row)
+    }
   }
 
   /** Opens the menu. */
@@ -481,7 +630,8 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     this.updateComplete.then(() => {
       // Raised in `updated()`, which the state change has just scheduled.
       const items = this.items
-      ;(end === 'first' ? items[0] : items[items.length - 1])?.focus()
+      this.field?.focus()
+      this.reach(end === 'first' ? items[0] : items[items.length - 1])
     })
   }
 
@@ -493,6 +643,8 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     this.panel.hide()
     this.drilldown.reset()
     this.stopHover()
+    this.requestFilter('')
+    this.reach(undefined)
     /* Only where the menu still had it. A dismissal that did not take focus with
        it, a press somewhere else on the page, should leave focus where the
        reader put it rather than yanking it back to the trigger. `Popover`
@@ -551,21 +703,23 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     if (!this.drilldown.enter(item)) {
       return
     }
+    this.requestFilter('')
     void this.updateComplete.then(async () => {
       if (!this.flies) {
-        this.items[0]?.focusItem()
+        this.reach(this.items[0])
         return
       }
       /* The submenu's first row, once its panel and the row have drawn. */
       await item.updateComplete
       const first = this.rowsOf(item).find((row) => !row.disabled)
       await first?.updateComplete
-      first?.focusItem()
+      this.reach(first)
     })
   }
 
   /** Returns to the page above, or closes when there is none. */
   private leave(): void {
+    this.requestFilter('')
     if (this.flies) {
       const holder = this.keyPage
       if (!holder) {
@@ -573,7 +727,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
         return
       }
       this.openPage(this.holderOf(holder))
-      this.updateComplete.then(() => holder.focus())
+      this.updateComplete.then(() => this.reach(holder))
       return
     }
     if (this.drilldown.atRoot) {
@@ -586,7 +740,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
        read. */
     const leaving = this.drilldown.page
     this.drilldown.back()
-    this.updateComplete.then(() => leaving?.focus())
+    this.updateComplete.then(() => this.reach(leaving ?? undefined))
   }
 
   private readonly handleSelect = (event: Event): void => {
@@ -631,9 +785,13 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
    */
   private readonly handleFocusIn = (event: FocusEvent): void => {
     const item = this.items.find((row) => row.contains(event.target as Node))
-    if (!item) {
-      return
+    if (item) {
+      this.revealRow(item)
     }
+  }
+
+  /** Scrolls the panel that holds a row to show it. */
+  private revealRow(item: HelixHeadlessMenuItem): void {
     /* `surface`, which is the part this template renders and the name the
        whole library spells this box with.
 
@@ -658,10 +816,25 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     /* In is where a submenu's caret points and out is back along the line, so
        on a right-to-left page the left arrow opens and the right comes back. */
     const along = inlineStep(this, event.key)
+    /* From the filter field, which keeps focus while the highlight moves. */
+    const typing = this.filterable && event.composedPath()[0] === this.field
+    const step = event.key === 'ArrowDown' ? 1 : event.key === 'ArrowUp' ? -1 : 0
 
     if (event.key === 'Escape') {
       event.stopPropagation()
-      this.leave()
+      /* One press empties the filter, and the next goes back or closes. */
+      if (!this.filterable || this.filter === '') {
+        this.leave()
+      } else {
+        this.filterBy('')
+      }
+    } else if (typing && step !== 0) {
+      const count = items.length
+      this.reach(items[at < 0 ? (step > 0 ? 0 : count - 1) : (at + step + count) % count])
+    } else if (typing && event.key === 'Enter') {
+      /* A press on the row, which chooses it, opens its submenu, or follows
+         its link, as a pointer's does. */
+      items[at]?.renderRoot.querySelector<HTMLElement>('[part="item"]')?.click()
     } else if (along === 1 && items[at]?.hasSubmenu) {
       this.enter(items[at] as HelixHeadlessMenuItem)
     } else if (along === -1) {
@@ -747,6 +920,21 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     }
   }
 
+  /**
+   * Keeps focus in the filter field through a press on a row or the way
+   * back, as React Aria's virtual focus does: the press still chooses.
+   */
+  private readonly handleMouseDown = (event: MouseEvent): void => {
+    if (
+      this.filterable &&
+      this.open &&
+      event.composedPath()[0] !== this.field &&
+      !this.fromTrigger(event)
+    ) {
+      event.preventDefault()
+    }
+  }
+
   private readonly handlePointerMove = (event: PointerEvent): void => {
     this.longPress.move(event)
   }
@@ -827,7 +1015,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
    * close. Not while the pointer is crossing toward an open submenu.
    */
   private readonly handleHover = (event: PointerEvent): void => {
-    if (!this.flies || !this.open || event.pointerType !== 'mouse') {
+    if (!(this.flies || this.filterable) || !this.open || event.pointerType !== 'mouse') {
       return
     }
     const row = event
@@ -839,7 +1027,10 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     this.hovered = row
     this.grace = undefined
     if (!row.disabled) {
-      row.focus()
+      this.reach(row)
+    }
+    if (!this.flies) {
+      return
     }
     clearTimeout(this.hoverTimer)
     this.hoverTimer = setTimeout(() => {
@@ -909,6 +1100,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     this.addEventListener('focusin', this.handleFocusIn)
     this.addEventListener('contextmenu', this.handleContextMenu)
     this.addEventListener('pointerdown', this.handlePointerDown)
+    this.addEventListener('mousedown', this.handleMouseDown)
     this.addEventListener('pointermove', this.handlePointerMove)
     this.addEventListener('pointerup', this.handlePointerUp)
     this.addEventListener('pointercancel', this.handlePointerCancel)
@@ -935,6 +1127,10 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     this.removeEventListener('focusin', this.handleFocusIn)
     this.removeEventListener('contextmenu', this.handleContextMenu)
     this.removeEventListener('pointerdown', this.handlePointerDown)
+    this.removeEventListener('mousedown', this.handleMouseDown)
+    if (this.filterable) {
+      markMatches(this, [], '')
+    }
     this.removeEventListener('pointermove', this.handlePointerMove)
     this.removeEventListener('pointerup', this.handlePointerUp)
     this.removeEventListener('pointercancel', this.handlePointerCancel)
@@ -964,7 +1160,10 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     const top = this.flies || this.drilldown.atRoot
     for (const child of this.children) {
       if (isSection(child)) {
-        child.onPage = top
+        /* A heading over rows the filter has all hidden goes with them. */
+        child.onPage =
+          top &&
+          (!this.filtering || [...child.children].some((row) => isItem(row) && this.kept(row)))
         for (const row of child.children) {
           if ((row as HelixHeadlessMenuItem).isMenuItem === true) {
             this.mark(row as HelixHeadlessMenuItem, top)
@@ -985,6 +1184,23 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     this.toggleState('drilled', !this.flies && !this.drilldown.atRoot)
     this.markColumns()
     this.nameSurface()
+    if (this.filterable) {
+      /* The words each row matched, marked as Listbox marks its options. */
+      markMatches(
+        this,
+        this.rowsOf(this.filterPage).filter((row) => this.kept(row)),
+        this.filtering ? this.filter.trim() : '',
+      )
+      /* A highlight the filter hid moves to the first row it keeps. */
+      const items = this.items
+      if (
+        changed.has('filter') &&
+        this.open &&
+        !items.includes(this.highlighted as HelixHeadlessMenuItem)
+      ) {
+        this.reach(items[0])
+      }
+    }
   }
 
   /**
@@ -996,7 +1212,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
    * `label` is a name of its own, so each of them clears this reference.
    */
   private nameSurface(): void {
-    const surface = this.partNamed('surface') as
+    const surface = this.menuBox as
       | (HTMLElement & { ariaLabelledByElements?: Element[] | null })
       | null
     if (!surface || !('ariaLabelledByElements' in surface)) {
@@ -1062,7 +1278,8 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
    */
   private mark(item: HelixHeadlessMenuItem, onPage: boolean): void {
     const page = this.drilldown.page
-    item.onPage = onPage
+    item.onPage = onPage && this.kept(item)
+    item.virtual = this.filterable
     const holds = page !== null && item.contains(page)
     item.flyout = this.flies
     item.expanded = this.flies && holds
@@ -1073,7 +1290,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
       for (const child of item.children) {
         const nested = child as HelixHeadlessMenuItem
         if (nested.isMenuItem === true && child.slot === 'submenu') {
-          this.mark(nested, onPage && holds)
+          this.mark(nested, item.onPage && holds)
         }
       }
       return
@@ -1098,6 +1315,45 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     /* The point a context menu opens against: a box of no size where the
        reader asked, fixed to the viewport. Drawn only while there is one. */
     const point = this.context && this.point
+    const filtering = this.filtering
+    /* What a filter that keeps no rows says, shown and announced. */
+    const none = filtering && !this.rowsOf(this.filterPage).some((row) => this.kept(row))
+    this.announced = none ? this.noResultsText : ''
+    const rows = html`${
+      // A header rather than a row in the list. The way back is not one of
+      // the things on this page, and putting it in the list means an arrow
+      // press lands on it as though it were. A `menuitem` all the same,
+      // since a menu holds menu items and nothing else: Left and Escape
+      // are its keys, and a press or a screen reader's cursor reaches it.
+      this.flies || this.drilldown.atRoot
+        ? nothing
+        : html`<div part="header">
+            <button
+              part="back"
+              type="button"
+              role="menuitem"
+              tabindex="-1"
+              aria-label=${this.backLabel}
+              @click=${() => this.leave()}
+            >
+              <svg part="back-mark" data-mirror fill="currentColor" viewBox=${caretLeft.viewBox} aria-hidden="true">
+                ${unsafeSVG(caretLeft.content)}
+              </svg>
+            </button>
+            <span part="title">${this.drilldown.label}</span>
+          </div>`
+    }
+      <slot @slotchange=${(event: Event) => this.countRows(event)}></slot>
+      ${
+        none
+          ? html`<p part="empty"><slot name="no-results">${this.noResultsText}</slot></p>`
+          : this.renderStatus(this.hasRows)
+      }`
+    /* With a filter, the field and then the `menu`: a menu holds menu items
+       and nothing else, so the field stands beside it, as React Aria's
+       `Autocomplete` puts its search field beside its menu. */
+    const busy = this.loading ? 'true' : nothing
+    const label = this.label || nothing
     return html`<slot name="trigger" @click=${this.handleTriggerClick}></slot>${
       point
         ? html`<span
@@ -1110,38 +1366,29 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
       <div
         part="surface"
         popover="manual"
-        role="menu"
-        aria-busy=${this.loading ? 'true' : nothing}
-        aria-label=${this.label || nothing}
+        role=${this.filterable ? nothing : 'menu'}
+        aria-busy=${this.filterable ? nothing : busy}
+        aria-label=${this.filterable ? nothing : label}
         data-drilled=${this.flies || this.drilldown.atRoot ? nothing : ''}
+        data-filtered=${filtering ? '' : nothing}
         ?hidden=${!this.open}
       >
         ${
-          // A header rather than a row in the list. The way back is not one of
-          // the things on this page, and putting it in the list means an arrow
-          // press lands on it as though it were. A `menuitem` all the same,
-          // since a menu holds menu items and nothing else: Left and Escape
-          // are its keys, and a press or a screen reader's cursor reaches it.
-          this.flies || this.drilldown.atRoot
-            ? nothing
-            : html`<div part="header">
-                <button
-                  part="back"
-                  type="button"
-                  role="menuitem"
-                  tabindex="-1"
-                  aria-label=${this.backLabel}
-                  @click=${() => this.leave()}
-                >
-                  <svg part="back-mark" data-mirror fill="currentColor" viewBox=${caretLeft.viewBox} aria-hidden="true">
-                    ${unsafeSVG(caretLeft.content)}
-                  </svg>
-                </button>
-                <span part="title">${this.drilldown.label}</span>
-              </div>`
+          this.filterable
+            ? html`<input
+                  part="search-field"
+                  type="text"
+                  autocomplete="off"
+                  spellcheck="false"
+                  .value=${this.filter}
+                  placeholder=${this.filterLabel}
+                  aria-label=${this.filterLabel}
+                  aria-autocomplete="list"
+                  aria-controls="items"
+                  @input=${this.handleFilterInput}
+                /><div part="items" id="items" role="menu" aria-busy=${busy} aria-label=${label}>${rows}</div>`
+            : rows
         }
-        <slot @slotchange=${(event: Event) => this.countRows(event)}></slot>
-        ${this.renderStatus(this.hasRows)}
       </div>${this.renderLive(this.hasRows)}`
   }
 }

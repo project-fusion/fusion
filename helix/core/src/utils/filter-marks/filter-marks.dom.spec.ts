@@ -92,3 +92,17 @@ describe('marking matches', () => {
     expect(registry.size).toBe(0)
   })
 })
+
+describe('whether a filter keeps an item', () => {
+  test('words that hold the filter, in any case, and every item for an empty filter', () => {
+    expect(marks.filterKeeps('Rename file', 'NAME')).toBe(true)
+    expect(marks.filterKeeps('Rename file', 'copy')).toBe(false)
+    expect(marks.filterKeeps('Rename file', '')).toBe(true)
+  })
+
+  test('the answer a page gives, where it gives a match', () => {
+    const starts = (text: string, filter: string) => text.startsWith(filter)
+    expect(marks.filterKeeps('Rename file', 'file', starts)).toBe(false)
+    expect(marks.filterKeeps('Rename file', 'Ren', starts)).toBe(true)
+  })
+})

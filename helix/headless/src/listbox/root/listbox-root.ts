@@ -11,6 +11,7 @@ import {
   DisabledCascadeController,
   drawAutofill,
   endInSight,
+  filterKeeps,
   formatWords,
   HelixFilterEvent,
   HelixFormElement,
@@ -1048,12 +1049,9 @@ export class HelixHeadlessListbox extends MixinCollection(
     this.forgetRemoved()
     const typed = this.filter.trim()
     const needle = typed.toLowerCase()
-    const match = this.filterMatch
     const chosen = new Set(this.values)
     for (const option of this.entries) {
-      option.hidden =
-        needle !== '' &&
-        !(match ? match(option.text, typed) : option.text.toLowerCase().includes(needle))
+      option.hidden = !filterKeeps(option.text, typed, this.filterMatch)
       option.selected = chosen.has(option.value)
     }
 
