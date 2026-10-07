@@ -33,7 +33,9 @@ import '../../table/index.js'
  * @documentation https://fusion.dev/helix/components/data-table
  *
  * @slot - The columns, as `TableColumn` elements.
+ * @slot empty - Content shown when there are no rows to show and none are loading, such as a picture and a link. Falls back to `empty-text`, which the live region still says.
  * @slot footer - Content below the grid. It replaces the built-in pagination.
+ * @slot loading - Content shown while the rows load, such as a spinner. Falls back to `loading-text`, which the live region still says.
  * @slot toolbar - Content above the grid, such as a search field or actions.
  *
  * @csspart cell - One cell.

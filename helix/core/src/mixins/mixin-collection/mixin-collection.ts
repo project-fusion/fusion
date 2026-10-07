@@ -42,6 +42,12 @@ export declare class CollectionElement {
   /** News the component has for the live region while there are rows and nothing is loading. */
   protected announced: string
 
+  /**
+   * Whether the status line is an `empty` or `loading` slot, with the text as
+   * its fallback. A family that turns it on documents the two slots.
+   */
+  protected statusSlots: boolean
+
   /** Binds to a rows slot's `slotchange`, and answers `hasRows` from it. */
   protected countRows(event: Event): void
 
@@ -215,10 +221,15 @@ export const MixinCollection = <T extends Constructor<HelixElement>>(Base: T) =>
         return nothing
       }
       const text = this.loading ? this.loadingText : this.emptyText
+      /* The text is the slot's fallback, so markup a consumer slots replaces it
+         and both never show at once. */
+      const shown = this.statusSlots
+        ? html`<slot name=${this.loading ? 'loading' : 'empty'}>${text}</slot>`
+        : text
       /* **A table owns rows and nothing else.** A paragraph inside `role="table"`
          is a child the role does not allow, so in a table the line is a row
          with one cell, and the inline span inside it draws nothing of its own. */
-      const words = cell ? html`<span role=${cell}>${text}</span>` : text
+      const words = cell ? html`<span role=${cell}>${shown}</span>` : shown
       const row = cell ? 'row' : nothing
       return this.loading
         ? html`<p part="loading" role=${row}>${words}</p>`
@@ -257,6 +268,17 @@ export const MixinCollection = <T extends Constructor<HelixElement>>(Base: T) =>
      * something else already asked for a render.
      */
     protected announced = ''
+
+    /**
+     * Whether the status line is an `empty` or `loading` slot, with
+     * `empty-text` or `loading-text` as its fallback.
+     *
+     * **Off unless a family turns it on**, because a slot is published API:
+     * each family that renders one documents it in its own manifest. The live
+     * region keeps saying the text either way, because a slotted picture has no
+     * words to say.
+     */
+    protected statusSlots = false
   }
 
   return Collection as unknown as Constructor<CollectionElement> & T

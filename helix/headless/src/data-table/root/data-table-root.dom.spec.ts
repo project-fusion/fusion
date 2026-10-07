@@ -170,6 +170,30 @@ describe('the regions around the grid', () => {
   })
 })
 
+describe('the empty and loading lines', () => {
+  /* Text attributes only, so a picture, a link to add the first row, or a
+     spinner meant forking the table. */
+  test('take markup slotted for them, and fall back to their words', async () => {
+    const { element, remove } = await mount(
+      `<helix-headless-data-table label="Sizes" empty-text="No sizes yet">
+        <helix-headless-table-column field="name">Name</helix-headless-table-column>
+        <p slot="empty">No sizes yet. <a href="#new">Add a size</a></p>
+      </helix-headless-data-table>`,
+      [],
+    )
+    await settled(element)
+    const slot = part(element, 'empty')?.querySelector('slot[name="empty"]') as HTMLSlotElement
+    expect(slot.assignedElements()).toEqual([element.querySelector('[slot="empty"]') as Element])
+    expect(part(element, 'live')?.textContent?.trim()).toBe('No sizes yet')
+
+    ;(element as Table & { loading: boolean }).loading = true
+    await settled(element)
+    const loading = part(element, 'loading')?.querySelector('slot[name="loading"]')
+    expect(loading?.textContent?.trim()).toBe('Loading')
+    remove()
+  })
+})
+
 describe('the schema comes from the columns', () => {
   test('a cell per column per row, read by field', async () => {
     const { element, remove } = await mount(SCHEMA)

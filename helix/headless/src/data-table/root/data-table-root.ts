@@ -210,7 +210,9 @@ const isControl = (element: HTMLElement): boolean =>
  * @documentation https://fusion.dev/helix/components/data-table
  *
  * @slot - The columns, as `TableColumn` elements.
+ * @slot empty - Content shown when there are no rows to show and none are loading, such as a picture and a link. Falls back to `empty-text`, which the live region still says.
  * @slot footer - Content below the grid. It replaces the built-in pagination.
+ * @slot loading - Content shown while the rows load, such as a spinner. Falls back to `loading-text`, which the live region still says.
  * @slot toolbar - Content above the grid, such as a search field or actions.
  *
  * @event {HelixActivateEvent} helix-activate - Fired after the page changes, with the new page as a string in `detail.value`.
@@ -308,6 +310,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * `registerWords('de', { 'helix-data-table': { nextLabel: 'Nächste Seite' } })`.
    */
   static words = 'helix-data-table'
+
+  /** The empty and loading lines are the `empty` and `loading` slots. */
+  protected override statusSlots = true
 
   /**
    * The word for an ascending sort, in a `sorted-label` that writes `{order}`.
@@ -1894,7 +1899,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
-   * The columns into the header row, everything else into the toolbar and footer.
+   * The columns into the header row, everything else into the slot it names.
    *
    * Manual assignment, so a consumer's own markup is never written to.
    */
@@ -1927,6 +1932,8 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     for (const [name, wanted] of [
       ['toolbar', true],
       ['footer', true],
+      ['empty', true],
+      ['loading', true],
     ] as const) {
       const slot = root.querySelector<HTMLSlotElement>(`slot[name="${name}"]`)
       if (slot?.assign && wanted) {
