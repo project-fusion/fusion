@@ -385,7 +385,7 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
       domain,
       (value) => (y(value) / PLOT_HEIGHT) * 100,
       formatNumbers(wordsLocale(this)),
-      '--line-chart-axis',
+      (widest) => `--line-chart-axis: ${widest}ch`,
     )
   }
 

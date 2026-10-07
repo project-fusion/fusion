@@ -11,24 +11,25 @@ import { ticks } from '../scale/ticks.js'
  * with `inset-block-start`, as a percentage of the axis, so a stylesheet that
  * makes the axis as tall as the plot puts each number on its level.
  *
- * `width` names the custom property the widest number is written to, in `ch`:
- * the ticks are positioned absolutely and give the column no width of their
- * own, so a stylesheet sizes the column from it.
+ * `width` builds the axis's style from the number of characters in its widest
+ * number. The ticks are positioned absolutely and give the column no width of
+ * their own, so each family writes its own custom property there, such as
+ * `--line-chart-axis` in `ch`, and a stylesheet sizes the column from it.
  *
  * @param domain The scale's lowest and highest values.
  * @param place Where a value sits down the plot, from 0 at the top to 100 at the bottom.
  * @param format How a value is written, such as a number in the chart's locale.
- * @param width The custom property the column's width is written to.
+ * @param width The style the axis carries, from the number of characters in its widest number.
  */
 export const drawValueAxis = (
   domain: readonly [number, number],
   place: (value: number) => number,
   format: (value: number) => string,
-  width: string,
+  width: (widest: number) => string,
 ): TemplateResult => {
   const levels = ticks(domain)
   const widest = Math.max(1, ...levels.map((level) => format(level).length))
-  return html`<div aria-hidden="true" part="axis" style=${`${width}: ${widest}ch`}>
+  return html`<div aria-hidden="true" part="axis" style=${width(widest)}>
     ${levels.map(
       (level) =>
         html`<span part="tick" style=${`inset-block-start: ${place(level)}%`}>${format(level)}</span>`,

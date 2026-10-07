@@ -391,7 +391,7 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
       domain,
       (value) => (y(value) / PLOT_HEIGHT) * 100,
       this.share ? (value) => percent.format(value) : formatNumbers(locale),
-      '--area-chart-axis',
+      (widest) => `--area-chart-axis: ${widest}ch`,
     )
   }
 
