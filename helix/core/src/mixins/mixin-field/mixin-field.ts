@@ -377,7 +377,9 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
      *
      * So the moments are listened for instead, and both of them demonstrably
      * reach the host: `invalid` when a form is submitted with this control
-     * failing, and `change` when the reader has edited and committed. Focus
+     * failing, and `change` when the reader has edited and committed. The
+     * `invalid` a script's `checkValidity()` fires is not one of them, as it
+     * is not for a native control. Focus
      * alone is deliberately not one of them. Tabbing past an empty required
      * field should not be answered with an error.
      *
@@ -719,7 +721,14 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
       const touch = (): void => {
         this.touched = true
       }
-      this.addEventListener('invalid', touch)
+      /* Not for the `invalid` a script's `checkValidity()` fires, which
+         `HelixFormElement` flags: a check reports and shows nothing. Read
+         through a cast because the base this grafts onto is any element. */
+      this.addEventListener('invalid', () => {
+        if (!(this as unknown as { checkingValidity?: boolean }).checkingValidity) {
+          touch()
+        }
+      })
       this.addEventListener('change', touch)
       this.renderRoot.addEventListener('slotchange', this.noteSlotted)
       /* **Every field is asked whether it is named**, once it has rendered,

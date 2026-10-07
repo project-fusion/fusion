@@ -292,7 +292,11 @@ export class HelixHeadlessChatComposer extends HelixFormElement {
 
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
-    this.addEventListener('invalid', this.touch)
+    this.addEventListener('invalid', () => {
+      if (!this.checkingValidity) {
+        this.touch()
+      }
+    })
   }
 
   protected override willUpdate(changed: PropertyValues): void {

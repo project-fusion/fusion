@@ -7,9 +7,10 @@ import type { TemplateResult } from 'lit'
  * focus goes, and the fieldset that disabled it. Implicit submission is
  * `utils/implicit-submit`'s.
  *
- * **The test double's `checkValidity` always answers true**, so what is
- * asserted here is the verdict the control hands the platform, read back
- * through `validity` and `validationMessage`, which the double records.
+ * **The test double judges nothing itself**: its `checkValidity` answers from
+ * the flags it was handed, so what is asserted here is the verdict the control
+ * hands the platform, read back through `validity` and `validationMessage`,
+ * which the double records.
  */
 type Probe = HTMLElement & {
   checkValidity(): boolean

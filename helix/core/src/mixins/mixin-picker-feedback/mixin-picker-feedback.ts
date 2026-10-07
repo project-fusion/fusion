@@ -135,7 +135,11 @@ export const MixinPickerFeedback = <T extends Constructor<HelixFormElement>>(Bas
       const touch = (): void => {
         this.touched = true
       }
-      this.addEventListener('invalid', touch)
+      this.addEventListener('invalid', () => {
+        if (!this.checkingValidity) {
+          touch()
+        }
+      })
       this.addEventListener('change', touch)
     }
 
