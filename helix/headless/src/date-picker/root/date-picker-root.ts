@@ -15,7 +15,6 @@ import {
   hostAria,
   inlineStep,
   commaList as list,
-  localToday,
   MixinControllerValue,
   MixinPickerFeedback,
   monthOf,
@@ -25,6 +24,8 @@ import {
   reportValues,
   requestChange,
   sameMonth,
+  todayIn,
+  weekendOf,
   weekStartOf,
   words,
   wordsLocale,
@@ -104,6 +105,8 @@ const firstOf = (year: number, month: number): Date =>
  * @aliases Calendar, Date grid, Month view
  * @documentation https://fusion.dev/helix/components/date-picker
  *
+ * @slot footer - Content under the calendar, such as buttons for today or a common range.
+ * @slot header - Content above the calendar, such as a note on what the date is for.
  * @slot next-icon - The glyph on the control that moves forward a month, usually a caret.
  * @slot previous-icon - The glyph on the control that moves back a month, usually a caret.
  *
@@ -121,6 +124,7 @@ const firstOf = (year: number, month: number): Date =>
  * @csspart day-outside - A day from a neighboring month, filling the grid out, beside `day`.
  * @csspart day-selected - The chosen day, or either end of a chosen range, beside `day`.
  * @csspart day-today - Today, beside `day`.
+ * @csspart day-weekend - A day of the weekend where the calendar's language is spoken, beside `day`: Saturday and Sunday in `en-US`, Friday and Saturday in `ar-EG`.
  * @csspart feedback - The message under the calendar, while `feedback` is set.
  * @csspart grid - The grid of days.
  * @csspart header - The month name and its controls.
@@ -139,7 +143,7 @@ const firstOf = (year: number, month: number): Date =>
  * @csspart previous - The control that moves to the previous month.
  * @csspart previous-mark - The glyph on the previous month control, where none is slotted.
  * @csspart week - One row of days.
- * @csspart weekday - A column header naming a day of the week.
+ * @csspart weekday - A column header naming a day of the week. It shows the short name and says the full one.
  *
  * @cssproperty --date-picker-column-count - How many month columns are drawn, capped at two. `--date-picker-columns` overrides it.
  *
@@ -400,6 +404,11 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
     return list(this.value)
   }
 
+  /** The days of the weekend, `0` for Sunday: the locale's, or Saturday and Sunday where none is named. */
+  private get weekend(): number[] {
+    return handedLocale(this) === '' ? [0, 6] : weekendOf(this.language)
+  }
+
   /** The day the week starts on: `firstDayOfWeek`, or the locale's. */
   private get weekStart(): number {
     if (this.firstDayOfWeek !== undefined && Number.isFinite(this.firstDayOfWeek)) {
@@ -457,7 +466,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
     /* Today as the reader's calendar has it, not as UTC does: at 8 PM on
        October 31 in Los Angeles it is November in UTC, and a calendar with no
        value opened on a month with no today in it. */
-    const from = asDate(this.selected[0] ?? '') ?? asDate(localToday()) ?? new Date()
+    const from = asDate(this.selected[0] ?? '') ?? asDate(todayIn(this.timeZone)) ?? new Date()
     return firstOf(from.getUTCFullYear(), from.getUTCMonth())
   }
 
@@ -482,7 +491,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
     for (const candidate of [
       asDate(this.focused),
       asDate(this.selected[0] ?? ''),
-      asDate(localToday()),
+      asDate(todayIn(this.timeZone)),
     ]) {
       if (candidate && sameMonth(candidate, shown)) {
         return candidate
@@ -915,6 +924,18 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
   stepMismatchMessage = 'Choose one of the dates the calendar offers.'
 
   /**
+   * The time zone today is read in, such as `America/New_York`, as React
+   * Aria's `today(timeZone)` reads it. Empty is the reader's own.
+   *
+   * Dates are plain `YYYY-MM-DD` and carry no zone, so this moves only today:
+   * the day marked `aria-current` and `day-today`, and the month a picker
+   * with no value opens on. A desk in Tokyo booking for an office in New York
+   * sets `America/New_York`, and today is the office's.
+   */
+  @property({ attribute: 'time-zone' })
+  timeZone = ''
+
+  /**
    * The validation message for a date that `disable-dates` or `disable-days`
    * bars.
    */
@@ -1127,6 +1148,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
         monthName: Intl.DateTimeFormat
         monthYear: Intl.DateTimeFormat
         weekday: Intl.DateTimeFormat
+        weekdayName: Intl.DateTimeFormat
         year: Intl.DateTimeFormat
       }
     | undefined
@@ -1138,6 +1160,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
     monthName: Intl.DateTimeFormat
     monthYear: Intl.DateTimeFormat
     weekday: Intl.DateTimeFormat
+    weekdayName: Intl.DateTimeFormat
     year: Intl.DateTimeFormat
   } {
     const language = calendarLocale(this.language, this.calendar)
@@ -1155,6 +1178,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
       monthName: utc({ month: 'short' }),
       monthYear: utc({ month: 'short', year: 'numeric' }),
       weekday: utc({ weekday: 'short' }),
+      weekdayName: utc({ weekday: 'long' }),
       year: utc({ year: 'numeric' }),
     }
     this.cachedFormats = built
@@ -1191,7 +1215,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
   }
 
   private renderMonth(month: Date, index: number): TemplateResult {
-    const { full, heading: named, weekday } = this.formats
+    const { full, heading: named, weekday, weekdayName } = this.formats
     /* The month's name, which is the heading and the grid's name both. */
     const heading = named.format(month)
     const weeks = this.weeksOf(month)
@@ -1199,8 +1223,9 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
     /* Today, marked with `aria-current="date"` in the accessibility tree and as
        `day-today` on the day, so a consumer can add a mark from CSS. Computed
        once per month rather than per cell. */
-    const today = localToday()
+    const today = todayIn(this.timeZone)
     const range = this.range
+    const weekend = this.weekend
 
     // One set of controls across the whole run: back on the first month,
     // forward on the last. A pair per month would offer six ways to make the
@@ -1255,7 +1280,10 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
       >
         <div part="week" role="row">
           ${weeks[0]?.map(
-            (date) => html`<span part="weekday" role="columnheader">${weekday.format(date)}</span>`,
+            (date) =>
+              html`<span part="weekday" role="columnheader" aria-label=${weekdayName.format(date)}
+                >${weekday.format(date)}</span
+              >`,
           )}
         </div>
         ${weeks.map(
@@ -1300,10 +1328,11 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
                 data-range-middle=${middle ? '' : nothing}
                 data-range-start=${start ? '' : nothing}
                 data-today=${iso === today ? '' : nothing}
+                data-weekend=${weekend.includes(date.getUTCDay()) ? '' : nothing}
                 tabindex=${!outside && iso === anchor && !this.isDisabled ? '0' : '-1'}
                 @click=${outside ? nothing : () => this.select(date)}
                 ><span
-                  part="day${!outside && selected && !middle ? ' day-selected' : ''}${iso === today ? ' day-today' : ''}${outside ? ' day-outside' : ''}${disabled ? ' day-disabled' : ''}"
+                  part="day${!outside && selected && !middle ? ' day-selected' : ''}${iso === today ? ' day-today' : ''}${outside ? ' day-outside' : ''}${disabled ? ' day-disabled' : ''}${weekend.includes(date.getUTCDay()) ? ' day-weekend' : ''}"
                   >${this.renderDay(date, outside)}</span
                 ></span
               >`
@@ -1367,7 +1396,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
       min: this.min,
       page: this.periodYear,
       shown: this.shown,
-      today: localToday(),
+      today: todayIn(this.timeZone),
       view: years ? 'year' : 'month',
     }).map(({ at, chosen, current, first, out }) => {
       const words = years ? yearName.format(first) : monthName.format(first)
@@ -1416,10 +1445,9 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
 
   protected override render(): TemplateResult {
     if (this.view !== 'day') {
-      return html`<div part="months" style="--date-picker-column-count: 1">
-          ${this.renderPeriods()}
-        </div>
-        ${this.renderPickerFeedback()}`
+      return html`<slot name="header"></slot>
+        <div part="months" style="--date-picker-column-count: 1">${this.renderPeriods()}</div>
+        <slot name="footer"></slot>${this.renderPickerFeedback()}`
     }
     const shown = this.shown
     const count = this.monthCount
@@ -1428,11 +1456,15 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
        fraction: only this element knows how many months there are, and a
        stylesheet cannot count children into a `repeat()`. Capped at two, and a
        consumer wanting more sets `--date-picker-columns`. */
-    return html`<div part="months" style="--date-picker-column-count: ${Math.min(count, 2)}">
-      ${Array.from({ length: count }, (_, index) =>
-        this.renderMonth(addMonths(shown, index), index),
-      )}
-    </div>${this.renderPickerFeedback()}`
+    /* The header and footer slots are bare, so with nothing in them they draw
+       no box and the calendar lays out as it did. */
+    return html`<slot name="header"></slot>
+      <div part="months" style="--date-picker-column-count: ${Math.min(count, 2)}">
+        ${Array.from({ length: count }, (_, index) =>
+          this.renderMonth(addMonths(shown, index), index),
+        )}
+      </div>
+      <slot name="footer"></slot>${this.renderPickerFeedback()}`
   }
 
   /**

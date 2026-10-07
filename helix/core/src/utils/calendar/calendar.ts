@@ -28,6 +28,49 @@ export const localToday = (now = new Date()): string => {
 }
 
 /**
+ * Today in a time zone, such as `America/New_York`, as `YYYY-MM-DD`: the
+ * reader's own where `timeZone` is empty, as `localToday` reads it. A zone
+ * `Intl` does not know is read as the reader's own too.
+ */
+export const todayIn = (timeZone = '', now = new Date()): string => {
+  if (timeZone === '') {
+    return localToday(now)
+  }
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      day: '2-digit',
+      month: '2-digit',
+      timeZone,
+      year: 'numeric',
+    }).formatToParts(now)
+    const part = (type: string): string => parts.find((one) => one.type === type)?.value ?? ''
+    return `${part('year').padStart(4, '0')}-${part('month')}-${part('day')}`
+  } catch {
+    return localToday(now)
+  }
+}
+
+/**
+ * The days of the weekend where a language is spoken, `0` for Sunday.
+ *
+ * From `Intl.Locale`'s week information, as `weekStartOf` reads it: Friday and
+ * Saturday in `ar-EG`, Sunday alone in `hi-IN`. Saturday and Sunday where the
+ * engine offers none.
+ */
+export const weekendOf = (locale: string): number[] => {
+  try {
+    const tag = new Intl.Locale(locale) as Intl.Locale & {
+      getWeekInfo?: () => { weekend: number[] }
+      weekInfo?: { weekend: number[] }
+    }
+    const days = tag.getWeekInfo?.().weekend ?? tag.weekInfo?.weekend
+    return days === undefined ? [0, 6] : days.map((day) => day % 7)
+  } catch {
+    return [0, 6]
+  }
+}
+
+/**
  * The first day of the week where a language is spoken, `0` for Sunday.
  *
  * From `Intl.Locale`'s week information, which an engine offers as

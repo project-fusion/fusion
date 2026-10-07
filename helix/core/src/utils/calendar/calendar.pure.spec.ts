@@ -10,6 +10,8 @@ import {
   periodCells,
   periodKey,
   periodMove,
+  todayIn,
+  weekendOf,
   weekStartOf,
   yearOut,
   yearPageOf,
@@ -164,5 +166,28 @@ describe('the months and the years', () => {
     expect(periodKey('year', 2027, 2026, 'ArrowRight', 1)).toEqual({ focus: 2028, pageYear: 2028 })
     expect(periodKey('year', 2019, 2019, 'End', 0)).toEqual({ focus: 2021, pageYear: 2021 })
     expect(periodKey('year', 2021, 2021, 'PageUp', 0)).toEqual({ focus: 2009, pageYear: 2009 })
+  })
+})
+
+/* React Aria reads today in a time zone of your choosing, and Zag marks the
+   weekend days a locale keeps. */
+describe('today in a time zone, and the weekend', () => {
+  /* 03:30 UTC on September 2 is still September 1 in New York and already
+     September 2 in Tokyo. */
+  const late = new Date(Date.UTC(2026, 8, 2, 3, 30))
+
+  test('today is the date in the zone asked for', () => {
+    expect(todayIn('America/New_York', late)).toBe('2026-09-01')
+    expect(todayIn('Asia/Tokyo', late)).toBe('2026-09-02')
+  })
+
+  test("and the reader's own where none is asked for, or the zone is unknown", () => {
+    expect(todayIn('', late)).toBe(localToday(late))
+    expect(todayIn('Not/AZone', late)).toBe(localToday(late))
+  })
+
+  test("the weekend is the locale's", () => {
+    expect(weekendOf('en-US').sort()).toEqual([0, 6])
+    expect(weekendOf('not a tag')).toEqual([0, 6])
   })
 })

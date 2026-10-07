@@ -409,3 +409,14 @@
     print-color-adjust: exact;
   }
 }
+
+/* Content above and under the calendar, set off from it by a step. */
+::slotted([slot="header"]) {
+  display: block;
+  margin-block-end: var(--helix-space-sm);
+}
+
+::slotted([slot="footer"]) {
+  display: block;
+  margin-block-start: var(--helix-space-sm);
+}
