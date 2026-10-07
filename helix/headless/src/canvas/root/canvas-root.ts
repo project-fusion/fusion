@@ -3,8 +3,8 @@ import {
   type CanvasView,
   capturePointer,
   customElement,
-  fillTemplate,
-  formatNumbers,
+  formatPercent,
+  formatWords,
   HelixBeforeMoveEvent,
   HelixBeforeReconnectEvent,
   HelixBeforeRelabelEvent,
@@ -26,14 +26,16 @@ import {
   type MoveDetail,
   type ReconnectDetail,
   type RelabelDetail,
-  type ViewportGestureLabels,
   type ViewportPanDetail,
   type ViewportWay,
   type ViewportZoomDetail,
+  words,
   wordsConverter,
+  wordsLocale,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { descriptionOf } from '../describe.js'
 import { HelixHeadlessCanvasEdge } from '../edge/canvas-edge.js'
 import { EdgePan } from '../edge-pan.js'
 import { neighborOf } from '../neighbor.js'
@@ -347,6 +349,12 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  */
 @customElement('helix-headless-canvas')
 export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
+  /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-canvas': { stoppedLabel: 'Verbinden beendet.' } })`.
+   */
+  static words = 'helix-canvas'
+
   /** The connection whose target had focus as an update began, and that target. */
   private focusedEdge: { key: string; target: Element } | undefined
 
@@ -356,11 +364,26 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     slotAssignment: 'manual',
   }
 
+  /**
+   * The hint shown when the board, waiting to be pressed with
+   * `gestures="activate"`, is scrolled or swiped over.
+   */
+  @words
+  @property({ attribute: 'activate-hint-label' })
+  override activateHintLabel = 'Press the board to use it'
+
+  /** The board's name where `label` is empty. */
+  @words
+  @property({ attribute: 'canvas-label' })
+  canvasLabel = 'Canvas'
+
   /** The text read with a card to say where its connections come from, with `{cards}`. */
+  @words
   @property({ attribute: 'comes-from-label' })
   comesFromLabel = 'from {cards}'
 
   /** The text announced when a connection is requested, with `{from}` and `{to}`. */
+  @words
   @property({ attribute: 'connected-label' })
   connectedLabel = 'Asked to connect {from} to {to}.'
 
@@ -371,6 +394,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    * controls already kept with `pan-up-label` and its three: a board on a page in another
    * language otherwise read its connections out in English.
    */
+  @words
   @property({ attribute: 'connecting-label' })
   connectingLabel =
     'Connecting from {from}. Move to another card and press Enter, or Escape to stop.'
@@ -381,8 +405,17 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    * Its own label, where it has one, is its description rather than part of
    * this, so a reader hears the ends first and what the line says after.
    */
+  @words
   @property({ attribute: 'connection-label' })
   connectionLabel = 'From {from} to {to}'
+
+  /**
+   * The name of the group of controls, read by screen readers, which names
+   * what the controls drive rather than the mechanism.
+   */
+  @words
+  @property({ attribute: 'controls-label' })
+  override controlsLabel = 'Board controls'
 
   /**
    * The accessible name for the board. Required.
@@ -397,6 +430,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    * The accessible name of the field for editing a label, with `{name}` for what
    * the label belongs to.
    */
+  @words
   @property({ attribute: 'label-editor-label' })
   labelEditorLabel = 'Label for {name}'
 
@@ -407,8 +441,17 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    * The list is joined the way the page's language joins one, "Second and
    * Third", rather than with a comma this component chose.
    */
+  @words
   @property({ attribute: 'leads-to-label' })
   leadsToLabel = 'leads to {cards}'
+
+  /**
+   * The text read with a card that has connections both ways. `{leadsTo}` is
+   * `leads-to-label` and `{comesFrom}` is `comes-from-label`, each filled in.
+   */
+  @words
+  @property({ attribute: 'linked-label' })
+  linkedLabel = '{leadsTo}; {comesFrom}'
 
   /**
    * What screen readers hear after a key moves a card, with `{name}` for the
@@ -418,6 +461,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    * the card and said nothing, so a reader moving one by keys could not tell
    * whether it had moved, or how far.
    */
+  @words
   @property({ attribute: 'moved-label' })
   movedLabel = '{name} moved to {x}, {y}'
 
@@ -463,6 +507,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    * The text announced when a connection's end is picked up, with `{from}` and
    * `{to}`.
    */
+  @words
   @property({ attribute: 'reconnecting-label' })
   reconnectingLabel =
     'Moving the end of the connection from {from} to {to}. Move to a card and press Enter, or Escape to stop.'
@@ -472,6 +517,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    * card and `{width}` and `{height}` for its new size, in the document's
    * units.
    */
+  @words
   @property({ attribute: 'resized-label' })
   resizedLabel = '{name} resized to {width} by {height}'
 
@@ -506,18 +552,21 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    * A card is an article and a connection a button, and neither has a selected
    * state for `aria-selected` to carry, so the state is said in words.
    */
+  @words
   @property({ attribute: 'selected-label' })
   selectedLabel = 'selected'
 
   /**
    * What screen readers hear after the selection grows or shrinks, with
-   * `{count}` for how many cards and connections are selected: by Space, a
+   * `{count}` for how many cards and connections are selected, written in the
+   * locale, where a language that needs plural forms writes them: by Space, a
    * click with Shift, Command or Control, Command or Control with A, a box
    * drawn across the board, or Escape.
    *
    * A selection of one made by arriving on a card or clicking it is not said,
    * since the card is.
    */
+  @words
   @property({ attribute: 'selection-label' })
   selectionLabel = '{count} selected'
 
@@ -541,6 +590,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   private editing: { target: 'edge' | 'group'; key: string; was: string } | undefined
 
   /** The text announced when a connection is stopped before it is requested. */
+  @words
   @property({ attribute: 'stopped-label' })
   stoppedLabel = 'Stopped connecting.'
 
@@ -557,10 +607,29 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   @property({ attribute: 'tone-labels', converter: wordsConverter })
   toneLabels: Partial<Record<CanvasTone, string>> = {}
 
+  /** The hint shown when one finger swipes over the board with `gestures="cooperative"`. */
+  @words
+  @property({ attribute: 'two-finger-hint-label' })
+  override twoFingerHintLabel = 'Use two fingers to move the board'
+
+  /** The line shown while the board, with `gestures="activate"`, has the gestures. */
+  @words
+  @property({ attribute: 'using-label' })
+  override usingLabel = 'Using the board. Press Escape to scroll the page again.'
+
+  /**
+   * The hint shown when the wheel scrolls past the board with
+   * `gestures="cooperative"`. `{key}` is ⌘ on a Mac and Ctrl elsewhere.
+   */
+  @words
+  @property({ attribute: 'wheel-hint-label' })
+  override wheelHintLabel = 'Use {key} and scroll to zoom the board'
+
   /**
    * What screen readers hear after a zoom button or key, with `{zoom}` for the
-   * zoom as a percentage, written the way the page's language writes one.
+   * zoom as a percentage, written the way the element's locale writes one.
    */
+  @words
   @property({ attribute: 'zoomed-label' })
   zoomedLabel = 'Zoom {zoom}'
 
@@ -619,11 +688,6 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    */
   private say(words: string): void {
     this.said = words !== '' && words === this.said ? `${words}\u00a0` : words
-  }
-
-  /** Numbers as the page's language writes them. */
-  private get numbers(): (value: number) => string {
-    return formatNumbers(this.closest('[lang]')?.getAttribute('lang') ?? '')
   }
 
   /**
@@ -916,20 +980,6 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     return new HelixCanvasZoomEvent(detail)
   }
 
-  protected override get restingControlsLabel(): string {
-    return 'Board controls'
-  }
-
-  /** What the board says about its gestures where the page does not say it. */
-  protected override get restingGestureLabels(): ViewportGestureLabels {
-    return {
-      activate: 'Press the board to use it',
-      twoFinger: 'Use two fingers to move the board',
-      using: 'Using the board. Press Escape to scroll the page again.',
-      wheel: 'Use {key} and scroll to zoom the board',
-    }
-  }
-
   /**
    * Zoom and fullscreen, without the pad.
    *
@@ -993,13 +1043,8 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     this.direct = false
     this.touched = true
     this.zoomAbout(by > 0 ? 1.25 : 1 / 1.25, { x: this.box.width / 2, y: this.box.height / 2 })
-    const lang = this.closest('[lang]')?.getAttribute('lang') || undefined
     this.say(
-      fillTemplate(this.zoomedLabel, {
-        zoom: new Intl.NumberFormat(lang, { maximumFractionDigits: 0, style: 'percent' }).format(
-          this.at.zoom,
-        ),
-      }),
+      formatWords(this, 'zoomedLabel', { zoom: formatPercent(this.at.zoom, wordsLocale(this)) }),
     )
     super.zoom(by)
   }
@@ -1214,7 +1259,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   /** Starts a connection from a card, from the keyboard. */
   private startLinking(from: string): void {
     this.linking = { from }
-    this.said = fillTemplate(this.connectingLabel, { from: this.nameOf(from) })
+    this.said = formatWords(this, 'connectingLabel', { from: this.nameOf(from) })
   }
 
   /**
@@ -1252,7 +1297,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       this.said = linking ? this.stoppedLabel : ''
       return
     }
-    this.said = fillTemplate(this.connectedLabel, {
+    this.said = formatWords(this, 'connectedLabel', {
       from: this.nameOf(linking.from),
       to: this.nameOf(arriving),
     })
@@ -1298,7 +1343,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     }
     this.said = pointer
       ? ''
-      : fillTemplate(this.reconnectingLabel, {
+      : formatWords(this, 'reconnectingLabel', {
           from: this.nameOf(edge.fromNode),
           to: this.nameOf(edge.toNode),
         })
@@ -1360,7 +1405,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     /* Said from the keyboard, as a new connection is: a reader who moved one
        end heard the start and never the end. */
     if (linking.pointer === undefined) {
-      this.said = fillTemplate(this.connectedLabel, {
+      this.said = formatWords(this, 'connectedLabel', {
         from: this.nameOf(detail.from),
         to: this.nameOf(detail.to),
       })
@@ -1683,7 +1728,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     if (this.dispatchEvent(new HelixSelectEvent({ value }))) {
       this.selected = value
       if (said) {
-        this.say(fillTemplate(this.selectionLabel, { count: this.numbers(list.length) }))
+        this.say(formatWords(this, 'selectionLabel', { count: list.length }))
       }
     }
   }
@@ -2474,10 +2519,10 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       if (this.requestMove(detail)) {
         this.dispatchEvent(new HelixMoveEvent(detail))
         this.say(
-          fillTemplate(this.movedLabel, {
+          formatWords(this, 'movedLabel', {
             name: this.nameOf(card.name),
-            x: this.numbers(card.x),
-            y: this.numbers(card.y),
+            x: card.x,
+            y: card.y,
           }),
         )
       }
@@ -2503,10 +2548,10 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       if (this.requestMove(detail)) {
         this.dispatchEvent(new HelixMoveEvent(detail))
         this.say(
-          fillTemplate(this.resizedLabel, {
-            height: this.numbers(box.height),
+          formatWords(this, 'resizedLabel', {
+            height: box.height,
             name: this.nameOf(card.name),
-            width: this.numbers(box.width),
+            width: box.width,
           }),
         )
       }
@@ -2910,7 +2955,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       const drawn = edge ? this.geometryOf(edge, origin) : undefined
       if (drawn) {
         at = drawn.mid
-        named = fillTemplate(this.connectionLabel, {
+        named = formatWords(this, 'connectionLabel', {
           from: this.textOf(drawn.from),
           to: this.textOf(drawn.to),
         })
@@ -2927,7 +2972,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     }
     return html`<input
       part="label-editor"
-      aria-label=${fillTemplate(this.labelEditorLabel, { name: named })}
+      aria-label=${formatWords(this, 'labelEditorLabel', { name: named })}
       data-target=${editing.target}
       style=${`--_canvas-editor-x: ${at.x}px; --_canvas-editor-y: ${at.y}px`}
       type="text"
@@ -3045,20 +3090,20 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       leads.set(edge.fromNode, [...(leads.get(edge.fromNode) ?? []), named(edge.toNode)])
       from.set(edge.toNode, [...(from.get(edge.toNode) ?? []), named(edge.fromNode)])
     }
-    const lang = this.closest('[lang]')?.getAttribute('lang') || undefined
-    const list = new Intl.ListFormat(lang, { type: 'conjunction' })
+    const list = new Intl.ListFormat(wordsLocale(this), { type: 'conjunction' })
     return new Map(
       this.nodes.map((one) => {
         const out = leads.get(one.id) ?? []
         const into = from.get(one.id) ?? []
+        const leadsTo =
+          out.length > 0 ? formatWords(this, 'leadsToLabel', { cards: list.format(out) }) : ''
+        const comesFrom =
+          into.length > 0 ? formatWords(this, 'comesFromLabel', { cards: list.format(into) }) : ''
         return [
           one.id,
-          [
-            out.length > 0 ? fillTemplate(this.leadsToLabel, { cards: list.format(out) }) : '',
-            into.length > 0 ? fillTemplate(this.comesFromLabel, { cards: list.format(into) }) : '',
-          ]
-            .filter(Boolean)
-            .join('; '),
+          leadsTo && comesFrom
+            ? formatWords(this, 'linkedLabel', { comesFrom, leadsTo })
+            : leadsTo || comesFrom,
         ]
       }),
     )
@@ -3741,8 +3786,8 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
        so a press lands on the target under it. */
     return svg`<path
         part="edge-target"
-        aria-description=${[pickedKeys.has(key) ? this.selectedLabel : undefined, element?.tone ? this.toneLabels[element.tone] : undefined, edge.label].filter(Boolean).join(', ') || nothing}
-        aria-label=${fillTemplate(this.connectionLabel, { from: this.textOf(from), to: this.textOf(to) })}
+        aria-description=${descriptionOf(wordsLocale(this), [pickedKeys.has(key) ? this.selectedLabel : '', element?.tone ? this.toneLabels[element.tone] : '', edge.label]) || nothing}
+        aria-label=${formatWords(this, 'connectionLabel', { from: this.textOf(from), to: this.textOf(to) })}
         d=${drawn.d}
         data-edge=${key}
         fill="none"
@@ -3899,7 +3944,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     return html`<div
       part="region"
       role="group"
-      aria-label=${this.label || 'Canvas'}
+      aria-label=${this.label || this.canvasLabel}
       aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight Plus Minus"
       tabindex="0"
       @focusin=${this.idle.stir}

@@ -1,4 +1,4 @@
-import { customElement, HelixElement, HelixMapPartChangeEvent } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, HelixMapPartChangeEvent, words } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -25,6 +25,12 @@ import { property } from 'lit/decorators.js'
  */
 @customElement('helix-headless-map-landcover')
 export class HelixHeadlessMapLandcover extends HelixElement {
+  /**
+   * The key this part's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-map-landcover': { label: 'Bodenbedeckung' } })`.
+   */
+  static words = 'helix-map-landcover'
+
   /** More about the land cover. Read after the label in the frame's list. */
   @property()
   description?: string
@@ -44,6 +50,7 @@ export class HelixHeadlessMapLandcover extends HelixElement {
   readonly layerKind = 'landcover' as const
 
   /** The layer's name in the frame's list. */
+  @words
   @property()
   label = 'Land cover'
 

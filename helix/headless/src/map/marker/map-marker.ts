@@ -1,8 +1,12 @@
 import {
   customElement,
+  formatNumber,
+  formatWords,
   HelixElement,
   HelixMapPartChangeEvent,
   PlacementController,
+  words,
+  wordsLocale,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -59,6 +63,12 @@ const BOOKKEEPING = new Set<PropertyKey>([
  */
 @customElement('helix-headless-map-marker')
 export class HelixHeadlessMapMarker extends HelixElement {
+  /**
+   * The key this part's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-map-marker': { passedLabel: '{label}, besucht' } })`.
+   */
+  static words = 'helix-map-marker'
+
   /**
    * @internal Whether the map's one tab stop is on this marker, written by the
    * frame. Not a consumer's to set: the frame keeps exactly one.
@@ -154,9 +164,15 @@ export class HelixHeadlessMapMarker extends HelixElement {
   @property({ type: Boolean })
   passed = false
 
-  /** The word added after a passed place's name. Defaults to "passed". */
+  /**
+   * What a passed place is called. `{label}` is its name.
+   *
+   * A word without `{label}`, such as `visited`, is written after the name
+   * with a comma, as before the sentence held the name.
+   */
+  @words
   @property({ attribute: 'passed-label' })
-  passedLabel = 'passed'
+  passedLabel = '{label}, passed'
 
   /** Whether focus is on this marker as it is gathered, and so has to move on. */
   private handingOver = false
@@ -223,6 +239,16 @@ export class HelixHeadlessMapMarker extends HelixElement {
     this.partNamed('marker')?.focus(options)
   }
 
+  /**
+   * A passed place's name in `passed-label`, or followed by a page's word
+   * that does not hold `{label}`.
+   */
+  private passedSaid(name: string): string | TemplateResult {
+    return this.passedLabel.includes('{label}')
+      ? formatWords(this, 'passedLabel', { label: name })
+      : html`${name}, ${this.passedLabel}`
+  }
+
   protected override render(): TemplateResult {
     /* The name is the button's content rather than an `aria-label` over it:
        one set of words, read and seen, and a stylesheet that hides the label
@@ -233,10 +259,11 @@ export class HelixHeadlessMapMarker extends HelixElement {
     const cluster = this.gathered.length > 1
     /* Asked only of a cluster, which only the connector makes in a browser:
        the server has no tree to find a language in. */
-    const lang = cluster ? this.closest('[lang]')?.getAttribute('lang') || undefined : undefined
+    const locale = cluster ? wordsLocale(this) : ''
+    const name = this.label ?? ''
     return html`<span part="marker" role="button" tabindex=${this.current ? '0' : '-1'} ?hidden=${this.gatheredBy !== undefined}>
-      <span part="point" aria-hidden="true">${cluster ? new Intl.NumberFormat(lang).format(this.gathered.length) : nothing}<slot name="icon" ?hidden=${cluster} @slotchange=${() => this.requestUpdate()}></slot></span>
-      <span part="label">${cluster ? new Intl.ListFormat(lang, { type: 'conjunction' }).format(this.gathered) : this.passed ? `${this.label ?? ''}, ${this.passedLabel}` : (this.label ?? '')}</span>
+      <span part="point" aria-hidden="true">${cluster ? formatNumber(this.gathered.length, locale) : nothing}<slot name="icon" ?hidden=${cluster} @slotchange=${() => this.requestUpdate()}></slot></span>
+      <span part="label">${cluster ? new Intl.ListFormat(locale, { type: 'conjunction' }).format(this.gathered) : this.passed ? this.passedSaid(name) : name}</span>
     </span>`
   }
 }
