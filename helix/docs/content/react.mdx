@@ -79,10 +79,32 @@ are strings and booleans, so they pass through server rendering intact. `cell`
 and `compare` are functions, set on an element that repairs its own props.
 Inside a `columns` array, the bridge could not reach them.
 
-The cell values still do not render on the server. That is a separate limit.
-Reading a cell needs the columns, and the server render does not pass the table
-its markup children. The first paint shows a labeled table with no data in
-either case. Use `helix-table` when the content must be in the served HTML.
+The table cannot draw its cells on the server, because reading a cell needs the
+columns and the server render does not pass the table its markup children. Write
+the first page as rows. In the same server component, map the first page of the
+array to `helix-table-row` and `helix-table-cell` elements under the columns.
+Sort and page it as the table does, and format each value as its column draws it:
+
+```tsx
+const firstPage = [...rows].sort((a, b) => a.name.localeCompare(b.name)).slice(0, 4)
+
+<helix-data-table default-sort="name:asc" label="People" page-size={4} rows={rows}>
+  <helix-table-column field="name" sortable>Name</helix-table-column>
+  <helix-table-column field="team" sortable>Team</helix-table-column>
+  {firstPage.map((person) => (
+    <helix-table-row key={person.name}>
+      <helix-table-cell header>{person.name}</helix-table-cell>
+      <helix-table-cell>{person.team}</helix-table-cell>
+    </helix-table-row>
+  ))}
+</helix-data-table>
+```
+
+The values are in the served HTML, and `@fusion.dev/helix-styles/helix.css` lays
+them out as the table before the script runs. The table shows your rows until
+`rows` holds a row, then draws its own in their place. It leaves your rows in the
+page, so React finds the markup it rendered. A development build warns when the
+first page the table draws shows different words from the rows you served.
 
 ### The React version
 

@@ -134,10 +134,32 @@ your elements and the element that takes focus is in its shadow root. Test for
 support before you use element references. Assigning to a property that an
 engine does not implement does nothing and throws no error.
 
-## A child dispatches a ready event to its parent
+## A parent finds its children
 
-A parent cannot poll for a child that has not upgraded yet. The child dispatches
-a bubbling ready event, and the parent listens for it.
+A child does not announce itself to its parent, and there is no ready event. A
+parent cannot wait on a child that has not upgraded, so what the parent needs
+from the child decides how it finds it:
+
+- For what you slotted, read `assignedElements` on the slot, and read it again
+  on `slotchange`.
+- For children that arrive, move, or change outside a slot, observe the light
+  DOM with a `MutationObserver`.
+- For a child's property, wait on `customElements.whenDefined`. A custom element
+  has no properties before it upgrades.
+- For a child's state that a script can change with no event, add a controller
+  to the child with `addController`. Its `hostUpdated` runs after every update
+  of the child.
+- Where the child holds the answer, it finds its parent by identity with
+  `closestInstance`, as `Accordion.Item` does.
+
+## Serve the values of a data table
+
+A data table reads each cell from its column, and the server does not pass it
+its columns, so it serves its headings and no values. Write the first page under
+the columns as `helix-table-row` and `helix-table-cell` elements, in the table's
+sort and page size. The table shows them until `rows` holds a row, then draws
+its own rows in their place. See [React](./react) for the server component
+version.
 
 ## Write a server spec
 
