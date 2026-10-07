@@ -635,6 +635,16 @@ export class HelixHeadlessObjectInspector extends HelixElement {
     }
   }
 
+  /**
+   * Moves focus to the row the keys move from, or to the tree while that row
+   * is scrolled out of the window, as Tab reaches them.
+   */
+  override focus(options?: FocusOptions): void {
+    this.renderRoot
+      ?.querySelector<HTMLElement>('#tree[tabindex="0"], #tree [tabindex="0"]')
+      ?.focus(options)
+  }
+
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
     this.finishHydration()

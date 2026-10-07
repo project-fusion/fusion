@@ -737,3 +737,15 @@ test("forwards the copy button's pending ring as `copy-spinner`", async () => {
   const copy = host.shadowRoot?.querySelector('[part~="copy"]')
   expect(copy?.getAttribute('exportparts')).toContain('spinner: copy-spinner')
 })
+
+describe('focusing the inspector', () => {
+  /* `focus()` on the element reaches the row the keys move from, as a press
+     of Tab does, and the tree with no row drawn. */
+  test('puts focus on the row the keys move from', async () => {
+    const host = await inspector()
+    host.focus()
+    const active = host.shadowRoot?.activeElement as HTMLElement | null
+    expect(active?.getAttribute('role')).toBe('row')
+    expect(active?.tabIndex).toBe(0)
+  })
+})
