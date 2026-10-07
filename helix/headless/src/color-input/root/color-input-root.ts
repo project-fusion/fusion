@@ -98,6 +98,8 @@ import '../../color-picker/index.js'
  * @csspart picker-channel-marker-label - The value a mark stands at, when `marker-labels` is set.
  * @csspart picker-channel-markers - The row of marks along the track.
  * @csspart picker-channel-output - The current value, shown beside the track.
+ * @csspart picker-channel-thumb - A ramp's thumb box, which holds no content in a picker.
+ * @csspart picker-channel-thumbs - The layer over a ramp's track that holds its thumb box.
  * @csspart picker-channel-tooltip - A ramp's value in a bubble, where a ramp shows one.
  * @csspart picker-channel-tooltips - The layer over a ramp's track that holds its bubble.
  * @csspart picker-channels - The channel sliders beside the sample.
@@ -122,7 +124,9 @@ import '../../color-picker/index.js'
  * @csspart picker-grid-brightness - The range input for the square's vertical axis.
  * @csspart picker-grid-handle - The mark showing where in the square the color sits.
  * @csspart picker-grid-saturation - The range input for the square's horizontal axis.
+ * @csspart picker-hint - The picker's own help, which the field's `hint` stands in for here, so it stays hidden.
  * @csspart picker-icon - An icon drawn by the picker.
+ * @csspart picker-label - The picker's own name, which the field's `label` stands in for here, so it stays hidden.
  * @csspart picker-sample - A chip of the current color. Pressing it copies the value.
  * @csspart picker-swatch - One preset.
  * @csspart picker-swatches - The row of presets.
@@ -499,6 +503,7 @@ export class HelixHeadlessColorInput extends MixinPickerField(
         channel-hint: picker-channel-hint, channel-label: picker-channel-label,
         channel-marker: picker-channel-marker, channel-marker-label: picker-channel-marker-label,
         channel-markers: picker-channel-markers, channel-output: picker-channel-output,
+        channel-thumb: picker-channel-thumb, channel-thumbs: picker-channel-thumbs,
         channel-tooltip: picker-channel-tooltip, channel-tooltips: picker-channel-tooltips,
         channels: picker-channels, controls: picker-controls, eyedropper: picker-eyedropper,
         eyedropper-button: picker-eyedropper-button, eyedropper-live: picker-eyedropper-live, eyedropper-spinner: picker-eyedropper-spinner, eyedropper-text: picker-eyedropper-text,
@@ -506,7 +511,8 @@ export class HelixHeadlessColorInput extends MixinPickerField(
         fields: picker-fields, footer: picker-footer, format: picker-format,
         format-button: picker-format-button, format-live: picker-format-live, format-spinner: picker-format-spinner, format-text: picker-format-text, grid: picker-grid,
         grid-brightness: picker-grid-brightness, grid-handle: picker-grid-handle,
-        grid-saturation: picker-grid-saturation, icon: picker-icon, sample: picker-sample,
+        grid-saturation: picker-grid-saturation, hint: picker-hint, icon: picker-icon,
+        label: picker-label, sample: picker-sample,
         swatch: picker-swatch, swatches: picker-swatches, value: picker-value,
         wheel: picker-wheel, wheel-hue: picker-wheel-hue"
       ?invalid=${this.resolvedFeedback !== ''}

@@ -544,6 +544,39 @@
 
 /* The message, under everything it is about, in the danger ink and the size a
    field's feedback takes, on the inset every other row takes. */
+/* The name above the square and the help under the presets, set as a field's
+   label and hint are, so a picker on its own reads like one. */
+[part="label"] {
+  color: var(--helix-color-foreground);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-medium);
+  line-height: var(--helix-leading-tight);
+  margin-block-end: var(--helix-space-xs);
+  padding-inline: var(--color-picker-padding, var(--helix-space-none));
+}
+
+:host([required]) [part="label"]::after {
+  color: var(--helix-color-danger);
+  content: "*";
+  margin-inline-start: var(--helix-space-2xs);
+}
+
+@supports (content: "*" / "") {
+  :host([required]) [part="label"]::after {
+    content: "*" / "";
+  }
+}
+
+[part="hint"] {
+  color: var(--helix-color-foreground-subtle);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  line-height: var(--helix-leading-normal);
+  margin-block-start: var(--helix-space-sm);
+  padding-inline: var(--color-picker-padding, var(--helix-space-none));
+}
+
 [part="feedback"] {
   color: var(--color-picker-feedback-color, var(--helix-color-danger));
   font-family: var(--helix-font-sans);
