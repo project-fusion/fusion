@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import { hasState, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -85,6 +85,26 @@ describe('callout icon slot', () => {
     const slot = callout.shadowRoot?.querySelector('slot[name="icon"]') as HTMLSlotElement
     expect(slot.assignedElements().length).toBe(0)
     expect(slot.querySelector('svg')).not.toBeNull()
+  })
+})
+
+/* Measured before this: a callout had no state but `settled`, so a sheet
+   could not lay out a callout with a heading, or one with a page's own icon,
+   apart from the rest. */
+describe('the regions a callout holds', () => {
+  test('say through states whether a heading or an icon of the page is slotted', async () => {
+    const plain = (await mount(
+      '<helix-headless-callout>x</helix-headless-callout>',
+    )) as HTMLElement & {
+      updateComplete: Promise<boolean>
+    }
+    await plain.updateComplete
+    expect([hasState(plain, 'has-heading'), hasState(plain, 'has-icon')]).toEqual([false, false])
+    const full = (await mount(
+      '<helix-headless-callout><strong slot="heading">Note</strong><svg slot="icon"></svg>x</helix-headless-callout>',
+    )) as HTMLElement & { updateComplete: Promise<boolean> }
+    await full.updateComplete
+    expect([hasState(full, 'has-heading'), hasState(full, 'has-icon')]).toEqual([true, true])
   })
 })
 
