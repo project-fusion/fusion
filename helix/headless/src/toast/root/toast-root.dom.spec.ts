@@ -476,8 +476,8 @@ describe('max-visible', () => {
 
   test('shows that many messages, and the next once one goes', async () => {
     const host = (await mount(`<helix-headless-toast label="Notifications" max-visible="2">
-      <helix-headless-toast-item>One</helix-headless-toast-item>
-      <helix-headless-toast-item>Two</helix-headless-toast-item>
+      <helix-headless-toast-item duration="5000">One</helix-headless-toast-item>
+      <helix-headless-toast-item duration="5000">Two</helix-headless-toast-item>
       <helix-headless-toast-item>Three</helix-headless-toast-item>
     </helix-headless-toast>`)) as HTMLElement
     await settled(host)
@@ -506,5 +506,69 @@ describe('max-visible', () => {
     expect(second.hidden).toBe(false)
     expect(second.isConnected).toBe(true)
     expect(polite?.textContent).toContain('Uploaded')
+  })
+})
+
+describe('a pointer or focus in the stack', () => {
+  /* Each message held only its own clock, so a reader resting on one message
+     watched the one beside it go, where React Aria and Radix hold them all. */
+  const stack = async (): Promise<{ host: HTMLElement; items: Item[] }> => {
+    const host = (await mount(`<helix-headless-toast>
+      <helix-headless-toast-item duration="5000">One</helix-headless-toast-item>
+      <helix-headless-toast-item duration="5000">Two</helix-headless-toast-item>
+    </helix-headless-toast>`)) as HTMLElement & { updateComplete: Promise<boolean> }
+    await (host as unknown as Item).updateComplete
+    const items = [...host.querySelectorAll('helix-headless-toast-item')] as Item[]
+    await Promise.all(items.map((one) => one.updateComplete))
+    return { host, items }
+  }
+  const paused = (items: Item[]): boolean[] => items.map((one) => one.hasAttribute('data-paused'))
+
+  test('holds every message while a pointer is over the stack', async () => {
+    const { host, items } = await stack()
+    host.dispatchEvent(new PointerEvent('pointerenter'))
+    await Promise.all(items.map((one) => one.updateComplete))
+    expect(paused(items)).toEqual([true, true])
+    host.dispatchEvent(new PointerEvent('pointerleave'))
+    await Promise.all(items.map((one) => one.updateComplete))
+    expect(paused(items)).toEqual([false, false])
+  })
+
+  test('holds every message while focus is in one, until it leaves the stack', async () => {
+    const { host, items } = await stack()
+    const outside = document.createElement('button')
+    document.body.append(outside)
+    items[0]?.dispatchEvent(new FocusEvent('focusin', { bubbles: true, composed: true }))
+    await Promise.all(items.map((one) => one.updateComplete))
+    expect(paused(items)).toEqual([true, true])
+    items[0]?.dispatchEvent(
+      new FocusEvent('focusout', { bubbles: true, composed: true, relatedTarget: items[1] }),
+    )
+    await Promise.all(items.map((one) => one.updateComplete))
+    expect(paused(items)).toEqual([true, true])
+    items[0]?.dispatchEvent(
+      new FocusEvent('focusout', { bubbles: true, composed: true, relatedTarget: outside }),
+    )
+    await Promise.all(items.map((one) => one.updateComplete))
+    expect(paused(items)).toEqual([false, false])
+    expect(host.isConnected).toBe(true)
+    outside.remove()
+  })
+})
+
+describe('swipe-direction', () => {
+  test('tells every message the edge it swipes toward, the end unless set', async () => {
+    const host = (await mount(`<helix-headless-toast>
+      <helix-headless-toast-item>One</helix-headless-toast-item>
+    </helix-headless-toast>`)) as HTMLElement & {
+      swipeDirection?: string
+      updateComplete: Promise<boolean>
+    }
+    await host.updateComplete
+    const item = host.querySelector('helix-headless-toast-item') as Item & { swipeToward: string }
+    expect(item.swipeToward).toBe('end')
+    host.swipeDirection = 'bottom'
+    await host.updateComplete
+    expect(item.swipeToward).toBe('bottom')
   })
 })
