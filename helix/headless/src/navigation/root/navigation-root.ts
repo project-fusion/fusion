@@ -7,6 +7,7 @@ import {
   IndicatorController,
   KeyboardNavigationController,
   type NavigableItem,
+  words,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -78,6 +79,12 @@ const navigable = (item: HTMLElement): NavigableItem => {
  */
 @customElement('helix-headless-navigation')
 export class HelixHeadlessNavigation extends HelixElement {
+  /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-navigation': { label: 'Hauptmenü' } })`.
+   */
+  static words = 'helix-navigation'
+
   /* The controller carries the RTL sign and border correction: a distance
      measured from the physical left and applied from the inline-start edge
      travels the wrong way in a right-to-left document. */
@@ -113,6 +120,7 @@ export class HelixHeadlessNavigation extends HelixElement {
    * and wins over this, so a footer navigation written the usual way is not a
    * second "Main".
    */
+  @words
   @property()
   label = 'Main'
 

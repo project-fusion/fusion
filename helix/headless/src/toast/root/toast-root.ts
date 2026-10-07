@@ -5,11 +5,12 @@ import {
   deepActiveElement,
   deepContains,
   FocusScopeController,
-  fillTemplate,
   focusableElements,
+  formatWords,
   HelixElement,
   hostAria,
   scrollHolders,
+  words,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -81,6 +82,13 @@ import { joinSaid, messageWords } from '../words.js'
 @customElement('helix-headless-toast')
 export class HelixHeadlessToast extends HelixElement {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-toast': { label: 'Benachrichtigungen ({hotkey})' } })`.
+   * A message's own words are under `helix-toast-item`.
+   */
+  static words = 'helix-toast'
+
+  /**
    * The key that takes focus to the stack and back, such as `F8` or `Alt+T`:
    * keys joined by `+`, the last one the key. Empty turns it off.
    */
@@ -91,6 +99,7 @@ export class HelixHeadlessToast extends HelixElement {
    * Accessible name for the region, with `{hotkey}` filled in. Translate it with
    * the rest of your interface.
    */
+  @words
   @property()
   label = 'Notifications ({hotkey})'
 
@@ -141,7 +150,7 @@ export class HelixHeadlessToast extends HelixElement {
        news to both and could be said twice. The two `live` parts say each
        arrival once instead, in the voice its tone asks for. */
     hostAria(this.internals, {
-      label: fillTemplate(this.label, { hotkey: this.hotkey }),
+      label: formatWords(this, 'label', { hotkey: this.hotkey }),
       role: 'region',
     })
   }

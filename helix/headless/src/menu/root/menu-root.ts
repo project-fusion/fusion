@@ -16,6 +16,7 @@ import {
   slottedWords,
   tellDisclosure,
   typeaheadBy,
+  words,
 } from '@fusion.dev/helix-core'
 import { caretLeft } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -109,8 +110,15 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
 @customElement('helix-headless-menu')
 export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(HelixElement)) {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-menu': { backLabel: 'Zurück' } })`.
+   */
+  static words = 'helix-menu'
+
+  /**
    * The text of the row that returns from a submenu.
    */
+  @words
   @property({ attribute: 'back-label' })
   backLabel = 'Back'
 

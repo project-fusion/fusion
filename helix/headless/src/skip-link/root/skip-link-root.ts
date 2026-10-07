@@ -4,6 +4,7 @@ import {
   HelixElement,
   plainClick,
   reportRuntime,
+  words,
 } from '@fusion.dev/helix-core'
 import { html, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -44,6 +45,12 @@ import { property } from 'lit/decorators.js'
  */
 @customElement('helix-headless-skip-link')
 export class HelixHeadlessSkipLink extends HelixElement {
+  /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-skip-link': { label: 'Zum Inhalt springen' } })`.
+   */
+  static words = 'helix-skip-link'
+
   /** Focus goes to the anchor inside, so the host is never the focus target. */
   static override shadowRootOptions: ShadowRootInit = {
     ...HelixElement.shadowRootOptions,
@@ -67,6 +74,7 @@ export class HelixHeadlessSkipLink extends HelixElement {
    * The fallback of the default slot, so slotted content replaces it rather than
    * appearing beside it.
    */
+  @words
   @property()
   label = 'Skip to content'
 

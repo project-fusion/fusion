@@ -79,6 +79,14 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 @customElement('helix-headless-toast-item')
 export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
   /**
+   * The key this part's words are registered under, its styled tag. The close
+   * control's `dismiss-label` comes from a mixin other families share, and
+   * registers as `{ 'helix-toast-item': { dismissLabel: 'Schließen' } }` once
+   * that mixin declares it a word.
+   */
+  static words = 'helix-toast-item'
+
+  /**
    * How long the message stays, in milliseconds. When it is not set, the
    * message stays until it is dismissed.
    *

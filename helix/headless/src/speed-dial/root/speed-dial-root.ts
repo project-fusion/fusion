@@ -14,6 +14,7 @@ import {
   tellDisclosure,
   typeaheadByWords,
   unlinkDescription,
+  words,
 } from '@fusion.dev/helix-core'
 import { plus } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -106,8 +107,15 @@ const navigable = (item: HelixHeadlessSpeedDialItem): NavigableItem => ({
 @customElement('helix-headless-speed-dial')
 export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-speed-dial': { label: 'Aktionen' } })`.
+   */
+  static words = 'helix-speed-dial'
+
+  /**
    * Accessible name for the trigger and the set of actions it opens.
    */
+  @words
   @property()
   label = 'Actions'
 
@@ -120,6 +128,7 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
    * plain element of yours once a reader reaches it, after hydration, unless
    * you described or labeled it yourself.
    */
+  @words
   @property({ attribute: 'long-press-label' })
   longPressLabel = 'Long press or press Alt+Down to show the actions'
 
