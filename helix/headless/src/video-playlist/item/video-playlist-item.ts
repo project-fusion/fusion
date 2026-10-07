@@ -40,6 +40,9 @@ import { property } from 'lit/decorators.js'
  * @csspart thumbnail - The image of `poster`, shown when the `media` slot is empty.
  *
  * @cssstate current - The entry that is playing.
+ * @cssstate dragging - The entry a pointer is dragging, in a `reorderable` playlist.
+ * @cssstate drop-after - The entry the dragged one would land after, which the drop indicator is drawn under.
+ * @cssstate drop-before - The entry the dragged one would land before, which the drop indicator is drawn over.
  */
 @customElement('helix-headless-video-playlist-item')
 export class HelixHeadlessVideoPlaylistItem extends HelixElement {
