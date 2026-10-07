@@ -143,6 +143,14 @@
   display: none;
 }
 
+/* The row after the last while more are fetched, quiet in the same way. */
+[part="loading"] {
+  color: var(--list-loading-color, var(--helix-color-foreground-muted));
+  font-size: var(--helix-text-sm);
+  padding: var(--list-loading-padding, var(--helix-space-sm));
+  text-align: center;
+}
+
 /* The copy of a row a pointer drags, drawn in the top layer and raised over
    the page while the row itself stays in place, faded. It has no transition, so
    it follows the pointer with nothing animated, whatever the reader's motion
