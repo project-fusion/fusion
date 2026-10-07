@@ -157,6 +157,8 @@ const kindOf = (value: unknown): ObjectInspectorEntry['type'] => {
  * @aliases JSON viewer, Object viewer, Inspector, Data explorer
  * @documentation https://fusion.dev/helix/components/object-inspector
  *
+ * @slot empty - Shown in the tree while it has no entries to show. Defaults to `empty-label`, or `no-matches-label` while a filter matched none.
+ *
  * @event {HelixActivateEvent} helix-activate - The active row moved, by a key or a click. The detail's `value` is its path.
  * @event {HelixBeforeActivateEvent} helix-before-activate - The active row is about to move, with its new path. Cancelable: cancel it to keep the row where it is.
  * @event {HelixBeforeCloseEvent} helix-before-close - A reader is about to close the active branch. Cancelable: cancel it to keep the branch open.
@@ -186,6 +188,7 @@ const kindOf = (value: unknown): ObjectInspectorEntry['type'] => {
  * @csspart copy-tooltip-right - The tooltip while it is right of the copy button. Set alongside `copy-tooltip`.
  * @csspart copy-tooltip-top - The tooltip while it is above the copy button. Set alongside `copy-tooltip`.
  * @csspart count - The number of entries a branch holds.
+ * @csspart empty - The row shown in the tree while it has no entries to show: no value, or a filter that matched none. It holds the `empty` slot.
  * @csspart frame - The tree and the copy button beside it.
  * @csspart header - The bar that holds the label, when there is one.
  * @csspart key - A property name or an array index.
@@ -204,6 +207,10 @@ const kindOf = (value: unknown): ObjectInspectorEntry['type'] => {
  * @csspart value - What `renderValue` drew for an entry, in place of its own drawing.
  *
  * @cssproperty --object-inspector-level - How deep a row is, from 0 at the root, for indenting it.
+ *
+ * @cssstate empty - While the tree has no entries to show: no value, or a filter that matched none.
+ * @cssstate filtered - While `filter` holds text.
+ * @cssstate matched - While `filter` holds text and matched at least one entry.
  */
 @customElement('helix-headless-object-inspector')
 export class HelixHeadlessObjectInspector extends HelixElement {
@@ -397,6 +404,22 @@ export class HelixHeadlessObjectInspector extends HelixElement {
   resultsLabel = '{count, plural, one {# result} other {# results}}'
 
   /**
+   * What the tree says while there is no value to show, such as before a
+   * fetch answers. The `empty` slot replaces it.
+   */
+  @words
+  @property({ attribute: 'empty-label' })
+  emptyLabel = 'Nothing to show'
+
+  /**
+   * What the tree says while a filter matched no entry. The `empty` slot
+   * replaces it.
+   */
+  @words
+  @property({ attribute: 'no-matches-label' })
+  noMatchesLabel = 'No matches'
+
+  /**
    * The tree's accessible name when `label` is empty and the host names it
    * with neither `aria-label` nor `aria-labelledby`.
    */
@@ -534,6 +557,15 @@ export class HelixHeadlessObjectInspector extends HelixElement {
     this.opened = withAncestors(this.opened, this.branches, paths)
   }
 
+  /**
+   * Whether the tree has no entries to show. Not while a value named by `for`
+   * is still to be read, as on a server and while hydrating what one sent,
+   * where it says nothing yet about the value.
+   */
+  private get blank(): boolean {
+    return this.rows.length === 0 && (this.for === '' || this.loadedFor === this.for)
+  }
+
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     this.hadFocus = this.hasFocusedRow()
@@ -579,6 +611,9 @@ export class HelixHeadlessObjectInspector extends HelixElement {
     if (changed.has('filter') && this.hasUpdated) {
       this.tell()
     }
+    this.toggleState('empty', this.blank)
+    this.toggleState('filtered', this.found !== undefined)
+    this.toggleState('matched', (this.found?.size ?? 0) > 0)
   }
 
   /**
@@ -1139,6 +1174,14 @@ export class HelixHeadlessObjectInspector extends HelixElement {
               ([row]) => row.path,
               ([row, at]) => this.renderRow(row, at),
             )
+          }${
+            /* A row, so the tree holds only rows, and one a reader can find:
+               an empty box said nothing, to the eye or to a screen reader. */
+            this.blank
+              ? html`<div part="empty" role="row"><div role="gridcell"><slot name="empty">${
+                  this.found ? this.noMatchesLabel : this.emptyLabel
+                }</slot></div></div>`
+              : nothing
           }
           ${this.windowed ? html`<div part="after" role="presentation" style="block-size: ${after}px"></div>` : nothing}
         </div>

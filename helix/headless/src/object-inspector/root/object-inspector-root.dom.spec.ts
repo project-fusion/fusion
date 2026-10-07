@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, hasState, mount, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -645,6 +645,44 @@ describe('a filtered object inspector', () => {
     const host = await inspector('filter="nowhere"')
     expect(rows(host)).toHaveLength(0)
     expect(tree(host).hasAttribute('aria-activedescendant')).toBe(false)
+  })
+
+  /* Measured before this: the host said nothing of a filter through its
+     states, and a filter that matched nothing left an empty box. */
+  test('says it is filtered, whether it matched, and that it is empty, through states', async () => {
+    const host = (await inspector('filter="main"')) as Inspector & { filter: string }
+    expect([
+      hasState(host, 'filtered'),
+      hasState(host, 'matched'),
+      hasState(host, 'empty'),
+    ]).toEqual([true, true, false])
+    host.filter = 'nowhere'
+    await host.updateComplete
+    expect([
+      hasState(host, 'filtered'),
+      hasState(host, 'matched'),
+      hasState(host, 'empty'),
+    ]).toEqual([true, false, true])
+    const empty = host.shadowRoot?.querySelector('[part="empty"]')
+    expect(empty?.getAttribute('role')).toBe('row')
+    expect(empty?.textContent?.trim()).toBe('No matches')
+    host.filter = ''
+    await host.updateComplete
+    expect([hasState(host, 'filtered'), hasState(host, 'empty')]).toEqual([false, false])
+    expect(host.shadowRoot?.querySelector('[part="empty"]')).toBeNull()
+  })
+})
+
+describe('an object inspector with nothing to show', () => {
+  test('says so in a row of the tree, in words the `empty` slot replaces', async () => {
+    const host = (await mount(
+      '<helix-headless-object-inspector empty-label="Waiting for the response"></helix-headless-object-inspector>',
+    )) as Inspector
+    await host.updateComplete
+    const empty = host.shadowRoot?.querySelector('[part="empty"]')
+    expect(hasState(host, 'empty')).toBe(true)
+    expect(empty?.textContent?.trim()).toBe('Waiting for the response')
+    expect(empty?.querySelector('slot[name="empty"]')).not.toBeNull()
   })
 })
 
