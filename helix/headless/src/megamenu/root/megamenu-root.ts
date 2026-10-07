@@ -8,6 +8,7 @@ import {
   KeyboardNavigationController,
   MixinControllerOpen,
   type NavigableItem,
+  type Placement,
   PopoverController,
   tellDisclosure,
 } from '@fusion.dev/helix-core'
@@ -32,7 +33,10 @@ import { HandOver, type Motion } from '../hand-over.js'
  *
  * It opens on hover by default, and a press always opens it too. `open-on` sets
  * which. Hover is the default because in a navigation bar people expect to move
- * along the row and see each section.
+ * along the row and see each section. A pointer resting on the trigger opens
+ * the panel after `open-delay`, and leaving closes it after `close-delay`. Moving
+ * from one open panel's trigger to another's opens the next at once, as Radix's
+ * `skipDelayDuration` does.
  *
  * When one panel opens in place of another, each says which way the reader
  * moved, as Radix's `data-motion` does. Moving toward the end of the bar, the
@@ -65,6 +69,12 @@ import { HandOver, type Motion } from '../hand-over.js'
  * to its trigger, and Tab moves through the panel's links and closes it on the
  * way out. The trigger says `aria-expanded`, and the panel is a group named by
  * `label`.
+ *
+ * A Helix trigger, such as `helix-button`, is told whether the panel is open
+ * inside its own shadow root. On a plain element, such as a `<button>`, the
+ * megamenu writes `aria-expanded`, from a frame after its own first render, so
+ * a server's markup is never changed while a framework hydrates it. It never
+ * writes it where you wrote `aria-expanded` yourself.
  *
  * @since 0.1.0
  * @status stable
@@ -135,10 +145,26 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
   bandBelow = 640
 
   /**
+   * How long a pointer leaving the trigger and the panel waits before the panel
+   * closes, in milliseconds. The pointer needs the time to cross from the
+   * trigger to the panel.
+   */
+  @property({ attribute: 'close-delay', type: Number })
+  closeDelay = 220
+
+  /**
    * The section's name, used for the default trigger and the panel.
    */
   @property()
   label = ''
+
+  /**
+   * How long a pointer rests on the trigger before the panel opens, in
+   * milliseconds, under `open-on="hover"`. A pointer crossing the bar on its
+   * way somewhere else opens nothing.
+   */
+  @property({ attribute: 'open-delay', type: Number })
+  openDelay = 120
 
   /**
    * Whether hovering over the trigger opens the panel (`hover`), or only a press
@@ -155,6 +181,14 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
      selects on it, so there is nothing to reflect for. */
   @property({ attribute: 'open-on' })
   openOn: 'click' | 'hover' = 'hover'
+
+  /**
+   * The side of the trigger a card panel opens on, when there is room. It
+   * moves if that side does not fit. A band ignores it, since a band spans the
+   * page under its bar.
+   */
+  @property()
+  placement: Placement = 'bottom-start'
 
   /**
    * Whether the panel is a card under the trigger or a band across the page.
@@ -223,17 +257,38 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
     onDismiss: () => this.close(),
     open: () => this.open,
     place: () => !this.banded,
-    placement: () => 'bottom-start',
+    placement: () => this.placement,
     surface: () => this.partNamed('surface'),
   })
 
-  /** Tells a slotted trigger the disclosure state, by property. See `tellDisclosure`. */
+  /**
+   * Tells a slotted trigger the disclosure state.
+   *
+   * A Helix trigger by property, through `tellDisclosure`. A plain element,
+   * which has no shadow root to keep the state out of the markup, by
+   * `aria-expanded`, from a frame after the first render, as `Popover` writes
+   * it. One that already carries `aria-expanded` is the consumer's to keep.
+   */
   private tellTrigger(): void {
     const slotted = this.slotted
-    if (slotted) {
+    if (!slotted || slotted.localName.includes('-')) {
       tellDisclosure(slotted, this.open)
+      return
     }
+    if (slotted !== this.told) {
+      if (!this.settledOnce || slotted.hasAttribute('aria-expanded')) {
+        return
+      }
+      this.told = slotted
+    }
+    slotted.setAttribute('aria-expanded', String(this.open))
   }
+
+  /** Whether a frame has passed since the first render, after which a plain trigger may be told. */
+  private settledOnce = false
+
+  /** The plain trigger this megamenu writes `aria-expanded` on. */
+  private told: Element | undefined
 
   /** What the consumer slotted, if they slotted anything. */
   private get slotted(): HTMLElement | undefined {
@@ -363,17 +418,6 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
     return this.trigger.getBoundingClientRect().bottom
   }
 
-  /**
-   * How long a pointer has to mean it, in milliseconds.
-   *
-   * Opening is the shorter wait: too long and the panel feels stuck, too short
-   * and crossing the bar opens things. Closing is longer because the pointer
-   * has to get from the trigger to the panel, and the straight line between
-   * them is not the line anybody moves along.
-   */
-  private static readonly OPEN_DELAY = 120
-  private static readonly CLOSE_DELAY = 220
-
   private timer: ReturnType<typeof setTimeout> | undefined
 
   /* What pressed last, so a click can be told apart from a tap. A click event
@@ -437,7 +481,7 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
     /* No wait when a panel is already down: the bar is open, and the reader
        moving along it is choosing, not passing through. */
     const showing = HelixHeadlessMegamenu.bar.showing
-    this.schedule(showing && showing !== this ? 0 : HelixHeadlessMegamenu.OPEN_DELAY, () => {
+    this.schedule(showing && showing !== this ? 0 : this.openDelay, () => {
       this.requestOpen(true)
     })
   }
@@ -446,7 +490,7 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
     if (this.openOn !== 'hover' || event.pointerType !== 'mouse') {
       return
     }
-    this.schedule(HelixHeadlessMegamenu.CLOSE_DELAY, () => {
+    this.schedule(this.closeDelay, () => {
       /* Not `close()`: leaving with the pointer should not pull focus back to
          the trigger, which would scroll the page to a nav bar the reader has
          moved on from. Escape is the one that returns them. */
@@ -559,6 +603,13 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
     this.addEventListener('pointerleave', this.handlePointerLeave)
     this.addEventListener('focusout', this.handleFocusOut)
     this.addEventListener('keydown', this.handleKeyDown)
+    /* A frame after the first render, when a plain trigger is first told the
+       panel is closed. Not in the first render: a framework that rendered the
+       trigger on a server may still be hydrating it then. */
+    void this.whenSettled.then(() => {
+      this.settledOnce = true
+      this.tellTrigger()
+    })
   }
 
   override disconnectedCallback(): void {
@@ -669,12 +720,12 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
        element's shadow root, and the consumer's markup is left as they served
        it.
 
-       **What it cannot reach is a trigger that is not a Helix element.** A plain
+       **A trigger that is not a Helix element is written to, late.** A plain
        `<button slot="trigger">` has no shadow root to hide the state in and no
        property to take it, and a React consumer cannot mirror it themselves
-       because the open state is this element's. That case is warned about rather
-       than written to, on the same argument `Tooltip` makes about a link it
-       will not write for the consumer.
+       because the open state is this element's. It gets `aria-expanded` from a
+       frame after the first render, which is after hydration, as `Popover`
+       writes it, and never where the consumer wrote their own.
 
        **`aria-controls` is not written here and cannot be.** It would name
        `panel`, an id inside this shadow root, and an IDREF resolves only within

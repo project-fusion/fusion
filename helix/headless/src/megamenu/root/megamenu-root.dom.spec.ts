@@ -146,6 +146,23 @@ describe('a megamenu opening on hover', () => {
     expect(host.open).toBe(false)
   })
 
+  test('waits as long as `open-delay` and `close-delay` say', async () => {
+    const host = (await mount(
+      `<helix-headless-megamenu label="Products" open-delay="0" close-delay="400"><a href="/one">One</a></helix-headless-megamenu>`,
+    )) as Section
+    host.dispatchEvent(pointer('pointerenter', 'mouse'))
+    await settle(20)
+    await host.updateComplete
+    expect(host.open).toBe(true)
+    host.dispatchEvent(pointer('pointerleave', 'mouse'))
+    await settle(300)
+    await host.updateComplete
+    expect(host.open).toBe(true)
+    await settle(200)
+    await host.updateComplete
+    expect(host.open).toBe(false)
+  })
+
   test('and a touch does not open it, because a tap has to', async () => {
     /* A touch screen synthesizes an enter on tap. Acting on it would open the
        panel and let the click behind it close the panel again, so a tap would
@@ -543,16 +560,27 @@ describe('a megamenu whose trigger the consumer slotted', () => {
     expect(trigger.expanded).toBe(false)
   })
 
-  test('a trigger that cannot hold the state is left alone rather than written to', async () => {
-    /* A plain `<button slot="trigger">` has no shadow root to keep the state out
-       of the markup and no property to take it, so nothing is written and
-       `tellDisclosure` says so once. The reader loses the announcement, which is
-       the cost this records rather than hides. */
-    const host = await slotted()
+  test('a plain trigger is told it is collapsed a frame after the first render, and then each change', async () => {
+    /* A plain `<button slot="trigger">` has no shadow root to keep the state
+       out of the markup, so it is written onto the button, late enough that a
+       framework has finished hydrating it, as `Popover` does. */
+    const host = (await slotted()) as Section & { whenSettled: Promise<void> }
     expect(own(host).hasAttribute('aria-expanded')).toBe(false)
+    await host.whenSettled
+    expect(own(host).getAttribute('aria-expanded')).toBe('false')
     host.open = true
     await host.updateComplete
-    expect(own(host).hasAttribute('aria-expanded')).toBe(false)
+    expect(own(host).getAttribute('aria-expanded')).toBe('true')
+  })
+
+  test('a plain trigger that says its own state is left to the page', async () => {
+    const host = (await mount(
+      `<helix-headless-megamenu label="Products"><button slot="trigger" aria-expanded="mixed">Products</button><a href="/one">One</a></helix-headless-megamenu>`,
+    )) as Section & { whenSettled: Promise<void> }
+    await host.whenSettled
+    host.open = true
+    await host.updateComplete
+    expect(host.querySelector('button')?.getAttribute('aria-expanded')).toBe('mixed')
   })
 
   test('and it is not given an `aria-controls` that could never resolve', async () => {
