@@ -448,3 +448,13 @@ describe('a clearable time input', () => {
     expect(part(host, 'clear')).toBeNull()
   })
 })
+
+describe('a time input holding nothing', () => {
+  test('is blank, as a state', async () => {
+    const host = (await field()) as InputTime & { internals: ElementInternals; value: string }
+    expect(host.internals.states.has('blank')).toBe(true)
+    host.value = '09:30'
+    await host.updateComplete
+    expect(host.internals.states.has('blank')).toBe(false)
+  })
+})

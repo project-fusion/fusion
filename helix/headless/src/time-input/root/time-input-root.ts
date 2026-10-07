@@ -177,6 +177,7 @@ import '../../time-picker/index.js'
  * @csspart trigger - The control that opens the list.
  * @csspart trigger-icon - The icon on the button that opens the clock.
  *
+ * @cssstate blank - The field holds no time.
  * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
  * @cssstate open - While the clock is open.
  */
@@ -813,6 +814,11 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
       @keydown=${this.handleDraftKey}
       @keypress=${this.handleKeypress}
     />`
+  }
+
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    this.toggleState('blank', this.value === '')
   }
 
   protected override render(): TemplateResult {
