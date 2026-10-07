@@ -442,7 +442,7 @@ describe('moving between turns', () => {
     const element = (await mount(three)) as Chat
     await element.updateComplete
     await Promise.resolve()
-    const turns = [...element.querySelectorAll('helix-headless-chat-message')] as Array<
+    const turns = [...element.querySelectorAll('helix-headless-chat-message')] as unknown as Array<
       HTMLElement & { internals: ElementInternals; updateComplete: Promise<unknown> }
     >
     await Promise.all(turns.map((one) => one.updateComplete))

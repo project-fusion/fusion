@@ -906,11 +906,11 @@ describe('choosing items', () => {
     await press(host, 'ArrowDown')
     expect((document.activeElement as HTMLElement).dataset.index).toBe('3')
     await press(host, 'a', { ctrlKey: true })
-    expect(host.value.split(',')).not.toContain('Row 2')
-    expect(host.value.split(',')).toHaveLength(8)
+    expect(String(host.value).split(',')).not.toContain('Row 2')
+    expect(String(host.value).split(',')).toHaveLength(8)
     row(host, 1).click()
     await settle(host)
-    expect(host.value.split(',')).not.toContain('Row 2')
+    expect(String(host.value).split(',')).not.toContain('Row 2')
     // Typing passes over a disabled item too.
     host.value = ''
     host.disabledKeys = 'Row 1'
