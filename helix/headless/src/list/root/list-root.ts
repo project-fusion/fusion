@@ -170,6 +170,17 @@ export class HelixHeadlessList extends HelixElement {
   @property({ attribute: 'canceled-label' })
   canceledLabel = 'Canceled'
 
+  /**
+   * What `disabled` takes from a row, in a list that selects: `all`, which
+   * passes over the row, or `selection`, which keeps the row out of the
+   * selection and lets the keys reach it and Enter or a press act on it, as
+   * React Aria's GridList takes `disabledBehavior`.
+   *
+   * Absent is `all`.
+   */
+  @property({ attribute: 'disabled-behavior' })
+  disabledBehavior?: 'all' | 'selection' | undefined
+
   /** What screen readers hear when a row is dropped, in a `reorderable` list. */
   @words
   @property({ attribute: 'dropped-label' })
@@ -278,17 +289,6 @@ export class HelixHeadlessList extends HelixElement {
    */
   @property({ attribute: 'selection-behavior' })
   selectionBehavior: ListSelectionBehavior = 'toggle'
-
-  /**
-   * What `disabled` takes from a row, in a list that selects: `all`, which
-   * passes over the row, or `selection`, which keeps the row out of the
-   * selection and lets the keys reach it and Enter or a press act on it, as
-   * React Aria's GridList takes `disabledBehavior`.
-   *
-   * Absent is `all`.
-   */
-  @property({ attribute: 'disabled-behavior' })
-  disabledBehavior?: 'all' | 'selection' | undefined
 
   /** Whether the row is out of reach of the keys and of actions, past selection. */
   private blocked(row: HelixHeadlessListItem): boolean {
