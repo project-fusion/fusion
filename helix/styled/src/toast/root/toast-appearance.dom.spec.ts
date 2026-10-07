@@ -64,6 +64,28 @@ if (hasLayout()) {
     })
   })
 
+  describe('a region holding messages back', () => {
+    /* The rule that keeps a hidden message laid out for its exit outranked
+       the one that takes a waiting message out of the stack, so the third of
+       three under `max-visible="2"` was drawn, read, and reached by Tab. */
+    test('takes the waiting message out of the stack', async () => {
+      const host = (await mount(
+        '<helix-toast label="N" max-visible="2"></helix-toast>',
+      )) as HTMLElement & {
+        add(message: string): HTMLElement
+        updateComplete: Promise<boolean>
+      }
+      host.add('One')
+      host.add('Two')
+      const third = host.add('Three') as Item
+      await host.updateComplete
+      await third.updateComplete
+      expect(third.hidden).toBe(true)
+      expect(getComputedStyle(third).display).toBe('none')
+      expect(third.getBoundingClientRect().height).toBe(0)
+    })
+  })
+
   describe('toast item appearance', () => {
     const item = async (attrs = ''): Promise<Item> => {
       const host = await region(`<helix-toast-item ${attrs}>Saved</helix-toast-item>`)
