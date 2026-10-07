@@ -117,6 +117,7 @@ const dates = (value: string): string[] =>
  * @csspart picker-day-outside - A day from a neighboring month. Applied with `picker-day`.
  * @csspart picker-day-selected - The chosen day, or either end of a chosen range. Applied with `picker-day`.
  * @csspart picker-day-today - Today. Applied with `picker-day`.
+ * @csspart picker-day-weekend - A day of the weekend where the calendar's language is spoken, beside `picker-day`.
  * @csspart picker-feedback - The calendar's own message, under it, while the calendar's `feedback` is set.
  * @csspart picker-grid - The grid of days.
  * @csspart picker-header - The month name and its controls.
@@ -777,7 +778,8 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
       exportparts="cell: picker-cell, cell-range-end: picker-cell-range-end,
         cell-range-middle: picker-cell-range-middle, cell-range-start: picker-cell-range-start,
         day: picker-day, day-disabled: picker-day-disabled, day-outside: picker-day-outside,
-        day-selected: picker-day-selected, day-today: picker-day-today, feedback: picker-feedback, grid: picker-grid,
+        day-selected: picker-day-selected, day-today: picker-day-today, day-weekend: picker-day-weekend,
+        feedback: picker-feedback, grid: picker-grid,
         header: picker-header, heading: picker-heading, heading-button: picker-heading-button,
         month: picker-month, months: picker-months, next: picker-next,
         next-mark: picker-next-mark, period: picker-period, period-current: picker-period-current,

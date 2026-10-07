@@ -1063,3 +1063,51 @@ describe('a date picker in a calendar other than the Gregorian', () => {
 /** A locale written in the Gregorian calendar. */
 const calendarOf = (lang: string): string =>
   new Intl.Locale(lang, { calendar: 'gregory' }).toString()
+
+/* React Aria names each weekday column in full, reads today in a time zone of
+   your choosing, and marks the weekend; Zag's calendar takes content above and
+   under the grid. */
+describe('the columns, the weekend, today, and content around the calendar', () => {
+  test('each weekday column shows the short name and says the full one', async () => {
+    const cal = await calendar('locale="en-US" default-month="2026-08"')
+    const headers = [...(cal.shadowRoot?.querySelectorAll('[part="weekday"]') ?? [])]
+    expect(headers[0]?.textContent?.trim()).toBe('Sun')
+    expect(headers[0]?.getAttribute('aria-label')).toBe('Sunday')
+  })
+
+  test("marks the weekend days of the calendar's language", async () => {
+    const cal = await calendar('locale="en-US" default-month="2026-08"')
+    const cells = days(cal).filter((cell) => !cell.hasAttribute('data-outside'))
+    const weekend = cells
+      .filter((cell) => cell.hasAttribute('data-weekend'))
+      .map((cell) => cell.textContent?.trim())
+    expect(weekend.slice(0, 2)).toEqual(['1', '2'])
+    const day = cells[0]?.querySelector('[part~="day"]')
+    expect(day?.getAttribute('part')).toContain('day-weekend')
+  })
+
+  test('reads today in `time-zone`', async () => {
+    const cal = (await calendar('default-month="2026-08"')) as DatePicker & {
+      timeZone: string
+      updateComplete: Promise<unknown>
+    }
+    const now = new Date()
+    const at = (zone: string): string =>
+      new Intl.DateTimeFormat('en-CA', { timeZone: zone }).format(now)
+    for (const zone of ['Pacific/Kiritimati', 'Pacific/Pago_Pago']) {
+      cal.timeZone = zone
+      ;(cal as unknown as { month: string }).month = at(zone).slice(0, 7)
+      await cal.updateComplete
+      const today = cal.shadowRoot?.querySelector('[part~="cell"][aria-current="date"]')
+      expect(today?.textContent?.trim()).toBe(String(Number(at(zone).slice(8, 10))))
+    }
+  })
+
+  test('takes content above and under the calendar in the header and footer slots', async () => {
+    const cal = (await mount(
+      '<helix-headless-date-picker label="Date" default-month="2026-08"><p slot="header">Arrival</p><button slot="footer">Today</button></helix-headless-date-picker>',
+    )) as DatePicker
+    expect(slotted(cal, 'header').length).toBe(1)
+    expect(slotted(cal, 'footer').length).toBe(1)
+  })
+})

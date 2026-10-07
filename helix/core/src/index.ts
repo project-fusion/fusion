@@ -383,6 +383,8 @@ export {
   periodKey,
   periodMove,
   sameMonth,
+  todayIn,
+  weekendOf,
   weekStartOf,
   YEARS_SHOWN,
   yearOut,
