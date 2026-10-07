@@ -2,6 +2,7 @@ import {
   AriaForwardController,
   anchorElement,
   arrowReach,
+  auditName,
   CommandController,
   customElement,
   deepActiveElement,
@@ -32,9 +33,10 @@ import { hideOutside } from '../hide-outside.js'
  *
  * The trigger is slotted and stays your own element. A Helix trigger is told
  * whether the popover is open inside its own shadow root. On a plain element,
- * such as a `<button>`, the popover writes `aria-expanded` only once a reader
- * has pressed it, which is after any hydration, and never where you wrote
- * `aria-expanded` yourself. It writes nothing else onto your markup.
+ * such as a `<button>`, the popover writes `aria-expanded`, from a frame after
+ * its own first render, or from the first press where that comes sooner. It
+ * never writes it where you wrote `aria-expanded` yourself, and writes nothing
+ * else onto your markup.
  *
  * The panel is in the top layer through the popover API, so it needs no
  * `z-index`, and an ancestor with `overflow: hidden`, `transform`, `filter`, or
@@ -57,6 +59,17 @@ import { hideOutside } from '../hide-outside.js'
  *
  * The panel's name is `label` when you set it. Otherwise it is the first
  * heading in the panel, or the elements an `aria-labelledby` on the host names.
+ * A development build warns when a popover opens with nothing but
+ * `fallback-label` to name it.
+ *
+ * **Keyboard.** Opening moves focus to the first control in the panel, or to
+ * the panel where it holds none.
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Enter, Space | On the trigger, opens the panel, or closes it while it is open. |
+ * | Escape | Closes the panel and puts focus back on the trigger. |
+ * | Tab, Shift+Tab | Moves through the controls in the panel. Leaving the panel and the trigger closes it. With `modal`, moves from the last control round to the first and from the first round to the last. |
  *
  * `arrow` draws a point on the panel's edge facing the trigger. The side the
  * panel landed on is on the host as `:state(placed-top)` and its kin, and the
@@ -376,6 +389,13 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
     super.connectedCallback()
     this.addEventListener('focusout', this.handleFocusOut)
     this.addEventListener('click', this.notePress, { capture: true })
+    /* A frame after the first render, which is when a closed panel is first
+       said to be closed. Not in the first render itself: a framework that
+       rendered the trigger on a server may still be hydrating it then. */
+    void this.whenSettled.then(() => {
+      this.pressed = true
+      this.tellTrigger()
+    })
   }
 
   /**
@@ -407,7 +427,7 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
     }
   }
 
-  /** Whether a reader has pressed the trigger, which is after any hydration. */
+  /** Whether the trigger may be told, from a frame after the first render or a reader's press. */
   private pressed = false
 
   /** The plain trigger this popover writes `aria-expanded` on, once it may. */
@@ -418,9 +438,8 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
    *
    * A Helix trigger by property, through `tellDisclosure`. A plain element,
    * which has no shadow root to keep the state out of the markup, by
-   * `aria-expanded`, and only from a reader's first press on: by then a server
-   * or a framework has long finished writing the element, so the write cannot
-   * be a hydration mismatch. One that already carries `aria-expanded` is the
+   * `aria-expanded`, from a frame after the first render or a reader's first
+   * press on, so a closed panel is said to be closed before anyone presses. One that already carries `aria-expanded` is the
    * consumer's to keep, and is left alone.
    */
   private tellTrigger(): void {
@@ -476,6 +495,16 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
        and discards. */
     this.tellTrigger()
     this.nameByHeading()
+    /* Asked once the panel first opens, as `Dialog` asks: a panel named by
+       `fallback-label` alone is announced as "Popover". */
+    if (changed.has('open') && this.open) {
+      auditName(
+        this,
+        () => null,
+        'Give it a `label`, or a heading in the panel.',
+        () => this.label !== '' || this.namedByHeading || headingIn(this.slotted) != null,
+      )
+    }
     /* Never on the first update for the same reason as focus below: a popover
        served open was opened by nobody, and the page it would hide is the
        server's. */
