@@ -1,10 +1,11 @@
 import {
   customElement,
-  HelixDismissEvent,
   HelixElement,
+  MixinDismissible,
   MixinSelectableItem,
   plainClick,
   reflectElements,
+  words,
 } from '@fusion.dev/helix-core'
 import { x } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -26,7 +27,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * can: a press on its `dismiss` mark, or Delete or Backspace while the tab
  * has focus, sends `helix-dismiss`. The tab does not remove itself, because
  * your code owns the set, so remove the tab and its panel in your handler.
- * The tab set then selects a tab that is left and keeps focus on the strip.
+ * Focus moves to the tab beside it, and the tab set selects a tab that is
+ * left.
  * The tab says the key through `aria-keyshortcuts`, and the mark is for the
  * pointer, hidden from screen readers.
  *
@@ -46,7 +48,13 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @cssstate selected - While it is the tab selected.
  */
 @customElement('helix-headless-tab')
-export class HelixHeadlessTab extends MixinSelectableItem(HelixElement) {
+export class HelixHeadlessTab extends MixinDismissible(MixinSelectableItem(HelixElement)) {
+  /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-tab': { dismissLabel: 'Schließen' } })`.
+   */
+  static words = 'helix-tab'
+
   /* The control is a `<button role="tab">` and the part is named for what it
      is, so the one thing the shared item has to know is said here. */
   protected override itemPart = 'tab'
@@ -61,11 +69,13 @@ export class HelixHeadlessTab extends MixinSelectableItem(HelixElement) {
   controls: Element | undefined = undefined
 
   /**
-   * Whether the tab can be closed: it draws a mark that sends `helix-dismiss`,
-   * and Delete or Backspace send it too.
+   * The tooltip on the mark that closes a `dismissible` tab. The mark is for
+   * the pointer and hidden from screen readers, which hear the Delete key
+   * through `aria-keyshortcuts`.
    */
-  @property({ reflect: true, type: Boolean })
-  dismissible = false
+  @words
+  @property({ attribute: 'dismiss-label' })
+  override dismissLabel = 'Close'
 
   /**
    * The URL the tab links to. Setting it renders the tab as a link, for a set
@@ -96,14 +106,20 @@ export class HelixHeadlessTab extends MixinSelectableItem(HelixElement) {
 
   /**
    * Sends `helix-dismiss` for a `dismissible` tab, and returns `false` where a
-   * listener refused it. The tab stays where it is either way: removing it is
-   * yours.
+   * listener refused it, or where the tab is not dismissible or is disabled.
+   * The tab stays where it is either way: removing it is yours. Where the tab
+   * had focus, focus moves to the tab beside it once you remove it.
    */
-  dismiss(): boolean {
+  override dismiss(): boolean {
     if (!this.dismissible || this.disabled) {
       return false
     }
-    return this.dispatchEvent(new HelixDismissEvent({ label: (this.textContent ?? '').trim() }))
+    return super.dismiss()
+  }
+
+  /** Where focus goes when a tab beside this one that held it is removed: this tab. */
+  protected override get returnFocusTo(): HTMLElement | null {
+    return this.partNamed('tab')
   }
 
   /** A press on the mark closes the tab, and neither selects it nor follows its link. */
@@ -125,7 +141,7 @@ export class HelixHeadlessTab extends MixinSelectableItem(HelixElement) {
     if (!this.dismissible) {
       return nothing
     }
-    return html`<span part="dismiss" aria-hidden="true" @click=${this.handleDismissPress}
+    return html`<span part="dismiss" aria-hidden="true" title=${this.dismissLabel} @click=${this.handleDismissPress}
       ><svg fill="currentColor" viewBox=${x.viewBox} aria-hidden="true">${unsafeSVG(x.content)}</svg></span
     >`
   }
