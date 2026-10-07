@@ -242,3 +242,20 @@ describe('a bubble for each thumb', () => {
     expect(bubbles(host)[1]?.getAttribute('style')).toContain('--slider-at: 0.6')
   })
 })
+
+describe('a vertical slider', () => {
+  /* `orientation` reached the stylesheet alone, so the headless slider was a
+     horizontal one to the accessibility tree, which reads the axis off the
+     range's writing mode. */
+  test('stands each range on end, maximum at the top, with no stylesheet', async () => {
+    for (const extra of ['', 'range']) {
+      const host = await slider(`orientation="vertical" ${extra}`)
+      for (const control of thumbs(host)) {
+        expect(control.style.writingMode).toBe('vertical-lr')
+        expect(control.style.direction).toBe('rtl')
+      }
+    }
+    const flat = await slider()
+    expect(thumbs(flat)[0]?.style.writingMode).toBe('')
+  })
+})
