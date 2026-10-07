@@ -1084,6 +1084,31 @@ describe('segmented', () => {
   })
 })
 
+describe('a segmented date input and autofill', () => {
+  /* A row of spans is no field a browser fills. Measured before this:
+     `autocomplete="bday"` on a segmented field reached no element at all. */
+  test('hands `autocomplete` to a hidden native date input, and takes its fill', async () => {
+    const host = await field('segmented name="born" autocomplete="bday"')
+    const hidden = host.shadowRoot?.querySelector('input[type="date"]') as HTMLInputElement
+    expect(hidden.getAttribute('autocomplete')).toBe('bday')
+    expect(hidden.getAttribute('aria-hidden')).toBe('true')
+    expect(hidden.tabIndex).toBe(-1)
+    const heard: string[] = []
+    host.addEventListener('change', () => heard.push(host.value))
+    hidden.value = '1990-05-17'
+    hidden.dispatchEvent(new Event('change'))
+    await host.updateComplete
+    expect(host.value).toBe('1990-05-17')
+    expect(heard).toEqual(['1990-05-17'])
+    expect(formValue(host)).toBe('1990-05-17')
+  })
+
+  test('and draws none without `autocomplete`', async () => {
+    const host = await field('segmented name="born"')
+    expect(host.shadowRoot?.querySelector('input[type="date"]')).toBeNull()
+  })
+})
+
 describe('the panel of a date input takes content of your own', () => {
   test('a header above the calendar and a footer under it', async () => {
     const host = (await mount(

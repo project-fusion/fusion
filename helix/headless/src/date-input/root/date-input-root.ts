@@ -204,11 +204,13 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
   })
 
   /**
-   * What the browser may autofill here, as one of the platform's own tokens.
+   * What the browser may autofill here, as one of the platform's own tokens,
+   * such as `bday`.
    *
    * Empty leaves the attribute off, which is the browser's default and is what
    * lets autofill work at all: hardcoding `off` here means a birthday or a
-   * postal code can never be filled in for a reader.
+   * postal code can never be filled in for a reader. With `segmented`, a
+   * hidden native date input carries it, since no browser fills the segments.
    */
   @property()
   autocomplete = ''
@@ -962,6 +964,42 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
       </svg></slot>`
   }
 
+  /**
+   * A native date input a browser's autofill can fill, where the field shows
+   * segments: a row of spans that no browser fills. React Aria's
+   * `HiddenDateInput` is the same answer for its segmented field.
+   *
+   * Drawn and never seen, a pixel and see-through, as Select's hidden select
+   * is, since Safari skips a field that is `display: none`. `aria-hidden` and
+   * out of the tab order, and in this shadow root, so the form still takes
+   * the value once, from the host. A fill is taken as a pick, with `input`
+   * and `change` from the host.
+   */
+  private renderAutofill(): TemplateResult | typeof nothing {
+    if (this.autocomplete === '' || this.autocomplete === 'off') {
+      return nothing
+    }
+    return html`<input
+      type="date"
+      aria-hidden="true"
+      autocomplete=${this.autocomplete}
+      name=${this.name || nothing}
+      style="position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;pointer-events:none"
+      tabindex="-1"
+      .value=${isDateValue(this.value) ? this.value : ''}
+      ?disabled=${this.isDisabled}
+      @change=${this.handleAutofill}
+      @input=${this.stopInner}
+    />`
+  }
+
+  private readonly handleAutofill = (event: Event): void => {
+    const filled = (event.currentTarget as HTMLInputElement).value
+    if (isDateValue(filled)) {
+      this.requestPicked(filled)
+    }
+  }
+
   /** The line of text the dates are typed into, where the field shows no segments. */
   private renderControl(): TemplateResult {
     return html`<input
@@ -1003,7 +1041,7 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
               )
             : nothing
         }
-        ${this.segmentsShown ? this.renderSegments() : this.renderControl()}
+        ${this.segmentsShown ? html`${this.renderSegments()}${this.renderAutofill()}` : this.renderControl()}
         <slot name="end"></slot>
         <button
           part="trigger"
