@@ -380,32 +380,6 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
   defaultExpanded = ''
 
   /**
-   * The keys of the rows whose rows are shown, separated by commas, in a table
-   * whose rows nest. A press on a row's disclosure button asks first, and
-   * `default-expanded` seeds what this element then owns.
-   */
-  @property()
-  get expanded(): string {
-    return this.expandedState ?? this.defaultExpanded
-  }
-
-  set expanded(next: string) {
-    const previous = this.expanded
-    this.expandedState = next
-    this.requestUpdate('expanded', previous)
-  }
-
-  /** The name of the heading over the disclosure buttons. */
-  @words
-  @property({ attribute: 'expand-column-label' })
-  expandColumnLabel = 'Expand'
-
-  /** The name of a row's disclosure button. `{row}` is the words of the row's first cell. */
-  @words
-  @property({ attribute: 'expand-row-label' })
-  expandRowLabel = 'Expand {row}'
-
-  /**
    * The keys selected at the start, separated by commas. Used until `selected`
    * is set.
    */
@@ -445,6 +419,32 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
    */
   @property({ attribute: 'error-text' })
   errorText = ''
+
+  /** The name of the heading over the disclosure buttons. */
+  @words
+  @property({ attribute: 'expand-column-label' })
+  expandColumnLabel = 'Expand'
+
+  /**
+   * The keys of the rows whose rows are shown, separated by commas, in a table
+   * whose rows nest. A press on a row's disclosure button asks first, and
+   * `default-expanded` seeds what this element then owns.
+   */
+  @property()
+  get expanded(): string {
+    return this.expandedState ?? this.defaultExpanded
+  }
+
+  set expanded(next: string) {
+    const previous = this.expanded
+    this.expandedState = next
+    this.requestUpdate('expanded', previous)
+  }
+
+  /** The name of a row's disclosure button. `{row}` is the words of the row's first cell. */
+  @words
+  @property({ attribute: 'expand-row-label' })
+  expandRowLabel = 'Expand {row}'
 
   /**
    * The table's name where neither `label` nor an `aria-label` or
@@ -533,21 +533,6 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
   selectColumnLabel = 'Select'
 
   /**
-   * What a press on a row, or in a `grid` table a key that moves to one, does
-   * to the rows already selected: `toggle`, the default, leaves them to the
-   * checkboxes, and `replace` selects the row alone.
-   */
-  @property({ attribute: 'selection-behavior' })
-  selectionBehavior: 'replace' | 'toggle' = 'toggle'
-
-  /**
-   * How many rows a `selectable` table selects: `multiple`, the default, or
-   * `single`, one at a time.
-   */
-  @property({ attribute: 'selection-mode' })
-  selectionMode?: 'multiple' | 'single'
-
-  /**
    * The keys of the selected rows, separated by commas.
    *
    * A reader's press fires `helix-select` first, and refusing it leaves the
@@ -574,6 +559,21 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
   @words
   @property({ attribute: 'selected-label' })
   selectedLabel = '{count} selected'
+
+  /**
+   * What a press on a row, or in a `grid` table a key that moves to one, does
+   * to the rows already selected: `toggle`, the default, leaves them to the
+   * checkboxes, and `replace` selects the row alone.
+   */
+  @property({ attribute: 'selection-behavior' })
+  selectionBehavior: 'replace' | 'toggle' = 'toggle'
+
+  /**
+   * How many rows a `selectable` table selects: `multiple`, the default, or
+   * `single`, one at a time.
+   */
+  @property({ attribute: 'selection-mode' })
+  selectionMode?: 'multiple' | 'single'
 
   /**
    * The name of a row's checkbox. `{row}` is replaced with the words of the
@@ -1060,7 +1060,9 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
       (node) =>
         node instanceof Element &&
         (node.matches('a[href], button, input, select, textarea, label, [contenteditable]') ||
-          node.getRootNode() === row.shadowRoot),
+          /* The row's own cells, the checkbox, the grip and the disclosure.
+             Not its slot, which a press on any of the page's cells passes. */
+          (node.getRootNode() === row.shadowRoot && node.localName !== 'slot')),
     )
     if (control) {
       return

@@ -524,6 +524,11 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   reconnectingLabel =
     'Moving the end of the connection from {from} to {to}. Move to a card and press Enter, or Escape to stop.'
 
+  /** What screen readers hear after a move or a resize is made again. */
+  @words
+  @property({ attribute: 'redone-label' })
+  redoneLabel = 'Move made again'
+
   /**
    * What screen readers hear after a key resizes a card, with `{name}` for the
    * card and `{width}` and `{height}` for its new size, in the document's
@@ -532,16 +537,6 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   @words
   @property({ attribute: 'resized-label' })
   resizedLabel = '{name} resized to {width} by {height}'
-
-  /** What screen readers hear after a move or a resize is made again. */
-  @words
-  @property({ attribute: 'redone-label' })
-  redoneLabel = 'Move made again'
-
-  /** What screen readers hear after a move or a resize is undone. */
-  @words
-  @property({ attribute: 'undone-label' })
-  undoneLabel = 'Move undone'
 
   /**
    * What a screen reader calls the board in place of its role, after its
@@ -615,16 +610,16 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   @property({ type: Number })
   snap?: number
 
+  /** The text announced when a connection is stopped before it is requested. */
+  @words
+  @property({ attribute: 'stopped-label' })
+  stoppedLabel = 'Stopped connecting.'
+
   /**
    * A label being edited in place: whose, and what it said before.
    */
   @state()
   private editing: { target: 'edge' | 'group'; key: string; was: string } | undefined
-
-  /** The text announced when a connection is stopped before it is requested. */
-  @words
-  @property({ attribute: 'stopped-label' })
-  stoppedLabel = 'Stopped connecting.'
 
   /**
    * What each tone means on this board, in words read out with the cards and
@@ -643,6 +638,11 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   @words
   @property({ attribute: 'two-finger-hint-label' })
   override twoFingerHintLabel = 'Use two fingers to move the board'
+
+  /** What screen readers hear after a move or a resize is undone. */
+  @words
+  @property({ attribute: 'undone-label' })
+  undoneLabel = 'Move undone'
 
   /** The line shown while the board, with `gestures="activate"`, has the gestures. */
   @words

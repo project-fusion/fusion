@@ -54,6 +54,12 @@ export class HelixHeadlessVideoPlaylistItem extends HelixElement {
   current = false
 
   /**
+   * Prevents the entry from being chosen.
+   */
+  @property({ reflect: true, type: Boolean })
+  disabled = false
+
+  /**
    * Whether the entry holds the playlist's tab stop. Unset, every entry is in
    * the tab order, which is what a server renders.
    *
@@ -63,12 +69,6 @@ export class HelixHeadlessVideoPlaylistItem extends HelixElement {
    */
   @property({ attribute: false })
   focusable?: boolean
-
-  /**
-   * Prevents the entry from being chosen.
-   */
-  @property({ reflect: true, type: Boolean })
-  disabled = false
 
   /**
    * The image shown before this entry plays, also used as the row's thumbnail.
