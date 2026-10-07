@@ -2732,3 +2732,16 @@ describe('a canvas with no name', () => {
     }
   })
 })
+
+/* The zoom lived in a private property on the plane, so a card's own stylesheet
+   could not keep a line one pixel wide, or draw less, as the board zoomed out. */
+describe('the zoom a card reads', () => {
+  test('is written on the box the cards are drawn in, beside the private one', async () => {
+    const host = await canvas()
+    const style = (part(host, 'viewport') as HTMLElement).getAttribute('style') ?? ''
+    const read = (name: string): string | undefined =>
+      new RegExp(`(?:^|;\\s*)${name}: ([0-9.e+-]+)`).exec(style)?.[1]
+    expect(read('--canvas-zoom')).toBeDefined()
+    expect(read('--canvas-zoom')).toBe(read('--_canvas-zoom'))
+  })
+})
