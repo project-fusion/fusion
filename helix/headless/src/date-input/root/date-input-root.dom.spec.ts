@@ -1362,3 +1362,10 @@ describe('the message for text that is no date', () => {
     expect(host.validationMessage).toBe('Datum als JJJJ-MM-TT.')
   })
 })
+
+describe('a date input in a time zone', () => {
+  test('hands the zone to its calendar, which reads today there', async () => {
+    const host = await field('time-zone="Pacific/Kiritimati"')
+    expect(picker(host).getAttribute('time-zone')).toBe('Pacific/Kiritimati')
+  })
+})
