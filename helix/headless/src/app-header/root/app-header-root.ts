@@ -63,8 +63,8 @@ import { inSectioningContent } from '../sectioning.js'
  * @documentation https://fusion.dev/helix/components/app-header
  *
  * @slot - The middle region, usually a `Navigation`.
- * @slot menu-icon - Replaces the glyph inside the toggle that opens a folded middle region.
  * @slot end - Trailing content.
+ * @slot menu-icon - Replaces the glyph inside the toggle that opens a folded middle region.
  * @slot start - Leading content, usually a wordmark.
  *
  * @event {HelixScrolledEvent} helix-scrolled - Fired when the page crosses the
