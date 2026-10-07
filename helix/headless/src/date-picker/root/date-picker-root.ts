@@ -7,14 +7,14 @@ import {
   calendarLocale,
   customElement,
   type DateCalendar,
-  fillTemplate,
+  formatWords,
   dateAsValue as fromDate,
   HelixFormElement,
   HelixNavigateEvent,
+  handedLocale,
   hostAria,
   inlineStep,
   commaList as list,
-  localeOf,
   localToday,
   MixinControllerValue,
   MixinPickerFeedback,
@@ -26,6 +26,8 @@ import {
   requestChange,
   sameMonth,
   weekStartOf,
+  words,
+  wordsLocale,
   YEARS_SHOWN,
   yearOut,
   yearPageOf,
@@ -148,14 +150,24 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
   MixinControllerValue(HelixFormElement),
 ) {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-date-picker': { nextLabel: 'Nächster Monat' } })`.
+   */
+  static words = 'helix-date-picker'
+
+  /**
    * The validation message for a value that is not a date.
    *
    * **Every sentence a control raises in the browser's bubble is a property**,
    * named for the validity flag it reports, so a form in another language
-   * speaks it. Absent is the control's own sentence, in English.
+   * speaks it. Unset is the sentence registered for the page's language, then
+   * the English. `{mode}` is `single`, `range` or `multiple`, so each can have
+   * its own sentence.
    */
+  @words
   @property({ attribute: 'bad-input-message' })
-  badInputMessage?: string
+  badInputMessage =
+    '{mode, select, single {Enter a date as YYYY-MM-DD.} other {Enter dates as YYYY-MM-DD, separated by commas.}}'
 
   /**
    * The calendar the heading, the days, and the months are written in:
@@ -229,6 +241,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
   /**
    * Accessible name for the grid.
    */
+  @words
   @property()
   label = 'Date Picker'
 
@@ -241,9 +254,9 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
   @property()
   locale = ''
 
-  /** The locale the words are written in: `locale`, or the page's `lang`. */
+  /** The locale the words and dates are written in: `locale`, or the page's `lang`. */
   private get language(): string {
-    return localeOf(this, this.locale)
+    return wordsLocale(this)
   }
 
   /**
@@ -315,24 +328,28 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
    * The name of the heading where it shows the months, with `{heading}`
    * filled in as the month on show.
    */
+  @words
   @property({ attribute: 'month-view-label' })
   monthViewLabel = '{heading}. Choose a month'
 
   /**
    * Accessible name for the control that pages forward.
    */
+  @words
   @property({ attribute: 'next-label' })
   nextLabel = 'Next month'
 
   /**
    * Accessible name for the control that moves forward a year, in the months.
    */
+  @words
   @property({ attribute: 'next-year-label' })
   nextYearLabel = 'Next year'
 
   /**
    * Accessible name for the control that moves forward a page, in the years.
    */
+  @words
   @property({ attribute: 'next-years-label' })
   nextYearsLabel = 'Later years'
 
@@ -344,18 +361,21 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
    * spelled out, since Lit lowercases a camelCase name rather than dash-casing
    * it.
    */
+  @words
   @property({ attribute: 'previous-label' })
   previousLabel = 'Previous month'
 
   /**
    * Accessible name for the control that moves back a year, in the months.
    */
+  @words
   @property({ attribute: 'previous-year-label' })
   previousYearLabel = 'Previous year'
 
   /**
    * Accessible name for the control that moves back a page, in the years.
    */
+  @words
   @property({ attribute: 'previous-years-label' })
   previousYearsLabel = 'Earlier years'
 
@@ -363,8 +383,9 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
    * The validation message for a date after `max`. `{max}` is replaced with
    * `max`, written as a date in `locale`.
    */
+  @words
   @property({ attribute: 'range-overflow-message' })
-  rangeOverflowMessage?: string
+  rangeOverflowMessage = 'Choose a date on or before {max}.'
 
   /**
    * The date the grid's tab stop is on.
@@ -384,8 +405,8 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
     if (this.firstDayOfWeek !== undefined && Number.isFinite(this.firstDayOfWeek)) {
       return ((Math.floor(this.firstDayOfWeek) % 7) + 7) % 7
     }
-    const language = this.language
-    return language === '' ? 0 : weekStartOf(language)
+    /* Sunday where nothing names a locale, as it always was. */
+    return handedLocale(this) === '' ? 0 : weekStartOf(this.language)
   }
 
   /**
@@ -836,8 +857,9 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
    * The validation message for a date before `min`. `{min}` is replaced with
    * `min`, written as a date in `locale`.
    */
+  @words
   @property({ attribute: 'range-underflow-message' })
-  rangeUnderflowMessage?: string
+  rangeUnderflowMessage = 'Choose a date on or after {min}.'
 
   /** Refuses every change while read-only. See `readOnly`. */
   override requestValue(next: string): boolean {
@@ -888,21 +910,24 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
   /**
    * The validation message for a date that `step` skips.
    */
+  @words
   @property({ attribute: 'step-mismatch-message' })
-  stepMismatchMessage?: string
+  stepMismatchMessage = 'Choose one of the dates the calendar offers.'
 
   /**
    * The validation message for a date that `disable-dates` or `disable-days`
    * bars.
    */
+  @words
   @property({ attribute: 'unavailable-message' })
-  unavailableMessage?: string
+  unavailableMessage = 'Choose a date that is available.'
 
   /**
    * The validation message for a required date picker with no date chosen.
    */
+  @words
   @property({ attribute: 'value-missing-message' })
-  valueMissingMessage?: string
+  valueMissingMessage = 'Choose a date.'
 
   /**
    * What the calendar shows: the days of a month, the months of a year, or a
@@ -917,6 +942,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
    * The name of the heading where it shows a page of years, with `{heading}`
    * filled in as the year on show.
    */
+  @words
   @property({ attribute: 'year-view-label' })
   yearViewLabel = '{heading}. Choose a year'
 
@@ -938,17 +964,13 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
     if (this.min !== '' && iso < this.min) {
       return [
         'rangeUnderflow',
-        fillTemplate(this.rangeUnderflowMessage || 'Choose a date on or after {min}.', {
-          min: this.spoken(this.min),
-        }),
+        formatWords(this, 'rangeUnderflowMessage', { min: this.spoken(this.min) }),
       ]
     }
     if (this.max !== '' && iso > this.max) {
       return [
         'rangeOverflow',
-        fillTemplate(this.rangeOverflowMessage || 'Choose a date on or before {max}.', {
-          max: this.spoken(this.max),
-        }),
+        formatWords(this, 'rangeOverflowMessage', { max: this.spoken(this.max) }),
       ]
     }
     const date = asDate(iso)
@@ -957,8 +979,8 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
       return undefined
     }
     return why === 'listed'
-      ? ['badInput', this.unavailableMessage || 'Choose a date that is available.']
-      : ['stepMismatch', this.stepMismatchMessage || 'Choose one of the dates the calendar offers.']
+      ? ['badInput', this.unavailableMessage]
+      : ['stepMismatch', this.stepMismatchMessage]
   }
 
   /**
@@ -974,11 +996,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
   private reportRequired(): void {
     const anchor = this.partNamed('grid') ?? undefined
     if (this.required && this.value === '') {
-      this.internals.setValidity(
-        { valueMissing: true },
-        this.valueMissingMessage || 'Choose a date.',
-        anchor,
-      )
+      this.internals.setValidity({ valueMissing: true }, this.valueMissingMessage, anchor)
       return
     }
     /* **A value the calendar cannot read is bad input.** The grid draws only
@@ -992,10 +1010,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
     if (held.length > 0 && held.some((one) => asDate(one) === null)) {
       this.internals.setValidity(
         { badInput: true },
-        this.badInputMessage ||
-          (this.mode === undefined
-            ? 'Enter a date as YYYY-MM-DD.'
-            : 'Enter dates as YYYY-MM-DD, separated by commas.'),
+        formatWords(this, 'badInputMessage', { mode: this.mode ?? 'single' }),
         anchor,
       )
       return
@@ -1019,10 +1034,12 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
       this.focused = ''
     }
     this.choosing = false
-    /* A page's `<label for>` names the group where `label` is still the
-       default, which is how a native control takes one. The platform gives
-       the host its labels, and the host is the group a reader is on. */
-    const outside = this.label === 'Date Picker' ? [...(this.internals.labels ?? [])] : []
+    /* A page's `<label for>` names the group where the page wrote no
+       `label`, which is how a native control takes one. The platform gives
+       the host its labels, and the host is the group a reader is on. The
+       attribute and not the words, which may be the ones registered for the
+       page's language. */
+    const outside = this.hasAttribute('label') ? [] : [...(this.internals.labels ?? [])]
     hostAria(this.internals, {
       label: this.label,
       labelledBy: outside as HTMLElement[],
@@ -1108,6 +1125,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
         locale: string
         long: Intl.DateTimeFormat
         monthName: Intl.DateTimeFormat
+        monthYear: Intl.DateTimeFormat
         weekday: Intl.DateTimeFormat
         year: Intl.DateTimeFormat
       }
@@ -1118,6 +1136,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
     heading: Intl.DateTimeFormat
     long: Intl.DateTimeFormat
     monthName: Intl.DateTimeFormat
+    monthYear: Intl.DateTimeFormat
     weekday: Intl.DateTimeFormat
     year: Intl.DateTimeFormat
   } {
@@ -1134,6 +1153,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
       locale: language,
       long: utc({ dateStyle: 'long' }),
       monthName: utc({ month: 'short' }),
+      monthYear: utc({ month: 'short', year: 'numeric' }),
       weekday: utc({ weekday: 'short' }),
       year: utc({ year: 'numeric' }),
     }
@@ -1210,7 +1230,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
           ''
         }
         <span part="heading" aria-live="polite"
-          >${this.renderHeadingText(heading, this.monthViewLabel)}</span
+          >${this.renderHeadingText(heading, 'monthViewLabel')}</span
         >
         ${
           last
@@ -1308,7 +1328,10 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
    * The heading's words, as a button that steps back to the months or the
    * years where `max-view` allows, and as text everywhere else.
    */
-  private renderHeadingText(text: string, label: string): TemplateResult | string {
+  private renderHeadingText(
+    text: string,
+    label: 'monthViewLabel' | 'yearViewLabel',
+  ): TemplateResult | string {
     const steps =
       this.maxView !== undefined &&
       (this.view === 'day' || (this.view === 'month' && this.maxView === 'year'))
@@ -1318,7 +1341,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
     return html`<button
       part="heading-button"
       type="button"
-      aria-label=${fillTemplate(label, { heading: text })}
+      aria-label=${formatWords(this, label, { heading: text })}
       ?disabled=${this.isDisabled}
       @click=${this.handleHeading}
     >${text}</button>`
@@ -1332,7 +1355,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
    * one tab stop in it, the month or year the keys are on.
    */
   private renderPeriods(): TemplateResult {
-    const { monthName, year: yearName } = this.formats
+    const { monthName, monthYear, year: yearName } = this.formats
     const years = this.view === 'year'
     const page = years ? yearPageOf(this.periodYear) : this.periodYear
     const heading = years
@@ -1353,7 +1376,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
         role="gridcell"
         aria-current=${current ? 'date' : nothing}
         aria-disabled=${out ? 'true' : nothing}
-        aria-label=${years ? words : `${words} ${yearName.format(first)}`}
+        aria-label=${years ? words : monthYear.format(first)}
         aria-selected=${chosen ? 'true' : nothing}
         tabindex=${at === stop && !this.isDisabled ? '0' : '-1'}
         @click=${() => this.choosePeriod(at)}
@@ -1375,7 +1398,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
           ${this.renderPreviousMark()}
         </button>
         <span part="heading" aria-live="polite"
-          >${this.renderHeadingText(heading, this.yearViewLabel)}</span
+          >${this.renderHeadingText(heading, 'yearViewLabel')}</span
         >
         <button
           part="next"

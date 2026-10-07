@@ -5,12 +5,12 @@ import {
   calendarLocale,
   customElement,
   type DateCalendar,
-  fillTemplate,
+  formatWords,
   dateAsValue as fromDate,
   type HelixBeforeChangeEvent,
   HelixFormElement,
+  handedLocale,
   isDateValue,
-  localeOf,
   MixinControllerOpen,
   MixinControllerValue,
   MixinField,
@@ -18,6 +18,8 @@ import {
   MixinPickerField,
   MixinSegmentedField,
   MixinTokens,
+  words,
+  wordsLocale,
 } from '@fusion.dev/helix-core'
 import { calendarBlank } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -153,6 +155,12 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
     ),
   ),
 ) {
+  /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-date-input': { triggerLabel: 'Datum auswählen' } })`.
+   */
+  static words = 'helix-date-input'
+
   /* A consumer's `aria-describedby` names ids in their own tree and the control
      is in this shadow root, so the reference has to be carried down as an
      element rather than copied as an id. See `AriaForwardController`: measured
@@ -188,6 +196,7 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
   /**
    * The name of the calendar's grid of days, read by screen readers.
    */
+  @words
   @property({ attribute: 'calendar-label' })
   calendarLabel = 'Date Picker'
 
@@ -271,9 +280,9 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
   @property()
   locale = ''
 
-  /** The locale the words are written in: `locale`, or the page's `lang`. */
+  /** The locale the words and dates are written in: `locale`, or the page's `lang`. */
   private get language(): string {
-    return localeOf(this, this.locale)
+    return wordsLocale(this)
   }
 
   /**
@@ -379,48 +388,56 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
    * The name of the calendar's heading where it shows the months, with
    * `{heading}` filled in.
    */
+  @words
   @property({ attribute: 'month-view-label' })
   monthViewLabel = '{heading}. Choose a month'
 
   /**
    * The name of the calendar's control that moves to the next month.
    */
+  @words
   @property({ attribute: 'next-label' })
   nextLabel = 'Next month'
 
   /**
    * The name of the calendar's control that moves forward a year.
    */
+  @words
   @property({ attribute: 'next-year-label' })
   nextYearLabel = 'Next year'
 
   /**
    * The name of the calendar's control that moves forward a page of years.
    */
+  @words
   @property({ attribute: 'next-years-label' })
   nextYearsLabel = 'Later years'
 
   /**
    * The text the field shows before a date is entered.
    */
+  @words
   @property()
   placeholder = 'YYYY-MM-DD'
 
   /**
    * The name of the calendar's control that moves to the previous month.
    */
+  @words
   @property({ attribute: 'previous-label' })
   previousLabel = 'Previous month'
 
   /**
    * The name of the calendar's control that moves back a year.
    */
+  @words
   @property({ attribute: 'previous-year-label' })
   previousYearLabel = 'Previous year'
 
   /**
    * The name of the calendar's control that moves back a page of years.
    */
+  @words
   @property({ attribute: 'previous-years-label' })
   previousYearsLabel = 'Earlier years'
 
@@ -428,25 +445,28 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
    * The message shown when a range holds more than two dates.
    *
    * **Every sentence a control raises in the browser's bubble is a property**,
-   * so a form in another language speaks it. Absent is the control's own
-   * sentence, in English.
+   * so a form in another language speaks it. Unset is the sentence registered
+   * for the page's language, then the English.
    */
+  @words
   @property({ attribute: 'range-length-message' })
-  rangeLengthMessage?: string
+  rangeLengthMessage = 'A range is two dates.'
 
   /**
    * The message shown when a date is after `max`. `{max}` is replaced with
    * `max`, written the way the field writes dates.
    */
+  @words
   @property({ attribute: 'range-overflow-message' })
-  rangeOverflowMessage?: string
+  rangeOverflowMessage = 'Choose a date on or before {max}.'
 
   /**
    * The message shown when a date is before `min`. `{min}` is replaced with
    * `min`, written the way the field writes dates.
    */
+  @words
   @property({ attribute: 'range-underflow-message' })
-  rangeUnderflowMessage?: string
+  rangeUnderflowMessage = 'Choose a date on or after {min}.'
 
   /**
    * The name of the button that removes one date. `{name}` is replaced with
@@ -455,6 +475,7 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
    * **The name goes in**, so a row of them is heard as which one each
    * removes rather than as "Remove" said once per date.
    */
+  @words
   @property({ attribute: 'remove-label' })
   removeLabel = 'Remove {name}'
 
@@ -472,12 +493,14 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
   /**
    * The message shown when a date is not on `step`.
    */
+  @words
   @property({ attribute: 'step-mismatch-message' })
-  stepMismatchMessage?: string
+  stepMismatchMessage = 'Choose one of the dates the calendar offers.'
 
   /**
    * The name of the button that opens the calendar, read by screen readers.
    */
+  @words
   @property({ attribute: 'trigger-label' })
   triggerLabel = 'Choose a date'
 
@@ -695,17 +718,13 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
     if (this.min !== '' && held.some((one) => one < this.min)) {
       return [
         'rangeUnderflow',
-        fillTemplate(this.rangeUnderflowMessage || 'Choose a date on or after {min}.', {
-          min: this.written(this.min),
-        }),
+        formatWords(this, 'rangeUnderflowMessage', { min: this.written(this.min) }),
       ]
     }
     if (this.max !== '' && held.some((one) => one > this.max)) {
       return [
         'rangeOverflow',
-        fillTemplate(this.rangeOverflowMessage || 'Choose a date on or before {max}.', {
-          max: this.written(this.max),
-        }),
+        formatWords(this, 'rangeOverflowMessage', { max: this.written(this.max) }),
       ]
     }
     /* What the calendar bars, a typed or seeded date is barred from too.
@@ -716,16 +735,13 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
       return date ? barredBy(date, this) : null
     })
     if (why.includes('listed')) {
-      return this.unavailableMessage || 'Choose a date that is available.'
+      return this.unavailableMessage
     }
     if (why.includes('step')) {
-      return [
-        'stepMismatch',
-        this.stepMismatchMessage || 'Choose one of the dates the calendar offers.',
-      ]
+      return ['stepMismatch', this.stepMismatchMessage]
     }
     if (this.mode === 'range' && held.length > 2) {
-      return this.rangeLengthMessage || 'A range is two dates.'
+      return this.rangeLengthMessage
     }
     return ''
   }
@@ -733,13 +749,15 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
   /**
    * The message shown when `disable-dates` or `disable-days` bars a date.
    */
+  @words
   @property({ attribute: 'unavailable-message' })
-  unavailableMessage?: string
+  unavailableMessage = 'Choose a date that is available.'
 
   /**
    * The name of the calendar's heading where it shows a page of years, with
    * `{heading}` filled in.
    */
+  @words
   @property({ attribute: 'year-view-label' })
   yearViewLabel = '{heading}. Choose a year'
 
@@ -775,7 +793,7 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
       disable-days=${this.disableDays || nothing}
       first-day-of-week=${this.firstDayOfWeek ?? nothing}
       label=${this.calendarLabel}
-      locale=${this.language || nothing}
+      locale=${handedLocale(this) || nothing}
       max=${this.max || nothing}
       max-view=${this.maxView ?? nothing}
       min=${this.min || nothing}
@@ -838,7 +856,7 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
                   part="date"
       exportparts="cell: date-cell, dismiss: date-dismiss, dismiss-mark: date-dismiss-mark, label: date-label, link: date-link, start: date-start"
                   dismissible
-                  dismiss-label=${fillTemplate(this.removeLabel, { name: this.written(date) })}
+                  dismiss-label=${formatWords(this, 'removeLabel', { name: this.written(date) })}
                   ?disabled=${this.isDisabled}
                   @helix-dismiss=${(event: Event) => {
                     event.stopPropagation()
@@ -873,6 +891,35 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
       </svg></slot>`
   }
 
+  /** The line of text the dates are typed into, where the field shows no segments. */
+  private renderControl(): TemplateResult {
+    return html`<input
+      part="control"
+      id=${this.controlId}
+      type="text"
+      .value=${this.display}
+      name=${this.name || nothing}
+      placeholder=${
+        this.mode === 'multiple' && dates(this.value).length > 0
+          ? nothing
+          : this.placeholder || nothing
+      }
+      autocomplete=${this.autocomplete || nothing}
+      inputmode="numeric"
+      aria-describedby=${this.describedBy ?? nothing}
+      aria-invalid=${this.invalidity ?? nothing}
+      ?disabled=${this.isDisabled}
+      ?readonly=${this.readOnly}
+      ?required=${this.required}
+      @blur=${this.handleBlur}
+      @change=${this.handleCommit}
+      @focus=${this.handleFocus}
+      @input=${this.handleInput}
+      @keydown=${this.handleDraftKey}
+      @keypress=${this.handleKeypress}
+    />`
+  }
+
   protected override render(): TemplateResult {
     return html`${this.renderLabel()}
       <div part="field" @keydown=${this.handleKeydown}>
@@ -884,35 +931,7 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
               )
             : nothing
         }
-        ${
-          this.segmentsShown
-            ? this.renderSegments()
-            : html`<input
-                part="control"
-                id=${this.controlId}
-                type="text"
-                .value=${this.display}
-                name=${this.name || nothing}
-                placeholder=${
-                  this.mode === 'multiple' && dates(this.value).length > 0
-                    ? nothing
-                    : this.placeholder || nothing
-                }
-                autocomplete=${this.autocomplete || nothing}
-                inputmode="numeric"
-                aria-describedby=${this.describedBy ?? nothing}
-                aria-invalid=${this.invalidity ?? nothing}
-                ?disabled=${this.isDisabled}
-                ?readonly=${this.readOnly}
-                ?required=${this.required}
-                @blur=${this.handleBlur}
-                @change=${this.handleCommit}
-                @focus=${this.handleFocus}
-                @input=${this.handleInput}
-                @keydown=${this.handleDraftKey}
-                @keypress=${this.handleKeypress}
-              />`
-        }
+        ${this.segmentsShown ? this.renderSegments() : this.renderControl()}
         <button
           part="trigger"
           type="button"
