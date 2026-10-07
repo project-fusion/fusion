@@ -208,6 +208,15 @@
 /* The message, under the times, in the danger ink and the size a field's
    feedback takes. Only with `feedback`, which also marks the picker invalid
    as `:state(invalid)`, beside the `invalid` attribute the rules above read. */
+/* Help under the times, set as the message that takes its place is, in the
+   quieter color a field's hint has. */
+[part="hint"] {
+  color: var(--helix-color-foreground-subtle);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  margin: var(--helix-space-sm) var(--helix-space-none) var(--helix-space-none);
+}
+
 [part="feedback"] {
   color: var(--time-picker-feedback-color, var(--helix-color-danger));
   font-family: var(--helix-font-sans);

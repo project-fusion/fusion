@@ -776,3 +776,19 @@ describe('an unnamed time picker', () => {
     expect(named.filter((one) => one.includes('no accessible name'))).toHaveLength(0)
   })
 })
+
+describe('a time picker with help under it', () => {
+  /* There was no hint at all, so help about the times sat outside the picker
+     and the list was not described by it. */
+  test('draws the hint under the times and describes the list by it', async () => {
+    const host = await picker('hint="Open 9 to 5"')
+    expect(part(host, 'hint')?.textContent?.trim()).toBe('Open 9 to 5')
+    expect(part(host, 'list')?.getAttribute('aria-describedby')).toBe('hint')
+  })
+
+  test('and a message in feedback takes its place', async () => {
+    const host = await picker('hint="Open 9 to 5" feedback="Choose a time"')
+    expect(part(host, 'hint')).toBeNull()
+    expect(part(host, 'list')?.getAttribute('aria-describedby')).toBe('feedback')
+  })
+})
