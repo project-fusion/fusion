@@ -319,6 +319,8 @@ describe('color picker', () => {
     expect(said).toEqual(['#ff0000'])
     expect(sample.hasAttribute('data-copied')).toBe(true)
     expect(sample.getAttribute('aria-label')).toBe('Copied')
+    const internals = (host as unknown as { internals: ElementInternals }).internals
+    expect(internals.states.has('copied')).toBe(true)
   })
 
   test('and a refused clipboard falls through to the older route', async () => {
@@ -446,6 +448,30 @@ describe('color picker', () => {
       const host = await withEyeDropper()
       expect(slotted(host, 'eyedropper-icon').length).toBe(0)
       expect(part(host, 'eyedropper')).not.toBeNull()
+    })
+
+    test('says it is sampling while the eyedropper is open, as a state', async () => {
+      let close: (picked: { sRGBHex: string }) => void = () => undefined
+      ;(globalThis as { EyeDropper?: unknown }).EyeDropper = class {
+        open(): Promise<{ sRGBHex: string }> {
+          return new Promise((resolve) => {
+            close = resolve
+          })
+        }
+      }
+      const host = (await mount(
+        '<helix-headless-color-picker></helix-headless-color-picker>',
+      )) as Color
+      await host.updateComplete
+      const internals = (host as unknown as { internals: ElementInternals }).internals
+      ;(part(host, 'eyedropper') as HTMLElement).click()
+      await host.updateComplete
+      expect(internals.states.has('sampling')).toBe(true)
+      close({ sRGBHex: '#00ff00' })
+      await new Promise((resolve) => setTimeout(resolve, 0))
+      await host.updateComplete
+      expect(internals.states.has('sampling')).toBe(false)
+      expect(host.value).toBe('#00ff00')
     })
   })
 })
@@ -670,6 +696,22 @@ if (hasLayout()) {
       )
       await host.updateComplete
       expect(host.value).toBe('#3366ff')
+    })
+  })
+
+  describe('a drag in the square', () => {
+    test('is a state while the pointer is down, for a stylesheet to draw the handle by', async () => {
+      const host = await picker('default-value="#3366ff"')
+      const grid = part(host, 'grid') as HTMLElement
+      const box = grid.getBoundingClientRect()
+      const at = { bubbles: true, clientX: box.left + 10, clientY: box.top + 10, pointerId: 1 }
+      const internals = (host as unknown as { internals: ElementInternals }).internals
+      grid.dispatchEvent(new PointerEvent('pointerdown', at))
+      await host.updateComplete
+      expect(internals.states.has('dragging')).toBe(true)
+      grid.dispatchEvent(new PointerEvent('pointerup', at))
+      await host.updateComplete
+      expect(internals.states.has('dragging')).toBe(false)
     })
   })
 }
