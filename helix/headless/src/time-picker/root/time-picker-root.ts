@@ -848,7 +848,16 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
       this.internals.setFormValue(null)
       return
     }
-    reportValues(this.internals, this.name, this.held)
+    /* A time the picker cannot read is sent as one empty entry, as a native
+       time field sends a time it cannot read. Measured before this:
+       `mode="multiple" value="09:00 10:30"` was invalid and submitted the
+       text. */
+    const held = this.held
+    reportValues(
+      this.internals,
+      this.name,
+      held.every((one) => valueAsSeconds(one) !== null) ? held : [''],
+    )
   }
 
   /**
@@ -1059,6 +1068,7 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
       data-column=${part}
       aria-describedby=${this.describedBy}
       aria-invalid=${this.marked ? 'true' : nothing}
+      aria-required=${this.required ? 'true' : nothing}
       exportparts="empty: column-empty, error: column-error, feedback: column-feedback, filter-icon: column-filter-icon,
         filter-mark: column-filter-mark, hint: column-hint, items: column-items, label: column-label,
         live: column-live, loading: column-loading, search: column-search, search-field: column-search-field"
@@ -1188,6 +1198,7 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
       part="list"
       aria-describedby=${this.describedBy}
       aria-invalid=${this.marked ? 'true' : nothing}
+      aria-required=${this.required ? 'true' : nothing}
       exportparts="empty: list-empty, error: list-error, feedback: list-feedback, filter-icon: list-filter-icon,
         filter-mark: list-filter-mark, hint: list-hint, items: list-items, label: list-label,
         live: list-live, loading: list-loading, search: list-search, search-field: list-search-field"

@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { formValue, hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -436,11 +436,9 @@ describe('a grid of times that refuses or insists', () => {
      from `MixinField`, because it is composed into a field that already has a
      label and a feedback region.
    *
-   * **Neither changes the render, which is the thing to know about them.** A
-   * read-only grid draws the same rows with the same tab stops, and a required
-   * one carries no `aria-required`, so the fact reaches a reader only through
-   * the validity the surrounding field reports. What is asserted is therefore
-   * the behavior each has, since that is the whole of what each does. */
+   * A read-only grid draws the same rows with the same tab stops, and a
+   * required one marks its list or its wheels `aria-required`, where the
+   * reader is. */
   test('read-only refuses a press and keeps the time it was given', async () => {
     const host = await picker('readonly default-value="09:00"')
     expect((host as Time & { requestValue: (next: string) => boolean }).requestValue('10:30')).toBe(
@@ -469,6 +467,31 @@ describe('a grid of times that refuses or insists', () => {
     ;(host as Time & { requestValue: (next: string) => boolean }).requestValue('10:30')
     await host.updateComplete
     expect(internals.validity.valid).toBe(true)
+  })
+
+  /* Measured before this: Chromium read `required=false` on the list of a
+     required picker, the attribute never reaching it. */
+  test('required is on the list, and on each wheel', async () => {
+    const list = part(await picker('required'), 'list')
+    expect(list?.getAttribute('aria-required')).toBe('true')
+    const control = list?.shadowRoot?.querySelector('[role="listbox"]')
+    expect(control?.getAttribute('aria-required')).toBe('true')
+    const wheels = await picker('required variant="wheels"')
+    const columns = [...(wheels.shadowRoot?.querySelectorAll('[part="column"]') ?? [])]
+    expect(columns.length).toBeGreaterThan(1)
+    expect(columns.every((one) => one.getAttribute('aria-required') === 'true')).toBe(true)
+    expect(part(await picker(''), 'list')?.hasAttribute('aria-required')).toBe(false)
+  })
+
+  /* Measured before this: `mode="multiple" value="09:00 10:30"` was invalid
+     and submitted the text as its one entry. */
+  test('a value it cannot read gives the form one empty entry', async () => {
+    const host = await picker('name="pm" mode="multiple" value="09:00 10:30"')
+    expect((host as Time & { internals: ElementInternals }).internals.validity.badInput).toBe(true)
+    expect((formValue(host) as FormData).getAll('pm')).toEqual([''])
+    host.value = '09:00,10:30'
+    await host.updateComplete
+    expect((formValue(host) as FormData).getAll('pm')).toEqual(['09:00', '10:30'])
   })
 
   test('and a grid nobody insisted on is valid while empty', async () => {
