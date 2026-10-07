@@ -1,5 +1,5 @@
 import { localeOf, runtimeLocale } from '../utils/locale-of/locale-of.js'
-import { defaultWordsLocale } from './registry.js'
+import { held, watchLang } from './held.js'
 
 /** Tags already checked, with what each one is as a locale. */
 const checked = new Map<string, string>()
@@ -40,6 +40,7 @@ const tagOf = (written: string): string => {
  * Always a tag `Intl` takes.
  */
 export const wordsLocale = (element: Element & { locale?: string | undefined }): string => {
+  watchLang()
   const own = tagOf(element.locale || '')
   if (own) {
     return own
@@ -48,10 +49,16 @@ export const wordsLocale = (element: Element & { locale?: string | undefined }):
      apart here: Lit's `isServer` is true in any test runner that resolves its
      `node` build. */
   if (typeof element.closest !== 'function' || (element as { hydrating?: boolean }).hydrating) {
-    return tagOf(element.getAttribute?.('lang') ?? '') || defaultWordsLocale()
+    return tagOf(element.getAttribute?.('lang') ?? '') || held.fallback
   }
   return localeOf(element) || runtimeLocale()
 }
+
+/* An element that reads its locale updates when the locale changes, so its
+   numbers are written in the new one. Where this module is loaded, the words
+   watcher reads the locale through `held`, and where it is not, no element
+   reads one. */
+held.locale = wordsLocale
 
 /**
  * The locale an element hands a child that reads only its own `lang` or

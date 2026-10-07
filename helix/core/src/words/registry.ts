@@ -1,4 +1,8 @@
+import { changed, held, type Speaker, watchLang } from './held.js'
 import type { Message, MessageTable } from './message.js'
+import { wordsLocale } from './words-locale.js'
+
+export { watchWords, wordsRegistered } from './held.js'
 
 /**
  * The words of every family, keyed by the family's styled tag, each with its
@@ -28,50 +32,6 @@ export type Words = {
   readonly [tag: string]: Readonly<Record<string, Message | MessageTable>> | undefined
 }
 
-/** One locale's words, by tag, then by property. */
-type Pack = Record<string, Record<string, Message | MessageTable>>
-
-/** What the page has registered, kept on `globalThis`. */
-interface Held {
-  /** Each locale's words, under its lowercase tag. */
-  packs: Map<string, Pack>
-  /** The locale a server render and a hydrating render speak. */
-  fallback: string
-  /** What updates the elements that read words. */
-  watchers: Set<() => void>
-  /** Whether an update is already queued for this task. */
-  queued?: boolean
-  /** Whether the document's `lang` is watched. */
-  observed?: boolean
-}
-
-/**
- * The page's words, held on `globalThis`.
- *
- * **One registry for a page that carries two copies of this module**, one per
- * bundle that imports it: words registered through one have to reach elements
- * defined through the other, as the icon registry's glyphs do.
- */
-// biome-ignore lint/suspicious/noAssignInExpressions: one registry, made by whichever copy loads first.
-const held: Held = ((globalThis as unknown as Record<symbol, Held>)[Symbol.for('helix.words')] ??= {
-  fallback: 'en',
-  packs: new Map(),
-  watchers: new Set(),
-})
-
-/** Asks every element that reads words to look again, once per task. */
-const changed = (): void => {
-  if (!held.queued) {
-    held.queued = true
-    queueMicrotask(() => {
-      held.queued = false
-      for (const watcher of held.watchers) {
-        watcher()
-      }
-    })
-  }
-}
-
 /**
  * Adds words for a locale, merged over the words already registered for it.
  * Elements on the page update once, in a microtask.
@@ -85,6 +45,9 @@ const changed = (): void => {
  * ```
  */
 export const registerWords = (locale: string, ...words: Words[]): void => {
+  held.find ??= (host: Speaker, tag: string, name: string) =>
+    lookupWord(wordsLocale(host), tag, name)
+  watchLang()
   const key = locale.toLowerCase()
   const pack = held.packs.get(key) ?? {}
   held.packs.set(key, pack)
@@ -178,9 +141,6 @@ export const localeChain = (locale: string): string[] => {
   return found
 }
 
-/** Whether any words are registered, for a read that can skip the lookup. */
-export const wordsRegistered = (): boolean => held.packs.size > 0
-
 /**
  * A registered word for a tag's property in a locale, with the locale it was
  * found in, or `undefined`.
@@ -206,23 +166,4 @@ export const lookupWord = (
     found = found ? [{ ...word, ...(found[0] as MessageTable) }, found[1]] : [word, one]
   }
   return found
-}
-
-/**
- * Calls `watcher` once in the microtask after words are registered or
- * cleared, or the document's `lang` changes. Returns the function that stops
- * it.
- *
- * The first watcher in a browser starts watching the document's `lang`, once
- * for the page.
- */
-export const watchWords = (watcher: () => void): (() => void) => {
-  held.watchers.add(watcher)
-  if (!held.observed && typeof MutationObserver === 'function' && globalThis.document) {
-    held.observed = true
-    new MutationObserver(changed).observe(document.documentElement, {
-      attributeFilter: ['lang'],
-    })
-  }
-  return () => held.watchers.delete(watcher)
 }
