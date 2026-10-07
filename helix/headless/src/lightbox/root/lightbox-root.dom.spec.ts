@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 /* happy-dom before the element, and the import dynamic for it: an element
    registered against the `customElements` happy-dom replaces never upgrades. */
@@ -519,5 +519,138 @@ describe('the counter', () => {
   test('is not drawn unless asked for', async () => {
     const host = await lightbox()
     expect(part(host, 'counter')).toBeNull()
+  })
+})
+
+describe('the arrows on a zoomed item', () => {
+  test('move about it, and leave the shown item where it is', async () => {
+    const host = (await lightbox('max-zoom="3"')) as Lightbox & { zoomTo(scale: number): void }
+    host.show()
+    await host.updateComplete
+    ;(part(host, 'viewport') as HTMLElement).getBoundingClientRect = () =>
+      ({ bottom: 300, height: 300, left: 0, right: 400, top: 0, width: 400 }) as DOMRect
+    host.zoomTo(3)
+    await host.updateComplete
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key: 'ArrowRight',
+    })
+    part(host, 'dialog')?.dispatchEvent(event)
+    await host.updateComplete
+    const viewport = part(host, 'viewport') as HTMLElement
+    expect(event.defaultPrevented).toBe(true)
+    expect(shown(host)).toBe('one')
+    expect(viewport.style.getPropertyValue('--lightbox-pan-x')).toBe('-40px')
+  })
+})
+
+describe('a press beside the item', () => {
+  const press = (target: Element, x = 10, y = 10): void => {
+    target.dispatchEvent(
+      new PointerEvent('pointerdown', { bubbles: true, clientX: x, clientY: y, composed: true }),
+    )
+    target.dispatchEvent(
+      new MouseEvent('click', { bubbles: true, clientX: x, clientY: y, composed: true }),
+    )
+  }
+
+  test('on the viewport closes the viewer', async () => {
+    const host = await lightbox()
+    host.show()
+    await host.updateComplete
+    press(part(host, 'viewport') as Element)
+    await host.updateComplete
+    expect(host.open).toBe(false)
+  })
+
+  test('on the item’s own box closes it too, and one that dragged does not', async () => {
+    /* happy-dom carries no event through slot assignment, so a press in the
+       item's shadow root never reaches the viewer there. */
+    if (!hasLayout()) {
+      return
+    }
+    const host = await lightbox()
+    host.show()
+    await host.updateComplete
+    const item = host.querySelector('helix-headless-lightbox-item') as HTMLElement & {
+      updateComplete: Promise<unknown>
+    }
+    await item.updateComplete
+    const box = item.shadowRoot?.querySelector('[part="item"]') as Element
+    box.dispatchEvent(
+      new PointerEvent('pointerdown', { bubbles: true, clientX: 10, composed: true }),
+    )
+    box.dispatchEvent(new MouseEvent('click', { bubbles: true, clientX: 90, composed: true }))
+    await host.updateComplete
+    expect(host.open).toBe(true)
+    press(box)
+    await host.updateComplete
+    expect(host.open).toBe(false)
+  })
+
+  test('on what the item holds leaves it open', async () => {
+    const host = (await mount(
+      `<helix-headless-lightbox label="Photos">
+        <helix-headless-lightbox-item value="one" label="A harbour"><img alt="A harbour"></helix-headless-lightbox-item>
+      </helix-headless-lightbox>`,
+    )) as Lightbox
+    host.show()
+    await host.updateComplete
+    press(host.querySelector('img') as Element)
+    await host.updateComplete
+    expect(host.open).toBe(true)
+  })
+})
+
+describe('Tab at either end of the viewer', () => {
+  test('wraps to the other end, rather than leaving the page', async () => {
+    const host = await lightbox('controls')
+    host.show()
+    await host.updateComplete
+    const dismiss = part(host, 'dismiss') as HTMLElement
+    dismiss.focus()
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key: 'Tab',
+    })
+    dismiss.dispatchEvent(event)
+    expect(event.defaultPrevented).toBe(true)
+    expect(host.shadowRoot?.activeElement).toBe(part(host, 'previous'))
+  })
+})
+
+describe('a viewer with no name', () => {
+  const warnedOn = async (markup: string): Promise<string[]> => {
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      await mount(markup)
+      await new Promise((done) => setTimeout(done, 5))
+    } finally {
+      console.warn = original
+    }
+    return warnings
+  }
+
+  test('is reported once it opens, by its tag', async () => {
+    const warnings = await warnedOn(
+      '<helix-headless-lightbox default-open><helix-headless-lightbox-item value="one"></helix-headless-lightbox-item></helix-headless-lightbox>',
+    )
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0]).toContain('<helix-headless-lightbox> has no accessible name')
+  })
+
+  test('and a viewer with a label, or not yet open, is not', async () => {
+    for (const named of [
+      '<helix-headless-lightbox default-open label="Photos"><helix-headless-lightbox-item value="one"></helix-headless-lightbox-item></helix-headless-lightbox>',
+      '<helix-headless-lightbox><helix-headless-lightbox-item value="one"></helix-headless-lightbox-item></helix-headless-lightbox>',
+    ]) {
+      expect([named, ...(await warnedOn(named))]).toEqual([named])
+    }
   })
 })
