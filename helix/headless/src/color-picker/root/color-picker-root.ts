@@ -161,7 +161,10 @@ interface EyeDropperConstructor {
  * @cssproperty --color-picker-saturation - The chosen saturation, 0 to 100, as a percentage.
  * @cssproperty --color-picker-swatch - The color a chip shows: the current color on the sample, and the preset's color on each preset.
  *
+ * @cssstate copied - The moment after the sample copies the value, while it says `copied-label`.
+ * @cssstate dragging - While a pointer drags the square's handle.
  * @cssstate invalid - While `invalid` is set or `feedback` says what is wrong.
+ * @cssstate sampling - While the eyedropper is open over the screen.
  */
 @customElement('helix-headless-color-picker')
 export class HelixHeadlessColorPicker extends MixinPickerFeedback(
@@ -518,6 +521,14 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
   @state()
   private swatchAt: number | undefined
 
+  /** Whether a pointer is dragging the square's handle, said as `:state(dragging)`. */
+  @state()
+  private dragging = false
+
+  /** Whether the eyedropper is open, said as `:state(sampling)`. */
+  @state()
+  private picking = false
+
   /**
    * Whether the value on this element was produced here.
    *
@@ -751,6 +762,7 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
       return
     }
     this.dispatchEvent(new HelixSampleStartEvent())
+    this.picking = true
     try {
       const { sRGBHex } = await new Dropper().open()
       const parsed = parseColor(sRGBHex)
@@ -763,6 +775,7 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
       /* Canceling is how this is normally left, and the platform reports it as
          a rejection. There is nothing to recover from and nothing to say. */
     }
+    this.picking = false
     this.dispatchEvent(new HelixSampleEndEvent())
   }
 
@@ -783,10 +796,12 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
     }
     const grid = event.currentTarget as HTMLElement
     if (event.type === 'pointerup' || event.type === 'pointercancel') {
+      this.dragging = false
       this.settle()
       return
     }
     if (event.type === 'pointerdown') {
+      this.dragging = true
       capturePointer(grid, event.pointerId)
       // So the keyboard carries on from where the pointer left off.
       this.partNamed('grid-saturation')?.focus()
@@ -1174,6 +1189,9 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
     if (!this.hydrating) {
       this.sampling = 'EyeDropper' in globalThis
     }
+    this.toggleState('copied', this.copier.copied)
+    this.toggleState('dragging', this.dragging)
+    this.toggleState('sampling', this.picking)
   }
 
   /**
