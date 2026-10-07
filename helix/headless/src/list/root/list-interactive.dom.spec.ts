@@ -125,6 +125,18 @@ describe('the keys', () => {
     expect(focused(list)).toBe(cell(first))
   })
 
+  /* A sheet outside could not tell which row showed keyboard focus without
+     reaching into the row's part. */
+  test('the row says its cell shows keyboard focus with a state', async () => {
+    const list = await grid()
+    const [first, , third] = list.rows as [Row, Row, Row]
+    cell(first).focus()
+    expect(hasState(first, 'focus-visible')).toBe(cell(first).matches(':focus-visible'))
+    press(cell(first), 'ArrowDown')
+    expect(hasState(first, 'focus-visible')).toBe(false)
+    expect(hasState(third, 'focus-visible')).toBe(cell(third).matches(':focus-visible'))
+  })
+
   test('Right goes to each control in the row and back to the row', async () => {
     const list = await grid()
     const first = list.rows[0] as Row
