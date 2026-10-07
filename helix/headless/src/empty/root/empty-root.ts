@@ -4,6 +4,7 @@ import {
   HelixElement,
   headingIn,
   headingLevel,
+  slotFilled,
   slottedWords,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -26,7 +27,16 @@ import { property } from 'lit/decorators.js'
  *
  * Every region is a bare slot. There is no `empty-state-heading` or
  * `empty-state-actions` element: assign your own heading and actions to the
- * slots.
+ * slots. The icon, the message and the actions slots are parts of the same
+ * names, as Card's regions are. A slot draws no box, so a part passes
+ * inherited properties, such as color and font, to what is slotted, and a
+ * page wanting a box there gives it one with `display`, such as a row of
+ * actions with `display: flex`.
+ *
+ * **The view says which regions it holds**, as `:state(has-icon)` and
+ * `:state(has-actions)`, so a sheet can space a view with no icon or no
+ * actions differently. Read in the browser, so a served view carries neither
+ * until the script runs.
  *
  * **Or give the heading as words.** `heading` draws them in a `heading` part
  * that is a heading at `heading-level`, 3 where it is not set, so a page
@@ -51,8 +61,14 @@ import { property } from 'lit/decorators.js'
  * @slot heading - The heading, which names what is missing. A heading element, such as an `<h3>`, keeps its level; any other element is read as a heading at `heading-level`. Replaces the one `heading` draws.
  * @slot icon - An icon above the heading.
  *
+ * @csspart actions - The slot the actions arrive through. A slot draws no box, so it passes inherited properties to the actions; `display: flex` lays them out in a row.
  * @csspart heading - The heading at `heading-level`: the one `heading` draws while nothing is slotted into `heading`, or the one around a slotted element that is no heading.
+ * @csspart icon - The slot the icon arrives through, drawing no box, as `actions` does.
  * @csspart live - A copy of the heading and the message, in a live region that screen readers announce when the view appears. Visually hidden in the styled tier.
+ * @csspart message - The slot the message arrives through, drawing no box, as `actions` does.
+ *
+ * @cssstate has-actions - Something is slotted into `actions`.
+ * @cssstate has-icon - Something is slotted into `icon`.
  */
 @customElement('helix-headless-empty')
 export class HelixHeadlessEmpty extends HelixElement {
@@ -103,6 +119,21 @@ export class HelixHeadlessEmpty extends HelixElement {
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
     this.finishHydration()
+  }
+
+  /* Read after every render as well as on `slotchange`, because a hydrated
+     slot was filled before any listener was bound and sends no change. */
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    this.readRegions()
+  }
+
+  /** Says which regions hold something, one call apiece so each pairs with its `@cssstate`. */
+  private readonly readRegions = (): void => {
+    const filled = (name: string): boolean =>
+      slotFilled(this.renderRoot?.querySelector<HTMLSlotElement>(`slot[name="${name}"]`))
+    this.toggleState('has-icon', filled('icon'))
+    this.toggleState('has-actions', filled('actions'))
   }
 
   /* Filled a frame after the view appears, when it appears after the page has
@@ -164,10 +195,13 @@ export class HelixHeadlessEmpty extends HelixElement {
        moving through the page meets them in one place; when the copy empties,
        they are back. The actions are never hidden. */
     const held = this.arrival.said !== '' && !this.noAnnounce
-    return html`<slot name="icon"></slot>
+    /* Each slot that is a part draws no box: a part on a slot is a name a
+       page reaches it by, and the slot stays `display: contents`, so the
+       view lays out as it did. */
+    return html`<slot name="icon" part="icon" @slotchange=${this.readRegions}></slot>
       ${this.renderHeading(held)}
-      <slot aria-hidden=${held ? 'true' : nothing} @slotchange=${say}></slot>
-      <slot name="actions"></slot>
+      <slot aria-hidden=${held ? 'true' : nothing} part="message" @slotchange=${say}></slot>
+      <slot name="actions" part="actions" @slotchange=${this.readRegions}></slot>
       ${
         this.noAnnounce
           ? nothing
