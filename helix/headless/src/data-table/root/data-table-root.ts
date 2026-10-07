@@ -176,6 +176,11 @@ const isControl = (element: HTMLElement): boolean =>
  * scrolls within one screen of the end, once for each number of rows. Add the
  * next rows to `rows`, and set `loading` while they are on their way.
  *
+ * When a fetch fails, set `error-text`, such as "The files did not load", and
+ * put a button that tries again in the `error` slot. The line shows after the
+ * rows in place of the empty and loading lines, the live region says it, and
+ * the table takes the `error` state. Clear it once you try again.
+ *
  * The controls inside the cells leave the tab order, so Tab moves past the
  * whole grid. A windowed table keeps the row holding focus drawn while the
  * rest scroll away.
@@ -216,6 +221,7 @@ const isControl = (element: HTMLElement): boolean =>
  *
  * @slot - The columns, as `TableColumn` elements.
  * @slot empty - Content shown when there are no rows to show and none are loading, such as a picture and a link. Falls back to `empty-text`, which the live region still says.
+ * @slot error - Content shown while `error-text` is set, such as a button that tries again. Falls back to `error-text`, which the live region still says.
  * @slot footer - Content below the grid. It replaces the built-in pagination.
  * @slot loading - Content shown while the rows load, such as a spinner. Falls back to `loading-text`, which the live region still says.
  * @slot toolbar - Content above the grid, such as a search field or actions.
@@ -252,6 +258,7 @@ const isControl = (element: HTMLElement): boolean =>
  * @csspart checkbox-mark-indeterminate - Added to `checkbox-mark` while only some rows are selected.
  * @csspart drag-preview - A copy of the row a pointer drags by its grip, which follows the pointer in the top layer until the row is let go, with `reorderable-rows`. A column's grip moves the column itself. Hidden from assistive technology.
  * @csspart empty - Shown when there are no rows, because none arrived or the filter matches none. While rows are loading, the `loading` part is shown in its place.
+ * @csspart error - Shown after the rows while `error-text` is set, in place of the empty and loading lines.
  * @csspart footer - The region below the grid.
  * @csspart grip-head - The heading over the row grips, with `reorderable-rows`.
  * @csspart head - The row that holds the column headings. It is `display: contents`, so it takes no space.
@@ -288,6 +295,9 @@ const isControl = (element: HTMLElement): boolean =>
  * @csspart toggle-mark - The caret in `toggle`. It points along the line while the row is closed and down while it is open.
  * @csspart toggle-open - Added to `toggle` while its row is open.
  * @csspart toolbar - The region above the grid.
+ *
+ * @cssstate empty - While there are no rows to show and none are loading.
+ * @cssstate error - While `error-text` is set.
  *
  * @cssproperty --data-table-cell-align - The alignment of the cell's column: `start`, `center`, or `end`. Unset when the column sets none. The component writes it on each cell it draws, and the stylesheet reads it. `Table` sets `--table-cell-align` for the same purpose.
  * @cssproperty --data-table-level - How deep a row is in a tree grid, from 1. The component writes it on each row header cell, and the stylesheet indents by it.
@@ -407,6 +417,18 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   @words
   @property({ attribute: 'dropped-label' })
   droppedLabel = 'Dropped'
+
+  /**
+   * The text shown and announced when the rows could not load, such as "The
+   * files did not load". Set it when a fetch fails, and clear it once you try
+   * again. Empty, the default, shows nothing.
+   *
+   * While it is set, a line after the rows shows it, or your own content in the
+   * `error` slot, in place of the empty and loading lines, and the live region
+   * says it.
+   */
+  @property({ attribute: 'error-text' })
+  errorText = ''
 
   /**
    * The estimated height of a row before it is drawn, in pixels.
@@ -1949,6 +1971,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       ['toolbar', true],
       ['footer', true],
       ['empty', true],
+      ['error', true],
       ['loading', true],
     ] as const) {
       const slot = root.querySelector<HTMLSlotElement>(`slot[name="${name}"]`)
@@ -2076,6 +2099,8 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     this.internals.ariaColCount =
       this.counts.columns === undefined ? null : String(this.counts.columns)
     this.markEmpty()
+    this.toggleState('error', this.errorText !== '')
+    this.toggleState('empty', !this.loading && !this.hasRows)
     this.assign()
     this.announceSort()
     this.quietControls()
@@ -2452,11 +2477,19 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     </div>`
   }
 
+  /**
+   * The line shown while `error-text` is set: a row holding one cell, as the
+   * empty and loading lines are, since a grid holds rows and nothing else.
+   */
+  private renderError(): TemplateResult {
+    return html`<p part="error" role="row"><span role="gridcell"><slot name="error">${this.errorText}</slot></span></p>`
+  }
+
   protected override render(): TemplateResult {
     const { available, matched, page } = this.view
     this.drawnPage = page
     /* After the rows, while there are rows to follow and none are on their way. */
-    this.moreDrawn = this.loadMore && !this.loading && page.length > 0
+    this.moreDrawn = this.loadMore && !this.loading && this.errorText === '' && page.length > 0
     const rows = this.windowOf(page)
     const kept = this.keptRow(page)
     const headStop = this.currentRow(page) === -1
@@ -2509,9 +2542,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
           }
         </div>
         ${this.renderSpacer('before', kept)}${this.renderRows(rows, page)}${this.renderSpacer('after', kept)}
-        ${this.renderMore(page)}${this.renderStatus(filled, 'gridcell')}
+        ${this.renderMore(page)}${this.errorText === '' ? this.renderStatus(filled, 'gridcell') : this.renderError()}
       </div>
-      ${this.renderLive(filled)}
+      ${this.errorText === '' ? this.renderLive(filled) : html`<span part="live" role="status">${this.errorText}</span>`}
       <div part="footer">
         <slot name="footer"></slot>
         ${

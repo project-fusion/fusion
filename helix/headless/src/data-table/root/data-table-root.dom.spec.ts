@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import {
   hasLayout,
+  hasState,
   mount as mountMarkup,
   part,
   registerDom,
@@ -190,6 +191,40 @@ describe('the empty and loading lines', () => {
     await settled(element)
     const loading = part(element, 'loading')?.querySelector('slot[name="loading"]')
     expect(loading?.textContent?.trim()).toBe('Loading')
+    remove()
+  })
+})
+
+/* A table whose fetch failed could say only that it was empty, which is false,
+   or that it was loading, which never ends. */
+describe('the error line', () => {
+  test('shows error-text after the rows, in place of the empty and loading lines, and says it', async () => {
+    const { element, remove } = await mount(
+      `<helix-headless-data-table label="Sizes" error-text="The sizes did not load" loading>
+        <helix-headless-table-column field="name">Name</helix-headless-table-column>
+        <button slot="error">Try again</button>
+      </helix-headless-data-table>`,
+      [],
+    )
+    await settled(element)
+    const line = part(element, 'error') as HTMLElement
+    expect(line.getAttribute('role')).toBe('row')
+    expect(line.querySelector('[role="gridcell"]')).not.toBeNull()
+    const slot = line.querySelector('slot[name="error"]') as HTMLSlotElement
+    expect(slot.assignedElements()).toEqual([element.querySelector('[slot="error"]') as Element])
+    expect(part(element, 'loading')).toBeNull()
+    expect(part(element, 'empty')).toBeNull()
+    expect(part(element, 'live')?.textContent?.trim()).toBe('The sizes did not load')
+    expect(hasState(element, 'error')).toBe(true)
+
+    const table = element as Table & { errorText: string; loading: boolean }
+    table.errorText = ''
+    table.loading = false
+    await settled(element)
+    expect(part(element, 'error')).toBeNull()
+    expect(part(element, 'empty')).not.toBeNull()
+    expect(hasState(element, 'error')).toBe(false)
+    expect(hasState(element, 'empty')).toBe(true)
     remove()
   })
 })
