@@ -72,6 +72,7 @@ export type ListItemMove = 'dragging' | 'drop-after' | 'drop-before'
  * @cssstate dragging - The row is being moved, in a `reorderable` list.
  * @cssstate drop-after - The row being moved goes after this one when it is dropped.
  * @cssstate drop-before - The row being moved goes before this one when it is dropped.
+ * @cssstate focus-visible - The row's cell has keyboard focus that the browser shows, in a list with `selection-mode`.
  * @cssstate selected - The row is selected, in a list that selects.
  */
 @customElement('helix-headless-list-item')
@@ -179,6 +180,21 @@ export class HelixHeadlessListItem extends HelixElement {
   /** Whether a list with `selection-mode` holds this row, which makes it a row of a grid. */
   private get grouped(): boolean {
     return this.focusable !== undefined
+  }
+
+  /**
+   * Says whether the cell shows keyboard focus, as `:focus-visible` does, so a
+   * sheet outside can draw the ring on the row by the host.
+   */
+  private readonly handleCellFocus = (event: FocusEvent): void => {
+    const cell = event.currentTarget as HTMLElement
+    let shown = false
+    try {
+      shown = event.type === 'focus' && cell.matches(':focus-visible')
+    } catch {
+      /* An engine that cannot parse `:focus-visible` shows no ring. */
+    }
+    this.toggleState('focus-visible', shown)
   }
 
   /** @internal The cell a list with `selection-mode` moves focus to. */
@@ -327,6 +343,8 @@ export class HelixHeadlessListItem extends HelixElement {
           tabindex=${tabindex}
           aria-labelledby=${labelledby}
           aria-describedby=${describedby}
+          @focus=${this.handleCellFocus}
+          @blur=${this.handleCellFocus}
         >${content}<slot name="end"></slot>${this.renderGrip()}</div>`
       : html`<div
           part="row${this.current === undefined ? '' : ' row-current'}"
@@ -334,6 +352,8 @@ export class HelixHeadlessListItem extends HelixElement {
           tabindex=${tabindex}
           aria-labelledby=${labelledby}
           aria-describedby=${describedby}
+          @focus=${this.handleCellFocus}
+          @blur=${this.handleCellFocus}
         ><a
           part="link"
           href=${this.href}
