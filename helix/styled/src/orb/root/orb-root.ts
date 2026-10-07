@@ -190,10 +190,17 @@ export class HelixOrb extends HelixElement {
    * object as JSON, such as `state-labels='{"done":"Terminé"}'`, so server
    * markup and plain HTML can carry the words too.
    */
-  // biome-ignore format: the words audit reads a table's English from the line it starts on
   @words
   @property({ attribute: 'state-labels', converter: wordsConverter })
-  stateLabels: Partial<Record<OrbState, string>> = { connecting: 'Connecting', done: 'Done', fetching: 'Fetching', listening: 'Listening', thinking: 'Thinking', waiting: 'Waiting', working: 'Working' }
+  stateLabels: Partial<Record<OrbState, string>> = {
+    connecting: 'Connecting',
+    done: 'Done',
+    fetching: 'Fetching',
+    listening: 'Listening',
+    thinking: 'Thinking',
+    waiting: 'Waiting',
+    working: 'Working',
+  }
 
   private canvas: HTMLCanvasElement | undefined
   private context: CanvasRenderingContext2D | null = null

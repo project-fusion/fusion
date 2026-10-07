@@ -3030,6 +3030,76 @@ fn words_joined() {
     );
 }
 
+/// Templates nest, so a word in an `html` template after an inner `html`
+/// template is not joined in code, and a plain literal inside an interpolation
+/// still is.
+#[test]
+fn words_nested() {
+    let tag = |hole: &str| {
+        format!(
+            "export class Tag extends HTMLElement {{
+  static words = 'helix-tag'
+
+  @words
+  @property({{ attribute: 'dismiss-label' }})
+  dismissLabel = 'Remove {{name}}'
+
+  render() {{
+    return html`<p>${{this.open ? html`<b></b>` : ''}}</p>
+      <button aria-label=${{{hole}}}></button>`
+  }}
+}}
+"
+        )
+    };
+    plant_in(
+        "words-nested",
+        "words",
+        &[
+            ("helix.json", TIERS),
+            ("src/tag/tag.ts", &tag("this.dismissLabel")),
+        ],
+        |tree| {
+            tree.write("src/tag/tag.ts", &tag("`${this.dismissLabel} now`"));
+        },
+        "a template literal joins `this.dismissLabel` with other text",
+        "src/tag/tag.ts:10",
+    );
+}
+
+/// A word table written over several lines has its English on the lines after
+/// the one it starts on, and is read to its closing brace.
+#[test]
+fn words_tables() {
+    let callout = |above: &str| {
+        format!(
+            "export class Callout extends HTMLElement {{
+  static words = 'helix-callout'
+{above}
+  @property({{ attribute: 'tone-labels' }})
+  toneLabels = {{
+    danger: 'Error',
+    info: 'Information',
+  }}
+}}
+"
+        )
+    };
+    plant_in(
+        "words-tables",
+        "words",
+        &[
+            ("helix.json", TIERS),
+            ("src/callout/callout.ts", &callout("  @words")),
+        ],
+        |tree| {
+            tree.write("src/callout/callout.ts", &callout(""));
+        },
+        "`toneLabels` defaults to English and is not a word property",
+        "src/callout/callout.ts:5",
+    );
+}
+
 /// A slot name is held to its own registry, read from what the manifest
 /// documents: `heading` is the word, and `title`, which Callout published for the
 /// same thing, is refused in its favor.

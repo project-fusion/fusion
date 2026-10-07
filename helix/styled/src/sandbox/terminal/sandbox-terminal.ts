@@ -128,10 +128,14 @@ export class HelixSandboxTerminal extends HelixElement {
    * its English words. As an attribute it is that object as JSON, and JSON
    * that does not parse is no words.
    */
-  // biome-ignore format: the words audit reads a table's English from the line it starts on
   @words
   @property({ attribute: 'level-words', converter: wordsConverter })
-  levelWords: Partial<Record<ConsoleLevel, string>> = { error: 'Errors', info: 'Info and above', log: 'All levels', warn: 'Warnings and errors' }
+  levelWords: Partial<Record<ConsoleLevel, string>> = {
+    error: 'Errors',
+    info: 'Info and above',
+    log: 'All levels',
+    warn: 'Warnings and errors',
+  }
 
   /**
    * What a screen reader is told a repeated line's count is. `{count}` is how
