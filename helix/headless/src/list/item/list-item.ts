@@ -104,14 +104,6 @@ export class HelixHeadlessListItem extends HelixElement {
   disabled = false
 
   /**
-   * Whether `disabled` takes the row out of selection alone, written by a list
-   * with `disabled-behavior="selection"`. No attribute: it is coordination
-   * between elements, as `focusable` is.
-   */
-  @property({ attribute: false })
-  selectionOnly = false
-
-  /**
    * Whether the row holds its list's tab stop.
    *
    * Written by a list with `selection-mode` on every row it holds, and unset
@@ -162,6 +154,14 @@ export class HelixHeadlessListItem extends HelixElement {
    */
   @property({ attribute: false })
   selected?: boolean | undefined
+
+  /**
+   * Whether `disabled` takes the row out of selection alone, written by a list
+   * with `disabled-behavior="selection"`. No attribute: it is coordination
+   * between elements, as `focusable` is.
+   */
+  @property({ attribute: false })
+  selectionOnly = false
 
   /**
    * Where the link opens. Use it for a row that leaves the site.

@@ -278,6 +278,13 @@ export class HelixHeadlessListbox extends MixinCollection(
   filterDelay = 0
 
   /**
+   * Placeholder text for the filter field.
+   */
+  @words
+  @property({ attribute: 'filter-label' })
+  filterLabel = 'Filter'
+
+  /**
    * Whether an option is kept by the filter: a function given the option's
    * words and the filter, trimmed, that returns `true` to keep it showing, as
    * React Aria's `Autocomplete` takes `filter`. For matching that ignores
@@ -288,13 +295,6 @@ export class HelixHeadlessListbox extends MixinCollection(
    */
   @property({ attribute: false })
   filterMatch?: ((text: string, filter: string) => boolean) | undefined
-
-  /**
-   * Placeholder text for the filter field.
-   */
-  @words
-  @property({ attribute: 'filter-label' })
-  filterLabel = 'Filter'
 
   /**
    * The options as data, for a list too long to draw whole: each a value,
