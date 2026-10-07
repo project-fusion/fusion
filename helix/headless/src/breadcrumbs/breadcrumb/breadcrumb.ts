@@ -6,7 +6,14 @@ import {
   slotNamed,
 } from '@fusion.dev/helix-core'
 import { caretRight } from '@fusion.dev/helix-icons'
-import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import {
+  type CSSResultGroup,
+  css,
+  html,
+  nothing,
+  type PropertyValues,
+  type TemplateResult,
+} from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
@@ -28,7 +35,10 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * including your own anchor.
  *
  * The current page is plain text, and `aria-current="page"` on the host conveys
- * the position.
+ * the position. In a trail where no crumb is `current`, the last one is said
+ * to be the current page, and keeps its link. An `aria-current` you write on
+ * the host, such as `aria-current="location"`, replaces the one the crumb
+ * gives itself.
  *
  * @since 0.1.0
  * @status stable
@@ -53,6 +63,16 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  */
 @customElement('helix-headless-breadcrumb')
 export class HelixHeadlessBreadcrumb extends HelixElement {
+  /* The first crumb has nothing before it to separate it from, so its
+     separator is not drawn, in this tier as in the styled one. Content, as
+     `Blockquote`'s marks are, so it is decided here; the styled tier replaces
+     the sheet and keeps the rule. */
+  static override styles: CSSResultGroup = css`
+    :host(:first-child) [part='separator'] {
+      display: none;
+    }
+  `
+
   /**
    * Marks this item as the page you are on.
    */
@@ -81,6 +101,13 @@ export class HelixHeadlessBreadcrumb extends HelixElement {
   href?: string
 
   /**
+   * @internal Set by the trail: this is its last crumb and no crumb is
+   * `current`, so this one is said to be the current page.
+   */
+  @property({ attribute: false })
+  implied = false
+
+  /**
    * The link's `rel` value, which describes how the linked page relates to this
    * one.
    *
@@ -101,7 +128,7 @@ export class HelixHeadlessBreadcrumb extends HelixElement {
     // role has to be there for the list to have items. In `willUpdate` rather
     // than `connectedCallback`, which the server never calls.
     hostAria(this.internals, { role: 'listitem' })
-    this.internals.ariaCurrent = this.current ? 'page' : null
+    this.internals.ariaCurrent = this.current || this.implied ? 'page' : null
   }
 
   protected override updated(changed: PropertyValues): void {

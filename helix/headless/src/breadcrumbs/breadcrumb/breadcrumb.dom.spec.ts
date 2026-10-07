@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, hasState, mount, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -98,5 +98,37 @@ describe('the end state', () => {
     await el.updateComplete
     await new Promise((resolve) => setTimeout(resolve))
     expect(hasState(el, 'end')).toBe(true)
+  })
+})
+
+describe('the separator', () => {
+  /* A trail of three drew a chevron before its first crumb in this tier, while
+     the class note said it hid it: the rule was only in the styled sheet. */
+  test('is not drawn before the first crumb, in this tier too', async () => {
+    const trail = await mount(
+      `<helix-headless-breadcrumbs>
+        <helix-headless-breadcrumb href="/">Home</helix-headless-breadcrumb>
+        <helix-headless-breadcrumb href="/docs">Docs</helix-headless-breadcrumb>
+        <helix-headless-breadcrumb current>Install</helix-headless-breadcrumb>
+      </helix-headless-breadcrumbs>`,
+    )
+    if (hasLayout()) {
+      const shown = [...trail.children].map(
+        (crumb) =>
+          getComputedStyle(crumb.shadowRoot?.querySelector('[part="separator"]') as Element)
+            .display,
+      )
+      expect(shown.map((one) => one === 'none')).toEqual([true, false, false])
+      return
+    }
+    /* happy-dom resolves no cascade, so the rule the element adopts is read. */
+    const declared = (
+      customElements.get('helix-headless-breadcrumb') as unknown as {
+        styles?: { cssText?: string }
+      }
+    ).styles
+    expect(declared?.cssText?.replace(/\s+/g, ' ')).toContain(
+      ":host(:first-child) [part='separator'] { display: none; }",
+    )
   })
 })

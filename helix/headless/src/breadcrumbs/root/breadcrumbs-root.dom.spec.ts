@@ -181,3 +181,26 @@ describe('a long trail written as data', () => {
     expect(part(crumbs, 'expand')).toBeNull()
   })
 })
+
+describe('a trail with no crumb marked current', () => {
+  type Crumb = HTMLElement & { implied: boolean; updateComplete: Promise<unknown> }
+  const implied = async (markup: string): Promise<boolean[]> => {
+    const host = await mount(markup)
+    const crumbs = [...host.children] as Crumb[]
+    await Promise.all(crumbs.map((one) => one.updateComplete))
+    return crumbs.map((one) => one.implied)
+  }
+
+  test('says its last crumb is the current page', async () => {
+    expect(
+      await implied(`<helix-headless-breadcrumbs>
+        <helix-headless-breadcrumb href="/">Home</helix-headless-breadcrumb>
+        <helix-headless-breadcrumb href="/work">Work</helix-headless-breadcrumb>
+      </helix-headless-breadcrumbs>`),
+    ).toEqual([false, true])
+  })
+
+  test('and leaves a trail that marks one alone', async () => {
+    expect(await implied(trail)).toEqual([false, false, false])
+  })
+})

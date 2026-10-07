@@ -1,9 +1,16 @@
-import { customElement, formatWords, HelixElement, hostAria, words } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  formatWords,
+  HelixElement,
+  hostAria,
+  whenHydrated,
+  words,
+} from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { repeat } from 'lit/directives/repeat.js'
 import { html } from 'lit/static-html.js'
-import '../breadcrumb/breadcrumb.js'
+import { HelixHeadlessBreadcrumb } from '../breadcrumb/breadcrumb.js'
 
 /** One step of a trail written as data, for `items`. */
 export interface BreadcrumbItem {
@@ -31,7 +38,8 @@ export interface BreadcrumbItem {
  * markers.
  *
  * The items are slotted directly, so they are `<ol>` children in the flat tree,
- * and each item sets `role="listitem"` on itself.
+ * and each item sets `role="listitem"` on itself. Where no slotted crumb is
+ * `current`, the last one is said to be the current page.
  *
  * The trail does not measure itself, and you write its overflow in markup: put
  * the crumb that holds the folded items where the gap should appear.
@@ -45,6 +53,11 @@ export interface BreadcrumbItem {
  * The button is named by `expand-label` and shows the whole trail, moving focus
  * to the first crumb it brought back. A new `items` folds again. Slotted crumbs
  * do not fold; write the folded crumb where the gap should be.
+ *
+ * **Keyboard.** Each crumb with an `href` is a link and one tab stop, and
+ * Enter follows it. The current page and the separators are not in the tab
+ * order. In a folded trail, Enter or Space on the fold's button shows the
+ * whole trail and moves focus to the first crumb it brought back.
  *
  * @since 0.1.0
  * @status stable
@@ -132,11 +145,33 @@ export class HelixHeadlessBreadcrumbs extends HelixElement {
     }
   }
 
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    this.markLast()
+  }
+
   /** How many crumbs drawn from `items` are folded away, or 0. */
   private get folded(): number {
     const most = this.maxItems ?? 0
     const count = this.items.length
     return !this.expanded && most >= 2 && count > most ? count - most : 0
+  }
+
+  /**
+   * Says the last slotted crumb is the current page where none is marked
+   * `current`, as React Aria's trail does. Through a property the crumb does
+   * not reflect, so nothing is written onto your markup.
+   */
+  private readonly markLast = (): void => {
+    const crumbs = (
+      this.renderRoot.querySelector<HTMLSlotElement>('slot:not([name])')?.assignedElements() ?? []
+    ).filter((one): one is HelixHeadlessBreadcrumb => one instanceof HelixHeadlessBreadcrumb)
+    const marked = crumbs.some((one) => one.current)
+    crumbs.forEach((crumb, index) => {
+      whenHydrated(crumb, () => {
+        crumb.implied = !marked && this.items.length === 0 && index === crumbs.length - 1
+      })
+    })
   }
 
   /** The crumbs `items` describes, each a crumb of this tier. */
@@ -189,7 +224,7 @@ export class HelixHeadlessBreadcrumbs extends HelixElement {
        source order, so there is nothing here to position it: the list renders
        what it was given, in the order it was given. */
     return html`<ol part="list" role="list">
-      ${this.renderItems()}<slot></slot>
+      ${this.renderItems()}<slot @slotchange=${this.markLast}></slot>
     </ol>`
   }
 }
