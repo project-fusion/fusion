@@ -117,8 +117,8 @@ type Player = HTMLElement & {
  * @event {HelixActivateEvent} helix-activate - The current entry changed. The playlist already holds the new entry when this is sent, and `detail.previous` is the entry it left. `currentEntry` is the entry itself, with its `src`, `poster` and name.
  * @event {HelixBeforeActivateEvent} helix-before-activate - The current entry is about to change, and `detail.cause` says why: `press`, `next`, `previous`, `ended`, or `removed`. Cancelable: cancel it to keep the current entry.
  * @event {HelixBeforeReorderEvent} helix-before-reorder - An entry was moved to a new place, in a `reorderable` playlist, with every entry's value in the new order in `detail.keys`. Cancelable: cancel it to keep the entry where it is.
- * @event {HelixReorderEvent} helix-reorder - Fired after `helix-before-reorder` when nobody canceled it. Move your entries to the order in `keys`. Cancelable: cancel it to say the move did not happen.
  * @event {HelixEndEvent} helix-end - The last entry finished playing, and the playlist stopped there. Not sent while `repeat` is set.
+ * @event {HelixReorderEvent} helix-reorder - Fired after `helix-before-reorder` when nobody canceled it. Move your entries to the order in `keys`. Cancelable: cancel it to say the move did not happen.
  *
  * @csspart empty - The box that holds the `empty` slot, drawn while there are no entries.
  * @csspart items - The list of entries.
