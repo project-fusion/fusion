@@ -164,6 +164,9 @@ describe('a dismissible callout', () => {
 
   type Note = HTMLElement & { open: boolean; updateComplete: Promise<boolean> }
 
+  const dismissOf = (note: Note): HTMLButtonElement =>
+    note.shadowRoot?.querySelector('[part="dismiss"]') as HTMLButtonElement
+
   /* Two frames, which is what a callout with no animation waits before it
      hides, and a turn after. */
   const frames = async (): Promise<void> => {
@@ -180,7 +183,7 @@ describe('a dismissible callout', () => {
       '<helix-headless-callout dismissible>Drafts save every minute.</helix-headless-callout>',
     )) as Note
     await note.updateComplete
-    ;(note.shadowRoot?.querySelector('[part="dismiss"]') as HTMLButtonElement).click()
+    dismissOf(note).click()
     await note.updateComplete
     expect(note.open).toBe(false)
     expect([hasState(note, 'closed'), hasState(note, 'exiting')]).toEqual([true, true])
@@ -214,14 +217,14 @@ describe('a dismissible callout', () => {
       '<helix-headless-callout dismissible>Kept.</helix-headless-callout>',
     )) as Note
     kept.addEventListener('helix-dismiss', (event) => event.preventDefault())
-    ;(kept.shadowRoot?.querySelector('[part="dismiss"]') as HTMLButtonElement).click()
+    dismissOf(kept).click()
     await kept.updateComplete
     expect(kept.open).toBe(true)
     const removed = (await mount(
       '<helix-headless-callout dismissible>Removed.</helix-headless-callout>',
     )) as Note
     removed.addEventListener('helix-dismiss', () => removed.remove())
-    ;(removed.shadowRoot?.querySelector('[part="dismiss"]') as HTMLButtonElement).click()
+    dismissOf(removed).click()
     expect(removed.open).toBe(true)
   })
 })
