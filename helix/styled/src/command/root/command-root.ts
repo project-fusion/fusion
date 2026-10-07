@@ -3,6 +3,7 @@ import { HelixHeadlessCommand } from '@fusion.dev/helix-headless/command'
 import type { CSSResultGroup } from 'lit'
 import '../../dialog/index.js'
 import '../../listbox/index.js'
+import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './command-root.css.js'
 
 /**
@@ -26,7 +27,7 @@ import { styles } from './command-root.css.js'
 export class HelixCommand extends HelixHeadlessCommand {
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [liveStyles, styles]
 }
 
 declare global {

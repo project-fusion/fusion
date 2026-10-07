@@ -1,11 +1,13 @@
 import {
   customElement,
   type DataOptionItem,
+  drawStatus,
   type HelixBeforeChangeEvent,
   HelixElement,
   HelixSelectEvent,
   MixinControllerOpen,
   matchesChord,
+  StatusController,
   words,
 } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -63,8 +65,9 @@ const says = (element: Element | null, state: string): boolean => {
  *
  * Choosing the opener says `helix-select` with its value, and canceling it
  * keeps the page that is shown. The list then shows the page, named by the
- * opener's words, and Backspace in an empty filter goes back. `page` says
- * which page is shown.
+ * opener's words, and a screen reader hears those words. Backspace in an empty
+ * filter goes back, and a screen reader hears the name of the page it goes
+ * back to. `page` says which page is shown.
  *
  * The filter is cleared when the palette closes, so each opening starts from
  * the full list. Combobox and Select do the same. As typing narrows the list, a
@@ -134,6 +137,7 @@ const says = (element: Element | null, state: string): boolean => {
  * @csspart listbox-loading - The text shown while the commands are loading.
  * @csspart listbox-search - The region that holds the filter field.
  * @csspart listbox-search-field - The filter field.
+ * @csspart live - The region a screen reader announces the page shown from, by the words of the command that opens it, drawn once there is one to say. Visually hidden in the styled tier.
  *
  * @cssstate empty - The list shows no commands: there are none, or typing hid every one.
  * @cssstate error - While `load-error` is set.
@@ -372,8 +376,18 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
     this.trail = trail
     this.page = page
     this.listbox?.requestFilter('')
-    void this.updateComplete.then(() => this.searchField?.focus())
+    void this.updateComplete.then(() => {
+      this.searchField?.focus()
+      /* The list is renamed for the page, and a name that changes is not
+         announced, so the page is said by its name. */
+      if (this.listName !== '') {
+        this.status.say(this.listName)
+      }
+    })
   }
+
+  /** The region the page shown is said from as it changes. */
+  private readonly status = new StatusController(this)
 
   /** Backspace in an empty filter, on a page, goes back to the page before. */
   private readonly handleBack = (event: KeyboardEvent): void => {
@@ -613,7 +627,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
         }
       }}
     >
-      ${this.renderListbox()}
+      ${this.renderListbox()}${drawStatus(this.status)}
       <!-- Handed on only while something fills it, as the list's slots are,
            so an empty header draws nothing in the dialog. -->
       <slot
@@ -693,7 +707,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
        here either, being a styled-tier property: where the panel sits is
        presentation, and this tier renders no CSS. */
     if (this.inline) {
-      return html`<slot name="header"></slot>${this.renderListbox()}${this.renderFooter(nothing)}`
+      return html`<slot name="header"></slot>${this.renderListbox()}${drawStatus(this.status)}${this.renderFooter(nothing)}`
     }
     return html`${this.renderDialog()}`
   }
