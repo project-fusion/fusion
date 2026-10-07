@@ -39,8 +39,12 @@ export type TagSelectionMode = SelectionMode
  * `selection-mode` lets a reader select tags, with Space, Enter or a press:
  * `single` selects one at a time and `multiple` any number. In `multiple`,
  * Shift with an arrow, Home or End selects the range from the tag last
- * pressed to the tag focus moves to, and Control or Command with A selects
- * every tag that is not disabled. `value` holds the
+ * pressed to the tag focus moves to, Shift with a press or Space selects the
+ * range to that tag, and Control or Command with A selects every tag that is
+ * not disabled. `selection-behavior="replace"` selects the tag a reader
+ * presses or moves to alone, as a file list does, and Control or Command
+ * with a press or Space adds or takes out one tag. `disallow-empty-selection`
+ * keeps one tag selected once one is. `value` holds the
  * selected tags' values, separated by commas, and a change asks with
  * `helix-before-change` and tells with `change`. Enter on a tag with an
  * `href` follows its link. A `disabled` tag is passed over. A selected tag
@@ -81,6 +85,14 @@ export class HelixHeadlessTagGroup extends HelixElement {
   static words = 'helix-tag-group'
 
   /**
+   * Keeps at least one tag selected once one is, as React Aria's
+   * `disallowEmptySelection`: a press or a key that would leave none selected
+   * is refused. Removing the last selected tag still takes it out of `value`.
+   */
+  @property({ attribute: 'disallow-empty-selection', type: Boolean })
+  disallowEmptySelection = false
+
+  /**
    * The words the group shows and says once its last tag is removed, where
    * nothing is in the `empty` slot.
    */
@@ -94,6 +106,17 @@ export class HelixHeadlessTagGroup extends HelixElement {
    */
   @property()
   label = ''
+
+  /**
+   * What a press, Space, or a move does to the tags already selected.
+   * `toggle`, the default, keeps them: a press adds or takes out the tag, and
+   * the arrow keys move focus alone. `replace` selects the tag alone, as a
+   * file list does, and the arrow keys carry the selection with focus.
+   * Control or Command with a press or Space adds or takes out one tag in
+   * `multiple`, and with an arrow moves focus without selecting.
+   */
+  @property({ attribute: 'selection-behavior' })
+  selectionBehavior: 'replace' | 'toggle' = 'toggle'
 
   /**
    * How many tags a reader can select: `single`, `multiple`, or none.
@@ -230,14 +253,44 @@ export class HelixHeadlessTagGroup extends HelixElement {
    * listener that refuses it keeps the selection. `change` follows once it
    * has moved.
    */
-  protected press(tag: HelixHeadlessTag): void {
+  protected press(tag: HelixHeadlessTag, cause?: KeyboardEvent | MouseEvent): void {
     const mode = this.selectionMode ?? 'none'
     if (mode === 'none' || tag.disabled) {
       return
     }
+    /* Shift extends from the tag last pressed, in either behavior, as React
+       Aria's selection does. */
+    if (mode === 'multiple' && cause?.shiftKey && this.anchor?.isConnected) {
+      this.extend(this.anchor, tag)
+      return
+    }
     this.anchor = tag
     this.reached = tag
-    requestValue(this, pressedValue(mode, this.written, this.valueFor(tag)), (value) => {
+    const adds = cause?.ctrlKey === true || cause?.metaKey === true
+    this.ask(
+      this.replaces && !(adds && mode === 'multiple')
+        ? this.valueFor(tag)
+        : pressedValue(mode, this.written, this.valueFor(tag)),
+    )
+  }
+
+  /** Whether a press or a move selects the tag alone. */
+  private get replaces(): boolean {
+    return this.selectionMode !== undefined && this.selectionBehavior === 'replace'
+  }
+
+  /**
+   * Asks for `value` to become `next`, where it changes and where it leaves a
+   * tag selected under `disallow-empty-selection`.
+   */
+  private ask(next: string): void {
+    if (next === this.written) {
+      return
+    }
+    if (this.disallowEmptySelection && commaList(next).length === 0) {
+      return
+    }
+    requestValue(this, next, (value) => {
       this.value = value
     })
   }
@@ -269,13 +322,7 @@ export class HelixHeadlessTagGroup extends HelixElement {
 
   /** Asks for `value` to hold these tags' values, in their order. */
   private choose(tags: readonly HelixHeadlessTag[]): void {
-    const next = [...new Set(tags.map((tag) => this.valueFor(tag)))].join(', ')
-    if (next === this.written) {
-      return
-    }
-    requestValue(this, next, (value) => {
-      this.value = value
-    })
+    this.ask([...new Set(tags.map((tag) => this.valueFor(tag)))].join(', '))
   }
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {
@@ -292,6 +339,15 @@ export class HelixHeadlessTagGroup extends HelixElement {
       }
       return
     }
+    /* Control or Command with Space adds or takes out the tag, under
+       `replace` in `multiple`, where Space alone selects it alone. */
+    if ((event.ctrlKey || event.metaKey) && event.key === ' ') {
+      if (this.replaces && multiple) {
+        event.preventDefault()
+        this.press(tag, event)
+      }
+      return
+    }
     if (event.ctrlKey || event.metaKey) {
       return
     }
@@ -303,6 +359,10 @@ export class HelixHeadlessTagGroup extends HelixElement {
       } else if (!event.shiftKey) {
         this.anchor = to
         this.reached = to
+        /* Under `replace` the selection moves with focus. */
+        if (this.replaces && to && !to.disabled) {
+          this.ask(this.valueFor(to))
+        }
       }
       return
     }
@@ -320,7 +380,7 @@ export class HelixHeadlessTagGroup extends HelixElement {
     }
     if ((event.key === ' ' || event.key === 'Enter') && this.selectionMode) {
       event.preventDefault()
-      this.press(tag)
+      this.press(tag, event)
     }
   }
 
@@ -336,7 +396,7 @@ export class HelixHeadlessTagGroup extends HelixElement {
           /(^| )(dismiss|link)( |$)/.test(node.getAttribute('part') ?? ''),
       )
     if (tag && !control) {
-      this.press(tag)
+      this.press(tag, event)
     }
   }
 

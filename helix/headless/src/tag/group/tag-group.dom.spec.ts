@@ -212,6 +212,96 @@ describe('selecting tags', () => {
   })
 })
 
+/* React Aria's `selectionBehavior="replace"` and `disallowEmptySelection`:
+   a file list's selection, and a filter that always keeps one choice. */
+describe('selection behavior and an empty selection', () => {
+  const PLAIN =
+    '<helix-headless-tag>Apple</helix-headless-tag><helix-headless-tag>Pear</helix-headless-tag><helix-headless-tag disabled>Fig</helix-headless-tag><helix-headless-tag>Plum</helix-headless-tag>'
+  const key = (tag: Tag, init: KeyboardEventInit): void => {
+    cell(tag).dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, ...init }),
+    )
+  }
+  const click = (tag: Tag, init: MouseEventInit = {}): void => {
+    cell(tag).dispatchEvent(
+      new MouseEvent('click', { bubbles: true, cancelable: true, composed: true, ...init }),
+    )
+  }
+
+  test('under replace, a press selects the tag alone, Control adds one, and Shift a range', async () => {
+    const one = await group('selection-mode="multiple" selection-behavior="replace"', PLAIN)
+    const [apple, pear, , plum] = one.tags as [Tag, Tag, Tag, Tag]
+    click(apple)
+    click(pear)
+    await settle(one)
+    expect(one.group.value).toBe('Pear')
+    click(plum, { ctrlKey: true })
+    await settle(one)
+    expect(one.group.value).toBe('Pear, Plum')
+    click(apple)
+    click(plum, { shiftKey: true })
+    await settle(one)
+    expect(one.group.value).toBe('Apple, Pear, Plum')
+  })
+
+  test('under replace, the arrow keys carry the selection, and Control moves without it', async () => {
+    const one = await group('selection-mode="multiple" selection-behavior="replace"', PLAIN)
+    const [apple, pear, , plum] = one.tags as [Tag, Tag, Tag, Tag]
+    cell(apple).focus()
+    key(apple, { key: ' ' })
+    key(apple, { key: 'ArrowRight' })
+    await settle(one)
+    expect(one.group.value).toBe('Pear')
+    key(pear, { ctrlKey: true, key: 'ArrowRight' })
+    await settle(one)
+    expect(one.group.value).toBe('Pear')
+    key(plum, { ctrlKey: true, key: ' ' })
+    await settle(one)
+    expect(one.group.value).toBe('Pear, Plum')
+  })
+
+  test('under toggle, the default, the arrow keys move focus alone', async () => {
+    const one = await group('selection-mode="multiple"', PLAIN)
+    const [apple] = one.tags as [Tag]
+    cell(apple).focus()
+    key(apple, { key: ' ' })
+    key(apple, { key: 'ArrowRight' })
+    await settle(one)
+    expect(one.group.value).toBe('Apple')
+  })
+
+  test('disallow-empty-selection refuses a press that would leave none selected', async () => {
+    const single = await group(
+      'selection-mode="single" disallow-empty-selection value="Apple"',
+      PLAIN,
+    )
+    click(single.tags[0] as Tag)
+    await settle(single)
+    expect(single.group.value).toBe('Apple')
+    click(single.tags[1] as Tag)
+    await settle(single)
+    expect(single.group.value).toBe('Pear')
+
+    const many = await group(
+      'selection-mode="multiple" disallow-empty-selection value="Apple, Pear"',
+      PLAIN,
+    )
+    click(many.tags[0] as Tag)
+    await settle(many)
+    expect(many.group.value).toBe('Pear')
+    click(many.tags[1] as Tag)
+    await settle(many)
+    expect(many.group.value).toBe('Pear')
+  })
+
+  test('and without it, the last selected tag can be let go', async () => {
+    const one = await group('selection-mode="single" value="Apple"', PLAIN)
+    click(one.tags[0] as Tag)
+    await settle(one)
+    expect(one.group.value).toBe('')
+  })
+})
+
 /* What a removal leaves behind: RAC's useListData takes a removed key out of
    the selection, and focus never drops to the page. */
 describe('a tag removed from a group', () => {
