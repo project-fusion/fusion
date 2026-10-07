@@ -24,7 +24,7 @@ import { repeat } from 'lit/directives/repeat.js'
    own message tag, and an interpolated tag is a static value. */
 import { html } from 'lit/static-html.js'
 import type { HelixHeadlessChatMessage } from '../message/chat-message.js'
-import { TURN_WORDS, type TurnWords } from '../naming.js'
+import { authorWords, TURN_WORDS, type TurnWords } from '../naming.js'
 
 /**
  * The regions a consumer fills, in the order they are rendered.
@@ -98,6 +98,8 @@ const secondNames = (table: Readonly<Record<string, string>>, key: string | unde
 /** A turn as the announcer reads it, whichever way it was handed over. */
 interface Heard {
   author: string | undefined
+  /** Who wrote it, in words a reader can be told, or empty where there are none. */
+  by: string
   failed: string
   id: unknown
   state: string | undefined
@@ -158,7 +160,8 @@ const drawnInFull = ({ element }: Rendered): boolean =>
  * The log is `aria-live="off"`. A separate status region announces each new
  * turn once, when it has finished arriving. It skips the user's own turns
  * unless they failed to send, turns loaded as history, and the turns already
- * there when the transcript opened.
+ * there when the transcript opened. A turn is said with its author first, such
+ * as "Ada: It ships today" (`arrival-label`), where its author can be named.
  *
  * Pass the turns as children or as `turns` data. Do not use both. Children
  * render from the server and suit most conversations. `turns` draws a long
@@ -269,6 +272,16 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
 
   /** How tall a turn is assumed to be before it has been drawn, in pixels. */
   static readonly ESTIMATE = 72
+
+  /**
+   * What a screen reader hears when a turn arrives. `{author}` is who wrote
+   * it, as its name says it, and `{text}` its words. A turn with no author a
+   * reader can be told, a turn by `them` with no `author-label`, says its
+   * words alone.
+   */
+  @words
+  @property({ attribute: 'arrival-label' })
+  arrivalLabel = '{author}: {text}'
 
   /**
    * Declarations for the turns from `turns` by each author, keyed by `author`,
@@ -613,6 +626,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
     if (this.fed) {
       return this.turns.map((turn) => ({
         author: turn.author,
+        by: authorWords(turn.author, turn.authorLabel ?? '', this.words),
         failed: this.failedLabel,
         id: this.identity(turn),
         state: turn.state,
@@ -621,6 +635,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
     }
     return this.messages.map((message) => ({
       author: message.author,
+      by: authorWords(message.author, message.authorLabel, this.words),
       failed: message.failedLabel,
       id: message,
       state: message.state,
@@ -862,10 +877,18 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
     return at < 0 ? [] : turns.slice(at + 1)
   }
 
+  /**
+   * What is said for a turn: a failed one with `failed-turn-label`, and
+   * another with `arrival-label` where its author can be named, so a reader
+   * in a conversation of several knows who spoke.
+   */
   private phrase(turn: Heard): string {
-    return turn.state === 'failed'
-      ? formatWords(this, 'failedTurnLabel', { failed: turn.failed, text: turn.text })
-      : turn.text
+    if (turn.state === 'failed') {
+      return formatWords(this, 'failedTurnLabel', { failed: turn.failed, text: turn.text })
+    }
+    return turn.by === ''
+      ? turn.text
+      : formatWords(this, 'arrivalLabel', { author: turn.by, text: turn.text })
   }
 
   /** Watches what is drawn for size, re-observing only when that changed. */
