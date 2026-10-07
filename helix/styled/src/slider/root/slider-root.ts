@@ -27,6 +27,7 @@ import { styles } from './slider-root.css.js'
  * @cssproperty --slider-length - The length of a vertical track. It defaults to nine rem and applies only when `orientation` is `vertical`. A horizontal track takes the width of its row.
  * @cssproperty --slider-marker-color - The color of the marks along the track.
  * @cssproperty --slider-thumb-color - The color of the thumb.
+ * @cssproperty --slider-thumb-content-color - The color of content in the `thumb` and `thumb-end` slots, drawn on the thumb.
  * @cssproperty --slider-thumb-length - The thumb's size along the track. It follows `--slider-thumb-size` unless you set it, and setting one of the two makes the thumb an oval.
  * @cssproperty --slider-thumb-radius - The thumb's corner radius. It is fully round by default, so a thumb with two different dimensions is a capsule unless you change it.
  * @cssproperty --slider-thumb-ring-color - The color of the ring between the thumb and the track. Set it for a slider that sits on a surface other than the page background.

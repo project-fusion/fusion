@@ -295,6 +295,49 @@ describe('a bubble for each thumb', () => {
   })
 })
 
+describe('content on a thumb', () => {
+  const boxes = (host: Slider): HTMLElement[] => [
+    ...(host.shadowRoot as ShadowRoot).querySelectorAll<HTMLElement>('[part="thumb"]'),
+  ]
+  const layer = (host: Slider): HTMLElement =>
+    (host.shadowRoot as ShadowRoot).querySelector('[part="thumbs"]') as HTMLElement
+  const settle = async (host: Slider): Promise<void> => {
+    for (const slot of (host.shadowRoot as ShadowRoot).querySelectorAll('slot')) {
+      slot.dispatchEvent(new Event('slotchange'))
+    }
+    await host.updateComplete
+  }
+
+  test('is a box for each thumb at its place, holding its slot, hidden from a reader', async () => {
+    const host = await slider('range default-value="20,70"')
+    expect(layer(host).getAttribute('aria-hidden')).toBe('true')
+    expect(boxes(host).map((box) => box.dataset.thumb)).toEqual(['start', 'end'])
+    expect(boxes(host).map((box) => box.style.getPropertyValue('--slider-at').trim())).toEqual([
+      '0.2',
+      '0.7',
+    ])
+    expect(boxes(host).map((box) => box.querySelector('slot')?.name)).toEqual([
+      'thumb',
+      'thumb-end',
+    ])
+  })
+
+  test('takes no room until a slot has content, then says so on the field', async () => {
+    const host = await slider('default-value="40"')
+    const field = part(host, 'field') as HTMLElement
+    expect(layer(host).hidden).toBe(true)
+    expect(field.hasAttribute('data-thumbs')).toBe(false)
+    const glyph = document.createElement('span')
+    glyph.slot = 'thumb'
+    glyph.textContent = '|'
+    host.append(glyph)
+    await settle(host)
+    expect(layer(host).hidden).toBe(false)
+    expect(field.hasAttribute('data-thumbs')).toBe(true)
+    expect(boxes(host)[0]?.style.getPropertyValue('--slider-at').trim()).toBe('0.4')
+  })
+})
+
 describe('a vertical slider', () => {
   /* `orientation` reached the stylesheet alone, so the headless slider was a
      horizontal one to the accessibility tree, which reads the axis off the

@@ -12,7 +12,7 @@ import {
   wordsLocale,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { property, state } from 'lit/decorators.js'
 
 /** The keys a native range moves its thumb with. */
 const SLIDER_KEYS = new Set([
@@ -91,6 +91,8 @@ const SLIDER_KEYS = new Set([
  * @slot feedback - The message that says what is wrong, for content richer than a string. It shows while there is a message.
  * @slot hint - Help under the control, for content richer than the `hint` text.
  * @slot label - The label, for content richer than the `label` text.
+ * @slot thumb - Content drawn on the thumb, such as a glyph: a single slider's thumb, or a range's lower one. It is decoration, hidden from a screen reader.
+ * @slot thumb-end - Content drawn on a range's upper thumb.
  *
  * @event {Event} change - Fired when the user releases the thumb.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired as the value changes. Cancelable: call `preventDefault()` to keep the current value.
@@ -105,10 +107,12 @@ const SLIDER_KEYS = new Set([
  * @csspart marker-label - The value a mark stands at, when `marker-labels` is set.
  * @csspart markers - The row of marks along the track.
  * @csspart output - The current value, shown beside the track.
+ * @csspart thumb - One thumb's own box over the track, which holds the `thumb` or `thumb-end` slot. It carries `data-thumb` on a range, `start` or `end`, and `--slider-at`, where its thumb is as a fraction of the track. Draw your own thumb here and hide the native one, or leave it empty.
+ * @csspart thumbs - The layer over the track that holds each `thumb`. It is `hidden` until a thumb slot has content, and then `[part="field"]` carries `data-thumbs`.
  * @csspart tooltip - One thumb's value in a bubble beside it, under `tooltip`. It carries `data-thumb` on a range, `start` or `end`, and `--slider-at`, where its thumb is as a fraction of the track.
  * @csspart tooltips - The layer over the track that holds the bubbles, under `tooltip`.
  *
- * @cssproperty --slider-at - Where a bubble's thumb is, as a fraction of the track, 0 to 1. Set on each `tooltip` part.
+ * @cssproperty --slider-at - Where a bubble's or a thumb box's thumb is, as a fraction of the track, 0 to 1. Set on each `tooltip` and `thumb` part.
  * @cssproperty --slider-fraction - The value as a fraction of the range, 0 to 1.
  * @cssproperty --slider-from - Where the filled span starts, as a fraction of the track, 0 to 1: a range's lower thumb, or a single thumb's `origin`.
  * @cssproperty --slider-marker-at - Where one marker sits, as a percentage of the track.
@@ -643,6 +647,38 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   @property({ attribute: 'value-text' })
   valueText = ''
 
+  /** Whether a `thumb` or `thumb-end` slot has content. */
+  @state()
+  private thumbContent = false
+
+  private readonly handleThumbSlot = (event: Event): void => {
+    const scope = (event.target as HTMLSlotElement).getRootNode() as ShadowRoot
+    this.thumbContent = [...scope.querySelectorAll<HTMLSlotElement>('[part="thumb"] slot')].some(
+      (slot) => slot.assignedNodes().length > 0,
+    )
+  }
+
+  /**
+   * A box for each thumb, over the track at the thumb's place, holding the
+   * `thumb` slot: a range's upper thumb holds `thumb-end`. Hidden from the
+   * accessibility tree, since each thumb is already a range with a name and a
+   * value, and `hidden` while no slot has content, so an empty layer takes no
+   * room in the row.
+   */
+  protected renderThumbs(start: number, end: number): TemplateResult {
+    const box = (fraction: number, name: 'thumb' | 'thumb-end', thumb?: 'end' | 'start') =>
+      html`<span part="thumb" data-thumb=${thumb ?? nothing} style="--slider-at: ${fraction}"
+        ><slot name=${name} @slotchange=${this.handleThumbSlot}></slot
+      ></span>`
+    return html`<div part="thumbs" aria-hidden="true" ?hidden=${!this.thumbContent}>
+      ${
+        this.range
+          ? [box(this.along(start), 'thumb', 'start'), box(this.along(end), 'thumb-end', 'end')]
+          : box(this.fraction, 'thumb')
+      }
+    </div>`
+  }
+
   /**
    * A bubble for each thumb, under `tooltip`, saying its value where it is.
    * After the thumbs, so a stylesheet can reach a bubble from a focused
@@ -756,6 +792,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
       part="field"
       data-markers=${this.markerValues.length > 0 ? '' : nothing}
       data-range=${this.range ? '' : nothing}
+      data-thumbs=${this.thumbContent ? '' : nothing}
       data-tooltip=${this.tooltip ? '' : nothing}
       style="--slider-fraction: ${this.fraction}; --slider-from: ${this.along(start)}; --slider-to: ${this.along(end)}"
     >
@@ -803,7 +840,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
             </div>`
           : nothing
       }
-      ${this.renderTooltips(start, end)}
+      ${this.renderThumbs(start, end)} ${this.renderTooltips(start, end)}
       ${
         /* Hidden from the accessibility tree, like the markers above it.
          *

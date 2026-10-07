@@ -651,6 +651,94 @@
   translate: 0 50%;
 }
 
+/*
+ *  Content on a thumb, under the `thumb` slots.
+ *
+ * In the control's own cell, as the bubbles are, and centered on the native
+ * thumb at its size, so a glyph sits on the handle and moves with it. The
+ * pointer passes through to the range underneath.
+ */
+[part="field"][data-thumbs] {
+  display: grid;
+  grid-template-columns: 1fr auto;
+}
+
+[part="field"][data-thumbs] [part="control"],
+[part="field"][data-thumbs] [part="thumbs"] {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+[part="field"][data-thumbs] [part="output"] {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+[part="field"][data-thumbs] [part="thumbs"] {
+  align-self: center;
+  block-size: var(--_slider-track);
+  display: block;
+  margin-inline: calc(var(--_slider-thumb-length) / 2);
+  pointer-events: none;
+  position: relative;
+  z-index: var(--helix-layer-overlay);
+}
+
+[part="thumb"] {
+  align-items: center;
+  block-size: var(--_slider-thumb);
+  color: var(--slider-thumb-content-color, var(--helix-color-foreground-inverse));
+  display: flex;
+  font-size: var(--helix-text-xs);
+  inline-size: var(--_slider-thumb-length);
+  inset-block-start: 50%;
+  inset-inline-start: calc(var(--slider-at, 0) * 100%);
+  justify-content: center;
+  position: absolute;
+  translate: -50% -50%;
+}
+
+:host(:dir(rtl)) [part="thumb"] {
+  translate: 50% -50%;
+}
+
+:host(:disabled) [part="thumb"] {
+  opacity: 0.5;
+}
+
+:host([orientation="vertical"]) [part="field"][data-thumbs] {
+  grid-template-columns: none;
+  grid-template-rows: 1fr auto;
+}
+
+:host([orientation="vertical"]) [part="field"][data-thumbs] [part="output"] {
+  grid-column: 1;
+  grid-row: 2;
+  justify-self: center;
+}
+
+:host([orientation="vertical"]) [part="field"][data-thumbs] [part="thumbs"] {
+  align-self: stretch;
+  block-size: auto;
+  inline-size: var(--_slider-track);
+  justify-self: center;
+  margin-block: calc(var(--_slider-thumb-length) / 2);
+  margin-inline: 0;
+}
+
+:host([orientation="vertical"]) [part="thumb"] {
+  block-size: var(--_slider-thumb-length);
+  inline-size: var(--_slider-thumb);
+  inset-block-end: calc(var(--slider-at, 0) * 100%);
+  inset-block-start: auto;
+  inset-inline-start: 50%;
+  translate: -50% 50%;
+}
+
+:host([orientation="vertical"]:dir(rtl)) [part="thumb"] {
+  translate: 50% 50%;
+}
+
 /* Print: a control prints the value it holds, and here the value is the fill, so
  * a track printed without it is a document saying nothing was set.
  *
