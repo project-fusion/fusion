@@ -1886,6 +1886,14 @@ snaps into a card. CSS cannot select "any custom element", and a bare
 `:not(:defined)` would also catch Next's own dev overlay, so the tags are
 enumerated.
 
+**A data table that serves its first page as rows is shown before it upgrades.** The
+rows are there to be read before the script runs, so `elements.css` lays them
+out as the table draws them: one grid whose tracks are counted from the
+columns, and the heading and cell boxes the styled tier draws. The served cells
+keep that box after the table upgrades and until it draws its own rows, so the
+hand-off moves nothing. A column's `width` and the checkbox column wait for the
+upgrade, a stylesheet having no way to read them from the host.
+
 **`@fusion.dev/helix` re-exports no stylesheet, and this is settled rather than
 pending.** Up to 0.0.9 it shipped its own `helix.css`, two `@import` lines
 pulling `@fusion.dev/helix-styles/all.css` and a local `elements.css`. That
