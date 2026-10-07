@@ -154,6 +154,80 @@ slot[name="start"]::slotted(*) {
   }
 }
 
+/* **Out of the way under `hide-on-scroll`.** A sticky bar slides up by its own
+   height; one that is not sticky has already scrolled away with the page. */
+:host([sticky]) {
+  transition:
+    backdrop-filter var(--helix-duration-normal) var(--helix-easing-standard),
+    background-color var(--helix-duration-normal) var(--helix-easing-standard),
+    border-color var(--helix-duration-normal) var(--helix-easing-standard),
+    translate var(--helix-duration-normal) var(--helix-easing-standard);
+}
+
+:host([sticky]:state(hidden)) {
+  translate: 0 -100%;
+}
+
+/* **Folded under `fold-below`.** The brand and the actions share the row, the
+   toggle ends it, and the middle region opens as a column below. */
+:host(:state(folded)) [part="row"] {
+  block-size: auto;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: var(--app-header-block-size, var(--helix-size-header));
+  row-gap: var(--helix-space-none);
+}
+
+:host(:state(folded)) [part="content"] {
+  align-items: stretch;
+  flex-direction: column;
+  grid-column: 1 / -1;
+  grid-row: 2;
+  justify-content: flex-start;
+  overflow-x: visible;
+  padding-block-end: var(--helix-space-sm);
+}
+
+/* `display: flex` above outranks the UA's `[hidden] { display: none }`. */
+[part="content"][hidden] {
+  display: none;
+}
+
+[part="toggle"] {
+  all: unset;
+  /* `all: unset` takes the `border-box` every shadow root is given with it. */
+  box-sizing: border-box;
+  align-items: center;
+  block-size: var(--helix-size-control);
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  display: inline-flex;
+  inline-size: var(--helix-size-control);
+  justify-content: center;
+}
+
+[part="toggle"] svg {
+  block-size: var(--helix-size-icon);
+  inline-size: var(--helix-size-icon);
+}
+
+[part="toggle"]:hover,
+:host(:state(open)) [part="toggle"] {
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
+  color: var(--helix-color-foreground);
+}
+
+[part="toggle"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host([sticky]) {
+    transition: none;
+  }
+}
+
 /* Print: a bar of destinations, and a printed page has no elsewhere to go. */
 @media print {
   :host {

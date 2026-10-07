@@ -1,12 +1,17 @@
 import {
   customElement,
+  deepActiveElement,
+  deepContains,
   elementById,
   HelixElement,
   HelixScrolledEvent,
   hostAria,
+  words,
 } from '@fusion.dev/helix-core'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { list } from '@fusion.dev/helix-icons'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { property, state } from 'lit/decorators.js'
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { inSectioningContent } from '../sectioning.js'
 
 /**
@@ -28,6 +33,20 @@ import { inSectioningContent } from '../sectioning.js'
  * The page is the window unless `scroller` names the element that scrolls, for
  * an app shell whose content scrolls inside a container.
  *
+ * **Set `hide-on-scroll` for a bar that moves out of the way.** Scrolling down
+ * past the bar's own height hides it, and scrolling up shows it again, as does
+ * focus moving into it. The custom state `hidden` is on the host while it is
+ * hidden, and the styled tier slides a `sticky` bar up out of view.
+ *
+ * **Set `fold-below` to fold the middle region on a narrow screen.** Below that
+ * many pixels of the bar's own width, the middle region is hidden behind a
+ * toggle at the end of the bar, named by `menu-label`. The toggle says whether
+ * the region is open with `aria-expanded`, and the region opens below the row.
+ * Escape closes it and puts focus back on the toggle. The custom state
+ * `folded` is on the host while the bar is that narrow, and `open` while the
+ * folded region is open. A server serves the bar unfolded, and the browser
+ * folds it once it has measured it.
+ *
  * The host is the page's `banner` landmark. Placed inside `main`, `article`,
  * `aside`, `nav` or `section`, it is a plain box instead, as a native
  * `<header>` is there, so a header inside a card or a pane does not add a
@@ -44,6 +63,7 @@ import { inSectioningContent } from '../sectioning.js'
  * @documentation https://fusion.dev/helix/components/app-header
  *
  * @slot - The middle region, usually a `Navigation`.
+ * @slot menu-icon - Replaces the glyph inside the toggle that opens a folded middle region.
  * @slot end - Trailing content.
  * @slot start - Leading content, usually a wordmark.
  *
@@ -57,11 +77,139 @@ import { inSectioningContent } from '../sectioning.js'
  * @csspart end - The trailing region.
  * @csspart row - The centered row inside the banner.
  * @csspart start - The leading region.
+ * @csspart toggle - The control that opens and closes the folded middle region, drawn while the bar is narrower than `fold-below`.
+ * @csspart toggle-mark - The glyph on the toggle, where none is slotted.
  *
+ * @cssstate folded - While the bar is narrower than `fold-below`, and the middle region is behind the toggle.
+ * @cssstate hidden - While `hide-on-scroll` has the bar out of the way, after a scroll down.
+ * @cssstate open - While the folded middle region is open.
  * @cssstate scrolled - While the page is scrolled down from the top, which is when the bar lifts off it.
  */
 @customElement('helix-headless-app-header')
 export class HelixHeadlessAppHeader extends HelixElement {
+  /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-app-header': { menuLabel: 'Menü' } })`.
+   */
+  static words = 'helix-app-header'
+
+  /**
+   * The width of the bar, in pixels, below which the middle region folds behind
+   * a toggle. Unset, it never folds.
+   */
+  @property({ attribute: 'fold-below', type: Number })
+  foldBelow?: number
+
+  /**
+   * Hides the bar as the page scrolls down past it, and shows it again as the
+   * page scrolls up.
+   */
+  @property({ attribute: 'hide-on-scroll', type: Boolean })
+  hideOnScroll = false
+
+  /** The name of the toggle that opens a folded middle region. */
+  @words
+  @property({ attribute: 'menu-label' })
+  menuLabel = 'Menu'
+
+  /** Whether the bar is narrower than `fold-below`, which only the observer sets. */
+  @state()
+  private folded = false
+
+  /** Whether the folded middle region is open. */
+  @state()
+  private unfolded = false
+
+  /** Watches the bar's own width while `fold-below` is set. */
+  private widths: ResizeObserver | undefined
+
+  /** Starts or stops watching the width, according to `fold-below`. */
+  private watchWidth(): void {
+    if (!this.foldBelow || typeof ResizeObserver === 'undefined') {
+      this.widths?.disconnect()
+      this.widths = undefined
+      this.folded = false
+      return
+    }
+    if (this.widths) {
+      return
+    }
+    this.widths = new ResizeObserver(([entry]) => {
+      const width = entry?.borderBoxSize?.[0]?.inlineSize ?? entry?.contentRect.width ?? 0
+      /* Zero is a bar not laid out yet, which is no narrow bar. */
+      if (width > 0) {
+        this.fold(width)
+      }
+    })
+    this.widths.observe(this)
+  }
+
+  /** Folds the middle region where the bar is narrower than `fold-below`. */
+  private fold(width: number): void {
+    const folded = this.foldBelow !== undefined && width < this.foldBelow
+    if (folded !== this.folded) {
+      this.folded = folded
+      this.unfolded = false
+    }
+  }
+
+  /** Opens or closes the folded middle region. */
+  private readonly handleToggle = (): void => {
+    this.unfolded = !this.unfolded
+  }
+
+  /** Escape in the open region closes it and puts focus back on the toggle. */
+  private readonly handleKeydown = (event: KeyboardEvent): void => {
+    if (event.key !== 'Escape' || !this.unfolded || event.defaultPrevented) {
+      return
+    }
+    event.preventDefault()
+    this.unfolded = false
+    void this.updateComplete.then(() => this.partNamed('toggle')?.focus())
+  }
+
+  /** Whether the bar is out of the way, under `hide-on-scroll`. */
+  private away = false
+
+  /** Where the page was last scrolled to, to tell down from up. */
+  private lastY = 0
+
+  /** Shows a hidden bar again when focus moves into it. */
+  private readonly handleFocusIn = (): void => {
+    this.hide(false)
+  }
+
+  /** Hides the bar or shows it again, under `hide-on-scroll`. */
+  private hide(away: boolean): void {
+    if (away === this.away) {
+      return
+    }
+    this.away = away
+    this.toggleState('hidden', away)
+  }
+
+  /**
+   * Hides the bar on a scroll down past its own height, and shows it on a
+   * scroll up. A few pixels either way are not a direction, so a bar does not
+   * flicker under a hand resting on a trackpad. Not while focus is in the bar
+   * or its folded region is open, which a reader is using.
+   */
+  private follow(y: number): void {
+    const moved = y - this.lastY
+    this.lastY = y
+    if (!this.hideOnScroll) {
+      this.hide(false)
+      return
+    }
+    const height = this.getBoundingClientRect().height
+    if (y <= height) {
+      this.hide(false)
+    } else if (moved > 4 && !this.unfolded && !deepContains(this, deepActiveElement())) {
+      this.hide(true)
+    } else if (moved < -4) {
+      this.hide(false)
+    }
+  }
   /**
    * Where the middle region sits in the bar.
    *
@@ -145,6 +293,7 @@ export class HelixHeadlessAppHeader extends HelixElement {
   private readonly handleScroll = (): void => {
     const source = this.source ?? window
     const y = source instanceof Element ? source.scrollTop : window.scrollY
+    this.follow(y)
     const next = this.scrolled ? y > 2 : y > 8
     if (next === this.scrolled) {
       return
@@ -161,6 +310,8 @@ export class HelixHeadlessAppHeader extends HelixElement {
     super.willUpdate(changed)
     // On the host, since the host is the banner.
     hostAria(this.internals, { role: this.landmark })
+    this.toggleState('folded', this.folded)
+    this.toggleState('open', this.folded && this.unfolded)
   }
 
   override connectedCallback(): void {
@@ -177,6 +328,11 @@ export class HelixHeadlessAppHeader extends HelixElement {
     // position to read there, and the un-scrolled markup it emits is what a
     // fresh load actually shows.
     this.listen()
+    this.addEventListener('focusin', this.handleFocusIn)
+    this.addEventListener('keydown', this.handleKeydown)
+    if (this.hasUpdated) {
+      this.watchWidth()
+    }
   }
 
   /** Whether this header is the page's banner, read from where it sits. */
@@ -189,6 +345,19 @@ export class HelixHeadlessAppHeader extends HelixElement {
     super.disconnectedCallback()
     this.source?.removeEventListener('scroll', this.handleScroll)
     this.source = undefined
+    this.removeEventListener('focusin', this.handleFocusIn)
+    this.removeEventListener('keydown', this.handleKeydown)
+    this.widths?.disconnect()
+    this.widths = undefined
+  }
+
+  /** The `fold-below` the width watch was started for, so a change is measured at once. */
+  private watchedFor: number | undefined
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.watchedFor = this.foldBelow
+    this.watchWidth()
   }
 
   protected override updated(changed: PropertyValues): void {
@@ -196,14 +365,44 @@ export class HelixHeadlessAppHeader extends HelixElement {
     if (changed.has('scroller') && this.isConnected) {
       this.listen()
     }
+    /* A `fold-below` set after the first render: the observer reports a size
+       only when it changes, so the bar is measured here. */
+    if (this.foldBelow !== this.watchedFor) {
+      this.watchedFor = this.foldBelow
+      this.watchWidth()
+      const width = this.getBoundingClientRect().width
+      if (this.widths && width > 0) {
+        this.fold(width)
+      }
+    }
+    if (changed.has('hideOnScroll') && !this.hideOnScroll) {
+      this.hide(false)
+    }
   }
 
   protected override render(): TemplateResult {
     return html`
       <div part="row">
         <div part="start"><slot name="start"></slot></div>
-        <div part="content"><slot></slot></div>
-        <div part="end"><slot name="end"></slot></div>
+        <div part="content" id="content" ?hidden=${this.folded && !this.unfolded}><slot></slot></div>
+        <div part="end"><slot name="end"></slot>${
+          this.folded
+            ? html`<button
+                part="toggle"
+                type="button"
+                aria-controls="content"
+                aria-expanded=${this.unfolded ? 'true' : 'false'}
+                aria-label=${this.menuLabel}
+                @click=${this.handleToggle}
+              >
+                <slot name="menu-icon">
+                  <svg part="toggle-mark" fill="currentColor" viewBox=${list.viewBox} aria-hidden="true">
+                    ${unsafeSVG(list.content)}
+                  </svg>
+                </slot>
+              </button>`
+            : nothing
+        }</div>
       </div>
     `
   }
