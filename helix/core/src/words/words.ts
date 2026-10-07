@@ -78,14 +78,27 @@ const recheck = (host: Host): void => {
   }
 }
 
-/** Watches the registry while the element is connected, and looks again after hydrating. */
+/**
+ * Watches the registry while the element is connected, and looks again after
+ * hydrating. An element whose locale changes with a `lang` updates even where
+ * no word of its own changes, so its numbers are written in the new locale.
+ */
 class WordsController implements ReactiveController {
   private stop: (() => void) | undefined
+  private locale = ''
 
   constructor(private readonly host: Host) {}
 
   hostConnected(): void {
-    this.stop = watchWords(() => recheck(this.host))
+    this.locale = wordsLocale(this.host)
+    this.stop = watchWords(() => {
+      recheck(this.host)
+      const locale = wordsLocale(this.host)
+      if (locale !== this.locale) {
+        this.locale = locale
+        this.host.requestUpdate()
+      }
+    })
   }
 
   hostDisconnected(): void {
@@ -122,7 +135,10 @@ class WordsController implements ReactiveController {
  * you set, then the words registered for the element's locale, then the
  * initializer, which is the English. Setting any value, the English included,
  * makes it yours. Setting `null` or `undefined`, or removing the attribute,
- * gives the registry's word back.
+ * gives the registry's word back. So does an empty validation message, a
+ * property whose name ends in `Message`: a field never reports a failed check
+ * with no sentence, and a template that renders an empty variable into
+ * `range-overflow-message=""` gets the built-in sentence.
  *
  * The class's static `words` names the key its words are registered under, the
  * family's styled tag, so the headless and styled tiers share one key. An
@@ -156,7 +172,7 @@ export const words = (proto: object, name: string): void => {
         return
       }
       const before = this[name as keyof Host]
-      held.own.set(name, value)
+      held.own.set(name, value === '' && name.endsWith('Message') ? undefined : value)
       this.requestUpdate(name, before)
     },
   })

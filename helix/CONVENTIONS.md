@@ -1534,6 +1534,10 @@ declares it. So every English default a component ships is a word property, and
   nearest `lang`, then the runtime's locale, and only the element's own
   attributes on a server and while hydrating. A child that reads only its own
   `lang` or `locale` is handed `handedLocale(this)`.
+- **A validation message is never empty.** A word property whose name ends in
+  `Message` reads an empty string as unset, so a page that renders an empty
+  variable into `range-overflow-message=""` gets the registered or English
+  sentence, and a field never reports a failed check with no words.
 
 ## A refusable event has a reader
 
