@@ -320,6 +320,27 @@ describe('combobox holding several', () => {
     ...(host as HTMLElement).shadowRoot!.querySelectorAll<HTMLElement>('[part="tag"]'),
   ]
 
+  /* Select and Listbox read an option's comma as part of its value; this split
+     `Paris, France` into two tags and two form entries. */
+  test('an option whose value holds a comma is one choice, one tag, and one entry', async () => {
+    document.body.innerHTML = `<helix-headless-combobox label="Place" multiple name="c">
+      <helix-headless-option value="Paris, France">Paris</helix-headless-option>
+      <helix-headless-option value="Rome">Rome</helix-headless-option>
+    </helix-headless-combobox>`
+    const host = document.body.firstElementChild as Updatable & { value: string }
+    await settle(host)
+    await type(host, 'pa')
+    await press(host, 'Enter')
+    await type(host, 'ro')
+    await press(host, 'Enter')
+    expect(host.value).toBe('Paris, France,Rome')
+    expect(tags(host).map((tag) => tag.textContent?.trim())).toEqual(['Paris', 'Rome'])
+    expect((formValue(host as HTMLElement) as FormData).getAll('c')).toEqual([
+      'Paris, France',
+      'Rome',
+    ])
+  })
+
   test('a token forwards every part of its tag, so each can be styled from outside', async () => {
     const host = await many()
     await type(host, 'ru')
