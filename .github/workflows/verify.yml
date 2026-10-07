@@ -354,6 +354,14 @@ jobs:
   # three framework typings, and `build` does not produce them, so without it
   # the tarballs ship without files their own manifests promise. After `warm`,
   # so both are a restore rather than the 214 seconds they were.
+  #
+  # **`smoke:template` builds them itself, so the job does not build first.**
+  # Turbo hashes a task's inputs when a run starts, and some of those inputs
+  # are files the build writes: `specs` reads the generated events module and
+  # `site#build` the generated faces. A second run in the same job hashed a
+  # tree the first had filled, missed `specs`, `themed-page`, `catalog` and
+  # `site#build`, and ran `next build` again: 37 of the step's 43 seconds on
+  # run 37566910950. One run is the same graph `warm` ran, so it restores.
   packaging:
     needs: warm
     runs-on: ubuntu-latest
@@ -364,9 +372,6 @@ jobs:
 
       - name: Set up bun and the dependencies
         uses: ./.github/actions/setup
-
-      - name: Build, and write the manifests and framework typings
-        run: bunx turbo run build analyze
 
       - name: Install a template out of the pack
         run: bun run smoke:template
@@ -479,8 +484,21 @@ jobs:
       # them actually built: clippy writes metadata where `cargo build` writes a
       # binary, and one entry shared between them would be whichever job saved
       # first and a recompile in the other.
+      #
+      # **The example plugin's target directories as well.** Three test binaries
+      # build it for WebAssembly into directories of its own, outside the
+      # workspace target, so nothing kept them: each test binary compiled the
+      # plugin's dependencies from cold and ran 42 to 54 seconds, one after the
+      # other, on run 37556830567. `key` gives the entry a new name, because an
+      # exact hit on the old one is never saved again.
       - name: Restore the Cargo cache
         uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        with:
+          cache-directories: |
+            fusion/plugins/example/target
+            fusion/plugins/example/target-past
+            fusion/plugins/example/target-escape
+          key: example-plugin
       - name: Clippy
         run: bun run rs:check
       - name: Rust tests
