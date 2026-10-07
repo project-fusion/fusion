@@ -72,12 +72,37 @@ const dates = (value: string): string[] =>
  * month, a day and a year in the order the locale writes them, each set with
  * digits or the arrow keys. Alt+Down opens the calendar from a segment.
  *
+ * Text that is not a date gives the form an empty value, as a native date
+ * field does, and `value` keeps the text so it can be corrected.
+ *
+ * **Keyboard.** The field is one tab stop, or each segment is with
+ * `segmented`, and the trigger is one more.
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Down | In the text field, opens the calendar with focus on the chosen day. |
+ * | Alt with Down | Opens the calendar, from the text field or a segment. |
+ * | Enter | In the text field, takes the typed date and submits the form, as a native field does. |
+ * | Escape | Closes the calendar and puts focus back in the field. |
+ * | Tab | In the open calendar, moves between its controls. Out of the field, closes it. |
+ * | Up, Down on a segment | Steps the segment by one, round from its last value to its first. |
+ * | Page Up, Page Down on a segment | Steps by a page: a week of days, two months, or five years. |
+ * | Home, End on a segment | Goes to the segment's first or last value. |
+ * | Digits on a segment | Fill it, and move to the next once it can take no more. |
+ * | Backspace, Delete on a segment | Empty the segment. |
+ * | Left, Right on a segment | Move to the previous or the next segment, along the line of text. |
+ *
+ * In the calendar, the keys are `DatePicker`'s: the arrows move by a day or a
+ * week, Page Up and Page Down by a month, with Shift by a year, and Home and
+ * End to the start and the end of the week.
+ *
  * @since 0.1.0
  * @status stable
  * @category forms
  * @aliases DatePicker, DateField, InputDate
  * @documentation https://fusion.dev/helix/components/date-input
  *
+ * @slot end - Content after the date, before the trigger, such as a clear button.
  * @slot feedback - The error message under the field.
  * @slot hint - The help text under the field.
  * @slot label - The label, for content richer than the `label` text.
@@ -85,6 +110,7 @@ const dates = (value: string): string[] =>
  * @slot panel-footer - Content in the panel under the calendar, such as a note or an action.
  * @slot panel-header - Content in the panel above the calendar, such as a heading or a shortcut.
  * @slot previous-icon - The icon on the calendar's previous month control.
+ * @slot start - Content before the date, such as an icon.
  * @slot trigger - The icon on the button that opens the calendar.
  *
  * @event {Event} change - Fired after the value changes.
@@ -686,9 +712,18 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
     }
   }
 
-  /** Each date, where `mode` holds several, sent one entry each. */
+  /**
+   * Each date, where `mode` holds several, sent one entry each.
+   *
+   * One date that is text and no date, such as `August 5`, is sent as an empty
+   * entry, as a native date field sends a date it cannot read.
+   */
   protected override get answers(): readonly string[] | undefined {
-    return this.mode === undefined ? undefined : dates(this.value)
+    if (this.mode !== undefined) {
+      return dates(this.value)
+    }
+    const text = this.value.trim()
+    return text === '' || isDateValue(text) ? undefined : ['']
   }
 
   /** What is wrong with the dates, which the text input cannot say. */
@@ -926,6 +961,7 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
   protected override render(): TemplateResult {
     return html`${this.renderLabel()}
       <div part="field" @keydown=${this.handleKeydown}>
+        <slot name="start"></slot>
         ${
           this.mode === 'multiple'
             ? this.renderTokenRow(
@@ -935,6 +971,7 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
             : nothing
         }
         ${this.segmentsShown ? this.renderSegments() : this.renderControl()}
+        <slot name="end"></slot>
         <button
           part="trigger"
           type="button"

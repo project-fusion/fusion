@@ -25,6 +25,14 @@
     border-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
+/* An icon or a unit at either end of the text: quieter than the value, and
+   never shrinking when the field is narrow, as `Input` draws them. */
+slot[name="start"]::slotted(*),
+slot[name="end"]::slotted(*) {
+  color: var(--helix-color-foreground-subtle);
+  flex: none;
+}
+
 :host(:disabled) [part="field"] {
   color: var(--helix-color-foreground-subtle);
 }

@@ -770,6 +770,31 @@ describe('input date holding several, in its form', () => {
   })
 })
 
+describe('input date with text that is no date', () => {
+  /* The form held whatever was typed, `August 5, 2027` included, where a
+     native date field sends a date it cannot read as empty. */
+  test('gives the form an empty entry, and keeps the text in the value', async () => {
+    const host = await field('name="d"')
+    await type(host, 'August 5, 2027')
+    expect(host.value).toBe('August 5, 2027')
+    expect((formValue(host) as FormData).getAll('d')).toEqual([''])
+    await type(host, '2027-08-05')
+    expect(formValue(host)).toBe('2027-08-05')
+  })
+})
+
+describe('input date takes content at either end', () => {
+  /* A field with an icon before the date or a clear button after it had to be
+     built around the element, outside its frame. */
+  test('in start and end, inside the field', async () => {
+    const host = await field()
+    const slots = [...(part(host, 'field')?.querySelectorAll(':scope > slot') ?? [])].map((one) =>
+      one.getAttribute('name'),
+    )
+    expect(slots).toEqual(['start', 'end'])
+  })
+})
+
 describe('the events a date input sends', () => {
   const heard = (host: InputDate): string[] => {
     const log: string[] = []
