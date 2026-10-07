@@ -153,3 +153,38 @@ describe('content around the label', () => {
     expect(start?.assignedElements().map((one) => one.textContent)).toEqual(['*'])
   })
 })
+
+describe('a toggle with no name', () => {
+  /* The missing-name warning is in development builds only, which the
+     package's `test:dom` script asks for with `--conditions helix-development`. */
+  const warnedOn = async (markup: string): Promise<string[]> => {
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      await mount(markup)
+      await new Promise((done) => setTimeout(done, 5))
+    } finally {
+      console.warn = original
+    }
+    return warnings
+  }
+
+  test('is reported by its tag, an icon alone being no name', async () => {
+    const warnings = await warnedOn(
+      '<helix-headless-toggle><svg slot="start"></svg></helix-headless-toggle>',
+    )
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0]).toContain('<helix-headless-toggle> has no accessible name')
+  })
+
+  test('and a toggle with words, a label, or a labeled icon is not', async () => {
+    for (const named of [
+      '<helix-headless-toggle>Bold</helix-headless-toggle>',
+      '<helix-headless-toggle aria-label="Bold"><svg slot="start"></svg></helix-headless-toggle>',
+      '<helix-headless-toggle><svg slot="start" aria-label="Bold"></svg></helix-headless-toggle>',
+    ]) {
+      expect([named, ...(await warnedOn(named))]).toEqual([named])
+    }
+  })
+})

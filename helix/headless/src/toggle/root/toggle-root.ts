@@ -1,4 +1,5 @@
 import {
+  auditName,
   customElement,
   HelixElement,
   HostClickController,
@@ -37,9 +38,9 @@ import { property } from 'lit/decorators.js'
  * @event {Event} change - Fired after a toggle button on its own is pressed or released.
  * @event {HelixSelectEvent} helix-select - Fired when the item is chosen. Cancelable: call `preventDefault()` to keep the current choice.
  *
- * @csspart item - The radio button.
+ * @csspart item - The button: a radio in a group where one is chosen, and a button with `aria-pressed` on its own or in a group where several can be.
  *
- * @cssstate pressed - The item is pressed, in a group where several can be.
+ * @cssstate pressed - The item is pressed, on its own or in a group where several can be.
  * @cssstate selected - The item is chosen.
  */
 @customElement('helix-headless-toggle')
@@ -148,6 +149,13 @@ export class HelixHeadlessToggle extends MixinSelectableItem(HelixElement) {
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
     this.finishHydration()
+    /* A toggle that shows only an icon is announced as "toggle button,
+       pressed" and nothing else. Development builds only. */
+    auditName(
+      this,
+      () => this.partNamed('item'),
+      'Give it words in its default slot, an `aria-label`, or a label on the icon it holds.',
+    )
   }
 
   protected override render(): TemplateResult {
