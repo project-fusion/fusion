@@ -9,7 +9,7 @@ import {
   customElement,
   drawIcon,
   FullscreenController,
-  fillTemplate,
+  formatWords,
   HelixElement,
   HelixNextEvent,
   HelixPreviousEvent,
@@ -22,6 +22,7 @@ import {
   SKIP_SECONDS,
   sameCopies,
   showCaption,
+  words,
   writtenList,
   writtenNumbers,
 } from '@fusion.dev/helix-core'
@@ -249,6 +250,12 @@ const clock = (seconds: number): string => {
 @customElement('helix-headless-video')
 export class HelixHeadlessVideo extends HelixElement {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-video': { playLabel: 'Abspielen' } })`.
+   */
+  static words = 'helix-video'
+
+  /**
    * Whether the video starts playing on its own. Browsers allow this only while
    * it is muted.
    *
@@ -268,6 +275,7 @@ export class HelixHeadlessVideo extends HelixElement {
    * language hears its own: the play, pause, loading and error labels were,
    * and the rest of the bar read out in English beside them.
    */
+  @words
   @property({ attribute: 'captions-label' })
   captionsLabel = 'Captions'
 
@@ -275,6 +283,7 @@ export class HelixHeadlessVideo extends HelixElement {
    * The name of the row that turns captions off, when the video has several
    * tracks.
    */
+  @words
   @property({ attribute: 'captions-off-label' })
   captionsOffLabel = 'Off'
 
@@ -324,12 +333,14 @@ export class HelixHeadlessVideo extends HelixElement {
   /**
    * What the control that saves the file is called.
    */
+  @words
   @property({ attribute: 'download-label' })
   downloadLabel = 'Download'
 
   /**
    * The message shown when the video cannot be played.
    */
+  @words
   @property({ attribute: 'error-label' })
   errorLabel = 'This video could not be played'
 
@@ -372,10 +383,12 @@ export class HelixHeadlessVideo extends HelixElement {
   extraControls = ''
 
   /**
-   * What the control that skips ahead is called, with `{seconds}` filled in.
+   * What the control that skips ahead is called. `{seconds}` is how far, written
+   * in the locale, and each language writes the forms it has.
    */
+  @words
   @property({ attribute: 'forward-label' })
-  forwardLabel = 'Forward {seconds} seconds'
+  forwardLabel = '{seconds, plural, one {Forward # second} other {Forward # seconds}}'
 
   /**
    * What the control that fills the screen is called.
@@ -384,6 +397,7 @@ export class HelixHeadlessVideo extends HelixElement {
    * `aria-pressed`: a name that changed as well read out "Exit fullscreen,
    * pressed", which is two answers to one question.
    */
+  @words
   @property({ attribute: 'fullscreen-label' })
   fullscreenLabel = 'Fullscreen'
 
@@ -411,6 +425,7 @@ export class HelixHeadlessVideo extends HelixElement {
   /**
    * The text announced while the video waits for more data.
    */
+  @words
   @property({ attribute: 'loading-label' })
   loadingLabel = 'Loading'
 
@@ -423,6 +438,7 @@ export class HelixHeadlessVideo extends HelixElement {
   /**
    * What the button that opens `overflow-controls` is called.
    */
+  @words
   @property({ attribute: 'more-label' })
   moreLabel = 'More controls'
 
@@ -430,12 +446,14 @@ export class HelixHeadlessVideo extends HelixElement {
    * The name of the mute control. The control shows as pressed while the video
    * is muted.
    */
+  @words
   @property({ attribute: 'mute-label' })
   muteLabel = 'Mute'
 
   /**
    * What the control that asks for the next video is called.
    */
+  @words
   @property({ attribute: 'next-label' })
   nextLabel = 'Next'
 
@@ -462,18 +480,23 @@ export class HelixHeadlessVideo extends HelixElement {
   /**
    * The name of the play control while pressing it would pause the video.
    */
+  @words
   @property({ attribute: 'pause-label' })
   pauseLabel = 'Pause'
 
   /**
-   * How the volume is read out, with `{percent}` filled in.
+   * How the volume is read out. `{percent}` is the volume from 0 to 100,
+   * written in the locale, and a language that needs plural forms writes them
+   * with `{percent, plural, ...}`.
    */
+  @words
   @property({ attribute: 'percent-label' })
   percentLabel = '{percent} percent'
 
   /**
    * What the control that floats the video over other windows is called.
    */
+  @words
   @property({ attribute: 'pip-label' })
   pipLabel = 'Picture in picture'
 
@@ -481,12 +504,14 @@ export class HelixHeadlessVideo extends HelixElement {
    * The name of the player when `label` is not set. The player is a group, and
    * this is what a screen reader calls it on arriving.
    */
+  @words
   @property({ attribute: 'player-label' })
   playerLabel = 'Video'
 
   /**
    * The name of the play control while pressing it would start the video.
    */
+  @words
   @property({ attribute: 'play-label' })
   playLabel = 'Play'
 
@@ -511,30 +536,36 @@ export class HelixHeadlessVideo extends HelixElement {
   /**
    * What the control that asks for the previous video is called.
    */
+  @words
   @property({ attribute: 'previous-label' })
   previousLabel = 'Previous'
 
   /**
    * What the control that casts the video to another device is called.
    */
+  @words
   @property({ attribute: 'remote-label' })
   remoteLabel = 'Play on another device'
 
   /**
-   * What the control that skips back is called, with `{seconds}` filled in.
+   * What the control that skips back is called. `{seconds}` is how far, written
+   * in the locale, and each language writes the forms it has.
    */
+  @words
   @property({ attribute: 'rewind-label' })
-  rewindLabel = 'Back {seconds} seconds'
+  rewindLabel = '{seconds, plural, one {Back # second} other {Back # seconds}}'
 
   /**
    * What the scrubber is called.
    */
+  @words
   @property({ attribute: 'seek-label' })
   seekLabel = 'Seek'
 
   /**
    * What the control that changes the speed is called.
    */
+  @words
   @property({ attribute: 'speed-label' })
   speedLabel = 'Playback speed'
 
@@ -582,6 +613,7 @@ export class HelixHeadlessVideo extends HelixElement {
   /**
    * What the menu of tracks is called, where the video has several.
    */
+  @words
   @property({ attribute: 'subtitles-label' })
   subtitlesLabel = 'Subtitles'
 
@@ -589,12 +621,14 @@ export class HelixHeadlessVideo extends HelixElement {
    * How the scrubber reads out where the video is, with `{position}` and
    * `{duration}` filled in.
    */
+  @words
   @property({ attribute: 'time-label' })
   timeLabel = '{position} of {duration}'
 
   /**
    * What the volume slider is called.
    */
+  @words
   @property({ attribute: 'volume-label' })
   volumeLabel = 'Volume'
 
@@ -1451,7 +1485,7 @@ export class HelixHeadlessVideo extends HelixElement {
       return html`<button
         part="rewind"
         type="button"
-        aria-label=${fillTemplate(this.rewindLabel, { seconds: SKIP_SECONDS })}
+        aria-label=${formatWords(this, 'rewindLabel', { seconds: SKIP_SECONDS })}
         @click=${() => this.skipBy(-SKIP_SECONDS)}
       >
         <slot name="rewind-icon">${drawIcon(arrowCounterClockwise)}</slot>
@@ -1461,7 +1495,7 @@ export class HelixHeadlessVideo extends HelixElement {
       return html`<button
         part="forward"
         type="button"
-        aria-label=${fillTemplate(this.forwardLabel, { seconds: SKIP_SECONDS })}
+        aria-label=${formatWords(this, 'forwardLabel', { seconds: SKIP_SECONDS })}
         @click=${() => this.skipBy(SKIP_SECONDS)}
       >
         <slot name="forward-icon">${drawIcon(arrowClockwise)}</slot>
@@ -1679,7 +1713,7 @@ export class HelixHeadlessVideo extends HelixElement {
             ? html`<slot name="rewind-icon" slot="start">${drawIcon(arrowCounterClockwise)}</slot>`
             : html`<slot name="forward-icon" slot="start">${drawIcon(arrowClockwise)}</slot>`
         }
-        ${fillTemplate(back ? this.rewindLabel : this.forwardLabel, { seconds: SKIP_SECONDS })}
+        ${formatWords(this, back ? 'rewindLabel' : 'forwardLabel', { seconds: SKIP_SECONDS })}
       </${this.tag('menu-item')}>`
     }
     if (one === 'previous') {
@@ -1727,6 +1761,9 @@ export class HelixHeadlessVideo extends HelixElement {
 
   protected renderBar(): TemplateResult {
     const done = this.knownDuration > 0 ? this.position / this.knownDuration : 0
+    const progress = `--video-progress: ${done}`
+    const level = `--video-level: ${this.silent ? 0 : this.loudness}`
+    const { fullscreenLabel, muteLabel, seekLabel, volumeLabel } = this
     return html`<div part="controls">
       <button
         part="play"
@@ -1755,19 +1792,19 @@ export class HelixHeadlessVideo extends HelixElement {
         max=${Number.isFinite(this.knownDuration) && this.knownDuration > 0 ? this.knownDuration : 0}
         step="0.01"
         .value=${String(this.position)}
-        aria-label=${this.seekLabel}
-        aria-valuetext=${fillTemplate(this.timeLabel, {
+        aria-label=${seekLabel}
+        aria-valuetext=${formatWords(this, 'timeLabel', {
           duration: clock(this.knownDuration),
           position: clock(this.position),
         })}
-        style=${`--video-progress: ${done}`}
+        style=${progress}
         @input=${this.takeScrub}
       />
       <span part="sound">
       <button
         part="mute"
         type="button"
-        aria-label=${this.muteLabel}
+        aria-label=${muteLabel}
         aria-pressed=${this.silent ? 'true' : 'false'}
         @click=${() => {
           const video = this.video
@@ -1789,11 +1826,11 @@ export class HelixHeadlessVideo extends HelixElement {
         max="1"
         step="0.05"
         .value=${String(this.silent ? 0 : this.loudness)}
-        aria-label=${this.volumeLabel}
-        aria-valuetext=${fillTemplate(this.percentLabel, {
+        aria-label=${volumeLabel}
+        aria-valuetext=${formatWords(this, 'percentLabel', {
           percent: Math.round((this.silent ? 0 : this.loudness) * 100),
         })}
-        style=${`--video-level: ${this.silent ? 0 : this.loudness}`}
+        style=${level}
         @input=${this.takeVolume}
       />
       </span>
@@ -1835,7 +1872,7 @@ export class HelixHeadlessVideo extends HelixElement {
       <button
         part="fullscreen"
         type="button"
-        aria-label=${this.fullscreenLabel}
+        aria-label=${fullscreenLabel}
         aria-pressed=${this.full ? 'true' : 'false'}
         @click=${() => void this.fullscreen.toggle()}
       >

@@ -5,8 +5,7 @@ import {
   customElement,
   drawStatus,
   elementById,
-  fillTemplate,
-  formatNumbers,
+  formatWords,
   HelixActivateEvent,
   HelixBeforeActivateEvent,
   HelixBeforeCloseEvent,
@@ -24,6 +23,8 @@ import {
   Typeahead,
   treeArrow,
   VirtualizeController,
+  words,
+  wordsLocale,
 } from '@fusion.dev/helix-core'
 import { caretDown, caretRight } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -92,8 +93,8 @@ import {
  * `filter` narrows the tree to the entries whose key or value holds the text,
  * ignoring case, and the branches that lead to them, which it opens. A matched
  * branch keeps everything under it. Each matched row carries `row-match`, and
- * a screen reader hears how many entries matched from `result-label` and
- * `results-label`. `filterable` adds a field that sets it: typing sends
+ * a screen reader hears how many entries matched from `results-label`.
+ * `filterable` adds a field that sets it: typing sends
  * `helix-filter`, which you can cancel, and then `helix-filtered`, and Down
  * moves from the field to the tree.
  *
@@ -166,6 +167,12 @@ import {
 @customElement('helix-headless-object-inspector')
 export class HelixHeadlessObjectInspector extends HelixElement {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-object-inspector': { copyValueLabel: 'Wert kopieren' } })`.
+   */
+  static words = 'helix-object-inspector'
+
+  /**
    * The active row's path, such as `/meta/tags/0`, and the empty string for the
    * root.
    *
@@ -192,10 +199,12 @@ export class HelixHeadlessObjectInspector extends HelixElement {
    * **Every word the inspector speaks is a property**, so a page in another
    * language hears its own rather than English around its own keys.
    */
+  @words
   @property({ attribute: 'copy-label' })
   copyLabel = 'Copy {name}'
 
   /** The copy button's accessible name on a row without a key, such as the root. */
+  @words
   @property({ attribute: 'copy-value-label' })
   copyValueLabel = 'Copy value'
 
@@ -240,6 +249,7 @@ export class HelixHeadlessObjectInspector extends HelixElement {
   filterable = false
 
   /** The filter field's placeholder and accessible name. */
+  @words
   @property({ attribute: 'filter-label' })
   filterLabel = 'Filter'
 
@@ -253,21 +263,43 @@ export class HelixHeadlessObjectInspector extends HelixElement {
   @property()
   for = ''
 
-  /** How an array of one entry counts it. `{count}` is replaced with the count. */
+  /**
+   * How an array of one entry counts it, where `items-label` should not say
+   * it. `{count}` is the count.
+   *
+   * @deprecated Write every form in `items-label`, as `{count, plural, one
+   * {# item} other {# items}}`. Removed in the next major version.
+   */
   @property({ attribute: 'item-label' })
-  itemLabel = '{count} item'
+  itemLabel?: string
 
-  /** How an array of any other number of entries counts them. `{count}` is replaced with the count. */
+  /**
+   * How an array counts its entries. `{count}` is the count, written in the
+   * locale, and each language writes the forms it has: `{count, plural, one
+   * {# element} few {# elementy} many {# elementów} other {# elementu}}`.
+   */
+  @words
   @property({ attribute: 'items-label' })
-  itemsLabel = '{count} items'
+  itemsLabel = '{count, plural, one {# item} other {# items}}'
 
-  /** How an object of one key counts it. `{count}` is replaced with the count. */
+  /**
+   * How an object of one key counts it, where `keys-label` should not say it.
+   * `{count}` is the count.
+   *
+   * @deprecated Write every form in `keys-label`, as `{count, plural, one
+   * {# key} other {# keys}}`. Removed in the next major version.
+   */
   @property({ attribute: 'key-label' })
-  keyLabel = '{count} key'
+  keyLabel?: string
 
-  /** How an object of any other number of keys counts them. `{count}` is replaced with the count. */
+  /**
+   * How an object counts its keys. `{count}` is the count, written in the
+   * locale, and each language writes the forms it has: `{count, plural, one
+   * {# klucz} few {# klucze} many {# kluczy} other {# klucza}}`.
+   */
+  @words
   @property({ attribute: 'keys-label' })
-  keysLabel = '{count} keys'
+  keysLabel = '{count, plural, one {# key} other {# keys}}'
 
   /**
    * Accessible name for the tree, and the text of the header where there is one.
@@ -291,21 +323,31 @@ export class HelixHeadlessObjectInspector extends HelixElement {
   @property({ attribute: 'no-copy', type: Boolean })
   noCopy = false
 
-  /** What a screen reader hears when a filter matches one entry. `{count}` is the count. */
+  /**
+   * What a screen reader hears when a filter matches one entry, where
+   * `results-label` should not say it. `{count}` is the count.
+   *
+   * @deprecated Write every form in `results-label`, as `{count, plural, one
+   * {# result} other {# results}}`. Removed in the next major version.
+   */
   @property({ attribute: 'result-label' })
-  resultLabel = '{count} result'
+  resultLabel?: string
 
   /**
-   * What a screen reader hears when a filter matches any other number of
-   * entries. `{count}` is the count. The two are chosen by `Intl.PluralRules`.
+   * What a screen reader hears when a filter matches entries. `{count}` is
+   * how many, written in the locale, and each language writes the forms it
+   * has: `{count, plural, one {# wynik} few {# wyniki} many {# wyników}
+   * other {# wyniku}}`.
    */
+  @words
   @property({ attribute: 'results-label' })
-  resultsLabel = '{count} results'
+  resultsLabel = '{count, plural, one {# result} other {# results}}'
 
   /**
    * The tree's accessible name when `label` is empty and the host names it
    * with neither `aria-label` nor `aria-labelledby`.
    */
+  @words
   @property({ attribute: 'tree-label' })
   treeLabel = 'Value'
 
@@ -486,10 +528,22 @@ export class HelixHeadlessObjectInspector extends HelixElement {
     }
   }
 
+  /**
+   * A count in its plural message, `items-label`, `keys-label` or
+   * `results-label`, or in the deprecated sentence for one where a page still
+   * sets it.
+   */
+  private counted(which: 'item' | 'key' | 'result', count: number): string {
+    const one = this[`${which}Label`]
+    return one
+      ? countLabel(count, one, this[`${which}sLabel`], wordsLocale(this))
+      : formatWords(this, `${which}sLabel`, { count })
+  }
+
   /** Says how many entries the filter matched, and nothing for an empty one. */
   private tell(): void {
     if (this.found) {
-      this.status.say(countLabel(this.found.size, this.resultLabel, this.resultsLabel, this.lang))
+      this.status.say(this.counted('result', this.found.size))
     }
   }
 
@@ -836,20 +890,8 @@ export class HelixHeadlessObjectInspector extends HelixElement {
     if (row.branch) {
       const count = entries(value as object).length
       const array = Array.isArray(value)
-      /* The language's own rule for which form a count takes, so a page that
-         sets `lang` and both words reads them right. */
-      const one = new Intl.PluralRules(this.lang || undefined).select(count) === 'one'
-      const words = array
-        ? one
-          ? this.itemLabel
-          : this.itemsLabel
-        : one
-          ? this.keyLabel
-          : this.keysLabel
       return html`<span part="summary">${array ? '[…]' : '{…}'}</span>
-        <span part="count" dir="auto"
-          >${fillTemplate(words, { count: formatNumbers(this.lang)(count) })}</span
-        >`
+        <span part="count" dir="auto">${this.counted(array ? 'item' : 'key', count)}</span>`
     }
     if (typeof value === 'string') {
       return html`<span part="string" dir="ltr">${JSON.stringify(value)}</span>`
@@ -961,7 +1003,7 @@ export class HelixHeadlessObjectInspector extends HelixElement {
         tooltip-arrow-left: copy-tooltip-arrow-left, tooltip-arrow-right: copy-tooltip-arrow-right,
         tooltip-arrow-top: copy-tooltip-arrow-top, tooltip-bottom: copy-tooltip-bottom,
         tooltip-left: copy-tooltip-left, tooltip-right: copy-tooltip-right, tooltip-top: copy-tooltip-top"
-      label=${row?.key === undefined ? this.copyValueLabel : fillTemplate(this.copyLabel, { name: row.key })}
+      label=${row?.key === undefined ? this.copyValueLabel : formatWords(this, 'copyLabel', { name: row.key })}
       .value=${this.copyable(row)}
     ></${this.tag('copy-button')}>`
   }

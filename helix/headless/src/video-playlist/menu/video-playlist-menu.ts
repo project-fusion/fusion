@@ -5,6 +5,7 @@ import {
   HelixElement,
   HelixSelectEvent,
   type Placement,
+  words,
 } from '@fusion.dev/helix-core'
 import { list } from '@fusion.dev/helix-icons'
 import { nothing, type TemplateResult } from 'lit'
@@ -58,11 +59,18 @@ import '../../menu/index.js'
 @customElement('helix-headless-video-playlist-menu')
 export class HelixHeadlessVideoPlaylistMenu extends HelixElement {
   /**
+   * The key this part's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-video-playlist-menu': { label: 'Folgen' } })`.
+   */
+  static words = 'helix-video-playlist-menu'
+
+  /**
    * The name of the menu and its trigger, read by screen readers.
    *
    * "Episodes" suits a series and is wrong for a set of camera angles, and the
    * component cannot know which one it is in.
    */
+  @words
   @property()
   label = 'Episodes'
 
