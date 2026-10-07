@@ -29,12 +29,15 @@ import { styles } from './virtual-list-root.css.js'
  * @cssproperty --virtual-list-block-size - How tall the scrolling box is.
  * @cssproperty --virtual-list-empty-color - The color of the text in the row shown when there are no items.
  * @cssproperty --virtual-list-empty-padding - The space around the text in the row shown when there are no items.
+ * @cssproperty --virtual-list-focus-ring-color - The color of the ring on the row holding focus. Defaults to `--helix-color-focus-ring`.
+ * @cssproperty --virtual-list-focus-ring-width - The width of the ring on the row holding focus. Defaults to `--helix-size-focus-ring`.
  * @cssproperty --virtual-list-loading-color - The color of the text in the row drawn while `loading` is set.
  * @cssproperty --virtual-list-loading-padding - The space around the text in the row drawn while `loading` is set.
  * @cssproperty --virtual-list-scrollbar-thumb-color - The thumb of the list's scrollbar. Defaults to `--helix-scrollbar-thumb-color`.
  * @cssproperty --virtual-list-scrollbar-thumb-hover-color - The thumb while the pointer is over the list. Defaults to `--helix-scrollbar-thumb-hover-color`.
  * @cssproperty --virtual-list-scrollbar-track-color - The track of the list's scrollbar. Defaults to `--helix-scrollbar-track-color`.
  * @cssproperty --virtual-list-selected-background-color - The fill behind a chosen row, in a list with `selection-mode`.
+ * @cssproperty --virtual-list-selected-color - The color of the text in a chosen row, in a list with `selection-mode`. Inherited by default.
  */
 @customElement('helix-virtual-list')
 export class HelixVirtualList extends HelixHeadlessVirtualList {

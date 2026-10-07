@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import {
   hasLayout,
+  hasState,
   mount,
   part,
   registerDom,
@@ -210,6 +211,41 @@ describe('virtual list', () => {
 
   /* An empty list drew nothing at all, so a reader could not tell no items
      from a broken list, and there was no place for a link to add the first. */
+  /* A stylesheet could tell neither an empty list nor a loading one from the
+     outside, so the box around it could not change for either. */
+  test('takes the empty state once it has read no items, and the loading state while loading', async () => {
+    const empty = await list(0)
+    expect(hasState(empty, 'empty')).toBe(true)
+    expect(hasState(empty, 'loading')).toBe(false)
+    const busy = await list(3, 'loading')
+    expect(hasState(busy, 'empty')).toBe(false)
+    expect(hasState(busy, 'loading')).toBe(true)
+    ;(busy as Updatable & { loading: boolean }).loading = false
+    await settle(busy)
+    expect(hasState(busy, 'loading')).toBe(false)
+  })
+
+  test('is reported once when it has no name, and not when it has one', async () => {
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      document.body.innerHTML = `<helix-headless-virtual-list for="rows"><template><div></div></template></helix-headless-virtual-list>
+        <script id="rows" type="application/json">["a"]</script>`
+      await settle(document.body.firstElementChild as Updatable)
+      await new Promise((done) => setTimeout(done, 5))
+      expect(warnings).toHaveLength(1)
+      expect(warnings[0]).toContain('<helix-headless-virtual-list> has no accessible name')
+      warnings.length = 0
+      await list(2)
+      await list(2, 'aria-label="Recent files"')
+      await new Promise((done) => setTimeout(done, 5))
+      expect(warnings).toEqual([])
+    } finally {
+      console.warn = original
+    }
+  })
+
   test('shows the empty row where it was given words or content, and only then', async () => {
     const quiet = await list(0)
     expect(part(quiet, 'empty')).toBeNull()
