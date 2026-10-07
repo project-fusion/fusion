@@ -423,6 +423,14 @@ export class HelixHeadlessVideo extends HelixElement {
   label = ''
 
   /**
+   * The title the device's own media controls show while the video plays,
+   * such as on a lock screen. Empty, the default, shows `label`. A playlist
+   * writes the current entry's name here.
+   */
+  @property({ attribute: 'media-title' })
+  mediaTitle = ''
+
+  /**
    * The text announced while the video waits for more data.
    */
   @words
@@ -1128,7 +1136,7 @@ export class HelixHeadlessVideo extends HelixElement {
   private claimSession(): void {
     const skips = writtenList(`${this.extraControls} ${this.overflowControls}`)
     this.session.claim(
-      { artwork: this.poster, title: this.label },
+      { artwork: this.poster, title: this.mediaTitle || this.label },
       {
         next: skips.includes('next') ? () => this.skip(false) : null,
         previous: skips.includes('previous') ? () => this.skip(true) : null,

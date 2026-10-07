@@ -54,17 +54,30 @@ describe('a video playlist', () => {
     expect(player(host).poster).toBe('/one.jpg')
   })
 
-  test('and takes the entry`s words, not everything in it, as the player`s name', async () => {
+  test('and takes the entry`s words, not everything in it, as the player`s title and name', async () => {
     /* Which is what a lock screen shows, the player handing it to the media
        session as the title. Never read `textContent` for it: that takes the
        whole subtree, so a row with a duration beside it reports "One12:00" and
        that string goes all the way to the platform. */
     const host = (await mount(`<helix-headless-video-playlist default-active="one" label="Episodes">
-      <helix-headless-video label="Player" slot="player"></helix-headless-video>
+      <helix-headless-video slot="player"></helix-headless-video>
       <helix-headless-video-playlist-item src="/one.mp4" value="one">One<span slot="meta">12:00</span></helix-headless-video-playlist-item>
     </helix-headless-video-playlist>`)) as Playlist
     await host.updateComplete
     expect(player(host).label).toBe('One')
+    expect((player(host) as Player & { mediaTitle: string }).mediaTitle).toBe('One')
+  })
+
+  /* The playlist wrote the entry over the name the consumer gave the player,
+     so a player labeled "Player" was read as "Setup". */
+  test('leaves the name you gave the player, and moves only its title', async () => {
+    const host = (await mount(`<helix-headless-video-playlist default-active="one" label="Episodes">
+      <helix-headless-video label="Player" slot="player"></helix-headless-video>
+      <helix-headless-video-playlist-item src="/one.mp4" value="one">One</helix-headless-video-playlist-item>
+    </helix-headless-video-playlist>`)) as Playlist
+    await host.updateComplete
+    expect(player(host).label).toBe('Player')
+    expect((player(host) as Player & { mediaTitle: string }).mediaTitle).toBe('One')
   })
 
   test('choosing an entry moves the player', async () => {
