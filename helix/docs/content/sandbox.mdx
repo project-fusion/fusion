@@ -73,6 +73,59 @@ first edit.
 Cancel `helix-before-edit` to refuse an edit. The pane keeps its text, and the
 preview does not receive the refused one.
 
+Several source panes are files. The sandbox shows one at a time under a row of
+tabs, each named by the pane's `label` or, without one, its `name`, and `file`
+holds the `name` of the pane shown. The arrow keys move between the tabs, and
+`Home` and `End` go to the first and the last. Choosing a tab sends
+`helix-before-change` with the pane's `name`, which you can cancel, and
+`change` once `file` holds it. The panes not shown carry `hidden`.
+
+## Your own editor
+
+Any element can be the source pane. Put it in the `source` slot, give it a
+`name`, and dispatch `helix-before-edit` with its text on each change, bubbling,
+as `helix-sandbox-source` does. The sandbox reads its `value` to seed the
+preview, and `helix-caret` from it fills the status bar's position. A wrapper
+around CodeMirror:
+
+```ts
+import { HelixBeforeEditEvent } from '@fusion.dev/helix'
+import { EditorView, basicSetup } from 'codemirror'
+
+class CodeEditor extends HTMLElement {
+  name = this.getAttribute('name') ?? 'html'
+  value = this.getAttribute('value') ?? ''
+
+  connectedCallback() {
+    new EditorView({
+      doc: this.value,
+      extensions: [
+        basicSetup,
+        EditorView.updateListener.of((update) => {
+          if (update.docChanged) {
+            this.value = update.state.doc.toString()
+            this.dispatchEvent(new HelixBeforeEditEvent({ value: this.value }))
+          }
+        }),
+      ],
+      parent: this,
+    })
+  }
+}
+customElements.define('code-editor', CodeEditor)
+```
+
+```html
+<helix-sandbox>
+  <code-editor
+    name="html"
+    slot="source"
+    value="<p>Hello</p>"
+  ></code-editor>
+  <helix-sandbox-preview slot="preview"></helix-sandbox-preview>
+</helix-sandbox>
+```
+
 In a source pane, Tab inserts two spaces. Shift+Tab moves focus back, and
 Escape then Tab moves it forward. The field's description says this to a
 screen reader.
@@ -85,6 +138,15 @@ store the arrangement or the source.
 Set `controls` on `helix-sandbox-terminal` for a clear button and a level
 filter above the log. Without them, `clear()` empties the log, and `level`
 hides the quieter lines.
+
+Set `controls` on `helix-sandbox-preview` for a reload button and a button that
+opens the example in a new tab, in the preview's corner. Without them,
+`reload()` and `open()` do the same. The tab runs the example in a frame
+sandboxed as the preview's own is.
+
+An error the example throws and does not catch shows over the preview, in its
+`error` part, until the next source is sent. Hide the part where you draw your
+own message from `:state(failed)`.
 
 ## The frame document
 

@@ -89,6 +89,13 @@ export class HelixSandboxSource extends HelixElement {
     'Tab inserts two spaces. To leave, press Escape and then Tab, or press Shift+Tab to go back.'
 
   /**
+   * The pane's file name, such as `index.html`, on its tab where a sandbox
+   * holds several panes. Empty puts the pane's `name` on the tab.
+   */
+  @property()
+  label = ''
+
+  /**
    * Which source this pane holds. Every `helix-before-edit` event includes it.
    *
    * `html` and `css` are what the sandbox root routes on; any other name is
