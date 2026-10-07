@@ -235,6 +235,20 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
   }
 
   /**
+   * Requests a new current stage, and returns whether it moved.
+   *
+   * Where only a step's `current` says where the reader is, `active` is first
+   * written with that step, so `helix-activate` names it as `previous`.
+   */
+  override requestActive(next: string, cause?: string): boolean {
+    const here = this.active === '' ? this.steps[this.at]?.value : undefined
+    if (here) {
+      this.active = here
+    }
+    return super.requestActive(next, cause)
+  }
+
+  /**
    * Moves to the next stage that can be gone to, as Ark UI's `goToNextStep`
    * does. Returns whether it moved: not past the last stage, not into a stage
    * `linear` holds out of reach, and not where a listener refused.
