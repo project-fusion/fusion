@@ -48,11 +48,13 @@ export interface BreadcrumbItem {
  * array of `{ label, href }`, drawn as crumbs in order, the last one as the
  * current page. Slotted crumbs follow them. Use one way or the other in a trail.
  *
- * With `max-items`, a trail drawn from `items` that is longer folds its middle
- * into one crumb: the first crumb, a button, then the last `max-items` less one.
- * The button is named by `expand-label` and shows the whole trail, moving focus
- * to the first crumb it brought back. A new `items` folds again. Slotted crumbs
- * do not fold; write the folded crumb where the gap should be.
+ * With `max-items`, a trail that is longer folds its middle into one place:
+ * the first crumb, a button, then the last `max-items` less one. The button is
+ * named by `expand-label` and shows the whole trail, moving focus to the first
+ * crumb it brought back. A trail drawn from `items` draws the button as a
+ * crumb of its own, and a new `items` folds again. A slotted trail hides the
+ * crumbs it folds, which take no room, and its first crumb draws the button
+ * after its link; a change to the crumbs folds again.
  *
  * **Keyboard.** Each crumb with an `href` is a link and one tab stop, and
  * Enter follows it. The current page and the separators are not in the tab
@@ -125,6 +127,25 @@ export class HelixHeadlessBreadcrumbs extends HelixElement {
   @state()
   private expanded = false
 
+  /** The crumbs slotted into the trail, in order. */
+  private get slotted(): HelixHeadlessBreadcrumb[] {
+    return (
+      this.renderRoot?.querySelector<HTMLSlotElement>('slot:not([name])')?.assignedElements() ?? []
+    ).filter((one): one is HelixHeadlessBreadcrumb => one instanceof HelixHeadlessBreadcrumb)
+  }
+
+  /** Shows the whole of a folded slotted trail and moves focus to the first crumb it brought back. */
+  private readonly unfold = (): void => {
+    this.expanded = true
+    this.updateComplete.then(() => {
+      const crumb = this.slotted[1]
+      const link =
+        crumb?.shadowRoot?.querySelector<HTMLElement>('a[part="link"]') ??
+        crumb?.querySelector<HTMLElement>('a[href]')
+      link?.focus()
+    })
+  }
+
   /** Shows the whole trail and moves focus to the first crumb it brought back. */
   private readonly expand = (): void => {
     this.expanded = true
@@ -163,15 +184,31 @@ export class HelixHeadlessBreadcrumbs extends HelixElement {
    * not reflect, so nothing is written onto your markup.
    */
   private readonly markLast = (): void => {
-    const crumbs = (
-      this.renderRoot.querySelector<HTMLSlotElement>('slot:not([name])')?.assignedElements() ?? []
-    ).filter((one): one is HelixHeadlessBreadcrumb => one instanceof HelixHeadlessBreadcrumb)
+    const crumbs = this.slotted
     const marked = crumbs.some((one) => one.current)
+    /* A slotted trail folds as a drawn one does: the crumbs after the first,
+       up to the last `max-items` less one. */
+    const most = this.maxItems ?? 0
+    const fold =
+      !this.expanded && this.items.length === 0 && most >= 2 && crumbs.length > most
+        ? crumbs.length - most
+        : 0
+    const label = fold > 0 ? formatWords(this, 'expandLabel', { count: fold }) : ''
     crumbs.forEach((crumb, index) => {
       whenHydrated(crumb, () => {
         crumb.implied = !marked && this.items.length === 0 && index === crumbs.length - 1
+        crumb.folded = index > 0 && index <= fold
+        crumb.fold = index === 0 ? fold : 0
+        crumb.foldLabel = index === 0 ? label : ''
+        crumb.onFold = index === 0 && fold > 0 ? this.unfold : undefined
       })
     })
+  }
+
+  /** New crumbs fold again, as a new `items` does. */
+  private readonly handleSlotChange = (): void => {
+    this.expanded = false
+    this.markLast()
   }
 
   /** The crumbs `items` describes, each a crumb of this tier. */
@@ -224,7 +261,7 @@ export class HelixHeadlessBreadcrumbs extends HelixElement {
        source order, so there is nothing here to position it: the list renders
        what it was given, in the order it was given. */
     return html`<ol part="list" role="list">
-      ${this.renderItems()}<slot @slotchange=${this.markLast}></slot>
+      ${this.renderItems()}<slot @slotchange=${this.handleSlotChange}></slot>
     </ol>`
   }
 }

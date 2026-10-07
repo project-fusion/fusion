@@ -272,7 +272,46 @@ a[part="link"]:focus-visible {
   position: absolute;
 }
 
-/* A hidden crumb takes no room. */
-:host([hidden]) {
+/* A hidden crumb takes no room, and nor does one a long trail folded away. */
+:host([hidden]),
+:host(:state(folded)) {
   display: none;
+}
+
+/* The fold after the first crumb of a long slotted trail: a chevron as the
+   separator draws one, and a button drawn as a crumb's link is, as the fold of
+   a trail drawn from `items` is. */
+[part="fold-separator"] {
+  color: var(--breadcrumbs-separator-color, var(--helix-color-foreground-subtle));
+  display: block;
+  user-select: none;
+}
+
+[part="fold-separator"] svg {
+  block-size: 1em;
+  inline-size: 1em;
+  vertical-align: calc(0.5cap - 0.5em);
+}
+
+[part="expand"] {
+  all: unset;
+  border-radius: var(--breadcrumbs-radius, var(--helix-radii-sm));
+  box-sizing: border-box;
+  color: var(--breadcrumbs-link-color, var(--helix-color-foreground-muted));
+  cursor: pointer;
+  line-height: var(--helix-leading-normal);
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+}
+
+[part="expand"]:hover {
+  background-color: var(
+    --breadcrumbs-hover-color,
+    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)
+  );
+  color: var(--breadcrumbs-current-color, var(--helix-color-foreground));
+}
+
+[part="expand"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
 }

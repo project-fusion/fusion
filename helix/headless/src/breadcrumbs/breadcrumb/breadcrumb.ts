@@ -1,7 +1,9 @@
 import {
   customElement,
   HelixElement,
+  HelixSelectEvent,
   hostAria,
+  plainClick,
   slotFilled,
   slotNamed,
 } from '@fusion.dev/helix-core'
@@ -28,8 +30,11 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * Set `href` to make the whole crumb an anchor, which works with Enter, middle
  * click, and the status bar, and before any JavaScript runs. A router cannot
  * reach an anchor inside a shadow root, so intercept the click for client-side
- * navigation, as with `Tree.Item` and `List.Item`. A trail that collapses also
- * reads `href` to rebuild its hidden crumbs elsewhere.
+ * navigation, as with `Tree.Item` and `List.Item`: a plain press on the link
+ * sends `helix-select` with the `href` as its value first, and canceling it
+ * keeps the browser from following, so a client-side router follows it
+ * instead, as React Aria's `onAction` lets a router do. A press with a
+ * modifier opens the link where the browser opens it and sends nothing.
  *
  * Without `href`, the crumb renders a plain `<span>` around what you slot,
  * including your own anchor.
@@ -54,12 +59,18 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @slot separator - Replaces the chevron shown before this item.
  * @slot start - Content before the label, such as an icon.
  *
+ * @event {HelixSelectEvent} helix-select - A plain press on the crumb's link, with its `href` as the value, before the browser follows it. Cancelable: cancel it to keep the browser from following, as a client-side router does.
+ *
+ * @csspart expand - The button after the first crumb of a folded slotted trail, which shows the folded crumbs.
+ * @csspart fold-separator - The chevron before that button.
  * @csspart link - The crumb itself, which is an `<a>` where `href` is set.
  * @csspart separator - The separator preceding the item.
  * @csspart separator-mark - The chevron between crumbs, shown when no separator is slotted.
  *
+ * @cssstate current - While the crumb is the current page, marked `current` or the last of a trail with none marked.
  * @cssstate end - While the `end` slot holds something, so a stylesheet can join
  * the label and what follows it into one control.
+ * @cssstate folded - While a trail longer than its `max-items` has folded the crumb away. It takes no room.
  */
 @customElement('helix-headless-breadcrumb')
 export class HelixHeadlessBreadcrumb extends HelixElement {
@@ -71,6 +82,10 @@ export class HelixHeadlessBreadcrumb extends HelixElement {
     :host(:first-child) [part='separator'] {
       display: none;
     }
+
+    :host(:state(folded)) {
+      display: none;
+    }
   `
 
   /**
@@ -78,6 +93,24 @@ export class HelixHeadlessBreadcrumb extends HelixElement {
    */
   @property({ reflect: true, type: Boolean })
   current = false
+
+  /**
+   * @internal Set by the trail: how many crumbs after this one a slotted trail
+   * longer than its `max-items` has folded, so this crumb draws the button
+   * that shows them. 0 draws none.
+   */
+  @property({ attribute: false })
+  fold = 0
+
+  /**
+   * @internal Set by the trail: whether this crumb is folded away.
+   */
+  @property({ attribute: false })
+  folded = false
+
+  /** @internal Set by the trail: the name of the button that shows the folded crumbs. */
+  @property({ attribute: false })
+  foldLabel = ''
 
   /**
    * The URL the crumb links to. The current page has none.
@@ -107,6 +140,9 @@ export class HelixHeadlessBreadcrumb extends HelixElement {
   @property({ attribute: false })
   implied = false
 
+  /** @internal Set by the trail: what a press on the fold's button does. */
+  onFold: (() => void) | undefined = undefined
+
   /**
    * The link's `rel` value, which describes how the linked page relates to this
    * one.
@@ -129,6 +165,38 @@ export class HelixHeadlessBreadcrumb extends HelixElement {
     // than `connectedCallback`, which the server never calls.
     hostAria(this.internals, { role: 'listitem' })
     this.internals.ariaCurrent = this.current || this.implied ? 'page' : null
+    this.toggleState('current', this.current || this.implied)
+    this.toggleState('folded', this.folded)
+  }
+
+  /**
+   * Sends `helix-select` for a plain press on the link, and keeps the browser
+   * from following where it was canceled.
+   */
+  private readonly handleLinkClick = (event: MouseEvent): void => {
+    if (!plainClick(event)) {
+      return
+    }
+    if (!this.dispatchEvent(new HelixSelectEvent({ value: this.href ?? '' }))) {
+      event.preventDefault()
+    }
+  }
+
+  /**
+   * The button that shows the crumbs a slotted trail folded after this one,
+   * with a chevron before it, drawn after the crumb's own label.
+   */
+  protected renderFold(): TemplateResult | typeof nothing {
+    if (this.fold === 0) {
+      return nothing
+    }
+    return html`<span part="fold-separator" aria-hidden="true"
+        ><svg data-mirror fill="currentColor" viewBox=${caretRight.viewBox}>
+          ${unsafeSVG(caretRight.content)}
+        </svg></span
+      ><button part="expand" type="button" aria-label=${this.foldLabel} @click=${() => this.onFold?.()}>
+        …
+      </button>`
   }
 
   protected override updated(changed: PropertyValues): void {
@@ -202,10 +270,11 @@ export class HelixHeadlessBreadcrumb extends HelixElement {
               href=${this.href ?? ''}
               target=${this.target || nothing}
               rel=${this.rel || nothing}
+              @click=${this.handleLinkClick}
               >${label}</a
             >`
           : html`<span part="link">${label}</span>`
-      }<slot name="end" @slotchange=${this.handleEnd}></slot>`
+      }<slot name="end" @slotchange=${this.handleEnd}></slot>${this.renderFold()}`
   }
 }
 
