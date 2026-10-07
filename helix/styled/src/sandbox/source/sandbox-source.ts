@@ -1,5 +1,6 @@
 import {
   customElement,
+  formatWords,
   HelixBeforeEditEvent,
   HelixCaretEvent,
   HelixEditEvent,
@@ -79,6 +80,15 @@ export class HelixSandboxSource extends HelixElement {
   @words
   @property({ attribute: 'field-label' })
   fieldLabel = 'Example source'
+
+  /**
+   * The editable region's name where the pane has a `label`, so each file's
+   * field says which file it holds. `{field}` is `field-label` and `{name}`
+   * the pane's `label`.
+   */
+  @words
+  @property({ attribute: 'field-name-label' })
+  fieldNameLabel = '{field}, {name}'
 
   /**
    * The field's description, read by screen readers while Tab indents.
@@ -276,7 +286,11 @@ export class HelixSandboxSource extends HelixElement {
   private renderField(): TemplateResult {
     return html`<textarea
       part="source"
-      aria-label=${this.fieldLabel}
+      aria-label=${
+        this.label
+          ? formatWords(this, 'fieldNameLabel', { field: this.fieldLabel, name: this.label })
+          : this.fieldLabel
+      }
       aria-describedby=${this.tabIndents ? 'keys' : nothing}
       spellcheck="false"
       .value=${this.value}

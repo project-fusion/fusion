@@ -345,3 +345,14 @@ describe('the source pane reporting its cursor', () => {
     expect(part(host, 'highlight')?.textContent).toBe('ab\n')
   })
 })
+
+describe('the name of the field', () => {
+  /* Every file's field was "Example source", so a reader moving between file
+     tabs heard the same name for each. */
+  test('says the file it holds, where the pane has a label', async () => {
+    const named = await source('label="index.html"')
+    expect(part(named, 'source')?.getAttribute('aria-label')).toBe('Example source, index.html')
+    const plain = await source()
+    expect(part(plain, 'source')?.getAttribute('aria-label')).toBe('Example source')
+  })
+})
