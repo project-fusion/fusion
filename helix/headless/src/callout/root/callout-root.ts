@@ -4,6 +4,7 @@ import {
   drawDismiss,
   drawDismissGlyph,
   formatWords,
+  HelixDismissEvent,
   HelixElement,
   hostAria,
   MixinDismissible,
@@ -13,7 +14,14 @@ import {
   words,
   wordsConverter,
 } from '@fusion.dev/helix-core'
-import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import {
+  type CSSResultGroup,
+  css,
+  html,
+  nothing,
+  type PropertyValues,
+  type TemplateResult,
+} from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
@@ -72,6 +80,13 @@ type CalloutTone = 'danger' | 'info' | 'neutral' | 'success' | 'warning'
  */
 @customElement('helix-headless-callout')
 export class HelixHeadlessCallout extends MixinDismissible(HelixElement) {
+  /* A passage set apart is a block, with no stylesheet from the page. */
+  static override styles: CSSResultGroup = css`
+    :host {
+      display: block;
+    }
+  `
+
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-callout': { toneLabels: { danger: 'Fehler' } } })`.
@@ -212,6 +227,15 @@ export class HelixHeadlessCallout extends MixinDismissible(HelixElement) {
     return this.dismissLabel.includes('{label}')
       ? formatWords(this, 'dismissLabel', { label: heading || tone }).trim()
       : this.dismissLabel
+  }
+
+  /**
+   * The event a dismissal sends, naming the note by its heading where it has
+   * one, the words its dismiss button is named by, and otherwise by its text.
+   */
+  protected override dismissEvent(): HelixDismissEvent {
+    const heading = slottedWords(this, ['heading'])
+    return heading ? new HelixDismissEvent({ label: heading }) : super.dismissEvent()
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
