@@ -31,10 +31,40 @@ export const targets = (selector: string): string[] => {
   return [...found]
 }
 
+/**
+ * A selector with its `:has()` and `:not()` taken out, so a tag inside one is
+ * never read as the one a `::part` hangs off:
+ * `helix-data-table:has(> helix-table-row)::part(toolbar)` is a data table's
+ * toolbar. Counted to the closing parenthesis, since what they hold can hold
+ * parentheses of its own.
+ */
+const bare = (selector: string): string => {
+  let out = ''
+  for (let at = 0; at < selector.length; at += 1) {
+    const held = /^:(?:has|not)\(/.exec(selector.slice(at))
+    if (held === null) {
+      out += selector[at]
+      continue
+    }
+    let depth = 0
+    for (at += held[0].length - 1; at < selector.length; at += 1) {
+      if (selector[at] === '(') {
+        depth += 1
+      } else if (selector[at] === ')') {
+        depth -= 1
+        if (depth === 0) {
+          break
+        }
+      }
+    }
+  }
+  return out
+}
+
 /** Every `::part(a b)` in a selector, with the tag it hangs off. */
 export const parts = (selector: string): Array<{ names: string[]; tag: string }> => {
   const found: Array<{ names: string[]; tag: string }> = []
-  for (const match of selector.matchAll(
+  for (const match of bare(selector).matchAll(
     /(helix-[a-z0-9-]+)((?:[^\s>+~,]*))::part\(\s*([^)]*?)\s*\)/g,
   )) {
     const names = (match[3] ?? '').split(/\s+/).filter(Boolean)
