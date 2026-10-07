@@ -5,6 +5,7 @@ import {
   drawIcon,
   drawStatus,
   type FacetDetail,
+  formatWords,
   HelixFacetEvent,
   HelixFormElement,
   holdCaret,
@@ -16,6 +17,8 @@ import {
   restoreValue,
   StatusController,
   scrollItemIntoView,
+  words,
+  wordsLocale,
 } from '@fusion.dev/helix-core'
 import { x } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -183,6 +186,12 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
 export class HelixHeadlessFilterInput extends MixinControllerOpen(
   MixinTokens(MixinControllerValue(MixinField(HelixFormElement))),
 ) {
+  /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-filter-input': { clearLabel: 'Leeren' } })`.
+   */
+  static words = 'helix-filter-input'
+
   /* The description names ids in the consumer's tree and the control is in this
      shadow root, so it is carried down as an element. See `Input`. */
   protected readonly aria = new AriaForwardController(this, {
@@ -207,6 +216,7 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
    * The name of the clear button, read by screen readers. The button shows only
    * an icon.
    */
+  @words
   @property({ attribute: 'clear-label' })
   clearLabel = 'Clear'
 
@@ -226,13 +236,26 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
   @property()
   placeholder = ''
 
-  /** What a reader hears for one suggestion, with `{count}` filled in. */
+  /**
+   * What a reader hears for one suggestion, where `suggestions-label` should
+   * not say it. `{count}` is the count.
+   *
+   * @deprecated Write every form in `suggestions-label`, as `{count, plural,
+   * one {# suggestion} other {# suggestions}}`. Removed in the next major
+   * version.
+   */
   @property({ attribute: 'suggestion-label' })
-  suggestionLabel = '{count} suggestion'
+  suggestionLabel?: string
 
-  /** What a reader hears for any other number of suggestions, with `{count}` filled in. */
+  /**
+   * What a reader hears as the panel opens on its suggestions. `{count}` is
+   * how many, written in the locale, and each language writes the forms it
+   * has: `{count, plural, one {# sugestia} few {# sugestie} many {# sugestii}
+   * other {# sugestii}}`.
+   */
+  @words
   @property({ attribute: 'suggestions-label' })
-  suggestionsLabel = '{count} suggestions'
+  suggestionsLabel = '{count, plural, one {# suggestion} other {# suggestions}}'
 
   /** The live region, rendered from the first count said. */
   private readonly status = new StatusController(this)
@@ -273,7 +296,11 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
     if (count < 0) {
       return
     }
-    this.status.sayNow(countLabel(count, this.suggestionLabel, this.suggestionsLabel, this.lang))
+    this.status.sayNow(
+      this.suggestionLabel
+        ? countLabel(count, this.suggestionLabel, this.suggestionsLabel, wordsLocale(this))
+        : formatWords(this, 'suggestionsLabel', { count }),
+    )
   }
 
   /**

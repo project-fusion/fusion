@@ -1,4 +1,4 @@
-import { customElement, HelixElement, HelixFacetEvent } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, HelixFacetEvent, words } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 /* `lit/static-html.js`, because this template interpolates tag names: it renders
@@ -93,8 +93,15 @@ import '../../menu/index.js'
 @customElement('helix-headless-filter-menu')
 export class HelixHeadlessFilterMenu extends HelixElement {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-filter-menu': { label: 'Filtern' } })`.
+   */
+  static words = 'helix-filter-menu'
+
+  /**
    * The menu's name, read by screen readers.
    */
+  @words
   @property()
   label = 'Filter'
 
