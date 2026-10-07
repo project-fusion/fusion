@@ -8,13 +8,21 @@ beforeAll(async () => {
 
 type Steps = HTMLElement & { updateComplete: Promise<unknown> }
 
+/* A press is applied a microtask after its `helix-select`, once every
+   listener has had the chance to refuse it, so the update to wait for is
+   requested after that. */
+const turn = async (host: Steps): Promise<void> => {
+  await null
+  await host.updateComplete
+}
+
 const steps = async (attrs = ''): Promise<Steps> => {
   const host = (await mount(`<helix-headless-steps ${attrs}>
     <helix-headless-step complete>Details</helix-headless-step>
     <helix-headless-step current>Payment</helix-headless-step>
     <helix-headless-step>Review</helix-headless-step>
   </helix-headless-steps>`)) as Steps
-  await host.updateComplete
+  await turn(host)
   return host
 }
 
@@ -68,7 +76,7 @@ describe('steps', () => {
       `<helix-headless-steps><helix-headless-step complete>A</helix-headless-step>
        <helix-headless-step complete current>B</helix-headless-step></helix-headless-steps>`,
     )) as Steps
-    await host.updateComplete
+    await turn(host)
     const steps = [...host.querySelectorAll('helix-headless-step')] as HTMLElement[]
     const done = at(steps, 0)
     const back = at(steps, 1)
@@ -102,7 +110,7 @@ describe('steps', () => {
     const host = (await mount(
       `<helix-headless-steps><helix-headless-step complete current>Details</helix-headless-step></helix-headless-steps>`,
     )) as Steps
-    await host.updateComplete
+    await turn(host)
     const step = host.querySelector('helix-headless-step') as HTMLElement
     await (step as unknown as Steps).updateComplete
     expect(part(step, 'label')?.getAttribute('aria-current')).toBe('step')
@@ -115,7 +123,7 @@ describe('a step is pressable, and only its name is', () => {
     const host = (await mount(
       `<helix-headless-steps><helix-headless-step ${attrs}>Payment</helix-headless-step></helix-headless-steps>`,
     )) as Steps
-    await host.updateComplete
+    await turn(host)
     const step = host.querySelector('helix-headless-step') as HTMLElement
     await (step as unknown as Steps).updateComplete
     return step
@@ -184,7 +192,7 @@ describe('the list can hold which step is current', () => {
       <helix-headless-step value="two">Two</helix-headless-step>
       <helix-headless-step value="three">Three</helix-headless-step>
     </helix-headless-steps>`)) as Steps
-    await host.updateComplete
+    await turn(host)
     return host
   }
 
@@ -215,7 +223,7 @@ describe('the list can hold which step is current', () => {
       <helix-headless-step complete value="one">One</helix-headless-step>
       <helix-headless-step current value="two">Two</helix-headless-step>
     </helix-headless-steps>`)) as Steps
-    await host.updateComplete
+    await turn(host)
     expect(currents(host)).toEqual([false, true])
   })
 
@@ -224,7 +232,7 @@ describe('the list can hold which step is current', () => {
     const third = host.querySelectorAll('helix-headless-step')[2] as HTMLElement
     await (third as unknown as Steps).updateComplete
     ;(part(third, 'label') as HTMLElement).click()
-    await host.updateComplete
+    await turn(host)
     expect((host as unknown as { active: string }).active).toBe('three')
     expect(currents(host)).toEqual([false, false, true])
   })
@@ -240,7 +248,21 @@ describe('the list can hold which step is current', () => {
     await (third as unknown as Steps).updateComplete
     third.addEventListener('helix-select', (event) => event.preventDefault())
     ;(part(third, 'label') as HTMLElement).click()
-    await host.updateComplete
+    await turn(host)
+    expect((host as unknown as { active: string }).active).toBe('one')
+    expect(currents(host)).toEqual([true, false, false])
+  })
+
+  test('and refusing it on the sequence itself keeps the step too', async () => {
+    /* The docblock tells you to listen on the sequence. Its own listener was
+       added first, so it applied the move before a listener on the same
+       element could refuse it. */
+    const host = await seq('default-active="one"')
+    host.addEventListener('helix-select', (event) => event.preventDefault())
+    const third = host.querySelectorAll('helix-headless-step')[2] as HTMLElement
+    await (third as unknown as Steps).updateComplete
+    ;(part(third, 'label') as HTMLElement).click()
+    await turn(host)
     expect((host as unknown as { active: string }).active).toBe('one')
     expect(currents(host)).toEqual([true, false, false])
   })
@@ -256,7 +278,7 @@ describe('the list can hold which step is current', () => {
     const third = host.querySelectorAll('helix-headless-step')[2] as HTMLElement
     await (third as unknown as Steps).updateComplete
     ;(part(third, 'label') as HTMLElement).click()
-    await host.updateComplete
+    await turn(host)
     expect(said).toEqual(['three'])
     expect(currents(host)).toEqual([false, false, true])
   })
@@ -270,7 +292,7 @@ describe('steps and what is inside a step', () => {
       <helix-headless-step value="s1">Cart<div slot="content"><span id="inside"></span></div></helix-headless-step>
       <helix-headless-step value="s2">Pay</helix-headless-step>
     </helix-headless-steps>`)) as Steps & { active: string }
-    await host.updateComplete
+    await turn(host)
     host.querySelector('#inside')?.dispatchEvent(
       new CustomEvent('helix-select', {
         bubbles: true,
@@ -279,7 +301,7 @@ describe('steps and what is inside a step', () => {
         detail: { value: 'y' },
       }),
     )
-    await host.updateComplete
+    await turn(host)
     expect(host.active).toBe('s1')
   })
 })
@@ -301,8 +323,8 @@ const linear = async (attrs = ''): Promise<{ host: Sequence; all: Step[] }> => {
     <helix-headless-step value="d">Review</helix-headless-step>
   </helix-headless-steps>`)) as Sequence
   const all = [...host.querySelectorAll('helix-headless-step')] as Step[]
-  for (let turn = 0; turn < 3; turn += 1) {
-    await host.updateComplete
+  for (let round = 0; round < 3; round += 1) {
+    await turn(host)
     await Promise.all(all.map((step) => step.updateComplete))
     await new Promise((resolve) => setTimeout(resolve))
   }
@@ -317,15 +339,15 @@ describe('a linear sequence', () => {
     expect(all.map((step) => step.locked)).toEqual([false, true, true, true])
     expect(all.map((step) => hasState(step, 'locked'))).toEqual([false, true, true, true])
     at(all, 2).select()
-    await host.updateComplete
+    await turn(host)
     expect(host.active).toBe('a')
     at(all, 0).complete = true
-    for (let turn = 0; turn < 3; turn += 1) {
+    for (let round = 0; round < 3; round += 1) {
       await new Promise((resolve) => setTimeout(resolve))
     }
     expect(all.map((step) => step.locked)).toEqual([false, false, false, true])
     at(all, 2).select()
-    await host.updateComplete
+    await turn(host)
     expect(host.active).toBe('c')
   })
 
@@ -335,17 +357,17 @@ describe('a linear sequence', () => {
     at(all, 0).complete = true
     await at(all, 0).updateComplete
     expect(host.next()).toBe(true)
-    await host.updateComplete
+    await turn(host)
     expect(host.active).toBe('b')
     expect(host.previous()).toBe(true)
-    await host.updateComplete
+    await turn(host)
     expect(host.active).toBe('a')
     expect(host.previous()).toBe(false)
   })
 })
 
 const settle = async (all: Step[]): Promise<void> => {
-  for (let turn = 0; turn < 3; turn += 1) {
+  for (let round = 0; round < 3; round += 1) {
     await Promise.all(all.map((step) => step.updateComplete))
     await new Promise((resolve) => setTimeout(resolve))
   }
@@ -359,15 +381,15 @@ describe('a sequence whose stages are complete once passed', () => {
     /* The stage the reader is on counts as passed, and the second is optional. */
     expect(all.map((step) => step.locked)).toEqual([false, false, false, true])
     expect(host.next()).toBe(true)
-    await host.updateComplete
+    await turn(host)
     await settle(all)
     expect(all.map((step) => step.complete)).toEqual([true, false, false, false])
     host.active = 'd'
-    await host.updateComplete
+    await turn(host)
     await settle(all)
     expect(all.map((step) => step.complete)).toEqual([true, true, true, false])
     expect(host.previous()).toBe(true)
-    await host.updateComplete
+    await turn(host)
     await settle(all)
     expect(host.active).toBe('c')
     expect(all.map((step) => step.complete)).toEqual([true, true, true, false])
@@ -382,9 +404,9 @@ describe('a reset', () => {
     at(all, 2).complete = true
     await settle(all)
     expect(host.next()).toBe(true)
-    await host.updateComplete
+    await turn(host)
     expect(host.reset()).toBe(true)
-    await host.updateComplete
+    await turn(host)
     await settle(all)
     expect(host.active).toBe('a')
     expect(all.map((step) => step.complete)).toEqual([false, false, false, false])
@@ -396,7 +418,7 @@ describe('a reset', () => {
     at(all, 0).complete = true
     await settle(all)
     expect(host.next()).toBe(true)
-    await host.updateComplete
+    await turn(host)
     host.addEventListener('helix-before-activate', (event) => event.preventDefault())
     expect(host.reset()).toBe(false)
     expect(host.active).toBe('b')
@@ -421,7 +443,7 @@ describe('a stage your own check holds', () => {
     expect(host.next()).toBe(true)
     await at(all, 0).updateComplete
     expect(hasState(at(all, 0), 'invalid')).toBe(false)
-    await host.updateComplete
+    await turn(host)
     expect(host.active).toBe('b')
     /* Back is never asked. */
     ok = false
@@ -434,7 +456,7 @@ describe('how far through a sequence is', () => {
   test('is the share of finished stages, on a progress part a sheet can draw', async () => {
     const host = await steps()
     await new Promise((resolve) => setTimeout(resolve))
-    await host.updateComplete
+    await turn(host)
     expect((host as Steps & { progress: number }).progress).toBe(33)
     const bar = part(host, 'progress') as HTMLElement
     expect(bar.getAttribute('role')).toBe('progressbar')
@@ -445,9 +467,9 @@ describe('how far through a sequence is', () => {
     for (const step of host.querySelectorAll('helix-headless-step')) {
       ;(step as Step).complete = true
     }
-    for (let turn = 0; turn < 3; turn += 1) {
+    for (let round = 0; round < 3; round += 1) {
       await new Promise((resolve) => setTimeout(resolve))
-      await host.updateComplete
+      await turn(host)
     }
     expect(bar.getAttribute('aria-valuenow')).toBe('100')
     expect(hasState(host, 'complete')).toBe(true)
@@ -458,11 +480,11 @@ describe('how far through a sequence is', () => {
   test('is said in words a page can change', async () => {
     const host = await steps()
     await new Promise((resolve) => setTimeout(resolve))
-    await host.updateComplete
+    await turn(host)
     const bar = part(host, 'progress') as HTMLElement
     expect(bar.getAttribute('aria-valuetext')).toBe('33% complete')
     host.setAttribute('progress-label', '{percent} percent done')
-    await host.updateComplete
+    await turn(host)
     expect(bar.getAttribute('aria-valuetext')).toBe('33 percent done')
   })
 })
