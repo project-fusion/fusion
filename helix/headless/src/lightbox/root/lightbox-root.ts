@@ -19,6 +19,7 @@ import {
   lockScroll,
   MixinControllerActive,
   MixinControllerOpen,
+  OpenPhaseController,
   resolveActiveItem,
   SwipeController,
   swipeStep,
@@ -58,9 +59,10 @@ import { ZoomController } from '../zoom-controller.js'
  * buttons that send `--previous`, `--next` and `--close`.
  *
  * **Set `max-zoom` to let a reader zoom into the shown item**, such as `3`.
- * Two fingers pinch it, a double click or a double tap zooms all the way in
- * about the point pressed and back out, and once zoomed one pointer drags it
- * about. `+` and `-` zoom in and out from the keyboard, and `0` puts it back.
+ * Two fingers pinch it, and so does a trackpad pinch or the wheel with Ctrl
+ * held, about the point under the pointer. A double click or a double tap
+ * zooms all the way in about the point pressed and back out, and once zoomed
+ * one pointer drags it about and the wheel moves it. `+` and `-` zoom in and out from the keyboard, and `0` puts it back.
  * The scale and the offset are on the `viewport` part as `--lightbox-zoom`,
  * `--lightbox-pan-x` and `--lightbox-pan-y`, written only while zoomed, and a
  * swipe moves to the next item only while the item is at its own size. With
@@ -142,6 +144,8 @@ import { ZoomController } from '../zoom-controller.js'
  * @cssproperty --lightbox-pan-y - How far the zoomed item is moved down from the middle of the viewport, in pixels. Written only while zoomed.
  * @cssproperty --lightbox-zoom - The scale the shown item is zoomed to, such as `2`. Written only while zoomed.
  *
+ * @cssstate entering - From the moment the viewer opens until its entrance has finished.
+ * @cssstate exiting - From the moment the viewer closes until its exit has finished.
  * @cssstate fullscreen - While the viewer fills the screen.
  * @cssstate idle - The user has been still long enough for the controls to hide.
  * @cssstate open - While the viewer is open.
@@ -352,7 +356,18 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
     surface: () => this.dialog,
   })
 
-  /* Pinch, double press and drag, about the viewport. */
+  /* `:state(entering)` and `:state(exiting)`, for a stylesheet drawing the
+     journey in or out, as `Dialog` records them. */
+  protected readonly phases = new OpenPhaseController(this, {
+    mark: {
+      entering: (on) => this.toggleState('entering', on),
+      exiting: (on) => this.toggleState('exiting', on),
+    },
+    open: () => this.open,
+    surface: () => this.dialog,
+  })
+
+  /* Pinch, double press, drag and the wheel, about the viewport. */
   private readonly zoomer = new ZoomController(this, {
     max: () => (this.open ? this.maxZoom : 1),
     onChange: (scale, pan) => this.drawZoom(scale, pan),

@@ -52,3 +52,22 @@ describe('lightbox item', () => {
     expect((part(host, 'item') as HTMLElement).hasAttribute('aria-label')).toBe(false)
   })
 })
+
+describe('a lightbox item with a description', () => {
+  /* The line under a picture was shown and never said with it. */
+  test('is described by it', async () => {
+    const host = (await mount(
+      '<helix-headless-lightbox-item value="one" label="Harbor"><img src="a.jpg" alt=""><p slot="description">Boats at dusk</p></helix-headless-lightbox-item>',
+    )) as Item
+    await host.updateComplete
+    const group = part(host, 'item') as HTMLElement
+    const id = group.getAttribute('aria-describedby') ?? ''
+    expect(id).not.toBe('')
+    expect(host.shadowRoot?.getElementById(id)?.getAttribute('name')).toBe('description')
+  })
+
+  test('and an item without one is described by nothing', async () => {
+    const host = await item()
+    expect((part(host, 'item') as HTMLElement).hasAttribute('aria-describedby')).toBe(false)
+  })
+})

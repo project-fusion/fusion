@@ -16,10 +16,12 @@ export interface ZoomOptions {
  * Pinch, double press and drag to zoom into the item a viewer shows, and to
  * move about it once zoomed.
  *
- * Two fingers scale the item about the point between them. A double press, a
- * double click or a double tap, zooms all the way in about the point pressed,
- * and back out again. One pointer dragged across a zoomed item moves it, never
- * so far that an edge comes inside the box. What it reports is a scale and an
+ * Two fingers scale the item about the point between them. A trackpad pinch,
+ * which the browser sends as a wheel with Ctrl held, and the wheel with Ctrl
+ * held scale it about the pointer. A double press, a double click or a double
+ * tap, zooms all the way in about the point pressed, and back out again. One
+ * pointer dragged across a zoomed item moves it, never so far that an edge
+ * comes inside the box, and so does the wheel without Ctrl. What it reports is a scale and an
  * offset from the middle of the box; drawing them is the caller's.
  */
 export class ZoomController implements ReactiveController {
@@ -59,11 +61,15 @@ export class ZoomController implements ReactiveController {
   hostConnected(): void {
     this.host.addEventListener('pointerdown', this.handleDown)
     this.host.addEventListener('dblclick', this.handleDouble)
+    /* Not passive, since a wheel the item answers must not also zoom or
+       scroll the page. */
+    this.host.addEventListener('wheel', this.handleWheel, { passive: false })
   }
 
   hostDisconnected(): void {
     this.host.removeEventListener('pointerdown', this.handleDown)
     this.host.removeEventListener('dblclick', this.handleDouble)
+    this.host.removeEventListener('wheel', this.handleWheel)
     this.release()
   }
 
@@ -177,6 +183,31 @@ export class ZoomController implements ReactiveController {
       return
     }
     this.begin()
+  }
+
+  /**
+   * A wheel with Ctrl held, which is also how the browser sends a trackpad
+   * pinch, scales the item about the pointer. Without Ctrl, a wheel over a
+   * zoomed item moves it. Over an item at its own size, a plain wheel is left
+   * to the page.
+   */
+  private readonly handleWheel = (event: WheelEvent): void => {
+    if (this.options.max() <= 1 || !this.inside(event)) {
+      return
+    }
+    /* Lines and pages in pixels, at the sizes a browser scrolls them by. */
+    const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? 400 : 1
+    if (event.ctrlKey) {
+      event.preventDefault()
+      /* One notch of a mouse wheel, 100 pixels, is about half again, the step
+         of the zoom-in control; a pinch sends many small deltas. */
+      this.zoomTo(this.scale * Math.exp((-event.deltaY * unit) / 250), this.offset(event))
+      return
+    }
+    if (this.scale > 1) {
+      event.preventDefault()
+      this.panBy({ x: -event.deltaX * unit, y: -event.deltaY * unit })
+    }
   }
 
   /** A double press zooms all the way in about the point, or back out. */
