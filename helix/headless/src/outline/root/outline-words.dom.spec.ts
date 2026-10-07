@@ -1,0 +1,40 @@
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
+import { clearWords, registerWords } from '@fusion.dev/helix-core'
+import { part, registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
+
+/** Outline on the words registry: the navigation's name. */
+beforeAll(async () => {
+  registerDom()
+  await import('../index.js')
+})
+
+afterEach(() => {
+  clearWords()
+  document.body.innerHTML = ''
+})
+
+const outline = async (around = '', extra = ''): Promise<Updatable> => {
+  document.body.innerHTML = `<div ${around}><helix-headless-outline ${extra}></helix-headless-outline></div>`
+  const host = document.querySelector('helix-headless-outline') as Updatable
+  await settle(host)
+  return host
+}
+
+describe('an outline on a page in another language', () => {
+  test('is named with the words registered for the nearest `lang`', async () => {
+    registerWords('de', { 'helix-outline': { label: 'Auf dieser Seite' } })
+    const host = await outline('lang="de"')
+    expect(part(host, 'nav')?.getAttribute('aria-label')).toBe('Auf dieser Seite')
+  })
+
+  test('keeps a `label` the page wrote', async () => {
+    registerWords('de', { 'helix-outline': { label: 'Auf dieser Seite' } })
+    const host = await outline('lang="de"', 'label="Inhalt"')
+    expect(part(host, 'nav')?.getAttribute('aria-label')).toBe('Inhalt')
+  })
+
+  test('is named in English where nothing is registered', async () => {
+    const host = await outline('lang="de"')
+    expect(part(host, 'nav')?.getAttribute('aria-label')).toBe('On this page')
+  })
+})

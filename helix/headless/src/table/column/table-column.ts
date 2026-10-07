@@ -1,6 +1,6 @@
 import {
   customElement,
-  fillTemplate,
+  formatWords,
   HelixBeforeResizeEvent,
   HelixElement,
   HelixResizedEvent,
@@ -9,6 +9,7 @@ import {
   isRtl,
   requestChange,
   valueAt,
+  words,
 } from '@fusion.dev/helix-core'
 import { dotsSixVertical } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type ReactiveElement, type TemplateResult } from 'lit'
@@ -109,6 +110,12 @@ export const edgeOf = (align: string | undefined): string | undefined =>
 @customElement('helix-headless-table-column')
 export class HelixHeadlessTableColumn extends HelixElement {
   /**
+   * The key this part's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-table-column': { resizeLabel: '{name} anpassen' } })`.
+   */
+  static words = 'helix-table-column'
+
+  /**
    * A function that reads the cell's content from a row, for cells that `field`
    * alone cannot read.
    *
@@ -152,14 +159,16 @@ export class HelixHeadlessTableColumn extends HelixElement {
   field = ''
 
   /**
-   * The accessible name of the grip that moves the column. `{name}` is replaced
-   * with the heading text.
+   * The accessible name of the grip that moves the column. `{name}` is the
+   * heading text, and `{named}` is `no` for a column without one, so the
+   * sentence for it can name the column another way.
    *
    * **Every word a column speaks is a property**, so a table in another
    * language hears its own rather than English around its own headings.
    */
+  @words
   @property({ attribute: 'move-label' })
-  moveLabel = 'Move {name}'
+  moveLabel = '{named, select, no {Move column} other {Move {name}}}'
 
   /**
    * Whether the column can be resized.
@@ -174,10 +183,11 @@ export class HelixHeadlessTableColumn extends HelixElement {
 
   /**
    * The accessible name of the separator that resizes the column. `{name}` is
-   * replaced with the heading text.
+   * the heading text, and `{named}` is `no` for a column without one.
    */
+  @words
   @property({ attribute: 'resize-label' })
-  resizeLabel = 'Resize {name}'
+  resizeLabel = '{named, select, no {Resize column} other {Resize {name}}}'
 
   /**
    * Makes this column's cells the headers of their rows, in `DataTable`.
@@ -276,10 +286,12 @@ export class HelixHeadlessTableColumn extends HelixElement {
 
   /**
    * The text screen readers announce for the column's width. `{width}` is
-   * replaced with the width.
+   * the width in pixels, written in the locale, and each language writes the
+   * forms it has.
    */
+  @words
   @property({ attribute: 'width-label' })
-  widthLabel = '{width} pixels'
+  widthLabel = '{width, plural, one {# pixel} other {# pixels}}'
 
   /**
    * @internal Read by a parent to identify its children across the light DOM,
@@ -598,6 +610,7 @@ export class HelixHeadlessTableColumn extends HelixElement {
 
   protected override render(): TemplateResult {
     const name = this.name
+    const named = { name, named: name ? 'yes' : 'no' }
     const grid = this.gridCell
     /* In a grid the controls leave the tab order, which has one stop: the cell
        holding them. A reader reaches them with Enter or F2. */
@@ -610,7 +623,7 @@ export class HelixHeadlessTableColumn extends HelixElement {
       aria-label=${grid && (this.movable || this.resizable) && name ? name : nothing}
     >${
       this.movable
-        ? html`<button part="grip" type="button" tabindex=${control} aria-label=${fillTemplate(this.moveLabel, { name: name || 'column' })}>
+        ? html`<button part="grip" type="button" tabindex=${control} aria-label=${formatWords(this, 'moveLabel', named)}>
             <svg aria-hidden="true" fill="currentColor" part="grip-mark" viewBox=${dotsSixVertical.viewBox}>
               ${unsafeSVG(dotsSixVertical.content)}
             </svg>
@@ -626,12 +639,12 @@ export class HelixHeadlessTableColumn extends HelixElement {
             part="resizer"
             role="separator"
             tabindex=${grid ? '-1' : '0'}
-            aria-label=${fillTemplate(this.resizeLabel, { name: name || 'column' })}
+            aria-label=${formatWords(this, 'resizeLabel', named)}
             aria-orientation="vertical"
             aria-valuemin=${HelixHeadlessTableColumn.NARROWEST}
             aria-valuemax="4096"
             aria-valuenow=${Math.max(HelixHeadlessTableColumn.NARROWEST, this.drawn)}
-            aria-valuetext=${fillTemplate(this.widthLabel, { width: this.drawn })}
+            aria-valuetext=${formatWords(this, 'widthLabel', { width: this.drawn })}
             @keydown=${this.handleResizeKey}
             @pointerdown=${this.handleResizeStart}
             @pointermove=${this.handleResizeMove}
