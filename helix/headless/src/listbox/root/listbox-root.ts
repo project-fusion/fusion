@@ -840,7 +840,16 @@ export class HelixHeadlessListbox extends MixinCollection(
         event.preventDefault()
         this.choose(this.activeValue)
       } else if (event.key === ' ') {
+        /* Space with nothing highlighted chooses where the reader is: the
+           chosen option, or the first one a reader can reach, which is where
+           APG's listbox puts focus as it arrives. Measured before this: the
+           first Space in a range Time Picker chose nothing. */
         event.preventDefault()
+        const at = this.currentValue || shown.find((option) => !option.disabled)?.value
+        if (at) {
+          this.activeValue = at
+          this.choose(at)
+        }
       }
       return
     }

@@ -73,6 +73,16 @@ describe('listbox', () => {
     expect(host.value).toBe('one,two')
   })
 
+  /* APG's listbox puts focus on the first option as it arrives where none is
+     chosen. Measured before this: the first Space in a range Time Picker, a
+     list with nothing highlighted, chose nothing. */
+  test('Space with nothing highlighted chooses the first option', async () => {
+    const host = (await list('multiple')) as Updatable & { value: string }
+    await press(host, ' ')
+    expect(host.value).toBe('one')
+    expect(options(host)[0]?.active).toBe(true)
+  })
+
   test('choosing the same option again takes it back', async () => {
     // The same press has to be able to undo itself, or a mis-tap is permanent.
     const host = (await list('multiple default-value="one,two"')) as Updatable & { value: string }
