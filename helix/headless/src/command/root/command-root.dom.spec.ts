@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -397,5 +397,54 @@ describe('a palette filtered on a server', () => {
       markup.replace('<helix-headless-command ', '<helix-headless-command filter-delay="250" '),
     )
     expect((listbox(host) as unknown as { filterDelay: number }).filterDelay).toBe(250)
+  })
+})
+
+describe('the palette’s own states and slots', () => {
+  /* The palette said `open` and nothing else, so a page could not style the
+     whole palette while it loaded or when typing hid every command. */
+  test('says loading, error, empty and no results on the host', async () => {
+    const host = await palette(
+      markup.replace(
+        '<helix-headless-command ',
+        '<helix-headless-command loading load-error="Offline" ',
+      ),
+    )
+    expect(hasState(host, 'loading')).toBe(true)
+    expect(hasState(host, 'error')).toBe(true)
+    expect(hasState(host, 'empty')).toBe(false)
+    host.removeAttribute('loading')
+    host.removeAttribute('load-error')
+    await settle(host)
+    expect(hasState(host, 'loading')).toBe(false)
+    expect(hasState(host, 'error')).toBe(false)
+    const field = listbox(host).shadowRoot?.querySelector(
+      '[part="search-field"]',
+    ) as HTMLInputElement
+    field.value = 'zzz'
+    field.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+    await settle(host)
+    expect(hasState(host, 'no-results')).toBe(true)
+    expect(hasState(host, 'empty')).toBe(true)
+  })
+
+  /* Neither had a way in: the dialog's header and the list's filter icon were
+     out of reach behind the palette's shadow root. */
+  test('hands a header to the dialog and a filter icon to the list, only where you give one', async () => {
+    const bare = await palette()
+    expect(bare.shadowRoot?.querySelector('slot[name="header"]')?.getAttribute('slot')).toBeNull()
+    expect(listbox(bare).querySelector('slot[name="filter-icon"]')?.getAttribute('slot')).toBeNull()
+    const host = await palette(
+      markup.replace(
+        '</helix-headless-command>',
+        '<h2 slot="header">Go to</h2><svg slot="filter-icon"></svg></helix-headless-command>',
+      ),
+    )
+    expect(host.shadowRoot?.querySelector('slot[name="header"]')?.getAttribute('slot')).toBe(
+      'header',
+    )
+    expect(listbox(host).querySelector('slot[name="filter-icon"]')?.getAttribute('slot')).toBe(
+      'filter-icon',
+    )
   })
 })
