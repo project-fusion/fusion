@@ -243,3 +243,31 @@ describe('your own rule, and an empty field', () => {
     expect(states.has('blank')).toBe(false)
   })
 })
+
+/* A barred `<input>` keeps `typeMismatch` and says nothing, and Chromium's
+   `setValidity` throws on a flag with no message: every update of these threw
+   before. The platform submits a barred field as it stands. */
+describe('a field barred from validation', () => {
+  type Barred = Input & { disabled: boolean; readOnly: boolean; validity: ValidityState }
+
+  test('read-only, holding text its type refuses, is valid', async () => {
+    const host = (await mount(
+      '<helix-headless-input label="Site" type="url" value="nope" readonly></helix-headless-input>',
+    )) as Barred
+    expect(host.validity.valid).toBe(true)
+    expect(host.validity.typeMismatch).toBeFalsy()
+  })
+
+  test('disabled after the fact, with a pattern it misses, is valid, and valid again is checked again', async () => {
+    const host = (await mount(
+      '<helix-headless-input label="Code" pattern="[0-9]+" value="abc"></helix-headless-input>',
+    )) as Barred
+    expect(host.validity.valid).toBe(false)
+    host.disabled = true
+    await host.updateComplete
+    expect(host.validity.valid).toBe(true)
+    host.disabled = false
+    await host.updateComplete
+    expect(host.validity.valid).toBe(false)
+  })
+})
