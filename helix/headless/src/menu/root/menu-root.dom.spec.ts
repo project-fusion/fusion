@@ -126,6 +126,13 @@ describe('moving through a menu with the keyboard', () => {
     press(host, 'ArrowLeft')
     await host.updateComplete
     expect(focused(share)).toBe(share)
+
+    /* On the top page Left goes nowhere, as the APG's menu button and React
+       Aria's Menu have it. It closed the menu. */
+    press(host, 'ArrowLeft')
+    await host.updateComplete
+    expect(host.open).toBe(true)
+    expect(focused(share)).toBe(share)
   })
 
   /* The submenu's caret points left on a right-to-left page, so left is the way

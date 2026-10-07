@@ -100,8 +100,8 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
  * rows, Home and End go to the first and the last, a typed letter moves to
  * the next row whose name starts with it, Enter and Space choose, Right Arrow
  * opens a row's submenu and Left Arrow goes back, the two swapping on a
- * right-to-left page, and Escape closes the menu and returns focus to the
- * trigger. Tab closes it and moves on.
+ * right-to-left page. Left Arrow on the top page does nothing. Escape closes
+ * the menu and returns focus to the trigger. Tab closes it and moves on.
  *
  * While it is open, the surface carries the trigger's width as
  * `--floating-anchor-inline-size` and the room left below it as
@@ -638,9 +638,10 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     } else if (along === 1 && items[at]?.hasSubmenu) {
       this.enter(items[at] as HelixHeadlessMenuItem)
     } else if (along === -1) {
-      /* Under `flyout`, Left on the top page closes nothing, as the APG's
-         menu button has it. */
-      if (this.flies && this.keyPage === null) {
+      /* Left on the top page closes nothing, as the APG's menu button and
+         React Aria's Menu have it, whether submenus fly out or drill in.
+         Escape closes. */
+      if (this.flies ? this.keyPage === null : this.drilldown.atRoot) {
         return
       }
       this.leave()
