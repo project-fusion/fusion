@@ -19,7 +19,7 @@ const SETTLE = 120
 import type { CSSResultGroup } from 'lit'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-import { defaultFrame } from '../frame.js'
+import { defaultFrame, withScript } from '../frame.js'
 import { styles as sheet } from './sandbox-preview.css.js'
 
 /** The frame saying it has a listener, and where to answer it. */
@@ -178,6 +178,13 @@ export class HelixSandboxPreview extends HelixElement {
   layout?: 'padded' | 'centered' | 'fullscreen' | 'hug'
 
   /**
+   * A script to run as a module after the markup, on every render of new
+   * source. A sandbox writes its `js` pane here.
+   */
+  @property()
+  script = ''
+
+  /**
    * Markup to render.
    */
   @property()
@@ -204,6 +211,11 @@ export class HelixSandboxPreview extends HelixElement {
 
   /** The source the frame held when it last reported an uncaught error. */
   private failedSource: string | undefined
+
+  /** What the frame is sent as its source: the markup, and the script after it. */
+  private get sending(): string {
+    return withScript(this.source, this.script)
+  }
 
   private get frame(): HTMLIFrameElement | null {
     return this.renderRoot.querySelector('iframe')
@@ -345,7 +357,7 @@ export class HelixSandboxPreview extends HelixElement {
          source it already holds, so the example that failed is not run again,
          and clearing `failed` for it hid the failure. A frame that loads within
          the wait, as the built-in one does, has already run it and failed. */
-      if (this.source !== this.failedSource) {
+      if (this.sending !== this.failedSource) {
         this.toggleState('failed', false)
       }
       this.send()
@@ -361,12 +373,12 @@ export class HelixSandboxPreview extends HelixElement {
       ...(this.colorMode ? { colorMode: this.colorMode } : {}),
       direction: this.direction ?? 'ltr',
       layout: this.layout ?? 'padded',
-      source: this.source,
+      source: this.sending,
       styles: this.styles,
       type: 'helix-preview-render',
     }
     this.frame?.contentWindow?.postMessage(message, HelixSandboxPreview.target)
-    this.sentSource = this.source
+    this.sentSource = this.sending
   }
 
   override connectedCallback(): void {
@@ -436,7 +448,7 @@ export class HelixSandboxPreview extends HelixElement {
      * keystrokes is one render. Layout, direction and the color mode go
      * straight out: they arrive one at a time from a menu, there is nothing to
      * coalesce, and a delay there is a delay a reader can see. */
-    if (changed.has('source') || changed.has('styles')) {
+    if (changed.has('source') || changed.has('script') || changed.has('styles')) {
       this.scheduleSend()
       return
     }

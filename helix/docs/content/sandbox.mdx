@@ -37,9 +37,14 @@ the value to the preview slotted into it. The source pane and the preview do not
 reference each other, so you can replace either one or use it alone.
 
 The event includes the pane's `name`, so one sandbox can hold several panes
-without tracking which element sent each event. A pane named `html` sets the
-preview's markup, and a pane named `css` sets its stylesheet. The sandbox
-ignores a pane with any other name, so that pane only displays its contents.
+without tracking which element sent each event. The names the sandbox reads:
+
+- A pane named `html` sets the preview's markup.
+- A pane named `css` sets its stylesheet.
+- A pane named `js` sets a script, which runs as a module after the markup.
+
+The sandbox ignores a pane with any other name, so that pane only displays its
+contents.
 
 A pane's text goes in its `value`. The pane renders no children. The sandbox
 also hands each pane's `value` to the preview when it starts, so you write the
