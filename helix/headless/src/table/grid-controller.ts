@@ -77,6 +77,16 @@ export interface TableGridOptions {
   disclose?: (row: number, forward: boolean) => boolean | number
   /** Whether the table is a grid now. */
   on: () => boolean
+  /**
+   * The rows drawn now, in a table that draws only some of them, which are
+   * the only rows whose cells are marked. Every row where it is left out.
+   */
+  drawn?: () => ReadonlySet<Element> | undefined
+  /**
+   * Brings drawn row `row` into view before a key focuses it, in a table that
+   * draws only the rows in view, so the row is drawn by then.
+   */
+  reveal?: (row: number) => void
 }
 
 type Row = Element & Partial<HelixHeadlessTableRow>
@@ -267,6 +277,9 @@ export class TableGridController implements ReactiveController {
     this.stopRow = place.row === -1 ? 'head' : this.options.rows()[place.row]
     this.stopColumn = place.column
     this.focusWanted = focus
+    if (focus && place.row >= 0) {
+      this.options.reveal?.(place.row)
+    }
     this.host.requestUpdate()
   }
 
@@ -285,7 +298,12 @@ export class TableGridController implements ReactiveController {
       column.gridCell = on
       column.tabStop = on && at.row === -1 && at.column === index + this.offset
     }
+    const drawn = this.options.drawn?.()
     for (const [index, line] of this.options.rows().entries()) {
+      /* A row out of view is marked once it is drawn again. */
+      if (drawn && !drawn.has(line)) {
+        continue
+      }
       const row = line as Row
       if (row.isTableRow) {
         const here = on && at.row === index

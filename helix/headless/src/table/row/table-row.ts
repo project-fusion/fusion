@@ -204,6 +204,14 @@ export class HelixHeadlessTableRow extends HelixElement {
   @state()
   level = 0
 
+  /**
+   * @internal The row's place among the table's rows, the headings being 1,
+   * in a `windowed` table, which draws only some of them, and 0 otherwise.
+   * Written by the table. Not a consumer's to set.
+   */
+  @state()
+  rowIndex = 0
+
   /** @internal Whether rows sit under this one. Written by the table. */
   @state()
   branch = false
@@ -258,6 +266,7 @@ export class HelixHeadlessTableRow extends HelixElement {
        and its checkbox already says so. */
     this.internals.ariaSelected = this.gridCell && this.selectable ? String(this.selected) : null
     this.internals.ariaDisabled = this.disabled ? 'true' : null
+    this.internals.ariaRowIndex = this.rowIndex > 0 ? String(this.rowIndex) : null
     /* A tree's depth and whether a branch is open, in a grid, which is then a
        `treegrid`. A plain table's disclosure button says it instead. */
     const tree = this.gridCell && this.level > 0
