@@ -108,7 +108,8 @@ export class HelixHeadlessFormatDate extends HelixElement {
   calendar?: DateCalendar | MonthCalendar
 
   /**
-   * The timestamp, in any format `Date` can parse.
+   * The timestamp: a `Date`, milliseconds since the epoch, or a string in any
+   * format `Date` can parse. The attribute is the string.
    *
    * An ISO string is what an API sends and what `<time datetime>` takes, so it
    * is the shape that needs no translation at either end. Left unset this
@@ -125,7 +126,7 @@ export class HelixHeadlessFormatDate extends HelixElement {
    * browser may use either.
    */
   @property()
-  date = ''
+  date: Date | number | string = ''
 
   /**
    * The locale's own pattern for the date: `full`, `long`, `medium`, or
@@ -354,9 +355,20 @@ export class HelixHeadlessFormatDate extends HelixElement {
     return Number.isNaN(parsed.getTime()) ? undefined : parsed
   }
 
-  /** The timestamp as written, in the attribute or in the light DOM. */
+  /**
+   * The timestamp as written, in the property, the attribute or the light DOM.
+   *
+   * A `Date` or a number is written as its ISO string, so it is read the way an
+   * attribute is. Measured before this: assigning `new Date()` threw, since
+   * only a string has `trim`, where Shoelace and Web Awesome take a `Date`.
+   */
   private get source(): string {
-    return (this.date || this.written).trim()
+    const date = this.date
+    if (typeof date === 'string') {
+      return (date || this.written).trim()
+    }
+    const at = new Date(date)
+    return Number.isNaN(at.getTime()) ? '' : at.toISOString()
   }
 
   /** Whether the reading is how long ago rather than the date. */
