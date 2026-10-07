@@ -402,6 +402,15 @@ slot[name="filter-icon"]::slotted(*) {
 
 /* Block padding only, as the listbox has: the rows run edge to edge, and the
    padding holds the first and last clear of the bar and the frame. */
+/* In the list's own cell, over the empty list, so the panel keeps its two
+   rows whether the list holds notes or not. */
+[part="empty"] {
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-sm);
+  grid-area: 2 / 1;
+  padding: var(--helix-space-sm);
+}
+
 [part="list"] {
   min-block-size: 0;
   overflow-y: auto;

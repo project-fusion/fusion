@@ -599,3 +599,27 @@ describe('the events a graph sends', () => {
     ])
   })
 })
+
+describe('a list with no notes', () => {
+  /* A search that found nothing left an empty box under the field, with the
+     count the only word on it. */
+  test('says so in the panel, in words a page can replace, and not in the listbox', async () => {
+    const host = (await graph()) as Graph & { query: string }
+    expect(part(host, 'empty')).toBeNull()
+    const field = part(host, 'search-field') as HTMLInputElement
+    field.value = 'nothing at all'
+    field.dispatchEvent(new Event('input'))
+    await settle(host)
+    const empty = part(host, 'empty') as HTMLElement
+    expect(empty.textContent?.trim()).toBe('No notes')
+    expect(empty.querySelector('slot[name="empty"]')).not.toBeNull()
+    expect(list(host).contains(empty)).toBe(false)
+    expect(rows(host)).toHaveLength(0)
+  })
+
+  test('lists its keys on the frame and on the list', async () => {
+    const host = await graph()
+    expect(part(host, 'region')?.getAttribute('aria-keyshortcuts')).toContain('Plus')
+    expect(list(host).getAttribute('aria-keyshortcuts')).toContain('PageDown')
+  })
+})

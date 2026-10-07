@@ -111,6 +111,12 @@ helix-headless-graph::part(count) {
   white-space: nowrap;
 }
 
+helix-headless-graph::part(empty) {
+  color: var(--_gray-muted);
+  grid-area: 2 / 1;
+  padding: 0.5rem;
+}
+
 helix-headless-graph::part(list) {
   padding-block: 0.25rem;
 }
