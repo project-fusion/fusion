@@ -201,19 +201,24 @@ describe('the pin', () => {
   })
 
   /**
-   * And only while there is one to offer.
+   * And a page that slotted nothing still gets one.
    *
-   * The way back is a slot, so a consumer who never filled it has no control to
-   * show and the region is a box with a negative top margin over the transcript:
-   * revealing it on every unpin moved the composer without putting anything on
-   * screen.
+   * The way back was a slot with nothing in it, so a consumer who never filled
+   * it had no way back at all: the region stayed hidden on every unpin. The
+   * slot's fallback is a button that does what the region does.
    */
-  test('a way back nobody slotted is never offered', async () => {
+  test('a way back nobody slotted is a button named by resume-label', async () => {
     const element = (await mount(bare)) as Chat
     await element.updateComplete
+    expect(part(element, 'resume')?.hasAttribute('hidden')).toBe(true)
     element.pinned = false
     await element.updateComplete
-    expect(part(element, 'resume')?.hasAttribute('hidden')).toBe(true)
+    expect(part(element, 'resume')?.hasAttribute('hidden')).toBe(false)
+    const button = part(element, 'resume-button') as HTMLButtonElement
+    expect(button.textContent?.trim()).toBe('Jump to latest')
+    button.click()
+    await element.updateComplete
+    expect(element.pinned).toBe(true)
   })
 
   /**
@@ -374,5 +379,74 @@ describe('the other side typing', () => {
     await element.updateComplete
     expect(part(element, 'typing')).toBeNull()
     expect(status.hasAttribute('data-empty')).toBe(true)
+  })
+})
+
+describe('moving between turns', () => {
+  const page = (from: Element, key: string, init: KeyboardEventInit = {}): KeyboardEvent => {
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key,
+      ...init,
+    })
+    from.dispatchEvent(event)
+    return event
+  }
+  const three = `
+    <helix-headless-chat label="Support">
+      <helix-headless-chat-message author="them" state="sent">One</helix-headless-chat-message>
+      <helix-headless-chat-message author="me" state="sent">Two</helix-headless-chat-message>
+      <helix-headless-chat-message author="them" state="sent">Three</helix-headless-chat-message>
+      <helix-headless-chat-composer slot="composer"></helix-headless-chat-composer>
+    </helix-headless-chat>`
+
+  /* A reader moving through a long conversation had no keys between turns,
+     only Tab through their controls. The feed's keys go turn to turn. */
+  test('Page Down and Page Up move focus from turn to turn', async () => {
+    const element = (await mount(three)) as Chat
+    await element.updateComplete
+    const turns = [...element.querySelectorAll('helix-headless-chat-message')] as HTMLElement[]
+    const [first, second, third] = turns as [HTMLElement, HTMLElement, HTMLElement]
+    // From the transcript itself, focus goes to the turn at the top of the view.
+    expect(page(part(element, 'log') as Element, 'PageDown').defaultPrevented).toBe(true)
+    await Promise.resolve()
+    expect(turns).toContain(document.activeElement as HTMLElement)
+    page(second, 'PageUp')
+    expect(document.activeElement?.textContent).toBe(first.textContent)
+    page(first, 'PageDown')
+    expect(document.activeElement?.textContent).toBe(second.textContent)
+    page(second, 'PageDown')
+    page(third, 'PageDown')
+    expect(document.activeElement?.textContent).toBe(third.textContent)
+    page(third, 'PageUp')
+    expect(document.activeElement?.textContent).toBe(second.textContent)
+    // Only the turns a reader moved to were made focusable.
+    expect(first.getAttribute('tabindex')).toBe('-1')
+  })
+
+  test('Control with End leaves for the composer', async () => {
+    const element = (await mount(three)) as Chat
+    await element.updateComplete
+    const turn = element.querySelector('helix-headless-chat-message') as HTMLElement
+    const event = page(turn, 'End', { ctrlKey: true })
+    expect(event.defaultPrevented).toBe(true)
+    const composer = element.querySelector('helix-headless-chat-composer') as HTMLElement
+    expect(composer.contains(document.activeElement) || document.activeElement === composer).toBe(
+      true,
+    )
+  })
+
+  test('each turn says its place in the conversation', async () => {
+    const element = (await mount(three)) as Chat
+    await element.updateComplete
+    await Promise.resolve()
+    const turns = [...element.querySelectorAll('helix-headless-chat-message')] as Array<
+      HTMLElement & { internals: ElementInternals; updateComplete: Promise<unknown> }
+    >
+    await Promise.all(turns.map((one) => one.updateComplete))
+    expect(turns.map((one) => one.internals.ariaPosInSet)).toEqual(['1', '2', '3'])
+    expect(turns.map((one) => one.internals.ariaSetSize)).toEqual(['3', '3', '3'])
   })
 })

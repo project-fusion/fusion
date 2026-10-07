@@ -1,6 +1,8 @@
 import {
   ChildrenController,
   customElement,
+  drawIcon,
+  focusableElements,
   formatWords,
   HelixBeforePinEvent,
   HelixElement,
@@ -16,6 +18,7 @@ import {
   words,
   wordsConverter,
 } from '@fusion.dev/helix-core'
+import { arrowDown } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { keyed } from 'lit/directives/keyed.js'
@@ -179,6 +182,19 @@ const drawnInFull = ({ element }: Rendered): boolean =>
  * "Ada is typing" (`typing-label`), which a screen reader hears, and clearing
  * it takes them away. Anything slotted into `status` is drawn first.
  *
+ * **Keyboard.** The transcript moves between turns the way a feed does. Each
+ * turn says its place, such as "3 of 40", windowed or not.
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Page Down, Page Up | On a turn or inside one, moves focus to the next or the previous turn. On the transcript itself, moves focus to the turn at the top of the view. |
+ * | Control with End | Moves focus to the composer. |
+ * | Control with Home | Moves focus to the first control above the transcript, or to the transcript. |
+ *
+ * While you are scrolled away from the newest turn, the `resume` region shows
+ * a button that takes you back, named by `resume-label`, "Jump to latest".
+ * Slot your own control into `resume` to replace it.
+ *
  * A screen reader names each turn by its author and its time, such as "You, 2
  * minutes ago". Set `me-label` and `message-label` to say it in your language,
  * and give each turn by `them` an `author-label`. A turn with neither an author
@@ -204,7 +220,7 @@ const drawnInFull = ({ element }: Rendered): boolean =>
  * @slot actions - Controls for the whole conversation, beside the header.
  * @slot composer - The composer, below the transcript.
  * @slot header - Content above the transcript that names the conversation.
- * @slot resume - The control that returns to the bottom, shown while the user has scrolled away.
+ * @slot resume - The control that returns to the bottom, shown while the user has scrolled away. Defaults to a button named by `resume-label`.
  * @slot status - Status beside the composer, such as someone typing or a lost connection.
  *
  * @event {HelixBeforePinEvent} helix-before-pin - Fired when the user pins or unpins the transcript by scrolling. Cancelable.
@@ -244,6 +260,8 @@ const drawnInFull = ({ element }: Rendered): boolean =>
  * @csspart message-state - The state text of a turn from `turns`, when there is one to show.
  * @csspart message-time - The time of a turn from `turns`.
  * @csspart resume - The control shown while the user is scrolled away from the bottom.
+ * @csspart resume-button - The button the `resume` region shows when nothing is slotted into it.
+ * @csspart resume-mark - The arrow on the default `resume-button`.
  * @csspart status - The status region, outside the log.
  * @csspart turn - The wrapper around the message drawn for one turn from `turns`.
  * @csspart typing - The words that say who is typing, in the status band, while `typing` names someone.
@@ -396,6 +414,11 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
     this.pinnedState = next
     this.requestUpdate('pinned', previous)
   }
+
+  /** The words on the button that returns to the newest turn, where `resume` is empty. */
+  @words
+  @property({ attribute: 'resume-label' })
+  resumeLabel = 'Jump to latest'
 
   /**
    * How near the bottom still counts as being at it, in pixels.
@@ -954,6 +977,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
     super.connectedCallback()
     /* The one thing inside a turn worth hearing about, and `attributeFilter`
        keeps it to that: a subtree watch of `state` alone never sees a token. */
+    this.addEventListener('keydown', this.handleKeydown)
     this.settling = new MutationObserver(this.handleSettle)
     this.settling.observe(this, { attributeFilter: ['state'], subtree: true })
     /* Children a parser is still adding when this upgrades are the transcript
@@ -978,6 +1002,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    this.removeEventListener('keydown', this.handleKeydown)
     this.settling?.disconnect()
     this.settling = undefined
     this.grower?.disconnect()
@@ -1053,11 +1078,150 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
    * has hydrated, so its first render is the server's.
    */
   private tellTurns(): void {
-    for (const message of this.messages) {
+    const messages = this.messages
+    messages.forEach((message, at) => {
       whenHydrated(message, () => {
         message.turnWords = this.words
+        message.turnPosition = at + 1
+        message.turnCount = messages.length
       })
+    })
+  }
+
+  /**
+   * Which turn an event came from, by its place, `-1` for the transcript
+   * itself, or `undefined` for anywhere else.
+   */
+  private turnFrom(path: readonly EventTarget[]): number | undefined {
+    for (const target of path) {
+      if (!(target instanceof HTMLElement)) {
+        continue
+      }
+      if (this.fed && target.getAttribute('part') === 'turn') {
+        return Number(target.dataset.index)
+      }
+      if (!this.fed && 'isChatMessage' in target) {
+        const at = this.messages.indexOf(target as HelixHeadlessChatMessage)
+        if (at >= 0) {
+          return at
+        }
+      }
+      if (target === this.log) {
+        return -1
+      }
     }
+    return undefined
+  }
+
+  /** The place of the turn at the top of the view, or the first turn. */
+  private topTurn(): number {
+    const id = this.anchor?.id
+    if (id === undefined) {
+      return 0
+    }
+    const at = this.fed
+      ? this.turns.findIndex((turn) => this.identity(turn) === id)
+      : this.messages.indexOf(id as HelixHeadlessChatMessage)
+    return Math.max(0, at)
+  }
+
+  /**
+   * Moves focus to turn `at`, drawing it first where the transcript is
+   * windowed and it is not drawn.
+   *
+   * **A turn takes focus only once a reader moves to it**, so the
+   * `tabindex="-1"` a turn written as a child needs is written then, long
+   * after any server's markup has hydrated, and never on a turn nobody moved
+   * to.
+   */
+  private async focusTurn(at: number): Promise<void> {
+    /* A reader moving to an older turn has left the newest one, and a pinned
+       transcript would take them straight back. */
+    const count = this.fed ? this.turns.length : this.messages.length
+    if (at < count - 1 && this.pinned) {
+      this.requestPinned(false)
+    }
+    if (this.fed) {
+      const drawn = (): HTMLElement | null | undefined =>
+        this.renderRoot
+          ?.querySelector<HTMLElement>(`[part="turn"][data-index="${at}"]`)
+          ?.querySelector<HTMLElement>(':scope > *')
+      if (!drawn()) {
+        this.virtualize.reveal(at)
+        this.virtualize.measure()
+        this.requestUpdate()
+        await this.updateComplete
+      }
+      drawn()?.focus()
+      return
+    }
+    const message = this.messages[at]
+    if (!message) {
+      return
+    }
+    if (!message.hasAttribute('tabindex')) {
+      message.setAttribute('tabindex', '-1')
+    }
+    message.focus()
+  }
+
+  /** The first control in the regions `names` holds, in their order. */
+  private firstControlIn(names: readonly string[]): HTMLElement | undefined {
+    for (const name of names) {
+      for (const child of this.given(name)) {
+        if (child instanceof HTMLElement) {
+          /* A component is asked itself, since its controls are in a shadow
+             root the walk below cannot see, and focusing one lands on them. */
+          const found =
+            child.localName.includes('-') ||
+            child.matches('button, a[href], input, textarea, select, [tabindex]')
+              ? child
+              : focusableElements(child)[0]
+          if (found) {
+            return found
+          }
+        }
+      }
+    }
+    return undefined
+  }
+
+  /**
+   * Page Down and Page Up move between turns, and Control with End or Home
+   * leaves the transcript, the keys the APG's feed answers.
+   */
+  private readonly handleKeydown = (event: KeyboardEvent): void => {
+    if (event.defaultPrevented || event.altKey || event.metaKey || event.shiftKey) {
+      return
+    }
+    const step = event.key === 'PageDown' ? 1 : event.key === 'PageUp' ? -1 : 0
+    const leave = event.ctrlKey && (event.key === 'End' || event.key === 'Home')
+    if ((step === 0 || event.ctrlKey) && !leave) {
+      return
+    }
+    const at = this.turnFrom(event.composedPath())
+    if (at === undefined) {
+      return
+    }
+    if (leave) {
+      const target =
+        event.key === 'End'
+          ? this.firstControlIn(['composer'])
+          : (this.firstControlIn(['header', 'actions']) ??
+            (this.log?.hasAttribute('tabindex') ? this.log : undefined))
+      if (target) {
+        event.preventDefault()
+        target.focus()
+      }
+      return
+    }
+    const count = this.fed ? this.turns.length : this.messages.length
+    if (count === 0) {
+      return
+    }
+    event.preventDefault()
+    const next = at < 0 ? this.topTurn() : Math.max(0, Math.min(count - 1, at + step))
+    void this.focusTurn(next)
   }
 
   private readonly handleSlotChange = (): void => {
@@ -1130,6 +1294,9 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
               at=${turn.at ?? nothing}
               style=${ownEntry(this.authorStyles, turn.author) ?? nothing}
               .turnWords=${this.words}
+              .turnPosition=${first + offset + 1}
+              .turnCount=${this.turns.length}
+              tabindex="-1"
               .failedLabel=${this.failedLabel}
               state=${turn.state ?? nothing}
             >${turn.text}</${message}>
@@ -1170,8 +1337,12 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
         }
       </div>
       <span part="live" role="status">${keyed(this.said, this.announcement)}</span>
-      <div part="resume" ?hidden=${!away || !this.has('resume')} @click=${this.handleResume}>
-        <slot name="resume"></slot>
+      <div part="resume" ?hidden=${!away} @click=${this.handleResume}>
+        <slot name="resume"
+          ><button part="resume-button" type="button">
+            <span part="resume-mark" aria-hidden="true">${drawIcon(arrowDown)}</span>${this.resumeLabel}
+          </button></slot
+        >
       </div>
       <div part="status" role="status" ?data-empty=${!this.has('status') && this.typing === ''}>
         <slot name="status"></slot>${

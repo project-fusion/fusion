@@ -4,6 +4,13 @@
   display: block;
 }
 
+/* A turn a reader moved to with Page Down or Page Up. Inset, because a turn
+   spans the transcript's width and the transcript clips. */
+:host(:focus-visible) {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}
+
 [part="message"] {
   align-items: start;
   display: grid;

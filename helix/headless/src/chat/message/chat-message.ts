@@ -163,6 +163,18 @@ export class HelixHeadlessChatMessage extends HelixElement {
   turnWords = TURN_WORDS
 
   /**
+   * @internal Set by the chat: where the turn stands in the conversation,
+   * from 1, and how many turns there are, which a screen reader says as
+   * "3 of 40". Zero where no chat has said.
+   */
+  @property({ attribute: false })
+  turnPosition = 0
+
+  /** @internal Set by the chat with `turnPosition`: how many turns there are. */
+  @property({ attribute: false })
+  turnCount = 0
+
+  /**
    * @internal Read by the transcript to identify its children across the light
    * DOM, which is cheaper than `instanceof`. Not a consumer's to read or set.
    */
@@ -209,6 +221,11 @@ export class HelixHeadlessChatMessage extends HelixElement {
        already do with this exact flag. */
     hostAria(this.internals, { label: this.name, role: 'article' })
     this.internals.ariaBusy = this.state === 'streaming' ? 'true' : null
+    /* Its place in the whole conversation, which a transcript drawn a window
+       at a time cannot show by counting the articles a reader can reach. */
+    const placed = this.turnPosition > 0 && this.turnCount > 0
+    this.internals.ariaPosInSet = placed ? String(this.turnPosition) : null
+    this.internals.ariaSetSize = placed ? String(this.turnCount) : null
   }
 
   /** The time as it reads now, or nothing where the turn has none. */
