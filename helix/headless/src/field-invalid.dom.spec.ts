@@ -153,6 +153,7 @@ describe('a field written aria-invalid', () => {
  *
  * Across the shapes that listen for the attempt: the field mixin's controls,
  * the pickers' feedback mixin, and the chat composer, which keeps its own.
+ * Combobox was reported on its own, in round 11.
  */
 describe('a required field checked from a script', () => {
   beforeAll(async () => {
@@ -161,6 +162,7 @@ describe('a required field checked from a script', () => {
 
   const CHECKED = [
     'helix-headless-chat-composer',
+    'helix-headless-combobox',
     'helix-headless-input',
     'helix-headless-textarea',
     'helix-headless-time-input',
