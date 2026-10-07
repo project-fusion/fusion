@@ -122,7 +122,8 @@ export declare class MixinSegmentedFieldInterface {
  * **What a segment does with a key**, which is React Aria's: digits fill it and
  * move on once it cannot take another, Up and Down step it and wrap, Page Up
  * and Page Down step it by a page, a week of days, five years or fifteen
- * minutes, Home and End go to its ends, Backspace and Delete empty it, Left and Right move between
+ * minutes, Home and End go to its ends, Backspace and Delete take off its
+ * last digit or move back from an empty segment, Left and Right move between
  * segments along the line of text, and Alt+Down opens the picker. Each segment
  * is a tab stop, as each is in React Aria.
  *
@@ -372,6 +373,22 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
       return true
     }
 
+    /**
+     * Takes the last digit off the segment, or moves to the segment before it
+     * where this one is already empty, as React Aria's segments do. A reader
+     * clearing a date from its end holds Backspace and it empties right to
+     * left.
+     */
+    private erase(element: HTMLElement): void {
+      if (this.edit(element, 'Backspace')) {
+        return
+      }
+      if (!(this as { readOnly?: boolean }).readOnly && !this.isDisabled) {
+        this.typed = ''
+        this.moveFocus(element, -1)
+      }
+    }
+
     /** What the segment's text was when a composition started to write into it. */
     private composing: [Node, string | null][] = []
 
@@ -395,8 +412,7 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
         event.inputType === 'deleteContentBackward' ||
         event.inputType === 'deleteContentForward'
       ) {
-        this.typed = ''
-        this.edit(element, 'Backspace')
+        this.erase(element)
         return
       }
       for (const character of latinDigits(event.data ?? '')) {
@@ -475,6 +491,11 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
       }
       if (event.metaKey || event.ctrlKey || event.altKey) {
         this.typed = ''
+        return
+      }
+      if (event.key === 'Backspace' || event.key === 'Delete') {
+        event.preventDefault()
+        this.erase(element)
         return
       }
       if (this.edit(element, latinDigits(event.key))) {

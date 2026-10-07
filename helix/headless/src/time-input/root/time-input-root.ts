@@ -90,7 +90,7 @@ import '../../time-picker/index.js'
  * | Home, End on a segment | Goes to the segment's first or last value. |
  * | Digits on a segment | Fill it, and move to the next once it can take no more. |
  * | A letter on the half of the day | Picks the half whose name starts with it, such as A for AM. |
- * | Backspace, Delete on a segment | Empty the segment. |
+ * | Backspace, Delete on a segment | Take off its last digit, or move to the segment before where it is empty. |
  * | Left, Right on a segment | Move to the previous or the next segment, along the line of text. |
  *
  * In the list, the keys are `TimePicker`'s.

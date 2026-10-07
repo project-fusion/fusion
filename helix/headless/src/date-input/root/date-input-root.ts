@@ -103,7 +103,7 @@ const dates = (value: string): string[] =>
  * | Page Up, Page Down on a segment | Steps by a page: a week of days, two months, or five years. |
  * | Home, End on a segment | Goes to the segment's first or last value. |
  * | Digits on a segment | Fill it, and move to the next once it can take no more. |
- * | Backspace, Delete on a segment | Empty the segment. |
+ * | Backspace, Delete on a segment | Take off its last digit, or move to the segment before where it is empty. |
  * | Left, Right on a segment | Move to the previous or the next segment, along the line of text. |
  *
  * In the calendar, the keys are `DatePicker`'s: the arrows move by a day or a

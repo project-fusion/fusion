@@ -338,7 +338,8 @@ const pageStep: Partial<Record<SegmentKind, number>> = {
  * nothing.
  *
  * The arrows step it and wrap, Page Up and Page Down step it by a page, Home
- * and End take it to its lowest and highest, Backspace and Delete empty it, a
+ * and End take it to its lowest and highest, Backspace and Delete take off its
+ * last digit and empty it from the last one, a
  * digit is typed as `typeDigit` types it, and on the meridiem a letter picks
  * the half whose word starts with it. `advance` says the segment is full and
  * focus moves on.
@@ -361,7 +362,18 @@ export const segmentKey = (
     return done(setSegment(segments, kind, key === 'Home' ? min : max, twelve, system))
   }
   if (key === 'Backspace' || key === 'Delete') {
-    return done(setSegment(segments, kind, undefined, twelve, system))
+    /* One digit at a time, as React Aria's segments erase: 2026 becomes 202,
+       and 12 becomes 1. An empty segment edits nothing, which the field reads
+       as a move to the segment before it. */
+    const shown = shownValue(kind, segments, twelve)
+    if (shown === undefined || Number.isNaN(shown)) {
+      return null
+    }
+    const left = kind === 'dayPeriod' ? '' : String(shown).slice(0, -1)
+    const rest = Number(left)
+    return left === '' || rest === 0
+      ? done(setSegment(segments, kind, undefined, twelve, system))
+      : { advance: false, segments: setSegment(segments, kind, rest, twelve, system), typed: left }
   }
   if (/^\d$/.test(key) && kind !== 'dayPeriod') {
     return typeDigit(segments, kind, typed, key, twelve, system)
