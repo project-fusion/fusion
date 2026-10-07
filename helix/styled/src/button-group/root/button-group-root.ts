@@ -44,6 +44,8 @@ const PRESSED = [
  *
  * @slot - The buttons in the group.
  *
+ * @csspart buttons - The slot the buttons are in. It draws no box, so the buttons lay out on the group itself.
+ *
  * @cssproperty --button-group-gap - Space between the buttons, when `spaced`.
  * @cssproperty --button-group-pressed-background-color - Fill behind a pressed button, in a selection mode. Defaults to the foreground color.
  * @cssproperty --button-group-pressed-border-color - Edge of a pressed button, in a selection mode. Defaults to its fill.
