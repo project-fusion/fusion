@@ -135,6 +135,12 @@ export class HelixOrb extends HelixElement {
    * Off by default, because the name and the busy state already change with
    * the state, and an orb beside a stream of messages would otherwise talk
    * over them. Set it on an orb that is the only sign of progress on the page.
+   *
+   * **Without it, finishing is silent.** `done` turns the orb into an image
+   * named "Done" that is no longer busy, which a screen reader reports when it
+   * next reaches the orb and does not say as it happens. A page whose own
+   * result arrives in a live region, such as a chat reply, already says the
+   * work is done; one that shows nothing else sets `announce`.
    */
   @property({ type: Boolean })
   announce = false
