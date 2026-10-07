@@ -876,7 +876,7 @@ describe('several source panes are files', () => {
     expect(all.map((tab) => tab.getAttribute('tabindex'))).toEqual(['0', '-1', '-1'])
     expect(shown(sandbox)).toEqual(['html'])
     const panel = sandbox.shadowRoot?.querySelector('[role="tabpanel"]') as HTMLElement
-    expect(panel.getAttribute('aria-labelledby')).toBe(all[0]?.id)
+    expect(panel.getAttribute('aria-labelledby')).toBe(all[0]?.id ?? '')
     expect(all[0]?.getAttribute('aria-controls')).toBe(panel.id)
   })
 
