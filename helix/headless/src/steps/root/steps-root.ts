@@ -338,23 +338,28 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
   /* Through the mixin, so a consumer can refuse the change with
      `helix-before-activate`.
 
-     **And only if the step's own choice stood.** `helix-select` is cancelable
-     and the step documents it as refusable; this element is the only thing that
-     acts on it, so a refusal nothing read was a veto that did nothing. This is
-     a bubble listener for an event from a child, so every listener on the step
-     has already run by the time it arrives. */
+     **And only if the step's own choice stood, read a microtask later.**
+     `helix-select` is cancelable, and the docblock tells you to listen for it
+     on the sequence. This listener is on the sequence too, added when it
+     connected, so it runs ahead of a listener you add afterwards, and read
+     inline the flag was not set yet: a refusal on the sequence changed
+     nothing. The dispatch is synchronous, so a microtask is after every
+     listener. `Tabs` and `Radio.Group` hold the same pair for the same
+     event. */
   private readonly handleSelection = (event: Event): void => {
     /* Only a choice made by one of this sequence's own steps. A tab set, a tree
        or a menu in a step's `content` sends `helix-select` too, and it bubbles
        out of the step: acted on, it set `active` to a value no step has. */
-    if (event.defaultPrevented || !this.steps.includes(event.target as HelixHeadlessStep)) {
+    if (!this.steps.includes(event.target as HelixHeadlessStep)) {
       return
     }
-    const index = this.steps.indexOf(event.target as HelixHeadlessStep)
-    if (!this.reachable(index) || !this.valid(index)) {
-      return
-    }
-    this.requestActive((event as CustomEvent<{ value: string }>).detail.value)
+    queueMicrotask(() => {
+      const index = this.steps.indexOf(event.target as HelixHeadlessStep)
+      if (event.defaultPrevented || !this.reachable(index) || !this.valid(index)) {
+        return
+      }
+      this.requestActive((event as CustomEvent<{ value: string }>).detail.value)
+    })
   }
 
   private readonly handleSlotChange = (): void => {
