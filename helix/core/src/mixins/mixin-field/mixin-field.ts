@@ -687,7 +687,13 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
        * being *wrong*: a reader hears the message as though it were help text.
        * `aria-invalid` is the one word for it, and this is the one place that
        * knows, so every field in the library gets it from here. */
-      this.internals.ariaInvalid = this.shownFeedback === '' ? null : 'true'
+      /* **`false` while nothing is shown, never left unset**, on a control
+       * that validates: a host with a role and no `aria-invalid` is judged by
+       * its validity, and Chromium's tree reported an untouched required
+       * Toggle Group, a `radiogroup`, as invalid on load, where a native
+       * required text field is not. */
+      this.internals.ariaInvalid =
+        this.shownFeedback !== '' ? 'true' : this.validates ? 'false' : null
     }
 
     /**

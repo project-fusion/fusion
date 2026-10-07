@@ -216,6 +216,32 @@ describe('toggle group in a form', () => {
     expect(formValue(group)).toBe('light')
   })
 
+  /* Measured before this: choosing in a group with no default and resetting
+     the form left the choice in place and submitted, since the group took the
+     mark it had put on the chosen item for one the markup declared. */
+  test('a reset of a group with no default chooses nothing', async () => {
+    const { group } = await inForm()
+    const reader = group as Updatable & { defaultValue: string; value: string }
+    reader.value = 'light'
+    await group.updateComplete
+    ;(group as Updatable & { formResetCallback: () => void }).formResetCallback()
+    await group.updateComplete
+    await group.updateComplete
+    expect(reader.value).toBe('')
+    expect(reader.defaultValue).toBe('')
+    expect(formValue(group)).toBeNull()
+  })
+
+  /* `false` and never unset: Chromium judges a `radiogroup` with no
+     `aria-invalid` by its validity, and reported a required group invalid
+     before the reader had done anything. */
+  test('a required group is not marked invalid before the reader has tried', async () => {
+    const { group } = await inForm('required')
+    const internals = (group as Updatable & { internals: ElementInternals }).internals
+    expect(internals.validity.valueMissing).toBe(true)
+    expect(internals.ariaInvalid).toBe('false')
+  })
+
   test('the browser can put back a choice it restored', async () => {
     const { group } = await inForm('default-value="light"')
     ;(

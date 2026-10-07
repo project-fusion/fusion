@@ -303,7 +303,7 @@ describe('radio group after a reset', () => {
     host.formResetCallback()
     await settle(host)
     expect(host.value).toBe('')
-    expect(host.internals.ariaInvalid).toBeNull()
+    expect(host.internals.ariaInvalid).toBe('false')
   })
 })
 

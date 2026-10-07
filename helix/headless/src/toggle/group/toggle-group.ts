@@ -137,11 +137,23 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
     if (this.value !== '' || this.children === undefined) {
       return
     }
-    const declared = this.items.find((item) => item.selected)
+    const declared = this.items.find(
+      (item) => item.defaultSelected || (item.selected && !this.marked.has(item)),
+    )
     if (declared) {
       this.defaultValue = declared.value
     }
   }
+
+  /**
+   * The items whose `selected` this group has written, which `adopt` passes
+   * over: the mark is this group's answer, and the markup declared nothing.
+   *
+   * Measured before this: in a group with no default, choosing List and then
+   * resetting the form left List chosen and submitted, because `adopt` read
+   * the mark `sync` had put on it as a declaration and made it the default.
+   */
+  private readonly marked = new WeakSet<HelixHeadlessToggle>()
 
   /** Marks the chosen item, separately from placing the indicator. */
   private sync(): void {
@@ -158,6 +170,7 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
     const pressed = new Set(this.values)
     const entry = this.focusable ? this.entry() : undefined
     for (const item of this.items) {
+      this.marked.add(item)
       item.selected = item === active
       item.pressed = this.multiple ? pressed.has(item.value) : undefined
       item.focusable = item === entry
