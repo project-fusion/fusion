@@ -372,6 +372,7 @@ export {
   addMonths,
   type Barring,
   barredBy,
+  type CalendarParts,
   type CalendarView,
   calendarLocale,
   type DateCalendar,

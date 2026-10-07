@@ -1176,4 +1176,40 @@ describe('a date input in a calendar other than the Gregorian', () => {
     )
     expect(segments(iso).map((one) => one.textContent?.trim())).toEqual(['2026', '10', '06'])
   })
+
+  /* Measured before this: `calendar` took only the five with Gregorian
+     months, and the segments were always the Gregorian day, month, and year. */
+  test('a calendar with months of its own, named, is written and segmented in it', async () => {
+    const host = await field('calendar="persian" default-value="2026-10-06" locale="en-US"')
+    expect(control(host).value).toBe(long('en-US-u-ca-persian'))
+    expect(picker(host).getAttribute('calendar')).toBe('persian')
+    const parts = (await field(
+      'segmented name="d" calendar="persian" default-value="2026-10-06" locale="en-US"',
+    )) as InputDate
+    expect(segments(parts).map((one) => one.textContent?.trim())).toEqual(['07', '14', '1405'])
+    const month = segments(parts)[0] as HTMLElement
+    expect(month.getAttribute('aria-valuetext')).toBe('7 – Mehr')
+    // Mehr has thirty days, and the twelfth month of 1405 twenty-nine.
+    expect(segments(parts)[1]?.getAttribute('aria-valuemax')).toBe('30')
+    month.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        key: 'ArrowUp',
+      }),
+    )
+    await parts.updateComplete
+    expect(parts.value).toBe('2026-11-05')
+    expect(formValue(parts)).toBe('2026-11-05')
+  })
+
+  test('a Hebrew leap year has a thirteenth month to set', async () => {
+    const host = await field(
+      'segmented calendar="hebrew" default-value="2027-03-10" locale="en-US"',
+    )
+    const month = segments(host).find((one) => one.getAttribute('data-segment') === 'month')
+    expect(month?.getAttribute('aria-valuemax')).toBe('13')
+    expect(month?.getAttribute('aria-valuetext')).toBe('7 – Adar II')
+  })
 })
