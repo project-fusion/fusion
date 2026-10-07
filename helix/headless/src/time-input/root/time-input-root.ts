@@ -63,17 +63,41 @@ import '../../time-picker/index.js'
  * hour, a minute, and AM or PM where the clock has them, each set with digits
  * or the arrow keys. Alt+Down opens the list from a segment.
  *
+ * Text that is not a time gives the form an empty value, as a native time
+ * field does, and `value` keeps the text so it can be corrected.
+ *
+ * **Keyboard.** The field is one tab stop, or each segment is with
+ * `segmented`, and the trigger is one more.
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Down | In the text field, opens the list on the chosen time. |
+ * | Alt with Down | Opens the list, from the text field or a segment. |
+ * | Enter | In the text field, takes the typed time and submits the form, as a native field does. In the list, chooses the highlighted time. |
+ * | Escape | Closes the list and puts focus back in the field. |
+ * | Up, Down on a segment | Steps the segment by one, round from its last value to its first. |
+ * | Page Up, Page Down on a segment | Steps by a page: two hours, or fifteen minutes or seconds. |
+ * | Home, End on a segment | Goes to the segment's first or last value. |
+ * | Digits on a segment | Fill it, and move to the next once it can take no more. |
+ * | A letter on the half of the day | Picks the half whose name starts with it, such as A for AM. |
+ * | Backspace, Delete on a segment | Empty the segment. |
+ * | Left, Right on a segment | Move to the previous or the next segment, along the line of text. |
+ *
+ * In the list, the keys are `TimePicker`'s.
+ *
  * @since 0.1.0
  * @status stable
  * @category forms
  * @aliases TimeField, InputTime
  * @documentation https://fusion.dev/helix/components/time-input
  *
+ * @slot end - Content after the time, before the trigger, such as a clear button.
  * @slot feedback - The message that says what is wrong with the value.
  * @slot hint - Help under the field.
  * @slot label - The label, for content richer than the `label` text.
  * @slot panel-footer - Content in the panel under the times, such as a note or an action.
  * @slot panel-header - Content in the panel above the times, such as a heading or a shortcut.
+ * @slot start - Content before the time, such as an icon.
  * @slot trigger - The icon on the field that shows a list opens.
  *
  * @event {Event} change - Fired after the value changes.
@@ -499,9 +523,18 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
     }
   }
 
-  /** Each time, where `mode` holds several, sent one entry each. */
+  /**
+   * Each time, where `mode` holds several, sent one entry each.
+   *
+   * One time that is text and no time, such as `2:45 P`, is sent as an empty
+   * entry, as a native time field sends a time it cannot read.
+   */
   protected override get answers(): readonly string[] | undefined {
-    return this.mode === undefined ? undefined : this.held
+    if (this.mode !== undefined) {
+      return this.held
+    }
+    const text = this.value.trim()
+    return text === '' || this.isTime(text) ? undefined : ['']
   }
   /** What is wrong with the times, which the text input cannot say. */
   protected override validate(): string | readonly [keyof ValidityStateFlags, string] {
@@ -707,6 +740,7 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
   protected override render(): TemplateResult {
     return html`${this.renderLabel()}
       <div part="field" @keydown=${this.handleKeydown}>
+        <slot name="start"></slot>
         ${
           this.mode === 'multiple'
             ? this.renderTokenRow(
@@ -716,6 +750,7 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
             : nothing
         }
         ${this.segmentsShown ? this.renderSegments() : this.renderControl()}
+        <slot name="end"></slot>
         <button
           part="trigger"
           type="button"

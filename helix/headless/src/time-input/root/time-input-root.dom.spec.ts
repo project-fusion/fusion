@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { formValue, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -368,4 +368,27 @@ describe('a time input in a page written in another language', () => {
 test("forwards the picker's own message as `picker-feedback`", async () => {
   const host = await field()
   expect(part(host, 'picker')?.getAttribute('exportparts')).toContain('feedback: picker-feedback')
+})
+
+describe('input time with text that is no time', () => {
+  /* The form held whatever was typed, `2:45 P` included, where a native time
+     field sends a time it cannot read as empty. */
+  test('gives the form an empty entry, and keeps the text in the value', async () => {
+    const host = await field('name="t"')
+    await type(host, '2:45 P')
+    expect(host.value).toBe('2:45 P')
+    expect((formValue(host) as FormData).getAll('t')).toEqual([''])
+    await type(host, '14:45')
+    expect(formValue(host)).toBe('14:45')
+  })
+})
+
+describe('input time takes content at either end', () => {
+  test('in start and end, inside the field', async () => {
+    const host = await field()
+    const slots = [...(part(host, 'field')?.querySelectorAll(':scope > slot') ?? [])].map((one) =>
+      one.getAttribute('name'),
+    )
+    expect(slots).toEqual(['start', 'end'])
+  })
 })

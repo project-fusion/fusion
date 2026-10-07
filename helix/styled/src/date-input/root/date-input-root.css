@@ -27,6 +27,14 @@
     border-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
+/* An icon or a unit at either end of the text: quieter than the value, and
+   never shrinking when the field is narrow, as `Input` draws them. */
+slot[name="start"]::slotted(*),
+slot[name="end"]::slotted(*) {
+  color: var(--helix-color-foreground-subtle);
+  flex: none;
+}
+
 /* The trigger is a mark inside the field rather than a button beside it: it has
    no box of its own, because a second frame inside the first is two controls
    where a reader sees one. */
