@@ -1462,6 +1462,40 @@ describe('canvas selections, sizes and shapes', () => {
     expect(host.selected.split(',').sort()).toEqual(['a', 'b', 'c', 'e1', 'e2', 'pair'])
   })
 
+  /* Selection followed focus on every arrow, so a keyboard could select one
+     card, a run, or everything, and never two cards apart. */
+  test('Control or Command with an arrow walks without selecting, and Space then adds', async () => {
+    const host = (await canvas()) as Board
+    const focused = (): Element => {
+      const at = document.activeElement
+      return at === host
+        ? (host.shadowRoot?.activeElement as Element)
+        : (at?.shadowRoot?.querySelector('[part="node"]') as Element)
+    }
+    const walk = (key: string, init: KeyboardEventInit = {}): void => {
+      focused().dispatchEvent(
+        new KeyboardEvent('keydown', {
+          bubbles: true,
+          cancelable: true,
+          composed: true,
+          key,
+          ...init,
+        }),
+      )
+    }
+    box(host, 'a').focus()
+    expect(host.selected).toBe('a')
+    walk('End', { ctrlKey: true })
+    expect(document.activeElement).toBe(card(host, 'c'))
+    expect(host.selected).toBe('a')
+    walk(' ')
+    expect(host.selected).toBe('a,c')
+    walk('ArrowUp', { metaKey: true })
+    expect(host.selected).toBe('a,c')
+    walk('ArrowUp')
+    expect(host.selected).not.toContain(',')
+  })
+
   test('Shift and a drag across the empty board selects the cards it touches', async () => {
     const host = (await canvas()) as Board
     const viewport = part(host, 'viewport') as HTMLElement
@@ -2659,5 +2693,42 @@ describe('the order a screen reader reads a board in', () => {
           ?.assignedElements() ?? []
       ).map((one) => one.textContent ?? '')
     expect([slotted('header'), slotted('footer')]).toEqual([['Above'], ['Below']])
+  })
+})
+
+/**
+ * What the console was warned while `markup` mounted and settled. The
+ * warning is in development builds only: `test:dom` passes
+ * `--conditions helix-development`, which core's `#audit-name` reads.
+ */
+const warnedOn = async (markup: string): Promise<string[]> => {
+  const warnings: string[] = []
+  const original = console.warn
+  console.warn = (message: string) => warnings.push(message)
+  try {
+    await mount(markup)
+    await new Promise((done) => setTimeout(done, 5))
+  } finally {
+    console.warn = original
+  }
+  return warnings.filter((warning) => warning.includes('accessible name'))
+}
+
+describe('a canvas with no name', () => {
+  test('is reported once, by its tag', async () => {
+    const warnings = await warnedOn('<helix-headless-canvas></helix-headless-canvas>')
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0]).toContain('<helix-headless-canvas> has no accessible name')
+  })
+
+  test('and one named by `label` or `aria-label` is not, and its region takes the name', async () => {
+    for (const markup of [
+      '<helix-headless-canvas label="Release plan"></helix-headless-canvas>',
+      '<helix-headless-canvas aria-label="Release plan"></helix-headless-canvas>',
+    ]) {
+      expect([markup, ...(await warnedOn(markup))]).toEqual([markup])
+      const host = document.body.lastElementChild as HTMLElement
+      expect(part(host, 'region')?.getAttribute('aria-label')).toBe('Release plan')
+    }
   })
 })
