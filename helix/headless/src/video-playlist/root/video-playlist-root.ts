@@ -20,6 +20,7 @@ import { playOrder, type Repeat, stepTo } from '../order.js'
 type Player = HTMLElement & {
   currentTime?: number
   label: string
+  mediaTitle?: string
   play: () => Promise<void> | void
   poster: string
   src: string
@@ -52,6 +53,10 @@ type Player = HTMLElement & {
  * back to the first. Without it, the playlist stops on the last entry and
  * sends `helix-end`. `shuffle` plays the entries in a random order, starting
  * from the one that is current, and `previous` retraces that order.
+ *
+ * **The player is named by the current entry**, and the device's own media
+ * controls show the entry as the title. A player you gave a `label` keeps
+ * your name, and only the title follows the entry.
  *
  * **Keyboard.** Each entry is a button in the tab order, and Enter or Space
  * plays it. The current entry carries `aria-current`. While focus is on the
@@ -373,7 +378,12 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
     if (player.src !== current.src) {
       player.src = current.src
       player.poster = current.poster
-      player.label = current.text
+      player.mediaTitle = current.text
+      /* The consumer's own name for the player stands. Only a player named by
+         nobody takes the entry's words as its name. */
+      if (!player.hasAttribute('label')) {
+        player.label = current.text
+      }
       if (this.chased) {
         /* After the player has rendered, not now. `src` here is the element's
            property, and the `<video>` inside it only takes the new source on
