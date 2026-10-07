@@ -418,3 +418,18 @@ describe('a time input reads a time as you write one', () => {
     expect(host.value).toBe('teatime')
   })
 })
+
+describe('the text of a time input opens a list', () => {
+  /* Measured before this: Down in the text opened the list while the text
+     said nothing of a popup, a textbox with no `aria-expanded`. */
+  test('so it says so, as a combobox with a dialog', async () => {
+    const host = await field()
+    expect(control(host).getAttribute('role')).toBe('combobox')
+    expect(control(host).getAttribute('aria-haspopup')).toBe('dialog')
+    expect(control(host).getAttribute('aria-controls')).toBe('surface')
+    expect(control(host).getAttribute('aria-expanded')).toBe('false')
+    ;(host as InputTime & { open: boolean }).open = true
+    await host.updateComplete
+    expect(control(host).getAttribute('aria-expanded')).toBe('true')
+  })
+})
