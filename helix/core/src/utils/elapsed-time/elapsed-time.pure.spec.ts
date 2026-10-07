@@ -45,15 +45,22 @@ describe('the compact reading', () => {
     expect(read(1200 * DAY).text).toBe('May 2023')
   })
 
+  /* Rounded as `relativeTime` rounds, so "4h" is not heard as "3 hours ago". */
+  test('the count is rounded, and one that rounds up to the next unit reads in it', () => {
+    expect(read(3.6 * HOUR).text).toBe('4h')
+    expect(read(100 * SECOND).text).toBe('2m')
+    expect(read(59.6 * MINUTE).text).toBe('1h')
+  })
+
   test('a timestamp that is not one reads as nothing rather than as the epoch', () => {
     expect(elapsedTime('en-US')(new Date('nonsense'), now).text).toBe('')
   })
 })
 
 describe('when the reading expires', () => {
-  test('it is the rest of the current unit, not a whole one', () => {
-    expect(read(90 * SECOND).next).toBe(30 * SECOND)
-    expect(read(MINUTE + 10 * SECOND).next).toBe(50 * SECOND)
+  test('it is until the count turns over, not a whole unit', () => {
+    expect(read(100 * SECOND).next).toBe(50 * SECOND)
+    expect(read(MINUTE + 10 * SECOND).next).toBe(20 * SECOND)
   })
 
   test('it never asks to be woken sooner than a second', () => {
@@ -73,7 +80,7 @@ describe('when the reading expires', () => {
    */
   test('the last day before the horizon wakes when the horizon arrives', () => {
     const left = read(7 * DAY - 30 * SECOND)
-    expect(left.text).toBe('6d')
+    expect(left.text).toBe('7d')
     expect(left.next).toBe(30 * SECOND)
   })
 

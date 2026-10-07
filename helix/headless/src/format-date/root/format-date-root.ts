@@ -36,7 +36,9 @@ const STYLES: readonly Intl.RelativeTimeFormatStyle[] = ['long', 'narrow', 'shor
  * **`relative` shows the same reading in words**, such as "3 hours ago" at
  * `long`, "3 hr. ago" at `short` and "3h ago" at `narrow`, the styles
  * `sl-relative-time` offers. `numeric="always"` says "1 day ago" where the
- * default says "yesterday".
+ * default says "yesterday". Both readings round the count, as
+ * `sl-relative-time` does: 100 seconds ago is "2 minutes ago", and 59.6
+ * minutes is "1 hour".
  *
  * **`date-style` and `time-style` take each locale's own pattern**, such as
  * "Tuesday, August 4, 2026" at `full`, and stand in for the separate fields,

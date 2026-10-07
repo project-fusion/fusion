@@ -1,4 +1,4 @@
-import { type Relative, UNITS as TIME_UNITS } from '../relative-time/relative-time.js'
+import { type Relative, roundedCount, UNITS as TIME_UNITS } from '../relative-time/relative-time.js'
 
 /**
  * A timestamp read the way a feed reads one: short, and a date once short stops
@@ -104,21 +104,14 @@ export const elapsedTime = (locale: string): ((from: Date, now: Date) => Relativ
       return { next: Number.POSITIVE_INFINITY, text: (format as Intl.DateTimeFormat).format(from) }
     }
 
-    let index = 0
-    for (let at = 0; at < UNITS.length; at += 1) {
-      if (size >= (UNITS[at] as { ms: number }).ms) {
-        index = at
-      }
-    }
-    const chosen = UNITS[index] as { ms: number; unit: string }
-    const count = Math.trunc(size / chosen.ms)
-
-    /* Time until the count ticks over, which is the remainder of the current
-       unit rather than the whole of one: read at 90 seconds an item is "1m" for
-       another 30 seconds, not another 60. Capped where `relativeTime` caps it,
-       and floored at a second so nobody is handed a zero and schedules a busy
-       loop. */
-    const remaining = Math.min(chosen.ms - (size % chosen.ms), HORIZON - size)
+    /* Rounded, as `relativeTime` rounds, so the reading and the words a screen
+       reader hears for it agree. The wait is until the count turns over,
+       capped where `relativeTime` caps it, and floored at a second so nobody
+       is handed a zero and schedules a busy loop. Never past the horizon,
+       where the reading becomes a date. */
+    const growing = elapsed > 0
+    const { count, index, next } = roundedCount(size, UNITS, growing)
+    const remaining = growing ? Math.min(next, HORIZON - size) : next
     return {
       next: Math.max(1000, Math.min(remaining, 3_600_000)),
       text: (short[index] as Intl.NumberFormat).format(count),

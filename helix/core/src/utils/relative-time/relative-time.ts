@@ -20,7 +20,7 @@ const held = new Map<string, Intl.RelativeTimeFormat>()
  * How long each unit lasts, in milliseconds, largest last. `elapsedTime`
  * reads its minute, hour and day from here.
  */
-export const UNITS: Array<{ ms: number; unit: Intl.RelativeTimeFormatUnit }> = [
+export const UNITS: Unit[] = [
   { ms: 1000, unit: 'second' },
   { ms: 60_000, unit: 'minute' },
   { ms: 3_600_000, unit: 'hour' },
@@ -29,6 +29,58 @@ export const UNITS: Array<{ ms: number; unit: Intl.RelativeTimeFormatUnit }> = [
   { ms: 2_629_800_000, unit: 'month' },
   { ms: 31_557_600_000, unit: 'year' },
 ]
+
+/** One unit of `UNITS`. */
+type Unit = { ms: number; unit: Intl.RelativeTimeFormatUnit }
+
+/**
+ * A size of time as a rounded count of one of `units`, and how long that
+ * count holds while the size grows (`growing`, a moment gone) or shrinks (a
+ * moment to come).
+ *
+ * **Rounded, as Shoelace's relative time rounds.** Truncated, a date 48 hours
+ * ahead, measured a few milliseconds later, read "tomorrow", and 59 minutes
+ * read "59 minutes" while 61 read "1 hour". A count that rounds up to the next
+ * unit's size reads in that unit: 59.6 minutes is 1 hour, 6.6 days is 1 week.
+ *
+ * `units` run smallest first and the size is at least the first of them.
+ * Exported for `elapsedTime`, which reads its minute, hour and day the same way.
+ */
+export const roundedCount = <U extends { ms: number }>(
+  size: number,
+  units: readonly U[],
+  growing: boolean,
+): { count: number; index: number; next: number } => {
+  let index = 0
+  for (let at = 1; at < units.length; at += 1) {
+    if (size >= (units[at] as U).ms) {
+      index = at
+    }
+  }
+  const ms = (at: number): number => (units[at] as U).ms
+  let count = Math.round(size / ms(index))
+  while (index + 1 < units.length && count * ms(index) >= ms(index + 1)) {
+    index += 1
+    count = Math.round(size / ms(index))
+  }
+  /* The count turns over half a unit either side of a whole one. Shrinking, it
+     also changes where the size drops under this unit, and, where this unit
+     was reached by rounding up, where the unit below stops rounding up to it.
+     A boundary too early only wakes a caller to the same text; one too late
+     leaves the old text on screen, so every candidate is counted. */
+  if (growing) {
+    return { count, index, next: (count + 0.5) * ms(index) - size }
+  }
+  const below = [(count - 0.5) * ms(index)]
+  if (size >= ms(index)) {
+    below.push(ms(index))
+  }
+  if (index > 0) {
+    below.push((Math.ceil(ms(index) / ms(index - 1)) - 0.5) * ms(index - 1))
+  }
+  const floor = Math.max(...below.filter((at) => at <= size))
+  return { count, index, next: size - floor + 1 }
+}
 
 /** What one timestamp reads as, and when that stops being true. */
 export interface Relative {
@@ -113,21 +165,14 @@ export const relativeTime = (
       }
     }
 
-    let chosen = UNITS[1] as { ms: number; unit: Intl.RelativeTimeFormatUnit }
-    for (const unit of UNITS) {
-      if (size >= unit.ms) {
-        chosen = unit
-      }
-    }
-    const count = Math.trunc(elapsed / chosen.ms)
-
-    /* Time until the count ticks over, which is the remainder of the current
-       unit rather than the whole of one: an item read at 90 seconds is "1 minute
-       ago" for another 30 seconds, not another 60. */
-    const remaining = chosen.ms - (size % chosen.ms)
+    /* Rounded, from the minute up: see `roundedCount`. The wait is until the
+       count turns over, which is part of a unit rather than the whole of one:
+       an item read at 100 seconds is "2 minutes ago" for another 50 seconds. */
+    const { count, index, next } = roundedCount(size, UNITS.slice(1), elapsed < 0)
+    const chosen = UNITS[index + 1] as Unit
     return {
-      next: Math.max(1000, Math.min(remaining, 3_600_000)),
-      text: found.format(count, chosen.unit),
+      next: Math.max(1000, Math.min(next, 3_600_000)),
+      text: found.format(elapsed < 0 ? -count : count, chosen.unit),
     }
   }
 }
