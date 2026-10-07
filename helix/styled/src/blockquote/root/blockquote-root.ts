@@ -1,6 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessBlockquote } from '@fusion.dev/helix-headless/blockquote'
 import type { CSSResultGroup } from 'lit'
+import { property } from 'lit/decorators.js'
 import { styles } from './blockquote-root.css.js'
 
 /**
@@ -11,6 +12,10 @@ import { styles } from './blockquote-root.css.js'
  * quotation marks are drawn by default, because the size and spacing already
  * set the passage apart. `marks` draws one large opening mark over the passage,
  * as a pull quote sets it, in the element's language.
+ *
+ * `text-align` sets the passage and its attribution in the middle of the
+ * column or against its far edge, as a pull quote often stands. There, the
+ * mark `marks` draws stands over the passage rather than beside it.
  *
  * @since 0.1.0
  * @status stable
@@ -34,6 +39,20 @@ import { styles } from './blockquote-root.css.js'
  */
 @customElement('helix-blockquote')
 export class HelixBlockquote extends HelixHeadlessBlockquote {
+  /**
+   * How the passage and its attribution align, set as `text-align`.
+   *
+   * `center` for a pull quote in the middle of a column and `end` for one
+   * against its far edge. Under either, the mark `marks` draws stands over
+   * the first line. Absent aligns as the prose around it does.
+   *
+   * Named for the CSS property it sets, as `Text.textAlign` is: `align` alone
+   * is a legacy HTML attribute the browser maps to `text-align` by itself,
+   * and it has no `start` or `end`.
+   */
+  @property({ attribute: 'text-align', reflect: true })
+  textAlign?: 'start' | 'center' | 'end'
+
   static override styles: CSSResultGroup = styles
 }
 
