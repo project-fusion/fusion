@@ -14,6 +14,7 @@ import {
   OpenPhaseController,
   reflectElements,
   unlockScroll,
+  words,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -42,7 +43,8 @@ import { wordsIn } from '../description.js'
  * says it is open, which would leave it impossible to reopen.
  *
  * The dialog's name is `label` when you set it. Otherwise it is the heading in
- * the `header` slot, or the elements an `aria-labelledby` on the host names.
+ * the `header` slot, or the elements an `aria-labelledby` on the host names,
+ * and `fallback-label` where nothing names it.
  * While it is open, the page behind it does not scroll.
  *
  * The dialog is described by the words at the start of its body: the elements
@@ -87,6 +89,12 @@ import { wordsIn } from '../description.js'
 @customElement('helix-headless-dialog')
 export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-dialog': { dismissLabel: 'Schließen' } })`.
+   */
+  static words = 'helix-dialog'
+
+  /**
    * Makes the dialog an alert dialog, for a message that interrupts to ask for
    * an answer, such as a confirmation before something is deleted.
    *
@@ -128,8 +136,17 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
    * The close control's accessible name. Translate it with the rest of your
    * interface.
    */
+  @words
   @property({ attribute: 'dismiss-label' })
   dismissLabel = 'Close'
+
+  /**
+   * The dialog's name where nothing names it: no `label`, no heading in the
+   * `header` slot, and no `aria-labelledby` on the host.
+   */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Dialog'
 
   /**
    * Accessible name for the dialog. When it is empty, the heading in the
@@ -357,11 +374,11 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
    */
   private describeByBody(): void {
     const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot:not([name])')
-    const words = this.hasAttribute('aria-describedby') ? [] : wordsIn(slot)
+    const said = this.hasAttribute('aria-describedby') ? [] : wordsIn(slot)
     this.describedByBody = reflectElements(
       this.dialog,
       'ariaDescribedByElements',
-      words,
+      said,
       this.describedByBody,
     )
   }
@@ -559,7 +576,7 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
       part="dialog"
       role=${this.alert ? 'alertdialog' : nothing}
       closedby=${this.closedBy ?? nothing}
-      aria-label=${this.label || 'Dialog'}
+      aria-label=${this.label || this.fallbackLabel}
       @cancel=${this.handleCancel}
       @click=${this.handleBackdrop}
       @close=${this.handleClose}

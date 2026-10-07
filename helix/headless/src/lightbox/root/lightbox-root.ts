@@ -7,7 +7,7 @@ import {
   drawDismiss,
   drawDismissGlyph,
   FullscreenController,
-  fillTemplate,
+  formatWords,
   HelixElement,
   hostAria,
   IdleController,
@@ -22,6 +22,7 @@ import {
   swipeStep,
   unlockScroll,
   whenHydrated,
+  words,
 } from '@fusion.dev/helix-core'
 import { caretLeft, caretRight, minus, plus } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -131,6 +132,12 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
   MixinControllerOpen(HelixElement),
 ) {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-lightbox': { nextLabel: 'Weiter' } })`.
+   */
+  static words = 'helix-lightbox'
+
+  /**
    * Draws the viewer's own previous, next and close controls over the picture,
    * and zoom-out and zoom-in controls where `max-zoom` allows zooming.
    *
@@ -156,8 +163,14 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
    * The close control's accessible name. Translate it with the rest of your
    * interface.
    */
+  @words
   @property({ attribute: 'dismiss-label' })
   dismissLabel = 'Close'
+
+  /** The viewer's name where `label` is empty. */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Lightbox'
 
   /**
    * How long the user can be idle before the header and footer hide, in
@@ -192,19 +205,22 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
   /**
    * The next control's accessible name.
    */
+  @words
   @property({ attribute: 'next-label' })
   nextLabel = 'Next'
 
   /**
    * The previous control's accessible name.
    */
+  @words
   @property({ attribute: 'previous-label' })
   previousLabel = 'Previous'
 
   /**
    * The name of an item with no `label` of its own, with `{index}` and
-   * `{count}` filled in.
+   * `{count}` filled in, written in the locale.
    */
+  @words
   @property({ attribute: 'slide-label' })
   slideLabel = '{index} of {count}'
 
@@ -213,38 +229,46 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
    * `aria-roledescription`. Translate it with the rest of your text, or empty
    * it to leave the role as `group`.
    */
+  @words
   @property({ attribute: 'slide-role-label' })
   slideRoleLabel = 'slide'
 
   /**
    * The status text that says which item is shown, with `{index}`, `{count}`
-   * and the item's `{label}` filled in.
+   * and the item's `{label}` filled in, the numbers written in the locale.
    *
    * Announced rather than only drawn, because the picture changing under a
    * reader who cannot see it is otherwise silent. A consumer who has their own
    * counter in the chrome can empty this and say it themselves.
    */
+  @words
   @property({ attribute: 'status-label' })
   statusLabel = '{index} of {count}'
 
   /**
    * The zoom-in control's accessible name.
    */
+  @words
   @property({ attribute: 'zoom-in-label' })
   zoomInLabel = 'Zoom in'
 
   /**
    * The zoom-out control's accessible name.
    */
+  @words
   @property({ attribute: 'zoom-out-label' })
   zoomOutLabel = 'Zoom out'
 
   /**
-   * What the live region says once a reader has stopped zooming, with the
-   * scale as a whole `{percent}` filled in. Empty it to say nothing.
+   * What the live region says once a reader has stopped zooming. `{scale,
+   * number, percent}` writes the scale as a percentage the way the locale
+   * writes one, such as `150%`, or `150 %` in French. `{percent}` is the same
+   * scale as a whole number, for a sentence that places the sign itself. Empty
+   * it to say nothing.
    */
+  @words
   @property({ attribute: 'zoom-status-label' })
-  zoomStatusLabel = 'Zoomed to {percent}%'
+  zoomStatusLabel = 'Zoomed to {scale, number, percent}'
 
   /** Whether the reader has been still long enough to hide the chrome. */
   @state()
@@ -318,7 +342,10 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
       return
     }
     this.zoomSaid.start(400, () => {
-      this.announcement = fillTemplate(this.zoomStatusLabel, { percent: percentOf(this.zoomScale) })
+      this.announcement = formatWords(this, 'zoomStatusLabel', {
+        percent: percentOf(this.zoomScale),
+        scale: this.zoomScale,
+      })
     })
   }
 
@@ -648,7 +675,7 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
       item.current = item === current
       /* Once the item has hydrated, so its first render is the server's. */
       whenHydrated(item, () => {
-        item.position = fillTemplate(this.slideLabel, {
+        item.position = formatWords(this, 'slideLabel', {
           count: items.length,
           index: at + 1,
           label: item.label,
@@ -687,7 +714,7 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
     this.announcement =
       at === -1 || !current
         ? ''
-        : fillTemplate(this.statusLabel, {
+        : formatWords(this, 'statusLabel', {
             count: items.length,
             index: at + 1,
             label: current.label,
@@ -699,7 +726,7 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
     const items = this.items
     const current = resolveActiveItem(this.active, items)
     return current
-      ? fillTemplate(this.statusLabel, {
+      ? formatWords(this, 'statusLabel', {
           count: items.length,
           index: items.indexOf(current) + 1,
           label: current.label,
@@ -717,7 +744,7 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
        controls. */
     return html`<dialog
       part="dialog"
-      aria-label=${this.label || 'Lightbox'}
+      aria-label=${this.label || this.fallbackLabel}
       autofocus
       tabindex="-1"
       @cancel=${this.handleCancel}

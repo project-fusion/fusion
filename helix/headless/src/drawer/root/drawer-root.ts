@@ -24,6 +24,7 @@ import {
   swipeEdge,
   towardEdge,
   unlockScroll,
+  words,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -68,7 +69,8 @@ import { startsSwipe } from '../swipe-start.js'
  * `dismiss-label`, as `Dialog` draws one.
  *
  * The panel's name is `label` when you set it. Otherwise it is the heading in
- * the `header` slot, or the elements an `aria-labelledby` on the host names.
+ * the `header` slot, or the elements an `aria-labelledby` on the host names,
+ * and `fallback-label` where nothing names it.
  *
  * Content stays mounted when the drawer is closed, so it is in the server
  * markup and can animate. A closed `<dialog>` is already out of the tab order
@@ -117,6 +119,12 @@ import { startsSwipe } from '../swipe-start.js'
  */
 @customElement('helix-headless-drawer')
 export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
+  /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-drawer': { dismissLabel: 'Schließen' } })`.
+   */
+  static words = 'helix-drawer'
+
   /* Opened and closed from anywhere on the page, without a line of script:
      `<helix-headless-button commandfor="…" command="--show">`. The same three commands
      the dialog answers, because they are the same act: a drawer and a dialog
@@ -157,8 +165,17 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
    * The close control's accessible name. Translate it with the rest of your
    * interface.
    */
+  @words
   @property({ attribute: 'dismiss-label' })
   dismissLabel = 'Close'
+
+  /**
+   * The panel's name where nothing names it: no `label`, no heading in the
+   * `header` slot, and no `aria-labelledby` on the host.
+   */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Drawer'
 
   /**
    * Accessible name for the panel. When it is empty, the heading in the
@@ -588,7 +605,7 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
     return html`<dialog
       part="panel"
       closedby=${closedBy ?? nothing}
-      aria-label=${this.label || 'Drawer'}
+      aria-label=${this.label || this.fallbackLabel}
       @cancel=${this.handleCancel}
       @click=${this.handleBackdrop}
       @close=${this.handleClose}
