@@ -1,6 +1,7 @@
 import {
   AriaForwardController,
   afterLinkFollowed,
+  chosenValues,
   customElement,
   type DataOption,
   type DataOptionItem,
@@ -49,7 +50,9 @@ import { over } from '../align.js'
  * whole set.
  *
  * `Select` owns the value, passes it down to the listbox, and takes changes
- * back, so the value lives in one place.
+ * back, so the value lives in one place. With `multiple`, the value is the
+ * chosen values joined with commas, and the form receives one entry for each.
+ * An option's value may hold a comma, and it is read as one value.
  *
  * Set `valueContent` to draw the trigger's content from the chosen options,
  * and several chosen options are written as a list in the reader's language.
@@ -432,7 +435,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
    * the commit creates the text node it needs.
    */
   private get display(): string | typeof nothing {
-    const chosen = new Set(this.value === '' ? [] : this.value.split(','))
+    const chosen = new Set(this.chosen)
     const words = this.entries.filter((option) => chosen.has(option.value)).map((one) => one.text)
     if (words.length > 0) {
       /* A list in the reader's language, as React Aria writes one: `unit` and
@@ -448,8 +451,20 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
     if (this.items) {
       return []
     }
-    const chosen = new Set(this.value === '' ? [] : this.value.split(','))
+    const chosen = new Set(this.chosen)
     return optionsAmong(this.knownChildren).filter((option) => chosen.has(option.value))
+  }
+
+  /**
+   * The chosen values, read against the options' values, so an option whose
+   * value holds a comma is one value. See `chosenValues`.
+   */
+  private get chosen(): string[] {
+    return chosenValues(
+      this.value,
+      new Set(this.entries.map((option) => option.value)),
+      this.multiple,
+    )
   }
 
   /** `items` as the list reads them, built once per array. */
@@ -773,7 +788,9 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
       }
     }
     const present = new Set(options.map((option) => option.value))
-    const held = this.value === '' ? [] : this.value.split(',')
+    /* Read against the options that were there as well, so a removed option
+       whose value holds a comma is still read as one value. */
+    const held = chosenValues(this.value, new Set([...present, ...this.seen]), this.multiple)
     const gone = held.filter((value) => this.seen.has(value) && !present.has(value))
     this.seen = present
     if (gone.length > 0) {
@@ -787,7 +804,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
        sends them; see `reportValues`. One answer as the string it is, since
        a single option's value may hold a comma. */
     if (this.multiple) {
-      reportValues(this.internals, this.name, this.value === '' ? [] : this.value.split(','))
+      reportValues(this.internals, this.name, this.chosen)
     } else {
       this.internals.setFormValue(this.value === '' ? null : this.value)
     }

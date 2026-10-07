@@ -1,4 +1,5 @@
 import { html, nothing, type TemplateResult } from 'lit'
+import { chosenValues } from '../chosen-values/chosen-values.js'
 
 /** What the hidden native select offers a browser's autofill, and what it does with the answer. */
 export interface DrawAutofillOptions {
@@ -54,7 +55,7 @@ export const drawAutofill = ({
   if (autocomplete === '') {
     return nothing
   }
-  const chosen = value.split(',')
+  const chosen = chosenValues(value, new Set(options.map((option) => option.value)), multiple)
   /* The empty option is never chosen by a fill, so it is dropped here. */
   const fill = (event: Event): void =>
     onFill(

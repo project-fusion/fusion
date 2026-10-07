@@ -405,6 +405,7 @@ export {
   selectsAll,
 } from './utils/chord/chord.js'
 export { type KeyNames, keyNames } from './utils/chord/key-names.js'
+export { chosenValues } from './utils/chosen-values/chosen-values.js'
 export { clamp } from './utils/clamp/clamp.js'
 export {
   clockLocale,
