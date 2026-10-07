@@ -1297,7 +1297,10 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
         ${
           /* Out of the Tab order: the square is one stop, and the saturation
              input above takes both pairs of arrows. Still in the tree, so a
-             screen reader browsing the panel finds the vertical axis. */
+             screen reader browsing the panel finds the vertical axis.
+
+             **Vertical in its writing mode**, which is the only thing Chromium
+             reads a range's orientation from, maximum at the top. */
           ''
         }
         <input
@@ -1306,6 +1309,7 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
           min="0"
           max="100"
           tabindex="-1"
+          style="writing-mode: vertical-lr; direction: rtl"
           aria-label=${axisName(this.brightnessLabel)}
           aria-describedby=${this.feedback === '' ? nothing : 'feedback'}
           aria-valuetext=${reversed}
