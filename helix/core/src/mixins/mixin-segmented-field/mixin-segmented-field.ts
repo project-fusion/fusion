@@ -379,13 +379,13 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
      * Text a touch keyboard writes into a segment, which arrives as input and
      * not as a key: an on-screen keyboard sends `Unidentified` for its keys,
      * so a digit tapped on a phone is read here, as React Aria's segments read
-     * it. Every input is cancelled, so the segment holds only what the field
+     * it. Every input is canceled, so the segment holds only what the field
      * draws in it.
      */
     private readonly handleSegmentBeforeInput = (event: InputEvent): void => {
       const element = event.currentTarget as HTMLElement
       if (event.inputType === 'insertCompositionText') {
-        /* A composition cannot be cancelled, so the text it writes is put
+        /* A composition cannot be canceled, so the text it writes is put
            back once it has been written. */
         this.composing = [...element.childNodes].map((node) => [node, node.nodeValue])
         return
