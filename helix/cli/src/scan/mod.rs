@@ -379,6 +379,12 @@ fn project(root: &Path, build: Option<&Path>) -> Read {
 /// own markup is the library's, and is not judged.
 fn analyzed(read: &Read, index: &Index, listing: &HashMap<String, Vec<String>>) -> Found {
     let mut analyzer = Analyzer::new(index, listing, &read.used);
+    analyzer.declare(
+        read.templates
+            .iter()
+            .filter(|(_, _, own)| !own)
+            .map(|(_, elements, _)| elements.as_slice()),
+    );
     for (path, rules, own) in &read.sheets {
         analyzer.sheet(path, rules, *own);
     }

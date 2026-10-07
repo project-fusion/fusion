@@ -108,6 +108,7 @@ export const KINDS = [
   'manifest-skew',
   'unforwarded-part',
   'unknown-attribute',
+  'unknown-slot',
   'unknown-tag',
 ] as const
 

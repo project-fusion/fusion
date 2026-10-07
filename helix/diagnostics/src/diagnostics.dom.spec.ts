@@ -1289,6 +1289,7 @@ describe('lint data', () => {
       family: undefined,
       hooks: ['--button-background-color', '--button-radius'],
       parts: ['button', 'icon'],
+      slots: [],
       written: [],
     })
   })

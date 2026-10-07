@@ -266,6 +266,7 @@ works on it:
 | `dead-part` | error | A `::part()` names a part the element does not publish |
 | `dead-hook` | error | A hook is set where nothing answers it, or a name close to a hook is set that nothing reads |
 | `unknown-attribute` | error | A Helix element carries an attribute it does not take |
+| `unknown-slot` | error | A child names a slot its Helix element does not have, so it is not drawn. Found by `helix scan`, from the templates |
 | `invalid-value` | error | An attribute with a closed set of values carries one outside it, so the element falls back to its default |
 | `unforwarded-part` | warn | The headless tier publishes the part and the styled tier does not forward it, which is a gap in Helix |
 | `unknown-tag` | error | A rule names a tag no manifest lists |

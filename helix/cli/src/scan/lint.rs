@@ -35,6 +35,9 @@ pub struct Published {
     pub hooks: Vec<(String, BTreeSet<String>)>,
     /// Each part, with the packages that publish it, in the order first seen.
     pub parts: Vec<(String, BTreeSet<String>)>,
+    /// The slots it has, the default one as `""`, or `None` where the lint
+    /// data predates them and so says nothing either way.
+    pub slots: Option<BTreeSet<String>>,
     /// The attributes the element writes on itself, which are output.
     pub written: HashSet<String>,
 }
@@ -122,6 +125,14 @@ impl Index {
                 let element = &mut index.tags[at].1;
                 for name in strings(entry.get("written")) {
                     element.written.insert(name);
+                }
+                /* A tier that lists slots says what the tag has; one that
+                does not says nothing, which leaves the check off. */
+                if entry.get("slots").is_some() {
+                    element
+                        .slots
+                        .get_or_insert_with(BTreeSet::new)
+                        .extend(strings(entry.get("slots")));
                 }
                 if let Some(attributes) = entry.get("attributes").and_then(|one| one.as_object()) {
                     for (name, values) in attributes {

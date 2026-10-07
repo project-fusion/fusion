@@ -25,7 +25,7 @@ use regex::Regex;
 
 use super::css::StyleRule;
 use super::identity::nearest;
-use super::lint::{Allows, Index};
+use super::lint::{Allows, Index, Published};
 use super::markup::{Element, Value};
 
 /// How far a misspelled hook may be from the real one: two edits, as the page
@@ -173,6 +173,8 @@ pub struct Analyzer<'a> {
     used: &'a HashSet<String>,
     /// The closest hook to each name that is not one, asked once per name.
     suggested: HashMap<String, Option<String>>,
+    /// Every part name the project's own templates write, `part="name"`.
+    declared: HashSet<String>,
     pub found: Found,
 }
 
@@ -187,7 +189,25 @@ impl<'a> Analyzer<'a> {
             listing,
             used,
             suggested: HashMap::new(),
+            declared: HashSet::new(),
             found: Found::default(),
+        }
+    }
+
+    /// The part names the project's own templates write, read before the
+    /// sheets: a `::part()` naming one of them may be a part of the project's
+    /// own, rendered inside a Helix element.
+    pub fn declare<'t>(&mut self, files: impl IntoIterator<Item = &'t [Element]>) {
+        for elements in files {
+            for element in elements {
+                for attribute in &element.attributes {
+                    if let ("part", Value::Literal(value)) = (&attribute.name[..], &attribute.value)
+                    {
+                        self.declared
+                            .extend(value.split_whitespace().map(str::to_owned));
+                    }
+                }
+            }
         }
     }
 
@@ -248,6 +268,22 @@ impl<'a> Analyzer<'a> {
                         expected: Some(part.clone()),
                         kind: "unforwarded-part",
                         message: format!("`{tag}` does not publish `{part}`, though `{other}` does, so this rule matches nothing until the part is forwarded. The fix belongs in Helix."),
+                        origin: origin(),
+                        subject: format!("{tag}::part({part})"),
+                        tag: tag.clone(),
+                    });
+                    continue;
+                }
+                /* **A part the project writes itself is left to the page.** A
+                template the project hands a Helix element, such as a Data
+                Table's cell, renders inside the element's shadow root, and a
+                `part` on it is reachable through `::part()` like the element's
+                own. Only the running page shows whether it is there. */
+                if self.declared.contains(&part) {
+                    self.found.unsettled.push(Raw {
+                        expected: None,
+                        kind: "dead-part",
+                        message: format!("`{tag}` publishes no part named `{part}`, and your templates write `part=\"{part}\"`. The rule works where one of them renders inside `{tag}`, as a Data Table's cell template does, which only the running page shows."),
                         origin: origin(),
                         subject: format!("{tag}::part({part})"),
                         tag: tag.clone(),
@@ -409,6 +445,15 @@ impl<'a> Analyzer<'a> {
         let mut keys: HashMap<String, usize> = HashMap::new();
         for (path, elements) in files {
             for (position, element) in elements.iter().enumerate() {
+                if let Some(raw) = self.slot(path, position, element, elements) {
+                    let key = format!("{} {}", raw.kind, raw.subject);
+                    let order = keys.len();
+                    let order = *keys.entry(key.clone()).or_insert(order);
+                    grouped
+                        .entry((order, key))
+                        .and_modify(|(_, count)| *count += 1)
+                        .or_insert((raw, 1));
+                }
                 let Some(published) = self.index.get(&element.tag) else {
                     continue;
                 };
@@ -430,24 +475,7 @@ impl<'a> Analyzer<'a> {
                         text: element.text.clone(),
                     };
                     let raw = match published.attribute(name) {
-                        None => {
-                            let suggestion = nearest(
-                                name,
-                                published.attributes.iter().map(|(one, _)| one.as_str()),
-                                None,
-                            );
-                            Raw {
-                                expected: suggestion.map(str::to_owned),
-                                kind: "unknown-attribute",
-                                message: match suggestion {
-                                    Some(suggestion) => format!("`{tag}` takes no attribute `{name}`, so it does nothing. The closest it takes is `{suggestion}`."),
-                                    None => format!("`{tag}` takes no attribute `{name}`, so it does nothing."),
-                                },
-                                origin: origin(),
-                                subject: format!("<{tag} {name}>"),
-                                tag: tag.to_owned(),
-                            }
-                        }
+                        None => unknown_attribute(tag, name, published, origin()),
                         Some(Allows::OneOf(allows)) => match &attribute.value {
                             Value::Literal(value)
                                 if !value.is_empty() && !allows.contains(value) =>
@@ -489,6 +517,93 @@ impl<'a> Analyzer<'a> {
             self.found.findings.push(raw);
         }
     }
+
+    /// A child naming a slot its Helix parent does not have, which the
+    /// browser assigns to nothing and so never draws.
+    ///
+    /// **Judged only where the parent is a Helix element and its lint data
+    /// lists slots.** A child of a component is the component's to place, and
+    /// lint data from before slots were listed says nothing either way.
+    fn slot(
+        &self,
+        path: &str,
+        position: usize,
+        element: &Element,
+        elements: &[Element],
+    ) -> Option<Raw> {
+        let name = element.attributes.iter().find_map(|attribute| {
+            match (&attribute.name[..], &attribute.value) {
+                ("slot", Value::Literal(value)) if !value.is_empty() => Some(value.as_str()),
+                _ => None,
+            }
+        })?;
+        let parent = elements.get(element.parent?)?;
+        let slots = self.index.get(&parent.tag)?.slots.as_ref()?;
+        if slots.contains(name) {
+            return None;
+        }
+        let tag = parent.tag.as_str();
+        let named: Vec<&str> = slots
+            .iter()
+            .map(String::as_str)
+            .filter(|one| !one.is_empty())
+            .collect();
+        let suggestion = nearest(name, named.iter().copied(), None);
+        Some(Raw {
+            expected: suggestion.map(str::to_owned),
+            kind: "unknown-slot",
+            message: match suggestion {
+                Some(suggestion) => format!("`{tag}` has no slot `{name}`, so this element is assigned nowhere and is not drawn. The closest slot it has is `{suggestion}`."),
+                None if named.is_empty() => format!("`{tag}` has no slot `{name}`, so this element is assigned nowhere and is not drawn. It has only its default slot."),
+                None => format!("`{tag}` has no slot `{name}`, so this element is assigned nowhere and is not drawn. Its slots are {}.", listed(&named, "and")),
+            },
+            origin: Origin {
+                index: position,
+                line: element.line,
+                sheet: path.to_owned(),
+                text: element.text.clone(),
+            },
+            subject: format!("<{tag}> [slot=\"{name}\"]"),
+            tag: tag.to_owned(),
+        })
+    }
+}
+
+/// An attribute a tag does not take, with the closest name it does take or,
+/// where nothing is close, the names that grew out of it.
+fn unknown_attribute(tag: &str, name: &str, published: &Published, origin: Origin) -> Raw {
+    let suggestion = nearest(
+        name,
+        published.attributes.iter().map(|(one, _)| one.as_str()),
+        None,
+    );
+    /* **A name that grew is a rename.** `align` became `align-items` on Flex
+    and `text-align` on a table column, too far for an edit distance and exactly
+    what an upgrade leaves behind, so the attributes that start or end with the
+    old name are named where nothing is close. */
+    let grown: Vec<&str> = published
+        .attributes
+        .iter()
+        .map(|(one, _)| one.as_str())
+        .filter(|one| one.starts_with(&format!("{name}-")) || one.ends_with(&format!("-{name}")))
+        .collect();
+    Raw {
+        expected: suggestion
+            .or(match grown.as_slice() {
+                [one] => Some(*one),
+                _ => None,
+            })
+            .map(str::to_owned),
+        kind: "unknown-attribute",
+        message: match suggestion {
+            Some(suggestion) => format!("`{tag}` takes no attribute `{name}`, so it does nothing. The closest it takes is `{suggestion}`."),
+            None if !grown.is_empty() => format!("`{tag}` takes no attribute `{name}`, so it does nothing. It takes {}, which may be what `{name}` became.", listed(&grown, "and")),
+            None => format!("`{tag}` takes no attribute `{name}`, so it does nothing."),
+        },
+        origin,
+        subject: format!("<{tag} {name}>"),
+        tag: tag.to_owned(),
+    }
 }
 
 #[cfg(test)]
@@ -504,7 +619,8 @@ mod tests {
         Index::of(&[LintData {
             package: "@fusion.dev/helix".to_owned(),
             tags: serde_json::json!({
-                "helix-card": { "attributes": { "tone": ["primary", "neutral"] }, "family": "card", "hooks": ["--card-padding"], "parts": ["body", "media"], "written": [] },
+                "helix-card": { "attributes": { "tone": ["primary", "neutral"] }, "family": "card", "hooks": ["--card-padding"], "parts": ["body", "media"], "slots": ["", "header", "footer"], "written": [] },
+                "helix-flex": { "attributes": { "align-content": null, "align-items": null, "gap": null }, "family": "flex", "hooks": [], "parts": [], "written": [] },
                 "helix-copy-button": { "attributes": {}, "family": "copy-button", "hooks": [], "parts": [], "written": [] },
                 "helix-icon-button": { "attributes": {}, "family": "icon-button", "hooks": ["--icon-button-size"], "parts": ["control"], "written": [] }
             })
@@ -579,6 +695,61 @@ mod tests {
             "helix-copy-button { --icon-button-size }"
         );
         assert_eq!(unsettled[0].message, "`helix-copy-button` has no hook `--icon-button-size`. `helix-icon-button` has it, so the rule works where one is inside `helix-copy-button`, which only the running page shows.");
+    }
+
+    #[test]
+    fn a_slot_the_parent_lacks_is_found_and_one_it_has_is_not() {
+        let index = index();
+        let listing = index.hooks();
+        let used = HashSet::new();
+        let mut analyzer = Analyzer::new(&index, &listing, &used);
+        let page = markup::read(
+            "<helix-card><span slot=\"title\">A</span><span slot=\"header\">B</span><b slot=\"headr\">C</b></helix-card><helix-flex><i slot=\"x\"></i></helix-flex>",
+            1,
+        );
+        analyzer.markup([("a.html", page.elements.as_slice())]);
+        let found: Vec<(&str, &str)> = analyzer
+            .found
+            .findings
+            .iter()
+            .map(|one| (one.kind, one.message.as_str()))
+            .collect();
+        assert_eq!(
+            found,
+            [
+                ("unknown-slot", "`helix-card` has no slot `title`, so this element is assigned nowhere and is not drawn. Its slots are `footer` and `header`."),
+                ("unknown-slot", "`helix-card` has no slot `headr`, so this element is assigned nowhere and is not drawn. The closest slot it has is `header`."),
+            ]
+        );
+    }
+
+    #[test]
+    fn a_part_the_project_writes_is_left_to_the_page() {
+        let index = index();
+        let listing = index.hooks();
+        let used = HashSet::new();
+        let mut analyzer = Analyzer::new(&index, &listing, &used);
+        let cells = markup::read("<a part=\"business link\" href=\"/\">A</a>", 1);
+        analyzer.declare([cells.elements.as_slice()]);
+        let rules = css::read("helix-card::part(business) { color: red; }\n", 1, false);
+        analyzer.sheet("app.css", &rules, false);
+        assert!(analyzer.found.findings.is_empty());
+        assert_eq!(analyzer.found.unsettled.len(), 1);
+        assert_eq!(analyzer.found.unsettled[0].kind, "dead-part");
+    }
+
+    #[test]
+    fn an_attribute_that_grew_names_what_it_became() {
+        let index = index();
+        let listing = index.hooks();
+        let used = HashSet::new();
+        let mut analyzer = Analyzer::new(&index, &listing, &used);
+        let page = markup::read("<helix-flex align=\"center\"></helix-flex>", 1);
+        analyzer.markup([("a.html", page.elements.as_slice())]);
+        assert_eq!(
+            analyzer.found.findings[0].message,
+            "`helix-flex` takes no attribute `align`, so it does nothing. It takes `align-content` and `align-items`, which may be what `align` became."
+        );
     }
 
     #[test]

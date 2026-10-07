@@ -18,6 +18,7 @@ const CATEGORY: Readonly<Record<Kind, FindingCategory>> = {
   'manifest-skew': 'integrity',
   'unforwarded-part': 'styling',
   'unknown-attribute': 'markup',
+  'unknown-slot': 'markup',
   'unknown-tag': 'integrity',
 }
 
@@ -34,6 +35,7 @@ const OWNER: Readonly<Record<Kind, Owner>> = {
   'manifest-skew': 'consumer',
   'unforwarded-part': 'helix',
   'unknown-attribute': 'consumer',
+  'unknown-slot': 'consumer',
   'unknown-tag': 'consumer',
 }
 
