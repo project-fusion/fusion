@@ -352,3 +352,30 @@ describe('narrowing and counting the suggestions', () => {
     expect(part(host as HTMLElement, 'live')?.textContent).toBe('1 suggestion')
   })
 })
+
+describe('Enter while an input method composes', () => {
+  /* Enter that accepts a candidate in Japanese, Chinese or Korean input
+     chose the highlighted suggestion and was swallowed, so the word being
+     written never reached the field. */
+  test('belongs to the input method, and chooses nothing', async () => {
+    const host = await mount(['absent', 'stale'])
+    await enter(host)
+    await type(host, 'st')
+    await press(host, 'ArrowDown')
+    const chosen: string[] = []
+    ;(host as HTMLElement).addEventListener('helix-select', (event) =>
+      chosen.push((event as CustomEvent<{ value: string }>).detail.value),
+    )
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      isComposing: true,
+      key: 'Enter',
+    })
+    control(host).dispatchEvent(event)
+    await settle(host)
+    expect(chosen).toEqual([])
+    expect(event.defaultPrevented).toBe(false)
+  })
+})
