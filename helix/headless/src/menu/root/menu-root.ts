@@ -15,6 +15,7 @@ import {
   type Placement,
   PopoverController,
   scrollItemIntoView,
+  sideOf,
   slottedWords,
   tellDisclosure,
   typeaheadBy,
@@ -151,6 +152,10 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
  * @cssstate drilled - A submenu's page is showing, so content that is not a row can hide with the top page.
  * @cssstate mark - A row on the current page has a checkbox or a link, so every row keeps the trailing column.
  * @cssstate open - While the menu is open.
+ * @cssstate placed-bottom - While the open panel sits below its trigger.
+ * @cssstate placed-left - While the open panel sits to the left of its trigger.
+ * @cssstate placed-right - While the open panel sits to the right of its trigger.
+ * @cssstate placed-top - While the open panel sits above its trigger.
  * @cssstate start - A row on the current page has content in its leading column, so every row keeps that column.
  */
 @customElement('helix-headless-menu')
@@ -377,6 +382,15 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     boundary: () => this,
     offset: () => this.offset,
     onDismiss: () => this.hide(),
+    /* The side the panel landed on, for a sheet outside that draws by side,
+       as Popover says it. */
+    onPlace: (placement) => {
+      const side = sideOf(placement)
+      this.toggleState('placed-bottom', side === 'bottom')
+      this.toggleState('placed-left', side === 'left')
+      this.toggleState('placed-right', side === 'right')
+      this.toggleState('placed-top', side === 'top')
+    },
     open: () => this.open,
     placement: () => this.placement,
     surface: () => this.partNamed('surface'),
