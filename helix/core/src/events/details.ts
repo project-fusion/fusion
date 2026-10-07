@@ -277,6 +277,12 @@ export interface TourAskDetail {
  * that `event.target` does not.
  */
 export interface ChangeDetail {
+  /**
+   * Why the change was asked for, where a family names its causes. Video
+   * Playlist sends `ended`, `next`, `press`, `previous`, and `removed` on
+   * `helix-before-activate`.
+   */
+  cause?: string
   /** The value after the change. */
   value: string
 }

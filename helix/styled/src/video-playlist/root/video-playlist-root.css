@@ -19,6 +19,14 @@
   overflow-y: auto;
 }
 
+/* Said where the entries would be, in the quiet ink an absence takes. */
+[part="empty"] {
+  color: var(--video-playlist-empty-color, var(--helix-color-foreground-muted));
+  font-size: var(--helix-text-sm);
+  padding: var(--video-playlist-empty-padding, var(--helix-space-md));
+  text-align: center;
+}
+
 /* Print: the same, plus a list of things that cannot be played.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this

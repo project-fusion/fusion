@@ -17,6 +17,8 @@ import { styles } from './video-playlist-root.css.js'
  * @aliases Playlist, Queue, Up next
  * @documentation https://fusion.dev/helix/components/video-playlist
  *
+ * @cssproperty --video-playlist-empty-color - The color of the words shown while there are no entries.
+ * @cssproperty --video-playlist-empty-padding - The space around the words shown while there are no entries.
  * @cssproperty --video-playlist-gap - The space between the player and the list.
  * @cssproperty --video-playlist-items-gap - The space between the entries.
  * @cssproperty --video-playlist-layout - The grid columns for the player and the list.

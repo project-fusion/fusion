@@ -511,3 +511,128 @@ describe('the keys on the player', () => {
     expect(host.active).toBe('one')
   })
 })
+
+describe('entries that leave', () => {
+  const five = async (): Promise<Playlist> => {
+    const host =
+      (await mount(`<helix-headless-video-playlist default-active="five" label="Episodes">
+      <helix-headless-video slot="player"></helix-headless-video>
+      ${['one', 'two', 'three', 'four', 'five']
+        .map(
+          (value) =>
+            `<helix-headless-video-playlist-item src="/${value}.mp4" value="${value}">${value}</helix-headless-video-playlist-item>`,
+        )
+        .join('')}
+    </helix-headless-video-playlist>`)) as Playlist
+    await host.updateComplete
+    return host
+  }
+
+  /* The playlist kept `active` on an entry that was gone, and the player kept
+     its clip, because nothing told it the entries had changed. */
+  test('removing the current last entry moves to the one before it', async () => {
+    const host = await five()
+    const causes: Array<string | undefined> = []
+    host.addEventListener('helix-before-activate', (event) => {
+      causes.push((event as CustomEvent<{ cause?: string }>).detail.cause)
+    })
+    host.querySelector('[value="five"]')?.remove()
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await host.updateComplete
+    expect(host.active).toBe('four')
+    expect(player(host).src).toBe('/four.mp4')
+    expect(causes).toEqual(['removed'])
+  })
+
+  test('removing a current entry in the middle moves to the one after it', async () => {
+    const host = await five()
+    host.requestActive('two')
+    await host.updateComplete
+    host.querySelector('[value="two"]')?.remove()
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await host.updateComplete
+    expect(host.active).toBe('three')
+    expect(player(host).src).toBe('/three.mp4')
+  })
+
+  test('a clip that was playing keeps playing in the entry that takes its place', async () => {
+    const host = await five()
+    Object.defineProperty(player(host), 'paused', { configurable: true, value: false })
+    const plays = watchPlays(player(host))
+    host.querySelector('[value="five"]')?.remove()
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await host.updateComplete
+    await player(host).updateComplete
+    await Promise.resolve()
+    expect(plays()).toBe(1)
+  })
+
+  test('an empty playlist says so, and the `empty` slot replaces the words', async () => {
+    const host = (await mount(
+      '<helix-headless-video-playlist empty-label="Nothing queued"></helix-headless-video-playlist>',
+    )) as Playlist
+    await host.updateComplete
+    expect(part(host, 'empty')?.textContent?.trim()).toBe('Nothing queued')
+    const one = document.createElement('helix-headless-video-playlist-item') as Entry
+    one.value = 'one'
+    host.append(one)
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await host.updateComplete
+    expect(part(host, 'empty')).toBeNull()
+  })
+})
+
+describe('the tab stop', () => {
+  const buttons = (host: Playlist) =>
+    entries(host).map((one) => one.shadowRoot?.querySelector('button')?.getAttribute('tabindex'))
+
+  test('the entries take one stop, on the current entry', async () => {
+    const host = await list()
+    await host.updateComplete
+    for (const one of entries(host)) {
+      await (one as Entry & { updateComplete: Promise<boolean> }).updateComplete
+    }
+    // Three is disabled, and a disabled button takes no focus anyway.
+    expect(buttons(host)).toEqual([null, '-1', '-1'])
+  })
+
+  test('and the stop follows the entry a reader focused', async () => {
+    const host = await list()
+    await host.updateComplete
+    const two = entries(host)[1] as Entry & { updateComplete: Promise<boolean> }
+    two.focus()
+    two.dispatchEvent(new FocusEvent('focusin', { bubbles: true, composed: true }))
+    await two.updateComplete
+    await (entries(host)[0] as Entry & { updateComplete: Promise<boolean> }).updateComplete
+    expect(buttons(host)).toEqual(['-1', null, '-1'])
+  })
+})
+
+describe('no-advance', () => {
+  test('stays on the entry that ended, and next still moves', async () => {
+    const host = await list(' no-advance')
+    await host.updateComplete
+    player(host).dispatchEvent(new Event('ended'))
+    await host.updateComplete
+    expect(host.active).toBe('one')
+    player(host).dispatchEvent(new CustomEvent('helix-next', { bubbles: true, composed: true }))
+    await host.updateComplete
+    expect(host.active).toBe('two')
+  })
+
+  test('an ended move says why, so a page can hold it for an up-next countdown', async () => {
+    const host = await list()
+    await host.updateComplete
+    host.addEventListener('helix-before-activate', (event) => {
+      if ((event as CustomEvent<{ cause?: string }>).detail.cause === 'ended') {
+        event.preventDefault()
+      }
+    })
+    player(host).dispatchEvent(new Event('ended'))
+    await host.updateComplete
+    expect(host.active).toBe('one')
+    ;(host as Playlist & { next(): void }).next()
+    await host.updateComplete
+    expect(host.active).toBe('two')
+  })
+})
