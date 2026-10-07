@@ -56,7 +56,9 @@ import '../../time-picker/index.js'
  *
  * Typing sends `input` on each keystroke and `change` when you leave the
  * field. The trigger and ArrowDown open the list, and so does a press into the
- * field; Tab into the field opens nothing. In the list, the arrow keys, typed digits and PageUp and PageDown
+ * field; Tab into the field opens nothing. The text field is a `combobox`
+ * with `aria-haspopup="dialog"`, `aria-expanded`, and `aria-controls`, since
+ * Down opens the list from it. In the list, the arrow keys, typed digits and PageUp and PageDown
  * move through the times, and Enter, Space or a click chooses one and closes
  * the panel. With `variant="wheels"` each wheel moves the time as you turn it,
  * the panel stays open, and Enter or Escape closes it.
@@ -753,6 +755,10 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
       placeholder=${
         this.mode === 'multiple' && this.held.length > 0 ? nothing : this.placeholder || nothing
       }
+      role="combobox"
+      aria-controls="surface"
+      aria-expanded=${this.open ? 'true' : 'false'}
+      aria-haspopup="dialog"
       autocomplete=${this.autocomplete || nothing}
       aria-describedby=${this.describedBy ?? nothing}
       aria-invalid=${this.invalidity ?? nothing}

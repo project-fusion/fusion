@@ -74,7 +74,9 @@ const dates = (value: string): string[] =>
  * Tab moves between the calendar's controls without leaving it, and Escape
  * closes it and returns focus to the field. A press into the field opens the
  * calendar too. Tab into the field opens nothing, and Tab out of the field
- * closes the calendar.
+ * closes the calendar. The text field is a `combobox` with
+ * `aria-haspopup="dialog"`, `aria-expanded`, and `aria-controls`, as in the
+ * APG date picker combobox, since Down opens the calendar from it.
  *
  * With `segmented`, the field is a row of segments in place of the text: a
  * month, a day and a year in the order the locale writes them, each set with
@@ -1051,6 +1053,10 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
           ? nothing
           : this.placeholder || nothing
       }
+      role="combobox"
+      aria-controls="surface"
+      aria-expanded=${this.open ? 'true' : 'false'}
+      aria-haspopup="dialog"
       autocomplete=${this.autocomplete || nothing}
       inputmode="numeric"
       aria-describedby=${this.describedBy ?? nothing}

@@ -1263,3 +1263,15 @@ describe('a date input reads a date as its locale writes one', () => {
     expect(host.value).toBe('2026-08-04,2026-08-11')
   })
 })
+
+describe('the text of a date input opens a calendar', () => {
+  test('so it says so, as a combobox with a dialog', async () => {
+    const host = await field()
+    expect(control(host).getAttribute('role')).toBe('combobox')
+    expect(control(host).getAttribute('aria-haspopup')).toBe('dialog')
+    expect(control(host).getAttribute('aria-expanded')).toBe('false')
+    host.open = true
+    await host.updateComplete
+    expect(control(host).getAttribute('aria-expanded')).toBe('true')
+  })
+})
