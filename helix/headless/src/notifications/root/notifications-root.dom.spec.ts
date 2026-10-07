@@ -715,3 +715,43 @@ describe('the list’s name', () => {
     expect(part(element, 'list')?.hasAttribute('aria-label')).toBe(false)
   })
 })
+
+describe('leaving the feed from the keyboard', () => {
+  test('Control+End goes to the first control after it, and Control+Home to the one before', async () => {
+    const page = await mount(`<div>
+      <button id="before">Before</button>
+      <helix-headless-notifications label="Activity">
+        <helix-headless-notification>One <button>Reply</button></helix-headless-notification>
+        <helix-headless-notification>Two</helix-headless-notification>
+      </helix-headless-notifications>
+      <button id="after">After</button>
+    </div>`)
+    const before = page.querySelector('#before') as HTMLElement
+    const after = page.querySelector('#after') as HTMLElement
+    const reply = page.querySelector('helix-headless-notification button') as HTMLElement
+    /* happy-dom lays nothing out, so the controls are given a box to count as
+       shown. */
+    for (const one of page.querySelectorAll('button')) {
+      if (!hasLayout()) {
+        one.getClientRects = () => [{}] as unknown as DOMRectList
+      }
+    }
+    const press = (from: Element, key: string): boolean => {
+      const event = new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        ctrlKey: true,
+        key,
+      })
+      from.dispatchEvent(event)
+      return event.defaultPrevented
+    }
+    reply.focus()
+    expect(press(reply, 'End')).toBe(true)
+    expect(document.activeElement).toBe(after)
+    reply.focus()
+    expect(press(reply, 'Home')).toBe(true)
+    expect(document.activeElement).toBe(before)
+  })
+})

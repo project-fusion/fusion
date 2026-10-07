@@ -46,6 +46,17 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
  * the feed holds one page of a longer list, and each row says its place in the
  * whole of it.
  *
+ * **Keyboard.**
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Down, Up | On a row, moves to the next or the previous row. |
+ * | Home, End | On a row, moves to the first or the last row. |
+ * | Page Down, Page Up | From anywhere in a row, moves to the next or the previous row. |
+ * | Control+End | From anywhere in the feed, moves to the first control after it on the page. |
+ * | Control+Home | From anywhere in the feed, moves to the nearest control before it on the page. |
+ * | Tab | Moves through the controls in a row, and on out of the feed. |
+ *
  * **`load-more` adds a button after the list** that sends `helix-load-more`,
  * for a feed that holds one page of a longer list. Append the next page, set
  * `loading` while it is on its way, and take `load-more` off once there is
@@ -387,7 +398,11 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
    * is how the APG feed pattern moves on from inside an article.
    */
   private readonly handleKeydown = (event: KeyboardEvent): void => {
-    if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) {
+    if (event.defaultPrevented || event.altKey || event.metaKey) {
+      return
+    }
+    if (event.ctrlKey) {
+      this.leave(event)
       return
     }
     const rows = this.reachable
@@ -407,6 +422,31 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
       this.stopRow = next
       this.rove()
       rowBox(next)?.focus()
+    }
+  }
+
+  /**
+   * `Control+End` and `Control+Home`, which leave the feed for the first
+   * control after it or the nearest one before it, as the APG feed pattern
+   * does. A feed of many rows is otherwise a long walk to get past.
+   */
+  private leave(event: KeyboardEvent): void {
+    if (event.key !== 'End' && event.key !== 'Home') {
+      return
+    }
+    const after = event.key === 'End'
+    const outside = focusableElements(document.body).filter(
+      (one) =>
+        one.tabIndex >= 0 &&
+        !deepContains(this, one) &&
+        (this.compareDocumentPosition(one) &
+          (after ? Node.DOCUMENT_POSITION_FOLLOWING : Node.DOCUMENT_POSITION_PRECEDING)) !==
+          0,
+    )
+    const next = after ? outside[0] : outside.at(-1)
+    if (next) {
+      event.preventDefault()
+      next.focus()
     }
   }
 
