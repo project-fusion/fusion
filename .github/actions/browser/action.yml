@@ -1,26 +1,47 @@
-# Chromium, restored when it can be, and what it links against.
+# Chromium and the system packages it links against, restored when they can be.
 #
-# **Keyed on the Playwright version and nothing else**, because that is what
-# decides which browser build `playwright install` fetches. It was keyed on the
-# lockfile, so any dependency bump downloaded the same browser again, and it
-# never hit anyway: every job of a run started together on an empty key, each
-# downloaded, and the cache one of them saved was scoped to that pull request.
-# `seed` in `verify.yml` saves it on `main`, where every pull request can read it.
+# **The browser is keyed on the Playwright version and nothing else**, because
+# that is what decides which browser build `playwright install` fetches. It was
+# keyed on the lockfile, so any dependency bump downloaded the same browser
+# again, and it never hit anyway: every job of a run started together on an
+# empty key, each downloaded, and the cache one of them saved was scoped to that
+# pull request. `seed` in `verify.yml` saves it on `main`, where every pull
+# request can read it.
 #
 # **The headless shell and not the whole browser.** `chromium.launch()` runs the
 # shell unless it is given a channel, and nothing here gives one, so the full
 # Chrome for Testing was a second download no check started.
 #
-# **`--with-deps` still runs**: the system packages are not in this cache, and
-# among them are the fonts a picture is taken with, installed on the runner that
-# took every baseline.
+# **The system packages are cached as the `.deb` files apt fetched**, keyed on
+# the runner image and the Playwright version. On a hit `dpkg` installs them
+# from the cache and the job never contacts the Ubuntu mirror. Every browser job
+# used to run `apt-get update` and fetch the same 32 MB, and on October 7, 2026
+# the mirror stalled often enough to fail runs: Azure's copy did not answer, apt
+# moved to `archive.ubuntu.com`, and the job sat in `apt-get update` with no
+# output until its 15-minute timeout. Over 1,072 browser jobs that day the step
+# took 32 seconds at the median, 347 at the 90th percentile and 967 at the
+# worst.
+#
+# **Keyed on the runner image because the set is a difference.** Most of what
+# Chromium needs is on the image already. apt fetches the rest, and upgrades the
+# few libraries the image holds an older build of, FreeType and Mesa among them.
+# The same files installed on a newer image could downgrade what it ships, so a
+# new image is a new key. The fonts in the set decide what a picture shows, and
+# these are the packages, at the versions, the baselines were taken with.
+#
+# **A miss installs from the mirror with a limit and a second try.** apt gives
+# up on a silent connection after 20 seconds and retries, each attempt is
+# capped at three minutes, and the second attempt drops the first mirror from
+# the runner's list. A miss caches what it fetched only when every package apt
+# installed or upgraded is there as a file, so a hit never installs part of the
+# set.
 name: Install Chromium
-description: Restores the Playwright browser for the version the lockfile holds, and installs its system packages.
+description: Restores the Playwright browser for the version the lockfile holds, and its system packages for the runner image, and installs both.
 
 runs:
   using: composite
   steps:
-    - name: Read the Playwright version off the lockfile
+    - name: Read the Playwright version and the runner image
       id: version
       shell: bash
       run: |
@@ -28,6 +49,12 @@ runs:
         version=$(grep -oE '"playwright-core@[^"]+"' bun.lock | head -1 | tr -d '"' | cut -d@ -f2)
         [ -n "$version" ] || { echo "::error::bun.lock names no playwright-core"; exit 1; }
         echo "version=$version" >> "$GITHUB_OUTPUT"
+        # Every GitHub-hosted runner sets `ImageOS` and `ImageVersion`. Without
+        # them nothing names the packages the machine already holds, and the
+        # packages come from the mirror.
+        if [ -n "${ImageOS:-}" ] && [ -n "${ImageVersion:-}" ]; then
+          echo "image=$ImageOS-$ImageVersion" >> "$GITHUB_OUTPUT"
+        fi
 
     - name: Restore the browser
       uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
@@ -35,6 +62,70 @@ runs:
         key: playwright-${{ runner.os }}-${{ steps.version.outputs.version }}
         path: ~/.cache/ms-playwright
 
-    - name: Install Chromium and its system packages
+    - name: Restore the system packages
+      id: packages
+      if: steps.version.outputs.image != ''
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        key: playwright-deps-${{ steps.version.outputs.image }}-${{ steps.version.outputs.version }}
+        path: ~/.cache/playwright-deps
+
+    - name: Install the system packages from the cache
+      if: steps.packages.outputs.cache-hit == 'true'
       shell: bash
-      run: bunx playwright install --with-deps --only-shell chromium
+      run: |
+        set -euo pipefail
+        shopt -s nullglob
+        files=(~/.cache/playwright-deps/*.deb)
+        echo "${#files[@]} packages from the cache"
+        if [ "${#files[@]}" -gt 0 ]; then
+          sudo dpkg -i "${files[@]}"
+        fi
+
+    # The command is the one every job ran before the cache, so the mirror
+    # installs the same set it always did.
+    - name: Install the system packages from the mirror
+      if: steps.packages.outputs.cache-hit != 'true'
+      shell: bash
+      env:
+        IMAGE: ${{ steps.version.outputs.image }}
+      run: |
+        set -euo pipefail
+        shopt -s nullglob
+        sudo tee /etc/apt/apt.conf.d/90-playwright-deps > /dev/null <<'CONF'
+        Acquire::Retries "3";
+        Acquire::http::Timeout "20";
+        Acquire::https::Timeout "20";
+        APT::Keep-Downloaded-Packages "true";
+        CONF
+        sudo apt-get clean
+        dpkg-query -W -f='${binary:Package} ${Version}\n' | sort > "$RUNNER_TEMP/packages-before"
+        if ! timeout 180 bunx playwright install --with-deps --only-shell chromium; then
+          echo "::warning::The first mirror stalled or failed. Trying again without it."
+          sudo dpkg --configure -a || true
+          if [ -f /etc/apt/apt-mirrors.txt ] && [ "$(wc -l < /etc/apt/apt-mirrors.txt)" -gt 1 ]; then
+            sudo sed -i 1d /etc/apt/apt-mirrors.txt
+          fi
+          timeout 180 bunx playwright install --with-deps --only-shell chromium
+        fi
+        dpkg-query -W -f='${binary:Package} ${Version}\n' | sort > "$RUNNER_TEMP/packages-after"
+        comm -13 "$RUNNER_TEMP/packages-before" "$RUNNER_TEMP/packages-after" > "$RUNNER_TEMP/packages-changed"
+        changed=$(wc -l < "$RUNNER_TEMP/packages-changed")
+        files=(/var/cache/apt/archives/*.deb)
+        echo "apt installed or upgraded $changed packages and kept ${#files[@]} files"
+        if [ -z "$IMAGE" ]; then
+          exit 0
+        fi
+        if [ "$changed" -ne "${#files[@]}" ]; then
+          echo "::warning::apt kept ${#files[@]} files for $changed packages, so none are cached."
+          exit 0
+        fi
+        mkdir -p ~/.cache/playwright-deps
+        cp "$RUNNER_TEMP/packages-changed" ~/.cache/playwright-deps/packages.txt
+        if [ "${#files[@]}" -gt 0 ]; then
+          cp "${files[@]}" ~/.cache/playwright-deps/
+        fi
+
+    - name: Install Chromium
+      shell: bash
+      run: bunx playwright install --only-shell chromium

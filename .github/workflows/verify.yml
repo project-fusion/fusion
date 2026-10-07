@@ -98,9 +98,11 @@ jobs:
     steps:
       - name: Check out
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Read the Playwright version off the lockfile
+      - name: Read the Playwright version off the lockfile, and the runner image
         id: version
-        run: echo "version=$(grep -oE '"playwright-core@[^"]+"' bun.lock | head -1 | tr -d '"' | cut -d@ -f2)" >> "$GITHUB_OUTPUT"
+        run: |
+          echo "version=$(grep -oE '"playwright-core@[^"]+"' bun.lock | head -1 | tr -d '"' | cut -d@ -f2)" >> "$GITHUB_OUTPUT"
+          echo "image=$ImageOS-$ImageVersion" >> "$GITHUB_OUTPUT"
       - name: Look up the dependencies
         id: dependencies
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
@@ -115,16 +117,26 @@ jobs:
           key: playwright-${{ runner.os }}-${{ steps.version.outputs.version }}
           lookup-only: true
           path: ~/.cache/ms-playwright
+      # The browser's system packages, keyed as `.github/actions/browser` keys
+      # them. A new runner image is a new key, so this misses once for each image.
+      - name: Look up the browser's system packages
+        id: packages
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          key: playwright-deps-${{ steps.version.outputs.image }}-${{ steps.version.outputs.version }}
+          lookup-only: true
+          path: ~/.cache/playwright-deps
       # Saves the dependencies on its way out when they missed.
       - name: Set up bun and the dependencies
-        if: steps.dependencies.outputs.cache-hit != 'true' || steps.browser.outputs.cache-hit != 'true'
+        if: steps.dependencies.outputs.cache-hit != 'true' || steps.browser.outputs.cache-hit != 'true' || steps.packages.outputs.cache-hit != 'true'
         uses: ./.github/actions/setup
         with:
           # It reads the lockfile and builds nothing.
           helix: false
-      # Saves the browser on its way out when it missed.
+      # Saves the browser and its system packages on its way out, each when it
+      # missed.
       - name: Install Chromium
-        if: steps.browser.outputs.cache-hit != 'true'
+        if: steps.browser.outputs.cache-hit != 'true' || steps.packages.outputs.cache-hit != 'true'
         uses: ./.github/actions/browser
       # A hit is one restore of the binary; a miss builds and saves it.
       - name: Put the helix binary on disk
