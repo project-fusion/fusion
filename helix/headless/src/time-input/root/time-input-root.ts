@@ -129,6 +129,8 @@ import '../../time-picker/index.js'
  * @csspart picker-column-search-field - The filter field.
  * @csspart picker-columns - The row of columns, in `wheels`.
  * @csspart picker-feedback - The picker's own message, under the times, while the picker's `feedback` is set.
+ * @csspart picker-hint - The picker's hint, which Time Input never sets: help under the field is the field's own `hint`.
+ * @csspart picker-label - The picker's visible label, which Time Input never draws: the field's `label` names it.
  * @csspart picker-list - The listbox holding the times, in `list`.
  * @csspart picker-list-empty - The text shown when the filter hides every option.
  * @csspart picker-list-error - The list's `error` part, which the list never sets: its times do not load.
@@ -634,7 +636,8 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
         column-filter-mark: picker-column-filter-mark, column-hint: picker-column-hint,
         column-items: picker-column-items, column-label: picker-column-label,
         column-live: picker-column-live, column-loading: picker-column-loading, column-search: picker-column-search,
-        column-search-field: picker-column-search-field, columns: picker-columns, feedback: picker-feedback, list: picker-list,
+        column-search-field: picker-column-search-field, columns: picker-columns, feedback: picker-feedback, hint: picker-hint,
+        label: picker-label, list: picker-list,
         list-empty: picker-list-empty, list-error: picker-list-error, list-feedback: picker-list-feedback,
         list-filter-icon: picker-list-filter-icon, list-filter-mark: picker-list-filter-mark,
         list-hint: picker-list-hint, list-items: picker-list-items, list-label: picker-list-label,
