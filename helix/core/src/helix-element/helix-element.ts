@@ -115,6 +115,18 @@ const SCROLLER = '[data-scroller]{overflow:auto}'
 const VIRTUAL = '[data-virtual]{overflow-anchor:none}'
 
 /**
+ * Words a screen reader reads where the eye reads something else, which a
+ * component marks `data-spoken`: `⇧⌘P` in Kbd is read as `Shift Command P`.
+ *
+ * The drawn text is `aria-hidden` and the words sit beside it, in no box the
+ * eye sees. The rule takes the words out of the layout and paints none of
+ * them, and names no token, so it belongs with the mechanisms here. Without
+ * it a page that loads only `helix/headless` showed both.
+ */
+const SPOKEN =
+  '[data-spoken]{position:absolute;inline-size:1px;block-size:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}'
+
+/**
  * Turns a drawing that runs along the line of text, or a glyph that points
  * along it, round with it on a right-to-left page.
  *
@@ -228,7 +240,7 @@ const SETTLED =
  * gzip more in Format Date under Rollup. The order is the same, so the
  * cascade is too.
  */
-const BASE = unsafeCSS(BOX_SIZING + HIDDEN + SCROLLER + VIRTUAL + MIRROR + SETTLED)
+const BASE = unsafeCSS(BOX_SIZING + HIDDEN + SCROLLER + VIRTUAL + SPOKEN + MIRROR + SETTLED)
 
 /**
  * How long an element keeps looking for React's props, and how often.

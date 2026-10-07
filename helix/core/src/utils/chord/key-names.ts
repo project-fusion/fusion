@@ -56,12 +56,82 @@ const ELSEWHERE: Readonly<Record<string, string>> = {
   up: '↑',
 }
 
+/**
+ * The words a screen reader says for a glyph, by the key's name: an Apple
+ * keyboard's modifiers and the arrows. A glyph alone is read as a symbol, or
+ * not at all.
+ */
+const SPOKEN: Readonly<Record<string, string>> = {
+  alt: 'Option',
+  backspace: 'Delete',
+  cmd: 'Command',
+  ctrl: 'Control',
+  del: 'Forward Delete',
+  down: 'Down Arrow',
+  enter: 'Return',
+  left: 'Left Arrow',
+  meta: 'Command',
+  mod: 'Command',
+  opt: 'Option',
+  right: 'Right Arrow',
+  shift: 'Shift',
+  tab: 'Tab',
+  up: 'Up Arrow',
+}
+
+/**
+ * The place of each modifier in a chord, per platform, so a chord is drawn in
+ * the platform's order whatever order it was written in.
+ *
+ * Apple orders its modifiers Control, Option, Shift, Command, as its menus
+ * draw them: `mod+shift+p` is `⇧⌘P` there. Windows writes the Windows key
+ * first, then Ctrl, Alt and Shift, as in `Ctrl+Shift+P`.
+ */
+const ORDER_APPLE: Readonly<Record<string, number>> = {
+  alt: 1,
+  cmd: 3,
+  ctrl: 0,
+  meta: 3,
+  mod: 3,
+  opt: 1,
+  shift: 2,
+}
+
+const ORDER_ELSEWHERE: Readonly<Record<string, number>> = {
+  alt: 2,
+  cmd: 0,
+  ctrl: 1,
+  meta: 0,
+  mod: 1,
+  opt: 2,
+  shift: 3,
+}
+
 /** A chord's keys as they are shown, and what is shown between two of them. */
 export interface KeyNames {
-  /** Each key's label, in the order the chord names them. */
+  /** Each key's label, modifiers first in the platform's order, then the rest as written. */
   keys: string[]
   /** What goes between two keys: `+`, a hyphen, or nothing. */
   separator: string
+  /**
+   * The chord in words for a screen reader, such as `Shift Command P`, where a
+   * label is a glyph a reader would hear as a symbol. Empty when every label
+   * is a word already.
+   */
+  spoken: string
+}
+
+/**
+ * A chord's names with its modifiers moved to the front, in the platform's
+ * order. Every other name keeps its place after them.
+ */
+const ordered = (parts: readonly string[], apple: boolean): string[] => {
+  const order = apple ? ORDER_APPLE : ORDER_ELSEWHERE
+  const rank = (part: string): number => order[part.toLowerCase()] ?? Number.POSITIVE_INFINITY
+  return parts
+    .map((part, index) => ({ index, part }))
+    .sort((a, b) => rank(a.part) - rank(b.part) || a.index - b.index)
+    .map(({ part }) => part)
 }
 
 /**
@@ -70,7 +140,9 @@ export interface KeyNames {
  *
  * `parts` are the chord's names as `chordParts` splits them. A name `own`
  * holds takes that label, a name the platform knows takes its glyph or word,
- * and any other single character is shown in capitals.
+ * and any other single character is shown in capitals. **Modifiers come first,
+ * in the platform's order**, so one `keys` value is right on every platform:
+ * `mod+shift+p` is `⇧⌘P` on an Apple keyboard and `Ctrl+Shift+P` elsewhere.
  *
  * **On an Apple keyboard glyphs run together and words are joined with a
  * hyphen**, as Apple writes `Command-K`. A label of more than one character
@@ -78,6 +150,10 @@ export interface KeyNames {
  * nothing between the two ran them into `CommandK`. The platform's own `Esc`
  * and `Space` keep running on from a glyph, as `⌘Esc` always has. Everywhere
  * else keys are joined with `+`.
+ *
+ * `spoken` says the chord in words where a label is one of the platform's
+ * glyphs, such as `⌘` or `↑`, which a screen reader reads as a symbol or
+ * skips. A label from `own` is taken as words already.
  */
 export const keyNames = (
   parts: readonly string[],
@@ -86,14 +162,26 @@ export const keyNames = (
 ): KeyNames => {
   const names = apple ? APPLE : ELSEWHERE
   let worded = false
-  const keys = parts.map((part) => {
+  let glyphs = false
+  const words: string[] = []
+  const keys = ordered(parts, apple).map((part) => {
     const name = part.toLowerCase()
     const mine = own[name]
     if (mine !== undefined) {
       worded ||= [...mine].length > 1
+      words.push(mine)
       return mine
     }
-    return names[name] ?? (part.length === 1 ? part.toUpperCase() : part)
+    const shown = names[name] ?? (part.length === 1 ? part.toUpperCase() : part)
+    const said = SPOKEN[name]
+    const glyph = said !== undefined && [...shown].length === 1
+    glyphs ||= glyph
+    words.push(glyph ? said : shown)
+    return shown
   })
-  return { keys, separator: apple ? (worded ? '-' : '') : '+' }
+  return {
+    keys,
+    separator: apple ? (worded ? '-' : '') : '+',
+    spoken: glyphs ? words.join(' ') : '',
+  }
 }
