@@ -93,6 +93,11 @@ interface EyeDropperConstructor {
  * is named by its color. The opacity ramp is heard as a percentage. Set
  * `color-words` to speak the names in another language.
  *
+ * `label` names the picker, which is then a group with that name, and the
+ * square's ramps say it before their own, as "Brand, Saturation". `hint`
+ * writes help under the picker, which the square, the ramps and the value
+ * field are described by. Inside Color Input the field carries both.
+ *
  * The presets are a listbox with the current color selected, and one tab
  * stop. The arrow keys move between them, Home and End go to the ends, and
  * Enter, Space or a press chooses one.
@@ -104,6 +109,8 @@ interface EyeDropperConstructor {
  * @documentation https://fusion.dev/helix/components/color-picker
  *
  * @slot eyedropper-icon - The icon on the eyedropper button, usually a dropper.
+ * @slot hint - Help under the picker, for content richer than the `hint` text.
+ * @slot label - The name above the picker, for content richer than the `label` text.
  *
  * @event {Event} change - Fired after the value changes.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the color changes. Cancelable: call `preventDefault()` to keep the current color.
@@ -123,6 +130,8 @@ interface EyeDropperConstructor {
  * @csspart channel-marker-label - The value a mark stands at, when `marker-labels` is set.
  * @csspart channel-markers - The row of marks along the track.
  * @csspart channel-output - The current value, shown beside the track.
+ * @csspart channel-thumb - A ramp's thumb box, which holds no content in a picker.
+ * @csspart channel-thumbs - The layer over a ramp's track that holds its thumb box.
  * @csspart channel-tooltip - A ramp's value in a bubble, where a ramp shows one.
  * @csspart channel-tooltips - The layer over a ramp's track that holds its bubble.
  * @csspart channels - The ramps beside the sample.
@@ -149,6 +158,8 @@ interface EyeDropperConstructor {
  * `--color-picker-brightness`, and this tier ships no CSS.
  * @csspart grid-brightness - The range input for the square's vertical axis.
  * @csspart grid-saturation - The range input for the square's horizontal axis.
+ * @csspart hint - The help under the picker, while `hint` is set or the `hint` slot has content.
+ * @csspart label - The name above the picker, while `label` is set or the `label` slot has content.
  * @csspart sample - A chip of the current color. Pressing it copies the value.
  * @csspart swatch - One preset, an option in the `swatches` listbox.
  * @csspart swatches - The row of presets, a listbox.
@@ -311,11 +322,25 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
   greenLabel = 'Green'
 
   /**
+   * Help under the picker, such as what the color is used for. The `hint`
+   * slot takes richer content.
+   */
+  @property()
+  hint = ''
+
+  /**
    * What the hue channel is called.
    */
   @words
   @property({ attribute: 'hue-label' })
   hueLabel = 'Hue'
+
+  /**
+   * The name above the picker, such as "Brand color". The picker is then a
+   * group with this name. The `label` slot takes richer content.
+   */
+  @property()
+  label = ''
 
   /**
    * What the lightness channel's field is called, in `channel-fields` with
@@ -520,6 +545,45 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
   /** The preset the reader was last on, which holds the row's one tab stop. */
   @state()
   private swatchAt: number | undefined
+
+  /** The `label` and `hint` slots that have content. */
+  @state()
+  private slotted = new Set<string>()
+
+  private readonly handleNamingSlot = (event: Event): void => {
+    const slot = event.target as HTMLSlotElement
+    const filled = slot.assignedNodes().some((node) => (node.textContent ?? '').trim() !== '')
+    if (filled !== this.slotted.has(slot.name)) {
+      const next = new Set(this.slotted)
+      next[filled ? 'add' : 'delete'](slot.name)
+      this.slotted = next
+    }
+  }
+
+  /** The picker's own name, from `label` or the `label` slot's words. */
+  private get named(): string {
+    return (
+      this.label ||
+      (this.slotted.has('label')
+        ? [...this.children]
+            .filter((child) => child.slot === 'label')
+            .map((child) => child.textContent ?? '')
+            .join(' ')
+            .trim()
+        : '')
+    )
+  }
+
+  /** Whether help is shown under the picker. */
+  private get hinted(): boolean {
+    return this.hint !== '' || this.slotted.has('hint')
+  }
+
+  /** The ids a control in the picker is described by: the help, then the message. */
+  private get describedBy(): string | typeof nothing {
+    const ids = [this.hinted ? 'hint' : '', this.feedback === '' ? '' : 'feedback'].filter(Boolean)
+    return ids.length > 0 ? ids.join(' ') : nothing
+  }
 
   /** Whether a pointer is dragging the square's handle, said as `:state(dragging)`. */
   @state()
@@ -1075,7 +1139,8 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
       exportparts="control: channel-control, feedback: channel-feedback, field: channel-field,
         hint: channel-hint, label: channel-label, marker: channel-marker,
         marker-label: channel-marker-label, markers: channel-markers, output: channel-output,
-        tooltip: channel-tooltip, tooltips: channel-tooltips"
+        thumb: channel-thumb, thumbs: channel-thumbs, tooltip: channel-tooltip,
+        tooltips: channel-tooltips"
       data-channel=${channel}
       aria-invalid=${this.marked ? 'true' : nothing}
       label=${label}
@@ -1185,7 +1250,12 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
        name has somewhere to be read. Unlabeled, the host stays without a
        role, as it is inside Color Input. */
     const outside = [...(this.internals.labels ?? [])] as HTMLElement[]
-    hostAria(this.internals, { labelledBy: outside, role: outside.length > 0 ? 'group' : '' })
+    const named = this.named
+    hostAria(this.internals, {
+      label: outside.length > 0 ? '' : named,
+      labelledBy: outside,
+      role: outside.length > 0 || named !== '' ? 'group' : '',
+    })
     if (!this.hydrating) {
       this.sampling = 'EyeDropper' in globalThis
     }
@@ -1308,7 +1378,7 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
     /* The square's two inputs are named with the picker's own name where it
        has one, as React Aria's color area names its own: "Brand, Saturation"
        says which picker on a page with two. */
-    const owner = this.getAttribute('aria-label')?.trim()
+    const owner = this.getAttribute('aria-label')?.trim() || this.named
     const axisName = (channel: string): string => (owner ? `${owner}, ${channel}` : channel)
     const area = html`<div
         part="grid"
@@ -1325,7 +1395,7 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
           min="0"
           max="100"
           aria-label=${axisName(this.saturationLabel)}
-          aria-describedby=${this.feedback === '' ? nothing : 'feedback'}
+          aria-describedby=${this.describedBy}
           aria-valuetext=${both}
           aria-invalid=${this.marked ? 'true' : nothing}
           .value=${String(color.saturation)}
@@ -1350,7 +1420,7 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
           tabindex="-1"
           style="writing-mode: vertical-lr; direction: rtl"
           aria-label=${axisName(this.brightnessLabel)}
-          aria-describedby=${this.feedback === '' ? nothing : 'feedback'}
+          aria-describedby=${this.describedBy}
           aria-valuetext=${reversed}
           aria-invalid=${this.marked ? 'true' : nothing}
           .value=${String(color.brightness)}
@@ -1359,9 +1429,12 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
           @change=${() => this.settle()}
         />
       </div>`
-    return html`${
-      this.wheel
-        ? html`<div
+    return html`<div part="label" ?hidden=${this.named === ''}>
+        <slot name="label" @slotchange=${this.handleNamingSlot}>${this.label}</slot>
+      </div>
+      ${
+        this.wheel
+          ? html`<div
             part="wheel"
             style="--color-picker-hue: ${color.hue}"
             @pointerdown=${this.handleWheelPointer}
@@ -1381,7 +1454,7 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
               max="360"
               dir="ltr"
               aria-label=${axisName(this.hueLabel)}
-              aria-describedby=${this.feedback === '' ? nothing : 'feedback'}
+              aria-describedby=${this.describedBy}
               aria-valuetext=${hueSaid(color.hue)}
               aria-invalid=${this.marked ? 'true' : nothing}
               .value=${String(color.hue)}
@@ -1391,8 +1464,8 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
             />
             ${area}
           </div>`
-        : area
-    }
+          : area
+      }
 
       <div part="controls" style="--color-picker-hue: ${color.hue}; --color-picker-swatch: ${painted}">
         <button
@@ -1439,7 +1512,7 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
                 part="value"
                 type="text"
                 aria-label=${this.valueLabel}
-                aria-describedby=${this.feedback === '' ? nothing : 'feedback'}
+                aria-describedby=${this.describedBy}
                 aria-invalid=${this.marked ? 'true' : nothing}
                 autocomplete=${this.autocomplete || nothing}
                 spellcheck="false"
@@ -1457,6 +1530,9 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
       </div>
 
       ${this.presets.length === 0 ? nothing : this.renderSwatches(painted)}
+      <div part="hint" id="hint" ?hidden=${!this.hinted}>
+        <slot name="hint" @slotchange=${this.handleNamingSlot}>${this.hint}</slot>
+      </div>
       ${this.renderPickerFeedback()}`
   }
 }
