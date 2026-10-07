@@ -40,6 +40,7 @@ type SuggestionOption = HTMLElement & {
   active: boolean
   disabled: boolean
   select(): void
+  selectionFollowsActive?: boolean
   value: string
 }
 

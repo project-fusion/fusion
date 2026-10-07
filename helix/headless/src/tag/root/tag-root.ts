@@ -89,16 +89,6 @@ export class HelixHeadlessTag extends MixinDismissible(HelixElement) {
   override dismissLabel = 'Remove {label}'
 
   /**
-   * Whether the tag holds its group's tab stop.
-   *
-   * Written by `Tag.Group` on every tag it holds, and unset outside one, which
-   * is how a tag knows it is a row. No attribute: it is coordination between
-   * elements, the same shape `Toggle.focusable` has.
-   */
-  @property({ attribute: false })
-  focusable?: boolean
-
-  /**
    * Whether the remove button is a tab stop of its own, outside a `Tag.Group`.
    *
    * A field that holds tags as its tokens, such as a `multiple` Combobox,
@@ -108,6 +98,16 @@ export class HelixHeadlessTag extends MixinDismissible(HelixElement) {
    */
   @property({ attribute: false })
   dismissTabStop = true
+
+  /**
+   * Whether the tag holds its group's tab stop.
+   *
+   * Written by `Tag.Group` on every tag it holds, and unset outside one, which
+   * is how a tag knows it is a row. No attribute: it is coordination between
+   * elements, the same shape `Toggle.focusable` has.
+   */
+  @property({ attribute: false })
+  focusable?: boolean
 
   /**
    * Makes the label a link to this address.
