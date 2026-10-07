@@ -5,6 +5,7 @@ import {
   hostAria,
   PaintGateController,
   readColor,
+  words,
   wordsConverter,
 } from '@fusion.dev/helix-core'
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
@@ -37,17 +38,6 @@ const LIGHT_Y = 0.36
 
 /** The frame the still orb is drawn at: far enough in to have a shape. */
 const STILL_PHASE = 1.4
-
-/** What each state is called, for a reader who cannot see it. */
-const LABELS: Record<OrbState, string> = {
-  connecting: 'Connecting',
-  done: 'Done',
-  fetching: 'Fetching',
-  listening: 'Listening',
-  thinking: 'Thinking',
-  waiting: 'Waiting',
-  working: 'Working',
-}
 
 /** A dot, ready to sort and draw. */
 interface Dot {
@@ -125,6 +115,12 @@ const GRAY: ColorBytes = [128, 128, 128]
  */
 @customElement('helix-orb')
 export class HelixOrb extends HelixElement {
+  /**
+   * The key this family's words are registered under, its tag:
+   * `registerWords('de', { 'helix-orb': { stateLabels: { thinking: 'Denkt nach' } } })`.
+   */
+  static words = 'helix-orb'
+
   static override styles: CSSResultGroup = [liveStyles, styles]
 
   /**
@@ -194,8 +190,10 @@ export class HelixOrb extends HelixElement {
    * object as JSON, such as `state-labels='{"done":"Terminé"}'`, so server
    * markup and plain HTML can carry the words too.
    */
+  // biome-ignore format: the words audit reads a table's English from the line it starts on
+  @words
   @property({ attribute: 'state-labels', converter: wordsConverter })
-  stateLabels: Partial<Record<OrbState, string>> = {}
+  stateLabels: Partial<Record<OrbState, string>> = { connecting: 'Connecting', done: 'Done', fetching: 'Fetching', listening: 'Listening', thinking: 'Thinking', waiting: 'Waiting', working: 'Working' }
 
   private canvas: HTMLCanvasElement | undefined
   private context: CanvasRenderingContext2D | null = null
@@ -297,7 +295,7 @@ export class HelixOrb extends HelixElement {
 
   /** The word for the state drawn, in the page's words where it gave them. */
   private get word(): string {
-    return this.stateLabels?.[this.shown] || LABELS[this.shown]
+    return this.stateLabels?.[this.shown] ?? ''
   }
 
   protected override render(): TemplateResult {

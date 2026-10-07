@@ -1,4 +1,4 @@
-import { customElement, HelixElement } from '@fusion.dev/helix-core'
+import { customElement, formatWords, HelixElement, words } from '@fusion.dev/helix-core'
 import type { CSSResultGroup, TemplateResult } from 'lit'
 import { html, nothing } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -49,6 +49,12 @@ const LABELS: Record<string, string> = {
 @customElement('helix-sandbox-status-bar')
 export class HelixSandboxStatusBar extends HelixElement {
   /**
+   * The key this part's words are registered under, its tag:
+   * `registerWords('de', { 'helix-sandbox-status-bar': { positionLabel: 'Z. {line}, Sp. {column}' } })`.
+   */
+  static words = 'helix-sandbox-status-bar'
+
+  /**
    * One-based column of the cursor.
    *
    * Absent shows no readout.
@@ -70,12 +76,23 @@ export class HelixSandboxStatusBar extends HelixElement {
   @property({ type: Number })
   line?: number
 
+  /**
+   * How the cursor's place reads. `{line}` and `{column}` are the line and
+   * the column, written as an editor writes them, without grouping.
+   */
+  @words
+  @property({ attribute: 'position-label' })
+  positionLabel = 'Ln {line}, Col {column}'
+
   /** How the position reads, or nothing when there is no cursor to report. */
   private get position(): string | undefined {
     if (this.line === undefined || this.column === undefined) {
       return undefined
     }
-    return `Ln ${this.line}, Col ${this.column}`
+    return formatWords(this, 'positionLabel', {
+      column: String(this.column),
+      line: String(this.line),
+    })
   }
 
   protected override render(): TemplateResult {

@@ -4,6 +4,7 @@ import {
   HelixConsoleEvent,
   HelixElement,
   HelixResizeEvent,
+  words,
 } from '@fusion.dev/helix-core'
 
 /**
@@ -112,6 +113,12 @@ export type PreviewMessage =
 @customElement('helix-sandbox-preview')
 export class HelixSandboxPreview extends HelixElement {
   /**
+   * The key this part's words are registered under, its tag:
+   * `registerWords('de', { 'helix-sandbox-preview': { label: 'Vorschau' } })`.
+   */
+  static words = 'helix-sandbox-preview'
+
+  /**
    * The color mode the frame renders in.
    *
    * **The frame is a document and a document has its own color mode.** Setting
@@ -143,6 +150,7 @@ export class HelixSandboxPreview extends HelixElement {
   /**
    * The frame's name, read by screen readers.
    */
+  @words
   @property()
   label = 'Preview'
 
@@ -240,13 +248,14 @@ export class HelixSandboxPreview extends HelixElement {
     if (event.source !== this.frame?.contentWindow || event.origin !== 'null') {
       return
     }
-    if (event.data?.type === 'helix-preview-ready') {
+    const data = event.data
+    if (data?.type === 'helix-preview-ready') {
       this.handleFrameLoad()
       return
     }
-    if (event.data?.type === 'helix-preview-console') {
-      this.dispatchEvent(new HelixConsoleEvent({ level: event.data.level, text: event.data.text }))
-      if (event.data.uncaught) {
+    if (data?.type === 'helix-preview-console') {
+      this.dispatchEvent(new HelixConsoleEvent({ level: data.level, text: data.text }))
+      if (data.uncaught) {
         this.toggleState('failed', true)
       }
     }
@@ -270,7 +279,7 @@ export class HelixSandboxPreview extends HelixElement {
      * `composed` so it leaves whatever shadow root this element sits in, which
      * is how those listeners find it in the path.
      */
-    if (event.data?.type === 'helix-preview-press') {
+    if (data?.type === 'helix-preview-press') {
       this.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true }))
     }
     /* Relayed rather than acted on. What the frame measured is a fact about the
@@ -278,8 +287,8 @@ export class HelixSandboxPreview extends HelixElement {
        whatever laid this element out. A preview that resized itself would be
        deciding for the page it sits in, and the workbench and a reference page
        want opposite things from the same number. */
-    if (event.data?.type === 'helix-preview-size') {
-      this.dispatchEvent(new HelixResizeEvent({ size: event.data.size }))
+    if (data?.type === 'helix-preview-size') {
+      this.dispatchEvent(new HelixResizeEvent({ size: data.size }))
     }
   }
 

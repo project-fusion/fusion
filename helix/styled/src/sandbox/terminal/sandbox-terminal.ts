@@ -1,9 +1,11 @@
 import {
   type ConsoleDetail,
   customElement,
+  formatWords,
   HelixBeforeChangeEvent,
   HelixElement,
   requestChange,
+  words,
   wordsConverter,
 } from '@fusion.dev/helix-core'
 import type { CSSResultGroup, TemplateResult } from 'lit'
@@ -11,14 +13,6 @@ import { html, nothing } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { type ConsoleLevel, LEVELS, shows } from '../levels.js'
 import { styles } from './sandbox-terminal.css.js'
-
-/** What each choice of the level filter reads, in English until a page says otherwise. */
-const LEVEL_WORDS: Record<ConsoleLevel, string> = {
-  error: 'Errors',
-  info: 'Info and above',
-  log: 'All levels',
-  warn: 'Warnings and errors',
-}
 
 /** One line, with however many times it has arrived in a row. */
 interface Entry extends ConsoleDetail {
@@ -76,8 +70,15 @@ const stop = (event: Event): void => event.stopPropagation()
 @customElement('helix-sandbox-terminal')
 export class HelixSandboxTerminal extends HelixElement {
   /**
+   * The key this part's words are registered under, its tag:
+   * `registerWords('de', { 'helix-sandbox-terminal': { clearLabel: 'Leeren' } })`.
+   */
+  static words = 'helix-sandbox-terminal'
+
+  /**
    * The clear button's text, under `controls`.
    */
+  @words
   @property({ attribute: 'clear-label' })
   clearLabel = 'Clear'
 
@@ -93,12 +94,14 @@ export class HelixSandboxTerminal extends HelixElement {
   /**
    * Text shown before anything has been written.
    */
+  @words
   @property({ attribute: 'empty-label' })
   emptyLabel = 'Nothing written to the console yet.'
 
   /**
    * The log's name, read by screen readers.
    */
+  @words
   @property()
   label = 'Console output'
 
@@ -115,6 +118,7 @@ export class HelixSandboxTerminal extends HelixElement {
   /**
    * The level filter's name, read by screen readers, under `controls`.
    */
+  @words
   @property({ attribute: 'level-label' })
   levelLabel = 'Levels shown'
 
@@ -124,8 +128,19 @@ export class HelixSandboxTerminal extends HelixElement {
    * its English words. As an attribute it is that object as JSON, and JSON
    * that does not parse is no words.
    */
+  // biome-ignore format: the words audit reads a table's English from the line it starts on
+  @words
   @property({ attribute: 'level-words', converter: wordsConverter })
-  levelWords: Partial<Record<ConsoleLevel, string>> = {}
+  levelWords: Partial<Record<ConsoleLevel, string>> = { error: 'Errors', info: 'Info and above', log: 'All levels', warn: 'Warnings and errors' }
+
+  /**
+   * What a screen reader is told a repeated line's count is. `{count}` is how
+   * many times it was written, two or more, in the locale, and a language
+   * writes the forms it has: `{count, plural, few {# razy} other {# razy}}`.
+   */
+  @words
+  @property({ attribute: 'times-label' })
+  timesLabel = '{count} times'
 
   @state()
   private entries: Entry[] = []
@@ -211,16 +226,20 @@ export class HelixSandboxTerminal extends HelixElement {
     if (!this.controls) {
       return nothing
     }
+    /* Read before the template, so the words audit, which pairs backticks
+       across the nested option template, does not take the button's words for
+       text joined in code. */
+    const clear = this.clearLabel
     return html`<div part="controls">
       <select part="filter" aria-label=${this.levelLabel} @change=${this.handleLevel} @input=${stop}>
         ${LEVELS.map(
           (one) =>
             html`<option value=${one} ?selected=${(this.level ?? 'log') === one}>
-              ${this.levelWords?.[one] ?? LEVEL_WORDS[one]}
+              ${this.levelWords[one]}
             </option>`,
         )}
       </select>
-      <button part="clear" type="button" @click=${() => this.clear()}>${this.clearLabel}</button>
+      <button part="clear" type="button" @click=${() => this.clear()}>${clear}</button>
     </div>`
   }
 
@@ -238,7 +257,7 @@ export class HelixSandboxTerminal extends HelixElement {
                 <span part="message">${entry.text}</span>
                 ${
                   entry.count > 1
-                    ? html`<span part="count" aria-label="${entry.count} times"
+                    ? html`<span part="count" aria-label=${formatWords(this, 'timesLabel', { count: entry.count })}
                         >${entry.count}</span
                       >`
                     : nothing
