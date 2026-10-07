@@ -104,8 +104,7 @@ slot[name="footer"]::slotted(*) {
 
 /* *A line of its own and its actions at the end of it**, once the actions slot
    holds something: the header or the footer takes the room and the actions
-   keep their own width. Served before the script can see the slot, the
-   actions stand on their own line at the end. */
+   keep their own width. */
 [part="header-row"],
 [part="footer-row"] {
   align-items: center;
@@ -132,6 +131,36 @@ slot[name="footer-actions"]::slotted(*) {
    kinds of control. */
 [part="footer-row"] slot[name="footer-actions"]::slotted(*) {
   margin-inline-start: auto;
+}
+
+/*
+ * **Served, the actions stand at the end of their line already.** Before the
+ * element is defined there is no row around them, since a server cannot see
+ * the slot, so the card is a grid of two columns: everything spans both, and
+ * the header and the footer take the first while their actions take the
+ * second, beside them. The second column is as wide as the actions, and no
+ * wider than nothing where there are none, so a card without actions lays out
+ * as it does once defined.
+ */
+:host(:not(:defined)) {
+  column-gap: var(--helix-space-none);
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+:host(:not(:defined)) slot::slotted(*) {
+  grid-column: 1 / -1;
+}
+
+:host(:not(:defined)) slot[name="header"]::slotted(*),
+:host(:not(:defined)) slot[name="footer"]::slotted(*) {
+  grid-column: 1;
+}
+
+:host(:not(:defined)) slot[name="header-actions"]::slotted(*),
+:host(:not(:defined)) slot[name="footer-actions"]::slotted(*) {
+  align-self: center;
+  grid-column: 2;
+  margin-inline-start: var(--card-gap, var(--helix-space-sm));
 }
 
 /* Sideways is the same stack with the media taken out of flow beside it. And

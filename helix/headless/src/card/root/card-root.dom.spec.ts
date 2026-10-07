@@ -127,8 +127,10 @@ describe('card regions', () => {
     )) as Named
     await card.updateComplete
     const heading = card.querySelector('h2')
+    /* An engine without element references hears the heading's words. */
+    const references = 'ariaLabelledByElements' in (card.internals as object)
     expect(role(card)).toBe('group')
-    if ('ariaLabelledByElements' in card.internals) {
+    if (references) {
       expect(card.internals.ariaLabelledByElements).toEqual([heading as Element])
     } else {
       expect(card.internals.ariaLabel).toBe('Storage')
@@ -139,7 +141,7 @@ describe('card regions', () => {
     await card.updateComplete
     expect(role(card)).toBe('group')
     expect(card.internals.ariaLabel).toBeNull()
-    if ('ariaLabelledByElements' in card.internals) {
+    if (references) {
       expect(card.internals.ariaLabelledByElements).toBeNull()
     }
   })

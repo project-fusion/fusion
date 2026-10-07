@@ -41,7 +41,9 @@ import { property, state } from 'lit/decorators.js'
  * header's and the footer's line, as Web Awesome's card does. While one holds
  * something, its line is a `header-row` or `footer-row` part; otherwise there
  * is no wrapper and every region is a bare slot. A server cannot see slotted
- * content, so served actions sit on their own line until the script runs.
+ * content, so a served card has no row; the styled tier sets served actions at
+ * the end of their line from the stylesheet alone, so they do not move when
+ * the script runs.
  *
  * **The card says which regions it holds**, as `:state(has-media)`,
  * `:state(has-header)` and `:state(has-footer)`, so a sheet can draw a card
