@@ -1,6 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessVideoPlaylist } from '@fusion.dev/helix-headless/video-playlist'
 import type { CSSResultGroup } from 'lit'
+import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './video-playlist-root.css.js'
 
 /**
@@ -23,7 +24,7 @@ import { styles } from './video-playlist-root.css.js'
  */
 @customElement('helix-video-playlist')
 export class HelixVideoPlaylist extends HelixHeadlessVideoPlaylist {
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [liveStyles, styles]
 }
 
 declare global {

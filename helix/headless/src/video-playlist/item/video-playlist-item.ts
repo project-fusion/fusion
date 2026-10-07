@@ -98,6 +98,14 @@ export class HelixHeadlessVideoPlaylistItem extends HelixElement {
       .trim()
   }
 
+  /**
+   * Focuses the entry's button, which is where the playlist's arrow keys send
+   * focus. The host itself takes no focus.
+   */
+  override focus(options?: FocusOptions): void {
+    this.renderRoot?.querySelector<HTMLButtonElement>('button')?.focus(options)
+  }
+
   private readonly choose = (): void => {
     if (this.disabled) {
       return

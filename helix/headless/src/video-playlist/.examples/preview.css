@@ -338,6 +338,11 @@ helix-headless-video-playlist::part(items) {
   overflow-y: auto;
 }
 
+helix-headless-video-playlist::part(live) {
+  clip-path: inset(50%);
+  position: absolute;
+}
+
 helix-headless-video-playlist-item {
   display: block;
 }

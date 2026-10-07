@@ -1,8 +1,12 @@
 import {
   customElement,
+  drawStatus,
+  formatWords,
   HelixElement,
   HelixEndEvent,
+  inlineStep,
   MixinControllerActive,
+  StatusController,
   words,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
@@ -59,10 +63,16 @@ type Player = HTMLElement & {
  * your name, and only the title follows the entry.
  *
  * **Keyboard.** Each entry is a button in the tab order, and Enter or Space
- * plays it. The current entry carries `aria-current`. While focus is on the
- * player, the player's own keys work, and `Video` lists them. Its previous
- * and next controls move through the entries in the same order the playlist
- * does.
+ * plays it. The arrow keys move focus to the entry before or after, and Home
+ * and End to the first and the last, passing over disabled entries. The
+ * current entry carries `aria-current`. While focus is on the player, the
+ * player's own keys work, and `Video` lists them. Its previous and next
+ * controls move through the entries in the same order the playlist does.
+ *
+ * **What a screen reader hears.** A list named by `label`, with a button for
+ * each entry. When the playlist moves to another entry, by a press, by the
+ * player's controls, or at the end of a clip, a live region says
+ * `playing-label`, "Now playing" and the entry's name.
  *
  * @since 0.1.0
  * @status stable
@@ -78,6 +88,7 @@ type Player = HTMLElement & {
  * @event {HelixEndEvent} helix-end - The last entry finished playing, and the playlist stopped there. Not sent while `repeat` is set.
  *
  * @csspart items - The list of entries.
+ * @csspart live - A live region that says which entry plays after the playlist moves.
  * @csspart player - The region that holds the player.
  */
 @customElement('helix-headless-video-playlist')
@@ -94,6 +105,21 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
   @words
   @property()
   label = 'Playlist'
+
+  /**
+   * What the live region says when the playlist moves to another entry.
+   * `{title}` is the entry's name.
+   *
+   * **A move a reader did not make is said.** At the end of a clip the
+   * playlist starts the next one, and the only other trace of that is the
+   * `aria-current` on a button the reader is not on.
+   */
+  @words
+  @property({ attribute: 'playing-label' })
+  playingLabel = 'Now playing {title}'
+
+  /** The live region, rendered from the first move. */
+  private readonly status = new StatusController(this)
 
   /**
    * What happens when an entry ends with no next one to go to. `one` plays the
@@ -288,6 +314,45 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
     this.requestActive((event as CustomEvent<{ value: string }>).detail.value)
   }
 
+  /**
+   * The arrow keys, Home and End on an entry move focus to another one.
+   *
+   * **The entries the keys reach are the enabled ones**, because a disabled
+   * button cannot take focus and a key that landed on one would leave focus
+   * where it was. Up and Left go back, Down and Right go on, and Left and
+   * Right swap on a right-to-left page, so a list laid out in a row moves the
+   * way it reads.
+   */
+  private readonly handleKeydown = (event: KeyboardEvent): void => {
+    const from = event.target
+    if (
+      !(from instanceof HelixHeadlessVideoPlaylistItem) ||
+      event.altKey ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.shiftKey
+    ) {
+      return
+    }
+    const reachable = this.items.filter((one) => !one.disabled)
+    const at = reachable.indexOf(from)
+    const step =
+      event.key === 'ArrowDown' ? 1 : event.key === 'ArrowUp' ? -1 : inlineStep(this, event.key)
+    const to =
+      event.key === 'Home'
+        ? 0
+        : event.key === 'End'
+          ? reachable.length - 1
+          : step !== 0 && at !== -1
+            ? Math.min(Math.max(at + step, 0), reachable.length - 1)
+            : undefined
+    if (to === undefined) {
+      return
+    }
+    event.preventDefault()
+    reachable[to]?.focus()
+  }
+
   private readonly handleNext = (): void => {
     this.next()
   }
@@ -323,6 +388,7 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
   override connectedCallback(): void {
     super.connectedCallback()
     this.addEventListener('helix-select', this.handleSelect)
+    this.addEventListener('keydown', this.handleKeydown)
     this.addEventListener('helix-next', this.handleNext)
     this.addEventListener('helix-previous', this.handlePrevious)
     /* `ended` is a media event and does not compose out of the player's shadow
@@ -340,6 +406,7 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('helix-select', this.handleSelect)
+    this.removeEventListener('keydown', this.handleKeydown)
     this.removeEventListener('helix-next', this.handleNext)
     this.removeEventListener('helix-previous', this.handlePrevious)
     this.removeEventListener('ended', this.handleEnded, true)
@@ -385,6 +452,7 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
         player.label = current.text
       }
       if (this.chased) {
+        this.status.say(formatWords(this, 'playingLabel', { title: current.text }))
         /* After the player has rendered, not now. `src` here is the element's
            property, and the `<video>` inside it only takes the new source on
            its next render: playing at this point plays the outgoing clip for an
@@ -404,7 +472,8 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
     return html`<div part="player"><slot name="player"></slot></div>
       <div part="items" role="list" aria-label=${this.label}>
         <slot></slot>
-      </div>`
+      </div>
+      ${drawStatus(this.status)}`
   }
 }
 
