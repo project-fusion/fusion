@@ -381,6 +381,38 @@ describe('input time with text that is no time', () => {
     await type(host, '14:45')
     expect(formValue(host)).toBe('14:45')
   })
+
+  /* Measured before this: a range or a multiple was invalid and submitted the
+     text, `09:00/10:30`, as its one entry. */
+  test('in a range or a multiple too', async () => {
+    for (const mode of ['range', 'multiple']) {
+      const host = await field(`name="t" mode="${mode}"`)
+      host.value = '09:00/10:30'
+      await host.updateComplete
+      expect(internals(host).validity.valid).toBe(false)
+      expect((formValue(host) as FormData).getAll('t')).toEqual([''])
+    }
+  })
+})
+
+describe('the list a time input opens', () => {
+  /* Measured before this: a field named by a slotted label or an `aria-label`
+     opened a list named "Time". */
+  test('is named as the field is', async () => {
+    const name = (host: InputTime): string | null | undefined =>
+      part(host, 'picker')?.getAttribute('label')
+    expect(name(await field())).toBe('Starts')
+    const slotted = (await mount(
+      '<helix-headless-time-input><span slot="label">Doors open</span></helix-headless-time-input>',
+    )) as InputTime
+    await slotted.updateComplete
+    expect(name(slotted)).toBe('Doors open')
+    const aria = (await mount(
+      '<helix-headless-time-input aria-label="Last entry"></helix-headless-time-input>',
+    )) as InputTime
+    await aria.updateComplete
+    expect(name(aria)).toBe('Last entry')
+  })
 })
 
 describe('input time takes content at either end', () => {

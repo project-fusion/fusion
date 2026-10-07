@@ -1309,6 +1309,17 @@ describe('a date input reads a date as its locale writes one', () => {
     }
   })
 
+  /* Measured before this: a range or a multiple of text that is no date was
+     invalid and submitted each piece of the text. */
+  test('and a range of text that is no date gives the form one empty entry', async () => {
+    for (const mode of ['range', 'multiple']) {
+      const host = await field(`name="d" mode="${mode}"`)
+      host.value = 'soon, later'
+      await host.updateComplete
+      expect((formValue(host) as FormData).getAll('d')).toEqual([''])
+    }
+  })
+
   test('and each end of a range', async () => {
     const host = await field('mode="range" locale="en-US"')
     await type(host, 'Aug 4, 2026 – 8/11/2026')
