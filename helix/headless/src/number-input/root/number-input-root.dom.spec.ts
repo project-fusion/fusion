@@ -850,3 +850,20 @@ describe('a stepper pressed with a mouse', () => {
     expect(host.value).toBe('4')
   })
 })
+
+/* React Aria's NumberField says whether it can step each way; this had no
+   state for a number at a bound. */
+describe('a number at a bound', () => {
+  test('says so as a state, at min and at max', async () => {
+    const host = await field('min="0" max="2" default-value="0"')
+    expect(hasState(host, 'at-min')).toBe(true)
+    expect(hasState(host, 'at-max')).toBe(false)
+    host.value = '2'
+    await host.updateComplete
+    expect(hasState(host, 'at-min')).toBe(false)
+    expect(hasState(host, 'at-max')).toBe(true)
+    host.value = '1'
+    await host.updateComplete
+    expect(hasState(host, 'at-max')).toBe(false)
+  })
+})

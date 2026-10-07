@@ -161,6 +161,8 @@ const REPEAT_EVERY = 60
  * @csspart increment-mark - The icon on the step up button.
  * @csspart label - The label above the field. It is also the grip you drag when `scrub` is set.
  *
+ * @cssstate at-max - The number is at `max`, so it cannot step up, as React Aria's NumberField says with `canIncrement`.
+ * @cssstate at-min - The number is at `min`, so it cannot step down.
  * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
  * @cssstate scrubbing - The label is being dragged to change the value, under `scrub`, as Zag's scrubber says while it is held.
  */
@@ -1022,6 +1024,9 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     this.releaseCaret?.()
     this.releaseCaret = undefined
     this.sync()
+    const parsed = this.numeric
+    this.toggleState('at-min', parsed !== null && this.min !== undefined && parsed <= this.min)
+    this.toggleState('at-max', parsed !== null && this.max !== undefined && parsed >= this.max)
   }
 
   /**
