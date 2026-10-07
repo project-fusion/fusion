@@ -125,7 +125,9 @@ export interface VirtualListRange {
  * **Row height.** Rows are placed by `estimate` until they are drawn. Then the
  * list reads the drawn rows' height once and places every row by it, so a
  * wrong estimate still reaches the last item. Set `measured` for rows of
- * different heights.
+ * different heights. Once the list draws rows of different heights, such as
+ * rows that wrap on a narrow screen, it places each row by its own height
+ * whether `measured` is set or not.
  *
  * The list follows its source. A new `items` array, an edit to the script's
  * text, or a script replaced under the same id draws the new rows. A row that
@@ -231,7 +233,8 @@ export class HelixHeadlessVirtualList extends HelixElement {
   /**
    * Places each row by its own measured height. Without it, rows are placed
    * by one height: `estimate` until rows are drawn, then the drawn rows' height,
-   * read once.
+   * read once. Rows that come out different heights are placed by their own
+   * heights either way.
    *
    * **Off by default, because the straight line is better when it holds.** One
    * height makes offset and index convert by division, which can never
@@ -497,6 +500,9 @@ export class HelixHeadlessVirtualList extends HelixElement {
     super.updated?.(changed)
     this.virtualize.measure()
     this.place()
+    /* The rows are drawn here, after the controller's own measuring pass, so
+       they are measured here too. */
+    this.virtualize.settle()
     this.report()
   }
 
@@ -817,13 +823,21 @@ export class HelixHeadlessVirtualList extends HelixElement {
     }
   }
 
-  /** New elements for item `at`: a `<div>` for `renderItem`, or the template's clone. */
+  /**
+   * New elements for item `at`: a `<div>` for `renderItem`, or the template's clone.
+   *
+   * **Only the template's elements are drawn.** The whitespace around them is
+   * text, and `place` takes rows out by their elements, so every text node
+   * drawn stayed in the list. Measured on the preview in Chromium: 3,846 nodes
+   * after 1,900 rows, and a window move cost 1.9 milliseconds where it had
+   * cost 0.34 at the top.
+   */
   private draw(template: HTMLTemplateElement | null, at: number): DocumentFragment {
     const fragment = document.createDocumentFragment()
     if (this.renderItem) {
       fragment.append(document.createElement('div'))
     } else if (template) {
-      fragment.append(template.content.cloneNode(true))
+      fragment.append(...(template.content.cloneNode(true) as DocumentFragment).children)
     }
     this.fill([...fragment.children], at)
     return fragment

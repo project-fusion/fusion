@@ -13,8 +13,13 @@ export interface VirtualizeOptions {
   estimate: () => number
   /**
    * Rows kept either side of what fits, so a scroll reveals something drawn
-   * rather than something blank. Four by default, which is roughly a frame of
-   * fast scrolling at a 32 pixel row.
+   * rather than something blank. Four by default.
+   *
+   * While the box scrolls, one more screen of rows is drawn on the side it is
+   * scrolling toward. On iOS the scroll runs in another process, and the page
+   * hears where it is a frame or more later. Four rows of 32 pixels cover
+   * about 18 milliseconds of a fling at 7,000 pixels a second, so without
+   * that screen the leading edge showed the empty spacer.
    */
   overscan?: number
   /**
@@ -50,6 +55,17 @@ export interface VirtualizeOptions {
    * whole set the first time it is asked.
    */
   measured?: () => boolean
+  /**
+   * Whether the controller holds the reader still on this pass when rows
+   * above them turn out a different height than estimated. True by default.
+   *
+   * A host that keeps its own reader in place answers false while it does,
+   * because two holds on one box each undo part of the other. `Chat` holds the
+   * turn being read while the log is still, and answers true while the reader
+   * scrolls, so the controller's spacer takes the move and nothing writes the
+   * scroll offset during a fling.
+   */
+  anchor?: () => boolean
 }
 
 /** A row that has been drawn, and which item of the set it drew. */
@@ -104,6 +120,13 @@ export interface RevealOptions {
  * height, then agreement.
  */
 const UNSTABLE = 10
+
+/**
+ * How long the box has to be still, in milliseconds, before a correction
+ * held in the spacer is written to the scroll offset. A fling moves the box
+ * every frame, so a gap this long means it has ended.
+ */
+const REST = 150
 
 /**
  * Works out which slice of a long set is worth rendering.
@@ -179,10 +202,58 @@ export class VirtualizeController implements ReactiveController {
   /** The length of the set when `endInSight` last answered true. */
   private askedAt = -1
 
+  /**
+   * How far the drawn rows sit from where the measured heights place them, in
+   * pixels, while the reader is scrolling.
+   *
+   * **A correction written to `scrollTop` during a fling ends the fling on
+   * iOS.** A row above the reader that turns out shorter than its estimate
+   * moves everything below it, and the controller has to put the reader back.
+   * While the box scrolls, the before spacer takes the difference and
+   * `scrollTop` is left alone. The spacer and the scroll offset are squared
+   * once the box has been still for `REST` milliseconds with no finger on it,
+   * or straight away when the spacer would have to be negative or the first
+   * row would sit below the top of the set.
+   */
+  private drift = 0
+
+  /**
+   * The scroll offset at the last scroll event or the last write of this
+   * controller's own, which gives the direction, and a move still to be heard.
+   */
+  private lastTop = 0
+
+  /**
+   * The item `reveal` scrolled to, which corrections hold still until the
+   * reader scrolls. Rows measured between the top of the box and that item
+   * would otherwise move it back out of view.
+   */
+  private target: number | undefined
+
+  /** The way the box last scrolled: 1 down, -1 up, 0 before any scroll. */
+  private heading: -1 | 0 | 1 = 0
+
+  /** Whether a finger is on the box. iOS keeps scrolling after it lifts. */
+  private touching = false
+
+  /** The timer that ends a scroll, set again on every scroll event. */
+  private resting: ReturnType<typeof setTimeout> | undefined
+
+  /**
+   * Whether the rows drawn on the straight line have come out different
+   * heights. From then on the list is placed by measurement, whatever
+   * `measured` says. A list whose rows are one height on a wide screen can
+   * wrap on a phone, and a straight line through rows of different heights
+   * moves the content by the difference each time a row enters or leaves.
+   */
+  private uneven = false
+
   constructor(host: ReactiveControllerHost, options: VirtualizeOptions) {
     this.host = host
     this.options = options
-    this.heights = new Heights(() => this.options.estimate())
+    /* Unmeasured items stand at the straight line's height, which is the
+       estimate until drawn rows have been read. */
+    this.heights = new Heights(() => this.line())
     host.addController(this)
     /* **The render after a render is this controller's design**: rows are
        measured once they are drawn, and a window that moves draws again.
@@ -221,7 +292,15 @@ export class VirtualizeController implements ReactiveController {
     this.observer?.disconnect()
     this.observer = undefined
     this.watching = false
-    this.options.container()?.removeEventListener('scroll', this.handleScroll)
+    const box = this.options.container()
+    box?.removeEventListener('scroll', this.handleScroll, { capture: true })
+    box?.removeEventListener('touchstart', this.handleTouchStart)
+    box?.removeEventListener('touchend', this.handleTouchEnd)
+    box?.removeEventListener('touchcancel', this.handleTouchEnd)
+    box?.removeEventListener('scrollend', this.handleTouchEnd)
+    clearTimeout(this.resting)
+    this.resting = undefined
+    this.touching = false
   }
 
   /** Attaches to the box the first time there is one to attach to. */
@@ -234,7 +313,21 @@ export class VirtualizeController implements ReactiveController {
       return
     }
     this.observer.observe(box)
-    box.addEventListener('scroll', this.handleScroll, { passive: true })
+    /* **In the capture phase, so it runs before a host's own `scroll`
+       listener on the same box.** A host that measures from its listener gets
+       an update, and the update runs between the two listeners. Run second,
+       this one had not yet marked the box as scrolling, so that update wrote
+       its correction to the scroll offset in the middle of the fling. */
+    box.addEventListener('scroll', this.handleScroll, { capture: true, passive: true })
+    box.addEventListener('touchstart', this.handleTouchStart, { passive: true })
+    box.addEventListener('touchend', this.handleTouchEnd, { passive: true })
+    box.addEventListener('touchcancel', this.handleTouchEnd, { passive: true })
+    /* A scroll that has ended has no finger on it, which covers a touch whose
+       end never arrived. Chromium's synthesized flings send none. */
+    box.addEventListener('scrollend', this.handleTouchEnd, { passive: true })
+    /* Where the box is now, so an offset set before this attached is not
+       read as a move whose event is still to come. */
+    this.lastTop = box.scrollTop
     /* Takes the box out of the browser's scroll anchoring, through a rule
        `HelixElement` ships into every shadow root. See `VIRTUAL` there. */
     box.setAttribute('data-virtual', '')
@@ -245,8 +338,91 @@ export class VirtualizeController implements ReactiveController {
      browser scroll without waiting to find out. */
   private readonly handleScroll = (): void => {
     // A reader moved, which is the one input this exists to answer.
+    const top = this.options.container()?.scrollTop ?? 0
+    if (top !== this.lastTop) {
+      this.heading = top > this.lastTop ? 1 : -1
+      this.lastTop = top
+      this.target = undefined
+      clearTimeout(this.resting)
+      this.resting = setTimeout(this.rest, REST)
+    }
     this.settling = 0
     this.measure()
+  }
+
+  private readonly handleTouchStart = (): void => {
+    this.touching = true
+  }
+
+  private readonly handleTouchEnd = (): void => {
+    this.touching = false
+    if (this.resting === undefined) {
+      this.rest()
+    }
+  }
+
+  /**
+   * Whether the reader is scrolling: a finger is on the box, the box moved
+   * within the last 150 milliseconds, or it has moved and its `scroll` event
+   * has not arrived yet.
+   *
+   * For a host that holds its own reader: a write to the scroll offset while
+   * this is true ends a fling on iOS, and a reader position noted before the
+   * last move is out of date.
+   */
+  scrolling(): boolean {
+    return (
+      this.touching ||
+      this.resting !== undefined ||
+      (this.options.container()?.scrollTop ?? this.lastTop) !== this.lastTop
+    )
+  }
+
+  /** Squares the spacer and the scroll offset once the box is still. */
+  private readonly rest = (): void => {
+    this.resting = undefined
+    if (this.touching || this.drift === 0) {
+      return
+    }
+    this.square()
+    this.settling = 0
+    this.measure()
+    this.host.requestUpdate()
+  }
+
+  /**
+   * Moves the drift into the scroll offset, so the rows do not move on screen
+   * when the render takes it out of the spacer.
+   *
+   * **The write goes on whichever side of the render keeps the room it
+   * needs.** A spacer that shrinks takes the room with it, and at the end of
+   * the set the box clamps the offset to the new height before `hostUpdated`
+   * runs. Written there as well, the move was made twice: in Chromium, End in
+   * a windowed Object Inspector left the focused row 61 pixels below the box.
+   * So a shrinking spacer is paid for now, and a growing one after the render.
+   */
+  private square(): void {
+    const box = this.options.container()
+    if (this.drift > 0 && box) {
+      box.scrollTop -= this.drift
+      this.lastTop = box.scrollTop
+    } else {
+      this.owed -= this.drift
+    }
+    this.drift = 0
+  }
+
+  /**
+   * Where the top of the box is in the measured heights, in pixels: the
+   * scroll offset, with what is owed to it and less the drift.
+   */
+  private offset(box: HTMLElement): number {
+    return box.scrollTop + this.owed - this.drift
+  }
+
+  /** How far past the screen to draw toward the side the box is scrolling to. */
+  private lead(box: HTMLElement): number {
+    return this.heading === 0 ? 0 : box.clientHeight
   }
 
   /**
@@ -265,9 +441,18 @@ export class VirtualizeController implements ReactiveController {
       return
     }
     const overscan = this.options.overscan ?? 4
-    const next = this.measuring()
+    let next = this.measuring()
       ? this.placed(box, total, overscan)
       : this.uniform(box, total, size, overscan)
+    /* The spacer cannot carry a negative drift past zero, and a positive one
+       at the start of the set would leave room above the first row. Squared
+       now, during the scroll, which is the one write this cannot put off. */
+    if (this.drift !== 0 && (next.before < 0 || next.first === 0)) {
+      this.square()
+      next = this.measuring()
+        ? this.placed(box, total, overscan)
+        : this.uniform(box, total, size, overscan)
+    }
     /* The host's own numbers changing is an outside cause, the same as a scroll
        or a resize: a set that grew is not this controller chasing itself. */
     if (this.last?.count !== total || this.last.estimate !== size) {
@@ -305,8 +490,11 @@ export class VirtualizeController implements ReactiveController {
     /* Held to the set, for an offset left past the end of a set that shrank:
        the box clamps its offset a frame later, and a window starting past the
        last item until then moved on every pass. */
-    const first = Math.max(0, Math.min(Math.floor(box.scrollTop / size), total) - overscan)
-    const fits = Math.ceil(box.clientHeight / size) + overscan * 2
+    const extra = Math.ceil(this.lead(box) / size)
+    const at = Math.min(Math.floor(this.offset(box) / size), total)
+    const first = Math.max(0, at - overscan - (this.heading < 0 ? extra : 0))
+    const fits =
+      Math.ceil(box.clientHeight / size) + overscan * 2 + (this.heading === 0 ? 0 : extra)
     const last = Math.min(total, first + fits)
     return { after: Math.max(0, (total - last) * size), before: first * size, first, last }
   }
@@ -338,9 +526,6 @@ export class VirtualizeController implements ReactiveController {
    */
   private sampleRows(): void {
     const estimate = Math.max(1, this.options.estimate())
-    if (this.sample?.estimate === estimate) {
-      return
-    }
     const heights = new Map<number, number>()
     for (const { element, index } of this.options.rows?.() ?? []) {
       heights.set(index, (heights.get(index) ?? 0) + element.getBoundingClientRect().height)
@@ -349,23 +534,36 @@ export class VirtualizeController implements ReactiveController {
     if (seen.length === 0) {
       return
     }
-    const was = this.line()
-    const size = Math.max(1, seen.reduce((sum, height) => sum + height, 0) / seen.length)
-    this.sample = { estimate, size }
-    if (Math.abs(size - was) < 0.5) {
-      return
+    /* Read on every pass, because rows that wrap can arrive at any point in
+       the set. The slope is still read once per estimate. */
+    const uneven = Math.max(...seen) - Math.min(...seen) > 1
+    if (this.sample?.estimate !== estimate) {
+      const was = this.line()
+      const size = Math.max(1, seen.reduce((sum, height) => sum + height, 0) / seen.length)
+      this.sample = { estimate, size }
+      if (Math.abs(size - was) >= 0.5) {
+        const box = this.options.container()
+        if (box && box.scrollTop > 0) {
+          box.scrollTop = (box.scrollTop / was) * size
+          this.lastTop = box.scrollTop
+        }
+        this.settling = 0
+        if (!uneven) {
+          this.measure()
+        }
+      }
     }
-    const box = this.options.container()
-    if (box && box.scrollTop > 0) {
-      box.scrollTop = (box.scrollTop / was) * size
+    if (uneven) {
+      /* Rows of different heights are placed by measurement from here on, and
+         the rows not yet drawn stand at the line's height. */
+      this.uneven = true
+      this.settle()
     }
-    this.settling = 0
-    this.measure()
   }
 
-  /** Whether this pass places by measurement: offered, and wanted. */
+  /** Whether this pass places by measurement: offered, and wanted or needed. */
   private measuring(): boolean {
-    return this.options.rows !== undefined && (this.options.measured?.() ?? true)
+    return this.options.rows !== undefined && (this.uneven || (this.options.measured?.() ?? true))
   }
 
   /**
@@ -376,16 +574,19 @@ export class VirtualizeController implements ReactiveController {
    * on screen plus the overscan, whatever the set's length.
    */
   private placed(box: HTMLElement, total: number, overscan: number): Window {
-    const first = Math.max(0, this.heights.indexAt(box.scrollTop, total) - overscan)
-    const bottom = box.scrollTop + box.clientHeight
-    let last = this.heights.indexAt(box.scrollTop, total)
+    const top = this.offset(box)
+    const lead = this.lead(box)
+    const from = this.heading < 0 ? top - lead : top
+    const first = Math.max(0, this.heights.indexAt(from, total) - overscan)
+    const bottom = top + box.clientHeight + (this.heading > 0 ? lead : 0)
+    let last = this.heights.indexAt(top, total)
     while (last < total && this.heights.before(last, total) < bottom) {
       last += 1
     }
     last = Math.min(total, last + overscan)
     return {
       after: Math.max(0, this.heights.total(total) - this.heights.before(last, total)),
-      before: this.heights.before(first, total),
+      before: this.heights.before(first, total) + this.drift,
       first,
       last,
     }
@@ -406,7 +607,7 @@ export class VirtualizeController implements ReactiveController {
     if (!box || total === 0) {
       return { first: 0, last: 0 }
     }
-    const top = Math.max(0, box.scrollTop)
+    const top = Math.max(0, this.offset(box))
     const bottom = top + box.clientHeight
     if (!this.measuring()) {
       const size = this.line()
@@ -435,7 +636,7 @@ export class VirtualizeController implements ReactiveController {
       return 0
     }
     const length = this.measuring() ? this.heights.total(total) : total * this.line()
-    return Math.max(0, length - Math.max(0, box.scrollTop) - box.clientHeight)
+    return Math.max(0, length - Math.max(0, this.offset(box)) - box.clientHeight)
   }
 
   /**
@@ -514,9 +715,31 @@ export class VirtualizeController implements ReactiveController {
       const box = this.options.container()
       if (box) {
         box.scrollTop += this.owed
+        this.lastTop = box.scrollTop
       }
       this.owed = 0
     }
+    this.settle()
+  }
+
+  /**
+   * Measures the rows in the tree now, and holds the reader still if they moved.
+   *
+   * `hostUpdated` calls this. A host that draws its rows after `hostUpdated`,
+   * in `updated`, calls it again once they are drawn, so the rows of this
+   * window are measured in the pass that draws them. Measured a pass later, a
+   * window chosen by the estimate stopped short of the bottom of the box and
+   * stayed there until the next scroll: in Chromium, 5,000 rows of 21 pixels
+   * against an estimate of 32 left 142 to 157 pixels of the box empty after
+   * each jump of 1,500 pixels, and the next scroll moved the reader back 297.
+   *
+   * **The reader is held by the row at the top of the box.** Rows drawn above
+   * it for the first time move it by what they came to, less what they were
+   * estimated at. The window's first row is the wrong anchor: no row before
+   * it is drawn, so nothing before it is measured, and the rows that do move
+   * the reader were never counted.
+   */
+  settle(): void {
     if (!this.measuring()) {
       this.sampleRows()
       return
@@ -526,7 +749,10 @@ export class VirtualizeController implements ReactiveController {
       return
     }
     const total = Math.max(0, this.options.count())
-    const was = this.heights.before(this.window.first, total)
+    const box = this.options.container()
+    const top = box ? this.offset(box) : 0
+    const anchor = this.target ?? this.heights.indexAt(top, total)
+    const was = this.heights.before(anchor, total)
     let news = false
     for (const { element, index } of rows) {
       if (this.heights.record(index, element.getBoundingClientRect().height)) {
@@ -539,10 +765,14 @@ export class VirtualizeController implements ReactiveController {
     /* An outside cause, on the same terms as a resize: the set told this
        something it did not know. Bounded, per the note above. */
     this.settling = 0
-    const box = this.options.container()
-    const now = this.heights.before(this.window.first, total)
-    if (box && box.scrollTop > 0 && now !== was) {
-      box.scrollTop += now - was
+    const moved = this.heights.before(anchor, total) - was
+    if (box && top > 0 && moved !== 0 && (this.options.anchor?.() ?? true)) {
+      if (this.scrolling()) {
+        this.drift -= moved
+      } else {
+        box.scrollTop += moved
+        this.lastTop = box.scrollTop
+      }
     }
     this.measure()
   }
@@ -626,6 +856,8 @@ export class VirtualizeController implements ReactiveController {
       box.scrollTo({ behavior, top: next })
     } else {
       box.scrollTop = next
+      this.lastTop = box.scrollTop
+      this.target = index
     }
   }
 
@@ -636,7 +868,7 @@ export class VirtualizeController implements ReactiveController {
   offsetOf(index: number): number {
     const total = Math.max(0, this.options.count())
     return this.measuring()
-      ? this.heights.before(index, total)
+      ? this.heights.before(index, total) + this.drift
       : Math.max(0, Math.min(index, total)) * this.line()
   }
 
@@ -652,6 +884,8 @@ export class VirtualizeController implements ReactiveController {
   forget(): void {
     this.heights.forget()
     this.sample = undefined
+    this.uneven = false
+    this.square()
   }
 
   /**

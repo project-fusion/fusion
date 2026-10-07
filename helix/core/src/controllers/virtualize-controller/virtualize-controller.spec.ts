@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'bun:test'
+import { afterEach, describe, expect, test } from 'bun:test'
 import { VirtualizeController } from './virtualize-controller.js'
 
 /**
@@ -822,5 +822,114 @@ describe('asking for more near the end', () => {
     expect(controller.endInSight(40)).toBe(true)
     expect(controller.endInSight(40)).toBe(false)
     expect(controller.endInSight(60)).toBe(true)
+  })
+})
+
+/**
+ * A box that keeps the listeners it is given, so a test can scroll it and
+ * touch it the way a reader does.
+ */
+const touchable = (scrollTop: number, clientHeight: number) => {
+  const listeners = new Map<string, () => void>()
+  const box = {
+    addEventListener: (type: string, listener: () => void) => {
+      listeners.set(type, listener)
+    },
+    clientHeight,
+    removeEventListener: (type: string) => {
+      listeners.delete(type)
+    },
+    scrollTop,
+    setAttribute: () => {},
+  } as unknown as HTMLElement & { scrollTop: number }
+  return { box, fire: (type: string) => listeners.get(type)?.() }
+}
+
+/** Longer than the controller waits before it takes a scroll to have ended. */
+const still = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 200))
+
+describe('a reader in the middle of a fling', () => {
+  /* The controller attaches its listeners once it has an observer, which it
+     makes when connected, and there is no ResizeObserver outside a browser. */
+  const real = globalThis.ResizeObserver
+  afterEach(() => {
+    globalThis.ResizeObserver = real
+  })
+  const connected = (
+    box: HTMLElement,
+    rows: () => ReturnType<typeof drawn>,
+    anchor?: () => boolean,
+  ): VirtualizeController => {
+    globalThis.ResizeObserver = class {
+      observe(): void {}
+      disconnect(): void {}
+    } as unknown as typeof ResizeObserver
+    const controller = new VirtualizeController(host(), {
+      ...(anchor ? { anchor } : {}),
+      container: () => box,
+      count: () => 1000,
+      estimate: () => 10,
+      overscan: 0,
+      rows,
+    })
+    controller.hostConnected()
+    controller.measure()
+    return controller
+  }
+
+  test('holds a correction in the spacer, and writes the scroll offset once the box is still', async () => {
+    /* A row above the reader turning out taller moves them down. Written to
+       the scroll offset during a fling, the correction ends the fling on iOS,
+       so the spacer above the window takes it until the box stops. */
+    const { box, fire } = touchable(500, 100)
+    let rows: ReturnType<typeof drawn> = []
+    const controller = connected(box, () => rows)
+    box.scrollTop = 450
+    fire('scroll')
+    rows = drawn([30], 40)
+    controller.hostUpdated()
+    expect(box.scrollTop).toBe(450)
+    expect(controller.scrolling()).toBe(true)
+    // Item 45 is still where the reader sees it: twenty further down, less the twenty held.
+    expect(controller.offsetOf(45)).toBe(450)
+
+    await still()
+    // Squared after the render that takes the twenty out of the spacer.
+    controller.hostUpdated()
+    expect(box.scrollTop).toBe(470)
+    expect(controller.offsetOf(45)).toBe(470)
+    expect(controller.scrolling()).toBe(false)
+    controller.hostDisconnected()
+  })
+
+  test('counts a finger on the box, and a move whose scroll event has not arrived', async () => {
+    const { box, fire } = touchable(500, 100)
+    const controller = connected(box, () => [])
+    expect(controller.scrolling()).toBe(false)
+    box.scrollTop = 480
+    expect(controller.scrolling()).toBe(true)
+    fire('scroll')
+    fire('touchstart')
+    await still()
+    // iOS keeps scrolling after the finger lifts, so the finger is what counts.
+    expect(controller.scrolling()).toBe(true)
+    fire('touchend')
+    expect(controller.scrolling()).toBe(false)
+    controller.hostDisconnected()
+  })
+
+  test('leaves the reader to a host whose anchor answers false', () => {
+    const { box } = touchable(500, 100)
+    let rows: ReturnType<typeof drawn> = []
+    const controller = connected(
+      box,
+      () => rows,
+      () => false,
+    )
+    rows = drawn([30], 40)
+    controller.hostUpdated()
+    expect(box.scrollTop).toBe(500)
+    expect(controller.offsetOf(50)).toBe(520)
+    controller.hostDisconnected()
   })
 })

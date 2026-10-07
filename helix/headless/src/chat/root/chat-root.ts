@@ -478,6 +478,10 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
   /* No `overscan`: the controller's four is a frame of fast scrolling, and a
      turn is taller than the row that number was chosen for. */
   private readonly virtualize = new VirtualizeController(this, {
+    /* `restore` holds the turn being read while the log is still, and the
+       controller holds it while the reader scrolls, when `restore` writes
+       nothing. Pinned, the bottom is followed and neither holds. */
+    anchor: () => !this.pinned && this.virtualize.scrolling(),
     container: () => (this.fed ? this.log : null),
     count: () => this.turns.length,
     estimate: () => HelixHeadlessChat.ESTIMATE,
@@ -724,11 +728,19 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
    * turn; what they were reading is the one fixed point. It is also idempotent,
    * which is what lets it run beside the browser's own scroll anchoring where
    * there is some: a turn the browser already put back has not moved.
+   *
+   * **A transcript fed as data writes no scroll offset while the reader
+   * scrolls.** Turns drawn above the reader for the first time come out taller
+   * or shorter than the estimate, and a write to `scrollTop` to make up for
+   * them ends a fling on iOS. While the reader scrolls, the controller holds
+   * them instead, in its spacer above the window, and squares the scroll offset
+   * once the log is still. The turn noted before a scroll whose event has not
+   * arrived is out of date, so that counts as scrolling too.
    */
   private restore(): void {
     const log = this.log
     const anchor = this.anchor
-    if (!log || !anchor) {
+    if (!log || !anchor || (this.fed && this.virtualize.scrolling())) {
       return
     }
     const found = this.rendered().find((turn) => turn.id === anchor.id)
@@ -852,6 +864,12 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
     if (this.pinned) {
       this.stick()
     } else {
+      /* A fed turn that changed size is measured now, so a reader who is
+         scrolling is held by the controller in this frame and not moved back
+         a render later. */
+      if (this.fed) {
+        this.virtualize.settle()
+      }
       this.restore()
     }
     this.remember()
