@@ -47,7 +47,7 @@ describe('drawer server output', () => {
        drawer is shut. */
     const markup = ssr(html`<helix-headless-drawer label="Examples"></helix-headless-drawer>`)
     expect(rendered(markup, 'helix-headless-drawer')).toMatch(
-      /<dialog[\s\S]*<div part="content"><slot><\/slot><\/div>[\s\S]*<\/dialog>/,
+      /<dialog[\s\S]*<div part="content">(<!--[^>]*-->)?<slot ?><\/slot><\/div>[\s\S]*<\/dialog>/,
     )
   })
 

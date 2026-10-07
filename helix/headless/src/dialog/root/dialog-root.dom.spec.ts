@@ -125,6 +125,46 @@ describe('dialog', () => {
     expect(cancel.defaultPrevented).toBe(true)
     expect(hasState(host, 'open')).toBe(true)
   })
+
+  /* A press on the backdrop lands on the `<dialog>` itself, outside the box of
+     its panel. The platform leaves a dialog open on that press under
+     `closedby="none"` and `"closerequest"`, and so does this element. */
+  const pressBackdrop = async (host: Dialog): Promise<void> => {
+    const native = part(host, 'dialog') as HTMLDialogElement
+    const box = native.getBoundingClientRect()
+    native.dispatchEvent(
+      new MouseEvent('click', { bubbles: true, clientX: box.right + 5, clientY: box.bottom + 5 }),
+    )
+    await host.updateComplete
+  }
+
+  test('a press on the backdrop closes it by default', async () => {
+    const host = await dialog()
+    host.show()
+    await host.updateComplete
+    await pressBackdrop(host)
+    expect(host.open).toBe(false)
+  })
+
+  for (const closedBy of ['none', 'closerequest']) {
+    test(`a press on the backdrop leaves it open under closedby="${closedBy}"`, async () => {
+      const host = await dialog(`closedby="${closedBy}"`)
+      host.show()
+      await host.updateComplete
+      await pressBackdrop(host)
+      expect(host.open).toBe(true)
+    })
+  }
+
+  test('escape leaves it open under closedby="none"', async () => {
+    const host = await dialog('closedby="none"')
+    host.show()
+    await host.updateComplete
+    const native = part(host, 'dialog') as HTMLDialogElement
+    native.dispatchEvent(new Event('cancel', { cancelable: true }))
+    await host.updateComplete
+    expect(host.open).toBe(true)
+  })
 })
 
 describe('a form in the dialog', () => {

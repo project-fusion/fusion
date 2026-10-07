@@ -58,6 +58,16 @@ import { wordsIn } from '../description.js'
  * announces with its description as it opens. Set `dismissible` to draw a
  * close control, labeled by `dismiss-label`.
  *
+ * **Keyboard.** Opening moves focus to the first control in the dialog.
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Tab, Shift+Tab | Moves through the controls in the dialog, from the last round to the first and from the first round to the last. |
+ * | Escape | Asks to close the dialog. A `helix-before-close` listener can refuse, and `persistent` or `closedby="none"` keeps it open. |
+ * | Enter, Space | On the close control, closes the dialog. |
+ *
+ * Closing puts focus back on the element that had it before the dialog opened.
+ *
  * @since 0.1.0
  * @status stable
  * @category overlays
@@ -117,8 +127,14 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
    * `closedby="any"` gains light dismiss without giving up the refusal, which is
    * the property this component exists to keep.
    *
+   * The press on the backdrop that this element handles itself follows it too:
+   * `closerequest` and `none` leave the dialog open on that press, as the
+   * platform does, and `none` also keeps it open on Escape in a browser without
+   * `closedby`.
+   *
    * Absent by default, which is the platform's `auto` and this library's rule
-   * that a resting value is an attribute's absence.
+   * that a resting value is an attribute's absence. Absent, a press on the
+   * backdrop closes the dialog.
    */
   @property({ attribute: 'closedby', reflect: true })
   closedBy?: 'any' | 'closerequest' | 'none'
@@ -264,7 +280,7 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
    */
   private readonly handleCancel = (event: Event): void => {
     event.preventDefault()
-    if (this.persistent) {
+    if (this.persistent || this.closedBy === 'none') {
       return
     }
     this.requestOpen(false)
@@ -486,7 +502,7 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
     ) {
       return
     }
-    if (this.persistent) {
+    if (this.persistent || this.closedBy === 'none' || this.closedBy === 'closerequest') {
       this.refuse()
       return
     }

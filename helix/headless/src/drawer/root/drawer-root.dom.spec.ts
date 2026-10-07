@@ -531,3 +531,109 @@ describe('Tab at either end of a modal drawer', () => {
     expect(press(dismiss).defaultPrevented).toBe(false)
   })
 })
+
+describe('a drawer that refuses dismissal', () => {
+  const opened = async (extra: string): Promise<Updatable> => {
+    const drawer = (await mount(
+      markup.replace('<helix-headless-drawer', `<helix-headless-drawer ${extra}`),
+    )) as Updatable
+    drawer.requestOpen(true)
+    await drawer.updateComplete
+    return drawer
+  }
+  const pressOutside = async (drawer: Updatable): Promise<void> => {
+    const panel = part(drawer, 'panel') as HTMLElement
+    const box = panel.getBoundingClientRect()
+    panel.dispatchEvent(
+      new MouseEvent('click', { bubbles: true, clientX: box.left - 10, clientY: box.top }),
+    )
+    await drawer.updateComplete
+  }
+  const pressEscape = async (drawer: Updatable): Promise<void> => {
+    ;(part(drawer, 'panel') as HTMLDialogElement).dispatchEvent(
+      new Event('cancel', { cancelable: true }),
+    )
+    await drawer.updateComplete
+  }
+
+  for (const extra of ['persistent', 'closedby="none"']) {
+    test(`stays open on Escape and on a press outside with ${extra}`, async () => {
+      const drawer = await opened(extra)
+      await pressEscape(drawer)
+      await pressOutside(drawer)
+      expect(drawer.open).toBe(true)
+    })
+  }
+
+  test('stays open on a press outside with closedby="closerequest", and closes on Escape', async () => {
+    const drawer = await opened('closedby="closerequest"')
+    await pressOutside(drawer)
+    expect(drawer.open).toBe(true)
+    await pressEscape(drawer)
+    expect(drawer.open).toBe(false)
+  })
+
+  test('still closes through its close control', async () => {
+    const drawer = await opened('persistent dismissible')
+    ;(part(drawer, 'dismiss') as HTMLElement).click()
+    await drawer.updateComplete
+    expect(drawer.open).toBe(false)
+  })
+})
+
+describe('the drawer’s description', () => {
+  test('is the words at the start of the body, and stops at the first control', async () => {
+    const drawer = (await mount(
+      `<helix-headless-drawer label="Filters">
+        <p>Narrow the list of orders.</p>
+        <label>Status <input /></label>
+      </helix-headless-drawer>`,
+    )) as Updatable & { requestUpdate(): void }
+    /* happy-dom has no ARIA element reflection, so the accessor is stood in. */
+    const panel = part(drawer, 'panel') as HTMLElement & Record<string, unknown>
+    if (!('ariaDescribedByElements' in panel)) {
+      Object.defineProperty(panel, 'ariaDescribedByElements', { value: null, writable: true })
+    }
+    drawer.requestUpdate()
+    await drawer.updateComplete
+    const said = ((panel.ariaDescribedByElements as Element[] | null) ?? []).map((one) =>
+      one.textContent?.trim(),
+    )
+    expect(said).toEqual(['Narrow the list of orders.'])
+  })
+})
+
+describe('a drawer with no name', () => {
+  /* The missing-name warning is in development builds only, which the
+     package's `test:dom` script asks for with `--conditions helix-development`. */
+  const warnedOn = async (markup: string): Promise<string[]> => {
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      await mount(markup)
+      await new Promise((done) => setTimeout(done, 5))
+    } finally {
+      console.warn = original
+    }
+    return warnings
+  }
+
+  test('is reported once it opens, by its tag', async () => {
+    const warnings = await warnedOn(
+      '<helix-headless-drawer default-open>Body</helix-headless-drawer>',
+    )
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0]).toContain('<helix-headless-drawer> has no accessible name')
+  })
+
+  test('and a drawer named by its label or a header heading, or not yet open, is not', async () => {
+    for (const named of [
+      '<helix-headless-drawer default-open label="Filters">Body</helix-headless-drawer>',
+      '<helix-headless-drawer default-open><h2 slot="header">Filters</h2>Body</helix-headless-drawer>',
+      '<helix-headless-drawer>Body</helix-headless-drawer>',
+    ]) {
+      expect([named, ...(await warnedOn(named))]).toEqual([named])
+    }
+  })
+})
