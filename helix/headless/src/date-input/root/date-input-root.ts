@@ -34,7 +34,7 @@ import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html } from 'lit/static-html.js'
 import '../../date-picker/index.js'
-import '../../tag/index.js'
+import '../../tag/root/index.js'
 
 /**
  * The dates in a value, which may hold more than one.

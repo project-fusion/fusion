@@ -6,7 +6,7 @@ import type { CSSResultGroup } from 'lit'
    was an empty inert box. It looked right only because the sandbox imports the
    whole barrel. Same arrangement Select uses for its listbox. */
 import '../../date-picker/index.js'
-import '../../tag/index.js'
+import '../../tag/root/index.js'
 import { styles as fieldStyles } from '../../shared/field/field.css.js'
 import { styles as fieldFrameStyles } from '../../shared/field/field-frame.css.js'
 import { styles as fieldSegmentsStyles } from '../../shared/field/field-segments.css.js'
