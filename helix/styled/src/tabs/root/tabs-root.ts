@@ -27,11 +27,15 @@ import { styles } from './tabs-root.css.js'
  * @slot - The tabs, as direct children of this element.
  * @slot indicator - A mark of your own, drawn inside the `indicator` part, where the selected tab's place and size reach it.
  * @slot panels - The panels, as direct children of this element. Panels inside a wrapper are not paired with tabs, because pairing reads only the direct children.
+ * @slot scroll-end-icon - Replaces the glyph on the button that scrolls the strip toward its end.
+ * @slot scroll-start-icon - Replaces the glyph on the button that scrolls the strip toward its start.
  *
  * @csspart indicator - The mark that moves to the selected tab. It carries the selected tab's place and size as `--indicator-x`, `--indicator-y`, `--indicator-inline-size` and `--indicator-block-size`.
  * @csspart panels - The panel container.
  * @csspart scroll-end - The button that scrolls the strip toward its end, shown under `scroll-controls` while there is more that way. It holds to the end of the strip.
+ * @csspart scroll-end-mark - The glyph on that button, where none is slotted.
  * @csspart scroll-start - The button that scrolls the strip toward its start, shown under `scroll-controls` while there is more that way. It holds to the start of the strip.
+ * @csspart scroll-start-mark - The glyph on that button, where none is slotted.
  * @csspart tabs - The tab list.
  *
  * @cssproperty --tabs-gap - The space between tabs.

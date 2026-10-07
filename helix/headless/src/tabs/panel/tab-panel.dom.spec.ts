@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { label, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import { hasState, label, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -72,5 +72,59 @@ describe('one tab panel', () => {
     const other = await panel()
     expect(part(other, 'panel')?.hasAttribute('hidden')).toBe(true)
     expect(role(other)).toBeNull()
+  })
+})
+
+describe('a lazy panel', () => {
+  /* React Aria unmounts a panel that is not shown, and a panel here was always
+     drawn whole, however expensive, whichever tab was open. */
+  const lazy = async (): Promise<{ heard: number[]; host: Panel }> => {
+    const host = (await mount(
+      '<helix-headless-tab-panel value="one" lazy><template><p id="drawn">Chart</p></template></helix-headless-tab-panel>',
+    )) as Panel
+    const heard: number[] = []
+    host.addEventListener('helix-load', () => heard.push(host.querySelectorAll('p').length))
+    return { heard, host }
+  }
+
+  test('keeps its content in the template until it is first shown', async () => {
+    const { heard, host } = await lazy()
+    expect(host.querySelector('p')).toBeNull()
+    expect(heard).toEqual([])
+  })
+
+  test('puts it in the first time it is shown, says so, and keeps it', async () => {
+    const { heard, host } = await lazy()
+    host.selected = true
+    await host.updateComplete
+    expect(host.querySelector('#drawn')?.textContent).toBe('Chart')
+    expect(host.querySelector('template')).toBeNull()
+    expect(heard).toEqual([1])
+    expect(hasState(host, 'loaded')).toBe(true)
+    host.selected = false
+    await host.updateComplete
+    host.selected = true
+    await host.updateComplete
+    expect(host.querySelectorAll('p').length).toBe(1)
+    expect(heard).toEqual([1])
+  })
+})
+
+describe('the glyphs on a tab set', () => {
+  test('are slot fallback, so each can be replaced by slotting', async () => {
+    const host = (await mount(`<helix-headless-tabs scroll-controls>
+      <helix-headless-tab dismissible value="a">A</helix-headless-tab>
+    </helix-headless-tabs>`)) as Panel
+    await host.updateComplete
+    const tab = host.querySelector('helix-headless-tab') as Panel
+    await tab.updateComplete
+    for (const [owner, name] of [
+      [host, 'scroll-start-icon'],
+      [host, 'scroll-end-icon'],
+      [tab, 'dismiss-icon'],
+    ] as const) {
+      const slot = owner.shadowRoot?.querySelector(`slot[name="${name}"]`)
+      expect(slot?.querySelector('svg')).not.toBeNull()
+    }
   })
 })

@@ -92,6 +92,8 @@ import { HelixHeadlessTab } from '../tab/tab.js'
  * @slot - The tabs, as direct children of this element.
  * @slot indicator - A mark of your own, drawn inside the `indicator` part, where `--indicator-x`, `--indicator-y`, `--indicator-inline-size` and `--indicator-block-size` reach it.
  * @slot panels - The panels, as direct children of this element. Panels inside a wrapper are not paired with tabs, because pairing reads only the direct children.
+ * @slot scroll-end-icon - Replaces the glyph on the button that scrolls the strip toward its end.
+ * @slot scroll-start-icon - Replaces the glyph on the button that scrolls the strip toward its start.
  *
  * @event {HelixActivateEvent} helix-activate - Fired after the active tab changes, so the element already holds the new value.
  * @event {HelixBeforeActivateEvent} helix-before-activate - Fired before the active tab changes, and cancelable. Canceling it is the only way to block a change.
@@ -103,7 +105,9 @@ import { HelixHeadlessTab } from '../tab/tab.js'
  *   and animate yourself.
  * @csspart panels - The panel container.
  * @csspart scroll-end - The button that scrolls the strip toward its end, shown under `scroll-controls` while there is more that way.
+ * @csspart scroll-end-mark - The glyph on that button, where none is slotted.
  * @csspart scroll-start - The button that scrolls the strip toward its start, shown under `scroll-controls` while there is more that way.
+ * @csspart scroll-start-mark - The glyph on that button, where none is slotted.
  * @csspart tabs - The tab list.
  */
 @customElement('helix-headless-tabs')
@@ -503,12 +507,15 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
     }
     const down = this.orientation === 'vertical'
     const icon = down ? (toward > 0 ? caretDown : caretUp) : toward > 0 ? caretRight : caretLeft
-    const glyph = html`<svg
+    const end = toward > 0 ? 'end' : 'start'
+    /* Slot fallback, so a glyph of your own replaces it by slotting. */
+    const glyph = html`<slot name=${`scroll-${end}-icon`}><svg
+      part=${`scroll-${end}-mark`}
       data-mirror=${down ? nothing : ''}
       aria-hidden="true"
       fill="currentColor"
       viewBox=${icon.viewBox}
-    >${unsafeSVG(icon.content)}</svg>`
+    >${unsafeSVG(icon.content)}</svg></slot>`
     const shown = toward > 0 ? this.more.end : this.more.start
     /* A press scrolls and leaves focus on the tab it was on. */
     const keepFocus = (event: Event): void => event.preventDefault()

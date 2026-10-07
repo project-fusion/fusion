@@ -63,6 +63,15 @@
   inline-size: var(--helix-size-icon);
 }
 
+/* A slotted replacement is sized like the default, so swapping it does not
+   move the strip. */
+slot[name="scroll-start-icon"]::slotted(*),
+slot[name="scroll-end-icon"]::slotted(*) {
+  --icon-size: var(--helix-size-icon);
+  block-size: var(--helix-size-icon);
+  inline-size: var(--helix-size-icon);
+}
+
 [part="scroll-start"]:hover,
 [part="scroll-end"]:hover {
   color: var(--helix-color-foreground);

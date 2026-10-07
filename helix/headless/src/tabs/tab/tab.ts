@@ -38,11 +38,13 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @documentation https://fusion.dev/helix/components/tabs
  *
  * @slot - The tab's label.
+ * @slot dismiss-icon - Replaces the glyph on the mark that closes a `dismissible` tab.
  *
  * @event {HelixDismissEvent} helix-dismiss - A `dismissible` tab was asked to close. The tab does not remove itself, so remove it and its panel in response. Cancelable.
  * @event {HelixSelectEvent} helix-select - Fired when the tab is chosen. Cancelable: canceling it stops the change and leaves the decision to you.
  *
  * @csspart dismiss - The mark a pointer presses to close a `dismissible` tab.
+ * @csspart dismiss-mark - The glyph on that mark, where none is slotted.
  * @csspart tab - The tab itself.
  *
  * @cssstate selected - While it is the tab selected.
@@ -142,7 +144,9 @@ export class HelixHeadlessTab extends MixinDismissible(MixinSelectableItem(Helix
       return nothing
     }
     return html`<span part="dismiss" aria-hidden="true" title=${this.dismissLabel} @click=${this.handleDismissPress}
-      ><svg fill="currentColor" viewBox=${x.viewBox} aria-hidden="true">${unsafeSVG(x.content)}</svg></span
+      ><slot name="dismiss-icon"
+        ><svg part="dismiss-mark" fill="currentColor" viewBox=${x.viewBox} aria-hidden="true">${unsafeSVG(x.content)}</svg></slot
+      ></span
     >`
   }
 
