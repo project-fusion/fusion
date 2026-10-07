@@ -287,6 +287,90 @@ describe('a key in a segment', () => {
   })
 })
 
+/* An on-screen keyboard opens only on an editable element, and sends its keys
+   as input with the key `Unidentified`. React Aria's segments are editable and
+   read `beforeinput`. Measured before this: the segments were spans with no
+   `contenteditable`, so a phone raised no keyboard, and input changed nothing. */
+describe('a touch keyboard in a segment', () => {
+  const input = async (host: Probe, at: HTMLElement, inputType: string, data: string | null) => {
+    const event = new InputEvent('beforeinput', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      data,
+      inputType,
+    })
+    at.dispatchEvent(event)
+    await host.updateComplete
+    return event
+  }
+
+  test('opens on an editable segment that does not check spelling', async () => {
+    const host = await mount('value="2026-08-04"')
+    const month = segment(host, 'month')
+    expect(month.getAttribute('contenteditable')).toBe('true')
+    expect(month.getAttribute('spellcheck')).toBe('false')
+    expect(month.getAttribute('autocorrect')).toBe('off')
+    expect(month.getAttribute('inputmode')).toBe('numeric')
+    host.setAttribute('disabled', '')
+    await host.updateComplete
+    expect(month.hasAttribute('contenteditable')).toBe(false)
+    expect(month.hasAttribute('inputmode')).toBe(false)
+  })
+
+  test('types its digits, moves on once the segment is full, and keeps the text the field draws', async () => {
+    const host = await mount('value="2026-08-04"')
+    const month = segment(host, 'month')
+    month.focus()
+    const first = await input(host, month, 'insertText', '1')
+    expect(first.defaultPrevented).toBe(true)
+    await input(host, month, 'insertText', '2')
+    expect(host.value).toBe('2026-12-04')
+    expect(month.textContent?.trim()).toBe('12')
+    expect(host.shadowRoot?.activeElement).toBe(segment(host, 'day'))
+  })
+
+  test('reads the digits of the keyboard locale, such as Arabic-Indic ones', async () => {
+    const host = await mount('value="2026-08-04"')
+    await input(host, segment(host, 'day'), 'insertText', '\u0669')
+    expect(host.value).toBe('2026-08-09')
+  })
+
+  test('empties the segment on delete, and refuses a letter', async () => {
+    const host = await mount('value="2026-08-04"')
+    const day = segment(host, 'day')
+    const letter = await input(host, day, 'insertText', 'x')
+    expect(letter.defaultPrevented).toBe(true)
+    expect(host.value).toBe('2026-08-04')
+    await input(host, day, 'deleteContentBackward', null)
+    expect(host.value).toBe('')
+    expect(day.textContent?.trim()).toBe('––')
+  })
+
+  test('picks the half of the day from a letter, and puts back the text a composition wrote', async () => {
+    const host = await mount('kind="time" value="14:30"')
+    const half = segment(host, 'dayPeriod')
+    await input(host, half, 'insertCompositionText', 'a')
+    const text = half.firstChild?.nextSibling as Text
+    half.append('a')
+    half.dispatchEvent(
+      new InputEvent('input', { bubbles: true, data: 'a', inputType: 'insertCompositionText' }),
+    )
+    await host.updateComplete
+    expect(host.value).toBe('02:30')
+    expect(half.textContent?.trim()).toBe('AM')
+    expect(text.isConnected).toBe(true)
+  })
+
+  test('changes nothing in a read-only field', async () => {
+    const host = await mount('value="2026-08-04"')
+    ;(host as unknown as { readOnly: boolean }).readOnly = true
+    await host.updateComplete
+    await input(host, segment(host, 'day'), 'insertText', '9')
+    expect(host.value).toBe('2026-08-04')
+  })
+})
+
 describe('a time', () => {
   test('on a twelve hour clock, keeps its half of the day and takes a letter for it', async () => {
     const host = await mount('kind="time" value="14:30"')

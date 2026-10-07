@@ -21,6 +21,7 @@ import {
   shownValue,
 } from '../../utils/date-segments/date-segments.js'
 import { inlineStep } from '../../utils/inline-step/inline-step.js'
+import { latinDigits } from '../../utils/number-format/number-format.js'
 import { appleTouch } from '../../utils/platform/platform.js'
 import { verdictFlags } from '../../utils/verdict-flags/verdict-flags.js'
 import { formatWords, words } from '../../words/words.js'
@@ -343,11 +344,113 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
       all[all.indexOf(from) + by]?.focus()
     }
 
+    /**
+     * Applies an editing key to the segment, the arrows, Backspace, a digit or
+     * a letter, and says whether it edited anything.
+     */
+    private edit(element: HTMLElement, key: string): boolean {
+      if ((this as { readOnly?: boolean }).readOnly || this.isDisabled) {
+        return false
+      }
+      const row = Number(element.dataset.row ?? 0)
+      const edit = segmentKey(key, {
+        kind: element.dataset.segment as SegmentKind,
+        locale: this.segmentLocale,
+        segments: this.parts[row] ?? {},
+        system: this.segmentSystem,
+        twelve: isTwelveHourLayout(this.layout),
+        typed: this.typed,
+      })
+      if (!edit) {
+        return false
+      }
+      this.typed = edit.typed
+      this.take(row, edit.segments)
+      if (edit.advance) {
+        this.moveFocus(element, 1)
+      }
+      return true
+    }
+
+    /** What the segment's text was when a composition started to write into it. */
+    private composing: [Node, string | null][] = []
+
+    /**
+     * Text a touch keyboard writes into a segment, which arrives as input and
+     * not as a key: an on-screen keyboard sends `Unidentified` for its keys,
+     * so a digit tapped on a phone is read here, as React Aria's segments read
+     * it. Every input is cancelled, so the segment holds only what the field
+     * draws in it.
+     */
+    private readonly handleSegmentBeforeInput = (event: InputEvent): void => {
+      const element = event.currentTarget as HTMLElement
+      if (event.inputType === 'insertCompositionText') {
+        /* A composition cannot be cancelled, so the text it writes is put
+           back once it has been written. */
+        this.composing = [...element.childNodes].map((node) => [node, node.nodeValue])
+        return
+      }
+      event.preventDefault()
+      if (
+        event.inputType === 'deleteContentBackward' ||
+        event.inputType === 'deleteContentForward'
+      ) {
+        this.typed = ''
+        this.edit(element, 'Backspace')
+        return
+      }
+      for (const character of latinDigits(event.data ?? '')) {
+        this.edit(element, character)
+      }
+    }
+
+    private readonly handleSegmentInput = (event: Event): void => {
+      const element = event.currentTarget as HTMLElement
+      const { data, inputType } = event as InputEvent
+      if (inputType !== 'insertCompositionText') {
+        return
+      }
+      const kept = new Set(this.composing.map(([node]) => node))
+      for (const node of [...element.childNodes]) {
+        if (!kept.has(node)) {
+          node.remove()
+        }
+      }
+      for (const [node, text] of this.composing) {
+        node.nodeValue = text
+      }
+      this.composing = []
+      /* Android sends some letters as a composition, the meridiem's A and P
+         among them. */
+      if (element.dataset.segment === 'dayPeriod' && data) {
+        this.edit(element, data.slice(-1))
+      }
+    }
+
+    /**
+     * Keeps the caret at the start of the segment with focus, where Chromium
+     * fires input for a typed key, and where Android's keyboard does not
+     * compose over the segment's text. A selection already there, or outside
+     * the segment, is left alone.
+     */
+    private readonly collapseSelection = (): void => {
+      const root = this.renderRoot as ShadowRoot | undefined
+      const active = this.segmentElements.find((one) => one === root?.activeElement)
+      const selection = document.getSelection()
+      const at = selection?.anchorNode
+      if (
+        active &&
+        selection &&
+        at &&
+        active.contains(at) &&
+        !(at === active && selection.isCollapsed && selection.anchorOffset === 0)
+      ) {
+        selection.collapse(active, 0)
+      }
+    }
+
     private readonly handleSegmentKeydown = (event: KeyboardEvent): void => {
       const element = event.currentTarget as HTMLElement
-      const kind = element.dataset.segment as SegmentKind
-      const row = Number(element.dataset.row ?? 0)
-      const twelve = isTwelveHourLayout(this.layout)
       if (event.key === 'ArrowDown' && event.altKey) {
         event.preventDefault()
         this.opener = element
@@ -374,24 +477,8 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
         this.typed = ''
         return
       }
-      if ((this as { readOnly?: boolean }).readOnly || this.isDisabled) {
-        return
-      }
-      const edit = segmentKey(event.key, {
-        kind,
-        locale: this.segmentLocale,
-        segments: this.parts[row] ?? {},
-        system: this.segmentSystem,
-        twelve,
-        typed: this.typed,
-      })
-      if (edit) {
+      if (this.edit(element, latinDigits(event.key))) {
         event.preventDefault()
-        this.typed = edit.typed
-        this.take(row, edit.segments)
-        if (edit.advance) {
-          this.moveFocus(element, 1)
-        }
       }
     }
 
@@ -401,8 +488,10 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
      */
     private readonly handleSegmentsFocusIn = (event: FocusEvent): void => {
       this.typed = ''
+      document.getSelection()?.collapse(event.target as Node, 0)
       if (!this.segmentElements.includes(event.relatedTarget as HTMLElement)) {
         this.entered = this.value
+        document.addEventListener('selectionchange', this.collapseSelection)
       }
     }
 
@@ -410,6 +499,7 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
       if (this.segmentElements.includes(event.relatedTarget as HTMLElement)) {
         return
       }
+      document.removeEventListener('selectionchange', this.collapseSelection)
       if (this.entered !== undefined && this.entered !== this.value) {
         this.announceChange()
       }
@@ -464,6 +554,7 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
     override disconnectedCallback(): void {
       super.disconnectedCallback()
       this.removeEventListener('click', this.handleLabelPress)
+      document.removeEventListener('selectionchange', this.collapseSelection)
     }
 
     /** @internal A row of segments counts against implicit submission, as a date input does. */
@@ -559,7 +650,10 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
             data-segment=${kind}
             role=${spin ? 'spinbutton' : 'textbox'}
             tabindex=${this.isDisabled ? '-1' : '0'}
-            inputmode=${kind === 'dayPeriod' ? nothing : 'numeric'}
+            contenteditable=${editable ? 'true' : nothing}
+            spellcheck=${editable ? 'false' : nothing}
+            autocorrect=${editable ? 'off' : nothing}
+            inputmode=${kind === 'dayPeriod' || !editable ? nothing : 'numeric'}
             enterkeyhint=${editable ? 'next' : nothing}
             aria-label=${named === id ? segmentName(kind, locale) : `${segmentName(kind, locale)},`}
             aria-labelledby=${named === id ? nothing : named}
@@ -572,6 +666,8 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
             aria-required=${this.required ? 'true' : nothing}
             aria-readonly=${(this as { readOnly?: boolean }).readOnly ? 'true' : nothing}
             @keydown=${this.handleSegmentKeydown}
+            @beforeinput=${this.handleSegmentBeforeInput}
+            @input=${this.handleSegmentInput}
             >${text}</span
           >`
         })}`
