@@ -24,6 +24,8 @@ import { styles } from './list-root.css.js'
  * @cssproperty --list-drag-preview-opacity - The opacity of the copy of a row a pointer drags.
  * @cssproperty --list-drag-preview-radius - The corner radius of the copy of a row a pointer drags.
  * @cssproperty --list-drag-preview-shadow - The shadow that raises the copy of a row a pointer drags over the page.
+ * @cssproperty --list-empty-color - The color of the text in the row shown while the list has no rows.
+ * @cssproperty --list-empty-padding - The space around the text in the row shown while the list has no rows.
  * @cssproperty --list-gap - The space between rows.
  * @cssproperty --list-marker-gutter - The space that the markers of ordered and unordered lists sit in.
  * @cssproperty --list-rail-inline-size - The width of the rail's track.

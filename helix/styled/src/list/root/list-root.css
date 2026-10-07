@@ -130,6 +130,19 @@
   --list-item-term-weight: var(--helix-weight-semibold);
 }
 
+/* The row shown while the list has no rows: quiet, and centered, so it reads
+   as the list's own state and not as a row of yours. */
+[part="empty"] {
+  color: var(--list-empty-color, var(--helix-color-foreground-muted));
+  font-size: var(--helix-text-sm);
+  padding: var(--list-empty-padding, var(--helix-space-md));
+  text-align: center;
+}
+
+[part="empty"][hidden] {
+  display: none;
+}
+
 /* The copy of a row a pointer drags, drawn in the top layer and raised over
    the page while the row itself stays in place, faded. It has no transition, so
    it follows the pointer with nothing animated, whatever the reader's motion
