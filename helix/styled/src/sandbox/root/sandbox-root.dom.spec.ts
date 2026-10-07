@@ -575,6 +575,76 @@ describe('sandbox dividers', () => {
     expect(body(sandbox).hasAttribute('data-collapsed')).toBe(false)
   })
 
+  /* Real keys are composed, so `Enter` reaches the sandbox from inside the
+     splitter it was pressed on. The splitter's own toggle asks for a collapse
+     the sandbox refuses, and nothing answered the key. */
+  const enter = async (host: Updatable, splitter: Splitter): Promise<void> => {
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key: 'Enter',
+    })
+    bar(splitter).dispatchEvent(event)
+    await splitter.updateComplete
+    await host.updateComplete
+  }
+
+  test('Enter shuts the lead pane, and opens it again where it was', async () => {
+    const sandbox = (await mount(wired)) as Updatable & { split: number }
+    const named = heard(sandbox)
+    await press(sandbox, panes(sandbox), 'ArrowRight')
+    const open = sandbox.split
+
+    await enter(sandbox, panes(sandbox))
+    expect(sandbox.split).toBe(0)
+    expect(panes(sandbox).position).toBe(0)
+    expect(panes(sandbox).hasAttribute('data-collapsed')).toBe(false)
+
+    await enter(sandbox, panes(sandbox))
+    expect(sandbox.split).toBe(open)
+    expect(panes(sandbox).position).toBe(open)
+    expect(named.filter((name) => name !== 'helix-before-split')).toEqual([])
+  })
+
+  test('Enter shuts the panel to its sliver, and opens it to its last height', async () => {
+    const sandbox = (await mount(`
+      <helix-sandbox panel-collapsed-size="36" panel-size="120">
+        <helix-sandbox-source slot="source" name="html" value="<p>one</p>"></helix-sandbox-source>
+        <helix-sandbox-preview slot="preview"></helix-sandbox-preview>
+        <helix-sandbox-terminal slot="panel"></helix-sandbox-terminal>
+      </helix-sandbox>`)) as Updatable & { panelSize: number }
+    const named = heard(sandbox)
+
+    await enter(sandbox, body(sandbox))
+    expect(sandbox.panelSize).toBe(36)
+    expect(hasState(sandbox, 'panel-collapsed')).toBe(true)
+
+    await enter(sandbox, body(sandbox))
+    expect(sandbox.panelSize).toBe(120)
+    expect(named).toEqual(['helix-before-panel-resize', 'helix-before-panel-resize'])
+  })
+
+  test('a refused Enter leaves the pane open', async () => {
+    const sandbox = (await mount(wired)) as Updatable & { split: number }
+    const start = sandbox.split
+    sandbox.addEventListener('helix-before-split', (event) => event.preventDefault())
+    await enter(sandbox, panes(sandbox))
+    expect(sandbox.split).toBe(start)
+    expect(panes(sandbox).position).toBe(start)
+  })
+
+  test('Enter typed in the source is a new line, and moves no divider', async () => {
+    const sandbox = (await mount(wired)) as Updatable & { split: number }
+    const start = sandbox.split
+    const source = sandbox.querySelector('helix-sandbox-source') as HTMLElement
+    part(source, 'source')?.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, composed: true, key: 'Enter' }),
+    )
+    await sandbox.updateComplete
+    expect(sandbox.split).toBe(start)
+  })
+
   test('an unrelated key is left alone', async () => {
     const sandbox = await mount(wired)
     const event = await press(sandbox as Updatable, panes(sandbox), 'PageDown')
