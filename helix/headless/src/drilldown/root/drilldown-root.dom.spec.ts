@@ -538,3 +538,44 @@ describe('a drilldown with navigation', () => {
     expect(part(row, 'item')?.getAttribute('role')).toBe('menuitem')
   })
 })
+
+describe('the page showing', () => {
+  type Paged = Stack & { page: string }
+
+  test('`page` follows a reader, and helix-navigate comes first with where they go', async () => {
+    const host = (await stack()) as Paged
+    const heard: string[] = []
+    host.addEventListener('helix-navigate', (event) => {
+      heard.push((event as CustomEvent<{ value: string }>).detail.value)
+    })
+    expect(host.page).toBe('')
+    await press(host, host.querySelector('[value="appearance"]') as Element)
+    await host.updateComplete
+    expect(host.page).toBe('appearance')
+    expect(showing(host)).toEqual(['theme'])
+    host.back()
+    await host.updateComplete
+    expect(host.page).toBe('')
+    expect(heard).toEqual(['appearance', ''])
+  })
+
+  test('a refused helix-navigate keeps the page showing', async () => {
+    const host = (await stack()) as Paged
+    host.addEventListener('helix-navigate', (event) => event.preventDefault())
+    await press(host, host.querySelector('[value="appearance"]') as Element)
+    await host.updateComplete
+    expect(host.page).toBe('')
+    expect(showing(host)).toEqual(['appearance', 'about'])
+  })
+
+  test('setting `page` shows that row’s page, and a value no page has shows the top', async () => {
+    const host = (await stack()) as Paged
+    host.page = 'appearance'
+    await host.updateComplete
+    expect(showing(host)).toEqual(['theme'])
+    host.page = 'about'
+    await host.updateComplete
+    expect(showing(host)).toEqual(['appearance', 'about'])
+    expect(host.page).toBe('')
+  })
+})

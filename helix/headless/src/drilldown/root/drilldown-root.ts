@@ -3,6 +3,7 @@ import {
   customElement,
   DrilldownController,
   HelixElement,
+  HelixNavigateEvent,
   hostAria,
   inlineStep,
   KeyboardNavigationController,
@@ -37,6 +38,11 @@ import { HelixHeadlessDrilldownItem } from '../item/drilldown-item.js'
  * A row that opens a page contains that page, so the stack holds one reference
  * and reads the rest from the DOM. The behavior lives in `DrilldownController`,
  * which `Menu` shares.
+ *
+ * **`page` is the page showing**, as the `value` of the row that opens it,
+ * and empty on the top page. Set it to show a page, such as one a link to a
+ * settings screen names. A reader's move updates it, and `helix-navigate`
+ * comes first, so you can refuse the move or take it yourself.
  *
  * After each move the host carries `data-direction`, `forward` into a page or
  * `back` out of one, and records `:state(forward)` or `:state(back)`, so a
@@ -76,6 +82,7 @@ import { HelixHeadlessDrilldownItem } from '../item/drilldown-item.js'
  * @slot - The rows of the top page.
  * @slot back-icon - Replaces the icon on the back button.
  *
+ * @event {HelixNavigateEvent} helix-navigate - Fired before a reader moves into a page or back out of one. `detail.value` is the `value` of the row whose page is about to show, empty for the top page. Cancelable: cancel it to stay on the page showing.
  * @event {HelixSelectEvent} helix-select - Fired when a row with no page is chosen. Cancelable: canceling it stops the change and leaves the decision to you.
  *
  * @csspart back - The button that goes back one page.
@@ -127,6 +134,14 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
    */
   @property({ type: Boolean })
   navigation = false
+
+  /**
+   * The page showing, as the `value` of the row that opens it. Empty is the
+   * top page. Setting it shows that page, and a value no row with a page has
+   * shows the top page.
+   */
+  @property()
+  page = ''
 
   /**
    * Which way the last move went, for whatever animates the change.
@@ -229,11 +244,26 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
     }
   }
 
+  /**
+   * Asks before a reader's move to a page, the row's or the top one, and
+   * returns whether the move may go ahead.
+   */
+  private navigate(to: HelixHeadlessDrilldownItem | null): boolean {
+    return this.dispatchEvent(new HelixNavigateEvent({ value: to?.value ?? '' }))
+  }
+
+  /** The row whose page holds a row, or null for the top page. */
+  private holderOf(row: HelixHeadlessDrilldownItem): HelixHeadlessDrilldownItem | null {
+    const parent = row.parentElement
+    return row.slot === 'page' && parent instanceof HelixHeadlessDrilldownItem ? parent : null
+  }
+
   /** Shows a row's page, and puts focus on the first row of it. */
   private enter(item: HelixHeadlessDrilldownItem): void {
-    if (!this.drilldown.enter(item)) {
+    if (!this.drilldown.hasPage(item) || !this.navigate(item) || !this.drilldown.enter(item)) {
       return
     }
+    this.page = item.value
     this.direction = 'forward'
     this.moved = true
     this.updateComplete.then(() => this.items[0]?.focusItem())
@@ -249,13 +279,36 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
    */
   back(): boolean {
     const leaving = this.drilldown.page
-    if (!this.drilldown.back()) {
+    if (leaving === null) {
       return false
     }
+    const to = this.holderOf(leaving)
+    if (!this.navigate(to) || !this.drilldown.back()) {
+      return false
+    }
+    this.page = to?.value ?? ''
     this.direction = 'back'
     this.moved = true
     this.updateComplete.then(() => leaving?.focusItem())
     return true
+  }
+
+  /** Shows the page of the row with a value, or the top page where no row with a page has it. */
+  private showPage(value: string): void {
+    const row =
+      value === ''
+        ? undefined
+        : [...this.querySelectorAll('*')].find(
+            (one): one is HelixHeadlessDrilldownItem =>
+              one instanceof HelixHeadlessDrilldownItem &&
+              one.value === value &&
+              this.drilldown.hasPage(one),
+          )
+    if (row) {
+      this.drilldown.enter(row)
+    } else {
+      this.drilldown.reset()
+    }
   }
 
   /* The stop follows the reader. Arrowing to a row and tabbing away and back
@@ -354,6 +407,12 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    /* A page set from outside. A reader's move has already moved the stack,
+       and finds it where `page` says. */
+    if (changed.has('page') && (this.drilldown.page?.value ?? '') !== this.page) {
+      this.showPage(this.page)
+      this.page = this.drilldown.page?.value ?? ''
+    }
     /* The landmark, through internals, so nothing is written onto the host. */
     hostAria(this.internals, {
       label: this.navigation ? this.label : '',
