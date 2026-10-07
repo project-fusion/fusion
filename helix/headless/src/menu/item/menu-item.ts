@@ -6,7 +6,9 @@ import {
   HelixBeforeToggleEvent,
   HelixElement,
   HelixSelectEvent,
+  isRtl,
   onApple,
+  PopoverController,
   requestChange,
   slotFilled,
 } from '@fusion.dev/helix-core'
@@ -84,8 +86,11 @@ import '../../kbd/index.js'
  * @csspart shortcut-key - One key of the shortcut's chord, such as `Ctrl`.
  * @csspart shortcut-separator - The `+` between two keys of the shortcut, where the platform writes one.
  * @csspart start - The leading column that holds the `start` slot. It is always rendered.
+ * @csspart surface - The panel a submenu opens in beside the row, under the menu's `submenus="flyout"`.
  *
  * @cssstate checked - The row is checked.
+ * @cssstate submenu-mark - Under `submenus="flyout"`, a row in this row's submenu can be ticked or opens a submenu, so the submenu keeps its trailing column.
+ * @cssstate submenu-start - Under `submenus="flyout"`, a row in this row's submenu has content before its label, so the submenu keeps its leading column.
  */
 @customElement('helix-headless-menu-item')
 export class HelixHeadlessMenuItem extends HelixElement {
@@ -145,6 +150,20 @@ export class HelixHeadlessMenuItem extends HelixElement {
    */
   @property({ reflect: true, type: Boolean })
   exclusive = false
+
+  /**
+   * @internal Whether this row's submenu is open beside it, under
+   * `submenus="flyout"`. Written by the menu.
+   */
+  @property({ attribute: false })
+  expanded = false
+
+  /**
+   * @internal Whether the menu opens submenus beside their rows, under
+   * `submenus="flyout"`. Written by the menu.
+   */
+  @property({ attribute: false })
+  flyout = false
 
   /**
    * The URL the row links to. Setting it renders the row as a link.
@@ -295,6 +314,26 @@ export class HelixHeadlessMenuItem extends HelixElement {
     this.start = named('start')
     this.end = named('end')
     this.description = named('description')
+    /* The columns of a flyout's own page, which the menu reserves for the
+       page it shows itself: a submenu's rows have their own leading and
+       trailing marks. */
+    const rows = this.knownChildren.filter(
+      (child) => child.slot === 'submenu' && (child as Partial<HelixHeadlessMenuItem>).isMenuItem,
+    ) as HelixHeadlessMenuItem[]
+    this.toggleState(
+      'submenu-start',
+      this.flyout && rows.some((row) => row.querySelector(':scope > [slot="start"]') !== null),
+    )
+    this.toggleState(
+      'submenu-mark',
+      this.flyout &&
+        rows.some(
+          (row) =>
+            row.checkable ||
+            row.checked ||
+            [...row.children].some((child) => child.slot === 'submenu'),
+        ),
+    )
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
@@ -429,6 +468,20 @@ export class HelixHeadlessMenuItem extends HelixElement {
   focusItem(): void {
     this.focus()
   }
+
+  /**
+   * The panel a flyout submenu opens in, beside the row and in the top layer.
+   * The menu around it says when, and answers a press outside and Escape, so
+   * its own dismissal does nothing.
+   */
+  protected readonly flyoutPanel = new PopoverController(this, {
+    anchor: () => this.partNamed('item'),
+    boundary: () => this,
+    onDismiss: () => {},
+    open: () => this.flyout && this.expanded && this.onPage && this.submenu,
+    placement: () => (isRtl(this) ? 'left-start' : 'right-start'),
+    surface: () => (this.flyout ? this.partNamed('surface') : null),
+  })
 
   /** Chooses the row, the same as pressing it. */
   select(): void {
@@ -647,6 +700,7 @@ export class HelixHeadlessMenuItem extends HelixElement {
       linked
         ? html`<a
             part="item"
+            id=${this.flyout ? 'row' : nothing}
             href=${this.href}
             target=${this.target || nothing}
             rel=${this.rel || nothing}
@@ -655,6 +709,7 @@ export class HelixHeadlessMenuItem extends HelixElement {
             aria-checked=${checkedState}
             aria-describedby=${this.describedBy}
             aria-haspopup=${submenu ? 'menu' : nothing}
+            aria-expanded=${this.flyout && submenu ? String(this.expanded) : nothing}
             aria-keyshortcuts=${keys}
             tabindex="-1"
             @click=${this.handleClick}
@@ -662,18 +717,30 @@ export class HelixHeadlessMenuItem extends HelixElement {
           >${inside}</a>`
         : html`<div
             part="item"
+            id=${this.flyout ? 'row' : nothing}
             role=${role}
             aria-checked=${checkedState}
             aria-describedby=${this.describedBy}
             aria-disabled=${this.disabled ? 'true' : nothing}
             aria-haspopup=${submenu ? 'menu' : nothing}
+            aria-expanded=${this.flyout && submenu ? String(this.expanded) : nothing}
             aria-keyshortcuts=${keys}
             tabindex=${this.disabled ? nothing : '-1'}
             @click=${this.handleClick}
             @keydown=${this.handleKeydown}
           >${inside}</div>`
     }
-      <div hidden><slot name="submenu" @slotchange=${this.readSubmenu}></slot></div>`
+      ${
+        this.flyout
+          ? html`<div
+              part="surface"
+              popover="manual"
+              role="menu"
+              aria-labelledby="row"
+              ?hidden=${!(this.expanded && submenu)}
+            ><slot name="submenu" @slotchange=${this.readSubmenu}></slot></div>`
+          : html`<div hidden><slot name="submenu" @slotchange=${this.readSubmenu}></slot></div>`
+      }`
   }
 }
 

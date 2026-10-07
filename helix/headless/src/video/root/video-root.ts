@@ -205,6 +205,7 @@ const clock = (seconds: number): string => {
  * @csspart entry-shortcut-key - One key of a row's shortcut chord, inside `entry-shortcut`. The player's rows set none.
  * @csspart entry-shortcut-separator - The `+` between two keys of a row's shortcut, where the platform writes one.
  * @csspart entry-start - The leading column that holds the `start` slot. It is always rendered.
+ * @csspart entry-surface - The panel a row's submenu opens in beside it. The player's rows have none.
  * @csspart failure - The message shown when the source cannot be played.
  * @csspart forward - The button that skips forward ten seconds.
  * @csspart fullscreen - The button that enters and leaves fullscreen.
@@ -1735,7 +1736,7 @@ export class HelixHeadlessVideo extends HelixElement {
         part="entry"
       exportparts="end: entry-end, item: entry-item, mark: entry-mark, shortcut: entry-shortcut,
         shortcut-kbd: entry-shortcut-kbd, shortcut-key: entry-shortcut-key,
-        shortcut-separator: entry-shortcut-separator, start: entry-start"
+        shortcut-separator: entry-shortcut-separator, start: entry-start, surface: entry-surface"
         value="off"
         checkable
         exclusive
@@ -1749,7 +1750,7 @@ export class HelixHeadlessVideo extends HelixElement {
         (track, at) => html`<${this.tag('menu-item')} part="entry"
         exportparts="end: entry-end, item: entry-item, mark: entry-mark, shortcut: entry-shortcut,
         shortcut-kbd: entry-shortcut-kbd, shortcut-key: entry-shortcut-key,
-        shortcut-separator: entry-shortcut-separator, start: entry-start"
+        shortcut-separator: entry-shortcut-separator, start: entry-start, surface: entry-surface"
           value=${track.language || String(at)}
           checkable
           exclusive
@@ -1795,7 +1796,7 @@ export class HelixHeadlessVideo extends HelixElement {
       return html`<${this.tag('menu-item')} part="entry"
       exportparts="end: entry-end, item: entry-item, mark: entry-mark, shortcut: entry-shortcut,
         shortcut-kbd: entry-shortcut-kbd, shortcut-key: entry-shortcut-key,
-        shortcut-separator: entry-shortcut-separator, start: entry-start"
+        shortcut-separator: entry-shortcut-separator, start: entry-start, surface: entry-surface"
         value="remote"
         @helix-select=${() => void this.remote.prompt()}
       >
@@ -1807,7 +1808,7 @@ export class HelixHeadlessVideo extends HelixElement {
       return html`<${this.tag('menu-item')} part="entry"
       exportparts="end: entry-end, item: entry-item, mark: entry-mark, shortcut: entry-shortcut,
         shortcut-kbd: entry-shortcut-kbd, shortcut-key: entry-shortcut-key,
-        shortcut-separator: entry-shortcut-separator, start: entry-start" value="speed" @helix-select=${() => this.cycleSpeed()}>
+        shortcut-separator: entry-shortcut-separator, start: entry-start, surface: entry-surface" value="speed" @helix-select=${() => this.cycleSpeed()}>
         <slot name="speed-icon" slot="start">${drawIcon(gauge)}</slot>
         ${this.speedLabel}: ${this.rate}x
       </${this.tag('menu-item')}>`
@@ -1817,7 +1818,7 @@ export class HelixHeadlessVideo extends HelixElement {
       return html`<${this.tag('menu-item')} part="entry"
       exportparts="end: entry-end, item: entry-item, mark: entry-mark, shortcut: entry-shortcut,
         shortcut-kbd: entry-shortcut-kbd, shortcut-key: entry-shortcut-key,
-        shortcut-separator: entry-shortcut-separator, start: entry-start"
+        shortcut-separator: entry-shortcut-separator, start: entry-start, surface: entry-surface"
         value=${one}
         @helix-select=${() => this.skipBy(back ? -SKIP_SECONDS : SKIP_SECONDS)}
       >
@@ -1833,7 +1834,7 @@ export class HelixHeadlessVideo extends HelixElement {
       return html`<${this.tag('menu-item')} part="entry"
       exportparts="end: entry-end, item: entry-item, mark: entry-mark, shortcut: entry-shortcut,
         shortcut-kbd: entry-shortcut-kbd, shortcut-key: entry-shortcut-key,
-        shortcut-separator: entry-shortcut-separator, start: entry-start" value="previous" @helix-select=${() => this.skip(true)}>
+        shortcut-separator: entry-shortcut-separator, start: entry-start, surface: entry-surface" value="previous" @helix-select=${() => this.skip(true)}>
         <slot name="previous-icon" slot="start">${drawIcon(skipBack)}</slot>
         ${this.previousLabel}
       </${this.tag('menu-item')}>`
@@ -1842,7 +1843,7 @@ export class HelixHeadlessVideo extends HelixElement {
       return html`<${this.tag('menu-item')} part="entry"
       exportparts="end: entry-end, item: entry-item, mark: entry-mark, shortcut: entry-shortcut,
         shortcut-kbd: entry-shortcut-kbd, shortcut-key: entry-shortcut-key,
-        shortcut-separator: entry-shortcut-separator, start: entry-start" value="next" @helix-select=${() => this.skip(false)}>
+        shortcut-separator: entry-shortcut-separator, start: entry-start, surface: entry-surface" value="next" @helix-select=${() => this.skip(false)}>
         <slot name="next-icon" slot="start">${drawIcon(skipForward)}</slot>
         ${this.nextLabel}
       </${this.tag('menu-item')}>`
@@ -1852,7 +1853,7 @@ export class HelixHeadlessVideo extends HelixElement {
       return html`<${this.tag('menu-item')} part="entry"
       exportparts="end: entry-end, item: entry-item, mark: entry-mark, shortcut: entry-shortcut,
         shortcut-kbd: entry-shortcut-kbd, shortcut-key: entry-shortcut-key,
-        shortcut-separator: entry-shortcut-separator, start: entry-start"
+        shortcut-separator: entry-shortcut-separator, start: entry-start, surface: entry-surface"
         ?download=${local}
         href=${this.src}
         rel=${local ? nothing : 'noreferrer'}
@@ -1866,7 +1867,7 @@ export class HelixHeadlessVideo extends HelixElement {
     return html`<${this.tag('menu-item')} part="entry"
     exportparts="end: entry-end, item: entry-item, mark: entry-mark, shortcut: entry-shortcut,
         shortcut-kbd: entry-shortcut-kbd, shortcut-key: entry-shortcut-key,
-        shortcut-separator: entry-shortcut-separator, start: entry-start" value="pip" @helix-select=${() => void this.togglePip()}>
+        shortcut-separator: entry-shortcut-separator, start: entry-start, surface: entry-surface" value="pip" @helix-select=${() => void this.togglePip()}>
       <slot name="pip-icon" slot="start">${drawIcon(pictureInPicture)}</slot>
       ${this.pipLabel}
     </${this.tag('menu-item')}>`

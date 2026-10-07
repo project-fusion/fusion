@@ -29,6 +29,32 @@ import { LongPress } from '../../speed-dial/long-press.js'
 import type { HelixHeadlessMenuItem } from '../item/menu-item.js'
 import type { HelixHeadlessMenuSection } from '../section/menu-section.js'
 
+/** Whether an element is a `Menu.Item`, read by identity across both tiers. */
+const isItem = (element: Element): element is HelixHeadlessMenuItem =>
+  element !== null &&
+  typeof element === 'object' &&
+  'isMenuItem' in element &&
+  (element as Partial<HelixHeadlessMenuItem>).isMenuItem === true
+
+/** How long a mouse rests on a row under `flyout` before its submenu opens, in milliseconds. */
+const HOVER_DELAY = 100
+
+/** How long the grace area toward an open submenu holds, in milliseconds, as Radix's does. */
+const GRACE = 300
+
+/** Whether a point is inside a triangle. */
+const inTriangle = (x: number, y: number, [a, b, c]: [number, number][]): boolean => {
+  if (!a || !b || !c) {
+    return false
+  }
+  const side = (p: [number, number], q: [number, number]): number =>
+    (q[0] - p[0]) * (y - p[1]) - (q[1] - p[1]) * (x - p[0])
+  const one = side(a, b)
+  const two = side(b, c)
+  const three = side(c, a)
+  return (one >= 0 && two >= 0 && three >= 0) || (one <= 0 && two <= 0 && three <= 0)
+}
+
 /** Whether an element is a `Menu.Section`, read by identity across both tiers. */
 const isSection = (element: Element): element is HelixHeadlessMenuSection =>
   'isMenuSection' in element && element.isMenuSection === true
@@ -48,10 +74,18 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
  * render, so a server's markup is never changed while a framework hydrates it.
  * It never writes `aria-expanded` where you wrote it yourself.
  *
- * Submenus drill down. A submenu replaces the panel's content, and a back row
- * returns to the previous page. One panel avoids the diagonal pointer path that
- * side-by-side panels need, stays inside a narrow window, and works on touch
- * screens, which have no hover.
+ * Submenus drill down by default. A submenu replaces the panel's content, and a
+ * back row returns to the previous page. One panel stays inside a narrow
+ * window, and works on touch screens, which have no hover.
+ *
+ * **`submenus="flyout"` opens each submenu in a panel of its own beside its
+ * row**, as React Aria's `SubmenuTrigger` and Radix's `Sub` do. Resting the
+ * pointer on the row opens it, and a pointer crossing toward the open panel
+ * over the rows between keeps it open, as Radix's grace area does. Right Arrow
+ * opens a row's submenu on its first row, and Left Arrow or Escape closes it
+ * and returns focus to the row, the two arrows swapping on a right-to-left
+ * page. The row says `aria-expanded`, and the panel is a `menu` named by the
+ * row.
  *
  * The root holds which page is open, because only one page shows at a time. It
  * sets this on items as a property, never as an attribute. An attribute written
@@ -151,6 +185,66 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
   @property()
   label = ''
 
+  /** Whether submenus open beside their rows. */
+  private get flies(): boolean {
+    return this.submenus === 'flyout'
+  }
+
+  /** The rows of the top page, read through each section. */
+  private get topRows(): HelixHeadlessMenuItem[] {
+    return [...this.children]
+      .filter((child) => child.slot !== 'trigger')
+      .flatMap((child) => (isSection(child) ? [...child.children] : [child]))
+      .filter(isItem)
+  }
+
+  /** The rows of a submenu, or of the top page for null. */
+  private rowsOf(holder: HelixHeadlessMenuItem | null): HelixHeadlessMenuItem[] {
+    return holder
+      ? [...holder.children].filter(
+          (child): child is HelixHeadlessMenuItem => child.slot === 'submenu' && isItem(child),
+        )
+      : this.topRows
+  }
+
+  /** The row whose submenu holds a row, or null for a row of the top page. */
+  private holderOf(row: HelixHeadlessMenuItem): HelixHeadlessMenuItem | null {
+    const parent = row.parentElement
+    return row.slot === 'submenu' && parent && isItem(parent) ? parent : null
+  }
+
+  /** The submenus open, from the top page down to the deepest. */
+  private get openPages(): (HelixHeadlessMenuItem | null)[] {
+    const pages: (HelixHeadlessMenuItem | null)[] = []
+    for (let page = this.drilldown.page; page; page = this.holderOf(page)) {
+      pages.unshift(page)
+    }
+    return [null, ...pages]
+  }
+
+  /**
+   * The submenu the keys move in under `flyout`: the one holding the row with
+   * focus, or the deepest open one.
+   */
+  private get keyPage(): HelixHeadlessMenuItem | null {
+    for (const page of this.openPages) {
+      const active = this.rowsOf(page).find((row) => row.active)
+      if (active) {
+        return page
+      }
+    }
+    return this.drilldown.page
+  }
+
+  /** Opens a submenu and closes the ones below it, or closes them all for null. */
+  private openPage(holder: HelixHeadlessMenuItem | null): void {
+    if (holder) {
+      this.drilldown.enter(holder)
+    } else {
+      this.drilldown.reset()
+    }
+  }
+
   /**
    * The description a trigger gives under `open-on="long-press"`, saying how
    * to open the menu. Translate it with the rest of your interface.
@@ -158,6 +252,12 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
   @words
   @property({ attribute: 'long-press-label' })
   longPressLabel = 'Long press or press Alt+Down to show the menu'
+
+  /**
+   * Space between the trigger and the surface, in pixels.
+   */
+  @property({ type: Number })
+  offset = 4
 
   /** Whether the trigger opens the menu only on a held press. */
   private get pressHeld(): boolean {
@@ -187,12 +287,6 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
   private heldAt: { x: number; y: number } | undefined
 
   /**
-   * Space between the trigger and the surface, in pixels.
-   */
-  @property({ type: Number })
-  offset = 4
-
-  /**
    * What opens the menu from its trigger. `long-press` leaves a press to the
    * trigger's own action and opens the menu on a press held for half a second,
    * or on Alt+Down or Alt+Up.
@@ -207,6 +301,13 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
    */
   @property()
   placement: Placement = 'bottom-start'
+
+  /**
+   * How a submenu opens. `drill` shows it in place of the page showing, with
+   * a way back. `flyout` opens it in a panel of its own beside its row.
+   */
+  @property()
+  submenus: 'drill' | 'flyout' = 'drill'
 
   /**
    * Which page is showing, and what is on it.
@@ -337,7 +438,8 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
      * something unfocusable, and stop: the keyboard is then stuck one row above
      * every disabled item in the menu. `Drilldown` filters for the same
      * reason. */
-    return this.drilldown.rows.filter((row) => !row.disabled)
+    const rows = this.flies ? this.rowsOf(this.keyPage) : this.drilldown.rows
+    return rows.filter((row) => !row.disabled)
   }
 
   /** Opens the menu. */
@@ -364,6 +466,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     }
     this.panel.hide()
     this.drilldown.reset()
+    this.stopHover()
     /* Only where the menu still had it. A dismissal that did not take focus with
        it, a press somewhere else on the page, should leave focus where the
        reader put it rather than yanking it back to the trigger. `Popover`
@@ -422,11 +525,31 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     if (!this.drilldown.enter(item)) {
       return
     }
-    this.updateComplete.then(() => this.items[0]?.focusItem())
+    void this.updateComplete.then(async () => {
+      if (!this.flies) {
+        this.items[0]?.focusItem()
+        return
+      }
+      /* The submenu's first row, once its panel and the row have drawn. */
+      await item.updateComplete
+      const first = this.rowsOf(item).find((row) => !row.disabled)
+      await first?.updateComplete
+      first?.focusItem()
+    })
   }
 
   /** Returns to the page above, or closes when there is none. */
   private leave(): void {
+    if (this.flies) {
+      const holder = this.keyPage
+      if (!holder) {
+        this.hide()
+        return
+      }
+      this.openPage(this.holderOf(holder))
+      this.updateComplete.then(() => holder.focus())
+      return
+    }
     if (this.drilldown.atRoot) {
       this.hide()
       return
@@ -442,7 +565,11 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
 
   private readonly handleSelect = (event: Event): void => {
     const item = event.target
-    if (!this.items.includes(item as HelixHeadlessMenuItem)) {
+    /* Under `flyout`, a row on any open panel, which a press can reach. */
+    const reachable = this.flies
+      ? isItem(item as Element) && (item as HelixHeadlessMenuItem).onPage
+      : this.items.includes(item as HelixHeadlessMenuItem)
+    if (!reachable) {
       return
     }
     const chosen = item as HelixHeadlessMenuItem
@@ -487,7 +614,10 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
        render finds null, and `scrollItemIntoView` then runs with no scroller and
        takes the page behind the menu with it, which is the one thing that method
        exists to prevent. */
-    const surface = this.partNamed('surface')
+    const holder = this.flies ? this.holderOf(item) : null
+    const surface = holder
+      ? holder.shadowRoot?.querySelector<HTMLElement>('[part="surface"]')
+      : this.partNamed('surface')
     scrollItemIntoView(item, { padding: 4, ...(surface ? { scroller: surface } : {}) })
   }
 
@@ -508,6 +638,11 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     } else if (along === 1 && items[at]?.hasSubmenu) {
       this.enter(items[at] as HelixHeadlessMenuItem)
     } else if (along === -1) {
+      /* Under `flyout`, Left on the top page closes nothing, as the APG's
+         menu button has it. */
+      if (this.flies && this.keyPage === null) {
+        return
+      }
       this.leave()
     } else if (event.key === 'Tab') {
       /* Out, and the panel goes with it.
@@ -639,8 +774,103 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     }
   }
 
+  /** The row the pointer last rested on, under `flyout`. */
+  private hovered: HelixHeadlessMenuItem | undefined
+
+  /** The wait before a rested-on row opens or closes a submenu. */
+  private hoverTimer: ReturnType<typeof setTimeout> | undefined
+
+  /**
+   * The triangle from where the pointer left a row with an open submenu to the
+   * near edge of that submenu, and until when it holds.
+   */
+  private grace: { points: [number, number][]; until: number } | undefined
+
+  private stopHover(): void {
+    clearTimeout(this.hoverTimer)
+    this.hoverTimer = undefined
+    this.hovered = undefined
+    this.grace = undefined
+  }
+
+  /**
+   * A mouse resting on a row, under `flyout`: focus follows it, and after a
+   * moment the row's submenu opens, or the submenus below the row's own page
+   * close. Not while the pointer is crossing toward an open submenu.
+   */
+  private readonly handleHover = (event: PointerEvent): void => {
+    if (!this.flies || !this.open || event.pointerType !== 'mouse') {
+      return
+    }
+    const row = event
+      .composedPath()
+      .find((node): node is HelixHeadlessMenuItem => isItem(node as Element))
+    if (!row?.onPage || row === this.hovered || this.inGrace(event)) {
+      return
+    }
+    this.hovered = row
+    this.grace = undefined
+    if (!row.disabled) {
+      row.focus()
+    }
+    clearTimeout(this.hoverTimer)
+    this.hoverTimer = setTimeout(() => {
+      if (!this.open || this.hovered !== row) {
+        return
+      }
+      if (row.hasSubmenu && !row.disabled) {
+        if (this.drilldown.page !== row) {
+          this.drilldown.enter(row)
+        }
+        return
+      }
+      const holder = this.holderOf(row)
+      if (this.drilldown.page !== holder) {
+        this.openPage(holder)
+      }
+    }, HOVER_DELAY)
+  }
+
+  /** The pointer leaving a row whose submenu is open, which starts the grace area. */
+  private readonly handleRowOut = (event: PointerEvent): void => {
+    if (!this.flies || event.pointerType !== 'mouse') {
+      return
+    }
+    const row = event
+      .composedPath()
+      .find((node): node is HelixHeadlessMenuItem => isItem(node as Element))
+    const panel = row?.expanded
+      ? row.shadowRoot?.querySelector<HTMLElement>('[part="surface"]')
+      : undefined
+    if (!panel) {
+      return
+    }
+    const box = panel.getBoundingClientRect()
+    const edge = box.left >= event.clientX ? box.left : box.right
+    this.grace = {
+      points: [
+        [event.clientX, event.clientY],
+        [edge, box.top],
+        [edge, box.bottom],
+      ],
+      until: Date.now() + GRACE,
+    }
+  }
+
+  /** Whether the pointer is inside the grace area, while it holds. */
+  private inGrace(event: PointerEvent): boolean {
+    const grace = this.grace
+    return (
+      grace !== undefined &&
+      Date.now() < grace.until &&
+      inTriangle(event.clientX, event.clientY, grace.points)
+    )
+  }
+
   override connectedCallback(): void {
     super.connectedCallback()
+    this.addEventListener('pointermove', this.handleHover)
+    this.addEventListener('pointerout', this.handleRowOut)
     /* Capture, so a drill-in never reaches a consumer's own listener on this
        same host. The guarantee the class documents is that choosing a row that
        opens a submenu is navigation rather than a choice, and stopping it in the
@@ -669,6 +899,9 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    this.removeEventListener('pointermove', this.handleHover)
+    this.removeEventListener('pointerout', this.handleRowOut)
+    this.stopHover()
     this.removeEventListener('helix-select', this.handleSelect, true)
     this.removeEventListener('keydown', this.handleKeydown)
     this.removeEventListener('focusin', this.handleFocusIn)
@@ -698,12 +931,15 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     // Every item shows or hides itself: which page is open is this element's
     // business, and where an item belongs is the item's. Set as a property, so
     // nothing is written onto a consumer's element.
+    /* Under `flyout` the top page always shows, with the open submenus
+       beside it. */
+    const top = this.flies || this.drilldown.atRoot
     for (const child of this.children) {
       if (isSection(child)) {
-        child.onPage = this.drilldown.atRoot
+        child.onPage = top
         for (const row of child.children) {
           if ((row as HelixHeadlessMenuItem).isMenuItem === true) {
-            this.mark(row as HelixHeadlessMenuItem, this.drilldown.atRoot)
+            this.mark(row as HelixHeadlessMenuItem, top)
           }
         }
         continue
@@ -712,13 +948,13 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
       if (item.isMenuItem !== true) {
         continue
       }
-      this.mark(item, this.drilldown.atRoot)
+      this.mark(item, top)
     }
     /* A state as well as the surface's `data-drilled`, because a divider is the
        consumer's child: a stylesheet outside can take it off a submenu page
        only by asking the host, and an attribute inside the shadow root is not
        something it can ask. */
-    this.toggleState('drilled', !this.drilldown.atRoot)
+    this.toggleState('drilled', !this.flies && !this.drilldown.atRoot)
     this.markColumns()
     this.nameSurface()
   }
@@ -771,7 +1007,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
    * which children have upgraded by the time this runs.
    */
   private markColumns(): void {
-    const rows = this.drilldown.rows
+    const rows = this.flies ? this.topRows : this.drilldown.rows
     this.toggleState(
       'start',
       rows.some((row) => row.querySelector(':scope > [slot="start"]') !== null),
@@ -799,6 +1035,21 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
   private mark(item: HelixHeadlessMenuItem, onPage: boolean): void {
     const page = this.drilldown.page
     item.onPage = onPage
+    const holds = page !== null && item.contains(page)
+    item.flyout = this.flies
+    item.expanded = this.flies && holds
+    if (this.flies) {
+      /* Its row stays, and its submenu opens beside it while it holds the
+         page, so its rows are on a page that shows. */
+      item.showingSubmenu = false
+      for (const child of item.children) {
+        const nested = child as HelixHeadlessMenuItem
+        if (nested.isMenuItem === true && child.slot === 'submenu') {
+          this.mark(nested, onPage && holds)
+        }
+      }
+      return
+    }
     /* **Holding the page counts, not just being it.** `item === page` was right
        for two levels and silently wrong for three: on the third page the row at
        the top is neither on a page nor the page, so it rendered `nothing`, and
@@ -834,7 +1085,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
         role="menu"
         aria-busy=${this.loading ? 'true' : nothing}
         aria-label=${this.label || nothing}
-        data-drilled=${this.drilldown.atRoot ? nothing : ''}
+        data-drilled=${this.flies || this.drilldown.atRoot ? nothing : ''}
         ?hidden=${!this.open}
       >
         ${
@@ -843,7 +1094,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
           // press lands on it as though it were. A `menuitem` all the same,
           // since a menu holds menu items and nothing else: Left and Escape
           // are its keys, and a press or a screen reader's cursor reaches it.
-          this.drilldown.atRoot
+          this.flies || this.drilldown.atRoot
             ? nothing
             : html`<div part="header">
                 <button
