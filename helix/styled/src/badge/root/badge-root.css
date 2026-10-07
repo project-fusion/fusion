@@ -66,13 +66,19 @@
 /*
  *  No value, so nothing to read: the mark collapses to a dot. It has its own
  *    size rather than borrowing the inline padding, which is a different quantity
- *    that happened to be close enough to pass for one. Shape follows content, so
- *    there is no attribute saying which one this is.
+ *    that happened to be close enough to pass for one. A minimum and no fixed
+ *    height, so the dot is the dot's size when empty and grows round an icon.
  */
-[part="indicator"]:empty {
-  block-size: var(--_badge-dot);
+[part="indicator"][data-dot] {
+  block-size: auto;
+  min-block-size: var(--_badge-dot);
   min-inline-size: var(--_badge-dot);
   padding-inline: var(--helix-space-none);
+}
+
+/* An icon in a mark with no value is the whole mark: the dot grows round it. */
+[part="indicator"][data-dot] slot[name="icon"]::slotted(*) {
+  margin: calc(var(--_badge-inset) / 2);
 }
 
 /* An icon inside the mark sits before the count, a little apart from it, at

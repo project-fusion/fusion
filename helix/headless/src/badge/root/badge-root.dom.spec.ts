@@ -32,7 +32,7 @@ describe('badge', () => {
     const indicator = part(badge, 'indicator')
     expect(indicator?.hasAttribute('data-blank')).toBe(true)
     // Its `0` is kept to fade out with and not read: clearing a count says nothing.
-    expect(indicator?.querySelector('[aria-hidden="true"]')?.textContent).toBe('0')
+    expect(indicator?.querySelector('span[aria-hidden="true"]')?.textContent).toBe('0')
     expect(badge.getAttributeNames()).toEqual(['value'])
   })
 
@@ -77,7 +77,7 @@ describe('badge', () => {
     )
     const indicator = part(badge, 'indicator')
     expect(indicator?.hasAttribute('aria-label')).toBe(false)
-    expect(indicator?.querySelector('[aria-hidden="true"]')).not.toBeNull()
+    expect(indicator?.querySelector('span[aria-hidden="true"]')).not.toBeNull()
   })
 
   test('the region is there before the first count is, so the count is heard', async () => {
@@ -331,32 +331,37 @@ describe('a badge with an icon', () => {
     expect(icon?.getAttribute('aria-hidden')).toBe('true')
     expect(indicator?.textContent).toBe('3')
     expect(indicator?.getAttribute('aria-label')).toBe('3 new')
-    expect(indicator?.hasAttribute('data-single')).toBe(false)
     expect(badge.internals.states.has('has-icon')).toBe(true)
   })
 
-  test('with no value, the icon is the whole mark, and the mark is no dot', async () => {
+  test('with no value, the icon is the whole mark, drawn where the dot would be', async () => {
     const badge = (await mount(
       '<helix-headless-badge label="Verified"><span>x</span><i slot="icon">*</i></helix-headless-badge>',
     )) as Badge
     await badge.updateComplete
     const indicator = part(badge, 'indicator')
-    expect(indicator?.hasAttribute('data-single')).toBe(true)
+    expect(indicator?.hasAttribute('data-dot')).toBe(true)
     expect(badge.internals.states.has('dot')).toBe(false)
     expect(indicator?.getAttribute('aria-label')).toBe('Verified')
   })
 
-  test('a badge with no icon keeps an indicator with nothing in it, which draws the dot', async () => {
-    const badge = (await mount(
+  /* Read off the value alone, which a server has too, so a served mark is the
+     one hydration draws. */
+  test('a mark with no value carries data-dot, icon or not, and one with a value does not', async () => {
+    const bare = (await mount(
       '<helix-headless-badge><span>x</span></helix-headless-badge>',
     )) as Badge
-    await badge.updateComplete
-    expect(part(badge, 'indicator')?.querySelector('slot')).toBeNull()
-    expect(badge.internals.states.has('dot')).toBe(true)
-    expect(badge.internals.states.has('has-icon')).toBe(false)
+    await bare.updateComplete
+    expect(part(bare, 'indicator')?.hasAttribute('data-dot')).toBe(true)
+    expect(bare.internals.states.has('dot')).toBe(true)
+    expect(bare.internals.states.has('has-icon')).toBe(false)
+    const counted = await mount(
+      '<helix-headless-badge value="2"><span>x</span></helix-headless-badge>',
+    )
+    expect(part(counted, 'indicator')?.hasAttribute('data-dot')).toBe(false)
   })
 
-  test('an icon slotted later moves into the mark, and out again when it goes', async () => {
+  test('an icon slotted later turns the states, and they turn back when it goes', async () => {
     const badge = (await mount(
       '<helix-headless-badge><span>x</span></helix-headless-badge>',
     )) as Badge
@@ -366,12 +371,12 @@ describe('a badge with an icon', () => {
     badge.append(icon)
     await new Promise((resolve) => setTimeout(resolve, 0))
     await badge.updateComplete
-    expect(part(badge, 'indicator')?.querySelector('slot[name="icon"]')).not.toBeNull()
+    expect(badge.internals.states.has('has-icon')).toBe(true)
     expect(badge.internals.states.has('dot')).toBe(false)
     icon.remove()
     await new Promise((resolve) => setTimeout(resolve, 0))
     await badge.updateComplete
-    expect(part(badge, 'indicator')?.querySelector('slot')).toBeNull()
+    expect(badge.internals.states.has('has-icon')).toBe(false)
     expect(badge.internals.states.has('dot')).toBe(true)
   })
 })

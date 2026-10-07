@@ -16,14 +16,15 @@ describe('badge server output', () => {
     expect(hostAttributes(markup, 'helix-headless-badge')).toEqual(['label'])
   })
 
-  test('the dot is empty in the server markup, so `:empty` holds before upgrade', () => {
-    // A whitespace text node inside the indicator would defeat the selector,
-    // and the server is where that would first show.
+  /* The dot is read off the value, which the server has, and the icon's slot
+     is served in the mark, so a served mark is the hydrated one whether or not
+     an icon is slotted. */
+  test('the dot is marked in the server markup, with the icon slot and no text', () => {
     const markup = withoutStyles(
       ssr(html`<helix-headless-badge label="new">x</helix-headless-badge>`),
     )
     expect(rendered(markup, 'helix-headless-badge')).toMatch(
-      /<span[^>]*part="indicator"[^>]*>(<!--[^>]*-->)*<\/span/,
+      /<span(?=[^>]*data-dot)[^>]*part="indicator"[^>]*>(<!--[^>]*-->)*<slot[^>]*name="icon"[^>]*><\/slot>(<!--[^>]*-->)*<\/span/,
     )
   })
 
