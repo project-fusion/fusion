@@ -517,3 +517,53 @@ describe('a palette drawn in the page', () => {
     expect(listbox(host).shadowRoot?.activeElement?.getAttribute('part')).toBe('search-field')
   })
 })
+
+describe('a palette with pages', () => {
+  const paged = `<helix-headless-command label="Commands">
+    <helix-headless-option value="theme" opens="theme">Change theme</helix-headless-option>
+    <helix-headless-option value="new">New file</helix-headless-option>
+    <helix-headless-option value="dark" slot="page:theme">Dark</helix-headless-option>
+  </helix-headless-command>`
+
+  /* A palette was one flat list, where a command such as "Change theme"
+     usually opens a page of its own. */
+  test('shows the commands slotted for the page, named by the command that opens it', async () => {
+    const host = (await palette(paged)) as Palette & { page: string }
+    const slotNames = () =>
+      [...(listbox(host).querySelectorAll(':scope > slot') ?? [])].map((one) =>
+        one.getAttribute('name'),
+      )
+    expect(slotNames()).toContain(null)
+    expect(listbox(host).getAttribute('aria-label')).toBe('Commands')
+    host.page = 'theme'
+    await settle(host)
+    expect(slotNames()).toContain('page:theme')
+    expect(slotNames()).not.toContain(null)
+    expect(listbox(host).getAttribute('aria-label')).toBe('Change theme')
+  })
+
+  test('Backspace in an empty filter goes back, and closing goes back to the first page', async () => {
+    const host = (await palette(paged)) as Palette & { page: string }
+    host.open = true
+    host.page = 'theme'
+    await settle(host)
+    const field = listbox(host).shadowRoot?.querySelector(
+      '[part="search-field"]',
+    ) as HTMLInputElement
+    const back = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key: 'Backspace',
+    })
+    field.dispatchEvent(back)
+    await settle(host)
+    expect(back.defaultPrevented).toBe(true)
+    expect(host.page).toBe('')
+    host.page = 'theme'
+    await settle(host)
+    host.open = false
+    await settle(host)
+    expect(host.page).toBe('')
+  })
+})

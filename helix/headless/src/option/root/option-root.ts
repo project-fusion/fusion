@@ -237,6 +237,19 @@ export class HelixHeadlessOption extends HelixElement {
   label = ''
 
   /**
+   * The page of commands this option opens, by name, where choosing it would
+   * otherwise run it.
+   *
+   * Declared here and acted on by whatever owns the list, as `alternate` is.
+   * `Command` is the only owner that reads it: choosing the option shows the
+   * commands slotted as `page:` and the name, such as `slot="page:theme"`,
+   * and Backspace in an empty filter goes back. Empty is an option that opens
+   * nothing, which is nearly every option.
+   */
+  @property()
+  opens = ''
+
+  /**
    * The link's `rel`. Set it whenever you set `target="_blank"`.
    */
   @property()

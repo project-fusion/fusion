@@ -12,6 +12,7 @@ import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
 import type { HelixHeadlessListbox } from '../../listbox/root/listbox-root.js'
+import { optionsAmong } from '../../option/root/option-root.js'
 /* Relative, so this registers the base pair and the styled file's identical
    imports register the styled pair. `tier` picks which the template asks for. */
 import '../../dialog/index.js'
@@ -48,6 +49,23 @@ const says = (element: Element | null, state: string): boolean => {
  * With `inline`, the palette is drawn in the page with no dialog, as a search
  * over a list that is always shown.
  *
+ * **Pages.** A command can open a page of commands of its own, as a palette
+ * offers "Change theme" and then the themes. Give the option `opens` with a
+ * name, and slot the page's commands as `page:` and that name:
+ *
+ * ```html
+ * <helix-command>
+ *   <helix-option value="theme" opens="theme">Change theme</helix-option>
+ *   <helix-option value="dark" slot="page:theme">Dark</helix-option>
+ *   <helix-option value="light" slot="page:theme">Light</helix-option>
+ * </helix-command>
+ * ```
+ *
+ * Choosing the opener says `helix-select` with its value, and canceling it
+ * keeps the page that is shown. The list then shows the page, named by the opener's
+ * words, and Backspace in an empty filter goes back. `page` says which page is
+ * shown.
+ *
  * The filter is cleared when the palette closes, so each opening starts from
  * the full list. Combobox and Select do the same. As typing narrows the list, a
  * screen reader hears how many commands are left, such as "3 commands".
@@ -61,8 +79,9 @@ const says = (element: Element | null, state: string): boolean => {
  * | Down, Up | Moves the highlight to the next or the previous command, round from the last to the first. |
  * | Page Down, Page Up | Moves the highlight by as many commands as the list shows at once. |
  * | Home, End, Left, Right | Move the caret in the filter field. |
- * | Enter | Runs the highlighted command, or follows it where it is a link, and closes the palette. |
+ * | Enter | Runs the highlighted command, or follows it where it is a link, and closes the palette. On a command with `opens`, shows its page. |
  * | Command or Control with Enter | Takes the highlighted command's `alternate` destination, where it has one. |
+ * | Backspace | In an empty filter on a page, goes back to the page before. |
  * | Escape | Clears the filter. With the filter empty, closes the palette and puts focus back where it was. |
  * | Tab | Stays in the palette, which is modal. With `inline`, moves on through the page. |
  *
@@ -221,6 +240,22 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
   noResultsText?: string
 
   /**
+   * The page of commands shown, by name: empty for the commands you write
+   * with no `slot`, or a name for the commands slotted as `page:` and the
+   * name, such as `slot="page:theme"`.
+   *
+   * An option with `opens` set to a name goes to that page when it is chosen,
+   * in place of running, and Backspace in an empty filter goes back to the
+   * page before. Closing the palette goes back to the first page. Set it to
+   * open the palette on a page of your choosing.
+   */
+  @property()
+  page = ''
+
+  /** The pages gone through to reach this one, which Backspace walks back. */
+  private trail: string[] = []
+
+  /**
    * The text shown in the filter field before anything is typed.
    */
   @words
@@ -320,7 +355,51 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
     if (!this.dispatchEvent(new HelixSelectEvent({ value }))) {
       return
     }
+    /* A command that opens a page goes there, and the palette stays open. */
+    const opens = (this.listbox?.options ?? []).find((option) => option.value === value)?.opens
+    if (opens) {
+      this.goTo([...this.trail, this.page], opens)
+      return
+    }
     this.requestOpen(false)
+  }
+
+  /**
+   * Shows a page of commands, with the trail that leads back from it. The
+   * filter starts empty, as it does on opening, and the field keeps focus.
+   */
+  private goTo(trail: string[], page: string): void {
+    this.trail = trail
+    this.page = page
+    this.listbox?.requestFilter('')
+    void this.updateComplete.then(() => this.searchField?.focus())
+  }
+
+  /** Backspace in an empty filter, on a page, goes back to the page before. */
+  private readonly handleBack = (event: KeyboardEvent): void => {
+    if (
+      event.key !== 'Backspace' ||
+      this.page === '' ||
+      event.composedPath()[0] !== this.searchField ||
+      this.searchField?.value !== ''
+    ) {
+      return
+    }
+    event.preventDefault()
+    const trail = [...this.trail]
+    this.goTo(trail, trail.pop() ?? '')
+  }
+
+  /**
+   * The list's name: the palette's, or on a page, the words of the command
+   * that opens it.
+   */
+  private get listName(): string {
+    if (this.page === '') {
+      return this.label
+    }
+    const opener = optionsAmong(this.knownChildren).find((option) => option.opens === this.page)
+    return opener?.text || this.label
   }
 
   /**
@@ -421,6 +500,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
     this.addEventListener('helix-select', this.swallowOptionSelect)
     /* Capture, so both reach this before the listbox and the row do. */
     this.addEventListener('keydown', this.handleAlternate, { capture: true })
+    this.addEventListener('keydown', this.handleBack)
     this.addEventListener('click', this.handleAlternate, { capture: true })
     document.addEventListener('keydown', this.handleHotkey)
   }
@@ -429,12 +509,18 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
     super.disconnectedCallback()
     this.removeEventListener('helix-select', this.swallowOptionSelect)
     this.removeEventListener('keydown', this.handleAlternate, { capture: true })
+    this.removeEventListener('keydown', this.handleBack)
     this.removeEventListener('click', this.handleAlternate, { capture: true })
     document.removeEventListener('keydown', this.handleHotkey)
   }
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    /* Closing goes back to the first page, so the next opening starts there. */
+    if (changed.get('open') === true && !this.open) {
+      this.trail = []
+      this.page = ''
+    }
     if (this.childrenKnown) {
       this.footed = this.knownChildren.some((child) => child.slot === 'footer')
     }
@@ -550,7 +636,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
           filter-icon: listbox-filter-icon, filter-mark: listbox-filter-mark, hint: listbox-hint,
           items: listbox-items, label: listbox-label, live: listbox-live, loading: listbox-loading,
           search: listbox-search, search-field: listbox-search-field"
-        aria-label=${this.label}
+        aria-label=${this.listName}
         empty-text=${this.emptyText}
         filter-delay=${this.filterDelay}
         filter-label=${this.placeholder}
@@ -567,7 +653,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
         @change=${this.stopInner}
         @input=${this.stopInner}
       >
-        <slot></slot>
+        ${this.page === '' ? html`<slot></slot>` : html`<slot name=${`page:${this.page}`}></slot>`}
         <!-- Handed on with the text as the fallback, for the reason Combobox
              gives: the list's own fallback never shows behind a passed slot. -->
         <slot name="empty" slot="empty">${this.emptyText}</slot>
