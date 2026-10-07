@@ -67,6 +67,11 @@ export type RuntimeKind =
   /** A React handler prop is a removed callback, which never ran from JSX. Development builds only. */
   | 'removed-callback'
   /**
+   * A Data Table's first drawn page differs from the rows the page served, so the rows change
+   * once it draws. Development builds only.
+   */
+  | 'served-rows-differ'
+  /**
    * A React handler prop uses Solid's `on:`, which React reads as another event's name.
    * Development builds only.
    */

@@ -45,10 +45,30 @@ describe('data table server output', () => {
 
   /* The count is the grid's, on the host's internals, which a server does not
      write: the `rowgroup` it used to sit on applied it to nothing. */
-  test('a table handed its rows serves them with their place in the result', () => {
+  test('a table handed its rows serves no count on the row group', () => {
     const markup = ssr(html`<helix-data-table .rows=${rows} label="Files"></helix-data-table>`)
     expect(partTag(markup, 'table')).not.toContain('aria-rowcount')
-    expect(rendered(markup, 'helix-data-table')).toContain('aria-rowindex="3"')
+  })
+
+  /**
+   * **The values reach the served HTML as the first page the page writes.** A
+   * server cannot give this element its columns, so it draws no cell from
+   * `rows`; the page writes the first page as rows, and the served root
+   * projects them, with the columns, through a default slot in the header.
+   * Asserted as the slot, read off a render with no children, and the absence
+   * of rows drawn from `rows`, which the served ones stand in for.
+   */
+  test('the served root projects the columns and the first page the page wrote', () => {
+    const bare = rendered(
+      withoutStyles(ssr(html`<helix-data-table label="Files"></helix-data-table>`)),
+      'helix-data-table',
+    )
+    expect(bare).toMatch(/<div part="head"[^>]*>(?:(?!<\/div>)[\s\S])*<slot\s*><\/slot>/)
+    const served = rendered(
+      withoutStyles(ssr(html`<helix-data-table .rows=${rows} label="Files"></helix-data-table>`)),
+      'helix-data-table',
+    )
+    expect(served).not.toMatch(/part="row"/)
   })
 
   test('the host carries only what the consumer wrote', () => {

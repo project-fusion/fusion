@@ -70,6 +70,160 @@ const selector = sorted.map((tag) => `${tag}:not(:defined)`).join(',\n')
    already covered. */
 const aligned = sorted.map((tag) => `${tag}[align]`).join(',\n')
 
+/* **A data table's first page, served as rows.** The page writes the first page
+   as `helix-table-row` and `helix-table-cell` children under the columns, so the
+   values are in the HTML a server sends. These rules lay that markup out as the
+   table draws it, from the first paint, and keep it laid out that way once the
+   table has upgraded and until it draws its own rows.
+
+   Up to ten columns are counted, more than any example declares, and each
+   column takes the track a column with no `width` takes. A column with a
+   `width` takes its own once the table upgrades. */
+const COUNTED = 10
+const SERVED = 'helix-data-table:not(:defined):has(> helix-table-row)'
+const VISIBLE = 'helix-table-column:not([hidden])'
+const tracks = Array.from(
+  { length: COUNTED },
+  (_, at) =>
+    `helix-data-table:not(:defined):has(> helix-table-column:nth-of-type(${at + 1}):last-of-type) {\n  --_data-table-count: ${at + 1};\n}`,
+).join('\n\n')
+/* `end` alone, which every numeric column here sets: a column set to the
+   center is centered once the table upgrades. */
+const edges = `${Array.from(
+  { length: COUNTED },
+  (_, at) =>
+    `helix-data-table:has(> helix-table-column:nth-of-type(${at + 1})[text-align="end"]) > helix-table-row > :nth-child(${at + 1})`,
+).join(',\n')} {\n  text-align: end;\n}`
+const served = `/* A data table's first page, served as rows: see \`fusion/scripts/build-elements-css.mjs\`.
+ *
+ * **Shown before the table upgrades**, which is the point of serving them, and
+ * the rows and cells stay shown when \`Table\` is not registered at all.
+ */
+${SERVED},
+${SERVED} > helix-table-column:not(:defined),
+helix-data-table > helix-table-row:not(:defined),
+helix-data-table > helix-table-row > helix-table-cell:not(:defined) {
+  visibility: visible;
+}
+
+/* **One grid, as the table's own**, which is what lines every column up across
+ * every row: the headings and the cells are its items, and the rows draw no box.
+ * The tracks are the ones the table works out for columns with no \`width\`,
+ * counted below. With declarative shadow DOM the grid is the shadow root's, and
+ * the same count reaches it through \`--data-table-template\`, which inherits
+ * until the table writes its own.
+ */
+${SERVED} {
+  display: grid;
+  grid-template-columns: var(--data-table-columns, var(--data-table-template));
+  overflow-x: auto;
+}
+
+helix-data-table:not(:defined) {
+  --data-table-template: repeat(var(--_data-table-count, 1), minmax(max-content, 1fr));
+}
+
+${tracks}
+
+/* A heading, as the column draws it in its own shadow root once it upgrades:
+ * the same rule, height, inset and weight. Under declarative shadow DOM the
+ * column's own box is emptied, so the heading is drawn once.
+ */
+${SERVED} > ${VISIBLE} {
+  align-items: center;
+  border-block-end: var(--helix-border-thin) solid
+    var(--data-table-rule-color, var(--helix-color-border));
+  box-sizing: border-box;
+  color: var(--data-table-heading-color, var(--helix-color-foreground-muted));
+  display: flex;
+  font-family: var(--helix-font-sans);
+  font-size: var(--data-table-text, var(--helix-text-sm));
+  font-weight: var(--helix-weight-semibold);
+  min-block-size: var(--helix-size-control-loose);
+  min-inline-size: 0;
+  padding-block: var(--data-table-padding-block, var(--helix-space-none));
+  padding-inline: var(--data-table-padding-inline, var(--helix-space-none) var(--helix-space-md));
+}
+
+${SERVED} > helix-table-column[text-align="center"] {
+  justify-content: center;
+}
+
+${SERVED} > helix-table-column[text-align="end"] {
+  justify-content: flex-end;
+}
+
+${SERVED} > helix-table-column::part(column) {
+  border: none;
+  min-block-size: 0;
+  padding: 0;
+}
+
+/* A cell, as the table draws one: the same box whether \`Table\` has upgraded
+ * it or not, so nothing moves when the table draws its own rows in their place.
+ */
+helix-data-table > helix-table-row:not([hidden]) {
+  display: contents;
+}
+
+helix-data-table > helix-table-row > helix-table-cell {
+  border-block-end: var(--helix-border-thin) solid
+    var(--data-table-rule-color, var(--helix-color-border));
+  box-sizing: border-box;
+  color: var(--data-table-color, var(--helix-color-foreground));
+  display: block;
+  font-family: var(--helix-font-sans);
+  font-size: var(--data-table-text, var(--helix-text-sm));
+  font-weight: inherit;
+  min-block-size: auto;
+  min-inline-size: auto;
+  overflow-wrap: normal;
+  padding-block: var(--data-table-padding-block, var(--helix-space-sm));
+  padding-inline: var(--data-table-padding-inline, var(--helix-space-none) var(--helix-space-md));
+}
+
+helix-data-table > helix-table-row:last-of-type > helix-table-cell {
+  border-block-end-color: transparent;
+}
+
+/* Each cell takes its column's edge, by its place in the row. */
+${edges}
+
+/* Once the table upgrades it draws its checkbox and grip columns first, which
+ * the served rows have no cells for.
+ */
+helix-data-table:defined:is([selectable], [reorderable-rows]) > helix-table-row > :first-child {
+  grid-column-start: 2;
+}
+
+helix-data-table:defined[selectable][reorderable-rows] > helix-table-row > :first-child {
+  grid-column-start: 3;
+}
+
+/* The toolbar above the rows and the footer below them, across every column,
+ * and the status lines left to the table, which says them once it upgrades.
+ * Under declarative shadow DOM the toolbar's own gap is the one taken here.
+ */
+${SERVED} > [slot="toolbar"] {
+  grid-column: 1 / -1;
+  margin-block-end: var(--data-table-toolbar-gap, var(--helix-space-sm));
+  order: -1;
+}
+
+${SERVED}::part(toolbar) {
+  padding-block-end: 0;
+}
+
+${SERVED} > [slot="footer"] {
+  grid-column: 1 / -1;
+  order: 1;
+}
+
+${SERVED} > :is([slot="empty"], [slot="error"], [slot="loading"]) {
+  display: none;
+}
+`
+
 /* Written into `helix/styles/src`, beside the three layers it is imported with,
    so `helix.css` reaches it with a relative `@import` like the others. A bare
    specifier in an `@import` is resolved by the bundler rather than by CSS, so
@@ -122,7 +276,8 @@ ${aligned}
 ) {
   text-align: inherit;
 }
-`,
+
+${served}`,
 )
 
 console.log(`elements.css: ${sorted.length} tags`)

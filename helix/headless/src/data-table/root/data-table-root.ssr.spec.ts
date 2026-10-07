@@ -20,10 +20,10 @@ import '../../table/index.js'
  * because there `children` always exists, which is the entire reason these
  * specs run in a second process.
  *
- * The rows are a property here rather than markup, so what a crawler gets is not
- * an accident of what the consumer typed: the table renders its cells from data
- * on the server exactly as it does in a browser, and that is the property worth
- * asserting.
+ * The rows are a property here, and the cells they make are not served: a
+ * server cannot give this element its columns to read them with. What carries
+ * the values to a crawler is the first page the page writes as rows, which the
+ * served root projects.
  */
 
 const rows = [
@@ -51,43 +51,62 @@ describe('data table server output', () => {
   })
 
   /**
-   * **The limitation, pinned so it cannot change quietly.**
+   * **The values are served when the page writes the first page as rows.**
    *
-   * The headings are served, because a column renders its own, and the row
-   * elements are served, because their count comes from `rows`, which is a
-   * property. The **cell values are not**, because reading them needs the
-   * columns and the columns are markup children that Lit SSR does not give this
-   * element. So a crawler sees a table of the right shape with nothing in it,
-   * which is strictly less than `Table` serves for a table whose rows are
-   * markup.
+   * The table reads each cell from its column, and Lit SSR gives this element
+   * no children to read, so it cannot draw a value on a server. The page can:
+   * it writes the first page as `TableRow` and `TableCell` children, and the
+   * served root projects them, through a default slot in the header, which
+   * takes the columns too. The columns carry no `slot`, and a server's root
+   * routes by name, so before this slot they were assigned nowhere and painted
+   * nothing until hydration.
    *
-   * That is the cost of "the schema is markup and the data is a property", and
-   * it is a bigger version of a cost the design already accepted: a consumer
-   * hand-authoring HTML with no build step gets default cell rendering. Filed
-   * rather than worked around here, because the obvious workaround is a
-   * `columns` property beside the markup columns, which splits one source of
-   * truth for columns into two that nothing checks agree: a table rendered one
-   * way on the server and another in the browser, with a hydration mismatch on
-   * top.
-   *
-   * Asserted rather than left implicit, so the day it is fixed this spec fails
-   * and says what changed.
+   * What a component owes a server for content it did not write is the slot
+   * that projects it, read off a render with no children, so that is what is
+   * asserted, with the absence of any row drawn from `rows` beside it: the
+   * served rows stand in for those until the table draws its own.
    */
-  test('the headings and the row structure are served, and the cell values are not', () => {
-    const served = withoutStyles(markup)
-    /* `toContain('Name')` read the column's own light-DOM text back out of the
-       render, so it passed with the column rendering nothing: a heading is
-       served by the slot the column puts in its own shadow root, read off a
-       column with no children. */
+  test('the served root projects the columns and the first page the page wrote', () => {
+    const bare = rendered(
+      withoutStyles(
+        ssr(html`<helix-headless-data-table label="Files"></helix-headless-data-table>`),
+      ),
+      'helix-headless-data-table',
+    )
+    expect(bare).toMatch(/<div part="head"[^>]*>(?:(?!<\/div>)[\s\S])*<slot\s*><\/slot>/)
+    const served = rendered(withoutStyles(markup), 'helix-headless-data-table')
+    expect(served).not.toMatch(/part="row"/)
+    expect(served).not.toContain('aria-rowindex="2"')
+    /* A heading is served by the slot the column puts in its own shadow root,
+       read off a column with no children. */
     const column = ssr(
       html`<helix-headless-table-column field="name" sortable></helix-headless-table-column>`,
     )
     expect(rendered(column, 'helix-headless-table-column')).toMatch(
       /<button part="sort"[^>]*><slot><\/slot>/,
     )
-    expect(rendered(served, 'helix-headless-data-table')).toContain('aria-rowindex="2"')
-    expect(rendered(served, 'helix-headless-data-table')).toContain('aria-rowindex="3"')
-    expect(served).not.toContain('alpha')
+  })
+
+  /**
+   * The checkbox and grip headings wait for hydration, because the rows the
+   * page served have no cells under them: a box before the headings would set
+   * each one a column off its values until then.
+   */
+  test('the checkbox and grip headings are not served', () => {
+    const served = rendered(
+      withoutStyles(
+        ssr(html`<helix-headless-data-table
+          .rows=${rows}
+          label="Files"
+          reorderable-rows
+          row-key="name"
+          selectable
+        ></helix-headless-data-table>`),
+      ),
+      'helix-headless-data-table',
+    )
+    expect(served).not.toContain('part="select-all"')
+    expect(served).not.toContain('part="grip-head"')
   })
 
   test('the host writes no attributes of its own, so hydration has nothing to reconcile', () => {
@@ -99,11 +118,11 @@ describe('data table server output', () => {
    * The counts belong to the grid, which is the host, and the host says them
    * through its internals, which a server does not write. On the `rowgroup`
    * they applied to nothing, so the served markup carries none there, and the
-   * rows still carry their place in the result.
+   * header row still carries its place.
    */
   test('the row count is not served on the row group, where it means nothing', () => {
     expect(partTag(markup, 'table')).not.toContain('aria-rowcount')
-    expect(rendered(markup, 'helix-headless-data-table')).toContain('aria-rowindex="2"')
+    expect(partTag(markup, 'head')).toContain('aria-rowindex="1"')
   })
 
   /**
@@ -198,8 +217,8 @@ describe('the uncontrolled defaults a table takes from markup', () => {
   /* `default-filter` is not asserted here and cannot be. The filter matches on
      each column's ordering value, the columns are markup children, and Lit SSR
      gives this element no tree to read them from, so every row matches nothing
-     and the served count is zero whatever the seed says. It is the same
-     limitation the note above pins for the cell values, and the seed is
+     and the served count is zero whatever the seed says. It is the reason the
+     values reach a server only as rows the page writes, and the seed is
      asserted in the DOM spec instead. */
 })
 

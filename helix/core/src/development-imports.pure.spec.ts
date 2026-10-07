@@ -32,11 +32,13 @@ describe('the development-only audits in the published files', () => {
     const exported = pkg.exports as unknown as Record<string, Record<string, string>>
     expect(Object.keys(pkg.imports).sort()).toEqual([
       '#audit-name',
+      '#audit-served',
       '#audit-source',
       '#react-audit',
     ])
     for (const [key, subpath] of [
       ['#audit-name', './audits/name'],
+      ['#audit-served', './audits/served'],
       ['#audit-source', './audits/source'],
       ['#react-audit', './audits/react'],
     ] as const) {

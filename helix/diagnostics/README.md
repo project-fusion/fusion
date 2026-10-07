@@ -313,6 +313,7 @@ diagnostics counts it by kind and tag. None fails a CI job.
 | `picture-in-picture-refused` | The browser refused picture in picture |
 | `refused-length` | A grid's `min` is not a length it can write, so it lays out by `columns` |
 | `removed-callback` | A React prop is a callback that was removed and never ran from JSX. Development builds only (the `development` export condition) |
+| `served-rows-differ` | A data table's first drawn page differs from the rows the page served, so the rows change once it draws. Development builds only (the `development` export condition) |
 | `solid-handler-syntax` | A React prop uses Solid's `on:` syntax. Development builds only (the `development` export condition) |
 | `stencil-regions-unused` | A graph stencil's regions could not be used |
 | `stencil-without-inside` | A graph stencil has no inside to place the notes in |
