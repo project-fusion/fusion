@@ -1055,6 +1055,10 @@ describe('canvas connections and removal', () => {
         nodes: ['b'],
       },
     ])
+    /* The request is said, as a request to connect is: nothing else would tell
+       a reader that the key did anything until the page acts. */
+    await host.updateComplete
+    expect(part(host, 'live')?.textContent?.trim()).toBe('Asked to remove Second.')
   })
 
   test('Delete on a connection asks for that connection alone', async () => {

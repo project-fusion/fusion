@@ -596,6 +596,15 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   redoneLabel = 'Move made again'
 
   /**
+   * What screen readers hear when Delete asks to remove what is selected, with
+   * `{count}` for how many cards and connections, and `{name}` for the one
+   * where there is one.
+   */
+  @words
+  @property({ attribute: 'removed-label' })
+  removedLabel = '{count, plural, one {Asked to remove {name}.} other {Asked to remove # items.}}'
+
+  /**
    * What screen readers hear after a key resizes a card, with `{name}` for the
    * card and `{width}` and `{height}` for its new size, in the document's
    * units.
@@ -1568,6 +1577,23 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       (key) => !gone.has(key),
     )
     this.refocus = { gone: [...gone], next }
+    /* Said as a connection request is, since the page may take a moment to act
+       on it, or refuse it, and a reader hears nothing from either. */
+    const only = asked[0]
+    const edge = only?.startsWith('edge:')
+      ? edges.find((one) => this.keyOf(one) === only)
+      : undefined
+    this.say(
+      formatWords(this, 'removedLabel', {
+        count: asked.length,
+        name: edge
+          ? formatWords(this, 'connectionLabel', {
+              from: this.nameOf(edge.fromNode),
+              to: this.nameOf(edge.toNode),
+            })
+          : this.nameOf(only ?? ''),
+      }),
+    )
     this.dispatchEvent(new HelixRemoveEvent(detail))
   }
 
