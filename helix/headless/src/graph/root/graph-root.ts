@@ -80,6 +80,7 @@ import {
  * @documentation https://fusion.dev/helix/components/graph
  *
  * @slot - The renderer's box, which the drawing is made in.
+ * @slot empty - What the panel shows when the list holds no notes. Defaults to `empty-label`.
  * @slot filter-icon - The icon in the search field. Defaults to a magnifying glass.
  * @slot footer - Content below the graph.
  * @slot fullscreen-icon - Replaces the glyph inside the fullscreen button.
@@ -106,6 +107,7 @@ import {
  * @csspart body - The drawing beside the list, or above it where the frame is narrow.
  * @csspart controls - The group the pan and zoom buttons sit in.
  * @csspart count - How many notes the list holds, which a search narrows, at the end of the search bar.
+ * @csspart empty - The box in place of the list when it holds no notes, holding the `empty` slot.
  * @csspart filter-icon - The icon beside the search field.
  * @csspart filter-mark - The default icon beside the search field, shown when none is slotted.
  * @csspart footer - The strip below the graph.
@@ -188,6 +190,14 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
    */
   @property({ type: Number })
   depth?: number
+
+  /**
+   * What the panel shows when the list holds no notes: the graph has none, or
+   * a search or the legend hid them all. A slotted `empty` replaces it.
+   */
+  @words
+  @property({ attribute: 'empty-label' })
+  emptyLabel = 'No notes'
 
   /**
    * The graph's name where `label` is empty and the host has no
@@ -906,6 +916,7 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
       part="region"
       role="group"
       aria-label=${this.label || this.getAttribute?.('aria-label') || this.fallbackLabel}
+      aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight Plus Minus"
       tabindex="0"
       @focusin=${this.idle.stir}
       @keydown=${this.handleKeydown}
@@ -951,6 +962,7 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
             data-scroller
             aria-label=${this.notesLabel}
             aria-activedescendant=${cursor}
+            aria-keyshortcuts="ArrowUp ArrowDown Home End PageUp PageDown Enter Space"
             @keydown=${this.handleListKeydown}
             @scroll=${() => this.virtualize.measure()}
           >
@@ -958,6 +970,14 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
             ${this.renderRows()}
             <div part="after" role="presentation" style="block-size: ${after}px"></div>
           </div>
+          ${
+            /* Beside the list and never in it: a listbox holds options, and
+               words in one would be read as a note. The live region already
+               says the count, so this is for the eye. */
+            this.entries.length === 0
+              ? html`<div part="empty"><slot name="empty">${this.emptyLabel}</slot></div>`
+              : nothing
+          }
         </div>
       </div>
       <div part="footer">
