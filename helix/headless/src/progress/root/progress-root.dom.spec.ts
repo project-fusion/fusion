@@ -58,10 +58,18 @@ describe('format-options', () => {
     expect(busy.internals?.ariaValueText).toBeNull()
   })
 
-  test('absent writes a whole percentage and leaves the reading to the platform', async () => {
+  /* Left to the platform, a range from 12 to 20 at 16 was read out as "16",
+     where the bar shows half, and a French page heard no French spacing.
+     React Aria's ProgressBar writes its formatted reading into the value text
+     whatever is shown, and so does this. */
+  test('absent writes a whole percentage, and says the same words it shows', async () => {
     const bar = await progress('show-value value="62" locale="en"')
     expect(bar.shadowRoot?.querySelector('[part="value"]')?.textContent?.trim()).toBe('62%')
-    expect(bar.internals?.ariaValueText).toBeNull()
+    expect(bar.internals?.ariaValueText).toBe('62%')
+    const ranged = await progress('min="12" max="20" value="16" locale="fr"')
+    expect(ranged.internals?.ariaValueText).toBe(
+      new Intl.NumberFormat('fr', { style: 'percent' }).format(0.5),
+    )
   })
 })
 
@@ -124,8 +132,8 @@ describe('progress', () => {
     expect(bar.internals?.ariaValueNow).toBe('3')
   })
 
-  test('no value text means none is announced, rather than an empty one', async () => {
-    expect((await progress()).internals?.ariaValueText).toBeNull()
+  test('no value text means the percentage is announced, rather than an empty text', async () => {
+    expect((await progress('value="62" locale="en"')).internals?.ariaValueText).toBe('62%')
   })
   test('reports no value at all, which is how the platform says unknown', async () => {
     /* Absent, not zero. An omitted `aria-valuenow` is the platform's own

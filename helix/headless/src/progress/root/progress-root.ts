@@ -28,6 +28,10 @@ import { property } from 'lit/decorators.js'
  *
  * The fill is a fraction of the track, written as a custom property.
  *
+ * **The reading is said in the words the bar would show**: a whole percentage
+ * of the range in `locale`, the reading `format-options` writes, or
+ * `value-text`, as `aria-valuetext` beside the number.
+ *
  * **Reaching `max` is said and sent.** When the value arrives at `max` from
  * below, the bar says `complete-label`, "Complete" by default, in a polite
  * `live` region and sends `helix-complete`, so a reader hears that the work is
@@ -85,7 +89,8 @@ export class HelixHeadlessProgress extends HelixElement {
    *
    * A `percent` style writes the share of the range, and any other the value
    * itself, so the example says "18 GB". Absent is a whole percentage. The
-   * words are announced as well as shown. `value-text` still wins.
+   * words are announced whether or not `show-value` shows them. `value-text`
+   * still wins.
    */
   @property({ attribute: 'format-options', type: Object })
   formatOptions?: Intl.NumberFormatOptions
@@ -250,8 +255,11 @@ export class HelixHeadlessProgress extends HelixElement {
     this.internals.ariaValueNow = this.indeterminate
       ? null
       : String(Math.min(Math.max(this.value || min, min), max))
-    this.internals.ariaValueText =
-      this.valueText || (this.formatOptions !== undefined && !this.indeterminate ? this.text : null)
+    /* The words the bar shows, said whether or not they are shown. Left to the
+       platform, a range from 12 to 20 at 16 was read as "16" where the bar
+       draws half, and in the runtime's digits rather than the page's. React
+       Aria's ProgressBar writes its formatted reading here the same way. */
+    this.internals.ariaValueText = this.indeterminate ? this.valueText || null : this.text
     this.toggleState('complete', this.complete)
   }
 
