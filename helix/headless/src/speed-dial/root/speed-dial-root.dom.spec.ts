@@ -148,6 +148,19 @@ describe('a speed dial', () => {
     expect(trigger.getAttribute('aria-expanded')).toBe('false')
   })
 
+  test('the drawn trigger takes a glyph of yours in place of its plus', async () => {
+    const host = (await mount(
+      `<helix-headless-speed-dial label="Write">
+        <svg slot="icon" id="pencil"></svg>
+        <helix-headless-speed-dial-item value="note">Note</helix-headless-speed-dial-item>
+      </helix-headless-speed-dial>`,
+    )) as Dial
+    await host.updateComplete
+    const slot = part(host, 'trigger')?.querySelector('slot[name="icon"]') as HTMLSlotElement
+    expect(slot.assignedElements()[0]?.id).toBe('pencil')
+    expect(slot.querySelector('svg')).not.toBeNull()
+  })
+
   /* The host takes no focus of its own, so a page focusing the dial, after a
      dialog closes for one, left focus on the body. */
   test('focusing the dial focuses its trigger, slotted or drawn', async () => {
