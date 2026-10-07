@@ -57,6 +57,8 @@ describe('input number', () => {
   test('the field and its buttons are a group, and the field is called a number field', async () => {
     const host = await field()
     expect(part(host, 'field')?.getAttribute('role')).toBe('group')
+    /* Named by the label, as React Aria's group is. It had no name. */
+    expect(part(host, 'field')?.getAttribute('aria-labelledby')).toBe(part(host, 'label')?.id ?? '')
     expect(control(host).getAttribute('aria-roledescription')).toBe('number field')
     host.setAttribute('role-label', 'Zahlenfeld')
     await host.updateComplete
