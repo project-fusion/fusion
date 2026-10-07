@@ -453,10 +453,21 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   private get fillStyle(): string {
     const fraction = this.fraction
     if (!this.origin) {
-      return `--slider-fraction: ${fraction}`
+      return `--slider-fraction: ${fraction}${this.axis}`
     }
     const at = { center: 0.5, end: 1, start: 0 }[this.origin] ?? 0
-    return `--slider-fraction: ${fraction}; --slider-from: ${Math.min(at, fraction)}; --slider-to: ${Math.max(at, fraction)}`
+    return `--slider-fraction: ${fraction}; --slider-from: ${Math.min(at, fraction)}; --slider-to: ${Math.max(at, fraction)}${this.axis}`
+  }
+
+  /**
+   * The range's axis, written on it, so a vertical slider is vertical to the
+   * accessibility tree with no stylesheet: Chromium reads a range's
+   * orientation off its writing mode and ignores `aria-orientation` there.
+   * `direction: rtl` puts the maximum at the top, which `vertical-lr` alone
+   * puts at the foot.
+   */
+  private get axis(): string {
+    return this.orientation === 'vertical' ? '; writing-mode: vertical-lr; direction: rtl' : ''
   }
 
   /**
@@ -639,7 +650,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
         id=${which === 'start' ? 'control' : 'control-end'}
         data-thumb=${which}
         type="range"
-        style="--slider-from: ${this.along(start)}; --slider-to: ${this.along(end)}"
+        style="--slider-from: ${this.along(start)}; --slider-to: ${this.along(end)}${this.axis}"
         min=${this.min}
         max=${this.max}
         step=${this.step}
