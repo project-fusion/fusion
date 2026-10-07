@@ -45,7 +45,7 @@ helix-listbox::part(search) {
 }
 
 helix-listbox::part(search-field) {
-  font-size: var(--helix-text-md);
+  font-size: max(var(--helix-text-field-min), var(--helix-text-md));
 }
 
 /* Room to read, because a palette is scanned rather than filled in. */

@@ -256,7 +256,7 @@
   box-sizing: border-box;
   color: var(--helix-color-foreground);
   font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-xs);
+  font-size: max(var(--helix-text-field-min), var(--helix-text-xs));
   inline-size: var(--canvas-label-editor-inline-size, 12rem);
   left: var(--_canvas-editor-x);
   padding: var(--helix-space-2xs) var(--helix-space-xs);

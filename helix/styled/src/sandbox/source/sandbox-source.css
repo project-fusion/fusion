@@ -10,7 +10,7 @@
   border: none;
   color: var(--helix-color-foreground-muted);
   font-family: var(--helix-font-mono);
-  font-size: var(--helix-text-xs);
+  font-size: max(var(--helix-text-field-min), var(--helix-text-xs));
   inline-size: 100%;
   line-height: var(--helix-leading-normal);
   min-block-size: var(--sandbox-source-min-block-size, 12rem);

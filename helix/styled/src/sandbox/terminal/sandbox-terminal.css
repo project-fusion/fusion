@@ -37,6 +37,12 @@
   padding: var(--helix-space-2xs) var(--helix-space-xs);
 }
 
+/* A select, which iOS Safari zooms into below 16px, so its type has the field
+   floor under it. */
+[part="filter"] {
+  font-size: max(var(--helix-text-field-min), var(--helix-text-xs));
+}
+
 [part="clear"] {
   cursor: pointer;
 }

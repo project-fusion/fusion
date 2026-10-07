@@ -146,7 +146,7 @@ slot[name="filter-icon"]::slotted(*) {
   box-sizing: border-box;
   color: var(--helix-color-foreground);
   font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-sm);
+  font-size: max(var(--helix-text-field-min), var(--helix-text-sm));
   font-weight: var(--helix-weight-medium);
   inline-size: 100%;
   padding-inline: var(--helix-space-xs);

@@ -749,6 +749,15 @@ export const TOKENS: Token[] = [
   ['size-control', 'var(--helix-size-control-md)'],
   /* The type and the inset a control takes at the current density. */
   ['text-control', 'var(--helix-text-sm)'],
+  /* *The smallest type a field you type into may take.** iOS Safari zooms the
+     page into a focused input, textarea or select whose text is under 16px, so
+     on a touch screen this is 16px and everywhere else it is 0, which leaves
+     the desktop sizes alone. A field sets its text to the larger of this and
+     its own step, `max(var(--helix-text-field-min), var(--helix-text-md))`.
+     The value is decided by the pointer in `_modes.css`, since a token here
+     cannot carry a media query. Set it to `0px` to keep the desktop sizes on a
+     touch screen. */
+  ['text-field-min', 'var(--_helix-text-field-min)'],
   ['space-control', 'var(--helix-space-md)'],
   ['size-control-lg', 'calc(3rem * var(--_helix-seed-density))'],
   /* *A step either side of whatever step is current**, for a control that is
