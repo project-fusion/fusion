@@ -152,6 +152,7 @@ import { HelixShortcutEvent } from './shortcut.js'
 import { HelixSortEvent } from './sort.js'
 import { HelixSortedEvent } from './sorted.js'
 import { HelixSplitEvent } from './split.js'
+import { HelixStrandsFallbackEvent } from './strands-fallback.js'
 import { HelixToggleEvent } from './toggle.js'
 import { HelixTourAskEvent } from './tour-ask.js'
 import { HelixTourStatusEvent } from './tour-status.js'
@@ -204,6 +205,7 @@ export type {
   ShortcutDetail,
   SkipDetail,
   SortDetail,
+  StrandsFallbackDetail,
   ToggleDetail,
   TourAskDetail,
   TourStatusDetail,
@@ -299,6 +301,7 @@ export {
   HelixSortEvent,
   HelixSortedEvent,
   HelixSplitEvent,
+  HelixStrandsFallbackEvent,
   HelixToggleEvent,
   HelixTourAskEvent,
   HelixTourStatusEvent,
@@ -404,6 +407,7 @@ const registry = {
   HelixSortEvent,
   HelixSortedEvent,
   HelixSplitEvent,
+  HelixStrandsFallbackEvent,
   HelixToggleEvent,
   HelixTourAskEvent,
   HelixTourStatusEvent,

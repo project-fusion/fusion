@@ -1,0 +1,5 @@
+/* Strands fills the box it is given, the way an image does, so an example has
+   to give it one. */
+.stage {
+  block-size: 20rem;
+}

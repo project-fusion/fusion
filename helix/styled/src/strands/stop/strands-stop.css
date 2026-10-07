@@ -1,0 +1,12 @@
+/* A stop is an instruction to its parent and draws nothing, so it takes no
+   room in the content box it is slotted into. */
+:host {
+  display: none;
+}
+
+/* Nothing to print either, said here because every sheet answers for paper. */
+@media print {
+  :host {
+    display: none;
+  }
+}

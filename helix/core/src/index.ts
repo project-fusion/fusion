@@ -250,6 +250,7 @@ export {
   HelixSortEvent,
   HelixSortedEvent,
   HelixSplitEvent,
+  HelixStrandsFallbackEvent,
   HelixToggleEvent,
   HelixTourAskEvent,
   HelixTourStatusEvent,
@@ -282,6 +283,7 @@ export {
   type ShortcutDetail,
   type SkipDetail,
   type SortDetail,
+  type StrandsFallbackDetail,
   type ToggleDetail,
   type TourStatusDetail,
   type TypingDetail,
@@ -463,6 +465,7 @@ export {
 export { type DrawIconOptions, drawIcon } from './utils/draw-icon/draw-icon.js'
 export { CHART_PLOT, drawTooltip, type ReadingCursor } from './utils/draw-tooltip/draw-tooltip.js'
 export { drawValueAxis } from './utils/draw-value-axis/draw-value-axis.js'
+export { drawsInSoftware } from './utils/draws-in-software/draws-in-software.js'
 export { elapsedTime } from './utils/elapsed-time/elapsed-time.js'
 export {
   type ElementByIdOptions,

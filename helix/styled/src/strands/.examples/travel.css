@@ -1,0 +1,7 @@
+/* Sections tall enough to scroll through, so the ribbon has a page to run
+   down. The element itself needs no box: in `travel` it fixes itself behind
+   the page. */
+.section {
+  min-block-size: 24rem;
+  padding-block: var(--helix-space-xl);
+}
