@@ -3,6 +3,7 @@ import { HelixHeadlessBarChart } from '@fusion.dev/helix-headless/bar-chart'
 import type { CSSResultGroup, PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as seriesStyles } from '../../shared/chart/series.css.js'
+import { styles as statusStyles } from '../../shared/chart/status.css.js'
 import { styles as tooltipStyles } from '../../shared/chart/tooltip.css.js'
 import { styles } from './bar-chart-root.css.js'
 import '../../tooltip/index.js'
@@ -220,7 +221,7 @@ export class HelixBarChart extends HelixHeadlessBarChart {
     }
   }
 
-  static override styles: CSSResultGroup = [seriesStyles, tooltipStyles, styles]
+  static override styles: CSSResultGroup = [seriesStyles, statusStyles, tooltipStyles, styles]
 }
 
 declare global {

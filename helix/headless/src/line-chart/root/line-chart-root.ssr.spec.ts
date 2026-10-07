@@ -15,6 +15,15 @@ describe('line chart server output', () => {
     expect(servedParts(markup)).toEqual(['plot'])
   })
 
+  /* "No readings" would be a claim about a table the server never read, so
+     the frame serves without it; `loading` is the page's own word and serves. */
+  test('serves its loading words, and no empty words before the table is read', () => {
+    const markup = ssr(
+      html`<helix-headless-line-chart for="sessions" loading></helix-headless-line-chart>`,
+    )
+    expect(servedParts(markup)).toEqual(['loading', 'plot'])
+  })
+
   /* The id `within` on the tooltip resolves against, so the bubble is clamped
      to the drawing rather than to the viewport. A refactor that drops it breaks
      nothing loudly: `getElementById` returns null, the boundary falls back to

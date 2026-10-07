@@ -12,6 +12,7 @@ import {
   linear,
   linePath,
   MixinChartSource,
+  MixinChartStatus,
   PLOT_HEIGHT,
   PLOT_WIDTH,
   type Point,
@@ -115,11 +116,19 @@ export interface AreaStack {
  * tap or key, and `helix-reading-press` says a reading was clicked, tapped, or
  * pressed with Enter or Space, for a page that opens what a reading stands for.
  *
+ * **A chart with nothing to draw says so.** A table with no readings shows
+ * `empty-text`, "No readings", in the plot, and `loading` shows `loading-text`
+ * there until readings arrive. The `empty` and `loading` slots take markup in
+ * their place, such as a link to add the first reading.
+ *
  * @since 0.1.0
  * @status stable
  * @category charts
  * @aliases Stacked Area Chart, Composition Chart, Banded Chart
  * @documentation https://fusion.dev/helix/components/area-chart
+ *
+ * @slot empty - Content shown in place of the drawing when the table has no readings, such as a link to add the first. Falls back to `empty-text`.
+ * @slot loading - Content shown in place of the drawing while `loading` is set and there are no readings yet. Falls back to `loading-text`.
  *
  * @event {HelixReadingChangeEvent} helix-reading-change - The reading shown moved, or was put away: `index` is the row, or `-1` for none, with its `label`, the `series` the keys rest on, and the `pointerType` that moved it.
  * @event {HelixReadingPressEvent} helix-reading-press - A reading was clicked, tapped, or pressed with Enter or Space, with the same detail as `helix-reading-change`.
@@ -127,12 +136,14 @@ export interface AreaStack {
  * @csspart area - One part's band.
  * @csspart axis - The numbers of the scale beside the plot, under `value-axis`.
  * @csspart baseline - The rule at zero, which is the floor of the drawing.
+ * @csspart empty - The words in place of the drawing when the table has no readings: the `empty` slot, falling back to `empty-text`. Not drawn while the table cannot be read yet, on the server and during hydration.
  * @csspart gridline - One rule across the plot, under `gridlines`.
  * @csspart guide - A rule down the reading a pointer is resting on.
  * @csspart label - One reading's name.
  * @csspart labels - The row of reading names.
  * @csspart line - The top edge of one part's band.
  * @csspart live - The readout: a polite live region that says the reading the keys moved to. Hide it visually.
+ * @csspart loading - The words in place of the drawing while `loading` is set and there are no readings: the `loading` slot, falling back to `loading-text`.
  * @csspart mark - The invisible point the tooltip is anchored to.
  * @csspart plot - The drawing, which takes focus to be read by key.
  * @csspart summary - The total and each part's share at the latest reading, written as a sentence for screen readers.
@@ -158,7 +169,7 @@ export interface AreaStack {
  * @cssproperty --area-chart-axis - The width of the axis, in `ch`, set from the widest number on it. Written by the component on the axis.
  */
 @customElement('helix-headless-area-chart')
-export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
+export class HelixHeadlessAreaChart extends MixinChartStatus(MixinChartSource(HelixElement)) {
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-area-chart': { totalLabel: 'Summe' } })`.
@@ -361,7 +372,7 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
     const rows = this.sourceRows
     const stack = this.stack
     if (rows.length === 0 || stack.columns.length === 0) {
-      return html`<div id=${CHART_PLOT} part="plot"></div>`
+      return html`<div id=${CHART_PLOT} part="plot">${this.renderStatus()}</div>`
     }
     const top = this.overlap
       ? Math.max(0, ...stack.layers.flat())

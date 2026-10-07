@@ -301,6 +301,10 @@ export {
   seriesNames,
 } from './mixins/mixin-chart-source/mixin-chart-source.js'
 export {
+  MixinChartStatus,
+  type MixinChartStatusInterface,
+} from './mixins/mixin-chart-status/mixin-chart-status.js'
+export {
   type CollectionElement,
   MixinCollection,
 } from './mixins/mixin-collection/mixin-collection.js'
