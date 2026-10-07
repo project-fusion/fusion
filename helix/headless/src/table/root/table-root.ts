@@ -129,7 +129,7 @@ const lengthOf = (element: Element | undefined): number => textOf(element).lengt
 const numberOf = (value: string): number => Number(value.replaceAll(',', ''))
 
 /** The slots a child names for itself, which hold content other than rows. */
-const STATUS = new Set(['empty', 'loading'])
+const STATUS = new Set(['empty', 'error', 'loading'])
 const NAMED = new Set([...STATUS, 'heading'])
 
 /**
@@ -225,6 +225,11 @@ const NAMED = new Set([...STATUS, 'heading'])
  * | A letter or a word | Moves to the next row whose first cell starts with what you typed. |
  * | Tab | Leaves the table. |
  *
+ * When the rows did not load, set `error-text`, such as "The orders did not
+ * load", and put a button that tries again in the `error` slot. The line shows
+ * after the rows in place of the empty and loading lines, the live region says
+ * it, and the table takes the `error` state. Clear it once you try again.
+ *
  * The CSS custom properties listed for this component are written by it and
  * read by the stylesheet that draws it. Do not set them. Each holds a number
  * the component computes and CSS cannot, so the stylesheet can draw the table
@@ -238,6 +243,7 @@ const NAMED = new Set([...STATUS, 'heading'])
  *
  * @slot - The table's rows.
  * @slot empty - Content shown when there are no rows and none are loading, such as a picture and a link. Falls back to `empty-text`, which the live region still says.
+ * @slot error - Content shown while `error-text` is set, such as a button that tries again. Falls back to `error-text`, which the live region still says.
  * @slot heading - Words that name the table, shown above it, such as a heading.
  * @slot loading - Content shown while the rows load, such as a spinner. Falls back to `loading-text`, which the live region still says.
  *
@@ -261,6 +267,7 @@ const NAMED = new Set([...STATUS, 'heading'])
  * @csspart checkbox-mark-indeterminate - Added to `checkbox-mark` while only some rows are selected.
  * @csspart drag-preview - A copy of the row a pointer drags by its grip, which follows the pointer in the top layer until the row is let go, in a `reorderable` table. Hidden from assistive technology.
  * @csspart empty - The text shown when there are no rows.
+ * @csspart error - The line shown after the rows while `error-text` is set, in place of the empty and loading text.
  * @csspart grid-end - An empty box after the rows, in a `grid` table. Tab focuses it on its way out of the table, so the key leaves from the end.
  * @csspart grid-start - An empty box before the rows, in a `grid` table. Shift with Tab focuses it on its way out of the table.
  * @csspart grip-head - The heading over the row grips, in a `reorderable` table.
@@ -271,6 +278,9 @@ const NAMED = new Set([...STATUS, 'heading'])
  * @csspart table - The grid.
  *
  * @cssproperty --table-template - The column track list the table works out from its columns. The component writes it inline on the element that reads it, so setting it has no effect. Set `columns` to change the tracks.
+ *
+ * @cssstate empty - While there are no rows and none are loading.
+ * @cssstate error - While `error-text` is set.
  */
 @customElement('helix-headless-table')
 export class HelixHeadlessTable extends MixinCollection(HelixElement) {
@@ -363,6 +373,18 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
   @words
   @property({ attribute: 'dropped-label' })
   droppedLabel = 'Dropped'
+
+  /**
+   * The text shown and announced when the rows could not load. Set it when a
+   * fetch fails, and clear it once you try again. Empty, the default, shows
+   * nothing.
+   *
+   * While it is set, a line after the rows shows it, or your own content in the
+   * `error` slot, in place of the empty and loading lines, and the live region
+   * says it.
+   */
+  @property({ attribute: 'error-text' })
+  errorText = ''
 
   /**
    * The table's name where neither `label` nor an `aria-label` or
@@ -1241,6 +1263,8 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    this.toggleState('error', this.errorText !== '')
+    this.toggleState('empty', !this.loading && !this.hasRows)
     this.assign()
     this.alignCells()
     this.markSorted()
@@ -1316,8 +1340,16 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
           this.handleSlotChange()
         }}
       ></slot>
-      ${this.renderStatus(this.hasRows, grid ? 'gridcell' : 'cell')}
-    </div>${end}${this.renderLive(this.hasRows)}${this.reorder.drawDragPreview()}`
+      ${
+        this.errorText === ''
+          ? this.renderStatus(this.hasRows, grid ? 'gridcell' : 'cell')
+          : html`<p part="error" role="row"><span role=${grid ? 'gridcell' : 'cell'}><slot name="error">${this.errorText}</slot></span></p>`
+      }
+    </div>${end}${
+      this.errorText === ''
+        ? this.renderLive(this.hasRows)
+        : html`<span part="live" role="status">${this.errorText}</span>`
+    }${this.reorder.drawDragPreview()}`
   }
 }
 

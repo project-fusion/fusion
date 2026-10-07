@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -111,6 +111,35 @@ describe('a collection that is empty or still arriving', () => {
       'slot[name="loading"]',
     ) as HTMLSlotElement
     expect(loading.assignedElements()).toEqual([empty.querySelector('[slot="loading"]') as Element])
+  })
+
+  /* A table whose fetch failed could say only that it was empty, which is
+     false, or that it was loading, which never ends. */
+  test('a table shows error-text after its rows, in place of both lines, and says it', async () => {
+    const host =
+      (await mount(`<helix-headless-table label="Invoices" error-text="The invoices did not load" loading>
+        <helix-headless-table-column>Name</helix-headless-table-column>
+        <button slot="error">Try again</button>
+      </helix-headless-table>`)) as Collection & { errorText: string }
+    await settle(host)
+    const line = part(host, 'error') as HTMLElement
+    expect(line.getAttribute('role')).toBe('row')
+    expect(line.querySelector('[role="cell"]')).not.toBeNull()
+    const slot = line.querySelector('slot[name="error"]') as HTMLSlotElement
+    expect(slot.assignedElements()).toEqual([host.querySelector('[slot="error"]') as Element])
+    expect(part(host, 'loading')).toBeNull()
+    expect((part(host, 'live') as HTMLElement).textContent?.trim()).toBe(
+      'The invoices did not load',
+    )
+    expect(hasState(host, 'error')).toBe(true)
+
+    host.errorText = ''
+    host.loading = false
+    await settle(host)
+    expect(part(host, 'error')).toBeNull()
+    expect(part(host, 'empty')).not.toBeNull()
+    expect(hasState(host, 'error')).toBe(false)
+    expect(hasState(host, 'empty')).toBe(true)
   })
 
   test('and falls back to its words where nothing is slotted', async () => {
