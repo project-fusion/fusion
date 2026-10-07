@@ -39,8 +39,9 @@ import '../../color-picker/index.js'
  * style the panel to match your interface.
  *
  * The field reads every color syntax, including `#f00`, `#ff0000`,
- * `rgb(255 0 0)`, `rgba(255,0,0,.5)`, `rgb(255 0 0 / 50%)`, and
- * `hsl(0 100% 50%)`. It writes colors in the syntax that `format` names. The
+ * `rgb(255 0 0)`, `rgba(255,0,0,.5)`, `rgb(255 0 0 / 50%)`,
+ * `hsl(0 100% 50%)`, `oklch(62.8% 0.258 29.2)`, and `hsb(0, 100%, 100%)`. It
+ * writes colors in the syntax that `format` names. The
  * field shows the value without reformatting it, because half-typed input does
  * not survive a round trip through a formatter. Date Input does the same with
  * dates.
@@ -192,7 +193,8 @@ export class HelixHeadlessColorInput extends MixinPickerField(
   colorWords: Partial<ColorWords> = {}
 
   /**
-   * The syntax the value is written in: `hex`, `rgb`, or `hsl`.
+   * The syntax the value is written in: `hex`, `rgb`, `hsl`, `oklch`, or
+   * `hsb`, as Color Picker's `format`.
    *
    * **Undefaulted, because it reflects.** The two together stamp an attribute
    * onto every host anybody renders, including the ones nobody configured: the

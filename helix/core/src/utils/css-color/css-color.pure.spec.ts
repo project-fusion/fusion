@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { formatColor, parseColor, toCss, toHsl, toRgb } from './css-color.js'
+import { formatColor, parseColor, toCss, toHsl, toOklch, toRgb } from './css-color.js'
 
 const red = { alpha: 100, brightness: 100, hue: 0, saturation: 100 }
 
@@ -83,5 +83,50 @@ describe('a color written back', () => {
     expect(formatColor(half, 'rgb', true)).toBe('rgba(255, 0, 0, 0.5)')
     expect(formatColor(red, 'hsl', false)).toBe('hsl(0, 100%, 50%)')
     expect(toCss(half)).toBe('rgb(255 0 0 / 50%)')
+  })
+})
+
+/* React Aria's and Zag's color strings write hue, saturation and brightness,
+   and CSS Color 4 writes `oklch()`. Both were refused as text that is not a
+   color. */
+describe('hsb and oklch', () => {
+  test('are read, in their comma, space and alpha spellings', () => {
+    expect(parseColor('hsb(0, 100%, 100%)')).toEqual(red)
+    expect(parseColor('hsba(0, 100%, 100%, 0.5)')?.alpha).toBe(50)
+    expect(parseColor('hsb(210 40% 80%)')).toEqual({
+      alpha: 100,
+      brightness: 80,
+      hue: 210,
+      saturation: 40,
+    })
+    expect(parseColor('oklch(62.8% 0.258 29.23)')).toEqual(red)
+    expect(parseColor('oklch(0.628 0.258 29.23deg / 50%)')?.alpha).toBe(50)
+    expect(toRgb(parseColor('oklch(100% 0 none)') ?? red)).toEqual({
+      blue: 255,
+      green: 255,
+      red: 255,
+    })
+  })
+
+  test('clip a color outside sRGB to the nearest channel values', () => {
+    expect(toRgb(parseColor('oklch(87% 0.4 142)') ?? red).green).toBe(255)
+  })
+
+  test('are written back, with the alpha where asked', () => {
+    const half = { ...red, alpha: 50 }
+    expect(formatColor(red, 'hsb', false)).toBe('hsb(0, 100%, 100%)')
+    expect(formatColor(half, 'hsb', true)).toBe('hsba(0, 100%, 100%, 0.5)')
+    expect(formatColor(red, 'oklch', false)).toBe('oklch(62.8% 0.258 29.2)')
+    expect(formatColor(half, 'oklch', true)).toBe('oklch(62.8% 0.258 29.2 / 0.5)')
+    expect(formatColor({ ...red, saturation: 0 }, 'oklch', false)).toBe('oklch(100% 0 0)')
+  })
+
+  test('round trip through oklch to the same bytes', () => {
+    for (const hex of ['#3366cc', '#00aa00', '#ff8800', '#123456', '#000000']) {
+      const color = parseColor(hex) ?? red
+      const back = parseColor(formatColor(color, 'oklch', false)) ?? red
+      expect(toRgb(back)).toEqual(toRgb(color))
+    }
+    expect(toOklch(red).lightness).toBeCloseTo(0.628, 3)
   })
 })
