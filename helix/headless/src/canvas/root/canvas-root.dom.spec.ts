@@ -2745,3 +2745,22 @@ describe('the zoom a card reads', () => {
     expect(read('--canvas-zoom')).toBe(read('--_canvas-zoom'))
   })
 })
+
+/* A screen reader called the frame a group, which says nothing of what is in
+   it. A named one is called by what it is. */
+describe('what a screen reader calls a canvas', () => {
+  test('is the canvas word, where it has a name, and the role alone where it does not', async () => {
+    const named = (await mount(
+      '<helix-headless-canvas label="Release plan"></helix-headless-canvas>',
+    )) as HTMLElement & { updateComplete: Promise<boolean> }
+    await named.updateComplete
+    expect(part(named, 'region')?.getAttribute('aria-roledescription')).toBe('canvas')
+    const unnamed = (await mount(
+      '<helix-headless-canvas></helix-headless-canvas>',
+    )) as HTMLElement & {
+      updateComplete: Promise<boolean>
+    }
+    await unnamed.updateComplete
+    expect(part(unnamed, 'region')?.hasAttribute('aria-roledescription')).toBe(false)
+  })
+})

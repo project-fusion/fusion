@@ -623,3 +623,22 @@ describe('a list with no notes', () => {
     expect(list(host).getAttribute('aria-keyshortcuts')).toContain('PageDown')
   })
 })
+
+/* A screen reader called the frame a group, which says nothing of what is in
+   it. A named one is called by what it is. */
+describe('what a screen reader calls a graph', () => {
+  test('is the graph word, where it has a name, and the role alone where it does not', async () => {
+    const named = (await mount(
+      '<helix-headless-graph label="Release plan"></helix-headless-graph>',
+    )) as HTMLElement & { updateComplete: Promise<boolean> }
+    await named.updateComplete
+    expect(part(named, 'region')?.getAttribute('aria-roledescription')).toBe('graph')
+    const unnamed = (await mount(
+      '<helix-headless-graph></helix-headless-graph>',
+    )) as HTMLElement & {
+      updateComplete: Promise<boolean>
+    }
+    await unnamed.updateComplete
+    expect(part(unnamed, 'region')?.hasAttribute('aria-roledescription')).toBe(false)
+  })
+})
