@@ -76,6 +76,7 @@ const TRIGGER_ID = 'trigger'
  *
  * @cssproperty --accordion-content-height - The height of the content, in pixels, written on the `content` part while the section is open.
  *
+ * @cssstate closing - While the item has closed and its content is still drawn, until the content part's animations end.
  * @cssstate open - While the item is open.
  */
 @customElement('helix-headless-accordion-item')
@@ -131,6 +132,13 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
    */
   @property({ attribute: false })
   groupHiddenUntilFound = true
+
+  /**
+   * @internal The accordion's `mode`, written by the accordion, so the trigger
+   * of the open section says it cannot close under `single`.
+   */
+  @property({ attribute: false })
+  groupMode: 'single' | 'single-collapsible' | undefined = undefined
 
   /**
    * The level of the heading around the trigger, from 1 to 6.
@@ -197,6 +205,7 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
     if (changed.has('open')) {
       this.closing = !this.open && changed.get('open') === true && this.findable
     }
+    this.toggleState('closing', this.closing)
   }
 
   /**
@@ -398,6 +407,10 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
    * the accessibility tree by itself, and an inert region is never searched.
    * It leaves the region's own box in the tree, so a closed findable section
    * drops `role="region"` and its name until it opens.
+   *
+   * Under `mode="single"` the open section's trigger is `aria-disabled`, as in
+   * Radix, because a press cannot close the last open section. It stays
+   * focusable, so the arrow keys still reach it.
    */
   protected override render(): TemplateResult {
     const open = this.open
@@ -406,12 +419,14 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
        named by its trigger would still be listed among the page's regions. */
     const landmark = shown || !this.findable
     const level = headingLevel(this.headingLevel ?? this.groupHeadingLevel)
+    const locked = open && this.groupMode === 'single'
     return html`
       <div part="container">
         <div part="heading" role="heading" aria-level=${level}>
         <button
           id=${TRIGGER_ID}
           aria-controls=${CONTENT_ID}
+          aria-disabled=${locked ? 'true' : nothing}
           aria-expanded=${open ? 'true' : 'false'}
           part="trigger"
           type="button"
