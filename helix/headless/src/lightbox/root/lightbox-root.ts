@@ -471,6 +471,18 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
     )
   }
 
+  /**
+   * The set changed: render it again.
+   *
+   * `items` is read on each render and nothing else marks a render as due when
+   * an item arrives or leaves, so an item appended after the first render had
+   * no role description, no place in the set, and no part in the count until
+   * some unrelated property changed.
+   */
+  private readonly handleSlotChange = (): void => {
+    this.requestUpdate()
+  }
+
   /** The native dialog, or nothing where there is no DOM to hold one. */
   private get dialog(): HTMLDialogElement | null {
     return this.renderRoot?.querySelector('dialog') ?? null
@@ -874,7 +886,7 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
     >
       <slot name="header" part="header"></slot>
       <div part="viewport">
-        <slot></slot>
+        <slot @slotchange=${this.handleSlotChange}></slot>
       </div>
       <slot name="footer" part="footer"></slot>
       ${this.controls ? this.renderControls() : nothing}
