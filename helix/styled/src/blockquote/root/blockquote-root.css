@@ -47,6 +47,15 @@
   text-align: end;
 }
 
+/* Inherited by the passage and the attribution alike. */
+:host([text-wrap="balance"]) {
+  text-wrap: balance;
+}
+
+:host([text-wrap="pretty"]) {
+  text-wrap: pretty;
+}
+
 /* Centered or at the end, a mark floated to the start would stand apart from
    the first line or pull it off the middle, so it stands over the passage on
    a line of its own, aligned as the passage is, and its line is shortened so

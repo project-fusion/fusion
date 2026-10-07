@@ -16,6 +16,7 @@ import { styles } from './blockquote-root.css.js'
  * `text-align` sets the passage and its attribution in the middle of the
  * column or against its far edge, as a pull quote often stands. There, the
  * mark `marks` draws stands over the passage rather than beside it.
+ * `text-wrap="balance"` evens out a short passage's lines.
  *
  * @since 0.1.0
  * @status stable
@@ -52,6 +53,18 @@ export class HelixBlockquote extends HelixHeadlessBlockquote {
    */
   @property({ attribute: 'text-align', reflect: true })
   textAlign?: 'start' | 'center' | 'end'
+
+  /**
+   * How the passage's lines break, set as `text-wrap`.
+   *
+   * `balance` evens out the length of every line, which suits a pull quote of
+   * a few lines in display type. `pretty` avoids a last line of one short
+   * word, for a longer passage. Absent, the lines break as the browser breaks
+   * them. The same name and values `Text` takes, but `nowrap`, a passage being
+   * more than one line.
+   */
+  @property({ attribute: 'text-wrap', reflect: true })
+  textWrap?: 'balance' | 'pretty'
 
   static override styles: CSSResultGroup = styles
 }
