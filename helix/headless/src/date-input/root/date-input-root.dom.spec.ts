@@ -1296,6 +1296,19 @@ describe('a date input reads a date as its locale writes one', () => {
     expect(german.value).toBe('2026-08-04')
   })
 
+  /* Measured before this: `Aug 4, 2026`, the date the field shows when idle
+     in en-US, stayed text, the comma read as two dates in one. */
+  test('with a comma inside the one date', async () => {
+    for (const text of ['Aug 4, 2026', 'August 4, 2026']) {
+      const host = await field('name="d" locale="en-US"')
+      await type(host, text)
+      control(host).dispatchEvent(new Event('change'))
+      await host.updateComplete
+      expect(host.value).toBe('2026-08-04')
+      expect(formValue(host)).toBe('2026-08-04')
+    }
+  })
+
   test('and each end of a range', async () => {
     const host = await field('mode="range" locale="en-US"')
     await type(host, 'Aug 4, 2026 – 8/11/2026')
