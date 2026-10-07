@@ -3,7 +3,7 @@ import { HelixHeadlessTimeInput } from '@fusion.dev/helix-headless/time-input'
 import type { CSSResultGroup } from 'lit'
 /* Inherited from the base along with the template: this file has neither tag in
    it to remind anyone. */
-import '../../tag/index.js'
+import '../../tag/root/index.js'
 import '../../time-picker/index.js'
 import { styles as fieldStyles } from '../../shared/field/field.css.js'
 import { styles as fieldFrameStyles } from '../../shared/field/field-frame.css.js'
