@@ -79,13 +79,17 @@ export class HelixHeadlessCallout extends MixinDismissible(HelixElement) {
   static words = 'helix-callout'
 
   /**
-   * Whether the callout is showing. A dismissal nobody canceled turns it
-   * false and the callout hides itself, and setting it true shows the callout
-   * again. Not reflected: open is the resting state, so an `open` attribute
-   * would appear on markup a server sent without it.
+   * The dismiss button's name, read by screen readers, with `{label}` for
+   * what the callout is called: its heading, or the tone's name where it has
+   * none.
+   *
+   * "Dismiss Scheduled maintenance" says which of several callouts the button
+   * takes away, where every button was "Dismiss". A label without `{label}` is
+   * read as written.
    */
-  @property({ type: Boolean })
-  open = true
+  @words
+  @property({ attribute: 'dismiss-label' })
+  override dismissLabel = 'Dismiss {label}'
 
   /** Which journey is the latest, so an entrance settling late leaves an exit alone. */
   private turn = 0
@@ -115,17 +119,13 @@ export class HelixHeadlessCallout extends MixinDismissible(HelixElement) {
   }
 
   /**
-   * The dismiss button's name, read by screen readers, with `{label}` for
-   * what the callout is called: its heading, or the tone's name where it has
-   * none.
-   *
-   * "Dismiss Scheduled maintenance" says which of several callouts the button
-   * takes away, where every button was "Dismiss". A label without `{label}` is
-   * read as written.
+   * Whether the callout is showing. A dismissal nobody canceled turns it
+   * false and the callout hides itself, and setting it true shows the callout
+   * again. Not reflected: open is the resting state, so an `open` attribute
+   * would appear on markup a server sent without it.
    */
-  @words
-  @property({ attribute: 'dismiss-label' })
-  override dismissLabel = 'Dismiss {label}'
+  @property({ type: Boolean })
+  open = true
 
   /**
    * What kind of attention the passage needs.

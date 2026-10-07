@@ -136,13 +136,6 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
   static words = 'helix-video-playlist'
 
   /**
-   * What the playlist says while it has no entries. The `empty` slot replaces it.
-   */
-  @words
-  @property({ attribute: 'empty-label' })
-  emptyLabel = 'No videos'
-
-  /**
    * What screen readers hear when a move is put back, in a `reorderable`
    * playlist. `{name}` is the entry's words.
    */
@@ -159,29 +152,11 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
   droppedLabel = 'Dropped'
 
   /**
-   * What screen readers hear each time a key moves an entry, in a
-   * `reorderable` playlist. `{name}` is the entry's words, `{position}` its
-   * new place, counting from 1, and `{count}` the number of entries.
+   * What the playlist says while it has no entries. The `empty` slot replaces it.
    */
   @words
-  @property({ attribute: 'moved-label' })
-  movedLabel = '{name} moved to position {position} of {count}'
-
-  /**
-   * What screen readers hear when a pointer picks up an entry, in a
-   * `reorderable` playlist. `{name}` is the entry's words.
-   */
-  @words
-  @property({ attribute: 'picked-up-label' })
-  pickedUpLabel = 'Picked up {name}'
-
-  /**
-   * Lets a reader move the entries, with Alt and the arrow keys or by
-   * dragging one. The playlist moves no entry itself: you move your entries
-   * on `helix-reorder`.
-   */
-  @property({ reflect: true, type: Boolean })
-  reorderable = false
+  @property({ attribute: 'empty-label' })
+  emptyLabel = 'No videos'
 
   /**
    * The list's name, read by screen readers.
@@ -191,12 +166,29 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
   label = 'Playlist'
 
   /**
+   * What screen readers hear each time a key moves an entry, in a
+   * `reorderable` playlist. `{name}` is the entry's words, `{position}` its
+   * new place, counting from 1, and `{count}` the number of entries.
+   */
+  @words
+  @property({ attribute: 'moved-label' })
+  movedLabel = '{name} moved to position {position} of {count}'
+
+  /**
    * Stays on an entry when its clip ends, where the playlist would otherwise
    * play the next one. The player's controls, a press, and `next()` still
    * move. `repeat="one"` still plays the entry again.
    */
   @property({ attribute: 'no-advance', type: Boolean })
   noAdvance = false
+
+  /**
+   * What screen readers hear when a pointer picks up an entry, in a
+   * `reorderable` playlist. `{name}` is the entry's words.
+   */
+  @words
+  @property({ attribute: 'picked-up-label' })
+  pickedUpLabel = 'Picked up {name}'
 
   /**
    * What the live region says when the playlist moves to another entry.
@@ -209,6 +201,14 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
   @words
   @property({ attribute: 'playing-label' })
   playingLabel = 'Now playing {title}'
+
+  /**
+   * Lets a reader move the entries, with Alt and the arrow keys or by
+   * dragging one. The playlist moves no entry itself: you move your entries
+   * on `helix-reorder`.
+   */
+  @property({ reflect: true, type: Boolean })
+  reorderable = false
 
   /** The live region, rendered from the first move. */
   private readonly status = new StatusController(this)
@@ -250,30 +250,15 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
     say: (words) => this.status.say(words),
   })
 
-  /** The entries marked last in a move, so a mark that moves is taken off where it was. */
-  private marked = new Set<HelixHeadlessVideoPlaylistItem>()
-
   /**
-   * Puts each entry's place in a move on it, as states the styled tier draws:
-   * the entry dragged, and the one the drop indicator is before or after.
+   * Tells each entry where it stands in a move, which it says through its
+   * states for the styled tier to draw: the entry dragged, and the one the
+   * drop indicator is before or after.
    */
   private markMoves(): void {
-    const marked = new Set<HelixHeadlessVideoPlaylistItem>()
     for (const entry of this.items) {
-      const move = this.reorderable ? this.reorder.moveOf(entry.value) : undefined
-      if (move || this.marked.has(entry)) {
-        for (const state of ['dragging', 'drop-after', 'drop-before'] as const) {
-          ;(entry as unknown as { toggleState(name: string, on: boolean): void }).toggleState(
-            state,
-            state === move,
-          )
-        }
-      }
-      if (move) {
-        marked.add(entry)
-      }
+      entry.move = this.reorderable ? this.reorder.moveOf(entry.value) : undefined
     }
-    this.marked = marked
   }
 
   /**

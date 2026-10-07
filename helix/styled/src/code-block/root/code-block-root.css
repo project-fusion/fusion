@@ -425,7 +425,7 @@
 
 [part="fold"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  outline-offset: calc(var(--helix-size-focus-ring) * -1);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }
 
 /* *A wash, not the tone's surface.** `success-surface` is the solid fill a
