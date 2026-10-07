@@ -1,4 +1,5 @@
 import {
+  animationsSettled,
   customElement,
   drawDismiss,
   drawDismissGlyph,
@@ -33,8 +34,12 @@ type CalloutTone = 'danger' | 'info' | 'neutral' | 'success' | 'warning'
  * region around it.
  *
  * Set `dismissible` for a note a reader may put away, as Shoelace's `closable`
- * alert does. The button fires `helix-dismiss` and the callout stays until a
- * listener removes it, so the page decides whether it comes back.
+ * alert does. The button fires `helix-dismiss`, and unless a listener cancels
+ * it the callout hides itself: `open` turns false, `:state(exiting)` holds
+ * while its exit animations run, and then it is `hidden`. Remove it in your
+ * listener to take it out of the page, or set `open` to show it again, which
+ * holds `:state(entering)` while it comes back. Focus on its dismiss button
+ * moves to the next callout's, or to the tab stop beside it, once it hides.
  *
  * A callout sets a passage apart inside a document and is read where it sits.
  * For page-level chrome above the masthead that is a live region and can be
@@ -51,7 +56,7 @@ type CalloutTone = 'danger' | 'info' | 'neutral' | 'success' | 'warning'
  * @slot heading - A heading above the content.
  * @slot icon - Replaces the icon chosen by `tone`.
  *
- * @event {HelixDismissEvent} helix-dismiss - The dismiss button was pressed. The callout does not remove itself, so remove it in response. Cancelable.
+ * @event {HelixDismissEvent} helix-dismiss - The dismiss button was pressed. Unless a listener cancels it, the callout hides itself, and a listener may remove it instead. Cancelable: cancel it to keep the callout showing.
  *
  * @csspart content - The content region.
  * @csspart dismiss - The button that dismisses the callout, shown when `dismissible` is set.
@@ -59,6 +64,9 @@ type CalloutTone = 'danger' | 'info' | 'neutral' | 'success' | 'warning'
  * @csspart icon - The icon region, an image named for the tone.
  * @csspart icon-mark - The icon for the tone, shown when no icon is slotted.
  *
+ * @cssstate closed - While `open` is false: the callout was dismissed, and is leaving or hidden.
+ * @cssstate entering - While a callout shown again by `open` runs its entrance animations.
+ * @cssstate exiting - While a dismissed callout runs its exit animations, before it is hidden.
  * @cssstate has-heading - Something is slotted into `heading`.
  * @cssstate has-icon - An icon of your own is slotted into `icon`, in place of the tone's.
  */
@@ -70,10 +78,40 @@ export class HelixHeadlessCallout extends MixinDismissible(HelixElement) {
    */
   static words = 'helix-callout'
 
+  /**
+   * Whether the callout is showing. A dismissal nobody canceled turns it
+   * false and the callout hides itself, and setting it true shows the callout
+   * again. Not reflected: open is the resting state, so an `open` attribute
+   * would appear on markup a server sent without it.
+   */
+  @property({ type: Boolean })
+  open = true
+
+  /** Which journey is the latest, so an entrance settling late leaves an exit alone. */
+  private turn = 0
+
+  /** Hidden from a reader once hidden, for the focus hand-off. */
+  protected override get present(): boolean {
+    return this.isConnected && !this.hasAttribute('hidden')
+  }
+
+  /**
+   * Hides the callout once a dismissal stands, unless the page removed it in
+   * its listener, which is the page's answer and leaves `open` as it was.
+   */
+  override dismiss(): boolean {
+    const stands = super.dismiss()
+    if (stands && this.isConnected) {
+      this.open = false
+    }
+    return stands
+  }
+
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     // On the host, since the host is the box.
     hostAria(this.internals, { role: 'note' })
+    this.toggleState('closed', !this.open)
   }
 
   /**
@@ -186,6 +224,43 @@ export class HelixHeadlessCallout extends MixinDismissible(HelixElement) {
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.readRegions()
+    if (changed.has('open') && changed.get('open') !== undefined) {
+      this.journey()
+    } else if (changed.has('open') && !this.open) {
+      /* Shut from the start, which is no journey. */
+      this.setAttribute('hidden', '')
+    }
+  }
+
+  /**
+   * The way out after a dismissal, or back in after `open` is set again.
+   *
+   * **Hidden only once the exit has run**, since a hidden element draws no
+   * animation: `:state(exiting)` holds until every animation on the callout
+   * has finished, or two frames where it has none, and then `hidden` takes it
+   * out of the page and out of the accessibility tree. Shown again at once,
+   * with `:state(entering)` while it arrives.
+   */
+  private journey(): void {
+    this.turn += 1
+    const turn = this.turn
+    const open = this.open
+    this.toggleState('entering', open)
+    this.toggleState('exiting', !open)
+    if (open) {
+      this.removeAttribute('hidden')
+    }
+    void animationsSettled(this).then(() => {
+      if (turn !== this.turn) {
+        return
+      }
+      this.toggleState('entering', false)
+      this.toggleState('exiting', false)
+      if (!open) {
+        this.setAttribute('hidden', '')
+        this.handFocusOn()
+      }
+    })
   }
 
   /** Says which regions hold something, one call apiece so each pairs with its `@cssstate`. */

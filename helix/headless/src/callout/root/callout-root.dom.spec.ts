@@ -121,10 +121,10 @@ describe('a slotted icon', () => {
   })
 })
 
-/* sl-alert's `closable`: a note a reader may put away, which the page then
-   removes. */
+/* sl-alert's `closable`: a note a reader may put away, which hides itself
+   unless the page says otherwise. */
 describe('a dismissible callout', () => {
-  test('draws a named dismiss button that asks to be removed, and stays', async () => {
+  test('draws a named dismiss button that asks to be removed, and stays in the page', async () => {
     const note = await mount(
       '<helix-headless-callout dismissible dismiss-label="Hide tip">Drafts save every minute.</helix-headless-callout>',
     )
@@ -160,5 +160,68 @@ describe('a dismissible callout', () => {
   test('draws no button unless asked', async () => {
     const note = await mount('<helix-headless-callout>Text</helix-headless-callout>')
     expect(note.shadowRoot?.querySelector('[part="dismiss"]')).toBeNull()
+  })
+
+  type Note = HTMLElement & { open: boolean; updateComplete: Promise<boolean> }
+
+  /* Two frames, which is what a callout with no animation waits before it
+     hides, and a turn after. */
+  const frames = async (): Promise<void> => {
+    for (let at = 0; at < 3; at += 1) {
+      await new Promise((done) => requestAnimationFrame(() => done(undefined)))
+    }
+    await new Promise((done) => setTimeout(done, 0))
+  }
+
+  /* Measured before this: a press on the button with no listener did
+     nothing at all, and a callout had no way out that a sheet could draw. */
+  test('hides itself once the dismissal stands, leaving through `exiting`', async () => {
+    const note = (await mount(
+      '<helix-headless-callout dismissible>Drafts save every minute.</helix-headless-callout>',
+    )) as Note
+    await note.updateComplete
+    ;(note.shadowRoot?.querySelector('[part="dismiss"]') as HTMLButtonElement).click()
+    await note.updateComplete
+    expect(note.open).toBe(false)
+    expect([hasState(note, 'closed'), hasState(note, 'exiting')]).toEqual([true, true])
+    expect(note.hasAttribute('hidden')).toBe(false)
+    await frames()
+    expect(hasState(note, 'exiting')).toBe(false)
+    expect(note.hasAttribute('hidden')).toBe(true)
+    note.open = true
+    await note.updateComplete
+    expect([hasState(note, 'closed'), hasState(note, 'entering')]).toEqual([false, true])
+    expect(note.hasAttribute('hidden')).toBe(false)
+  })
+
+  test('hands focus to the next callout once it has hidden', async () => {
+    document.body.innerHTML =
+      '<helix-headless-callout dismissible>One</helix-headless-callout><helix-headless-callout dismissible>Two</helix-headless-callout>'
+    const [first, second] = [...document.body.children] as Note[]
+    await Promise.all([first?.updateComplete, second?.updateComplete])
+    const button = (one: Note | undefined): HTMLButtonElement =>
+      one?.shadowRoot?.querySelector('[part="dismiss"]') as HTMLButtonElement
+    button(first).focus()
+    button(first).click()
+    await frames()
+    await frames()
+    expect(first?.hasAttribute('hidden')).toBe(true)
+    expect(second?.shadowRoot?.activeElement).toBe(button(second))
+  })
+
+  test('stays showing where a listener cancels, and stays open where one removes it', async () => {
+    const kept = (await mount(
+      '<helix-headless-callout dismissible>Kept.</helix-headless-callout>',
+    )) as Note
+    kept.addEventListener('helix-dismiss', (event) => event.preventDefault())
+    ;(kept.shadowRoot?.querySelector('[part="dismiss"]') as HTMLButtonElement).click()
+    await kept.updateComplete
+    expect(kept.open).toBe(true)
+    const removed = (await mount(
+      '<helix-headless-callout dismissible>Removed.</helix-headless-callout>',
+    )) as Note
+    removed.addEventListener('helix-dismiss', () => removed.remove())
+    ;(removed.shadowRoot?.querySelector('[part="dismiss"]') as HTMLButtonElement).click()
+    expect(removed.open).toBe(true)
   })
 })

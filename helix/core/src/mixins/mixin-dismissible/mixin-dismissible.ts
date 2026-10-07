@@ -29,6 +29,10 @@ export declare class DismissibleElement {
 
   /** Where focus lands when a neighbor that held it is removed: the dismiss control. */
   protected get returnFocusTo(): HTMLElement | null
+
+  protected get present(): boolean
+
+  protected handFocusOn(): void
 }
 
 /**
@@ -106,6 +110,28 @@ export const MixinDismissible = <T extends Constructor<LitElement>>(Base: T) => 
      */
     protected get returnFocusTo(): HTMLElement | null {
       return this.shadowRoot?.querySelector<HTMLElement>('[part~="dismiss"]') ?? null
+    }
+
+    /**
+     * Whether the element is still on the page for a reader, which is what
+     * the focus hand-off waits on: connected, for a surface the page removes.
+     * A surface that hides itself says it is gone once hidden, and calls
+     * `handFocusOn` then.
+     */
+    protected get present(): boolean {
+      return this.isConnected
+    }
+
+    /**
+     * Hands focus on now, where a dismissal is waiting for this element to
+     * go: for a surface that hides itself, once it has.
+     */
+    protected handFocusOn(): void {
+      const settle = this.handOff
+      if (settle) {
+        this.forgetFocus?.()
+        requestAnimationFrame(() => settle(true))
+      }
     }
 
     /** Fires `helix-dismiss`, and returns `false` if a listener cancels it. */
@@ -186,7 +212,10 @@ export const MixinDismissible = <T extends Constructor<LitElement>>(Base: T) => 
       this.forgetFocus?.()
       const settle = (late: boolean): void => {
         const active = document.activeElement
-        if (this.isConnected || (active !== null && active !== document.body)) {
+        /* Focus still inside an element that hid itself has nowhere a reader
+           can see, which is as dropped as focus on the body. */
+        const dropped = active === null || active === document.body || deepContains(this, active)
+        if (this.present || !dropped) {
           return
         }
         for (const neighbor of neighbors) {
@@ -231,11 +260,7 @@ export const MixinDismissible = <T extends Constructor<LitElement>>(Base: T) => 
 
     override disconnectedCallback(): void {
       super.disconnectedCallback()
-      const settle = this.handOff
-      if (settle) {
-        this.forgetFocus?.()
-        requestAnimationFrame(() => settle(true))
-      }
+      this.handFocusOn()
     }
   }
 
