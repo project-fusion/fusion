@@ -27,6 +27,7 @@ import '../../copy-button/index.js'
  * @since 0.1.0
  * @status stable
  * @category typography
+ * @aliases Code block, Snippet, Pre
  * @documentation https://fusion.dev/helix/components/code-block
  *
  * @cssproperty --code-block-added-color - The color a diff's added lines are tinted in and their `+` is drawn in. The success color by default.
