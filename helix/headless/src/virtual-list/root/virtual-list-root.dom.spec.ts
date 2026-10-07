@@ -1037,6 +1037,26 @@ describe('a gap', () => {
   })
 })
 
+describe('a grid of columns that fit', () => {
+  /* The column count was fixed, so a grid of tiles had the same count on a
+     phone as on a wide screen. */
+  inBrowser('min-column-width lays out as many columns as fit, and follows the box', async () => {
+    const host = await fed(named(100))
+    host.minColumnWidth = 100
+    host.style.display = 'block'
+    host.style.inlineSize = '420px'
+    await settle(host)
+    await new Promise((resolve) => setTimeout(resolve, 50))
+    await settle(host)
+    const slot = host.shadowRoot?.querySelector('slot:not([name])') as HTMLElement
+    expect(slot.getAttribute('style')).toContain('repeat(4,')
+    host.style.inlineSize = '220px'
+    await new Promise((resolve) => setTimeout(resolve, 50))
+    await settle(host)
+    expect(slot.getAttribute('style')).toContain('repeat(2,')
+  })
+})
+
 describe('a grid', () => {
   const press = async (host: Updatable, key: string, init: KeyboardEventInit = {}) => {
     ;(document.activeElement as HTMLElement).dispatchEvent(

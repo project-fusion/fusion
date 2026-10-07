@@ -81,7 +81,9 @@ export interface VirtualListRange {
  * **A grid.** `columns` lays the items out that many to a line, as a grid of
  * equal columns, and windows the set a line at a time, as React Aria's grid
  * layout does. Each item draws one element, a cell of the grid, and
- * `estimate` is the height of a line. `gap` spaces the rows, and the columns
+ * `estimate` is the height of a line. `min-column-width` lays out as many
+ * columns as fit the box instead, as React Aria's grid layout does with its
+ * smallest item size, and follows the box as it resizes. `gap` spaces the rows, and the columns
  * of a grid, by a number of pixels the list counts in each row's place.
  *
  * **Keyboard.** The list is one tab stop.
@@ -298,6 +300,14 @@ export class HelixHeadlessVirtualList extends HelixElement {
   measured = false
 
   /**
+   * The narrowest a column of a grid may be, in pixels. Set, the list lays
+   * out as many columns as fit the box at that width, at least one, and
+   * follows the box as it resizes, which `columns` then does not decide.
+   */
+  @property({ attribute: 'min-column-width', type: Number })
+  minColumnWidth = 0
+
+  /**
    * Draws one item into its row, given the item and its index. Set it as a
    * property.
    *
@@ -444,9 +454,46 @@ export class HelixHeadlessVirtualList extends HelixElement {
     return Number.isFinite(this.gap) && this.gap > 0 ? this.gap : 0
   }
 
-  /** How many items a line holds: `columns`, at least one. */
+  /**
+   * How many items a line holds: as many as fit at `min-column-width` where
+   * it is set and the box has a width, and `columns` otherwise, at least one.
+   */
   private get across(): number {
+    if (this.minColumnWidth > 0 && this.boxWidth > 0) {
+      const space = this.space
+      return Math.max(1, Math.floor((this.boxWidth + space) / (this.minColumnWidth + space)))
+    }
     return Math.max(1, Math.trunc(this.columns) || 1)
+  }
+
+  /** How wide the box is, read for `min-column-width`. */
+  @state()
+  private boxWidth = 0
+
+  /** Watches the box's width, for `min-column-width`. */
+  private widthWatch: ResizeObserver | undefined
+
+  /** The items to a line the measurements were taken at. */
+  private measuredAcross = 1
+
+  /** Watches the box for its width while `min-column-width` asks for it. */
+  private watchWidth(): void {
+    const viewport = this.partNamed('viewport')
+    if (this.minColumnWidth <= 0 || !viewport || typeof ResizeObserver === 'undefined') {
+      this.widthWatch?.disconnect()
+      this.widthWatch = undefined
+      return
+    }
+    if (this.widthWatch) {
+      return
+    }
+    this.widthWatch = new ResizeObserver(([entry]) => {
+      const width = entry?.contentRect.width ?? 0
+      if (width > 0 && Math.abs(width - this.boxWidth) >= 1) {
+        this.boxWidth = width
+      }
+    })
+    this.widthWatch.observe(viewport)
   }
 
   /** The items a span of lines holds. */
@@ -535,6 +582,13 @@ export class HelixHeadlessVirtualList extends HelixElement {
        short, the box pulled its offset up to match, and End left the last item
        below the box. The first render has no box yet, so it places in
        `updated` alone. */
+    /* A line holds a different number of items now, so every line measured
+       held others. */
+    const across = this.across
+    if (across !== this.measuredAcross) {
+      this.measuredAcross = across
+      this.virtualize.forget()
+    }
     if (this.hasUpdated) {
       if (changed.has('items')) {
         this.keepPlace(changed.get('items') as readonly unknown[] | undefined)
@@ -610,6 +664,8 @@ export class HelixHeadlessVirtualList extends HelixElement {
     this.watcher = undefined
     this.sizes?.disconnect()
     this.sizes = undefined
+    this.widthWatch?.disconnect()
+    this.widthWatch = undefined
     if (this.resized !== undefined) {
       cancelAnimationFrame(this.resized)
       this.resized = undefined
@@ -661,6 +717,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
     super.updated?.(changed)
     this.toggleState('empty', this.readFor !== undefined && this.data.length === 0)
     this.toggleState('loading', this.loading)
+    this.watchWidth()
     const was = this.virtualize.window
     this.virtualize.measure()
     /* A window the measure just moved has asked for the render that sizes its
