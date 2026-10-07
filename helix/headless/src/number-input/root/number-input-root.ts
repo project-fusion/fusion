@@ -1,7 +1,6 @@
 import {
   AriaForwardController,
   appleTouch,
-  valueAsNumber as asNumber,
   customElement,
   formatNumber,
   formatWords,
@@ -1091,14 +1090,17 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
       ${this.renderHint()}${this.renderFeedback()}`
   }
   /**
-   * The value as a number, or `NaN` while the control is empty.
+   * The value as a number, or `NaN` while the control is empty or does not
+   * hold a number.
    *
+   * Read in the locale and the format, as the form reads it, so `1,5` typed
+   * in a locale with a decimal comma is 1.5 here while the form holds 1.5.
    * `NaN` and not zero, which is the trap the platform already avoids: `Number('')`
    * is zero, so an empty control would report a number it does not hold and a
    * form would submit it.
    */
   get valueAsNumber(): number {
-    return asNumber(this.value)
+    return this.numeric ?? Number.NaN
   }
 
   set valueAsNumber(count: number) {
