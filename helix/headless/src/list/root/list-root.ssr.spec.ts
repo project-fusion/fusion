@@ -65,4 +65,21 @@ describe('list server output', () => {
     expect(rendered(markup, 'helix-headless-list')).not.toContain('part="live"')
     expect(hostAttributes(markup, 'helix-headless-list')).toEqual(['reorderable'])
   })
+
+  /* Served as the client draws it, so hydration finds the same part: empty
+     and closed, and only on a list that reorders. */
+  test('a reorderable list serves its drag preview empty, and any other list none', () => {
+    const served = rendered(
+      ssr(html`<helix-headless-list reorderable></helix-headless-list>`),
+      'helix-headless-list',
+    )
+    expect(served).toContain(
+      '<div part="drag-preview" popover="manual" aria-hidden="true" inert></div>',
+    )
+    const plain = rendered(
+      ssr(html`<helix-headless-list></helix-headless-list>`),
+      'helix-headless-list',
+    )
+    expect(plain).not.toContain('drag-preview')
+  })
 })

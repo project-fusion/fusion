@@ -243,6 +243,7 @@ const isControl = (element: HTMLElement): boolean =>
  * @csspart checkbox-mark-checked - Added to `checkbox-mark` while its box is checked.
  * @csspart checkbox-mark-dash - Added to `checkbox-mark` while it draws the dash, which it keeps until its box is checked.
  * @csspart checkbox-mark-indeterminate - Added to `checkbox-mark` while only some rows are selected.
+ * @csspart drag-preview - A copy of the row a pointer drags by its grip, which follows the pointer in the top layer until the row is let go, with `reorderable-rows`. A column's grip moves the column itself. Hidden from assistive technology.
  * @csspart empty - Shown when there are no rows, because none arrived or the filter matches none. While rows are loading, the `loading` part is shown in its place.
  * @csspart footer - The region below the grid.
  * @csspart grip-head - The heading over the row grips, with `reorderable-rows`.
@@ -914,18 +915,8 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    */
   private readonly rowMoves = new ReorderController(this, {
     axis: 'block',
-    box: (key) => {
-      const index = this.pagePlaces().get(key)
-      const { first, last } = this.virtualize.window
-      /* A row outside the window has no box, and the one kept drawn beside it
-         for the tab stop has a box that is not where the row belongs. */
-      if (index === undefined || (this.windowed && (index < first || index >= last))) {
-        return undefined
-      }
-      const line = this.renderRoot?.querySelector?.(`[part~="row"][data-row="${index}"]`)
-      /* A row is `display: contents`, so its box is its cells'. */
-      return line?.firstElementChild?.getBoundingClientRect()
-    },
+    /* A row is `display: contents`, so its box is its cells'. */
+    box: (key) => this.lineOf(key)?.firstElementChild?.getBoundingClientRect(),
     drop: (move) => this.requestRowMove(move),
     enabled: () => this.rowGrips && !parse(this.sort),
     grip: (event) => {
@@ -948,6 +939,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       const row = this.drawnPage[this.pagePlaces().get(key) ?? -1]
       return row ? this.rowName(row, key) : key
     },
+    preview: (key) => this.lineOf(key),
     say: (said) => this.say(said),
     scroller: () => {
       const table = this.partNamed('table')
@@ -956,6 +948,19 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         : scrollingAncestor(this, { axis: 'y', overflowing: true })
     },
   })
+
+  /**
+   * The row drawn for a key on this page, or nothing for a row outside the
+   * window: the one kept drawn beside it for the tab stop is not where the
+   * row belongs.
+   */
+  private lineOf(key: string): Element | null | undefined {
+    const index = this.pagePlaces().get(key)
+    const { first, last } = this.virtualize.window
+    return index === undefined || (this.windowed && (index < first || index >= last))
+      ? undefined
+      : this.renderRoot?.querySelector?.(`[part~="row"][data-row="${index}"]`)
+  }
 
   /** Said once, so a table that re-renders does not repeat it. */
   private warnedAboutKey = false
@@ -2509,7 +2514,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
             ></${pagination}>`
             : nothing
         }
-      </div>`
+      </div>${this.rowMoves.drawDragPreview()}`
   }
 
   /**

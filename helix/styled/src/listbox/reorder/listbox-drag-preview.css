@@ -1,0 +1,17 @@
+/* What a reorderable listbox adopts into its own shadow root while it
+   reorders: the copy of an option a pointer drags, drawn in the top layer and
+   raised over the page while the option itself stays in place, faded. It has
+   no transition, so it follows the pointer with nothing animated, whatever the
+   reader's motion setting.
+
+   Selected as the list's one popover, which is the `drag-preview` part the
+   reorder entry draws, rather than by that part: the list's own template draws
+   no such part, so a check of the parts it renders would not find it. */
+[popover] {
+  background-color: var(--listbox-drag-preview-background-color, var(--helix-color-surface-raised));
+  border: var(--listbox-drag-preview-border-width, var(--helix-border-floating)) solid
+    var(--listbox-drag-preview-border-color, var(--helix-color-border));
+  border-radius: var(--listbox-drag-preview-radius, var(--helix-radii-sm));
+  box-shadow: var(--listbox-drag-preview-shadow, var(--helix-shadow-floating));
+  opacity: var(--listbox-drag-preview-opacity, 0.9);
+}

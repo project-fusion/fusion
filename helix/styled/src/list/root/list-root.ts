@@ -18,6 +18,12 @@ import { styles } from './list-root.css.js'
  * @aliases Rows, Stack, Menu
  * @documentation https://fusion.dev/helix/components/list
  *
+ * @cssproperty --list-drag-preview-background-color - The fill behind the copy of a row a pointer drags.
+ * @cssproperty --list-drag-preview-border-color - The color of the edge around the copy of a row a pointer drags.
+ * @cssproperty --list-drag-preview-border-width - The width of the edge around the copy of a row a pointer drags. None by default, where the shadow lifts it.
+ * @cssproperty --list-drag-preview-opacity - The opacity of the copy of a row a pointer drags.
+ * @cssproperty --list-drag-preview-radius - The corner radius of the copy of a row a pointer drags.
+ * @cssproperty --list-drag-preview-shadow - The shadow that raises the copy of a row a pointer drags over the page.
  * @cssproperty --list-gap - The space between rows.
  * @cssproperty --list-marker-gutter - The space that the markers of ordered and unordered lists sit in.
  * @cssproperty --list-rail-inline-size - The width of the rail's track.

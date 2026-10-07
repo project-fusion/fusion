@@ -105,3 +105,26 @@ describe('a data table with reorderable-rows', () => {
     host.remove()
   })
 })
+
+describe('the drag preview of a reorderable data table', () => {
+  /* The copy a pointer drags is drawn in the data table's own shadow root, so its
+     sheet gives it its look. Nothing in it is animated, so it follows the
+     pointer the same way whatever the reader's motion setting. */
+  test('raises the copy over the page through the family hooks', () => {
+    const preview = sheet().split('[part="drag-preview"] {')[1]?.split('}')[0] ?? ''
+    expect(preview).toContain(
+      'background-color: var(--data-table-drag-preview-background-color, var(--helix-color-surface-raised))',
+    )
+    expect(preview).toContain(
+      'border: var(--data-table-drag-preview-border-width, var(--helix-border-floating)) solid',
+    )
+    expect(preview).toContain(
+      'border-radius: var(--data-table-drag-preview-radius, var(--helix-radii-sm))',
+    )
+    expect(preview).toContain(
+      'box-shadow: var(--data-table-drag-preview-shadow, var(--helix-shadow-floating))',
+    )
+    expect(preview).toContain('opacity: var(--data-table-drag-preview-opacity, 0.9)')
+    expect(preview).not.toContain('transition')
+  })
+})

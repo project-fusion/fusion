@@ -17,6 +17,15 @@ const sheet = (): string => {
     .join('\n')
 }
 
+/** The tree's own stylesheet as text, which draws what its shadow root holds. */
+const rootSheet = (): string => {
+  const declared = (customElements.get('helix-tree') as unknown as { styles: unknown }).styles
+  return (Array.isArray(declared) ? declared : [declared])
+    .flat(Number.POSITIVE_INFINITY)
+    .map((one) => String((one as { cssText?: string }).cssText ?? ''))
+    .join('\n')
+}
+
 /** The declarations of the first rule written for `selector`. */
 const rule = (selector: string): string => sheet().split(`${selector} {`)[1]?.split('}')[0] ?? ''
 
@@ -74,5 +83,28 @@ describe('a reorderable tree', () => {
       'One',
     ])
     tree.remove()
+  })
+})
+
+describe('the drag preview of a reorderable tree', () => {
+  /* The copy a pointer drags is drawn in the tree's own shadow root, so its
+     sheet gives it its look. Nothing in it is animated, so it follows the
+     pointer the same way whatever the reader's motion setting. */
+  test('raises the copy over the page through the family hooks', () => {
+    const preview = rootSheet().split('[part="drag-preview"] {')[1]?.split('}')[0] ?? ''
+    expect(preview).toContain(
+      'background-color: var(--tree-drag-preview-background-color, var(--helix-color-surface-raised))',
+    )
+    expect(preview).toContain(
+      'border: var(--tree-drag-preview-border-width, var(--helix-border-floating)) solid',
+    )
+    expect(preview).toContain(
+      'border-radius: var(--tree-drag-preview-radius, var(--helix-radii-sm))',
+    )
+    expect(preview).toContain(
+      'box-shadow: var(--tree-drag-preview-shadow, var(--helix-shadow-floating))',
+    )
+    expect(preview).toContain('opacity: var(--tree-drag-preview-opacity, 0.9)')
+    expect(preview).not.toContain('transition')
   })
 })

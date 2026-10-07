@@ -23,12 +23,19 @@ import { styles } from './tree-root.css.js'
  *
  * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. The item sends it, and you can listen for it on the tree. Cancelable: canceling it changes nothing.
  *
+ * @csspart drag-preview - A copy of the row a pointer drags by its grip, which follows the pointer in the top layer until the item is let go, in a `reorderable` tree. Hidden from assistive technology.
  * @csspart live - A copy of the empty and loading messages, and each step of a move in a `reorderable` tree, in a live region that announces them when they change. Visually hidden in the styled tier.
  * @csspart tree - The tree container.
  *
  * @cssproperty --tree-chevron-gap - The space before the chevron. Set from `chevron-placement`.
  * @cssproperty --tree-chevron-order - The chevron's order in the row. Set from `chevron-placement` and read by each item.
  * @cssproperty --tree-chevron-size - Size of the chevron, and the gutter a leaf reserves.
+ * @cssproperty --tree-drag-preview-background-color - The fill behind the copy of an item a pointer drags.
+ * @cssproperty --tree-drag-preview-border-color - The color of the edge around the copy of an item a pointer drags.
+ * @cssproperty --tree-drag-preview-border-width - The width of the edge around the copy of an item a pointer drags. None by default, where the shadow lifts it.
+ * @cssproperty --tree-drag-preview-opacity - The opacity of the copy of an item a pointer drags.
+ * @cssproperty --tree-drag-preview-radius - The corner radius of the copy of an item a pointer drags.
+ * @cssproperty --tree-drag-preview-shadow - The shadow that raises the copy of an item a pointer drags over the page.
  * @cssproperty --tree-gap - Space between rows.
  * @cssproperty --tree-indent - Indent added per level.
  * @cssproperty --tree-row-size - Minimum height of a row, so rows with and without an icon match.
