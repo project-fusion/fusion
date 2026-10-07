@@ -62,9 +62,9 @@ const says = (element: Element | null, state: string): boolean => {
  * ```
  *
  * Choosing the opener says `helix-select` with its value, and canceling it
- * keeps the page that is shown. The list then shows the page, named by the opener's
- * words, and Backspace in an empty filter goes back. `page` says which page is
- * shown.
+ * keeps the page that is shown. The list then shows the page, named by the
+ * opener's words, and Backspace in an empty filter goes back. `page` says
+ * which page is shown.
  *
  * The filter is cleared when the palette closes, so each opening starts from
  * the full list. Combobox and Select do the same. As typing narrows the list, a
@@ -86,11 +86,10 @@ const says = (element: Element | null, state: string): boolean => {
  * | Tab | Stays in the palette, which is modal. With `inline`, moves on through the page. |
  *
  * **ARIA.** The palette is a modal `dialog` named by `label`, or with
- * `inline` no dialog at all. Inside it the
- * filter field is a `combobox` with `aria-activedescendant` on the
- * highlighted command, and the commands are a `listbox` of `option`s. How
- * many commands typing left, the empty text and the loading text are said in
- * a polite live region.
+ * `inline` no dialog at all. Inside it the filter field is a `combobox` with
+ * `aria-activedescendant` on the highlighted command, and the commands are a
+ * `listbox` of `option`s. How many commands typing left, the empty text and
+ * the loading text are said in a polite live region.
  *
  * @since 0.1.0
  * @status stable

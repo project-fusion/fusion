@@ -871,14 +871,17 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
     return this.feedback !== '' ? 'feedback' : this.hinted ? 'hint' : nothing
   }
 
-  /** The hint under the times, or a bare slot while there is none to show. */
+  /**
+   * The hint under the times, or a bare slot while there is none to show,
+   * hidden while a message stands in its place, so a slotted hint goes too.
+   */
   private renderHint(): TemplateResult {
     const read = (event: Event): void => {
       this.hintSlotted = slotFilled(event.target as HTMLSlotElement)
     }
     return this.hinted
       ? html`<p part="hint" id="hint"><slot name="hint" @slotchange=${read}>${this.hint}</slot></p>`
-      : html`<slot name="hint" @slotchange=${read}></slot>`
+      : html`<slot name="hint" ?hidden=${this.feedback !== ''} @slotchange=${read}></slot>`
   }
 
   /** Whether a label is slotted, which draws the `label` part around it. */

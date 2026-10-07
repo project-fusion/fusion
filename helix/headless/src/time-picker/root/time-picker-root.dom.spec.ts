@@ -789,6 +789,7 @@ describe('a time picker with help under it', () => {
   test('and a message in feedback takes its place', async () => {
     const host = await picker('hint="Open 9 to 5" feedback="Choose a time"')
     expect(part(host, 'hint')).toBeNull()
+    expect(host.shadowRoot?.querySelector('slot[name="hint"]')?.hasAttribute('hidden')).toBe(true)
     expect(part(host, 'list')?.getAttribute('aria-describedby')).toBe('feedback')
   })
 })
