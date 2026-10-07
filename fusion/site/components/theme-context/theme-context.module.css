@@ -12,6 +12,5 @@
 .themedScope {
   background: var(--helix-color-background);
   color: var(--helix-color-foreground);
-  color-scheme: var(--preview-color-scheme, light dark);
   min-block-size: 100svh;
 }
