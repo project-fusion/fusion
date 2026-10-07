@@ -203,3 +203,51 @@ describe('a required field checked from a script', () => {
     })
   }
 })
+
+/**
+ * A script that writes a value and asks at once is answered about that value.
+ *
+ * A control reports its verdict as it updates, and an update waits for a
+ * microtask, so `checkValidity()` straight after a write answered about the
+ * value before it: a Time Input given a time past its `max` said it was valid
+ * until `updateComplete`. A native control answers about the value it was just
+ * given. In `HelixFormElement`, so every form control has it.
+ */
+describe('a field asked about a value a script just wrote', () => {
+  type Written = Updatable & { checkValidity(): boolean; validity: ValidityState; value: string }
+
+  const written = async (markup: string): Promise<Written> => {
+    const host = (await mount(markup)) as Written
+    await settle(host)
+    return host
+  }
+
+  test('time input: a time past max is invalid at once', async () => {
+    const host = await written(
+      '<helix-headless-time-input label="Start" required min="09:00" max="17:00" value="10:00"></helix-headless-time-input>',
+    )
+    expect(host.checkValidity()).toBe(true)
+    host.value = '18:00'
+    expect(host.checkValidity()).toBe(false)
+    expect(host.validity.rangeOverflow).toBe(true)
+  })
+
+  test('time picker: an emptied required range is missing at once', async () => {
+    const host = await written(
+      '<helix-headless-time-picker label="Slot" required mode="range" value="09:00"></helix-headless-time-picker>',
+    )
+    expect(host.checkValidity()).toBe(true)
+    host.value = ''
+    expect(host.checkValidity()).toBe(false)
+    expect(host.validity.valueMissing).toBe(true)
+  })
+
+  test('number input: a number past max is invalid at once', async () => {
+    const host = await written(
+      '<helix-headless-number-input label="Count" max="5" value="3"></helix-headless-number-input>',
+    )
+    expect(host.validity.valid).toBe(true)
+    host.value = '9'
+    expect(host.validity.valid).toBe(false)
+  })
+})

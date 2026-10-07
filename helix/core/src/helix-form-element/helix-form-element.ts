@@ -384,12 +384,44 @@ export class HelixFormElement extends HelixElement {
    * @reference https://developer.mozilla.org/docs/Web/API/ElementInternals/validity ElementInternals.validity
    */
   get validity(): ValidityState {
+    this.runPendingUpdate()
     return this.internals.validity
   }
 
   /** The message the browser would show for the control, or an empty string. */
   get validationMessage(): string {
+    this.runPendingUpdate()
     return this.internals.validationMessage
+  }
+
+  /** Whether an update is running, so `runPendingUpdate` never starts one inside another. */
+  private updateRunning = false
+
+  protected override performUpdate(): void {
+    this.updateRunning = true
+    try {
+      super.performUpdate()
+    } finally {
+      this.updateRunning = false
+    }
+  }
+
+  /**
+   * Runs an update that is on its way, so the verdict read next is the one
+   * for what the control holds now.
+   *
+   * **A control reports its verdict as it updates, and an update waits for a
+   * microtask**, so a script that wrote `value` and asked at once was answered
+   * about the value before: measured on Time Input, `value = '18:00'` past a
+   * `max` of 17:00 and `checkValidity()` returned true until `updateComplete`.
+   * A native control answers about the value it was just given, so the
+   * questions a script can ask run the pending update first. Lit's
+   * `performUpdate` is the documented way to run one synchronously.
+   */
+  private runPendingUpdate(): void {
+    if (this.hasUpdated && this.isUpdatePending && !this.updateRunning) {
+      this.performUpdate()
+    }
   }
 
   /** Whether the control is checked when its form is submitted. */
@@ -402,6 +434,7 @@ export class HelixFormElement extends HelixElement {
    * not. The control shows no message for it: `reportValidity()` does that.
    */
   checkValidity(): boolean {
+    this.runPendingUpdate()
     this.checkInProgress = true
     try {
       return this.internals.checkValidity()
@@ -432,6 +465,7 @@ export class HelixFormElement extends HelixElement {
    * and shows the browser's message at the control.
    */
   reportValidity(): boolean {
+    this.runPendingUpdate()
     this.applyValidity()
     return this.internals.reportValidity()
   }
