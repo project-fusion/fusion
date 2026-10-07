@@ -88,7 +88,7 @@ describe('a picker’s own verdict', () => {
     const host = await mount()
     host.failing = 'missing'
     await host.updateComplete
-    /* `false`, never unset: a host with a role is otherwise judged by its
+    /* `false` until the reader has tried: a host with a role is otherwise judged by its
        validity, and reported invalid before the reader has done anything. */
     expect(host.internals.ariaInvalid).toBe('false')
     expect(host.internals.states.has('invalid')).toBe(false)

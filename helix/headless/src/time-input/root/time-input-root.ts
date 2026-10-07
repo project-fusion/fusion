@@ -218,8 +218,8 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
 
   /**
    * Whether the field shows a button that empties it, as Input's `clearable`
-   * does. Shown only while the field holds something to clear, and not while
-   * it is disabled or read-only.
+   * does. Shown only while the field holds something to clear and is neither
+   * disabled nor read-only.
    */
   @property({ type: Boolean })
   clearable = false
