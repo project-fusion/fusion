@@ -1,5 +1,6 @@
 import {
   customElement,
+  type DataOptionItem,
   type HelixBeforeChangeEvent,
   HelixElement,
   HelixSelectEvent,
@@ -15,6 +16,15 @@ import type { HelixHeadlessListbox } from '../../listbox/root/listbox-root.js'
    imports register the styled pair. `tier` picks which the template asks for. */
 import '../../dialog/index.js'
 import '../../listbox/index.js'
+
+/** Whether an element is in a custom state, where the engine can say. */
+const says = (element: Element | null, state: string): boolean => {
+  try {
+    return element?.matches(`:state(${state})`) ?? false
+  } catch {
+    return false
+  }
+}
 
 /**
  * @summary A command palette: a list of commands that opens from anywhere on the page and filters as you type.
@@ -142,6 +152,19 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
    */
   @property()
   hotkey = 'mod+k'
+
+  /**
+   * The commands as data, for a palette too long to draw whole: each a value,
+   * which is also its words, or a record with a `value`, a `label` and
+   * `disabled`. Handed to the list, which draws only the commands in sight and
+   * reads no children while it is set. See Listbox's `items`.
+   *
+   * Choosing one says `helix-select` with its value, as a child option does.
+   * A command that is a link, or that has an `alternate`, is an option you
+   * write as a child.
+   */
+  @property({ attribute: false })
+  items: readonly DataOptionItem[] | undefined = undefined
 
   /**
    * Accessible name for the overlay, which has no visible heading.
@@ -409,6 +432,13 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
     const settled = list !== null && !this.loading
     this.toggleState('loading', this.loading)
     this.toggleState('error', Boolean(this.loadError))
+    if (this.items !== undefined) {
+      /* Commands drawn from `items` are the list's own, and it says what it
+         shows in its states, which a browser reads with `:state()`. */
+      this.toggleState('empty', settled && says(list, 'empty'))
+      this.toggleState('no-results', settled && says(list, 'no-results'))
+      return
+    }
     this.toggleState('empty', settled && !shown)
     this.toggleState('no-results', settled && list.filter !== '' && options.length > 0 && !shown)
   }
@@ -489,6 +519,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
         result-label=${this.resultLabel ?? ''}
         results-label=${this.resultsLabel}
         ?loading=${this.loading}
+        .items=${this.items}
         filterable
         @helix-before-change=${this.handleChange}
         @helix-filter=${this.handleFilter}
