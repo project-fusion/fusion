@@ -24,6 +24,14 @@
   outline-offset: 0;
 }
 
+/* Wrong, once the reader has tried it: the edge and the ring take the danger
+   color, as every field's do. */
+:host(:state(invalid)) [part="composer"],
+:host(:state(invalid)) [part="composer"]:focus-within {
+  border-color: var(--helix-color-danger);
+  outline-color: var(--helix-color-danger);
+}
+
 /* The field owns no edge and no ground of its own: it is the inside of the box
    above, and a second border inside the first is the double-struck look every
    field rule in this library exists to prevent.
