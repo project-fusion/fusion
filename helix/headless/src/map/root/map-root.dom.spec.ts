@@ -137,6 +137,18 @@ describe('map frame, drawn', () => {
   })
 })
 
+describe('map frame, updates', () => {
+  /* The map heard its own news about its gestures, sent from `updated`, and
+     asked for a second update, which Lit's development build warned about on
+     every map. `updateComplete` is false where an update asked for another. */
+  test('the first update asks for no second one', async () => {
+    const host = document.createElement('helix-headless-map') as Map
+    host.setAttribute('label', 'Stores')
+    document.body.replaceChildren(host)
+    expect(await host.updateComplete).toBe(true)
+  })
+})
+
 describe('map frame', () => {
   test('the region carries the name, which is the whole argument for the family', async () => {
     /* Measured before this was written: a canvas slotted the ordinary way has no
