@@ -276,6 +276,18 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   filterDelay = 0
 
   /**
+   * What the form receives for each chosen option: `key`, its `value`, or
+   * `text`, its words, as React Aria's ComboBox `formValue` offers.
+   *
+   * `text` is for a server that wants what the reader saw, such as a city's
+   * name. A value no option carries, typed with `allows-custom-value` or made
+   * with `creatable`, is sent as it is either way. Absent is `key`, and the
+   * host carries no attribute for it.
+   */
+  @property({ attribute: 'form-value' })
+  formValue?: 'key' | 'text'
+
+  /**
    * The list's name, read by screen readers. The list has no visible name.
    */
   @words
@@ -1234,10 +1246,24 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
     /* Several answers as several entries, the way a native `<select multiple>`
        sends them; see `reportValues`. One answer as the string it is, since
        a single option's value may hold a comma. */
-    if (this.multiple) {
-      reportValues(this.internals, this.name, this.value === '' ? [] : this.value.split(','))
+    const values = this.multiple ? this.values : this.value === '' ? [] : [this.value]
+    /* The words where asked, read off the options as `chosen` reads them, and
+       the value kept as the state a restored page reads back. */
+    const words =
+      this.formValue === 'text'
+        ? new Map(optionsAmong(this.knownChildren).map((option) => [option.value, option.text]))
+        : undefined
+    const answers = words ? values.map((value) => words.get(value) ?? value) : values
+    if (!this.multiple) {
+      this.internals.setFormValue(answers[0] ?? null, this.value)
+    } else if (words && this.name !== '' && answers.length > 0) {
+      const data = new FormData()
+      for (const answer of answers) {
+        data.append(this.name, answer)
+      }
+      this.internals.setFormValue(data, this.value)
     } else {
-      this.internals.setFormValue(this.value === '' ? null : this.value)
+      reportValues(this.internals, this.name, answers)
     }
     this.reportRequired(this.value === '', this.valueMissingMessage, 'control')
   }
