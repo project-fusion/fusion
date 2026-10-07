@@ -364,6 +364,20 @@ describe('a linear sequence', () => {
     expect(host.active).toBe('a')
     expect(host.previous()).toBe(false)
   })
+
+  test('two calls in a row move two stages, each from where the last one left', async () => {
+    /* The second call reads `active`, which the first has already written.
+       The steps' `current` waits for the update. */
+    const { all, host } = await linear()
+    at(all, 0).complete = true
+    await settle(all)
+    expect(host.next()).toBe(true)
+    expect(host.next()).toBe(true)
+    expect(host.active).toBe('c')
+    expect(host.previous()).toBe(true)
+    expect(host.previous()).toBe(true)
+    expect(host.active).toBe('a')
+  })
 })
 
 const settle = async (all: Step[]): Promise<void> => {
