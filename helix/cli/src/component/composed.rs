@@ -54,16 +54,26 @@ static OVERRIDE: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"static override tier = '([^']*)'").expect("a literal pattern compiles")
 });
 
-/// The families a file side-effect imports.
+/// The families a file side-effect imports, and the parts it imports alone.
+///
+/// `../../tag/index.js` is the family `tag`, which registers every part of it.
+/// `../../tag/root/index.js` is the part `tag/root`, which registers the tags
+/// declared in that part's folder and no others, so a field that draws tags
+/// and never a group carries no group code.
 fn imports(code: &str) -> BTreeSet<String> {
     SIDE_EFFECT
         .captures_iter(code)
         .filter_map(|one| {
-            one[1]
+            let within: Vec<&str> = one[1]
                 .trim_end_matches("/index.js")
-                .rsplit('/')
-                .next()
-                .map(str::to_owned)
+                .split('/')
+                .filter(|part| *part != "." && *part != "..")
+                .collect();
+            match within.as_slice() {
+                [family, part] => Some(format!("{family}/{part}")),
+                [.., last] => Some((*last).to_owned()),
+                [] => None,
+            }
         })
         .collect()
 }
@@ -102,13 +112,14 @@ fn bare(tag: &str, prefixes: &[&str]) -> String {
     tag.to_owned()
 }
 
-/// Every layered source file, and where each tag is declared.
+/// Every layered source file, and where each tag is declared: its family, and
+/// its family and part, `tag/root`.
 fn layered(
     roots: [&std::path::Path; 2],
     prefixes: &[&str],
 ) -> (
     BTreeMap<std::path::PathBuf, String>,
-    BTreeMap<String, String>,
+    BTreeMap<String, (String, String)>,
 ) {
     let mut read = BTreeMap::new();
     let mut declared_in = BTreeMap::new();
@@ -122,13 +133,18 @@ fn layered(
             let code = uncommented(&text);
             for found in DEFINED.captures_iter(&code) {
                 let name = bare(&found[1], prefixes);
-                if let Some(owner) = family(&file, root).and_then(|_| {
-                    file.parent()
+                let part = file.parent();
+                if let Some((owner, part)) = family(&file, root).and_then(|_| {
+                    let owner = part
                         .and_then(|one| one.parent())
                         .and_then(|one| one.file_name())
-                        .and_then(|one| one.to_str())
+                        .and_then(|one| one.to_str())?;
+                    let part = part
+                        .and_then(|one| one.file_name())
+                        .and_then(|one| one.to_str())?;
+                    Some((owner, part))
                 }) {
-                    declared_in.insert(name, owner.to_owned());
+                    declared_in.insert(name, (owner.to_owned(), format!("{owner}/{part}")));
                 }
             }
             read.insert(file, code);
@@ -226,7 +242,7 @@ fn judge(
     context: &Context,
     layers: &Layers,
     read: &BTreeMap<std::path::PathBuf, String>,
-    declared_in: &BTreeMap<String, String>,
+    declared_in: &BTreeMap<String, (String, String)>,
     prefixes: &[&str],
     roots: [&std::path::Path; 2],
     findings: &mut Vec<Finding>,
@@ -301,8 +317,12 @@ fn judge(
         let imported = imports(code);
         for name in &tags {
             checked += 1;
-            let owner = declared_in.get(name).map_or(name.as_str(), String::as_str);
-            if owner == own || imported.contains(owner) {
+            let (owner, part) = declared_in
+                .get(name)
+                .map_or((name.as_str(), ""), |(owner, part)| {
+                    (owner.as_str(), part.as_str())
+                });
+            if owner == own || imported.contains(owner) || imported.contains(part) {
                 continue;
             }
             findings.push(Finding {

@@ -537,6 +537,50 @@ export class BaseButtonRoot extends LitElement {
     );
 }
 
+/// A part's own entry registers the tags declared in that part, so a family
+/// that renders only that part may import it alone, and a part that does not
+/// declare the tag is no import of it.
+#[test]
+fn composed_part_entry() {
+    plant_in(
+        "composed-part-entry",
+        "composed",
+        &[
+            ("helix.json", PAIR),
+            (
+                "packages/base/src/icon/root/icon-root.ts",
+                "@customElement('base-icon')\nexport class BaseIconRoot extends LitElement {}\n",
+            ),
+            (
+                "packages/base/src/button/root/button-root.ts",
+                r"import '../../icon/root/index.js';
+
+export class BaseButtonRoot extends LitElement {
+  render() {
+    return html`<${this.tag('icon')}></${this.tag('icon')}>`;
+  }
+}
+",
+            ),
+        ],
+        |tree| {
+            tree.write(
+                "packages/base/src/button/root/button-root.ts",
+                r"import '../../icon/group/index.js';
+
+export class BaseButtonRoot extends LitElement {
+  render() {
+    return html`<${this.tag('icon')}></${this.tag('icon')}>`;
+  }
+}
+",
+            );
+        },
+        "renders `<icon>` and never imports it",
+        "packages/base/src/button/root/button-root.ts",
+    );
+}
+
 #[test]
 fn corners() {
     plant(
