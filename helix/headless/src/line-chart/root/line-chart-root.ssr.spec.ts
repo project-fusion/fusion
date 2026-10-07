@@ -24,6 +24,17 @@ describe('line chart server output', () => {
     expect(servedParts(markup)).toEqual(['loading', 'plot'])
   })
 
+  /* Data is drawn on the client only, as a table is read there, so a server
+     given data serves the frame and says nothing about its readings. */
+  test('serves its plot alone when given data', () => {
+    const markup = ssr(
+      html`<helix-headless-line-chart
+        .data=${{ columns: ['Month', 'Sessions'], rows: [['Jan', 3]] }}
+      ></helix-headless-line-chart>`,
+    )
+    expect(servedParts(markup)).toEqual(['plot'])
+  })
+
   /* The id `within` on the tooltip resolves against, so the bubble is clamped
      to the drawing rather than to the viewport. A refactor that drops it breaks
      nothing loudly: `getElementById` returns null, the boundary falls back to

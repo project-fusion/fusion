@@ -3,6 +3,7 @@ import { property } from 'lit/decorators.js'
 import { ChartPointerController } from '../../controllers/chart-pointer-controller/chart-pointer-controller.js'
 import { SourceController } from '../../controllers/source-controller/source-controller.js'
 import type { HelixElement } from '../../helix-element/helix-element.js'
+import type { ChartData } from '../../utils/read-data/read-data.js'
 import { type Row, type Series, seriesKey } from '../../utils/read-series/read-series.js'
 import { writtenList } from '../../utils/written-list/written-list.js'
 import { words } from '../../words/words.js'
@@ -124,6 +125,11 @@ export const seriesNames = (list: string | undefined): string[] => writtenList(l
  */
 export declare class MixinChartSourceInterface {
   /**
+   * The readings as data, in the shape of a table, where the page has no
+   * table to point `for` at. `for` wins where both are set.
+   */
+  data: ChartData | undefined
+  /**
    * The id of the table to read.
    *
    * Names a table in the same tree, so a chart inside another component's
@@ -158,6 +164,11 @@ export declare class MixinChartSourceInterface {
    * {count}`, or to nothing to say no position.
    */
   positionLabel: string
+  /**
+   * Whether the readings have been looked for: false on the server and while
+   * hydrating, where no table is resolved and no data is read.
+   */
+  get readingsKnown(): boolean
   /**
    * The table's columns, one series each. Empty when there is no table.
    */
@@ -264,6 +275,33 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
     for = ''
 
     /**
+     * The readings as data, in the shape of a table, where the page has no
+     * table to point `for` at. `for` wins where both are set.
+     *
+     * ```js
+     * chart.data = {
+     *   caption: 'Sessions by channel',
+     *   columns: ['Month', 'Direct', 'Referral'],
+     *   rows: [['Jan', 10, 4], ['Feb', 20, 8]],
+     * }
+     * ```
+     *
+     * The first column holds each row's label and every column after it a
+     * series, as in a table. A cell is a number, words, `null` for a blank,
+     * or `{ value, text }` for a number shown as words, such as `$128k`. A
+     * number is shown in `locale`.
+     *
+     * **A table is still the better source where the page can show one**:
+     * it reads with no script and before hydration, and a reader can sort and
+     * copy it. Data is drawn on the client only, so a server serves the
+     * frame, and the summary, the keys and the readout are then the whole of
+     * what a screen reader is given. Set a new object to redraw: the chart
+     * does not look inside the one it has.
+     */
+    @property({ attribute: false })
+    data: ChartData | undefined = undefined
+
+    /**
      * The chart's name, which starts the chart's text summary.
      *
      * Absent falls back to the table's own caption, which is usually the right
@@ -368,12 +406,23 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
      * strip always did.
      */
     get named(): string {
+      const table = this.source.element
       return (
         this.getAttribute?.('aria-label') ||
         this.label ||
-        this.source.element?.querySelector('caption')?.textContent?.trim() ||
+        table?.querySelector('caption')?.textContent?.trim() ||
+        (table ? '' : this.data?.caption) ||
         ''
       )
+    }
+
+    /**
+     * Whether the readings have been looked for: false on the server and
+     * while hydrating, where no table is resolved and no data is read. A
+     * chart says it has no readings only once this is true.
+     */
+    get readingsKnown(): boolean {
+      return this.source.known
     }
 
     /**

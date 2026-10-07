@@ -350,3 +350,51 @@ describe('with nothing to draw', () => {
     expect(part(refreshing, 'svg') ?? part(refreshing, 'plot')?.querySelector('svg')).not.toBeNull()
   })
 })
+
+/* A chart read only a table by id, where a page whose numbers arrive as data
+   had to write a table to draw one. */
+describe('from data', () => {
+  const DATA = {
+    caption: 'Sessions by channel',
+    columns: ['Month', 'Spend', 'Revenue'],
+    rows: [
+      ['Jan', 10, 20],
+      ['Feb', 20, 41],
+      ['Mar', 15, 29],
+    ],
+  }
+
+  test('draws the readings, named by the caption, where no table is named', async () => {
+    const chart = (await mount(
+      '<helix-headless-scatter-chart></helix-headless-scatter-chart>',
+    )) as HTMLElement & {
+      data: unknown
+      readings: number
+      updateComplete: Promise<boolean>
+    }
+    chart.data = DATA
+    await chart.updateComplete
+    expect(chart.readings).toBe(3)
+    expect(part(chart, 'plot')?.getAttribute('aria-label')).toBe('Sessions by channel')
+    expect(part(chart, 'summary')?.textContent).toContain('Sessions by channel')
+    expect(part(chart, 'empty')).toBeNull()
+    chart.data = { columns: ['Month', 'Spend', 'Revenue'], rows: [] }
+    await chart.updateComplete
+    expect(part(chart, 'empty')?.textContent?.trim()).toBe('No readings')
+  })
+
+  test('a table named by for wins over data', async () => {
+    await mount(
+      `<div><table id="t"><caption>From the table</caption><thead><tr><th>Month</th><th>Spend</th><th>Revenue</th></tr></thead><tbody><tr><th>Jan</th><td>3</td><td>6</td></tr></tbody></table><helix-headless-scatter-chart for="t"></helix-headless-scatter-chart></div>`,
+    )
+    const chart = document.querySelector('helix-headless-scatter-chart') as HTMLElement & {
+      data: unknown
+      readings: number
+      updateComplete: Promise<boolean>
+    }
+    chart.data = DATA
+    await chart.updateComplete
+    expect(chart.readings).toBe(1)
+    expect(part(chart, 'plot')?.getAttribute('aria-label')).toBe('From the table')
+  })
+})
