@@ -296,12 +296,12 @@ const isControl = (element: HTMLElement): boolean =>
  * @csspart toggle-open - Added to `toggle` while its row is open.
  * @csspart toolbar - The region above the grid.
  *
- * @cssstate empty - While there are no rows to show and none are loading.
- * @cssstate error - While `error-text` is set.
- *
  * @cssproperty --data-table-cell-align - The alignment of the cell's column: `start`, `center`, or `end`. Unset when the column sets none. The component writes it on each cell it draws, and the stylesheet reads it. `Table` sets `--table-cell-align` for the same purpose.
  * @cssproperty --data-table-level - How deep a row is in a tree grid, from 1. The component writes it on each row header cell, and the stylesheet indents by it.
  * @cssproperty --data-table-template - The column track list, worked out from the columns. The component writes it inline on the element that reads it, so setting it has no effect. Set a column's `width` to change it.
+ *
+ * @cssstate empty - While there are no rows to show and none are loading.
+ * @cssstate error - While `error-text` is set.
  */
 @customElement('helix-headless-data-table')
 export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
