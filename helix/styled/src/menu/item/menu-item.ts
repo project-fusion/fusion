@@ -1,6 +1,8 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessMenuItem } from '@fusion.dev/helix-headless/menu'
 import type { CSSResultGroup } from 'lit'
+import { styles as floatingEntranceStyles } from '../../shared/floating/entrance.css.js'
+import { styles as floatingPanelStyles } from '../../shared/floating/panel.css.js'
 /* Inherited from the base along with the template: the shortcut's key. */
 import '../../kbd/index.js'
 import { styles } from './menu-item.css.js'
@@ -31,7 +33,7 @@ import { styles } from './menu-item.css.js'
 export class HelixMenuItem extends HelixHeadlessMenuItem {
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [floatingPanelStyles, floatingEntranceStyles, styles]
 }
 
 declare global {

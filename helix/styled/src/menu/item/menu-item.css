@@ -210,3 +210,36 @@ slot[name="submenu"] {
 slot[name="submenu"]::slotted(helix-divider) {
   margin-block: var(--helix-space-2xs);
 }
+
+/* The panel a submenu opens in beside its row, under `submenus="flyout"`. The
+   look is the menu's own surface. */
+[part="surface"] {
+  --menu-item-start: 0px;
+  --menu-item-end: 0px;
+  --_floating-background-color: var(--menu-background-color, var(--helix-color-surface-overlay));
+  --_floating-border-color: var(--menu-border-color, var(--helix-color-border));
+  --_floating-border-width: var(--menu-border-width, var(--helix-border-floating));
+  --_floating-shadow: var(--menu-shadow, var(--helix-shadow-floating));
+
+  max-block-size: var(--menu-max-block-size, var(--floating-available-block-size, none));
+  min-inline-size: var(--menu-min-inline-size, 12rem);
+  overflow-y: auto;
+  padding-block: var(--helix-space-xs);
+  padding-inline: var(--helix-space-none);
+}
+
+:host(:state(submenu-start)) [part="surface"] {
+  --menu-item-start: calc(var(--helix-size-icon) + var(--helix-space-xs));
+}
+
+:host(:state(submenu-mark)) [part="surface"] {
+  --menu-item-end: calc(var(--helix-size-icon) + var(--helix-space-xs));
+}
+
+[part="surface"][data-placement^="left"] {
+  transform-origin: 100% 0;
+}
+
+[part="surface"][data-placement^="right"] {
+  transform-origin: 0 0;
+}

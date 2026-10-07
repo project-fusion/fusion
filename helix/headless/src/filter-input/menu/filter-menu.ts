@@ -80,6 +80,7 @@ import '../../menu/index.js'
  * @csspart entry-shortcut-key - One key of the shortcut's chord.
  * @csspart entry-shortcut-separator - The `+` between two keys of the shortcut, where the platform writes one.
  * @csspart entry-start - The leading column.
+ * @csspart entry-surface - The panel a row's submenu opens in beside it. The filter menu's rows have none.
  * @csspart menu - The menu the fields are offered in.
  * @csspart menu-back - The button that goes back from a field's page.
  * @csspart menu-back-mark - The icon on the back button.
@@ -346,7 +347,7 @@ export class HelixHeadlessFilterMenu extends HelixElement {
           exportparts="end: entry-end, item: entry-item, mark: entry-mark, shortcut: entry-shortcut,
             shortcut-kbd: entry-shortcut-kbd,
             shortcut-key: entry-shortcut-key, shortcut-separator: entry-shortcut-separator,
-            start: entry-start"
+            start: entry-start, surface: entry-surface"
           data-facet="field"
           data-field=${name}
         >
@@ -366,7 +367,7 @@ export class HelixHeadlessFilterMenu extends HelixElement {
                   exportparts="end: entry-end, item: entry-item, mark: entry-mark, shortcut: entry-shortcut,
             shortcut-kbd: entry-shortcut-kbd,
             shortcut-key: entry-shortcut-key, shortcut-separator: entry-shortcut-separator,
-            start: entry-start"
+            start: entry-start, surface: entry-surface"
                   slot="submenu"
                   data-facet="comparison"
                   data-field=${name}
@@ -378,7 +379,7 @@ export class HelixHeadlessFilterMenu extends HelixElement {
                       exportparts="end: entry-end, item: entry-item, mark: entry-mark, shortcut: entry-shortcut,
             shortcut-kbd: entry-shortcut-kbd,
             shortcut-key: entry-shortcut-key, shortcut-separator: entry-shortcut-separator,
-            start: entry-start"
+            start: entry-start, surface: entry-surface"
                       slot="submenu"
                       checkable
                       exclusive
@@ -414,7 +415,7 @@ export class HelixHeadlessFilterMenu extends HelixElement {
               exportparts="end: entry-end, item: entry-item, mark: entry-mark, shortcut: entry-shortcut,
             shortcut-kbd: entry-shortcut-kbd,
             shortcut-key: entry-shortcut-key, shortcut-separator: entry-shortcut-separator,
-            start: entry-start"
+            start: entry-start, surface: entry-surface"
               slot="submenu"
               checkable
               ?exclusive=${using?.arity === 'one'}

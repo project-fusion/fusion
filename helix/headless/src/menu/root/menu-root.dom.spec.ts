@@ -902,3 +902,116 @@ describe('a menu opened by a long press', () => {
     )
   })
 })
+
+/* React Aria's SubmenuTrigger and Radix's Sub open a submenu beside its row. */
+describe('a menu with flyout submenus', () => {
+  type Row = HTMLElement & {
+    expanded: boolean
+    onPage: boolean
+    updateComplete: Promise<boolean>
+  }
+  const flyout = async (): Promise<Menu> => {
+    const host = (await mount(`<helix-headless-menu label="Actions" submenus="flyout">
+      <button slot="trigger">Open</button>
+      <helix-headless-menu-item value="copy">Copy</helix-headless-menu-item>
+      <helix-headless-menu-item value="share">Share
+        <helix-headless-menu-item slot="submenu" value="mail">Mail</helix-headless-menu-item>
+        <helix-headless-menu-item slot="submenu" value="sms">SMS</helix-headless-menu-item>
+      </helix-headless-menu-item>
+    </helix-headless-menu>`)) as Menu
+    host.open = true
+    await host.updateComplete
+    await settled(host)
+    return host
+  }
+  const settled = async (host: Menu): Promise<void> => {
+    for (let round = 0; round < 3; round += 1) {
+      await host.updateComplete
+      for (const one of host.querySelectorAll('helix-headless-menu-item')) {
+        await (one as Row).updateComplete
+      }
+      await new Promise((done) => setTimeout(done, 0))
+    }
+  }
+  const rowOf = (host: Menu, value: string): Row => host.querySelector(`[value="${value}"]`) as Row
+  const key = (host: Menu, name: string): void => {
+    host.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: name }))
+  }
+  const focusedValue = (host: Menu): string | null => {
+    let at: Element | null = host.ownerDocument.activeElement
+    while (at?.shadowRoot?.activeElement) {
+      at = at.shadowRoot.activeElement
+    }
+    const root = at?.getRootNode()
+    return root instanceof ShadowRoot ? root.host.getAttribute('value') : null
+  }
+
+  test('keeps the top page showing, with no way back drawn', async () => {
+    const host = await flyout()
+    expect(rowOf(host, 'copy').onPage).toBe(true)
+    expect(rowOf(host, 'mail').onPage).toBe(false)
+    key(host, 'ArrowDown')
+    key(host, 'ArrowDown')
+    key(host, 'ArrowRight')
+    await settled(host)
+    expect(rowOf(host, 'copy').onPage).toBe(true)
+    expect(rowOf(host, 'mail').onPage).toBe(true)
+    expect(part(host, 'back')).toBeNull()
+    expect(hasState(host, 'drilled')).toBe(false)
+  })
+
+  test('Right opens a row’s submenu beside it on its first row, and Left closes it back to the row', async () => {
+    const host = await flyout()
+    key(host, 'ArrowDown')
+    key(host, 'ArrowDown')
+    expect(focusedValue(host)).toBe('share')
+    const share = rowOf(host, 'share')
+    expect(part(share, 'item')?.getAttribute('aria-expanded')).toBe('false')
+    key(host, 'ArrowRight')
+    await settled(host)
+    expect(share.expanded).toBe(true)
+    expect(part(share, 'item')?.getAttribute('aria-expanded')).toBe('true')
+    const panel = part(share, 'surface')
+    expect(panel?.getAttribute('role')).toBe('menu')
+    expect(panel?.hasAttribute('hidden')).toBe(false)
+    expect(focusedValue(host)).toBe('mail')
+    key(host, 'ArrowDown')
+    expect(focusedValue(host)).toBe('sms')
+    key(host, 'ArrowLeft')
+    await settled(host)
+    expect(share.expanded).toBe(false)
+    expect(focusedValue(host)).toBe('share')
+    expect(host.open).toBe(true)
+  })
+
+  test('Escape in a submenu closes it alone, and on the top page closes the menu', async () => {
+    const host = await flyout()
+    key(host, 'ArrowDown')
+    key(host, 'ArrowDown')
+    key(host, 'ArrowRight')
+    await settled(host)
+    key(host, 'Escape')
+    await settled(host)
+    expect(rowOf(host, 'share').expanded).toBe(false)
+    expect(host.open).toBe(true)
+    key(host, 'Escape')
+    await settled(host)
+    expect(host.open).toBe(false)
+  })
+
+  test('a row of a submenu is chosen as a row of the top page is', async () => {
+    const host = await flyout()
+    key(host, 'ArrowDown')
+    key(host, 'ArrowDown')
+    key(host, 'ArrowRight')
+    await settled(host)
+    const chosen: string[] = []
+    host.addEventListener('helix-select', (event) => {
+      chosen.push((event as CustomEvent<{ value: string }>).detail.value)
+    })
+    ;(part(rowOf(host, 'sms'), 'item') as HTMLElement).click()
+    await settled(host)
+    expect(chosen).toEqual(['sms'])
+    expect(host.open).toBe(false)
+  })
+})
