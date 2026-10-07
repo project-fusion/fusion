@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasState, mount, part, registerDom, settle } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -243,5 +243,31 @@ describe('reaching max', () => {
   test('is not complete while indeterminate', async () => {
     const busy = await progress('indeterminate value="100"')
     expect(hasState(busy, 'complete')).toBe(false)
+  })
+})
+
+/* Web Awesome's progress bar draws a label inside its indicator; this one drew
+   nothing it was given but a label above. */
+describe('words in the default slot', () => {
+  test('are drawn in the content part, said as the reading, and set the content state', async () => {
+    const bar = await progress('value="47" locale="en"')
+    expect(hasState(bar, 'content')).toBe(false)
+    bar.append('47% uploaded')
+    await settle(bar)
+    const content = part(bar, 'content')
+    expect(content?.getAttribute('aria-hidden')).toBe('true')
+    expect(content?.querySelector('slot:not([name])')).not.toBeNull()
+    expect(hasState(bar, 'content')).toBe(true)
+    expect(bar.internals?.ariaValueText).toBe('47% uploaded')
+    expect(bar.internals?.ariaValueNow).toBe('47')
+  })
+
+  test('give way to value text, and a ring draws them too', async () => {
+    const worded = (await mount(
+      '<helix-headless-progress label="Import" value="3" max="8" value-text="3 of 8 records">38%</helix-headless-progress>',
+    )) as Progress
+    expect(worded.internals?.ariaValueText).toBe('3 of 8 records')
+    const ring = await progress('shape="ring" value="62"')
+    expect(part(ring, 'content')?.querySelector('slot:not([name])')).not.toBeNull()
   })
 })

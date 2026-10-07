@@ -67,3 +67,25 @@ describe("the progress bar's hooks", () => {
     }
   })
 })
+
+/* Words on the bar, measured in Chromium: the track grows from 8px to 14px for
+   `text-xs`, and the words read in the on-primary ink over the fill and the
+   page's ink over the track, split where the fill ends. */
+describe('words on the bar', () => {
+  test('make room only while there are any, and paint over the fill', () => {
+    expect(rule('[part="content"]')).toContain('display: none')
+    expect(rule(':host(:state(content)) [part="track"]')).toContain('display: grid')
+    const words = rule(':host(:state(content)) [part="content"]')
+    expect(words).toContain('position: relative')
+    expect(words).toContain('background-clip: text')
+  })
+
+  test('are split in two colors at the fill, each with a hook', () => {
+    const words = rule(':host(:state(content)) [part="content"]')
+    expect(words).toContain(
+      'var(--progress-content-fill-color, var(--helix-color-foreground-on-primary))',
+    )
+    expect(words).toContain('var(--progress-content-color, var(--helix-color-foreground))')
+    expect(words).toContain('calc(var(--progress-fraction, 0) * 100%)')
+  })
+})

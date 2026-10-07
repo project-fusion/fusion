@@ -6,6 +6,8 @@ import {
   hostAria,
   readingText,
   StatusController,
+  slotFilled,
+  slotNamed,
   slottedWords,
   words,
   wordsLocale,
@@ -32,6 +34,11 @@ import { property } from 'lit/decorators.js'
  * of the range in `locale`, the reading `format-options` writes, or
  * `value-text`, as `aria-valuetext` beside the number.
  *
+ * **Words set in the default slot are drawn on the bar**, or in the middle of a
+ * ring, such as `62%` or `3 of 8`, and are what the bar says as its reading
+ * where `value-text` is not set. While there are any, the bar carries
+ * `:state(content)`, so a sheet can make room for them.
+ *
  * **Reaching `max` is said and sent.** When the value arrives at `max` from
  * below, the bar says `complete-label`, "Complete" by default, in a polite
  * `live` region and sends `helix-complete`, so a reader hears that the work is
@@ -45,10 +52,12 @@ import { property } from 'lit/decorators.js'
  * @aliases Progress bar, Loading bar
  * @documentation https://fusion.dev/helix/components/progress
  *
+ * @slot - Words drawn on the bar, or in the middle of a ring, such as the reading. Said as the reading where `value-text` is not set.
  * @slot label - A visible label. Its words name the progress bar in place of `label`.
  *
  * @event {HelixCompleteEvent} helix-complete - The value reached `max` from below. Its `value` is `max`. Not sent for a bar that starts full.
  *
+ * @csspart content - The box holding the words of the default slot, over the track or in the middle of the ring. Carries `--progress-fraction`.
  * @csspart groove - The unfilled circle under the ring's filled arc.
  * @csspart indicator - The filled part that shows the work done.
  * @csspart live - A polite region that says `complete-label` when the work is done, rendered from that moment. Hide it visually.
@@ -58,6 +67,7 @@ import { property } from 'lit/decorators.js'
  * @cssproperty --progress-fraction - The value as a fraction of the range, 0 to 1. Pinned to 1 while indeterminate.
  *
  * @cssstate complete - The value is at `max` and the bar is not indeterminate.
+ * @cssstate content - Words are set in the default slot.
  */
 @customElement('helix-headless-progress')
 export class HelixHeadlessProgress extends HelixElement {
@@ -259,7 +269,8 @@ export class HelixHeadlessProgress extends HelixElement {
        platform, a range from 12 to 20 at 16 was read as "16" where the bar
        draws half, and in the runtime's digits rather than the page's. React
        Aria's ProgressBar writes its formatted reading here the same way. */
-    this.internals.ariaValueText = this.indeterminate ? this.valueText || null : this.text
+    const shown = this.valueText || slottedWords(this, [''])
+    this.internals.ariaValueText = this.indeterminate ? shown || null : shown || this.text
     this.toggleState('complete', this.complete)
   }
 
@@ -301,6 +312,12 @@ export class HelixHeadlessProgress extends HelixElement {
     this.requestUpdate()
   }
 
+  /** The words on the bar changed, so the reading is said again and the state set. */
+  private readonly reworded = (): void => {
+    this.toggleState('content', slotFilled(slotNamed(this.renderRoot, '')))
+    this.requestUpdate()
+  }
+
   protected override render(): TemplateResult {
     /* A custom property rather than a width, so the styled tier decides what
        the number means: a bar fills along it, and a ring would sweep. */
@@ -322,13 +339,21 @@ export class HelixHeadlessProgress extends HelixElement {
       <circle part="indicator" pathLength="100" style="--progress-fraction: ${fraction}" />
     </svg>`
 
+    /* `aria-hidden`, because the host says these words as its reading: a
+       progress bar's children are presentational, and a copy read beside the
+       value would say it twice. */
+    const content = html`<span part="content" aria-hidden="true" style="--progress-fraction: ${fraction}"
+      ><slot @slotchange=${this.reworded}></slot
+    ></span>`
+
     /* A bare slot, so one with no label generates the box it always did.
        A label arriving later renames the host, which `slotchange` asks for. */
     return html`<slot name="label" @slotchange=${this.renamed}></slot>${
       this.shape === 'ring'
-        ? ring
+        ? html`${ring}${content}`
         : html`<div part="track">
             <div part="indicator" style="--progress-fraction: ${fraction}"></div>
+            ${content}
           </div>`
     }
       ${
