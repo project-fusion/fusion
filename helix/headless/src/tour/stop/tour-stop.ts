@@ -162,18 +162,18 @@ export class HelixHeadlessTourStop extends HelixElement {
   current = false
 
   /**
-   * Run as the tour reaches the stop, before it is shown: see the description
-   * above. A function, so it is set from script and has no attribute.
-   */
-  @property({ attribute: false })
-  effect?: TourStopEffect
-
-  /**
    * Label for the control that goes on from the last stop.
    */
   @words
   @property({ attribute: 'done-label' })
   doneLabel = 'Done'
+
+  /**
+   * Run as the tour reaches the stop, before it is shown: see the description
+   * above. A function, so it is set from script and has no attribute.
+   */
+  @property({ attribute: false })
+  effect?: TourStopEffect
 
   /**
    * Whether the stop is the first one, with no stop before it.

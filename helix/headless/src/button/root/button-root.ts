@@ -180,15 +180,6 @@ export class HelixHeadlessButton extends HelixFormElement {
   focusable = true
 
   /**
-   * @internal Set by a Button Group in a selection mode: whether the group has
-   * this button pressed. Recorded as `:state(pressed)`, so a page can style a
-   * pressed button from its own element. The group says it to screen readers
-   * on the control.
-   */
-  @property({ attribute: false })
-  pressed?: boolean | undefined
-
-  /**
    * Where this button's submission goes, overriding the form's own.
    *
    * **The five `form*` overrides ride on a native submit button that stands in
@@ -275,6 +266,15 @@ export class HelixHeadlessButton extends HelixFormElement {
    */
   @property({ attribute: false })
   popup?: 'dialog' | 'grid' | 'listbox' | 'menu' | 'tree'
+
+  /**
+   * @internal Set by a Button Group in a selection mode: whether the group has
+   * this button pressed. Recorded as `:state(pressed)`, so a page can style a
+   * pressed button from its own element. The group says it to screen readers
+   * on the control.
+   */
+  @property({ attribute: false })
+  pressed?: boolean | undefined
 
   /**
    * The status region, rendered from the first time the button is pending, so

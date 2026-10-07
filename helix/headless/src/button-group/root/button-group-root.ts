@@ -112,6 +112,14 @@ const isGroupButton = (child: Element): child is GroupButton =>
 @customElement('helix-headless-button-group')
 export class HelixHeadlessButtonGroup extends HelixElement {
   /**
+   * Keeps at least one button pressed once one is, as React Aria's
+   * `disallowEmptySelection`: a press that would leave none pressed is
+   * refused.
+   */
+  @property({ attribute: 'disallow-empty-selection', type: Boolean })
+  disallowEmptySelection = false
+
+  /**
    * The group's name, read by screen readers.
    *
    * On the host through internals, so an author's `aria-label` still overrides
@@ -119,14 +127,6 @@ export class HelixHeadlessButtonGroup extends HelixElement {
    */
   @property()
   label = ''
-
-  /**
-   * Keeps at least one button pressed once one is, as React Aria's
-   * `disallowEmptySelection`: a press that would leave none pressed is
-   * refused.
-   */
-  @property({ attribute: 'disallow-empty-selection', type: Boolean })
-  disallowEmptySelection = false
 
   /**
    * Which way the buttons are stacked.
