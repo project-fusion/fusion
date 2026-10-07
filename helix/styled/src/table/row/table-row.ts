@@ -24,6 +24,7 @@ import '../../checkbox/index.js'
  * @cssproperty --table-drop-indicator-size - The thickness of the line where a moved row would land.
  * @cssproperty --table-grip-color - The color of a row's grip, in a `reorderable` table.
  * @cssproperty --table-grip-disabled-opacity - The opacity of a row's grip while a sort decides the order.
+ * @cssproperty --table-row-disabled-opacity - The opacity of the cells of a `disabled` row.
  * @cssproperty --table-row-hover-background-color - The wash across the cells of a row with `href` under the pointer.
  */
 @customElement('helix-table-row')

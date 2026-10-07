@@ -545,7 +545,8 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     part: (name) => this.partNamed(name),
     rows: () => (this.childrenKnown ? this.arrangedRows : []),
     rowWords: () => this.arrangedRows.map((row) => textOf(row.children[0])),
-    selectAll: () => this.selectable && this.requestSelected(new Set(this.everyKey)),
+    selectAll: () =>
+      this.selectable && this.requestSelected(new Set([...this.chosen, ...this.enabledKeys])),
     selectRange: (to, from) => this.selectRange(to, from),
   })
 
@@ -770,9 +771,22 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     return this.keyed.map(({ key }) => key)
   }
 
-  /** The checkbox in the heading: every row, or none where every row is chosen. */
+  /** The keys of the rows that can be chosen: every row that is not `disabled`. */
+  private get enabledKeys(): string[] {
+    return this.keyed.filter(({ row }) => !row.disabled).map(({ key }) => key)
+  }
+
+  /** Whether the row of that key is `disabled`. */
+  private isDisabled(key: string): boolean {
+    return this.keyed.find((one) => one.key === key)?.row.disabled === true
+  }
+
+  /**
+   * The checkbox in the heading: every row that can be chosen, or none of
+   * them where each already is. A `disabled` row keeps what it had.
+   */
   private chooseAll(): void {
-    this.requestSelected(new Set(toggleEvery(this.chosen, this.everyKey)))
+    this.requestSelected(new Set(toggleEvery(this.chosen, this.enabledKeys)))
   }
 
   /** The key of the row a Shift range runs from: the one last chosen. */
@@ -792,8 +806,11 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     const keys = this.arrangedRows.map((row) => keyOf.get(row) ?? '')
     const { anchor, anchorKey } = anchorAt(keys, this.anchorKey, from)
     this.anchorKey = anchorKey
-    const next = rangeAdd([...this.chosen], keys, anchor, to)
-    if (next) {
+    const now = this.chosen
+    const next = rangeAdd([...now], keys, anchor, to)?.filter(
+      (key) => now.has(key) || !this.isDisabled(key),
+    )
+    if (next && next.length > now.size) {
       this.requestSelected(new Set(next))
     }
     return true
@@ -801,6 +818,9 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
 
   /** One row's checkbox, ticked or not. It becomes the row a range runs from. */
   private chooseRow(key: string, on: boolean): void {
+    if (this.isDisabled(key)) {
+      return
+    }
     this.anchorKey = key
     const keys = this.chosen
     if (on) {
@@ -840,7 +860,7 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
       this.chooseRow(found.key, !this.chosen.has(found.key))
       return true
     }
-    if (event.key === 'Enter' && row?.href) {
+    if (event.key === 'Enter' && row?.href && !row.disabled) {
       followLink(this.ownerDocument, { href: row.href, rel: row.rel, target: row.target }, event)
       return true
     }
@@ -1253,7 +1273,7 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     /* None while the rows are not known, as on a server, so a render hydrating
        what one sent draws the box the server drew. Read from the rows there,
        the box's mixed state was primed as committed and never drawn. */
-    const every = this.childrenKnown ? this.keyed.map(({ key }) => key) : []
+    const every = this.childrenKnown ? this.enabledKeys : []
     const { checked, indeterminate } = everyState(this.chosen, every)
     const checkbox = this.tag('checkbox')
     const grid = this.grid
