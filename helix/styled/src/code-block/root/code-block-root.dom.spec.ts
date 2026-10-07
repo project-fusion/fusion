@@ -20,8 +20,8 @@ const sheet = (): string => {
 const rule = (selector: string): string => sheet().split(`${selector} {`)[1]?.split('}')[0] ?? ''
 
 describe('wrap, height and line numbers', () => {
-  test('`wrap` wraps long lines anywhere, except under line numbers', () => {
-    const wrapped = rule(':host([wrap]:not([diff], [line-numbers])) [part="code"]')
+  test('`wrap` wraps long lines anywhere, under line numbers too', () => {
+    const wrapped = rule(':host([wrap]:not([diff])) [part="code"]')
     expect(wrapped).toContain('white-space: pre-wrap')
     expect(wrapped).toContain('overflow-wrap: anywhere')
   })

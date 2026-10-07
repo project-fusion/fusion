@@ -443,3 +443,99 @@ describe('translation', () => {
     expect(el.hasAttribute('translate')).toBe(false)
   })
 })
+
+/* Line highlighting was missing: a page could not point a reader at the lines
+   a passage is about. */
+describe('marked lines', () => {
+  test('draws a band for each run of lines mark-lines names, hidden from the tree', async () => {
+    const el = (await mount(
+      '<helix-headless-code-block mark-lines="2, 4-5, 5">a\nb\nc\nd\ne</helix-headless-code-block>',
+    )) as Updatable
+    await el.updateComplete
+    const marks = [...(el.shadowRoot?.querySelectorAll('[part="mark"]') ?? [])]
+    expect(marks.map((mark) => mark.getAttribute('data-lines'))).toEqual(['2-2', '4-5'])
+    expect(marks.every((mark) => mark.getAttribute('aria-hidden') === 'true')).toBe(true)
+  })
+
+  test('places a band where its lines are laid out', async () => {
+    const el = (await mount(
+      '<helix-headless-code-block mark-lines="2">a\nb\nc</helix-headless-code-block>',
+    )) as Updatable
+    await el.updateComplete
+    const mark = part(el as HTMLElement, 'mark') as HTMLElement
+    expect(mark.style.getPropertyValue('--code-block-mark-start')).toMatch(/px$/)
+    expect(mark.style.getPropertyValue('--code-block-mark-size')).toMatch(/px$/)
+  })
+})
+
+describe('wrapping', () => {
+  test('wrappable draws a pressed button that asks, then wraps the lines', async () => {
+    const el = (await mount(
+      '<helix-headless-code-block wrappable no-copy>one</helix-headless-code-block>',
+    )) as Updatable & { wrap: boolean }
+    const asked: boolean[] = []
+    const told: boolean[] = []
+    el.addEventListener('helix-before-toggle', (event) =>
+      asked.push((event as CustomEvent<{ checked: boolean }>).detail.checked),
+    )
+    el.addEventListener('helix-toggle', (event) =>
+      told.push((event as CustomEvent<{ checked: boolean }>).detail.checked),
+    )
+    const button = part(el as HTMLElement, 'wrap-toggle') as HTMLButtonElement
+    // A header stands for the button alone, with no name.
+    expect(part(el as HTMLElement, 'header')?.contains(button)).toBe(true)
+    expect(button.getAttribute('aria-pressed')).toBe('false')
+    button.click()
+    await el.updateComplete
+    expect(el.wrap).toBe(true)
+    expect(el.hasAttribute('wrap')).toBe(true)
+    expect(button.getAttribute('aria-pressed')).toBe('true')
+    el.addEventListener('helix-before-toggle', (event) => event.preventDefault(), { once: true })
+    button.click()
+    await el.updateComplete
+    expect(el.wrap).toBe(true)
+    expect(asked).toEqual([true, false])
+    expect(told).toEqual([true])
+  })
+
+  test('numbers each line in an element of its own, so it can be as tall as its line', async () => {
+    const el = (await mount(
+      '<helix-headless-code-block wrap line-numbers>a\nb</helix-headless-code-block>',
+    )) as Updatable
+    await el.updateComplete
+    await el.updateComplete
+    const numbers = [
+      ...(el.shadowRoot?.querySelectorAll('[part="gutter"] > [part="number"]') ?? []),
+    ]
+    expect(numbers.map((number) => number.textContent?.trim())).toEqual(['1', '2'])
+  })
+})
+
+describe('the header', () => {
+  test('holds the page controls in actions, and draws for them with no name', async () => {
+    const el = (await mount(
+      '<helix-headless-code-block><button slot="actions">Run</button>one</helix-headless-code-block>',
+    )) as Updatable
+    await el.updateComplete
+    const header = part(el as HTMLElement, 'header')
+    expect(header?.querySelector('slot[name="actions"]')).not.toBeNull()
+    // The copy button moves into the header with them, and is drawn once.
+    expect(el.shadowRoot?.querySelectorAll('[part="copy"]')).toHaveLength(1)
+    expect(header?.querySelector('[part="copy"]')).not.toBeNull()
+  })
+
+  test("passes the page's icons to the copy button", async () => {
+    const el = (await mount(
+      '<helix-headless-code-block><span slot="copy-icon">C</span><span slot="copied-icon">D</span>one</helix-headless-code-block>',
+    )) as Updatable
+    await el.updateComplete
+    const copy = part(el as HTMLElement, 'copy') as HTMLElement
+    expect(copy.querySelector('slot[name="copy-icon"]')?.hasAttribute('slot')).toBe(false)
+    expect(copy.querySelector('slot[name="copied-icon"]')?.getAttribute('slot')).toBe('copied')
+    const plain = (await mount(
+      '<helix-headless-code-block>one</helix-headless-code-block>',
+    )) as Updatable
+    await plain.updateComplete
+    expect((part(plain as HTMLElement, 'copy') as HTMLElement).querySelector('slot')).toBeNull()
+  })
+})
