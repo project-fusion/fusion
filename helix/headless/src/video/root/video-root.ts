@@ -1,6 +1,7 @@
 import {
   activeCue,
   adoptTrack,
+  auditName,
   type Caption,
   CueController,
   captionsAmong,
@@ -1506,6 +1507,15 @@ export class HelixHeadlessVideo extends HelixElement {
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated?.(changed)
     this.finishHydration()
+    /* A player with no `label` is announced by `player-label`, "Video", which
+       says nothing of what it shows. Development builds only. A playlist
+       names its player before the read. */
+    auditName(
+      this,
+      () => null,
+      'Give it a `label` that says what the video shows, such as "Product tour".',
+      () => this.label !== '',
+    )
     const video = this.video
     if (video) {
       /* **Silent as asked, which the attribute alone did not make it.** The
