@@ -12,6 +12,7 @@ import {
   formatWords,
   HelixBeforeToggleEvent,
   HelixElement,
+  HelixLoadMoreEvent,
   HelixSelectEvent,
   HelixSelectedEvent,
   HelixSortEvent,
@@ -25,6 +26,7 @@ import {
   rangeAdd,
   reflectElements,
   requestChange,
+  scrollingAncestor,
   sort,
   splitValues,
   toggleEvery,
@@ -249,6 +251,11 @@ const NAMED = new Set([...STATUS, 'heading'])
  * | A letter or a word | Moves to the next row whose first cell starts with what you typed. |
  * | Tab | Leaves the table. |
  *
+ * **Loading more.** `load-more` sends `helix-load-more` once the end of the
+ * table comes within a screen of view, in the box that scrolls it or the
+ * page, once for each number of rows: add rows and it can send it again. Set
+ * `loading` while you fetch, and the table asks for nothing until it clears.
+ *
  * When the rows did not load, set `error-text`, such as "The orders did not
  * load", and put a button that tries again in the `error` slot. The line shows
  * after the rows in place of the empty and loading lines, the live region says
@@ -273,6 +280,7 @@ const NAMED = new Set([...STATUS, 'heading'])
  *
  * @event {HelixBeforeReorderEvent} helix-before-reorder - Fired when a row is dropped at a new place, in a `reorderable` table, with every row's key in the new order. Cancelable: cancel it to keep the row where it is.
  * @event {HelixBeforeToggleEvent} helix-before-toggle - Fired from a row when its disclosure button is pressed, with whether it would be open in `detail.checked`. Cancelable: cancel it to keep the row as it is.
+ * @event {HelixLoadMoreEvent} helix-load-more - Fired, in a table with `load-more`, when the end of the table comes within a screen of view, once for each number of rows.
  * @event {HelixReorderEvent} helix-reorder - Fired after `helix-before-reorder` when nobody canceled it. Move your rows to the order in `keys`. Cancelable: cancel it to say the move did not happen.
  * @event {HelixSelectEvent} helix-select - The selection is about to change. The event carries every selected key, separated by commas. Cancelable: cancel it to keep the current selection.
  * @event {HelixSelectedEvent} helix-selected - Fired after the selection changes, with every selected key, separated by commas.
@@ -474,6 +482,13 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
    */
   @property()
   label = ''
+
+  /**
+   * Sends `helix-load-more` once the end of the table comes within a screen
+   * of view, so you can add the next rows as a reader nears them.
+   */
+  @property({ attribute: 'load-more', type: Boolean })
+  loadMore = false
 
   /**
    * What screen readers hear each time a key moves a held row, in a
@@ -1416,6 +1431,10 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     super.connectedCallback()
     this.watcher = new MutationObserver(() => this.requestUpdate())
     this.watcher.observe(this, { characterData: true, childList: true, subtree: true })
+    /* Moved in the page, a `load-more` table watches its end again. */
+    if (this.hasUpdated) {
+      this.watchEnd()
+    }
     this.addEventListener('click', this.handleHeadClick)
     this.addEventListener('click', this.handleRowClick)
     this.addEventListener('helix-before-toggle', this.handleToggle)
@@ -1423,6 +1442,9 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    this.endWatcher?.disconnect()
+    this.endWatcher = undefined
+    this.watchedEnd = undefined
     this.watcher?.disconnect()
     this.watcher = undefined
     this.removeEventListener('click', this.handleHeadClick)
@@ -1577,6 +1599,61 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
       this.gridKeys.mark()
       this.gridKeys.place()
     }
+    this.watchEnd()
+  }
+
+  /** Watches the end of a `load-more` table coming near the box that scrolls it. */
+  private endWatcher: IntersectionObserver | undefined
+
+  /** The end being watched, so a new one is watched again. */
+  private watchedEnd: Element | undefined
+
+  /** The number of rows `helix-load-more` was last sent for. */
+  private askedAt: number | undefined
+
+  /**
+   * Starts or stops watching the end of the table, against the box that
+   * scrolls it, or the page, with a screen of room below it, so the next rows
+   * are asked for before a reader reaches the last. List does the same.
+   */
+  private watchEnd(): void {
+    const end = this.loadMore ? this.renderRoot.querySelector('[data-end]') : null
+    if (end === this.watchedEnd) {
+      if (this.endInView) {
+        this.askForMore()
+      }
+      return
+    }
+    this.endWatcher?.disconnect()
+    this.endWatcher = undefined
+    this.endInView = false
+    this.watchedEnd = end ?? undefined
+    if (!end || typeof IntersectionObserver === 'undefined') {
+      return
+    }
+    this.endWatcher = new IntersectionObserver(
+      (entries) => {
+        this.endInView = entries.some((entry) => entry.isIntersecting)
+        if (this.endInView) {
+          this.askForMore()
+        }
+      },
+      { root: scrollingAncestor(this, { axis: 'y' }), rootMargin: '0px 0px 100% 0px' },
+    )
+    this.endWatcher.observe(end)
+  }
+
+  /** Whether the end of the table was in reach when last measured. */
+  private endInView = false
+
+  /** Sends `helix-load-more`, once for each number of rows, and never while loading. */
+  private askForMore(): void {
+    const count = this.slotted.length
+    if (!this.loadMore || this.loading || this.askedAt === count) {
+      return
+    }
+    this.askedAt = count
+    this.dispatchEvent(new HelixLoadMoreEvent())
   }
 
   /** The heading over the row grips, named by `row-grips-label`. */
@@ -1668,7 +1745,7 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
           ? this.renderStatus(this.hasRows, grid ? 'gridcell' : 'cell')
           : html`<p part="error" role="row"><span role=${grid ? 'gridcell' : 'cell'}><slot name="error">${this.errorText}</slot></span></p>`
       }
-    </div>${end}${
+    </div>${end}${this.loadMore ? html`<span data-end aria-hidden="true"></span>` : nothing}${
       this.errorText === ''
         ? this.renderLive(this.hasRows)
         : html`<span part="live" role="status">${this.errorText}</span>`
