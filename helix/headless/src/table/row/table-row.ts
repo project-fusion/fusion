@@ -5,7 +5,7 @@ import {
   hostAria,
   pressedOwnControl,
 } from '@fusion.dev/helix-core'
-import { dotsSixVertical } from '@fusion.dev/helix-icons'
+import { caretRight, dotsSixVertical } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type ReactiveElement, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
@@ -35,6 +35,12 @@ export type TableRowMove = 'dragging' | 'drop-after' | 'drop-before'
  * the drop indicator is, with the `dragging`, `drop-before`, and `drop-after`
  * states.
  *
+ * **`parent` nests the row under another**, by that row's key. The table
+ * then draws a column of disclosure buttons: a row with rows under it has one,
+ * named by the table's `expand-row-label` and saying whether it is open with
+ * `aria-expanded`, and its rows are drawn only while it is open. The cell is
+ * indented by the row's depth through `--table-row-level`.
+ *
  * **`href` makes the whole row a link**, as a row action does in React Aria's
  * table: a press anywhere on the row follows it, except on a link or a control
  * of the row's own, and Control, Command or Shift open it the way they open a
@@ -61,15 +67,21 @@ export type TableRowMove = 'dragging' | 'drop-after' | 'drop-before'
  * @csspart checkbox-mark-checked - Added to `checkbox-mark` while its box is checked.
  * @csspart checkbox-mark-dash - Added to `checkbox-mark` while it draws the dash, which it keeps until its box is checked.
  * @csspart checkbox-mark-indeterminate - Added to `checkbox-mark` while only some rows are selected.
+ * @csspart expand - The cell that holds the row's disclosure button, in a table whose rows nest. It carries `--table-row-level`, the row's depth from 1.
+ * @csspart expand-button - The button that shows and hides the rows under this one.
+ * @csspart expand-mark - The caret on the disclosure button, which points along the line, turned down by the styled tier while the row is open.
  * @csspart grip - The cell that holds the row's grip, in a `reorderable` table.
  * @csspart grip-button - The button that moves the row.
  * @csspart grip-mark - The icon on the grip.
  * @csspart select - The cell that holds the row's checkbox, in a `selectable` table.
  * @csspart select-selected - Added to `select` while the row is selected.
  *
+ * @cssproperty --table-row-level - Written by the row on its `expand` cell: how deep the row sits, from 1. Do not set it.
+ *
  * @cssstate dragging - The row is being moved, in a `reorderable` table.
  * @cssstate drop-after - The row being moved goes after this one when it is dropped.
  * @cssstate drop-before - The row being moved goes before this one when it is dropped.
+ * @cssstate expanded - While the rows under this one are shown.
  * @cssstate link - While the row has `href` and is not `disabled`, so a press on it follows the link.
  * @cssstate selected - While the row is selected, in a `selectable` table.
  */
@@ -91,6 +103,14 @@ export class HelixHeadlessTableRow extends HelixElement {
    */
   @property({ reflect: true, type: Boolean })
   disabled = false
+
+  /**
+   * The key of the row this one sits under, in a table whose rows nest: that
+   * row's `value`, or its place among the rows where it has none. Empty, the
+   * default, is a row at the top.
+   */
+  @property()
+  parent = ''
 
   /**
    * The URL a press on the row follows, which makes the whole row a link.
@@ -176,6 +196,34 @@ export class HelixHeadlessTableRow extends HelixElement {
   @state()
   selectStop = false
 
+  /**
+   * @internal How deep the row sits, from 1, in a table whose rows nest, and
+   * 0 in one whose rows do not, which draws no disclosure cell. Written by the
+   * table. Not a consumer's to set.
+   */
+  @state()
+  level = 0
+
+  /** @internal Whether rows sit under this one. Written by the table. */
+  @state()
+  branch = false
+
+  /** @internal Whether the rows under this one are shown. Written by the table. */
+  @state()
+  open = false
+
+  /** @internal The name of the disclosure button. Written by the table. */
+  @state()
+  expandLabel = ''
+
+  /** @internal Whether the disclosure cell holds the grid's one tab stop. Written by the table. */
+  @state()
+  expandStop = false
+
+  /** @internal What a press on the disclosure button asks of the table. Written by the table. */
+  @state()
+  expandWith: (() => void) | undefined = undefined
+
   /** The table's rules this row holds, so the next ones replace them rather than pile up. */
   private columnRules: CSSStyleSheet | undefined = undefined
 
@@ -210,6 +258,12 @@ export class HelixHeadlessTableRow extends HelixElement {
        and its checkbox already says so. */
     this.internals.ariaSelected = this.gridCell && this.selectable ? String(this.selected) : null
     this.internals.ariaDisabled = this.disabled ? 'true' : null
+    /* A tree's depth and whether a branch is open, in a grid, which is then a
+       `treegrid`. A plain table's disclosure button says it instead. */
+    const tree = this.gridCell && this.level > 0
+    this.internals.ariaLevel = tree ? String(this.level) : null
+    this.internals.ariaExpanded = tree && this.branch ? String(this.open) : null
+    this.toggleState('expanded', this.branch && this.open)
     this.toggleState('selected', this.selectable && this.selected)
     this.toggleState('link', this.href !== '' && !this.disabled)
     this.toggleState('dragging', this.move === 'dragging')
@@ -325,8 +379,39 @@ export class HelixHeadlessTableRow extends HelixElement {
     ></span>`
   }
 
+  /**
+   * The disclosure cell, in a table whose rows nest: a button where rows sit
+   * under this one, and an empty cell where none do, so the columns stay in
+   * line. In a grid the cell takes focus and Space or Enter on it presses the
+   * button, which leaves the tab order.
+   */
+  protected renderExpand(): TemplateResult | typeof nothing {
+    if (this.level === 0) {
+      return nothing
+    }
+    const grid = this.gridCell
+    return html`<span
+      part="expand"
+      role=${grid ? 'gridcell' : 'cell'}
+      style="--table-row-level: ${this.level}"
+      tabindex=${grid ? (this.expandStop ? '0' : '-1') : nothing}
+      >${
+        this.branch
+          ? html`<button
+              part="expand-button"
+              type="button"
+              tabindex=${grid ? '-1' : nothing}
+              aria-label=${this.expandLabel}
+              aria-expanded=${this.open ? 'true' : 'false'}
+              @click=${() => this.expandWith?.()}
+            ><svg aria-hidden="true" data-mirror fill="currentColor" part="expand-mark" viewBox=${caretRight.viewBox}>${unsafeSVG(caretRight.content)}</svg></button>`
+          : nothing
+      }</span
+    >`
+  }
+
   protected override render(): TemplateResult {
-    return html`${this.renderGrip()}${this.renderSelect()}<slot @slotchange=${this.handleSlotChange}></slot>`
+    return html`${this.renderGrip()}${this.renderSelect()}${this.renderExpand()}<slot @slotchange=${this.handleSlotChange}></slot>`
   }
 }
 
