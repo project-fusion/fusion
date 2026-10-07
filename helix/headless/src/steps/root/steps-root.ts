@@ -218,9 +218,20 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
     )
   }
 
-  /** The index of the stage the reader is on, or `-1`. */
+  /**
+   * The index of the stage the reader is on, or `-1`.
+   *
+   * Read from `active` once anything has set it, because a move writes
+   * `active` at once and each step's `current` only on the next update: two
+   * calls to `next()` in one task then move two stages.
+   */
   private get at(): number {
-    return this.steps.findIndex((step) => step.current)
+    const steps = this.steps
+    if (this.active === '') {
+      return steps.findIndex((step) => step.current)
+    }
+    const item = this.resolveActive(steps)
+    return item ? steps.indexOf(item) : -1
   }
 
   /**
