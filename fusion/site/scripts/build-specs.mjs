@@ -178,12 +178,14 @@ const shareRuntime = {
  * shares a page with imports the same family from the package's `dist`: two
  * modules, two classes, and the second registration warned that the page held
  * two copies, as Graph and Map did on every run. Resolved to the source, the
- * two are one module, and the specs test the code as it stands.
+ * two are one module, and the specs test the code as it stands. A part's own
+ * entry, such as `@fusion.dev/helix-headless/tag/root`, is resolved the same
+ * way, or the part it shares with its family's entry is two classes.
  */
 const headlessFromSource = {
   name: 'headless-from-source',
   setup(build) {
-    build.onResolve({ filter: /^@fusion\.dev\/helix-headless(\/[a-z0-9-]+)?$/ }, ({ path }) => {
+    build.onResolve({ filter: /^@fusion\.dev\/helix-headless(\/[a-z0-9-]+){0,2}$/ }, ({ path }) => {
       const family = path.slice('@fusion.dev/helix-headless'.length)
       const entry = join(root, SOURCE.headless, family, 'index.ts')
       return existsSync(entry) ? { path: entry } : undefined
