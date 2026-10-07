@@ -617,3 +617,134 @@ describe('the step a move leaves', () => {
     expect(heard).toEqual([{ previous: 'cart', value: 'ship' }])
   })
 })
+
+describe('steps written with no value', () => {
+  /* A value is a name a script can use, and a sequence written without any
+     still moves: each step is named by its place, counted from 1. */
+  const plain = async (attrs = ''): Promise<{ host: Sequence; all: Step[] }> => {
+    const host = (await mount(`<helix-headless-steps ${attrs}>
+      <helix-headless-step current>Cart</helix-headless-step>
+      <helix-headless-step>Shipping</helix-headless-step>
+      <helix-headless-step>Payment</helix-headless-step>
+    </helix-headless-steps>`)) as Sequence
+    const all = [...host.querySelectorAll('helix-headless-step')] as Step[]
+    await turn(host)
+    await Promise.all(all.map((step) => step.updateComplete))
+    return { all, host }
+  }
+  const currents = (all: Step[]): boolean[] => all.map((one) => one.hasAttribute('current'))
+
+  test('move with next and previous, each named by its place', async () => {
+    const { all, host } = await plain()
+    expect(host.next()).toBe(true)
+    await turn(host)
+    expect(host.active).toBe('2')
+    expect(currents(all)).toEqual([false, true, false])
+    expect(host.previous()).toBe(true)
+    await turn(host)
+    expect(host.active).toBe('1')
+    expect(currents(all)).toEqual([true, false, false])
+  })
+
+  test('move when a name is pressed, and say where they went', async () => {
+    const { all, host } = await plain()
+    const heard: { previous: string; value: string }[] = []
+    host.addEventListener('helix-activate', (event) => {
+      heard.push((event as CustomEvent<{ previous: string; value: string }>).detail)
+    })
+    ;(part(at(all, 2), 'label') as HTMLElement).click()
+    await turn(host)
+    expect(currents(all)).toEqual([false, false, true])
+    expect(heard).toEqual([{ previous: '1', value: '3' }])
+  })
+
+  test('start where `active` names them by place', async () => {
+    const { all } = await plain('active="2"')
+    expect(currents(all)).toEqual([false, true, false])
+  })
+})
+
+describe('a sequence the arrow keys move through is one tab stop', () => {
+  type Named = Step & { focus(): void }
+  const stops = (all: Step[]): boolean[] =>
+    all.map((one) => (part(one, 'label') as unknown as { focusable: boolean }).focusable)
+  const settled = async (host: Sequence, all: Step[]): Promise<void> => {
+    for (let round = 0; round < 3; round += 1) {
+      await turn(host)
+      await Promise.all(all.map((step) => step.updateComplete))
+    }
+  }
+
+  test('held by the current stage, and moved to the stage the arrows reach', async () => {
+    const host = (await mount(`<helix-headless-steps arrows active="b">
+      <helix-headless-step value="a">Cart</helix-headless-step>
+      <helix-headless-step value="b">Shipping</helix-headless-step>
+      <helix-headless-step value="c">Payment</helix-headless-step>
+    </helix-headless-steps>`)) as Sequence
+    const all = [...host.querySelectorAll('helix-headless-step')] as Named[]
+    await settled(host, all)
+    expect(stops(all)).toEqual([false, true, false])
+    at(all, 1).focus()
+    ;(part(at(all, 1), 'label') as HTMLElement).dispatchEvent(
+      new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        key: 'ArrowRight',
+      }),
+    )
+    await settled(host, all)
+    expect(host.ownerDocument.activeElement).toBe(at(all, 2))
+    expect(stops(all)).toEqual([false, false, true])
+    /* Going to a stage gives it the stop back. */
+    host.active = 'a'
+    await settled(host, all)
+    expect(stops(all)).toEqual([true, false, false])
+  })
+
+  test('and without arrows every name is its own stop', async () => {
+    const host = (await mount(`<helix-headless-steps active="b">
+      <helix-headless-step value="a">Cart</helix-headless-step>
+      <helix-headless-step value="b">Shipping</helix-headless-step>
+    </helix-headless-steps>`)) as Sequence
+    const all = [...host.querySelectorAll('helix-headless-step')] as Step[]
+    await settled(host, all)
+    expect(stops(all)).toEqual([true, true])
+  })
+})
+
+describe('buttons of your own that move the sequence', () => {
+  /* Ark UI's previous and next triggers, as the platform's invokers: any
+     button with `commandfor` and `--previous`, `--next` or `--reset`. */
+  test('move it, under the same rules as next and previous', async () => {
+    const back =
+      (await mount(`<helix-headless-button command="--previous" commandfor="flow">Back</helix-headless-button>
+      <helix-headless-button command="--next" commandfor="flow">Continue</helix-headless-button>
+      <helix-headless-button command="--reset" commandfor="flow">Start over</helix-headless-button>
+      <helix-headless-steps id="flow" completion="passed" active="a">
+        <helix-headless-step value="a">Cart</helix-headless-step>
+        <helix-headless-step value="b">Shipping</helix-headless-step>
+      </helix-headless-steps>`)) as HTMLElement & { updateComplete: Promise<unknown> }
+    const [forward, reset] = [
+      back.nextElementSibling,
+      back.nextElementSibling?.nextElementSibling,
+    ] as HTMLElement[]
+    const host = back.ownerDocument.getElementById('flow') as Sequence
+    await turn(host)
+    await back.updateComplete
+    const press = (trigger: HTMLElement | undefined): void =>
+      trigger?.shadowRoot?.querySelector('button')?.click()
+    press(forward)
+    await turn(host)
+    expect(host.active).toBe('b')
+    press(back)
+    await turn(host)
+    expect(host.active).toBe('a')
+    press(forward)
+    await turn(host)
+    press(reset)
+    await turn(host)
+    expect(host.active).toBe('a')
+    expect(host.querySelector('helix-headless-step')?.hasAttribute('complete')).toBe(false)
+  })
+})

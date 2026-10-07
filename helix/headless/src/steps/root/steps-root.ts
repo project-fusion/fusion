@@ -1,4 +1,5 @@
 import {
+  CommandController,
   customElement,
   focusItemOf,
   formatWords,
@@ -33,6 +34,13 @@ const navigable = (step: HelixHeadlessStep): NavigableItem => {
 }
 
 /**
+ * What names a step in `active`: its `value`, or its place in the sequence,
+ * counted from 1, where it has none. A sequence written without values still
+ * moves, and `active="2"` names its second stage.
+ */
+const keyOf = (step: HelixHeadlessStep, index: number): string => step.value || String(index + 1)
+
+/**
  * @summary A sequence of stages that shows which stage the user is on.
  *
  * @description
@@ -44,12 +52,21 @@ const navigable = (step: HelixHeadlessStep): NavigableItem => {
  * sequence is correct in the server's markup, where the root cannot count its
  * slotted children.
  *
+ * `active` names a step by its `value`. A step with no `value` is named by its
+ * place, counted from 1, so a sequence written without values moves as one
+ * written with them, and `helix-activate` says `1`, `2` and so on. Give every
+ * step a value or none, because a value of `2` and the second place are one
+ * name.
+ *
  * `linear` keeps a reader from passing a stage they have not finished, as Ark
  * UI's linear steps do: a stage ahead is out of reach, and its button disabled,
  * until every stage before it is `complete` or `optional`. Going back is always
  * allowed. `next()` and `previous()` move one stage either way, under the
  * same rules, for your own buttons. `reset()` goes back to the first stage and
- * clears every stage's `complete`, as Ark UI's `resetStep` does.
+ * clears every stage's `complete`, as Ark UI's `resetStep` does. A button
+ * anywhere on the page calls them with no script, as Ark UI's previous and
+ * next triggers do: give it `commandfor` with the sequence's `id`, and
+ * `command="--previous"`, `"--next"` or `"--reset"`.
  *
  * `completion="passed"` marks a stage `complete` once a reader moves past it,
  * as Ark UI counts a stage before the current one as completed. Going back
@@ -76,11 +93,13 @@ const navigable = (step: HelixHeadlessStep): NavigableItem => {
  * button is described by its `complete-label`.
  *
  * **Keyboard.** Each stage's name is a button and its own tab stop, and Enter
- * or Space goes to the stage. Set `arrows` and the arrow keys move focus
- * between the names as well, as Ark UI's steps do: Left and Right along a row,
- * Up and Down a column, Home and End to the first and the last. The arrows
- * pass over a disabled stage and one a linear sequence holds out of reach,
- * and they move focus without going to the stage.
+ * or Space goes to the stage. Set `arrows` and the names are one tab stop, the
+ * current stage's, and the arrow keys move focus between them: Left and Right
+ * along a row, Up and Down a column, Home and End to the first and the last.
+ * The stop follows focus, so Tab leaves the sequence and Shift+Tab comes back
+ * to the name the reader left. The arrows pass over a disabled stage and one a
+ * linear sequence holds out of reach, and they move focus without going to the
+ * stage.
  *
  * @since 0.1.0
  * @status stable
@@ -110,7 +129,8 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
 
   /**
    * Whether the arrow keys move focus between the stages' names, along the
-   * way the steps run. Off by default, so the arrows keep scrolling the page.
+   * way the steps run, and the names are one tab stop. Off by default, so the
+   * arrows keep scrolling the page.
    */
   @property({ type: Boolean })
   arrows = false
@@ -211,6 +231,16 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
     wrap: false,
   })
 
+  /* Your own previous, next and start-over buttons, as `<helix-button
+     commandfor>` and nothing else. */
+  protected readonly commands = new CommandController(this, {
+    commands: {
+      '--next': () => this.next(),
+      '--previous': () => this.previous(),
+      '--reset': () => this.reset(),
+    },
+  })
+
   /** The steps, in the order the consumer wrote them. */
   private get steps(): HelixHeadlessStep[] {
     return [...this.querySelectorAll<HelixHeadlessStep>(':scope > *')].filter(
@@ -230,8 +260,18 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
     if (this.active === '') {
       return steps.findIndex((step) => step.current)
     }
-    const item = this.resolveActive(steps)
+    const item = this.named(steps)
     return item ? steps.indexOf(item) : -1
+  }
+
+  /** The step `active` names, by `value` or by place, or the first enabled one. */
+  private named(steps: HelixHeadlessStep[]): HelixHeadlessStep | undefined {
+    const keyed = steps.map((step, index) => ({
+      disabled: step.disabled,
+      step,
+      value: keyOf(step, index),
+    }))
+    return this.resolveActive(keyed)?.step
   }
 
   /**
@@ -241,7 +281,8 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
    * written with that step, so `helix-activate` names it as `previous`.
    */
   override requestActive(next: string, cause?: string): boolean {
-    const here = this.active === '' ? this.steps[this.at]?.value : undefined
+    const at = this.active === '' ? this.at : -1
+    const here = at === -1 ? undefined : keyOf(this.steps[at] as HelixHeadlessStep, at)
     if (here) {
       this.active = here
     }
@@ -270,8 +311,8 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
    */
   reset(): boolean {
     const steps = this.steps
-    const first = steps.find((one) => !one.disabled)
-    if (!first || !this.requestActive(first.value)) {
+    const first = steps.findIndex((one) => !one.disabled)
+    if (first === -1 || !this.requestActive(keyOf(steps[first] as HelixHeadlessStep, first))) {
       return false
     }
     for (const one of steps) {
@@ -292,7 +333,7 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
     if (!target || !this.reachable(index) || !this.valid(index)) {
       return false
     }
-    return this.requestActive(target.value)
+    return this.requestActive(keyOf(target, index))
   }
 
   /**
@@ -345,8 +386,8 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
       return
     }
     const steps = this.steps
-    const value = this.resolveActive(steps)?.value ?? ''
-    const reached = steps.findIndex((step) => step.value === value)
+    const named = this.named(steps)
+    const reached = named ? steps.indexOf(named) : -1
     steps.forEach((step, index) => {
       const current = index === reached
       const passed = this.completion === 'passed' && index < reached
@@ -383,23 +424,70 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
       if (event.defaultPrevented || !this.reachable(index) || !this.valid(index)) {
         return
       }
-      this.requestActive((event as CustomEvent<{ value: string }>).detail.value)
+      this.requestActive(keyOf(this.steps[index] as HelixHeadlessStep, index))
     })
+  }
+
+  /** The step whose name holds the sequence's one tab stop under `arrows`, once focus has chosen it. */
+  private holder: HelixHeadlessStep | undefined
+
+  /**
+   * Gives the one tab stop to a name, under `arrows`: the one focus last left,
+   * else the current stage's, else the first a reader can go to. Without
+   * `arrows` every name is its own stop. Client only.
+   */
+  private rove(): void {
+    const steps = this.steps
+    const open = steps.filter((step, index) => !step.disabled && this.reachable(index))
+    const current = steps[this.at]
+    const holder = !this.arrows
+      ? undefined
+      : this.holder && open.includes(this.holder)
+        ? this.holder
+        : current && open.includes(current)
+          ? current
+          : open[0]
+    for (const step of steps) {
+      whenHydrated(step, () => {
+        step.stop = !this.arrows || step === holder
+      })
+    }
+  }
+
+  /* Focus on a stage's name gives it the stop, so Shift+Tab comes back to
+     the name a reader left. Focus in what a stage holds is the stage's own,
+     and its path passes no name. */
+  private readonly handleFocus = (event: FocusEvent): void => {
+    if (!this.arrows) {
+      return
+    }
+    const path = event.composedPath()
+    const step = this.steps.find((one) => {
+      const name = one.shadowRoot?.querySelector('[part="label"]')
+      return name ? path.includes(name) : false
+    })
+    if (step && step !== this.holder) {
+      this.holder = step
+      this.rove()
+    }
   }
 
   private readonly handleSlotChange = (): void => {
     this.sync()
     this.lock()
+    this.rove()
   }
 
   override connectedCallback(): void {
     super.connectedCallback()
     this.addEventListener('helix-select', this.handleSelection)
+    this.addEventListener('focusin', this.handleFocus)
     /* A stage a script finishes, or one the reader arrives at, moves what a
        linear sequence can reach. Both are reflected, so their attributes say
        when they change. */
     this.watcher = new MutationObserver(() => {
       this.lock()
+      this.rove()
       this.requestUpdate()
     })
     this.watcher.observe(this, {
@@ -412,6 +500,7 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('helix-select', this.handleSelection)
+    this.removeEventListener('focusin', this.handleFocus)
     this.watcher?.disconnect()
     this.watcher = undefined
   }
@@ -443,6 +532,18 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
     }
     if (changed.has('linear') || changed.has('active') || changed.has('completion')) {
       this.lock()
+    }
+    if (changed.has('active')) {
+      /* Going to a stage gives it the stop. */
+      this.holder = undefined
+    }
+    if (
+      changed.has('arrows') ||
+      changed.has('linear') ||
+      changed.has('active') ||
+      changed.has('completion')
+    ) {
+      this.rove()
     }
   }
 
