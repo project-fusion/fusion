@@ -4,16 +4,18 @@ import {
   type ColorWords,
   colorName,
   customElement,
+  formatWords,
   type HelixBeforeChangeEvent,
   HelixFormElement,
-  localeOf,
   MixinControllerOpen,
   MixinControllerValue,
   MixinField,
   MixinPickerField,
   parseColor,
   toCss,
+  words,
   wordsConverter,
+  wordsLocale,
 } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -138,6 +140,12 @@ import '../../color-picker/index.js'
 export class HelixHeadlessColorInput extends MixinPickerField(
   MixinControllerOpen(MixinControllerValue(MixinField(HelixFormElement))),
 ) {
+  /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-color-input': { triggerLabel: 'Farbe auswählen' } })`.
+   */
+  static words = 'helix-color-input'
+
   /* A consumer's `aria-describedby` names ids in their own tree and the control
      is in this shadow root, so the reference has to be carried down as an
      element rather than copied as an id. See `AriaForwardController`: measured
@@ -243,8 +251,18 @@ export class HelixHeadlessColorInput extends MixinPickerField(
   swatches = ''
 
   /**
+   * What the swatch says in `variant="swatch"`, after the field's label, once
+   * there is a color. `{name}` is the color's name, such as "vibrant red", and
+   * `{value}` the value as written.
+   */
+  @words
+  @property({ attribute: 'swatch-label' })
+  swatchLabel = '{name} {value}'
+
+  /**
    * Accessible name for the control that opens the panel.
    */
+  @words
   @property({ attribute: 'trigger-label' })
   triggerLabel = 'Choose a color'
 
@@ -304,6 +322,13 @@ export class HelixHeadlessColorInput extends MixinPickerField(
     return this.control ?? this.partNamed('trigger')
   }
 
+  /** The swatch's words in `swatch`, which its label points at, and never drawn. */
+  private renderSwatchValue(): TemplateResult | typeof nothing {
+    return this.variant === 'swatch'
+      ? html`<span id="swatch-value" hidden>${this.swatchWords}</span>`
+      : nothing
+  }
+
   /** What the picker should show, which is only ever a color. */
   private get picked(): string {
     return parseColor(this.value) ? this.value : this.settled
@@ -322,7 +347,10 @@ export class HelixHeadlessColorInput extends MixinPickerField(
     if (!parsed) {
       return this.value || this.triggerLabel
     }
-    return `${colorName(parsed, this.colorWords, localeOf(this))} ${this.value}`
+    return formatWords(this, 'swatchLabel', {
+      name: colorName(parsed, this.colorWords, wordsLocale(this)),
+      value: this.value,
+    })
   }
 
   /** What the trigger's swatch paints, which is only ever a color. */
@@ -562,9 +590,7 @@ export class HelixHeadlessColorInput extends MixinPickerField(
                "Brand color" was read as "Choose a color" and the color itself
                was never said. The label, then the value, or the trigger's words
                where there is no value yet. */
-            this.variant === 'swatch'
-              ? html`<span id="swatch-value" hidden>${this.swatchWords}</span>`
-              : nothing
+            this.renderSwatchValue()
           }
         </button>
       </div>

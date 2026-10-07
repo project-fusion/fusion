@@ -8,10 +8,10 @@ import {
   colorName,
   customElement,
   drawIcon,
-  fillTemplate,
   focusItemOf,
   formatColor,
   formatNumber,
+  formatWords,
   HelixFormElement,
   HelixSampleEndEvent,
   HelixSampleStartEvent,
@@ -19,14 +19,15 @@ import {
   hueName,
   isRtl,
   KeyboardNavigationController,
-  localeOf,
   MixinControllerValue,
   MixinPickerFeedback,
   parseColor,
   rovingStop,
   splitValues,
   toCss,
+  words,
   wordsConverter,
+  wordsLocale,
 } from '@fusion.dev/helix-core'
 import { eyedropper } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -163,6 +164,12 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
   MixinControllerValue(HelixFormElement),
 ) {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-color-picker': { hueLabel: 'Farbton' } })`.
+   */
+  static words = 'helix-color-picker'
+
+  /**
    * Whether the color carries an alpha channel.
    *
    * Off by default, because it widens every value written, and a consumer who
@@ -185,12 +192,14 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
   /**
    * The message shown when the value is text that is not a color.
    */
+  @words
   @property({ attribute: 'bad-input-message' })
-  badInputMessage?: string
+  badInputMessage = 'Enter a color, like #ff0000, rgb(255 0 0) or hsl(0 100% 50%).'
 
   /**
    * What the blue channel's field is called, in `channel-fields`.
    */
+  @words
   @property({ attribute: 'blue-label' })
   blueLabel = 'Blue'
 
@@ -200,6 +209,7 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
    * **Every word the picker speaks is a property**, so a page in another
    * language hears its own rather than English between its own labels.
    */
+  @words
   @property({ attribute: 'brightness-label' })
   brightnessLabel = 'Brightness'
 
@@ -236,6 +246,7 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
   /**
    * The text the sample shows for a moment after it copies the value.
    */
+  @words
   @property({ attribute: 'copied-label' })
   copiedLabel = 'Copied'
 
@@ -243,12 +254,14 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
    * The name of the sample, which copies the value. `{value}` is replaced with
    * the color.
    */
+  @words
   @property({ attribute: 'copy-label' })
   copyLabel = 'Copy {value}'
 
   /**
    * What the eyedropper is called.
    */
+  @words
   @property({ attribute: 'eyedropper-label' })
   eyedropperLabel = 'Sample a color from the screen'
 
@@ -264,18 +277,21 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
   /**
    * What the syntax toggle is called, with `{format}` filled in.
    */
+  @words
   @property({ attribute: 'format-label' })
   formatLabel = 'Syntax: {format}. Change it.'
 
   /**
    * What the green channel's field is called, in `channel-fields`.
    */
+  @words
   @property({ attribute: 'green-label' })
   greenLabel = 'Green'
 
   /**
    * What the hue channel is called.
    */
+  @words
   @property({ attribute: 'hue-label' })
   hueLabel = 'Hue'
 
@@ -283,6 +299,7 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
    * What the lightness channel's field is called, in `channel-fields` with
    * hsl.
    */
+  @words
   @property({ attribute: 'lightness-label' })
   lightnessLabel = 'Lightness'
 
@@ -320,12 +337,14 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
   /**
    * What the opacity channel is called, where `alpha` offers one.
    */
+  @words
   @property({ attribute: 'opacity-label' })
   opacityLabel = 'Opacity'
 
   /**
    * What the row of `swatches` is called.
    */
+  @words
   @property({ attribute: 'presets-label' })
   presetsLabel = 'Presets'
 
@@ -361,6 +380,7 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
   /**
    * What the red channel's field is called, in `channel-fields`.
    */
+  @words
   @property({ attribute: 'red-label' })
   redLabel = 'Red'
 
@@ -392,8 +412,23 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
   /**
    * What the square's horizontal ramp is called.
    */
+  @words
   @property({ attribute: 'saturation-label' })
   saturationLabel = 'Saturation'
+
+  /**
+   * What a screen reader hears for the square's place, the color's two
+   * numbers and its name, on whichever of its two inputs it is on.
+   * `{first}` is `saturation` or `brightness`, the input's own channel, which
+   * is said first, so each order is its whole sentence. `{saturation}` and
+   * `{brightness}` are shares from 0 to 1, written as percentages with
+   * `number, percent`, `{saturationLabel}` and `{brightnessLabel}` the
+   * channels' names, and `{name}` the color's, such as "vibrant red".
+   */
+  @words
+  @property({ attribute: 'square-text' })
+  squareText =
+    '{first, select, brightness {{brightnessLabel} {brightness, number, percent}, {saturationLabel} {saturation, number, percent}, {name}} other {{saturationLabel} {saturation, number, percent}, {brightnessLabel} {brightness, number, percent}, {name}}}'
 
   /**
    * Colors offered under the picker, as a comma-separated list.
@@ -404,12 +439,14 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
   /**
    * What the group holding the eyedropper and the syntax toggle is called.
    */
+  @words
   @property({ attribute: 'tools-label' })
   toolsLabel = 'Color tools'
 
   /**
    * What the text field holding the value is called.
    */
+  @words
   @property({ attribute: 'value-label' })
   valueLabel = 'Color'
 
@@ -418,10 +455,12 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
    *
    * **Every sentence a control raises in the browser's bubble is a property**,
    * named for the validity flag it reports, so a form in another language
-   * speaks it. Absent is the control's own sentence, in English.
+   * speaks it. Unset is the sentence registered for the page's language, then
+   * the English.
    */
+  @words
   @property({ attribute: 'value-missing-message' })
-  valueMissingMessage?: string
+  valueMissingMessage = 'Choose a color.'
 
   /**
    * Draws the hue as a wheel around the square, in place of the hue ramp, as
@@ -851,7 +890,7 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
     if (this.required && this.value === '') {
       this.internals.setValidity(
         { valueMissing: true },
-        this.valueMissingMessage || 'Choose a color.',
+        this.valueMissingMessage,
         this.partNamed('grid') ?? undefined,
       )
       return
@@ -859,7 +898,7 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
     if (this.value !== '' && parseColor(this.value) === null) {
       this.internals.setValidity(
         { badInput: true },
-        this.badInputMessage || 'Enter a color, like #ff0000, rgb(255 0 0) or hsl(0 100% 50%).',
+        this.badInputMessage,
         this.partNamed('value') ?? this.partNamed('grid') ?? undefined,
       )
       return
@@ -1146,7 +1185,7 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
                     : html`<${this.tag('button')}
                         part="format"
       exportparts="button: format-button, live: format-live, spinner: format-spinner, text: format-text"
-                        label=${fillTemplate(this.formatLabel, { format: this.format ?? 'hex' })}
+                        label=${formatWords(this, 'formatLabel', { format: this.format ?? 'hex' })}
                         ?disabled=${this.isDisabled}
                         @click=${this.handleFormat}
                       >
@@ -1182,7 +1221,7 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
           type="button"
           role="option"
           tabindex=${index === stop ? '0' : '-1'}
-          aria-label=${parsed ? colorName(parsed, this.colorWords, localeOf(this)) : preset}
+          aria-label=${parsed ? colorName(parsed, this.colorWords, wordsLocale(this)) : preset}
           aria-selected=${chosen[index] ? 'true' : 'false'}
           style="--color-picker-swatch: ${preset}"
           ?disabled=${this.isDisabled}
@@ -1203,17 +1242,30 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
     /* And then the color's name, which is what the two numbers make: "Saturation
        100%, Brightness 100%" says where the handle is and "vibrant red" says
        what a sighted reader sees there, which is React Aria's reading. */
-    const named = colorName(color, this.colorWords, localeOf(this))
-    const both = `${this.saturationLabel} ${color.saturation}%, ${this.brightnessLabel} ${color.brightness}%, ${named}`
-    const reversed = `${this.brightnessLabel} ${color.brightness}%, ${this.saturationLabel} ${color.saturation}%, ${named}`
+    const locale = wordsLocale(this)
+    const square = (first: 'brightness' | 'saturation'): string =>
+      formatWords(this, 'squareText', {
+        brightness: color.brightness / 100,
+        brightnessLabel: this.brightnessLabel,
+        first,
+        name: colorName(color, this.colorWords, locale),
+        saturation: color.saturation / 100,
+        saturationLabel: this.saturationLabel,
+      })
+    const both = square('saturation')
+    const reversed = square('brightness')
     /* The hue ramp names the hue at full strength, which is what the ramp
        paints: the current color's own hue is gray wherever saturation is
        nothing, and a ramp read out as gray all the way along says nothing. */
     const hue = hueName(
       { alpha: 100, brightness: 100, hue: color.hue, saturation: 100 },
       this.colorWords,
-      localeOf(this),
+      locale,
     )
+    /* The hue's number and its name as the language lists two things: "120,
+       green" in English. */
+    const hueSaid = (value: number | string): string =>
+      new Intl.ListFormat(locale, { style: 'short', type: 'unit' }).format([String(value), hue])
     /* The square's two inputs are named with the picker's own name where it
        has one, as React Aria's color area names its own: "Brand, Saturation"
        says which picker on a page with two. */
@@ -1287,7 +1339,7 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
               dir="ltr"
               aria-label=${axisName(this.hueLabel)}
               aria-describedby=${this.feedback === '' ? nothing : 'feedback'}
-              aria-valuetext=${`${color.hue}, ${hue}`}
+              aria-valuetext=${hueSaid(color.hue)}
               aria-invalid=${this.marked ? 'true' : nothing}
               .value=${String(color.hue)}
               ?disabled=${this.isDisabled}
@@ -1306,14 +1358,14 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
           aria-label=${
             this.copier.copied
               ? this.copiedLabel
-              : fillTemplate(this.copyLabel, { value: this.value }).trim()
+              : formatWords(this, 'copyLabel', { value: this.value }).trim()
           }
           data-copied=${this.copier.copied ? '' : nothing}
           ?disabled=${this.isDisabled || this.value === ''}
           @click=${() => this.copier.copy(this.value)}
         ></button>
         <div part="channels">
-          ${this.wheel ? nothing : this.renderChannel('hue', this.hueLabel, 360, color.hue, `{value}, ${hue}`)}
+          ${this.wheel ? nothing : this.renderChannel('hue', this.hueLabel, 360, color.hue, hueSaid('{value}'))}
           ${
             this.alpha
               ? this.renderChannel(
@@ -1324,7 +1376,7 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
                   /* A percentage in the reader's language, "50%" or "50 %",
                      React Aria's reading of an alpha slider: the bare number
                      did not say what it counted. */
-                  formatNumber(color.alpha / 100, localeOf(this), { style: 'percent' }),
+                  formatNumber(color.alpha / 100, locale, { style: 'percent' }),
                 )
               : nothing
           }
