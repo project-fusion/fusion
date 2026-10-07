@@ -702,6 +702,9 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
     }
   }
 
+  /** The item shown at the last update, whose zoom a different item does not keep. */
+  private zoomedItem: HelixHeadlessLightboxItem | undefined = undefined
+
   /** The item on screen: the one `active` names, or the first where it names none. */
   private get shown() {
     return resolveActiveItem(this.active ?? '', this.items)
@@ -768,12 +771,16 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
     this.toggleState('fullscreen', this.filled)
     this.toggleState('idle', this.resting)
     this.toggleState('zoomable', this.maxZoom > 1)
-    /* Every item starts at its own size, and a closed viewer keeps no zoom. */
-    if (changed.has('active') || (changed.has('open') && !this.open)) {
+    /* Every item starts at its own size, and a closed viewer keeps no zoom.
+       Checked against the shown item, since `active` stays the same when the
+       shown item is removed or its `value` is renamed. */
+    const shown = this.shown
+    if (shown !== this.zoomedItem || (changed.has('open') && !this.open)) {
       this.quietZoom = true
       this.zoomer.reset()
       this.quietZoom = false
     }
+    this.zoomedItem = shown
     /* Before render and not after, or the region renders one move behind: the
        reading is this element's own state, so computing it in `updated` puts it
        into the *next* render and announces the picture the reader has just left. */

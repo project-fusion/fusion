@@ -457,6 +457,52 @@ describe('zooming into the shown item', () => {
     expect(zoom(host)).toBe('')
   })
 
+  describe('the item shown next starts at its own size, with `active` unchanged', () => {
+    /* The zoom is on the viewport, so it stayed on whichever item came next:
+       the reset ran only when `active` changed. */
+    const settled = async (host: Lightbox): Promise<void> => {
+      await new Promise((settle) => setTimeout(settle))
+      await host.updateComplete
+    }
+
+    test('once the shown item is removed', async () => {
+      const host = await opened('max-zoom="3" active="two"')
+      host.zoomTo(2)
+      host.querySelector('[value="two"]')?.remove()
+      await settled(host)
+      expect(shown(host)).toBe('one')
+      expect(zoom(host)).toBe('')
+      expect(hasState(host, 'zoomed')).toBe(false)
+    })
+
+    test('once the shown item’s `value` is renamed', async () => {
+      const host = await opened('max-zoom="3" active="two"')
+      host.zoomTo(2)
+      host.querySelector('[value="two"]')?.setAttribute('value', 'other')
+      await settled(host)
+      expect(shown(host)).toBe('one')
+      expect(zoom(host)).toBe('')
+    })
+
+    test('once another item is renamed to the `value` that `active` names', async () => {
+      const host = await opened('max-zoom="3" active="four"')
+      host.zoomTo(2)
+      host.querySelector('[value="three"]')?.setAttribute('value', 'four')
+      await settled(host)
+      expect(shown(host)).toBe('four')
+      expect(zoom(host)).toBe('')
+    })
+
+    test('and the shown item keeps its zoom while another item is removed', async () => {
+      const host = await opened('max-zoom="3" active="two"')
+      host.zoomTo(2)
+      host.querySelector('[value="three"]')?.remove()
+      await settled(host)
+      expect(shown(host)).toBe('two')
+      expect(zoom(host)).toBe('2')
+    })
+  })
+
   test('the next item starts at its own size', async () => {
     const host = await opened('max-zoom="3"')
     host.zoomTo(2)
