@@ -1125,6 +1125,12 @@ describe('the grid keyboard', () => {
     await settled(element)
     await settled(element)
     expect(roles(0)).toEqual(['gridcell', 'gridcell', 'rowheader'])
+    /* And the row takes its name from that cell. Named by its content, the
+       row was every cell's words, the checkbox's "Select Alpha" first. */
+    const row = element.shadowRoot?.querySelector('[data-row="0"]')
+    const header = element.shadowRoot?.querySelector('[data-row="0"] > [role="rowheader"]')
+    expect(header?.id).not.toBe('')
+    expect(row?.getAttribute('aria-labelledby')).toBe(header?.id ?? null)
   })
 
   test('moves to the row whose header starts with the letters typed', async () => {

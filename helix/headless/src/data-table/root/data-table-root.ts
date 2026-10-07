@@ -2183,6 +2183,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     place: number,
     stop: boolean,
     header: boolean,
+    id?: string,
   ): TemplateResult {
     const edge = edgeOf(column.textAlign)
     /* The depth goes on the row header, which indents, and holds the toggle. */
@@ -2196,6 +2197,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     return html`<span
       part="cell${picked ? ' cell-selected' : ''}${header ? ' cell-header' : ''}"
       role=${header ? 'rowheader' : 'gridcell'}
+      id=${id ?? nothing}
       tabindex=${stop ? '0' : '-1'}
       data-column=${place}
       style=${style || nothing}
@@ -2297,10 +2299,15 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
            reach a cell by the row it sits in. */
         const moveKey = grips ? this.moveKeyOf(row) : ''
         const marked = mark?.key === moveKey ? mark.edge : undefined
+        /* The row is named by its row header, as React Aria's rows are. Named
+           by its content, it was every cell's words, the checkbox's "Select
+           Alpha" first. */
+        const header = named ? `row-header-${index}` : undefined
         return html`<div
           part="row${held?.key === moveKey ? ' row-dragging' : ''}${marked === 'before' ? ' row-drop-before' : ''}${marked === 'after' ? ' row-drop-after' : ''}"
           role="row"
           aria-rowindex=${this.rowIndex(index)}
+          aria-labelledby=${header ?? nothing}
           aria-selected=${chosen ? String(picked) : nothing}
           aria-level=${placed ? placed.level : nothing}
           aria-posinset=${placed ? placed.position : nothing}
@@ -2332,6 +2339,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
               place + offset,
               stop(place + offset),
               column === named,
+              column === named ? header : undefined,
             ),
           )}
         </div>`
