@@ -730,3 +730,5 @@ export const whenHydrated = (element: Element, write: () => void): void => {
 /* This copy of Helix says which release it is, once, as it loads: see
    `noteVersion`. */
 noteVersion()
+
+// Measures verify with every example in scope. Reverted by the next commit.
