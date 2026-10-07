@@ -416,7 +416,7 @@ describe('a grid table whose rows nest', () => {
     expect(host.expanded).toBe('')
   })
 
-  test('moves from a row with none under it to the row it sits under with Left', async () => {
+  test('moves from a row with none under it to the row it sits under with Left, as Data Table does', async () => {
     const host = await table('default-expanded="src"')
     disclosure(host, 'a').focus()
     expect(await press(host, 'ArrowLeft')).toBe(true)
