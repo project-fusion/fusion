@@ -3,6 +3,7 @@ import {
   customElement,
   DrilldownController,
   HelixElement,
+  hostAria,
   inlineStep,
   KeyboardNavigationController,
   keyClaimed,
@@ -50,7 +51,13 @@ import { HelixHeadlessDrilldownItem } from '../item/drilldown-item.js'
  * Arrow or Escape goes back, the two arrows swapping on a right-to-left page.
  *
  * The rows of the page showing are a `menu`, named by `label` on the top page
- * and by the page's title below it. The back button and the title sit above
+ * and by the page's title below it.
+ *
+ * **`navigation` makes it a site's navigation.** The host is a `navigation`
+ * landmark named by `label`, each page is a list, and each row is a list item
+ * holding a link or a button, as the APG's disclosure navigation is built,
+ * so a reader meets places to go in place of a menu of commands. The keys stay
+ * the same. The back button and the title sit above
  * the menu. Disabled rows stay reachable with the arrow keys, and typing a
  * letter moves to the next row whose name starts with it.
  *
@@ -99,6 +106,14 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
      and a default accessible name is the one place that claim reaches a
      reader. */
   label = 'Navigation'
+
+  /**
+   * Whether the drilldown is a site's navigation: a `navigation` landmark
+   * named by `label`, whose pages are lists of links. Without it, each page is
+   * a `menu`.
+   */
+  @property({ type: Boolean })
+  navigation = false
 
   /**
    * The text of the back button.
@@ -331,6 +346,15 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
     this.removeEventListener('focusin', this.handleFocusIn)
   }
 
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    /* The landmark, through internals, so nothing is written onto the host. */
+    hostAria(this.internals, {
+      label: this.navigation ? this.label : '',
+      role: this.navigation ? 'navigation' : '',
+    })
+  }
+
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     /* Which rows are on the page showing, written onto the rows themselves
@@ -386,6 +410,7 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
     onPage: boolean,
   ): void {
     item.onPage = onPage
+    item.listed = this.navigation
     item.showingPage = item === page
     item.onPath = page !== null && item !== page && item.contains(page)
     for (const child of item.children) {
@@ -420,10 +445,10 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
     }
       <div
         aria-busy=${this.loading ? 'true' : nothing}
-        aria-label=${this.drilldown.atRoot ? this.label || nothing : nothing}
+        aria-label=${this.drilldown.atRoot && !this.navigation ? this.label || nothing : nothing}
         aria-labelledby=${this.drilldown.atRoot ? nothing : 'title'}
         part="page"
-        role="menu"
+        role=${this.navigation ? 'list' : 'menu'}
       >
         <slot @slotchange=${(event: Event) => this.countRows(event)}></slot>
         ${this.renderStatus(this.hasRows)}
