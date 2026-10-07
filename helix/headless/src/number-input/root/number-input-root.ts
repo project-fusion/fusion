@@ -76,9 +76,9 @@ const REPEAT_EVERY = 60
  * The locale's group separators are read in every field, so `1,234` is a
  * number in `en-US`.
  *
- * The field and its two buttons sit in a `role="group"`, and the field carries
- * `role-label`, "number field" in English, as its `aria-roledescription`, as
- * React Aria's NumberField does. On iOS and iPadOS the field is a plain text
+ * The field and its two buttons sit in a `role="group"` named by the label,
+ * and the field carries `role-label`, "number field" in English, as its
+ * `aria-roledescription`, as React Aria's NumberField does. On iOS and iPadOS the field is a plain text
  * field, with no `role="spinbutton"`, which VoiceOver reads as a slider you
  * cannot type in, and no role description, so VoiceOver says the field is
  * required. React Aria's NumberField does the same.
@@ -1007,7 +1007,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     const atMin = parsed !== null && this.min !== undefined && parsed <= this.min
     const atMax = parsed !== null && this.max !== undefined && parsed >= this.max
     return html`${this.renderLabel()}
-      <div part="field" role="group">
+      <div part="field" role="group" aria-labelledby=${this.labeled ? this.labelId : nothing}>
         <button
           part="decrement"
           type="button"
