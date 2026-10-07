@@ -7,6 +7,8 @@ import {
   drawTooltip,
   extent,
   HelixElement,
+  HelixReadingChangeEvent,
+  HelixReadingPressEvent,
   linear,
   linePath,
   MixinChartSource,
@@ -59,11 +61,19 @@ import '../../tooltip/index.js'
  * a reading. The tooltip follows, the `live` part says the reading in words,
  * and Escape puts the tooltip away.
  *
+ * **A tap shows the reading under it**, and keeps it until a tap lands
+ * elsewhere. `helix-reading-change` says each move of the reading, by pointer,
+ * tap or key, and `helix-reading-press` says a reading was clicked, tapped, or
+ * pressed with Enter or Space, for a page that opens what a reading stands for.
+ *
  * @since 0.1.0
  * @status stable
  * @category charts
  * @aliases Time Series, Trend Chart, Multi-line Chart
  * @documentation https://fusion.dev/helix/components/line-chart
+ *
+ * @event {HelixReadingChangeEvent} helix-reading-change - The reading shown moved, or was put away: `index` is the row, or `-1` for none, with its `label`, the `series` the keys rest on, and the `pointerType` that moved it.
+ * @event {HelixReadingPressEvent} helix-reading-press - A reading was clicked, tapped, or pressed with Enter or Space, with the same detail as `helix-reading-change`.
  *
  * @csspart area - The wash under one line, where `area` is set.
  * @csspart band - The band around the reading under the pointer.
@@ -109,6 +119,22 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
    * `registerWords('de', { 'helix-line-chart': { positionLabel: '{position} von {count}' } })`.
    */
   static words = 'helix-line-chart'
+
+  /**
+   * Sends the reading's moves and presses as `helix-reading-change` and
+   * `helix-reading-press`, which the pointer hears. Here and not in a
+   * constructor, where the manifest's analyzer reads the assignment as a
+   * member of this class.
+   */
+  override connectedCallback(): void {
+    super.connectedCallback()
+    this.pointer.onReading = (heard, detail) =>
+      this.dispatchEvent(
+        heard === 'press'
+          ? new HelixReadingPressEvent(detail)
+          : new HelixReadingChangeEvent(detail),
+      )
+  }
 
   /**
    * Draws a wash under each line, down to the floor of the plot. The washes

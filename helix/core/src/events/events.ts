@@ -132,6 +132,8 @@ import { HelixPreviewEvent } from './preview.js'
 import { HelixPreviousEvent } from './previous.js'
 import { HelixRangeChangeEvent } from './range-change.js'
 import { HelixReadEvent } from './read.js'
+import { HelixReadingChangeEvent } from './reading-change.js'
+import { HelixReadingPressEvent } from './reading-press.js'
 import { HelixReconnectEvent } from './reconnect.js'
 import { HelixRejectEvent } from './reject.js'
 import { HelixRelabelEvent } from './relabel.js'
@@ -187,6 +189,7 @@ export type {
   PressPointerType,
   RangeDetail,
   ReadDetail,
+  ReadingDetail,
   ReconnectDetail,
   Refusal,
   RefusedFile,
@@ -276,6 +279,8 @@ export {
   HelixPreviousEvent,
   HelixRangeChangeEvent,
   HelixReadEvent,
+  HelixReadingChangeEvent,
+  HelixReadingPressEvent,
   HelixReconnectEvent,
   HelixRejectEvent,
   HelixRelabelEvent,
@@ -379,6 +384,8 @@ const registry = {
   HelixPreviousEvent,
   HelixRangeChangeEvent,
   HelixReadEvent,
+  HelixReadingChangeEvent,
+  HelixReadingPressEvent,
   HelixReconnectEvent,
   HelixRejectEvent,
   HelixRelabelEvent,

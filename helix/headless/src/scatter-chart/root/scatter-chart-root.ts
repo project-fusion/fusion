@@ -6,6 +6,8 @@ import {
   formatNumbers,
   formatWords,
   HelixElement,
+  HelixReadingChangeEvent,
+  HelixReadingPressEvent,
   isRtl,
   linear,
   MixinChartSource,
@@ -126,11 +128,19 @@ const nice = ([low, high]: [number, number]): [number, number] => {
  * reads in its own direction. The summary and the tooltip bubble follow the
  * page's direction.
  *
+ * **A tap shows the reading under it**, and keeps it until a tap lands
+ * elsewhere. `helix-reading-change` says each move of the reading, by pointer,
+ * tap or key, and `helix-reading-press` says a reading was clicked, tapped, or
+ * pressed with Enter or Space, for a page that opens what a reading stands for.
+ *
  * @since 0.1.0
  * @status stable
  * @category charts
  * @aliases Scatter Plot, XY Chart, Correlation Chart, Dot Plot
  * @documentation https://fusion.dev/helix/components/scatter-chart
+ *
+ * @event {HelixReadingChangeEvent} helix-reading-change - The reading shown moved, or was put away: `index` is the row, or `-1` for none, with its `label`, the `series` the keys rest on, and the `pointerType` that moved it.
+ * @event {HelixReadingPressEvent} helix-reading-press - A reading was clicked, tapped, or pressed with Enter or Space, with the same detail as `helix-reading-change`.
  *
  * @csspart gridline - One line across the plot, drawn when `gridlines` is set.
  * @csspart live - The readout: a polite live region that says the row the keys moved to. Hide it visually.
@@ -257,14 +267,24 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
        Here rather than in a constructor, where the manifest's analyzer reads
        the assignment as a member of this class. */
     this.pointer.axis = 'none'
+    /* The reading's moves and presses, sent as `helix-reading-change` and
+       `helix-reading-press`. */
+    this.pointer.onReading = (heard, detail) =>
+      this.dispatchEvent(
+        heard === 'press'
+          ? new HelixReadingPressEvent(detail)
+          : new HelixReadingChangeEvent(detail),
+      )
     this.addEventListener('pointermove', this.handleMove)
     this.addEventListener('pointerleave', this.handleLeave)
+    this.addEventListener('pointerup', this.handleTap)
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('pointermove', this.handleMove)
     this.removeEventListener('pointerleave', this.handleLeave)
+    this.removeEventListener('pointerup', this.handleTap)
   }
 
   /**
@@ -556,14 +576,46 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
     if (event.pointerType !== 'mouse' && event.pointerType !== 'pen') {
       return
     }
+    const found = this.pointNear(event, REACH)
+    if (found === null) {
+      return
+    }
+    if (found !== this.nearest) {
+      this.nearest = found
+      this.pointer.set(found?.row ?? -1)
+      this.requestUpdate()
+    }
+  }
+
+  /**
+   * The point a tap lands nearest, within twice a pointer's reach, a finger
+   * being broader than a cursor. It stays shown until a tap lands elsewhere.
+   */
+  private readonly handleTap = (event: PointerEvent): void => {
+    if (event.pointerType !== 'touch') {
+      return
+    }
+    const found = this.pointNear(event, REACH * 2)
+    if (found) {
+      this.nearest = found
+      this.pointer.tapTo(found.row)
+      this.requestUpdate()
+    }
+  }
+
+  /**
+   * The drawn point nearest a pointer, within `reach` pixels, `undefined` for
+   * none in reach, and `null` with no plot to measure.
+   */
+  private pointNear(event: PointerEvent, reach: number): ScatterPoint | undefined | null {
     const box = this.partNamed('plot')?.getBoundingClientRect()
     if (!box || box.width === 0 || box.height === 0) {
-      return
+      return null
     }
     const across = event.clientX - box.left
     const up = event.clientY - box.top
     let found: ScatterPoint | undefined
-    let best = REACH ** 2
+    let best = reach ** 2
     for (const point of this.drawn) {
       const distance =
         ((point.x / PLOT_WIDTH) * box.width - across) ** 2 +
@@ -573,11 +625,7 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
         found = point
       }
     }
-    if (found !== this.nearest) {
-      this.nearest = found
-      this.pointer.set(found?.row ?? -1)
-      this.requestUpdate()
-    }
+    return found
   }
 
   private readonly handleLeave = (): void => {
