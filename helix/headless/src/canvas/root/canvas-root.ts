@@ -1,5 +1,6 @@
 import {
   assignSlots,
+  auditName,
   type CanvasView,
   capturePointer,
   customElement,
@@ -240,6 +241,10 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  * - One card holds the board's tab stop.
  * - The arrow keys move through the cards in reading order. The card you land
  *   on scrolls into view, and its connections are announced with it.
+ * - The card you land on is selected. Control or Command with an arrow key,
+ *   Home, or End moves without changing the selection, and Space adds the card
+ *   to the selection or takes it out, so you can select cards that are not
+ *   next to each other.
  * - Shift with an arrow key moves the card: by 16 units, or to the next
  *   multiple of `snap` where it is set. Alt with an arrow key resizes it from
  *   its bottom right corner the same way.
@@ -527,8 +532,9 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    *
    * **Comma separated, the way `Listbox` writes a multiple value**, so a page
    * reads one selection the same way wherever it comes from. A click, or a key
-   * that lands on one, selects it alone; Shift, Command or Control with a click
-   * adds or takes one away, and so does Space; Command or Control with A
+   * that lands on one, selects it alone; Command or Control with an arrow key
+   * moves without selecting; Shift, Command or Control with a click adds or
+   * takes one away, and so does Space; Command or Control with A
    * selects everything; Shift and a drag across the empty board selects the
    * cards the box touches. A click on the empty board, or Escape, selects
    * nothing. Dragging, Shift with an arrow, and Delete act on the whole
@@ -2667,8 +2673,19 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       return
     }
     event.preventDefault()
-    this.focusStop(walk[to]?.key)
+    /* **Command or Control walks without selecting**, the way a listbox that
+       selects several moves its focus apart from its selection, so Space can
+       then add a card that is not next to the ones already chosen. */
+    this.walkingApart = event.ctrlKey || event.metaKey
+    try {
+      this.focusStop(walk[to]?.key)
+    } finally {
+      this.walkingApart = false
+    }
   }
+
+  /** Whether the stop focus is moving to keeps the selection as it is. */
+  private walkingApart = false
 
   /**
    * A stop a reader landed on becomes the tab stop, and a card comes into view.
@@ -2688,7 +2705,12 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     this.stop = edge ?? card?.name
     /* A keyboard landing selects what it lands on, keeping a selection it
        lands inside; a pointer's selection is its press's and its release's. */
-    if (!this.pointing && this.stop !== undefined && !this.picked.includes(this.stop)) {
+    if (
+      !this.pointing &&
+      !this.walkingApart &&
+      this.stop !== undefined &&
+      !this.picked.includes(this.stop)
+    ) {
       this.choose(this.stop)
     }
     if (card) {
@@ -3330,6 +3352,14 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
     this.finishHydration()
+    /* A board with no name is read as "Canvas", which says nothing of what is
+       on it. Development builds only. */
+    auditName(
+      this,
+      () => null,
+      'Give it a `label` that says what the board holds, such as "Release plan".',
+      () => this.label !== '',
+    )
     if (this.waiting) {
       /* The box as it is now, so the first resize after this keeps the view's
          middle: the viewport settles its height after the first render, and
@@ -3791,7 +3821,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
         d=${drawn.d}
         data-edge=${key}
         fill="none"
-        aria-keyshortcuts="Enter F2 C Delete"
+        aria-keyshortcuts="Enter F2 Space Control+ArrowDown Control+ArrowUp C Delete"
         role="button"
         tabindex=${key === stop ? '0' : '-1'}
       />
@@ -3944,7 +3974,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     return html`<div
       part="region"
       role="group"
-      aria-label=${this.label || this.fallbackLabel}
+      aria-label=${this.label || this.getAttribute?.('aria-label') || this.fallbackLabel}
       aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight Plus Minus"
       tabindex="0"
       @focusin=${this.idle.stir}
