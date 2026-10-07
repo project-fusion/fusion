@@ -31,7 +31,9 @@ describe('tour server output', () => {
     const bare = ssr(html`<helix-tour label="Getting started"></helix-tour>`)
     expect(rendered(bare, 'helix-tour')).toContain('<slot></slot>')
     const markup = withoutStyles(ssr(tour))
-    expect(markup.match(/<div part="content"><slot><\/slot><\/div>/g)).toHaveLength(2)
+    expect(
+      markup.match(/<div part="content">(<!--[^>]*-->)?<slot ?><\/slot><\/div>/g),
+    ).toHaveLength(2)
   })
 
   test('and every panel is served hidden', () => {

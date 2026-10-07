@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import { hasState, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -154,5 +154,104 @@ describe('an app header inside sectioning content', () => {
     expect(role(header)).toBeNull()
     document.body.append(header)
     expect(role(header)).toBe('banner')
+  })
+})
+
+describe('a header that folds', () => {
+  type Folding = HTMLElement & {
+    fold(width: number): void
+    updateComplete: Promise<unknown>
+  }
+  const folding = async (): Promise<Folding> => {
+    const header = (await mount(`
+      <helix-headless-app-header fold-below="640" menu-label="Site menu">
+        <span slot="start">Fusion</span>
+        <a href="/work">Work</a>
+      </helix-headless-app-header>
+    `)) as Folding
+    /* What the width watch reports for a 400 pixel bar. */
+    header.fold(400)
+    await header.updateComplete
+    return header
+  }
+
+  test('hides the middle region behind a named toggle that says whether it is open', async () => {
+    const header = await folding()
+    const toggle = part(header, 'toggle') as HTMLButtonElement
+    const content = part(header, 'content') as HTMLElement
+    expect([toggle.getAttribute('aria-label'), toggle.getAttribute('aria-expanded')]).toEqual([
+      'Site menu',
+      'false',
+    ])
+    expect(toggle.getAttribute('aria-controls')).toBe(content.id)
+    expect(content.hidden).toBe(true)
+    expect(hasState(header, 'folded')).toBe(true)
+
+    toggle.click()
+    await header.updateComplete
+    expect([toggle.getAttribute('aria-expanded'), content.hidden]).toEqual(['true', false])
+    expect(hasState(header, 'open')).toBe(true)
+  })
+
+  test('closes on Escape and puts focus back on the toggle', async () => {
+    const header = await folding()
+    const toggle = part(header, 'toggle') as HTMLButtonElement
+    toggle.click()
+    await header.updateComplete
+    const link = header.querySelector('a') as HTMLElement
+    link.focus()
+    link.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        key: 'Escape',
+      }),
+    )
+    await header.updateComplete
+    await header.updateComplete
+    expect((part(header, 'content') as HTMLElement).hidden).toBe(true)
+    expect(header.shadowRoot?.activeElement).toBe(toggle)
+  })
+
+  test('draws no toggle and hides nothing where the bar is wide, or nothing asked it to fold', async () => {
+    const header = await folding()
+    header.fold(900)
+    await header.updateComplete
+    expect(part(header, 'toggle')).toBeNull()
+    expect((part(header, 'content') as HTMLElement).hidden).toBe(false)
+    const plain = await mount(
+      '<helix-headless-app-header><a href="/">Home</a></helix-headless-app-header>',
+    )
+    expect(part(plain, 'toggle')).toBeNull()
+  })
+})
+
+describe('a header that hides on scroll', () => {
+  type Hiding = HTMLElement & { follow(y: number): void; updateComplete: Promise<unknown> }
+
+  test('goes on a scroll down past it and comes back on a scroll up', async () => {
+    const header = (await mount(
+      '<helix-headless-app-header hide-on-scroll><a href="/">Home</a></helix-headless-app-header>',
+    )) as Hiding
+    header.getBoundingClientRect = () => ({ height: 56 }) as DOMRect
+    header.follow(400)
+    header.follow(600)
+    expect(hasState(header, 'hidden')).toBe(true)
+    header.follow(500)
+    expect(hasState(header, 'hidden')).toBe(false)
+    header.follow(700)
+    header.dispatchEvent(new FocusEvent('focusin', { bubbles: true }))
+    expect(hasState(header, 'hidden')).toBe(false)
+  })
+
+  test('and stays where it is without hide-on-scroll', async () => {
+    const header = (await mount(
+      '<helix-headless-app-header><a href="/">Home</a></helix-headless-app-header>',
+    )) as Hiding
+    header.getBoundingClientRect = () => ({ height: 56 }) as DOMRect
+    header.follow(400)
+    header.follow(600)
+    expect(hasState(header, 'hidden')).toBe(false)
   })
 })

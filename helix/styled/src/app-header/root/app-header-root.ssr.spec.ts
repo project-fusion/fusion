@@ -44,7 +44,9 @@ describe('app header server output', () => {
        What the header owes a crawler is the unnamed slot that projects it, read
        off a render with no children so the only shadow root here is its own. */
     const bare = ssr(html`<helix-app-header></helix-app-header>`)
-    expect(rendered(bare, 'helix-app-header')).toContain('<div part="content"><slot></slot></div>')
+    expect(rendered(bare, 'helix-app-header')).toMatch(
+      /<div\s+part="content"[^>]*>(<!--[^>]*-->)?<slot><\/slot><\/div>/,
+    )
   })
 
   test('declarative shadow DOM carries the material', () => {
