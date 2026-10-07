@@ -213,10 +213,10 @@ export class HelixHeadlessNavigation extends HelixElement {
 
   /** The landmark's name as a screen reader lists it. */
   private get landmarkName(): string {
-    const labelled = this.getAttribute('aria-labelledby')
-    if (labelled) {
+    const labeled = this.getAttribute('aria-labelledby')
+    if (labeled) {
       const root = this.getRootNode() as Document | ShadowRoot
-      return labelled
+      return labeled
         .split(/\s+/)
         .map((id) => root.getElementById?.(id)?.textContent?.trim() ?? '')
         .join(' ')
