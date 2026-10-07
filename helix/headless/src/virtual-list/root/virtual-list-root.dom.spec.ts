@@ -36,8 +36,12 @@ const inBrowser = hasLayout() ? test : (): void => {}
 const VIEWPORT = `helix-headless-virtual-list::part(viewport) {
   block-size: 12rem;
 }
-helix-headless-virtual-list > [data-index] {
+helix-headless-virtual-list > [data-index],
+helix-headless-virtual-list > [data-section] > * {
   block-size: 2rem;
+}
+helix-headless-virtual-list:state(horizontal) > [data-index] {
+  inline-size: 2rem;
 }`
 
 beforeAll(async () => {

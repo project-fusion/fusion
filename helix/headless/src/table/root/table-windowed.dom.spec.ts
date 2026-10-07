@@ -1,9 +1,35 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
+/**
+ * What the styled tier gives a windowed table, so a browser lays the rows out
+ * where the arithmetic expects them: one grid, a box that scrolls, and rows
+ * of the estimate's height. Scoped to these tables, since a family's specs
+ * share a page. happy-dom lays nothing out and reads none of it.
+ */
+const BOX = `.window-spec::part(table) {
+  align-content: start;
+  block-size: 300px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  overflow-y: auto;
+}
+.window-spec::part(head),
+.window-spec helix-headless-table-row {
+  display: contents;
+}
+.window-spec helix-headless-table-cell,
+.window-spec helix-headless-table-column {
+  block-size: 40px;
+  display: block;
+}`
+
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  const sheet = document.createElement('style')
+  sheet.textContent = BOX
+  document.head.append(sheet)
 })
 
 type Windowed = HTMLElement & {
@@ -28,7 +54,7 @@ const table = async (count: number, attributes = 'windowed'): Promise<Windowed> 
       `<helix-headless-table-row value="r${at}"><helix-headless-table-cell>Row ${at + 1}</helix-headless-table-cell><helix-headless-table-cell>${at}</helix-headless-table-cell></helix-headless-table-row>`,
   ).join('')
   const host = (await mount(
-    `<helix-headless-table label="Builds" ${attributes}><helix-headless-table-column>Name</helix-headless-table-column><helix-headless-table-column>Number</helix-headless-table-column>${rows}</helix-headless-table>`,
+    `<helix-headless-table class="window-spec" label="Builds" ${attributes}><helix-headless-table-column>Name</helix-headless-table-column><helix-headless-table-column>Number</helix-headless-table-column>${rows}</helix-headless-table>`,
   )) as Windowed
   await settle(host)
   return host
