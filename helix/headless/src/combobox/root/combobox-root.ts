@@ -76,6 +76,7 @@ const isInsertion = (event: Event): boolean =>
  * | Key | What it does |
  * |---|---|
  * | Down, Up | On a closed field, opens the list on the chosen option, or the first or the last. In the open list, moves the highlight, round from the last option to the first. |
+ * | Alt with Down, Alt with Up | Opens the list without moving the highlight, and closes it, choosing nothing. |
  * | Page Down, Page Up | In the open list, moves the highlight by as many options as the list shows at once. |
  * | Enter | Chooses the highlighted option. With nothing left in the list, creates what was typed with `creatable`, or takes it with `allows-custom-value`. On a closed field, submits the form. |
  * | Escape | Closes the list and puts the chosen words back. On a closed field, a second Escape clears a single choice. |
@@ -1011,12 +1012,24 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
        gesture to the reader. Measured before this: Down opened the list one
        past the chosen option. */
     if (!this.open) {
-      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      /* Alt with Down opens the list and moves no highlight, so the one Alt
+         with Up closed on is where it was, as the APG combobox and Zag's do. */
+      if (event.key === 'ArrowDown' && event.altKey) {
+        event.preventDefault()
+        this.requestOpen(true)
+      } else if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
         event.preventDefault()
         const fallback = event.key === 'ArrowDown' ? 'first' : 'last'
         this.opening = this.values.length > 0 ? 'selected' : fallback
         this.requestOpen(true)
       }
+      return
+    }
+    /* Alt with Up closes the list and chooses nothing, as Escape does, and
+       leaves the highlight where it was. */
+    if (event.key === 'ArrowUp' && event.altKey) {
+      event.preventDefault()
+      this.close()
       return
     }
     if (this.moveAroundCreate(event)) {
