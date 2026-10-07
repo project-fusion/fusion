@@ -189,6 +189,30 @@ export class HelixHeadlessNavigation extends HelixElement {
   @property({ reflect: true })
   orientation?: 'vertical'
 
+  /**
+   * How the destinations are drawn, with `Tabs`' three values and for the same
+   * reasons.
+   *
+   * Unset is a pill under the current destination with nothing behind the row,
+   * for a bar inside other chrome. `underlined` is a rule under the row and a
+   * thicker one under the current destination, for a bar that heads a page, as
+   * a repository's or a project's sections do. `segmented` puts the pill in a
+   * framed, sunken track, for a short set that reads as one control.
+   *
+   * **The same words as `Tabs`, because a reader cannot tell the two apart.**
+   * Navigation moves between pages and tabs between the panels of one page,
+   * and the bar looks the same either way. A console whose sections are pages
+   * could not draw them the way its underlined tabs were drawn.
+   *
+   * Down a column, `underlined` stands the rule and the mark along the
+   * column's inline end.
+   *
+   * Reflected and left unset by default, so the host carries nothing a
+   * consumer's server markup does not already have.
+   */
+  @property({ reflect: true })
+  variant?: 'segmented' | 'underlined'
+
   private current: MutationObserver | undefined
 
   /** The disclosures among the destinations that are open. */

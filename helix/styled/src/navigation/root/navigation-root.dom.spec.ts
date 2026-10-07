@@ -66,7 +66,52 @@ describe('navigation', () => {
     )
   })
 
+  test('underlined draws a rule under the row and the marker as a bar on it', () => {
+    expect(rule(':host([variant="underlined"]) [part="nav"]')).toContain('--navigation-rule-color')
+    const bar = rule(':host([variant="underlined"]) [part="indicator"]')
+    expect(bar).toContain('--navigation-indicator-thickness')
+    expect(bar).toContain('inset-block-end: 0')
+  })
+
+  test('segmented puts the marker in a sunken, framed track', () => {
+    const track = rule(':host([variant="segmented"]) [part="nav"]')
+    expect(track).toContain('var(--helix-color-surface-sunken)')
+    expect(track).toContain('border: var(--helix-border-thin) solid')
+  })
+
   if (hasLayout()) {
+    test('in a browser, underlined puts the bar along the bottom of the current destination', async () => {
+      const nav = await mount(`<helix-navigation label="Sections" variant="underlined">
+        <a href="#one">One</a>
+        <a aria-current="page" href="#two">Two, the longest</a>
+      </helix-navigation>`)
+      await idle()
+      const two = nav.querySelectorAll('a')[1]?.getBoundingClientRect()
+      const bar = (part(nav, 'indicator') as HTMLElement).getBoundingClientRect()
+      const row = (part(nav, 'nav') as HTMLElement).getBoundingClientRect()
+      expect(Math.abs(bar.left - (two?.left ?? 0))).toBeLessThan(1)
+      expect(Math.abs(bar.width - (two?.width ?? 0))).toBeLessThan(1)
+      expect(Math.abs(bar.bottom - row.bottom)).toBeLessThan(1)
+      expect(bar.height).toBeLessThan(4)
+    })
+
+    test('in a browser, segmented keeps every destination inside its track', async () => {
+      const nav = await mount(`<helix-navigation label="Sections" variant="segmented">
+        <a aria-current="page" href="#one">One</a>
+        <a href="#two">Two</a>
+      </helix-navigation>`)
+      await idle()
+      const track = (part(nav, 'nav') as HTMLElement).getBoundingClientRect()
+      for (const link of nav.querySelectorAll('a')) {
+        const box = link.getBoundingClientRect()
+        expect(box.top).toBeGreaterThan(track.top)
+        expect(box.bottom).toBeLessThan(track.bottom)
+      }
+      const marker = (part(nav, 'indicator') as HTMLElement).getBoundingClientRect()
+      const one = nav.querySelector('a')?.getBoundingClientRect()
+      expect(Math.abs(marker.height - (one?.height ?? 0))).toBeLessThan(1)
+    })
+
     test('in a browser, a vertical bar is a column and the marker sits on the current destination', async () => {
       const nav =
         await mount(`<helix-navigation label="Sections" orientation="vertical" style="inline-size: 12rem">
