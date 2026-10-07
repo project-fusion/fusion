@@ -157,6 +157,7 @@ import '../../time-picker/index.js'
  * @csspart picker-list-loading - The text shown while the options load.
  * @csspart picker-list-search - The region that holds the filter field.
  * @csspart picker-list-search-field - The filter field.
+ * @csspart picker-now - The picker's button that chooses the current time, which Time Input does not draw.
  * @csspart picker-option - One time in the picker. Carries `data-between` inside a range.
  * @csspart picker-option-between - A time inside a chosen range, between its two ends. Set together with `picker-option`.
  * @csspart picker-option-description - The caption under the label, when there is one.
@@ -710,7 +711,7 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
         list-filter-icon: picker-list-filter-icon, list-filter-mark: picker-list-filter-mark,
         list-hint: picker-list-hint, list-items: picker-list-items, list-label: picker-list-label,
         list-live: picker-list-live, list-loading: picker-list-loading, list-search: picker-list-search,
-        list-search-field: picker-list-search-field, option: picker-option,
+        list-search-field: picker-list-search-field, now: picker-now, option: picker-option,
         option-between: picker-option-between, option-item-active: picker-option-item-active,
         option-item-selected: picker-option-item-selected,
         option-description: picker-option-description, option-item: picker-option-item,
