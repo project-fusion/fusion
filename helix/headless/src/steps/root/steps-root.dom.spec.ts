@@ -515,3 +515,48 @@ describe('a finished stage', () => {
     expect(part(label, 'button')?.getAttribute('aria-current')).toBe('step')
   })
 })
+
+describe('a sequence the arrow keys move through', () => {
+  /* Ark UI's steps: the arrows walk the stages' names along the row, over the
+     ones out of reach, and choose nothing. */
+  test('moves focus between the names, over a locked stage, and stops at the ends', async () => {
+    const { all, host } = await linear('arrows')
+    const label = (step: Step): HTMLElement => part(step, 'label') as HTMLElement
+    const press = (step: Step, key: string): boolean => {
+      const event = new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        key,
+      })
+      label(step).dispatchEvent(event)
+      return event.defaultPrevented
+    }
+    const focused = (): Element | null => host.ownerDocument.activeElement
+    at(all, 0).complete = true
+    await settle(all)
+    /* d is out of reach: c is not finished. */
+    at(all, 0).focus()
+    expect(press(at(all, 0), 'ArrowRight')).toBe(true)
+    expect(focused()).toBe(at(all, 1))
+    press(at(all, 1), 'ArrowRight')
+    expect(focused()).toBe(at(all, 2))
+    expect(press(at(all, 2), 'ArrowRight')).toBe(true)
+    expect(focused()).toBe(at(all, 2))
+    press(at(all, 2), 'Home')
+    expect(focused()).toBe(at(all, 0))
+    expect(host.active).toBe('a')
+  })
+
+  test('leaves the arrows alone unless asked', async () => {
+    const { all } = await linear()
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key: 'ArrowRight',
+    })
+    ;(part(at(all, 0), 'label') as HTMLElement).dispatchEvent(event)
+    expect(event.defaultPrevented).toBe(false)
+  })
+})

@@ -148,6 +148,14 @@ export class HelixHeadlessStep extends HelixElement {
   private readonly status = new StatusController(this)
 
   /**
+   * Puts focus on the step's name, the control a reader presses, as a
+   * `focus()` on a native control would.
+   */
+  override focus(options?: FocusOptions): void {
+    this.partNamed('label')?.focus(options)
+  }
+
+  /**
    * Fires `helix-select` for the step, unless the step is `disabled` or a
    * linear sequence has it out of reach.
    */
