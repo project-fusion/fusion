@@ -27,6 +27,35 @@ describe('a menu trigger', () => {
     expect(trigger.hasAttribute('aria-haspopup')).toBe(false)
   })
 
+  test('a plain button is told it opens a menu a frame after the first render, and then each change', async () => {
+    const host = (await mount(`<helix-headless-menu label="Actions">
+      <button slot="trigger">Actions</button>
+      <helix-headless-menu-item value="a">Rename</helix-headless-menu-item>
+    </helix-headless-menu>`)) as Updatable & { open: boolean; whenSettled: Promise<void> }
+    const button = host.querySelector('button') as HTMLButtonElement
+    /* Not in the first render, which a framework may still be hydrating. */
+    expect(button.hasAttribute('aria-expanded')).toBe(false)
+    await host.whenSettled
+    expect(button.getAttribute('aria-haspopup')).toBe('menu')
+    expect(button.getAttribute('aria-expanded')).toBe('false')
+    host.open = true
+    await settle(host)
+    expect(button.getAttribute('aria-expanded')).toBe('true')
+  })
+
+  test('a plain button that says its own state is left to the page', async () => {
+    const host = (await mount(`<helix-headless-menu label="Actions">
+      <button slot="trigger" aria-expanded="false">Actions</button>
+      <helix-headless-menu-item value="a">Rename</helix-headless-menu-item>
+    </helix-headless-menu>`)) as Updatable & { open: boolean; whenSettled: Promise<void> }
+    const button = host.querySelector('button') as HTMLButtonElement
+    await host.whenSettled
+    host.open = true
+    await settle(host)
+    expect(button.getAttribute('aria-expanded')).toBe('false')
+    expect(button.hasAttribute('aria-haspopup')).toBe(false)
+  })
+
   /* A component that wraps a menu forwards its own trigger slot into the
      menu's, so the element assigned there is a `<slot>`. Video Playlist's menu
      does, and the menu warned that its own `<slot>` could not be told. */

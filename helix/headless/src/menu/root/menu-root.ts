@@ -42,10 +42,11 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
  * ancestor with `overflow: hidden` does not clip it and it needs no `z-index`.
  *
  * Slot a `helix-button` or `helix-icon-button` as the trigger, and the menu
- * tells it that it opens a menu and whether the menu is open. A plain
- * `<button>` can only be told by writing attributes onto your markup, which
- * the menu does not do, so give it `aria-haspopup="menu"` and set its
- * `aria-expanded` from the `toggle` event.
+ * tells it that it opens a menu and whether the menu is open, inside its own
+ * shadow root. On a plain element, such as a `<button>`, the menu writes
+ * `aria-haspopup="menu"` and `aria-expanded`, from a frame after its own first
+ * render, so a server's markup is never changed while a framework hydrates it.
+ * It never writes `aria-expanded` where you wrote it yourself.
  *
  * Submenus drill down. A submenu replaces the panel's content, and a back row
  * returns to the previous page. One panel avoids the diagonal pointer path that
@@ -293,8 +294,31 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     /* Flattened, because a component that wraps a menu forwards its own
        trigger slot into this one, and the element assigned here is then that
        `<slot>`. The trigger is what it holds. */
-    tellDisclosure(slot?.assignedElements({ flatten: true })[0], this.open, 'menu')
+    const trigger = slot?.assignedElements({ flatten: true })[0]
+    if (!trigger || trigger.localName.includes('-')) {
+      tellDisclosure(trigger, this.open, 'menu')
+      return
+    }
+    /* A plain element, by attribute, from a frame after the first render, as
+       `Popover` writes it. One that carries its own `aria-expanded` is the
+       consumer's to keep. */
+    if (trigger !== this.told) {
+      if (!this.settledOnce || trigger.hasAttribute('aria-expanded')) {
+        return
+      }
+      this.told = trigger
+      if (!trigger.hasAttribute('aria-haspopup')) {
+        trigger.setAttribute('aria-haspopup', 'menu')
+      }
+    }
+    trigger.setAttribute('aria-expanded', String(this.open))
   }
+
+  /** Whether a frame has passed since the first render, after which a plain trigger may be told. */
+  private settledOnce = false
+
+  /** The plain trigger this menu writes `aria-expanded` on. */
+  private told: Element | undefined
 
   /** The element the surface opens against. */
   private get trigger(): HTMLElement {
@@ -632,6 +656,15 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     this.addEventListener('pointercancel', this.handlePointerCancel)
     this.addEventListener('click', this.handleHeldClick, true)
     this.addEventListener('focusin', this.handleTriggerFocusIn)
+    /* A frame after the first render, when a plain trigger is first told the
+       menu is closed. Not in the first render: a framework that rendered the
+       trigger on a server may still be hydrating it then. */
+    void this.whenSettled.then(() => {
+      this.settledOnce = true
+      if (!this.context) {
+        this.tellTrigger()
+      }
+    })
   }
 
   override disconnectedCallback(): void {
