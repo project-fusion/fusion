@@ -262,19 +262,6 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
     readonly pointer = new ChartPointerController(this)
 
     /**
-     * The id of the table to read.
-     *
-     * Names a table in the same tree, so a chart inside another component's
-     * shadow root reads a table in that root rather than one in the document. A
-     * `<table>` or anything built from grid roles, including `helix-table`.
-     *
-     * **In React this arrives as a property and not as an attribute**, the way
-     * `Tooltip.for` does, so it does not reflect and nothing styles on it.
-     */
-    @property()
-    for = ''
-
-    /**
      * The readings as data, in the shape of a table, where the page has no
      * table to point `for` at. `for` wins where both are set.
      *
@@ -300,6 +287,19 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
      */
     @property({ attribute: false })
     data: ChartData | undefined = undefined
+
+    /**
+     * The id of the table to read.
+     *
+     * Names a table in the same tree, so a chart inside another component's
+     * shadow root reads a table in that root rather than one in the document. A
+     * `<table>` or anything built from grid roles, including `helix-table`.
+     *
+     * **In React this arrives as a property and not as an attribute**, the way
+     * `Tooltip.for` does, so it does not reflect and nothing styles on it.
+     */
+    @property()
+    for = ''
 
     /**
      * The chart's name, which starts the chart's text summary.
