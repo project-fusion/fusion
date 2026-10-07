@@ -45,7 +45,11 @@ const SLIDER_KEYS = new Set([
  *
  * A range with two thumbs is two inputs stacked on one track, because there is
  * no native two-thumb range. Each thumb keeps its own value, and a named range
- * submits two entries under its name, the lower first.
+ * submits one entry per thumb under its name, the lowest first. A range given
+ * more than two values, such as `default-value="20,50,80"`, has a thumb for
+ * each, as React Aria's slider takes any number of thumbs: each stops at its
+ * neighbors, and the ones between the first and the last are named by
+ * `thumb-label`.
  * `min-steps-between-thumbs` keeps them that many steps apart, and the readout
  * joins the two as `range-text` writes them.
  *
@@ -293,6 +297,15 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   step = 1
 
   /**
+   * The name of a thumb between a range's first and last, read after the
+   * slider's label, with `{index}` filled in: its place, counted from 1. The
+   * first is `minimum-label` and the last `maximum-label`.
+   */
+  @words
+  @property({ attribute: 'thumb-label' })
+  thumbLabel = 'thumb {index}'
+
+  /**
    * Whether each thumb shows its value in a bubble beside it, as Web
    * Awesome's `with-tooltip`. The styled slider shows the bubbles while the
    * slider is under the pointer or holds focus. They repeat what each thumb
@@ -324,9 +337,14 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
    */
   private get reserve(): number {
     const widest = Math.max(this.said(this.min).length, this.said(this.max).length)
-    return this.range
-      ? widest * 2 + formatWords(this, 'rangeText', { end: '', start: '' }).length
-      : widest
+    const count = this.points.length
+    if (!this.range) {
+      return widest
+    }
+    /* More than two are listed, each with a comma and a space, and an "and". */
+    return count > 2
+      ? widest * count + 2 * (count - 1) + 4
+      : widest * 2 + formatWords(this, 'rangeText', { end: '', start: '' }).length
   }
 
   /**
@@ -386,17 +404,24 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
    * is what a filter with nothing filtered out looks like.
    */
   private get bounds(): [number, number] {
-    /* A lone number is not a range, so it is not read as one. `willUpdate`
-     * seeds and sanitizes a range to a pair, and anything else that arrives
-     * between the two opens fully wide, which is what "nothing filtered out"
-     * looks like. */
-    const parts = this.value.split(',')
-    const from = Number.parseFloat(parts[0] ?? '')
-    const to = Number.parseFloat(parts[1] ?? '')
-    if (!Number.isFinite(from) || !Number.isFinite(to)) {
+    const points = this.points
+    return [points[0] ?? this.min, points.at(-1) ?? this.max]
+  }
+
+  /**
+   * A range's values, one per thumb, as numbers in order.
+   *
+   * A lone number is not a range, so it is not read as one. `willUpdate`
+   * seeds and sanitizes a range to two values or more, and anything else that
+   * arrives between the two opens fully wide, which is what "nothing filtered
+   * out" looks like.
+   */
+  private get points(): number[] {
+    const parts = this.value.split(',').map((part) => Number.parseFloat(part))
+    if (parts.length < 2 || parts.some((part) => !Number.isFinite(part))) {
       return [this.min, this.max]
     }
-    return [Math.min(from, to), Math.max(from, to)]
+    return parts.sort((left, right) => left - right)
   }
 
   /** Where one value sits along the track, as a fraction of it. */
@@ -413,30 +438,28 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
     // `input` is composed and would reach a consumer beside this element's.
     event.stopPropagation()
     const control = event.target as HTMLInputElement
+    /* Which of a range's thumbs moved, by its place from the lowest. */
+    const at = Number(control.dataset.index ?? 0)
     if (this.readOnly) {
-      const [start, end] = this.bounds
-      restoreValue(
-        control,
-        this.range ? String(control.dataset.thumb === 'start' ? start : end) : this.value,
-      )
+      restoreValue(control, this.range ? String(this.points[at]) : this.value)
       return
     }
     if (this.range) {
-      const [start, end] = this.bounds
+      const points = this.points
       const moved = Number(control.value)
-      /* Clamped against the other thumb rather than bounded by it, for the
+      /* Clamped against its neighbors rather than bounded by them, for the
          reason the class says: bounding shortens the input's own range and the
-         two thumbs stop sharing a track. */
+         thumbs stop sharing a track. */
       const gap = this.gap
-      const pair =
-        control.dataset.thumb === 'start'
-          ? [Math.min(moved, end - gap), end]
-          : [start, Math.max(moved, start + gap)]
-      this.requestValue(pair.join(','))
-      restoreValue(
-        control,
-        String(control.dataset.thumb === 'start' ? this.bounds[0] : this.bounds[1]),
+      const low = at > 0 ? (points[at - 1] ?? this.min) + gap : Number.NEGATIVE_INFINITY
+      const high =
+        at < points.length - 1 ? (points[at + 1] ?? this.max) - gap : Number.POSITIVE_INFINITY
+      this.requestValue(
+        points
+          .map((one, index) => (index === at ? Math.min(high, Math.max(low, moved)) : one))
+          .join(','),
       )
+      restoreValue(control, String(this.points[at]))
       return
     }
     const next = control.value
@@ -472,7 +495,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
    */
   private sync(): void {
     if (this.range && this.name) {
-      reportValues(this.internals, this.name, this.value.split(','))
+      reportValues(this.internals, this.name, this.points.map(String))
     } else {
       this.internals.setFormValue(this.value)
     }
@@ -586,17 +609,14 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
    */
   private sanitize(text: string): string {
     if (this.range) {
-      const [from, to] = text.split(',').map((part) => Number.parseFloat(part))
-      if (
-        from === undefined ||
-        to === undefined ||
-        !Number.isFinite(from) ||
-        !Number.isFinite(to)
-      ) {
+      const values = text.split(',').map((part) => Number.parseFloat(part))
+      if (values.length < 2 || values.some((one) => !Number.isFinite(one))) {
         return `${this.min},${this.max}`
       }
-      const ends = [this.settled(from), this.settled(to)].sort((a, b) => a - b)
-      return ends.join(',')
+      return values
+        .map((one) => this.settled(one))
+        .sort((a, b) => a - b)
+        .join(',')
     }
     const parsed = Number.parseFloat(text)
     const at = Number.isFinite(parsed) ? parsed : this.min + (this.max - this.min) / 2
@@ -683,10 +703,17 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
       html`<span part="thumb" data-thumb=${thumb ?? nothing} style="--slider-at: ${fraction}"
         >${slot(end)}</span
       >`
+    /* A thumb between the first and the last takes no content. */
     return html`<div part="thumbs" aria-hidden="true" ?hidden=${!this.thumbContent}>
       ${
         this.range
-          ? [box(this.along(start), false, 'start'), box(this.along(end), true, 'end')]
+          ? this.points.map((at, index, all) =>
+              index === 0
+                ? box(this.along(at), false, 'start')
+                : index === all.length - 1
+                  ? box(this.along(at), true, 'end')
+                  : html`<span part="thumb" data-thumb="middle" style="--slider-at: ${this.along(at)}"></span>`,
+            )
           : box(this.fraction, false)
       }
     </div>`
@@ -702,17 +729,24 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
     if (!this.tooltip) {
       return nothing
     }
-    const bubble = (fraction: number, text: string, thumb?: 'end' | 'start'): TemplateResult =>
+    const bubble = (
+      fraction: number,
+      text: string,
+      thumb?: 'end' | 'middle' | 'start',
+    ): TemplateResult =>
       html`<span part="tooltip" data-thumb=${thumb ?? nothing} style="--slider-at: ${fraction}"
         >${text}</span
       >`
     return html`<div part="tooltips" aria-hidden="true">
       ${
         this.range
-          ? [
-              bubble(this.along(start), this.said(start), 'start'),
-              bubble(this.along(end), this.said(end), 'end'),
-            ]
+          ? this.points.map((at, index, all) =>
+              bubble(
+                this.along(at),
+                this.said(at),
+                index === 0 ? 'start' : index === all.length - 1 ? 'end' : 'middle',
+              ),
+            )
           : bubble(this.fraction, this.said(this.value))
       }
     </div>`
@@ -733,6 +767,11 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
        fill being right is what makes it read as a drawing bug rather than a
        value one. */
     const [start, end] = this.bounds
+    /* `control` for the lowest, `control-end` for the highest, and the place
+       for any between. */
+    const ids = this.points.map((_, index, all) =>
+      index === 0 ? 'control' : index === all.length - 1 ? 'control-end' : `control-${index}`,
+    )
 
     /* One input per thumb, each spanning the whole range so both read against
        the same track. The lower one paints the fill and the upper one's track
@@ -750,19 +789,27 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
        The lower one, because a label forwards a press to the first control it
        names and the reader expects the start of the range. The upper takes
        `control-end`, which is what the readout lists alongside it. */
-    const thumb = (which: 'end' | 'start', at: number): TemplateResult => html`<input
+    const points = this.points
+    const last = points.length - 1
+    const thumb = (at: number, index: number): TemplateResult => {
+      const which = index === 0 ? 'start' : index === last ? 'end' : 'middle'
+      const named = which === 'middle' ? `thumb-name-${index}` : `${which}-name`
+      const before = points[index - 1]
+      const after = points[index + 1]
+      return html`<input
         part="control"
-        id=${which === 'start' ? 'control' : 'control-end'}
+        id=${ids[index] ?? nothing}
         data-thumb=${which}
+        data-index=${index}
         type="range"
         style="--slider-from: ${this.along(start)}; --slider-to: ${this.along(end)}${this.axis}"
         min=${this.min}
         max=${this.max}
         step=${this.step}
         .value=${String(at)}
-        aria-labelledby=${this.labeled ? `${this.labelId} ${which}-name` : `${which}-name`}
-        aria-valuemin=${which === 'end' ? start + this.gap : nothing}
-        aria-valuemax=${which === 'start' ? end - this.gap : nothing}
+        aria-labelledby=${this.labeled ? `${this.labelId} ${named}` : named}
+        aria-valuemin=${before === undefined ? nothing : before + this.gap}
+        aria-valuemax=${after === undefined ? nothing : after - this.gap}
         aria-valuetext=${this.spoken(at)}
         aria-describedby=${this.describedBy ?? nothing}
         aria-invalid=${this.invalidity ?? nothing}
@@ -772,6 +819,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
         @change=${this.handleChange}
         @keydown=${this.handleKeydown}
       />`
+    }
 
     /* `data-markers` mirrors "there are marks" for the stylesheet.
      *
@@ -798,7 +846,12 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
          never drawn: a reference reads a hidden element's text all the same. */
       this.range
         ? html`<span id="start-name" hidden>${this.minimumLabel}</span
-            ><span id="end-name" hidden>${this.maximumLabel}</span>`
+            >${this.points.slice(1, -1).map(
+              (_, index) =>
+                html`<span id=${`thumb-name-${index + 1}`} hidden
+                  >${formatWords(this, 'thumbLabel', { index: index + 2 })}</span
+                >`,
+            )}<span id="end-name" hidden>${this.maximumLabel}</span>`
         : nothing
     }
     <div
@@ -809,8 +862,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
       data-tooltip=${this.tooltip ? '' : nothing}
       style="--slider-fraction: ${this.fraction}; --slider-from: ${this.along(start)}; --slider-to: ${this.along(end)}"
     >
-      ${this.range ? thumb('start', start) : nothing}
-      ${this.range ? thumb('end', end) : nothing}
+      ${this.range ? this.points.map((at, index) => thumb(at, index)) : nothing}
       ${
         this.range
           ? nothing
@@ -865,13 +917,20 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
         this.showValue
           ? html`<output
               part="output"
-              for=${this.range ? 'control control-end' : 'control'}
+              for=${this.range ? ids.join(' ') : 'control'}
               aria-hidden="true"
               style=${`--_slider-output-reserve: ${this.reserve}ch`}
               >${
-                this.range
-                  ? formatWords(this, 'rangeText', { end: this.said(end), start: this.said(start) })
-                  : this.said(this.value)
+                !this.range
+                  ? this.said(this.value)
+                  : this.points.length > 2
+                    ? new Intl.ListFormat(wordsLocale(this), { type: 'conjunction' }).format(
+                        this.points.map((at) => this.said(at)),
+                      )
+                    : formatWords(this, 'rangeText', {
+                        end: this.said(end),
+                        start: this.said(start),
+                      })
               }</output
             >`
           : nothing

@@ -354,3 +354,45 @@ describe('a vertical slider', () => {
     expect(thumbs(flat)[0]?.style.writingMode).toBe('')
   })
 })
+
+/* React Aria's slider takes any number of thumbs; a range here held two, and a
+   third value was dropped. */
+describe('a range with more than two thumbs', () => {
+  test('has a thumb for each value, in order, each named by its place', async () => {
+    const host = await slider('range name="p" default-value="80,20,50"')
+    expect(host.value).toBe('20,50,80')
+    const controls = thumbs(host)
+    expect(controls.map((one) => one.value)).toEqual(['20', '50', '80'])
+    expect(controls.map((one) => one.dataset.thumb)).toEqual(['start', 'middle', 'end'])
+    expect(controls.map((one) => one.id)).toEqual(['control', 'control-1', 'control-end'])
+    const scope = host.shadowRoot as ShadowRoot
+    const named = (control: HTMLInputElement): string =>
+      (control.getAttribute('aria-labelledby') ?? '')
+        .split(/\s+/)
+        .map((id) => scope.getElementById(id)?.textContent?.trim() ?? '')
+        .join(' ')
+    expect(controls.map(named)).toEqual(['Price minimum', 'Price thumb 2', 'Price maximum'])
+    expect((formValue(host) as FormData).getAll('p')).toEqual(['20', '50', '80'])
+  })
+
+  test('stops each thumb at its neighbors, and says so', async () => {
+    const host = await slider('range default-value="20,50,80" min-steps-between-thumbs="5"')
+    const middle = thumbs(host)[1] as HTMLInputElement
+    expect(middle.getAttribute('aria-valuemin')).toBe('25')
+    expect(middle.getAttribute('aria-valuemax')).toBe('75')
+    middle.value = '95'
+    middle.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+    await host.updateComplete
+    expect(host.value).toBe('20,75,80')
+    middle.value = '0'
+    middle.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+    await host.updateComplete
+    expect(host.value).toBe('20,25,80')
+  })
+
+  test('lists every value in the readout', async () => {
+    const host = await slider('range show-value default-value="20,50,80"')
+    expect(part(host, 'output')?.textContent?.trim()).toBe('20, 50, and 80')
+    expect(part(host, 'output')?.getAttribute('for')).toBe('control control-1 control-end')
+  })
+})
