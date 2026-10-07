@@ -202,7 +202,8 @@ helix-data-table:defined[selectable][reorderable-rows] > helix-table-row > :firs
 
 /* The toolbar above the rows and the footer below them, across every column,
  * and the status lines left to the table, which says them once it upgrades.
- * Under declarative shadow DOM the toolbar's own gap is the one taken here.
+ * Under declarative shadow DOM the gaps taken here stand in for the regions'
+ * own.
  */
 ${SERVED} > [slot="toolbar"] {
   grid-column: 1 / -1;
@@ -216,7 +217,12 @@ ${SERVED}::part(toolbar) {
 
 ${SERVED} > [slot="footer"] {
   grid-column: 1 / -1;
+  margin-block-start: var(--data-table-footer-gap, var(--helix-space-sm));
   order: 1;
+}
+
+${SERVED}:has(> [slot="footer"])::part(footer) {
+  padding-block-start: 0;
 }
 
 ${SERVED} > :is([slot="empty"], [slot="error"], [slot="loading"]) {
