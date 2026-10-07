@@ -2,7 +2,7 @@ import {
   ChildrenController,
   capturePointer,
   customElement,
-  fillTemplate,
+  formatWords,
   HelixActivateEvent,
   HelixElement,
   HelixSelectEvent,
@@ -10,6 +10,7 @@ import {
   inlineStep,
   isRtl,
   requestChange,
+  words,
 } from '@fusion.dev/helix-core'
 import { caretLeft, caretRight, play, stop } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -143,6 +144,12 @@ const DRAG_SLOP = 4
 @customElement('helix-headless-carousel')
 export class HelixHeadlessCarousel extends HelixElement {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-carousel': { nextLabel: 'Nächste Folie' } })`.
+   */
+  static words = 'helix-carousel'
+
+  /**
    * Manual, so each slide can be wrapped without its markup being touched.
    *
    * A slide has to be a `group` carrying `aria-roledescription="slide"` and a
@@ -231,12 +238,14 @@ export class HelixHeadlessCarousel extends HelixElement {
    * language hears its own: only `label` was, and the controls around it
    * read out in English.
    */
+  @words
   @property({ attribute: 'indicator-label' })
   indicatorLabel = 'Slide {index}'
 
   /**
    * The name of the row of indicators, with the carousel's `{label}` filled in.
    */
+  @words
   @property({ attribute: 'indicators-label' })
   indicatorsLabel = '{label} slides'
 
@@ -258,6 +267,7 @@ export class HelixHeadlessCarousel extends HelixElement {
   /**
    * The carousel's name, read by screen readers.
    */
+  @words
   @property()
   label = 'Carousel'
 
@@ -280,6 +290,7 @@ export class HelixHeadlessCarousel extends HelixElement {
   /**
    * The name of the control that moves to the next slide.
    */
+  @words
   @property({ attribute: 'next-label' })
   nextLabel = 'Next slide'
 
@@ -377,6 +388,7 @@ export class HelixHeadlessCarousel extends HelixElement {
   /**
    * The name of the control that moves to the previous slide.
    */
+  @words
   @property({ attribute: 'previous-label' })
   previousLabel = 'Previous slide'
 
@@ -385,12 +397,14 @@ export class HelixHeadlessCarousel extends HelixElement {
    * `aria-roledescription`. Translate it with the rest of your text, or empty
    * it to leave the role as `group`.
    */
+  @words
   @property({ attribute: 'role-label' })
   roleLabel = 'carousel'
 
   /**
    * The name of each slide, with `{index}` and `{count}` filled in.
    */
+  @words
   @property({ attribute: 'slide-label' })
   slideLabel = '{index} of {count}'
 
@@ -398,6 +412,7 @@ export class HelixHeadlessCarousel extends HelixElement {
    * The word screen readers announce in place of a slide's role, set as
    * `aria-roledescription`. Translate it with the rest of your text.
    */
+  @words
   @property({ attribute: 'slide-role-label' })
   slideRoleLabel = 'slide'
 
@@ -412,12 +427,14 @@ export class HelixHeadlessCarousel extends HelixElement {
   /**
    * The name of the rotation control while rotation is stopped.
    */
+  @words
   @property({ attribute: 'start-label' })
   startLabel = 'Start slide rotation'
 
   /**
    * The name of the rotation control while rotation is running.
    */
+  @words
   @property({ attribute: 'stop-label' })
   stopLabel = 'Stop slide rotation'
 
@@ -1304,7 +1321,7 @@ export class HelixHeadlessCarousel extends HelixElement {
       this.showing = undefined
       /* Not on the first render, which is the carousel arriving. */
       if (this.hasUpdated) {
-        this.said = fillTemplate(this.slideLabel, {
+        this.said = formatWords(this, 'slideLabel', {
           count: this.slides.length,
           index: this.index + 1,
         })
@@ -1615,7 +1632,7 @@ export class HelixHeadlessCarousel extends HelixElement {
             part="slide"
             role="group"
             aria-roledescription=${this.slideRoleLabel || nothing}
-            aria-label=${fillTemplate(this.slideLabel, { count: this.slides.length, index: index + 1 })}
+            aria-label=${formatWords(this, 'slideLabel', { count: this.slides.length, index: index + 1 })}
             style=${this.paneStyle(index, last, stops)}
           >
             <slot
@@ -1639,7 +1656,7 @@ export class HelixHeadlessCarousel extends HelixElement {
            and the roving tab stop and every `aria-label` in the row would move
            with it. */
         this.slides.length > 1 && this.across !== undefined
-          ? html`<div part="indicators" role="group" aria-label=${fillTemplate(this.indicatorsLabel, { label: this.label })}>
+          ? html`<div part="indicators" role="group" aria-label=${formatWords(this, 'indicatorsLabel', { label: this.label })}>
               ${
                 /* Plain buttons, not a half-built tablist.
                  *
@@ -1658,7 +1675,7 @@ export class HelixHeadlessCarousel extends HelixElement {
                 return html`<button
                   part="indicator${current ? ' indicator-current' : ''}"
                   type="button"
-                  aria-label=${fillTemplate(this.indicatorLabel, { index: at + 1 })}
+                  aria-label=${formatWords(this, 'indicatorLabel', { index: at + 1 })}
                   aria-current=${at === place ? 'true' : nothing}
                   tabindex=${at === place ? '0' : '-1'}
                   ?data-current=${current}

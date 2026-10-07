@@ -3,6 +3,7 @@ import {
   HelixElement,
   HelixEndEvent,
   MixinControllerActive,
+  words,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -77,8 +78,15 @@ type Player = HTMLElement & {
 @customElement('helix-headless-video-playlist')
 export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixElement) {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-video-playlist': { label: 'Wiedergabeliste' } })`.
+   */
+  static words = 'helix-video-playlist'
+
+  /**
    * The list's name, read by screen readers.
    */
+  @words
   @property()
   label = 'Playlist'
 
