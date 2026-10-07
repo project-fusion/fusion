@@ -69,8 +69,20 @@ export declare class MixinSegmentedFieldInterface {
    */
   segmented: boolean
 
+  /**
+   * What a screen reader hears before the segments of a range's first date or
+   * time, after each segment's own name.
+   */
+  rangeStartLabel: string
+
+  /** What a screen reader hears before the segments of a range's second date or time. */
+  rangeEndLabel: string
+
   /** Whether the segments are drawn: `segmented`, where the family can hold them. */
   protected get segmentsShown(): boolean
+
+  /** How many rows of segments the value takes: two for a range, one otherwise. */
+  protected get segmentGroups(): number
 
   /** The row of segments, the group a description is carried to, or `null` while none is drawn. */
   protected get segmentGroup(): HTMLElement | null
@@ -160,6 +172,22 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
     incompleteMessage = '{kind, select, date {Enter a whole date.} other {Enter a whole time.}}'
 
     /**
+     * What a screen reader hears before the segments of a range's second date
+     * or time, after each segment's own name.
+     */
+    @words
+    @property({ attribute: 'range-end-label' })
+    rangeEndLabel = 'End'
+
+    /**
+     * What a screen reader hears before the segments of a range's first date
+     * or time, after each segment's own name: "month, Start, Stay".
+     */
+    @words
+    @property({ attribute: 'range-start-label' })
+    rangeStartLabel = 'Start'
+
+    /**
      * Whether the field is a row of segments, one for each part of the date or
      * time, in place of a line of text.
      *
@@ -171,9 +199,12 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
     @property({ type: Boolean })
     segmented = false
 
-    /** The parts set so far, which may be fewer than a whole value. */
+    /**
+     * The parts set so far in each row, which may be fewer than a whole
+     * value: one row, or two for a range.
+     */
     @state()
-    private parts: Segments = {}
+    private parts: Segments[] = [{}]
 
     /** The digits typed into the segment that has focus, for a number that runs on. */
     private typed = ''
@@ -202,6 +233,27 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
     /** Whether the segments are drawn: `segmented`, where the family can hold them. */
     protected get segmentsShown(): boolean {
       return this.segmented && this.segmentable
+    }
+
+    /** How many rows of segments the value takes: two for a range, one otherwise. */
+    protected get segmentGroups(): number {
+      return 1
+    }
+
+    /** The value the rows add up to: each row's, joined by commas, or empty while any row is not whole. */
+    private joined(rows: readonly Segments[]): string {
+      const values = rows.map((one) =>
+        segmentsValue(this.segmentedKind, one, this.layout, this.segmentSystem),
+      )
+      return values.some((one) => one === '') ? '' : values.join(',')
+    }
+
+    /** The rows a value names, one per row, empty where it names none. */
+    private rowsOf(value: string): Segments[] {
+      const values = this.segmentGroups > 1 ? value.split(',') : [value]
+      return Array.from({ length: this.segmentGroups }, (_, row) =>
+        segmentsOf(this.segmentedKind, (values[row] ?? '').trim(), this.segmentSystem),
+      )
     }
 
     /** A date or a time. Each family says which. */
@@ -252,9 +304,9 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
      * A refused value puts the parts back to what the value still says, the way
      * a refused text field puts its text back.
      */
-    private take(next: Segments): void {
-      this.parts = next
-      const value = segmentsValue(this.segmentedKind, next, this.layout, this.segmentSystem)
+    private take(row: number, next: Segments): void {
+      this.parts = this.parts.map((one, index) => (index === row ? next : one))
+      const value = this.joined(this.parts)
       if (value === this.value) {
         this.sync()
         return
@@ -262,7 +314,7 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
       this.own = true
       if (!this.requestValue(value)) {
         this.own = false
-        this.parts = segmentsOf(this.segmentedKind, this.value, this.segmentSystem)
+        this.parts = this.rowsOf(this.value)
       }
     }
 
@@ -274,6 +326,7 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
     private readonly handleSegmentKeydown = (event: KeyboardEvent): void => {
       const element = event.currentTarget as HTMLElement
       const kind = element.dataset.segment as SegmentKind
+      const row = Number(element.dataset.row ?? 0)
       const twelve = isTwelveHourLayout(this.layout)
       if (event.key === 'ArrowDown' && event.altKey) {
         event.preventDefault()
@@ -306,7 +359,7 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
       const edit = segmentKey(event.key, {
         kind,
         locale: this.segmentLocale,
-        segments: this.parts,
+        segments: this.parts[row] ?? {},
         system: this.segmentSystem,
         twelve,
         typed: this.typed,
@@ -314,7 +367,7 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
       if (edit) {
         event.preventDefault()
         this.typed = edit.typed
-        this.take(edit.segments)
+        this.take(row, edit.segments)
         if (edit.advance) {
           this.moveFocus(element, 1)
         }
@@ -354,17 +407,16 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
       if (
         !own &&
         this.segmentsShown &&
-        segmentsValue(this.segmentedKind, this.parts, this.layout, this.segmentSystem) !==
-          this.value
+        (this.parts.length !== this.segmentGroups || this.joined(this.parts) !== this.value)
       ) {
-        this.parts = segmentsOf(this.segmentedKind, this.value, this.segmentSystem)
+        this.parts = this.rowsOf(this.value)
       }
     }
 
     /** A reset empties a half-typed date too, which the value alone does not show. */
     override formResetCallback(): void {
       super.formResetCallback()
-      this.parts = {}
+      this.parts = this.rowsOf('')
       this.typed = ''
     }
 
@@ -409,7 +461,14 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
         return
       }
       const anchor = this.anchor ?? undefined
-      const partial = isPartial(this.segmentedKind, this.parts, this.layout, this.segmentSystem)
+      /* A row half set, or one row whole and the other empty, which is half a
+         range. */
+      const partial =
+        this.parts.some((one) =>
+          isPartial(this.segmentedKind, one, this.layout, this.segmentSystem),
+        ) ||
+        (this.value === '' &&
+          this.parts.some((one) => Object.values(one).some((part) => part !== undefined)))
       const fault = verdictFlags(this.validate())
       if (partial) {
         this.internals.setValidity(
@@ -439,6 +498,63 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
       const twelve = isTwelveHourLayout(layout)
       const locale = this.segmentLocale
       const system = this.segmentSystem
+      const rows = this.segmentGroups
+      /* A range is two rows of the same segments with a dash between them, as
+         React Aria's DateRangePicker draws its two fields. Each segment in a
+         range is named with its row's word as well, "month, Start, Stay". */
+      const row = (index: number): TemplateResult => {
+        const parts = this.parts[index] ?? {}
+        const prefix = index === 0 ? this.controlId : `${this.controlId}-end`
+        const rowName = rows > 1 ? `${prefix}-row` : ''
+        return html`${
+          rows > 1
+            ? html`<span id=${rowName} hidden
+                >${index === 0 ? this.rangeStartLabel : this.rangeEndLabel}</span
+              >`
+            : nothing
+        }${layout.map((slot) => {
+          if ('literal' in slot) {
+            return html`<span part="literal" aria-hidden="true">${slot.literal}</span>`
+          }
+          const kind = slot.kind
+          const shown = shownValue(kind, parts, twelve)
+          const { max, min } = segmentRange(kind, parts, twelve, system)
+          const text = segmentText(kind, parts, twelve, locale)
+          const empty = shown === undefined
+          const id = `${prefix}-${kind}`
+          const editable = !this.isDisabled && !(this as { readOnly?: boolean }).readOnly
+          /* Named with the field's label after its own, "month, Starts", as
+             React Aria names a segment: VoiceOver on iOS does not read a
+             group's name, so a segment named "month" alone left the reader
+             unsure which date it was in. **And invalid on each segment**,
+             where the reader is: a group's `aria-invalid` is announced by no
+             screen reader as focus moves between the parts inside it. */
+          const spin = !this.touchApple
+          const named = [id, rowName, this.labeled ? this.labelId : ''].filter(Boolean).join(' ')
+          return html`<span
+            part="segment${empty ? ' segment-placeholder' : ''}"
+            id=${id}
+            data-row=${rows > 1 ? index : nothing}
+            data-segment=${kind}
+            role=${spin ? 'spinbutton' : 'textbox'}
+            tabindex=${this.isDisabled ? '-1' : '0'}
+            inputmode=${kind === 'dayPeriod' ? nothing : 'numeric'}
+            enterkeyhint=${editable ? 'next' : nothing}
+            aria-label=${named === id ? segmentName(kind, locale) : `${segmentName(kind, locale)},`}
+            aria-labelledby=${named === id ? nothing : named}
+            aria-invalid=${this.invalidity ?? nothing}
+            aria-valuemin=${spin ? min : nothing}
+            aria-valuemax=${spin ? max : nothing}
+            aria-valuenow=${spin ? (shown ?? nothing) : nothing}
+            aria-valuetext=${spin ? (empty ? this.emptySegmentLabel : segmentValueText(kind, parts, twelve, locale, system)) : nothing}
+            aria-disabled=${this.isDisabled ? 'true' : nothing}
+            aria-required=${this.required ? 'true' : nothing}
+            aria-readonly=${(this as { readOnly?: boolean }).readOnly ? 'true' : nothing}
+            @keydown=${this.handleSegmentKeydown}
+            >${text}</span
+          >`
+        })}`
+      }
       return html`<div
         part="segments"
         id=${this.controlId}
@@ -450,46 +566,11 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
         @focusout=${this.handleSegmentsFocusOut}
         @keypress=${this.handleKeypress}
       >
-        ${layout.map((slot) => {
-          if ('literal' in slot) {
-            return html`<span part="literal" aria-hidden="true">${slot.literal}</span>`
-          }
-          const kind = slot.kind
-          const shown = shownValue(kind, this.parts, twelve)
-          const { max, min } = segmentRange(kind, this.parts, twelve, system)
-          const text = segmentText(kind, this.parts, twelve, locale)
-          const empty = shown === undefined
-          const id = `${this.controlId}-${kind}`
-          const editable = !this.isDisabled && !(this as { readOnly?: boolean }).readOnly
-          /* Named with the field's label after its own, "month, Starts", as
-             React Aria names a segment: VoiceOver on iOS does not read a
-             group's name, so a segment named "month" alone left the reader
-             unsure which date it was in. **And invalid on each segment**,
-             where the reader is: a group's `aria-invalid` is announced by no
-             screen reader as focus moves between the parts inside it. */
-          const spin = !this.touchApple
-          return html`<span
-            part="segment${empty ? ' segment-placeholder' : ''}"
-            id=${id}
-            data-segment=${kind}
-            role=${spin ? 'spinbutton' : 'textbox'}
-            tabindex=${this.isDisabled ? '-1' : '0'}
-            inputmode=${kind === 'dayPeriod' ? nothing : 'numeric'}
-            enterkeyhint=${editable ? 'next' : nothing}
-            aria-label=${this.labeled ? `${segmentName(kind, locale)},` : segmentName(kind, locale)}
-            aria-labelledby=${this.labeled ? `${id} ${this.labelId}` : nothing}
-            aria-invalid=${this.invalidity ?? nothing}
-            aria-valuemin=${spin ? min : nothing}
-            aria-valuemax=${spin ? max : nothing}
-            aria-valuenow=${spin ? (shown ?? nothing) : nothing}
-            aria-valuetext=${spin ? (empty ? this.emptySegmentLabel : segmentValueText(kind, this.parts, twelve, locale, system)) : nothing}
-            aria-disabled=${this.isDisabled ? 'true' : nothing}
-            aria-required=${this.required ? 'true' : nothing}
-            aria-readonly=${(this as { readOnly?: boolean }).readOnly ? 'true' : nothing}
-            @keydown=${this.handleSegmentKeydown}
-            >${text}</span
-          >`
-        })}
+        ${Array.from({ length: rows }, (_, index) =>
+          index === 0
+            ? row(0)
+            : html`<span part="literal range-separator" aria-hidden="true"> – </span>${row(index)}`,
+        )}
       </div>`
     }
   }

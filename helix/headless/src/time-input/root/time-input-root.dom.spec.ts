@@ -458,3 +458,14 @@ describe('a time input holding nothing', () => {
     expect(host.internals.states.has('blank')).toBe(false)
   })
 })
+
+describe('a segmented time range', () => {
+  test('is two rows of segments, the start and the end', async () => {
+    const host = await field('segmented mode="range" locale="en-GB" default-value="09:00,17:30"')
+    const shown = [...(host.shadowRoot?.querySelectorAll('[part~="segment"]') ?? [])].map((one) =>
+      one.textContent?.trim(),
+    )
+    expect(shown).toEqual(['09', '00', '17', '30'])
+    expect(part(host, 'range-separator')?.textContent?.trim()).toBe('–')
+  })
+})

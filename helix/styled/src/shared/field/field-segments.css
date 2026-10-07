@@ -39,7 +39,7 @@
   color: var(--_segment-placeholder-color, var(--helix-color-foreground-subtle));
 }
 
-[part="literal"] {
+[part~="literal"] {
   color: var(--_segment-literal-color, var(--helix-color-foreground-muted));
   white-space: pre;
 }
