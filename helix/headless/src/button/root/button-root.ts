@@ -75,6 +75,7 @@ import { submitAs } from '../submitter.js'
  * @csspart text - The button's words, which the styled button trims to their capitals and baseline so the letters sit at the middle in any font.
  *
  * @cssstate pending - The button is pending: `pending` is set.
+ * @cssstate pressed - A Button Group in a selection mode has this button pressed.
  */
 @customElement('helix-headless-button')
 export class HelixHeadlessButton extends HelixFormElement {
@@ -177,6 +178,15 @@ export class HelixHeadlessButton extends HelixFormElement {
    */
   @property({ attribute: false })
   focusable = true
+
+  /**
+   * @internal Set by a Button Group in a selection mode: whether the group has
+   * this button pressed. Recorded as `:state(pressed)`, so a page can style a
+   * pressed button from its own element. The group says it to screen readers
+   * on the control.
+   */
+  @property({ attribute: false })
+  pressed?: boolean
 
   /**
    * Where this button's submission goes, overriding the form's own.
@@ -508,6 +518,7 @@ export class HelixHeadlessButton extends HelixFormElement {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     this.toggleState('pending', this.pending)
+    this.toggleState('pressed', this.pressed === true)
   }
 
   protected override updated(changed: PropertyValues): void {

@@ -54,6 +54,7 @@ import { styles } from './button-root.css.js'
  * @cssproperty --button-spinner-size - Size of the ring a pending button turns. Defaults to the size of its icons.
  *
  * @cssstate pending - The button is pending: `pending` is set. A ring turns over its hidden words.
+ * @cssstate pressed - A Button Group in a selection mode has this button pressed.
  */
 @customElement('helix-button')
 export class HelixButton extends MixinControlSurface(HelixHeadlessButton) {

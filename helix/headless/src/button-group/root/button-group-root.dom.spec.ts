@@ -116,9 +116,19 @@ const flush = async (group: Group): Promise<Group> => {
   return group
 }
 
-/** What each button's control says about being pressed. */
+/**
+ * What each button's control says about being pressed: `aria-pressed` on a
+ * toggle, `aria-checked` on a radio.
+ */
 const pressedOf = (group: Element): (string | null)[] =>
-  buttonsOf(group).map((button) => inner(button).getAttribute('aria-pressed'))
+  buttonsOf(group).map(
+    (button) =>
+      inner(button).getAttribute('aria-pressed') ?? inner(button).getAttribute('aria-checked'),
+  )
+
+/** The role each button's control has been given, where it has one. */
+const rolesOf = (group: Element): (string | null)[] =>
+  buttonsOf(group).map((button) => inner(button).getAttribute('role'))
 
 const view = `<helix-headless-button-group label="Calendar view" selection-mode="single" value="week">
   <helix-headless-button value="day">Day</helix-headless-button>
@@ -129,10 +139,55 @@ const view = `<helix-headless-button-group label="Calendar view" selection-mode=
 /* WA and Shoelace put a set of toggles in a group, and React Aria's
    ToggleButtonGroup is one: until this a pressed view had nowhere to say so. */
 describe('a button group with selection-mode', () => {
-  test('is a toolbar of toggle buttons, pressed on the control inside each', async () => {
+  test('single: is a radiogroup of radios, checked on the control inside each', async () => {
+    /* React Aria's ToggleButtonGroup in single selection: one of a set is a
+       radio, and a set of toggles that release each other is not a toolbar. */
     const group = await mountGroup(view)
-    expect(role(group)).toBe('toolbar')
+    expect(role(group)).toBe('radiogroup')
+    expect(rolesOf(group)).toEqual(['radio', 'radio', 'radio'])
     expect(pressedOf(group)).toEqual(['false', 'true', 'false'])
+    expect(inner(buttonsOf(group)[1] as Element).hasAttribute('aria-pressed')).toBe(false)
+  })
+
+  test('multiple: is a toolbar of toggle buttons, pressed on the control inside each', async () => {
+    const group = await mountGroup(view.replace('"single"', '"multiple"'))
+    expect(role(group)).toBe('toolbar')
+    expect(rolesOf(group)).toEqual([null, null, null])
+    expect(pressedOf(group)).toEqual(['false', 'true', 'false'])
+  })
+
+  test('a pressed button says so on its own element through a state', async () => {
+    const group = await mountGroup(view)
+    expect(buttonsOf(group).map((button) => hasState(button, 'pressed'))).toEqual([
+      false,
+      true,
+      false,
+    ])
+    group.selectionMode = undefined
+    await flush(group)
+    expect(buttonsOf(group).map((button) => hasState(button, 'pressed'))).toEqual([
+      false,
+      false,
+      false,
+    ])
+  })
+
+  test('disallow-empty-selection keeps the pressed one pressed', async () => {
+    /* A view switcher has no view with none pressed, and a second press on
+       the current one emptied it. */
+    const group = await mountGroup(view.replace('label=', 'disallow-empty-selection label='))
+    const [, week] = buttonsOf(group)
+    let changes = 0
+    group.addEventListener('change', () => {
+      changes += 1
+    })
+    inner(week as Element).click()
+    await flush(group)
+    expect(group.value).toBe('week')
+    expect(changes).toBe(0)
+    inner(buttonsOf(group)[0] as Element).click()
+    await flush(group)
+    expect(group.value).toBe('day')
   })
 
   test("writes nothing onto the consumer's markup", async () => {
@@ -283,7 +338,7 @@ describe('a button group with selection-mode', () => {
     expect(internals?.ariaOrientation).toBeNull()
     expect(pressedOf(group)).toEqual([null, null, null])
     expect(buttonsOf(group).map((button) => button.focusable)).toEqual([true, true, true])
-    group.setAttribute('selection-mode', 'single')
+    group.setAttribute('selection-mode', 'multiple')
     await flush(group)
     expect(role(group)).toBe('toolbar')
     expect(buttonsOf(group).map((button) => button.focusable)).toEqual([false, true, false])
@@ -296,12 +351,14 @@ describe('a button group with selection-mode', () => {
     document.body.append(day as Element)
     await flush(group)
     expect(inner(day as Element).hasAttribute('aria-pressed')).toBe(false)
+    expect(inner(day as Element).hasAttribute('aria-checked')).toBe(false)
+    expect(inner(day as Element).hasAttribute('role')).toBe(false)
     expect(day?.focusable).toBe(true)
   })
 
   test("inside a toolbar it is a group, and the toolbar's keys own the stop", async () => {
     // A toolbar inside a toolbar is a reader's dead end.
-    document.body.innerHTML = `<div role="toolbar">${view}</div>`
+    document.body.innerHTML = `<div role="toolbar">${view.replace('"single"', '"multiple"')}</div>`
     const group = document.querySelector('helix-headless-button-group') as Group
     await flush(group)
     expect(role(group)).toBe('group')

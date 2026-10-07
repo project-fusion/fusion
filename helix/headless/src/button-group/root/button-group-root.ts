@@ -24,6 +24,7 @@ import { arrowTarget } from '../arrows.js'
 type GroupButton = HTMLElement & {
   disabled?: boolean
   focusable: boolean
+  pressed?: boolean
   updateComplete: Promise<unknown>
   value: string
 }
@@ -52,11 +53,15 @@ const isGroupButton = (child: Element): child is GroupButton =>
  * appearance and size.
  *
  * **Buttons that stay pressed.** With `selection-mode`, each button with a
- * `value` is a toggle button: a press presses or releases it, and it says so
- * with `aria-pressed`. `single` keeps one pressed at a time, and a press on the
- * pressed one releases it. `multiple` lets any number be pressed. `value` is
- * the pressed values, comma separated. A press sends a cancelable
- * `helix-before-change` with the value it would leave, then `change`.
+ * `value` is a toggle button: a press presses or releases it. `multiple` lets
+ * any number be pressed, and each button says so with `aria-pressed`. `single`
+ * keeps one pressed at a time: the group is a `radiogroup` and each button a
+ * `radio` that says so with `aria-checked`, as React Aria's toggle button
+ * group is. A press on the pressed one releases it, unless
+ * `disallow-empty-selection` keeps one pressed. `value` is the pressed values,
+ * comma separated. A press sends a cancelable `helix-before-change` with the
+ * value it would leave, then `change`. A pressed Helix button has
+ * `:state(pressed)` on its own element.
  *
  * The pressed state is written on the control inside each button's shadow
  * root, so the markup you rendered is never changed and a framework hydrating
@@ -84,10 +89,10 @@ const isGroupButton = (child: Element): child is GroupButton =>
  * | Space, Enter | Presses or releases the focused button. |
  *
  * Left and Right swap on a right-to-left page, and a disabled button is
- * passed over. In a selection mode the group is a `toolbar`, with
+ * passed over. Under `multiple` the group is a `toolbar`, with
  * `aria-orientation` under `orientation="vertical"`. Inside a toolbar it stays
  * a named `group`, and the toolbar's own arrow keys walk its buttons, so a
- * reader meets one toolbar.
+ * reader meets one toolbar. Under `single` it is a `radiogroup` either way.
  *
  * @since 0.1.0
  * @status stable
@@ -114,6 +119,14 @@ export class HelixHeadlessButtonGroup extends HelixElement {
    */
   @property()
   label = ''
+
+  /**
+   * Keeps at least one button pressed once one is, as React Aria's
+   * `disallowEmptySelection`: a press that would leave none pressed is
+   * refused.
+   */
+  @property({ attribute: 'disallow-empty-selection', type: Boolean })
+  disallowEmptySelection = false
 
   /**
    * Which way the buttons are stacked.
@@ -282,7 +295,13 @@ export class HelixHeadlessButtonGroup extends HelixElement {
       const control = button.shadowRoot?.querySelector('button')
       if (control && !button.hasAttribute('aria-pressed')) {
         const toggle = this.told.has(button) && button.value !== ''
-        this.markPressed(control, toggle ? this.pressed(button) : undefined)
+        const pressed = toggle ? this.pressed(button) : undefined
+        /* And on the button's own element, as a custom state, where the button
+           has one to record it in. */
+        if ('pressed' in button && button.pressed !== pressed) {
+          button.pressed = pressed
+        }
+        this.markPressed(control, pressed)
       }
     })
   }
@@ -291,14 +310,25 @@ export class HelixHeadlessButtonGroup extends HelixElement {
    * Says on a button's control whether it is pressed, or that it is no toggle
    * at all where `pressed` is undefined. A styled tier draws the look here.
    *
+   * Under `single` the control is a `radio` that says so with `aria-checked`,
+   * and under `multiple` a toggle button that says so with `aria-pressed`.
+   *
    * @param control The focusable control inside the button's shadow root.
    * @param pressed Whether the button is pressed, or undefined where it is not a toggle.
    */
   protected markPressed(control: HTMLElement, pressed: boolean | undefined): void {
-    if (pressed === undefined) {
+    const radio = pressed !== undefined && this.selectionMode === 'single'
+    if (pressed === undefined || radio) {
       control.removeAttribute('aria-pressed')
     } else {
       control.setAttribute('aria-pressed', String(pressed))
+    }
+    if (radio) {
+      control.setAttribute('role', 'radio')
+      control.setAttribute('aria-checked', String(pressed))
+    } else {
+      control.removeAttribute('role')
+      control.removeAttribute('aria-checked')
     }
     control.style.setProperty(
       '--button-group-pressed',
@@ -315,8 +345,12 @@ export class HelixHeadlessButtonGroup extends HelixElement {
     const mode = this.selectionMode
     const button = this.buttons.find((one) => event.composedPath().includes(one))
     if (mode && button && button.value !== '') {
-      requestValue(this, pressedValue(mode, this.value, button.value), (next) => {
-        this.value = next
+      const next = pressedValue(mode, this.value, button.value)
+      if (this.disallowEmptySelection && commaList(next).length === 0) {
+        return
+      }
+      requestValue(this, next, (value) => {
+        this.value = value
       })
     }
   }
@@ -374,11 +408,15 @@ export class HelixHeadlessButtonGroup extends HelixElement {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    /* A toolbar in a selection mode, as React Aria's ToggleButtonGroup is, and
-       a group of the toolbar around it otherwise, since a toolbar inside a
-       toolbar is a reader's dead end. */
+    /* As React Aria's ToggleButtonGroup is: a `radiogroup` under `single`, a
+       toolbar under `multiple`, and a group of the toolbar around it
+       otherwise, since a toolbar inside a toolbar is a reader's dead end. */
     const toolbar = this.roving
-    hostAria(this.internals, { label: this.label, role: toolbar ? 'toolbar' : 'group' })
+    const radios = this.selectionMode === 'single'
+    hostAria(this.internals, {
+      label: this.label,
+      role: radios ? 'radiogroup' : toolbar ? 'toolbar' : 'group',
+    })
     this.internals.ariaOrientation = toolbar ? (this.orientation ?? null) : null
     this.toggleState('pressed', Boolean(this.selectionMode) && commaList(this.value).length > 0)
   }
