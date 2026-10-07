@@ -5,10 +5,12 @@ import {
   type Relative,
   RelativeClockController,
   relativeTime,
+  words,
+  wordsConverter,
   wordsLocale,
 } from '@fusion.dev/helix-core'
 import { circle, record } from '@fusion.dev/helix-icons'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
@@ -31,7 +33,14 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * counting parent, and no script. `Steps` and `Breadcrumbs` work the same way.
  *
  * `tone` sets the kind of event and is the only thing that colors the mark. It
- * uses the same values as `Announcement`.
+ * uses the same values as `Announcement`. **A screen reader hears the tone as
+ * a word**, from `tone-labels`: the mark is an image named "Error",
+ * "Information", "Success" or "Warning", so the color is not the only place
+ * the meaning is. `neutral` and `primary` say nothing unless you name them.
+ *
+ * **`pending` marks an event that has not happened yet**, such as one that is
+ * scheduled. The mark is the open circle, and a screen reader hears
+ * `pending-label`, "Scheduled", with the tone's word.
  *
  * @since 0.1.0
  * @status stable
@@ -41,12 +50,12 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @slot - What happened.
  * @slot marker - The mark on the line. Defaults to a dot, which is the slot's fallback
- * content.
+ * content. A mark you slot is read as the tone's word, where the entry has one.
  * @slot time - When it happened, written the way you want it shown.
  *
  * @csspart content - What happened, and the time above it.
  * @csspart dot - The dot drawn when no marker is slotted.
- * @csspart marker - The mark on the line.
+ * @csspart marker - The mark on the line. An image named by the tone's word, and by `pending-label`, where either applies.
  * @csspart rail - The column that holds the mark and the line. Draw the two halves of the
  * line with `::part(rail)::before` and `::part(rail)::after` in your stylesheet. This
  * tier ships no CSS and renders no extra box for the line.
@@ -54,6 +63,12 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  */
 @customElement('helix-headless-timeline-item')
 export class HelixHeadlessTimelineItem extends HelixElement {
+  /**
+   * The key this part's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-timeline-item': { toneLabels: { danger: 'Fehler' } } })`.
+   */
+  static words = 'helix-timeline-item'
+
   /**
    * When it happened, in machine-readable form. Setting it wraps the time in a
    * `<time>` element.
@@ -104,10 +119,52 @@ export class HelixHeadlessTimelineItem extends HelixElement {
   }
 
   /**
-   * The kind of event. It sets the color of the mark and nothing else.
+   * Marks an event that has not happened yet, such as one that is scheduled.
+   * The mark is the open circle, and a screen reader hears `pending-label`.
+   */
+  @property({ reflect: true, type: Boolean })
+  pending = false
+
+  /** What a screen reader hears for an entry that is `pending`. */
+  @words
+  @property({ attribute: 'pending-label' })
+  pendingLabel = 'Scheduled'
+
+  /**
+   * The kind of event. It sets the color of the mark, and a screen reader
+   * hears it as the word `tone-labels` gives it.
    */
   @property({ reflect: true })
   tone?: 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'
+
+  /**
+   * What a screen reader is told this entry's tone is, such as "Failed".
+   * Absent is the tone's word in `tone-labels`.
+   */
+  @property({ attribute: 'tone-label' })
+  toneLabel = ''
+
+  /**
+   * What a screen reader is told each tone is, by the tone's name, written as
+   * JSON in the attribute: `tone-labels='{"danger":"Failed"}'`. A tone with no
+   * word is not read, which is `neutral` and `primary` in English.
+   */
+  @words
+  @property({ attribute: 'tone-labels', converter: wordsConverter })
+  toneLabels: Partial<
+    Record<'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning', string>
+  > = {
+    danger: 'Error',
+    info: 'Information',
+    success: 'Success',
+    warning: 'Warning',
+  }
+
+  /** What the mark says: the tone's word and the pending word, where either applies. */
+  private get markName(): string {
+    const tone = this.tone === undefined ? '' : this.toneLabel || (this.toneLabels[this.tone] ?? '')
+    return [tone, this.pending ? this.pendingLabel : ''].filter((word) => word !== '').join(', ')
+  }
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
@@ -131,13 +188,21 @@ export class HelixHeadlessTimelineItem extends HelixElement {
    * Toned entries are reporting something, so they take the circle with a
    * center, which is `Steps` drawing the stage a reader is standing on. Untoned
    * ones are just things that happened and take the open circle, which is
-   * `Steps` drawing a stage nobody has reached. The same two glyphs in both
+   * `Steps` drawing a stage nobody has reached, and so does a `pending`
+   * entry, which nobody has reached yet either. The same two glyphs in both
    * components rather than two that resemble each other: a shape drawn twice
    * drifts, and these are already the marks a reader has learned one page over.
    */
   protected renderMarker(): TemplateResult {
-    const icon = this.tone === undefined ? circle : record
-    return html`<span part="marker"
+    const icon = this.tone === undefined || this.pending ? circle : record
+    /* **An image named by the meaning**, so the color is not the only place
+       the tone is. On the mark's box rather than the glyph, so a mark a page
+       slots is read the same way, and none where there is nothing to say. */
+    const name = this.markName
+    return html`<span
+      part="marker"
+      role=${name === '' ? nothing : 'img'}
+      aria-label=${name === '' ? nothing : name}
       ><slot name="marker"
         ><svg part="dot" fill="currentColor" viewBox=${icon.viewBox} aria-hidden="true">
           ${unsafeSVG(icon.content)}
