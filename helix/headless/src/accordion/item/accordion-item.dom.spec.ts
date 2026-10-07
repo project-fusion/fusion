@@ -196,3 +196,35 @@ describe('the chevron', () => {
     expect(slot?.getAttribute('aria-hidden')).toBe('true')
   })
 })
+
+describe('a section with no summary', () => {
+  /* The missing-name warning is in development builds only, which the
+     package's `test:dom` script asks for with `--conditions helix-development`. */
+  const warnedOn = async (markup: string): Promise<string[]> => {
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      await mount(markup)
+      await new Promise((done) => setTimeout(done, 5))
+    } finally {
+      console.warn = original
+    }
+    return warnings
+  }
+
+  test('is reported once, by its tag', async () => {
+    const warnings = await warnedOn(
+      '<helix-headless-accordion-item>Body</helix-headless-accordion-item>',
+    )
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0]).toContain('<helix-headless-accordion-item> has no accessible name')
+  })
+
+  test('and a section with words in its summary is not', async () => {
+    const warnings = await warnedOn(
+      '<helix-headless-accordion-item><span slot="summary">Shipping</span>Body</helix-headless-accordion-item>',
+    )
+    expect(warnings).toEqual([])
+  })
+})

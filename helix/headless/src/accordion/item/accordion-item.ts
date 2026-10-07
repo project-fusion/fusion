@@ -1,5 +1,6 @@
 import {
   animationsFinished,
+  auditName,
   closestInstance,
   customElement,
   HelixElement,
@@ -49,6 +50,10 @@ const TRIGGER_ID = 'trigger'
  * content shrinking rather than an empty box. Set `hidden-until-found="false"`
  * and a closed section is `hidden` and `inert` instead, and find in page skips
  * it.
+ *
+ * A section whose trigger has no words, with nothing in its `summary` slot,
+ * is announced as a bare button, and a development build warns once with the
+ * kind `missing-name`.
  *
  * While it is open, the content part carries the content's height as
  * `--accordion-content-height`, as Radix's accordion does, for a stylesheet
@@ -243,6 +248,15 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
       }
     })
     observer.observe(content, { attributeFilter: ['hidden'] })
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    auditName(
+      this,
+      () => this.renderRoot.querySelector<HTMLElement>(`#${TRIGGER_ID}`),
+      'Write its title in the `summary` slot.',
+    )
   }
 
   /** Whether the item was open at the last update, and `undefined` before one. */
