@@ -3,10 +3,11 @@ import {
   followLink,
   HelixElement,
   HelixSelectEvent,
+  hostAria,
   type LinkModifiers,
   slotFilled,
 } from '@fusion.dev/helix-core'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
@@ -53,6 +54,12 @@ export const optionsAmong = (elements: readonly Element[]): HelixHeadlessOption[
  * An option with `href` is a link: choosing it follows the link and selects
  * nothing, as an entry in a command palette that goes to a page does.
  *
+ * The option's name is its label alone, as React Aria's `slot="label"` makes
+ * it: what is in `start` and `end`, an avatar's initials or a shortcut, is
+ * drawn and not read as part of the name. The description is read as the
+ * option's description. A name you give with `aria-label` or
+ * `aria-labelledby` wins over both.
+ *
  * @since 0.1.0
  * @status stable
  * @category forms
@@ -77,6 +84,8 @@ export const optionsAmong = (elements: readonly Element[]): HelixHeadlessOption[
  * @cssstate active - While the keyboard is on the option, which is the option `aria-activedescendant` names.
  * @cssstate disabled - While the option cannot be chosen.
  * @cssstate has-indicator - An icon is slotted into `indicator`.
+ * @cssstate hovered - While a mouse or a pen is over the option. A touch sets no hover, as React Aria's `data-hovered` does not.
+ * @cssstate pressed - While a pointer presses the option, from the press to the release.
  * @cssstate selected - While the option is chosen.
  */
 @customElement('helix-headless-option')
@@ -375,6 +384,49 @@ export class HelixHeadlessOption extends HelixElement {
     this.toggleState('disabled', this.disabled)
   }
 
+  /**
+   * The name is the label part and the description the description part, by
+   * reference, because the host's own content runs `start` and `end` into its
+   * name: an option with initials and a shortcut was called `P Priya Shah ⌘P`.
+   * The alternate destination is part of the description where there is a
+   * caption to read with it. A name the consumer wrote on the host wins.
+   */
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    const named = this.hasAttribute('aria-label') || this.hasAttribute('aria-labelledby')
+    const label = this.partNamed('label')
+    /* The caption is the part where the property draws one, and otherwise
+       what is slotted into `description`, which is in the host's own tree. */
+    const caption = this.partNamed('description')
+    const alternate = this.renderRoot.querySelector('[data-alternate]')
+    const described = [
+      ...(caption ? [caption] : this.knownChildren.filter((child) => child.slot === 'description')),
+      ...(alternate ? [alternate] : []),
+    ]
+    hostAria(this.internals, {
+      describedBy: described,
+      labelledBy: named || !label ? [] : [label],
+    })
+  }
+
+  /** A hover from a mouse or a pen, which a touch does not make. */
+  private readonly handlePointerEnter = (event: PointerEvent): void => {
+    this.toggleState('hovered', event.pointerType !== 'touch')
+  }
+
+  private readonly handlePointerLeave = (): void => {
+    this.toggleState('hovered', false)
+    this.toggleState('pressed', false)
+  }
+
+  private readonly handlePointerDown = (event: PointerEvent): void => {
+    this.toggleState('pressed', event.button === 0 && !this.disabled)
+  }
+
+  private readonly handlePointerUp = (): void => {
+    this.toggleState('pressed', false)
+  }
+
   protected override render(): TemplateResult {
     /* `role` and `aria-selected` on the host through internals, because an
        option's semantics have to be visible to the listbox that owns it and a
@@ -387,8 +439,12 @@ export class HelixHeadlessOption extends HelixElement {
         ? String(this.selected || (this.selectionFollowsActive && this.active))
         : null
     this.internals.ariaDisabled = this.disabled ? 'true' : null
-    this.internals.ariaDescription =
-      this.alternate !== '' && this.alternateLabel !== '' ? this.alternateLabel : null
+    const alternate = this.alternate !== '' && this.alternateLabel !== ''
+    /* A description by reference outranks `aria-description`, so with a
+       caption the alternate destination is read from a hidden element beside it. */
+    const captioned =
+      Boolean(this.description) || this.knownChildren.some((child) => child.slot === 'description')
+    this.internals.ariaDescription = alternate && !captioned ? this.alternateLabel : null
 
     /* A pointer reaches `select()` the way every other choosable row in this
        library does, from a `@click` in its own template: `Tabs.Tab`,
@@ -404,6 +460,11 @@ export class HelixHeadlessOption extends HelixElement {
     return html`<div
       part="item${this.selected ? ' item-selected' : ''}${this.active ? ' item-active' : ''}"
       @click=${(event: MouseEvent) => this.select(event)}
+      @pointercancel=${this.handlePointerUp}
+      @pointerdown=${this.handlePointerDown}
+      @pointerenter=${this.handlePointerEnter}
+      @pointerleave=${this.handlePointerLeave}
+      @pointerup=${this.handlePointerUp}
     >
       <slot name="start"></slot>
       <span part="text">
@@ -411,9 +472,10 @@ export class HelixHeadlessOption extends HelixElement {
         ${
           this.description
             ? html`<span part="description"><slot name="description">${this.description}</slot></span>`
-            : html`<slot name="description"></slot>`
+            : html`<slot name="description" @slotchange=${() => this.requestUpdate()}></slot>`
         }
       </span>
+      ${alternate && captioned ? html`<span data-alternate hidden>${this.alternateLabel}</span>` : nothing}
       <slot name="end"></slot>
       <slot
         name="indicator"

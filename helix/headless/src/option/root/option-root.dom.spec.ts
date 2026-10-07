@@ -286,3 +286,90 @@ describe('an option’s own content', () => {
     expect(host.internals.ariaSelected).toBe('false')
   })
 })
+
+describe('what an option is called', () => {
+  type Option = HTMLElement & {
+    alternate: string
+    alternateLabel: string
+    internals: ElementInternals & {
+      ariaDescribedByElements: Element[] | null
+      ariaLabelledByElements: Element[] | null
+    }
+    updateComplete: Promise<unknown>
+  }
+
+  /* The name was the host's whole content, so initials in `start` and a
+     shortcut in `end` were read into it: `P Priya Shah ⌘P`, and the caption
+     ran on after the name rather than being its description. */
+  test('is its label alone, and its caption is its description', async () => {
+    const host = (await mount(
+      '<helix-headless-option value="p" description="Lead designer"><span slot="start">P</span>Priya Shah<kbd slot="end">⌘P</kbd></helix-headless-option>',
+    )) as Option
+    await host.updateComplete
+    expect(host.internals.ariaLabelledByElements).toEqual([part(host, 'label') as Element])
+    expect(host.internals.ariaDescribedByElements).toEqual([part(host, 'description') as Element])
+  })
+
+  test('a slotted caption is its description too', async () => {
+    const host = (await mount(
+      '<helix-headless-option value="h">Helix<em slot="description">the design system</em></helix-headless-option>',
+    )) as Option
+    await host.updateComplete
+    expect(host.internals.ariaDescribedByElements?.map((one) => one.localName)).toEqual(['em'])
+  })
+
+  test('a name written on the host wins', async () => {
+    const host = (await mount(
+      '<helix-headless-option value="p" aria-label="Priya">Priya Shah</helix-headless-option>',
+    )) as Option
+    await host.updateComplete
+    expect(host.internals.ariaLabelledByElements ?? null).toBeNull()
+  })
+
+  /* A description by reference outranks `aria-description`, so the second
+     destination of a captioned row would have gone unsaid. */
+  test('says its second destination beside a caption', async () => {
+    const host = (await mount(
+      '<helix-headless-option value="h" description="the design system" alternate="/sandbox" alternate-label="Opens the sandbox with Shift">Helix</helix-headless-option>',
+    )) as Option
+    await host.updateComplete
+    const said = host.internals.ariaDescribedByElements?.map((one) => one.textContent?.trim())
+    expect(said).toEqual(['the design system', 'Opens the sandbox with Shift'])
+    expect(host.internals.ariaDescription ?? null).toBeNull()
+    ;(host as unknown as { description: string }).description = ''
+    await host.updateComplete
+    expect(host.internals.ariaDescription).toBe('Opens the sandbox with Shift')
+  })
+})
+
+describe('an option under a pointer', () => {
+  const pointer = (target: Element, type: string, pointerType = 'mouse'): void => {
+    target.dispatchEvent(new PointerEvent(type, { bubbles: true, button: 0, pointerType }))
+  }
+
+  /* React Aria's options say `data-hovered` and `data-pressed`; this said
+     neither, so a press could be drawn only with `:active`. */
+  test('says hovered for a mouse and pressed from the press to the release', async () => {
+    const host = await mount('<helix-headless-option value="a">Alpha</helix-headless-option>')
+    const row = part(host, 'item') as Element
+    pointer(row, 'pointerenter')
+    expect(hasState(host, 'hovered')).toBe(true)
+    pointer(row, 'pointerdown')
+    expect(hasState(host, 'pressed')).toBe(true)
+    pointer(row, 'pointerup')
+    expect(hasState(host, 'pressed')).toBe(false)
+    pointer(row, 'pointerleave')
+    expect(hasState(host, 'hovered')).toBe(false)
+  })
+
+  test('a touch sets no hover, and a disabled option no press', async () => {
+    const host = await mount(
+      '<helix-headless-option value="a" disabled>Alpha</helix-headless-option>',
+    )
+    const row = part(host, 'item') as Element
+    pointer(row, 'pointerenter', 'touch')
+    expect(hasState(host, 'hovered')).toBe(false)
+    pointer(row, 'pointerdown', 'touch')
+    expect(hasState(host, 'pressed')).toBe(false)
+  })
+})
