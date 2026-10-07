@@ -36,13 +36,16 @@ export interface MessageOptions {
   plurals?: string
 }
 
-/** An argument: its name, type, style, branches and offset. */
+/**
+ * An argument, in short keys because they ship as written: its name (`n`),
+ * type (`t`), style (`s`), branches (`b`) and offset (`o`).
+ */
 interface Argument {
-  name: string
-  type?: string
-  style?: string
-  branches?: Record<string, Part[]>
-  offset?: number
+  n: string
+  t?: string
+  s?: string
+  b?: Record<string, Part[]>
+  o?: number
 }
 
 /** Text, the `#` of a plural (`0`), or an argument. */
@@ -50,6 +53,12 @@ type Part = string | 0 | Argument
 
 /** Each message parsed once. Messages are few and come from properties. */
 const parsed = new Map<string, Part[]>()
+
+/** A name, a type, a style or a branch key, with the spaces around it. */
+const WORD = /\s*([^\s,{}]+)\s*/y
+
+/** The spaces before a branch, or the brace that ends the branches. */
+const SPACE = /\s*/y
 
 /**
  * The parts of a message.
@@ -61,112 +70,91 @@ const parsed = new Map<string, Part[]>()
 const parse = (source: string): Part[] => {
   let at = 0
   const fail = (): never => {
-    throw new SyntaxError(source)
+    throw at
   }
-  const word = (): string => {
-    const found = /^\s*([^\s,{}]+)\s*/.exec(source.slice(at))
-    if (!found) {
-      fail()
-    }
-    at += (found as RegExpExecArray)[0].length
-    return (found as RegExpExecArray)[1] as string
+  const match = (pattern: RegExp): string => {
+    pattern.lastIndex = at
+    const found = pattern.exec(source) ?? fail()
+    at = pattern.lastIndex
+    return found[1] as string
   }
   const take = (char: string): void => {
-    while (/\s/.test(source[at] ?? '')) {
-      at++
-    }
     if (source[at++] !== char) {
       fail()
     }
   }
-  const text = (inPlural: boolean): Part[] => {
+  /* Text up to the brace that closes it, where `#` is the count inside a
+     plural. An apostrophe before a brace, or before `#` there, quotes text up
+     to the next lone apostrophe; two apostrophes are one. */
+  const text = (plural: boolean): Part[] => {
     const parts: Part[] = []
     let written = ''
     const flush = (): void => {
       if (written) {
         parts.push(written)
-        written = ''
       }
+      written = ''
     }
-    while (at < source.length) {
-      const char = source[at] as string
-      const next = source[at + 1]
+    for (let char = source[at]; char && char !== '}'; char = source[at]) {
+      const next = source[++at]
       if (char === "'" && next === "'") {
-        written += "'"
-        at += 2
-      } else if (char === "'" && (next === '{' || next === '}' || (inPlural && next === '#'))) {
-        /* Quoted text runs to the next lone apostrophe. */
+        written += char
         at++
+      } else if (char === "'" && (next === '{' || next === '}' || (plural && next === '#'))) {
         while (at < source.length) {
-          if (source[at] === "'") {
-            if (source[at + 1] !== "'") {
-              at++
+          const quoted = source[at++]
+          if (quoted === "'") {
+            if (source[at] !== "'") {
               break
             }
             at++
           }
-          written += source[at++]
+          written += quoted
         }
-      } else if (char === '}') {
-        break
-      } else if (char === '#' && inPlural) {
+      } else if (char === '#' && plural) {
         flush()
         parts.push(0)
-        at++
       } else if (char === '{') {
         flush()
-        at++
-        parts.push(argument(inPlural))
+        parts.push(argument(plural))
       } else {
         written += char
-        at++
       }
     }
     flush()
     return parts
   }
-  const argument = (inPlural: boolean): Argument => {
-    const name = word()
-    if (source[at] === '}') {
-      at++
-      return { name }
-    }
-    take(',')
-    const type = word()
-    if (source[at] === '}') {
-      at++
-      return { name, type }
-    }
-    take(',')
-    if (type !== 'plural' && type !== 'selectordinal' && type !== 'select') {
-      const end = source.indexOf('}', at)
-      if (end < 0) {
-        fail()
-      }
-      const style = source.slice(at, end).trim()
-      at = end + 1
-      return { name, style, type }
-    }
-    const branches: Record<string, Part[]> = {}
-    let offset = 0
-    while (source[at] !== '}') {
-      let key = word()
-      if (key.startsWith('offset:')) {
-        offset = Number(key.slice(7) || word())
-        key = word()
-      }
-      take('{')
-      branches[key] = text(type !== 'select' || inPlural)
-      take('}')
-      while (/\s/.test(source[at] ?? '')) {
-        at++
-      }
-      if (at >= source.length) {
-        fail()
+  const argument = (plural: boolean): Argument => {
+    const found: Argument = { n: match(WORD) }
+    if (source[at] !== '}') {
+      take(',')
+      const type = match(WORD)
+      found.t = type
+      if (source[at] !== '}') {
+        take(',')
+        if (type !== 'plural' && type !== 'selectordinal' && type !== 'select') {
+          const end = source.indexOf('}', at)
+          found.s = source.slice(at, end < 0 ? fail() : end).trim()
+          at = end
+        } else {
+          const branches: Record<string, Part[]> = {}
+          found.b = branches
+          while (source[at] !== '}') {
+            let key = match(WORD)
+            if (key.startsWith('offset:')) {
+              found.o = Number(key.slice(7) || match(WORD))
+              key = match(WORD)
+            }
+            take('{')
+            branches[key] = text(type !== 'select' || plural)
+            take('}')
+            match(SPACE)
+          }
+        }
       }
     }
     at++
-    return { branches, name, offset, type }
+    return found
   }
   try {
     const parts = text(false)
@@ -178,16 +166,6 @@ const parse = (source: string): Part[] => {
 
 /** The plural rules of a locale, built once each. */
 const rules = new Map<string, Intl.PluralRules>()
-
-const pluralOf = (locale: string, type: Intl.PluralRuleType, count: number): string => {
-  const key = `${locale}|${type}`
-  let found = rules.get(key)
-  if (!found) {
-    found = new Intl.PluralRules(locale || undefined, { type })
-    rules.set(key, found)
-  }
-  return found.select(count)
-}
 
 /** The `Intl.NumberFormat` options a number argument's style names. */
 const STYLES: Record<string, Intl.NumberFormatOptions> = {
@@ -221,7 +199,7 @@ export const formatMessage = (
     parsed.set(message, parts)
   }
   const plurals = options.plurals ?? locale
-  const isolated = (text: string): string => (options.isolate ? `⁨${text}⁩` : text)
+  const isolated = (text: string): string => (options.isolate ? `\u2068${text}\u2069` : text)
   const run = (from: Part[], count: number): string =>
     from
       .map((part) => {
@@ -231,23 +209,31 @@ export const formatMessage = (
         if (part === 0) {
           return formatNumber(count, locale)
         }
-        const value = values[part.name]
+        const { b: branches, n: name, t: type } = part
+        const value = values[name]
         if (value === undefined) {
-          return `{${part.name}}`
+          return `{${name}}`
         }
-        if (part.type === 'number' || (part.type === undefined && typeof value === 'number')) {
-          return isolated(formatNumber(Number(value), locale, STYLES[part.style ?? '']))
+        if (type === 'number' || (!type && typeof value === 'number')) {
+          return isolated(formatNumber(+value, locale, STYLES[part.s as string]))
         }
-        if (!part.branches) {
+        if (!branches) {
           return isolated(String(value))
         }
-        if (part.type === 'select') {
-          return run(part.branches[String(value)] ?? part.branches.other ?? [], count)
+        if (type === 'select') {
+          return run(branches[value] ?? branches.other ?? [], count)
         }
-        const shifted = Number(value) - (part.offset ?? 0)
-        const form = pluralOf(plurals, part.type === 'plural' ? 'cardinal' : 'ordinal', shifted)
+        const shifted = +value - (part.o ?? 0)
+        const key = `${plurals}|${type}`
+        let rule = rules.get(key)
+        if (!rule) {
+          rule = new Intl.PluralRules(plurals || undefined, {
+            type: type === 'plural' ? 'cardinal' : 'ordinal',
+          })
+          rules.set(key, rule)
+        }
         return run(
-          part.branches[`=${value}`] ?? part.branches[form] ?? part.branches.other ?? [],
+          branches[`=${value}`] ?? branches[rule.select(shifted)] ?? branches.other ?? [],
           shifted,
         )
       })

@@ -40,9 +40,9 @@ interface Held {
   /** What updates the elements that read words. */
   watchers: Set<() => void>
   /** Whether an update is already queued for this task. */
-  queued: boolean
+  queued?: boolean
   /** Whether the document's `lang` is watched. */
-  observed: boolean
+  observed?: boolean
 }
 
 /**
@@ -52,32 +52,24 @@ interface Held {
  * bundle that imports it: words registered through one have to reach elements
  * defined through the other, as the icon registry's glyphs do.
  */
-const held = (): Held => {
-  const global = globalThis as unknown as Record<symbol, Held | undefined>
-  const key = Symbol.for('helix.words')
-  global[key] ??= {
-    fallback: 'en',
-    observed: false,
-    packs: new Map(),
-    queued: false,
-    watchers: new Set(),
-  }
-  return global[key]
-}
+// biome-ignore lint/suspicious/noAssignInExpressions: one registry, made by whichever copy loads first.
+const held: Held = ((globalThis as unknown as Record<symbol, Held>)[Symbol.for('helix.words')] ??= {
+  fallback: 'en',
+  packs: new Map(),
+  watchers: new Set(),
+})
 
 /** Asks every element that reads words to look again, once per task. */
 const changed = (): void => {
-  const registry = held()
-  if (registry.queued) {
-    return
+  if (!held.queued) {
+    held.queued = true
+    queueMicrotask(() => {
+      held.queued = false
+      for (const watcher of held.watchers) {
+        watcher()
+      }
+    })
   }
-  registry.queued = true
-  queueMicrotask(() => {
-    registry.queued = false
-    for (const watcher of registry.watchers) {
-      watcher()
-    }
-  })
 }
 
 /**
@@ -93,31 +85,29 @@ const changed = (): void => {
  * ```
  */
 export const registerWords = (locale: string, ...words: Words[]): void => {
-  const registry = held()
   const key = locale.toLowerCase()
-  const pack = registry.packs.get(key) ?? {}
+  const pack = held.packs.get(key) ?? {}
+  held.packs.set(key, pack)
   for (const one of words) {
-    for (const [tag, properties] of Object.entries(one)) {
-      const into = pack[tag] ?? {}
-      pack[tag] = into
-      for (const [name, value] of Object.entries(properties ?? {})) {
+    for (const tag in one) {
+      // biome-ignore lint/suspicious/noAssignInExpressions: the tag's words, made where it has none.
+      const into = (pack[tag] ??= {})
+      for (const [name, value] of Object.entries(one[tag] ?? {})) {
         const before = into[name]
         into[name] =
           typeof value === 'object' && typeof before === 'object' ? { ...before, ...value } : value
       }
     }
   }
-  registry.packs.set(key, pack)
   changed()
 }
 
 /** Removes a locale's words, or every locale's where no locale is given. */
 export const clearWords = (locale?: string): void => {
-  const { packs } = held()
   if (locale === undefined) {
-    packs.clear()
+    held.packs.clear()
   } else {
-    packs.delete(locale.toLowerCase())
+    held.packs.delete(locale.toLowerCase())
   }
   changed()
 }
@@ -131,20 +121,18 @@ export const clearWords = (locale?: string): void => {
  * that renders several sets `lang` or `locale` on the elements.
  */
 export const setDefaultWordsLocale = (locale: string): void => {
-  held().fallback = locale
+  held.fallback = locale
   changed()
 }
 
 /** The locale set with `setDefaultWordsLocale`. */
-export const defaultWordsLocale = (): string => held().fallback
+export const defaultWordsLocale = (): string => held.fallback
 
 /**
  * Asks every element that reads words to update, after an ancestor's `lang`
  * changes. A change to the document's own `lang` is watched for you.
  */
-export const refreshWords = (): void => {
-  changed()
-}
+export const refreshWords = (): void => changed()
 
 /** The tags each locale falls back through, worked out once each. */
 const chains = new Map<string, string[]>()
@@ -164,24 +152,26 @@ export const localeChain = (locale: string): string[] => {
   if (found) {
     return found
   }
-  const tags: string[] = []
+  let tags: string[] = []
   try {
     const asked = new Intl.Locale(locale)
-    const full = asked.maximize?.() ?? asked
-    tags.push(
+    const full = asked.maximize?.()
+    const script = `${full?.language}-${full?.script}`
+    tags = [
       asked.baseName,
-      `${full.language}-${full.script}-${full.region}`,
-      `${full.language}-${full.script}`,
-      asked.region ? `${asked.language}-${asked.region}` : '',
+      `${script}-${full?.region}`,
+      script,
+      `${asked.language}-${asked.region}`,
       asked.language,
-    )
+    ]
   } catch {
     /* No tag `Intl` takes: English. */
   }
-  tags.push('en')
   found = [
     ...new Set(
-      tags.filter((tag) => tag && !tag.includes('undefined')).map((tag) => tag.toLowerCase()),
+      [...tags, 'en']
+        .filter((tag) => tag && !tag.includes('undefined'))
+        .map((tag) => tag.toLowerCase()),
     ),
   ]
   chains.set(locale, found)
@@ -189,7 +179,7 @@ export const localeChain = (locale: string): string[] => {
 }
 
 /** Whether any words are registered, for a read that can skip the lookup. */
-export const wordsRegistered = (): boolean => held().packs.size > 0
+export const wordsRegistered = (): boolean => held.packs.size > 0
 
 /**
  * A registered word for a tag's property in a locale, with the locale it was
@@ -204,10 +194,9 @@ export const lookupWord = (
   tag: string,
   name: string,
 ): [Message | MessageTable, string] | undefined => {
-  const { packs } = held()
   let found: [Message | MessageTable, string] | undefined
   for (const one of localeChain(locale)) {
-    const word = packs.get(one)?.[tag]?.[name]
+    const word = held.packs.get(one)?.[tag]?.[name]
     if (word === undefined) {
       continue
     }
@@ -228,15 +217,12 @@ export const lookupWord = (
  * for the page.
  */
 export const watchWords = (watcher: () => void): (() => void) => {
-  const registry = held()
-  registry.watchers.add(watcher)
-  if (!registry.observed && typeof MutationObserver === 'function' && globalThis.document) {
-    registry.observed = true
+  held.watchers.add(watcher)
+  if (!held.observed && typeof MutationObserver === 'function' && globalThis.document) {
+    held.observed = true
     new MutationObserver(changed).observe(document.documentElement, {
       attributeFilter: ['lang'],
     })
   }
-  return () => {
-    registry.watchers.delete(watcher)
-  }
+  return () => held.watchers.delete(watcher)
 }
