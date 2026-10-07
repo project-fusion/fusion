@@ -491,3 +491,40 @@ describe('map frame, states', () => {
     expect(hasState(host, 'layers-open')).toBe(true)
   })
 })
+
+/**
+ * What the console was warned while `markup` mounted and settled. The
+ * warning is in development builds only: `test:dom` passes
+ * `--conditions helix-development`, which core's `#audit-name` reads.
+ */
+const warnedOn = async (markup: string): Promise<string[]> => {
+  const warnings: string[] = []
+  const original = console.warn
+  console.warn = (message: string) => warnings.push(message)
+  try {
+    await mount(markup)
+    await new Promise((done) => setTimeout(done, 5))
+  } finally {
+    console.warn = original
+  }
+  return warnings.filter((warning) => warning.includes('accessible name'))
+}
+
+describe('a map with no name', () => {
+  test('is reported once, by its tag', async () => {
+    const warnings = await warnedOn('<helix-headless-map></helix-headless-map>')
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0]).toContain('<helix-headless-map> has no accessible name')
+  })
+
+  test('and one named by `label` or `aria-label` is not, and its region takes the name', async () => {
+    for (const markup of [
+      '<helix-headless-map label="Release plan"></helix-headless-map>',
+      '<helix-headless-map aria-label="Release plan"></helix-headless-map>',
+    ]) {
+      expect([markup, ...(await warnedOn(markup))]).toEqual([markup])
+      const host = document.body.lastElementChild as HTMLElement
+      expect(part(host, 'region')?.getAttribute('aria-label')).toBe('Release plan')
+    }
+  })
+})

@@ -1,4 +1,5 @@
 import {
+  auditName,
   customElement,
   focusItemOf,
   formatWords,
@@ -928,6 +929,14 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
     this.finishHydration()
+    /* A map with no name is read as "Map", which says nothing of where it is.
+       Development builds only. */
+    auditName(
+      this,
+      () => null,
+      'Give it a `label` that says what the map shows, such as "Stores in Edinburgh".',
+      () => this.label !== '',
+    )
   }
 
   /**
