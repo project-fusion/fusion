@@ -7,6 +7,7 @@ import {
   IndicatorController,
   KeyboardNavigationController,
   type NavigableItem,
+  reportRuntime,
   words,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
@@ -49,6 +50,12 @@ const navigable = (item: HTMLElement): NavigableItem => {
   })
 }
 
+/** The navigations on the page, to tell two with one name apart. */
+const connected = new Set<HelixHeadlessNavigation>()
+
+/** The navigations already warned about, each once. */
+const warned = new WeakSet<HelixHeadlessNavigation>()
+
 /**
  * @summary A set of destinations, with a marker on the current one.
  *
@@ -85,6 +92,15 @@ const navigable = (item: HTMLElement): NavigableItem => {
  * links and not a single control, and the keys across the other axis are
  * left to the page and to an open panel.
  *
+ * While a `Megamenu`, or another disclosure among the destinations, is open,
+ * the navigation is `:state(open)`, so a page can dim what lies under the
+ * panel, as Radix's navigation menu marks its open state.
+ *
+ * A screen reader lists the page's navigation landmarks by name, so two named
+ * alike cannot be told apart. Where another navigation in the same document
+ * has the same name, "Main" for two with no `label`, the later one warns once
+ * with the kind `duplicate-name`.
+ *
  * @since 0.1.0
  * @status stable
  * @category navigation
@@ -96,6 +112,8 @@ const navigable = (item: HTMLElement): NavigableItem => {
  *
  * @csspart indicator - The marker that moves to the current destination. It carries the destination's place and size as `--indicator-x`, `--indicator-y`, `--indicator-inline-size` and `--indicator-block-size`, and `data-placed` once it has been placed.
  * @csspart nav - The navigation landmark.
+ *
+ * @cssstate open - While a megamenu or another disclosure among the destinations is open.
  */
 @customElement('helix-headless-navigation')
 export class HelixHeadlessNavigation extends HelixElement {
@@ -173,6 +191,71 @@ export class HelixHeadlessNavigation extends HelixElement {
 
   private current: MutationObserver | undefined
 
+  /** The disclosures among the destinations that are open. */
+  private readonly opened = new Set<EventTarget>()
+
+  /**
+   * Hears a disclosure among the destinations open or close. In capture,
+   * because `toggle` does not bubble.
+   */
+  private readonly handleToggle = (event: Event): void => {
+    const target = event.target
+    if (target === this || target === null) {
+      return
+    }
+    if ((event as ToggleEvent).newState === 'open') {
+      this.opened.add(target)
+    } else {
+      this.opened.delete(target)
+    }
+    this.toggleState('open', this.opened.size > 0)
+  }
+
+  /** The landmark's name as a screen reader lists it. */
+  private get landmarkName(): string {
+    const labelled = this.getAttribute('aria-labelledby')
+    if (labelled) {
+      const root = this.getRootNode() as Document | ShadowRoot
+      return labelled
+        .split(/\s+/)
+        .map((id) => root.getElementById?.(id)?.textContent?.trim() ?? '')
+        .join(' ')
+        .trim()
+    }
+    return (this.getAttribute('aria-label') ?? this.label).trim()
+  }
+
+  /**
+   * Warns once where another navigation in the same document has the same
+   * name, a task after the first render, so the page's other landmarks have
+   * rendered too.
+   */
+  private auditTwin(): void {
+    setTimeout(() => {
+      if (!this.isConnected || warned.has(this)) {
+        return
+      }
+      const name = this.landmarkName
+      const root = this.getRootNode()
+      const twin = [...connected].some(
+        (other) =>
+          other !== this &&
+          other.isConnected &&
+          (other.compareDocumentPosition(this) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0 &&
+          other.getRootNode() === root &&
+          other.landmarkName === name,
+      )
+      if (twin) {
+        warned.add(this)
+        reportRuntime({
+          kind: 'duplicate-name',
+          message: `<${this.localName}> has the name "${name}", which another navigation on the page has too, so a screen reader lists the two alike. Give each a \`label\` that says what it holds, such as "Footer".`,
+          tag: this.localName,
+        })
+      }
+    })
+  }
+
   /**
    * The destinations the consumer slotted, and the items of a slotted list in
    * place of the list.
@@ -216,6 +299,8 @@ export class HelixHeadlessNavigation extends HelixElement {
    * render and there is nothing to watch yet. */
   override connectedCallback(): void {
     super.connectedCallback()
+    connected.add(this)
+    this.addEventListener('toggle', this.handleToggle, true)
     if (this.hasUpdated) {
       this.watch()
     }
@@ -223,12 +308,17 @@ export class HelixHeadlessNavigation extends HelixElement {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    connected.delete(this)
+    this.removeEventListener('toggle', this.handleToggle, true)
+    this.opened.clear()
+    this.toggleState('open', false)
     this.current?.disconnect()
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
     this.watch()
+    this.auditTwin()
   }
 
   protected override render(): TemplateResult {

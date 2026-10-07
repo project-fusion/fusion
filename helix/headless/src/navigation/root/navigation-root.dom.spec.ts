@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -160,5 +160,53 @@ describe('destinations written as a list', () => {
       }
     ).indicator.options
     expect(placing.active()?.textContent?.trim()).toBe('Mind')
+  })
+})
+
+describe('two navigations with one name', () => {
+  const warnedOn = async (markup: string): Promise<string[]> => {
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      document.body.innerHTML = markup
+      await new Promise((done) => setTimeout(done, 5))
+    } finally {
+      console.warn = original
+    }
+    return warnings
+  }
+
+  /* A screen reader lists landmarks by name, and two called "Main" cannot be
+     told apart. */
+  test('warn once, from the later one', async () => {
+    const warnings = await warnedOn(
+      '<helix-headless-navigation><a href="/">Home</a></helix-headless-navigation><helix-headless-navigation><a href="/legal">Legal</a></helix-headless-navigation>',
+    )
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0]).toContain('has the name "Main"')
+  })
+
+  test('and two named apart do not', async () => {
+    const warnings = await warnedOn(
+      '<helix-headless-navigation><a href="/">Home</a></helix-headless-navigation><helix-headless-navigation aria-label="Footer"><a href="/legal">Legal</a></helix-headless-navigation>',
+    )
+    expect(warnings).toEqual([])
+  })
+})
+
+describe('a navigation holding an open disclosure', () => {
+  /* A page dims what lies under an open megamenu panel by this state. */
+  test('is open while one is, and not once it closes', async () => {
+    const nav = await mount(`<helix-headless-navigation label="Sections">
+      <details><summary>More</summary><a href="/a">A</a></details>
+    </helix-headless-navigation>`)
+    const details = nav.querySelector('details') as HTMLDetailsElement
+    /* As the browser sends it, which happy-dom has no class for. */
+    const toggle = (newState: string): Event => Object.assign(new Event('toggle'), { newState })
+    details.dispatchEvent(toggle('open'))
+    expect(hasState(nav, 'open')).toBe(true)
+    details.dispatchEvent(toggle('closed'))
+    expect(hasState(nav, 'open')).toBe(false)
   })
 })
