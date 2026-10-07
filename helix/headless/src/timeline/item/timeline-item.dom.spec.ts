@@ -99,7 +99,7 @@ describe('a relative time', () => {
   })
 
   test('is written from datetime where nothing is slotted, and moves on as it goes stale', async () => {
-    const said = Date.now() - 90_000
+    const said = Date.now() - 80_000
     const element = await entry(
       `lang="en" relative datetime="${new Date(said).toISOString()}"`,
       'Shipped',

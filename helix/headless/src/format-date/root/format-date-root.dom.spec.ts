@@ -175,12 +175,13 @@ const stopped = () => {
 describe('a reading left on the page', () => {
   test('moves on by itself when its words go stale, and not before', async () => {
     const clock = stopped()
-    const moment = new Date(clock.now() - 42 * 60_000 - 30_000).toISOString()
+    const moment = new Date(clock.now() - 42 * 60_000 - 10_000).toISOString()
     const element = await stamp(
       `<helix-headless-format-date elapsed locale="en-US" date="${moment}"></helix-headless-format-date>`,
     )
     expect(part(element, 'time')?.textContent).toBe('42m')
-    clock.advance(20_000)
+    /* Rounded, so 42 minutes turns to 43 at 42 and a half. */
+    clock.advance(15_000)
     await element.updateComplete
     expect(part(element, 'time')?.textContent).toBe('42m')
     clock.advance(10_000)
@@ -193,7 +194,7 @@ describe('a reading left on the page', () => {
 describe('a frozen reading', () => {
   test('stays as it was drawn, and catches up once it is not frozen', async () => {
     const clock = stopped()
-    const moment = new Date(clock.now() - 42 * 60_000 - 30_000).toISOString()
+    const moment = new Date(clock.now() - 42 * 60_000 - 10_000).toISOString()
     const element = (await stamp(
       `<helix-headless-format-date elapsed frozen locale="en-US" date="${moment}"></helix-headless-format-date>`,
     )) as Stamp & { frozen: boolean }
@@ -242,6 +243,20 @@ describe('relative written as a flag', () => {
       )
       expect(part(element, 'time')?.textContent).toBe('3 hours ago')
     }
+  })
+})
+
+describe('a relative count', () => {
+  /* Measured before this in Chromium: a date two days ahead, read the moment
+     after it was set, said "tomorrow". Shoelace rounds the count. */
+  test('is rounded, so two days ahead reads as two days', async () => {
+    const element = await stamp(
+      '<helix-headless-format-date relative="long" locale="en-US"></helix-headless-format-date>',
+    )
+    element.date = Date.now() + 2 * 86_400_000 - 50
+    await element.updateComplete
+    expect(part(element, 'time')?.textContent).toBe('in 2 days')
+    expect(part(element, 'time')?.getAttribute('aria-label')).toBe('in 2 days')
   })
 })
 

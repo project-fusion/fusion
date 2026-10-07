@@ -34,6 +34,20 @@ describe('the reading', () => {
     expect(read(at(-86_400_000), now).text).toBe('yesterday')
   })
 
+  /* Shoelace rounds; truncated, 48 hours ahead read a few milliseconds later
+     was "tomorrow". */
+  test('the count is rounded, so two days ahead read a moment later is still two days', () => {
+    expect(read(at(2 * 86_400_000 - 5), now).text).toBe('in 2 days')
+    expect(read(at(-100_000), now).text).toBe('2 minutes ago')
+    expect(read(at(-80_000), now).text).toBe('1 minute ago')
+  })
+
+  test('a count that rounds up to the next unit reads in that unit', () => {
+    expect(read(at(-59.6 * 60_000), now).text).toBe('1 hour ago')
+    expect(read(at(-23.6 * 3_600_000), now).text).toBe('yesterday')
+    expect(read(at(6.6 * 86_400_000), now).text).toBe('next week')
+  })
+
   test('a future timestamp reads as the future rather than as a negative past', () => {
     expect(read(at(120_000), now).text).toBe('in 2 minutes')
   })
@@ -49,13 +63,27 @@ describe('when it stops being true', () => {
   })
 
   /**
-   * The off-by-one that matters: an item at 90 seconds is "1 minute ago" for
-   * another 30 seconds, not another 60. Scheduled on the whole unit, every item
+   * The off-by-one that matters: an item at 100 seconds is "2 minutes ago" for
+   * another 50 seconds, not another 60. Scheduled on the whole unit, every item
    * in a feed drifts by up to one unit and stays wrong until the next tick.
    */
-  test('the wait is the rest of the current unit, not the whole of one', () => {
-    expect(read(at(-90_000), now).next).toBe(30_000)
-    expect(read(at(-5_400_000), now).next).toBe(1_800_000)
+  test('the wait is until the count turns over, not a whole unit', () => {
+    expect(read(at(-100_000), now).next).toBe(50_000)
+    expect(read(at(-80_000), now).next).toBe(10_000)
+    expect(read(at(-6_000_000), now).next).toBe(3_000_000)
+  })
+
+  /* A moment to come draws nearer, so its count turns over on the way down:
+     "in 2 days" holds until a day and a half is left. */
+  test('a moment to come waits until its count turns over on the way down', () => {
+    expect(read(at(2 * 86_400_000), now).next).toBeLessThanOrEqual(3_600_000)
+    const minutes = read(at(160_000), now)
+    expect(minutes.text).toBe('in 3 minutes')
+    expect(minutes.next).toBe(10_001)
+    /* 59.6 minutes ahead reads an hour, and turns to minutes at 59.5. */
+    const hour = read(at(3_576_000), now)
+    expect(hour.text).toBe('in 1 hour')
+    expect(hour.next).toBe(6001)
   })
 
   /**
