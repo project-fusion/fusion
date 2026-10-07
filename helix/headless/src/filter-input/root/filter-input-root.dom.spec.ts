@@ -334,3 +334,21 @@ describe('the arrow keys and the tokens', () => {
     expect(filter.shadowRoot?.activeElement === control).toBe(true)
   })
 })
+
+/* Each token's remove button was a tab stop of its own, so Tab through a field
+   holding three filters took four presses. A `multiple` Combobox already keeps
+   its text as the one stop. */
+describe('the tab order', () => {
+  test('holds the text and no token', async () => {
+    const filter = await mount(WITH_TAGS)
+    await settle(filter as Updatable)
+    const tokens = slotted(filter, 'tags') as (HTMLElement & {
+      updateComplete: Promise<unknown>
+    })[]
+    await Promise.all(tokens.map((token) => token.updateComplete))
+    for (const token of tokens) {
+      expect(part(token, 'dismiss')?.getAttribute('tabindex')).toBe('-1')
+    }
+    expect(part(filter, 'control')?.hasAttribute('tabindex')).toBe(false)
+  })
+})

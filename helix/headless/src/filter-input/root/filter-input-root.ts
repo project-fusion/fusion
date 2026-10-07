@@ -86,8 +86,9 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * first colon, reads a leading `-` as the negation, and reads a word in
  * brackets before the colon as the comparison.
  *
- * **Keyboard.** Focus stays in the text. The text names the highlighted
- * suggestion as its `aria-activedescendant`.
+ * **Keyboard.** Focus stays in the text, which is the field's one tab stop. The
+ * text names the highlighted suggestion as its `aria-activedescendant`, and the
+ * arrow keys reach the tokens.
  *
  * | Key | What it does |
  * |---|---|
@@ -918,9 +919,29 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
     this.leading = (event.target as HTMLSlotElement).assignedNodes({ flatten: true }).length > 0
   }
 
-  /** The row again, whenever what is in it changes. */
+  /**
+   * The row again, whenever what is in it changes.
+   *
+   * **And the text is the field's one tab stop.** Each token's remove button
+   * was a stop of its own, so Tab through a field with five filters took six
+   * presses. A `Tag` or `FilterChip` takes `dismissTabStop` for this, as the
+   * tags of a `multiple` Combobox do, and the arrow keys still reach every one.
+   * A token not yet defined is told once it is.
+   */
   private readonly handleTokens = (): void => {
     this.over = this.hideOverflow(this.tokens)
+    for (const token of this.tokenElements()) {
+      const quiet = (): void => {
+        if ('dismissTabStop' in token) {
+          ;(token as HTMLElement & { dismissTabStop: boolean }).dismissTabStop = false
+        }
+      }
+      if (token.localName.includes('-') && !customElements.get(token.localName)) {
+        void customElements.whenDefined(token.localName).then(quiet)
+      } else {
+        quiet()
+      }
+    }
   }
 
   /** The tokens slotted in `tags`, which the arrow keys reach from the text. */

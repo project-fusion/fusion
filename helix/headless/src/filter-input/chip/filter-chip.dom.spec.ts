@@ -146,3 +146,16 @@ describe('a chip with nothing to compare against', () => {
     expect(marked.shadowRoot?.querySelector('[part="values"]')).not.toBeNull()
   })
 })
+
+describe('the remove button in the tab order', () => {
+  test('is a stop of its own, until a field takes the stop', async () => {
+    const element = (await chip('dismissible label="Status"')) as HTMLElement & {
+      dismissTabStop: boolean
+      updateComplete: Promise<unknown>
+    }
+    expect(part(element, 'dismiss')?.hasAttribute('tabindex')).toBe(false)
+    element.dismissTabStop = false
+    await element.updateComplete
+    expect(part(element, 'dismiss')?.getAttribute('tabindex')).toBe('-1')
+  })
+})
