@@ -6,12 +6,25 @@ import {
   HelixFormElement,
   MixinControllerValue,
   MixinField,
+  reportValues,
   restoreValue,
   words,
   wordsLocale,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+
+/** The keys a native range moves its thumb with. */
+const SLIDER_KEYS = new Set([
+  'ArrowDown',
+  'ArrowLeft',
+  'ArrowRight',
+  'ArrowUp',
+  'End',
+  'Home',
+  'PageDown',
+  'PageUp',
+])
 
 /**
  * @summary A value chosen from a range by dragging.
@@ -31,7 +44,8 @@ import { property } from 'lit/decorators.js'
  * does not draw a hundred and one marks by accident.
  *
  * A range with two thumbs is two inputs stacked on one track, because there is
- * no native two-thumb range. Each thumb keeps its own value.
+ * no native two-thumb range. Each thumb keeps its own value, and a named range
+ * submits two entries under its name, the lower first.
  * `min-steps-between-thumbs` keeps them that many steps apart, and the readout
  * joins the two as `range-text` writes them.
  *
@@ -61,6 +75,8 @@ import { property } from 'lit/decorators.js'
  * | Left, Down | Moves the thumb down by `step`. |
  * | Page Up, Page Down | Moves the thumb by a larger step. |
  * | Home, End | Moves the thumb to its lowest or highest value. |
+ *
+ * Under `readonly` none of these move the thumb, and Tab still reaches it.
  *
  * Each thumb is an `<input type="range">` with `aria-valuetext` where the value
  * is formatted or worded. A range's thumbs say they stop at each other with
@@ -234,9 +250,11 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   /**
    * Adds a second thumb, so the value is a pair.
    *
-   * The pair is one string, `"10,50"`, which is what a form submits and what
-   * `MixinControllerValue` already holds. `valueAsNumber` reads the lower of
-   * the two, since a range has no single number.
+   * The pair is one string, `"10,50"`, which is what `value` and
+   * `MixinControllerValue` hold. A form receives two entries under the name,
+   * `price=10&price=50`, as React Aria's two thumbs send theirs.
+   * `valueAsNumber` reads the lower of the two, since a range has no single
+   * number.
    */
   @property({ reflect: true, type: Boolean })
   range = false
@@ -248,6 +266,17 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   @words
   @property({ attribute: 'range-text' })
   rangeText = '{start} to {end}'
+
+  /**
+   * Whether a reader can see and focus the value and cannot change it. A
+   * read-only slider still submits its value.
+   *
+   * React Aria's `isReadOnly`. Each thumb stays a tab stop and says
+   * `aria-readonly`. The arrow keys, the page keys, Home, End, and a drag
+   * leave the value where it is. A script can still set `value`.
+   */
+  @property({ attribute: 'readonly', reflect: true, type: Boolean })
+  readOnly = false
 
   /**
    * Shows the chosen value beside the track.
@@ -380,6 +409,14 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
     // `input` is composed and would reach a consumer beside this element's.
     event.stopPropagation()
     const control = event.target as HTMLInputElement
+    if (this.readOnly) {
+      const [start, end] = this.bounds
+      restoreValue(
+        control,
+        this.range ? String(control.dataset.thumb === 'start' ? start : end) : this.value,
+      )
+      return
+    }
     if (this.range) {
       const [start, end] = this.bounds
       const moved = Number(control.value)
@@ -410,12 +447,31 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   /** Relayed, because `change` does not cross a shadow boundary on its own. */
   private readonly handleChange = (event: Event): void => {
     event.stopPropagation()
-    this.announceChange()
+    if (!this.readOnly) {
+      this.announceChange()
+    }
   }
 
-  /** Reports the value. */
+  /**
+   * Keeps a read-only thumb still under the keys that move it. Tab and every
+   * other key pass, so focus moves on.
+   */
+  private readonly handleKeydown = (event: KeyboardEvent): void => {
+    if (this.readOnly && SLIDER_KEYS.has(event.key)) {
+      event.preventDefault()
+    }
+  }
+
+  /**
+   * Reports the value: one entry, or for a named range one entry per thumb.
+   * The joined pair is the state the browser restores.
+   */
   private sync(): void {
-    this.internals.setFormValue(this.value)
+    if (this.range && this.name) {
+      reportValues(this.internals, this.name, this.value.split(','))
+    } else {
+      this.internals.setFormValue(this.value)
+    }
     this.refreshFeedback()
   }
 
@@ -661,9 +717,11 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
         aria-valuetext=${this.spoken(at)}
         aria-describedby=${this.describedBy ?? nothing}
         aria-invalid=${this.invalidity ?? nothing}
+        aria-readonly=${this.readOnly ? 'true' : nothing}
         ?disabled=${this.isDisabled}
         @input=${this.handleInput}
         @change=${this.handleChange}
+        @keydown=${this.handleKeydown}
       />`
 
     /* `data-markers` mirrors "there are marks" for the stylesheet.
@@ -720,9 +778,11 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
               aria-valuetext=${this.spoken(this.value)}
               aria-describedby=${this.describedBy ?? nothing}
               aria-invalid=${this.invalidity ?? nothing}
+              aria-readonly=${this.readOnly ? 'true' : nothing}
               ?disabled=${this.isDisabled}
               @input=${this.handleInput}
               @change=${this.handleChange}
+              @keydown=${this.handleKeydown}
             />`
       }
       ${
