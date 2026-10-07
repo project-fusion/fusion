@@ -17,6 +17,7 @@ import {
   MixinPickerField,
   MixinSegmentedField,
   MixinTokens,
+  readWrittenTime,
   timeFault,
   words,
   wordsLocale,
@@ -48,9 +49,10 @@ import '../../time-picker/index.js'
  * `seconds`, because that is what the form
  * submits, what `min` and `max` compare against, and what sorts correctly as a
  * string. While idle, the field shows the time in the user's locale format.
- * Once the caret is in the field, it shows the value itself, because a
- * formatted time such as `2:30 PM` cannot be typed back and `Intl` has no
- * parser for it.
+ * Once the caret is in the field, it shows the value itself. You can type
+ * `14:30`, or a time as you write one, such as `2:30 PM`, `2.30pm`, or
+ * `14h30`, and the field reads it as you leave it, with AM and PM in the
+ * locale's words.
  *
  * Typing sends `input` on each keystroke and `change` when you leave the
  * field. The trigger and ArrowDown open the list, and so does a press into the
@@ -429,15 +431,41 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
   }
 
   /** Adds what was typed to the set, or takes the last one back out. */
+  /**
+   * A time as the reader wrote it, as the value writes one: `HH:mm` as it
+   * is, and `2:30 PM`, `2.30pm`, `14h30`, or `1430` read back, with the half
+   * of the day in the locale's words. Empty where it is no time.
+   */
+  private read(text: string): string {
+    return this.isTime(text) ? text : readWrittenTime(text, this.language, this.seconds)
+  }
+
+  /**
+   * The text the reader leaves, read: a time written as a reader writes one
+   * becomes the value as the field commits. Not on each key, where `2:3` is
+   * a time a moment before it is `2:30`.
+   */
+  private readonly handleTextCommit = (event: Event): void => {
+    if (this.mode !== 'multiple') {
+      const held = this.held
+      const read = held.map((one) => this.read(one))
+      if (held.length > 0 && !held.every((one) => this.isTime(one)) && read.every(Boolean)) {
+        this.requestValue(read.join(','))
+      }
+    }
+    this.handleCommit(event)
+  }
+
   private readonly handleDraftKey = (event: KeyboardEvent): void => {
     if (this.mode !== 'multiple') {
       return
     }
     const held = this.held
-    if (event.key === 'Enter' && this.isTime(this.draft)) {
+    const draft = this.read(this.draft.trim())
+    if (event.key === 'Enter' && draft !== '') {
       event.preventDefault()
-      if (!held.includes(this.draft)) {
-        this.requestPicked([...held, this.draft].sort().join(','))
+      if (!held.includes(draft)) {
+        this.requestPicked([...held, draft].sort().join(','))
       }
       this.draft = ''
     } else if (event.key === 'Backspace' && this.draft === '' && held.length > 0) {
@@ -732,7 +760,7 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
       ?readonly=${this.readOnly}
       ?required=${this.required}
       @blur=${this.handleBlur}
-      @change=${this.handleCommit}
+      @change=${this.handleTextCommit}
       @focus=${this.handleFocus}
       @input=${this.handleInput}
       @keydown=${this.handleDraftKey}

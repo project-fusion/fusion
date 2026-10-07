@@ -488,3 +488,140 @@ export const segmentName = (kind: SegmentKind, locale: string): string => {
     return kind
   }
 }
+
+/** The first code point of each run of ten decimal digits a locale may write: Arabic-Indic, Persian, Devanagari, Bengali, Thai, full-width, and others. */
+const ZEROS = [
+  0x660, 0x6f0, 0x966, 0x9e6, 0xa66, 0xae6, 0xb66, 0xbe6, 0xc66, 0xce6, 0xd66, 0xe50, 0xed0, 0xf20,
+  0x1040, 0x17e0, 0x1810, 0xff10,
+]
+
+/** Text with every decimal digit a locale writes turned into `0` to `9`. */
+const latinDigits = (text: string): string =>
+  text.replace(/\p{Nd}/gu, (char) => {
+    const code = char.charCodeAt(0)
+    const zero = ZEROS.find((one) => code >= one && code < one + 10)
+    return zero === undefined ? char : String(code - zero)
+  })
+
+/** A two-digit year, read as the year within eighty years back and twenty forward. */
+const wholeYear = (year: number, digits: number, now: number): number => {
+  if (digits > 2) {
+    return year
+  }
+  const century = Math.floor(now / 100) * 100
+  const near = century + year
+  return near > now + 20 ? near - 100 : near
+}
+
+/**
+ * The date a reader wrote in the order and the digits of `locale`, as
+ * `YYYY-MM-DD`, or empty where it is no date.
+ *
+ * `8/4/2026` in `en-US` and `4.8.2026` in `de-DE` are August 4, 2026, and a
+ * month written as a word, `Aug 4, 2026` or `4. August 2026`, is read by its
+ * name in the Gregorian calendar. A first number of four digits is a year,
+ * as ISO writes it. A year of two digits is the nearest year within eighty
+ * years back and twenty forward. `Intl` formats and does not parse, so this
+ * reads the numbers back in the order `segmentLayout` finds the locale
+ * writing them. Under `system`, the numbers are that calendar's year, month,
+ * and day.
+ */
+export const readWrittenDate = (text: string, locale: string, system?: MonthSystem): string => {
+  const plain = latinDigits(text).toLowerCase()
+  const numbers = [...plain.matchAll(/\d+/g)].map((match) => match[0])
+  let order: SegmentKind[] = segmentLayout('date', locale).flatMap((slot) =>
+    'kind' in slot && slot.kind !== 'dayPeriod' ? [slot.kind] : [],
+  )
+  const found: Segments = {}
+  if (!system) {
+    /* A month written as a word: its long name, or the short one with any
+       dot, whichever the text holds. */
+    const names = (style: 'long' | 'short'): string[] =>
+      Array.from({ length: 12 }, (_, index) =>
+        new Intl.DateTimeFormat(locale || undefined, { month: style, timeZone: 'UTC' })
+          .format(new Date(Date.UTC(2000, index, 1)))
+          .toLowerCase()
+          .replace(/\.$/, ''),
+      )
+    const words = plain.match(/\p{L}+/gu) ?? []
+    for (const style of ['long', 'short'] as const) {
+      const at = names(style).findIndex(
+        (name) => name.length > 1 && words.some((word) => word === name),
+      )
+      if (at >= 0 && found.month === undefined) {
+        found.month = at + 1
+        order = order.filter((kind) => kind !== 'month')
+      }
+    }
+  }
+  if (numbers.length !== order.length || numbers.length === 0) {
+    return ''
+  }
+  if ((numbers[0] as string).length >= 3) {
+    const shown = order
+    order = (['year', 'month', 'day'] as SegmentKind[]).filter((kind) => shown.includes(kind))
+  }
+  const now = system ? system.parts(new Date()).year : new Date().getFullYear()
+  order.forEach((kind, index) => {
+    const digits = numbers[index] as string
+    found[kind] = kind === 'year' ? wholeYear(Number(digits), digits.length, now) : Number(digits)
+  })
+  const { day, month, year } = found
+  if (day === undefined || month === undefined || year === undefined || year < 1 || year > 9999) {
+    return ''
+  }
+  if (month < 1 || month > monthsIn(year, system) || day < 1 || day > daysIn(month, year, system)) {
+    return ''
+  }
+  return system
+    ? fromDate(system.from(year, month, day))
+    : segmentsValue('date', found, [{ kind: 'year' }, { kind: 'month' }, { kind: 'day' }])
+}
+
+/**
+ * The time a reader wrote, as `HH:mm`, or `HH:mm:ss` with `seconds`, or empty
+ * where it is no time.
+ *
+ * Reads `2:30 PM`, `2.30pm`, `14h30`, and `3 pm` alike, with the half of the
+ * day in the locale's own words or as `am` and `pm`, and digits in the
+ * locale's own script.
+ */
+export const readWrittenTime = (text: string, locale: string, seconds = false): string => {
+  const plain = latinDigits(text).toLowerCase()
+  const numbers = [...plain.matchAll(/\d+/g)].map((match) => Number(match[0]))
+  const letters = plain.replace(/[\d\s:.,h]/g, '')
+  const words = [0, 1].map((half) =>
+    segmentText('dayPeriod', { dayPeriod: half }, true, locale).toLowerCase().replace(/\./g, ''),
+  )
+  const bare = letters.replace(/\./g, '')
+  const half =
+    bare === ''
+      ? undefined
+      : words.indexOf(bare) >= 0
+        ? words.indexOf(bare)
+        : /^a(m)?$/.test(bare)
+          ? 0
+          : /^p(m)?$/.test(bare)
+            ? 1
+            : -1
+  if (half === -1 || numbers.length === 0 || numbers.length > 3) {
+    return ''
+  }
+  /* `1430` is 14:30, as a reader typing digits alone means it. */
+  if (numbers.length === 1 && /\d{3,4}/.test(plain)) {
+    const run = numbers[0] as number
+    numbers.splice(0, 1, Math.floor(run / 100), run % 100)
+  }
+  let [hour = 0, minute = 0, second = 0] = numbers
+  if (half !== undefined) {
+    if (hour < 1 || hour > 12) {
+      return ''
+    }
+    hour = (hour % 12) + half * 12
+  }
+  if (hour > 23 || minute > 59 || second > 59) {
+    return ''
+  }
+  const pad = (number: number): string => String(number).padStart(2, '0')
+  return seconds ? `${pad(hour)}:${pad(minute)}:${pad(second)}` : `${pad(hour)}:${pad(minute)}`
+}
