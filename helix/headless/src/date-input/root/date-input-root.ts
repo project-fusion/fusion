@@ -127,11 +127,11 @@ const dates = (value: string): string[] =>
  * @slot trigger - The icon on the button that opens the calendar.
  *
  * @event {Event} change - Fired after the value changes.
- * @event {Event} input - Fired after the value changes.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the date changes. Cancelable: call `preventDefault()` to keep the current date.
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the calendar closes. Cancelable: call `preventDefault()` to keep it open.
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the calendar opens. Cancelable: call `preventDefault()` to keep it closed.
  * @event {HelixClearEvent} helix-clear - Fired after the clear button has emptied the field, after `input` and `change`.
+ * @event {Event} input - Fired after the value changes.
  * @event {ToggleEvent} toggle - Fired when the calendar opens or closes, with `newState` and `oldState`.
  *
  * @csspart clear - The button that empties the field, under `clearable`, while it holds a date.
