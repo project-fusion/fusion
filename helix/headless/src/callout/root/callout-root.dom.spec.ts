@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, hasState, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -226,5 +226,31 @@ describe('a dismissible callout', () => {
     removed.addEventListener('helix-dismiss', () => removed.remove())
     dismissOf(removed).click()
     expect(removed.open).toBe(true)
+  })
+})
+
+describe('what a dismissal says and how the note lays out', () => {
+  /* The button is named from the heading, so the event names the same note. */
+  test('helix-dismiss carries the heading where there is one, the words the button is named by', async () => {
+    const note = await mount(
+      '<helix-headless-callout dismissible><span slot="heading">Payment failed</span>Card declined.</helix-headless-callout>',
+    )
+    const button = part(note, 'dismiss') as HTMLButtonElement
+    expect(button.getAttribute('aria-label')).toBe('Dismiss Payment failed')
+    let heard = ''
+    note.addEventListener('helix-dismiss', (event) => {
+      heard = (event as CustomEvent<{ label: string }>).detail.label
+    })
+    button.click()
+    expect(heard).toBe('Payment failed')
+  })
+
+  /* A passage set apart is a block, with no stylesheet from the page. */
+  const run = hasLayout() ? test : (): void => {}
+  run('the headless note is a block', async () => {
+    const note = await mount(
+      '<helix-headless-callout>Drafts save every minute.</helix-headless-callout>',
+    )
+    expect(getComputedStyle(note).display).toBe('block')
   })
 })
