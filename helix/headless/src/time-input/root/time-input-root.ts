@@ -3,13 +3,13 @@ import {
   valueAsTime as asTime,
   clockLocale,
   customElement,
-  fillTemplate,
+  formatWords,
   timeAsValue as fromTime,
   type HelixBeforeChangeEvent,
   HelixFormElement,
   type HourCycle,
+  handedLocale,
   isClockValue,
-  localeOf,
   MixinControllerOpen,
   MixinControllerValue,
   MixinField,
@@ -18,6 +18,8 @@ import {
   MixinSegmentedField,
   MixinTokens,
   timeFault,
+  words,
+  wordsLocale,
   writeClock,
 } from '@fusion.dev/helix-core'
 import { clock } from '@fusion.dev/helix-icons'
@@ -150,6 +152,12 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
     ),
   ),
 ) {
+  /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-time-input': { triggerLabel: 'Uhrzeit auswählen' } })`.
+   */
+  static words = 'helix-time-input'
+
   /* A consumer's `aria-describedby` names ids in their own tree and the control
      is in this shadow root, so the reference has to be carried down as an
      element rather than copied as an id. See `AriaForwardController`: measured
@@ -198,9 +206,9 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
   @property()
   locale = ''
 
-  /** The locale the words are written in: `locale`, or the page's `lang`. */
+  /** The locale the words and times are written in: `locale`, or the page's `lang`. */
   private get language(): string {
-    return localeOf(this, this.locale)
+    return wordsLocale(this)
   }
 
   /**
@@ -229,6 +237,7 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
   /**
    * Placeholder text shown before a time is entered.
    */
+  @words
   @property()
   placeholder = 'HH:mm'
 
@@ -236,25 +245,28 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
    * The message shown when a range holds more than two times.
    *
    * **Every sentence a control raises in the browser's bubble is a property**,
-   * so a form in another language speaks it. Absent is the control's own
-   * sentence, in English.
+   * so a form in another language speaks it. Unset is the sentence registered
+   * for the page's language, then the English.
    */
+  @words
   @property({ attribute: 'range-length-message' })
-  rangeLengthMessage?: string
+  rangeLengthMessage = 'A range is two times.'
 
   /**
    * The message shown when a time is after `max`, with `{max}` filled in as
    * the field displays it.
    */
+  @words
   @property({ attribute: 'range-overflow-message' })
-  rangeOverflowMessage?: string
+  rangeOverflowMessage = 'Choose a time at or before {max}.'
 
   /**
    * The message shown when a time is before `min`, with `{min}` filled in as
    * the field displays it.
    */
+  @words
   @property({ attribute: 'range-underflow-message' })
-  rangeUnderflowMessage?: string
+  rangeUnderflowMessage = 'Choose a time at or after {min}.'
 
   /**
    * The name of the button that removes one time, with `{name}` filled in.
@@ -262,6 +274,7 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
    * **The name goes in**, so a row of them is heard as which one each
    * removes rather than as "Remove" said once per time.
    */
+  @words
   @property({ attribute: 'remove-label' })
   removeLabel = 'Remove {name}'
 
@@ -295,14 +308,16 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
   /**
    * The name of the button that opens the list, read by screen readers.
    */
+  @words
   @property({ attribute: 'trigger-label' })
   triggerLabel = 'Choose a time'
 
   /**
    * The message shown when `disable-times` bars a time.
    */
+  @words
   @property({ attribute: 'unavailable-message' })
-  unavailableMessage?: string
+  unavailableMessage = 'Choose a time that is available.'
 
   /** Every time in the value, which may hold more than one. */
   private get held(): string[] {
@@ -517,7 +532,7 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
     if (faults.includes('rangeUnderflow')) {
       return [
         'rangeUnderflow',
-        fillTemplate(this.rangeUnderflowMessage || 'Choose a time at or after {min}.', {
+        formatWords(this, 'rangeUnderflowMessage', {
           min: writeClock(this.min, clockLocale(this.language, this.hourCycle), this.seconds),
         }),
       ]
@@ -525,16 +540,16 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
     if (faults.includes('rangeOverflow')) {
       return [
         'rangeOverflow',
-        fillTemplate(this.rangeOverflowMessage || 'Choose a time at or before {max}.', {
+        formatWords(this, 'rangeOverflowMessage', {
           max: writeClock(this.max, clockLocale(this.language, this.hourCycle), this.seconds),
         }),
       ]
     }
     if (faults.includes('unavailable')) {
-      return this.unavailableMessage || 'Choose a time that is available.'
+      return this.unavailableMessage
     }
     if (this.mode === 'range' && held.length > 2) {
-      return this.rangeLengthMessage || 'A range is two times.'
+      return this.rangeLengthMessage
     }
     return ''
   }
@@ -602,7 +617,7 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
       manual
       label=${this.label || 'Time'}
       hour-cycle=${this.hourCycle ?? nothing}
-      locale=${this.language || nothing}
+      locale=${handedLocale(this) || nothing}
       max=${this.max}
       min=${this.min}
       ?seconds=${this.seconds}
@@ -628,7 +643,7 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
                   part="time"
       exportparts="cell: time-cell, dismiss: time-dismiss, dismiss-mark: time-dismiss-mark, label: time-label, link: time-link, start: time-start"
                   dismissible
-                  dismiss-label=${fillTemplate(this.removeLabel, { name: this.written(at) })}
+                  dismiss-label=${formatWords(this, 'removeLabel', { name: this.written(at) })}
                   ?disabled=${this.isDisabled}
                   @helix-dismiss=${(event: Event) => {
                     event.stopPropagation()
@@ -662,6 +677,32 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
       </svg></slot>`
   }
 
+  /** The line of text the times are typed into, where the field shows no segments. */
+  private renderControl(): TemplateResult {
+    return html`<input
+      part="control"
+      id=${this.controlId}
+      type="text"
+      .value=${this.display}
+      name=${this.name || nothing}
+      placeholder=${
+        this.mode === 'multiple' && this.held.length > 0 ? nothing : this.placeholder || nothing
+      }
+      autocomplete=${this.autocomplete || nothing}
+      aria-describedby=${this.describedBy ?? nothing}
+      aria-invalid=${this.invalidity ?? nothing}
+      ?disabled=${this.isDisabled}
+      ?readonly=${this.readOnly}
+      ?required=${this.required}
+      @blur=${this.handleBlur}
+      @change=${this.handleCommit}
+      @focus=${this.handleFocus}
+      @input=${this.handleInput}
+      @keydown=${this.handleDraftKey}
+      @keypress=${this.handleKeypress}
+    />`
+  }
+
   protected override render(): TemplateResult {
     return html`${this.renderLabel()}
       <div part="field" @keydown=${this.handleKeydown}>
@@ -673,34 +714,7 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
               )
             : nothing
         }
-        ${
-          this.segmentsShown
-            ? this.renderSegments()
-            : html`<input
-                part="control"
-                id=${this.controlId}
-                type="text"
-                .value=${this.display}
-                name=${this.name || nothing}
-                placeholder=${
-                  this.mode === 'multiple' && this.held.length > 0
-                    ? nothing
-                    : this.placeholder || nothing
-                }
-                autocomplete=${this.autocomplete || nothing}
-                aria-describedby=${this.describedBy ?? nothing}
-                aria-invalid=${this.invalidity ?? nothing}
-                ?disabled=${this.isDisabled}
-                ?readonly=${this.readOnly}
-                ?required=${this.required}
-                @blur=${this.handleBlur}
-                @change=${this.handleCommit}
-                @focus=${this.handleFocus}
-                @input=${this.handleInput}
-                @keydown=${this.handleDraftKey}
-                @keypress=${this.handleKeypress}
-              />`
-        }
+        ${this.segmentsShown ? this.renderSegments() : this.renderControl()}
         <button
           part="trigger"
           type="button"

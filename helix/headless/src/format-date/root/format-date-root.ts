@@ -4,10 +4,10 @@ import {
   type DateCalendar,
   elapsedTime,
   HelixElement,
-  localeOf,
   type Relative,
   RelativeClockController,
   relativeTime,
+  wordsLocale,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -207,7 +207,7 @@ export class HelixHeadlessFormatDate extends HelixElement {
    * the calendar.
    */
   private get language(): string {
-    return calendarLocale(localeOf(this, this.locale), this.calendar)
+    return calendarLocale(wordsLocale(this), this.calendar)
   }
 
   /**

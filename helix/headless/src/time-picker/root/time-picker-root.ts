@@ -3,14 +3,13 @@ import {
   commaList,
   customElement,
   dayPeriod,
-  fillTemplate,
+  formatWords,
   type HelixBeforeChangeEvent,
   HelixFormElement,
   type HourCycle,
   hostWords,
   inlineStep,
   isTwelveHour,
-  localeOf,
   MixinControllerValue,
   MixinPickerFeedback,
   nearestTime,
@@ -22,6 +21,8 @@ import {
   valueAsSeconds,
   wheelParts,
   wholeHour,
+  words,
+  wordsLocale,
   writeClock,
 } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -121,14 +122,25 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
   MixinControllerValue(HelixFormElement),
 ) {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-time-picker': { label: 'Uhrzeit' } })`.
+   */
+  static words = 'helix-time-picker'
+
+  /**
    * The validation message for a value that is not a time.
    *
    * **Every sentence a control raises in the browser's bubble is a property**,
    * named for the validity flag it reports, so a form in another language
-   * speaks it. Absent is the control's own sentence, in English.
+   * speaks it. Unset is the sentence registered for the page's language, then
+   * the English. `{shape}` is how a time is written, `HH:mm` or `HH:mm:ss`, and
+   * `{mode}` is `single`, `range` or `multiple`, so each can have its own
+   * sentence.
    */
+  @words
   @property({ attribute: 'bad-input-message' })
-  badInputMessage?: string
+  badInputMessage =
+    '{mode, select, single {Enter a time as {shape}.} other {Enter times as {shape}, separated by commas.}}'
 
   /**
    * Times that cannot be chosen, as `HH:mm`, separated by commas or spaces.
@@ -170,6 +182,7 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
    *
    * An `aria-label` or `aria-labelledby` on the host names the list instead.
    */
+  @words
   @property()
   label = 'Time'
 
@@ -184,7 +197,7 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
 
   /** The locale the words are written in: `locale`, or the page's `lang`. */
   private get language(): string {
-    return localeOf(this, this.locale)
+    return wordsLocale(this)
   }
 
   /**
@@ -254,15 +267,17 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
    * The validation message for a time after `max`. `{max}` is replaced with
    * `max`, written in `locale`.
    */
+  @words
   @property({ attribute: 'range-overflow-message' })
-  rangeOverflowMessage?: string
+  rangeOverflowMessage = 'Choose a time at or before {max}.'
 
   /**
    * The validation message for a time before `min`. `{min}` is replaced with
    * `min`, written in `locale`.
    */
+  @words
   @property({ attribute: 'range-underflow-message' })
-  rangeUnderflowMessage?: string
+  rangeUnderflowMessage = 'Choose a time at or after {min}.'
 
   /**
    * Every time on offer, as seconds since midnight.
@@ -583,20 +598,23 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
   /**
    * The validation message for a time that `step` skips.
    */
+  @words
   @property({ attribute: 'step-mismatch-message' })
-  stepMismatchMessage?: string
+  stepMismatchMessage = 'Choose one of the times on offer.'
 
   /**
    * The validation message for a time that `disable-times` bars.
    */
+  @words
   @property({ attribute: 'unavailable-message' })
-  unavailableMessage?: string
+  unavailableMessage = 'Choose a time that is available.'
 
   /**
    * The validation message for a required time picker with no time chosen.
    */
+  @words
   @property({ attribute: 'value-missing-message' })
-  valueMissingMessage?: string
+  valueMissingMessage = 'Choose a time.'
 
   /**
    * What is wrong with a time the picker can read, as a validity flag and a
@@ -618,21 +636,21 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
       case 'rangeUnderflow':
         return [
           'rangeUnderflow',
-          fillTemplate(this.rangeUnderflowMessage || 'Choose a time at or after {min}.', {
+          formatWords(this, 'rangeUnderflowMessage', {
             min: writeClock(this.min, this.clock, this.seconds),
           }),
         ]
       case 'rangeOverflow':
         return [
           'rangeOverflow',
-          fillTemplate(this.rangeOverflowMessage || 'Choose a time at or before {max}.', {
+          formatWords(this, 'rangeOverflowMessage', {
             max: writeClock(this.max, this.clock, this.seconds),
           }),
         ]
       case 'unavailable':
-        return ['badInput', this.unavailableMessage || 'Choose a time that is available.']
+        return ['badInput', this.unavailableMessage]
       case 'stepMismatch':
-        return ['stepMismatch', this.stepMismatchMessage || 'Choose one of the times on offer.']
+        return ['stepMismatch', this.stepMismatchMessage]
       default:
         return undefined
     }
@@ -681,11 +699,7 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
   private reportRequired(): void {
     const anchor = this.partNamed('list') ?? undefined
     if (this.required && this.value === '') {
-      this.internals.setValidity(
-        { valueMissing: true },
-        this.valueMissingMessage || 'Choose a time.',
-        anchor,
-      )
+      this.internals.setValidity({ valueMissing: true }, this.valueMissingMessage, anchor)
       return
     }
     /* A value the wheels cannot read is bad input, the same as on the calendar:
@@ -695,13 +709,12 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
        shaped right at all. */
     const held = this.held
     if (held.length > 0 && held.some((one) => valueAsSeconds(one) === null)) {
-      const shape = this.seconds ? 'HH:mm:ss' : 'HH:mm'
       this.internals.setValidity(
         { badInput: true },
-        this.badInputMessage ||
-          (this.mode === undefined
-            ? `Enter a time as ${shape}.`
-            : `Enter times as ${shape}, separated by commas.`),
+        formatWords(this, 'badInputMessage', {
+          mode: this.mode ?? 'single',
+          shape: this.seconds ? 'HH:mm:ss' : 'HH:mm',
+        }),
         anchor,
       )
       return
