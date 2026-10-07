@@ -18,6 +18,25 @@
   position: relative;
 }
 
+/* **A list of destinations lays out as bare links do.** The list is the row,
+   or the column, and its items take the bar's height. `list-style` inherits,
+   so the items lose their bullets with it. */
+::slotted(:is(ul, ol, [role="list"])) {
+  align-items: center;
+  block-size: 100%;
+  display: flex;
+  gap: var(--navigation-gap, var(--helix-space-2xs));
+  list-style: none;
+  margin: var(--helix-space-none);
+  padding: var(--helix-space-none);
+}
+
+:host([orientation="vertical"]) ::slotted(:is(ul, ol, [role="list"])) {
+  align-items: stretch;
+  block-size: auto;
+  flex-direction: column;
+}
+
 /* Behind the destinations and out of flow, so animating it reflows nothing. */
 [part="indicator"] {
   background-color: var(--navigation-indicator-color, var(--helix-color-surface-sunken));

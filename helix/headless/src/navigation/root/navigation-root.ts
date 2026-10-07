@@ -15,6 +15,19 @@ import { property } from 'lit/decorators.js'
 /** What can take focus itself, which a destination usually is. */
 const FOCUSABLE = 'a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
 
+/** Whether a slotted element is a list of destinations, such as a `<ul>`. */
+const isList = (element: Element): boolean =>
+  element.localName === 'ul' ||
+  element.localName === 'ol' ||
+  element.getAttribute('role') === 'list'
+
+/**
+ * The element on a destination that says it is current: the destination
+ * itself, or the link inside a list item.
+ */
+const markOf = (item: HTMLElement): Element | null =>
+  item.hasAttribute('aria-current') ? item : item.querySelector('[aria-current]')
+
 /**
  * A destination as the keyboard controller moves through it: the link itself,
  * a `Megamenu`'s trigger, or the first thing inside it that takes focus.
@@ -55,6 +68,13 @@ const navigable = (item: HTMLElement): NavigableItem => {
  * one page can mark the section in view with `aria-current="location"`. Where
  * several are marked, `page` wins.
  *
+ * **The destinations can be a list.** Slot a `<ul>` or an `<ol>` of `<li>`
+ * elements, each holding a link, and a screen reader says how many there are
+ * and where each one is, as in Radix's `NavigationMenu.List`. The marker and
+ * the arrow keys work on the list items as they do on bare links. Give the
+ * list `role="list"` as well, since Safari drops the semantics of a list drawn
+ * without bullets.
+ *
  * Set `orientation="vertical"` to stack the destinations in a column, for a
  * sidebar.
  *
@@ -92,11 +112,12 @@ export class HelixHeadlessNavigation extends HelixElement {
     active: () => {
       const items = this.items
       const marked = (item: HTMLElement): boolean => {
-        const current = item.getAttribute('aria-current')
-        return current !== null && current !== 'false'
+        const current = markOf(item)?.getAttribute('aria-current')
+        return current !== null && current !== undefined && current !== 'false'
       }
       return (
-        items.find((item) => item.getAttribute('aria-current') === 'page') ?? items.find(marked)
+        items.find((item) => markOf(item)?.getAttribute('aria-current') === 'page') ??
+        items.find(marked)
       )
     },
     indicator: () => this.partNamed('indicator'),
@@ -152,10 +173,15 @@ export class HelixHeadlessNavigation extends HelixElement {
 
   private current: MutationObserver | undefined
 
-  /** The destinations the consumer slotted. */
+  /**
+   * The destinations the consumer slotted, and the items of a slotted list in
+   * place of the list.
+   */
   private get items(): HTMLElement[] {
     const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot:not([name])')
-    return (slot?.assignedElements() ?? []) as HTMLElement[]
+    return (slot?.assignedElements() ?? []).flatMap((one) =>
+      isList(one) ? [...one.children] : [one],
+    ) as HTMLElement[]
   }
 
   /** Re-measures when the links change or hand over the current page. */
@@ -175,7 +201,8 @@ export class HelixHeadlessNavigation extends HelixElement {
     // reloading, so nothing else would tell the marker to move.
     this.current = new MutationObserver(() => this.indicator.place())
     for (const item of this.items) {
-      this.current.observe(item, { attributeFilter: ['aria-current'] })
+      /* The subtree too, for the link inside a list item. */
+      this.current.observe(item, { attributeFilter: ['aria-current'], subtree: true })
     }
   }
 

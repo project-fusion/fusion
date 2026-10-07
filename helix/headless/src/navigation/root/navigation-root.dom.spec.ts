@@ -119,3 +119,44 @@ describe('the arrow keys', () => {
     expect(press(plain.querySelector('a') as HTMLElement, 'ArrowRight')).toBe(false)
   })
 })
+
+describe('destinations written as a list', () => {
+  const listed = `<helix-headless-navigation arrows label="Sections">
+    <ul role="list">
+      <li><a href="/design">Design</a></li>
+      <li><a aria-current="page" href="/mind">Mind</a></li>
+      <li><a href="/work">Work</a></li>
+    </ul>
+  </helix-headless-navigation>`
+
+  test('are walked by the arrow keys, item by item', async () => {
+    const nav = await mount(listed)
+    const [design, mind, work] = [...nav.querySelectorAll('a')] as HTMLElement[]
+    const press = (from: Element, key: string): boolean => {
+      const event = new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        key,
+      })
+      from.dispatchEvent(event)
+      return event.defaultPrevented
+    }
+    design?.focus()
+    expect(press(design as HTMLElement, 'ArrowRight')).toBe(true)
+    expect(document.activeElement).toBe(mind)
+    press(mind as HTMLElement, 'End')
+    expect(document.activeElement).toBe(work)
+  })
+
+  test('put the marker on the item whose link is current', async () => {
+    const nav = await mount(listed)
+    /* What the marker is placed on, read from the controller that places it. */
+    const placing = (
+      nav as unknown as {
+        indicator: { options: { active(): Element | undefined } }
+      }
+    ).indicator.options
+    expect(placing.active()?.textContent?.trim()).toBe('Mind')
+  })
+})

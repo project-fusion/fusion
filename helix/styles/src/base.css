@@ -810,6 +810,12 @@ helix-toggle[disabled]::part(item) {
   justify-content: start;
 }
 
+/* A link in a list item fills the item down a column, as a bare link fills its
+   place in the column. */
+:where(helix-navigation[orientation="vertical"]) :where(li) > :where([data-navigation-item], a) {
+  display: flex;
+}
+
 :where([data-navigation-item], helix-navigation a):hover {
   background-color: var(
     --navigation-item-hover-background-color,
