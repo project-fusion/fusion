@@ -81,6 +81,25 @@ describe('a skeleton around content', () => {
     expect(skeleton.internals.ariaHidden ?? null).toBeNull()
   })
 
+  /* A labeled skeleton stayed a progress bar named "Loading card" around the
+     card it had finished loading, so a screen reader read the loaded content
+     as a busy indicator. */
+  test('a label names the busy indicator while it loads, and loaded content is left as it is', async () => {
+    const skeleton = (await mount(
+      '<helix-headless-skeleton label="Loading card" loading><p>Card</p></helix-headless-skeleton>',
+    )) as Skeleton
+    await skeleton.updateComplete
+    expect([skeleton.internals.role, skeleton.internals.ariaLabel]).toEqual([
+      'progressbar',
+      'Loading card',
+    ])
+    skeleton.loading = false
+    await skeleton.updateComplete
+    expect(skeleton.internals.role ?? null).toBeNull()
+    expect(skeleton.internals.ariaLabel ?? null).toBeNull()
+    expect(skeleton.internals.ariaHidden ?? null).toBeNull()
+  })
+
   test('an empty skeleton stays hidden, loading or not', async () => {
     const skeleton = (await mount(
       '<helix-headless-skeleton loading> </helix-headless-skeleton>',
