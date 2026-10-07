@@ -45,8 +45,7 @@
 
 /* Inset, so the viewport's clipping leaves all four sides of it. */
 ::slotted([data-index]:focus-visible) {
-  outline: var(--virtual-list-focus-ring-width, var(--helix-size-focus-ring)) solid
-    var(--virtual-list-focus-ring-color, var(--helix-color-focus-ring));
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }
 

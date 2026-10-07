@@ -29,8 +29,6 @@ import { styles } from './virtual-list-root.css.js'
  * @cssproperty --virtual-list-block-size - How tall the scrolling box is.
  * @cssproperty --virtual-list-empty-color - The color of the text in the row shown when there are no items.
  * @cssproperty --virtual-list-empty-padding - The space around the text in the row shown when there are no items.
- * @cssproperty --virtual-list-focus-ring-color - The color of the ring on the row holding focus. Defaults to `--helix-color-focus-ring`.
- * @cssproperty --virtual-list-focus-ring-width - The width of the ring on the row holding focus. Defaults to `--helix-size-focus-ring`.
  * @cssproperty --virtual-list-loading-color - The color of the text in the row drawn while `loading` is set.
  * @cssproperty --virtual-list-loading-padding - The space around the text in the row drawn while `loading` is set.
  * @cssproperty --virtual-list-scrollbar-thumb-color - The thumb of the list's scrollbar. Defaults to `--helix-scrollbar-thumb-color`.
