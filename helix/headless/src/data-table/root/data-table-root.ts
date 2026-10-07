@@ -302,6 +302,7 @@ const isControl = (element: HTMLElement): boolean =>
  *
  * @cssstate empty - While there are no rows to show and none are loading.
  * @cssstate error - While `error-text` is set.
+ * @cssstate loading - While `loading` is set, as the rows are on their way.
  */
 @customElement('helix-headless-data-table')
 export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
@@ -2101,6 +2102,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     this.markEmpty()
     this.toggleState('error', this.errorText !== '')
     this.toggleState('empty', !this.loading && !this.hasRows)
+    this.toggleState('loading', this.loading)
     this.assign()
     this.announceSort()
     this.quietControls()

@@ -133,9 +133,12 @@ describe('a collection that is empty or still arriving', () => {
     )
     expect(hasState(host, 'error')).toBe(true)
 
+    expect(hasState(host, 'loading')).toBe(true)
+
     host.errorText = ''
     host.loading = false
     await settle(host)
+    expect(hasState(host, 'loading')).toBe(false)
     expect(part(host, 'error')).toBeNull()
     expect(part(host, 'empty')).not.toBeNull()
     expect(hasState(host, 'error')).toBe(false)
