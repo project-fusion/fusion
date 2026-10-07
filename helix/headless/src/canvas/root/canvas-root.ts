@@ -291,9 +291,9 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  * connection is a new element, and React discards an element the board adds to
  * its markup on the next render, so you write the connection.
  *
- * **`route` draws the connections' lines yourself**: a function from where a
- * line leaves and arrives, and the sides it does, to its SVG path, for a route
- * of your own such as one that bends around the cards between. What it returns
+ * **`edgeRoute` draws the connections' lines your own way**: a function from
+ * where a line leaves and arrives, and the sides it does, to its SVG path, for
+ * a route such as one that bends around the cards between. What it returns
  * is the line drawn, the line pressed and focused, and the one an arrowhead
  * sits at the end of. Nothing back draws the board's own.
  *
@@ -452,6 +452,17 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   @property({ attribute: 'copied-label' })
   copiedLabel = '{count, plural, one {# card copied} other {# cards copied}}'
 
+  /**
+   * Draws every connection's line: a function from where it leaves and
+   * arrives, and the sides it does, to its SVG path and where its label sits.
+   *
+   * Absent, or returning nothing for a connection, draws the board's own
+   * route. A function that throws draws the board's own too, and the error is
+   * reported to the page as an uncaught one. Set it as a property.
+   */
+  @property({ attribute: false })
+  edgeRoute?: CanvasRoute
+
   /** The board's name where `label` is empty. */
   @words
   @property({ attribute: 'fallback-label' })
@@ -574,17 +585,6 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   @words
   @property({ attribute: 'role-label' })
   roleLabel = 'canvas'
-
-  /**
-   * Draws every connection's line: a function from where it leaves and
-   * arrives, and the sides it does, to its SVG path and where its label sits.
-   *
-   * Absent, or returning nothing for a connection, draws the board's own
-   * route. A function that throws draws the board's own too, and the error is
-   * reported to the page as an uncaught one. Set it as a property.
-   */
-  @property({ attribute: false })
-  route?: CanvasRoute
 
   /**
    * The names of the selected cards and connections, comma separated. Empty
@@ -1602,7 +1602,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     return { ...drawn, from, to }
   }
 
-  /** One connection's line, by `route` where it draws one, and by the board's own where not. */
+  /** One connection's line, by `edgeRoute` where it draws one, and by the board's own where not. */
   private draw(
     edge: CanvasEdge,
     from: CanvasNode,
@@ -1610,11 +1610,11 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     path: CanvasPath,
     drawnHeads: { start: boolean; end: boolean },
   ): { d: string; mid: { x: number; y: number } } {
-    if (this.route) {
+    if (this.edgeRoute) {
       const { end, fromSide, start, toSide } = ends(edge, from, to)
       let own: ReturnType<CanvasRoute>
       try {
-        own = this.route({ edge, end, fromSide, path, start, toSide })
+        own = this.edgeRoute({ edge, end, fromSide, path, start, toSide })
       } catch (error) {
         globalThis.reportError?.(error)
       }

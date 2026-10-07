@@ -2862,7 +2862,7 @@ describe('what a screen reader calls a canvas', () => {
    that wanted its lines to bend around the cards between had no way in. */
 describe('a route of your own', () => {
   type Routed = Canvas & {
-    route?: (ends: {
+    edgeRoute?: (ends: {
       edge: { id: string }
       end: { x: number; y: number }
       fromSide: string
@@ -2880,7 +2880,7 @@ describe('a route of your own', () => {
   test('draws the line it returns, pressed and focused along the same path', async () => {
     const host = (await canvas()) as Routed
     const asked: string[] = []
-    host.route = ({ edge, end, fromSide, path, start, toSide }) => {
+    host.edgeRoute = ({ edge, end, fromSide, path, start, toSide }) => {
       asked.push(`${edge.id} ${fromSide}->${toSide} ${path}`)
       return { d: `M ${start.x} ${start.y} V ${end.y} H ${end.x}` }
     }
@@ -2895,14 +2895,14 @@ describe('a route of your own', () => {
     const host = (await canvas()) as Routed
     const [own] = drawn(host, 'e1')
     expect(own).toMatch(/^M /)
-    host.route = () => undefined
+    host.edgeRoute = () => undefined
     await host.updateComplete
     expect(drawn(host, 'e1')[0]).toBe(own as string)
     const reported: unknown[] = []
     const original = globalThis.reportError
     globalThis.reportError = (error: unknown) => reported.push(error)
     try {
-      host.route = () => {
+      host.edgeRoute = () => {
         throw new Error('no route')
       }
       await host.updateComplete
