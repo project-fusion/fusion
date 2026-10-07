@@ -108,11 +108,11 @@ import '../../time-picker/index.js'
  * @slot trigger - The icon on the field that shows a list opens.
  *
  * @event {Event} change - Fired after the value changes.
- * @event {Event} input - Fired after the value changes.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the time changes. Cancelable: canceling it stops the change and leaves the decision to you.
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the list closes. Cancelable: canceling it keeps the list open and leaves the decision to you.
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the list opens. Cancelable: canceling it keeps the list closed and leaves the decision to you.
  * @event {HelixClearEvent} helix-clear - Fired after the clear button has emptied the field, after `input` and `change`.
+ * @event {Event} input - Fired after the value changes.
  * @event {ToggleEvent} toggle - Fired after the list opens or closes, with `newState` and `oldState`.
  *
  * @csspart clear - The button that empties the field, under `clearable`, while it holds a time.
@@ -451,7 +451,6 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
     return Math.max(0, this.held.length - this.shownTimes.length)
   }
 
-  /** Adds what was typed to the set, or takes the last one back out. */
   /**
    * A time as the reader wrote it, as the value writes one: `HH:mm` as it
    * is, and `2:30 PM`, `2.30pm`, `14h30`, or `1430` read back, with the half
@@ -477,6 +476,7 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
     this.handleCommit(event)
   }
 
+  /** Adds what was typed to the set, or takes the last one back out. */
   private readonly handleDraftKey = (event: KeyboardEvent): void => {
     if (this.mode !== 'multiple') {
       return
