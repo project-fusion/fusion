@@ -1,5 +1,6 @@
 import {
   AriaForwardController,
+  auditName,
   closestInstance,
   commaList,
   customElement,
@@ -76,6 +77,10 @@ const KEYS = new Set([
  * Shift+Space checks every item from the one last checked to the focused one,
  * and Control+Shift+Home or End checks every item from the focused one to the
  * first or the last, then moves there, as the tree pattern's range keys do.
+ *
+ * A tree with no name of its own is announced as "Tree", which says nothing
+ * about what it holds, so a development build warns once with the kind
+ * `missing-name` where neither `label` nor an `aria-label` names it.
  *
  * Removing the item that has focus moves focus to the item after it among its
  * siblings, or the one before, or its parent, so focus stays in the tree.
@@ -918,6 +923,14 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
     this.syncItems()
+    /* Named only by the default, the tree is "Tree" to a screen reader.
+       Development builds only. */
+    auditName(
+      this,
+      () => null,
+      'Give it a `label` that says what it holds, such as "Files".',
+      () => this.hasAttribute('label') || this.label !== 'Tree',
+    )
   }
 
   protected override updated(changed: PropertyValues): void {
