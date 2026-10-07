@@ -411,3 +411,49 @@ describe('next() and previous()', () => {
     expect(host.active).toBe('one')
   })
 })
+
+describe('the keyboard and the live region', () => {
+  const button = (entry: Entry) => entry.shadowRoot?.querySelector('button') as HTMLButtonElement
+  const press = (entry: Entry, key: string) =>
+    entry.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key }))
+  const focusedEntry = (host: Playlist) =>
+    entries(host).find((one) => document.activeElement === one)
+
+  test('the arrow keys, Home and End move between the entries a key can reach', async () => {
+    const host = (await mount(`<helix-headless-video-playlist default-active="one" label="Episodes">
+      <helix-headless-video-playlist-item src="/one.mp4" value="one">One</helix-headless-video-playlist-item>
+      <helix-headless-video-playlist-item disabled src="/two.mp4" value="two">Two</helix-headless-video-playlist-item>
+      <helix-headless-video-playlist-item src="/three.mp4" value="three">Three</helix-headless-video-playlist-item>
+      <helix-headless-video-playlist-item src="/four.mp4" value="four">Four</helix-headless-video-playlist-item>
+    </helix-headless-video-playlist>`)) as Playlist
+    await host.updateComplete
+    const [one, , three, four] = entries(host) as [Entry, Entry, Entry, Entry]
+    button(one).focus()
+    press(one, 'ArrowDown')
+    expect(focusedEntry(host)).toBe(three)
+    press(three, 'ArrowRight')
+    expect(focusedEntry(host)).toBe(four)
+    press(four, 'ArrowDown')
+    expect(focusedEntry(host)).toBe(four)
+    press(four, 'Home')
+    expect(focusedEntry(host)).toBe(one)
+    press(one, 'End')
+    expect(focusedEntry(host)).toBe(four)
+    press(four, 'ArrowUp')
+    expect(focusedEntry(host)).toBe(three)
+    // Moving focus chooses nothing.
+    expect(host.active).toBe('one')
+  })
+
+  test('says the entry it moved to, and nothing before the first move', async () => {
+    const host = await list()
+    await host.updateComplete
+    expect(part(host, 'live')).toBeNull()
+    player(host).dispatchEvent(new Event('ended'))
+    await host.updateComplete
+    await new Promise((done) => requestAnimationFrame(() => done(undefined)))
+    await host.updateComplete
+    expect(part(host, 'live')?.getAttribute('role')).toBe('status')
+    expect(part(host, 'live')?.textContent).toBe('Now playing Two')
+  })
+})
