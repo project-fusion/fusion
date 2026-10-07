@@ -615,6 +615,10 @@ export class HelixHeadlessTableColumn extends HelixElement {
     /* In a grid the controls leave the tab order, which has one stop: the cell
        holding them. A reader reaches them with Enter or F2. */
     const control = grid ? '-1' : nothing
+    /* The width the separator reports, held to its own range, so the number and
+       its words agree for a heading not drawn yet or drawn narrower than the
+       floor. */
+    const width = Math.min(4096, Math.max(HelixHeadlessTableColumn.NARROWEST, this.drawn))
     return html`<span
       part="column"
       role=${grid ? 'columnheader' : nothing}
@@ -643,8 +647,8 @@ export class HelixHeadlessTableColumn extends HelixElement {
             aria-orientation="vertical"
             aria-valuemin=${HelixHeadlessTableColumn.NARROWEST}
             aria-valuemax="4096"
-            aria-valuenow=${Math.max(HelixHeadlessTableColumn.NARROWEST, this.drawn)}
-            aria-valuetext=${formatWords(this, 'widthLabel', { width: this.drawn })}
+            aria-valuenow=${width}
+            aria-valuetext=${formatWords(this, 'widthLabel', { width })}
             @keydown=${this.handleResizeKey}
             @pointerdown=${this.handleResizeStart}
             @pointermove=${this.handleResizeMove}

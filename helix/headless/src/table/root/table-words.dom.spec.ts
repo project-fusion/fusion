@@ -88,7 +88,7 @@ describe('a table on a page in another language', () => {
     registerWords('pl', POLISH)
     const host = await table('lang="pl"')
     const resizer = part(column(host, 0), 'resizer')
-    expect(resizer?.getAttribute('aria-valuetext')).toBe('0 pikseli')
+    expect(resizer?.getAttribute('aria-valuetext')).toBe('48 pikseli')
   })
 
   test('updates once words are registered after it rendered', async () => {
@@ -104,7 +104,17 @@ describe('the sentences a table says in English', () => {
     const host = await table()
     expect(await sortBy(host, 'count:asc')).toBe('Sorted by Count, ascending')
     expect(await sortBy(host, 'count:desc')).toBe('Sorted by Count, descending')
-    expect(part(column(host, 0), 'resizer')?.getAttribute('aria-valuetext')).toBe('0 pixels')
+    expect(part(column(host, 0), 'resizer')?.getAttribute('aria-valuetext')).toBe('48 pixels')
+  })
+
+  /* The value is held to the floor and its words read the raw drawn width, so
+     a heading not drawn yet said 48 and "0 pixels" at once. */
+  test('say the width the separator reports as its value', async () => {
+    const host = await table()
+    const resizer = part(column(host, 0), 'resizer')
+    expect(resizer?.getAttribute('aria-valuetext')).toBe(
+      `${resizer?.getAttribute('aria-valuenow')} pixels`,
+    )
   })
 
   test('still fill `{order}` in a page’s own sentence', async () => {
