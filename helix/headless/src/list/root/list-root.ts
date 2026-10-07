@@ -1,4 +1,5 @@
 import {
+  auditName,
   commaList,
   customElement,
   deepActiveElement,
@@ -105,6 +106,15 @@ import {
  * no `start` counts down from the number of rows, which a server cannot know,
  * so served markup counts from one until the list runs.
  *
+ * **An empty list.** Set `empty-label`, or put your own content in the `empty`
+ * slot, for a row shown while the list has no rows, such as "No files yet" and
+ * a link to add one. Without either, an empty list shows nothing. The list
+ * takes the `empty` state while it has no rows, whatever it shows.
+ *
+ * An interactive list with no name is reported once in a development build,
+ * since a screen reader announces it as a grid and nothing more. Name it with
+ * `label` or `aria-label`.
+ *
  * @since 0.1.0
  * @status stable
  * @category data
@@ -112,6 +122,7 @@ import {
  * @documentation https://fusion.dev/helix/components/list
  *
  * @slot - The rows.
+ * @slot empty - Content for the row shown while the list has no rows. Falls back to `empty-label`.
  *
  * @event {Event} change - Fired once a press has changed which rows are selected.
  * @event {HelixActionEvent} helix-action - Sent from a row when the reader acts on it: Enter, or a press in a list that selects nothing. Read the row from `target`. A row with `href` follows its link instead.
@@ -119,8 +130,11 @@ import {
  * @event {HelixBeforeReorderEvent} helix-before-reorder - Fired when a row is dropped at a new place, in a `reorderable` list, with every row's value in the new order. Cancelable: cancel it to keep the row where it is.
  * @event {HelixReorderEvent} helix-reorder - Fired after `helix-before-reorder` when nobody canceled it. Move your rows to the order in `keys`. Cancelable: cancel it to say the move did not happen.
  *
+ * @csspart empty - The row shown while the list has no rows, where `empty-label` or the `empty` slot gives it content. A grid row with one cell in a list that selects.
  * @csspart drag-preview - A copy of the row a pointer drags, which follows the pointer in the top layer until the row is let go, in a `reorderable` list. Hidden from assistive technology.
  * @csspart live - The region that says each step of a move to screen readers, in a `reorderable` list. Drawn from the first move. Visually hidden in the styled tier.
+ *
+ * @cssstate empty - While the list has no rows.
  *
  * @cssproperty --list-first - The number of the first row, written where `start` or `reversed` moves it.
  * @cssproperty --list-step - What each row adds to the number before it: `1`, or `-1` where `reversed`.
@@ -145,6 +159,13 @@ export class HelixHeadlessList extends HelixElement {
   @words
   @property({ attribute: 'dropped-label' })
   droppedLabel = 'Dropped'
+
+  /**
+   * The text of the row shown while the list has no rows, where the `empty`
+   * slot is empty. Empty, the default, shows no row.
+   */
+  @property({ attribute: 'empty-label' })
+  emptyLabel = ''
 
   /**
    * The kind of list, which follows from the content.
@@ -681,6 +702,19 @@ export class HelixHeadlessList extends HelixElement {
     if (this.interactive || changed.get('selectionMode') !== undefined) {
       this.sync()
     }
+    if (this.interactive) {
+      /* A grid with no name is announced as a grid and nothing more, so a
+         reader cannot tell what its rows are. Development builds only. */
+      auditName(
+        this,
+        () => null,
+        'Give it a `label`, or an `aria-label` that says what the rows are.',
+        () => this.label !== '',
+      )
+    }
+    if (this.childrenKnown) {
+      this.toggleState('empty', this.rows.length === 0)
+    }
     if (this.reorderable || changed.get('reorderable') !== undefined) {
       this.syncMoves()
       this.refocus()
@@ -716,7 +750,29 @@ export class HelixHeadlessList extends HelixElement {
   protected override render(): TemplateResult {
     /* A row arriving or leaving changes who holds the stop and how many rows
        a reversed list counts down from. */
-    return html`<slot style=${this.numbers} @slotchange=${this.handleSlotChange}></slot>${drawStatus(this.status)}${this.reorder.drawDragPreview()}`
+    return html`<slot style=${this.numbers} @slotchange=${this.handleSlotChange}></slot>${this.drawEmpty()}${drawStatus(this.status)}${this.reorder.drawDragPreview()}`
+  }
+
+  /**
+   * The row shown while the list has no rows: a list item, or a grid row with
+   * one cell in a list that selects. Drawn only once the children are known,
+   * so a server and a hydrating render never claim an empty list, and hidden
+   * while it has neither `empty-label` nor content in the `empty` slot.
+   */
+  private drawEmpty(): TemplateResult | typeof nothing {
+    if (!this.childrenKnown || this.rows.length > 0) {
+      return nothing
+    }
+    const shown = this.emptyLabel !== '' || this.querySelector(':scope > [slot="empty"]') !== null
+    const content = html`<slot name="empty" @slotchange=${this.handleEmptyChange}>${this.emptyLabel}</slot>`
+    return this.interactive
+      ? html`<div part="empty" role="row" ?hidden=${!shown}><div role="gridcell">${content}</div></div>`
+      : html`<div part="empty" role="listitem" ?hidden=${!shown}>${content}</div>`
+  }
+
+  /* Content arriving in or leaving the `empty` slot shows or hides the row. */
+  private readonly handleEmptyChange = (): void => {
+    this.requestUpdate()
   }
 
   private readonly handleSlotChange = (): void => {
