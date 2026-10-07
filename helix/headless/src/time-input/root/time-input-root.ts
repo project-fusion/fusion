@@ -67,7 +67,9 @@ import '../../time-picker/index.js'
  *
  * With `segmented`, the field is a row of segments in place of the text: an
  * hour, a minute, and AM or PM where the clock has them, each set with digits
- * or the arrow keys. Alt+Down opens the list from a segment.
+ * or the arrow keys. Alt+Down opens the list from a segment. A `range` is two
+ * rows with a dash between them, the start and the end, and `multiple` keeps
+ * the text.
  *
  * Text that is not a time gives the form an empty value, as a native time
  * field does, and `value` keeps the text so it can be corrected.
@@ -161,6 +163,7 @@ import '../../time-picker/index.js'
  * @csspart picker-option-item-selected - The row of a chosen time: the one time, or either end of a range.
  * @csspart picker-option-label - The option's label.
  * @csspart picker-option-text - The label and the caption, as one column.
+ * @csspart range-separator - The dash between a range's two rows of segments, in `segmented`, beside `literal`.
  * @csspart rest - The count of times held beyond the ones shown. A `<button>` with `expandable`, and a `<span>` without it.
  * @csspart segment - One part of the time, an hour, a minute, a second or AM and PM, in `segmented`.
  * @csspart segment-placeholder - A segment with nothing in it yet. Applied with `segment`.
@@ -383,11 +386,16 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
   }
 
   /**
-   * Segments hold one time, so `range` and `multiple` keep the line of text,
-   * whose separators and tags are how those modes write several.
+   * A row of segments holds one time, and `range` takes two rows with a dash
+   * between them, as React Aria's range fields do. `multiple` keeps the line
+   * of text, whose tags are how it writes several.
    */
   protected override get segmentable(): boolean {
-    return this.mode === undefined
+    return this.mode !== 'multiple'
+  }
+
+  protected override get segmentGroups(): number {
+    return this.mode === 'range' ? 2 : 1
   }
 
   protected override get segmentedKind(): 'time' {

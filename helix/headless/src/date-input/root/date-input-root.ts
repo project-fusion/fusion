@@ -82,7 +82,9 @@ const dates = (value: string): string[] =>
  *
  * With `segmented`, the field is a row of segments in place of the text: a
  * month, a day and a year in the order the locale writes them, each set with
- * digits or the arrow keys. Alt+Down opens the calendar from a segment.
+ * digits or the arrow keys. Alt+Down opens the calendar from a segment. A
+ * `range` is two rows with a dash between them, the start and the end, as
+ * React Aria's DateRangePicker draws them, and `multiple` keeps the text.
  *
  * Text that is not a date gives the form an empty value, as a native date
  * field does, and `value` keeps the text so it can be corrected.
@@ -179,6 +181,7 @@ const dates = (value: string): string[] =>
  * @csspart picker-selection - The chosen date or range in words, which screen readers hear when it changes. Drawn for screen readers only.
  * @csspart picker-week - One row of days.
  * @csspart picker-weekday - A column header naming a day of the week.
+ * @csspart range-separator - The dash between a range's two rows of segments, in `segmented`, beside `literal`.
  * @csspart rest - The count of dates beyond the ones shown. It is a `<button>` with `expandable` and a `<span>` without it.
  * @csspart segment - One part of the date, a year, a month or a day, in `segmented`.
  * @csspart segment-placeholder - A segment with nothing in it yet. Applied with `segment`.
@@ -600,11 +603,16 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
   }
 
   /**
-   * Segments hold one date, so `range` and `multiple` keep the line of text,
-   * whose separators and tags are how those modes write several.
+   * A row of segments holds one date, and `range` takes two rows with a dash
+   * between them, as React Aria's range fields do. `multiple` keeps the line
+   * of text, whose tags are how it writes several.
    */
   protected override get segmentable(): boolean {
-    return this.mode === undefined
+    return this.mode !== 'multiple'
+  }
+
+  protected override get segmentGroups(): number {
+    return this.mode === 'range' ? 2 : 1
   }
 
   protected override get segmentedKind(): 'date' {

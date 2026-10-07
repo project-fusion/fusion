@@ -1077,10 +1077,51 @@ describe('segmented', () => {
     expect(formValue(host)).toBe('0001-08-04')
   })
 
-  test('a range and a multiple keep the line of text, which writes several dates', async () => {
-    const host = await field('segmented mode="range"')
+  test('a multiple keeps the line of text, whose tags write several dates', async () => {
+    const host = await field('segmented mode="multiple"')
     expect(part(host, 'control')).not.toBeNull()
     expect(part(host, 'segments')).toBeNull()
+  })
+
+  /* Measured before this: a range kept the line of text, where React Aria's
+     DateRangePicker gives its start and its end a row of segments each. */
+  test('a range is two rows of segments, the start and the end', async () => {
+    const host = await field(
+      'segmented mode="range" name="stay" locale="en-US" default-value="2026-08-04,2026-08-10"',
+    )
+    expect(part(host, 'control')).toBeNull()
+    expect(segments(host).map((one) => one.textContent?.trim())).toEqual([
+      '08',
+      '04',
+      '2026',
+      '08',
+      '10',
+      '2026',
+    ])
+    const end = segments(host)[4] as HTMLElement
+    const said = (end.getAttribute('aria-labelledby') ?? '')
+      .split(' ')
+      .map((id) => host.shadowRoot?.getElementById(id)?.textContent?.trim())
+    // "day, End, Starts": its own name, its row's, and the field's.
+    expect(said.slice(1)).toEqual(['End', 'Starts'])
+    await press(host, end, 'ArrowUp')
+    expect(host.value).toBe('2026-08-04,2026-08-11')
+    expect((formValue(host) as FormData).getAll('stay')).toEqual(['2026-08-04', '2026-08-11'])
+  })
+
+  test('a range with one row empty is half a range, and holds no value', async () => {
+    const host = (await field('segmented mode="range" locale="en-US"')) as InputDate & {
+      internals: ElementInternals
+    }
+    for (const [at, key] of [
+      [0, '8'],
+      [1, '4'],
+      [2, 'ArrowUp'],
+    ] as const) {
+      await press(host, segments(host)[at] as HTMLElement, key)
+    }
+    expect(host.value).toBe('')
+    expect(host.internals.validity.badInput).toBe(true)
   })
 })
 
