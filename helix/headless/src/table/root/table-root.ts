@@ -2,6 +2,7 @@ import {
   AriaForwardController,
   anchorAt,
   assignSlots,
+  auditName,
   commaList,
   customElement,
   cycle,
@@ -173,6 +174,7 @@ const ESTIMATE = 40
  * The `heading` slot names the table: slot a heading or a line of text into
  * it, and the table is named by its words. An `aria-label` or `aria-labelledby` on the
  * host wins over it.
+ * A table with no name is reported once in a development build.
  *
  * **Selecting.** `selectable` adds a column of checkboxes.
  *
@@ -1809,6 +1811,14 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     this.markSorted()
     this.markSelected()
     this.nameByHeading()
+    /* A table with no name is read as "Table", which says nothing of what it
+       holds. Development builds only. */
+    auditName(
+      this,
+      () => null,
+      'Give it a `label`, or put a heading in its `heading` slot, that says what the rows are.',
+      () => this.label !== '' || this.headings.length > 0,
+    )
     if (this.childrenKnown) {
       this.gridKeys.mark()
       this.gridKeys.place()

@@ -261,6 +261,7 @@ export class HelixHeadlessTableRow extends HelixElement {
     //
     // Set in `willUpdate`, which the server does call, unlike `connectedCallback`.
     hostAria(this.internals, { role: 'row' })
+    this.nameByHeader()
     /* `aria-selected` in a grid only, where the row is what a reader moves
        through: in a plain table a row is not a thing that can be selected,
        and its checkbox already says so. */
@@ -278,6 +279,35 @@ export class HelixHeadlessTableRow extends HelixElement {
     this.toggleState('dragging', this.move === 'dragging')
     this.toggleState('drop-after', this.move === 'drop-after')
     this.toggleState('drop-before', this.move === 'drop-before')
+  }
+
+  /**
+   * Names the row by its header cell, the cell with `header` among cells of
+   * values, or by its first cell where it has none, as React Aria's rows are
+   * named.
+   *
+   * **Named from its contents, a row read out its checkbox's name too**, "Select
+   * 412 412 main Passed" in a `selectable` table, since the checkbox is a cell of
+   * the row's own. Not on a server, which has no cells to point at, and not
+   * where a page named the row itself.
+   */
+  private nameByHeader(): void {
+    const cells = this.childrenKnown
+      ? this.knownChildren.filter(
+          (child) => 'isTableCell' in child && !child.hasAttribute('hidden'),
+        )
+      : []
+    const values = cells.some((cell) => !cell.hasAttribute('header'))
+    const header =
+      (values ? cells.find((cell) => cell.hasAttribute('header')) : undefined) ?? cells[0]
+    const own = this.hasAttribute('aria-label') || this.hasAttribute('aria-labelledby')
+    if ('ariaLabelledByElements' in this.internals) {
+      hostAria(this.internals, { labelledBy: header && !own ? [header] : [] })
+    } else {
+      hostAria(this.internals, {
+        label: header && !own ? (header.textContent ?? '').replace(/\s+/g, ' ').trim() : '',
+      })
+    }
   }
 
   override connectedCallback(): void {
@@ -322,6 +352,7 @@ export class HelixHeadlessTableRow extends HelixElement {
    * upgrades while its row is still being parsed has no value beside it yet.
    */
   private readonly handleSlotChange = (): void => {
+    this.requestUpdate()
     for (const cell of this.children) {
       if ('isTableCell' in cell) {
         ;(cell as unknown as ReactiveElement).requestUpdate()

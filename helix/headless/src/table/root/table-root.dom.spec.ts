@@ -826,3 +826,64 @@ describe('a table that loads more', () => {
     expect(asked).toBe(1)
   })
 })
+
+/* A row named from its contents read out its own checkbox too: "Select 412
+   412 main Passed". */
+describe('a row is named by its header cell', () => {
+  const labelledBy = (row: Element | null): Element[] | null | undefined =>
+    (row as unknown as { internals: ElementInternals }).internals.ariaLabelledByElements
+
+  test('names each row by the cell with `header`, or by its first cell', async () => {
+    const host = (await mount(`<helix-headless-table label="Runs" selectable grid>
+      <helix-headless-table-column>Run</helix-headless-table-column>
+      <helix-headless-table-column>Branch</helix-headless-table-column>
+      <helix-headless-table-row value="412">
+        <helix-headless-table-cell>main</helix-headless-table-cell>
+        <helix-headless-table-cell header>412</helix-headless-table-cell>
+      </helix-headless-table-row>
+      <helix-headless-table-row value="411">
+        <helix-headless-table-cell>411</helix-headless-table-cell>
+        <helix-headless-table-cell>main</helix-headless-table-cell>
+      </helix-headless-table-row>
+    </helix-headless-table>`)) as Updating
+    await settle(host)
+    const [first, second] = [...host.querySelectorAll('helix-headless-table-row')]
+    /* By reference where the platform takes one, and by the cell's words
+       where it does not. */
+    const name = (row: Element | undefined): string | null | undefined => {
+      const internals = (row as unknown as { internals: ElementInternals }).internals
+      return 'ariaLabelledByElements' in internals
+        ? labelledBy(row ?? null)
+            ?.map((cell) => cell.textContent)
+            .join(' ')
+        : internals.ariaLabel
+    }
+    expect(name(first)).toBe('412')
+    expect(name(second)).toBe('411')
+  })
+
+  test('is reported once when the table has no name, and not when it has one', async () => {
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      const nameless = (await mount(
+        '<helix-headless-table><helix-headless-table-row><helix-headless-table-cell>a</helix-headless-table-cell></helix-headless-table-row></helix-headless-table>',
+      )) as Updating
+      await settle(nameless)
+      await new Promise((done) => setTimeout(done, 5))
+      expect(
+        warnings.filter((one) => one.includes('<helix-headless-table> has no accessible name')),
+      ).toHaveLength(1)
+      warnings.length = 0
+      const named = (await mount(
+        '<helix-headless-table><h3 slot="heading">Runs</h3><helix-headless-table-row><helix-headless-table-cell>a</helix-headless-table-cell></helix-headless-table-row></helix-headless-table>',
+      )) as Updating
+      await settle(named)
+      await new Promise((done) => setTimeout(done, 5))
+      expect(warnings.filter((one) => one.includes('has no accessible name'))).toEqual([])
+    } finally {
+      console.warn = original
+    }
+  })
+})
