@@ -4,6 +4,7 @@ import {
   hasLayout,
   hasState,
   mount,
+  notYetDefined,
   part,
   registerDom,
   settle,
@@ -719,5 +720,34 @@ describe('a select a browser can autofill', () => {
     field.dispatchEvent(new Event('change', { bubbles: true }))
     await settle(host)
     expect(heard).toEqual(['two'])
+  })
+})
+
+describe('an option whose definition loads after it was added', () => {
+  /* The host hears the definition from `whenDefined`, a microtask after it,
+     and both elements then render. */
+  const upgraded = async (...elements: Element[]): Promise<void> => {
+    for (let round = 0; round < 3; round += 1) {
+      await new Promise((done) => setTimeout(done, 0))
+      await Promise.all(
+        elements.map((one) => (one as Element & { updateComplete?: unknown }).updateComplete),
+      )
+    }
+  }
+  /* The options are this element's children, which reach the listbox through
+     a slot, so the select is what hears the upgrade and tells the listbox. */
+  test('is selected by the value the select names, and its words are on the trigger', async () => {
+    const host = await mount(
+      '<helix-headless-select label="L" name="c" default-value="two"><helix-headless-option value="one">One</helix-headless-option></helix-headless-select>',
+    )
+    const late = notYetDefined('helix-headless-option')
+    Object.assign(late.element, { value: 'two' })
+    late.element.textContent = 'Two'
+    host.append(late.element)
+    await upgraded(host)
+    late.define()
+    await upgraded(host, late.element, part(host, 'listbox') as Element)
+    expect(hasState(late.element, 'selected')).toBe(true)
+    expect(part(host, 'value')?.textContent?.trim()).toBe('Two')
   })
 })

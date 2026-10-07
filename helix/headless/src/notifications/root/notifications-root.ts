@@ -13,6 +13,7 @@ import {
   MixinCollection,
   markRegion,
   rovingStop,
+  UpgradeController,
   whenHydrated,
   words,
 } from '@fusion.dev/helix-core'
@@ -343,6 +344,12 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
   protected readonly childWatch = new ChildrenController(this, this.handleSlotChange)
 
   /**
+   * Hears a row upgrade after it arrived. A row is known by its marker, which
+   * an element that has not upgraded lacks, so the row was assigned nowhere.
+   */
+  protected readonly upgradeWatch = new UpgradeController(this, this.handleSlotChange)
+
+  /**
    * An item's own read event, heard on the way past, so the count follows.
    *
    * `unread` is derived from the items and nothing about an item changing tells
@@ -609,7 +616,7 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
    * moment the markup is parsed. The rows themselves come from `items`, which
    * does need them upgraded, and that is the honest limit rather than a claim
    * this had made the other way: a row that upgrades late is counted on the next
-   * update, which its own `slotchange` asks for.
+   * update, which `UpgradeController` asks for when its definition arrives.
    */
   private markMedia(): void {
     this.toggleState(

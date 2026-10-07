@@ -3,6 +3,9 @@ import {
   at,
   formValue,
   hasLayout,
+  hasState,
+  mount,
+  notYetDefined,
   part,
   registerDom,
   settle,
@@ -1225,5 +1228,31 @@ describe('a combobox that sends the words', () => {
   test('by default, the value', async () => {
     const host = await combobox('default-value="rb"')
     expect(formValue(host as HTMLElement)).toBe('rb')
+  })
+})
+
+describe('an option whose definition loads after it was added', () => {
+  /* The host hears the definition from `whenDefined`, a microtask after it,
+     and both elements then render. */
+  const upgraded = async (...elements: Element[]): Promise<void> => {
+    for (let round = 0; round < 3; round += 1) {
+      await new Promise((done) => setTimeout(done, 0))
+      await Promise.all(
+        elements.map((one) => (one as Element & { updateComplete?: unknown }).updateComplete),
+      )
+    }
+  }
+  test('is selected by the value the combobox names', async () => {
+    const host = await mount(
+      '<helix-headless-combobox label="L" name="c" default-value="two"><helix-headless-option value="one">One</helix-headless-option></helix-headless-combobox>',
+    )
+    const late = notYetDefined('helix-headless-option')
+    Object.assign(late.element, { value: 'two' })
+    late.element.textContent = 'Two'
+    host.append(late.element)
+    await upgraded(host)
+    late.define()
+    await upgraded(host, late.element)
+    expect(hasState(late.element, 'selected')).toBe(true)
   })
 })

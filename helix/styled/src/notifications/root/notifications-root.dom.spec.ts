@@ -51,6 +51,29 @@ describe('the styled feed', () => {
   })
 })
 
+describe('a row that arrives after the render', () => {
+  test('prepended to a feed that rendered empty, is drawn and hides the empty line', async () => {
+    const element = (await mount(
+      '<helix-notifications label="Activity"></helix-notifications>',
+    )) as HTMLElement & {
+      updateComplete: Promise<unknown>
+    }
+    await element.updateComplete
+    expect(part(element, 'empty')).not.toBeNull()
+    const row = document.createElement('helix-notification')
+    row.textContent = 'New'
+    element.prepend(row)
+    /* The feed hears the row from a `MutationObserver`, a task after this one. */
+    await new Promise((done) => setTimeout(done, 0))
+    await settle(element)
+    const list = element.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="items"]')
+    const drawn = list?.assignedElements() ?? []
+    expect(drawn.length === 1 && drawn[0] === row).toBe(true)
+    expect(part(element, 'empty')).toBeNull()
+    expect(hasState(element, 'empty')).toBe(false)
+  })
+})
+
 /* The feed's stylesheet as text: happy-dom resolves no cascade, so here is
    held that the rule exists, and the pictures that it applies. */
 const feedSheet = (): string => {

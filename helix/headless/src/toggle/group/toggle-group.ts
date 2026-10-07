@@ -12,6 +12,7 @@ import {
   rovingStop,
   toggleValue,
   toolbarAround,
+  UpgradeController,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -351,6 +352,12 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
   /* A toggle added or removed inside a wrapper fires no `slotchange`, which
      sees direct children only. */
   private observer: MutationObserver | undefined
+
+  /* A toggle that upgrades after it arrived is read again, so `default-value`
+     selects it and the tab stop counts it. */
+  protected readonly upgradeWatch = new UpgradeController(this, () => this.handleItems(), {
+    subtree: true,
+  })
 
   /* Through the mixin, so a consumer can refuse the change with
      `helix-before-change`.

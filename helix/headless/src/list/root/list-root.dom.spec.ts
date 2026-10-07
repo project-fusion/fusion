@@ -1,5 +1,13 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, part, registerDom, role, slotted } from '@fusion.dev/helix-testing/dom'
+import {
+  hasState,
+  mount,
+  notYetDefined,
+  part,
+  registerDom,
+  role,
+  slotted,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -233,5 +241,30 @@ describe('a list that loads more', () => {
     expect(row.getAttribute('role')).toBe('row')
     expect(row.querySelector('[role="gridcell"]')).not.toBeNull()
     expect(part(list, 'empty')).toBeNull()
+  })
+})
+
+describe('an item whose definition loads after it was added', () => {
+  /* The host hears the definition from `whenDefined`, a microtask after it,
+     and both elements then render. */
+  const upgraded = async (...elements: Element[]): Promise<void> => {
+    for (let round = 0; round < 3; round += 1) {
+      await new Promise((done) => setTimeout(done, 0))
+      await Promise.all(
+        elements.map((one) => (one as Element & { updateComplete?: unknown }).updateComplete),
+      )
+    }
+  }
+  test('takes the role the list gives its rows once it upgrades', async () => {
+    const list = await mount(
+      '<helix-headless-list label="Files" selection-mode="single"><helix-headless-list-item value="a">Alpha</helix-headless-list-item></helix-headless-list>',
+    )
+    const late = notYetDefined('helix-headless-list-item')
+    late.element.textContent = 'Beta'
+    list.append(late.element)
+    await upgraded(list)
+    late.define()
+    await upgraded(list, late.element)
+    expect(role(late.element)).toBe('row')
   })
 })

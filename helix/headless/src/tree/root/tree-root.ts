@@ -19,6 +19,7 @@ import {
   Typeahead,
   treeArrow,
   typesCharacter,
+  UpgradeController,
   whenHydrated,
   words,
 } from '@fusion.dev/helix-core'
@@ -330,6 +331,11 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
   }
 
   private watcher: MutationObserver | undefined
+
+  /* An item that upgrades after it arrived gets its level and its place. */
+  protected readonly upgradeWatch = new UpgradeController(this, () => this.syncItems(), {
+    subtree: true,
+  })
 
   /** The item that last had focus, so its removal can hand focus on. */
   private focused: HelixHeadlessTreeItem | undefined

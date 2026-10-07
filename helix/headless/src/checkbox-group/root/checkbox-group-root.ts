@@ -7,6 +7,7 @@ import {
   HelixFormElement,
   hostAria,
   MixinField,
+  UpgradeController,
   words,
 } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type ReactiveController, type TemplateResult } from 'lit'
@@ -190,6 +191,9 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
 
   /** Watches for boxes arriving inside a wrapper, which no slot reports. */
   private observer: MutationObserver | undefined
+
+  /** Reads a box again once it upgrades, so it takes the group's name and value. */
+  protected readonly upgradeWatch = new UpgradeController(this, undefined, { subtree: true })
 
   /** The value the required check last judged. */
   private judged: string | undefined

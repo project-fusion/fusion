@@ -21,6 +21,7 @@ import {
   reportValues,
   StatusController,
   submitImplicitly,
+  UpgradeController,
   words,
   wordsLocale,
 } from '@fusion.dev/helix-core'
@@ -529,6 +530,21 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   private get listbox(): HelixHeadlessListbox | null {
     return this.partNamed<HelixHeadlessListbox>('listbox')
   }
+
+  /**
+   * Hears an option upgrade after it arrived. The options are this element's
+   * children, which the listbox reaches through a slot and does not watch, so
+   * both read them again: the listbox to select the one `value` names, and this
+   * element for the words in its field.
+   */
+  protected readonly upgradeWatch = new UpgradeController(
+    this,
+    () => {
+      this.listbox?.requestUpdate()
+      this.requestUpdate()
+    },
+    { subtree: true },
+  )
 
   /* Not `MixinPickerField`, though this is a text field with a panel over it.
      The agreement differs at every point the mixin fixes: the whole field is

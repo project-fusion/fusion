@@ -803,6 +803,35 @@ export const hasState = (host: Element, name: string): boolean =>
 export const part = (host: HTMLElement, name: string): Element | null =>
   host.shadowRoot?.querySelector(`[part~="${name}"]`) ?? null
 
+/** How many names `notYetDefined` has handed out, so each is new. */
+let undefinedNames = 0
+
+/**
+ * An element whose definition has not loaded yet, and the call that loads it.
+ *
+ * Stands for a child added while its script is still on its way: it has the
+ * name of no defined element, so it is a plain `HTMLElement` until `define`
+ * defines its name as a subclass of `base`, which upgrades it. A name of its own
+ * each time, since a name stays defined for the life of the page.
+ *
+ * Set what it needs as properties before `define`, which carry across the
+ * upgrade. happy-dom calls no `attributeChangedCallback` when it upgrades an
+ * element, so an attribute is not read there.
+ */
+export const notYetDefined = (base: string): { define: () => void; element: HTMLElement } => {
+  undefinedNames += 1
+  const name = `${base}-late-${undefinedNames}`
+  return {
+    define: () => {
+      customElements.define(
+        name,
+        class extends (customElements.get(base) as CustomElementConstructor) {},
+      )
+    },
+    element: document.createElement(name),
+  }
+}
+
 /**
  * Waits until a component has stopped asking for updates, with a ceiling.
  *

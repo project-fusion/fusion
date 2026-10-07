@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasState, mount, notYetDefined, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -552,5 +552,33 @@ describe('a tree with no name of its own', () => {
     ]) {
       expect(await warnedOn(named)).toEqual([])
     }
+  })
+})
+
+describe('an item whose definition loads after it was added', () => {
+  /* The host hears the definition from `whenDefined`, a microtask after it,
+     and both elements then render. */
+  const upgraded = async (...elements: Element[]): Promise<void> => {
+    for (let round = 0; round < 3; round += 1) {
+      await new Promise((done) => setTimeout(done, 0))
+      await Promise.all(
+        elements.map((one) => (one as Element & { updateComplete?: unknown }).updateComplete),
+      )
+    }
+  }
+  test('takes its level and its place once it upgrades', async () => {
+    const tree = await mount(
+      '<helix-headless-tree label="Files"><helix-headless-tree-item value="a">a</helix-headless-tree-item></helix-headless-tree>',
+    )
+    const late = notYetDefined('helix-headless-tree-item')
+    late.element.textContent = 'b'
+    tree.append(late.element)
+    await upgraded(tree)
+    late.define()
+    await upgraded(tree, late.element)
+    const row = part(late.element, 'item')
+    expect(row?.getAttribute('aria-level')).toBe('1')
+    expect(row?.getAttribute('aria-posinset')).toBe('2')
+    expect(row?.getAttribute('aria-setsize')).toBe('2')
   })
 })

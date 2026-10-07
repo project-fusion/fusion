@@ -33,6 +33,7 @@ import {
   Typeahead,
   toggleEvery,
   typesCharacter,
+  UpgradeController,
   words,
   wordsLocale,
 } from '@fusion.dev/helix-core'
@@ -658,6 +659,10 @@ export class HelixHeadlessListbox extends MixinCollection(
   get options(): HelixHeadlessOption[] {
     return this.among((node) => node instanceof HelixHeadlessOption, this.children)
   }
+
+  /* An option that upgrades after it arrived is read again, so `default-value`
+     selects it. Through a group too, which puts a level between them. */
+  protected readonly upgradeWatch = new UpgradeController(this, undefined, { subtree: true })
 
   /**
    * The elements of one kind in the list: its options, its groups or its

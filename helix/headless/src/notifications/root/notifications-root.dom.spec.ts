@@ -1,5 +1,13 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, hasState, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import {
+  hasLayout,
+  hasState,
+  mount,
+  notYetDefined,
+  part,
+  registerDom,
+  role,
+} from '@fusion.dev/helix-testing/dom'
 
 /* The feed, after hydration.
  *
@@ -500,6 +508,63 @@ describe('a row that arrives after the render', () => {
     const rows = group.shadowRoot?.querySelector<HTMLSlotElement>('slot:not([name])')
     expect(rows?.assignedElements().includes(row)).toBe(true)
     expect(host.unread).toBe(2)
+    expect(host.getAttribute('unread')).toBe('2')
+  })
+
+  test('prepended to a feed that rendered empty, is drawn and hides the empty line', async () => {
+    const host = await feed(
+      '<helix-headless-notifications label="Activity"></helix-headless-notifications>',
+    )
+    expect(part(host, 'empty')).not.toBeNull()
+    const row = document.createElement('helix-headless-notification')
+    row.textContent = 'New'
+    host.prepend(row)
+    await settle(host)
+    expect(drawn(host, 'items').length === 1 && drawn(host, 'items')[0] === row).toBe(true)
+    expect(part(host, 'empty')).toBeNull()
+    expect(hasState(host, 'empty')).toBe(false)
+  })
+
+  /* A row added while its definition is still loading carries no marker, so the
+     feed does not see a row until it upgrades. The upgrade changes no child list
+     and no assignment, so the feed waits for the definition. */
+  test('that upgrades after it arrived, is drawn and counted when it does', async () => {
+    const host = await feed(
+      '<helix-headless-notifications label="Activity"></helix-headless-notifications>',
+    )
+    const late = notYetDefined('helix-headless-notification')
+    const row = late.element
+    row.textContent = 'Late'
+    host.prepend(row)
+    await settle(host)
+    expect(part(host, 'empty')).not.toBeNull()
+    late.define()
+    await settle(host)
+    expect(drawn(host, 'items').length === 1 && drawn(host, 'items')[0] === row).toBe(true)
+    expect(part(host, 'empty')).toBeNull()
+    expect(host.getAttribute('unread')).toBe('1')
+  })
+
+  test('in a group, that upgrades after it arrived, is drawn by the group and counted by the feed', async () => {
+    const host = await feed(`
+      <helix-headless-notifications label="Activity">
+        <helix-headless-notification-group label="Today">
+          <helix-headless-notification>One</helix-headless-notification>
+        </helix-headless-notification-group>
+      </helix-headless-notifications>`)
+    const group = host.querySelector('helix-headless-notification-group') as HTMLElement & {
+      updateComplete: Promise<unknown>
+    }
+    const late = notYetDefined('helix-headless-notification')
+    const row = late.element
+    row.textContent = 'Two'
+    group.append(row)
+    await settle(host)
+    late.define()
+    await group.updateComplete
+    await settle(host)
+    const rows = group.shadowRoot?.querySelector<HTMLSlotElement>('slot:not([name])')
+    expect(rows?.assignedElements().includes(row)).toBe(true)
     expect(host.getAttribute('unread')).toBe('2')
   })
 

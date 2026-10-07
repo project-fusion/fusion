@@ -139,6 +139,10 @@ export {
   TokenColorController,
 } from './controllers/token-color-controller/token-color-controller.js'
 export {
+  UpgradeController,
+  type UpgradeOptions,
+} from './controllers/upgrade-controller/upgrade-controller.js'
+export {
   type Rendered,
   VirtualizeController,
   type VirtualizeOptions,

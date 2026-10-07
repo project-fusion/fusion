@@ -5,6 +5,7 @@ import {
   HelixElement,
   hostAria,
   MixinControllerOpen,
+  UpgradeController,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -223,10 +224,15 @@ export class HelixHeadlessNotificationGroup extends MixinControllerOpen(HelixEle
    * the group is in is asked to update as well, since it counts the group's
    * rows and does not watch inside the group.
    */
-  protected readonly childWatch = new ChildrenController(this, () => {
+  private readonly recount = (): void => {
     this.requestUpdate()
     ;(this.parentElement as Partial<Pick<HelixElement, 'requestUpdate'>> | null)?.requestUpdate?.()
-  })
+  }
+
+  protected readonly childWatch = new ChildrenController(this, this.recount)
+
+  /** Hears a row upgrade after it arrived, which neither the slot nor `childWatch` reports. */
+  protected readonly upgradeWatch = new UpgradeController(this, this.recount)
 
   private readonly handleToggle = (): void => {
     this.toggleOpen()

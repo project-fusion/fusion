@@ -1,5 +1,12 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import {
+  hasState,
+  mount,
+  notYetDefined,
+  part,
+  registerDom,
+  role,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -286,5 +293,33 @@ describe('a crumb a reader presses', () => {
     const crumbs = [...host.children] as Array<HTMLElement & { updateComplete: Promise<unknown> }>
     await Promise.all(crumbs.map((one) => one.updateComplete))
     expect(crumbs.map((one) => hasState(one, 'current'))).toEqual([false, false, true])
+  })
+})
+
+describe('a crumb whose definition loads after it was added', () => {
+  /* The host hears the definition from `whenDefined`, a microtask after it,
+     and both elements then render. */
+  const upgraded = async (...elements: Element[]): Promise<void> => {
+    for (let round = 0; round < 3; round += 1) {
+      await new Promise((done) => setTimeout(done, 0))
+      await Promise.all(
+        elements.map((one) => (one as Element & { updateComplete?: unknown }).updateComplete),
+      )
+    }
+  }
+  test('is the current one once it upgrades, and the one before is not', async () => {
+    const trail = await mount(
+      '<helix-headless-breadcrumbs><helix-headless-breadcrumb href="/">Home</helix-headless-breadcrumb></helix-headless-breadcrumbs>',
+    )
+    const first = trail.querySelector('helix-headless-breadcrumb') as HTMLElement
+    const late = notYetDefined('helix-headless-breadcrumb')
+    Object.assign(late.element, { current: true })
+    late.element.textContent = 'Here'
+    trail.append(late.element)
+    await upgraded(trail)
+    late.define()
+    await upgraded(trail, first, late.element)
+    expect(hasState(late.element, 'current')).toBe(true)
+    expect(hasState(first, 'current')).toBe(false)
   })
 })

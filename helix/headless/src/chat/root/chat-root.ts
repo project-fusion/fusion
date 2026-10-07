@@ -13,6 +13,7 @@ import {
   onUnlessFalse,
   type Rendered,
   requestChange,
+  UpgradeController,
   VirtualizeController,
   whenHydrated,
   words,
@@ -498,6 +499,12 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
    * never a turn's own text, which a streaming turn rewrites every frame.
    */
   protected readonly childWatch = new ChildrenController(this, () => this.handleSlotChange())
+
+  /**
+   * Hears a message upgrade after it arrived. A message is known by its marker,
+   * which an element that has not upgraded lacks, so it was assigned nowhere.
+   */
+  protected readonly upgradeWatch = new UpgradeController(this, () => this.handleSlotChange())
 
   /** Watches the turns' own `state`, which is when one of them settles. */
   private settling: MutationObserver | undefined = undefined

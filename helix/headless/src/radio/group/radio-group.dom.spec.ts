@@ -2,6 +2,9 @@ import { beforeAll, describe, expect, test } from 'bun:test'
 import {
   at,
   formValue,
+  hasState,
+  mount,
+  notYetDefined,
   part,
   registerDom,
   settle,
@@ -480,5 +483,33 @@ describe('radios inside a layout wrapper', () => {
     }
     expect(team.selected).toBe(true)
     expect(formValue(host)).toBe('c')
+  })
+})
+
+describe('a radio whose definition loads after it was added', () => {
+  /* The host hears the definition from `whenDefined`, a microtask after it,
+     and both elements then render. */
+  const upgraded = async (...elements: Element[]): Promise<void> => {
+    for (let round = 0; round < 3; round += 1) {
+      await new Promise((done) => setTimeout(done, 0))
+      await Promise.all(
+        elements.map((one) => (one as Element & { updateComplete?: unknown }).updateComplete),
+      )
+    }
+  }
+  test('is selected by the value the group names, and holds the tab stop', async () => {
+    const group = await mount(
+      '<helix-headless-radio-group label="L" name="c" default-value="two"><helix-headless-radio value="one">One</helix-headless-radio></helix-headless-radio-group>',
+    )
+    const late = notYetDefined('helix-headless-radio')
+    Object.assign(late.element, { value: 'two' })
+    late.element.textContent = 'Two'
+    group.append(late.element)
+    await upgraded(group)
+    late.define()
+    await upgraded(group, late.element)
+    expect(hasState(late.element, 'selected')).toBe(true)
+    const first = group.querySelector('helix-headless-radio') as HTMLElement
+    expect(part(first, 'item')?.getAttribute('tabindex')).toBe('-1')
   })
 })

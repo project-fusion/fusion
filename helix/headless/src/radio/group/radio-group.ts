@@ -7,6 +7,7 @@ import {
   KeyboardNavigationController,
   MixinControllerValue,
   MixinField,
+  UpgradeController,
   words,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
@@ -177,6 +178,10 @@ export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(Hel
   /* A radio added or removed inside a wrapper fires no `slotchange`, which
      sees direct children only. */
   private observer: MutationObserver | undefined
+
+  /* A radio that upgrades after it arrived is read again, so `default-value`
+     selects it and the tab stop counts it. */
+  protected readonly upgradeWatch = new UpgradeController(this, undefined, { subtree: true })
 
   /**
    * Announces before it applies, so a listener can refuse the change.

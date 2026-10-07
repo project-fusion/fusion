@@ -1,7 +1,9 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import {
   formValue,
+  hasState,
   mount,
+  notYetDefined,
   part,
   registerDom,
   role,
@@ -546,5 +548,33 @@ describe('a toggle group that allows no choice', () => {
     await choose(group, 2)
     await choose(group, 2)
     expect(group.value).toBe('dark')
+  })
+})
+
+describe('a toggle whose definition loads after it was added', () => {
+  /* The host hears the definition from `whenDefined`, a microtask after it,
+     and both elements then render. */
+  const upgraded = async (...elements: Element[]): Promise<void> => {
+    for (let round = 0; round < 3; round += 1) {
+      await new Promise((done) => setTimeout(done, 0))
+      await Promise.all(
+        elements.map((one) => (one as Element & { updateComplete?: unknown }).updateComplete),
+      )
+    }
+  }
+  test('is selected by the value the group names, and holds the tab stop', async () => {
+    const group = await mount(
+      '<helix-headless-toggle-group label="Mode" default-value="light"><helix-headless-toggle value="system">System</helix-headless-toggle></helix-headless-toggle-group>',
+    )
+    const late = notYetDefined('helix-headless-toggle')
+    Object.assign(late.element, { value: 'light' })
+    late.element.textContent = 'Light'
+    group.append(late.element)
+    await upgraded(group)
+    late.define()
+    await upgraded(group, late.element)
+    expect(hasState(late.element, 'selected')).toBe(true)
+    const first = group.querySelector('helix-headless-toggle') as HTMLElement
+    expect(part(first, 'item')?.getAttribute('tabindex')).toBe('-1')
   })
 })
