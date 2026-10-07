@@ -619,6 +619,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     // Stopped for the reason `Input.handleInput` gives: the inner control's own
     // `input` is composed and would reach a consumer beside this element's.
     event.stopPropagation()
+    this.enterCommit = undefined
     const control = event.target as HTMLInputElement
     this.requestValue(control.value)
     restoreValue(control, this.shown)
@@ -675,8 +676,17 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
   private readonly handleChange = (event: Event): void => {
     event.stopPropagation()
     this.settle()
-    this.announceChange()
+    /* Enter announced this value already, and the field's own `change` follows
+       the same keypress. */
+    const announced = this.enterCommit === this.value
+    this.enterCommit = undefined
+    if (!announced) {
+      this.announceChange()
+    }
   }
+
+  /** The value Enter settled and announced, until the field's `change` or the next keystroke. */
+  private enterCommit: string | undefined
 
   /**
    * The four keys a spinner answers, which `Input` does not bind.
@@ -829,11 +839,21 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
    *
    * On `keypress`, where the platform runs its own implicit submission, so a
    * consumer who prevents the `keydown` for Enter stops this too.
+   *
+   * **Settled first**, as blur settles it. The typed text is read as a number,
+   * `change` announces it, and the form value is written before the form is
+   * submitted, so a field showing `$2,500.50` submits 2500.5.
    */
   private readonly handleKeypress = (event: KeyboardEvent): void => {
-    if (event.key === 'Enter' && !event.defaultPrevented) {
-      submitImplicitly(this.form)
+    if (event.key !== 'Enter' || event.defaultPrevented) {
+      return
     }
+    if (this.settle()) {
+      this.sync()
+      this.enterCommit = this.value
+      this.announceChange()
+    }
+    submitImplicitly(this.form)
   }
 
   /** @internal A single line of text counts against implicit submission. */
