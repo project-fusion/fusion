@@ -142,20 +142,22 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
   context = false
 
   /**
+   * Accessible name for the surface.
+   *
+   * Empty by default, which names the surface by its trigger, so a menu opened
+   * from "Actions" is announced as "Actions". An `aria-label` or
+   * `aria-labelledby` on the host names it too, and wins over both.
+   */
+  @property()
+  label = ''
+
+  /**
    * The description a trigger gives under `open-on="long-press"`, saying how
    * to open the menu. Translate it with the rest of your interface.
    */
   @words
   @property({ attribute: 'long-press-label' })
   longPressLabel = 'Long press or press Alt+Down to show the menu'
-
-  /**
-   * What opens the menu from its trigger. `long-press` leaves a press to the
-   * trigger's own action and opens the menu on a press held for half a second,
-   * or on Alt+Down or Alt+Up.
-   */
-  @property({ attribute: 'open-on' })
-  openOn: 'click' | 'long-press' = 'click'
 
   /** Whether the trigger opens the menu only on a held press. */
   private get pressHeld(): boolean {
@@ -185,20 +187,18 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
   private heldAt: { x: number; y: number } | undefined
 
   /**
-   * Accessible name for the surface.
-   *
-   * Empty by default, which names the surface by its trigger, so a menu opened
-   * from "Actions" is announced as "Actions". An `aria-label` or
-   * `aria-labelledby` on the host names it too, and wins over both.
-   */
-  @property()
-  label = ''
-
-  /**
    * Space between the trigger and the surface, in pixels.
    */
   @property({ type: Number })
   offset = 4
+
+  /**
+   * What opens the menu from its trigger. `long-press` leaves a press to the
+   * trigger's own action and opens the menu on a press held for half a second,
+   * or on Alt+Down or Alt+Up.
+   */
+  @property({ attribute: 'open-on' })
+  openOn: 'click' | 'long-press' = 'click'
 
   /**
    * The side the menu opens on, when there is room.

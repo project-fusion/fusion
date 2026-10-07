@@ -102,18 +102,18 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
   focusable = false
 
   /**
-   * @internal Whether the row is a list item of a drilldown with
-   * `navigation`. Written by the stack.
-   */
-  @property({ attribute: false })
-  listed = false
-
-  /**
    * The URL the row links to. Setting it renders the row as a link, unless the
    * row opens a page or is disabled.
    */
   @property()
   href = ''
+
+  /**
+   * @internal Whether the row is a list item of a drilldown with
+   * `navigation`. Written by the stack.
+   */
+  @property({ attribute: false })
+  listed = false
 
   /**
    * @internal Read by a parent to identify its children across the light DOM,
