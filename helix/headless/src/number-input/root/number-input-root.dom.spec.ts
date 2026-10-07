@@ -418,6 +418,28 @@ describe('Enter in the field', () => {
     )
     expect(submitted).toBe(1)
   })
+
+  /* The form was submitted before the typed text was read as a number, so a
+     field showing `$2,500.50` sent that text and the value settled afterwards. */
+  test('submits the typed number as a number, and announces change first', async () => {
+    document.body.innerHTML = `<form><helix-headless-number-input name="price" label="Price" locale="en-US" format-options='{"style":"currency","currency":"USD"}' default-value="1200"></helix-headless-number-input></form>`
+    const host = document.querySelector('helix-headless-number-input') as Field
+    await host.updateComplete
+    control(host).dispatchEvent(new Event('focus'))
+    await type(host, '$2,500.50')
+    const heard: string[] = []
+    host.addEventListener('change', () => heard.push(`change:${host.value}`))
+    document.querySelector('form')?.addEventListener('submit', (event) => {
+      event.preventDefault()
+      heard.push(`submit:${formValue(host)}`)
+    })
+    control(host).dispatchEvent(
+      new KeyboardEvent('keypress', { bubbles: true, cancelable: true, key: 'Enter' }),
+    )
+    // The field's own `change` follows the keypress, and is not a second commit.
+    control(host).dispatchEvent(new Event('change'))
+    expect(heard).toEqual(['change:2500.5', 'submit:2500.5'])
+  })
 })
 
 describe('leaving a number out of range', () => {
