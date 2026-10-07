@@ -143,7 +143,17 @@ export class HelixHeadlessStep extends HelixElement {
   optional = false
 
   /**
-   * The value the step sends in `helix-select`.
+   * @internal Set by a sequence with `arrows`: whether the name holds the
+   * sequence's one tab stop. A property, because the sequence writes it after
+   * the step upgrades.
+   */
+  @property({ attribute: false })
+  stop = true
+
+  /**
+   * The value the step sends in `helix-select`, and what names the step in its
+   * sequence's `active`. Without one, the sequence names the step by its place,
+   * counted from 1.
    */
   @property()
   value = ''
@@ -263,6 +273,7 @@ export class HelixHeadlessStep extends HelixElement {
       part="label"
       exportparts="button: label-button, live: label-live, spinner: label-spinner, text: label-text"
       emphasis="ghost"
+      .focusable=${this.stop}
       aria-current=${this.current ? 'step' : nothing}
       aria-describedby=${this.complete ? 'state' : nothing}
       ?disabled=${this.disabled || this.locked}
