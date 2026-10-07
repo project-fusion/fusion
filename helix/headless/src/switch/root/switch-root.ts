@@ -6,6 +6,7 @@ import {
   MixinControllerChecked,
   MixinField,
   markRegion,
+  words,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -68,6 +69,12 @@ import { property } from 'lit/decorators.js'
  */
 @customElement('helix-headless-switch')
 export class HelixHeadlessSwitch extends MixinControllerChecked(MixinField(HelixFormElement)) {
+  /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-switch': { valueMissingMessage: '...' } })`.
+   */
+  static words = 'helix-switch'
+
   /* A consumer's `aria-describedby` names ids in their own tree and the control
      is in this shadow root, so the reference has to be carried down as an
      element rather than copied as an id. See `AriaForwardController`: measured
@@ -86,6 +93,15 @@ export class HelixHeadlessSwitch extends MixinControllerChecked(MixinField(Helix
    */
   @property()
   value = 'on'
+
+  /**
+   * The message reported when the field is required and the switch is off.
+   * Absent, or empty, is this sentence, or the words registered for the page's
+   * locale.
+   */
+  @words
+  @property({ attribute: 'value-missing-message' })
+  override valueMissingMessage = 'Turn this on to continue.'
 
   private readonly handleChange = (event: Event): void => {
     event.stopPropagation()
@@ -112,7 +128,7 @@ export class HelixHeadlessSwitch extends MixinControllerChecked(MixinField(Helix
     // `null` rather than the value when it is off, which is how a checkbox
     // behaves: an unticked box submits nothing rather than a blank.
     this.internals.setFormValue(this.checked ? this.value : null)
-    this.reportRequired(!this.checked, 'Turn this on to continue.', 'control')
+    this.reportRequired(!this.checked, this.valueMissingMessage, 'control')
   }
 
   /** Returns the switch to the state its markup declared. */

@@ -3,6 +3,7 @@ import { html, nothing, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import type { HelixElement } from '../../helix-element/helix-element.js'
 import { drawIcon } from '../../utils/draw-icon/draw-icon.js'
+import { formatWords, words } from '../../words/words.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
 type Constructor<T> = new (...args: any[]) => T
@@ -61,6 +62,12 @@ export declare class MixinTokensInterface {
    * either way and this is what says what pressing it does.
    */
   collapseLabel: string
+
+  /**
+   * The count of the tokens past `max-tags`, as it is shown, with `{count}`
+   * for the number, written in the element's locale. `+{count}` by default.
+   */
+  restText: string
 
   /**
    * The cap in force right now, which is none while the reader has expanded it.
@@ -136,8 +143,16 @@ export declare class MixinTokensInterface {
 export const MixinTokens = <T extends Constructor<HelixElement>>(Base: T) => {
   class TokensElement extends Base {
     /**
+     * The key the count's words are registered under: the host's own, which
+     * each family names with its styled tag, `static words =
+     * 'helix-combobox'`. A host with none reads its tag name.
+     */
+    static words = ''
+
+    /**
      * The button's label, read by screen readers, once every token is showing.
      */
+    @words
     @property({ attribute: 'collapse-label' })
     collapseLabel = 'Show fewer'
 
@@ -151,6 +166,7 @@ export const MixinTokens = <T extends Constructor<HelixElement>>(Base: T) => {
      * The count button's label, read by screen readers. Its visible text, such
      * as `+3`, does not say what it does.
      */
+    @words
     @property({ attribute: 'expand-label' })
     expandLabel = 'Show all'
 
@@ -159,6 +175,14 @@ export const MixinTokens = <T extends Constructor<HelixElement>>(Base: T) => {
      */
     @property({ attribute: 'max-tags', type: Number })
     maxTags = 0
+
+    /**
+     * The count of the tokens past `max-tags`, as it is shown, with `{count}`
+     * for the number, written in the element's locale.
+     */
+    @words
+    @property({ attribute: 'rest-text' })
+    restText = '+{count}'
 
     /**
      * Whether the reader has asked for all of them.
@@ -203,14 +227,16 @@ export const MixinTokens = <T extends Constructor<HelixElement>>(Base: T) => {
      */
     private renderRest(over: number): TemplateResult | typeof nothing {
       if (!this.expandable) {
-        return over > 0 ? html`<span part="rest">${`+${over}`}</span>` : nothing
+        return over > 0
+          ? html`<span part="rest">${formatWords(this, 'restText', { count: over })}</span>`
+          : nothing
       }
       if (over < 1 && !this.expanded) {
         return nothing
       }
       /* **A mark rather than words on the way back, and the words become its
-         name.** `+3` is a number in every language and needs no translating;
-         "Show fewer" is a sentence, and a control that is a count going one way
+         name.** `+3` is a count, written in the locale's digits through
+         `rest-text`; "Show fewer" is a sentence, and a control that is a count going one way
          and a phrase coming back also changes width as it is pressed, which
          moves the row of tokens beside it. A caret is the same size either way.
 
@@ -228,7 +254,7 @@ export const MixinTokens = <T extends Constructor<HelixElement>>(Base: T) => {
         type="button"
         aria-label=${this.expanded ? this.collapseLabel : this.expandLabel}
         @click=${this.toggleExpanded}
-        >${this.expanded ? drawIcon(caretUp) : `+${over}`}</button
+        >${this.expanded ? drawIcon(caretUp) : formatWords(this, 'restText', { count: over })}</button
       >`
     }
 

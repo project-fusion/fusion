@@ -7,6 +7,7 @@ import {
   KeyboardNavigationController,
   MixinControllerValue,
   MixinField,
+  words,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -80,6 +81,12 @@ import { HelixHeadlessRadio } from '../root/radio-root.js'
 @customElement('helix-headless-radio-group')
 export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(HelixFormElement)) {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-radio-group': { valueMissingMessage: '...' } })`.
+   */
+  static words = 'helix-radio-group'
+
+  /**
    * Whether the group holds a tab stop of its own.
    *
    * A toolbar is one tab stop, so a toolbar the group sits in sets this to
@@ -117,6 +124,15 @@ export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(Hel
    */
   @property({ attribute: 'readonly', reflect: true, type: Boolean })
   readOnly = false
+
+  /**
+   * The message reported when the field is required and no option is chosen.
+   * Absent, or empty, is this sentence, or the words registered for the page's
+   * locale.
+   */
+  @words
+  @property({ attribute: 'value-missing-message' })
+  override valueMissingMessage = 'Choose one to continue.'
 
   /* Moving and choosing are one act, which is the radio group pattern and is
      what this controller exists to stop being written per component. */
@@ -284,7 +300,7 @@ export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(Hel
   private sync(): void {
     const answered = this.answered
     this.internals.setFormValue(answered ? this.value : null)
-    this.reportRequired(!answered, 'Choose one to continue.', 'items')
+    this.reportRequired(!answered, this.valueMissingMessage, 'items')
   }
 
   override connectedCallback(): void {

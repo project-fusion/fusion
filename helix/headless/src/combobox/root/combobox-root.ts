@@ -431,6 +431,15 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   suggest = false
 
   /**
+   * The message reported when the field is required and nothing is chosen.
+   * Absent, or empty, is this sentence, or the words registered for the page's
+   * locale.
+   */
+  @words
+  @property({ attribute: 'value-missing-message' })
+  override valueMissingMessage = 'Choose one to continue.'
+
+  /**
    * What the reader has typed, which narrows the list and is not the value.
    *
    * State rather than a property, because it is a keystroke rather than API: a
@@ -1213,7 +1222,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
     } else {
       this.internals.setFormValue(this.value === '' ? null : this.value)
     }
-    this.reportRequired(this.value === '', 'Choose one to continue.', 'control')
+    this.reportRequired(this.value === '', this.valueMissingMessage, 'control')
   }
 
   /** A link option, once followed, closes the panel as a choice does. */

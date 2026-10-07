@@ -126,6 +126,15 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
   }
 
   /**
+   * The message reported when the field is required and no box is ticked.
+   * Absent, or empty, is this sentence, or the words registered for the page's
+   * locale.
+   */
+  @words
+  @property({ attribute: 'value-missing-message' })
+  override valueMissingMessage = 'Choose at least one to continue.'
+
+  /**
    * The checked values, as a list, in the order the boxes are written.
    *
    * The same set as `value`, and the one to use where a value may hold a
@@ -447,7 +456,7 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
    */
   private validate(): void {
     this.judged = this.value
-    this.reportRequired(this.judged === '', 'Choose at least one to continue.', 'items')
+    this.reportRequired(this.judged === '', this.valueMissingMessage, 'items')
   }
 
   protected override updated(changed: PropertyValues): void {

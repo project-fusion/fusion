@@ -186,12 +186,16 @@ keys, import the generated types once:
 import type {} from '@fusion.dev/helix/words'
 ```
 
-Every family reads the registry for the words it declares, except Listbox and
-Editor. A few words that several families share are still plain properties: the
-name of a dismiss button, `dismiss-label`; a collection's `empty-text` and
-`loading-text`; and the sentences a field reports from the code its fields
-share, such as `value-missing-message`. Set those on the element, as described
-in [Set the words of other families](#set-the-words-of-other-families).
+Every family reads the registry for the words it declares, the words several
+families share included. Register a shared word under each family's key: the
+name of a dismiss button, `dismissLabel`, under `helix-callout`; a collection's
+`emptyText` and `loadingText` under `helix-tree`; and the sentence a field
+reports when a required value is missing, `valueMissingMessage`, under
+`helix-checkbox`. A family that has its own English for a shared word, such as
+Tag's `Remove {label}`, keeps it until you register another.
+
+The name a family gives itself where nothing else names it is `fallbackLabel`
+in every family, such as `{ 'helix-table': { fallbackLabel: 'Tabelle' } }`.
 
 ### Which words an element uses
 
@@ -266,9 +270,9 @@ one process do not affect each other.
 
 ### Set the words of other families
 
-A value set on the element always wins, so Listbox, Editor, and the shared
-words above take their words as properties, such as `empty-text` on a listbox.
-Properties that combine values are format templates:
+A value set on the element always wins, so any family takes its words as
+properties too, such as `empty-text` on a listbox. Properties that combine
+values are format templates:
 
 ```html
 <helix-pagination-summary

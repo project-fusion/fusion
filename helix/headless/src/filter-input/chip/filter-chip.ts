@@ -4,6 +4,7 @@ import {
   labelWith,
   MixinDismissible,
   slottedWords,
+  words,
 } from '@fusion.dev/helix-core'
 import { x } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -73,11 +74,22 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  */
 @customElement('helix-headless-filter-chip')
 export class HelixHeadlessFilterChip extends MixinDismissible(HelixElement) {
-  /* "Remove filter" rather than the mixin's "Dismiss", for the reason `Tag`
-     gives its own override: the control's name is what a screen-reader user
-     hears, and taking a filter out of a set is not closing a message. The
-     chip's own words follow it, so several chips are told apart: see
-     `removeName`. */
+  /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-filter-chip': { dismissLabel: 'Filter entfernen' } })`.
+   */
+  static words = 'helix-filter-chip'
+
+  /**
+   * The remove button's name, read by screen readers. The chip's own words
+   * follow it, so several chips are told apart.
+   *
+   * "Remove filter" rather than the mixin's "Dismiss", for the reason `Tag`
+   * gives its own: taking a filter out of a set is a different act from
+   * closing a message.
+   */
+  @words
+  @property({ attribute: 'dismiss-label' })
   override dismissLabel = 'Remove filter'
 
   /**
