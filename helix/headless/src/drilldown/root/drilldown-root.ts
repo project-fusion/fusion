@@ -114,19 +114,19 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
   label = 'Navigation'
 
   /**
+   * The text of the back button.
+   */
+  @words
+  @property({ attribute: 'back-label' })
+  backLabel = 'Back'
+
+  /**
    * Whether the drilldown is a site's navigation: a `navigation` landmark
    * named by `label`, whose pages are lists of links. Without it, each page is
    * a `menu`.
    */
   @property({ type: Boolean })
   navigation = false
-
-  /**
-   * The text of the back button.
-   */
-  @words
-  @property({ attribute: 'back-label' })
-  backLabel = 'Back'
 
   /**
    * Which way the last move went, for whatever animates the change.
