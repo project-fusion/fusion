@@ -62,8 +62,11 @@ by, and there is no second copy of that number to bump.
 
 A browser job adds `.github/actions/browser`: the headless shell, cached under
 the Playwright version the lockfile holds, and the system packages it links
-against, which are not cached and include the fonts every baseline was taken
-with.
+against, which include the fonts every baseline was taken with. The packages are
+cached as the `.deb` files apt fetched, under the runner image and the
+Playwright version, so a browser job installs them with `dpkg` and never waits
+on the Ubuntu mirror. A new runner image misses once and installs from the
+mirror with a time limit and a second try.
 
 ## One build, before the jobs that would each do their own
 
