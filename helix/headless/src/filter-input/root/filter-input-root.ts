@@ -23,6 +23,7 @@ import {
 import { x } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import type { HelixHeadlessFilterChip } from '../chip/filter-chip.js'
 import { HelixHeadlessFilterField } from '../field/filter-field.js'
 import { readFilterText } from '../grammar.js'
 import { HelixHeadlessFilterMenu } from '../menu/filter-menu.js'
@@ -144,7 +145,8 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  *   and removing the chip alone would leave its value ticked in the hidden
  *   menu. Its dismissal is treated as the field being filtered by nothing, so
  *   it fires `helix-facet` like every other change, and the chip goes when the
- *   filter goes.
+ *   filter goes. Set `chips` and the field adds, updates, and removes those
+ *   chips itself, from every `helix-facet` you do not cancel.
  *
  * @since 0.1.0
  * @status stable
@@ -204,6 +206,22 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
 
   /** Typed, so every keystroke is announced. See `announcesInput`. */
   protected override readonly announcesInput = true
+
+  /**
+   * Whether the field keeps a `FilterChip` for each filter in its `tags` slot,
+   * from the `helix-facet` events it hears.
+   *
+   * Off, you build the chips, which is what you do when your own model holds
+   * the filters. On, a filter typed, picked, or changed adds or updates the
+   * chip for its field, one with no values takes it away (unless its
+   * comparison takes none, such as "is empty"), and removing the chip clears
+   * the filter. A `helix-facet` you cancel changes no chip.
+   *
+   * The chips are elements the field adds to its own children, so leave this
+   * off where a framework renders those children and would remove them.
+   */
+  @property({ type: Boolean })
+  chips = false
 
   /**
    * Shows a button that empties the field.
@@ -567,6 +585,48 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
   }
 
   /**
+   * Keeps the chip for a filter in step with it, under `chips`.
+   *
+   * After every listener has had its turn, so a consumer's `preventDefault()`
+   * on the same event, on this element or above it, is read: `dispatchEvent`
+   * runs them all before the microtask does.
+   */
+  private readonly handleFacet = (event: Event): void => {
+    if (!this.chips) {
+      return
+    }
+    const facet = (event as CustomEvent<FacetDetail>).detail
+    queueMicrotask(() => {
+      if (!event.defaultPrevented) {
+        this.drawChip(facet)
+      }
+    })
+  }
+
+  /** Adds, updates or removes the chip for one filter. See `chips`. */
+  private drawChip(facet: FacetDetail): void {
+    const tag = `${(this.constructor as typeof HelixFormElement).tier}filter-chip`
+    const held = [...this.children].find(
+      (child) => child.localName === tag && child.getAttribute('name') === facet.field,
+    ) as HelixHeadlessFilterChip | undefined
+    if (facet.values.length === 0 && facet.arity !== 'none') {
+      held?.remove()
+      return
+    }
+    const chip = held ?? (document.createElement(tag) as HelixHeadlessFilterChip)
+    chip.slot = 'tags'
+    chip.dismissible = true
+    chip.label = facet.label
+    chip.setAttribute('name', facet.field)
+    chip.operator = facet.operator
+    chip.operatorLabel = facet.operatorLabel
+    chip.textContent = facet.values.join(', ')
+    if (!held) {
+      this.append(chip)
+    }
+  }
+
+  /**
    * A chip asking to go, answered as the filter going.
    *
    * **Taken rather than passed on, and only for a chip naming a declared
@@ -893,11 +953,13 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
   override connectedCallback(): void {
     super.connectedCallback()
     this.addEventListener('helix-dismiss', this.handleDismiss)
+    this.addEventListener(HelixFacetEvent.eventName, this.handleFacet)
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('helix-dismiss', this.handleDismiss)
+    this.removeEventListener(HelixFacetEvent.eventName, this.handleFacet)
   }
 
   protected override willUpdate(changed: PropertyValues): void {

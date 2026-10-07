@@ -283,3 +283,59 @@ describe('the rest of the reading', () => {
     expect(heard[0]?.operatorLabel).toBe('is none of')
   })
 })
+
+/* Every example built its chips from `helix-facet` with the same dozen lines;
+   `chips` is those lines, kept by the field. */
+describe('a field that keeps its own chips', () => {
+  const chipsOf = (host: Updatable): (HTMLElement & { operatorLabel: string })[] =>
+    [...(host as HTMLElement).querySelectorAll('helix-headless-filter-chip')] as (HTMLElement & {
+      operatorLabel: string
+    })[]
+
+  const withChips = async (): Promise<Updatable> => {
+    const host = await mount()
+    ;(host as HTMLElement & { chips: boolean }).chips = true
+    await settle(host)
+    return host
+  }
+
+  test('draws a chip for a typed filter, updates it, and takes it away with the filter', async () => {
+    const host = await withChips()
+    await type(host, 'disposition:refunded')
+    await press(host)
+    await settle(host)
+    expect(chipsOf(host)).toHaveLength(1)
+    const chip = chipsOf(host)[0] as HTMLElement & { label: string; operator: string }
+    expect(chip.slot).toBe('tags')
+    expect(chip.getAttribute('name')).toBe('disposition')
+    expect(chip.label).toBe('Disposition')
+    expect(chip.textContent).toBe('refunded')
+    const menu = (host as HTMLElement).querySelector('helix-headless-filter-menu') as unknown as {
+      apply: (field: string, values: readonly string[]) => boolean
+    }
+    menu.apply('disposition', ['refunded', 'settled'])
+    await settle(host)
+    expect(chipsOf(host)).toHaveLength(1)
+    expect(chipsOf(host)[0]?.textContent).toBe('refunded, settled')
+    ;(chipsOf(host)[0] as unknown as { dismiss: () => boolean }).dismiss()
+    await settle(host)
+    expect(chipsOf(host)).toHaveLength(0)
+  })
+
+  test('draws nothing for a filter you refuse', async () => {
+    const host = await withChips()
+    watch(host, true)
+    await type(host, 'disposition:refunded')
+    await press(host)
+    await settle(host)
+    expect(chipsOf(host)).toHaveLength(0)
+  })
+
+  test('draws nothing while it is off', async () => {
+    const host = await mount()
+    await type(host, 'disposition:refunded')
+    await press(host)
+    await settle(host)
+    expect(chipsOf(host)).toHaveLength(0)
+  })
+})
