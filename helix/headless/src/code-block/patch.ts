@@ -298,3 +298,54 @@ const markWords = (lines: DiffLine[]): void => {
     }
   }
 }
+
+/** A stretch of a hunk's lines: drawn, or unchanged lines folded behind a control. */
+export interface DiffRun {
+  /** Whether the lines are unchanged ones folded away. */
+  folded: boolean
+  lines: DiffLine[]
+  /** Where the run starts among the hunk's lines, which names a fold. */
+  start: number
+}
+
+/**
+ * A hunk's lines with each long run of unchanged lines folded, keeping `keep`
+ * lines on the side of each change, as a code host draws a diff with more
+ * context than a reader needs.
+ *
+ * A fold hides two lines or more: a control in place of one line is no
+ * shorter than the line.
+ */
+export const foldContext = (lines: DiffLine[], keep: number): DiffRun[] => {
+  const runs: DiffRun[] = []
+  const add = (start: number, end: number, folded: boolean): void => {
+    if (end <= start) {
+      return
+    }
+    const last = runs.at(-1)
+    if (last && !last.folded && !folded) {
+      last.lines.push(...lines.slice(start, end))
+    } else {
+      runs.push({ folded, lines: lines.slice(start, end), start })
+    }
+  }
+  let at = 0
+  while (at < lines.length) {
+    const context = lines[at]?.kind === 'context'
+    let end = at
+    while (end < lines.length && (lines[end]?.kind === 'context') === context) {
+      end += 1
+    }
+    const head = context && at > 0 ? keep : 0
+    const tail = context && end < lines.length ? keep : 0
+    if (context && end - at - head - tail >= 2) {
+      add(at, at + head, false)
+      add(at + head, end - tail, true)
+      add(end - tail, end, false)
+    } else {
+      add(at, end, false)
+    }
+    at = end
+  }
+  return runs
+}
