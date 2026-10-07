@@ -66,8 +66,9 @@ type Player = HTMLElement & {
  * plays it. The arrow keys move focus to the entry before or after, and Home
  * and End to the first and the last, passing over disabled entries. The
  * current entry carries `aria-current`. While focus is on the player, the
- * player's own keys work, and `Video` lists them. Its previous and next
- * controls move through the entries in the same order the playlist does.
+ * player's own keys work, and `Video` lists them, and Shift with N or P plays
+ * the next or the previous entry. The player's previous and next controls
+ * move through the entries in the same order the playlist does.
  *
  * **What a screen reader hears.** A list named by `label`, with a button for
  * each entry. When the playlist moves to another entry, by a press, by the
@@ -327,6 +328,9 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
    */
   private readonly handleKeydown = (event: KeyboardEvent): void => {
     const from = event.target
+    if (this.takePlayerKey(event)) {
+      return
+    }
     if (
       !(from instanceof HelixHeadlessVideoPlaylistItem) ||
       event.altKey ||
@@ -360,6 +364,34 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
     if (event.target === this.player) {
       this.toggleState('ended', false)
     }
+  }
+
+  /**
+   * Shift with N plays the next entry and Shift with P the previous one, while
+   * focus is on the player, the keys a reader knows from the common players.
+   * Not inside a field the player holds, where they are letters.
+   */
+  private takePlayerKey(event: KeyboardEvent): boolean {
+    const player = this.player
+    if (
+      !player ||
+      event.target !== player ||
+      event.defaultPrevented ||
+      !event.shiftKey ||
+      event.altKey ||
+      event.ctrlKey ||
+      event.metaKey ||
+      (event.key !== 'N' && event.key !== 'P')
+    ) {
+      return false
+    }
+    const origin = event.composedPath()[0] as HTMLElement | undefined
+    if (origin?.tagName === 'INPUT' || origin?.isContentEditable) {
+      return false
+    }
+    event.preventDefault()
+    this.step(event.key === 'N' ? 1 : -1)
+    return true
   }
 
   private readonly handleNext = (): void => {

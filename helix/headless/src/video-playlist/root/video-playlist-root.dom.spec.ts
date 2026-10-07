@@ -479,3 +479,35 @@ describe('the states a stylesheet reads', () => {
     expect(hasState(host, 'ended')).toBe(false)
   })
 })
+
+describe('the keys on the player', () => {
+  test('Shift with N and P move to the next and the previous entry, and play', async () => {
+    const host = await list()
+    await host.updateComplete
+    const plays = watchPlays(player(host))
+    const press = (key: string, init: KeyboardEventInit = { shiftKey: true }): boolean =>
+      player(host).dispatchEvent(
+        new KeyboardEvent('keydown', {
+          bubbles: true,
+          cancelable: true,
+          composed: true,
+          key,
+          ...init,
+        }),
+      )
+    expect(press('N')).toBe(false)
+    await host.updateComplete
+    await player(host).updateComplete
+    await Promise.resolve()
+    expect(host.active).toBe('two')
+    expect(plays()).toBe(1)
+    press('P')
+    await host.updateComplete
+    expect(host.active).toBe('one')
+    // A plain n is a letter, and a chord is the browser's.
+    press('n', {})
+    press('N', { metaKey: true, shiftKey: true })
+    await host.updateComplete
+    expect(host.active).toBe('one')
+  })
+})
