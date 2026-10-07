@@ -37,7 +37,7 @@ import { wheelName } from '../wheel-name.js'
    identical imports register the styled ones. `tier` picks which the template
    asks for. */
 import '../../listbox/index.js'
-import '../../option/index.js'
+import '../../option/root/index.js'
 
 /**
  * @summary A control for choosing a time from a list or from wheels.
