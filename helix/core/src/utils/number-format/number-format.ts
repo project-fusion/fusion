@@ -12,14 +12,16 @@
 const held = new Map<string, Intl.NumberFormat>()
 
 /** The formatter for a locale and options. An empty locale is the runtime's. */
+/* `null` is what an `Object` property reads once its attribute is taken off,
+   and `Intl.NumberFormat` throws on it where it takes `undefined`. */
 const formatter = (
   locale: string,
-  options: Intl.NumberFormatOptions | undefined,
+  options: Intl.NumberFormatOptions | null | undefined,
 ): Intl.NumberFormat => {
   const key = `${locale}|${JSON.stringify(options ?? {})}`
   let found = held.get(key)
   if (!found) {
-    found = new Intl.NumberFormat(locale || undefined, options)
+    found = new Intl.NumberFormat(locale || undefined, options ?? undefined)
     held.set(key, found)
   }
   return found
@@ -29,7 +31,7 @@ const formatter = (
 export const formatNumber = (
   value: number,
   locale = '',
-  options?: Intl.NumberFormatOptions,
+  options?: Intl.NumberFormatOptions | null,
 ): string => formatter(locale, options).format(value)
 
 /** A share written as a whole percentage, which a reading says by default. */

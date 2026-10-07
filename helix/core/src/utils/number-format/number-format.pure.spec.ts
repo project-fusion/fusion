@@ -8,6 +8,12 @@ describe('formatting a number', () => {
     expect(formatNumber(0.25, 'en-US', { style: 'percent' })).toBe('25%')
     expect(formatNumber(12, 'en-US', { currency: 'USD', style: 'currency' })).toBe('$12.00')
   })
+
+  /* An `Object` property reads `null` once its attribute is taken off, and a
+     Trend or a Stat whose `format-options` was removed threw while rendering. */
+  test('takes null options as none', () => {
+    expect(formatNumber(1234.5, 'en-US', null)).toBe('1,234.5')
+  })
 })
 
 describe('reading a number', () => {

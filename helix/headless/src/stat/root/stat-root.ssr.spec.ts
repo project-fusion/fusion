@@ -28,4 +28,12 @@ describe('stat server output', () => {
       ),
     ).toEqual([])
   })
+
+  test('a figure given as a number is written on the server', () => {
+    const markup = rendered(
+      ssr(html`<helix-headless-stat locale="en" value="98.5"></helix-headless-stat>`),
+      'helix-headless-stat',
+    )
+    expect(markup).toMatch(/<span part="value">(<!--[^>]*-->)*98\.5(<!--[^>]*-->)*<\/span>/)
+  })
 })
