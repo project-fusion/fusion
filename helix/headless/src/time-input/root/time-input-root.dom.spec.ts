@@ -511,3 +511,30 @@ describe('the message for text that is no time', () => {
     expect(host.validationMessage).toBe('Uhrzeit als HH:mm.')
   })
 })
+
+/* Opening on a time between two steps started the highlight from the top:
+   the second Down highlighted midnight. */
+describe('a time input holding a time between two steps', () => {
+  test('opens its list on the nearest time, and Down moves on from it', async () => {
+    const host = await field('value="14:07"')
+    host.open = true
+    await host.updateComplete
+    const picker = part(host, 'picker') as HTMLElement & { updateComplete: Promise<unknown> }
+    await picker.updateComplete
+    const list = part(picker, 'list') as HTMLElement & { updateComplete: Promise<unknown> }
+    await list.updateComplete
+    const active = (): string | undefined =>
+      [
+        ...list.querySelectorAll<HTMLElement & { active: boolean; value: string }>(
+          '[part~="option"]',
+        ),
+      ].find((option) => option.active)?.value
+    expect(active()).toBe('14:00')
+    part(list, 'items')?.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, composed: true, key: 'ArrowDown' }),
+    )
+    await list.updateComplete
+    expect(active()).toBe('14:15')
+    expect(host.value).toBe('14:07')
+  })
+})

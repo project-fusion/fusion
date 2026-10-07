@@ -956,3 +956,30 @@ describe('the current time', () => {
     expect(host.value).toBe('09:00:05')
   })
 })
+
+/* No row holds a time between two steps, so the list had nothing to move from:
+   Down from 14:07 went to the top, and the list, which chooses as it moves,
+   set the value to 00:00. */
+describe('a time between two steps', () => {
+  const press = async (host: Time, key: string): Promise<void> => {
+    const list = part(host, 'list') as HTMLElement & { updateComplete: Promise<unknown> }
+    list.dispatchEvent(new FocusEvent('focusin', { bubbles: true, composed: true }))
+    await list.updateComplete
+    part(list, 'items')?.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, composed: true, key }),
+    )
+    await host.updateComplete
+  }
+
+  test('Down moves from the nearest time on offer', async () => {
+    const host = await picker('value="14:07"')
+    await press(host, 'ArrowDown')
+    expect(host.value).toBe('14:15')
+  })
+
+  test('and Up moves the other way from it', async () => {
+    const host = await picker('value="14:07"')
+    await press(host, 'ArrowUp')
+    expect(host.value).toBe('13:45')
+  })
+})
