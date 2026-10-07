@@ -3,9 +3,11 @@ import {
   valueAsTime as asTime,
   clockLocale,
   customElement,
+  drawIcon,
   formatWords,
   timeAsValue as fromTime,
   type HelixBeforeChangeEvent,
+  HelixClearEvent,
   HelixFormElement,
   type HourCycle,
   handedLocale,
@@ -23,7 +25,7 @@ import {
   wordsLocale,
   writeClock,
 } from '@fusion.dev/helix-core'
-import { clock } from '@fusion.dev/helix-icons'
+import { clock, x } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
@@ -95,6 +97,7 @@ import '../../time-picker/index.js'
  * @aliases TimeField, InputTime
  * @documentation https://fusion.dev/helix/components/time-input
  *
+ * @slot clear-icon - Replaces the cross on the clear button, under `clearable`.
  * @slot end - Content after the time, before the trigger, such as a clear button.
  * @slot feedback - The message that says what is wrong with the value.
  * @slot hint - Help under the field.
@@ -105,12 +108,14 @@ import '../../time-picker/index.js'
  * @slot trigger - The icon on the field that shows a list opens.
  *
  * @event {Event} change - Fired after the value changes.
+ * @event {Event} input - Fired after the value changes.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the time changes. Cancelable: canceling it stops the change and leaves the decision to you.
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the list closes. Cancelable: canceling it keeps the list open and leaves the decision to you.
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the list opens. Cancelable: canceling it keeps the list closed and leaves the decision to you.
- * @event {Event} input - Fired after the value changes.
+ * @event {HelixClearEvent} helix-clear - Fired after the clear button has emptied the field, after `input` and `change`.
  * @event {ToggleEvent} toggle - Fired after the list opens or closes, with `newState` and `oldState`.
  *
+ * @csspart clear - The button that empties the field, under `clearable`, while it holds a time.
  * @csspart control - The text input.
  * @csspart feedback - The message that says what is wrong with the value.
  * @csspart field - The box that holds the text and the trigger.
@@ -206,6 +211,19 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
    */
   @property()
   autocomplete = ''
+
+  /**
+   * Whether the field shows a button that empties it, as Input's `clearable`
+   * does. Shown only while the field holds something to clear, and not while
+   * it is disabled or read-only.
+   */
+  @property({ type: Boolean })
+  clearable = false
+
+  /** The accessible name of the clear button, which shows only an icon. */
+  @words
+  @property({ attribute: 'clear-label' })
+  clearLabel = 'Clear'
 
   /** Typed, so a keystroke is announced as `input` alone. See `announcesInput`. */
   protected override readonly announcesInput = true
@@ -744,6 +762,29 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
       </svg></slot>`
   }
 
+  /** Whether there is a clear button on screen right now. */
+  private get showsClear(): boolean {
+    return this.clearable && this.value !== '' && !this.isDisabled && !this.readOnly
+  }
+
+  /**
+   * Empties the field, through `requestValue` so a consumer who owns the
+   * value decides, then says `change` and `helix-clear` and puts focus back
+   * in the field, the button having gone.
+   */
+  private readonly handleClear = (): void => {
+    if (this.value !== '' && this.requestValue('')) {
+      this.announceChange()
+      this.dispatchEvent(new HelixClearEvent())
+    }
+    void this.updateComplete.then(() => this.returnFocus())
+  }
+
+  /** The cross on the clear button, behind a seam a tier can move. */
+  protected renderClearIcon(): TemplateResult {
+    return html`<slot name="clear-icon">${drawIcon(x)}</slot>`
+  }
+
   /** The line of text the times are typed into, where the field shows no segments. */
   private renderControl(): TemplateResult {
     return html`<input
@@ -788,6 +829,18 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
         }
         ${this.segmentsShown ? this.renderSegments() : this.renderControl()}
         <slot name="end"></slot>
+        ${
+          this.showsClear
+            ? html`<button
+                part="clear"
+                type="button"
+                aria-label=${this.clearLabel}
+                @click=${this.handleClear}
+              >
+                ${this.renderClearIcon()}
+              </button>`
+            : nothing
+        }
         <button
           part="trigger"
           type="button"
