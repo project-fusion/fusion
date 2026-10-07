@@ -2,8 +2,10 @@ import {
   assignSlots,
   ChildrenController,
   customElement,
+  DelayController,
   deepContains,
   focusableElements,
+  formatWords,
   HelixElement,
   HelixLoadMoreEvent,
   HelixReadEvent,
@@ -56,6 +58,11 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
  * | Control+End | From anywhere in the feed, moves to the first control after it on the page. |
  * | Control+Home | From anywhere in the feed, moves to the nearest control before it on the page. |
  * | Tab | Moves through the controls in a row, and on out of the feed. |
+ *
+ * **A notification that arrives says so.** Unread rows added above the rows
+ * there were are counted in the live region,
+ * "1 new notification", in `arrived-label`. Rows that arrive while `loading`
+ * is set say nothing, so set it while a page is on its way.
  *
  * **`load-more` adds a button after the list** that sends `helix-load-more`,
  * for a feed that holds one page of a longer list. Append the next page, set
@@ -122,6 +129,14 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
    * A notification's own words are under `helix-notification`.
    */
   static words = 'helix-notifications'
+
+  /**
+   * What the feed says when unread notifications arrive, with `{count}` the
+   * number of them. Empty it to say nothing.
+   */
+  @words
+  @property({ attribute: 'arrived-label' })
+  arrivedLabel = '{count, plural, one {# new notification} other {# new notifications}}'
 
   /** The region's name where `label` is empty. */
   @words
@@ -486,8 +501,45 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
     this.removeEventListener('keydown', this.handleKeydown)
   }
 
+  /** The rows the feed has met, so a row that arrives later is told apart. */
+  private seen: WeakSet<Element> | undefined
+
+  /** Empties the arrival a moment after it is said, so the next one is news. */
+  private readonly hush = new DelayController(this, { renders: false })
+
+  /**
+   * Counts the unread rows that arrived above the rows there were, and says
+   * how many. Rows that fill an empty feed are a page, which says nothing. The rows there are at the first update are
+   * the feed's to begin with, and say nothing.
+   */
+  private noteArrivals(): void {
+    if (!this.childrenKnown) {
+      return
+    }
+    const items = this.items
+    const seen = this.seen
+    if (!seen) {
+      this.seen = new WeakSet(items)
+      return
+    }
+    const firstKnown = items.findIndex((item) => seen.has(item))
+    const fresh = items.filter((item, at) => !seen.has(item) && at < firstKnown && !item.read)
+    for (const item of items) {
+      seen.add(item)
+    }
+    if (fresh.length === 0 || this.loading || this.arrivedLabel === '') {
+      return
+    }
+    this.announced = formatWords(this, 'arrivedLabel', { count: fresh.length })
+    this.hush.start(1000, () => {
+      this.announced = ''
+      this.requestUpdate()
+    })
+  }
+
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    this.noteArrivals()
     hostAria(this.internals, { label: this.label || this.fallbackLabel, role: 'region' })
     const failed = this.failed
     this.toggleState('error', failed)
