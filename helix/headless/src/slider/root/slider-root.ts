@@ -4,6 +4,7 @@ import {
   formatNumber,
   formatWords,
   HelixFormElement,
+  isRtl,
   MixinControllerValue,
   MixinField,
   reportValues,
@@ -12,7 +13,7 @@ import {
   wordsLocale,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { property, state } from 'lit/decorators.js'
 
 /** The keys a native range moves its thumb with. */
 const SLIDER_KEYS = new Set([
@@ -52,6 +53,10 @@ const SLIDER_KEYS = new Set([
  * `thumb-label`.
  * `min-steps-between-thumbs` keeps them that many steps apart, and the readout
  * joins the two as `range-text` writes them.
+ *
+ * A press on a range's track takes the nearest thumb to the point pressed,
+ * and moving the pointer drags it, as React Aria's and Web Awesome's sliders
+ * do. The thumb takes focus, and `change` is sent as the press ends.
  *
  * `origin` sets where a single thumb's fill starts: at `min`, at the middle of
  * the track, or at `max`. A balance or an offset from zero fills from the
@@ -122,6 +127,7 @@ const SLIDER_KEYS = new Set([
  * @cssproperty --slider-marker-at - Where one marker sits, as a percentage of the track.
  * @cssproperty --slider-to - Where the filled span ends, as a fraction of the track, 0 to 1: a range's upper thumb, or the farther of a single thumb and its `origin`.
  *
+ * @cssstate dragging - A thumb is being dragged, by its thumb or from a press on the track.
  * @cssstate invalid - The slider has an error to show, from the browser's validation or from your `feedback`.
  */
 @customElement('helix-headless-slider')
@@ -471,6 +477,130 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
     restoreValue(control, this.value)
   }
 
+  /** Whether a pointer is dragging a thumb, which `:state(dragging)` says. */
+  @state()
+  private dragging = false
+
+  /** Ends a drag when its pointer lifts, wherever it lifts. */
+  private readonly endDrag = (): void => {
+    this.dragging = false
+    window.removeEventListener('pointerup', this.endDrag)
+    window.removeEventListener('pointercancel', this.endDrag)
+  }
+
+  private startDrag(): void {
+    this.dragging = true
+    window.addEventListener('pointerup', this.endDrag)
+    window.addEventListener('pointercancel', this.endDrag)
+  }
+
+  /**
+   * Half a thumb, which is where the thumb's center stops short of each end
+   * of its input. Measured off the thumb's length as the stylesheet sets it,
+   * or a platform thumb's 16 pixels where none does.
+   */
+  private thumbInset(field: HTMLElement): number {
+    const probe = document.createElement('span')
+    probe.style.cssText =
+      'position:absolute;visibility:hidden;inline-size:var(--_slider-thumb-length,16px)'
+    field.append(probe)
+    const length = probe.getBoundingClientRect().width
+    probe.remove()
+    return length / 2
+  }
+
+  /**
+   * The value under a pointer, along a thumb's input, less `inset` at each
+   * end. Upward on a vertical track, and from the right on a right-to-left
+   * page.
+   */
+  private valueAt(event: PointerEvent, input: HTMLElement, inset: number): number {
+    const box = input.getBoundingClientRect()
+    const vertical = this.orientation === 'vertical'
+    const length = vertical ? box.height : box.width
+    const from = vertical
+      ? box.bottom - event.clientY
+      : isRtl(this)
+        ? box.right - event.clientX
+        : event.clientX - box.left
+    const fraction = Math.min(1, Math.max(0, (from - inset) / Math.max(1, length - inset * 2)))
+    return this.settled(this.min + fraction * (this.max - this.min))
+  }
+
+  /** Moves one of a range's thumbs, kept between its neighbors. */
+  private moveThumb(at: number, wanted: number): void {
+    const points = this.points
+    const gap = this.gap
+    const low = at > 0 ? (points[at - 1] ?? this.min) + gap : Number.NEGATIVE_INFINITY
+    const high =
+      at < points.length - 1 ? (points[at + 1] ?? this.max) - gap : Number.POSITIVE_INFINITY
+    const next = points
+      .map((one, index) => (index === at ? Math.min(high, Math.max(low, wanted)) : one))
+      .join(',')
+    if (next !== points.join(',')) {
+      this.requestValue(next)
+    }
+  }
+
+  /**
+   * A press on the field: on a thumb, the start of the platform's own drag,
+   * and on a range's track, the nearest thumb taken to the point and dragged
+   * from there.
+   *
+   * **A range's inputs take presses on their thumbs only**, being stacked on
+   * one track, so a press beside a thumb reached no input at all and did
+   * nothing. Measured before this: a press at 90 on a range holding 20 and 60
+   * left it at 20 and 60. React Aria's and Web Awesome's sliders move the
+   * nearest thumb there.
+   */
+  private readonly handlePress = (event: PointerEvent): void => {
+    if (this.isDisabled || this.readOnly || event.button !== 0) {
+      return
+    }
+    const inputs = [...this.renderRoot.querySelectorAll<HTMLInputElement>('input[part="control"]')]
+    if (inputs.includes(event.composedPath()[0] as HTMLInputElement)) {
+      this.startDrag()
+      return
+    }
+    const first = inputs[0]
+    const field = event.currentTarget as HTMLElement
+    if (!this.range || !first) {
+      return
+    }
+    const inset = this.thumbInset(field)
+    const wanted = this.valueAt(event, first, inset)
+    /* The nearest thumb, and of two at the same place the one the press is
+       past, so a press above a closed range opens it upward. */
+    let at = 0
+    this.points.forEach((one, index) => {
+      const distance = Math.abs(one - wanted)
+      const best = Math.abs((this.points[at] ?? 0) - wanted)
+      if (distance < best || (distance === best && wanted > one)) {
+        at = index
+      }
+    })
+    event.preventDefault()
+    this.moveThumb(at, wanted)
+    inputs[at]?.focus({ preventScroll: true })
+    this.startDrag()
+    field.setPointerCapture?.(event.pointerId)
+    const move = (next: PointerEvent): void => this.moveThumb(at, this.valueAt(next, first, inset))
+    const end = (): void => {
+      field.removeEventListener('pointermove', move)
+      field.removeEventListener('pointerup', end)
+      field.removeEventListener('pointercancel', end)
+      this.announceChange()
+    }
+    field.addEventListener('pointermove', move)
+    field.addEventListener('pointerup', end)
+    field.addEventListener('pointercancel', end)
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    this.endDrag()
+  }
+
   /** Relayed, because `change` does not cross a shadow boundary on its own. */
   private readonly handleChange = (event: Event): void => {
     event.stopPropagation()
@@ -572,6 +702,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    this.toggleState('dragging', this.dragging)
     /* A slider with no value starts in the middle, which is the platform's own
        rule and is what the control will show whether or not this agrees, and a
        range starts fully wide. Seeded here so the value the form would submit
@@ -856,6 +987,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
     }
     <div
       part="field"
+      @pointerdown=${this.handlePress}
       data-markers=${this.markerValues.length > 0 ? '' : nothing}
       data-range=${this.range ? '' : nothing}
       data-thumbs=${this.thumbContent ? '' : nothing}

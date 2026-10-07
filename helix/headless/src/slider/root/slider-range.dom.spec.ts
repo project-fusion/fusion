@@ -396,3 +396,69 @@ describe('a range with more than two thumbs', () => {
     expect(part(host, 'output')?.getAttribute('for')).toBe('control control-1 control-end')
   })
 })
+
+describe('a press on a range track', () => {
+  /* A track 216 pixels long from x = 0, with a 16 pixel thumb: the thumb's
+     center runs from 8 to 208, so a value of 0 to 100 is two pixels a step. */
+  const laidOut = async (host: Slider, run: () => Promise<void>): Promise<void> => {
+    const real = HTMLElement.prototype.getBoundingClientRect
+    HTMLElement.prototype.getBoundingClientRect = function (this: HTMLElement) {
+      const width = this.localName === 'span' ? 16 : 216
+      return { bottom: 8, height: 8, left: 0, right: width, top: 0, width, x: 0, y: 0 } as DOMRect
+    }
+    try {
+      await run()
+    } finally {
+      HTMLElement.prototype.getBoundingClientRect = real
+    }
+    await host.updateComplete
+  }
+  const press = (host: Slider, type: string, clientX: number): void => {
+    const field = part(host, 'field') as HTMLElement
+    field.dispatchEvent(
+      new PointerEvent(type, { bubbles: true, button: 0, cancelable: true, clientX, pointerId: 1 }),
+    )
+  }
+
+  /* Measured before this: a press at 90 on a range holding 20 and 60 reached
+     no input, the inputs taking presses on their thumbs only, and changed
+     nothing. */
+  test('takes the nearest thumb there, drags it, and says `change` as it lifts', async () => {
+    const host = (await slider('range default-value="20,60"')) as Slider & {
+      internals: ElementInternals
+    }
+    const heard: string[] = []
+    host.addEventListener('change', () => heard.push(host.value))
+    await laidOut(host, async () => {
+      press(host, 'pointerdown', 188)
+      await host.updateComplete
+      expect(host.value).toBe('20,90')
+      expect(host.internals.states.has('dragging')).toBe(true)
+      press(host, 'pointermove', 158)
+      await host.updateComplete
+      expect(host.value).toBe('20,75')
+      press(host, 'pointerup', 158)
+      window.dispatchEvent(new Event('pointerup'))
+    })
+    expect(host.internals.states.has('dragging')).toBe(false)
+    expect(heard).toEqual(['20,75'])
+    expect(host.shadowRoot?.activeElement?.getAttribute('data-thumb')).toBe('end')
+  })
+
+  test('the lower thumb for a press below it, kept short of the other', async () => {
+    const host = await slider('range default-value="20,60" min-steps-between-thumbs="5"')
+    await laidOut(host, async () => {
+      press(host, 'pointerdown', 18)
+      press(host, 'pointerup', 18)
+    })
+    expect(host.value).toBe('5,60')
+  })
+
+  test('and nothing on a single thumb, whose input takes the press itself', async () => {
+    const host = await slider('default-value="40"')
+    await laidOut(host, async () => {
+      press(host, 'pointerdown', 188)
+    })
+    expect(host.value).toBe('40')
+  })
+})
