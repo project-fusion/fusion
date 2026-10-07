@@ -22,8 +22,12 @@ import { styles } from './progress-root.css.js'
  * @aliases Progress bar, Loading bar
  * @documentation https://fusion.dev/helix/components/progress
  *
+ * @slot - Words drawn on the bar, or in the middle of a ring, such as the reading. The bar grows to their height, and over the fill they take the fill's own ink.
  * @slot label - A visible label, above a bar and under a ring. Its words name it in place of `label`.
  *
+ * @cssproperty --progress-content-color - The color of the words of the default slot where they are over the track, and in a ring.
+ * @cssproperty --progress-content-fill-color - The color of the words of the default slot where they are over the fill.
+ * @cssproperty --progress-content-size - The type size of the words of the default slot.
  * @cssproperty --progress-color - Fill of the part that is done.
  * @cssproperty --progress-label-color - Color of a slotted label.
  * @cssproperty --progress-label-gap - Space between a slotted label and the bar.

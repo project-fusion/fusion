@@ -169,6 +169,71 @@ slot[name="label"]::slotted(*) {
   }
 }
 
+/* =========================================================== content ======
+   Words on the bar, which make room for themselves: the track becomes a grid
+   one cell deep, the fill and the words stacked in it, and grows to the
+   words' height. Only while there are words, so a plain bar keeps exactly the
+   box it always had. */
+[part="content"] {
+  display: none;
+}
+
+:host(:state(content)) [part="track"] {
+  block-size: auto;
+  display: grid;
+  min-block-size: var(--progress-size, var(--helix-size-progress));
+}
+
+:host(:state(content)) [part="track"] > * {
+  grid-area: 1 / 1;
+}
+
+/* **Two colors, split exactly where the fill ends.** The words run the whole
+   length of the track and the color is a gradient clipped to their glyphs,
+   one stop at the fraction the fill is scaled to, so a letter half over the
+   fill is half in each color and every letter reads against what is behind
+   it. One color would be lost over one of the two at some value. */
+:host(:state(content)) [part="content"] {
+  --_progress-over: var(--progress-content-fill-color, var(--helix-color-foreground-on-primary));
+  --_progress-under: var(--progress-content-color, var(--helix-color-foreground));
+  --_progress-split: calc(var(--progress-fraction, 0) * 100%);
+
+  -webkit-background-clip: text;
+  background-clip: text;
+  background-image: linear-gradient(
+    to right,
+    var(--_progress-over) var(--_progress-split),
+    var(--_progress-under) var(--_progress-split)
+  );
+  color: transparent;
+  display: block;
+  font-family: var(--helix-font-sans);
+  font-size: var(--progress-content-size, var(--helix-text-xs));
+  font-variant-numeric: tabular-nums;
+  line-height: var(--helix-leading-tight);
+  padding-block: var(--helix-space-none);
+  padding-inline: var(--helix-space-xs);
+  /* Positioned, so it paints over the fill: a `scale` makes the fill a layer
+     of its own, painted after anything in the flow. */
+  position: relative;
+  white-space: nowrap;
+}
+
+:host(:state(content):dir(rtl)) [part="content"] {
+  background-image: linear-gradient(
+    to left,
+    var(--_progress-over) var(--_progress-split),
+    var(--_progress-under) var(--_progress-split)
+  );
+}
+
+/* No proportion to split at while running, and a wash too light for the
+   color made for a solid fill: the words keep the page's ink. */
+:host(:state(content)[indeterminate]) [part="content"],
+:host(:state(content)[emphasis="subtle"]) [part="content"] {
+  --_progress-over: var(--_progress-under);
+}
+
 /* ============================================================ ring ======= The
    loader's shape carrying the bar's value, which is what was asked for and what
    a conic gradient could not give. */
@@ -229,6 +294,15 @@ slot[name="label"]::slotted(*) {
 :host([shape="ring"]) [part="value"] {
   grid-area: 1 / 1;
   min-inline-size: 0;
+  text-align: center;
+}
+
+/* In the middle of the ring, in the page's ink: nothing is drawn under it. */
+:host([shape="ring"]:state(content)) [part="content"] {
+  background-image: none;
+  color: var(--progress-content-color, var(--helix-color-foreground));
+  grid-area: 1 / 1;
+  padding-inline: var(--helix-space-none);
   text-align: center;
 }
 
@@ -319,6 +393,19 @@ slot[name="label"]::slotted(*) {
 
   :host([shape="ring"]) [part="groove"] {
     stroke: CanvasText;
+  }
+
+  /* The fill is Highlight, so the words over it are HighlightText, and the
+     split is drawn in system colors the forced palette leaves alone. */
+  :host(:state(content)) [part="content"] {
+    --_progress-over: HighlightText;
+    --_progress-under: CanvasText;
+
+    forced-color-adjust: none;
+  }
+
+  :host([shape="ring"]:state(content)) [part="content"] {
+    color: CanvasText;
   }
 }
 
