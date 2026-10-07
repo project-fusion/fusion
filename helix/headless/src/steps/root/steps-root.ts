@@ -28,7 +28,13 @@ import type { HelixHeadlessStep } from '../step/step.js'
  * UI's linear steps do: a stage ahead is out of reach, and its button disabled,
  * until every stage before it is `complete` or `optional`. Going back is always
  * allowed. `next()` and `previous()` move one stage either way, under the
- * same rules, for your own buttons.
+ * same rules, for your own buttons. `reset()` goes back to the first stage and
+ * clears every stage's `complete`, as Ark UI's `resetStep` does.
+ *
+ * `completion="passed"` marks a stage `complete` once a reader moves past it,
+ * as Ark UI counts a stage before the current one as completed. Going back
+ * leaves it complete. In a `linear` sequence the next stage is then in reach
+ * from the current one, and `validate` decides whether the reader may go.
  *
  * To check a stage before a reader moves on from it, set `validate` to a
  * function that answers whether the stage is valid, as Ark UI's `isStepValid`
@@ -74,6 +80,17 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
    * `registerWords('de', { 'helix-steps': { progressLabel: '{share, number, percent} erledigt' } })`.
    */
   static words = 'helix-steps'
+
+  /**
+   * What marks a stage `complete`.
+   *
+   * Absent, you do: each step's `complete` is yours, because a reader who
+   * steps back has finished more stages than the one they are on. `passed`
+   * marks every stage before the one a reader moves to, and leaves the marks
+   * when they go back.
+   */
+  @property({ reflect: true })
+  completion?: 'passed'
 
   /**
    * The sequence's name, read by screen readers.
@@ -175,6 +192,25 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
     return this.step(-1)
   }
 
+  /**
+   * Goes back to the first stage that can be gone to, and clears `complete`
+   * and the invalid mark from every stage, as Ark UI's `resetStep` does.
+   * Returns whether it moved: a listener can refuse the move with
+   * `helix-before-activate`, and the stages then keep their marks.
+   */
+  reset(): boolean {
+    const steps = this.steps
+    const first = steps.find((one) => !one.disabled)
+    if (!first || !this.requestActive(first.value)) {
+      return false
+    }
+    for (const one of steps) {
+      one.complete = false
+      one.invalid = false
+    }
+    return true
+  }
+
   /** Moves `delta` stages, skipping disabled ones. */
   private step(delta: number): boolean {
     const steps = this.steps
@@ -206,7 +242,7 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
 
   /** Whether the stage at `index` can be gone to from where the reader is. */
   private reachable(index: number): boolean {
-    return !this.linear || canReach(this.steps, this.at, index)
+    return !this.linear || canReach(this.steps, this.at, index, this.completion === 'passed')
   }
 
   /** Marks the stages a linear sequence holds out of reach. Client only. */
@@ -240,13 +276,18 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
     }
     const steps = this.steps
     const value = this.resolveActive(steps)?.value ?? ''
-    for (const step of steps) {
-      const current = step.value === value
+    const reached = steps.findIndex((step) => step.value === value)
+    steps.forEach((step, index) => {
+      const current = index === reached
+      const passed = this.completion === 'passed' && index < reached
       /* Not into a step still hydrating what a server sent: see `whenHydrated`. */
       whenHydrated(step, () => {
         step.current = current
+        if (passed) {
+          step.complete = true
+        }
       })
-    }
+    })
   }
 
   /* Through the mixin, so a consumer can refuse the change with
@@ -322,10 +363,10 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    if (changed.has('active')) {
+    if (changed.has('active') || changed.has('completion')) {
       this.sync()
     }
-    if (changed.has('linear') || changed.has('active')) {
+    if (changed.has('linear') || changed.has('active') || changed.has('completion')) {
       this.lock()
     }
   }
