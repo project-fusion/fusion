@@ -38,6 +38,7 @@ import '../../table/index.js'
  *
  * @csspart cell - One cell.
  * @csspart cell-selected - Added to `cell` in a selected row.
+ * @csspart drag-preview - A copy of the row a pointer drags by its grip, which follows the pointer in the top layer until the row is let go, with `reorderable-rows`. Hidden from assistive technology.
  * @csspart live - A copy of the empty and loading messages, which screen readers announce when they change. Visually hidden in the styled tier.
  * @csspart table - The grid.
  *
@@ -46,6 +47,12 @@ import '../../table/index.js'
  * short result keeps the full box with space below it.
  * @cssproperty --data-table-color - The text color of a cell.
  * @cssproperty --data-table-columns - The grid track list for the columns. It overrides the list worked out from the columns.
+ * @cssproperty --data-table-drag-preview-background-color - The fill behind the copy of a row a pointer drags.
+ * @cssproperty --data-table-drag-preview-border-color - The color of the edge around the copy of a row a pointer drags.
+ * @cssproperty --data-table-drag-preview-border-width - The width of the edge around the copy of a row a pointer drags. None by default, where the shadow lifts it.
+ * @cssproperty --data-table-drag-preview-opacity - The opacity of the copy of a row a pointer drags.
+ * @cssproperty --data-table-drag-preview-radius - The corner radius of the copy of a row a pointer drags.
+ * @cssproperty --data-table-drag-preview-shadow - The shadow that raises the copy of a row a pointer drags over the page.
  * @cssproperty --data-table-dragging-opacity - The opacity of a row being moved, with `reorderable-rows`.
  * @cssproperty --data-table-drop-indicator-color - The color of the line where a moved row would land.
  * @cssproperty --data-table-drop-indicator-size - The thickness of the line where a moved row would land.

@@ -239,6 +239,50 @@ describe('a reorderable listbox', () => {
   })
 })
 
+describe('a pointer dragging an option', () => {
+  const pointer = (target: EventTarget, type: string, y: number): void => {
+    target.dispatchEvent(
+      new PointerEvent(type, {
+        bubbles: true,
+        button: 0,
+        clientX: 5,
+        clientY: y,
+        composed: true,
+        pointerId: 1,
+      }),
+    )
+  }
+
+  test('draws a copy of it in the list’s drag-preview part, hidden from assistive technology, which follows the pointer until the drop', async () => {
+    const list = await make('reorderable manual')
+    follow(list)
+    const beta = optionsOf(list)[1] as Option
+    pointer(beta, 'pointerdown', 5)
+    pointer(window, 'pointermove', 25)
+    const preview = part(list, 'drag-preview') as HTMLElement
+    expect(preview.getAttribute('aria-hidden')).toBe('true')
+    expect(preview.textContent).toContain('Beta')
+    expect(preview.style.getPropertyValue('translate')).toBe('0px 20px')
+    pointer(window, 'pointerup', 25)
+    expect(part(list, 'drag-preview')?.childElementCount ?? 0).toBe(0)
+  })
+
+  test('Escape takes the copy away, and Alt with an arrow draws none', async () => {
+    const list = await make('reorderable manual')
+    follow(list)
+    pointer(optionsOf(list)[1] as Option, 'pointerdown', 5)
+    pointer(window, 'pointermove', 25)
+    window.dispatchEvent(new KeyboardEvent('keydown', { cancelable: true, key: 'Escape' }))
+    expect(part(list, 'drag-preview')?.childElementCount ?? 0).toBe(0)
+    pointer(window, 'pointerup', 25)
+    await highlight(list, 'a')
+    press(list, 'ArrowDown', { altKey: true })
+    await settle(list)
+    expect(order(list)).toEqual(['b', 'a', 'c'])
+    expect(part(list, 'drag-preview')?.childElementCount ?? 0).toBe(0)
+  })
+})
+
 describe('a listbox that does not move its options', () => {
   test('without reorderable, Alt with Down moves nothing', async () => {
     const list = await make('manual')

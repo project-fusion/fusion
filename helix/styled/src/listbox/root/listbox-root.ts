@@ -27,6 +27,12 @@ import { styles } from './listbox-root.css.js'
  * @cssproperty --listbox-background-color - The panel's fill. Set it to `transparent` when the list is already inside a panel.
  * @cssproperty --listbox-border - The panel's border, as a shorthand. Set it to `none` when the list is already inside a panel.
  * @cssproperty --listbox-column-min-inline-size - How narrow a column may be with `layout="grid"`. As many columns as fit are drawn. Defaults to `8rem`.
+ * @cssproperty --listbox-drag-preview-background-color - The fill behind the copy of an option a pointer drags.
+ * @cssproperty --listbox-drag-preview-border-color - The color of the edge around the copy of an option a pointer drags.
+ * @cssproperty --listbox-drag-preview-border-width - The width of the edge around the copy of an option a pointer drags. None by default, where the shadow lifts it.
+ * @cssproperty --listbox-drag-preview-opacity - The opacity of the copy of an option a pointer drags.
+ * @cssproperty --listbox-drag-preview-radius - The corner radius of the copy of an option a pointer drags.
+ * @cssproperty --listbox-drag-preview-shadow - The shadow that raises the copy of an option a pointer drags over the page.
  * @cssproperty --listbox-dragging-opacity - The opacity of an option being dragged, in a `reorderable` list with `@fusion.dev/helix/listbox/reorder` imported.
  * @cssproperty --listbox-drop-indicator-color - The color of the line where a dragged option would land.
  * @cssproperty --listbox-drop-indicator-size - The thickness of the line where a dragged option would land.

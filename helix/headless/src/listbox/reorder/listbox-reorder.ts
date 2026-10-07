@@ -45,8 +45,10 @@ const keyOfItem = (item: DataOptionItem): string =>
  *
  * It marks the option being dragged with `:state(dragging)` and the one the
  * drop indicator is beside with `:state(drop-before)` or `:state(drop-after)`.
- * The styled tier's entry draws those through a sheet it hands in, which this
- * adopts into each option while the list reorders.
+ * While a pointer drags an option, a copy of it follows the pointer as the
+ * list's `drag-preview` part. The styled tier's entry draws those through two
+ * sheets it hands in, which this adopts while the list reorders: one into
+ * each option, and one into the list.
  */
 export class ListboxReorderController implements ReactiveController {
   private readonly host: HelixHeadlessListbox
@@ -54,14 +56,21 @@ export class ListboxReorderController implements ReactiveController {
   /** The sheet each option adopts while the list reorders, from the styled tier. */
   sheet: CSSResult | undefined
 
+  /**
+   * The sheet the list adopts while it reorders, from the styled tier, which
+   * draws the `drag-preview` part.
+   */
+  listSheet: CSSResult | undefined
+
   /** The options marked last, so a mark that moves is taken off where it was. */
   private marked = new Set<Drawn>()
 
   private readonly reorder: ReorderController
 
-  constructor(host: HelixHeadlessListbox, sheet?: CSSResult) {
+  constructor(host: HelixHeadlessListbox, sheet?: CSSResult, listSheet?: CSSResult) {
     this.host = host
     this.sheet = sheet
+    this.listSheet = listSheet
     host.addController(this)
     this.reorder = new ReorderController(host, {
       axis: 'block',
@@ -79,6 +88,7 @@ export class ListboxReorderController implements ReactiveController {
       holds: false,
       keys: (key) => this.keysAround(key),
       name: (key) => this.optionFor(key)?.text || key,
+      preview: (key) => this.optionFor(key),
       scroller: () => host.renderRoot?.querySelector<HTMLElement>('[part="items"]') ?? null,
     })
   }
@@ -90,6 +100,30 @@ export class ListboxReorderController implements ReactiveController {
    */
   hostUpdated(): void {
     queueMicrotask(() => this.mark())
+  }
+
+  /**
+   * Draws the list's `drag-preview` part at the end of its shadow root while
+   * it reorders, and takes it away after. The list's own template has none to
+   * draw, and the controller fills this one while a pointer drags an option.
+   */
+  private drawPreview(on: boolean): void {
+    const root = this.host.renderRoot
+    const drawn = root?.querySelector('[part="drag-preview"]')
+    if (on && root && !drawn) {
+      const preview = document.createElement('div')
+      for (const [name, value] of [
+        ['part', 'drag-preview'],
+        ['popover', 'manual'],
+        ['aria-hidden', 'true'],
+        ['inert', ''],
+      ]) {
+        preview.setAttribute(name as string, value as string)
+      }
+      root.append(preview)
+    } else if (!on) {
+      drawn?.remove()
+    }
   }
 
   /** The options the list draws now: its elements, or the records it drew of `items`. */
@@ -126,9 +160,11 @@ export class ListboxReorderController implements ReactiveController {
     return options.filter((option) => option.parentElement === parent).map((one) => one.value)
   }
 
-  /** Puts each option's state in a move on it, and the styled tier's sheet. */
+  /** Puts each option's state in a move on it, and the styled tier's sheets. */
   private mark(): void {
     const on = this.host.reorderable
+    adopt(this.host, this.listSheet, on)
+    this.drawPreview(on)
     const drawn = this.drawn
     const marked = new Set<Drawn>()
     for (const option of drawn) {
@@ -141,7 +177,7 @@ export class ListboxReorderController implements ReactiveController {
       if (move) {
         marked.add(option)
       }
-      this.adopt(option, on)
+      adopt(option, this.sheet, on)
     }
     for (const option of this.marked) {
       if (!drawn.includes(option)) {
@@ -152,28 +188,33 @@ export class ListboxReorderController implements ReactiveController {
     }
     this.marked = marked
   }
+}
 
-  /** Gives an option the styled tier's sheet while the list reorders, and takes it back after. */
-  private adopt(option: Drawn, on: boolean): void {
-    const root = option.shadowRoot
-    const sheet = this.sheet?.styleSheet
-    if (!root || !sheet || root.adoptedStyleSheets.includes(sheet) === on) {
-      return
-    }
-    root.adoptedStyleSheets = on
-      ? [...root.adoptedStyleSheets, sheet]
-      : root.adoptedStyleSheets.filter((one) => one !== sheet)
+/** Gives an element a sheet of the styled tier while the list reorders, and takes it back after. */
+const adopt = (element: Element, given: CSSResult | undefined, on: boolean): void => {
+  const root = element.shadowRoot
+  const sheet = given?.styleSheet
+  if (!root || !sheet || root.adoptedStyleSheets.includes(sheet) === on) {
+    return
   }
+  root.adoptedStyleSheets = on
+    ? [...root.adoptedStyleSheets, sheet]
+    : root.adoptedStyleSheets.filter((one) => one !== sheet)
 }
 
 /** The controller each list was given, so a class given one twice gives each list one. */
 const given = new WeakMap<HelixHeadlessListbox, ListboxReorderController>()
 
-/** Gives a list its controller, once, and the styled tier's sheet where it has none yet. */
-const attach = (list: HelixHeadlessListbox, sheet: CSSResult | undefined): void => {
+/** Gives a list its controller, once, and the styled tier's sheets where it has none yet. */
+const attach = (
+  list: HelixHeadlessListbox,
+  sheet: CSSResult | undefined,
+  listSheet: CSSResult | undefined,
+): void => {
   const controller = given.get(list) ?? new ListboxReorderController(list)
   given.set(list, controller)
   controller.sheet ??= sheet
+  controller.listSheet ??= listSheet
 }
 
 /**
@@ -196,7 +237,8 @@ const onPage = <T extends Element>(
  *
  * The entries call it for their own tier's class: the headless entry for
  * `HelixHeadlessListbox`, and the styled one for `HelixListbox`, with the
- * sheet that draws a move. A class that has registered keeps the list of what
+ * sheet that draws a move on an option and the sheet that draws the list's
+ * `drag-preview` part. A class that has registered keeps the list of what
  * it was given when it did, so each is given its own.
  *
  * **Lists already on the page are given one too.** A page that imports the
@@ -204,11 +246,15 @@ const onPage = <T extends Element>(
  * runs, so the ones in the document and its open shadow roots are found and
  * given theirs, and every list built after gets one as it is built.
  */
-export const reorderListbox = (element: typeof HelixHeadlessListbox, sheet?: CSSResult): void => {
-  element.addInitializer((host) => attach(host as HelixHeadlessListbox, sheet))
+export const reorderListbox = (
+  element: typeof HelixHeadlessListbox,
+  sheet?: CSSResult,
+  listSheet?: CSSResult,
+): void => {
+  element.addInitializer((host) => attach(host as HelixHeadlessListbox, sheet, listSheet))
   if (typeof document !== 'undefined') {
     for (const list of onPage(element)) {
-      attach(list, sheet)
+      attach(list, sheet, listSheet)
       list.requestUpdate()
     }
   }

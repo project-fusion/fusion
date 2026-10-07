@@ -98,6 +98,7 @@ const KEYS = new Set([
  * @event {HelixReorderEvent} helix-reorder - Fired after `helix-before-reorder` when nobody canceled it. Move your items to the order in `keys`, each an item's `value`, or its words where it has none. Cancelable: cancel it to say the move did not happen.
  * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. The item sends it, and you can listen for it on the tree. Cancelable: canceling it changes nothing.
  *
+ * @csspart drag-preview - A copy of the row a pointer drags by its grip, which follows the pointer in the top layer until the item is let go, in a `reorderable` tree. Hidden from assistive technology.
  * @csspart empty - Shown when there are no rows to show.
  * @csspart live - A copy of the empty and loading messages, and each step of a move in a `reorderable` tree, in a live region that announces them when they change. Visually hidden in the styled tier.
  * @csspart loading - Shown while the rows load.
@@ -171,6 +172,7 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
       const item = this.itemFor(key)
       return (item && slottedWords(item, [''])) || key
     },
+    preview: (key) => this.itemFor(key)?.shadowRoot?.querySelector('[part="row"]'),
     refocus: (key) => this.focusOn(this.itemFor(key)),
   })
 
@@ -719,7 +721,7 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
         }}
       ></slot>
       ${this.renderStatus(this.hasRows)}
-    </div>${this.renderLive(this.hasRows)}`
+    </div>${this.renderLive(this.hasRows)}${this.reorder.drawDragPreview()}`
   }
 }
 

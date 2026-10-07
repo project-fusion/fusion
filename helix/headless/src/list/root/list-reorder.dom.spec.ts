@@ -97,11 +97,32 @@ const follow = (list: List): Detail[] => {
   return heard
 }
 
+/* A pointer event as a mouse sends it, where `y` says how far down. */
+const pointer = (target: EventTarget, type: string, y: number): void => {
+  target.dispatchEvent(
+    new PointerEvent(type, {
+      bubbles: true,
+      button: 0,
+      clientX: 5,
+      clientY: y,
+      composed: true,
+      pointerId: 1,
+    }),
+  )
+}
+
+const pressEscape = (): void => {
+  window.dispatchEvent(
+    new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' }),
+  )
+}
+
 describe('a list that does not reorder', () => {
-  test('draws no grip and no live region', async () => {
+  test('draws no grip, no live region, and no drag preview', async () => {
     const list = await make()
     expect(list.rows.map((row) => grip(row))).toEqual([null, null, null])
     expect(part(list, 'live')).toBeNull()
+    expect(part(list, 'drag-preview')).toBeNull()
   })
 })
 
@@ -221,5 +242,44 @@ describe('a reorderable list', () => {
     click(grip(list.rows[1] as Row) as Element)
     await settle(list)
     expect(await spoken(list)).toBe('Holding Beta')
+  })
+})
+
+describe('a pointer dragging a row', () => {
+  test('draws a copy of it in the drag-preview part, hidden from assistive technology, which follows the pointer until the drop', async () => {
+    const list = await make('reorderable')
+    const alpha = list.rows[0] as Row
+    /* Drawn by the template, empty and closed, until a pointer drags. */
+    expect(part(list, 'drag-preview')?.childElementCount).toBe(0)
+    pointer(grip(alpha) as Element, 'pointerdown', 5)
+    pointer(window, 'pointermove', 25)
+    const preview = part(list, 'drag-preview') as HTMLElement
+    expect(preview.getAttribute('aria-hidden')).toBe('true')
+    expect(preview.getAttribute('popover')).toBe('manual')
+    expect(preview.textContent).toContain('Alpha')
+    expect(preview.style.getPropertyValue('translate')).toBe('0px 20px')
+    pointer(window, 'pointermove', 40)
+    expect(preview.style.getPropertyValue('translate')).toBe('0px 35px')
+    pointer(window, 'pointerup', 40)
+    expect(part(list, 'drag-preview')?.childElementCount ?? 0).toBe(0)
+  })
+
+  test('Escape takes the copy away and puts it back, and a move with the keys draws none', async () => {
+    const list = await make('reorderable')
+    const alpha = list.rows[0] as Row
+    let asked = 0
+    list.addEventListener('helix-before-reorder', () => {
+      asked += 1
+    })
+    pointer(grip(alpha) as Element, 'pointerdown', 5)
+    pointer(window, 'pointermove', 25)
+    pressEscape()
+    expect(part(list, 'drag-preview')?.childElementCount ?? 0).toBe(0)
+    pointer(window, 'pointerup', 25)
+    expect(asked).toBe(0)
+    click(grip(alpha) as Element)
+    press(grip(alpha) as Element, 'ArrowDown')
+    await settle(list)
+    expect(part(list, 'drag-preview')?.childElementCount ?? 0).toBe(0)
   })
 })

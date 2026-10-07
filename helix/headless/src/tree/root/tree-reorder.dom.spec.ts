@@ -117,11 +117,32 @@ const order = (parent: Element): string[] =>
     .filter((child) => child.localName === 'helix-headless-tree-item')
     .map((child) => child.getAttribute('value') ?? '')
 
+/* A pointer event as a mouse sends it, where `y` says how far down. */
+const pointer = (target: EventTarget, type: string, y: number): void => {
+  target.dispatchEvent(
+    new PointerEvent(type, {
+      bubbles: true,
+      button: 0,
+      clientX: 5,
+      clientY: y,
+      composed: true,
+      pointerId: 1,
+    }),
+  )
+}
+
+const pressEscape = (): void => {
+  window.dispatchEvent(
+    new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' }),
+  )
+}
+
 describe('a tree that does not reorder', () => {
-  test('draws no grip, and Alt with an arrow moves nothing', async () => {
+  test('draws no grip and no drag preview, and Alt with an arrow moves nothing', async () => {
     const tree = await make('')
     const heard = follow(tree)
     expect(itemsOf(tree).map((one) => grip(one))).toEqual([null, null, null, null, null, null])
+    expect(part(tree, 'drag-preview')).toBeNull()
     press(item(tree, 'a'), 'ArrowDown', { altKey: true })
     expect(heard).toEqual([])
     expect(order(item(tree, 'src'))).toEqual(['a', 'b', 'c'])
@@ -226,5 +247,44 @@ describe('a reorderable tree', () => {
     follow(tree)
     press(item(tree, 'license'), 'Home', { altKey: true })
     expect(await spoken(tree)).toBe('LICENSE is now 1 of 3')
+  })
+})
+
+describe('a pointer dragging an item by its grip', () => {
+  test('draws a copy of it in the drag-preview part, hidden from assistive technology, which follows the pointer until the drop', async () => {
+    const tree = await make()
+    const readme = item(tree, 'readme')
+    /* Drawn by the template, empty and closed, until a pointer drags. */
+    expect(part(tree, 'drag-preview')?.childElementCount).toBe(0)
+    pointer(grip(readme) as Element, 'pointerdown', 5)
+    pointer(window, 'pointermove', 25)
+    const preview = part(tree, 'drag-preview') as HTMLElement
+    expect(preview.getAttribute('aria-hidden')).toBe('true')
+    expect(preview.getAttribute('popover')).toBe('manual')
+    expect(preview.textContent).toContain('README')
+    expect(preview.style.getPropertyValue('translate')).toBe('0px 20px')
+    pointer(window, 'pointermove', 40)
+    expect(preview.style.getPropertyValue('translate')).toBe('0px 35px')
+    pointer(window, 'pointerup', 40)
+    expect(part(tree, 'drag-preview')?.childElementCount ?? 0).toBe(0)
+  })
+
+  test('Escape takes the copy away and puts it back, and a move with the keys draws none', async () => {
+    const tree = await make()
+    const readme = item(tree, 'readme')
+    let asked = 0
+    tree.addEventListener('helix-before-reorder', () => {
+      asked += 1
+    })
+    pointer(grip(readme) as Element, 'pointerdown', 5)
+    pointer(window, 'pointermove', 25)
+    pressEscape()
+    expect(part(tree, 'drag-preview')?.childElementCount ?? 0).toBe(0)
+    pointer(window, 'pointerup', 25)
+    expect(asked).toBe(0)
+    click(grip(readme) as Element)
+    press(readme, 'ArrowUp')
+    await settle(tree)
+    expect(part(tree, 'drag-preview')?.childElementCount ?? 0).toBe(0)
   })
 })

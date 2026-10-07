@@ -1,9 +1,16 @@
-import type { ReactiveController, ReactiveControllerHost, ReactiveElement } from 'lit'
+import type {
+  nothing,
+  ReactiveController,
+  ReactiveControllerHost,
+  ReactiveElement,
+  TemplateResult,
+} from 'lit'
 import { HelixBeforeReorderEvent } from '../../events/before-reorder.js'
 import type { ReorderDetail } from '../../events/details.js'
 import { HelixReorderEvent } from '../../events/reorder.js'
 import { deepActiveElement } from '../../utils/focusable-elements/focusable-elements.js'
 import { isRtl } from '../../utils/is-rtl/is-rtl.js'
+import { boxOf, dragPreviewOf, drawDragPreview } from '../../utils/reorder/drag-preview.js'
 import {
   centersOf,
   dropMark,
@@ -123,6 +130,20 @@ export interface ReorderOptions {
   name?: (key: string) => string
 
   /**
+   * The element a pointer drag copies for the drag preview: a copy of what it
+   * draws follows the pointer, raised over the page, until the item is let go
+   * or Escape puts it back. A move made with the keys draws none. No preview
+   * is drawn where this is not given.
+   *
+   * The copy is drawn in the host's `drag-preview` part, which the host's
+   * template draws with `drawDragPreview`: a manual popover in its shadow
+   * root, hidden from assistive technology, shown in the top layer so no
+   * scrolling box clips it. The host's stylesheet gives it its look. No
+   * preview is drawn where the host draws no such part.
+   */
+  preview?: (key: string) => Element | null | undefined
+
+  /**
    * Gives focus back to the item with that key, called after a move made from
    * the keyboard stood, once the page has moved the item and focus went to the
    * body with it. Focus the page put anywhere else is left there. Focus is left
@@ -209,6 +230,12 @@ export class ReorderController implements ReactiveController {
   /** The frame the next scroll waits for. */
   private frame = 0
 
+  /** The copy of the dragged item that follows the pointer, while one is drawn. */
+  private shown: HTMLElement | undefined = undefined
+
+  /** Where the pointer went down on the item the preview copies. */
+  private anchor = { x: 0, y: 0 }
+
   constructor(host: ReactiveControllerHost & HTMLElement, options: ReorderOptions) {
     this.host = host
     this.options = options
@@ -243,6 +270,14 @@ export class ReorderController implements ReactiveController {
     return this.held?.key === key ? 'dragging' : mark?.key === key ? `drop-${mark.edge}` : undefined
   }
 
+  /**
+   * The `drag-preview` part, for the host's template: an empty manual popover
+   * while items may be moved, which a pointer drag fills and shows.
+   */
+  drawDragPreview(): TemplateResult | typeof nothing {
+    return drawDragPreview(this.enabled())
+  }
+
   hostConnected(): void {
     this.host.addEventListener('pointerdown', this.handleDown)
     this.host.addEventListener('click', this.handleClick, true)
@@ -256,6 +291,7 @@ export class ReorderController implements ReactiveController {
     this.host.removeEventListener('keydown', this.handleKey, true)
     this.host.removeEventListener('focusout', this.handleFocusOut)
     this.listen(false)
+    this.lower()
     this.awaiting?.disconnect()
     this.state = IDLE
     this.holder = null
@@ -281,11 +317,17 @@ export class ReorderController implements ReactiveController {
 
   /** What a change of state calls for. */
   private enter(before: ReorderState, next: ReorderState): void {
+    if (next.phase !== 'held') {
+      this.lower()
+    }
     if (next.phase === 'held') {
       if (before.phase !== 'held') {
         if (next.by === 'keyboard') {
           this.speak('pickedUp', next.key)
         } else {
+          if (before.phase === 'pressed') {
+            this.lift(next.key, before)
+          }
           this.scroll()
         }
       } else if (next.by === 'keyboard') {
@@ -459,6 +501,43 @@ export class ReorderController implements ReactiveController {
     }
     this.pointer = { x: event.clientX, y: event.clientY }
     this.drag()
+    this.glide()
+  }
+
+  /**
+   * Draws the drag preview: a copy of the item, where it is, in the host's
+   * `drag-preview` part, shown in the top layer. Measured before the host
+   * draws the item as dragged, so the copy is the item as it was.
+   */
+  private lift(key: string, from: { x: number; y: number }): void {
+    const element = this.options.preview?.(key)
+    const root = (this.host as { renderRoot?: ParentNode }).renderRoot ?? this.host.shadowRoot
+    const preview = root?.querySelector<HTMLElement>('[part="drag-preview"]')
+    if (!element || !preview) {
+      return
+    }
+    const box = boxOf(element)
+    preview.style.cssText = `inset:auto;left:${box.left}px;top:${box.top}px;width:${box.width}px;height:${box.height}px;margin:0;padding:0;overflow:clip;pointer-events:none`
+    preview.replaceChildren(...dragPreviewOf(element, true, box))
+    preview.showPopover?.()
+    this.shown = preview
+    this.anchor = from
+    this.glide()
+  }
+
+  /** Moves the drag preview with the pointer. */
+  private glide(): void {
+    this.shown?.style.setProperty(
+      'translate',
+      `${this.pointer.x - this.anchor.x}px ${this.pointer.y - this.anchor.y}px`,
+    )
+  }
+
+  /** Takes the drag preview away: hides the part and empties it. */
+  private lower(): void {
+    this.shown?.hidePopover?.()
+    this.shown?.replaceChildren()
+    this.shown = undefined
   }
 
   /** Places the dragged item under the pointer's last reading. */
@@ -475,15 +554,29 @@ export class ReorderController implements ReactiveController {
     const dragged = this.state.phase === 'held'
     this.send({ type: 'release' })
     if (dragged) {
-      /* The click a release raises lands on the grip, and would take hold of
-         the item again. */
-      window.addEventListener('click', swallow, { capture: true, once: true })
-      setTimeout(() => window.removeEventListener('click', swallow, { capture: true }), 0)
+      swallowClick()
     }
   }
 
   private readonly handleCancel = (): void => {
     this.send({ type: 'cancel' })
+  }
+
+  /**
+   * Escape while a pointer drags puts the item back. Heard on the window,
+   * since focus may be anywhere while a pointer drags, and kept from the page,
+   * so a dialog the list is in stays open.
+   */
+  private readonly handleEscape = (event: KeyboardEvent): void => {
+    const state = this.state
+    if (event.key === 'Escape' && state.phase === 'held' && state.by === 'pointer') {
+      event.preventDefault()
+      event.stopPropagation()
+      this.send({ type: 'cancel' })
+      /* The pointer is still down, and the click its release raises would
+         take hold of the item again. */
+      window.addEventListener('pointerup', swallowClick, { once: true })
+    }
   }
 
   /** Starts or stops hearing the pointer on the window, and the scrolling with it. */
@@ -492,11 +585,13 @@ export class ReorderController implements ReactiveController {
       window.addEventListener('pointermove', this.handleMove)
       window.addEventListener('pointerup', this.handleUp)
       window.addEventListener('pointercancel', this.handleCancel)
+      window.addEventListener('keydown', this.handleEscape, true)
       return
     }
     window.removeEventListener('pointermove', this.handleMove)
     window.removeEventListener('pointerup', this.handleUp)
     window.removeEventListener('pointercancel', this.handleCancel)
+    window.removeEventListener('keydown', this.handleEscape, true)
     if (this.frame) {
       cancelAnimationFrame(this.frame)
       this.frame = 0
@@ -736,4 +831,10 @@ export class ReorderController implements ReactiveController {
 const swallow = (event: Event): void => {
   event.preventDefault()
   event.stopPropagation()
+}
+
+/** Keeps the click a pointer's release raises, if one comes at once, from the page. */
+const swallowClick = (): void => {
+  window.addEventListener('click', swallow, { capture: true, once: true })
+  setTimeout(() => window.removeEventListener('click', swallow, { capture: true }), 0)
 }

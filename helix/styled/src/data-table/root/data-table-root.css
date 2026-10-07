@@ -433,6 +433,22 @@
   opacity: 0.5;
 }
 
+/* The copy of a row a pointer drags, drawn in the top layer and raised over
+   the page while the row itself stays in place, faded. It has no transition, so
+   it follows the pointer with nothing animated, whatever the reader's motion
+   setting. */
+[part="drag-preview"] {
+  background-color: var(
+    --data-table-drag-preview-background-color,
+    var(--helix-color-surface-raised)
+  );
+  border: var(--data-table-drag-preview-border-width, var(--helix-border-floating)) solid
+    var(--data-table-drag-preview-border-color, var(--helix-color-border));
+  border-radius: var(--data-table-drag-preview-radius, var(--helix-radii-sm));
+  box-shadow: var(--data-table-drag-preview-shadow, var(--helix-shadow-floating));
+  opacity: var(--data-table-drag-preview-opacity, 0.9);
+}
+
 /* Print: zebra striping is a fill printers drop unevenly, which is worse than
    none. `@media print` does not cross a shadow boundary, so a page cannot answer
    this on a component's behalf and every family says it for itself. */

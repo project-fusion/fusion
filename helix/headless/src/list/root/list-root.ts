@@ -119,6 +119,7 @@ import {
  * @event {HelixBeforeReorderEvent} helix-before-reorder - Fired when a row is dropped at a new place, in a `reorderable` list, with every row's value in the new order. Cancelable: cancel it to keep the row where it is.
  * @event {HelixReorderEvent} helix-reorder - Fired after `helix-before-reorder` when nobody canceled it. Move your rows to the order in `keys`. Cancelable: cancel it to say the move did not happen.
  *
+ * @csspart drag-preview - A copy of the row a pointer drags, which follows the pointer in the top layer until the row is let go, in a `reorderable` list. Hidden from assistive technology.
  * @csspart live - The region that says each step of a move to screen readers, in a `reorderable` list. Drawn from the first move. Visually hidden in the styled tier.
  *
  * @cssproperty --list-first - The number of the first row, written where `start` or `reversed` moves it.
@@ -314,6 +315,7 @@ export class HelixHeadlessList extends HelixElement {
     },
     keys: () => this.rows.map((row) => this.valueFor(row)),
     name: (key) => this.rowFor(key)?.words || key,
+    preview: (key) => this.rowFor(key),
     say: (said) => this.status.say(said),
     scroller: () => {
       const first = this.rows[0]
@@ -714,7 +716,7 @@ export class HelixHeadlessList extends HelixElement {
   protected override render(): TemplateResult {
     /* A row arriving or leaving changes who holds the stop and how many rows
        a reversed list counts down from. */
-    return html`<slot style=${this.numbers} @slotchange=${this.handleSlotChange}></slot>${drawStatus(this.status)}`
+    return html`<slot style=${this.numbers} @slotchange=${this.handleSlotChange}></slot>${drawStatus(this.status)}${this.reorder.drawDragPreview()}`
   }
 
   private readonly handleSlotChange = (): void => {

@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { mount, registerDom } from '@fusion.dev/helix-testing/dom'
+import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 /* Rows moved by a grip, with `reorderable-rows`. The table moves no row: the
    specs that move one set `rows` to the order `helix-reorder` carries, as a
@@ -95,11 +95,33 @@ const follow = (element: Table): Detail[] => {
   return heard
 }
 
+/* A pointer event as a mouse sends it, where `y` says how far down. */
+const pointer = (target: EventTarget, type: string, y: number): void => {
+  target.dispatchEvent(
+    new PointerEvent(type, {
+      bubbles: true,
+      button: 0,
+      clientX: 5,
+      clientY: y,
+      composed: true,
+      pointerId: 1,
+    }),
+  )
+}
+
+const pressEscape = (): void => {
+  window.dispatchEvent(
+    new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' }),
+  )
+}
+
 describe('a table without reorderable-rows', () => {
-  test('draws no grips and leads each row with its first column', async () => {
-    const element = await table('')
+  test('draws no grips and no drag preview, and leads each row with its first column', async () => {
+    const element = await table('reorderable')
     expect(grips(element)).toEqual([])
     expect(shadow(element, '[part="grip-head"]')).toEqual([])
+    /* A column's grip moves the column itself, so `reorderable` alone draws none. */
+    expect(part(element, 'drag-preview')).toBeNull()
     expect(
       shadow(element, '[part~="row"]')[0]?.firstElementChild?.getAttribute('data-column'),
     ).toBe('0')
@@ -260,5 +282,44 @@ describe('a column dragged by its grip', () => {
     )
     await settle(element)
     expect(element.order).toBe('a x c b')
+  })
+})
+
+describe('a pointer dragging a row by its grip', () => {
+  test('draws a copy of it in the drag-preview part, hidden from assistive technology, which follows the pointer until the drop', async () => {
+    const element = await table('reorderable-rows')
+    const grip = grips(element)[1] as HTMLElement
+    /* Drawn by the template, empty and closed, until a pointer drags. */
+    expect(part(element, 'drag-preview')?.childElementCount).toBe(0)
+    pointer(grip.querySelector('button') as HTMLElement, 'pointerdown', 5)
+    pointer(window, 'pointermove', 25)
+    const preview = part(element, 'drag-preview') as HTMLElement
+    expect(preview.getAttribute('aria-hidden')).toBe('true')
+    expect(preview.getAttribute('popover')).toBe('manual')
+    expect(preview.textContent).toContain('bravo')
+    expect(preview.style.getPropertyValue('translate')).toBe('0px 20px')
+    pointer(window, 'pointermove', 40)
+    expect(preview.style.getPropertyValue('translate')).toBe('0px 35px')
+    pointer(window, 'pointerup', 40)
+    expect(part(element, 'drag-preview')?.childElementCount ?? 0).toBe(0)
+  })
+
+  test('Escape takes the copy away and puts it back, and a move with the keys draws none', async () => {
+    const element = await table('reorderable-rows')
+    const grip = grips(element)[1] as HTMLElement
+    let asked = 0
+    element.addEventListener('helix-before-reorder', () => {
+      asked += 1
+    })
+    pointer(grip.querySelector('button') as HTMLElement, 'pointerdown', 5)
+    pointer(window, 'pointermove', 25)
+    pressEscape()
+    expect(part(element, 'drag-preview')?.childElementCount ?? 0).toBe(0)
+    pointer(window, 'pointerup', 25)
+    expect(asked).toBe(0)
+    press(grip, ' ')
+    press(grip, 'ArrowDown')
+    await settle(element)
+    expect(part(element, 'drag-preview')?.childElementCount ?? 0).toBe(0)
   })
 })

@@ -386,6 +386,133 @@ describe('a pointer dragging a grip', () => {
   })
 })
 
+describe('the drag preview', () => {
+  /* A host with a shadow root that draws the part, as a Lit host's template
+     does, and rows with words in them, whose copy the preview draws. */
+  const withPreview = (more: More = {}, part = true) => {
+    const made = setup(false, {
+      preview: (key) => made.rows[['a', 'b', 'c'].indexOf(key)],
+      ...more,
+    })
+    const host = made.rows[0]?.parentElement as HTMLElement
+    const root = host.attachShadow({ mode: 'open' })
+    if (part) {
+      const drawn = document.createElement('div')
+      drawn.setAttribute('part', 'drag-preview')
+      root.append(drawn)
+    }
+    for (const [index, row] of made.rows.entries()) {
+      row.append(['Alpha', 'Beta', 'Gamma'][index] as string)
+    }
+    const preview = (): HTMLElement | null => root.querySelector('[part="drag-preview"]')
+    return { ...made, host, preview, root }
+  }
+
+  const pressEscape = (): KeyboardEvent => {
+    const event = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' })
+    window.dispatchEvent(event)
+    return event
+  }
+
+  test('a pointer drag draws a copy of the item in the part the host draws, where the item is', () => {
+    const { grips, host, preview, rows } = withPreview()
+    pointer(grips[1] as Element, 'pointerdown', 30)
+    pointer(window, 'pointermove', 31)
+    expect(preview()?.childElementCount).toBe(0)
+    pointer(window, 'pointermove', 40)
+    const drawn = preview() as HTMLElement
+    expect(drawn.textContent).toBe('Beta')
+    expect(drawn.querySelector('button')).not.toBeNull()
+    /* The row's box, 20 pixels down, and nothing written on the page. */
+    expect([drawn.style.top, drawn.style.width, drawn.style.height]).toEqual([
+      '20px',
+      '100px',
+      '20px',
+    ])
+    expect(host.querySelectorAll('[part="drag-preview"]').length).toBe(0)
+    expect(rows[1]?.childElementCount).toBe(1)
+  })
+
+  test('the part a template draws is a closed manual popover, out of the accessibility tree, while items may be moved', () => {
+    let on = true
+    const { reorder } = withPreview({ enabled: () => on })
+    const markup = (): string =>
+      (reorder.drawDragPreview() as { strings?: readonly string[] }).strings?.join('') ?? ''
+    expect(markup()).toBe(
+      '<div part="drag-preview" popover="manual" aria-hidden="true" inert></div>',
+    )
+    on = false
+    expect(markup()).toBe('')
+  })
+
+  test('a host that draws no part draws no preview', () => {
+    const { grips, reorder, root } = withPreview({}, false)
+    pointer(grips[0] as Element, 'pointerdown', 10)
+    pointer(window, 'pointermove', 55)
+    expect(reorder.held?.by).toBe('pointer')
+    expect(root.childElementCount).toBe(0)
+  })
+
+  test('follows the pointer from where it went down', () => {
+    const { grips, preview } = withPreview()
+    pointer(grips[1] as Element, 'pointerdown', 30)
+    pointer(window, 'pointermove', 40)
+    expect(preview()?.style.getPropertyValue('translate')).toBe('0px 10px')
+    pointer(window, 'pointermove', 52)
+    expect(preview()?.style.getPropertyValue('translate')).toBe('0px 22px')
+  })
+
+  test('is emptied after the drop', () => {
+    const { drops, grips, preview } = withPreview()
+    pointer(grips[0] as Element, 'pointerdown', 10)
+    pointer(window, 'pointermove', 55)
+    pointer(window, 'pointerup', 55)
+    expect(drops).toEqual([{ from: 0, key: 'a', to: 2 }])
+    expect(preview()?.childElementCount ?? 0).toBe(0)
+  })
+
+  test('Escape puts the item back, takes the preview away, and keeps the key from the page', () => {
+    const { drops, grips, preview, reorder, said } = withPreview()
+    pointer(grips[0] as Element, 'pointerdown', 10)
+    pointer(window, 'pointermove', 55)
+    const event = pressEscape()
+    expect(event.defaultPrevented).toBe(true)
+    expect(preview()?.childElementCount ?? 0).toBe(0)
+    expect(reorder.held).toBeUndefined()
+    expect(said).toEqual(['Canceled'])
+    /* The click the release raises on the grip does not take hold again. */
+    pointer(window, 'pointerup', 55)
+    click(grips[0] as Element)
+    pointer(window, 'pointerup', 55)
+    expect(reorder.held).toBeUndefined()
+    expect(drops).toEqual([])
+  })
+
+  test('a canceled pointer takes it away', () => {
+    const { grips, preview } = withPreview()
+    pointer(grips[0] as Element, 'pointerdown', 10)
+    pointer(window, 'pointermove', 55)
+    pointer(window, 'pointercancel', 55)
+    expect(preview()?.childElementCount ?? 0).toBe(0)
+  })
+
+  test('a move made with the keys draws none', () => {
+    const { grips, preview, reorder } = withPreview()
+    click(grips[0] as Element)
+    key(grips[0] as Element, 'ArrowDown')
+    expect(reorder.held?.to).toBe(1)
+    expect(preview()?.childElementCount ?? 0).toBe(0)
+  })
+
+  test('a host that names no element to copy draws none', () => {
+    const { grips, preview, reorder } = withPreview({ preview: undefined })
+    pointer(grips[0] as Element, 'pointerdown', 10)
+    pointer(window, 'pointermove', 55)
+    expect(reorder.held?.by).toBe('pointer')
+    expect(preview()?.childElementCount ?? 0).toBe(0)
+  })
+})
+
 describe('asking for a move', () => {
   const detail: ReorderDetail = {
     from: 0,
