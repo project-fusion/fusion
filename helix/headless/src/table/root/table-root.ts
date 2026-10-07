@@ -126,6 +126,10 @@ const lengthOf = (element: Element | undefined): number => textOf(element).lengt
 /** A cell's text as a number, with the commas that group its digits taken out. */
 const numberOf = (value: string): number => Number(value.replaceAll(',', ''))
 
+/** The slots a child names for itself, which hold content other than rows. */
+const STATUS = new Set(['empty', 'loading'])
+const NAMED = new Set([...STATUS, 'heading'])
+
 /**
  * @summary A table of data, laid out on a grid.
  *
@@ -228,7 +232,9 @@ const numberOf = (value: string): number => Number(value.replaceAll(',', ''))
  * @documentation https://fusion.dev/helix/components/table
  *
  * @slot - The table's rows.
+ * @slot empty - Content shown when there are no rows and none are loading, such as a picture and a link. Falls back to `empty-text`, which the live region still says.
  * @slot heading - Words that name the table, shown above it, such as a heading.
+ * @slot loading - Content shown while the rows load, such as a spinner. Falls back to `loading-text`, which the live region still says.
  *
  * @event {HelixBeforeReorderEvent} helix-before-reorder - Fired when a row is dropped at a new place, in a `reorderable` table, with every row's key in the new order. Cancelable: cancel it to keep the row where it is.
  * @event {HelixReorderEvent} helix-reorder - Fired after `helix-before-reorder` when nobody canceled it. Move your rows to the order in `keys`. Cancelable: cancel it to say the move did not happen.
@@ -268,6 +274,9 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
    * `registerWords('de', { 'helix-table': { selectAllLabel: 'Alle Zeilen auswählen' } })`.
    */
   static words = 'helix-table'
+
+  /** The empty and loading lines are the `empty` and `loading` slots. */
+  protected override statusSlots = true
 
   /**
    * The word for an ascending sort, in a `sorted-label` that writes `{order}`.
@@ -1067,11 +1076,14 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     slotAssignment: 'manual',
   }
 
-  /** The rows: every child that is not a column, which is what the body slot is assigned. */
+  /**
+   * The rows: every child that is not a column, a heading, or the content of
+   * the `empty` or `loading` slot, which is what the body slot is assigned.
+   */
   protected override get slotted(): Element[] {
     const columns = new Set<Element>(this.tableColumns)
     return [...(this.children ?? [])].filter(
-      (child) => !columns.has(child) && child.getAttribute('slot') !== 'heading',
+      (child) => !columns.has(child) && !NAMED.has(child.getAttribute('slot') ?? ''),
     )
   }
 
@@ -1088,10 +1100,20 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
        slot is given them in. */
     const columns = new Set<Element>(this.tableColumns)
     const headings = new Set<Element>(this.headings)
+    const status = [...(this.children ?? [])].filter((child) =>
+      STATUS.has(child.getAttribute('slot') ?? ''),
+    )
     assignSlots(
       this.renderRoot as ParentNode | undefined,
-      [...columns, ...headings, ...this.arrangedRows],
-      (child) => (columns.has(child) ? 'columns' : headings.has(child) ? 'heading' : ''),
+      [...columns, ...headings, ...status, ...this.arrangedRows],
+      (child) =>
+        columns.has(child)
+          ? 'columns'
+          : headings.has(child)
+            ? 'heading'
+            : status.includes(child)
+              ? (child.getAttribute('slot') ?? '')
+              : '',
     )
   }
 

@@ -91,6 +91,37 @@ describe('a collection that is empty or still arriving', () => {
     expect((part(busy, 'loading') as HTMLElement)?.textContent?.trim()).toBe('Fetching invoices')
   })
 
+  /* The empty and loading lines were text attributes only, so a picture, a
+     link to add the first row, or a spinner meant forking the table. */
+  test('a table takes its own markup for both lines, and counts neither as a row', async () => {
+    const empty = (await mount(`<helix-headless-table label="Invoices" empty-text="No invoices yet">
+        <helix-headless-table-column>Name</helix-headless-table-column>
+        <p slot="empty">No invoices yet. <a href="#new">Add an invoice</a></p>
+        <p slot="loading">Fetching invoices</p>
+      </helix-headless-table>`)) as Collection
+    await settle(empty)
+    const line = part(empty, 'empty') as HTMLElement
+    const slot = line.querySelector('slot[name="empty"]') as HTMLSlotElement
+    expect(slot.assignedElements()).toEqual([empty.querySelector('[slot="empty"]') as Element])
+    expect((part(empty, 'live') as HTMLElement).textContent?.trim()).toBe('No invoices yet')
+
+    empty.loading = true
+    await settle(empty)
+    const loading = (part(empty, 'loading') as HTMLElement).querySelector(
+      'slot[name="loading"]',
+    ) as HTMLSlotElement
+    expect(loading.assignedElements()).toEqual([empty.querySelector('[slot="loading"]') as Element])
+  })
+
+  test('and falls back to its words where nothing is slotted', async () => {
+    const host = (await mount(
+      '<helix-headless-table label="Invoices" empty-text="No invoices yet"></helix-headless-table>',
+    )) as Collection
+    await settle(host)
+    const slot = (part(host, 'empty') as HTMLElement).querySelector('slot[name="empty"]')
+    expect(slot?.textContent?.trim()).toBe('No invoices yet')
+  })
+
   test('every collection speaks the same two words', async () => {
     // One vocabulary. A reader meeting "Loading" in a menu and a different
     // arrangement of the same idea in a table learns it twice.
