@@ -610,6 +610,89 @@ describe('canvas moves', () => {
     expect(card(host, 'c').x).toBe(130)
   })
 
+  /* A copy could not be pasted back: Control with V on the board did nothing. */
+  test('a paste of what a copy wrote adds the cards beside the originals, with new names, and selects them', async () => {
+    const host = (await canvas()) as Canvas & { selected: string }
+    const copied = JSON.stringify({
+      edges: [{ fromNode: 'a', id: 'e1', toNode: 'b' }],
+      nodes: [
+        { height: 100, id: 'a', text: 'First', type: 'text', width: 200, x: 0, y: 0 },
+        { color: '3', height: 100, id: 'b', type: 'text', width: 200, x: 260, y: 0 },
+      ],
+    })
+    let pasted: unknown
+    host.addEventListener('helix-paste', (event) => {
+      pasted = (event as CustomEvent).detail.document
+    })
+    const event = new Event('paste', { bubbles: true, cancelable: true, composed: true })
+    Object.defineProperty(event, 'clipboardData', { value: { getData: () => copied } })
+    card(host, 'a').shadowRoot?.querySelector('[part="node"]')?.dispatchEvent(event)
+    await host.updateComplete
+    expect(event.defaultPrevented).toBe(true)
+    const added = card(host, 'a-2')
+    expect([added.x, added.y, added.textContent]).toEqual([32, 32, 'First'])
+    expect(card(host, 'b-2').getAttribute('tone')).toBe('accent')
+    const edge = host.querySelector('[name="e1-2"]') as HTMLElement & { from: string; to: string }
+    expect([edge.from, edge.to]).toEqual(['a-2', 'b-2'])
+    expect(host.selected).toBe('a-2,b-2')
+    expect(pasted).toBeDefined()
+  })
+
+  test('a paste a page refuses adds nothing, and the page has the document to add itself', async () => {
+    const host = (await canvas()) as Canvas & { paste(text: string): boolean }
+    let offered: { nodes: Array<{ id: string; x: number }> } | undefined
+    host.addEventListener('helix-before-paste', (event) => {
+      offered = (event as CustomEvent).detail.document
+      event.preventDefault()
+    })
+    const text = '{"nodes":[{"id":"c","type":"text","x":130,"y":300,"width":200,"height":100}]}'
+    expect(host.paste(text)).toBe(false)
+    expect(offered?.nodes[0]).toMatchObject({ id: 'c-2', x: 162 })
+    expect(cards(host)).toHaveLength(4)
+  })
+
+  test('a paste of text that is not a board, or onto a read-only board, is left alone', async () => {
+    const host = (await canvas()) as Canvas & { paste(text: string): boolean }
+    expect(host.paste('Hello')).toBe(false)
+    const still = (await canvas('readonly')) as Canvas & { paste(text: string): boolean }
+    expect(
+      still.paste('{"nodes":[{"id":"z","type":"text","x":0,"y":0,"width":9,"height":9}]}'),
+    ).toBe(false)
+    expect(cards(still)).toHaveLength(4)
+  })
+
+  /* A board drawn by hand or pasted together had no way to tidy it. */
+  test('arrange moves the cards apart along the arrows, and undo puts them back', async () => {
+    const host = (await canvas()) as Canvas & {
+      arrange(options?: { gap?: number }): boolean
+      undo(): boolean
+    }
+    const before = cards(host).map((one) => [(one as Card).x, (one as Card).y])
+    let moved = 0
+    host.addEventListener('helix-move', () => {
+      moved += 1
+    })
+    expect(host.arrange({ gap: 40 })).toBe(true)
+    expect(moved).toBe(1)
+    const boxes = ['pair', 'c'].map((name) => {
+      const one = card(host, name) as Card & { height: number; width: number }
+      return { bottom: one.y + one.height, top: one.y }
+    })
+    // The group, which holds a and b, comes before c, which b points to.
+    expect(boxes[1]?.top).toBeGreaterThanOrEqual((boxes[0]?.bottom ?? 0) + 40)
+    // The cards inside the group kept their place in it.
+    expect(card(host, 'a').x - card(host, 'pair').x).toBe(20)
+    expect(host.undo()).toBe(true)
+    expect(cards(host).map((one) => [(one as Card).x, (one as Card).y])).toEqual(before)
+  })
+
+  test('an arrangement a page refuses moves nothing', async () => {
+    const host = (await canvas()) as Canvas & { arrange(): boolean }
+    host.addEventListener('helix-before-move', (event) => event.preventDefault())
+    expect(host.arrange()).toBe(false)
+    expect([card(host, 'c').x, card(host, 'c').y]).toEqual([130, 300])
+  })
+
   test('the arrows are the card\u2019s only when pressed on the card, not inside it', async () => {
     /* A card may hold a chart or a field that answers the arrows itself. */
     const host = await canvas(
