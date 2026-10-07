@@ -126,12 +126,12 @@ const plotted = (series: Series[]): Series[] => series.filter((one) => one.point
  * Reads a table as series, one per data column.
  *
  * **The table is the chart's accessible representation, not a fallback for
- * one.** Every chart here takes its numbers from real markup rather than from a
- * property, so the page is readable with no script at all, sortable by anything
- * that sorts tables, and correct in a screen reader without a parallel
- * description that has to be kept in step by hand. A `values` array would be
- * easier to pass and would make the accessible version the thing nobody
- * maintains.
+ * one.** Every chart here takes its numbers from real markup by preference, so
+ * the page is readable with no script at all, sortable by anything that sorts
+ * tables, and correct in a screen reader without a parallel description that
+ * has to be kept in step by hand. A chart's `data` takes the same shape for a
+ * page that has no table to show, and is read by `seriesFromData`; the docs
+ * steer every page that can show a table to the table.
  *
  * The shape is the ordinary one: a header row naming the series, a first column
  * of row headers, and numbers in the rest. A single-column table has one series
