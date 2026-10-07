@@ -47,6 +47,11 @@ describe('code', () => {
     )
   })
 
+  test('a fragment longer than the line breaks inside itself, each piece washed', () => {
+    expect(rule('[part="code"]')).toContain('overflow-wrap: break-word')
+    expect(rule('[part="code"]')).toContain('box-decoration-break: clone')
+  })
+
   test('the hooks the docs name are what the sheet reads', () => {
     for (const hook of [
       '--code-background-color',
@@ -61,8 +66,8 @@ describe('code', () => {
     }
   })
 
-  test('carries no attribute of its own', async () => {
+  test('carries no attribute of its own beyond the translation mode', async () => {
     const code = await mount('<helix-code>x</helix-code>')
-    expect(code.getAttributeNames()).toEqual([])
+    expect(code.getAttributeNames()).toEqual(['translate'])
   })
 })
