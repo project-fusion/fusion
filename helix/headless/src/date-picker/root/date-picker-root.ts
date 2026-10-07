@@ -17,13 +17,16 @@ import {
   commaList as list,
   MixinControllerValue,
   MixinPickerFeedback,
+  MONTH_CALENDARS,
+  type MonthCalendar,
+  type MonthSystem,
   monthOf,
   monthOut,
+  monthSystem,
   periodCells,
   periodKey,
   reportValues,
   requestChange,
-  sameMonth,
   todayIn,
   weekendOf,
   weekStartOf,
@@ -174,18 +177,25 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
     '{mode, select, single {Enter a date as YYYY-MM-DD.} other {Enter dates as YYYY-MM-DD, separated by commas.}}'
 
   /**
-   * The calendar the heading, the days, and the months are written in:
-   * `gregory`, `buddhist`, `japanese`, `roc`, or `iso8601`, the five whose
-   * months are the Gregorian months.
+   * The calendar the heading, the days, and the months are written in.
    *
-   * Absent is the locale's own where it is one of the five, such as
-   * `buddhist` for `th-TH` or `japanese` for `ja-JP-u-ca-japanese`, and
-   * `gregory` for every other, such as `persian` for `fa-IR`, so the heading
-   * names the Gregorian month the grid shows. The value is `YYYY-MM-DD` in
-   * every calendar.
+   * `gregory`, `buddhist`, `japanese`, `roc`, and `iso8601` are the five
+   * whose months are the Gregorian months. Absent is the locale's own where
+   * it is one of the five, such as `buddhist` for `th-TH` or `japanese` for
+   * `ja-JP-u-ca-japanese`, and `gregory` for every other, such as `persian`
+   * for `fa-IR`.
+   *
+   * `persian`, `hebrew`, `islamic-umalqura`, `islamic-civil`, `ethiopic`,
+   * `coptic`, and `indian` draw a calendar with months of its own, as React
+   * Aria's calendars do: each grid is one of that calendar's months, the
+   * Hebrew leap month and Ethiopia's five-day thirteenth month included, and
+   * Previous, Next and the page keys move by those months. `month` and
+   * `helix-navigate` then name a month by its first day, `YYYY-MM-DD`. The
+   * heading stays text, as the months and years views are drawn in Gregorian
+   * months only. The value is `YYYY-MM-DD` in every calendar.
    */
   @property()
-  calendar?: DateCalendar
+  calendar?: DateCalendar | MonthCalendar
 
   /**
    * What each day shows, in place of its number: a function given the date as
@@ -298,8 +308,9 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
   private monthState: string | undefined = undefined
 
   /**
-   * The month shown, as `YYYY-MM`. When it is not set, it follows `value`,
-   * then the current month.
+   * The month shown, as `YYYY-MM`, or as its first day, `YYYY-MM-DD`, under a
+   * `calendar` with months of its own. When it is not set, it follows
+   * `value`, then the current month.
    *
    * Separate from `value` on purpose, so paging selects nothing and a consumer
    * can drive the view. Reading gives the month on show; writing sets it, and
@@ -313,7 +324,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
      * getter returning `''` while a month is on display leaves that guard dead:
      * the first arrow key writes `monthState` and from then on the grid stops
      * following `value`. */
-    return this.monthState ?? (this.defaultMonth || fromDate(this.derivedMonth).slice(0, 7))
+    return this.monthState ?? (this.defaultMonth || this.system.key(this.derivedMonth))
   }
 
   set month(next: string) {
@@ -448,11 +459,25 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
 
   /** The month being shown, resolved from `month`, then `value`, then today. */
   private get shown(): Date {
-    const explicit = /^(\d{4})-(\d{2})$/.exec(this.monthState ?? this.defaultMonth)
+    const explicit = /^(\d{4})-(\d{2})(?:-(\d{2}))?$/.exec(this.monthState ?? this.defaultMonth)
     if (explicit) {
-      return firstOf(Number(explicit[1]), Number(explicit[2]) - 1)
+      const first = firstOf(Number(explicit[1]), Number(explicit[2]) - 1)
+      return this.system.start(explicit[3] ? addDays(first, Number(explicit[3]) - 1) : first)
     }
     return this.derivedMonth
+  }
+
+  /**
+   * The months the calendar pages through: its own under a `calendar` with
+   * months of its own, and the Gregorian months otherwise.
+   */
+  private get system(): MonthSystem {
+    return monthSystem(this.calendar)
+  }
+
+  /** Whether `calendar` names a calendar with months of its own. */
+  private get ownMonths(): boolean {
+    return MONTH_CALENDARS.includes(this.calendar ?? '')
   }
 
   /**
@@ -467,7 +492,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
        October 31 in Los Angeles it is November in UTC, and a calendar with no
        value opened on a month with no today in it. */
     const from = asDate(this.selected[0] ?? '') ?? asDate(todayIn(this.timeZone)) ?? new Date()
-    return firstOf(from.getUTCFullYear(), from.getUTCMonth())
+    return this.system.start(from)
   }
 
   /**
@@ -493,7 +518,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
       asDate(this.selected[0] ?? ''),
       asDate(todayIn(this.timeZone)),
     ]) {
-      if (candidate && sameMonth(candidate, shown)) {
+      if (candidate && this.system.same(candidate, shown)) {
         return candidate
       }
     }
@@ -544,14 +569,16 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
 
   /** Whether the month before the first one shown is wholly before `min`. */
   private get atStart(): boolean {
-    return asDate(this.min) !== null && monthOf(addMonths(this.shown, -1)) < this.min.slice(0, 7)
+    /* The last day before the first month shown is before `min`, which is
+       the month before wholly before it in any calendar. */
+    return asDate(this.min) !== null && fromDate(addDays(this.shown, -1)) < this.min
   }
 
   /** Whether the month after the last one shown is wholly after `max`. */
   private get atEnd(): boolean {
     return (
       asDate(this.max) !== null &&
-      monthOf(addMonths(this.shown, this.monthCount)) > this.max.slice(0, 7)
+      fromDate(this.system.start(this.system.add(this.shown, this.monthCount))) > this.max
     )
   }
 
@@ -567,7 +594,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
     if (this.isDisabled) {
       return
     }
-    const next = monthOf(date)
+    const next = this.system.key(date)
     if (next === this.month) {
       return
     }
@@ -633,7 +660,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
   }
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {
-    if (this.view !== 'day') {
+    if (this.view !== 'day' && !this.ownMonths) {
       this.handlePeriodKeydown(event)
       return
     }
@@ -671,7 +698,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
     } else {
       // Shift pages by a year, which is the same move twelve months over.
       const step = event.key === 'PageUp' ? -1 : 1
-      this.moveTo(addMonths(from, event.shiftKey ? step * 12 : step))
+      this.moveTo(this.system.add(from, event.shiftKey ? step * 12 : step))
     }
 
     event.preventDefault()
@@ -1163,7 +1190,9 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
     weekdayName: Intl.DateTimeFormat
     year: Intl.DateTimeFormat
   } {
-    const language = calendarLocale(this.language, this.calendar)
+    const language = this.ownMonths
+      ? `${new Intl.Locale(this.language || new Intl.DateTimeFormat().resolvedOptions().locale, { calendar: this.calendar })}`
+      : calendarLocale(this.language, this.calendar)
     if (this.cachedFormats?.locale === language) {
       return this.cachedFormats
     }
@@ -1242,7 +1271,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
                 type="button"
                 aria-label=${this.previousLabel}
                 ?disabled=${this.isDisabled || this.atStart}
-                @click=${() => this.show(addMonths(this.shown, -1))}
+                @click=${() => this.show(this.system.add(this.shown, -1))}
               >
                 ${this.renderPreviousMark()}
               </button>`
@@ -1264,7 +1293,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
                 type="button"
                 aria-label=${this.nextLabel}
                 ?disabled=${this.isDisabled || this.atEnd}
-                @click=${() => this.show(addMonths(this.shown, 1))}
+                @click=${() => this.show(this.system.add(this.shown, 1))}
               >
                 ${this.renderNextMark()}
               </button>`
@@ -1299,7 +1328,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
                  answer on the page twice and runs the range band through two
                  rows. The band stops at the last day the grid owns and picks up
                  in the next, which is where those dates actually are. */
-              const outside = !sameMonth(date, month)
+              const outside = !this.system.same(date, month)
               const start = !outside && range !== null && iso === range[0]
               const end = !outside && range !== null && iso === range[1]
               const middle = !outside && range !== null && iso > range[0] && iso < range[1]
@@ -1350,7 +1379,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
    * neighboring month keep their number, being only there to square the grid.
    */
   protected renderDay(date: Date, outside: boolean): unknown {
-    return this.dayContent && !outside ? this.dayContent(fromDate(date)) : date.getUTCDate()
+    return this.dayContent && !outside ? this.dayContent(fromDate(date)) : this.system.day(date)
   }
 
   /**
@@ -1363,6 +1392,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
   ): TemplateResult | string {
     const steps =
       this.maxView !== undefined &&
+      !this.ownMonths &&
       (this.view === 'day' || (this.view === 'month' && this.maxView === 'year'))
     if (!steps) {
       return text
@@ -1444,7 +1474,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
   }
 
   protected override render(): TemplateResult {
-    if (this.view !== 'day') {
+    if (this.view !== 'day' && !this.ownMonths) {
       return html`<slot name="header"></slot>
         <div part="months" style="--date-picker-column-count: 1">${this.renderPeriods()}</div>
         <slot name="footer"></slot>${this.renderPickerFeedback()}`
@@ -1461,7 +1491,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
     return html`<slot name="header"></slot>
       <div part="months" style="--date-picker-column-count: ${Math.min(count, 2)}">
         ${Array.from({ length: count }, (_, index) =>
-          this.renderMonth(addMonths(shown, index), index),
+          this.renderMonth(this.system.add(shown, index), index),
         )}
       </div>
       <slot name="footer"></slot>${this.renderPickerFeedback()}`

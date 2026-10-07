@@ -1111,3 +1111,73 @@ describe('the columns, the weekend, today, and content around the calendar', () 
     expect(slotted(cal, 'footer').length).toBe(1)
   })
 })
+
+/* React Aria draws a Persian, Hebrew or Islamic calendar's own months. Here a
+   calendar with months of its own was written over Gregorian months. */
+describe('a date picker drawing a calendar with months of its own', () => {
+  const heading = (cal: DatePicker): string => part(cal, 'heading')?.textContent?.trim() ?? ''
+  const written = (calendar: string, iso: string, options: Intl.DateTimeFormatOptions): string =>
+    new Intl.DateTimeFormat(`en-US-u-ca-${calendar}`, { ...options, timeZone: 'UTC' }).format(
+      new Date(`${iso}T00:00:00Z`),
+    )
+  const inMonth = (cal: DatePicker): HTMLElement[] =>
+    days(cal).filter((cell) => !cell.hasAttribute('data-outside'))
+
+  test('draws the Persian month a date is in, numbered as that calendar numbers it', async () => {
+    const cal = (await calendar(
+      'locale="en-US" calendar="persian" default-value="2026-10-06"',
+    )) as DatePicker & { updateComplete: Promise<unknown> }
+    expect(heading(cal)).toBe(written('persian', '2026-10-06', { month: 'long', year: 'numeric' }))
+    const cells = inMonth(cal)
+    expect(cells.length).toBe(30)
+    expect(cells[0]?.textContent?.trim()).toBe('1')
+    expect(cells[0]?.getAttribute('aria-label')).toBe(
+      written('persian', '2026-09-23', { dateStyle: 'full' }),
+    )
+    expect(
+      cells.find((cell) => cell.getAttribute('aria-selected') === 'true')?.textContent?.trim(),
+    ).toBe('14')
+    expect(cal.month).toBe('2026-09-23')
+  })
+
+  test('pages by its months, with Next, and says the month by its first day', async () => {
+    const cal = (await calendar(
+      'locale="en-US" calendar="persian" default-value="2026-10-06"',
+    )) as DatePicker & { updateComplete: Promise<unknown> }
+    const heard: string[] = []
+    cal.addEventListener('helix-navigate', (event) =>
+      heard.push((event as CustomEvent<{ value: string }>).detail.value),
+    )
+    next(cal)
+    await cal.updateComplete
+    expect(heard).toEqual(['2026-10-23'])
+    expect(heading(cal)).toBe(written('persian', '2026-10-23', { month: 'long', year: 'numeric' }))
+    expect(inMonth(cal)[0]?.getAttribute('aria-label')).toBe(
+      written('persian', '2026-10-23', { dateStyle: 'full' }),
+    )
+  })
+
+  test('opens on the month `month` names by its first day, and draws the Hebrew leap month', async () => {
+    const cal = await calendar('locale="en-US" calendar="hebrew" default-month="2027-02-08"')
+    expect(heading(cal)).toBe(written('hebrew', '2027-02-08', { month: 'long', year: 'numeric' }))
+    expect(heading(cal)).toContain('Adar I')
+  })
+
+  test('keeps the heading as text, the months and years views being Gregorian', async () => {
+    const cal = await calendar(
+      'locale="en-US" calendar="persian" max-view="year" default-month="2026-09-23"',
+    )
+    expect(part(cal, 'heading-button')).toBeNull()
+  })
+
+  test('and stops Previous at `min` as it does in Gregorian months', async () => {
+    const cal = await calendar(
+      'locale="en-US" calendar="persian" default-month="2026-09-23" min="2026-09-23"',
+    )
+    expect((part(cal, 'previous') as HTMLButtonElement | null)?.disabled).toBe(true)
+    const later = await calendar(
+      'locale="en-US" calendar="persian" default-month="2026-09-23" min="2026-09-22"',
+    )
+    expect((part(later, 'previous') as HTMLButtonElement | null)?.disabled).toBe(false)
+  })
+})

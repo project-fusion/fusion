@@ -159,6 +159,133 @@ export const addMonths = (date: Date, months: number): Date => {
   return utcDate(target.getUTCFullYear(), target.getUTCMonth(), Math.min(date.getUTCDate(), last))
 }
 
+/**
+ * The calendars Date Picker draws with months of their own, when `calendar`
+ * names one: the months of the year in Iran, Israel, Saudi Arabia, Ethiopia,
+ * Egypt's Coptic church, and India's national calendar. React Aria's
+ * `createCalendar` offers the same set.
+ */
+export type MonthCalendar =
+  | 'coptic'
+  | 'ethiopic'
+  | 'hebrew'
+  | 'indian'
+  | 'islamic-civil'
+  | 'islamic-umalqura'
+  | 'persian'
+
+/** The `MonthCalendar` names, for a check at run time. */
+export const MONTH_CALENDARS: readonly string[] = [
+  'coptic',
+  'ethiopic',
+  'hebrew',
+  'indian',
+  'islamic-civil',
+  'islamic-umalqura',
+  'persian',
+]
+
+/**
+ * The months of a calendar, as Date Picker pages through them. Every date is
+ * still a Gregorian `Date` at midnight UTC, and a month is the run of days
+ * from its first.
+ */
+export interface MonthSystem {
+  /** A date some months away, its day kept where the month is long enough. */
+  add(date: Date, months: number): Date
+  /** The day of its month, from 1. */
+  day(date: Date): number
+  /** The month a date is in, as `month` writes it: `YYYY-MM`, or its first day where the months are the calendar's own. */
+  key(date: Date): string
+  /** Whether two dates fall in one month. */
+  same(left: Date, right: Date): boolean
+  /** The first day of the month a date is in. */
+  start(date: Date): Date
+}
+
+/** The Gregorian months, which the five `DateCalendar` names share. */
+const GREGORIAN: MonthSystem = {
+  add: (date, months) => addMonths(date, months),
+  day: (date) => date.getUTCDate(),
+  key: (date) => monthOf(date),
+  same: (left, right) => sameMonth(left, right),
+  start: (date) => utcDate(date.getUTCFullYear(), date.getUTCMonth(), 1),
+}
+
+/**
+ * A calendar's months read from `Intl`: the day of the month each date has
+ * there, and nothing else, since a month is the run of days from a first.
+ * The leap months of the Hebrew year and Ethiopia's five-day thirteenth month
+ * come out of that with no table.
+ */
+const intlMonths = (calendar: MonthCalendar): MonthSystem => {
+  const format = new Intl.DateTimeFormat(`en-u-ca-${calendar}-nu-latn`, {
+    day: 'numeric',
+    timeZone: 'UTC',
+  })
+  const days = new Map<number, number>()
+  const day = (date: Date): number => {
+    const at = date.getTime()
+    let found = days.get(at)
+    if (found === undefined) {
+      found = Number(format.formatToParts(date).find((part) => part.type === 'day')?.value)
+      if (days.size > 4000) {
+        days.clear()
+      }
+      days.set(at, found)
+    }
+    return found
+  }
+  const start = (date: Date): Date => addDays(date, 1 - day(date))
+  /* The days in the month that starts at `first`: the first day after it
+     that is a first. Most months run 29 to 31 days, so those are tried
+     before the short ones. */
+  const length = (first: Date): number => {
+    for (const count of [29, 30, 31, 28, 32]) {
+      if (day(addDays(first, count)) === 1 && day(addDays(first, count - 1)) === count) {
+        return count
+      }
+    }
+    for (let count = 1; count < 28; count += 1) {
+      if (day(addDays(first, count)) === 1) {
+        return count
+      }
+    }
+    return 30
+  }
+  return {
+    add: (date, months) => {
+      let first = start(date)
+      for (let step = 0; step < Math.abs(months); step += 1) {
+        first = months > 0 ? addDays(first, length(first)) : start(addDays(first, -1))
+      }
+      return addDays(first, Math.min(day(date), length(first)) - 1)
+    },
+    day,
+    key: (date) => fromDate(start(date)),
+    same: (left, right) => start(left).getTime() === start(right).getTime(),
+    start,
+  }
+}
+
+const systems = new Map<string, MonthSystem>()
+
+/**
+ * The months a calendar pages through: its own for a `MonthCalendar` name,
+ * and the Gregorian months for every other.
+ */
+export const monthSystem = (calendar = ''): MonthSystem => {
+  if (!MONTH_CALENDARS.includes(calendar)) {
+    return GREGORIAN
+  }
+  let system = systems.get(calendar)
+  if (system === undefined) {
+    system = intlMonths(calendar as MonthCalendar)
+    systems.set(calendar, system)
+  }
+  return system
+}
+
 /** What bars a date, besides `min` and `max`. */
 export interface Barring {
   /** Dates as `YYYY-MM-DD`, separated by commas or spaces. */
