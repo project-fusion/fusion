@@ -271,3 +271,26 @@ describe('a field barred from validation', () => {
     expect(host.validity.valid).toBe(false)
   })
 })
+
+/* Shoelace's input passes `setRangeText` through to its control; this had
+   every other member of the selection API and not this one. */
+describe('setRangeText', () => {
+  type Ranged = Input & {
+    setRangeText(text: string, start?: number, end?: number, mode?: SelectionMode): void
+  }
+
+  test('replaces a range and takes the text as the value, with no event', async () => {
+    const host = (await mount(
+      '<helix-headless-input label="Name" value="Ada Byron"></helix-headless-input>',
+    )) as Ranged
+    let heard = 0
+    host.addEventListener('input', () => {
+      heard += 1
+    })
+    host.setRangeText('Lovelace', 4, 9, 'end')
+    await host.updateComplete
+    expect(host.value).toBe('Ada Lovelace')
+    expect(control(host).value).toBe('Ada Lovelace')
+    expect(heard).toBe(0)
+  })
+})
