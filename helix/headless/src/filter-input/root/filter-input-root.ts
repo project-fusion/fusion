@@ -717,6 +717,12 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
      about passing `typed` is for: here the two agree, and saying which one is
      meant keeps it true if that ever stops being so. */
   private readonly handleKeydown = (event: KeyboardEvent): void => {
+    /* A key that an input method is composing with is the input method's.
+       Enter there accepts a candidate in Japanese, Chinese or Korean, and read
+       here it chose a suggestion or turned half a word into a chip. */
+    if (event.isComposing) {
+      return
+    }
     if (this.tokenKeydown(event, this.value)) {
       return
     }
