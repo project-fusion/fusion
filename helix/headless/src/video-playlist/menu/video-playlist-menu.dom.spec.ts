@@ -228,6 +228,27 @@ describe('video playlist menu', () => {
     expect(await ticked(menu)).toEqual(['false', 'true', 'false'])
   })
 
+  /* The menu opened on its first entry wherever the playlist was, so a reader
+     several episodes in had to find their place again. */
+  /* Browser only: happy-dom does not move focus into a menu row's shadow root. */
+  ;(hasLayout() ? test : test.skip)('opens on the entry playing', async () => {
+    const { menu, playlist } = await mountMenu()
+    playlist.active = 'two'
+    await playlist.updateComplete
+    const trigger = part(menu, 'trigger') as HTMLElement
+    trigger.click()
+    for (let turn = 0; turn < 5; turn += 1) {
+      await new Promise((resolve) => setTimeout(resolve, 0))
+    }
+    const chain: Element[] = []
+    for (let at = document.activeElement; at; at = at.shadowRoot?.activeElement ?? null) {
+      chain.push(at)
+    }
+    expect(chain.find((one) => one.localName.endsWith('menu-item'))?.getAttribute('value')).toBe(
+      'two',
+    )
+  })
+
   /* The playlist plays its first entry when nothing names one, and the menu
      marked no entry until one was named. */
   test('marks the entry playing when nothing named it', async () => {

@@ -636,3 +636,26 @@ describe('no-advance', () => {
     expect(host.active).toBe('two')
   })
 })
+
+describe('entries that share a file', () => {
+  /* A move between two entries of one file changed no `src`, so the playlist
+     neither played nor said it. */
+  test('a press on the other one plays it from the start and says so', async () => {
+    const host = (await mount(`<helix-headless-video-playlist default-active="one" label="Episodes">
+      <helix-headless-video slot="player"></helix-headless-video>
+      <helix-headless-video-playlist-item src="/same.mp4" value="one">Cut</helix-headless-video-playlist-item>
+      <helix-headless-video-playlist-item src="/same.mp4" value="two">Recut</helix-headless-video-playlist-item>
+    </helix-headless-video-playlist>`)) as Playlist
+    await host.updateComplete
+    const plays = watchPlays(player(host))
+    entries(host)[1]?.shadowRoot?.querySelector('button')?.click()
+    await host.updateComplete
+    await player(host).updateComplete
+    await Promise.resolve()
+    expect(host.active).toBe('two')
+    expect(plays()).toBe(1)
+    await new Promise((done) => requestAnimationFrame(() => done(undefined)))
+    await host.updateComplete
+    expect(part(host, 'live')?.textContent).toBe('Now playing Recut')
+  })
+})
