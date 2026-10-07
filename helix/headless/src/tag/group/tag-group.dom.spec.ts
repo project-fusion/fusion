@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { mount, notYetDefined, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 /* A set of tags as one control: a grid of rows with one tab stop, moved through
    with the arrow keys, emptied with Delete and Backspace, and selected with
@@ -460,5 +460,30 @@ describe('a group as a page sets it', () => {
     await one.group.updateComplete
     const slot = part(one.group, 'empty')?.querySelector('slot')
     expect(slot?.textContent).toBe('No tags')
+  })
+})
+
+describe('a tag whose definition loads after it was added', () => {
+  /* The host hears the definition from `whenDefined`, a microtask after it,
+     and both elements then render. */
+  const upgraded = async (...elements: Element[]): Promise<void> => {
+    for (let round = 0; round < 3; round += 1) {
+      await new Promise((done) => setTimeout(done, 0))
+      await Promise.all(
+        elements.map((one) => (one as Element & { updateComplete?: unknown }).updateComplete),
+      )
+    }
+  }
+  test('takes its row role once it upgrades', async () => {
+    const group = await mount(
+      '<helix-headless-tag-group label="Fruit"><helix-headless-tag>Apple</helix-headless-tag></helix-headless-tag-group>',
+    )
+    const late = notYetDefined('helix-headless-tag')
+    late.element.textContent = 'Pear'
+    group.append(late.element)
+    await upgraded(group)
+    late.define()
+    await upgraded(group, late.element)
+    expect(role(late.element)).toBe('row')
   })
 })

@@ -1,5 +1,13 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import {
+  hasLayout,
+  mount,
+  notYetDefined,
+  part,
+  registerDom,
+  role,
+  slotted,
+} from '@fusion.dev/helix-testing/dom'
 
 /** What a named slot was actually given, which is the only proof of assignment. */
 const assigned = (element: HTMLElement, name: string): Element[] =>
@@ -448,5 +456,35 @@ describe('moving between turns', () => {
     await Promise.all(turns.map((one) => one.updateComplete))
     expect(turns.map((one) => one.internals.ariaPosInSet)).toEqual(['1', '2', '3'])
     expect(turns.map((one) => one.internals.ariaSetSize)).toEqual(['3', '3', '3'])
+  })
+})
+
+describe('a message whose definition loads after it was added', () => {
+  /* The host hears the definition from `whenDefined`, a microtask after it,
+     and both elements then render. */
+  const upgraded = async (...elements: Element[]): Promise<void> => {
+    for (let round = 0; round < 3; round += 1) {
+      await new Promise((done) => setTimeout(done, 0))
+      await Promise.all(
+        elements.map((one) => (one as Element & { updateComplete?: unknown }).updateComplete),
+      )
+    }
+  }
+  /* The transcript is assigned by hand to the messages it recognizes, and an
+     element that has not upgraded is not one yet. In a browser a visible chat
+     was rescued by its resize observer; a hidden one was not. */
+  test('is drawn in the transcript once it upgrades, while the chat is hidden', async () => {
+    const chat = await mount(
+      '<helix-headless-chat label="Conversation" hidden><helix-headless-chat-message author="them" state="sent">Hello</helix-headless-chat-message></helix-headless-chat>',
+    )
+    const late = notYetDefined('helix-headless-chat-message')
+    /* No `state`: it reflects, and the chat's own watch on that attribute would
+       read the transcript again for a reason unrelated to the upgrade. */
+    late.element.textContent = 'Hi'
+    chat.append(late.element)
+    await upgraded(chat)
+    late.define()
+    await upgraded(chat, late.element)
+    expect(slotted(chat, 'messages').includes(late.element)).toBe(true)
   })
 })

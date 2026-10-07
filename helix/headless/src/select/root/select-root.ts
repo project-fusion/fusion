@@ -21,6 +21,7 @@ import {
   StatusController,
   sideOf,
   typesCharacter,
+  UpgradeController,
   words,
   wordsLocale,
 } from '@fusion.dev/helix-core'
@@ -345,6 +346,21 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
   private get listbox(): HelixHeadlessListbox | null {
     return this.partNamed<HelixHeadlessListbox>('listbox')
   }
+
+  /**
+   * Hears an option upgrade after it arrived. The options are this element's
+   * children, which the listbox reaches through a slot and does not watch, so
+   * both read them again: the listbox to select the one `value` names, and this
+   * element for the words on its trigger.
+   */
+  protected readonly upgradeWatch = new UpgradeController(
+    this,
+    () => {
+      this.listbox?.requestUpdate()
+      this.requestUpdate()
+    },
+    { subtree: true },
+  )
 
   /* The surface floats *and is in the top layer*.
    *

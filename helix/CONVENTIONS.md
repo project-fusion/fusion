@@ -502,6 +502,17 @@ Two things follow for the component:
   the resting state of a `data-` mirror is the attribute's absence, so an empty
   slot needs no event to stay correct. `Checkbox` carries the case where that is
   not enough.
+- **A parent that knows its children by class waits for them to upgrade.** A
+  child whose definition loads after the parent fails `instanceof` and lacks any
+  marker its class sets, such as `isNotification`. Its upgrade changes no child
+  list and no assignment, so neither `slotchange` nor a `MutationObserver`
+  reports it. Measured in Chromium on eleven families: a listbox left the option
+  its `default-value` named unselected, a tree gave the item no level, and the
+  notification feed drew the row nowhere. Such a parent adds `UpgradeController`
+  from `helix/core`, with `subtree` where its items may sit inside wrappers, and
+  passes the handler its `slotchange` already calls. A parent whose children
+  arrive through a slot it renders inside another element, as Select's options
+  reach its listbox, adds its own and tells the inner element.
 
 `Avatar` had this before it was written down: its default slot falls back to
 the initials derived from `name`. `Tooltip` follows it.

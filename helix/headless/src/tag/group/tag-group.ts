@@ -15,6 +15,7 @@ import {
   type SelectionMode,
   slottedWords,
   typeaheadByWords,
+  UpgradeController,
   whenHydrated,
   words,
 } from '@fusion.dev/helix-core'
@@ -451,6 +452,9 @@ export class HelixHeadlessTagGroup extends HelixElement {
     this.sync()
     this.requestUpdate()
   }
+
+  /** Reads a tag again once it upgrades, so it takes its role and its place. */
+  protected readonly upgradeWatch = new UpgradeController(this, this.handleSlotchange)
 
   /* Wherever the reader lands, by key or by pointer, holds the stop next. */
   private readonly handleFocusin = (event: FocusEvent): void => {

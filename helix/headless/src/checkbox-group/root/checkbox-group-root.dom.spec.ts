@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import {
   mount,
+  notYetDefined,
   part,
   registerDom,
   role,
@@ -426,5 +427,31 @@ describe('boxes with no value', () => {
     all.shadowRoot?.querySelector<HTMLElement>('[part="control"]')?.click()
     await settle(g)
     expect(g.boxes.map((box) => box.checked)).toEqual([false, false, false])
+  })
+})
+
+describe('a box whose definition loads after it was added', () => {
+  /* The host hears the definition from `whenDefined`, a microtask after it,
+     and both elements then render. */
+  const upgraded = async (...elements: Element[]): Promise<void> => {
+    for (let round = 0; round < 3; round += 1) {
+      await new Promise((done) => setTimeout(done, 0))
+      await Promise.all(
+        elements.map((one) => (one as Element & { updateComplete?: unknown }).updateComplete),
+      )
+    }
+  }
+  test('takes the group’s name once it upgrades', async () => {
+    const group = await mount(
+      '<helix-headless-checkbox-group label="L" name="shared"><helix-headless-checkbox value="design">Design</helix-headless-checkbox></helix-headless-checkbox-group>',
+    )
+    const late = notYetDefined('helix-headless-checkbox')
+    Object.assign(late.element, { value: 'mind' })
+    late.element.textContent = 'Mind'
+    group.append(late.element)
+    await upgraded(group)
+    late.define()
+    await upgraded(group, late.element)
+    expect(late.element.getAttribute('name')).toBe('shared')
   })
 })

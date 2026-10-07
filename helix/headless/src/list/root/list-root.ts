@@ -25,6 +25,7 @@ import {
   scrollRoom,
   selectsAll,
   typeaheadByWords,
+  UpgradeController,
   whenHydrated,
   words,
 } from '@fusion.dev/helix-core'
@@ -963,6 +964,9 @@ export class HelixHeadlessList extends HelixElement {
     this.rowsChanged = true
     this.requestUpdate()
   }
+
+  /** Reads an item again once it upgrades, so it takes the role the list gives its rows. */
+  protected readonly upgradeWatch = new UpgradeController(this, this.handleSlotChange)
 }
 
 declare global {

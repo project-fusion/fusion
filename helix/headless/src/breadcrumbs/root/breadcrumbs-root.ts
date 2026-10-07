@@ -3,6 +3,7 @@ import {
   formatWords,
   HelixElement,
   hostAria,
+  UpgradeController,
   whenHydrated,
   words,
 } from '@fusion.dev/helix-core'
@@ -212,6 +213,9 @@ export class HelixHeadlessBreadcrumbs extends HelixElement {
     this.expanded = false
     this.markLast()
   }
+
+  /** Reads a crumb again once it upgrades, so the current one is marked. */
+  protected readonly upgradeWatch = new UpgradeController(this, this.handleSlotChange)
 
   /** The crumbs `items` describes, each a crumb of this tier. */
   protected renderItems(): TemplateResult | typeof nothing {
