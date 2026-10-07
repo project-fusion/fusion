@@ -27,6 +27,7 @@ import { holdControls, releaseControls } from '../controls.js'
 import { fillHoles, keyOf, textsOf } from '../fill.js'
 import { skipDisabled, stepIndex } from '../keys.js'
 import { drawPlan, itemsOf, stopAfter } from '../plan.js'
+import { entryOf, headOf, itemsIn, type Sections, sectionAt, sectionsOf } from '../sections.js'
 
 /**
  * Draws one item into its row, for a list given `renderItem`.
@@ -36,6 +37,13 @@ import { drawPlan, itemsOf, stopAfter } from '../plan.js'
  * `const row: VirtualListRenderer<Person> = (person) => person.name`.
  */
 export type VirtualListRenderer<Item = unknown> = (item: Item, index: number) => unknown
+
+/**
+ * Draws one section's header, for a list given `sectionField`, given the
+ * section's name and its place among the sections. Returns anything Lit
+ * renders.
+ */
+export type VirtualListSectionRenderer = (name: string, index: number) => unknown
 
 /** Where `scrollToIndex` puts an item, and how it gets there. */
 export interface VirtualListScrollOptions {
@@ -55,6 +63,18 @@ export interface VirtualListRange {
   /** One past the index of the last item on screen. */
   last: number
 }
+
+/** How many lists have drawn sections, for each one's header ids. */
+let sectionCount = 0
+
+/** A new prefix for one list's header ids. */
+const nextSectionId = (): string => {
+  sectionCount += 1
+  return `virtual-list-${sectionCount}`
+}
+
+/** The rows in the tree: the list's children, or a section's in a list with sections. */
+const ROWS = ':scope > [data-index], :scope > [data-section] > [data-index]'
 
 /**
  * @summary A list that renders only the rows of a long set that are on screen.
@@ -86,12 +106,26 @@ export interface VirtualListRange {
  * smallest item size, and follows the box as it resizes. `gap` spaces the rows, and the columns
  * of a grid, by a number of pixels the list counts in each row's place.
  *
+ * **Across.** `orientation="horizontal"` lays the items out along a line and
+ * scrolls it sideways, as a strip of cards does, windowed the same way:
+ * `estimate` is then an item's width, and the box needs an inline size.
+ *
+ * **Sections.** `section-field` names the field of each item that says which
+ * section it is in, and the list draws a header before each section's items,
+ * as React Aria's list box sections do. Each section is an element with the
+ * `group` role, named by its header, which is its first child and carries
+ * `data-header`, so your stylesheet styles it, such as with `position:
+ * sticky`. A section starts wherever the field changes, so give the items in
+ * order. The window counts the headers with the items, and a section the
+ * window starts inside is drawn with its header. `renderSection` draws a
+ * header of your own.
+ *
  * **Keyboard.** The list is one tab stop.
  *
  * | Key | What it does |
  * |---|---|
  * | Down, Up | Moves to the next or the previous item, or in a grid to the item in the same column on the next or the previous line. |
- * | Right, Left | In a grid, moves to the next or the previous item along the line, the other way round on a right-to-left page. |
+ * | Right, Left | In a grid, moves to the next or the previous item along the line, the other way round on a right-to-left page. In a list that runs across, moves to the next or the previous item the same way, and Down and Up are left to the row. |
  * | Home, End | Moves to the first or the last item. |
  * | Page Down, Page Up | Moves by the number of items, or of lines in a grid, on screen. |
  * | A letter or a word | Moves to the next item whose text starts with what you typed. |
@@ -184,6 +218,7 @@ export interface VirtualListRange {
  * @csspart viewport - The scrolling box. On this tier, it needs only a block size.
  *
  * @cssstate empty - While the list has read its items and holds none.
+ * @cssstate horizontal - While the list runs across, with `orientation="horizontal"`.
  * @cssstate loading - While `loading` is set.
  */
 @customElement('helix-headless-virtual-list')
@@ -308,6 +343,15 @@ export class HelixHeadlessVirtualList extends HelixElement {
   minColumnWidth = 0
 
   /**
+   * Which way the list runs. `horizontal` lays the items out along a line
+   * and scrolls it sideways: Left and Right move between items, the other
+   * way round on a right-to-left page, and `estimate` is an item's width. A
+   * grid always runs down.
+   */
+  @property()
+  orientation: 'horizontal' | 'vertical' = 'vertical'
+
+  /**
    * Draws one item into its row, given the item and its index. Set it as a
    * property.
    *
@@ -318,6 +362,24 @@ export class HelixHeadlessVirtualList extends HelixElement {
   @property({ attribute: false })
   // biome-ignore lint/suspicious/noExplicitAny: a renderer typed for any item is assignable here
   renderItem: VirtualListRenderer<any> | undefined
+
+  /**
+   * Draws each section's header, given its name and its place among the
+   * sections, for a list given `section-field`. Set it as a property. Where
+   * it is unset, the header is the name as text.
+   */
+  @property({ attribute: false })
+  renderSection: VirtualListSectionRenderer | undefined
+
+  /**
+   * The field of each item that names its section, as a key or a path of
+   * keys. Set, the items are drawn in sections: a header, then the items, in
+   * an element with the `group` role that the header names. A section starts
+   * wherever the field changes, so give the items in order. A list of one
+   * column only.
+   */
+  @property({ attribute: 'section-field' })
+  sectionField = ''
 
   /**
    * What a press does to the items already chosen: `toggle` adds or takes out
@@ -429,12 +491,17 @@ export class HelixHeadlessVirtualList extends HelixElement {
   /* No `overscan` property. The controller's four is a frame of fast scrolling
      at a 32 pixel row, which is a fact about the platform rather than a
      preference. */
-  /* Windowed by lines, which are the items themselves in a list. */
+  /* Windowed by lines, which are the items themselves in a list, and the
+     headers and the items in a list with sections. */
   private readonly virtualize = new VirtualizeController(this, {
     container: () => this.partNamed('viewport'),
-    count: () => Math.ceil(this.data.length / this.across),
+    count: () =>
+      this.sections
+        ? this.data.length + this.sections.starts.length
+        : Math.ceil(this.data.length / this.across),
     estimate: () => this.estimate,
     gap: () => this.space,
+    horizontal: () => this.horizontal,
     measured: () => this.measured,
     rows: () => this.lines(),
   })
@@ -498,7 +565,41 @@ export class HelixHeadlessVirtualList extends HelixElement {
 
   /** The items a span of lines holds. */
   private itemsOn(lines: { first: number; last: number }): VirtualListRange {
-    return itemsOf(lines, this.across, this.data.length)
+    const sections = this.sections
+    return sections
+      ? itemsIn(sections, lines, this.data.length)
+      : itemsOf(lines, this.across, this.data.length)
+  }
+
+  /** The line item `at` is on: its entry in a list with sections. */
+  private lineOf(at: number): number {
+    const sections = this.sections
+    return sections ? entryOf(sections, at) : Math.floor(at / this.across)
+  }
+
+  /** Whether the list runs across, which a grid never does. */
+  private get horizontal(): boolean {
+    return this.orientation === 'horizontal' && this.across === 1
+  }
+
+  /** The sections and the items they were read from, kept until either changes. */
+  private sectionsRead: { data: readonly unknown[]; field: string; sections: Sections } | undefined
+
+  /** The sections `section-field` divides the items into, in a list of one column. */
+  private get sections(): Sections | undefined {
+    const data = this.data
+    if (this.sectionField === '' || data.length === 0 || this.across !== 1) {
+      return undefined
+    }
+    const read = this.sectionsRead
+    if (read?.data !== data || read.field !== this.sectionField) {
+      this.sectionsRead = {
+        data,
+        field: this.sectionField,
+        sections: sectionsOf(data, this.sectionField),
+      }
+    }
+    return this.sectionsRead?.sections
   }
 
   /**
@@ -514,7 +615,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
       return
     }
     const at = Math.max(0, Math.min(Math.trunc(index), count - 1))
-    this.virtualize.reveal(Math.floor(at / this.across), 0, options)
+    this.virtualize.reveal(this.lineOf(at), 0, options)
     this.virtualize.measure()
   }
 
@@ -533,7 +634,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
    * window moved.
    */
   private drawn(): Rendered[] {
-    return [...this.querySelectorAll<HTMLElement>(':scope > [data-index]')].map((element) => ({
+    return [...this.querySelectorAll<HTMLElement>(ROWS)].map((element) => ({
       element,
       index: Number(element.dataset.index),
     }))
@@ -546,6 +647,15 @@ export class HelixHeadlessVirtualList extends HelixElement {
   private lines(): Rendered[] {
     const across = this.across
     const drawn = this.drawn()
+    const sections = this.sections
+    if (sections) {
+      return [
+        ...drawn.map(({ element, index }) => ({ element, index: entryOf(sections, index) })),
+        ...[...this.querySelectorAll<HTMLElement>(':scope > [data-section] > [data-entry]')].map(
+          (element) => ({ element, index: Number(element.dataset.entry) }),
+        ),
+      ]
+    }
     return across === 1
       ? drawn
       : drawn
@@ -589,6 +699,10 @@ export class HelixHeadlessVirtualList extends HelixElement {
       this.measuredAcross = across
       this.virtualize.forget()
     }
+    /* Lengths measured down the box, or without headers, place nothing now. */
+    if (this.hasUpdated && (changed.has('orientation') || changed.has('sectionField'))) {
+      this.virtualize.forget()
+    }
     if (this.hasUpdated) {
       if (changed.has('items')) {
         this.keepPlace(changed.get('items') as readonly unknown[] | undefined)
@@ -622,10 +736,12 @@ export class HelixHeadlessVirtualList extends HelixElement {
     }
     /* The controller counts lines, so a grid holds its place where whole
        lines arrived. */
-    if (by % this.across === 0) {
+    if (this.sections) {
+      this.virtualize.shift(this.lineOf(by) - 1)
+    } else if (by % this.across === 0) {
       this.virtualize.shift(by / this.across)
     }
-    for (const row of this.querySelectorAll<HTMLElement>(':scope > [data-index]')) {
+    for (const row of this.querySelectorAll<HTMLElement>(ROWS)) {
       row.dataset.index = String(Number(row.dataset.index) + by)
     }
     this.active += by
@@ -717,6 +833,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
     super.updated?.(changed)
     this.toggleState('empty', this.readFor !== undefined && this.data.length === 0)
     this.toggleState('loading', this.loading)
+    this.toggleState('horizontal', this.horizontal)
     this.watchWidth()
     const was = this.virtualize.window
     this.virtualize.measure()
@@ -796,16 +913,28 @@ export class HelixHeadlessVirtualList extends HelixElement {
 
   /** The item a row element drew, for an element that is one of the rows. */
   private indexOf(node: EventTarget | null): number | undefined {
-    if (!(node instanceof HTMLElement) || node.parentElement !== this) {
+    if (!this.isRow(node)) {
       return undefined
     }
     const index = node.dataset.index
     return index === undefined ? undefined : Number(index)
   }
 
+  /** Whether a node is one of the rows: a child, or a child of a section. */
+  private isRow(node: unknown): node is HTMLElement {
+    const parent = node instanceof HTMLElement ? node.parentElement : null
+    return (
+      parent === this || (parent?.parentElement === this && parent.hasAttribute('data-section'))
+    )
+  }
+
   /** The row that holds the tab stop for item `index`, where it is drawn. */
   private rowFor(index: number): HTMLElement | null {
-    return this.querySelector<HTMLElement>(`:scope > [data-index="${index}"]`)
+    return (
+      [...this.querySelectorAll<HTMLElement>(ROWS)].find(
+        (row) => row.dataset.index === String(index),
+      ) ?? null
+    )
   }
 
   /**
@@ -864,14 +993,26 @@ export class HelixHeadlessVirtualList extends HelixElement {
     }
     const count = this.data.length
     const { first, last } = this.virtualize.visible()
-    const stepped = stepIndex(event.key, at, count, last - first - 1, {
+    const forward = isRtl(this) ? 'ArrowLeft' : 'ArrowRight'
+    /* Across, the keys along the line step as Down and Up do in a column,
+       and Down and Up are left to the row. */
+    const key = !this.horizontal
+      ? event.key
+      : event.key === forward
+        ? 'ArrowDown'
+        : event.key === 'ArrowLeft' || event.key === 'ArrowRight'
+          ? 'ArrowUp'
+          : event.key === 'ArrowDown' || event.key === 'ArrowUp'
+            ? ''
+            : event.key
+    const stepped = stepIndex(key, at, count, last - first - 1, {
       across: this.across,
-      forward: isRtl(this) ? 'ArrowLeft' : 'ArrowRight',
+      forward,
     })
     const next =
       stepped === undefined
         ? undefined
-        : skipDisabled(event.key, at, stepped, count, (one) => this.isDisabled(one), this.across)
+        : skipDisabled(key, at, stepped, count, (one) => this.isDisabled(one), this.across)
     if (next === undefined) {
       if (stepped !== undefined) {
         event.preventDefault()
@@ -970,9 +1111,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
       return
     }
     const path = event.composedPath()
-    const row = path.find(
-      (node): node is HTMLElement => node instanceof HTMLElement && node.parentElement === this,
-    )
+    const row = path.find((node): node is HTMLElement => this.isRow(node))
     const at = this.indexOf(row ?? null)
     if (at === undefined) {
       return
@@ -1005,7 +1144,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
        window can stop short of a row once the rows it measured turn out
        shorter: in Chromium, End on 5000 rows of 18px drew 4983 to 4996. */
     this.focusing = index
-    this.virtualize.reveal(Math.floor(index / this.across))
+    this.virtualize.reveal(this.lineOf(index))
     this.virtualize.measure()
     this.requestUpdate()
     try {
@@ -1041,7 +1180,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
   /** A row that takes focus, by a press or by Tab, takes the tab stop with it. */
   private readonly handleFocusIn = (event: FocusEvent): void => {
     let node = event.target as Node | null
-    while (node && node.parentNode !== this) {
+    while (node && node !== this && !this.isRow(node)) {
       node = node.parentNode
     }
     const index = this.indexOf(node)
@@ -1060,7 +1199,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
   private focusedIndex(): number | undefined {
     const root = this.getRootNode() as Document | ShadowRoot
     let node = root.activeElement as Element | null
-    while (node && node.parentElement !== this) {
+    while (node && node !== this && !this.isRow(node)) {
       node = node.parentElement
     }
     const index = node instanceof HTMLElement ? node.dataset.index : undefined
@@ -1185,14 +1324,25 @@ export class HelixHeadlessVirtualList extends HelixElement {
        writes the same sizes. */
     if (this.hasUpdated) {
       const spacers = this.spacerSizes()
-      this.partNamed<HTMLElement>('before')?.style.setProperty('block-size', `${spacers.before}px`)
-      this.partNamed<HTMLElement>('after')?.style.setProperty('block-size', `${spacers.after}px`)
+      const size = this.horizontal ? 'inline-size' : 'block-size'
+      this.partNamed<HTMLElement>('before')?.style.setProperty(size, `${spacers.before}px`)
+      this.partNamed<HTMLElement>('after')?.style.setProperty(size, `${spacers.after}px`)
     }
+    const sections = this.sections
+    /* Every row is drawn again into its section when the sections change. */
+    const regroup = sections !== this.placedSections
+    this.placedSections = sections
     /* A child given a slot of its own, such as `loading`, is the consumer's. */
-    const children = [...this.children].filter(
-      (child): child is HTMLElement =>
-        child !== template && child instanceof HTMLElement && !child.hasAttribute('slot'),
-    )
+    const children = [
+      ...[...this.children].filter(
+        (child): child is HTMLElement =>
+          child !== template &&
+          child instanceof HTMLElement &&
+          !child.hasAttribute('slot') &&
+          !child.hasAttribute('data-section'),
+      ),
+      ...this.querySelectorAll<HTMLElement>(':scope > [data-section] > [data-index]'),
+    ]
     const plan = drawPlan({
       across: this.across,
       count,
@@ -1202,7 +1352,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
       last,
       /* A row drawn the other way, by the template or by the function, is
          drawn again from nothing: its markup is not the other's to fill. */
-      redraw: (this.filledBy === undefined) !== (this.renderItem === undefined),
+      redraw: regroup || (this.filledBy === undefined) !== (this.renderItem === undefined),
     })
     const drawn = new Map<number, Element[]>()
     for (const child of children) {
@@ -1214,27 +1364,38 @@ export class HelixHeadlessVirtualList extends HelixElement {
       }
       drawn.set(index, [...(drawn.get(index) ?? []), child])
     }
-    const refill = this.filledFrom !== this.data || this.filledBy !== this.renderItem
+    const refill =
+      this.filledFrom !== this.data ||
+      this.filledBy !== this.renderItem ||
+      this.headedBy !== this.renderSection
     this.filledFrom = this.data
     this.filledBy = this.renderItem
+    this.headedBy = this.renderSection
+    const groups = this.groups(sections, plan.wanted, regroup, refill)
     /* Rows drawn or filled on this pass, whose controls are new to the tab order. */
     const fresh = new Set<number>()
-    let anchor: Element | null = drawn.values().next().value?.[0] ?? null
+    /* Where the next new row goes in each parent: before the first row drawn
+       after it, or at the end. */
+    const anchors = new Map<Element, Element | null>()
     for (const at of plan.wanted) {
+      const parent: Element = (sections && groups.get(sectionAt(sections, at))) || this
+      if (!anchors.has(parent)) {
+        anchors.set(parent, parent.querySelector(':scope > [data-index]'))
+      }
       const group = drawn.get(at)
       if (group) {
         if (refill) {
           this.fill(group, at)
           fresh.add(at)
         }
-        anchor = (group.at(-1) as Element).nextElementSibling
+        anchors.set(parent, (group.at(-1) as Element).nextElementSibling)
         continue
       }
       const fragment = this.draw(template, at)
       drawn.set(at, [...fragment.children])
       this.watchSize([...fragment.children])
       fresh.add(at)
-      this.insertBefore(fragment, anchor)
+      parent.insertBefore(fragment, anchors.get(parent) ?? null)
     }
     this.active = stopAfter(this.active, plan.wanted, {
       count,
@@ -1273,15 +1434,124 @@ export class HelixHeadlessVirtualList extends HelixElement {
     }
   }
 
-  /** The spacers' heights: the window's, with the line kept for focus taking its own room. */
+  /** The sections the rows were last placed in. */
+  private placedSections: Sections | undefined
+
+  /** The function the drawn headers were drawn by, so a new one draws them again. */
+  private headedBy: VirtualListSectionRenderer | undefined
+
+  /** Ties each header's id to this list. */
+  private readonly sectionId = nextSectionId()
+
+  /**
+   * The section elements a pass draws rows into, by section, for the
+   * sections of the wanted items: each a `group` named by its header, which
+   * is its first child. The ones no wanted item is in leave, and all of them
+   * do when the sections change.
+   */
+  private groups(
+    sections: Sections | undefined,
+    wanted: readonly number[],
+    regroup: boolean,
+    refill: boolean,
+  ): Map<number, HTMLElement> {
+    const keep = new Set(sections ? wanted.map((at) => sectionAt(sections, at)) : [])
+    const groups = new Map<number, HTMLElement>()
+    for (const group of this.querySelectorAll<HTMLElement>(':scope > [data-section]')) {
+      const at = Number(group.dataset.section)
+      if (regroup || !keep.has(at)) {
+        this.sizes?.unobserve(group.firstElementChild as Element)
+        group.remove()
+      } else {
+        groups.set(at, group)
+      }
+    }
+    if (!sections) {
+      return groups
+    }
+    for (const at of [...keep].sort((a, b) => a - b)) {
+      let group = groups.get(at)
+      const fresh = group === undefined
+      if (!group) {
+        group = document.createElement('div')
+        const header = document.createElement('div')
+        header.id = `${this.sectionId}-${at}`
+        header.dataset.entry = String(headOf(sections, at))
+        header.setAttribute('data-header', '')
+        group.dataset.section = String(at)
+        group.setAttribute('role', 'group')
+        group.setAttribute('aria-labelledby', header.id)
+        group.append(header)
+        /* Before the next section drawn, so the sections stay in order. */
+        const after = [...groups].find(([other]) => other > at)?.[1] ?? null
+        this.insertBefore(group, after)
+        groups.set(at, group)
+        this.watchSize([header])
+      }
+      const header = group.firstElementChild as HTMLElement
+      if (fresh || refill) {
+        const name = sections.names[at] ?? ''
+        if (this.renderSection) {
+          render(this.renderSection(name, at), header)
+        } else {
+          header.textContent = name
+        }
+      }
+      /* A list box's group holds options and a header that is no option. */
+      if (this.selectionMode) {
+        header.setAttribute('role', 'presentation')
+      } else {
+        header.removeAttribute('role')
+      }
+      const gap = this.space
+      group.style.cssText = this.horizontal
+        ? `display: flex; column-gap: ${gap}px`
+        : gap === 0
+          ? ''
+          : `display: flex; flex-direction: column; row-gap: ${gap}px`
+    }
+    return groups
+  }
+
+  /**
+   * The spacers' sizes: the window's, with the line kept for focus taking its
+   * own room, and so do the headers drawn with their sections from outside it.
+   */
   private spacerSizes(): { after: number; before: number } {
     const kept = this.hasUpdated ? this.keptIndex() : undefined
-    return this.virtualize.spacers(kept === undefined ? undefined : Math.floor(kept / this.across))
+    const room = this.virtualize.spacers(kept === undefined ? undefined : this.lineOf(kept))
+    const sections = this.sections
+    if (!sections || !this.hasUpdated) {
+      return room
+    }
+    const { first, last } = this.virtualize.window
+    const items = this.itemsOn(this.virtualize.window)
+    const drawnIn = new Set<number>()
+    if (items.last > items.first) {
+      drawnIn.add(sectionAt(sections, items.first))
+    }
+    if (kept !== undefined) {
+      drawnIn.add(sectionAt(sections, kept))
+    }
+    let { after, before } = room
+    for (const section of drawnIn) {
+      const head = headOf(sections, section)
+      if (head < first) {
+        before = Math.max(0, before - this.virtualize.sizeOf(head))
+      } else if (head >= last) {
+        after = Math.max(0, after - this.virtualize.sizeOf(head))
+      }
+    }
+    return { after, before }
   }
 
   protected override render(): TemplateResult {
     const { after, before } = this.spacerSizes()
     const across = this.across
+    const horizontal = this.horizontal
+    const size = horizontal ? 'inline-size' : 'block-size'
+    const flex = horizontal ? '; flex: none' : ''
+    const gap = this.space
     /* Only once the browser has read the source, so a server and a list whose
        items are on their way say nothing about an empty set. `readFor` is set
        by the read in `willUpdate`, so the first render after it draws the row;
@@ -1298,26 +1568,32 @@ export class HelixHeadlessVirtualList extends HelixElement {
       aria-multiselectable=${this.selectionMode === 'multiple' ? 'true' : nothing}
       aria-busy=${this.loading ? 'true' : nothing}
       aria-label=${this.label}
+      aria-orientation=${this.selectionMode && horizontal ? 'horizontal' : nothing}
+      style=${horizontal ? 'display: flex' : nothing}
       @scroll=${() => {
         this.virtualize.measure()
         this.report()
       }}
     >
-      <div part="before" style="block-size: ${before}px"></div>
+      <div part="before" style="${size}: ${before}px${flex}"></div>
       <slot
         style=${
           /* A gap after the last drawn row as well, which the spacer below
              counts as part of the row before it. */
-          across === 1
-            ? this.space === 0
-              ? nothing
-              : `display: flex; flex-direction: column; row-gap: ${this.space}px; padding-block-end: ${this.space}px`
-            : `display: grid; grid-template-columns: repeat(${across}, minmax(0, 1fr))${
-                this.space === 0 ? '' : `; gap: ${this.space}px; padding-block-end: ${this.space}px`
+          horizontal
+            ? `display: flex; flex: none${
+                gap === 0 ? '' : `; column-gap: ${gap}px; padding-inline-end: ${gap}px`
               }`
+            : across === 1
+              ? gap === 0
+                ? nothing
+                : `display: flex; flex-direction: column; row-gap: ${gap}px; padding-block-end: ${gap}px`
+              : `display: grid; grid-template-columns: repeat(${across}, minmax(0, 1fr))${
+                  gap === 0 ? '' : `; gap: ${gap}px; padding-block-end: ${gap}px`
+                }`
         }
       ></slot>
-      <div part="after" style="block-size: ${after}px"></div>
+      <div part="after" style="${size}: ${after}px${flex}"></div>
       ${
         /* An item of the list that is not one of the set, so it carries no
            place in it, as React Aria's loading row does. */
