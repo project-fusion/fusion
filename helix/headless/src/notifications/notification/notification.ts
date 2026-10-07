@@ -76,6 +76,7 @@ import '../../format-date/index.js'
  * @csspart time-day - Format Date's `day`, forwarded for a time drawn as fields. An elapsed time draws none.
  * @csspart time-day-period - Format Date's `day-period`, forwarded for a time drawn as fields. An elapsed time draws none.
  * @csspart time-era - Format Date's `era`, forwarded for a time drawn as fields. An elapsed time draws none.
+ * @csspart time-fractional-second - Format Date's `fractional-second`, forwarded for a time drawn as fields. An elapsed time draws none.
  * @csspart time-hour - Format Date's `hour`, forwarded for a time drawn as fields. An elapsed time draws none.
  * @csspart time-minute - Format Date's `minute`, forwarded for a time drawn as fields. An elapsed time draws none.
  * @csspart time-month - Format Date's `month`, forwarded for a time drawn as fields. An elapsed time draws none.
@@ -341,7 +342,8 @@ export class HelixHeadlessNotification extends MixinDismissible(HelixElement) {
   private renderTime(): TemplateResult {
     const stamp = this.tag('format-date')
     return html`<${stamp}
-      exportparts="time, day: time-day, day-period: time-day-period, era: time-era, hour: time-hour,
+      exportparts="time, day: time-day, day-period: time-day-period, era: time-era,
+        fractional-second: time-fractional-second, hour: time-hour,
         minute: time-minute, month: time-month, second: time-second,
         time-zone-name: time-time-zone-name, weekday: time-weekday, year: time-year"
       elapsed
