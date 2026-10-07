@@ -5,8 +5,7 @@ import {
   commaList,
   customElement,
   drawTooltip,
-  fillTemplate,
-  formatNumbers,
+  formatWords,
   HelixElement,
   HelixResizeEvent,
   MixinChartSource,
@@ -17,6 +16,7 @@ import {
   requestValue,
   StatusController,
   searchableById,
+  words,
   writtenList,
   writtenNumbers,
 } from '@fusion.dev/helix-core'
@@ -133,8 +133,16 @@ import { fits, monthPage, overviewOf, type Reading, toneOf } from './buckets.js'
 @customElement('helix-headless-heatmap')
 export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
   /**
-   * The word the `overview` puts before the busiest reading.
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-heatmap': { emptyText: 'Keine Werte' } })`.
    */
+  static words = 'helix-heatmap'
+
+  /**
+   * The name the `overview` gives the busiest reading, `{busiestLabel}` in
+   * `overview-label`.
+   */
+  @words
   @property({ attribute: 'busiest-label' })
   busiestLabel = 'Busiest'
 
@@ -144,6 +152,7 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
    * Never shown while the table cannot be read at all, which is a server render
    * and the hydrating one after it: see `sourceKnown`.
    */
+  @words
   @property({ attribute: 'empty-text' })
   emptyText = 'No readings'
 
@@ -177,6 +186,16 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
   minCell = 8
 
   /**
+   * The `overview`'s sentence. `{busiestLabel}` and `{totalLabel}` are
+   * `busiest-label` and `total-label`, `{busiest}` the busiest reading's name
+   * and its reading as the table writes it, and `{total}` the total of the
+   * readings drawn, written in the locale.
+   */
+  @words
+  @property({ attribute: 'overview-label' })
+  overviewLabel = '{busiestLabel}: {busiest}; {totalLabel} {total}.'
+
+  /**
    * How many rows the strip has.
    *
    * `1` is a status strip and `7` is a calendar week, which are the two readings
@@ -193,15 +212,19 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
    * where the cell stands: "Day 1: 0 (1 of 14, selected)". Empty adds
    * nothing.
    */
+  @words
   @property({ attribute: 'selected-label' })
   selectedLabel = 'selected'
 
   /**
-   * What the `selection` part says after the selection changes, with `{count}` for
-   * how many cells are selected.
+   * What the `selection` part says after the selection changes. `{count}` is
+   * how many cells are selected, written in the locale, and a language that
+   * needs plural forms writes them: `{count, plural, one {# wybrany} few
+   * {# wybrane} many {# wybranych} other {# wybranego}}`.
    */
+  @words
   @property({ attribute: 'selection-label' })
-  selectionLabel = '{count} selected'
+  selectionLabel = '{count, plural, one {# selected} other {# selected}}'
 
   /**
    * How many cells a reader can select: `single` or `multiple`.
@@ -210,6 +233,14 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
    */
   @property({ attribute: 'selection-mode' })
   selectionMode?: 'multiple' | 'single'
+
+  /**
+   * The strip's name where the chart has none: no `aria-label`, `label`, or
+   * table caption.
+   */
+  @words
+  @property({ attribute: 'strip-label' })
+  stripLabel = 'Heatmap'
 
   /**
    * Lower bounds for the tone buckets, in the order the tones are given.
@@ -238,8 +269,10 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
   tones = ''
 
   /**
-   * The word the `overview` puts before the total of the readings drawn.
+   * The name the `overview` gives the total of the readings drawn,
+   * `{totalLabel}` in `overview-label`.
    */
+  @words
   @property({ attribute: 'total-label' })
   totalLabel = 'Total'
 
@@ -337,7 +370,7 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
     }
     requestValue(this, next, (value) => {
       this.value = value
-      this.status.say(fillTemplate(this.selectionLabel, { count: commaList(value).length }))
+      this.status.say(formatWords(this, 'selectionLabel', { count: commaList(value).length }))
     })
   }
 
@@ -648,7 +681,7 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
     const chosen = new Set(this.selectionMode ? commaList(this.value) : [])
     return html`<div
         aria-describedby=${readable ? 'helix-chart-summary' : nothing}
-        aria-label=${this.named || 'Heatmap'}
+        aria-label=${this.named || this.stripLabel}
         part="strip"
         id=${CHART_PLOT}
         role=${readable ? 'application' : 'img'}
@@ -714,9 +747,13 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
     const row = rows[offset + busiest]
     /* The day and its count apart, so "Jan 6, 12" is not heard as one date. */
     const text = row?.cells[column]?.text ?? ''
-    const most = row ? `${this.busiestLabel}: ${row.label}${text === '' ? '' : `, ${text}`}` : ''
-    const sum = `${this.totalLabel} ${formatNumbers(this.locale)(total)}`
-    return html`<p id="helix-chart-summary" part="overview">${most ? `${most}; ${sum}` : sum}.</p>`
+    const said = formatWords(this, 'overviewLabel', {
+      busiest: text === '' ? (row?.label ?? '') : `${row?.label ?? ''}, ${text}`,
+      busiestLabel: this.busiestLabel,
+      total,
+      totalLabel: this.totalLabel,
+    })
+    return html`<p id="helix-chart-summary" part="overview">${said}</p>`
   }
 
   /**

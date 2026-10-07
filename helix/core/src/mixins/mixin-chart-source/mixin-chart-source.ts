@@ -144,8 +144,8 @@ export declare class MixinChartSourceInterface {
    * The locale the chart's own numbers are written in: its axis, its
    * percentages and its totals, such as `de` for `1.240` and `32 %`.
    *
-   * Absent uses the runtime's own. The table's cells are shown as the table
-   * writes them, whatever this says.
+   * Absent reads the nearest `lang`, then the runtime's own. The table's
+   * cells are shown as the table writes them, whatever this says.
    */
   locale: string
   /**
@@ -268,8 +268,8 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
      * The locale the chart's own numbers are written in: its axis, its
      * percentages and its totals, such as `de` for `1.240` and `32 %`.
      *
-     * Absent uses the runtime's own. The table's cells are shown as the table
-     * writes them, whatever this says.
+     * Absent reads the nearest `lang`, then the runtime's own. The table's
+     * cells are shown as the table writes them, whatever this says.
      */
     @property()
     locale = ''

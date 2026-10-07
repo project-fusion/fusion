@@ -8,6 +8,7 @@ import {
   PLOT_WIDTH,
   type Row,
   seriesIndex,
+  wordsLocale,
 } from '@fusion.dev/helix-core'
 import { html, nothing, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -341,14 +342,14 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
    */
   protected renderSummary(shares: DonutShare[]): TemplateResult {
     const rows = this.sourceRows
+    const locale = wordsLocale(this)
     const parts = shares
       .filter((share) => this.showsSeries(rows[share.row]?.label ?? ''))
-      .map(
-        (share) =>
-          `${rows[share.row]?.label ?? ''} ${percentIn(this.locale).format(share.fraction)}`,
-      )
+      .map((share) => `${rows[share.row]?.label ?? ''} ${percentIn(locale).format(share.fraction)}`)
     const named = this.named ? `${this.named}: ` : ''
-    return html`<p id="helix-chart-summary" part="summary">${named}${parts.join(', ')}.</p>`
+    /* Listed as the locale lists, which in English is with commas. */
+    const listed = new Intl.ListFormat(locale, { style: 'short', type: 'unit' }).format(parts)
+    return html`<p id="helix-chart-summary" part="summary">${named}${listed}.</p>`
   }
 
   /**
@@ -415,7 +416,7 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
       top: half ? CENTER - EDGE : 0,
       width: PLOT_WIDTH,
     }
-    const format = percentIn(this.locale)
+    const format = percentIn(wordsLocale(this))
     return html`${shares.map((share, index) => {
       const place = sliceLabelAt(share, ring)
       if (!place) {
@@ -589,7 +590,7 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
     const cells = [...row.cells]
     cells[column] = {
       ...cell,
-      text: `${cell.text} (${percentIn(this.locale).format(share.fraction)})`,
+      text: `${cell.text} (${percentIn(wordsLocale(this)).format(share.fraction)})`,
     }
     return rows.map((one, index) => (index === share.row ? { ...row, cells } : one))
   }
