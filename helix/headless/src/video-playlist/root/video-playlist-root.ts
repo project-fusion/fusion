@@ -240,6 +240,9 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
    */
   private stop: string | undefined
 
+  /** The entry the player was last pointed at. */
+  private pointed: HelixHeadlessVideoPlaylistItem | undefined
+
   /** Hears entries arrive and leave, which change no property here. */
   private watcher: MutationObserver | undefined
 
@@ -603,9 +606,17 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
     /* Only on a change. Writing `src` with the value it already holds reloads
        the resource in every engine, so a playlist that assigned on each update
        would restart the clip whenever anything else about it rendered. */
-    if (player.src !== current.src) {
+    /* **By the entry, not by its source.** Two entries may play one file, a
+       clip and its recut say, and a move between them changed no `src`, so it
+       was neither played nor said. */
+    if (player.src !== current.src || current !== this.pointed) {
+      this.pointed = current
       this.toggleState('ended', false)
-      player.src = current.src
+      if (player.src !== current.src) {
+        player.src = current.src
+      } else if (this.chased) {
+        player.currentTime = 0
+      }
       player.poster = current.poster
       player.mediaTitle = current.text
       /* The consumer's own name for the player stands. Only a player named by

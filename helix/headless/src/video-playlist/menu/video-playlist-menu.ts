@@ -97,7 +97,26 @@ export class HelixHeadlessVideoPlaylistMenu extends HelixElement {
   private readonly heardToggle = (event: Event): void => {
     if (event.target === event.currentTarget) {
       this.open = (event as Event & { newState?: string }).newState === 'open'
+      if (this.open) {
+        this.focusPlaying(
+          event.currentTarget as HTMLElement & { updateComplete?: Promise<unknown> },
+        )
+      }
     }
+  }
+
+  /**
+   * Puts focus on the entry playing once the menu has opened, as a list of
+   * choices opens on the one chosen. The menu focuses its first row as it
+   * opens, so this follows that.
+   */
+  private focusPlaying(menu: HTMLElement & { updateComplete?: Promise<unknown> }): void {
+    void Promise.all([this.updateComplete, menu.updateComplete]).then(() => {
+      const playing = this.renderRoot.querySelector<HTMLElement>('[part~="entry"][checked]')
+      if (playing && !playing.hasAttribute('disabled')) {
+        playing.focus()
+      }
+    })
   }
 
   private observer: MutationObserver | undefined
