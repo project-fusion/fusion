@@ -18,6 +18,9 @@ import { formatOptions } from '../options.js'
 /** A date with no time of day, `YYYY-MM-DD`, which names a day rather than an instant. */
 const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/
 
+/** The styles `relative` names; anything else, an empty flag among them, reads `long`. */
+const STYLES: readonly Intl.RelativeTimeFormatStyle[] = ['long', 'narrow', 'short']
+
 /**
  * @summary A timestamp, formatted for the user's locale.
  *
@@ -254,7 +257,9 @@ export class HelixHeadlessFormatDate extends HelixElement {
    * `narrow` ("3h ago").
    *
    * The reading refreshes as it goes stale, as `elapsed` does, and the whole
-   * date is its title. `elapsed` wins where both are set.
+   * date is its title. `elapsed` wins where both are set. Written with no
+   * value, as `elapsed` is, or with a style `Intl` does not know, it reads
+   * `long`.
    */
   @property()
   relative?: 'long' | 'narrow' | 'short'
@@ -365,7 +370,9 @@ export class HelixHeadlessFormatDate extends HelixElement {
       ? elapsedTime(this.language)(moment, now)
       : relativeTime(this.language, {
           numeric: this.numeric ?? 'auto',
-          style: this.relative ?? 'long',
+          style: STYLES.includes(this.relative as Intl.RelativeTimeFormatStyle)
+            ? (this.relative as Intl.RelativeTimeFormatStyle)
+            : 'long',
         })(moment, now)
   }
 

@@ -230,6 +230,21 @@ describe('which side of now a reading is on', () => {
   })
 })
 
+describe('relative written as a flag', () => {
+  /* Measured before this: `relative` with no value, the spelling `elapsed`
+     takes, threw a RangeError from `Intl.RelativeTimeFormat` during the
+     update and left the element blank. */
+  test('reads in words, as relative="long" does', async () => {
+    const moment = new Date(Date.now() - 3 * 3_600_000).toISOString()
+    for (const spelling of ['relative', 'relative="wide"']) {
+      const element = await stamp(
+        `<helix-headless-format-date ${spelling} locale="en-US" date="${moment}"></helix-headless-format-date>`,
+      )
+      expect(part(element, 'time')?.textContent).toBe('3 hours ago')
+    }
+  })
+})
+
 describe('a reading under a minute old', () => {
   /* Measured before this: "in 0 seconds", a moment ago read as the future. */
   test('is in the past where every number is written', async () => {
