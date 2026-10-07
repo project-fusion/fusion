@@ -280,6 +280,25 @@ describe('in a form', () => {
     expect((part(element, 'field') as HTMLTextAreaElement).value).toBe('Hello')
   })
 
+  /* The state was left out, so a draft the reader emptied had none, and a
+     restore brought back the declared draft they had deleted. */
+  test('saves the draft as its state, an emptied one too', async () => {
+    const element = await inForm('value="Hello"')
+    const internals = (element as unknown as { internals: ElementInternals }).internals
+    const saved: unknown[] = []
+    const report = internals.setFormValue.bind(internals)
+    internals.setFormValue = (value, state) => {
+      saved.push(state)
+      report(value, state)
+    }
+    await type(element, 'Kept')
+    await type(element, '')
+    expect(saved).toEqual(['Kept', ''])
+    expect(formValue(element)).toBeNull()
+    element.formStateRestoreCallback(saved.at(-1) as string)
+    expect(element.value).toBe('')
+  })
+
   test('a restore brings the draft back, and an empty one the declared draft', async () => {
     const element = await inForm('value="Hello"')
     element.formStateRestoreCallback('Kept')
