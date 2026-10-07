@@ -1,0 +1,52 @@
+export function Example() {
+  return (
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
+      <helix-flex
+        align-items="center"
+        data-density="sm"
+        gap="sm"
+      >
+        <helix-tag>Draft</helix-tag>
+        <helix-tag
+          dismissible
+          tone="primary"
+        >
+          Design
+        </helix-tag>
+        <helix-button>Filter</helix-button>
+      </helix-flex>
+
+      <helix-flex
+        align-items="center"
+        gap="sm"
+      >
+        <helix-tag>Draft</helix-tag>
+        <helix-tag
+          dismissible
+          tone="primary"
+        >
+          Design
+        </helix-tag>
+        <helix-button>Filter</helix-button>
+      </helix-flex>
+
+      <helix-flex
+        align-items="center"
+        data-density="lg"
+        gap="sm"
+      >
+        <helix-tag>Draft</helix-tag>
+        <helix-tag
+          dismissible
+          tone="primary"
+        >
+          Design
+        </helix-tag>
+        <helix-button>Filter</helix-button>
+      </helix-flex>
+    </helix-flex>
+  )
+}
