@@ -126,6 +126,22 @@ const spoken = (message: Element): string =>
     .trim()
 
 /**
+ * Whether a drawn turn holds its message as it will be seen, and so can be
+ * measured.
+ *
+ * **A turn's message renders a microtask after the turn is drawn**, and the
+ * controller measures in the pass that draws it. Measured then, a turn was its
+ * text alone: in Chromium, 16 pixels for a turn drawn at 55.5, and that height
+ * stood for it until it was drawn again. Which turns were caught that way
+ * depended on when `turns` arrived, before the element was connected or after,
+ * so the same transcript set from a script and from a React prop measured
+ * differently. A message that has not rendered yet keeps the estimate until a
+ * later pass measures it.
+ */
+const drawnInFull = ({ element }: Rendered): boolean =>
+  (element.firstElementChild as { hasUpdated?: boolean } | null)?.hasUpdated !== false
+
+/**
  * @summary A conversation's turns in a scrolling transcript that keeps the user's place.
  *
  * @description
@@ -485,7 +501,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
     container: () => (this.fed ? this.log : null),
     count: () => this.turns.length,
     estimate: () => HelixHeadlessChat.ESTIMATE,
-    rows: () => (this.fed ? this.drawn() : []),
+    rows: () => (this.fed ? this.drawn().filter(drawnInFull) : []),
   })
 
   /**
