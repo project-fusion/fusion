@@ -65,6 +65,24 @@ export const readingText = (
     : formatNumber(share, locale, options ?? WHOLE_PERCENT)
 
 /**
+ * Text with every decimal digit written in ASCII: Arabic-Indic `١٢٣`, Persian
+ * `۱۲۳` and Devanagari `१२३` read as `123`. A keyboard in one of those
+ * locales types its own digits, and `Number` reads only ASCII.
+ */
+export const latinDigits = (text: string): string =>
+  text.replace(/\p{Nd}/gu, (digit) => {
+    /* Unicode writes each script's digits as a run of ten from its zero, and
+       some runs follow each other, so the digit's place is counted from the
+       start of the run it is in. */
+    const point = digit.codePointAt(0) ?? 0
+    let zero = point
+    while (/\p{Nd}/u.test(String.fromCodePoint(zero - 1))) {
+      zero -= 1
+    }
+    return String((point - zero) % 10)
+  })
+
+/**
  * Whether the group separators in a number stand where a locale puts them:
  * one to three digits, then groups of three, up to the decimal separator.
  */
