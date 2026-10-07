@@ -82,7 +82,7 @@ const SLIDER_KEYS = new Set([
  * |---|---|
  * | Right, Up | Moves the thumb up by `step`. |
  * | Left, Down | Moves the thumb down by `step`. |
- * | Page Up, Page Down | Moves the thumb by a larger step. |
+ * | Page Up, Page Down | Moves the thumb by `page-step`, or by the platform's larger step where it is not set. |
  * | Home, End | Moves the thumb to its lowest or highest value. |
  *
  * Under `readonly` none of these move the thumb, and Tab still reaches it.
@@ -128,6 +128,7 @@ const SLIDER_KEYS = new Set([
  * @cssproperty --slider-to - Where the filled span ends, as a fraction of the track, 0 to 1: a range's upper thumb, or the farther of a single thumb and its `origin`.
  *
  * @cssstate dragging - A thumb is being dragged, by its thumb or from a press on the track.
+ * @cssstate focus-visible - A thumb has focus that the keyboard brought, where the browser draws a focus ring.
  * @cssstate invalid - The slider has an error to show, from the browser's validation or from your `feedback`.
  */
 @customElement('helix-headless-slider')
@@ -260,6 +261,14 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
    */
   @property({ reflect: true })
   origin?: 'center' | 'end' | 'start'
+
+  /**
+   * How far Page Up and Page Down move a thumb, in the slider's own units, as
+   * React Aria's `pageSize` and Zag's `largeStep` do. Absent leaves the keys
+   * to the platform, which moves a tenth of the track.
+   */
+  @property({ attribute: 'page-step', type: Number })
+  pageStep?: number
 
   /**
    * Adds a second thumb, so the value is a pair.
@@ -527,8 +536,8 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
     return this.settled(this.min + fraction * (this.max - this.min))
   }
 
-  /** Moves one of a range's thumbs, kept between its neighbors. */
-  private moveThumb(at: number, wanted: number): void {
+  /** Moves one of a range's thumbs, kept between its neighbors, and says whether it moved. */
+  private moveThumb(at: number, wanted: number): boolean {
     const points = this.points
     const gap = this.gap
     const low = at > 0 ? (points[at - 1] ?? this.min) + gap : Number.NEGATIVE_INFINITY
@@ -537,9 +546,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
     const next = points
       .map((one, index) => (index === at ? Math.min(high, Math.max(low, wanted)) : one))
       .join(',')
-    if (next !== points.join(',')) {
-      this.requestValue(next)
-    }
+    return next !== points.join(',') && this.requestValue(next)
   }
 
   /**
@@ -581,7 +588,9 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
     })
     event.preventDefault()
     this.moveThumb(at, wanted)
-    inputs[at]?.focus({ preventScroll: true })
+    /* A pointer's focus, so no ring, as a press on the thumb itself draws
+       none. */
+    inputs[at]?.focus({ focusVisible: false, preventScroll: true } as FocusOptions)
     this.startDrag()
     field.setPointerCapture?.(event.pointerId)
     const move = (next: PointerEvent): void => this.moveThumb(at, this.valueAt(next, first, inset))
@@ -610,13 +619,46 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   }
 
   /**
-   * Keeps a read-only thumb still under the keys that move it. Tab and every
-   * other key pass, so focus moves on.
+   * Keeps a read-only thumb still under the keys that move it, and moves a
+   * thumb by `page-step` under Page Up and Page Down. Tab and every other key
+   * pass, so focus moves on.
    */
   private readonly handleKeydown = (event: KeyboardEvent): void => {
     if (this.readOnly && SLIDER_KEYS.has(event.key)) {
       event.preventDefault()
+      return
     }
+    const by = this.pageStep
+    if ((event.key !== 'PageUp' && event.key !== 'PageDown') || !by || this.isDisabled) {
+      return
+    }
+    event.preventDefault()
+    const sign = event.key === 'PageUp' ? 1 : -1
+    if (this.range) {
+      const at = Number((event.target as HTMLElement).dataset.index ?? 0)
+      if (!this.moveThumb(at, this.settled((this.points[at] ?? this.min) + sign * by))) {
+        return
+      }
+    } else {
+      const next = String(this.settled(Number(this.value) + sign * by))
+      if (next === this.value || !this.requestValue(next)) {
+        return
+      }
+    }
+    this.announceChange()
+  }
+
+  /**
+   * Says whether the keyboard brought focus to a thumb, as
+   * `:state(focus-visible)` on the host, where a stylesheet outside can reach
+   * the whole control: a ring around the track, or the readout in bold.
+   */
+  private readonly handleFocusChange = (event: FocusEvent): void => {
+    const input = event.target as HTMLElement
+    this.toggleState(
+      'focus-visible',
+      event.type === 'focusin' && input.matches?.(':focus-visible') === true,
+    )
   }
 
   /**
@@ -987,6 +1029,8 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
     }
     <div
       part="field"
+      @focusin=${this.handleFocusChange}
+      @focusout=${this.handleFocusChange}
       @pointerdown=${this.handlePress}
       data-markers=${this.markerValues.length > 0 ? '' : nothing}
       data-range=${this.range ? '' : nothing}
