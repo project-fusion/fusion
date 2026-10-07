@@ -156,13 +156,27 @@ export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(Hel
     items: () => this.items,
   })
 
-  /** The radios, in light-DOM order. Client only: the server has no tree. */
+  /**
+   * The radios, in light-DOM order. Client only: the server has no tree.
+   *
+   * Descendants, as `Checkbox.Group` reads its boxes, so a radio inside a
+   * layout wrapper of yours is one of the group's. A radio held by a group
+   * nested inside this one is that group's.
+   */
   get items(): HelixHeadlessRadio[] {
     // Empty on the server, which has no tree, so `focusTarget` can ask while it renders.
-    return [...(this.children ?? [])].filter(
-      (child): child is HelixHeadlessRadio => child instanceof HelixHeadlessRadio,
+    if (this.children === undefined) {
+      return []
+    }
+    return [...this.querySelectorAll('*')].filter(
+      (element): element is HelixHeadlessRadio =>
+        element instanceof HelixHeadlessRadio && nearestGroup(element) === this,
     )
   }
+
+  /* A radio added or removed inside a wrapper fires no `slotchange`, which
+     sees direct children only. */
+  private observer: MutationObserver | undefined
 
   /**
    * Announces before it applies, so a listener can refuse the change.
@@ -306,11 +320,15 @@ export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(Hel
   override connectedCallback(): void {
     super.connectedCallback()
     this.addEventListener('helix-select', this.handleSelection as EventListener)
+    this.observer = new MutationObserver(() => this.requestUpdate())
+    this.observer.observe(this, { childList: true, subtree: true })
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('helix-select', this.handleSelection as EventListener)
+    this.observer?.disconnect()
+    this.observer = undefined
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -347,6 +365,15 @@ export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(Hel
       </div>
       ${this.renderHint()}${this.renderFeedback()}`
   }
+}
+
+/** The group nearest around a radio, or nothing. */
+const nearestGroup = (radio: Element): HelixHeadlessRadioGroup | null => {
+  let parent = radio.parentElement
+  while (parent && !(parent instanceof HelixHeadlessRadioGroup)) {
+    parent = parent.parentElement
+  }
+  return parent
 }
 
 declare global {
