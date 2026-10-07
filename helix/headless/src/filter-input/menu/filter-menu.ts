@@ -406,7 +406,6 @@ export class HelixHeadlessFilterMenu extends HelixElement {
                   part="divider"
                   exportparts="content: divider-content, line: divider-line"
                   slot="submenu"
-                  announced
                 ></${divider}>`
               : nothing
           }
