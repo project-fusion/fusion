@@ -9,6 +9,9 @@
 /** A color as three sRGB bytes, which is what a canvas reports and takes. */
 export type ColorBytes = [number, number, number]
 
+/** A color as three sRGB bytes and its alpha, from 0 to 1. */
+export type ColorBytesAlpha = [number, number, number, number]
+
 /**
  * One pixel of scratch, and what it has already been asked.
  *
@@ -16,22 +19,47 @@ export type ColorBytes = [number, number, number]
  * on a server where there is no document.
  */
 let swatch: CanvasRenderingContext2D | null | undefined
-const known = new Map<string, ColorBytes | undefined>()
+const known = new Map<string, ColorBytesAlpha | undefined>()
 
 /** How many answers are held. Small: a palette is a handful of colors. */
 const KEPT = 64
 
-/** Paints `value` over `under` and reports what landed. */
-const painted = (context: CanvasRenderingContext2D, value: string, under: string): ColorBytes => {
-  context.fillStyle = under
+/**
+ * Whether the engine parses `value` as a color.
+ *
+ * Assigning a value the engine will not parse leaves `fillStyle` where it was,
+ * so the value is assigned over two different colors and parses where both
+ * read back the same.
+ */
+const parses = (context: CanvasRenderingContext2D, value: string): boolean => {
+  context.fillStyle = '#000000'
   context.fillStyle = value
-  context.fillRect(0, 0, 1, 1)
-  const [red, green, blue] = context.getImageData(0, 0, 1, 1).data
-  return [red ?? 0, green ?? 0, blue ?? 0]
+  const overBlack = String(context.fillStyle)
+  context.fillStyle = '#ffffff'
+  context.fillStyle = value
+  return String(context.fillStyle) === overBlack
 }
 
 /**
- * A computed color as three sRGB bytes, or nothing where it cannot be read.
+ * `value` painted onto a clear pixel and read back, alpha and all, or nothing
+ * where the engine does not parse it.
+ */
+export const paintedColor = (
+  context: CanvasRenderingContext2D,
+  value: string,
+): ColorBytesAlpha | undefined => {
+  if (!parses(context, value)) {
+    return undefined
+  }
+  context.clearRect(0, 0, 1, 1)
+  context.fillRect(0, 0, 1, 1)
+  const [red, green, blue, alpha] = context.getImageData(0, 0, 1, 1).data
+  return [red ?? 0, green ?? 0, blue ?? 0, Math.round(((alpha ?? 0) / 255) * 1000) / 1000]
+}
+
+/**
+ * A computed color as three sRGB bytes and its alpha, or nothing where it
+ * cannot be read.
  *
  * **Painting it is the only way to read it.** A color-typed property is
  * resolved before it is reported, but resolved is not the same as converted:
@@ -41,13 +69,11 @@ const painted = (context: CanvasRenderingContext2D, value: string, under: string
  * `lab(0 0 0)`, which scrapes to black and looks right, so only dark mode
  * showed it: dark red mixed toward black, on a near-black ground.
  *
- * **Painted twice, over two different grounds, which is what makes the refusal
- * honest.** Assigning a value the engine will not parse leaves `fillStyle`
- * exactly where it was, so a single paint cannot tell a color apart from the
- * ground it failed to replace. Over black and over white, a value that parsed
- * gives the same answer twice and one that did not gives two. A caller then
- * chooses its own fallback rather than being handed a color nobody picked,
- * which is the half both earlier copies of this had to guess at.
+ * **A value the engine does not parse is refused**, so a caller chooses its
+ * own fallback rather than being handed a color nobody picked. A see-through
+ * color is read with its alpha: `rgb(255 0 0 / 50%)` is `[255, 0, 0, 0.5]`.
+ * It was refused too, when the test for parsing was painting over black and
+ * over white, and Orb drew it gray.
  *
  * A readback is not free, so the answer is held against the string it came
  * from, refusals included. The oldest goes when the store is full rather than
@@ -56,7 +82,7 @@ const painted = (context: CanvasRenderingContext2D, value: string, under: string
  *
  * @param value A resolved color, as `getComputedStyle` reports one.
  */
-export const readColor = (value: string): ColorBytes | undefined => {
+export const readColorAlpha = (value: string): ColorBytesAlpha | undefined => {
   if (known.has(value)) {
     const seen = known.get(value)
     return seen ? [...seen] : undefined
@@ -72,9 +98,7 @@ export const readColor = (value: string): ColorBytes | undefined => {
   if (!swatch) {
     return undefined
   }
-  const over = painted(swatch, value, '#000000')
-  const under = painted(swatch, value, '#ffffff')
-  const read = over.every((one, at) => one === under[at]) ? over : undefined
+  const read = paintedColor(swatch, value)
   if (known.size >= KEPT) {
     const oldest = known.keys().next().value
     if (oldest !== undefined) {
@@ -83,6 +107,20 @@ export const readColor = (value: string): ColorBytes | undefined => {
   }
   known.set(value, read)
   return read ? [...read] : undefined
+}
+
+/**
+ * A computed color as three sRGB bytes, or nothing where it cannot be read or
+ * is see-through.
+ *
+ * `readColorAlpha` is the reading, and this keeps an opaque color only, which
+ * is what a caller with no use for alpha can draw as it is.
+ *
+ * @param value A resolved color, as `getComputedStyle` reports one.
+ */
+export const readColor = (value: string): ColorBytes | undefined => {
+  const read = readColorAlpha(value)
+  return read && read[3] === 1 ? [read[0], read[1], read[2]] : undefined
 }
 
 /**

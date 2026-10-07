@@ -512,7 +512,13 @@ export { plainClick } from './utils/plain-click/plain-click.js'
 export { appleTouch, onAndroid, onApple, type Platform } from './utils/platform/platform.js'
 export { pressType, type RecentPress } from './utils/press-type/press-type.js'
 export { rangeAdd } from './utils/range-add/range-add.js'
-export { type ColorBytes, readColor, rgbOf } from './utils/read-color/read-color.js'
+export {
+  type ColorBytes,
+  type ColorBytesAlpha,
+  readColor,
+  readColorAlpha,
+  rgbOf,
+} from './utils/read-color/read-color.js'
 export {
   byRow,
   type Extremes,

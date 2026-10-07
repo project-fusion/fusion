@@ -1,10 +1,10 @@
 import {
-  type ColorBytes,
+  type ColorBytesAlpha,
   customElement,
   HelixElement,
   hostAria,
   PaintGateController,
-  readColor,
+  readColorAlpha,
   words,
   wordsConverter,
 } from '@fusion.dev/helix-core'
@@ -50,7 +50,7 @@ interface Dot {
 }
 
 /** What an unreadable color answers with, mid gray in both modes. */
-const GRAY: ColorBytes = [128, 128, 128]
+const GRAY: ColorBytesAlpha = [128, 128, 128, 1]
 
 /**
  * @summary An animated shape that shows what an agent is doing.
@@ -508,8 +508,8 @@ export class HelixOrb extends HelixElement {
        comment gives. A mid gray is what an unreadable value answers, which is
        visible against either mode's ground rather than disappearing into one. */
     const painted = getComputedStyle(ctx.canvas)
-    const ink = readColor(painted.color) ?? GRAY
-    const ground = readColor(painted.textDecorationColor) ?? GRAY
+    const ink = readColorAlpha(painted.color) ?? GRAY
+    const ground = readColorAlpha(painted.textDecorationColor) ?? GRAY
 
     const mesh = meshFor(size)
     const even = evenSphere(mesh.lanes, mesh.segs)
@@ -579,9 +579,15 @@ export class HelixOrb extends HelixElement {
         continue
       }
       const t = Math.min(1, Math.max(0, dot.shade))
-      ctx.fillStyle = `rgba(${Math.round(ink[0] + (ground[0] - ink[0]) * t)},${Math.round(
-        ink[1] + (ground[1] - ink[1]) * t,
-      )},${Math.round(ink[2] + (ground[2] - ink[2]) * t)},${dot.alpha})`
+      /* Mixed with each end weighted by its alpha, so a see-through ink stays
+         its own color and a clear ground fades a dot out rather than to black. */
+      const alpha = ink[3] + (ground[3] - ink[3]) * t
+      if (alpha <= 0) {
+        continue
+      }
+      const channel = (at: 0 | 1 | 2): number =>
+        Math.round((ink[at] * ink[3] + (ground[at] * ground[3] - ink[at] * ink[3]) * t) / alpha)
+      ctx.fillStyle = `rgba(${channel(0)},${channel(1)},${channel(2)},${dot.alpha * alpha})`
       ctx.beginPath()
       ctx.arc(dot.x, dot.y, Math.max(0.3, dot.radius), 0, Math.PI * 2)
       ctx.fill()
