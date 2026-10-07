@@ -6,12 +6,27 @@
 export const SITE_THEME_KEY = 'fusion-site-theme'
 
 /**
- * The prefix the theme owns on the root element.
+ * The `<style>` element the theme is written into, one per document.
  *
- * Every property written under it is removable as a group, which is what makes
- * a reset possible without a list of names to keep in step with the engine.
+ * **A stylesheet, so the theme follows the mode by itself.** It held one mode's
+ * colors as inline properties on the root, and nothing but the landing page
+ * re-derived them when the mode changed: measured on Cortex with a theme kept,
+ * the site's mode went to dark and every token stayed on its light value, the
+ * graph and the page with it. The engine's two-mode block writes each color as
+ * a `light-dark()` pair, the way the shipped stylesheet writes its own, so the
+ * mode the root is in picks the half on every page.
  */
-export const OWNED = '--helix-'
+export const THEME_STYLE_ID = 'site-theme'
+
+/**
+ * Where the theme's block is declared: on the root, while it is marked.
+ *
+ * **Two classes of specificity, which is what lets it win.** The shipped tokens
+ * are declared under `:root` and under `[data-helix-theme]`, one class each, so
+ * a block under `:root` alone would win or lose by where its `<style>` lands in the
+ * document.
+ */
+export const THEME_SELECTOR = ':root[data-helix-theme]'
 
 /** The flag that turns the token layer's own declarations back on. */
 export const THEME_FLAG = 'helixTheme'
@@ -32,18 +47,19 @@ export interface ThemeSettings {
   chromaScale: number
   density: number
   radius: number
-  scheme: 'dark' | 'light'
 }
 
 /** What the engine made of it, which is what the page needs back. */
 export interface StoredTheme {
-  seeds: Record<string, string>
+  /**
+   * The engine's block for both modes, under `THEME_SELECTOR`.
+   */
+  css: string
   settings: ThemeSettings
-  tokens: readonly { hex: string; name: string }[]
   /**
    * What shape the record is in, and which engine wrote it.
    */
-  version: 2
+  version: 3
 }
 
 /**
@@ -55,8 +71,12 @@ export interface StoredTheme {
  * beside the stylesheet's new labels: in dark mode the home page's "Coming
  * soon" tag came out white on white. A theme saved before is now left unread,
  * and the page draws in its own palette until the reader picks again.
+ *
+ * **3 since the theme holds both modes.** A theme saved as 2 holds one mode's
+ * colors, which is the record that left the page in that mode whatever the site
+ * was set to, so it is left unread the same way.
  */
-export const THEME_VERSION = 2
+export const THEME_VERSION = 3
 
 /**
  * Reads the stored theme, or nothing.
@@ -72,7 +92,7 @@ export const readSiteTheme = (): StoredTheme | null => {
       return null
     }
     const parsed = JSON.parse(raw) as StoredTheme
-    if (parsed?.version !== THEME_VERSION || !Array.isArray(parsed.tokens)) {
+    if (parsed?.version !== THEME_VERSION || typeof parsed.css !== 'string') {
       return null
     }
     return parsed
@@ -95,7 +115,60 @@ export const writeSiteTheme = (theme: Omit<StoredTheme, 'version'>): void => {
 }
 
 /**
- * Takes the theme off the root element.
+ * Tells what watches the root's mode that the palette under it changed.
+ *
+ * **The aura resolves `--helix-color-primary` through a controller that
+ * observes the root with `attributeFilter: ['data-color-mode']` and nothing
+ * else**, so a palette written or removed without touching that attribute
+ * tells it nothing: a reset put every other surface back and left the aura
+ * painted in the reader's brand. Writing the same value is enough, since the
+ * mutation record is what the controller wants.
+ *
+ * **Set and removed where there is none**, because absent means "follow the
+ * operating system", and leaving one behind would pin the mode for a reader
+ * who never chose one. Both records are taken in one task, and the controller
+ * reads the root after it, with the attribute gone.
+ */
+const nudgeMode = (root: HTMLElement): void => {
+  const mode = root.getAttribute('data-color-mode')
+  if (mode !== null) {
+    root.setAttribute('data-color-mode', mode)
+    return
+  }
+  root.setAttribute('data-color-mode', 'light')
+  root.removeAttribute('data-color-mode')
+}
+
+/**
+ * Writes the theme onto the page: the block into its `<style>`, and the marks
+ * onto the root.
+ *
+ * **The root is the only element the palette is painted onto**, and the page's
+ * scope inherits it, as do the aura and the wordmark, which sit outside any
+ * scope a page can set. So clearing the root clears the page. Keep it the only
+ * one: a second copy on the scope once outlived a reset, and the hero stayed in
+ * the reader's color while every control said it had gone.
+ */
+export const paintSiteTheme = (css: string, brand: string): void => {
+  const root = document.documentElement
+  let sheet = document.getElementById(THEME_STYLE_ID)
+  if (!sheet) {
+    sheet = document.createElement('style')
+    sheet.id = THEME_STYLE_ID
+    document.head.append(sheet)
+  }
+  sheet.textContent = css
+  root.dataset[THEME_FLAG] = ''
+  if (brand) {
+    root.dataset[BRAND_FLAG] = ''
+  } else {
+    delete root.dataset[BRAND_FLAG]
+  }
+  nudgeMode(root)
+}
+
+/**
+ * Takes the theme off the page.
  *
  * Deleting it on teardown throws that away, and it showed as a hard flash of
  * light-mode blue on every reload. The mechanism is worth keeping written down,
@@ -108,41 +181,12 @@ export const writeSiteTheme = (theme: Omit<StoredTheme, 'version'>): void => {
  * draw: a full-viewport field at light-mode brightness under chrome that is
  * already dark.
  */
-const clearSiteThemeFrom = (node: HTMLElement): void => {
-  for (const name of [...node.style]) {
-    if (name.startsWith(OWNED)) {
-      node.style.removeProperty(name)
-    }
-  }
-  delete node.dataset[THEME_FLAG]
-  delete node.dataset[BRAND_FLAG]
-}
-
-/**
- * **The root is the only element the palette is painted onto.**
- *
- * `paintRoot` writes it there, and the page's scope inherits it, as do the aura
- * and the wordmark, which sit outside any scope a page can set. So clearing the
- * root clears the page. Keep it the only one: a second copy on the scope once
- * outlived a reset, and the hero stayed in the reader's color while every
- * control said it had gone.
- */
 export const clearSiteThemeFromRoot = (): void => {
   const root = document.documentElement
-  clearSiteThemeFrom(root)
-  /* **The same nudge `paintRoot` ends with, and for the same reason.** The aura
-     resolves `--helix-color-primary` through a controller that observes this
-     element with `attributeFilter: ['data-color-mode']` and nothing else, so
-     removing the properties tells it nothing: a reset put every other surface
-     back and left the aura painted in the reader's brand.
-
-     Same value is fine; the mutation record is what the controller wants. Only
-     when the attribute is already there, because absent means "follow the
-     operating system" and adding one would pin the mode a reset never touched. */
-  const mode = root.getAttribute('data-color-mode')
-  if (mode !== null) {
-    root.setAttribute('data-color-mode', mode)
-  }
+  document.getElementById(THEME_STYLE_ID)?.remove()
+  delete root.dataset[THEME_FLAG]
+  delete root.dataset[BRAND_FLAG]
+  nudgeMode(root)
 }
 
 /**

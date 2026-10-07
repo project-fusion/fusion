@@ -3,11 +3,11 @@
 import { initTheme, type ThemeEngine } from '@fusion.dev/helix-theme'
 import { createContext, type ReactNode, useContext, useEffect, useMemo, useState } from 'react'
 import {
-  BRAND_FLAG,
   clearSiteThemeFromRoot,
-  OWNED,
+  paintSiteTheme,
   readSiteTheme,
   THEME_RESET_EVENT,
+  THEME_SELECTOR,
   writeSiteTheme,
 } from '@/utils/site-theme/site-theme'
 import { accentFrom, INITIAL, SITE_BRAND } from '@/utils/theme-defaults/theme-defaults'
@@ -16,9 +16,11 @@ import styles from './theme-context.module.css'
 
 /** What the last derivation produced, for anything that wants to show it. */
 export interface Derived {
+  /** Both modes as one block, which is what the page is painted with. */
+  css: string
   /** Track gradients for the sliders, built from the derived primary. */
   ramps: { accent?: string; saturation?: string }
-  /** The derivation itself, so the root can be painted from the same one. */
+  /** The mode the site is in, which is what the controls show. */
   theme: { seeds: Record<string, string>; tokens: readonly { hex: string; name: string }[] }
   /** Roles too close to tell apart. Empty is the good case. */
   collisions: readonly string[]
@@ -88,22 +90,27 @@ const derive = (
   /* An empty brand is no brand, which the engine reads as ink. Handed over as
      an empty string, it is a color the engine cannot read, and it throws. */
   const accent = settings.brand ? accentFrom(settings.accentHue) : undefined
-  const theme = engine.derive({
-    ...(accent ? { accent } : {}),
-    ...(settings.brand ? { brand: settings.brand } : {}),
-    chroma: { scale: settings.chromaScale / 100 },
-    contrastTarget: INITIAL.contrastTarget,
-    density: settings.density / 100,
-    font: { base: INITIAL.textBase, scale: INITIAL.textScale / 100 },
-    material: { blur: INITIAL.blur, opacity: INITIAL.translucency / 100 },
-    radius: settings.radius / 100,
-    scheme: settings.scheme,
-    separation: {
-      floating: INITIAL.floating as 'border' | 'fill' | 'shadow',
-      surface: INITIAL.surface,
+  /* **Both modes in one call**, so the page follows the site's mode on every
+     page without the engine: the block is a `light-dark()` pair per color. */
+  const modes = engine.deriveModes(
+    {
+      ...(accent ? { accent } : {}),
+      ...(settings.brand ? { brand: settings.brand } : {}),
+      chroma: { scale: settings.chromaScale / 100 },
+      contrastTarget: INITIAL.contrastTarget,
+      density: settings.density / 100,
+      font: { base: INITIAL.textBase, scale: INITIAL.textScale / 100 },
+      material: { blur: INITIAL.blur, opacity: INITIAL.translucency / 100 },
+      radius: settings.radius / 100,
+      separation: {
+        floating: INITIAL.floating as 'border' | 'fill' | 'shadow',
+        surface: INITIAL.surface,
+      },
+      status: { allowance: INITIAL.allowance, harmony: INITIAL.harmony / 100 },
     },
-    status: { allowance: INITIAL.allowance, harmony: INITIAL.harmony / 100 },
-  })
+    [THEME_SELECTOR],
+  )
+  const theme = modes[settings.scheme]
 
   /* The engine measures every pair it derives and reports what it could not
      clear, and that report is returned rather than dropped: a palette anybody
@@ -128,6 +135,7 @@ const derive = (
 
   return {
     collisions: theme.collisions ?? [],
+    css: modes.css[THEME_SELECTOR] ?? '',
     measured: theme.tokens.filter((t) => typeof t.contrast === 'number').length,
     ramps,
     swatches: SHOWN.filter((n) => byName.has(n)).map((n) => ({
@@ -151,38 +159,6 @@ const readSiteScheme = (): 'dark' | 'light' => {
     return chosen
   }
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-}
-
-/**
- * Paints the palette onto the document root, and only there.
- *
- * **The scope inherits the palette from the root.** Every token is a custom
- * property, and custom properties inherit, so a palette on the root reaches the
- * page without being written twice. The scope used to be marked
- * `data-helix-theme` and handed the same values: the mark made the stylesheet
- * declare its default tokens on the scope again, which hid the root's, and the
- * copy was there to win them back.
- */
-const paintRoot = (
-  theme: { seeds: Record<string, string>; tokens: readonly { hex: string; name: string }[] },
-  scheme: 'dark' | 'light',
-  brand: string,
-): void => {
-  const root = document.documentElement
-  root.dataset.helixTheme = ''
-  if (brand) {
-    root.dataset[BRAND_FLAG] = ''
-  } else {
-    delete root.dataset[BRAND_FLAG]
-  }
-  for (const token of theme.tokens) {
-    root.style.setProperty(`${OWNED}${token.name}`, token.hex)
-  }
-  for (const [name, value] of Object.entries(theme.seeds)) {
-    root.style.setProperty(`${OWNED}${name}`, value)
-  }
-  /* The nudge. Same value is fine; the record is what the controller wants. */
-  root.setAttribute('data-color-mode', scheme)
 }
 
 const clearRoot = (): void => {
@@ -221,11 +197,12 @@ export const ThemeScope = ({ children }: { children: ReactNode }) => {
   const [radius, setRadius] = useState(INITIAL.radius)
   const [density, setDensity] = useState(INITIAL.density)
   /* Seeded light for hydration, which is what the server rendered, then moved
-     to the site's mode by the effects below. Light is right for a blank canvas
+     to the site's mode by the effect below. Light is right for a blank canvas
      and wrong for a page inside a dark site: left
      there, the scope paints itself white under dark chrome and the reel's scrim,
-     which is the background color at 70%, becomes a white blob over the field. A
-     draft should look like the site until a reader says otherwise. */
+     which is the background color at 70%, becomes a white blob over the field.
+     The theme holds both modes, so this follows the site's mode always, and
+     picks which of them the controls describe. */
   const [scheme, setScheme] = useState<'dark' | 'light'>('light')
 
   useEffect(() => {
@@ -249,11 +226,6 @@ export const ThemeScope = ({ children }: { children: ReactNode }) => {
     }
   }, [])
 
-  /* Adopt the site's mode on arrival, and keep following it while nobody has
-     touched the toggle. Once they have, `chosen` latches and the page stops
-     changing under them. */
-  const [chosen, setChosen] = useState(false)
-
   /**
    * **Nothing is painted until a reader moves something.**
    */
@@ -272,16 +244,11 @@ export const ThemeScope = ({ children }: { children: ReactNode }) => {
     setAccentHue(stored.settings.accentHue)
     setRadius(stored.settings.radius)
     setDensity(stored.settings.density)
-    setScheme(stored.settings.scheme)
-    /* Latched, so the two effects that follow the site's mode stop overriding
-       the scheme this theme was derived in. */
-    setChosen(true)
     setTouched(true)
   }, [])
 
-  /**
-   * Two sources, and only one of them stops being listened to.
-   */
+  /* The site's mode, from both of its sources: the attribute a reader sets, and
+     the operating system's answer where none is set. */
   useEffect(() => {
     const follow = () => setScheme(readSiteScheme())
     const modes = new MutationObserver(follow)
@@ -289,19 +256,14 @@ export const ThemeScope = ({ children }: { children: ReactNode }) => {
       attributeFilter: ['data-color-mode'],
       attributes: true,
     })
-    return () => modes.disconnect()
-  }, [])
-
-  useEffect(() => {
-    if (chosen) {
-      return
-    }
     const query = window.matchMedia('(prefers-color-scheme: dark)')
-    const follow = () => setScheme(readSiteScheme())
     follow()
     query.addEventListener('change', follow)
-    return () => query.removeEventListener('change', follow)
-  }, [chosen])
+    return () => {
+      modes.disconnect()
+      query.removeEventListener('change', follow)
+    }
+  }, [])
 
   useEffect(() => {
     if (!engine) {
@@ -315,7 +277,7 @@ export const ThemeScope = ({ children }: { children: ReactNode }) => {
        page itself still waits, so it opens in exactly what the stylesheet
        ships. */
     if (touched) {
-      paintRoot(report.theme, scheme, brand)
+      paintSiteTheme(report.css, brand)
       /* **Stored at the same moment it is painted, and storing the same
          thing.** The alternative was to save on a control's change handler,
          which would have written the settings a frame before the engine turned
@@ -325,9 +287,8 @@ export const ThemeScope = ({ children }: { children: ReactNode }) => {
          `touched` gates it, so a page that has painted nothing stores
          nothing. */
       writeSiteTheme({
-        seeds: report.theme.seeds,
-        settings: { accentHue, brand, chromaScale, density, radius, scheme },
-        tokens: report.theme.tokens,
+        css: report.css,
+        settings: { accentHue, brand, chromaScale, density, radius },
       })
     }
   }, [accentHue, brand, chromaScale, density, engine, radius, scheme, touched])
@@ -345,10 +306,6 @@ export const ThemeScope = ({ children }: { children: ReactNode }) => {
       setRadius(INITIAL.radius)
       setDensity(INITIAL.density)
       setTouched(false)
-      /* Unlatched as well, so the scope goes back to following the site's mode
-         the way it does before anybody touches anything. */
-      setChosen(false)
-      setScheme(readSiteScheme())
     }
     window.addEventListener(THEME_RESET_EVENT, forget)
     return () => window.removeEventListener(THEME_RESET_EVENT, forget)
@@ -386,11 +343,9 @@ export const ThemeScope = ({ children }: { children: ReactNode }) => {
         setTouched(true)
         setRadius(value)
       },
-      setScheme: (value: 'dark' | 'light') => {
-        setChosen(true)
-        setTouched(true)
-        setScheme(value)
-      },
+      /* **Only the controls move.** The theme holds both modes, and the toggle
+         sets the site's mode; this moves the controls with it a frame early. */
+      setScheme,
       touched,
     }),
     [accentHue, brand, chromaScale, density, derived, radius, scheme, touched],
