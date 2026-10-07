@@ -116,7 +116,7 @@ describe('the glyphs on a tab set', () => {
       <helix-headless-tab dismissible value="a">A</helix-headless-tab>
     </helix-headless-tabs>`)) as Panel
     await host.updateComplete
-    const tab = host.querySelector('helix-headless-tab') as Panel
+    const tab = host.querySelector('helix-headless-tab') as unknown as Panel
     await tab.updateComplete
     for (const [owner, name] of [
       [host, 'scroll-start-icon'],

@@ -102,7 +102,7 @@ describe('a step with content', () => {
     const content = part(host, 'content') as HTMLElement
     const named = content.getAttribute('aria-labelledby') ?? ''
     expect(content.getAttribute('role')).toBe('group')
-    expect(host.shadowRoot?.getElementById(named)).toBe(part(host, 'label'))
+    expect(host.shadowRoot?.getElementById(named) === part(host, 'label')).toBe(true)
   })
 
   test('leaves an empty content region without a role', async () => {

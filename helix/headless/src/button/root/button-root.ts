@@ -186,7 +186,7 @@ export class HelixHeadlessButton extends HelixFormElement {
    * on the control.
    */
   @property({ attribute: false })
-  pressed?: boolean
+  pressed?: boolean | undefined
 
   /**
    * Where this button's submission goes, overriding the form's own.

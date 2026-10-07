@@ -542,7 +542,11 @@ describe('a pointer or focus in the stack', () => {
     await Promise.all(items.map((one) => one.updateComplete))
     expect(paused(items)).toEqual([true, true])
     items[0]?.dispatchEvent(
-      new FocusEvent('focusout', { bubbles: true, composed: true, relatedTarget: items[1] }),
+      new FocusEvent('focusout', {
+        bubbles: true,
+        composed: true,
+        relatedTarget: items[1] ?? null,
+      }),
     )
     await Promise.all(items.map((one) => one.updateComplete))
     expect(paused(items)).toEqual([true, true])

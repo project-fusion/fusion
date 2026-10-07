@@ -928,7 +928,7 @@ describe('a stop on its way in', () => {
     const tour = await run(false)
     tour.open = true
     await tour.updateComplete
-    const first = tour.stops[0] as HTMLElement & { updateComplete: Promise<boolean> }
+    const first = tour.stops[0] as unknown as HTMLElement & { updateComplete: Promise<boolean> }
     await first.updateComplete
     expect(hasState(first, 'entering')).toBe(true)
     await new Promise((done) => setTimeout(done, 100))

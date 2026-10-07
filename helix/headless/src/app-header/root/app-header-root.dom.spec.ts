@@ -344,7 +344,7 @@ describe('an open folded region', () => {
   test('puts the toggle before the brand with toggle-placement="start"', async () => {
     const header = await folded('toggle-placement="start"')
     const toggle = part(header, 'toggle') as HTMLElement
-    expect(toggle.parentElement).toBe(part(header, 'start'))
+    expect(toggle.parentElement === part(header, 'start')).toBe(true)
     expect(part(header, 'start')?.firstElementChild).toBe(toggle)
     expect(part(header, 'end')?.querySelector('[part="toggle"]')).toBeNull()
   })

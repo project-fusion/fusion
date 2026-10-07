@@ -24,7 +24,7 @@ import { arrowTarget } from '../arrows.js'
 type GroupButton = HTMLElement & {
   disabled?: boolean
   focusable: boolean
-  pressed?: boolean
+  pressed?: boolean | undefined
   updateComplete: Promise<unknown>
   value: string
 }
