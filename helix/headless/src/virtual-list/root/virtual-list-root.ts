@@ -19,6 +19,7 @@ import {
   toggleValue,
   typesCharacter,
   VirtualizeController,
+  words,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, render, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -155,6 +156,12 @@ export interface VirtualListRange {
 @customElement('helix-headless-virtual-list')
 export class HelixHeadlessVirtualList extends HelixElement {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-virtual-list': { loadingLabel: 'Weitere werden geladen' } })`.
+   */
+  static words = 'helix-virtual-list'
+
+  /**
    * How many items a line holds. One, the default, is a list; more lays the
    * items out as a grid of that many equal columns, windowed a line at a
    * time, with Left and Right moving along a line.
@@ -217,6 +224,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
   loading = false
 
   /** The text of the row drawn while `loading` is set, where the `loading` slot is empty. */
+  @words
   @property({ attribute: 'loading-label' })
   loadingLabel = 'Loading more'
 

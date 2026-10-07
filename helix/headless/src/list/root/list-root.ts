@@ -3,8 +3,8 @@ import {
   customElement,
   deepActiveElement,
   drawStatus,
-  fillTemplate,
   focusItemOf,
+  formatWords,
   HelixActionEvent,
   HelixElement,
   hostAria,
@@ -24,6 +24,7 @@ import {
   selectsAll,
   typeaheadByWords,
   whenHydrated,
+  words,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -126,13 +127,21 @@ import {
 @customElement('helix-headless-list')
 export class HelixHeadlessList extends HelixElement {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-list': { moveLabel: '{name} verschieben' } })`.
+   */
+  static words = 'helix-list'
+
+  /**
    * What screen readers hear when a held row is put back, or a move is
    * refused, in a `reorderable` list.
    */
+  @words
   @property({ attribute: 'canceled-label' })
   canceledLabel = 'Canceled'
 
   /** What screen readers hear when a row is dropped, in a `reorderable` list. */
+  @words
   @property({ attribute: 'dropped-label' })
   droppedLabel = 'Dropped'
 
@@ -172,6 +181,7 @@ export class HelixHeadlessList extends HelixElement {
    * `reorderable` list. `{name}` is the row's words, `{position}` the place it
    * would go, counting from 1, and `{count}` the number of rows.
    */
+  @words
   @property({ attribute: 'moved-label' })
   movedLabel = '{name} moved to position {position} of {count}'
 
@@ -179,6 +189,7 @@ export class HelixHeadlessList extends HelixElement {
    * The name of each row's grip, in a `reorderable` list. `{name}` is
    * replaced with the row's words.
    */
+  @words
   @property({ attribute: 'move-label' })
   moveLabel = 'Move {name}'
 
@@ -186,6 +197,7 @@ export class HelixHeadlessList extends HelixElement {
    * What screen readers hear when a key or a click picks up a row, in a
    * `reorderable` list. `{name}` is the row's words.
    */
+  @words
   @property({ attribute: 'picked-up-label' })
   pickedUpLabel = 'Picked up {name}'
 
@@ -302,17 +314,11 @@ export class HelixHeadlessList extends HelixElement {
     },
     keys: () => this.rows.map((row) => this.valueFor(row)),
     name: (key) => this.rowFor(key)?.words || key,
-    say: (words) => this.status.say(words),
+    say: (said) => this.status.say(said),
     scroller: () => {
       const first = this.rows[0]
       return first ? scrollingAncestor(first, { axis: 'y', overflowing: true }) : null
     },
-    words: () => ({
-      canceled: this.canceledLabel,
-      dropped: this.droppedLabel,
-      moved: this.movedLabel,
-      pickedUp: this.pickedUpLabel,
-    }),
   })
 
   /** Whether the list is a grid a reader moves through. */
@@ -384,7 +390,7 @@ export class HelixHeadlessList extends HelixElement {
         /* A disabled row stays where it is, and the others move past it. */
         row.grip =
           this.reorderable && !row.disabled
-            ? fillTemplate(this.moveLabel, { name: row.words || key })
+            ? formatWords(this, 'moveLabel', { name: row.words || key })
             : undefined
         row.move =
           held?.key === key

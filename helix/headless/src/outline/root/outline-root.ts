@@ -8,6 +8,7 @@ import {
   reflectElements,
   scrollItemIntoView,
   scrollingAncestor,
+  words,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -74,6 +75,12 @@ const isFragment = (element: Element): element is HTMLAnchorElement =>
 @customElement('helix-headless-outline')
 export class HelixHeadlessOutline extends HelixElement {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-outline': { label: 'Auf dieser Seite' } })`.
+   */
+  static words = 'helix-outline'
+
+  /**
    * Manual, so each link in a flat run can be put in a list item of its own.
    *
    * The list items are slots, which lay out as nothing at all, so each link is
@@ -131,6 +138,7 @@ export class HelixHeadlessOutline extends HelixElement {
    * The navigation's name, read by screen readers. A heading in the `heading`
    * slot names it in place of this.
    */
+  @words
   @property()
   label = 'On this page'
 
