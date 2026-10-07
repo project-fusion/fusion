@@ -5,6 +5,7 @@ import {
   drawTooltip,
   extent,
   formatNumbers,
+  formatWords,
   HelixElement,
   linear,
   linePath,
@@ -18,6 +19,8 @@ import {
   seriesNames,
   ticks,
   unbroken,
+  words,
+  wordsLocale,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -102,6 +105,12 @@ import '../../tooltip/index.js'
 @customElement('helix-headless-bar-chart')
 export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-bar-chart': { highestLabel: 'Höchster Wert' } })`.
+   */
+  static words = 'helix-bar-chart'
+
+  /**
    * Which gridlines are drawn across the plot, if any.
    *
    * Absent draws none. `value` rules the axis the columns are *measured* on,
@@ -125,8 +134,10 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
   gridlines?: 'both' | 'category' | 'value'
 
   /**
-   * The word the summary puts before each series' highest reading.
+   * The name the summary gives each series' highest reading, `{highestLabel}`
+   * in `summary-label`.
    */
+  @words
   @property({ attribute: 'highest-label' })
   highestLabel = 'Highest'
 
@@ -221,6 +232,15 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
    */
   @property({ reflect: true, type: Boolean })
   stacked = false
+
+  /**
+   * The summary's sentence. `{highestLabel}` is `highest-label`, and
+   * `{readings}` each series' highest reading: the series, the category and
+   * the reading as the table writes it.
+   */
+  @words
+  @property({ attribute: 'summary-label' })
+  summaryLabel = '{highestLabel}: {readings}.'
 
   /** The series names on the second scale, lowercased and trimmed. */
   private get scaled(): Set<string> {
@@ -325,14 +345,11 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
      * axis of six numbers laid out that way is an empty box. The count is known
      * here and unknowable to a selector, so it is written as a length and the
        stylesheet reads it. */
+    const format = formatNumbers(wordsLocale(this))
     const widest =
       z === undefined
         ? 0
-        : Math.max(
-            ...[...ticks(domain), ...ticks(other)].map(
-              (level) => formatNumbers(this.locale)(level).length,
-            ),
-          )
+        : Math.max(...[...ticks(domain), ...ticks(other)].map((level) => format(level).length))
 
     /* The second axis wears its series' color when exactly one series is on it,
        which is the case worth helping and the only one a single color can
@@ -380,7 +397,11 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
       return [`${one.name} ${top.label} ${text}`]
     })
     const named = this.named ? `${this.named}. ` : ''
-    return html`<p id="helix-chart-summary" part="summary">${named}${this.highestLabel}: ${highest.join('; ')}.</p>`
+    const said = formatWords(this, 'summaryLabel', {
+      highestLabel: this.highestLabel,
+      readings: highest.join('; '),
+    })
+    return html`<p id="helix-chart-summary" part="summary">${named}${said}</p>`
   }
 
   /**
@@ -643,6 +664,7 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
     tint?: string,
   ): TemplateResult {
     const sizing = sideways ? undefined : `--bar-chart-axis: ${widest}ch`
+    const format = formatNumbers(wordsLocale(this))
     return html`<div
       aria-hidden="true"
       data-axis=${which}
@@ -654,7 +676,7 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
           html`<span
             part="tick"
             style=${sideways ? `inset-inline-start: ${scale(level)}%` : `inset-block-start: ${scale(level)}%`}
-            >${formatNumbers(this.locale)(level)}</span
+            >${format(level)}</span
           >`,
       )}
     </div>`

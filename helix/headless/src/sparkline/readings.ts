@@ -8,7 +8,7 @@
  * `extremesOf`, which Heatmap asks too.
  */
 
-import { extremesOf, fillTemplate, type Point } from '@fusion.dev/helix-core'
+import { extremesOf, type Point } from '@fusion.dev/helix-core'
 
 /**
  * A reading in words, for the readout: the row's name where a table gave one,
@@ -60,14 +60,25 @@ export const areaPath = (runs: readonly Run[], floor: number): string =>
     })
     .join('')
 
+/** The readings an overview names, each as the readout writes it. */
+export interface Overview {
+  /** The first reading. */
+  first: string
+  /** The highest reading. */
+  high: string
+  /** The last reading. */
+  last: string
+  /** The lowest reading. */
+  low: string
+}
+
 /**
- * What the readings come to, in `template`: `{first}` and `{last}` for the
- * first and the last reading, `{high}` and `{low}` for the highest and the
- * lowest, each written by `write`. Empty where there are fewer than two
- * readings, which make no trend.
+ * What the readings come to, as `say` puts it: the first and the last
+ * reading, and the highest and the lowest, each written by `write`. Empty
+ * where there are fewer than two readings, which make no trend.
  */
 export const overviewWords = (
-  template: string,
+  say: (overview: Overview) => string,
   slots: readonly (number | undefined)[],
   write: (at: number) => string,
 ): string => {
@@ -78,7 +89,7 @@ export const overviewWords = (
   if (placed.length < 2 || first === undefined || last === undefined) {
     return ''
   }
-  return fillTemplate(template, {
+  return say({
     first: write(first),
     high: write(high as number),
     last: write(last),

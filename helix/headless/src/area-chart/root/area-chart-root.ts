@@ -4,6 +4,7 @@ import {
   customElement,
   drawTooltip,
   formatNumbers,
+  formatWords,
   HelixElement,
   linear,
   linePath,
@@ -15,6 +16,8 @@ import {
   reportRuntime,
   seriesIndex,
   ticks,
+  words,
+  wordsLocale,
 } from '@fusion.dev/helix-core'
 import { html, nothing, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -139,6 +142,12 @@ export interface AreaStack {
 @customElement('helix-headless-area-chart')
 export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-area-chart': { totalLabel: 'Summe' } })`.
+   */
+  static words = 'helix-area-chart'
+
+  /**
    * How a band's edge gets from one reading to the next.
    *
    * Three values, and the class doc argues for each: `straight` is absent and
@@ -192,8 +201,18 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
   share = false
 
   /**
+   * The summary's sentence. `{reading}` is the latest reading's name,
+   * `{totalLabel}` the name for the sum, `{total}` the sum, written in the
+   * locale, and `{shares}` each part's share, listed as the locale lists.
+   */
+  @words
+  @property({ attribute: 'summary-label' })
+  summaryLabel = '{reading}: {totalLabel} {total}; {shares}.'
+
+  /**
    * The name for the sum of the parts, shown in the tooltip and the summary.
    */
+  @words
   @property({ attribute: 'total-label' })
   totalLabel = 'Total'
 
@@ -451,11 +470,11 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
   protected renderSummary(stack: AreaStack, rows: Row[]): TemplateResult {
     const last = rows.length - 1
     const total = stack.totals[last] ?? 0
-    const format = formatNumbers(this.locale)
+    const locale = wordsLocale(this)
     const shares = stack.names.flatMap((name, depth) =>
       this.showsSeries(name)
         ? [
-            `${name} ${percentIn(this.locale).format(total > 0 ? (stack.values[depth]?.[last] ?? 0) / total : 0)}`,
+            `${name} ${percentIn(locale).format(total > 0 ? (stack.values[depth]?.[last] ?? 0) / total : 0)}`,
           ]
         : [],
     )
@@ -463,8 +482,13 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
     /* One string and one text node: a space standing alone between two
        bindings is a text node of its own, which Chromium's description drops,
        and the summary was read as "Total14". */
-    const words = `${named}${rows[last]?.label ?? ''}: ${this.totalLabel} ${format(total)}; ${shares.join(', ')}.`
-    return html`<p id="helix-chart-summary" part="summary">${words}</p>`
+    const said = `${named}${formatWords(this, 'summaryLabel', {
+      reading: rows[last]?.label ?? '',
+      shares: new Intl.ListFormat(locale, { style: 'short', type: 'unit' }).format(shares),
+      total,
+      totalLabel: this.totalLabel,
+    })}`
+    return html`<p id="helix-chart-summary" part="summary">${said}</p>`
   }
 
   /**
@@ -474,7 +498,8 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
    * no series color: it is the sum of the bands, not a band.
    */
   private tallied(rows: Row[], stack: AreaStack): Row[] {
-    const format = formatNumbers(this.locale)
+    const locale = wordsLocale(this)
+    const format = formatNumbers(locale)
     return rows.map((row, index) => {
       const total = stack.totals[index] ?? 0
       return {
@@ -484,7 +509,7 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
             this.share && cell.value !== undefined && stack.columns.includes(column) && total > 0
               ? {
                   ...cell,
-                  text: `${cell.text} (${percentIn(this.locale).format(Math.max(0, cell.value) / total)})`,
+                  text: `${cell.text} (${percentIn(locale).format(Math.max(0, cell.value) / total)})`,
                 }
               : cell,
           ),

@@ -18,6 +18,7 @@ import {
   seriesKey,
   ticks,
   unbroken,
+  wordsLocale,
 } from '@fusion.dev/helix-core'
 import { html, nothing, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -345,10 +346,12 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
       return [{ label: last.label, reading: `${one.name} ${text}` }]
     })
     /* One label where every series ended on the same row, which is the usual
-       table, and each its own where they did not. */
+       table, and each its own where they did not. The readings are listed as
+       the locale lists, which in English is with commas. */
     const shared = latest.every((one) => one.label === latest[0]?.label)
+    const listed = new Intl.ListFormat(wordsLocale(this), { style: 'short', type: 'unit' })
     const body = shared
-      ? `${latest[0]?.label ?? ''}: ${latest.map((one) => one.reading).join(', ')}`
+      ? `${latest[0]?.label ?? ''}: ${listed.format(latest.map((one) => one.reading))}`
       : latest.map((one) => `${one.label}: ${one.reading}`).join('; ')
     const named = this.named ? `${this.named}, ` : ''
     return html`<p id="helix-chart-summary" part="summary">${named}${body}.</p>`

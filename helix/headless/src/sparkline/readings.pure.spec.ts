@@ -62,8 +62,10 @@ describe('the wash under the line', () => {
 
 describe('what the readings come to', () => {
   const words = (slots: (number | undefined)[]) =>
-    overviewWords('From {first} to {last}, highest {high}, lowest {low}', slots, (at) =>
-      String(slots[at]),
+    overviewWords(
+      ({ first, high, last, low }) => `From ${first} to ${last}, highest ${high}, lowest ${low}`,
+      slots,
+      (at) => String(slots[at]),
     )
 
   test('says the first, the last, the highest and the lowest reading', () => {

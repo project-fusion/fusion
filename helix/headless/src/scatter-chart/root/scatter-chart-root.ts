@@ -4,6 +4,7 @@ import {
   drawTooltip,
   extent,
   formatNumbers,
+  formatWords,
   HelixElement,
   isRtl,
   linear,
@@ -12,6 +13,8 @@ import {
   PLOT_WIDTH,
   seriesIndex,
   ticks,
+  words,
+  wordsLocale,
 } from '@fusion.dev/helix-core'
 import { html, nothing, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -170,8 +173,16 @@ const nice = ([low, high]: [number, number]): [number, number] => {
 @customElement('helix-headless-scatter-chart')
 export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
   /**
-   * The word the summary uses for the strength of the relation.
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-scatter-chart': { seriesLabel: '…' } })`.
    */
+  static words = 'helix-scatter-chart'
+
+  /**
+   * The word for the strength of the relation, `{correlationLabel}` in
+   * `series-label`.
+   */
+  @words
   @property({ attribute: 'correlation-label' })
   correlationLabel = 'correlation'
 
@@ -187,10 +198,27 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
   gridlines?: 'both' | 'x' | 'y'
 
   /**
-   * The word the summary uses for a row when it counts them.
+   * The word for the rows a series rests on, `{pointsLabel}` in
+   * `series-label`. `{count}` is how many, so the word takes its plural
+   * forms: `{count, plural, one {punkt} few {punkty} other {punktów}}`.
    */
+  @words
   @property({ attribute: 'points-label' })
-  pointsLabel = 'points'
+  pointsLabel = '{count, plural, one {point} other {points}}'
+
+  /**
+   * What the summary says of each series. `{y}` is what the series measures up,
+   * `{x}` what the chart measures across, `{count}` how many rows it rests on,
+   * written in the locale, `{pointsLabel}` the word for them, and
+   * `{correlation}` its correlation, or `none` where there are fewer than
+   * three points or no spread to measure, so each case is a whole sentence:
+   * `{correlation, select, none {...} other {...}}`. `{correlationLabel}` is
+   * `correlation-label`.
+   */
+  @words
+  @property({ attribute: 'series-label' })
+  seriesLabel =
+    '{correlation, select, none {{y} / {x}: {count} {pointsLabel}} other {{y} / {x}: {count} {pointsLabel}, {correlationLabel} {correlation}}}'
 
   /**
    * The heading of a column whose numbers size the points, such as
@@ -337,7 +365,7 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
         <div id=${CHART_PLOT} part="plot"></div>
       </div>`
     }
-    const format = formatNumbers(this.locale)
+    const format = formatNumbers(wordsLocale(this))
     const along = linear(field.x, [0, PLOT_WIDTH])
     const up = linear(field.y, [PLOT_HEIGHT, 0])
     return html`<div dir="ltr" part="plane">
@@ -456,12 +484,18 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
    * absent where there are fewer than three points or no spread to measure.
    */
   protected renderSummary(field: ScatterField): TemplateResult {
+    const coefficient = coefficientIn(wordsLocale(this))
     const clauses = field.yNames.map((name, depth) => {
       const pairs = field.pairs[depth] ?? []
       const r = correlation(pairs)
-      const strength =
-        r === undefined ? '' : `, ${this.correlationLabel} ${coefficientIn(this.locale).format(r)}`
-      return `${name} / ${field.xName}: ${pairs.length} ${this.pointsLabel}${strength}`
+      return formatWords(this, 'seriesLabel', {
+        correlation: r === undefined ? 'none' : coefficient.format(r),
+        correlationLabel: this.correlationLabel,
+        count: pairs.length,
+        pointsLabel: formatWords(this, 'pointsLabel', { count: pairs.length }),
+        x: field.xName,
+        y: name,
+      })
     })
     const named = this.named ? `${this.named}. ` : ''
     return html`<p id="helix-chart-summary" part="summary">${named}${clauses.join('; ')}.</p>`

@@ -1,7 +1,6 @@
-import type { ReactiveController, ReactiveControllerHost } from 'lit'
-import { fillTemplate } from '../../utils/fill-template/fill-template.js'
-import { formatNumbers } from '../../utils/format-numbers/format-numbers.js'
+import type { ReactiveController, ReactiveControllerHost, ReactiveElement } from 'lit'
 import { isRtl } from '../../utils/is-rtl/is-rtl.js'
+import { formatWords } from '../../words/words.js'
 import { stepReading } from './reading-step.js'
 
 /**
@@ -67,8 +66,8 @@ export interface ChartPointerHost extends ReactiveControllerHost, HTMLElement {
    */
   readonly positionLabel?: string
   /**
-   * The locale the position's numbers are written in. Absent or empty is the
-   * runtime's own.
+   * The locale the position's numbers are written in. Absent or empty reads
+   * the nearest `lang`, then the runtime's own, as `wordsLocale` does.
    */
   readonly locale?: string
 }
@@ -228,8 +227,13 @@ export class ChartPointerController implements ReactiveController {
     if (words === '' || place < 0) {
       return ''
     }
-    const format = formatNumbers(this.host.locale ?? '')
-    return fillTemplate(words, { count: format(shown.length), position: format(place + 1) })
+    /* Through the words registry, so a host that declares `positionLabel` a
+       word speaks the page's language, and the numbers go in as numbers, so a
+       plural form can be picked and the digits are the locale's. */
+    return formatWords(this.host as ChartPointerHost & ReactiveElement, 'positionLabel', {
+      count: shown.length,
+      position: place + 1,
+    })
   }
 
   /**

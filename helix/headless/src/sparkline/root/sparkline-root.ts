@@ -6,6 +6,7 @@ import {
   extent,
   extremesOf,
   formatNumbers,
+  formatWords,
   HelixElement,
   linear,
   linePath,
@@ -14,6 +15,8 @@ import {
   type Series,
   SourceController,
   unbroken,
+  words,
+  wordsLocale,
   writtenList,
   writtenNumbers,
 } from '@fusion.dev/helix-core'
@@ -96,6 +99,12 @@ const STRIP_HEIGHT = 32
 @customElement('helix-headless-sparkline')
 export class HelixHeadlessSparkline extends HelixElement {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-sparkline': { positionLabel: '{position} von {count}' } })`.
+   */
+  static words = 'helix-sparkline'
+
+  /**
    * How the line is drawn from one reading to the next.
    *
    * **`smooth` is the resting curve.** A straight segment asserts nothing about
@@ -151,11 +160,11 @@ export class HelixHeadlessSparkline extends HelixElement {
   label = ''
 
   /**
-   * The locale the readout's numbers and positions are written in, such as
-   * `de` for `1.240`.
+   * The locale the words, the readout's numbers and positions are in, such
+   * as `de` for `1.240`.
    *
-   * Absent uses the runtime's own. A table's cells are shown as the table
-   * writes them, whatever this says.
+   * Absent reads the nearest `lang`, then the runtime's own. A table's cells
+   * are shown as the table writes them, whatever this says.
    */
   @property()
   locale = ''
@@ -178,6 +187,7 @@ export class HelixHeadlessSparkline extends HelixElement {
    * Set it to the words of the page's language, or to nothing to say no
    * more than the name. Said only where the sparkline is named.
    */
+  @words
   @property({ attribute: 'overview-label' })
   overviewLabel = 'From {first} to {last}, highest {high}, lowest {low}'
 
@@ -221,6 +231,7 @@ export class HelixHeadlessSparkline extends HelixElement {
    * Set it to the words of the page's language, such as `{position} von
    * {count}`, or to nothing to say no position.
    */
+  @words
   @property({ attribute: 'position-label' })
   positionLabel = '{position} of {count}'
 
@@ -328,7 +339,10 @@ export class HelixHeadlessSparkline extends HelixElement {
     const rows = this.source.rows
     const row = rows[at]
     if (!row) {
-      return { label: '', text: value === undefined ? '' : formatNumbers(this.locale)(value) }
+      return {
+        label: '',
+        text: value === undefined ? '' : formatNumbers(wordsLocale(this))(value),
+      }
     }
     /* The first column any row holds a number in, which is the one
        `readSeries` drew first. */
@@ -448,7 +462,11 @@ export class HelixHeadlessSparkline extends HelixElement {
     const name = this.named
     const named = name !== ''
     const overview = named
-      ? overviewWords(this.overviewLabel, slots, (index) => this.reading(index, slots[index]).text)
+      ? overviewWords(
+          (values) => formatWords(this, 'overviewLabel', { ...values }),
+          slots,
+          (index) => this.reading(index, slots[index]).text,
+        )
       : ''
 
     /* **Named, the drawing is read by key**, as every chart's plot is: an
