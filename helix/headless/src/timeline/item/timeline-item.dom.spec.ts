@@ -37,6 +37,28 @@ describe('one timeline entry', () => {
     expect(part(bare, 'time')?.hasAttribute('datetime')).toBe(false)
   })
 
+  /* The tone colored the mark and said nothing, so a reader who could not see
+     the color was not told an event had failed. */
+  test('names its mark by the tone, so the meaning is not only a color', async () => {
+    const failed = await entry('tone="danger"')
+    expect(part(failed, 'marker')?.getAttribute('role')).toBe('img')
+    expect(part(failed, 'marker')?.getAttribute('aria-label')).toBe('Error')
+
+    const own = await entry('tone="danger" tone-label="Failed"')
+    expect(part(own, 'marker')?.getAttribute('aria-label')).toBe('Failed')
+
+    const quiet = await entry('tone="neutral"')
+    expect(part(quiet, 'marker')?.hasAttribute('role')).toBe(false)
+    expect(part(quiet, 'marker')?.hasAttribute('aria-label')).toBe(false)
+  })
+
+  test('a pending entry says it has not happened yet', async () => {
+    const later = await entry('pending tone="info"')
+    expect(part(later, 'marker')?.getAttribute('aria-label')).toBe('Information, Scheduled')
+    const bare = await entry('pending')
+    expect(part(bare, 'marker')?.getAttribute('aria-label')).toBe('Scheduled')
+  })
+
   /* The time is a sibling of the content, not the first thing inside it. Nested,
      the mark on the rail could only sit a fixed distance from the top of the
      entry, which is right for a one-line time and wrong for two. */
