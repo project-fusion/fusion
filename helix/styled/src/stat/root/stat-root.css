@@ -35,8 +35,9 @@ slot[name="label"]::slotted(*) {
   letter-spacing: var(--helix-tracking-wide);
 }
 
-/* The inherited half on the slot, the rest on what was slotted. */
-slot:not([name]) {
+/* The inherited half on the slot, the rest on what was slotted. The same
+   part is the figure `value` writes, which takes all of it. */
+[part="value"] {
   color: var(--stat-value-color, var(--helix-color-foreground));
   font-family: var(--helix-font-display);
   font-size: var(--stat-value-size, calc(var(--helix-text-3xl) / var(--helix-text-md) * 1em));

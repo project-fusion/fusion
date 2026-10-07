@@ -58,6 +58,27 @@ describe('stat', () => {
   })
 })
 
+/* Trend and Badge write a number with `Intl`; a stat's figure had to be
+   formatted by the page before it was slotted. */
+describe('a stat given a number', () => {
+  test('writes value with format-options in its locale, in place of the slot', async () => {
+    const stat = (await mount(
+      `<helix-headless-stat locale="en" value="1234567" format-options='{"notation":"compact"}'>
+        <span slot="label">Downloads</span>
+      </helix-headless-stat>`,
+    )) as Updatable & { locale: string; value: number | undefined }
+    expect(part(stat, 'value')?.tagName).toBe('SPAN')
+    expect(part(stat, 'value')?.textContent).toBe('1.2M')
+    stat.locale = 'de'
+    stat.removeAttribute('format-options')
+    await stat.updateComplete
+    expect(part(stat, 'value')?.textContent).toBe('1.234.567')
+    stat.value = undefined
+    await stat.updateComplete
+    expect(part(stat, 'value')?.tagName).toBe('SLOT')
+  })
+})
+
 describe('stat direction', () => {
   test('a stat is a label over a number by default', async () => {
     /* The markup order never changes with the visual one: a screen reader hears

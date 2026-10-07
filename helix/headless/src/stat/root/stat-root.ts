@@ -1,10 +1,12 @@
 import {
   customElement,
+  formatNumber,
   HelixElement,
   hostAria,
   reportRuntime,
   slotFilled,
   slottedWords,
+  wordsLocale,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -28,6 +30,12 @@ import { property } from 'lit/decorators.js'
  * attribute; a stat with no label has no role. Put a `Trend` in the `trend`
  * slot to have it read inside the group, after the figure it qualifies.
  *
+ * **Or give the figure as a number.** `value` is written with
+ * `Intl.NumberFormat`, in `locale` and with `format-options`, so
+ * `value="1234567" format-options='{"notation":"compact"}'` shows `1.2M`, and
+ * a server writes it as the browser does. A number in `value` takes the place
+ * of a slotted figure.
+ *
  * **Each slot is a part of the same name**, and `value` for the figure, so a
  * page reaches the label, the unit and the trend from outside. A slot draws no
  * box, so a part passes inherited properties to what is slotted. **The stat
@@ -49,7 +57,7 @@ import { property } from 'lit/decorators.js'
  * @csspart label - The slot the label arrives through, drawing no box, as `value` does.
  * @csspart trend - The slot the trend arrives through, drawing no box, as `value` does.
  * @csspart unit - The slot the unit arrives through, drawing no box, as `value` does.
- * @csspart value - The slot the value is written in. A slot draws no box, so it takes the inherited properties, such as color and font, and passes them to the value.
+ * @csspart value - The slot the value is written in, or the figure `value` writes. A slot draws no box, so it takes the inherited properties, such as color and font, and passes them to the value.
  *
  * @cssstate has-label - Something is slotted into `label`.
  * @cssstate has-trend - Something is slotted into `trend`.
@@ -86,6 +94,35 @@ export class HelixHeadlessStat extends HelixElement {
    */
   @property({ reflect: true })
   direction?: 'column-reverse' | 'row' | 'row-reverse'
+
+  /**
+   * `Intl.NumberFormat` options `value` is written with, such as
+   * `{"notation":"compact"}` for `1.2M` or `{"style":"percent"}` for `98%`,
+   * written as JSON in the attribute.
+   *
+   * Absent writes the number as the locale writes any number.
+   */
+  @property({ attribute: 'format-options', type: Object })
+  formatOptions?: Intl.NumberFormatOptions
+
+  /**
+   * The locale `value` is written in, such as `de` for `1.234.567`.
+   *
+   * Absent reads the nearest `lang`, then the runtime's own. Set it on a page
+   * rendered on a server, so the server and the browser write the figure
+   * alike.
+   */
+  @property()
+  locale = ''
+
+  /**
+   * The figure as a number, written with `format-options` in `locale` in
+   * place of a slotted value.
+   *
+   * Absent leaves the figure to the slot.
+   */
+  @property({ type: Number })
+  value?: number
 
   /* Named by what is slotted as the label: by reference where the engine
      reflects elements, so an edit to the label's text renames the group, and
@@ -142,8 +179,16 @@ export class HelixHeadlessStat extends HelixElement {
     /* The label's slot asks for the update that names the group, since a
        label arriving later changes no property; that update reads the
        pieces, and the unit's and the trend's slots read them directly. */
+    const value = this.value
+    const figure =
+      value === undefined || !Number.isFinite(value)
+        ? ''
+        : formatNumber(value, wordsLocale(this), this.formatOptions)
+    /* **The figure replaces the slot**, where a slot's fallback would not: the
+       line breaks between the stat's children are assigned to the unnamed
+       slot, so a fallback under it would never show. */
     return html`<slot name="label" part="label" @slotchange=${() => this.requestUpdate()}></slot>
-      <slot part="value"></slot>
+      ${figure === '' ? html`<slot part="value"></slot>` : html`<span part="value">${figure}</span>`}
       <slot name="unit" part="unit" @slotchange=${this.readPieces}></slot>
       <slot name="trend" part="trend" @slotchange=${this.readPieces}></slot>`
   }
