@@ -146,7 +146,7 @@ export const MixinPickerFeedback = <T extends Constructor<HelixFormElement>>(Bas
 
     /* `ariaInvalid` on the host through `ElementInternals` rather than as an
        attribute, which a React consumer's server markup never had. **`false`
-       while unmarked, never left unset**: a host with a role and no
+       while unmarked**: a host with a role and no
        `aria-invalid` is judged by its validity, and Chromium's tree reported
        an untouched required Date Picker, a `group`, as invalid on load. */
     protected override willUpdate(changed: PropertyValues): void {

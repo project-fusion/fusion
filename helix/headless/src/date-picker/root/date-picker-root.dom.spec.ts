@@ -1300,7 +1300,7 @@ describe('a calendar holding several dates', () => {
     expect(preview).toHaveLength(5)
     expect(preview[0]?.hasAttribute('data-range-start')).toBe(true)
     expect(preview[4]?.hasAttribute('data-range-end')).toBe(true)
-    // Drawn, and not chosen: only the end already chosen is selected.
+    // Drawn and unchosen: only the end already chosen is selected.
     expect(preview.filter((one) => one.getAttribute('aria-selected') === 'true')).toHaveLength(1)
     grid(cal)?.dispatchEvent(new Event('pointerleave'))
     await cal.updateComplete
