@@ -288,14 +288,37 @@ fn font_faces(theme: &Theme, namespace: &str, lines: &mut Vec<String>) {
         lines.push("  /* Assumes these faces are already loaded. */".to_owned());
     }
     if let Some(body) = &font.body {
-        lines.push(format!("  --{namespace}-font-sans: {body};"));
+        lines.push(format!("  --{namespace}-font-sans: {};", stack(body, SANS)));
     }
     if let Some(display) = font.display.as_ref().or(font.body.as_ref()) {
-        lines.push(format!("  --{namespace}-font-display: {display};"));
+        lines.push(format!("  --{namespace}-font-display: {};", stack(display, SANS)));
     }
     if let Some(mono) = &font.mono {
-        lines.push(format!("  --{namespace}-font-mono: {mono};"));
+        lines.push(format!("  --{namespace}-font-mono: {};", stack(mono, MONO)));
     }
+}
+
+/// What a sans or display face falls back to.
+const SANS: &str = "ui-sans-serif, system-ui, sans-serif";
+/// What a monospace face falls back to.
+const MONO: &str = "ui-monospace, monospace";
+
+/// A face as a family list: the face, quoted, then the generic stack.
+///
+/// **A face alone left nothing under it.** The token replaces the stack the
+/// stylesheet falls back through, so a face that failed to load, or one the
+/// reader's machine lacked, drew in the browser's default face, a serif in
+/// every engine. A value with a comma in it is already a list, and is the
+/// consumer's to keep.
+fn stack(face: &str, generic: &str) -> String {
+    let face = face.trim();
+    if face.contains(',') {
+        return face.to_owned();
+    }
+    if face.starts_with('"') || face.starts_with('\'') {
+        return format!("{face}, {generic}");
+    }
+    format!("\"{face}\", {generic}")
 }
 
 fn motion(theme: &Theme, namespace: &str, lines: &mut Vec<String>) {

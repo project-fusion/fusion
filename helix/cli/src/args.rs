@@ -224,6 +224,11 @@ pub struct Build {
     pub out: Option<PathBuf>,
 
     /// The selector the block is written under.
+    ///
+    /// `:root` ties the selectors Helix's own stylesheet declares its tokens
+    /// under, so the block wins only where it loads after that stylesheet.
+    /// `:root[data-helix-theme]` outranks them wherever it loads, on a root
+    /// that carries the attribute.
     #[arg(long, default_value = ":root", value_name = "SELECTOR")]
     pub selector: String,
 
