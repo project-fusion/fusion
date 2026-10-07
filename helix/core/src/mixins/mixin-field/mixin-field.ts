@@ -657,6 +657,17 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
     protected copyValidity(
       control: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement,
     ): void {
+      /* **A control barred from validation has no verdict to copy.** A
+         read-only, disabled, or fieldset-disabled `<input type="url">` holding
+         `nope` keeps `typeMismatch` in its validity while its
+         `validationMessage` is empty, and `setValidity` refuses a flag with no
+         words. Measured in Chromium before this: every update of such an
+         Input threw. The platform submits a barred control as it is, so the
+         host reports nothing wrong either. */
+      if (!control.willValidate) {
+        this.internals.setValidity({})
+        return
+      }
       /* An empty sentence is no sentence: the page has not said anything, and
          a verdict with a flag and no words is one `setValidity` refuses. */
       const message =
