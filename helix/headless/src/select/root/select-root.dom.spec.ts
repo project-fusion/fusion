@@ -75,6 +75,28 @@ describe('select', () => {
     expect(formValue(host)).toBe('one')
   })
 
+  /* An option whose value held a comma was never shown as chosen: the value
+     was split on the comma and neither half was an option. With `multiple`
+     the form sent the halves as two answers. */
+  test('an option whose value holds a comma is chosen whole', async () => {
+    const markup = (extra: string): string => `<helix-headless-select label="M" name="m" ${extra}>
+      <helix-headless-option value="x,y">XY</helix-headless-option>
+      <helix-headless-option value="z">Zed</helix-headless-option>
+    </helix-headless-select>`
+    const one = (await mount(markup('value="x,y"'))) as HTMLElement & { value: string }
+    await settle(one as unknown as Updatable)
+    expect(shown(one as unknown as Updatable)).toBe('XY')
+    expect(formValue(one)).toBe('x,y')
+    const several = (await mount(markup('multiple value="z,x,y"'))) as HTMLElement
+    await settle(several as unknown as Updatable)
+    expect(shown(several as unknown as Updatable)).toBe('XY, Zed')
+    expect((formValue(several) as FormData).getAll('m')).toEqual(['z', 'x,y'])
+    const options = [...several.querySelectorAll('helix-headless-option')] as (HTMLElement & {
+      selected: boolean
+    })[]
+    expect(options.map((option) => option.selected)).toEqual([true, true])
+  })
+
   test('required says so in its own words once asked', async () => {
     const host = await select('required')
     expect(part(host as HTMLElement, 'feedback')).toBeNull()

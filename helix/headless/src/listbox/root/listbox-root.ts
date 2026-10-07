@@ -1,6 +1,7 @@
 import {
   AriaForwardController,
   centerInView,
+  chosenValues,
   columnStep,
   countLabel,
   customElement,
@@ -74,7 +75,9 @@ type Entry = HelixHeadlessOption | (DataOption & { href?: undefined })
  * With `multiple` set, `value` is a comma-separated string, like
  * `Checkbox.Group`'s, because `MixinControllerValue` holds a string. The form
  * receives one entry per selected option, as a native `<select multiple>` sends
- * it, so your server does not split on commas.
+ * it, so your server does not split on commas. An option's value may hold a
+ * comma: a run of the string that is an option's value is read as that one
+ * value, and the form sends it as one entry.
  *
  * Selected and active are separate. The selected option is the value. The
  * active option is where the keyboard is: the arrow keys move it, and
@@ -697,9 +700,18 @@ export class HelixHeadlessListbox extends MixinCollection(
     return this.entries.filter((option) => !option.hidden)
   }
 
-  /** The chosen values, as an array whether or not `multiple` is set. */
+  /**
+   * The chosen values, as an array whether or not `multiple` is set.
+   *
+   * Read against the options' values, so an option whose value holds a comma
+   * is one value. See `chosenValues`.
+   */
   get values(): string[] {
-    return this.value === '' ? [] : this.value.split(',')
+    return chosenValues(
+      this.value,
+      new Set(this.entries.map((option) => option.value)),
+      this.multiple,
+    )
   }
 
   /**
@@ -1093,10 +1105,13 @@ export class HelixHeadlessListbox extends MixinCollection(
       return
     }
     const present = new Set(this.entries.map((option) => option.value))
-    const gone = this.values.filter((value) => this.seen.has(value) && !present.has(value))
+    /* Read against the options that were there as well, so a removed option
+       whose value holds a comma is still read as one value. */
+    const held = chosenValues(this.value, new Set([...present, ...this.seen]), this.multiple)
+    const gone = held.filter((value) => this.seen.has(value) && !present.has(value))
     this.seen = present
     if (gone.length > 0) {
-      this.value = this.values.filter((value) => !gone.includes(value)).join(',')
+      this.value = held.filter((value) => !gone.includes(value)).join(',')
     }
   }
 
@@ -1126,7 +1141,7 @@ export class HelixHeadlessListbox extends MixinCollection(
        sends them; see `reportValues`. One answer as the string it is, since
        a single option's value may hold a comma. */
     if (this.multiple) {
-      reportValues(this.internals, this.name, this.value === '' ? [] : this.value.split(','))
+      reportValues(this.internals, this.name, this.values)
     } else {
       this.internals.setFormValue(this.value === '' ? null : this.value)
     }
@@ -1226,7 +1241,7 @@ export class HelixHeadlessListbox extends MixinCollection(
    * alone points `aria-activedescendant` at nothing until a key has moved it.
    */
   private get currentValue(): string {
-    return this.activeValue || (this.value.split(',')[0] ?? '')
+    return this.activeValue || (this.values[0] ?? '')
   }
 
   /*
