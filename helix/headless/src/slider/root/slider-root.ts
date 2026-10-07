@@ -1,12 +1,14 @@
 import {
   AriaForwardController,
   customElement,
-  fillTemplate,
   formatNumber,
+  formatWords,
   HelixFormElement,
   MixinControllerValue,
   MixinField,
   restoreValue,
+  words,
+  wordsLocale,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -100,6 +102,12 @@ import { property } from 'lit/decorators.js'
  */
 @customElement('helix-headless-slider')
 export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFormElement)) {
+  /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-slider': { rangeText: '{start} bis {end}' } })`.
+   */
+  static words = 'helix-slider'
+
   /* A consumer's `aria-describedby` names ids in their own tree and the control
      is in this shadow root, so the reference has to be carried down as an
      element rather than copied as an id. See `AriaForwardController`: measured
@@ -133,8 +141,8 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   formatter?: (value: number) => string
 
   /**
-   * The locale `format-options` writes the value in, such as `de-DE`. Empty is
-   * the reader's own.
+   * The locale the value and the words are written in, such as `de-DE`. Empty
+   * reads the nearest `lang`, then the browser's language.
    */
   @property()
   locale = ''
@@ -178,6 +186,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
    * had thumbs called "minimum" and "maximum" and nothing else. The word is a
    * property, like every other word a control speaks.
    */
+  @words
   @property({ attribute: 'maximum-label' })
   maximumLabel = 'maximum'
 
@@ -188,6 +197,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   min = 0
 
   /** The name of a range's lower thumb, read after the slider's label. */
+  @words
   @property({ attribute: 'minimum-label' })
   minimumLabel = 'minimum'
 
@@ -235,6 +245,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
    * How the readout joins a range's two values, with `{start}` and `{end}`
    * filled in. Write it in the page's language, such as `{start} bis {end}`.
    */
+  @words
   @property({ attribute: 'range-text' })
   rangeText = '{start} to {end}'
 
@@ -281,7 +292,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   private get reserve(): number {
     const widest = Math.max(this.said(this.min).length, this.said(this.max).length)
     return this.range
-      ? widest * 2 + fillTemplate(this.rangeText, { end: '', start: '' }).length
+      ? widest * 2 + formatWords(this, 'rangeText', { end: '', start: '' }).length
       : widest
   }
 
@@ -540,13 +551,15 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
     if (this.formatter) {
       return this.formatter(number)
     }
-    return this.formatOptions ? formatNumber(number, this.locale, this.formatOptions) : String(at)
+    return this.formatOptions
+      ? formatNumber(number, wordsLocale(this), this.formatOptions)
+      : String(at)
   }
 
   /** What a screen reader says for one thumb, where `value-text` asks. */
   private spoken(at: number | string): string | typeof nothing {
     if (this.valueText) {
-      return fillTemplate(this.valueText, { value: this.said(at) })
+      return formatWords(this, 'valueText', { value: this.said(at) })
     }
     return this.formats ? this.said(at) : nothing
   }
@@ -736,7 +749,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
               style=${`--_slider-output-reserve: ${this.reserve}ch`}
               >${
                 this.range
-                  ? fillTemplate(this.rangeText, { end: this.said(end), start: this.said(start) })
+                  ? formatWords(this, 'rangeText', { end: this.said(end), start: this.said(start) })
                   : this.said(this.value)
               }</output
             >`

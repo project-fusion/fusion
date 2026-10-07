@@ -1,6 +1,7 @@
 import {
   AriaForwardController,
   customElement,
+  formatWords,
   HelixCompleteEvent,
   HelixFormElement,
   MixinControllerValue,
@@ -8,6 +9,7 @@ import {
   restoreValue,
   submitImplicitly,
   verdictFlags,
+  words,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -120,6 +122,12 @@ const keepFocus = (event: Event): void => event.preventDefault()
  */
 @customElement('helix-headless-pin-input')
 export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(HelixFormElement)) {
+  /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-pin-input': { tooShortMessage: '{length, plural, one {Bitte # Zeichen eingeben.} other {Bitte alle # Zeichen eingeben.}}' } })`.
+   */
+  static words = 'helix-pin-input'
+
   /* A consumer's `aria-describedby` names ids in their own tree and the field
      is in this shadow root, so the reference has to be carried down as an
      element rather than copied as an id. See `AriaForwardController`. */
@@ -161,6 +169,7 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
    * named by `label`, and a screen reader does not meet the boxes. Removed in
    * the next breaking release.
    */
+  @words
   @property({ attribute: 'cell-label' })
   cellLabel = 'Character {index} of {length}'
 
@@ -207,11 +216,14 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
   readOnly = false
 
   /**
-   * The message shown when the code is started and not finished, with
-   * `{length}` filled in. When it is unset, an English default is shown.
+   * The message shown when the code is started and not finished. `{length}`
+   * is how many characters the code has, written in the locale, and each
+   * language writes the forms it has.
    */
+  @words
   @property({ attribute: 'too-short-message' })
-  tooShortMessage?: string
+  tooShortMessage =
+    '{length, plural, one {Please enter the # character.} other {Please enter all # characters.}}'
 
   /**
    * The characters a box accepts, which also sets the keyboard a phone shows.
@@ -511,7 +523,7 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
     const found = verdictFlags(
       codeVerdict(this.value, this.count, this.required, {
         missing: this.valueMissingMessage,
-        short: this.tooShortMessage,
+        short: (length) => formatWords(this, 'tooShortMessage', { length }),
       }),
     )
     this.internals.setValidity(found?.[0] ?? {}, found?.[1] ?? '', control)

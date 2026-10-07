@@ -32,7 +32,13 @@ import { HelixHeadlessButton } from '../../button/root/button-root.js'
  * @csspart button - The inner button.
  */
 @customElement('helix-headless-icon-button')
-export class HelixHeadlessIconButton extends HelixHeadlessButton {}
+export class HelixHeadlessIconButton extends HelixHeadlessButton {
+  /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-icon-button': { pendingLabel: 'Wird geladen' } })`.
+   */
+  static override words = 'helix-icon-button'
+}
 
 declare global {
   interface HTMLElementTagNameMap {

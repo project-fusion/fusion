@@ -11,6 +11,7 @@ import {
   type OwnRule,
   restoreValue,
   submitImplicitly,
+  words,
 } from '@fusion.dev/helix-core'
 import { eye, eyeSlash, x } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -86,6 +87,12 @@ export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'te
  */
 @customElement('helix-headless-input')
 export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFormElement)) {
+  /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-input': { clearLabel: 'Leeren' } })`.
+   */
+  static words = 'helix-input'
+
   /* A consumer's `aria-describedby` names ids in their own tree and the control
      is in this shadow root, so the reference has to be carried down as an
      element rather than copied as an id. See `AriaForwardController`: measured
@@ -129,6 +136,7 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
   /**
    * The accessible name of the clear button, which shows only an icon.
    */
+  @words
   @property({ attribute: 'clear-label' })
   clearLabel = 'Clear'
 
@@ -480,6 +488,7 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
    *
    * The state is `aria-pressed`, not this.
    */
+  @words
   @property({ attribute: 'reveal-label' })
   revealLabel = 'Show password'
 

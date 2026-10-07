@@ -7,6 +7,7 @@ import {
   HelixFormElement,
   hostAria,
   MixinField,
+  words,
 } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type ReactiveController, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -84,6 +85,12 @@ import { type SetBox, selectAllPress, selectAllState } from '../select-all.js'
  */
 @customElement('helix-headless-checkbox-group')
 export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
+  /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-checkbox-group': { selectAllLabel: 'Alle auswählen' } })`.
+   */
+  static words = 'helix-checkbox-group'
+
   /* `name` is inherited from `HelixFormElement`, reflected and with the
      converter that makes an empty one absent rather than `name=""`. What it
      means differs slightly and the property does not: the group submits nothing
@@ -98,6 +105,7 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
   /**
    * The words beside the box `select-all` draws.
    */
+  @words
   @property({ attribute: 'select-all-label' })
   selectAllLabel = 'Select all'
 

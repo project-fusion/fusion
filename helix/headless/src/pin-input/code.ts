@@ -1,4 +1,4 @@
-import { fillTemplate, type PickerVerdict } from '@fusion.dev/helix-core'
+import type { PickerVerdict } from '@fusion.dev/helix-core'
 
 /** What a box accepts, which decides the keyboard a phone offers. */
 export type PinType = 'alphanumeric' | 'numeric' | 'text'
@@ -76,19 +76,19 @@ export const overwriteCode = (code: string, at: number, text: string, count: num
   return { caret: Math.min(count - 1, start + text.length), code: characters.join('') }
 }
 
-/** The messages a code's verdict is written with, where the page set its own. */
+/** The messages a code's verdict is written with. */
 export interface CodeMessages {
   /** For a code with no characters in a required field. */
   missing?: string | undefined
-  /** For a code with fewer characters than boxes; `{length}` is how many. */
-  short?: string | undefined
+  /** For a code with fewer characters than boxes, written for how many there are. */
+  short: (length: number) => string
 }
 
 /**
  * What is wrong with a code, as a picker field reports it: a required field
  * with nothing in it is missing, a code with fewer characters than boxes is
- * too short, and anything else is fine (`''`). The platform's own words where
- * the page set none.
+ * too short, and anything else is fine (`''`). The platform's own words for a
+ * missing code where the page set none.
  */
 export const codeVerdict = (
   code: string,
@@ -100,10 +100,7 @@ export const codeVerdict = (
     return ['valueMissing', messages.missing || 'Please fill in this field.']
   }
   if (code !== '' && code.length < count) {
-    return [
-      'tooShort',
-      fillTemplate(messages.short || 'Please enter all {length} characters.', { length: count }),
-    ]
+    return ['tooShort', messages.short(count)]
   }
   return ''
 }

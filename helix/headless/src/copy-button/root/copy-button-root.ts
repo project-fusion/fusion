@@ -1,4 +1,4 @@
-import { CopyController, customElement, HelixCopyErrorEvent } from '@fusion.dev/helix-core'
+import { CopyController, customElement, HelixCopyErrorEvent, words } from '@fusion.dev/helix-core'
 import { check, copy, x } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -77,11 +77,18 @@ import '../../tooltip/index.js'
 @customElement('helix-headless-copy-button')
 export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-copy-button': { copiedLabel: 'Kopiert' } })`.
+   */
+  static override words = 'helix-copy-button'
+
+  /**
    * The button's name and tooltip text after a copy.
    *
    * `attribute` written out, because Lit lowercases a property name rather than
    * dash-casing it, and `copiedlabel` is not what anyone would type.
    */
+  @words
   @property({ attribute: 'copied-label' })
   copiedLabel = 'Copied'
 
@@ -89,6 +96,7 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
    * The button's name and tooltip text after a press that put nothing on the
    * clipboard.
    */
+  @words
   @property({ attribute: 'error-label' })
   errorLabel = 'Could not copy'
 
@@ -115,6 +123,7 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
    * the name of this one is not a judgment call: every copy button in the
    * world is called Copy. A consumer with a better word still sets it.
    */
+  @words
   @property()
   override label = 'Copy'
 
