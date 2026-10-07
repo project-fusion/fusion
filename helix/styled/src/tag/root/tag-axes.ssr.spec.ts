@@ -38,14 +38,22 @@ describe('tag visual axes', () => {
     expect(styles(served)).toContain(':host([tone="danger"])')
   })
 
+  test('shape reflects, which is the only channel the sheet has to it', () => {
+    // shape: a pill's fully rounded ends.
+    const served = ssr(html`<helix-tag .shape=${'pill'}></helix-tag>`)
+    expect(hostTag(served, TAG)).toContain('shape="pill"')
+    expect(styles(served)).toContain(':host([shape="pill"])')
+  })
+
   test('and one that asked for no axis carries none', () => {
     /* Undefaulted, which is the rule a reflected property comes with: one
        with a default writes its attribute onto every host anybody renders,
        and the sheet then has to describe the resting arrangement as well as
        the departure.
-       The axes here are `emphasis` and `tone`. */
+       The axes here are `emphasis`, `shape` and `tone`. */
     const bare = hostTag(ssr(html`<helix-tag></helix-tag>`), TAG)
     expect(bare).not.toContain('emphasis=')
     expect(bare).not.toContain('tone=')
+    expect(bare).not.toContain('shape=')
   })
 })
