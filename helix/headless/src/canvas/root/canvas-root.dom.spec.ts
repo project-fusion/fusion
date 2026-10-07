@@ -2857,3 +2857,96 @@ describe('what a screen reader calls a canvas', () => {
     expect(part(unnamed, 'region')?.hasAttribute('aria-roledescription')).toBe(false)
   })
 })
+
+/* A route of a board's own was three, curve, straight and step, and a page
+   that wanted its lines to bend around the cards between had no way in. */
+describe('a route of your own', () => {
+  type Routed = Canvas & {
+    route?: (ends: {
+      edge: { id: string }
+      end: { x: number; y: number }
+      fromSide: string
+      path: string
+      start: { x: number; y: number }
+      toSide: string
+    }) => { d: string; mid?: { x: number; y: number } } | undefined
+  }
+  /** The path a connection is pressed along, and the one it paints after it. */
+  const drawn = (host: Canvas, name: string): string[] => {
+    const target = host.shadowRoot?.querySelector(`[part="edge-target"][data-edge="edge:${name}"]`)
+    return [target, target?.nextElementSibling].map((one) => one?.getAttribute('d') ?? '')
+  }
+
+  test('draws the line it returns, pressed and focused along the same path', async () => {
+    const host = (await canvas()) as Routed
+    const asked: string[] = []
+    host.route = ({ edge, end, fromSide, path, start, toSide }) => {
+      asked.push(`${edge.id} ${fromSide}->${toSide} ${path}`)
+      return { d: `M ${start.x} ${start.y} V ${end.y} H ${end.x}` }
+    }
+    await host.updateComplete
+    expect(asked).toContain('e1 right->left curve')
+    const [target, line] = drawn(host, 'e1')
+    expect(target).toMatch(/^M [\d.-]+ [\d.-]+ V [\d.-]+ H [\d.-]+$/)
+    expect(line).toBe(target)
+  })
+
+  test('nothing back, or a throw, draws the board’s own, and the throw is reported', async () => {
+    const host = (await canvas()) as Routed
+    const [own] = drawn(host, 'e1')
+    expect(own).toMatch(/^M /)
+    host.route = () => undefined
+    await host.updateComplete
+    expect(drawn(host, 'e1')[0]).toBe(own as string)
+    const reported: unknown[] = []
+    const original = globalThis.reportError
+    globalThis.reportError = (error: unknown) => reported.push(error)
+    try {
+      host.route = () => {
+        throw new Error('no route')
+      }
+      await host.updateComplete
+    } finally {
+      globalThis.reportError = original
+    }
+    expect(drawn(host, 'e1')[0]).toBe(own as string)
+    expect(reported.length).toBeGreaterThan(0)
+  })
+})
+
+/* A board larger than its frame had no picture of the whole of it, and a
+   reader far out on one side had to pan back to find the rest. */
+describe('the minimap', () => {
+  test('is drawn only where `controls` names it, a box per card, hidden from screen readers', async () => {
+    expect(part(await canvas(), 'minimap')).toBeNull()
+    const host = await canvas('controls="zoom minimap"')
+    const minimap = part(host, 'minimap') as SVGSVGElement
+    expect(minimap.getAttribute('aria-hidden')).toBe('true')
+    expect(minimap.querySelectorAll('[part="minimap-node"]')).toHaveLength(4)
+    expect(minimap.querySelectorAll('[part="minimap-node"][data-group]')).toHaveLength(1)
+    expect(minimap.querySelectorAll('[part="minimap-view"]')).toHaveLength(1)
+    expect(minimap.hasAttribute('tabindex')).toBe(false)
+  })
+
+  test('draws nothing for an empty board', async () => {
+    expect(part(await canvas('controls="minimap"', ''), 'minimap')).toBeNull()
+  })
+
+  test('a press on it moves the view, and the board says so', async () => {
+    const host = await canvas('controls="minimap"')
+    const views: unknown[] = []
+    host.addEventListener('helix-canvas-view', (event) => views.push((event as CustomEvent).detail))
+    const minimap = part(host, 'minimap') as SVGSVGElement
+    const frame = (): string => {
+      const view = minimap.querySelector('[part="minimap-view"]') as SVGRectElement
+      return `${view.getAttribute('x')},${view.getAttribute('y')}`
+    }
+    const was = frame()
+    minimap.dispatchEvent(
+      new PointerEvent('pointerdown', { bubbles: true, button: 0, clientX: 40, clientY: 30 }),
+    )
+    await host.updateComplete
+    expect(views).toHaveLength(1)
+    expect(frame()).not.toBe(was)
+  })
+})

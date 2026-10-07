@@ -46,6 +46,8 @@ import {
   type CanvasDocument,
   type CanvasEdge,
   type CanvasNode,
+  type CanvasPath,
+  type CanvasRoute,
   type CanvasSide,
   type CanvasTone,
   colorOf,
@@ -67,6 +69,8 @@ export type {
   CanvasNode,
   CanvasNodeProps,
   CanvasPath,
+  CanvasRoute,
+  CanvasRouteEnds,
   CanvasSide,
   CanvasTone,
 } from './canvas-document.js'
@@ -287,6 +291,17 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  * connection is a new element, and React discards an element the board adds to
  * its markup on the next render, so you write the connection.
  *
+ * **`route` draws the connections' lines yourself**: a function from where a
+ * line leaves and arrives, and the sides it does, to its SVG path, for a route
+ * of your own such as one that bends around the cards between. What it returns
+ * is the line drawn, the line pressed and focused, and the one an arrowhead
+ * sits at the end of. Nothing back draws the board's own.
+ *
+ * Add `minimap` to `controls` for a picture of the whole board in a corner:
+ * each card as a box, and a frame around what is on screen. A press or a drag
+ * on it brings that place to the middle of the view. It is for a pointer, and
+ * a screen reader skips it: the arrow keys and `show()` reach every card.
+ *
  * Cards and connections are `helix-canvas-node` and `helix-canvas-edge`
  * elements, so they are in the served markup whichever renderer wrote them. The
  * library fetches nothing, and an array passed to an element is missing from
@@ -343,6 +358,9 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  * @csspart label-editor - The field for editing a connection's label or a group's name, placed over that text.
  * @csspart live - A live region that screen readers announce while a connection is being made.
  * @csspart marquee - The box a Shift-drag across the empty board draws, which selects the cards it touches.
+ * @csspart minimap - The picture of the whole board, under `controls="minimap"`.
+ * @csspart minimap-node - One card in the minimap.
+ * @csspart minimap-view - The frame in the minimap around what is on screen.
  * @csspart pan-down - The button that moves the board down.
  * @csspart pan-end - The button that moves the board toward the end of a line of text: right in English.
  * @csspart pan-start - The button that moves the board toward the start of a line of text: left in English.
@@ -556,6 +574,17 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   @words
   @property({ attribute: 'role-label' })
   roleLabel = 'canvas'
+
+  /**
+   * Draws every connection's line: a function from where it leaves and
+   * arrives, and the sides it does, to its SVG path and where its label sits.
+   *
+   * Absent, or returning nothing for a connection, draws the board's own
+   * route. A function that throws draws the board's own too, and the error is
+   * reported to the page as an uncaught one. Set it as a property.
+   */
+  @property({ attribute: false })
+  route?: CanvasRoute
 
   /**
    * The names of the selected cards and connections, comma separated. Empty
@@ -1563,7 +1592,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     if (!from || !to) {
       return undefined
     }
-    const drawn = connector(
+    const drawn = this.draw(
       edge,
       onPlane(from, origin),
       onPlane(to, origin),
@@ -1571,6 +1600,29 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       heads(edge),
     )
     return { ...drawn, from, to }
+  }
+
+  /** One connection's line, by `route` where it draws one, and by the board's own where not. */
+  private draw(
+    edge: CanvasEdge,
+    from: CanvasNode,
+    to: CanvasNode,
+    path: CanvasPath,
+    drawnHeads: { start: boolean; end: boolean },
+  ): { d: string; mid: { x: number; y: number } } {
+    if (this.route) {
+      const { end, fromSide, start, toSide } = ends(edge, from, to)
+      let own: ReturnType<CanvasRoute>
+      try {
+        own = this.route({ edge, end, fromSide, path, start, toSide })
+      } catch (error) {
+        globalThis.reportError?.(error)
+      }
+      if (own?.d) {
+        return { d: own.d, mid: own.mid ?? { x: (start.x + end.x) / 2, y: (start.y + end.y) / 2 } }
+      }
+    }
+    return connector(edge, from, to, path, drawnHeads)
   }
 
   /** The card an event came from, wherever inside it the event began. */
@@ -4129,7 +4181,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     if (target) {
       const reversed = linking.moving === 'from'
       const [from, to] = reversed ? [target, anchor] : [anchor, target]
-      const drawn = connector(
+      const drawn = this.draw(
         {
           fromNode: from.id,
           fromSide: reversed ? linking.toSide : linking.side,
@@ -4157,6 +4209,111 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       return svg`<path part="draft" aria-hidden="true" d=${`M ${start.x} ${start.y} L ${end.x} ${end.y}`} fill="none" />`
     }
     return nothing
+  }
+
+  /** The part of the document on screen, in its own units. */
+  private get onScreen(): { x: number; y: number; width: number; height: number } {
+    const board = extent(this.nodes)
+    const { height, width } = this.box
+    const { x, y, zoom } = this.at
+    return {
+      height: height / zoom,
+      width: width / zoom,
+      x: board.x - MARGIN - x / zoom,
+      y: board.y - MARGIN - y / zoom,
+    }
+  }
+
+  /** What the minimap shows: every card and what is on screen, with room around them. */
+  private get minimapArea(): { x: number; y: number; width: number; height: number } {
+    const board = extent(this.nodes)
+    const view = this.onScreen
+    const x = Math.min(board.x, view.x)
+    const y = Math.min(board.y, view.y)
+    const width = Math.max(board.x + board.width, view.x + view.width) - x
+    const height = Math.max(board.y + board.height, view.y + view.height) - y
+    const room = Math.max(width, height) * 0.05
+    return {
+      height: height + room * 2,
+      width: width + room * 2,
+      x: x - room,
+      y: y - room,
+    }
+  }
+
+  /**
+   * A press or a drag on the minimap, which brings the place under it to the
+   * middle of the view.
+   *
+   * **The point is read through the picture's own scale**: the area is drawn
+   * whole and centered in the box, so the box's spare width or height is split
+   * either side of it.
+   */
+  private readonly handleMinimapPointer = (event: PointerEvent): void => {
+    if (event.type === 'pointermove' && (event.buttons & 1) === 0) {
+      return
+    }
+    const picture = event.currentTarget as SVGSVGElement
+    if (event.type === 'pointerdown') {
+      if (event.button !== 0) {
+        return
+      }
+      capturePointer(picture, event.pointerId)
+    }
+    event.preventDefault()
+    const area = this.minimapArea
+    const shown = picture.getBoundingClientRect()
+    const scale = Math.min(shown.width / area.width, shown.height / area.height) || 1
+    const point = {
+      x: area.x + (event.clientX - shown.left - (shown.width - area.width * scale) / 2) / scale,
+      y: area.y + (event.clientY - shown.top - (shown.height - area.height * scale) / 2) / scale,
+    }
+    const board = extent(this.nodes)
+    const { zoom } = this.at
+    this.direct = event.type === 'pointermove'
+    this.touched = true
+    this.at = {
+      ...this.at,
+      x: this.box.width / 2 - (point.x - board.x + MARGIN) * zoom,
+      y: this.box.height / 2 - (point.y - board.y + MARGIN) * zoom,
+    }
+  }
+
+  /**
+   * The minimap, under `controls="minimap"`: each card as a box, and a frame
+   * around what is on screen.
+   *
+   * **A picture for a pointer**, hidden from screen readers and taking no
+   * focus, as a map's own overview is: the arrow keys and `show()` already take
+   * a keyboard to any card, and a second way that says nothing a reader can
+   * use would be a stop that does nothing.
+   */
+  private renderMinimap(): TemplateResult | typeof nothing {
+    const nodes = this.nodes
+    if (!this.drawsControls('minimap') || nodes.length === 0) {
+      return nothing
+    }
+    const area = this.minimapArea
+    const view = this.onScreen
+    /* A size of its own, which a sheet overrides: one drawn from the viewBox
+       alone took its height from the area's shape, and in the flow of a
+       headless region that moved the box the area is measured from. */
+    return html`<svg
+      part="minimap"
+      aria-hidden="true"
+      height="120"
+      preserveAspectRatio="xMidYMid meet"
+      viewBox=${`${area.x} ${area.y} ${area.width} ${area.height}`}
+      width="160"
+      @pointerdown=${this.handleMinimapPointer}
+      @pointermove=${this.handleMinimapPointer}
+    >
+      ${nodes.map(
+        (node) =>
+          svg`<rect part="minimap-node" data-group=${node.type === 'group' ? '' : nothing} x=${node.x} y=${node.y} width=${node.width} height=${node.height} />`,
+      )}
+      ${svg`<rect part="minimap-view" x=${view.x} y=${view.y} width=${view.width} height=${view.height} />`}
+    </svg>`
   }
 
   protected override render(): TemplateResult {
@@ -4221,7 +4378,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
         <slot name="empty"></slot>
         ${this.renderGestures()}
       </div>
-      ${this.renderControls()}
+      ${this.renderControls()} ${this.renderMinimap()}
       <span part="live" role="status">${this.said}</span>
       <div part="footer">
         <slot name="footer"></slot>

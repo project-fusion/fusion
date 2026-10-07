@@ -8,6 +8,8 @@ export type {
   CanvasNode,
   CanvasNodeProps,
   CanvasPath,
+  CanvasRoute,
+  CanvasRouteEnds,
   CanvasSide,
   CanvasTone,
 } from './root/canvas-root.js'
