@@ -159,6 +159,7 @@ const firstOf = (year: number, month: number): Date =>
  *
  * @cssproperty --date-picker-column-count - How many month columns are drawn, capped at two. `--date-picker-columns` overrides it.
  *
+ * @cssstate blank - While no date is chosen.
  * @cssstate invalid - While `invalid` is set, `feedback` says what is wrong, the picker holds a date outside `min` and `max` or one it bars, or it is `required`, holds no date, and the reader has answered once or a form has refused it.
  * @cssstate month-view - While the months of a year are shown, where `max-view` is set.
  * @cssstate range-pending - While a `range` holds its first end and waits for the second.
@@ -1257,6 +1258,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
        property says nothing about it. Writing `disabled` here also overwrote
        the answer `HelixFormElement.willUpdate` had just computed. */
     this.internals.ariaDisabled = this.isDisabled ? 'true' : null
+    this.toggleState('blank', this.value === '')
     this.toggleState('range-pending', this.pending)
     this.toggleState('month-view', this.view === 'month')
     this.toggleState('year-view', this.view === 'year')

@@ -188,6 +188,7 @@ const dates = (value: string): string[] =>
  * @csspart trigger - The control that opens the calendar.
  * @csspart trigger-icon - The icon on the button that opens the calendar.
  *
+ * @cssstate blank - The field holds no date.
  * @cssstate invalid - The field has an error to show, from the browser's validation or from your `feedback`.
  * @cssstate open - The calendar is open.
  */
@@ -440,6 +441,7 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    this.toggleState('blank', this.value === '')
     /* A different count, language or calendar is a different width, so what
        was measured no longer answers and every month is shown to be measured
        again at the next placement. */

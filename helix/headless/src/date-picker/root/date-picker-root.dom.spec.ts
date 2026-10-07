@@ -1339,3 +1339,17 @@ describe('a calendar says which view it shows', () => {
     expect(cal.internals.states.has('month-view')).toBe(false)
   })
 })
+
+describe('a calendar with no date chosen', () => {
+  test('is blank, as a state', async () => {
+    const cal = (await calendar('default-month="2026-08"')) as DatePicker & {
+      internals: ElementInternals
+      updateComplete: Promise<unknown>
+      value: string
+    }
+    expect(cal.internals.states.has('blank')).toBe(true)
+    cal.value = '2026-08-04'
+    await cal.updateComplete
+    expect(cal.internals.states.has('blank')).toBe(false)
+  })
+})

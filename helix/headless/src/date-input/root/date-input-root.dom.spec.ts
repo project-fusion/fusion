@@ -1299,3 +1299,13 @@ describe('a clearable date input', () => {
     expect(part(await field('default-value="2026-08-04"'), 'clear')).toBeNull()
   })
 })
+
+describe('a date input holding nothing', () => {
+  test('is blank, as a state', async () => {
+    const host = (await field()) as InputDate & { internals: ElementInternals }
+    expect(host.internals.states.has('blank')).toBe(true)
+    host.value = '2026-08-04'
+    await host.updateComplete
+    expect(host.internals.states.has('blank')).toBe(false)
+  })
+})
