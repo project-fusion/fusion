@@ -169,6 +169,17 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
   filterDelay = 0
 
   /**
+   * Whether a command is kept by the filter: a function given the command's
+   * words and the filter, trimmed, that returns `true` to keep it showing, as
+   * React Aria's `Autocomplete` takes `filter`. See Listbox's `filterMatch`.
+   *
+   * Absent, a command is kept where its words hold the filter, in any case. A
+   * property only, there being no way to write a function in markup.
+   */
+  @property({ attribute: false })
+  filterMatch?: ((text: string, filter: string) => boolean) | undefined
+
+  /**
    * The key that opens the palette, written as `mod+k`, `shift+p`, or `k`,
    * in Kbd's chord spelling: `mod` is Command or Control, `ctrl`, `cmd`,
    * `alt` and `shift` the keys they name.
@@ -653,6 +664,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
         aria-label=${this.listName}
         empty-text=${this.emptyText}
         filter-delay=${this.filterDelay}
+        .filterMatch=${this.filterMatch}
         filter-label=${this.placeholder}
         load-error=${this.loadError}
         loading-text=${this.loadingText}

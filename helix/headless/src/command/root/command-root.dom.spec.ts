@@ -476,6 +476,30 @@ describe('a palette of commands given as data', () => {
   })
 })
 
+/* The palette matched a command only where its words held the filter, and
+   React Aria's Autocomplete takes a `filter` function for anything else. */
+describe('a palette given a filter match', () => {
+  test('keeps the commands the function keeps', async () => {
+    const host = (await palette()) as Palette & {
+      filterMatch: (text: string, filter: string) => boolean
+    }
+    const initials = (text: string): string =>
+      text
+        .split(' ')
+        .map((word) => word[0]?.toLowerCase())
+        .join('')
+    host.filterMatch = (text, filter) => initials(text).startsWith(filter.toLowerCase())
+    host.open = true
+    await settle(host)
+    listbox(host).requestFilter('sc')
+    await settle(host)
+    const shown = [...host.querySelectorAll('helix-headless-option')]
+      .filter((option) => !(option as HTMLElement).hidden)
+      .map((option) => option.getAttribute('value'))
+    expect(shown).toEqual(['theme'])
+  })
+})
+
 describe('a palette drawn in the page', () => {
   /* The palette could only open in a dialog, where React Aria's Autocomplete
      is a search over a list drawn where it stands. */
