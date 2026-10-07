@@ -60,7 +60,9 @@ import { type DiffFile, type DiffHunk, type DiffLine, pairLines, parsePatch } fr
  * removed. The block never computes a diff itself. Line numbers come from the
  * hunk headers and are hidden from the accessibility tree. Changed lines are
  * `<ins>` and `<del>` with the `+` and `-` kept as text, so the change does not
- * depend on color. Each file in the patch is its own block under its own name,
+ * depend on color. Where a removed line is paired with the added line that
+ * replaced it, the words each does not share with the other are the `changed`
+ * part, so the eye goes to what changed within the line. Each file in the patch is its own block under its own name,
  * and its copy button copies the new version of the file. `variant="split"`
  * shows the old version beside the new, each removal opposite its replacement.
  *
@@ -99,6 +101,7 @@ import { type DiffFile, type DiffHunk, type DiffLine, pairLines, parsePatch } fr
  * @csspart added - In a diff, a line only the new version has, an `<ins>`.
  * @csspart block - The scrolling `<pre>`.
  * @csspart code - The `<code>` inside it.
+ * @csspart changed - In a diff, the words of a changed line that the line opposite it does not have, inside its `text`.
  * @csspart context - In a diff, a line both versions share.
  * @csspart copy - The copy button. It sits in the header when there is one, and beside the code otherwise.
  * @csspart copy-button - The inner button.
@@ -821,7 +824,14 @@ export class HelixHeadlessCodeBlock extends HelixElement {
     const numbers = side
       ? this.renderNumber(side === 'old' ? line.old : line.new, width)
       : html`${this.renderNumber(line.old, width)}${this.renderNumber(line.new, width)}`
-    const text = html`<span part="text">${line.text}\n</span>`
+    /* The words a changed line does not share with its pair, marked for the
+       eye alone: the line's own `<ins>` or `<del>` already says what it is. */
+    const words = line.pieces
+      ? line.pieces.map((piece) =>
+          piece.changed ? html`<span part="changed">${piece.text}</span>` : piece.text,
+        )
+      : line.text
+    const text = html`<span part="text">${words}\n</span>`
     if (line.kind === 'added') {
       return html`<ins part="added">${numbers}<span part="marker">+</span>${text}</ins>`
     }

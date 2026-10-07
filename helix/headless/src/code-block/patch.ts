@@ -8,11 +8,22 @@
  * depends on, out of a component library. What is left is punctuation: a header
  * per file, a `@@` per hunk, and a first character per line.
  *
+ * **Within a changed line it does compare.** A removed line and the added line
+ * paired with it are compared word by word, which takes two short strings and
+ * no dependency, so a reader sees which words changed without comparing two
+ * whole lines by eye.
+ *
  * **Line numbers come from the hunk headers**, so they are the file's numbers
  * rather than the diff's, which is the only kind a reader can look up. A line
  * that is not in a hunk is not in the output: file headers, `index` lines and
  * `diff --git` are metadata, and a name is taken from them and nothing else.
  */
+
+/** A run of a changed line's text, and whether the line it is paired with lacks it. */
+export interface DiffPiece {
+  changed: boolean
+  text: string
+}
 
 /** One line of a hunk, as the unified format marks it. */
 export interface DiffLine {
@@ -22,6 +33,11 @@ export interface DiffLine {
   /** The number on the new side, absent for a line that only the old side has. */
   new?: number
   text: string
+  /**
+   * The line's text in runs, where it replaced a line or was replaced by one
+   * and the two share some words. Absent for every other line.
+   */
+  pieces?: DiffPiece[]
 }
 
 /** A `@@` header and the lines under it. */
@@ -129,7 +145,106 @@ export const parsePatch = (patch: string): DiffFile[] => {
       }
     }
   }
+  for (const one of files) {
+    for (const { lines } of one.hunks) {
+      markWords(lines)
+    }
+  }
   return files
+}
+
+/** Words, runs of space, and single marks: what a changed line is compared in. */
+const TOKEN = /[\p{L}\p{N}_]+|\s+|[^\p{L}\p{N}_\s]/gu
+
+/**
+ * Past this many tokens on either line, the comparison costs more than the
+ * marks are worth, and the line is drawn whole, as GitHub draws a long one.
+ */
+const MOST_TOKENS = 200
+
+/** Joins neighboring runs that are both changed or both shared. */
+const joined = (pieces: DiffPiece[]): DiffPiece[] => {
+  const out: DiffPiece[] = []
+  for (const piece of pieces) {
+    const last = out.at(-1)
+    if (last && last.changed === piece.changed) {
+      last.text += piece.text
+    } else {
+      out.push({ ...piece })
+    }
+  }
+  return out
+}
+
+/**
+ * The runs of two paired lines that the other line does not have, by the
+ * longest run of words they share in order.
+ *
+ * **Space between two changes is part of the change**, so "a b" replaced by
+ * "c d" is one run, with no gap for the eye to bridge. Two lines
+ * that share no word share nothing worth marking: the whole line is the
+ * change, which its own wash already says, and `undefined` draws it whole.
+ */
+export const changedWords = (
+  before: string,
+  after: string,
+): [DiffPiece[], DiffPiece[]] | undefined => {
+  const a = before.match(TOKEN) ?? []
+  const b = after.match(TOKEN) ?? []
+  if (a.length === 0 || b.length === 0 || a.length > MOST_TOKENS || b.length > MOST_TOKENS) {
+    return undefined
+  }
+  /* The longest common subsequence, filled from the ends so each row reads
+     forward. */
+  const width = b.length + 1
+  const table = new Uint16Array((a.length + 1) * width)
+  for (let i = a.length - 1; i >= 0; i -= 1) {
+    for (let j = b.length - 1; j >= 0; j -= 1) {
+      table[i * width + j] =
+        a[i] === b[j]
+          ? (table[(i + 1) * width + j + 1] as number) + 1
+          : Math.max(table[(i + 1) * width + j] as number, table[i * width + j + 1] as number)
+    }
+  }
+  const left: DiffPiece[] = []
+  const right: DiffPiece[] = []
+  let shared = false
+  let i = 0
+  let j = 0
+  while (i < a.length || j < b.length) {
+    if (i < a.length && j < b.length && a[i] === b[j]) {
+      shared ||= (a[i] as string).trim() !== ''
+      left.push({ changed: false, text: a[i] as string })
+      right.push({ changed: false, text: b[j] as string })
+      i += 1
+      j += 1
+    } else if (
+      j >= b.length ||
+      (i < a.length &&
+        (table[(i + 1) * width + j] as number) >= (table[i * width + j + 1] as number))
+    ) {
+      left.push({ changed: true, text: a[i] as string })
+      i += 1
+    } else {
+      right.push({ changed: true, text: b[j] as string })
+      j += 1
+    }
+  }
+  if (!shared) {
+    return undefined
+  }
+  const bridged = (pieces: DiffPiece[]): DiffPiece[] =>
+    joined(
+      pieces.map((piece, at) =>
+        !piece.changed &&
+        piece.text.trim() === '' &&
+        pieces[at - 1]?.changed &&
+        pieces[at + 1]?.changed
+          ? { ...piece, changed: true }
+          : piece,
+      ),
+    )
+  return [bridged(left), bridged(right)]
 }
 
 /**
@@ -165,4 +280,21 @@ export const pairLines = (lines: DiffLine[]): DiffRow[] => {
     }
   }
   return rows
+}
+
+/**
+ * Marks the words each changed line does not share with the line it is paired
+ * with, the pairs being the ones the side-by-side view puts opposite each
+ * other, so both views mark the same words.
+ */
+const markWords = (lines: DiffLine[]): void => {
+  for (const { left, right } of pairLines(lines)) {
+    if (left?.kind !== 'removed' || right?.kind !== 'added') {
+      continue
+    }
+    const pieces = changedWords(left.text, right.text)
+    if (pieces) {
+      ;[left.pieces, right.pieces] = pieces
+    }
+  }
 }
