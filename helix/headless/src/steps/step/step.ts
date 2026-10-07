@@ -11,7 +11,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { check, circle, record } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html } from 'lit/static-html.js'
 /* Relative, so this registers the base button and the styled file's identical
@@ -43,6 +43,10 @@ import '../../button/index.js'
  * becomes complete while the page is open says it once in a polite live
  * region. The current stage's button carries `aria-current="step"`, and only
  * the button, so the state is said once, on the control.
+ *
+ * A stage's `content`, while it holds anything, is a group named by the
+ * stage's name, so a screen reader moving into it hears which stage it
+ * belongs to.
  *
  * @since 0.1.0
  * @status stable
@@ -144,6 +148,25 @@ export class HelixHeadlessStep extends HelixElement {
   @property()
   value = ''
 
+  /** Whether anything is slotted into `content`, which makes it a named group. */
+  @state()
+  private holding = false
+
+  /** Reads whether the `content` slot holds anything. */
+  private readonly readContent = (): void => {
+    const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="content"]')
+    this.holding = (slot?.assignedNodes() ?? []).some(
+      (node) => node.nodeType === Node.ELEMENT_NODE || (node.textContent ?? '').trim() !== '',
+    )
+  }
+
+  /* Read once rendered as well as on `slotchange`, which an engine need not
+     send for what was assigned before the slot existed. */
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.readContent()
+  }
+
   /** Says a stage was finished, from the first time one is. */
   private readonly status = new StatusController(this)
 
@@ -236,6 +259,7 @@ export class HelixHeadlessStep extends HelixElement {
    */
   protected renderLabel(): TemplateResult {
     return html`<${this.tag('button')}
+      id="label"
       part="label"
       exportparts="button: label-button, live: label-live, spinner: label-spinner, text: label-text"
       emphasis="ghost"
@@ -269,7 +293,11 @@ export class HelixHeadlessStep extends HelixElement {
         ${this.renderLabel()}
         <span part="description"><slot name="description"></slot></span>
       </span>
-      <div part="content"><slot name="content"></slot></div>${drawStatus(this.status)}`
+      <div
+        part="content"
+        role=${this.holding ? 'group' : nothing}
+        aria-labelledby=${this.holding ? 'label' : nothing}
+      ><slot name="content" @slotchange=${this.readContent}></slot></div>${drawStatus(this.status)}`
   }
 }
 
