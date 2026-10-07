@@ -48,6 +48,51 @@ const windowFor = (
   return { owner, window: controller.window }
 }
 
+/* A strip of cards scrolled sideways read its window off `scrollTop`, which
+   is always zero there, so the window never moved past the first cards. */
+describe('a set that runs across the box', () => {
+  const across = (scrollLeft: number, direction = 'ltr') => {
+    const element = {
+      addEventListener: () => {},
+      clientHeight: 0,
+      clientWidth: 320,
+      removeEventListener: () => {},
+      scrollLeft,
+      scrollTop: 0,
+    } as unknown as HTMLElement
+    const was = globalThis.getComputedStyle
+    globalThis.getComputedStyle = (() => ({ direction })) as unknown as typeof getComputedStyle
+    const controller = new VirtualizeController(host(), {
+      container: () => element,
+      count: () => 1000,
+      estimate: () => 32,
+      horizontal: () => true,
+    })
+    controller.measure()
+    return {
+      controller,
+      element,
+      restore: () => {
+        globalThis.getComputedStyle = was
+      },
+    }
+  }
+
+  test('windows by the inline offset and the width of the box', () => {
+    const { controller, restore } = across(3200)
+    expect([controller.window.first, controller.window.last]).toEqual([96, 114])
+    restore()
+  })
+
+  test('reads a right-to-left offset, which counts down from zero, from the start of the line', () => {
+    const { controller, element, restore } = across(-3200, 'rtl')
+    expect(controller.window.first).toBe(96)
+    controller.reveal(10)
+    expect(element.scrollLeft).toBe(-320)
+    restore()
+  })
+})
+
 describe('the window a scroll offset asks for', () => {
   test('starts at the top, with overscan clamped away', () => {
     /* `first` cannot go below zero however much overscan is asked for, or the

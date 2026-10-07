@@ -1129,3 +1129,149 @@ describe('a grid', () => {
     expect(host.value).toBe('Row 1,Row 2,Row 3,Row 4,Row 5,Row 6')
   })
 })
+
+/* A strip of cards could only scroll down: the list had no way across. */
+describe('a list that runs across', () => {
+  const press = async (host: Updatable, key: string) => {
+    ;(document.activeElement as HTMLElement).dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key }),
+    )
+    await settle(host)
+  }
+  const focusedAt = (): string | undefined => (document.activeElement as HTMLElement).dataset.index
+
+  test('lays the rows along a line and windows them by the scroll across', async () => {
+    const host = await fed(named(4000))
+    host.orientation = 'horizontal'
+    await settle(host)
+    const viewport = part(host, 'viewport') as HTMLElement
+    expect(viewport.style.display).toBe('flex')
+    expect((part(host, 'before') as HTMLElement).style.inlineSize).toBe('0px')
+    Object.defineProperty(viewport, 'clientWidth', { configurable: true, value: 192 })
+    viewport.scrollLeft = 320
+    viewport.dispatchEvent(new Event('scroll'))
+    await settle(host)
+    expect((host as unknown as { range: unknown }).range).toEqual({ first: 10, last: 16 })
+  })
+
+  test('moves with Left and Right, and leaves Up and Down to the row', async () => {
+    const host = await fed(named(40))
+    host.orientation = 'horizontal'
+    await settle(host)
+    ;(host.querySelector('[data-index="0"]') as HTMLElement).focus()
+    await press(host, 'ArrowRight')
+    expect(focusedAt()).toBe('1')
+    await press(host, 'ArrowDown')
+    expect(focusedAt()).toBe('1')
+    await press(host, 'ArrowLeft')
+    expect(focusedAt()).toBe('0')
+    await press(host, 'End')
+    expect(focusedAt()).toBe('39')
+  })
+
+  test('takes Left as the way on, on a right-to-left page', async () => {
+    document.documentElement.dir = 'rtl'
+    try {
+      const host = await fed(named(40))
+      host.orientation = 'horizontal'
+      await settle(host)
+      ;(host.querySelector('[data-index="0"]') as HTMLElement).focus()
+      await press(host, 'ArrowLeft')
+      expect(focusedAt()).toBe('1')
+      await press(host, 'ArrowRight')
+      expect(focusedAt()).toBe('0')
+    } finally {
+      document.documentElement.dir = ''
+    }
+  })
+
+  test('says it runs across, in a list box', async () => {
+    const host = await fed(named(10))
+    host.orientation = 'horizontal'
+    host.selectionMode = 'single'
+    await settle(host)
+    expect(part(host, 'viewport')?.getAttribute('aria-orientation')).toBe('horizontal')
+  })
+})
+
+/* A long list grouped by a field read as one run of rows, with no way to say
+   where one group ended. */
+describe('sections', () => {
+  const teams = (count: number) =>
+    Array.from({ length: count }, (_, at) => ({
+      name: `Person ${at + 1}`,
+      team: `Team ${Math.floor(at / 10) + 1}`,
+    }))
+  const groups = (host: Element): HTMLElement[] => [
+    ...host.querySelectorAll<HTMLElement>(':scope > [data-section]'),
+  ]
+  /** A box tall enough for the whole of a short list. */
+  const tall = async (host: Updatable): Promise<void> => {
+    const viewport = part(host, 'viewport') as HTMLElement
+    Object.defineProperty(viewport, 'clientHeight', { configurable: true, value: 1000 })
+    viewport.dispatchEvent(new Event('scroll'))
+    await settle(host)
+  }
+
+  test('draws each section as a group named by its header, its rows inside it', async () => {
+    const host = await fed(teams(25))
+    host.sectionField = 'team'
+    await settle(host)
+    await tall(host)
+    const drawnGroups = groups(host)
+    expect(drawnGroups.map((group) => group.getAttribute('role'))).toEqual([
+      'group',
+      'group',
+      'group',
+    ])
+    const [first] = drawnGroups
+    const header = first?.firstElementChild as HTMLElement
+    expect(header.textContent).toBe('Team 1')
+    expect(first?.getAttribute('aria-labelledby')).toBe(header.id)
+    expect(first?.querySelectorAll('[data-index]')).toHaveLength(10)
+    // Each row still says its place in the whole set.
+    expect(drawnGroups[1]?.querySelector('[data-index]')?.getAttribute('aria-posinset')).toBe('11')
+  })
+
+  test('keeps a section header drawn with its rows when the window starts inside it', async () => {
+    const host = await fed(teams(4000))
+    host.sectionField = 'team'
+    await settle(host)
+    const viewport = part(host, 'viewport') as HTMLElement
+    Object.defineProperty(viewport, 'clientHeight', { configurable: true, value: 192 })
+    /* Entry 3210 at the top, and the window from entry 3206, item 2914, the
+       fifth of Team 292, whose header is entry 3201. */
+    viewport.scrollTop = 3210 * 32
+    viewport.dispatchEvent(new Event('scroll'))
+    await settle(host)
+    const [first] = groups(host)
+    expect(first?.firstElementChild?.textContent).toBe('Team 292')
+    const rows = [...(first?.querySelectorAll<HTMLElement>('[data-index]') ?? [])]
+    expect(rows[0]?.dataset.index).toBe('2914')
+    // The header drawn above the window takes its room out of the spacer.
+    const window = (
+      host as unknown as { virtualize: { window: { before: number; first: number } } }
+    ).virtualize.window
+    expect((part(host, 'before') as HTMLElement).style.blockSize).toBe(`${window.before - 32}px`)
+  })
+
+  test('moves between items across sections, past the headers, and selects in a list box', async () => {
+    const host = await fed(teams(25))
+    host.sectionField = 'team'
+    host.selectionMode = 'multiple'
+    host.keyField = 'name'
+    await settle(host)
+    await tall(host)
+    expect(groups(host)[0]?.firstElementChild?.getAttribute('role')).toBe('presentation')
+    const row = host.querySelector('[data-index="9"]') as HTMLElement
+    row.focus()
+    row.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowDown' }),
+    )
+    await settle(host)
+    expect((document.activeElement as HTMLElement).dataset.index).toBe('10')
+    ;(document.activeElement as HTMLElement).click()
+    await settle(host)
+    expect(host.value).toBe('Person 11')
+  })
+})

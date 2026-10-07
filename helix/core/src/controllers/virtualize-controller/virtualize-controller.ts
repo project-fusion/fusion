@@ -18,6 +18,13 @@ export interface VirtualizeOptions {
    */
   gap?: () => number
   /**
+   * Whether the set runs across the box, scrolled sideways. The scroll axis is
+   * then the inline one: offsets are `scrollLeft` from the start of the line,
+   * which runs right to left on a right-to-left page, and items are measured
+   * by their width. Down the box by default.
+   */
+  horizontal?: () => boolean
+  /**
    * Rows kept either side of what fits, so a scroll reveals something drawn
    * rather than something blank. Four by default.
    *
@@ -333,11 +340,45 @@ export class VirtualizeController implements ReactiveController {
     box.addEventListener('scrollend', this.handleTouchEnd, { passive: true })
     /* Where the box is now, so an offset set before this attached is not
        read as a move whose event is still to come. */
-    this.lastTop = box.scrollTop
+    this.lastTop = this.scrolled(box)
     /* Takes the box out of the browser's scroll anchoring, through a rule
        `HelixElement` ships into every shadow root. See `VIRTUAL` there. */
     box.setAttribute('data-virtual', '')
     this.watching = true
+  }
+
+  /** Whether the scroll axis is the inline one. */
+  private across(): boolean {
+    return this.options.horizontal?.() ?? false
+  }
+
+  /** The box's scroll offset from the start of the set. */
+  private scrolled(box: HTMLElement): number {
+    return this.across() ? Math.abs(box.scrollLeft) : box.scrollTop
+  }
+
+  /**
+   * Scrolls the box to `to` from the start of the set, and notes it. Sideways
+   * on a right-to-left page the offset counts down from zero.
+   */
+  private scrollBox(box: HTMLElement, to: number): void {
+    if (this.across()) {
+      box.scrollLeft = getComputedStyle(box).direction === 'rtl' ? -to : to
+    } else {
+      box.scrollTop = to
+    }
+    this.lastTop = this.scrolled(box)
+  }
+
+  /** How long the box is along the scroll axis. */
+  private span(box: HTMLElement): number {
+    return this.across() ? box.clientWidth : box.clientHeight
+  }
+
+  /** How long an element is along the scroll axis. */
+  private length(element: Element): number {
+    const box = element.getBoundingClientRect()
+    return this.across() ? box.width : box.height
   }
 
   /* `passive`, because this never calls `preventDefault` and saying so lets the
@@ -348,7 +389,7 @@ export class VirtualizeController implements ReactiveController {
     if (box) {
       this.noteClamp(box)
     }
-    const top = box?.scrollTop ?? 0
+    const top = box ? this.scrolled(box) : 0
     if (top !== this.lastTop) {
       this.heading = top > this.lastTop ? 1 : -1
       this.lastTop = top
@@ -371,6 +412,12 @@ export class VirtualizeController implements ReactiveController {
     }
   }
 
+  /** The box's scroll offset now, or the last one noted where there is no box. */
+  private scrolledNow(): number {
+    const box = this.options.container()
+    return box ? this.scrolled(box) : this.lastTop
+  }
+
   /**
    * Whether the reader is scrolling: a finger is on the box, the box moved
    * within the last 150 milliseconds, or it has moved and its `scroll` event
@@ -381,11 +428,7 @@ export class VirtualizeController implements ReactiveController {
    * last move is out of date.
    */
   scrolling(): boolean {
-    return (
-      this.touching ||
-      this.resting !== undefined ||
-      (this.options.container()?.scrollTop ?? this.lastTop) !== this.lastTop
-    )
+    return this.touching || this.resting !== undefined || this.scrolledNow() !== this.lastTop
   }
 
   /**
@@ -405,10 +448,11 @@ export class VirtualizeController implements ReactiveController {
     const was = this.lastTop
     if (
       !this.touching &&
-      box.scrollTop < was &&
-      box.scrollTop >= box.scrollHeight - box.clientHeight - 1
+      this.scrolled(box) < was &&
+      this.scrolled(box) >=
+        (this.across() ? box.scrollWidth : box.scrollHeight) - this.span(box) - 1
     ) {
-      this.lastTop = box.scrollTop
+      this.lastTop = this.scrolled(box)
     }
     return was
   }
@@ -447,8 +491,7 @@ export class VirtualizeController implements ReactiveController {
   private square(): void {
     const box = this.options.container()
     if (this.drift > 0 && box) {
-      box.scrollTop -= this.drift
-      this.lastTop = box.scrollTop
+      this.scrollBox(box, this.scrolled(box) - this.drift)
     } else if (this.drift !== 0) {
       this.owed -= this.drift
       this.host.requestUpdate()
@@ -461,12 +504,12 @@ export class VirtualizeController implements ReactiveController {
    * scroll offset, with what is owed to it and less the drift.
    */
   private offset(box: HTMLElement): number {
-    return box.scrollTop + this.owed - this.drift
+    return this.scrolled(box) + this.owed - this.drift
   }
 
   /** How far past the screen to draw toward the side the box is scrolling to. */
   private lead(box: HTMLElement): number {
-    return this.heading === 0 ? 0 : box.clientHeight
+    return this.heading === 0 ? 0 : this.span(box)
   }
 
   /**
@@ -537,8 +580,7 @@ export class VirtualizeController implements ReactiveController {
     const extra = Math.ceil(this.lead(box) / size)
     const at = Math.min(Math.floor(this.offset(box) / size), total)
     const first = Math.max(0, at - overscan - (this.heading < 0 ? extra : 0))
-    const fits =
-      Math.ceil(box.clientHeight / size) + overscan * 2 + (this.heading === 0 ? 0 : extra)
+    const fits = Math.ceil(this.span(box) / size) + overscan * 2 + (this.heading === 0 ? 0 : extra)
     const last = Math.min(total, first + fits)
     return { after: Math.max(0, (total - last) * size), before: first * size, first, last }
   }
@@ -577,7 +619,7 @@ export class VirtualizeController implements ReactiveController {
     const estimate = Math.max(1, this.options.estimate())
     const heights = new Map<number, number>()
     for (const { element, index } of this.options.rows?.() ?? []) {
-      heights.set(index, (heights.get(index) ?? 0) + element.getBoundingClientRect().height)
+      heights.set(index, (heights.get(index) ?? 0) + this.length(element))
     }
     const seen = [...heights.values()].filter((height) => height > 0)
     if (seen.length === 0) {
@@ -593,9 +635,8 @@ export class VirtualizeController implements ReactiveController {
       this.sample = { estimate, size }
       if (Math.abs(size - was) >= 0.5) {
         const box = this.options.container()
-        if (box && box.scrollTop > 0) {
-          box.scrollTop = (box.scrollTop / was) * size
-          this.lastTop = box.scrollTop
+        if (box && this.scrolled(box) > 0) {
+          this.scrollBox(box, (this.scrolled(box) / was) * size)
         }
         this.settling = 0
         if (!uneven) {
@@ -628,7 +669,7 @@ export class VirtualizeController implements ReactiveController {
     const lead = this.lead(box)
     const from = this.heading < 0 ? top - lead : top
     const first = Math.max(0, this.heights.indexAt(from, total) - overscan)
-    const bottom = top + box.clientHeight + (this.heading > 0 ? lead : 0)
+    const bottom = top + this.span(box) + (this.heading > 0 ? lead : 0)
     let last = this.heights.indexAt(top, total)
     while (last < total && this.heights.before(last, total) < bottom) {
       last += 1
@@ -658,7 +699,7 @@ export class VirtualizeController implements ReactiveController {
       return { first: 0, last: 0 }
     }
     const top = Math.max(0, this.offset(box))
-    const bottom = top + box.clientHeight
+    const bottom = top + this.span(box)
     if (!this.measuring()) {
       const size = this.line()
       const first = Math.min(Math.floor(top / size), total)
@@ -686,7 +727,7 @@ export class VirtualizeController implements ReactiveController {
       return 0
     }
     const length = this.measuring() ? this.heights.total(total) : total * this.line()
-    return Math.max(0, length - Math.max(0, this.offset(box)) - box.clientHeight)
+    return Math.max(0, length - Math.max(0, this.offset(box)) - this.span(box))
   }
 
   /**
@@ -705,13 +746,14 @@ export class VirtualizeController implements ReactiveController {
   endInSight(length = Math.max(0, this.options.count())): boolean {
     /* The rule is core's `endInSight`, which Listbox asks of its own scroll,
        so the two lists ask on the same terms. */
+    const box = this.options.container()
     if (
       this.options.count() <= 0 ||
       !endInSight({
         askedAt: this.askedAt,
         count: length,
         remaining: this.remaining(),
-        screen: this.options.container()?.clientHeight ?? 0,
+        screen: box ? this.span(box) : 0,
       })
     ) {
       return false
@@ -764,8 +806,7 @@ export class VirtualizeController implements ReactiveController {
     if (this.owed !== 0) {
       const box = this.options.container()
       if (box) {
-        box.scrollTop += this.owed
-        this.lastTop = box.scrollTop
+        this.scrollBox(box, this.scrolled(box) + this.owed)
       }
       this.owed = 0
     }
@@ -806,7 +847,7 @@ export class VirtualizeController implements ReactiveController {
     const was = this.heights.before(anchor, total)
     let news = false
     for (const { element, index } of rows) {
-      if (this.heights.record(index, element.getBoundingClientRect().height + this.gap())) {
+      if (this.heights.record(index, this.length(element) + this.gap())) {
         news = true
       }
     }
@@ -823,8 +864,7 @@ export class VirtualizeController implements ReactiveController {
       } else {
         /* From where the box was, which a clamp to a shorter set has already
            moved by part of the same difference. */
-        box.scrollTop = from + moved
-        this.lastTop = box.scrollTop
+        this.scrollBox(box, from + moved)
       }
     }
     this.measure()
@@ -889,27 +929,30 @@ export class VirtualizeController implements ReactiveController {
     }
     const top = this.offsetOf(index)
     const size = this.sizeOf(index)
-    const room = box.clientHeight - inset
+    const span = this.span(box)
+    const at = this.scrolled(box)
+    const room = span - inset
     let to: number
     if (align === 'start') {
       to = top
     } else if (align === 'center') {
       to = top - inset - (room - size) / 2
     } else if (align === 'end') {
-      to = top + size + inset - box.clientHeight
-    } else if (top < box.scrollTop) {
+      to = top + size + inset - span
+    } else if (top < at) {
       to = top
-    } else if (top + size + inset > box.scrollTop + box.clientHeight) {
-      to = top + size + inset - box.clientHeight
+    } else if (top + size + inset > at + span) {
+      to = top + size + inset - span
     } else {
       return
     }
     const next = Math.max(0, to)
     if (behavior && typeof box.scrollTo === 'function') {
-      box.scrollTo({ behavior, top: next })
+      const across = this.across()
+      const rtl = across && getComputedStyle(box).direction === 'rtl'
+      box.scrollTo(across ? { behavior, left: rtl ? -next : next } : { behavior, top: next })
     } else {
-      box.scrollTop = next
-      this.lastTop = box.scrollTop
+      this.scrollBox(box, next)
       this.target = index
     }
   }
