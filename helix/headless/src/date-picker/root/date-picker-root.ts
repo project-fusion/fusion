@@ -308,6 +308,9 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
   /** The month on show, whoever set it, and `undefined` until somebody has. */
   private monthState: string | undefined = undefined
 
+  /** Whether the month on show is one the reader paged to, which `showChosen` forgets. */
+  private browsed = false
+
   /**
    * The month shown, as `YYYY-MM`, or as its first day, `YYYY-MM-DD`, under a
    * `calendar` with months of its own. When it is not set, it follows
@@ -330,6 +333,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
 
   set month(next: string) {
     const previous = this.month
+    this.browsed = false
     this.monthState = next
     this.requestUpdate('month', previous)
   }
@@ -602,6 +606,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
     requestChange({
       apply: (month) => {
         const previous = this.month
+        this.browsed = true
         this.monthState = month
         this.requestUpdate('month', previous)
       },
@@ -875,9 +880,37 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
    * plain `focus()` on it did nothing and focus stayed on the trigger.
    */
   override focus(options?: FocusOptions): void {
+    /* After a render that is on its way, such as the one `showChosen` asks
+       for, so focus lands on the stop that render draws. */
+    if (this.isUpdatePending) {
+      void this.updateComplete.then(() => this.focus(options))
+      return
+    }
     this.renderRoot
       ?.querySelector<HTMLElement>('[part~="cell"][tabindex="0"], [part~="period"][tabindex="0"]')
       ?.focus(options)
+  }
+
+  /**
+   * Shows the days again, on the month of the chosen date, with the tab stop
+   * on that date, forgetting the month and the day the reader browsed to.
+   *
+   * Date Input calls it each time its panel opens, which is where the APG
+   * date picker dialog puts focus. Measured before this: from August 4, two
+   * presses of Page Down, Escape, and Down again opened on October 4.
+   * A `month` you set stays until the reader pages away from it.
+   */
+  showChosen(): void {
+    this.focused = ''
+    this.pageYear = undefined
+    this.periodFocus = undefined
+    this.view = 'day'
+    if (this.browsed) {
+      this.browsed = false
+      const previous = this.month
+      this.monthState = undefined
+      this.requestUpdate('month', previous)
+    }
   }
 
   override connectedCallback(): void {

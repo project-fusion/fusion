@@ -410,6 +410,11 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
       this.fitted = undefined
       this.wide = undefined
     }
+    /* Each opening starts on the chosen date, as the APG date picker dialog
+       does, whatever month the reader paged to the last time. */
+    if (changed.has('open') && this.open) {
+      this.partNamed<HTMLElement & { showChosen?: () => void }>('picker')?.showChosen?.()
+    }
   }
 
   /**
