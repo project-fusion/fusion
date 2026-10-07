@@ -44,6 +44,40 @@ import {
   withAncestors,
 } from '../rows.js'
 
+/** What a `renderValue` function is told about the entry it draws. */
+export interface ObjectInspectorEntry {
+  /** How deep the entry is, from 0 at the root. */
+  depth: number
+  /** The property name or array index the value is under, absent for the root. */
+  key: string | undefined
+  /** The entry's path, as `active` writes it: `/meta/tags/0`. */
+  path: string
+  /** What kind of value it is, as JSON names it: `array`, `boolean`, `null`, `number`, `object` or `string`. Anything else is `other`. */
+  type: 'array' | 'boolean' | 'null' | 'number' | 'object' | 'other' | 'string'
+}
+
+/**
+ * Draws one entry's value, for an inspector given `renderValue`.
+ *
+ * Returns anything Lit renders, such as a template from `html`, a string, or a
+ * DOM node, or `undefined` to draw the value as the inspector does.
+ */
+export type ObjectInspectorRenderer = (value: unknown, entry: ObjectInspectorEntry) => unknown
+
+/** The kind of value an entry holds, as `ObjectInspectorEntry.type` names it. */
+const kindOf = (value: unknown): ObjectInspectorEntry['type'] => {
+  if (value === null) {
+    return 'null'
+  }
+  if (Array.isArray(value)) {
+    return 'array'
+  }
+  const type = typeof value
+  return type === 'boolean' || type === 'number' || type === 'object' || type === 'string'
+    ? type
+    : 'other'
+}
+
 /**
  * @summary A structured value shown as a tree, where you can close branches,
  * see how many entries each holds, and copy any part.
@@ -107,6 +141,12 @@ import {
  * selected. The button sits beside the tree, because assistive technology
  * cannot reliably reach a button inside a tree item.
  *
+ * **Your own drawing of a value.** `renderValue` is a function from a value and
+ * its entry, its path, key, depth and type, to what Lit renders, such as a
+ * link for a URL or a swatch for a color. Return `undefined` to draw the value
+ * as the inspector does. What you draw sits in the `value` part, after the
+ * key. Filtering and copying still read the value itself.
+ *
  * `windowed` draws only the rows in view, for values with thousands of entries.
  * The box needs a height for windowing to work. The styled tier sets one, and
  * in the headless tier you set it yourself.
@@ -161,6 +201,7 @@ import {
  * @csspart summary - The brackets that stand for a branch's contents.
  * @csspart toggle - The caret on a branch. It points down when the branch is open and sideways when it is closed.
  * @csspart tree - The tree grid that holds the rows.
+ * @csspart value - What `renderValue` drew for an entry, in place of its own drawing.
  *
  * @cssproperty --object-inspector-level - How deep a row is, from 0 at the root, for indenting it.
  */
@@ -322,6 +363,18 @@ export class HelixHeadlessObjectInspector extends HelixElement {
    */
   @property({ attribute: 'no-copy', type: Boolean })
   noCopy = false
+
+  /**
+   * Draws an entry's value your way, given the value and its entry. Set it as
+   * a property.
+   *
+   * It returns what Lit renders: a template from `html`, a string, or a DOM
+   * node. `undefined` draws the value as the inspector does, so a function can
+   * draw some entries and leave the rest, such as only the strings under
+   * `/links`.
+   */
+  @property({ attribute: false })
+  renderValue: ObjectInspectorRenderer | undefined
 
   /**
    * What a screen reader hears when a filter matches one entry, where
@@ -885,8 +938,17 @@ export class HelixHeadlessObjectInspector extends HelixElement {
      code, a JSON literal, so it reads left to right on any page, and the count
      takes the direction of what it says. The key stays in the line: isolating
      it as well changed no row's order and redrew the colon after an index. */
-  private renderValue(row: Row): TemplateResult {
+  private drawValue(row: Row): TemplateResult {
     const { value } = row
+    const drawn = this.renderValue?.(value, {
+      depth: row.depth,
+      key: row.key,
+      path: row.path,
+      type: kindOf(value),
+    })
+    if (drawn !== undefined) {
+      return html`<span part="value">${drawn}</span>`
+    }
     if (row.branch) {
       const count = entries(value as object).length
       const array = Array.isArray(value)
@@ -952,7 +1014,7 @@ export class HelixHeadlessObjectInspector extends HelixElement {
               ${unsafeSVG((row.open ? caretDown : caretRight).content)}
             </svg>`
         : nothing
-    }${row.key === undefined ? nothing : html`<span part="key">${row.key}</span>: `}${this.renderValue(row)}</div>
+    }${row.key === undefined ? nothing : html`<span part="key">${row.key}</span>: `}${this.drawValue(row)}</div>
     </div>`
   }
 

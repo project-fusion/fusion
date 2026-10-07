@@ -244,6 +244,38 @@ describe('an object inspector', () => {
   })
 })
 
+/* A value could only be drawn as its JSON literal, so a URL could not be a
+   link and a color could not show its swatch. */
+describe('an object inspector given renderValue', () => {
+  test('draws the values the function returns, in the value part, and the rest as before', async () => {
+    const host = await inspector('default-depth="2"')
+    const seen: string[] = []
+    ;(host as Inspector & { renderValue: unknown }).renderValue = (
+      value: unknown,
+      entry: { depth: number; key: string | undefined; path: string; type: string },
+    ) => {
+      seen.push(`${entry.path}|${entry.key}|${entry.depth}|${entry.type}`)
+      if (entry.type !== 'string') {
+        return undefined
+      }
+      const link = document.createElement('a')
+      link.href = `#${value}`
+      link.textContent = String(value)
+      return link
+    }
+    await host.updateComplete
+    const drawn = [...(host.shadowRoot?.querySelectorAll('[part="value"]') ?? [])]
+    expect(drawn.map((one) => one.textContent)).toEqual(['main', 'dpl', 'a', 'b'])
+    expect(drawn[0]?.querySelector('a')?.getAttribute('href')).toBe('#main')
+    expect(host.shadowRoot?.querySelector('[part="number"]')?.textContent).toBe('42')
+    expect(host.shadowRoot?.querySelector('[part="string"]')).toBeNull()
+    expect(seen).toContain('|undefined|0|object')
+    expect(seen).toContain('/tags|tags|1|array')
+    expect(seen).toContain('/tags/0|0|2|string')
+    expect(seen).toContain('/target|target|1|null')
+  })
+})
+
 describe('an object inspector given a new value', () => {
   /* An inspector showing live data, a polled response or a debug panel, closed
      every branch and went back to the root on each update. */
