@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import { mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -88,6 +88,19 @@ describe('callout icon slot', () => {
   })
 })
 
+/* An `<svg>` a page slotted as the icon was read as a second, unnamed image
+   beside the tone's name. */
+describe('a slotted icon', () => {
+  test('is drawn and not read, the region around it carrying the name', async () => {
+    const callout = await mount(
+      '<helix-headless-callout tone="warning"><svg slot="icon"></svg>Careful.</helix-headless-callout>',
+    )
+    const slot = callout.shadowRoot?.querySelector('slot[name="icon"]') as HTMLSlotElement
+    expect(slot.getAttribute('aria-hidden')).toBe('true')
+    expect(part(callout, 'icon')?.getAttribute('aria-label')).toBe('Warning')
+  })
+})
+
 /* sl-alert's `closable`: a note a reader may put away, which the page then
    removes. */
 describe('a dismissible callout', () => {
@@ -104,6 +117,24 @@ describe('a dismissible callout', () => {
     button.click()
     expect(heard).toBe('Drafts save every minute.')
     expect(note.isConnected).toBe(true)
+  })
+
+  /* Every button was "Dismiss", which says nothing about which callout it
+     takes away. */
+  test('names the button for the heading, or for the tone where there is none', async () => {
+    const titled = await mount(
+      '<helix-headless-callout dismissible tone="warning"><span slot="heading">Scheduled maintenance</span>Down on Sunday.</helix-headless-callout>',
+    )
+    await (titled as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    expect(titled.shadowRoot?.querySelector('[part="dismiss"]')?.getAttribute('aria-label')).toBe(
+      'Dismiss Scheduled maintenance',
+    )
+    const plain = await mount(
+      '<helix-headless-callout dismissible tone="danger">Failed.</helix-headless-callout>',
+    )
+    expect(plain.shadowRoot?.querySelector('[part="dismiss"]')?.getAttribute('aria-label')).toBe(
+      'Dismiss Error',
+    )
   })
 
   test('draws no button unless asked', async () => {
