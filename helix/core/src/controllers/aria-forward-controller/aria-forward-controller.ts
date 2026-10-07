@@ -78,6 +78,9 @@ const RELATIONSHIPS = [
  * written `aria-invalid="true"`, and a picker marks the list or slider it
  * draws with it, and either way the word belongs on the control a reader is on.
  *
+ * `aria-required` is another: Time Picker marks the list or the wheels it
+ * draws as required, since the reader is on them and the host has no role.
+ *
  * `aria-current` is another: a stage in a sequence marks its name's button
  * `aria-current="step"`, and the button is a host the tree reports as
  * `generic`, so the word reached nobody until it was carried to the control.
@@ -94,6 +97,7 @@ const STATES = [
   'aria-controls',
   'aria-invalid',
   'aria-pressed',
+  'aria-required',
 ] as const
 
 /**
