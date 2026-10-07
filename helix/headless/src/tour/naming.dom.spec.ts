@@ -61,7 +61,7 @@ describe('what names a tour stop', () => {
       progress,
     })
     expect(words(named.labelledBy)).toEqual(['2 of 5'])
-    expect(named.describedBy).toEqual([])
+    expect(words(named.describedBy)).toEqual(['Text'])
   })
 })
 
@@ -75,5 +75,43 @@ describe('what describes a tour stop', () => {
       progress,
     })
     expect(words(named.describedBy)).toEqual(['Narrow the list.', '2 of 5'])
+  })
+
+  test('the words at the start of its content where the description slot is empty', () => {
+    const named = stopNaming({
+      content: make('<h3>Filters</h3><p>Narrow the list.</p><button>Reset</button><p>After</p>'),
+      description: [],
+      heading: [],
+      labeled: false,
+      progress,
+    })
+    expect(words(named.labelledBy)).toEqual(['Filters'])
+    expect(words(named.describedBy)).toEqual(['Narrow the list.', '2 of 5'])
+  })
+
+  test('a card’s text, and not the title inside it that names the panel', () => {
+    const named = stopNaming({
+      content: make('<div class="card"><h3>Filters</h3><p>Narrow the list.</p></div>'),
+      description: [],
+      heading: [],
+      labeled: false,
+      progress,
+    })
+    expect(words(named.labelledBy)).toEqual(['Filters'])
+    expect(words(named.describedBy)).toEqual(['Narrow the list.', '2 of 5'])
+  })
+
+  test('the region around its content where the content is words alone', () => {
+    const region = make('<div part="content"></div>')[0] as Element
+    const named = stopNaming({
+      content: [],
+      description: [],
+      heading: [],
+      labeled: true,
+      loose: region,
+      progress,
+    })
+    expect(named.describedBy.length).toBe(2)
+    expect(named.describedBy[0] === region && named.describedBy[1] === progress).toBe(true)
   })
 })

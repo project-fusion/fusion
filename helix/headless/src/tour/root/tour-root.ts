@@ -1,4 +1,5 @@
 import {
+  auditName,
   controlsIn,
   customElement,
   deepActiveElement,
@@ -61,11 +62,27 @@ import { onPage, waitFor } from '../wait.js'
  * you have moved it somewhere else on the page. A stop does not trap focus, so
  * you can still `Tab` out to the element it describes.
  *
- * **The arrow keys move between stops** while focus is in one: the arrow that
- * points the way the line runs goes on, and the other goes back, so on a
- * right-to-left page `ArrowLeft` goes on. Neither finishes the tour at the last
- * stop, and a text field in a stop keeps its own arrows. `Escape` skips the
- * tour.
+ * **The target is scrolled into view** before its stop is shown, by the
+ * least distance that brings it on screen, so the stop that points at it is
+ * on screen too.
+ *
+ * **Keyboard.** Focus is on the current stop's panel, which is not in the
+ * `Tab` order itself.
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Right | Goes to the next stop. On the last stop it does nothing, and Next finishes the tour. |
+ * | Left | Goes back to the previous stop. |
+ * | Escape | Skips the tour, and puts focus back where it was when the tour opened. |
+ * | Tab, Shift+Tab | Moves through the controls in the stop, and on out to the page. A stop does not trap focus. |
+ * | Enter, Space | On Back, Next, or Skip, presses it. |
+ *
+ * The arrow that points the way the line runs goes on, and the other goes
+ * back, so on a right-to-left page Left goes on and Right goes back. A text field in a stop keeps
+ * its own arrows.
+ *
+ * The tour is a region named by `label` while it runs. A development build
+ * warns when a tour opens with no `label`.
  *
  * @since 0.1.0
  * @status stable
@@ -403,10 +420,36 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    this.reveal()
     this.settle()
     this.light()
+    if (changed.has('open') && this.open) {
+      auditName(
+        this,
+        () => null,
+        'Give it a `label`, such as "Getting started".',
+        () => this.label !== '',
+      )
+    }
     this.follow(changed)
     this.wait()
+  }
+
+  /** The target last scrolled into view, so a render that moved nothing scrolls nothing. */
+  private revealed: HTMLElement | undefined
+
+  /**
+   * Scrolls the current target into view, by the least distance that brings
+   * it on screen, before its stop is shown beside it. Zag's tour does the same.
+   * A target already on screen does not move.
+   */
+  private reveal(): void {
+    const target = this.lit ?? undefined
+    if (target === this.revealed) {
+      return
+    }
+    this.revealed = target
+    target?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' })
   }
 
   /** Where focus was when the tour opened, to give it back when it ends. */

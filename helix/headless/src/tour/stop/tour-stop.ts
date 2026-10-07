@@ -53,7 +53,8 @@ import { stopNaming } from '../naming.js'
  * The panel is a `group`, and a `dialog` for a dialog stop, only while the
  * stop is shown. It is named by the `heading` slot, then by the first heading
  * in the content, then by `label`, and otherwise by its place in the tour. It
- * is described by the `description` slot and by its place, such as "2 of 5",
+ * is described by the `description` slot, or where that is empty by the words
+ * at the start of the content, and by its place, such as "2 of 5",
  * so a screen reader says where the reader is at every stop. `focus()` moves
  * focus to the panel, which is what the tour does when it opens or moves on.
  *
@@ -295,6 +296,11 @@ export class HelixHeadlessTourStop extends HelixElement {
       description: slotted('description'),
       heading: slotted('heading'),
       labeled: this.label !== '',
+      loose: [...this.childNodes].some(
+        (one) => one.nodeType === Node.TEXT_NODE && (one.textContent ?? '').trim() !== '',
+      )
+        ? this.partNamed('content')
+        : null,
       progress: this.position === '' ? null : this.partNamed('progress'),
     })
     /* Owned outright: the stop writes both whatever it found, and clears what
@@ -386,7 +392,7 @@ export class HelixHeadlessTourStop extends HelixElement {
       ></div>
       <slot name="heading" part="heading" @slotchange=${this.nameByHeading}></slot>
       <slot name="description" part="description" @slotchange=${this.nameByHeading}></slot>
-      <div part="content"><slot></slot></div>
+      <div part="content"><slot @slotchange=${this.nameByHeading}></slot></div>
       ${
         /* Said always, through the panel's description, and drawn only when the
            tour asks: a panel's position is the screen reader's to hear at every
