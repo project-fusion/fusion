@@ -30,6 +30,7 @@ import {
   sort,
   splitValues,
   toggleEvery,
+  treeArrow,
   whenHydrated,
   words,
 } from '@fusion.dev/helix-core'
@@ -244,7 +245,7 @@ const NAMED = new Set([...STATUS, 'heading'])
  * | Space on a row, Enter or Space on its checkbox cell | Selects the row, in a `selectable` table. |
  * | Enter or Space on a disclosure cell | Shows or hides the rows under the row, in a table whose rows nest. |
  * | Right on a disclosure cell | Shows the rows under a shut row, and otherwise moves one cell along the row. Left does, on a right-to-left page. |
- * | Left on a disclosure cell | Hides the rows under an open row. On any other row it moves to the row this one sits under where the disclosure cells are the first column, and otherwise one cell back along the row. |
+ * | Left on a disclosure cell | Hides the rows under an open row, and moves to the row this one sits under from any other. |
  * | Enter or Space on a grip cell | Picks the row up, or drops it, in a `reorderable` table. Up, Down, Home, and End move a row picked up, and Escape puts it back. |
  * | Down, Up, Page Down, Page Up under `selection-behavior="replace"` | Selects the row it moves to alone. Control or Command with the key moves without selecting. |
  * | Shift with Down or Up | Selects the rows it moves across, in a `selectable` table. |
@@ -1149,11 +1150,10 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
   }
 
   /**
-   * Right or Left on a disclosure cell, as on a tree's item: on to open a
-   * shut row, back to shut an open one. Back on a row that is shut, or has
-   * no rows under it, moves to the row it sits under where the disclosure
-   * cells are the first column, since the key moves nowhere there. Anything
-   * else moves along the row.
+   * Right or Left on a disclosure cell, as on a tree's item and as Data
+   * Table's row headers do: on to open a shut row, back to shut an open one.
+   * Back on a row that is shut, or has no rows under it, moves to the row it
+   * sits under. Anything else moves along the row.
    */
   private disclose(at: number, forward: boolean): boolean | number {
     const rows = this.arrangedRows
@@ -1162,14 +1162,15 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     if (!(row && found)) {
       return false
     }
-    if (row.branch && this.open.has(found.key) !== forward) {
+    const arrow = treeArrow(
+      { branch: row.branch ?? false, open: this.open.has(found.key) },
+      forward ? 1 : -1,
+    )
+    if (arrow === 'open' || arrow === 'close') {
       this.toggleRow(found.key)
       return true
     }
-    if (forward || this.lead.length > 1) {
-      return false
-    }
-    const parent = rows.indexOf(this.rowFor(row.parent ?? '') as Row)
+    const parent = arrow === 'parent' ? rows.indexOf(this.rowFor(row.parent ?? '') as Row) : -1
     return parent >= 0 ? parent : false
   }
 
