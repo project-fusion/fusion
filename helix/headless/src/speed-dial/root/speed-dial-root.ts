@@ -60,8 +60,9 @@ const navigable = (item: HelixHeadlessSpeedDialItem): NavigableItem => ({
  * action whose name starts with it. The actions are one tab stop, and Tab
  * closes the dial and moves on.
  *
- * **Keyboard.** On the trigger, Enter, Space or a press opens the dial on its
- * first action. With the dial open:
+ * **Keyboard.** On the trigger, Enter, Space, Down or a press opens the dial
+ * on its first action, and Up opens it on its last, as an APG menu button
+ * does. With the dial open:
  *
  * | Key | What it does |
  * |---|---|
@@ -84,6 +85,13 @@ const navigable = (item: HelixHeadlessSpeedDialItem): NavigableItem => ({
  * the trigger says so in its description, `long-press-label`, the drawn one
  * and a slotted one alike. A press that has opened the dial does not also do
  * the trigger's action.
+ *
+ * **Open on hover.** With `open-on="hover"`, a mouse resting on the trigger
+ * opens the dial, as Material's speed dial does, and the dial closes a moment
+ * after the mouse leaves both the trigger and the actions. A press, a touch
+ * and the keyboard open it as under `click`, and a press on the trigger of a
+ * dial already open moves focus to its first action, so the press a mouse
+ * makes after hovering keeps the dial open.
  *
  * @since 0.1.0
  * @status stable
@@ -139,12 +147,14 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
   offset = 12
 
   /**
-   * What opens the dial. `click` opens it on a press of the trigger. Under
-   * `long-press`, a press is the trigger's own action, and the dial opens on a
-   * press held for half a second, or on Alt+Down or Alt+Up.
+   * What opens the dial. `click` opens it on a press of the trigger. `hover`
+   * also opens it while a mouse rests on the trigger, and closes it once the
+   * mouse has left. Under `long-press`, a press is the trigger's own action,
+   * and the dial opens on a press held for half a second, or on Alt+Down or
+   * Alt+Up.
    */
   @property({ attribute: 'open-on' })
-  openOn: 'click' | 'long-press' = 'click'
+  openOn: 'click' | 'hover' | 'long-press' = 'click'
 
   /**
    * The direction the actions open in. They move to another side if that side
@@ -175,6 +185,12 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
    * wherever the reader is typing.
    */
   private focusOnOpen = false
+
+  /** Whether the open under way puts focus on the last action, from Up. */
+  private focusLast = false
+
+  /** The close a mouse leaving a hover dial has asked for, a moment from now. */
+  private leaving: ReturnType<typeof setTimeout> | undefined
 
   /* Registered rather than held, the way `ToggleGroup` holds its keys: the
      controller follows `open` on its own, so nothing here talks to it after
@@ -229,6 +245,45 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
     return this.openOn === 'long-press'
   }
 
+  /** Opens on a mouse coming over the trigger, under `open-on="hover"`. */
+  private readonly handleTriggerPointerOver = (event: PointerEvent): void => {
+    if (this.openOn !== 'hover' || event.pointerType !== 'mouse') {
+      return
+    }
+    this.stay()
+    if (!this.open) {
+      this.requestOpen(true)
+    }
+  }
+
+  /** Keeps a hover dial open while the mouse is back over it. */
+  private readonly handlePointerEnter = (): void => {
+    this.stay()
+  }
+
+  /**
+   * Closes a hover dial a moment after the mouse leaves it, so a mouse
+   * crossing the gap between the trigger and the actions keeps it open.
+   * Focus inside the dial keeps it open too, as a reader is using it.
+   */
+  private readonly handlePointerLeave = (event: PointerEvent): void => {
+    if (this.openOn !== 'hover' || event.pointerType !== 'mouse' || !this.open) {
+      return
+    }
+    this.stay()
+    this.leaving = setTimeout(() => {
+      this.leaving = undefined
+      if (this.open && !this.matches(':focus-within')) {
+        this.requestOpen(false)
+      }
+    }, 300)
+  }
+
+  private stay(): void {
+    clearTimeout(this.leaving)
+    this.leaving = undefined
+  }
+
   /**
    * Puts focus on the trigger, the slotted one or the button drawn in its
    * place, as a `focus()` on a native control would. The host itself takes no
@@ -252,6 +307,12 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
   }
 
   private readonly handleTriggerClick = (): void => {
+    if (this.open && this.openOn === 'hover') {
+      /* The mouse that opened it by hovering presses next, and that press
+         means use it. */
+      this.items.find((one) => !one.disabled)?.focusItem()
+      return
+    }
     if (this.open) {
       this.requestOpen(false)
       return
@@ -321,13 +382,14 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
        the dial, except the one a long-press trigger opens with: Alt with Down
        or Up, as React Aria's menu trigger takes it. */
     if (!this.open) {
-      if (
-        this.pressHeld &&
-        event.altKey &&
-        (event.key === 'ArrowDown' || event.key === 'ArrowUp')
-      ) {
+      const arrow = event.key === 'ArrowDown' || event.key === 'ArrowUp'
+      /* Down or Up on a trigger that opens on a press, as an APG menu button
+         takes them; a long-press trigger keeps the plain arrows and opens on
+         Alt with one. */
+      if (arrow && (this.pressHeld ? event.altKey : !event.altKey)) {
         event.preventDefault()
         this.focusOnOpen = this.requestOpen(true)
+        this.focusLast = this.focusOnOpen && event.key === 'ArrowUp'
       }
       return
     }
@@ -350,6 +412,8 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
     this.addEventListener('helix-select', this.handleSelect)
     this.addEventListener('keydown', this.handleKeydown)
     this.addEventListener('click', this.handleHeldClick, true)
+    this.addEventListener('pointerenter', this.handlePointerEnter)
+    this.addEventListener('pointerleave', this.handlePointerLeave)
   }
 
   override disconnectedCallback(): void {
@@ -362,6 +426,9 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
     this.removeEventListener('helix-select', this.handleSelect)
     this.removeEventListener('keydown', this.handleKeydown)
     this.removeEventListener('click', this.handleHeldClick, true)
+    this.removeEventListener('pointerenter', this.handlePointerEnter)
+    this.removeEventListener('pointerleave', this.handlePointerLeave)
+    this.stay()
   }
 
   /**
@@ -445,8 +512,13 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
     super.updated?.(changed)
     this.announce()
     this.describeTrigger()
+    if (!this.open) {
+      this.stay()
+    }
     if (this.open && this.focusOnOpen) {
       this.focusOnOpen = false
+      const last = this.focusLast
+      this.focusLast = false
       /* On the first action, which is where a reader who opened this with the
          keyboard expects to be. The pointer does not mind either way.
 
@@ -463,7 +535,8 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
              key starts from nothing. `KeyboardNavigationController` filters
              disabled items itself; this is the one place that reaches past it
              and indexes the list. */
-          this.items.find((one) => !one.disabled)?.focusItem()
+          const usable = this.items.filter((one) => !one.disabled)
+          ;(last ? usable.at(-1) : usable[0])?.focusItem()
         }
       })
     }
@@ -488,6 +561,7 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
       @focusin=${this.handleTriggerFocusIn}
       @pointercancel=${this.handleTriggerPointerCancel}
       @pointerdown=${this.handleTriggerPointerDown}
+      @pointerover=${this.handleTriggerPointerOver}
       @pointermove=${this.handleTriggerPointerMove}
       @pointerup=${this.handleTriggerPointerUp}
       @slotchange=${() => this.describeTrigger()}

@@ -35,6 +35,11 @@ let toldSelected = false
  * Put a `Kbd` in the `shortcut` slot to draw it as keys instead; the dial
  * imports no `Kbd` of its own. Showing a shortcut does not bind it.
  *
+ * `href` makes the action a link, as Menu's rows take one: the `item` part is
+ * then an `<a>` carrying `menuitem`, so the browser follows it, opens it in a
+ * new tab on a middle press, and offers its own menu for it. Choosing it still
+ * sends `helix-select` and closes the dial. A disabled action draws no link.
+ *
  * @since 0.1.0
  * @status stable
  * @category actions
@@ -48,7 +53,7 @@ let toldSelected = false
  * @event {HelixSelectEvent} helix-select - The action was chosen. Cancelable: cancel it to keep the dial open.
  *
  * @csspart icon - The box that holds the icon.
- * @csspart item - The control for the action.
+ * @csspart item - The control for the action, which is an `<a>` where `href` is set.
  * @csspart label - The action's name, beside the icon.
  * @csspart shortcut - The box after the name that holds the shortcut, shown while `shortcut` is set or something is in the `shortcut` slot.
  */
@@ -61,12 +66,38 @@ export class HelixHeadlessSpeedDialItem extends HelixElement {
   disabled = false
 
   /**
+   * Whether the link downloads the file when the action is chosen. Only
+   * meaningful beside an `href`, and only for a file served from the page's
+   * origin.
+   */
+  @property({ type: Boolean })
+  download = false
+
+  /**
+   * The URL the action links to. Setting it draws the action as a link.
+   */
+  @property()
+  href = ''
+
+  /**
+   * The link's `rel`. Set it whenever you set `target="_blank"`.
+   */
+  @property()
+  rel = ''
+
+  /**
    * The action's keyboard shortcut as a chord, such as `mod+s`, carried as
    * `aria-keyshortcuts` and drawn after the name. `mod` is Command on an Apple
    * keyboard and Control elsewhere. Showing a shortcut does not bind it.
    */
   @property()
   shortcut = ''
+
+  /**
+   * Where the link opens, such as `_blank` for a new tab.
+   */
+  @property()
+  target = ''
 
   /**
    * The action's value, sent in `helix-select` when the action is chosen.
@@ -150,11 +181,51 @@ export class HelixHeadlessSpeedDialItem extends HelixElement {
     this.choose()
   }
 
+  /**
+   * Space presses a linked action, which an anchor ignores, and the click that
+   * comes back both announces and follows the link. Enter is the anchor's own.
+   */
+  private readonly handleKeydown = (event: KeyboardEvent): void => {
+    if (event.key !== ' ') {
+      return
+    }
+    const link = this.renderRoot.querySelector<HTMLAnchorElement>('a[part="item"]')
+    if (link) {
+      event.preventDefault()
+      link.click()
+    }
+  }
+
   protected override render(): TemplateResult {
     /* In this reader's platform's words, and in the server's while hydrating
        what one sent, which has no keyboard to ask. */
     const keys =
       this.shortcut === '' ? nothing : ariaChord(this.shortcut, !this.hydrating && onApple())
+    const inside = html`<span part="icon"><slot name="icon"></slot></span>
+      <span part="label"><slot></slot><span
+          part="shortcut"
+          aria-hidden="true"
+          ?hidden=${!this.hasShortcut && this.shortcut === ''}
+        >${this.renderShortcut()}</span
+      ></span>`
+    /* The anchor is the row, carrying the role and the roving tab stop, as in
+       Menu: a link inside a `menuitem` loses the row its name. A disabled
+       action renders no `href`, because `aria-disabled` alone still
+       navigates. */
+    if (this.href !== '' && !this.disabled) {
+      return html`<a
+        part="item"
+        href=${this.href}
+        target=${this.target || nothing}
+        rel=${this.rel || nothing}
+        ?download=${this.download}
+        role="menuitem"
+        aria-keyshortcuts=${keys}
+        tabindex="-1"
+        @click=${this.handleClick}
+        @keydown=${this.handleKeydown}
+      >${inside}</a>`
+    }
     return html`<button
       part="item"
       role="menuitem"
@@ -165,13 +236,7 @@ export class HelixHeadlessSpeedDialItem extends HelixElement {
       tabindex="-1"
       @click=${this.handleClick}
     >
-      <span part="icon"><slot name="icon"></slot></span>
-      <span part="label"><slot></slot><span
-          part="shortcut"
-          aria-hidden="true"
-          ?hidden=${!this.hasShortcut && this.shortcut === ''}
-        >${this.renderShortcut()}</span
-      ></span>
+      ${inside}
     </button>`
   }
 

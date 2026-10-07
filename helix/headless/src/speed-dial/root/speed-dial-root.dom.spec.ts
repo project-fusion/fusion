@@ -309,6 +309,79 @@ describe('a speed dial and the keys around it', () => {
 })
 
 /* Menu has sections; a dial's actions were one flat list. */
+describe('a speed dial opened from its trigger with an arrow', () => {
+  /* The APG menu button: Down opens on the first item, Up on the last. */
+  test('opens on Down at the first action and on Up at the last', async () => {
+    const { actions, host } = await dial()
+    press(host, 'ArrowDown')
+    await host.updateComplete
+    await host.updateComplete
+    expect(host.open).toBe(true)
+    expect(focused(at(actions, 0))).toBe(at(actions, 0))
+    press(host, 'Escape')
+    await host.updateComplete
+    press(host, 'ArrowUp')
+    await host.updateComplete
+    await host.updateComplete
+    expect(host.open).toBe(true)
+    expect(focused(at(actions, 0))).toBe(at(actions, 2))
+  })
+})
+
+describe('a speed dial that opens on hover', () => {
+  const hover = (target: EventTarget, type: string, pointerType = 'mouse'): void => {
+    target.dispatchEvent(new PointerEvent(type, { bubbles: true, composed: true, pointerType }))
+  }
+
+  const trigger = (host: Dial): Element =>
+    host.shadowRoot?.querySelector('slot[name="trigger"]') as Element
+
+  test('opens when a mouse comes over the trigger, and leaves focus where it is', async () => {
+    const { host } = await dial(' open-on="hover"')
+    hover(trigger(host), 'pointerover')
+    await host.updateComplete
+    expect(host.open).toBe(true)
+    expect(host.ownerDocument.activeElement).toBe(host.ownerDocument.body)
+  })
+
+  test('and a touch does not open it', async () => {
+    const { host } = await dial(' open-on="hover"')
+    hover(trigger(host), 'pointerover', 'touch')
+    await host.updateComplete
+    expect(host.open).toBe(false)
+  })
+
+  test('closes a moment after the mouse leaves, unless it comes back', async () => {
+    const { host } = await dial(' open-on="hover"')
+    hover(trigger(host), 'pointerover')
+    await host.updateComplete
+    hover(host, 'pointerleave')
+    hover(host, 'pointerenter')
+    await new Promise((done) => setTimeout(done, 350))
+    expect(host.open).toBe(true)
+    hover(host, 'pointerleave')
+    await new Promise((done) => setTimeout(done, 350))
+    expect(host.open).toBe(false)
+  })
+
+  test('a press on the trigger of an open dial moves to its first action and keeps it open', async () => {
+    const { actions, host } = await dial(' open-on="hover"')
+    hover(trigger(host), 'pointerover')
+    await host.updateComplete
+    pressTrigger(host)
+    await host.updateComplete
+    expect(host.open).toBe(true)
+    expect(focused(at(actions, 0))).toBe(at(actions, 0))
+  })
+
+  test('a dial that opens on a press does not open on hover', async () => {
+    const { host } = await dial()
+    hover(trigger(host), 'pointerover')
+    await host.updateComplete
+    expect(host.open).toBe(false)
+  })
+})
+
 describe('a speed dial with groups', () => {
   test('names each group, and the arrows walk through every group in order', async () => {
     const host = (await mount(
