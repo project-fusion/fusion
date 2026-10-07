@@ -18,10 +18,12 @@ import { styles } from './tab.css.js'
  *
  * @slot - The tab's label.
  *
+ * @csspart dismiss - The mark a pointer presses to close a `dismissible` tab.
  * @csspart tab - The tab itself.
  *
  * @cssproperty --tabs-tab-block-size - The height of a tab. `segmented` sizes its tabs to the track and does not read it.
  * @cssproperty --tabs-tab-color - The label color of a tab that is not current.
+ * @cssproperty --tabs-tab-dismiss-color - The color of the mark that closes a `dismissible` tab.
  * @cssproperty --tabs-tab-disabled-opacity - How faint a disabled tab is drawn.
  * @cssproperty --tabs-tab-font-size - The size of a tab's label.
  * @cssproperty --tabs-tab-font-weight - The weight of a tab's label.

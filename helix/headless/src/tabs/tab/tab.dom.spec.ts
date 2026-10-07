@@ -85,3 +85,39 @@ describe('one tab', () => {
     }
   })
 })
+
+describe('a dismissible tab', () => {
+  /* Web Awesome's closable tab: the tab asks, and the page removes it. */
+  test('asks to close on a press of its mark, and is not chosen by it', async () => {
+    const host = await tab('dismissible')
+    const heard: string[] = []
+    host.addEventListener('helix-dismiss', (event) => {
+      heard.push((event as CustomEvent<{ label: string }>).detail.label)
+    })
+    host.addEventListener('helix-select', () => heard.push('select'))
+    ;(part(host, 'dismiss') as HTMLElement).click()
+    expect(heard).toEqual(['One'])
+    expect(part(host, 'dismiss')?.getAttribute('aria-hidden')).toBe('true')
+  })
+
+  test('asks on Delete and Backspace, and says so through aria-keyshortcuts', async () => {
+    const host = await tab('dismissible')
+    const control = part(host, 'tab') as HTMLElement
+    expect(control.getAttribute('aria-keyshortcuts')).toBe('Delete')
+    let asked = 0
+    host.addEventListener('helix-dismiss', () => {
+      asked += 1
+    })
+    for (const key of ['Delete', 'Backspace', 'a']) {
+      control.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key }))
+    }
+    expect(asked).toBe(2)
+  })
+
+  test('draws no mark and takes no key unless it is dismissible', async () => {
+    const host = await tab()
+    expect(part(host, 'dismiss')).toBeNull()
+    expect(part(host, 'tab')?.hasAttribute('aria-keyshortcuts')).toBe(false)
+    expect((host as Tab & { dismiss(): boolean }).dismiss()).toBe(false)
+  })
+})

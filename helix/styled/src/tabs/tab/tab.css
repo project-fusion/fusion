@@ -84,3 +84,22 @@
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }
+
+/* The close mark of a dismissible tab, after its label, sized to the text. */
+[part="dismiss"] {
+  align-items: center;
+  border-radius: var(--helix-radii-sm);
+  color: var(--tabs-tab-dismiss-color, currentColor);
+  display: inline-flex;
+  margin-inline: var(--helix-space-2xs) calc(var(--helix-space-2xs) * -1);
+  padding: var(--helix-space-none);
+}
+
+[part="dismiss"] svg {
+  block-size: 1em;
+  inline-size: 1em;
+}
+
+[part="dismiss"]:hover {
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 10%, transparent);
+}
