@@ -18,11 +18,13 @@ const press = (tab: Element | null): void => {
 }
 
 describe('the events example', () => {
-  run('pressing a tab asks to activate it, then selects it', async () => {
+  run('pressing a tab is heard first, and then the strip asks to activate it', async () => {
     await example(events)
     press(document.querySelector('helix-tab[value="billing"]'))
     await idle()
-    expect(logged()).toEqual(['helix-before-activate', 'helix-select'])
+    /* The root acts on the press once every listener has had the chance to
+       refuse it, so the press is heard before the request it makes. */
+    expect(logged()).toEqual(['helix-select', 'helix-before-activate'])
     expect((document.getElementById('strip') as HTMLElement & { active: string }).active).toBe(
       'billing',
     )
