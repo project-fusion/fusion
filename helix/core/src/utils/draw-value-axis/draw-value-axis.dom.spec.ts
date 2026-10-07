@@ -20,7 +20,7 @@ describe('a value axis', () => {
         [0, 1000],
         (value) => 100 - value / 10,
         (value) => `${value}`,
-        '--x-axis',
+        (widest) => `--x-axis: ${widest}ch`,
       ),
       box,
     )

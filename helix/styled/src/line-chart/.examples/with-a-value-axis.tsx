@@ -45,7 +45,7 @@ export function Example() {
 
       <helix-line-chart
         for="sessions-axis"
-        gridlines
+        gridlines="value"
         value-axis
       ></helix-line-chart>
     </helix-flex>

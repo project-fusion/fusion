@@ -260,6 +260,15 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
   stacked = false
 
   /**
+   * The summary's sentence. `{highestLabel}` is `highest-label`, and
+   * `{readings}` each series' highest reading: the series, the category and
+   * the reading as the table writes it.
+   */
+  @words
+  @property({ attribute: 'summary-label' })
+  summaryLabel = '{highestLabel}: {readings}.'
+
+  /**
    * Draws the numbers of the scale the bars are measured on, the `axis` part,
    * at the levels `gridlines` rules: down the side of columns, and along the
    * bottom of bars under `orientation="horizontal"`.
@@ -269,15 +278,6 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
    */
   @property({ attribute: 'value-axis', reflect: true, type: Boolean })
   valueAxis = false
-
-  /**
-   * The summary's sentence. `{highestLabel}` is `highest-label`, and
-   * `{readings}` each series' highest reading: the series, the category and
-   * the reading as the table writes it.
-   */
-  @words
-  @property({ attribute: 'summary-label' })
-  summaryLabel = '{highestLabel}: {readings}.'
 
   /** The series names on the second scale, lowercased and trimmed. */
   private get scaled(): Set<string> {
