@@ -30,6 +30,7 @@ import { styles } from './time-picker-root.css.js'
  * @cssproperty --time-picker-invalid-color - The ring around the chosen time, or around the times while nothing is chosen, while the picker is invalid.
  * @cssproperty --time-picker-list-block-size - How tall the list is before it scrolls.
  * @cssproperty --time-picker-mark-radius - The corners of the mark on a wheel's row.
+ * @cssproperty --time-picker-now-color - The ink of the button that chooses the current time, with `show-now`.
  * @cssproperty --time-picker-range-color - Fill behind the times inside a range.
  * @cssproperty --time-picker-row-size - Height and minimum width of one row in a wheel.
  * @cssproperty --time-picker-selected-color - Fill on the chosen row of a wheel.

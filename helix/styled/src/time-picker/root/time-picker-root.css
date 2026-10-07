@@ -224,6 +224,40 @@
   margin: var(--helix-space-sm) var(--helix-space-none) var(--helix-space-none);
 }
 
+/* The button that chooses the current time, with `show-now`: a line of the
+   primary ink under the times, set at the size of the hint beside it, with
+   the row's height so a finger can take it. */
+[part="now"] {
+  all: unset;
+  align-items: center;
+  block-size: var(--helix-size-control-tight);
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  color: var(--time-picker-now-color, var(--helix-color-primary));
+  cursor: pointer;
+  display: inline-flex;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-medium);
+  margin-block-start: var(--helix-space-xs);
+  padding-inline: var(--helix-space-xs);
+  transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+[part="now"]:not(:disabled):hover {
+  background-color: var(--helix-color-surface-raised);
+}
+
+[part="now"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+[part="now"]:disabled {
+  color: var(--helix-color-foreground-subtle);
+  cursor: not-allowed;
+}
+
 /* Print: a control prints the value it holds, and the state has to survive. */
 @media print {
   :host {

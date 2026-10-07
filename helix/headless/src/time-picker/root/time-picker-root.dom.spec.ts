@@ -873,3 +873,86 @@ describe('a time picker with help under it', () => {
     expect(part(host, 'list')?.getAttribute('aria-describedby')).toBe('feedback')
   })
 })
+
+/* A form about something happening now had the reader scroll to the clock's
+   time. `show-now` draws one button for it, and the time it picks is one the
+   picker offers, which is what keeps it valid. */
+describe('the current time', () => {
+  type Now = Time & { selectNow(): boolean }
+
+  const nowButton = (host: Time): HTMLButtonElement | null | undefined =>
+    host.shadowRoot?.querySelector<HTMLButtonElement>('[part="now"]')
+
+  /** The clock's time in seconds since midnight, read as the picker reads it. */
+  const clockNow = (): number => {
+    const at = new Date()
+    return at.getHours() * 3600 + at.getMinutes() * 60 + at.getSeconds()
+  }
+
+  test('is offered only with show-now, in the words of now-label', async () => {
+    expect(nowButton(await picker())).toBeNull()
+    const host = await picker('show-now now-label="Right now"')
+    expect(nowButton(host)?.textContent?.trim()).toBe('Right now')
+    expect(nowButton(host)?.type).toBe('button')
+  })
+
+  test('is clamped to min and max', async () => {
+    const host = (await picker('show-now min="09:00" max="09:00"')) as Now
+    nowButton(host)?.click()
+    await host.updateComplete
+    expect(host.value).toBe('09:00')
+  })
+
+  test('is rounded to the nearest time on the step', async () => {
+    /* Two times a day, midnight and noon, so the answer is midnight until six
+       in the morning and noon after it: there is no midnight at the end. */
+    const host = (await picker('show-now step="720"')) as Now
+    const expected = clockNow() <= 21_600 ? '00:00' : '12:00'
+    expect(host.selectNow()).toBe(true)
+    expect(host.value).toBe(expected)
+  })
+
+  test('passes a barred time for the nearest open one', async () => {
+    const host = (await picker('min="09:00" max="09:30" step="30" disable-times="09:00"')) as Now
+    expect(host.selectNow()).toBe(true)
+    expect(host.value).toBe('09:30')
+  })
+
+  test('announces the change, and canceling it keeps the time', async () => {
+    const host = (await picker('show-now value="10:00" min="09:00" max="09:00"')) as Now
+    const proposed: string[] = []
+    host.addEventListener('helix-before-change', (event) => {
+      proposed.push((event as CustomEvent<{ value: string }>).detail.value)
+      event.preventDefault()
+    })
+    nowButton(host)?.click()
+    await host.updateComplete
+    expect(proposed).toEqual(['09:00'])
+    expect(host.value).toBe('10:00')
+  })
+
+  test('joins the times held with a mode', async () => {
+    const host = (await picker(
+      'show-now mode="multiple" value="10:00" min="09:00" max="09:00"',
+    )) as Now
+    expect(host.selectNow()).toBe(true)
+    expect(host.value).toBe('10:00,09:00')
+  })
+
+  test('is refused while disabled or read-only', async () => {
+    const off = (await picker('show-now disabled min="09:00" max="09:00"')) as Now
+    expect(nowButton(off)?.disabled).toBe(true)
+    expect(off.selectNow()).toBe(false)
+    expect(off.value).toBe('')
+    const fixed = (await picker('show-now readonly min="09:00" max="09:00"')) as Now
+    expect(nowButton(fixed)?.disabled).toBe(true)
+    expect(fixed.selectNow()).toBe(false)
+    expect(fixed.value).toBe('')
+  })
+
+  test('is written with its seconds where the picker holds them', async () => {
+    const host = (await picker('seconds step="1" min="09:00:05" max="09:00:05"')) as Now
+    host.selectNow()
+    expect(host.value).toBe('09:00:05')
+  })
+})

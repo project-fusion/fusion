@@ -50,7 +50,9 @@ import '../../option/root/index.js'
  * between the wheels, and Tab does too.
  *
  * `hour-cycle` writes every time on a twelve or a twenty-four hour clock
- * whatever the locale, and `seconds` holds times to the second.
+ * whatever the locale, and `seconds` holds times to the second. `show-now`
+ * draws a button that chooses the current time, on the step and inside the
+ * bounds.
  *
  * The step keeps the list usable. At the default of 15 minutes a day is 96
  * rows, which people can scroll or type into. At 1 minute it is 1,440. Use the
@@ -127,6 +129,7 @@ import '../../option/root/index.js'
  * @csspart hint - Help under the times, shown while there is no message in `feedback`.
  * @csspart label - The visible label above the times, drawn while a label is slotted.
  * @csspart list - The listbox holding the times, in `list`.
+ * @csspart now - The button that chooses the current time, drawn with `show-now`.
  * @csspart list-empty - The text shown when the filter hides every option.
  * @csspart list-error - The list's `error` part, which Time Picker never sets: its times do not load.
  * @csspart list-feedback - The message that says what is wrong with the value.
@@ -318,6 +321,14 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
   mode?: 'multiple' | 'range'
 
   /**
+   * The words on the button that chooses the current time, drawn with
+   * `show-now`.
+   */
+  @words
+  @property({ attribute: 'now-label' })
+  nowLabel = 'Now'
+
+  /**
    * The validation message for a time after `max`. `{max}` is replaced with
    * `max`, written in `locale`.
    */
@@ -446,29 +457,81 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
     if (this.isDisabled) {
       return
     }
-    const announced = (event as HelixBeforeChangeEvent).detail.value
+    this.choose((event as HelixBeforeChangeEvent).detail.value)
+  }
+
+  /**
+   * Requests the times a pick announced, kept to what the mode allows, and
+   * returns whether the value changed.
+   */
+  private choose(announced: string): boolean {
     /* The listbox already skips a disabled option, so this is the second lock
        rather than the first: it covers a value arriving from a consumer's own
        dispatch, and it is what makes the refusal a fact about the component
        rather than about the listbox it happens to render. */
     if (announced.split(',').some((one) => this.barred(one.trim()))) {
-      return
+      return false
     }
     if (this.mode !== 'range') {
-      this.requestValue(announced)
-      return
+      return this.requestValue(announced)
     }
     const next = announced
       .split(',')
       .map((one) => one.trim())
       .filter(Boolean)
     if (next.length <= 2) {
-      this.requestValue(next.sort().join(','))
-      return
+      return this.requestValue(next.sort().join(','))
     }
     const before = new Set(this.held)
     const added = next.find((one) => !before.has(one))
-    this.requestValue(added ?? '')
+    return this.requestValue(added ?? '')
+  }
+
+  /**
+   * Chooses the current time, as a press on the `show-now` button does, and
+   * returns whether the value changed.
+   *
+   * The time is read off the reader's clock and moved to the nearest time on
+   * offer that is not barred, so it falls on the `step` and inside `min` and
+   * `max`. It is requested as a pick is, so `helix-before-change` can cancel
+   * it. With a `mode` the time joins the times held, and a range that holds
+   * two starts over from it, as a third pick does.
+   */
+  selectNow(): boolean {
+    if (this.isDisabled) {
+      return false
+    }
+    const clock = new Date()
+    const at = clock.getHours() * 3600 + clock.getMinutes() * 60 + clock.getSeconds()
+    const open = this.times.filter((time) => !this.barredAt(time))
+    if (open.length === 0) {
+      return false
+    }
+    const now = this.valueFor(nearestTime(open, at))
+    if (this.mode === undefined) {
+      return this.requestValue(now)
+    }
+    if (this.held.includes(now)) {
+      return false
+    }
+    return this.choose([...this.held, now].join(','))
+  }
+
+  private readonly handleNow = (): void => {
+    this.selectNow()
+  }
+
+  /** The button that chooses the current time, drawn with `show-now`. */
+  private renderNow(): TemplateResult | typeof nothing {
+    if (!this.showNow) {
+      return nothing
+    }
+    return html`<button
+      part="now"
+      type="button"
+      ?disabled=${this.isDisabled || this.readOnly}
+      @click=${this.handleNow}
+    >${this.nowLabel}</button>`
   }
 
   /**
@@ -665,6 +728,18 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
    */
   @property({ type: Boolean })
   seconds = false
+
+  /**
+   * Draws a button under the times that chooses the current time, as
+   * `selectNow()` does.
+   *
+   * For a form about something happening now, such as a shift starting or a
+   * dose taken, where the reader would otherwise scroll to the time on the
+   * clock. The button is a tab stop after the times, and its words are
+   * `now-label`.
+   */
+  @property({ attribute: 'show-now', type: Boolean })
+  showNow = false
 
   /**
    * How far apart the offered times are, in minutes, or in seconds with
@@ -1238,9 +1313,9 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
        range on wheels is two sets of wheels and a multiple is a set, which a
        wheel cannot hold. */
     if (this.variant === 'wheels' && this.mode === undefined) {
-      return html`${this.renderSlottedLabel()}${this.renderSpinner()}${this.renderHint()}${this.renderPickerFeedback()}`
+      return html`${this.renderSlottedLabel()}${this.renderSpinner()}${this.renderNow()}${this.renderHint()}${this.renderPickerFeedback()}`
     }
-    return html`${this.renderSlottedLabel()}${this.renderList()}${this.renderHint()}${this.renderPickerFeedback()}`
+    return html`${this.renderSlottedLabel()}${this.renderList()}${this.renderNow()}${this.renderHint()}${this.renderPickerFeedback()}`
   }
 
   /**
