@@ -1238,3 +1238,28 @@ describe('a date input in a calendar other than the Gregorian', () => {
     expect(month?.getAttribute('aria-valuetext')).toBe('7 – Adar II')
   })
 })
+
+describe('a date input reads a date as its locale writes one', () => {
+  /* Measured before this: `8/4/2026` typed in en-US was text and no date. */
+  test('in the order and the digits of `locale`, as the field commits', async () => {
+    const host = await field('name="d" locale="en-US"')
+    await type(host, '8/4/2026')
+    control(host).dispatchEvent(new Event('change'))
+    await host.updateComplete
+    expect(host.value).toBe('2026-08-04')
+    expect(formValue(host)).toBe('2026-08-04')
+    const german = await field('locale="de-DE"')
+    await type(german, '4.8.2026')
+    control(german).dispatchEvent(new Event('change'))
+    await german.updateComplete
+    expect(german.value).toBe('2026-08-04')
+  })
+
+  test('and each end of a range', async () => {
+    const host = await field('mode="range" locale="en-US"')
+    await type(host, 'Aug 4, 2026 – 8/11/2026')
+    control(host).dispatchEvent(new Event('change'))
+    await host.updateComplete
+    expect(host.value).toBe('2026-08-04,2026-08-11')
+  })
+})

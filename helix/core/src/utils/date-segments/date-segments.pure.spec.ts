@@ -1,7 +1,10 @@
 import { afterEach, describe, expect, test } from 'bun:test'
+import { monthSystem } from '../calendar/calendar.js'
 import {
   isPartial,
   isTwelveHourLayout,
+  readWrittenDate,
+  readWrittenTime,
   type SegmentSlot,
   segmentKey,
   segmentLayout,
@@ -210,5 +213,44 @@ describe('what an editing key does to a segment', () => {
     expect(segmentKey('1', at('dayPeriod'))).toBeNull()
     expect(segmentKey('Enter', at('month'))).toBeNull()
     expect(segmentKey('x', at('month'))).toBeNull()
+  })
+})
+
+/* `Intl` formats and does not parse, so a text field read ISO alone and
+   refused `8/4/2026` from a reader in the United States. */
+describe('a date or a time written in a locale', () => {
+  test('a date in the order and the words of its locale', () => {
+    expect(readWrittenDate('8/4/2026', 'en-US')).toBe('2026-08-04')
+    expect(readWrittenDate('4.8.2026', 'de-DE')).toBe('2026-08-04')
+    expect(readWrittenDate('04/08/26', 'en-GB')).toBe('2026-08-04')
+    expect(readWrittenDate('Aug 4, 2026', 'en-US')).toBe('2026-08-04')
+    expect(readWrittenDate('4. August 2026', 'de-DE')).toBe('2026-08-04')
+    expect(readWrittenDate('2026/8/4', 'en-US')).toBe('2026-08-04')
+    expect(readWrittenDate('۱۴۰۵/۷/۱۴', 'fa-IR-u-ca-persian', monthSystem('persian'))).toBe(
+      '2026-10-06',
+    )
+  })
+
+  test('and nothing for what is no date', () => {
+    expect(readWrittenDate('2/30/2026', 'en-US')).toBe('')
+    expect(readWrittenDate('13/4/2026', 'en-US')).toBe('')
+    expect(readWrittenDate('8/4', 'en-US')).toBe('')
+    expect(readWrittenDate('soon', 'en-US')).toBe('')
+  })
+
+  test('a time on either clock, with the half of the day in words', () => {
+    expect(readWrittenTime('2:30 PM', 'en-US')).toBe('14:30')
+    expect(readWrittenTime('2.30pm', 'en-US')).toBe('14:30')
+    expect(readWrittenTime('3 pm', 'en-US')).toBe('15:00')
+    expect(readWrittenTime('12:05 am', 'en-US')).toBe('00:05')
+    expect(readWrittenTime('14h30', 'fr-FR')).toBe('14:30')
+    expect(readWrittenTime('1430', 'de-DE')).toBe('14:30')
+    expect(readWrittenTime('9:07:05', 'en-GB', true)).toBe('09:07:05')
+  })
+
+  test('and nothing for what is no time', () => {
+    expect(readWrittenTime('25:00', 'en-GB')).toBe('')
+    expect(readWrittenTime('13 pm', 'en-US')).toBe('')
+    expect(readWrittenTime('noon-ish', 'en-US')).toBe('')
   })
 })

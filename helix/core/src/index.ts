@@ -450,7 +450,11 @@ export {
   drawOptions,
   windowOf,
 } from './utils/data-options/data-options.js'
-export { segmentName } from './utils/date-segments/date-segments.js'
+export {
+  readWrittenDate,
+  readWrittenTime,
+  segmentName,
+} from './utils/date-segments/date-segments.js'
 export {
   type DrawDismissOptions,
   drawDismiss,

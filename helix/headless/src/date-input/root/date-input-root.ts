@@ -22,6 +22,7 @@ import {
   type MonthCalendar,
   type MonthSystem,
   monthSystem,
+  readWrittenDate,
   words,
   wordsLocale,
 } from '@fusion.dev/helix-core'
@@ -64,7 +65,10 @@ const dates = (value: string): string[] =>
  * gives a picker and locale formatting but allows almost no styling, so the
  * field is a text field. Typing sends `input` on each keystroke and `change`
  * when you leave the field, as a text field does. A date picked from the
- * calendar sends both.
+ * calendar sends both. The field reads ISO, `2026-08-04`, and a date written
+ * in the order, the digits, and the month names of `locale`, `8/4/2026` or
+ * `Aug 4, 2026` in `en-US` and `4.8.2026` in `de-DE`, which becomes the value
+ * as you leave the field.
  *
  * The trigger and ArrowDown open the calendar with focus on the selected day,
  * Tab moves between the calendar's controls without leaving it, and Escape
@@ -249,8 +253,9 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
    * **The field renders when it is idle and holds the value when it is being
    * edited.** A written date is a rendering, and a document being edited must
    * not be a rendering of something else: `Intl.DateTimeFormat` formats and does
-   * not parse, so `4 August 2026` cannot be typed back, and writing a parser per
-   * locale is how a field ends up rejecting what it just displayed.
+   * not parse, so a rendering such as `Tuesday, August 4, 2026` is no text to
+   * edit. The field does read a date typed in the locale's order and digits as
+   * you leave it, which covers what a reader types.
    *
    * The way out is not to choose between the two but to separate them in time.
    * Idle, the field shows `4 August 2026`, which is what a date is for reading.
@@ -680,16 +685,49 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
     this.restore()
   }
 
+  /**
+   * A date as the reader wrote it, as `YYYY-MM-DD`: ISO as it is, and the
+   * order, the digits, and the month names of the field's locale and calendar
+   * read back, so `8/4/2026` in `en-US` is August 4, 2026. Empty where it is
+   * no date.
+   */
+  private read(text: string): string {
+    return isDateValue(text) ? text : readWrittenDate(text, this.segmentLocale, this.segmentSystem)
+  }
+
+  /**
+   * The text the reader leaves, read in the field's locale: a date written as
+   * the locale writes one becomes the value, as ISO, when the field commits.
+   * Not on each key, where `8/4/202` is a date in the year 202 and taking it
+   * would move the caret mid-year.
+   */
+  private readonly handleTextCommit = (event: Event): void => {
+    if (this.mode !== 'multiple') {
+      /* A range written with a dash keeps the commas inside each end, as in
+         `Aug 4, 2026 – Aug 11, 2026`. */
+      const held =
+        this.mode === 'range' && /\s[–-]\s/.test(this.value)
+          ? this.value.split(/\s+[–-]\s+/).map((one) => one.trim())
+          : dates(this.value)
+      const read = held.map((one) => this.read(one))
+      if (held.length > 0 && !held.every(isDateValue) && read.every(Boolean)) {
+        this.requestValue(read.join(','))
+      }
+    }
+    this.handleCommit(event)
+  }
+
   /** Adds what was typed to the set, or takes the last one back out. */
   private readonly handleDraftKey = (event: KeyboardEvent): void => {
     if (this.mode !== 'multiple') {
       return
     }
     const held = dates(this.value)
-    if (event.key === 'Enter' && isDateValue(this.draft)) {
+    const draft = this.read(this.draft.trim())
+    if (event.key === 'Enter' && draft !== '') {
       event.preventDefault()
-      if (!held.includes(this.draft)) {
-        this.requestPicked([...held, this.draft].join(','))
+      if (!held.includes(draft)) {
+        this.requestPicked([...held, draft].join(','))
       }
       this.draft = ''
     } else if (event.key === 'Backspace' && this.draft === '' && held.length > 0) {
@@ -1021,7 +1059,7 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
       ?readonly=${this.readOnly}
       ?required=${this.required}
       @blur=${this.handleBlur}
-      @change=${this.handleCommit}
+      @change=${this.handleTextCommit}
       @focus=${this.handleFocus}
       @input=${this.handleInput}
       @keydown=${this.handleDraftKey}

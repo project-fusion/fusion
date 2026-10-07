@@ -392,3 +392,29 @@ describe('input time takes content at either end', () => {
     expect(slots).toEqual(['start', 'end'])
   })
 })
+
+describe('a time input reads a time as you write one', () => {
+  /* Measured before this: `2:30 PM` typed into the field was text and no time,
+     and the form received nothing. */
+  test('on either clock, as the field commits', async () => {
+    const host = await field('name="t" locale="en-US"')
+    await type(host, '2:30 PM')
+    expect(host.value).toBe('2:30 PM')
+    control(host).dispatchEvent(new Event('change'))
+    await host.updateComplete
+    expect(host.value).toBe('14:30')
+    const french = await field('locale="fr-FR"')
+    await type(french, '14h05')
+    control(french).dispatchEvent(new Event('change'))
+    await french.updateComplete
+    expect(french.value).toBe('14:05')
+  })
+
+  test('and leaves text that is no time as it was', async () => {
+    const host = await field('locale="en-US"')
+    await type(host, 'teatime')
+    control(host).dispatchEvent(new Event('change'))
+    await host.updateComplete
+    expect(host.value).toBe('teatime')
+  })
+})
