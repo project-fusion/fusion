@@ -27,9 +27,11 @@ import { styles } from './number-input-root.css.js'
  * @aliases NumberField, Stepper, InputNumber
  * @documentation https://fusion.dev/helix/components/number-input
  *
+ * @slot decrement-icon - Replaces the icon on the step down button.
  * @slot end - Content after the number, such as a unit.
  * @slot feedback - The message that says what is wrong, for content richer than a string. It shows while there is a message.
  * @slot hint - Help under the control, for content richer than the `hint` text.
+ * @slot increment-icon - Replaces the icon on the step up button.
  * @slot label - The label, for content richer than the `label` text.
  * @slot start - Content before the number, such as a unit or an icon.
  *
@@ -48,7 +50,7 @@ import { styles } from './number-input-root.css.js'
  * @cssproperty --number-input-stepper-border-color - The rule between each stepper button and the number.
  * @cssproperty --number-input-stepper-color - Icon color of the stepper buttons at rest.
  * @cssproperty --number-input-stepper-color-hover - Icon color of a stepper button under the pointer.
- * @cssproperty --number-input-stepper-icon-size - Width and height of the stepper icons.
+ * @cssproperty --number-input-stepper-icon-size - Width and height of the stepper icons, drawn or slotted.
  * @cssproperty --number-input-stepper-size - Width of each stepper button.
  */
 @customElement('helix-number-input')
