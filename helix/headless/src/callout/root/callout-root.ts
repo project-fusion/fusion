@@ -99,10 +99,15 @@ export class HelixHeadlessCallout extends MixinDismissible(HelixElement) {
    * `danger` is said as "Error", the word a reader understands, and
    * `neutral` as "Note", for what the passage is.
    */
-  // biome-ignore format: the words audit reads a table's English from the line it starts on
   @words
   @property({ attribute: 'tone-labels', converter: wordsConverter })
-  toneLabels: Partial<Record<'danger' | 'info' | 'neutral' | 'success' | 'warning', string>> = { danger: 'Error', info: 'Information', neutral: 'Note', success: 'Success', warning: 'Warning' }
+  toneLabels: Partial<Record<'danger' | 'info' | 'neutral' | 'success' | 'warning', string>> = {
+    danger: 'Error',
+    info: 'Information',
+    neutral: 'Note',
+    success: 'Success',
+    warning: 'Warning',
+  }
 
   /**
    * The mark for the callout's tone, behind a seam.

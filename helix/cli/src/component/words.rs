@@ -52,10 +52,6 @@ static KEY: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"static\s+(?:override\s+)?words\s*=\s*['`]").expect("a literal pattern compiles")
 });
 
-/// A template literal with no tag, which builds a string in code.
-static PLAIN: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"(?:^|[^\w$.`])`([^`]*)`").expect("a literal pattern compiles"));
-
 /// An interpolation in a template literal.
 static HOLE: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"\$\{([^}]*)\}").expect("a literal pattern compiles"));
@@ -74,7 +70,9 @@ fn declared(code: &str) -> Vec<Declared> {
     DECLARATION
         .captures_iter(code)
         .map(|found| {
-            let value = found.get(3).map_or("", |one| one.as_str().trim());
+            let value = found.get(3).map_or("", |one| {
+                table_at(code, one.start()).unwrap_or(one.as_str()).trim()
+            });
             let name = found[2].to_owned();
             let quoted = value.starts_with(['\'', '"', '`']);
             let table =
@@ -87,6 +85,152 @@ fn declared(code: &str) -> Vec<Declared> {
             }
         })
         .collect()
+}
+
+/// A table initializer from its opening brace to the brace that closes it,
+/// where it begins at `at`, so a table written over several lines reads as a
+/// whole: its English is on the lines after the one it starts on.
+fn table_at(code: &str, at: usize) -> Option<&str> {
+    let bytes = code.as_bytes();
+    if bytes.get(at) != Some(&b'{') {
+        return None;
+    }
+    let mut depth = 0usize;
+    let mut quote: Option<u8> = None;
+    let mut index = at;
+    while index < bytes.len() {
+        let one = bytes[index];
+        match quote {
+            Some(_) if one == b'\\' => index += 1,
+            Some(open) if one == open => quote = None,
+            Some(_) => {}
+            None => match one {
+                b'\'' | b'"' | b'`' => quote = Some(one),
+                b'{' => depth += 1,
+                b'}' => {
+                    depth -= 1;
+                    if depth == 0 {
+                        return Some(&code[at..=index]);
+                    }
+                }
+                _ => {}
+            },
+        }
+        index += 1;
+    }
+    None
+}
+
+/// What the scanner is inside: code, which may be an interpolation of a
+/// template, or a template's text.
+enum Frame {
+    /// Code, with the braces opened in it and, inside an interpolation, the
+    /// code as written, nested templates left out.
+    Code { depth: usize, hole: Option<Vec<u8>> },
+    /// A template literal's text, with whether a tag reads it and where it starts.
+    Template {
+        tagged: bool,
+        at: usize,
+        text: Vec<u8>,
+    },
+}
+
+/// Every template literal no tag reads, each with the offset its text starts
+/// at and its text, each interpolation kept as `${…}`.
+///
+/// **Templates nest**, so a closing backtick is paired with the backtick that
+/// opened it. A regular expression pairing backticks in order read the text
+/// after an inner `html` template's closing backtick as a plain literal, and
+/// reported a word in the outer template as joined in code.
+fn plain_templates(code: &str) -> Vec<(usize, String)> {
+    let bytes = code.as_bytes();
+    let mut stack = vec![Frame::Code {
+        depth: 0,
+        hole: None,
+    }];
+    let mut found = Vec::new();
+    let mut index = 0;
+    while index < bytes.len() {
+        let one = bytes[index];
+        let next = bytes.get(index + 1).copied();
+        let Some(frame) = stack.last_mut() else {
+            break;
+        };
+        match frame {
+            Frame::Code { depth, hole } => match one {
+                b'\'' | b'"' => {
+                    let from = index;
+                    index += 1;
+                    while index < bytes.len() && bytes[index] != one && bytes[index] != b'\n' {
+                        index += usize::from(bytes[index] == b'\\') + 1;
+                    }
+                    let to = (index + 1).min(bytes.len());
+                    if let Some(hole) = hole {
+                        hole.extend_from_slice(&bytes[from..to]);
+                    }
+                }
+                b'`' => {
+                    let tagged = index > 0 && {
+                        let before = bytes[index - 1];
+                        before.is_ascii_alphanumeric()
+                            || matches!(before, b'_' | b'$' | b')' | b']')
+                    };
+                    if let Some(hole) = hole {
+                        hole.extend_from_slice(b"``");
+                    }
+                    stack.push(Frame::Template {
+                        tagged,
+                        at: index + 1,
+                        text: Vec::new(),
+                    });
+                }
+                b'}' if *depth == 0 && hole.is_some() => {
+                    let written = hole.take().unwrap_or_default();
+                    stack.pop();
+                    if let Some(Frame::Template { text, .. }) = stack.last_mut() {
+                        text.extend_from_slice(&written);
+                        text.push(b'}');
+                    }
+                }
+                _ => {
+                    match one {
+                        b'{' => *depth += 1,
+                        b'}' => *depth = depth.saturating_sub(1),
+                        _ => {}
+                    }
+                    if let Some(hole) = hole {
+                        hole.push(one);
+                    }
+                }
+            },
+            Frame::Template { tagged, at, text } => match one {
+                b'\\' => {
+                    text.push(one);
+                    if let Some(escaped) = next {
+                        text.push(escaped);
+                    }
+                    index += 1;
+                }
+                b'`' => {
+                    if !*tagged {
+                        found.push((*at, String::from_utf8_lossy(text).into_owned()));
+                    }
+                    stack.pop();
+                }
+                b'$' if next == Some(b'{') => {
+                    text.extend_from_slice(b"${");
+                    stack.push(Frame::Code {
+                        depth: 0,
+                        hole: Some(Vec::new()),
+                    });
+                    index += 1;
+                }
+                _ => text.push(one),
+            },
+        }
+        index += 1;
+    }
+    found
 }
 
 /// The family a source file belongs to: the folder under its tier.
@@ -136,8 +280,8 @@ fn judged(properties: &[Declared], at: &dyn Fn(usize) -> String) -> (usize, Vec<
 /// Every plain template literal that joins one of `wordy` with other text.
 fn joins(code: &str, wordy: &[&str], at: &dyn Fn(usize) -> String) -> Vec<Finding> {
     let mut findings = Vec::new();
-    for literal in PLAIN.captures_iter(code) {
-        let body = &literal[1];
+    for (start, body) in plain_templates(code) {
+        let body = body.as_str();
         let holes: Vec<String> = HOLE
             .captures_iter(body)
             .map(|hole| hole[1].trim().to_owned())
@@ -155,7 +299,7 @@ fn joins(code: &str, wordy: &[&str], at: &dyn Fn(usize) -> String) -> Vec<Findin
             detail: "Put the other text in the message, with a placeholder for each value, so a \
                      translation can order the sentence."
                 .to_owned(),
-            file: at(literal.get(1).map_or(0, |one| one.start())),
+            file: at(start),
             message: format!("a template literal joins `{joined}` with other text"),
         });
     }
