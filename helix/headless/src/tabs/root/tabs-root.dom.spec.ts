@@ -8,6 +8,14 @@ beforeAll(async () => {
 
 type Updatable = HTMLElement & { updateComplete: Promise<unknown> }
 
+/* A choice is applied a microtask after its `helix-select`, once every
+   listener has had the chance to refuse it, so the update to wait for is
+   requested after that. */
+const turn = async (host: Updatable): Promise<void> => {
+  await null
+  await host.updateComplete
+}
+
 const markup = `
   <helix-headless-tabs default-active="one">
     <helix-headless-tab value="one">One</helix-headless-tab>
@@ -34,7 +42,7 @@ describe('tabs selection', () => {
     const host = (await mount(markup)) as Updatable
     const second = tabs(host)[1] as Updatable & { select(): void }
     second.select()
-    await host.updateComplete
+    await turn(host)
 
     expect(hasState(second, 'selected')).toBe(true)
     expect(hasState(panels(host)[1] as Element, 'selected')).toBe(true)
@@ -51,10 +59,23 @@ describe('tabs selection', () => {
     const second = tabs(host)[1] as Updatable & { select(): void }
     second.addEventListener('helix-select', (event) => event.preventDefault())
     second.select()
-    await host.updateComplete
+    await turn(host)
 
     expect(host.active).toBe('one')
     expect(hasState(second, 'selected')).toBe(false)
+    expect(hasState(panels(host)[0] as Element, 'selected')).toBe(true)
+  })
+
+  test('and refusing it on the strip itself keeps the selection too', async () => {
+    /* The docblock tells you to listen on the root. The root's own listener was
+       added first, so it applied the choice before a listener on the same
+       element could refuse it. */
+    const host = (await mount(markup)) as Updatable & { active: string }
+    host.addEventListener('helix-select', (event) => event.preventDefault())
+    ;(part(tabs(host)[1] as HTMLElement, 'tab') as HTMLElement).click()
+    await turn(host)
+    expect(host.active).toBe('one')
+    expect(hasState(tabs(host)[1] as Element, 'selected')).toBe(false)
     expect(hasState(panels(host)[0] as Element, 'selected')).toBe(true)
   })
 
@@ -62,7 +83,7 @@ describe('tabs selection', () => {
     const host = (await mount(markup)) as Updatable
     const third = tabs(host)[2] as Updatable & { select(): void }
     third.select()
-    await host.updateComplete
+    await turn(host)
     expect(hasState(third, 'selected')).toBe(false)
   })
 
@@ -108,12 +129,12 @@ describe('tabs keyboard', () => {
   test('arrows move selection and wrap past the ends', async () => {
     const host = (await mount(markup)) as Updatable
     press(host, 'ArrowRight')
-    await host.updateComplete
+    await turn(host)
     expect(hasState(tabs(host)[1] as Element, 'selected')).toBe(true)
 
     // Three is disabled, so right from two wraps to one rather than stopping.
     press(host, 'ArrowRight')
-    await host.updateComplete
+    await turn(host)
     expect(hasState(tabs(host)[0] as Element, 'selected')).toBe(true)
   })
 
@@ -129,10 +150,10 @@ describe('tabs keyboard', () => {
         markup.replace('default-active="one"', 'default-active="two"').replace(' disabled', ''),
       )) as Updatable
       press(host, 'ArrowLeft')
-      await host.updateComplete
+      await turn(host)
       expect(hasState(tabs(host)[2] as Element, 'selected')).toBe(true)
       press(host, 'ArrowRight')
-      await host.updateComplete
+      await turn(host)
       expect(hasState(tabs(host)[1] as Element, 'selected')).toBe(true)
     } finally {
       document.documentElement.removeAttribute('dir')
@@ -145,22 +166,22 @@ describe('tabs keyboard', () => {
        reads as Right, Up as Left. */
     const host = (await mount(markup)) as Updatable
     press(host, 'ArrowDown')
-    await host.updateComplete
+    await turn(host)
     expect(hasState(tabs(host)[1] as Element, 'selected')).toBe(true)
 
     press(host, 'ArrowUp')
-    await host.updateComplete
+    await turn(host)
     expect(hasState(tabs(host)[0] as Element, 'selected')).toBe(true)
   })
 
   test('Home and End reach the ends', async () => {
     const host = (await mount(markup)) as Updatable
     press(host, 'End')
-    await host.updateComplete
+    await turn(host)
     expect(hasState(tabs(host)[1] as Element, 'selected')).toBe(true)
 
     press(host, 'Home')
-    await host.updateComplete
+    await turn(host)
     expect(hasState(tabs(host)[0] as Element, 'selected')).toBe(true)
   })
 
@@ -169,7 +190,7 @@ describe('tabs keyboard', () => {
       markup.replace('<helix-headless-tabs ', '<helix-headless-tabs manual '),
     )) as Updatable
     press(host, 'ArrowRight')
-    await host.updateComplete
+    await turn(host)
     // Focus moved; selection did not.
     expect(hasState(tabs(host)[0] as Element, 'selected')).toBe(true)
   })
@@ -193,9 +214,9 @@ describe('tabs keyboard', () => {
     }
 
     pressFrom(tabs(host)[0] as HTMLElement, 'ArrowRight')
-    await host.updateComplete
+    await turn(host)
     pressFrom(tabs(host)[1] as HTMLElement, 'ArrowRight')
-    await host.updateComplete
+    await turn(host)
 
     // Two moves, and the second wrapped past the disabled third.
     expect(reached).toEqual(['two', 'one'])
@@ -211,7 +232,7 @@ describe('tabs keyboard', () => {
        tab, so there is nothing to move. */
     const host = (await mount(markup)) as Updatable
     const event = pressFrom(panels(host)[0] as HTMLElement, 'ArrowRight')
-    await host.updateComplete
+    await turn(host)
 
     expect(hasState(tabs(host)[0] as Element, 'selected')).toBe(true)
     expect(event.defaultPrevented).toBe(false)
@@ -228,7 +249,7 @@ describe('tabs selection can be refused', () => {
     /* Whether a selection can be refused should not depend on which component
        is being looked at: `Radio.Group` two folders away can be. */
     const host = (await mount(markup)) as Updatable & { active: string }
-    await host.updateComplete
+    await turn(host)
     const started = host.active
 
     host.addEventListener('helix-before-activate', (event) => event.preventDefault())
@@ -242,7 +263,7 @@ describe('tabs selection can be refused', () => {
         detail: { value: other.getAttribute('value') },
       }),
     )
-    await host.updateComplete
+    await turn(host)
 
     expect(host.active).toBe(started)
   })
@@ -257,7 +278,7 @@ describe('tabs selection can be refused', () => {
       <helix-headless-tab-panel slot="panels" value="b">B</helix-headless-tab-panel>
     </helix-headless-tabs>`
     const host = document.body.firstElementChild as Updatable
-    await host.updateComplete
+    await turn(host)
 
     const tabs = [...host.querySelectorAll('helix-headless-tab')] as (HTMLElement & {
       selected: boolean
@@ -275,9 +296,9 @@ describe('tabs, controlled and uncontrolled', () => {
         <helix-headless-tab value="two">Two</helix-headless-tab>
       </helix-headless-tabs>`,
     )) as Updatable & { active: string }
-    await host.updateComplete
+    await turn(host)
     ;(tabs(host)[1] as unknown as { select(): void }).select()
-    await host.updateComplete
+    await turn(host)
 
     // Announced and applied: a declared `active` is a seed.
     expect(host.active).toBe('two')
@@ -291,13 +312,13 @@ describe('tabs, controlled and uncontrolled', () => {
         <helix-headless-tab value="two">Two</helix-headless-tab>
       </helix-headless-tabs>`,
     )) as Updatable & { active: string }
-    await host.updateComplete
+    await turn(host)
     let asked = ''
     host.addEventListener('helix-before-activate', (event) => {
       asked = (event as CustomEvent<{ value: string }>).detail.value
     })
     ;(tabs(host)[1] as unknown as { select(): void }).select()
-    await host.updateComplete
+    await turn(host)
     expect(asked).toBe('two')
   })
 
@@ -308,9 +329,9 @@ describe('tabs, controlled and uncontrolled', () => {
         <helix-headless-tab value="two">Two</helix-headless-tab>
       </helix-headless-tabs>`,
     )) as Updatable & { active: string }
-    await host.updateComplete
+    await turn(host)
     ;(tabs(host)[1] as unknown as { select(): void }).select()
-    await host.updateComplete
+    await turn(host)
     expect(host.active).toBe('two')
   })
 
@@ -322,7 +343,7 @@ describe('tabs, controlled and uncontrolled', () => {
         <helix-headless-tab value="two">Two</helix-headless-tab>
       </helix-headless-tabs>`,
     )) as Updatable & { active: string }
-    await host.updateComplete
+    await turn(host)
     expect(host.active).toBe('two')
   })
 })
@@ -345,7 +366,7 @@ describe('tabs and the markup a server sent', () => {
         <helix-headless-tab-panel selected slot="panels" value="three">Third</helix-headless-tab-panel>
       </helix-headless-tabs>`,
     )) as Updatable
-    await host.updateComplete
+    await turn(host)
 
     expect(hasState(tabs(host)[2] as Element, 'selected')).toBe(true)
     expect(hasState(tabs(host)[0] as Element, 'selected')).toBe(false)
@@ -359,7 +380,7 @@ describe('tabs and the markup a server sent', () => {
         <helix-headless-tab selected value="two">Two</helix-headless-tab>
       </helix-headless-tabs>`,
     )) as Updatable
-    await host.updateComplete
+    await turn(host)
     expect(hasState(tabs(host)[0] as Element, 'selected')).toBe(true)
     expect(hasState(tabs(host)[1] as Element, 'selected')).toBe(false)
   })
@@ -371,7 +392,7 @@ describe('tabs and the markup a server sent', () => {
         <helix-headless-tab value="two">Two</helix-headless-tab>
       </helix-headless-tabs>`,
     )) as Updatable
-    await host.updateComplete
+    await turn(host)
     expect(hasState(tabs(host)[1] as Element, 'selected')).toBe(true)
   })
 })
@@ -387,14 +408,14 @@ describe('tabs modes are decided once', () => {
         <helix-headless-tab value="two">Two</helix-headless-tab>
       </helix-headless-tabs>`,
     )) as Updatable & { active: string }
-    await host.updateComplete
+    await turn(host)
 
     host.active = 'two'
-    await host.updateComplete
+    await turn(host)
     expect(host.active).toBe('two')
 
     ;(tabs(host)[0] as unknown as { select(): void }).select()
-    await host.updateComplete
+    await turn(host)
     expect(host.active).toBe('one')
   })
 })
@@ -405,7 +426,7 @@ describe('tabs and what is inside a panel', () => {
   test('a choice from inside a panel leaves the tab set where it is', async () => {
     const host = (await mount(markup)) as Updatable & { active: string }
     ;(tabs(host)[1] as Updatable & { select(): void }).select()
-    await host.updateComplete
+    await turn(host)
     const inside = document.createElement('div')
     panels(host)[1]?.append(inside)
     inside.dispatchEvent(
@@ -416,7 +437,7 @@ describe('tabs and what is inside a panel', () => {
         detail: { value: 'elsewhere' },
       }),
     )
-    await host.updateComplete
+    await turn(host)
     expect(host.active).toBe('two')
     expect(hasState(panels(host)[1] as Element, 'selected')).toBe(true)
   })
@@ -457,7 +478,7 @@ describe('each tab and the panel it shows', () => {
      shadow roots. The set hands each tab its panel's host. */
   test('are paired by the set, for an element reference', async () => {
     const host = (await mount(markup)) as Updatable
-    await host.updateComplete
+    await turn(host)
     const [one, two] = tabs(host) as (Updatable & { controls?: Element })[]
     expect(one?.controls).toBe(panels(host)[0])
     expect(two?.controls).toBe(panels(host)[1])
@@ -489,7 +510,7 @@ describe('each tab and the panel it shows', () => {
       },
     })
     const host = (await mount(markup)) as Updatable
-    await host.updateComplete
+    await turn(host)
     for (const tab of tabs(host)) {
       await tab.updateComplete
     }
@@ -523,7 +544,7 @@ describe('tabs that are links', () => {
     const host = (await mount(links)) as Updatable & { active: string }
     const [home, docs] = tabs(host)
     home?.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowRight' }))
-    await host.updateComplete
+    await turn(host)
     expect(document.activeElement).toBe(docs ?? null)
     expect(hasState(docs as Element, 'selected')).toBe(false)
   })
@@ -544,7 +565,7 @@ describe('removing the selected tab', () => {
     const host = (await mount(markup)) as Tabs
     const second = tabs(host)[1] as Updatable & { select(): void; focus(): void }
     second.select()
-    await host.updateComplete
+    await turn(host)
     second.focus()
     const heard: string[] = []
     host.addEventListener('helix-activate', (event) =>
@@ -552,9 +573,9 @@ describe('removing the selected tab', () => {
     )
     second.remove()
     panels(host)[1]?.remove()
-    await host.updateComplete
+    await turn(host)
     await new Promise((done) => setTimeout(done, 0))
-    await host.updateComplete
+    await turn(host)
     return { heard, host }
   }
 
@@ -576,6 +597,68 @@ describe('removing the selected tab', () => {
   })
 })
 
+describe('dismissing the selected tab with the key', () => {
+  /* A dismissed tab hands focus to the tab after it, and the strip chose its
+     first tab, so in automatic mode focus sat on one tab while another was
+     selected. */
+  const dismissible = `
+    <helix-headless-tabs active="c">
+      <helix-headless-tab dismissible value="a">Alpha</helix-headless-tab>
+      <helix-headless-tab dismissible value="b">Beta</helix-headless-tab>
+      <helix-headless-tab dismissible value="c">Gamma</helix-headless-tab>
+      <helix-headless-tab dismissible value="d">Delta</helix-headless-tab>
+      <helix-headless-tab-panel slot="panels" value="a">A</helix-headless-tab-panel>
+      <helix-headless-tab-panel slot="panels" value="b">B</helix-headless-tab-panel>
+      <helix-headless-tab-panel slot="panels" value="c">C</helix-headless-tab-panel>
+      <helix-headless-tab-panel slot="panels" value="d">D</helix-headless-tab-panel>
+    </helix-headless-tabs>`
+
+  const dismiss = async (value: string): Promise<Updatable & { active: string }> => {
+    const host = (await mount(
+      dismissible.replace('active="c"', `active="${value}"`),
+    )) as Updatable & { active: string }
+    host.addEventListener('helix-dismiss', (event) => {
+      const tab = event.target as HTMLElement
+      host.querySelector(`helix-headless-tab-panel[value="${tab.getAttribute('value')}"]`)?.remove()
+      tab.remove()
+    })
+    const tab = host.querySelector(`helix-headless-tab[value="${value}"]`) as Updatable
+    const control = part(tab, 'tab') as HTMLElement
+    control.focus()
+    control.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        key: 'Delete',
+      }),
+    )
+    await turn(host)
+    await new Promise((done) => setTimeout(done, 0))
+    await turn(host)
+    return host
+  }
+
+  /* The document reports the tab's host, the control being inside its shadow root. */
+  const focused = (host: HTMLElement): string | null => {
+    const active = document.activeElement
+    return active && host.contains(active) ? active.getAttribute('value') : null
+  }
+
+  test('selects the tab after it, which is the tab that takes focus', async () => {
+    const host = await dismiss('c')
+    expect(host.active).toBe('d')
+    expect(focused(host)).toBe('d')
+    expect(hasState(tabs(host)[2] as Element, 'selected')).toBe(true)
+  })
+
+  test('selects the tab before it where it was the last', async () => {
+    const host = await dismiss('d')
+    expect(host.active).toBe('c')
+    expect(focused(host)).toBe('c')
+  })
+})
+
 describe('a strip with more tabs than fit', () => {
   /* Web Awesome's scroll buttons. happy-dom lays nothing out, so the strip's
      lengths are given to it. */
@@ -587,7 +670,7 @@ describe('a strip with more tabs than fit', () => {
     const host = (await mount(
       markup.replace('<helix-headless-tabs', '<helix-headless-tabs scroll-controls'),
     )) as Updatable
-    await host.updateComplete
+    await turn(host)
     const strip = part(host, 'tabs') as HTMLElement
     const scrolled: number[] = []
     Object.defineProperty(strip, 'clientWidth', { configurable: true, value: 200 })
@@ -596,7 +679,7 @@ describe('a strip with more tabs than fit', () => {
       scrolled.push(options.left ?? 0)
     }) as typeof strip.scrollBy
     strip.dispatchEvent(new Event('scroll'))
-    await host.updateComplete
+    await turn(host)
     return { host, scrolled, strip }
   }
 
@@ -610,7 +693,7 @@ describe('a strip with more tabs than fit', () => {
     expect(end.getAttribute('tabindex')).toBe('-1')
     Object.defineProperty(strip, 'scrollLeft', { configurable: true, value: 300 })
     strip.dispatchEvent(new Event('scroll'))
-    await host.updateComplete
+    await turn(host)
     expect(start.hidden).toBe(false)
     expect(end.hidden).toBe(true)
   })
@@ -623,7 +706,7 @@ describe('a strip with more tabs than fit', () => {
 
   test('draws no buttons unless asked', async () => {
     const host = (await mount(markup)) as Updatable
-    await host.updateComplete
+    await turn(host)
     expect(part(host, 'scroll-start')).toBeNull()
     expect(part(host, 'scroll-end')).toBeNull()
   })

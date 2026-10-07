@@ -64,9 +64,9 @@ import { HelixHeadlessTab } from '../tab/tab.js'
  * | Enter, Space | Selects the tab with focus, or follows its link. |
  * | Tab | Leaves the list for the selected panel. |
  *
- * Removing the selected tab selects the first enabled tab that is left, and
- * `active` says so, with `helix-activate`. Where the removed tab had focus,
- * focus moves to the tab now selected.
+ * Removing the selected tab selects the enabled tab beside it, the next one
+ * or else the one before, and `active` says so, with `helix-activate`. Where
+ * the removed tab had focus, focus moves to the tab now selected.
  *
  * **More tabs than fit.** With `scroll-controls`, a strip that scrolls shows a
  * button at each end it can scroll toward, as Web Awesome's tab group does,
@@ -225,24 +225,27 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
      straight from the event leaves `helix-before-activate` an announcement
      nobody can answer.
 
-     **And only if the tab's own choice stood.** `helix-select` is cancelable
-     and the tab documents it as refusable; this element is the only thing that
-     acts on it, so a refusal nothing read was a veto that did nothing. Read
-     here rather than a microtask later, which is the difference from `Menu`:
-     that listener runs in capture, ahead of a consumer's on the same host, and
-     this one is a bubble listener for an event from a child, so every listener
-     on the tab has already run by the time it arrives. A consumer on this
-     element refuses with `helix-before-activate` instead, which the mixin
-     dispatches below. */
+     **And only if the tab's own choice stood, read a microtask later.**
+     `helix-select` is cancelable, and the docblock tells you to listen for it
+     on this element. This listener is on this element too, added when it
+     connected, so it runs ahead of a listener you add afterwards, and read
+     inline the flag was not set yet: a refusal on the root changed nothing.
+     The dispatch is synchronous, so a microtask is after every listener, the
+     tab's and the root's. `Radio.Group` holds the same pair for the same
+     event. */
   private readonly handleSelection = (event: Event): void => {
     /* Only a choice made by one of this set's own tabs. `helix-select` bubbles
        and is composed, and a tree, a menu or another tab set inside a panel
        sends it too: acted on, it set `active` to a value no tab has, and the
        set fell back to its first tab under the reader. */
-    if (event.defaultPrevented || !this.tabs.includes(event.target as HelixHeadlessTab)) {
+    if (!this.tabs.includes(event.target as HelixHeadlessTab)) {
       return
     }
-    this.requestActive((event as CustomEvent<{ value: string }>).detail.value)
+    queueMicrotask(() => {
+      if (!event.defaultPrevented) {
+        this.requestActive((event as CustomEvent<{ value: string }>).detail.value)
+      }
+    })
   }
 
   /** Which ends the strip can scroll toward, under `scroll-controls`. */
@@ -290,6 +293,18 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
   /** The values of the tabs the last pairing read, to tell a removed tab from one not yet here. */
   private held: string[] = []
 
+  /**
+   * The enabled tab nearest to where a removed one stood: the next ones
+   * nearest first, then the ones before it nearest first. The same order a
+   * dismissed tab hands focus in.
+   */
+  private beside(gone: string, tabs: HelixHeadlessTab[]): HelixHeadlessTab | undefined {
+    const at = this.held.indexOf(gone)
+    const by = new Map(tabs.map((tab) => [tab.value, tab]))
+    const order = [...this.held.slice(at + 1), ...this.held.slice(0, at).reverse()]
+    return order.map((value) => by.get(value)).find((tab) => tab !== undefined && !tab.disabled)
+  }
+
   /** Pushes the current value down to whichever tab and panel own it. */
   private sync(): void {
     const tabs = this.tabs
@@ -306,10 +321,6 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
        A written `active` still wins, a declared property being a seed and a
        correction, and a set with neither still opens on the first enabled tab. */
     const declared = this.active === '' ? tabs.find((tab) => tab.selected) : undefined
-    /* Through the mixin, which also skips a disabled first tab. A hand-written
-       fallback to the first child shows a disabled tab as current and opens its
-       panel with it. */
-    const value = (declared ?? this.resolveActive(tabs))?.value ?? ''
     /* **A removed tab takes its name out of `active` with it.** Left alone,
        `active` named a tab that no longer existed while another was shown as
        selected, and the next `requestActive` of that value was a change to
@@ -317,6 +328,14 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
        more, so a value naming a tab that has not arrived yet is left alone. */
     const previous = this.active
     const gone = this.held.includes(previous) && !tabs.some((tab) => tab.value === previous)
+    /* Through the mixin, which also skips a disabled first tab. A hand-written
+       fallback to the first child shows a disabled tab as current and opens its
+       panel with it. A removed selected tab hands the selection to the tab
+       beside it, which is where a dismissed tab hands focus, so focus and
+       selection stay on one tab. */
+    const value =
+      (declared ?? (gone ? this.beside(previous, tabs) : undefined) ?? this.resolveActive(tabs))
+        ?.value ?? ''
     this.held = tabs.map((tab) => tab.value)
     if (gone && value !== '') {
       this.active = value
