@@ -4,7 +4,7 @@ import type { CSSResultGroup } from 'lit'
 /* Inherited from the base along with the template: this file has neither tag in
    it to remind anyone. */
 import '../../listbox/index.js'
-import '../../option/index.js'
+import '../../option/root/index.js'
 import { styles } from './time-picker-root.css.js'
 
 /**
