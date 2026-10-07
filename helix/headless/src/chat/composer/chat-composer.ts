@@ -267,10 +267,11 @@ export class HelixHeadlessChatComposer extends HelixFormElement {
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.markEmpty()
-    /* Nothing where nothing is written, so an empty composer submits no entry
-       rather than a blank one. */
+    /* Nothing where nothing is written, so an empty composer submits no entry.
+       The draft is the state either way, so a browser restoring the form puts
+       back a draft the reader emptied as empty, and not the declared one. */
     if (changed.has('value')) {
-      this.internals.setFormValue(this.value === '' ? null : this.value)
+      this.internals.setFormValue(this.value === '' ? null : this.value, this.value)
     }
     /* The browser's verdict on the field, copied with the field as the anchor,
        so the message is in the reader's language and points at the text. */
