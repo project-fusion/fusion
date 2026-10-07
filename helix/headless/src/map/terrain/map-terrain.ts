@@ -1,4 +1,4 @@
-import { customElement, HelixElement, HelixMapPartChangeEvent } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, HelixMapPartChangeEvent, words } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -32,6 +32,12 @@ export type MapTerrainEncoding = 'mapbox' | 'terrarium'
  */
 @customElement('helix-headless-map-terrain')
 export class HelixHeadlessMapTerrain extends HelixElement {
+  /**
+   * The key this part's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-map-terrain': { label: 'Gelände' } })`.
+   */
+  static words = 'helix-map-terrain'
+
   /** The elevation provider's credit, shown in the frame's footer. Links in it stay links. */
   @property()
   attribution?: string
@@ -63,6 +69,7 @@ export class HelixHeadlessMapTerrain extends HelixElement {
   readonly layerKind = 'terrain' as const
 
   /** The layer's name in the frame's list. */
+  @words
   @property()
   label = 'Terrain'
 

@@ -1,4 +1,4 @@
-import { customElement, HelixElement, HelixMapPartChangeEvent } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, HelixMapPartChangeEvent, words } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -39,6 +39,12 @@ const framesConverter = {
  */
 @customElement('helix-headless-map-raster')
 export class HelixHeadlessMapRaster extends HelixElement {
+  /**
+   * The key this part's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-map-raster': { label: 'Überlagerung' } })`.
+   */
+  static words = 'helix-map-raster'
+
   /** The tile provider's credit, shown in the frame's footer. Links in it stay links. */
   @property()
   attribution?: string
@@ -84,6 +90,7 @@ export class HelixHeadlessMapRaster extends HelixElement {
    * The layer's name in the frame's list and its tile in the layers menu.
    * Defaults to "Overlay", so neither is ever a control with no name.
    */
+  @words
   @property()
   label = 'Overlay'
 

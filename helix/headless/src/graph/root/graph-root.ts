@@ -1,8 +1,7 @@
 import {
   auditName,
   customElement,
-  fillTemplate,
-  formatNumbers,
+  formatWords,
   type GraphSignalDetail,
   HelixElement,
   HelixGraphFilterEvent,
@@ -17,10 +16,11 @@ import {
   scrollItemIntoView,
   scrollRoom,
   Typeahead,
-  type ViewportGestureLabels,
   type ViewportPanDetail,
   type ViewportZoomDetail,
   VirtualizeController,
+  words,
+  wordsLocale,
 } from '@fusion.dev/helix-core'
 import { list, magnifyingGlass } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -152,9 +152,35 @@ import {
  */
 @customElement('helix-headless-graph')
 export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(HelixElement)) {
-  /** What the list says of a note's count, with `{count}`. */
+  /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-graph': { searchLabel: 'Notiz suchen' } })`.
+   */
+  static words = 'helix-graph'
+
+  /**
+   * The hint shown when the graph, waiting to be pressed with
+   * `gestures="activate"`, is scrolled or swiped over.
+   */
+  @words
+  @property({ attribute: 'activate-hint-label' })
+  override activateHintLabel = 'Press the graph to use it'
+
+  /**
+   * The name of the group of controls, read by screen readers, which names
+   * what the controls drive rather than the mechanism.
+   */
+  @words
+  @property({ attribute: 'controls-label' })
+  override controlsLabel = 'Graph controls'
+
+  /**
+   * What the list says of how many notes it holds. `{count}` is the count,
+   * written in the locale, and each language writes the forms it has.
+   */
+  @words
   @property({ attribute: 'count-label' })
-  countLabel = '{count} notes'
+  countLabel = '{count, plural, one {# note} other {# notes}}'
 
   /**
    * How many links from the selected note to show, for its local graph. Unset
@@ -162,6 +188,14 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
    */
   @property({ type: Number })
   depth?: number
+
+  /**
+   * The graph's name where `label` is empty and the host has no
+   * `aria-label`.
+   */
+  @words
+  @property({ attribute: 'graph-label' })
+  graphLabel = 'Graph'
 
   /** The groups turned off in the legend, by name, whose notes neither the drawing nor the list shows. A property, never an attribute. */
   @property({ attribute: false })
@@ -182,14 +216,17 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
   legend = false
 
   /** The legend's name, read by screen readers. */
+  @words
   @property({ attribute: 'legend-label' })
   legendLabel = 'Groups'
 
   /** How a note linked both to and from the selected one is described, with `{note}`. */
+  @words
   @property({ attribute: 'linked-both-label' })
   linkedBothLabel = 'Linked both ways with {note}'
 
   /** How a note the selected one links to is described, with `{note}`, the selected note's name. */
+  @words
   @property({ attribute: 'linked-from-label' })
   linkedFromLabel = 'Linked from {note}'
 
@@ -198,22 +235,27 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
   links: readonly GraphLink[] = []
 
   /** How a note that links to the selected one is described, with `{note}`. */
+  @words
   @property({ attribute: 'links-to-label' })
   linksToLabel = 'Links to {note}'
 
   /** What screen readers hear once the drawing has moved down, after `moved()`. */
+  @words
   @property({ attribute: 'moved-down-label' })
   movedDownLabel = 'Moved down'
 
   /** What screen readers hear once the drawing has moved left, after `moved()`. */
+  @words
   @property({ attribute: 'moved-left-label' })
   movedLeftLabel = 'Moved left'
 
   /** What screen readers hear once the drawing has moved right, after `moved()`. */
+  @words
   @property({ attribute: 'moved-right-label' })
   movedRightLabel = 'Moved right'
 
   /** What screen readers hear once the drawing has moved up, after `moved()`. */
+  @words
   @property({ attribute: 'moved-up-label' })
   movedUpLabel = 'Moved up'
 
@@ -230,22 +272,45 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
   noPanel = false
 
   /** The list's name, read by screen readers, and the name of the button that opens it with `no-panel`. */
+  @words
   @property({ attribute: 'notes-label' })
   notesLabel = 'Notes'
 
   /** The search field's name. */
+  @words
   @property({ attribute: 'search-label' })
   searchLabel = 'Find a note'
 
   /** How the selected note is described in the list. */
+  @words
   @property({ attribute: 'selected-label' })
   selectedLabel = 'Selected'
 
+  /** The hint shown when one finger swipes over the graph with `gestures="cooperative"`. */
+  @words
+  @property({ attribute: 'two-finger-hint-label' })
+  override twoFingerHintLabel = 'Use two fingers to move the graph'
+
+  /** The line shown while the graph, with `gestures="activate"`, has the gestures. */
+  @words
+  @property({ attribute: 'using-label' })
+  override usingLabel = 'Using the graph. Press Escape to scroll the page again.'
+
+  /**
+   * The hint shown when the wheel scrolls past the graph with
+   * `gestures="cooperative"`. `{key}` is ⌘ on a Mac and Ctrl elsewhere.
+   */
+  @words
+  @property({ attribute: 'wheel-hint-label' })
+  override wheelHintLabel = 'Use {key} and scroll to zoom the graph'
+
   /** What screen readers hear once the drawing has zoomed in, after `moved()`. */
+  @words
   @property({ attribute: 'zoomed-in-label' })
   zoomedInLabel = 'Zoomed in'
 
   /** What screen readers hear once the drawing has zoomed out, after `moved()`. */
+  @words
   @property({ attribute: 'zoomed-out-label' })
   zoomedOutLabel = 'Zoomed out'
 
@@ -421,7 +486,7 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
       this.adjacency = adjacencyOf(this.links)
     }
     if (changed.has('nodes')) {
-      this.sorted = sortedOf(this.nodes, this.closest?.('[lang]')?.getAttribute('lang') ?? '')
+      this.sorted = sortedOf(this.nodes, wordsLocale(this))
     }
     if (changed.has('nodes')) {
       this.groups = groupsOf(this.nodes)
@@ -501,29 +566,14 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
     return 'zoom fullscreen'
   }
 
-  protected override get restingControlsLabel(): string {
-    return 'Graph controls'
-  }
-
   /** Which gestures the renderer takes, which `connectGraph` hears from here. */
   protected override gesturesChanged(): void {
     this.dispatchEvent(new HelixGraphPartChangeEvent({ kind: 'gestures' }))
   }
 
-  /** What the graph says about its gestures where the page does not say it. */
-  protected override get restingGestureLabels(): ViewportGestureLabels {
-    return {
-      activate: 'Press the graph to use it',
-      twoFinger: 'Use two fingers to move the graph',
-      using: 'Using the graph. Press Escape to scroll the page again.',
-      wheel: 'Use {key} and scroll to zoom the graph',
-    }
-  }
-
   /** How many notes the list holds, in the page's numbers. */
   private countText(): string {
-    const lang = this.closest?.('[lang]')?.getAttribute('lang') ?? ''
-    return fillTemplate(this.countLabel, { count: formatNumbers(lang)(this.entries.length) })
+    return formatWords(this, 'countLabel', { count: this.entries.length })
   }
 
   /** How a row stands to the selected note, in words, or nothing where it does not. */
@@ -534,11 +584,11 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
       case 'selected':
         return this.selectedLabel
       case 'to':
-        return fillTemplate(this.linkedFromLabel, { note })
+        return formatWords(this, 'linkedFromLabel', { note })
       case 'from':
-        return fillTemplate(this.linksToLabel, { note })
+        return formatWords(this, 'linksToLabel', { note })
       case 'both':
-        return fillTemplate(this.linkedBothLabel, { note })
+        return formatWords(this, 'linkedBothLabel', { note })
       default:
         return ''
     }
@@ -855,7 +905,7 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
     return html`<div
       part="region"
       role="group"
-      aria-label=${this.label || this.getAttribute?.('aria-label') || 'Graph'}
+      aria-label=${this.label || this.getAttribute?.('aria-label') || this.graphLabel}
       tabindex="0"
       @focusin=${this.idle.stir}
       @keydown=${this.handleKeydown}

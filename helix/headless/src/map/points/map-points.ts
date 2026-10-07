@@ -1,10 +1,12 @@
 import {
   customElement,
+  formatWords,
   HelixActivateEvent,
   HelixElement,
   HelixMapClusterEvent,
   HelixMapPartChangeEvent,
   isRtl,
+  words,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -82,6 +84,12 @@ export interface MapPointsCollection {
  */
 @customElement('helix-headless-map-points')
 export class HelixHeadlessMapPoints extends HelixElement {
+  /**
+   * The key this part's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-map-points': { label: 'Orte' } })`.
+   */
+  static words = 'helix-map-points'
+
   /** Combines nearby points into counts. Pressing a count zooms in to it. */
   @property({ type: Boolean })
   cluster = false
@@ -90,8 +98,9 @@ export class HelixHeadlessMapPoints extends HelixElement {
    * The name read for a count. `{count}` is replaced by the number of places.
    * Defaults to "{count} places".
    */
+  @words
   @property({ attribute: 'count-label' })
-  countLabel = '{count} places'
+  countLabel = '{count, plural, one {# place} other {# places}}'
 
   /**
    * The points, as a GeoJSON collection or a list of `{ lat, lng, label, id }`
@@ -122,6 +131,7 @@ export class HelixHeadlessMapPoints extends HelixElement {
    * The layer's name, used in the frame's list, its tile in the layers menu,
    * and the group of places the keyboard walks. Defaults to "Places".
    */
+  @words
   @property()
   label = 'Places'
 
@@ -153,8 +163,7 @@ export class HelixHeadlessMapPoints extends HelixElement {
   /** What a point or a count in view is called. */
   private nameOf(one: MapPointsInView): string {
     if (one.count !== undefined) {
-      const lang = this.closest('[lang]')?.getAttribute('lang') || undefined
-      return this.countLabel.replace('{count}', new Intl.NumberFormat(lang).format(one.count))
+      return formatWords(this, 'countLabel', { count: one.count })
     }
     return one.label || one.value || ''
   }

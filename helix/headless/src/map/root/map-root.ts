@@ -1,8 +1,7 @@
 import {
   customElement,
-  fillTemplate,
   focusItemOf,
-  formatNumbers,
+  formatWords,
   HelixActivateEvent,
   HelixBeforeChangeEvent,
   HelixBeforeToggleEvent,
@@ -20,9 +19,9 @@ import {
   MixinViewport,
   requestChange,
   type ViewportControlsPlacement,
-  type ViewportGestureLabels,
   type ViewportPanDetail,
   type ViewportZoomDetail,
+  words,
 } from '@fusion.dev/helix-core'
 import {
   buildings,
@@ -255,6 +254,20 @@ const SETTLES = 400
 @customElement('helix-headless-map')
 export class HelixHeadlessMap extends MixinViewport(HelixElement) {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-map': { layersLabel: 'Kartenebenen' } })`.
+   */
+  static words = 'helix-map'
+
+  /**
+   * The hint shown when the map, waiting to be pressed with
+   * `gestures="activate"`, is scrolled or swiped over.
+   */
+  @words
+  @property({ attribute: 'activate-hint-label' })
+  override activateHintLabel = 'Press the map to use it'
+
+  /**
    * The map's rotation, in degrees clockwise from north. `connectMap` keeps it
    * current, and the Face north button's needle turns with it.
    */
@@ -268,15 +281,26 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
   @property({ type: Boolean })
   cluster = false
 
+  /**
+   * The name of the group of controls, read by screen readers, which names
+   * what the controls drive rather than the mechanism.
+   */
+  @words
+  @property({ attribute: 'controls-label' })
+  override controlsLabel = 'Map controls'
+
   /** The Face north button's label. */
+  @words
   @property({ attribute: 'face-north-label' })
   faceNorthLabel = 'Face north'
 
   /** What screen readers hear when the map is tilted back to looking straight down. */
+  @words
   @property({ attribute: 'flat-label' })
   flatLabel = 'Looking straight down'
 
   /** The Hybrid map type's name. */
+  @words
   @property({ attribute: 'hybrid-label' })
   hybridLabel = 'Hybrid'
 
@@ -291,8 +315,14 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
    * The name of the layers button and menu, and of the list of the map's
    * layers, such as routes, areas, and points, read by screen readers.
    */
+  @words
   @property({ attribute: 'layers-label' })
   layersLabel = 'Map layers'
+
+  /** The map's name where `label` is empty and the host has no `aria-label`. */
+  @words
+  @property({ attribute: 'map-label' })
+  mapLabel = 'Map'
 
   /**
    * @internal Pictures of the map in each map type, written by the connector
@@ -310,26 +340,32 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
   mapType?: 'hybrid' | 'satellite' | undefined
 
   /** The name of the map types in the layers menu, read by screen readers. */
+  @words
   @property({ attribute: 'map-type-label' })
   mapTypeLabel = 'Map type'
 
   /** What screen readers hear when the map has moved down. */
+  @words
   @property({ attribute: 'moved-down-label' })
   movedDownLabel = 'Moved down'
 
   /** What screen readers hear when the map has moved left. */
+  @words
   @property({ attribute: 'moved-left-label' })
   movedLeftLabel = 'Moved left'
 
   /** What screen readers hear when the map has moved right. */
+  @words
   @property({ attribute: 'moved-right-label' })
   movedRightLabel = 'Moved right'
 
   /** What screen readers hear when the map has moved up. */
+  @words
   @property({ attribute: 'moved-up-label' })
   movedUpLabel = 'Moved up'
 
   /** What screen readers hear when the map is turned back to face north. */
+  @words
   @property({ attribute: 'north-label' })
   northLabel = 'Facing north'
 
@@ -342,42 +378,71 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
   pitch = 0
 
   /** The rotate left button's label. */
+  @words
   @property({ attribute: 'rotate-left-label' })
   rotateLeftLabel = 'Rotate left'
 
   /** The rotate right button's label. */
+  @words
   @property({ attribute: 'rotate-right-label' })
   rotateRightLabel = 'Rotate right'
 
   /** The Satellite map type's name. */
+  @words
   @property({ attribute: 'satellite-label' })
   satelliteLabel = 'Satellite'
 
   /** The Standard map type's name. */
+  @words
   @property({ attribute: 'standard-label' })
   standardLabel = 'Standard'
 
   /**
    * What screen readers hear when the map is tilted. `{degrees}` is the tilt
-   * from looking straight down.
+   * from looking straight down, written in the locale, and each language
+   * writes the forms it has.
    */
+  @words
   @property({ attribute: 'tilted-label' })
-  tiltedLabel = 'Tilted {degrees} degrees'
+  tiltedLabel = '{degrees, plural, one {Tilted # degree} other {Tilted # degrees}}'
 
   /** The 3D button's label. */
+  @words
   @property({ attribute: 'tilt-label' })
   tiltLabel = 'Show in 3D'
 
   /**
    * What screen readers hear when the map is turned. `{degrees}` is the way the
-   * top of the map faces, clockwise from north.
+   * top of the map faces, clockwise from north, written in the locale, and
+   * each language writes the forms it has.
    */
+  @words
   @property({ attribute: 'turned-label' })
-  turnedLabel = 'Facing {degrees} degrees'
+  turnedLabel = '{degrees, plural, one {Facing # degree} other {Facing # degrees}}'
+
+  /** The hint shown when one finger swipes over the map with `gestures="cooperative"`. */
+  @words
+  @property({ attribute: 'two-finger-hint-label' })
+  override twoFingerHintLabel = 'Use two fingers to move the map'
+
+  /** The line shown while the map, with `gestures="activate"`, has the gestures. */
+  @words
+  @property({ attribute: 'using-label' })
+  override usingLabel = 'Using the map. Press Escape to scroll the page again.'
 
   /**
-   * What screen readers hear after a zoom. `{level}` is the zoom level.
+   * The hint shown when the wheel scrolls past the map with
+   * `gestures="cooperative"`. `{key}` is ⌘ on a Mac and Ctrl elsewhere.
    */
+  @words
+  @property({ attribute: 'wheel-hint-label' })
+  override wheelHintLabel = 'Use {key} and scroll to zoom the map'
+
+  /**
+   * What screen readers hear after a zoom. `{level}` is the zoom level,
+   * written in the locale.
+   */
+  @words
   @property({ attribute: 'zoomed-label' })
   zoomedLabel = 'Zoom level {level}'
 
@@ -462,8 +527,6 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     if (!asked) {
       return
     }
-    const numbers = formatNumbers(this.closest('[lang]')?.getAttribute('lang') ?? '')
-    const degrees = (value: number): string => numbers(Math.round(value))
     const bearing = ((Math.round(this.bearing) % 360) + 360) % 360
     const words: Record<string, string> = {
       down: this.movedDownLabel,
@@ -477,14 +540,14 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
         : asked.kind === 'zoom'
           ? this.zoomLevel === undefined
             ? ''
-            : fillTemplate(this.zoomedLabel, { level: numbers(this.zoomLevel) })
+            : formatWords(this, 'zoomedLabel', { level: this.zoomLevel })
           : asked.kind === 'tilt'
             ? Math.round(this.pitch) === 0
               ? this.flatLabel
-              : fillTemplate(this.tiltedLabel, { degrees: degrees(this.pitch) })
+              : formatWords(this, 'tiltedLabel', { degrees: Math.round(this.pitch) })
             : bearing === 0
               ? this.northLabel
-              : fillTemplate(this.turnedLabel, { degrees: degrees(bearing) })
+              : formatWords(this, 'turnedLabel', { degrees: bearing })
     /* The same words twice would change nothing in the region and be heard
        once, so a second "Moved left" differs by a space no reader says. */
     /* Against the region as it stands, and not trimmed: `trim` takes the
@@ -816,16 +879,6 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     }
   }
 
-  /** What the map says about its gestures where the page does not say it. */
-  protected override get restingGestureLabels(): ViewportGestureLabels {
-    return {
-      activate: 'Press the map to use it',
-      twoFinger: 'Use two fingers to move the map',
-      using: 'Using the map. Press Escape to scroll the page again.',
-      wheel: 'Use {key} and scroll to zoom the map',
-    }
-  }
-
   /** Which gestures the renderer takes, which `connectMap` hears from here. */
   protected override gesturesChanged(): void {
     this.dispatchEvent(new HelixMapPartChangeEvent({ kind: 'gestures' }))
@@ -1042,6 +1095,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
    * which a pointer otherwise needs.
    */
   protected renderCompass(pan: boolean, rotate: boolean): TemplateResult {
+    const { faceNorthLabel } = this
     return html`<div part="compass">
       ${
         rotate
@@ -1071,7 +1125,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
             </button>`
           : nothing
       }
-      <button part="face-north" aria-label=${this.faceNorthLabel} type="button" style=${`--map-needle-turn: ${-this.bearing}deg`} @click=${() => this.faceNorth()}>
+      <button part="face-north" aria-label=${faceNorthLabel} type="button" style=${`--map-needle-turn: ${-this.bearing}deg`} @click=${() => this.faceNorth()}>
         <slot name="face-north-icon">
           <svg part="needle" aria-hidden="true" viewBox="0 0 16 16">
             <path data-end="north" d="M8 1.5 10.5 8h-5Z" />
@@ -1115,7 +1169,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     if (!pan && !zoom && !rotate && !tilt && !fullscreen && menu === nothing) {
       return nothing
     }
-    return html`<div part="controls" role="group" aria-label=${this.controlsLabel ?? this.restingControlsLabel}>
+    return html`<div part="controls" role="group" aria-label=${this.controlsLabel}>
       ${
         fullscreen
           ? html`<button
@@ -1206,17 +1260,6 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     return new HelixMapZoomEvent(detail)
   }
 
-  /**
-   * What the group of controls is called.
-   *
-   * The surface is shared and this is the half that is a map: a reader meeting
-   * the group hears what it drives rather than "view controls", which names the
-   * mechanism.
-   */
-  protected override get restingControlsLabel(): string {
-    return 'Map controls'
-  }
-
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     /* The host carries the name, so a consumer's own `aria-label` is the thing
@@ -1274,7 +1317,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     return html`<div
       part="region"
       role="group"
-      aria-label=${this.label || this.getAttribute('aria-label') || 'Map'}
+      aria-label=${this.label || this.getAttribute('aria-label') || this.mapLabel}
       aria-keyshortcuts=${this.keyShortcuts}
       tabindex="0"
       @focusin=${this.idle.stir}

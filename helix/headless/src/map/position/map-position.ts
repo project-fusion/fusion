@@ -3,6 +3,7 @@ import {
   HelixElement,
   HelixMapPartChangeEvent,
   PlacementController,
+  words,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -40,6 +41,12 @@ import { property, state } from 'lit/decorators.js'
  */
 @customElement('helix-headless-map-position')
 export class HelixHeadlessMapPosition extends HelixElement {
+  /**
+   * The key this part's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-map-position': { label: 'Aktueller Standort' } })`.
+   */
+  static words = 'helix-map-position'
+
   /** How accurate the position is, in meters. Drawn as a ring with this radius. */
   @property({ type: Number })
   accuracy?: number
@@ -63,6 +70,7 @@ export class HelixHeadlessMapPosition extends HelixElement {
   readonly isMapPosition = true
 
   /** What it is, such as "Van 12". Read by screen readers. Defaults to "Live position". */
+  @words
   @property()
   label = 'Live position'
 

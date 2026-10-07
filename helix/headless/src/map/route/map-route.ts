@@ -1,4 +1,4 @@
-import { customElement, HelixElement, HelixMapPartChangeEvent } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, HelixMapPartChangeEvent, words } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -48,6 +48,12 @@ export const pointsConverter = { fromAttribute: pointsOf }
 @customElement('helix-headless-map-route')
 export class HelixHeadlessMapRoute extends HelixElement {
   /**
+   * The key this part's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-map-route': { label: 'Route' } })`.
+   */
+  static words = 'helix-map-route'
+
+  /**
    * More about the route, such as its distance or time. Read after its label
    * in the frame's list.
    */
@@ -72,6 +78,7 @@ export class HelixHeadlessMapRoute extends HelixElement {
    * The route's name, used in the frame's list and its tile in the layers
    * menu. Defaults to "Route", so neither is ever a control with no name.
    */
+  @words
   @property()
   label = 'Route'
 

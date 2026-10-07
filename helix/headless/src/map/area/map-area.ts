@@ -1,4 +1,4 @@
-import { customElement, HelixElement, HelixMapPartChangeEvent } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, HelixMapPartChangeEvent, words } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 import { type MapPoint, pointsConverter } from '../route/map-route.js'
@@ -26,6 +26,12 @@ import { type MapPoint, pointsConverter } from '../route/map-route.js'
  */
 @customElement('helix-headless-map-area')
 export class HelixHeadlessMapArea extends HelixElement {
+  /**
+   * The key this part's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-map-area': { label: 'Gebiet' } })`.
+   */
+  static words = 'helix-map-area'
+
   /**
    * Words drawn on the map with the area, such as `A` for a search sector.
    * Unset, nothing is drawn. Keep it short: it is a caption on a map, and the
@@ -65,6 +71,7 @@ export class HelixHeadlessMapArea extends HelixElement {
    * The area's name, used in the frame's list and its tile in the layers
    * menu. Defaults to "Area", so neither is ever a control with no name.
    */
+  @words
   @property()
   label = 'Area'
 

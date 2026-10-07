@@ -4,9 +4,9 @@ import { FullscreenController } from '../../controllers/fullscreen-controller/fu
 import { IdleController } from '../../controllers/idle-controller/idle-controller.js'
 import type { ViewportPanDetail, ViewportZoomDetail } from '../../events/events.js'
 import type { HelixElement } from '../../helix-element/helix-element.js'
-import { fillTemplate } from '../../utils/fill-template/fill-template.js'
 import { inlineStep } from '../../utils/inline-step/inline-step.js'
 import { isRtl } from '../../utils/is-rtl/is-rtl.js'
+import { formatWords, words } from '../../words/words.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
 type Constructor<T> = new (...args: any[]) => T
@@ -26,7 +26,13 @@ export type ViewportGestures = 'activate' | 'always' | 'cooperative'
  */
 export type ViewportGestureMode = 'cooperative' | 'free' | 'off'
 
-/** The words a surface says about its gestures, where the page does not say them. */
+/**
+ * The words a surface says about its gestures.
+ *
+ * @deprecated Each family declares its gesture words as word properties,
+ * `activate-hint-label` and its three, which a page registers by locale.
+ * Removed in the next major version.
+ */
 export interface ViewportGestureLabels {
   /** The hint while an `activate` surface waits to be pressed. */
   activate: string
@@ -57,23 +63,20 @@ export declare class ViewportElement {
   /** Which gestures the surface takes from the page. Unset is the family's own. */
   gestures?: ViewportGestures
 
-  /** The hint while a surface with `gestures="activate"` waits to be pressed. */
-  activateHintLabel?: string
+  /** The hint while a surface with `gestures="activate"` waits to be pressed, a word property each family declares. */
+  activateHintLabel: string
 
-  /** The hint when one finger swipes over a surface with `gestures="cooperative"`. */
-  twoFingerHintLabel?: string
+  /** The hint when one finger swipes over a surface with `gestures="cooperative"`, a word property each family declares. */
+  twoFingerHintLabel: string
 
-  /** The line while a surface with `gestures="activate"` has the gestures. */
-  usingLabel?: string
+  /** The line while a surface with `gestures="activate"` has the gestures, a word property each family declares. */
+  usingLabel: string
 
-  /** The hint when the wheel scrolls past a surface with `gestures="cooperative"`, with `{key}`. */
-  wheelHintLabel?: string
+  /** The hint when the wheel scrolls past a surface with `gestures="cooperative"`, with `{key}`, a word property each family declares. */
+  wheelHintLabel: string
 
   /** @internal Which gestures the thing drawing the surface takes right now. */
   get gestureMode(): ViewportGestureMode
-
-  /** What the surface says about its gestures where the page does not say it, which each family says for itself. */
-  protected get restingGestureLabels(): ViewportGestureLabels
 
   /** Whether an `activate` surface has been pressed, and has the gestures. */
   protected gesturesTaken: boolean
@@ -138,11 +141,8 @@ export declare class ViewportElement {
   /** The key relay, bound by the family's own frame. */
   protected handleKeydown: (event: KeyboardEvent) => void
 
-  /** The name of the group of controls, read by screen readers. */
-  controlsLabel: string | undefined
-
-  /** What the group of controls is called where the page does not say, which each family says for itself. */
-  protected get restingControlsLabel(): string
+  /** The name of the group of controls, read by screen readers, a word property each family declares. */
+  controlsLabel: string
 
   /** The pan event, built and not dispatched, for a family that names its own. */
   protected panEvent(detail: ViewportPanDetail): Event
@@ -209,11 +209,19 @@ export declare class ViewportElement {
 export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
   class Viewport extends Base {
     /**
-     * The hint shown when a surface waiting to be pressed is scrolled or
-     * swiped over, with `gestures="activate"`. Absent is the family's own.
+     * The key the surface's words are registered under. Each family that
+     * applies this names its own styled tag, `static words = 'helix-map'`,
+     * which wins over this empty one, so a map's words and a board's are
+     * registered apart.
      */
-    @property({ attribute: 'activate-hint-label' })
-    activateHintLabel?: string
+    static words = ''
+
+    /**
+     * The hint shown when a surface waiting to be pressed is scrolled or
+     * swiped over, with `gestures="activate"`. Each family declares it as a
+     * word property with its own English, such as "Press the map to use it".
+     */
+    declare activateHintLabel: string
 
     /**
      * Which controls to show, as a list such as `pan zoom fullscreen`, or
@@ -242,15 +250,12 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
     controls?: string
 
     /**
-     * The name of the group of controls, read by screen readers.
-     *
-     * Absent is the family's own name for it, "Map controls" or "Board
-     * controls", which names what the controls drive rather than the
-     * mechanism. Written here to say it in another language, which every other
-     * string this surface speaks already allowed and this one did not.
+     * The name of the group of controls, read by screen readers. Each family
+     * declares it as a word property with its own English, "Map controls" or
+     * "Board controls", which names what the controls drive rather than the
+     * mechanism.
      */
-    @property({ attribute: 'controls-label' })
-    controlsLabel?: string
+    declare controlsLabel: string
 
     /**
      * Which corner the controls sit in.
@@ -269,6 +274,7 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
     controlsPlacement?: ViewportControlsPlacement
 
     /** The fullscreen button's label. */
+    @words
     @property({ attribute: 'fullscreen-label' })
     fullscreenLabel = 'Fill the screen'
 
@@ -316,14 +322,17 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
      * the translator's as the word for panning, and a language can put it
      * anywhere in the phrase.
      */
+    @words
     @property({ attribute: 'pan-down-label' })
     panDownLabel = 'Pan down'
 
     /** The pan left button's label. */
+    @words
     @property({ attribute: 'pan-left-label' })
     panLeftLabel = 'Pan left'
 
     /** The pan right button's label. */
+    @words
     @property({ attribute: 'pan-right-label' })
     panRightLabel = 'Pan right'
 
@@ -338,32 +347,31 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
     panStep = 0.25
 
     /** The pan up button's label. */
+    @words
     @property({ attribute: 'pan-up-label' })
     panUpLabel = 'Pan up'
 
     /**
      * The hint shown when one finger swipes over a surface with
-     * `gestures="cooperative"`. Absent is the family's own.
+     * `gestures="cooperative"`. Each family declares it as a word property.
      */
-    @property({ attribute: 'two-finger-hint-label' })
-    twoFingerHintLabel?: string
+    declare twoFingerHintLabel: string
 
     /**
      * The line shown while a surface with `gestures="activate"` has the
-     * gestures. Absent is the family's own.
+     * gestures. Each family declares it as a word property.
      */
-    @property({ attribute: 'using-label' })
-    usingLabel?: string
+    declare usingLabel: string
 
     /**
      * The hint shown when the wheel scrolls past a surface with
-     * `gestures="cooperative"`, with `{key}`, which is ⌘ on a Mac and Ctrl
-     * elsewhere. Absent is the family's own.
+     * `gestures="cooperative"`, with `{key}`. Each family declares it as a
+     * word property.
      */
-    @property({ attribute: 'wheel-hint-label' })
-    wheelHintLabel?: string
+    declare wheelHintLabel: string
 
     /** The zoom in button's label. */
+    @words
     @property({ attribute: 'zoom-in-label' })
     zoomInLabel = 'Zoom in'
 
@@ -410,33 +418,9 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
     )
 
     /** The zoom out button's label. */
+    @words
     @property({ attribute: 'zoom-out-label' })
     zoomOutLabel = 'Zoom out'
-
-    /**
-     * What the group of controls is called where the page does not say.
-     *
-     * A getter a family overrides rather than a default on the property, the
-     * way `restingControls` is: a default would reflect nothing and still be
-     * one value for every family composing this.
-     */
-    protected get restingControlsLabel(): string {
-      return 'View controls'
-    }
-
-    /**
-     * What the surface says about its gestures where the page does not say
-     * it, which a family overrides to name what it is: "Press the map to use
-     * it" reads better than a word that fits every surface.
-     */
-    protected get restingGestureLabels(): ViewportGestureLabels {
-      return {
-        activate: 'Press to use it',
-        twoFinger: 'Use two fingers to move it',
-        using: 'In use. Press Escape to scroll the page again.',
-        wheel: 'Use {key} and scroll to zoom',
-      }
-    }
 
     /**
      * @internal Which gestures the thing drawing the surface takes: all of
@@ -489,10 +473,9 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
     private readonly handleGestureWheel = (event: WheelEvent): void => {
       if (this.gestures === 'cooperative' && !(event.ctrlKey || event.metaKey)) {
         const mac = typeof navigator !== 'undefined' && navigator.userAgent.includes('Mac')
-        const words = this.wheelHintLabel ?? this.restingGestureLabels.wheel
-        this.showHint(fillTemplate(words, { key: mac ? '⌘' : 'Ctrl' }), event)
+        this.showHint(formatWords(this, 'wheelHintLabel', { key: mac ? '⌘' : 'Ctrl' }), event)
       } else if (this.gestures === 'activate' && !this.gesturesTaken) {
-        this.showHint(this.activateHintLabel ?? this.restingGestureLabels.activate, event)
+        this.showHint(this.activateHintLabel, event)
       }
     }
 
@@ -503,9 +486,9 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
         return
       }
       if (this.gestures === 'cooperative') {
-        this.showHint(this.twoFingerHintLabel ?? this.restingGestureLabels.twoFinger, finger)
+        this.showHint(this.twoFingerHintLabel, finger)
       } else if (this.gestures === 'activate' && !this.gesturesTaken) {
-        this.showHint(this.activateHintLabel ?? this.restingGestureLabels.activate, finger)
+        this.showHint(this.activateHintLabel, finger)
       }
     }
 
@@ -632,7 +615,7 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
           ?hidden=${this.hint === ''}
           style=${at ? `--_viewport-hint-x: ${(at.x * 100).toFixed(2)}%; --_viewport-hint-y: ${(at.y * 100).toFixed(2)}%` : nothing}
         >${this.hint}</div>
-        <div part="gesture-status" aria-hidden="true" ?hidden=${!this.gesturesTaken}>${this.usingLabel ?? this.restingGestureLabels.using}</div>`
+        <div part="gesture-status" aria-hidden="true" ?hidden=${!this.gesturesTaken}>${this.usingLabel}</div>`
     }
 
     /**
@@ -867,7 +850,7 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
       const [up, start, end, down] = (['up', 'start', 'end', 'down'] as const).map((way) =>
         this.panGlyph(way),
       )
-      return html`<div part="controls" role="group" aria-label=${this.controlsLabel ?? this.restingControlsLabel}>
+      return html`<div part="controls" role="group" aria-label=${this.controlsLabel}>
         ${
           pan
             ? html`<button part="pan-up" aria-label=${this.panLabel('up')} type="button" @click=${() => this.pan('up')}>

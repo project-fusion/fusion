@@ -1,4 +1,4 @@
-import { customElement, HelixElement, HelixMapPartChangeEvent } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, HelixMapPartChangeEvent, words } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -23,6 +23,12 @@ import { property } from 'lit/decorators.js'
  */
 @customElement('helix-headless-map-buildings')
 export class HelixHeadlessMapBuildings extends HelixElement {
+  /**
+   * The key this part's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-map-buildings': { label: '3D-Gebäude' } })`.
+   */
+  static words = 'helix-map-buildings'
+
   /** More about the buildings. Read after the label in the frame's list. */
   @property()
   description?: string
@@ -42,6 +48,7 @@ export class HelixHeadlessMapBuildings extends HelixElement {
   readonly layerKind = 'buildings' as const
 
   /** The layer's name in the frame's list. */
+  @words
   @property()
   label = '3D buildings'
 

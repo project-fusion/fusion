@@ -1,6 +1,12 @@
-import { customElement, HelixElement, PlacementController } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  HelixElement,
+  PlacementController,
+  wordsLocale,
+} from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { descriptionOf } from '../describe.js'
 
 /**
  * What the board draws from a card, as distinct from what it writes onto one:
@@ -335,7 +341,7 @@ export class HelixHeadlessCanvasNode extends HelixElement {
     >
       <slot id="content"></slot>
       <slot name="description"></slot>
-      <span id="about" hidden>${[this.status, this.meaning, this.links].filter(Boolean).join(', ')}</span>
+      <span id="about" hidden>${descriptionOf(wordsLocale(this), [this.status, this.meaning, this.links])}</span>
     </div>
     ${
       /* **Written out, four times, because a part name behind an interpolation
