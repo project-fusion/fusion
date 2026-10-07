@@ -464,6 +464,23 @@ describe('canvas moves', () => {
     expect(said).toEqual(['before', 'move [{"name":"c","x":170,"y":320}]'])
   })
 
+  test('a drag is one move to undo, however many steps it took', async () => {
+    const host = (await canvas()) as Canvas & { undo(): boolean }
+    const box = card(host, 'c').shadowRoot?.querySelector('[part="node"]') as HTMLElement
+    const viewport = part(host, 'viewport') as HTMLElement
+    box.dispatchEvent(pointer('pointerdown', { x: 10, y: 10 }))
+    viewport.dispatchEvent(pointer('pointermove', { x: 30, y: 10 }))
+    await host.updateComplete
+    viewport.dispatchEvent(pointer('pointermove', { x: 50, y: 30 }))
+    await host.updateComplete
+    viewport.dispatchEvent(pointer('pointerup', { x: 50, y: 30 }))
+    await host.updateComplete
+    expect([card(host, 'c').x, card(host, 'c').y]).toEqual([170, 320])
+    expect(host.undo()).toBe(true)
+    expect([card(host, 'c').x, card(host, 'c').y]).toEqual([130, 300])
+    expect(host.undo()).toBe(false)
+  })
+
   test('a move refused is not made, which is how a consumer holds the positions', async () => {
     const host = await canvas()
     host.addEventListener('helix-before-move', (event) => event.preventDefault())
@@ -515,6 +532,58 @@ describe('canvas moves', () => {
     const still = await canvas('readonly')
     press(card(still, 'c'), 'ArrowRight', true)
     expect(card(still, 'c').x).toBe(130)
+  })
+
+  /* A board a reader rearranged could not be put back: there was no undo, so
+     a card moved by mistake had to be carried back by hand. */
+  test('Control with Z undoes the last move, and with Shift makes it again', async () => {
+    const host = (await canvas()) as Canvas & { redo(): boolean; undo(): boolean }
+    const asked: Array<{ nodes: Array<{ name: string; x: number; y: number }> }> = []
+    host.addEventListener('helix-before-move', (event) =>
+      asked.push((event as CustomEvent).detail as (typeof asked)[number]),
+    )
+    press(card(host, 'c'), 'ArrowRight', true)
+    press(card(host, 'c'), 'ArrowRight', true)
+    await host.updateComplete
+    expect(card(host, 'c').x).toBe(162)
+    const key = (init: KeyboardEventInit) => {
+      const event = new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        ctrlKey: true,
+        key: 'z',
+        ...init,
+      })
+      card(host, 'c').shadowRoot?.querySelector('[part="node"]')?.dispatchEvent(event)
+      return event
+    }
+    expect(key({}).defaultPrevented).toBe(true)
+    expect(card(host, 'c').x).toBe(146)
+    key({})
+    expect(card(host, 'c').x).toBe(130)
+    // Nothing left to undo, and the key is left alone.
+    expect(key({}).defaultPrevented).toBe(false)
+    key({ key: 'Z', shiftKey: true })
+    expect(card(host, 'c').x).toBe(146)
+    expect(host.redo()).toBe(true)
+    expect(card(host, 'c').x).toBe(162)
+    // Each undo asked first, as a move does.
+    expect(asked.at(-3)?.nodes[0]).toMatchObject({ name: 'c', x: 130 })
+    // A new move ends what could be made again.
+    host.undo()
+    press(card(host, 'c'), 'ArrowDown', true)
+    expect(host.redo()).toBe(false)
+  })
+
+  test('an undo a page refuses moves nothing and stays to be undone', async () => {
+    const host = (await canvas()) as Canvas & { undo(): boolean }
+    press(card(host, 'c'), 'ArrowRight', true)
+    host.addEventListener('helix-before-move', (event) => event.preventDefault(), { once: true })
+    expect(host.undo()).toBe(false)
+    expect(card(host, 'c').x).toBe(146)
+    expect(host.undo()).toBe(true)
+    expect(card(host, 'c').x).toBe(130)
   })
 
   test('the arrows are the card\u2019s only when pressed on the card, not inside it', async () => {
