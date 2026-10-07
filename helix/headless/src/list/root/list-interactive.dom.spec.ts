@@ -152,13 +152,13 @@ describe('selection', () => {
     cell(list.rows[0] as Row).click()
     cell(list.rows[2] as Row).click()
     await settle(list)
-    expect(seen).toEqual(['a', 'a, c'])
-    expect(list.value).toBe('a, c')
+    expect(seen).toEqual(['a', 'a,c'])
+    expect(list.value).toBe('a,c')
     expect(changes).toBe(2)
 
     list.addEventListener('helix-before-change', (event) => event.preventDefault())
     cell(list.rows[0] as Row).click()
-    expect(list.value).toBe('a, c')
+    expect(list.value).toBe('a,c')
   })
 
   test('a press on a control in the row does not select it', async () => {
@@ -246,10 +246,10 @@ describe('ranges and replacing', () => {
     cell(a).focus()
     key(cell(a), 'ArrowDown', { shiftKey: true })
     await settle(list)
-    expect(list.value).toBe('a, b')
+    expect(list.value).toBe('a,b')
     key(focused(list) as Element, 'ArrowDown', { shiftKey: true })
     await settle(list)
-    expect(list.value).toBe('a, b, d')
+    expect(list.value).toBe('a,b,d')
   })
 
   test('Shift with a press or Space takes in the rows from the last one pressed', async () => {
@@ -259,13 +259,13 @@ describe('ranges and replacing', () => {
     await settle(list)
     click(cell(e), { shiftKey: true })
     await settle(list)
-    expect(list.value).toBe('a, b, d, e')
+    expect(list.value).toBe('a,b,d,e')
     click(cell(d))
     await settle(list)
-    expect(list.value).toBe('a, b, e')
+    expect(list.value).toBe('a,b,e')
     key(cell(a), ' ', { shiftKey: true })
     await settle(list)
-    expect(list.value).toBe('a, b, e, d')
+    expect(list.value).toBe('a,b,e,d')
   })
 
   test('Control or Command with A selects every row a key can reach', async () => {
@@ -276,10 +276,10 @@ describe('ranges and replacing', () => {
     )
     key(cell(list.rows[0] as Row), 'a', { ctrlKey: true })
     await settle(list)
-    expect(list.value).toBe('a, b, d, e')
+    expect(list.value).toBe('a,b,d,e')
     key(cell(list.rows[0] as Row), 'A', { metaKey: true })
     // Everything is already selected, so nothing is asked.
-    expect(changes).toEqual(['a, b, d, e'])
+    expect(changes).toEqual(['a,b,d,e'])
   })
 
   test('Page Down and Page Up move a box of rows, and Shift takes them in', async () => {
@@ -290,11 +290,11 @@ describe('ranges and replacing', () => {
     key(cell(a), 'PageDown', { shiftKey: true })
     await settle(list)
     expect(focused(list)).toBe(cell(e))
-    expect(list.value).toBe('a, b, d, e')
+    expect(list.value).toBe('a,b,d,e')
     key(cell(e), 'PageUp')
     await settle(list)
     expect(focused(list)).toBe(cell(a))
-    expect(list.value).toBe('a, b, d, e')
+    expect(list.value).toBe('a,b,d,e')
   })
 
   test('Page Down under replace selects the row it lands on', async () => {
@@ -308,7 +308,7 @@ describe('ranges and replacing', () => {
   })
 
   test('Escape lets go of the selection, asking first, and only then keeps the key', async () => {
-    const list = await rows5('value="a, d"')
+    const list = await rows5('value="a,d"')
     const outside: string[] = []
     const listen = (event: KeyboardEvent): void => {
       outside.push(event.key)
@@ -324,7 +324,7 @@ describe('ranges and replacing', () => {
     })
     cell(list.rows[0] as Row).dispatchEvent(first)
     await settle(list)
-    expect(list.value).toBe('a, d')
+    expect(list.value).toBe('a,d')
     list.removeEventListener('helix-before-change', refuse)
     key(cell(list.rows[0] as Row), 'Escape')
     await settle(list)
@@ -354,7 +354,7 @@ describe('ranges and replacing', () => {
     expect(list.value).toBe('d')
     click(cell(a), { metaKey: true })
     await settle(list)
-    expect(list.value).toBe('d, a')
+    expect(list.value).toBe('d,a')
   })
 
   test('a row is named by its label and described by its description, not its controls', async () => {
