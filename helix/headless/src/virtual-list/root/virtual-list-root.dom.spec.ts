@@ -333,6 +333,22 @@ if (hasLayout()) {
 }
 
 describe('placing rows by what they came to', () => {
+  /* A row was measured once, so one that grew after it was drawn kept its old
+     height, and the window went on drawing the rows its old height left room
+     for. */
+  inBrowser('measures a row again when it changes size after it is drawn', async () => {
+    const host = await fed(named(200))
+    host.measured = true
+    await settle(host)
+    const before = drawn(host).length
+    const second = host.querySelector('[data-index="1"]') as HTMLElement
+    second.style.blockSize = '20rem'
+    await new Promise((resolve) => setTimeout(resolve, 100))
+    await settle(host)
+    expect(drawn(host).length).toBeLessThan(before)
+    second.style.blockSize = ''
+  })
+
   /* Measured rows shorter than their estimates shrink the content at the end
      of the set, and the box pulls its offset up to match. The list read that
      as the reader scrolling and moved its window up a second time, so End left
@@ -537,6 +553,24 @@ describe('the keyboard', () => {
     expect((document.activeElement as HTMLElement).dataset.index).toBe('0')
     await press(host, 'ArrowDown')
     expect((document.activeElement as HTMLElement).dataset.index).toBe('1')
+  })
+
+  test('keeps focus on its item when items arrive before it', async () => {
+    const host = await fed(named(50))
+    ;(host.querySelector('[data-index="0"]') as HTMLElement).focus()
+    await press(host, 'ArrowDown')
+    await press(host, 'ArrowDown')
+    const focused = document.activeElement as HTMLElement
+    expect(focused.textContent?.trim()).toBe('Row 3')
+    const older = host.items as unknown[]
+    host.items = [{ name: 'New 1' }, { name: 'New 2' }, ...older]
+    await settle(host)
+    expect(document.activeElement).toBe(focused)
+    expect(focused.dataset.index).toBe('4')
+    expect(focused.textContent?.trim()).toBe('Row 3')
+    expect(focused.getAttribute('tabindex')).toBe('0')
+    await press(host, 'ArrowUp')
+    expect((document.activeElement as HTMLElement).textContent?.trim()).toBe('Row 2')
   })
 
   /* The row went with its item, and focus went to `<body>`, where the arrow
@@ -858,6 +892,81 @@ describe('choosing items', () => {
     host.addEventListener('helix-before-change', (event) => event.preventDefault(), { once: true })
     await press(host, ' ')
     expect(host.value).toBe('Row 1,Row 3')
+  })
+
+  test('passes over disabled items, marks them, and never chooses them', async () => {
+    const host = await fed(named(10))
+    host.selectionMode = 'multiple'
+    host.keyField = 'name'
+    host.disabledKeys = 'Row 2,Row 3'
+    await settle(host)
+    expect(row(host, 1).getAttribute('aria-disabled')).toBe('true')
+    expect(row(host, 0).hasAttribute('aria-disabled')).toBe(false)
+    row(host, 0).focus()
+    await press(host, 'ArrowDown')
+    expect((document.activeElement as HTMLElement).dataset.index).toBe('3')
+    await press(host, 'a', { ctrlKey: true })
+    expect(host.value.split(',')).not.toContain('Row 2')
+    expect(host.value.split(',')).toHaveLength(8)
+    row(host, 1).click()
+    await settle(host)
+    expect(host.value.split(',')).not.toContain('Row 2')
+    // Typing passes over a disabled item too.
+    host.value = ''
+    host.disabledKeys = 'Row 1'
+    await settle(host)
+    row(host, 4).focus()
+    await press(host, 'r')
+    expect((document.activeElement as HTMLElement).dataset.index).toBe('5')
+  })
+
+  test('Escape lets go of every chosen item, and keeps the key from what holds the list', async () => {
+    const host = await fed(named(10))
+    host.selectionMode = 'multiple'
+    host.keyField = 'name'
+    host.value = 'Row 1,Row 4'
+    await settle(host)
+    let outside = 0
+    const hear = (): void => {
+      outside += 1
+    }
+    document.body.addEventListener('keydown', hear)
+    try {
+      row(host, 0).focus()
+      await press(host, 'Escape')
+      expect(host.value).toBe('')
+      expect(outside).toBe(0)
+      // With nothing to let go of, the key goes on.
+      await press(host, 'Escape')
+      expect(outside).toBe(1)
+    } finally {
+      document.body.removeEventListener('keydown', hear)
+    }
+  })
+
+  test('selection-behavior replace selects the item alone, and the arrows carry it', async () => {
+    const host = await fed(named(10))
+    host.selectionMode = 'multiple'
+    host.selectionBehavior = 'replace'
+    host.keyField = 'name'
+    await settle(host)
+    row(host, 2).click()
+    await settle(host)
+    expect(host.value).toBe('Row 3')
+    row(host, 4).click()
+    await settle(host)
+    expect(host.value).toBe('Row 5')
+    row(host, 1).dispatchEvent(new MouseEvent('click', { bubbles: true, ctrlKey: true }))
+    await settle(host)
+    expect(host.value).toBe('Row 2,Row 5')
+    row(host, 4).focus()
+    await press(host, 'ArrowDown')
+    expect(host.value).toBe('Row 6')
+    await press(host, 'ArrowDown', { ctrlKey: true })
+    expect((document.activeElement as HTMLElement).dataset.index).toBe('6')
+    expect(host.value).toBe('Row 6')
+    await press(host, ' ', { ctrlKey: true })
+    expect(host.value).toBe('Row 6,Row 7')
   })
 
   test('takes in a range with Shift, and every item with Control or Command and A', async () => {

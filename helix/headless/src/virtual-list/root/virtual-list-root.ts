@@ -25,7 +25,7 @@ import { html, nothing, type PropertyValues, render, type TemplateResult } from 
 import { property, state } from 'lit/decorators.js'
 import { holdControls, releaseControls } from '../controls.js'
 import { fillHoles, keyOf, textsOf } from '../fill.js'
-import { stepIndex } from '../keys.js'
+import { skipDisabled, stepIndex } from '../keys.js'
 import { drawPlan, itemsOf, stopAfter } from '../plan.js'
 
 /**
@@ -92,6 +92,7 @@ export interface VirtualListRange {
  * | Home, End | Moves to the first or the last item. |
  * | Page Down, Page Up | Moves by the number of items, or of lines in a grid, on screen. |
  * | A letter or a word | Moves to the next item whose text starts with what you typed. |
+ * | Escape | Lets go of every chosen item, in a list with `selection-mode`. |
  * | Tab | Moves into the focused row's own links and buttons, then out of the list. |
  *
  * An item that is not drawn is scrolled into view and focused, so a keyboard
@@ -108,12 +109,23 @@ export interface VirtualListRange {
  * from: `single` selects one item and `multiple` any number. Space or a press
  * selects an item, Shift with Space, an arrow, Home, End or a press takes in
  * the items from the last one chosen, and Control or Command with A selects
- * them all, in `multiple`. `value` holds the chosen items' keys, separated by
- * commas, in the order of the set: `key-field` names each item's key, and a
- * string or a number item is its own key. A change asks with
- * `helix-before-change` and tells with `change`. Each row is an `option`
- * marked `aria-selected`, so a row's own links and buttons are not reached
- * there: keep those to a list without `selection-mode`.
+ * them all, in `multiple`. Escape lets go of every chosen item, and keeps the
+ * key from the dialog or menu around the list while there was something to
+ * let go of. `value` holds the chosen items' keys, separated by commas, in
+ * the order of the set: `key-field` names each item's key, and a string or a
+ * number item is its own key. A change asks with `helix-before-change` and
+ * tells with `change`. Each row is an `option` marked `aria-selected`, so a
+ * row's own links and buttons are not reached there: keep those to a list
+ * without `selection-mode`.
+ *
+ * `selection-behavior="replace"` selects the item pressed alone, as a file
+ * list does, and the arrow keys carry the selection with them. Control or
+ * Command with a press or with Space adds or takes out one item, and with an
+ * arrow moves without selecting.
+ *
+ * **Disabled items.** `disabled-keys` names items by their keys, separated by
+ * commas. Their rows carry `aria-disabled`, the keys and typing pass over
+ * them, and a press, Space, or Control with A does not select them.
  *
  * **Loading more.** `helix-range-change` fires as the items on screen change,
  * and `range` holds them. `helix-load-more` fires once a reader is within one
@@ -186,6 +198,13 @@ export class HelixHeadlessVirtualList extends HelixElement {
    */
   @property({ type: Number })
   columns = 1
+
+  /**
+   * The keys of the items a reader cannot choose or move to, separated by
+   * commas, as `value` writes keys. Their rows carry `aria-disabled`.
+   */
+  @property({ attribute: 'disabled-keys' })
+  disabledKeys = ''
 
   /**
    * The text of the row shown when there are no items and none are loading,
@@ -287,6 +306,14 @@ export class HelixHeadlessVirtualList extends HelixElement {
   selectionMode?: 'multiple' | 'single'
 
   /**
+   * What a press does to the items already chosen: `toggle` adds or takes out
+   * the item, and `replace` selects it alone and lets the arrow keys carry the
+   * selection, with Control or Command adding or taking out one item.
+   */
+  @property({ attribute: 'selection-behavior' })
+  selectionBehavior: 'replace' | 'toggle' = 'toggle'
+
+  /**
    * The field of each item that typing matches, as a key or a path of keys
    * (`author.name`).
    *
@@ -352,6 +379,21 @@ export class HelixHeadlessVirtualList extends HelixElement {
    * script replaced under the same id.
    */
   private watcher: MutationObserver | undefined
+
+  /**
+   * Watches the drawn rows for a change of size after they were drawn: an
+   * image that loads, a row that opens, text a page edits in place.
+   *
+   * **Measured once, a row that grew later kept its old height**, so the
+   * window and the spacers placed every row after it by the old one. React
+   * Aria's virtualizer observes its items for the same reason. A frame later,
+   * so a size the next render changes is not asked of the browser's pass over
+   * the observers a second time.
+   */
+  private sizes: ResizeObserver | undefined
+
+  /** The frame the next measure of resized rows waits for. */
+  private resized: number | undefined
 
   /** Carries a host `aria-label` and `aria-labelledby` to the element with the `list` role. */
   protected readonly aria = new AriaForwardController(this, {
@@ -476,7 +518,47 @@ export class HelixHeadlessVirtualList extends HelixElement {
        below the box. The first render has no box yet, so it places in
        `updated` alone. */
     if (this.hasUpdated) {
+      if (changed.has('items')) {
+        this.keepPlace(changed.get('items') as readonly unknown[] | undefined)
+      }
       this.place()
+    }
+  }
+
+  /**
+   * Keeps the reader on the item they were reading when items arrive before
+   * it, as a feed loading newer posts above does.
+   *
+   * **Every index moves by what arrived**, so the drawn rows are renumbered,
+   * the tab stop moves with its item, and the controller is told, which moves
+   * the scroll offset by the room the new items take. Recognized where the
+   * new array ends with the old one: the same items, or the same keys under
+   * `key-field`.
+   */
+  private keepPlace(was: readonly unknown[] | undefined): void {
+    const now = this.data
+    if (!was || was.length === 0 || now.length <= was.length) {
+      return
+    }
+    const by = now.length - was.length
+    const same = (at: number, then: number): boolean =>
+      now[at] === was[then] ||
+      (this.keyField !== '' &&
+        keyOf(now[at], at, this.keyField) === keyOf(was[then], then, this.keyField))
+    if (!same(by, 0) || !same(now.length - 1, was.length - 1)) {
+      return
+    }
+    /* The controller counts lines, so a grid holds its place where whole
+       lines arrived. */
+    if (by % this.across === 0) {
+      this.virtualize.shift(by / this.across)
+    }
+    for (const row of this.querySelectorAll<HTMLElement>(':scope > [data-index]')) {
+      row.dataset.index = String(Number(row.dataset.index) + by)
+    }
+    this.active += by
+    if (this.released !== undefined) {
+      this.released += by
     }
   }
 
@@ -508,6 +590,31 @@ export class HelixHeadlessVirtualList extends HelixElement {
     this.removeEventListener('focusout', this.handleFocusOut)
     this.watcher?.disconnect()
     this.watcher = undefined
+    this.sizes?.disconnect()
+    this.sizes = undefined
+    if (this.resized !== undefined) {
+      cancelAnimationFrame(this.resized)
+      this.resized = undefined
+    }
+  }
+
+  /** Watches a row drawn on this pass for a change of size. */
+  private watchSize(elements: Element[]): void {
+    if (typeof ResizeObserver === 'undefined') {
+      return
+    }
+    this.sizes ??= new ResizeObserver(() => {
+      if (this.resized !== undefined) {
+        return
+      }
+      this.resized = requestAnimationFrame(() => {
+        this.resized = undefined
+        this.virtualize.settle()
+      })
+    })
+    for (const element of elements) {
+      this.sizes.observe(element)
+    }
   }
 
   /**
@@ -592,7 +699,19 @@ export class HelixHeadlessVirtualList extends HelixElement {
         ?.content.querySelector('[data-field]')
         ?.getAttribute('data-field') ||
       ''
-    return textsOf(this.data, field)
+    const off = this.disabled
+    const texts = textsOf(this.data, field)
+    return off.size === 0 ? texts : texts.map((text, at) => (off.has(this.keyAt(at)) ? '' : text))
+  }
+
+  /** The keys `disabled-keys` names. */
+  private get disabled(): Set<string> {
+    return new Set(commaList(this.disabledKeys))
+  }
+
+  /** Whether item `at` is one a reader cannot choose or move to. */
+  private isDisabled(at: number): boolean {
+    return this.disabledKeys !== '' && this.disabled.has(this.keyAt(at))
   }
 
   /** The item a row element drew, for an element that is one of the rows. */
@@ -633,28 +752,50 @@ export class HelixHeadlessVirtualList extends HelixElement {
       return
     }
     const toggle = event.ctrlKey || event.metaKey
+    const replacing = this.selectionMode !== undefined && this.selectionBehavior === 'replace'
     if (this.selectionMode && !event.altKey) {
       if (selectsAll(event) && this.selectionMode === 'multiple') {
         event.preventDefault()
-        this.choose(this.keys().join(','))
+        const off = this.disabled
+        this.choose(
+          this.keys()
+            .filter((key) => !off.has(key))
+            .join(','),
+        )
         return
       }
-      if (event.key === ' ' && !toggle) {
+      if (event.key === ' ' && (!toggle || replacing)) {
         event.preventDefault()
-        this.press(at, event.shiftKey)
+        this.press(at, event.shiftKey, toggle)
+        return
+      }
+      /* As React Aria's lists do, and only where there is something to let
+         go of, so the key still reaches a dialog around an empty choice. */
+      if (event.key === 'Escape' && this.value !== '' && !toggle && !event.shiftKey) {
+        event.preventDefault()
+        event.stopPropagation()
+        this.choose('')
         return
       }
     }
     const extend = event.shiftKey && this.selectionMode === 'multiple'
-    if (event.altKey || toggle || (event.shiftKey && !extend)) {
+    if (event.altKey || (toggle && !replacing) || (event.shiftKey && !extend)) {
       return
     }
+    const count = this.data.length
     const { first, last } = this.virtualize.visible()
-    const next = stepIndex(event.key, at, this.data.length, last - first - 1, {
+    const stepped = stepIndex(event.key, at, count, last - first - 1, {
       across: this.across,
       forward: isRtl(this) ? 'ArrowLeft' : 'ArrowRight',
     })
+    const next =
+      stepped === undefined
+        ? undefined
+        : skipDisabled(event.key, at, stepped, count, (one) => this.isDisabled(one), this.across)
     if (next === undefined) {
+      if (stepped !== undefined) {
+        event.preventDefault()
+      }
       return
     }
     event.preventDefault()
@@ -662,6 +803,8 @@ export class HelixHeadlessVirtualList extends HelixElement {
     if (extend) {
       this.anchor ??= this.keyAt(at)
       this.press(next, true)
+    } else if (replacing && !toggle) {
+      this.press(next)
     }
   }
 
@@ -686,22 +829,36 @@ export class HelixHeadlessVirtualList extends HelixElement {
    * and List take in a range. Otherwise the item is where the next range runs
    * from.
    */
-  private press(at: number, extend = false): void {
+  private press(at: number, extend = false, toggle = false): void {
     const mode = this.selectionMode
-    const key = this.keyAt(at)
-    if (!mode || at < 0 || at >= this.data.length) {
+    if (!mode || at < 0 || at >= this.data.length || this.isDisabled(at)) {
       return
     }
+    const key = this.keyAt(at)
     const now = commaList(this.value)
     if (extend && mode === 'multiple') {
       const keys = this.keys()
-      const range = rangeAdd(now, keys, anchorAt(keys, this.anchor, at).anchor, at)
+      const off = this.disabled
+      const range = rangeAdd(
+        now,
+        keys.map((one) => (off.has(one) ? '' : one)),
+        anchorAt(keys, this.anchor, at).anchor,
+        at,
+      )?.filter((one) => one !== '')
       if (range) {
         this.choose(this.inOrder(range))
       }
       return
     }
     this.anchor = key
+    /* Under `replace` a press is the item alone, and Control or Command is
+       the toggle `toggle` gives every press. */
+    if (this.selectionBehavior === 'replace' && !toggle) {
+      if (!(now.length === 1 && now[0] === key)) {
+        this.choose(key)
+      }
+      return
+    }
     if (mode === 'single') {
       this.choose(now.length === 1 && now[0] === key ? '' : key)
       return
@@ -751,7 +908,11 @@ export class HelixHeadlessVirtualList extends HelixElement {
     ) {
       return
     }
-    this.press(at, event.shiftKey && this.selectionMode === 'multiple')
+    this.press(
+      at,
+      event.shiftKey && this.selectionMode === 'multiple',
+      event.ctrlKey || event.metaKey,
+    )
   }
 
   /**
@@ -840,15 +1001,26 @@ export class HelixHeadlessVirtualList extends HelixElement {
 
   /**
    * Writes a row's role, and whether it is chosen in a list that selects:
-   * `option` with `aria-selected` there, and `listitem` otherwise. Every pass,
+   * `option` with `aria-selected` there, and `listitem` otherwise, and
+   * `aria-disabled` on an item `disabled-keys` names. Every pass,
    * since a choice changes no row's content.
    */
-  private mark(element: Element, at: number, chosen: ReadonlySet<string>): void {
+  private mark(
+    element: Element,
+    at: number,
+    chosen: ReadonlySet<string>,
+    off: ReadonlySet<string>,
+  ): void {
     element.setAttribute('role', this.selectionMode ? 'option' : 'listitem')
     if (this.selectionMode) {
       element.setAttribute('aria-selected', String(chosen.has(this.keyAt(at))))
     } else {
       element.removeAttribute('aria-selected')
+    }
+    if (off.size > 0 && off.has(this.keyAt(at))) {
+      element.setAttribute('aria-disabled', 'true')
+    } else {
+      element.removeAttribute('aria-disabled')
     }
   }
 
@@ -942,6 +1114,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
     for (const child of children) {
       const index = Number(child.dataset.index)
       if (plan.remove.has(index)) {
+        this.sizes?.unobserve(child)
         child.remove()
         continue
       }
@@ -965,6 +1138,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
       }
       const fragment = this.draw(template, at)
       drawn.set(at, [...fragment.children])
+      this.watchSize([...fragment.children])
       fresh.add(at)
       this.insertBefore(fragment, anchor)
     }
@@ -975,9 +1149,10 @@ export class HelixHeadlessVirtualList extends HelixElement {
       onScreen: this.range.first,
     })
     const chosen = this.chosen
+    const off = this.disabled
     for (const [at, group] of drawn) {
       for (const element of group) {
-        this.mark(element, at, chosen)
+        this.mark(element, at, chosen, off)
       }
       const stop = at === this.active
       group[0]?.setAttribute('tabindex', stop ? '0' : '-1')

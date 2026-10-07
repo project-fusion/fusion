@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { stepIndex } from './keys.js'
+import { skipDisabled, stepIndex } from './keys.js'
 
 describe('stepIndex', () => {
   test('moves one item with the vertical arrows, and stops at either end', () => {
@@ -62,5 +62,30 @@ describe('stepIndex in a grid', () => {
     expect(stepIndex('PageDown', 1, 10, 1, grid)).toBe(5)
     expect(stepIndex('PageDown', 1, 10, 5, grid)).toBe(9)
     expect(stepIndex('PageUp', 9, 10, 5, grid)).toBe(1)
+  })
+})
+
+describe('skipDisabled', () => {
+  const off =
+    (...indexes: number[]) =>
+    (at: number) =>
+      indexes.includes(at)
+
+  test('passes over disabled items in the way the key moves', () => {
+    expect(skipDisabled('ArrowDown', 0, 1, 5, off(1, 2))).toBe(3)
+    expect(skipDisabled('ArrowUp', 4, 3, 5, off(3))).toBe(2)
+    expect(skipDisabled('Home', 3, 0, 5, off(0, 1))).toBe(2)
+    expect(skipDisabled('End', 0, 4, 5, off(4))).toBe(3)
+  })
+
+  test('keeps to the column in a grid, and stays where nothing that way can be reached', () => {
+    // Three to a line: 0 1 2 / 3 4 5 / 6 7 8, with 4 disabled.
+    expect(skipDisabled('ArrowDown', 1, 4, 9, off(4), 3)).toBe(7)
+    expect(skipDisabled('ArrowDown', 3, 4, 5, off(4))).toBeUndefined()
+    expect(skipDisabled('ArrowRight', 0, 1, 3, off(1, 2))).toBeUndefined()
+  })
+
+  test('leaves an item that is not disabled alone', () => {
+    expect(skipDisabled('ArrowDown', 0, 1, 5, off())).toBe(1)
   })
 })
