@@ -80,6 +80,21 @@ describe('what a transcript says', () => {
     expect(said(element)).toBe('')
   })
 
+  /* A conversation of several said every turn as its words alone, so a reader
+     could not tell who had spoken. */
+  test('a turn with its author first, where its author can be named', async () => {
+    const element = await opened()
+    const named = turn('them', 'It ships today.')
+    named.setAttribute('author-label', 'Ada')
+    element.append(named)
+    await settle(element)
+    expect(said(element)).toBe('Ada: It ships today.')
+    element.setAttribute('arrival-label', '{author} wrote {text}')
+    element.append(turn('grace', 'Thanks.'))
+    await settle(element)
+    expect(said(element)).toBe('grace wrote Thanks.')
+  })
+
   test('the reader’s own turn when it did not send, in the words the turn shows', async () => {
     const element = await opened()
     const mine = turn('me', 'Thanks', 'sending')
@@ -249,6 +264,12 @@ describe('turns handed over as data', () => {
     element.turns = [...element.turns, { author: 'them', key: 'new', text: 'Something new' }]
     await settle(element)
     expect(said(element)).toBe('Something new')
+    element.turns = [
+      ...element.turns,
+      { author: 'them', authorLabel: 'Ada', key: 'named', text: 'Hi' },
+    ]
+    await settle(element)
+    expect(said(element)).toBe('Ada: Hi')
     const before = utterance(element)
     element.turns = [...conversation(10), ...element.turns]
     await settle(element)
