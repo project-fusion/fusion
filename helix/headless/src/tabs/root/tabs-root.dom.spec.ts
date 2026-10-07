@@ -537,3 +537,41 @@ describe('tabs that are links', () => {
     expect(click.defaultPrevented).toBe(true)
   })
 })
+
+describe('removing the selected tab', () => {
+  type Tabs = Updatable & { active: string }
+  const removed = async (): Promise<{ host: Tabs; heard: string[] }> => {
+    const host = (await mount(markup)) as Tabs
+    const second = tabs(host)[1] as Updatable & { select(): void; focus(): void }
+    second.select()
+    await host.updateComplete
+    second.focus()
+    const heard: string[] = []
+    host.addEventListener('helix-activate', (event) =>
+      heard.push((event as CustomEvent<{ value: string }>).detail.value),
+    )
+    second.remove()
+    panels(host)[1]?.remove()
+    await host.updateComplete
+    await new Promise((done) => setTimeout(done, 0))
+    await host.updateComplete
+    return { heard, host }
+  }
+
+  test('selects a tab that is left, and active says which', async () => {
+    const { heard, host } = await removed()
+    const left = tabs(host)
+    expect(left.map((one) => hasState(one, 'selected'))).toEqual([true, false])
+    expect(host.active).toBe('one')
+    expect(heard).toEqual(['one'])
+  })
+
+  test('hands focus to the tab now selected where the removed one had it', async () => {
+    const { host } = await removed()
+    const first = tabs(host)[0] as Element
+    const active = document.activeElement
+    expect(
+      active === first || first.contains(active) || first.shadowRoot?.activeElement != null,
+    ).toBe(true)
+  })
+})

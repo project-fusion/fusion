@@ -1,6 +1,8 @@
 import {
   AriaForwardController,
   customElement,
+  deepActiveElement,
+  HelixActivateEvent,
   HelixElement,
   IndicatorController,
   KeyboardNavigationController,
@@ -47,6 +49,20 @@ import { HelixHeadlessTab } from '../tab/tab.js'
  * follow the reading direction, so on a right-to-left page Left moves on.
  * Disabled tabs are passed over. Tab leaves the list for the selected panel,
  * which is a tab stop only while it holds nothing focusable.
+ *
+ * **Keyboard.**
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Right, Down | Moves to the next tab, from the last round to the first. Selects it, unless `manual` is set or a tab is a link. |
+ * | Left, Up | Moves to the tab before, from the first round to the last. |
+ * | Home, End | Moves to the first or the last tab. |
+ * | Enter, Space | Selects the tab with focus, or follows its link. |
+ * | Tab | Leaves the list for the selected panel. |
+ *
+ * Removing the selected tab selects the first enabled tab that is left, and
+ * `active` says so, with `helix-activate`. Where the removed tab had focus,
+ * focus moves to the tab now selected.
  *
  * The `indicator` part moves to the selected tab and carries its place and
  * size, so a mark of your own can be drawn there: style the part, or slot an
@@ -206,6 +222,9 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
     this.requestActive((event as CustomEvent<{ value: string }>).detail.value)
   }
 
+  /** The values of the tabs the last pairing read, to tell a removed tab from one not yet here. */
+  private held: string[] = []
+
   /** Pushes the current value down to whichever tab and panel own it. */
   private sync(): void {
     const tabs = this.tabs
@@ -226,6 +245,18 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
        fallback to the first child shows a disabled tab as current and opens its
        panel with it. */
     const value = (declared ?? this.resolveActive(tabs))?.value ?? ''
+    /* **A removed tab takes its name out of `active` with it.** Left alone,
+       `active` named a tab that no longer existed while another was shown as
+       selected, and the next `requestActive` of that value was a change to
+       nothing. Only where `active` names a tab this set held and holds no
+       more, so a value naming a tab that has not arrived yet is left alone. */
+    const previous = this.active
+    const gone = this.held.includes(previous) && !tabs.some((tab) => tab.value === previous)
+    this.held = tabs.map((tab) => tab.value)
+    if (gone && value !== '') {
+      this.active = value
+      this.dispatchEvent(new HelixActivateEvent({ previous, value }))
+    }
     /* Not into a tab or a panel still hydrating what a server sent: see
        `whenHydrated`. `Steps` writes into its children the same way. Both sides
        read `childrenKnown` now, so a hydrating child renders a strip every tab
@@ -258,14 +289,42 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
     }
   }
 
+  /** The tab that last had focus, so its removal can hand focus on. */
+  private focused: HelixHeadlessTab | undefined
+
+  private readonly handleFocusIn = (event: FocusEvent): void => {
+    const path = event.composedPath()
+    this.focused = this.tabs.find((tab) => path.includes(tab))
+  }
+
+  /**
+   * Puts focus on the selected tab where the tab that had it was removed and
+   * focus fell to the page, which is where removing a focused element leaves
+   * it.
+   */
+  private refocus(): void {
+    const gone = this.focused
+    if (!gone || this.tabs.includes(gone)) {
+      return
+    }
+    this.focused = undefined
+    const active = deepActiveElement()
+    if (active !== null && active !== document.body) {
+      return
+    }
+    void this.updateComplete.then(() => this.tabs.find((tab) => tab.selected)?.focus())
+  }
+
   override connectedCallback(): void {
     super.connectedCallback()
     this.addEventListener('helix-select', this.handleSelection)
+    this.addEventListener('focusin', this.handleFocusIn)
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('helix-select', this.handleSelection)
+    this.removeEventListener('focusin', this.handleFocusIn)
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
@@ -302,6 +361,7 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
   private readonly handleSlotChange = (): void => {
     this.sync()
     this.indicator.place()
+    this.refocus()
   }
 
   protected override updated(changed: PropertyValues): void {
