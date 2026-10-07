@@ -17,7 +17,7 @@ import {
   HelixConnectEvent,
   HelixElement,
   HelixMoveEvent,
-  HelixPasteEvent,
+  HelixPastedEvent,
   HelixReconnectEvent,
   HelixRelabelEvent,
   HelixRemoveEvent,
@@ -352,7 +352,7 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  * @event {HelixCanvasZoomEvent} helix-canvas-zoom - The board zoomed one step, from its controls or the keys. A wheel or a pinch sends `helix-canvas-view`.
  * @event {HelixConnectEvent} helix-connect - Two cards were chosen to be joined. Add a `helix-canvas-edge` to join them.
  * @event {HelixMoveEvent} helix-move - Cards moved and the move is finished: a drag was released, a click put a card down, or a key was pressed.
- * @event {HelixPasteEvent} helix-paste - Cards and connections were pasted, and the board holds them.
+ * @event {HelixPastedEvent} helix-pasted - Cards and connections were pasted, and the board holds them.
  * @event {HelixReconnectEvent} helix-reconnect - A connection's end moved, and the move is finished.
  * @event {HelixRelabelEvent} helix-relabel - A connection's label or a group's name changed.
  * @event {HelixRemoveEvent} helix-remove - Cards or connections were chosen for removal. Remove the elements it names.
@@ -553,6 +553,11 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   @property({ reflect: true })
   order?: 'spatial' | 'edges'
 
+  /** What screen readers hear after a paste, with `{count}` for the cards pasted. */
+  @words
+  @property({ attribute: 'pasted-label' })
+  pastedLabel = '{count, plural, one {# card pasted} other {# cards pasted}}'
+
   /**
    * The route every connection takes when it sets no `path` of its own:
    * `straight`, or `step` for right angles.
@@ -563,11 +568,6 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    */
   @property({ reflect: true })
   path?: 'straight' | 'step'
-
-  /** What screen readers hear after a paste, with `{count}` for the cards pasted. */
-  @words
-  @property({ attribute: 'pasted-label' })
-  pastedLabel = '{count, plural, one {# card pasted} other {# cards pasted}}'
 
   /**
    * Prevents every card from being moved, connected, or removed.
@@ -2109,7 +2109,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     this.requestUpdate()
     this.choose(nodes.map((one) => one.name))
     this.say(formatWords(this, 'pastedLabel', { count: nodes.length }))
-    this.dispatchEvent(new HelixPasteEvent({ document: placed }))
+    this.dispatchEvent(new HelixPastedEvent({ document: placed }))
     return true
   }
 
