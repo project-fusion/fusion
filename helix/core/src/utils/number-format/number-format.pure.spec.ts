@@ -1,5 +1,11 @@
 import { describe, expect, test } from 'bun:test'
-import { formatNumber, formatPercent, parseNumber, readingText } from './number-format.js'
+import {
+  formatNumber,
+  formatPercent,
+  latinDigits,
+  parseNumber,
+  readingText,
+} from './number-format.js'
 
 describe('formatting a number', () => {
   test('writes the locale and the options', () => {
@@ -48,6 +54,15 @@ describe('reading a number', () => {
     expect(parseNumber('1.2.3', 'de-DE')).toBeNull()
   })
 
+  /* A keyboard in Arabic types its own digits. Measured before this: `١٢٣` in
+     `ar-EG` was no number, and the field refused it. */
+  test('reads the digits a locale writes, and what it writes back', () => {
+    expect(parseNumber('\u0661\u0662\u0663', 'ar-EG')).toBe(123)
+    expect(parseNumber(formatNumber(-1234.5, 'ar-EG'), 'ar-EG')).toBe(-1234.5)
+    expect(parseNumber('\u06f1\u06f2', 'fa-IR')).toBe(12)
+    expect(parseNumber(formatNumber(2.75, 'hi-IN-u-nu-deva'), 'hi-IN-u-nu-deva')).toBe(2.75)
+  })
+
   test('is nothing for text that is no number', () => {
     for (const text of ['', 'abc', '1.2.3x', '--1']) {
       expect(parseNumber(text, 'en-US')).toBeNull()
@@ -85,5 +100,12 @@ describe('formatPercent', () => {
     expect(formatPercent(0.25)).toBe(
       formatNumber(0.25, '', { maximumFractionDigits: 0, style: 'percent' }),
     )
+  })
+})
+
+describe('digits in ASCII', () => {
+  test('are written for the digits of any script, and other text is kept', () => {
+    expect(latinDigits('\u0660\u0669 \u06f4 \u0967 x9')).toBe('09 4 1 x9')
+    expect(latinDigits('\u{1d7d8}\u{1d7e2}')).toBe('00')
   })
 })

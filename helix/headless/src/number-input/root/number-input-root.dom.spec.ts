@@ -40,7 +40,7 @@ describe('input number', () => {
        one thing `type=number` was giving. */
     const host = await field()
     expect(control(host).getAttribute('type')).toBe('text')
-    expect(control(host).getAttribute('inputmode')).toBe('decimal')
+    expect(control(host).getAttribute('inputmode')).toBe('numeric')
   })
 
   test('it announces itself as a number in a range, not a line of text', async () => {
@@ -726,5 +726,127 @@ describe('on iOS and iPadOS', () => {
       }
     }
     expect(control(await field()).getAttribute('role')).toBe('spinbutton')
+  })
+})
+
+/* The keypad a phone shows, as React Aria's NumberField picks it. Measured
+   before this: always `decimal`, which has no minus key on a phone, so
+   `min="-10"` reached a negative number only through the steppers. */
+describe('the keypad on a phone', () => {
+  const on = async (agent: string, attrs: string): Promise<string | null> => {
+    const own = Object.getOwnPropertyDescriptor(navigator, 'userAgent')
+    Object.defineProperty(navigator, 'userAgent', { configurable: true, value: agent })
+    try {
+      return control(await field(attrs)).getAttribute('inputmode')
+    } finally {
+      if (own) {
+        Object.defineProperty(navigator, 'userAgent', own)
+      } else {
+        delete (navigator as unknown as Record<string, unknown>).userAgent
+      }
+    }
+  }
+  const android = 'Mozilla/5.0 (Linux; Android 15; Pixel 9)'
+  const iphone = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)'
+
+  test('has a minus key where the number can be negative', async () => {
+    expect(await on(android, 'min="-10" step="0.5"')).toBe('numeric')
+    expect(await on(iphone, 'min="-10"')).toBe('text')
+    expect(await on(iphone, '')).toBe('text')
+  })
+
+  test('has a decimal separator where the number takes a fraction, and digits alone otherwise', async () => {
+    expect(await on(android, 'min="0" step="0.5"')).toBe('decimal')
+    expect(await on(iphone, 'min="0"')).toBe('decimal')
+    expect(await on(iphone, 'min="0" step="1"')).toBe('numeric')
+    expect(await on(android, 'min="0" step="any"')).toBe('decimal')
+  })
+})
+
+/* A native number field takes `step="any"` for a number on no grid. Measured
+   before this: 2.75 was a step mismatch, "the nearest valid values are 2 and
+   3", and Up went to 4. */
+describe('a step of any', () => {
+  test('puts the number on no grid, and steps by one', async () => {
+    const host = (await field('step="any" default-value="2.75"')) as Field & {
+      validity: ValidityState
+    }
+    expect(host.validity.valid).toBe(true)
+    control(host).dispatchEvent(new Event('blur'))
+    await host.updateComplete
+    expect(host.value).toBe('2.75')
+    control(host).dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowUp' }),
+    )
+    await host.updateComplete
+    expect(host.value).toBe('3.75')
+  })
+
+  test('still keeps the number in range', async () => {
+    const host = await field('step="any" max="3"')
+    await type(host, '3.25')
+    control(host).dispatchEvent(new Event('blur'))
+    await host.updateComplete
+    expect(host.value).toBe('3')
+  })
+})
+
+describe('a typed fraction with no step and no format', () => {
+  /* React Aria keeps a typed fraction when no step is given. Measured before
+     this: `2,75` typed in German became 3 on blur, with nothing said. */
+  test('is kept to three decimal places', async () => {
+    const host = await field('locale="de-DE"')
+    await type(host, '2,75')
+    control(host).dispatchEvent(new Event('blur'))
+    await host.updateComplete
+    expect(host.value).toBe('2.75')
+    await type(host, '1,23456')
+    control(host).dispatchEvent(new Event('blur'))
+    await host.updateComplete
+    expect(host.value).toBe('1.235')
+  })
+})
+
+describe('digits in the locale script', () => {
+  /* Measured before this: `١٢٣` typed in `ar-EG` was bad input, "Please enter
+     a number." */
+  test('are read as the number they write', async () => {
+    const host = (await field(
+      `locale="ar-EG" name="n" format-options='{"maximumFractionDigits":2}' default-value="12"`,
+    )) as Field & { validity: ValidityState }
+    expect(control(host).value).toBe('\u0661\u0662')
+    await type(host, '\u0661\u0662\u0663')
+    expect(host.validity.valid).toBe(true)
+    expect(formValue(host)).toBe('123')
+  })
+})
+
+describe('a stepper pressed with a mouse', () => {
+  /* React Aria's NumberField keeps focus in the field. Measured before this:
+     focus moved to the button, out of the tab order, and Up then did
+     nothing. */
+  test('leaves focus in the field, so the arrows step next', async () => {
+    const host = await field('default-value="2"')
+    const up = part(host, 'increment') as HTMLElement
+    const down = new MouseEvent('mousedown', { bubbles: true, cancelable: true })
+    up.dispatchEvent(
+      new PointerEvent('pointerdown', {
+        bubbles: true,
+        button: 0,
+        pointerId: 1,
+        pointerType: 'mouse',
+      }),
+    )
+    up.dispatchEvent(down)
+    up.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, button: 0, pointerId: 1 }))
+    await host.updateComplete
+    expect(down.defaultPrevented).toBe(true)
+    expect(host.shadowRoot?.activeElement).toBe(control(host))
+    expect(host.value).toBe('3')
+    control(host).dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowUp' }),
+    )
+    await host.updateComplete
+    expect(host.value).toBe('4')
   })
 })

@@ -131,7 +131,11 @@ export const parseNumber = (
     .filter(Boolean)
     .sort((a, b) => b.length - a.length)
   const percent = options?.style === 'percent' && /[%\u066a\u2030]/u.test(text)
-  let read = text.replace(/[\s\u00a0\u202f]/gu, '')
+  /* Digits in the locale's own script, `١٢٣` in Arabic, are read as ASCII,
+     and the direction marks a right-to-left locale writes around its minus
+     sign are dropped. Measured before this: `١٢٣` typed in `ar-EG` was no
+     number. */
+  let read = latinDigits(text).replace(/[\s\u00a0\u202f\u061c\u200e\u200f]/gu, '')
   for (const one of dropped) {
     read = read.replace(new RegExp(literal(one), 'gu'), '')
   }

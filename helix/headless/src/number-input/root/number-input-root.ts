@@ -42,6 +42,27 @@ const SCRUB_PITCH = 4
  */
 const SCRUB_FINE = 16
 
+/** The format a field with no `format-options` writes its number in: the locale's plain decimal. */
+const PLAIN_FORMAT: Intl.NumberFormatOptions = {}
+
+/** `step` as written: `any`, or a number, as a native number field reads it. */
+const stepConverter = {
+  fromAttribute: (text: string | null): number | 'any' | undefined => {
+    if (text === null) {
+      return undefined
+    }
+    return text.trim().toLowerCase() === 'any' ? 'any' : Number(text)
+  },
+  toAttribute: (step: number | 'any' | undefined): string | undefined =>
+    step === undefined ? undefined : String(step),
+}
+
+/** Which phone a browser runs on, for the keypads it has: an iPhone, Android, or neither. */
+const phoneOf = (platform: { userAgent?: string } | undefined): 'android' | 'iphone' | '' => {
+  const agent = platform?.userAgent ?? ''
+  return /iPhone|iPod/u.test(agent) ? 'iphone' : /android/iu.test(agent) ? 'android' : ''
+}
+
 /** A number as `Number()` writes one back: a sign, digits and one decimal point. */
 const PLAIN = /^-?(\d+(\.\d*)?|\.\d+)$/
 
@@ -59,7 +80,7 @@ const REPEAT_EVERY = 60
  * A separate family from `Input`'s `type="number"`. It renders two buttons,
  * binds four keys `Input` does not, and handles clamping and stepping.
  *
- * The field is `type="text"` with `inputmode="decimal"`. Tested in a real
+ * The field is `type="text"` with an `inputmode` for a number. Tested in a real
  * browser, `type="number"` fails in three ways:
  * - Typing `12e` gives a `.value` of `""`, so the element cannot see what you
  *   typed. A `type="text"` field keeps `"12e"`.
@@ -67,7 +88,11 @@ const REPEAT_EVERY = 60
  *   to 4, when you only meant to scroll the page.
  * - `selectionStart` is `null`, so the caret cannot be managed.
  *
- * `inputmode="decimal"` keeps the numeric keypad on phones.
+ * `inputmode` keeps a numeric keypad on phones, chosen as React Aria's
+ * NumberField chooses it: a keypad with a minus key where the number can be
+ * negative, and one with a decimal separator where the format shows a
+ * fraction. An iPhone has no keypad with a minus key, so a field that can be
+ * negative takes the full keyboard there.
  *
  * `format-options` shows the number with `Intl.NumberFormat` in `locale`, as a
  * currency, a percent or a unit, while the field is not being edited. Focus
@@ -307,13 +332,14 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
    * invalid, as it is in a native number field.
    *
    * Unset, a step moves by one, or by one percent under a percent format, and
-   * a typed number is rounded to the smallest amount `format-options` shows
-   * rather than to whole steps, as React Aria's NumberField does: a field
-   * showing dollars keeps the cents typed into it. Without `format-options`
-   * the grid is whole numbers, as in a native number field.
+   * a typed number is rounded to the smallest amount the format shows, as
+   * React Aria's NumberField does: a field showing dollars keeps the cents
+   * typed into it, and one with no `format-options` keeps three decimal
+   * places. `any` puts the number on no grid, as it does in a native number
+   * field: a step moves by one, and any number in range is valid.
    */
-  @property({ type: Number })
-  step?: number
+  @property({ converter: stepConverter })
+  step?: number | 'any'
 
   /**
    * The message the browser shows when the number is off the step grid, with
@@ -383,6 +409,29 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
    */
   private readonly touchApple = appleTouch(typeof navigator === 'undefined' ? undefined : navigator)
 
+  /** The phone the field is on, read once on the client, for the keypad it offers. */
+  private readonly phone = phoneOf(typeof navigator === 'undefined' ? undefined : navigator)
+
+  /**
+   * The keypad a phone shows, as React Aria's NumberField chooses it.
+   * `numeric` on Android has a minus key and a decimal separator, and
+   * `decimal` has no minus key. On an iPhone neither has a minus key, so a
+   * number that can be negative takes the full keyboard. Measured before
+   * this: `decimal` with `min="-10"`, so a phone could not type the minus.
+   */
+  private get keypad(): 'decimal' | 'numeric' | 'text' {
+    const negative = this.min === undefined || this.min < 0
+    const grid = this.grid
+    const fraction = grid === 0 || !Number.isInteger(grid)
+    if (this.phone === 'iphone') {
+      return negative ? 'text' : fraction ? 'decimal' : 'numeric'
+    }
+    if (this.phone === 'android') {
+      return negative ? 'numeric' : fraction ? 'decimal' : 'numeric'
+    }
+    return 'numeric'
+  }
+
   private get control(): HTMLInputElement | null {
     return this.partNamed<HTMLInputElement>('control')
   }
@@ -403,21 +452,28 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
   /** The grain last read off the format, with the locale and options it was read for. */
   private grainOf?: [string, Intl.NumberFormatOptions, number]
 
+  /** The step as a number, or zero where it is unset or `any`. */
+  private get stepSize(): number {
+    return typeof this.step === 'number' ? Math.abs(this.step) || 0 : 0
+  }
+
   /** How far one press moves: `step`, or the stride the format implies. */
   private get stride(): number {
-    return Math.abs(this.step ?? 0) || strideOf(this.formatOptions)
+    return this.stepSize || strideOf(this.formatOptions)
   }
 
   /**
-   * The grid a typed number is rounded to: `step` where it is set, and
-   * otherwise the smallest amount the format shows, or whole numbers.
+   * The grid a typed number is rounded to: `step` where it is set, nothing
+   * where it is `any`, and otherwise the smallest amount the format shows.
+   * Measured before this: with no step and no format, `2,75` typed in German
+   * became 3 on blur.
    */
   private get grid(): number {
-    const step = Math.abs(this.step ?? 0)
-    const options = this.formatOptions
-    if (step || !options) {
-      return step || 1
+    const step = this.stepSize
+    if (step || this.step === 'any') {
+      return step
     }
+    const options = this.formatOptions ?? PLAIN_FORMAT
     const [locale, read, grain] = this.grainOf ?? []
     if (locale === this.locale && read === options && grain !== undefined) {
       return grain
@@ -442,6 +498,9 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
   /** Whether `value` is on the step grid, counted from `min`. */
   private onStep(value: number): boolean {
     const step = this.grid
+    if (!step) {
+      return true
+    }
     const anchor = this.min ?? 0
     const steps = (value - anchor) / step
     // To the precision the grid is written in, so 0.1 + 0.2 is on a 0.1 grid.
@@ -459,14 +518,14 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
   private clamp(value: number): number {
     const step = this.grid
     const anchor = this.min ?? 0
-    const stepped = anchor + Math.round((value - anchor) / step) * step
+    const stepped = step ? anchor + Math.round((value - anchor) / step) * step : value
     const floored = this.min === undefined ? stepped : Math.max(this.min, stepped)
     const capped = this.max === undefined ? floored : Math.min(this.max, floored)
     /* Decimal places from the step and the anchor together: a step of 0.5 from
        an anchor of 0.25 lands on 0.75, which needs two rather than the one the
        step alone would give. */
     const places = Math.max(decimals(step), decimals(anchor))
-    return Number(capped.toFixed(places))
+    return step ? Number(capped.toFixed(places)) : capped
   }
 
   /**
@@ -545,6 +604,13 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     }
     const button = event.currentTarget as HTMLButtonElement
     const up = button.getAttribute('part') === 'increment'
+    /* A mouse press puts focus in the field, so the arrows step next, as
+       React Aria's NumberField does. A touch leaves focus where it is, so a
+       phone does not raise its keyboard. Measured before this: focus moved
+       to the button, and Up then did nothing. */
+    if (event.pointerType === 'mouse' && this.control && !this.control.matches(':focus')) {
+      this.control.focus({ preventScroll: true })
+    }
     clearTimeout(this.repeat)
     this.pressStepped = true
     button.setPointerCapture?.(event.pointerId)
@@ -563,6 +629,11 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
       clearTimeout(this.repeat)
       this.repeat = setTimeout(step, REPEAT_DELAY)
     }
+  }
+
+  /** Keeps a pressed stepper from taking focus from the field. */
+  private readonly handleStepperMouseDown = (event: MouseEvent): void => {
+    event.preventDefault()
   }
 
   /**
@@ -1016,6 +1087,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
           ?disabled=${this.isDisabled || this.readOnly || atMin}
           @click=${this.handleStepperClick}
           @lostpointercapture=${this.stopRepeat}
+          @mousedown=${this.handleStepperMouseDown}
           @pointercancel=${this.stopRepeat}
           @pointerdown=${this.handleStepperDown}
           @pointerup=${this.stopRepeat}
@@ -1038,7 +1110,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
           type="text"
           role=${this.touchApple ? nothing : 'spinbutton'}
           aria-roledescription=${this.touchApple || this.roleLabel === '' ? nothing : this.roleLabel}
-          inputmode="decimal"
+          inputmode=${this.keypad}
           autocomplete=${this.autocomplete || nothing}
           name=${this.name || nothing}
           placeholder=${this.placeholder || nothing}
@@ -1080,6 +1152,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
           ?disabled=${this.isDisabled || this.readOnly || atMax}
           @click=${this.handleStepperClick}
           @lostpointercapture=${this.stopRepeat}
+          @mousedown=${this.handleStepperMouseDown}
           @pointercancel=${this.stopRepeat}
           @pointerdown=${this.handleStepperDown}
           @pointerup=${this.stopRepeat}
