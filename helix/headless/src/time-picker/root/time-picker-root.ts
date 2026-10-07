@@ -1,4 +1,5 @@
 import {
+  auditName,
   clockLocale,
   commaList,
   customElement,
@@ -82,7 +83,8 @@ import '../../option/index.js'
  * | Tab | Moves to the next wheel, then out of the picker. |
  *
  * **ARIA.** The list is a `listbox` named by `label`, a slotted label, the
- * host's `aria-label` or its `aria-labelledby`, with `aria-multiselectable`
+ * host's `aria-label` or its `aria-labelledby`, and a development build warns
+ * where all four are empty, with `aria-multiselectable`
  * with a `mode` and `aria-invalid` while `feedback` says what is wrong. The
  * wheels are a `group` with that name, holding one `listbox` per wheel, named
  * "Hour", "Minute", "Second" and "AM/PM" in the page's language.
@@ -888,6 +890,31 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
        should not see the previous one. */
     this.report()
     this.toggleState('blank', this.value === '')
+  }
+
+  /* A list of times with no name reads as times with nothing saying what
+     they are for. Development builds only.
+
+     Said once, for the picker. The list inside is a field that audits its own
+     name, and its sentence names a list the page never wrote, so it is asked
+     here first and answered as named: `auditName` reads an element once. */
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    auditName(
+      this,
+      () => null,
+      'Give it a `label`, a label in the `label` slot, or an `aria-label` that says what the time is for.',
+      () => this.listName !== '',
+    )
+    const list = this.partNamed('list')
+    if (list) {
+      auditName(
+        list,
+        () => null,
+        '',
+        () => true,
+      )
+    }
   }
 
   protected override updated(changed: PropertyValues): void {

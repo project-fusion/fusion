@@ -748,3 +748,31 @@ describe('a time picker’s own message', () => {
     expect(part(plain, 'list')?.hasAttribute('aria-describedby')).toBe(false)
   })
 })
+
+describe('an unnamed time picker', () => {
+  const warnedOn = async (markup: string): Promise<string[]> => {
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      await mount(markup)
+      await new Promise((done) => setTimeout(done, 5))
+    } finally {
+      console.warn = original
+    }
+    return warnings
+  }
+
+  /* A picker whose `label` was emptied, with nothing else naming it, was
+     reported only as the list inside it, a list the page never wrote. */
+  test('is reported once, as itself, and a named one is not', async () => {
+    const unnamed = await warnedOn(
+      '<helix-headless-time-picker label=""></helix-headless-time-picker>',
+    )
+    const said = unnamed.filter((one) => one.includes('no accessible name'))
+    expect(said).toHaveLength(1)
+    expect(said[0]).toContain('<helix-headless-time-picker>')
+    const named = await warnedOn('<helix-headless-time-picker></helix-headless-time-picker>')
+    expect(named.filter((one) => one.includes('no accessible name'))).toHaveLength(0)
+  })
+})
