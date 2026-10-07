@@ -21,6 +21,7 @@ import {
   KeyboardNavigationController,
   MixinControllerValue,
   MixinPickerFeedback,
+  type PickerFailure,
   parseColor,
   rovingStop,
   splitValues,
@@ -143,7 +144,7 @@ interface EyeDropperConstructor {
  * @csspart eyedropper-live - The live region of the button inside `eyedropper`, which says its pending label.
  * @csspart eyedropper-spinner - The ring the eyedropper button turns while it is pending.
  * @csspart eyedropper-text - The words on the button inside `eyedropper`, trimmed to their capitals and baseline.
- * @csspart feedback - The message under the picker, while `feedback` is set.
+ * @csspart feedback - The message under the picker: `feedback`, or what is wrong with the answer once the picker is marked invalid.
  * @csspart field - One channel's number field with its label, in `channel-fields`.
  * @csspart field-input - The number input in a channel's field.
  * @csspart field-label - The name above a channel's number input.
@@ -450,10 +451,11 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
    * the anchor the browser points its bubble at.
    *
    * **Text that is not a color is bad input**, so a form does not submit
-   * `#00` from a half-typed value. The picker draws no message of its own, so
-   * reporting it as each keystroke arrives shows nothing until the form asks;
-   * Color Input shows its own message against the field the reader typed
-   * into.
+   * `#00` from a half-typed value. The picker marks it, and says
+   * `badInputMessage` under itself, once the reader leaves the value field or
+   * presses Enter, and a missing color once the reader has committed one or a
+   * form has refused the picker. Color Input shows its own message against the
+   * field the reader typed into.
    */
   @property({ reflect: true, type: Boolean })
   required = false
@@ -579,8 +581,66 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
 
   /** The ids a control in the picker is described by: the help, then the message. */
   private get describedBy(): string | typeof nothing {
-    const ids = [this.hinted ? 'hint' : '', this.feedback === '' ? '' : 'feedback'].filter(Boolean)
+    const ids = [this.hinted ? 'hint' : '', this.said === '' ? '' : 'feedback'].filter(Boolean)
     return ids.length > 0 ? ids.join(' ') : nothing
+  }
+
+  /**
+   * Whether the reader is typing into the value field, between the first
+   * keystroke and the `change` that ends it.
+   *
+   * Half-typed text is rarely a color: `#00ff00` passes through `#0` and
+   * `#00ff0` on the way. So text that is not a color is refused once the
+   * reader leaves the field or presses Enter, and not on every keystroke.
+   */
+  @state()
+  private typing = false
+
+  /**
+   * A required picker with no color is missing, and text that is not a color
+   * is refused, once the reader has finished typing it. See
+   * `MixinPickerFeedback.marked`.
+   *
+   * Measured before this: typed "nonsense" and a required picker its form
+   * refused both failed `checkValidity()` while `:state(invalid)` stayed off,
+   * the value field had no `aria-invalid`, and nothing was said.
+   */
+  protected override get failure(): PickerFailure | undefined {
+    if (this.value === '') {
+      return this.required ? 'missing' : undefined
+    }
+    return parseColor(this.value) === null && !this.typing ? 'refused' : undefined
+  }
+
+  /**
+   * The line under the picker: `feedback`, or, where the picker is marked by
+   * its own validation, what is wrong.
+   */
+  private get said(): string {
+    if (this.feedback !== '') {
+      return this.feedback
+    }
+    if (!this.marked || this.invalid) {
+      return ''
+    }
+    const failure = this.failure
+    return failure === 'refused'
+      ? this.badInputMessage
+      : failure === 'missing'
+        ? this.valueMissingMessage
+        : ''
+  }
+
+  /** A reset ends any typing, so the color it puts back is judged at once. */
+  override formResetCallback(): void {
+    super.formResetCallback()
+    this.typing = false
+  }
+
+  /** The line `said` holds, or nothing while it is empty. */
+  protected override renderPickerFeedback(): TemplateResult | typeof nothing {
+    const said = this.said
+    return said === '' ? nothing : html`<p part="feedback" id="feedback">${said}</p>`
   }
 
   /** Whether a pointer is dragging the square's handle, said as `:state(dragging)`. */
@@ -674,6 +734,7 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
       return
     }
     const typed = (event.target as HTMLInputElement).value
+    this.typing = true
     const parsed = parseColor(typed)
     if (parsed) {
       this.moved = parsed
@@ -1527,6 +1588,7 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
                 @input=${this.handleValueInput}
                 @change=${(event: Event) => {
                   event.stopPropagation()
+                  this.typing = false
                   this.settle()
                 }}
               />`

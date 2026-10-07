@@ -553,6 +553,62 @@ describe('a required color', () => {
   })
 })
 
+/* Measured before this in Chromium: typed "nonsense" and a required picker
+   its form refused both failed `checkValidity()` while `:state(invalid)` was
+   off, no control carried `aria-invalid`, and nothing was said. Date Picker
+   marked both. */
+describe('an answer the picker refuses', () => {
+  const internals = (host: HTMLElement): ElementInternals =>
+    (host as unknown as { internals: ElementInternals }).internals
+
+  const typeInto = async (host: Color, text: string, commit: boolean): Promise<void> => {
+    const field = part(host, 'value') as HTMLInputElement
+    field.value = text
+    field.dispatchEvent(new Event('input', { bubbles: true }))
+    if (commit) {
+      field.dispatchEvent(new Event('change', { bubbles: true }))
+    }
+    await host.updateComplete
+  }
+
+  test('text that is not a color is marked and said once the reader leaves the field', async () => {
+    const host = await picker('name="brand" default-value="#3366ff"')
+    await typeInto(host, 'nonsense', false)
+    expect(internals(host).states.has('invalid')).toBe(false)
+    expect(part(host, 'feedback')).toBeNull()
+    await typeInto(host, 'nonsense', true)
+    expect(internals(host).validity.badInput).toBe(true)
+    expect(internals(host).states.has('invalid')).toBe(true)
+    expect(internals(host).ariaInvalid).toBe('true')
+    const field = part(host, 'value') as HTMLInputElement
+    expect(field.getAttribute('aria-invalid')).toBe('true')
+    const message = part(host, 'feedback') as HTMLElement
+    expect(message.textContent?.trim()).toBe(
+      'Enter a color, like #ff0000, rgb(255 0 0) or hsl(0 100% 50%).',
+    )
+    expect(field.getAttribute('aria-describedby')).toContain(message.id)
+    await typeInto(host, '#00ff00', true)
+    expect(internals(host).states.has('invalid')).toBe(false)
+    expect(part(host, 'feedback')).toBeNull()
+  })
+
+  test('a value set to text that is not a color is marked at once', async () => {
+    const host = await picker('value="nope"')
+    expect(internals(host).states.has('invalid')).toBe(true)
+    expect(part(host, 'grid-saturation')?.getAttribute('aria-invalid')).toBe('true')
+  })
+
+  test('a required picker with no color is marked once a form refuses it, and not before', async () => {
+    const host = await picker('name="brand" required')
+    expect(internals(host).states.has('invalid')).toBe(false)
+    ;(host as unknown as { reportValidity(): boolean }).reportValidity()
+    await host.updateComplete
+    expect(internals(host).states.has('invalid')).toBe(true)
+    expect(part(host, 'grid-saturation')?.getAttribute('aria-invalid')).toBe('true')
+    expect((part(host, 'feedback') as HTMLElement).textContent?.trim()).toBe('Choose a color.')
+  })
+})
+
 describe('a read-only color picker', () => {
   test('refuses the square, and the handle goes back where the value still is', async () => {
     /* The square is drawn from the model rather than from the value, so a
