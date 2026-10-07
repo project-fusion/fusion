@@ -46,15 +46,18 @@ const tab = () => {
 }
 
 describe('the schedule', () => {
+  /* A quiet wait sixteen times the time between changes, and a longest wait
+     well past the burst, because a busy runner fires a 5 ms timer late: at a
+     quiet of 20, one late timer was a pause long enough to run in. */
   test('changes in a burst are one run, once they stop', async () => {
     runs = 0
-    const plan = schedule(count, timing, tab().on)
+    const plan = schedule(count, { ...timing, longest: 2000, quiet: 80 }, tab().on)
     for (let at = 0; at < 10; at += 1) {
       plan.poke()
       await pause(5)
     }
     expect(runs).toBe(0)
-    await pause(60)
+    await pause(200)
     expect(runs).toBe(1)
     plan.stop()
   })
