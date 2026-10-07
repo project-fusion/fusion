@@ -199,8 +199,93 @@ describe('what a row tells a reader it is', () => {
     expect(await roleOf('checkable exclusive value="go"')).toBe('menuitemradio')
   })
 
-  test('and exclusive on its own is not a choice at all', async () => {
-    expect(await roleOf('exclusive value="go"')).toBe('menuitem')
+  test('and exclusive on its own is one of a set too, since a set is a choice', async () => {
+    expect(await roleOf('exclusive value="go"')).toBe('menuitemradio')
+  })
+})
+
+describe('what a choice does to the menu', () => {
+  const opened = async (rows: string, attrs = ''): Promise<{ host: Menu; rows: Item[] }> => {
+    const host = (await mount(
+      `<helix-headless-menu label="View" ${attrs}><button slot="trigger">View</button>${rows}</helix-headless-menu>`,
+    )) as Menu
+    host.toggleOpen()
+    await host.updateComplete
+    const all = [...host.querySelectorAll('helix-headless-menu-item')] as Item[]
+    for (const one of all) {
+      await (one as unknown as { updateComplete: Promise<boolean> }).updateComplete
+    }
+    return { host, rows: all }
+  }
+  const press = async (host: Menu, row: Item, key: string): Promise<void> => {
+    row.shadowRoot
+      ?.querySelector('[part="item"]')
+      ?.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key }))
+    await null
+    await host.updateComplete
+  }
+  const click = async (host: Menu, row: Item): Promise<void> => {
+    row.shadowRoot?.querySelector<HTMLElement>('[part="item"]')?.click()
+    await null
+    await host.updateComplete
+  }
+
+  /* The APG's menu: Space on a menuitemcheckbox or a menuitemradio changes it
+     and leaves the menu open, and Enter changes it and closes the menu. */
+  test('Space ticks a choice and leaves the menu open, and Enter ticks and closes', async () => {
+    const { host, rows } = await opened(
+      '<helix-headless-menu-item checkable checked value="grid">Grid</helix-headless-menu-item>',
+    )
+    const [grid] = rows as [Item]
+    await press(host, grid, ' ')
+    expect(grid.checked).toBe(false)
+    expect(host.open).toBe(true)
+    await press(host, grid, 'Enter')
+    expect(grid.checked).toBe(true)
+    expect(host.open).toBe(false)
+  })
+
+  test('and Space on one of a set leaves it open as well', async () => {
+    const { host, rows } = await opened(
+      `<helix-headless-menu-item exclusive checked value="list">List</helix-headless-menu-item>
+       <helix-headless-menu-item exclusive value="grid">Grid</helix-headless-menu-item>`,
+    )
+    const [list, grid] = rows as [Item, Item]
+    await press(host, grid, ' ')
+    expect([list.checked, grid.checked]).toEqual([false, true])
+    expect(host.open).toBe(true)
+  })
+
+  test('Space on a command still closes the menu', async () => {
+    const { host, rows } = await opened(
+      '<helix-headless-menu-item value="copy">Copy</helix-headless-menu-item>',
+    )
+    await press(host, rows[0] as Item, ' ')
+    expect(host.open).toBe(false)
+  })
+
+  /* Ark UI's `closeOnSelect`, on the menu and on a row. */
+  test('close-on-select="false" keeps the menu open after any choice', async () => {
+    const { host, rows } = await opened(
+      `<helix-headless-menu-item value="copy">Copy</helix-headless-menu-item>
+       <helix-headless-menu-item checkable value="wrap">Wrap</helix-headless-menu-item>`,
+      'close-on-select="false"',
+    )
+    await click(host, rows[0] as Item)
+    expect(host.open).toBe(true)
+    await press(host, rows[1] as Item, 'Enter')
+    expect(host.open).toBe(true)
+  })
+
+  test('and a row says so for itself, over the menu', async () => {
+    const { host, rows } = await opened(
+      `<helix-headless-menu-item close-on-select="false" value="zoom">Zoom in</helix-headless-menu-item>
+       <helix-headless-menu-item value="copy">Copy</helix-headless-menu-item>`,
+    )
+    await click(host, rows[0] as Item)
+    expect(host.open).toBe(true)
+    await click(host, rows[1] as Item)
+    expect(host.open).toBe(false)
   })
 })
 

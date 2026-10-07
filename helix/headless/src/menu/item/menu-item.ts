@@ -8,6 +8,7 @@ import {
   HelixSelectEvent,
   isRtl,
   onApple,
+  onUnlessFalse,
   PopoverController,
   requestChange,
   slotFilled,
@@ -30,15 +31,21 @@ import '../../kbd/index.js'
  * - `checked` makes the row a choice.
  * - With neither, the row is a command.
  *
- * The role follows the kind. A row with `checked` is `menuitemcheckbox` with
- * `aria-checked`, and `exclusive` makes it `menuitemradio`, for a set where
- * only one can be on. A row that opens a page keeps `menuitem` and sets
- * `aria-haspopup`.
+ * The role follows the kind. A row with `checkable` or `checked` is
+ * `menuitemcheckbox` with `aria-checked`, and an `exclusive` row is
+ * `menuitemradio`, for a set where only one can be on. A row that opens a page
+ * keeps `menuitem` and sets `aria-haspopup`.
  *
  * Choosing a choice row checks or unchecks it before `helix-select` is sent,
  * so a listener reads the new `checked`. An `exclusive` row turns on and turns
  * off the `exclusive` rows next to it. Cancel `helix-before-toggle` to keep a
  * row as it is and set `checked` yourself.
+ *
+ * Space on a choice row changes it and leaves the menu open, so a reader can
+ * set several in a row, as the APG's menu does. Enter and a press change it and
+ * close the menu. `close-on-select="false"` on the row keeps the menu open after
+ * any choice of it, and `close-on-select` on the row closes it after a Space as
+ * well.
  *
  * The menu sets whether the row's page is showing as a property, never as an
  * attribute. An attribute written onto your element after it upgrades causes a
@@ -103,7 +110,8 @@ export class HelixHeadlessMenuItem extends HelixElement {
    * as a checkbox tells a reader its siblings are commands, which is the one
    * thing they are not.
    *
-   * `checked` implies it, so a row that is on never has to say both.
+   * `checked` and `exclusive` imply it, so a row that is on, or one of a set,
+   * never has to say both.
    *
    * Choosing the row checks or unchecks it, after a `helix-before-toggle` that
    * you can cancel.
@@ -119,6 +127,16 @@ export class HelixHeadlessMenuItem extends HelixElement {
    */
   @property({ type: Boolean })
   checked = false
+
+  /**
+   * Whether choosing the row closes the menu.
+   *
+   * Unset takes the menu's `close-on-select`, which is on, and keeps the menu
+   * open after a Space on a choice row. Write `close-on-select="false"` for a
+   * row that changes something the reader is watching, such as a zoom step.
+   */
+  @property({ attribute: 'close-on-select', converter: onUnlessFalse })
+  closeOnSelect?: boolean
 
   /**
    * Whether the row is disabled, so it cannot be chosen.
@@ -145,8 +163,7 @@ export class HelixHeadlessMenuItem extends HelixElement {
    * it checked. `menuitemradio` tells a reader which kind of set they are in,
    * where `menuitemcheckbox` says every row is independent.
    *
-   * Meaningless without `checkable`, since a row that cannot be ticked is not
-   * one of a set of anything.
+   * It makes the row a choice, so it needs no `checkable` beside it.
    */
   @property({ reflect: true, type: Boolean })
   exclusive = false
@@ -243,6 +260,21 @@ export class HelixHeadlessMenuItem extends HelixElement {
   readonly isMenuItem = true
 
   /**
+   * @internal Whether the last choice of this row asked the menu to stay open:
+   * a Space on a choice row, or `close-on-select="false"`. Read by the menu
+   * while it hears the row's `helix-select`.
+   */
+  keepsOpen = false
+
+  /**
+   * @internal Whether the row is a choice: it can be ticked, or is one of a
+   * set. Read by the menu to reserve the trailing column.
+   */
+  get choice(): boolean {
+    return this.checkable || this.checked || this.exclusive
+  }
+
+  /**
    * Whether anything was slotted into `submenu`.
    *
    * False on the server, which is the right answer rather than a safe one: the
@@ -328,10 +360,7 @@ export class HelixHeadlessMenuItem extends HelixElement {
       'submenu-mark',
       this.flyout &&
         rows.some(
-          (row) =>
-            row.checkable ||
-            row.checked ||
-            [...row.children].some((child) => child.slot === 'submenu'),
+          (row) => row.choice || [...row.children].some((child) => child.slot === 'submenu'),
         ),
     )
   }
@@ -528,7 +557,7 @@ export class HelixHeadlessMenuItem extends HelixElement {
    * An `exclusive` row only turns on, and turning on turns its set off.
    */
   private tick(): void {
-    if (!(this.checkable || this.checked) || this.hasSubmenu) {
+    if (!this.choice || this.hasSubmenu) {
       return
     }
     const next = this.exclusive ? true : !this.checked
@@ -568,17 +597,27 @@ export class HelixHeadlessMenuItem extends HelixElement {
     return peers
   }
 
-  private choose(): void {
+  /**
+   * Chooses the row. `space` is whether a Space chose it, which keeps the menu
+   * open on a choice row unless the row says otherwise.
+   */
+  private choose(space = false): void {
     if (this.disabled) {
       return
     }
+    const spaceKeeps = space && this.choice && !this.hasSubmenu
+    this.keepsOpen = this.closeOnSelect === undefined ? spaceKeeps : !this.closeOnSelect
     this.tick()
     this.dispatchEvent(new HelixSelectEvent({ value: this.value }))
   }
 
   private readonly handleClick = (): void => {
-    this.choose()
+    this.choose(this.spacePressed)
+    this.spacePressed = false
   }
+
+  /** Whether the click on its way is the one a Space on a linked row sent. */
+  private spacePressed = false
 
   /**
    * Enter and Space choose the row, which a `<div>` would not do on its own.
@@ -607,10 +646,12 @@ export class HelixHeadlessMenuItem extends HelixElement {
     }
     event.preventDefault()
     if (link) {
+      this.spacePressed = true
       link.click()
+      this.spacePressed = false
       return
     }
-    this.handleClick()
+    this.choose(event.key === ' ')
   }
 
   /**
@@ -684,7 +725,7 @@ export class HelixHeadlessMenuItem extends HelixElement {
        A disabled row renders no `href`. A disabled anchor is not a thing the
        platform has, and `aria-disabled` alone still navigates. */
     const linked = this.href !== '' && !this.disabled
-    const ticks = this.checkable || this.checked
+    const ticks = this.choice
     const role = ticks ? (this.exclusive ? 'menuitemradio' : 'menuitemcheckbox') : 'menuitem'
     const checkedState = ticks ? (this.checked ? 'true' : 'false') : nothing
     /* In this reader's platform's words, and in the server's while hydrating

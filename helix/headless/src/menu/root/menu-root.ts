@@ -12,6 +12,7 @@ import {
   linkDescription,
   MixinCollection,
   MixinControllerOpen,
+  onUnlessFalse,
   type Placement,
   PopoverController,
   scrollItemIntoView,
@@ -99,7 +100,8 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
  * Keys: Enter, Space or Down Arrow on the trigger opens the menu on its first
  * row, and Up Arrow on its last. In the menu, Up and Down Arrow move between
  * rows, Home and End go to the first and the last, a typed letter moves to
- * the next row whose name starts with it, Enter and Space choose, Right Arrow
+ * the next row whose name starts with it, Enter and Space choose (Space on a
+ * choice row changes it and leaves the menu open), Right Arrow
  * opens a row's submenu and Left Arrow goes back, the two swapping on a
  * right-to-left page. Left Arrow on the top page does nothing. Escape closes
  * the menu and returns focus to the trigger. Tab closes it and moves on.
@@ -177,6 +179,16 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
    * Whether the menu is the trigger's context menu: it opens where the reader
    * asks for one, with a right-click, a long press, Shift+F10 or the menu key.
    */
+  /**
+   * Whether choosing a row closes the menu.
+   *
+   * On by default, and a Space on a choice row leaves the menu open either way.
+   * Write `close-on-select="false"` to keep the menu open after every choice, as
+   * Ark UI's `closeOnSelect` does. A row's own `close-on-select` wins over this.
+   */
+  @property({ attribute: 'close-on-select', converter: onUnlessFalse })
+  closeOnSelect = true
+
   @property({ reflect: true, type: Boolean })
   context = false
 
@@ -602,8 +614,9 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
        anyway, and a page that heard `helix-before-close` and `toggle` before
        the choice that caused them. Found running the events example. The
        dispatch is synchronous, so a microtask is after all of it. */
+    const keep = chosen.keepsOpen || (chosen.closeOnSelect === undefined && !this.closeOnSelect)
     queueMicrotask(() => {
-      if (!event.defaultPrevented) {
+      if (!(event.defaultPrevented || keep)) {
         this.hide()
       }
     })
@@ -1032,7 +1045,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
        sideways as the reader ticks their way down it. */
     this.toggleState(
       'mark',
-      rows.some((row) => row.checkable || row.checked || this.drilldown.hasPage(row)),
+      rows.some((row) => row.choice || this.drilldown.hasPage(row)),
     )
   }
 
