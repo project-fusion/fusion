@@ -31,6 +31,7 @@ export interface ManifestSource {
       members?: Array<{ kind?: string; name: string; readonly?: boolean; static?: boolean }>
       cssParts?: Array<{ name: string }>
       cssProperties?: Array<{ name: string }>
+      slots?: Array<{ name: string }>
       tagName?: string
     }>
   }>
@@ -38,8 +39,8 @@ export interface ManifestSource {
 
 /**
  * What diagnostics reads of one package's manifest, and nothing else: per
- * tag, the parts, the hooks, the attributes with the values each allows, the
- * attributes the element writes on itself, and the family.
+ * tag, the parts, the hooks, the slots, the attributes with the values each
+ * allows, the attributes the element writes on itself, and the family.
  *
  * **About a seventieth of the manifest.** Measured 4 Oct 2026: 124 KB for the
  * styled tier and 103 KB for the headless one, 18 KB and 14 KB compressed,
@@ -63,6 +64,11 @@ export interface LintTag {
   family?: string | undefined
   hooks: string[]
   parts: string[]
+  /**
+   * The slots the element has, by name, the default one as `""`. Absent from
+   * lint data written before 0.165, which a reader takes as unknown.
+   */
+  slots?: string[]
   /** The attributes the element writes on itself: one named for a read-only member. */
   written: string[]
 }
@@ -94,6 +100,7 @@ export const lintOf = (manifest: ManifestSource, name: string): LintData => {
         family,
         hooks: [],
         parts: [],
+        slots: [],
         written: [],
       }
       tags[tag] = entry
@@ -111,12 +118,14 @@ export const lintOf = (manifest: ManifestSource, name: string): LintData => {
       }
       entry.parts.push(...(declaration.cssParts ?? []).map((part) => part.name))
       entry.hooks.push(...(declaration.cssProperties ?? []).map((hook) => hook.name))
+      entry.slots?.push(...(declaration.slots ?? []).map((slot) => slot.name))
     }
   }
   for (const entry of Object.values(tags)) {
     entry.written = [...new Set(entry.written)]
     entry.parts = [...new Set(entry.parts)]
     entry.hooks = [...new Set(entry.hooks)]
+    entry.slots = [...new Set(entry.slots)]
   }
   return {
     package: manifest.helix?.package ?? name,

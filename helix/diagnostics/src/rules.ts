@@ -57,6 +57,7 @@ export const SHIPPED_RULES: Readonly<Record<Kind, Severity>> = {
   'manifest-skew': 'error',
   'unforwarded-part': 'warn',
   'unknown-attribute': 'error',
+  'unknown-slot': 'error',
   'unknown-tag': 'error',
 }
 

@@ -19,8 +19,8 @@
 use oxc_allocator::Allocator;
 use oxc_ast::ast::{
     Argument, CallExpression, Expression, JSXAttributeItem, JSXAttributeName, JSXAttributeValue,
-    JSXElement, JSXElementName, ObjectProperty, PropertyKey, TaggedTemplateExpression,
-    TemplateLiteral,
+    JSXElement, JSXElementName, ObjectExpression, ObjectProperty, ObjectPropertyKind, PropertyKey,
+    TaggedTemplateExpression, TemplateLiteral,
 };
 use oxc_ast_visit::{walk, Visit};
 use oxc_parser::Parser;
@@ -145,6 +145,52 @@ fn attribute(name: &JSXAttributeName<'_>, value: Option<&JSXAttributeValue<'_>>)
     }
 }
 
+/// The attributes a spread writes, where its keys can be read: an object
+/// literal, `{...{ 'empty-text': text }}`, or one handed to a call, as
+/// `{...defined({ field, 'text-align': align })}` filters out what is unset.
+///
+/// **Read, because a spread is where a rename hid.** A column's `align` became
+/// `text-align`, and passed through a spread, neither the type check nor a
+/// scan saw it: the column fell back to the start with nothing reported. A key
+/// is judged by name; its value only where it is written as a string, since the
+/// helper may drop it.
+fn spread_attributes(argument: &Expression<'_>) -> Vec<Attribute> {
+    let object: Option<&ObjectExpression<'_>> = match argument {
+        Expression::ObjectExpression(object) => Some(object),
+        Expression::CallExpression(call) => match call.arguments.first() {
+            Some(Argument::ObjectExpression(object)) => Some(object),
+            _ => None,
+        },
+        _ => None,
+    };
+    let Some(object) = object else {
+        return Vec::new();
+    };
+    object
+        .properties
+        .iter()
+        .filter_map(|property| match property {
+            ObjectPropertyKind::ObjectProperty(property) if !property.computed => {
+                let name = match &property.key {
+                    PropertyKey::StaticIdentifier(key) => key.name.to_string(),
+                    PropertyKey::StringLiteral(key) => key.value.to_string(),
+                    _ => return None,
+                };
+                /* A capital is a property, as a written attribute's is. */
+                if name.chars().any(|one| one.is_ascii_uppercase()) {
+                    return None;
+                }
+                let value = match &property.value {
+                    Expression::StringLiteral(text) => Value::Literal(text.value.to_string()),
+                    _ => Value::Bound,
+                };
+                Some(Attribute { name, value })
+            }
+            _ => None,
+        })
+        .collect()
+}
+
 /// The `helix-*` tag a call defines: `@customElement('helix-x')`, or
 /// `customElements.define('helix-x', ...)`.
 fn defined(call: &CallExpression<'_>) -> Option<String> {
@@ -184,9 +230,9 @@ impl<'a> Visit<'a> for Reader<'_> {
         let attributes = opening
             .attributes
             .iter()
-            .filter_map(|item| match item {
-                JSXAttributeItem::Attribute(one) => Some(attribute(&one.name, one.value.as_ref())),
-                JSXAttributeItem::SpreadAttribute(_) => None,
+            .flat_map(|item| match item {
+                JSXAttributeItem::Attribute(one) => vec![attribute(&one.name, one.value.as_ref())],
+                JSXAttributeItem::SpreadAttribute(spread) => spread_attributes(&spread.argument),
             })
             .collect();
         let span = opening.span;
@@ -258,6 +304,29 @@ mod tests {
 
     use super::read;
     use crate::scan::markup::Value;
+
+    #[test]
+    fn a_spread_of_an_object_literal_writes_its_keys() {
+        let template = read(
+            "export const Column = ({ align }) => (\n  <helix-table-column {...defined({ 'text-align': align, align, field: 'name', rowKey: 'id' })} {...{ width: '10rem' }} {...props} />\n)\n",
+            SourceType::tsx(),
+        )
+        .expect("parses");
+        let values: Vec<(&str, &Value)> = template.elements[0]
+            .attributes
+            .iter()
+            .map(|one| (one.name.as_str(), &one.value))
+            .collect();
+        assert_eq!(
+            values,
+            [
+                ("text-align", &Value::Bound),
+                ("align", &Value::Bound),
+                ("field", &Value::Literal("name".to_owned())),
+                ("width", &Value::Literal("10rem".to_owned())),
+            ]
+        );
+    }
 
     #[test]
     fn jsx_elements_keep_strings_and_skip_expressions() {

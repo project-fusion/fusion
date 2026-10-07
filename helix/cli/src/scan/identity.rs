@@ -12,7 +12,7 @@ use std::sync::LazyLock;
 use regex::Regex;
 
 /// Every fault class, stable across versions, as `report.ts` lists them.
-pub const KINDS: [&str; 8] = [
+pub const KINDS: [&str; 9] = [
     "dead-hook",
     "dead-part",
     "duplicate-registration",
@@ -20,6 +20,7 @@ pub const KINDS: [&str; 8] = [
     "manifest-skew",
     "unforwarded-part",
     "unknown-attribute",
+    "unknown-slot",
     "unknown-tag",
 ];
 
@@ -28,7 +29,7 @@ pub const KINDS: [&str; 8] = [
 pub fn category(kind: &str) -> &'static str {
     match kind {
         "dead-hook" | "dead-part" | "unforwarded-part" => "styling",
-        "invalid-value" | "unknown-attribute" => "markup",
+        "invalid-value" | "unknown-attribute" | "unknown-slot" => "markup",
         _ => "integrity",
     }
 }
