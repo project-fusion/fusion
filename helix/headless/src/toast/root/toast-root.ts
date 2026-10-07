@@ -52,7 +52,12 @@ import { joinSaid, messageWords } from '../words.js'
  * to render them from: it appends a message of the region's own tier and
  * removes it once it has been dismissed and has finished leaving. Messages
  * you render yourself stay yours, and the region never removes them. A touch
- * or a pen swipes a message away toward the end of the line.
+ * or a pen swipes a message away toward the end of the line, or toward the
+ * edge `swipe-direction` names.
+ *
+ * **Every message's timer waits while a pointer or focus is in the stack**, as
+ * React Aria's and Radix's regions do, so a reader moving from one message to
+ * the next does not lose the one behind them.
  *
  * **The stack is in the top layer.** The `region` part is a `popover="manual"`
  * shown while a message is showing, and shown again above a modal dialog that
@@ -118,6 +123,13 @@ export class HelixHeadlessToast extends HelixElement {
   @words
   @property()
   label = 'Notifications ({hotkey})'
+
+  /**
+   * The edge a touch or a pen swipes a message toward to dismiss it: `end`,
+   * the end of the line, or `start`, `top` or `bottom`. Unset is `end`.
+   */
+  @property({ attribute: 'swipe-direction' })
+  swipeDirection?: 'bottom' | 'end' | 'start' | 'top'
 
   /**
    * How many messages show at once. The messages after that many wait, hidden
@@ -367,6 +379,53 @@ export class HelixHeadlessToast extends HelixElement {
     )
   }
 
+  /** Whether a pointer is over the stack. */
+  private pointerIn = false
+
+  /** Whether focus is in the stack. */
+  private focusIn = false
+
+  /**
+   * Tells every message whether the stack holds its timer and which way it
+   * swipes, which only the region knows.
+   */
+  private inform(): void {
+    const held = this.pointerIn || this.focusIn
+    for (const one of this.children) {
+      const item = one as HTMLElement & { regionHeld?: boolean; swipeToward?: string }
+      if (!('regionHeld' in item)) {
+        continue
+      }
+      if (item.regionHeld !== held) {
+        item.regionHeld = held
+      }
+      const toward = this.swipeDirection ?? 'end'
+      if (item.swipeToward !== toward) {
+        item.swipeToward = toward
+      }
+    }
+  }
+
+  private readonly handlePointerEnter = (): void => {
+    this.pointerIn = true
+    this.inform()
+  }
+
+  private readonly handlePointerLeave = (): void => {
+    this.pointerIn = false
+    this.inform()
+  }
+
+  /** Focus leaving the stack, and not moving between its messages. */
+  private readonly handleFocusOut = (event: FocusEvent): void => {
+    const next = event.relatedTarget
+    if (next instanceof Node && deepContains(this, next)) {
+      return
+    }
+    this.focusIn = false
+    this.inform()
+  }
+
   /** The messages `max-visible` holds back. */
   private readonly held = new WeakSet<Element>()
 
@@ -512,6 +571,10 @@ export class HelixHeadlessToast extends HelixElement {
     if (from instanceof HTMLElement && !deepContains(this, from)) {
       this.focusOrigin = from
     }
+    if (!this.focusIn) {
+      this.focusIn = true
+      this.inform()
+    }
   }
 
   /**
@@ -564,12 +627,17 @@ export class HelixHeadlessToast extends HelixElement {
   override connectedCallback(): void {
     super.connectedCallback()
     this.addEventListener('focusin', this.handleFocusIn)
+    this.addEventListener('focusout', this.handleFocusOut)
+    /* On the host, which a pointer enters through any message in the stack. */
+    this.addEventListener('pointerenter', this.handlePointerEnter)
+    this.addEventListener('pointerleave', this.handlePointerLeave)
     this.addEventListener('helix-dismiss', this.handleDismiss)
     document.addEventListener('keydown', this.handleHotkey)
     this.watcher = new MutationObserver((records) => {
       const added = records.flatMap((record) => [...record.addedNodes])
       /* First, so a message past `max-visible` is held before it is shown or said. */
       this.restack()
+      this.inform()
       this.place(added)
       this.tell(added)
       this.sweep()
@@ -588,7 +656,12 @@ export class HelixHeadlessToast extends HelixElement {
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('focusin', this.handleFocusIn)
+    this.removeEventListener('focusout', this.handleFocusOut)
+    this.removeEventListener('pointerenter', this.handlePointerEnter)
+    this.removeEventListener('pointerleave', this.handlePointerLeave)
     this.removeEventListener('helix-dismiss', this.handleDismiss)
+    this.pointerIn = false
+    this.focusIn = false
     document.removeEventListener('keydown', this.handleHotkey)
     this.watcher?.disconnect()
     this.watcher = undefined
@@ -597,6 +670,7 @@ export class HelixHeadlessToast extends HelixElement {
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
     this.queue()
+    this.inform()
     this.place()
   }
 
@@ -605,6 +679,9 @@ export class HelixHeadlessToast extends HelixElement {
     if (changed.has('maxVisible')) {
       this.restack()
       this.place()
+    }
+    if (changed.has('swipeDirection')) {
+      this.inform()
     }
   }
 

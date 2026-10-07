@@ -235,7 +235,7 @@ slot[name="icon"]::slotted(*) {
 
 [part="item"][data-swiping] {
   transition: none;
-  translate: var(--toast-swipe-x, 0) 0;
+  translate: var(--toast-swipe-x, 0) var(--toast-swipe-y, 0);
   user-select: none;
 }
 

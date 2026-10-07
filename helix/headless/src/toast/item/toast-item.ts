@@ -3,6 +3,7 @@ import {
   customElement,
   drawDismiss,
   drawDismissGlyph,
+  edgeOffset,
   HelixElement,
   hostAria,
   isRtl,
@@ -10,6 +11,7 @@ import {
   requestChange,
   SwipeController,
   settleSwipe,
+  swipeAxis,
   swipeEdge,
   type ToneMark,
   toneMark,
@@ -28,8 +30,9 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * **Each item runs its own timer.** A timer held by the region would restart
  * with each new message, and the last of three messages would stay for nine
- * seconds. It pauses while the pointer or focus is on the message, and while
- * the page is hidden, so a message is not spent in a background tab.
+ * seconds. It pauses while the pointer or focus is on the message or anywhere
+ * in the region's stack, and while the page is hidden, so a message is not
+ * spent in a background tab.
  *
  * **Each message is an `alertdialog` named by its words**, which is how a reader
  * who moves into the stack hears which message they are on. Give it a
@@ -38,10 +41,11 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * says each message once as it arrives, a `danger` one assertively, so a
  * message is never a live region of its own.
  *
- * A touch or a pen swipes a message toward the end of the line, and past
- * halfway, or quickly, dismisses it through the same `helix-dismiss` as its
- * control. While it moves, the distance is on the `item` part as
- * `--toast-swipe-x`.
+ * A touch or a pen swipes a message toward the end of the line, or toward the
+ * edge the region's `swipe-direction` names, and past halfway, or quickly,
+ * dismisses it through the same `helix-dismiss` as its control. While it
+ * moves, the distance is on the `item` part as `--toast-swipe-x` or
+ * `--toast-swipe-y`.
  *
  * **Escape dismisses the message holding focus**, through the same
  * `helix-dismiss`, and focus moves to the next message.
@@ -78,9 +82,10 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @cssproperty --toast-duration - How long this message stays, in milliseconds, for a progress hint.
  * @cssproperty --toast-swipe-x - How far a swipe has moved the message across, in pixels, toward the right.
+ * @cssproperty --toast-swipe-y - How far a swipe has moved the message down, in pixels, under a `swipe-direction` of `top` or `bottom`.
  *
  * @cssstate closed - The message has been dismissed and is hidden, or leaving.
- * @cssstate paused - The dismiss timer is paused, while a pointer or focus is on the message, or while the page is hidden.
+ * @cssstate paused - The dismiss timer is paused, while a pointer or focus is on the message or in the stack, or while the page is hidden.
  * @cssstate waiting - The region holds the message back, past its `max-visible`, until a message before it goes.
  */
 @customElement('helix-headless-toast-item')
@@ -127,36 +132,73 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
     this.requestUpdate('open', previous)
   }
 
-  /* Swiped toward the end of the line to dismiss. Touch and pen only: a
-     mouse drags to select the message's text. */
+  /**
+   * @internal Set by the region: the edge a swipe dismisses toward, from its
+   * `swipe-direction`.
+   */
+  @property({ attribute: false })
+  swipeToward: 'bottom' | 'end' | 'start' | 'top' = 'end'
+
+  /**
+   * @internal Set by the region: whether a pointer or focus in the stack holds
+   * this message's timer.
+   */
+  @property({ attribute: false, type: Boolean })
+  regionHeld = false
+
+  /** Whether the timer is held for `regionHeld`, so the hold is let go once. */
+  private regionHolding = false
+
+  /** Holds the timer while the region asks, and lets it go once. */
+  private holdForRegion(): void {
+    const want = this.regionHeld && this.isConnected
+    if (want === this.regionHolding) {
+      return
+    }
+    this.regionHolding = want
+    if (want) {
+      this.countdown.hold()
+    } else {
+      this.countdown.release()
+    }
+  }
+
+  /** The physical edge a swipe dismisses toward. */
+  private get swipeTo(): ReturnType<typeof swipeEdge> {
+    return swipeEdge(this.swipeToward, isRtl(this))
+  }
+
+  /* Swiped toward an edge to dismiss, the end of the line unless the region
+     names another. Touch and pen only: a mouse drags to select the message's
+     text. */
   protected readonly swipes = new SwipeController(this, {
-    axis: () => (this.open ? 'x' : undefined),
-    end: (dx, _dy, vx) => {
-      const edge = swipeEdge('end', isRtl(this))
-      const width = this.partNamed('item')?.getBoundingClientRect().width ?? 0
+    axis: () => (this.open ? swipeAxis(this.swipeTo) : undefined),
+    end: (dx, dy, vx, vy) => {
+      const edge = this.swipeTo
+      const box = this.partNamed('item')?.getBoundingClientRect()
+      const across = swipeAxis(edge) === 'x'
       const shown = settleSwipe({
         points: [1],
-        size: width,
-        travel: Math.max(0, towardEdge(edge, dx, 0)),
-        velocity: towardEdge(edge, vx, 0),
+        size: (across ? box?.width : box?.height) ?? 0,
+        travel: Math.max(0, towardEdge(edge, dx, dy)),
+        velocity: towardEdge(edge, vx, vy),
       })
       if (shown === 0 && this.dismiss()) {
         return
       }
       this.slide(0)
     },
-    move: (dx) => this.slide(Math.max(0, towardEdge(swipeEdge('end', isRtl(this)), dx, 0))),
+    move: (dx, dy) => this.slide(Math.max(0, towardEdge(this.swipeTo, dx, dy))),
     start: (_target, event) => event.pointerType !== 'mouse',
     surface: () => this.partNamed('item'),
   })
 
-  /** Writes how far a swipe has moved the message toward the end of the line. */
+  /** Writes how far a swipe has moved the message toward its edge. */
   private slide(travel: number): void {
-    const physical = isRtl(this) ? -travel : travel
-    this.partNamed('item')?.style.setProperty(
-      '--toast-swipe-x',
-      travel === 0 ? '' : `${Math.round(physical)}px`,
-    )
+    const item = this.partNamed('item')
+    const { x, y } = edgeOffset(this.swipeTo, travel)
+    item?.style.setProperty('--toast-swipe-x', x === 0 ? '' : `${Math.round(x)}px`)
+    item?.style.setProperty('--toast-swipe-y', y === 0 ? '' : `${Math.round(y)}px`)
   }
 
   /**
@@ -292,6 +334,7 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
       } else {
         this.resume()
       }
+      this.holdForRegion()
     }
     this.addEventListener('keydown', this.handleKeydown)
   }
@@ -300,6 +343,7 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
     super.disconnectedCallback()
     /* The countdown drops its holds as the host leaves. */
     this.holding = false
+    this.regionHolding = false
     this.removeEventListener('keydown', this.handleKeydown)
   }
 
@@ -354,6 +398,16 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
     this.name()
     if (changed.has('waiting')) {
       this.wait(this.waiting)
+    }
+    if (changed.has('regionHeld')) {
+      this.holdForRegion()
+    }
+    /* A swipe up or down is one the page would otherwise take as a scroll. */
+    if (changed.has('swipeToward')) {
+      this.partNamed('item')?.style.setProperty(
+        'touch-action',
+        swipeAxis(this.swipeTo) === 'y' ? 'pan-x' : '',
+      )
     }
   }
 
