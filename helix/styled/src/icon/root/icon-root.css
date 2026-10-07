@@ -91,7 +91,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :host([animation]) {
+  :host([animation="spin"]),
+  :host([animation="pulse"]),
+  :host([animation="beat"]) {
     animation: none;
   }
 }

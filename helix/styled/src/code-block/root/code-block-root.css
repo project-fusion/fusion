@@ -199,7 +199,7 @@
 [part="old"]:focus-visible,
 [part="new"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  outline-offset: calc(var(--helix-size-focus-ring) * -1);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }
 
 /* Wrapped rather than scrolled, for prose-like code. Anywhere, since a long

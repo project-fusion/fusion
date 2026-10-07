@@ -15,8 +15,8 @@
 }
 
 /*
- * **A paragraph is its lines.** Each line is one `em` tall, the lines a line
- * height apart, so the column is as tall as the text it stands for, and the
+ * **A paragraph is its lines.** Each line is one `em` tall, the lines a body
+ * line height apart, so the column is as tall as the text it stands for, and the
  * last line stops short, as a paragraph's does. One line, or a count the
  * script reads as none, is the single line above.
  */
@@ -54,7 +54,7 @@
 [part="lines"] {
   display: flex;
   flex-direction: column;
-  gap: calc(1lh - 1em);
+  gap: calc((var(--helix-leading-normal) - 1) * 1em);
 }
 
 [part~="line"] {
