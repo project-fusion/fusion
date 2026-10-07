@@ -54,6 +54,13 @@ export class HelixTag extends HelixHeadlessTag {
   emphasis?: 'outlined' | 'solid' | 'subtle'
 
   /**
+   * The tag's outline. `pill` rounds its ends fully, for a set of tags among
+   * rounded controls. Absent is the theme's small radius.
+   */
+  @property({ reflect: true })
+  shape?: 'pill'
+
+  /**
    * The meaning the tag's color shows, such as `success` or `danger`.
    *
    * `tone` is semantic color, which is what these are and what `helix-text`

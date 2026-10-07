@@ -39,6 +39,15 @@
   white-space: nowrap;
 }
 
+/* Fully rounded ends, and the remove button's ring rounded to match. */
+:host([shape="pill"]) {
+  border-radius: var(--tag-radius, var(--helix-radii-full));
+}
+
+:host([shape="pill"]) [part="dismiss"] {
+  border-radius: var(--helix-radii-full);
+}
+
 /* *The label stays inside the pill.** The host is `white-space: nowrap` and its
    overflow is visible, so a tag given less room than its text paints the words
    straight out through the rounded end: measured in a table whose Status column
