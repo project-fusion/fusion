@@ -53,6 +53,55 @@
   overflow: hidden;
 }
 
+/* The file tabs over the source, and the shown file under them. */
+[part="pane"][data-files] {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+[part="files"] {
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  display: flex;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  overflow-x: auto;
+}
+
+[part="file"] {
+  background-color: transparent;
+  border: none;
+  border-block-end: var(--helix-border-thick) solid transparent;
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  font: inherit;
+  padding: var(--helix-space-xs) var(--helix-space-sm);
+  white-space: nowrap;
+}
+
+[part="file"]:hover {
+  color: var(--helix-color-foreground);
+}
+
+[part="file"][aria-selected="true"] {
+  border-block-end-color: var(--helix-color-accent);
+  color: var(--helix-color-foreground);
+}
+
+[part="file"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}
+
+[data-files] > [role="tabpanel"] {
+  min-block-size: 0;
+}
+
+/* A file not shown. The sandbox writes `hidden` on it, and a pane's own sheet
+   sets its `display`, which the attribute alone does not win against. */
+::slotted([hidden]) {
+  display: none;
+}
+
 /* No fill of its own. */
 [part="panel"] {
   block-size: 100%;

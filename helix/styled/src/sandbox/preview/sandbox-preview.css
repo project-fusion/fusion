@@ -1,6 +1,8 @@
 :host {
   display: block;
   min-block-size: 0;
+  /* The box the error and the controls are placed in. */
+  position: relative;
 }
 
 [part="frame"] {
@@ -9,4 +11,55 @@
   border: none;
   display: block;
   inline-size: 100%;
+}
+
+/* Over the example, which is stale while it fails, until the next source is
+   sent. The shape of what was thrown is kept, as the terminal keeps it. */
+[part="error"] {
+  background-color: var(--helix-color-background);
+  box-sizing: border-box;
+  color: var(--helix-color-danger);
+  font-family: var(--helix-font-mono);
+  font-size: var(--helix-text-xs);
+  inset: 0;
+  line-height: var(--helix-leading-normal);
+  margin: var(--helix-space-none);
+  overflow: auto;
+  padding: var(--helix-space-md);
+  position: absolute;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* In the corner, over the example, in the terminal's small type. */
+[part="controls"] {
+  display: flex;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  gap: var(--helix-space-2xs);
+  inset-block-end: var(--helix-space-xs);
+  inset-inline-end: var(--helix-space-xs);
+  position: absolute;
+}
+
+[part="reload"],
+[part="open"] {
+  background-color: var(--helix-color-surface);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground);
+  cursor: pointer;
+  font: inherit;
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+}
+
+[part="reload"]:hover,
+[part="open"]:hover {
+  background-color: var(--helix-color-surface-sunken);
+}
+
+[part="reload"]:focus-visible,
+[part="open"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
 }

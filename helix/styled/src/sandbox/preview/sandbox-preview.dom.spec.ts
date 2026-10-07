@@ -197,3 +197,88 @@ describe('the preview states', () => {
     expect(hasState(host, 'failed')).toBe(true)
   })
 })
+
+describe('the error, and the controls', () => {
+  const from = (frame: HTMLIFrameElement, data: unknown): MessageEvent =>
+    new MessageEvent('message', { data, origin: 'null', source: frame.contentWindow })
+
+  /* A failure was a state and nothing else, so a sandbox nobody styled for it
+     went on showing the last example that worked. */
+  test('shows what the example threw over it while it is `failed`, and not after', async () => {
+    const host = (await preview()) as Preview & { source: string }
+    const frame = part(host, 'frame') as HTMLIFrameElement
+    frame.dispatchEvent(new Event('load'))
+    expect(part(host, 'error')).toBeNull()
+    window.dispatchEvent(
+      from(frame, {
+        level: 'error',
+        text: 'Uncaught TypeError: x is not a function',
+        type: 'helix-preview-console',
+        uncaught: true,
+      }),
+    )
+    await host.updateComplete
+    expect(part(host, 'error')?.textContent).toBe('Uncaught TypeError: x is not a function')
+    host.source = '<p>Fixed</p>'
+    await host.updateComplete
+    await new Promise((resolve) => setTimeout(resolve, 150))
+    await host.updateComplete
+    expect(part(host, 'error')).toBeNull()
+  })
+
+  test('draws no buttons without `controls`, and a named reload and open with it', async () => {
+    expect(part(await preview(), 'controls')).toBeNull()
+    const host = (await preview('src="/frame.html" controls')) as Preview & { reload: () => void }
+    const reload = part(host, 'reload') as HTMLButtonElement
+    const open = part(host, 'open') as HTMLButtonElement
+    expect([reload.textContent, open.textContent]).toEqual([
+      'Reload preview',
+      'Open preview in a new tab',
+    ])
+    expect([reload.type, open.type]).toEqual(['button', 'button'])
+    ;(part(host, 'frame') as HTMLIFrameElement).dispatchEvent(new Event('load'))
+    expect(hasState(host, 'loading')).toBe(false)
+    reload.click()
+    expect(hasState(host, 'loading')).toBe(true)
+  })
+
+  /* The tab is a page of this origin, so the example must not run in it: it
+     runs in a frame inside, with the same sandbox as the preview's own. */
+  test('opens the example in a new tab, in a frame sandboxed as its own, cut off from the page', async () => {
+    const host = (await preview('src="/frame.html" controls label="Card"')) as Preview & {
+      open: () => Window | null
+      source: string
+    }
+    host.source = '<p>Hello</p>'
+    await host.updateComplete
+    const tabDocument = document.implementation.createHTMLDocument('')
+    const tab = { document: tabDocument, opener: window } as unknown as Window
+    const original = window.open
+    const asked: unknown[][] = []
+    window.open = ((...args: unknown[]) => {
+      asked.push(args)
+      return tab
+    }) as typeof window.open
+    restore = () => {
+      window.open = original
+    }
+    ;(part(host, 'open') as HTMLButtonElement).click()
+    expect(asked).toEqual([['', '_blank']])
+    expect(tab.opener).toBeNull()
+    expect(tabDocument.title).toBe('Card')
+    const frame = tabDocument.querySelector('iframe') as HTMLIFrameElement
+    expect((frame.getAttribute('sandbox') ?? '').split(/\s+/).sort()).toEqual([
+      'allow-forms',
+      'allow-scripts',
+    ])
+    expect(frame.title).toBe('Card')
+    expect(frame.getAttribute('src')).toBe((part(host, 'frame') as HTMLIFrameElement).src)
+    // The tab's own script sends the example, since the frame takes one only from its parent.
+    const sends = frame.nextElementSibling as HTMLScriptElement
+    expect(sends.localName).toBe('script')
+    expect(sends.textContent).toContain('"source":"<p>Hello</p>"')
+
+    window.open = (() => null) as typeof window.open
+    expect(host.open()).toBeNull()
+  })
+})

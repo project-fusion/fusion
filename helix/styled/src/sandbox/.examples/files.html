@@ -1,0 +1,36 @@
+<!-- @summary Several source panes as files under a row of tabs, and a preview with reload and open buttons. -->
+
+<link
+  href="styles.css"
+  rel="stylesheet"
+>
+
+<div class="stage">
+  <helix-sandbox>
+    <helix-sandbox-source
+      label="index.html"
+      name="html"
+      slot="source"
+      value="&lt;p class=&quot;lead&quot;&gt;Edited here, drawn beside it.&lt;/p&gt;"
+    ></helix-sandbox-source>
+    <helix-sandbox-source
+      label="styles.css"
+      name="css"
+      slot="source"
+      value=".lead { font: inherit; font-weight: 600 }"
+    ></helix-sandbox-source>
+    <helix-sandbox-source
+      label="main.js"
+      name="js"
+      slot="source"
+      value="console.log('Rendered')"
+    ></helix-sandbox-source>
+
+    <helix-sandbox-preview
+      controls
+      label="Live preview"
+      slot="preview"
+      src="/sandbox/frame.html"
+    ></helix-sandbox-preview>
+  </helix-sandbox>
+</div>

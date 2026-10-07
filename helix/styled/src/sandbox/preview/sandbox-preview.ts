@@ -18,9 +18,12 @@ const SETTLE = 120
 
 import type { CSSResultGroup } from 'lit'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { property, state } from 'lit/decorators.js'
 import { defaultFrame, withScript } from '../frame.js'
 import { styles as sheet } from './sandbox-preview.css.js'
+
+/** What the frame is allowed, here and in a tab `open()` makes. */
+const SANDBOX = 'allow-scripts allow-forms'
 
 /** The frame saying it has a listener, and where to answer it. */
 export interface PreviewReady {
@@ -104,6 +107,15 @@ export type PreviewMessage =
  * reports. A page draws its own spinner or message from either, such as a
  * sibling shown by `helix-sandbox-preview:state(failed) + .message`.
  *
+ * **A failed preview shows the error over the example**, in the `error` part,
+ * until the next source is sent. The terminal says it too, so the part is not
+ * announced. Hide it with `::part(error) { display: none }` where the page
+ * draws its own.
+ *
+ * **`controls` draws two buttons in the preview's corner**: one reloads the
+ * frame's document, as `reload()` does, and one opens the example in a new
+ * tab, as `open()` does. The tab runs it in a frame sandboxed as this one is.
+ *
  * @since 0.1.0
  * @status stable
  * @aliases Result, Output
@@ -112,7 +124,11 @@ export type PreviewMessage =
  * @event {HelixConsoleEvent} helix-console - Fired once per console call in the frame.
  * @event {HelixResizeEvent} helix-resize - Fired when the height of the frame's content changes, with the new height.
  *
+ * @csspart controls - The buttons in the preview's corner, under `controls`.
+ * @csspart error - The error the example threw and did not catch, shown over it while the preview is `failed`.
  * @csspart frame - The iframe.
+ * @csspart open - The button that opens the example in a new tab, under `controls`.
+ * @csspart reload - The button that reloads the frame's document, under `controls`.
  *
  * @cssstate failed - Since the example threw an error it did not catch, until the next source is sent.
  * @cssstate loading - While the frame's document loads, until it can take the example.
@@ -142,6 +158,13 @@ export class HelixSandboxPreview extends HelixElement {
    */
   @property({ attribute: 'color-mode' })
   colorMode?: 'dark' | 'light'
+
+  /**
+   * Whether the preview draws a reload button and a button that opens the
+   * example in a new tab, in its corner.
+   */
+  @property({ reflect: true, type: Boolean })
+  controls = false
 
   /**
    * Writing direction inside the frame.
@@ -178,6 +201,22 @@ export class HelixSandboxPreview extends HelixElement {
   layout?: 'padded' | 'centered' | 'fullscreen' | 'hug'
 
   /**
+   * The name of the button that opens the example in a new tab, under
+   * `controls`.
+   */
+  @words
+  @property({ attribute: 'open-label' })
+  openLabel = 'Open preview in a new tab'
+
+  /**
+   * The name of the button that reloads the frame's document, under
+   * `controls`.
+   */
+  @words
+  @property({ attribute: 'reload-label' })
+  reloadLabel = 'Reload preview'
+
+  /**
    * A script to run as a module after the markup, on every render of new
    * source. A sandbox writes its `js` pane here.
    */
@@ -211,6 +250,16 @@ export class HelixSandboxPreview extends HelixElement {
 
   /** The source the frame held when it last reported an uncaught error. */
   private failedSource: string | undefined
+
+  /** What the example threw and did not catch, while the preview is `failed`. */
+  @state()
+  private failure: string | undefined
+
+  /** Says the preview failed with `text`, or, with none, that it has not. */
+  private fail(text?: string): void {
+    this.failure = text
+    this.toggleState('failed', text !== undefined)
+  }
 
   /** What the frame is sent as its source: the markup, and the script after it. */
   private get sending(): string {
@@ -283,7 +332,7 @@ export class HelixSandboxPreview extends HelixElement {
       this.dispatchEvent(new HelixConsoleEvent({ level: data.level, text: data.text }))
       if (data.uncaught) {
         this.failedSource = this.sentSource
-        this.toggleState('failed', true)
+        this.fail(data.text)
       }
     }
     /* **A press in the frame, put back into the page as a press.**
@@ -358,18 +407,15 @@ export class HelixSandboxPreview extends HelixElement {
          and clearing `failed` for it hid the failure. A frame that loads within
          the wait, as the built-in one does, has already run it and failed. */
       if (this.sending !== this.failedSource) {
-        this.toggleState('failed', false)
+        this.fail()
       }
       this.send()
     })
   }
 
-  /** Sends the current source to the frame, once it is listening. */
-  private send(): void {
-    if (!this.ready) {
-      return
-    }
-    const message: PreviewRender = {
+  /** What the frame is sent: the source, its stylesheet and its settings. */
+  private get message(): PreviewRender {
+    return {
       ...(this.colorMode ? { colorMode: this.colorMode } : {}),
       direction: this.direction ?? 'ltr',
       layout: this.layout ?? 'padded',
@@ -377,8 +423,58 @@ export class HelixSandboxPreview extends HelixElement {
       styles: this.styles,
       type: 'helix-preview-render',
     }
-    this.frame?.contentWindow?.postMessage(message, HelixSandboxPreview.target)
+  }
+
+  /** Sends the current source to the frame, once it is listening. */
+  private send(): void {
+    if (!this.ready) {
+      return
+    }
+    this.frame?.contentWindow?.postMessage(this.message, HelixSandboxPreview.target)
     this.sentSource = this.sending
+  }
+
+  /**
+   * Opens the example in a new tab, and returns the tab's window, or `null`
+   * where the browser refused to open one.
+   *
+   * **The tab runs the example as this preview does**: in a frame that fills
+   * it, with this frame's `sandbox`, loading `src` or the built-in document,
+   * and sent the example once it loads. The example stays on an opaque origin,
+   * and the tab's `opener` is cleared, so it cannot reach this page. The tab
+   * shows the example as it was when it opened, and edits after that do not
+   * reach it. A short inline script in the tab sends the example, so on a page
+   * whose Content Security Policy refuses inline scripts the tab opens empty,
+   * as the built-in document does there.
+   */
+  open(): Window | null {
+    const tab = window.open('', '_blank')
+    if (!tab) {
+      return null
+    }
+    tab.opener = null
+    const { body } = tab.document
+    tab.document.title = this.label
+    body.style.margin = '0'
+    const frame = tab.document.createElement('iframe')
+    frame.setAttribute('sandbox', SANDBOX)
+    frame.title = this.label
+    frame.style.cssText = 'block-size: 100vh; border: none; display: block; inline-size: 100vw'
+    if (this.src === '') {
+      frame.srcdoc = defaultFrame()
+    } else {
+      /* As this element's own frame resolved it, against this page, which the
+         tab's blank document does not share. */
+      frame.src = this.frame?.src || this.src
+    }
+    /* **Sent by a script of the tab's own.** A frame takes a render only from
+       its parent window, and a message is from the window whose script posted
+       it: posted from here it came from this page, and the frame refused it. */
+    const send = tab.document.createElement('script')
+    send.textContent = `const frame = document.currentScript.previousElementSibling
+frame.onload = () => frame.contentWindow.postMessage(${JSON.stringify(this.message)}, '*')`
+    body.append(frame, send)
+    return tab
   }
 
   override connectedCallback(): void {
@@ -426,7 +522,7 @@ export class HelixSandboxPreview extends HelixElement {
     this.ready = false
     this.sentSource = undefined
     this.failedSource = undefined
-    this.toggleState('failed', false)
+    this.fail()
     this.toggleState('loading', true)
   }
 
@@ -452,7 +548,26 @@ export class HelixSandboxPreview extends HelixElement {
       this.scheduleSend()
       return
     }
-    this.send()
+    /* Only a setting the frame is sent. A failure shown, or the controls
+       drawn, is this element's own, and sending on it ran the example again. */
+    if (changed.has('colorMode') || changed.has('direction') || changed.has('layout')) {
+      this.send()
+    }
+  }
+
+  /** The reload and open buttons, under `controls`. */
+  private renderControls(): TemplateResult | typeof nothing {
+    if (!this.controls) {
+      return nothing
+    }
+    /* Read before the template, as the terminal reads its clear button's, so
+       the words audit does not take them for text joined in code. */
+    const reload = this.reloadLabel
+    const open = this.openLabel
+    return html`<div part="controls">
+      <button part="reload" type="button" @click=${() => this.reload()}>${reload}</button>
+      <button part="open" type="button" @click=${() => this.open()}>${open}</button>
+    </div>`
   }
 
   protected override render(): TemplateResult {
@@ -463,8 +578,10 @@ export class HelixSandboxPreview extends HelixElement {
       srcdoc=${this.src === '' ? defaultFrame() : nothing}
       title=${this.label}
       allow="clipboard-write *; fullscreen *"
-      sandbox="allow-scripts allow-forms"
-    ></iframe>`
+      sandbox=${SANDBOX}
+    ></iframe>${
+      this.failure === undefined ? nothing : html`<pre part="error">${this.failure}</pre>`
+    }${this.renderControls()}`
   }
 
   static override styles: CSSResultGroup = sheet

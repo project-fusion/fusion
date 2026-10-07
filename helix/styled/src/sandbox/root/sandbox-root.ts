@@ -10,12 +10,14 @@ import {
   HelixElement,
   HelixPanelResizeEvent,
   HelixSplitEvent,
+  inlineStep,
   requestChange,
+  requestValue,
   words,
 } from '@fusion.dev/helix-core'
 import '../../splitter/index.js'
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
-import { html } from 'lit'
+import { html, nothing } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import type { HelixSandboxPreview } from '../preview/sandbox-preview.js'
 import type { HelixSandboxStatusBar } from '../status-bar/sandbox-status-bar.js'
@@ -45,6 +47,18 @@ type PaneName = keyof typeof PANE_KEYS
 const isPaneName = (name: unknown): name is PaneName =>
   typeof name === 'string' && Object.hasOwn(PANE_KEYS, name)
 
+/** A source pane's `name`, as the property or the attribute holds it. */
+const nameOf = (pane: Element): string => {
+  const { name } = pane as { name?: unknown }
+  return typeof name === 'string' ? name : (pane.getAttribute('name') ?? '')
+}
+
+/** What a source pane's file tab says: its `label`, or its `name` without one. */
+const fileOf = (pane: Element): string => {
+  const { label } = pane as { label?: unknown }
+  return (typeof label === 'string' && label) || pane.getAttribute('label') || nameOf(pane)
+}
+
 /**
  * @summary An editable source pane paired with a live preview.
  *
@@ -64,6 +78,20 @@ const isPaneName = (name: unknown): name is PaneName =>
  * pointer, the keyboard, and the corner. The inner splitter holds the panes and
  * the outer one holds the panel, so the panel spans the full width.
  *
+ * **Several source panes are files**, one shown at a time under a row of
+ * tabs, each named by the pane's `label` or, without one, its `name`. `file`
+ * holds the `name` of the pane shown. The tabs are a tab list: the arrow keys
+ * move between them and show each pane, and `Home` and `End` go to the first
+ * and the last. Choosing one sends `helix-before-change` with the pane's
+ * `name`, which you can cancel, and `change` once `file` holds it. The panes
+ * not shown carry `hidden`. One pane draws no tabs.
+ *
+ * **Any editor can be the source pane**: an element in the `source` slot with
+ * a `name` that dispatches `helix-before-edit` with its text, which bubbles.
+ * A wrapper around CodeMirror or Monaco sends one on each change and is a pane
+ * like `helix-sandbox-source`, and the sandbox reads its `value` to seed the
+ * preview. Dispatch `helix-caret` from it too for the status bar's position.
+ *
  * On a focused divider, the arrow keys move it, and `Home` and `End` move it
  * to its ends. `Enter` on the panes divider shuts the lead pane, and pressed
  * again it opens the pane where it was. `Enter` on the panel divider shuts the
@@ -82,6 +110,8 @@ const isPaneName = (name: unknown): name is PaneName =>
  * @slot status - A status bar, spanning both panes at the bottom.
  * @slot toolbar - A bar across the top, spanning both panes.
  *
+ * @event {Event} change - A file tab showed its pane, whose `name` `file` now holds.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired before a file tab shows its pane, with the pane's `name`. Cancelable: cancel it to keep the pane shown.
  * @event {HelixBeforeEditEvent} helix-before-edit - Fired before the source is edited. The source pane dispatches it, and you can listen for it on the sandbox. Cancelable: cancel it to keep the source unchanged.
  * @event {HelixBeforePanelResizeEvent} helix-before-panel-resize - Fired before the panel's divider is released, with the panel's height in pixels. A panel dragged closed reports `panel-collapsed-size`, its smallest height. Cancelable: cancel it to keep the current height.
  * @event {HelixBeforeSplitEvent} helix-before-split - Fired before the panes' divider is released, with the lead pane's share. Cancelable: cancel it to keep the current split.
@@ -94,6 +124,8 @@ const isPaneName = (name: unknown): name is PaneName =>
  *
  * @csspart body - The splitter holding the panes above the panel. `::part(body):state(dragging)` matches while its divider is held.
  * @csspart corner - The handle where the two dividers cross.
+ * @csspart file - One file tab, `aria-selected` while its pane is shown.
+ * @csspart files - The file tabs over the source panes, where there are several.
  * @csspart pane - Either pane.
  * @csspart panel - The box that holds the slotted panel.
  * @csspart panes - The splitter holding the source and preview panes. `::part(panes):state(dragging)` matches while its divider is held.
@@ -144,6 +176,21 @@ export class HelixSandbox extends HelixElement {
    */
   @property({ attribute: 'default-split', type: Number })
   defaultSplit = DEFAULT_SPLIT
+
+  /**
+   * The `name` of the source pane shown, where the sandbox holds several.
+   *
+   * Unset, or a name no pane has, shows the first.
+   */
+  @property()
+  file?: string
+
+  /**
+   * The name of the file tabs, read by screen readers.
+   */
+  @words
+  @property({ attribute: 'files-label' })
+  filesLabel = 'Files'
 
   /**
    * Which pane comes first, before the divider.
@@ -233,6 +280,98 @@ export class HelixSandbox extends HelixElement {
    */
   @state()
   private hasPanel = false
+
+  /** The source panes where there are several, each a file with a tab. */
+  @state()
+  private files: Element[] = []
+
+  /** The panes this element wrote `hidden` on, to take it off again. */
+  private readonly hid = new Set<Element>()
+
+  /** The pane shown among the files. */
+  private get shownFile(): Element | undefined {
+    return this.files.find((pane) => nameOf(pane) === this.file) ?? this.files[0]
+  }
+
+  /** Notes the source panes, which are files where there are several. */
+  private readFiles(): void {
+    const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="source"]')
+    const panes = slot?.assignedElements({ flatten: true }) ?? []
+    const files = panes.length > 1 ? panes : []
+    if (files.length !== this.files.length || files.some((pane, at) => pane !== this.files[at])) {
+      this.files = files
+    }
+  }
+
+  /** Shows the pane a file tab names, once nobody refused. */
+  private chooseFile(pane: Element): void {
+    if (pane !== this.shownFile) {
+      requestValue(this, nameOf(pane), (name) => {
+        this.file = name
+      })
+    }
+  }
+
+  /**
+   * Arrow keys, `Home` and `End` on the file tabs, which move to a tab and
+   * show its pane, as a tab list that follows focus does. Left and Right swap
+   * on a right-to-left page.
+   */
+  private readonly handleFileKey = (event: KeyboardEvent): void => {
+    const files = this.files
+    const at = files.indexOf(this.shownFile as Element)
+    const step = inlineStep(this, event.key)
+    const to =
+      event.key === 'Home'
+        ? 0
+        : event.key === 'End'
+          ? files.length - 1
+          : step === 0
+            ? -1
+            : (at + step + files.length) % files.length
+    const pane = files[to]
+    if (!pane) {
+      return
+    }
+    event.preventDefault()
+    this.chooseFile(pane)
+    void this.updateComplete.then(() => {
+      this.renderRoot.querySelector<HTMLElement>(`[part="file"][aria-selected="true"]`)?.focus()
+    })
+  }
+
+  /** The row of file tabs, where there are several source panes. */
+  private renderFiles(): TemplateResult | typeof nothing {
+    if (this.files.length === 0) {
+      return nothing
+    }
+    const shown = this.shownFile
+    return html`<div part="files" role="tablist" aria-label=${this.filesLabel} @keydown=${this.handleFileKey}>
+      ${this.files.map((pane, at) => {
+        const selected = pane === shown
+        return html`<button part="file" id=${`file-${at}`} role="tab" type="button"
+          aria-controls="files-panel" aria-selected=${selected ? 'true' : 'false'}
+          tabindex=${selected ? '0' : '-1'} @click=${() => this.chooseFile(pane)}>${fileOf(pane)}</button>`
+      })}
+    </div>`
+  }
+
+  /** Hides the files not shown, and shows any this element hid that is now. */
+  private showFile(): void {
+    const shown = this.shownFile
+    for (const pane of this.files) {
+      if (pane !== shown && !pane.hasAttribute('hidden')) {
+        pane.setAttribute('hidden', '')
+        this.hid.add(pane)
+      }
+    }
+    for (const pane of this.hid) {
+      if (pane === shown || !this.files.includes(pane)) {
+        pane.removeAttribute('hidden')
+        this.hid.delete(pane)
+      }
+    }
+  }
 
   /**
    * The body's height, which is what a pixel panel is a fraction of.
@@ -400,6 +539,7 @@ export class HelixSandbox extends HelixElement {
    * to be written twice. Client only, like the other reads of the light DOM.
    */
   private readonly seed = (): void => {
+    this.readFiles()
     const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="source"]')
     for (const pane of slot?.assignedElements({ flatten: true }) ?? []) {
       const { name, value } = pane as Element & { name?: unknown; value?: unknown }
@@ -830,6 +970,30 @@ export class HelixSandbox extends HelixElement {
     this.hasPanel = this.querySelector(':scope > [slot="panel"]') !== null
   }
 
+  /** Shows the file chosen, once the tabs that choose it are drawn. */
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    if (changed.has('files') || changed.has('file')) {
+      this.showFile()
+    }
+  }
+
+  /**
+   * One pane and the slot it shows. The source pane holds the file tabs, where
+   * there are several, and is then the panel they control.
+   */
+  private renderPane(name: 'preview' | 'source', at: 'end' | 'start'): TemplateResult {
+    const slot = html`<slot name=${name} @slotchange=${this.seed}></slot>`
+    if (name === 'preview' || this.files.length === 0) {
+      return html`<div part="pane" data-pane=${name} slot=${at}>${slot}</div>`
+    }
+    const tab = `file-${this.files.indexOf(this.shownFile as Element)}`
+    return html`<div part="pane" data-pane=${name} data-files slot=${at}>
+      ${this.renderFiles()}
+      <div id="files-panel" role="tabpanel" aria-labelledby=${tab}>${slot}</div>
+    </div>`
+  }
+
   protected override render(): TemplateResult {
     const vertical = this.axis === 'vertical'
     const first = this.lead === 'preview' ? 'preview' : 'source'
@@ -852,8 +1016,8 @@ export class HelixSandbox extends HelixElement {
           label=${label} orientation=${vertical ? 'vertical' : 'horizontal'} .position=${split}
           @helix-before-collapse=${this.handleCollapse} @helix-before-resize=${this.handlePanesChange}
           @keydown=${this.handleDividerKey}>
-          <div part="pane" data-pane=${first} slot="start"><slot name=${first} @slotchange=${this.seed}></slot></div>
-          <div part="pane" data-pane=${second} slot="end"><slot name=${second} @slotchange=${this.seed}></slot></div>
+          ${this.renderPane(first, 'start')}
+          ${this.renderPane(second, 'end')}
         </helix-splitter>
         <div part="panel" slot="end"><slot name="panel" @slotchange=${this.readPanel}></slot></div>
       </helix-splitter>

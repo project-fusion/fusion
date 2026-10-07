@@ -829,3 +829,117 @@ describe('sandbox states', () => {
     expect(hasState(tabs, 'panel-collapsed')).toBe(false)
   })
 })
+
+/* Several panes stacked in one column, every one of them open, was all a
+   sandbox did with them, and file tabs were a page's to build. */
+describe('several source panes are files', () => {
+  type Sandbox = Updatable & { file?: string }
+
+  const files = async (): Promise<Sandbox> => {
+    const sandbox = (await mount(`
+      <helix-sandbox>
+        <helix-sandbox-source slot="source" name="html" label="index.html" value="<p>one</p>"></helix-sandbox-source>
+        <helix-sandbox-source slot="source" name="css" value="p { color: red }"></helix-sandbox-source>
+        <helix-sandbox-source slot="source" name="js" label="main.js" value=""></helix-sandbox-source>
+        <helix-sandbox-preview slot="preview"></helix-sandbox-preview>
+      </helix-sandbox>`)) as Sandbox
+    await sandbox.updateComplete
+    return sandbox
+  }
+  const tabs = (sandbox: HTMLElement): HTMLButtonElement[] => [
+    ...(sandbox.shadowRoot?.querySelectorAll<HTMLButtonElement>('[part="file"]') ?? []),
+  ]
+  const shown = (sandbox: HTMLElement): string[] =>
+    [...sandbox.querySelectorAll('helix-sandbox-source')]
+      .filter((pane) => !pane.hasAttribute('hidden'))
+      .map((pane) => pane.getAttribute('name') ?? '')
+  const key = (tab: HTMLElement, name: string): void => {
+    tab.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, composed: true, key: name }))
+  }
+
+  test('one pane draws no tabs and is never hidden', async () => {
+    const sandbox = (await mount(wired)) as Sandbox
+    await sandbox.updateComplete
+    expect(part(sandbox, 'files')).toBeNull()
+    expect(shown(sandbox)).toEqual(['html'])
+  })
+
+  test('several draw a named tab list, each tab named by its label or its name, the first shown', async () => {
+    const sandbox = await files()
+    const list = part(sandbox, 'files') as HTMLElement
+    expect(list.getAttribute('role')).toBe('tablist')
+    expect(list.getAttribute('aria-label')).toBe('Files')
+    const all = tabs(sandbox)
+    expect(all.map((tab) => tab.textContent)).toEqual(['index.html', 'css', 'main.js'])
+    expect(all.map((tab) => tab.getAttribute('role'))).toEqual(['tab', 'tab', 'tab'])
+    expect(all.map((tab) => tab.getAttribute('aria-selected'))).toEqual(['true', 'false', 'false'])
+    expect(all.map((tab) => tab.getAttribute('tabindex'))).toEqual(['0', '-1', '-1'])
+    expect(shown(sandbox)).toEqual(['html'])
+    const panel = sandbox.shadowRoot?.querySelector('[role="tabpanel"]') as HTMLElement
+    expect(panel.getAttribute('aria-labelledby')).toBe(all[0]?.id)
+    expect(all[0]?.getAttribute('aria-controls')).toBe(panel.id)
+  })
+
+  test('a tab asks, then shows its pane, and `file` holds its name', async () => {
+    const sandbox = await files()
+    const heard: string[] = []
+    sandbox.addEventListener('helix-before-change', (event) =>
+      heard.push(`before:${(event as CustomEvent).detail.value}`),
+    )
+    sandbox.addEventListener('change', () => heard.push('change'))
+    tabs(sandbox)[1]?.click()
+    await sandbox.updateComplete
+    expect(heard).toEqual(['before:css', 'change'])
+    expect(sandbox.file).toBe('css')
+    expect(shown(sandbox)).toEqual(['css'])
+    expect(tabs(sandbox).map((tab) => tab.getAttribute('aria-selected'))).toEqual([
+      'false',
+      'true',
+      'false',
+    ])
+
+    sandbox.addEventListener('helix-before-change', (event) => event.preventDefault())
+    tabs(sandbox)[2]?.click()
+    await sandbox.updateComplete
+    expect(sandbox.file).toBe('css')
+    expect(shown(sandbox)).toEqual(['css'])
+  })
+
+  test('`file` set by the page shows that pane', async () => {
+    const sandbox = await files()
+    sandbox.file = 'js'
+    await sandbox.updateComplete
+    expect(shown(sandbox)).toEqual(['js'])
+  })
+
+  test('the arrow keys, Home and End move between the tabs and show each pane', async () => {
+    const sandbox = await files()
+    const [first] = tabs(sandbox) as [HTMLButtonElement]
+    key(first, 'ArrowRight')
+    await sandbox.updateComplete
+    expect(shown(sandbox)).toEqual(['css'])
+    key(first, 'End')
+    await sandbox.updateComplete
+    expect(shown(sandbox)).toEqual(['js'])
+    key(first, 'ArrowRight')
+    await sandbox.updateComplete
+    expect(shown(sandbox)).toEqual(['html'])
+    key(first, 'ArrowLeft')
+    await sandbox.updateComplete
+    expect(shown(sandbox)).toEqual(['js'])
+    key(first, 'Home')
+    await sandbox.updateComplete
+    expect(shown(sandbox)).toEqual(['html'])
+  })
+
+  test('down to one pane, the tabs go and nothing stays hidden', async () => {
+    const sandbox = await files()
+    const panes = [...sandbox.querySelectorAll('helix-sandbox-source')]
+    panes[1]?.remove()
+    panes[2]?.remove()
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await sandbox.updateComplete
+    expect(part(sandbox, 'files')).toBeNull()
+    expect(panes.map((pane) => pane.hasAttribute('hidden'))).toEqual([false, false, false])
+  })
+})
