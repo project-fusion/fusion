@@ -304,8 +304,9 @@ slot[name="icon"]::slotted(*) {
 /* Hidden and still laid out, which is the one case `HelixElement`'s prepended
    rule leaves open on purpose: it says so itself, that `!important` is not used
    because a component with a real reason to stay laid out while hidden should be
-   able to answer it. */
-:host([hidden]:not([hidden="until-found"])) {
+   able to answer it. A waiting message is hidden too and takes no box, so it
+   is left out here: this rule outranks the one under it. */
+:host([hidden]:not([hidden="until-found"], :state(waiting))) {
   display: grid;
 }
 
