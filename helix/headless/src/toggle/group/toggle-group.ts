@@ -446,6 +446,10 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
        richer than a string. */
     hostAria(this.internals, { label: this.label, role: this.groupRole })
     this.internals.ariaOrientation = this.orientation ?? null
+    /* `required` on the radio group, as `Radio.Group` says it, so a reader
+       hears why the form would refuse the group. A toolbar takes no
+       `aria-required`. */
+    this.internals.ariaRequired = this.required && !this.multiple ? 'true' : null
     // `null` rather than an empty string when nothing is chosen, which is the
     // difference between a control that submits nothing and one that submits a
     // blank. Under `selection-mode="multiple"`, one entry per pressed value, as

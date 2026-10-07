@@ -8,12 +8,17 @@ import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
- * @summary One option in a toggle group.
+ * @summary One option in a toggle group, or a toggle button on its own.
  *
  * @description
  * Renders a `<button role="radio">` for use as a form control. In a group with
  * `selection-mode="multiple"` it is a `<button>` that says whether it is
  * pressed with `aria-pressed`.
+ *
+ * **On its own, outside a `Toggle.Group`, it is a toggle button**, as React
+ * Aria's `ToggleButton`: a `<button>` with `aria-pressed`. A press, Enter or
+ * Space sends `helix-select`, which you can cancel, then flips `selected` and
+ * sends `change`. Write `selected` in the markup to start it pressed.
  *
  * Do not use it for navigation. For navigation, use links marked with
  * `aria-current` and styled by the `data-navigation-item` recipe in the base
@@ -27,6 +32,7 @@ import { property } from 'lit/decorators.js'
  *
  * @slot - The item's label.
  *
+ * @event {Event} change - Fired after a toggle button on its own is pressed or released.
  * @event {HelixSelectEvent} helix-select - Fired when the item is chosen. Cancelable: call `preventDefault()` to keep the current choice.
  *
  * @csspart item - The radio button.
@@ -75,8 +81,8 @@ export class HelixHeadlessToggle extends MixinSelectableItem(HelixElement) {
   }
 
   /**
-   * Whether the item holds the group's tab stop. Unset, the chosen item holds
-   * it.
+   * Whether the item holds the group's tab stop. Unset, no group holds the
+   * item, and it is a toggle button with a tab stop of its own.
    *
    * Written by the group on every item: `true` for the chosen item, or for the
    * first item that can be chosen while there is no selection to carry the
@@ -97,9 +103,35 @@ export class HelixHeadlessToggle extends MixinSelectableItem(HelixElement) {
   @property({ attribute: false })
   pressed?: boolean | undefined
 
+  /**
+   * Whether no `Toggle.Group` holds the item, which makes it a toggle button
+   * of its own. A group writes `focusable` on every item it holds. A server,
+   * and the render that hydrates its markup, cannot tell, and draw the item a
+   * group holds.
+   */
+  private get alone(): boolean {
+    return this.focusable === undefined && this.childrenKnown
+  }
+
+  /**
+   * Chooses the item in its group, or, on its own, flips `selected` once
+   * `helix-select` stands and sends `change`.
+   */
+  override select(): boolean {
+    if (!this.alone) {
+      return super.select()
+    }
+    if (!super.select()) {
+      return false
+    }
+    this.selected = !this.selected
+    this.dispatchEvent(new Event('change', { bubbles: true }))
+    return true
+  }
+
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    this.toggleState('pressed', this.pressed === true)
+    this.toggleState('pressed', this.alone ? this.selected : this.pressed === true)
   }
 
   /**
@@ -128,14 +160,17 @@ export class HelixHeadlessToggle extends MixinSelectableItem(HelixElement) {
        `FilterInput.Chip` uses in the same words, a server and the render that
        has to be its, so a browser draws what it drew before. `Radio.Root`
        carries the same line for the same reason. */
+    const alone = this.alone
+    const radio = !alone && this.pressed === undefined
+    const pressed = alone ? this.selected : this.pressed
     return html`<button
       part="item"
       type="button"
-      role=${this.pressed === undefined ? 'radio' : nothing}
-      aria-checked=${this.pressed === undefined ? String(this.selected) : nothing}
-      aria-pressed=${this.pressed === undefined ? nothing : String(this.pressed)}
+      role=${radio ? 'radio' : nothing}
+      aria-checked=${radio ? String(this.selected) : nothing}
+      aria-pressed=${radio || pressed === undefined ? nothing : String(pressed)}
       ?disabled=${this.disabled}
-      tabindex=${(this.focusable ?? this.selected) || !this.childrenKnown ? '0' : '-1'}
+      tabindex=${alone || (this.focusable ?? this.selected) || !this.childrenKnown ? '0' : '-1'}
       @click=${() => this.select()}
     ><slot></slot></button>`
   }
