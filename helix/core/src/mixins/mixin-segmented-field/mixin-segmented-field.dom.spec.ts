@@ -246,6 +246,35 @@ describe('a key in a segment', () => {
     expect(host.validity.valid).toBe(true)
   })
 
+  /* React Aria's segments erase one digit at a time and step back from an
+     empty one. These emptied a whole segment and stayed on it, so clearing a
+     date from its end took a Left before every Backspace. */
+  test('Backspace takes off one digit, then moves back from an empty segment', async () => {
+    const host = await mount('value="2026-12-24"')
+    const day = segment(host, 'day')
+    day.focus()
+    await key(host, day, 'Backspace')
+    expect(segment(host, 'day').textContent?.trim()).toBe('02')
+    expect(host.value).toBe('2026-12-02')
+    await key(host, segment(host, 'day'), 'Backspace')
+    expect(segment(host, 'day').textContent?.trim()).toBe('––')
+    expect(host.shadowRoot?.activeElement).toBe(segment(host, 'day'))
+    await key(host, segment(host, 'day'), 'Backspace')
+    expect(host.shadowRoot?.activeElement).toBe(segment(host, 'month'))
+    await key(host, segment(host, 'month'), 'Backspace')
+    expect(segment(host, 'month').textContent?.trim()).toBe('01')
+    const year = await mount('value="2026-12-24"')
+    await key(year, segment(year, 'year'), 'Backspace')
+    expect(segment(year, 'year').textContent?.trim()).toBe('0202')
+  })
+
+  test('and a digit typed after it is added to what is left', async () => {
+    const host = await mount('kind="time" value="14:50"')
+    await key(host, segment(host, 'minute'), 'Backspace')
+    await key(host, segment(host, 'minute'), '8')
+    expect(host.value).toBe('14:58')
+  })
+
   test('Left and Right move between segments', async () => {
     const host = await mount('value="2026-08-04"')
     const month = segment(host, 'month')
