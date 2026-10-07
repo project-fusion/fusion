@@ -1,6 +1,6 @@
 import type { ReactiveController, ReactiveElement } from 'lit'
+import { held, watchWords, wordsRegistered } from './held.js'
 import { formatMessage, type MessageTable, type MessageValues } from './message.js'
-import { lookupWord, watchWords, wordsRegistered } from './registry.js'
 import { wordsLocale } from './words-locale.js'
 
 /** An element that reads words: a Lit element, perhaps with a `locale`. */
@@ -61,11 +61,7 @@ const resolve = (host: Host, name: string): [unknown, string] => {
   let found: [unknown, string] = [own, '']
   if (own == null || table) {
     const registered = wordsRegistered()
-      ? lookupWord(
-          wordsLocale(host),
-          (host.constructor as { words?: string }).words || host.localName,
-          name,
-        )
+      ? held.find?.(host, (host.constructor as { words?: string }).words || host.localName, name)
       : undefined
     found = table
       ? [{ ...table, ...(registered?.[0] as MessageTable), ...(own as MessageTable) }, '']
@@ -99,10 +95,10 @@ const watcher = (host: Host): ReactiveController => {
   let locale = ''
   return {
     hostConnected: () => {
-      locale = wordsLocale(host)
+      locale = held.locale?.(host) ?? ''
       stop = watchWords(() => {
         recheck(host)
-        const now = wordsLocale(host)
+        const now = held.locale?.(host) ?? ''
         if (now !== locale) {
           locale = now
           host.requestUpdate()
