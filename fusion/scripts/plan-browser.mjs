@@ -46,6 +46,13 @@
  * rather than with slack, and moved down it buys wall clock with money: 70 plans
  * 29 jobs and bills 63.
  *
+ * **110, once the costs were measured, for a shard to end inside five minutes
+ * of a run.** With every family weighed by what it took on run 37557109520, a
+ * shard of 125 seconds of work took 150 to 182 seconds as a job, and on a run
+ * that rebuilds the components it starts about 95 seconds in. At 110 the
+ * slowest check plans seven jobs where it planned six, and the corpus plans 32
+ * jobs where it planned 28, each still billed three minutes.
+ *
  * **What the target cannot fix is a shard that is not the share it was sized
  * for**, which is `@fusion.dev/scripts/cost`'s half of this. A target of 125 and
  * four contrast shards of 118, 43, 40 and 43 seconds is the right count spent
@@ -75,7 +82,7 @@ import { root, SOURCE } from '@fusion.dev/scripts/workspace'
 console.log = console.error
 
 /** The seconds of work a shard is sized to, before setup. */
-const TARGET = 125
+const TARGET = 110
 
 const TIERS = [
   { name: 'headless', source: join(root, SOURCE.headless) },
