@@ -293,6 +293,7 @@ diagnostics counts it by kind and tag. None fails a CI job.
 | --- | --- |
 | `cite-not-url` | A blockquote's `cite` holds words, where it takes the URL of the source |
 | `deprecated` | A deprecated property, attribute or slot was used; the message names what replaces it |
+| `duplicate-name` | Two navigation landmarks on the page share a name, so a screen reader lists them alike |
 | `duplicate-registration` | Two copies of Helix are on the page. Also the finding of the same name |
 | `fullscreen-refused` | The browser refused fullscreen, usually in a frame without `allow="fullscreen"` |
 | `min-out-of-range` | A rating's `min` is not a score between 0 and its `max` |

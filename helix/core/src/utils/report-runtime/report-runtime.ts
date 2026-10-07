@@ -25,6 +25,8 @@ export type RuntimeKind =
   | 'cite-not-url'
   /** A deprecated property, attribute or slot was used; the message names what replaces it. */
   | 'deprecated'
+  /** Two landmarks of one kind share a name, so a screen reader lists them alike. */
+  | 'duplicate-name'
   /** Another class asked for a tag that is already registered: two copies of Helix. */
   | 'duplicate-registration'
   /** The browser refused fullscreen, usually for a frame without the permission. */
