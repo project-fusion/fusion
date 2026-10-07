@@ -102,6 +102,29 @@ describe('the keys', () => {
     expect(focused(list)).toBe(cell(third))
   })
 
+  /* Removing the focused row dropped focus to the body, and the arrow keys
+     did nothing until the reader tabbed back in. React Aria's GridList moves
+     focus to a neighbor. */
+  test('removing the focused row moves focus to the next row a key can reach', async () => {
+    const list = await grid('multiple')
+    const [first, , third] = list.rows as [Row, Row, Row]
+    cell(first).focus()
+    first.remove()
+    await new Promise((done) => setTimeout(done, 0))
+    await settle(list)
+    expect(focused(list)).toBe(cell(third))
+  })
+
+  test('or to the one before it, where the removed row was the last', async () => {
+    const list = await grid('multiple')
+    const [first, , third] = list.rows as [Row, Row, Row]
+    cell(third).focus()
+    third.remove()
+    await new Promise((done) => setTimeout(done, 0))
+    await settle(list)
+    expect(focused(list)).toBe(cell(first))
+  })
+
   test('Right goes to each control in the row and back to the row', async () => {
     const list = await grid()
     const first = list.rows[0] as Row
