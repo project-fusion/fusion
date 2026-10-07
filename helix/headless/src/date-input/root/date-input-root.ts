@@ -231,19 +231,6 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
   autocomplete = ''
 
   /**
-   * Whether the field shows a button that empties it, as Input's `clearable`
-   * does. Shown only while the field holds something to clear, and not while
-   * it is disabled or read-only.
-   */
-  @property({ type: Boolean })
-  clearable = false
-
-  /** The accessible name of the clear button, which shows only an icon. */
-  @words
-  @property({ attribute: 'clear-label' })
-  clearLabel = 'Clear'
-
-  /**
    * The calendar the written date, the segments, and the calendar's days are
    * in: `gregory`, `buddhist`, `japanese`, `roc`, or `iso8601`, or a calendar
    * with months of its own that Date Picker's `calendar` names, such as
@@ -267,6 +254,19 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
   @words
   @property({ attribute: 'calendar-label' })
   calendarLabel = 'Date Picker'
+
+  /**
+   * Whether the field shows a button that empties it, as Input's `clearable`
+   * does. Shown only while the field holds something to clear, and not while
+   * it is disabled or read-only.
+   */
+  @property({ type: Boolean })
+  clearable = false
+
+  /** The accessible name of the clear button, which shows only an icon. */
+  @words
+  @property({ attribute: 'clear-label' })
+  clearLabel = 'Clear'
 
   /** Typed, so a keystroke is announced as `input` alone. See `announcesInput`. */
   protected override readonly announcesInput = true

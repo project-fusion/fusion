@@ -593,7 +593,9 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
     inputs[at]?.focus({ focusVisible: false, preventScroll: true } as FocusOptions)
     this.startDrag()
     field.setPointerCapture?.(event.pointerId)
-    const move = (next: PointerEvent): void => this.moveThumb(at, this.valueAt(next, first, inset))
+    const move = (next: PointerEvent): void => {
+      this.moveThumb(at, this.valueAt(next, first, inset))
+    }
     const end = (): void => {
       field.removeEventListener('pointermove', move)
       field.removeEventListener('pointerup', end)
