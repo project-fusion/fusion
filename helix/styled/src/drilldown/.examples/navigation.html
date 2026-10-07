@@ -1,0 +1,33 @@
+<!-- @summary A site's navigation, with pages of links in a landmark. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+/>
+
+<helix-drilldown
+  class="panel"
+  label="Site"
+  navigation
+>
+  <helix-drilldown-item value="docs">
+    Documentation
+    <helix-drilldown-item
+      href="#start"
+      slot="page"
+      value="start"
+    >Getting started</helix-drilldown-item>
+    <helix-drilldown-item
+      href="#theming"
+      slot="page"
+      value="theming"
+    >Theming</helix-drilldown-item>
+  </helix-drilldown-item>
+  <helix-drilldown-item
+    href="#blog"
+    value="blog"
+  >Blog</helix-drilldown-item>
+  <helix-drilldown-item
+    href="#pricing"
+    value="pricing"
+  >Pricing</helix-drilldown-item>
+</helix-drilldown>
