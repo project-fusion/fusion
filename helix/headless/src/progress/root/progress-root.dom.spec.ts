@@ -126,6 +126,15 @@ describe('progress', () => {
     expect([under.fraction, under.internals?.ariaValueNow]).toEqual([0, '12'])
   })
 
+  /* Zero is a value like any other once the range runs below it. Read as
+     "no value", it announced the bottom of the range while the bar drew the
+     middle. */
+  test('a value of zero inside a range that runs below zero is announced as zero', async () => {
+    const bar = await progress('min="-10" max="10" value="0"')
+    expect(bar.fraction).toBe(0.5)
+    expect(bar.internals?.ariaValueNow).toBe('0')
+  })
+
   test('value text is announced beside the number, never instead of it', async () => {
     const bar = await progress('max="8" value="3" value-text="3 of 8 records"')
     expect(bar.internals?.ariaValueText).toBe('3 of 8 records')
