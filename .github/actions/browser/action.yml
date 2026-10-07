@@ -31,7 +31,7 @@
 #
 # **A miss installs from the mirror with a limit and a second try.** apt gives
 # up on a silent connection after 20 seconds and retries, each attempt is
-# capped at three minutes, and the second attempt drops the first mirror from
+# capped at four minutes, and the second attempt drops the first mirror from
 # the runner's list. A miss caches what it fetched only when every package apt
 # installed or upgraded is there as a file, so a hit never installs part of the
 # set.
@@ -100,13 +100,24 @@ runs:
         CONF
         sudo apt-get clean
         dpkg-query -W -f='${binary:Package} ${Version}\n' | sort > "$RUNNER_TEMP/packages-before"
-        if ! timeout 180 bunx playwright install --with-deps --only-shell chromium; then
-          echo "::warning::The first mirror stalled or failed. Trying again without it."
+        # `timeout` stops `bunx`, and `sudo` does not pass a signal from its
+        # own process group on to apt, so apt is stopped here. Until it exits
+        # it holds the dpkg lock, and the second attempt fails on the lock.
+        install() {
+          timeout 240 bunx playwright install --with-deps --only-shell chromium && return 0
+          sudo pkill -x apt-get || true
+          for _ in $(seq 20); do pgrep -x apt-get > /dev/null || break; sleep 1; done
+          sudo pkill -9 -x apt-get || true
           sudo dpkg --configure -a || true
+          return 1
+        }
+        if ! install; then
+          echo "::warning::The first mirror stalled or failed. Trying again without it."
+          cat /etc/apt/apt-mirrors.txt || true
           if [ -f /etc/apt/apt-mirrors.txt ] && [ "$(wc -l < /etc/apt/apt-mirrors.txt)" -gt 1 ]; then
             sudo sed -i 1d /etc/apt/apt-mirrors.txt
           fi
-          timeout 180 bunx playwright install --with-deps --only-shell chromium
+          install
         fi
         dpkg-query -W -f='${binary:Package} ${Version}\n' | sort > "$RUNNER_TEMP/packages-after"
         comm -13 "$RUNNER_TEMP/packages-before" "$RUNNER_TEMP/packages-after" > "$RUNNER_TEMP/packages-changed"
