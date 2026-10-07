@@ -18,6 +18,11 @@ import { awaitRegion, claimBusy, releaseBusy } from '../busy.js'
  * Draws two concentric circles: a track and a moving arc. The track shows the
  * arc as a proportion of a whole, and costs one element.
  *
+ * **For work whose length is known, use `Progress` with `shape="ring"`.** It
+ * draws the same ring filled to the value, says the value as a progress bar
+ * does, and says when the work is complete. A loader claims no proportion, so
+ * it takes no value.
+ *
  * **The center is a slot, empty by default.** Put your logo there once, where
  * your app wraps the loader. When nothing is slotted, nothing extra is
  * rendered.
