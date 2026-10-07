@@ -27,6 +27,7 @@
   font: inherit;
   gap: var(--helix-space-sm);
   padding: var(--helix-space-none);
+  text-decoration: none;
 }
 
 [part="item"]:disabled {

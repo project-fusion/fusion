@@ -133,3 +133,38 @@ describe('a shortcut with nothing slotted', () => {
     expect(drawn(none)).toBe('')
   })
 })
+
+describe('an action with an href', () => {
+  /* Menu's rows take an href the same way: the anchor is the row. */
+  test('is a link carrying the menuitem role, and choosing it still says so', async () => {
+    const host = (await mount(
+      '<helix-headless-speed-dial-item href="/new" target="_blank" rel="noopener" value="new">New page</helix-headless-speed-dial-item>',
+    )) as HTMLElement & { updateComplete: Promise<unknown> }
+    await host.updateComplete
+    const item = host.shadowRoot?.querySelector('[part="item"]') as HTMLElement
+    expect(item.localName).toBe('a')
+    expect(item.getAttribute('role')).toBe('menuitem')
+    expect(item.getAttribute('href')).toBe('/new')
+    expect(item.getAttribute('target')).toBe('_blank')
+    expect(item.getAttribute('rel')).toBe('noopener')
+    expect(item.getAttribute('tabindex')).toBe('-1')
+    const chosen: string[] = []
+    host.addEventListener('helix-select', (event) => {
+      chosen.push((event as CustomEvent<{ value: string }>).detail.value)
+      event.preventDefault()
+    })
+    item.addEventListener('click', (event) => event.preventDefault())
+    item.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: ' ' }))
+    expect(chosen).toEqual(['new'])
+  })
+
+  test('draws no link while disabled', async () => {
+    const host = (await mount(
+      '<helix-headless-speed-dial-item href="/new" disabled>New page</helix-headless-speed-dial-item>',
+    )) as HTMLElement & { updateComplete: Promise<unknown> }
+    await host.updateComplete
+    const item = host.shadowRoot?.querySelector('[part="item"]') as HTMLElement
+    expect(item.localName).toBe('button')
+    expect(item.hasAttribute('href')).toBe(false)
+  })
+})
