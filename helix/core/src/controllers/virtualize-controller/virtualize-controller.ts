@@ -338,7 +338,11 @@ export class VirtualizeController implements ReactiveController {
      browser scroll without waiting to find out. */
   private readonly handleScroll = (): void => {
     // A reader moved, which is the one input this exists to answer.
-    const top = this.options.container()?.scrollTop ?? 0
+    const box = this.options.container()
+    if (box) {
+      this.noteClamp(box)
+    }
+    const top = box?.scrollTop ?? 0
     if (top !== this.lastTop) {
       this.heading = top > this.lastTop ? 1 : -1
       this.lastTop = top
@@ -376,6 +380,31 @@ export class VirtualizeController implements ReactiveController {
       this.resting !== undefined ||
       (this.options.container()?.scrollTop ?? this.lastTop) !== this.lastTop
     )
+  }
+
+  /**
+   * Takes the offset as the box's own where the box moved it up only because
+   * the set below it got shorter, which the browser does to keep the offset
+   * inside the content, and answers where it was before.
+   *
+   * **Not a reader scrolling.** Rows at the end of the set measured shorter
+   * than their estimates shrink the content, and the box pulls its offset back
+   * to the new bottom before any `scroll` event arrives. Read as a scroll, the
+   * difference went into the spacer as drift and was then paid a second time:
+   * in Chromium, End on 2,000 rows of one to five lines left the window 292
+   * pixels above the last item, which stayed drawn below the box as the row
+   * holding focus.
+   */
+  private noteClamp(box: HTMLElement): number {
+    const was = this.lastTop
+    if (
+      !this.touching &&
+      box.scrollTop < was &&
+      box.scrollTop >= box.scrollHeight - box.clientHeight - 1
+    ) {
+      this.lastTop = box.scrollTop
+    }
+    return was
   }
 
   /** Squares the spacer and the scroll offset once the box is still. */
@@ -759,6 +788,7 @@ export class VirtualizeController implements ReactiveController {
     }
     const total = Math.max(0, this.options.count())
     const box = this.options.container()
+    const from = box ? this.noteClamp(box) : this.lastTop
     const top = box ? this.offset(box) : 0
     const anchor = this.target ?? this.heights.indexAt(top, total)
     const was = this.heights.before(anchor, total)
@@ -779,7 +809,9 @@ export class VirtualizeController implements ReactiveController {
       if (this.scrolling()) {
         this.drift -= moved
       } else {
-        box.scrollTop += moved
+        /* From where the box was, which a clamp to a shorter set has already
+           moved by part of the same difference. */
+        box.scrollTop = from + moved
         this.lastTop = box.scrollTop
       }
     }

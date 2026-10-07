@@ -468,6 +468,16 @@ export class HelixHeadlessVirtualList extends HelixElement {
       this.readFor = this.for
       this.read()
     }
+    /* **The rows go in with the spacers that make room for them.** Placed only
+       in `updated`, the render had already given the spacers the new window
+       while the rows were the old one, and the controller measured that in
+       between: at the end of a measured list the content came out 160 pixels
+       short, the box pulled its offset up to match, and End left the last item
+       below the box. The first render has no box yet, so it places in
+       `updated` alone. */
+    if (this.hasUpdated) {
+      this.place()
+    }
   }
 
   override connectedCallback(): void {
@@ -909,6 +919,9 @@ export class HelixHeadlessVirtualList extends HelixElement {
     }
     const count = this.data.length
     const { first, last } = this.itemsOn(this.virtualize.window)
+    /* The row holding focus, so focus can go on to a neighbor if its item has
+       left the set. */
+    const holding = this.focusedIndex()
     /* A child given a slot of its own, such as `loading`, is the consumer's. */
     const children = [...this.children].filter(
       (child): child is HTMLElement =>
@@ -975,6 +988,20 @@ export class HelixHeadlessVirtualList extends HelixElement {
       }
     }
     this.released = this.active
+    /* **Focus is never left on the page.** The focused item left the set,
+       which takes its row with it, and focus went to `<body>`, where the arrow
+       keys do nothing. It goes to the item now in its place, or to the last
+       item when the set ends before it. A task later, once this update is
+       done, since moving focus may draw a row. */
+    if (holding !== undefined && plan.remove.has(holding) && count > 0) {
+      const next = Math.min(holding, count - 1)
+      this.active = next
+      setTimeout(() => {
+        if (this.focusedIndex() === undefined && this.isConnected) {
+          void this.focusIndex(next)
+        }
+      }, 0)
+    }
   }
 
   protected override render(): TemplateResult {

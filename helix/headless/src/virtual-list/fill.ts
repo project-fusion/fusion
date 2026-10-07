@@ -40,9 +40,14 @@ const writeAttribute = (element: Element, name: string, value: unknown): void =>
   element.setAttribute(name, value === true ? '' : textOf(value))
 }
 
-/** Fills one element's holes, its own and those below it, from an item. */
+/**
+ * Fills one element's holes, its own and those below it, from an item.
+ *
+ * The element itself whatever hole it carries, so a row whose root is a link
+ * takes its `data-field-href` as readily as its text.
+ */
 export const fillHoles = (root: Element, item: unknown): void => {
-  const holes = [...(root.matches('[data-field]') ? [root] : []), ...root.querySelectorAll('*')]
+  const holes = [root, ...root.querySelectorAll('*')]
   for (const hole of holes) {
     for (const { name, value } of [...hole.attributes]) {
       if (name === 'data-field') {
