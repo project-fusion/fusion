@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, registerDom, role, slotted } from '@fusion.dev/helix-testing/dom'
+import { hasState, mount, part, registerDom, role, slotted } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -306,5 +306,27 @@ describe('a button group with selection-mode', () => {
     await flush(group)
     expect(role(group)).toBe('group')
     expect(buttonsOf(group).map((button) => button.focusable)).toEqual([true, true, true])
+  })
+})
+
+describe('what a sheet can reach on the group', () => {
+  test('the buttons sit in a part that draws no box of its own', async () => {
+    const group = await mount(markup)
+    expect(part(group, 'buttons')?.localName).toBe('slot')
+  })
+
+  test('a group with a button pressed says so through a state', async () => {
+    const group =
+      (await mount(`<helix-headless-button-group label="Format" selection-mode="multiple">
+      <helix-headless-button value="bold">Bold</helix-headless-button>
+      <helix-headless-button value="italic">Italic</helix-headless-button>
+    </helix-headless-button-group>`)) as HTMLElement & {
+        updateComplete: Promise<unknown>
+        value: string
+      }
+    expect(hasState(group, 'pressed')).toBe(false)
+    group.value = 'bold'
+    await group.updateComplete
+    expect(hasState(group, 'pressed')).toBe(true)
   })
 })
