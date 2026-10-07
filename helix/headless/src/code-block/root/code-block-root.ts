@@ -148,10 +148,10 @@ const nameOf = (block: Element): string => {
  * @slot copy-icon - The copy button's icon before a copy. Defaults to a clipboard.
  *
  * @event {Event} change - A file tab showed its file, whose name `file` now holds.
- * @event {HelixCopyEvent} helix-copy - The copy button put the code on the clipboard, with the text in `detail.value`.
- * @event {HelixCopyErrorEvent} helix-copy-error - A press on the copy button put nothing on the clipboard: the browser did not allow the write, or there was no code.
  * @event {HelixBeforeChangeEvent} helix-before-change - A file tab is about to show its file, with the file's name in `detail.value`. Cancelable: cancel it to keep the file shown.
  * @event {HelixBeforeToggleEvent} helix-before-toggle - The wrap button was pressed, with the `wrap` it asks for in `detail.checked`. Cancelable: cancel it to keep the lines as they are.
+ * @event {HelixCopyEvent} helix-copy - The copy button put the code on the clipboard, with the text in `detail.value`.
+ * @event {HelixCopyErrorEvent} helix-copy-error - A press on the copy button put nothing on the clipboard: the browser did not allow the write, or there was no code.
  * @event {HelixToggleEvent} helix-toggle - Fired after the wrap button changed `wrap`, with the new value in `detail.checked`.
  *
  * @csspart actions - The box in the header that holds the `actions` slot, drawn while something is slotted there.

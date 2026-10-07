@@ -71,8 +71,7 @@ const fileOf = (pane: Element): string => {
  * alone.
  *
  * The preview runs an edit once typing has rested for `preview-delay`, 300
- * milliseconds by default, so it reloads once for a word rather than once for
- * each letter. A pane's text when the sandbox starts reaches it at once.
+ * milliseconds by default, so a word typed reloads it once. A pane's text when the sandbox starts reaches it at once.
  *
  * The event carries the pane's `name`, so one sandbox can hold several panes.
  * `html` sets the preview's markup, `css` sets its stylesheet, and `js` sets
@@ -271,9 +270,9 @@ export class HelixSandbox extends HelixElement {
 
   /**
    * How long typing rests before the preview runs the new source, in
-   * milliseconds, as Sandpack's `recompileDelay` does: the preview reloads its
-   * frame on each run, so it runs once for a word rather than once for each
-   * letter. `0` runs it on every edit.
+   * milliseconds, as Sandpack's `recompileDelay` does. The preview reloads its
+   * frame on each run, so a word typed runs it once. `0` runs it on every
+   * edit.
    */
   @property({ attribute: 'preview-delay', type: Number })
   previewDelay = 300
