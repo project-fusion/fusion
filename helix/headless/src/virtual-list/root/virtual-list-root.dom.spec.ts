@@ -1002,6 +1002,41 @@ describe('choosing items', () => {
   })
 })
 
+describe('a gap', () => {
+  test('spaces the rows, and the columns of a grid, from the slot', async () => {
+    const host = await fed(named(20))
+    host.gap = 8
+    await settle(host)
+    const slot = host.shadowRoot?.querySelector('slot:not([name])') as HTMLElement
+    expect(slot.getAttribute('style')).toContain('row-gap: 8px')
+    host.columns = 3
+    await settle(host)
+    expect(slot.getAttribute('style')).toContain('gap: 8px')
+  })
+
+  /* The list counts the gap in each row's place, so the rows do not walk away
+     from the scroll position, and End reaches the last row. */
+  inBrowser('places each row a gap from the last, and End shows the last row', async () => {
+    const host = await fed(named(1000))
+    host.gap = 12
+    await settle(host)
+    const top = (at: number) =>
+      (host.querySelector(`[data-index="${at}"]`) as HTMLElement).getBoundingClientRect().top
+    expect(Math.round(top(1) - top(0))).toBe(32 + 12)
+    ;(host.querySelector('[data-index="0"]') as HTMLElement).focus()
+    ;(document.activeElement as HTMLElement).dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'End' }),
+    )
+    await new Promise((resolve) => setTimeout(resolve, 300))
+    await settle(host)
+    const row = document.activeElement as HTMLElement
+    const box = (part(host, 'viewport') as HTMLElement).getBoundingClientRect()
+    expect(row.dataset.index).toBe('999')
+    expect(row.getBoundingClientRect().bottom).toBeLessThanOrEqual(box.bottom + 1)
+    expect(row.getBoundingClientRect().top).toBeGreaterThanOrEqual(box.top - 1)
+  })
+})
+
 describe('a grid', () => {
   const press = async (host: Updatable, key: string, init: KeyboardEventInit = {}) => {
     ;(document.activeElement as HTMLElement).dispatchEvent(

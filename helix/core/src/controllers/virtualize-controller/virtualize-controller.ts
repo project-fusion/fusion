@@ -12,6 +12,12 @@ export interface VirtualizeOptions {
   /** How tall one item is along the scroll axis, in pixels. */
   estimate: () => number
   /**
+   * The space between two items along the scroll axis, in pixels, which the
+   * host draws, such as a flex or grid `gap`. Each item counts it as part of
+   * its own size. Zero by default.
+   */
+  gap?: () => number
+  /**
    * Rows kept either side of what fits, so a scroll reveals something drawn
    * rather than something blank. Four by default.
    *
@@ -550,7 +556,12 @@ export class VirtualizeController implements ReactiveController {
    */
   private line(): number {
     const estimate = Math.max(1, this.options.estimate())
-    return this.sample?.estimate === estimate ? this.sample.size : estimate
+    return this.sample?.estimate === estimate ? this.sample.size : estimate + this.gap()
+  }
+
+  /** The space the host draws between two items, which each item counts. */
+  private gap(): number {
+    return Math.max(0, this.options.gap?.() ?? 0)
   }
 
   /**
@@ -577,7 +588,8 @@ export class VirtualizeController implements ReactiveController {
     const uneven = Math.max(...seen) - Math.min(...seen) > 1
     if (this.sample?.estimate !== estimate) {
       const was = this.line()
-      const size = Math.max(1, seen.reduce((sum, height) => sum + height, 0) / seen.length)
+      const size =
+        Math.max(1, seen.reduce((sum, height) => sum + height, 0) / seen.length) + this.gap()
       this.sample = { estimate, size }
       if (Math.abs(size - was) >= 0.5) {
         const box = this.options.container()
@@ -794,7 +806,7 @@ export class VirtualizeController implements ReactiveController {
     const was = this.heights.before(anchor, total)
     let news = false
     for (const { element, index } of rows) {
-      if (this.heights.record(index, element.getBoundingClientRect().height)) {
+      if (this.heights.record(index, element.getBoundingClientRect().height + this.gap())) {
         news = true
       }
     }
