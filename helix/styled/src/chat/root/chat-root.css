@@ -175,6 +175,59 @@
   box-shadow: var(--chat-resume-shadow, var(--helix-shadow-floating));
 }
 
+/* The way back where nothing was slotted: the solid button the examples slot,
+   drawn by this sheet because a fallback is not slotted and `::slotted()`
+   never reaches it. The same edge and lift as a slotted control. */
+[part="resume-button"] {
+  all: unset;
+  box-sizing: border-box;
+
+  align-items: center;
+  background-color: var(--helix-color-foreground);
+  block-size: var(--helix-size-control);
+  border: var(--chat-resume-border-width, var(--helix-border-floating)) solid
+    var(--chat-resume-border-color, var(--helix-color-border));
+  border-radius: var(--helix-radii-sm);
+  box-shadow: var(--chat-resume-shadow, var(--helix-shadow-floating));
+  color: var(--helix-color-background);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-control);
+  font-weight: var(--helix-weight-medium);
+  gap: var(--helix-space-xs);
+  line-height: var(--helix-leading-tight);
+  padding-inline: var(--helix-space-control);
+  pointer-events: auto;
+  white-space: nowrap;
+}
+
+/* Softened toward the page, as a solid neutral button is: the ink is already
+   the darkest there is. */
+[part="resume-button"]:hover {
+  background-color: color-mix(
+    in oklab,
+    var(--helix-color-foreground) 86%,
+    var(--helix-color-background)
+  );
+}
+
+[part="resume-button"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+[part="resume-mark"] {
+  block-size: var(--helix-size-icon-sm);
+  display: inline-flex;
+  inline-size: var(--helix-size-icon-sm);
+}
+
+[part="resume-mark"] svg {
+  block-size: 100%;
+  inline-size: 100%;
+}
+
 /* The status band sits between the transcript and the composer, and needs block
    padding of its own or "somebody is typing" jams against the composer's rule:
    measured without it, 18 pixels tall against a 65 pixel composer, reading as a
