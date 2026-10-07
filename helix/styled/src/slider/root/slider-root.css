@@ -684,9 +684,14 @@
   z-index: var(--helix-layer-overlay);
 }
 
+/* The box paints the thumb's own color over the native thumb, at its size and
+   radius, so the content reads against a ground a contrast check can see: the
+   native thumb is a pseudo-element no tool measures. */
 [part="thumb"] {
   align-items: center;
+  background-color: var(--slider-thumb-color, var(--helix-color-surface-inverse));
   block-size: var(--_slider-thumb);
+  border-radius: var(--_slider-thumb-radii);
   color: var(--slider-thumb-content-color, var(--helix-color-foreground-inverse));
   display: flex;
   font-size: var(--helix-text-xs);
@@ -700,10 +705,6 @@
 
 :host(:dir(rtl)) [part="thumb"] {
   translate: 50% -50%;
-}
-
-:host(:disabled) [part="thumb"] {
-  opacity: 0.5;
 }
 
 :host([orientation="vertical"]) [part="field"][data-thumbs] {

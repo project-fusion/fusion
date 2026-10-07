@@ -546,37 +546,33 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
   @state()
   private swatchAt: number | undefined
 
-  /** The `label` and `hint` slots that have content. */
-  @state()
-  private slotted = new Set<string>()
+  /**
+   * The children in a slot, read off the children rather than heard from
+   * `slotchange`: a declarative shadow root fires that before anything
+   * listens, so a served picker kept its label hidden.
+   */
+  private slottedIn(name: 'hint' | 'label'): Element[] {
+    return this.knownChildren.filter((child) => child.slot === name)
+  }
 
-  private readonly handleNamingSlot = (event: Event): void => {
-    const slot = event.target as HTMLSlotElement
-    const filled = slot.assignedNodes().some((node) => (node.textContent ?? '').trim() !== '')
-    if (filled !== this.slotted.has(slot.name)) {
-      const next = new Set(this.slotted)
-      next[filled ? 'add' : 'delete'](slot.name)
-      this.slotted = next
-    }
+  private readonly handleNamingSlot = (): void => {
+    this.requestUpdate()
   }
 
   /** The picker's own name, from `label` or the `label` slot's words. */
   private get named(): string {
     return (
       this.label ||
-      (this.slotted.has('label')
-        ? [...this.children]
-            .filter((child) => child.slot === 'label')
-            .map((child) => child.textContent ?? '')
-            .join(' ')
-            .trim()
-        : '')
+      this.slottedIn('label')
+        .map((child) => child.textContent ?? '')
+        .join(' ')
+        .trim()
     )
   }
 
   /** Whether help is shown under the picker. */
   private get hinted(): boolean {
-    return this.hint !== '' || this.slotted.has('hint')
+    return this.hint !== '' || this.slottedIn('hint').length > 0
   }
 
   /** The ids a control in the picker is described by: the help, then the message. */
@@ -867,8 +863,10 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
     if (event.type === 'pointerdown') {
       this.dragging = true
       capturePointer(grid, event.pointerId)
-      // So the keyboard carries on from where the pointer left off.
-      this.partNamed('grid-saturation')?.focus()
+      /* So the keyboard carries on from where the pointer left off. Without
+         scrolling: the square is under the pointer already, and a scroll
+         here moved it under a press that was read against where it had been. */
+      this.partNamed('grid-saturation')?.focus({ preventScroll: true })
     } else if (!grid.hasPointerCapture(event.pointerId)) {
       return
     }
@@ -900,7 +898,7 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
     }
     if (event.type === 'pointerdown') {
       capturePointer(wheel, event.pointerId)
-      this.partNamed('wheel-hue')?.focus()
+      this.partNamed('wheel-hue')?.focus({ preventScroll: true })
     } else if (!wheel.hasPointerCapture(event.pointerId)) {
       return
     }
