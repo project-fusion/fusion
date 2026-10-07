@@ -6,4 +6,4 @@
  * release, so the two never disagree; a spec beside this holds them to it.
  * Nothing else in the running code knows which release it is.
  */
-export const VERSION = '0.151.0'
+export const VERSION = '0.152.0'
