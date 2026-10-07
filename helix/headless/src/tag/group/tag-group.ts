@@ -37,7 +37,10 @@ export type TagSelectionMode = SelectionMode
  * focus moves to the next tag, or the previous one after the last.
  *
  * `selection-mode` lets a reader select tags, with Space, Enter or a press:
- * `single` selects one at a time and `multiple` any number. `value` holds the
+ * `single` selects one at a time and `multiple` any number. In `multiple`,
+ * Shift with an arrow, Home or End selects the range from the tag last
+ * pressed to the tag focus moves to, and Control or Command with A selects
+ * every tag that is not disabled. `value` holds the
  * selected tags' values, separated by commas, and a change asks with
  * `helix-before-change` and tells with `change`. Enter on a tag with an
  * `href` follows its link. A `disabled` tag is passed over. A selected tag
@@ -112,6 +115,13 @@ export class HelixHeadlessTagGroup extends HelixElement {
 
   /** The tag the reader was last on, which keeps the tab stop. */
   private last: HelixHeadlessTag | undefined
+
+  /**
+   * Where a range chosen with Shift and an arrow starts, and where it reached,
+   * in `multiple`: the tag last pressed or moved to without Shift.
+   */
+  private anchor: HelixHeadlessTag | undefined
+  private reached: HelixHeadlessTag | undefined
 
   /**
    * The arrow keys, Home, End and typed letters, moving focus and choosing
@@ -225,14 +235,75 @@ export class HelixHeadlessTagGroup extends HelixElement {
     if (mode === 'none' || tag.disabled) {
       return
     }
+    this.anchor = tag
+    this.reached = tag
     requestValue(this, pressedValue(mode, this.written, this.valueFor(tag)), (value) => {
+      this.value = value
+    })
+  }
+
+  /** The reachable tags from one to the other, either way round. */
+  private span(from: HelixHeadlessTag, to: HelixHeadlessTag): HelixHeadlessTag[] {
+    const tags = this.reachable
+    const [start, end] = [tags.indexOf(from), tags.indexOf(to)].sort((a, b) => a - b)
+    return start === undefined || end === undefined || start < 0 ? [] : tags.slice(start, end + 1)
+  }
+
+  /**
+   * Shift and an arrow, Home or End, in `multiple`: the range from the anchor
+   * to the tag focus moved to is selected, in place of the range the last such
+   * key selected, as React Aria's selection extends.
+   */
+  private extend(from: HelixHeadlessTag, to: HelixHeadlessTag): void {
+    const anchor = this.anchor?.isConnected ? this.anchor : from
+    const before = new Set(this.span(anchor, this.reached?.isConnected ? this.reached : from))
+    const after = this.span(anchor, to)
+    this.anchor = anchor
+    this.reached = to
+    const kept = this.tags.filter(
+      (tag) => commaList(this.written).includes(this.valueFor(tag)) && !before.has(tag),
+    )
+    const chosen = [...new Set([...kept, ...after])]
+    this.choose(this.tags.filter((tag) => chosen.includes(tag)))
+  }
+
+  /** Asks for `value` to hold these tags' values, in their order. */
+  private choose(tags: readonly HelixHeadlessTag[]): void {
+    const next = [...new Set(tags.map((tag) => this.valueFor(tag)))].join(', ')
+    if (next === this.written) {
+      return
+    }
+    requestValue(this, next, (value) => {
       this.value = value
     })
   }
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {
     const tag = this.tagOf(event)
-    if (!tag || tag.disabled || event.altKey || event.ctrlKey || event.metaKey) {
+    if (!tag || tag.disabled || event.altKey) {
+      return
+    }
+    const multiple = this.selectionMode === 'multiple'
+    /* Control or Command with A selects every tag that can be, in `multiple`. */
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'a') {
+      if (multiple) {
+        event.preventDefault()
+        this.choose(this.reachable)
+      }
+      return
+    }
+    if (event.ctrlKey || event.metaKey) {
+      return
+    }
+    /* The keyboard controller, listening first, has already moved focus. */
+    if (MOVES.has(event.key)) {
+      const to = this.last
+      if (multiple && event.shiftKey && to && to !== tag) {
+        this.extend(tag, to)
+      } else if (!event.shiftKey) {
+        this.anchor = to
+        this.reached = to
+      }
       return
     }
     if (event.key === 'Delete' || event.key === 'Backspace') {
@@ -379,6 +450,9 @@ export class HelixHeadlessTagGroup extends HelixElement {
     return html`<slot @slotchange=${this.handleSlotchange}></slot>${empty}`
   }
 }
+
+/** The keys that move focus between tags, which Shift turns into a range. */
+const MOVES = new Set(['ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'End', 'Home'])
 
 declare global {
   interface HTMLElementTagNameMap {
