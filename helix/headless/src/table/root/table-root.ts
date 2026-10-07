@@ -1,5 +1,6 @@
 import {
   AriaForwardController,
+  anchorAt,
   assignSlots,
   commaList,
   customElement,
@@ -20,6 +21,7 @@ import {
   onAndroid,
   parse,
   ReorderController,
+  rangeAdd,
   reflectElements,
   requestChange,
   sort,
@@ -203,7 +205,7 @@ const NAMED = new Set([...STATUS, 'heading'])
  * through cell by cell, the headings included, as React Aria's table is. The
  * table is then a `grid` and each value a `gridcell`, and the table gives
  * every cell a `tabindex` so focus can rest on it: set `grid` only where the
- * cells may carry one. For typeahead and range selection, use `DataTable`.
+ * cells may carry one.
  *
  * | Key | What it does |
  * |---|---|
@@ -217,7 +219,10 @@ const NAMED = new Set([...STATUS, 'heading'])
  * | Enter, Space on a sortable heading | Sorts by the column. |
  * | Space on a row, Enter or Space on its checkbox cell | Selects the row, in a `selectable` table. |
  * | Enter or Space on a grip cell | Picks the row up, or drops it, in a `reorderable` table. Up, Down, Home, and End move a row picked up, and Escape puts it back. |
+ * | Shift with Down or Up | Selects the rows it moves across, in a `selectable` table. |
+ * | Shift with Space | Selects every row from the one last chosen, in a `selectable` table. |
  * | Control or Command with A | Selects every row, in a `selectable` table. |
+ * | A letter or a word | Moves to the next row whose first cell starts with what you typed. |
  * | Tab | Leaves the table. |
  *
  * The CSS custom properties listed for this component are written by it and
@@ -539,7 +544,9 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     on: () => this.grid,
     part: (name) => this.partNamed(name),
     rows: () => (this.childrenKnown ? this.arrangedRows : []),
+    rowWords: () => this.arrangedRows.map((row) => textOf(row.children[0])),
     selectAll: () => this.selectable && this.requestSelected(new Set(this.everyKey)),
+    selectRange: (to, from) => this.selectRange(to, from),
   })
 
   /**
@@ -768,8 +775,33 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     this.requestSelected(new Set(toggleEvery(this.chosen, this.everyKey)))
   }
 
-  /** One row's checkbox, ticked or not. */
+  /** The key of the row a Shift range runs from: the one last chosen. */
+  private anchorKey: string | undefined = undefined
+
+  /**
+   * Selects every row from the one last chosen to the drawn row `to`, keeping
+   * what was already selected. With no row to run from, the range is the row
+   * the reader is on, `from`, and it becomes the one to run from. Says whether
+   * the table selects at all.
+   */
+  private selectRange(to: number, from: number): boolean {
+    if (!this.selectable) {
+      return false
+    }
+    const keyOf = new Map(this.keyed.map(({ key, row }) => [row as Element, key]))
+    const keys = this.arrangedRows.map((row) => keyOf.get(row) ?? '')
+    const { anchor, anchorKey } = anchorAt(keys, this.anchorKey, from)
+    this.anchorKey = anchorKey
+    const next = rangeAdd([...this.chosen], keys, anchor, to)
+    if (next) {
+      this.requestSelected(new Set(next))
+    }
+    return true
+  }
+
+  /** One row's checkbox, ticked or not. It becomes the row a range runs from. */
   private chooseRow(key: string, on: boolean): void {
+    this.anchorKey = key
     const keys = this.chosen
     if (on) {
       keys.add(key)
