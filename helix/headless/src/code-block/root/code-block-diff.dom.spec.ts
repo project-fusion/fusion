@@ -41,6 +41,18 @@ describe('a code block reading a diff', () => {
     expect(parts(host, 'context')).toHaveLength(2)
   })
 
+  test('marks the words a changed line changed, inside its text', async () => {
+    const host = await block(
+      'diff',
+      '--- a/a.ts\n+++ b/a.ts\n@@ -1,1 +1,1 @@\n-const size = 10\n+const size = 12\n',
+    )
+    expect(parts(host, 'changed').map((word) => word.textContent)).toEqual(['10', '12'])
+    expect(parts(host, 'text').map((text) => text.textContent)).toEqual([
+      'const size = 10\n',
+      'const size = 12\n',
+    ])
+  })
+
   test('says what happened in text as well, so it is not carried by color', async () => {
     const host = await block()
     expect(parts(host, 'marker').map((marker) => marker.textContent)).toEqual([' ', '-', '+', ' '])

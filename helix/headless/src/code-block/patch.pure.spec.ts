@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { type DiffLine, pairLines, parsePatch } from './patch.js'
+import { changedWords, type DiffLine, pairLines, parsePatch } from './patch.js'
 
 /* What a unified diff says, read back as the lines a reader sees. Every patch
    here is the shape a real tool writes: `git diff`, `diff -u`, a code host's
@@ -113,5 +113,39 @@ describe('pairing lines side by side', () => {
       ['x', 'y'],
       [undefined, 'z'],
     ])
+  })
+})
+
+/* A changed line was one wash from end to end, so `timeout: 1000` replaced by
+   `timeout: 5000` left the reader to find the one number that moved. */
+describe('the words a changed line changed', () => {
+  const marked = (pieces: { changed: boolean; text: string }[] | undefined): string[] =>
+    (pieces ?? []).filter((piece) => piece.changed).map((piece) => piece.text)
+
+  test('are the ones the line opposite does not have', () => {
+    const [before, after] = changedWords('  timeout: 1000,', '  timeout: 5000,') ?? []
+    expect(marked(before)).toEqual(['1000'])
+    expect(marked(after)).toEqual(['5000'])
+    expect(before?.map((piece) => piece.text).join('')).toBe('  timeout: 1000,')
+  })
+
+  test('take the space between two changed words with them, as one run', () => {
+    const [before, after] = changedWords('let a b = 1', 'let c d = 1') ?? []
+    expect(marked(before)).toEqual(['a b'])
+    expect(marked(after)).toEqual(['c d'])
+  })
+
+  test('are nothing where the two lines share no word, which the line already says', () => {
+    expect(changedWords('alpha', 'beta')).toBeUndefined()
+  })
+
+  test('are read for each removed line and the added line paired with it', () => {
+    const lines = parsePatch(GIT)[0]?.hunks[0]?.lines ?? []
+    const removed = lines.find((line) => line.kind === 'removed')
+    const [replacing, extra] = lines.filter((line) => line.kind === 'added')
+    expect(marked(removed?.pieces)).toEqual(['1000'])
+    expect(marked(replacing?.pieces)).toEqual(['5000'])
+    expect(extra?.pieces).toBeUndefined()
+    expect(lines.find((line) => line.kind === 'context')?.pieces).toBeUndefined()
   })
 })

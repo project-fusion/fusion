@@ -424,6 +424,26 @@
   );
 }
 
+/* The words that changed within a line: the line's own tone, deeper, so the
+   eye goes to them first and the line still reads as one wash. */
+[part="added"] [part="changed"] {
+  background-color: color-mix(
+    in srgb,
+    var(--code-block-added-color, var(--helix-color-success)) 32%,
+    var(--code-block-background-color, var(--helix-color-background))
+  );
+  border-radius: var(--helix-radii-sm);
+}
+
+[part="removed"] [part="changed"] {
+  background-color: color-mix(
+    in srgb,
+    var(--code-block-removed-color, var(--helix-color-danger)) 32%,
+    var(--code-block-background-color, var(--helix-color-background))
+  );
+  border-radius: var(--helix-radii-sm);
+}
+
 [part="marker"] {
   padding-inline-end: var(--helix-space-xs);
   user-select: none;
@@ -490,6 +510,7 @@
 
   [part="added"],
   [part="removed"],
+  [part="changed"],
   [part="hunk"],
   [part="filler"] {
     print-color-adjust: exact;
