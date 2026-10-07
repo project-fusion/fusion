@@ -154,6 +154,14 @@ describe('the warning', () => {
     expect(await warned(() => auditName(host, () => control, ''))).toHaveLength(1)
   })
 
+  /* A menu row whose page closed before the read draws no row, and was
+     reported for a name it has. */
+  test('a control not drawn at the read is read again when it next asks', async () => {
+    const { control, host } = button('<span></span>', '')
+    expect(await warned(() => auditName(host, () => undefined, ''))).toEqual([])
+    expect(await warned(() => auditName(host, () => control, ''))).toHaveLength(1)
+  })
+
   test('a host taken out before the read is not reported', async () => {
     const { control, host } = button('<span></span>', '')
     expect(
