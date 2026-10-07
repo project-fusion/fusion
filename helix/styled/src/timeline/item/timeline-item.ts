@@ -16,9 +16,13 @@ import { styles } from './timeline-item.css.js'
  * @aliases Activity item, History entry, Event
  * @documentation https://fusion.dev/helix/components/timeline
  *
+ * @cssproperty --timeline-column-gap - Space between the rail and the time and what happened.
+ * @cssproperty --timeline-marker-color - The color of the mark on an entry with no `tone`. A `tone` colors the mark itself.
  * @cssproperty --timeline-marker-radius - How round the mark is. Zero is a square, and half its size is a disc.
  * @cssproperty --timeline-marker-size - Edge length of the mark.
+ * @cssproperty --timeline-rail-color - The color of the line.
  * @cssproperty --timeline-rail-size - Width of the line.
+ * @cssproperty --timeline-time-color - The color of the time.
  */
 @customElement('helix-timeline-item')
 export class HelixTimelineItem extends HelixHeadlessTimelineItem {

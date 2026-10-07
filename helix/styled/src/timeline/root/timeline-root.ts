@@ -24,6 +24,10 @@ import { styles } from './timeline-root.css.js'
  *   side by side in the order they are read, and the time over what happened
  *   under each mark. Use it for a few entries, since they share the width.
  *
+ * An entry's custom properties, such as `--timeline-rail-color` and
+ * `--timeline-marker-size`, inherit, so setting them on the timeline changes
+ * every entry in it.
+ *
  * @since 0.1.0
  * @status stable
  * @category data
