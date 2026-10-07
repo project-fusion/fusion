@@ -69,19 +69,24 @@ describe("the progress bar's hooks", () => {
 })
 
 /* Words on the bar, measured in Chromium: the track grows from 8px to 14px for
-   `text-xs`, and the words read in the on-primary ink over the fill and the
-   page's ink over the track, split where the fill ends. */
+   `text-xs`, a bar with none keeps 8px, and the words read in the on-primary
+   ink over the fill and the page's ink over the track, split where the fill
+   ends. No rule asks the `content` state, which a server cannot set, so the
+   served bar is the hydrated one. */
 describe('words on the bar', () => {
-  test('make room only while there are any, and paint over the fill', () => {
-    expect(rule('[part="content"]')).toContain('display: none')
-    expect(rule(':host(:state(content)) [part="track"]')).toContain('display: grid')
-    const words = rule(':host(:state(content)) [part="content"]')
+  test('make room in a grid one cell deep, and paint over the fill', () => {
+    expect(rule('[part="track"]')).toContain(
+      'min-block-size: var(--progress-size, var(--helix-size-progress))',
+    )
+    expect(sheet()).toContain('[part="track"] > * {')
+    expect(sheet()).not.toContain(':state(content)')
+    const words = rule('[part="content"]')
     expect(words).toContain('position: relative')
     expect(words).toContain('background-clip: text')
   })
 
   test('are split in two colors at the fill, each with a hook', () => {
-    const words = rule(':host(:state(content)) [part="content"]')
+    const words = rule('[part="content"]')
     expect(words).toContain(
       'var(--progress-content-fill-color, var(--helix-color-foreground-on-primary))',
     )
