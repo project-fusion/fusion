@@ -560,6 +560,9 @@ describe('a palette with pages', () => {
     await settle(host)
     expect(back.defaultPrevented).toBe(true)
     expect(host.page).toBe('')
+    /* Renaming the list says nothing, so the page is said by its name. */
+    await new Promise((done) => requestAnimationFrame(done))
+    expect(host.shadowRoot?.querySelector('[part="live"]')?.textContent).toBe('Commands')
     host.page = 'theme'
     await settle(host)
     host.open = false
