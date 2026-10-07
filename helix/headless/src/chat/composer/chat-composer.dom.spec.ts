@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { formValue, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { formValue, hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 /* The composer, which is one field and one rule about Enter. */
 
@@ -10,6 +10,7 @@ beforeAll(async () => {
 
 interface Composer extends HTMLElement {
   disabled: boolean
+  setCustomValidity?: (message: string) => void
   form: HTMLFormElement | null
   formResetCallback: () => void
   formStateRestoreCallback: (state: string | null) => void
@@ -285,6 +286,69 @@ describe('in a form', () => {
     expect(element.value).toBe('Kept')
     element.formStateRestoreCallback(null)
     expect(element.value).toBe('Hello')
+  })
+})
+
+/* The composer took a value and none of a field's constraints, so a form
+   could not require a message or bound its length. */
+describe('constraints', () => {
+  type Checked = Composer & { checkValidity: () => boolean; validity: ValidityState }
+
+  test('a required composer is invalid while empty, and says so only once tried', async () => {
+    const element = (await composer('required')) as Checked
+    const field = part(element, 'field') as HTMLTextAreaElement
+    expect(field.required).toBe(true)
+    expect(element.validity.valueMissing).toBe(true)
+    expect(hasState(element, 'invalid')).toBe(false)
+    expect(field.hasAttribute('aria-invalid')).toBe(false)
+
+    /* What a form's submission sends to a control that fails. */
+    element.dispatchEvent(new Event('invalid'))
+    await element.updateComplete
+    await element.updateComplete
+    expect(hasState(element, 'invalid')).toBe(true)
+    expect(field.getAttribute('aria-invalid')).toBe('true')
+
+    await type(element, 'hello')
+    await element.updateComplete
+    expect(element.validity.valid).toBe(true)
+    expect(hasState(element, 'invalid')).toBe(false)
+  })
+
+  test('the lengths reach the field, and a draft that fails them does not send', async () => {
+    const element = (await composer('minlength="3" maxlength="20"')) as Checked
+    const field = part(element, 'field') as HTMLTextAreaElement
+    expect(field.getAttribute('minlength')).toBe('3')
+    expect(field.getAttribute('maxlength')).toBe('20')
+
+    let sent = 0
+    element.addEventListener('helix-send', () => {
+      sent += 1
+    })
+    await type(element, 'hi')
+    element.setCustomValidity?.('Too short')
+    await element.updateComplete
+    expect(element.send()).toBe(false)
+    expect(sent).toBe(0)
+    await element.updateComplete
+    await element.updateComplete
+    expect(hasState(element, 'invalid')).toBe(true)
+
+    element.setCustomValidity?.('')
+    await type(element, 'hello')
+    expect(element.send()).toBe(true)
+    expect(sent).toBe(1)
+  })
+
+  test('a reset takes the mark away', async () => {
+    const element = (await composer('required')) as Checked
+    element.dispatchEvent(new Event('invalid'))
+    await element.updateComplete
+    await element.updateComplete
+    element.formResetCallback()
+    await element.updateComplete
+    await element.updateComplete
+    expect(hasState(element, 'invalid')).toBe(false)
   })
 })
 

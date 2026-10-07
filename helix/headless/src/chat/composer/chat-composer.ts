@@ -9,8 +9,8 @@ import {
   words,
 } from '@fusion.dev/helix-core'
 import { arrowElbowDownLeft } from '@fusion.dev/helix-icons'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { property, state } from 'lit/decorators.js'
 import { live } from 'lit/directives/live.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
@@ -33,6 +33,13 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * form reset puts back the `value` the markup declared, and a `<fieldset
  * disabled>` turns the composer off. Sending is still `helix-send`, and it
  * does not submit the form.
+ *
+ * **`required`, `minlength` and `maxlength` are checked by the browser**, as
+ * on a `<textarea>`, and the message is the browser's. `maxlength` stops the
+ * field taking more. A draft that fails them does not send, and the composer
+ * takes `:state(invalid)` and `aria-invalid` once the reader has tried to send
+ * it, the form was submitted, or the reader edited the field and left it.
+ * Tabbing past an empty composer marks nothing.
  *
  * **`typing` says whether the user is writing**, and `helix-typing` is sent
  * each time it changes: when they start, and when they send or stop for
@@ -59,6 +66,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @csspart send - The send button.
  * @csspart start - The box around the `start` slot.
  * @csspart tools - The row under the field.
+ *
+ * @cssstate invalid - The draft fails `required`, `minlength`, `maxlength`, or a custom error, and the reader has tried to send or submit it, or edited the field and left it.
  */
 @customElement('helix-headless-chat-composer')
 export class HelixHeadlessChatComposer extends HelixFormElement {
@@ -88,6 +97,26 @@ export class HelixHeadlessChatComposer extends HelixFormElement {
    */
   @property({ type: Number })
   rows = 1
+
+  /**
+   * The most characters a draft can have. The field stops taking more.
+   */
+  @property({ attribute: 'maxlength', type: Number })
+  maxLength?: number
+
+  /**
+   * The fewest characters a draft can have, once the reader has written in
+   * the field, as on a `<textarea>`.
+   */
+  @property({ attribute: 'minlength', type: Number })
+  minLength?: number
+
+  /**
+   * Whether the form needs a draft to submit. An empty draft never sends,
+   * required or not.
+   */
+  @property({ type: Boolean })
+  required = false
 
   /**
    * Label for the send button.
@@ -131,6 +160,13 @@ export class HelixHeadlessChatComposer extends HelixFormElement {
   /** Whether the user is writing, which `helix-typing` announces. */
   private writing = false
 
+  /** Whether the reader has tried to send or submit the draft, or edited it and left. */
+  private touched = false
+
+  /** Whether the composer shows that its draft is wrong. */
+  @state()
+  private shownInvalid = false
+
   /** The pause after which the user has stopped writing. */
   private readonly pause = new DelayController(this, { renders: false })
 
@@ -168,6 +204,11 @@ export class HelixHeadlessChatComposer extends HelixFormElement {
     if (value === '' || this.isDisabled) {
       return false
     }
+    /* A draft the form would refuse is refused here too, and shown as wrong. */
+    if (!this.internals.validity.valid) {
+      this.touch()
+      return false
+    }
     if (!this.dispatchEvent(new HelixSendEvent({ value }))) {
       return false
     }
@@ -175,6 +216,9 @@ export class HelixHeadlessChatComposer extends HelixFormElement {
        first and hears about the failure afterwards has thrown away the only copy
        of what the reader wrote. */
     this.value = ''
+    /* An empty field after a send is a fresh draft, so a required composer
+       does not show itself wrong. */
+    this.touched = false
     this.markTyping(false)
     return true
   }
@@ -191,6 +235,14 @@ export class HelixHeadlessChatComposer extends HelixFormElement {
   override formResetCallback(): void {
     super.formResetCallback()
     this.value = this.declared
+    this.touched = false
+    this.requestUpdate()
+  }
+
+  /** The reader has had a go at the draft, so whether it is wrong can be shown. */
+  private readonly touch = (): void => {
+    this.touched = true
+    this.requestUpdate()
   }
 
   /** Brings back the draft when the browser restores the form. */
@@ -220,6 +272,23 @@ export class HelixHeadlessChatComposer extends HelixFormElement {
     if (changed.has('value')) {
       this.internals.setFormValue(this.value === '' ? null : this.value)
     }
+    /* The browser's verdict on the field, copied with the field as the anchor,
+       so the message is in the reader's language and points at the text. */
+    const field = this.partNamed<HTMLTextAreaElement>('field')
+    if (field?.validity) {
+      this.internals.setValidity(field.validity, field.validationMessage, field)
+    }
+    const invalid = this.touched && !this.internals.validity.valid
+    this.toggleState('invalid', invalid)
+    this.internals.ariaInvalid = invalid ? 'true' : null
+    if (invalid !== this.shownInvalid) {
+      this.shownInvalid = invalid
+    }
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.addEventListener('invalid', this.touch)
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -282,7 +351,12 @@ export class HelixHeadlessChatComposer extends HelixFormElement {
         aria-label=${this.label}
         placeholder=${this.placeholder}
         rows=${this.rows}
+        ?required=${this.required}
+        minlength=${this.minLength ?? nothing}
+        maxlength=${this.maxLength ?? nothing}
+        aria-invalid=${this.shownInvalid ? 'true' : nothing}
         ?disabled=${this.isDisabled}
+        @change=${this.touch}
         @input=${this.handleInput}
         @keydown=${this.handleKey}
       ></textarea>
