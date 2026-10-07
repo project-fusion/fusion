@@ -9,6 +9,7 @@ import {
   MixinDismissible,
   requestChange,
   slotFilled,
+  words,
 } from '@fusion.dev/helix-core'
 import { x } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -91,6 +92,12 @@ import '../../format-date/index.js'
 @customElement('helix-headless-notification')
 export class HelixHeadlessNotification extends MixinDismissible(HelixElement) {
   /**
+   * The key this part's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-notification': { unreadLabel: 'Ungelesen' } })`.
+   */
+  static words = 'helix-notification'
+
+  /**
    * When it happened, as anything `Date` parses.
    *
    * An ISO string is what an API sends and what `<time datetime>` takes, so it
@@ -170,6 +177,7 @@ export class HelixHeadlessNotification extends MixinDismissible(HelixElement) {
    * The unread mark is drawn, so a reader who cannot see it hears this word in
    * its place. Translate it with the rest of your interface.
    */
+  @words
   @property({ attribute: 'unread-label' })
   unreadLabel = 'Unread'
 

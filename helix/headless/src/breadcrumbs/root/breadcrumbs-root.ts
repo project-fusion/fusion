@@ -1,4 +1,4 @@
-import { customElement, fillTemplate, HelixElement, hostAria } from '@fusion.dev/helix-core'
+import { customElement, formatWords, HelixElement, hostAria, words } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { repeat } from 'lit/directives/repeat.js'
@@ -67,9 +67,18 @@ export interface BreadcrumbItem {
 @customElement('helix-headless-breadcrumbs')
 export class HelixHeadlessBreadcrumbs extends HelixElement {
   /**
-   * The name of the button that shows a folded trail's hidden crumbs. `{count}`
-   * is replaced by how many it shows. Translate it with the page.
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-breadcrumbs': { label: 'Brotkrümelpfad' } })`.
    */
+  static words = 'helix-breadcrumbs'
+
+  /**
+   * The name of the button that shows a folded trail's hidden crumbs. `{count}`
+   * is how many it shows, written in the locale, and a language with plural
+   * forms writes them: `{count, plural, one {# weiteren zeigen} other {#
+   * weitere zeigen}}`.
+   */
+  @words
   @property({ attribute: 'expand-label' })
   expandLabel = 'Show {count} more'
 
@@ -87,6 +96,7 @@ export class HelixHeadlessBreadcrumbs extends HelixElement {
    * The landmark's name, read by screen readers. An `aria-label` on the host
    * wins over it.
    */
+  @words
   @property()
   label = 'Breadcrumb'
 
@@ -150,7 +160,7 @@ export class HelixHeadlessBreadcrumbs extends HelixElement {
             ><button
               part="expand"
               type="button"
-              aria-label=${fillTemplate(this.expandLabel, { count: String(folded) })}
+              aria-label=${formatWords(this, 'expandLabel', { count: folded })}
               @click=${this.expand}
             >
               …

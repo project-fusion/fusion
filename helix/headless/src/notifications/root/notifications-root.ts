@@ -12,6 +12,7 @@ import {
   markRegion,
   rovingStop,
   whenHydrated,
+  words,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -105,6 +106,18 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
   }
 
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-notifications': { markAllLabel: 'Alle als gelesen markieren' } })`.
+   * A notification's own words are under `helix-notification`.
+   */
+  static words = 'helix-notifications'
+
+  /** The region's name where `label` is empty. */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Notifications'
+
+  /**
    * The feed's name, read by screen readers.
    */
   @property()
@@ -131,6 +144,7 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
   /**
    * The text of the `load-more` button.
    */
+  @words
   @property({ attribute: 'load-more-label' })
   loadMoreLabel = 'Load more'
 
@@ -143,6 +157,7 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
   /**
    * Label for the mark-all control.
    */
+  @words
   @property({ attribute: 'mark-all-label' })
   markAllLabel = 'Mark all as read'
 
@@ -433,7 +448,7 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    hostAria(this.internals, { label: this.label || 'Notifications', role: 'region' })
+    hostAria(this.internals, { label: this.label || this.fallbackLabel, role: 'region' })
     const failed = this.failed
     this.toggleState('error', failed)
     this.toggleState('loading', this.loading)

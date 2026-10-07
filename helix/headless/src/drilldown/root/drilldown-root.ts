@@ -10,6 +10,7 @@ import {
   type NavigableItem,
   slottedWords,
   typeaheadByWords,
+  words,
 } from '@fusion.dev/helix-core'
 import { caretLeft } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -80,12 +81,19 @@ import { HelixHeadlessDrilldownItem } from '../item/drilldown-item.js'
 @customElement('helix-headless-drilldown')
 export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-drilldown': { backLabel: 'Zurück' } })`.
+   */
+  static words = 'helix-drilldown'
+
+  /**
    * The name of the top page's menu, read by screen readers. A page below it is
    * named by its title.
    *
    * An `aria-label` or `aria-labelledby` on the host names the top page too,
    * and wins over this.
    */
+  @words
   @property()
   /* Not "Menu". This component's own description is built around not being one,
      and a default accessible name is the one place that claim reaches a
@@ -95,6 +103,7 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
   /**
    * The text of the back button.
    */
+  @words
   @property({ attribute: 'back-label' })
   backLabel = 'Back'
 
