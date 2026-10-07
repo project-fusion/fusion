@@ -94,6 +94,9 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * | Home, End | Highlights the first or the last suggestion while the panel is open. |
  * | Escape | Closes the panel and stops there, so a dialog around the field stays open. |
  * | Backspace | In an empty field, asks the last token to go. |
+ * | Left | With the caret at the start of the text, moves to the last token's remove button. Right on a right-to-left page. |
+ * | Left, Right on a token | Move between the tokens, and past the last back to the text. |
+ * | Delete, Backspace on a token | Asks the token to go. |
  *
  * **Typed filters.** The field parses only the fields you declare. Write
  * `FilterField` elements, usually inside the `FilterMenu` slotted into `start`,
@@ -857,6 +860,11 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
   /** The row again, whenever what is in it changes. */
   private readonly handleTokens = (): void => {
     this.over = this.hideOverflow(this.tokens)
+  }
+
+  /** The tokens slotted in `tags`, which the arrow keys reach from the text. */
+  protected override tokenElements(): HTMLElement[] {
+    return (this.tokens?.assignedElements({ flatten: true }) ?? []) as HTMLElement[]
   }
 
   /**

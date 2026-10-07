@@ -417,6 +417,58 @@ describe('combobox holding several', () => {
     const listbox = part(host as HTMLElement, 'listbox') as HTMLElement & { multiple: boolean }
     expect(listbox.multiple).toBe(true)
   })
+
+  /* Focus went to the first tag's remove button, so a label press or Tab from
+     the control before put Enter and Space on removing a choice, and each tag
+     was a tab stop ahead of the text. */
+  test('focus goes to the text, and the tags are no tab stops ahead of it', async () => {
+    const host = await many('default-value="rs,rb"')
+    ;(host as HTMLElement).focus()
+    expect((host as HTMLElement).shadowRoot?.activeElement === control(host)).toBe(true)
+    const stops = tags(host).map((tag) =>
+      tag.shadowRoot?.querySelector('[part~="dismiss"]')?.getAttribute('tabindex'),
+    )
+    expect(stops).toEqual(['-1', '-1'])
+  })
+
+  test('the arrow keys move from the text to the tags and back, and Delete takes one off', async () => {
+    const host = await many('default-value="rs,rb,go"')
+    const dismiss = (at: number): HTMLElement =>
+      tags(host)[at]?.shadowRoot?.querySelector('[part~="dismiss"]') as HTMLElement
+    const focused = (): Element | null | undefined =>
+      document.activeElement?.shadowRoot?.activeElement?.shadowRoot?.activeElement
+    control(host).focus()
+    await press(host, 'ArrowLeft')
+    expect(focused() === dismiss(2)).toBe(true)
+    const key = (target: HTMLElement, name: string): void => {
+      target.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          bubbles: true,
+          cancelable: true,
+          composed: true,
+          key: name,
+        }),
+      )
+    }
+    key(dismiss(2), 'ArrowLeft')
+    expect(focused() === dismiss(1)).toBe(true)
+    key(dismiss(1), 'Delete')
+    await settle(host)
+    expect((host as unknown as { value: string }).value).toBe('rs,go')
+    key(dismiss(1), 'ArrowRight')
+    expect((host as HTMLElement).shadowRoot?.activeElement === control(host)).toBe(true)
+  })
+})
+
+describe('a required combobox', () => {
+  /* Validity said a choice was missing and the accessibility tree said the
+     field was optional. */
+  test('says so on its text field', async () => {
+    const host = await combobox('required')
+    expect(control(host).getAttribute('aria-required')).toBe('true')
+    const optional = await combobox()
+    expect(control(optional).hasAttribute('aria-required')).toBe(false)
+  })
 })
 
 describe('combobox that takes an answer it was not given', () => {

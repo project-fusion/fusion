@@ -39,7 +39,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * **Keyboard.** The remove button is a tab stop of its own, and Enter or Space
  * on it asks to remove the filter. In a `FilterInput`, Backspace in the empty
- * field asks to remove the last chip.
+ * field asks to remove the last chip, the arrow keys move between the field
+ * and the chips, and Delete or Backspace on a chip asks to remove it.
  *
  * The remove button is named `dismiss-label` followed by the chip's words,
  * such as "Remove filter Status is not open", so a row of chips says which

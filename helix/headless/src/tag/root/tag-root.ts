@@ -99,6 +99,17 @@ export class HelixHeadlessTag extends MixinDismissible(HelixElement) {
   focusable?: boolean
 
   /**
+   * Whether the remove button is a tab stop of its own, outside a `Tag.Group`.
+   *
+   * A field that holds tags as its tokens, such as a `multiple` Combobox,
+   * writes `false`: the field's text is its one tab stop, and the arrow keys
+   * move from the text to the tags. No attribute: it is coordination between
+   * elements, as `focusable` is.
+   */
+  @property({ attribute: false })
+  dismissTabStop = true
+
+  /**
    * Makes the label a link to this address.
    */
   @property()
@@ -246,7 +257,7 @@ export class HelixHeadlessTag extends MixinDismissible(HelixElement) {
       label: this.removeName,
       mark: html`<slot name="dismiss-icon">${drawDismissGlyph()}</slot>`,
       onDismiss: () => this.dismiss(),
-      tabindex: this.grouped ? '-1' : undefined,
+      tabindex: this.grouped || !this.dismissTabStop ? '-1' : undefined,
     })
   }
 }
