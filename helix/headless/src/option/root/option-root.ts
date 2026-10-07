@@ -4,8 +4,9 @@ import {
   HelixElement,
   HelixSelectEvent,
   type LinkModifiers,
+  slotFilled,
 } from '@fusion.dev/helix-core'
-import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
@@ -59,7 +60,9 @@ export const optionsAmong = (elements: readonly Element[]): HelixHeadlessOption[
  * @documentation https://fusion.dev/helix/components/option
  *
  * @slot - The option's label.
+ * @slot description - A second line under the label, for content richer than the `description` text.
  * @slot end - Content after the label, such as a shortcut or a count.
+ * @slot indicator - An icon shown while the option is chosen, in place of the check the styled option draws.
  * @slot start - Content before the label, such as an icon or an avatar.
  *
  * @event {HelixSelectEvent} helix-select - The option was chosen. Cancelable: canceling it leaves the selection as it was, and keeps the browser from following an option's `href`.
@@ -72,6 +75,8 @@ export const optionsAmong = (elements: readonly Element[]): HelixHeadlessOption[
  * @csspart text - The label and the description under it, as one column.
  *
  * @cssstate active - While the keyboard is on the option, which is the option `aria-activedescendant` names.
+ * @cssstate disabled - While the option cannot be chosen.
+ * @cssstate has-indicator - An icon is slotted into `indicator`.
  * @cssstate selected - While the option is chosen.
  */
 @customElement('helix-headless-option')
@@ -164,14 +169,10 @@ export class HelixHeadlessOption extends HelixElement {
    * ends. Matching still reads the label, so what somebody types is matched
    * against the name rather than against prose about it.
    *
-   * **A property and not a slot, which is the departure worth explaining.** The
-   * area rules say a content property is its slot's fallback, and that holds for
-   * a region always drawn: `Avatar`'s initials, `Tooltip`'s text. This one is
-   * usually absent, and a wrapped slot generates a box whether or not it is
-   * filled, so every option without a caption would carry an empty line. The
-   * detection that would avoid it does not exist, `:host(:has())` being invalid
-   * and the server having no children to inspect. A property is known at render
-   * time, so the component can decline to draw the box at all.
+   * For a caption richer than a string, slot it into `description`. The
+   * property is that slot's fallback inside the `description` part. With no
+   * property the slot is drawn bare, which takes no box while it is empty, so
+   * an option without a caption carries no empty line.
    *
    * It does not reflect, per the rule that payload state stays off the host: a
    * string is not a fact a selector needs.
@@ -239,6 +240,17 @@ export class HelixHeadlessOption extends HelixElement {
    */
   @property({ type: Boolean })
   selected = false
+
+  /**
+   * Whether the option says it is selected while the keyboard is on it.
+   *
+   * Written by a control whose list holds suggestions, such as `FilterInput`:
+   * nothing there stays chosen, so the row the keyboard is on is the
+   * selection, as the APG combobox's list with selection that follows focus
+   * says. No attribute: it is coordination between elements.
+   */
+  @property({ attribute: false })
+  selectionFollowsActive = false
 
   /**
    * Where the link opens, such as `_blank`, for an option with an `href`.
@@ -360,6 +372,7 @@ export class HelixHeadlessOption extends HelixElement {
     super.willUpdate(changed)
     this.toggleState('selected', this.selected)
     this.toggleState('active', this.active)
+    this.toggleState('disabled', this.disabled)
   }
 
   protected override render(): TemplateResult {
@@ -369,7 +382,10 @@ export class HelixHeadlessOption extends HelixElement {
     this.internals.role = 'option'
     /* A link is followed, not chosen, so it says nothing about being chosen,
        as React Aria's link items in a list that selects nothing. */
-    this.internals.ariaSelected = this.href === '' ? String(this.selected) : null
+    this.internals.ariaSelected =
+      this.href === ''
+        ? String(this.selected || (this.selectionFollowsActive && this.active))
+        : null
     this.internals.ariaDisabled = this.disabled ? 'true' : null
     this.internals.ariaDescription =
       this.alternate !== '' && this.alternateLabel !== '' ? this.alternateLabel : null
@@ -392,9 +408,18 @@ export class HelixHeadlessOption extends HelixElement {
       <slot name="start"></slot>
       <span part="text">
         <span part="label"><slot>${this.label}</slot></span>
-        ${this.description ? html`<span part="description">${this.description}</span>` : nothing}
+        ${
+          this.description
+            ? html`<span part="description"><slot name="description">${this.description}</slot></span>`
+            : html`<slot name="description"></slot>`
+        }
       </span>
       <slot name="end"></slot>
+      <slot
+        name="indicator"
+        @slotchange=${(event: Event) =>
+          this.toggleState('has-indicator', slotFilled(event.target as HTMLSlotElement))}
+      ></slot>
     </div>`
   }
 }

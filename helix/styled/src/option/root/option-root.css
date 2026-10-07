@@ -53,8 +53,10 @@
 /* The caption, quieter than the words above it and on one line for the reason
    the label gives: a list whose rows are different heights is a list the
    keyboard moves through unevenly, and a caption that wraps to two lines makes
-   one row twice its neighbors. */
-[part="description"] {
+   one row twice its neighbors. A caption slotted into `description` is drawn
+   the same way. */
+[part="description"],
+slot[name="description"]::slotted(*) {
   color: var(--helix-color-foreground-muted);
   font-size: var(--helix-text-xs);
   line-height: var(--helix-leading-tight);
@@ -72,6 +74,20 @@
   white-space: nowrap;
 }
 
+/* An icon slotted into `indicator` is shown only on the chosen option, where
+   the tick would be, and the tick goes. */
+slot[name="indicator"]::slotted(*) {
+  display: none;
+}
+
+:host(:state(selected)) slot[name="indicator"]::slotted(*) {
+  block-size: var(--helix-size-icon-tight);
+  display: block;
+  flex: 0 0 auto;
+  inline-size: var(--helix-size-icon-tight);
+  margin-inline-start: auto;
+}
+
 /* The chosen option, which is not the same fact as where the keyboard is. */
 :host(:state(selected)) [part~="item"]::after {
   content: "";
@@ -84,6 +100,10 @@
   mask-position: center;
   mask-repeat: no-repeat;
   mask-size: contain;
+}
+
+:host(:state(has-indicator)) [part~="item"]::after {
+  content: none;
 }
 
 :host(:state(active)) [part~="item"],
