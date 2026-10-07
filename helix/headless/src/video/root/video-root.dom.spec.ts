@@ -785,6 +785,37 @@ describe('the name of the player', () => {
     )
     expect(part(host, 'stage')?.getAttribute('aria-label')).toBe('A clip')
   })
+
+  /* The missing-name warning is in development builds only, which the
+     package's `test:dom` script asks for with `--conditions helix-development`.
+     A player with no `label` was announced as "Video" and nothing said so. */
+  const warnedOn = async (markup: string): Promise<string[]> => {
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      await player(markup)
+      await new Promise((done) => setTimeout(done, 5))
+    } finally {
+      console.warn = original
+    }
+    return warnings
+  }
+
+  test('is reported where there is no `label`, by its tag', async () => {
+    const warnings = await warnedOn('<helix-headless-video src="/clip.mp4"></helix-headless-video>')
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0]).toContain('<helix-headless-video> has no accessible name')
+  })
+
+  test('and a player named by `label` or `aria-label` is not', async () => {
+    for (const named of [
+      '<helix-headless-video label="A clip" src="/clip.mp4"></helix-headless-video>',
+      '<helix-headless-video aria-label="A clip" src="/clip.mp4"></helix-headless-video>',
+    ]) {
+      expect([named, ...(await warnedOn(named))]).toEqual([named])
+    }
+  })
 })
 
 /* The glyphs were drawn inline, so a page with an icon set of its own had no
