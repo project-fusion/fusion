@@ -96,10 +96,20 @@ export class HelixHeadlessListItem extends HelixElement {
 
   /**
    * Takes the row out of reach in a list with `selection-mode`: the arrow keys
-   * pass over it and it cannot be selected or acted on.
+   * pass over it and it cannot be selected or acted on. In a list with
+   * `disabled-behavior="selection"`, it cannot be selected and is reached and
+   * acted on as any row is.
    */
   @property({ reflect: true, type: Boolean })
   disabled = false
+
+  /**
+   * Whether `disabled` takes the row out of selection alone, written by a list
+   * with `disabled-behavior="selection"`. No attribute: it is coordination
+   * between elements, as `focusable` is.
+   */
+  @property({ attribute: false })
+  selectionOnly = false
 
   /**
    * Whether the row holds its list's tab stop.
@@ -245,7 +255,10 @@ export class HelixHeadlessListItem extends HelixElement {
     super.willUpdate(changed)
     hostAria(this.internals, { role: this.grouped ? 'row' : 'listitem' })
     this.internals.ariaSelected = this.selected === undefined ? null : String(this.selected)
-    this.internals.ariaDisabled = this.grouped && this.disabled ? 'true' : null
+    /* Not disabled to a reader where it is only out of selection, as React
+       Aria's GridList has it: the row is reached and acted on. */
+    this.internals.ariaDisabled =
+      this.grouped && this.disabled && !this.selectionOnly ? 'true' : null
     /* On the link where there is one, which is what a reader lands on, and on
        the row otherwise. */
     this.internals.ariaCurrent =
