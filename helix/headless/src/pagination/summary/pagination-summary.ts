@@ -1,4 +1,4 @@
-import { customElement, fillTemplate, formatNumbers, HelixElement } from '@fusion.dev/helix-core'
+import { customElement, formatWords, HelixElement, words } from '@fusion.dev/helix-core'
 import { html, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -25,8 +25,14 @@ import { property } from 'lit/decorators.js'
 @customElement('helix-headless-pagination-summary')
 export class HelixHeadlessPaginationSummary extends HelixElement {
   /**
+   * The key this part's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-pagination-summary': { format: '{from}–{to} von {total}' } })`.
+   */
+  static words = 'helix-pagination-summary'
+
+  /**
    * The text shown. `{from}`, `{to}`, and `{total}` are replaced with the first
-   * item, the last item, and the item count.
+   * item, the last item, and the item count, written in the locale.
    *
    * A template rather than a prefix and a suffix, because word order is not
    * universal: `format="{total} 件中 {from}-{to} 件"` is one attribute here and
@@ -40,13 +46,13 @@ export class HelixHeadlessPaginationSummary extends HelixElement {
    * family. The root's templates are `pageLabel`, `statusLabel` and `gapLabel`,
    * which each label something; this labels nothing, it *is* the thing.
    */
+  @words
   @property()
   format = '{from}-{to} of {total}'
 
   /**
-   * Locale for the numbers.
-   *
-   * Absent uses the runtime's own.
+   * The locale the words and the numbers are in, as a BCP 47 tag such as
+   * `de`. Empty reads the nearest `lang`, then the browser's language.
    */
   @property()
   locale = ''
@@ -68,11 +74,6 @@ export class HelixHeadlessPaginationSummary extends HelixElement {
    */
   @property({ type: Number })
   total = 0
-
-  /** Held across every component asking for the same locale. */
-  private get numbers(): (value: number) => string {
-    return formatNumbers(this.locale)
-  }
 
   protected override render(): TemplateResult {
     /* An empty template rather than `nothing`, so the element generates a box
@@ -99,11 +100,7 @@ export class HelixHeadlessPaginationSummary extends HelixElement {
     /* And the end is clamped to the total, because the last page is rarely
        full: 248 items at 25 a page end at 248, not at 250. */
     const to = Math.min(this.total, from + size - 1)
-    return html`${fillTemplate(this.format, {
-      from: this.numbers(from),
-      to: this.numbers(to),
-      total: this.numbers(this.total),
-    })}`
+    return html`${formatWords(this, 'format', { from, to, total: this.total })}`
   }
 }
 
