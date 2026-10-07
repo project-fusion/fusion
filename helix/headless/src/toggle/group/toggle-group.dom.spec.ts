@@ -462,3 +462,22 @@ describe('a vertical group', () => {
     expect(group.internals.ariaOrientation).toBe('vertical')
   })
 })
+
+describe('toggles inside a layout wrapper', () => {
+  /* Only direct children were items, so a toggle inside a wrapper was never
+     selected and never a tab stop. */
+  test('are the group’s items, selected, reachable, and moved by the arrows', async () => {
+    const group = (await mount(`<helix-headless-toggle-group label="View" default-value="grid">
+      <span><helix-headless-toggle value="list">List</helix-headless-toggle></span>
+      <span><helix-headless-toggle value="grid">Grid</helix-headless-toggle></span>
+    </helix-headless-toggle-group>`)) as Updatable & { value: string }
+    const [list, grid] = items(group)
+    expect([list?.selected, grid?.selected]).toEqual([false, true])
+    expect(part(grid as HTMLElement, 'item')?.getAttribute('tabindex')).toBe('0')
+    group.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Home' }))
+    await new Promise((done) => setTimeout(done))
+    await group.updateComplete
+    expect(group.value).toBe('list')
+    expect(formValue(group)).toBe('list')
+  })
+})

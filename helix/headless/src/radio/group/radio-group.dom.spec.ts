@@ -436,3 +436,49 @@ describe('a radio with its own indicator', () => {
     expect(box?.querySelector('slot')?.getAttribute('name')).toBe('indicator')
   })
 })
+
+describe('radios inside a layout wrapper', () => {
+  /* Only direct children were radios of the group, so a radio in a row with a
+     description was never checked, never a tab stop, and a press set a value no
+     radio showed. */
+  test('are the group’s radios, checked, reachable, and chosen by a press', async () => {
+    document.body.innerHTML = `<helix-headless-radio-group label="Plan" name="plan" default-value="b">
+      <div><helix-headless-radio value="a">Basic</helix-headless-radio></div>
+      <div><helix-headless-radio value="b">Pro</helix-headless-radio></div>
+    </helix-headless-radio-group>`
+    const host = document.body.firstElementChild as Updatable & { value: string }
+    await settle(host)
+    const [basic, pro] = [...host.querySelectorAll('helix-headless-radio')] as (HTMLElement & {
+      selected: boolean
+    })[]
+    expect([basic?.selected, pro?.selected]).toEqual([false, true])
+    expect(part(pro as HTMLElement, 'item')?.getAttribute('tabindex')).toBe('0')
+    basic?.click()
+    await settle(host)
+    expect(host.value).toBe('a')
+    expect([basic?.selected, pro?.selected]).toEqual([true, false])
+    host.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowDown' }))
+    await settle(host)
+    expect(host.value).toBe('b')
+  })
+
+  test('and a radio added inside a wrapper later joins the group', async () => {
+    document.body.innerHTML = `<helix-headless-radio-group label="Plan" name="plan" default-value="c">
+      <div><helix-headless-radio value="a">Basic</helix-headless-radio></div>
+    </helix-headless-radio-group>`
+    const host = document.body.firstElementChild as Updatable
+    await settle(host)
+    const row = host.querySelector('div') as HTMLElement
+    row.insertAdjacentHTML(
+      'beforeend',
+      '<helix-headless-radio value="c">Team</helix-headless-radio>',
+    )
+    await new Promise((resolve) => setTimeout(resolve))
+    await settle(host)
+    const team = host.querySelector('helix-headless-radio[value="c"]') as HTMLElement & {
+      selected: boolean
+    }
+    expect(team.selected).toBe(true)
+    expect(formValue(host)).toBe('c')
+  })
+})

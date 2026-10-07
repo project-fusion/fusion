@@ -309,12 +309,25 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
     items: () => this.items,
   })
 
+  /**
+   * The toggles, in light-DOM order, at any depth, so a toggle inside a layout
+   * wrapper of yours is one of the group's. A toggle held by a group nested
+   * inside this one is that group's.
+   */
   private get items(): HelixHeadlessToggle[] {
     // Empty on the server, which has no tree, so `focusTarget` can ask while it renders.
-    return [...(this.children ?? [])].filter(
-      (child): child is HelixHeadlessToggle => child instanceof HelixHeadlessToggle,
+    if (this.children === undefined) {
+      return []
+    }
+    return [...this.querySelectorAll('*')].filter(
+      (element): element is HelixHeadlessToggle =>
+        element instanceof HelixHeadlessToggle && nearestGroup(element) === this,
     )
   }
+
+  /* A toggle added or removed inside a wrapper fires no `slotchange`, which
+     sees direct children only. */
+  private observer: MutationObserver | undefined
 
   /* Through the mixin, so a consumer can refuse the change with
      `helix-before-change`.
@@ -371,12 +384,16 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
     super.connectedCallback()
     this.addEventListener('helix-select', this.handleSelection)
     this.addEventListener('focusin', this.noteFocus)
+    this.observer = new MutationObserver(this.handleItems)
+    this.observer.observe(this, { childList: true, subtree: true })
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('helix-select', this.handleSelection)
     this.removeEventListener('focusin', this.noteFocus)
+    this.observer?.disconnect()
+    this.observer = undefined
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
@@ -544,6 +561,15 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
     this.indicator.place()
     this.requestUpdate()
   }
+}
+
+/** The group nearest around a toggle, or nothing. */
+const nearestGroup = (toggle: Element): HelixHeadlessToggleGroup | null => {
+  let parent = toggle.parentElement
+  while (parent && !(parent instanceof HelixHeadlessToggleGroup)) {
+    parent = parent.parentElement
+  }
+  return parent
 }
 
 declare global {
