@@ -1,6 +1,7 @@
 import {
   AriaForwardController,
   afterLinkFollowed,
+  chosenValues,
   countLabel,
   customElement,
   DelayController,
@@ -332,12 +333,13 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   /**
    * Whether more than one option can be chosen.
    *
-   * The list already does the work: `value` comes apart on commas, a press
-   * toggles rather than replaces, and the arrows move without choosing. What
-   * this adds is the tags, and keeping the panel open between picks.
+   * The list already does the work: `value` is the chosen values joined with
+   * commas, a press toggles rather than replaces, and the arrows move without
+   * choosing. What this adds is the tags, and keeping the panel open between
+   * picks.
    *
-   * A comma is therefore not available inside an option's value, which is the
-   * listbox's contract and not this element's to change.
+   * An option's value may hold a comma, and it is read as one value, as
+   * `Select` and `Listbox` read it. So may an answer the reader created.
    *
    * **The list is told, and the field is not.** `aria-multiselectable` belongs
    * to `listbox`, `grid`, `tree` and `tablist`, and `combobox` dropped it in
@@ -572,10 +574,24 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
     surface: () => this.partNamed('surface'),
   })
 
-  /** The values chosen, in the order they were chosen. */
+  /**
+   * The values chosen, in the order they were chosen, read against the
+   * options' values and the answers created here, so a value that holds a
+   * comma is one value. See `chosenValues`.
+   *
+   * Measured before this: choosing `Paris, France` drew two tags, "Paris" and
+   * "France", and the form received two entries.
+   */
   private get values(): string[] {
-    return this.value === '' ? [] : this.value.split(',')
+    const known = new Set(this.created)
+    for (const option of optionsAmong(this.knownChildren)) {
+      known.add(option.value)
+    }
+    return chosenValues(this.value, known, this.multiple)
   }
+
+  /** The answers created here, which no option holds, kept so their commas read as theirs. */
+  private readonly created = new Set<string>()
 
   /**
    * The chosen options themselves, for their words.
@@ -698,6 +714,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
       return
     }
     const next = this.multiple ? [...this.values, wanted].join(',') : wanted
+    this.created.add(wanted)
     if (!this.requestValue(next)) {
       return
     }
@@ -779,6 +796,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
       (option) => option.text.trim().toLowerCase() === typed.toLowerCase(),
     )
     const answer = named?.value ?? typed
+    this.created.add(answer)
     if (this.multiple) {
       if (!this.values.includes(answer)) {
         this.requestValue([...this.values, answer].join(','))
