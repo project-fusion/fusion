@@ -799,7 +799,7 @@ describe('a table that loads more', () => {
       Array.from(
         { length: count },
         (_, at) =>
-          `<helix-headless-table-row><helix-headless-table-cell>Row ${from + at}</helix-headless-table-cell></helix-headless-table-row>`,
+          `<helix-headless-table-row><helix-headless-table-cell style="display: block; block-size: 2rem">Row ${from + at}</helix-headless-table-cell></helix-headless-table-row>`,
       ).join('')
     document.body.innerHTML = `<div style="block-size: 120px; overflow: auto">
       <helix-headless-table label="Rows" load-more>
