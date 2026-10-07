@@ -790,7 +790,9 @@ export class HelixHeadlessList extends HelixElement {
     const counted = numbering(
       this.start,
       this.reversed,
-      this.childrenKnown ? this.knownChildren.length : undefined,
+      this.childrenKnown
+        ? this.knownChildren.filter((child) => !child.hasAttribute('slot')).length
+        : undefined,
     )
     return counted ? `--list-first: ${counted.first}; --list-step: ${counted.step}` : nothing
   }
