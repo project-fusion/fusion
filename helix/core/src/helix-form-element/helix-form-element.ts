@@ -399,10 +399,32 @@ export class HelixFormElement extends HelixElement {
 
   /**
    * Returns whether the control is valid, and fires `invalid` on it when it is
-   * not.
+   * not. The control shows no message for it: `reportValidity()` does that.
    */
   checkValidity(): boolean {
-    return this.internals.checkValidity()
+    this.checkInProgress = true
+    try {
+      return this.internals.checkValidity()
+    } finally {
+      this.checkInProgress = false
+    }
+  }
+
+  /** Whether `checkValidity()` is running, set only for the `invalid` it fires. */
+  private checkInProgress = false
+
+  /**
+   * @internal Whether the `invalid` firing now comes from `checkValidity()`.
+   *
+   * **Such an `invalid` reports and shows nothing**, as on a native control: a
+   * required `<input>` checked from a script fires `invalid` and does not match
+   * `:user-invalid`, measured in Chromium. Every layer that takes `invalid` as
+   * a reader's attempt asks this first, so a script that checks an untouched
+   * field does not mark it wrong. A submission, `reportValidity()`, and the
+   * reader's own edits still do.
+   */
+  protected get checkingValidity(): boolean {
+    return this.checkInProgress
   }
 
   /**

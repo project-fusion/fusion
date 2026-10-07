@@ -114,6 +114,12 @@ const shimTableSections = (): void => {
  * `valid` is true when none of them is set. Deciding what counts as a valid
  * email is the platform's job and is not attempted here.
  *
+ * `checkValidity` and `reportValidity` answer from that record and fire a
+ * cancelable `invalid` on the host when it fails, as the platform does, so a
+ * spec can tell a check apart from a submission by what the control shows
+ * afterward. The bubble `reportValidity` raises is the browser's and is not
+ * modeled.
+ *
  * Everything else is inert, so a test that starts depending on it will read as
  * obviously empty rather than quietly passing against a stub.
  */
@@ -148,6 +154,12 @@ const shimElementInternals = (): void => {
     const host = this
     let validity: ValidityState = { valid: true } as ValidityState
     let validationMessage = ''
+    const check = (): boolean => {
+      if (!validity.valid) {
+        host.dispatchEvent(new Event('invalid', { cancelable: true }))
+      }
+      return validity.valid
+    }
     return {
       ariaCurrent: null,
       /* Declared, not merely assignable: a component that guards on
@@ -160,7 +172,7 @@ const shimElementInternals = (): void => {
       ariaDescribedByElements: null,
       ariaLabel: null,
       ariaLabelledByElements: null,
-      checkValidity: () => true,
+      checkValidity: check,
       get form(): HTMLFormElement | null {
         // The platform grants form ownership only to form-associated elements,
         // so the stub checks the same flag rather than handing a form to
@@ -171,7 +183,7 @@ const shimElementInternals = (): void => {
       get labels(): NodeList {
         return document.querySelectorAll(host.id ? `label[for="${host.id}"]` : 'nothing-matches')
       },
-      reportValidity: () => validity.valid,
+      reportValidity: check,
       role: null,
       setFormValue: (value: unknown) => {
         reported.set(host, value as FormValue)

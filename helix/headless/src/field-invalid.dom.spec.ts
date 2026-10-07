@@ -140,3 +140,66 @@ describe('a field written aria-invalid', () => {
     )
   })
 })
+
+/**
+ * A script that checks a field learns its verdict, and the field shows nothing.
+ *
+ * `checkValidity()` fires `invalid` on a failing control, and every field took
+ * that event as a reader's attempt: an untouched required Time Input checked
+ * from a script turned `:state(invalid)` on and said `aria-invalid="true"`
+ * before anybody had used it. A native `<input>` checked the same way stays
+ * unmarked, measured in Chromium, where `:user-invalid` stays off. So a check
+ * only reports, and `reportValidity()` is the call that shows the message.
+ *
+ * Across the shapes that listen for the attempt: the field mixin's controls,
+ * the pickers' feedback mixin, and the chat composer, which keeps its own.
+ */
+describe('a required field checked from a script', () => {
+  beforeAll(async () => {
+    await import('./chat/index.js')
+  })
+
+  const CHECKED = [
+    'helix-headless-chat-composer',
+    'helix-headless-input',
+    'helix-headless-textarea',
+    'helix-headless-time-input',
+    'helix-headless-time-picker',
+  ]
+
+  type Checked = Updatable & { checkValidity(): boolean; reportValidity(): boolean }
+
+  const required = async (tag: string): Promise<Checked> => {
+    const host = (await mount(`<${tag} label="Field" required></${tag}>`)) as Checked
+    await settle(host)
+    return host
+  }
+
+  const shown = (host: Checked): boolean => {
+    const internals = (host as unknown as { internals: ElementInternals }).internals
+    return (
+      (internals.states as unknown as Set<string>).has('invalid') ||
+      internals.ariaInvalid === 'true' ||
+      invalid(host as unknown as Field).some((node) => node.getAttribute('aria-invalid') === 'true')
+    )
+  }
+
+  for (const tag of CHECKED) {
+    test(`${tag}: checkValidity() fires invalid and shows nothing`, async () => {
+      const host = await required(tag)
+      let fired = 0
+      host.addEventListener('invalid', () => fired++)
+      expect(host.checkValidity()).toBe(false)
+      expect(fired).toBe(1)
+      await settle(host)
+      expect(shown(host)).toBe(false)
+    })
+
+    test(`${tag}: reportValidity() shows the message`, async () => {
+      const host = await required(tag)
+      expect(host.reportValidity()).toBe(false)
+      await settle(host)
+      expect(shown(host)).toBe(true)
+    })
+  }
+})
