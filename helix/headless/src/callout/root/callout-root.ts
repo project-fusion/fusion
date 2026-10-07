@@ -4,7 +4,7 @@ import {
   drawDismiss,
   drawDismissGlyph,
   formatWords,
-  HelixDismissEvent,
+  type HelixDismissEvent,
   HelixElement,
   hostAria,
   MixinDismissible,
@@ -234,8 +234,12 @@ export class HelixHeadlessCallout extends MixinDismissible(HelixElement) {
    * one, the words its dismiss button is named by, and otherwise by its text.
    */
   protected override dismissEvent(): HelixDismissEvent {
+    const event = super.dismissEvent()
     const heading = slottedWords(this, ['heading'])
-    return heading ? new HelixDismissEvent({ label: heading }) : super.dismissEvent()
+    if (heading) {
+      event.detail.label = heading
+    }
+    return event
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
