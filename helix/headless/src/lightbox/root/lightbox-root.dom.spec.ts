@@ -321,6 +321,27 @@ describe('each item is a slide', () => {
     ])
     expect(all[1]?.getAttribute('aria-roledescription')).toBe('Folie')
   })
+
+  test('an item appended after the first render is a slide, and counted', async () => {
+    /* Nothing else changes when it arrives, so nothing else would render the
+       set again: the item had no role description and the count stayed one. */
+    const host = (await mount(
+      `<helix-headless-lightbox label="Photos" counter status-label="Picture {index} of {count}" open>
+        <helix-headless-lightbox-item value="one" label="A"></helix-headless-lightbox-item>
+      </helix-headless-lightbox>`,
+    )) as Lightbox
+    await host.updateComplete
+    const item = document.createElement('helix-headless-lightbox-item')
+    item.setAttribute('value', 'two')
+    item.setAttribute('label', 'B')
+    host.append(item)
+    await new Promise((settle) => setTimeout(settle))
+    await host.updateComplete
+    const [, added] = await groups(host)
+    expect(added?.getAttribute('aria-roledescription')).toBe('slide')
+    expect(added?.getAttribute('aria-label')).toBe('B')
+    expect((part(host, 'counter') as HTMLElement).textContent).toBe('Picture 1 of 2')
+  })
 })
 
 describe('a swipe across the picture', () => {

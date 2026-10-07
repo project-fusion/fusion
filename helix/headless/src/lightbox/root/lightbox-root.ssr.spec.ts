@@ -21,7 +21,7 @@ describe('lightbox server output', () => {
     expect(hasPart(markup, 'dialog')).toBe(true)
     expect(partTag(markup, 'dialog')).toMatch(/<dialog/)
     expect(rendered(markup, 'helix-headless-lightbox')).toMatch(
-      /<dialog[\s\S]*<slot><\/slot>[\s\S]*<\/dialog>/,
+      /<dialog[\s\S]*<slot\s*><\/slot>[\s\S]*<\/dialog>/,
     )
   })
 
