@@ -318,6 +318,7 @@ const NAMED = new Set([...STATUS, 'heading'])
  *
  * @cssstate empty - While there are no rows and none are loading.
  * @cssstate error - While `error-text` is set.
+ * @cssstate loading - While `loading` is set, as the rows are on their way.
  */
 @customElement('helix-headless-table')
 export class HelixHeadlessTable extends MixinCollection(HelixElement) {
@@ -1618,6 +1619,7 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     super.updated(changed)
     this.toggleState('error', this.errorText !== '')
     this.toggleState('empty', !this.loading && !this.hasRows)
+    this.toggleState('loading', this.loading)
     this.assign()
     this.alignCells()
     this.markSorted()

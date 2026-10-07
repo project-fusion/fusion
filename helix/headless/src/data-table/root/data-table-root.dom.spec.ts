@@ -191,6 +191,10 @@ describe('the empty and loading lines', () => {
     await settled(element)
     const loading = part(element, 'loading')?.querySelector('slot[name="loading"]')
     expect(loading?.textContent?.trim()).toBe('Loading')
+    /* Measured before this: `loading` was an attribute only, so a sheet keyed
+       on states, as the empty and error lines are, could not draw it. */
+    expect(hasState(element, 'loading')).toBe(true)
+    expect(hasState(element, 'empty')).toBe(false)
     remove()
   })
 })
