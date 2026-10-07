@@ -870,6 +870,11 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
       }
     } else {
       this.stopAligning()
+      /* The side is the open list's, so a closed one sits on neither. Measured
+         before this: `:state(placed-bottom)` still matched after a press
+         outside closed the list. */
+      this.toggleState('placed-bottom', false)
+      this.toggleState('placed-top', false)
       /* The filter goes with a close. Without this a filterable select reopens
          still narrowed by the old needle, with `hidden` still written on the
          options it ruled out, so the second use of the control starts from the
