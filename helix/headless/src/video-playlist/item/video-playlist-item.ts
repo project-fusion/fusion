@@ -1,5 +1,5 @@
 import { customElement, HelixElement, HelixSelectEvent } from '@fusion.dev/helix-core'
-import { html, nothing, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
@@ -36,6 +36,8 @@ import { property } from 'lit/decorators.js'
  * @csspart label - The name and the content after it.
  * @csspart media - The column at the start of the row.
  * @csspart thumbnail - The image of `poster`, shown when the `media` slot is empty.
+ *
+ * @cssstate current - The entry that is playing.
  */
 @customElement('helix-headless-video-playlist-item')
 export class HelixHeadlessVideoPlaylistItem extends HelixElement {
@@ -129,6 +131,17 @@ export class HelixHeadlessVideoPlaylistItem extends HelixElement {
         this.poster === '' ? nothing : html`<img part="thumbnail" alt="" src=${this.poster} />`
       }
     </slot>`
+  }
+
+  /**
+   * Mirrors the playing entry where a stylesheet can select on the host,
+   * `helix-video-playlist-item:state(current)`. A custom state, because the
+   * playlist writes `current`, and an attribute it wrote would be markup a
+   * server never sent.
+   */
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    this.toggleState('current', this.current)
   }
 
   protected override render(): TemplateResult {

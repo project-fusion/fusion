@@ -90,6 +90,8 @@ type Player = HTMLElement & {
  * @csspart items - The list of entries.
  * @csspart live - A live region that says which entry plays after the playlist moves.
  * @csspart player - The region that holds the player.
+ *
+ * @cssstate ended - The last entry finished and the playlist stopped there, until an entry plays again.
  */
 @customElement('helix-headless-video-playlist')
 export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixElement) {
@@ -353,6 +355,13 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
     reachable[to]?.focus()
   }
 
+  /** The player playing again, after the end or anywhere, means the list has not ended. */
+  private readonly handlePlay = (event: Event): void => {
+    if (event.target === this.player) {
+      this.toggleState('ended', false)
+    }
+  }
+
   private readonly handleNext = (): void => {
     this.next()
   }
@@ -379,6 +388,7 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
       return
     }
     if (this.following(1).next === undefined) {
+      this.toggleState('ended', true)
       this.dispatchEvent(new HelixEndEvent())
       return
     }
@@ -401,6 +411,7 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
        it and the playlist stopped at the end of the first clip. Capture reaches
        every ancestor whether the event bubbles or not. */
     this.addEventListener('ended', this.handleEnded, true)
+    this.addEventListener('play', this.handlePlay, true)
   }
 
   override disconnectedCallback(): void {
@@ -410,6 +421,7 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
     this.removeEventListener('helix-next', this.handleNext)
     this.removeEventListener('helix-previous', this.handlePrevious)
     this.removeEventListener('ended', this.handleEnded, true)
+    this.removeEventListener('play', this.handlePlay, true)
   }
 
   /** A shuffle turned off forgets its order, so the next one is new. */
@@ -443,6 +455,7 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
        the resource in every engine, so a playlist that assigned on each update
        would restart the clip whenever anything else about it rendered. */
     if (player.src !== current.src) {
+      this.toggleState('ended', false)
       player.src = current.src
       player.poster = current.poster
       player.mediaTitle = current.text
