@@ -640,13 +640,17 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
         ${
           // A header rather than a row in the list. The way back is not one of
           // the things on this page, and putting it in the list means an arrow
-          // press lands on it as though it were.
+          // press lands on it as though it were. A `menuitem` all the same,
+          // since a menu holds menu items and nothing else: Left and Escape
+          // are its keys, and a press or a screen reader's cursor reaches it.
           this.drilldown.atRoot
             ? nothing
             : html`<div part="header">
                 <button
                   part="back"
                   type="button"
+                  role="menuitem"
+                  tabindex="-1"
                   aria-label=${this.backLabel}
                   @click=${() => this.leave()}
                 >

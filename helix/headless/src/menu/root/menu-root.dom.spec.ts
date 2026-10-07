@@ -499,6 +499,16 @@ describe('menu submenus, coming and going', () => {
     expect(part(host, 'back')?.getAttribute('aria-label')).toBe('Up one')
   })
 
+  test('the way back is a menu item, since a menu holds menu items and nothing else', async () => {
+    const host = await deep()
+    host.open = true
+    await host.updateComplete
+    at(host, 'field').select()
+    await host.updateComplete
+    const back = part(host, 'back') as HTMLElement
+    expect([back.getAttribute('role'), back.getAttribute('tabindex')]).toEqual(['menuitem', '-1'])
+  })
+
   test('a submenu keeps its slot on the page above, and paints nothing there', async () => {
     const host = await deep()
     host.open = true
