@@ -384,6 +384,10 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
     super.connectedCallback()
     this.addEventListener('helix-select', this.handleSelection)
     this.addEventListener('focusin', this.handleFocusIn)
+    /* Watched again on reconnection, since disconnection let the strip go. */
+    if (this.hasUpdated) {
+      this.watchStrip()
+    }
   }
 
   override disconnectedCallback(): void {
