@@ -69,6 +69,11 @@ const UNTYPED = new Set([
  * the shortcut with the control. A chord the page wrote there itself is left
  * alone, and the key takes back only what it added.
  *
+ * A chord is drawn with the platform's modifiers first, in its order, so one
+ * `keys` value is right everywhere: `mod+shift+p` is `⇧⌘P` on an Apple
+ * keyboard and `Ctrl+Shift+P` elsewhere. Where it is drawn in glyphs, it is
+ * read in words, such as `Shift Command P`.
+ *
  * `caps` draws a chord as a key per key: each is a `key` part and the `+`
  * between two a `separator` part, so a sheet can draw a cap for each.
  * `key-labels` renames any key, on every platform, such as
@@ -337,20 +342,29 @@ export class HelixHeadlessKbd extends HelixElement {
     /* One text node unless `caps` asks for a part per key: a chord split into
        elements is laid out as several runs of text, which places a glyph from
        a fallback font a fraction of a pixel away from where one run put it. */
-    const { keys, separator } = this.label
-    return html`<kbd part="kbd">${this.caps ? this.renderChord() : keys.join(separator)}</kbd>`
+    const { keys, separator, spoken } = this.label
+    if (spoken === '') {
+      return html`<kbd part="kbd">${this.caps ? this.renderChord() : keys.join(separator)}</kbd>`
+    }
+    /* Glyphs are drawn for the eye and said in words: `⇧⌘P` alone is read as
+       symbols, or skipped. */
+    return html`<kbd part="kbd">${
+      this.caps ? this.renderChord() : html`<span aria-hidden="true">${keys.join(separator)}</span>`
+    }<span data-spoken>${spoken}</span></kbd>`
   }
 
   /**
    * The chord under `caps`, a part for each key and for each `+` between two,
    * so a sheet can draw a cap per key. Written with no space between, so a
-   * chord reads as the one label it was.
+   * chord reads as the one label it was. Where the chord is said in words,
+   * the parts are hidden from a screen reader, which reads the words.
    */
   protected renderChord(): TemplateResult {
-    const { keys, separator } = this.label
+    const { keys, separator, spoken } = this.label
+    const hidden = spoken === '' ? nothing : 'true'
     return html`${keys.map(
       (key, index) =>
-        html`${index > 0 && separator !== '' ? html`<span part="separator">${separator}</span>` : nothing}<span part="key">${key}</span>`,
+        html`${index > 0 && separator !== '' ? html`<span part="separator" aria-hidden=${hidden}>${separator}</span>` : nothing}<span part="key" aria-hidden=${hidden}>${key}</span>`,
     )}`
   }
 }

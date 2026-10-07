@@ -14,7 +14,23 @@ const kbd = async (attrs = '', inner = ''): Promise<Kbd> => {
   return host
 }
 
-const label = (host: Kbd): string => (part(host, 'kbd') as HTMLElement).textContent?.trim() ?? ''
+/** What the eye reads: the key's text, leaving out the words only a screen reader reads. */
+const label = (host: Kbd): string => {
+  const drawn = (part(host, 'kbd') as HTMLElement).cloneNode(true) as HTMLElement
+  for (const words of drawn.querySelectorAll('[data-spoken]')) {
+    words.remove()
+  }
+  return drawn.textContent?.trim() ?? ''
+}
+
+/** What a screen reader reads: the text no `aria-hidden` takes away. */
+const spoken = (host: Kbd): string => {
+  const read = (part(host, 'kbd') as HTMLElement).cloneNode(true) as HTMLElement
+  for (const hidden of read.querySelectorAll('[aria-hidden="true"]')) {
+    hidden.remove()
+  }
+  return read.textContent?.trim() ?? ''
+}
 
 const APPLE_AGENT =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
@@ -94,13 +110,51 @@ describe('a key drawn from a chord', () => {
   })
 })
 
+/* `mod+shift+p` drew ⌘⇧P on a Mac, where every menu writes ⇧⌘P, so no one
+   value of `keys` was right on both platforms. */
+describe("the platform's order", () => {
+  test('puts the modifiers in the order each platform writes them', async () => {
+    expect(await onPlatform(APPLE_AGENT, async () => label(await kbd('keys="mod+shift+p"')))).toBe(
+      '⇧⌘P',
+    )
+    expect(await onPlatform(OTHER_AGENT, async () => label(await kbd('keys="shift+mod+p"')))).toBe(
+      'Ctrl+Shift+P',
+    )
+  })
+})
+
+/* `⌘K` was the whole of what a screen reader was given, a symbol it reads as
+   a symbol or skips. */
+describe('a chord drawn in glyphs', () => {
+  test('is read in words, and drawn in glyphs', async () => {
+    const host = await onPlatform(APPLE_AGENT, () => kbd('keys="mod+shift+p"'))
+    expect({ drawn: label(host), read: spoken(host) }).toEqual({
+      drawn: '⇧⌘P',
+      read: 'Shift Command P',
+    })
+  })
+
+  test('is read in words key by key under caps too', async () => {
+    const host = await onPlatform(APPLE_AGENT, () => kbd('caps keys="mod+k"'))
+    expect(spoken(host)).toBe('Command K')
+  })
+
+  test('a chord in words is read as it is drawn, with nothing added', async () => {
+    const host = await onPlatform(OTHER_AGENT, () => kbd('keys="mod+k"'))
+    expect({
+      read: spoken(host),
+      words: (part(host, 'kbd') as HTMLElement).querySelector('[data-spoken]'),
+    }).toEqual({ read: 'Ctrl+K', words: null })
+  })
+})
+
 /* A chord was one box holding its whole label, with nothing a sheet could
    reach inside it. */
 describe('caps', () => {
   const parts = (host: Kbd): string[] =>
-    [...(part(host, 'kbd')?.children ?? [])].map(
-      (one) => `${one.getAttribute('part')} ${one.textContent}`,
-    )
+    [...(part(host, 'kbd')?.children ?? [])]
+      .filter((one) => one.hasAttribute('part'))
+      .map((one) => `${one.getAttribute('part')} ${one.textContent}`)
 
   test('draws a part per key, with the platform separator between', async () => {
     expect(
@@ -134,7 +188,7 @@ describe('key-labels', () => {
     const attrs = `key-labels='{"mod":"Command","k":"K key"}' keys="mod+k"`
     expect(await onPlatform(APPLE_AGENT, async () => label(await kbd(attrs)))).toBe('Command-K key')
     expect(await onPlatform(APPLE_AGENT, async () => label(await kbd('keys="mod+shift+p"')))).toBe(
-      '⌘⇧P',
+      '⇧⌘P',
     )
   })
 
