@@ -5,7 +5,9 @@ import { registerDom } from '@fusion.dev/helix-testing/dom'
    asked of the mixin rather than of Color, Date or Time Picker. */
 
 type Probe = HTMLElement & {
+  failing: 'missing' | 'refused' | ''
   feedback: string
+  formResetCallback(): void
   internals: ElementInternals
   invalid: boolean
   updateComplete: Promise<boolean>
@@ -23,6 +25,11 @@ beforeAll(async () => {
   customElements.define(
     tag,
     class extends MixinPickerFeedback(HelixFormElement) {
+      static override properties = { failing: { type: String } }
+      declare failing: 'missing' | 'refused' | ''
+      protected override get failure() {
+        return this.failing || undefined
+      }
       protected override render() {
         return html`<button part="answer" aria-invalid=${this.marked ? 'true' : 'false'}></button>
           ${this.renderPickerFeedback()}`
@@ -63,7 +70,43 @@ describe('a picker’s feedback', () => {
     expect(host.internals.states.has('invalid')).toBe(true)
     host.invalid = false
     await host.updateComplete
-    expect(host.internals.ariaInvalid).toBeNull()
+    expect(host.internals.ariaInvalid).toBe('false')
     expect(host.internals.states.has('invalid')).toBe(false)
+  })
+})
+
+describe('a picker’s own verdict', () => {
+  test('marks a refused answer at once', async () => {
+    const host = await mount()
+    host.failing = 'refused'
+    await host.updateComplete
+    expect(host.internals.ariaInvalid).toBe('true')
+    expect(host.internals.states.has('invalid')).toBe(true)
+  })
+
+  test('marks a missing answer once a form has refused it, until a reset', async () => {
+    const host = await mount()
+    host.failing = 'missing'
+    await host.updateComplete
+    /* `false`, never unset: a host with a role is otherwise judged by its
+       validity, and reported invalid before the reader has done anything. */
+    expect(host.internals.ariaInvalid).toBe('false')
+    expect(host.internals.states.has('invalid')).toBe(false)
+    host.dispatchEvent(new Event('invalid'))
+    await host.updateComplete
+    expect(host.internals.ariaInvalid).toBe('true')
+    expect(host.internals.states.has('invalid')).toBe(true)
+    host.formResetCallback()
+    await host.updateComplete
+    expect(host.internals.states.has('invalid')).toBe(false)
+  })
+
+  test('and once the reader has committed an answer', async () => {
+    const host = await mount()
+    host.failing = 'missing'
+    await host.updateComplete
+    host.dispatchEvent(new Event('change'))
+    await host.updateComplete
+    expect(host.internals.states.has('invalid')).toBe(true)
   })
 })

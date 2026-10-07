@@ -522,6 +522,37 @@ describe('a time outside what the picker offers', () => {
   })
 })
 
+describe('a time picker says when its time is wrong', () => {
+  type Checked = Time & { internals: ElementInternals; formResetCallback(): void }
+  const list = (host: Time): Element | null | undefined =>
+    host.shadowRoot?.querySelector('[part="list"]')
+
+  /* Measured before this: `value="13:00" max="12:00"` reported `rangeOverflow`
+     while the list carried no `aria-invalid` and `:state(invalid)` was off. A
+     native time input past its `max` is invalid in Chromium's tree on load. */
+  test('a time past a bound is marked at once, on the list and as a state', async () => {
+    const host = (await picker('max="12:00" value="13:00"')) as Checked
+    expect(host.internals.validity.rangeOverflow).toBe(true)
+    expect(list(host)?.getAttribute('aria-invalid')).toBe('true')
+    expect(host.internals.states.has('invalid')).toBe(true)
+    expect(host.internals.ariaInvalid).toBe('true')
+  })
+
+  test('a missing time waits until a form refuses it, and a reset forgets that', async () => {
+    const host = (await picker('required')) as Checked
+    expect(host.internals.validity.valueMissing).toBe(true)
+    expect(list(host)?.hasAttribute('aria-invalid')).toBe(false)
+    expect(host.internals.states.has('invalid')).toBe(false)
+    host.dispatchEvent(new Event('invalid'))
+    await host.updateComplete
+    expect(list(host)?.getAttribute('aria-invalid')).toBe('true')
+    expect(host.internals.states.has('invalid')).toBe(true)
+    host.formResetCallback()
+    await host.updateComplete
+    expect(host.internals.states.has('invalid')).toBe(false)
+  })
+})
+
 describe('the words on the wheels', () => {
   const column = (host: Time, which: string): HTMLElement =>
     host.shadowRoot?.querySelector(`[data-column="${which}"]`) as HTMLElement

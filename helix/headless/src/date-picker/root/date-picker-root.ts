@@ -23,6 +23,7 @@ import {
   monthOf,
   monthOut,
   monthSystem,
+  type PickerFailure,
   periodCells,
   periodKey,
   reportValues,
@@ -150,7 +151,7 @@ const firstOf = (year: number, month: number): Date =>
  *
  * @cssproperty --date-picker-column-count - How many month columns are drawn, capped at two. `--date-picker-columns` overrides it.
  *
- * @cssstate invalid - While `invalid` is set or `feedback` says what is wrong.
+ * @cssstate invalid - While `invalid` is set, `feedback` says what is wrong, the picker holds a date outside `min` and `max` or one it bars, or it is `required`, holds no date, and the reader has answered once or a form has refused it.
  */
 @customElement('helix-headless-date-picker')
 export class HelixHeadlessDatePicker extends MixinPickerFeedback(
@@ -1042,10 +1043,21 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
    * browser points its bubble at.
    */
   private reportRequired(): void {
-    const anchor = this.partNamed('grid') ?? undefined
-    if (this.required && this.value === '') {
-      this.internals.setValidity({ valueMissing: true }, this.valueMissingMessage, anchor)
+    const problem = this.problem
+    if (problem) {
+      this.internals.setValidity(problem[0], problem[1], this.partNamed('grid') ?? undefined)
       return
+    }
+    this.internals.setValidity({})
+  }
+
+  /**
+   * What is wrong with the answer, as validity flags and a message, or nothing.
+   * `reportRequired` hands it to the form, and `failure` to the mark.
+   */
+  private get problem(): [ValidityStateFlags, string] | undefined {
+    if (this.required && this.value === '') {
+      return [{ valueMissing: true }, this.valueMissingMessage]
     }
     /* **A value the calendar cannot read is bad input.** The grid draws only
        what it can parse, so `value="not-a-date"` would otherwise select
@@ -1056,21 +1068,27 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
        and `valueAsDate` reads the parts back after constructing to say so. */
     const held = this.selected
     if (held.length > 0 && held.some((one) => asDate(one) === null)) {
-      this.internals.setValidity(
+      return [
         { badInput: true },
         formatWords(this, 'badInputMessage', { mode: this.mode ?? 'single' }),
-        anchor,
-      )
-      return
+      ]
     }
     for (const one of held) {
       const fault = this.fault(one)
       if (fault) {
-        this.internals.setValidity({ [fault[0]]: true }, fault[1], anchor)
-        return
+        return [{ [fault[0]]: true }, fault[1]]
       }
     }
-    this.internals.setValidity({})
+    return undefined
+  }
+
+  /** A missing date waits for the reader; a refused one is marked at once. */
+  protected override get failure(): PickerFailure | undefined {
+    const problem = this.problem
+    if (!problem) {
+      return undefined
+    }
+    return problem[0].valueMissing ? 'missing' : 'refused'
   }
 
   protected override willUpdate(changed: PropertyValues): void {

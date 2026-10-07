@@ -15,6 +15,7 @@ import {
   MixinPickerFeedback,
   nearestTime,
   offeredTimes,
+  type PickerFailure,
   reportValues,
   secondsAsValue,
   slotFilled,
@@ -86,7 +87,10 @@ import '../../option/index.js'
  * host's `aria-label` or its `aria-labelledby`. A development build warns
  * where all four are empty. The list is described by the hint, or by the
  * message in `feedback` in its place, and carries `aria-multiselectable` with
- * a `mode` and `aria-invalid` while `feedback` says what is wrong. The wheels
+ * a `mode`. It carries `aria-invalid` while `feedback` says what is wrong,
+ * while it holds a time outside `min` and `max` or one the picker does not
+ * offer, and, for a `required` picker with no time, once the reader has
+ * chosen one or a form has refused the picker. The wheels
  * are a `group` with that name, holding one `listbox` per wheel, named "Hour",
  * "Minute", "Second" and "AM/PM" in the page's language, and each described
  * the same way.
@@ -145,7 +149,7 @@ import '../../option/index.js'
  * @csspart option-text - The label and the caption, as one column.
  *
  * @cssstate blank - While no time is chosen.
- * @cssstate invalid - While `invalid` is set or `feedback` says what is wrong.
+ * @cssstate invalid - While `invalid` is set, `feedback` says what is wrong, or the list carries `aria-invalid`.
  */
 @customElement('helix-headless-time-picker')
 export class HelixHeadlessTimePicker extends MixinPickerFeedback(
@@ -746,10 +750,21 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
    * browser points its bubble at.
    */
   private reportRequired(): void {
-    const anchor = this.partNamed('list') ?? undefined
-    if (this.required && this.value === '') {
-      this.internals.setValidity({ valueMissing: true }, this.valueMissingMessage, anchor)
+    const problem = this.problem
+    if (problem) {
+      this.internals.setValidity(problem[0], problem[1], this.partNamed('list') ?? undefined)
       return
+    }
+    this.internals.setValidity({})
+  }
+
+  /**
+   * What is wrong with the answer, as validity flags and a message, or nothing.
+   * `reportRequired` hands it to the form, and `failure` to the mark.
+   */
+  private get problem(): [ValidityStateFlags, string] | undefined {
+    if (this.required && this.value === '') {
+      return [{ valueMissing: true }, this.valueMissingMessage]
     }
     /* A value the wheels cannot read is bad input, the same as on the calendar:
        `value="not-a-time"` marks no row, and would otherwise report `:valid` and
@@ -758,24 +773,30 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
        shaped right at all. */
     const held = this.held
     if (held.length > 0 && held.some((one) => valueAsSeconds(one) === null)) {
-      this.internals.setValidity(
+      return [
         { badInput: true },
         formatWords(this, 'badInputMessage', {
           mode: this.mode ?? 'single',
           shape: this.seconds ? 'HH:mm:ss' : 'HH:mm',
         }),
-        anchor,
-      )
-      return
+      ]
     }
     for (const one of held) {
       const fault = this.fault(one)
       if (fault) {
-        this.internals.setValidity({ [fault[0]]: true }, fault[1], anchor)
-        return
+        return [{ [fault[0]]: true }, fault[1]]
       }
     }
-    this.internals.setValidity({})
+    return undefined
+  }
+
+  /** A missing time waits for the reader; a refused one is marked at once. */
+  protected override get failure(): PickerFailure | undefined {
+    const problem = this.problem
+    if (!problem) {
+      return undefined
+    }
+    return problem[0].valueMissing ? 'missing' : 'refused'
   }
 
   /**
