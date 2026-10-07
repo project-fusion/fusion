@@ -139,3 +139,17 @@ describe('a toggle on its own', () => {
     )
   })
 })
+
+/* Web Awesome's radio button takes content before and after its label, and a
+   toggle took its label alone. */
+describe('content around the label', () => {
+  test('goes in the start and end slots, inside the button, around the label', async () => {
+    const host = (await mount(
+      '<helix-headless-toggle value="a"><span slot="start">*</span>Grid<span slot="end">3</span></helix-headless-toggle>',
+    )) as Toggle
+    const slots = [...(part(host, 'item')?.querySelectorAll('slot') ?? [])].map((slot) => slot.name)
+    expect(slots).toEqual(['start', '', 'end'])
+    const start = part(host, 'item')?.querySelector<HTMLSlotElement>('slot[name="start"]')
+    expect(start?.assignedElements().map((one) => one.textContent)).toEqual(['*'])
+  })
+})

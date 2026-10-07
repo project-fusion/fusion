@@ -1,0 +1,30 @@
+export function Example() {
+  return (
+    <helix-toggle-group
+      default-value="light"
+      label="Theme"
+    >
+      <helix-toggle value="light">
+        <helix-icon
+          name="sun"
+          slot="start"
+        ></helix-icon>
+        Light
+      </helix-toggle>
+      <helix-toggle value="dark">
+        <helix-icon
+          name="moon"
+          slot="start"
+        ></helix-icon>
+        Dark
+      </helix-toggle>
+      <helix-toggle value="system">
+        <helix-icon
+          name="monitor"
+          slot="start"
+        ></helix-icon>
+        System
+      </helix-toggle>
+    </helix-toggle-group>
+  )
+}

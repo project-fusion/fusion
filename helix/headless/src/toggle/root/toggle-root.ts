@@ -31,6 +31,8 @@ import { property } from 'lit/decorators.js'
  * @documentation https://fusion.dev/helix/components/toggle
  *
  * @slot - The item's label.
+ * @slot end - Content after the label, such as a count or a shortcut.
+ * @slot start - Content before the label, such as an icon.
  *
  * @event {Event} change - Fired after a toggle button on its own is pressed or released.
  * @event {HelixSelectEvent} helix-select - Fired when the item is chosen. Cancelable: call `preventDefault()` to keep the current choice.
@@ -172,7 +174,7 @@ export class HelixHeadlessToggle extends MixinSelectableItem(HelixElement) {
       ?disabled=${this.disabled}
       tabindex=${alone || (this.focusable ?? this.selected) || !this.childrenKnown ? '0' : '-1'}
       @click=${() => this.select()}
-    ><slot></slot></button>`
+    ><slot name="start"></slot><slot></slot><slot name="end"></slot></button>`
   }
 }
 
