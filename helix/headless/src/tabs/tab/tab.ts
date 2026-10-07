@@ -27,8 +27,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * can: a press on its `dismiss` mark, or Delete or Backspace while the tab
  * has focus, sends `helix-dismiss`. The tab does not remove itself, because
  * your code owns the set, so remove the tab and its panel in your handler.
- * Focus moves to the tab beside it, and the tab set selects a tab that is
- * left.
+ * Focus moves to the tab beside it, and where the tab was selected, the tab
+ * set selects that same tab.
  * The tab says the key through `aria-keyshortcuts`, and the mark is for the
  * pointer, hidden from screen readers.
  *
