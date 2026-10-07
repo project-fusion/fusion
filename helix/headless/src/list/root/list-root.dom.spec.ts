@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, expect, test } from 'bun:test'
+import { beforeAll, describe, expect, test } from 'bun:test'
 import { hasState, mount, part, registerDom, role, slotted } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
@@ -128,8 +128,14 @@ describe('an interactive list with no name', () => {
 describe('a list that loads more', () => {
   type Watched = { callback: IntersectionObserverCallback; target: Element | undefined }
   const watchers: Watched[] = []
-  const original = globalThis.IntersectionObserver
-  beforeAll(() => {
+
+  /**
+   * Runs `body` with an observer that reports what `reach` tells it, in place
+   * of the page's, which happy-dom lacks and a browser answers from layout.
+   */
+  const watching = async (body: () => Promise<void>): Promise<void> => {
+    const original = globalThis.IntersectionObserver
+    watchers.length = 0
     globalThis.IntersectionObserver = class {
       private readonly watched: Watched
       constructor(callback: IntersectionObserverCallback) {
@@ -143,10 +149,12 @@ describe('a list that loads more', () => {
         this.watched.target = undefined
       }
     } as unknown as typeof IntersectionObserver
-  })
-  afterAll(() => {
-    globalThis.IntersectionObserver = original
-  })
+    try {
+      await body()
+    } finally {
+      globalThis.IntersectionObserver = original
+    }
+  }
 
   /** Tells the list its end is in reach, or out of it. */
   const reach = (inView: boolean): void => {
@@ -160,50 +168,51 @@ describe('a list that loads more', () => {
     }
   }
 
-  test('asks once the end is in reach, once for each number of rows, and not while loading', async () => {
-    const list = await settled(`<helix-headless-list label="Files" load-more>
+  test('asks once the end is in reach, once for each number of rows, and not while loading', () =>
+    watching(async () => {
+      const list = await settled(`<helix-headless-list label="Files" load-more>
         <helix-headless-list-item>One</helix-headless-list-item>
       </helix-headless-list>`)
-    let asked = 0
-    list.addEventListener('helix-load-more', () => {
-      asked += 1
-    })
-    reach(true)
-    reach(true)
-    expect(asked).toBe(1)
+      let asked = 0
+      list.addEventListener('helix-load-more', () => {
+        asked += 1
+      })
+      reach(true)
+      reach(true)
+      expect(asked).toBe(1)
 
-    const busy = list as Updatable & { loading: boolean }
-    busy.loading = true
-    await busy.updateComplete
-    const row = part(list, 'loading') as HTMLElement
-    expect(row.getAttribute('role')).toBe('listitem')
-    expect(row.textContent?.trim()).toBe('Loading more')
-    expect(hasState(list, 'loading')).toBe(true)
+      const busy = list as Updatable & { loading: boolean }
+      busy.loading = true
+      await busy.updateComplete
+      const row = part(list, 'loading') as HTMLElement
+      expect(row.getAttribute('role')).toBe('listitem')
+      expect(row.textContent?.trim()).toBe('Loading more')
+      expect(hasState(list, 'loading')).toBe(true)
 
-    list.append(document.createElement('helix-headless-list-item'))
-    await new Promise((done) => setTimeout(done, 0))
-    await list.updateComplete
-    expect(asked).toBe(1)
-    /* The fetch is done and the end is still in reach, so the list asks again. */
-    busy.loading = false
-    await busy.updateComplete
-    expect(asked).toBe(2)
-    expect(part(list, 'loading')).toBeNull()
-  })
+      list.append(document.createElement('helix-headless-list-item'))
+      await new Promise((done) => setTimeout(done, 0))
+      await list.updateComplete
+      expect(asked).toBe(1)
+      /* The fetch is done and the end is still in reach, so the list asks again. */
+      busy.loading = false
+      await busy.updateComplete
+      expect(asked).toBe(2)
+      expect(part(list, 'loading')).toBeNull()
+    }))
 
-  test('watches nothing and asks for nothing without load-more', async () => {
-    watchers.length = 0
-    const list = await settled(`<helix-headless-list label="Files">
+  test('watches nothing and asks for nothing without load-more', () =>
+    watching(async () => {
+      const list = await settled(`<helix-headless-list label="Files">
         <helix-headless-list-item>One</helix-headless-list-item>
       </helix-headless-list>`)
-    let asked = 0
-    list.addEventListener('helix-load-more', () => {
-      asked += 1
-    })
-    reach(true)
-    expect(watchers.filter((one) => one.target)).toHaveLength(0)
-    expect(asked).toBe(0)
-  })
+      let asked = 0
+      list.addEventListener('helix-load-more', () => {
+        asked += 1
+      })
+      reach(true)
+      expect(watchers.filter((one) => one.target)).toHaveLength(0)
+      expect(asked).toBe(0)
+    }))
 
   test('shows its loading row as a grid row with one cell in a list that selects, and no empty row', async () => {
     const list = await settled(
