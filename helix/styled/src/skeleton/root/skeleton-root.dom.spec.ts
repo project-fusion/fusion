@@ -57,10 +57,11 @@ describe('skeleton', () => {
     expect(rule(':host([shape="circle"])')).toContain(
       'inline-size: var(--skeleton-size, var(--helix-size-control))',
     )
-    for (const shape of ['text', 'circle']) {
-      expect(rule(`:host([shape="${shape}"]) [part="skeleton"]`)).toContain(
-        'border-radius: var(--helix-radii-full)',
-      )
+    for (const selector of [
+      ':host([shape="text"]) [part~="skeleton"]',
+      ':host([shape="circle"]) [part="skeleton"]',
+    ]) {
+      expect(rule(selector)).toContain('border-radius: var(--helix-radii-full)')
     }
   })
 
@@ -69,8 +70,8 @@ describe('skeleton', () => {
        traveling across it reads as work in progress. So the animated thing is
        a layer clipped by the surface, and the surface holds still. The layer
        is the `sheen` part, which a page reaches. */
-    expect(rule('[part="skeleton"]')).not.toContain('animation')
-    expect(rule('[part="skeleton"]')).toContain('overflow: hidden')
+    expect(rule('[part~="skeleton"]')).not.toContain('animation')
+    expect(rule('[part~="skeleton"]')).toContain('overflow: hidden')
     expect(rule('[part="sheen"]')).toContain('animation: helix-skeleton-sweep')
     expect(sheet()).not.toContain('::after')
     expect(sheet()).toContain('@keyframes helix-skeleton-sweep')
@@ -134,9 +135,51 @@ describe('skeleton around content', () => {
   })
 
   test('effect="pulse" fades the fill, and effect="none" sits still', async () => {
-    expect(rule(':host([effect="pulse"]) [part="skeleton"]')).toContain('helix-skeleton-pulse')
+    expect(rule(':host([effect="pulse"]) [part~="skeleton"]')).toContain('helix-skeleton-pulse')
     const still = (await mount('<helix-skeleton effect="none"></helix-skeleton>')) as Updatable
     expect(still.getAttribute('effect')).toBe('none')
     expect(sheet()).toContain(':host([effect="none"]) [part="sheen"]')
+  })
+})
+
+/* A paragraph took one element a line, and a page wrote three skeletons and a
+   width for the last one to stand in for three lines of text. */
+describe('a paragraph of lines', () => {
+  type Lines = Updatable & { lines?: number; shape?: string }
+  const lines = (host: Element): Element[] => [
+    ...(host.shadowRoot?.querySelectorAll('[part~="line"]') ?? []),
+  ]
+
+  test('lines draws one shape a line, each a skeleton part, for a text shape', async () => {
+    const host = (await mount('<helix-skeleton shape="text" lines="3"></helix-skeleton>')) as Lines
+    expect(lines(host)).toHaveLength(3)
+    expect(lines(host).every((line) => line.getAttribute('part') === 'skeleton line')).toBe(true)
+    expect(part(host, 'lines')).not.toBeNull()
+    expect(host.getAttribute('lines')).toBe('3')
+    host.lines = 1
+    await host.updateComplete
+    expect(lines(host)).toHaveLength(0)
+    expect(part(host, 'skeleton')).not.toBeNull()
+  })
+
+  test('a block or a circle stays one shape whatever lines says', async () => {
+    const host = (await mount('<helix-skeleton lines="3"></helix-skeleton>')) as Lines
+    expect(lines(host)).toHaveLength(0)
+  })
+
+  test('each line is one em tall, a line height apart, and the last one shorter', () => {
+    expect(rule(':host([shape="text"][lines]:not([lines="1"]):not([lines="0"]))')).toContain(
+      'block-size: auto',
+    )
+    expect(rule('[part="lines"]')).toContain('gap: calc(1lh - 1em)')
+    expect(rule('[part~="line"]')).toContain('block-size: 1em')
+    expect(rule('[part~="line"]:last-child:not(:first-child)')).toContain(
+      'inline-size: var(--skeleton-last-line-size, 60%)',
+    )
+  })
+
+  test('over content, the paragraph takes the content box and steps aside after', () => {
+    expect(rule(':host(:state(wrapping)) [part="lines"]')).toContain('position: absolute')
+    expect(rule(':host(:state(wrapping):not([loading])) [part="lines"]')).toContain('display: none')
   })
 })

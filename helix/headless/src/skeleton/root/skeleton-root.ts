@@ -113,7 +113,17 @@ export class HelixHeadlessSkeleton extends HelixElement {
        indicator. */
     return html`<span part="content" ?inert=${this.loading}
         ><slot @slotchange=${() => this.requestUpdate()}></slot></span
-      ><span part="skeleton"><span part="sheen"></span></span>`
+      >${this.renderShape()}`
+  }
+
+  /**
+   * The placeholder shape and the sheen inside it.
+   *
+   * A method, so a tier above can draw the placeholder as several shapes, as
+   * the styled tier draws a paragraph of lines.
+   */
+  protected renderShape(): TemplateResult {
+    return html`<span part="skeleton"><span part="sheen"></span></span>`
   }
 }
 

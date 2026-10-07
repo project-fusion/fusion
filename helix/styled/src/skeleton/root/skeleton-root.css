@@ -14,6 +14,16 @@
   block-size: 1em;
 }
 
+/*
+ * **A paragraph is its lines.** Each line is one `em` tall, the lines a line
+ * height apart, so the column is as tall as the text it stands for, and the
+ * last line stops short, as a paragraph's does. One line, or a count the
+ * script reads as none, is the single line above.
+ */
+:host([shape="text"][lines]:not([lines="1"]):not([lines="0"])) {
+  block-size: auto;
+}
+
 :host([shape="circle"]) {
   aspect-ratio: 1 / 1;
   /* The control step, not the bare `2.5rem` it works out to: that is
@@ -26,7 +36,7 @@
 /*
  *  The base fill, and nothing animated on this element at all.
  */
-[part="skeleton"] {
+[part~="skeleton"] {
   background-color: var(
     --skeleton-color,
     color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)
@@ -39,6 +49,20 @@
      corner radius. */
   overflow: hidden;
   position: relative;
+}
+
+[part="lines"] {
+  display: flex;
+  flex-direction: column;
+  gap: calc(1lh - 1em);
+}
+
+[part~="line"] {
+  block-size: 1em;
+}
+
+[part~="line"]:last-child:not(:first-child) {
+  inline-size: var(--skeleton-last-line-size, 60%);
 }
 
 /*
@@ -62,7 +86,7 @@
   position: absolute;
 }
 
-:host([shape="text"]) [part="skeleton"] {
+:host([shape="text"]) [part~="skeleton"] {
   border-radius: var(--helix-radii-full);
 }
 
@@ -83,7 +107,7 @@
   background-image: none;
 }
 
-:host([effect="pulse"]) [part="skeleton"] {
+:host([effect="pulse"]) [part~="skeleton"] {
   animation: helix-skeleton-pulse var(--skeleton-duration, calc(var(--helix-duration-slow) * 4))
     ease-in-out infinite;
 }
@@ -125,14 +149,18 @@
 }
 
 :host(:state(wrapping)) [part="skeleton"],
-:host(:not(:defined):not(:empty)) [part="skeleton"] {
+:host(:not(:defined):not(:empty)) [part="skeleton"],
+:host(:state(wrapping)) [part="lines"],
+:host(:not(:defined):not(:empty)) [part="lines"] {
   block-size: auto;
   inset: 0;
   position: absolute;
 }
 
 :host(:state(wrapping):not([loading])) [part="skeleton"],
-:host(:not(:defined):not(:empty):not([loading])) [part="skeleton"] {
+:host(:not(:defined):not(:empty):not([loading])) [part="skeleton"],
+:host(:state(wrapping):not([loading])) [part="lines"],
+:host(:not(:defined):not(:empty):not([loading])) [part="lines"] {
   display: none;
 }
 
@@ -155,7 +183,7 @@
    sits there rather than animating something else instead. */
 @media (prefers-reduced-motion: reduce) {
   [part="sheen"],
-  :host([effect="pulse"]) [part="skeleton"] {
+  :host([effect="pulse"]) [part~="skeleton"] {
     animation: none;
   }
 
