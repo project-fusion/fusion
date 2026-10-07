@@ -127,6 +127,10 @@ const isControl = (element: HTMLElement): boolean =>
  *   and shows a dash while only some are chosen.
  * - Shift with a press on a checkbox selects every row between it and the row
  *   last chosen.
+ * - `selection-behavior="replace"` makes a press or a move select the row
+ *   alone, as a file list does. Control or Command with a press adds or takes
+ *   out one row, and Shift with a press selects every row from the one last
+ *   chosen.
  *
  * To act on a single row, such as opening it, put a link or a button in a cell.
  *
@@ -143,7 +147,8 @@ const isControl = (element: HTMLElement): boolean =>
  * | Enter, F2 | Moves into the cell's controls. Escape moves back to the cell, and Tab moves between the controls of one cell. |
  * | Enter, Space on a sortable heading | Sorts by the column. |
  * | Enter, Space on the `load-more` row | Sends `helix-load-more`. |
- * | Space on a row | Selects the row, in a `selectable` table. |
+ * | Space on a row | Selects the row, in a `selectable` table. Under `selection-behavior="replace"`, selects it alone, and Control or Command with Space adds or takes out the row. |
+ * | Down, Up, Page Down, Page Up under `selection-behavior="replace"` | Selects the row it moves to alone. Control or Command with the key moves without selecting. |
  * | Shift with Down or Up | Selects the rows it moves across, in a `selectable` table. |
  * | Shift with Space | Selects every row from the one last chosen, in a `selectable` table. |
  * | Control or Command with A | Selects every row, in a `selectable` table. |
@@ -705,6 +710,17 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    */
   @property({ type: Boolean })
   selectable = false
+
+  /**
+   * What a key or a press on a row does to the rows already selected, in a
+   * `selectable` table. `toggle`, the default, keeps them: Space adds or takes
+   * out the row. `replace` selects the row alone, as a file list does: Down and
+   * Up carry the selection with them, and a press on a row selects it. Control
+   * or Command with a press or Space adds or takes out one row, and with a move
+   * goes without selecting. The checkboxes add or take out one row either way.
+   */
+  @property({ attribute: 'selection-behavior' })
+  selectionBehavior: 'replace' | 'toggle' = 'toggle'
 
   /** The name of the checkbox in the heading that selects every row. */
   @words
@@ -2542,6 +2558,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   override connectedCallback(): void {
     super.connectedCallback()
     this.addEventListener('click', this.handleHeadClick)
+    this.addEventListener('click', this.handleRowClick)
     this.addEventListener('pointerdown', this.notePress, true)
     this.addEventListener('keydown', this.notePress, true)
     this.addEventListener('focusin', this.handleFocusIn)
@@ -2558,6 +2575,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('click', this.handleHeadClick)
+    this.removeEventListener('click', this.handleRowClick)
     this.removeEventListener('pointerdown', this.notePress, true)
     this.removeEventListener('keydown', this.notePress, true)
     this.removeEventListener('focusin', this.handleFocusIn)
@@ -2573,6 +2591,60 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    */
   private readonly notePress = (event: KeyboardEvent | PointerEvent): void => {
     this.shiftPressed = event.shiftKey
+  }
+
+  /** Whether a press or a move on a row selects it alone. */
+  private get replaces(): boolean {
+    return this.selectable && this.selectionBehavior === 'replace'
+  }
+
+  /**
+   * Selects the row at `row` on the page alone, and makes it where a range
+   * runs from. Asks nothing where it is already the only one selected.
+   */
+  private chooseOnly(row: number): void {
+    const data = this.drawnPage[row]
+    if (!data) {
+      return
+    }
+    const key = this.keyOf(data, this.rowIndex(row) - 2)
+    this.anchorKey = key
+    const now = this.chosen
+    if (now.size === 1 && now.has(key)) {
+      return
+    }
+    this.requestSelected(new Set([key]))
+  }
+
+  /**
+   * A press on a row under `selection-behavior="replace"`: it selects the row
+   * alone, Control or Command adds or takes out the row, and Shift selects
+   * every row from the one last chosen. A press on a control in a cell, or on
+   * the checkbox or grip column, is the control's.
+   */
+  private readonly handleRowClick = (event: MouseEvent): void => {
+    if (!this.replaces || event.defaultPrevented) {
+      return
+    }
+    const place = this.placeOf(event)
+    if (!place || place.row < 0 || place.row >= this.drawnPage.length || place.column < this.lead) {
+      return
+    }
+    const origin = event.composedPath()[0]
+    if (origin instanceof Node && this.controlsIn(place).some((one) => deepContains(one, origin))) {
+      return
+    }
+    if (event.shiftKey && this.anchorKey !== undefined) {
+      this.selectRange(place.row)
+      return
+    }
+    if (event.ctrlKey || event.metaKey) {
+      const data = this.drawnPage[place.row] as DataRow
+      const key = this.keyOf(data, this.rowIndex(place.row) - 2)
+      this.chooseRow(key, !this.chosen.has(key))
+      return
+    }
+    this.chooseOnly(place.row)
   }
 
   /**
@@ -2860,16 +2932,27 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     }
     const { column, row } = to
     event.preventDefault()
-    /* Shift with Up or Down takes the rows it crosses into the selection. */
+    /* Shift with Up or Down takes the rows it crosses into the selection.
+       Under `replace` a move to another row selects it alone, and Control or
+       Command keeps the selection where it was. */
+    const onRow = row >= 0 && row < this.drawnPage.length
     if (
       event.shiftKey &&
       this.selectable &&
       (event.key === 'ArrowUp' || event.key === 'ArrowDown') &&
       place.row >= 0 &&
-      row >= 0 &&
-      row < this.drawnPage.length
+      onRow
     ) {
       this.selectRange(row, place.row)
+    } else if (
+      this.replaces &&
+      onRow &&
+      row !== place.row &&
+      !event.shiftKey &&
+      !event.ctrlKey &&
+      !event.metaKey
+    ) {
+      this.chooseOnly(row)
     }
     if (row !== place.row || column !== place.column) {
       this.moveTo(row, column)
@@ -2941,6 +3024,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         if (this.selectable && row && event.shiftKey && this.anchorKey !== undefined) {
           event.preventDefault()
           this.selectRange(place.row)
+        } else if (this.replaces && row && !event.ctrlKey && !event.metaKey) {
+          event.preventDefault()
+          this.chooseOnly(place.row)
         } else if (this.selectable && row) {
           event.preventDefault()
           const key = this.keyOf(row, this.rowIndex(place.row) - 2)

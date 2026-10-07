@@ -1156,6 +1156,66 @@ describe('the grid keyboard', () => {
     expect(element.selected.split(',').sort()).toEqual(['alpha', 'bravo', 'charlie', 'delta'])
   })
 
+  /* Replace is how a file list selects: the row a reader moves to or presses
+     is the selection. The table had only the toggle, where every row stays
+     until it is pressed again. */
+  const replacing = async (): Promise<Grid> => {
+    const { element } = await mount(
+      GRID.replace('selectable', 'selectable selection-behavior="replace"'),
+    )
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await settled(element)
+    const stop = element.shadowRoot?.querySelector('[part="table"] [tabindex="0"]') as HTMLElement
+    stop.focus()
+    await settled(element)
+    return element as Grid
+  }
+
+  test('under replace, carries the selection with Down, and Control moves without it', async () => {
+    const element = await replacing()
+    await press(element, ' ')
+    expect(element.selected).toBe('delta')
+    await press(element, 'ArrowDown')
+    expect(element.selected).toBe('alpha')
+    await press(element, 'ArrowDown', { ctrlKey: true })
+    expect(element.selected).toBe('alpha')
+    expect(place(focused(element))).toBe('2:0')
+    await press(element, ' ', { ctrlKey: true })
+    expect(element.selected).toBe('alpha,charlie')
+    await press(element, ' ')
+    expect(element.selected).toBe('charlie')
+  })
+
+  test('under replace, a press on a row selects it alone, Control adds one, and Shift a range', async () => {
+    const element = await replacing()
+    const click = async (row: number, init: MouseEventInit = {}): Promise<void> => {
+      const cell = element.shadowRoot?.querySelector(
+        `[part~="row"][data-row="${row}"] > [data-column="1"]`,
+      ) as HTMLElement
+      cell.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true, ...init }))
+      await settled(element)
+    }
+    await click(2)
+    expect(element.selected).toBe('charlie')
+    await click(0, { metaKey: true })
+    expect(element.selected).toBe('delta,charlie')
+    await click(3, { shiftKey: true })
+    expect(element.selected).toBe('delta,alpha,charlie,bravo')
+    await click(1)
+    expect(element.selected).toBe('alpha')
+  })
+
+  test('keeps the toggle by default, where a press on a row selects nothing', async () => {
+    const element = await start()
+    const cell = element.shadowRoot?.querySelector(
+      '[part~="row"][data-row="2"] > [data-column="1"]',
+    ) as HTMLElement
+    cell.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+    await settled(element)
+    await press(element, 'ArrowDown')
+    expect(element.selected).toBe('')
+  })
+
   test('selects from the row last chosen with Shift on a checkbox', async () => {
     const element = await start()
     await press(element, ' ')
