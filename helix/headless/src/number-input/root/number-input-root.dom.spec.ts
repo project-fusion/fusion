@@ -539,6 +539,15 @@ describe('a number in a locale that writes a decimal comma', () => {
     expect(formValue(host)).toBe('1.5')
   })
 
+  /* `valueAsNumber` read the text with the platform's parse, so it was NaN
+     while the form already held 1.5. */
+  test('and valueAsNumber holds it while it is still being typed', async () => {
+    const host = (await field('locale="de-DE" name="de"')) as Field & { valueAsNumber: number }
+    await type(host, '1,5')
+    expect(formValue(host)).toBe('1.5')
+    expect(host.valueAsNumber).toBe(1.5)
+  })
+
   test('and stays not a number where the locale groups with a comma', async () => {
     const host = await field('locale="en-US" step="0.1"')
     await type(host, '1,5')
