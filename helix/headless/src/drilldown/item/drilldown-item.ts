@@ -1,4 +1,5 @@
 import {
+  auditName,
   customElement,
   deepActiveElement,
   HelixElement,
@@ -43,6 +44,9 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * Choosing it fires `helix-select` first: cancel the event and the link is not
  * followed, so a router can take the navigation. A row that opens a page, or a
  * disabled row, renders no link.
+ *
+ * A development build warns when a row has no words to be named by, such as a
+ * row holding only an icon with no label.
  *
  * The row is named by its label alone. Words in `description`, a line under
  * the label, and in `end` describe it instead, through `aria-describedby`, as
@@ -197,6 +201,19 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
       this.page = named('page')
       this.description = named('description')
       this.end = named('end')
+    }
+  }
+
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    /* Once the row is first drawn, which for a page's row is when the page
+       first shows: until then there is no row to name. */
+    if (this.partNamed('item')) {
+      auditName(
+        this,
+        () => this.partNamed('item'),
+        'Give the row words in its default slot, or a label on the icon it holds.',
+      )
     }
   }
 

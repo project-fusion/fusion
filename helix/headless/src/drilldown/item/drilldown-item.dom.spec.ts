@@ -220,3 +220,32 @@ describe('a drilldown row with an href', () => {
     expect(part(parent, 'item')?.tagName).toBe('BUTTON')
   })
 })
+
+describe('a drilldown row with no name', () => {
+  /* The missing-name warning is in development builds only. */
+  const warnedOn = async (markup: string): Promise<string[]> => {
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      await mount(markup)
+      await new Promise((done) => setTimeout(done, 5))
+    } finally {
+      console.warn = original
+    }
+    return warnings
+  }
+
+  test('is reported by its tag, and a row with words is not', async () => {
+    const warnings = await warnedOn(
+      '<helix-headless-drilldown-item value="x"><svg slot="start"></svg></helix-headless-drilldown-item>',
+    )
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0]).toContain('<helix-headless-drilldown-item> has no accessible name')
+    expect(
+      await warnedOn(
+        '<helix-headless-drilldown-item value="x">Theme</helix-headless-drilldown-item>',
+      ),
+    ).toEqual([])
+  })
+})
