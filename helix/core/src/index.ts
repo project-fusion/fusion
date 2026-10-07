@@ -336,6 +336,7 @@ export {
 export {
   MixinPickerFeedback,
   type MixinPickerFeedbackInterface,
+  type PickerFailure,
 } from './mixins/mixin-picker-feedback/mixin-picker-feedback.js'
 export {
   MixinPickerField,

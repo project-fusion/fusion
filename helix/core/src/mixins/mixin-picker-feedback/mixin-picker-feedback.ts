@@ -1,5 +1,5 @@
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { property, state } from 'lit/decorators.js'
 import type { HelixFormElement } from '../../helix-form-element/helix-form-element.js'
 import { hostAria } from '../../utils/host-aria/host-aria.js'
 
@@ -26,12 +26,26 @@ export declare class MixinPickerFeedbackInterface {
    */
   invalid: boolean
 
-  /** Whether a reader is told the answer is wrong: `invalid`, or `feedback`. */
+  /**
+   * Whether a reader is told the answer is wrong: `invalid`, `feedback`, a
+   * held answer the picker refuses, or a missing answer once the reader has
+   * committed one or a form has refused the picker.
+   */
   protected get marked(): boolean
+
+  /**
+   * What the picker's own validation finds: `missing` for a required picker
+   * with nothing chosen, `refused` for an answer it holds and refuses, or
+   * nothing. Read in `willUpdate`, so a picker answers it from its properties.
+   */
+  protected get failure(): PickerFailure | undefined
 
   /** The `feedback` line, or nothing while there is none. */
   protected renderPickerFeedback(): TemplateResult | typeof nothing
 }
+
+/** What a picker's own validation finds, which `marked` reads. */
+export type PickerFailure = 'missing' | 'refused'
 
 /**
  * `feedback` and `invalid` for a picker that stands on its own as a form
@@ -73,9 +87,56 @@ export const MixinPickerFeedback = <T extends Constructor<HelixFormElement>>(Bas
     @property({ reflect: true, type: Boolean })
     invalid = false
 
-    /** Whether a reader is told the answer is wrong: `invalid`, or `feedback`. */
+    /**
+     * Whether the reader has committed an answer, or a form has refused the
+     * picker. A reset forgets it.
+     */
+    @state()
+    private touched = false
+
+    /**
+     * Whether a reader is told the answer is wrong: `invalid`, `feedback`, a
+     * held answer the picker refuses, or a missing answer once the reader has
+     * committed one or a form has refused the picker.
+     *
+     * **A refused answer is marked at once, and a missing one waits**, as
+     * Chromium's tree does for native controls: a time input holding a time
+     * past its `max` reports invalid on load, and an empty required text field
+     * does not, since the reader already hears that it is required. Measured
+     * before this on Time Picker: `value="13:00" max="12:00"` reported
+     * `rangeOverflow` while the list said nothing and `:state(invalid)` was off.
+     */
     protected get marked(): boolean {
-      return this.invalid || this.feedback !== ''
+      if (this.invalid || this.feedback !== '') {
+        return true
+      }
+      const failure = this.failure
+      return failure === 'refused' || (failure === 'missing' && this.touched)
+    }
+
+    /**
+     * What the picker's own validation finds: `missing`, `refused`, or
+     * nothing, which is what a picker that does not answer it reports.
+     */
+    protected get failure(): PickerFailure | undefined {
+      return undefined
+    }
+
+    override formResetCallback(): void {
+      super.formResetCallback()
+      this.touched = false
+    }
+
+    /* The two moments a missing answer becomes one to mention: a form refused
+       the picker, or the reader committed an answer. In `firstUpdated`, which
+       a server never runs. */
+    protected override firstUpdated(changed: PropertyValues): void {
+      super.firstUpdated(changed)
+      const touch = (): void => {
+        this.touched = true
+      }
+      this.addEventListener('invalid', touch)
+      this.addEventListener('change', touch)
     }
 
     /** @internal `feedback` marks the picker invalid, as a field's does. */
@@ -84,10 +145,13 @@ export const MixinPickerFeedback = <T extends Constructor<HelixFormElement>>(Bas
     }
 
     /* `ariaInvalid` on the host through `ElementInternals` rather than as an
-       attribute, which a React consumer's server markup never had. */
+       attribute, which a React consumer's server markup never had. **`false`
+       while unmarked, never left unset**: a host with a role and no
+       `aria-invalid` is judged by its validity, and Chromium's tree reported
+       an untouched required Date Picker, a `group`, as invalid on load. */
     protected override willUpdate(changed: PropertyValues): void {
       super.willUpdate(changed)
-      this.internals.ariaInvalid = this.marked ? 'true' : null
+      this.internals.ariaInvalid = this.marked ? 'true' : 'false'
       this.toggleState('invalid', this.marked)
     }
 
