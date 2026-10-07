@@ -1,0 +1,10 @@
+.stage {
+  block-size: 16rem;
+}
+
+/* The strands from the success color and a few from info, through the hooks.
+   The ground and the peak keep the theme's. */
+.field {
+  --strands-glow: var(--helix-color-success);
+  --strands-tint: var(--helix-color-info);
+}

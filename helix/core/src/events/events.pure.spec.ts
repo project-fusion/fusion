@@ -102,6 +102,16 @@ describe('the events that carried no class before', () => {
     expect(event.cancelable).toBe(false)
     expect(helixEventNames.has('helix-aura-fallback')).toBe(true)
   })
+
+  test('helix-strands-fallback says why the gradient shows', async () => {
+    const { HelixStrandsFallbackEvent } = await import('./events.js')
+    const event = new HelixStrandsFallbackEvent({ reason: 'software' })
+    expect(event.type).toBe('helix-strands-fallback')
+    expect(event.detail.reason).toBe('software')
+    expect(event.bubbles).toBe(true)
+    expect(event.cancelable).toBe(false)
+    expect(helixEventNames.has('helix-strands-fallback')).toBe(true)
+  })
 })
 
 describe('the notifications a sandbox sends once a request is applied', () => {

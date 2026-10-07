@@ -1,0 +1,90 @@
+:host {
+  /* Each color is its hook, or the theme's token. The canvas reads the same
+     ones below, and the peak, which only the ribbon draws. */
+  --_strands-glow: var(--strands-glow, var(--helix-color-primary));
+  --_strands-ground: var(--strands-ground, var(--helix-color-background));
+  --_strands-tint: var(--strands-tint, var(--helix-color-info));
+
+  position: relative;
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+
+  /* The fallback, needing no detection: a canvas that never draws is
+     transparent, so the host lays a soft band of the same colors underneath
+     it, at a fifth of the glow, which is about what the ribbon averages to
+     once it is spread over the box. */
+  background-image: linear-gradient(
+    115deg,
+    var(--_strands-ground) 20%,
+    color-mix(in oklab, var(--_strands-glow) 22%, var(--_strands-ground)) 48%,
+    color-mix(in oklab, var(--_strands-tint) 12%, var(--_strands-ground)) 58%,
+    var(--_strands-ground) 82%
+  );
+
+  /* Decorative, so it never takes a click meant for what is over it. */
+  pointer-events: none;
+}
+
+/* **In `travel`, behind the page, fixed to the viewport.** On the layer
+   beneath the page it paints over the page color, which a body background
+   hands to the viewport, and under every block in the flow. A consumer moves
+   it with `z-index` on the element, which wins over this. */
+:host([travel]) {
+  block-size: auto;
+  inline-size: auto;
+  inset: 0;
+  position: fixed;
+  z-index: var(--helix-layer-beneath);
+}
+
+[part="canvas"] {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+
+  /* **The colors, carried on color properties a canvas never paints**, as on
+     Aura: a custom property is handed back as the text that was written and a
+     color property is resolved by the engine first. The peak is carried twice,
+     the dark page's and the light page's, and the script picks one by the
+     ground. */
+  caret-color: var(--strands-peak, var(--helix-color-primary-hover));
+  color: var(--_strands-glow);
+  column-rule-color: var(--strands-peak, var(--helix-color-primary-active));
+  outline-color: var(--_strands-ground);
+  text-decoration-color: var(--_strands-tint);
+
+  /* A change to any of the five ends a transition the script hears, so a hook
+     set while the loop is stopped still paints a frame in the new colors. On
+     the fast duration, which the token layer shortens for a reader who asked
+     for no motion and never to nothing, so the end still fires. */
+  transition-duration: var(--helix-duration-fast);
+  transition-property: caret-color, color, column-rule-color, outline-color, text-decoration-color;
+}
+
+/* Over the ribbon and covering it, so it changes nothing about the element's
+   box. Not hit-testable itself; its content is. */
+[part="content"] {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+::slotted(*) {
+  pointer-events: auto;
+}
+
+/* While the browser holds the context, because a lost canvas is not reliably
+   transparent. Restated because the UA's `[hidden]` loses to the `display`
+   above. */
+[part="canvas"][hidden] {
+  display: none;
+}
+
+/* Decoration has no place on paper, and a printer renders a canvas as a gray
+   slab. */
+@media print {
+  :host {
+    display: none;
+  }
+}

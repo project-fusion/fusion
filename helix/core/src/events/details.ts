@@ -482,6 +482,17 @@ export interface AuraFallbackDetail {
   reason: 'lost' | 'software' | 'unavailable'
 }
 
+/** Detail carried by `helix-strands-fallback`. */
+export interface StrandsFallbackDetail {
+  /**
+   * Why the gradient shows: `software` for a renderer that draws on the CPU,
+   * `unavailable` for no WebGL or a program the browser refused, and `lost`
+   * for a context the browser took back, on a GPU reset or past its limit of
+   * about sixteen.
+   */
+  reason: 'lost' | 'software' | 'unavailable'
+}
+
 /** Detail carried by `helix-range-change`. */
 export interface RangeDetail {
   /** The index of the first item on screen. */

@@ -1,0 +1,10 @@
+/* Three boxes side by side, and stacked where there is no room for three. */
+.forms {
+  display: grid;
+  gap: var(--helix-space-md);
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+}
+
+.stage {
+  block-size: 16rem;
+}

@@ -1,0 +1,10 @@
+/* Two ribbons side by side, so the difference reads at a glance. */
+.pair {
+  display: grid;
+  gap: var(--helix-space-md);
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+}
+
+.stage {
+  block-size: 16rem;
+}

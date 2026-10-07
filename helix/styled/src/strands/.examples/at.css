@@ -1,0 +1,11 @@
+/* `at` is a share of the width, so the bend keeps its place as the box
+   changes shape. */
+.pair {
+  display: grid;
+  gap: var(--helix-space-md);
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+}
+
+.stage {
+  block-size: 16rem;
+}
