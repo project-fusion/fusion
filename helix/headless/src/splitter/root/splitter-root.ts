@@ -5,6 +5,7 @@ import {
   commaList,
   customElement,
   formatPercent,
+  formatWords,
   HelixBeforeCollapseEvent,
   HelixBeforeResizeEvent,
   HelixCollapseEvent,
@@ -227,6 +228,19 @@ export class HelixHeadlessSplitter extends HelixElement {
   @words
   @property({ attribute: 'corner-label' })
   cornerLabel = 'Resize both'
+
+  /**
+   * What the handle where two dividers cross says it is set to, both dividers
+   * at once: `{across}` is where the divider that runs down stands, and
+   * `{down}` where the one that runs across stands, each a percentage.
+   *
+   * **Both, because the handle moves both**, and a number names one: the
+   * handle's `aria-valuenow` is the divider its `aria-orientation` names, and
+   * these words are the whole of where it is.
+   */
+  @words
+  @property({ attribute: 'corner-value-label' })
+  cornerValueLabel = '{across} across, {down} down'
 
   /**
    * Which pane starts shut, when `collapsed` is not set.
@@ -750,6 +764,20 @@ export class HelixHeadlessSplitter extends HelixElement {
       }
     })
     this.sizes.observe(this)
+  }
+
+  /**
+   * Where a crossing stands in words: this splitter's divider at `own` and the
+   * nested one's at `theirs`, as `corner-value-label` puts them.
+   */
+  private cornerWords(own: number, theirs: number): string {
+    const locale = wordsLocale(this)
+    const mine = formatPercent(Math.round(own) / 100, locale)
+    const nested = formatPercent(Math.round(theirs) / 100, locale)
+    return formatWords(this, 'cornerValueLabel', {
+      across: this.vertical ? nested : mine,
+      down: this.vertical ? mine : nested,
+    })
   }
 
   /**
@@ -1504,7 +1532,7 @@ export class HelixHeadlessSplitter extends HelixElement {
           aria-valuemax="100"
           aria-valuemin="0"
           aria-valuenow=${Math.round(crossing.at)}
-          aria-valuetext=${formatPercent(Math.round(crossing.at) / 100, wordsLocale(this))}
+          aria-valuetext=${this.cornerWords(position, crossing.at)}
           data-cross=${index}
           style="--splitter-corner-at: ${crossing.at}%; --splitter-position: ${position}%"
           @dblclick=${this.handleCornerDoubleClick}

@@ -496,6 +496,15 @@ describe('splitter while it moves', () => {
     expect(handle.getAttribute('aria-valuenow')).toBe('65')
     expect(handle.getAttribute('aria-orientation')).toBe('horizontal')
   })
+
+  /* One number could not say where a handle moving two dividers stood, so a
+     reader heard one of them and not the other. */
+  test('the corner says where both dividers stand', async () => {
+    const [host] = await nested('default-position="30"', 'orientation="vertical" position="65"')
+    expect((corner(host) as HTMLElement).getAttribute('aria-valuetext')).toBe(
+      '30% across, 65% down',
+    )
+  })
 })
 
 describe('a splitter given a bound as a length', () => {
