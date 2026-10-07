@@ -50,7 +50,8 @@
   left: 0;
   position: absolute;
   top: 0;
-  transform: translate(var(--_canvas-x), var(--_canvas-y)) scale(var(--_canvas-zoom));
+  /* The zoom the board publishes for the cards, which is the zoom it draws. */
+  transform: translate(var(--_canvas-x), var(--_canvas-y)) scale(var(--canvas-zoom));
   transform-origin: 0 0;
   /* The move a press asks for, eased. A board that jumped would leave a reader
      working out what had changed; the plane is one element, so this is one
