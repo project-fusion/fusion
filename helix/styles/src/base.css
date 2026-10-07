@@ -810,6 +810,14 @@ helix-toggle[disabled]::part(item) {
   justify-content: start;
 }
 
+/* **Inside a segmented track, the destinations take the track's height.** The
+   floor above is the bar's, and the track is a control's height less its
+   frame and padding, which is under the floor: held to it, a destination
+   overflowed the track it sits in. */
+:where(helix-navigation[variant="segmented"]) :where([data-navigation-item], a) {
+  min-block-size: 0;
+}
+
 /* A link in a list item fills the item down a column, as a bare link fills its
    place in the column. */
 :where(helix-navigation[orientation="vertical"]) :where(li) > :where([data-navigation-item], a) {
