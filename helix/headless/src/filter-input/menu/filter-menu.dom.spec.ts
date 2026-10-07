@@ -444,3 +444,25 @@ describe('refusing', () => {
     expect(seen[0]?.operatorLabel).toBe('')
   })
 })
+
+/* Measured before this in Chromium: every Filter Input whose menu offered a
+   field printed "<helix-divider announced> is deprecated", from the menu's
+   own divider, which a page could not reach to fix. */
+describe('the rule between comparisons and values', () => {
+  test('is a separator, and raises no warning', async () => {
+    const warned: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warned.push(String(message))
+    try {
+      const element = await picker()
+      await new Promise((done) => setTimeout(done, 5))
+      const divider = element.shadowRoot?.querySelector('[part="divider"]')
+      expect(divider).not.toBeNull()
+      expect(divider?.hasAttribute('announced')).toBe(false)
+      expect(divider?.hasAttribute('decorative')).toBe(false)
+    } finally {
+      console.warn = original
+    }
+    expect(warned.filter((message) => message.includes('deprecated'))).toEqual([])
+  })
+})
