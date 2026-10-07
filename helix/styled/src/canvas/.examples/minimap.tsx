@@ -1,0 +1,65 @@
+export function Example() {
+  return (
+    <helix-canvas
+      controls="zoom fullscreen minimap"
+      label="Release plan"
+    >
+      <helix-canvas-node
+        height={64}
+        name="plan"
+        width={160}
+        x={0}
+        y={0}
+      >
+        Plan
+      </helix-canvas-node>
+
+      <helix-canvas-node
+        height={64}
+        name="build"
+        tone="info"
+        width={160}
+        x={480}
+        y={0}
+      >
+        Build
+      </helix-canvas-node>
+
+      <helix-canvas-node
+        height={64}
+        name="review"
+        width={160}
+        x={960}
+        y={320}
+      >
+        Review
+      </helix-canvas-node>
+
+      <helix-canvas-node
+        height={64}
+        name="ship"
+        tone="primary"
+        width={160}
+        x={1440}
+        y={640}
+      >
+        Ship
+      </helix-canvas-node>
+
+      <helix-canvas-edge
+        from="plan"
+        to="build"
+      ></helix-canvas-edge>
+
+      <helix-canvas-edge
+        from="build"
+        to="review"
+      ></helix-canvas-edge>
+
+      <helix-canvas-edge
+        from="review"
+        to="ship"
+      ></helix-canvas-edge>
+    </helix-canvas>
+  )
+}
