@@ -518,3 +518,33 @@ describe('a required toggle group', () => {
     )
   })
 })
+
+describe('a toggle group that allows no choice', () => {
+  /* React Aria's ToggleButtonGroup and Radix's ToggleGroup take the choice
+     back on a second press. */
+  const choose = async (group: HTMLElement, at: number): Promise<void> => {
+    ;(items(group)[at] as unknown as { select: () => void }).select()
+    await new Promise((resolve) => setTimeout(resolve))
+  }
+
+  test('takes the choice back on a second press', async () => {
+    const group = (await mount(
+      markup.replace(
+        '<helix-headless-toggle-group',
+        '<helix-headless-toggle-group allow-empty-selection',
+      ),
+    )) as HTMLElement & { value: string }
+    await choose(group, 2)
+    expect(group.value).toBe('dark')
+    await choose(group, 2)
+    expect(group.value).toBe('')
+    expect(items(group).some((item) => item.selected)).toBe(false)
+  })
+
+  test('and keeps it without the attribute, as a radio group does', async () => {
+    const group = (await mount(markup)) as HTMLElement & { value: string }
+    await choose(group, 2)
+    await choose(group, 2)
+    expect(group.value).toBe('dark')
+  })
+})
