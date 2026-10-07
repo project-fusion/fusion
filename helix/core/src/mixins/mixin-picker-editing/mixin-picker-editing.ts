@@ -53,6 +53,9 @@ export declare class MixinPickerEditingInterface {
   requestOpen(next: boolean): boolean
 }
 
+/** The keys that move the caret or edit the text, besides a printable character. */
+const caretKeys = new Set(['ArrowLeft', 'ArrowRight', 'Backspace', 'Delete', 'End', 'Home'])
+
 /**
  * Grafts the typing half of a picker field: a press into it opens the picker,
  * it holds the value while the caret is in it, and it refuses while read-only.
@@ -76,9 +79,6 @@ export declare class MixinPickerEditingInterface {
  * the two that take this mixin; Color Input declares its own, the same
  * property refusing the same two requests.
  */
-/** The keys that move the caret or edit the text, besides a printable character. */
-const caretKeys = new Set(['ArrowLeft', 'ArrowRight', 'Backspace', 'Delete', 'End', 'Home'])
-
 export const MixinPickerEditing = <T extends Constructor<EditingBase>>(Base: T) => {
   // JSDoc is duplicated from MixinPickerEditingInterface deliberately. The
   // interface is what TypeScript consumers see; this class is what the manifest
