@@ -60,3 +60,39 @@ export const stepIndex = (
       return undefined
   }
 }
+
+/**
+ * Where a key lands once disabled items are passed over: from `to`, which
+ * `stepIndex` gave, on in the way the key moves until an item that is not
+ * disabled. A line move steps a line at a time, in the same column. Home looks
+ * forward from the first item and End back from the last. `undefined` where
+ * every item that way is disabled, and the key moves nothing.
+ */
+export const skipDisabled = (
+  key: string,
+  from: number,
+  to: number,
+  count: number,
+  disabled: (index: number) => boolean,
+  across = 1,
+): number | undefined => {
+  if (!disabled(to)) {
+    return to
+  }
+  const width = Math.max(1, Math.trunc(across))
+  const line = key === 'ArrowDown' || key === 'ArrowUp' || key === 'PageDown' || key === 'PageUp'
+  const way = key === 'Home' ? 1 : key === 'End' ? -1 : to >= from ? 1 : -1
+  const step = (line ? width : 1) * way
+  for (let at = to + step; at >= 0 && at < count; at += step) {
+    if (!disabled(at)) {
+      return at
+    }
+  }
+  /* Nothing that way on the same column: the nearest item along the set. */
+  for (let at = to + way; at >= 0 && at < count; at += way) {
+    if (!disabled(at)) {
+      return at === from ? undefined : at
+    }
+  }
+  return undefined
+}
