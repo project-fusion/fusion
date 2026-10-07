@@ -1,5 +1,13 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, hasState, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import {
+  hasLayout,
+  hasState,
+  mount,
+  part,
+  registerDom,
+  role,
+  settle,
+} from '@fusion.dev/helix-testing/dom'
 
 /* The styled tier, which is paint over the headless behavior.
  *
@@ -40,6 +48,72 @@ describe('the styled feed', () => {
   test('the count reaches the host, so a badge can read it without counting', async () => {
     const element = await mount(markup)
     expect(element.getAttribute('unread')).toBe('1')
+  })
+})
+
+/* The feed's stylesheet as text: happy-dom resolves no cascade, so here is
+   held that the rule exists, and the pictures that it applies. */
+const feedSheet = (): string => {
+  const declared = (customElements.get('helix-notifications') as unknown as { styles: unknown })
+    .styles
+  return (Array.isArray(declared) ? declared : [declared])
+    .flat(Number.POSITIVE_INFINITY)
+    .map((one) => String((one as { cssText?: string }).cssText ?? ''))
+    .join('\n')
+}
+
+describe('separation on the feed', () => {
+  const feed = async (separation: string): Promise<HTMLElement & { separation?: string }> => {
+    const element = (await mount(`
+      <helix-notifications label="Activity" ${separation}>
+        <h2 slot="header">Activity</h2>
+        <helix-notification>One</helix-notification>
+        <helix-notification separation="plain">Two</helix-notification>
+        <helix-notification-group label="Earlier">
+          <helix-notification>Three</helix-notification>
+        </helix-notification-group>
+      </helix-notifications>`)) as HTMLElement & { separation?: string }
+    await settle(element)
+    return element
+  }
+  const rows = (element: HTMLElement): Element[] => [
+    ...element.querySelectorAll('helix-notification'),
+  ]
+
+  test('makes every row that sets none a box, grouped rows included, and a row keeps its own', async () => {
+    const element = await feed('separation="filled"')
+    const [one, two, three] = rows(element) as [Element, Element, Element]
+    expect(hasState(one, 'feed-filled')).toBe(true)
+    expect(hasState(three, 'feed-filled')).toBe(true)
+    expect(hasState(two, 'feed-filled')).toBe(false)
+    /* Said as a state, so the row's markup stays the page's. */
+    expect(one.hasAttribute('separation')).toBe(false)
+  })
+
+  test('follows a change, and plain or none leaves every row as it was', async () => {
+    const element = await feed('separation="outlined"')
+    const [one] = rows(element) as [Element]
+    expect(hasState(one, 'feed-outlined')).toBe(true)
+    element.separation = 'plain'
+    await settle(element)
+    await settle(one as HTMLElement)
+    expect(hasState(one, 'feed-outlined')).toBe(false)
+    expect(hasState(one, 'feed-filled')).toBe(false)
+    const bare = await feed('')
+    expect(
+      rows(bare).some((row) => hasState(row, 'feed-filled') || hasState(row, 'feed-outlined')),
+    ).toBe(false)
+    expect(bare.hasAttribute('separation')).toBe(false)
+  })
+
+  test('takes the rule under the header away and puts the gap between boxes before the first', () => {
+    const text = feedSheet()
+    expect(text).toContain(
+      ':host([separation="filled"]) [part="header"],\n:host([separation="outlined"]) [part="header"] {border-block-end: none;}',
+    )
+    expect(text).toContain(
+      ':host([separation="filled"]) [part="list"],\n:host([separation="outlined"]) [part="list"] {padding-block-start: var(--notifications-item-gap, var(--helix-space-xs));}',
+    )
   })
 })
 

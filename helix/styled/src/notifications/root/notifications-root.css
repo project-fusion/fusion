@@ -64,6 +64,20 @@
   overflow-y: auto;
 }
 
+/* **A feed of boxes.** The rule under the header is drawn for rows separated
+   by rules, and above a box it reads as a stray line. A box draws its own
+   edge, so the rule goes and the first box stands the same gap below the
+   header that falls between the boxes. */
+:host([separation="filled"]) [part="header"],
+:host([separation="outlined"]) [part="header"] {
+  border-block-end: none;
+}
+
+:host([separation="filled"]) [part="list"],
+:host([separation="outlined"]) [part="list"] {
+  padding-block-start: var(--notifications-item-gap, var(--helix-space-xs));
+}
+
 [part="footer"] {
   border-block-start: var(--helix-border-thin) solid
     var(--notifications-rule, var(--helix-color-border));

@@ -119,16 +119,24 @@
  *
  * The gap is a margin on the host rather than a `gap` on the list, because the
  * list holds a mixture: a feed of `plain` rows wants no gap at all, and a `gap`
- * there would be charged to every row whatever it is. */
+ * there would be charged to every row whatever it is.
+ *
+ * `feed-filled` and `feed-outlined` are the feed's `separation`, taken by a
+ * row that sets none of its own. A stylesheet in a row cannot see the feed it
+ * is in, so the feed says it on each row as a state. */
 :host([separation="filled"]),
-:host([separation="outlined"]) {
+:host([separation="outlined"]),
+:host(:state(feed-filled)),
+:host(:state(feed-outlined)) {
   --notifications-rule: transparent;
 
   margin-block-end: var(--notifications-item-gap, var(--helix-space-xs));
 }
 
 :host([separation="filled"]) [part="item"],
-:host([separation="outlined"]) [part="item"] {
+:host([separation="outlined"]) [part="item"],
+:host(:state(feed-filled)) [part="item"],
+:host(:state(feed-outlined)) [part="item"] {
   border: var(--helix-border-thin) solid var(--notifications-item-edge, var(--helix-color-border));
   border-radius: var(--notifications-item-radius, var(--helix-radii-md));
 }
@@ -136,7 +144,8 @@
 /* A fill as well as an edge. `surface-raised` rather than `surface`, because the
    feed itself usually sits on a surface already and a row has to be the rung
    above whatever it is on rather than the same one. */
-:host([separation="filled"]) [part="item"] {
+:host([separation="filled"]) [part="item"],
+:host(:state(feed-filled)) [part="item"] {
   background-color: var(--notifications-item-fill, var(--helix-color-surface-raised));
 }
 
@@ -144,7 +153,8 @@
    `surface-raised`, which is the row's too, so the disc vanished and the
    initials floated in both schemes. Mixed from the foreground, the way a hover
    well is, it sits one step off whatever the row is filled with. */
-:host([separation="filled"]) {
+:host([separation="filled"]),
+:host(:state(feed-filled)) {
   --avatar-background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
 }
 
