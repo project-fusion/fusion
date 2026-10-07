@@ -1,6 +1,6 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessNotification } from '@fusion.dev/helix-headless/notifications'
-import type { CSSResultGroup } from 'lit'
+import type { CSSResultGroup, PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as glyphStyles } from '../../shared/glyph/glyph.css.js'
 import { styles } from './notification.css.js'
@@ -57,10 +57,20 @@ import '../../format-date/index.js'
  * @cssproperty --notifications-unread-mark - Color of the edge mark on an unread item.
  * @cssproperty --notifications-unread-offset - Distance from the unread mark to the row's top edge.
  * @cssproperty --notifications-unread-radius - Corner radius of the unread mark, which can turn it into a dot.
+ *
+ * @cssstate feed-filled - The feed's `separation` is `filled` and the row sets none of its own, so the row is drawn as `filled`.
+ * @cssstate feed-outlined - The feed's `separation` is `outlined` and the row sets none of its own, so the row is drawn as `outlined`.
  */
 @customElement('helix-notification')
 export class HelixNotification extends HelixHeadlessNotification {
   static override tier = 'helix-'
+
+  /**
+   * @internal Set by the feed: its own `separation`, which this row takes
+   * where it sets none, as `:state(feed-filled)` or `:state(feed-outlined)`.
+   */
+  @property({ attribute: false })
+  feedSeparation: 'filled' | 'outlined' | 'plain' | undefined = undefined
 
   /**
    * How a row is separated from the one above it.
@@ -76,13 +86,19 @@ export class HelixNotification extends HelixHeadlessNotification {
    * scan or a set of things to act on. The reference this came from draws cards
    * because every row in it has a control.
    *
-   * **On the row and not on the feed, because the row is the box being
-   * separated.** A consumer wanting the whole feed carded says so once, in a
-   * document rule on the element, rather than on every item: this is a styled
-   * axis and a stylesheet is where it is set.
+   * **On the row, because the row is the box being separated, and on the
+   * feed for every row at once.** A feed's own `separation` is taken by each
+   * row that sets none, and a row that sets one keeps it, `plain` included.
    */
   @property({ reflect: true })
   separation?: 'filled' | 'outlined' | 'plain'
+
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    const taken = this.separation ? undefined : this.feedSeparation
+    this.toggleState('feed-filled', taken === 'filled')
+    this.toggleState('feed-outlined', taken === 'outlined')
+  }
 
   static override styles: CSSResultGroup = [glyphStyles, styles]
 }

@@ -5,13 +5,13 @@ export function Example() {
     <helix-notifications
       className="feed"
       label="Notifications"
+      separation="filled"
     >
       <h2 slot="header">Notifications</h2>
 
       <helix-notification
         at="2026-09-09T03:00:00Z"
         dismissible
-        separation="filled"
       >
         <helix-avatar
           name="Boyd Larkin"
@@ -39,7 +39,6 @@ export function Example() {
       <helix-notification
         at="2026-09-08T03:00:00Z"
         dismissible
-        separation="filled"
       >
         <helix-avatar
           name="Jordan Lee"
@@ -67,7 +66,6 @@ export function Example() {
       <helix-notification
         at="2026-09-07T03:00:00Z"
         read
-        separation="filled"
       >
         <helix-avatar
           name="Santos Kling"

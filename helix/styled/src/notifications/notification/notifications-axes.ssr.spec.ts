@@ -41,3 +41,22 @@ describe('notifications visual axes', () => {
     expect(bare).not.toContain('separation=')
   })
 })
+
+describe('the feed’s separation', () => {
+  test('reflects, and the row’s sheet draws a row that takes it as its own', () => {
+    const served = ssr(
+      html`<helix-notifications .separation=${'filled'}><helix-notification></helix-notification></helix-notifications>`,
+    )
+    expect(hostTag(served, 'helix-notifications')).toContain('separation="filled"')
+    expect(styles(served)).toContain(':host(:state(feed-filled)) [part="item"]')
+    expect(styles(served)).toContain(':host([separation="filled"]) [part="header"]')
+  })
+
+  test('and a feed that asked for none carries none', () => {
+    const bare = hostTag(
+      ssr(html`<helix-notifications></helix-notifications>`),
+      'helix-notifications',
+    )
+    expect(bare).not.toContain('separation=')
+  })
+})
