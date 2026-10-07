@@ -604,6 +604,39 @@ describe('an item whose `label` or `value` changes after the first render', () =
     expect((part(host, 'counter') as HTMLElement).textContent).toBe('A beach, 1 of 3')
   })
 
+  test('is the only change that renders the viewer again, so its content changing does not', async () => {
+    /* The watch covers the subtree, and a `<progress value>` updated while a
+       video plays would otherwise render the viewer again on each update.
+       The item's own `label` last, so a counter that never ran fails here. */
+    const host = (await mount(
+      `<helix-headless-lightbox label="Photos">
+        <helix-headless-lightbox-item value="one" label="A harbour">
+          <video><track kind="captions" label="English"></video>
+          <progress value="0" max="10"></progress>
+        </helix-headless-lightbox-item>
+      </helix-headless-lightbox>`,
+    )) as Lightbox & { requestUpdate: (...args: unknown[]) => void }
+    await settled(host)
+    let asked = 0
+    const request = host.requestUpdate.bind(host)
+    host.requestUpdate = (...args: unknown[]) => {
+      asked += 1
+      request(...args)
+    }
+    const progress = host.querySelector('progress') as HTMLProgressElement
+    for (const at of ['1', '2', '3']) {
+      progress.setAttribute('value', at)
+      await settled(host)
+    }
+    host.querySelector('track')?.setAttribute('label', 'Deutsch')
+    await settled(host)
+    expect(asked).toBe(0)
+
+    host.querySelector('helix-headless-lightbox-item')?.setAttribute('label', 'A beach')
+    await settled(host)
+    expect(asked).toBe(1)
+  })
+
   test('is named without its old `label` once it has none', async () => {
     const host = await lightbox('slide-label="{label} {index} of {count}"')
     const item = host.querySelector('[value="one"]') as HTMLElement & {
