@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'bun:test'
+import { afterEach, describe, expect, test } from 'bun:test'
 import {
   isPartial,
   isTwelveHourLayout,
@@ -20,10 +20,31 @@ const kinds = (layout: SegmentSlot[]): string[] =>
   layout.map((slot) => ('kind' in slot ? slot.kind : `[${slot.literal}]`))
 
 describe('the order a locale writes the parts in', () => {
+  const real = Intl.DateTimeFormat.prototype.formatToParts
+  afterEach(() => {
+    Intl.DateTimeFormat.prototype.formatToParts = real
+  })
+
   test('a date', () => {
     expect(kinds(segmentLayout('date', 'en-US'))).toEqual(['month', '[/]', 'day', '[/]', 'year'])
     expect(kinds(segmentLayout('date', 'de-DE'))).toEqual(['day', '[.]', 'month', '[.]', 'year'])
     expect(kinds(segmentLayout('date', 'ja-JP'))[0]).toBe('year')
+  })
+
+  test('the ISO 8601 calendar is year, month and day with hyphens, whatever ICU writes', () => {
+    const iso = ['year', '[-]', 'month', '[-]', 'day']
+    expect(kinds(segmentLayout('date', 'en-US-u-ca-iso8601'))).toEqual(iso)
+    expect(kinds(segmentLayout('date', 'de-DE-u-ca-iso8601'))).toEqual(iso)
+    /* An ICU before CLDR 42, as on Linux, writes the locale's order for it. */
+    const us = new Intl.DateTimeFormat('en-US', {
+      day: '2-digit',
+      month: '2-digit',
+      timeZone: 'UTC',
+      year: 'numeric',
+    })
+    Intl.DateTimeFormat.prototype.formatToParts = (date) => real.call(us, date)
+    expect(kinds(segmentLayout('date', 'en-US-u-ca-iso8601'))).toEqual(iso)
+    expect(kinds(segmentLayout('date', 'en-US'))).toEqual(['month', '[/]', 'day', '[/]', 'year'])
   })
 
   test('a time, on the clock asked for', () => {

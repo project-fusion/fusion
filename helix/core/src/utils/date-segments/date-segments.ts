@@ -39,7 +39,8 @@ const SAMPLE = new Date(Date.UTC(2006, 10, 22, 15, 4, 5))
  * between them, read off `Intl`'s own rendering of a sample.
  *
  * `en-US` is month, day, year with slashes; `de-DE` day, month, year with
- * dots; `ja-JP` year, month, day. A time follows the clock: a twelve hour
+ * dots; `ja-JP` year, month, day; the `iso8601` calendar year, month, day
+ * with hyphens. A time follows the clock: a twelve hour
  * locale ends with the half of the day.
  */
 export const segmentLayout = (
@@ -62,6 +63,21 @@ export const segmentLayout = (
           ...(options.seconds ? { second: '2-digit' } : {}),
           ...(options.hourCycle ? { hourCycle: options.hourCycle } : {}),
         })
+  /* The ISO 8601 calendar is year, month and day with hyphens in every
+     locale. ICU writes it so from CLDR 42; an older ICU, such as the one Bun
+     and Node use on Linux, writes the locale's own order, so it is set here. */
+  if (
+    kind === 'date' &&
+    (/-ca-iso8601/i.test(locale) || format.resolvedOptions().calendar === 'iso8601')
+  ) {
+    return [
+      { kind: 'year' },
+      { literal: '-' },
+      { kind: 'month' },
+      { literal: '-' },
+      { kind: 'day' },
+    ]
+  }
   const known = new Set<string>(['day', 'dayPeriod', 'hour', 'minute', 'month', 'second', 'year'])
   const slots: SegmentSlot[] = []
   for (const part of format.formatToParts(SAMPLE)) {
