@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -237,5 +237,71 @@ describe('a swipe', () => {
     swipe(found, 200, 'mouse')
     expect(box.style.getPropertyValue('--toast-swipe-x')).toBe('')
     release(200)
+  })
+})
+
+describe('Escape on a message', () => {
+  const pressEscape = (target: Element): KeyboardEvent => {
+    const key = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key: 'Escape',
+    })
+    target.dispatchEvent(key)
+    return key
+  }
+
+  test('dismisses the message holding focus, through helix-dismiss', async () => {
+    const found = await message('dismissible')
+    const heard: string[] = []
+    found.addEventListener('helix-dismiss', () => heard.push('dismiss'))
+    const key = pressEscape(found)
+    await found.updateComplete
+    expect(heard).toEqual(['dismiss'])
+    expect(key.defaultPrevented).toBe(true)
+    expect(found.open).toBe(false)
+  })
+
+  test('a refused dismissal leaves the message, and the key to the page', async () => {
+    const found = await message('dismissible')
+    found.addEventListener('helix-dismiss', (event) => event.preventDefault())
+    const key = pressEscape(found)
+    await found.updateComplete
+    expect(found.open).toBe(true)
+    expect(key.defaultPrevented).toBe(false)
+  })
+})
+
+describe('the states a message records', () => {
+  test('closed once dismissed, and paused while its clock is held', async () => {
+    const found = (await message('duration="5000"')) as Item & {
+      dismiss(): boolean
+      pause(): void
+    }
+    expect(hasState(found, 'closed')).toBe(false)
+    found.pause()
+    expect(hasState(found, 'paused')).toBe(true)
+    found.dismiss()
+    await found.updateComplete
+    expect(hasState(found, 'closed')).toBe(true)
+  })
+
+  test('waiting while the region holds it back, hidden and with its clock stopped', async () => {
+    const found = (await message('duration="40"')) as Item & { waiting: boolean }
+    found.waiting = true
+    await found.updateComplete
+    expect(hasState(found, 'waiting')).toBe(true)
+    expect(found.hidden).toBe(true)
+    await new Promise((done) => setTimeout(done, 80))
+    expect(found.open).toBe(true)
+    found.waiting = false
+    await found.updateComplete
+    expect(found.hidden).toBe(false)
+    const until = Date.now() + 1200
+    while (Date.now() < until && found.open) {
+      await new Promise((done) => setTimeout(done, 20))
+    }
+    expect(found.open).toBe(false)
   })
 })
