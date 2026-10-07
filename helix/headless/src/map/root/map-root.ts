@@ -597,6 +597,22 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
   }
 
   /**
+   * Closes the layers menu when focus moves on from its button and the menu,
+   * as a Tab past the last tile does. Focus leaving the page, with nothing
+   * focused in its place, leaves the menu as it is.
+   */
+  private readonly handleMenuFocusOut = (event: FocusEvent): void => {
+    const to = event.relatedTarget as Node | null
+    if (!(this.layersOpen && to)) {
+      return
+    }
+    const owners = this.renderRoot.querySelectorAll('[part="layers-toggle"], [part="layers-menu"]')
+    if (![...owners].some((owner) => owner.contains(to))) {
+      this.layersOpen = false
+    }
+  }
+
+  /**
    * Keys pressed in the layers menu. Escape closes it and returns to its
    * button, and no key reaches the region, where the arrows would pan the map.
    */
@@ -1036,6 +1052,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
             this.dispatchEvent(new HelixMapPartChangeEvent({ kind: 'menu' }))
           }
         }}
+        @focusout=${this.handleMenuFocusOut}
         @keydown=${this.handleMenuKeydown}
       >
         <slot name="layers-icon">
@@ -1050,6 +1067,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
         role="group"
         aria-label=${this.layersLabel}
         ?hidden=${!this.layersOpen}
+        @focusout=${this.handleMenuFocusOut}
         @keydown=${this.handleMenuKeydown}
       >
         ${this.imagery.length > 0 ? this.renderMapTypes() : nothing}
