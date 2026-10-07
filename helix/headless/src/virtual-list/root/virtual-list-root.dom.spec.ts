@@ -208,6 +208,37 @@ describe('virtual list', () => {
     expect(document.activeElement).toBe(link)
   })
 
+  /* An empty list drew nothing at all, so a reader could not tell no items
+     from a broken list, and there was no place for a link to add the first. */
+  test('shows the empty row where it was given words or content, and only then', async () => {
+    const quiet = await list(0)
+    expect(part(quiet, 'empty')).toBeNull()
+
+    const said = await list(0, 'empty-label="No rows yet"')
+    const row = part(said, 'empty') as HTMLElement
+    expect(row.getAttribute('role')).toBe('listitem')
+    expect(row.textContent?.trim()).toBe('No rows yet')
+
+    const busy = await list(0, 'empty-label="No rows yet" loading')
+    expect(part(busy, 'empty')).toBeNull()
+
+    const full = await list(3, 'empty-label="No rows yet"')
+    expect(part(full, 'empty')).toBeNull()
+  })
+
+  test('takes your own content for the empty row, and draws no row of it', async () => {
+    document.body.innerHTML = `<helix-headless-virtual-list for="rows" label="Rows">
+        <template><div data-field="name"></div></template>
+        <p slot="empty">Nothing here. <a href="#add">Add a row</a></p>
+      </helix-headless-virtual-list>
+      <script id="rows" type="application/json">[]</script>`
+    const host = document.body.firstElementChild as Updatable
+    await settle(host)
+    const slot = (part(host, 'empty') as HTMLElement).querySelector('slot') as HTMLSlotElement
+    expect(slot.assignedElements()).toEqual([host.querySelector('[slot="empty"]') as Element])
+    expect(host.querySelectorAll(':scope > [data-index]')).toHaveLength(0)
+  })
+
   /* The source was read once per `for`, so new JSON written into the script,
      which is how a framework updates a text child, left the old rows drawn. */
   test('draws the rows again when the source is edited', async () => {

@@ -61,6 +61,13 @@
 
 /* The row after the last item while more are fetched: quiet, and centered
    under the rows, so it reads as the list's own state and not as an item. */
+[part="empty"] {
+  color: var(--virtual-list-empty-color, var(--helix-color-foreground-muted));
+  font-size: var(--helix-text-sm);
+  padding: var(--virtual-list-empty-padding, var(--helix-space-md));
+  text-align: center;
+}
+
 [part="loading"] {
   color: var(--virtual-list-loading-color, var(--helix-color-foreground-muted));
   font-size: var(--helix-text-sm);

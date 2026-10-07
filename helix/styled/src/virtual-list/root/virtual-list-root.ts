@@ -22,10 +22,13 @@ import { styles } from './virtual-list-root.css.js'
  *
  * @csspart after - The space that stands in for the rows below the rendered ones.
  * @csspart before - The space that stands in for the rows above the rendered ones.
+ * @csspart empty - The row shown when there are no items and none are loading, where `empty-label` or the `empty` slot gives it content.
  * @csspart loading - The row after the last item while `loading` is set.
  * @csspart viewport - The scrolling box.
  *
  * @cssproperty --virtual-list-block-size - How tall the scrolling box is.
+ * @cssproperty --virtual-list-empty-color - The color of the text in the row shown when there are no items.
+ * @cssproperty --virtual-list-empty-padding - The space around the text in the row shown when there are no items.
  * @cssproperty --virtual-list-loading-color - The color of the text in the row drawn while `loading` is set.
  * @cssproperty --virtual-list-loading-padding - The space around the text in the row drawn while `loading` is set.
  * @cssproperty --virtual-list-scrollbar-thumb-color - The thumb of the list's scrollbar. Defaults to `--helix-scrollbar-thumb-color`.

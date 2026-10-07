@@ -122,6 +122,12 @@ export interface VirtualListRange {
  * the last item says "Loading more" (`loading-label`, or your own content in
  * the `loading` slot). `scrollToIndex` takes a reader to an item.
  *
+ * **An empty list.** Set `empty-label`, or put your own content in the `empty`
+ * slot, for a row shown when there are no items and none are loading, such as
+ * "No messages yet" and a link to write one. Without either, an empty list
+ * shows nothing, since a list whose items have not arrived yet has not said
+ * it has none.
+ *
  * **Row height.** Rows are placed by `estimate` until they are drawn. Then the
  * list reads the drawn rows' height once and places every row by it, so a
  * wrong estimate still reaches the last item. Set `measured` for rows of
@@ -143,6 +149,7 @@ export interface VirtualListRange {
  * @documentation https://fusion.dev/helix/components/virtual-list
  *
  * @slot - The `<template>` that defines one row. The list writes the rows it renders beside it, and this slot shows them between the two spacers.
+ * @slot empty - Content for the row shown when there are no items and none are loading. Falls back to `empty-label`.
  * @slot loading - Content for the row after the last item while `loading` is set. Falls back to `loading-label`.
  *
  * @event {Event} change - Fired once a press or a key has changed which items are selected, in a list with `selection-mode`.
@@ -152,6 +159,7 @@ export interface VirtualListRange {
  *
  * @csspart after - The space that stands in for the rows below the rendered ones.
  * @csspart before - The space that stands in for the rows above the rendered ones.
+ * @csspart empty - The row shown when there are no items and none are loading, where `empty-label` or the `empty` slot gives it content.
  * @csspart loading - The row after the last item while `loading` is set.
  * @csspart viewport - The scrolling box. On this tier, it needs only a block size.
  */
@@ -224,6 +232,13 @@ export class HelixHeadlessVirtualList extends HelixElement {
    */
   @property({ type: Boolean })
   loading = false
+
+  /**
+   * The text of the row shown when there are no items and none are loading,
+   * where the `empty` slot is empty. Empty, the default, shows no row.
+   */
+  @property({ attribute: 'empty-label' })
+  emptyLabel = ''
 
   /** The text of the row drawn while `loading` is set, where the `loading` slot is empty. */
   @words
@@ -956,6 +971,13 @@ export class HelixHeadlessVirtualList extends HelixElement {
       kept === undefined ? undefined : Math.floor(kept / this.across),
     )
     const across = this.across
+    /* Only once the browser has read the source, so a server and a list whose
+       items are on their way say nothing about an empty set. */
+    const empty =
+      this.hasUpdated &&
+      !this.loading &&
+      this.data.length === 0 &&
+      (this.emptyLabel !== '' || this.querySelector(':scope > [slot="empty"]') !== null)
     return html`<div
       data-scroller
       part="viewport"
@@ -983,6 +1005,13 @@ export class HelixHeadlessVirtualList extends HelixElement {
         this.loading
           ? html`<div part="loading" role=${this.selectionMode ? 'option' : 'listitem'}>
               <slot name="loading">${this.loadingLabel}</slot>
+            </div>`
+          : nothing
+      }
+      ${
+        empty
+          ? html`<div part="empty" role=${this.selectionMode ? 'option' : 'listitem'}>
+              <slot name="empty">${this.emptyLabel}</slot>
             </div>`
           : nothing
       }
