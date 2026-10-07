@@ -400,14 +400,23 @@ export class VirtualizeController implements ReactiveController {
    * runs. Written there as well, the move was made twice: in Chromium, End in
    * a windowed Object Inspector left the focused row 61 pixels below the box.
    * So a shrinking spacer is paid for now, and a growing one after the render.
+   *
+   * **A move owed to the render asks for that render.** At the start of the
+   * set the spacer is already zero, so squaring leaves the window the same and
+   * `measure` asks for no update. The owed move then waited for whatever
+   * rendered next. In Chromium, a chat scrolled to its top measured the turns
+   * above the reader 62 pixels taller than their estimates, and the history
+   * prepended after that paid the 62 pixels along with its own room, so the
+   * turn being read moved 62 pixels.
    */
   private square(): void {
     const box = this.options.container()
     if (this.drift > 0 && box) {
       box.scrollTop -= this.drift
       this.lastTop = box.scrollTop
-    } else {
+    } else if (this.drift !== 0) {
       this.owed -= this.drift
+      this.host.requestUpdate()
     }
     this.drift = 0
   }
