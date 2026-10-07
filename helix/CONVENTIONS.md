@@ -1534,6 +1534,12 @@ declares it. So every English default a component ships is a word property, and
   nearest `lang`, then the runtime's locale, and only the element's own
   attributes on a server and while hydrating. A child that reads only its own
   `lang` or `locale` is handed `handedLocale(this)`.
+- **A built-in fallback name is `fallbackLabel`** (`fallback-label`), in
+  every family: the name an element gives itself where `label`, an
+  `aria-label` and a heading all leave it unnamed. `label` stays the page's
+  name and empty by default, and the element reads `this.label ||
+  this.fallbackLabel`. One spelling, so a page and a translator find it in
+  each family by one name.
 - **A validation message is never empty.** A word property whose name ends in
   `Message` reads an empty string as unset, so a page that renders an empty
   variable into `range-overflow-message=""` gets the registered or English

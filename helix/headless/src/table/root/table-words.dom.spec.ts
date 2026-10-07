@@ -53,10 +53,10 @@ const sortBy = async (host: Updating, sort: string): Promise<string> => {
 
 const POLISH = {
   'helix-table': {
+    fallbackLabel: 'Tabela',
     selectAllLabel: 'Zaznacz wszystkie wiersze',
     sortedLabel:
       '{direction, select, ascending {Posortowano rosnąco: {column}} descending {Posortowano malejąco: {column}} other {Posortowano: {column}}}',
-    tableLabel: 'Tabela',
   },
   'helix-table-column': {
     widthLabel:

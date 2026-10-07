@@ -57,6 +57,16 @@ describe('the count a graph says', () => {
 })
 
 describe('a graph on a page in another language', () => {
+  test('is named by the fallback name registered for it where `label` is empty', async () => {
+    registerWords('de', { 'helix-graph': { fallbackLabel: 'Notizgraph' } })
+    document.body.innerHTML =
+      '<div lang="de"><helix-headless-graph><canvas></canvas></helix-headless-graph></div>'
+    const host = document.querySelector('helix-headless-graph') as Graph
+    host.nodes = NOTES
+    await settle(host)
+    expect(part(host, 'region')?.getAttribute('aria-label')).toBe('Notizgraph')
+  })
+
   test('speaks the words registered for the nearest `lang`', async () => {
     registerWords('de', GERMAN)
     const host = await graph('lang="de"')

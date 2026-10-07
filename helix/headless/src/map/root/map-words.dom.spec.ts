@@ -98,7 +98,7 @@ describe('a map on a page in another language', () => {
   })
 
   test('names itself with its word where it has no `label`', async () => {
-    registerWords('pl', { 'helix-map': { mapLabel: 'Mapa' } })
+    registerWords('pl', { 'helix-map': { fallbackLabel: 'Mapa' } })
     document.body.innerHTML = '<div lang="pl"><helix-headless-map></helix-headless-map></div>'
     const host = document.querySelector('helix-headless-map') as Frame
     await settle(host)
