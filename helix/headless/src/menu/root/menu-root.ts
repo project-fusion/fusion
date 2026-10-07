@@ -139,7 +139,7 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
  * on a submenu goes back, and Escape clears the filter and then closes the
  * menu. Home, End and the other keys move the caret and type. The field names
  * the highlighted row with `aria-activedescendant`, and the rows are a `menu`
- * after the field, `part="items"`. Cancel `helix-filter` to keep every row
+ * after the field. Cancel `helix-filter` to keep every row
  * showing and narrow the rows yourself, such as by replacing them with rows
  * from a server.
  *
@@ -163,11 +163,10 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
  * @csspart back-mark - The glyph on the back control of a submenu.
  * @csspart empty - The text shown when the menu has no items.
  * @csspart header - The bar above a submenu, holding the way back and its name.
- * @csspart items - With `filterable`, the `menu` that holds the rows, after the filter field.
  * @csspart live - A live region that repeats the empty and loading text, so screen readers announce it when it changes. Visually hidden in the styled tier.
  * @csspart loading - The text shown while the items are loading.
  * @csspart search-field - With `filterable`, the field that narrows the rows.
- * @csspart surface - The floating panel the menu is drawn on. It is the `menu` itself, and with `filterable` it holds the filter field and `items`.
+ * @csspart surface - The floating panel the menu is drawn on. It is the `menu` itself, and with `filterable` it holds the filter field and then the `menu`.
  * @csspart title - The name of the submenu that is showing.
  *
  * @cssproperty --floating-anchor-inline-size - The trigger's width, written on the panel while it is open, as in `min-inline-size: var(--floating-anchor-inline-size)`. Read it; a value set here is written over.
@@ -533,7 +532,9 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
 
   /** The element that is the `menu`: the surface, or with `filterable` the box after the field. */
   private get menuBox(): HTMLElement | null {
-    return this.partNamed(this.filterable ? 'items' : 'surface')
+    return this.filterable
+      ? (this.renderRoot?.querySelector<HTMLElement>('#items') ?? null)
+      : this.partNamed('surface')
   }
 
   /** The filter field, with `filterable`. */
@@ -1386,7 +1387,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
                   aria-autocomplete="list"
                   aria-controls="items"
                   @input=${this.handleFilterInput}
-                /><div part="items" id="items" role="menu" aria-busy=${busy} aria-label=${label}>${rows}</div>`
+                /><div id="items" role="menu" aria-busy=${busy} aria-label=${label}>${rows}</div>`
             : rows
         }
       </div>${this.renderLive(this.hasRows)}`

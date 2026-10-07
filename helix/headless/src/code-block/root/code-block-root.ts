@@ -285,6 +285,13 @@ export class HelixHeadlessCodeBlock extends HelixElement {
   expandable = false
 
   /**
+   * The expand button's words while the cap hides lines.
+   */
+  @words
+  @property({ attribute: 'expand-label' })
+  expandLabel = 'Show all lines'
+
+  /**
    * The name of the file shown, where the block holds several Code Blocks:
    * the `label` of one, or its `language` without one.
    *
@@ -299,13 +306,6 @@ export class HelixHeadlessCodeBlock extends HelixElement {
   @words
   @property({ attribute: 'files-label' })
   filesLabel = 'Files'
-
-  /**
-   * The expand button's words while the cap hides lines.
-   */
-  @words
-  @property({ attribute: 'expand-label' })
-  expandLabel = 'Show all lines'
 
   /**
    * The words of a button that hides a run of unchanged lines it showed, in a

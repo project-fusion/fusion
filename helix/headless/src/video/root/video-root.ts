@@ -192,6 +192,7 @@ const clock = (seconds: number): string => {
  * @csspart captions-menu-header - The bar above a submenu, holding the way back and its name.
  * @csspart captions-menu-live - The inner menu's `live` part, a live region that repeats the empty and loading text for screen readers.
  * @csspart captions-menu-loading - The text shown while the items are loading.
+ * @csspart captions-menu-search-field - The inner menu's filter field, drawn with `filterable`.
  * @csspart captions-menu-surface - The floating panel the menu is drawn on.
  * @csspart captions-menu-title - The name of the submenu that is showing.
  * @csspart controls - The control bar along the bottom.
@@ -225,6 +226,7 @@ const clock = (seconds: number): string => {
  * @csspart overflow-header - The bar above a submenu, holding the way back and its name.
  * @csspart overflow-live - The inner menu's `live` part, a live region that repeats the empty and loading text for screen readers.
  * @csspart overflow-loading - The text shown while the items are loading.
+ * @csspart overflow-search-field - The inner menu's filter field, drawn with `filterable`.
  * @csspart overflow-surface - The floating panel the menu is drawn on.
  * @csspart overflow-title - The name of the submenu that is showing.
  * @csspart pip - The picture-in-picture button, when `extra-controls` includes it and the browser supports it.
@@ -1729,7 +1731,8 @@ export class HelixHeadlessVideo extends HelixElement {
     }
     return html`<${this.tag('menu')} part="captions-menu"
     exportparts="back: captions-menu-back, back-mark: captions-menu-back-mark, empty: captions-menu-empty,
-      header: captions-menu-header, live: captions-menu-live, loading: captions-menu-loading, surface: captions-menu-surface,
+      header: captions-menu-header, live: captions-menu-live, loading: captions-menu-loading,
+      search-field: captions-menu-search-field, surface: captions-menu-surface,
       title: captions-menu-title" label=${this.subtitlesLabel} placement="top-end"
       @toggle=${(event: Event) => this.heardMenu('captions', event)}>
       <button
@@ -1965,7 +1968,8 @@ export class HelixHeadlessVideo extends HelixElement {
           ? nothing
           : html`<${this.tag('menu')} part="overflow"
           exportparts="back: overflow-back, back-mark: overflow-back-mark, empty: overflow-empty,
-            header: overflow-header, live: overflow-live, loading: overflow-loading, surface: overflow-surface,
+            header: overflow-header, live: overflow-live, loading: overflow-loading,
+            search-field: overflow-search-field, surface: overflow-surface,
             title: overflow-title" label=${this.moreLabel} placement="top-end"
             @toggle=${(event: Event) => this.heardMenu('overflow', event)}>
               <button
