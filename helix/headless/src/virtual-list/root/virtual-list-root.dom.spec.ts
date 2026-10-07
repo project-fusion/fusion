@@ -333,6 +333,42 @@ if (hasLayout()) {
 }
 
 describe('placing rows by what they came to', () => {
+  /* Measured rows shorter than their estimates shrink the content at the end
+     of the set, and the box pulls its offset up to match. The list read that
+     as the reader scrolling and moved its window up a second time, so End left
+     the last item drawn below the box. */
+  inBrowser('End in a measured list of mixed heights shows the last item', async () => {
+    document.body.innerHTML =
+      '<helix-headless-virtual-list label="Rows" measured><template><div class="mixed"><span data-field="name"></span></div></template></helix-headless-virtual-list>'
+    const host = document.body.firstElementChild as HTMLElement &
+      Updatable &
+      Record<string, unknown>
+    const style = document.createElement('style')
+    style.textContent =
+      'helix-headless-virtual-list > .mixed[data-index] { block-size: auto; inline-size: 20rem; }'
+    document.head.append(style)
+    try {
+      host.items = Array.from({ length: 2000 }, (_, at) => ({
+        name: `${'word '.repeat(1 + ((at * 7) % 40))}${at}`,
+      }))
+      await settle(host)
+      ;(host.querySelector('[data-index="0"]') as HTMLElement).focus()
+      ;(document.activeElement as HTMLElement).dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'End' }),
+      )
+      await new Promise((resolve) => setTimeout(resolve, 400))
+      await settle(host)
+      const row = document.activeElement as HTMLElement
+      const box = (part(host, 'viewport') as HTMLElement).getBoundingClientRect()
+      const at = row.getBoundingClientRect()
+      expect(row.dataset.index).toBe('1999')
+      expect(at.top).toBeGreaterThanOrEqual(box.top - 1)
+      expect(at.bottom).toBeLessThanOrEqual(box.bottom + 1)
+    } finally {
+      style.remove()
+    }
+  })
+
   test('stamps each row with the item it drew, not its place in the window', async () => {
     /* The controller reads this rather than counting from `window.first`,
        because `hostUpdated` runs before `updated`: what is in the tree when it
@@ -416,6 +452,16 @@ describe('items given as a property', () => {
     expect(second?.hasAttribute('href')).toBe(false)
     expect(second?.hasAttribute('data-open')).toBe(false)
   })
+
+  /* Only a root that carried `data-field` was read, so a row whose root is a
+     link kept the template's `href` on every row. */
+  test("fills the holes on the template's root element", async () => {
+    const host = await fed(
+      [{ name: 'One', url: '#one' }],
+      '<template><a href="#none" data-field-href="url"><span data-field="name"></span></a></template>',
+    )
+    expect(drawn(host)[0]?.getAttribute('href')).toBe('#one')
+  })
 })
 
 describe('items drawn by a function', () => {
@@ -491,6 +537,24 @@ describe('the keyboard', () => {
     expect((document.activeElement as HTMLElement).dataset.index).toBe('0')
     await press(host, 'ArrowDown')
     expect((document.activeElement as HTMLElement).dataset.index).toBe('1')
+  })
+
+  /* The row went with its item, and focus went to `<body>`, where the arrow
+     keys do nothing. */
+  test('moves focus to the last item when the set ends before the focused one', async () => {
+    const host = await fed(named(100))
+    ;(host.querySelector('[data-index="0"]') as HTMLElement).focus()
+    await press(host, 'ArrowDown')
+    await press(host, 'ArrowDown')
+    await press(host, 'ArrowDown')
+    expect((document.activeElement as HTMLElement).dataset.index).toBe('3')
+    host.items = named(2)
+    await settle(host)
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await settle(host)
+    expect((document.activeElement as HTMLElement).dataset.index).toBe('1')
+    await press(host, 'ArrowUp')
+    expect((document.activeElement as HTMLElement).dataset.index).toBe('0')
   })
 
   test("leaves keys pressed in a row's own controls alone", async () => {
