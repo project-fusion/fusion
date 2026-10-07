@@ -18,7 +18,13 @@ beforeAll(async () => {
 })
 
 const hosts: HTMLElement[] = []
+const controllers: ReactiveController[] = []
+/* A drag a spec leaves held keeps its listeners on the window, the capture-phase
+   Escape among them, which would keep that key from every later spec. */
 afterEach(() => {
+  for (const one of controllers.splice(0)) {
+    one.hostDisconnected?.()
+  }
   for (const one of hosts.splice(0)) {
     one.remove()
   }
@@ -88,6 +94,9 @@ const setup = (refuse = false, more: More = {}) => {
     ...(more as Partial<ReorderOptions>),
   })
   controller?.hostConnected?.()
+  if (controller) {
+    controllers.push(controller)
+  }
   const grips = rows.map((row) => row.querySelector('button') as HTMLButtonElement)
   return { drops, grips, reorder, rows, said, updates: () => updates }
 }

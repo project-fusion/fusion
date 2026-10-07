@@ -266,11 +266,6 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
   @property({ attribute: 'author-styles', converter: wordsConverter })
   authorStyles: Record<string, string> = {}
 
-  /** The conversation's name, read by screen readers, where `label` is empty. */
-  @words
-  @property({ attribute: 'conversation-label' })
-  conversationLabel = 'Conversation'
-
   /**
    * Whether the transcript opens pinned to the bottom, when `pinned` is not
    * set.
@@ -298,6 +293,11 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
   @words
   @property({ attribute: 'failed-turn-label' })
   failedTurnLabel = '{failed}: {text}'
+
+  /** The conversation's name, read by screen readers, where `label` is empty. */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Conversation'
 
   /**
    * Whether there are older turns to load, and whether they are loading.
@@ -925,7 +925,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    hostAria(this.internals, { label: this.label || this.conversationLabel, role: 'region' })
+    hostAria(this.internals, { label: this.label || this.fallbackLabel, role: 'region' })
     if (changed.has('meLabel') || changed.has('messageLabel') || changed.has('turnLabel')) {
       this.words = { me: this.meLabel, sentence: this.messageLabel, turn: this.turnLabel }
     }
@@ -1093,7 +1093,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
         part="log"
         role="log"
         aria-live="off"
-        aria-label=${this.label || this.conversationLabel}
+        aria-label=${this.label || this.fallbackLabel}
         aria-busy=${busy ? 'true' : nothing}
         ?data-windowed=${fed}
         @scroll=${this.handleScroll}
