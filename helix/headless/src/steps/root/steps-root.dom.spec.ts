@@ -596,3 +596,24 @@ describe('a sequence the arrow keys move through', () => {
     expect(event.defaultPrevented).toBe(false)
   })
 })
+
+describe('the step a move leaves', () => {
+  /* Where only a step's `current` says where the reader is, nothing has
+     written `active` yet, and the first move still leaves that step. */
+  test('is the step marked current, on the first move', async () => {
+    const host = (await mount(`<helix-headless-steps linear completion="passed">
+      <helix-headless-step value="cart" current>Cart</helix-headless-step>
+      <helix-headless-step value="ship">Shipping</helix-headless-step>
+    </helix-headless-steps>`)) as Steps
+    await turn(host)
+    const heard: { previous: string; value: string }[] = []
+    host.addEventListener('helix-activate', (event) => {
+      heard.push((event as CustomEvent<{ previous: string; value: string }>).detail)
+    })
+    const ship = host.querySelector('helix-headless-step[value="ship"]') as HTMLElement
+    await (ship as unknown as Steps).updateComplete
+    ;(part(ship, 'label') as HTMLElement).click()
+    await turn(host)
+    expect(heard).toEqual([{ previous: 'cart', value: 'ship' }])
+  })
+})
