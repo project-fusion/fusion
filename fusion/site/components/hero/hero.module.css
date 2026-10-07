@@ -209,15 +209,15 @@
 /*
  *  The half of the heading the brand paints.
  *
- * **In the muted gray with no brand, and in the brand with one.** With no brand
- * set, `primary` is the ink itself, and beside a heading already in the
- * foreground it was the same color: near-white on white in dark mode, and
- * near-black on black in light. So ink takes `primary-muted`. A brand is a
- * second tone on its own, and muted it read as washed out, so a brand takes
- * `primary`, under `data-site-brand` on the root.
+ * **In the brand, and in the muted gray under ink.** A brand is a second tone
+ * on its own, and muted it read as washed out, so the site's blue and a brand a
+ * reader picks both take `primary`. A reader who picks ink has `primary` as the
+ * ink itself, and beside a heading already in the foreground it was the same
+ * color: near-white on white in dark mode, and near-black on black in light. So
+ * a theme painted without `data-site-brand` takes `primary-muted`.
  */
 .tDisplayAccent {
-  color: var(--helix-color-primary-muted);
+  color: var(--helix-color-primary);
   /* **Its own line, so the color break and the line break are the same break.**
      `text-wrap: balance` on the heading optimises for even line lengths and
      knows nothing about the two tones: it stranded "and" at the end of the first
@@ -227,8 +227,8 @@
   display: block;
 }
 
-:global([data-site-brand]) .tDisplayAccent {
-  color: var(--helix-color-primary);
+:global(:root[data-helix-theme]:not([data-site-brand])) .tDisplayAccent {
+  color: var(--helix-color-primary-muted);
 }
 
 .tDisplay {

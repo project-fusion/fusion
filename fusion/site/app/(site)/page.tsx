@@ -70,14 +70,14 @@ export default function Home() {
             gradient rather than a seam, and is the price of one canvas over nine
             screens instead of two over four.
 
-            **`gain` at 0.75 since the site went to ink.** The field is drawn in
-            the primary, which in dark mode is now a near-white at lightness
-            0.91 where Fusion's blue sat at 0.67, about two and a half times the
-            light. */}
+            **`gain` at 1.05, in Fusion's blue.** The field is drawn in the
+            primary, which in dark mode sits at lightness 0.67. Under ink it was
+            a near-white at 0.91, about two and a half times the light, and the
+            gain went to 0.75 while the site wore it. */}
         <helix-aura
           class={styles.reelAura}
           data-layer
-          gain={0.75}
+          gain={1.05}
           scale={3.5}
           speed={1}
           terminus={0.5625}
