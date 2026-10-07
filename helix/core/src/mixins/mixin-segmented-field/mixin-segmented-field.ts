@@ -103,8 +103,9 @@ export declare class MixinSegmentedFieldInterface {
  * `04.08.2026` in German and `08/04/2026` in English with nothing to parse.
  *
  * **What a segment does with a key**, which is React Aria's: digits fill it and
- * move on once it cannot take another, Up and Down step it and wrap, Home and
- * End go to its ends, Backspace and Delete empty it, Left and Right move between
+ * move on once it cannot take another, Up and Down step it and wrap, Page Up
+ * and Page Down step it by a page, a week of days, five years or fifteen
+ * minutes, Home and End go to its ends, Backspace and Delete empty it, Left and Right move between
  * segments along the line of text, and Alt+Down opens the picker. Each segment
  * is a tab stop, as each is in React Aria.
  *
@@ -471,6 +472,7 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
             aria-valuenow=${spin ? (shown ?? nothing) : nothing}
             aria-valuetext=${spin ? (empty ? this.emptySegmentLabel : segmentValueText(kind, this.parts, twelve, locale)) : nothing}
             aria-disabled=${this.isDisabled ? 'true' : nothing}
+            aria-required=${this.required ? 'true' : nothing}
             aria-readonly=${(this as { readOnly?: boolean }).readOnly ? 'true' : nothing}
             @keydown=${this.handleSegmentKeydown}
             >${text}</span

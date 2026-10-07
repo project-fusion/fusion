@@ -489,6 +489,42 @@ describe('input date can be written out', () => {
     expect(control.value).toBe('4 August 2026')
   })
 
+  /* Picking hands focus back with the rendering showing, and a key that edited
+     it wrote `August 5, 2027`, which no date can be read from. */
+  test('after a pick, the first key that edits puts the value in the field first', async () => {
+    const host = await field('default-value="2026-08-04" locale="en-GB"')
+    const control = part(host, 'control') as HTMLInputElement
+    host.toggleOpen()
+    await host.updateComplete
+    picker(host).dispatchEvent(
+      new CustomEvent('helix-before-change', {
+        bubbles: true,
+        composed: true,
+        detail: { name: 'value', value: '2026-08-05' },
+      }),
+    )
+    await host.updateComplete
+    expect(control.value).toBe('5 August 2026')
+    control.setSelectionRange(control.value.length, control.value.length)
+    control.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        key: 'Backspace',
+      }),
+    )
+    expect(control.value).toBe('2026-08-05')
+    expect(control.selectionStart).toBe(10)
+    control.value = '2026-08-0'
+    control.dispatchEvent(new Event('input', { bubbles: true }))
+    control.value = '2026-08-07'
+    control.dispatchEvent(new Event('input', { bubbles: true }))
+    await host.updateComplete
+    expect(host.value).toBe('2026-08-07')
+    expect(control.value).toBe('2026-08-07')
+  })
+
   test('`iso` turns the rendering off, for a reader entering data', async () => {
     const host = await field('date-style="iso" default-value="2026-08-04"')
     expect((part(host, 'control') as HTMLInputElement).value).toBe('2026-08-04')

@@ -246,14 +246,25 @@ export interface SegmentKeyState {
   typed: string
 }
 
+/** How far Page Up and Page Down step each kind of segment, as React Aria's segments step. */
+const pageStep: Partial<Record<SegmentKind, number>> = {
+  day: 7,
+  hour: 2,
+  minute: 15,
+  month: 2,
+  second: 15,
+  year: 5,
+}
+
 /**
  * What an editing key does to a segment, or `null` for a key that edits
  * nothing.
  *
- * The arrows step it and wrap, Home and End take it to its lowest and highest,
- * Backspace and Delete empty it, a digit is typed as `typeDigit` types it, and
- * on the meridiem a letter picks the half whose word starts with it. `advance`
- * says the segment is full and focus moves on.
+ * The arrows step it and wrap, Page Up and Page Down step it by a page, Home
+ * and End take it to its lowest and highest, Backspace and Delete empty it, a
+ * digit is typed as `typeDigit` types it, and on the meridiem a letter picks
+ * the half whose word starts with it. `advance` says the segment is full and
+ * focus moves on.
  */
 export const segmentKey = (
   key: string,
@@ -263,6 +274,10 @@ export const segmentKey = (
     next === undefined ? null : { advance: false, segments: next, typed: '' }
   if (key === 'ArrowUp' || key === 'ArrowDown') {
     return done(stepSegment(segments, kind, key === 'ArrowUp' ? 1 : -1, twelve))
+  }
+  if (key === 'PageUp' || key === 'PageDown') {
+    const by = (key === 'PageUp' ? 1 : -1) * (pageStep[kind] ?? 1)
+    return done(stepSegment(segments, kind, by, twelve))
   }
   if (key === 'Home' || key === 'End') {
     const { max, min } = segmentRange(kind, segments, twelve)

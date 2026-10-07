@@ -76,6 +76,9 @@ export declare class MixinPickerEditingInterface {
  * the two that take this mixin; Color Input declares its own, the same
  * property refusing the same two requests.
  */
+/** The keys that move the caret or edit the text, besides a printable character. */
+const caretKeys = new Set(['ArrowLeft', 'ArrowRight', 'Backspace', 'Delete', 'End', 'Home'])
+
 export const MixinPickerEditing = <T extends Constructor<EditingBase>>(Base: T) => {
   // JSDoc is duplicated from MixinPickerEditingInterface deliberately. The
   // interface is what TypeScript consumers see; this class is what the manifest
@@ -149,11 +152,55 @@ export const MixinPickerEditing = <T extends Constructor<EditingBase>>(Base: T) 
       this.pressing = event.type === 'pointerdown' && event.composedPath()[0] === this.control
     }
 
+    /**
+     * The first key that moves the caret or edits, while the focused field
+     * shows its rendering, puts the value in the field before the key acts.
+     *
+     * Picking hands focus back to a field that shows `August 5, 2026`, which is
+     * what the reader chose. `Intl` formats and does not parse, so a key that
+     * edited the rendering wrote text no date could be read from. The caret
+     * keeps its place at the start, at the end, or around the whole text, and
+     * goes to the end otherwise.
+     */
+    private readonly handleEditKey = (event: KeyboardEvent): void => {
+      const control = this.control
+      if (
+        this.editing ||
+        this.readOnly ||
+        this.isDisabled ||
+        !control ||
+        event.composedPath()[0] !== control ||
+        event.altKey ||
+        event.ctrlKey ||
+        event.metaKey ||
+        event.isComposing ||
+        (event.key.length !== 1 && !caretKeys.has(event.key))
+      ) {
+        return
+      }
+      const shown = control.value.length
+      const start = control.selectionStart ?? shown
+      const end = control.selectionEnd ?? shown
+      this.editing = true
+      const text = this.display
+      if (text === control.value) {
+        return
+      }
+      control.value = text
+      if (start === 0 && end === shown) {
+        control.setSelectionRange(0, text.length)
+      } else {
+        const at = end === 0 ? 0 : text.length
+        control.setSelectionRange(at, at)
+      }
+    }
+
     override connectedCallback(): void {
       super.connectedCallback()
       this.addEventListener('pointerdown', this.handlePress)
       this.addEventListener('pointercancel', this.handlePress)
       this.addEventListener('click', this.handlePress)
+      this.addEventListener('keydown', this.handleEditKey)
     }
 
     override disconnectedCallback(): void {
@@ -161,6 +208,7 @@ export const MixinPickerEditing = <T extends Constructor<EditingBase>>(Base: T) 
       this.removeEventListener('pointerdown', this.handlePress)
       this.removeEventListener('pointercancel', this.handlePress)
       this.removeEventListener('click', this.handlePress)
+      this.removeEventListener('keydown', this.handleEditKey)
     }
 
     /**

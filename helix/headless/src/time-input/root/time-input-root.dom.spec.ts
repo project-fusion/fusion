@@ -109,6 +109,30 @@ describe('input time', () => {
     expect(host.open).toBe(false)
   })
 
+  /* Picking hands focus back with `2:45 PM` showing, and End, Backspace left
+     `2:45 P` in the field and in `value`. */
+  test('after a pick, the first key that edits puts the value in the field first', async () => {
+    const host = await field('locale="en-US"')
+    host.open = true
+    await host.updateComplete
+    part(host, 'picker')?.dispatchEvent(
+      new CustomEvent('helix-before-change', {
+        bubbles: true,
+        composed: true,
+        detail: { name: 'time', value: '14:45' },
+      }),
+    )
+    await host.updateComplete
+    expect(control(host).value).toBe('2:45 PM')
+    control(host).dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key: 'End' }),
+    )
+    expect(control(host).value).toBe('14:45')
+    await host.updateComplete
+    expect(control(host).value).toBe('14:45')
+    expect(host.value).toBe('14:45')
+  })
+
   test('pressing into the field from outside opens the list', async () => {
     const host = await field()
     control(host).dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true }))
