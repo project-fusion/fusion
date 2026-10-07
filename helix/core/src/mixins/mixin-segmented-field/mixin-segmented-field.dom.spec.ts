@@ -199,6 +199,21 @@ describe('a key in a segment', () => {
     expect(inputs).toBe(2)
   })
 
+  /* React Aria's segments step by a page on Page Up and Page Down, and these
+     did nothing. */
+  test('Page Up and Page Down step it by a page: a week of days, five years, fifteen minutes', async () => {
+    const host = await mount('value="2026-12-04"')
+    await key(host, segment(host, 'day'), 'PageUp')
+    expect(host.value).toBe('2026-12-11')
+    await key(host, segment(host, 'year'), 'PageDown')
+    expect(host.value).toBe('2021-12-11')
+    await key(host, segment(host, 'month'), 'PageUp')
+    expect(host.value).toBe('2021-02-11')
+    const time = await mount('kind="time" value="14:50"')
+    await key(time, segment(time, 'minute'), 'PageUp')
+    expect(time.value).toBe('14:05')
+  })
+
   test('digits fill it and move on once it can take no more', async () => {
     const host = await mount('value="2026-08-04"')
     const month = segment(host, 'month')
@@ -303,6 +318,19 @@ describe('the value from elsewhere', () => {
   test('a required field with nothing in it is missing its value', async () => {
     const host = await mount('required')
     expect(host.validity.valueMissing).toBe(true)
+  })
+
+  /* Validity said a date was missing and every spinbutton said it was
+     optional, where React Aria's segments say `aria-required`. */
+  test('a required field says so on every segment', async () => {
+    const host = await mount('required')
+    expect(segments(host).map((one) => one.getAttribute('aria-required'))).toEqual([
+      'true',
+      'true',
+      'true',
+    ])
+    const optional = await mount()
+    expect(segments(optional).some((one) => one.hasAttribute('aria-required'))).toBe(false)
   })
 })
 
