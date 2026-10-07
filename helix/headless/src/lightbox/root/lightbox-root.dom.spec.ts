@@ -524,6 +524,52 @@ describe('the header and the footer', () => {
   })
 })
 
+describe('an item whose `label` or `value` changes after the first render', () => {
+  /* No slot reports an attribute changing, so each of these kept what the
+     viewer had worked out from the old one until some unrelated property
+     changed. */
+  const settled = async (host: Lightbox): Promise<void> => {
+    await new Promise((settle) => setTimeout(settle))
+    await host.updateComplete
+  }
+
+  test('is shown once its new `value` is the one `active` names', async () => {
+    const host = await lightbox('active="four"')
+    expect(shown(host)).toBe('one')
+    host.querySelector('[value="three"]')?.setAttribute('value', 'four')
+    await settled(host)
+    expect(shown(host)).toBe('four')
+  })
+
+  test('gives way once its new `value` is not the one `active` names', async () => {
+    const host = await lightbox('active="two"')
+    expect(shown(host)).toBe('two')
+    host.querySelector('[value="two"]')?.setAttribute('value', 'other')
+    await settled(host)
+    expect(shown(host)).toBe('one')
+  })
+
+  test('puts its new `label` in the counter', async () => {
+    const host = await lightbox('counter status-label="{label}, {index} of {count}"')
+    await host.updateComplete
+    expect((part(host, 'counter') as HTMLElement).textContent).toBe('A harbour, 1 of 3')
+    host.querySelector('[value="one"]')?.setAttribute('label', 'A beach')
+    await settled(host)
+    expect((part(host, 'counter') as HTMLElement).textContent).toBe('A beach, 1 of 3')
+  })
+
+  test('is named without its old `label` once it has none', async () => {
+    const host = await lightbox('slide-label="{label} {index} of {count}"')
+    const item = host.querySelector('[value="one"]') as HTMLElement & {
+      updateComplete: Promise<unknown>
+    }
+    item.removeAttribute('label')
+    await settled(host)
+    await item.updateComplete
+    expect((part(item, 'item') as HTMLElement).getAttribute('aria-label')).toBe(' 1 of 3')
+  })
+})
+
 describe('the counter', () => {
   test('is drawn with `counter`, in the words of `status-label`, and hidden from screen readers', async () => {
     const host = await lightbox('counter status-label="Picture {index} of {count}"')
