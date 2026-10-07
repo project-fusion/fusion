@@ -179,6 +179,35 @@ describe('virtual list', () => {
     expect(document.activeElement).toBe(link)
   })
 
+  /* Chromium passes focus through `<body>` between `focusout` and `focusin`,
+     and runs microtasks there when a key moves it. The kept row was let go in
+     that gap, so Tab from a row scrolled out of the window to its own link
+     removed the row and the link with it. */
+  test('keeps a row scrolled out of the window while focus moves into it', async () => {
+    const rows = Array.from({ length: 500 }, (_, at) => ({ name: `Row ${at + 1}` }))
+    document.body.innerHTML = `<helix-headless-virtual-list for="rows" estimate="32" label="Rows">
+        <template><div><a href="#" data-field="name"></a></div></template>
+      </helix-headless-virtual-list>
+      <script id="rows" type="application/json">${JSON.stringify(rows)}</script>`
+    const host = document.body.firstElementChild as Updatable
+    await settle(host)
+    const row = host.querySelector('[data-index="1"]') as HTMLElement
+    row.focus()
+    const viewport = part(host, 'viewport') as HTMLElement
+    viewport.scrollTop = 3_200
+    viewport.dispatchEvent(new Event('scroll'))
+    await settle(host)
+    expect(row.isConnected).toBe(true)
+
+    row.blur()
+    await settle(host)
+    const link = row.querySelector('a') as HTMLElement
+    link.focus()
+    await settle(host)
+    expect(row.isConnected).toBe(true)
+    expect(document.activeElement).toBe(link)
+  })
+
   /* The source was read once per `for`, so new JSON written into the script,
      which is how a framework updates a text child, left the old rows drawn. */
   test('draws the rows again when the source is edited', async () => {

@@ -739,9 +739,24 @@ export class HelixHeadlessVirtualList extends HelixElement {
     this.rowFor(index)?.focus()
   }
 
-  /** The row kept for focus is let go once focus has left it. */
-  private readonly handleFocusOut = (): void => {
-    this.requestUpdate()
+  /**
+   * The row kept for focus is let go once focus has left it.
+   *
+   * **A task later, and not at once.** Between `focusout` and `focusin` the
+   * page's focus is on `<body>`, and Chromium runs microtasks there when a key
+   * moves focus. An update asked for here ran in that gap: Tab from a kept row
+   * to its own link found no row holding focus, removed the row, and the link
+   * went with it, leaving focus on `<body>`. A move to a control inside this
+   * list asks for its own update in `handleFocusIn`, so it needs nothing here.
+   */
+  private readonly handleFocusOut = (event: FocusEvent): void => {
+    const next = event.relatedTarget
+    if (next instanceof Node && this.contains(next)) {
+      return
+    }
+    setTimeout(() => {
+      this.requestUpdate()
+    }, 0)
   }
 
   /** A row that takes focus, by a press or by Tab, takes the tab stop with it. */
