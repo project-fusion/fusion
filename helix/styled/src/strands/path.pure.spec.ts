@@ -97,7 +97,7 @@ describe('strands page path', () => {
     expect(Math.max(...first)).toBeLessThan(Math.min(...second))
   })
 
-  test('turns off screen between two waves, so each reads alone', () => {
+  test('turns off screen between two waves a screen apart, so each reads alone', () => {
     const points = pagePath(
       [stop(0, 'fan'), stop(4000, 'waves'), stop(5200, 'waves')],
       'ribbon',
@@ -105,8 +105,53 @@ describe('strands page path', () => {
       view.height,
       6400,
     )
-    const between = lit(points).filter(([, y]) => y > 4000 + 60 && y < 5200 - 60)
+    /* The first wave sweeps down a fifth of a screen as it crosses. */
+    const between = lit(points).filter(([, y]) => y > 4000 + 160 && y < 5200 - 60)
     expect(between).toEqual([])
+  })
+
+  test('brings the ribbon back across a longer gap between two waves', () => {
+    const points = pagePath(
+      [stop(0, 'fan'), stop(3000, 'waves'), stop(7000, 'waves')],
+      'ribbon',
+      view.width,
+      view.height,
+      8000,
+    )
+    const between = lit(points).filter(([, y]) => y > 3600 && y < 6200)
+    expect(between.length).toBeGreaterThan(2)
+    for (const [, , width] of between) {
+      expect(width).toBeGreaterThan(0.06 * 2)
+    }
+  })
+
+  test("hands a fan's lower arm to the ribbon without turning back", () => {
+    /* The arm used to run out to the side, and the ribbon started back toward
+       the middle, so the two met in a hook at the edge of the hero. */
+    const points = pagePath([stop(0, 'fan')], 'ribbon', view.width, view.height, 6400)
+    const bend = points.indexOf(narrowest(points))
+    const exit = points[bend + 2] as PathPoint
+    const next = points[bend + 3] as PathPoint
+    expect(next[1]).toBeGreaterThan(exit[1])
+    expect(Math.abs(next[0] - exit[0])).toBeLessThan(0.1)
+    /* And at the ribbon's width or near it, which used to triple at once. */
+    expect(next[2] / exit[2]).toBeLessThan(1.7)
+  })
+
+  test('leans a ribbon into a wave from the side the ribbon is on', () => {
+    const points = pagePath(
+      [stop(0, 'fan'), stop(4000, 'waves')],
+      'ribbon',
+      view.width,
+      view.height,
+      6400,
+    )
+    const lead = points.findIndex(([, y, width]) => width < 0.2 && y > 3000)
+    const ribbon = points[lead - 1] as PathPoint
+    const into = points[lead] as PathPoint
+    expect(into[0] > 0.5).toBe(ribbon[0] > 0.5)
+    /* The turn is spread over most of a screen, not taken in a corner. */
+    expect(into[1] - ribbon[1]).toBeGreaterThan(view.height * 0.5)
   })
 
   test('ends on the last wave rather than bringing the ribbon back', () => {
@@ -117,7 +162,7 @@ describe('strands page path', () => {
       view.height,
       6400,
     )
-    expect(lit(points).filter(([, y]) => y > 4000 + 60)).toEqual([])
+    expect(lit(points).filter(([, y]) => y > 4000 + 160)).toEqual([])
   })
 
   test('fills the gap between a fan and a wave with soft ribbon', () => {

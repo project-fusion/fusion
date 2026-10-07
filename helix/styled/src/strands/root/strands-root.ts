@@ -77,8 +77,9 @@ const TRAVEL_EASE = 0.09
  * bottom, so scrolling travels along it. Put `helix-strands-stop` elements
  * inside to pin a form to a section: each names an element with `for` and says
  * which form the ribbon takes there. Between stops the ribbon fills the gap in
- * its own `variant`, and between two waves it turns off screen so each wave
- * reads alone. Set `z-index` on the element to move it.
+ * its own `variant`, and between two waves less than a screen and a half
+ * apart it turns off screen so each wave reads alone. Set `z-index` on the
+ * element to move it.
  *
  * The ribbon stops moving in these cases:
  * - `prefers-reduced-motion` is set. The element shows one still frame, and in
