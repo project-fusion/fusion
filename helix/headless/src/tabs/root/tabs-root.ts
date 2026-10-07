@@ -6,6 +6,7 @@ import {
   KeyboardNavigationController,
   MixinControllerActive,
   whenHydrated,
+  words,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -75,6 +76,12 @@ import { HelixHeadlessTab } from '../tab/tab.js'
  */
 @customElement('helix-headless-tabs')
 export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
+  /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-tabs': { label: 'Reiter' } })`.
+   */
+  static words = 'helix-tabs'
+
   /* Arrow keys, Home and End. Same controller as the radio group and the toggle
      group: `origin: 'focus'` because `manual` lets focus and selection diverge,
      and `selects` because `manual` is what decides whether arriving chooses. */
@@ -107,6 +114,7 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
    * An `aria-label` or `aria-labelledby` on the host names the tab list too,
    * and wins over this.
    */
+  @words
   @property()
   label = 'Tabs'
 

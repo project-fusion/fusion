@@ -1,11 +1,13 @@
 import {
   customElement,
   drawStatus,
+  formatWords,
   HelixElement,
   HelixSelectEvent,
   hostAria,
   StatusController,
   slottedWords,
+  words,
 } from '@fusion.dev/helix-core'
 import { check, circle, record } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -72,15 +74,32 @@ import '../../button/index.js'
 @customElement('helix-headless-step')
 export class HelixHeadlessStep extends HelixElement {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-step': { completeLabel: 'Erledigt' } })`.
+   */
+  static words = 'helix-step'
+
+  /**
    * Whether this stage is finished.
    */
   @property({ reflect: true, type: Boolean })
   complete = false
 
   /**
+   * What a screen reader hears when the stage is finished while the page is
+   * open. `{name}` is the stage's name and `{complete}` is `complete-label`, so
+   * a language can write the whole sentence in its own order. A stage with no
+   * name says `complete-label` alone.
+   */
+  @words
+  @property({ attribute: 'completed-label' })
+  completedLabel = '{name}, {complete}'
+
+  /**
    * The words that tell a screen reader the stage is finished. Translate it
    * with the page.
    */
+  @words
   @property({ attribute: 'complete-label' })
   completeLabel = 'Complete'
 
@@ -188,7 +207,11 @@ export class HelixHeadlessStep extends HelixElement {
       /* The name alone, without the description or the content slotted
          beside it. */
       const name = slottedWords(this, [''])
-      this.status.say(name === '' ? this.completeLabel : `${name}, ${this.completeLabel}`)
+      this.status.say(
+        name === ''
+          ? this.completeLabel
+          : formatWords(this, 'completedLabel', { complete: this.completeLabel, name }),
+      )
     }
   }
 
