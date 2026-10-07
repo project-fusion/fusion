@@ -116,3 +116,15 @@ describe('text-align', () => {
     expect(sheet()).toContain(':host([marks][text-align="center"]) [part="blockquote"]::before')
   })
 })
+
+/* A pull quote of a few lines in display type left a short last line. */
+describe('text-wrap', () => {
+  test('reflects, and balances or tidies the lines', async () => {
+    const quote = (await mount(
+      '<helix-blockquote text-wrap="balance">Said so.</helix-blockquote>',
+    )) as HTMLElement & { textWrap?: string }
+    expect(quote.textWrap).toBe('balance')
+    expect(rule(':host([text-wrap="balance"])')).toContain('text-wrap: balance')
+    expect(rule(':host([text-wrap="pretty"])')).toContain('text-wrap: pretty')
+  })
+})
