@@ -1305,6 +1305,18 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
       <div part="after" role="presentation" style="block-size: ${after}px; flex: none"></div>`
   }
 
+  /**
+   * The `resume` slot, with the way back drawn where nothing is slotted, behind a seam:
+   * the slot answers a page, and this answers the tier above.
+   */
+  protected renderResume(): TemplateResult {
+    return html`<slot name="resume"
+      ><button part="resume-button" type="button">
+        <span part="resume-mark" aria-hidden="true">${drawIcon(arrowDown)}</span>${this.resumeLabel}
+      </button></slot
+    >`
+  }
+
   protected override render(): TemplateResult {
     const away = !this.pinned
     const fed = this.fed
@@ -1338,11 +1350,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
       </div>
       <span part="live" role="status">${keyed(this.said, this.announcement)}</span>
       <div part="resume" ?hidden=${!away} @click=${this.handleResume}>
-        <slot name="resume"
-          ><button part="resume-button" type="button">
-            <span part="resume-mark" aria-hidden="true">${drawIcon(arrowDown)}</span>${this.resumeLabel}
-          </button></slot
-        >
+        ${this.renderResume()}
       </div>
       <div part="status" role="status" ?data-empty=${!this.has('status') && this.typing === ''}>
         <slot name="status"></slot>${

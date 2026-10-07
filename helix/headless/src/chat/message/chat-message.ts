@@ -155,12 +155,9 @@ export class HelixHeadlessChatMessage extends HelixElement {
   @property({ reflect: true })
   state?: 'failed' | 'sending' | 'sent' | 'streaming'
 
-  /**
-   * @internal Set by the chat: the word for `me` and the sentence that names a
-   * turn with both an author and a time, in the chat's language.
-   */
+  /** @internal Set by the chat with `turnPosition`: how many turns there are. */
   @property({ attribute: false })
-  turnWords = TURN_WORDS
+  turnCount = 0
 
   /**
    * @internal Set by the chat: where the turn stands in the conversation,
@@ -170,9 +167,12 @@ export class HelixHeadlessChatMessage extends HelixElement {
   @property({ attribute: false })
   turnPosition = 0
 
-  /** @internal Set by the chat with `turnPosition`: how many turns there are. */
+  /**
+   * @internal Set by the chat: the word for `me` and the sentence that names a
+   * turn with both an author and a time, in the chat's language.
+   */
   @property({ attribute: false })
-  turnCount = 0
+  turnWords = TURN_WORDS
 
   /**
    * @internal Read by the transcript to identify its children across the light

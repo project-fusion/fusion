@@ -14,6 +14,9 @@ import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
+/** The kinds of event a timeline entry can be, which `tone` takes. */
+type TimelineTone = 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'
+
 /**
  * @summary One event on a timeline: when it happened, and what it was.
  *
@@ -81,13 +84,11 @@ export class HelixHeadlessTimelineItem extends HelixElement {
   datetime = ''
 
   /**
-   * Writes the time as how long ago it was, or how long until it, from
-   * `datetime`, where the `time` slot is empty: `long` ("3 hours ago"),
-   * `short` ("3 hr. ago") or `narrow` ("3h ago"). Set with no value, it is
-   * `long`. The words move on as they go stale.
+   * Marks an event that has not happened yet, such as one that is scheduled.
+   * The mark is the open circle, and a screen reader hears `pending-label`.
    */
-  @property()
-  relative?: 'long' | 'narrow' | 'short'
+  @property({ reflect: true, type: Boolean })
+  pending = false
 
   /** The time the reading is drawn against, moved on when the words go stale. */
   private readonly clock = new RelativeClockController(this, {
@@ -118,17 +119,19 @@ export class HelixHeadlessTimelineItem extends HelixElement {
     return relativeTime(wordsLocale(this), { style: this.relative || 'long' })(moment, now)
   }
 
-  /**
-   * Marks an event that has not happened yet, such as one that is scheduled.
-   * The mark is the open circle, and a screen reader hears `pending-label`.
-   */
-  @property({ reflect: true, type: Boolean })
-  pending = false
-
   /** What a screen reader hears for an entry that is `pending`. */
   @words
   @property({ attribute: 'pending-label' })
   pendingLabel = 'Scheduled'
+
+  /**
+   * Writes the time as how long ago it was, or how long until it, from
+   * `datetime`, where the `time` slot is empty: `long` ("3 hours ago"),
+   * `short` ("3 hr. ago") or `narrow` ("3h ago"). Set with no value, it is
+   * `long`. The words move on as they go stale.
+   */
+  @property()
+  relative?: 'long' | 'narrow' | 'short'
 
   /**
    * The kind of event. It sets the color of the mark, and a screen reader
@@ -151,9 +154,7 @@ export class HelixHeadlessTimelineItem extends HelixElement {
    */
   @words
   @property({ attribute: 'tone-labels', converter: wordsConverter })
-  toneLabels: Partial<
-    Record<'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning', string>
-  > = {
+  toneLabels: Partial<Record<TimelineTone, string>> = {
     danger: 'Error',
     info: 'Information',
     success: 'Success',

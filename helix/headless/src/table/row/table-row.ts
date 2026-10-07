@@ -105,19 +105,19 @@ export class HelixHeadlessTableRow extends HelixElement {
   disabled = false
 
   /**
+   * The URL a press on the row follows, which makes the whole row a link.
+   * Empty, the default, leaves presses to the row's cells.
+   */
+  @property()
+  href = ''
+
+  /**
    * The key of the row this one sits under, in a table whose rows nest: that
    * row's `value`, or its place among the rows where it has none. Empty, the
    * default, is a row at the top.
    */
   @property()
   parent = ''
-
-  /**
-   * The URL a press on the row follows, which makes the whole row a link.
-   * Empty, the default, leaves presses to the row's cells.
-   */
-  @property()
-  href = ''
 
   /** The `rel` of the row's link. You set it yourself, as on an anchor. */
   @property()

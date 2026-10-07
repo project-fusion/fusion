@@ -310,19 +310,19 @@ export class HelixHeadlessVirtualList extends HelixElement {
   renderItem: VirtualListRenderer<any> | undefined
 
   /**
-   * Makes the list a list box a reader chooses from: `single` selects one
-   * item, and `multiple` any number. Unset is a list a reader reads.
-   */
-  @property({ attribute: 'selection-mode' })
-  selectionMode?: 'multiple' | 'single'
-
-  /**
    * What a press does to the items already chosen: `toggle` adds or takes out
    * the item, and `replace` selects it alone and lets the arrow keys carry the
    * selection, with Control or Command adding or taking out one item.
    */
   @property({ attribute: 'selection-behavior' })
   selectionBehavior: 'replace' | 'toggle' = 'toggle'
+
+  /**
+   * Makes the list a list box a reader chooses from: `single` selects one
+   * item, and `multiple` any number. Unset is a list a reader reads.
+   */
+  @property({ attribute: 'selection-mode' })
+  selectionMode?: 'multiple' | 'single'
 
   /**
    * The field of each item that typing matches, as a key or a path of keys

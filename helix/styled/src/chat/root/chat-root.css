@@ -175,21 +175,21 @@
   box-shadow: var(--chat-resume-shadow, var(--helix-shadow-floating));
 }
 
-/* The way back where nothing was slotted: the solid button the examples slot,
-   drawn by this sheet because a fallback is not slotted and `::slotted()`
-   never reaches it. The same edge and lift as a slotted control. */
+/* The way back where nothing was slotted, drawn by this sheet because a
+   fallback is not slotted and `::slotted()` never reaches it: a raised
+   surface with the same edge and lift as a slotted control. */
 [part="resume-button"] {
   all: unset;
   box-sizing: border-box;
 
   align-items: center;
-  background-color: var(--helix-color-foreground);
+  background-color: var(--helix-color-surface-raised);
   block-size: var(--helix-size-control);
   border: var(--chat-resume-border-width, var(--helix-border-floating)) solid
     var(--chat-resume-border-color, var(--helix-color-border));
   border-radius: var(--helix-radii-sm);
   box-shadow: var(--chat-resume-shadow, var(--helix-shadow-floating));
-  color: var(--helix-color-background);
+  color: var(--helix-color-foreground);
   cursor: pointer;
   display: inline-flex;
   font-family: var(--helix-font-sans);
@@ -202,13 +202,12 @@
   white-space: nowrap;
 }
 
-/* Softened toward the page, as a solid neutral button is: the ink is already
-   the darkest there is. */
+/* A wash of the ink under the pointer, as a ghost button takes. */
 [part="resume-button"]:hover {
   background-color: color-mix(
     in oklab,
-    var(--helix-color-foreground) 86%,
-    var(--helix-color-background)
+    var(--helix-color-foreground) 6%,
+    var(--helix-color-surface-raised)
   );
 }
 
