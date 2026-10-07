@@ -742,11 +742,14 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
   private readonly handleTextCommit = (event: Event): void => {
     if (this.mode !== 'multiple') {
       /* A range written with a dash keeps the commas inside each end, as in
-         `Aug 4, 2026 – Aug 11, 2026`. */
+         `Aug 4, 2026 – Aug 11, 2026`, and one date is the whole text, as in
+         `Aug 4, 2026`, the way en-US writes the date the field shows. */
       const held =
-        this.mode === 'range' && /\s[–-]\s/.test(this.value)
-          ? this.value.split(/\s+[–-]\s+/).map((one) => one.trim())
-          : dates(this.value)
+        this.mode !== 'range'
+          ? [this.value.trim()].filter(Boolean)
+          : /\s[–-]\s/.test(this.value)
+            ? this.value.split(/\s+[–-]\s+/).map((one) => one.trim())
+            : dates(this.value)
       const read = held.map((one) => this.read(one))
       if (held.length > 0 && !held.every(isDateValue) && read.every(Boolean)) {
         this.requestValue(read.join(','))
