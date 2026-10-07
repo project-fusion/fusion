@@ -61,6 +61,9 @@ import { styles } from './filter-input-root.css.js'
  */
 @customElement('helix-filter-input')
 export class HelixFilterInput extends HelixHeadlessFilterInput {
+  /* So the chips `chips` writes are this tier's `helix-filter-chip`. */
+  static override tier = 'helix-'
+
   static override styles: CSSResultGroup = [
     liveStyles,
     glyphStyles,

@@ -38,9 +38,10 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * press. `requestChange` documents the pattern.
  *
  * **Keyboard.** The remove button is a tab stop of its own, and Enter or Space
- * on it asks to remove the filter. In a `FilterInput`, Backspace in the empty
- * field asks to remove the last chip, the arrow keys move between the field
- * and the chips, and Delete or Backspace on a chip asks to remove it.
+ * on it asks to remove the filter. In a `FilterInput`, the field's text is the
+ * one tab stop: Backspace in the empty field asks to remove the last chip, the
+ * arrow keys move between the field and the chips, and Delete or Backspace on
+ * a chip asks to remove it.
  *
  * The remove button is named `dismiss-label` followed by the chip's words,
  * such as "Remove filter Status is not open", so a row of chips says which
@@ -92,6 +93,17 @@ export class HelixHeadlessFilterChip extends MixinDismissible(HelixElement) {
   @words
   @property({ attribute: 'dismiss-label' })
   override dismissLabel = 'Remove filter'
+
+  /**
+   * Whether the remove button is a tab stop of its own.
+   *
+   * `FilterInput` writes `false` on the chips in its `tags` slot: the field's
+   * text is its one tab stop, and the arrow keys move from the text to the
+   * chips, as in a `multiple` Combobox. No attribute: it is coordination
+   * between elements, as `Tag.dismissTabStop` is.
+   */
+  @property({ attribute: false })
+  dismissTabStop = true
 
   /**
    * The name of the field the filter is on, as shown on the chip.
@@ -216,6 +228,7 @@ export class HelixHeadlessFilterChip extends MixinDismissible(HelixElement) {
               part="dismiss"
               type="button"
               aria-label=${this.removeName}
+              tabindex=${this.dismissTabStop ? nothing : '-1'}
               @click=${() => this.dismiss()}
             >
               <svg part="dismiss-mark" fill="currentColor" viewBox=${x.viewBox} aria-hidden="true">
