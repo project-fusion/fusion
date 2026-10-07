@@ -583,6 +583,14 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
   stepMismatchMessage = 'Choose one of the dates the calendar offers.'
 
   /**
+   * The time zone today is read in, such as `America/New_York`, handed to the
+   * calendar: the day marked today, and the month an empty field opens on.
+   * Empty is the reader's own. Dates are plain `YYYY-MM-DD` and carry no zone.
+   */
+  @property({ attribute: 'time-zone' })
+  timeZone = ''
+
+  /**
    * The name of the button that opens the calendar, read by screen readers.
    */
   @words
@@ -953,6 +961,7 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
       previous-years-label=${this.previousYearsLabel}
       selection-label=${this.selectionLabel}
       step=${this.step}
+      time-zone=${this.timeZone || nothing}
       year-view-label=${this.yearViewLabel}
       .dayContent=${this.dayContent}
       .isDateUnavailable=${this.isDateUnavailable}
