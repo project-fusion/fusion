@@ -1,0 +1,32 @@
+<!-- @summary A menu whose submenus open in a panel beside their rows. -->
+<!-- @min 300 -->
+<helix-menu
+  label="File"
+  submenus="flyout"
+>
+  <helix-button slot="trigger">File</helix-button>
+
+  <helix-menu-item value="new">New file</helix-menu-item>
+  <helix-menu-item value="share">
+    Share
+    <helix-menu-item
+      slot="submenu"
+      value="mail"
+    >Mail</helix-menu-item>
+    <helix-menu-item
+      slot="submenu"
+      value="link"
+    >Copy link</helix-menu-item>
+  </helix-menu-item>
+  <helix-menu-item value="export">
+    Export as
+    <helix-menu-item
+      slot="submenu"
+      value="pdf"
+    >PDF</helix-menu-item>
+    <helix-menu-item
+      slot="submenu"
+      value="png"
+    >PNG</helix-menu-item>
+  </helix-menu-item>
+</helix-menu>
