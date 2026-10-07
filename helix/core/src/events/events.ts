@@ -78,6 +78,7 @@ import { HelixBeforeEditEvent } from './before-edit.js'
 import { HelixBeforeMoveEvent } from './before-move.js'
 import { HelixBeforeOpenEvent } from './before-open.js'
 import { HelixBeforePanelResizeEvent } from './before-panel-resize.js'
+import { HelixBeforePasteEvent } from './before-paste.js'
 import { HelixBeforePinEvent } from './before-pin.js'
 import { HelixBeforeReconnectEvent } from './before-reconnect.js'
 import { HelixBeforeRelabelEvent } from './before-relabel.js'
@@ -126,6 +127,7 @@ import { HelixMoveEvent } from './move.js'
 import { HelixNavigateEvent } from './navigate.js'
 import { HelixNextEvent } from './next.js'
 import { HelixPanelResizeEvent } from './panel-resize.js'
+import { HelixPasteEvent } from './paste.js'
 import { HelixPinEvent } from './pin.js'
 import { HelixPressEvent } from './press.js'
 import { HelixPreviewEvent } from './preview.js'
@@ -186,6 +188,7 @@ export type {
   MoveDetail,
   NavigateDetail,
   OpenDetail,
+  PasteDetail,
   PressDetail,
   PressPointerType,
   RangeDetail,
@@ -227,6 +230,7 @@ export {
   HelixBeforeMoveEvent,
   HelixBeforeOpenEvent,
   HelixBeforePanelResizeEvent,
+  HelixBeforePasteEvent,
   HelixBeforePinEvent,
   HelixBeforeReconnectEvent,
   HelixBeforeRelabelEvent,
@@ -275,6 +279,7 @@ export {
   HelixNavigateEvent,
   HelixNextEvent,
   HelixPanelResizeEvent,
+  HelixPasteEvent,
   HelixPinEvent,
   HelixPressEvent,
   HelixPreviewEvent,
@@ -333,6 +338,7 @@ const registry = {
   HelixBeforeMoveEvent,
   HelixBeforeOpenEvent,
   HelixBeforePanelResizeEvent,
+  HelixBeforePasteEvent,
   HelixBeforePinEvent,
   HelixBeforeReconnectEvent,
   HelixBeforeRelabelEvent,
@@ -381,6 +387,7 @@ const registry = {
   HelixNavigateEvent,
   HelixNextEvent,
   HelixPanelResizeEvent,
+  HelixPasteEvent,
   HelixPinEvent,
   HelixPressEvent,
   HelixPreviewEvent,

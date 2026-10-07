@@ -44,6 +44,9 @@ import { styles } from './canvas-root.css.js'
  */
 @customElement('helix-canvas')
 export class HelixCanvas extends HelixHeadlessCanvas {
+  /** A paste adds this tier's cards and connections. */
+  static override tier = 'helix-'
+
   /**
    * Draws `lines` or `dots` on the board's plane, so you can see it move.
    *

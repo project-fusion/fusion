@@ -71,6 +71,47 @@ export interface ConnectDetail {
   toSide?: 'top' | 'right' | 'bottom' | 'left' | undefined
 }
 
+/** A side of a card, as JSON Canvas names it. */
+type PasteSide = 'top' | 'right' | 'bottom' | 'left'
+
+/**
+ * What a paste adds to a board: a JSON Canvas document whose ids the board
+ * does not hold yet, its cards moved clear of the ones they were copied from.
+ * The shape is the format's, which `fromJsonCanvas` reads.
+ */
+export interface PasteDetail {
+  document: {
+    edges?: Array<{
+      color?: string | undefined
+      fromEnd?: 'none' | 'arrow' | undefined
+      fromNode: string
+      fromSide?: PasteSide | undefined
+      id: string
+      label?: string | undefined
+      path?: 'curve' | 'straight' | 'step' | undefined
+      toEnd?: 'none' | 'arrow' | undefined
+      toNode: string
+      toSide?: PasteSide | undefined
+    }>
+    nodes?: Array<{
+      background?: string | undefined
+      backgroundStyle?: 'cover' | 'ratio' | 'repeat' | undefined
+      color?: string | undefined
+      file?: string | undefined
+      height: number
+      id: string
+      label?: string | undefined
+      subpath?: string | undefined
+      text?: string | undefined
+      type: 'text' | 'file' | 'link' | 'group'
+      url?: string | undefined
+      width: number
+      x: number
+      y: number
+    }>
+  }
+}
+
 /** Where a connection's ends are going, and where they were. */
 export interface ReconnectDetail {
   /** The connection's name, where it has one. */
