@@ -309,6 +309,12 @@ slot[name="icon"]::slotted(*) {
   display: grid;
 }
 
+/* Held back by the region's `max-visible`: out of the stack until a message
+   before it goes, and its entrance plays when it shows. */
+:host(:state(waiting)) {
+  display: none;
+}
+
 :host([data-closed]) {
   grid-template-rows: minmax(0, 0fr);
   margin-block-start: 0;

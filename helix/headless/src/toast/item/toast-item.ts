@@ -43,6 +43,9 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * control. While it moves, the distance is on the `item` part as
  * `--toast-swipe-x`.
  *
+ * **Escape dismisses the message holding focus**, through the same
+ * `helix-dismiss`, and focus moves to the next message.
+ *
  * **Messages are inverted by default.** The item flips `color-scheme`, so a new
  * message stands out from the page without using a color that carries meaning.
  *
@@ -75,6 +78,10 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @cssproperty --toast-duration - How long this message stays, in milliseconds, for a progress hint.
  * @cssproperty --toast-swipe-x - How far a swipe has moved the message across, in pixels, toward the right.
+ *
+ * @cssstate closed - The message has been dismissed and is hidden, or leaving.
+ * @cssstate paused - The dismiss timer is paused, while a pointer or focus is on the message, or while the page is hidden.
+ * @cssstate waiting - The region holds the message back, past its `max-visible`, until a message before it goes.
  */
 @customElement('helix-headless-toast-item')
 export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
@@ -170,6 +177,7 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
     holdWhileHidden: true,
     paused: (paused) => {
       this.toggleAttribute('data-paused', paused)
+      this.toggleState('paused', paused)
     },
   })
 
@@ -180,6 +188,38 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
    */
   @property({ reflect: true })
   tone?: 'danger' | 'info' | 'success' | 'warning'
+
+  /**
+   * Whether the region holds the message back, because more messages are
+   * showing than its `max-visible`. The region sets it. A waiting message is
+   * hidden, its timer has not started, and it is said once it shows.
+   */
+  @property({ attribute: false, type: Boolean })
+  waiting = false
+
+  /** Whether the dismiss timer has started, which it does once the message first shows. */
+  private started = false
+
+  /** Whether the timer is held for `waiting`, so the hold is let go once. */
+  private holding = false
+
+  /** Starts the timer when the message first shows, and holds it while it waits again. */
+  private wait(waiting: boolean): void {
+    if (waiting) {
+      if (this.started && !this.holding) {
+        this.holding = true
+        this.countdown.hold()
+      }
+      return
+    }
+    if (this.holding) {
+      this.holding = false
+      this.countdown.release()
+    } else if (!this.started && this.hasUpdated) {
+      this.started = true
+      this.countdown.start(this.duration)
+    }
+  }
 
   /** Whether it is showing, whoever said so, and `undefined` until somebody has. */
   private openState: boolean | undefined = undefined
@@ -247,7 +287,34 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
        paused it, and `firstUpdated` happens once, so a message a framework
        moved stayed on screen for good. */
     if (this.hasUpdated && this.open) {
-      this.resume()
+      if (this.waiting) {
+        this.wait(true)
+      } else {
+        this.resume()
+      }
+    }
+    this.addEventListener('keydown', this.handleKeydown)
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    /* The countdown drops its holds as the host leaves. */
+    this.holding = false
+    this.removeEventListener('keydown', this.handleKeydown)
+  }
+
+  /**
+   * Escape dismisses the message holding focus, as Radix's toast does. Taken
+   * only when the dismissal goes ahead, so a refused one leaves the key to
+   * the page.
+   */
+  private readonly handleKeydown = (event: KeyboardEvent): void => {
+    if (event.key !== 'Escape' || event.defaultPrevented || !this.open) {
+      return
+    }
+    if (this.dismiss()) {
+      event.preventDefault()
+      event.stopPropagation()
     }
   }
 
@@ -272,7 +339,9 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
        It costs the styled tier nothing, the same as the accordion: `:host` sets
        `display: grid` unconditionally so the author rule beats the UA sheet,
        and the exit still animates its row down from `1fr`. */
-    this.toggleAttribute('hidden', !this.open)
+    this.toggleAttribute('hidden', !this.open || this.waiting)
+    this.toggleState('closed', !this.open)
+    this.toggleState('waiting', this.waiting)
     /* A dialog a reader can move into, named by its words. Through internals,
        so nothing is written onto the consumer's element. Not a live region:
        the region says the message as it arrives, in the voice of its tone. */
@@ -283,6 +352,9 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.name()
+    if (changed.has('waiting')) {
+      this.wait(this.waiting)
+    }
   }
 
   /** The elements assigned to one of the message's named slots. */
@@ -314,7 +386,10 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
     super.firstUpdated(changed)
     /* Here rather than in `connectedCallback`, which the server never calls, and
        started only once: the clock belongs to this message's life on screen. */
-    this.countdown.start(this.duration)
+    if (!this.waiting) {
+      this.started = true
+      this.countdown.start(this.duration)
+    }
   }
 
   /**

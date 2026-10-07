@@ -67,6 +67,19 @@ import { joinSaid, messageWords } from '../words.js'
  * message, then the one before it, then back to where it was before it entered
  * the stack.
  *
+ * **`max-visible` limits how many messages show at once**, as Zag's `max`
+ * does. The messages after that many, in document order, wait: each is hidden,
+ * its timer has not started, and the region says it once it shows, when a
+ * message before it goes. A waiting message has `:state(waiting)`.
+ *
+ * **Keyboard.**
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | F8, or your `hotkey` | Moves focus to the first control in the stack, and back to where it was when pressed in the stack. |
+ * | Tab, Shift+Tab | Moves between the controls of the messages. |
+ * | Escape | Dismisses the message holding focus. Focus moves to the next message, then the one before it, then back to where it was. |
+ *
  * @since 0.1.0
  * @status stable
  * @category overlays
@@ -105,6 +118,14 @@ export class HelixHeadlessToast extends HelixElement {
   @words
   @property()
   label = 'Notifications ({hotkey})'
+
+  /**
+   * How many messages show at once. The messages after that many wait, hidden
+   * and with their timers stopped, until a message before them goes. Unset,
+   * every message shows.
+   */
+  @property({ attribute: 'max-visible', type: Number })
+  maxVisible?: number
 
   /**
    * Which corner or edge the stack sits at.
@@ -326,7 +347,9 @@ export class HelixHeadlessToast extends HelixElement {
   /** Removes a message `add()` made, once it has hidden and finished leaving. */
   private sweep(): void {
     for (const one of [...this.children]) {
-      if (!(one instanceof HTMLElement) || !one.hidden || !this.made.has(one)) {
+      /* Closed, and not merely waiting under `max-visible`. */
+      const closed = (one as { open?: boolean }).open === false
+      if (!(one instanceof HTMLElement) || !closed || !one.hidden || !this.made.has(one)) {
         continue
       }
       this.made.delete(one)
@@ -340,8 +363,56 @@ export class HelixHeadlessToast extends HelixElement {
   /** The messages that are showing, in order. */
   private get showing(): HTMLElement[] {
     return [...this.children].filter(
-      (one): one is HTMLElement => one instanceof HTMLElement && !one.hidden,
+      (one): one is HTMLElement => one instanceof HTMLElement && !one.hidden && !this.held.has(one),
     )
+  }
+
+  /** The messages `max-visible` holds back. */
+  private readonly held = new WeakSet<Element>()
+
+  /**
+   * Holds back the messages past `max-visible`, and returns the ones it has
+   * just let go. A message that has been dismissed takes no place in the line.
+   */
+  private queue(): HTMLElement[] {
+    const max = this.maxVisible
+    const line = [...this.children].filter(
+      (one): one is HTMLElement & { waiting?: boolean } =>
+        one instanceof HTMLElement && (one as { open?: boolean }).open !== false,
+    )
+    const released: HTMLElement[] = []
+    line.forEach((one, at) => {
+      const wait = max !== undefined && max >= 0 && at >= max
+      if (this.held.has(one) && !wait) {
+        released.push(one)
+      }
+      if (wait) {
+        this.held.add(one)
+      } else {
+        this.held.delete(one)
+      }
+      if ((one.waiting ?? false) !== wait) {
+        one.waiting = wait
+      }
+    })
+    return released
+  }
+
+  /**
+   * Lets go of the messages past `max-visible` that now have room, raises the
+   * stack and says them, once each has shown.
+   */
+  private restack(): void {
+    const released = this.queue()
+    if (released.length === 0) {
+      return
+    }
+    void Promise.all(
+      released.map((one) => (one as Partial<{ updateComplete: Promise<unknown> }>).updateComplete),
+    ).then(() => {
+      this.place(released)
+      this.tell(released)
+    })
   }
 
   private get region(): HTMLElement | null {
@@ -497,6 +568,8 @@ export class HelixHeadlessToast extends HelixElement {
     document.addEventListener('keydown', this.handleHotkey)
     this.watcher = new MutationObserver((records) => {
       const added = records.flatMap((record) => [...record.addedNodes])
+      /* First, so a message past `max-visible` is held before it is shown or said. */
+      this.restack()
       this.place(added)
       this.tell(added)
       this.sweep()
@@ -523,7 +596,16 @@ export class HelixHeadlessToast extends HelixElement {
 
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
+    this.queue()
     this.place()
+  }
+
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    if (changed.has('maxVisible')) {
+      this.restack()
+      this.place()
+    }
   }
 
   protected override render(): TemplateResult {

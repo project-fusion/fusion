@@ -460,3 +460,51 @@ describe('add()', () => {
     expect(item.isConnected).toBe(true)
   })
 })
+
+describe('max-visible', () => {
+  type Held = Item & { waiting: boolean }
+  const items = (host: HTMLElement): Held[] =>
+    [...host.querySelectorAll('helix-headless-toast-item')] as Held[]
+  const settled = async (host: HTMLElement): Promise<void> => {
+    for (let round = 0; round < 3; round += 1) {
+      await new Promise((done) => setTimeout(done, 0))
+      for (const one of items(host)) {
+        await one.updateComplete
+      }
+    }
+  }
+
+  test('shows that many messages, and the next once one goes', async () => {
+    const host = (await mount(`<helix-headless-toast label="Notifications" max-visible="2">
+      <helix-headless-toast-item>One</helix-headless-toast-item>
+      <helix-headless-toast-item>Two</helix-headless-toast-item>
+      <helix-headless-toast-item>Three</helix-headless-toast-item>
+    </helix-headless-toast>`)) as HTMLElement
+    await settled(host)
+    expect(items(host).map((one) => one.hidden)).toEqual([false, false, true])
+    expect(items(host).map((one) => one.waiting)).toEqual([false, false, true])
+    items(host)[0]?.dismiss()
+    await settled(host)
+    expect(items(host).map((one) => one.hidden)).toEqual([true, false, false])
+  })
+
+  test('holds a message added past the limit, and says it once it shows', async () => {
+    const host = (await mount(
+      `<helix-headless-toast label="Notifications" max-visible="1"></helix-headless-toast>`,
+    )) as HTMLElement & { add(message: string): Item }
+    const first = host.add('Saved')
+    const second = host.add('Uploaded') as Held
+    await settled(host)
+    expect(second.waiting).toBe(true)
+    expect(second.hidden).toBe(true)
+    await new Promise((done) => setTimeout(done, 40))
+    const polite = host.shadowRoot?.querySelector('[role="status"]')
+    expect(polite?.textContent).not.toContain('Uploaded')
+    first.dismiss()
+    await settled(host)
+    await new Promise((done) => setTimeout(done, 40))
+    expect(second.hidden).toBe(false)
+    expect(second.isConnected).toBe(true)
+    expect(polite?.textContent).toContain('Uploaded')
+  })
+})
