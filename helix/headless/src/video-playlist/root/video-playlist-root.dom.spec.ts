@@ -659,3 +659,34 @@ describe('entries that share a file', () => {
     expect(part(host, 'live')?.textContent).toBe('Now playing Recut')
   })
 })
+
+describe('the entry a playlist starts on', () => {
+  const unset = async (): Promise<Playlist> => {
+    const host = (await mount(`<helix-headless-video-playlist label="Episodes">
+      <helix-headless-video slot="player"></helix-headless-video>
+      <helix-headless-video-playlist-item src="/a.mp4" value="a">Episode A</helix-headless-video-playlist-item>
+      <helix-headless-video-playlist-item src="/b.mp4" value="b">Episode B</helix-headless-video-playlist-item>
+    </helix-headless-video-playlist>`)) as Playlist
+    await host.updateComplete
+    await host.updateComplete
+    return host
+  }
+
+  /* With no `active` and no `default-active`, the first entry is in the
+     player and says `aria-current`, so `active` names it too. */
+  test('is what `active` reports', async () => {
+    const host = await unset()
+    expect(entries(host)[0]?.current).toBe(true)
+    expect(host.active).toBe('a')
+  })
+
+  test('and a press on it still plays it', async () => {
+    const host = await unset()
+    const plays = watchPlays(player(host))
+    entries(host)[0]?.shadowRoot?.querySelector('button')?.click()
+    await host.updateComplete
+    await player(host).updateComplete
+    await Promise.resolve()
+    expect(plays()).toBe(1)
+  })
+})

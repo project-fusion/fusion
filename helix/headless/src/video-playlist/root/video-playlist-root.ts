@@ -472,8 +472,18 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
     if (event.defaultPrevented) {
       return
     }
+    const value = (event as CustomEvent<{ value: string }>).detail.value
+    /* The entry in the player already: a press plays it where it is paused,
+       which is what pressing the opening entry is for. */
+    const player = this.player
+    if (value === this.active) {
+      if (player && player.paused !== false) {
+        void Promise.resolve(player.play()).catch(() => {})
+      }
+      return
+    }
     this.chased = true
-    this.requestActive((event as CustomEvent<{ value: string }>).detail.value, 'press')
+    this.requestActive(value, 'press')
   }
 
   /** An entry that takes focus takes the tab stop with it. */
@@ -686,6 +696,15 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
     super.willUpdate(changed)
     if (changed.has('shuffle') && !this.shuffle) {
       this.dealt = undefined
+    }
+    /* The entry the player opens on, where nothing named one, is the one
+       `active` reports. Written as the state and not as a move: nothing was
+       asked for, so nothing is announced or played. */
+    if (this.active === '' && this.childrenKnown) {
+      const opening = this.resolveActive(this.items)
+      if (opening) {
+        this.active = opening.value
+      }
     }
   }
 
