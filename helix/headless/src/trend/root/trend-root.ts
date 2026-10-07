@@ -1,4 +1,11 @@
-import { customElement, HelixElement, reportRuntime } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  formatWords,
+  HelixElement,
+  reportRuntime,
+  words,
+  wordsLocale,
+} from '@fusion.dev/helix-core'
 import { arrowDown, arrowUp, minus } from '@fusion.dev/helix-icons'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -86,8 +93,16 @@ const readDirection = (value: string | undefined): (typeof DIRECTIONS)[Direction
 @customElement('helix-headless-trend')
 export class HelixHeadlessTrend extends HelixElement {
   /**
-   * The word read out after the direction when the move is an improvement.
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-trend': { upLabel: 'Gestiegen' } })`.
    */
+  static words = 'helix-trend'
+
+  /**
+   * The word read out after the direction when the move is an improvement,
+   * `{betterLabel}` in `judgment-label`.
+   */
+  @words
   @property({ attribute: 'better-label' })
   betterLabel = 'better'
 
@@ -104,6 +119,7 @@ export class HelixHeadlessTrend extends HelixElement {
   /**
    * The word read out for a move down.
    */
+  @words
   @property({ attribute: 'down-label' })
   downLabel = 'Down'
 
@@ -135,9 +151,22 @@ export class HelixHeadlessTrend extends HelixElement {
   good?: 'down' | 'up'
 
   /**
-   * The locale `value` is written in, such as `de` for `1.234,5`.
+   * What the `direction` part says. `{direction}` is the word for the
+   * movement, `up-label`, `down-label` or `unchanged-label`, and
+   * `{judgment}` is `better` or `worse` where `good` judges the move, so a
+   * language whose words agree with the movement writes each phrase whole:
+   * `{judgment, select, better {...} worse {...} other {...}}`.
+   * `{betterLabel}` and `{worseLabel}` are `better-label` and `worse-label`.
+   */
+  @words
+  @property({ attribute: 'judgment-label' })
+  judgmentLabel =
+    '{judgment, select, better {{direction}, {betterLabel}} worse {{direction}, {worseLabel}} other {{direction}}}'
+
+  /**
+   * The locale the words and `value` are in, such as `de` for `1.234,5`.
    *
-   * Absent uses the runtime's own. Set it on a page rendered on a server, so
+   * Absent reads the nearest `lang`, then the runtime's own. Set it on a page rendered on a server, so
    * the server and the browser write the figure alike.
    */
   @property()
@@ -159,12 +188,14 @@ export class HelixHeadlessTrend extends HelixElement {
    * The word read out for no move, or for a direction that is not one of the
    * three.
    */
+  @words
   @property({ attribute: 'unchanged-label' })
   unchangedLabel = 'Unchanged'
 
   /**
    * The word read out for a move up.
    */
+  @words
   @property({ attribute: 'up-label' })
   upLabel = 'Up'
 
@@ -181,8 +212,10 @@ export class HelixHeadlessTrend extends HelixElement {
   value?: number
 
   /**
-   * The word read out after the direction when the move is a setback.
+   * The word read out after the direction when the move is a setback,
+   * `{worseLabel}` in `judgment-label`.
    */
+  @words
   @property({ attribute: 'worse-label' })
   worseLabel = 'worse'
 
@@ -258,8 +291,12 @@ export class HelixHeadlessTrend extends HelixElement {
     const direction = readDirection(moved)
     /* Silent on a neutral move, whatever `good` says. Neither better nor worse
        is a reading of "unchanged" that the word already carries. */
-    const judged = this.judged
-    const judgment = judged ? `, ${judged === 'better' ? this.betterLabel : this.worseLabel}` : ''
+    const said = formatWords(this, 'judgmentLabel', {
+      betterLabel: this.betterLabel,
+      direction: this[direction.word],
+      judgment: this.judged ?? 'none',
+      worseLabel: this.worseLabel,
+    })
 
     /* A slot per movement around the one for all three, so a page slots three
        glyphs once and the trend shows the one that matches. Unmatched slots
@@ -291,9 +328,9 @@ export class HelixHeadlessTrend extends HelixElement {
     const figure =
       value === undefined || !Number.isFinite(value)
         ? ''
-        : figureOf(value, this.locale, this.formatOptions)
+        : figureOf(value, wordsLocale(this), this.formatOptions)
     return html`${glyph}
-      <span part="direction">${`${this[direction.word]}${judgment}`}</span>
+      <span part="direction">${said}</span>
       <span part="value" ?hidden=${figure === ''}>${figure}</span><slot></slot>
       <slot name="label"></slot>`
   }

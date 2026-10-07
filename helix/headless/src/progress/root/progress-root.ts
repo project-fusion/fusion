@@ -7,6 +7,8 @@ import {
   readingText,
   StatusController,
   slottedWords,
+  words,
+  wordsLocale,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -56,12 +58,19 @@ import { property } from 'lit/decorators.js'
 @customElement('helix-headless-progress')
 export class HelixHeadlessProgress extends HelixElement {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-progress': { completeLabel: 'Fertig' } })`.
+   */
+  static words = 'helix-progress'
+
+  /**
    * The words a screen reader hears when the value reaches `max`, such as
    * "Upload complete".
    *
    * Said once, politely, as the work finishes. Empty says nothing, for a bar
    * whose page announces the result itself.
    */
+  @words
   @property({ attribute: 'complete-label' })
   completeLabel = 'Complete'
 
@@ -104,13 +113,14 @@ export class HelixHeadlessProgress extends HelixElement {
    * A visible label in the `label` slot names it instead, with the words it
    * shows, so the name and the label cannot disagree.
    */
+  @words
   @property()
   label = 'Progress'
 
   /**
-   * The locale the percentage is written in, such as `fr` for `72 %`.
+   * The locale the words and the percentage are in, such as `fr` for `72 %`.
    *
-   * Absent uses the runtime's own.
+   * Absent reads the nearest `lang`, then the runtime's own.
    */
   @property()
   locale = ''
@@ -272,7 +282,7 @@ export class HelixHeadlessProgress extends HelixElement {
       readingText(
         Math.min(Math.max(this.value, this.range.min), this.range.max),
         this.fraction,
-        this.locale,
+        wordsLocale(this),
         this.formatOptions,
       )
     )

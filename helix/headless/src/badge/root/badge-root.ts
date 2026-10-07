@@ -1,4 +1,4 @@
-import { customElement, focusTarget, HelixElement } from '@fusion.dev/helix-core'
+import { customElement, focusTarget, HelixElement, wordsLocale } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { badgeBlank, badgeCapped, badgeText, badgeWords } from '../count.js'
@@ -70,14 +70,18 @@ export class HelixHeadlessBadge extends HelixElement {
    * Required for a dot, which has no text to read. `{count}` is replaced with
    * what the badge shows, so `label="{count} unread"` reads "8 unread" and
    * stays current as `value` changes, with no label of yours to keep in step.
+   * A language with plural forms writes them, `{count, plural, one {{count}
+   * nieprzeczytana} few {{count} nieprzeczytane} other {{count}
+   * nieprzeczytanych}}`, picked by the count in `locale`.
    */
   @property()
   label = ''
 
   /**
-   * The locale a count is written in under `format-options`, such as `de`.
+   * The locale a count is written in under `format-options`, and whose plural
+   * rules `label` picks a form by, such as `de`.
    *
-   * Absent uses the runtime's own.
+   * Absent reads the nearest `lang`, then the runtime's own.
    */
   @property()
   locale = ''
@@ -125,12 +129,12 @@ export class HelixHeadlessBadge extends HelixElement {
 
   /** What the indicator reads, once the cap has been applied. */
   private get text(): string {
-    return badgeText(this.given, this.max, this.locale, this.formatOptions)
+    return badgeText(this.given, this.max, wordsLocale(this), this.formatOptions)
   }
 
   /** What a reader hears for the mark, or nothing for a blank or unnamed one. */
   private get words(): string {
-    return badgeWords(this.text, this.label, this.blank)
+    return badgeWords(this.text, this.label, this.blank, wordsLocale(this))
   }
 
   /** The control the badge describes, while it describes one. */

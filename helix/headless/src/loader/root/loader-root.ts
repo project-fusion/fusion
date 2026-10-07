@@ -5,6 +5,7 @@ import {
   HelixElement,
   hostAria,
   reportRuntime,
+  words,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -57,6 +58,12 @@ import { awaitRegion, claimBusy, releaseBusy } from '../busy.js'
 @customElement('helix-headless-loader')
 export class HelixHeadlessLoader extends HelixElement {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-loader': { label: 'Wird geladen' } })`.
+   */
+  static words = 'helix-loader'
+
+  /**
    * How long the loader waits before it shows, in milliseconds, so work that
    * finishes quickly never flashes one.
    *
@@ -80,6 +87,7 @@ export class HelixHeadlessLoader extends HelixElement {
    * The loader's name, announced by screen readers while the work is in
    * progress.
    */
+  @words
   @property()
   label = 'Loading'
 

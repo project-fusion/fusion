@@ -1,4 +1,4 @@
-import { fillTemplate, formatNumber } from '@fusion.dev/helix-core'
+import { formatMessage, formatNumber } from '@fusion.dev/helix-core'
 
 /*
  * What a badge's mark reads and says, from its value, as pure functions of the
@@ -39,10 +39,15 @@ export const badgeText = (
 /**
  * What a reader hears for the mark: `label` with `{count}` filled, or the text
  * alone, and nothing for a blank mark or an unnamed dot.
+ *
+ * `label` is a message, so it can hold plural forms: `{count, plural, one
+ * {{count} unread} other {{count} unread}}`. `{count}` is the text as the mark
+ * shows it, such as `99+`, and the form is picked by its number in `locale`'s
+ * rules, `other` where the text is no number.
  */
-export const badgeWords = (text: string, label: string, blank: boolean): string => {
+export const badgeWords = (text: string, label: string, blank: boolean, locale = ''): string => {
   if (blank || (text === '' && label === '')) {
     return ''
   }
-  return fillTemplate(label, { count: text }) || text
+  return formatMessage(label, { count: text }, locale) || text
 }

@@ -35,6 +35,16 @@ describe('a badge count', () => {
     expect(badgeWords('', 'Online', false)).toBe('Online')
   })
 
+  test('a label with plural forms picks the form by the count, in the locale', () => {
+    const unread =
+      '{count, plural, one {{count} nieprzeczytana} few {{count} nieprzeczytane} other {{count} nieprzeczytanych}}'
+    expect(badgeWords('1', unread, false, 'pl')).toBe('1 nieprzeczytana')
+    expect(badgeWords('3', unread, false, 'pl')).toBe('3 nieprzeczytane')
+    expect(badgeWords('5', unread, false, 'pl')).toBe('5 nieprzeczytanych')
+    /* A capped count is no number, so it takes the last form, as written. */
+    expect(badgeWords('99+', unread, false, 'pl')).toBe('99+ nieprzeczytanych')
+  })
+
   test('says nothing for a blank mark or an unnamed dot', () => {
     expect(badgeWords('0', '{count} unread', true)).toBe('')
     expect(badgeWords('', '', false)).toBe('')

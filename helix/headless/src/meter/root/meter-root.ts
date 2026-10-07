@@ -1,22 +1,22 @@
 import {
   customElement,
   drawStatus,
+  formatWords,
   HelixBandEvent,
   HelixElement,
   hostAria,
   readingText,
   StatusController,
   slottedWords,
+  words,
   wordsConverter,
+  wordsLocale,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /** Which band a value falls in, once `optimum` has said which end is good. */
 export type MeterBand = 'fair' | 'good' | 'poor'
-
-/** The words a band is said with under `live`, where `band-labels` gives none. */
-const BAND_WORDS: Readonly<Record<MeterBand, string>> = { fair: 'Fair', good: 'Good', poor: 'Poor' }
 
 /**
  * @summary A measurement in a known range, with optional bands that mark it good, fair, or poor.
@@ -77,6 +77,12 @@ const BAND_WORDS: Readonly<Record<MeterBand, string>> = { fair: 'Fair', good: 'G
 @customElement('helix-headless-meter')
 export class HelixHeadlessMeter extends HelixElement {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-meter': { label: 'Messwert' } })`.
+   */
+  static words = 'helix-meter'
+
+  /**
    * Sets the band directly, for a rule that `low`, `high`, and `optimum` cannot
    * express.
    *
@@ -112,10 +118,13 @@ export class HelixHeadlessMeter extends HelixElement {
    * The words each band is said with under `live`, by its name, written as
    * JSON in the attribute: `band-labels='{"poor":"Almost full"}'`.
    *
-   * A band left out keeps its default: "Good", "Fair" or "Poor".
+   * A band left out keeps its default: "Good", "Fair" or "Poor". Reading the
+   * property gives every band's words, yours over the registry's over the
+   * English.
    */
+  @words
   @property({ attribute: 'band-labels', converter: wordsConverter })
-  bandLabels: Partial<Record<MeterBand, string>> = {}
+  bandLabels: Partial<Record<MeterBand, string>> = { fair: 'Fair', good: 'Good', poor: 'Poor' }
 
   /**
    * `Intl.NumberFormat` options the reading is written with, as React Aria's
@@ -148,6 +157,7 @@ export class HelixHeadlessMeter extends HelixElement {
    * A visible label in the `label` slot names it instead, with the words it
    * shows, so the name and the label cannot disagree.
    */
+  @words
   @property()
   label = 'Meter'
 
@@ -163,9 +173,18 @@ export class HelixHeadlessMeter extends HelixElement {
   live = false
 
   /**
-   * The locale the percentage is written in, such as `fr` for `72 %`.
+   * What `live` says as the reading moves into another band. `{reading}` is
+   * the reading as it is shown, and `{band}` the band's words from
+   * `band-labels`.
+   */
+  @words
+  @property({ attribute: 'live-label' })
+  liveLabel = '{reading}, {band}'
+
+  /**
+   * The locale the words and the percentage are in, such as `fr` for `72 %`.
    *
-   * Absent uses the runtime's own.
+   * Absent reads the nearest `lang`, then the runtime's own.
    */
   @property()
   locale = ''
@@ -361,7 +380,7 @@ export class HelixHeadlessMeter extends HelixElement {
       readingText(
         Number.isFinite(this.value) ? this.value : this.span.min,
         this.ratio,
-        this.locale,
+        wordsLocale(this),
         this.formatOptions,
       )
     )
@@ -406,7 +425,9 @@ export class HelixHeadlessMeter extends HelixElement {
     }
     this.dispatchEvent(new HelixBandEvent({ band: band ?? '' }))
     if (band && this.live) {
-      this.status.say(`${this.text}, ${this.bandLabels[band] ?? BAND_WORDS[band]}`)
+      this.status.say(
+        formatWords(this, 'liveLabel', { band: this.bandLabels[band] ?? '', reading: this.text }),
+      )
     }
   }
 
