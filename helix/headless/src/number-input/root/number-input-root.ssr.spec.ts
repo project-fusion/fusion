@@ -29,7 +29,7 @@ describe('input number server output', () => {
   test('the field is text with a numeric keypad, not a native spinner', () => {
     const tag = partTag(ssr(field), 'control')
     expect(tag).toContain('type="text"')
-    expect(tag).toContain('inputmode="decimal"')
+    expect(tag).toContain('inputmode="numeric"')
   })
 
   test('the number is already in the field, so nothing arrives on hydration', () => {
