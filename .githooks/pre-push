@@ -1,25 +1,33 @@
 #!/bin/sh
-# Refuses a push whose generated files are behind their sources.
+# Checks what a push publishes, in seconds, before it leaves this machine.
 #
-# This is the one class CI cannot fix for you: `verify.yml` runs everything else
-# better than a laptop does, but it cannot regenerate. It judges and never
-# writes, because a hook that edits the tree during `git push` produces a push
-# that does not contain the edits.
+# **Two checks, because only these two have to run before a push.** A withheld
+# name in a commit message is public the moment the push lands, and CI can only
+# report it afterwards. Formatting is the other: it is a check on the files the
+# push changes, and it costs a second. Everything else this hook used to run is
+# in `verify`, which CI runs on every push: `check:cli`, the generated-file
+# checks, and `biome ci` over the whole tree.
 #
-# The bar for adding a check here is seconds rather than minutes, and a failure
-# that is otherwise silent. A slow hook is one people pass `--no-verify` to.
+# **Seconds, cold or warm.** The hook used to build the workspace for
+# `check:cli` and the generated-file checks: 69 seconds in a fresh worktree and
+# 28 with every cache warm, measured October 7, 2026. A slow hook is one people
+# pass `--no-verify` to. It now builds nothing, so a fresh clone pays what a
+# warm one does.
+#
+# **Biome reads the files the pushed commits change, and nothing else.** Another
+# session's unfinished edit elsewhere in the checkout cannot block this push.
+# It judges and never writes, because a hook that edits the tree during
+# `git push` produces a push that does not contain the edits.
 #
 # Installed by `git config core.hooksPath .githooks`, which `prepare` runs on
 # `bun install`. Skip once with `git push --no-verify`.
 set -e
 
-# A runner installs this too, and none of it is a runner's job: `check:cli` runs
-# a Rust binary a workflow has not built, so it fails here with no useful
-# message. Measured 30 Aug 2026, when `Visual baselines` retook every picture,
-# committed them, and died here on the push having opened no pull request.
+# A runner installs this too, and none of it is a runner's job: the push a
+# workflow makes is checked by the workflow that made it.
 [ -n "$CI" ] && exit 0
 
-# `turbo` is a workspace binary and `sh -c` below does not get the PATH bun adds.
+# `biome` is a workspace binary, and `sh` does not get the PATH bun adds.
 PATH="$PWD/node_modules/.bin:$PATH"
 export PATH
 
@@ -31,12 +39,8 @@ pushing=$(cat)
 # **A push that only deletes refs carries no commits, so there is nothing here
 # to judge.** git writes one line per ref with an all-zero local sha for a
 # deletion, which is the same zero `check-withheld` already skips when it turns
-# these lines into ranges. Everything below reads the working tree instead, so a
-# `git push --delete` was refused for a tree the deletion has nothing to do
-# with: measured 16 Sep 2026 deleting twenty merged branches, where biome
-# refused another session's half-finished edit and the only way through was
-# `--no-verify`, which is the habit a hook should not teach. No lines at all is
-# the same answer for the same reason: nothing is being transferred.
+# these lines into ranges. No lines at all is the same answer for the same
+# reason: nothing is being transferred.
 if ! printf '%s\n' "$pushing" | awk 'NF >= 4 && $2 !~ /^0+$/ { found = 1 } END { exit found ? 0 : 1 }'; then
   printf 'pre-push: deletions only, nothing to verify\n'
   exit 0
@@ -52,53 +56,32 @@ printf '%s\n' "$pushing" | bun fusion/scripts/check-withheld.mjs --pushing >/tmp
 }
 rm -f /tmp/pre-push-$$.log
 
-printf 'pre-push: formatting and lint\n'
-bunx biome ci . >/dev/null 2>&1 || {
-  printf '\n  biome refuses this tree. Run `bun run fix` and commit the result.\n\n'
-  exit 1
-}
+# The files the pushed commits change, over the same ranges `check-withheld`
+# reads: a new branch from `origin/main`, any other ref from where the remote
+# has it. A file a commit deleted is not on disk to format.
+changed=$(printf '%s\n' "$pushing" | awk 'NF >= 4 && $2 !~ /^0+$/ {
+  if ($4 ~ /^0+$/) print "origin/main.." $2; else print $4 ".." $2
+}' | while read -r range; do
+  git log --format= --name-only --diff-filter=d "$range"
+done | sort -u | while read -r file; do
+  if [ -f "$file" ]; then printf '%s\n' "$file"; fi
+done)
 
-# `reachable` is the rule that earned this line: it reads `:host([x])` and
-# `::slotted(tag[x])` against whether `x` reflects, and the fault it catches is
-# silent every other way. The rest ride along because the whole set costs about
-# a second.
-printf 'pre-push: the rules that ship\n'
-bun run check:cli >/tmp/pre-push-$$.log 2>&1 || {
+if [ -z "$changed" ]; then
+  printf 'pre-push: clear\n'
+  exit 0
+fi
+
+printf 'pre-push: formatting and lint\n'
+# `--no-errors-on-unmatched`, because a push may change only files biome does
+# not read, such as a lockfile or a picture.
+printf '%s\n' "$changed" | xargs biome ci --colors=off --no-errors-on-unmatched >/tmp/pre-push-$$.log 2>&1 || {
   printf '\n'
-  grep -v '^\$' /tmp/pre-push-$$.log | tail -4 | sed 's/^/  /'
-  printf '\n'
+  tail -20 /tmp/pre-push-$$.log | sed 's/^/  /'
+  printf '\n  biome refuses a file this push changes. Run `bun run fix` and commit the result.\n\n'
   rm -f /tmp/pre-push-$$.log
   exit 1
 }
-rm -f /tmp/pre-push-$$.log
-
-printf 'pre-push: generated files\n'
-# This loop is the authority on the list, and it is kept in step with `regen` by
-# hand: a writer whose `check:` is not here, or a check here whose writer is not
-# in `regen`, is a red build with no published way out of it.
-#
-# Written out rather than built from a suffix. A name a shell assembles at run
-# time is a name nothing can check, and `fusion workspace`'s `scripts` rule reads
-# literal `bun run` calls.
-for check in \
-  "turbo run token-layer -- --check" \
-  "turbo run docs-check" \
-  "turbo run samples -- --check" \
-  "turbo run routes-check" \
-  "turbo run content -- --check" \
-  "turbo run register -- --check" \
-  "turbo run themed-page-check" \
-  "bun run check:gen:element-events" \
-  "bun run check:gen:metrics" \
-  "bun run check:gen:eval"; do
-  sh -c "$check" >/tmp/pre-push-$$.log 2>&1 || {
-    printf '\n'
-    grep -v '^\$' /tmp/pre-push-$$.log | tail -3 | sed 's/^/  /'
-    printf '\n'
-    rm -f /tmp/pre-push-$$.log
-    exit 1
-  }
-done
 rm -f /tmp/pre-push-$$.log
 
 printf 'pre-push: clear\n'

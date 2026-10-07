@@ -111,16 +111,20 @@ step between the two the registry still names a page the tree no longer has. `ca
 rather than dying on it, but the run still writes a site missing that page until
 the registry catches up, and the warning names the command.
 
-**What CI cannot do is regenerate**, which is the one thing worth checking before
-a push. `helix/docs/content/metrics.mdx is behind the built packages` is a red
-build that stays red until somebody runs `bun run gen:metrics` and pushes again,
-so `.githooks/pre-push` runs the withheld-name check, `biome ci`, `check:cli`
-and the generated-file checks and nothing else: seconds against minutes.
-It judges and never writes, because a hook that edits the tree during `git push`
-produces a push that does not contain the edits. A push that only deletes refs
-carries no commits and reaches none of it, since every one of those checks reads
-the working tree and a deletion has nothing to do with the tree.
-`git push --no-verify` skips it.
+**What CI cannot do is regenerate.** `helix/docs/content/metrics.mdx is behind
+the built packages` is a red build that stays red until somebody runs
+`bun run gen:metrics` and pushes again. `verify` finds it, and `bun run regen` is
+the way out.
+
+**`.githooks/pre-push` takes seconds, cold or warm, because it builds nothing.**
+It runs the two checks that have to pass before a push publishes anything: the
+withheld-name check over the pushed commits, and `biome ci` over the files those
+commits change. Another session's unfinished edit elsewhere in the checkout
+cannot block a push. Everything else is in `verify`, which CI runs on every
+push. It judges and never writes, because a hook that edits the tree during
+`git push` produces a push that does not contain the edits. A push that only
+deletes refs carries no commits and reaches none of it. `git push --no-verify`
+skips it.
 
 Installed by `git config core.hooksPath .githooks`, which the `prepare` script
 runs on `bun install`. No hook manager: husky and lefthook would each be a
@@ -128,10 +132,6 @@ dependency whose job is that one line. The script asks whether it is in a
 repository first, because `bun install` also runs where there is none: a
 `vercel deploy` uploads files rather than cloning, and `git config` there exits
 128 and takes the install down with it.
-
-**The generated-file list in the hook is kept in step with `regen` by hand**, and
-the loop in `.githooks/pre-push` is the authority. If prose anywhere counts it and
-disagrees, the loop is right.
 
 ## Stack
 
