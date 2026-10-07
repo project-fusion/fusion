@@ -32,6 +32,7 @@ import {
   Typeahead,
   toggleEvery,
   typesCharacter,
+  words,
   wordsLocale,
 } from '@fusion.dev/helix-core'
 import { magnifyingGlass } from '@fusion.dev/helix-icons'
@@ -180,6 +181,12 @@ type Entry = HelixHeadlessOption | (DataOption & { href?: undefined })
 export class HelixHeadlessListbox extends MixinCollection(
   MixinControllerValue(MixinField(HelixFormElement)),
 ) {
+  /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-listbox': { filterLabel: 'Filtern' } })`.
+   */
+  static words = 'helix-listbox'
+
   /* A consumer's `aria-describedby` names ids in their own tree and the control
      is in this shadow root, so the reference has to be carried down as an
      element rather than copied as an id. See `AriaForwardController`: measured
@@ -218,6 +225,7 @@ export class HelixHeadlessListbox extends MixinCollection(
    * about a filter, and the mixin's "Nothing to show" is about a list that was
    * never given anything.
    */
+  @words
   @property({ attribute: 'empty-text' })
   override emptyText = 'No matches'
 
@@ -269,6 +277,7 @@ export class HelixHeadlessListbox extends MixinCollection(
   /**
    * Placeholder text for the filter field.
    */
+  @words
   @property({ attribute: 'filter-label' })
   filterLabel = 'Filter'
 
@@ -381,6 +390,7 @@ export class HelixHeadlessListbox extends MixinCollection(
    * writes the forms it has: `{count, plural, one {# wynik} few {# wyniki}
    * many {# wyników} other {# wyniku}}`.
    */
+  @words
   @property({ attribute: 'results-label' })
   resultsLabel = '{count, plural, one {# result} other {# results}}'
 
@@ -388,8 +398,18 @@ export class HelixHeadlessListbox extends MixinCollection(
    * What VoiceOver hears as the highlight reaches a chosen option from the
    * filter field, on Apple devices. `{name}` is the option's words.
    */
+  @words
   @property({ attribute: 'selected-label' })
   selectedLabel = '{name}, selected'
+
+  /**
+   * The message reported when the field is required and no option is chosen.
+   * Absent, or empty, is this sentence, or the words registered for the page's
+   * locale.
+   */
+  @words
+  @property({ attribute: 'value-missing-message' })
+  override valueMissingMessage = 'Choose one to continue.'
 
   /**
    * Which option the keyboard is on, which is not what is chosen.
@@ -1110,7 +1130,7 @@ export class HelixHeadlessListbox extends MixinCollection(
     } else {
       this.internals.setFormValue(this.value === '' ? null : this.value)
     }
-    this.reportRequired(this.value === '', 'Choose one to continue.', 'items')
+    this.reportRequired(this.value === '', this.valueMissingMessage, 'items')
   }
 
   override connectedCallback(): void {

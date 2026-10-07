@@ -11,6 +11,7 @@ import {
   HelixBeforeEditEvent,
   HelixCaretEvent,
   HelixElement,
+  words,
 } from '@fusion.dev/helix-core'
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
 import { html } from 'lit'
@@ -80,8 +81,15 @@ const LANGUAGES = {
 @customElement('helix-sandbox-editor')
 export class HelixSandboxEditor extends HelixElement {
   /**
+   * The key the editor's words are registered under, its tag:
+   * `registerWords('de', { 'helix-sandbox-editor': { fieldLabel: 'Quelltext' } })`.
+   */
+  static words = 'helix-sandbox-editor'
+
+  /**
    * Accessible name for the editable region.
    */
+  @words
   @property({ attribute: 'field-label' })
   fieldLabel = 'Example source'
 
@@ -117,6 +125,9 @@ export class HelixSandboxEditor extends HelixElement {
 
   private view: EditorView | undefined
   private readonly language$ = new Compartment()
+
+  /** The editable region's name, which follows `field-label` and the words registered for it. */
+  private readonly name$ = new Compartment()
 
   /** Where the cursor is, counted from one, as an editor reports it. */
   get caret(): CaretDetail {
@@ -204,7 +215,7 @@ export class HelixSandboxEditor extends HelixElement {
               this.dispatchEvent(new HelixCaretEvent(this.caret))
             }
           }),
-          EditorView.contentAttributes.of({ 'aria-label': this.fieldLabel }),
+          this.name$.of(EditorView.contentAttributes.of({ 'aria-label': this.fieldLabel })),
         ],
       }),
     })
@@ -241,6 +252,14 @@ export class HelixSandboxEditor extends HelixElement {
 
     if (changed.has('language')) {
       view.dispatch({ effects: this.language$.reconfigure(LANGUAGES[this.language]()) })
+    }
+
+    if (changed.has('fieldLabel')) {
+      view.dispatch({
+        effects: this.name$.reconfigure(
+          EditorView.contentAttributes.of({ 'aria-label': this.fieldLabel }),
+        ),
+      })
     }
 
     if (changed.has('readOnly')) {

@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { clearWords } from '@fusion.dev/helix-core'
+import { clearWords, registerWords } from '@fusion.dev/helix-core'
 import { part, registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
 
 /**
@@ -48,5 +48,45 @@ describe('the count a listbox says', () => {
 
   test('still takes the deprecated sentence for one, where a page sets it', async () => {
     expect(await counted('', 'result-label="Just {count}"', 'go')).toBe('Just 1')
+  })
+})
+
+describe('the words a listbox says', () => {
+  test('are the words registered for the nearest `lang`, under its key', async () => {
+    registerWords('de', {
+      'helix-listbox': {
+        emptyText: 'Keine Treffer',
+        filterLabel: 'Filtern',
+        resultsLabel: '{count, plural, one {# Treffer} other {# Treffer}}',
+        valueMissingMessage: 'Bitte eine wählen.',
+      },
+    })
+    document.body.innerHTML = `<div lang="de"><helix-headless-listbox label="L" filterable required>
+      <helix-headless-option value="1">Rust</helix-headless-option>
+      <helix-headless-option value="2">Ruby</helix-headless-option>
+    </helix-headless-listbox></div>`
+    const host = document.querySelector('helix-headless-listbox') as Filtered & {
+      validationMessage: string
+    }
+    await settle(host)
+    expect(part(host, 'search-field')?.getAttribute('aria-label')).toBe('Filtern')
+    expect(host.validationMessage).toBe('Bitte eine wählen.')
+    host.requestFilter('r')
+    await settle(host)
+    expect(part(host, 'live')?.textContent?.trim()).toBe('2 Treffer')
+    host.requestFilter('zz')
+    await settle(host)
+    expect(part(host, 'empty')?.textContent?.trim()).toBe('Keine Treffer')
+  })
+
+  test('keep their English where nothing is registered', async () => {
+    document.body.innerHTML = `<helix-headless-listbox label="L" required>
+      <helix-headless-option value="1">Rust</helix-headless-option>
+    </helix-headless-listbox>`
+    const host = document.querySelector('helix-headless-listbox') as Filtered & {
+      validationMessage: string
+    }
+    await settle(host)
+    expect(host.validationMessage).toBe('Choose one to continue.')
   })
 })
