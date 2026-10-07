@@ -1,5 +1,13 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { at, hasState, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import {
+  at,
+  hasLayout,
+  hasState,
+  mount,
+  part,
+  registerDom,
+  role,
+} from '@fusion.dev/helix-testing/dom'
 
 /* happy-dom before the element, and the import dynamic for that reason:
    `@customElement` runs on import, static imports are hoisted, and an element
@@ -1022,3 +1030,20 @@ describe('a menu with flyout submenus', () => {
     expect(host.open).toBe(false)
   })
 })
+
+/* The side the panel landed on was a data attribute inside the shadow root,
+   where no sheet outside can read it. Popover and Select say it as a state. */
+if (hasLayout()) {
+  describe('the side the menu opens on', () => {
+    test('is a state on the host', async () => {
+      const host = await menu()
+      host.open = true
+      await host.updateComplete
+      for (let attempt = 0; attempt < 50 && !hasState(host, 'placed-bottom'); attempt += 1) {
+        await new Promise((resolve) => requestAnimationFrame(resolve))
+      }
+      expect(hasState(host, 'placed-bottom')).toBe(true)
+      expect(hasState(host, 'placed-top')).toBe(false)
+    })
+  })
+}
