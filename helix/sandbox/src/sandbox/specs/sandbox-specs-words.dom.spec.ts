@@ -34,7 +34,7 @@ type Runner = Updatable & {
 
 const runner = async (around = ''): Promise<Runner> => {
   document.body.innerHTML = `<div ${around}><helix-sandbox-specs></helix-sandbox-specs></div>`
-  const host = document.querySelector('helix-sandbox-specs') as Runner
+  const host = document.querySelector('helix-sandbox-specs') as unknown as Runner
   await settle(host)
   return host
 }
