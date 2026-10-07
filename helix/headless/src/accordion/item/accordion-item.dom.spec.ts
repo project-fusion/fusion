@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -149,12 +149,14 @@ describe('a section find in page can search', () => {
     await host.updateComplete
     expect(content.hasAttribute('hidden')).toBe(false)
     expect(content.hasAttribute('inert')).toBe(true)
+    expect(hasState(host, 'closing')).toBe(true)
     end()
     await finished
     await new Promise((resolve) => setTimeout(resolve))
     await host.updateComplete
     expect(content.getAttribute('hidden')).toBe('until-found')
     expect(content.hasAttribute('inert')).toBe(false)
+    expect(hasState(host, 'closing')).toBe(false)
   })
 
   test('and nothing running hides it at once', async () => {

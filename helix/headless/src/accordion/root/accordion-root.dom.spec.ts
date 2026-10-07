@@ -243,6 +243,36 @@ describe('a single accordion however its sections open', () => {
     await settled(host)
     expect(state(found)).toEqual([false, true, false])
   })
+
+  /* Radix marks the open trigger disabled under a single accordion, because a
+     press cannot close it; a reader hears that before pressing. */
+  test('marks the open trigger aria-disabled, and only under single', async () => {
+    const trigger = (item: Item): Element | null | undefined =>
+      item.shadowRoot?.querySelector('[part="trigger"]')
+    const host = await mount(
+      three.replace('<helix-headless-accordion>', '<helix-headless-accordion mode="single">'),
+    )
+    const found = await settled(host)
+    expect(found.map((item) => trigger(item)?.getAttribute('aria-disabled') ?? null)).toEqual([
+      'true',
+      null,
+      null,
+    ])
+    click(at(found, 1))
+    await settled(host)
+    expect(found.map((item) => trigger(item)?.getAttribute('aria-disabled') ?? null)).toEqual([
+      null,
+      'true',
+      null,
+    ])
+    ;(host as HTMLElement & { mode?: string }).mode = 'single-collapsible'
+    await settled(host)
+    expect(found.map((item) => trigger(item)?.hasAttribute('aria-disabled'))).toEqual([
+      false,
+      false,
+      false,
+    ])
+  })
 })
 
 describe('the heading around each trigger', () => {

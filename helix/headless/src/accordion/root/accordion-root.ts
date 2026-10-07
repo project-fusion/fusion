@@ -52,7 +52,8 @@ const navigable = (item: HelixHeadlessAccordionItem): NavigableItem =>
  * Keys, on a trigger: Up and Down Arrow move to the previous and the next
  * trigger, and so do Left and Right, wrapping at the ends; Home and End go to
  * the first and the last. Enter and Space open and close the section. Disabled
- * sections are passed over.
+ * sections are passed over. Under `single` the open section's trigger is
+ * `aria-disabled`, because a press cannot close it.
  *
  * Each trigger is a button with `aria-expanded` and `aria-controls`, inside a
  * heading, level 3 unless `heading-level` says otherwise, so the sections are
@@ -137,6 +138,7 @@ export class HelixHeadlessAccordion extends HelixElement {
       whenHydrated(item, () => {
         item.groupHeadingLevel = this.headingLevel
         item.groupHiddenUntilFound = this.hiddenUntilFound
+        item.groupMode = this.mode
       })
     }
     if (this.mode === undefined) {
