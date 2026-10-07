@@ -101,3 +101,21 @@ describe('the editing example', () => {
     expect(named(launch, 'ship')).not.toBeNull()
   })
 })
+
+describe('the first render', () => {
+  /* The fit used to move the view inside the update that drew the board, so
+     the update that finished was followed by another, and Lit's development
+     build said so for every board. `updateComplete` answers false while a
+     further update is pending. */
+  run('a board draws once and asks for no second render', async () => {
+    document.body.innerHTML = ''
+    const board = document.createElement('helix-canvas') as Updatable & { label: string }
+    board.label = 'Plan'
+    board.style.blockSize = '300px'
+    board.innerHTML =
+      '<helix-canvas-node name="a" x="0" y="0" width="200" height="100">A</helix-canvas-node>' +
+      '<helix-canvas-node name="b" x="900" y="600" width="200" height="100">B</helix-canvas-node>'
+    document.body.append(board)
+    expect(await board.updateComplete).toBe(true)
+  })
+})
