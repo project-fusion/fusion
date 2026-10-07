@@ -830,7 +830,7 @@ describe('a table that loads more', () => {
 /* A row named from its contents read out its own checkbox too: "Select 412
    412 main Passed". */
 describe('a row is named by its header cell', () => {
-  const labelledBy = (row: Element | null): Element[] | null | undefined =>
+  const labelledBy = (row: Element | null): readonly Element[] | null | undefined =>
     (row as unknown as { internals: ElementInternals }).internals.ariaLabelledByElements
 
   test('names each row by the cell with `header`, or by its first cell', async () => {
@@ -851,12 +851,12 @@ describe('a row is named by its header cell', () => {
     /* By reference where the platform takes one, and by the cell's words
        where it does not. */
     const name = (row: Element | undefined): string | null | undefined => {
-      const internals = (row as unknown as { internals: ElementInternals }).internals
+      const internals = (row as unknown as { internals: Record<string, unknown> }).internals
       return 'ariaLabelledByElements' in internals
         ? labelledBy(row ?? null)
             ?.map((cell) => cell.textContent)
             .join(' ')
-        : internals.ariaLabel
+        : (internals.ariaLabel as string | null)
     }
     expect(name(first)).toBe('412')
     expect(name(second)).toBe('411')
