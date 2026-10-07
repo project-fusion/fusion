@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -46,6 +46,48 @@ describe('the source pane', () => {
     expect(field.value).toBe('ab  ')
     expect(host.value).toBe('ab  ')
   })
+
+  /* Browser only: happy-dom keeps no undo history. Writing the field's value
+     emptied the history, so undo after Tab took back nothing, neither the
+     indent nor what was typed before it. The caret moves between the two edits,
+     which closes the first as a keystroke and a click would. */
+  test.skipIf(!hasLayout())('lets undo take back an indent, and only the indent', async () => {
+    const host = await source()
+    const field = part(host, 'source') as HTMLTextAreaElement
+    field.focus()
+    document.execCommand('insertText', false, 'Y')
+    field.setSelectionRange(0, 0)
+    field.setSelectionRange(1, 1)
+
+    expect(press(field, 'Tab').defaultPrevented).toBe(true)
+    expect(field.value).toBe('Y  ')
+    expect(host.value).toBe('Y  ')
+
+    document.execCommand('undo')
+    expect(field.value).toBe('Y')
+    expect(host.value).toBe('Y')
+  })
+
+  /* Browser only, for the computed outline. The focused field showed only a
+     change of fill, at 1.04:1 against the one before. */
+  test.skipIf(!hasLayout())(
+    'draws a ring around the focused field, with or without colors',
+    async () => {
+      const host = (await source()) as Source & { tokenize?: unknown }
+      const field = part(host, 'source') as HTMLTextAreaElement
+      field.focus()
+      expect(getComputedStyle(field).outlineStyle).toBe('solid')
+      expect(Number.parseFloat(getComputedStyle(field).outlineWidth)).toBeGreaterThan(0)
+
+      host.tokenize = (text: string) => [{ text }]
+      await host.updateComplete
+      const colored = part(host, 'source') as HTMLTextAreaElement
+      colored.focus()
+      const box = part(host, 'field') as HTMLElement
+      expect(getComputedStyle(box).outlineStyle).toBe('solid')
+      expect(Number.parseFloat(getComputedStyle(box).outlineWidth)).toBeGreaterThan(0)
+    },
+  )
 
   /* And Escape is the way out, so the pane is not a trap. One Tab after it
      leaves; the one after that indents again, because escaping is about the next

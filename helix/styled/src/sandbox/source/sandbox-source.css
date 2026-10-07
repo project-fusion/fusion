@@ -25,12 +25,12 @@
   resize: none;
 }
 
-/*
- *  No ring on the editor, and the caret instead.
- */
+/* The ring is drawn inside the pane, which fills its box to the edges where
+   an outer ring would be clipped. */
 [part="source"]:focus-visible {
   background-color: var(--helix-color-surface);
-  outline: none;
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }
 
 /* **Under `tokenize`, the field is drawn transparent over a colored copy of
@@ -53,6 +53,13 @@
   background-color: var(--helix-color-surface);
 }
 
+/* Under `tokenize` the field is as tall as its text and scrolls inside this
+   box, so the ring goes on the box, which stays in view. */
+[part="field"]:has(> [part="source"]:focus-visible) {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}
+
 [part="field"] > [part] {
   grid-area: 1 / 1;
   letter-spacing: normal;
@@ -69,6 +76,7 @@
   block-size: auto;
   caret-color: var(--helix-color-foreground);
   color: transparent;
+  outline: none;
   overflow: hidden;
 }
 

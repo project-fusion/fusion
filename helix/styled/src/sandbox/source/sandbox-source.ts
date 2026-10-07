@@ -212,11 +212,31 @@ export class HelixSandboxSource extends HelixElement {
     }
 
     event.preventDefault()
-    const field = event.target as HTMLTextAreaElement
-    const { selectionEnd, selectionStart, value } = field
-    field.value = `${value.slice(0, selectionStart)}  ${value.slice(selectionEnd)}`
-    field.selectionStart = selectionStart + 2
-    field.selectionEnd = field.selectionStart
+    this.indent(event.target as HTMLTextAreaElement)
+  }
+
+  /**
+   * Writes the two spaces Tab inserts, as typing would.
+   *
+   * **Through `insertText`, so undo takes the indent back.** Assigning
+   * `field.value` empties the textarea's undo history: a reader who typed,
+   * pressed Tab and then Cmd+Z or Ctrl+Z lost the indent and everything typed
+   * before it. `insertText` is the edit a keystroke makes, so it joins the
+   * history and sends the `input` event that `handleInput` takes. It writes
+   * into whatever has focus, so it is used only while the field has it. Where it
+   * is not supported, the field is written directly.
+   */
+  private indent(field: HTMLTextAreaElement): void {
+    const { ownerDocument } = field
+    const focused = (field.getRootNode() as Document | ShadowRoot).activeElement === field
+    if (
+      focused &&
+      typeof ownerDocument.execCommand === 'function' &&
+      ownerDocument.execCommand('insertText', false, '  ')
+    ) {
+      return
+    }
+    field.setRangeText('  ', field.selectionStart, field.selectionEnd, 'end')
     this.edit(field, field.value)
   }
 
