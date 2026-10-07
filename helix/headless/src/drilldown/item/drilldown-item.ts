@@ -36,6 +36,13 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * `aria-haspopup`, the same way `Menu` marks a row with a submenu. The server
  * render leaves both out, because the server cannot see the children.
  *
+ * **A row with an `href` is a link.** The row itself renders as an `<a>`
+ * carrying `menuitem`, as `Menu.Item` does, so a middle click, a modified
+ * click and the status bar keep working. Enter follows it, and Space does too.
+ * Choosing it fires `helix-select` first: cancel the event and the link is not
+ * followed, so a router can take the navigation. A row that opens a page, or a
+ * disabled row, renders no link.
+ *
  * The row is named by its label alone. Words in `description`, a line under
  * the label, and in `end` describe it instead, through `aria-describedby`, as
  * `Menu.Item` does: a reader hears "Theme", then "Dark".
@@ -54,7 +61,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @event {HelixSelectEvent} helix-select - Fired when the row is chosen. Cancelable: canceling it stops the change and leaves the decision to you.
  *
- * @csspart item - The row itself.
+ * @csspart item - The row itself, which is an `<a>` where `href` is set.
  * @csspart label - The row's label.
  * @csspart mark - The caret at the end of a row that opens a page, after the `end` slot. The caret points, so a stylesheet mirrors it in a right-to-left document.
  */
@@ -65,6 +72,13 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
    */
   @property({ reflect: true, type: Boolean })
   disabled = false
+
+  /**
+   * Whether the link downloads the file when the row is chosen. Only
+   * meaningful beside an `href`, and only for a file served from this origin.
+   */
+  @property({ type: Boolean })
+  download = false
 
   /**
    * Whether this row holds the region's tab stop. Set by the drill-down.
@@ -81,6 +95,13 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
    */
   @property({ attribute: false })
   focusable = false
+
+  /**
+   * The URL the row links to. Setting it renders the row as a link, unless the
+   * row opens a page or is disabled.
+   */
+  @property()
+  href = ''
 
   /**
    * @internal Read by a parent to identify its children across the light DOM,
@@ -105,11 +126,23 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
   onPath = false
 
   /**
+   * The link's `rel`. Set it whenever you set `target="_blank"`.
+   */
+  @property()
+  rel = ''
+
+  /**
    * @internal Whether this row's own page is the one showing. Written by the
    * stack.
    */
   @property({ attribute: false })
   showingPage = false
+
+  /**
+   * Where the link opens, for rows that should open outside the current page.
+   */
+  @property()
+  target = ''
 
   /**
    * Identifies the row to your event listeners.
@@ -223,10 +256,42 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
 
   /** Fires `helix-select` for this row. */
   select(): void {
+    this.choose()
+  }
+
+  /** Fires `helix-select`, and returns whether the choice stood. */
+  private choose(): boolean {
     if (this.disabled) {
+      return false
+    }
+    return this.dispatchEvent(new HelixSelectEvent({ value: this.value }))
+  }
+
+  /**
+   * A press on the row. On a link, a refused `helix-select` stops the link
+   * from being followed, so a router can take the navigation.
+   */
+  private readonly handleClick = (event: MouseEvent): void => {
+    if (!this.choose() && this.linked) {
+      event.preventDefault()
+    }
+  }
+
+  /**
+   * Space on a link presses it, which an anchor does not do on its own. Enter
+   * is the anchor's, which fires a click and follows the link.
+   */
+  private readonly handleLinkKeydown = (event: KeyboardEvent): void => {
+    if (event.key !== ' ') {
       return
     }
-    this.dispatchEvent(new HelixSelectEvent({ value: this.value }))
+    event.preventDefault()
+    ;(event.currentTarget as HTMLAnchorElement).click()
+  }
+
+  /** Whether the row renders as a link. */
+  private get linked(): boolean {
+    return this.href !== '' && !this.disabled && !this.page
   }
 
   /**
@@ -274,18 +339,7 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
      * named by its `aria-describedby`, which reads them all the same. The
      * description takes no box while it is empty, so a row without one lays
      * out as it did; `data-empty` says which it is. */
-    return html`<button
-      part="item"
-      type="button"
-      role="menuitem"
-      aria-describedby=${this.describedBy}
-      aria-disabled=${this.disabled ? 'true' : nothing}
-      aria-haspopup=${this.page ? 'menu' : nothing}
-      tabindex=${this.focusable ? '0' : '-1'}
-      ?data-described=${this.description}
-      @click=${() => this.select()}
-    >
-      <slot name="start"></slot>
+    const inside = html`<slot name="start"></slot>
       <span part="label"><slot></slot></span>
       <slot
         id="description"
@@ -295,8 +349,35 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
         @slotchange=${this.readWords}
       ></slot>
       <slot id="end" name="end" aria-hidden="true" @slotchange=${this.readWords}></slot>
-      ${this.page ? this.renderMark() : nothing}
-    </button>
+      ${this.page ? this.renderMark() : nothing}`
+    /* One row, two tags, as `Menu.Item` writes them: the anchor carries the
+       role and the tab stop, since a `menuitem` cannot contain a link. */
+    const row = this.linked
+      ? html`<a
+          part="item"
+          href=${this.href}
+          target=${this.target || nothing}
+          rel=${this.rel || nothing}
+          ?download=${this.download}
+          role="menuitem"
+          aria-describedby=${this.describedBy}
+          tabindex=${this.focusable ? '0' : '-1'}
+          ?data-described=${this.description}
+          @click=${this.handleClick}
+          @keydown=${this.handleLinkKeydown}
+        >${inside}</a>`
+      : html`<button
+          part="item"
+          type="button"
+          role="menuitem"
+          aria-describedby=${this.describedBy}
+          aria-disabled=${this.disabled ? 'true' : nothing}
+          aria-haspopup=${this.page ? 'menu' : nothing}
+          tabindex=${this.focusable ? '0' : '-1'}
+          ?data-described=${this.description}
+          @click=${this.handleClick}
+        >${inside}</button>`
+    return html`${row}
     <div hidden><slot name="page" @slotchange=${this.readPage}></slot></div>`
   }
 }

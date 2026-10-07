@@ -164,3 +164,59 @@ describe('the words around a row’s label', () => {
     expect(item.querySelector('slot[name="description"]')?.hasAttribute('data-empty')).toBe(true)
   })
 })
+
+/* React Aria's menu rows take an `href`. A drilldown is a region of places to
+   go, and its rows could not be links. */
+describe('a drilldown row with an href', () => {
+  test('is the link itself, carrying the role and the tab stop', async () => {
+    const found = await row('value="docs" href="/docs" target="_blank" rel="noopener"')
+    const link = part(found, 'item') as HTMLAnchorElement
+    expect(link.tagName).toBe('A')
+    expect(link.getAttribute('href')).toBe('/docs')
+    expect(link.getAttribute('target')).toBe('_blank')
+    expect(link.getAttribute('rel')).toBe('noopener')
+    expect(link.getAttribute('role')).toBe('menuitem')
+    expect(link.getAttribute('tabindex')).toBe('-1')
+  })
+
+  test('chooses the row on a press, and a refused choice does not follow the link', async () => {
+    const found = await row('value="docs" href="#docs"')
+    const heard: string[] = []
+    found.addEventListener('helix-select', (event) => {
+      heard.push((event as Event & { detail: { value: string } }).detail.value)
+    })
+    const link = part(found, 'item') as HTMLAnchorElement
+    const press = new MouseEvent('click', { bubbles: true, cancelable: true })
+    link.dispatchEvent(press)
+    expect(heard).toEqual(['docs'])
+    expect(press.defaultPrevented).toBe(false)
+
+    found.addEventListener('helix-select', (event) => event.preventDefault())
+    const refused = new MouseEvent('click', { bubbles: true, cancelable: true })
+    link.dispatchEvent(refused)
+    expect(refused.defaultPrevented).toBe(true)
+  })
+
+  test('Space presses the link, which an anchor does not do on its own', async () => {
+    const found = await row('value="docs" href="#docs"')
+    const link = part(found, 'item') as HTMLAnchorElement
+    const pressed: string[] = []
+    link.addEventListener('click', (event) => {
+      event.preventDefault()
+      pressed.push('click')
+    })
+    const space = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: ' ' })
+    link.dispatchEvent(space)
+    expect(space.defaultPrevented).toBe(true)
+    expect(pressed).toEqual(['click'])
+  })
+
+  test('a disabled row, or one that opens a page, is no link', async () => {
+    expect(part(await row('href="/docs" disabled'), 'item')?.tagName).toBe('BUTTON')
+    const parent = (await mount(`<helix-headless-drilldown-item href="/docs">Docs
+      <helix-headless-drilldown-item slot="page">Intro</helix-headless-drilldown-item>
+    </helix-headless-drilldown-item>`)) as Row
+    await parent.updateComplete
+    expect(part(parent, 'item')?.tagName).toBe('BUTTON')
+  })
+})
