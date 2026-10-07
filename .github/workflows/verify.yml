@@ -237,10 +237,18 @@ jobs:
   # reaches `analyze` and `catalog`, and a second invocation hashed a tree the
   # first had filled with generated files: `analyze` missed, and rebuilt
   # fourteen tasks in 81 seconds. Named together, the three are one graph.
+  #
+  # **The runner is a repository variable, `WARM_RUNNER`, and `ubuntu-latest`
+  # without one.** On a change that rebuilds the components, `warm` is about
+  # four minutes on two cores, most of it `metrics` compressing every bundle and
+  # `next build`, and both use every core they get. A larger x64 runner named in
+  # the variable takes that time down with no change here. It has to be x64:
+  # `RUNNER_ARCH` is in every turbo key, so an Arm runner's build is one no
+  # other job here can restore.
   warm:
     needs: proven
     if: ${{ !cancelled() && needs.proven.outputs.proven != 'true' }}  # dialect:quoted, GitHub's function
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.WARM_RUNNER || 'ubuntu-latest' }}
     timeout-minutes: 15
     steps:
       - name: Check out
