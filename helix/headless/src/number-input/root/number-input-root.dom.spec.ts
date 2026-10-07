@@ -7,8 +7,8 @@ beforeAll(async () => {
 })
 
 type Field = HTMLElement & {
-  stepDown(large?: boolean): void
-  stepUp(large?: boolean): void
+  stepDown(count?: number | boolean): void
+  stepUp(count?: number | boolean): void
   updateComplete: Promise<unknown>
   value: string
 }
@@ -372,6 +372,16 @@ describe('number input scrub', () => {
 
   const scrubField = async (attrs: string) =>
     mount(`<helix-headless-number-input label="N" scrub ${attrs}></helix-headless-number-input>`)
+
+  /* The group around the steppers is named by the label's id, and the label
+     `scrub` draws had none: Chromium reported the group with no name. */
+  test('the label it grips still names the group', async () => {
+    const host = await scrubField('')
+    const label = part(host, 'label') as HTMLElement
+    const group = part(host, 'field') as HTMLElement
+    expect(label.id).not.toBe('')
+    expect(group.getAttribute('aria-labelledby')).toBe(label.id)
+  })
 
   test('a label without `scrub` does not move the value', async () => {
     /* The part is there either way, because every field has a label. What
@@ -865,5 +875,48 @@ describe('a number at a bound', () => {
     host.value = '1'
     await host.updateComplete
     expect(hasState(host, 'at-max')).toBe(false)
+  })
+})
+
+/* React Aria names its steppers with the field's label after the verb, so a
+   reader moving through the page hears which field a stepper changes. */
+describe('the steppers', () => {
+  test('are named by their verb and the field label', async () => {
+    const host = await field()
+    const label = part(host, 'label') as HTMLElement
+    for (const which of ['decrement', 'increment']) {
+      const button = part(host, which) as HTMLButtonElement
+      expect(button.getAttribute('aria-labelledby')).toBe(`${button.id} ${label.id}`)
+      expect(button.getAttribute('aria-label')).toBe(
+        which === 'decrement' ? 'Decrease' : 'Increase',
+      )
+    }
+  })
+
+  test('keep the verb alone where there is no label', async () => {
+    const host = (await mount(
+      '<helix-headless-number-input name="n"></helix-headless-number-input>',
+    )) as Field
+    expect((part(host, 'increment') as HTMLElement).hasAttribute('aria-labelledby')).toBe(false)
+  })
+})
+
+/* `Input.stepUp(count)` and the native method take a count; this took a flag
+   for the large step, so the same call meant two different things. */
+describe('stepUp and stepDown', () => {
+  test('take a count of steps, as the native methods do', async () => {
+    const host = await field('default-value="10" step="2"')
+    host.stepUp(3)
+    expect(host.value).toBe('16')
+    host.stepDown(2)
+    expect(host.value).toBe('12')
+  })
+
+  test('take `true` for the large step, as PageUp does', async () => {
+    const host = await field('default-value="0" step="1" large-step="5"')
+    host.stepUp(true)
+    expect(host.value).toBe('5')
+    host.stepDown()
+    expect(host.value).toBe('4')
   })
 })

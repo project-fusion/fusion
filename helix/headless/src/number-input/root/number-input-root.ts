@@ -212,7 +212,9 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
   badInputMessage = 'Please enter a number.'
 
   /**
-   * The name of the step down button, read by screen readers.
+   * The name of the step down button, read by screen readers. The field's
+   * label follows it, so a reader hears "Decrease Quantity", as React Aria
+   * names its steppers.
    */
   @words
   @property({ attribute: 'decrement-label' })
@@ -231,7 +233,9 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
   formatOptions?: Intl.NumberFormatOptions
 
   /**
-   * The name of the step up button, read by screen readers.
+   * The name of the step up button, read by screen readers. The field's
+   * label follows it, so a reader hears "Increase Quantity", as React Aria
+   * names its steppers.
    */
   @words
   @property({ attribute: 'increment-label' })
@@ -570,20 +574,32 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     }
   }
 
-  /** Steps the value up, by `largeStep` steps when `large` is set. */
-  stepUp(large = false): void {
-    this.nudge(large ? (this.largeStep ?? 10) : 1)
+  /**
+   * Steps the value up by `step`, `count` times, as the native method and
+   * `Input.stepUp` do. `true` takes `largeStep` steps, as `PageUp` does.
+   */
+  stepUp(count: number | boolean = 1): void {
+    this.nudge(this.stepsOf(count))
   }
 
   /**
-   * Steps the value down, by `largeStep` steps when `large` is set.
+   * Steps the value down by `step`, `count` times. `true` takes `largeStep`
+   * steps, as `PageDown` does.
    *
    * The same path a press of the down arrow takes, so a consumer driving this
    * from their own control gets the clamping and the announcement rather than
    * having to repeat both.
    */
-  stepDown(large = false): void {
-    this.nudge(large ? -(this.largeStep ?? 10) : -1)
+  stepDown(count: number | boolean = 1): void {
+    this.nudge(-this.stepsOf(count))
+  }
+
+  /** How many steps a `stepUp` argument asks for: a count, or `largeStep` for `true`. */
+  private stepsOf(count: number | boolean): number {
+    if (typeof count === 'boolean') {
+      return count ? (this.largeStep ?? 10) : 1
+    }
+    return Number.isFinite(count) ? Math.trunc(count) : 1
   }
 
   /** The timer of a held stepper button. */
@@ -694,6 +710,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     return html`<label
       part="label"
       for=${this.controlId}
+      id=${this.labelId}
       ?data-hidden=${hidden !== null}
       @pointercancel=${this.handleScrubEnd}
       @pointerdown=${this.handleScrubDown}
@@ -1086,8 +1103,10 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
       <div part="field" role="group" aria-labelledby=${this.labeled ? this.labelId : nothing}>
         <button
           part="decrement"
+          id="decrement"
           type="button"
           aria-label=${this.decrementLabel}
+          aria-labelledby=${this.labeled ? `decrement ${this.labelId}` : nothing}
           tabindex="-1"
           ?disabled=${this.isDisabled || this.readOnly || atMin}
           @click=${this.handleStepperClick}
@@ -1151,8 +1170,10 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
         <slot name="end"></slot>
         <button
           part="increment"
+          id="increment"
           type="button"
           aria-label=${this.incrementLabel}
+          aria-labelledby=${this.labeled ? `increment ${this.labelId}` : nothing}
           tabindex="-1"
           ?disabled=${this.isDisabled || this.readOnly || atMax}
           @click=${this.handleStepperClick}
