@@ -22,7 +22,7 @@ describe('headless video playlist menu server output', () => {
     const markup = ssr(
       html`<helix-headless-video-playlist-menu></helix-headless-video-playlist-menu>`,
     )
-    expect(markup).not.toContain('part="entry"')
+    expect(rendered(markup, 'helix-headless-video-playlist-menu')).not.toContain('part="entry"')
   })
 
   test('writes nothing onto the host that the consumer did not write', () => {
