@@ -1,5 +1,6 @@
 import {
   AriaForwardController,
+  auditName,
   CommandController,
   customElement,
   drawDismiss,
@@ -28,6 +29,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { wordsIn } from '../../dialog/description.js'
 import { beyondWindow } from '../reveal.js'
 import { startsSwipe } from '../swipe-start.js'
 
@@ -50,6 +52,11 @@ import { startsSwipe } from '../swipe-start.js'
  * A drawer with `modal="false"` leaves the page usable and still closes on
  * Escape, in a browser without `closedby` as well.
  *
+ * Set `persistent` for a drawer that has to be answered: Escape, a press
+ * outside, and a swipe leave it open, and the close control and `close()`
+ * still close it. `closedby="none"` keeps it open on all three as well, and
+ * `closedby="closerequest"` keeps it open on a press outside.
+ *
  * **A touch or a pen swipes it away**, toward the edge it came from, resolved
  * against the writing direction. A swipe past halfway, or a quick one, closes
  * it through the same request as every other way out. `snap-points` lists the
@@ -70,7 +77,20 @@ import { startsSwipe } from '../swipe-start.js'
  *
  * The panel's name is `label` when you set it. Otherwise it is the heading in
  * the `header` slot, or the elements an `aria-labelledby` on the host names,
- * and `fallback-label` where nothing names it.
+ * and `fallback-label` where nothing names it. A development build warns
+ * when a drawer opens with nothing but `fallback-label` to name it.
+ *
+ * The panel is described by the words at the start of its body, as `Dialog`
+ * is: the elements in the default slot before the first one that is or holds
+ * a control. An `aria-describedby` on the host replaces it.
+ *
+ * **Keyboard.** Opening moves focus to the first control in the panel.
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Tab, Shift+Tab | In a modal drawer, moves through the controls in the panel, from the last round to the first and from the first round to the last. In a drawer that is not modal, moves on to the page. |
+ * | Escape | Asks to close the drawer. A `helix-before-close` listener can refuse, and `persistent` or `closedby="none"` keeps it open. |
+ * | Enter, Space | On the close control, closes the drawer. |
  *
  * Content stays mounted when the drawer is closed, so it is in the server
  * markup and can animate. A closed `<dialog>` is already out of the tab order
@@ -151,6 +171,21 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
    */
   @property({ attribute: 'closedby', reflect: true })
   closedBy?: 'any' | 'closerequest' | 'none'
+
+  /**
+   * Stops Escape, a press outside, and a swipe from closing the drawer, for a
+   * drawer that has to be answered.
+   *
+   * The close control and `close()` still close it, as on `Dialog`: a panel
+   * with no way out at all is a trap.
+   */
+  @property({ reflect: true, type: Boolean })
+  persistent = false
+
+  /** Whether a request to dismiss the drawer, by Escape or a swipe, is refused. */
+  private get refusesDismissal(): boolean {
+    return this.persistent || this.closedBy === 'none'
+  }
 
   /**
    * Draws a control that closes the drawer, in the corner where the title is.
@@ -329,7 +364,7 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
       travel: Math.max(0, this.rest + towardEdge(edge, dx, dy)),
       velocity: towardEdge(edge, vx, vy),
     })
-    if (shown === 0 && this.requestOpen(false)) {
+    if (shown === 0 && !this.refusesDismissal && this.requestOpen(false)) {
       return
     }
     if (shown !== 0) {
@@ -432,7 +467,9 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
       return
     }
     event.preventDefault()
-    this.requestOpen(false)
+    if (!this.refusesDismissal) {
+      this.requestOpen(false)
+    }
   }
 
   /* `Tab` from the last control goes to the first, and `Shift+Tab` from the
@@ -469,7 +506,9 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
    */
   private readonly handleCancel = (event: Event): void => {
     event.preventDefault()
-    this.requestOpen(false)
+    if (!this.refusesDismissal) {
+      this.requestOpen(false)
+    }
   }
 
   /** A close that happened anyway is reflected back rather than argued with. */
@@ -514,6 +553,9 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
     ) {
       return
     }
+    if (this.refusesDismissal || this.closedBy === 'closerequest') {
+      return
+    }
     this.requestOpen(false)
   }
 
@@ -542,6 +584,25 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
     )
   }
 
+  /** Whether the body's words are what currently describe the panel. */
+  private describedByBody = false
+
+  /**
+   * Describes the panel by the words at the start of its body, where nothing
+   * else describes it, as `Dialog` does. An `aria-describedby` on the host
+   * comes first.
+   */
+  private describeByBody(): void {
+    const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot:not([name])')
+    const said = this.hasAttribute('aria-describedby') ? [] : wordsIn(slot)
+    this.describedByBody = reflectElements(
+      this.panel,
+      'ariaDescribedByElements',
+      said,
+      this.describedByBody,
+    )
+  }
+
   /* On the host, which hears focus moving to slotted content and to the
      panel's own controls alike. */
   override connectedCallback(): void {
@@ -558,6 +619,7 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.nameByHeader()
+    this.describeByBody()
     if (changed.has('open') && !this.open) {
       this.rest = 0
       this.shown = 1
@@ -580,6 +642,21 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
       return
     }
     if (this.open && !panel.open) {
+      /* Asked once the drawer first opens, as `Dialog` asks: a panel named by
+         `fallback-label` alone is announced as "Drawer". */
+      auditName(
+        this,
+        () => null,
+        'Give it a `label`, or a heading in the `header` slot.',
+        () =>
+          this.label !== '' ||
+          this.namedByHeader ||
+          headingsIn(
+            this.renderRoot
+              .querySelector<HTMLSlotElement>('slot[name="header"]')
+              ?.assignedElements({ flatten: true }) ?? [],
+          ).length > 0,
+      )
       if (this.modal) {
         panel.showModal()
       } else {
@@ -612,7 +689,7 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
       @keydown=${this.handleKeydown}
     >
       <div part="header"><slot name="header" @slotchange=${this.nameByHeader}></slot></div>
-      <div part="content"><slot></slot></div>
+      <div part="content"><slot @slotchange=${this.describeByBody}></slot></div>
       <div part="footer"><slot name="footer"></slot></div>
       ${
         this.dismissible
