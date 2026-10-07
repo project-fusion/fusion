@@ -755,3 +755,43 @@ describe('leaving the feed from the keyboard', () => {
     expect(document.activeElement).toBe(before)
   })
 })
+
+describe('a notification that arrives', () => {
+  const settle = async (host: Feed): Promise<void> => {
+    await new Promise((done) => setTimeout(done, 0))
+    await host.updateComplete
+  }
+  const arrive = (host: Feed, words: string, where: 'start' | 'end', read = false): void => {
+    const row = document.createElement('helix-headless-notification')
+    row.textContent = words
+    if (read) {
+      row.setAttribute('default-read', '')
+    }
+    if (where === 'start') {
+      host.prepend(row)
+    } else {
+      host.append(row)
+    }
+  }
+
+  test('says how many unread ones arrived above the rows there were', async () => {
+    const host = await feed()
+    expect(part(host, 'live')?.textContent).toBe('')
+    arrive(host, 'Four', 'start')
+    arrive(host, 'Five', 'start')
+    await settle(host)
+    expect(part(host, 'live')?.textContent).toBe('2 new notifications')
+  })
+
+  test('says nothing for a page added after them, a read one, or one that arrives while loading', async () => {
+    const host = await feed()
+    arrive(host, 'Older', 'end')
+    arrive(host, 'Seen', 'start', true)
+    await settle(host)
+    expect(part(host, 'live')?.textContent).toBe('')
+    ;(host as Feed & { loading: boolean }).loading = true
+    arrive(host, 'Six', 'start')
+    await settle(host)
+    expect(part(host, 'live')?.textContent).not.toContain('new')
+  })
+})
