@@ -92,6 +92,30 @@ describe('empty view', () => {
     expect(slotted(empty, 'actions')[0]?.textContent).toBe('go')
   })
 
+  /* The regions were reachable only as slotted light DOM, so a page could not
+     lay the actions out in a row or color the icon's region from outside. A
+     part on a slot draws no box, so the view lays out as it did. */
+  test('the icon, the message and the actions are parts, and the view says which it holds', async () => {
+    type View = HTMLElement & { internals: ElementInternals; updateComplete: Promise<boolean> }
+    const empty = (await mount(`
+      <helix-headless-empty>
+        <helix-headless-icon slot="icon" name="x"></helix-headless-icon>
+        <p>Try another search.</p>
+      </helix-headless-empty>`)) as View
+    await empty.updateComplete
+    for (const name of ['icon', 'message', 'actions']) {
+      expect(part(empty, name)?.tagName).toBe('SLOT')
+    }
+    expect(empty.internals.states.has('has-icon')).toBe(true)
+    expect(empty.internals.states.has('has-actions')).toBe(false)
+    const action = document.createElement('button')
+    action.slot = 'actions'
+    empty.append(action)
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await empty.updateComplete
+    expect(empty.internals.states.has('has-actions')).toBe(true)
+  })
+
   /* A page rendering from data had to write a heading element to get one,
      and a `<p slot="heading">` was no heading in the outline at all. */
   test('draws a heading from words, at the level asked, and yields it to a slotted one', async () => {
