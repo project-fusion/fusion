@@ -65,6 +65,22 @@ beforeAll(async () => {
     }
   }
   customElements.define('words-hydrating', HydratingProbe)
+
+  /** One with a validation message, which is never empty. */
+  class MessageProbe extends LitElement {
+    static words = 'helix-message-probe'
+
+    /** What a field reports when its value is past the end. */
+    @decorate
+    @property({ attribute: 'range-overflow-message' })
+    rangeOverflowMessage = 'Too far.'
+
+    /** What the field is called. */
+    @decorate
+    @property()
+    label = 'Field'
+  }
+  customElements.define('words-message', MessageProbe)
 })
 
 afterEach(() => {
@@ -206,6 +222,32 @@ describe('a page that changes its words', () => {
     registry.refreshWords()
     await updated(probe)
     expect(drawn(probe)[0]).toBe('Keine Treffer')
+  })
+
+  test('writes its numbers in a new `lang` though none of its words changed', async () => {
+    const probe = await mount('<div><words-probe></words-probe></div>')
+    expect(drawn(probe)[1]).toBe('1,200 results')
+    probe.parentElement?.setAttribute('lang', 'de')
+    registry.refreshWords()
+    await updated(probe)
+    expect(drawn(probe)[1]).toBe('1.200 results')
+    probe.parentElement?.removeAttribute('lang')
+    registry.refreshWords()
+    await updated(probe)
+    expect(drawn(probe)[1]).toBe('1,200 results')
+  })
+
+  test('reads an empty validation message as unset, and keeps any other empty word', async () => {
+    registry.registerWords('de', { 'helix-message-probe': { rangeOverflowMessage: 'Zu weit.' } })
+    document.body.innerHTML =
+      '<words-message range-overflow-message="" label=""></words-message><div lang="de"><words-message range-overflow-message=""></words-message></div>'
+    const [english, german] = [...document.querySelectorAll('words-message')] as (HTMLElement & {
+      label: string
+      rangeOverflowMessage: string
+    })[]
+    expect(english?.rangeOverflowMessage).toBe('Too far.')
+    expect(english?.label).toBe('')
+    expect(german?.rangeOverflowMessage).toBe('Zu weit.')
   })
 
   test('stops reaching an element once it leaves the page', async () => {

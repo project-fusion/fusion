@@ -51,4 +51,12 @@ describe('a number input on a page in another language', () => {
     )
     expect(bubble(await field('', 'value="abc"'))).toBe('Please enter a number.')
   })
+
+  test('raises its own sentence where the page sets an empty one', async () => {
+    /* A template rendering an empty variable: an empty sentence would make
+       the browser refuse the check, so the field says its built-in one. */
+    expect(bubble(await field('', 'default-value="9" max="3" range-overflow-message=""'))).toBe(
+      'Value must be 3 or less.',
+    )
+  })
 })
