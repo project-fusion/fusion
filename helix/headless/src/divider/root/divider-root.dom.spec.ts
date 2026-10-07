@@ -64,6 +64,23 @@ describe('divider semantics', () => {
   })
 })
 
+describe('the old `announced`', () => {
+  /* It still reads, and a page writing it was never told it asks for nothing. */
+  test('is reported once as deprecated, and a plain divider is not', async () => {
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      await mount('<helix-headless-divider announced></helix-headless-divider>')
+      await mount('<helix-headless-divider></helix-headless-divider>')
+    } finally {
+      console.warn = original
+    }
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0]).toContain('announced')
+  })
+})
+
 /* React Aria's separator inside a toolbar takes the toolbar's other axis. A
    divider in a horizontal toolbar was a horizontal separator, and drew as one,
    unless the page wrote `orientation="vertical"` on it. */

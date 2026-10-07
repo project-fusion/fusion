@@ -1407,7 +1407,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
                     ))}
                   </helix-menu-item>
 
-                  <helix-divider announced></helix-divider>
+                  <helix-divider></helix-divider>
 
                   <helix-menu-item checkable checked={showEditor ? true : undefined} value="editor">
                     Editor

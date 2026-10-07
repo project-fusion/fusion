@@ -2,6 +2,7 @@ import {
   customElement,
   HelixElement,
   markRegion,
+  reportRuntime,
   toolbarAround,
   toolbarAxis,
 } from '@fusion.dev/helix-core'
@@ -54,9 +55,10 @@ export class HelixHeadlessDivider extends HelixElement {
    * Whether screen readers announce the line as a separator, which they now do
    * by default.
    *
-   * It dates from when the line was decorative by default. It is still read,
-   * and it wins over `decorative`, so a divider written with it stays a
-   * separator.
+   * @deprecated Remove it: a divider is a separator unless `decorative` is
+   * set. It dates from when the line was decorative by default, and it is
+   * still read and wins over `decorative`, so a divider written with it stays
+   * a separator.
    */
   @property({ reflect: true, type: Boolean })
   announced = false
@@ -131,9 +133,21 @@ export class HelixHeadlessDivider extends HelixElement {
     this.finishHydration()
   }
 
+  /* Said once for an element that writes the old `announced`, which reads on
+     and asks for nothing the default does not already do. A server runs no
+     `updated`, so nothing is said there. */
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.markEmpty()
+    if (changed.has('announced') && this.announced && changed.get('announced') === undefined) {
+      reportRuntime({
+        kind: 'deprecated',
+        message:
+          `<${this.localName} announced> is deprecated: remove it. A divider is a separator ` +
+          'unless `decorative` is set.',
+        tag: this.localName,
+      })
+    }
   }
 
   protected override render(): TemplateResult {
