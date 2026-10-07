@@ -295,6 +295,33 @@ slot[name="label"]::slotted(*) {
   }
 }
 
+/* Forced colors paint every background the page's Canvas color, so the track
+   and the fill came out one white bar with no progress on it. The fill keeps
+   the system's Highlight, and the track is outlined so the whole length still
+   reads. A ring is drawn in strokes, which forced colors leave alone. */
+@media (forced-colors: active) {
+  [part="track"] {
+    outline: var(--helix-border-thin) solid CanvasText;
+  }
+
+  [part="indicator"] {
+    background-color: Highlight;
+    forced-color-adjust: none;
+  }
+
+  :host([shape="ring"]) [part="track"] {
+    outline: none;
+  }
+
+  :host([shape="ring"]) [part="indicator"] {
+    stroke: Highlight;
+  }
+
+  :host([shape="ring"]) [part="groove"] {
+    stroke: CanvasText;
+  }
+}
+
 /* Print: the same. */
 @media print {
   :host {
