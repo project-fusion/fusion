@@ -27,6 +27,19 @@ describe('card server output', () => {
     expect(rendered(markup, 'helix-card')).toContain('<slot part="body"></slot>')
   })
 
+  /* A served card has no row, since the server cannot see the actions slot,
+     so its actions stood on a line of their own and moved up beside the
+     header when the script ran. The served sheet sets them there itself. */
+  test('the served sheet sets actions at the end of their line before the script runs', () => {
+    const sheet = styles(served)
+    const rule = (selector: string): string => sheet.split(`${selector} {`)[1]?.split('}')[0] ?? ''
+    expect(rule(':host(:not(:defined))')).toContain('grid-template-columns: minmax(0, 1fr) auto')
+    expect(rule(':host(:not(:defined))')).toContain('column-gap: var(--helix-space-none)')
+    expect(sheet).toMatch(
+      /:host\(:not\(:defined\)\) slot\[name="header-actions"\]::slotted\(\*\),\s*:host\(:not\(:defined\)\) slot\[name="footer-actions"\]::slotted\(\*\) \{[^}]*grid-column: 2/,
+    )
+  })
+
   test('declarative shadow DOM carries the styles', () => {
     expect(rendered(markup, 'helix-card')).toContain('shadowrootmode="open"')
     expect(styles(served)).toContain('--helix-color-surface')
