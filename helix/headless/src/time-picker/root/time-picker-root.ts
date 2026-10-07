@@ -517,6 +517,32 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
     return this.choose([...this.held, now].join(','))
   }
 
+  /**
+   * Puts the list's highlight on the offered time nearest one held between two
+   * steps, so the arrows move from there.
+   *
+   * No row holds `14:07` at a step of 15, so the list had nothing to move
+   * from: Down went to the top of the list, and in a list that chooses as it
+   * moves, the value became 00:00. Down now goes to 14:15.
+   */
+  private highlightNearest(): void {
+    const at = this.mode === undefined ? valueAsSeconds(this.value) : null
+    if (at === null || this.times.includes(at)) {
+      return
+    }
+    const open = this.times.filter((time) => !this.barredAt(time))
+    if (open.length === 0) {
+      return
+    }
+    this.partNamed<HTMLElement & { highlightValue?: (value: string) => void }>(
+      'list',
+    )?.highlightValue?.(this.valueFor(nearestTime(open, at)))
+  }
+
+  private readonly handleListFocus = (): void => {
+    this.highlightNearest()
+  }
+
   private readonly handleNow = (): void => {
     this.selectNow()
   }
@@ -668,6 +694,7 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
       return
     }
     if (this.variant !== 'wheels') {
+      this.highlightNearest()
       this.partNamed<HTMLElement & { reveal?: () => void }>('list')?.reveal?.()
       return
     }
@@ -1284,6 +1311,7 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
       ?manual=${this.manual}
       ?multiple=${this.mode !== undefined}
       .value=${this.value}
+      @focusin=${this.handleListFocus}
       @helix-before-change=${this.handleChange}
       @input=${this.handleListInput}
       @pointerleave=${this.handleListLeave}

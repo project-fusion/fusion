@@ -1020,7 +1020,8 @@ export class HelixHeadlessListbox extends MixinCollection(
   }
 
   /**
-   * Scrolls the chosen option to the middle of the list.
+   * Scrolls the chosen option to the middle of the list, or the highlighted one
+   * where nothing is chosen.
    *
    * A method rather than something this does on its own, because a listbox
    * opening on its answer usually wants it merely *visible* and the browser
@@ -1037,9 +1038,34 @@ export class HelixHeadlessListbox extends MixinCollection(
       return
     }
     const items = this.partNamed('items')
-    const chosen = this.options.find((option) => option.selected && !option.hidden)
+    /* The highlight where nothing is chosen, which `highlightValue` put on the
+       time nearest one between two steps. */
+    const chosen =
+      this.options.find((option) => option.selected && !option.hidden) ??
+      this.options.find((option) => option.value === this.activeValue && !option.hidden)
     if (items && chosen) {
       centerInView(items, chosen)
+    }
+  }
+
+  /**
+   * Puts the highlight on the option holding `value`, without choosing it, so
+   * the arrow keys move from there. Nothing changes where no option a reader
+   * can reach holds `value`.
+   *
+   * Time Picker calls it for a time between two of its steps, which no option
+   * holds: without it the first arrow moved from the top of the list, so Down
+   * from 14:07 went to midnight.
+   */
+  highlightValue(value: string): void {
+    if (!this.shown.some((option) => !option.disabled && option.value === value)) {
+      return
+    }
+    this.typeahead.reset()
+    this.parked = false
+    this.activeValue = value
+    if (this.childrenKnown) {
+      this.place()
     }
   }
 
