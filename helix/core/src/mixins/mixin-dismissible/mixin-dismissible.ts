@@ -112,7 +112,10 @@ export const MixinDismissible = <T extends Constructor<LitElement>>(Base: T) => 
     dismiss(): boolean {
       const inside = deepContains(this, deepActiveElement())
       const neighbors = inside ? this.neighbors() : []
-      const beside = inside && neighbors.length === 0 ? this.stopBeside() : undefined
+      /* Read whether or not there are neighbors: a neighbor that is not
+         dismissible has no control to take focus, and the tab stop beside is
+         where it goes then. */
+      const beside = inside ? this.stopBeside() : undefined
       const event = this.dismissEvent()
       this.dispatchEvent(event)
       if ((neighbors.length > 0 || beside) && !event.defaultPrevented) {
@@ -123,7 +126,8 @@ export const MixinDismissible = <T extends Constructor<LitElement>>(Base: T) => 
 
     /**
      * The tab stop after this element on the page, or the one before it at the
-     * end, for a lone element whose removal would drop focus to the body.
+     * end, for an element whose removal would drop focus to the body because
+     * no neighbor of its kind has a control to take it.
      *
      * **A lone Callout or Announcement had nowhere to hand focus**, so a
      * keyboard reader who dismissed one started again from the top of the
