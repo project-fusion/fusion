@@ -117,6 +117,40 @@ describe('card regions', () => {
     expect(role(card)).toBe('group')
   })
 
+  /* A card with a title and no name was a box a reader entered without
+     hearing what it was. The title is the name, by reference where the engine
+     has references, so a renamed heading renames the card. */
+  test('with no other name, a heading in its header names it', async () => {
+    type Named = HTMLElement & { internals: ElementInternals; updateComplete: Promise<boolean> }
+    const card = (await mount(
+      '<helix-headless-card><div slot="header"><h2>Storage</h2><p>Used this month</p></div>Body</helix-headless-card>',
+    )) as Named
+    await card.updateComplete
+    const heading = card.querySelector('h2')
+    expect(role(card)).toBe('group')
+    if ('ariaLabelledByElements' in card.internals) {
+      expect(card.internals.ariaLabelledByElements).toEqual([heading as Element])
+    } else {
+      expect(card.internals.ariaLabel).toBe('Storage')
+    }
+    expect(card.hasAttribute('aria-labelledby')).toBe(false)
+
+    card.setAttribute('aria-label', 'Disk')
+    await card.updateComplete
+    expect(role(card)).toBe('group')
+    expect(card.internals.ariaLabel).toBeNull()
+    if ('ariaLabelledByElements' in card.internals) {
+      expect(card.internals.ariaLabelledByElements).toBeNull()
+    }
+  })
+
+  test('a header with no heading in it names nothing', async () => {
+    const card = await mount(
+      '<helix-headless-card><p slot="header">Storage</p>Body</helix-headless-card>',
+    )
+    expect(role(card)).toBeNull()
+  })
+
   test('a consumer-supplied name is left alone', async () => {
     const card = await mount('<helix-headless-card aria-label="Report">Body</helix-headless-card>')
     expect(card.getAttribute('aria-label')).toBe('Report')

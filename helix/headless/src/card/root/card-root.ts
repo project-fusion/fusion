@@ -1,4 +1,10 @@
-import { customElement, HelixElement, hostAria, slotFilled } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  HelixElement,
+  headingIn,
+  hostAria,
+  slotFilled,
+} from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
@@ -15,12 +21,16 @@ import { property, state } from 'lit/decorators.js'
  * through with `::part`.
  *
  * Name the card with `label`, as a Stat Group is named, or with `aria-label`
- * or `aria-labelledby`. These are the only names that work with server
- * rendering, because reading a title from the light DOM needs a DOM, and the
- * server has none. `label` is set through `ElementInternals`, so it writes no
- * attribute onto the card. **A named card is a group**, so a
+ * or `aria-labelledby`. `label` is set through `ElementInternals`, so it
+ * writes no attribute onto the card. **A named card is a group**, so a
  * reader entering it hears its name; an unnamed one has no role, since a group
  * with no name only adds "group" to what a reader says.
+ *
+ * **With none of those, a heading in `header` names the card**, such as the
+ * `<h2>` of its title, by reference, so the name follows the heading's words.
+ * Reading a heading needs a DOM, so a served card is named by it once the
+ * script runs; `label`, `aria-label` and `aria-labelledby` are the names a
+ * server writes.
  *
  * Each region's slot is a part of the same name, `body` for the main content,
  * as Web Awesome's card names its regions. A slot draws no box, so a part
@@ -94,18 +104,29 @@ export class HelixHeadlessCard extends HelixElement {
   mediaPlacement?: 'end'
 
   /**
-   * @internal The host's `aria-labelledby`, observed so the card becomes a
-   * group once it is named. Not reflected: the attribute is the consumer's.
+   * Hears a name written on the card, which no property mirrors.
+   *
+   * Lit observes the attributes of its own properties only, and `ariaLabel`
+   * and `ariaLabelledByElements` belong to the platform. Observed here rather
+   * than through a property, so the manifest lists no attribute of the card's
+   * own for them.
    */
-  @property({ attribute: 'aria-labelledby' })
-  protected labelledBy: string | null = null
+  static override get observedAttributes(): string[] {
+    // biome-ignore lint/complexity/noThisInStatic: super runs Lit's getter with the subclass as this, so a styled card keeps its own attributes, where the class name would read the base's
+    return [...super.observedAttributes, 'aria-label', 'aria-labelledby']
+  }
 
   /**
-   * @internal The host's `aria-label`, observed for the same reason as
-   * `labelledBy`. Not reflected: the attribute is the consumer's.
+   * Called by the browser when an observed attribute changes. A name written
+   * or taken off asks for an update, because it decides whether the card is a
+   * group and whether its heading names it.
    */
-  @property({ attribute: 'aria-label' })
-  protected namedBy: string | null = null
+  override attributeChangedCallback(name: string, old: string | null, value: string | null): void {
+    super.attributeChangedCallback(name, old, value)
+    if (name === 'aria-label' || name === 'aria-labelledby') {
+      this.requestUpdate()
+    }
+  }
 
   /** Whether `footer-actions` holds something, read from the slot. */
   @state()
@@ -117,10 +138,30 @@ export class HelixHeadlessCard extends HelixElement {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    // On the host, since the host is the box. Set here rather than in
-    // `connectedCallback`, which the server never calls.
-    const named = Boolean(this.label.trim() || this.namedBy?.trim() || this.labelledBy?.trim())
-    hostAria(this.internals, { label: this.label, role: named ? 'group' : '' })
+    this.writeName()
+  }
+
+  /**
+   * Says what the card is and what names it. On the host, since the host is
+   * the box, and from `willUpdate`, which the server calls too.
+   *
+   * **A heading in `header` is the name only where nothing else is**, and it
+   * names the card by reference, so a renamed heading renames the card. An
+   * engine without element references hears its words.
+   */
+  private writeName(): void {
+    const attribute = (name: string): boolean => Boolean(this.getAttribute?.(name)?.trim())
+    const named =
+      this.label.trim() !== '' || attribute('aria-label') || attribute('aria-labelledby')
+    const heading = named
+      ? null
+      : headingIn(this.knownChildren.filter((child) => child.slot === 'header'))
+    const references = 'ariaLabelledByElements' in this.internals
+    hostAria(this.internals, {
+      label: heading && !references ? (heading.textContent ?? '').trim() : this.label,
+      labelledBy: heading ? [heading] : [],
+      role: named || heading ? 'group' : '',
+    })
   }
 
   /* Read after every render as well as on `slotchange`, because a hydrated
@@ -150,6 +191,7 @@ export class HelixHeadlessCard extends HelixElement {
     this.toggleState('has-media', filled('media'))
     this.toggleState('has-header', this.headerActions || filled('header'))
     this.toggleState('has-footer', this.footerActions || filled('footer'))
+    this.writeName()
   }
 
   protected override render(): TemplateResult {
