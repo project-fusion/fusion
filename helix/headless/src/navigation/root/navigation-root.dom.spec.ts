@@ -131,7 +131,9 @@ describe('destinations written as a list', () => {
 
   test('are walked by the arrow keys, item by item', async () => {
     const nav = await mount(listed)
-    const [design, mind, work] = [...nav.querySelectorAll('a')] as HTMLElement[]
+    const design = nav.querySelector('a[href="/design"]') as HTMLElement
+    const mind = nav.querySelector('a[href="/mind"]') as HTMLElement
+    const work = nav.querySelector('a[href="/work"]') as HTMLElement
     const press = (from: Element, key: string): boolean => {
       const event = new KeyboardEvent('keydown', {
         bubbles: true,
@@ -142,10 +144,10 @@ describe('destinations written as a list', () => {
       from.dispatchEvent(event)
       return event.defaultPrevented
     }
-    design?.focus()
-    expect(press(design as HTMLElement, 'ArrowRight')).toBe(true)
+    design.focus()
+    expect(press(design, 'ArrowRight')).toBe(true)
     expect(document.activeElement).toBe(mind)
-    press(mind as HTMLElement, 'End')
+    press(mind, 'End')
     expect(document.activeElement).toBe(work)
   })
 

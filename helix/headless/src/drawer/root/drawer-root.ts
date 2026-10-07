@@ -173,21 +173,6 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
   closedBy?: 'any' | 'closerequest' | 'none'
 
   /**
-   * Stops Escape, a press outside, and a swipe from closing the drawer, for a
-   * drawer that has to be answered.
-   *
-   * The close control and `close()` still close it, as on `Dialog`: a panel
-   * with no way out at all is a trap.
-   */
-  @property({ reflect: true, type: Boolean })
-  persistent = false
-
-  /** Whether a request to dismiss the drawer, by Escape or a swipe, is refused. */
-  private get refusesDismissal(): boolean {
-    return this.persistent || this.closedBy === 'none'
-  }
-
-  /**
    * Draws a control that closes the drawer, in the corner where the title is.
    *
    * Pressing it is `close()`, so it sends `helix-before-close` like every other
@@ -195,6 +180,11 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
    */
   @property({ reflect: true, type: Boolean })
   dismissible = false
+
+  /** Whether a request to dismiss the drawer, by Escape or a swipe, is refused. */
+  private get refusesDismissal(): boolean {
+    return this.persistent || this.closedBy === 'none'
+  }
 
   /**
    * The close control's accessible name. Translate it with the rest of your
@@ -219,10 +209,6 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
   @property()
   label = ''
 
-  /* `aria-labelledby` and `aria-describedby` written on the host, carried to
-     the `<dialog>` that is the node a reader is on. */
-  protected readonly aria = new AriaForwardController(this, { target: () => this.panel })
-
   /**
    * Whether the drawer blocks the page behind it.
    *
@@ -238,6 +224,20 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
    */
   @property({ converter: onUnlessFalse })
   modal = true
+
+  /* `aria-labelledby` and `aria-describedby` written on the host, carried to
+     the `<dialog>` that is the node a reader is on. */
+  protected readonly aria = new AriaForwardController(this, { target: () => this.panel })
+
+  /**
+   * Stops Escape, a press outside, and a swipe from closing the drawer, for a
+   * drawer that has to be answered.
+   *
+   * The close control and `close()` still close it, as on `Dialog`: a panel
+   * with no way out at all is a trap.
+   */
+  @property({ reflect: true, type: Boolean })
+  persistent = false
 
   /**
    * Which edge the drawer comes from.

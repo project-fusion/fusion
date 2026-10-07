@@ -94,6 +94,24 @@ export class HelixHeadlessAppHeader extends HelixElement {
   static words = 'helix-app-header'
 
   /**
+   * Where the middle region sits in the bar.
+   *
+   * Centered by default, which reads as the site's spine when the navigation is
+   * the primary thing in the header rather than an afterthought beside a logo.
+   * Centered against the banner rather than against whatever space the brand
+   * left over, so the middle of the nav is the middle of the window whatever
+   * the wordmark and the actions happen to measure.
+   *
+   * `start` is the opt-out, for a header whose middle region trails the brand.
+   *
+   * **Named for the region and not for what is usually in it.** The middle slot
+   * takes a search field or a breadcrumb trail as readily as a `Navigation`, so
+   * the property carries the part's name, `content`.
+   */
+  @property({ attribute: 'content-align', reflect: true })
+  contentAlign?: 'start'
+
+  /**
    * The width of the bar, in pixels, below which the middle region folds behind
    * a toggle. Unset, it never folds.
    */
@@ -106,11 +124,6 @@ export class HelixHeadlessAppHeader extends HelixElement {
    */
   @property({ attribute: 'hide-on-scroll', type: Boolean })
   hideOnScroll = false
-
-  /** The name of the toggle that opens a folded middle region. */
-  @words
-  @property({ attribute: 'menu-label' })
-  menuLabel = 'Menu'
 
   /** Whether the bar is narrower than `fold-below`, which only the observer sets. */
   @state()
@@ -210,23 +223,10 @@ export class HelixHeadlessAppHeader extends HelixElement {
       this.hide(false)
     }
   }
-  /**
-   * Where the middle region sits in the bar.
-   *
-   * Centered by default, which reads as the site's spine when the navigation is
-   * the primary thing in the header rather than an afterthought beside a logo.
-   * Centered against the banner rather than against whatever space the brand
-   * left over, so the middle of the nav is the middle of the window whatever
-   * the wordmark and the actions happen to measure.
-   *
-   * `start` is the opt-out, for a header whose middle region trails the brand.
-   *
-   * **Named for the region and not for what is usually in it.** The middle slot
-   * takes a search field or a breadcrumb trail as readily as a `Navigation`, so
-   * the property carries the part's name, `content`.
-   */
-  @property({ attribute: 'content-align', reflect: true })
-  contentAlign?: 'start'
+  /** The name of the toggle that opens a folded middle region. */
+  @words
+  @property({ attribute: 'menu-label' })
+  menuLabel = 'Menu'
 
   /**
    * The id of the element whose scrolling lifts the bar, for an app shell that
@@ -380,6 +380,19 @@ export class HelixHeadlessAppHeader extends HelixElement {
     }
   }
 
+  /**
+   * The glyph on the toggle that opens a folded middle region, behind a seam:
+   * slot fallback, so a consumer replaces it by slotting, and a method, so a
+   * tier above replaces it by overriding.
+   */
+  protected renderMenuIcon(): TemplateResult {
+    return html`<slot name="menu-icon">
+      <svg part="toggle-mark" fill="currentColor" viewBox=${list.viewBox} aria-hidden="true">
+        ${unsafeSVG(list.content)}
+      </svg>
+    </slot>`
+  }
+
   protected override render(): TemplateResult {
     return html`
       <div part="row">
@@ -395,11 +408,7 @@ export class HelixHeadlessAppHeader extends HelixElement {
                 aria-label=${this.menuLabel}
                 @click=${this.handleToggle}
               >
-                <slot name="menu-icon">
-                  <svg part="toggle-mark" fill="currentColor" viewBox=${list.viewBox} aria-hidden="true">
-                    ${unsafeSVG(list.content)}
-                  </svg>
-                </slot>
+                ${this.renderMenuIcon()}
               </button>`
             : nothing
         }</div>
