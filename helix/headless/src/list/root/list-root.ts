@@ -146,11 +146,11 @@ import {
  * @csspart live - The region that says each step of a move to screen readers, in a `reorderable` list. Drawn from the first move. Visually hidden in the styled tier.
  * @csspart loading - The row after the last while `loading` is set. A grid row with one cell in a list that selects.
  *
- * @cssstate empty - While the list has no rows.
- * @cssstate loading - While `loading` is set.
- *
  * @cssproperty --list-first - The number of the first row, written where `start` or `reversed` moves it.
  * @cssproperty --list-step - What each row adds to the number before it: `1`, or `-1` where `reversed`.
+ *
+ * @cssstate empty - While the list has no rows.
+ * @cssstate loading - While `loading` is set.
  */
 @customElement('helix-headless-list')
 export class HelixHeadlessList extends HelixElement {
