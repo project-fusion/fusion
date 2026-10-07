@@ -4,7 +4,7 @@ import type { CSSResultGroup } from 'lit'
 /* Inherited from the base along with the template: this file has no
    `<helix-listbox>` in it to remind anyone. */
 import '../../listbox/index.js'
-import '../../tag/index.js'
+import '../../tag/root/index.js'
 import { styles as fieldStyles } from '../../shared/field/field.css.js'
 import { styles as fieldFrameStyles } from '../../shared/field/field-frame.css.js'
 import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
