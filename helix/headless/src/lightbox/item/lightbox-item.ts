@@ -1,6 +1,6 @@
 import { customElement, HelixElement } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { property, state } from 'lit/decorators.js'
 
 /**
  * @summary One item a lightbox can show, such as a picture, a video frame, or a chart.
@@ -13,7 +13,8 @@ import { property } from 'lit/decorators.js'
  * Each item is a `group` with the role description `slide`, named by its
  * `label` or, without one, by its place in the set, such as "2 of 5", as the
  * APG carousel pattern names a slide. The lightbox supplies both words, so they
- * are translated on the lightbox.
+ * are translated on the lightbox. A `description`, while there is one,
+ * describes the group, so a screen reader says it with the name.
  *
  * An item that is not current is hidden and stays in the DOM, as a `TabPanel`
  * does. Crawlers can read it, it is in the server-rendered markup, and an
@@ -69,6 +70,25 @@ export class HelixHeadlessLightboxItem extends HelixElement {
   @property()
   value = ''
 
+  /** Whether anything is slotted into `description`, which then describes the group. */
+  @state()
+  private described = false
+
+  /** Reads whether the `description` slot holds anything. */
+  private readonly readDescription = (): void => {
+    const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="description"]')
+    this.described = (slot?.assignedNodes() ?? []).some(
+      (node) => node.nodeType === Node.ELEMENT_NODE || (node.textContent ?? '').trim() !== '',
+    )
+  }
+
+  /* Read once rendered as well as on `slotchange`, which an engine need not
+     send for what was assigned before the slot existed. */
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.readDescription()
+  }
+
   /**
    * Mirrors the shown state where a stylesheet can select on it.
    *
@@ -88,10 +108,11 @@ export class HelixHeadlessLightboxItem extends HelixElement {
       role="group"
       aria-roledescription=${this.roleLabel || nothing}
       aria-label=${this.label || this.position || nothing}
+      aria-describedby=${this.described ? 'description' : nothing}
       ?hidden=${!this.current}
     >
       <slot></slot>
-      <slot name="description"></slot>
+      <slot id="description" name="description" @slotchange=${this.readDescription}></slot>
     </div>`
   }
 }

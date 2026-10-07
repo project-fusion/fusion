@@ -114,3 +114,50 @@ describe('zooming into an item', () => {
     expect([controller.scale, changes.length, controller.pinched]).toEqual([1, 0, false])
   })
 })
+
+describe('the wheel', () => {
+  const wheel = (surface: HTMLElement, init: WheelEventInit): WheelEvent => {
+    const all = { clientX: 200, clientY: 150, ctrlKey: false, ...init }
+    const event = new WheelEvent('wheel', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      ...all,
+    })
+    /* happy-dom's wheel is a `UIEvent`, with no pointer position and no keys. */
+    for (const [key, value] of Object.entries(all)) {
+      if ((event as unknown as Record<string, unknown>)[key] === undefined) {
+        Object.defineProperty(event, key, { value })
+      }
+    }
+    surface.dispatchEvent(event)
+    return event
+  }
+
+  /* A trackpad pinch reaches the page as a wheel with Ctrl held, and the
+     viewer ignored it, so the browser zoomed the whole page instead. */
+  test('with Ctrl held zooms the item, and keeps the page from zooming', () => {
+    const { controller, surface } = zoomer()
+    const event = wheel(surface, { ctrlKey: true, deltaY: -100 })
+    expect(event.defaultPrevented).toBe(true)
+    expect(controller.scale).toBeGreaterThan(1.4)
+    expect(controller.scale).toBeLessThan(1.6)
+    wheel(surface, { ctrlKey: true, deltaY: 1000 })
+    expect(controller.scale).toBe(1)
+  })
+
+  test('without Ctrl moves a zoomed item, and leaves one at its own size to the page', () => {
+    const { controller, surface } = zoomer()
+    expect(wheel(surface, { deltaY: 40 }).defaultPrevented).toBe(false)
+    controller.zoomTo(2)
+    const event = wheel(surface, { deltaY: 40 })
+    expect(event.defaultPrevented).toBe(true)
+    expect(controller.pan.y).toBe(-40)
+  })
+
+  test('does nothing where zooming is off', () => {
+    const { controller, surface } = zoomer(1)
+    expect(wheel(surface, { ctrlKey: true, deltaY: -100 }).defaultPrevented).toBe(false)
+    expect(controller.scale).toBe(1)
+  })
+})

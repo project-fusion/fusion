@@ -654,3 +654,28 @@ describe('a viewer with no name', () => {
     }
   })
 })
+
+describe('the journey in and out', () => {
+  /* `:state(open)` turns at once, so a stylesheet had no way to tell an exit
+     still on screen from a viewer at rest. */
+  test('is entering from opening until the entrance ends, and exiting on the way out', async () => {
+    const host = await lightbox()
+    host.show()
+    await host.updateComplete
+    expect(hasState(host, 'entering')).toBe(true)
+    expect(hasState(host, 'exiting')).toBe(false)
+    host.close()
+    await host.updateComplete
+    expect(hasState(host, 'entering')).toBe(false)
+    expect(hasState(host, 'exiting')).toBe(true)
+    await new Promise((done) => setTimeout(done, 100))
+    expect(hasState(host, 'exiting')).toBe(false)
+  })
+
+  test('is neither for a viewer served open', async () => {
+    const host = await lightbox('open')
+    await host.updateComplete
+    expect(hasState(host, 'entering')).toBe(false)
+    expect(hasState(host, 'exiting')).toBe(false)
+  })
+})
