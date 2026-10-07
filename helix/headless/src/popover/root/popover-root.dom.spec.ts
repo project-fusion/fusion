@@ -385,10 +385,13 @@ describe('a plain trigger', () => {
       </helix-headless-popover>`,
     )) as Popover
 
-  test('carries nothing until a reader presses it, and then says whether the panel is open', async () => {
-    const host = await plain()
+  test('says the panel is closed before any press, and then whether it is open', async () => {
+    const host = (await plain()) as Popover & {
+      whenSettled: Promise<void>
+    }
     const trigger = host.querySelector('[slot="trigger"]') as HTMLButtonElement
-    expect(trigger.hasAttribute('aria-expanded')).toBe(false)
+    await host.whenSettled
+    expect(trigger.getAttribute('aria-expanded')).toBe('false')
     trigger.click()
     /* happy-dom does not carry an event through slot assignment, so the
        trigger slot's own listener, which opens the panel in a browser, never
@@ -480,5 +483,40 @@ describe('entering and exiting', () => {
     expect(hasState(host, 'exiting')).toBe(true)
     await settled(host)
     expect(hasState(host, 'exiting')).toBe(false)
+  })
+})
+
+describe('a popover with no name', () => {
+  /* The missing-name warning is in development builds only, which the
+     package's `test:dom` script asks for with `--conditions helix-development`. */
+  const warnedOn = async (markup: string): Promise<string[]> => {
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      await mount(markup)
+      await new Promise((done) => setTimeout(done, 5))
+    } finally {
+      console.warn = original
+    }
+    return warnings
+  }
+
+  test('is reported once it opens, by its tag', async () => {
+    const warnings = await warnedOn(
+      '<helix-headless-popover default-open><button slot="trigger">More</button><p>Body</p></helix-headless-popover>',
+    )
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0]).toContain('<helix-headless-popover> has no accessible name')
+  })
+
+  test('and a popover named by its label or a heading, or not yet open, is not', async () => {
+    for (const named of [
+      '<helix-headless-popover default-open label="Filters"><button slot="trigger">More</button><p>Body</p></helix-headless-popover>',
+      '<helix-headless-popover default-open><button slot="trigger">More</button><h2>Filters</h2></helix-headless-popover>',
+      '<helix-headless-popover><button slot="trigger">More</button><p>Body</p></helix-headless-popover>',
+    ]) {
+      expect([named, ...(await warnedOn(named))]).toEqual([named])
+    }
   })
 })
