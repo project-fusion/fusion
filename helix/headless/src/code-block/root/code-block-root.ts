@@ -14,7 +14,15 @@ import { html } from 'lit/static-html.js'
 import '../../copy-button/index.js'
 import { highlightedLines } from '../highlight.js'
 import { gutterNumbers, lineCount, lineRuns, lineSpans } from '../lines.js'
-import { type DiffFile, type DiffHunk, type DiffLine, pairLines, parsePatch } from '../patch.js'
+import {
+  type DiffFile,
+  type DiffHunk,
+  type DiffLine,
+  type DiffRun,
+  foldContext,
+  pairLines,
+  parsePatch,
+} from '../patch.js'
 
 /**
  * @summary A block of code with an optional name and a copy button.
@@ -65,6 +73,9 @@ import { type DiffFile, type DiffHunk, type DiffLine, pairLines, parsePatch } fr
  * part, so the eye goes to what changed within the line. Each file in the patch is its own block under its own name,
  * and its copy button copies the new version of the file. `variant="split"`
  * shows the old version beside the new, each removal opposite its replacement.
+ * `context-lines` folds each long run of unchanged lines, keeping that many
+ * beside each change, behind a button that shows them and hides them again,
+ * as a code host draws a diff written with more context than a reader needs.
  *
  * **A block that scrolls is a tab stop.** While its lines run past its width or
  * its cap, the scroller is a region named for the block, such as "Code,
@@ -122,6 +133,7 @@ import { type DiffFile, type DiffHunk, type DiffLine, pairLines, parsePatch } fr
  * @csspart expand - The button under a capped block that shows every line, and fewer again. Drawn when `expandable` is set and the cap hides something.
  * @csspart file - In a diff, one file's header and block.
  * @csspart filler - In a split diff, the empty row opposite a line the other side does not have.
+ * @csspart fold - In a diff with `context-lines`, the button that shows a folded run of unchanged lines, and hides it again, saying which with `aria-expanded`.
  * @csspart frame - The code, and the copy button beside it where there is no header.
  * @csspart gutter - The line numbers beside the code, shown when `line-numbers` is set.
  * @csspart header - The bar that holds the name and the copy button, shown when there is a name.
@@ -204,6 +216,14 @@ export class HelixHeadlessCodeBlock extends HelixElement {
   copyNameLabel = '{copy}, {name}'
 
   /**
+   * In a diff, how many unchanged lines to keep beside each change. Each
+   * longer run of unchanged lines is folded behind a button that shows it.
+   * Unset shows every line the diff holds.
+   */
+  @property({ attribute: 'context-lines', type: Number })
+  contextLines?: number
+
+  /**
    * Whether the content is a unified diff, drawn as the lines it changed.
    *
    * Reflected, because the stylesheet paints a diff differently from code, and
@@ -222,6 +242,23 @@ export class HelixHeadlessCodeBlock extends HelixElement {
    */
   @property({ type: Boolean })
   expandable = false
+
+  /**
+   * The words of a button that hides a run of unchanged lines it showed, in a
+   * diff with `context-lines`. `{count}` is how many, and each language
+   * writes the forms it has.
+   */
+  @words
+  @property({ attribute: 'hide-unchanged-label' })
+  hideUnchangedLabel = '{count, plural, one {Hide # unchanged line} other {Hide # unchanged lines}}'
+
+  /**
+   * The words of a button that shows a folded run of unchanged lines, in a
+   * diff with `context-lines`. `{count}` is how many.
+   */
+  @words
+  @property({ attribute: 'show-unchanged-label' })
+  showUnchangedLabel = '{count, plural, one {Show # unchanged line} other {Show # unchanged lines}}'
 
   /**
    * The expand button's words while the cap hides lines.
@@ -382,8 +419,49 @@ export class HelixHeadlessCodeBlock extends HelixElement {
     const text = this.text
     if (text !== this.parsed.text) {
       this.parsed = { files: parsePatch(text), text }
+      this.unfolded.clear()
     }
     return this.parsed.files
+  }
+
+  /** The folds a reader opened, by file, hunk and the line each starts at. */
+  private readonly unfolded = new Set<string>()
+
+  /** A hunk's lines in runs, folded where `context-lines` asks. */
+  private runsOf(hunk: DiffHunk): DiffRun[] {
+    const keep = this.contextLines
+    return keep === undefined || keep < 0
+      ? [{ folded: false, lines: hunk.lines, start: 0 }]
+      : foldContext(hunk.lines, Math.floor(keep))
+  }
+
+  /**
+   * The button over a folded run, and the run once it is open.
+   *
+   * A disclosure, so focus stays on the button as the lines appear under it.
+   * The new side of a split diff draws the same words hidden from the
+   * accessibility tree, there to keep the rows level and to answer a press.
+   */
+  private renderFold(
+    run: DiffRun,
+    key: string,
+    line: (one: DiffLine) => TemplateResult,
+    hidden = false,
+  ): TemplateResult {
+    const open = this.unfolded.has(key)
+    const words = formatWords(this, open ? 'hideUnchangedLabel' : 'showUnchangedLabel', {
+      count: run.lines.length,
+    })
+    const toggle = (): void => {
+      if (!this.unfolded.delete(key)) {
+        this.unfolded.add(key)
+      }
+      this.requestUpdate()
+    }
+    const control = hidden
+      ? html`<span part="fold" aria-hidden="true" @click=${toggle}>${words}</span>`
+      : html`<button part="fold" type="button" aria-expanded=${open ? 'true' : 'false'} @click=${toggle}>${words}</button>`
+    return html`${control}\n${open ? run.lines.map(line) : nothing}`
   }
 
   /**
@@ -851,22 +929,29 @@ export class HelixHeadlessCodeBlock extends HelixElement {
    * The new side's hunk headers are hidden from the accessibility tree, being
    * the old side's text again and there only to keep the rows level.
    */
-  private renderSplit(file: DiffFile, width: number): TemplateResult {
-    const hunks = file.hunks.map((hunk) => ({ hunk, rows: pairLines(hunk.lines) }))
+  private renderSplit(file: DiffFile, width: number, at: number): TemplateResult {
+    const hunks = file.hunks.map((hunk) => ({ hunk, runs: this.runsOf(hunk) }))
     const filler = html`<span part="filler" aria-hidden="true">\n</span>`
+    const side = (old: boolean): TemplateResult[] =>
+      hunks.map(
+        ({ hunk, runs }, h) =>
+          html`${this.renderHunk(hunk, !old)}${runs.map((run) =>
+            run.folded
+              ? this.renderFold(
+                  run,
+                  `${at}:${h}:${run.start}`,
+                  (line) => this.renderLine(line, width, old ? 'old' : 'new'),
+                  !old,
+                )
+              : pairLines(run.lines).map(({ left, right }) => {
+                  const line = old ? left : right
+                  return line ? this.renderLine(line, width, old ? 'old' : 'new') : filler
+                }),
+          )}`,
+      )
     return html`<div part="split">
-      <pre part="old" translate="no"><code part="code">${hunks.map(
-        ({ hunk, rows }) =>
-          html`${this.renderHunk(hunk)}${rows.map(({ left }) =>
-            left ? this.renderLine(left, width, 'old') : filler,
-          )}`,
-      )}</code></pre>
-      <pre part="new" translate="no"><code part="code">${hunks.map(
-        ({ hunk, rows }) =>
-          html`${this.renderHunk(hunk, true)}${rows.map(({ right }) =>
-            right ? this.renderLine(right, width, 'new') : filler,
-          )}`,
-      )}</code></pre>
+      <pre part="old" translate="no"><code part="code">${side(true)}</code></pre>
+      <pre part="new" translate="no"><code part="code">${side(false)}</code></pre>
     </div>`
   }
 
@@ -877,7 +962,7 @@ export class HelixHeadlessCodeBlock extends HelixElement {
    * comes from: a diff edited later arrives by `slotchange` like any other.
    */
   private renderDiff(files: DiffFile[]): TemplateResult {
-    return html`${files.map((file) => {
+    return html`${files.map((file, at) => {
       const name = file.name || this.label
       const widest = Math.max(
         0,
@@ -897,10 +982,16 @@ export class HelixHeadlessCodeBlock extends HelixElement {
         <div part="frame">
           ${
             this.variant === 'split'
-              ? this.renderSplit(file, width)
+              ? this.renderSplit(file, width, at)
               : html`<pre part="block" translate="no"><code part="code">${file.hunks.map(
-                  (hunk) =>
-                    html`${this.renderHunk(hunk)}${hunk.lines.map((line) => this.renderLine(line, width))}`,
+                  (hunk, h) =>
+                    html`${this.renderHunk(hunk)}${this.runsOf(hunk).map((run) =>
+                      run.folded
+                        ? this.renderFold(run, `${at}:${h}:${run.start}`, (line) =>
+                            this.renderLine(line, width),
+                          )
+                        : run.lines.map((line) => this.renderLine(line, width)),
+                    )}`,
                 )}</code></pre>`
           }
           ${this.headed(name) ? nothing : this.renderCopy(now)}

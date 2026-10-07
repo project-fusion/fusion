@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { changedWords, type DiffLine, pairLines, parsePatch } from './patch.js'
+import { changedWords, type DiffLine, foldContext, pairLines, parsePatch } from './patch.js'
 
 /* What a unified diff says, read back as the lines a reader sees. Every patch
    here is the shape a real tool writes: `git diff`, `diff -u`, a code host's
@@ -147,5 +147,30 @@ describe('the words a changed line changed', () => {
     expect(marked(replacing?.pieces)).toEqual(['5000'])
     expect(extra?.pieces).toBeUndefined()
     expect(lines.find((line) => line.kind === 'context')?.pieces).toBeUndefined()
+  })
+})
+
+/* A diff written with more context than a reader needs, `git diff -U20` say,
+   drew every unchanged line, so the changes sat far apart in a long block. */
+describe('folding unchanged lines', () => {
+  const lines = (marks: string): DiffLine[] =>
+    [...marks].map((mark, at) => ({
+      kind: mark === '+' ? 'added' : mark === '-' ? 'removed' : 'context',
+      text: String(at),
+    }))
+  const shape = (marks: string, keep: number): string[] =>
+    foldContext(lines(marks), keep).map(
+      (run) => `${run.folded ? 'fold' : 'show'} ${run.start}+${run.lines.length}`,
+    )
+
+  test('keeps that many unchanged lines beside each change, and folds the rest', () => {
+    expect(shape('      -+      ', 2)).toEqual(['fold 0+4', 'show 4+6', 'fold 10+4'])
+    expect(shape('-        +', 1)).toEqual(['show 0+2', 'fold 2+6', 'show 8+2'])
+  })
+
+  test('folds nothing shorter than two lines, which a control would not shorten', () => {
+    expect(shape('-    +', 2)).toEqual(['show 0+6'])
+    expect(shape('-     +', 2)).toEqual(['show 0+7'])
+    expect(shape('-      +', 2)).toEqual(['show 0+3', 'fold 3+2', 'show 5+3'])
   })
 })

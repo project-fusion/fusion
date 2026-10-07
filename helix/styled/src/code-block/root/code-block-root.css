@@ -405,6 +405,29 @@
   color: var(--helix-color-foreground-muted);
 }
 
+/* A folded run of unchanged lines: a row in the hunk header's colors that a
+   press opens, set in the sans face so it reads as a control and not as code. */
+[part="fold"] {
+  all: unset;
+  background-color: var(--helix-color-surface-sunken);
+  box-sizing: border-box;
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  display: flex;
+  font-family: var(--helix-font-sans);
+  inline-size: 100%;
+  padding-inline: var(--helix-space-md);
+}
+
+[part="fold"]:hover {
+  color: var(--helix-color-foreground);
+}
+
+[part="fold"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-ring) * -1);
+}
+
 /* *A wash, not the tone's surface.** `success-surface` is the solid fill a
    button stands on, and code on it read as an alarm with the `+` vanishing into
    it. This is Tag's resting fill, the tone at 14% over the ground. */

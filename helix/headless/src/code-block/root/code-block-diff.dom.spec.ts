@@ -53,6 +53,29 @@ describe('a code block reading a diff', () => {
     ])
   })
 
+  test('folds long runs of unchanged lines behind a button that shows them and hides them', async () => {
+    const long = `--- a/a.ts\n+++ b/a.ts\n@@ -1,9 +1,9 @@\n a\n b\n c\n d\n-e\n+E\n f\n g\n h\n i\n`
+    const host = await block('diff context-lines="1"', long)
+    const fold = (): HTMLButtonElement[] => parts(host, 'fold') as HTMLButtonElement[]
+    expect(fold().map((one) => [one.textContent, one.getAttribute('aria-expanded')])).toEqual([
+      ['Show 3 unchanged lines', 'false'],
+      ['Show 3 unchanged lines', 'false'],
+    ])
+    expect(parts(host, 'text').map((line) => line.textContent?.trim())).toEqual([
+      'd',
+      'e',
+      'E',
+      'f',
+    ])
+    fold()[0]?.click()
+    await host.updateComplete
+    expect(fold()[0]?.getAttribute('aria-expanded')).toBe('true')
+    expect(fold()[0]?.textContent).toBe('Hide 3 unchanged lines')
+    expect(parts(host, 'context')).toHaveLength(5)
+    const all = await block('diff', long)
+    expect(parts(all, 'fold')).toHaveLength(0)
+  })
+
   test('says what happened in text as well, so it is not carried by color', async () => {
     const host = await block()
     expect(parts(host, 'marker').map((marker) => marker.textContent)).toEqual([' ', '-', '+', ' '])
@@ -115,5 +138,18 @@ describe('a split diff', () => {
       side?.querySelectorAll('[part="context"], [part="added"], [part="removed"], [part="filler"]')
         .length ?? 0
     expect(rows(old)).toBe(rows(now))
+  })
+
+  test('folds on both sides, with one control a reader reaches', async () => {
+    const long = `--- a/a.ts\n+++ b/a.ts\n@@ -1,6 +1,6 @@\n a\n b\n c\n d\n-e\n+E\n f\n`
+    const host = await block('diff variant="split" context-lines="0"', long)
+    const [old] = parts(host, 'old')
+    const [now] = parts(host, 'new')
+    expect(old?.querySelector('[part="fold"]')?.localName).toBe('button')
+    expect(now?.querySelector('[part="fold"]')?.getAttribute('aria-hidden')).toBe('true')
+    ;(now?.querySelector('[part="fold"]') as HTMLElement).click()
+    await host.updateComplete
+    expect(old?.querySelector('[part="fold"]')?.getAttribute('aria-expanded')).toBe('true')
+    expect(now?.querySelectorAll('[part="context"]')).toHaveLength(5)
   })
 })
