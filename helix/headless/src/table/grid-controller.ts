@@ -58,6 +58,12 @@ export interface TableGridOptions {
   selectRange: (to: number, from: number) => boolean
   /** Selects every row for Control or Command with A, and says whether it did. */
   selectAll: () => boolean
+  /**
+   * Focus moved to another row by a key with no Shift, row `to`, and
+   * `control` says whether Control or Command was held. A table whose moves
+   * carry the selection selects the row there.
+   */
+  arrive?: (to: number, control: boolean) => void
   /** Whether the table is a grid now. */
   on: () => boolean
 }
@@ -430,6 +436,8 @@ export class TableGridController implements ReactiveController {
       to.row >= 0
     ) {
       this.options.selectRange(to.row, place.row)
+    } else if (!event.shiftKey && to.row >= 0 && to.row !== place.row) {
+      this.options.arrive?.(to.row, event.ctrlKey || event.metaKey)
     }
     if (to.row !== place.row || to.column !== place.column) {
       this.moveTo(to)

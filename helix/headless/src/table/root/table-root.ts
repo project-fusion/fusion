@@ -182,6 +182,15 @@ const NAMED = new Set([...STATUS, 'heading'])
  * Tab reaches each checkbox, and Space ticks it. To act on one row, put a
  * link or a button in a cell, or give the row an `href`.
  *
+ * `selection-mode="single"` selects one row at a time: ticking a row lets go
+ * of the one before, the heading holds no checkbox, and Shift and Control with
+ * A take in nothing more. `selection-behavior="replace"` makes a press on a
+ * row, anywhere but its own controls, select it alone, as a file list does,
+ * and in a `grid` table the arrow keys carry the selection with them. Control
+ * or Command with a press adds or takes out the row, and with an arrow moves
+ * without selecting. Shift with a press takes in the rows from the one last
+ * chosen.
+ *
  * **Moving rows.** `reorderable` adds a column of grips before the checkboxes,
  * under a heading named by `row-grips-label`.
  *
@@ -219,6 +228,7 @@ const NAMED = new Set([...STATUS, 'heading'])
  * | Enter, Space on a sortable heading | Sorts by the column. |
  * | Space on a row, Enter or Space on its checkbox cell | Selects the row, in a `selectable` table. |
  * | Enter or Space on a grip cell | Picks the row up, or drops it, in a `reorderable` table. Up, Down, Home, and End move a row picked up, and Escape puts it back. |
+ * | Down, Up, Page Down, Page Up under `selection-behavior="replace"` | Selects the row it moves to alone. Control or Command with the key moves without selecting. |
  * | Shift with Down or Up | Selects the rows it moves across, in a `selectable` table. |
  * | Shift with Space | Selects every row from the one last chosen, in a `selectable` table. |
  * | Control or Command with A | Selects every row, in a `selectable` table. |
@@ -465,6 +475,29 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
   selectAllLabel = 'Select every row'
 
   /**
+   * The name of the heading over the checkboxes under
+   * `selection-mode="single"`, where it holds no checkbox of its own.
+   */
+  @words
+  @property({ attribute: 'select-column-label' })
+  selectColumnLabel = 'Select'
+
+  /**
+   * What a press on a row, or in a `grid` table a key that moves to one, does
+   * to the rows already selected: `toggle`, the default, leaves them to the
+   * checkboxes, and `replace` selects the row alone.
+   */
+  @property({ attribute: 'selection-behavior' })
+  selectionBehavior: 'replace' | 'toggle' = 'toggle'
+
+  /**
+   * How many rows a `selectable` table selects: `multiple`, the default, or
+   * `single`, one at a time.
+   */
+  @property({ attribute: 'selection-mode' })
+  selectionMode?: 'multiple' | 'single'
+
+  /**
    * The keys of the selected rows, separated by commas.
    *
    * A reader's press fires `helix-select` first, and refusing it leaves the
@@ -561,6 +594,11 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
   /** The keyboard of a `grid` table, in `grid-controller.ts`. */
   private readonly gridKeys = new TableGridController(this, {
     activate: (place, event) => this.activate(place, event),
+    arrive: (to, control) => {
+      if (this.replaces && !control) {
+        this.chooseOnly(to)
+      }
+    },
     columns: () => this.tableColumns.filter((column) => column.shown),
     lead: () => this.lead,
     on: () => this.grid,
@@ -568,7 +606,9 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     rows: () => (this.childrenKnown ? this.arrangedRows : []),
     rowWords: () => this.arrangedRows.map((row) => textOf(row.children[0])),
     selectAll: () =>
-      this.selectable && this.requestSelected(new Set([...this.chosen, ...this.enabledKeys])),
+      this.selectable &&
+      !this.single &&
+      this.requestSelected(new Set([...this.chosen, ...this.enabledKeys])),
     selectRange: (to, from) => this.selectRange(to, from),
   })
 
@@ -808,7 +848,75 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
    * them where each already is. A `disabled` row keeps what it had.
    */
   private chooseAll(): void {
+    if (this.single) {
+      return
+    }
     this.requestSelected(new Set(toggleEvery(this.chosen, this.enabledKeys)))
+  }
+
+  /** Whether the table selects one row at a time. */
+  private get single(): boolean {
+    return this.selectionMode === 'single'
+  }
+
+  /** Whether a press or a move on a row selects it alone. */
+  private get replaces(): boolean {
+    return this.selectable && this.selectionBehavior === 'replace'
+  }
+
+  /**
+   * Selects the drawn row `at` alone, and makes it where a range runs from.
+   * Asks nothing where it is already the only one selected.
+   */
+  private chooseOnly(at: number): void {
+    const row = this.arrangedRows[at]
+    const found = this.keyed.find((one) => one.row === row)
+    if (!found || found.row.disabled) {
+      return
+    }
+    this.anchorKey = found.key
+    const now = this.chosen
+    if (now.size === 1 && now.has(found.key)) {
+      return
+    }
+    this.requestSelected(new Set([found.key]))
+  }
+
+  /**
+   * A press on a row under `selection-behavior="replace"`: it selects the row
+   * alone, Control or Command adds or takes out the row, and Shift takes in
+   * the rows from the one last chosen. A press on the row's own controls, its
+   * checkbox or its grip is theirs.
+   */
+  private readonly handleRowClick = (event: MouseEvent): void => {
+    if (!this.replaces || event.defaultPrevented) {
+      return
+    }
+    const path = event.composedPath()
+    const at = this.arrangedRows.findIndex((row) => path.includes(row))
+    const row = this.arrangedRows[at] as Row | undefined
+    if (!row) {
+      return
+    }
+    const control = path.find(
+      (node) =>
+        node instanceof Element &&
+        (node.matches('a[href], button, input, select, textarea, label, [contenteditable]') ||
+          node.getRootNode() === row.shadowRoot),
+    )
+    if (control) {
+      return
+    }
+    if (event.shiftKey && !this.single) {
+      this.selectRange(at, at)
+      return
+    }
+    const found = this.keyed.find((one) => one.row === row)
+    if (found && (event.ctrlKey || event.metaKey)) {
+      this.chooseRow(found.key, !this.chosen.has(found.key))
+      return
+    }
+    this.chooseOnly(at)
   }
 
   /** The key of the row a Shift range runs from: the one last chosen. */
@@ -823,6 +931,11 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
   private selectRange(to: number, from: number): boolean {
     if (!this.selectable) {
       return false
+    }
+    /* One row at a time takes in nothing more: the row it reached is the one. */
+    if (this.single) {
+      this.chooseOnly(to)
+      return true
     }
     const keyOf = new Map(this.keyed.map(({ key, row }) => [row as Element, key]))
     const keys = this.arrangedRows.map((row) => keyOf.get(row) ?? '')
@@ -844,8 +957,11 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
       return
     }
     this.anchorKey = key
-    const keys = this.chosen
+    const keys = this.single ? new Set(this.chosen.has(key) ? [key] : []) : this.chosen
     if (on) {
+      if (this.single) {
+        keys.clear()
+      }
       keys.add(key)
     } else {
       keys.delete(key)
@@ -879,7 +995,13 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     const row = this.arrangedRows[place.row] as Row | undefined
     const found = this.keyed.find((one) => one.row === row)
     if (this.selectable && found && (event.key === ' ' || lead)) {
-      this.chooseRow(found.key, !this.chosen.has(found.key))
+      /* Under `replace` Space selects the row alone, and Control or Command
+         with it adds or takes out the row, as a press does. */
+      if (this.replaces && !lead && !(event.ctrlKey || event.metaKey)) {
+        this.chooseOnly(place.row)
+      } else {
+        this.chooseRow(found.key, !this.chosen.has(found.key))
+      }
       return true
     }
     if (event.key === 'Enter' && row?.href && !row.disabled) {
@@ -1116,6 +1238,7 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     this.watcher = new MutationObserver(() => this.requestUpdate())
     this.watcher.observe(this, { characterData: true, childList: true, subtree: true })
     this.addEventListener('click', this.handleHeadClick)
+    this.addEventListener('click', this.handleRowClick)
     this.addEventListener('helix-before-toggle', this.handleToggle)
   }
 
@@ -1124,6 +1247,7 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     this.watcher?.disconnect()
     this.watcher = undefined
     this.removeEventListener('click', this.handleHeadClick)
+    this.removeEventListener('click', this.handleRowClick)
     this.removeEventListener('helix-before-toggle', this.handleToggle)
   }
 
@@ -1294,6 +1418,13 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     if (!this.selectable) {
       return nothing
     }
+    /* One row at a time has nothing to select every row of, so the heading
+       holds no checkbox and is named for the column. */
+    if (this.single) {
+      return html`<span part="select-all" role="columnheader" aria-label=${this.selectColumnLabel}
+        tabindex=${this.grid ? (this.gridKeys.isStop({ column: this.lead.indexOf('select'), row: -1 }) ? '0' : '-1') : nothing}
+      ></span>`
+    }
     /* None while the rows are not known, as on a server, so a render hydrating
        what one sent draws the box the server drew. Read from the rows there,
        the box's mixed state was primed as committed and never drawn. */
@@ -1328,7 +1459,7 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     return html`<slot name="heading"></slot>${start}<div
       part="table"
       role=${grid ? 'grid' : 'table'}
-      aria-multiselectable=${grid && this.selectable ? 'true' : nothing}
+      aria-multiselectable=${grid && this.selectable ? (this.single ? 'false' : 'true') : nothing}
       aria-busy=${this.loading ? 'true' : nothing}
       aria-label=${this.label || this.fallbackLabel}
       style=${template ? `--table-template: ${template}` : ''}

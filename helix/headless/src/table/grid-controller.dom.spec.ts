@@ -232,6 +232,39 @@ describe('a grid table', () => {
     expect(host.selected).toBe('api,queue')
   })
 
+  test('under selection-behavior replace, the arrows carry the selection and Control moves alone', async () => {
+    const host = (await mount(
+      three.replace('grid selectable', 'grid selectable selection-behavior="replace"'),
+    )) as Gridded
+    await settle(host)
+    await settle(host)
+    cells(host)[0]?.focus()
+    await press(host, 'ArrowDown')
+    expect(host.selected).toBe('api')
+    await press(host, 'ArrowDown', { ctrlKey: true })
+    expect(focused(host)).toBe(cells(host)[2] as Element)
+    expect(host.selected).toBe('api')
+    await press(host, ' ', { ctrlKey: true })
+    expect(host.selected).toBe('api,queue')
+    await press(host, ' ')
+    expect(host.selected).toBe('queue')
+  })
+
+  test('under selection-mode single, Shift takes in nothing more and Control with A nothing', async () => {
+    const host = (await mount(
+      three.replace('grid selectable', 'grid selectable selection-mode="single"'),
+    )) as Gridded
+    await settle(host)
+    await settle(host)
+    expect(part(host, 'table')?.getAttribute('aria-multiselectable')).toBe('false')
+    cells(host)[0]?.focus()
+    await press(host, ' ')
+    await press(host, 'ArrowDown', { shiftKey: true })
+    expect(host.selected).toBe('api')
+    expect(await press(host, 'a', { ctrlKey: true })).toBe(false)
+    expect(host.selected).toBe('api')
+  })
+
   /* A row a reader may see and not choose, as React Aria's `disabledKeys`. */
   test('passes over a disabled row when selecting, and keeps its link shut', async () => {
     const host = (await mount(
