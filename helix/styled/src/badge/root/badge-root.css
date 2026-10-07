@@ -75,6 +75,18 @@
   padding-inline: var(--helix-space-none);
 }
 
+/* An icon inside the mark sits before the count, a little apart from it, at
+   the count's size. Alone, it is the whole mark, a circle like one digit. */
+[part="indicator"] {
+  gap: calc(var(--_badge-inset) / 2);
+}
+
+slot[name="icon"]::slotted(*) {
+  --icon-size: var(--badge-icon-size, var(--_badge-text));
+
+  flex: none;
+}
+
 /* One character, so the mark is a circle. `min-inline-size` alone does not get
    there: the inline padding pushes a wide glyph past the block size, and a 9
    renders 1.2px wider than it is tall where a 1 does not. */

@@ -1,6 +1,6 @@
 import { customElement, focusTarget, HelixElement, wordsLocale } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { property, state } from 'lit/decorators.js'
 import { badgeBlank, badgeCapped, badgeText, badgeWords } from '../count.js'
 
 /**
@@ -38,6 +38,13 @@ import { badgeBlank, badgeCapped, badgeText, badgeWords } from '../count.js'
  * button "Inbox 8 unread", and stays current as the count changes. The styled
  * tier's `placement="inline"` draws the mark in the line for that case.
  *
+ * **An icon goes inside the mark** through the `icon` slot, before the count,
+ * as Web Awesome's badge takes one at its start. With no `value` the icon is
+ * the whole mark, such as a check on an avatar, drawn where the dot would be.
+ * The icon is hidden from screen readers: the count and `label` are what the
+ * mark says. A server cannot see the slotted icon, so a served badge with an
+ * icon and no value is a dot until the script runs.
+ *
  * @since 0.1.0
  * @status stable
  * @category markers
@@ -45,12 +52,15 @@ import { badgeBlank, badgeCapped, badgeText, badgeWords } from '../count.js'
  * @documentation https://fusion.dev/helix/components/badge
  *
  * @slot - The element being decorated.
+ * @slot icon - An icon inside the mark, before the count, or the whole mark when there is no value. Hidden from screen readers.
  *
- * @csspart indicator - The count, or the dot when there is no value.
+ * @csspart icon - The slot the icon arrives through, inside the indicator. A slot draws no box, so it passes inherited properties, such as color, to the icon.
+ * @csspart indicator - The count, or the dot when there is no value and no icon.
  *
  * @cssstate blank - The value is zero, so there is no mark.
  * @cssstate capped - The count is past `max`, so the mark shows `{max}+`.
- * @cssstate dot - There is no value, so the mark is a dot.
+ * @cssstate dot - There is no value and no icon, so the mark is a dot.
+ * @cssstate has-icon - Something is slotted into `icon`, so it is drawn inside the mark.
  */
 @customElement('helix-headless-badge')
 export class HelixHeadlessBadge extends HelixElement {
@@ -111,6 +121,15 @@ export class HelixHeadlessBadge extends HelixElement {
    */
   @property()
   value: number | string = ''
+
+  /** Whether something is slotted into `icon`, read from the children. */
+  @state()
+  private hasIcon = false
+
+  /** Reads whether an icon is slotted, from the children where they can be known. */
+  private readonly readIcon = (): void => {
+    this.hasIcon = this.knownChildren.some((child) => child.slot === 'icon')
+  }
 
   /** The value as text, whatever it was set to. */
   private get given(): string {
@@ -224,9 +243,13 @@ export class HelixHeadlessBadge extends HelixElement {
      `willUpdate`, which a server calls too. */
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    if (!this.hasUpdated) {
+      this.readIcon()
+    }
     this.toggleState('capped', this.capped)
-    this.toggleState('dot', this.given.trim() === '')
+    this.toggleState('dot', this.given.trim() === '' && !this.hasIcon)
     this.toggleState('blank', this.blank)
+    this.toggleState('has-icon', this.hasIcon)
   }
 
   protected override updated(changed: PropertyValues): void {
@@ -276,14 +299,27 @@ export class HelixHeadlessBadge extends HelixElement {
     // `single` is what lets a one-character mark be a circle. Whether the text
     // fits inside the square is a fact about the string, and CSS cannot count
     // characters.
+    //
+    // **The icon's slot is inside the mark only while it holds an icon**, so a
+    // dot is still an indicator with nothing in it. Until then the slot waits
+    // outside, hidden, to hear an icon arrive.
+    const icon = this.hasIcon
+      ? html`<slot
+          aria-hidden="true"
+          name="icon"
+          part="icon"
+          @slotchange=${this.readIcon}
+        ></slot>`
+      : nothing
     return html`<slot @slotchange=${this.handleSlotchange}></slot>
+      ${this.hasIcon ? nothing : html`<slot hidden name="icon" @slotchange=${this.readIcon}></slot>`}
       <span
         part="indicator"
         data-blank=${blank ? '' : nothing}
-        data-single=${text.length <= 1 ? '' : nothing}
+        data-single=${text.length + (this.hasIcon ? 1 : 0) <= 1 ? '' : nothing}
         role="status"
         aria-label=${announced ? this.words : nothing}
-        >${blank ? html`<span aria-hidden="true">${text}</span>` : text}</span
+        >${icon}${blank ? html`<span aria-hidden="true">${text}</span>` : text}</span
       >`
   }
 }
