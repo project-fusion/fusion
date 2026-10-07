@@ -16,6 +16,8 @@ import {
   offeredTimes,
   reportValues,
   secondsAsValue,
+  slotFilled,
+  slottedWords,
   timeBarred,
   timeFault,
   valueAsSeconds,
@@ -26,7 +28,7 @@ import {
   writeClock,
 } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { property, state } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
 import { wheelName } from '../wheel-name.js'
 /* Relative, so this registers the headless elements and the styled file's
@@ -67,11 +69,32 @@ import '../../option/index.js'
  * its choice in markup for the same reason. The list and the wheels both do
  * this, because each wheel is also a listbox.
  *
+ * **Keyboard.** The list is one tab stop, and each wheel is one.
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Down, Up | Moves to the next or the previous time, or in a wheel to the next or the previous hour, minute, second, or half of the day. |
+ * | Home, End | Moves to the first or the last time, or the first or the last in a wheel. |
+ * | Page Down, Page Up | Moves by as many times as the list shows at once. |
+ * | Digits | Moves to the next time that starts with what you typed, such as `9` for 9:00. |
+ * | Enter, Space | Chooses the highlighted time. Moving chooses too, except under `manual` or with a `mode`. With a `mode`, Space adds or removes the time. |
+ * | Right, Left | In the wheels, moves to the next or the previous wheel, mirrored right to left. |
+ * | Tab | Moves to the next wheel, then out of the picker. |
+ *
+ * **ARIA.** The list is a `listbox` named by `label`, a slotted label, the
+ * host's `aria-label` or its `aria-labelledby`, with `aria-multiselectable`
+ * with a `mode` and `aria-invalid` while `feedback` says what is wrong. The
+ * wheels are a `group` with that name, holding one `listbox` per wheel, named
+ * "Hour", "Minute", "Second" and "AM/PM" in the page's language.
+ *
  * @since 0.1.0
  * @status stable
  * @category forms
  * @aliases Time, TimeList
  * @documentation https://fusion.dev/helix/components/time-picker
+ *
+ * @slot empty - What the list shows when no time falls between `min` and `max`, for content richer than `empty-text`.
+ * @slot label - A visible label above the times, which names the list, for content richer than the `label` text.
  *
  * @event {Event} change - Fired after the value changes.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the time changes, and cancelable. Canceling it keeps the current time.
@@ -92,6 +115,7 @@ import '../../option/index.js'
  * @csspart column-search-field - The filter field.
  * @csspart columns - The row of columns, in `wheels`.
  * @csspart feedback - The message under the times, while `feedback` is set.
+ * @csspart label - The visible label above the times, drawn while a label is slotted.
  * @csspart list - The listbox holding the times, in `list`.
  * @csspart list-empty - The text shown when the filter hides every option.
  * @csspart list-error - The list's `error` part, which Time Picker never sets: its times do not load.
@@ -158,6 +182,15 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
   disableTimes = ''
 
   /**
+   * What the list says when no time falls between `min` and `max`.
+   *
+   * The fallback of the `empty` slot.
+   */
+  @words
+  @property({ attribute: 'empty-text' })
+  emptyText = 'No times to choose from'
+
+  /**
    * The clock the times are written on: `h12` for twelve hours with a
    * meridiem, `h23` for twenty-four.
    *
@@ -180,7 +213,8 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
   /**
    * Accessible name for the list, which has no visible one of its own.
    *
-   * An `aria-label` or `aria-labelledby` on the host names the list instead.
+   * An `aria-label` or `aria-labelledby` on the host names the list instead,
+   * and so does a label slotted into `label`, which is also drawn above it.
    */
   @words
   @property()
@@ -804,7 +838,28 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
    * aria-label="Slot">` was a listbox named "Time".
    */
   private get listName(): string {
-    return hostWords(this, this.label)
+    const slotted = this.labelSlotted ? slottedWords(this, ['label']) : ''
+    return hostWords(this, slotted || this.label)
+  }
+
+  /** Whether a label is slotted, which draws the `label` part around it. */
+  @state()
+  private labelSlotted = false
+
+  /** Reads the `label` slot, and the list's name again with it. */
+  private readonly handleLabelSlot = (event: Event): void => {
+    this.labelSlotted = slotFilled(event.target as HTMLSlotElement)
+    this.requestUpdate()
+  }
+
+  /**
+   * The slotted label, in the `label` part, above the times. A bare slot while
+   * nothing is slotted, which draws no box.
+   */
+  private renderSlottedLabel(): TemplateResult {
+    return this.labelSlotted
+      ? html`<div part="label"><slot name="label" @slotchange=${this.handleLabelSlot}></slot></div>`
+      : html`<slot name="label" @slotchange=${this.handleLabelSlot}></slot>`
   }
 
   /**
@@ -1018,6 +1073,7 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
       aria-label=${this.listName}
       data-unset=${this.value === '' ? '' : nothing}
       ?disabled=${this.isDisabled}
+      empty-text=${this.emptyText}
       ?manual=${this.manual}
       ?multiple=${this.mode !== undefined}
       .value=${this.value}
@@ -1039,6 +1095,7 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
           >${writeClock(at, this.clock, this.seconds)}</${this.tag('option')}
         >`
       })}
+      <slot name="empty" slot="empty">${this.emptyText}</slot>
     </${this.tag('listbox')}>`
   }
 
@@ -1047,9 +1104,9 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
        range on wheels is two sets of wheels and a multiple is a set, which a
        wheel cannot hold. */
     if (this.variant === 'wheels' && this.mode === undefined) {
-      return html`${this.renderSpinner()}${this.renderPickerFeedback()}`
+      return html`${this.renderSlottedLabel()}${this.renderSpinner()}${this.renderPickerFeedback()}`
     }
-    return html`${this.renderList()}${this.renderPickerFeedback()}`
+    return html`${this.renderSlottedLabel()}${this.renderList()}${this.renderPickerFeedback()}`
   }
 
   /**
