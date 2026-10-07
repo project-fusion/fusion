@@ -462,3 +462,33 @@ describe('a press on a range track', () => {
     expect(host.value).toBe('40')
   })
 })
+
+describe('Page Up and Page Down under `page-step`', () => {
+  const page = async (host: Slider, at: number, key: string): Promise<void> => {
+    thumbs(host)[at]?.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key }),
+    )
+    await host.updateComplete
+  }
+
+  /* React Aria's `pageSize` and Zag's `largeStep`. Measured before this, the
+     page keys moved a tenth of the track, the platform's step, and nothing
+     set it. */
+  test('move a thumb that far, and say `change`', async () => {
+    const host = await slider('default-value="40" page-step="25"')
+    const heard: string[] = []
+    host.addEventListener('change', () => heard.push(host.value))
+    await page(host, 0, 'PageUp')
+    expect(host.value).toBe('65')
+    await page(host, 0, 'PageDown')
+    await page(host, 0, 'PageDown')
+    expect(host.value).toBe('15')
+    expect(heard).toEqual(['65', '40', '15'])
+  })
+
+  test("and a range's thumb, kept short of its neighbor", async () => {
+    const host = await slider('range default-value="20,60" page-step="50"')
+    await page(host, 0, 'PageUp')
+    expect(host.value).toBe('60,60')
+  })
+})
