@@ -1,5 +1,6 @@
 import {
   customElement,
+  formatWords,
   type HelixBeforeEditEvent,
   HelixBeforePanelResizeEvent,
   type HelixBeforeResizeEvent,
@@ -10,6 +11,7 @@ import {
   HelixPanelResizeEvent,
   HelixSplitEvent,
   requestChange,
+  words,
 } from '@fusion.dev/helix-core'
 import '../../splitter/index.js'
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
@@ -89,9 +91,16 @@ const PANEL_MAX = 0.8
 @customElement('helix-sandbox')
 export class HelixSandbox extends HelixElement {
   /**
+   * The key this family's words are registered under, its tag:
+   * `registerWords('de', { 'helix-sandbox': { panelLabel: 'Bereich anpassen' } })`.
+   */
+  static words = 'helix-sandbox'
+
+  /**
    * The name of the corner handle that moves both dividers at once, read by
    * screen readers.
    */
+  @words
   @property({ attribute: 'corner-label' })
   cornerLabel = 'Resize panes and panel'
 
@@ -170,6 +179,7 @@ export class HelixSandbox extends HelixElement {
   /**
    * The name of the panel's divider, read by screen readers.
    */
+  @words
   @property({ attribute: 'panel-label' })
   panelLabel = 'Resize panel'
 
@@ -181,12 +191,13 @@ export class HelixSandbox extends HelixElement {
 
   /**
    * The name of the divider between the panes, read by screen readers.
-   *
-   * Empty names the lead pane, "Resize source pane" or "Resize preview pane",
-   * since the divider's value is that pane's share.
+   * `{pane}` is the lead pane, `source` or `preview`, whose share the
+   * divider's value is, so each is a whole sentence: "Resize source pane" or
+   * "Resize preview pane".
    */
+  @words
   @property({ attribute: 'separator-label' })
-  separatorLabel = ''
+  separatorLabel = '{pane, select, preview {Resize preview pane} other {Resize source pane}}'
 
   /**
    * Percentage of the sandbox given to the lead pane: the source, unless `lead`
@@ -744,8 +755,7 @@ export class HelixSandbox extends HelixElement {
        Rendering both slots in both positions would be two elements answering
        to one name, and an assignment goes to the first. */
     const home = Number.isFinite(this.defaultSplit) ? this.defaultSplit : DEFAULT_SPLIT
-    const label =
-      this.separatorLabel || (first === 'preview' ? 'Resize preview pane' : 'Resize source pane')
+    const label = formatWords(this, 'separatorLabel', { pane: first })
     return html`<slot name="toolbar"></slot>
       <helix-splitter part="body" ?data-panel=${this.hasPanel} exportparts="separator, corner"
         orientation="vertical" collapsed-size=${this.panelSliver} corner-label=${this.cornerLabel}

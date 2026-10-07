@@ -6,6 +6,7 @@ import {
   HelixElement,
   onUnlessFalse,
   restoreValue,
+  words,
 } from '@fusion.dev/helix-core'
 import type { CSSResultGroup, TemplateResult } from 'lit'
 import { html, nothing } from 'lit'
@@ -67,14 +68,22 @@ const MODIFIERS = new Set(['Alt', 'AltGraph', 'Control', 'Meta', 'Shift'])
 @customElement('helix-sandbox-source')
 export class HelixSandboxSource extends HelixElement {
   /**
+   * The key this part's words are registered under, its tag:
+   * `registerWords('de', { 'helix-sandbox-source': { fieldLabel: 'Quelltext' } })`.
+   */
+  static words = 'helix-sandbox-source'
+
+  /**
    * The editable region's name, read by screen readers.
    */
+  @words
   @property({ attribute: 'field-label' })
   fieldLabel = 'Example source'
 
   /**
    * The field's description, read by screen readers while Tab indents.
    */
+  @words
   @property({ attribute: 'keys-description' })
   keysDescription =
     'Tab inserts two spaces. To leave, press Escape and then Tab, or press Shift+Tab to go back.'

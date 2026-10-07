@@ -1,4 +1,4 @@
-import { customElement, HelixElement } from '@fusion.dev/helix-core'
+import { customElement, formatWords, HelixElement, words } from '@fusion.dev/helix-core'
 import type { SpecResult } from '@fusion.dev/helix-testing/browser'
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
 import { html, nothing } from 'lit'
@@ -60,6 +60,19 @@ interface ResultsMessage {
 @customElement('helix-sandbox-specs')
 export class HelixSandboxSpecs extends HelixElement {
   /**
+   * The key this part's words are registered under, its tag:
+   * `registerWords('de', { 'helix-sandbox-specs': { runningText: 'Läuft…' } })`.
+   */
+  static words = 'helix-sandbox-specs'
+
+  /**
+   * Shown when nothing has run yet.
+   */
+  @words
+  @property({ attribute: 'empty-text' })
+  emptyText = 'No specs have been run.'
+
+  /**
    * Which family's specs to run.
    *
    * Changing it runs them.
@@ -70,8 +83,16 @@ export class HelixSandboxSpecs extends HelixElement {
   /**
    * Accessible name for the results.
    */
+  @words
   @property()
   label = 'Spec results'
+
+  /**
+   * Shown while the specs run.
+   */
+  @words
+  @property({ attribute: 'running-text' })
+  runningText = 'Running…'
 
   /**
    * The document that runs them.
@@ -80,6 +101,16 @@ export class HelixSandboxSpecs extends HelixElement {
    */
   @property()
   src = ''
+
+  /**
+   * The counts and how long the run took, once it is done. `{passed}` and
+   * `{failed}` are how many passed and failed and `{time}` the milliseconds it
+   * took, each written in the locale.
+   */
+  @words
+  @property({ attribute: 'summary-label' })
+  summaryLabel =
+    '{failed, plural, =0 {{passed} passed in {time}ms} other {{passed} passed, {failed} failed in {time}ms}}'
 
   @state()
   private results: SpecResult[] = []
@@ -262,7 +293,7 @@ export class HelixSandboxSpecs extends HelixElement {
 
   private summary(): TemplateResult | typeof nothing {
     if (this.running) {
-      return html`<p part="summary">Running…</p>`
+      return html`<p part="summary">${this.runningText}</p>`
     }
     if (this.failure !== '') {
       return html`<p part="summary" data-state="fail">${this.failure}</p>`
@@ -273,8 +304,7 @@ export class HelixSandboxSpecs extends HelixElement {
     const failed = this.failed
     const passed = this.results.length - failed
     return html`<p part="summary" data-state=${failed > 0 ? 'fail' : 'pass'}>
-      ${passed} passed${failed > 0 ? `, ${failed} failed` : ''} in
-      ${Math.round(this.elapsed)}ms
+      ${formatWords(this, 'summaryLabel', { failed, passed, time: Math.round(this.elapsed) })}
     </p>`
   }
 
@@ -285,7 +315,7 @@ export class HelixSandboxSpecs extends HelixElement {
       <div part="results" role="status" aria-label=${this.label} tabindex="0">
         ${
           nothingYet
-            ? html`<p part="empty">No specs have been run.</p>`
+            ? html`<p part="empty">${this.emptyText}</p>`
             : this.grouped.map(
                 (group) => html`<section>
                   ${group.suite === '' ? nothing : html`<h3 part="suite">${group.suite}</h3>`}
