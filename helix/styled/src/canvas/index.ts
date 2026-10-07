@@ -6,6 +6,8 @@ export type {
   CanvasNode,
   CanvasNodeProps,
   CanvasPath,
+  CanvasRoute,
+  CanvasRouteEnds,
   CanvasSide,
   CanvasTone,
 } from '@fusion.dev/helix-headless/canvas'

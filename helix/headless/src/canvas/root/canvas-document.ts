@@ -153,6 +153,31 @@ const nearestSides = (from: CanvasNode, to: CanvasNode): [CanvasSide, CanvasSide
 /** How a connector travels between the two cards it joins. */
 export type CanvasPath = 'curve' | 'straight' | 'step'
 
+/** What a board's `route` is given for one connection, in the board's own units. */
+export interface CanvasRouteEnds {
+  /** The connection. */
+  edge: CanvasEdge
+  /** Where it arrives, on the side of the card it arrives at. */
+  end: { x: number; y: number }
+  /** The side of the card it leaves. */
+  fromSide: CanvasSide
+  /** The route the board would draw: the connection's `path`, or the board's. */
+  path: CanvasPath
+  /** Where it leaves, on the side of the card it leaves. */
+  start: { x: number; y: number }
+  /** The side of the card it arrives at. */
+  toSide: CanvasSide
+}
+
+/**
+ * Draws a connection's line: its SVG path from `start` to `end`, and where its
+ * label sits, the middle of the two ends where it says nothing. Nothing back
+ * draws the board's own.
+ */
+export type CanvasRoute = (
+  ends: CanvasRouteEnds,
+) => { d: string; mid?: { x: number; y: number } | undefined } | undefined
+
 /** The unit step out of a side, which is where a connector leaves it. */
 const normal = (side: CanvasSide): { x: number; y: number } => ({
   x: side === 'left' ? -1 : side === 'right' ? 1 : 0,

@@ -36,6 +36,8 @@ import { styles } from './canvas-root.css.js'
  * @cssproperty --canvas-label-color - The color of the label on a connection.
  * @cssproperty --canvas-label-editor-inline-size - The width of the field for editing a label.
  * @cssproperty --canvas-label-font-size - The size of the label on a connection.
+ * @cssproperty --canvas-minimap-block-size - The height of the minimap, under `controls="minimap"`.
+ * @cssproperty --canvas-minimap-inline-size - The width of the minimap, under `controls="minimap"`.
  * @cssproperty --canvas-radius - The frame's corners.
  * @cssproperty --canvas-selected-color - The color of what is selected: a card's outline, its corners and its move handle, a connection and its ends, and the box drawn to select.
  * @cssproperty --viewport-control-background-color - The background of the pan and zoom buttons. `Map` uses the same property.
