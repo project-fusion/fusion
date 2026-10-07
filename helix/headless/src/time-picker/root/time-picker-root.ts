@@ -129,7 +129,6 @@ import '../../option/root/index.js'
  * @csspart hint - Help under the times, shown while there is no message in `feedback`.
  * @csspart label - The visible label above the times, drawn while a label is slotted.
  * @csspart list - The listbox holding the times, in `list`.
- * @csspart now - The button that chooses the current time, drawn with `show-now`.
  * @csspart list-empty - The text shown when the filter hides every option.
  * @csspart list-error - The list's `error` part, which Time Picker never sets: its times do not load.
  * @csspart list-feedback - The message that says what is wrong with the value.
@@ -142,6 +141,7 @@ import '../../option/root/index.js'
  * @csspart list-loading - The text shown while the options load.
  * @csspart list-search - The region that holds the filter field.
  * @csspart list-search-field - The filter field.
+ * @csspart now - The button that chooses the current time, drawn with `show-now`.
  * @csspart option - One time in the list. It carries `data-between` inside a range, and inside the run to the time under the pointer while a range waits for its second end.
  * @csspart option-between - A time inside a chosen range, excluding its ends, beside `option`.
  * @csspart option-description - The caption under the time's label, when there is one.
