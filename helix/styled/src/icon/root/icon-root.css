@@ -10,6 +10,90 @@
 [part="svg"] {
   block-size: 100%;
   inline-size: 100%;
+  rotate: var(--icon-rotate, none);
+}
+
+/* The box takes the glyph's proportions: its height from the size, its width
+   from the drawing's own box. */
+:host([auto-width]) {
+  inline-size: auto;
+}
+
+:host([auto-width]) [part="svg"] {
+  inline-size: auto;
+}
+
+/* Turned and flipped on the glyph, inside the box. A flip is a `transform`,
+   which composes with the `scale` that `mirror` sets on a right-to-left page. */
+:host([rotate="90"]) [part="svg"] {
+  rotate: 90deg;
+}
+
+:host([rotate="180"]) [part="svg"] {
+  rotate: 180deg;
+}
+
+:host([rotate="270"]) [part="svg"] {
+  rotate: 270deg;
+}
+
+:host([flip="x"]) [part="svg"] {
+  transform: scale(-1, 1);
+}
+
+:host([flip="y"]) [part="svg"] {
+  transform: scale(1, -1);
+}
+
+:host([flip="both"]) [part="svg"] {
+  transform: scale(-1, -1);
+}
+
+/* On the host, which turns, fades or swells as a whole, so the glyph's own
+   turn and flip hold inside it. */
+:host([animation="spin"]) {
+  animation: helix-icon-spin var(--icon-animation-duration, calc(var(--helix-duration-slow) * 3))
+    linear infinite;
+}
+
+:host([animation="pulse"]) {
+  animation: helix-icon-pulse var(--icon-animation-duration, calc(var(--helix-duration-slow) * 6))
+    ease-in-out infinite;
+}
+
+:host([animation="beat"]) {
+  animation: helix-icon-beat var(--icon-animation-duration, calc(var(--helix-duration-slow) * 3))
+    ease-in-out infinite;
+}
+
+@keyframes helix-icon-spin {
+  to {
+    rotate: 1turn;
+  }
+}
+
+@keyframes helix-icon-pulse {
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes helix-icon-beat {
+  0%,
+  60%,
+  100% {
+    scale: 1;
+  }
+
+  30% {
+    scale: 1.2;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host([animation]) {
+    animation: none;
+  }
 }
 
 /* Print: a glyph, which prints as ink.

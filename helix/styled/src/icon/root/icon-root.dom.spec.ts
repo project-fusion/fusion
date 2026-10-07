@@ -54,3 +54,50 @@ describe('icon', () => {
     expect(icon.getAttributeNames()).toEqual(['name'])
   })
 })
+
+/* Web Awesome's icon turns, flips and animates its glyph; here a page wrote
+   its own transform onto the part. */
+describe('turning, flipping and moving the glyph', () => {
+  type Icon = HTMLElement & {
+    animation?: string
+    autoWidth: boolean
+    flip?: string
+    rotate?: number
+    updateComplete: Promise<unknown>
+  }
+
+  test('rotate, flip, animation and auto-width reflect, so the sheet can read them', async () => {
+    const icon = (await mount('<helix-icon name="gear"></helix-icon>')) as Icon
+    icon.rotate = 90
+    icon.flip = 'x'
+    icon.animation = 'spin'
+    icon.autoWidth = true
+    await icon.updateComplete
+    expect(icon.getAttribute('rotate')).toBe('90')
+    expect(icon.getAttribute('flip')).toBe('x')
+    expect(icon.getAttribute('animation')).toBe('spin')
+    expect(icon.hasAttribute('auto-width')).toBe(true)
+  })
+
+  test('the glyph turns by a quarter or by any angle, and flips with a transform', () => {
+    expect(rule('[part="svg"]')).toContain('rotate: var(--icon-rotate, none)')
+    expect(rule(':host([rotate="90"]) [part="svg"]')).toContain('rotate: 90deg')
+    expect(rule(':host([rotate="270"]) [part="svg"]')).toContain('rotate: 270deg')
+    /* A transform, so it composes with the `scale` the mirror sets. */
+    expect(rule(':host([flip="x"]) [part="svg"]')).toContain('transform: scale(-1, 1)')
+    expect(rule(':host([flip="both"]) [part="svg"]')).toContain('transform: scale(-1, -1)')
+  })
+
+  test('each animation runs on the host at a hook, and reduced motion stills them all', () => {
+    expect(rule(':host([animation="spin"])')).toContain('var(--icon-animation-duration,')
+    expect(rule(':host([animation="pulse"])')).toContain('helix-icon-pulse')
+    expect(rule(':host([animation="beat"])')).toContain('helix-icon-beat')
+    expect(sheet()).toMatch(
+      /prefers-reduced-motion: reduce\)\s*\{\s*:host\(\[animation\]\)\s*\{\s*animation: none/,
+    )
+  })
+
+  test('auto-width lets the box follow the glyph', () => {
+    expect(rule(':host([auto-width])')).toContain('inline-size: auto')
+  })
+})
