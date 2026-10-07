@@ -8,6 +8,7 @@ import paging from '../.examples/paging.html' with { type: 'text' }
 import preview from '../.examples/preview.html' with { type: 'text' }
 import searching from '../.examples/searching.html' with { type: 'text' }
 import arranging from '../.examples/selecting-and-arranging.html' with { type: 'text' }
+import serving from '../.examples/serving-the-first-page.html' with { type: 'text' }
 import summary_and_size from '../.examples/summary-and-size.html' with { type: 'text' }
 import windowed_paging from '../.examples/windowed-paging.html' with { type: 'text' }
 import windowing from '../.examples/windowing.html' with { type: 'text' }
@@ -214,4 +215,30 @@ describe('the moving rows example', () => {
       )
     },
   )
+})
+
+describe('the serving example', () => {
+  /* The served rows are the page's markup and the drawn ones are the table's, so
+     they line up only if the two are laid out alike. Measured cell by cell:
+     the words, and the box each one sits in, before and after the rows draw. */
+  run('the rows the page served stand where the drawn rows draw, with the same words', async () => {
+    const [markup, script] = String(serving).split('<script>')
+    await example(markup)
+    await idle()
+    const files = document.getElementById('files') as HTMLElement
+    const box = (cell: Element): (number | string)[] => {
+      const { height, width, x, y } = cell.getBoundingClientRect()
+      return [
+        cell.textContent?.trim() ?? '',
+        ...[x, y, width, height].map((one) => Math.round(one)),
+      ]
+    }
+    const served = [...files.querySelectorAll('helix-table-cell')].map(box)
+    expect(served).toHaveLength(12)
+    expect(rows(files)).toHaveLength(0)
+    new Function(String(script).replace('</script>', ''))()
+    await idle()
+    const drawn = [...(files.shadowRoot?.querySelectorAll('[part~="cell"]') ?? [])].map(box)
+    expect(drawn).toEqual(served)
+  })
 })
