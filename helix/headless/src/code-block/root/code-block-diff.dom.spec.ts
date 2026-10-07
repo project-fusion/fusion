@@ -145,9 +145,10 @@ describe('a split diff', () => {
     const host = await block('diff variant="split" context-lines="0"', long)
     const [old] = parts(host, 'old')
     const [now] = parts(host, 'new')
+    const shadow = now?.querySelector('[part="fold"]') as HTMLElement
     expect(old?.querySelector('[part="fold"]')?.localName).toBe('button')
-    expect(now?.querySelector('[part="fold"]')?.getAttribute('aria-hidden')).toBe('true')
-    ;(now?.querySelector('[part="fold"]') as HTMLElement).click()
+    expect(shadow.getAttribute('aria-hidden')).toBe('true')
+    shadow.click()
     await host.updateComplete
     expect(old?.querySelector('[part="fold"]')?.getAttribute('aria-expanded')).toBe('true')
     expect(now?.querySelectorAll('[part="context"]')).toHaveLength(5)
