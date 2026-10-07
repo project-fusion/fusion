@@ -1270,3 +1270,60 @@ describe('splitter states and handle', () => {
     expect(slot.assignedElements().map((one) => one.textContent)).toEqual(['grip'])
   })
 })
+
+describe('a primary pane', () => {
+  type Holding = Splitter & { holdPrimary(length: number): void }
+
+  test('keeps its pixels as the splitter grows, and the other pane takes the change', async () => {
+    const start = (await splitter('primary="start" default-position="25"')) as Holding
+    /* What the length watch reports: 800 pixels, then 1000. */
+    start.holdPrimary(800)
+    start.holdPrimary(1000)
+    await start.updateComplete
+    expect(start.position).toBe(20)
+
+    const end = (await splitter('primary="end" default-position="75"')) as Holding
+    end.holdPrimary(800)
+    end.holdPrimary(1000)
+    await end.updateComplete
+    expect(end.position).toBe(80)
+  })
+
+  test('and without one, both panes keep their share', async () => {
+    const host = (await splitter('default-position="25"')) as Holding
+    host.holdPrimary(800)
+    host.holdPrimary(1000)
+    await host.updateComplete
+    expect(host.position).toBe(25)
+  })
+})
+
+describe('F6', () => {
+  test('moves focus from one pane to the first control in the other', async () => {
+    const host = (await mount(`<helix-headless-splitter>
+      <div slot="start"><button id="a">A</button></div>
+      <div slot="end"><p>Text</p><button id="b">B</button></div>
+    </helix-headless-splitter>`)) as Splitter
+    await host.updateComplete
+    const a = host.querySelector('#a') as HTMLElement
+    const b = host.querySelector('#b') as HTMLElement
+    const f6 = (from: HTMLElement): KeyboardEvent => {
+      const event = new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        key: 'F6',
+      })
+      from.dispatchEvent(event)
+      return event
+    }
+    a.focus()
+    expect(f6(a).defaultPrevented).toBe(true)
+    expect(document.activeElement).toBe(b)
+    f6(b)
+    expect(document.activeElement).toBe(a)
+    separator(host).focus()
+    f6(separator(host))
+    expect(document.activeElement).toBe(a)
+  })
+})
