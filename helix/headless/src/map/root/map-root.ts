@@ -157,7 +157,8 @@ const SETTLES = 400
  * same `group`, such as a route and its dotted legs, share one tile. A tile
  * sends `helix-before-toggle` from the layer first, so you can store the
  * choice or refuse it, and `helix-toggle` from it once `hidden` holds the
- * choice.
+ * choice. Escape closes the menu and returns focus to its button, and the menu
+ * closes when focus moves on from it or a press lands outside the map.
  *
  * Imagery, a `helix-map-raster` with `ground`, is a map type and not a tile.
  * The menu opens with a card for each type, Standard, Hybrid, and Satellite,
