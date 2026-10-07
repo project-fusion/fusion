@@ -58,6 +58,9 @@ type CalloutTone = 'danger' | 'info' | 'neutral' | 'success' | 'warning'
  * @csspart dismiss-mark - The cross on the dismiss button, shown when the `dismiss-icon` slot is empty.
  * @csspart icon - The icon region, an image named for the tone.
  * @csspart icon-mark - The icon for the tone, shown when no icon is slotted.
+ *
+ * @cssstate has-heading - Something is slotted into `heading`.
+ * @cssstate has-icon - An icon of your own is slotted into `icon`, in place of the tone's.
  */
 @customElement('helix-headless-callout')
 export class HelixHeadlessCallout extends MixinDismissible(HelixElement) {
@@ -140,7 +143,7 @@ export class HelixHeadlessCallout extends MixinDismissible(HelixElement) {
   protected renderIcon(icon: { content: string; viewBox: string }, _label: string): TemplateResult {
     /* `aria-hidden` on the slot, so an icon a page slots is drawn and not
        read: Chromium read an unnamed image beside the tone's name. */
-    return html`<slot name="icon" aria-hidden="true">
+    return html`<slot name="icon" aria-hidden="true" @slotchange=${this.readRegions}>
       <svg part="icon-mark" fill="currentColor" viewBox=${icon.viewBox} aria-hidden="true">
         ${unsafeSVG(icon.content)}
       </svg>
@@ -176,6 +179,29 @@ export class HelixHeadlessCallout extends MixinDismissible(HelixElement) {
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
     this.finishHydration()
+  }
+
+  /* Read after every render as well as on `slotchange`, because a hydrated
+     slot was filled before any listener was bound and sends no change. */
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    this.readRegions()
+  }
+
+  /** Says which regions hold something, one call apiece so each pairs with its `@cssstate`. */
+  private readonly readRegions = (): void => {
+    /* What a page slotted, which is not the slot's own fallback: the tone's
+       mark is the icon slot's child, and a flattened read counts it. */
+    const filled = (name: string): boolean => {
+      const slot = this.renderRoot?.querySelector<HTMLSlotElement>(`slot[name="${name}"]`)
+      return (slot?.assignedNodes({ flatten: true }) ?? []).some(
+        (node) =>
+          node.parentNode !== slot &&
+          (node.nodeType === Node.ELEMENT_NODE || node.textContent?.trim() !== ''),
+      )
+    }
+    this.toggleState('has-heading', filled('heading'))
+    this.toggleState('has-icon', filled('icon'))
   }
 
   protected override render(): TemplateResult {
