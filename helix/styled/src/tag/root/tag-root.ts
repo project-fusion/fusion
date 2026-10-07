@@ -11,6 +11,11 @@ import { styles } from './tag-root.css.js'
  * Seven tones. The fill is a tint of the status color made with `color-mix`, so
  * when a theme changes its status colors, the tints change with them.
  *
+ * A tag takes its height from the region it is in, as the controls beside it
+ * do: `data-density="sm"`, `md`, or `lg` on the tag or on any element around
+ * it sets `--helix-size-tag` to the small, resting, or large step, so a row of
+ * tags and buttons stays one height. `shape="pill"` rounds its ends.
+ *
  * @since 0.1.0
  * @status stable
  * @category markers
