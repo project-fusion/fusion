@@ -127,7 +127,7 @@ import { HelixMoveEvent } from './move.js'
 import { HelixNavigateEvent } from './navigate.js'
 import { HelixNextEvent } from './next.js'
 import { HelixPanelResizeEvent } from './panel-resize.js'
-import { HelixPasteEvent } from './paste.js'
+import { HelixPastedEvent } from './pasted.js'
 import { HelixPinEvent } from './pin.js'
 import { HelixPressEvent } from './press.js'
 import { HelixPreviewEvent } from './preview.js'
@@ -279,7 +279,7 @@ export {
   HelixNavigateEvent,
   HelixNextEvent,
   HelixPanelResizeEvent,
-  HelixPasteEvent,
+  HelixPastedEvent,
   HelixPinEvent,
   HelixPressEvent,
   HelixPreviewEvent,
@@ -387,7 +387,7 @@ const registry = {
   HelixNavigateEvent,
   HelixNextEvent,
   HelixPanelResizeEvent,
-  HelixPasteEvent,
+  HelixPastedEvent,
   HelixPinEvent,
   HelixPressEvent,
   HelixPreviewEvent,

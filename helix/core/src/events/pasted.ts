@@ -1,11 +1,11 @@
 import type { PasteDetail } from './details.js'
 
 /** Cards and connections were pasted onto a board, which now holds them. */
-export class HelixPasteEvent extends CustomEvent<PasteDetail> {
-  static readonly eventName = 'helix-paste'
+export class HelixPastedEvent extends CustomEvent<PasteDetail> {
+  static readonly eventName = 'helix-pasted'
 
   constructor(detail: PasteDetail) {
-    super(HelixPasteEvent.eventName, {
+    super(HelixPastedEvent.eventName, {
       bubbles: true,
       cancelable: false,
       composed: true,

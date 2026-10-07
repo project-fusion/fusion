@@ -229,7 +229,7 @@ export {
   HelixNavigateEvent,
   HelixNextEvent,
   HelixPanelResizeEvent,
-  HelixPasteEvent,
+  HelixPastedEvent,
   HelixPinEvent,
   HelixPressEvent,
   HelixPreviewEvent,

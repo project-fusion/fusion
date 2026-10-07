@@ -621,7 +621,7 @@ describe('canvas moves', () => {
       ],
     })
     let pasted: unknown
-    host.addEventListener('helix-paste', (event) => {
+    host.addEventListener('helix-pasted', (event) => {
       pasted = (event as CustomEvent).detail.document
     })
     const event = new Event('paste', { bubbles: true, cancelable: true, composed: true })
