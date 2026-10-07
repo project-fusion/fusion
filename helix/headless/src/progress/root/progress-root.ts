@@ -264,7 +264,7 @@ export class HelixHeadlessProgress extends HelixElement {
      * carried and what a screen reader read out. */
     this.internals.ariaValueNow = this.indeterminate
       ? null
-      : String(Math.min(Math.max(this.value || min, min), max))
+      : String(Math.min(Math.max(Number.isNaN(this.value) ? min : this.value, min), max))
     /* The words the bar shows, said whether or not they are shown. Left to the
        platform, a range from 12 to 20 at 16 was read as "16" where the bar
        draws half, and in the runtime's digits rather than the page's. React
