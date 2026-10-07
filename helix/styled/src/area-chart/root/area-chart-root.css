@@ -90,6 +90,52 @@
   white-space: nowrap;
 }
 
+/* Relative, so a tick's percentage resolves against the axis, which the grid
+   makes exactly as tall as the plot it sits beside. As wide as its widest
+   number, which the chart writes, since a positioned tick gives no width, and
+   a character more, since a sign or a percent is wider than a digit. */
+[part="axis"] {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-xs);
+  font-variant-numeric: tabular-nums;
+  inline-size: calc(var(--area-chart-axis, 3ch) + 1ch);
+  pointer-events: none;
+  position: relative;
+}
+
+/* Centered on the level it names, for the reason `BarChart` gives: a number
+   whose top edge is on the line reads as belonging to the band under it. */
+[part="tick"] {
+  inset-inline-end: 0;
+  position: absolute;
+  translate: 0 -50%;
+  white-space: nowrap;
+}
+
+/*
+ *  The scale's numbers, under `value-axis`, in a column of their own beside the
+ *  plot.
+ *
+ * **A column of the host grid, not a layer over the plot**, for the reason
+ * `BarChart` gives: the plot is the pointer's catchment and the tooltip's
+ * containing block, both measured from its box, so padding it to make room
+ * would move every reading. At the inline start, where the drawing starts on
+ * either page direction.
+ */
+:host([value-axis]) {
+  grid-template-columns: auto 1fr;
+}
+
+:host([value-axis]) [part="axis"] {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+:host([value-axis]) [part="plot"],
+:host([value-axis]) [part="labels"] {
+  grid-column: 2;
+}
+
 /* Said and not shown: the bands are the picture of it. Out of sight and in the
    accessibility tree, the recipe Pagination uses for its own words. */
 [part="summary"] {

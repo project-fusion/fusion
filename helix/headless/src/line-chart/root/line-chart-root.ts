@@ -5,7 +5,9 @@ import {
   commaList,
   customElement,
   drawTooltip,
+  drawValueAxis,
   extent,
+  formatNumbers,
   HelixElement,
   HelixReadingChangeEvent,
   HelixReadingPressEvent,
@@ -51,6 +53,9 @@ import '../../tooltip/index.js'
  * `<svg>` that fills its box scales with the box, so the same `font-size` can
  * render at 10px in a narrow chart and 43px in a wide one.
  *
+ * `value-axis` draws the scale's numbers beside the plot, at the levels
+ * `gridlines` rules, written in `locale`.
+ *
  * The table is the accessible representation, and the drawing is hidden from
  * screen readers, who get the numbers. The `summary` part names the chart, from
  * `label` or the table's caption, and gives each series' latest reading.
@@ -76,6 +81,7 @@ import '../../tooltip/index.js'
  * @event {HelixReadingPressEvent} helix-reading-press - A reading was clicked, tapped, or pressed with Enter or Space, with the same detail as `helix-reading-change`.
  *
  * @csspart area - The wash under one line, where `area` is set.
+ * @csspart axis - The numbers of the scale beside the plot, under `value-axis`.
  * @csspart band - The band around the reading under the pointer.
  * @csspart baseline - The rule at zero, where zero is inside the range.
  * @csspart gridline - One rule across the plot, under `gridlines`.
@@ -92,6 +98,7 @@ import '../../tooltip/index.js'
  * @csspart summary - The chart's name and each series' latest reading, written as a sentence for screen readers. Hide it visually.
  * @csspart svg - The drawing surface the lines and areas sit on.
  * @csspart terminus - The mark on one series' last reading.
+ * @csspart tick - One number on the axis, placed with `inset-block-start` at its level.
  * @csspart tooltip - The bubble, forwarded from `Tooltip`.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
  * @csspart tooltip-arrow - The bubble's point, forwarded from `Tooltip`.
@@ -111,6 +118,7 @@ import '../../tooltip/index.js'
  *
  * @cssproperty --chart-terminus-x - Where a series' last reading sits horizontally, as a percentage. Written by the component.
  * @cssproperty --chart-terminus-y - Where a series' last reading sits vertically, as a percentage. Written by the component.
+ * @cssproperty --line-chart-axis - The width of the axis, in `ch`, set from the widest number on it. Written by the component on the axis.
  */
 @customElement('helix-headless-line-chart')
 export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
@@ -270,6 +278,17 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
   @property({ reflect: true })
   terminus?: 'none' | 'ring' | 'square' | 'triangle'
 
+  /**
+   * Draws the scale's numbers beside the plot, the `axis` part, at the levels
+   * `gridlines` rules, so a reading can be measured off the drawing as well
+   * as read from the tooltip.
+   *
+   * Absent draws none: a line read for its shape needs no numbers beside it,
+   * and the tooltip and the table hold every reading.
+   */
+  @property({ attribute: 'value-axis', reflect: true, type: Boolean })
+  valueAxis = false
+
   /** The domain every series is drawn against, which the tooltip also needs. */
   private range(series: Series[]): [number, number] {
     /* Over the series drawn, so hiding one from a legend fits the scale to
@@ -353,7 +372,21 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
     const slot = PLOT_WIDTH / readings.length
     const x = linear([0, Math.max(readings.length - 1, 1)], [slot / 2, PLOT_WIDTH - slot / 2])
 
-    return html`${this.renderPlot(series, x, y, domain)} ${this.renderLabels(readings)}${this.renderSummary(series)}`
+    return html`${this.valueAxis ? this.renderAxis(y, domain) : nothing}${this.renderPlot(series, x, y, domain)} ${this.renderLabels(readings)}${this.renderSummary(series)}`
+  }
+
+  /**
+   * The scale's numbers beside the plot, under `value-axis`, written in the
+   * chart's locale. A seam, so a subclass can write the numbers its own way,
+   * such as a currency.
+   */
+  protected renderAxis(y: (value: number) => number, domain: [number, number]): TemplateResult {
+    return drawValueAxis(
+      domain,
+      (value) => (y(value) / PLOT_HEIGHT) * 100,
+      formatNumbers(wordsLocale(this)),
+      '--line-chart-axis',
+    )
   }
 
   /**

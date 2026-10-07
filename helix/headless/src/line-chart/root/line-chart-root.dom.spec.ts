@@ -531,3 +531,23 @@ describe('the reading, heard by the page', () => {
     ])
   })
 })
+
+/* A reading could be measured only from the tooltip: the drawing had no numbers
+   beside it. */
+describe('value-axis', () => {
+  const ticks = (host: HTMLElement): string[] =>
+    [...(host.shadowRoot?.querySelectorAll('[part="tick"]') ?? [])].map(
+      (one) => one.textContent ?? '',
+    )
+
+  test("draws the scale's numbers beside the plot, at the levels the grid rules", async () => {
+    const host = await chart(SESSIONS, 'for="sessions" value-axis')
+    expect(part(host, 'axis')?.getAttribute('aria-hidden')).toBe('true')
+    expect(ticks(host)).toEqual(['980', '990', '1,000', '1,010', '1,020'])
+  })
+
+  test('absent draws none', async () => {
+    const host = await chart(SESSIONS, 'for="sessions"')
+    expect(part(host, 'axis')).toBeNull()
+  })
+})
