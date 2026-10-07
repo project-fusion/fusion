@@ -31,6 +31,7 @@ interface Detail {
   key: string
   keys: string[]
   kind: string
+  parent?: string
   to: number
   value: string
 }
@@ -181,7 +182,7 @@ describe('a reorderable tree', () => {
     expect(await spoken(tree)).toBe('a.ts moved to position 2 of 3')
   })
 
-  test('moves an item only among its siblings, never into another branch', async () => {
+  test('Alt with Up or Down moves an item only among its siblings', async () => {
     const tree = await make()
     const heard = follow(tree)
     press(item(tree, 'src'), 'End', { altKey: true })
@@ -286,5 +287,81 @@ describe('a pointer dragging an item by its grip', () => {
     press(readme, 'ArrowUp')
     await settle(tree)
     expect(part(tree, 'drag-preview')?.childElementCount ?? 0).toBe(0)
+  })
+})
+
+describe('an item moved into another branch', () => {
+  /* Alt with the arrow along the line goes in a level, under the item before,
+     and the other arrow comes out, after the parent. The page moves it, so
+     this answers as a page whose data is nested would. */
+  const nestFollow = (tree: Tree): Detail[] => {
+    const heard: Detail[] = []
+    tree.addEventListener('helix-reorder', (event) => {
+      const detail = (event as CustomEvent<Detail>).detail
+      heard.push(detail)
+      const into = detail.parent ? item(tree, detail.parent) : tree
+      for (const key of detail.keys) {
+        const one = item(tree, key)
+        if (detail.parent) {
+          one.slot = 'children'
+        } else {
+          one.removeAttribute('slot')
+        }
+        into.append(one)
+      }
+    })
+    return heard
+  }
+
+  test('goes in under the item before it, which opens, and focus follows it', async () => {
+    const tree = await make()
+    const heard = nestFollow(tree)
+    const readme = item(tree, 'readme')
+    readme.focusItem()
+    press(readme, 'ArrowRight', { altKey: true })
+    await settle(tree)
+    expect(heard.map((one) => [one.key, one.parent, one.keys.join(',')])).toEqual([
+      ['readme', 'src', 'a,b,c,readme'],
+    ])
+    expect(order(item(tree, 'src'))).toEqual(['a', 'b', 'c', 'readme'])
+    expect(await spoken(tree)).toBe('README moved into src, position 4 of 4')
+    expect(tree.ownerDocument.activeElement).toBe(readme)
+  })
+
+  test('comes out after its parent, to the top level', async () => {
+    const tree = await make()
+    const heard = nestFollow(tree)
+    const b = item(tree, 'b')
+    b.focusItem()
+    press(b, 'ArrowLeft', { altKey: true })
+    await settle(tree)
+    expect(heard.map((one) => [one.key, one.parent, one.keys.join(',')])).toEqual([
+      ['b', '', 'src,b,readme,license'],
+    ])
+    expect(order(tree)).toEqual(['src', 'b', 'readme', 'license'])
+    expect(await spoken(tree)).toBe('b.ts moved into Files, position 2 of 4')
+  })
+
+  test('a refused move stays put and is said as canceled', async () => {
+    const tree = await make()
+    tree.addEventListener('helix-before-reorder', (event) => event.preventDefault())
+    const readme = item(tree, 'readme')
+    readme.focusItem()
+    press(readme, 'ArrowRight', { altKey: true })
+    expect(await spoken(tree)).toBe('Canceled')
+    expect(order(tree)).toEqual(['src', 'readme', 'license'])
+  })
+
+  test('nothing moves where the tree does not reorder', async () => {
+    const tree = await make('')
+    let heard = 0
+    tree.addEventListener('helix-before-reorder', () => {
+      heard += 1
+    })
+    const readme = item(tree, 'readme')
+    readme.focusItem()
+    press(readme, 'ArrowRight', { altKey: true })
+    await settle(tree)
+    expect(heard).toBe(0)
   })
 })

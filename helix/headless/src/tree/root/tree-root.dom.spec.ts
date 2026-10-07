@@ -113,6 +113,20 @@ describe('depth is published, not drawn', () => {
     })
   }
 
+  test('and every row says its place among its siblings, once the tree has counted them', async () => {
+    const { branch, child } = await tree()
+    const host = branch.parentElement as HTMLElement
+    await settleTree(host)
+    const leaf = host.querySelector('[value="leaf"]') as Item
+    const at = (item: Item): string[] => [
+      part(item, 'item')?.getAttribute('aria-posinset') ?? '',
+      part(item, 'item')?.getAttribute('aria-setsize') ?? '',
+    ]
+    expect(at(branch)).toEqual(['1', '2'])
+    expect(at(leaf)).toEqual(['2', '2'])
+    expect(at(child)).toEqual(['1', '1'])
+  })
+
   test('and every row says how deep it is, in a property a rule can read', async () => {
     const { branch, child } = await tree()
     await child.updateComplete
@@ -398,6 +412,34 @@ describe('a tree of check marks', () => {
     await settleTree(host)
     expect(values()).toEqual(['b'])
     expect((b as Item & { focusable: boolean }).focusable).toBe(true)
+  })
+
+  /* The tree pattern's range keys: Shift+Space from the row last checked,
+     and Control+Shift+Home or End to either end. */
+  test('Shift+Space checks a range, and Control+Shift+End checks to the last row', async () => {
+    const host = await mount(files)
+    const [docs, a, b, c] = (await settleTree(host)) as Item[]
+    const values = (): string[] => (host as Tree & { values: string[] }).values
+    const key = (item: Item, init: KeyboardEventInit): void => {
+      ;(part(item, 'item') ?? item).dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, ...init }),
+      )
+    }
+    ;(docs as Item).open = true
+    await settleTree(host)
+    key(a as Item, { key: ' ' })
+    await settleTree(host)
+    expect(values()).toEqual(['a'])
+    key(c as Item, { key: ' ', shiftKey: true })
+    await settleTree(host)
+    expect(values()).toEqual(['a', 'b', 'c'])
+    key(docs as Item, { ctrlKey: true, key: 'a' })
+    await settleTree(host)
+    expect(values()).toEqual([])
+    key(b as Item, { ctrlKey: true, key: 'End', shiftKey: true })
+    await settleTree(host)
+    expect(values()).toEqual(['b', 'c'])
+    expect((c as Item).focusable).toBe(true)
   })
 
   test('says which rows are checked and which are partly, where a sheet can read it', async () => {

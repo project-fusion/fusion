@@ -32,6 +32,27 @@ export const checkedState = (row: CheckableRow, chosen: ReadonlySet<string>): bo
 }
 
 /**
+ * The checked values after checking every row in `rows`, in `order`: a range
+ * the reader extends with Shift and Space, or with Control, Shift and Home or
+ * End. Rows already checked stay checked, and disabled rows are passed over.
+ */
+export const checkRows = (
+  rows: readonly CheckableRow[],
+  chosen: readonly string[],
+  order: readonly string[],
+): string[] => {
+  const added = new Set(chosen)
+  for (const row of rows) {
+    if (!row.disabled) {
+      for (const value of valuesOf(row)) {
+        added.add(value)
+      }
+    }
+  }
+  return order.filter((value) => added.has(value))
+}
+
+/**
  * The checked values after a press on `row`, in `order`.
  *
  * A leaf comes in or out. A branch checks every leaf under it, or clears them

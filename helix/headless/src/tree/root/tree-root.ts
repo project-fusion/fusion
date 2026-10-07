@@ -4,12 +4,14 @@ import {
   commaList,
   customElement,
   deepActiveElement,
+  formatWords,
   HelixElement,
   inlineStep,
   keyClaimed,
   MixinCollection,
   MixinControllerActive,
   ReorderController,
+  requestReorder,
   scrollItemIntoView,
   selectsAll,
   slottedWords,
@@ -23,7 +25,7 @@ import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { fromGrip } from '../grip.js'
 import { HelixHeadlessTreeItem } from '../item/tree-item.js'
-import { type CheckableRow, checkedState, pressRow } from '../selection.js'
+import { type CheckableRow, checkedState, checkRows, pressRow } from '../selection.js'
 
 /** Keys the tree handles, per the APG tree pattern. */
 const KEYS = new Set([
@@ -71,6 +73,9 @@ const KEYS = new Set([
  * or open, and the tree's one tab stop stays on the item last reached. In a
  * tree of check marks, Control+A (Command+A on an Apple keyboard) checks every
  * item or clears them all, and Shift with Up or Down Arrow moves and checks.
+ * Shift+Space checks every item from the one last checked to the focused one,
+ * and Control+Shift+Home or End checks every item from the focused one to the
+ * first or the last, then moves there, as the tree pattern's range keys do.
  *
  * Removing the item that has focus moves focus to the item after it among its
  * siblings, or the one before, or its parent, so focus stays in the tree.
@@ -86,7 +91,15 @@ const KEYS = new Set([
  * `helix-before-reorder`, which you can refuse, and then `helix-reorder`, whose
  * `keys` hold the siblings in the new order. **You move the items**: the tree
  * moves no element of yours, and focus follows the moved item once you have.
- * Moving an item into another branch is not part of this.
+ *
+ * **Alt with the arrow along the line moves an item into another branch.**
+ * Alt with the arrow that opens a branch (Right on a left-to-right page) puts
+ * the focused item last inside the item before it, and opens that item; Alt
+ * with the other arrow puts it after its parent, a level out. The same
+ * `helix-before-reorder` and `helix-reorder` are sent, with `parent` naming
+ * the branch it moves into by its key, `''` for the top level, and `keys`
+ * holding that branch's items in their new order. The tree says the move with
+ * `moved-into-label`.
  *
  * @since 0.1.0
  * @status stable
@@ -147,6 +160,17 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
   @words
   @property({ attribute: 'moved-label' })
   movedLabel = '{name} moved to position {position} of {count}'
+
+  /**
+   * What screen readers hear when an item moves into another branch, in a
+   * `reorderable` tree. `{name}` is the item's words, `{parent}` the words of
+   * the branch it moved into, or the tree's `label` for the top level,
+   * `{position}` its place there, counting from 1, and `{count}` the number of
+   * items there.
+   */
+  @words
+  @property({ attribute: 'moved-into-label' })
+  movedIntoLabel = '{name} moved into {parent}, position {position} of {count}'
 
   /** Carries a host `aria-label` and `aria-labelledby` to the tree. */
   protected readonly aria = new AriaForwardController(this, {
@@ -305,6 +329,9 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
   /** The item that last had focus, so its removal can hand focus on. */
   private focused: HelixHeadlessTreeItem | undefined
 
+  /** The item last checked or unchecked, where a range Shift+Space checks starts. */
+  private anchor: HelixHeadlessTreeItem | undefined
+
   private readonly handleFocusIn = (event: FocusEvent): void => {
     /* The innermost item on the path, which comes first: a nested item is
        inside every branch above it. */
@@ -411,6 +438,7 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
           ? pressRow(this.rowOf(origin), this.values, this.order).join(',')
           : (event as CustomEvent<{ value: string }>).detail.value,
       )
+      this.anchor = origin
     }
     this.syncItems()
   }
@@ -480,8 +508,20 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
     const multiple = this.multiple
     const checked = new Set(this.values)
 
+    /* Each item's place among its siblings, read once per parent. */
+    const places = new Map<HelixHeadlessTreeItem, { position: number; size: number }>()
+    for (const item of this.items) {
+      if (!places.has(item)) {
+        const siblings = this.siblingsOf(item)
+        siblings.forEach((one, at) => {
+          places.set(one, { position: at + 1, size: siblings.length })
+        })
+      }
+    }
+
     for (const item of this.items) {
       const key = this.keyOf(item)
+      const place = places.get(item)
       const selected = !multiple && item.value !== '' && item.value === this.active
       const state = multiple ? checkedState(this.rowOf(item), checked) : false
       const focusable = item === stop
@@ -506,6 +546,8 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
         item.checked = state
         item.focusable = focusable
         item.level = level
+        item.position = place?.position
+        item.setSize = place?.size
         item.heads = heads
         /* A disabled item draws no grip, and the others move past it. */
         item.grip = this.reorderable
@@ -586,9 +628,27 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
       this.syncItems()
       return true
     }
+    const visible = this.visibleItems
+    const at = visible.indexOf(current)
+    if (event.shiftKey && event.key === ' ') {
+      /* From the item last checked to this one, or this one alone. */
+      const from = this.anchor ? visible.indexOf(this.anchor) : -1
+      const range = from < 0 ? [current] : visible.slice(Math.min(from, at), Math.max(from, at) + 1)
+      this.checkRange(range)
+      return true
+    }
+    if (
+      event.shiftKey &&
+      (event.ctrlKey || event.metaKey) &&
+      (event.key === 'Home' || event.key === 'End')
+    ) {
+      const range = event.key === 'Home' ? visible.slice(0, at + 1) : visible.slice(at)
+      this.checkRange(range)
+      this.focusOn(event.key === 'Home' ? range[0] : range.at(-1))
+      return true
+    }
     if (event.shiftKey && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) {
-      const visible = this.visibleItems
-      const next = visible[visible.indexOf(current) + (event.key === 'ArrowDown' ? 1 : -1)]
+      const next = visible[at + (event.key === 'ArrowDown' ? 1 : -1)]
       if (next) {
         this.focusOn(next)
         next.select()
@@ -596,6 +656,102 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
       return true
     }
     return false
+  }
+
+  /** Checks every item of a range, and keeps the ones already checked. */
+  private checkRange(range: HelixHeadlessTreeItem[]): void {
+    this.requestActive(
+      checkRows(
+        range.map((item) => this.rowOf(item)),
+        this.values,
+        this.order,
+      ).join(','),
+    )
+    this.syncItems()
+  }
+
+  /**
+   * Moves the focused item into another branch, in a `reorderable` tree: last
+   * inside the item before it, `toward` the line's end, or after its parent,
+   * toward its start. Asks the page, which moves the item, and says where it
+   * went or that the move was refused. Returns whether the key moved anything.
+   */
+  private nest(current: HelixHeadlessTreeItem, toward: number): boolean {
+    const siblings = this.siblingsOf(current)
+    const from = siblings.indexOf(current)
+    const key = this.keyOf(current)
+    let into: HelixHeadlessTreeItem | undefined
+    let keys: string[]
+    if (toward > 0) {
+      const before = siblings[from - 1]
+      if (!before || before.disabled) {
+        return false
+      }
+      into = before
+      const inside = [...before.children].filter(
+        (node): node is HelixHeadlessTreeItem => node instanceof HelixHeadlessTreeItem,
+      )
+      keys = [...inside.map((one) => this.keyOf(one)), key]
+    } else {
+      const parent = closestInstance(current.parentElement, HelixHeadlessTreeItem)
+      if (!(parent instanceof HelixHeadlessTreeItem) || !this.items.includes(parent)) {
+        return false
+      }
+      const above = closestInstance(parent.parentElement, HelixHeadlessTreeItem)
+      into =
+        above instanceof HelixHeadlessTreeItem && this.items.includes(above) ? above : undefined
+      keys = this.siblingsOf(parent).map((one) => this.keyOf(one))
+      keys.splice(keys.indexOf(this.keyOf(parent)) + 1, 0, key)
+    }
+    const to = keys.indexOf(key)
+    const stood = requestReorder(this, {
+      from,
+      key,
+      keys,
+      kind: 'item',
+      parent: into ? this.keyOf(into) : '',
+      to,
+      value: keys.join(','),
+    })
+    const name = slottedWords(current, ['']) || key
+    this.announced = stood
+      ? formatWords(this, 'movedIntoLabel', {
+          count: keys.length,
+          name,
+          parent: into ? slottedWords(into, ['']) || this.keyOf(into) : this.label,
+          position: to + 1,
+        })
+      : this.canceledLabel
+    this.requestUpdate()
+    if (stood) {
+      if (into && !into.open) {
+        into.requestOpen(true)
+      }
+      this.follow(key)
+    }
+    return true
+  }
+
+  /**
+   * Gives focus back to a moved item once the page has moved it, where moving
+   * it sent focus to the body, as a move among siblings does.
+   */
+  private follow(key: string): void {
+    const lost = (): boolean => {
+      const active = deepActiveElement()
+      return !active || active === document.body
+    }
+    if (lost()) {
+      this.focusOn(this.itemFor(key))
+      return
+    }
+    const watch = new MutationObserver(() => {
+      watch.disconnect()
+      if (lost()) {
+        this.focusOn(this.itemFor(key))
+      }
+    })
+    watch.observe(this, { childList: true, subtree: true })
   }
 
   private move(from: HelixHeadlessTreeItem, delta: number): void {
@@ -655,10 +811,18 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
        so the key that opens a branch is the one its chevron points along. */
     const along = inlineStep(this, event.key)
 
+    if (event.altKey && along !== 0 && this.reorderable) {
+      if (!current.disabled && this.nest(current, along)) {
+        event.preventDefault()
+      }
+      return
+    }
+
     /* Space checks the row in a tree of check marks, and leaves a branch open
        or shut: Enter is what opens one there. */
     if (this.multiple && event.key === ' ') {
       current.select()
+      this.anchor = current
       event.preventDefault()
       return
     }
