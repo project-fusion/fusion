@@ -291,16 +291,15 @@ type Step = HTMLElement & {
   updateComplete: Promise<unknown>
 }
 
-const linear = async (): Promise<{
-  host: Steps & { active: string; next(): boolean; previous(): boolean }
-  all: Step[]
-}> => {
-  const host = (await mount(`<helix-headless-steps linear active="a">
+type Sequence = Steps & { active: string; next(): boolean; previous(): boolean; reset(): boolean }
+
+const linear = async (attrs = ''): Promise<{ host: Sequence; all: Step[] }> => {
+  const host = (await mount(`<helix-headless-steps linear active="a" ${attrs}>
     <helix-headless-step value="a">Details</helix-headless-step>
     <helix-headless-step value="b" optional>Gift note</helix-headless-step>
     <helix-headless-step value="c">Payment</helix-headless-step>
     <helix-headless-step value="d">Review</helix-headless-step>
-  </helix-headless-steps>`)) as Steps & { active: string; next(): boolean; previous(): boolean }
+  </helix-headless-steps>`)) as Sequence
   const all = [...host.querySelectorAll('helix-headless-step')] as Step[]
   for (let turn = 0; turn < 3; turn += 1) {
     await host.updateComplete
@@ -316,6 +315,7 @@ describe('a linear sequence', () => {
   test('holds a stage ahead out of reach until the ones before it are finished', async () => {
     const { all, host } = await linear()
     expect(all.map((step) => step.locked)).toEqual([false, true, true, true])
+    expect(all.map((step) => hasState(step, 'locked'))).toEqual([false, true, true, true])
     at(all, 2).select()
     await host.updateComplete
     expect(host.active).toBe('a')
@@ -341,6 +341,66 @@ describe('a linear sequence', () => {
     await host.updateComplete
     expect(host.active).toBe('a')
     expect(host.previous()).toBe(false)
+  })
+})
+
+const settle = async (all: Step[]): Promise<void> => {
+  for (let turn = 0; turn < 3; turn += 1) {
+    await Promise.all(all.map((step) => step.updateComplete))
+    await new Promise((resolve) => setTimeout(resolve))
+  }
+}
+
+describe('a sequence whose stages are complete once passed', () => {
+  /* Ark UI counts every stage before the current one as completed. Going back
+     keeps the marks, because the reader did finish them. */
+  test('marks the stages a reader moves past, and keeps them on the way back', async () => {
+    const { all, host } = await linear('completion="passed"')
+    /* The stage the reader is on counts as passed, and the second is optional. */
+    expect(all.map((step) => step.locked)).toEqual([false, false, false, true])
+    expect(host.next()).toBe(true)
+    await host.updateComplete
+    await settle(all)
+    expect(all.map((step) => step.complete)).toEqual([true, false, false, false])
+    host.active = 'd'
+    await host.updateComplete
+    await settle(all)
+    expect(all.map((step) => step.complete)).toEqual([true, true, true, false])
+    expect(host.previous()).toBe(true)
+    await host.updateComplete
+    await settle(all)
+    expect(host.active).toBe('c')
+    expect(all.map((step) => step.complete)).toEqual([true, true, true, false])
+  })
+})
+
+describe('a reset', () => {
+  /* Ark UI's resetStep. */
+  test('goes back to the first stage and clears every mark', async () => {
+    const { all, host } = await linear()
+    at(all, 0).complete = true
+    at(all, 2).complete = true
+    await settle(all)
+    expect(host.next()).toBe(true)
+    await host.updateComplete
+    expect(host.reset()).toBe(true)
+    await host.updateComplete
+    await settle(all)
+    expect(host.active).toBe('a')
+    expect(all.map((step) => step.complete)).toEqual([false, false, false, false])
+    expect(all.map((step) => step.locked)).toEqual([false, true, true, true])
+  })
+
+  test('and a refused move keeps the marks', async () => {
+    const { all, host } = await linear()
+    at(all, 0).complete = true
+    await settle(all)
+    expect(host.next()).toBe(true)
+    await host.updateComplete
+    host.addEventListener('helix-before-activate', (event) => event.preventDefault())
+    expect(host.reset()).toBe(false)
+    expect(host.active).toBe('b')
+    expect(at(all, 0).complete).toBe(true)
   })
 })
 

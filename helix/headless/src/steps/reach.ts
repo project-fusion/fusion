@@ -12,12 +12,21 @@ export interface ReachableStep {
  * Back is always allowed, as Ark UI's linear steps allow it. Forward is allowed
  * only where every stage from the one the reader is on up to the target is
  * complete or optional, so no stage is passed unfinished.
+ *
+ * `passing` is a sequence whose stages are complete once a reader moves past
+ * them, so the stage the reader is on counts as finished and the next one is
+ * in reach.
  */
-export const canReach = (steps: readonly ReachableStep[], from: number, to: number): boolean => {
+export const canReach = (
+  steps: readonly ReachableStep[],
+  from: number,
+  to: number,
+  passing = false,
+): boolean => {
   if (to <= from) {
     return true
   }
-  for (let at = Math.max(from, 0); at < to; at += 1) {
+  for (let at = Math.max(passing ? from + 1 : from, 0); at < to; at += 1) {
     const step = steps[at]
     if (step && !step.complete && !step.optional) {
       return false

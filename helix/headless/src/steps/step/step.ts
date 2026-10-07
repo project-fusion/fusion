@@ -70,6 +70,7 @@ import '../../button/index.js'
  * @csspart state - The words that describe a finished stage's button. Hidden.
  *
  * @cssstate invalid - The sequence's `validate` last answered that this stage is not valid.
+ * @cssstate locked - A `linear` sequence holds this stage out of reach until the stages before it are finished.
  */
 @customElement('helix-headless-step')
 export class HelixHeadlessStep extends HelixElement {
@@ -193,6 +194,7 @@ export class HelixHeadlessStep extends HelixElement {
        and the state is said once, on the control a reader is on. */
     hostAria(this.internals, { role: 'listitem' })
     this.toggleState('invalid', this.invalid)
+    this.toggleState('locked', this.locked)
   }
 
   /**

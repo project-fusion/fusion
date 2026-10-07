@@ -16,6 +16,12 @@ describe('canReach', () => {
     expect(canReach([step(true), step(false, true), step()], 0, 2)).toBe(true)
     expect(canReach([step(), step(), step()], 0, 1)).toBe(false)
   })
+
+  test('passing counts the stage the reader is on as finished, and no other', () => {
+    expect(canReach([step(), step(), step()], 0, 1, true)).toBe(true)
+    expect(canReach([step(), step(), step()], 0, 2, true)).toBe(false)
+    expect(canReach([step(), step(true), step()], 0, 2, true)).toBe(true)
+  })
 })
 
 describe('progressOf', () => {
