@@ -19,6 +19,19 @@ const sheet = (): string => {
 /** The declarations of the first rule written for `selector`. */
 const rule = (selector: string): string => sheet().split(`${selector} {`)[1]?.split('}')[0] ?? ''
 
+/* Forced colors painted the track and the fill the same Canvas white, so a bar
+   at 50 showed no progress at all in Windows High Contrast. */
+describe('in forced colors', () => {
+  test('the fill keeps the system Highlight and the track is outlined', () => {
+    const forced = sheet().split('@media (forced-colors: active)')[1] ?? ''
+    const fill = forced.split('[part="indicator"] {')[1]?.split('}')[0] ?? ''
+    const track = forced.split('[part="track"] {')[1]?.split('}')[0] ?? ''
+    expect(fill).toContain('background-color: Highlight')
+    expect(fill).toContain('forced-color-adjust: none')
+    expect(track).toContain('CanvasText')
+  })
+})
+
 describe('a slotted label', () => {
   test('sits above the bar across the whole row, with hooks that fall back to today', () => {
     const label = rule('slot[name="label"]::slotted(*)')
