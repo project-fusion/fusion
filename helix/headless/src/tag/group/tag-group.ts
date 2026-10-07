@@ -52,6 +52,8 @@ export type TagSelectionMode = SelectionMode
  * set is a `group`, and focus moves to its `empty` part,
  * which holds the `empty` slot: put words there such as "No filters" for a
  * reader to hear. With nothing slotted it says `empty-label`, "No tags".
+ * Where only disabled tags are left, the first of them holds the tab stop and
+ * takes focus, so the reader stays in the set.
  *
  * @since 0.1.0
  * @status stable
@@ -184,11 +186,18 @@ export class HelixHeadlessTagGroup extends HelixElement {
       selected: chosen.has(this.valueFor(tag)),
       tag,
     }))
-    const holder = rovingStop(
-      items,
-      items.find((item) => item.tag === this.last),
-      { disabled: (item) => item.disabled, selected: (item) => item.selected },
-    )?.tag
+    /* **And the first tag where every tag is disabled**, as React Aria's grid
+       keeps a stop of its own with no row to land on, so a group whose last
+       tag that could take focus was removed keeps focus and a stop. */
+    const holder =
+      rovingStop(
+        items,
+        items.find((item) => item.tag === this.last),
+        {
+          disabled: (item) => item.disabled,
+          selected: (item) => item.selected,
+        },
+      )?.tag ?? tags[0]
     for (const tag of tags) {
       whenHydrated(tag, () => {
         tag.focusable = tag === holder
@@ -286,7 +295,17 @@ export class HelixHeadlessTagGroup extends HelixElement {
         this.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
       }
       const active = document.activeElement
-      if (!had || this.tags.length > 0 || (active !== null && active !== document.body)) {
+      if (!had || (active !== null && active !== document.body)) {
+        return
+      }
+      /* Tags remain and every one is disabled, so none took focus from the
+         dismissed one: the first, which holds the stop, takes it. */
+      const [first] = this.tags
+      if (first) {
+        if (this.reachable.length === 0) {
+          this.sync()
+          first.focusItem()
+        }
         return
       }
       this.requestUpdate()

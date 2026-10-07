@@ -253,6 +253,24 @@ describe('a tag removed from a group', () => {
     expect(host.shadowRoot?.activeElement).toBe(part(host, 'empty'))
   })
 
+  /* Focus fell to the body when the last tag that could take it went and a
+     disabled tag stayed, and the group was then left with no tab stop. */
+  test('where only disabled tags remain keeps focus on one, which holds the stop', async () => {
+    const one = await group(
+      '',
+      '<helix-headless-tag dismissible>Open</helix-headless-tag><helix-headless-tag dismissible disabled>Archived</helix-headless-tag>',
+    )
+    one.group.addEventListener('helix-dismiss', (event) => (event.target as Tag).remove())
+    const [open, archived] = one.tags as [Tag, Tag]
+    cell(open).focus()
+    press(open, 'Delete')
+    await frame()
+    await archived.updateComplete
+    expect(document.activeElement === archived).toBe(true)
+    expect(archived.shadowRoot?.activeElement === cell(archived)).toBe(true)
+    expect(cell(archived).getAttribute('tabindex')).toBe('0')
+  })
+
   test('renders no `empty` part while there are tags', async () => {
     const one = await group('', FRUIT)
     expect(part(one.group, 'empty')).toBeNull()
