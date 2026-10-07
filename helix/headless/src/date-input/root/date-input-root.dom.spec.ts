@@ -908,6 +908,37 @@ describe('the calendar a date input opens', () => {
   })
 })
 
+describe('a date input reopened after browsing', () => {
+  /* Measured before this: from August 4, two presses of Page Down, Escape, and
+     the calendar opened again on October 4, where the docs promise the
+     chosen date. */
+  test('opens on the chosen date again', async () => {
+    const host = await field('locale="en-US" default-value="2026-08-04"')
+    const calendar = picker(host) as HTMLElement & { updateComplete: Promise<unknown> }
+    const settle = async (): Promise<void> => {
+      await host.updateComplete
+      await calendar.updateComplete
+      await calendar.updateComplete
+    }
+    ;(part(host, 'trigger') as HTMLElement).click()
+    await settle()
+    for (const key of ['PageDown', 'PageDown']) {
+      calendar.shadowRoot
+        ?.querySelector('[part~="cell"][tabindex="0"]')
+        ?.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, composed: true, key }))
+      await settle()
+    }
+    expect(calendar.shadowRoot?.activeElement?.getAttribute('aria-label')).toContain('October 4')
+    host.open = false
+    await settle()
+    ;(part(host, 'trigger') as HTMLElement).click()
+    await settle()
+    expect(calendar.shadowRoot?.activeElement?.getAttribute('aria-label')).toContain(
+      'August 4, 2026',
+    )
+  })
+})
+
 describe('Enter in a date input', () => {
   test('submits a form with no button and no other field', async () => {
     document.body.innerHTML =
