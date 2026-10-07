@@ -176,10 +176,6 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
   backLabel = 'Back'
 
   /**
-   * Whether the menu is the trigger's context menu: it opens where the reader
-   * asks for one, with a right-click, a long press, Shift+F10 or the menu key.
-   */
-  /**
    * Whether choosing a row closes the menu.
    *
    * On by default, and a Space on a choice row leaves the menu open either way.
@@ -189,6 +185,10 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
   @property({ attribute: 'close-on-select', converter: onUnlessFalse })
   closeOnSelect = true
 
+  /**
+   * Whether the menu is the trigger's context menu: it opens where the reader
+   * asks for one, with a right-click, a long press, Shift+F10 or the menu key.
+   */
   @property({ reflect: true, type: Boolean })
   context = false
 
