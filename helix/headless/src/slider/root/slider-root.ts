@@ -102,7 +102,7 @@ const SLIDER_KEYS = new Set([
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired as the value changes. Cancelable: call `preventDefault()` to keep the current value.
  * @event {Event} input - Fired after the value changes.
  *
- * @csspart control - The range input.
+ * @csspart control - The range input, one per thumb. On a range each carries `data-thumb`, `start`, `middle`, or `end`, and `data-index`, its place from the lowest.
  * @csspart feedback - The error message under the track.
  * @csspart field - The row that holds the control and its readout.
  * @csspart hint - The help text under the track, shown while there is no error.
@@ -111,9 +111,9 @@ const SLIDER_KEYS = new Set([
  * @csspart marker-label - The value a mark stands at, when `marker-labels` is set.
  * @csspart markers - The row of marks along the track.
  * @csspart output - The current value, shown beside the track.
- * @csspart thumb - One thumb's own box over the track, which holds the `thumb` or `thumb-end` slot. It carries `data-thumb` on a range, `start` or `end`, and `--slider-at`, where its thumb is as a fraction of the track. Draw your own thumb here and hide the native one, or leave it empty.
+ * @csspart thumb - One thumb's own box over the track, which holds the `thumb` or `thumb-end` slot. It carries `data-thumb` on a range, `start`, `middle`, or `end`, and `--slider-at`, where its thumb is as a fraction of the track. Draw your own thumb here and hide the native one, or leave it empty.
  * @csspart thumbs - The layer over the track that holds each `thumb`. It is `hidden` until a thumb slot has content, and then `[part="field"]` carries `data-thumbs`.
- * @csspart tooltip - One thumb's value in a bubble beside it, under `tooltip`. It carries `data-thumb` on a range, `start` or `end`, and `--slider-at`, where its thumb is as a fraction of the track.
+ * @csspart tooltip - One thumb's value in a bubble beside it, under `tooltip`. It carries `data-thumb` on a range, `start`, `middle`, or `end`, and `--slider-at`, where its thumb is as a fraction of the track.
  * @csspart tooltips - The layer over the track that holds the bubbles, under `tooltip`.
  *
  * @cssproperty --slider-at - Where a bubble's or a thumb box's thumb is, as a fraction of the track, 0 to 1. Set on each `tooltip` and `thumb` part.
