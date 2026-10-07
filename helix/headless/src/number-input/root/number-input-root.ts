@@ -3,8 +3,8 @@ import {
   appleTouch,
   valueAsNumber as asNumber,
   customElement,
-  fillTemplate,
   formatNumber,
+  formatWords,
   numberAsValue as fromNumber,
   HelixFormElement,
   holdCaret,
@@ -13,6 +13,8 @@ import {
   parseNumber,
   restoreValue,
   submitImplicitly,
+  words,
+  wordsLocale,
 } from '@fusion.dev/helix-core'
 import { minus, plus } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -121,6 +123,12 @@ const SCRUB_FINE = 16
  */
 @customElement('helix-headless-number-input')
 export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(HelixFormElement)) {
+  /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-number-input': { incrementLabel: 'Erhöhen' } })`.
+   */
+  static words = 'helix-number-input'
+
   /* A consumer's `aria-describedby` names ids in their own tree and the control
      is in this shadow root, so the reference has to be carried down as an
      element rather than copied as an id. See `AriaForwardController`: measured
@@ -151,14 +159,17 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
    * **Every sentence a control raises in the browser's bubble is a property**,
    * named for the validity flag it reports, so a form in another language
    * speaks it: `feedback` replaces the message under the field and does not
-   * reach the bubble. Absent is the control's own sentence, in English.
+   * reach the bubble. Unset is the sentence registered for the page's
+   * language, then the English.
    */
+  @words
   @property({ attribute: 'bad-input-message' })
-  badInputMessage?: string
+  badInputMessage = 'Please enter a number.'
 
   /**
    * The name of the step down button, read by screen readers.
    */
+  @words
   @property({ attribute: 'decrement-label' })
   decrementLabel = 'Decrease'
 
@@ -177,6 +188,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
   /**
    * The name of the step up button, read by screen readers.
    */
+  @words
   @property({ attribute: 'increment-label' })
   incrementLabel = 'Increase'
 
@@ -227,17 +239,19 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
 
   /**
    * The message the browser shows when the number is above `max`, with `{max}`
-   * filled in.
+   * filled in, written in the locale.
    */
+  @words
   @property({ attribute: 'range-overflow-message' })
-  rangeOverflowMessage?: string
+  rangeOverflowMessage = 'Value must be {max} or less.'
 
   /**
    * The message the browser shows when the number is below `min`, with `{min}`
-   * filled in.
+   * filled in, written in the locale.
    */
+  @words
   @property({ attribute: 'range-underflow-message' })
-  rangeUnderflowMessage?: string
+  rangeUnderflowMessage = 'Value must be {min} or more.'
 
   /**
    * Prevents editing. The value is still submitted with the form.
@@ -273,10 +287,13 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
 
   /**
    * The message the browser shows when the number is off the step grid, with
-   * `{below}` and `{above}` filled in with the nearest valid values.
+   * `{below}` and `{above}` filled in with the nearest valid values, written in
+   * the locale.
    */
+  @words
   @property({ attribute: 'step-mismatch-message' })
-  stepMismatchMessage?: string
+  stepMismatchMessage =
+    'Please enter a valid value. The two nearest valid values are {below} and {above}.'
 
   /**
    * What a screen reader says for the value, with `{value}` filled in, such as
@@ -378,6 +395,18 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     const fresh = formatGrain(this.locale, options)
     this.grainOf = [this.locale, options, fresh]
     return fresh
+  }
+
+  /**
+   * A number as a message writes it: in the locale the words are in, every
+   * digit kept and no grouping, which in English is the number as it was
+   * always written.
+   */
+  private written(number: number): string {
+    return formatNumber(number, wordsLocale(this), {
+      maximumFractionDigits: 20,
+      useGrouping: false,
+    })
   }
 
   /** Whether `value` is on the step grid, counted from `min`. */
@@ -716,25 +745,17 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
         control,
       )
     } else if (this.value.trim() !== '' && parsed === null) {
-      this.internals.setValidity(
-        { badInput: true },
-        this.badInputMessage || 'Please enter a number.',
-        control,
-      )
+      this.internals.setValidity({ badInput: true }, this.badInputMessage, control)
     } else if (parsed !== null && this.min !== undefined && parsed < this.min) {
       this.internals.setValidity(
         { rangeUnderflow: true },
-        fillTemplate(this.rangeUnderflowMessage || 'Value must be {min} or more.', {
-          min: this.min,
-        }),
+        formatWords(this, 'rangeUnderflowMessage', { min: this.written(this.min) }),
         control,
       )
     } else if (parsed !== null && this.max !== undefined && parsed > this.max) {
       this.internals.setValidity(
         { rangeOverflow: true },
-        fillTemplate(this.rangeOverflowMessage || 'Value must be {max} or less.', {
-          max: this.max,
-        }),
+        formatWords(this, 'rangeOverflowMessage', { max: this.written(this.max) }),
         control,
       )
     } else if (parsed !== null && !this.onStep(parsed)) {
@@ -744,11 +765,10 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
       const above = this.clamp(anchor + Math.ceil((parsed - anchor) / step) * step)
       this.internals.setValidity(
         { stepMismatch: true },
-        fillTemplate(
-          this.stepMismatchMessage ||
-            'Please enter a valid value. The two nearest valid values are {below} and {above}.',
-          { above, below },
-        ),
+        formatWords(this, 'stepMismatchMessage', {
+          above: this.written(above),
+          below: this.written(below),
+        }),
         control,
       )
     } else {
@@ -867,7 +887,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
             parsed === null
               ? nothing
               : this.valueText
-                ? fillTemplate(this.valueText, {
+                ? formatWords(this, 'valueText', {
                     value: this.formatOptions
                       ? formatNumber(parsed, this.locale, this.formatOptions)
                       : this.value,

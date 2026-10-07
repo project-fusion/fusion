@@ -12,6 +12,7 @@ import {
   StatusController,
   submitsOnEnter,
   supportsInvokers,
+  words,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -77,6 +78,12 @@ import { submitAs } from '../submitter.js'
  */
 @customElement('helix-headless-button')
 export class HelixHeadlessButton extends HelixFormElement {
+  /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-button': { pendingLabel: 'Wird geladen' } })`.
+   */
+  static words = 'helix-button'
+
   /* A consumer's `aria-describedby` names ids in their tree and this control is
      in a shadow root, so the reference has to be carried down as an element
      rather than copied as an id. See the controller: measured, the host held
@@ -216,9 +223,13 @@ export class HelixHeadlessButton extends HelixFormElement {
    * Lives here rather than only on `IconButton` so the two share one render.
    * An icon-only button without it is a control a screen reader announces as
    * "button" and nothing else.
+   *
+   * Undefaulted, so a subclass's own default, such as Copy Button's `Copy`, is
+   * the first value its element receives and so the English its words fall
+   * back to.
    */
   @property()
-  label = ''
+  label?: string
 
   /**
    * Whether the action the button started is still running.
@@ -239,6 +250,7 @@ export class HelixHeadlessButton extends HelixFormElement {
   /**
    * What a reader hears when the button becomes pending while it has focus.
    */
+  @words
   @property({ attribute: 'pending-label' })
   pendingLabel = 'Loading'
 

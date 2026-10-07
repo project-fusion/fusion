@@ -11,6 +11,7 @@ import {
   MixinField,
   type OwnRule,
   restoreValue,
+  words,
 } from '@fusion.dev/helix-core'
 import { x } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -77,6 +78,12 @@ import { grownHeight, lineMetrics } from '../grow.js'
  */
 @customElement('helix-headless-textarea')
 export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(HelixFormElement)) {
+  /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-textarea': { clearLabel: 'Leeren' } })`.
+   */
+  static words = 'helix-textarea'
+
   /* A consumer's `aria-describedby` names ids in their own tree and the control
      is in this shadow root, so the reference has to be carried down as an
      element rather than copied as an id. See `AriaForwardController`: measured
@@ -114,6 +121,7 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
   /**
    * The accessible name of the clear button, which shows only an icon.
    */
+  @words
   @property({ attribute: 'clear-label' })
   clearLabel = 'Clear'
 

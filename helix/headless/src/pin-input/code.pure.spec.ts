@@ -54,7 +54,7 @@ describe('a run written over the code', () => {
 /* The verdict and the caret keys were written inside the component, so only a
    page could hold them. */
 describe('codeVerdict', () => {
-  const messages = { missing: '', short: '' }
+  const messages = { missing: '', short: (length: number) => `Enter all ${length}.` }
 
   test('a required field with nothing in it is missing', () => {
     expect(codeVerdict('', 6, true, messages)).toEqual([
@@ -65,22 +65,16 @@ describe('codeVerdict', () => {
   })
 
   test('a code with fewer characters than boxes is too short', () => {
-    expect(codeVerdict('123', 6, false, messages)).toEqual([
-      'tooShort',
-      'Please enter all 6 characters.',
-    ])
+    expect(codeVerdict('123', 6, false, messages)).toEqual(['tooShort', 'Enter all 6.'])
     expect(codeVerdict('123456', 6, true, messages)).toBe('')
   })
 
-  test("in the page's words where it set them", () => {
-    expect(codeVerdict('', 4, true, { missing: 'Enter the code', short: '' })).toEqual([
+  test("in the page's words where it set them, written for the code's length", () => {
+    expect(codeVerdict('', 4, true, { ...messages, missing: 'Enter the code' })).toEqual([
       'valueMissing',
       'Enter the code',
     ])
-    expect(codeVerdict('1', 4, false, { missing: '', short: '{length} digits, please' })).toEqual([
-      'tooShort',
-      '4 digits, please',
-    ])
+    expect(codeVerdict('1', 4, false, messages)).toEqual(['tooShort', 'Enter all 4.'])
   })
 })
 

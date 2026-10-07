@@ -2,7 +2,7 @@ import {
   AriaForwardController,
   valueAsNumber as asNumber,
   customElement,
-  fillTemplate,
+  formatWords,
   numberAsValue as fromNumber,
   HelixClearEvent,
   HelixFormElement,
@@ -14,6 +14,7 @@ import {
   nearest,
   reportRuntime,
   SlottedGlyph,
+  words,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -87,6 +88,12 @@ import { property, state } from 'lit/decorators.js'
  */
 @customElement('helix-headless-rating')
 export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFormElement)) {
+  /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-rating': { optionLabel: '{score} von {max}' } })`.
+   */
+  static words = 'helix-rating'
+
   /*
    * Discrete. `Input`, `Slider`, `NumberInput`, `Textarea` and `PinInput` all
    * announce input, and every one of them is edited continuously: a value passes
@@ -159,11 +166,12 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
 
   /**
    * The name of each mark a reader can choose, with `{score}` and `{max}`
-   * filled in. Set it to translate "3 out of 5".
+   * filled in, written in the locale. Set it to translate "3 out of 5".
    *
    * Also what a read-only rating says for its score where `value-text` is
    * empty.
    */
+  @words
   @property({ attribute: 'option-label' })
   optionLabel = '{score} out of {max}'
 
@@ -596,7 +604,7 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
 
   /** The name of one score, as `optionLabel` writes it. */
   private nameFor(score: number): string {
-    return fillTemplate(this.optionLabel, { max: this.max, score })
+    return formatWords(this, 'optionLabel', { max: this.max, score })
   }
 
   /**
