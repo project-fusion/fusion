@@ -100,8 +100,8 @@ import { type DiffFile, type DiffHunk, type DiffLine, pairLines, parsePatch } fr
  * @csspart actions - The box in the header that holds the `actions` slot, drawn while something is slotted there.
  * @csspart added - In a diff, a line only the new version has, an `<ins>`.
  * @csspart block - The scrolling `<pre>`.
- * @csspart code - The `<code>` inside it.
  * @csspart changed - In a diff, the words of a changed line that the line opposite it does not have, inside its `text`.
+ * @csspart code - The `<code>` inside it.
  * @csspart context - In a diff, a line both versions share.
  * @csspart copy - The copy button. It sits in the header when there is one, and beside the code otherwise.
  * @csspart copy-button - The inner button.
