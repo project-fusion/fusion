@@ -18,9 +18,9 @@
 # used to run `apt-get update` and fetch the same 32 MB, and on October 7, 2026
 # the mirror stalled often enough to fail runs: Azure's copy did not answer, apt
 # moved to `archive.ubuntu.com`, and the job sat in `apt-get update` with no
-# output until its 15-minute timeout. Over 1,072 browser jobs that day the step
-# took 32 seconds at the median, 347 at the 90th percentile and 967 at the
-# worst.
+# output until its 15-minute timeout. Over 3,007 browser jobs that day the step
+# took 20 seconds at the median, 309 at the 95th percentile and 967 at the
+# worst, and 45 jobs reached the timeout. From the cache it takes 7 to 20.
 #
 # **Keyed on the runner image because the set is a difference.** Most of what
 # Chromium needs is on the image already. apt fetches the rest, and upgrades the
