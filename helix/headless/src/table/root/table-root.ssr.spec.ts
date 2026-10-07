@@ -42,7 +42,7 @@ describe('table server output', () => {
         'helix-headless-table',
       ),
       /* Lit's markers stand where the checkbox heading of a selectable table goes. */
-    ).toMatch(/<div part="head" role="row">(<!--[^>]*-->)*<slot name="columns"><\/slot><\/div>/)
+    ).toMatch(/<div part="head" role="row"\s*>(<!--[^>]*-->)*<slot name="columns"><\/slot><\/div>/)
     expect(
       rendered(
         ssr(html`<helix-headless-table-row></helix-headless-table-row>`),

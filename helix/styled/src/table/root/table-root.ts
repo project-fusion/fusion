@@ -24,10 +24,13 @@ import '../../checkbox/index.js'
  * @slot heading - Words that name the table, shown above it in the weight of a heading.
  * @slot loading - Content shown while the rows load, such as a spinner. Falls back to `loading-text`, which the live region still says.
  *
+ * @csspart after - The space that stands in for the rows below the window. Only while `windowed`.
+ * @csspart before - The space that stands in for the rows above the window. Only while `windowed`.
  * @csspart drag-preview - A copy of the row a pointer drags by its grip, which follows the pointer in the top layer until the row is let go, in a `reorderable` table. Hidden from assistive technology.
  * @csspart live - A live region that repeats the empty and loading text, and says each step of a move, so screen readers announce it when it changes. Visually hidden in the styled tier.
  * @csspart table - The grid.
  *
+ * @cssproperty --table-block-size - How tall the table's box is while `windowed`, when it scrolls its rows. 24em by default.
  * @cssproperty --table-columns - Track list for the columns. It overrides the track list worked out from the columns.
  * @cssproperty --table-drag-preview-background-color - The fill behind the copy of a row a pointer drags.
  * @cssproperty --table-drag-preview-border-color - The color of the edge around the copy of a row a pointer drags.
@@ -38,6 +41,7 @@ import '../../checkbox/index.js'
  * @cssproperty --table-error-color - The color of the words in the line shown while `error-text` is set.
  * @cssproperty --table-title-color - The color of the words in the `heading` slot.
  * @cssproperty --table-title-gap - The space between the `heading` slot and the grid.
+ * @cssproperty --table-heading-background-color - The fill behind the headings while `windowed`, which the rows scroll under. The page's background by default.
  * @cssproperty --table-title-text - The font size of the words in the `heading` slot.
  */
 @customElement('helix-table')

@@ -31,6 +31,7 @@ import {
   splitValues,
   toggleEvery,
   treeArrow,
+  VirtualizeController,
   whenHydrated,
   words,
 } from '@fusion.dev/helix-core'
@@ -135,6 +136,9 @@ const numberOf = (value: string): number => Number(value.replaceAll(',', ''))
 /** The slots a child names for itself, which hold content other than rows. */
 const STATUS = new Set(['empty', 'error', 'loading'])
 const NAMED = new Set([...STATUS, 'heading'])
+
+/** How tall a row is taken to be, in pixels, until it is drawn and measured. */
+const ESTIMATE = 40
 
 /**
  * @summary A table of data, laid out on a grid.
@@ -254,9 +258,17 @@ const NAMED = new Set([...STATUS, 'heading'])
  * | A letter or a word | Moves to the next row whose first cell starts with what you typed. |
  * | Tab | Leaves the table. |
  *
+ * **Long tables.** `windowed` draws only the rows in view, as Data Table's
+ * does, and the box of the table scrolls under headings that stick. The
+ * table still says how many rows it has with `aria-rowcount`, and each row
+ * its place with `aria-rowindex`. The keys reach every row, drawn or not, and
+ * the row holding focus stays drawn when it scrolls away. Nested rows,
+ * sorting, and selecting work as they do in a table that draws every row.
+ *
  * **Loading more.** `load-more` sends `helix-load-more` once the end of the
  * table comes within a screen of view, in the box that scrolls it or the
- * page, once for each number of rows: add rows and it can send it again. Set
+ * page, or in the table's own box when it is `windowed`, once for each
+ * number of rows: add rows and it can send it again. Set
  * `loading` while you fetch, and the table asks for nothing until it clears.
  *
  * When the rows did not load, set `error-text`, such as "The orders did not
@@ -291,6 +303,8 @@ const NAMED = new Set([...STATUS, 'heading'])
  * @event {HelixSortedEvent} helix-sorted - Fired after the sort order changes, with the new order.
  * @event {HelixToggleEvent} helix-toggle - Fired from a row once the rows under it are shown or hidden, with whether it is open in `detail.checked`.
  *
+ * @csspart after - The space that stands in for the rows below the window. Only while `windowed`.
+ * @csspart before - The space that stands in for the rows above the window. Only while `windowed`.
  * @csspart checkbox - The checkbox in the heading that selects every row, in a `selectable` table.
  * @csspart checkbox-box - The box drawn for the checkbox's input.
  * @csspart checkbox-control - The checkbox's input.
@@ -638,6 +652,19 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
   @property({ attribute: 'unsorted-label' })
   unsortedLabel = 'Not sorted'
 
+  /**
+   * Draws only the rows in view, with empty space in place of the rest, as
+   * Data Table's `windowed` does. The table's box then scrolls, at the
+   * height `--table-block-size` gives it in the styled tier, and the
+   * headings stick to its top.
+   *
+   * Off by default. Windowing costs a scroll listener, a measurement per row
+   * drawn, and a height on the table, and a table of twenty rows should pay
+   * none of them.
+   */
+  @property({ reflect: true, type: Boolean })
+  windowed = false
+
   @state()
   private sortState: string | undefined = undefined
 
@@ -649,7 +676,47 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
 
   /** Whether any row sits under another, which makes the table a tree. */
   private get nests(): boolean {
-    return this.childrenKnown && this.keyed.some(({ row }) => (row.parent ?? '') !== '')
+    return this.remember(
+      'nests',
+      () => this.childrenKnown && this.keyed.some(({ row }) => (row.parent ?? '') !== ''),
+    )
+  }
+
+  /**
+   * What the table read from its rows, kept until anything asks for an
+   * update or the turn ends.
+   *
+   * **Read once rather than on every question.** A render, the assignment
+   * and the keyboard each asked for the rows in order dozens of times, and
+   * each answer walked every row: in Chromium a windowed table of 3,000 rows
+   * took 89 milliseconds to move its window, 42 of them reading the keys.
+   */
+  private memo: { arranged?: Element[]; keyed?: { key: string; row: Row }[]; nests?: boolean } = {}
+
+  private remember<K extends keyof HelixHeadlessTable['memo']>(
+    key: K,
+    compute: () => NonNullable<HelixHeadlessTable['memo'][K]>,
+  ): NonNullable<HelixHeadlessTable['memo'][K]> {
+    const memo = this.memo
+    if (Object.keys(memo).length === 0) {
+      queueMicrotask(() => {
+        if (this.memo === memo) {
+          this.memo = {}
+        }
+      })
+    }
+    memo[key] ??= compute()
+    return memo[key] as NonNullable<HelixHeadlessTable['memo'][K]>
+  }
+
+  /** @internal Forgets what was read from the rows, then asks for an update as Lit does. */
+  override requestUpdate(
+    name?: PropertyKey,
+    oldValue?: unknown,
+    options?: Parameters<HelixElement['requestUpdate']>[2],
+  ): void {
+    this.memo = {}
+    super.requestUpdate(name, oldValue, options)
   }
 
   /** The keys of the rows whose rows are shown. */
@@ -714,9 +781,11 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     },
     columns: () => this.tableColumns.filter((column) => column.shown),
     disclose: (at, forward) => this.disclose(at, forward),
+    drawn: () => (this.windowed ? new Set(this.drawnRows) : undefined),
     lead: () => this.lead,
     on: () => this.grid,
     part: (name) => this.partNamed(name),
+    reveal: (row) => this.revealRow(row),
     rows: () => (this.childrenKnown ? this.arrangedRows : []),
     rowWords: () => this.arrangedRows.map((row) => textOf(row.children[0])),
     selectAll: () =>
@@ -725,6 +794,87 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
       this.requestSelected(new Set([...this.chosen, ...this.enabledKeys])),
     selectRange: (to, from) => this.selectRange(to, from),
   })
+
+  /**
+   * The slice of a long table that is drawn, under `windowed`. The rows are
+   * the page's elements, so the window is which of them the body slot is
+   * given: a row it is not given is not laid out and not in the
+   * accessibility tree.
+   */
+  private readonly virtualize = new VirtualizeController(this, {
+    container: () => (this.windowed ? this.partNamed('table') : null),
+    count: () => this.arrangedCount,
+    estimate: () => ESTIMATE,
+    measured: () => this.windowed,
+    rows: () => (this.windowed ? this.measuredRows() : []),
+  })
+
+  /** How many rows are drawn in order, read when the rows are assigned. */
+  private arrangedCount = 0
+
+  /** A `windowed` table has rows while it holds any, drawn or not. */
+  protected override get hasRows(): boolean {
+    return (this.windowed && this.arrangedCount > 0) || super.hasRows
+  }
+
+  /** The rows the body slot was last given, under `windowed`. */
+  private drawnRows: Element[] = []
+
+  /**
+   * The rows drawn now, each by its first cell, with its place among the
+   * rows. A row is `display: contents` and has no box, and a cell is a grid
+   * item stretched to its row, as Data Table measures its rows.
+   */
+  private measuredRows(): { element: HTMLElement; index: number }[] {
+    const rows = this.arrangedRows
+    const at = new Map(rows.map((row, index) => [row, index]))
+    return this.drawnRows.flatMap((row) => {
+      const cell = [...row.children].find(
+        (child) => child.getAttribute('hidden') === null && child.getAttribute('slot') === null,
+      )
+      const index = at.get(row)
+      return cell instanceof HTMLElement && index !== undefined ? [{ element: cell, index }] : []
+    })
+  }
+
+  /** The row outside the window that stays drawn: the grid's stop, or the row holding focus. */
+  private keptRow(rows: Element[]): number | undefined {
+    const { first, last } = this.virtualize.window
+    /* In a grid the stop, which focus is on or on its way to. */
+    const active = (this.getRootNode() as Document | ShadowRoot).activeElement
+    const focused = this.grid
+      ? this.gridKeys.current().row
+      : rows.findIndex((row) => active !== null && row.contains(active))
+    return focused >= 0 && (focused < first || focused >= last) ? focused : undefined
+  }
+
+  /**
+   * The rows to draw under `windowed`: the window, and the row kept for
+   * focus beside it on its side.
+   */
+  private windowOf(rows: Element[]): Element[] {
+    const { first, last } = this.virtualize.window
+    const drawn = rows.slice(first, last)
+    const kept = this.keptRow(rows)
+    const row = kept === undefined ? undefined : rows[kept]
+    if (kept !== undefined && row) {
+      return kept < first ? [row, ...drawn] : [...drawn, row]
+    }
+    return drawn
+  }
+
+  /**
+   * Scrolls drawn row `row` into view below the headings, and moves the
+   * window to it, before a key focuses it.
+   */
+  private revealRow(row: number): void {
+    if (!this.windowed) {
+      return
+    }
+    const heading = this.gridKeys.cellAt({ column: 0, row: -1 })
+    this.virtualize.reveal(row, heading?.getBoundingClientRect().height ?? 0)
+    this.virtualize.measure()
+  }
 
   /**
    * Moving rows by their grips, in a `reorderable` table. The rows are the
@@ -812,6 +962,11 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
    * which is what a framework holding those rows needs.
    */
   private get arrangedRows(): Element[] {
+    return this.remember('arranged', () => this.arrange())
+  }
+
+  /** The rows in the order they are drawn, worked out again. */
+  private arrange(): Element[] {
     const rows = this.slotted
     const spec = parse(this.sort)
     const declared = this.tableColumns
@@ -950,10 +1105,12 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
 
   /** The rows as written, each with the key `selected` lists it by. */
   private get keyed(): { key: string; row: Row }[] {
-    return this.slotted.map((row, index) => ({
-      key: (row as Row).value || String(index),
-      row: row as Row,
-    }))
+    return this.remember('keyed', () =>
+      this.slotted.map((row, index) => ({
+        key: (row as Row).value || String(index),
+        row: row as Row,
+      })),
+    )
   }
 
   /** The keys selected now. */
@@ -1237,10 +1394,31 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     const tree = this.nests
     const shapes = tree ? this.shape() : undefined
     const open = this.open
+    /* The rows drawn, in a `windowed` table, each told its place. */
+    const drawn = this.windowed ? new Set<Element>(this.drawnRows) : undefined
+    const places = drawn
+      ? new Map(this.arrangedRows.map((row, index) => [row, index + 2]))
+      : undefined
     for (const { key, row } of this.keyed) {
       if (!row.isTableRow) {
         continue
       }
+      /* **A row out of view still gets its cells**, so it is laid out whole
+         the moment it is drawn: given them only then, a row arrived a cell
+         short of the grid's width for a render, and the rows after it moved
+         by as much under the reader. Its words wait until it is drawn. */
+      if (drawn && !drawn.has(row)) {
+        const shape = shapes?.get(key)
+        whenHydrated(row, () => {
+          row.selectable = this.selectable
+          row.gripLabel = this.reorderable ? row.gripLabel || ' ' : ''
+          row.level = shape?.level ?? 0
+          row.branch = shape?.branch ?? false
+          row.open = open.has(key)
+        })
+        continue
+      }
+      const place = places?.get(row) ?? 0
       const name = textOf(row.children[0]) || key
       const label = formatWords(this, 'selectRowLabel', { row: name })
       const grip = this.reorderable ? formatWords(this, 'moveRowLabel', { row: name }) : ''
@@ -1263,6 +1441,7 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
         row.open = open.has(key)
         row.expandLabel = expand
         row.expandWith = tree ? () => this.toggleRow(key) : undefined
+        row.rowIndex = place
       })
     }
   }
@@ -1532,9 +1711,13 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     const status = [...(this.children ?? [])].filter((child) =>
       STATUS.has(child.getAttribute('slot') ?? ''),
     )
+    const arranged = this.arrangedRows
+    this.arrangedCount = arranged.length
+    const rows = this.windowed ? this.windowOf(arranged) : arranged
+    this.drawnRows = this.windowed ? rows : []
     assignSlots(
       this.renderRoot as ParentNode | undefined,
-      [...columns, ...headings, ...status, ...this.arrangedRows],
+      [...columns, ...headings, ...status, ...rows],
       (child) =>
         columns.has(child)
           ? 'columns'
@@ -1630,6 +1813,12 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
       this.gridKeys.mark()
       this.gridKeys.place()
     }
+    /* The rows just given to the slot are measured in the pass that draws
+       them, and a window they move asks for the next. */
+    if (this.windowed) {
+      this.virtualize.measure()
+      this.virtualize.settle()
+    }
     this.watchEnd()
   }
 
@@ -1648,7 +1837,11 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
    * are asked for before a reader reaches the last. List does the same.
    */
   private watchEnd(): void {
-    const end = this.loadMore ? this.renderRoot.querySelector('[data-end]') : null
+    /* A `windowed` table scrolls its own box, which the controller reads. */
+    if (this.windowed) {
+      this.nearEnd()
+    }
+    const end = this.loadMore && !this.windowed ? this.renderRoot.querySelector('[data-end]') : null
     if (end === this.watchedEnd) {
       if (this.endInView) {
         this.askForMore()
@@ -1672,6 +1865,13 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
       { root: scrollingAncestor(this, { axis: 'y' }), rootMargin: '0px 0px 100% 0px' },
     )
     this.endWatcher.observe(end)
+  }
+
+  /** Asks for more once a reader of a `windowed` table is within a screen of its end. */
+  private readonly nearEnd = (): void => {
+    if (this.windowed && this.loadMore && this.virtualize.endInSight(this.arrangedCount)) {
+      this.askForMore()
+    }
   }
 
   /** Whether the end of the table was in reach when last measured. */
@@ -1752,6 +1952,11 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
   protected override render(): TemplateResult {
     const template = this.template
     const grid = this.grid
+    /* Under `windowed`, the table says how many rows it has, and the room the
+       rows not drawn would take stands before and after the ones that are. */
+    const windowed = this.windowed && this.childrenKnown
+    const count = windowed ? this.arrangedRows.length : 0
+    const room = windowed ? this.virtualize.spacers(this.keptRow(this.arrangedRows)) : undefined
     /* The two ends a Tab leaves the grid by, each focused for a moment so the
        key goes on from there. Empty, so they take no room. */
     const start = grid ? html`<span part="grid-start" tabindex="-1"></span>` : nothing
@@ -1762,15 +1967,19 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
       aria-multiselectable=${grid && this.selectable ? (this.single ? 'false' : 'true') : nothing}
       aria-busy=${this.loading ? 'true' : nothing}
       aria-label=${this.label || this.fallbackLabel}
+      aria-rowcount=${windowed ? count + 1 : nothing}
       style=${template ? `--table-template: ${template}` : ''}
+      @scroll=${this.nearEnd}
     >
-      <div part="head" role="row">${this.renderGripHead()}${this.renderSelectAll()}${this.renderExpandHead()}<slot name="columns"></slot></div>
+      <div part="head" role="row" aria-rowindex=${windowed ? 1 : nothing}>${this.renderGripHead()}${this.renderSelectAll()}${this.renderExpandHead()}<slot name="columns"></slot></div>
+      ${room ? html`<div part="before" role="presentation" style="block-size: ${room.before}px"></div>` : nothing}
       <slot
         @slotchange=${(event: Event) => {
           this.countRows(event)
           this.handleSlotChange()
         }}
       ></slot>
+      ${room ? html`<div part="after" role="presentation" style="block-size: ${room.after}px"></div>` : nothing}
       ${
         this.errorText === ''
           ? this.renderStatus(this.hasRows, grid ? 'gridcell' : 'cell')

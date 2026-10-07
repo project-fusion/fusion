@@ -80,6 +80,44 @@
   text-align: center;
 }
 
+/* **A windowed table scrolls its own box**, at a definite height, as Data
+   Table's does: the window is a reading of that box, and a height that
+   followed the rows drawn would move under every reading. The rows start at
+   the top of a box taller than they are. */
+:host([windowed]) [part="table"] {
+  align-content: start;
+  block-size: var(--table-block-size, 24em);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* The headings stick, and each heading's own box does it, relayed into the
+   column as Data Table does, since the column and the head row have no box.
+   The fill is the surface the table sits on, so rows pass under it unseen. */
+:host([windowed]) ::slotted(helix-table-column) {
+  --_table-heading-background-color: var(
+    --table-heading-background-color,
+    var(--helix-color-background)
+  );
+  --_table-heading-layer: var(--helix-layer-sticky);
+  --_table-heading-position: sticky;
+}
+
+:host([windowed]) [part="expand-head"],
+:host([windowed]) [part="grip-head"],
+:host([windowed]) [part="select-all"] {
+  background-color: var(--table-heading-background-color, var(--helix-color-background));
+  inset-block-start: 0;
+  position: sticky;
+  z-index: var(--helix-layer-sticky);
+}
+
+/* The room the rows outside the window would take, across every column. */
+[part="after"],
+[part="before"] {
+  grid-column: 1 / -1;
+}
+
 /* Rows that are already there stay, and dim, while a new set arrives. */
 :host([loading]) [part="table"] {
   opacity: 0.5;
