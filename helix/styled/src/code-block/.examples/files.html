@@ -1,0 +1,26 @@
+<!-- @summary Three code blocks shown as files under tabs, one at a time. -->
+
+<helix-code-block file="app.ts">
+  <helix-code-block
+    label="index.html"
+    language="html"
+  >&lt;script type="module" src="./app.ts"&gt;&lt;/script&gt;
+&lt;link rel="stylesheet" href="./app.css" /&gt;</helix-code-block
+  >
+  <helix-code-block
+    label="app.ts"
+    language="ts"
+  >import '@fusion.dev/helix/button'
+
+document.querySelector('helix-button')?.addEventListener('click', () => {
+  console.log('pressed')
+})</helix-code-block
+  >
+  <helix-code-block
+    label="app.css"
+    language="css"
+  >helix-button {
+  --button-radius: 999px;
+}</helix-code-block
+  >
+</helix-code-block>

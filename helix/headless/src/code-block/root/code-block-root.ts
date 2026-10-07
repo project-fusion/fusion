@@ -4,7 +4,9 @@ import {
   HelixBeforeToggleEvent,
   HelixElement,
   HelixToggleEvent,
+  inlineStep,
   requestChange,
+  requestValue,
   words,
 } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -23,6 +25,28 @@ import {
   pairLines,
   parsePatch,
 } from '../patch.js'
+
+/** Whether an element is a Code Block, of either tier, by its tag. */
+const isBlock = (element: Element | null): element is HelixHeadlessCodeBlock =>
+  element?.localName.endsWith('code-block') === true
+
+/** The Code Blocks a block holds as its code, which are files under its tabs. */
+const blocksIn = (host: Element): HelixHeadlessCodeBlock[] =>
+  [...host.children].filter(
+    (child) => child.slot === '' && isBlock(child),
+  ) as HelixHeadlessCodeBlock[]
+
+/** A file's name on its tab: its `label`, or its `language` without one. */
+const nameOf = (block: Element): string => {
+  const { label, language } = block as { label?: unknown; language?: unknown }
+  return (
+    (typeof label === 'string' && label) ||
+    block.getAttribute('label') ||
+    (typeof language === 'string' && language) ||
+    block.getAttribute('language') ||
+    ''
+  )
+}
 
 /**
  * @summary A block of code with an optional name and a copy button.
@@ -94,6 +118,18 @@ import {
  * keeps hydration clean, and draws the diff once it can read the content. Diff
  * mode is experimental. The rest of the family is stable.
  *
+ * **Several blocks are files**, one shown at a time under a row of tabs, as
+ * Sandbox shows its source panes. Put Code Blocks in the default slot of a
+ * Code Block, and each is a file named on its tab by its `label` or, without
+ * one, its `language`. `file` holds the name of the file shown. The tabs are a
+ * tab list: the arrow keys move to a tab and show its file, the two swapping
+ * on a right-to-left page, and Home and End go to the first and the last.
+ * Choosing one sends `helix-before-change` with the file's name, which you can
+ * cancel, and `change` once `file` holds it. The files not shown carry
+ * `hidden`, and the one shown draws no name of its own, its tab naming it. One
+ * block draws no tabs. A server cannot see the blocks inside, so the client
+ * draws the tabs once it upgrades.
+ *
  * @since 0.1.0
  * @status stable
  * @category typography
@@ -105,6 +141,8 @@ import {
  * @slot copied-icon - The copy button's icon after a copy. Defaults to a check mark.
  * @slot copy-icon - The copy button's icon before a copy. Defaults to a clipboard.
  *
+ * @event {Event} change - A file tab showed its file, whose name `file` now holds.
+ * @event {HelixBeforeChangeEvent} helix-before-change - A file tab is about to show its file, with the file's name in `detail.value`. Cancelable: cancel it to keep the file shown.
  * @event {HelixBeforeToggleEvent} helix-before-toggle - The wrap button was pressed, with the `wrap` it asks for in `detail.checked`. Cancelable: cancel it to keep the lines as they are.
  * @event {HelixToggleEvent} helix-toggle - Fired after the wrap button changed `wrap`, with the new value in `detail.checked`.
  *
@@ -132,6 +170,8 @@ import {
  * @csspart copy-tooltip-top - The tooltip while it is above the copy button. Applied with `copy-tooltip`.
  * @csspart expand - The button under a capped block that shows every line, and fewer again. Drawn when `expandable` is set and the cap hides something.
  * @csspart file - In a diff, one file's header and block.
+ * @csspart file-tab - One file tab, `aria-selected` while its file is shown.
+ * @csspart files - The file tabs over the blocks a block holds, where there are several.
  * @csspart filler - In a split diff, the empty row opposite a line the other side does not have.
  * @csspart fold - In a diff with `context-lines`, the button that shows a folded run of unchanged lines, and hides it again, saying which with `aria-expanded`.
  * @csspart frame - The code, and the copy button beside it where there is no header.
@@ -155,6 +195,7 @@ import {
  * @cssproperty --code-block-mark-start - Written by the block on each `mark`: how far down the code its run of lines starts. Do not set it.
  *
  * @cssstate expanded - The expand button has shown every line of a capped block.
+ * @cssstate tabbed - The block is one of several files under another block's tabs, which name it, so it draws no name of its own.
  */
 @customElement('helix-headless-code-block')
 export class HelixHeadlessCodeBlock extends HelixElement {
@@ -242,6 +283,22 @@ export class HelixHeadlessCodeBlock extends HelixElement {
    */
   @property({ type: Boolean })
   expandable = false
+
+  /**
+   * The name of the file shown, where the block holds several Code Blocks:
+   * the `label` of one, or its `language` without one.
+   *
+   * Unset, or a name no file has, shows the first.
+   */
+  @property()
+  file?: string
+
+  /**
+   * The name of the file tabs, read by screen readers.
+   */
+  @words
+  @property({ attribute: 'files-label' })
+  filesLabel = 'Files'
 
   /**
    * The expand button's words while the cap hides lines.
@@ -673,6 +730,124 @@ export class HelixHeadlessCodeBlock extends HelixElement {
     })
   }
 
+  /** The Code Blocks this block holds as its code, once its children can be read. */
+  private get blocks(): HelixHeadlessCodeBlock[] {
+    return this.childrenKnown ? blocksIn(this) : []
+  }
+
+  /**
+   * Whether the block is one of several files under another block's tabs,
+   * which name it. Read from the parent, so a block needs no telling.
+   */
+  private get tabbed(): boolean {
+    const parent = this.childrenKnown ? this.parentElement : null
+    return this.slot === '' && isBlock(parent) && blocksIn(parent).length > 1
+  }
+
+  /** The file shown among several: the one `file` names, or the first. */
+  private shownFile(blocks: HelixHeadlessCodeBlock[]): HelixHeadlessCodeBlock | undefined {
+    return blocks.find((block) => nameOf(block) === this.file) ?? blocks[0]
+  }
+
+  /** Shows the file a tab names, once nobody refused. */
+  private chooseFile(block: HelixHeadlessCodeBlock): void {
+    if (block !== this.shownFile(this.blocks)) {
+      requestValue(this, nameOf(block), (name) => {
+        this.file = name
+      })
+    }
+  }
+
+  /**
+   * Arrow keys, `Home` and `End` on the file tabs, which move to a tab and
+   * show its file, as a tab list that follows focus does and as Sandbox's file
+   * tabs do. Left and Right swap on a right-to-left page.
+   */
+  private readonly handleFileKey = (event: KeyboardEvent): void => {
+    const blocks = this.blocks
+    const count = blocks.length
+    const at = blocks.indexOf(this.shownFile(blocks) as HelixHeadlessCodeBlock)
+    const step = inlineStep(this, event.key)
+    const to =
+      event.key === 'Home'
+        ? 0
+        : event.key === 'End'
+          ? count - 1
+          : step === 0
+            ? -1
+            : (at + step + count) % count
+    const block = blocks[to]
+    if (!block) {
+      return
+    }
+    event.preventDefault()
+    this.chooseFile(block)
+    void this.updateComplete.then(() => {
+      this.renderRoot.querySelector<HTMLElement>('[part="file-tab"][aria-selected="true"]')?.focus()
+    })
+  }
+
+  /** The blocks this element hid, to show them again. */
+  private readonly hid = new Set<Element>()
+
+  /** How many files the block last held, so each is told when that changes. */
+  private fileCount = 0
+
+  /**
+   * Hides the files not shown, shows any this element hid that is now, and
+   * tells each file when how many there are changes, since a file draws its
+   * own name only while it is alone.
+   */
+  private showFile(): void {
+    const blocks = this.blocks
+    const files = blocks.length > 1 ? blocks : []
+    const shown = this.shownFile(files)
+    for (const block of files) {
+      if (block !== shown && !block.hidden) {
+        block.hidden = true
+        this.hid.add(block)
+      }
+    }
+    for (const block of this.hid) {
+      if (block === shown || !files.includes(block as HelixHeadlessCodeBlock)) {
+        ;(block as HTMLElement).hidden = false
+        this.hid.delete(block)
+      }
+    }
+    if (blocks.length !== this.fileCount) {
+      this.fileCount = blocks.length
+      for (const block of blocks) {
+        block.requestUpdate?.()
+      }
+    }
+  }
+
+  /**
+   * The tabs over several files, and the file shown under them. One file
+   * draws no tabs, only itself.
+   */
+  private renderFiles(blocks: HelixHeadlessCodeBlock[]): TemplateResult {
+    const slot = html`<slot @slotchange=${() => this.requestUpdate()}></slot>`
+    if (blocks.length < 2) {
+      return slot
+    }
+    const shown = this.shownFile(blocks)
+    return html`<div part="files" role="tablist" aria-label=${this.filesLabel} @keydown=${this.handleFileKey}>
+        ${blocks.map((block, at) => {
+          const selected = block === shown
+          return html`<button part="file-tab" id=${`file-${at}`} role="tab" type="button"
+            aria-controls="files-panel" aria-selected=${selected ? 'true' : 'false'}
+            tabindex=${selected ? '0' : '-1'} @click=${() => this.chooseFile(block)}>${nameOf(block)}</button>`
+        })}
+      </div>
+      <div id="files-panel" role="tabpanel" aria-labelledby=${`file-${blocks.indexOf(shown as HelixHeadlessCodeBlock)}`}>${slot}</div>`
+  }
+
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    this.toggleState('tabbed', this.tabbed)
+  }
+
   /* Measured after each render, and again whenever the block changes size,
      which a narrower page or a font arriving does with no render. Every block
      is watched, since any of them may come to scroll. */
@@ -683,6 +858,7 @@ export class HelixHeadlessCodeBlock extends HelixElement {
       this.sizes.observe(this)
     }
     this.measure()
+    this.showFile()
   }
 
   override connectedCallback(): void {
@@ -706,6 +882,10 @@ export class HelixHeadlessCodeBlock extends HelixElement {
   }
 
   protected override render(): TemplateResult {
+    const blocks = this.blocks
+    if (blocks.length > 0) {
+      return this.renderFiles(blocks)
+    }
     const files = this.files
     if (files.length > 0) {
       return this.renderDiff(files)
@@ -765,10 +945,13 @@ export class HelixHeadlessCodeBlock extends HelixElement {
       ? html`<span part="gutter" aria-hidden="true">${numbers}</span>`
       : nothing
     const name = this.label || this.language
-    return html`${this.renderHeader(name)}
+    /* A file under tabs is named by its tab, and its copy button still says
+       its name. */
+    const drawn = this.tabbed ? '' : name
+    return html`${this.renderHeader(name, undefined, drawn)}
       <div part="frame">
         <pre id="block" part="block" translate="no">${gutter}${code}</pre>
-        ${this.headed(name) ? nothing : this.renderCopy()}
+        ${this.headed(drawn) ? nothing : this.renderCopy()}
       </div>${this.renderExpand()}`
   }
 
@@ -816,10 +999,14 @@ export class HelixHeadlessCodeBlock extends HelixElement {
    * `Usage` section of one-line imports into a run of empty strips. The button
    * then stands beside the code, in room the block keeps for it.
    */
-  private renderHeader(name: string, value?: string): TemplateResult | typeof nothing {
+  private renderHeader(
+    name: string,
+    value?: string,
+    drawn = name,
+  ): TemplateResult | typeof nothing {
     const acting = this.slotted('actions')
-    return this.headed(name)
-      ? html`<div part="header">${name ? html`<span part="label">${name}</span>` : nothing}${
+    return this.headed(drawn)
+      ? html`<div part="header">${drawn ? html`<span part="label">${drawn}</span>` : nothing}${
           acting ? html`<span part="actions"><slot name="actions"></slot></span>` : nothing
         }${this.renderWrapToggle()}${this.renderCopy(value, name)}</div>`
       : nothing

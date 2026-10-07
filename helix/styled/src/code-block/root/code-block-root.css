@@ -187,6 +187,55 @@
   border-start-start-radius: var(--helix-radii-none);
 }
 
+/* *File tabs are the header of the files under them**, drawn as the header
+   is, so a set of files reads as one block whose name can be switched. */
+[part="files"] {
+  backdrop-filter: var(--code-block-backdrop, none);
+  background-color: var(--code-block-header-background-color, var(--helix-color-surface-raised));
+  border: var(--helix-border-thin) solid var(--code-block-border-color, var(--helix-color-border));
+  border-block-end-width: var(--helix-space-none);
+  border-start-end-radius: var(--code-block-radius, var(--helix-radii-lg));
+  border-start-start-radius: var(--code-block-radius, var(--helix-radii-lg));
+  display: flex;
+  overflow-x: auto;
+  padding-inline: var(--helix-space-xs);
+}
+
+[part="file-tab"] {
+  background-color: transparent;
+  border: none;
+  border-block-end: var(--helix-border-thick) solid transparent;
+  color: var(--code-block-label-color, var(--helix-color-foreground-muted));
+  cursor: pointer;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-medium);
+  padding-block: var(--helix-space-xs);
+  padding-inline: var(--helix-space-sm);
+  white-space: nowrap;
+}
+
+[part="file-tab"]:hover,
+[part="file-tab"][aria-selected="true"] {
+  color: var(--helix-color-foreground);
+}
+
+[part="file-tab"][aria-selected="true"] {
+  border-block-end-color: var(--helix-color-accent);
+}
+
+[part="file-tab"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}
+
+/* A file under the tabs takes the place of the block under a header: its top
+   edge is the tabs' line. */
+:host(:state(tabbed)) :is([part="header"], [part="block"]) {
+  border-start-end-radius: var(--helix-radii-none);
+  border-start-start-radius: var(--helix-radii-none);
+}
+
 [part="code"] {
   color: var(--code-block-color, var(--helix-color-foreground));
   font-family: var(--_code-block-face);
