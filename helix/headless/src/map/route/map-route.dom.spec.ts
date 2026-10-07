@@ -247,6 +247,32 @@ describe('map layers menu', () => {
     expect((part(host, 'layers-menu') as HTMLElement).hidden).toBe(true)
   })
 
+  /* A Tab past the last tile walked on to the 3D, zoom and rotate buttons
+     with the menu still drawn over the map. */
+  test('the menu closes when focus moves on from it, and stays open while focus is in it', async () => {
+    const host = await menuFrame()
+    const toggle = part(host, 'layers-toggle') as HTMLButtonElement
+    const menu = part(host, 'layers-menu') as HTMLElement
+    toggle.click()
+    await host.updateComplete
+    const tile = menu.querySelector('[part="layer-choice"]') as HTMLElement
+    const leave = (from: Element, to: EventTarget | null): void => {
+      from.dispatchEvent(
+        new FocusEvent('focusout', { bubbles: true, composed: true, relatedTarget: to }),
+      )
+    }
+    leave(toggle, tile)
+    leave(tile, toggle)
+    leave(tile, null)
+    await host.updateComplete
+    expect(menu.hidden).toBe(false)
+
+    leave(tile, part(host, 'zoom-in') as HTMLElement)
+    await host.updateComplete
+    expect(menu.hidden).toBe(true)
+    expect(toggle.getAttribute('aria-expanded')).toBe('false')
+  })
+
   test('layers in one group are one tile, named by the first, that shows or hides them all', async () => {
     const host = (await mount(
       `<helix-headless-map controls="layers" label="Walk">
