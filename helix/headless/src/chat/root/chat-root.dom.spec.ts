@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import {
   hasLayout,
+  hasState,
   mount,
   notYetDefined,
   part,
@@ -59,7 +60,7 @@ const chat = async (attributes = '') => {
 describe('the transcript', () => {
   /* Browser only, for a box that scrolls. Safari makes no scroller a tab stop,
      so a keyboard there could not reach a long history. */
-  test.skipIf(!hasLayout())('the log is a tab stop while it scrolls, and only then', async () => {
+  test.skipIf(!hasLayout())('the log is a tab stop while it scrolls', async () => {
     const element = await chat('style="display: block; block-size: 160px"')
     const log = part(element, 'log') as HTMLElement
     log.style.blockSize = '100%'
@@ -75,9 +76,18 @@ describe('the transcript', () => {
     await element.updateComplete
     expect(log.scrollHeight).toBeGreaterThan(log.clientHeight)
     expect(log.getAttribute('tabindex')).toBe('0')
+  })
 
+  /* A transcript that fits was no stop at all, so a conversation whose turns
+     held no control had no way into them by keyboard. */
+  test('the log is a tab stop while it holds a turn, so Page Down can enter them', async () => {
     const short = await chat()
-    expect(part(short, 'log')?.hasAttribute('tabindex')).toBe(false)
+    expect(part(short, 'log')?.getAttribute('tabindex')).toBe('0')
+    const empty = (await mount(
+      '<helix-headless-chat label="Support"></helix-headless-chat>',
+    )) as Chat
+    await empty.updateComplete
+    expect(part(empty, 'log')?.hasAttribute('tabindex')).toBe(false)
   })
 
   test('the host is a named region, and the log is a log that says nothing itself', async () => {
@@ -348,6 +358,30 @@ describe('the pin', () => {
  * Words the mixin does not default to, since it holds "Nothing to show" and
  * "Loading": read against those, the assertion is satisfied by the mixin alone
  * and says nothing about the string reaching it from here. */
+describe('what the conversation is doing, as states a stylesheet can match', () => {
+  /* A sheet that dims the header while history loads, or marks the frame while
+     someone types, needed the property itself, which no selector reaches. */
+  test('pinned, typing, loading and empty follow what they name', async () => {
+    const element = await chat()
+    expect(hasState(element, 'pinned')).toBe(true)
+    expect(hasState(element, 'typing')).toBe(false)
+    expect(hasState(element, 'loading')).toBe(false)
+    expect(hasState(element, 'empty')).toBe(false)
+    element.pinned = false
+    element.setAttribute('typing', 'Ada')
+    element.setAttribute('history', 'loading')
+    await element.updateComplete
+    expect(hasState(element, 'pinned')).toBe(false)
+    expect(hasState(element, 'typing')).toBe(true)
+    expect(hasState(element, 'loading')).toBe(true)
+    const empty = (await mount(
+      '<helix-headless-chat label="Support"></helix-headless-chat>',
+    )) as Chat
+    await empty.updateComplete
+    expect(hasState(empty, 'empty')).toBe(true)
+  })
+})
+
 describe('a transcript with nothing in it', () => {
   test('says the consumer’s words once it has looked', async () => {
     const host = await mount(

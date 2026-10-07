@@ -184,7 +184,10 @@ const drawnInFull = ({ element }: Rendered): boolean =>
  * it takes them away. Anything slotted into `status` is drawn first.
  *
  * **Keyboard.** The transcript moves between turns the way a feed does. Each
- * turn says its place, such as "3 of 40", windowed or not.
+ * turn says its place, such as "3 of 40", windowed or not. The transcript is
+ * a tab stop while it holds a turn, and the turn a reader moved to is one
+ * too. Moving to an older turn unpins a transcript that scrolls and scrolls
+ * the turn into view, and moving to the newest pins it again.
  *
  * | Key | What it does |
  * |---|---|
@@ -266,6 +269,11 @@ const drawnInFull = ({ element }: Rendered): boolean =>
  * @csspart status - The status region, outside the log.
  * @csspart turn - The wrapper around the message drawn for one turn from `turns`.
  * @csspart typing - The words that say who is typing, in the status band, while `typing` names someone.
+ *
+ * @cssstate empty - The conversation has no turns.
+ * @cssstate loading - Older turns are loading: `history` is `loading`.
+ * @cssstate pinned - The transcript follows its newest turn.
+ * @cssstate typing - `typing` names someone on the other side.
  */
 @customElement('helix-headless-chat')
 export class HelixHeadlessChat extends MixinCollection(HelixElement) {
@@ -594,20 +602,24 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
   }
 
   /**
-   * Makes the log a tab stop while it scrolls, and takes the stop away when it
-   * does not.
+   * Makes the log a tab stop while it holds a turn or scrolls, and takes the
+   * stop away from an empty log.
    *
    * **A reader on a keyboard scrolls the history from the log itself.**
    * Chromium and Firefox make a box that scrolls focusable on their own, and
    * Safari does not, so there the arrow keys could not reach a long history.
-   * A log that fits is no stop at all, so Tab goes straight to the composer.
+   *
+   * **And it is where the turns are entered.** Page Down from the log goes to
+   * the turn at the top of the view. A log that fits was no stop at all, so a
+   * conversation whose turns held no control had no way into them by keyboard.
    */
   private markScroller(): void {
     const log = this.log
     if (!log) {
       return
     }
-    if (log.scrollHeight > log.clientHeight) {
+    const turns = this.fed ? this.turns.length : this.messages.length
+    if (turns > 0 || log.scrollHeight > log.clientHeight) {
       log.tabIndex = 0
     } else {
       log.removeAttribute('tabindex')
@@ -1036,6 +1048,13 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
     if (changed.has('turns')) {
       this.follow(changed.get('turns') as readonly ChatTurn[] | undefined)
     }
+    this.toggleState('pinned', this.pinned)
+    this.toggleState('typing', this.typing !== '')
+    this.toggleState('loading', this.history === 'loading')
+    this.toggleState(
+      'empty',
+      this.childrenKnown && this.turns.length === 0 && this.messages.length === 0,
+    )
   }
 
   /**
@@ -1143,13 +1162,27 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
   private async focusTurn(at: number): Promise<void> {
     /* A reader moving to an older turn has left the newest one, and a pinned
        transcript would take them straight back. A transcript that fits has
-       no newest turn out of sight, so it stays pinned and draws no way back. */
+       no newest turn out of sight, so it stays pinned and draws no way back.
+
+       **The update unpinning asks for runs before the turn is shown.** That
+       update puts back the turn the reader was looking at, and run after the
+       move it scrolled the transcript to the bottom again, where the scroll
+       pinned it, with the turn a reader was on out of view. */
     const count = this.fed ? this.turns.length : this.messages.length
     const log = this.log
     const scrolls = log !== null && log !== undefined && log.scrollHeight > log.clientHeight
-    if (at < count - 1 && this.pinned && scrolls) {
-      this.requestPinned(false)
+    if (at < count - 1 && this.pinned && scrolls && this.requestPinned(false)) {
+      await this.updateComplete
     }
+    await this.showTurn(at)
+    /* The newest turn is the bottom, and a reader on it is following again. */
+    if (at === count - 1 && !this.pinned && this.atBottom) {
+      this.requestPinned(true)
+    }
+  }
+
+  /** Draws turn `at` where it is windowed and not drawn, and visits it. */
+  private async showTurn(at: number): Promise<void> {
     if (this.fed) {
       const drawn = (): HTMLElement | null | undefined =>
         this.renderRoot
@@ -1194,7 +1227,37 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
         this.stop = turn
       }
     }
-    turn.focus()
+    turn.focus({ preventScroll: true })
+    this.reveal(turn)
+  }
+
+  /** Where this element last scrolled the transcript to show a turn, until the scroll that follows. */
+  private placed: number | undefined
+
+  /**
+   * Scrolls the transcript, and nothing around it, until `turn` is in view,
+   * and notes the turn at the top as the reader's place. A pinned transcript
+   * is left at the bottom, which is where whoever holds the pin wants it.
+   *
+   * The edge nearest the turn moves the least, and a turn taller than the
+   * transcript is shown from its start.
+   */
+  private reveal(turn: HTMLElement): void {
+    const log = this.log
+    if (!log || this.pinned) {
+      return
+    }
+    const box = log.getBoundingClientRect()
+    const rect = turn.getBoundingClientRect()
+    const by =
+      rect.top < box.top || rect.height > box.height
+        ? rect.top - box.top
+        : Math.max(0, rect.bottom - box.bottom)
+    if (Math.abs(by) >= 1) {
+      log.scrollTop += by
+      this.placed = log.scrollTop
+    }
+    this.remember()
   }
 
   /** The first control in the regions `names` holds, in their order. */
@@ -1291,6 +1354,16 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
    */
   private readonly handleScroll = (): void => {
     const log = this.log
+    /* The scroll that showed a turn a reader moved to is not the reader
+       coming back: read as one within `threshold` of the bottom, it pinned,
+       and the pin scrolled the turn they were on out of view. */
+    const placed = this.placed
+    this.placed = undefined
+    if (log && placed !== undefined && Math.abs(log.scrollTop - placed) < 1 && !this.pinned) {
+      this.remember()
+      this.reachHistory()
+      return
+    }
     if (this.pinned && log && log.scrollTop >= this.stuckAt - 1 && !this.atBottom) {
       this.stick()
     } else {
