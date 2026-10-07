@@ -2,6 +2,9 @@ import {
   AriaForwardController,
   afterLinkFollowed,
   customElement,
+  type DataOption,
+  type DataOptionItem,
+  dataOptions,
   drawAutofill,
   drawStatus,
   HelixFormElement,
@@ -15,6 +18,7 @@ import {
   PopoverController,
   reportValues,
   StatusController,
+  sideOf,
   typesCharacter,
   words,
   wordsLocale,
@@ -39,7 +43,10 @@ import { over } from '../align.js'
  * place for focus to return to when the list closes.
  *
  * Your options stay in your light DOM and are slotted through into the listbox,
- * so the listbox looks through slots to find them.
+ * so the listbox looks through slots to find them. For a list too long to draw
+ * whole, set `items` instead: the list draws only the options in sight, as
+ * Listbox's `items` does, and the trigger, its keys and the form read the
+ * whole set.
  *
  * `Select` owns the value, passes it down to the listbox, and takes changes
  * back, so the value lives in one place.
@@ -128,6 +135,8 @@ import { over } from '../align.js'
  *
  * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
  * @cssstate open - While the list is open.
+ * @cssstate placed-bottom - While the open list sits below the trigger.
+ * @cssstate placed-top - While the open list sits above the trigger, where there was no room below.
  */
 @customElement('helix-headless-select')
 export class HelixHeadlessSelect extends MixinControllerOpen(
@@ -196,6 +205,22 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
    */
   @property({ attribute: false })
   focusable = true
+
+  /**
+   * The options as data, for a list too long to draw whole: each a value,
+   * which is also its words, or a record with a `value`, a `label` and
+   * `disabled`. Passed to the list, which draws only the options in sight,
+   * as Listbox's `items` does. Set, the options you write as children are
+   * not read.
+   *
+   * The trigger shows the chosen options' labels, the letters and the Left
+   * and Right keys on the closed trigger choose over the whole set, and a
+   * chosen value whose option leaves `items` drops out of `value`.
+   * `value-content` is not called for `items`. Import the Option family as
+   * well, whose elements are drawn.
+   */
+  @property({ attribute: false })
+  items: readonly DataOptionItem[] | undefined = undefined
 
   /**
    * The open list's name where nothing names the Select, read by screen
@@ -353,6 +378,13 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
     ],
     offset: () => 4,
     onDismiss: () => this.close(),
+    /* The side the list landed on, for a sheet outside that draws by side,
+       as Popover says it. */
+    onPlace: (placement) => {
+      const side = sideOf(placement)
+      this.toggleState('placed-bottom', side === 'bottom')
+      this.toggleState('placed-top', side === 'top')
+    },
     open: () => this.open,
     /* Placed here instead where the list opens over the trigger, which is
        no side of it. */
@@ -400,20 +432,41 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
    * the commit creates the text node it needs.
    */
   private get display(): string | typeof nothing {
-    const words = this.chosenOptions.map((option) => option.text)
+    const chosen = new Set(this.value === '' ? [] : this.value.split(','))
+    const words = this.entries.filter((option) => chosen.has(option.value)).map((one) => one.text)
     if (words.length > 0) {
       /* A list in the reader's language, as React Aria writes one: `unit` and
          `short` is "A, B, C" in English and each language's own separators in
          the rest. */
       return new Intl.ListFormat(wordsLocale(this), { style: 'short', type: 'unit' }).format(words)
     }
-    return this.value !== '' && !this.childrenKnown ? nothing : this.placeholder
+    return this.value !== '' && !this.childrenKnown && !this.items ? nothing : this.placeholder
   }
 
-  /** The chosen options, in the order they appear. None on a server or while hydrating. */
+  /** The chosen options, in the order they appear. None on a server or while hydrating, and none for `items`. */
   private get chosenOptions(): HelixHeadlessOption[] {
+    if (this.items) {
+      return []
+    }
     const chosen = new Set(this.value === '' ? [] : this.value.split(','))
     return optionsAmong(this.knownChildren).filter((option) => chosen.has(option.value))
+  }
+
+  /** `items` as the list reads them, built once per array. */
+  private data: { from: readonly DataOptionItem[]; options: DataOption[] } | undefined
+
+  /**
+   * Every option the select reads, in order: the records of `items`, or the
+   * option elements among its children.
+   */
+  private get entries(): readonly { disabled: boolean; text: string; value: string }[] {
+    if (!this.items) {
+      return optionsAmong(this.knownChildren)
+    }
+    if (this.data?.from !== this.items) {
+      this.data = { from: this.items, options: dataOptions(this.items) }
+    }
+    return this.data.options
   }
 
   /**
@@ -636,8 +689,9 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
     const step = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0
     if (step !== 0 && !this.multiple && !(event.altKey || event.ctrlKey || event.metaKey)) {
       event.preventDefault()
-      const reachable =
-        listbox?.options.filter((option) => !option.hidden && !option.disabled) ?? []
+      const reachable = this.items
+        ? this.entries.filter((option) => !option.disabled)
+        : (listbox?.options.filter((option) => !option.hidden && !option.disabled) ?? [])
       const next =
         reachable[Math.max(0, reachable.findIndex((one) => one.value === this.value) + step)]
       if (next) {
@@ -709,9 +763,9 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
   private reconcileOptions(): void {
     /* Off this element's own children, as `display` reads its words, so the
        two cannot disagree about which options exist. */
-    const options = optionsAmong(this.knownChildren)
-    if (this.defaultValue === '' && !this.hasAttribute('default-value')) {
-      const declared = options
+    const options = this.entries
+    if (!this.items && this.defaultValue === '' && !this.hasAttribute('default-value')) {
+      const declared = optionsAmong(this.knownChildren)
         .filter((option) => option.defaultSelected)
         .map((option) => option.value)
       if (declared.length > 0) {
@@ -743,7 +797,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     hostAria(this.internals, { label: this.label })
-    if (this.childrenKnown) {
+    if (this.childrenKnown || this.items) {
       this.reconcileOptions()
     }
   }
@@ -817,6 +871,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
       .value=${this.value}
       ?multiple=${this.multiple}
       ?filterable=${this.filterable}
+      .items=${this.items}
       manual
       aria-label=${this.listName || this.listLabel || nothing}
       @keydown=${this.handleListKeydown}
@@ -924,7 +979,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
         disabled: this.isDisabled,
         multiple: this.multiple,
         onFill: (value) => this.requestValue(value),
-        options: optionsAmong(this.knownChildren),
+        options: this.entries,
         value: this.value,
       })}`
   }
