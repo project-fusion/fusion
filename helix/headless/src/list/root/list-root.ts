@@ -8,6 +8,7 @@ import {
   formatWords,
   HelixActionEvent,
   HelixElement,
+  HelixLoadMoreEvent,
   hostAria,
   inlineStep,
   KeyboardNavigationController,
@@ -107,9 +108,17 @@ import {
  * so served markup counts from one until the list runs.
  *
  * **An empty list.** Set `empty-label`, or put your own content in the `empty`
- * slot, for a row shown while the list has no rows, such as "No files yet" and
- * a link to add one. Without either, an empty list shows nothing. The list
- * takes the `empty` state while it has no rows, whatever it shows.
+ * slot, for a row shown while the list has no rows and none are loading, such
+ * as "No files yet" and a link to add one. Without either, an empty list shows
+ * nothing. The list takes the `empty` state while it has no rows, whatever it
+ * shows.
+ *
+ * **Loading more.** `load-more` sends `helix-load-more` once the end of the
+ * list comes within a screen of view, in the box that scrolls it or the page,
+ * once for each number of rows: add rows and it can send it again. While you
+ * fetch, set `loading`: the list is busy, and a row after the last says
+ * "Loading more" (`loading-label`, or your own content in the `loading`
+ * slot). The list asks for nothing while `loading` is set.
  *
  * An interactive list with no name is reported once in a development build,
  * since a screen reader announces it as a grid and nothing more. Name it with
@@ -122,19 +131,23 @@ import {
  * @documentation https://fusion.dev/helix/components/list
  *
  * @slot - The rows.
- * @slot empty - Content for the row shown while the list has no rows. Falls back to `empty-label`.
+ * @slot empty - Content for the row shown while the list has no rows and none are loading. Falls back to `empty-label`.
+ * @slot loading - Content for the row after the last while `loading` is set. Falls back to `loading-label`.
  *
  * @event {Event} change - Fired once a press has changed which rows are selected.
  * @event {HelixActionEvent} helix-action - Sent from a row when the reader acts on it: Enter, or a press in a list that selects nothing. Read the row from `target`. A row with `href` follows its link instead.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired before a press changes which rows are selected, with the `value` it would leave. Cancelable.
  * @event {HelixBeforeReorderEvent} helix-before-reorder - Fired when a row is dropped at a new place, in a `reorderable` list, with every row's value in the new order. Cancelable: cancel it to keep the row where it is.
+ * @event {HelixLoadMoreEvent} helix-load-more - Fired, in a list with `load-more`, when the end of the list comes within a screen of view, once for each number of rows.
  * @event {HelixReorderEvent} helix-reorder - Fired after `helix-before-reorder` when nobody canceled it. Move your rows to the order in `keys`. Cancelable: cancel it to say the move did not happen.
  *
- * @csspart empty - The row shown while the list has no rows, where `empty-label` or the `empty` slot gives it content. A grid row with one cell in a list that selects.
  * @csspart drag-preview - A copy of the row a pointer drags, which follows the pointer in the top layer until the row is let go, in a `reorderable` list. Hidden from assistive technology.
+ * @csspart empty - The row shown while the list has no rows and none are loading, where `empty-label` or the `empty` slot gives it content. A grid row with one cell in a list that selects.
  * @csspart live - The region that says each step of a move to screen readers, in a `reorderable` list. Drawn from the first move. Visually hidden in the styled tier.
+ * @csspart loading - The row after the last while `loading` is set. A grid row with one cell in a list that selects.
  *
  * @cssstate empty - While the list has no rows.
+ * @cssstate loading - While `loading` is set.
  *
  * @cssproperty --list-first - The number of the first row, written where `start` or `reversed` moves it.
  * @cssproperty --list-step - What each row adds to the number before it: `1`, or `-1` where `reversed`.
@@ -197,6 +210,25 @@ export class HelixHeadlessList extends HelixElement {
    */
   @property()
   label = ''
+
+  /**
+   * Sends `helix-load-more` once the end of the list comes within a screen of
+   * view, so you can add the next rows as a reader nears them.
+   */
+  @property({ attribute: 'load-more', type: Boolean })
+  loadMore = false
+
+  /**
+   * Marks the list as busy fetching more rows, and draws a row after the last
+   * that says so. The list asks for no more while it is set.
+   */
+  @property({ type: Boolean })
+  loading = false
+
+  /** The text of the row drawn while `loading` is set, where the `loading` slot is empty. */
+  @words
+  @property({ attribute: 'loading-label' })
+  loadingLabel = 'Loading more'
 
   /**
    * What screen readers hear each time an arrow key moves a held row, in a
@@ -686,6 +718,8 @@ export class HelixHeadlessList extends HelixElement {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    this.endWatcher?.disconnect()
+    this.endWatcher = undefined
     this.removeEventListener('keydown', this.handleKeyCapture, true)
     this.removeEventListener('keydown', this.handleKeydown)
     this.removeEventListener('click', this.handleClick)
@@ -715,6 +749,13 @@ export class HelixHeadlessList extends HelixElement {
     if (this.childrenKnown) {
       this.toggleState('empty', this.rows.length === 0)
     }
+    this.toggleState('loading', this.loading)
+    this.watchEnd()
+    /* Rows that arrived without moving the end out of reach, or a fetch that
+       finished, change nothing the observer sees, so the list asks again here. */
+    if (this.endInView) {
+      this.askForMore()
+    }
     if (this.reorderable || changed.get('reorderable') !== undefined) {
       this.syncMoves()
       this.refocus()
@@ -724,6 +765,7 @@ export class HelixHeadlessList extends HelixElement {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     hostAria(this.internals, { label: this.label, role: this.interactive ? 'grid' : 'list' })
+    this.internals.ariaBusy = this.loading ? 'true' : null
     this.internals.ariaMultiSelectable = this.selectionMode === 'multiple' ? 'true' : null
     /* `role="list"` at every kind, including `description`. A description list
        has its own native role, but this renders divs rather than `<dl>`, and
@@ -750,7 +792,7 @@ export class HelixHeadlessList extends HelixElement {
   protected override render(): TemplateResult {
     /* A row arriving or leaving changes who holds the stop and how many rows
        a reversed list counts down from. */
-    return html`<slot style=${this.numbers} @slotchange=${this.handleSlotChange}></slot>${this.drawEmpty()}${drawStatus(this.status)}${this.reorder.drawDragPreview()}`
+    return html`<slot style=${this.numbers} @slotchange=${this.handleSlotChange}></slot>${this.drawLoading()}${this.drawEmpty()}${this.loadMore ? html`<span data-end aria-hidden="true"></span>` : nothing}${drawStatus(this.status)}${this.reorder.drawDragPreview()}`
   }
 
   /**
@@ -760,7 +802,7 @@ export class HelixHeadlessList extends HelixElement {
    * while it has neither `empty-label` nor content in the `empty` slot.
    */
   private drawEmpty(): TemplateResult | typeof nothing {
-    if (!this.childrenKnown || this.rows.length > 0) {
+    if (!this.childrenKnown || this.rows.length > 0 || this.loading) {
       return nothing
     }
     const shown = this.emptyLabel !== '' || this.querySelector(':scope > [slot="empty"]') !== null
@@ -768,6 +810,73 @@ export class HelixHeadlessList extends HelixElement {
     return this.interactive
       ? html`<div part="empty" role="row" ?hidden=${!shown}><div role="gridcell">${content}</div></div>`
       : html`<div part="empty" role="listitem" ?hidden=${!shown}>${content}</div>`
+  }
+
+  /**
+   * The row after the last while `loading` is set: a list item, or a grid row
+   * with one cell in a list that selects. It is not one of the rows, so it
+   * carries no value and a key never lands on it.
+   */
+  private drawLoading(): TemplateResult | typeof nothing {
+    if (!this.loading) {
+      return nothing
+    }
+    const content = html`<slot name="loading">${this.loadingLabel}</slot>`
+    return this.interactive
+      ? html`<div part="loading" role="row"><div role="gridcell">${content}</div></div>`
+      : html`<div part="loading" role="listitem">${content}</div>`
+  }
+
+  /** Watches the end of a `load-more` list coming near the box that scrolls it. */
+  private endWatcher: IntersectionObserver | undefined
+
+  /** The end being watched, so a new one is watched again. */
+  private watchedEnd: Element | undefined
+
+  /** Whether the end of the list was in reach when last measured. */
+  private endInView = false
+
+  /** The number of rows `helix-load-more` was last sent for. */
+  private askedAt: number | undefined
+
+  /**
+   * Starts or stops watching the end of the list. The box it is measured
+   * against is the one that scrolls the list, or the page, and a screen of
+   * room is added below it, so the next rows are asked for before a reader
+   * reaches the last.
+   */
+  private watchEnd(): void {
+    const end = this.loadMore ? this.renderRoot.querySelector('[data-end]') : null
+    if (end === this.watchedEnd) {
+      return
+    }
+    this.endWatcher?.disconnect()
+    this.endWatcher = undefined
+    this.endInView = false
+    this.watchedEnd = end ?? undefined
+    if (!end || typeof IntersectionObserver === 'undefined') {
+      return
+    }
+    this.endWatcher = new IntersectionObserver(
+      (entries) => {
+        this.endInView = entries.some((entry) => entry.isIntersecting)
+        if (this.endInView) {
+          this.askForMore()
+        }
+      },
+      { root: scrollingAncestor(this, { axis: 'y' }), rootMargin: '0px 0px 100% 0px' },
+    )
+    this.endWatcher.observe(end)
+  }
+
+  /** Sends `helix-load-more`, once for each number of rows, and never while loading. */
+  private askForMore(): void {
+    const count = this.rows.length
+    if (!this.loadMore || this.loading || this.askedAt === count) {
+      return
+    }
+    this.askedAt = count
+    this.dispatchEvent(new HelixLoadMoreEvent())
   }
 
   /* Content arriving in or leaving the `empty` slot shows or hides the row. */

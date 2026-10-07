@@ -27,6 +27,8 @@ import { styles } from './list-root.css.js'
  * @cssproperty --list-empty-color - The color of the text in the row shown while the list has no rows.
  * @cssproperty --list-empty-padding - The space around the text in the row shown while the list has no rows.
  * @cssproperty --list-gap - The space between rows.
+ * @cssproperty --list-loading-color - The color of the text in the row drawn while `loading` is set.
+ * @cssproperty --list-loading-padding - The space around the text in the row drawn while `loading` is set.
  * @cssproperty --list-marker-gutter - The space that the markers of ordered and unordered lists sit in.
  * @cssproperty --list-rail-inline-size - The width of the rail's track.
  * @cssproperty --list-rail-style - The counter style of the rail's numbers. Takes any `list-style-type`.
