@@ -192,6 +192,46 @@ describe('a grid table', () => {
     expect(host.selected).toBe('web,api')
   })
 
+  /* Typeahead and Shift ranges were Data Table's alone, which React Aria's
+     table has as well. */
+  const three = `
+    <helix-headless-table label="Services" grid selectable>
+      <helix-headless-table-column>Service</helix-headless-table-column>
+      <helix-headless-table-row value="web"><helix-headless-table-cell header>web</helix-headless-table-cell></helix-headless-table-row>
+      <helix-headless-table-row value="api"><helix-headless-table-cell header>api</helix-headless-table-cell></helix-headless-table-row>
+      <helix-headless-table-row value="queue"><helix-headless-table-cell header>queue</helix-headless-table-cell></helix-headless-table-row>
+    </helix-headless-table>`
+
+  test('moves to the row whose first cell starts with the letters typed', async () => {
+    const host = (await mount(three)) as Gridded
+    await settle(host)
+    await settle(host)
+    cells(host)[0]?.focus()
+    expect(await press(host, 'q')).toBe(true)
+    expect(focused(host)).toBe(cells(host)[2] as Element)
+    expect(await press(host, 'z')).toBe(false)
+    expect(focused(host)).toBe(cells(host)[2] as Element)
+    expect(host.selected).toBe('')
+  })
+
+  test('selects the rows Shift with Down crosses, and Shift with Space a range', async () => {
+    const host = (await mount(three)) as Gridded
+    await settle(host)
+    await settle(host)
+    cells(host)[0]?.focus()
+    await press(host, 'ArrowDown', { shiftKey: true })
+    expect(host.selected).toBe('web,api')
+    expect(focused(host)).toBe(cells(host)[1] as Element)
+
+    host.selected = ''
+    await settle(host)
+    await press(host, ' ')
+    expect(host.selected).toBe('api')
+    await press(host, 'ArrowDown')
+    await press(host, ' ', { shiftKey: true })
+    expect(host.selected).toBe('api,queue')
+  })
+
   /* The stop and focus were on a row that went, so focus fell to the page and
      the stop to the first heading. React Aria moves both to a neighbor. */
   test('hands focus to the next row, at the same column, when the focused row goes', async () => {

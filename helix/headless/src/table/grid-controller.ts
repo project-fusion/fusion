@@ -9,6 +9,8 @@ import {
   scrollingAncestor,
   scrollRoom,
   selectsAll,
+  Typeahead,
+  typesCharacter,
   whenHydrated,
 } from '@fusion.dev/helix-core'
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
@@ -44,6 +46,16 @@ export interface TableGridOptions {
   part: (name: string) => HTMLElement | null
   /** The rows in the order they are drawn. */
   rows: () => Element[]
+  /**
+   * The words each row is found by when a reader types, in the order the rows
+   * are drawn.
+   */
+  rowWords: () => string[]
+  /**
+   * Selects every row from the row last chosen, or from row `from` where none
+   * was, to row `to`, and says whether the table selects at all.
+   */
+  selectRange: (to: number, from: number) => boolean
   /** Selects every row for Control or Command with A, and says whether it did. */
   selectAll: () => boolean
   /** Whether the table is a grid now. */
@@ -60,8 +72,8 @@ const shown = (element: Element): boolean => {
 
 /**
  * The keyboard of a `grid` table: one tab stop among its cells, the arrow
- * keys, Home, End and the Page keys between them, and Enter or F2 into a
- * cell's controls.
+ * keys, Home, End and the Page keys between them, Enter or F2 into a cell's
+ * controls, typeahead over the rows, and Shift ranges of rows.
  *
  * **Tab leaves the grid.** The controls in a cell are the consumer's, so their
  * tab order is left as written: Tab on a cell, or past the last control of a
@@ -96,6 +108,9 @@ export class TableGridController implements ReactiveController {
 
   /** The cells given a `tabindex`, so a table that stops being a grid takes it back. */
   private readonly given = new Set<HTMLElement>()
+
+  /** The letters a reader has typed at the rows. */
+  private readonly typeahead = new Typeahead()
 
   constructor(host: ReactiveControllerHost & HTMLElement, options: TableGridOptions) {
     this.host = host
@@ -359,6 +374,27 @@ export class TableGridController implements ReactiveController {
       }
       return
     }
+    /* A letter finds the next row whose words start with it. A Space is part
+       of a search under way, and otherwise selects. */
+    if (typesCharacter(event) && (event.key !== ' ' || this.typeahead.typing())) {
+      const found = this.typeahead.match(event.key, this.options.rowWords(), place.row)
+      if (found >= 0) {
+        event.preventDefault()
+        if (found !== place.row) {
+          this.moveTo({
+            column: Math.max(0, Math.min(place.column, this.widthOf(found) - 1)),
+            row: found,
+          })
+        }
+      }
+      return
+    }
+    if (event.key === ' ' && event.shiftKey && place.row >= 0) {
+      if (this.options.selectRange(place.row, place.row)) {
+        event.preventDefault()
+      }
+      return
+    }
     if (event.key === 'Enter' || event.key === ' ' || event.key === 'F2') {
       if (event.key !== 'F2' && this.options.activate(place, event)) {
         event.preventDefault()
@@ -386,6 +422,15 @@ export class TableGridController implements ReactiveController {
     }
     event.preventDefault()
     to.column = Math.max(0, Math.min(to.column, this.widthOf(to.row) - 1))
+    /* Shift with Up or Down takes the rows it crosses into the selection. */
+    if (
+      event.shiftKey &&
+      (event.key === 'ArrowUp' || event.key === 'ArrowDown') &&
+      place.row >= 0 &&
+      to.row >= 0
+    ) {
+      this.options.selectRange(to.row, place.row)
+    }
     if (to.row !== place.row || to.column !== place.column) {
       this.moveTo(to)
     }
