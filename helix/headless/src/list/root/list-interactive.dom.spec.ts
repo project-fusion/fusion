@@ -208,6 +208,18 @@ describe('a reversed list', () => {
     const slot = list.shadowRoot?.querySelector('slot') as HTMLSlotElement
     expect(slot.getAttribute('style')).toBe('--list-first: 3; --list-step: -1')
   })
+
+  test('counts its rows and not the content of its empty or loading slots', async () => {
+    const list = (await mount(`<helix-headless-list kind="ordered" reversed loading>
+      <helix-headless-list-item>One</helix-headless-list-item>
+      <helix-headless-list-item>Two</helix-headless-list-item>
+      <p slot="loading">Fetching</p>
+      <p slot="empty">None yet</p>
+    </helix-headless-list>`)) as List
+    await list.updateComplete
+    const slot = list.shadowRoot?.querySelector('slot') as HTMLSlotElement
+    expect(slot.getAttribute('style')).toBe('--list-first: 2; --list-step: -1')
+  })
 })
 
 describe('ranges and replacing', () => {
