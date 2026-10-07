@@ -210,12 +210,12 @@ because nothing stamps them.
    you, and it is the one class of failure a push will not resolve on its own.
    Several generators read what an earlier one wrote, so `regen` is a
    hand-written order rather than an alphabetical one.
-3. **`git push`.** The pre-push hook runs the withheld-name check, `biome ci`,
-   `check:cli` and the generated-file checks, and nothing else: seconds against
-   minutes. It judges
-   and never writes, because a hook that edits the tree during `git push`
-   produces a push that does not contain the edits. `git push --no-verify` skips
-   it, and `verify.yml` does the rest.
+3. **`git push`.** The pre-push hook takes seconds and builds nothing. It runs
+   the withheld-name check over the pushed commits and `biome ci` over the files
+   they change. It judges and never writes, because a hook that edits the tree
+   during `git push` produces a push that does not contain the edits.
+   `git push --no-verify` skips it, and `verify.yml` does the rest, the
+   generated-file checks included.
 
 **Regenerated files land in a commit of their own, and no source rides with
 them.** They are written from the whole tree at once, so any of them may carry a
