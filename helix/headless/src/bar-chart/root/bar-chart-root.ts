@@ -12,6 +12,7 @@ import {
   linear,
   linePath,
   MixinChartSource,
+  MixinChartStatus,
   PLOT_HEIGHT,
   PLOT_WIDTH,
   type Series,
@@ -62,11 +63,19 @@ import '../../tooltip/index.js'
  * tap or key, and `helix-reading-press` says a reading was clicked, tapped, or
  * pressed with Enter or Space, for a page that opens what a reading stands for.
  *
+ * **A chart with nothing to draw says so.** A table with no readings shows
+ * `empty-text`, "No readings", in the plot, and `loading` shows `loading-text`
+ * there until readings arrive. The `empty` and `loading` slots take markup in
+ * their place, such as a link to add the first reading.
+ *
  * @since 0.1.0
  * @status stable
  * @category charts
  * @aliases Column Chart, Categorical Chart
  * @documentation https://fusion.dev/helix/components/bar-chart
+ *
+ * @slot empty - Content shown in place of the drawing when the table has no readings, such as a link to add the first. Falls back to `empty-text`.
+ * @slot loading - Content shown in place of the drawing while `loading` is set and there are no readings yet. Falls back to `loading-text`.
  *
  * @event {HelixReadingChangeEvent} helix-reading-change - The reading shown moved, or was put away: `index` is the row, or `-1` for none, with its `label`, the `series` the keys rest on, and the `pointerType` that moved it.
  * @event {HelixReadingPressEvent} helix-reading-press - A reading was clicked, tapped, or pressed with Enter or Space, with the same detail as `helix-reading-change`.
@@ -77,6 +86,7 @@ import '../../tooltip/index.js'
  * @csspart bar-wash-end - The far stop of a bar's gradient, where one is used.
  * @csspart bar-wash-start - The stop of a bar's gradient at its base.
  * @csspart baseline - The line the columns stand on.
+ * @csspart empty - The words in place of the drawing when the table has no readings: the `empty` slot, falling back to `empty-text`. Not drawn while the table cannot be read yet, on the server and during hydration.
  * @csspart gridline - One gridline across the plot, drawn when `gridlines` is set.
  * @csspart group - One category's columns, together.
  * @csspart group-active - The group the tooltip describes. Set together with `group`.
@@ -84,6 +94,7 @@ import '../../tooltip/index.js'
  * @csspart labels - The row of category names.
  * @csspart line - A series drawn as a line, named in `lines`.
  * @csspart live - The readout: a polite live region that says the reading the keys moved to. Hide it visually.
+ * @csspart loading - The words in place of the drawing while `loading` is set and there are no readings: the `loading` slot, falling back to `loading-text`.
  * @csspart mark - The invisible point the tooltip is anchored to.
  * @csspart plot - The drawing, which takes focus to be read by key.
  * @csspart summary - The chart's name and each series' highest reading, written as a sentence for screen readers. Hide it visually.
@@ -113,7 +124,7 @@ import '../../tooltip/index.js'
  *   `wash="gradient"` is set.
  */
 @customElement('helix-headless-bar-chart')
-export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
+export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(HelixElement)) {
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-bar-chart': { highestLabel: 'Höchster Wert' } })`.
@@ -323,7 +334,7 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
        category off the axis and every other series slid one place left. */
     const categories = series.length === 0 ? [] : this.sourceRows.map((row) => row.label)
     if (categories.length === 0) {
-      return html`<div id=${CHART_PLOT} part="plot"></div>`
+      return html`<div id=${CHART_PLOT} part="plot">${this.renderStatus()}</div>`
     }
 
     /* Zero at both ends, so a series that goes negative gets a baseline inside

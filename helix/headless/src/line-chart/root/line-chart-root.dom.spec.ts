@@ -551,3 +551,43 @@ describe('value-axis', () => {
     expect(part(host, 'axis')).toBeNull()
   })
 })
+
+/* An empty table drew a blank plot at full height, which reads as a chart that
+   failed, and a chart waiting for its readings drew the same. */
+describe('with nothing to draw', () => {
+  const EMPTY = `<table id="none"><thead><tr><th scope="col">Month</th><th scope="col">Sessions</th></tr></thead><tbody></tbody></table>`
+  const FULL = `<table id="some"><thead><tr><th scope="col">Month</th><th scope="col">Sessions</th></tr></thead><tbody><tr><th scope="row">Jan</th><td>3</td></tr><tr><th scope="row">Feb</th><td>5</td></tr></tbody></table>`
+
+  const host = async (table: string, attributes: string, inside = ''): Promise<HTMLElement> => {
+    await mount(
+      `<div>${table}<helix-headless-line-chart ${attributes}>${inside}</helix-headless-line-chart></div>`,
+    )
+    const chart = document.querySelector('helix-headless-line-chart') as HTMLElement & {
+      updateComplete: Promise<boolean>
+    }
+    await chart.updateComplete
+    await chart.updateComplete
+    return chart
+  }
+
+  test('says it has no readings, in words a page can set or slot', async () => {
+    const chart = await host(EMPTY, 'for="none"')
+    const empty = part(chart, 'empty')
+    expect(empty?.closest('[part~="plot"]')).not.toBeNull()
+    expect(empty?.textContent?.trim()).toBe('No readings')
+    const worded = await host(EMPTY, 'for="none" empty-text="Nothing sold yet"')
+    expect(part(worded, 'empty')?.textContent?.trim()).toBe('Nothing sold yet')
+    const linked = await host(EMPTY, 'for="none"', '<a slot="empty" href="#add">Add a reading</a>')
+    const slot = part(linked, 'empty')?.querySelector('slot[name="empty"]') as HTMLSlotElement
+    expect(slot.assignedElements().map((one) => one.textContent)).toEqual(['Add a reading'])
+  })
+
+  test('says it is loading while loading is set, and keeps drawing readings it has', async () => {
+    const waiting = await host(EMPTY, 'for="none" loading')
+    expect(part(waiting, 'empty')).toBeNull()
+    expect(part(waiting, 'loading')?.textContent?.trim()).toBe('Loading readings')
+    const refreshing = await host(FULL, 'for="some" loading')
+    expect(part(refreshing, 'loading')).toBeNull()
+    expect(part(refreshing, 'svg') ?? part(refreshing, 'plot')?.querySelector('svg')).not.toBeNull()
+  })
+})

@@ -1,0 +1,21 @@
+/*
+ *  The words a chart shows in place of its drawing: `empty-text` when the table
+ *    has no readings and `loading-text` while they load, or what a page slotted
+ *    for either. Shared by the four charts on axes, which take them from one
+ *    mixin and draw them in the same box.
+ *
+ *  In the middle of the plot, which keeps the height it has with a drawing, so
+ *    the page does not move when the readings arrive.
+ */
+[part="empty"],
+[part="loading"] {
+  color: var(--helix-color-foreground-subtle);
+  display: grid;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  inset: 0;
+  margin: var(--helix-space-none);
+  place-content: center;
+  position: absolute;
+  text-align: center;
+}

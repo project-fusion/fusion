@@ -14,6 +14,7 @@ import {
   linear,
   linePath,
   MixinChartSource,
+  MixinChartStatus,
   PLOT_HEIGHT,
   PLOT_WIDTH,
   type Point,
@@ -71,11 +72,19 @@ import '../../tooltip/index.js'
  * tap or key, and `helix-reading-press` says a reading was clicked, tapped, or
  * pressed with Enter or Space, for a page that opens what a reading stands for.
  *
+ * **A chart with nothing to draw says so.** A table with no readings shows
+ * `empty-text`, "No readings", in the plot, and `loading` shows `loading-text`
+ * there until readings arrive. The `empty` and `loading` slots take markup in
+ * their place, such as a link to add the first reading.
+ *
  * @since 0.1.0
  * @status stable
  * @category charts
  * @aliases Time Series, Trend Chart, Multi-line Chart
  * @documentation https://fusion.dev/helix/components/line-chart
+ *
+ * @slot empty - Content shown in place of the drawing when the table has no readings, such as a link to add the first. Falls back to `empty-text`.
+ * @slot loading - Content shown in place of the drawing while `loading` is set and there are no readings yet. Falls back to `loading-text`.
  *
  * @event {HelixReadingChangeEvent} helix-reading-change - The reading shown moved, or was put away: `index` is the row, or `-1` for none, with its `label`, the `series` the keys rest on, and the `pointerType` that moved it.
  * @event {HelixReadingPressEvent} helix-reading-press - A reading was clicked, tapped, or pressed with Enter or Space, with the same detail as `helix-reading-change`.
@@ -84,6 +93,7 @@ import '../../tooltip/index.js'
  * @csspart axis - The numbers of the scale beside the plot, under `value-axis`.
  * @csspart band - The band around the reading under the pointer.
  * @csspart baseline - The rule at zero, where zero is inside the range.
+ * @csspart empty - The words in place of the drawing when the table has no readings: the `empty` slot, falling back to `empty-text`. Not drawn while the table cannot be read yet, on the server and during hydration.
  * @csspart gridline - One rule across the plot, under `gridlines`.
  * @csspart guide - A rule down the reading a pointer is resting on.
  * @csspart label - One reading's name.
@@ -91,6 +101,7 @@ import '../../tooltip/index.js'
  * @csspart line - The line for one series.
  * @csspart line-dashed - A `line` whose series `dashed` names. Set alongside `line`.
  * @csspart live - The readout: a polite live region that says the reading the keys moved to. Hide it visually.
+ * @csspart loading - The words in place of the drawing while `loading` is set and there are no readings: the `loading` slot, falling back to `loading-text`.
  * @csspart mark - The invisible point the tooltip is anchored to.
  * @csspart marker - The mark on one reading, under `markers`, and on a reading with a blank on either side. Placed with `inset-inline-start` and `inset-block-start`, and carries its series color as `--chart-series`.
  * @csspart marker-lone - A `marker` on a reading with a blank on either side, which no line reaches. Set alongside `marker`.
@@ -121,7 +132,7 @@ import '../../tooltip/index.js'
  * @cssproperty --line-chart-axis - The width of the axis, in `ch`, set from the widest number on it. Written by the component on the axis.
  */
 @customElement('helix-headless-line-chart')
-export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
+export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(HelixElement)) {
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-line-chart': { positionLabel: '{position} von {count}' } })`.
@@ -350,7 +361,7 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
        in it, which is also how the pointer and the tooltip count them. */
     const readings = series.length === 0 ? [] : this.sourceRows.map((row) => row.label)
     if (readings.length === 0) {
-      return html`<div id=${CHART_PLOT} part="plot"></div>`
+      return html`<div id=${CHART_PLOT} part="plot">${this.renderStatus()}</div>`
     }
 
     const domain = this.range(series)

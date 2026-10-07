@@ -11,6 +11,7 @@ import {
   isRtl,
   linear,
   MixinChartSource,
+  MixinChartStatus,
   PLOT_HEIGHT,
   PLOT_WIDTH,
   seriesIndex,
@@ -133,17 +134,27 @@ const nice = ([low, high]: [number, number]): [number, number] => {
  * tap or key, and `helix-reading-press` says a reading was clicked, tapped, or
  * pressed with Enter or Space, for a page that opens what a reading stands for.
  *
+ * **A chart with nothing to draw says so.** A table with no readings shows
+ * `empty-text`, "No readings", in the plot, and `loading` shows `loading-text`
+ * there until readings arrive. The `empty` and `loading` slots take markup in
+ * their place, such as a link to add the first reading.
+ *
  * @since 0.1.0
  * @status stable
  * @category charts
  * @aliases Scatter Plot, XY Chart, Correlation Chart, Dot Plot
  * @documentation https://fusion.dev/helix/components/scatter-chart
  *
+ * @slot empty - Content shown in place of the drawing when the table has no readings, such as a link to add the first. Falls back to `empty-text`.
+ * @slot loading - Content shown in place of the drawing while `loading` is set and there are no readings yet. Falls back to `loading-text`.
+ *
  * @event {HelixReadingChangeEvent} helix-reading-change - The reading shown moved, or was put away: `index` is the row, or `-1` for none, with its `label`, the `series` the keys rest on, and the `pointerType` that moved it.
  * @event {HelixReadingPressEvent} helix-reading-press - A reading was clicked, tapped, or pressed with Enter or Space, with the same detail as `helix-reading-change`.
  *
+ * @csspart empty - The words in place of the drawing when the table has no readings: the `empty` slot, falling back to `empty-text`. Not drawn while the table cannot be read yet, on the server and during hydration.
  * @csspart gridline - One line across the plot, drawn when `gridlines` is set.
  * @csspart live - The readout: a polite live region that says the row the keys moved to. Hide it visually.
+ * @csspart loading - The words in place of the drawing while `loading` is set and there are no readings: the `loading` slot, falling back to `loading-text`.
  * @csspart mark - The invisible point the tooltip is anchored to.
  * @csspart plane - The grid that holds the plot, both axes, and their names. It runs left to right on every page.
  * @csspart plot - The drawing, which takes focus to be read by key.
@@ -181,7 +192,7 @@ const nice = ([low, high]: [number, number]): [number, number] => {
  * @cssproperty --chart-tick - A tick's position along its axis, as a percentage. The component writes it.
  */
 @customElement('helix-headless-scatter-chart')
-export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
+export class HelixHeadlessScatterChart extends MixinChartStatus(MixinChartSource(HelixElement)) {
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-scatter-chart': { seriesLabel: '…' } })`.
@@ -382,7 +393,7 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
     this.drawn = field.points
     if (field.points.length === 0) {
       return html`<div dir="ltr" part="plane">
-        <div id=${CHART_PLOT} part="plot"></div>
+        <div id=${CHART_PLOT} part="plot">${this.renderStatus()}</div>
       </div>`
     }
     const format = formatNumbers(wordsLocale(this))
