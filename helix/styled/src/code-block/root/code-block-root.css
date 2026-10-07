@@ -191,6 +191,17 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
+/* A box that scrolls is a tab stop, and shows where focus is. The ring is
+   drawn inside the box's edge, so the code's own scroller, which sits inside
+   the block's padding, shows it whole. */
+[part="block"]:focus-visible,
+[part="code"]:focus-visible,
+[part="old"]:focus-visible,
+[part="new"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-ring) * -1);
+}
+
 /* Wrapped rather than scrolled, for prose-like code. Anywhere, since a long
    path or a hash has no space to break at. Not under line numbers, where a
    wrapped line would take one number and several rows. */

@@ -45,6 +45,16 @@ import { type DiffFile, type DiffHunk, type DiffLine, pairLines, parsePatch } fr
  * and its copy button copies the new version of the file. `variant="split"`
  * shows the old version beside the new, each removal opposite its replacement.
  *
+ * **A block that scrolls is a tab stop.** While its lines run past its width or
+ * its cap, the scroller is a region named for the block, such as "Code,
+ * app.ts", that Tab reaches, so a keyboard scrolls it with the arrow keys in
+ * every browser. Chromium and Firefox make a scrolling box focusable on their
+ * own, and Safari does not. A block that fits is no stop at all.
+ *
+ * **Code is left untranslated.** A page translator that rewrites prose would
+ * also rewrite the code, so the block sets `translate="no"` on itself when it
+ * connects. A `translate` you set is kept.
+ *
  * On the server, the slot renders as ordinary code, so a diff first appears as
  * the patch text in a `<pre>`. The client makes the same first render, which
  * keeps hydration clean, and draws the diff once it can read the content. Diff
@@ -103,6 +113,24 @@ export class HelixHeadlessCodeBlock extends HelixElement {
    * `registerWords('de', { 'helix-code-block': { copyLabel: 'Code kopieren' } })`.
    */
   static words = 'helix-code-block'
+
+  /**
+   * The name of a block that scrolls, which is a tab stop while it does.
+   *
+   * Where the block has a name, the scroller says it too, such as "Code,
+   * app.ts", as `code-name-label` puts it.
+   */
+  @words
+  @property({ attribute: 'code-label' })
+  codeLabel = 'Code'
+
+  /**
+   * The name of a block that scrolls, where the block has a name. `{code}` is
+   * `code-label` and `{name}` the block's name.
+   */
+  @words
+  @property({ attribute: 'code-name-label' })
+  codeNameLabel = '{code}, {name}'
 
   /**
    * The expand button's words while the block shows every line.
@@ -318,7 +346,7 @@ export class HelixHeadlessCodeBlock extends HelixElement {
   @state()
   private expanded = false
 
-  /** Watches the block's size, while it is expandable. */
+  /** Watches the block's size. */
   private sizes: ResizeObserver | undefined
 
   /**
@@ -328,6 +356,7 @@ export class HelixHeadlessCodeBlock extends HelixElement {
    * everything.
    */
   private readonly measure = (): void => {
+    this.markScrollers()
     if (!this.expanded) {
       this.capped =
         this.expandable &&
@@ -338,11 +367,51 @@ export class HelixHeadlessCodeBlock extends HelixElement {
     }
   }
 
+  /**
+   * Makes each box that scrolls a tab stop and a region named for its block,
+   * and takes both away from a box that fits.
+   *
+   * **A reader on a keyboard scrolls the code from the box itself.** Chromium
+   * and Firefox make a scrolling box focusable on their own, and Safari does
+   * not, so there the arrow keys could not reach the end of a long line. A
+   * box counts while its sheet lets it scroll and its content is wider or
+   * taller than it is drawn: an unstyled `<pre>` overflows without scrolling,
+   * and a stop on it would scroll nothing.
+   */
+  private markScrollers(): void {
+    for (const box of this.renderRoot.querySelectorAll<HTMLElement>(
+      '[part="block"], [part="code"], [part="old"], [part="new"]',
+    )) {
+      const style = getComputedStyle(box)
+      const scrolls = (value: string) => value === 'auto' || value === 'scroll'
+      const overflows =
+        (scrolls(style.overflowX) && box.scrollWidth > box.clientWidth + 1) ||
+        (scrolls(style.overflowY) && box.scrollHeight > box.clientHeight + 1)
+      if (overflows) {
+        const name = box.closest('[part="file"]')?.querySelector('[part="label"]')?.textContent
+        const named = name ?? (this.label || this.language)
+        box.tabIndex = 0
+        box.setAttribute('role', 'region')
+        box.setAttribute(
+          'aria-label',
+          named
+            ? formatWords(this, 'codeNameLabel', { code: this.codeLabel, name: named })
+            : this.codeLabel,
+        )
+      } else {
+        box.removeAttribute('tabindex')
+        box.removeAttribute('role')
+        box.removeAttribute('aria-label')
+      }
+    }
+  }
+
   /* Measured after each render, and again whenever the block changes size,
-     which a narrower page or a font arriving does with no render. */
+     which a narrower page or a font arriving does with no render. Every block
+     is watched, since any of them may come to scroll. */
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    if (this.expandable && typeof ResizeObserver !== 'undefined') {
+    if (typeof ResizeObserver !== 'undefined') {
       this.sizes ??= new ResizeObserver(this.measure)
       this.sizes.observe(this)
     }
@@ -351,6 +420,12 @@ export class HelixHeadlessCodeBlock extends HelixElement {
 
   override connectedCallback(): void {
     super.connectedCallback()
+    /* The slotted code inherits its translation mode from the host, its parent
+       in the page, so the attribute has to be on the host. The `<pre>`s carry
+       it too, for the highlighted lines and the diff drawn inside. */
+    if (!this.hasAttribute('translate')) {
+      this.setAttribute('translate', 'no')
+    }
     if (typeof MutationObserver !== 'undefined') {
       this.observer ??= new MutationObserver(() => this.requestUpdate())
       this.observer.observe(this, { characterData: true, childList: true, subtree: true })
@@ -412,7 +487,7 @@ export class HelixHeadlessCodeBlock extends HelixElement {
     const name = this.label || this.language
     return html`${this.renderHeader(name)}
       <div part="frame">
-        <pre id="block" part="block">${gutter}${code}</pre>
+        <pre id="block" part="block" translate="no">${gutter}${code}</pre>
         ${name ? nothing : this.renderCopy()}
       </div>${this.renderExpand()}`
   }
@@ -528,13 +603,13 @@ export class HelixHeadlessCodeBlock extends HelixElement {
     const hunks = file.hunks.map((hunk) => ({ hunk, rows: pairLines(hunk.lines) }))
     const filler = html`<span part="filler" aria-hidden="true">\n</span>`
     return html`<div part="split">
-      <pre part="old"><code part="code">${hunks.map(
+      <pre part="old" translate="no"><code part="code">${hunks.map(
         ({ hunk, rows }) =>
           html`${this.renderHunk(hunk)}${rows.map(({ left }) =>
             left ? this.renderLine(left, width, 'old') : filler,
           )}`,
       )}</code></pre>
-      <pre part="new"><code part="code">${hunks.map(
+      <pre part="new" translate="no"><code part="code">${hunks.map(
         ({ hunk, rows }) =>
           html`${this.renderHunk(hunk, true)}${rows.map(({ right }) =>
             right ? this.renderLine(right, width, 'new') : filler,
@@ -571,7 +646,7 @@ export class HelixHeadlessCodeBlock extends HelixElement {
           ${
             this.variant === 'split'
               ? this.renderSplit(file, width)
-              : html`<pre part="block"><code part="code">${file.hunks.map(
+              : html`<pre part="block" translate="no"><code part="code">${file.hunks.map(
                   (hunk) =>
                     html`${this.renderHunk(hunk)}${hunk.lines.map((line) => this.renderLine(line, width))}`,
                 )}</code></pre>`

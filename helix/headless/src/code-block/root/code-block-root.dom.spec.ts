@@ -379,3 +379,70 @@ test("forwards the copy button's pending ring as `copy-spinner`", async () => {
   const copy = el.shadowRoot?.querySelector('[part="copy"]')
   expect(copy?.getAttribute('exportparts')).toContain('spinner: copy-spinner')
 })
+
+/* Safari makes no scroller a tab stop, so a keyboard there could not reach the
+   end of a long line. happy-dom lays nothing out, so the overflow is said by
+   the scroller's sizes and its sheet by an inline style. */
+describe('a block that scrolls', () => {
+  type Block = Updatable & { requestUpdate: () => void }
+  const overflow = (box: HTMLElement, wide: boolean): void => {
+    box.style.overflowX = 'auto'
+    Object.defineProperty(box, 'scrollWidth', { configurable: true, get: () => (wide ? 900 : 300) })
+    Object.defineProperty(box, 'clientWidth', { configurable: true, get: () => 300 })
+  }
+
+  test('is a tab stop and a region named for the block, and only while it scrolls', async () => {
+    const el = (await mount(
+      '<helix-headless-code-block label="app.ts">const a = 1</helix-headless-code-block>',
+    )) as Block
+    await el.updateComplete
+    const block = part(el, 'block') as HTMLElement
+    expect(block.hasAttribute('tabindex')).toBe(false)
+    overflow(block, true)
+    el.requestUpdate()
+    await el.updateComplete
+    expect(block.getAttribute('tabindex')).toBe('0')
+    expect(block.getAttribute('role')).toBe('region')
+    expect(block.getAttribute('aria-label')).toBe('Code, app.ts')
+    overflow(block, false)
+    el.requestUpdate()
+    await el.updateComplete
+    expect(['tabindex', 'role', 'aria-label'].some((name) => block.hasAttribute(name))).toBe(false)
+  })
+
+  test('a block with no name is named by its words alone', async () => {
+    const el = (await mount(
+      '<helix-headless-code-block code-label="Codice">x</helix-headless-code-block>',
+    )) as Block
+    await el.updateComplete
+    const block = part(el, 'block') as HTMLElement
+    overflow(block, true)
+    el.requestUpdate()
+    await el.updateComplete
+    expect(block.getAttribute('aria-label')).toBe('Codice')
+  })
+
+  /* An unstyled `<pre>` runs past its box without scrolling, and a stop on it
+     would scroll nothing. */
+  test('a box that overflows without scrolling is no stop', async () => {
+    const el = (await mount('<helix-headless-code-block>x</helix-headless-code-block>')) as Block
+    await el.updateComplete
+    const block = part(el, 'block') as HTMLElement
+    overflow(block, true)
+    block.style.overflowX = 'visible'
+    el.requestUpdate()
+    await el.updateComplete
+    expect(block.hasAttribute('tabindex')).toBe(false)
+  })
+})
+
+describe('translation', () => {
+  test('the block is left untranslated unless the page says otherwise', async () => {
+    const el = await mount('<helix-headless-code-block>const a = 1</helix-headless-code-block>')
+    expect(el.getAttribute('translate')).toBe('no')
+    const words = await mount(
+      '<helix-headless-code-block translate="yes">Hello</helix-headless-code-block>',
+    )
+    expect(words.getAttribute('translate')).toBe('yes')
+  })
+})
