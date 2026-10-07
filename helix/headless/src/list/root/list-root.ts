@@ -318,6 +318,9 @@ export class HelixHeadlessList extends HelixElement {
   /** The row the reader was last on, which keeps the tab stop. */
   private last: HelixHeadlessListItem | undefined
 
+  /** The rows in order on the last `sync`, so a removed row's place is known. */
+  private placed: HelixHeadlessListItem[] = []
+
   /** The value of the row a Shift range runs from: the last row pressed. */
   private anchor: string | undefined
 
@@ -489,6 +492,10 @@ export class HelixHeadlessList extends HelixElement {
     const mode = this.selectionMode
     const chosen = new Set(commaList(this.value))
     const rows = this.rows
+    if (mode) {
+      this.followRemoved(rows)
+    }
+    this.placed = rows
     const holder = mode
       ? rovingStop(rows, this.last, {
           disabled: (row) => row.disabled,
@@ -501,6 +508,34 @@ export class HelixHeadlessList extends HelixElement {
         row.selected =
           mode === undefined || mode === 'none' ? undefined : chosen.has(this.valueFor(row))
       })
+    }
+  }
+
+  /**
+   * Moves the tab stop off a row the page removed, to the next row a key can
+   * reach or, at the end, the one before it, and moves focus there where
+   * removing the row dropped it to the body.
+   *
+   * **Focus went to the body**, and the arrow keys did nothing until the
+   * reader tabbed back into the list. React Aria's GridList moves focus to a
+   * neighbor the same way. Focus anywhere but the body is where you put it,
+   * and is left there.
+   */
+  private followRemoved(rows: HelixHeadlessListItem[]): void {
+    const last = this.last
+    const at = last ? this.placed.indexOf(last) : -1
+    if (!last || at < 0 || rows.includes(last)) {
+      return
+    }
+    const present = new Set(rows)
+    const reachable = (row: HelixHeadlessListItem): boolean => present.has(row) && !row.disabled
+    const next =
+      this.placed.slice(at + 1).find(reachable) ??
+      this.placed.slice(0, at).reverse().find(reachable)
+    this.last = next
+    const active = deepActiveElement()
+    if (next && (active === null || active === document.body)) {
+      whenHydrated(next, () => next.focusItem())
     }
   }
 
