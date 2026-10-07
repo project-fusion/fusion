@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import { hasState, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -455,5 +455,27 @@ describe('the keyboard and the live region', () => {
     await host.updateComplete
     expect(part(host, 'live')?.getAttribute('role')).toBe('status')
     expect(part(host, 'live')?.textContent).toBe('Now playing Two')
+  })
+})
+
+/* Which entry plays was a part on the row inside each entry, and the end of the
+   list was an event alone, so a page could style neither from the hosts. */
+describe('the states a stylesheet reads', () => {
+  test('the entry playing is `current`, and the list is `ended` once it stops at its end', async () => {
+    const host = await list()
+    await host.updateComplete
+    const [one, two] = entries(host) as [Entry, Entry]
+    await (one as Entry & { updateComplete: Promise<boolean> }).updateComplete
+    expect(hasState(one, 'current')).toBe(true)
+    expect(hasState(two, 'current')).toBe(false)
+    host.requestActive('two')
+    await host.updateComplete
+    await (two as Entry & { updateComplete: Promise<boolean> }).updateComplete
+    expect(hasState(two, 'current')).toBe(true)
+    expect(hasState(host, 'ended')).toBe(false)
+    player(host).dispatchEvent(new Event('ended'))
+    expect(hasState(host, 'ended')).toBe(true)
+    player(host).dispatchEvent(new Event('play'))
+    expect(hasState(host, 'ended')).toBe(false)
   })
 })
