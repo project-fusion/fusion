@@ -85,20 +85,6 @@ export class HelixHeadlessChatComposer extends HelixFormElement {
   label = 'Message'
 
   /**
-   * Placeholder text shown in an empty field.
-   */
-  @property()
-  placeholder = ''
-
-  /**
-   * How many rows the field opens at.
-   *
-   * It grows from there.
-   */
-  @property({ type: Number })
-  rows = 1
-
-  /**
    * The most characters a draft can have. The field stops taking more.
    */
   @property({ attribute: 'maxlength', type: Number })
@@ -112,11 +98,25 @@ export class HelixHeadlessChatComposer extends HelixFormElement {
   minLength?: number
 
   /**
+   * Placeholder text shown in an empty field.
+   */
+  @property()
+  placeholder = ''
+
+  /**
    * Whether the form needs a draft to submit. An empty draft never sends,
    * required or not.
    */
   @property({ type: Boolean })
   required = false
+
+  /**
+   * How many rows the field opens at.
+   *
+   * It grows from there.
+   */
+  @property({ type: Number })
+  rows = 1
 
   /**
    * Label for the send button.

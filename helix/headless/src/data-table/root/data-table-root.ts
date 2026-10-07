@@ -711,17 +711,6 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   @property({ type: Boolean })
   selectable = false
 
-  /**
-   * What a key or a press on a row does to the rows already selected, in a
-   * `selectable` table. `toggle`, the default, keeps them: Space adds or takes
-   * out the row. `replace` selects the row alone, as a file list does: Down and
-   * Up carry the selection with them, and a press on a row selects it. Control
-   * or Command with a press or Space adds or takes out one row, and with a move
-   * goes without selecting. The checkboxes add or take out one row either way.
-   */
-  @property({ attribute: 'selection-behavior' })
-  selectionBehavior: 'replace' | 'toggle' = 'toggle'
-
   /** The name of the checkbox in the heading that selects every row. */
   @words
   @property({ attribute: 'select-all-label' })
@@ -756,6 +745,17 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   @words
   @property({ attribute: 'selected-label' })
   selectedLabel = '{count} selected'
+
+  /**
+   * What a key or a press on a row does to the rows already selected, in a
+   * `selectable` table. `toggle`, the default, keeps them: Space adds or takes
+   * out the row. `replace` selects the row alone, as a file list does: Down and
+   * Up carry the selection with them, and a press on a row selects it. Control
+   * or Command with a press or Space adds or takes out one row, and with a move
+   * goes without selecting. The checkboxes add or take out one row either way.
+   */
+  @property({ attribute: 'selection-behavior' })
+  selectionBehavior: 'replace' | 'toggle' = 'toggle'
 
   /**
    * The name of a row's checkbox. `{row}` is replaced with the row's value in
