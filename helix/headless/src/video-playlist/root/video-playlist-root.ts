@@ -9,7 +9,7 @@ import {
   StatusController,
   words,
 } from '@fusion.dev/helix-core'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixHeadlessVideoPlaylistItem } from '../item/video-playlist-item.js'
 import { playOrder, type Repeat, stepTo } from '../order.js'
@@ -23,6 +23,7 @@ import { playOrder, type Repeat, stepTo } from '../order.js'
  */
 type Player = HTMLElement & {
   currentTime?: number
+  paused?: boolean
   label: string
   mediaTitle?: string
   play: () => Promise<void> | void
@@ -52,19 +53,31 @@ type Player = HTMLElement & {
  * - the player reaches the end.
  *
  * On `ended` the playlist advances and the next clip starts playing, because
- * the user already pressed play once. `repeat` decides what happens at the
+ * the user already pressed play once. `no-advance` turns that off, and the
+ * playlist stays on the entry that ended. `repeat` decides what happens at the
  * end: `one` plays the same entry again, and `all` goes from the last entry
  * back to the first. Without it, the playlist stops on the last entry and
  * sends `helix-end`. `shuffle` plays the entries in a random order, starting
  * from the one that is current, and `previous` retraces that order.
  *
+ * **`helix-before-activate` says why the playlist is moving**, in
+ * `detail.cause`: `press` for an entry or a menu choice, `next` and
+ * `previous` for the player's controls and the methods, `ended` at the end of
+ * a clip, and `removed` when the current entry leaves the playlist. Cancel an
+ * `ended` move to show your own "Up next" countdown, then call `next()`.
+ *
+ * **Removing the current entry moves the playlist on**, to the entry after it,
+ * or to the one before it when it was the last. A clip that was playing keeps
+ * playing in the entry that takes its place.
+ *
  * **The player is named by the current entry**, and the device's own media
  * controls show the entry as the title. A player you gave a `label` keeps
  * your name, and only the title follows the entry.
  *
- * **Keyboard.** Each entry is a button in the tab order, and Enter or Space
- * plays it. The arrow keys move focus to the entry before or after, and Home
- * and End to the first and the last, passing over disabled entries. The
+ * **Keyboard.** The entries take one stop in the tab order: the entry you
+ * last focused, or the current entry before you have focused one. Enter or
+ * Space plays it. The arrow keys move focus to the entry before or after, and
+ * Home and End to the first and the last, passing over disabled entries. The
  * current entry carries `aria-current`. While focus is on the player, the
  * player's own keys work, and `Video` lists them, and Shift with N or P plays
  * the next or the previous entry. The player's previous and next controls
@@ -82,12 +95,14 @@ type Player = HTMLElement & {
  * @documentation https://fusion.dev/helix/components/video-playlist
  *
  * @slot - The entries.
+ * @slot empty - Shown while the playlist has no entries. Defaults to `empty-label`.
  * @slot player - The player that plays the entries.
  *
  * @event {HelixActivateEvent} helix-activate - The current entry changed. The playlist already holds the new entry when this is sent, and `detail.previous` is the entry it left. `currentEntry` is the entry itself, with its `src`, `poster` and name.
- * @event {HelixBeforeActivateEvent} helix-before-activate - The current entry is about to change. Cancelable: cancel it to keep the current entry.
+ * @event {HelixBeforeActivateEvent} helix-before-activate - The current entry is about to change, and `detail.cause` says why: `press`, `next`, `previous`, `ended`, or `removed`. Cancelable: cancel it to keep the current entry.
  * @event {HelixEndEvent} helix-end - The last entry finished playing, and the playlist stopped there. Not sent while `repeat` is set.
  *
+ * @csspart empty - The box that holds the `empty` slot, drawn while there are no entries.
  * @csspart items - The list of entries.
  * @csspart live - A live region that says which entry plays after the playlist moves.
  * @csspart player - The region that holds the player.
@@ -103,11 +118,26 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
   static words = 'helix-video-playlist'
 
   /**
+   * What the playlist says while it has no entries. The `empty` slot replaces it.
+   */
+  @words
+  @property({ attribute: 'empty-label' })
+  emptyLabel = 'No videos'
+
+  /**
    * The list's name, read by screen readers.
    */
   @words
   @property()
   label = 'Playlist'
+
+  /**
+   * Stays on an entry when its clip ends, where the playlist would otherwise
+   * play the next one. The player's controls, a press, and `next()` still
+   * move. `repeat="one"` still plays the entry again.
+   */
+  @property({ attribute: 'no-advance', type: Boolean })
+  noAdvance = false
 
   /**
    * What the live region says when the playlist moves to another entry.
@@ -195,6 +225,25 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
   private chased = false
 
   /**
+   * The entries' values in the order of the last update, and the one that was
+   * current then. Read when entries leave, to find the neighbor of a current
+   * entry that has gone.
+   */
+  private known: { current: string | undefined; values: string[] } = {
+    current: undefined,
+    values: [],
+  }
+
+  /**
+   * The entry that holds the list's tab stop: the one a reader last focused.
+   * Before they focus one, the current entry holds it.
+   */
+  private stop: string | undefined
+
+  /** Hears entries arrive and leave, which change no property here. */
+  private watcher: MutationObserver | undefined
+
+  /**
    * The player, whichever tag the consumer slotted.
    *
    * Asked of the slot rather than matched by tag name: each tier registers its
@@ -228,7 +277,7 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
    * A move a consumer refuses with `helix-before-activate` plays nothing, and
    * leaves nothing behind to play on a later change.
    */
-  private step(by: number): void {
+  private step(by: number, cause: 'ended' | 'next' | 'previous'): void {
     const { current, next } = this.following(by)
     if (next === undefined) {
       return
@@ -238,7 +287,7 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
       return
     }
     this.chased = true
-    if (!this.requestActive(next)) {
+    if (!this.requestActive(next, cause)) {
       this.chased = false
     }
   }
@@ -274,7 +323,7 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
    * entry otherwise.
    */
   next(): void {
-    this.step(1)
+    this.step(1, 'next')
   }
 
   /**
@@ -282,7 +331,7 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
    * does. Under `shuffle` it goes back through the order that played.
    */
   previous(): void {
-    this.step(-1)
+    this.step(-1, 'previous')
   }
 
   private readonly handleSelect = (event: Event): void => {
@@ -314,7 +363,58 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
       return
     }
     this.chased = true
-    this.requestActive((event as CustomEvent<{ value: string }>).detail.value)
+    this.requestActive((event as CustomEvent<{ value: string }>).detail.value, 'press')
+  }
+
+  /** An entry that takes focus takes the tab stop with it. */
+  private readonly handleFocusIn = (event: FocusEvent): void => {
+    const entry = event.target
+    if (entry instanceof HelixHeadlessVideoPlaylistItem && this.items.includes(entry)) {
+      this.stop = entry.value
+      this.placeStop(this.items)
+    }
+  }
+
+  /**
+   * Entries arrived or left. Where the current entry left, the playlist moves
+   * to the entry after it, or to the one before it when it was the last, and
+   * keeps playing where it was playing.
+   */
+  private readonly handleEntries = (): void => {
+    const { current, values } = this.known
+    const items = this.items
+    const present = new Set(items.filter((one) => !one.disabled).map((one) => one.value))
+    if (current !== undefined && !items.some((one) => one.value === current)) {
+      const at = values.indexOf(current)
+      const next =
+        values.slice(at + 1).find((value) => present.has(value)) ??
+        values
+          .slice(0, at)
+          .reverse()
+          .find((value) => present.has(value))
+      if (next !== undefined) {
+        this.chased = this.player?.paused === false
+        if (!this.requestActive(next, 'removed')) {
+          this.chased = false
+        }
+      }
+    }
+    this.requestUpdate()
+  }
+
+  /**
+   * Gives one entry the tab stop and takes it from the rest: the entry last
+   * focused, then the current entry, then the first that can be chosen.
+   */
+  private placeStop(items: HelixHeadlessVideoPlaylistItem[]): void {
+    const enabled = items.filter((one) => !one.disabled)
+    const holder =
+      enabled.find((one) => one.value === this.stop) ??
+      enabled.find((one) => one.current) ??
+      enabled[0]
+    for (const item of items) {
+      item.focusable = item === holder
+    }
   }
 
   /**
@@ -390,7 +490,7 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
       return false
     }
     event.preventDefault()
-    this.step(event.key === 'N' ? 1 : -1)
+    this.step(event.key === 'N' ? 1 : -1, event.key === 'N' ? 'next' : 'previous')
     return true
   }
 
@@ -424,11 +524,14 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
       this.dispatchEvent(new HelixEndEvent())
       return
     }
-    this.step(1)
+    if (!this.noAdvance) {
+      this.step(1, 'ended')
+    }
   }
 
   override connectedCallback(): void {
     super.connectedCallback()
+    this.addEventListener('focusin', this.handleFocusIn)
     this.addEventListener('helix-select', this.handleSelect)
     this.addEventListener('keydown', this.handleKeydown)
     this.addEventListener('helix-next', this.handleNext)
@@ -444,16 +547,28 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
        every ancestor whether the event bubbles or not. */
     this.addEventListener('ended', this.handleEnded, true)
     this.addEventListener('play', this.handlePlay, true)
+    if (typeof MutationObserver !== 'undefined') {
+      this.watcher ??= new MutationObserver(this.handleEntries)
+      this.watcher.observe(this, { childList: true, subtree: true })
+    }
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    this.watcher?.disconnect()
+    this.removeEventListener('focusin', this.handleFocusIn)
     this.removeEventListener('helix-select', this.handleSelect)
     this.removeEventListener('keydown', this.handleKeydown)
     this.removeEventListener('helix-next', this.handleNext)
     this.removeEventListener('helix-previous', this.handlePrevious)
     this.removeEventListener('ended', this.handleEnded, true)
     this.removeEventListener('play', this.handlePlay, true)
+  }
+
+  /** Asks for the render after a hydration, which can see the entries. */
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.finishHydration()
   }
 
   /** A shuffle turned off forgets its order, so the next one is new. */
@@ -479,6 +594,8 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
     for (const item of items) {
       item.current = item === current
     }
+    this.known = { current: current?.value, values: items.map((one) => one.value) }
+    this.placeStop(items)
     const player = this.player
     if (!player || !current) {
       return
@@ -514,10 +631,15 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
   }
 
   protected override render(): TemplateResult {
+    /* Only where the entries can be known: a server and a hydrating render
+       cannot see them, and an empty state drawn because nobody has looked yet
+       is the one an empty state must never be. */
+    const empty = this.childrenKnown && this.items.length === 0
     return html`<div part="player"><slot name="player"></slot></div>
       <div part="items" role="list" aria-label=${this.label}>
         <slot></slot>
       </div>
+      ${empty ? html`<div part="empty"><slot name="empty">${this.emptyLabel}</slot></div>` : nothing}
       ${drawStatus(this.status)}`
   }
 }

@@ -32,8 +32,12 @@ export declare class MixinControllerActiveInterface {
    */
   defaultActive: string
 
-  /** Requests a new current item, and returns whether the change was applied. */
-  requestActive(next: string): boolean
+  /**
+   * Requests a new current item, and returns whether the change was applied.
+   * `cause` says why, where the family names its causes, and reaches
+   * `helix-before-activate` as `detail.cause`.
+   */
+  requestActive(next: string, cause?: string): boolean
 
   /**
    * Which item is current, given what there is to choose from.
@@ -114,9 +118,10 @@ export const MixinControllerActive = <T extends Constructor<HelixElement>>(Base:
      * by the time this runs, so refusing is simply not writing: there is
      * nothing to put back. Nobody refusing means the set updates itself,
      * whether or not a consumer declared `active`, a declared property being a
-     * seed and a correction.
+     * seed and a correction. `cause` says why, where the family names its
+     * causes, and reaches the event as `detail.cause`.
      */
-    requestActive(next: string): boolean {
+    requestActive(next: string, cause?: string): boolean {
       if (next === this.active) {
         return true
       }
@@ -127,7 +132,8 @@ export const MixinControllerActive = <T extends Constructor<HelixElement>>(Base:
           this.activeState = value
           this.requestUpdate('active', previous)
         },
-        event: (value) => new HelixBeforeActivateEvent({ value }),
+        event: (value) =>
+          new HelixBeforeActivateEvent(cause === undefined ? { value } : { cause, value }),
         host: this,
         next,
       })

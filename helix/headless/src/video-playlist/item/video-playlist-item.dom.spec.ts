@@ -35,6 +35,14 @@ describe('one playlist entry', () => {
     expect(part(one, 'item')?.getAttribute('part')).toBe('item')
   })
 
+  test('draws the `indicator` slot only on the entry playing', async () => {
+    const one = await entry('value="a"', 'His Girl Friday<span slot="indicator">Playing</span>')
+    expect(part(one, 'indicator')).toBeNull()
+    one.current = true
+    await one.updateComplete
+    expect(part(one, 'indicator')?.getAttribute('name')).toBe('indicator')
+  })
+
   /* `textContent` takes the whole subtree, so a row with a duration beside it
      reads "His Girl Friday0:06", and that string goes to the player and on to
      the lock screen. Only the unslotted nodes are the name; anything named is a

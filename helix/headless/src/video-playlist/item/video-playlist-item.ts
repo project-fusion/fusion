@@ -25,12 +25,14 @@ import { property } from 'lit/decorators.js'
  * @documentation https://fusion.dev/helix/components/video-playlist
  *
  * @slot - The entry's name.
+ * @slot indicator - A mark shown on the entry that is playing, such as an equalizer icon. Rendered only while the entry is current.
  * @slot media - A thumbnail. Defaults to an image of `poster`.
  * @slot meta - Content after the name, such as a duration or a date.
  *
  * @event {HelixSelectEvent} helix-select - The entry was chosen. Cancelable: cancel it to keep the current entry.
  *
  * @csspart container - The list item that holds the button.
+ * @csspart indicator - The `indicator` slot, at the end of the row, rendered only while the entry is playing. It draws no box until you give it one.
  * @csspart item - The row, which is a button.
  * @csspart item-current - Added to `item` for the entry that is playing.
  * @csspart label - The name and the content after it.
@@ -50,6 +52,17 @@ export class HelixHeadlessVideoPlaylistItem extends HelixElement {
    */
   @property({ attribute: false })
   current = false
+
+  /**
+   * Whether the entry holds the playlist's tab stop. Unset, every entry is in
+   * the tab order, which is what a server renders.
+   *
+   * **Written by the playlist, with no attribute, and it reaches the button.**
+   * The playlist gives the stop to the entry a reader last focused, or to the
+   * current one, and the arrow keys reach the rest.
+   */
+  @property({ attribute: false })
+  focusable?: boolean
 
   /**
    * Prevents the entry from being chosen.
@@ -155,6 +168,7 @@ export class HelixHeadlessVideoPlaylistItem extends HelixElement {
         type="button"
         aria-current=${this.current ? 'true' : nothing}
         ?disabled=${this.disabled}
+        tabindex=${this.focusable === false ? '-1' : nothing}
         @click=${this.choose}
       >
         <span part="media">${this.renderMedia()}</span>
@@ -162,6 +176,7 @@ export class HelixHeadlessVideoPlaylistItem extends HelixElement {
           <slot></slot>
           <slot name="meta"></slot>
         </span>
+        ${this.current ? html`<slot name="indicator" part="indicator"></slot>` : nothing}
       </button>
     </div>`
   }
