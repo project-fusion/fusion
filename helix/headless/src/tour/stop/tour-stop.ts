@@ -4,6 +4,7 @@ import {
   elementById,
   HelixElement,
   HelixTourAskEvent,
+  OpenPhaseController,
   type Placement,
   PopoverController,
   reflectElements,
@@ -16,6 +17,28 @@ import { property, state } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
 import '../../button/index.js'
 import { stopNaming } from '../naming.js'
+
+/** What a stop's `effect` is given: the stop's place, its target, and the tour's moves. */
+export interface TourStopContext {
+  /** The stop's index in the tour. */
+  index: number
+  /** Goes on to the next stop, as Next does. */
+  next(): void
+  /** Ends the tour early, as Skip does. */
+  skip(): void
+  /** The element `for` names, now, or `null` where it is not on the page yet. */
+  target: HTMLElement | null
+}
+
+/**
+ * A stop's `effect`: run as the tour reaches the stop, before it is shown. A
+ * promise holds the stop back until it settles, and a function returned, or
+ * resolved, runs when the tour leaves the stop.
+ */
+export type TourStopEffect = (
+  context: TourStopContext,
+  // biome-ignore lint/suspicious/noConfusingVoidType: an effect written with no return, async or not, returns void, and has to be one.
+) => void | (() => void) | Promise<void | (() => void)>
 
 /**
  * @summary One stop on a tour: the element it points at, and a panel of content about it.
@@ -45,6 +68,13 @@ import { stopNaming } from '../naming.js'
  * **The buttons are slot fallback.** With nothing in the `actions` slot, you
  * get Back, Next, and Skip, already wired. Slot your own `actions` and drive
  * them with `next()`, `back()`, and `skip()` on the root.
+ *
+ * **Set `effect` to prepare the page for a stop**, such as opening the menu
+ * it points into or loading what it describes. It is a function, set from
+ * script, that the tour runs as it reaches the stop. Return a promise and the
+ * stop waits for it, and the tour has `:state(preparing)` meanwhile; return a
+ * function, or resolve to one, and the tour runs it when it leaves the stop.
+ * Zag's tour step has the same `effect`.
  *
  * **`for` is an id, as with `Tooltip`**, so you can point at a target elsewhere
  * on the page from markup. It resolves against the stop's root node, so a stop
@@ -97,6 +127,8 @@ import { stopNaming } from '../naming.js'
  * @csspart skip-spinner - The ring `skip` turns while it is pending.
  * @csspart skip-text - The words on that button, trimmed to their capitals and baseline.
  *
+ * @cssstate entering - From the moment the stop is shown until its entrance has finished.
+ * @cssstate exiting - From the moment the stop is left until its exit has finished.
  * @cssstate placed-bottom - The panel sits below its target.
  * @cssstate placed-left - The panel sits to the left of its target.
  * @cssstate placed-right - The panel sits to the right of its target.
@@ -128,6 +160,13 @@ export class HelixHeadlessTourStop extends HelixElement {
    */
   @property({ reflect: true, type: Boolean })
   current = false
+
+  /**
+   * Run as the tour reaches the stop, before it is shown: see the description
+   * above. A function, so it is set from script and has no attribute.
+   */
+  @property({ attribute: false })
+  effect?: TourStopEffect
 
   /**
    * Label for the control that goes on from the last stop.
@@ -214,6 +253,17 @@ export class HelixHeadlessTourStop extends HelixElement {
    */
   @state()
   private side?: Side
+
+  /* `:state(entering)` and `:state(exiting)`, for a stylesheet drawing the
+     stop's arrival and departure, as `Dialog` records them. */
+  protected readonly phases = new OpenPhaseController(this, {
+    mark: {
+      entering: (on) => this.toggleState('entering', on),
+      exiting: (on) => this.toggleState('exiting', on),
+    },
+    open: () => this.current && this.type !== 'wait',
+    surface: () => this.partNamed('bubble'),
+  })
 
   /** The element the stop points at, or `null` when no element has the `for` id. */
   get target(): HTMLElement | null {
