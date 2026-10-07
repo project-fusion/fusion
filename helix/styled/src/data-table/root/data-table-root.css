@@ -286,6 +286,19 @@
   grid-column: 1 / -1;
 }
 
+/* What the table says when its rows did not load: the same line as the empty
+   and loading ones, in the foreground color, since it is news a reader acts on. */
+[part="error"] {
+  color: var(--data-table-error-color, var(--helix-color-foreground));
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  grid-column: 1 / -1;
+  margin: var(--helix-space-none);
+  padding-block: var(--helix-space-md);
+  padding-inline: var(--helix-space-sm);
+  text-align: center;
+}
+
 /* A tree grid's row headers step in by their depth, and a row with nothing
    under it keeps the room its button would take, so the names of siblings
    share an edge. Only in a tree grid, so a flat table keeps its own inset. */

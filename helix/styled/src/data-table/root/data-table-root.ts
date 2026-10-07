@@ -34,6 +34,7 @@ import '../../table/index.js'
  *
  * @slot - The columns, as `TableColumn` elements.
  * @slot empty - Content shown when there are no rows to show and none are loading, such as a picture and a link. Falls back to `empty-text`, which the live region still says.
+ * @slot error - Content shown while `error-text` is set, such as a button that tries again. Falls back to `error-text`, which the live region still says.
  * @slot footer - Content below the grid. It replaces the built-in pagination.
  * @slot loading - Content shown while the rows load, such as a spinner. Falls back to `loading-text`, which the live region still says.
  * @slot toolbar - Content above the grid, such as a search field or actions.
@@ -58,6 +59,7 @@ import '../../table/index.js'
  * @cssproperty --data-table-dragging-opacity - The opacity of a row being moved, with `reorderable-rows`.
  * @cssproperty --data-table-drop-indicator-color - The color of the line where a moved row would land.
  * @cssproperty --data-table-drop-indicator-size - The thickness of the line where a moved row would land.
+ * @cssproperty --data-table-error-color - The color of the words in the line shown while `error-text` is set.
  * @cssproperty --data-table-footer-gap - The space between the grid and the footer below it.
  * @cssproperty --data-table-footer-item-gap - The space between the pieces of the footer, such as a summary and the pagination.
  * @cssproperty --data-table-grip-color - The color of a row's grip, with `reorderable-rows`.
