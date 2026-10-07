@@ -12,7 +12,7 @@ import {
   wordsLocale,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property, state } from 'lit/decorators.js'
+import { property } from 'lit/decorators.js'
 
 /** The keys a native range moves its thumb with. */
 const SLIDER_KEYS = new Set([
@@ -640,6 +640,12 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
     this.sync()
   }
 
+  /** Draws, once a served slider has hydrated, what its children ask for. */
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.finishHydration()
+  }
+
   /**
    * What a screen reader says for a thumb's value, with `{value}` filled in,
    * such as `{value} degrees`. Empty announces the number alone.
@@ -647,15 +653,17 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   @property({ attribute: 'value-text' })
   valueText = ''
 
-  /** Whether a `thumb` or `thumb-end` slot has content. */
-  @state()
-  private thumbContent = false
+  /**
+   * Whether a `thumb` or `thumb-end` slot has content, read off the children
+   * rather than heard from `slotchange`: a declarative shadow root fires that
+   * before anything listens, so a served slider kept its layer hidden.
+   */
+  private get thumbContent(): boolean {
+    return this.knownChildren.some((child) => child.slot === 'thumb' || child.slot === 'thumb-end')
+  }
 
-  private readonly handleThumbSlot = (event: Event): void => {
-    const scope = (event.target as HTMLSlotElement).getRootNode() as ShadowRoot
-    this.thumbContent = [...scope.querySelectorAll<HTMLSlotElement>('[part="thumb"] slot')].some(
-      (slot) => slot.assignedNodes().length > 0,
-    )
+  private readonly handleThumbSlot = (): void => {
+    this.requestUpdate()
   }
 
   /**

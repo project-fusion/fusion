@@ -1048,7 +1048,7 @@ describe('a color picker with a label and a hint', () => {
 
   test('shows the label, is a group by that name, and the square says it first', async () => {
     const host = await picker('label="Brand color" value="#ff0000"')
-    expect(part(host, 'label')?.hidden).toBe(false)
+    expect((part(host, 'label') as HTMLElement | null)?.hidden).toBe(false)
     expect(part(host, 'label')?.textContent?.trim()).toBe('Brand color')
     expect(internalsOf(host).role).toBe('group')
     expect(internalsOf(host).ariaLabel).toBe('Brand color')
@@ -1059,7 +1059,7 @@ describe('a color picker with a label and a hint', () => {
 
   test('shows the hint, and the square and the value are described by it', async () => {
     const host = await picker('hint="Used for links" value="#ff0000" feedback="Too bright"')
-    expect(part(host, 'hint')?.hidden).toBe(false)
+    expect((part(host, 'hint') as HTMLElement | null)?.hidden).toBe(false)
     expect(part(host, 'grid-saturation')?.getAttribute('aria-describedby')).toBe('hint feedback')
     expect(part(host, 'value')?.getAttribute('aria-describedby')).toBe('hint feedback')
   })
@@ -1071,15 +1071,15 @@ describe('a color picker with a label and a hint', () => {
       slot.dispatchEvent(new Event('slotchange'))
     }
     await host.updateComplete
-    expect(part(host, 'label')?.hidden).toBe(false)
+    expect((part(host, 'label') as HTMLElement | null)?.hidden).toBe(false)
     expect(internalsOf(host).ariaLabel).toBe('Accent')
-    expect(part(host, 'hint')?.hidden).toBe(false)
+    expect((part(host, 'hint') as HTMLElement | null)?.hidden).toBe(false)
   })
 
   test('and without either, draws neither and stays without a role', async () => {
     const host = await picker('value="#ff0000"')
-    expect(part(host, 'label')?.hidden).toBe(true)
-    expect(part(host, 'hint')?.hidden).toBe(true)
+    expect((part(host, 'label') as HTMLElement | null)?.hidden).toBe(true)
+    expect((part(host, 'hint') as HTMLElement | null)?.hidden).toBe(true)
     expect(internalsOf(host).role).toBeFalsy()
     expect(part(host, 'grid-saturation')?.hasAttribute('aria-describedby')).toBe(false)
   })
