@@ -100,6 +100,7 @@ const navigable = (item: HelixHeadlessSpeedDialItem): NavigableItem => ({
  * @documentation https://fusion.dev/helix/components/speed-dial
  *
  * @slot - The actions.
+ * @slot icon - Replaces the plus on the button the dial draws when no trigger is slotted, such as with a pencil for a dial of ways to write.
  * @slot trigger - The control that opens the actions. Without one, a button named by `label` is drawn.
  *
  * @event {HelixBeforeCloseEvent} helix-before-close - The actions are about to close. Cancelable: cancel it to keep them open.
@@ -580,7 +581,7 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
              a speed dial opens with everywhere it exists. */
           ''
         }
-        ${drawIcon(plus)}
+        <slot name="icon">${drawIcon(plus)}</slot>
       </button>
       ${held ? html`<span id="long-press" hidden>${this.longPressLabel}</span>` : nothing}
     </slot>`

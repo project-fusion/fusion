@@ -198,6 +198,12 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
+/* A glyph of your own in the drawn trigger takes the plus's size. */
+::slotted([slot="icon"]) {
+  block-size: var(--icon-size);
+  inline-size: var(--icon-size);
+}
+
 /*
  *  Not printed, being a control. Paper cannot be pressed, and a button's chrome
  * on a page is an instruction to do the one thing that is not available.
