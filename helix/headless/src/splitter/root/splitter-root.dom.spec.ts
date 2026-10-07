@@ -1298,6 +1298,38 @@ describe('a primary pane', () => {
   })
 })
 
+describe('a row of three panes from splitters nested on one axis', () => {
+  type Holding = Splitter & { holdPrimary(length: number): void }
+
+  /* Zag's splitter: moving one divider resizes only the two panes beside it,
+     so the nested divider stays put while the outer one moves. */
+  test('keeps the far pane while the outer divider moves, and every share as the row resizes', async () => {
+    const outer = (await mount(`<helix-headless-splitter default-position="40">
+      <div slot="start">Files</div>
+      <helix-headless-splitter slot="end" default-position="50">
+        <div slot="start">Source</div>
+        <div slot="end">Outline</div>
+      </helix-headless-splitter>
+    </helix-headless-splitter>`)) as Splitter
+    let outerWidth = 1000
+    outer.getBoundingClientRect = () => ({ height: 400, width: outerWidth }) as DOMRect
+    const inner = outer.querySelector('helix-headless-splitter') as Holding
+    await inner.updateComplete
+    await outer.updateComplete
+    ;(inner as unknown as { findOuter(): void }).findOuter()
+    /* The outer divider moves from 40 to 50: the inner box goes from 600 to 500. */
+    inner.holdPrimary(600)
+    inner.holdPrimary(500)
+    await inner.updateComplete
+    expect(inner.position).toBe(40)
+    /* The whole row grows, and the inner box with it: shares stay. */
+    outerWidth = 1200
+    inner.holdPrimary(600)
+    await inner.updateComplete
+    expect(inner.position).toBe(40)
+  })
+})
+
 describe('F6', () => {
   test('moves focus from one pane to the first control in the other', async () => {
     const host = (await mount(`<helix-headless-splitter>

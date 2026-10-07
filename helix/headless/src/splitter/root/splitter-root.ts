@@ -87,6 +87,13 @@ const FOCUSABLE =
  * takes all of the change, as Web Awesome's split panel does. Without it,
  * both panes keep their share.
  *
+ * **Three or more panes along one axis are splitters nested on that axis**, a
+ * splitter in the `end` pane of another for three columns. The nested one
+ * keeps the pane on its far side the size it was while the outer divider
+ * moves, so a divider resizes only the two panes beside it, as Zag's splitter
+ * does with any number of panels. Where the whole row is resized, every pane
+ * keeps its share, unless `primary` says otherwise.
+ *
  * **Keyboard.** The divider is one tab stop.
  *
  * | Key | What it does |
@@ -387,6 +394,30 @@ export class HelixHeadlessSplitter extends HelixElement {
   /** Watches this element's length along its axis while `primary` is set. */
   private lengths: ResizeObserver | undefined
 
+  /**
+   * The splitter this one is nested in on the same axis, and the pane of it
+   * this one is in, for a row of three or more panes.
+   */
+  private chain: { by: HelixHeadlessSplitter; side: 'end' | 'start' } | null = null
+
+  /** The length of the splitter this one is chained to, last seen. */
+  private chainLength = 0
+
+  /**
+   * The pane that keeps its pixels as this splitter's length changes:
+   * `primary`, or the far pane of one chained into another, whose divider
+   * would otherwise drag this one's along with it.
+   */
+  private get held(): 'end' | 'start' | undefined {
+    return this.primary ?? this.chain?.side
+  }
+
+  /** The chained splitter's length along the shared axis, in pixels. */
+  private measureChain(): number {
+    const box = this.chain?.by.getBoundingClientRect()
+    return box ? (this.vertical ? box.height : box.width) : 0
+  }
+
   /** The length along the axis last seen, in pixels. */
   private length = 0
 
@@ -395,7 +426,7 @@ export class HelixHeadlessSplitter extends HelixElement {
    * the primary pane's size in pixels as the length changes.
    */
   private watchLength(): void {
-    if (!this.primary || typeof ResizeObserver === 'undefined') {
+    if (!this.held || typeof ResizeObserver === 'undefined') {
       this.lengths?.disconnect()
       this.lengths = undefined
       this.length = 0
@@ -423,17 +454,29 @@ export class HelixHeadlessSplitter extends HelixElement {
   private holdPrimary(length: number): void {
     const before = this.length
     this.length = length
-    if (!this.primary || before <= 0 || length <= 0 || length === before) {
+    const held = this.held
+    /* A chained splitter holds its far pane only while the outer divider
+       moves: where the outer one changed length too, the whole row was
+       resized, and every pane keeps its share. */
+    if (!this.primary && this.chain) {
+      const outer = this.measureChain()
+      const outerBefore = this.chainLength
+      this.chainLength = outer
+      if (outer !== outerBefore) {
+        return
+      }
+    }
+    if (!held || before <= 0 || length <= 0 || length === before) {
       return
     }
     if (this.collapsed || this.dragging) {
       return
     }
     const position = this.position
-    const kept = ((this.primary === 'start' ? position : 100 - position) / 100) * before
+    const kept = ((held === 'start' ? position : 100 - position) / 100) * before
     const share = (kept / length) * 100
     const previous = position
-    this.positionState = this.clamp(this.primary === 'start' ? share : 100 - share)
+    this.positionState = this.clamp(held === 'start' ? share : 100 - share)
     this.requestUpdate('position', previous)
   }
 
@@ -1158,8 +1201,20 @@ export class HelixHeadlessSplitter extends HelixElement {
    */
   private findOuter(): void {
     const outer = closestInstance(this.parentElement, HelixHeadlessSplitter)
-    if (!outer || outer === this || outer.vertical === this.vertical) {
-      // Parallel dividers never meet, so there is no corner to take hold of.
+    this.chain = null
+    if (outer && outer !== this && outer.vertical === this.vertical) {
+      /* Parallel dividers never meet, so there is no corner to take hold of,
+         and the two are one row of panes: this one holds its far pane while
+         the outer divider moves. */
+      let node: Element = this
+      while (node.parentElement && node.parentElement !== outer) {
+        node = node.parentElement
+      }
+      this.chain = { by: outer, side: node.slot === 'start' ? 'start' : 'end' }
+      this.chainLength = this.measureChain()
+      return
+    }
+    if (!outer || outer === this) {
       return
     }
     this.outer = outer
@@ -1305,8 +1360,8 @@ export class HelixHeadlessSplitter extends HelixElement {
          a splitter reordered in the DOM would stop watching its own width and
          `auto` would freeze on whatever it last saw. */
       this.watchWidth()
-      this.watchLength()
       this.findOuter()
+      this.watchLength()
     }
     this.addEventListener('keydown', this.handlePaneKeys)
   }
@@ -1319,6 +1374,7 @@ export class HelixHeadlessSplitter extends HelixElement {
     this.lengths?.disconnect()
     this.lengths = undefined
     this.length = 0
+    this.chain = null
     if (this.outer) {
       channel.get(this.outer)?.uncross(this)
     }
@@ -1329,8 +1385,8 @@ export class HelixHeadlessSplitter extends HelixElement {
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
     this.watchWidth()
-    this.watchLength()
     this.findOuter()
+    this.watchLength()
     /* The server wrote its own locale's percentage, which this reader's may
        write differently. */
     this.finishHydration()
