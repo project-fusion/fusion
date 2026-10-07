@@ -562,6 +562,42 @@ describe('the name of a time picker', () => {
     await host.updateComplete
     expect(part(host, 'list')?.getAttribute('aria-label')).toBe('Opening')
   })
+
+  /* The picker had no slot at all, so a visible label had to sit outside it
+     and the list went on being called "Time". */
+  test('a slotted label is drawn above the times and names the list', async () => {
+    const host = (await mount(
+      '<helix-headless-time-picker><b slot="label">Pickup time</b></helix-headless-time-picker>',
+    )) as Time
+    host.shadowRoot?.querySelector('slot[name="label"]')?.dispatchEvent(new Event('slotchange'))
+    await host.updateComplete
+    const label = part(host, 'label')
+    expect(label?.querySelector('slot')?.getAttribute('name')).toBe('label')
+    expect(part(host, 'list')?.getAttribute('aria-label')).toBe('Pickup time')
+  })
+
+  test('and names the wheels', async () => {
+    const host = (await mount(
+      '<helix-headless-time-picker variant="wheels"><b slot="label">Alarm</b></helix-headless-time-picker>',
+    )) as Time
+    host.shadowRoot?.querySelector('slot[name="label"]')?.dispatchEvent(new Event('slotchange'))
+    await host.updateComplete
+    expect(part(host, 'columns')?.getAttribute('aria-label')).toBe('Alarm')
+  })
+})
+
+describe('a time picker with no time to offer', () => {
+  /* `min` after `max` leaves no time, and the list said the listbox's own
+     "No matches", which is about a filter the picker does not have. */
+  test('says so in its own words, and takes markup of your own for it', async () => {
+    const host = await picker('min="18:00" max="09:00"')
+    expect(options(host)).toHaveLength(0)
+    const list = part(host, 'list') as HTMLElement & { emptyText: string }
+    expect(list.emptyText).toBe('No times to choose from')
+    const forwarded = list.querySelector('slot[name="empty"]')
+    expect(forwarded?.getAttribute('slot')).toBe('empty')
+    expect(forwarded?.textContent?.trim()).toBe('No times to choose from')
+  })
 })
 
 describe('focus on a time picker', () => {

@@ -2,6 +2,18 @@
   display: block;
 }
 
+/* A slotted label, set as every field's label is in `shared/field`, a step
+   above the times. */
+[part="label"] {
+  color: var(--helix-color-foreground);
+  display: block;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-medium);
+  line-height: var(--helix-leading-tight);
+  padding-block-end: var(--helix-space-2xs);
+}
+
 /* Bounded, and scrolling inside that bound. Seven rows by default, an odd
    number of the option's own height, because the list comes to rest with its
    chosen time in the middle: at 16rem, eight rows, it rested with half a row
