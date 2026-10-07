@@ -401,7 +401,12 @@ describe('the hotkey', () => {
     expect(key({ altKey: true, ctrlKey: true, key: 't', shiftKey: true }).defaultPrevented).toBe(
       false,
     )
-    expect(key({ ctrlKey: true, key: 'T', shiftKey: true }).defaultPrevented).toBe(true)
+    /* `mod` is Command on an Apple keyboard and Control elsewhere, read from the
+       user agent: happy-dom's is neither, and the browser specs run on a Mac. */
+    const mod = /mac|iphone|ipad|ipod/i.test(navigator.userAgent)
+      ? { metaKey: true }
+      : { ctrlKey: true }
+    expect(key({ ...mod, key: 'T', shiftKey: true }).defaultPrevented).toBe(true)
   })
 })
 

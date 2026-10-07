@@ -111,7 +111,11 @@ describe('the drag preview of a reorderable data table', () => {
      sheet gives it its look. Nothing in it is animated, so it follows the
      pointer the same way whatever the reader's motion setting. */
   test('raises the copy over the page through the family hooks', () => {
-    const preview = sheet().split('[part="drag-preview"] {')[1]?.split('}')[0] ?? ''
+    /* Read with the line breaks a formatter puts in a long `var()` taken out. */
+    const preview = (sheet().split('[part="drag-preview"] {')[1]?.split('}')[0] ?? '')
+      .replace(/\(\s+/g, '(')
+      .replace(/\s+\)/g, ')')
+      .replace(/\s+/g, ' ')
     expect(preview).toContain(
       'background-color: var(--data-table-drag-preview-background-color, var(--helix-color-surface-raised))',
     )

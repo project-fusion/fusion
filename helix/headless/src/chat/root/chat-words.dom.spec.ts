@@ -43,8 +43,8 @@ const chat = async (around = '', inside = ''): Promise<Chat> => {
 
 const GERMAN = {
   'helix-chat': {
-    conversationLabel: 'Unterhaltung',
     failedTurnLabel: '{text} ({failed})',
+    fallbackLabel: 'Unterhaltung',
     typingLabel: '{author} schreibt',
   },
   'helix-chat-composer': { sendLabel: 'Senden' },

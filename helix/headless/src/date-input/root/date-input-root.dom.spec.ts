@@ -436,6 +436,19 @@ describe('input date shows what it holds', () => {
     expect(tag?.getAttribute('dismiss-label')).toBe(`Take ${tag?.textContent?.trim()} off`)
     expect(tag?.getAttribute('dismiss-label')).not.toContain('2026-08-04')
   })
+
+  test('and the control says the date once, with none of the markers the template writes', async () => {
+    const host = await field(
+      'date-style="medium" default-value="2026-08-04" locale="en-GB" mode="multiple"',
+    )
+    const tag = host.shadowRoot?.querySelector('[part="date"]') as HTMLElement & {
+      updateComplete: Promise<unknown>
+    }
+    await tag.updateComplete
+    await tag.updateComplete
+    const control = tag.shadowRoot?.querySelector('[part~="dismiss"]')
+    expect(control?.getAttribute('aria-label')).toBe('Remove 4 Aug 2026')
+  })
 })
 
 describe('input date can be written out', () => {
