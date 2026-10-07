@@ -49,9 +49,9 @@ const type = async (host: Updatable, text: string, inputType = 'insertText'): Pr
   await settle(host)
 }
 
-const press = async (host: Updatable, key: string): Promise<void> => {
+const press = async (host: Updatable, key: string, altKey = false): Promise<void> => {
   control(host).dispatchEvent(
-    new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key }),
+    new KeyboardEvent('keydown', { altKey, bubbles: true, cancelable: true, composed: true, key }),
   )
   await settle(host)
 }
@@ -116,6 +116,26 @@ describe('combobox', () => {
         ?.textContent?.trim(),
     ).toBe('Ruby')
     expect((host as HTMLElement).shadowRoot?.activeElement).toBe(field)
+  })
+
+  /* Measured before this: Alt with Up moved the highlight up, as Up does, and
+     the list stayed open. */
+  test('Alt with Up closes the list choosing nothing, and Alt with Down opens it on the same highlight', async () => {
+    const host = await combobox()
+    const highlighted = (): string | undefined =>
+      options(host)
+        .find((option) => option.active)
+        ?.textContent?.trim()
+    control(host).focus()
+    await press(host, 'ArrowDown')
+    await press(host, 'ArrowDown')
+    expect(highlighted()).toBe('Ruby')
+    await press(host, 'ArrowUp', true)
+    expect((host as unknown as { open: boolean }).open).toBe(false)
+    expect((host as unknown as { value: string }).value).toBe('')
+    await press(host, 'ArrowDown', true)
+    expect((host as unknown as { open: boolean }).open).toBe(true)
+    expect(highlighted()).toBe('Ruby')
   })
 
   test('the first Down opens the panel and lands on the first option', async () => {
