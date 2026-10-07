@@ -1,7 +1,6 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessCodeBlock } from '@fusion.dev/helix-headless/code-block'
 import type { CSSResultGroup } from 'lit'
-import { property } from 'lit/decorators.js'
 import { styles } from './code-block-root.css.js'
 import '../../copy-button/index.js'
 
@@ -22,7 +21,8 @@ import '../../copy-button/index.js'
  *
  * Long lines scroll by default. Set `wrap` to wrap them instead, for prose-like
  * code such as a long command, and set `--code-block-max-block-size` to cap the
- * height of a long file, which then scrolls.
+ * height of a long file, which then scrolls. A line `mark-lines` names takes a
+ * band in the primary color, with an edge at its start.
  *
  * @since 0.1.0
  * @status stable
@@ -42,6 +42,8 @@ import '../../copy-button/index.js'
  * @cssproperty --code-block-header-background-color - The background behind the name. The default is `surface-raised`.
  * @cssproperty --code-block-label-color - The color of the name in the header.
  * @cssproperty --code-block-line-height - The line height of the code and its line numbers, as a number or a length.
+ * @cssproperty --code-block-mark-color - The band behind the lines `mark-lines` names. The primary color at a wash by default.
+ * @cssproperty --code-block-mark-edge-color - The edge at the start of a band behind marked lines. The primary color by default.
  * @cssproperty --code-block-max-block-size - The tallest the code grows before it scrolls, or until `expandable`'s button shows every line. The default is no limit.
  * @cssproperty --code-block-radius - The corner radius of the header's top and the block's bottom, which form one shape.
  * @cssproperty --code-block-removed-color - The color a diff's removed lines are tinted in and their `-` is drawn in. The danger color by default.
@@ -49,17 +51,6 @@ import '../../copy-button/index.js'
 @customElement('helix-code-block')
 export class HelixCodeBlock extends HelixHeadlessCodeBlock {
   static override tier = 'helix-'
-
-  /**
-   * Whether long lines wrap.
-   *
-   * Off by default, so long lines scroll, because a line break can be
-   * significant in code and a wrapped line reads as two. For prose-like code, such as a long command or
-   * a log line, a wrap reads better than a scroll. Line numbers keep the lines
-   * unwrapped, since a wrapped line would take one number and several rows.
-   */
-  @property({ reflect: true, type: Boolean })
-  wrap = false
 
   static override styles: CSSResultGroup = styles
 }

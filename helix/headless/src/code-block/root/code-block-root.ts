@@ -1,11 +1,19 @@
-import { customElement, formatWords, HelixElement, words } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  formatWords,
+  HelixBeforeToggleEvent,
+  HelixElement,
+  HelixToggleEvent,
+  requestChange,
+  words,
+} from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeHTML } from 'lit/directives/unsafe-html.js'
 import { html } from 'lit/static-html.js'
 import '../../copy-button/index.js'
 import { highlightedLines } from '../highlight.js'
-import { gutterNumbers, lineCount } from '../lines.js'
+import { gutterNumbers, lineCount, lineRuns, lineSpans } from '../lines.js'
 import { type DiffFile, type DiffHunk, type DiffLine, pairLines, parsePatch } from '../patch.js'
 
 /**
@@ -22,7 +30,18 @@ import { type DiffFile, type DiffHunk, type DiffLine, pairLines, parsePatch } fr
  * For a fragment of code inside a sentence, use `Code`.
  *
  * Set `line-numbers` to number the lines in a gutter beside the code, hidden
- * from the accessibility tree and left out of a copy. Set `highlight` to a
+ * from the accessibility tree and left out of a copy. Set `mark-lines` to
+ * mark lines a reader should look at, such as `2, 4-6`: the block draws a
+ * band behind each run, placed where the lines are laid out, so it follows a
+ * highlighter's markup and lines that wrap. Set `wrap` to wrap long lines
+ * rather than scroll them; a gutter then numbers each line where it starts.
+ * Set `wrappable` for a button in the header that turns `wrap` on and off,
+ * pressed while the lines wrap.
+ *
+ * The header holds the name, the `actions` slot, and the copy button. Slot a
+ * control into `actions`, such as a button that sets `wrap` or one that opens
+ * the code in an editor, and the block draws a header for it even with no
+ * name. `copy-icon` and `copied-icon` replace the copy button's two icons. Set `highlight` to a
  * function that turns the code into highlighted markup, such as one wrapping
  * Shiki or Prism, and the block draws what it returns; it is handed the
  * block's `language`, so one function serves every block. The code stays in
@@ -69,7 +88,14 @@ import { type DiffFile, type DiffHunk, type DiffLine, pairLines, parsePatch } fr
  * @documentation https://fusion.dev/helix/components/code-block
  *
  * @slot - The code.
+ * @slot actions - Controls for the block, in the header before the copy button.
+ * @slot copied-icon - The copy button's icon after a copy. Defaults to a check mark.
+ * @slot copy-icon - The copy button's icon before a copy. Defaults to a clipboard.
  *
+ * @event {HelixBeforeToggleEvent} helix-before-toggle - The wrap button was pressed, with the `wrap` it asks for in `detail.checked`. Cancelable: cancel it to keep the lines as they are.
+ * @event {HelixToggleEvent} helix-toggle - Fired after the wrap button changed `wrap`, with the new value in `detail.checked`.
+ *
+ * @csspart actions - The box in the header that holds the `actions` slot, drawn while something is slotted there.
  * @csspart added - In a diff, a line only the new version has, an `<ins>`.
  * @csspart block - The scrolling `<pre>`.
  * @csspart code - The `<code>` inside it.
@@ -98,13 +124,20 @@ import { type DiffFile, type DiffHunk, type DiffLine, pairLines, parsePatch } fr
  * @csspart header - The bar that holds the name and the copy button, shown when there is a name.
  * @csspart hunk - In a diff, a `@@` line saying where the lines under it are.
  * @csspart label - The block's name: its `label`, or its `language` where it has no label.
+ * @csspart mark - The band behind a run of lines `mark-lines` names. The block writes where the run is laid out into `--code-block-mark-start`, `--code-block-mark-size`, and `--code-block-mark-inline-size` on it. Hidden from the accessibility tree.
  * @csspart marker - In a diff, the `+`, `-`, or space that starts a line.
  * @csspart new - In a split diff, the new version's `<pre>`.
- * @csspart number - In a diff, a line number.
+ * @csspart number - In a diff, a line number. In a `wrap` block with `line-numbers`, one line's number in the gutter, which the block makes as tall as the line it numbers through `--code-block-line-size`.
  * @csspart old - In a split diff, the old version's `<pre>`.
  * @csspart removed - In a diff, a line only the old version has, a `<del>`.
  * @csspart split - In a split diff, the two versions side by side.
  * @csspart text - In a diff, a line's code.
+ * @csspart wrap-toggle - The button in the header that wraps the lines and unwraps them, drawn when `wrappable` is set.
+ *
+ * @cssproperty --code-block-line-size - Written by the block on each `number` in a `wrap` block with `line-numbers`: how tall the line it numbers is laid out. Do not set it.
+ * @cssproperty --code-block-mark-inline-size - Written by the block on each `mark`: how wide the code is, scrolled part included. Do not set it.
+ * @cssproperty --code-block-mark-size - Written by the block on each `mark`: how tall its run of lines is. Do not set it.
+ * @cssproperty --code-block-mark-start - Written by the block on each `mark`: how far down the code its run of lines starts. Do not set it.
  *
  * @cssstate expanded - The expand button has shown every line of a capped block.
  */
@@ -253,6 +286,14 @@ export class HelixHeadlessCodeBlock extends HelixElement {
   lineNumbers = false
 
   /**
+   * The lines to mark, as numbers and ranges counted from 1, such as `2, 4-6`.
+   * Each run is drawn as a band behind its lines. Not for a diff, which marks
+   * its own changes.
+   */
+  @property({ attribute: 'mark-lines' })
+  markLines = ''
+
+  /**
    * Whether to leave the copy button off.
    *
    * Negative, which is not a style choice. A boolean attribute is true whenever
@@ -285,6 +326,47 @@ export class HelixHeadlessCodeBlock extends HelixElement {
    */
   @property({ reflect: true })
   variant?: 'split'
+
+  /**
+   * Whether long lines wrap. Without it they scroll.
+   *
+   * Off by default, so long lines scroll, because a line break can be
+   * significant in code and a wrapped line reads as two. For prose-like code,
+   * such as a long command or a log line, a wrap reads better than a scroll.
+   * With `line-numbers`, each number stands beside the line it numbers
+   * however many rows that line takes. Reflected, because the stylesheet
+   * wraps the lines.
+   */
+  @property({ reflect: true, type: Boolean })
+  wrap = false
+
+  /** The wrap button's name, which it keeps whether it is pressed or not. */
+  @words
+  @property({ attribute: 'wrap-label' })
+  wrapLabel = 'Wrap lines'
+
+  /**
+   * Whether the header has a button that wraps the lines and unwraps them. The
+   * block draws a header for it even with no name.
+   */
+  @property({ type: Boolean })
+  wrappable = false
+
+  /** Asks to wrap or unwrap the lines, and says so once it has. */
+  private toggleWrap(): void {
+    const next = !this.wrap
+    const applied = requestChange({
+      apply: (checked) => {
+        this.wrap = checked
+      },
+      event: (checked) => new HelixBeforeToggleEvent({ checked }),
+      host: this,
+      next,
+    })
+    if (applied) {
+      this.dispatchEvent(new HelixToggleEvent({ checked: next }))
+    }
+  }
 
   /** The last text read as a diff, and what it read as, so a render does not parse twice. */
   private parsed: { files: DiffFile[]; text: string } = { files: [], text: '' }
@@ -359,6 +441,7 @@ export class HelixHeadlessCodeBlock extends HelixElement {
    */
   private readonly measure = (): void => {
     this.markScrollers()
+    this.placeLines()
     if (!this.expanded) {
       this.capped =
         this.expandable &&
@@ -406,6 +489,107 @@ export class HelixHeadlessCodeBlock extends HelixElement {
         box.removeAttribute('aria-label')
       }
     }
+  }
+
+  /**
+   * Where each line of the code is laid out in the `<code>`, from the top of
+   * its content, as the browser placed the text: one row, or several where it
+   * wraps.
+   */
+  private lineBoxes(code: HTMLElement): Array<{ bottom: number; top: number }> {
+    const slot = code.querySelector('slot')
+    const roots: Node[] = slot && !slot.hidden ? slot.assignedNodes({ flatten: true }) : [code]
+    const texts: Text[] = []
+    for (const root of roots) {
+      if (root.nodeType === Node.TEXT_NODE) {
+        texts.push(root as Text)
+        continue
+      }
+      const walker = (root.ownerDocument ?? document).createTreeWalker(root, NodeFilter.SHOW_TEXT)
+      for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+        texts.push(node as Text)
+      }
+    }
+    const starts: number[] = []
+    let total = 0
+    for (const text of texts) {
+      starts.push(total)
+      total += text.data.length
+    }
+    /* A character offset in the whole code, as a place in one text node. */
+    const at = (offset: number): [Text, number] | undefined => {
+      for (let index = texts.length - 1; index >= 0; index -= 1) {
+        const start = starts[index] ?? 0
+        if (offset >= start) {
+          const text = texts[index] as Text
+          return [text, Math.min(offset - start, text.data.length)]
+        }
+      }
+      return undefined
+    }
+    const box = code.getBoundingClientRect()
+    const origin = box.top + code.clientTop - code.scrollTop
+    const row = Number.parseFloat(getComputedStyle(code).lineHeight) || 0
+    const boxes: Array<{ bottom: number; top: number }> = []
+    for (const [from, to] of lineSpans(texts.map((text) => text.data).join(''))) {
+      const start = at(from)
+      /* An empty line is measured by the break that ends it. */
+      const end = at(to === from ? Math.min(to + 1, total) : to)
+      const previous = boxes.at(-1)
+      let top = previous ? previous.bottom : 0
+      let bottom = top + row
+      if (start && end) {
+        const range = (code.ownerDocument ?? document).createRange()
+        range.setStart(start[0], start[1])
+        range.setEnd(end[0], end[1])
+        const rects = [...range.getClientRects()].filter((rect) => rect.height > 0)
+        if (rects.length > 0) {
+          /* A text box is the glyphs' height, and a line is its line box: the
+             leading goes half above and half below. */
+          const half = Math.max(0, (row - (rects[0]?.height ?? row)) / 2)
+          top = Math.min(...rects.map((rect) => rect.top)) - origin - half
+          bottom = Math.max(...rects.map((rect) => rect.bottom)) - origin + half
+        }
+      }
+      boxes.push({ bottom, top })
+    }
+    return boxes
+  }
+
+  /**
+   * Places each mark behind its run of lines, and makes each number in a
+   * wrapping gutter as tall as its line, from where the lines are laid out.
+   *
+   * **Written onto the elements as custom properties**, which are facts the
+   * block computed and CSS cannot, and no render follows from them.
+   */
+  private placeLines(): void {
+    const code = this.renderRoot.querySelector<HTMLElement>('[part="code"]')
+    const marks = [...this.renderRoot.querySelectorAll<HTMLElement>('[part="mark"]')]
+    const numbers = [
+      ...this.renderRoot.querySelectorAll<HTMLElement>('[part="gutter"] > [part="number"]'),
+    ]
+    if (!code || (marks.length === 0 && numbers.length === 0)) {
+      return
+    }
+    const boxes = this.lineBoxes(code)
+    for (const mark of marks) {
+      const [first, last] = (mark.dataset.lines ?? '').split('-').map(Number)
+      const top = boxes[(first ?? 0) - 1]
+      const bottom = boxes[Math.min(last ?? 0, boxes.length) - 1]
+      mark.hidden = !top || !bottom
+      if (top && bottom) {
+        mark.style.setProperty('--code-block-mark-start', `${top.top}px`)
+        mark.style.setProperty('--code-block-mark-size', `${bottom.bottom - top.top}px`)
+        mark.style.setProperty('--code-block-mark-inline-size', `${code.scrollWidth}px`)
+      }
+    }
+    numbers.forEach((number, index) => {
+      const line = boxes[index]
+      if (line) {
+        number.style.setProperty('--code-block-line-size', `${line.bottom - line.top}px`)
+      }
+    })
   }
 
   /* Measured after each render, and again whenever the block changes size,
@@ -460,10 +644,17 @@ export class HelixHeadlessCodeBlock extends HelixElement {
     }
     /* The slot stays either way, hidden under highlighted markup, so a change
        to the code still reaches `slotchange` and the code stays the page's. */
+    /* Bands behind the runs `mark-lines` names, placed once the lines are laid
+       out. Not on a server, which lays nothing out. */
+    const runs = this.childrenKnown ? lineRuns(this.markLines) : []
+    const marks = runs.map(
+      ([first, last]) =>
+        html`<span part="mark" aria-hidden="true" data-lines="${first}-${last}"></span>`,
+    )
     const code =
       highlighted === undefined
-        ? html`<code part="code"><slot @slotchange=${() => this.requestUpdate()}></slot></code>`
-        : html`<code part="code">${unsafeHTML(highlighted)}</code><slot
+        ? html`<code part="code">${marks}<slot @slotchange=${() => this.requestUpdate()}></slot></code>`
+        : html`<code part="code">${marks}${unsafeHTML(highlighted)}</code><slot
               hidden
               @slotchange=${() => this.requestUpdate()}
             ></slot>`
@@ -477,14 +668,26 @@ export class HelixHeadlessCodeBlock extends HelixElement {
        gutter stayed empty for good. `nothing` makes that render insert the
        text. */
     const lines = lineCount(text)
+    /* One element to a number where lines wrap, so each can be as tall as
+       the line it numbers. */
+    const numbers =
+      lines === 0
+        ? nothing
+        : this.wrap
+          ? Array.from(
+              { length: lines },
+              (_, index) => html`<span part="number">${index + 1}
+</span>`,
+            )
+          : gutterNumbers(lines)
     const gutter = this.lineNumbers
-      ? html`<span part="gutter" aria-hidden="true">${lines === 0 ? nothing : gutterNumbers(lines)}</span>`
+      ? html`<span part="gutter" aria-hidden="true">${numbers}</span>`
       : nothing
     const name = this.label || this.language
     return html`${this.renderHeader(name)}
       <div part="frame">
         <pre id="block" part="block" translate="no">${gutter}${code}</pre>
-        ${name ? nothing : this.renderCopy()}
+        ${this.headed(name) ? nothing : this.renderCopy()}
       </div>${this.renderExpand()}`
   }
 
@@ -514,6 +717,11 @@ export class HelixHeadlessCodeBlock extends HelixElement {
     </button>`
   }
 
+  /** Whether the block draws a header: it has a name, a wrap button, or a control in `actions`. */
+  private headed(name: string): boolean {
+    return name !== '' || (this.wrappable && !this.diff) || this.slotted('actions')
+  }
+
   /**
    * The name with the copy button beside it, or nothing when there is no name.
    *
@@ -522,14 +730,39 @@ export class HelixHeadlessCodeBlock extends HelixElement {
    * diff cannot: its washes run to the edge, so the button stood on the hunk
    * line and the line under it. In the header it is over nothing.
    *
-   * **No name draws no header**, rather than a bar to hold one button, which
-   * turned a `Usage` section of one-line imports into a run of empty strips.
-   * The button then stands beside the code, in room the block keeps for it.
+   * **No name draws no header**, unless the page put a control in `actions`
+   * or asked for the wrap button. A bar holding the copy button alone turned a
+   * `Usage` section of one-line imports into a run of empty strips. The button
+   * then stands beside the code, in room the block keeps for it.
    */
   private renderHeader(name: string, value?: string): TemplateResult | typeof nothing {
-    return name
-      ? html`<div part="header"><span part="label">${name}</span>${this.renderCopy(value, name)}</div>`
+    const acting = this.slotted('actions')
+    return this.headed(name)
+      ? html`<div part="header">${name ? html`<span part="label">${name}</span>` : nothing}${
+          acting ? html`<span part="actions"><slot name="actions"></slot></span>` : nothing
+        }${this.renderWrapToggle()}${this.renderCopy(value, name)}</div>`
       : nothing
+  }
+
+  /** The button that wraps the lines and unwraps them, where `wrappable` asks for one. Not for a diff. */
+  private renderWrapToggle(): TemplateResult | typeof nothing {
+    if (!this.wrappable || this.diff) {
+      return nothing
+    }
+    return html`<button
+      part="wrap-toggle"
+      type="button"
+      aria-pressed=${this.wrap ? 'true' : 'false'}
+      @click=${() => this.toggleWrap()}
+    >${this.wrapLabel}</button>`
+  }
+
+  /**
+   * Whether the page slotted something into `name`. Not known on a server or
+   * while hydrating what one sent, which render as though nothing were.
+   */
+  private slotted(name: string): boolean {
+    return this.knownChildren.some((child) => child.getAttribute('slot') === name)
   }
 
   private renderCopy(value?: string, name?: string): TemplateResult | typeof nothing {
@@ -563,7 +796,20 @@ export class HelixHeadlessCodeBlock extends HelixElement {
       copied-label=${this.copiedLabel}
       label=${name ? formatWords(this, 'copyNameLabel', { copy: this.copyLabel, name }) : this.copyLabel}
       .value=${value}
-    ></${this.tag('copy-button')}>`
+    >${this.renderCopyIcons()}</${this.tag('copy-button')}>`
+  }
+
+  /**
+   * The page's own icons for the copy button, passed on through slots of the
+   * block's, where the page slotted them. A slot passed on with nothing in it
+   * would stand in for the button's own icon and draw nothing, so it is drawn
+   * only for an icon the page gave. In a diff, the first file's button takes
+   * them, a slotted element going to one slot.
+   */
+  private renderCopyIcons(): TemplateResult {
+    return html`${this.slotted('copy-icon') ? html`<slot name="copy-icon"></slot>` : nothing}${
+      this.slotted('copied-icon') ? html`<slot name="copied-icon" slot="copied"></slot>` : nothing
+    }`
   }
 
   /** A number padded to the widest in its file, so the columns line up as text. */
@@ -647,7 +893,7 @@ export class HelixHeadlessCodeBlock extends HelixElement {
                     html`${this.renderHunk(hunk)}${hunk.lines.map((line) => this.renderLine(line, width))}`,
                 )}</code></pre>`
           }
-          ${name ? nothing : this.renderCopy(now)}
+          ${this.headed(name) ? nothing : this.renderCopy(now)}
         </div>
       </div>`
     })}<slot hidden @slotchange=${() => this.requestUpdate()}></slot>`

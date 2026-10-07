@@ -104,6 +104,50 @@
   margin-inline-start: auto;
 }
 
+/* The page's controls at the end of the bar, before the copy button, and the
+   wrap button with them. */
+[part="actions"] {
+  align-items: center;
+  display: flex;
+  gap: var(--helix-space-2xs);
+  margin-inline-start: auto;
+}
+
+[part="header"]
+  > :is([part="actions"], [part="wrap-toggle"])
+  ~ :is([part="copy"], [part="wrap-toggle"]) {
+  margin-inline-start: var(--helix-space-none);
+}
+
+[part="wrap-toggle"] {
+  all: unset;
+  box-sizing: border-box;
+
+  border-radius: var(--helix-radii-sm);
+  color: var(--code-block-label-color, var(--helix-color-foreground-muted));
+  cursor: pointer;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-medium);
+  margin-inline-start: auto;
+  padding-block: var(--helix-space-2xs);
+  padding-inline: var(--helix-space-xs);
+}
+
+[part="wrap-toggle"]:hover,
+[part="wrap-toggle"][aria-pressed="true"] {
+  color: var(--helix-color-foreground);
+}
+
+[part="wrap-toggle"][aria-pressed="true"] {
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
+}
+
+[part="wrap-toggle"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
 /* In the code's type, so its `1lh` is a line of code: the button is a flex
    box sized by its token, so the type moves nothing in it. */
 [part="frame"] > [part="copy"] {
@@ -159,9 +203,12 @@
    instead. */
 :host(:not([diff])) [part="code"] {
   display: block;
+  /* Its own stacking context and the box the marks are placed in. */
+  isolation: isolate;
   /* A long file stops growing here and scrolls, when a page asks. */
   max-block-size: var(--code-block-max-block-size, none);
   overflow-x: auto;
+  position: relative;
 }
 
 /* Every line, once the expand button has asked for them. */
@@ -203,11 +250,31 @@
 }
 
 /* Wrapped rather than scrolled, for prose-like code. Anywhere, since a long
-   path or a hash has no space to break at. Not under line numbers, where a
-   wrapped line would take one number and several rows. */
-:host([wrap]:not([diff], [line-numbers])) [part="code"] {
+   path or a hash has no space to break at. Under line numbers, each number is
+   as tall as the line it numbers, which the block measures. */
+:host([wrap]:not([diff])) [part="code"] {
   overflow-wrap: anywhere;
   white-space: pre-wrap;
+}
+
+/* The band behind a run of marked lines, placed by the block where the lines
+   are laid out, and drawn behind the code: the code is its own stacking
+   context, so a band below zero paints over its ground and under its text. */
+[part="mark"] {
+  background-color: var(
+    --code-block-mark-color,
+    color-mix(in oklab, var(--helix-color-primary) 12%, transparent)
+  );
+  block-size: var(--code-block-mark-size, 0);
+  border-inline-start: var(--helix-border-thick) solid
+    var(--code-block-mark-edge-color, var(--helix-color-primary));
+  box-sizing: border-box;
+  inline-size: max(100%, var(--code-block-mark-inline-size, 100%));
+  inset-block-start: var(--code-block-mark-start, 0);
+  inset-inline-start: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: -1;
 }
 
 /* The numbers beside the code, level with its lines: the gutter is in the same
@@ -396,6 +463,15 @@
   font-variant-numeric: tabular-nums;
   padding-inline-end: var(--helix-space-sm);
   user-select: none;
+}
+
+/* A gutter's number in a block whose lines wrap: one to a box, as tall as the
+   line it numbers, which the block measures. */
+[part="gutter"] > [part="number"] {
+  block-size: var(--code-block-line-size, auto);
+  color: inherit;
+  display: block;
+  padding-inline-end: var(--helix-space-none);
 }
 
 /* Print: a fill that is a slab of gray on paper; the border frames it instead. */
