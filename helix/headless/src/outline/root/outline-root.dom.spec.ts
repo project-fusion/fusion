@@ -307,3 +307,19 @@ describe('following the section in view', () => {
     expect(box.scrollTop).toBe(0)
   })
 })
+
+/* The mark was a span with nothing in it: a page wanting a mark of its own,
+   a dot or a gradient, could only restyle the span. */
+describe('the indicator slot', () => {
+  test('draws a mark of your own inside the indicator, outside the run of links', async () => {
+    const nav = (await mount(
+      '<helix-headless-outline><span slot="indicator" class="mark"></span><a href="#a">A</a><a href="#b">B</a></helix-headless-outline>',
+    )) as Nav
+    await nav.updateComplete
+    await nav.updateComplete
+    const slot = nav.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="indicator"]')
+    expect(slot?.assignedElements().map((one) => one.className)).toEqual(['mark'])
+    expect(slot?.parentElement?.getAttribute('part')).toBe('indicator')
+    expect(nav.shadowRoot?.querySelectorAll('[role="listitem"]').length).toBe(2)
+  })
+})
