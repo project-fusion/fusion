@@ -24,15 +24,18 @@ import '../../table/index.js'
  * without `paginated` and with either `mode`, so a page or a chunk from a
  * server can be windowed.
  *
- * **The cell values do not server-render.** Use `helix-table` when the content
- * has to be in the served HTML.
+ * **Write the first page as rows, so the served HTML carries the values.**
+ * Write it under the columns as `helix-table-row` and `helix-table-cell`
+ * elements. `@fusion.dev/helix-styles/helix.css` lays them out as the table
+ * draws them before it upgrades, and the table shows them until `rows` holds a
+ * row.
  *
  * @since 0.1.0
  * @status stable
  * @category data
  * @documentation https://fusion.dev/helix/components/data-table
  *
- * @slot - The columns, as `TableColumn` elements.
+ * @slot - The columns, as `TableColumn` elements, and the first page served as `TableRow` elements, which show until `rows` holds a row.
  * @slot empty - Content shown when there are no rows to show and none are loading, such as a picture and a link. Falls back to `empty-text`, which the live region still says.
  * @slot error - Content shown while `error-text` is set, such as a button that tries again. Falls back to `error-text`, which the live region still says.
  * @slot footer - Content below the grid. It replaces the built-in pagination.

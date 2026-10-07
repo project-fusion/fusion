@@ -5,6 +5,16 @@
   display: block;
 }
 
+/* **Across the whole host, whatever the host is.** Before the table upgrades, a
+   page that served its first page as rows has the host laid out as the grid
+   those rows need (`@fusion.dev/helix-styles`), and with declarative shadow DOM
+   these regions are what that grid holds, each a row of its own. */
+[part="toolbar"],
+[part="table"],
+[part="footer"] {
+  grid-column: 1 / -1;
+}
+
 [part="table"] {
   display: grid;
   /* The consumer's hook first, then what the columns worked out. The derived

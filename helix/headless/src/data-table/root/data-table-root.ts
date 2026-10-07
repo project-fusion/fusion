@@ -3,6 +3,7 @@ import {
   type Axis,
   anchorAt,
   arranged,
+  auditServed,
   commaList,
   countLabel,
   customElement,
@@ -111,10 +112,15 @@ const isControl = (element: HTMLElement): boolean =>
  *
  * Sort and filter apply to the whole set, including the rows on other pages.
  *
- * **The cell values do not server-render.** The headings and the row elements
- * do. Reading a cell needs the columns, and Lit SSR does not pass the column
- * children to this element, so a crawler sees an empty table of the right
- * shape. Use `Table` when the served HTML has to carry the values.
+ * **Write the first page as rows, so the served HTML carries the values.** The
+ * table reads each cell from its column, and a server does not pass the column
+ * children to this element, so on its own it serves the headings and no values.
+ * Write the first page under the columns as `TableRow` and `TableCell`
+ * elements, in the table's sort and page size and formatted as its columns draw
+ * them. The table shows your rows until `rows` holds a row, then draws its own
+ * in their place and leaves yours in the page, unshown. A development build
+ * warns when the two differ. In React, map the first page of the same array in
+ * the same server component.
  *
  * `selectable` adds a column of checkboxes, keyed on `row-key`:
  *
@@ -219,7 +225,7 @@ const isControl = (element: HTMLElement): boolean =>
  * @aliases Grid, Result table, Data grid
  * @documentation https://fusion.dev/helix/components/data-table
  *
- * @slot - The columns, as `TableColumn` elements.
+ * @slot - The columns, as `TableColumn` elements, and the first page served as `TableRow` elements, which show until `rows` holds a row.
  * @slot empty - Content shown when there are no rows to show and none are loading, such as a picture and a link. Falls back to `empty-text`, which the live region still says.
  * @slot error - Content shown while `error-text` is set, such as a button that tries again. Falls back to `error-text`, which the live region still says.
  * @slot footer - Content below the grid. It replaces the built-in pagination.
@@ -908,6 +914,18 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   /** Whether the last render drew the `more` row, which follows the page's rows. */
   private moreDrawn = false
 
+  /**
+   * Whether `rows` has held a row, after which the rows the page served are
+   * never shown again, whatever `rows` holds later.
+   */
+  private drewRows = false
+
+  /** Whether the last render showed the rows the page served. */
+  private serving = false
+
+  /** Whether the render before the last showed them, so the change is checked once. */
+  private servedLast = false
+
   /** The letters typed at the grid, which move to the row whose header they start. */
   private readonly typeahead = new Typeahead()
 
@@ -1525,7 +1543,40 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * what this replaced.
    */
   protected override get hasRows(): boolean {
-    return this.view.available > 0 || !this.sourceKnown
+    return this.view.available > 0 || !this.sourceKnown || this.serving
+  }
+
+  /**
+   * The rows the page served: the first page, written as `TableRow` children.
+   *
+   * By tag, because the page may not register `Table`, and an element that is
+   * not defined has no `isTableRow` to find it by.
+   */
+  private get servedRows(): Element[] {
+    return this.knownChildren.filter((child) =>
+      /^helix-(headless-)?table-row$/.test(child.localName),
+    )
+  }
+
+  /**
+   * Whether this render shows the rows the page served in place of drawing its
+   * own.
+   *
+   * **Until `rows` has held a row, and never after.** A server cannot tell
+   * whether the page served any, and a render hydrating what one sent has to
+   * render the same, so both show the slot that would hold them. In a browser
+   * the rows are shown while `rows` is empty, which is how a framework that
+   * renders on a server leaves the property until it hydrates. Once the table
+   * has drawn its own rows it stops showing the served ones and never removes
+   * them: they are the page's markup, and a framework that rendered them owns
+   * them.
+   */
+  private serves(): boolean {
+    if (!this.sourceKnown) {
+      return true
+    }
+    this.drewRows ||= this.rows.length > 0
+    return !this.drewRows && this.servedRows.length > 0
   }
 
   /**
@@ -1967,6 +2018,11 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
        it was given, so this moves the headings without touching the markup. */
     const columns = this.orderedColumns
     head.assign(...columns)
+    /* The rows the page served, while they are shown, into the slot that stands
+       in for the drawn rows. Left unassigned after, so they draw nothing. */
+    root
+      .querySelector<HTMLSlotElement>('[part="table"] > slot:not([name])')
+      ?.assign(...(this.serving ? this.servedRows : []))
     const rest = [...this.children].filter((child) => !columns.includes(child as never))
     for (const [name, wanted] of [
       ['toolbar', true],
@@ -2104,6 +2160,16 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     this.toggleState('empty', !this.loading && !this.hasRows)
     this.toggleState('loading', this.loading)
     this.assign()
+    /* Once, on the render that drew the rows the served ones stood in for. */
+    if (this.servedLast && !this.serving) {
+      auditServed(
+        this,
+        this.servedRows,
+        [...this.renderRoot.querySelectorAll('[part~="row"]')],
+        this.drawnPage.length,
+      )
+    }
+    this.servedLast = this.serving
     this.announceSort()
     this.quietControls()
     this.placeFocus()
@@ -2497,7 +2563,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
 
   protected override render(): TemplateResult {
     const { available, matched, page } = this.view
-    this.drawnPage = page
+    const serving = this.serves()
+    this.serving = serving
+    this.drawnPage = serving ? [] : page
     /* After the rows, while there are rows to follow and none are on their way. */
     this.moreDrawn = this.loadMore && !this.loading && this.errorText === '' && page.length > 0
     const rows = this.windowOf(page)
@@ -2520,7 +2588,8 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
        here. A screen reader told a table has no rows has been told something
        false; one told nothing counts what it can see. */
     const counted = this.mode === 'server' ? Math.max(this.total, available) : matched
-    const countKnown = counted > 0 || this.sourceKnown
+    /* Nor while the served rows stand in for rows that have not arrived. */
+    const countKnown = counted > 0 || (this.sourceKnown && !serving)
     /* **On the grid, which is the host.** `aria-rowcount` and `aria-colcount`
        belong to a table or a grid and mean nothing on a `rowgroup`, which is
        where they sat, so a windowed or paged result never said how long it
@@ -2538,8 +2607,15 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         @scroll=${this.handleScroll}
       >
         <div part="head" role="row" aria-rowindex="1">
-          ${this.rowGrips ? this.renderGripHead(headStop && this.currentColumn === 0) : nothing}${
-            this.selectable
+          ${
+            /* None on a server, whose page has no cells under them: the served
+               rows start at the first column, and a box above them would set
+               every heading one column off its values until hydration. */
+            this.rowGrips && this.sourceKnown
+              ? this.renderGripHead(headStop && this.currentColumn === 0)
+              : nothing
+          }${
+            this.selectable && this.sourceKnown
               ? this.renderSelectAll(headStop && this.currentColumn === this.selectAt)
               : nothing
           }${
@@ -2549,9 +2625,23 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
                     html`<slot name=${`column-${index + 1}`} @slotchange=${this.handleSlotChange}></slot>`,
                 )
               : html`<slot name="columns" @slotchange=${this.handleSlotChange}></slot>`
+          }${
+            /* **The server's root routes by name and has only named slots**, so
+               the columns, which carry no `slot`, were assigned nowhere and
+               painted nothing until hydration routed them. A default slot here
+               takes them, and the rows the page served after them, until then.
+               The header is `display: contents` in the styled tier, so the
+               headings and the cells are items of the one grid either way. */
+            this.sourceKnown ? nothing : html`<slot @slotchange=${this.handleSlotChange}></slot>`
           }
         </div>
-        ${this.renderSpacer('before', kept)}${this.renderRows(rows, page)}${this.renderSpacer('after', kept)}
+        ${
+          serving
+            ? this.sourceKnown
+              ? html`<slot @slotchange=${this.handleSlotChange}></slot>`
+              : nothing
+            : html`${this.renderSpacer('before', kept)}${this.renderRows(rows, page)}${this.renderSpacer('after', kept)}`
+        }
         ${this.renderMore(page)}${this.errorText === '' ? this.renderStatus(filled, 'gridcell') : this.renderError()}
       </div>
       ${this.errorText === '' ? this.renderLive(filled) : html`<span part="live" role="status">${this.errorText}</span>`}
