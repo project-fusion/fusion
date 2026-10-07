@@ -180,6 +180,13 @@ export class HelixHeadlessVirtualList extends HelixElement {
   columns = 1
 
   /**
+   * The text of the row shown when there are no items and none are loading,
+   * where the `empty` slot is empty. Empty, the default, shows no row.
+   */
+  @property({ attribute: 'empty-label' })
+  emptyLabel = ''
+
+  /**
    * The height of one row, in pixels, used to find the row at a scroll offset.
    *
    * An estimate rather than a measurement while `measured` is off, which is
@@ -232,13 +239,6 @@ export class HelixHeadlessVirtualList extends HelixElement {
    */
   @property({ type: Boolean })
   loading = false
-
-  /**
-   * The text of the row shown when there are no items and none are loading,
-   * where the `empty` slot is empty. Empty, the default, shows no row.
-   */
-  @property({ attribute: 'empty-label' })
-  emptyLabel = ''
 
   /** The text of the row drawn while `loading` is set, where the `loading` slot is empty. */
   @words
@@ -972,9 +972,11 @@ export class HelixHeadlessVirtualList extends HelixElement {
     )
     const across = this.across
     /* Only once the browser has read the source, so a server and a list whose
-       items are on their way say nothing about an empty set. */
+       items are on their way say nothing about an empty set. `readFor` is set
+       by the read in `willUpdate`, so the first render after it draws the row;
+       `hasUpdated` waited for a second render that a browser never asks for. */
     const empty =
-      this.hasUpdated &&
+      this.readFor !== undefined &&
       !this.loading &&
       this.data.length === 0 &&
       (this.emptyLabel !== '' || this.querySelector(':scope > [slot="empty"]') !== null)

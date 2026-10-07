@@ -82,6 +82,17 @@ export class HelixHeadlessTableRow extends HelixElement {
   readonly isTableRow = true
 
   /**
+   * Takes the row out of the table's selection and out of its link: the row's
+   * checkbox is disabled, Space, Shift ranges, and the checkbox in the heading
+   * pass over it, and a press does not follow `href`. A row already selected
+   * stays selected. A screen reader hears it as unavailable, and in a `grid`
+   * table the arrow keys still reach it, as a disabled cell in a grid is
+   * reached.
+   */
+  @property({ reflect: true, type: Boolean })
+  disabled = false
+
+  /**
    * The URL a press on the row follows, which makes the whole row a link.
    * Empty, the default, leaves presses to the row's cells.
    */
@@ -102,17 +113,6 @@ export class HelixHeadlessTableRow extends HelixElement {
    */
   @property()
   value = ''
-
-  /**
-   * Takes the row out of the table's selection and out of its link: the row's
-   * checkbox is disabled, Space, Shift ranges, and the checkbox in the heading
-   * pass over it, and a press does not follow `href`. A row already selected
-   * stays selected. A screen reader hears it as unavailable, and in a `grid`
-   * table the arrow keys still reach it, as a disabled cell in a grid is
-   * reached.
-   */
-  @property({ reflect: true, type: Boolean })
-  disabled = false
 
   /**
    * @internal Whether the table this row sits in is `selectable`, written by

@@ -222,9 +222,12 @@ export const MixinCollection = <T extends Constructor<HelixElement>>(Base: T) =>
       }
       const text = this.loading ? this.loadingText : this.emptyText
       /* The text is the slot's fallback, so markup a consumer slots replaces it
-         and both never show at once. */
+         and both never show at once. Each name is written out rather than
+         bound, so the slots check can read that the collection renders it. */
       const shown = this.statusSlots
-        ? html`<slot name=${this.loading ? 'loading' : 'empty'}>${text}</slot>`
+        ? this.loading
+          ? html`<slot name="loading">${text}</slot>`
+          : html`<slot name="empty">${text}</slot>`
         : text
       /* **A table owns rows and nothing else.** A paragraph inside `role="table"`
          is a child the role does not allow, so in a table the line is a row

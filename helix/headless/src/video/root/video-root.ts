@@ -423,14 +423,6 @@ export class HelixHeadlessVideo extends HelixElement {
   label = ''
 
   /**
-   * The title the device's own media controls show while the video plays,
-   * such as on a lock screen. Empty, the default, shows `label`. A playlist
-   * writes the current entry's name here.
-   */
-  @property({ attribute: 'media-title' })
-  mediaTitle = ''
-
-  /**
    * The text announced while the video waits for more data.
    */
   @words
@@ -442,6 +434,14 @@ export class HelixHeadlessVideo extends HelixElement {
    */
   @property({ reflect: true, type: Boolean })
   loop = false
+
+  /**
+   * The title the device's own media controls show while the video plays,
+   * such as on a lock screen. Empty, the default, shows `label`. A playlist
+   * writes the current entry's name here.
+   */
+  @property({ attribute: 'media-title' })
+  mediaTitle = ''
 
   /**
    * What the button that opens `overflow-controls` is called.
