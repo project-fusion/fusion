@@ -66,6 +66,17 @@ import { onPage, waitFor } from '../wait.js'
  * least distance that brings it on screen, so the stop that points at it is
  * on screen too.
  *
+ * **A stop's `effect` runs as the tour reaches it**, before it is shown, and
+ * the stop waits for a promise it returns, with `:state(preparing)` on the
+ * tour meanwhile. A function it returns runs when the tour leaves the stop.
+ *
+ * **A press outside the current stop and its target does nothing by
+ * default**, so a reader can use the page the tour is describing. Set
+ * `outside-press="close"` to end the tour on one, through `helix-before-close`
+ * as Skip does, or `outside-press="block"` to refuse it, so the stop and its
+ * target are all a pointer can reach while the tour runs, as Zag's
+ * `preventInteraction` does.
+ *
  * **Keyboard.** Focus is on the current stop's panel, which is not in the
  * `Tab` order itself.
  *
@@ -111,6 +122,7 @@ import { onPage, waitFor } from '../wait.js'
  * @cssproperty --tour-spotlight-y - The lit box's top edge, from the window's top edge, in pixels. Written on the spotlight while it lights a target.
  *
  * @cssstate open - While the tour is running.
+ * @cssstate preparing - While the tour waits for the current stop's `effect` before showing the stop.
  * @cssstate waiting - While the tour waits at a `wait` stop for its target to be on the page.
  */
 /*
@@ -187,6 +199,14 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
    */
   @property({ attribute: 'next-label' })
   nextLabel = ''
+
+  /**
+   * What a press outside the current stop and its target does while the tour
+   * runs. Unset, nothing: the page stays usable. `close` ends the tour, as
+   * Skip does, and `block` refuses the press.
+   */
+  @property({ attribute: 'outside-press' })
+  outsidePress?: 'block' | 'close'
 
   /**
    * Draws each stop's place in the run in its panel, as well as saying it.
@@ -382,6 +402,8 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
     this.addEventListener('helix-tour-ask', this.handleAsk)
     this.addEventListener('keydown', this.handleArrows)
     document.addEventListener('keydown', this.handleKeydown)
+    document.addEventListener('pointerdown', this.handleOutside, true)
+    document.addEventListener('click', this.handleOutside, true)
     window.addEventListener('resize', this.handleViewport, { passive: true })
     window.addEventListener('scroll', this.handleViewport, { capture: true, passive: true })
     /* Moved rather than new, so the watch torn down on disconnect comes back:
@@ -397,6 +419,9 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
     this.removeEventListener('helix-tour-ask', this.handleAsk)
     this.removeEventListener('keydown', this.handleArrows)
     document.removeEventListener('keydown', this.handleKeydown)
+    document.removeEventListener('pointerdown', this.handleOutside, true)
+    document.removeEventListener('click', this.handleOutside, true)
+    this.enter(undefined)
     window.removeEventListener('resize', this.handleViewport)
     window.removeEventListener('scroll', this.handleViewport, { capture: true })
     this.sizer?.disconnect()
@@ -418,8 +443,106 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
     })
   }
 
+  /**
+   * Answers a press outside the current stop and its target, as
+   * `outside-press` asks. A press on the tour's own parts, the stop or the
+   * target is the reader using the tour.
+   */
+  private readonly handleOutside = (event: Event): void => {
+    const mode = this.outsidePress
+    if (!this.open || !mode) {
+      return
+    }
+    const path = event.composedPath()
+    const stop = this.current
+    const target = stop?.type === undefined ? stop?.target : undefined
+    if (path.includes(this) || (target && path.includes(target))) {
+      return
+    }
+    if (mode === 'block') {
+      event.preventDefault()
+      event.stopPropagation()
+    } else if (event.type === 'pointerdown') {
+      this.skip()
+    }
+  }
+
+  /** The stop whose `effect` has run, and the function to run on leaving it. */
+  private entered: { leave?: () => void; stop: HelixHeadlessTourStop } | undefined
+
+  /** The stop held back while its `effect` settles. */
+  private preparing: HelixHeadlessTourStop | undefined
+
+  /**
+   * Runs the current stop's `effect` as the tour reaches it, and the last
+   * one's leaving function as it leaves, and holds the stop back while a
+   * promise settles.
+   */
+  private enter(stop: HelixHeadlessTourStop | undefined): void {
+    if (stop === this.entered?.stop) {
+      return
+    }
+    const left = this.entered
+    this.entered = stop ? { stop } : undefined
+    left?.leave?.()
+    this.preparing = undefined
+    this.toggleState('preparing', false)
+    const effect = stop?.effect
+    if (!stop || !effect) {
+      return
+    }
+    const ran = effect({
+      index: this.index,
+      next: () => this.next(),
+      skip: () => this.skip(),
+      target: stop.target,
+    })
+    const keep = (leave: unknown): void => {
+      if (typeof leave !== 'function') {
+        return
+      }
+      if (this.entered?.stop === stop) {
+        this.entered.leave = leave as () => void
+      } else {
+        ;(leave as () => void)()
+      }
+    }
+    if (typeof (ran as Promise<unknown> | undefined)?.then !== 'function') {
+      keep(ran)
+      return
+    }
+    this.preparing = stop
+    this.toggleState('preparing', true)
+    /* A refused promise still shows the stop: the stop is what the reader
+       asked for, and a page that failed to prepare it has said so itself. */
+    void (ran as Promise<unknown>)
+      .then(keep, () => undefined)
+      .then(() => {
+        if (this.preparing !== stop) {
+          return
+        }
+        this.preparing = undefined
+        this.toggleState('preparing', false)
+        this.requestUpdate()
+        void this.updateComplete.then(() => {
+          /* Where the reader still is where the move left them: on the page's
+           body, in the tour, or on the control that opened it. */
+          const active = deepActiveElement()
+          const waiting =
+            active === null ||
+            active === document.body ||
+            active === this.returnFocus ||
+            deepContains(this, active)
+          if (waiting) {
+            this.focusCurrent()
+          }
+        })
+      })
+  }
+
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    this.enter(this.open ? this.current : undefined)
     this.reveal()
     this.settle()
     this.light()
@@ -558,7 +681,7 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
     /* Not into a stop still hydrating what a server sent: see `whenHydrated`. */
     stops.forEach((stop, index) => {
       whenHydrated(stop, () => {
-        stop.current = this.open && index === at
+        stop.current = this.open && index === at && this.preparing !== stop
         stop.first = index === 0
         stop.last = index === stops.length - 1
         stop.position = formatWords(this, 'progressLabel', {
@@ -587,7 +710,9 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
     const stop = this.current
     /* A bubble only: a dialog and a floating stop point at nothing, and a wait
        stop shows nothing. */
-    return this.open && stop?.type === undefined ? stop?.target : undefined
+    return this.open && stop?.type === undefined && this.preparing !== stop
+      ? stop?.target
+      : undefined
   }
 
   /** The stop being shown, or nothing where there are no stops. */
@@ -649,7 +774,8 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
 
   /** Reads the current target's box, which is where the light falls. */
   private light(): void {
-    const stop = this.open ? this.current : undefined
+    const shown = this.current
+    const stop = this.open && this.preparing !== shown ? shown : undefined
     const veiled =
       stop !== undefined && stop.type !== 'wait' && (stop.type !== undefined || !stop.target)
     if (veiled !== this.veiled) {

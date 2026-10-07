@@ -791,3 +791,147 @@ describe('a tour with no name', () => {
     }
   })
 })
+
+describe("a stop's effect", () => {
+  /* Zag's tour step runs an effect before it shows, for a stop whose target
+     has to be opened or loaded first; a stop here could only wait for its
+     target to appear by itself. */
+  type Effect = (context: {
+    index: number
+    next(): void
+    skip(): void
+    target: HTMLElement | null
+  }) => unknown
+
+  const prepared = async (
+    effect: Effect,
+  ): Promise<{ stops: (HTMLElement & { current: boolean; effect?: Effect })[]; tour: Tour }> => {
+    const tour = await run(false)
+    const stops = tour.stops as (HTMLElement & { current: boolean; effect?: Effect })[]
+    ;(stops[1] as { effect?: Effect }).effect = effect
+    return { stops, tour }
+  }
+
+  test('runs as the tour reaches the stop, with its place and target', async () => {
+    const heard: unknown[] = []
+    const { tour } = await prepared((context) => {
+      heard.push([context.index, context.target?.id])
+    })
+    tour.open = true
+    await tour.updateComplete
+    expect(heard).toEqual([])
+    tour.next()
+    await tour.updateComplete
+    expect(heard).toEqual([[1, 'two']])
+  })
+
+  test('holds the stop back while its promise settles, and the tour says it is preparing', async () => {
+    let finish: () => void = () => {}
+    const { stops, tour } = await prepared(
+      () =>
+        new Promise<void>((done) => {
+          finish = done
+        }),
+    )
+    tour.open = true
+    await tour.updateComplete
+    tour.next()
+    await tour.updateComplete
+    expect(stops.map((stop) => stop.current)).toEqual([false, false, false])
+    expect(hasState(tour, 'preparing')).toBe(true)
+    finish()
+    await new Promise((done) => setTimeout(done, 0))
+    await tour.updateComplete
+    expect(stops.map((stop) => stop.current)).toEqual([false, true, false])
+    expect(hasState(tour, 'preparing')).toBe(false)
+  })
+
+  test('runs what it returned when the tour leaves the stop', async () => {
+    const left: string[] = []
+    const { tour } = await prepared(() => () => left.push('left'))
+    tour.open = true
+    await tour.updateComplete
+    tour.next()
+    await tour.updateComplete
+    expect(left).toEqual([])
+    tour.next()
+    await tour.updateComplete
+    expect(left).toEqual(['left'])
+  })
+
+  test('runs it when the tour ends at that stop too', async () => {
+    const left: string[] = []
+    const { tour } = await prepared(async () => () => left.push('left'))
+    tour.open = true
+    await tour.updateComplete
+    tour.next()
+    await tour.updateComplete
+    await new Promise((done) => setTimeout(done, 0))
+    tour.skip()
+    await tour.updateComplete
+    expect(left).toEqual(['left'])
+  })
+})
+
+describe('outside-press', () => {
+  const press = (target: Element): { clicked: boolean; down: PointerEvent } => {
+    const down = new PointerEvent('pointerdown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+    })
+    target.dispatchEvent(down)
+    const click = new MouseEvent('click', { bubbles: true, cancelable: true, composed: true })
+    let clicked = false
+    target.addEventListener('click', () => {
+      clicked = true
+    })
+    target.dispatchEvent(click)
+    return { clicked, down }
+  }
+
+  test('does nothing by default, so the page stays usable', async () => {
+    const tour = await run()
+    const { clicked } = press(document.getElementById('three') as Element)
+    await tour.updateComplete
+    expect(tour.open).toBe(true)
+    expect(clicked).toBe(true)
+  })
+
+  test('close ends the tour on a press outside the stop and its target', async () => {
+    const tour = await run()
+    tour.setAttribute('outside-press', 'close')
+    await tour.updateComplete
+    press(document.getElementById('one') as Element)
+    await tour.updateComplete
+    expect(tour.open).toBe(true)
+    press(document.getElementById('three') as Element)
+    await tour.updateComplete
+    expect(tour.open).toBe(false)
+  })
+
+  test('block refuses a press outside, and lets one on the target through', async () => {
+    const tour = await run()
+    tour.setAttribute('outside-press', 'block')
+    await tour.updateComplete
+    const outside = press(document.getElementById('three') as Element)
+    expect(outside.clicked).toBe(false)
+    expect(outside.down.defaultPrevented).toBe(true)
+    const target = press(document.getElementById('one') as Element)
+    expect(target.clicked).toBe(true)
+    expect(tour.open).toBe(true)
+  })
+})
+
+describe('a stop on its way in', () => {
+  test('is entering once shown, and neither once its entrance is over', async () => {
+    const tour = await run(false)
+    tour.open = true
+    await tour.updateComplete
+    const first = tour.stops[0] as HTMLElement & { updateComplete: Promise<boolean> }
+    await first.updateComplete
+    expect(hasState(first, 'entering')).toBe(true)
+    await new Promise((done) => setTimeout(done, 100))
+    expect(hasState(first, 'entering')).toBe(false)
+  })
+})
