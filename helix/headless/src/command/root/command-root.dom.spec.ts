@@ -448,3 +448,30 @@ describe('the palette’s own states and slots', () => {
     )
   })
 })
+
+describe('a palette of commands given as data', () => {
+  /* Only children could be commands, where Listbox takes `items` and draws a
+     window of a long list. */
+  test('hands its items to the list, and says the one chosen', async () => {
+    const host = (await palette(
+      '<helix-headless-command label="Commands"></helix-headless-command>',
+    )) as Palette & { items: string[] }
+    host.items = ['Alpha', 'Beta']
+    host.open = true
+    await settle(host)
+    expect((listbox(host) as unknown as { items: string[] }).items).toEqual(['Alpha', 'Beta'])
+    const said: string[] = []
+    host.addEventListener('helix-select', (event) =>
+      said.push((event as CustomEvent<{ value: string }>).detail.value),
+    )
+    const field = listbox(host).shadowRoot?.querySelector('[part="search-field"]') as HTMLElement
+    for (const key of ['ArrowDown', 'Enter']) {
+      field.dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key }),
+      )
+      await settle(host)
+    }
+    expect(said).toEqual(['Alpha'])
+    expect(host.open).toBe(false)
+  })
+})
