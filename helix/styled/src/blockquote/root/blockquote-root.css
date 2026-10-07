@@ -34,6 +34,31 @@
   content: no-close-quote;
 }
 
+/* Logical values, so `end` is the far edge in a right-to-left column too. */
+:host([text-align="start"]) {
+  text-align: start;
+}
+
+:host([text-align="center"]) {
+  text-align: center;
+}
+
+:host([text-align="end"]) {
+  text-align: end;
+}
+
+/* Centered or at the end, a mark floated to the start would stand apart from
+   the first line or pull it off the middle, so it stands over the passage on
+   a line of its own, aligned as the passage is, and its line is shortened so
+   the passage stays close under it. */
+:host([marks][text-align="center"]) [part="blockquote"]::before,
+:host([marks][text-align="end"]) [part="blockquote"]::before {
+  display: block;
+  float: none;
+  line-height: 0.75;
+  margin-inline-end: var(--helix-space-none);
+}
+
 /* On the slot, not on what was slotted into it. */
 slot:not([name]) {
   /* A step back from full strength. */

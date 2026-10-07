@@ -94,3 +94,25 @@ describe('blockquote hooks', () => {
     )
   })
 })
+
+/* A pull quote could only stand at the start of its column. Measured in
+   Chromium: under `text-align="center"` the passage and the attribution both
+   compute `text-align: center`, and the mark stands over the first line. */
+describe('text-align', () => {
+  test('reflects, and sets the passage and its attribution with logical values', async () => {
+    const quote = (await mount(
+      '<helix-blockquote attribution="A" marks text-align="center">Said so.</helix-blockquote>',
+    )) as HTMLElement & { textAlign?: string }
+    expect(quote.textAlign).toBe('center')
+    expect(rule(':host([text-align="center"])')).toContain('text-align: center')
+    expect(rule(':host([text-align="end"])')).toContain('text-align: end')
+    expect(rule(':host([text-align="start"])')).toContain('text-align: start')
+  })
+
+  test('stands the mark over the passage where a float would pull the first line away', () => {
+    const mark = rule(':host([marks][text-align="end"]) [part="blockquote"]::before')
+    expect(mark).toContain('display: block')
+    expect(mark).toContain('float: none')
+    expect(sheet()).toContain(':host([marks][text-align="center"]) [part="blockquote"]::before')
+  })
+})
