@@ -87,3 +87,18 @@ export const markMatches = (owner: Element, elements: Iterable<Element>, needle:
     registry.set(FILTER_MARK, new Highlight(...all))
   }
 }
+
+/**
+ * Whether a filter keeps an item: its words hold the filter, in any case, or
+ * `match` says so where the page gave one. An empty filter keeps everything.
+ *
+ * One answer for every family that filters, so Listbox, Command and a
+ * filterable Menu keep the same items for the same words, and a `filterMatch`
+ * the page writes once means the same thing in each.
+ */
+export const filterKeeps = (
+  text: string,
+  filter: string,
+  match?: ((text: string, filter: string) => boolean) | undefined,
+): boolean =>
+  filter === '' || (match ? match(text, filter) : text.toLowerCase().includes(filter.toLowerCase()))

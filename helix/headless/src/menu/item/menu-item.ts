@@ -3,9 +3,11 @@ import {
   auditName,
   customElement,
   deepActiveElement,
+  followLink,
   HelixBeforeToggleEvent,
   HelixElement,
   HelixSelectEvent,
+  hostAria,
   isRtl,
   onApple,
   onUnlessFalse,
@@ -68,6 +70,12 @@ import '../../kbd/index.js'
  * slots, so a mark of your own replaces either by being slotted. Neither is
  * read as part of the row's name.
  *
+ * In a menu with `filterable`, focus stays in the menu's filter field and the
+ * row the arrow keys reach is highlighted: the field names it with
+ * `aria-activedescendant`, the row carries its role on its host so the field
+ * can point at it, and `:state(highlighted)` says which row it is. A row with
+ * an `href` then follows its link without an anchor, as `Option` does.
+ *
  * @since 0.1.0
  * @status stable
  * @aliases Menu option, Menu row
@@ -96,6 +104,7 @@ import '../../kbd/index.js'
  * @csspart surface - The panel a submenu opens in beside the row, under the menu's `submenus="flyout"`.
  *
  * @cssstate checked - The row is checked.
+ * @cssstate highlighted - In a menu with `filterable`, the arrow keys or the pointer reached the row while focus stays in the filter field.
  * @cssstate submenu-mark - Under `submenus="flyout"`, a row in this row's submenu can be ticked or opens a submenu, so the submenu keeps its trailing column.
  * @cssstate submenu-start - Under `submenus="flyout"`, a row in this row's submenu has content before its label, so the submenu keeps its leading column.
  */
@@ -183,6 +192,13 @@ export class HelixHeadlessMenuItem extends HelixElement {
   flyout = false
 
   /**
+   * @internal Whether the row is the one the keys reached in a menu that keeps
+   * focus in its filter field. Written by the menu.
+   */
+  @property({ attribute: false })
+  highlighted = false
+
+  /**
    * The URL the row links to. Setting it renders the row as a link.
    *
    * **The row itself becomes an `<a>`, and the role goes with it.** A
@@ -251,6 +267,14 @@ export class HelixHeadlessMenuItem extends HelixElement {
    */
   @property()
   value = ''
+
+  /**
+   * @internal Whether the menu keeps focus in its filter field, so the row is
+   * highlighted rather than focused and says what it is from its host, where
+   * the field's `aria-activedescendant` can reach it. Written by the menu.
+   */
+  @property({ attribute: false })
+  virtual = false
 
   /**
    * @internal Read by a parent to identify its children across the light DOM,
@@ -338,6 +362,7 @@ export class HelixHeadlessMenuItem extends HelixElement {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     this.toggleState('checked', this.checked)
+    this.toggleState('highlighted', this.virtual && this.highlighted)
     if (!this.childrenKnown) {
       return
     }
@@ -374,6 +399,15 @@ export class HelixHeadlessMenuItem extends HelixElement {
     super.updated(changed)
     /* Once the row is first drawn, which for a submenu's row is when its page
        first shows: until then there is no row to name. */
+    /* The description by reference, from the host, where the host says what
+       the row is. */
+    hostAria(this.internals, {
+      describedBy: this.onHost
+        ? [...this.renderRoot.querySelectorAll('#description, #end-words')].filter((slot) =>
+            slot.id === 'description' ? this.description : this.end,
+          )
+        : [],
+    })
     if (this.partNamed('item')) {
       auditName(
         this,
@@ -427,11 +461,11 @@ export class HelixHeadlessMenuItem extends HelixElement {
   }
 
   /** What describes the row: the line under its label and the words after it. */
-  private get describedBy(): string | typeof nothing {
+  private get describedBy(): string | null {
     const ids = [this.description ? 'description' : '', this.end ? 'end-words' : '']
       .filter((id) => id !== '')
       .join(' ')
-    return ids === '' ? nothing : ids
+    return ids === '' ? null : ids
   }
 
   /**
@@ -530,6 +564,9 @@ export class HelixHeadlessMenuItem extends HelixElement {
    * first row of a page it has just opened.
    */
   get active(): boolean {
+    if (this.virtual) {
+      return this.highlighted
+    }
     /* The focused node itself, found through every shadow root, and asked
        whether it is in this row's own. `document.activeElement` stops at the
        outermost host, which is this row only while the menu is in the document
@@ -608,7 +645,15 @@ export class HelixHeadlessMenuItem extends HelixElement {
     const spaceKeeps = space && this.choice && !this.hasSubmenu
     this.keepsOpen = this.closeOnSelect === undefined ? spaceKeeps : !this.closeOnSelect
     this.tick()
-    this.dispatchEvent(new HelixSelectEvent({ value: this.value }))
+    /* A link drawn without an anchor, in a menu that keeps focus in its
+       filter field, is followed here unless a listener refused the choice. */
+    if (
+      this.dispatchEvent(new HelixSelectEvent({ value: this.value })) &&
+      this.virtual &&
+      this.href !== ''
+    ) {
+      followLink(this.ownerDocument, this)
+    }
   }
 
   private readonly handleClick = (): void => {
@@ -692,7 +737,32 @@ export class HelixHeadlessMenuItem extends HelixElement {
     return nothing
   }
 
+  /** Whether the row says what it is from its host, for a field's `aria-activedescendant`. */
+  private get onHost(): boolean {
+    return this.virtual && this.onPage && !this.showingSubmenu
+  }
+
   protected override render(): TemplateResult | typeof nothing {
+    const submenu = this.hasSubmenu
+    const ticks = this.choice
+    const role = ticks ? (this.exclusive ? 'menuitemradio' : 'menuitemcheckbox') : 'menuitem'
+    const checkedState = ticks ? (this.checked ? 'true' : 'false') : null
+    /* In this reader's platform's words, and in the server's while hydrating
+       what one sent, which has no keyboard to ask. */
+    const keys =
+      this.shortcut === '' ? null : ariaChord(this.shortcut, !this.hydrating && onApple())
+    /* The row's semantics on the host where the menu keeps focus in its
+       filter field, which can point only at an element in the tree around it,
+       and on the row inside otherwise. */
+    const host = this.onHost
+    const internals = this.internals
+    internals.role = host ? role : null
+    internals.ariaChecked = host ? checkedState : null
+    internals.ariaDisabled = host && this.disabled ? 'true' : null
+    internals.ariaHasPopup = host && submenu ? 'menu' : null
+    internals.ariaExpanded = host && this.flyout && submenu ? String(this.expanded) : null
+    internals.ariaKeyShortcuts = host ? keys : null
+    const own = <T>(value: T): T | typeof nothing => (host || value === null ? nothing : value)
     // The page this row opened is showing, so what it contributes is the slot
     // its rows are assigned to and nothing else. Its own row belongs to the
     // page above.
@@ -716,7 +786,6 @@ export class HelixHeadlessMenuItem extends HelixElement {
     if (!this.onPage) {
       return nothing
     }
-    const submenu = this.hasSubmenu
     /* One row, two tags. Everything about it is the same but the element, which
        is what an `href` changes: the anchor carries the role and the tab stop
        rather than sitting inside something that does, for the reason the
@@ -724,14 +793,7 @@ export class HelixHeadlessMenuItem extends HelixElement {
 
        A disabled row renders no `href`. A disabled anchor is not a thing the
        platform has, and `aria-disabled` alone still navigates. */
-    const linked = this.href !== '' && !this.disabled
-    const ticks = this.choice
-    const role = ticks ? (this.exclusive ? 'menuitemradio' : 'menuitemcheckbox') : 'menuitem'
-    const checkedState = ticks ? (this.checked ? 'true' : 'false') : nothing
-    /* In this reader's platform's words, and in the server's while hydrating
-       what one sent, which has no keyboard to ask. */
-    const keys =
-      this.shortcut === '' ? nothing : ariaChord(this.shortcut, !this.hydrating && onApple())
+    const linked = this.href !== '' && !this.disabled && !this.virtual
     const inside = html`<span part="start" ?data-empty=${!this.start}
           ><slot name="start" @slotchange=${this.readStart}></slot
         ></span>
@@ -749,11 +811,11 @@ export class HelixHeadlessMenuItem extends HelixElement {
             rel=${this.rel || nothing}
             ?download=${this.download}
             role=${role}
-            aria-checked=${checkedState}
-            aria-describedby=${this.describedBy}
+            aria-checked=${own(checkedState)}
+            aria-describedby=${own(this.describedBy)}
             aria-haspopup=${submenu ? 'menu' : nothing}
             aria-expanded=${this.flyout && submenu ? String(this.expanded) : nothing}
-            aria-keyshortcuts=${keys}
+            aria-keyshortcuts=${own(keys)}
             tabindex="-1"
             @click=${this.handleClick}
             @keydown=${this.handleKeydown}
@@ -761,14 +823,14 @@ export class HelixHeadlessMenuItem extends HelixElement {
         : html`<div
             part="item"
             id=${this.flyout ? 'row' : nothing}
-            role=${role}
-            aria-checked=${checkedState}
-            aria-describedby=${this.describedBy}
-            aria-disabled=${this.disabled ? 'true' : nothing}
-            aria-haspopup=${submenu ? 'menu' : nothing}
-            aria-expanded=${this.flyout && submenu ? String(this.expanded) : nothing}
-            aria-keyshortcuts=${keys}
-            tabindex=${this.disabled ? nothing : '-1'}
+            role=${own(role)}
+            aria-checked=${own(checkedState)}
+            aria-describedby=${own(this.describedBy)}
+            aria-disabled=${own(this.disabled ? 'true' : null)}
+            aria-haspopup=${own(submenu ? 'menu' : null)}
+            aria-expanded=${own(this.flyout && submenu ? String(this.expanded) : null)}
+            aria-keyshortcuts=${own(keys)}
+            tabindex=${own(this.disabled ? null : '-1')}
             @click=${this.handleClick}
             @keydown=${this.handleKeydown}
           >${inside}</div>`
