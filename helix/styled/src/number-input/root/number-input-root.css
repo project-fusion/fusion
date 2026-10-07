@@ -121,7 +121,9 @@ slot[name="end"]::slotted(*) {
 }
 
 [part="decrement"] svg,
-[part="increment"] svg {
+[part="increment"] svg,
+slot[name="decrement-icon"]::slotted(*),
+slot[name="increment-icon"]::slotted(*) {
   block-size: var(--number-input-stepper-icon-size, var(--helix-size-icon-tight));
   inline-size: var(--number-input-stepper-icon-size, var(--helix-size-icon-tight));
 }

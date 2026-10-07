@@ -52,6 +52,28 @@ describe('input number', () => {
     expect(input.getAttribute('aria-valuenow')).toBe('4')
   })
 
+  /* React Aria's NumberField puts the field and its buttons in a group and
+     calls the field a number field; this said neither. */
+  test('the field and its buttons are a group, and the field is called a number field', async () => {
+    const host = await field()
+    expect(part(host, 'field')?.getAttribute('role')).toBe('group')
+    expect(control(host).getAttribute('aria-roledescription')).toBe('number field')
+    host.setAttribute('role-label', 'Zahlenfeld')
+    await host.updateComplete
+    expect(control(host).getAttribute('aria-roledescription')).toBe('Zahlenfeld')
+    host.setAttribute('role-label', '')
+    await host.updateComplete
+    expect(control(host).hasAttribute('aria-roledescription')).toBe(false)
+  })
+
+  test('an icon of your own replaces each stepper glyph', async () => {
+    const host = await field()
+    for (const name of ['decrement', 'increment']) {
+      const slot = part(host, name)?.querySelector(`slot[name="${name}-icon"]`)
+      expect(slot?.querySelector(`[part="${name}-mark"]`)).not.toBeNull()
+    }
+  })
+
   test('steps by whole steps', async () => {
     const host = await field('default-value="10" step="5"')
     host.stepUp()
@@ -229,6 +251,34 @@ describe('input number keyboard', () => {
   })
 })
 
+describe('a held stepper button', () => {
+  const press = (button: Element, type: string): void => {
+    button.dispatchEvent(new PointerEvent(type, { bubbles: true, button: 0, pointerId: 1 }))
+  }
+
+  /* A press stepped once however long it was held, where React Aria's
+     NumberField steps again after 400 milliseconds and every 60 after that. */
+  test('steps at once, and again while it is held', async () => {
+    const host = await field('default-value="1"')
+    const up = part(host, 'increment') as HTMLElement
+    press(up, 'pointerdown')
+    expect(host.value).toBe('2')
+    await new Promise((resolve) => setTimeout(resolve, 540))
+    press(up, 'pointerup')
+    up.click()
+    const held = Number(host.value)
+    expect(held).toBeGreaterThanOrEqual(3)
+    await new Promise((resolve) => setTimeout(resolve, 150))
+    expect(Number(host.value)).toBe(held)
+  })
+
+  test('and a click with no press before it steps once', async () => {
+    const host = await field('default-value="1"')
+    ;(part(host, 'decrement') as HTMLElement).click()
+    expect(host.value).toBe('0')
+  })
+})
+
 describe('input number validity', () => {
   test('a read-only field is not missing, however empty and however required', async () => {
     /* The platform exempts a read-only control from validation, and the
@@ -242,6 +292,23 @@ describe('input number validity', () => {
   test('reports its value to the form', async () => {
     const host = await field('default-value="7" name="guests"')
     expect(formValue(host)).toBe('7')
+  })
+
+  /* The form held the text as typed until the field settled it, so a form
+     read while the field had focus got `$2,500.50`, and text that was no
+     number at all. */
+  test('while typing, the form holds the number the text reads as, and no text that is not one', async () => {
+    const host = await field(
+      `name="price" locale="en-US" format-options='{"style":"currency","currency":"USD"}'`,
+    )
+    control(host).dispatchEvent(new Event('focus'))
+    await type(host, '$2,500.50')
+    expect(host.value).toBe('$2,500.50')
+    expect(formValue(host)).toBe('2500.5')
+    await type(host, '0.50')
+    expect(formValue(host)).toBe('0.50')
+    await type(host, '12e')
+    expect(formValue(host)).toBe('')
   })
 
   test('a value under the floor is a range underflow, in the platform’s words', async () => {

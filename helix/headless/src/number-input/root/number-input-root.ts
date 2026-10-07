@@ -43,6 +43,16 @@ const SCRUB_PITCH = 4
  */
 const SCRUB_FINE = 16
 
+/** A number as `Number()` writes one back: a sign, digits and one decimal point. */
+const PLAIN = /^-?(\d+(\.\d*)?|\.\d+)$/
+
+/**
+ * How long a stepper button is held before it steps again, and how often it
+ * steps after that, in milliseconds: React Aria's NumberField's 400 and 60.
+ */
+const REPEAT_DELAY = 400
+const REPEAT_EVERY = 60
+
 /**
  * @summary A field for a number, typed or changed with step buttons.
  *
@@ -67,17 +77,24 @@ const SCRUB_FINE = 16
  * The locale's group separators are read in every field, so `1,234` is a
  * number in `en-US`.
  *
- * On iOS and iPadOS the field is a plain text field, with no
- * `role="spinbutton"`, which VoiceOver reads as a slider you cannot type in,
- * and no role description, so VoiceOver says the field is required. React
- * Aria's NumberField does the same.
+ * The field and its two buttons sit in a `role="group"`, and the field carries
+ * `role-label`, "number field" in English, as its `aria-roledescription`, as
+ * React Aria's NumberField does. On iOS and iPadOS the field is a plain text
+ * field, with no `role="spinbutton"`, which VoiceOver reads as a slider you
+ * cannot type in, and no role description, so VoiceOver says the field is
+ * required. React Aria's NumberField does the same.
  *
  * Validity follows the platform's rules: `min`, `max`, and `step` are checked
  * and reported through the host's own `setValidity`, under the platform's flag
  * names.
  *
  * Stepping is separate from typing, so a number is not corrected while you type
- * it.
+ * it. While you type, the form holds the number the text reads as, so a field
+ * showing `$2,500.50` gives the form 2500.5, and text that is not a number
+ * gives it nothing, as a native number field does.
+ *
+ * Holding a stepper button down steps once, then again after 400 milliseconds,
+ * then every 60 milliseconds until you let go, as React Aria's NumberField does.
  *
  * **Keyboard.** The field is one tab stop, and the stepper buttons are not in
  * the tab order.
@@ -98,9 +115,11 @@ const SCRUB_FINE = 16
  * @aliases NumberField, Stepper, InputNumber
  * @documentation https://fusion.dev/helix/components/number-input
  *
+ * @slot decrement-icon - Replaces the icon on the step down button.
  * @slot end - Content after the number, such as a unit.
  * @slot feedback - The message that says what is wrong, for content richer than a string. It shows while there is a message.
  * @slot hint - Help under the control, for content richer than the `hint` text.
+ * @slot increment-icon - Replaces the icon on the step up button.
  * @slot label - The label, for content richer than the `label` text.
  * @slot start - Content before the number, such as a unit or an icon.
  *
@@ -112,7 +131,7 @@ const SCRUB_FINE = 16
  * @csspart decrement - The button that steps the value down.
  * @csspart decrement-mark - The icon on the step down button.
  * @csspart feedback - The message that says what is wrong.
- * @csspart field - The box that holds the whole control.
+ * @csspart field - The box that holds the whole control, a `role="group"` around the field and its buttons.
  * @csspart hint - Help text under the field, shown while there is no feedback.
  * @csspart increment - The button that steps the value up.
  * @csspart increment-mark - The icon on the step up button.
@@ -258,6 +277,18 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
    */
   @property({ attribute: 'readonly', reflect: true, type: Boolean })
   readOnly = false
+
+  /**
+   * The words screen readers announce for the field's role, set as its
+   * `aria-roledescription`. Translate it with the rest of your text, or empty
+   * it to leave the role as `spinbutton`.
+   *
+   * Never written on iOS and iPadOS, where a role description stops VoiceOver
+   * saying that the field is required.
+   */
+  @words
+  @property({ attribute: 'role-label' })
+  roleLabel = 'number field'
 
   /**
    * Makes the label a grip that changes the value when it is dragged.
@@ -495,6 +526,77 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     this.nudge(large ? -(this.largeStep ?? 10) : -1)
   }
 
+  /** The timer of a held stepper button. */
+  private repeat: ReturnType<typeof setTimeout> | undefined
+
+  /** Whether a pointer press stepped already, so the click that ends it does not step again. */
+  private pressStepped = false
+
+  /**
+   * A stepper button pressed with a pointer steps at once, and again while it
+   * is held.
+   *
+   * Captured, so letting go outside the button still ends the hold. A click
+   * with no press before it, from a screen reader or a script, steps once in
+   * `handleStepperClick`.
+   */
+  private readonly handleStepperDown = (event: PointerEvent): void => {
+    if (event.button !== 0) {
+      return
+    }
+    const button = event.currentTarget as HTMLButtonElement
+    const up = button.getAttribute('part') === 'increment'
+    clearTimeout(this.repeat)
+    this.pressStepped = true
+    button.setPointerCapture?.(event.pointerId)
+    const step = (): void => {
+      const before = this.value
+      if (up) {
+        this.stepUp()
+      } else {
+        this.stepDown()
+      }
+      // A step that moved nothing is a bound, and holding on past it does nothing.
+      this.repeat = this.value === before ? undefined : setTimeout(step, REPEAT_EVERY)
+    }
+    step()
+    if (this.repeat !== undefined) {
+      clearTimeout(this.repeat)
+      this.repeat = setTimeout(step, REPEAT_DELAY)
+    }
+  }
+
+  /**
+   * Ends a hold. The click that follows a release arrives in the same task,
+   * so the press is forgotten after it.
+   */
+  private readonly stopRepeat = (): void => {
+    clearTimeout(this.repeat)
+    this.repeat = undefined
+    if (this.pressStepped) {
+      setTimeout(() => {
+        this.pressStepped = false
+      })
+    }
+  }
+
+  private readonly handleStepperClick = (event: MouseEvent): void => {
+    if (this.pressStepped) {
+      this.pressStepped = false
+      return
+    }
+    if ((event.currentTarget as HTMLElement).getAttribute('part') === 'increment') {
+      this.stepUp()
+    } else {
+      this.stepDown()
+    }
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    this.stopRepeat()
+  }
+
   /**
    * The label is the surface, which is where the convention already is.
    *
@@ -729,6 +831,24 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
   }
 
   /**
+   * What the form holds for the field: the number the text reads as.
+   *
+   * The text as written where it is already a plain number, so a value of
+   * `0.50` is sent as written. A number written in the locale or the format,
+   * `$2,500.50` or `1.234,5`, is sent as the number, 2500.5 or 1234.5, so a
+   * form read while the field still has focus gets what a submit would. Text
+   * that is not a number is sent as empty, as a native number field sends it.
+   * The text itself is the state the browser restores.
+   */
+  private submitted(parsed: number | null): string {
+    const text = this.value.trim()
+    if (parsed === null) {
+      return ''
+    }
+    return PLAIN.test(text) ? text : String(parsed)
+  }
+
+  /**
    * Reports the value and a verdict on it.
    *
    * Computed here rather than copied off the field, which is the one place this
@@ -739,11 +859,11 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
    */
   private sync(): void {
     const control = this.control
-    this.internals.setFormValue(this.value)
+    const parsed = this.numeric
+    this.internals.setFormValue(this.submitted(parsed), this.value)
     if (!control) {
       return
     }
-    const parsed = this.numeric
     /* Not while read-only, which the platform exempts from validation: the
        reader cannot fill it, so the form could never be sent. */
     if (this.readOnly) {
@@ -866,18 +986,24 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     const atMin = parsed !== null && this.min !== undefined && parsed <= this.min
     const atMax = parsed !== null && this.max !== undefined && parsed >= this.max
     return html`${this.renderLabel()}
-      <div part="field">
+      <div part="field" role="group">
         <button
           part="decrement"
           type="button"
           aria-label=${this.decrementLabel}
           tabindex="-1"
           ?disabled=${this.isDisabled || this.readOnly || atMin}
-          @click=${() => this.stepDown()}
+          @click=${this.handleStepperClick}
+          @lostpointercapture=${this.stopRepeat}
+          @pointercancel=${this.stopRepeat}
+          @pointerdown=${this.handleStepperDown}
+          @pointerup=${this.stopRepeat}
         >
-          <svg part="decrement-mark" fill="currentColor" viewBox=${minus.viewBox} aria-hidden="true">
-            ${unsafeSVG(minus.content)}
-          </svg>
+          <slot name="decrement-icon" aria-hidden="true"
+            ><svg part="decrement-mark" fill="currentColor" viewBox=${minus.viewBox} aria-hidden="true">
+              ${unsafeSVG(minus.content)}
+            </svg></slot
+          >
         </button>
         <slot name="start"></slot>
         ${
@@ -894,6 +1020,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
           .value=${this.shown}
           type="text"
           role=${this.touchApple ? nothing : 'spinbutton'}
+          aria-roledescription=${this.touchApple || this.roleLabel === '' ? nothing : this.roleLabel}
           inputmode="decimal"
           autocomplete=${this.autocomplete || nothing}
           name=${this.name || nothing}
@@ -934,11 +1061,17 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
           aria-label=${this.incrementLabel}
           tabindex="-1"
           ?disabled=${this.isDisabled || this.readOnly || atMax}
-          @click=${() => this.stepUp()}
+          @click=${this.handleStepperClick}
+          @lostpointercapture=${this.stopRepeat}
+          @pointercancel=${this.stopRepeat}
+          @pointerdown=${this.handleStepperDown}
+          @pointerup=${this.stopRepeat}
         >
-          <svg part="increment-mark" fill="currentColor" viewBox=${plus.viewBox} aria-hidden="true">
-            ${unsafeSVG(plus.content)}
-          </svg>
+          <slot name="increment-icon" aria-hidden="true"
+            ><svg part="increment-mark" fill="currentColor" viewBox=${plus.viewBox} aria-hidden="true">
+              ${unsafeSVG(plus.content)}
+            </svg></slot
+          >
         </button>
       </div>
       ${this.renderHint()}${this.renderFeedback()}`
