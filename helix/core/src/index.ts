@@ -444,6 +444,7 @@ export {
 } from './utils/draw-dismiss/draw-dismiss.js'
 export { type DrawIconOptions, drawIcon } from './utils/draw-icon/draw-icon.js'
 export { CHART_PLOT, drawTooltip, type ReadingCursor } from './utils/draw-tooltip/draw-tooltip.js'
+export { drawValueAxis } from './utils/draw-value-axis/draw-value-axis.js'
 export { elapsedTime } from './utils/elapsed-time/elapsed-time.js'
 export {
   type ElementByIdOptions,

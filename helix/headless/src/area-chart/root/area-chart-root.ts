@@ -3,6 +3,7 @@ import {
   type Curve,
   customElement,
   drawTooltip,
+  drawValueAxis,
   formatNumbers,
   formatWords,
   HelixElement,
@@ -93,6 +94,9 @@ export interface AreaStack {
  * compare the parts with each other; the scale then fits the largest part
  * rather than the total.
  *
+ * `value-axis` draws the scale's numbers beside the plot, at the levels
+ * `gridlines` rules: amounts in `locale`, or percentages under `share`.
+ *
  * The drawing is hidden from screen readers. The text summary gives the latest
  * reading's total and each part's share of it, and the table beside the chart
  * has every number.
@@ -121,6 +125,7 @@ export interface AreaStack {
  * @event {HelixReadingPressEvent} helix-reading-press - A reading was clicked, tapped, or pressed with Enter or Space, with the same detail as `helix-reading-change`.
  *
  * @csspart area - One part's band.
+ * @csspart axis - The numbers of the scale beside the plot, under `value-axis`.
  * @csspart baseline - The rule at zero, which is the floor of the drawing.
  * @csspart gridline - One rule across the plot, under `gridlines`.
  * @csspart guide - A rule down the reading a pointer is resting on.
@@ -132,6 +137,7 @@ export interface AreaStack {
  * @csspart plot - The drawing, which takes focus to be read by key.
  * @csspart summary - The total and each part's share at the latest reading, written as a sentence for screen readers.
  * @csspart svg - The drawing surface the bands sit on.
+ * @csspart tick - One number on the axis, placed with `inset-block-start` at its level.
  * @csspart tooltip - The bubble, forwarded from `Tooltip`.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
  * @csspart tooltip-arrow - The bubble's point, forwarded from `Tooltip`.
@@ -148,6 +154,8 @@ export interface AreaStack {
  * @csspart tooltip-right - The bubble while it is right of the reading, beside `tooltip`.
  * @csspart tooltip-top - The bubble while it is above the reading, beside `tooltip`.
  * @csspart tooltip-value - A column's value inside the tooltip.
+ *
+ * @cssproperty --area-chart-axis - The width of the axis, in `ch`, set from the widest number on it. Written by the component on the axis.
  */
 @customElement('helix-headless-area-chart')
 export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
@@ -241,6 +249,16 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
   @words
   @property({ attribute: 'total-label' })
   totalLabel = 'Total'
+
+  /**
+   * Draws the scale's numbers beside the plot, the `axis` part, at the levels
+   * `gridlines` rules: amounts, or percentages under `share`.
+   *
+   * Absent draws none: bands read as a composition need no numbers beside
+   * them, and the tooltip and the table hold every reading.
+   */
+  @property({ attribute: 'value-axis', reflect: true, type: Boolean })
+  valueAxis = false
 
   private warnedAboutNegatives = false
 
@@ -357,8 +375,24 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
        edge of the box sits half a slot away from its own name. */
     const slot = PLOT_WIDTH / rows.length
     const x = linear([0, Math.max(rows.length - 1, 1)], [slot / 2, PLOT_WIDTH - slot / 2])
-    return html`${this.renderPlot(stack, rows.length, x, y, domain)}
+    return html`${this.valueAxis ? this.renderAxis(y, domain) : nothing}${this.renderPlot(stack, rows.length, x, y, domain)}
       ${this.renderLabels(rows.map((row) => row.label))} ${this.renderSummary(stack, rows)}`
+  }
+
+  /**
+   * The scale's numbers beside the plot, under `value-axis`: amounts written
+   * in the chart's locale, or percentages under `share`. A seam, so a
+   * subclass can write the numbers its own way, such as a currency.
+   */
+  protected renderAxis(y: (value: number) => number, domain: [number, number]): TemplateResult {
+    const locale = wordsLocale(this)
+    const percent = percentIn(locale)
+    return drawValueAxis(
+      domain,
+      (value) => (y(value) / PLOT_HEIGHT) * 100,
+      this.share ? (value) => percent.format(value) : formatNumbers(locale),
+      '--area-chart-axis',
+    )
   }
 
   /**

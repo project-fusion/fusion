@@ -283,6 +283,33 @@
   grid-row: 3;
 }
 
+/* One scale's numbers under `value-axis`, placed as the primary is with two:
+   down the inline start of columns, and under the bars when they run across.
+   With `secondary` the rules above already place both. */
+:host([value-axis]:not([secondary]):not([orientation="horizontal"])) {
+  grid-template-columns: auto 1fr;
+}
+
+:host([value-axis]:not([secondary]):not([orientation="horizontal"]))
+  [part="axis"][data-axis="primary"] {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+:host([value-axis]:not([secondary]):not([orientation="horizontal"])) [part="plot"],
+:host([value-axis]:not([secondary]):not([orientation="horizontal"])) [part="labels"] {
+  grid-column: 2;
+}
+
+:host([value-axis][orientation="horizontal"]:not([secondary])) {
+  grid-template-rows: 1fr auto;
+}
+
+:host([value-axis][orientation="horizontal"]:not([secondary])) [part="axis"][data-axis="primary"] {
+  grid-column: 2;
+  grid-row: 2;
+}
+
 /* Relative, so a tick's percentage resolves against the axis, which the grid
    has already made exactly as long as the plot it sits beside. */
 [part="axis"] {

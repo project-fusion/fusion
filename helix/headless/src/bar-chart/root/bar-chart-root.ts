@@ -71,7 +71,7 @@ import '../../tooltip/index.js'
  * @event {HelixReadingChangeEvent} helix-reading-change - The reading shown moved, or was put away: `index` is the row, or `-1` for none, with its `label`, the `series` the keys rest on, and the `pointerType` that moved it.
  * @event {HelixReadingPressEvent} helix-reading-press - A reading was clicked, tapped, or pressed with Enter or Space, with the same detail as `helix-reading-change`.
  *
- * @csspart axis - The numbers of one scale, drawn only when `secondary` splits the chart into two scales.
+ * @csspart axis - The numbers of one scale: the primary under `value-axis`, and both when `secondary` splits the chart into two scales.
  * @csspart band - The category band under the pointer.
  * @csspart bar - One column.
  * @csspart bar-wash-end - The far stop of a bar's gradient, where one is used.
@@ -260,6 +260,17 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
   stacked = false
 
   /**
+   * Draws the numbers of the scale the bars are measured on, the `axis` part,
+   * at the levels `gridlines` rules: down the side of columns, and along the
+   * bottom of bars under `orientation="horizontal"`.
+   *
+   * Absent draws none with one scale, since bars compared with each other need
+   * no numbers. With `secondary` both scales are drawn whatever this says.
+   */
+  @property({ attribute: 'value-axis', reflect: true, type: Boolean })
+  valueAxis = false
+
+  /**
    * The summary's sentence. `{highestLabel}` is `highest-label`, and
    * `{readings}` each series' highest reading: the series, the category and
    * the reading as the table writes it.
@@ -372,10 +383,11 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
      * here and unknowable to a selector, so it is written as a length and the
        stylesheet reads it. */
     const format = formatNumbers(wordsLocale(this))
+    const levels = [...ticks(domain), ...(z === undefined ? [] : ticks(other))]
     const widest =
-      z === undefined
+      z === undefined && !this.valueAxis
         ? 0
-        : Math.max(...[...ticks(domain), ...ticks(other)].map((level) => format(level).length))
+        : Math.max(1, ...levels.map((level) => format(level).length))
 
     /* The second axis wears its series' color when exactly one series is on it,
        which is the case worth helping and the only one a single color can
@@ -393,7 +405,9 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
         : undefined
 
     return html`${
-      z === undefined ? nothing : this.renderAxis(y, domain, 'primary', sideways, widest)
+      z === undefined && !this.valueAxis
+        ? nothing
+        : this.renderAxis(y, domain, 'primary', sideways, widest)
     }${this.renderPlot(series, categories, y, domain, floor, z)}${
       z === undefined ? nothing : this.renderAxis(z, other, 'secondary', sideways, widest, tint)
     }${this.renderLabels(categories)}${this.renderSummary(series)}`
@@ -663,8 +677,8 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
    * a small chart is furniture that makes the drawing smaller for no reading a
    * reader was going to do. With two scales that argument inverts: a reader
    * cannot tell there are two, cannot tell which series is on which, and cannot
-   * recover either from the picture. So this appears with `secondary` and never
-   * without it.
+   * recover either from the picture. So this appears with `secondary`, and
+   * with one scale only where `value-axis` asks for its numbers.
    *
    * **Beside the plot and not inside it.** Inside, the numbers are drawn over
    * the drawing, and a horizontal chart shows it immediately: its value axis
@@ -675,7 +689,7 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
    * to the right.
    *
    * A column of the host grid instead, which the stylesheet grows only when
-   * `secondary` is set. That is what the property reflects for.
+   * `secondary` or `value-axis` is set. That is what the two reflect for.
    *
    * The primary hugs the edge the drawing starts at and the secondary the edge
    * it ends at: down the two sides for columns, along the bottom and top for
