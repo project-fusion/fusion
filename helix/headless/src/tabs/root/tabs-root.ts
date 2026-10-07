@@ -498,30 +498,33 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
   }
 
   /**
-   * One of the two scroll buttons, pointing the way it scrolls. A caret along
-   * the line is mirrored on a right-to-left page, and one down a column is not.
+   * One of the two scroll buttons, with the glyph pointing the way it scrolls.
    */
   private renderScroll(toward: 1 | -1): TemplateResult | typeof nothing {
     if (!this.scrollControls) {
       return nothing
     }
-    const down = this.orientation === 'vertical'
-    const icon = down ? (toward > 0 ? caretDown : caretUp) : toward > 0 ? caretRight : caretLeft
-    const end = toward > 0 ? 'end' : 'start'
-    /* Slot fallback, so a glyph of your own replaces it by slotting. */
-    const glyph = html`<slot name=${`scroll-${end}-icon`}><svg
-      part=${`scroll-${end}-mark`}
-      data-mirror=${down ? nothing : ''}
-      aria-hidden="true"
-      fill="currentColor"
-      viewBox=${icon.viewBox}
-    >${unsafeSVG(icon.content)}</svg></slot>`
     const shown = toward > 0 ? this.more.end : this.more.start
     /* A press scrolls and leaves focus on the tab it was on. */
     const keepFocus = (event: Event): void => event.preventDefault()
     return toward > 0
-      ? html`<button part="scroll-end" type="button" tabindex="-1" aria-hidden="true" ?hidden=${!shown} @mousedown=${keepFocus} @click=${() => this.scrollStrip(1)}>${glyph}</button>`
-      : html`<button part="scroll-start" type="button" tabindex="-1" aria-hidden="true" ?hidden=${!shown} @mousedown=${keepFocus} @click=${() => this.scrollStrip(-1)}>${glyph}</button>`
+      ? html`<button part="scroll-end" type="button" tabindex="-1" aria-hidden="true" ?hidden=${!shown} @mousedown=${keepFocus} @click=${() => this.scrollStrip(1)}>${this.renderScrollIcon(1)}</button>`
+      : html`<button part="scroll-start" type="button" tabindex="-1" aria-hidden="true" ?hidden=${!shown} @mousedown=${keepFocus} @click=${() => this.scrollStrip(-1)}>${this.renderScrollIcon(-1)}</button>`
+  }
+
+  /**
+   * The glyph on a scroll button, behind a seam: slot fallback, so a consumer
+   * replaces it by slotting, and a method, so a tier above replaces it by
+   * overriding. A caret along the line is mirrored on a right-to-left page, and
+   * one down a column is not.
+   */
+  protected renderScrollIcon(toward: 1 | -1): TemplateResult {
+    const down = this.orientation === 'vertical'
+    const icon = down ? (toward > 0 ? caretDown : caretUp) : toward > 0 ? caretRight : caretLeft
+    const mirror = down ? nothing : ''
+    return toward > 0
+      ? html`<slot name="scroll-end-icon"><svg part="scroll-end-mark" data-mirror=${mirror} aria-hidden="true" fill="currentColor" viewBox=${icon.viewBox}>${unsafeSVG(icon.content)}</svg></slot>`
+      : html`<slot name="scroll-start-icon"><svg part="scroll-start-mark" data-mirror=${mirror} aria-hidden="true" fill="currentColor" viewBox=${icon.viewBox}>${unsafeSVG(icon.content)}</svg></slot>`
   }
 
   protected override render(): TemplateResult {

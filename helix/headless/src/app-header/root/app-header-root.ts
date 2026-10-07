@@ -138,15 +138,10 @@ export class HelixHeadlessAppHeader extends MixinControllerOpen(HelixElement) {
   @property({ attribute: 'hide-on-scroll', type: Boolean })
   hideOnScroll = false
 
-  /**
-   * Where the toggle that opens a folded middle region sits: at the end of the
-   * bar, after the trailing content, or with `start`, before the leading
-   * content.
-   *
-   * Optional, so the resting bar writes no attribute onto the host.
-   */
-  @property({ attribute: 'toggle-placement', reflect: true })
-  togglePlacement?: 'start'
+  /** The name of the toggle that opens a folded middle region. */
+  @words
+  @property({ attribute: 'menu-label' })
+  menuLabel = 'Menu'
 
   /** Whether the bar is narrower than `fold-below`, which only the observer sets. */
   @state()
@@ -289,17 +284,22 @@ export class HelixHeadlessAppHeader extends MixinControllerOpen(HelixElement) {
       this.hide(false)
     }
   }
-  /** The name of the toggle that opens a folded middle region. */
-  @words
-  @property({ attribute: 'menu-label' })
-  menuLabel = 'Menu'
-
   /**
    * The id of the element whose scrolling lifts the bar, for an app shell that
    * scrolls a container instead of the window. Unset is the window.
    */
   @property()
   scroller?: string
+
+  /**
+   * Where the toggle that opens a folded middle region sits: at the end of the
+   * bar, after the trailing content, or with `start`, before the leading
+   * content.
+   *
+   * Optional, so the resting bar writes no attribute onto the host.
+   */
+  @property({ attribute: 'toggle-placement', reflect: true })
+  togglePlacement?: 'start'
 
   /* The role the host takes: `banner`, or none inside sectioning content. Read
      when the element connects, since a server has no ancestors to read. */

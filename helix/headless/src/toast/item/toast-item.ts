@@ -133,18 +133,18 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
   }
 
   /**
-   * @internal Set by the region: the edge a swipe dismisses toward, from its
-   * `swipe-direction`.
-   */
-  @property({ attribute: false })
-  swipeToward: 'bottom' | 'end' | 'start' | 'top' = 'end'
-
-  /**
    * @internal Set by the region: whether a pointer or focus in the stack holds
    * this message's timer.
    */
   @property({ attribute: false, type: Boolean })
   regionHeld = false
+
+  /**
+   * @internal Set by the region: the edge a swipe dismisses toward, from its
+   * `swipe-direction`.
+   */
+  @property({ attribute: false })
+  swipeToward: 'bottom' | 'end' | 'start' | 'top' = 'end'
 
   /** Whether the timer is held for `regionHeld`, so the hold is let go once. */
   private regionHolding = false

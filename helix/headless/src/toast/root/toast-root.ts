@@ -125,13 +125,6 @@ export class HelixHeadlessToast extends HelixElement {
   label = 'Notifications ({hotkey})'
 
   /**
-   * The edge a touch or a pen swipes a message toward to dismiss it: `end`,
-   * the end of the line, or `start`, `top` or `bottom`. Unset is `end`.
-   */
-  @property({ attribute: 'swipe-direction' })
-  swipeDirection?: 'bottom' | 'end' | 'start' | 'top'
-
-  /**
    * How many messages show at once. The messages after that many wait, hidden
    * and with their timers stopped, until a message before them goes. Unset,
    * every message shows.
@@ -173,6 +166,13 @@ export class HelixHeadlessToast extends HelixElement {
     | 'top-center'
     | 'top-end'
     | 'top-start'
+
+  /**
+   * The edge a touch or a pen swipes a message toward to dismiss it: `end`,
+   * the end of the line, or `start`, `top` or `bottom`. Unset is `end`.
+   */
+  @property({ attribute: 'swipe-direction' })
+  swipeDirection?: 'bottom' | 'end' | 'start' | 'top'
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
