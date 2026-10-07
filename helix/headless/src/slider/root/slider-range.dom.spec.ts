@@ -148,7 +148,7 @@ describe('a range nobody has touched', () => {
   test('holds and submits the whole span as a pair', async () => {
     const host = await slider('range name="sr" min="10" max="90"')
     expect(host.value).toBe('10,90')
-    expect(formValue(host)).toBe('10,90')
+    expect((formValue(host) as FormData).getAll('sr')).toEqual(['10', '90'])
   })
 
   test('and a reset returns it there', async () => {
@@ -159,6 +159,58 @@ describe('a range nobody has touched', () => {
     host.formResetCallback()
     await host.updateComplete
     expect(host.value).toBe('10,90')
+  })
+})
+
+describe('a range in a form', () => {
+  /* It sent `price=40,80`, one entry a server has to split on a convention
+     this library chose. React Aria's thumbs send one entry each. */
+  test('submits one entry per thumb under its name, the lower first', async () => {
+    const host = await slider('range name="price" default-value="40,80"')
+    await move(host, 'end', '90')
+    expect((formValue(host) as FormData).getAll('price')).toEqual(['40', '90'])
+  })
+
+  test('and restores the pair it saved', async () => {
+    const host = (await slider('range name="price" default-value="40,80"')) as Slider & {
+      formStateRestoreCallback(state: string): void
+    }
+    host.formStateRestoreCallback('20,60')
+    await host.updateComplete
+    expect(host.value).toBe('20,60')
+  })
+})
+
+describe('a read-only slider', () => {
+  const key = (control: HTMLInputElement, name: string): KeyboardEvent => {
+    const event = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: name })
+    control.dispatchEvent(event)
+    return event
+  }
+
+  test('says so on each thumb, and keeps its value under a drag', async () => {
+    const host = await slider('range readonly name="price" default-value="40,80"')
+    expect(thumbs(host).map((one) => one.getAttribute('aria-readonly'))).toEqual(['true', 'true'])
+    await move(host, 'start', '10')
+    expect(host.value).toBe('40,80')
+    expect(thumbs(host)[0]?.value).toBe('40')
+    expect((formValue(host) as FormData).getAll('price')).toEqual(['40', '80'])
+  })
+
+  test('refuses the keys that move a thumb and lets Tab through', async () => {
+    const host = await slider('readonly default-value="40"')
+    const control = thumbs(host)[0] as HTMLInputElement
+    for (const name of ['ArrowRight', 'ArrowUp', 'PageUp', 'Home', 'End']) {
+      expect(key(control, name).defaultPrevented).toBe(true)
+    }
+    expect(key(control, 'Tab').defaultPrevented).toBe(false)
+  })
+
+  test('and a slider that is not read-only says nothing of it', async () => {
+    const host = await slider('default-value="40"')
+    const control = thumbs(host)[0] as HTMLInputElement
+    expect(control.hasAttribute('aria-readonly')).toBe(false)
+    expect(key(control, 'ArrowRight').defaultPrevented).toBe(false)
   })
 })
 

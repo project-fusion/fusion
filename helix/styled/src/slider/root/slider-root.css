@@ -293,6 +293,10 @@
   cursor: not-allowed;
 }
 
+:host([readonly]) [part="control"] {
+  cursor: default;
+}
+
 :host(:disabled) {
   opacity: 0.5;
 }
