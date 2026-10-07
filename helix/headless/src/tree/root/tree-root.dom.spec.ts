@@ -439,3 +439,42 @@ describe('a tree that chooses only the items at the ends', () => {
     expect((host as Tree & { active: string }).active).toBe('a')
   })
 })
+
+describe('removing the item that has focus', () => {
+  const removing = async (which: string): Promise<{ host: HTMLElement; focused: () => string }> => {
+    const host = await mount(`
+      <helix-headless-tree label="Files">
+        <helix-headless-tree-item value="docs">docs</helix-headless-tree-item>
+        <helix-headless-tree-item value="src">src</helix-headless-tree-item>
+        <helix-headless-tree-item value="tests">tests</helix-headless-tree-item>
+      </helix-headless-tree>`)
+    const items = [...host.querySelectorAll('helix-headless-tree-item')] as (Item & {
+      focusItem(): void
+    })[]
+    await Promise.all(items.map((one) => one.updateComplete))
+    const item = items.find((one) => one.getAttribute('value') === which) as Item & {
+      focusItem(): void
+    }
+    item.focusItem()
+    item.remove()
+    await new Promise((done) => setTimeout(done, 0))
+    await Promise.all(items.map((one) => one.updateComplete))
+    const focused = (): string => {
+      /* The item host, which is what focus inside its shadow root is
+         retargeted to at the document. */
+      const owner = items.find((one) => one.isConnected && one === document.activeElement)
+      return owner?.getAttribute('value') ?? document.activeElement?.localName ?? ''
+    }
+    return { focused, host }
+  }
+
+  test('moves focus to the item after it', async () => {
+    const { focused } = await removing('docs')
+    expect(focused()).toBe('src')
+  })
+
+  test('or to the one before, where it was the last', async () => {
+    const { focused } = await removing('tests')
+    expect(focused()).toBe('src')
+  })
+})
