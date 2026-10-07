@@ -50,6 +50,14 @@ describe('divider semantics', () => {
     expect(line(plain)?.getAttribute('aria-labelledby')).toBe('content')
   })
 
+  /* "Or" was read twice, as the separator's name and again as the text beside it. */
+  test('the content that names a separator is read once, as its name', async () => {
+    const divider = await mount('<helix-headless-divider>Or</helix-headless-divider>')
+    expect(part(divider, 'content')?.getAttribute('aria-hidden')).toBe('true')
+    const decorative = await mount('<helix-headless-divider decorative>Or</helix-headless-divider>')
+    expect(part(decorative, 'content')?.hasAttribute('aria-hidden')).toBe(false)
+  })
+
   test('an announced separator with no orientation is horizontal', async () => {
     const divider = await mount('<helix-headless-divider announced></helix-headless-divider>')
     expect(line(divider)?.getAttribute('aria-orientation')).toBe('horizontal')

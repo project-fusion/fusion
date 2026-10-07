@@ -21,6 +21,17 @@ const sheet = (): string => {
 /** The declarations of the first rule written for `selector`. */
 const rule = (selector: string): string => sheet().split(`${selector} {`)[1]?.split('}')[0] ?? ''
 
+/* Forced colors painted the line the page's Canvas color, so it vanished in
+   Windows High Contrast. */
+describe('in forced colors', () => {
+  test('the line keeps the text color', () => {
+    const forced = sheet().split('@media (forced-colors: active)')[1] ?? ''
+    const line = forced.split('[part="line"] {')[1]?.split('}')[0] ?? ''
+    expect(line).toContain('background-color: CanvasText')
+    expect(line).toContain('forced-color-adjust: none')
+  })
+})
+
 describe('divider', () => {
   test('draws a line either side of whatever is set in, each half taking what is left', async () => {
     const divider = await mount('<helix-divider>OR</helix-divider>')
