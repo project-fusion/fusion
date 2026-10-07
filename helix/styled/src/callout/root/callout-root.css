@@ -161,8 +161,28 @@ slot[name="dismiss-icon"]::slotted(*) {
   inline-size: var(--helix-size-icon);
 }
 
+/* A dismissed callout fades out before the base tier hides it, and fades in
+   when `open` shows it again. Opacity only, so nothing beside it moves until
+   it is gone. */
+:host(:state(exiting)) {
+  opacity: 0;
+  transition: opacity var(--helix-duration-normal) var(--helix-easing-accelerate);
+}
+
+:host(:state(entering)) {
+  transition: opacity var(--helix-duration-normal) var(--helix-easing-decelerate);
+}
+
+@starting-style {
+  :host(:state(entering)) {
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  [part="dismiss"] {
+  [part="dismiss"],
+  :host(:state(exiting)),
+  :host(:state(entering)) {
     transition: none;
   }
 }
