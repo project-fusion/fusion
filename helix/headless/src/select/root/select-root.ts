@@ -928,7 +928,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
    */
   protected renderIndicator(): TemplateResult {
     return html`<slot name="indicator">
-      <svg part="indicator" fill="currentColor" viewBox=${caretDown.viewBox} aria-hidden="true">
+      <svg part="indicator" fill="currentColor" width="1em" height="1em" viewBox=${caretDown.viewBox} aria-hidden="true">
         ${unsafeSVG(caretDown.content)}
       </svg>
     </slot>`

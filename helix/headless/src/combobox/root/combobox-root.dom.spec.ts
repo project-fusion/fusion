@@ -1276,3 +1276,16 @@ describe('an option whose definition loads after it was added', () => {
     expect(hasState(late.element, 'selected')).toBe(true)
   })
 })
+
+/* An inline `<svg>` with a `viewBox` and no size fills the width it is given:
+   with no stylesheet the caret was 1,264px tall and the field 1,289px. */
+describe('the caret with no stylesheet', () => {
+  test('is one em square by its own attributes', async () => {
+    const host = await mount(
+      '<helix-headless-combobox label="Fruit"><helix-headless-option value="a">Apple</helix-headless-option></helix-headless-combobox>',
+    )
+    const caret = host.shadowRoot?.querySelector('svg[part="indicator"]')
+    expect(caret?.getAttribute('width')).toBe('1em')
+    expect(caret?.getAttribute('height')).toBe('1em')
+  })
+})

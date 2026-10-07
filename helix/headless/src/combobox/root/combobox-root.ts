@@ -1525,10 +1525,15 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
    * slot is for the page and the method is for whoever is building the styled
    * layer, and a fallback with only the first is one a tier can restyle and
    * cannot change.
+   *
+   * **One em square by its own attributes**, which any stylesheet overrides.
+   * An inline `<svg>` with a `viewBox` and no size fills the width it is given:
+   * measured with no stylesheet, the caret was 1,264px tall, the field 1,289px,
+   * and the panel opened above the top of the page.
    */
   protected renderIndicator(): TemplateResult {
     return html`<slot name="indicator">
-      <svg part="indicator" fill="currentColor" viewBox=${caretDown.viewBox} aria-hidden="true">
+      <svg part="indicator" fill="currentColor" width="1em" height="1em" viewBox=${caretDown.viewBox} aria-hidden="true">
         ${unsafeSVG(caretDown.content)}
       </svg>
     </slot>`
