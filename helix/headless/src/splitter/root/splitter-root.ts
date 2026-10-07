@@ -48,6 +48,10 @@ interface Crossed {
  */
 const channel = new WeakMap<HelixHeadlessSplitter, Crossed>()
 
+/** What F6 can move focus to in a pane. */
+const FOCUSABLE =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+
 /**
  * @summary Two panes and a divider that you can move.
  *
@@ -77,6 +81,21 @@ const channel = new WeakMap<HelixHeadlessSplitter, Crossed>()
  * on press, and every other way of collapsing records it in `settle`.
  * `collapsed-size` keeps a sliver of the pane visible, such as a tab strip.
  * Collapsing overrides `min` and `max`.
+ *
+ * Set `primary` to the pane that keeps its size when the splitter's own size
+ * changes, such as a sidebar beside a window being resized. The other pane
+ * takes all of the change, as Web Awesome's split panel does. Without it,
+ * both panes keep their share.
+ *
+ * **Keyboard.** The divider is one tab stop.
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Left, Right | Moves a side-by-side divider by `step`. On a right-to-left page, Left moves it toward the end. |
+ * | Up, Down | Moves a stacked divider by `step`. |
+ * | Home, End | Moves the divider to its bounds. |
+ * | Enter | Collapses the start pane, and opens it again. |
+ * | F6 | Moves focus from one pane to the first control in the other, and from the divider to the start pane. |
  *
  * @since 0.1.0
  * @status stable
@@ -356,6 +375,104 @@ export class HelixHeadlessSplitter extends HelixElement {
        where it was dropped. */
     this.reached = undefined
     this.requestUpdate('position', previous)
+  }
+
+  /**
+   * The pane that keeps its size when the splitter's own size changes. The
+   * other pane takes all of the change. Unset, both keep their share.
+   */
+  @property()
+  primary?: 'end' | 'start'
+
+  /** Watches this element's length along its axis while `primary` is set. */
+  private lengths: ResizeObserver | undefined
+
+  /** The length along the axis last seen, in pixels. */
+  private length = 0
+
+  /**
+   * Starts or stops watching the length, according to `primary`, and holds
+   * the primary pane's size in pixels as the length changes.
+   */
+  private watchLength(): void {
+    if (!this.primary || typeof ResizeObserver === 'undefined') {
+      this.lengths?.disconnect()
+      this.lengths = undefined
+      this.length = 0
+      return
+    }
+    if (this.lengths) {
+      return
+    }
+    this.lengths = new ResizeObserver(([entry]) => {
+      const box = entry?.borderBoxSize?.[0]
+      const length =
+        (this.vertical
+          ? (box?.blockSize ?? entry?.contentRect.height)
+          : (box?.inlineSize ?? entry?.contentRect.width)) ?? 0
+      this.holdPrimary(length)
+    })
+    this.lengths.observe(this)
+  }
+
+  /**
+   * Moves the divider so the primary pane keeps the pixels it had, as the
+   * splitter's length goes from the one last seen to `length`. Not while a
+   * pane is shut or a drag holds the divider.
+   */
+  private holdPrimary(length: number): void {
+    const before = this.length
+    this.length = length
+    if (!this.primary || before <= 0 || length <= 0 || length === before) {
+      return
+    }
+    if (this.collapsed || this.dragging) {
+      return
+    }
+    const position = this.position
+    const kept = ((this.primary === 'start' ? position : 100 - position) / 100) * before
+    const share = (kept / length) * 100
+    const previous = position
+    this.positionState = this.clamp(this.primary === 'start' ? share : 100 - share)
+    this.requestUpdate('position', previous)
+  }
+
+  /**
+   * F6, which moves focus between the panes, as the window splitter pattern
+   * allows: from the start pane to the end pane, and from the end pane or the
+   * divider to the start pane. Only a pane that holds a control takes focus.
+   */
+  private readonly handlePaneKeys = (event: KeyboardEvent): void => {
+    if (
+      event.key !== 'F6' ||
+      event.altKey ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.defaultPrevented
+    ) {
+      return
+    }
+    const path = event.composedPath()
+    const pane = (name: 'end' | 'start'): Element[] =>
+      this.renderRoot
+        ?.querySelector<HTMLSlotElement>(`slot[name="${name}"]`)
+        ?.assignedElements({ flatten: true }) ?? []
+    /* The innermost splitter answers: a nested one sits in a pane of this one,
+       and its F6 is its own. */
+    const inner = path.find((node) => node instanceof HelixHeadlessSplitter)
+    if (inner !== this) {
+      return
+    }
+    const fromStart = pane('start').some((one) => path.includes(one))
+    const to = pane(fromStart ? 'end' : 'start')
+    const first = to.flatMap((one) => [
+      ...(one instanceof HTMLElement && one.matches(FOCUSABLE) ? [one] : []),
+      ...one.querySelectorAll<HTMLElement>(FOCUSABLE),
+    ])[0]
+    if (first) {
+      event.preventDefault()
+      first.focus()
+    }
   }
 
   /**
@@ -1188,14 +1305,20 @@ export class HelixHeadlessSplitter extends HelixElement {
          a splitter reordered in the DOM would stop watching its own width and
          `auto` would freeze on whatever it last saw. */
       this.watchWidth()
+      this.watchLength()
       this.findOuter()
     }
+    this.addEventListener('keydown', this.handlePaneKeys)
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    this.removeEventListener('keydown', this.handlePaneKeys)
     this.sizes?.disconnect()
     this.sizes = undefined
+    this.lengths?.disconnect()
+    this.lengths = undefined
+    this.length = 0
     if (this.outer) {
       channel.get(this.outer)?.uncross(this)
     }
@@ -1206,6 +1329,7 @@ export class HelixHeadlessSplitter extends HelixElement {
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
     this.watchWidth()
+    this.watchLength()
     this.findOuter()
     /* The server wrote its own locale's percentage, which this reader's may
        write differently. */
@@ -1217,6 +1341,9 @@ export class HelixHeadlessSplitter extends HelixElement {
     super.updated(changed)
     if (changed.has('orientation')) {
       this.watchWidth()
+    }
+    if (changed.has('primary')) {
+      this.watchLength()
     }
     /* The resolved collapse, mirrored for a consumer's own rules: a shut pane
        usually wants its contents to stop being read as well as stop being seen.
