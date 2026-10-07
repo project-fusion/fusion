@@ -550,6 +550,27 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
     return this.partNamed('log')
   }
 
+  /**
+   * Makes the log a tab stop while it scrolls, and takes the stop away when it
+   * does not.
+   *
+   * **A reader on a keyboard scrolls the history from the log itself.**
+   * Chromium and Firefox make a box that scrolls focusable on their own, and
+   * Safari does not, so there the arrow keys could not reach a long history.
+   * A log that fits is no stop at all, so Tab goes straight to the composer.
+   */
+  private markScroller(): void {
+    const log = this.log
+    if (!log) {
+      return
+    }
+    if (log.scrollHeight > log.clientHeight) {
+      log.tabIndex = 0
+    } else {
+      log.removeAttribute('tabindex')
+    }
+  }
+
   /** Whether the reader is within `threshold` of the bottom right now. */
   private get atBottom(): boolean {
     const log = this.log
@@ -877,6 +898,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
    * above them in a browser without scroll anchoring.
    */
   private readonly handleResize = (): void => {
+    this.markScroller()
     if (this.pinned) {
       this.stick()
     } else {
@@ -997,6 +1019,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
       this.virtualize.measure()
     }
     this.watchSizes()
+    this.markScroller()
     this.remember()
     this.reachHistory()
     this.announce()
