@@ -5,6 +5,8 @@ import {
   HelixFormElement,
   hostWords,
   requestChange,
+  words,
+  wordsLocale,
 } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -94,6 +96,12 @@ import '../../select/index.js'
 @customElement('helix-headless-pagination-size')
 export class HelixHeadlessPaginationSize extends HelixFormElement {
   /**
+   * The key this part's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-pagination-size': { label: 'Pro Seite' } })`.
+   */
+  static words = 'helix-pagination-size'
+
+  /**
    * The size to start on when `value` is not set.
    */
   @property({ attribute: 'default-value', type: Number })
@@ -102,13 +110,13 @@ export class HelixHeadlessPaginationSize extends HelixFormElement {
   /**
    * The label beside the control.
    */
+  @words
   @property()
   label = 'Per page'
 
   /**
-   * Locale for the numbers.
-   *
-   * Absent uses the runtime's own.
+   * The locale the words and the numbers are in, as a BCP 47 tag such as
+   * `de`. Empty reads the nearest `lang`, then the browser's language.
    */
   @property()
   locale = ''
@@ -146,7 +154,7 @@ export class HelixHeadlessPaginationSize extends HelixFormElement {
 
   /** Held across every component asking for the same locale. */
   private get numbers(): (value: number) => string {
-    return formatNumbers(this.locale)
+    return formatNumbers(wordsLocale(this))
   }
 
   /** The sizes, parsed once, with anything that is not a size dropped. */

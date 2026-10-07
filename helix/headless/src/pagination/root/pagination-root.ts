@@ -3,11 +3,14 @@ import {
   deepActiveElement,
   fillTemplate,
   formatNumbers,
+  formatWords,
   HelixActivateEvent,
   HelixElement,
   HelixNavigateEvent,
   hostAria,
   requestChange,
+  words,
+  wordsLocale,
 } from '@fusion.dev/helix-core'
 import {
   caretDoubleLeft,
@@ -49,25 +52,15 @@ interface Hidden {
 type Slot = Hidden | number
 
 /**
- * Fills `{page}` and `{pages}` in a template a consumer wrote.
+ * Fills `{page}` and `{pages}` in `href`, with the numbers as digits.
  *
- * A template rather than a prefix, because word order is not universal and a
- * `page-label="Page"` that this glued a number onto would produce the English
- * order in every language. `href="/products?page={page}"` is the same mechanism
- * doing a second job, which is why there is one placeholder syntax and not two.
- *
- * `format` is what makes the numbers local as well as the words. It is the
- * identity for an address and an `Intl.NumberFormat` for anything a person
- * reads: a URL is machine-facing and `?page=1,234` is a different page from
- * `?page=1234`, where a label read aloud should say the number the way the
+ * An address is machine-facing, so its numbers are not written in the locale
+ * the words are: `?page=1,234` is a different page from `?page=1234`. The
+ * words are formatted with `formatWords`, which writes each number the way the
  * reader's locale says it.
  */
-const fill = (
-  template: string,
-  page: number,
-  pages: number,
-  format: (value: number) => string = String,
-): string => fillTemplate(template, { page: format(page), pages: format(pages) })
+const fill = (template: string, page: number, pages: number): string =>
+  fillTemplate(template, { page: String(page), pages: String(pages) })
 
 /**
  * @summary Controls for moving between the pages of a long set of results.
@@ -129,6 +122,12 @@ const fill = (
 @customElement('helix-headless-pagination')
 export class HelixHeadlessPagination extends HelixElement {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-pagination': { nextLabel: 'Nächste Seite' } })`.
+   */
+  static words = 'helix-pagination'
+
+  /**
    * How many pages to show at each end, whatever the current one is.
    */
   @property({ type: Number })
@@ -175,12 +174,14 @@ export class HelixHeadlessPagination extends HelixElement {
   /**
    * Accessible name for the control that jumps to the first page.
    */
+  @words
   @property({ attribute: 'first-label' })
   firstLabel = 'First page'
 
   /**
    * Accessible name for a gap. `{page}` is replaced with the page it jumps to.
    */
+  @words
   @property({ attribute: 'gap-label' })
   gapLabel = 'Skip to page {page}'
 
@@ -197,17 +198,20 @@ export class HelixHeadlessPagination extends HelixElement {
   /**
    * Accessible name for the navigation landmark.
    */
+  @words
   @property()
   label = 'Pagination'
 
   /**
    * Accessible name for the control that jumps to the last page.
    */
+  @words
   @property({ attribute: 'last-label' })
   lastLabel = 'Last page'
 
   /**
-   * Locale for the page numbers. Absent uses the runtime's own.
+   * The locale the words and the page numbers are in, as a BCP 47 tag such as
+   * `de`. Empty reads the nearest `lang`, then the browser's language.
    *
    * The same property the calendar takes, doing the same job one layer down:
    * the templates make the *words* the consumer's, and this makes the *numbers*
@@ -225,6 +229,7 @@ export class HelixHeadlessPagination extends HelixElement {
   /**
    * Accessible name for the control that moves forward.
    */
+  @words
   @property({ attribute: 'next-label' })
   nextLabel = 'Next page'
 
@@ -260,6 +265,7 @@ export class HelixHeadlessPagination extends HelixElement {
    * Accessible name for one page. `{page}` and `{pages}` are replaced with the
    * page number and the page count.
    */
+  @words
   @property({ attribute: 'page-label' })
   pageLabel = 'Page {page}'
 
@@ -290,6 +296,7 @@ export class HelixHeadlessPagination extends HelixElement {
   /**
    * Accessible name for the control that moves back.
    */
+  @words
   @property({ attribute: 'previous-label' })
   previousLabel = 'Previous page'
 
@@ -308,6 +315,7 @@ export class HelixHeadlessPagination extends HelixElement {
    * width from a control whose whole reason for existing is that the row is
    * narrow. The numbers are the reading.
    */
+  @words
   @property({ attribute: 'status-label' })
   statusLabel = '{page} of {pages}'
 
@@ -347,7 +355,7 @@ export class HelixHeadlessPagination extends HelixElement {
 
   /** Held across every component asking for the same locale. */
   private get numbers(): (value: number) => string {
-    return formatNumbers(this.locale)
+    return formatNumbers(wordsLocale(this))
   }
 
   /**
@@ -556,7 +564,7 @@ export class HelixHeadlessPagination extends HelixElement {
     }
     if (this.announced !== this.page) {
       this.announced = this.page
-      this.announcement = fill(this.pageLabel, this.page, this.count, this.numbers)
+      this.announcement = formatWords(this, 'pageLabel', { page: this.page, pages: this.count })
     }
   }
 
@@ -572,7 +580,7 @@ export class HelixHeadlessPagination extends HelixElement {
   private renderPage(page: number): TemplateResult {
     const current = page === this.current
     const shown = this.numbers(page)
-    const name = fill(this.pageLabel, page, this.count, this.numbers)
+    const name = formatWords(this, 'pageLabel', { page, pages: this.count })
     return html`<li part="item">
       ${
         this.href
@@ -620,7 +628,7 @@ export class HelixHeadlessPagination extends HelixElement {
    */
   private renderGap(hidden: Hidden): TemplateResult {
     const to = Math.round((hidden.from + hidden.to) / 2)
-    const name = fill(this.gapLabel, to, this.count, this.numbers)
+    const name = formatWords(this, 'gapLabel', { page: to, pages: this.count })
     return html`<li part="item">
       ${
         this.href
@@ -768,7 +776,7 @@ export class HelixHeadlessPagination extends HelixElement {
     if (this.compact) {
       return html`${this.ends ? this.renderFirst() : nothing}${this.renderPrevious()}
         <span part="status"
-          >${fill(this.statusLabel, this.current, this.count, this.numbers)}</span
+          >${formatWords(this, 'statusLabel', { page: this.current, pages: this.count })}</span
         >
         ${this.renderNext()}${this.ends ? this.renderLast() : nothing}${this.renderLive()}`
     }
