@@ -66,8 +66,8 @@ describe('code', () => {
     }
   })
 
-  test('carries no attribute of its own beyond the translation mode', async () => {
+  test('carries no attribute of its own', async () => {
     const code = await mount('<helix-code>x</helix-code>')
-    expect(code.getAttributeNames()).toEqual(['translate'])
+    expect(code.getAttributeNames()).toEqual([])
   })
 })

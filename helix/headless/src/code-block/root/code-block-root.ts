@@ -51,9 +51,11 @@ import { type DiffFile, type DiffHunk, type DiffLine, pairLines, parsePatch } fr
  * every browser. Chromium and Firefox make a scrolling box focusable on their
  * own, and Safari does not. A block that fits is no stop at all.
  *
- * **Code is left untranslated.** A page translator that rewrites prose would
- * also rewrite the code, so the block sets `translate="no"` on itself when it
- * connects. A `translate` you set is kept.
+ * **The code the block draws is marked untranslated**, `translate="no"` on
+ * its `<pre>`, so a page translator leaves highlighted lines and a diff as
+ * written. Code in the slot takes its translation mode from the element, which
+ * writes nothing onto itself, so set `translate="no"` on the element to keep a
+ * translator off plain code too.
  *
  * On the server, the slot renders as ordinary code, so a diff first appears as
  * the patch text in a `<pre>`. The client makes the same first render, which
@@ -420,12 +422,6 @@ export class HelixHeadlessCodeBlock extends HelixElement {
 
   override connectedCallback(): void {
     super.connectedCallback()
-    /* The slotted code inherits its translation mode from the host, its parent
-       in the page, so the attribute has to be on the host. The `<pre>`s carry
-       it too, for the highlighted lines and the diff drawn inside. */
-    if (!this.hasAttribute('translate')) {
-      this.setAttribute('translate', 'no')
-    }
     if (typeof MutationObserver !== 'undefined') {
       this.observer ??= new MutationObserver(() => this.requestUpdate())
       this.observer.observe(this, { characterData: true, childList: true, subtree: true })
