@@ -134,10 +134,43 @@ pub fn targets(selector: &str) -> Vec<String> {
     found
 }
 
+/// A selector with its `:has()` and `:not()` taken out, so a tag inside one is
+/// never read as the one a `::part` hangs off:
+/// `helix-data-table:has(> helix-table-row)::part(toolbar)` is a data table's
+/// toolbar. Counted to the closing parenthesis, since what they hold can hold
+/// parentheses of its own.
+fn bare(selector: &str) -> String {
+    let mut out = String::with_capacity(selector.len());
+    let mut rest = selector;
+    while let Some(first) = rest.chars().next() {
+        let held = [":has(", ":not("].iter().find(|one| rest.starts_with(*one));
+        let Some(held) = held else {
+            out.push(first);
+            rest = &rest[first.len_utf8()..];
+            continue;
+        };
+        let mut depth = 0_usize;
+        let mut end = rest.len();
+        for (at, one) in rest.char_indices().skip(held.len() - 1) {
+            if one == '(' {
+                depth += 1;
+            } else if one == ')' {
+                depth -= 1;
+                if depth == 0 {
+                    end = at + 1;
+                    break;
+                }
+            }
+        }
+        rest = &rest[end..];
+    }
+    out
+}
+
 /// Every `::part(a b)` in a selector, with the tag it hangs off.
 pub fn parts(selector: &str) -> Vec<(String, Vec<String>)> {
     PARTS
-        .captures_iter(selector)
+        .captures_iter(&bare(selector))
         .filter_map(|found| {
             let names: Vec<String> = found[3].split_whitespace().map(str::to_owned).collect();
             (!names.is_empty()).then(|| (found[1].to_owned(), names))
@@ -650,6 +683,20 @@ mod tests {
                 ),
                 ("helix-tag".to_owned(), vec!["label".to_owned()]),
             ]
+        );
+    }
+
+    #[test]
+    fn a_part_hangs_off_the_tag_outside_a_pseudo_class() {
+        assert_eq!(
+            parts("helix-data-table:not(:defined):has(> helix-table-row)::part(toolbar)"),
+            [("helix-data-table".to_owned(), vec!["toolbar".to_owned()])]
+        );
+        assert_eq!(
+            parts(
+                "helix-data-table:has(> helix-table-column:nth-of-type(2)) > helix-table-column::part(column)"
+            ),
+            [("helix-table-column".to_owned(), vec!["column".to_owned()])]
         );
     }
 
