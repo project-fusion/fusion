@@ -437,12 +437,9 @@ describe('a block that scrolls', () => {
 })
 
 describe('translation', () => {
-  test('the block is left untranslated unless the page says otherwise', async () => {
+  test('the drawn code is marked untranslated, and the host is left as written', async () => {
     const el = await mount('<helix-headless-code-block>const a = 1</helix-headless-code-block>')
-    expect(el.getAttribute('translate')).toBe('no')
-    const words = await mount(
-      '<helix-headless-code-block translate="yes">Hello</helix-headless-code-block>',
-    )
-    expect(words.getAttribute('translate')).toBe('yes')
+    expect(part(el, 'block')?.getAttribute('translate')).toBe('no')
+    expect(el.hasAttribute('translate')).toBe(false)
   })
 })

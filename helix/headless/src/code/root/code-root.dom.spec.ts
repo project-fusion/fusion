@@ -16,12 +16,9 @@ describe('code', () => {
     expect(code?.tagName).toBe('CODE')
   })
 
-  /* A translator reads the slotted text through the host, its parent in the
-     page, so the host is where the mode has to be. */
-  test('is left untranslated unless the page says otherwise', async () => {
+  test('the code element is marked untranslated, and the host is left as written', async () => {
     const code = await mount('<helix-headless-code>data-density</helix-headless-code>')
-    expect(code.getAttribute('translate')).toBe('no')
-    const words = await mount('<helix-headless-code translate="yes">Save</helix-headless-code>')
-    expect(words.getAttribute('translate')).toBe('yes')
+    expect(code.shadowRoot?.querySelector('[part="code"]')?.getAttribute('translate')).toBe('no')
+    expect(code.hasAttribute('translate')).toBe(false)
   })
 })

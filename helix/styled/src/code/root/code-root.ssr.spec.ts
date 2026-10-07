@@ -19,7 +19,9 @@ describe('code server output', () => {
     /* `toContain('data-density')` passed on the host's own text, which is in
        the response whatever the fragment renders. The slot inside the `<code>`
        is what puts the text in the element. */
-    expect(rendered(markup, 'helix-code')).toContain('<code part="code"><slot></slot></code>')
+    expect(rendered(markup, 'helix-code')).toContain(
+      '<code part="code" translate="no"><slot></slot></code>',
+    )
   })
 
   test('the host carries nothing the consumer did not write', () => {
