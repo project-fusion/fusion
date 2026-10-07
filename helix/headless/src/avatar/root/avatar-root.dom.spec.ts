@@ -137,6 +137,18 @@ describe('the status an avatar reports', () => {
     expect(avatar.getAttribute('data-status')).toBe('error')
   })
 
+  test('with no picture, reports error and writes nothing onto the host', async () => {
+    // Known on the first update, so it is a state and not an attribute: one
+    // written before React hydrates is a mismatch.
+    const avatar = (await mount(
+      '<helix-headless-avatar name="Ross Sheppard"></helix-headless-avatar>',
+    )) as Reporting
+    await new Promise((resolve) => setTimeout(resolve))
+    await avatar.updateComplete
+    expect(avatar.status).toBe('error')
+    expect(avatar.hasAttribute('data-status')).toBe(false)
+  })
+
   test('arrives as loaded', async () => {
     const avatar = (await mount(
       '<helix-headless-avatar name="Ross Sheppard" src="/ross.avif"></helix-headless-avatar>',

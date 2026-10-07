@@ -124,7 +124,9 @@ export class HelixHeadlessAvatar extends HelixElement {
    * report `Image` gives, for the same reason. `load` and `error` fire once, so
    * a listener bound after the picture settled hears neither, which is the
    * platform on an `<img>` too, and this is what that listener asks instead.
-   * Mirrored to `data-status` rather than reflected, as `Image` explains.
+   * Mirrored to `data-status` rather than reflected, as `Image` explains, once a
+   * picture has loaded or failed. An avatar with no `src` reports `error` here
+   * and as `:state(error)`, and writes no `data-status`.
    */
   @property({ attribute: false })
   status: 'error' | 'loaded' | 'loading' = 'loading'
@@ -231,9 +233,17 @@ export class HelixHeadlessAvatar extends HelixElement {
       this.startWait()
     }
     /* The mirror, written here rather than reflected, the way `Image` writes
-       it: `loading` is the resting state and writes nothing. */
-    if (changed.has('status')) {
-      if (this.status === 'loading') {
+       it: `loading` is the resting state and writes nothing.
+
+       **And an avatar with no picture writes nothing either.** Its `error` is
+       known on the first update, which `Image` names as the case for a custom
+       state and never an attribute, and `:state(error)` already carries it.
+       Deferred by a task in `firstUpdated`, the write still landed before
+       React hydrated: in a Next.js console every account avatar, which has a
+       name and no picture, logged a hydration mismatch on `data-status`. The
+       attribute is kept for what a picture did, which needs a fetch first. */
+    if (changed.has('status') || changed.has('src')) {
+      if (this.status === 'loading' || this.src === '') {
         this.removeAttribute('data-status')
       } else {
         this.setAttribute('data-status', this.status)
