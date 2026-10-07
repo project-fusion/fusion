@@ -177,6 +177,13 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
   move?: TreeItemMove | undefined
 
   /**
+   * @internal The item's place among its siblings, counting from one, written
+   * by the tree for `aria-posinset`, for the reason `level` gives.
+   */
+  @property({ attribute: false, type: Number })
+  position?: number
+
+  /**
    * The link's `rel` value, which describes how the linked page relates to this
    * one.
    *
@@ -201,6 +208,13 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
    */
   @property({ type: Boolean })
   selected = false
+
+  /**
+   * @internal How many siblings the item has, itself included, written by the
+   * tree for `aria-setsize`, for the reason `level` gives.
+   */
+  @property({ attribute: false, type: Number })
+  setSize?: number
 
   /**
    * Where the link opens. Use it for a row that leaves the site.
@@ -534,6 +548,10 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
        `TreeRoot.syncItems` writes the depth through `whenHydrated`, so the
        render after hydration is what fills this in. */
     const depth = this.level ?? nothing
+    /* Its place among its siblings, by the same argument: counted by the tree,
+       absent until it has. */
+    const position = this.position ?? nothing
+    const size = this.setSize ?? nothing
     const expanded = this.isBranch ? (this.open ? 'true' : 'false') : nothing
     /* Checked rather than selected in a tree of check marks, which is the tree
        pattern's checkbox reading: a reader hears "checked", "not checked" or
@@ -565,6 +583,8 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
         aria-disabled=${linked ? nothing : off}
         aria-busy=${linked ? nothing : busy}
         aria-level=${linked ? nothing : depth}
+        aria-posinset=${linked ? nothing : position}
+        aria-setsize=${linked ? nothing : size}
         tabindex=${linked ? nothing : tabIndex}
       >
         ${
@@ -581,6 +601,8 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
                 aria-disabled=${off}
                 aria-busy=${busy}
                 aria-level=${depth}
+                aria-posinset=${position}
+                aria-setsize=${size}
                 tabindex=${tabIndex}
                 style="--tree-level: ${level}"
                 @click=${this.handleRowClick}

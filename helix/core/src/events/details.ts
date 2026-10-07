@@ -305,6 +305,14 @@ export interface ReorderDetail extends ChangeDetail {
   /** What moved: a column of a data table, an item of a list, or a row of a data table. */
   kind: 'column' | 'item' | 'row'
 
+  /**
+   * The key of the branch a tree item moves into, and `''` for the top level,
+   * where a `reorderable` tree moves an item into another branch. `keys` are
+   * then that branch's items in their new order. Absent for a move among
+   * siblings.
+   */
+  parent?: string
+
   /** Where the key is after the move, counting from 0 in `keys`. */
   to: number
 

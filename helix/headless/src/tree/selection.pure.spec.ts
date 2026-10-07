@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { type CheckableRow, checkedState, pressRow } from './selection.js'
+import { type CheckableRow, checkedState, checkRows, pressRow } from './selection.js'
 
 const leaf = (value: string, disabled = false): CheckableRow => ({
   branch: false,
@@ -45,5 +45,17 @@ describe('pressRow', () => {
 
   test('a disabled row changes nothing', () => {
     expect(pressRow(leaf('a', true), ['b'], order)).toEqual(['b'])
+  })
+})
+
+describe('checkRows', () => {
+  test('checks every row of a range, keeps what was checked, and passes disabled rows over', () => {
+    const order = ['a', 'b', 'c', 'd']
+    const rows: CheckableRow[] = [
+      { branch: false, disabled: false, leaves: [], value: 'b' },
+      { branch: false, disabled: true, leaves: [], value: 'c' },
+      { branch: true, disabled: false, leaves: ['d'], value: 'folder' },
+    ]
+    expect(checkRows(rows, ['a'], order)).toEqual(['a', 'b', 'd'])
   })
 })
