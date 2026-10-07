@@ -537,6 +537,19 @@ describe('the counter', () => {
     expect(counter.textContent).toBe('Picture 2 of 3')
   })
 
+  test('drops an item removed after the first render, and the first item is shown', async () => {
+    /* The same path as an item appended: nothing else changes when it leaves,
+       so the counter still read "2 of 3" with two items left. */
+    const host = await lightbox('counter status-label="{index} of {count}" open active="two"')
+    await host.updateComplete
+    expect((part(host, 'counter') as HTMLElement).textContent).toBe('2 of 3')
+    host.querySelector('[value="two"]')?.remove()
+    await new Promise((settle) => setTimeout(settle))
+    await host.updateComplete
+    expect((part(host, 'counter') as HTMLElement).textContent).toBe('1 of 2')
+    expect(shown(host)).toBe('one')
+  })
+
   test('is not drawn unless asked for', async () => {
     const host = await lightbox()
     expect(part(host, 'counter')).toBeNull()
