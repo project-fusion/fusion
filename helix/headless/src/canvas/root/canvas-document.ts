@@ -153,7 +153,7 @@ const nearestSides = (from: CanvasNode, to: CanvasNode): [CanvasSide, CanvasSide
 /** How a connector travels between the two cards it joins. */
 export type CanvasPath = 'curve' | 'straight' | 'step'
 
-/** What a board's `route` is given for one connection, in the board's own units. */
+/** What a board's `edgeRoute` is given for one connection, in the board's own units. */
 export interface CanvasRouteEnds {
   /** The connection. */
   edge: CanvasEdge
