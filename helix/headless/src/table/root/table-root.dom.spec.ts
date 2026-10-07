@@ -659,6 +659,39 @@ describe('a selectable table', () => {
     expect(host.selected).toBe('')
   })
 
+  /* One row at a time was not on offer: every selectable table took any
+     number, with a box in the heading for every row. */
+  test('selection-mode single ticks one row at a time, with no box in the heading', async () => {
+    const host = (await mount(
+      selectable.replace('selectable', 'selectable selection-mode="single"'),
+    )) as Selecting
+    await settle(host)
+    expect(part(host, 'select-all')?.querySelector('[part="checkbox"]')).toBeNull()
+    expect(part(host, 'select-all')?.getAttribute('aria-label')).toBe('Select')
+    ask(rows(host)[0]?.shadowRoot?.querySelector('[part="checkbox"]'), true)
+    await settle(host)
+    expect(host.selected).toBe('web')
+  })
+
+  test('selection-behavior replace selects a pressed row alone, and Control adds one', async () => {
+    const host = (await mount(
+      selectable.replace('selectable', 'selectable selection-behavior="replace"'),
+    )) as Selecting
+    await settle(host)
+    const [web, billing] = rows(host)
+    const cell = (row: HTMLElement | undefined) =>
+      row?.querySelector('helix-headless-table-cell') as HTMLElement
+    cell(web).click()
+    await settle(host)
+    expect(host.selected).toBe('web')
+    cell(billing).dispatchEvent(new MouseEvent('click', { bubbles: true, ctrlKey: true }))
+    await settle(host)
+    expect(host.selected).toBe('web,billing')
+    cell(billing).click()
+    await settle(host)
+    expect(host.selected).toBe('billing')
+  })
+
   test('leaves a checkbox the consumer put in a cell alone', async () => {
     const host = (await mount(selectable)) as Selecting
     await settle(host)
