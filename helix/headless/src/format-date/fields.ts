@@ -13,6 +13,7 @@ export const FIELD: Record<string, (value: string) => TemplateResult> = {
   day: (value) => html`<span part="day">${value}</span>`,
   dayPeriod: (value) => html`<span part="day-period">${value}</span>`,
   era: (value) => html`<span part="era">${value}</span>`,
+  fractionalSecond: (value) => html`<span part="fractional-second">${value}</span>`,
   hour: (value) => html`<span part="hour">${value}</span>`,
   minute: (value) => html`<span part="minute">${value}</span>`,
   month: (value) => html`<span part="month">${value}</span>`,

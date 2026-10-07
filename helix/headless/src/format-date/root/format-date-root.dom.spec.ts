@@ -355,3 +355,29 @@ describe('a date in a calendar', () => {
     expect(part(fields, 'day')?.textContent).toBe('14')
   })
 })
+
+describe('every option Intl takes for a date', () => {
+  /* Measured before this: `time-zone-name` took `long` and `short` alone,
+     and a fraction of a second and the part of the day had no option. */
+  test('the offset and generic zone names, fractions of a second, and the part of the day', async () => {
+    const at = '2026-08-04T16:41:07.250Z'
+    const written = (options: Intl.DateTimeFormatOptions): string =>
+      new Intl.DateTimeFormat('en-US', { ...options, timeZone: 'America/Los_Angeles' }).format(
+        new Date(at),
+      )
+    const offset = await stamp(
+      `<helix-headless-format-date locale="en-US" date="${at}" time-zone="America/Los_Angeles" hour="numeric" minute="2-digit" time-zone-name="shortOffset"></helix-headless-format-date>`,
+    )
+    expect(part(offset, 'time')?.textContent).toBe(
+      written({ hour: 'numeric', minute: '2-digit', timeZoneName: 'shortOffset' }),
+    )
+    const fraction = await stamp(
+      `<helix-headless-format-date locale="en-US" date="${at}" time-zone="America/Los_Angeles" hour="numeric" minute="2-digit" second="2-digit" fractional-second-digits="3" fields></helix-headless-format-date>`,
+    )
+    expect(part(fraction, 'fractional-second')?.textContent).toBe('250')
+    const period = await stamp(
+      `<helix-headless-format-date locale="en-US" date="${at}" time-zone="America/Los_Angeles" hour="numeric" day-period="long"></helix-headless-format-date>`,
+    )
+    expect(part(period, 'time')?.textContent).toBe(written({ dayPeriod: 'long', hour: 'numeric' }))
+  })
+})
