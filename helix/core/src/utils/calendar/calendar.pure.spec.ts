@@ -5,6 +5,7 @@ import {
   barredBy,
   calendarLocale,
   localToday,
+  MONTH_CALENDARS,
   monthOf,
   monthOut,
   monthSystem,
@@ -58,12 +59,14 @@ describe('calendarLocale', () => {
     expect(calendarLocale('zh-TW-u-ca-roc')).toBe('zh-TW-u-ca-roc')
   })
 
-  test('a calendar asked for wins where it is one of the five, and is ignored where not', () => {
+  test('a calendar asked for wins, and a name no date family draws is ignored', () => {
     expect(calendarLocale('fa-IR', 'japanese')).toBe('fa-IR-u-ca-japanese')
     expect(calendarLocale('th-TH', 'gregory')).toBe('th-TH-u-ca-gregory')
     expect(calendarLocale('en-US-u-ca-islamic', 'roc')).toBe('en-US-u-ca-roc')
-    expect(calendarLocale('en-US', 'persian')).toBe('en-US')
-    expect(calendarLocale('fa-IR', 'persian')).toBe('fa-IR-u-ca-gregory')
+    expect(calendarLocale('en-US', 'persian')).toBe('en-US-u-ca-persian')
+    expect(calendarLocale('fa-IR', 'persian')).toBe('fa-IR-u-ca-persian')
+    expect(calendarLocale('zh-CN', 'chinese')).toBe('zh-CN-u-ca-chinese')
+    expect(calendarLocale('en-US', 'lunar')).toBe('en-US')
   })
 
   test('the runtime locale takes a calendar too, and a tag Intl refuses throws as a formatter does', () => {
@@ -241,5 +244,114 @@ describe('the months of a calendar with months of its own', () => {
     expect(gregorian.key(day('2026-10-06'))).toBe('2026-10')
     expect(iso(gregorian.start(day('2026-10-06')))).toBe('2026-10-01')
     expect(gregorian.day(day('2026-10-06'))).toBe(6)
+  })
+})
+
+/* The months and the years views, and Date Input's segments, count in the
+   calendar's own years and months: 13 in a Hebrew leap year and in Ethiopia,
+   and the Chinese year by its Gregorian number. */
+describe('the years of a calendar with months of its own', () => {
+  const iso = (date: Date): string => date.toISOString().slice(0, 10)
+
+  test("a date's year, month and day, and back", () => {
+    const persian = monthSystem('persian')
+    expect(persian.parts(day('2026-10-06'))).toEqual({ day: 14, month: 7, year: 1405 })
+    expect(iso(persian.from(1405, 7, 14))).toBe('2026-10-06')
+    expect(iso(persian.from(1405, 1, 1))).toBe('2026-03-21')
+    const hebrew = monthSystem('hebrew')
+    expect(hebrew.parts(day('2026-09-12'))).toEqual({ day: 1, month: 1, year: 5787 })
+    const chinese = monthSystem('chinese')
+    expect(chinese.parts(day('2026-02-17')).year).toBe(2026)
+    expect(chinese.parts(day('2026-02-16')).year).toBe(2025)
+    expect(chinese.parts(day('2026-02-17')).month).toBe(1)
+  })
+
+  test('a year has the months the calendar gives it', () => {
+    expect(monthSystem('hebrew').months(5787)).toBe(13)
+    expect(monthSystem('hebrew').months(5786)).toBe(12)
+    expect(monthSystem('ethiopic').months(2019)).toBe(13)
+    expect(monthSystem('ethiopic').days(2018, 13)).toBe(5)
+    expect(monthSystem('persian').months(1405)).toBe(12)
+    expect(monthSystem('islamic-civil').months(1448)).toBe(12)
+    expect(monthSystem('chinese').months(2025)).toBe(13)
+    expect(monthSystem('gregory').months(2026)).toBe(12)
+  })
+
+  test('a day and a month beyond their ends are kept inside them', () => {
+    const ethiopic = monthSystem('ethiopic')
+    expect(ethiopic.parts(ethiopic.from(2018, 13, 30))).toEqual({ day: 5, month: 13, year: 2018 })
+    expect(ethiopic.parts(ethiopic.from(2018, 14, 1))).toEqual({ day: 1, month: 13, year: 2018 })
+    expect(iso(monthSystem('').from(2026, 2, 31))).toBe('2026-02-28')
+  })
+
+  test('a year away keeps the month by its name, across a leap year', () => {
+    const hebrew = monthSystem('hebrew')
+    const names = new Intl.DateTimeFormat('en-u-ca-hebrew', { month: 'long', timeZone: 'UTC' })
+    // Nisan 5786 to Nisan 5787, which is the eighth month in a leap year.
+    const nisan = hebrew.from(5786, 7, 10)
+    expect(names.format(nisan)).toBe('Nisan')
+    expect(names.format(hebrew.addYears(nisan, 1))).toBe('Nisan')
+    // Adar 5786 to Adar II 5787, and Adar I back to Adar.
+    expect(names.format(hebrew.addYears(hebrew.from(5786, 6, 10), 1))).toBe('Adar II')
+    expect(names.format(hebrew.addYears(hebrew.from(5787, 6, 10), -1))).toBe('Adar')
+    expect(iso(monthSystem('').addYears(day('2024-02-29'), 1))).toBe('2025-02-28')
+  })
+
+  test('the months view and the years view count in the calendar', () => {
+    const hebrew = monthSystem('hebrew')
+    const cells = periodCells({
+      max: '',
+      min: '',
+      page: 5787,
+      shown: hebrew.from(5787, 8, 1),
+      system: hebrew,
+      today: '2026-10-06',
+      view: 'month',
+    })
+    expect(cells).toHaveLength(13)
+    expect(cells.filter((one) => one.chosen).map((one) => one.at)).toEqual([7])
+    expect(cells.filter((one) => one.current).map((one) => one.at)).toEqual([0])
+    const years = periodCells({
+      max: '2027-12-31',
+      min: '',
+      page: 1405,
+      shown: day('2026-10-01'),
+      system: monthSystem('persian'),
+      today: '2026-10-06',
+      view: 'year',
+    })
+    expect(years.map((one) => one.at)).toEqual([
+      1404, 1405, 1406, 1407, 1408, 1409, 1410, 1411, 1412, 1413, 1414, 1415,
+    ])
+    expect(years.filter((one) => one.chosen).map((one) => one.at)).toEqual([1405])
+    expect(years.filter((one) => one.out).map((one) => one.at)).toEqual([
+      1407, 1408, 1409, 1410, 1411, 1412, 1413, 1414, 1415,
+    ])
+  })
+
+  test('a key moves across a year of thirteen months', () => {
+    const months = (year: number): number => monthSystem('hebrew').months(year)
+    expect(periodKey('month', 12, 5787, 'ArrowRight', 1, months)).toEqual({
+      focus: 0,
+      pageYear: 5788,
+    })
+    expect(periodKey('month', 0, 5788, 'ArrowLeft', -1, months)).toEqual({
+      focus: 12,
+      pageYear: 5787,
+    })
+    expect(periodKey('month', 12, 5787, 'PageDown', 0, months)).toEqual({
+      focus: 11,
+      pageYear: 5788,
+    })
+  })
+
+  test('every calendar Intl knows reads back the dates it writes', () => {
+    for (const name of MONTH_CALENDARS) {
+      const system = monthSystem(name)
+      for (const value of ['1990-01-01', '2026-10-06', '2027-03-20', '2061-12-31']) {
+        const { day: dayOf, month, year } = system.parts(day(value))
+        expect([name, iso(system.from(year, month, dayOf))]).toEqual([name, value])
+      }
+    }
   })
 })

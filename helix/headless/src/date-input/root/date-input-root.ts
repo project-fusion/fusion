@@ -18,6 +18,10 @@ import {
   MixinPickerField,
   MixinSegmentedField,
   MixinTokens,
+  MONTH_CALENDARS,
+  type MonthCalendar,
+  type MonthSystem,
+  monthSystem,
   words,
   wordsLocale,
 } from '@fusion.dev/helix-core'
@@ -210,17 +214,22 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
   autocomplete = ''
 
   /**
-   * The calendar the written date and the calendar's days are in: `gregory`,
-   * `buddhist`, `japanese`, `roc`, or `iso8601`.
+   * The calendar the written date, the segments, and the calendar's days are
+   * in: `gregory`, `buddhist`, `japanese`, `roc`, or `iso8601`, or a calendar
+   * with months of its own that Date Picker's `calendar` names, such as
+   * `persian`, `hebrew`, `islamic-umalqura`, `ethiopic`, or `chinese`.
    *
-   * Absent is the locale's own where it is one of the five, and `gregory` for
-   * every other, as Date Picker's `calendar` is. The value is `YYYY-MM-DD` in
-   * every calendar, and a focused field is ISO in every calendar. In
-   * `segmented`, the segments are the Gregorian day, month, and year, in the
-   * order the locale writes them, or ISO order for `iso8601`.
+   * Absent is the locale's own where its months are the Gregorian months, and
+   * `gregory` for every other, as Date Picker's `calendar` is. The value is
+   * `YYYY-MM-DD` in every calendar, and a focused text field is ISO in every
+   * calendar. In `segmented`, the segments are the day, month, and year as
+   * the calendar counts them, in the order the locale writes them: Mehr 14,
+   * 1405 is month 7 and day 14 of 1405 under `persian`. Under the five with
+   * Gregorian months they are the Gregorian day, month, and year, or ISO order
+   * for `iso8601`.
    */
   @property()
-  calendar?: DateCalendar
+  calendar?: DateCalendar | MonthCalendar
 
   /**
    * The name of the calendar's grid of days, read by screen readers.
@@ -576,11 +585,18 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
   /**
    * The segments are the Gregorian day, month and year, which is what they
    * hold, in ISO order where the calendar is `iso8601`. A year shown as 2569
-   * or Reiwa 8 would be a year the segment does not hold.
+   * or Reiwa 8 would be a year the segment does not hold. Under a calendar
+   * with months of its own they hold that calendar's parts, so they are laid
+   * out and named in it.
    */
   protected override get segmentLocale(): string {
     const tag = calendarLocale(this.language, this.calendar)
-    return tag.includes('-ca-iso8601') ? tag : calendarLocale(tag, 'gregory')
+    return tag.includes('-ca-iso8601') || this.segmentSystem ? tag : calendarLocale(tag, 'gregory')
+  }
+
+  /** The calendar the segments count in, where it has months of its own. */
+  protected override get segmentSystem(): MonthSystem | undefined {
+    return MONTH_CALENDARS.includes(this.calendar ?? '') ? monthSystem(this.calendar) : undefined
   }
 
   /** One date, written the way `dateStyle` asks for. */

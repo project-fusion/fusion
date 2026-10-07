@@ -17,10 +17,8 @@ import {
   commaList as list,
   MixinControllerValue,
   MixinPickerFeedback,
-  MONTH_CALENDARS,
   type MonthCalendar,
   type MonthSystem,
-  monthOf,
   monthOut,
   monthSystem,
   type PickerFailure,
@@ -77,9 +75,11 @@ const firstOf = (year: number, month: number): Date =>
  * **Dates are `YYYY-MM-DD` strings, and every calculation is in UTC**, because
  * a local-time `Date` shifts across a time zone or daylight-saving boundary.
  *
- * **The days are the Gregorian calendar's**, written in `calendar`: the
- * locale's own where its months are the Gregorian months, as `th-TH` writes
- * 2569 for 2026, and `gregory` where they are not, as for `fa-IR`.
+ * **The months are the ones `calendar` counts**: the Gregorian months for the
+ * locale's own calendar where its months are the Gregorian months, as `th-TH`
+ * writes 2569 for 2026, and `gregory` where they are not, as for `fa-IR`
+ * with no `calendar`. Name a calendar with months of its own, such as
+ * `persian`, and every view counts its days, months, and years from `Intl`.
  *
  * `month` sets which month the grid shows, separately from `value`, so paging
  * selects nothing and you can control the view. When unset, it follows the
@@ -197,14 +197,16 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
    * `ja-JP-u-ca-japanese`, and `gregory` for every other, such as `persian`
    * for `fa-IR`.
    *
-   * `persian`, `hebrew`, `islamic-umalqura`, `islamic-civil`, `ethiopic`,
-   * `coptic`, and `indian` draw a calendar with months of its own, as React
-   * Aria's calendars do: each grid is one of that calendar's months, the
-   * Hebrew leap month and Ethiopia's five-day thirteenth month included, and
-   * Previous, Next and the page keys move by those months. `month` and
+   * `persian`, `hebrew`, `islamic`, `islamic-umalqura`, `islamic-civil`,
+   * `islamic-tbla`, `islamic-rgsa`, `ethiopic`, `ethioaa`, `coptic`,
+   * `indian`, `chinese`, and `dangi` draw a calendar with months of its own,
+   * as React Aria's calendars do: each grid is one of that calendar's months,
+   * the Hebrew and Chinese leap months and Ethiopia's five-day thirteenth
+   * month included, and Previous, Next and the page keys move by those
+   * months. With `max-view`, the months view shows that calendar's year, of
+   * twelve or thirteen months, and the years view its years. `month` and
    * `helix-navigate` then name a month by its first day, `YYYY-MM-DD`. The
-   * heading stays text, as the months and years views are drawn in Gregorian
-   * months only. The value is `YYYY-MM-DD` in every calendar.
+   * value is `YYYY-MM-DD` in every calendar.
    */
   @property()
   calendar?: DateCalendar | MonthCalendar
@@ -537,11 +539,6 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
     return monthSystem(this.calendar)
   }
 
-  /** Whether `calendar` names a calendar with months of its own. */
-  private get ownMonths(): boolean {
-    return MONTH_CALENDARS.includes(this.calendar ?? '')
-  }
-
   /**
    * The month to open on when nothing has declared one.
    *
@@ -725,7 +722,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
   }
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {
-    if (this.view !== 'day' && !this.ownMonths) {
+    if (this.view !== 'day') {
       this.handlePeriodKeydown(event)
       return
     }
@@ -761,9 +758,10 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
     } else if (event.key === 'End') {
       this.moveTo(addDays(from, 6 - ((from.getUTCDay() - this.weekStart + 7) % 7)))
     } else {
-      // Shift pages by a year, which is the same move twelve months over.
+      /* Shift pages by a year, to the month of the same name: twelve months
+         in the Gregorian calendar, and in a Hebrew leap year thirteen. */
       const step = event.key === 'PageUp' ? -1 : 1
-      this.moveTo(this.system.add(from, event.shiftKey ? step * 12 : step))
+      this.moveTo(event.shiftKey ? this.system.addYears(from, step) : this.system.add(from, step))
     }
 
     event.preventDefault()
@@ -788,25 +786,28 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
 
   /** The year on show in the months and the years. */
   private get periodYear(): number {
-    return this.pageYear ?? this.shown.getUTCFullYear()
+    return this.pageYear ?? this.system.parts(this.shown).year
   }
 
   /** The index or the year the tab stop sits on in the months or the years. */
   private get periodStop(): number {
-    if (this.periodFocus !== undefined) {
-      return this.periodFocus
+    if (this.view === 'year') {
+      return this.periodFocus ?? this.periodYear
     }
-    return this.view === 'year' ? this.periodYear : this.shown.getUTCMonth()
+    /* Kept inside the year on show, which in a calendar with leap months may
+       be a month shorter than the year the stop came from. */
+    const index = this.periodFocus ?? this.system.parts(this.shown).month - 1
+    return Math.min(index, this.system.months(this.periodYear) - 1)
   }
 
   /** Whether a month, as its first day, lies wholly outside `min` and `max`. */
   private monthOut(first: Date): boolean {
-    return monthOut(first, this.min, this.max)
+    return monthOut(first, this.min, this.max, this.system)
   }
 
   /** Whether a year lies wholly outside `min` and `max`. */
   private yearOut(year: number): boolean {
-    return yearOut(year, this.min, this.max)
+    return yearOut(year, this.min, this.max, this.system)
   }
 
   /** Changes the view, and takes focus to its tab stop once it has drawn. */
@@ -824,8 +825,9 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
       return
     }
     if (this.view === 'day') {
-      this.pageYear = this.shown.getUTCFullYear()
-      this.periodFocus = this.shown.getUTCMonth()
+      const { month, year } = this.system.parts(this.shown)
+      this.pageYear = year
+      this.periodFocus = month - 1
       this.zoom('month')
     } else if (this.view === 'month' && this.maxView === 'year') {
       this.periodFocus = this.periodYear
@@ -849,9 +851,9 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
       /* The month in view, in the year chosen, as React Aria keeps it: a reader
          moving from August 2026 to 2030 is looking for August. Where `min` or
          `max` leaves that month out, the nearest month the year has. */
-      const month = this.shown.getUTCMonth()
-      const open = Array.from({ length: 12 }, (_, index) => index).filter(
-        (index) => !this.monthOut(firstOf(at, index)),
+      const month = this.system.parts(this.shown).month - 1
+      const open = Array.from({ length: this.system.months(at) }, (_, index) => index).filter(
+        (index) => !this.monthOut(this.system.from(at, index + 1, 1)),
       )
       this.periodFocus = open.includes(month)
         ? month
@@ -860,14 +862,14 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
       this.zoom('month')
       return
     }
-    const first = firstOf(this.periodYear, at)
+    const first = this.system.from(this.periodYear, at + 1, 1)
     if (this.monthOut(first)) {
       return
     }
     this.show(first)
     /* A refused move leaves the months up, the month on show being where it
        was; the reader is still choosing. */
-    if (this.month !== monthOf(first)) {
+    if (this.month !== this.system.key(first)) {
       return
     }
     this.pageYear = undefined
@@ -920,6 +922,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
       this.periodYear,
       event.key,
       inlineStep(this, event.key),
+      (year) => this.system.months(year),
     )
     if (moved === null) {
       return
@@ -1346,9 +1349,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
     weekdayName: Intl.DateTimeFormat
     year: Intl.DateTimeFormat
   } {
-    const language = this.ownMonths
-      ? `${new Intl.Locale(this.language || new Intl.DateTimeFormat().resolvedOptions().locale, { calendar: this.calendar ?? 'gregory' })}`
-      : calendarLocale(this.language, this.calendar)
+    const language = calendarLocale(this.language, this.calendar)
     if (this.cachedFormats?.locale === language) {
       return this.cachedFormats
     }
@@ -1555,7 +1556,6 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
   ): TemplateResult | string {
     const steps =
       this.maxView !== undefined &&
-      !this.ownMonths &&
       (this.view === 'day' || (this.view === 'month' && this.maxView === 'year'))
     if (!steps) {
       return text
@@ -1581,14 +1581,15 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
     const years = this.view === 'year'
     const page = years ? yearPageOf(this.periodYear) : this.periodYear
     const heading = years
-      ? `${yearName.format(firstOf(page, 0))} – ${yearName.format(firstOf(page + YEARS_SHOWN - 1, 0))}`
-      : yearName.format(firstOf(page, 0))
+      ? `${yearName.format(this.system.from(page, 1, 1))} – ${yearName.format(this.system.from(page + YEARS_SHOWN - 1, 1, 1))}`
+      : yearName.format(this.system.from(page, 1, 1))
     const stop = this.periodStop
     const cells = periodCells({
       max: this.max,
       min: this.min,
       page: this.periodYear,
       shown: this.shown,
+      system: this.system,
       today: todayIn(this.timeZone),
       view: years ? 'year' : 'month',
     }).map(({ at, chosen, current, first, out }) => {
@@ -1605,7 +1606,8 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
         >${words}</span
       >`
     })
-    const rows = [0, 3, 6, 9].map(
+    /* Rows of three: four, or five for a year of thirteen months. */
+    const rows = Array.from({ length: Math.ceil(cells.length / 3) }, (_, row) => row * 3).map(
       (from) => html`<div part="period-row" role="row">${cells.slice(from, from + 3)}</div>`,
     )
     return html`<div part="month">
@@ -1637,7 +1639,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
   }
 
   protected override render(): TemplateResult {
-    if (this.view !== 'day' && !this.ownMonths) {
+    if (this.view !== 'day') {
       return html`<slot name="header"></slot>
         <div part="months" style="--date-picker-column-count: 1">${this.renderPeriods()}</div>
         <slot name="footer"></slot>${this.renderPickerFeedback()}`

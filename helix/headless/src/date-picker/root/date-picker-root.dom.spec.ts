@@ -1163,11 +1163,77 @@ describe('a date picker drawing a calendar with months of its own', () => {
     expect(heading(cal)).toContain('Adar I')
   })
 
-  test('keeps the heading as text, the months and years views being Gregorian', async () => {
-    const cal = await calendar(
+  /* Measured before this: under a calendar with months of its own the
+     heading stayed text, the months and years views being Gregorian only. */
+  test("shows the calendar's own months and years from the heading", async () => {
+    const cal = (await calendar(
       'locale="en-US" calendar="persian" max-view="year" default-month="2026-09-23"',
+    )) as DatePicker & { updateComplete: Promise<unknown> }
+    const periods = (): string[] =>
+      [...(cal.shadowRoot?.querySelectorAll('[part~="period"]') ?? [])].map(
+        (one) => one.textContent?.trim() ?? '',
+      )
+    ;(part(cal, 'heading-button') as HTMLElement).click()
+    await cal.updateComplete
+    expect(periods()).toHaveLength(12)
+    expect(periods()[0]).toBe(written('persian', '2026-03-21', { month: 'short' }))
+    expect(periods()[6]).toBe(written('persian', '2026-09-23', { month: 'short' }))
+    expect(cal.shadowRoot?.querySelector('[part~="period-selected"]')?.textContent?.trim()).toBe(
+      written('persian', '2026-09-23', { month: 'short' }),
     )
-    expect(part(cal, 'heading-button')).toBeNull()
+    ;(part(cal, 'heading-button') as HTMLElement).click()
+    await cal.updateComplete
+    expect(periods()).toContain(written('persian', '2026-09-23', { year: 'numeric' }))
+    // A year, then a month, shows that month's days.
+    const years = [...(cal.shadowRoot?.querySelectorAll<HTMLElement>('[part~="period"]') ?? [])]
+    years
+      .find(
+        (one) => one.textContent?.trim() === written('persian', '2027-09-23', { year: 'numeric' }),
+      )
+      ?.click()
+    await cal.updateComplete
+    cal.shadowRoot?.querySelectorAll<HTMLElement>('[part~="period"]')[0]?.click()
+    await cal.updateComplete
+    expect(cal.month).toBe('2027-03-21')
+    expect(heading(cal)).toBe(written('persian', '2027-03-21', { month: 'long', year: 'numeric' }))
+  })
+
+  test('draws a Hebrew leap year as thirteen months, and keys move through them', async () => {
+    const cal = (await calendar(
+      'locale="en-US" calendar="hebrew" max-view="month" default-month="2027-02-08"',
+    )) as DatePicker & { updateComplete: Promise<unknown> }
+    ;(part(cal, 'heading-button') as HTMLElement).click()
+    await cal.updateComplete
+    const periods = [...(cal.shadowRoot?.querySelectorAll<HTMLElement>('[part~="period"]') ?? [])]
+    expect(periods).toHaveLength(13)
+    expect(cal.shadowRoot?.querySelectorAll('[part="period-row"]')).toHaveLength(5)
+    expect(periods.map((one) => one.textContent?.trim())).toContain('Adar II')
+    const stop = (): string =>
+      cal.shadowRoot?.querySelector('[part~="period"][tabindex="0"]')?.textContent?.trim() ?? ''
+    expect(stop()).toBe('Adar I')
+    const grid = cal.shadowRoot?.querySelector('[part="periods"]') as HTMLElement
+    for (const key of ['ArrowRight', 'ArrowRight']) {
+      grid.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, composed: true, key }))
+      await cal.updateComplete
+    }
+    expect(stop()).toBe('Nisan')
+    // Down from the last row goes on into the next year, which has twelve.
+    for (const key of ['ArrowDown', 'ArrowDown']) {
+      grid.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, composed: true, key }))
+      await cal.updateComplete
+    }
+    expect(stop()).toBe('Tishri')
+  })
+
+  test('pages a year with Shift to the month of the same name', async () => {
+    const cal = (await calendar(
+      'locale="en-US" calendar="hebrew" default-month="2026-03-19" default-value="2026-03-28"',
+    )) as DatePicker & { updateComplete: Promise<unknown> }
+    expect(heading(cal)).toContain('Nisan')
+    await press(cal, 'PageDown', true)
+    await cal.updateComplete
+    expect(heading(cal)).toContain('Nisan')
+    expect(heading(cal)).toContain('5787')
   })
 
   test('and stops Previous at `min` as it does in Gregorian months', async () => {

@@ -1,6 +1,7 @@
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import type { HelixFormElement } from '../../helix-form-element/helix-form-element.js'
+import type { MonthSystem } from '../../utils/calendar/calendar.js'
 import {
   isPartial,
   isTwelveHourLayout,
@@ -85,6 +86,9 @@ export declare class MixinSegmentedFieldInterface {
 
   /** The clock and the seconds a time is laid out with. */
   protected get segmentOptions(): SegmentOptions
+
+  /** The calendar a date's parts are counted in, or `undefined` for the Gregorian calendar. */
+  protected get segmentSystem(): MonthSystem | undefined
 
   /** The row of segments, in the locale's order, with what it writes between them. */
   protected renderSegments(): TemplateResult
@@ -215,6 +219,11 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
       return {}
     }
 
+    /** The calendar a date's parts are counted in, or `undefined` for the Gregorian calendar. */
+    protected get segmentSystem(): MonthSystem | undefined {
+      return undefined
+    }
+
     private get layout(): SegmentSlot[] {
       return segmentLayout(this.segmentedKind, this.segmentLocale, this.segmentOptions)
     }
@@ -245,7 +254,7 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
      */
     private take(next: Segments): void {
       this.parts = next
-      const value = segmentsValue(this.segmentedKind, next, this.layout)
+      const value = segmentsValue(this.segmentedKind, next, this.layout, this.segmentSystem)
       if (value === this.value) {
         this.sync()
         return
@@ -253,7 +262,7 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
       this.own = true
       if (!this.requestValue(value)) {
         this.own = false
-        this.parts = segmentsOf(this.segmentedKind, this.value)
+        this.parts = segmentsOf(this.segmentedKind, this.value, this.segmentSystem)
       }
     }
 
@@ -298,6 +307,7 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
         kind,
         locale: this.segmentLocale,
         segments: this.parts,
+        system: this.segmentSystem,
         twelve,
         typed: this.typed,
       })
@@ -344,9 +354,10 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
       if (
         !own &&
         this.segmentsShown &&
-        segmentsValue(this.segmentedKind, this.parts, this.layout) !== this.value
+        segmentsValue(this.segmentedKind, this.parts, this.layout, this.segmentSystem) !==
+          this.value
       ) {
-        this.parts = segmentsOf(this.segmentedKind, this.value)
+        this.parts = segmentsOf(this.segmentedKind, this.value, this.segmentSystem)
       }
     }
 
@@ -398,7 +409,7 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
         return
       }
       const anchor = this.anchor ?? undefined
-      const partial = isPartial(this.segmentedKind, this.parts, this.layout)
+      const partial = isPartial(this.segmentedKind, this.parts, this.layout, this.segmentSystem)
       const fault = verdictFlags(this.validate())
       if (partial) {
         this.internals.setValidity(
@@ -427,6 +438,7 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
       const layout = this.layout
       const twelve = isTwelveHourLayout(layout)
       const locale = this.segmentLocale
+      const system = this.segmentSystem
       return html`<div
         part="segments"
         id=${this.controlId}
@@ -444,7 +456,7 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
           }
           const kind = slot.kind
           const shown = shownValue(kind, this.parts, twelve)
-          const { max, min } = segmentRange(kind, this.parts, twelve)
+          const { max, min } = segmentRange(kind, this.parts, twelve, system)
           const text = segmentText(kind, this.parts, twelve, locale)
           const empty = shown === undefined
           const id = `${this.controlId}-${kind}`
@@ -470,7 +482,7 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
             aria-valuemin=${spin ? min : nothing}
             aria-valuemax=${spin ? max : nothing}
             aria-valuenow=${spin ? (shown ?? nothing) : nothing}
-            aria-valuetext=${spin ? (empty ? this.emptySegmentLabel : segmentValueText(kind, this.parts, twelve, locale)) : nothing}
+            aria-valuetext=${spin ? (empty ? this.emptySegmentLabel : segmentValueText(kind, this.parts, twelve, locale, system)) : nothing}
             aria-disabled=${this.isDisabled ? 'true' : nothing}
             aria-required=${this.required ? 'true' : nothing}
             aria-readonly=${(this as { readOnly?: boolean }).readOnly ? 'true' : nothing}

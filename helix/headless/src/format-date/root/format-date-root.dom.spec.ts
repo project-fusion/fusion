@@ -338,4 +338,20 @@ describe('a date in a calendar', () => {
     await element.updateComplete
     expect(part(element, 'time')?.textContent).toBe('October 6, 2026')
   })
+
+  /* Measured before this: `calendar="persian"` was ignored, and the date read
+     October 6, 2026 where a Persian Date Picker beside it drew Mehr 14. */
+  test('a calendar with months of its own is written in it when `calendar` names it', async () => {
+    for (const calendar of ['persian', 'hebrew', 'islamic-umalqura', 'ethiopic', 'chinese']) {
+      const element = await stamp(
+        `<helix-headless-format-date locale="en-US" calendar="${calendar}" date="2026-10-06" date-style="long"></helix-headless-format-date>`,
+      )
+      expect(part(element, 'time')?.textContent).toBe(long(`en-US-u-ca-${calendar}`))
+    }
+    const fields = await stamp(
+      '<helix-headless-format-date locale="en-US" calendar="persian" date="2026-10-06" date-style="long" fields></helix-headless-format-date>',
+    )
+    expect(part(fields, 'month')?.textContent).toBe('Mehr')
+    expect(part(fields, 'day')?.textContent).toBe('14')
+  })
 })

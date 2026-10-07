@@ -109,11 +109,13 @@ const tagged = new Map<string, string>()
  * The language tag a date family formats with: `locale`, with the calendar it
  * writes dates in.
  *
- * That is `calendar` where it is one of the five `DateCalendar` names, then
- * the locale's own calendar where its months are the Gregorian months, then
- * `gregory`. **A calendar with months of its own, such as `persian` for `fa-IR`
- * or `islamic-umalqura` for `ar-SA` in some engines, is written as `gregory`.**
- * The arithmetic is Gregorian, so a heading in Mehr 1405 over the days of
+ * That is `calendar` where it names a `DateCalendar` or a `MonthCalendar`,
+ * then the locale's own calendar where its months are the Gregorian months,
+ * then `gregory`. **A calendar with months of its own that only the locale
+ * names, such as `persian` for `fa-IR` or `islamic-umalqura` for `ar-SA` in
+ * some engines, is written as `gregory`**, so a page that asked for no other
+ * calendar keeps the Gregorian dates it had. Before the date families drew
+ * such a calendar's own months, a heading in Mehr 1405 over the days of
  * October 2026 named a month the grid did not show.
  *
  * `locale` unchanged where nothing moves, so a page in a Gregorian locale
@@ -126,11 +128,12 @@ export const calendarLocale = (locale: string, calendar = ''): string => {
   let tag = tagged.get(key)
   if (tag === undefined) {
     const own = new Intl.DateTimeFormat(locale || undefined).resolvedOptions()
-    const wanted = DRAWN.includes(calendar)
-      ? calendar
-      : DRAWN.includes(own.calendar)
-        ? ''
-        : 'gregory'
+    const wanted =
+      DRAWN.includes(calendar) || MONTH_CALENDARS.includes(calendar)
+        ? calendar
+        : DRAWN.includes(own.calendar)
+          ? ''
+          : 'gregory'
     tag = wanted ? `${new Intl.Locale(locale || own.locale, { calendar: wanted })}` : locale
     tagged.set(key, tag)
   }
@@ -160,82 +163,146 @@ export const addMonths = (date: Date, months: number): Date => {
 }
 
 /**
- * The calendars Date Picker draws with months of their own, when `calendar`
- * names one: the months of the year in Iran, Israel, Saudi Arabia, Ethiopia,
- * Egypt's Coptic church, and India's national calendar. React Aria's
- * `createCalendar` offers the same set.
+ * The calendars the date families draw with months of their own, when
+ * `calendar` names one: the months of the year in Iran, Israel, the Islamic
+ * calendars, Ethiopia, Egypt's Coptic church, India's national calendar, and
+ * the Chinese and Korean lunisolar calendars. Every calendar `Intl` knows
+ * whose months are not the Gregorian months.
  */
 export type MonthCalendar =
+  | 'chinese'
   | 'coptic'
+  | 'dangi'
+  | 'ethioaa'
   | 'ethiopic'
   | 'hebrew'
   | 'indian'
+  | 'islamic'
   | 'islamic-civil'
+  | 'islamic-rgsa'
+  | 'islamic-tbla'
   | 'islamic-umalqura'
   | 'persian'
 
 /** The `MonthCalendar` names, for a check at run time. */
 export const MONTH_CALENDARS: readonly string[] = [
+  'chinese',
   'coptic',
+  'dangi',
+  'ethioaa',
   'ethiopic',
   'hebrew',
   'indian',
+  'islamic',
   'islamic-civil',
+  'islamic-rgsa',
+  'islamic-tbla',
   'islamic-umalqura',
   'persian',
 ]
 
+/** A date as a calendar counts it: its year, its month from 1, and its day from 1. */
+export interface CalendarParts {
+  day: number
+  month: number
+  year: number
+}
+
 /**
- * The months of a calendar, as Date Picker pages through them. Every date is
- * still a Gregorian `Date` at midnight UTC, and a month is the run of days
- * from its first.
+ * The days, months, and years of a calendar, as the date families page and
+ * edit them. Every date is still a Gregorian `Date` at midnight UTC, and a
+ * month is the run of days from its first.
  */
 export interface MonthSystem {
   /** A date some months away, its day kept where the month is long enough. */
   add(date: Date, months: number): Date
+  /**
+   * A date some years away: the month of the same name where the year has
+   * one, so Nisan stays Nisan across a Hebrew leap year, and the day kept
+   * where the month is long enough.
+   */
+  addYears(date: Date, years: number): Date
   /** The day of its month, from 1. */
   day(date: Date): number
+  /** How many days a month of a year has. */
+  days(year: number, month: number): number
+  /** The date of a year, month, and day, the month and the day kept inside the year and the month. */
+  from(year: number, month: number, day: number): Date
   /** The month a date is in, as `month` writes it: `YYYY-MM`, or its first day where the months are the calendar's own. */
   key(date: Date): string
+  /** How many months a year has: 12, or 13 in a Hebrew leap year, in Ethiopia, and in a Chinese leap year. */
+  months(year: number): number
+  /** A date's year, month, and day, as the calendar counts them. */
+  parts(date: Date): CalendarParts
   /** Whether two dates fall in one month. */
   same(left: Date, right: Date): boolean
   /** The first day of the month a date is in. */
   start(date: Date): Date
 }
 
+/** The days in a Gregorian month, `month` from 1. */
+const gregorianDays = (year: number, month: number): number => utcDate(year, month, 0).getUTCDate()
+
 /** The Gregorian months, which the five `DateCalendar` names share. */
 const GREGORIAN: MonthSystem = {
   add: (date, months) => addMonths(date, months),
+  addYears: (date, years) => addMonths(date, years * 12),
   day: (date) => date.getUTCDate(),
+  days: gregorianDays,
+  from: (year, month, day) => {
+    const kept = Math.min(12, Math.max(1, month))
+    return utcDate(year, kept - 1, Math.min(Math.max(1, day), gregorianDays(year, kept)))
+  },
   key: (date) => monthOf(date),
+  months: () => 12,
+  parts: (date) => ({
+    day: date.getUTCDate(),
+    month: date.getUTCMonth() + 1,
+    year: date.getUTCFullYear(),
+  }),
   same: (left, right) => sameMonth(left, right),
   start: (date) => utcDate(date.getUTCFullYear(), date.getUTCMonth(), 1),
 }
 
 /**
- * A calendar's months read from `Intl`: the day of the month each date has
- * there, and nothing else, since a month is the run of days from a first.
- * The leap months of the Hebrew year and Ethiopia's five-day thirteenth month
- * come out of that with no table.
+ * A calendar's days, months, and years read from `Intl`: the year and the
+ * day of the month each date has there, and nothing else. A month is the run
+ * of days from a first, and a year the run of months that share its number,
+ * so the leap months of the Hebrew and Chinese years and Ethiopia's five-day
+ * thirteenth month come out of it with no table. The Chinese and Korean
+ * years are counted by their Gregorian year, which `Intl` gives as
+ * `relatedYear`.
  */
 const intlMonths = (calendar: MonthCalendar): MonthSystem => {
-  const format = new Intl.DateTimeFormat(`en-u-ca-${calendar}-nu-latn`, {
-    day: 'numeric',
-    timeZone: 'UTC',
-  })
-  const days = new Map<number, number>()
-  const day = (date: Date): number => {
-    const at = date.getTime()
-    let found = days.get(at)
+  const tag = `en-u-ca-${calendar}-nu-latn`
+  const format = new Intl.DateTimeFormat(tag, { day: 'numeric', timeZone: 'UTC', year: 'numeric' })
+  const named = new Intl.DateTimeFormat(tag, { month: 'long', timeZone: 'UTC' })
+  const read = new Map<number, [number, number]>()
+  /* A date's year and day, remembered, since every question below asks them
+     of the same few hundred dates. */
+  const at = (date: Date): [number, number] => {
+    const time = date.getTime()
+    let found = read.get(time)
     if (found === undefined) {
-      found = Number(format.formatToParts(date).find((part) => part.type === 'day')?.value)
-      if (days.size > 4000) {
-        days.clear()
+      const parts = format.formatToParts(date)
+      const part = (type: string): number =>
+        Number(parts.find((one) => (one.type as string) === type)?.value)
+      const year = part('relatedYear')
+      found = [Number.isNaN(year) ? part('year') : year, part('day')]
+      /* A day an engine cannot name is the day after the one before it. The
+         ICU in Bun writes the last day of some Chinese months as day 0, where
+         Chromium writes 30. */
+      if (!(found[1] >= 1)) {
+        found[1] = at(addDays(date, -1))[1] + 1
       }
-      days.set(at, found)
+      if (read.size > 4000) {
+        read.clear()
+      }
+      read.set(time, found)
     }
     return found
   }
+  const day = (date: Date): number => at(date)[1]
   const start = (date: Date): Date => addDays(date, 1 - day(date))
   /* The days in the month that starts at `first`: the first day after it
      that is a first. Most months run 29 to 31 days, so those are tried
@@ -253,16 +320,84 @@ const intlMonths = (calendar: MonthCalendar): MonthSystem => {
     }
     return 30
   }
+  /* How many days a year runs, on average, which puts a guess at a year's
+     middle close enough that a few steps find it. */
+  const anchor = start(utcDate(2000, 0, 1))
+  const anchorYear = at(anchor)[0]
+  const span = 36_525 / (at(utcDate(2100, 0, 1))[0] - anchorYear)
+  const years = new Map<number, Date[]>()
+  /* The first day of each month of a year. */
+  const firsts = (year: number): Date[] => {
+    let found = years.get(year)
+    if (found !== undefined) {
+      return found
+    }
+    let probe = addDays(anchor, Math.round((year - anchorYear + 0.5) * span))
+    for (let step = 0; step < 60 && at(probe)[0] !== year; step += 1) {
+      probe = addDays(probe, (year - at(probe)[0]) * 20)
+    }
+    let first = start(probe)
+    while (at(addDays(first, -1))[0] === year) {
+      const earlier = start(addDays(first, -1))
+      if (earlier.getTime() >= first.getTime()) {
+        break
+      }
+      first = earlier
+    }
+    found = []
+    while (at(first)[0] === year && found.length < 14) {
+      found.push(first)
+      first = addDays(first, length(first))
+    }
+    if (years.size > 400) {
+      years.clear()
+    }
+    years.set(year, found)
+    return found
+  }
+  const months = (year: number): number => Math.max(1, firsts(year).length)
+  const firstOf = (year: number, month: number): Date =>
+    firsts(year)[Math.min(months(year), Math.max(1, month)) - 1] ?? anchor
+  const days = (year: number, month: number): number => length(firstOf(year, month))
+  const from = (year: number, month: number, wanted: number): Date => {
+    const first = firstOf(year, month)
+    return addDays(first, Math.min(Math.max(1, wanted), length(first)) - 1)
+  }
+  const parts = (date: Date): CalendarParts => {
+    const [year, dayOf] = at(date)
+    const all = firsts(year)
+    let month = all.length
+    while (month > 1 && (all[month - 1] as Date).getTime() > date.getTime()) {
+      month -= 1
+    }
+    return { day: dayOf, month, year }
+  }
   return {
-    add: (date, months) => {
+    add: (date, count) => {
       let first = start(date)
-      for (let step = 0; step < Math.abs(months); step += 1) {
-        first = months > 0 ? addDays(first, length(first)) : start(addDays(first, -1))
+      for (let step = 0; step < Math.abs(count); step += 1) {
+        first = count > 0 ? addDays(first, length(first)) : start(addDays(first, -1))
       }
       return addDays(first, Math.min(day(date), length(first)) - 1)
     },
+    addYears: (date, count) => {
+      const { day: dayOf, month, year } = parts(date)
+      const name = named.format(firstOf(year, month))
+      const names = firsts(year + count).map((first) => named.format(first))
+      /* The month of that name, then one whose name holds it, as Adar II
+         holds Adar, then the month in the same place. */
+      let index = names.indexOf(name)
+      if (index < 0) {
+        index = names.findLastIndex((one) => one.startsWith(name) || name.startsWith(one))
+      }
+      return from(year + count, index < 0 ? month : index + 1, dayOf)
+    },
     day,
+    days,
+    from,
     key: (date) => fromDate(start(date)),
+    months,
+    parts,
     same: (left, right) => start(left).getTime() === start(right).getTime(),
     start,
   }
@@ -271,8 +406,8 @@ const intlMonths = (calendar: MonthCalendar): MonthSystem => {
 const systems = new Map<string, MonthSystem>()
 
 /**
- * The months a calendar pages through: its own for a `MonthCalendar` name,
- * and the Gregorian months for every other.
+ * The days, months, and years a calendar pages through: its own for a
+ * `MonthCalendar` name, and the Gregorian months for every other.
  */
 export const monthSystem = (calendar = ''): MonthSystem => {
   if (!MONTH_CALENDARS.includes(calendar)) {
@@ -368,14 +503,14 @@ export const periodMove = (key: string, at: number, along: number): number | nul
 }
 
 /** Whether a month, as its first day, lies wholly outside `min` and `max`, either of which may be empty. */
-export const monthOut = (first: Date, min: string, max: string): boolean => {
-  const month = monthOf(first)
-  return (min !== '' && month < min.slice(0, 7)) || (max !== '' && month > max.slice(0, 7))
-}
+export const monthOut = (first: Date, min: string, max: string, system = GREGORIAN): boolean =>
+  (min !== '' && fromDate(addDays(system.add(first, 1), -1)) < min) ||
+  (max !== '' && fromDate(first) > max)
 
 /** Whether a year lies wholly outside `min` and `max`, either of which may be empty. */
-export const yearOut = (year: number, min: string, max: string): boolean =>
-  (min !== '' && year < Number(min.slice(0, 4))) || (max !== '' && year > Number(max.slice(0, 4)))
+export const yearOut = (year: number, min: string, max: string, system = GREGORIAN): boolean =>
+  (min !== '' && fromDate(addDays(system.from(year + 1, 1, 1), -1)) < min) ||
+  (max !== '' && fromDate(system.from(year, 1, 1)) > max)
 
 /** One month or year in the months or the years view. */
 export interface PeriodCell {
@@ -401,6 +536,8 @@ export interface PeriodPage {
   page: number
   /** The first of the month the calendar shows. */
   shown: Date
+  /** The calendar the months and the years are counted in, Gregorian where none is given. */
+  system?: MonthSystem | undefined
   /** Today, as `YYYY-MM-DD`. */
   today: string
   /** Which view: `month` for the months of a year, `year` for a page of years. */
@@ -408,21 +545,33 @@ export interface PeriodPage {
 }
 
 /**
- * The twelve cells of the months or the years view, in reading order: the
- * months of `page`, or the page of years that holds it.
+ * The cells of the months or the years view, in reading order: the months of
+ * `page`, twelve or the thirteen a calendar's year may have, or the twelve
+ * years on the page that holds it.
  */
-export const periodCells = ({ max, min, page, shown, today, view }: PeriodPage): PeriodCell[] => {
+export const periodCells = ({
+  max,
+  min,
+  page,
+  shown,
+  system = GREGORIAN,
+  today,
+  view,
+}: PeriodPage): PeriodCell[] => {
   const years = view === 'year'
-  const start = years ? yearPageOf(page) : page
-  return Array.from({ length: 12 }, (_, index) => {
-    const at = years ? start + index : index
-    const first = utcDate(years ? at : start, years ? 0 : index, 1)
+  const now = asDate(today)
+  const held = system.parts(shown).year
+  const count = years ? YEARS_SHOWN : system.months(page)
+  const startYear = years ? yearPageOf(page) : page
+  return Array.from({ length: count }, (_, index) => {
+    const at = years ? startYear + index : index
+    const first = years ? system.from(at, 1, 1) : system.from(page, index + 1, 1)
     return {
       at,
-      chosen: years ? at === shown.getUTCFullYear() : monthOf(first) === monthOf(shown),
-      current: years ? String(at) === today.slice(0, 4) : monthOf(first) === today.slice(0, 7),
+      chosen: years ? at === held : system.same(first, shown),
+      current: now !== null && (years ? system.parts(now).year === at : system.same(first, now)),
       first,
-      out: years ? yearOut(at, min, max) : monthOut(first, min, max),
+      out: years ? yearOut(at, min, max, system) : monthOut(first, min, max, system),
     }
   })
 }
@@ -434,7 +583,9 @@ export const periodCells = ({ max, min, page, shown, today, view }: PeriodPage):
  * `stop` is the month's index or the year the stop is on, `year` the year the
  * months view shows, and `along` which way the inline keys go, as
  * `periodMove` takes it. A move off the months of one year lands in the next
- * or the last, and a move off a page of years turns the page.
+ * or the last, and a move off a page of years turns the page. `months` says
+ * how many months a year has, twelve where it is not given. The page keys
+ * move the months a year, to the month in the same place.
  */
 export const periodKey = (
   view: 'month' | 'year',
@@ -442,6 +593,7 @@ export const periodKey = (
   year: number,
   key: string,
   along: number,
+  months: (year: number) => number = () => 12,
 ): { focus: number; pageYear: number } | null => {
   const index = view === 'year' ? stop - yearPageOf(stop) : stop
   const delta = periodMove(key, index, along)
@@ -451,6 +603,19 @@ export const periodKey = (
   if (view === 'year') {
     return { focus: stop + delta, pageYear: stop + delta }
   }
-  const months = year * 12 + stop + delta
-  return { focus: ((months % 12) + 12) % 12, pageYear: Math.floor(months / 12) }
+  if (key === 'PageUp' || key === 'PageDown') {
+    const to = year + Math.sign(delta)
+    return { focus: Math.min(stop, months(to) - 1), pageYear: to }
+  }
+  let at = stop + delta
+  let on = year
+  while (at < 0) {
+    on -= 1
+    at += months(on)
+  }
+  while (at >= months(on)) {
+    at -= months(on)
+    on += 1
+  }
+  return { focus: at, pageYear: on }
 }

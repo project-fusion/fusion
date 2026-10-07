@@ -1,3 +1,6 @@
+import type { MonthSystem } from '../calendar/calendar.js'
+import { valueAsDate as asDate, dateAsValue as fromDate } from '../value-as/value-as.js'
+
 /*
  * A date or a time as segments, the way React Aria's DateField and TimeField
  * and Web Awesome's time input take one: a year, a month and a day, or an
@@ -15,7 +18,8 @@ export type SegmentKind = 'day' | 'dayPeriod' | 'hour' | 'minute' | 'month' | 's
 export type SegmentedKind = 'date' | 'time'
 
 /**
- * The parts set so far, each a number: the month 1 to 12, the hour 0 to 23
+ * The parts set so far, each a number: the month 1 to 12, or to 13 in a
+ * calendar whose year can have 13, the hour 0 to 23
  * whatever clock it is shown on, and the half of the day 0 for before noon and
  * 1 for after. A part not yet set is absent.
  */
@@ -99,9 +103,47 @@ export const segmentLayout = (
 export const isTwelveHourLayout = (layout: readonly SegmentSlot[]): boolean =>
   layout.some((slot) => 'kind' in slot && slot.kind === 'dayPeriod')
 
-/** How many days a month has, in a year, or thirty-one where either is not known. */
-const daysIn = (month?: number, year?: number): number =>
-  month === undefined ? 31 : new Date(Date.UTC(year ?? 2000, month, 0)).getUTCDate()
+/** This year in a calendar: its own count, or the Gregorian year where none is given. */
+const yearNow = (system?: MonthSystem): number =>
+  system ? system.parts(new Date()).year : new Date().getFullYear()
+
+/**
+ * The years a segment with no year set is measured against: this one and the
+ * two after it, which in the Hebrew calendar always hold a leap year.
+ */
+const yearsAround = (system: MonthSystem): number[] => {
+  const now = yearNow(system)
+  return [now, now + 1, now + 2]
+}
+
+/** How many months a year has, or the most a year has where the year is not known. */
+const monthsIn = (year?: number, system?: MonthSystem): number => {
+  if (!system) {
+    return 12
+  }
+  return year === undefined
+    ? Math.max(...yearsAround(system).map((one) => system.months(one)))
+    : system.months(year)
+}
+
+/**
+ * How many days a month has, in a year, or the most it has where either is
+ * not known: thirty-one in the Gregorian calendar, which lets February 29
+ * stand until a year says otherwise.
+ */
+const daysIn = (month?: number, year?: number, system?: MonthSystem): number => {
+  if (!system) {
+    return month === undefined ? 31 : new Date(Date.UTC(year ?? 2000, month, 0)).getUTCDate()
+  }
+  if (month === undefined) {
+    return 31
+  }
+  const years = year === undefined ? yearsAround(system) : [year]
+  return Math.max(
+    ...years.filter((one) => month <= system.months(one)).map((one) => system.days(one, month)),
+    1,
+  )
+}
 
 /**
  * The lowest and highest a segment can be, as it is shown: the hour on a twelve
@@ -111,14 +153,15 @@ export const segmentRange = (
   kind: SegmentKind,
   segments: Segments,
   twelve: boolean,
+  system?: MonthSystem,
 ): { max: number; min: number } => {
   switch (kind) {
     case 'year':
       return { max: 9999, min: 1 }
     case 'month':
-      return { max: 12, min: 1 }
+      return { max: monthsIn(segments.year, system), min: 1 }
     case 'day':
-      return { max: daysIn(segments.month, segments.year), min: 1 }
+      return { max: daysIn(segments.month, segments.year, system), min: 1 }
     case 'hour':
       return twelve ? { max: 12, min: 1 } : { max: 23, min: 0 }
     case 'minute':
@@ -147,14 +190,15 @@ export const shownValue = (
 
 /**
  * Sets a segment from the number shown for it, which on a twelve hour clock
- * is put back together with the half of the day, and keeps the day inside its
- * month.
+ * is put back together with the half of the day, and keeps the month inside
+ * its year and the day inside its month.
  */
 export const setSegment = (
   segments: Segments,
   kind: SegmentKind,
   shown: number | undefined,
   twelve: boolean,
+  system?: MonthSystem,
 ): Segments => {
   const next: Segments = { ...segments }
   if (shown === undefined) {
@@ -173,8 +217,11 @@ export const setSegment = (
   } else {
     next[kind] = shown
   }
+  if (next.month !== undefined) {
+    next.month = Math.min(next.month, monthsIn(next.year, system))
+  }
   if (next.day !== undefined) {
-    next.day = Math.min(next.day, daysIn(next.month, next.year))
+    next.day = Math.min(next.day, daysIn(next.month, next.year, system))
   }
   return next
 }
@@ -189,20 +236,21 @@ export const stepSegment = (
   kind: SegmentKind,
   by: number,
   twelve: boolean,
-  thisYear = new Date().getFullYear(),
+  thisYear?: number,
+  system?: MonthSystem,
 ): Segments => {
-  const { max, min } = segmentRange(kind, segments, twelve)
+  const { max, min } = segmentRange(kind, segments, twelve, system)
   const shown = shownValue(kind, segments, twelve)
   let next: number
   if (shown === undefined) {
-    next = kind === 'year' ? thisYear : by > 0 ? min : max
+    next = kind === 'year' ? (thisYear ?? yearNow(system)) : by > 0 ? min : max
   } else if (kind === 'year') {
     next = Math.min(max, Math.max(min, shown + by))
   } else {
     const span = max - min + 1
     next = ((((shown - min + by) % span) + span) % span) + min
   }
-  return setSegment(segments, kind, next, twelve)
+  return setSegment(segments, kind, next, twelve, system)
 }
 
 /**
@@ -220,15 +268,16 @@ export const typeDigit = (
   typed: string,
   digit: string,
   twelve: boolean,
+  system?: MonthSystem,
 ): { advance: boolean; segments: Segments; typed: string } => {
-  const { max, min } = segmentRange(kind, segments, twelve)
+  const { max, min } = segmentRange(kind, segments, twelve, system)
   let text = `${typed}${digit}`
   if (Number(text) > max) {
     text = digit
   }
   const value = Number(text)
   const full = text.length >= String(max).length || value * 10 > max
-  const next = value >= min ? setSegment(segments, kind, value, twelve) : segments
+  const next = value >= min ? setSegment(segments, kind, value, twelve, system) : segments
   return { advance: full && value >= min, segments: next, typed: full ? '' : text }
 }
 
@@ -240,6 +289,8 @@ export interface SegmentKeyState {
   locale: string
   /** The field's parts. */
   segments: Segments
+  /** The calendar a date's parts are counted in, Gregorian where none is given. */
+  system?: MonthSystem | undefined
   /** Whether the field is on a twelve hour clock. */
   twelve: boolean
   /** The digits typed into the segment so far. */
@@ -268,26 +319,26 @@ const pageStep: Partial<Record<SegmentKind, number>> = {
  */
 export const segmentKey = (
   key: string,
-  { kind, locale, segments, twelve, typed }: SegmentKeyState,
+  { kind, locale, segments, system, twelve, typed }: SegmentKeyState,
 ): { advance: boolean; segments: Segments; typed: string } | null => {
   const done = (next: Segments | undefined) =>
     next === undefined ? null : { advance: false, segments: next, typed: '' }
   if (key === 'ArrowUp' || key === 'ArrowDown') {
-    return done(stepSegment(segments, kind, key === 'ArrowUp' ? 1 : -1, twelve))
+    return done(stepSegment(segments, kind, key === 'ArrowUp' ? 1 : -1, twelve, undefined, system))
   }
   if (key === 'PageUp' || key === 'PageDown') {
     const by = (key === 'PageUp' ? 1 : -1) * (pageStep[kind] ?? 1)
-    return done(stepSegment(segments, kind, by, twelve))
+    return done(stepSegment(segments, kind, by, twelve, undefined, system))
   }
   if (key === 'Home' || key === 'End') {
-    const { max, min } = segmentRange(kind, segments, twelve)
-    return done(setSegment(segments, kind, key === 'Home' ? min : max, twelve))
+    const { max, min } = segmentRange(kind, segments, twelve, system)
+    return done(setSegment(segments, kind, key === 'Home' ? min : max, twelve, system))
   }
   if (key === 'Backspace' || key === 'Delete') {
-    return done(setSegment(segments, kind, undefined, twelve))
+    return done(setSegment(segments, kind, undefined, twelve, system))
   }
   if (/^\d$/.test(key) && kind !== 'dayPeriod') {
-    return typeDigit(segments, kind, typed, key, twelve)
+    return typeDigit(segments, kind, typed, key, twelve, system)
   }
   if (kind === 'dayPeriod' && key.length === 1) {
     const letter = key.toLowerCase()
@@ -300,10 +351,17 @@ export const segmentKey = (
   return null
 }
 
-/** The segments a value names, or none where it names nothing whole. */
-export const segmentsOf = (kind: SegmentedKind, value: string): Segments => {
+/**
+ * The segments a value names, or none where it names nothing whole: a date's
+ * year, month, and day as `system` counts them, Gregorian where none is given.
+ */
+export const segmentsOf = (kind: SegmentedKind, value: string, system?: MonthSystem): Segments => {
   if (kind === 'date') {
     const parts = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value)
+    const date = system && parts ? asDate(value) : null
+    if (system && date) {
+      return { ...system.parts(date) }
+    }
     return parts ? { day: Number(parts[3]), month: Number(parts[2]), year: Number(parts[1]) } : {}
   }
   const parts = /^(\d{2}):(\d{2})(?::(\d{2}))?$/.exec(value)
@@ -330,6 +388,7 @@ export const segmentsValue = (
   kind: SegmentedKind,
   segments: Segments,
   layout: readonly SegmentSlot[],
+  system?: MonthSystem,
 ): string => {
   const shown = layout.flatMap((slot) => ('kind' in slot ? [slot.kind] : []))
   const needed = shown.filter((one) => one !== 'dayPeriod')
@@ -338,6 +397,9 @@ export const segmentsValue = (
   }
   const pad = (number: number | undefined, width = 2): string =>
     String(number ?? 0).padStart(width, '0')
+  if (kind === 'date' && system) {
+    return fromDate(system.from(segments.year ?? 1, segments.month ?? 1, segments.day ?? 1))
+  }
   if (kind === 'date') {
     return `${pad(segments.year, 4)}-${pad(segments.month)}-${pad(segments.day)}`
   }
@@ -350,8 +412,9 @@ export const isPartial = (
   kind: SegmentedKind,
   segments: Segments,
   layout: readonly SegmentSlot[],
+  system?: MonthSystem,
 ): boolean =>
-  segmentsValue(kind, segments, layout) === '' &&
+  segmentsValue(kind, segments, layout, system) === '' &&
   layout.some(
     (slot) => 'kind' in slot && slot.kind !== 'dayPeriod' && segments[slot.kind] !== undefined,
   )
@@ -389,13 +452,16 @@ export const segmentText = (
 /**
  * What a screen reader hears for a segment's value: what it shows, and for a
  * month its name as well, "8 – August", which is React Aria's reading. A
- * month heard as a number alone leaves a reader counting.
+ * month heard as a number alone leaves a reader counting. In a calendar with
+ * months of its own, the name is that calendar's month in the year the
+ * segments hold, or in this year: "7 – Mehr".
  */
 export const segmentValueText = (
   kind: SegmentKind,
   segments: Segments,
   twelve: boolean,
   locale: string,
+  system?: MonthSystem,
 ): string => {
   const text = segmentText(kind, segments, twelve, locale)
   const month = segments.month
@@ -405,7 +471,11 @@ export const segmentValueText = (
   const name = new Intl.DateTimeFormat(locale || undefined, {
     month: 'long',
     timeZone: 'UTC',
-  }).format(new Date(Date.UTC(2000, month - 1, 1)))
+  }).format(
+    system
+      ? system.from(segments.year ?? yearNow(system), month, 1)
+      : new Date(Date.UTC(2000, month - 1, 1)),
+  )
   return `${month} – ${name}`
 }
 
