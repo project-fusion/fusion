@@ -82,6 +82,13 @@ export class HelixHeadlessTimelineItem extends HelixElement {
     },
   })
 
+  /**
+   * What the `time` slot shows where nothing is slotted: the reading under
+   * `relative`, read against the clock before each render, and nothing
+   * otherwise.
+   */
+  private reading = ''
+
   /** The instant `datetime` names, where `relative` asks for a reading of it. */
   private get moment(): Date | undefined {
     if (this.relative === undefined || this.datetime === '') {
@@ -107,6 +114,8 @@ export class HelixHeadlessTimelineItem extends HelixElement {
     if (['datetime', 'relative'].some((key) => changed.has(key))) {
       this.clock.tick()
     }
+    const moment = this.moment
+    this.reading = moment ? this.readingAt(moment, new Date(this.clock.now)).text : ''
     hostAria(this.internals, { role: 'listitem' })
   }
 
@@ -138,10 +147,7 @@ export class HelixHeadlessTimelineItem extends HelixElement {
   }
 
   protected override render(): TemplateResult {
-    const moment = this.moment
-    const when = html`<slot name="time"
-      >${moment ? this.readingAt(moment, new Date(this.clock.now)).text : ''}</slot
-    >`
+    const when = html`<slot name="time">${this.reading}</slot>`
     /* The time is a sibling of the content rather than the first thing inside
        it, so the two are separate rows and the rail can align its mark to the
        second of them. Nested, the mark could only ever be a fixed distance from

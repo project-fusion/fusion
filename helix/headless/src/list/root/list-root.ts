@@ -212,13 +212,6 @@ export class HelixHeadlessList extends HelixElement {
   label = ''
 
   /**
-   * Sends `helix-load-more` once the end of the list comes within a screen of
-   * view, so you can add the next rows as a reader nears them.
-   */
-  @property({ attribute: 'load-more', type: Boolean })
-  loadMore = false
-
-  /**
    * Marks the list as busy fetching more rows, and draws a row after the last
    * that says so. The list asks for no more while it is set.
    */
@@ -229,6 +222,13 @@ export class HelixHeadlessList extends HelixElement {
   @words
   @property({ attribute: 'loading-label' })
   loadingLabel = 'Loading more'
+
+  /**
+   * Sends `helix-load-more` once the end of the list comes within a screen of
+   * view, so you can add the next rows as a reader nears them.
+   */
+  @property({ attribute: 'load-more', type: Boolean })
+  loadMore = false
 
   /**
    * What screen readers hear each time an arrow key moves a held row, in a
@@ -714,12 +714,18 @@ export class HelixHeadlessList extends HelixElement {
     this.addEventListener('keydown', this.handleKeydown)
     this.addEventListener('click', this.handleClick)
     this.addEventListener('focusin', this.handleFocusin)
+    /* Moved in the page, a `load-more` list watches its end again. Its shadow
+       root keeps the end it drew, so nothing has to render first. */
+    if (this.hasUpdated) {
+      this.watchEnd()
+    }
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.endWatcher?.disconnect()
     this.endWatcher = undefined
+    this.watchedEnd = undefined
     this.removeEventListener('keydown', this.handleKeyCapture, true)
     this.removeEventListener('keydown', this.handleKeydown)
     this.removeEventListener('click', this.handleClick)
