@@ -710,3 +710,19 @@ describe('a megamenu and keyboard focus', () => {
     expect(host.open).toBe(true)
   })
 })
+
+/* Radix's navigation menu marks the link of the page you are on. */
+describe('the section you are in', () => {
+  test('is current while a link in its panel says it is the page', async () => {
+    const host = (await mount(
+      `<helix-headless-megamenu label="Docs"><a href="/a">A</a><a href="/b" aria-current="page">B</a></helix-headless-megamenu>`,
+    )) as Section
+    expect(hasState(host, 'current')).toBe(true)
+    host.querySelector('[aria-current]')?.removeAttribute('aria-current')
+    await new Promise((done) => setTimeout(done, 0))
+    expect(hasState(host, 'current')).toBe(false)
+    host.querySelector('a')?.setAttribute('aria-current', 'page')
+    await new Promise((done) => setTimeout(done, 0))
+    expect(hasState(host, 'current')).toBe(true)
+  })
+})
