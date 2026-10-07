@@ -1540,6 +1540,13 @@ declares it. So every English default a component ships is a word property, and
   name and empty by default, and the element reads `this.label ||
   this.fallbackLabel`. One spelling, so a page and a translator find it in
   each family by one name.
+- **A mixin's words resolve under its host's key.** The mixin writes
+  `static words = ''` and `@words` on its own words; a host with no key reads
+  its tag name. A family that rewords one, such as Tag's `Remove {label}` over
+  `Dismiss`, writes `@words` and `@property` above the override, and its
+  initializer, which runs last, is the English. So every `@words` declaration
+  has an initializer. A family with its own sentence for a required value
+  declares it as `valueMissingMessage`.
 - **A validation message is never empty.** A word property whose name ends in
   `Message` reads an empty string as unset, so a page that renders an empty
   variable into `range-overflow-message=""` gets the registered or English

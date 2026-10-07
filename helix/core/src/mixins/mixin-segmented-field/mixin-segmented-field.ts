@@ -22,6 +22,7 @@ import {
 import { inlineStep } from '../../utils/inline-step/inline-step.js'
 import { appleTouch } from '../../utils/platform/platform.js'
 import { verdictFlags } from '../../utils/verdict-flags/verdict-flags.js'
+import { formatWords, words } from '../../words/words.js'
 import type { MixinControllerOpenInterface } from '../mixin-controller-open/mixin-controller-open.js'
 import type { MixinControllerValueInterface } from '../mixin-controller-value/mixin-controller-value.js'
 import type { MixinFieldInterface } from '../mixin-field/mixin-field.js'
@@ -44,8 +45,22 @@ type SegmentedBase = HelixFormElement &
  * anonymous class that has private members (TS4094).
  */
 export declare class MixinSegmentedFieldInterface {
+  /**
+   * What a row of segments reports when the field is required and every
+   * segment is empty, where `value-missing-message` is not set. `{kind}` is
+   * `date` or `time`.
+   */
+  emptyMessage: string
+
   /** What a screen reader hears for a segment with nothing in it. */
   emptySegmentLabel: string
+
+  /**
+   * What a row of segments reports while some segments are set and others
+   * are not, where `bad-input-message` is not set. `{kind}` is `date` or
+   * `time`.
+   */
+  incompleteMessage: string
 
   /**
    * Whether the field is a row of segments, one for each part of the date or
@@ -107,11 +122,37 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
   // analyzer reads when resolving inherited members into dependent packages.
   class SegmentedFieldElement extends Base {
     /**
+     * The key the segments' words are registered under: the host's own,
+     * which each family names with its styled tag, `static words =
+     * 'helix-date-input'`. A host with none reads its tag name.
+     */
+    static words = ''
+
+    /**
+     * What a row of segments reports when the field is required and every
+     * segment is empty, where `value-missing-message` is not set. `{kind}` is
+     * `date` or `time`.
+     */
+    @words
+    @property({ attribute: 'empty-message' })
+    emptyMessage = '{kind, select, date {Enter a date.} other {Enter a time.}}'
+
+    /**
      * What a screen reader hears for a segment with nothing in it, which a
      * sighted reader sees as dashes.
      */
+    @words
     @property({ attribute: 'empty-segment-label' })
     emptySegmentLabel = 'Empty'
+
+    /**
+     * What a row of segments reports while some segments are set and others
+     * are not, where `bad-input-message` is not set. `{kind}` is `date` or
+     * `time`.
+     */
+    @words
+    @property({ attribute: 'incomplete-message' })
+    incompleteMessage = '{kind, select, date {Enter a whole date.} other {Enter a whole time.}}'
 
     /**
      * Whether the field is a row of segments, one for each part of the date or
@@ -362,14 +403,14 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
         this.internals.setValidity(
           { badInput: true },
           this.badInputMessage ||
-            (this.segmentedKind === 'date' ? 'Enter a whole date.' : 'Enter a whole time.'),
+            formatWords(this, 'incompleteMessage', { kind: this.segmentedKind }),
           anchor,
         )
       } else if (this.required && this.value === '') {
         this.internals.setValidity(
           { valueMissing: true },
           this.valueMissingMessage ||
-            (this.segmentedKind === 'date' ? 'Enter a date.' : 'Enter a time.'),
+            formatWords(this, 'emptyMessage', { kind: this.segmentedKind }),
           anchor,
         )
       } else if (fault !== null) {

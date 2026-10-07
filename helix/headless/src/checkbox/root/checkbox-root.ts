@@ -6,6 +6,7 @@ import {
   MixinControllerChecked,
   MixinField,
   slotFilled,
+  words,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -76,6 +77,12 @@ import { property } from 'lit/decorators.js'
  */
 @customElement('helix-headless-checkbox')
 export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(HelixFormElement)) {
+  /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-checkbox': { valueMissingMessage: '...' } })`.
+   */
+  static words = 'helix-checkbox'
+
   /* A consumer's `aria-describedby` names ids in their own tree and the control
      is in this shadow root, so the reference has to be carried down as an
      element rather than copied as an id. See `AriaForwardController`: measured
@@ -105,6 +112,15 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
    */
   @property()
   value = 'on'
+
+  /**
+   * The message reported when the field is required and the box is not ticked.
+   * Absent, or empty, is this sentence, or the words registered for the page's
+   * locale.
+   */
+  @words
+  @property({ attribute: 'value-missing-message' })
+  override valueMissingMessage = 'Tick this box to continue.'
 
   /**
    * Whether the mark draws the dash: from the moment the box is indeterminate
@@ -149,7 +165,7 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
   /** Reports the value and the validity the host stands behind. */
   private sync(): void {
     this.internals.setFormValue(this.checked ? this.value : null)
-    this.reportRequired(!this.checked, 'Tick this box to continue.', 'control')
+    this.reportRequired(!this.checked, this.valueMissingMessage, 'control')
   }
 
   /** Resets the box to the state set in its markup. */

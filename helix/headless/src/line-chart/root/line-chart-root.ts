@@ -105,6 +105,12 @@ import '../../tooltip/index.js'
 @customElement('helix-headless-line-chart')
 export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-line-chart': { positionLabel: '{position} von {count}' } })`.
+   */
+  static words = 'helix-line-chart'
+
+  /**
    * Draws a wash under each line, down to the floor of the plot. The washes
    * overlap and do not add up, so for parts that make a total, use
    * `Area Chart`, which stacks them.

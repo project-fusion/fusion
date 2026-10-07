@@ -1,6 +1,7 @@
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import type { HelixElement } from '../../helix-element/helix-element.js'
+import { words } from '../../words/words.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
 type Constructor<T> = new (...args: any[]) => T
@@ -81,8 +82,16 @@ export declare class CollectionElement {
 export const MixinCollection = <T extends Constructor<HelixElement>>(Base: T) => {
   class Collection extends Base {
     /**
+     * The key the empty and loading texts are registered under: the host's
+     * own, which each family names with its styled tag, `static words =
+     * 'helix-tree'`. A host with none reads its tag name.
+     */
+    static words = ''
+
+    /**
      * The text shown and announced when there are no rows and none are loading.
      */
+    @words
     @property({ attribute: 'empty-text' })
     emptyText = 'Nothing to show'
 
@@ -99,6 +108,7 @@ export const MixinCollection = <T extends Constructor<HelixElement>>(Base: T) =>
     /**
      * The text shown and announced while the rows load.
      */
+    @words
     @property({ attribute: 'loading-text' })
     loadingText = 'Loading'
 

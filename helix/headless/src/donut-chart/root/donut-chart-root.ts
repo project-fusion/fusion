@@ -151,6 +151,12 @@ export interface DonutShare {
 @customElement('helix-headless-donut-chart')
 export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-donut-chart': { positionLabel: '{position} von {count}' } })`.
+   */
+  static words = 'helix-donut-chart'
+
+  /**
    * The pointer is not mapped across this one.
    *
    * Every other chart lays its readings out along the line, so the nearest is

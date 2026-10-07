@@ -209,6 +209,15 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
   step = 1
 
   /**
+   * The message reported when the field is required and no rating is chosen.
+   * Absent, or empty, is this sentence, or the words registered for the page's
+   * locale.
+   */
+  @words
+  @property({ attribute: 'value-missing-message' })
+  override valueMissingMessage = 'Choose a rating to continue.'
+
+  /**
    * The text screen readers read for the score, in place of "3.5 out of 5".
    *
    * A rating out of five is one of the few places a screen reader gets a worse
@@ -495,7 +504,7 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
     /* Nothing where nothing is chosen, which is what a radio group submits:
        an empty entry reads on the server as a rating somebody gave. */
     this.internals.setFormValue(this.value === '' ? null : this.value)
-    this.reportRequired(this.value === '', 'Choose a rating to continue.', 'marks')
+    this.reportRequired(this.value === '', this.valueMissingMessage, 'marks')
   }
 
   private readonly handleOptionClick = (event: MouseEvent): void => {

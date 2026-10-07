@@ -349,9 +349,11 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
     /**
      * The message shown when the field is required and empty.
      *
-     * **Absent, or empty, is the control's own sentence**, "Choose one to continue." on a
-     * set and the browser's own on a text field, which the browser writes in
-     * the reader's language. Every other word a control speaks is a property,
+     * **Absent, or empty, is the control's own sentence**, "Choose one to
+     * continue." on a set and the browser's own on a text field, which the
+     * browser writes in the reader's language. A family with a sentence of its
+     * own declares it as this property's English, a word property a page
+     * registers for its locale under the family's key. Every other word a control speaks is a property,
      * and this one was the English a form in another language still spoke in
      * the bubble it raises on submit: `feedback` replaces the message under
      * the field and does not reach that one.

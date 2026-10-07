@@ -6,29 +6,43 @@ import { wordsLocale } from './words-locale.js'
 /** An element that reads words: a Lit element, perhaps with a `locale`. */
 type Host = ReactiveElement & { locale?: string | undefined }
 
-/** What an element holds for its word properties. */
+/**
+ * What an element holds for one word property, in short keys because they
+ * ship as written: its English (`e`), the value set on it after construction,
+ * which wins (`o`), what it last resolved to, to tell whether an update
+ * changes it (`l`), and how many initializers have set it (`i`).
+ */
 interface Held {
-  /** Each property's English, its initializer. */
-  english: Map<string, unknown>
-  /** What was set after construction: yours, which wins. */
-  own: Map<string, unknown>
-  /** What each property last resolved to, to tell whether an update changes it. */
-  last: Map<string, unknown>
+  e?: unknown
+  o?: unknown
+  l?: unknown
+  i: number
 }
 
-const elements = new WeakMap<object, Held>()
+/** Where an element keeps its word properties, by name. */
+const HELD = Symbol()
 
-const heldBy = (host: object): Held => {
-  let found = elements.get(host)
-  if (!found) {
-    found = { english: new Map(), last: new Map(), own: new Map() }
-    elements.set(host, found)
+/** An element's word properties, which none has before its first is set. */
+const heldBy = (host: object): Record<string, Held> =>
+  (host as { [HELD]?: Record<string, Held> })[HELD] ?? {}
+
+/** The word properties each prototype declares. */
+const declared = new WeakMap<object, Set<string>>()
+
+/**
+ * How many classes an element is made from declare `name` a word property,
+ * each with an initializer: the sets its construction makes, each an English
+ * the next replaces. A family that overrides a mixin's English with its own
+ * writes `@words` above the override, and its initializer, which runs last,
+ * is the English.
+ */
+const initializers = (host: object, name: string): number => {
+  let count = 0
+  for (let proto = Object.getPrototypeOf(host); proto; proto = Object.getPrototypeOf(proto)) {
+    count += declared.get(proto)?.has(name) ? 1 : 0
   }
-  return found
+  return count
 }
-
-/** Whether a class's elements already watch the registry, inherited by subclasses. */
-const WATCHED = Symbol('words watched')
 
 /**
  * A word property's value, and the locale its plural forms are in: yours, in
@@ -36,43 +50,40 @@ const WATCHED = Symbol('words watched')
  * the English, in `en`.
  */
 const resolve = (host: Host, name: string): [unknown, string] => {
-  const held = heldBy(host)
+  const word = heldBy(host)[name]
   /* A property no `@words` declares is read as it is, in the element's
      locale, so a shared helper formats a family that has not moved yet. */
-  if (!held.english.has(name)) {
+  if (!word) {
     return [host[name as keyof Host], '']
   }
-  const own = held.own.get(name)
-  const english = held.english.get(name)
+  const { e: english, o: own } = word
+  const table = typeof english === 'object' && (english as MessageTable | null)
   let found: [unknown, string] = [own, '']
-  if (own == null || typeof english === 'object') {
+  if (own == null || table) {
     const registered = wordsRegistered()
       ? lookupWord(
           wordsLocale(host),
-          (host.constructor as { words?: string }).words ?? host.localName,
+          (host.constructor as { words?: string }).words || host.localName,
           name,
         )
       : undefined
-    found =
-      typeof english === 'object' && english !== null
-        ? [{ ...english, ...(registered?.[0] as MessageTable), ...(own as MessageTable) }, '']
-        : (registered ?? [english, 'en'])
+    found = table
+      ? [{ ...table, ...(registered?.[0] as MessageTable), ...(own as MessageTable) }, '']
+      : (registered ?? [english, 'en'])
   }
-  held.last.set(name, found[0])
+  word.l = found[0]
   return found
 }
 
 /** The same words, compared by value where a word is a table. */
 const same = (one: unknown, two: unknown): boolean =>
-  one === two ||
-  (typeof one === 'object' &&
-    typeof two === 'object' &&
-    JSON.stringify(one) === JSON.stringify(two))
+  one === two || JSON.stringify(one) === JSON.stringify(two)
 
 /** Updates an element whose words now resolve to something else, naming each one. */
 const recheck = (host: Host): void => {
-  for (const [name, before] of heldBy(host).last) {
-    if (!same(before, resolve(host, name)[0])) {
+  for (const [name, word] of Object.entries(heldBy(host))) {
+    const before = word.l
+    if ('l' in word && !same(before, resolve(host, name)[0])) {
       host.requestUpdate(name, before)
     }
   }
@@ -83,38 +94,30 @@ const recheck = (host: Host): void => {
  * hydrating. An element whose locale changes with a `lang` updates even where
  * no word of its own changes, so its numbers are written in the new locale.
  */
-class WordsController implements ReactiveController {
-  private stop: (() => void) | undefined
-  private locale = ''
-
-  constructor(private readonly host: Host) {}
-
-  hostConnected(): void {
-    this.locale = wordsLocale(this.host)
-    this.stop = watchWords(() => {
-      recheck(this.host)
-      const locale = wordsLocale(this.host)
-      if (locale !== this.locale) {
-        this.locale = locale
-        this.host.requestUpdate()
+const watcher = (host: Host): ReactiveController => {
+  let stop: (() => void) | undefined
+  let locale = ''
+  return {
+    hostConnected: () => {
+      locale = wordsLocale(host)
+      stop = watchWords(() => {
+        recheck(host)
+        const now = wordsLocale(host)
+        if (now !== locale) {
+          locale = now
+          host.requestUpdate()
+        }
+      })
+    },
+    hostDisconnected: () => stop?.(),
+    /* After the hydrating render, which read only the element's own
+       attributes, the words are read again with the nearest `lang`. An
+       element whose words differ updates once. */
+    hostUpdated: () => {
+      if ((host as { hydrating?: boolean }).hydrating === true) {
+        queueMicrotask(() => recheck(host))
       }
-    })
-  }
-
-  hostDisconnected(): void {
-    this.stop?.()
-    this.stop = undefined
-  }
-
-  /**
-   * After the hydrating render, which read only the element's own attributes,
-   * the words are read again with the nearest `lang`. An element whose words
-   * differ updates once.
-   */
-  hostUpdated(): void {
-    if ((this.host as { hydrating?: boolean }).hydrating === true) {
-      queueMicrotask(() => recheck(this.host))
-    }
+    },
   }
 }
 
@@ -140,39 +143,49 @@ class WordsController implements ReactiveController {
  * with no sentence, and a template that renders an empty variable into
  * `range-overflow-message=""` gets the built-in sentence.
  *
+ * **A subclass or a family that overrides a word's English writes `@words`
+ * above the override**, and its initializer is the English: a family's
+ * `Remove filter` over a mixin's `Dismiss`. Every `@words` declaration has an
+ * initializer, so an element knows how many of its sets are English.
+ *
  * The class's static `words` names the key its words are registered under, the
- * family's styled tag, so the headless and styled tiers share one key. An
- * element whose words change updates once, with each changed property named.
+ * family's styled tag, so the headless and styled tiers share one key. A mixin
+ * that declares words writes `static words = ''`, which its host's key
+ * replaces; a host with no key of its own reads its tag name. An element whose
+ * words change updates once, with each changed property named.
  */
 export const words = (proto: object, name: string): void => {
-  const ctor = proto.constructor as typeof ReactiveElement & { [WATCHED]?: true }
   if (!Object.getOwnPropertyDescriptor(proto, name)) {
-    ctor.createProperty(name)
+    ;(proto.constructor as typeof ReactiveElement).createProperty(name)
   }
-  if (!ctor[WATCHED]) {
-    ctor[WATCHED] = true
-    ctor.addInitializer((host) => {
-      host.addController(new WordsController(host as Host))
-    })
-  }
+  const names = declared.get(proto) ?? new Set()
+  declared.set(proto, names.add(name))
   Object.defineProperty(proto, name, {
     configurable: true,
     enumerable: true,
     get(this: Host): unknown {
       return resolve(this, name)[0]
     },
-    set(this: Host, value: unknown) {
-      const held = heldBy(this)
-      /* The initializer is the first value any element receives: it runs in
-         the constructor, before an attribute, a property a framework sets, or
-         a value saved from before the element upgraded. */
-      if (!held.english.has(name)) {
-        held.english.set(name, value)
+    set(this: Host & { [HELD]?: Record<string, Held> }, value: unknown) {
+      /* The first word an element receives, in its constructor, starts it
+         watching the registry. */
+      if (!this[HELD]) {
+        this[HELD] = {}
+        this.addController(watcher(this))
+      }
+      // biome-ignore lint/suspicious/noAssignInExpressions: made on the first value the property receives.
+      const word = (this[HELD][name] ??= { i: 0 })
+      /* Each initializer is English, the most derived class's last: they run
+         in the constructor, before an attribute, a property a framework sets,
+         or a value saved from before the element upgraded. */
+      if (word.i < initializers(this, name)) {
+        word.i++
+        word.e = value
         this.requestUpdate(name, undefined, undefined, true, value)
         return
       }
       const before = this[name as keyof Host]
-      held.own.set(name, value === '' && name.endsWith('Message') ? undefined : value)
+      word.o = value === '' && name.endsWith('Message') ? undefined : value
       this.requestUpdate(name, before)
     },
   })

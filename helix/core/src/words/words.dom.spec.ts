@@ -187,6 +187,76 @@ describe('a word property', () => {
   })
 })
 
+describe('a word a mixin declares', () => {
+  /* A mixin's words resolve under its host's key, and a family that rewords
+     one declares its own English: Tag's "Remove {label}" over "Dismiss". */
+  const define = async (): Promise<void> => {
+    if (customElements.get('words-mixed')) {
+      return
+    }
+    const { LitElement } = await import('lit')
+    const { property } = await import('lit/decorators.js')
+    // biome-ignore lint/suspicious/noExplicitAny: a mixin's constructor is variadic.
+    const Mixin = <T extends new (...args: any[]) => InstanceType<typeof LitElement>>(Base: T) => {
+      class Dismissing extends Base {
+        static words = ''
+
+        @words.words
+        @property({ attribute: 'dismiss-label' })
+        dismissLabel = 'Dismiss'
+      }
+      return Dismissing
+    }
+    class Mixed extends Mixin(LitElement) {
+      static override words = 'helix-mixed'
+    }
+    class Reworded extends Mixin(LitElement) {
+      static override words = 'helix-reworded'
+
+      @words.words
+      @property({ attribute: 'dismiss-label' })
+      override dismissLabel = 'Remove'
+    }
+    class Keyless extends Mixin(LitElement) {}
+    customElements.define('words-mixed', Mixed)
+    customElements.define('words-reworded', Reworded)
+    customElements.define('words-keyless', Keyless)
+  }
+  type Dismissing = Probe & { dismissLabel: string | null }
+
+  test("resolves under its host's key, or its tag where the host names none", async () => {
+    await define()
+    registry.registerWords('de', {
+      'helix-mixed': { dismissLabel: 'Schließen' },
+      'words-keyless': { dismissLabel: 'Ausblenden' },
+    })
+    const mixed = (await mount(
+      '<div lang="de"><words-mixed></words-mixed></div>',
+      'words-mixed',
+    )) as Dismissing
+    expect(mixed.dismissLabel).toBe('Schließen')
+    const keyless = (await mount(
+      '<div lang="de"><words-keyless></words-keyless></div>',
+      'words-keyless',
+    )) as Dismissing
+    expect(keyless.dismissLabel).toBe('Ausblenden')
+  })
+
+  test('takes the English of the family that rewords it, which the registry replaces', async () => {
+    await define()
+    const host = (await mount('<words-reworded></words-reworded>', 'words-reworded')) as Dismissing
+    expect(host.dismissLabel).toBe('Remove')
+    registry.registerWords('de', { 'helix-reworded': { dismissLabel: 'Entfernen' } })
+    document.documentElement.setAttribute('lang', 'de')
+    await updated(host)
+    expect(host.dismissLabel).toBe('Entfernen')
+    host.dismissLabel = 'Weg damit'
+    expect(host.dismissLabel).toBe('Weg damit')
+    host.dismissLabel = null
+    expect(String(host.dismissLabel)).toBe('Entfernen')
+  })
+})
+
 describe('a page that changes its words', () => {
   test('updates connected elements once, naming each word that changed', async () => {
     const probe = await mount('<div lang="de"><words-probe></words-probe></div>')

@@ -269,6 +269,15 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
   valueContent?: ((chosen: readonly HelixHeadlessOption[]) => unknown) | undefined
 
   /**
+   * The message reported when the field is required and nothing is chosen.
+   * Absent, or empty, is this sentence, or the words registered for the page's
+   * locale.
+   */
+  @words
+  @property({ attribute: 'value-missing-message' })
+  override valueMissingMessage = 'Choose one to continue.'
+
+  /**
    * Which option is chosen, as an index, or `-1` where none is.
    *
    * Read off the listbox this renders, which owns the options and is where the
@@ -728,7 +737,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
     } else {
       this.internals.setFormValue(this.value === '' ? null : this.value)
     }
-    this.reportRequired(this.value === '', 'Choose one to continue.', 'trigger')
+    this.reportRequired(this.value === '', this.valueMissingMessage, 'trigger')
   }
 
   protected override willUpdate(changed: PropertyValues): void {

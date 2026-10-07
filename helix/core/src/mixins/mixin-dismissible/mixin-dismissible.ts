@@ -6,6 +6,7 @@ import {
   deepContains,
 } from '../../utils/focusable-elements/focusable-elements.js'
 import { tabStops } from '../../utils/tab-stops/tab-stops.js'
+import { words } from '../../words/words.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
 type Constructor<T> = new (...args: any[]) => T
@@ -51,6 +52,13 @@ export declare class DismissibleElement {
 export const MixinDismissible = <T extends Constructor<LitElement>>(Base: T) => {
   class Dismissible extends Base {
     /**
+     * The key the dismiss control's name is registered under: the host's own,
+     * which each family names with its styled tag, `static words =
+     * 'helix-callout'`. A host with none reads its tag name.
+     */
+    static words = ''
+
+    /**
      * Whether the element shows a control that dismisses it.
      */
     @property({ reflect: true, type: Boolean })
@@ -63,7 +71,12 @@ export const MixinDismissible = <T extends Constructor<LitElement>>(Base: T) => 
      * derive one rather than dash-casing it, so this would otherwise be
      * reachable only as `dismisslabel`, which nobody would guess and no linter
      * would catch.
+     *
+     * A word property: register it for a locale under the host's key. A family
+     * that names the control otherwise, such as Tag's `Remove {label}`,
+     * declares its own English with `@words` above the override.
      */
+    @words
     @property({ attribute: 'dismiss-label' })
     dismissLabel = 'Dismiss'
 

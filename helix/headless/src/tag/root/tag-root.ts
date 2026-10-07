@@ -2,12 +2,12 @@ import {
   customElement,
   drawDismiss,
   drawDismissGlyph,
-  formatMessage,
+  formatWords,
   HelixElement,
   hostAria,
   MixinDismissible,
   slottedWords,
-  wordsLocale,
+  words,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -62,11 +62,11 @@ import { property } from 'lit/decorators.js'
  */
 @customElement('helix-headless-tag')
 export class HelixHeadlessTag extends MixinDismissible(HelixElement) {
-  /* "Remove" rather than the mixin's "Dismiss". A tag is taken out of a set,
-     which is a different act from closing a message, and the control's name is
-     what a screen-reader user hears. One sentence with the tag's words in it,
-     `{label}`, so a translation puts them where its language does. */
-  override dismissLabel = 'Remove {label}'
+  /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-tag': { dismissLabel: '{label} entfernen' } })`.
+   */
+  static words = 'helix-tag'
 
   /**
    * Takes the tag out of reach: its link and its remove button stop
@@ -75,6 +75,18 @@ export class HelixHeadlessTag extends MixinDismissible(HelixElement) {
    */
   @property({ reflect: true, type: Boolean })
   disabled = false
+
+  /**
+   * The remove button's name, read by screen readers, with `{label}` for the
+   * tag's own words.
+   *
+   * "Remove" rather than the mixin's "Dismiss": a tag is taken out of a set,
+   * which is a different act from closing a message. One sentence with the
+   * tag's words in it, so a translation puts them where its language does.
+   */
+  @words
+  @property({ attribute: 'dismiss-label' })
+  override dismissLabel = 'Remove {label}'
 
   /**
    * Whether the tag holds its group's tab stop.
@@ -176,13 +188,12 @@ export class HelixHeadlessTag extends MixinDismissible(HelixElement) {
    * the name is the verb alone until the update after.
    */
   private get removeName(): string {
-    const words = this.words
-    if (this.dismissLabel.includes('{label}')) {
-      return formatMessage(this.dismissLabel, { label: words }, wordsLocale(this)).trim()
+    const { dismissLabel, words } = this
+    if (dismissLabel.includes('{label}')) {
+      return formatWords(this, 'dismissLabel', { label: words }).trim()
     }
-    return words === '' || this.dismissLabel.includes(words)
-      ? this.dismissLabel
-      : `${this.dismissLabel} ${words}`
+    /* A page's own verb with no `{label}`: the words follow it. */
+    return words === '' || dismissLabel.includes(words) ? dismissLabel : `${dismissLabel} ${words}`
   }
 
   protected override firstUpdated(changed: PropertyValues): void {

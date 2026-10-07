@@ -5,6 +5,7 @@ import { SourceController } from '../../controllers/source-controller/source-con
 import type { HelixElement } from '../../helix-element/helix-element.js'
 import { type Row, type Series, seriesKey } from '../../utils/read-series/read-series.js'
 import { writtenList } from '../../utils/written-list/written-list.js'
+import { words } from '../../words/words.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
 type Constructor<T> = new (...args: any[]) => T
@@ -229,6 +230,13 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
   Base: T,
 ): T & Constructor<MixinChartSourceInterface> => {
   class ChartSourceElement extends Base {
+    /**
+     * The key `position-label` is registered under: the host's own, which
+     * each chart names with its styled tag, `static words =
+     * 'helix-line-chart'`. A host with none reads its tag name.
+     */
+    static words = ''
+
     /** Resolves `for` and re-renders when the table behind it changes. */
     protected readonly source = new SourceController(this)
 
@@ -283,6 +291,7 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
      * {count}`, or to nothing to say no position. A slice or a series a
      * legend hid is not counted.
      */
+    @words
     @property({ attribute: 'position-label' })
     positionLabel = '{position} of {count}'
 
