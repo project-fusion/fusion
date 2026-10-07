@@ -1,5 +1,12 @@
 import { customElement, HelixElement, reportRuntime } from '@fusion.dev/helix-core'
-import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import {
+  type CSSResultGroup,
+  css,
+  html,
+  nothing,
+  type PropertyValues,
+  type TemplateResult,
+} from 'lit'
 import { property } from 'lit/decorators.js'
 import { typedMarks } from '../marks.js'
 
@@ -15,6 +22,12 @@ import { typedMarks } from '../marks.js'
  * element, and its marks follow it: `lang="de"` sets „…“ and `lang="fr"` «…»
  * inside an English page.
  *
+ * **`no-marks` leaves the marks off**, for a quotation set where the page draws
+ * its own, such as a pull quote with a large decorative mark beside it or a
+ * table of sayings. The quotation still counts toward nesting, so a quote
+ * inside it takes the inner marks it would have had. Text with marks typed
+ * into it raises no warning under `no-marks`.
+ *
  * For a passage set off from the surrounding text, use a blockquote.
  *
  * @since 0.1.0
@@ -29,11 +42,34 @@ import { typedMarks } from '../marks.js'
  */
 @customElement('helix-headless-quote')
 export class HelixHeadlessQuote extends HelixElement {
+  /* `no-open-quote` draws nothing and still counts the level, so a quote
+     nested inside one without marks takes the inner marks. */
+  static override styles: CSSResultGroup = css`
+    :host([no-marks]) [part='quote']::before {
+      content: no-open-quote;
+    }
+
+    :host([no-marks]) [part='quote']::after {
+      content: no-close-quote;
+    }
+  `
+
   /**
    * URL identifying where the quotation came from.
    */
   @property()
   cite = ''
+
+  /**
+   * Whether to leave the quotation marks off, for a quotation set where the
+   * page draws its own.
+   *
+   * Negative, because the marks are on by default and a boolean attribute is
+   * true whenever it is present. Reflected, because a stylesheet takes the
+   * marks off on it.
+   */
+  @property({ attribute: 'no-marks', reflect: true, type: Boolean })
+  noMarks = false
 
   /** Whether this quote has said its text carries typed marks, so it says so once. */
   private warned = false
@@ -48,7 +84,7 @@ export class HelixHeadlessQuote extends HelixElement {
       .filter((node) => !(node instanceof Element) || !node.slot)
       .map((node) => node.textContent ?? '')
       .join('')
-    if (this.warned || !typedMarks(text)) {
+    if (this.warned || this.noMarks || !typedMarks(text)) {
       return
     }
     this.warned = true

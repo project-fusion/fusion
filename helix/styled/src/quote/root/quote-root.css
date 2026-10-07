@@ -20,6 +20,16 @@
   font-weight: var(--quote-font-weight, inherit);
 }
 
+/* `no-open-quote` draws nothing and still counts the level, so a quote nested
+   inside one without marks takes the inner marks. */
+:host([no-marks]) [part="quote"]::before {
+  content: no-open-quote;
+}
+
+:host([no-marks]) [part="quote"]::after {
+  content: no-close-quote;
+}
+
 /* Print: the marks and the slant, with no fill behind them.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
