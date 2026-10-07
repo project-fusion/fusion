@@ -70,6 +70,13 @@
 }
 
 /* The hover step, which a browser's thin bar has no way to draw on the thumb. */
+/* The transcript is a tab stop while it holds a turn, and its ring is drawn
+   inside the box, as a turn's is, so no container clips it. */
+[part="log"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}
+
 [part="log"]:hover {
   scrollbar-color: var(--chat-scrollbar-thumb-hover-color, var(--helix-scrollbar-thumb-hover-color))
     var(--chat-scrollbar-track-color, var(--helix-scrollbar-track-color));

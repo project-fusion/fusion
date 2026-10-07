@@ -304,3 +304,55 @@ describe('what is said', () => {
     expect(rect.height).toBeLessThanOrEqual(1)
   })
 })
+
+describe('a reader moving between turns of a long transcript', () => {
+  /* Unpinning asked for an update, and that update put the reader's old place
+     back after focus had scrolled to the turn: the transcript went back to the
+     bottom, pinned again, and the turn a reader was on sat out of view. */
+  const press = (from: Element, key: string): void => {
+    from.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key }),
+    )
+  }
+  const shown = (element: Chat, turn: Element): boolean => {
+    const box = log(element).getBoundingClientRect()
+    const rect = turn.getBoundingClientRect()
+    return rect.top >= box.top - 1 && rect.bottom <= box.bottom + 1
+  }
+
+  geometry(
+    'sees the turn it is on, and leaves the transcript unpinned until the last',
+    async () => {
+      const turns = Array.from(
+        { length: 30 },
+        (_, index) =>
+          `<helix-chat-message author="${index % 2 ? 'me' : 'them'}" state="sent">Message number ${index} with some text to fill space in the transcript</helix-chat-message>`,
+      ).join('')
+      const element = (await mount(
+        `<helix-chat label="Support" style="display: flex; block-size: 400px">${turns}</helix-chat>`,
+      )) as Chat
+      await frames(element)
+      const all = [...element.querySelectorAll('helix-chat-message')]
+      expect(fromBottom(element)).toBeLessThan(1)
+      log(element).focus()
+      press(log(element), 'PageDown')
+      await frames(element)
+      for (let step = 0; step < 6; step += 1) {
+        press(document.activeElement as Element, 'PageUp')
+        await frames(element)
+        const focused = document.activeElement as Element
+        expect(all.indexOf(focused)).toBeLessThan(all.length - 1)
+        expect(shown(element, focused)).toBe(true)
+        expect(element.pinned).toBe(false)
+      }
+      /* The newest turn is the bottom, and a reader on it is following again. */
+      for (let step = 0; step < all.length; step += 1) {
+        press(document.activeElement as Element, 'PageDown')
+      }
+      await frames(element)
+      expect(document.activeElement).toBe(all.at(-1) as Element)
+      expect(shown(element, all.at(-1) as Element)).toBe(true)
+      expect(element.pinned).toBe(true)
+    },
+  )
+})
