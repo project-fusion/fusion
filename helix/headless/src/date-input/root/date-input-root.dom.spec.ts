@@ -914,7 +914,7 @@ describe('a date input reopened after browsing', () => {
      chosen date. */
   test('opens on the chosen date again', async () => {
     const host = await field('locale="en-US" default-value="2026-08-04"')
-    const calendar = picker(host) as HTMLElement & { updateComplete: Promise<unknown> }
+    const calendar = picker(host) as unknown as HTMLElement & { updateComplete: Promise<unknown> }
     const settle = async (): Promise<void> => {
       await host.updateComplete
       await calendar.updateComplete
