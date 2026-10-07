@@ -379,3 +379,17 @@ describe('Enter while an input method composes', () => {
     expect(event.defaultPrevented).toBe(false)
   })
 })
+
+describe('the highlighted suggestion', () => {
+  /* A suggestion is never kept, so the highlighted row is the selection, and
+     the accessibility tree said no row was selected. */
+  test('is the selected option while it is highlighted', async () => {
+    const host = await mount(['absent', 'stale'])
+    await enter(host)
+    await press(host, 'ArrowDown')
+    const said = options(host).map(
+      (option) => (option as unknown as { internals: ElementInternals }).internals.ariaSelected,
+    )
+    expect(said).toEqual(['true', 'false'])
+  })
+})

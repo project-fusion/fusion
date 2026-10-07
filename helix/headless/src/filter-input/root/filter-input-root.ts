@@ -985,6 +985,8 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
     const active = this.open ? options[this.activeAt] : undefined
     for (const [at, option] of options.entries()) {
       option.active = this.open && at === this.activeAt
+      /* A suggestion is never kept, so the highlighted one is the selection. */
+      option.selectionFollowsActive = true
     }
     const control = this.control
     if (control && 'ariaActiveDescendantElement' in control) {

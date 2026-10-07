@@ -225,3 +225,64 @@ describe('an option that is a link', () => {
     expect(host.shadowRoot?.querySelector('a')).toBeNull()
   })
 })
+
+describe('an option’s own content', () => {
+  type Option = HTMLElement & {
+    active: boolean
+    disabled: boolean
+    internals: ElementInternals
+    selected: boolean
+    selectionFollowsActive: boolean
+    text: string
+    updateComplete: Promise<unknown>
+  }
+
+  /* A caption could only be a string, and the tick on a chosen row could not
+     be replaced. */
+  test('takes a slotted caption and a slotted indicator, and neither is part of its text', async () => {
+    const host = (await mount(
+      '<helix-headless-option value="h">Helix<em slot="description">the design system</em><svg slot="indicator"></svg></helix-headless-option>',
+    )) as Option
+    const description = host.shadowRoot?.querySelector(
+      'slot[name="description"]',
+    ) as HTMLSlotElement
+    expect(description.assignedElements().map((one) => one.localName)).toEqual(['em'])
+    const indicator = host.shadowRoot?.querySelector('slot[name="indicator"]') as HTMLSlotElement
+    expect(indicator.assignedElements().map((one) => one.localName)).toEqual(['svg'])
+    indicator.dispatchEvent(new Event('slotchange'))
+    expect(hasState(host, 'has-indicator')).toBe(true)
+    expect(host.text).toBe('Helix')
+  })
+
+  test('draws the `description` text inside its part, as the caption slot’s fallback', async () => {
+    const host = (await mount(
+      '<helix-headless-option value="h" description="the design system">Helix</helix-headless-option>',
+    )) as Option
+    expect(part(host, 'description')?.querySelector('slot')?.getAttribute('name')).toBe(
+      'description',
+    )
+    expect(part(host, 'description')?.textContent?.trim()).toBe('the design system')
+  })
+
+  test('says disabled as a state a stylesheet can select', async () => {
+    const host = (await mount(
+      '<helix-headless-option value="a" disabled>Alpha</helix-headless-option>',
+    )) as Option
+    expect(hasState(host, 'disabled')).toBe(true)
+  })
+
+  test('says it is selected while active, where the list it is in holds suggestions', async () => {
+    const host = (await mount(
+      '<helix-headless-option value="a">Alpha</helix-headless-option>',
+    )) as Option
+    host.active = true
+    await host.updateComplete
+    expect(host.internals.ariaSelected).toBe('false')
+    host.selectionFollowsActive = true
+    await host.updateComplete
+    expect(host.internals.ariaSelected).toBe('true')
+    host.active = false
+    await host.updateComplete
+    expect(host.internals.ariaSelected).toBe('false')
+  })
+})
