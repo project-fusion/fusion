@@ -98,6 +98,28 @@ if (hasLayout()) {
       }
       expect(hasState(host, 'placed-bottom')).toBe(true)
       expect(hasState(host, 'placed-top')).toBe(false)
+      host.open = false
+      await settle(host)
+      expect(hasState(host, 'placed-bottom')).toBe(false)
     })
   })
 }
+
+/* The manifest says the state holds while the open list sits below; measured
+   before this in Chromium, it still matched after the list closed. Set by hand
+   here, since only a browser places the list. */
+describe('the side the list opened on', () => {
+  test('goes when the list closes', async () => {
+    document.body.innerHTML = `<helix-headless-select label="L"><helix-headless-option value="a">A</helix-headless-option></helix-headless-select>`
+    const host = document.body.firstElementChild as Select
+    await settle(host)
+    host.open = true
+    await settle(host)
+    const states = (host as unknown as { internals: ElementInternals }).internals.states
+    states.add(hasState(host, 'placed-top') ? 'placed-top' : 'placed-bottom')
+    host.open = false
+    await settle(host)
+    expect(hasState(host, 'placed-bottom')).toBe(false)
+    expect(hasState(host, 'placed-top')).toBe(false)
+  })
+})
