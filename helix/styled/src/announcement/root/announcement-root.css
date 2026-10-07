@@ -203,6 +203,19 @@
   gap: var(--helix-space-xs);
 }
 
+/* **The actions are clear of the dismiss too.** Only the message was, so a
+   link in the actions ran under the cross: measured at 700, the link spanned
+   622 to 676 and the button 652 to 676. An empty actions region draws no box,
+   so a band with no actions is unchanged. */
+:host([dismissible]) [part="actions"] {
+  margin-inline-end: calc(
+    var(--helix-size-icon) +
+    var(--helix-space-2xs) *
+    2 +
+    var(--helix-space-xs)
+  );
+}
+
 [part="dismiss"] {
   all: unset;
   /* `all: unset` takes `box-sizing` with it, back to `content-box`, and the
