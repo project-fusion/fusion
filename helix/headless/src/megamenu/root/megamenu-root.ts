@@ -54,6 +54,10 @@ import { HandOver, type Motion } from '../hand-over.js'
  * navigation menu publishes the same pair from its shared viewport, so a
  * stylesheet can grow or shrink one panel into the next.
  *
+ * While a link in the panel carries `aria-current="page"`, the host has
+ * `:state(current)`, so the trigger of the section holding the page you are
+ * on can say so, as Radix's navigation menu marks its active link.
+ *
  * The panel's default slot is the `columns` part and draws no box, so a sheet
  * can give the columns one of their own. While a panel is open, an
  * `indicator` slot is rendered beside its trigger, as Radix's indicator
@@ -101,6 +105,7 @@ import { HandOver, type Motion } from '../hand-over.js'
  * @cssproperty --megamenu-surface-inline-size - The panel's own width, written on the surface while it is open.
  * @cssproperty --megamenu-top - Where the panel starts, measured from the bar above it.
  *
+ * @cssstate current - A link in the panel carries `aria-current="page"`, so the trigger can show the section you are in.
  * @cssstate from-end - The panel opened in place of one earlier in the bar, so it can enter from the end side.
  * @cssstate from-start - The panel opened in place of one later in the bar, so it can enter from the start side.
  * @cssstate narrow - The page is narrower than `band-below`, so the panel is shown as a band whatever its variant.
@@ -356,6 +361,17 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
     }
   }
 
+  /** Watches the panel's links for the one that is the page you are on. */
+  private currentWatch: MutationObserver | undefined
+
+  /** Records whether a link in the panel is the page you are on. */
+  private markCurrent(): void {
+    const current = [...this.querySelectorAll('[aria-current="page"]')].some(
+      (link) => !link.closest('[slot="trigger"]'),
+    )
+    this.toggleState('current', current)
+  }
+
   /** Shuts it and puts the reader back where they were. */
   private close(): void {
     if (!this.requestOpen(false)) {
@@ -603,6 +619,15 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
     this.addEventListener('pointerleave', this.handlePointerLeave)
     this.addEventListener('focusout', this.handleFocusOut)
     this.addEventListener('keydown', this.handleKeyDown)
+    this.markCurrent()
+    if (typeof MutationObserver === 'function') {
+      this.currentWatch = new MutationObserver(() => this.markCurrent())
+      this.currentWatch.observe(this, {
+        attributeFilter: ['aria-current'],
+        childList: true,
+        subtree: true,
+      })
+    }
     /* A frame after the first render, when a plain trigger is first told the
        panel is closed. Not in the first render: a framework that rendered the
        trigger on a server may still be hydrating it then. */
@@ -623,6 +648,8 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
     this.removeEventListener('pointerleave', this.handlePointerLeave)
     this.removeEventListener('focusout', this.handleFocusOut)
     this.removeEventListener('keydown', this.handleKeyDown)
+    this.currentWatch?.disconnect()
+    this.currentWatch = undefined
     HelixHeadlessMegamenu.bar.remove(this)
     this.stop()
   }
