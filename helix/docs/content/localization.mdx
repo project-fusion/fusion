@@ -104,8 +104,8 @@ Six families format numbers or dates and take a `locale`:
 ></helix-pagination>
 ```
 
-If you do not set `locale`, these controls use the browser's locale, which is
-usually correct. Set `locale` when your users choose your application's
+If you do not set `locale`, these controls use the nearest `lang` attribute,
+then the browser's locale, which is usually correct. Set `locale` when your users choose your application's
 language separately from the language of their operating system.
 
 The first day of the week comes from `Intl.Locale`'s week information, which
@@ -186,10 +186,12 @@ keys, import the generated types once:
 import type {} from '@fusion.dev/helix/words'
 ```
 
-Combobox and Data Table read the registry. The other families take their words
-as properties, as described in
-[Set the words of other families](#set-the-words-of-other-families), and move
-to the registry one family at a time.
+Every family reads the registry for the words it declares, except Listbox and
+Editor. A few words that several families share are still plain properties: the
+name of a dismiss button, `dismiss-label`; a collection's `empty-text` and
+`loading-text`; and the sentences a field reports from the code its fields
+share, such as `value-missing-message`. Set those on the element, as described
+in [Set the words of other families](#set-the-words-of-other-families).
 
 ### Which words an element uses
 
@@ -264,9 +266,9 @@ one process do not affect each other.
 
 ### Set the words of other families
 
-Families that do not read the registry yet take their words as properties.
-Examples include `pan-up-label` on a map. Properties that combine values are
-format templates:
+A value set on the element always wins, so Listbox, Editor, and the shared
+words above take their words as properties, such as `empty-text` on a listbox.
+Properties that combine values are format templates:
 
 ```html
 <helix-pagination-summary
@@ -298,7 +300,8 @@ or `disable-times` rules out.
 A message appears in the browser's own validation bubble and on the line under
 the field. `feedback` does not reach the bubble. If you do not set a message, a
 text field shows the browser's own message, which is already in your user's
-language. Every other control shows its English sentence.
+language. Every other control shows its English sentence. An empty message
+counts as not set.
 
 ```html
 <helix-number-input
