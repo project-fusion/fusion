@@ -86,9 +86,10 @@ const says = (element: Element | null, state: string): boolean => {
  * | Tab | Stays in the palette, which is modal. With `inline`, moves on through the page. |
  *
  * **ARIA.** The palette is a modal `dialog` named by `label`, or with
- * `inline` no dialog at all. Inside it the filter field is a `combobox` with
- * `aria-activedescendant` on the highlighted command, and the commands are a
- * `listbox` of `option`s. How many commands typing left, the empty text and
+ * `inline` no dialog at all. Inside it the filter field is a text field with
+ * `aria-autocomplete="list"`, `aria-controls` on the list, and
+ * `aria-activedescendant` on the highlighted command, as the field of React
+ * Aria's `Autocomplete` is. The commands are a `listbox` of `option`s. How many commands typing left, the empty text and
  * the loading text are said in a polite live region.
  *
  * @since 0.1.0
