@@ -1,10 +1,10 @@
 import { describe, expect, test } from 'bun:test'
-import { type Color, parseColor } from '@fusion.dev/helix-core'
+import { type Color, type ColorFormat, parseColor } from '@fusion.dev/helix-core'
 import { type ChannelName, channelFields, writeChannel } from './channels.js'
 
 const model = (value: string): Color => parseColor(value) as Color
 
-const numbers = (value: string, format: 'hex' | 'hsl' | 'rgb', alpha = false): unknown[] =>
+const numbers = (value: string, format: ColorFormat, alpha = false): unknown[] =>
   channelFields(value, model(value), format, alpha).map((one) => [one.channel, one.value])
 
 describe('the channels a value is written with', () => {
@@ -26,6 +26,32 @@ describe('the channels a value is written with', () => {
     ])
   })
 
+  test('are hue, saturation and brightness for hsb', () => {
+    expect(numbers('hsb(182, 60%, 80%)', 'hsb')).toEqual([
+      ['hue', 182],
+      ['saturation', 60],
+      ['brightness', 80],
+    ])
+  })
+
+  test('are lightness, chroma and hue for oklch, in steps finer than one', () => {
+    expect(numbers('oklch(62.8% 0.258 29.23)', 'oklch')).toEqual([
+      ['lightness', 62.8],
+      ['chroma', 0.258],
+      ['hue', 29.2],
+    ])
+    expect(numbers('oklch(0.5 50% 120)', 'oklch')).toEqual([
+      ['lightness', 50],
+      ['chroma', 0.2],
+      ['hue', 120],
+    ])
+    expect(
+      channelFields('oklch(50% 0.2 120)', model('oklch(50% 0.2 120)'), 'oklch', false).map(
+        (one) => one.step,
+      ),
+    ).toEqual([0.1, 0.001, 0.1])
+  })
+
   test('come from the color where the text is in another syntax', () => {
     expect(numbers('rgb(255, 0, 0)', 'hsl')).toEqual([
       ['hue', 0],
@@ -38,7 +64,7 @@ describe('the channels a value is written with', () => {
 describe('setting one channel', () => {
   const write = (
     value: string,
-    format: 'hex' | 'hsl' | 'rgb',
+    format: ColorFormat,
     alpha: boolean,
     channel: ChannelName,
     to: number,
@@ -49,6 +75,16 @@ describe('setting one channel', () => {
     expect(write('#3366cc', 'hex', false, 'green', 200)).toBe('#33c8cc')
     expect(write('#33c8cc', 'hex', false, 'green', 201)).toBe('#33c9cc')
     expect(write('hsl(0, 100%, 50%)', 'hsl', false, 'lightness', 25)).toBe('hsl(0, 100%, 25%)')
+  })
+
+  test('in hsb and oklch, on the channel step', () => {
+    expect(write('hsb(0, 100%, 100%)', 'hsb', false, 'brightness', 40)).toBe('hsb(0, 100%, 40%)')
+    expect(write('oklch(62.8% 0.258 29.2)', 'oklch', false, 'chroma', 0.1234)).toBe(
+      'oklch(62.8% 0.123 29.2)',
+    )
+    expect(write('oklch(62.8% 0.258 29.2)', 'oklch', true, 'alpha', 50)).toBe(
+      'oklch(62.8% 0.258 29.2 / 0.5)',
+    )
   })
 
   test('keeps the number inside the channel, and writes nothing for what is not one', () => {

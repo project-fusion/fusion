@@ -426,6 +426,7 @@ export {
   parseColor,
   toCss,
   toHsl,
+  toOklch,
   toRgb,
 } from './utils/css-color/css-color.js'
 export {

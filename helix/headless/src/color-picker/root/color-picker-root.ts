@@ -42,8 +42,12 @@ import '../../button/index.js'
 import '../../button-group/index.js'
 import '../../slider/index.js'
 
-/** The formats the toggle walks through, in the order it walks them. */
-const FORMATS: ColorFormat[] = ['hex', 'rgb', 'hsl']
+/**
+ * The formats the toggle walks through, in the order it walks them: the CSS
+ * syntaxes. `hsb` is not CSS, so it is reached by `format` alone, and the
+ * toggle walks on from it to hex.
+ */
+const FORMATS: ColorFormat[] = ['hex', 'rgb', 'hsl', 'oklch']
 
 /**
  * Where a picker starts when there is nothing to start from.
@@ -216,8 +220,9 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
   /**
    * Whether the picker shows a number field for each channel of the color, as
    * React Aria's ColorField does with `channel`: red, green and blue for hex
-   * and rgb, hue, saturation and lightness for hsl, and the opacity with
-   * `alpha`.
+   * and rgb, hue, saturation and lightness for hsl, hue, saturation and
+   * brightness for hsb, lightness, chroma and hue for oklch, and the opacity
+   * with `alpha`.
    *
    * For a reader who has the numbers from a brand guide, and for a keyboard,
    * where typing 128 is quicker than holding an arrow key. The fields follow
@@ -225,6 +230,14 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
    */
   @property({ attribute: 'channel-fields', type: Boolean })
   channelFields = false
+
+  /**
+   * What the chroma channel's field is called, in `channel-fields` with
+   * oklch.
+   */
+  @words
+  @property({ attribute: 'chroma-label' })
+  chromaLabel = 'Chroma'
 
   /**
    * The words a color's name is spoken in, as JSON keyed by their English,
@@ -266,10 +279,16 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
   eyedropperLabel = 'Sample a color from the screen'
 
   /**
-   * The syntax the value is written in: `hex`, `rgb`, or `hsl`.
+   * The syntax the value is written in: `hex`, `rgb`, `hsl`, `oklch`, or
+   * `hsb`.
    *
    * Only what is written. Everything is read whatever this says, so a picker on
-   * `hex` still takes an `rgb()` handed to it and stores the hex for it.
+   * `hex` still takes an `rgb()` or an `oklch()` handed to it and stores the
+   * hex for it. `oklch` writes the sRGB color the picker holds, such as
+   * `oklch(62.8% 0.258 29.2)`; a color outside sRGB that is handed in is
+   * clipped to it. `hsb` writes the picker's own model, `hsb(0, 100%, 100%)`,
+   * as React Aria's and Zag's color strings do. It is not CSS, so the toggle
+   * walks the other four.
    */
   @property({ reflect: true })
   format?: ColorFormat
@@ -297,7 +316,7 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
 
   /**
    * What the lightness channel's field is called, in `channel-fields` with
-   * hsl.
+   * hsl and oklch.
    */
   @words
   @property({ attribute: 'lightness-label' })
@@ -934,6 +953,8 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
     return {
       alpha: this.opacityLabel,
       blue: this.blueLabel,
+      brightness: this.brightnessLabel,
+      chroma: this.chromaLabel,
       green: this.greenLabel,
       hue: this.hueLabel,
       lightness: this.lightnessLabel,
@@ -1001,10 +1022,10 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
           <input
             part="field-input"
             type="number"
-            inputmode="numeric"
+            inputmode=${field.step < 1 ? 'decimal' : 'numeric'}
             min=${field.min}
             max=${field.max}
-            step="1"
+            step=${field.step}
             .value=${live(String(field.value))}
             ?disabled=${this.isDisabled}
             ?readonly=${this.readOnly}

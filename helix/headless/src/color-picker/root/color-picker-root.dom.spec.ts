@@ -95,18 +95,30 @@ describe('color syntaxes', () => {
     expect(host.value).toBe('hsl(240, 100%, 50%)')
   })
 
-  test('the toggle walks hex to rgb to hsl and back, rewriting as it goes', async () => {
+  test('oklch and hsb too, read and written', async () => {
+    const host = await picker('format="oklch" default-value="#ff0000"')
+    await ramp(host, 'hue', 0)
+    expect(host.value).toBe('oklch(62.8% 0.258 29.2)')
+    const model = await picker('format="hsb" default-value="oklch(62.8% 0.258 29.23)"')
+    await ramp(model, 'hue', 240)
+    expect(model.value).toBe('hsb(240, 100%, 100%)')
+  })
+
+  test('the toggle walks hex to rgb to hsl to oklch and back, rewriting as it goes', async () => {
     const host = await picker('default-value="#ff0000"')
     const toggle = part(host, 'format') as HTMLElement
-    toggle.click()
-    await host.updateComplete
-    expect(host.value).toBe('rgb(255, 0, 0)')
-    toggle.click()
-    await host.updateComplete
-    expect(host.value).toBe('hsl(0, 100%, 50%)')
-    toggle.click()
-    await host.updateComplete
-    expect(host.value).toBe('#ff0000')
+    const seen: string[] = []
+    for (let press = 0; press < 4; press++) {
+      toggle.click()
+      await host.updateComplete
+      seen.push(host.value)
+    }
+    expect(seen).toEqual([
+      'rgb(255, 0, 0)',
+      'hsl(0, 100%, 50%)',
+      'oklch(62.8% 0.258 29.2)',
+      '#ff0000',
+    ])
   })
 
   test('a name is not a color here, and is left alone rather than half read', async () => {
@@ -852,6 +864,17 @@ describe('a number field for each channel', () => {
     expect(names(host)).toEqual(['Hue', 'Saturation', 'Lightness', 'Opacity'])
     await typeInto(host, fields(host)[2] as HTMLInputElement, '25')
     expect(host.value).toBe('hsla(0, 100%, 25%, 0.5)')
+  })
+
+  test('is lightness, chroma and hue for oklch, in decimals, and brightness for hsb', async () => {
+    const host = await picker('channel-fields format="oklch" value="oklch(62.8% 0.258 29.2)"')
+    expect(names(host)).toEqual(['Lightness', 'Chroma', 'Hue'])
+    expect(fields(host).map((one) => one.step)).toEqual(['0.1', '0.001', '0.1'])
+    expect(fields(host)[1]?.inputMode).toBe('decimal')
+    await typeInto(host, fields(host)[1] as HTMLInputElement, '0.1')
+    expect(host.value).toBe('oklch(62.8% 0.1 29.2)')
+    const model = await picker('channel-fields format="hsb" value="hsb(0, 100%, 100%)"')
+    expect(names(model)).toEqual(['Hue', 'Saturation', 'Brightness'])
   })
 
   test('a number out of range is put back inside it, and an empty field moves nothing', async () => {
