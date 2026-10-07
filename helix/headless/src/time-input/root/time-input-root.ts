@@ -372,6 +372,15 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
   @property({ attribute: 'unavailable-message' })
   unavailableMessage = 'Choose a time that is available.'
 
+  /**
+   * The message for text that is no time, where `bad-input-message` is not
+   * set. `{mode}` is `single`, `range`, or `multiple`, and `{shape}` is `HH:mm`, or `HH:mm:ss` with `seconds`.
+   */
+  @words
+  @property({ attribute: 'unreadable-message' })
+  unreadableMessage =
+    '{mode, select, single {Enter a time as {shape}.} other {Enter times as {shape}, separated by commas.}}'
+
   /** Every time in the value, which may hold more than one. */
   private get held(): string[] {
     /* The en dash and the spaced hyphen both mean "to", because a range is shown
@@ -611,9 +620,7 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
     if (held.length > 0 && !held.every((one) => this.isTime(one))) {
       return (
         this.badInputMessage ||
-        (this.mode === undefined
-          ? `Enter a time as ${shape}.`
-          : `Enter times as ${shape}, separated by commas.`)
+        formatWords(this, 'unreadableMessage', { mode: this.mode ?? 'single', shape })
       )
     }
     /* Each fault across every time, in the order the messages take, so a

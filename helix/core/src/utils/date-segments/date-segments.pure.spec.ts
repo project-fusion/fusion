@@ -15,6 +15,7 @@ import {
   segmentText,
   segmentValueText,
   setSegment,
+  shownValue,
   stepSegment,
   typeDigit,
 } from './date-segments.js'
@@ -252,5 +253,36 @@ describe('a date or a time written in a locale', () => {
     expect(readWrittenTime('25:00', 'en-GB')).toBe('')
     expect(readWrittenTime('13 pm', 'en-US')).toBe('')
     expect(readWrittenTime('noon-ish', 'en-US')).toBe('')
+  })
+})
+
+/* Each of an hour and its half is a segment of its own. Measured before this:
+   Backspace on AM did nothing while an hour was set, and Backspace on the hour
+   emptied AM as well. */
+describe('emptying the hour or its half', () => {
+  const layout = [
+    { kind: 'hour' },
+    { literal: ':' },
+    { kind: 'minute' },
+    { kind: 'dayPeriod' },
+  ] as SegmentSlot[]
+
+  test('empties the half alone, and the time waits for it', () => {
+    const afternoon = { dayPeriod: 1, hour: 14, minute: 30 }
+    const emptied = setSegment(afternoon, 'dayPeriod', undefined, true)
+    expect(shownValue('dayPeriod', emptied, true)).toBeUndefined()
+    expect(shownValue('hour', emptied, true)).toBe(2)
+    expect(segmentsValue('time', emptied, layout)).toBe('')
+    expect(isPartial('time', emptied, layout)).toBe(true)
+    const morning = setSegment(emptied, 'dayPeriod', 0, true)
+    expect(segmentsValue('time', morning, layout)).toBe('02:30')
+  })
+
+  test('empties the hour alone, and the half stays', () => {
+    const emptied = setSegment({ dayPeriod: 1, hour: 14, minute: 30 }, 'hour', undefined, true)
+    expect(shownValue('hour', emptied, true)).toBeUndefined()
+    expect(shownValue('dayPeriod', emptied, true)).toBe(1)
+    const back = setSegment(emptied, 'hour', 3, true)
+    expect(segmentsValue('time', back, layout)).toBe('15:30')
   })
 })

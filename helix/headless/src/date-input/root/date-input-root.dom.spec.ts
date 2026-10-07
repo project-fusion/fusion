@@ -1350,3 +1350,15 @@ describe('a date input holding nothing', () => {
     expect(host.internals.states.has('blank')).toBe(false)
   })
 })
+
+describe('the message for text that is no date', () => {
+  /* Measured before this: the sentence was built in English, with no word
+     property a page in another language could register. */
+  test('is a word of its own, with the mode in it', async () => {
+    const host = (await field(
+      'unreadable-message="{mode, select, single {Datum als JJJJ-MM-TT.} other {Daten als JJJJ-MM-TT.}}"',
+    )) as InputDate & { validationMessage: string }
+    await type(host, 'soon')
+    expect(host.validationMessage).toBe('Datum als JJJJ-MM-TT.')
+  })
+})

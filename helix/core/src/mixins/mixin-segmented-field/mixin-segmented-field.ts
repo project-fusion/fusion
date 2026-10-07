@@ -225,6 +225,26 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
     /** The value when focus came into the segments, so leaving them says `change` once. */
     private entered: string | undefined = undefined
 
+    /** The segment Alt+Down opened the picker from, which focus goes back to. */
+    private opener: HTMLElement | undefined = undefined
+
+    /**
+     * Puts focus back on the segment the picker was opened from, as the
+     * trigger takes it back to the field. Measured before this: Escape after
+     * Alt+Down on AM/PM put focus on the hour.
+     */
+    protected override returnFocus(): void {
+      const opener = this.opener
+      this.opener = undefined
+      if (opener?.isConnected && this.segmentsShown) {
+        this.returning = true
+        opener.focus()
+        this.returning = false
+        return
+      }
+      super.returnFocus()
+    }
+
     /** Whether this family can show segments in its current shape. */
     protected get segmentable(): boolean {
       return true
@@ -330,6 +350,7 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
       const twelve = isTwelveHourLayout(this.layout)
       if (event.key === 'ArrowDown' && event.altKey) {
         event.preventDefault()
+        this.opener = element
         this.handleTriggerClick()
         return
       }
