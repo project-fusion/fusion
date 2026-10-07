@@ -693,7 +693,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
    * value, and `hidden` while no slot has content, so an empty layer takes no
    * room in the row.
    */
-  protected renderThumbs(start: number, end: number): TemplateResult {
+  protected renderThumbs(): TemplateResult {
     /* The slot names written out, so the manifest's slot check can read them. */
     const slot = (end: boolean): TemplateResult =>
       end
@@ -725,7 +725,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
    * thumb, and hidden from the accessibility tree for the reason the readout
    * is: each thumb already reports its value.
    */
-  protected renderTooltips(start: number, end: number): TemplateResult | typeof nothing {
+  protected renderTooltips(): TemplateResult | typeof nothing {
     if (!this.tooltip) {
       return nothing
     }
@@ -905,7 +905,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
             </div>`
           : nothing
       }
-      ${this.renderThumbs(start, end)} ${this.renderTooltips(start, end)}
+      ${this.renderThumbs()} ${this.renderTooltips()}
       ${
         /* Hidden from the accessibility tree, like the markers above it.
          *

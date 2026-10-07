@@ -1191,7 +1191,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
     year: Intl.DateTimeFormat
   } {
     const language = this.ownMonths
-      ? `${new Intl.Locale(this.language || new Intl.DateTimeFormat().resolvedOptions().locale, { calendar: this.calendar })}`
+      ? `${new Intl.Locale(this.language || new Intl.DateTimeFormat().resolvedOptions().locale, { calendar: this.calendar ?? 'gregory' })}`
       : calendarLocale(this.language, this.calendar)
     if (this.cachedFormats?.locale === language) {
       return this.cachedFormats
