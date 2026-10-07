@@ -83,11 +83,13 @@ import '../../option/index.js'
  * | Tab | Moves to the next wheel, then out of the picker. |
  *
  * **ARIA.** The list is a `listbox` named by `label`, a slotted label, the
- * host's `aria-label` or its `aria-labelledby`, and a development build warns
- * where all four are empty, with `aria-multiselectable`
- * with a `mode` and `aria-invalid` while `feedback` says what is wrong. The
- * wheels are a `group` with that name, holding one `listbox` per wheel, named
- * "Hour", "Minute", "Second" and "AM/PM" in the page's language.
+ * host's `aria-label` or its `aria-labelledby`. A development build warns
+ * where all four are empty. The list is described by the hint, or by the
+ * message in `feedback` in its place, and carries `aria-multiselectable` with
+ * a `mode` and `aria-invalid` while `feedback` says what is wrong. The wheels
+ * are a `group` with that name, holding one `listbox` per wheel, named "Hour",
+ * "Minute", "Second" and "AM/PM" in the page's language, and each described
+ * the same way.
  *
  * @since 0.1.0
  * @status stable
@@ -96,6 +98,7 @@ import '../../option/index.js'
  * @documentation https://fusion.dev/helix/components/time-picker
  *
  * @slot empty - What the list shows when no time falls between `min` and `max`, for content richer than `empty-text`.
+ * @slot hint - Help under the times, for content richer than the `hint` text.
  * @slot label - A visible label above the times, which names the list, for content richer than the `label` text.
  *
  * @event {Event} change - Fired after the value changes.
@@ -117,6 +120,7 @@ import '../../option/index.js'
  * @csspart column-search-field - The filter field.
  * @csspart columns - The row of columns, in `wheels`.
  * @csspart feedback - The message under the times, while `feedback` is set.
+ * @csspart hint - Help under the times, shown while there is no message in `feedback`.
  * @csspart label - The visible label above the times, drawn while a label is slotted.
  * @csspart list - The listbox holding the times, in `list`.
  * @csspart list-empty - The text shown when the filter hides every option.
@@ -191,6 +195,15 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
   @words
   @property({ attribute: 'empty-text' })
   emptyText = 'No times to choose from'
+
+  /**
+   * Help under the times, such as the hours a shop is open, read by screen
+   * readers as the list's description. A message in `feedback` replaces it.
+   *
+   * The fallback of the `hint` slot.
+   */
+  @property()
+  hint = ''
 
   /**
    * The clock the times are written on: `h12` for twelve hours with a
@@ -844,6 +857,30 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
     return hostWords(this, slotted || this.label)
   }
 
+  /** Whether a hint is slotted, which draws the `hint` part around it. */
+  @state()
+  private hintSlotted = false
+
+  /** Whether the hint shows: there is one, and no message stands in its place. */
+  private get hinted(): boolean {
+    return (this.hint !== '' || this.hintSlotted) && this.feedback === ''
+  }
+
+  /** The ids that describe each list: the hint, or the message in its place. */
+  private get describedBy(): string | typeof nothing {
+    return this.feedback !== '' ? 'feedback' : this.hinted ? 'hint' : nothing
+  }
+
+  /** The hint under the times, or a bare slot while there is none to show. */
+  private renderHint(): TemplateResult {
+    const read = (event: Event): void => {
+      this.hintSlotted = slotFilled(event.target as HTMLSlotElement)
+    }
+    return this.hinted
+      ? html`<p part="hint" id="hint"><slot name="hint" @slotchange=${read}>${this.hint}</slot></p>`
+      : html`<slot name="hint" @slotchange=${read}></slot>`
+  }
+
   /** Whether a label is slotted, which draws the `label` part around it. */
   @state()
   private labelSlotted = false
@@ -963,7 +1000,7 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
     return html`<${this.tag('listbox')}
       part="column"
       data-column=${part}
-      aria-describedby=${this.feedback === '' ? nothing : 'feedback'}
+      aria-describedby=${this.describedBy}
       aria-invalid=${this.marked ? 'true' : nothing}
       exportparts="empty: column-empty, error: column-error, feedback: column-feedback, filter-icon: column-filter-icon,
         filter-mark: column-filter-mark, hint: column-hint, items: column-items, label: column-label,
@@ -1092,7 +1129,7 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
   protected renderList(): TemplateResult {
     return html`<${this.tag('listbox')}
       part="list"
-      aria-describedby=${this.feedback === '' ? nothing : 'feedback'}
+      aria-describedby=${this.describedBy}
       aria-invalid=${this.marked ? 'true' : nothing}
       exportparts="empty: list-empty, error: list-error, feedback: list-feedback, filter-icon: list-filter-icon,
         filter-mark: list-filter-mark, hint: list-hint, items: list-items, label: list-label,
@@ -1131,9 +1168,9 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
        range on wheels is two sets of wheels and a multiple is a set, which a
        wheel cannot hold. */
     if (this.variant === 'wheels' && this.mode === undefined) {
-      return html`${this.renderSlottedLabel()}${this.renderSpinner()}${this.renderPickerFeedback()}`
+      return html`${this.renderSlottedLabel()}${this.renderSpinner()}${this.renderHint()}${this.renderPickerFeedback()}`
     }
-    return html`${this.renderSlottedLabel()}${this.renderList()}${this.renderPickerFeedback()}`
+    return html`${this.renderSlottedLabel()}${this.renderList()}${this.renderHint()}${this.renderPickerFeedback()}`
   }
 
   /**
