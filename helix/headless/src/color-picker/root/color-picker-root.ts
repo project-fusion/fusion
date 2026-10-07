@@ -83,8 +83,10 @@ interface EyeDropperConstructor {
  * gray after you drag to the bottom of the square and back.
  *
  * The square is one tab stop. In it, the up and down arrows move brightness
- * and the left and right arrows move saturation, and PageUp and PageDown move
- * brightness by ten. The picker sends `input` as the color moves and `change`
+ * and the left and right arrows move saturation, by ten with Shift. PageUp and
+ * PageDown move brightness by ten, and Home and End move saturation by ten,
+ * turned on a right-to-left page as the arrows are, as React Aria's ColorArea
+ * does. The picker sends `input` as the color moves and `change`
  * when a drag, a key, a typed value or a preset settles it, as
  * `<input type="color">` does.
  *
@@ -948,7 +950,9 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
    * its own one axis: on the saturation input, ArrowUp moved the handle
    * sideways. Here the vertical keys move brightness and the horizontal keys
    * move saturation, turned on a right-to-left page as the pointer is, which is
-   * what React Aria's ColorArea does.
+   * what React Aria's ColorArea does. Shift makes an arrow a step of ten, and
+   * Home and End are saturation's steps of ten, as PageUp and PageDown are
+   * brightness's.
    */
   private readonly handleAreaKeydown = (event: KeyboardEvent): void => {
     if (this.isDisabled || this.readOnly) {
@@ -957,11 +961,14 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
     const color = this.color
     const along = isRtl(this) ? -1 : 1
     const held = (at: number): number => clamp(at, 0, 100)
+    const step = event.shiftKey ? 10 : 1
     const moves: Record<string, Partial<Color>> = {
-      ArrowDown: { brightness: held(color.brightness - 1) },
-      ArrowLeft: { saturation: held(color.saturation - along) },
-      ArrowRight: { saturation: held(color.saturation + along) },
-      ArrowUp: { brightness: held(color.brightness + 1) },
+      ArrowDown: { brightness: held(color.brightness - step) },
+      ArrowLeft: { saturation: held(color.saturation - along * step) },
+      ArrowRight: { saturation: held(color.saturation + along * step) },
+      ArrowUp: { brightness: held(color.brightness + step) },
+      End: { saturation: held(color.saturation + along * 10) },
+      Home: { saturation: held(color.saturation - along * 10) },
       PageDown: { brightness: held(color.brightness - 10) },
       PageUp: { brightness: held(color.brightness + 10) },
     }
