@@ -458,11 +458,11 @@
   );
 }
 
-:host([range]) [part="control"][data-thumb="end"]::-webkit-slider-runnable-track {
+:host([range]) [part="control"]:not([data-thumb="start"])::-webkit-slider-runnable-track {
   background: transparent;
 }
 
-:host([range]) [part="control"][data-thumb="end"]::-moz-range-track {
+:host([range]) [part="control"]:not([data-thumb="start"])::-moz-range-track {
   background: transparent;
 }
 
