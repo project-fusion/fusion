@@ -7,6 +7,7 @@ import {
   localToday,
   monthOf,
   monthOut,
+  monthSystem,
   periodCells,
   periodKey,
   periodMove,
@@ -189,5 +190,56 @@ describe('today in a time zone, and the weekend', () => {
   test("the weekend is the locale's", () => {
     expect(weekendOf('en-US').sort()).toEqual([0, 6])
     expect(weekendOf('not a tag')).toEqual([0, 6])
+  })
+})
+
+/* React Aria draws the Persian, Hebrew, Islamic, Ethiopic, Coptic and Indian
+   calendars with their own months; here every grid was a Gregorian month. */
+describe('the months of a calendar with months of its own', () => {
+  const iso = (date: Date): string => date.toISOString().slice(0, 10)
+
+  test('start on the first of the month as the calendar counts it', () => {
+    const persian = monthSystem('persian')
+    expect(iso(persian.start(day('2026-10-06')))).toBe('2026-09-23')
+    expect(persian.day(day('2026-10-06'))).toBe(14)
+    expect(persian.key(day('2026-10-06'))).toBe('2026-09-23')
+    expect(persian.same(day('2026-09-23'), day('2026-10-22'))).toBe(true)
+    expect(persian.same(day('2026-10-22'), day('2026-10-23'))).toBe(false)
+  })
+
+  test('page by whole months of their own length, keeping the day where it fits', () => {
+    const persian = monthSystem('persian')
+    expect(iso(persian.add(day('2026-10-06'), 1))).toBe('2026-11-05')
+    expect(iso(persian.add(day('2026-10-06'), -1))).toBe('2026-09-05')
+    const islamic = monthSystem('islamic-umalqura')
+    const first = islamic.start(day('2026-10-06'))
+    const next = islamic.add(first, 1)
+    const span = (next.getTime() - first.getTime()) / 86_400_000
+    expect([29, 30]).toContain(span)
+    expect(islamic.day(next)).toBe(1)
+  })
+
+  test("take the Hebrew leap month and Ethiopia's short thirteenth month in their stride", () => {
+    /* 5787 is a leap year, with Adar I and Adar II. */
+    const hebrew = monthSystem('hebrew')
+    const names = new Intl.DateTimeFormat('en-u-ca-hebrew', { month: 'long', timeZone: 'UTC' })
+    let at = hebrew.start(day('2026-09-12'))
+    const seen: string[] = []
+    for (let month = 0; month < 13; month += 1) {
+      seen.push(names.format(at))
+      at = hebrew.add(at, 1)
+    }
+    expect(seen).toContain('Adar I')
+    expect(seen).toContain('Adar II')
+    const ethiopic = monthSystem('ethiopic')
+    const pagume = ethiopic.start(day('2026-09-08'))
+    expect(iso(ethiopic.add(pagume, 1))).toBe('2026-09-11')
+  })
+
+  test('and every other calendar is the Gregorian months', () => {
+    const gregorian = monthSystem('buddhist')
+    expect(gregorian.key(day('2026-10-06'))).toBe('2026-10')
+    expect(iso(gregorian.start(day('2026-10-06')))).toBe('2026-10-01')
+    expect(gregorian.day(day('2026-10-06'))).toBe(6)
   })
 })
