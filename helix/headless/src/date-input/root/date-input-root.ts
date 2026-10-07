@@ -842,9 +842,7 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
     if (held.length > 0 && !held.every(isDateValue)) {
       return (
         this.badInputMessage ||
-        (this.mode === undefined
-          ? 'Enter a date as YYYY-MM-DD.'
-          : 'Enter dates as YYYY-MM-DD, separated by commas.')
+        formatWords(this, 'unreadableMessage', { mode: this.mode ?? 'single' })
       )
     }
     /* The bound as the field writes a date, the way Time Input writes its
@@ -891,6 +889,15 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
   @words
   @property({ attribute: 'unavailable-message' })
   unavailableMessage = 'Choose a date that is available.'
+
+  /**
+   * The message for text that is no date, where `bad-input-message` is not
+   * set. `{mode}` is `single`, `range`, or `multiple`.
+   */
+  @words
+  @property({ attribute: 'unreadable-message' })
+  unreadableMessage =
+    '{mode, select, single {Enter a date as YYYY-MM-DD.} other {Enter dates as YYYY-MM-DD, separated by commas.}}'
 
   /**
    * The name of the calendar's heading where it shows a page of years, with

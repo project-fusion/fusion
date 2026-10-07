@@ -172,6 +172,13 @@ export const segmentRange = (
   }
 }
 
+/**
+ * Whether the half of the day was emptied while the hour was kept, which
+ * leaves the hour its number on the clock and the time unknown until the
+ * half is set again. Marked as `NaN`, a number no key sets.
+ */
+const halfCleared = (segments: Segments): boolean => Number.isNaN(segments.dayPeriod ?? 0)
+
 /** A segment's number as it is shown: the hour on the clock the field is on. */
 export const shownValue = (
   kind: SegmentKind,
@@ -179,6 +186,9 @@ export const shownValue = (
   twelve: boolean,
 ): number | undefined => {
   if (kind === 'dayPeriod') {
+    if (halfCleared(segments)) {
+      return undefined
+    }
     return segments.hour === undefined ? segments.dayPeriod : segments.hour >= 12 ? 1 : 0
   }
   const value = segments[kind]
@@ -202,12 +212,28 @@ export const setSegment = (
 ): Segments => {
   const next: Segments = { ...segments }
   if (shown === undefined) {
+    /* Emptying one of an hour and its half keeps the other, as each is a
+       segment of its own. Measured before this: Backspace on AM did nothing
+       while an hour was set, and Backspace on the hour emptied AM too. */
+    if (kind === 'dayPeriod' && twelve && segments.hour !== undefined) {
+      next.hour = segments.hour % 12
+      next.dayPeriod = Number.NaN
+      return next
+    }
+    if (kind === 'hour' && twelve && segments.hour !== undefined && !halfCleared(segments)) {
+      next.dayPeriod = segments.hour >= 12 ? 1 : 0
+    }
     delete next[kind]
     return next
   }
   if (kind === 'hour' && twelve) {
-    const half =
-      segments.hour !== undefined ? (segments.hour >= 12 ? 1 : 0) : (segments.dayPeriod ?? 0)
+    const half = halfCleared(segments)
+      ? 0
+      : segments.hour !== undefined
+        ? segments.hour >= 12
+          ? 1
+          : 0
+        : (segments.dayPeriod ?? 0)
     next.hour = (shown % 12) + half * 12
   } else if (kind === 'dayPeriod') {
     next.dayPeriod = shown
@@ -392,7 +418,10 @@ export const segmentsValue = (
 ): string => {
   const shown = layout.flatMap((slot) => ('kind' in slot ? [slot.kind] : []))
   const needed = shown.filter((one) => one !== 'dayPeriod')
-  if (needed.some((one) => segments[one] === undefined)) {
+  if (
+    needed.some((one) => segments[one] === undefined) ||
+    (shown.includes('dayPeriod') && halfCleared(segments))
+  ) {
     return ''
   }
   const pad = (number: number | undefined, width = 2): string =>

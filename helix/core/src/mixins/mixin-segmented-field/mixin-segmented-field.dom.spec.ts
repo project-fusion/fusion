@@ -265,6 +265,20 @@ describe('a key in a segment', () => {
     expect(host.open).toBe(false)
   })
 
+  /* Measured before this: Escape after Alt+Down on AM/PM put focus on the
+     hour, the first segment. */
+  test('Escape puts focus back on the segment Alt+Down opened from', async () => {
+    const host = await mount('kind="time" value="14:30"')
+    const half = segment(host, 'dayPeriod')
+    await key(host, half, 'ArrowDown', { altKey: true })
+    expect(host.open).toBe(true)
+    const inside = host.shadowRoot?.querySelector('#inside') as HTMLElement
+    inside.focus()
+    await key(host, inside, 'Escape')
+    expect(host.open).toBe(false)
+    expect(host.shadowRoot?.activeElement).toBe(half)
+  })
+
   test('changes nothing in a disabled field', async () => {
     const host = await mount('value="2026-08-04" disabled')
     await key(host, segment(host, 'month'), 'ArrowUp')

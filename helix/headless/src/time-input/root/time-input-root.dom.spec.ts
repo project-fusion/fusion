@@ -469,3 +469,13 @@ describe('a segmented time range', () => {
     expect(part(host, 'range-separator')?.textContent?.trim()).toBe('–')
   })
 })
+
+describe('the message for text that is no time', () => {
+  test('is a word of its own, with the shape in it', async () => {
+    const host = (await field('unreadable-message="Uhrzeit als {shape}."')) as InputTime & {
+      validationMessage: string
+    }
+    await type(host, 'soon')
+    expect(host.validationMessage).toBe('Uhrzeit als HH:mm.')
+  })
+})
