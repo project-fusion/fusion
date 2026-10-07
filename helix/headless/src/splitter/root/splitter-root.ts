@@ -13,6 +13,8 @@ import {
   inlineStep,
   isRtl,
   requestChange,
+  words,
+  wordsLocale,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -61,7 +63,7 @@ const channel = new WeakMap<HelixHeadlessSplitter, Crossed>()
  *
  * The divider has `role="separator"` and `aria-valuenow`, with
  * `aria-valuetext` saying the start pane's share as a percentage in the
- * reader's locale, and `aria-controls` names the start pane. Drag it with a pointer or move it with the arrow keys,
+ * nearest `lang`, or in the reader's locale where no `lang` is set, and `aria-controls` names the start pane. Drag it with a pointer or move it with the arrow keys,
  * press `Home` or `End` to move it to its bounds, and press `Enter` to collapse
  * the start pane and open it again. A drag in progress is tracked as a state, so both dividers a
  * corner moves stay lit for as long as they move.
@@ -133,6 +135,12 @@ const channel = new WeakMap<HelixHeadlessSplitter, Crossed>()
 @customElement('helix-headless-splitter')
 export class HelixHeadlessSplitter extends HelixElement {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-splitter': { label: 'Bereiche anpassen' } })`.
+   */
+  static words = 'helix-splitter'
+
+  /**
    * Which pane is shut, if either.
    *
    * The same accessor pair as `position`, and deliberately a second state
@@ -172,6 +180,7 @@ export class HelixHeadlessSplitter extends HelixElement {
    * range, 0 against a minimum of 20, which reads as broken rather than as
    * shut. While shut it reports the whole 0 to 100 it sits on and says this.
    */
+  @words
   @property({ attribute: 'collapsed-label' })
   collapsedLabel = 'Collapsed'
 
@@ -189,6 +198,7 @@ export class HelixHeadlessSplitter extends HelixElement {
   /**
    * The name of the handle where two dividers cross, read by screen readers.
    */
+  @words
   @property({ attribute: 'corner-label' })
   cornerLabel = 'Resize both'
 
@@ -210,6 +220,7 @@ export class HelixHeadlessSplitter extends HelixElement {
    * An `aria-label` or `aria-labelledby` on the host names the divider too,
    * and wins over this.
    */
+  @words
   @property()
   label = 'Resize panes'
 
@@ -1284,7 +1295,7 @@ export class HelixHeadlessSplitter extends HelixElement {
             ? this.collapsedLabel
             : this.hydrating
               ? nothing
-              : formatPercent(Math.round(position) / 100)
+              : formatPercent(Math.round(position) / 100, wordsLocale(this))
         }
         ?data-dragging=${this.dragging}
         ?data-flush=${this.flush}
@@ -1310,7 +1321,7 @@ export class HelixHeadlessSplitter extends HelixElement {
           aria-valuemax="100"
           aria-valuemin="0"
           aria-valuenow=${Math.round(crossing.at)}
-          aria-valuetext=${formatPercent(Math.round(crossing.at) / 100)}
+          aria-valuetext=${formatPercent(Math.round(crossing.at) / 100, wordsLocale(this))}
           data-cross=${index}
           style="--splitter-corner-at: ${crossing.at}%; --splitter-position: ${position}%"
           @dblclick=${this.handleCornerDoubleClick}

@@ -1,10 +1,11 @@
 import {
   customElement,
-  fillTemplate,
+  formatWords,
   HelixElement,
   hostAria,
   MixinControllerActive,
   whenHydrated,
+  words,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -69,11 +70,18 @@ import type { HelixHeadlessStep } from '../step/step.js'
 @customElement('helix-headless-steps')
 export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-steps': { progressLabel: '{share, number, percent} erledigt' } })`.
+   */
+  static words = 'helix-steps'
+
+  /**
    * The sequence's name, read by screen readers.
    *
    * A list of stages is a landmark a reader arrives at out of order, so it
    * needs a name of its own rather than borrowing the heading above it.
    */
+  @words
   @property()
   label = 'Steps'
 
@@ -101,11 +109,14 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
   orientation?: 'vertical'
 
   /**
-   * What the `progress` part says to a screen reader, with `{percent}` filled
-   * in with `progress`.
+   * What the `progress` part says to a screen reader. `{share, number,
+   * percent}` writes `progress` as a percentage the way the locale writes one,
+   * such as `40%`, or `40 %` in French. `{percent}` is `progress` as a whole
+   * number, for a sentence that places the sign itself.
    */
+  @words
   @property({ attribute: 'progress-label' })
-  progressLabel = '{percent}% complete'
+  progressLabel = '{share, number, percent} complete'
 
   /**
    * A function that answers whether a stage is valid, asked about the stage a
@@ -329,7 +340,7 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
         aria-valuemin="0"
         aria-valuemax="100"
         aria-valuenow=${progress}
-        aria-valuetext=${fillTemplate(this.progressLabel, { percent: String(progress) })}
+        aria-valuetext=${formatWords(this, 'progressLabel', { percent: progress, share: progress / 100 })}
         style="--steps-progress: ${progress}%"
         hidden
       ></div>`

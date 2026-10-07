@@ -6,6 +6,7 @@ import {
   inlineStep,
   keyClaimed,
   toolbarAround,
+  words,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -199,11 +200,18 @@ interface Control {
 @customElement('helix-headless-toolbar')
 export class HelixHeadlessToolbar extends HelixElement {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-toolbar': { label: 'Werkzeugleiste' } })`.
+   */
+  static words = 'helix-toolbar'
+
+  /**
    * The toolbar's name, read by screen readers.
    *
    * An `aria-label` or `aria-labelledby` on the host names the toolbar too,
    * and wins over this.
    */
+  @words
   @property()
   label = 'Toolbar'
 

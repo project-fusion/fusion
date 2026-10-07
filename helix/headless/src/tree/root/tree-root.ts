@@ -16,6 +16,7 @@ import {
   treeArrow,
   typesCharacter,
   whenHydrated,
+  words,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -105,13 +106,21 @@ const KEYS = new Set([
 @customElement('helix-headless-tree')
 export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(HelixElement)) {
   /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-tree': { label: 'Baum' } })`.
+   */
+  static words = 'helix-tree'
+
+  /**
    * What screen readers hear when a held item is put back, or a move is
    * refused, in a `reorderable` tree.
    */
+  @words
   @property({ attribute: 'canceled-label' })
   canceledLabel = 'Canceled'
 
   /** What screen readers hear when a held item is dropped, in a `reorderable` tree. */
+  @words
   @property({ attribute: 'dropped-label' })
   droppedLabel = 'Dropped'
 
@@ -121,6 +130,7 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
    * An `aria-label` or `aria-labelledby` on the host names the tree too, and
    * wins over this.
    */
+  @words
   @property()
   label = 'Tree'
 
@@ -129,6 +139,7 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
    * tree. `{name}` is the item's words, `{position}` its place among its
    * siblings, counting from 1, and `{count}` the number of siblings.
    */
+  @words
   @property({ attribute: 'moved-label' })
   movedLabel = '{name} moved to position {position} of {count}'
 
@@ -245,6 +256,7 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
    * What screen readers hear when a click on a grip picks up an item, in a
    * `reorderable` tree. `{name}` is the item's words.
    */
+  @words
   @property({ attribute: 'picked-up-label' })
   pickedUpLabel = 'Picked up {name}'
 
