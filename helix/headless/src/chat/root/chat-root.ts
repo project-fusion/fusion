@@ -1136,16 +1136,18 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
    * Moves focus to turn `at`, drawing it first where the transcript is
    * windowed and it is not drawn.
    *
-   * **A turn takes focus only once a reader moves to it**, so the
-   * `tabindex="-1"` a turn written as a child needs is written then, long
-   * after any server's markup has hydrated, and never on a turn nobody moved
-   * to.
+   * **A turn takes focus only once a reader moves to it**, so the `tabindex`
+   * it needs is written then, long after any server's markup has hydrated,
+   * and never on a turn nobody moved to.
    */
   private async focusTurn(at: number): Promise<void> {
     /* A reader moving to an older turn has left the newest one, and a pinned
-       transcript would take them straight back. */
+       transcript would take them straight back. A transcript that fits has
+       no newest turn out of sight, so it stays pinned and draws no way back. */
     const count = this.fed ? this.turns.length : this.messages.length
-    if (at < count - 1 && this.pinned) {
+    const log = this.log
+    const scrolls = log !== null && log !== undefined && log.scrollHeight > log.clientHeight
+    if (at < count - 1 && this.pinned && scrolls) {
       this.requestPinned(false)
     }
     if (this.fed) {
@@ -1159,17 +1161,40 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
         this.requestUpdate()
         await this.updateComplete
       }
-      drawn()?.focus()
+      const turn = drawn()
+      if (turn) {
+        this.visit(turn)
+      }
       return
     }
     const message = this.messages[at]
-    if (!message) {
-      return
+    if (message) {
+      this.visit(message)
     }
-    if (!message.hasAttribute('tabindex')) {
-      message.setAttribute('tabindex', '-1')
+  }
+
+  /** The turn that is a tab stop because a reader moved to it. */
+  private stop: HTMLElement | undefined
+
+  /**
+   * Focuses a turn, making it the transcript's one stop a reader moved to.
+   *
+   * **`0`, and never `-1`.** Chromium leaves the whole of a shadow host at a
+   * negative `tabindex` out of the Tab order, its own controls and what is
+   * slotted into it alike, so a turn at `-1` lost its links and its Try again
+   * once a reader had paged through it. The stop moves with the reader, and a
+   * `tabindex` you wrote on a turn is left as it is.
+   */
+  private visit(turn: HTMLElement): void {
+    if (this.stop !== turn) {
+      this.stop?.removeAttribute('tabindex')
+      this.stop = undefined
+      if (!turn.hasAttribute('tabindex')) {
+        turn.setAttribute('tabindex', '0')
+        this.stop = turn
+      }
     }
-    message.focus()
+    turn.focus()
   }
 
   /** The first control in the regions `names` holds, in their order. */
@@ -1303,7 +1328,6 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
               .turnWords=${this.words}
               .turnPosition=${first + offset + 1}
               .turnCount=${this.turns.length}
-              tabindex="-1"
               .failedLabel=${this.failedLabel}
               state=${turn.state ?? nothing}
             >${turn.text}</${message}>

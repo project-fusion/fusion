@@ -281,7 +281,10 @@ export class HelixHeadlessChatComposer extends HelixFormElement {
     }
     const invalid = this.touched && !this.internals.validity.valid
     this.toggleState('invalid', invalid)
-    this.internals.ariaInvalid = invalid ? 'true' : null
+    /* **`false` while nothing is shown**: a host with a role and no
+       `aria-invalid` is judged by its validity, and Chromium exposed an
+       untouched required composer, a `group`, as invalid on load. */
+    this.internals.ariaInvalid = invalid ? 'true' : 'false'
     if (invalid !== this.shownInvalid) {
       this.shownInvalid = invalid
     }

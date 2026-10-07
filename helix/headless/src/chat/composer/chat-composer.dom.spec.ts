@@ -320,6 +320,11 @@ describe('constraints', () => {
     expect(element.validity.valueMissing).toBe(true)
     expect(hasState(element, 'invalid')).toBe(false)
     expect(field.hasAttribute('aria-invalid')).toBe(false)
+    /* The host is a group with a role, and a host with no `aria-invalid` is
+       judged by its validity: Chromium exposed the untouched composer as
+       invalid on load. */
+    const internals = (element as unknown as { internals: ElementInternals }).internals
+    expect(internals.ariaInvalid).toBe('false')
 
     /* What a form's submission sends to a control that fails. */
     element.dispatchEvent(new Event('invalid'))
@@ -327,6 +332,7 @@ describe('constraints', () => {
     await element.updateComplete
     expect(hasState(element, 'invalid')).toBe(true)
     expect(field.getAttribute('aria-invalid')).toBe('true')
+    expect(internals.ariaInvalid).toBe('true')
 
     await type(element, 'hello')
     await element.updateComplete

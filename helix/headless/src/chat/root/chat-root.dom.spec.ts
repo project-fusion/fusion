@@ -430,8 +430,49 @@ describe('moving between turns', () => {
     expect(document.activeElement?.textContent).toBe(third.textContent)
     page(third, 'PageUp')
     expect(document.activeElement?.textContent).toBe(second.textContent)
-    // Only the turns a reader moved to were made focusable.
-    expect(first.getAttribute('tabindex')).toBe('-1')
+    /* Only the turn a reader is on is a stop, and as `0`: a host at `-1`
+       takes its slotted links and its own Try again out of the Tab order. */
+    expect(second.getAttribute('tabindex')).toBe('0')
+    expect(turns.filter((turn) => turn.hasAttribute('tabindex'))).toEqual([second])
+  })
+
+  /* Chromium skips the whole of a shadow host at `tabindex="-1"` when it
+     walks the Tab order, so a turn a reader had paged through lost its link
+     and its Try again, and Tab from before the chat went past both. */
+  test('a turn a reader paged through keeps its controls in the Tab order', async () => {
+    const element = (await mount(`
+      <helix-headless-chat label="Support">
+        <helix-headless-chat-message author="them" state="sent">See <a href="#docs">the docs</a></helix-headless-chat-message>
+        <helix-headless-chat-message author="me" state="failed">Two</helix-headless-chat-message>
+        <helix-headless-chat-message author="them" state="sent">Three</helix-headless-chat-message>
+      </helix-headless-chat>`)) as Chat
+    await element.updateComplete
+    const [first, second, third] = [
+      ...element.querySelectorAll('helix-headless-chat-message'),
+    ] as HTMLElement[] as [HTMLElement, HTMLElement, HTMLElement]
+    page(first.querySelector('a') as HTMLElement, 'PageDown')
+    page(second, 'PageDown')
+    page(third, 'PageUp')
+    page(second, 'PageUp')
+    for (const turn of [first, second, third]) {
+      expect(turn.getAttribute('tabindex')).not.toBe('-1')
+    }
+  })
+
+  /* A transcript that fits has nothing below to jump to, so moving to an
+     older turn leaves it pinned and draws no way back. */
+  test('moving to an older turn of a transcript that does not scroll leaves it pinned', async () => {
+    const element = (await mount(three)) as Chat
+    await element.updateComplete
+    const [, second, third] = [
+      ...element.querySelectorAll('helix-headless-chat-message'),
+    ] as HTMLElement[] as [HTMLElement, HTMLElement, HTMLElement]
+    const log = part(element, 'log') as HTMLElement
+    expect(log.scrollHeight).toBe(log.clientHeight)
+    page(third, 'PageUp')
+    page(second, 'PageUp')
+    await element.updateComplete
+    expect(element.pinned).toBe(true)
   })
 
   test('Control with End leaves for the composer', async () => {
