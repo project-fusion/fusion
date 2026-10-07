@@ -190,6 +190,14 @@ export class HelixHeadlessCodeBlock extends HelixElement {
   collapseLabel = 'Show fewer lines'
 
   /**
+   * In a diff, how many unchanged lines to keep beside each change. Each
+   * longer run of unchanged lines is folded behind a button that shows it.
+   * Unset shows every line the diff holds.
+   */
+  @property({ attribute: 'context-lines', type: Number })
+  contextLines?: number
+
+  /**
    * The copy button's name and tooltip text after a copy.
    */
   @words
@@ -216,14 +224,6 @@ export class HelixHeadlessCodeBlock extends HelixElement {
   copyNameLabel = '{copy}, {name}'
 
   /**
-   * In a diff, how many unchanged lines to keep beside each change. Each
-   * longer run of unchanged lines is folded behind a button that shows it.
-   * Unset shows every line the diff holds.
-   */
-  @property({ attribute: 'context-lines', type: Number })
-  contextLines?: number
-
-  /**
    * Whether the content is a unified diff, drawn as the lines it changed.
    *
    * Reflected, because the stylesheet paints a diff differently from code, and
@@ -244,6 +244,13 @@ export class HelixHeadlessCodeBlock extends HelixElement {
   expandable = false
 
   /**
+   * The expand button's words while the cap hides lines.
+   */
+  @words
+  @property({ attribute: 'expand-label' })
+  expandLabel = 'Show all lines'
+
+  /**
    * The words of a button that hides a run of unchanged lines it showed, in a
    * diff with `context-lines`. `{count}` is how many, and each language
    * writes the forms it has.
@@ -251,21 +258,6 @@ export class HelixHeadlessCodeBlock extends HelixElement {
   @words
   @property({ attribute: 'hide-unchanged-label' })
   hideUnchangedLabel = '{count, plural, one {Hide # unchanged line} other {Hide # unchanged lines}}'
-
-  /**
-   * The words of a button that shows a folded run of unchanged lines, in a
-   * diff with `context-lines`. `{count}` is how many.
-   */
-  @words
-  @property({ attribute: 'show-unchanged-label' })
-  showUnchangedLabel = '{count, plural, one {Show # unchanged line} other {Show # unchanged lines}}'
-
-  /**
-   * The expand button's words while the cap hides lines.
-   */
-  @words
-  @property({ attribute: 'expand-label' })
-  expandLabel = 'Show all lines'
 
   /**
    * Turns the code into highlighted markup, which the block draws in place of
@@ -356,6 +348,14 @@ export class HelixHeadlessCodeBlock extends HelixElement {
    */
   @property({ attribute: 'no-copy', reflect: true, type: Boolean })
   noCopy = false
+
+  /**
+   * The words of a button that shows a folded run of unchanged lines, in a
+   * diff with `context-lines`. `{count}` is how many.
+   */
+  @words
+  @property({ attribute: 'show-unchanged-label' })
+  showUnchangedLabel = '{count, plural, one {Show # unchanged line} other {Show # unchanged lines}}'
 
   /**
    * How a diff's two versions are arranged. It has no effect without `diff`.

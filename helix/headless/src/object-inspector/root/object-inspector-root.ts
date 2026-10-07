@@ -268,6 +268,14 @@ export class HelixHeadlessObjectInspector extends HelixElement {
   defaultDepth = 1
 
   /**
+   * What the tree says while there is no value to show, such as before a
+   * fetch answers. The `empty` slot replaces it.
+   */
+  @words
+  @property({ attribute: 'empty-label' })
+  emptyLabel = 'Nothing to show'
+
+  /**
    * The open branches, by path, in no set order.
    *
    * Writing opens exactly these and closes every other, keeping the active row
@@ -372,6 +380,14 @@ export class HelixHeadlessObjectInspector extends HelixElement {
   noCopy = false
 
   /**
+   * What the tree says while a filter matched no entry. The `empty` slot
+   * replaces it.
+   */
+  @words
+  @property({ attribute: 'no-matches-label' })
+  noMatchesLabel = 'No matches'
+
+  /**
    * Draws an entry's value your way, given the value and its entry. Set it as
    * a property.
    *
@@ -402,22 +418,6 @@ export class HelixHeadlessObjectInspector extends HelixElement {
   @words
   @property({ attribute: 'results-label' })
   resultsLabel = '{count, plural, one {# result} other {# results}}'
-
-  /**
-   * What the tree says while there is no value to show, such as before a
-   * fetch answers. The `empty` slot replaces it.
-   */
-  @words
-  @property({ attribute: 'empty-label' })
-  emptyLabel = 'Nothing to show'
-
-  /**
-   * What the tree says while a filter matched no entry. The `empty` slot
-   * replaces it.
-   */
-  @words
-  @property({ attribute: 'no-matches-label' })
-  noMatchesLabel = 'No matches'
 
   /**
    * The tree's accessible name when `label` is empty and the host names it

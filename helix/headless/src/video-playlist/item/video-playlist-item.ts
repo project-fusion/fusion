@@ -74,6 +74,13 @@ export class HelixHeadlessVideoPlaylistItem extends HelixElement {
   focusable?: boolean
 
   /**
+   * @internal Set by a `reorderable` playlist: where this entry stands in a
+   * move, which it says through its states.
+   */
+  @property({ attribute: false })
+  move: 'dragging' | 'drop-after' | 'drop-before' | undefined = undefined
+
+  /**
    * The image shown before this entry plays, also used as the row's thumbnail.
    *
    * One property doing both, because they are the same picture: the frame that
@@ -158,6 +165,9 @@ export class HelixHeadlessVideoPlaylistItem extends HelixElement {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     this.toggleState('current', this.current)
+    this.toggleState('dragging', this.move === 'dragging')
+    this.toggleState('drop-after', this.move === 'drop-after')
+    this.toggleState('drop-before', this.move === 'drop-before')
   }
 
   protected override render(): TemplateResult {
