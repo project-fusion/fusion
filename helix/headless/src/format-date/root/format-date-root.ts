@@ -75,6 +75,7 @@ const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/
  * @csspart day - The day of the month, with `fields`.
  * @csspart day-period - AM or PM, or the locale's word for the part of the day, with `fields`.
  * @csspart era - The era, such as AD, with `fields` and `era`.
+ * @csspart fractional-second - The fraction of a second, with `fields` and `fractional-second-digits`.
  * @csspart hour - The hour, with `fields`.
  * @csspart minute - The minute, with `fields`.
  * @csspart month - The month, with `fields`.
@@ -137,6 +138,14 @@ export class HelixHeadlessFormatDate extends HelixElement {
   day?: 'numeric' | '2-digit'
 
   /**
+   * Writes the part of the day in words, such as "in the morning" or "at
+   * night", in its `long`, `short`, or `narrow` form, where `hour` is on a
+   * twelve-hour clock.
+   */
+  @property({ attribute: 'day-period' })
+  dayPeriod?: 'long' | 'narrow' | 'short'
+
+  /**
    * Shows how long ago the timestamp was, in a compact form such as "3h", in
    * place of the date.
    *
@@ -164,6 +173,13 @@ export class HelixHeadlessFormatDate extends HelixElement {
    */
   @property({ type: Boolean })
   fields?: boolean
+
+  /**
+   * How many digits of a fraction of a second to write after `second`: 1, 2,
+   * or 3, as in 09:41:07.250.
+   */
+  @property({ attribute: 'fractional-second-digits', type: Number })
+  fractionalSecondDigits?: 1 | 2 | 3
 
   /**
    * Draws an `elapsed` or `relative` reading once and leaves it, where it
@@ -266,10 +282,12 @@ export class HelixHeadlessFormatDate extends HelixElement {
   timeZone?: string
 
   /**
-   * Shows the name of the time zone, in its `long` or `short` form.
+   * Shows the name of the time zone: `long` or `short`, as Pacific Daylight
+   * Time or PDT, `longOffset` or `shortOffset`, as GMT-07:00 or GMT-7, or
+   * `longGeneric` or `shortGeneric`, as Pacific Time or PT.
    */
   @property({ attribute: 'time-zone-name' })
-  timeZoneName?: 'long' | 'short'
+  timeZoneName?: 'long' | 'longGeneric' | 'longOffset' | 'short' | 'shortGeneric' | 'shortOffset'
 
   /**
    * How the weekday is written, where one is shown.

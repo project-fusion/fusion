@@ -7,7 +7,9 @@ import { FIELD } from './fields.js'
 export interface Asked {
   dateStyle?: 'full' | 'long' | 'medium' | 'short' | undefined
   day?: 'numeric' | '2-digit' | undefined
+  dayPeriod?: 'long' | 'narrow' | 'short' | undefined
   era?: 'long' | 'narrow' | 'short' | undefined
+  fractionalSecondDigits?: 1 | 2 | 3 | undefined
   hour?: 'numeric' | '2-digit' | undefined
   hourCycle?: 'h11' | 'h12' | 'h23' | 'h24' | undefined
   minute?: 'numeric' | '2-digit' | undefined
@@ -15,17 +17,28 @@ export interface Asked {
   second?: 'numeric' | '2-digit' | undefined
   timeStyle?: 'full' | 'long' | 'medium' | 'short' | undefined
   timeZone?: string | undefined
-  timeZoneName?: 'long' | 'short' | undefined
+  timeZoneName?:
+    | 'long'
+    | 'longGeneric'
+    | 'longOffset'
+    | 'short'
+    | 'shortGeneric'
+    | 'shortOffset'
+    | undefined
   weekday?: 'long' | 'short' | 'narrow' | undefined
   year?: 'numeric' | '2-digit' | undefined
 }
 
 /**
  * The fields a style stands in for, which `Intl` refuses beside one: every
- * field a date is drawn in, as `fields.ts` names them. `dayPeriod` is among
- * them and is never an option, so it is never copied.
+ * field a date is drawn in, as `fields.ts` names them, and the digits of a
+ * fraction of a second, which `Intl` names `fractionalSecond` as a part and
+ * `fractionalSecondDigits` as an option.
  */
-const FIELDS = Object.keys(FIELD) as (keyof Asked)[]
+const FIELDS = [
+  ...Object.keys(FIELD).filter((one) => one !== 'fractionalSecond'),
+  'fractionalSecondDigits',
+] as (keyof Asked)[]
 
 /**
  * The `Intl.DateTimeFormat` options for what was asked, and none that was not:
@@ -43,7 +56,7 @@ const FIELDS = Object.keys(FIELD) as (keyof Asked)[]
 export const formatOptions = (asked: Asked, dateOnly = false): Intl.DateTimeFormatOptions => {
   /* An option left `undefined` is one `Intl` reads as absent, so each is
      copied as it stands, set or not. */
-  const options: Record<string, string | undefined> = {
+  const options: Record<string, number | string | undefined> = {
     hourCycle: asked.hourCycle,
     timeZone: asked.timeZone || (dateOnly ? 'UTC' : undefined),
   }
