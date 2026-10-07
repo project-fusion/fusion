@@ -80,6 +80,33 @@
   overflow: hidden;
 }
 
+/* **Under `line-numbers`, each line is a block of the colored copy**, so a
+   line that wraps is one block and its number, the block's `::before`, stands
+   in the gutter beside its first row. The gutter is the start padding of the
+   copy and of the field alike, so their text still lines up. */
+:host([line-numbers]) [part="field"] > [part] {
+  padding-inline-start: calc(var(--helix-space-sm) * 3 + var(--_sandbox-source-gutter, 1ch));
+}
+
+:host([line-numbers]) [part="highlight"] {
+  counter-reset: line;
+}
+
+[part="line"] {
+  counter-increment: line;
+  display: block;
+  min-block-size: 1lh;
+  position: relative;
+}
+
+[part="line"]::before {
+  color: var(--sandbox-source-line-number-color, var(--helix-color-foreground-subtle));
+  content: counter(line);
+  inset-inline-end: calc(100% + var(--helix-space-sm) * 2);
+  position: absolute;
+  text-align: end;
+}
+
 /* The syntax tokens the editor uses, so a highlighter's kinds read the same
    colors in both, each behind a hook of its own. */
 [data-kind="callable"] {

@@ -81,6 +81,28 @@ describe('the built-in frame document', () => {
     expect(hosted.hasAttribute('srcdoc')).toBe(false)
   })
 
+  /* An example that imported a package by name failed in the built-in
+     document: nothing told the browser where the name lives. */
+  test('resolves the packages `imports` names, through an import map ahead of every script', async () => {
+    const own = (await preview(
+      `src="" imports='{"canvas-confetti": "https://esm.sh/canvas-confetti@1.9.3"}'`,
+    )) as Preview & { imports: Record<string, string> }
+    const document = part(own, 'frame')?.getAttribute('srcdoc') ?? ''
+    const map = document.match(/<script type="importmap">(.*?)<\/script>/)?.[1] ?? ''
+    expect(JSON.parse(map)).toEqual({
+      imports: { 'canvas-confetti': 'https://esm.sh/canvas-confetti@1.9.3' },
+    })
+    expect(document.indexOf('type="importmap"')).toBeLessThan(document.indexOf('<script>'))
+    /* A map is read once, as the document loads, so a new one loads it again. */
+    own.imports = { lodash: 'https://esm.sh/lodash-es@4.17.21' }
+    await own.updateComplete
+    expect(part(own, 'frame')?.getAttribute('srcdoc')).toContain('lodash-es@4.17.21')
+    expect(hasState(own, 'loading')).toBe(true)
+    /* No map without `imports`, so the document is what it was. */
+    const plain = part(await preview(''), 'frame')?.getAttribute('srcdoc') ?? ''
+    expect(plain).not.toContain('importmap')
+  })
+
   test('keeps the sandbox, with scripts and no origin of its own', async () => {
     const own = part(await preview(''), 'frame') as HTMLIFrameElement
     expect((own.getAttribute('sandbox') ?? '').split(/\s+/).sort()).toEqual([

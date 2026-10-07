@@ -356,3 +356,75 @@ describe('the name of the field', () => {
     expect(part(plain, 'source')?.getAttribute('aria-label')).toBe('Example source')
   })
 })
+
+describe('the source a pane is written with', () => {
+  /* A pane written with its source inside it opened empty, with nothing to
+     say the text was ignored. */
+  test('is its text where `value` is not set, without the indentation of the page', async () => {
+    const host = (await mount(`<helix-sandbox-source name="css">
+      p {
+        color: red;
+      }
+    </helix-sandbox-source>`)) as Source
+    await host.updateComplete
+    expect(host.value).toBe('p {\n  color: red;\n}')
+    expect((part(host, 'source') as HTMLTextAreaElement).value).toBe(host.value)
+  })
+
+  test('is the markup of a template it holds, which the page does not run', async () => {
+    const host = (await mount(`<helix-sandbox-source name="html"><template>
+      <p>Hello</p>
+      <script>console.log('ran')</script>
+    </template></helix-sandbox-source>`)) as Source
+    await host.updateComplete
+    expect(host.value).toBe(`<p>Hello</p>\n<script>console.log('ran')</script>`)
+  })
+
+  test('is `value` where it is set', async () => {
+    const host = (await mount(
+      '<helix-sandbox-source name="css" value="b { }">a { }</helix-sandbox-source>',
+    )) as Source
+    await host.updateComplete
+    expect(host.value).toBe('b { }')
+  })
+})
+
+describe('a new line', () => {
+  /* Each line of a block was typed back to the margin by hand. */
+  test('keeps the indentation of the line it breaks', async () => {
+    const host = await source()
+    const field = part(host, 'source') as HTMLTextAreaElement
+    field.value = 'p {\n  color: red;'
+    field.selectionStart = field.value.length
+    field.selectionEnd = field.value.length
+    expect(press(field, 'Enter').defaultPrevented).toBe(true)
+    expect(host.value).toBe('p {\n  color: red;\n  ')
+  })
+
+  test('is the platform’s own where the line has no indentation', async () => {
+    const host = await source()
+    const field = part(host, 'source') as HTMLTextAreaElement
+    field.value = 'p {'
+    field.selectionStart = 3
+    field.selectionEnd = 3
+    expect(press(field, 'Enter').defaultPrevented).toBe(false)
+  })
+})
+
+describe('line numbers', () => {
+  test('number each line of the source beside it, hidden from screen readers', async () => {
+    const host = await source('line-numbers value="a\nb\n\nc"')
+    await host.updateComplete
+    const lines = [...(host.shadowRoot?.querySelectorAll('[part~="line"]') ?? [])]
+    expect(lines).toHaveLength(4)
+    expect(lines.map((line) => line.textContent)).toEqual(['a', 'b', '', 'c'])
+    expect(part(host, 'highlight')?.getAttribute('aria-hidden')).toBe('true')
+    /* The field is still the textarea, and still the only thing read. */
+    expect(part(host, 'source')?.localName).toBe('textarea')
+  })
+
+  test('are not drawn unless asked', async () => {
+    const host = await source('value="a"')
+    expect(host.shadowRoot?.querySelector('[part~="line"]')).toBeNull()
+  })
+})

@@ -330,10 +330,23 @@ export const withScript = (source: string, script: string): string =>
  * escaped slash back into a plain one: measured, Bun printed `\u002f` as `/`.
  */
 const SCRIPT_END = ['<', 'script>'].join('/')
-export const defaultFrame = (): string => {
+
+/**
+ * The built-in document, with an import map for `imports` where there are any.
+ *
+ * **The map comes first in the head**, because a browser reads an import map
+ * only before the first module it loads, and the example's scripts are
+ * modules. `</` is escaped in the map as in the script, so a URL cannot close
+ * the element early.
+ */
+export const defaultFrame = (imports?: Readonly<Record<string, string>>): string => {
   if (builtIn === undefined) {
     const script = `(${serveWith})({drawn:${drawn},isRender:${isRender},layoutRules:${JSON.stringify(LAYOUT_RULES)},loggedText:${loggedText},runScripts:${runScripts},withoutStylesheets:${withoutStylesheets}})`
     builtIn = `<!doctype html><html><head><meta charset="utf-8"><meta content="width=device-width" name="viewport"><style>:root{color-scheme:light dark;font-family:system-ui,sans-serif}body{margin:0}</style></head><body><div id="preview-root"></div><script>${script.replaceAll('</', '<\\/')}${SCRIPT_END}</body></html>`
   }
-  return builtIn
+  if (!imports || Object.keys(imports).length === 0) {
+    return builtIn
+  }
+  const map = JSON.stringify({ imports }).replaceAll('</', '<\\/')
+  return builtIn.replace('<head>', `<head><script type="importmap">${map}${SCRIPT_END}`)
 }

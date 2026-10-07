@@ -89,6 +89,15 @@ export type PreviewMessage =
  * `servePreview` does. It defines no element, so an example that uses Helix
  * components needs a `src` that imports them.
  *
+ * **`imports` lets an example import packages by name** in the built-in
+ * document, as an import map: each name maps to the address of an ES module,
+ * such as `{"canvas-confetti": "https://esm.sh/canvas-confetti@1.9.3"}`, and
+ * `import confetti from 'canvas-confetti'` in the `js` pane then loads it. A
+ * CDN that serves npm packages as modules, such as esm.sh or jsDelivr's
+ * `+esm`, gives every package an address. A new map loads the document again,
+ * since a browser reads one only as a document starts. A `src` document
+ * declares its own.
+ *
  * **Examples render in a frame**, so an example's styles and scripts do not
  * affect the page around the sandbox, and `position: fixed` stays inside the
  * pane. The frame starts empty, with its own stylesheets and its own custom
@@ -199,6 +208,15 @@ export class HelixSandboxPreview extends HelixElement {
    */
   @property()
   layout?: 'padded' | 'centered' | 'fullscreen' | 'hug'
+
+  /**
+   * The packages an example can import by name in the built-in document,
+   * each mapped to the address of an ES module, as an import map's `imports`.
+   * Set it as JSON in the attribute or as an object. Not read where `src` is
+   * set.
+   */
+  @property({ type: Object })
+  imports?: Record<string, string>
 
   /**
    * The name of the button that opens the example in a new tab, under
@@ -461,7 +479,7 @@ export class HelixSandboxPreview extends HelixElement {
     frame.title = this.label
     frame.style.cssText = 'block-size: 100vh; border: none; display: block; inline-size: 100vw'
     if (this.src === '') {
-      frame.srcdoc = defaultFrame()
+      frame.srcdoc = defaultFrame(this.imports)
     } else {
       /* As this element's own frame resolved it, against this page, which the
          tab's blank document does not share. */
@@ -508,7 +526,7 @@ frame.onload = () => frame.contentWindow.postMessage(${JSON.stringify(this.messa
     }
     this.unready()
     if (this.src === '') {
-      frame.srcdoc = defaultFrame()
+      frame.srcdoc = defaultFrame(this.imports)
       return
     }
     frame.src = this.src
@@ -529,7 +547,9 @@ frame.onload = () => frame.contentWindow.postMessage(${JSON.stringify(this.messa
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     // A new document has to say it is listening again before anything is sent.
-    if (changed.has('src')) {
+    /* A new import map is a new document as well, the built-in one loading
+       again with it. */
+    if (changed.has('src') || (changed.has('imports') && this.src === '')) {
       this.unready()
       return
     }
@@ -575,7 +595,7 @@ frame.onload = () => frame.contentWindow.postMessage(${JSON.stringify(this.messa
       part="frame"
       @load=${this.handleFrameLoad}
       src=${this.src || nothing}
-      srcdoc=${this.src === '' ? defaultFrame() : nothing}
+      srcdoc=${this.src === '' ? defaultFrame(this.imports) : nothing}
       title=${this.label}
       allow="clipboard-write *; fullscreen *"
       sandbox=${SANDBOX}
