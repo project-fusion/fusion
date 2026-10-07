@@ -5,9 +5,11 @@ import {
   calendarLocale,
   customElement,
   type DateCalendar,
+  drawIcon,
   formatWords,
   dateAsValue as fromDate,
   type HelixBeforeChangeEvent,
+  HelixClearEvent,
   HelixFormElement,
   handedLocale,
   isDateValue,
@@ -26,7 +28,7 @@ import {
   words,
   wordsLocale,
 } from '@fusion.dev/helix-core'
-import { calendarBlank } from '@fusion.dev/helix-icons'
+import { calendarBlank, x } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
@@ -112,6 +114,7 @@ const dates = (value: string): string[] =>
  * @aliases DatePicker, DateField, InputDate
  * @documentation https://fusion.dev/helix/components/date-input
  *
+ * @slot clear-icon - Replaces the cross on the clear button, under `clearable`.
  * @slot end - Content after the date, before the trigger, such as a clear button.
  * @slot feedback - The error message under the field.
  * @slot hint - The help text under the field.
@@ -124,12 +127,14 @@ const dates = (value: string): string[] =>
  * @slot trigger - The icon on the button that opens the calendar.
  *
  * @event {Event} change - Fired after the value changes.
+ * @event {Event} input - Fired after the value changes.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the date changes. Cancelable: call `preventDefault()` to keep the current date.
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the calendar closes. Cancelable: call `preventDefault()` to keep it open.
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the calendar opens. Cancelable: call `preventDefault()` to keep it closed.
- * @event {Event} input - Fired after the value changes.
+ * @event {HelixClearEvent} helix-clear - Fired after the clear button has emptied the field, after `input` and `change`.
  * @event {ToggleEvent} toggle - Fired when the calendar opens or closes, with `newState` and `oldState`.
  *
+ * @csspart clear - The button that empties the field, under `clearable`, while it holds a date.
  * @csspart control - The text input.
  * @csspart date - One held date, as a tag, in `multiple`.
  * @csspart date-cell - The tag's grid cell, which a tag draws only inside a tag group.
@@ -220,6 +225,19 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
    */
   @property()
   autocomplete = ''
+
+  /**
+   * Whether the field shows a button that empties it, as Input's `clearable`
+   * does. Shown only while the field holds something to clear, and not while
+   * it is disabled or read-only.
+   */
+  @property({ type: Boolean })
+  clearable = false
+
+  /** The accessible name of the clear button, which shows only an icon. */
+  @words
+  @property({ attribute: 'clear-label' })
+  clearLabel = 'Clear'
 
   /**
    * The calendar the written date, the segments, and the calendar's days are
@@ -1040,6 +1058,29 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
     }
   }
 
+  /** Whether there is a clear button on screen right now. */
+  private get showsClear(): boolean {
+    return this.clearable && this.value !== '' && !this.isDisabled && !this.readOnly
+  }
+
+  /**
+   * Empties the field, through `requestValue` so a consumer who owns the
+   * value decides, then says `change` and `helix-clear` and puts focus back
+   * in the field, the button having gone.
+   */
+  private readonly handleClear = (): void => {
+    if (this.value !== '' && this.requestValue('')) {
+      this.announceChange()
+      this.dispatchEvent(new HelixClearEvent())
+    }
+    void this.updateComplete.then(() => this.returnFocus())
+  }
+
+  /** The cross on the clear button, behind a seam a tier can move. */
+  protected renderClearIcon(): TemplateResult {
+    return html`<slot name="clear-icon">${drawIcon(x)}</slot>`
+  }
+
   /** The line of text the dates are typed into, where the field shows no segments. */
   private renderControl(): TemplateResult {
     return html`<input
@@ -1087,6 +1128,18 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
         }
         ${this.segmentsShown ? html`${this.renderSegments()}${this.renderAutofill()}` : this.renderControl()}
         <slot name="end"></slot>
+        ${
+          this.showsClear
+            ? html`<button
+                part="clear"
+                type="button"
+                aria-label=${this.clearLabel}
+                @click=${this.handleClear}
+              >
+                ${this.renderClearIcon()}
+              </button>`
+            : nothing
+        }
         <button
           part="trigger"
           type="button"

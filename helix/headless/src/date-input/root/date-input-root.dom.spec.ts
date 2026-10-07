@@ -1275,3 +1275,27 @@ describe('the text of a date input opens a calendar', () => {
     expect(control(host).getAttribute('aria-expanded')).toBe('true')
   })
 })
+
+describe('a clearable date input', () => {
+  test('shows a named button while it holds a date, which empties it', async () => {
+    const host = await field('clearable name="d" default-value="2026-08-04"')
+    const heard: string[] = []
+    for (const name of ['change', 'helix-clear']) {
+      host.addEventListener(name, () => heard.push(name))
+    }
+    const clear = part(host, 'clear') as HTMLButtonElement
+    expect(clear.getAttribute('aria-label')).toBe('Clear')
+    clear.click()
+    await host.updateComplete
+    expect(host.value).toBe('')
+    expect(formValue(host)).toBe('')
+    expect(heard).toEqual(['change', 'helix-clear'])
+    expect(part(host, 'clear')).toBeNull()
+  })
+
+  test('and none while empty, read-only, or without `clearable`', async () => {
+    expect(part(await field('clearable'), 'clear')).toBeNull()
+    expect(part(await field('clearable readonly default-value="2026-08-04"'), 'clear')).toBeNull()
+    expect(part(await field('default-value="2026-08-04"'), 'clear')).toBeNull()
+  })
+})

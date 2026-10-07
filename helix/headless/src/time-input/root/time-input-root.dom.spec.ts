@@ -433,3 +433,18 @@ describe('the text of a time input opens a list', () => {
     expect(control(host).getAttribute('aria-expanded')).toBe('true')
   })
 })
+
+describe('a clearable time input', () => {
+  test('shows a named button while it holds a time, which empties it', async () => {
+    const host = await field('clearable default-value="09:30"')
+    const heard: string[] = []
+    for (const name of ['change', 'helix-clear']) {
+      host.addEventListener(name, () => heard.push(name))
+    }
+    ;(part(host, 'clear') as HTMLButtonElement).click()
+    await host.updateComplete
+    expect(host.value).toBe('')
+    expect(heard).toEqual(['change', 'helix-clear'])
+    expect(part(host, 'clear')).toBeNull()
+  })
+})
