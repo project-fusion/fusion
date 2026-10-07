@@ -218,10 +218,11 @@
       "inputs": ["$TURBO_DEFAULT$", "content/faces/faces.generated.ts"],
       "outputs": []
     },
-    // `helix-cem` writes four files and this used to claim one, then three.
-    // The manifest is the obvious output; `jsx.d.ts`, `vue.d.ts` and
-    // `svelte.d.ts` are written beside it by the typings generators, and an
-    // output a task does not declare is one a cache hit does not restore.
+    // `analyze` writes six files and this used to claim one, then three.
+    // The manifest is the obvious output; `jsx.d.ts`, `vue.d.ts`,
+    // `svelte.d.ts` and `words.d.ts` are written beside it by the typings
+    // generators, and an output a task does not declare is one a cache hit
+    // does not restore.
     //
     // **The generator is an input, and it is not in this package.** The
     // manifest is `helix manifest build`'s, so an edit to the Rust that writes
@@ -271,7 +272,8 @@
         "lint.json",
         "types/jsx.d.ts",
         "types/svelte.d.ts",
-        "types/vue.d.ts"
+        "types/vue.d.ts",
+        "types/words.d.ts"
       ]
     },
     "build": {
