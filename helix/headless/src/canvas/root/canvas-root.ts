@@ -372,11 +372,6 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   @property({ attribute: 'activate-hint-label' })
   override activateHintLabel = 'Press the board to use it'
 
-  /** The board's name where `label` is empty. */
-  @words
-  @property({ attribute: 'canvas-label' })
-  canvasLabel = 'Canvas'
-
   /** The text read with a card to say where its connections come from, with `{cards}`. */
   @words
   @property({ attribute: 'comes-from-label' })
@@ -416,6 +411,11 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   @words
   @property({ attribute: 'controls-label' })
   override controlsLabel = 'Board controls'
+
+  /** The board's name where `label` is empty. */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Canvas'
 
   /**
    * The accessible name for the board. Required.
@@ -3944,7 +3944,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     return html`<div
       part="region"
       role="group"
-      aria-label=${this.label || this.canvasLabel}
+      aria-label=${this.label || this.fallbackLabel}
       aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight Plus Minus"
       tabindex="0"
       @focusin=${this.idle.stir}

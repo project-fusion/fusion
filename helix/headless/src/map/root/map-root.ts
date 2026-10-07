@@ -294,6 +294,11 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
   @property({ attribute: 'face-north-label' })
   faceNorthLabel = 'Face north'
 
+  /** The map's name where `label` is empty and the host has no `aria-label`. */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Map'
+
   /** What screen readers hear when the map is tilted back to looking straight down. */
   @words
   @property({ attribute: 'flat-label' })
@@ -318,11 +323,6 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
   @words
   @property({ attribute: 'layers-label' })
   layersLabel = 'Map layers'
-
-  /** The map's name where `label` is empty and the host has no `aria-label`. */
-  @words
-  @property({ attribute: 'map-label' })
-  mapLabel = 'Map'
 
   /**
    * @internal Pictures of the map in each map type, written by the connector
@@ -1317,7 +1317,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     return html`<div
       part="region"
       role="group"
-      aria-label=${this.label || this.getAttribute('aria-label') || this.mapLabel}
+      aria-label=${this.label || this.getAttribute('aria-label') || this.fallbackLabel}
       aria-keyshortcuts=${this.keyShortcuts}
       tabindex="0"
       @focusin=${this.idle.stir}

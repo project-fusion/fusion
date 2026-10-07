@@ -350,6 +350,14 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
   droppedLabel = 'Dropped'
 
   /**
+   * The table's name where neither `label` nor an `aria-label` or
+   * `aria-labelledby` on the host gives it one.
+   */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Table'
+
+  /**
    * Makes the table a grid: one tab stop, and the arrow keys, Home, End and the
    * Page keys move focus between its cells, the headings included. Enter moves
    * into a cell's controls, and Tab leaves the table.
@@ -485,14 +493,6 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
   @property({ attribute: 'sorted-label' })
   sortedLabel =
     '{direction, select, ascending {Sorted by {column}, ascending} descending {Sorted by {column}, descending} other {Sorted by {column}}}'
-
-  /**
-   * The table's name where neither `label` nor an `aria-label` or
-   * `aria-labelledby` on the host gives it one.
-   */
-  @words
-  @property({ attribute: 'table-label' })
-  tableLabel = 'Table'
 
   /** What screen readers hear when the table stops being sorted. */
   @words
@@ -1230,7 +1230,7 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
       role=${grid ? 'grid' : 'table'}
       aria-multiselectable=${grid && this.selectable ? 'true' : nothing}
       aria-busy=${this.loading ? 'true' : nothing}
-      aria-label=${this.label || this.tableLabel}
+      aria-label=${this.label || this.fallbackLabel}
       style=${template ? `--table-template: ${template}` : ''}
     >
       <div part="head" role="row">${this.renderGripHead()}${this.renderSelectAll()}<slot name="columns"></slot></div>

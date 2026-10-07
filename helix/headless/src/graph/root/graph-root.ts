@@ -194,8 +194,8 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
    * `aria-label`.
    */
   @words
-  @property({ attribute: 'graph-label' })
-  graphLabel = 'Graph'
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Graph'
 
   /** The groups turned off in the legend, by name, whose notes neither the drawing nor the list shows. A property, never an attribute. */
   @property({ attribute: false })
@@ -905,7 +905,7 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
     return html`<div
       part="region"
       role="group"
-      aria-label=${this.label || this.getAttribute?.('aria-label') || this.graphLabel}
+      aria-label=${this.label || this.getAttribute?.('aria-label') || this.fallbackLabel}
       tabindex="0"
       @focusin=${this.idle.stir}
       @keydown=${this.handleKeydown}

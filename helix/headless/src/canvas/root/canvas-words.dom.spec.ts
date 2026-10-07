@@ -44,8 +44,8 @@ const said = (host: Canvas): string =>
 
 const GERMAN = {
   'helix-canvas': {
-    canvasLabel: 'Tafel',
     comesFromLabel: 'von {cards}',
+    fallbackLabel: 'Tafel',
     leadsToLabel: 'führt zu {cards}',
     linkedLabel: '{leadsTo}, {comesFrom}',
     selectedLabel: 'ausgewählt',
