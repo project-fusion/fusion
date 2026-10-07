@@ -66,7 +66,7 @@ export const choiceValue = ({
   if (extend && mode === 'multiple') {
     const from = anchor === undefined ? -1 : shown.indexOf(anchor)
     const range = rangeAdd(now, shown, from, shown.indexOf(pressed))
-    return range ? range.join(', ') : null
+    return range ? range.join(',') : null
   }
   if (behavior === 'replace' && !toggle) {
     return now.length === 1 && now[0] === pressed ? null : pressed
@@ -74,8 +74,10 @@ export const choiceValue = ({
   if (arrived) {
     return null
   }
-  const next = pressedValue(mode, value, pressed)
-  return next === value ? null : next
+  /* Written without spaces, as every collection in the data family writes its
+     keys: `a,c`. */
+  const next = commaList(pressedValue(mode, value, pressed)).join(',')
+  return next === commaList(value).join(',') ? null : next
 }
 
 /**

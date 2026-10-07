@@ -254,7 +254,7 @@ export class HelixHeadlessList extends HelixElement {
   type?: '1' | 'a' | 'A' | 'i' | 'I'
 
   /**
-   * The selected rows' values, separated by commas, in a list that selects.
+   * The selected rows' values, separated by commas with no spaces, such as `a,c`, in a list that selects.
    *
    * Set it to start with rows selected. A row's value is its `value`, or its
    * words where it has none.
@@ -603,7 +603,7 @@ export class HelixHeadlessList extends HelixElement {
     }
     if (selectsAll(event) && this.selectionMode === 'multiple') {
       event.preventDefault()
-      const every = this.reachable.map((one) => this.valueFor(one)).join(', ')
+      const every = this.reachable.map((one) => this.valueFor(one)).join(',')
       this.choose(every === this.value ? null : every)
     } else if (event.key === 'Escape' && this.value !== '' && this.selectionMode !== 'none') {
       /* React Aria's GridList clears on Escape too, and keeps the key from
