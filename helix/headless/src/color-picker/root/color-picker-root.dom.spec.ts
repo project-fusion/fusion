@@ -962,3 +962,15 @@ describe('a color picker with a hue wheel', () => {
     expect(host.shadowRoot?.querySelector('[data-channel="hue"]')).not.toBeNull()
   })
 })
+
+describe('the square’s vertical axis', () => {
+  /* Both axes were horizontal ranges, so the brightness slider said it ran
+     sideways while it moved up and down. */
+  test('is a vertical range, its maximum at the top', async () => {
+    const host = await picker()
+    const brightness = part(host, 'grid-brightness') as HTMLInputElement
+    expect(brightness.style.writingMode).toBe('vertical-lr')
+    expect(brightness.style.direction).toBe('rtl')
+    expect((part(host, 'grid-saturation') as HTMLInputElement).style.writingMode).toBe('')
+  })
+})
