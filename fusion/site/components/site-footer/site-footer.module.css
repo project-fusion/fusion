@@ -13,6 +13,12 @@
      needs to read as its own region rather than as the end of the page. */
   border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
   padding-block: var(--helix-space-2xl);
+  /* **Positioned, so it paints over a page that isolates itself.** The landing
+     page's reel is its own stacking context, for the strand fixed behind it,
+     and a stacking context paints after every block that is not positioned:
+     the strand's canvas covered this footer whole. Positioned, the footer
+     paints in page order, after the reel. */
+  position: relative;
 }
 
 /* Brand at the start, links at the end, and both wrap onto their own line when
