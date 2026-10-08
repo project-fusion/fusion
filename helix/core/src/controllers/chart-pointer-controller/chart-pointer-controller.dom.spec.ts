@@ -707,6 +707,18 @@ describe('a chart that hears its readings', () => {
     ])
   })
 
+  test('is told the keyboard put the reading away when Escape did', () => {
+    const one = hearing(4)
+    one.press('ArrowRight')
+    one.point.hostUpdated()
+    one.press('Escape')
+    one.point.hostUpdated()
+    expect(one.heard.at(-1)).toEqual([
+      'change',
+      { index: -1, label: '', pointerType: 'keyboard', series: '' },
+    ])
+  })
+
   test('is told of a press: a click on the plot, and Enter or Space on a reading', () => {
     const one = hearing(4)
     move(one, 71, 100)
