@@ -458,8 +458,11 @@ export class HelixFormElement extends HelixElement {
    * A native control answers about the value it was just given, so the
    * questions a script can ask run the pending update first. Lit's
    * `performUpdate` is the documented way to run one synchronously.
+   *
+   * Protected for a control that submits on its own, which has to hand the
+   * form the verdict for what it holds now: Pin Input's `autosubmit`.
    */
-  private runPendingUpdate(): void {
+  protected runPendingUpdate(): void {
     if (this.hasUpdated && this.isUpdatePending && !this.updateRunning) {
       this.performUpdate()
     }

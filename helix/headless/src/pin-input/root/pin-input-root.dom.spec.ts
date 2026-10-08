@@ -519,6 +519,32 @@ describe('the gaps Zag and Web Awesome close', () => {
     expect([host.value, submitted]).toEqual(['1234', 1])
   })
 
+  /* The form met the `tooShort` verdict for `123` and refused the code,
+     measured in Chromium: `invalid` from the field and no `submit`. */
+  test('autosubmit hands the form the verdict for a code typed one key at a time', async () => {
+    document.body.innerHTML =
+      '<form><helix-headless-pin-input label="Code" length="4" autosubmit required></helix-headless-pin-input></form>'
+    const form = document.querySelector('form') as HTMLFormElement
+    const host = document.querySelector('helix-headless-pin-input') as Pin
+    await host.updateComplete
+    /* What the platform reads, the internals, rather than the host's
+       `validity`, which brings the verdict up to date as it is asked. */
+    const { internals } = host as unknown as { internals: ElementInternals }
+    const verdicts: boolean[] = []
+    host.addEventListener('helix-complete', () => verdicts.push(internals.validity.valid))
+    form.requestSubmit = () => {
+      verdicts.push(internals.validity.valid)
+    }
+    for (const code of ['1', '12', '123']) {
+      await edit(host, code)
+    }
+    const field = control(host)
+    field.value = '1234'
+    field.setSelectionRange(4, 4)
+    field.dispatchEvent(new Event('input', { bubbles: true }))
+    expect(verdicts).toEqual([true, true])
+  })
+
   test('format draws its separators between the boxes, hidden from the reader', async () => {
     const host = await pin('length="6" format="###-###"')
     const separators = [...(host.shadowRoot?.querySelectorAll('[part="separator"]') ?? [])]
