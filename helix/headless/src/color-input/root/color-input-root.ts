@@ -471,37 +471,6 @@ export class HelixHeadlessColorInput extends MixinPickerField(
     if (changed.has('value') && parseColor(this.value)) {
       this.settled = this.value
     }
-    if (changed.has('open') && !this.open) {
-      this.pressedOpen = false
-    }
-  }
-
-  /** Whether the trigger's press opened the panel that is open now. */
-  private pressedOpen = false
-
-  /**
-   * The trigger's press, which notes that it opened the panel, so Escape hands
-   * focus back to the trigger.
-   */
-  private readonly handlePress = (): void => {
-    const opening = !this.open
-    this.handleTriggerClick()
-    this.pressedOpen = opening && this.open
-  }
-
-  /**
-   * Hands focus back to the control that opened the panel: the trigger after
-   * its press, which is the APG date picker dialog's rule, and the text after
-   * ArrowDown from it.
-   */
-  protected override returnFocus(): void {
-    const trigger = this.pressedOpen ? this.partNamed('trigger') : null
-    this.pressedOpen = false
-    if (trigger) {
-      trigger.focus()
-      return
-    }
-    super.returnFocus()
   }
 
   /*
@@ -618,7 +587,7 @@ export class HelixHeadlessColorInput extends MixinPickerField(
               : nothing
           }
           ?disabled=${this.isDisabled}
-          @click=${this.handlePress}
+          @click=${this.handleTriggerClick}
         >
           <span
             part="preview"

@@ -76,7 +76,7 @@ export declare class MixinPickerFieldInterface {
    * The trigger's press: opens the panel with focus in the picker, or closes
    * it.
    */
-  protected readonly handleTriggerClick: () => void
+  protected readonly handleTriggerClick: (event?: Event) => void
 
   /** Enter in the text submits the form, as it does in a native text field. */
   protected readonly handleKeypress: (event: KeyboardEvent) => void
@@ -348,8 +348,7 @@ export const MixinPickerField = <T extends Constructor<PickerBase>>(Base: T) => 
     protected readonly handleKeydown = (event: KeyboardEvent): void => {
       if (event.key === 'Escape' && this.open) {
         event.stopPropagation()
-        this.requestOpen(false)
-        this.returnFocus()
+        this.dismiss()
         return
       }
       const fromText = event.composedPath()[0] === this.control
@@ -413,7 +412,28 @@ export const MixinPickerField = <T extends Constructor<PickerBase>>(Base: T) => 
       }
       event.stopPropagation()
       event.preventDefault()
+      this.dismiss()
+    }
+
+    /**
+     * Escape's close, which hands focus back to the control that opened the
+     * panel: the trigger after its press, which is the APG date picker
+     * dialog's rule, and the field otherwise.
+     *
+     * **Here rather than in each family.** Color Input had the rule alone, and
+     * Date Input and Time Input, on the same code, put focus in the text after
+     * the trigger's press: one control before where the reader had been.
+     */
+    private dismiss(): void {
+      const trigger = this.pressedOpen ? this.partNamed('trigger') : null
+      this.pressedOpen = false
       this.requestOpen(false)
+      if (trigger) {
+        this.returning = true
+        trigger.focus()
+        this.returning = false
+        return
+      }
       this.returnFocus()
     }
 
@@ -452,6 +472,9 @@ export const MixinPickerField = <T extends Constructor<PickerBase>>(Base: T) => 
     /** Whether the trigger opened the panel, so focus moves into the picker. */
     private fromTrigger = false
 
+    /** Whether the trigger's press opened the panel that is open now, so Escape returns there. */
+    private pressedOpen = false
+
     /**
      * Enter in the text submits the form, as it does in a native text field.
      *
@@ -482,9 +505,13 @@ export const MixinPickerField = <T extends Constructor<PickerBase>>(Base: T) => 
      * the text opens the panel too, on the families that type, and moving
      * focus from there would take the caret from a reader who came to type.
      */
-    protected readonly handleTriggerClick = (): void => {
-      this.fromTrigger = !this.open
+    protected readonly handleTriggerClick = (event?: Event): void => {
+      const opening = !this.open
+      this.fromTrigger = opening
       this.toggleOpen()
+      /* A press, so Escape goes back to the trigger. Alt+Down from a segment
+         calls this with no event, and Escape goes back to that segment. */
+      this.pressedOpen = event !== undefined && opening && this.open
     }
 
     /**
@@ -571,6 +598,9 @@ export const MixinPickerField = <T extends Constructor<PickerBase>>(Base: T) => 
           this.partNamed('picker')?.focus()
         }
         this.fromTrigger = false
+        if (!this.open) {
+          this.pressedOpen = false
+        }
       }
       /* Every update, not only the ones that name `value`.
          `value` is an accessor over `valueState ?? defaultValue`, so a consumer
