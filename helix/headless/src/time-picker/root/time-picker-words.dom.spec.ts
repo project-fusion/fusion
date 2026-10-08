@@ -30,10 +30,14 @@ describe('a time picker on a page in another language', () => {
     expect(part(host, 'list')?.getAttribute('aria-label')).toBe('Godzina')
   })
 
-  test('says the sentence for its mode and shape where a value is no time', async () => {
-    expect(bubble(await picker('', 'value="nope"'))).toBe('Enter a time as HH:mm.')
-    expect(bubble(await picker('', 'value="nope" seconds mode="multiple"'))).toBe(
-      'Enter times as HH:mm:ss, separated by commas.',
+  /* It named a pattern token, "Enter a time as HH:mm.", to a reader whose list
+     showed `2:30 PM`. */
+  test('says the sentence for its mode where a value is no time, with a time as it shows one', async () => {
+    expect(bubble(await picker('', 'value="nope" locale="en-US"'))).toBe(
+      'Enter a time such as 2:30 PM.',
+    )
+    expect(bubble(await picker('', 'value="nope" locale="de-DE" seconds mode="multiple"'))).toBe(
+      'Enter times such as 14:30:15, separated by commas.',
     )
     registerWords('pl', {
       'helix-time-picker': {

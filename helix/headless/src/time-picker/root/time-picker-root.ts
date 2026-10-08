@@ -171,14 +171,19 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
    * **Every sentence a control raises in the browser's bubble is a property**,
    * named for the validity flag it reports, so a form in another language
    * speaks it. Unset is the sentence registered for the page's language, then
-   * the English. `{shape}` is how a time is written, `HH:mm` or `HH:mm:ss`, and
-   * `{mode}` is `single`, `range` or `multiple`, so each can have its own
-   * sentence.
+   * the English. `{example}` is a time written as the picker writes one,
+   * `2:30 PM` in `en-US` and `14:30` in `de-DE`, `{shape}` is `HH:mm` or
+   * `HH:mm:ss`, and `{mode}` is `single`, `range` or `multiple`, so each can
+   * have its own sentence.
+   *
+   * **The default names a time as the picker shows one.** It said "Enter a
+   * time as HH:mm." to a reader whose list showed `2:30 PM`, and a pattern
+   * token is words for a developer. Time Input says the same.
    */
   @words
   @property({ attribute: 'bad-input-message' })
   badInputMessage =
-    '{mode, select, single {Enter a time as {shape}.} other {Enter times as {shape}, separated by commas.}}'
+    '{mode, select, single {Enter a time such as {example}.} other {Enter times such as {example}, separated by commas.}}'
 
   /**
    * Times that cannot be chosen, as `HH:mm`, separated by commas or spaces.
@@ -923,6 +928,7 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
       return [
         { badInput: true },
         formatWords(this, 'badInputMessage', {
+          example: writeClock(this.seconds ? '14:30:15' : '14:30', this.clock, this.seconds),
           mode: this.mode ?? 'single',
           shape: this.seconds ? 'HH:mm:ss' : 'HH:mm',
         }),
