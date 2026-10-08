@@ -33,12 +33,34 @@ impl Drop for Servers {
     }
 }
 
+/// Stops a server and everything it started, and waits for it, never for
+/// long.
+///
+/// **`--` before the group**, because procps `kill` on Linux reads `-1234` as
+/// an option and signals nothing. macOS's `kill` takes it either way, so a run
+/// there ended and the same run on a runner waited for a server that never
+/// stopped, until the job's timeout.
+///
+/// **Bounded.** Ten seconds after `TERM` the group gets `KILL`, so a server that
+/// ignores the first signal cannot hold the run open.
 #[cfg(unix)]
 fn stop(child: &mut Child) {
-    /* The process group, which `process_group(0)` made the child's own. */
-    let _ = Command::new("kill")
-        .args(["-TERM", &format!("-{}", child.id())])
-        .status();
+    let group = format!("-{}", child.id());
+    let signal = |name: &str| {
+        let _ = Command::new("kill")
+            .args(["-s", name, "--", &group])
+            .stderr(Stdio::null())
+            .status();
+    };
+    signal("TERM");
+    for _ in 0..100 {
+        if matches!(child.try_wait(), Ok(Some(_))) {
+            return;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(100));
+    }
+    signal("KILL");
+    let _ = child.kill();
     let _ = child.wait();
 }
 
