@@ -23,10 +23,11 @@
     "check:gen:eval": "turbo run analyze token-layer && bun fusion/scripts/build-eval.mjs && bun fusion/scripts/build-eval.mjs --check && bun fusion/scripts/run-eval.mjs --check",
     "check:gen:metrics": "turbo run build --filter=@fusion.dev/helix --filter=@fusion.dev/helix-headless --filter=@fusion.dev/helix-styles --filter=@fusion.dev/helix-theme && bun fusion/scripts/build-metrics.mjs --check",
     "check:prose": "turbo run catalog && bun run fusion prose check",
-    "check:spec": "bun run fusion spec check && bun run check:spec:diagnostics && bun run check:spec:floors && bun run check:spec:visual && bun run check:spec:visual-parity && bun run check:spec:dsd",
+    "check:spec": "bun run fusion spec check && bun run check:spec:diagnostics && bun run check:spec:floors && bun run check:spec:visual && bun run check:spec:visual-parity && bun run check:spec:dsd && bun run check:spec:site",
     "check:spec:diagnostics": "turbo run @fusion.dev/helix#analyze @fusion.dev/helix-headless#analyze frame && bun fusion/scripts/check-diagnostics.mjs",
     "check:spec:dsd": "turbo run frame && bun fusion/scripts/check-dsd.mjs",
     "check:spec:floors": "bun fusion/scripts/check-floors.mjs",
+    "check:spec:site": "turbo run build --filter=@fusion.dev/site && bun proof/cli/npm/bin.mjs test --config fusion/site/proof.config.ts",
     "check:spec:visual": "turbo run frame && bun proof/cli/npm/bin.mjs test",
     "check:spec:visual-parity": "turbo run frame && bun fusion/scripts/check-visual-parity.mjs",
     "check:withheld": "bun fusion/scripts/check-withheld.mjs",
@@ -68,6 +69,7 @@
     "typecheck": "turbo run typecheck",
     "verify": "biome ci . && turbo run token-layer -- --check && bun run typecheck && bun run analyze && bun run check:cli && turbo run docs-check && turbo run samples -- --check && bun run check:gen:eval && turbo run content -- --check && turbo run catalog && turbo run routes-check && turbo run register -- --check && bun run check:gen:metrics && bun run check:css:seeds && turbo run wasm-check && bun run check:prose && bun run check:withheld && turbo run themed-page-check && bun run check:gen:element-events && bun run fusion spec check && bun run check:spec:floors && bun run test && bun run rs:check && bun run rs:test",
     "visual:update": "turbo run frame && bun proof/cli/npm/bin.mjs update",
+    "visual:update-site": "turbo run build --filter=@fusion.dev/site && bun proof/cli/npm/bin.mjs update --config fusion/site/proof.config.ts",
     "watch": "turbo watch frame catalog --filter=@fusion.dev/site"
   },
   "devDependencies": {

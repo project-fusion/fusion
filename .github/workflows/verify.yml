@@ -816,6 +816,42 @@ jobs:
             .local/dsd/diff/*.png
             .local/diagnostics/*.json
 
+  # **The site's pages, pictured by Fusion Proof's own GitHub Action.** Five
+  # pages at 1440 and 390 light and 1440 dark, from `next start` over the build
+  # `warm` made, compared with the baselines under `fusion/site/baselines`.
+  # `fusion/site/proof.config.ts` says why each page is there.
+  #
+  # **After `warm`, because `next build` is the slow half of it**, and a
+  # restore here. It runs beside `tests`, which also waits on `warm`, and
+  # finishes inside it, so it adds nothing to the run's wall time.
+  #
+  # **Every run, the skippable diffs included.** `touched.sh` lets the browser
+  # jobs skip a change under `fusion/docs/`, which no example reads; the site
+  # renders that writing.
+  site:
+    needs: [proven, warm]
+    if: ${{ !cancelled() && needs.proven.outputs.proven != 'true' && needs.warm.result == 'success' }}  # dialect:quoted, GitHub's function
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up bun and the dependencies
+        uses: ./.github/actions/setup
+      - name: Put the proof binary on disk
+        uses: ./.github/actions/proof
+      # `warm` built it, so this is a restore of `.next`.
+      - name: Build the site
+        run: bunx turbo run build --filter=@fusion.dev/site
+      - name: Picture the site
+        uses: ./proof/action
+        with:
+          args: --config fusion/site/proof.config.ts
+          mode: check
+          playwright: bunx playwright
+          proof: bun proof/cli/npm/bin.mjs
+          report: fusion/site/.proof/report
+
   # **The examples' diagnostics, sent to the console when a tree lands on
   # `main`**, where each finding becomes an issue with a state: stage 8 of the
   # diagnostics plan.
@@ -893,7 +929,7 @@ jobs:
   verify:
     if: always()
     needs:
-      [proven, plan, warm, warm-browser, checks, cli, floors, packaging, lint, types, tests, rust, browser]
+      [proven, plan, warm, warm-browser, checks, cli, floors, packaging, lint, types, tests, rust, browser, site]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
