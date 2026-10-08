@@ -6,9 +6,10 @@
  * it. Importing it gives every board of this tier the field, opened by a
  * double click, F2, or Enter on a group.
  */
+import { addFeature } from '@fusion.dev/helix-core'
 import { HelixHeadlessCanvas } from '../root/canvas-root.js'
-import { addLabelEditor } from './canvas-label-editor.js'
+import { drawLabelEditor, openLabelEditor } from './canvas-label-editor.js'
 
-addLabelEditor(HelixHeadlessCanvas)
+addFeature(HelixHeadlessCanvas, { drawLabelEditor, openLabelEditor })
 
-export { addLabelEditor } from './canvas-label-editor.js'
+export { drawLabelEditor, openLabelEditor } from './canvas-label-editor.js'

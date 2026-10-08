@@ -19,10 +19,6 @@
   touch-action: none;
 }
 
-:host([controls-placement^="bottom"]) [part="minimap"] {
-  inset-block: var(--helix-space-sm) auto;
-}
-
 [part="minimap-node"] {
   fill: var(--helix-color-foreground-subtle);
 }

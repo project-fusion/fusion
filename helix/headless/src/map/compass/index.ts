@@ -6,9 +6,10 @@
  * gives every map of this tier the compass its `controls` names, as they do
  * by default.
  */
+import { addFeature } from '@fusion.dev/helix-core'
 import { HelixHeadlessMap } from '../root/map-root.js'
-import { addCompass } from './map-compass.js'
+import { drawCompass } from './map-compass.js'
 
-addCompass(HelixHeadlessMap)
+addFeature(HelixHeadlessMap, { drawCompass })
 
-export { addCompass } from './map-compass.js'
+export { drawCompass } from './map-compass.js'

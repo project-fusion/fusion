@@ -172,14 +172,12 @@ export interface CanvasEditing {
 export interface CanvasAdditions {
   arrange?: (board: HelixHeadlessCanvas, options: CanvasArrangeOptions) => boolean
   clipboard?: (board: HelixHeadlessCanvas, event: ClipboardEvent) => void
-  labelEditor?: {
-    open: (board: HelixHeadlessCanvas, editing: CanvasEditing) => void
-    render: (
-      board: HelixHeadlessCanvas,
-      origin: { x: number; y: number },
-    ) => TemplateResult | typeof nothing
-  }
-  minimap?: (board: HelixHeadlessCanvas) => TemplateResult | typeof nothing
+  drawLabelEditor?: (
+    board: HelixHeadlessCanvas,
+    origin: { x: number; y: number },
+  ) => TemplateResult | typeof nothing
+  drawMinimap?: (board: HelixHeadlessCanvas) => TemplateResult
+  openLabelEditor?: (board: HelixHeadlessCanvas, editing: CanvasEditing) => void
   paste?: (board: HelixHeadlessCanvas, document: CanvasDocument | string) => boolean
   settle?: (board: HelixHeadlessCanvas) => void
 }
@@ -3203,9 +3201,9 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       this,
       'canvas/label-editor',
       'was asked to edit a label',
-      () => !added(this).labelEditor,
+      () => !added(this).openLabelEditor,
     )
-    added(this).labelEditor?.open(this, editing)
+    added(this).openLabelEditor?.(this, editing)
   }
 
   /**
@@ -3796,7 +3794,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       this,
       'canvas/minimap',
       'names `minimap` in `controls`',
-      () => this.drawsControls('minimap') && !added(this).minimap,
+      () => this.drawsControls('minimap') && !added(this).drawMinimap,
     )
     this.watchBox()
     this.watchWords()
@@ -4253,6 +4251,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   }
 
   protected override render(): TemplateResult {
+    const { drawLabelEditor, drawMinimap } = added(this)
     const nodes = this.nodes
     const drawn = extent(nodes)
     const box = { height: drawn.height + MARGIN * 2, width: drawn.width + MARGIN * 2 }
@@ -4309,7 +4308,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
           ${this.renderStops(origin, box)}
           <slot @slotchange=${this.handleSlotChange}></slot>
           ${this.renderEnds(origin)}
-          ${added(this).labelEditor?.render(this, origin) ?? nothing}
+          ${drawLabelEditor ? drawLabelEditor(this, origin) : nothing}
           ${this.renderMarquee(origin)}
         </div>
         <slot name="empty"></slot>
@@ -4317,7 +4316,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
         ${this.renderGestures()}
       </div>
       ${this.renderControls()}
-      ${this.drawsControls('minimap') && nodes.length > 0 ? (added(this).minimap?.(this) ?? nothing) : nothing}
+      ${drawMinimap && this.drawsControls('minimap') && nodes.length > 0 ? drawMinimap(this) : nothing}
       <span part="live" role="status">${this.said}</span>
       <div part="footer">
         <slot name="footer"></slot>

@@ -5,10 +5,10 @@
  * gives every board the minimap, where `controls` names `minimap`, and the
  * sheet that draws it.
  */
-import { addMinimap } from '@fusion.dev/helix-headless/canvas/minimap'
+import { addFeature } from '@fusion.dev/helix-core'
 import { HelixCanvas } from '../root/canvas-root.js'
-import { styles } from './canvas-minimap.css.js'
+import { drawStyledMinimap } from './canvas-minimap.js'
 
-addMinimap(HelixCanvas, styles)
+addFeature(HelixCanvas, { drawMinimap: drawStyledMinimap })
 
-export { addMinimap } from '@fusion.dev/helix-headless/canvas/minimap'
+export { drawMinimap } from '@fusion.dev/helix-headless/canvas/minimap'

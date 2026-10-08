@@ -6,10 +6,11 @@
  * it. Importing it gives every board the field, opened by a double click,
  * F2, or Enter on a group, and the sheet that draws it.
  */
-import { addLabelEditor } from '@fusion.dev/helix-headless/canvas/label-editor'
+import { addFeature } from '@fusion.dev/helix-core'
+import { openLabelEditor } from '@fusion.dev/helix-headless/canvas/label-editor'
 import { HelixCanvas } from '../root/canvas-root.js'
-import { styles } from './canvas-label-editor.css.js'
+import { drawStyledLabelEditor } from './canvas-label-editor.js'
 
-addLabelEditor(HelixCanvas, styles)
+addFeature(HelixCanvas, { drawLabelEditor: drawStyledLabelEditor, openLabelEditor })
 
-export { addLabelEditor } from '@fusion.dev/helix-headless/canvas/label-editor'
+export { drawLabelEditor, openLabelEditor } from '@fusion.dev/helix-headless/canvas/label-editor'

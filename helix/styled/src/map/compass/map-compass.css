@@ -3,7 +3,7 @@
 
 /* **The compass's own icon is the needle's size**, where the shared sheet
    gives every other control's icon the size of its glyph. */
-[part="controls"] [part="face-north"] ::slotted(*) {
+:host [part="face-north"] ::slotted(*) {
   --icon-size: var(--helix-size-icon-md);
 
   block-size: var(--helix-size-icon-md);
@@ -52,18 +52,4 @@
   box-shadow:
     var(--helix-shadow-floating),
     0 0 0 var(--helix-border-floating) var(--helix-color-border);
-}
-
-/* The needle turns with the map: north in the danger red a compass paints its
-   north in, south in the ink. */
-[part="needle"] {
-  block-size: var(--helix-size-icon-md);
-  inline-size: var(--helix-size-icon-md);
-  transform: rotate(var(--map-needle-turn, 0deg));
-}
-[part="needle"] [data-end="north"] {
-  fill: var(--map-needle-north-color, var(--helix-color-danger));
-}
-[part="needle"] [data-end="south"] {
-  fill: var(--map-needle-south-color, var(--helix-color-foreground-muted));
 }

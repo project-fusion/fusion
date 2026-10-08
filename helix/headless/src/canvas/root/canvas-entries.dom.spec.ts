@@ -18,8 +18,9 @@ beforeAll(async () => {
     class extends HelixHeadlessCanvas {
       static arrange = undefined
       static clipboard = undefined
-      static labelEditor = undefined
-      static minimap = undefined
+      static drawLabelEditor = undefined
+      static drawMinimap = undefined
+      static openLabelEditor = undefined
       static paste = undefined
       static settle = undefined
     },

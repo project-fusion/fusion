@@ -29,20 +29,8 @@
   position: absolute;
 }
 
-:host([fill]) [part="layers-menu"] {
-  max-block-size: calc(100cqb - var(--helix-space-sm) * 2);
-}
-
 [part="layers-menu"][hidden] {
   display: none;
-}
-
-:host([controls-placement^="bottom"]) [part="layers-menu"] {
-  inset-block: auto 0;
-}
-
-:host([controls-placement$="start"]) [part="layers-menu"] {
-  inset-inline: calc(100% + var(--helix-space-2xs)) auto;
 }
 
 /* **The map types first, three across**: a picture of the map over its name,

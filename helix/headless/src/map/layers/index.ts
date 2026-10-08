@@ -4,9 +4,10 @@
  * Its own entry, so a map without the menu carries none of it. Importing it
  * gives every map of this tier the menu, where `controls` names `layers`.
  */
+import { addFeature } from '@fusion.dev/helix-core'
 import { HelixHeadlessMap } from '../root/map-root.js'
-import { addLayersMenu } from './map-layers.js'
+import { drawLayersMenu } from './map-layers.js'
 
-addLayersMenu(HelixHeadlessMap)
+addFeature(HelixHeadlessMap, { drawLayersMenu })
 
-export { addLayersMenu } from './map-layers.js'
+export { drawLayersMenu } from './map-layers.js'

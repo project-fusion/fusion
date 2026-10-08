@@ -1,6 +1,4 @@
 import {
-  addFeature,
-  adoptSheet,
   HelixBeforeChangeEvent,
   HelixBeforeToggleEvent,
   HelixMapPartChangeEvent,
@@ -19,7 +17,7 @@ import {
   stack,
   target,
 } from '@fusion.dev/helix-icons'
-import { type CSSResult, html, nothing, type ReactiveController, type TemplateResult } from 'lit'
+import { html, nothing, type ReactiveController, type TemplateResult } from 'lit'
 import { live } from 'lit/directives/live.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import type { HelixHeadlessMap, MapLayer, MapType } from '../root/map-root.js'
@@ -59,12 +57,14 @@ const iconOf = (layer: MapLayer | undefined): HelixIcon => {
 
 /** The frame as the menu reads it: the members its public API leaves out. */
 interface Frame {
+  layersOpen: boolean
   readonly layers: MapLayer[]
-  toggleState(name: string, on: boolean): void
+  renderLayersIcon(): TemplateResult
 }
 
 /**
- * The layers menu of one map: whether it is open, and what closes it.
+ * What opens and closes the layers menu of one map, which the map holds as
+ * its `layersOpen` state.
  *
  * Made the first time the map draws the menu, so a map whose `controls` never
  * names `layers` makes none.
@@ -72,12 +72,14 @@ interface Frame {
 class LayersMenu implements ReactiveController {
   private readonly map: HelixHeadlessMap
 
-  /** Whether the menu is open. */
-  open = false
-
   constructor(map: HelixHeadlessMap) {
     this.map = map
     map.addController(this)
+  }
+
+  /** Whether the menu is open. */
+  get open(): boolean {
+    return (this.map as unknown as Frame).layersOpen
   }
 
   /** Opens or closes the menu, and listens for a press outside it while it is open. */
@@ -85,17 +87,12 @@ class LayersMenu implements ReactiveController {
     if (open === this.open) {
       return
     }
-    this.open = open
+    ;(this.map as unknown as Frame).layersOpen = open
     if (open) {
       document.addEventListener('pointerdown', this.handleOutside)
     } else {
       document.removeEventListener('pointerdown', this.handleOutside)
     }
-    this.map.requestUpdate()
-  }
-
-  hostUpdate(): void {
-    ;(this.map as unknown as Frame).toggleState('layers-open', this.open)
   }
 
   hostDisconnected(): void {
@@ -266,10 +263,11 @@ const renderMapTypes = (map: HelixHeadlessMap): TemplateResult => {
  * order they are written, with its picture and name, pressed while it is
  * shown. A group's tile is pressed while any of its layers is shown.
  */
-const renderLayersMenu = (map: HelixHeadlessMap): TemplateResult => {
+export const drawLayersMenu = (map: HelixHeadlessMap): TemplateResult => {
   const menu = menus.get(map) ?? new LayersMenu(map)
   menus.set(map, menu)
-  const { layers } = map as unknown as Frame
+  const frame = map as unknown as Frame
+  const { layers } = frame
   const entries = entriesOf(layers)
   return html`<button
       part="layers-toggle"
@@ -287,11 +285,7 @@ const renderLayersMenu = (map: HelixHeadlessMap): TemplateResult => {
       @focusout=${menu.handleFocusOut}
       @keydown=${menu.handleKeydown}
     >
-      <slot name="layers-icon">
-        <svg aria-hidden="true" fill="currentColor" height="16" viewBox=${stack.viewBox} width="16">
-          ${unsafeSVG(stack.content)}
-        </svg>
-      </slot>
+      ${frame.renderLayersIcon()}
     </button>
     <div
       part="layers-menu"
@@ -324,19 +318,4 @@ const renderLayersMenu = (map: HelixHeadlessMap): TemplateResult => {
           : nothing
       }
     </div>`
-}
-
-/**
- * Gives every map of a class its layers menu, drawn where `controls` names
- * `layers` and the map has layers. The entries call it for their own tier's
- * class: the headless entry for `HelixHeadlessMap`, and the styled one for
- * `HelixMap`, with the sheet that draws the menu.
- */
-export const addLayersMenu = (element: typeof HelixHeadlessMap, sheet?: CSSResult): void => {
-  addFeature(element, {
-    layersMenu: (map: HelixHeadlessMap) => {
-      adoptSheet(map, sheet)
-      return renderLayersMenu(map)
-    },
-  })
 }

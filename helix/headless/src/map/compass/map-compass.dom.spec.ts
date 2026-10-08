@@ -19,7 +19,7 @@ beforeAll(async () => {
   customElements.define(
     'bare-compass-map',
     class extends Frame {
-      static compass = undefined
+      static drawCompass = undefined
     },
   )
 })

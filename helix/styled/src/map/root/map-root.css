@@ -227,6 +227,38 @@
   background-color: var(--helix-color-primary-surface-hover);
 }
 
+/* ============================================ the compass and the menu === */
+
+/* The needle, which the frame draws inside the compass from
+   `@fusion.dev/helix/map/compass`, and where the layers menu from
+   `@fusion.dev/helix/map/layers` opens: the rules that read the frame's own
+   attributes stay in the frame's sheet, and the rest arrive with each entry. */
+/* The needle turns with the map: north in the danger red a compass paints its
+   north in, south in the ink. */
+[part="needle"] {
+  block-size: var(--helix-size-icon-md);
+  inline-size: var(--helix-size-icon-md);
+  transform: rotate(var(--map-needle-turn, 0deg));
+}
+[part="needle"] [data-end="north"] {
+  fill: var(--map-needle-north-color, var(--helix-color-danger));
+}
+[part="needle"] [data-end="south"] {
+  fill: var(--map-needle-south-color, var(--helix-color-foreground-muted));
+}
+
+:host([fill]) [part="layers-menu"] {
+  max-block-size: calc(100cqb - var(--helix-space-sm) * 2);
+}
+
+:host([controls-placement^="bottom"]) [part="layers-menu"] {
+  inset-block: auto 0;
+}
+
+:host([controls-placement$="start"]) [part="layers-menu"] {
+  inset-inline: calc(100% + var(--helix-space-2xs)) auto;
+}
+
 /* ======================================================= forced colors === */
 
 /* **The pressed 3D button in a system color.** Forced colors replace the

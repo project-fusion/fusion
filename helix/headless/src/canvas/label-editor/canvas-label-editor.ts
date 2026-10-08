@@ -1,75 +1,18 @@
 import {
-  addFeature,
-  adoptSheet,
   formatWords,
   HelixBeforeRelabelEvent,
   HelixRelabelEvent,
   type RelabelDetail,
 } from '@fusion.dev/helix-core'
-import { type CSSResult, html, nothing, type TemplateResult } from 'lit'
+import { html, nothing, type TemplateResult } from 'lit'
 import { boardOf } from '../board.js'
 import type { CanvasEditing, HelixHeadlessCanvas } from '../root/canvas-root.js'
 
 /** The label each board is editing, while it is. */
 const edits = new WeakMap<HelixHeadlessCanvas, CanvasEditing>()
 
-/**
- * Opens the field for a connection's label or a group's name. The field takes
- * the caret with what it says selected once it is drawn, so typing replaces it
- * and an arrow key keeps it.
- */
-const open = (board: HelixHeadlessCanvas, editing: CanvasEditing): void => {
-  edits.set(board, editing)
-  board.requestUpdate()
-  void board.updateComplete.then(() => {
-    const field = boardOf(board).partNamed<HTMLInputElement>('label-editor')
-    field?.focus()
-    field?.select()
-  })
-}
-
-/**
- * Finishes editing a label: asks, writes it where the page did not refuse,
- * and says it did. The same value is no change and asks nothing.
- */
-const finish = (board: HelixHeadlessCanvas, field: HTMLInputElement, keep: boolean): void => {
-  const editing = edits.get(board)
-  if (!editing) {
-    return
-  }
-  edits.delete(board)
-  board.requestUpdate()
-  const inner = boardOf(board)
-  const label = field.value.trim()
-  const back = (): void => {
-    void board.updateComplete.then(() => inner.focusStop(editing.key))
-  }
-  if (!keep || label === editing.was) {
-    back()
-    return
-  }
-  const edge = editing.target === 'edge' ? inner.edgeElement(editing.key) : undefined
-  const card = editing.target === 'group' ? inner.cardNamed(editing.key) : undefined
-  const detail: RelabelDetail = {
-    label,
-    name: edge ? edge.name : (card?.name ?? ''),
-    target: editing.target,
-    was: editing.was,
-    ...(edge ? { from: edge.from, to: edge.to } : {}),
-  }
-  if (board.dispatchEvent(new HelixBeforeRelabelEvent(detail))) {
-    if (edge) {
-      edge.label = label || undefined
-    } else if (card) {
-      card.label = label
-    }
-    board.dispatchEvent(new HelixRelabelEvent(detail))
-  }
-  back()
-}
-
 /** The field a label is edited in, where the label is, while one is. */
-const render = (
+export const drawLabelEditor = (
   board: HelixHeadlessCanvas,
   origin: { x: number; y: number },
 ): TemplateResult | typeof nothing => {
@@ -122,20 +65,56 @@ const render = (
 }
 
 /**
- * Gives every board of a class the field that edits a connection's label or a
- * group's name in place, opened by a double click, F2, or Enter on a group.
- * The entries call it for their own tier's class: the headless entry for
- * `HelixHeadlessCanvas`, and the styled one for `HelixCanvas`, with the sheet
- * that draws the field.
+ * Opens the field for a connection's label or a group's name. The field takes
+ * the caret with what it says selected once it is drawn, so typing replaces it
+ * and an arrow key keeps it.
  */
-export const addLabelEditor = (element: typeof HelixHeadlessCanvas, sheet?: CSSResult): void => {
-  addFeature(element, {
-    labelEditor: {
-      open,
-      render: (board: HelixHeadlessCanvas, origin: { x: number; y: number }) => {
-        adoptSheet(board, sheet)
-        return render(board, origin)
-      },
-    },
+export const openLabelEditor = (board: HelixHeadlessCanvas, editing: CanvasEditing): void => {
+  edits.set(board, editing)
+  board.requestUpdate()
+  void board.updateComplete.then(() => {
+    const field = boardOf(board).partNamed<HTMLInputElement>('label-editor')
+    field?.focus()
+    field?.select()
   })
+}
+
+/**
+ * Finishes editing a label: asks, writes it where the page did not refuse,
+ * and says it did. The same value is no change and asks nothing.
+ */
+const finish = (board: HelixHeadlessCanvas, field: HTMLInputElement, keep: boolean): void => {
+  const editing = edits.get(board)
+  if (!editing) {
+    return
+  }
+  edits.delete(board)
+  board.requestUpdate()
+  const inner = boardOf(board)
+  const label = field.value.trim()
+  const back = (): void => {
+    void board.updateComplete.then(() => inner.focusStop(editing.key))
+  }
+  if (!keep || label === editing.was) {
+    back()
+    return
+  }
+  const edge = editing.target === 'edge' ? inner.edgeElement(editing.key) : undefined
+  const card = editing.target === 'group' ? inner.cardNamed(editing.key) : undefined
+  const detail: RelabelDetail = {
+    label,
+    name: edge ? edge.name : (card?.name ?? ''),
+    target: editing.target,
+    was: editing.was,
+    ...(edge ? { from: edge.from, to: edge.to } : {}),
+  }
+  if (board.dispatchEvent(new HelixBeforeRelabelEvent(detail))) {
+    if (edge) {
+      edge.label = label || undefined
+    } else if (card) {
+      card.label = label
+    }
+    board.dispatchEvent(new HelixRelabelEvent(detail))
+  }
+  back()
 }

@@ -5,9 +5,10 @@
  * gives every board of this tier the minimap, where `controls` names
  * `minimap`.
  */
+import { addFeature } from '@fusion.dev/helix-core'
 import { HelixHeadlessCanvas } from '../root/canvas-root.js'
-import { addMinimap } from './canvas-minimap.js'
+import { drawMinimap } from './canvas-minimap.js'
 
-addMinimap(HelixHeadlessCanvas)
+addFeature(HelixHeadlessCanvas, { drawMinimap })
 
-export { addMinimap } from './canvas-minimap.js'
+export { drawMinimap } from './canvas-minimap.js'

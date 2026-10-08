@@ -30,6 +30,13 @@
   position: relative;
 }
 
+/* Where the minimap from `@fusion.dev/helix/canvas/minimap` sits when the
+   controls move to the bottom: a rule that reads the board's own attribute
+   stays in the board's sheet, and the rest arrive with the entry. */
+:host([controls-placement^="bottom"]) [part="minimap"] {
+  inset-block: var(--helix-space-sm) auto;
+}
+
 /* What a consumer slots for an empty board, shown only when it is one: the
    markup is always there, because the shape of the template cannot depend on
    what the server could not count. */

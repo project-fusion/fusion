@@ -22,8 +22,10 @@ import {
   type ViewportZoomDetail,
   words,
 } from '@fusion.dev/helix-core'
+import { stack } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import type { HelixHeadlessMapMarker } from '../marker/map-marker.js'
 
 /** What the frame reads off a layer, which is all its list and menu need. */
@@ -80,8 +82,8 @@ const LAYERS = [
  * sheet, and a frame whose page never imports one carries none of its code.
  */
 export interface MapAdditions {
-  compass?: (map: HelixHeadlessMap, pan: boolean, rotate: boolean) => TemplateResult
-  layersMenu?: (map: HelixHeadlessMap) => TemplateResult | typeof nothing
+  drawCompass?: (map: HelixHeadlessMap, pan: boolean, rotate: boolean) => TemplateResult
+  drawLayersMenu?: (map: HelixHeadlessMap) => TemplateResult
 }
 
 /** What the entries have added to this frame's class. */
@@ -579,6 +581,10 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     )
   }
 
+  /** Whether the layers menu is open, which `map/layers` opens and closes. */
+  @state()
+  private layersOpen = false
+
   /* A layer a page hides or shows itself, which its checkbox and the list
      follow. Made on connection, so the server never builds one. */
   private hiding?: MutationObserver
@@ -798,13 +804,13 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
       this,
       'map/compass',
       'has the compass among its controls',
-      () => this.drawsCompass && !added(this).compass,
+      () => this.drawsCompass && !added(this).drawCompass,
     )
     auditEntry(
       this,
       'map/layers',
       'names `layers` in `controls`',
-      () => this.drawsControls('layers') && this.layers.length > 0 && !added(this).layersMenu,
+      () => this.drawsControls('layers') && this.layers.length > 0 && !added(this).drawLayersMenu,
     )
     this.addEventListener(HelixMapPartChangeEvent.eventName, this.handlePartChange)
     this.addEventListener('click', this.handleClick)
@@ -910,9 +916,19 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
    * it is imported.
    */
   protected renderLayersMenu(): TemplateResult | typeof nothing {
-    return this.drawsControls('layers') && this.layers.length > 0
-      ? (added(this).layersMenu?.(this) ?? nothing)
+    const { drawLayersMenu } = added(this)
+    return drawLayersMenu && this.drawsControls('layers') && this.layers.length > 0
+      ? drawLayersMenu(this)
       : nothing
+  }
+
+  /** The glyph inside the layers button, where `layers-icon` is empty. */
+  protected renderLayersIcon(): TemplateResult {
+    return html`<slot name="layers-icon">
+      <svg aria-hidden="true" fill="currentColor" height="16" viewBox=${stack.viewBox} width="16">
+        ${unsafeSVG(stack.content)}
+      </svg>
+    </slot>`
   }
 
   /**
@@ -920,7 +936,18 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
    * names them, which `map/compass` draws: nothing until it is imported.
    */
   protected renderCompass(pan: boolean, rotate: boolean): TemplateResult | typeof nothing {
-    return added(this).compass?.(this, pan, rotate) ?? nothing
+    const { drawCompass } = added(this)
+    return drawCompass ? drawCompass(this, pan, rotate) : nothing
+  }
+
+  /** The compass needle, turned to point north, where `face-north-icon` is empty. */
+  protected renderNeedle(): TemplateResult {
+    return html`<slot name="face-north-icon">
+      <svg part="needle" aria-hidden="true" viewBox="0 0 16 16">
+        <path data-end="north" d="M8 1.5 10.5 8h-5Z" />
+        <path data-end="south" d="M8 14.5 5.5 8h5Z" />
+      </svg>
+    </slot>`
   }
 
   /**
@@ -1040,6 +1067,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     hostAria(this.internals, { label: this.label })
     this.toggleState('fullscreen', this.filled)
     this.toggleState('idle', this.resting)
+    this.toggleState('layers-open', this.layersOpen)
     /* Whole degrees, as the readout says them: a map settling a hair off
        north is facing north to a reader, and to a stylesheet. */
     this.toggleState('rotated', Math.round(this.bearing) % 360 !== 0)

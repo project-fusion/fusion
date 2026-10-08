@@ -6,10 +6,10 @@
  * gives every map the compass its `controls` names, as they do by default,
  * and the sheet that draws it.
  */
-import { addCompass } from '@fusion.dev/helix-headless/map/compass'
+import { addFeature } from '@fusion.dev/helix-core'
 import { HelixMap } from '../root/map-root.js'
-import { styles } from './map-compass.css.js'
+import { drawStyledCompass } from './map-compass.js'
 
-addCompass(HelixMap, styles)
+addFeature(HelixMap, { drawCompass: drawStyledCompass })
 
-export { addCompass } from '@fusion.dev/helix-headless/map/compass'
+export { drawCompass } from '@fusion.dev/helix-headless/map/compass'

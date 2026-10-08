@@ -1,5 +1,5 @@
-import { addFeature, adoptSheet, capturePointer } from '@fusion.dev/helix-core'
-import { type CSSResult, html, nothing, svg, type TemplateResult } from 'lit'
+import { capturePointer } from '@fusion.dev/helix-core'
+import { html, nothing, svg, type TemplateResult } from 'lit'
 import { type Board, boardOf } from '../board.js'
 import { extent, MARGIN } from '../root/canvas-document.js'
 import type { HelixHeadlessCanvas } from '../root/canvas-root.js'
@@ -85,7 +85,7 @@ const point = (board: HelixHeadlessCanvas, event: PointerEvent): void => {
  * a keyboard to any card, and a second way that says nothing a reader can
  * use would be a stop that does nothing.
  */
-const render = (board: HelixHeadlessCanvas): TemplateResult | typeof nothing => {
+export const drawMinimap = (board: HelixHeadlessCanvas): TemplateResult => {
   const inner = boardOf(board)
   const area = areaOf(inner)
   const view = onScreen(inner)
@@ -109,19 +109,4 @@ const render = (board: HelixHeadlessCanvas): TemplateResult | typeof nothing => 
     )}
     ${svg`<rect part="minimap-view" x=${view.x} y=${view.y} width=${view.width} height=${view.height} />`}
   </svg>`
-}
-
-/**
- * Gives every board of a class its minimap, drawn where `controls` names
- * `minimap`. The entries call it for their own tier's class: the headless
- * entry for `HelixHeadlessCanvas`, and the styled one for `HelixCanvas`, with
- * the sheet that draws it.
- */
-export const addMinimap = (element: typeof HelixHeadlessCanvas, sheet?: CSSResult): void => {
-  addFeature(element, {
-    minimap: (board: HelixHeadlessCanvas) => {
-      adoptSheet(board, sheet)
-      return render(board)
-    },
-  })
 }

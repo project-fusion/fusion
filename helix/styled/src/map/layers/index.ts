@@ -5,10 +5,10 @@
  * gives every map the menu, where `controls` names `layers`, and the sheet
  * that draws it.
  */
-import { addLayersMenu } from '@fusion.dev/helix-headless/map/layers'
+import { addFeature } from '@fusion.dev/helix-core'
 import { HelixMap } from '../root/map-root.js'
-import { styles } from './map-layers.css.js'
+import { drawStyledLayersMenu } from './map-layers.js'
 
-addLayersMenu(HelixMap, styles)
+addFeature(HelixMap, { drawLayersMenu: drawStyledLayersMenu })
 
-export { addLayersMenu } from '@fusion.dev/helix-headless/map/layers'
+export { drawLayersMenu } from '@fusion.dev/helix-headless/map/layers'

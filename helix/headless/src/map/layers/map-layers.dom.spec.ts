@@ -19,7 +19,7 @@ beforeAll(async () => {
   customElements.define(
     'bare-layers-map',
     class extends Frame {
-      static layersMenu = undefined
+      static drawLayersMenu = undefined
     },
   )
 })
