@@ -118,10 +118,19 @@ const live = (host: HTMLElement): string => part(host, 'live')?.textContent?.tri
  * happy-dom has no layout, so these run in a browser that has both
  * (`bun run specs:browser map`).
  */
-const drawn =
-  hasLayout() && document.createElement('canvas').getContext('webgl2') !== null
-    ? test
-    : (): void => {}
+const webgl2 = hasLayout() && document.createElement('canvas').getContext('webgl2') !== null
+const drawn = webgl2 ? test : (): void => {}
+
+/* **A skipped spec is an absence in the browser run**, which reports passes and
+   failures and nothing else, so a browser with no WebGL 2 would drop every spec
+   below without a word. In a browser the missing context is a failure that
+   names itself. Headless Chromium on a GitHub runner draws WebGL 2 in
+   SwiftShader, so the specs below run there. */
+if (hasLayout()) {
+  test('the browser draws in WebGL 2, so every spec on a MapLibre map runs', () => {
+    expect(webgl2).toBe(true)
+  })
+}
 
 /**
  * The frame on a map MapLibre draws, end to end.

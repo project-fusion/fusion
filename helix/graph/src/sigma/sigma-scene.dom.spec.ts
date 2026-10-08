@@ -6,10 +6,18 @@ import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/d
  * the frame's selection and its keys. happy-dom has no WebGL, so these run in
  * the browser only (`bun run specs:browser graph`).
  */
-const scene =
-  hasLayout() && document.createElement('canvas').getContext('webgl2') !== null
-    ? test
-    : (): void => {}
+const webgl2 = hasLayout() && document.createElement('canvas').getContext('webgl2') !== null
+const scene = webgl2 ? test : (): void => {}
+
+/* **A skipped spec is an absence in the browser run**, which reports passes and
+   failures and nothing else, so a browser with no WebGL 2 would drop every spec
+   below without a word. In a browser the missing context is a failure that
+   names itself. */
+if (hasLayout()) {
+  test('the browser draws in WebGL 2, so every spec on a Sigma drawing runs', () => {
+    expect(webgl2).toBe(true)
+  })
+}
 
 beforeAll(async () => {
   registerDom()
