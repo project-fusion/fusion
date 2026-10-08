@@ -3,9 +3,6 @@ import { HelixHeadlessCommand } from '@fusion.dev/helix-headless/command'
 import type { CSSResultGroup } from 'lit'
 import '../../dialog/index.js'
 import '../../listbox/index.js'
-/* The commands are options, so importing the palette alone gives a palette
-   whose commands upgrade. */
-import '../../option/index.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './command-root.css.js'
 

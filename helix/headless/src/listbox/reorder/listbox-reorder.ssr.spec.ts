@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import { hostAttributes, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
+import '../../option/index.js'
 import './index.js'
 
 /* The entry gives a list what it does in a browser, and nothing to serve: a

@@ -2,6 +2,8 @@ import { describe, expect, test } from 'bun:test'
 import { hasPart, hostAttributes, partTag, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
+/* The options are the page's import, as they are a consumer's. */
+import '../../option/index.js'
 
 describe('select server output', () => {
   test('the trigger ships as a button, so the control is there before any script', () => {

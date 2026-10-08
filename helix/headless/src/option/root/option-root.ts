@@ -10,29 +10,9 @@ import {
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
-/**
- * The options among some elements, reaching one level into a group.
- *
- * What a control holding options reads its words from, off its own children
- * rather than off the listbox they are slotted into: the slot exists only once a
- * render has made it, so the listbox has none on a first render, and on a page a
- * server rendered the `slotchange` that would correct it fires before anything
- * listens.
- *
- * **An option by its shape, not by `instanceof`.** A tag is defined once, by
- * whichever copy of this class registered it first, and a second copy in the
- * same document tests against a class no element on the page has: every option
- * failed it, and a select said "Choose" over its value. Two copies are a
- * consumer with a duplicated dependency, or the browser specs, where each
- * family's bundle carries its own and they share one page.
- */
-export const optionsAmong = (elements: readonly Element[]): HelixHeadlessOption[] => {
-  const isOption = (element: Element): element is HelixHeadlessOption =>
-    'text' in element && 'value' in element && 'selected' in element
-  return elements.flatMap((element) =>
-    isOption(element) ? [element] : [...element.children].filter(isOption),
-  )
-}
+/* Re-exported, so the family's entry still offers it: the containers import
+   it from `among.ts`, which registers nothing. */
+export { isOption, optionsAmong } from '../among.js'
 
 /**
  * @summary One choice in a listbox.

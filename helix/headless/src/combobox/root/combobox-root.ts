@@ -1,6 +1,7 @@
 import {
   AriaForwardController,
   afterLinkFollowed,
+  auditChildren,
   chosenValues,
   countLabel,
   customElement,
@@ -32,7 +33,7 @@ import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html } from 'lit/static-html.js'
 import type { HelixHeadlessListbox } from '../../listbox/root/listbox-root.js'
-import { optionsAmong } from '../../option/root/option-root.js'
+import { optionsAmong } from '../../option/among.js'
 import { HelixHeadlessTag } from '../../tag/root/tag-root.js'
 /* Relative, so this registers the base listbox and the styled file's identical
    import registers the styled one. `tier` picks which the template asks for. */
@@ -109,6 +110,18 @@ const isInsertion = (event: Event): boolean =>
  * It does not add the option. The options are your light DOM, and your
  * framework would re-render over an element the combobox inserted, so add the
  * option in your event handler.
+ *
+ * **The options are an import of their own.** An option is the Option family's,
+ * which the combobox does not register, so a page that writes one imports it
+ * beside the combobox:
+ *
+ * ```js
+ * import '@fusion.dev/helix/combobox'
+ * import '@fusion.dev/helix/option'
+ * ```
+ *
+ * In development, a combobox holding an option nobody registered says so once
+ * the page has loaded, with the line to add.
  *
  * @since 0.1.0
  * @status stable
@@ -1349,6 +1362,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
 
   override connectedCallback(): void {
     super.connectedCallback()
+    auditChildren(this, 'option', 'option', 'it suggests nothing')
     this.addEventListener('helix-select', this.handleLinkFollowed)
     this.watcher = new MutationObserver(() => this.requestUpdate())
     this.watcher.observe(this, {

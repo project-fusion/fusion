@@ -151,6 +151,17 @@ export interface Family {
   documentation: string
   elements: Element[]
   examples: Example[]
+  /**
+   * The entries of other families whose elements a page writes inside this
+   * one, such as `option` for Select: the family does not register them, so
+   * the page imports them beside it. The reference's usage lists them under
+   * the family's own entries.
+   *
+   * Read from the import lines the family's descriptions show, where each
+   * container says what to import beside it. See "A container does not
+   * register another family's children" in `helix/CONVENTIONS.md`.
+   */
+  imports: string[]
   label: string
   since: string
   slug: string
@@ -523,6 +534,7 @@ export const catalog = (manifests: HelixManifest[], examples: ExampleSource[] = 
               a.tagName.localeCompare(b.tagName),
           ),
         examples: examplesOf(slug, root.helix, examples),
+        imports: importsOf(slug, entries),
         label: startCase(slug),
         since: root.helix?.since ?? '',
         slug,
@@ -533,6 +545,23 @@ export const catalog = (manifests: HelixManifest[], examples: ExampleSource[] = 
     })
     .sort((a, b) => a.label.localeCompare(b.label))
 }
+
+/**
+ * The entries of other families a family's descriptions import beside its own:
+ * an `import '@fusion.dev/helix/option'` line in Select's names `option`. An
+ * entry of the family's own, such as `filter-input/menu`, is a part's and is
+ * listed with the part.
+ */
+const importsOf = (slug: string, declarations: readonly HelixDeclaration[]): string[] =>
+  [
+    ...new Set(
+      declarations.flatMap((declaration) =>
+        [...(declaration.description ?? '').matchAll(/import '@fusion\.dev\/helix\/([a-z-]+)'/g)]
+          .map((match) => match[1] ?? '')
+          .filter((entry) => entry !== '' && entry !== slug),
+      ),
+    ),
+  ].sort()
 
 /** The family of a given slug, from an already-built catalog. */
 export const findInCatalog = (families: Family[], slug: string): Family | undefined =>

@@ -241,3 +241,44 @@ describe('entries', () => {
     expect(catalog([manifest])[0]?.elements[0]?.entry).toBe('pagination')
   })
 })
+
+/* A container does not register another family's children, so a page that
+   writes an option in a Select imports the Option family too, and the
+   reference says so beside the Select's own entry. */
+describe('imports', () => {
+  const written: HelixManifest = {
+    modules: [
+      {
+        declarations: [
+          {
+            description:
+              "Options are an import of their own:\n\n```js\nimport '@fusion.dev/helix/select'\nimport '@fusion.dev/helix/option'\n```",
+            name: 'HelixHeadlessSelect',
+            tagName: 'helix-headless-select',
+          },
+          { name: 'HelixSelect', tagName: 'helix-select' },
+        ],
+        path: 'src/select/root/select-root.ts',
+      },
+      {
+        declarations: [
+          {
+            description: "```js\nimport '@fusion.dev/helix/filter-input/menu'\n```",
+            name: 'HelixFilterInput',
+            tagName: 'helix-filter-input',
+          },
+        ],
+        path: 'src/filter-input/root/filter-input-root.ts',
+      },
+    ],
+  }
+
+  test('are the other families a description imports beside the family', () => {
+    expect(findInCatalog(catalog([written]), 'select')?.imports).toEqual(['option'])
+  })
+
+  test('and never the family itself or an entry of its own', () => {
+    expect(findInCatalog(catalog([written]), 'filter-input')?.imports).toEqual([])
+    expect(catalog([manifest])[0]?.imports).toEqual([])
+  })
+})

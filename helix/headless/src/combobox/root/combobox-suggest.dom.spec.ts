@@ -4,6 +4,7 @@ import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/d
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  await import('../../option/index.js')
 })
 
 type Combobox = HTMLElement & { open: boolean; updateComplete: Promise<unknown> }

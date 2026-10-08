@@ -317,6 +317,60 @@ build is one somebody turns off.
 tier below it, `tier` overridden wherever a base template interpolates, and the
 family imported by both tiers.
 
+### A container does not register another family's children
+
+Who registers an element follows from who writes it:
+
+- **A family's entry registers its own parts.** `@fusion.dev/helix/tabs`
+  defines Tab and Tab Panel, because a page writing tabs writes all three.
+- **A family registers every element it renders inside its own shadow root**,
+  because the consumer never writes those: Copy Button's tooltip, Select's
+  list, Date Input's tags. The section above is how.
+- **An element the consumer writes in light DOM that belongs to another family
+  is the consumer's import.** `<helix-option>` inside Select, Combobox,
+  Listbox, Command or Filter Input is the Option family's, and
+  `<helix-table-column>` inside Data Table is the Table family's. The container
+  does not register it, and the page imports it beside the container:
+
+```js
+import '@fusion.dev/helix/select'
+import '@fusion.dev/helix/option'
+```
+
+Select and Filter Input imported Option and Combobox did not, so a page that
+imported Select alone got working options, a page that imported Combobox alone
+got a list that offered nothing, and each reference page showed the family's
+import alone. Registering every child in every container would carry each
+child's code in each container. One rule across the containers is something a
+reader can predict, and the reference can state.
+
+**An element a family draws from data is the second rule's, even in light
+DOM.** Listbox draws its tier's options in its own shadow root for `items`, and
+Filter Input appends options to itself for what `source` returns. The page
+wrote neither, so the family registers each with an `import()` the first time
+it draws one, through a `defineOption` each tier overrides, and a list of
+children carries none of the option's code.
+
+**A missing child is reported once, in development.** A container calls
+core's `auditChildren` with the child's tag and entry; once the page has
+loaded and painted, a child of that tag that is still undefined is reported as
+`unregistered-part`, once for each container and child tag, naming the line to
+add. It is a development-only audit, `#audit-children`, as `missing-name` is.
+The same kind reports a Filter Menu written without `filter-input/menu`, which
+is the first rule's case: a part with an entry of its own.
+
+**A helper a container shares with the child's family lives in a module that
+registers nothing.** `optionsAmong` and `isOption` are in `option/among.ts` and
+`edgeOf` in `table/edge.ts`, and the containers import those; importing them
+from `option-root.ts` or `table-column.ts` registered the element as a side
+effect. `option/among.pure.spec.ts` reads each container's import graph and
+fails where one reaches the child's module again.
+
+**Each container's description shows the import block**, and the catalog reads
+those lines into `Family.imports`, which the reference lists under the
+family's own entries in Usage. The barrels, `@fusion.dev/helix` and
+`@fusion.dev/helix-headless`, register everything and need nothing more.
+
 ## Server rendering
 
 Every component must render on a server with no DOM. The app no longer ships
