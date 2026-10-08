@@ -114,7 +114,7 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * | Enter | Presses the highlighted suggestion. With none highlighted, reads the typed filters into chips, or submits the form when there are none. |
  * | Down, Up | Moves the highlight through the suggestions, wrapping, and opens the panel. |
  * | Home, End | Highlights the first or the last suggestion while the panel is open. |
- * | Escape | Closes the panel and stops there, so a dialog around the field stays open. |
+ * | Escape | Closes the panel and stops there, so a dialog around the field stays open. With the panel closed, empties the text. In an empty field, does nothing, so the page hears it. |
  * | Backspace | In an empty field, asks the last token to go. |
  * | Left | With the caret at the start of the text, moves to the last token's remove button. Right on a right-to-left page. |
  * | Left, Right on a token | Move between the tokens, and past the last back to the text. |
@@ -123,7 +123,8 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * **Typed filters.** The field parses only the fields you declare. Write
  * `FilterField` elements, usually inside the `FilterMenu` slotted into `start`,
  * so the picker and the text share one set. On Enter, the field reads the text
- * against them. `disposition:refunded,settled` and `-disposition:refunded` fire
+ * against them, and a paste is read the same way as soon as it lands.
+ * `disposition:refunded,settled` and `-disposition:refunded` fire
  * `helix-facet` exactly as ticking those values in the picker would, and the
  * parsed text is removed. Everything else stays, so `refund tuesday
  * disposition:settled` is a filter and a search at once. Helix defines the
@@ -592,6 +593,13 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
        now. */
     this.dismissed = false
     this.settleOpen()
+    /* **A paste is read at once**, as Enter reads what was typed: a pasted
+       `status:open` is a finished filter, and leaving it as text until the
+       reader thought to press Enter showed a query the results did not
+       follow. */
+    if ((event as InputEvent).inputType === 'insertFromPaste') {
+      this.readFilters()
+    }
   }
 
   /** Relayed, because `change` does not cross a shadow boundary on its own. */
@@ -877,6 +885,16 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
       if (this.readFilters() > 0) {
         event.preventDefault()
       }
+      return
+    }
+
+    /* **Escape with the panel shut empties the text**, as a search field does,
+       and stops there, so a dialog around the field stays open until the text
+       is gone. An empty field leaves the key to the page. */
+    if (event.key === 'Escape' && !this.open && this.value !== '') {
+      event.preventDefault()
+      event.stopPropagation()
+      this.handleClear()
       return
     }
 
