@@ -18,7 +18,7 @@ import { styles } from './avatar-root.css.js'
  * @aliases Profile picture, Gravatar
  * @documentation https://fusion.dev/helix/components/avatar
  *
- * @slot - Replaces the image and initials entirely, for an icon.
+ * @slot - Shown when there is no usable image, in place of the initials, for an icon. Hidden from assistive technology when the avatar has a `name`, which the host announces.
  *
  * @csspart image - The image, when one is loading or loaded.
  * @csspart initials - The initials shown when there is no usable image.
