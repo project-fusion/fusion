@@ -6,8 +6,20 @@ a baseline kept in your git repository, and fails the run when a picture
 changes.
 
 **Fusion Proof is in development.** This package installs the `proof` command,
-and the command has no verbs yet: `proof --version` and `proof --help` are what
-works today. The rest of this page describes what we are building.
+and `proof compare` is the one command that works today. The rest of this page
+describes what we are building.
+
+```sh
+proof compare baseline.png current.png --diff difference.png
+```
+
+`proof compare` exits 0 when every pixel matches and 1 when a pixel differs or
+the two pictures are different sizes. `--diff` writes an image of the
+difference: the baseline in gray, the differing pixels red, and the pixels left
+out as antialiasing yellow. `--threshold` sets how far apart two colors may be
+and still count as the same pixel, from 0 to 1, and is 0.1 unless you set it.
+The comparison is `pixelmatch`'s, ported to Rust, and it needs no browser and no
+Node.
 
 ```sh
 npm install --save-dev @fusion.dev/proof

@@ -20,6 +20,15 @@ clap = { version = "4", features = ["derive"] }
 # other two command lines and owned by none of them, so this is no dependency on
 # the fusion domain: the crate's `lib.rs` carries the argument.
 fusion-rules = { workspace = true }
+# **The PNG codec, in Rust and with no system library.** It decodes about twice
+# as fast as `pngjs` and encodes a diff image about eighty times as fast,
+# measured in the proposal on an 8.1 megapixel page, and it cross-compiles to
+# every platform package with nothing to link.
+png = "0.18"
+
+[dev-dependencies]
+# The contract tests write their own pictures rather than reading committed ones.
+png = "0.18"
 
 [lints]
 workspace = true
