@@ -716,3 +716,137 @@ describe('readings, as every chart sends them', () => {
     expect(said).toEqual([`change ${40 - drawn} Day ${41 - drawn} keyboard`])
   })
 })
+
+/* A calendar's selection was a run of days in the table's order, so a reader
+   could not take in the same weekdays across weeks. `selection-shape` asks for
+   a rectangle instead: the rows and columns between two corners, as a
+   spreadsheet takes a range. */
+describe('a rectangle of cells', () => {
+  type Selecting = Strip & { value: string }
+  const DAYS = (count: number) =>
+    Array.from({ length: count }, (_, day) => [`Day ${day + 1}`, day] as [string, number])
+  const key = (element: HTMLElement, name: string, shiftKey = false): void => {
+    part(element, 'strip')?.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        key: name,
+        shiftKey,
+      }),
+    )
+  }
+  const click = (element: HTMLElement, index: number, modifiers: MouseEventInit = {}): void => {
+    cells(element)[index]?.dispatchEvent(
+      new MouseEvent('click', { bubbles: true, cancelable: true, composed: true, ...modifiers }),
+    )
+  }
+  const frame = (): Promise<void> => new Promise((done) => requestAnimationFrame(() => done()))
+  const selected = (element: HTMLElement): number[] =>
+    cells(element).flatMap((one, index) =>
+      one.getAttribute('aria-selected') === 'true' ? [index] : [],
+    )
+
+  test('is not the default: Shift with an arrow still takes in the days between', async () => {
+    for (const shape of ['', 'selection-shape="linear"']) {
+      const element = (await strip(
+        `rows="7" selection-mode="multiple" ${shape}`,
+        DAYS(21),
+      )) as Selecting
+      key(element, 'Home')
+      key(element, ' ')
+      key(element, 'ArrowRight', true)
+      await element.updateComplete
+      expect(element.value).toBe('Day 1, Day 2, Day 3, Day 4, Day 5, Day 6, Day 7, Day 8')
+    }
+  })
+
+  test('grows and shrinks from the cell pressed by Shift with the arrows, and says the count', async () => {
+    const element = (await strip(
+      'rows="7" selection-mode="multiple" selection-shape="rectangle"',
+      DAYS(21),
+    )) as Selecting
+    key(element, 'Home')
+    key(element, 'ArrowDown')
+    key(element, ' ')
+    key(element, 'ArrowRight', true)
+    key(element, 'ArrowDown', true)
+    await element.updateComplete
+    expect(element.value).toBe('Day 2, Day 3, Day 9, Day 10')
+    expect(selected(element)).toEqual([1, 2, 8, 9])
+    key(element, 'ArrowUp', true)
+    await element.updateComplete
+    await frame()
+    await element.updateComplete
+    expect(element.value).toBe('Day 2, Day 9')
+    expect(selected(element)).toEqual([1, 8])
+    expect(part(element, 'selection')?.textContent).toBe('2 selected')
+  })
+
+  test('starts from the cell the keys left where nothing was pressed', async () => {
+    const element = (await strip(
+      'rows="7" selection-mode="multiple" selection-shape="rectangle"',
+      DAYS(21),
+    )) as Selecting
+    key(element, 'Home')
+    await element.updateComplete
+    key(element, 'ArrowRight', true)
+    await element.updateComplete
+    expect(element.value).toBe('Day 1, Day 8')
+  })
+
+  test('takes the rectangle to a cell clicked with Shift, and a cell clicked with Ctrl starts another', async () => {
+    const element = (await strip(
+      'rows="7" selection-mode="multiple" selection-shape="rectangle"',
+      DAYS(21),
+    )) as Selecting
+    click(element, 1)
+    click(element, 16, { shiftKey: true })
+    await element.updateComplete
+    expect(selected(element)).toEqual([1, 2, 8, 9, 15, 16])
+    click(element, 20, { ctrlKey: true })
+    click(element, 13, { shiftKey: true })
+    await element.updateComplete
+    // The first rectangle stays, and the value is in the table's order.
+    expect(element.value).toBe('Day 2, Day 3, Day 9, Day 10, Day 14, Day 16, Day 17, Day 21')
+    click(element, 9, { metaKey: true })
+    await element.updateComplete
+    expect(selected(element)).toEqual([1, 2, 8, 13, 15, 16, 20])
+  })
+
+  test('skips the places a short last column has no day for', async () => {
+    const element = (await strip(
+      'rows="7" selection-mode="multiple" selection-shape="rectangle"',
+      DAYS(10),
+    )) as Selecting
+    click(element, 8)
+    click(element, 4, { shiftKey: true })
+    await element.updateComplete
+    expect(element.value).toBe('Day 2, Day 3, Day 4, Day 5, Day 9, Day 10')
+  })
+
+  test('grows the way the arrow points on a right-to-left page', async () => {
+    const host = (await mount(
+      `<div dir="rtl">${table(DAYS(21))}<helix-headless-heatmap for="uptime" rows="7" selection-mode="multiple" selection-shape="rectangle"></helix-headless-heatmap></div>`,
+    )) as HTMLElement
+    const element = host.querySelector('helix-headless-heatmap') as Selecting
+    await element.updateComplete
+    key(element, 'Home')
+    key(element, ' ')
+    key(element, 'ArrowLeft', true)
+    key(element, 'ArrowDown', true)
+    await element.updateComplete
+    expect(element.value).toBe('Day 1, Day 2, Day 8, Day 9')
+  })
+
+  test('is a single cell at a time under `single`', async () => {
+    const element = (await strip(
+      'rows="7" selection-mode="single" selection-shape="rectangle"',
+      DAYS(21),
+    )) as Selecting
+    click(element, 1)
+    click(element, 16, { shiftKey: true })
+    await element.updateComplete
+    expect(element.value).toBe('Day 17')
+  })
+})
