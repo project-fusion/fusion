@@ -37,6 +37,12 @@ import '../../date-picker/index.js'
 import '../../tag/root/index.js'
 
 /**
+ * The date the bad-input message names, its day past twelve so no order of day
+ * and month misreads it.
+ */
+const EXAMPLE = '2026-08-24'
+
+/**
  * The dates in a value, which may hold more than one.
  *
  * A range is two and a multiple is any number, comma separated, which is what
@@ -854,7 +860,10 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
     if (held.length > 0 && !held.every(isDateValue)) {
       return (
         this.badInputMessage ||
-        formatWords(this, 'unreadableMessage', { mode: this.mode ?? 'single' })
+        formatWords(this, 'unreadableMessage', {
+          example: this.written(EXAMPLE),
+          mode: this.mode ?? 'single',
+        })
       )
     }
     /* The bound as the field writes a date, the way Time Input writes its
@@ -904,12 +913,18 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
 
   /**
    * The message for text that is no date, where `bad-input-message` is not
-   * set. `{mode}` is `single`, `range`, or `multiple`.
+   * set. `{mode}` is `single`, `range`, or `multiple`, and `{example}` is a
+   * date written as the field writes one, `August 24, 2026` in `en-US` and
+   * `24. August 2026` in `de-DE` at the default `date-style`.
+   *
+   * **The default names a date the field reads back.** It said "Enter a date
+   * as YYYY-MM-DD." to a reader whose field showed `August 4, 2026`, and a
+   * pattern token is words for a developer. Time Input says the same.
    */
   @words
   @property({ attribute: 'unreadable-message' })
   unreadableMessage =
-    '{mode, select, single {Enter a date as YYYY-MM-DD.} other {Enter dates as YYYY-MM-DD, separated by commas.}}'
+    '{mode, select, single {Enter a date such as {example}.} other {Enter dates such as {example}, separated by commas.}}'
 
   /**
    * The name of the calendar's heading where it shows a page of years, with
