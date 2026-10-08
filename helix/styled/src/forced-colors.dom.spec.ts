@@ -109,6 +109,9 @@ describe('under forced colors', () => {
   test('a legend’s swatch and a graph’s keep the colors they key', () => {
     expect(rule('helix-legend', '[part~="entry"]::before')).toContain('forced-color-adjust: none')
     expect(rule('helix-graph', '[part="legend-swatch"]')).toContain('forced-color-adjust: none')
+    expect(forced('helix-graph')).toMatch(
+      /\[part="search"\]:has\(\[aria-activedescendant\]\) ~ \[part="list"\] \[part~="note-cursor"\] \{\s*outline:/u,
+    )
   })
 
   test('a place on a map keeps the colors it was given for the map under it', () => {
