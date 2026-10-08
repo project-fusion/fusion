@@ -19,7 +19,14 @@ import {
   caretRight,
   type HelixIcon,
 } from '@fusion.dev/helix-icons'
-import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import {
+  type CSSResultGroup,
+  css,
+  html,
+  nothing,
+  type PropertyValues,
+  type TemplateResult,
+} from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { repeat } from 'lit/directives/repeat.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
@@ -126,6 +133,18 @@ export class HelixHeadlessPagination extends HelixElement {
    * `registerWords('de', { 'helix-pagination': { nextLabel: 'Nächste Seite' } })`.
    */
   static words = 'helix-pagination'
+
+  /* The pages are a list for the count a screen reader gives, and the order
+     a list's markers would number is not the pages': the run starts wherever
+     the current page puts it, and a gap is an item too, so a reader heard
+     "3." before "Page 4". The markers go here, with no stylesheet from the
+     page, and `role="list"` keeps the list in Safari, which drops one without
+     markers. The styled tier replaces the sheet and keeps the rule. */
+  static override styles: CSSResultGroup = css`
+    [part='list'] {
+      list-style: none;
+    }
+  `
 
   /**
    * How many pages to show at each end, whatever the current one is.
