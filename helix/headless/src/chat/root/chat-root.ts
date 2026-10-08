@@ -163,6 +163,13 @@ const drawnInFull = ({ element }: Rendered): boolean =>
  * `loading` while you fetch, then prepend the older turns. The turn the user
  * was reading stays in place on screen.
  *
+ * The transcript is a `log`, the role for content added in order where the
+ * newest matters most, and it answers the APG feed's keys. The `feed` role
+ * reads its articles as a list from the top, with no newest end to stay
+ * pinned to, so the log keeps the role a conversation has. While `loading` is
+ * set or older turns load, the log carries `aria-busy`, as the APG asks of a
+ * feed.
+ *
  * The log is `aria-live="off"`. A separate status region announces each new
  * turn once, when it has finished arriving. It skips the user's own turns
  * unless they failed to send, turns loaded as history, and the turns already
