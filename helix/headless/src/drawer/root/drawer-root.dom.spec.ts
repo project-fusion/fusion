@@ -269,6 +269,49 @@ describe('show() and close()', () => {
   })
 })
 
+describe('a form in the drawer', () => {
+  /* The platform closes the nearest `<dialog>` ancestor of a `method="dialog"`
+     form, and a slotted form's ancestors are the light DOM, where there is
+     none. So the drawer stayed open where `Dialog` closed for the same markup. */
+  test('closes it with `method="dialog"` from the footer, and the button’s value is the return value', async () => {
+    const drawer = (await mount(
+      `<helix-headless-drawer label="Filters">
+        <form method="dialog" slot="footer"><button value="apply">Apply</button></form>
+      </helix-headless-drawer>`,
+    )) as Drawer
+    drawer.show()
+    await drawer.updateComplete
+    const form = drawer.querySelector('form') as HTMLFormElement
+    const submit = new SubmitEvent('submit', {
+      bubbles: true,
+      cancelable: true,
+      submitter: form.querySelector('button'),
+    })
+    let returned = ''
+    drawer.addEventListener('helix-before-close', () => {
+      returned = drawer.returnValue
+    })
+    form.dispatchEvent(submit)
+    await drawer.updateComplete
+    expect([drawer.open, returned, submit.defaultPrevented]).toEqual([false, 'apply', true])
+  })
+
+  test('and leaves any other form alone', async () => {
+    const drawer = (await mount(
+      `<helix-headless-drawer label="Search">
+        <form><button>Go</button></form>
+      </helix-headless-drawer>`,
+    )) as Drawer
+    drawer.show()
+    await drawer.updateComplete
+    const form = drawer.querySelector('form') as HTMLFormElement
+    form.addEventListener('submit', (event) => event.preventDefault())
+    form.dispatchEvent(new SubmitEvent('submit', { bubbles: true, cancelable: true }))
+    await drawer.updateComplete
+    expect(drawer.open).toBe(true)
+  })
+})
+
 describe('Escape on a drawer that is not modal', () => {
   const browserKnows = 'closedBy' in HTMLDialogElement.prototype
 

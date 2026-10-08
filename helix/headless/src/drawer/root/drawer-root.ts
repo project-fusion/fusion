@@ -30,6 +30,7 @@ import {
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { wordsIn } from '../../dialog/description.js'
+import { closeOnDialogSubmit } from '../../dialog/form-method.js'
 import { beyondWindow } from '../reveal.js'
 import { startsSwipe } from '../swipe-start.js'
 
@@ -608,16 +609,23 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
     )
   }
 
+  /** A `<form method="dialog">` slotted into the drawer closes it, as in `Dialog`. */
+  private readonly handleSubmit = (event: SubmitEvent): void => {
+    closeOnDialogSubmit(event, (value) => this.close(value))
+  }
+
   /* On the host, which hears focus moving to slotted content and to the
-     panel's own controls alike. */
+     panel's own controls alike, and a submit from any slot. */
   override connectedCallback(): void {
     super.connectedCallback()
     this.addEventListener('focusin', this.handleFocusIn)
+    this.addEventListener('submit', this.handleSubmit)
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('focusin', this.handleFocusIn)
+    this.removeEventListener('submit', this.handleSubmit)
     unlockScroll(this)
   }
 
