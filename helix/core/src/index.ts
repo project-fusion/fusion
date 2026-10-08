@@ -241,6 +241,8 @@ export {
   HelixPanelResizeEvent,
   HelixPastedEvent,
   HelixPinEvent,
+  HelixPlotChangeEvent,
+  HelixPlotTurnEvent,
   HelixPressEvent,
   HelixPreviewEvent,
   HelixPreviousEvent,
@@ -281,6 +283,8 @@ export {
   type NavigateDetail,
   type OpenDetail,
   type PasteDetail,
+  type PlotChangeDetail,
+  type PlotTurnDetail,
   type PressDetail,
   type PressPointerType,
   type RangeDetail,
@@ -452,6 +456,12 @@ export {
 export { closestInstance } from './utils/closest-instance/closest-instance.js'
 export { type ColorWords, colorName, hueName } from './utils/color-name/color-name.js'
 export { columnStep } from './utils/column-step/column-step.js'
+export {
+  contextBudget,
+  type Holder,
+  LIVE,
+  pageBudget,
+} from './utils/context-budget/context-budget.js'
 export { countLabel } from './utils/count-label/count-label.js'
 export { createSheet } from './utils/create-sheet/create-sheet.js'
 export {

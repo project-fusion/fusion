@@ -161,6 +161,7 @@
       "helix/graph/src",
       "helix/headless/src",
       "helix/map/src",
+      "helix/plot/src",
       "helix/styled/src"
     ]
   }

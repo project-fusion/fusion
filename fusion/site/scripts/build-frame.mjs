@@ -27,6 +27,7 @@ const entry = join(root, 'fusion/site/preview/preview-frame-entry.ts')
 const graphEntry = join(root, 'fusion/site/preview/preview-graph-entry.ts')
 const cosmosEntry = join(root, 'fusion/site/preview/preview-graph-cosmos-entry.ts')
 const threeEntry = join(root, 'fusion/site/preview/preview-graph-three-entry.ts')
+const plotThreeEntry = join(root, 'fusion/site/preview/preview-plot-three-entry.ts')
 const mapEntry = join(root, 'fusion/site/preview/preview-map-entry.ts')
 const maplibreEntry = join(root, 'fusion/site/preview/preview-maplibre-entry.ts')
 
@@ -185,6 +186,22 @@ if (!threeBuilt.success) {
 const threeScript = await threeBuilt.outputs[0].text()
 await writeFile(join(out, 'graph-three.js'), threeScript)
 
+/* The same for a 3D Scatter chart three.js draws. */
+const plotThreeBuilt = await Bun.build({
+  entrypoints: [plotThreeEntry],
+  format: 'iife',
+  minify: true,
+  target: 'browser',
+})
+if (!plotThreeBuilt.success) {
+  for (const log of plotThreeBuilt.logs) {
+    console.error(log)
+  }
+  process.exit(1)
+}
+const plotThreeScript = await plotThreeBuilt.outputs[0].text()
+await writeFile(join(out, 'plot-three.js'), plotThreeScript)
+
 const built = await Bun.build({
   define: {
     __PREVIEW_GRAPH_COSMOS_URL__: JSON.stringify(`./graph-cosmos.js?v=${stamp(cosmosScript)}`),
@@ -192,6 +209,7 @@ const built = await Bun.build({
     __PREVIEW_GRAPH_URL__: JSON.stringify(`./graph.js?v=${stamp(graphScript)}`),
     __PREVIEW_MAP_URL__: JSON.stringify(`./map.js?v=${stamp(mapScript)}`),
     __PREVIEW_MAPLIBRE_URL__: JSON.stringify(`./maplibre-gl.js?v=${stamp(maplibre)}`),
+    __PREVIEW_PLOT_THREE_URL__: JSON.stringify(`./plot-three.js?v=${stamp(plotThreeScript)}`),
   },
   entrypoints: [entry],
   format: 'iife',

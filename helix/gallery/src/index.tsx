@@ -75,6 +75,7 @@ import { quoteArt } from './art/quote'
 import { radioArt } from './art/radio'
 import { ratingArt } from './art/rating'
 import { sandboxArt } from './art/sandbox'
+import { scatter3dArt } from './art/scatter-3d'
 import { scatterChartArt } from './art/scatter-chart'
 import { scrollAreaArt } from './art/scroll-area'
 import { selectArt } from './art/select'
@@ -113,7 +114,7 @@ import { virtualListArt } from './art/virtual-list'
  * Every family has an entry, and every entry is a file under `art/` named for
  * the family it draws. The system they all obey is `system.md`.
  *
- * **One hundred and seven, not the one hundred and six folders in `helix/styled/src`.** The catalog is
+ * **One hundred and eight, not the one hundred and seven folders in `helix/styled/src`.** The catalog is
  * built from the manifests, so it also carries `editor` and `sandbox` from
  * `@fusion.dev/helix-sandbox`. The count that matters is whatever `getFamilies`
  * returns, never a directory listing.
@@ -225,6 +226,7 @@ const art: Record<string, ReactNode> = {
   radio: radioArt,
   rating: ratingArt,
   sandbox: sandboxArt,
+  'scatter-3d': scatter3dArt,
   'scatter-chart': scatterChartArt,
   'scroll-area': scrollAreaArt,
   select: selectArt,
