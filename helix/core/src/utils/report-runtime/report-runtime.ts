@@ -37,6 +37,8 @@ export type RuntimeKind =
   | 'misread-direction'
   /** A React handler prop names an event the element never dispatches itself. Development builds only. */
   | 'misplaced-handler'
+  /** A Chat was given turns both as children and as `turns`, which it draws as two runs. */
+  | 'mixed-turns'
   /** An Image has no `alt`, so a screen reader announces its file name. */
   | 'missing-alt'
   /** The three.js driver could not load its layout, so the notes stay where they started. */

@@ -12,6 +12,7 @@ import {
   MixinCollection,
   onUnlessFalse,
   type Rendered,
+  reportRuntime,
   requestChange,
   UpgradeController,
   VirtualizeController,
@@ -167,8 +168,10 @@ const drawnInFull = ({ element }: Rendered): boolean =>
  * there when the transcript opened. A turn is said with its author first, such
  * as "Ada: It ships today" (`arrival-label`), where its author can be named.
  *
- * Pass the turns as children or as `turns` data. Do not use both. Children
- * render from the server and suit most conversations. `turns` draws a long
+ * Pass the turns as children or as `turns` data. Do not use both: a chat given
+ * both draws every turn from `turns` and then the children, and says so once
+ * in the console. Children render from the server and suit most
+ * conversations. `turns` draws a long
  * transcript one window at a time, so the log needs a block size of its own.
  *
  * **A conversation is built from three elements.** The chat holds the
@@ -1048,6 +1051,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
     if (changed.has('turns')) {
       this.follow(changed.get('turns') as readonly ChatTurn[] | undefined)
     }
+    this.warnMixed()
     this.toggleState('pinned', this.pinned)
     this.toggleState('typing', this.typing !== '')
     this.toggleState('loading', this.history === 'loading')
@@ -1055,6 +1059,22 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
       'empty',
       this.childrenKnown && this.turns.length === 0 && this.messages.length === 0,
     )
+  }
+
+  /** Whether the chat has said it was given turns both ways. */
+  private warnedMixed = false
+
+  /** Says once that turns arrived both as children and as `turns`. */
+  private warnMixed(): void {
+    if (this.warnedMixed || this.turns.length === 0 || this.messages.length === 0) {
+      return
+    }
+    this.warnedMixed = true
+    reportRuntime({
+      kind: 'mixed-turns',
+      message: `A chat was given ${this.messages.length} turns as children and ${this.turns.length} as \`turns\`, and draws the children after every turn from \`turns\`. Pass one or the other.`,
+      tag: this.localName,
+    })
   }
 
   /**

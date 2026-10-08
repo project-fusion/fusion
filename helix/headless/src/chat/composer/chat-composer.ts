@@ -39,7 +39,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * field taking more. A draft that fails them does not send, and the composer
  * takes `:state(invalid)` and `aria-invalid` once the reader has tried to send
  * it, the form was submitted, or the reader edited the field and left it.
- * Tabbing past an empty composer marks nothing.
+ * Sending an empty required composer counts as trying. Tabbing past an empty
+ * composer marks nothing.
  *
  * **`typing` says whether the user is writing**, and `helix-typing` is sent
  * each time it changes: when they start, and when they send or stop for
@@ -201,7 +202,15 @@ export class HelixHeadlessChatComposer extends HelixFormElement {
    */
   send(): boolean {
     const value = this.value.trim()
-    if (value === '' || this.isDisabled) {
+    if (this.isDisabled) {
+      return false
+    }
+    /* Nothing is sent, and a required composer says why, as a draft the form
+       would refuse does. */
+    if (value === '') {
+      if (this.required) {
+        this.touch()
+      }
       return false
     }
     /* A draft the form would refuse is refused here too, and shown as wrong. */

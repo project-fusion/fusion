@@ -382,6 +382,26 @@ describe('what the conversation is doing, as states a stylesheet can match', () 
   })
 })
 
+describe('turns given both ways', () => {
+  /* The rule was written down and nothing held a page to it. */
+  test('are reported once, naming how many came each way', async () => {
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      const element = (await mount(markup())) as Chat & { turns: unknown[] }
+      element.turns = [{ author: 'them', text: 'From data' }]
+      await element.updateComplete
+      element.turns = [...element.turns, { author: 'me', text: 'Again' }]
+      await element.updateComplete
+      expect(warnings.filter((one) => one.includes('as children'))).toHaveLength(1)
+      expect(warnings.find((one) => one.includes('as children'))).toContain('2 turns as children')
+    } finally {
+      console.warn = original
+    }
+  })
+})
+
 describe('a transcript with nothing in it', () => {
   test('says the consumer’s words once it has looked', async () => {
     const host = await mount(

@@ -340,6 +340,25 @@ describe('constraints', () => {
     expect(hasState(element, 'invalid')).toBe(false)
   })
 
+  /* Enter on an empty required composer sent nothing and said nothing, so a
+     reader could not tell the field wanted text. */
+  test('a required composer sent empty says it is wrong, and sends nothing', async () => {
+    const element = (await composer('required')) as Checked
+    const heard: unknown[] = []
+    element.addEventListener('helix-send', (event) => heard.push(event))
+    press(element, 'Enter')
+    await element.updateComplete
+    await element.updateComplete
+    expect(heard).toEqual([])
+    expect(hasState(element, 'invalid')).toBe(true)
+    expect(part(element, 'field')?.getAttribute('aria-invalid')).toBe('true')
+    /* One that is not required is simply not sent. */
+    const optional = (await composer()) as Checked
+    press(optional, 'Enter')
+    await optional.updateComplete
+    expect(hasState(optional, 'invalid')).toBe(false)
+  })
+
   test('the lengths reach the field, and a draft that fails them does not send', async () => {
     const element = (await composer('minlength="3" maxlength="20"')) as Checked
     const field = part(element, 'field') as HTMLTextAreaElement
