@@ -165,10 +165,10 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
  * @slot no-results - What the menu shows when the filter keeps no rows, for content richer than `no-results-text`.
  * @slot trigger - The control that opens the menu, or with `context` the area a context menu opens over.
  *
+ * @event {Event} change - A reader's choice checked or unchecked rows. Read `checkedValues` for the rows that are checked now.
  * @event {HelixBeforeCloseEvent} helix-before-close - The menu is about to close. Cancelable: cancel it to keep it open.
  * @event {HelixBeforeOpenEvent} helix-before-open - The menu is about to open. Cancelable: cancel it to keep it closed.
  * @event {HelixFilterEvent} helix-filter - The text in the filter field changed, with the new text in `detail.value`. Cancelable: cancel it to keep every row showing and narrow the rows yourself.
- * @event {Event} change - A reader's choice checked or unchecked rows. Read `checkedValues` for the rows that are checked now.
  * @event {HelixSelectEvent} helix-select - An item was chosen. Cancelable: cancel it to keep the menu open.
  * @event {ToggleEvent} toggle - The menu opened or closed. The event carries `newState` and `oldState`.
  *
