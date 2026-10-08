@@ -839,6 +839,66 @@ describe('a rectangle of cells', () => {
     expect(element.value).toBe('Day 1, Day 2, Day 8, Day 9')
   })
 
+  /* The anchor was the cell's place among those drawn, so a resize that
+     added a column moved it onto another day, and the next range started
+     there. It is the row of the table now. */
+  describe('from the same day after a resize', () => {
+    const resized = async (attributes: string): Promise<Selecting> => {
+      const element = (await strip(
+        `rows="7" min-cell="10" gap="0" selection-mode="multiple" ${attributes}`,
+        DAYS(35),
+      )) as Selecting
+      ;(element as unknown as { width: number }).width = 30
+      await element.updateComplete
+      expect(cells(element)).toHaveLength(21)
+      return element
+    }
+    const widen = async (element: Selecting): Promise<void> => {
+      ;(element as unknown as { width: number }).width = 1000
+      await element.updateComplete
+      expect(cells(element)).toHaveLength(35)
+    }
+
+    test('a rectangle', async () => {
+      const element = await resized('selection-shape="rectangle"')
+      // Day 16, the second day of the first column drawn.
+      click(element, 1)
+      await widen(element)
+      click(element, 29, { shiftKey: true })
+      await element.updateComplete
+      expect(element.value).toBe('Day 16, Day 23, Day 30')
+    })
+
+    test('a run of days', async () => {
+      const element = await resized('')
+      // Day 16, the second day of the first column drawn.
+      key(element, 'Home')
+      key(element, 'ArrowDown')
+      key(element, ' ')
+      await widen(element)
+      key(element, 'Home')
+      key(element, 'ArrowDown', true)
+      await element.updateComplete
+      const run = Array.from({ length: 14 }, (_, day) => `Day ${day + 2}`)
+      expect(element.value).toBe(['Day 16', ...run].join(', '))
+    })
+
+    test('a rectangle whose first corner is no longer drawn', async () => {
+      const element = (await strip(
+        'rows="7" min-cell="10" gap="0" selection-mode="multiple" selection-shape="rectangle"',
+        DAYS(35),
+      )) as Selecting
+      // Day 9, in the second column.
+      click(element, 8)
+      ;(element as unknown as { width: number }).width = 30
+      await element.updateComplete
+      // Day 30, drawn now in the third column of three.
+      click(element, 15, { shiftKey: true })
+      await element.updateComplete
+      expect(element.value).toBe('Day 9, Day 16, Day 23, Day 30')
+    })
+  })
+
   test('is a single cell at a time under `single`', async () => {
     const element = (await strip(
       'rows="7" selection-mode="single" selection-shape="rectangle"',
