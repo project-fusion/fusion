@@ -675,6 +675,26 @@ describe('the keyboard', () => {
     await settle(host)
     expect(host.querySelector('[tabindex="0"]')?.getAttribute('data-index')).toBe('100')
   })
+
+  /* Shift+Tab back into a list landed on the first row on screen, and the
+     reader's place in it was lost. */
+  test('keeps the row a reader left as the tab stop, drawn, when it scrolls away', async () => {
+    const host = await fed(named(500))
+    const outside = document.createElement('button')
+    document.body.append(outside)
+    ;(host.querySelector('[data-index="3"]') as HTMLElement).focus()
+    await settle(host)
+    outside.focus()
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await settle(host)
+    const viewport = part(host, 'viewport') as HTMLElement
+    viewport.scrollTop = 3_200
+    viewport.dispatchEvent(new Event('scroll'))
+    await settle(host)
+    expect(host.querySelector('[tabindex="0"]')?.getAttribute('data-index')).toBe('3')
+    expect(host.querySelector('[data-index="100"]')?.getAttribute('tabindex')).toBe('-1')
+    outside.remove()
+  })
 })
 
 describe('taking a reader to an item', () => {
