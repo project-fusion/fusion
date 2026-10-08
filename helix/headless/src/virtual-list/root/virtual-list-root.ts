@@ -133,8 +133,10 @@ const ROWS = ':scope > [data-index], :scope > [data-section] > [data-index]'
  * | Tab | Moves into the focused row's own links and buttons, then out of the list. |
  *
  * An item that is not drawn is scrolled into view and focused, so a keyboard
- * reaches the whole set. When the row holding the tab stop scrolls away, the
- * stop moves to the first row on screen. Typing matches each item's
+ * reaches the whole set. The row a reader last focused keeps the tab stop and
+ * stays drawn when it scrolls away, so Tab and Shift+Tab come back to it, as
+ * React Aria's collections do. In a list nobody has focused yet, the stop
+ * moves to the first row on screen. Typing matches each item's
  * `text-field`, which is the first `data-field` of the row template by default,
  * or the item itself when it is a string or a number.
  *
@@ -1191,6 +1193,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
     const index = this.indexOf(node)
     if (index !== undefined) {
       this.active = index
+      this.visited = true
     }
     this.requestUpdate()
   }
@@ -1214,9 +1217,16 @@ export class HelixHeadlessVirtualList extends HelixElement {
   /** The item a key is moving focus to, drawn until it has it. */
   private focusing: number | undefined
 
-  /** The item drawn outside the window to keep focus, or to take it, if there is one. */
+  /** Whether a reader has focused a row, after which their row keeps the tab stop. */
+  private visited = false
+
+  /**
+   * The item drawn outside the window to keep focus, to take it, or to take
+   * it back: the row a reader last focused stays drawn after focus leaves the
+   * list, so Shift+Tab returns to it.
+   */
   private keptIndex(): number | undefined {
-    const index = this.focusing ?? this.focusedIndex()
+    const index = this.focusing ?? this.focusedIndex() ?? (this.visited ? this.active : undefined)
     const { first, last } = this.itemsOn(this.virtualize.window)
     return index !== undefined && index < this.data.length && (index < first || index >= last)
       ? index
@@ -1311,9 +1321,10 @@ export class HelixHeadlessVirtualList extends HelixElement {
    * **The row holding focus is drawn outside the window too**, beside it on the
    * side it belongs, and the spacer on that side gives up its room.
    *
-   * **One row holds the tab stop**, the one the reader last focused while it is
-   * drawn, and the first row on screen once it is not. Its own links and
-   * buttons are in the tab order, and those of every other row wait.
+   * **One row holds the tab stop**, the one the reader last focused, which
+   * stays drawn outside the window, and the first row on screen in a list
+   * nobody has focused yet. Its own links and buttons are in the tab order,
+   * and those of every other row wait.
    */
   private place(): void {
     const template = this.querySelector<HTMLTemplateElement>(':scope > template')
@@ -1325,6 +1336,10 @@ export class HelixHeadlessVirtualList extends HelixElement {
     /* The row holding focus, so focus can go on to a neighbor if its item has
        left the set. */
     const holding = this.focusedIndex()
+    /* A new set has no row a reader left, unless they are in it now. */
+    if (this.filledFrom !== this.data && holding === undefined) {
+      this.visited = false
+    }
     /* Read before anything moves. */
     const onScreen = this.range.first
     /* **The spacers move with the rows, before either is laid out.** Rows
