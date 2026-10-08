@@ -289,7 +289,7 @@ describe('the error, and the controls', () => {
     await host.updateComplete
     expect(part(host, 'error')?.textContent).toBe('Uncaught TypeError: x is not a function')
     /* The frame is described by the error while it shows. */
-    expect(frame.getAttribute('aria-describedby')).toBe(part(host, 'error')?.id)
+    expect(frame.getAttribute('aria-describedby')).toBe(part(host, 'error')?.id ?? null)
     host.source = '<p>Fixed</p>'
     await host.updateComplete
     await new Promise((resolve) => setTimeout(resolve, 150))
