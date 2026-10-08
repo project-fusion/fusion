@@ -22,18 +22,23 @@ use std::path::{Path, PathBuf};
 /// One page to picture.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Entry {
-    /// The directory the file is in, which relative requests resolve against
-    /// and which the baselines are written into.
+    /// The directory the baselines are written into: beside an HTML file,
+    /// which relative requests from it resolve against, or a source's
+    /// `baselines`.
     pub dir: PathBuf,
-    pub file: PathBuf,
+    /// The HTML file, for an entry the harness serves.
+    pub file: Option<PathBuf>,
     /// `source/name`, unique across the run.
     pub id: String,
     /// What the glob named it: one name may have an entry in several sources.
     pub name: String,
     /// The index of its source in the config.
     pub source: usize,
-    /// The file's name without its extension, which the baselines take.
+    /// What the baselines' file names start with: an HTML file's name
+    /// without its extension, or the entry's name.
     pub stem: String,
+    /// The page's address, for an entry on a server.
+    pub url: Option<String>,
 }
 
 /// Every file under `root` that `glob` matches, with the name `{name}` took or

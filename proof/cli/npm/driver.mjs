@@ -9,6 +9,8 @@
  *
  * - `config` imports the config file and answers with its values. Functions
  *   stay here, where they run.
+ * - `fetch` and `wait` ask a server for a page, or wait for it to answer, so
+ *   the binary needs no HTTP of its own.
  * - `start` serves the harness origin and launches Chromium.
  * - `capture` pictures entries, answering `shot` for each picture as it is
  *   taken, `item` when an entry is done, and `captured` at the end.
@@ -103,6 +105,8 @@ const state = {
   lanes: [],
   network: 'origin',
   origin: undefined,
+  /** The origins requests may reach: the harness's and each source's server. */
+  origins: new Set(),
   /** `/source/name/` to the directory relative requests resolve in, and its renames. */
   pages: new Map(),
   /** What `inspect.run` returned for each entry, for `inspect.report`. */
@@ -266,9 +270,11 @@ const take = async (page, item, readyProperty) => {
       await page.setViewportSize({ height: shot.height, width: shot.width })
       await page.emulateMedia({ colorScheme: shot.scheme })
       if (index === 0) {
-        await page.goto(`${state.origin}${item.path}?proof=${encodeURIComponent(item.key)}`, {
-          waitUntil: 'load',
-        })
+        /* An entry on a server has its own address. An HTML entry is served
+           here, its document named in the query. */
+        const address =
+          item.url ?? `${state.origin}${item.path}?proof=${encodeURIComponent(item.key)}`
+        await page.goto(address, { waitUntil: 'load' })
         const missing = await upgrades(page)
         if (missing.length > 0) {
           throw new Error(
@@ -343,7 +349,7 @@ const lanes = async (count) => {
         } catch {
           origin = undefined
         }
-        return origin === state.origin ? route.continue() : route.abort()
+        return state.origins.has(origin) ? route.continue() : route.abort()
       })
     }
     state.lanes.push(await context.newPage())
@@ -353,7 +359,7 @@ const lanes = async (count) => {
 
 const handlers = {
   async capture({ items, readyProperty }) {
-    for (const item of items) {
+    for (const item of items.filter((one) => one.path !== undefined)) {
       state.documents.set(item.key, item.html)
       state.pages.set(item.path, { dir: item.dir, files: item.files ?? {} })
     }
@@ -396,12 +402,17 @@ const handlers = {
     })
   },
 
+  async fetch({ url }) {
+    const answer = await fetch(url, { redirect: 'follow' })
+    say({ ok: answer.ok, op: 'fetched', status: answer.status, text: await answer.text() })
+  },
+
   async finish({ update }) {
     const reported = await state.config.inspect?.report?.(state.runs, { update })
     say({ failed: Boolean(reported?.failed), op: 'finished' })
   },
 
-  async start({ network, serve, workers }) {
+  async start({ network, origins = [], serve, workers }) {
     state.network = network
     state.workers = workers
     state.serve = Object.entries(serve)
@@ -410,9 +421,29 @@ const handlers = {
     state.server = createServer(respond)
     await new Promise((done) => state.server.listen(0, '127.0.0.1', done))
     state.origin = `http://127.0.0.1:${state.server.address().port}`
+    state.origins = new Set([state.origin, ...origins])
     const { chromium } = await import('playwright')
     state.browser = await chromium.launch()
     say({ browser: `chromium ${state.browser.version()}`, op: 'started' })
+  },
+
+  /* Polls until anything answers, a refusal of the connection being the one
+     thing that means nothing is listening yet. */
+  async wait({ seconds, url }) {
+    const deadline = Date.now() + seconds * 1000
+    for (;;) {
+      try {
+        await fetch(url, { redirect: 'manual', signal: AbortSignal.timeout(5000) })
+        say({ op: 'waited', up: true })
+        return
+      } catch {
+        if (Date.now() > deadline) {
+          say({ op: 'waited', up: false })
+          return
+        }
+        await new Promise((done) => setTimeout(done, 500))
+      }
+    }
   },
 }
 

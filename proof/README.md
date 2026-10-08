@@ -2,14 +2,15 @@
 
 **Fusion Proof**, visual regression testing with baselines kept in git.
 
-**Building.** Phase 0 is done: the domain, the packages, and the release lane.
-Phase 1 is underway: `proof test` and `proof update` picture HTML files and
-compare them with their baselines, and `proof compare` compares two PNG files.
-Fusion runs it on every Helix example: `check:spec:visual` and `visual:update`
-are `proof test` and `proof update` with the root
-[proof.config.ts](../proof.config.ts).
-What each later phase adds is the roadmap in
-[cli/npm/README.md](cli/npm/README.md), the page npm shows.
+**Building.** Phases 0 and 1 are done, and phase 2 is underway. `proof test`
+and `proof update` picture HTML files, a server's pages, Storybook stories,
+and JSON catalogs, compare by pixel or by structural similarity, and write a
+report that `proof report` opens. `proof compare` compares two PNG files, and
+`action/` is the GitHub Action. Fusion runs it on every Helix example with the
+root [proof.config.ts](../proof.config.ts), and on five site pages with
+[fusion/site/proof.config.ts](../fusion/site/proof.config.ts). What each later
+phase adds is the roadmap in [cli/npm/README.md](cli/npm/README.md), the page
+npm shows.
 
 Packages are flat inside this folder, one directory each, the same arrangement
 `helix/` uses.
@@ -20,8 +21,9 @@ Packages are flat inside this folder, one directory each, the same arrangement
 | `cli/npm` | `proof` | the command, its shim, and the Node driver that runs Playwright |
 | `cli/platforms/*` | `proof-<platform>` | the binary for one platform, an optional dependency of `proof` |
 
-Two folders are planned beside `cli`: `action` for the GitHub Action in phase 2,
-and `app` for the GitHub App after it.
+`action` beside `cli` is the GitHub Action, with `action/browser`, the browser
+install it shares with Fusion's own workflows. `app`, for the GitHub App, is
+planned after it.
 
 ## Decisions
 

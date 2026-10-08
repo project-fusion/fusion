@@ -13,12 +13,8 @@
 //! matches on the second take passes and is named, because a check that fails
 //! on a flaky picture teaches people to run it again, and one that hides it
 //! teaches nothing. An update holds a picture that matched on the second take.
-//!
-//! **Every run states what it compared and what it skipped in the line that
-//! gives the verdict**, because a count alone reads as the whole corpus.
 
 use std::collections::BTreeMap;
-use std::fmt::Write as _;
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -27,14 +23,16 @@ use fusion_rules::error::{Failure, Outcome};
 use fusion_rules::exit::Code;
 use serde_json::{json, Value};
 
-use crate::config::{Config, Exception, Platform, Shot, Source};
+use crate::config::{Config, Diff, Exception, Mode, Network, Platform, Shot, Source};
 use crate::diff;
-use crate::discover::{self, Entry};
+use crate::discover::Entry;
 use crate::driver::Driver;
 use crate::fingerprint::Fingerprint;
 use crate::harness;
 use crate::image;
+use crate::report;
 use crate::shard::{self, Shard};
+use crate::sources;
 
 /// The config file names looked for, in order, when none is given.
 const NAMES: [&str; 3] = ["proof.config.ts", "proof.config.mjs", "proof.config.js"];
@@ -48,14 +46,33 @@ pub struct Options {
     pub workers: Option<usize>,
 }
 
+/// How far a shot is from its baseline.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum Measure {
+    Pixels(usize),
+    Similarity { floor: f64, score: f64 },
+}
+
+impl Measure {
+    pub fn describe(self) -> String {
+        match self {
+            Self::Pixels(1) => "1 pixel differs".to_string(),
+            Self::Pixels(count) => format!("{count} pixels differ"),
+            Self::Similarity { floor, score } => {
+                format!("the structural similarity is {score:.4} against a floor of {floor}")
+            }
+        }
+    }
+}
+
 /// What became of one shot.
 #[derive(Debug)]
-enum Fate {
+pub enum Fate {
     /// The capture failed, and why.
     Broken(String),
     Differs {
-        differing: usize,
-        marked: PathBuf,
+        marked: Option<PathBuf>,
+        measure: Measure,
     },
     /// An update left the baseline alone, the comparison passing.
     Held,
@@ -70,13 +87,16 @@ enum Fate {
     /// It differed, then matched when it was taken again.
     Steadied,
     /// It differed by no more than its exception allows.
-    Tolerated(usize),
+    Tolerated {
+        measure: Measure,
+        reason: String,
+    },
     /// An update wrote it, and why.
     Written(&'static str),
 }
 
 impl Fate {
-    fn fails(&self) -> bool {
+    pub fn fails(&self) -> bool {
         matches!(
             self,
             Self::Broken(_)
@@ -94,15 +114,16 @@ enum Verdict {
     Matched,
     Missing,
     Resized { from: (u32, u32), to: (u32, u32) },
-    Differs(usize),
-    Within(usize),
+    Differs(Measure),
+    Within(Measure),
 }
 
-/// Compares a capture with its baseline, allowing `allowed` pixels.
+/// Compares a capture with its baseline, by the diff its source uses and
+/// allowing `allowed` pixels in the pixel mode.
 fn judge(
     baseline: Option<&[u8]>,
     current: &[u8],
-    threshold: f64,
+    diff: &Diff,
     allowed: usize,
 ) -> std::result::Result<Verdict, String> {
     let Some(baseline) = baseline else {
@@ -121,11 +142,26 @@ fn judge(
             to: (after.width, after.height),
         });
     }
-    let differing = diff::count(&before, &after, threshold, None);
-    Ok(match differing {
-        0 => Verdict::Matched,
-        n if n <= allowed => Verdict::Within(n),
-        n => Verdict::Differs(n),
+    Ok(match diff.mode {
+        Mode::Pixel => match diff::count(&before, &after, diff.threshold, None) {
+            0 => Verdict::Matched,
+            n if n <= allowed => Verdict::Within(Measure::Pixels(n)),
+            n => Verdict::Differs(Measure::Pixels(n)),
+        },
+        Mode::Perceptual => {
+            let score = diff::ssim(&before, &after);
+            let measure = Measure::Similarity {
+                floor: diff.ssim,
+                score,
+            };
+            if before.rgba == after.rgba {
+                Verdict::Matched
+            } else if score >= diff.ssim {
+                Verdict::Within(measure)
+            } else {
+                Verdict::Differs(measure)
+            }
+        }
     })
 }
 
@@ -165,41 +201,6 @@ fn relative(base: &Path, path: &Path) -> String {
         .replace('\\', "/")
 }
 
-/// Every entry each source's glob matches, in config order and then by path.
-fn entries(config: &Config, base: &Path) -> Outcome<Vec<Entry>> {
-    let mut out: Vec<Entry> = Vec::new();
-    for (index, source) in config.sources.iter().enumerate() {
-        let Source::Html(html) = source;
-        let root = base.join(&html.root);
-        let found = discover::matches(&root, &html.glob)
-            .map_err(|why| Failure::input(format!("the source `{}`", html.name), why))?;
-        for (name, file) in found {
-            let id = format!("{}/{name}", html.name);
-            if out.iter().any(|entry| entry.id == id) {
-                return Err(Failure::input(
-                    format!("the source `{}`", html.name),
-                    format!("two files are named `{id}`"),
-                ));
-            }
-            out.push(Entry {
-                dir: file.parent().map(Path::to_path_buf).unwrap_or_default(),
-                stem: file
-                    .file_stem()
-                    .map(|stem| stem.to_string_lossy().into_owned())
-                    .unwrap_or_default(),
-                file,
-                id,
-                name,
-                source: index,
-            });
-        }
-    }
-    if out.is_empty() {
-        return Err(Failure::input("the sources", "their globs match no file"));
-    }
-    Ok(out)
-}
-
 fn exception_for<'a>(
     exceptions: &'a [Exception],
     entry: &Entry,
@@ -220,11 +221,18 @@ fn paths(entry: &Entry, shot: &Shot) -> (PathBuf, PathBuf) {
     )
 }
 
-/// One shot in the shape the driver takes.
+/// One shot in the shape the driver takes. The harness rules are for an HTML
+/// entry, which the harness wrote the document of.
 fn shot_request(config: &Config, entry: &Entry, shot: &Shot) -> Value {
-    let Source::Html(html) = &config.sources[entry.source];
+    let harness = match &config.sources[entry.source] {
+        Source::Html(html) => html
+            .harness
+            .resolved()
+            .map(|harness| harness::css(&harness, shot)),
+        _ => None,
+    };
     json!({
-        "harness": html.harness.resolved().map(|harness| harness::css(&harness, shot)),
+        "harness": harness,
         "height": shot.height,
         "name": shot.name,
         "scheme": shot.scheme.as_str(),
@@ -234,21 +242,30 @@ fn shot_request(config: &Config, entry: &Entry, shot: &Shot) -> Value {
 
 /// One entry, with the shots to take of it, in the shape the driver takes.
 fn item(config: &Config, entry: &Entry, shots: &[&Shot], inspect: bool) -> Outcome<Value> {
-    let Source::Html(html) = &config.sources[entry.source];
-    let body = fs::read_to_string(&entry.file).map_err(|error| {
+    let source = &config.sources[entry.source];
+    let mut out = json!({
+        "entry": { "file": entry.file, "id": entry.id, "name": entry.name, "source": source.name(), "url": entry.url },
+        "inspect": inspect,
+        "key": entry.id,
+        "shots": shots.iter().map(|shot| shot_request(config, entry, shot)).collect::<Vec<_>>(),
+    });
+    let (Source::Html(html), Some(file)) = (source, &entry.file) else {
+        out["url"] = json!(entry.url);
+        return Ok(out);
+    };
+    let body = fs::read_to_string(file).map_err(|error| {
         Failure::input(
-            format!("cannot read {}", entry.file.display()),
+            format!("cannot read {}", file.display()),
             error.to_string().to_lowercase(),
         )
     })?;
-    let first = shots[0];
     let page = harness::document(
         &entry.id,
         &html.styles,
         &html.scripts,
         html.harness
             .resolved()
-            .map(|harness| harness::css(&harness, first))
+            .map(|harness| harness::css(&harness, shots[0]))
             .as_deref(),
         &body,
     );
@@ -257,16 +274,11 @@ fn item(config: &Config, entry: &Entry, shots: &[&Shot], inspect: bool) -> Outco
         .iter()
         .map(|(asked, file)| (asked, file.replace("{stem}", &entry.stem)))
         .collect();
-    Ok(json!({
-        "dir": entry.dir,
-        "entry": { "file": entry.file, "id": entry.id, "name": entry.name, "source": html.name },
-        "files": files,
-        "html": page,
-        "inspect": inspect,
-        "key": entry.id,
-        "path": format!("/{}/", entry.id),
-        "shots": shots.iter().map(|shot| shot_request(config, entry, shot)).collect::<Vec<_>>(),
-    }))
+    out["dir"] = json!(entry.dir);
+    out["files"] = json!(files);
+    out["html"] = json!(page);
+    out["path"] = json!(format!("/{}/", entry.id));
+    Ok(out)
 }
 
 /// The pictures one capture request produced, by entry and shot index, with
@@ -339,17 +351,10 @@ fn capture(
     }
 }
 
-fn plural(count: usize, one: &str, many: &str) -> String {
-    format!("{count} {}", if count == 1 { one } else { many })
-}
-
-/// The command, start to finish.
-#[allow(clippy::too_many_lines)] // One sequence a reader follows top to bottom.
-pub fn run(options: &Options) -> Outcome<Code> {
-    let path = find(options.config.as_deref())?;
+/// Loads the config through a driver started beside it.
+fn load(asked: Option<&Path>) -> Outcome<(PathBuf, PathBuf, Driver, Config)> {
+    let path = find(asked)?;
     let base = path.parent().map(Path::to_path_buf).unwrap_or_default();
-    let internal = |why: String| Failure::new(Code::Internal, "the driver", why);
-
     let mut driver = Driver::start(&base)
         .map_err(|why| Failure::input("cannot start the capture driver", why))?;
     let answered = driver
@@ -357,6 +362,55 @@ pub fn run(options: &Options) -> Outcome<Code> {
         .map_err(|why| Failure::input(format!("cannot load {}", relative(&base, &path)), why))?;
     let config = Config::parse(answered["config"].clone())
         .map_err(|why| Failure::input(relative(&base, &path), why))?;
+    Ok((path, base, driver, config))
+}
+
+/// `proof report`: opens the last run's report, or prints its summary as
+/// Markdown for a CI job.
+pub fn open_report(config: Option<&Path>, markdown: bool) -> Outcome<Code> {
+    let (_, base, driver, config) = load(config)?;
+    driver.close();
+    let dir = base.join(&config.report);
+    let record = dir.join("run.json");
+    let text = fs::read_to_string(&record).map_err(|_| {
+        Failure::input(
+            "no report",
+            format!("there is no {}", relative(&base, &record)),
+        )
+        .hint("proof test")
+    })?;
+    if markdown {
+        let value: Value = serde_json::from_str(&text).map_err(|error| {
+            Failure::input(
+                format!("cannot read {}", record.display()),
+                error.to_string(),
+            )
+        })?;
+        print!("{}", report::markdown(&value));
+        return Ok(Code::Ok);
+    }
+    let page = dir.join("index.html");
+    println!("proof: the report is {}", page.display());
+    let opener = match std::env::consts::OS {
+        "macos" => Some("open"),
+        "linux" => Some("xdg-open"),
+        _ => None,
+    };
+    if let Some(opener) = opener {
+        let _ = std::process::Command::new(opener)
+            .arg(&page)
+            .stdout(std::process::Stdio::null())
+            .stderr(std::process::Stdio::null())
+            .status();
+    }
+    Ok(Code::Ok)
+}
+
+/// The command, start to finish.
+#[allow(clippy::too_many_lines)] // One sequence a reader follows top to bottom.
+pub fn run(options: &Options) -> Outcome<Code> {
+    let (path, base, mut driver, config) = load(options.config.as_deref())?;
+    let internal = |why: String| Failure::new(Code::Internal, "the driver", why);
 
     if config.platform == Platform::Linux && std::env::consts::OS != "linux" {
         println!(
@@ -368,7 +422,10 @@ pub fn run(options: &Options) -> Outcome<Code> {
         return Ok(Code::Ok);
     }
 
-    let every = entries(&config, &base)?;
+    /* Before discovery, because a sitemap and a Storybook index are read from
+    the server that serves them. */
+    let servers = sources::start(&config, &base, &mut driver)?;
+    let every = sources::entries(&config, &base, &mut driver)?;
     for exception in &config.exceptions {
         if !every
             .iter()
@@ -475,10 +532,18 @@ pub fn run(options: &Options) -> Outcome<Code> {
         let cores = std::thread::available_parallelism().map_or(1, std::num::NonZero::get);
         cores.saturating_sub(1).clamp(1, 4)
     });
+    /* A server a source pictures is an origin of the harness too. */
+    let origins: Vec<String> = config
+        .sources
+        .iter()
+        .filter_map(Source::server)
+        .map(|served| sources::origin(&served.url))
+        .collect();
     let started = driver
         .ask(&json!({
-            "network": match config.network { crate::config::Network::Origin => "origin", crate::config::Network::Open => "open" },
+            "network": match config.network { Network::Origin => "origin", Network::Open => "open" },
             "op": "start",
+            "origins": origins,
             "serve": serve,
             "workers": workers,
         }))
@@ -551,10 +616,19 @@ pub fn run(options: &Options) -> Outcome<Code> {
     }
     let first = capture(&mut driver, &items, &keys, &config.shots, ready)?;
 
+    let diff_of = |entry: &Entry| config.sources[entry.source].diff().unwrap_or(&config.diff);
+    let allowed_for = |entry: &Entry, shot: &Shot| {
+        exception_for(&config.exceptions, entry, shot)
+            .and_then(|one| one.pixels)
+            .unwrap_or(diff_of(entry).pixels)
+    };
+
     let mut results: BTreeMap<(usize, usize), Fate> = BTreeMap::new();
+    let mut currents: BTreeMap<(usize, usize), Vec<u8>> = BTreeMap::new();
     let mut again: Vec<(usize, usize)> = Vec::new();
     for (at, entry) in mine.iter().enumerate() {
         for shot in taken(entry) {
+            let picture = &config.shots[shot];
             if let Some(why) = first.broken.get(&at) {
                 results.insert((at, shot), Fate::Broken(why.clone()));
                 continue;
@@ -566,18 +640,23 @@ pub fn run(options: &Options) -> Outcome<Code> {
                 );
                 continue;
             };
-            let (baseline, _) = paths(entry, &config.shots[shot]);
-            let exception = exception_for(&config.exceptions, entry, &config.shots[shot]);
-            let allowed = exception
-                .and_then(|one| one.pixels)
-                .unwrap_or(config.diff.pixels);
+            let (baseline, _) = paths(entry, picture);
+            let exception = exception_for(&config.exceptions, entry, picture);
             let existing = fs::read(&baseline).ok();
-            match judge(existing.as_deref(), bytes, config.diff.threshold, allowed) {
+            match judge(
+                existing.as_deref(),
+                bytes,
+                diff_of(entry),
+                allowed_for(entry, picture),
+            ) {
                 Err(why) => {
                     results.insert((at, shot), Fate::Broken(why));
                 }
                 Ok(Verdict::Differs(_) | Verdict::Resized { .. }) => again.push((at, shot)),
                 Ok(verdict) => {
+                    if verdict == Verdict::Missing && !options.update {
+                        currents.insert((at, shot), bytes.clone());
+                    }
                     let result = settle(verdict, exception, options.update, &baseline, bytes)?;
                     results.insert((at, shot), result);
                 }
@@ -601,10 +680,7 @@ pub fn run(options: &Options) -> Outcome<Code> {
             let entry = mine[at];
             let picture = &config.shots[shot];
             let (baseline, marked) = paths(entry, picture);
-            let exception = exception_for(&config.exceptions, entry, picture);
-            let allowed = exception
-                .and_then(|one| one.pixels)
-                .unwrap_or(config.diff.pixels);
+            let diff = diff_of(entry);
             let existing = fs::read(&baseline).ok();
             let result = match (second.broken.get(&at), second.pictures.get(&(at, shot))) {
                 (Some(why), _) => Fate::Broken(why.clone()),
@@ -612,7 +688,12 @@ pub fn run(options: &Options) -> Outcome<Code> {
                     Fate::Broken("the driver returned no picture on the second take".to_string())
                 }
                 (None, Some(bytes)) => {
-                    match judge(existing.as_deref(), bytes, config.diff.threshold, allowed) {
+                    match judge(
+                        existing.as_deref(),
+                        bytes,
+                        diff,
+                        allowed_for(entry, picture),
+                    ) {
                         Err(why) => Fate::Broken(why),
                         Ok(Verdict::Matched | Verdict::Within(_)) if options.update => Fate::Held,
                         Ok(Verdict::Matched | Verdict::Within(_)) => Fate::Steadied,
@@ -620,15 +701,22 @@ pub fn run(options: &Options) -> Outcome<Code> {
                             write(&baseline, bytes)?;
                             Fate::Written("it differs")
                         }
-                        Ok(Verdict::Resized { from, to }) => Fate::Resized { from, to },
-                        Ok(Verdict::Differs(differing)) => {
+                        Ok(Verdict::Resized { from, to }) => {
+                            currents.insert((at, shot), bytes.clone());
+                            Fate::Resized { from, to }
+                        }
+                        Ok(Verdict::Differs(measure)) => {
                             let before = image::decode(existing.as_deref().unwrap_or_default())
                                 .map_err(|why| internal(why.clone()))?;
                             let after = image::decode(bytes).map_err(internal)?;
-                            let (_, drawn) = diff::marked(&before, &after, config.diff.threshold);
+                            let (_, drawn) = diff::marked(&before, &after, diff.threshold);
                             let encoded = image::encode(&drawn).map_err(internal)?;
                             write(&marked, &encoded)?;
-                            Fate::Differs { differing, marked }
+                            currents.insert((at, shot), bytes.clone());
+                            Fate::Differs {
+                                marked: Some(marked),
+                                measure,
+                            }
                         }
                         Ok(Verdict::Missing) => Fate::Missing,
                     }
@@ -647,6 +735,7 @@ pub fn run(options: &Options) -> Outcome<Code> {
         false
     };
     driver.close();
+    drop(servers);
 
     if let Some(timings) = &config.timings {
         let mut by_name: BTreeMap<&str, f64> = BTreeMap::new();
@@ -654,11 +743,7 @@ pub fn run(options: &Options) -> Outcome<Code> {
             *by_name.entry(mine[*at].name.as_str()).or_default() += seconds;
         }
         let text = serde_json::to_string_pretty(&by_name).unwrap_or_default() + "\n";
-        let target = base.join(timings);
-        if let Some(parent) = target.parent() {
-            let _ = fs::create_dir_all(parent);
-        }
-        write(&target, text.as_bytes())?;
+        write(&base.join(timings), text.as_bytes())?;
     }
 
     /* The diff image of a shot that no longer differs is from a run that is
@@ -678,17 +763,46 @@ pub fn run(options: &Options) -> Outcome<Code> {
         write(&fingerprint_path, here.to_text().as_bytes())?;
     }
 
-    Ok(report(
-        &config,
-        &base,
-        &mine,
-        &results,
-        options.update,
-        &scope,
-        &retake,
-        write_fingerprint,
+    let mut skipped = Vec::new();
+    for entry in &mine {
+        for shot in &config.shots {
+            if let Some(exception) =
+                exception_for(&config.exceptions, entry, shot).filter(|one| one.unstable)
+            {
+                skipped.push(format!(
+                    "{}, {} ({})",
+                    entry.id, shot.name, exception.reason
+                ));
+            }
+        }
+    }
+    let rows = results
+        .iter()
+        .map(|(&(at, shot), fate)| {
+            let (baseline, marked) = paths(mine[at], &config.shots[shot]);
+            report::Row {
+                baseline,
+                current: currents.get(&(at, shot)).map(Vec::as_slice),
+                diff: matches!(fate, Fate::Differs { .. }).then_some(marked),
+                entry: &mine[at].id,
+                fate,
+                shot: &config.shots[shot].name,
+                source: config.sources[mine[at].source].name(),
+            }
+        })
+        .collect();
+    Ok(report::finish(&report::Run {
+        base: &base,
+        dir: base.join(&config.report),
+        entries: mine.len(),
+        fingerprint: write_fingerprint.then_some(fingerprint_path),
         inspected_failed,
-    ))
+        retake: &retake,
+        rows,
+        scope: &scope,
+        skipped,
+        update: options.update,
+    }))
 }
 
 /// What a first-take verdict that needs no second take becomes, writing the
@@ -700,18 +814,21 @@ fn settle(
     baseline: &Path,
     bytes: &[u8],
 ) -> Outcome<Fate> {
-    let budget = exception.and_then(|one| one.pixels).is_some();
+    let budget = exception.filter(|one| one.pixels.is_some());
     Ok(match verdict {
-        Verdict::Matched if budget => Fate::Spent,
+        Verdict::Matched if budget.is_some() => Fate::Spent,
         Verdict::Matched | Verdict::Within(_) if update => Fate::Held,
         Verdict::Matched => Fate::Matched,
-        Verdict::Within(differing) => {
-            if budget {
-                Fate::Tolerated(differing)
-            } else {
-                Fate::Matched
-            }
-        }
+        Verdict::Within(measure) => match budget {
+            Some(one) => Fate::Tolerated {
+                measure,
+                reason: match &one.measured {
+                    Some(measured) => format!("{} Measured: {measured}", one.reason),
+                    None => one.reason.clone(),
+                },
+            },
+            None => Fate::Matched,
+        },
         Verdict::Missing if update => {
             write(baseline, bytes)?;
             Fate::Written("it had no baseline")
@@ -740,161 +857,6 @@ fn write(path: &Path, bytes: &[u8]) -> Outcome<()> {
     })
 }
 
-/// Prints what the run found and returns its code.
-#[allow(clippy::too_many_arguments, clippy::too_many_lines)] // The run's whole state, read once.
-fn report(
-    config: &Config,
-    base: &Path,
-    mine: &[&Entry],
-    results: &BTreeMap<(usize, usize), Fate>,
-    update: bool,
-    scope: &str,
-    retake: &str,
-    wrote_fingerprint: bool,
-    inspected_failed: bool,
-) -> Code {
-    let named = |at: usize, shot: usize| format!("{}, {}", mine[at].id, config.shots[shot].name);
-    let mut lines = Vec::new();
-    let mut notes = Vec::new();
-    let mut written = Vec::new();
-    let mut held = 0;
-    let mut by_source: BTreeMap<&str, usize> = BTreeMap::new();
-    for (&(at, shot), result) in results {
-        *by_source
-            .entry(config.sources[mine[at].source].name())
-            .or_default() += 1;
-        let what = named(at, shot);
-        match result {
-            Fate::Broken(why) => lines.push(format!("{what}: {why}")),
-            Fate::Differs { differing, marked } => lines.push(format!(
-                "{what}: {} on two takes, marked in {}.",
-                plural(*differing, "pixel differs", "pixels differ"),
-                relative(base, marked)
-            )),
-            Fate::Missing => lines.push(format!("{what}: no baseline.")),
-            Fate::Resized { from, to } => lines.push(format!(
-                "{what}: {}x{} became {}x{}. A size change is a layout change, and no diff image is written \
-                 because there is nothing to lay one over.",
-                from.0, from.1, to.0, to.1
-            )),
-            Fate::Spent => lines.push(format!(
-                "{what}: matches its baseline, so its exception is spent. Remove it from the config."
-            )),
-            Fate::Steadied => notes.push(format!(
-                "{what}: differed on the first take and matched on the second. A picture that needs a second \
-                 take is not holding still: make it settle, or mark it unstable with the reason."
-            )),
-            Fate::Tolerated(differing) => {
-                let exception = exception_for(&config.exceptions, mine[at], &config.shots[shot]);
-                let reason = exception.map(|one| one.reason.as_str()).unwrap_or_default();
-                let measured = exception.and_then(|one| one.measured.as_deref()).map(|text| format!(" Measured: {text}")).unwrap_or_default();
-                let budget = exception.and_then(|one| one.pixels).unwrap_or_default();
-                notes.push(format!("{what}: {differing} of the {budget} pixels its exception allows differ. {reason}{measured}"));
-            }
-            Fate::Held => held += 1,
-            Fate::Written(why) => written.push(format!("{what} ({why})")),
-            Fate::Matched => {}
-        }
-    }
-
-    let mut skipped = Vec::new();
-    for entry in mine {
-        for shot in &config.shots {
-            if let Some(exception) =
-                exception_for(&config.exceptions, entry, shot).filter(|one| one.unstable)
-            {
-                skipped.push(format!(
-                    "{}, {} ({})",
-                    entry.id, shot.name, exception.reason
-                ));
-            }
-        }
-    }
-    let skipped = if skipped.is_empty() {
-        "Skipped none.".to_string()
-    } else {
-        format!(
-            "Skipped {} as unstable: {}.",
-            plural(skipped.len(), "shot", "shots"),
-            skipped.join("; ")
-        )
-    };
-    let total = results.len();
-    let sources = by_source
-        .iter()
-        .map(|(name, count)| format!("{name} {count}"))
-        .collect::<Vec<_>>()
-        .join(", ");
-    let counted = format!(
-        "{} of {} ({sources})",
-        plural(total, "shot", "shots"),
-        plural(mine.len(), "entry", "entries")
-    );
-
-    for note in &notes {
-        println!("proof: {note}");
-    }
-    let failed = results.values().any(Fate::fails) || inspected_failed;
-    if !lines.is_empty() {
-        println!("\n  {}\n", lines.join("\n  "));
-    }
-
-    let mut verdict = String::new();
-    if update {
-        let _ = write!(
-            verdict,
-            "proof: wrote {} of {total} baselines{scope}",
-            written.len()
-        );
-        if !written.is_empty() && written.len() <= 12 {
-            let _ = write!(verdict, ": {}", written.join(", "));
-        }
-        let _ = write!(verdict, ". {held} already match and were left alone.");
-        if wrote_fingerprint {
-            let _ = write!(
-                verdict,
-                " Wrote the environment fingerprint to {}.",
-                relative(base, &base.join(&config.fingerprint))
-            );
-        }
-        if !lines.is_empty() {
-            let _ = write!(
-                verdict,
-                " {} could not be taken, listed above.",
-                plural(lines.len(), "shot", "shots")
-            );
-        }
-        let _ = write!(verdict, " {skipped}");
-        println!("{verdict}");
-        if !written.is_empty() {
-            println!("proof: review each written picture before committing it. A baseline records whatever was on screen as correct.");
-        }
-    } else if lines.is_empty() {
-        println!("proof: compared {counted}{scope}, and every one matches its baseline. {skipped}");
-    } else {
-        println!(
-            "proof: {} of {counted}{scope}{} {} not match {}, listed above. {skipped}",
-            lines.len(),
-            if scope.is_empty() { "" } else { "," },
-            if lines.len() == 1 { "does" } else { "do" },
-            if lines.len() == 1 {
-                "its baseline"
-            } else {
-                "their baselines"
-            },
-        );
-        println!("proof: if the change was meant, retake the baselines. {retake}");
-    }
-    if inspected_failed {
-        println!("proof: the config's inspect reported a failure, above.");
-    }
-    if failed {
-        Code::Failed
-    } else {
-        Code::Ok
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -912,20 +874,30 @@ mod tests {
         .unwrap()
     }
 
+    fn pixel() -> Diff {
+        Diff::default()
+    }
+
     #[test]
     fn no_baseline_is_missing() {
-        assert_eq!(judge(None, &png(2, 2, false), 0.1, 0), Ok(Verdict::Missing));
+        assert_eq!(
+            judge(None, &png(2, 2, false), &pixel(), 0),
+            Ok(Verdict::Missing)
+        );
     }
 
     #[test]
     fn equal_bytes_match_without_a_decode() {
-        assert_eq!(judge(Some(b"same"), b"same", 0.1, 0), Ok(Verdict::Matched));
+        assert_eq!(
+            judge(Some(b"same"), b"same", &pixel(), 0),
+            Ok(Verdict::Matched)
+        );
     }
 
     #[test]
     fn a_size_change_is_reported_as_one() {
         assert_eq!(
-            judge(Some(&png(2, 2, false)), &png(2, 3, false), 0.1, 0),
+            judge(Some(&png(2, 2, false)), &png(2, 3, false), &pixel(), 0),
             Ok(Verdict::Resized {
                 from: (2, 2),
                 to: (2, 3)
@@ -936,19 +908,41 @@ mod tests {
     #[test]
     fn a_budget_holds_a_difference_within_it() {
         assert_eq!(
-            judge(Some(&png(3, 3, false)), &png(3, 3, true), 0.1, 0),
-            Ok(Verdict::Differs(1))
+            judge(Some(&png(3, 3, false)), &png(3, 3, true), &pixel(), 0),
+            Ok(Verdict::Differs(Measure::Pixels(1)))
         );
         assert_eq!(
-            judge(Some(&png(3, 3, false)), &png(3, 3, true), 0.1, 1),
-            Ok(Verdict::Within(1))
+            judge(Some(&png(3, 3, false)), &png(3, 3, true), &pixel(), 1),
+            Ok(Verdict::Within(Measure::Pixels(1)))
         );
+    }
+
+    #[test]
+    fn the_perceptual_mode_judges_by_similarity() {
+        let perceptual = Diff {
+            mode: Mode::Perceptual,
+            ..Diff::default()
+        };
+        let Ok(Verdict::Differs(Measure::Similarity { score, .. })) =
+            judge(Some(&png(3, 3, false)), &png(3, 3, true), &perceptual, 0)
+        else {
+            panic!("one black pixel in nine is a structural change");
+        };
+        assert!(score < 0.99);
+        let lenient = Diff {
+            ssim: 0.0,
+            ..perceptual
+        };
+        assert!(matches!(
+            judge(Some(&png(3, 3, false)), &png(3, 3, true), &lenient, 0),
+            Ok(Verdict::Within(_))
+        ));
     }
 
     fn exception(pixels: Option<usize>) -> Exception {
         Exception {
             entry: "a".to_string(),
-            measured: None,
+            measured: Some("3 pixels on 4 runs".to_string()),
             pixels,
             reason: "why".to_string(),
             shot: None,
@@ -963,17 +957,17 @@ mod tests {
             settle(Verdict::Matched, Some(&exception(Some(4))), false, &at, b"").unwrap(),
             Fate::Spent
         ));
-        assert!(matches!(
-            settle(
-                Verdict::Within(2),
-                Some(&exception(Some(4))),
-                false,
-                &at,
-                b""
-            )
-            .unwrap(),
-            Fate::Tolerated(2)
-        ));
+        let Fate::Tolerated { reason, .. } = settle(
+            Verdict::Within(Measure::Pixels(2)),
+            Some(&exception(Some(4))),
+            false,
+            &at,
+            b"",
+        )
+        .unwrap() else {
+            panic!("a difference inside the budget is tolerated");
+        };
+        assert_eq!(reason, "why Measured: 3 pixels on 4 runs");
         assert!(matches!(
             settle(Verdict::Matched, None, true, &at, b"").unwrap(),
             Fate::Held

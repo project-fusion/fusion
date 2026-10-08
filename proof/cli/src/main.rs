@@ -20,8 +20,10 @@ mod driver;
 mod fingerprint;
 mod harness;
 mod image;
+mod report;
 mod run;
 mod shard;
+mod sources;
 
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -112,6 +114,20 @@ enum Command {
     /// it beside the baseline. On a platform other than the config's, it says
     /// so and exits 0.
     Test(Selection),
+    /// Open the report of the last run, or print its summary.
+    ///
+    /// Every `test` and `update` writes the report into the config's `report`
+    /// directory. `--markdown` prints its summary as Markdown, which a CI job
+    /// can append to its summary page.
+    Report {
+        /// The config file. `proof.config.ts`, `.mjs` or `.js` in the working
+        /// directory when not given.
+        #[arg(long, value_name = "PATH")]
+        config: Option<PathBuf>,
+        /// Print the summary as Markdown instead of opening the page.
+        #[arg(long)]
+        markdown: bool,
+    },
     /// Picture every entry and write the baselines the comparison rejects.
     ///
     /// A shot that matches its baseline is left alone, so the files an update
@@ -234,6 +250,7 @@ fn main() -> ExitCode {
             diff,
             threshold,
         } => compare(baseline, current, diff.as_deref(), *threshold),
+        Command::Report { config, markdown } => run::open_report(config.as_deref(), *markdown),
         Command::Test(selection) => selection
             .options(false)
             .and_then(|options| run::run(&options)),

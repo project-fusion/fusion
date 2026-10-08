@@ -35,8 +35,25 @@ export interface Harness {
   padding?: number
 }
 
+/** How a shot is compared with its baseline. */
+export interface Diff {
+  /**
+   * `pixel` counts the pixels past `threshold`, and is the default. `perceptual` scores structural
+   * similarity, for photographs and gradients whose pixels move a shade on every render.
+   */
+  mode?: 'perceptual' | 'pixel'
+  /** Pixels a shot may differ by and still pass, in the pixel mode. 0 when not given. */
+  pixels?: number
+  /** The lowest structural similarity a shot may score and pass, in the perceptual mode, from 0 to 1. 0.99 when not given. */
+  ssim?: number
+  /** How far apart two colors may be and still be one pixel, from 0 to 1. 0.1 when not given. */
+  threshold?: number
+}
+
 /** HTML files from a glob, each pictured inside a document the harness writes. */
 export interface HtmlSource {
+  /** The diff for this source's shots, in place of the config's. */
+  diff?: Diff
   /**
    * Relative requests from a page answered by another file in its directory,
    * with `{stem}` for the page's own file name without its extension:
@@ -63,19 +80,70 @@ export interface HtmlSource {
   styles?: string[]
 }
 
-/** Any source of entries. Phase 1 reads HTML files. */
-export type Source = HtmlSource
+/** What every source on a server shares. */
+interface Served {
+  /** The directory each entry's baselines are written in, relative to the config. */
+  baselines: string
+  /** The directory `start` runs in, relative to the config. */
+  cwd?: string
+  /** The diff for this source's shots, in place of the config's. */
+  diff?: Diff
+  /** The first half of each entry's id, `<name>/<entry>`. One word. */
+  name: string
+  /**
+   * A shell command that starts the server, run only when nothing answers at `url`, and stopped
+   * when the run ends. Left out, the server has to be running already.
+   */
+  start?: string
+  /** Seconds to wait for the server to answer after `start`. 120 when not given. */
+  timeout?: number
+  /** The server's address, `http://localhost:3000`. */
+  url: string
+}
+
+/** Pages of any server, by route or from its sitemap. */
+export interface ServerSource extends Served {
+  /** Picks this source out of the others. */
+  kind: 'server'
+  /** Routes to picture, each a path or a path and the name its baselines take. `/` is named `index`. */
+  routes?: (string | { name: string; path: string })[]
+  /** A sitemap's path on the server, `/sitemap.xml`, whose every route is pictured too. */
+  sitemap?: string
+}
+
+/** Stories from a running Storybook, read from its `index.json`. */
+export interface StorybookSource extends Served {
+  /** Stories carrying one of these tags are left out. */
+  exclude?: string[]
+  /** Only stories carrying one of these tags, when any are given. */
+  include?: string[]
+  /** Picks this source out of the others. */
+  kind: 'storybook'
+}
+
+/** Entries listed in a JSON file: an array of `{ id, url }`, each `url` relative to the server. */
+export interface CatalogSource extends Served {
+  /** The catalog file, relative to the config. */
+  catalog: string
+  /** Picks this source out of the others. */
+  kind: 'catalog'
+}
+
+/** Any source of entries. */
+export type Source = CatalogSource | HtmlSource | ServerSource | StorybookSource
 
 /** An entry as `inspect` sees it. */
 export interface Entry {
-  /** The HTML file, absolute. */
-  file: string
+  /** The HTML file, absolute, for an entry from an HTML source. */
+  file?: string
   /** `<source>/<name>`, unique across the run. */
   id: string
   /** What the glob named it. */
   name: string
   /** The name of the source it came from. */
   source: string
+  /** The page's address, for an entry on a server. */
+  url?: string
 }
 
 /** A run of `inspect.run`, collected for `inspect.report`. */
@@ -125,13 +193,8 @@ export interface Exception {
 
 /** A `proof.config.ts`. */
 export interface Config {
-  /** How a picture is compared with its baseline. */
-  diff?: {
-    /** Pixels a shot may differ by and still pass. 0 when not given. */
-    pixels?: number
-    /** How far apart two colors may be and still be one pixel, from 0 to 1. 0.1 when not given. */
-    threshold?: number
-  }
+  /** How a shot is compared with its baseline, unless its source sets its own. */
+  diff?: Diff
   /** Exceptions to the comparison, each with its reason. */
   exceptions?: Exception[]
   /** Where the environment fingerprint is kept, relative to the config. `proof.fingerprint.json` when not given. */
@@ -142,6 +205,8 @@ export interface Config {
   network?: 'open' | 'origin'
   /** `linux` takes and compares baselines on Linux alone, and is the default. `any` compares wherever it runs. */
   platform?: 'any' | 'linux'
+  /** Where each run writes its report and `run.json`, relative to the config. `.proof/report` when not given. */
+  report?: string
   /** How your project retakes its baselines, said when a run fails. */
   retake?: string
   /** URL paths the harness serves from disk, relative to the config. A path ending in `/` serves a directory. */
