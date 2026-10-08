@@ -65,10 +65,24 @@ import { fits, monthPage, overviewOf, type Reading, toneOf } from './buckets.js'
  * `multiple` any number. Space, Enter or a press selects the cell the keys or
  * the pointer rest on, or lets it go, and under `multiple` Shift with an arrow,
  * Home, End, PageUp or PageDown takes in every cell from the last one pressed
- * to where the key went. `value` holds the selected days, by the names their
- * rows have in the table, separated by commas. A change asks with
+ * to where the key went. `value` holds the selected days, separated by
+ * commas: each by its row's `<time datetime>`, such as `2026-06-11`, or by
+ * its row's name where the row carries no date. A change asks with
  * `helix-before-change` and tells with `change`, and the `selection` part says
  * how many are selected, in `selection-label`.
+ *
+ * **Keyboard.** The strip is one tab stop once it has cells.
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Tab | Moves focus to the strip and shows the first cell. |
+ * | Down, Up | Moves to the next or the previous cell. |
+ * | Right, Left | Moves a column on or back, a week with `rows="7"`. On a right-to-left page, Left moves on. |
+ * | Home, End | Moves to the first or the last cell. |
+ * | Page Down, Page Up | Moves a month on or back where the rows carry dates, and four columns otherwise. |
+ * | Enter, Space | Selects the cell, or lets it go, under `selection-mode`. |
+ * | Shift with an arrow, Home, End, Page Up or Page Down | Selects every cell from the last one pressed to where the key went, under `selection-mode="multiple"`. |
+ * | Escape | Puts the cell's tooltip away. |
  *
  * @since 0.1.0
  * @status stable
@@ -128,6 +142,9 @@ import { fits, monthPage, overviewOf, type Reading, toneOf } from './buckets.js'
  * @cssproperty --heatmap-tone-primary - The color of the `primary` tone.
  * @cssproperty --heatmap-tone-success - The color of the `success` tone, named in `tones` or in `data-tone`.
  * @cssproperty --heatmap-tone-warning - The color of the `warning` tone.
+ *
+ * @cssstate active - While a cell is shown, under the pointer or the keys, with its tooltip open.
+ * @cssstate empty - While the `empty` part stands in place of the cells.
  */
 @customElement('helix-headless-heatmap')
 export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
@@ -276,8 +293,9 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
   totalLabel = 'Total'
 
   /**
-   * The selected cells, by the names their rows have in the table, such as
-   * `2026-06-11`, separated by commas.
+   * The selected cells, separated by commas: each by the date its row's
+   * header carries in a `<time datetime>`, such as `2026-06-11`, or by the
+   * header's words where it carries none.
    *
    * Set it to start with cells selected. Written by a press or a key under
    * `selection-mode`.
@@ -351,11 +369,18 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
   /** The region a change of selection is said in, rendered from the first change. */
   private readonly status = new StatusController(this)
 
-  /** The name each drawn cell stands for in `value`: its row's name in the table. */
+  /**
+   * The name each drawn cell stands for in `value`: the date its row's header
+   * carries in a `<time datetime>`, or the header's words where it carries
+   * none.
+   */
   private keysOf(cells: readonly Reading[]): string[] {
     const offset = this.points.length - cells.length
     const rows = this.sourceRows
-    return cells.map((_, index) => rows[offset + index]?.label ?? '')
+    return cells.map((_, index) => {
+      const row = rows[offset + index]
+      return row?.when ?? row?.label ?? ''
+    })
   }
 
   /**
@@ -633,6 +658,8 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
     super.updated(changed)
     this.markEmpty()
     this.measure()
+    this.toggleState('active', this.pointer.at >= 0)
+    this.toggleState('empty', this.drawn.length === 0 && this.sourceKnown)
     /* Written here rather than reflected, and announced only on a change: a
        consumer recomputing a summary from this is doing work, and an event per
        resize frame is work per frame.
