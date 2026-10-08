@@ -158,8 +158,13 @@ A data table reads each cell from its column, and the server does not pass it
 its columns, so it serves its headings and no values. Write the first page under
 the columns as `helix-table-row` and `helix-table-cell` elements, in the table's
 sort and page size. The table shows them until `rows` holds a row, then draws
-its own rows in their place. See [React](./react) for the server component
-version.
+its own rows in their place. Size its columns with `columns` on the table, which
+the server sends, so the served rows are laid out at the widths the table draws.
+See [React](./react) for the server component version.
+
+A `Table` served with declarative shadow DOM lays out its headings and cells in
+columns before it hydrates. A column of sentences takes its width from its text once the table
+upgrades, so set `columns` on a table that has one.
 
 ## Write a server spec
 

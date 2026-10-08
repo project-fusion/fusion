@@ -106,6 +106,12 @@ them out as the table before the script runs. The table shows your rows until
 page, so React finds the markup it rendered. A development build warns when the
 first page the table draws shows different words from the rows you served.
 
+Size the columns with `columns` on the table, such as
+`columns="2fr 1fr max-content"`. The stylesheet can read the table's own
+attribute and not a column's `width`, so the served rows are laid out at the
+widths the table draws, and nothing moves when it upgrades. The checkbox column of a
+`selectable` table and the pagination's row are held from the first paint too.
+
 ### The React version
 
 The bridge is runtime code in `@fusion.dev/helix-core`, which you already have,
