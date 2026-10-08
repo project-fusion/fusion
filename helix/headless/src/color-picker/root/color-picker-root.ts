@@ -1207,12 +1207,17 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
    */
   protected renderFields(color: Color): TemplateResult {
     return html`<div part="fields">
-      ${channelFields(this.value, color, this.format ?? 'hex', this.alpha).map(
-        (field) => html`<label part="field">
-          <span part="field-label">${this.channelWord(field.channel)}</span>
+      ${channelFields(this.value, color, this.format ?? 'hex', this.alpha).map((field) => {
+        const word = this.channelWord(field.channel)
+        const name = this.channelName(word)
+        /* The picker's name with the word the label shows, and the label
+           alone where the picker has no name. */
+        return html`<label part="field">
+          <span part="field-label">${word}</span>
           <input
             part="field-input"
             type="number"
+            aria-label=${name === word ? nothing : name}
             inputmode=${field.step < 1 ? 'decimal' : 'numeric'}
             min=${field.min}
             max=${field.max}
@@ -1227,9 +1232,23 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
               this.requestUpdate()
             }}
           />
-        </label>`,
-      )}
+        </label>`
+      })}
     </div>`
+  }
+
+  /**
+   * A channel's name, after the picker's own where the picker has one.
+   *
+   * **Every channel the same way**, as React Aria's color area names its own:
+   * "Brand, Saturation" says which picker on a page with two. The square's
+   * axes and the wheel took the picker's name, and the hue and opacity ramps
+   * and the number fields did not, so two pickers on a page gave two sliders
+   * named "Hue", measured in Chromium's tree.
+   */
+  protected channelName(channel: string): string {
+    const owner = this.getAttribute('aria-label')?.trim() || this.named
+    return owner ? `${owner}, ${channel}` : channel
   }
 
   /**
@@ -1255,7 +1274,7 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
         tooltips: channel-tooltips"
       data-channel=${channel}
       aria-invalid=${this.marked ? 'true' : nothing}
-      label=${label}
+      label=${this.channelName(label)}
       max=${max}
       min="0"
       value-text=${spoken || nothing}
@@ -1492,11 +1511,6 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
        green" in English. */
     const hueSaid = (value: number | string): string =>
       new Intl.ListFormat(locale, { style: 'short', type: 'unit' }).format([String(value), hue])
-    /* The square's two inputs are named with the picker's own name where it
-       has one, as React Aria's color area names its own: "Brand, Saturation"
-       says which picker on a page with two. */
-    const owner = this.getAttribute('aria-label')?.trim() || this.named
-    const axisName = (channel: string): string => (owner ? `${owner}, ${channel}` : channel)
     const area = html`<div
         part="grid"
         style="--color-picker-hue: ${color.hue}; --color-picker-saturation: ${color.saturation}%; --color-picker-brightness: ${color.brightness}%"
@@ -1511,7 +1525,7 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
           type="range"
           min="0"
           max="100"
-          aria-label=${axisName(this.saturationLabel)}
+          aria-label=${this.channelName(this.saturationLabel)}
           aria-describedby=${this.describedBy}
           aria-valuetext=${both}
           aria-invalid=${this.marked ? 'true' : nothing}
@@ -1536,7 +1550,7 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
           max="100"
           tabindex="-1"
           style="writing-mode: vertical-lr; direction: rtl"
-          aria-label=${axisName(this.brightnessLabel)}
+          aria-label=${this.channelName(this.brightnessLabel)}
           aria-describedby=${this.describedBy}
           aria-valuetext=${reversed}
           aria-invalid=${this.marked ? 'true' : nothing}
@@ -1570,7 +1584,7 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
               min="0"
               max="360"
               dir="ltr"
-              aria-label=${axisName(this.hueLabel)}
+              aria-label=${this.channelName(this.hueLabel)}
               aria-describedby=${this.describedBy}
               aria-valuetext=${hueSaid(color.hue)}
               aria-invalid=${this.marked ? 'true' : nothing}
