@@ -305,7 +305,7 @@ describe('a field that keeps its own chips', () => {
     await press(host)
     await settle(host)
     expect(chipsOf(host)).toHaveLength(1)
-    const chip = chipsOf(host)[0] as HTMLElement & { label: string; operator: string }
+    const chip = chipsOf(host)[0] as unknown as HTMLElement & { label: string; operator: string }
     expect(chip.slot).toBe('tags')
     expect(chip.getAttribute('name')).toBe('disposition')
     expect(chip.label).toBe('Disposition')
