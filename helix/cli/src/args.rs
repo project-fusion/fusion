@@ -54,14 +54,28 @@ pub struct Cli {
 
 #[derive(Debug, Subcommand)]
 pub enum Noun {
-    /* **A noun with no verb, and that is the shape rather than an omission.**
-    Every other noun here does several things to one subject; this does one
-    thing and the client asks for the rest over the protocol. A `helix mcp
-    serve` would be a word a reader types to no effect. */
-    /// Serve the derivation to an agent, over stdio, as an MCP server.
+    /* **Serving is the noun's own action**, so `helix mcp` with no verb
+    serves, as it always has, and `init` is the one verb beside it: writing a
+    client's configuration is a different act from serving, and a person runs
+    it once. */
+    /// Serve Helix to an agent, over stdio, as an MCP server.
     ///
-    /// Takes no verb: the client asks for what it wants over the protocol.
-    Mcp,
+    /// With no verb it serves: the client asks for what it wants over the
+    /// protocol. `helix mcp init` writes a client's configuration.
+    Mcp(Mcp),
+
+    /* **A noun for the installed packages' own description of themselves.**
+    Each verb is one of the MCP server's lookups, so a script and an agent
+    get the same answer from the same function. */
+    /// Look up the installed Helix packages: families, examples, imports, and tokens.
+    ///
+    /// Reads `api.json`, `examples.json`, and `tokens.json` from the Helix
+    /// packages in `node_modules`, so every answer is the installed version's.
+    #[command(subcommand_required = true, arg_required_else_help = true)]
+    Api {
+        #[command(subcommand)]
+        verb: Api,
+    },
 
     /* **The design system saying whether you extended it correctly**, rather
     than a linter to be configured into usefulness. */
@@ -75,12 +89,8 @@ pub enum Noun {
         verb: Component,
     },
 
-    /* **A noun with no verb, like `mcp` and for the opposite reason.** `new`
-    does one thing to one subject and there is no second verb it could take:
-    `helix new list` would be a word for what an omitted `--template` already
-    prints. */
-    /* **A noun with no verb, like `mcp`**: it does one thing, which is to
-    serve, and a page asks for the rest over HTTP. */
+    /* **A noun with no verb**: it does one thing, which is to serve, and a
+    page asks for the rest over HTTP. */
     /// Receive the runs `initDiagnostics()` sends from your app, and print them.
     ///
     /// Listens on 127.0.0.1 beside any dev server. Pages on a local host post
@@ -99,6 +109,9 @@ pub enum Noun {
         verb: Manifest,
     },
 
+    /* **A noun with no verb.** `new` does one thing to one subject and there
+    is no second verb it could take: `helix new list` would be a word for what
+    an omitted `--template` already prints. */
     /// Scaffold a project from a Helix template.
     ///
     /// Reads `@fusion.dev/helix-templates` from `node_modules`. Omit
@@ -384,4 +397,108 @@ pub struct New {
     /// Write into this directory instead of one named after the project.
     #[arg(long)]
     pub into: Option<PathBuf>,
+}
+
+/// What `helix mcp` takes.
+#[derive(Args, Debug)]
+pub struct Mcp {
+    #[command(subcommand)]
+    pub verb: Option<McpVerb>,
+}
+
+#[derive(Debug, Subcommand)]
+pub enum McpVerb {
+    /// Write a client's configuration to run `helix mcp` in this project.
+    ///
+    /// Adds a `helix` server to the file the client reads and keeps every
+    /// other server in it.
+    Init(McpInit),
+}
+
+/// What `helix mcp init` takes.
+#[derive(Args, Debug)]
+pub struct McpInit {
+    /// The client to configure.
+    #[arg(long, value_enum)]
+    pub client: Client,
+
+    /// Replace a `helix` server the file already has.
+    #[arg(long)]
+    pub force: bool,
+}
+
+/// The clients `helix mcp init` writes for, and the file each reads.
+#[derive(Clone, Copy, Debug, clap::ValueEnum)]
+pub enum Client {
+    /// Claude Code: `.mcp.json`.
+    Claude,
+    /// Cursor: `.cursor/mcp.json`.
+    Cursor,
+    /// VS Code: `.vscode/mcp.json`.
+    Vscode,
+}
+
+/// What can be asked of the installed packages.
+#[derive(Debug, Subcommand)]
+pub enum Api {
+    /// The families that answer a name, an alias, a tag, or a purpose.
+    Find(ApiFind),
+    /// One family's API: tags, properties, events, slots, parts, words, and imports.
+    Family(ApiFamily),
+    /// One example of a family, with the import lines it needs.
+    Example(ApiExample),
+    /// The import lines that register the given tags.
+    Imports(ApiImports),
+    /// The semantic tokens, by a word in the name or description.
+    Tokens(ApiTokens),
+}
+
+#[derive(Args, Debug)]
+pub struct ApiFind {
+    /// What to look for, such as `dropdown` or `date picker`.
+    pub query: String,
+
+    /// How many families to list.
+    #[arg(long, default_value_t = 10)]
+    pub limit: usize,
+}
+
+#[derive(Args, Debug)]
+pub struct ApiFamily {
+    /// The family's slug, label, alias, or one of its tags.
+    pub family: String,
+
+    /// The tier to read. Defaults to the styled tier where it is installed.
+    #[arg(long, value_parser = ["styled", "headless"])]
+    pub tier: Option<String>,
+}
+
+#[derive(Args, Debug)]
+pub struct ApiExample {
+    /// The family's slug, label, alias, or one of its tags.
+    pub family: String,
+
+    /// The example's slug. Defaults to the family's first, its preview.
+    pub example: Option<String>,
+
+    /// The tier to read. Defaults to the styled tier where it is installed.
+    #[arg(long, value_parser = ["styled", "headless"])]
+    pub tier: Option<String>,
+}
+
+#[derive(Args, Debug)]
+pub struct ApiImports {
+    /// The tags a page writes, such as `helix-select helix-option`.
+    #[arg(required = true)]
+    pub tags: Vec<String>,
+}
+
+#[derive(Args, Debug)]
+pub struct ApiTokens {
+    /// A word in the token's name or description.
+    pub query: Option<String>,
+
+    /// Only this category, such as `color` or `space`.
+    #[arg(long)]
+    pub category: Option<String>,
 }

@@ -31,6 +31,8 @@ mod markup;
 mod usage;
 mod weight;
 
+pub use identity::nearest;
+
 use std::collections::{HashMap, HashSet};
 use std::hash::{BuildHasher, RandomState};
 use std::path::{Path, PathBuf};

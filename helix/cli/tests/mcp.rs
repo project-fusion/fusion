@@ -61,7 +61,8 @@ fn answer(reply: &serde_json::Value) -> (bool, String) {
 fn it_negotiates_and_lists_its_tools() {
     let replies = talk(&[HELLO, r#"{"jsonrpc":"2.0","id":2,"method":"tools/list"}"#]);
     assert_eq!(replies.len(), 2);
-    assert_eq!(replies[0]["result"]["protocolVersion"], "2024-11-05");
+    /* No revision asked for, so the newest this speaks. */
+    assert_eq!(replies[0]["result"]["protocolVersion"], "2025-11-25");
     assert_eq!(replies[0]["result"]["serverInfo"]["name"], "helix");
 
     let tools = replies[1]["result"]["tools"].as_array().expect("a list");
@@ -69,7 +70,18 @@ fn it_negotiates_and_lists_its_tools() {
         .iter()
         .map(|tool| tool["name"].as_str().unwrap())
         .collect();
-    assert_eq!(names, ["helix_derive_theme", "helix_audit_theme"]);
+    assert_eq!(
+        names,
+        [
+            "helix_find",
+            "helix_family",
+            "helix_example",
+            "helix_imports",
+            "helix_tokens",
+            "helix_derive_theme",
+            "helix_audit_theme"
+        ]
+    );
     /* Every tool has a description and a schema, because a client shows the first
     to a model and validates against the second, and a tool missing either is
     one a model will not call correctly. */

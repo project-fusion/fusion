@@ -27,7 +27,8 @@ helix component fix        # the rules that can write
 | `new` | Scaffolds a project from a Helix template |
 | `diagnostics` | Receives the runs `initDiagnostics()` sends from your app and prints each new finding. `--out <path>` writes the CI file, `--port` picks the port, 7417 by default, and `--config <path>` names the settings served to the page |
 | `scan` | Reads your project's stylesheets, templates, and modules, and prints each finding with its file and line. `--build <dir>` weighs each Helix family in your bundle, `--out <path>` writes the run to the CI file, and `--config <path>` names the settings |
-| `mcp` | Serves the derivation to an agent over stdio, as an MCP server |
+| `api` | Looks up the installed Helix packages: `find` a family, a `family`'s API, an `example` with its imports, the `imports` for a list of tags, and `tokens` |
+| `mcp` | Serves the same lookups and the theme derivation to an agent over stdio, as an MCP server. `mcp init --client claude\|cursor\|vscode` writes the client's configuration |
 
 `--json` is on every verb, in a shape a script can read without parsing
 sentences: the rules, their counts and their findings. `--no-color` is the third

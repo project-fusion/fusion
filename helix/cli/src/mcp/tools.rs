@@ -1,21 +1,46 @@
-//! The tools, and why there are two of them.
+//! The tools: five lookups and two derivations.
 //!
-//! **Both are the derivation and neither is a lookup.** An agent asking what
-//! `#c1272d` produces, or whether a palette it is proposing clears its contrast
-//! targets, is asking a question whose answer does not exist until it is
-//! computed. Everything a document can hold is a document: the manifest, the
-//! token set, the examples, all of them URLs.
+//! **The lookups answer from the installed packages.** Each is one decision an
+//! agent makes while writing a page: which family, what it takes, an example
+//! to start from, what to import, which token. Each reads the `api.json`,
+//! `examples.json`, and `tokens.json` the project's Helix packages ship, so an
+//! answer is the installed version's and names it. Each is a `helix api` verb
+//! as well, so a script and an agent get the same answer from one function.
 //!
-//! The two split the way `build` and `audit` do, and for the same reason those
-//! are two verbs over one computation: one hands back what to write and the other
-//! hands back what was measured. An agent picking a brand color wants the second
-//! long before it wants the first.
+//! **The derivations answer what no file can hold**: what a brand color
+//! derives to, and whether it clears its contrast targets. They split the way
+//! `build` and `audit` do, one handing back what to write and the other what
+//! was measured.
+//!
+//! **Every result is structured**, with an `outputSchema` it conforms to and
+//! the same object as JSON text for a client that reads only text.
+
+use std::fmt::Write;
+use std::path::Path;
 
 use fusion_helix_theme::css::{to_css, to_css_modes};
 use fusion_helix_theme::intent::ThemeIntent;
+use fusion_rules::error::Failure;
+use serde_json::{json, Value};
 
+use crate::api;
 use crate::theme::audit::measurement;
 use crate::theme::{modes, violations};
+
+/// What a tool hands back: the structured result and the text beside it.
+pub struct Answer {
+    pub structured: Value,
+    pub text: String,
+}
+
+impl Answer {
+    fn of(structured: Value) -> Self {
+        Self {
+            text: structured.to_string(),
+            structured,
+        }
+    }
+}
 
 /// What the tools take, described for a client that has never seen Helix.
 ///
@@ -24,8 +49,8 @@ use crate::theme::{modes, violations};
 /// an agent that has read the file format can already call the tool. A schema
 /// enumerating every optional field here would be a third copy of it, after the
 /// Rust struct and the starter file `helix theme init` writes.
-fn intent_schema() -> serde_json::Value {
-    serde_json::json!({
+fn intent_schema() -> Value {
+    json!({
         "properties": {
             "intent": {
                 "description": "A theme intent, the same JSON `helix.theme.json` holds. Every key is optional. `brand` is a hex color, or `{ \"light\": hex, \"dark\": hex }` for one per mode, and without one the theme is ink: near-black on a light page and near-white on a dark one. Without `scheme` (\"light\" or \"dark\") the theme is derived in both modes. Other keys include `contrastTarget` (4.5 for AA, 7 for AAA), `accent`, `background` (the page's color, `{ \"light\": hex, \"dark\": hex }`), `chroma`, `neutral`, `radius`, `density`, and `separation`.",
@@ -37,77 +62,256 @@ fn intent_schema() -> serde_json::Value {
     })
 }
 
+/// The annotations every tool carries: none of them writes anything or
+/// reaches the network, and the same call gives the same answer.
+fn annotations(title: &str) -> Value {
+    json!({
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": title,
+    })
+}
+
+/// An input schema of string arguments, the named ones required.
+fn strings(properties: &[(&str, &str)], required: &[&str]) -> Value {
+    let properties: serde_json::Map<String, Value> = properties
+        .iter()
+        .map(|(name, description)| {
+            (
+                (*name).to_owned(),
+                json!({ "description": description, "type": "string" }),
+            )
+        })
+        .collect();
+    json!({ "properties": properties, "required": required, "type": "object" })
+}
+
+/// An output schema: an object with these keys required, each of this type.
+fn output(keys: &[(&str, &str)]) -> Value {
+    let properties: serde_json::Map<String, Value> = keys
+        .iter()
+        .map(|(name, kind)| ((*name).to_owned(), json!({ "type": kind })))
+        .collect();
+    let required: Vec<&str> = keys.iter().map(|(name, _)| *name).collect();
+    json!({ "properties": properties, "required": required, "type": "object" })
+}
+
+const TIER: (&str, &str) = (
+    "tier",
+    "`styled` or `headless`. Defaults to the styled tier where it is installed.",
+);
+
 /// Every tool, as `tools/list` returns them.
-pub fn catalog() -> Vec<serde_json::Value> {
+pub fn catalog() -> Vec<Value> {
     vec![
-        serde_json::json!({
+        json!({
+            "annotations": annotations("Find a Helix family"),
+            "description": "Finds the Helix families that answer a name, an alias, a tag, or a purpose, such as `dropdown` or `date picker`, best first. Use it before writing a component you have not looked up. Each match has its slug, which helix_family takes.",
+            "inputSchema": {
+                "properties": {
+                    "limit": { "description": "How many families to list. Defaults to 10.", "type": "integer" },
+                    "query": { "description": "A name, alias, tag, or a few words of purpose.", "type": "string" },
+                },
+                "required": ["query"],
+                "type": "object",
+            },
+            "name": "helix_find",
+            "outputSchema": output(&[("matches", "array"), ("query", "string"), ("versions", "object")]),
+            "title": "Find a Helix family",
+        }),
+        json!({
+            "annotations": annotations("Read a Helix family"),
+            "description": "Returns one Helix family's API from the installed package: each tag with its properties and their literal unions, attributes, events with the exact React prop, slots, parts, custom properties, custom states, the properties registerWords translates, and `usage`, the import lines to copy. Write only what it lists. Lists the family's examples by slug for helix_example.",
+            "inputSchema": strings(&[("family", "The family's slug, label, alias, or one of its tags, such as `select` or `helix-option`."), TIER], &["family"]),
+            "name": "helix_family",
+            "outputSchema": output(&[("examples", "array"), ("family", "object"), ("package", "string"), ("version", "string")]),
+            "title": "Read a Helix family",
+        }),
+        json!({
+            "annotations": annotations("Read a Helix example"),
+            "description": "Returns one example of a Helix family as HTML and TSX, with its stylesheet and `imports`, the import lines that register every element it writes. Copy the imports with the markup.",
+            "inputSchema": strings(&[("family", "The family's slug, label, alias, or one of its tags."), ("example", "The example's slug, from helix_family. Defaults to the family's preview."), TIER], &["family"]),
+            "name": "helix_example",
+            "outputSchema": output(&[("example", "object"), ("family", "string"), ("package", "string"), ("version", "string")]),
+            "title": "Read a Helix example",
+        }),
+        json!({
+            "annotations": annotations("Import Helix tags"),
+            "description": "Returns the import lines that register the given tags, such as `helix-select` and `helix-option`, and lists any tag no installed package publishes with the closest one. Call it with every tag a file writes.",
+            "inputSchema": {
+                "properties": {
+                    "tags": { "description": "The tags a page writes.", "items": { "type": "string" }, "type": "array" },
+                },
+                "required": ["tags"],
+                "type": "object",
+            },
+            "name": "helix_imports",
+            "outputSchema": output(&[("lines", "array"), ("unknown", "array"), ("versions", "object")]),
+            "title": "Import Helix tags",
+        }),
+        json!({
+            "annotations": annotations("Find Helix tokens"),
+            "description": "Returns the semantic tokens, the custom properties to style with, filtered by a word in the name or description and by category, each with its value and description. Read these and never a `--_helix-` primitive.",
+            "inputSchema": strings(&[("query", "A word in the token's name or description, such as `surface`."), ("category", "Only this category, such as `color` or `space`.")], &[]),
+            "name": "helix_tokens",
+            "outputSchema": output(&[("categories", "array"), ("package", "string"), ("tokens", "array"), ("version", "string")]),
+            "title": "Find Helix tokens",
+        }),
+        json!({
+            "annotations": annotations("Derive a Helix theme"),
             "description": "Derives a complete Helix token set from a brand color, or from none for ink, and returns the CSS to write, with each color a `light-dark()` pair unless the intent names one mode. Every foreground and background pair meets its contrast target by construction. Use this when you need the actual custom properties for a theme.",
             "inputSchema": intent_schema(),
             "name": "helix_derive_theme",
+            "outputSchema": output(&[("css", "string")]),
+            "title": "Derive a Helix theme",
         }),
-        serde_json::json!({
+        json!({
+            "annotations": annotations("Audit a Helix theme"),
             "description": "Measures every foreground against the ground it is really painted on and reports each pair with its ratio and target, plus any roles too close to tell apart. Use this to find out whether a brand color can produce an accessible palette before committing to it.",
             "inputSchema": intent_schema(),
             "name": "helix_audit_theme",
+            "outputSchema": output(&[("collisions", "array"), ("failed", "integer"), ("pairings", "array"), ("violations", "array")]),
+            "title": "Audit a Helix theme",
         }),
     ]
 }
 
-/// Runs one tool.
+/// The names `catalog` lists, for the message about a name it does not.
+fn names() -> Vec<String> {
+    catalog()
+        .iter()
+        .filter_map(|tool| tool["name"].as_str().map(str::to_owned))
+        .collect()
+}
+
+/// A failure as the sentence a model reads, with the next step and the names
+/// it could have used.
+fn said(failure: &Failure) -> String {
+    let mut line = format!("{}: {}.", failure.what, failure.why);
+    if let Some(hint) = &failure.hint {
+        let _ = write!(line, " Try: {hint}.");
+    }
+    if !failure.choices.is_empty() {
+        let _ = write!(line, " It accepts: {}.", failure.choices.join(", "));
+    }
+    line
+}
+
+/// A required string argument, or the sentence saying it is missing.
+fn argument<'a>(arguments: &'a Value, name: &str) -> Result<&'a str, String> {
+    arguments[name]
+        .as_str()
+        .filter(|value| !value.trim().is_empty())
+        .ok_or_else(|| format!("`{name}` is required, as a string."))
+}
+
+/// Runs one tool, answering lookups from the packages installed at `from`.
 ///
 /// # Errors
 ///
 /// The message to show the caller, which is prose rather than a code: the reader
 /// is a model, and "cannot derive: brand is not a hex color" is a thing it can
 /// act on where a number is not.
-pub fn call(name: &str, arguments: &serde_json::Value) -> Result<String, String> {
+pub fn call(name: &str, arguments: &Value, from: &Path) -> Result<Answer, String> {
     /* **The name is checked before the arguments are read**, never the other way
-    round. Both tools take an intent, so parsing first tells a caller who
-    misspelled a tool name that their intent is malformed. An error describing
-    the wrong mistake is worse than a generic one: it sends the reader to fix
-    something that is correct. */
-    if name != "helix_audit_theme" && name != "helix_derive_theme" {
-        return Err(format!(
-            "no tool named {name}. This server has helix_audit_theme and helix_derive_theme."
-        ));
+    round. Parsing first tells a caller who misspelled a tool name that their
+    arguments are malformed, which sends them to fix something that is correct. */
+    match name {
+        "helix_find" => {
+            let limit = arguments["limit"]
+                .as_u64()
+                .and_then(|limit| usize::try_from(limit).ok())
+                .unwrap_or(10);
+            api::find(from, argument(arguments, "query")?, limit)
+                .map(Answer::of)
+                .map_err(|failure| said(&failure))
+        }
+        "helix_family" => api::family(
+            from,
+            argument(arguments, "family")?,
+            arguments["tier"].as_str(),
+        )
+        .map(Answer::of)
+        .map_err(|failure| said(&failure)),
+        "helix_example" => api::example(
+            from,
+            argument(arguments, "family")?,
+            arguments["example"].as_str(),
+            arguments["tier"].as_str(),
+        )
+        .map(Answer::of)
+        .map_err(|failure| said(&failure)),
+        "helix_imports" => {
+            let tags: Vec<String> = arguments["tags"]
+                .as_array()
+                .map(|tags| {
+                    tags.iter()
+                        .filter_map(Value::as_str)
+                        .map(str::to_owned)
+                        .collect()
+                })
+                .unwrap_or_default();
+            if tags.is_empty() {
+                return Err("`tags` is required, as an array of tag names.".to_owned());
+            }
+            api::imports(from, &tags)
+                .map(Answer::of)
+                .map_err(|failure| said(&failure))
+        }
+        "helix_tokens" => api::tokens(
+            from,
+            arguments["query"].as_str(),
+            arguments["category"].as_str(),
+        )
+        .map(Answer::of)
+        .map_err(|failure| said(&failure)),
+        "helix_audit_theme" | "helix_derive_theme" => theme(name, arguments),
+        _ => Err(format!(
+            "no tool named {name}. This server has {}.",
+            names().join(", ")
+        )),
     }
+}
+
+/// The two derivations.
+fn theme(name: &str, arguments: &Value) -> Result<Answer, String> {
     let intent = read(arguments)?;
     let themes =
         modes(&intent).map_err(|failure| format!("cannot derive that intent: {failure}"))?;
-
-    match name {
-        "helix_audit_theme" => {
-            /* The shape `helix theme audit --json` emits, key for key. Two
-            representations of one report would be two things to keep true, and
-            an agent that learned one has learned the other. There is no file,
-            so `source` is null. */
-            let mut report = measurement(&themes);
-            report.insert("source".to_owned(), serde_json::Value::Null);
-            Ok(serde_json::Value::Object(report).to_string())
-        }
-        "helix_derive_theme" => {
-            /* **Refused when it fails its own contract, the way `build` is.** A
-            palette that does not meet the contrast it claims is the failure
-            this engine exists to prevent, and handing one to a model that will
-            paste it into a stylesheet is worse than handing it to a person who
-            might read the warning above it. */
-            let failing = violations(&themes);
-            if !failing.is_empty() {
-                return Err(format!(
-                    "that intent derives a palette that fails its own contrast targets, so it is not returned. {}\n\nCall helix_audit_theme with the same intent to see every pair.",
-                    failing.join(" ")
-                ));
-            }
-            Ok(match themes.as_slice() {
-                [light, dark] => to_css_modes(light, dark, ":root"),
-                [one, ..] => to_css(one, ":root"),
-                [] => unreachable!("an intent derives in at least one mode"),
-            })
-        }
-        /* Unreachable: the guard above is exhaustive over the two names, and it
-        is there rather than here so the message can be written once. */
-        other => Err(format!("no tool named {other}")),
+    if name == "helix_audit_theme" {
+        /* The shape `helix theme audit --json` emits, key for key. Two
+        representations of one report would be two things to keep true, and
+        an agent that learned one has learned the other. There is no file,
+        so `source` is null. */
+        let mut report = measurement(&themes);
+        report.insert("source".to_owned(), Value::Null);
+        return Ok(Answer::of(Value::Object(report)));
     }
+    /* **Refused when it fails its own contract, the way `build` is.** A
+    palette that does not meet the contrast it claims is the failure this
+    engine exists to prevent, and handing one to a model that will paste it
+    into a stylesheet is worse than handing it to a person who might read the
+    warning above it. */
+    let failing = violations(&themes);
+    if !failing.is_empty() {
+        return Err(format!(
+            "that intent derives a palette that fails its own contrast targets, so it is not returned. {}\n\nCall helix_audit_theme with the same intent to see every pair.",
+            failing.join(" ")
+        ));
+    }
+    let css = match themes.as_slice() {
+        [light, dark] => to_css_modes(light, dark, ":root"),
+        [one, ..] => to_css(one, ":root"),
+        [] => unreachable!("an intent derives in at least one mode"),
+    };
+    /* The text is the CSS itself, as it always was, so a client that reads
+    only text pastes a stylesheet. */
+    Ok(Answer {
+        structured: json!({ "css": css }),
+        text: css,
+    })
 }
 
 /// Reads the intent out of the arguments.
@@ -117,7 +321,7 @@ pub fn call(name: &str, arguments: &serde_json::Value) -> Result<String, String>
 /// sends `{"brand": "#..."}`, and both are the caller being reasonable. The
 /// wrapped form is tried first so an intent that somehow has an `intent` key of
 /// its own resolves the documented way.
-fn read(arguments: &serde_json::Value) -> Result<ThemeIntent, String> {
+fn read(arguments: &Value) -> Result<ThemeIntent, String> {
     let body = arguments.get("intent").unwrap_or(arguments);
     serde_json::from_value(body.clone()).map_err(|failure| {
         format!("that is not a theme intent: {failure}. It is the JSON `helix.theme.json` holds, such as `{{\"brand\": \"#0b3d91\"}}`.")
