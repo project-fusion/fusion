@@ -207,3 +207,21 @@
     print-color-adjust: exact;
   }
 }
+
+/* Forced colors paint every background the page's Canvas color, and a mark is a
+   background seen through its shape, so the stars vanished. The filled marks
+   take the system's Highlight and the empty ones GrayText. */
+@media (forced-colors: active) {
+  [part="track"],
+  [part="fill"] {
+    forced-color-adjust: none;
+  }
+
+  [part="track"] {
+    color: GrayText;
+  }
+
+  [part="fill"] {
+    color: Highlight;
+  }
+}

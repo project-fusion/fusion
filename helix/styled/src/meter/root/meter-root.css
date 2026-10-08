@@ -335,3 +335,28 @@ slot[name="label"]::slotted(*) {
     var(--meter-track-color, var(--helix-color-surface-sunken))
   );
 }
+
+/* Forced colors paint every background the page's Canvas color, so the track
+   and the fill came out as nothing at all, the value alone left. As on
+   `Progress`, the track is outlined so the whole range reads and the fill is
+   the system's Highlight; a fill in a band keeps the band's color, which is
+   what it says, and the ticks keep the ground's. */
+@media (forced-colors: active) {
+  [part="track"] {
+    outline: var(--helix-border-thin) solid CanvasText;
+  }
+
+  [part~="indicator"] {
+    background-color: Highlight;
+    forced-color-adjust: none;
+  }
+
+  [part~="indicator"][data-band] {
+    background-color: var(--_meter-hue);
+  }
+
+  [part="tick"] {
+    background-color: Canvas;
+    forced-color-adjust: none;
+  }
+}

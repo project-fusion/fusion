@@ -429,3 +429,13 @@
     transition: none;
   }
 }
+
+/* Forced colors paint every background the page's Canvas color, and a point is
+   a background, so a place lost its color and its fill while the map under it,
+   a canvas forced colors leave alone, kept every one of its own. The point
+   keeps the colors it was given for that map, its pin and its tip with it. */
+@media (forced-colors: active) {
+  [part="point"] {
+    forced-color-adjust: none;
+  }
+}

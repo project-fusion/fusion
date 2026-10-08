@@ -200,3 +200,18 @@
     print-color-adjust: exact;
   }
 }
+
+/* Forced colors paint every background the page's Canvas color, so the points
+   vanished and left the axes. A point's color says its series, which the
+   legend keys, so the points keep it, ringed in the system's text color so
+   each reads on any canvas; the one the keys rest on is ringed in Highlight. */
+@media (forced-colors: active) {
+  [part~="point"] {
+    box-shadow: 0 0 0 var(--helix-border-thin) CanvasText;
+    forced-color-adjust: none;
+  }
+
+  [part~="point"][data-active] {
+    box-shadow: 0 0 0 var(--helix-border-thick) Highlight;
+  }
+}

@@ -71,3 +71,12 @@
 :host([terminus="triangle"]:dir(rtl)) [part="terminus"] {
   clip-path: polygon(100% 0%, 0% 50%, 100% 100%);
 }
+
+/* Forced colors paint every background the page's Canvas color, and the mark is
+   a background, so the line kept its color and lost its end. It keeps the
+   color its line is drawn in, which SVG keeps under forced colors too. */
+@media (forced-colors: active) {
+  [part="terminus"] {
+    forced-color-adjust: none;
+  }
+}

@@ -118,6 +118,18 @@
   }
 }
 
+/* Forced colors: the cursor and the high and low marks are backgrounds, which
+   the browser replaced with the canvas. They keep the line's color, which
+   under forced colors is the system's text color. */
+@media (forced-colors: active) {
+  [part="cursor"],
+  [part="high"],
+  [part="lone"],
+  [part="low"] {
+    forced-color-adjust: none;
+  }
+}
+
 /* *Emphasis, and one value, for a drawing whose whole point is its size.** A
    sparkline sits inside a line of text or a table cell, and the case that arises
    there is a row that is context beside a row that is being read, which is

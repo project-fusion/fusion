@@ -297,3 +297,14 @@
 :host([tone="warning"]) {
   --_map-position-tone: var(--helix-color-warning);
 }
+
+/* Forced colors: the dot, its pulse and its heading are backgrounds, which the
+   browser replaced with the canvas, over a map that keeps its colors. They
+   keep theirs. */
+@media (forced-colors: active) {
+  [part="dot"],
+  [part="heading"],
+  [part="pulse"] {
+    forced-color-adjust: none;
+  }
+}
