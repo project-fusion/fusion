@@ -114,6 +114,17 @@ const TEXT_STEPS: [(&str, i32); 7] = [
 /// Below this a label stops being small and starts being unreadable.
 const TEXT_FLOOR: f64 = 11.0;
 
+/// The body size a ramp is built from when a theme sets only the ratio.
+const TEXT_BASE: f64 = 14.0;
+
+/// The ratio a ramp compounds by when a theme sets only the body size.
+///
+/// **At this ratio and `TEXT_BASE` the ramp is the one `helix/styles` ships.**
+/// A theme that sets a size or a ratio replaces the shipped ramp with this one,
+/// so a shipped step that differed would move under a theme that asked for the
+/// defaults. The test below holds the two equal.
+const TEXT_RATIO: f64 = 1.32;
+
 /// What each character does to the three weights, which move together.
 fn weights(weight: Weight) -> [(&'static str, u32); 3] {
     match weight {
@@ -373,8 +384,7 @@ fn durations(namespace: &str, multiplier: f64, lines: &mut Vec<String>) {
 }
 
 /// The ramp, emitted only where a base or a ratio was asked for, so a theme that
-/// says nothing about size leaves the hand-picked scale standing rather than
-/// replacing it with a generated one that rounds differently.
+/// says nothing about size leaves the shipped scale standing.
 fn text_ramp(theme: &Theme, namespace: &str, lines: &mut Vec<String>) {
     let font = &theme.intent.font;
     if font.base.is_none() && font.scale.is_none() {
@@ -383,8 +393,8 @@ fn text_ramp(theme: &Theme, namespace: &str, lines: &mut Vec<String>) {
         }
         return;
     }
-    let body = font.base.unwrap_or(14.0);
-    let step = font.scale.unwrap_or(1.32);
+    let body = font.base.unwrap_or(TEXT_BASE);
+    let step = font.scale.unwrap_or(TEXT_RATIO);
 
     /* **Compounded from the rounded step, not from the base.** A designer builds
     a scale by taking the last round number and multiplying it, which is why real
@@ -446,5 +456,73 @@ fn material(theme: &Theme, namespace: &str, lines: &mut Vec<String>) {
             "  --{namespace}-material-opacity: {};",
             crate::derive::seeds::trimmed(opacity, 3)
         ));
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::collections::BTreeMap;
+
+    use super::{to_css, TEXT_BASE, TEXT_RATIO};
+    use crate::derive::theme::derive_theme;
+    use crate::intent::{Color, Font, ThemeIntent};
+
+    /// The shipped ramp, in rem by token name, read from the token layer's
+    /// source: each `text-*` token names a size primitive, and the primitive
+    /// carries the value.
+    fn shipped() -> BTreeMap<String, f64> {
+        let primitives = include_str!("../../styles/src/primitives.css");
+        let tokens = include_str!("../../styles/src/tokens.ts");
+        let size = |primitive: &str| -> f64 {
+            primitives
+                .lines()
+                .find_map(|line| line.trim().strip_prefix(&format!("--{primitive}:")))
+                .and_then(|value| value.trim().strip_suffix("rem;"))
+                .and_then(|value| value.parse().ok())
+                .unwrap_or_else(|| panic!("primitives.css declares {primitive} in rem"))
+        };
+        tokens
+            .lines()
+            .filter_map(|line| {
+                let rest = line.trim().strip_prefix("['text-")?;
+                let (name, rest) = rest.split_once("', 'var(--")?;
+                let primitive = rest.strip_suffix(")'],")?;
+                primitive
+                    .starts_with("_helix-size-")
+                    .then(|| (name.to_owned(), size(primitive)))
+            })
+            .collect()
+    }
+
+    /// The ramp the engine emits, in rem by token name.
+    fn emitted(css: &str) -> BTreeMap<String, f64> {
+        css.lines()
+            .filter_map(|line| {
+                let rest = line.trim().strip_prefix("--helix-text-")?;
+                let (name, value) = rest.split_once(": ")?;
+                let value = value.strip_suffix("rem;")?.parse().ok()?;
+                Some((name.to_owned(), value))
+            })
+            .collect()
+    }
+
+    #[test]
+    fn the_ramp_at_the_defaults_is_the_ramp_that_ships() {
+        let intent = ThemeIntent {
+            font: Some(Font {
+                base: Some(TEXT_BASE),
+                scale: Some(TEXT_RATIO),
+                ..Font::default()
+            }),
+            ..ThemeIntent::new(Color::Hex("#3b82f6".to_owned()))
+        };
+        let theme = derive_theme(&intent).expect("the default ramp derives");
+        let shipped = shipped();
+        assert_eq!(shipped.len(), 7, "tokens.ts maps seven text steps to sizes");
+        assert_eq!(
+            emitted(&to_css(&theme, ":root")),
+            shipped,
+            "the engine's ramp at its defaults differs from helix/styles"
+        );
     }
 }

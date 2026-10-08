@@ -584,14 +584,20 @@ export const TOKENS: Token[] = [
      `--helix-leading-normal` is a 22.5 pixel line box, and that half pixel is
      not free: it is what made aligning a mark to the middle of a line of type
      fiddly enough to need an optical correction in `Timeline`. Fourteen gives
-     21. */
+     21.
+
+     **The steps above it are the theme engine's ramp at its defaults**, a ratio
+     of 1.32 rounded at each step. A theme that sets a size or a ratio replaces
+     the ramp with the engine's own, so a step that differed here would change
+     size under a theme that sets the default size and ratio. A test in
+     `helix/theme/rust/css.rs` holds the two equal. */
   ['text-xs', 'var(--_helix-size-12)'],
   ['text-sm', 'var(--_helix-size-13)'],
   ['text-md', 'var(--_helix-size-14)'],
   ['text-lg', 'var(--_helix-size-18)'],
   ['text-xl', 'var(--_helix-size-24)'],
   ['text-2xl', 'var(--_helix-size-32)'],
-  ['text-3xl', 'var(--_helix-size-44)'],
+  ['text-3xl', 'var(--_helix-size-42)'],
   ['weight-regular', '400', 'Body text. Most of a page uses this weight.'],
   ['weight-medium', '500', 'Labels, and quieter headings.'],
   ['weight-semibold', '600', 'Headings. The heaviest weight in Helix.'],

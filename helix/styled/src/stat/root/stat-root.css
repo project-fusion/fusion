@@ -16,7 +16,7 @@
    absolute off the type ramp, because a figure is one of the few things that
    legitimately has to scale with its surroundings. A `Stat` in a donut's hole is
    the case: the hole is a proportion of the chart and grows with the ring, while
-   a 44px number does not, so the same markup that fits at one chart size paints
+   a 42px number does not, so the same markup that fits at one chart size paints
    across the slices at every other. Divide the ramp again and the figures
    follow, which a hand-written `3.143em` would not, and a raw value is refused
    anyway. */
