@@ -362,6 +362,34 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
     this.control?.setSelectionRange(start, end, direction)
   }
 
+  /**
+   * Replaces a range of the text, as the native method does: the selection
+   * where `start` and `end` are left out, and `selectMode` says what is
+   * selected after. It sends no event, as the native method sends none.
+   */
+  setRangeText(
+    replacement: string,
+    start?: number,
+    end?: number,
+    selectMode?: SelectionMode,
+  ): void {
+    const control = this.control
+    if (!control) {
+      return
+    }
+    if (start === undefined || end === undefined) {
+      control.setRangeText(replacement)
+    } else {
+      control.setRangeText(replacement, start, end, selectMode)
+    }
+    this.value = control.value
+  }
+
+  /** Selects everything in the field. */
+  select(): void {
+    this.control?.select()
+  }
+
   /** How many characters the value holds. */
   get textLength(): number {
     return this.value.length

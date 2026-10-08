@@ -173,3 +173,37 @@ describe('clearing, your own rule, and an empty field', () => {
     expect(states.has('blank')).toBe(false)
   })
 })
+
+/* Input and the native element have both; this had every other member of the
+   selection API and not these two. */
+describe('select and setRangeText', () => {
+  type Ranged = Updatable & {
+    value: string
+    select(): void
+    setRangeText(text: string, start?: number, end?: number, mode?: SelectionMode): void
+  }
+
+  test('replaces a range and takes the text as the value, with no event', async () => {
+    const host = (await mount(
+      '<helix-headless-textarea label="Name" value="Ada Byron"></helix-headless-textarea>',
+    )) as Ranged
+    let heard = 0
+    host.addEventListener('input', () => {
+      heard += 1
+    })
+    host.setRangeText('Lovelace', 4, 9, 'end')
+    await host.updateComplete
+    expect(host.value).toBe('Ada Lovelace')
+    expect(control(host).value).toBe('Ada Lovelace')
+    expect(heard).toBe(0)
+  })
+
+  test('select selects the whole text in the field', async () => {
+    const host = (await mount(
+      '<helix-headless-textarea label="Name" value="Ada"></helix-headless-textarea>',
+    )) as Ranged
+    host.select()
+    expect(control(host).selectionStart).toBe(0)
+    expect(control(host).selectionEnd).toBe(3)
+  })
+})
