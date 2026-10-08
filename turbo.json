@@ -561,9 +561,15 @@
         "$TURBO_ROOT$/helix/theme/package.json",
         "$TURBO_ROOT$/helix/theme/wasm/**"
       ],
+      // **The memo of compressed sizes is an output and never an input.** It is
+      // restored with the page, so `check:gen:metrics` in another job looks up
+      // the sizes of the bundles this task compressed. The sizes depend only
+      // on the bytes, and the builds above already carry the bytes into the
+      // key. As an input, the file would change the key on every run.
       "outputs": [
         "content/metrics.mdx",
-        "$TURBO_ROOT$/fusion/site/content/landing/claims.generated.ts"
+        "$TURBO_ROOT$/fusion/site/content/landing/claims.generated.ts",
+        "$TURBO_ROOT$/.local/metrics/sizes.json"
       ]
     },
     "peers": { "cache": false },

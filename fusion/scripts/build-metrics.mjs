@@ -52,6 +52,7 @@ import {
   mkdirSync,
   readdirSync,
   readFileSync,
+  renameSync,
   rmSync,
   statSync,
   writeFileSync,
@@ -263,12 +264,17 @@ const grouped = (value) => String(value).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 const compressed = { brotli: promisify(brotliCompress), gzip: promisify(gzip) }
 
 /**
- * The three sizes of one buffer.
+ * The two compressed sizes of one buffer.
  *
  * Gzip at 9 and brotli at 11, which is what a CDN serving static assets uses,
  * with the size hint brotli wants so its window is not guessed.
+ *
+ * **Every setting is written inside this function.** The source of the
+ * function is part of the key the sizes are stored under (see `ENGINE`). A
+ * setting kept outside the function could change while the key stayed the
+ * same, and the memo would then return sizes measured with the old setting.
  */
-const sizes = async (buffer) => {
+const compress = async (buffer) => {
   const [brotli, gzipped] = await Promise.all([
     compressed.brotli(buffer, {
       params: {
@@ -278,7 +284,103 @@ const sizes = async (buffer) => {
     }),
     compressed.gzip(buffer, { level: 9 }),
   ])
-  return { brotli: brotli.length, gzip: gzipped.length, raw: buffer.length }
+  return { brotli: brotli.length, gzip: gzipped.length }
+}
+
+/**
+ * The compressed sizes already measured, keyed by a hash of the bytes.
+ *
+ * **Compression is most of this script's run time, and its result depends
+ * only on the bytes.** A bundle that did not change keeps its sizes. So each
+ * measurement is stored under a hash of the bundle, and a bundle with a stored
+ * size is not compressed again. A change to one family compresses that
+ * family's bundles, and `check:gen:metrics` after a write in the same job
+ * compresses one bundle. Bundling still runs every time, so the hash is of
+ * the bytes this machine builds now.
+ *
+ * **Two things carry the file between jobs.** It is an output of the `metrics`
+ * turbo task, so the job that runs the check restores it with the build. An
+ * Actions cache in `verify` carries it from one run of `warm` to the next,
+ * because a turbo miss restores no outputs. The file is never an input, so it
+ * moves no cache key. A missing file, or one from another engine, costs time
+ * and changes no number on the page.
+ */
+const MEMO = join(root, '.local/metrics/sizes.json')
+
+/**
+ * Everything besides the bytes that can change a compressed size, as one hash.
+ *
+ * - The Bun build that compresses, by version and revision, and the zlib it
+ *   links.
+ * - The platform and the architecture, in case a compressor picks its code
+ *   path by machine.
+ * - The source of `compress`, which holds every setting.
+ *
+ * A memo written under any other engine is discarded whole.
+ */
+const ENGINE = createHash('sha256')
+  .update(
+    JSON.stringify({
+      arch: process.arch,
+      bun: Bun.version,
+      compress: compress.toString(),
+      platform: process.platform,
+      revision: Bun.revision,
+      zlib: process.versions.zlib ?? null,
+    }),
+  )
+  .digest('hex')
+
+/** The memo as found on disk, or empty when it is missing, unreadable or from another engine. */
+const remembered = (() => {
+  try {
+    const memo = JSON.parse(readFileSync(MEMO, 'utf8'))
+    return memo.engine === ENGINE && memo.sizes && typeof memo.sizes === 'object' ? memo.sizes : {}
+  } catch {
+    return {}
+  }
+})()
+
+/** Every size this run used, which is the whole of the memo it writes. */
+const used = new Map()
+
+/** How many buffers were compressed, and how many were answered by the memo. */
+const tally = { compressed: 0, remembered: 0 }
+
+/** Whether a memo entry is two counts of bytes and not something else. */
+const wellFormed = (entry) =>
+  Number.isSafeInteger(entry?.brotli) &&
+  entry.brotli > 0 &&
+  Number.isSafeInteger(entry?.gzip) &&
+  entry.gzip > 0
+
+/**
+ * The three sizes of one buffer.
+ *
+ * **The first buffer of every run is compressed, whether or not the memo holds
+ * it.** When the memo holds it, the two results have to match. The first
+ * buffer is always the shared runtime, so the cost is one compression per run.
+ * If the compressor's output changes while its key stays the same, the run
+ * fails here and prints no stale size.
+ */
+const sizes = async (buffer) => {
+  const key = digest(buffer)
+  const known = wellFormed(remembered[key]) ? remembered[key] : undefined
+  let measured = known
+  if (known === undefined || tally.compressed === 0) {
+    tally.compressed += 1
+    measured = await compress(buffer)
+    if (known && (known.brotli !== measured.brotli || known.gzip !== measured.gzip)) {
+      throw new Error(
+        `${MEMO} says ${JSON.stringify(known)} for a buffer the compressor measures at ` +
+          `${JSON.stringify(measured)}. Delete the file and run again.`,
+      )
+    }
+  } else {
+    tally.remembered += 1
+  }
+  used.set(key, { brotli: measured.brotli, gzip: measured.gzip })
+  return { brotli: measured.brotli, gzip: measured.gzip, raw: buffer.length }
 }
 
 /**
@@ -964,6 +1066,15 @@ if (stale) {
    `verify` is built not to have, even into `.local/`. */
 if (!check) {
   mkdirSync(join(root, '.local/metrics'), { recursive: true })
+  /* Only the sizes this run used, so the file holds one page's worth. Written
+     to a temporary name and renamed, so another run in the same checkout
+     reads either the old file or the new one, whole. */
+  const memo = `${MEMO}.${process.pid}`
+  writeFileSync(
+    memo,
+    `${JSON.stringify({ engine: ENGINE, sizes: Object.fromEntries([...used].sort(([a], [b]) => (a < b ? -1 : 1))) })}\n`,
+  )
+  renameSync(memo, MEMO)
   writeFileSync(
     RECEIPT,
     `${JSON.stringify(
@@ -982,5 +1093,6 @@ if (!check) {
 }
 console.log(
   `metrics: ${styled.rows.length} styled and ${headless.rows.length} headless families ` +
-    (check ? 'measured, current' : `written to ${OUTPUT}`),
+    (check ? 'measured, current' : `written to ${OUTPUT}`) +
+    `; compressed ${tally.compressed} bundles and found ${tally.remembered} in the memo`,
 )
