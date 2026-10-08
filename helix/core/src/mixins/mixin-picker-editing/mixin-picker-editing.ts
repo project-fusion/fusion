@@ -244,13 +244,35 @@ export const MixinPickerEditing = <T extends Constructor<EditingBase>>(Base: T) 
       const pressed = this.pressing
       this.pressing = false
       const from = event.relatedTarget
-      if (!pressed || this.open || this.isDisabled || this.returning) {
-        return
+      const inside = from instanceof Node && Boolean(this.renderRoot?.contains?.(from))
+      if (!pressed && !this.returning) {
+        this.selectOnArrival()
       }
-      if (from instanceof Node && this.renderRoot?.contains?.(from)) {
+      if (!pressed || this.open || this.isDisabled || this.returning || inside) {
         return
       }
       this.requestOpen(true)
+    }
+
+    /**
+     * Selects the text a reader tabbed into, once the field shows it for
+     * editing, as Tab into a native `<input>` holding text selects all of it,
+     * from either side. Not when this element hands the caret back itself.
+     *
+     * **After the update**, because focus is what turns editing on, and the
+     * text the field then writes put the caret at its end. Measured in
+     * Chromium before this: Tab into a Time Input holding `14:30` left the
+     * selection at 5 to 5, and typing `9am` gave `14:309am`. A press keeps
+     * its caret where the pointer put it.
+     */
+    private selectOnArrival(): void {
+      void this.updateComplete.then(() => {
+        const control = this.control
+        const root = this.renderRoot as ShadowRoot | undefined
+        if (control && root?.activeElement === control) {
+          control.select()
+        }
+      })
     }
   }
 

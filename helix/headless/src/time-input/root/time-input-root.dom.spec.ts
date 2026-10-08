@@ -82,10 +82,28 @@ describe('input time', () => {
     expect(internals(host).validationMessage).toContain('17:00')
   })
 
-  test('something that is not a time says what one looks like', async () => {
-    const host = await field()
+  /* It named a pattern token, "Enter a time as HH:mm.", to a reader whose
+     field showed `2:30 PM`. */
+  test('something that is not a time says what one looks like, with a time the field reads back', async () => {
+    const host = await field('locale="en-US"')
     await type(host, '25:00')
-    expect(internals(host).validationMessage).toBe('Enter a time as HH:mm.')
+    expect(internals(host).validationMessage).toBe('Enter a time such as 2:30 PM.')
+    const german = await field('locale="de-DE" seconds')
+    await type(german, 'bald')
+    expect(internals(german).validationMessage).toBe('Enter a time such as 14:30:15.')
+  })
+
+  /* Tab into a native `<input>` holding text selects it, and typing replaces
+     it. Measured in Chromium before this: the caret sat at the end of `14:30`,
+     and typing `9am` gave `14:309am`. */
+  test('a field that holds a time selects its text when focus arrives', async () => {
+    const host = await field('value="14:30" locale="en-US"')
+    const input = control(host)
+    input.focus()
+    await host.updateComplete
+    await host.updateComplete
+    expect(input.value).toBe('14:30')
+    expect([input.selectionStart, input.selectionEnd]).toEqual([0, 5])
   })
 
   test('an empty field is not invalid, it is empty', async () => {
