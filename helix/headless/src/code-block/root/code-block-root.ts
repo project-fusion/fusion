@@ -145,10 +145,10 @@ const nameOf = (block: Element): string => {
  * the slot, so the copy button and the page's own text are the code as
  * written.
  *
- * **Code Block ships no grammar**, so a page that shows plain code carries
- * none. For color with no highlighter of your own, import one entry beside
- * the block's, which colors every block by its `language` (`css`, `html`,
- * `js`, `jsx`, `sh`, `ts` or `tsx`) with the Lezer grammars of the sandbox's
+ * **Code Block ships no grammar**, so plain code costs you no parser. To color
+ * code without a highlighter of your own, import one more entry beside the
+ * block's. It colors every block by its `language` (`css`, `html`, `js`,
+ * `jsx`, `sh`, `ts`, or `tsx`) with the Lezer grammars of the sandbox's
  * editor, in the editor's colors:
  *
  * ```js
@@ -156,8 +156,8 @@ const nameOf = (block: Element): string => {
  * import '@fusion.dev/helix-sandbox/code-block'
  * ```
  *
- * `registerHighlighter` is how that entry does it, and how a page registers
- * any highlighter once for every block.
+ * That entry calls `registerHighlighter`, which you can also call yourself to
+ * give every block one highlighter of your own.
  *
  * Set `expandable` on a block whose height is capped, such as by
  * `--code-block-max-block-size`, and a button under it shows every line and
