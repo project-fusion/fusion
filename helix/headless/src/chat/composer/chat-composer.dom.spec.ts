@@ -138,6 +138,23 @@ describe('the value', () => {
     await type(element, 'Typed')
     expect(heard.at(-1)).toBe(element)
   })
+
+  /* A document listener in the bubble phase never heard the composer typed
+     in, measured in Chromium: the event was sent without `bubbles`. */
+  test('and bubbles and is composed, as a native field’s input is', async () => {
+    const element = await composer()
+    const heard: Array<[EventTarget | null, boolean, boolean]> = []
+    const listen = (event: Event): void => {
+      heard.push([event.target, event.bubbles, event.composed])
+    }
+    document.addEventListener('input', listen)
+    try {
+      await type(element, 'Typed')
+    } finally {
+      document.removeEventListener('input', listen)
+    }
+    expect(heard).toEqual([[element, true, true]])
+  })
 })
 
 describe('Enter', () => {

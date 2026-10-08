@@ -63,7 +63,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @event {HelixSendEvent} helix-send - Fired when the user sends their turn, and cancelable.
  * @event {HelixTypingEvent} helix-typing - The user started or stopped writing, with `typing` saying which, as the composer's `typing` does.
- * @event {Event} input - The user changed the text. Read it from `value`, for a typing indicator or a saved draft. Sent on the composer and does not bubble.
+ * @event {Event} input - The user changed the text. Read it from `value`, for a typing indicator or a saved draft. Bubbles and is composed, as a native field's is.
  *
  * @csspart composer - The whole composer.
  * @csspart end - The box around the `end` slot.
@@ -447,13 +447,12 @@ export class HelixHeadlessChatComposer extends HelixFormElement {
     event.stopPropagation()
     this.value = (event.target as HTMLTextAreaElement).value
     this.edited = true
-    /* On the composer alone, without bubbling, the way a media element sends
-       its events. A transcript speaks for the controls it holds, and a bubbling
-       `input` from the composer slotted into one was the transcript speaking in
-       another element's name. A listener on the composer hears it, and so does
-       a React `onInput`, which `HelixElement` binds for an event that does not
-       bubble. */
-    this.dispatchEvent(new Event('input'))
+    /* Bubbling and composed, as the `input` of a native field is and as every
+       other field here sends it. Sent on the composer alone before this, and a
+       listener on the document or on a form never heard the composer typed
+       in, measured in Chromium. The target is the composer, so a listener
+       above a transcript still knows which element was typed in. */
+    this.announceInput()
     this.markTyping(this.value !== '')
   }
 
