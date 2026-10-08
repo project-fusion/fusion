@@ -578,4 +578,33 @@ describe('the page showing', () => {
     expect(showing(host)).toEqual(['appearance', 'about'])
     expect(host.page).toBe('')
   })
+
+  /* A row had focus, `page` changed under it, and focus fell to the body,
+     where the arrow keys reach nothing. */
+  test('setting `page` while a row has focus takes focus into the new page', async () => {
+    const host = (await stack()) as Paged
+    const appearance = host.querySelector('[value="appearance"]') as Item & { focusItem(): void }
+    appearance.focusItem()
+    expect(document.activeElement).toBe(appearance)
+    host.page = 'appearance'
+    await host.updateComplete
+    await host.updateComplete
+    expect((document.activeElement as Item | null)?.value).toBe('theme')
+    host.page = ''
+    await host.updateComplete
+    await host.updateComplete
+    expect(document.activeElement).toBe(appearance)
+  })
+
+  test('and leaves focus elsewhere where it is', async () => {
+    const host = (await stack()) as Paged
+    const outside = document.createElement('button')
+    document.body.append(outside)
+    outside.focus()
+    host.page = 'appearance'
+    await host.updateComplete
+    await host.updateComplete
+    expect(document.activeElement).toBe(outside)
+    outside.remove()
+  })
 })

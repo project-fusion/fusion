@@ -410,8 +410,23 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
     /* A page set from outside. A reader's move has already moved the stack,
        and finds it where `page` says. */
     if (changed.has('page') && (this.drilldown.page?.value ?? '') !== this.page) {
+      const leaving = this.drilldown.page
+      const focused = this.contains(document.activeElement)
       this.showPage(this.page)
       this.page = this.drilldown.page?.value ?? ''
+      /* Focus goes into the new page, as a reader's move takes it: onto the
+         row that opened the page left where the new page holds it, and onto
+         the first row otherwise. Measured before this: a row had focus, the
+         page changed under it, and focus fell to the body, where the arrow
+         keys reach nothing. Only where focus was in the list, so a page set
+         from outside never takes focus from elsewhere. */
+      if (focused) {
+        this.updateComplete.then(() => {
+          const items = this.items
+          const to = leaving && items.includes(leaving) ? leaving : items[0]
+          to?.focusItem()
+        })
+      }
     }
     /* The landmark, through internals, so nothing is written onto the host. */
     hostAria(this.internals, {
