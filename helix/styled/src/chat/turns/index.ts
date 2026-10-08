@@ -7,6 +7,6 @@
  * tier's entry serves both.
  */
 import '@fusion.dev/helix-headless/chat/turns'
-import '../root/chat-root.js'
+import '../index.js'
 
 export { drawTurns, followTurns, revealTurn } from '@fusion.dev/helix-headless/chat/turns'

@@ -8,7 +8,7 @@
  */
 import { addFeature } from '@fusion.dev/helix-core'
 import { openLabelEditor } from '@fusion.dev/helix-headless/canvas/label-editor'
-import { HelixCanvas } from '../root/canvas-root.js'
+import { HelixCanvas } from '../index.js'
 import { drawStyledLabelEditor } from './canvas-label-editor.js'
 
 addFeature(HelixCanvas, { drawLabelEditor: drawStyledLabelEditor, openLabelEditor })

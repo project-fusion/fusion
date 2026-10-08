@@ -6,7 +6,7 @@
  * that draws it.
  */
 import { addFeature } from '@fusion.dev/helix-core'
-import { HelixMap } from '../root/map-root.js'
+import { HelixMap } from '../index.js'
 import { drawStyledLayersMenu } from './map-layers.js'
 
 addFeature(HelixMap, { drawLayersMenu: drawStyledLayersMenu })

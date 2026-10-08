@@ -5,7 +5,7 @@
  * gives every map of this tier the menu, where `controls` names `layers`.
  */
 import { addFeature } from '@fusion.dev/helix-core'
-import { HelixHeadlessMap } from '../root/map-root.js'
+import { HelixHeadlessMap } from '../index.js'
 import { drawLayersMenu } from './map-layers.js'
 
 addFeature(HelixHeadlessMap, { drawLayersMenu })

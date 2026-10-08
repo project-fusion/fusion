@@ -6,7 +6,7 @@
  * sheet that draws it.
  */
 import { addFeature } from '@fusion.dev/helix-core'
-import { HelixCanvas } from '../root/canvas-root.js'
+import { HelixCanvas } from '../index.js'
 import { drawStyledMinimap } from './canvas-minimap.js'
 
 addFeature(HelixCanvas, { drawMinimap: drawStyledMinimap })

@@ -7,7 +7,7 @@
  * and the sheet that draws it.
  */
 import { addFeature } from '@fusion.dev/helix-core'
-import { HelixMap } from '../root/map-root.js'
+import { HelixMap } from '../index.js'
 import { drawStyledCompass } from './map-compass.js'
 
 addFeature(HelixMap, { drawCompass: drawStyledCompass })

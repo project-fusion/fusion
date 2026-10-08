@@ -6,7 +6,7 @@
  * `minimap`.
  */
 import { addFeature } from '@fusion.dev/helix-core'
-import { HelixHeadlessCanvas } from '../root/canvas-root.js'
+import { HelixHeadlessCanvas } from '../index.js'
 import { drawMinimap } from './canvas-minimap.js'
 
 addFeature(HelixHeadlessCanvas, { drawMinimap })

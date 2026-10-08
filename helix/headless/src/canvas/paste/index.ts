@@ -6,7 +6,7 @@
  * Importing it gives every board of this tier Control or Command with C and
  * V, and `paste()`.
  */
-import { HelixHeadlessCanvas } from '../root/canvas-root.js'
+import { HelixHeadlessCanvas } from '../index.js'
 import { addPaste } from './canvas-paste.js'
 
 addPaste(HelixHeadlessCanvas)

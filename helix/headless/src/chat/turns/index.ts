@@ -6,7 +6,7 @@
  * transcript, one window at a time.
  */
 import { addFeature } from '@fusion.dev/helix-core'
-import { HelixHeadlessChat } from '../root/chat-root.js'
+import { HelixHeadlessChat } from '../index.js'
 import { drawTurns, followTurns, revealTurn } from './chat-turns.js'
 
 addFeature(HelixHeadlessChat, { drawTurns, followTurns, revealTurn })

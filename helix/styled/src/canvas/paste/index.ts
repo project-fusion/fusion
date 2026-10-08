@@ -8,6 +8,6 @@
  * serves both.
  */
 import '@fusion.dev/helix-headless/canvas/paste'
-import '../root/canvas-root.js'
+import '../index.js'
 
 export { addPaste } from '@fusion.dev/helix-headless/canvas/paste'

@@ -7,7 +7,7 @@
  * by default.
  */
 import { addFeature } from '@fusion.dev/helix-core'
-import { HelixHeadlessMap } from '../root/map-root.js'
+import { HelixHeadlessMap } from '../index.js'
 import { drawCompass } from './map-compass.js'
 
 addFeature(HelixHeadlessMap, { drawCompass })

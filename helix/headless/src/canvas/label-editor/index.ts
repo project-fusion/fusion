@@ -7,7 +7,7 @@
  * double click, F2, or Enter on a group.
  */
 import { addFeature } from '@fusion.dev/helix-core'
-import { HelixHeadlessCanvas } from '../root/canvas-root.js'
+import { HelixHeadlessCanvas } from '../index.js'
 import { drawLabelEditor, openLabelEditor } from './canvas-label-editor.js'
 
 addFeature(HelixHeadlessCanvas, { drawLabelEditor, openLabelEditor })

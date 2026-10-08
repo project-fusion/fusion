@@ -30,7 +30,7 @@ const FIELDS: [sheet: string, selector: string][] = [
   ['chat/composer/chat-composer.css', '[part="field"] {'],
   ['object-inspector/root/object-inspector-root.css', '[part="search-field"] {'],
   ['graph/root/graph-root.css', '[part="search-field"] {'],
-  ['canvas/root/canvas-root.css', '[part="label-editor"] {'],
+  ['canvas/label-editor/canvas-label-editor.css', '[part="label-editor"] {'],
   ['sandbox/source/sandbox-source.css', '[part="source"] {'],
   ['sandbox/terminal/sandbox-terminal.css', '[part="filter"] {'],
 ]

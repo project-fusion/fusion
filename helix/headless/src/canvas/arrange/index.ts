@@ -4,7 +4,7 @@
  * Its own entry, so a board whose cards are never arranged carries none of
  * it. Importing it gives every board of this tier `arrange()`.
  */
-import { HelixHeadlessCanvas } from '../root/canvas-root.js'
+import { HelixHeadlessCanvas } from '../index.js'
 import { addArrange } from './canvas-arrange.js'
 
 addArrange(HelixHeadlessCanvas)

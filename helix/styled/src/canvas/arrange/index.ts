@@ -6,6 +6,6 @@
  * own, so the headless tier's entry serves both.
  */
 import '@fusion.dev/helix-headless/canvas/arrange'
-import '../root/canvas-root.js'
+import '../index.js'
 
 export { addArrange, type CanvasArrangeOptions } from '@fusion.dev/helix-headless/canvas/arrange'
