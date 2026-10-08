@@ -361,3 +361,42 @@ describe('the open panel of a color input', () => {
     expect(inner.feedback).toBe('')
   })
 })
+
+/* The APG date picker dialog returns focus to the button that opened it.
+   Measured before this in Chromium: Escape after the trigger's press put focus
+   in the text field, one control before where the reader had been. */
+describe('where Escape hands focus back', () => {
+  const pressEscape = (from: Element): void => {
+    from.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, composed: true, key: 'Escape' }),
+    )
+  }
+
+  test('to the trigger, when the trigger opened the panel', async () => {
+    const host = await field('value="#ff0000"')
+    /* No focus first: happy-dom hands the trigger's `focusout` a target
+       inside the picker's own shadow root, which reads as leaving, and shuts
+       the panel. Chromium retargets it to the picker. */
+    const trigger = part(host, 'trigger') as HTMLButtonElement
+    trigger.click()
+    await host.updateComplete
+    expect(host.open).toBe(true)
+    pressEscape(part(host, 'surface') as HTMLElement)
+    await host.updateComplete
+    expect(host.open).toBe(false)
+    expect(host.shadowRoot?.activeElement).toBe(trigger)
+  })
+
+  test('to the text, when ArrowDown from it opened the panel', async () => {
+    const host = await field('value="#ff0000"')
+    control(host).dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, composed: true, key: 'ArrowDown' }),
+    )
+    await host.updateComplete
+    expect(host.open).toBe(true)
+    pressEscape(control(host))
+    await host.updateComplete
+    expect(host.open).toBe(false)
+    expect(host.shadowRoot?.activeElement).toBe(control(host))
+  })
+})
