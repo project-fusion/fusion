@@ -60,7 +60,9 @@ import { PNG } from 'pngjs'
  * for a limit that is the platform's, and says so in the output. `twice` with a
  * reason lets a component render a second time on the client where that render
  * answers a measurement of the first, which is the exception Lit's warning
- * itself names, and says so too.
+ * itself names, and says so too. `still: true` holds the server's page to
+ * its first paint: every heading and cell under the fixture, measured before
+ * any script runs, must stand in the same place once it has hydrated.
  */
 const FIXTURES = [
   {
@@ -126,6 +128,22 @@ const FIXTURES = [
     markup:
       '<helix-data-table label="Files" page-size="2"><helix-table-column field="name">Name</helix-table-column><helix-table-column field="size" text-align="end">Size</helix-table-column><helix-table-row><helix-table-cell header>alpha</helix-table-cell><helix-table-cell>30 B</helix-table-cell></helix-table-row><helix-table-row><helix-table-cell header>bravo</helix-table-cell><helix-table-cell>4 B</helix-table-cell></helix-table-row></helix-data-table>',
     name: 'data-table-served',
+  },
+  {
+    check: `const footer = host.shadowRoot.querySelector('[part="footer"]')
+      return footer.hasAttribute('data-held') ? null : 'lets go of the pagination row before its rows draw'`,
+    markup:
+      '<helix-data-table columns="2fr max-content" label="Files" page-size="2" row-key="name" selectable><helix-table-column field="name">Name</helix-table-column><helix-table-column field="size" text-align="end">Size</helix-table-column><helix-table-row><helix-table-cell header>alpha</helix-table-cell><helix-table-cell>30 B</helix-table-cell></helix-table-row><helix-table-row><helix-table-cell header>bravo</helix-table-cell><helix-table-cell>4 B</helix-table-cell></helix-table-row></helix-data-table>',
+    name: 'data-table-still',
+    still: true,
+  },
+  {
+    check: `const cell = host.querySelector('helix-table-row').shadowRoot.querySelector('[part~="select"]')
+      return cell ? null : 'draws no checkbox cell'`,
+    markup:
+      '<helix-table label="Ways back" selectable><helix-table-column>Option</helix-table-column><helix-table-column text-align="end">Cost</helix-table-column><helix-table-row value="back"><helix-table-cell header>Roll back</helix-table-cell><helix-table-cell>Low</helix-table-cell></helix-table-row><helix-table-row value="fix"><helix-table-cell header>Fix forward</helix-table-cell><helix-table-cell>Medium</helix-table-cell></helix-table-row></helix-table>',
+    name: 'table-still',
+    still: true,
   },
   {
     check: `const list = host.shadowRoot.querySelector('slot[name="items"]')?.assignedElements() ?? []
@@ -371,6 +389,21 @@ if (!built.success) {
 const bundle = await built.outputs[0].text()
 const sheet = readFileSync(SHEET)
 
+/* Where each heading and cell under a host stands, by its place in the host,
+   and the host's height: a column draws its heading in its own shadow root once
+   it upgrades, so its box is that one. */
+const LAYOUT = `(host) => {
+  const origin = host.getBoundingClientRect()
+  const box = (one) => {
+    const shown = getComputedStyle(one).display === 'contents'
+      ? one.shadowRoot?.querySelector('[part="column"]') ?? one
+      : one
+    const { height, width, x, y } = shown.getBoundingClientRect()
+    return [one.textContent.trim(), ...[x - origin.x, y - origin.y, width, height].map(Math.round)].join(' ')
+  }
+  return ['height ' + Math.round(origin.height), ...[...host.querySelectorAll('helix-table-column, helix-table-cell')].map(box)]
+}`
+
 /* Before any script runs, which hosts arrived without a shadow root. Written
    into the server's page only, and read back once it has settled. */
 const PARSED = `<script>
@@ -379,17 +412,35 @@ const PARSED = `<script>
     .map((one) => one.localName)
 </script>`
 
+/* **Where the fixtures held to their first paint stand, once the fonts are in
+   and before the definitions are.** Measured as the page parses, the words were
+   in the fallback face and the hydrated ones in the sheet's, a pixel apart for
+   a reason that is the harness's, so the bundle loads after the fonts. */
+const STILL = `<script>
+  const still = () => Object.fromEntries([...document.querySelectorAll('[data-still]')]
+    .map((holder) => [holder.dataset.fixture, (${LAYOUT})(holder.firstElementChild)]))
+  still()
+  document.fonts.ready.then(() => {
+    window.__still = still()
+    const bundle = document.createElement('script')
+    bundle.src = '/frame.js'
+    document.body.append(bundle)
+  })
+</script>`
+
 const fixturePage = (mode) => {
   const holders = fixtures
     .filter((fixture) => mode === 'client' || fixture.dsd !== false)
     .map(
       (fixture) =>
-        `<div data-fixture="${fixture.name}">${
+        `<div data-fixture="${fixture.name}"${fixture.still ? ' data-still' : ''}>${
           mode === 'server' ? server[`fixture:${fixture.name}`].server : fixture.markup
         }</div>`,
     )
     .join('\n')
-  return `<!doctype html><meta charset="utf-8"><title>dsd</title>${holders}${PARSED}<script src="/frame.js"></script>`
+  /* The sheet, so a fixture held to its first paint is laid out as a page lays
+     it out before any script: by `helix.css`. */
+  return `<!doctype html><meta charset="utf-8"><title>dsd</title><link rel="stylesheet" href="/frame.css">${holders}${PARSED}${STILL}`
 }
 
 /**
@@ -535,6 +586,25 @@ if (fixtures.length > 0) {
       failures.push(
         `fixtures, from the server: ${[...new Set(rootless)].join(', ')} arrived with no shadow root`,
       )
+    }
+    if (mode === 'server') {
+      const moved = await tab.evaluate((layout) => {
+        const measure = new Function(`return ${layout}`)()
+        return Object.entries(window.__still).flatMap(([name, before]) => {
+          const after = measure(
+            document.querySelector(`[data-fixture="${name}"]`).firstElementChild,
+          )
+          const changed = before.filter((one, index) => one !== after[index])
+          return changed.length === 0 && before.length === after.length
+            ? []
+            : [{ after: after.filter((one) => !before.includes(one)), changed, name }]
+        })
+      }, LAYOUT)
+      for (const { after, changed, name } of moved) {
+        failures.push(
+          `${name}, hydrated: moved from its first paint, ${changed.slice(0, 3).join(', ')} to ${after.slice(0, 3).join(', ')}`,
+        )
+      }
     }
     for (const error of said) {
       failures.push(
