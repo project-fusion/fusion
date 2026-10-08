@@ -421,6 +421,22 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
     this.resizing = undefined
   }
 
+  /* The tab shown where nothing named one is the one `active` reports, as
+     Video Playlist reports the entry it opens on. Written as the state and not
+     as a move: nothing was asked for, so `helix-activate` is not sent.
+     Measured before this: the first tab drew selected and `active` read `''`
+     until the reader moved. In `willUpdate`, so the write joins this update. */
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    if (this.active === '' && this.childrenKnown) {
+      const tabs = this.tabs
+      const shown = tabs.find((tab) => tab.selected) ?? this.resolveActive(tabs)
+      if (shown) {
+        this.active = shown.value
+      }
+    }
+  }
+
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
     this.sync()
@@ -478,6 +494,10 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
    */
   private readonly handleSlotChange = (): void => {
     this.sync()
+    /* Tabs that arrived after the first render name the one shown. */
+    if (this.active === '') {
+      this.requestUpdate()
+    }
     this.indicator.place()
     this.refocus()
     this.measure()
