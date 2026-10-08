@@ -262,11 +262,11 @@ export class HelixHeadlessCarousel extends HelixElement {
   /** The slide in view, whoever set it, and `undefined` until somebody has. */
   private indexState: number | undefined = undefined
 
-  /** How many panes were drawn at the last update, to scroll when the first are. */
-  private scrolledFor = 0
-
   /** What the live region says: the position of the slide the last move landed on. */
   private said = ''
+
+  /** How many panes were drawn at the last update, to scroll when the first are. */
+  private scrolledFor = 0
 
   /**
    * The carousel's name, read by screen readers.
