@@ -1,0 +1,33 @@
+<helix-button
+  command="--show"
+  commandfor="panel"
+  emphasis="solid"
+  tone="primary"
+>
+  Open drawer
+</helix-button>
+
+<helix-drawer
+  id="panel"
+  label="Project details"
+  placement="end"
+>
+  <span slot="header">Project details</span>
+  <helix-flex
+    align-items="start"
+    direction="column"
+    gap="md"
+  >
+    <helix-text variant="body">
+      See who owns the project, who can edit it, and when it last changed.
+    </helix-text>
+    <helix-button
+      command="--close"
+      commandfor="panel"
+      emphasis="solid"
+      tone="primary"
+    >
+      Close
+    </helix-button>
+  </helix-flex>
+</helix-drawer>

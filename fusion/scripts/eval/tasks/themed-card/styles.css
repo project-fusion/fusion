@@ -1,0 +1,9 @@
+.page {
+  padding: var(--helix-space-md);
+  background: var(--helix-color-surface);
+}
+
+helix-card {
+  --card-gap: var(--helix-space-md);
+  --card-border-color: var(--helix-color-border);
+}
