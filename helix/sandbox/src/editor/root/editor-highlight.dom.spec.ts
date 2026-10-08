@@ -10,6 +10,8 @@ let highlightStyle: HighlightStyle
 let tags: typeof import('@lezer/highlight').tags
 let getStyleTags: typeof import('@lezer/highlight').getStyleTags
 let javascriptLanguage: typeof import('@codemirror/lang-javascript').javascriptLanguage
+let forceParsing: typeof import('@codemirror/language').forceParsing
+let EditorView: typeof import('@codemirror/view').EditorView
 
 /**
  * The editor colors its source.
@@ -26,6 +28,8 @@ beforeAll(async () => {
   ;({ highlightStyle } = await import('./highlight.js'))
   ;({ getStyleTags, tags } = await import('@lezer/highlight'))
   ;({ javascriptLanguage } = await import('@codemirror/lang-javascript'))
+  ;({ forceParsing } = await import('@codemirror/language'))
+  ;({ EditorView } = await import('@codemirror/view'))
   await import('./editor-root.js')
 })
 
@@ -42,6 +46,16 @@ const editor = async (language: string, value: string): Promise<Updatable> => {
   host.value = value
   document.body.append(host)
   await settle(host)
+  /* CodeMirror parses for a few milliseconds when the view is built and
+     finishes the rest when the page is idle. A cold CI runner ran out of that
+     budget on the first editor, so the spec parses the whole document before
+     it reads the spans. */
+  const mount = host.shadowRoot?.querySelector<HTMLElement>('.cm-editor')
+  const view = mount ? EditorView.findFromDOM(mount) : null
+  if (!view) {
+    throw new Error('helix-sandbox-editor mounted no CodeMirror view')
+  }
+  forceParsing(view, view.state.doc.length, 5000)
   return host
 }
 
