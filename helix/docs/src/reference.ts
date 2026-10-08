@@ -28,7 +28,7 @@ import type {
   HelixManifest,
   HelixMember,
 } from '@fusion.dev/helix-cem'
-import { startCase } from './naming.js'
+import { place, startCase } from '@fusion.dev/helix-cem'
 
 /**
  * An example, as much of one as a markdown reference prints.
@@ -118,18 +118,6 @@ const table = (depth: number, heading: string, columns: string[], rows: string[]
   const rule = `| ${columns.map(() => '---').join(' | ')} |`
   const body = rows.map((row) => `| ${row.join(' | ')} |`).join('\n')
   return `\n${'#'.repeat(depth)} ${heading}\n\n${head}\n${rule}\n${body}\n`
-}
-
-/**
- * The family and part a declaration belongs to, from where its file is.
- *
- * Not from the tag name. A tag is a string the family prefix can only be
- * guessed out of: `helix-button-group` is one family and `helix-tab` is a
- * part of another, and nothing in the name says which. The path says both.
- */
-export const place = (path: string | undefined): { family: string; part: string } => {
-  const [, family = '', part = ''] = /^src\/([^/]+)\/([^/]+)\//.exec(path ?? '') ?? []
-  return { family, part }
 }
 
 /** One family's declarations, in the order a reference prints them. */

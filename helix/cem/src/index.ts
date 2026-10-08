@@ -1,10 +1,11 @@
 import { spawnSync } from 'node:child_process'
-import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { dirname, join, resolve } from 'node:path'
 import { lintOf, type ManifestSource } from '@fusion.dev/helix-diagnostics'
 import { jsxTypesPlugin } from '@wc-toolkit/jsx-types'
 import { vuejsTypesPlugin } from '@wc-toolkit/vuejs-types'
+import { catalog, type ExampleSource } from './catalog.js'
 import { jsxBaseProps } from './plugins/jsx-base-props.js'
 import { jsxDeclaredEvents } from './plugins/jsx-declared-events.js'
 import { jsxImports } from './plugins/jsx-imports.js'
@@ -66,6 +67,53 @@ const MANIFEST = 'custom-elements.json'
  * reads from a full manifest cannot drift apart.
  */
 const LINT = 'lint.json'
+
+/**
+ * The tier's catalog without its examples: every family with its elements,
+ * their properties, events with React props, slots, parts, hooks, states,
+ * words, and the import lines. `helix mcp` answers from it, and it is the
+ * same `catalog()` the site's family pages are written from, so an agent and a
+ * reader see one answer. About a third of the manifest, which repeats every
+ * inherited member on every class.
+ */
+const API = 'api.json'
+
+/** The tier's examples by family, each with the import lines it needs. */
+const EXAMPLES = 'examples.json'
+
+/**
+ * The example files under `src/<family>/.examples`, as the site reads them:
+ * the HTML is the list, and the stylesheet and the TSX beside it are optional.
+ */
+const examplesOnDisk = (cwd: string): ExampleSource[] => {
+  const source = join(cwd, 'src')
+  if (!existsSync(source)) {
+    return []
+  }
+  const found: ExampleSource[] = []
+  for (const family of readdirSync(source, { withFileTypes: true })) {
+    const dir = join(source, family.name, '.examples')
+    if (!family.isDirectory() || !existsSync(dir)) {
+      continue
+    }
+    for (const file of readdirSync(dir).sort()) {
+      if (!file.endsWith('.html')) {
+        continue
+      }
+      const slug = file.replace(/\.html$/, '')
+      const read = (name: string): string =>
+        existsSync(join(dir, name)) ? readFileSync(join(dir, name), 'utf8').trim() : ''
+      found.push({
+        css: read(`${slug}.css`),
+        family: family.name,
+        html: read(file),
+        slug,
+        tsx: read(`${slug}.tsx`),
+      })
+    }
+  }
+  return found
+}
 
 /**
  * What runs over the finished manifest, in the order it runs.
@@ -239,6 +287,15 @@ export const analyze = (options: HelixCemOptions, cwd = process.cwd()): HelixMan
   const lint = lintOf(customElementsManifest as ManifestSource, name)
   if (Object.keys(lint.tags).length > 0) {
     writeFileSync(join(cwd, LINT), `${JSON.stringify(lint)}\n`)
+    const families = catalog([customElementsManifest], examplesOnDisk(cwd))
+    writeFileSync(
+      join(cwd, API),
+      `${JSON.stringify({ families: families.map(({ examples: _, ...family }) => family), package: name })}\n`,
+    )
+    writeFileSync(
+      join(cwd, EXAMPLES),
+      `${JSON.stringify({ examples: Object.fromEntries(families.map((family) => [family.slug, family.examples])), package: name })}\n`,
+    )
   }
   const context: HelixContext = {
     thirdPartyCEMs: [...dependencies.values()].map(
@@ -257,6 +314,18 @@ export const analyze = (options: HelixCemOptions, cwd = process.cwd()): HelixMan
   return customElementsManifest
 }
 
+export {
+  type ApiMember,
+  catalog,
+  type Element,
+  type EventDoc,
+  type Example,
+  type ExampleSource,
+  type Family,
+  findInCatalog,
+  type PropertyDoc,
+} from './catalog.js'
+export { displayName, place, startCase, tierOf } from './naming.js'
 export type {
   Documented,
   HelixAttribute,
