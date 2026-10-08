@@ -642,25 +642,166 @@ compass sets `--map-needle-turn` to the angle that points north, so an icon in
 
 ## Write a driver
 
-To use another renderer, write a driver: an object with two methods.
+To use another renderer, write a driver: an object that moves the renderer's
+view when the frame asks, and tells the frame when the view moved. `connectMap`
+calls it. `mapLibreDriver` and `leafletDriver` are drivers, and the `MapDriver`
+type in `@fusion.dev/helix-map` describes every method.
 
-- `panBy(x, y, motion)` moves the map by a number of pixels.
-- `zoomBy(direction, motion)` zooms in for `1` and out for `-1`.
+### Units
 
-`motion` is your theme's `{ duration, easing }`, or `null` to move without
-animation. Each optional method turns on a feature:
-
-| Method | Turns on |
+| Quantity | Unit |
 |---|---|
-| `project`, `onView` | Placing markers and positions |
-| `show` | Bringing a focused marker into view |
-| `fit` | `connection.fit()` and zooming in to clusters |
-| `layers` | Drawing routes, areas, and points |
-| `credits` | The map credit in the frame's footer |
-| `silenceKeyboard`, `focusTarget`, `replaceZoom` | Using the frame's keys and zoom buttons |
-| `bearing` | Arrows that stay correct when the map is rotated, and the Face north arrow |
-| `rotate`, `tilt` | The rotate, Face north, and tilt buttons and keys |
-| `zoom` | Saying the zoom level after a zoom |
+| A place | `{ lat, lng }` in degrees |
+| A position on screen | CSS pixels from the top left of the renderer's box, right and down positive |
+| Bearing | Degrees clockwise from north |
+| Tilt | Degrees from looking straight down, `0` being flat |
+| Zoom | The renderer's own levels |
+| Motion | `{ duration, easing }`, where `duration` is in milliseconds and `easing(t)` maps 0 to 1 onto 0 to 1, or `null` |
 
-Without `project`, markers stay hidden. To animate a move your page makes
-itself, read the same motion with `motionOf(element, pace)`.
+`motion` comes from your theme's motion tokens. It is `null` when the user has
+asked for reduced motion, and the driver then moves at once.
+
+### Required methods
+
+- `panBy(x, y, motion)` moves the view by `x` and `y` CSS pixels. The frame
+  asks for a fraction of its own box, so an arrow key moves the map by the same
+  share of the screen at every zoom. On a right-to-left page, `connectMap`
+  turns the frame's start and end into left and right before it calls the
+  driver.
+- `zoomBy(direction, motion)` zooms one step in, for `1`, or out, for `-1`. A
+  step is whatever the renderer calls one, usually one level.
+
+### Optional methods
+
+Each optional method turns on a feature. Without it, the feature is off and
+nothing fails.
+
+| Method | When `connectMap` calls it | What it must do | Turns on |
+|---|---|---|---|
+| `onView(moved)` | Once, at connect | Call `moved` on every frame the view moves, and return a function that stops | Markers that follow the map, and the announcements after a move |
+| `project(place)` | On every view change, for each marker | Return where `place` falls, in CSS pixels | Placing markers and positions. Without it, markers stay hidden |
+| `zoom()` | After each view change | Return the zoom | Saying "Zoom level 14" after a zoom |
+| `bearing()`, `pitch()` | After each view change | Return the bearing and the tilt | The compass needle, the 3D button's pressed state, and arrows that stay correct on a turned map |
+| `rotate({ by, to }, motion)` | On the rotate buttons, Face north, and Shift with Left or Right | Turn by `by` degrees, or to the bearing `to` | Rotating |
+| `tilt({ by, to }, motion)` | On the 3D button, and Shift with Up or Down | Tilt by `by` degrees, or to `to` | Tilting |
+| `show(place, motion)` | When the keyboard reaches a marker that is off screen | Bring `place` to the middle of the view, at `place.zoom` where it has one | Walking markers off screen |
+| `fit(bounds, padding, motion)` | On `connection.fit()`, and on a press on a cluster | Frame the `northEast` and `southWest` corners, inset by `padding` pixels | `connection.fit()` and zooming in to clusters |
+| `silenceKeyboard()` | Once, at connect | Turn off the renderer's own keys, and return a function that turns them back on | One set of keys |
+| `focusTarget()` | Once, at connect | Return the element the renderer made focusable | One tab stop. `connectMap` sets its `tabindex` to `-1` and puts it back on disconnect |
+| `replaceZoom()` | Once the frame has drawn its zoom buttons | Remove the renderer's zoom buttons, and return a function that puts them back | One set of zoom buttons |
+| `credits(changed)` | Once, at connect | Return `read()`, the credits as markup, and `stop()`; call `changed` when they change | The map credit in the frame's footer |
+| `ready(done)` | Once, at connect | Call `done` when the view is drawn whole, and return a function that stops waiting | `helix-map-ready` and `:state(ready)` |
+| `gestures(mode)` | When the frame's `gestures` changes | Take the wheel and touches as `free`, `cooperative`, or `off` says | Sharing the scroll with the page |
+| `layers(read, events)` | Once, at connect | Draw `read()`, and draw it again on `update()` | Routes, areas, points, and tile layers |
+| `labels(shown)` | When the map type changes | Show or hide the renderer's own roads and names | The Satellite map type |
+| `previews(ask)` | When the layers menu opens after the view moved | Resolve to an image URL for each map type | Pictures in the layers menu |
+| `behind(place)` | With `project` | Return `true` for a place on the far side of a globe | Hiding markers behind a globe |
+
+`connection.disconnect()` calls every function a method returned, gives the
+renderer its gestures back with `gestures('free')`, takes the markers off their
+places, puts the focus target's `tabindex` back as it was, and stops listening
+to the frame. Call it before you remove the renderer.
+
+### How the frame says a move
+
+The frame's keys and buttons only ask. The frame says "Moved left" or "Zoom
+level 14" after the driver calls the `moved` it gave to `onView`, and once the
+view has been still for a moment. A driver without `onView` never makes the
+frame speak, so the frame never describes a move that did not happen.
+
+### Example
+
+This driver shows a plan drawn as one image, such as a floor plan, whose edges
+are at known latitudes and longitudes. It moves the image with a CSS transform,
+places markers, and animates over the page's motion. The same driver runs in
+our specs, so this example stays correct.
+
+```js
+import { connectMap } from '@fusion.dev/helix-map'
+
+const planDriver = (image, plan) => {
+  const view = { scale: 1, x: 0, y: 0 }
+  const listeners = new Set()
+  let moving = 0
+
+  const draw = () => {
+    image.style.transformOrigin = '0 0'
+    image.style.transform = `translate(${view.x}px, ${view.y}px) scale(${view.scale})`
+    for (const moved of listeners) {
+      moved()
+    }
+  }
+
+  // Moves the view to `next` over the page's motion, or at once where it is null.
+  const go = (next, motion) => {
+    const run = ++moving
+    if (!motion || motion.duration <= 0) {
+      Object.assign(view, next)
+      draw()
+      return
+    }
+    const from = { ...view }
+    const start = performance.now()
+    const step = (now) => {
+      if (run !== moving) {
+        return
+      }
+      const t = Math.min(1, (now - start) / motion.duration)
+      const k = motion.easing(t)
+      view.x = from.x + (next.x - from.x) * k
+      view.y = from.y + (next.y - from.y) * k
+      view.scale = from.scale + (next.scale - from.scale) * k
+      draw()
+      if (t < 1) {
+        requestAnimationFrame(step)
+      }
+    }
+    requestAnimationFrame(step)
+  }
+
+  return {
+    onView: (moved) => {
+      listeners.add(moved)
+      return () => listeners.delete(moved)
+    },
+    panBy: (x, y, motion) => go({ ...view, x: view.x - x, y: view.y - y }, motion),
+    project: ({ lat, lng }) => ({
+      x: view.x + ((lng - plan.west) / (plan.east - plan.west)) * plan.width * view.scale,
+      y: view.y + ((plan.north - lat) / (plan.north - plan.south)) * plan.height * view.scale,
+    }),
+    zoom: () => Math.log2(view.scale),
+    zoomBy: (direction, motion) => {
+      const box = image.parentElement.getBoundingClientRect()
+      const k = direction > 0 ? 2 : 0.5
+      const [cx, cy] = [box.width / 2, box.height / 2]
+      go({ scale: view.scale * k, x: cx - (cx - view.x) * k, y: cy - (cy - view.y) * k }, motion)
+    },
+  }
+}
+
+const frame = document.querySelector('helix-map')
+const connection = connectMap(
+  frame,
+  planDriver(frame.querySelector('img'), {
+    east: 0.004,
+    height: 600,
+    north: 51.502,
+    south: 51.5,
+    west: 0,
+    width: 800,
+  }),
+)
+```
+
+`width` and `height` are the image's size in CSS pixels at zoom `0`. To animate
+a move your page makes itself, read the same motion with
+`motionOf(element, pace)`.
+
+### Test a driver
+
+Our specs test each driver twice. A stand-in renderer records what the driver
+asks it, which runs anywhere. Then the browser specs connect a frame to the real
+MapLibre and Leaflet with a style that loads nothing, press the frame's keys and
+buttons, and check that the view moved and that the frame said so. Test your
+driver the same way: connect it to a frame, press a key on the frame's `region`
+part, and wait for the `live` part to say the move.

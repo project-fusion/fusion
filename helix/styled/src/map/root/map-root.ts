@@ -19,6 +19,10 @@ import { styles } from './map-root.css.js'
  * to draw the map's credit compact in a corner over the map, which suits a
  * map the width of the page.
  *
+ * The [Maps](https://fusion.dev/helix/docs/maps) guide connects a renderer,
+ * lists the keys and what a screen reader hears, and describes every method
+ * a driver for another renderer can have.
+ *
  * @since 0.100.0
  * @status experimental
  * @category media

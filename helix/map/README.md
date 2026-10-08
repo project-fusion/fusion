@@ -59,9 +59,11 @@ bun run --filter @fusion.dev/helix-map build
 bun run --filter @fusion.dev/helix-map test
 ```
 
-The specs drive stand-ins for each renderer. What they cannot show, that the
-real libraries move the way the stand-ins are told, was checked against
-MapLibre 5.24 and Leaflet 1.9.4 in Chromium on September 25, 2026, and against
-MapLibre 6.11 on September 28, 2026.
+The specs drive each driver twice. A stand-in for each renderer records what
+the driver asks of it, under `bun test`. The browser specs, run with
+`bun run specs:browser map`, connect a frame to the real MapLibre and Leaflet
+with a style that loads nothing, press the frame's keys and buttons, and check
+that the camera moved and that the frame said so. The guide's own driver, under
+"Write a driver", runs in the specs too.
 
 MIT

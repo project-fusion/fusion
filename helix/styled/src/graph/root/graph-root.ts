@@ -16,6 +16,10 @@ import { styles } from './graph-root.css.js'
  * `no-panel`, the drawing takes the whole frame, and a button among the
  * controls opens the search and the list over its end.
  *
+ * The [Graphs](https://fusion.dev/helix/docs/graphs) guide connects a
+ * renderer, lists the keys and what a screen reader hears, and describes the
+ * methods of a driver for another renderer.
+ *
  * @since 0.116.0
  * @status experimental
  * @category media
