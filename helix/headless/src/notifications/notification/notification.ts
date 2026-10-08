@@ -461,8 +461,18 @@ export class HelixHeadlessNotification extends MixinDismissible(HelixElement) {
          the row beside it, or to the feed's own controls, before the row
          goes. Left alone it would fall to the body. */
       const next = deepContains(this, deepActiveElement()) ? this.neighbor() : null
+      const holder = this.parentElement as Partial<Pick<HelixElement, 'updateComplete'>> | null
       this.remove()
       next?.focus()
+      /* A row a folded group shows only once this one has gone is drawn by
+         the group's next update, and a row that is drawn nowhere takes no
+         focus. Measured before this: in a collapsed group, focus passed over
+         the row that took this one's place, and the next row, to Load more. */
+      if (next && (next.getRootNode() as Document | ShadowRoot).activeElement !== next) {
+        void Promise.resolve()
+          .then(() => holder?.updateComplete)
+          .then(() => next.focus())
+      }
     }
   }
 
@@ -487,7 +497,20 @@ export class HelixHeadlessNotification extends MixinDismissible(HelixElement) {
           (one): one is HelixHeadlessNotification => 'isNotification' in one,
         )
     const at = rows.indexOf(this)
-    const order = [...rows.slice(at + 1), ...rows.slice(0, Math.max(at, 0)).reverse()]
+    /* A row a folded group draws nowhere takes no focus, except the one that
+       takes this row's place as the group's first once this one has gone. */
+    const group = this.parentElement
+    const promoted =
+      group && 'isNotificationGroup' in group && this.assignedSlot !== null
+        ? [...group.children].find(
+            (one): one is HelixHeadlessNotification => one !== this && 'isNotification' in one,
+          )
+        : undefined
+    const drawn = (row: HelixHeadlessNotification): boolean =>
+      !('isNotificationGroup' in (row.parentElement ?? {})) ||
+      row.assignedSlot !== null ||
+      row === promoted
+    const order = [...rows.slice(at + 1), ...rows.slice(0, Math.max(at, 0)).reverse()].filter(drawn)
     for (const row of order) {
       const target = row.shadowRoot?.querySelector<HTMLElement>('[part="item"]')
       if (target) {

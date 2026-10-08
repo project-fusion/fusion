@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, hasState, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 /* One notification.
  *
@@ -344,6 +344,50 @@ describe('focus when a row is dismissed', () => {
     dismiss?.focus()
     dismiss?.click()
     expect(first?.shadowRoot?.activeElement?.getAttribute('part')).toBe('item')
+  })
+
+  /* A collapsed group draws its first row only. Focus went to a row drawn
+     nowhere, which takes none, and fell past the rest of the feed. In a
+     browser, since happy-dom assigns no slot by hand and so draws every row. */
+  const browser = hasLayout() ? test : (): void => {}
+
+  const folded = async (): Promise<Item[]> => {
+    const feed = await mount(
+      `<helix-headless-notifications>
+        <helix-headless-notification-group label="Today" collapsible>
+          <helix-headless-notification id="n1" dismissible>One</helix-headless-notification>
+          <helix-headless-notification id="n2">Two</helix-headless-notification>
+        </helix-headless-notification-group>
+        <helix-headless-notification id="n3" dismissible>Three</helix-headless-notification>
+      </helix-headless-notifications>`,
+    )
+    const rows = [...feed.querySelectorAll('helix-headless-notification')] as Item[]
+    await Promise.all(rows.map((row) => row.updateComplete))
+    await (feed.querySelector('helix-headless-notification-group') as Item).updateComplete
+    return rows
+  }
+
+  const dismissed = async (row: Item | undefined): Promise<void> => {
+    const dismiss = row?.shadowRoot?.querySelector<HTMLElement>('[part="dismiss"]')
+    dismiss?.focus()
+    dismiss?.click()
+    for (let turn = 0; turn < 3; turn += 1) {
+      await new Promise((resolve) => setTimeout(resolve, 0))
+    }
+  }
+
+  browser('in a collapsed group, lands on the row that takes its place', async () => {
+    const [n1, n2] = await folded()
+    await dismissed(n1)
+    expect(n2?.assignedSlot).not.toBeNull()
+    expect(n2?.shadowRoot?.activeElement?.getAttribute('part')).toBe('item')
+  })
+
+  browser('and from after a collapsed group, on the row it draws', async () => {
+    const [n1, n2, n3] = await folded()
+    await dismissed(n3)
+    expect(n2?.shadowRoot?.activeElement).toBeNull()
+    expect(n1?.shadowRoot?.activeElement?.getAttribute('part')).toBe('item')
   })
 })
 
