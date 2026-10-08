@@ -100,6 +100,21 @@ describe('under forced colors', () => {
     expect(rule('helix-skeleton', '[part~="skeleton"]')).toContain('GrayText')
   })
 
+  /* Measured in Chromium under `emulateMedia({ forcedColors: 'active' })`:
+     the sheen's gradient computed to `none` before. After, it is a GrayText
+     band whose darkest column moved from x 2 to 33, 112, 239 and 365 in frames
+     400 ms apart on a 368 px skeleton, and with motion reduced as well the
+     background is `none` and nothing moves. */
+  test('a skeleton sweeps a GrayText band, only while motion is allowed', () => {
+    const sheen = rule('helix-skeleton', '[part="sheen"]')
+    expect(sheen).toContain('GrayText')
+    expect(sheen).toContain('forced-color-adjust: none')
+    const moving = forced('helix-skeleton').split('and (prefers-reduced-motion: no-preference)')
+    expect(moving).toHaveLength(2)
+    expect(moving[1]).toContain('[part="sheen"]')
+    expect(moving[0]).not.toContain('[part="sheen"]')
+  })
+
   test('a badge keeps its fill and its tone, bounded in the text color', () => {
     const mark = rule('helix-badge', '[part="indicator"]')
     expect(mark).toContain('forced-color-adjust: none')
