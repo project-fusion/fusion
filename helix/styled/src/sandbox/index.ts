@@ -22,6 +22,7 @@ export {
 } from './frame.js'
 export * from './preview/sandbox-preview.js'
 export * from './root/sandbox-root.js'
+export { type ManifestLike, manifestWords } from './source/editing.js'
 export * from './source/sandbox-source.js'
 export * from './status-bar/sandbox-status-bar.js'
 export * from './terminal/sandbox-terminal.js'

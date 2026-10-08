@@ -428,3 +428,193 @@ describe('line numbers', () => {
     expect(host.shadowRoot?.querySelector('[part~="line"]')).toBeNull()
   })
 })
+
+/** A key pressed with modifiers, such as Control and `]`. */
+const chord = (
+  field: HTMLTextAreaElement,
+  key: string,
+  modifiers: KeyboardEventInit = { ctrlKey: true },
+): KeyboardEvent => {
+  const event = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key, ...modifiers })
+  field.dispatchEvent(event)
+  return event
+}
+
+/** A field holding `value` with `from` to `to` selected. */
+const select = async (attributes: string, from: number, to = from) => {
+  const host = await source(attributes)
+  await host.updateComplete
+  const field = part(host, 'source') as HTMLTextAreaElement
+  field.setSelectionRange(from, to)
+  return { field, host }
+}
+
+describe('the editing keys', () => {
+  test('Tab with text selected indents every line it touches', async () => {
+    const { field, host } = await select('value="a\nb"', 0, 3)
+    expect(press(field, 'Tab').defaultPrevented).toBe(true)
+    expect(host.value).toBe('  a\n  b')
+    expect([field.selectionStart, field.selectionEnd]).toEqual([0, 7])
+  })
+
+  test('Mod+] indents the line and Mod+[ outdents it, with Control or Command', async () => {
+    const { field, host } = await select('value="a"', 1)
+    expect(chord(field, ']').defaultPrevented).toBe(true)
+    expect(host.value).toBe('  a')
+    expect(chord(field, '[', { metaKey: true }).defaultPrevented).toBe(true)
+    expect(host.value).toBe('a')
+  })
+
+  test('Mod+/ comments the lines out and back in, in the syntax of the pane', async () => {
+    const script = await select('name="js" value="  a()"', 3)
+    chord(script.field, '/')
+    expect(script.host.value).toBe('  // a()')
+    chord(script.field, '/')
+    expect(script.host.value).toBe('  a()')
+
+    const markup = await select('value="<p>Hi</p>"', 0)
+    chord(markup.field, '/')
+    expect(markup.host.value).toBe('<!-- <p>Hi</p> -->')
+  })
+
+  test('an edit a consumer refuses leaves the source', async () => {
+    const { field, host } = await select('value="a"', 1)
+    host.addEventListener('helix-before-edit', (event) => event.preventDefault())
+    chord(field, ']')
+    expect(host.value).toBe('a')
+    expect(field.value).toBe('a')
+  })
+})
+
+describe('closing brackets', () => {
+  test('are off unless asked, so a bracket types as itself', async () => {
+    const { field } = await select('value=""', 0)
+    expect(press(field, '(').defaultPrevented).toBe(false)
+  })
+
+  test('close a bracket typed at the end of a line, and step over the closing one', async () => {
+    const { field, host } = await select('close-brackets value="f"', 1)
+    expect(press(field, '(').defaultPrevented).toBe(true)
+    expect(host.value).toBe('f()')
+    expect(field.selectionStart).toBe(2)
+    expect(press(field, ')').defaultPrevented).toBe(true)
+    expect(host.value).toBe('f()')
+    expect(field.selectionStart).toBe(3)
+  })
+
+  test('delete an empty pair with one Backspace', async () => {
+    const { field, host } = await select('close-brackets value="f()"', 2)
+    expect(press(field, 'Backspace').defaultPrevented).toBe(true)
+    expect(host.value).toBe('f')
+  })
+})
+
+describe('matching brackets', () => {
+  /** The brackets marked, as their part names. */
+  const marked = (host: Source): (string | null)[] =>
+    [...(host.shadowRoot?.querySelectorAll('[part~="bracket"]') ?? [])].map((each) =>
+      each.getAttribute('part'),
+    )
+
+  test('mark the bracket beside the caret and its pair, in a copy hidden from screen readers', async () => {
+    const { field, host } = await select('match-brackets value="f(a)"', 4)
+    field.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true, key: 'End' }))
+    await host.updateComplete
+    expect(marked(host)).toEqual(['bracket', 'bracket'])
+    expect(part(host, 'highlight')?.getAttribute('aria-hidden')).toBe('true')
+    expect(part(host, 'highlight')?.textContent).toBe('f(a)\n')
+  })
+
+  test('mark a bracket with no pair as unmatched', async () => {
+    const { field, host } = await select('match-brackets value="f(a"', 2)
+    field.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true, key: 'ArrowLeft' }))
+    await host.updateComplete
+    expect(marked(host)).toEqual(['bracket bracket-unmatched'])
+  })
+})
+
+describe('completion', () => {
+  /** Types `text` at the caret, as a keystroke would. */
+  const type = (field: HTMLTextAreaElement, text: string): void => {
+    field.setRangeText(text, field.selectionStart, field.selectionEnd, 'end')
+    field.dispatchEvent(
+      new InputEvent('input', { bubbles: true, data: text, inputType: 'insertText' }),
+    )
+  }
+
+  test('offers the words that start with the word typed, and Enter takes the one chosen', async () => {
+    const { field, host } = await select('complete value="console.log()\n"', 14)
+    expect(field.getAttribute('aria-autocomplete')).toBe('list')
+    ;(host as Source & { completions: string[] }).completions = ['const']
+    await host.updateComplete
+    type(field, 'con')
+    await host.updateComplete
+    const list = part(host, 'completions') as HTMLElement
+    expect(list.getAttribute('role')).toBe('listbox')
+    expect(list.getAttribute('aria-label')).toBe('Completions')
+    expect([...list.querySelectorAll('[role="option"]')].map((each) => each.textContent)).toEqual([
+      'console',
+      'const',
+    ])
+    expect(field.getAttribute('aria-controls')).toBe('completions')
+    expect(field.getAttribute('aria-activedescendant')).toBe('completion-0')
+
+    expect(press(field, 'ArrowDown').defaultPrevented).toBe(true)
+    await host.updateComplete
+    expect(field.getAttribute('aria-activedescendant')).toBe('completion-1')
+    expect(part(host, 'completion-active')?.textContent).toBe('const')
+
+    expect(press(field, 'Enter').defaultPrevented).toBe(true)
+    await host.updateComplete
+    expect(host.value).toBe('console.log()\nconst')
+    expect(part(host, 'completions')).toBeNull()
+    expect(field.hasAttribute('aria-activedescendant')).toBe(false)
+  })
+
+  test('closes on Escape without arming the next Tab to leave', async () => {
+    const { field, host } = await select('complete value="alpha "', 6)
+    type(field, 'al')
+    await host.updateComplete
+    expect(part(host, 'completions')).not.toBeNull()
+    press(field, 'Escape')
+    await host.updateComplete
+    expect(part(host, 'completions')).toBeNull()
+    expect(press(field, 'Tab').defaultPrevented).toBe(true)
+  })
+
+  test('are off unless asked', async () => {
+    const { field, host } = await select('value="alpha "', 6)
+    type(field, 'al')
+    await host.updateComplete
+    expect(part(host, 'completions')).toBeNull()
+    expect(field.hasAttribute('aria-autocomplete')).toBe(false)
+  })
+})
+
+describe('the source given', () => {
+  test('is `:state(modified)` once edited, and `reset()` puts it back as an edit', async () => {
+    const { field, host } = await select('value="a"', 1)
+    const pane = host as Source & { modified: boolean; reset(): void }
+    expect(pane.modified).toBe(false)
+    press(field, 'Tab')
+    await host.updateComplete
+    expect(pane.modified).toBe(true)
+    const edits: string[] = []
+    host.addEventListener('helix-edit', (event) => edits.push((event as CustomEvent).detail.value))
+    pane.reset()
+    await host.updateComplete
+    expect(host.value).toBe('a')
+    expect(field.value).toBe('a')
+    expect(pane.modified).toBe(false)
+    expect(edits).toEqual(['a'])
+  })
+
+  test('is the last `value` set from outside', async () => {
+    const { field, host } = await select('value="a"', 1)
+    const pane = host as Source & { modified: boolean }
+    press(field, 'Tab')
+    host.value = 'b'
+    await host.updateComplete
+    expect(pane.modified).toBe(false)
+  })
+})

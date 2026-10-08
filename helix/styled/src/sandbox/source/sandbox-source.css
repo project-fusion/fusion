@@ -133,3 +133,49 @@
 [data-kind="tag"] {
   color: var(--sandbox-source-tag-color, var(--helix-color-syntax-tag));
 }
+
+/* Under `match-brackets`, the bracket beside the caret and its pair, while
+   the field has focus. A bracket with no pair is drawn as invalid. */
+[part="field"]:focus-within [part~="bracket"] {
+  background-color: var(--sandbox-source-bracket-color, var(--helix-color-accent-subtle));
+  border-radius: var(--helix-radii-sm);
+}
+
+[part="field"]:focus-within [part~="bracket-unmatched"] {
+  background-color: transparent;
+  color: var(--sandbox-source-invalid-color, var(--helix-color-syntax-invalid));
+}
+
+/* Under `complete`, the list opens under the word being typed. The pane
+   places it there, in the box that scrolls with the text. */
+[part="field"] {
+  position: relative;
+}
+
+[part="completions"] {
+  background-color: var(--helix-color-surface-overlay);
+  border: var(--sandbox-source-completions-border-width, var(--helix-border-floating)) solid
+    var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  box-shadow: var(--sandbox-source-completions-shadow, var(--helix-shadow-floating));
+  font-family: var(--helix-font-mono);
+  font-size: max(var(--helix-text-field-min), var(--helix-text-xs));
+  max-block-size: 12rem;
+  min-inline-size: 8rem;
+  overflow-y: auto;
+  padding: var(--helix-space-2xs);
+  position: absolute;
+  z-index: 1;
+}
+
+[part~="completion"] {
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground);
+  cursor: pointer;
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+  white-space: nowrap;
+}
+
+[part~="completion-active"] {
+  background-color: var(--helix-color-accent-surface);
+}

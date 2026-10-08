@@ -11,8 +11,20 @@ import {
 } from '@fusion.dev/helix-core'
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
 import { html, nothing } from 'lit'
-import { property } from 'lit/decorators.js'
+import { property, state } from 'lit/decorators.js'
 import { drawnRuns, type SandboxToken, type SandboxTokenizer } from '../tokens.js'
+import {
+  type Completions,
+  closeBracket,
+  deletePair,
+  indentLines,
+  matchBracket,
+  outdentLines,
+  type SourceEdit,
+  suggest,
+  syntaxOf,
+  toggleComment,
+} from './editing.js'
 import { styles } from './sandbox-source.css.js'
 
 /** Keys that only ever modify another, and so are not a press of their own. */
@@ -35,20 +47,85 @@ const dedent = (text: string): string => {
   return Number.isFinite(shared) ? lines.map((line) => line.slice(shared)).join('\n') : ''
 }
 
-/** Runs of text cut at each line break, a line to an array. */
-const linesOf = (runs: readonly SandboxToken[]): SandboxToken[][] => {
-  const lines: SandboxToken[][] = [[]]
+/**
+ * What a run of the drawn copy marks: the bracket beside the caret or its
+ * pair, a bracket with no pair, or the point the completions open under.
+ */
+type Mark = 'anchor' | 'bracket' | 'unmatched'
+
+/** A run of the drawn copy, with what it marks where it marks something. */
+interface Piece extends SandboxToken {
+  mark?: Mark | undefined
+}
+
+/**
+ * Runs cut at each marked position: a bracket becomes a run of its own, and
+ * the anchor an empty run before the character it marks.
+ */
+const cut = (runs: readonly SandboxToken[], marks: ReadonlyMap<number, Mark>): Piece[] => {
+  if (marks.size === 0) {
+    return [...runs]
+  }
+  const points = [...marks.keys()].sort((a, b) => a - b)
+  const pieces: Piece[] = []
+  let at = 0
+  let next = 0
   for (const { kind, text } of runs) {
+    let from = 0
+    for (
+      let point = points[next];
+      point !== undefined && point < at + text.length;
+      point = points[++next]
+    ) {
+      const mark = marks.get(point)
+      const index = point - at
+      if (index > from) {
+        pieces.push({ kind, text: text.slice(from, index) })
+      }
+      from = mark === 'anchor' ? index : index + 1
+      pieces.push({ kind, mark, text: text.slice(index, from) })
+    }
+    if (from < text.length) {
+      pieces.push({ kind, text: text.slice(from) })
+    }
+    at += text.length
+  }
+  for (const point of points.slice(next)) {
+    pieces.push({ mark: marks.get(point), text: '' })
+  }
+  return pieces
+}
+
+/** Runs of text cut at each line break, a line to an array. */
+const linesOf = (runs: readonly Piece[]): Piece[][] => {
+  const lines: Piece[][] = [[]]
+  for (const { kind, mark, text } of runs) {
     text.split('\n').forEach((piece, at) => {
       if (at > 0) {
         lines.push([])
       }
-      if (piece !== '') {
-        lines.at(-1)?.push(kind ? { kind, text: piece } : { text: piece })
+      if (piece !== '' || mark === 'anchor') {
+        lines.at(-1)?.push({ kind, mark, text: piece })
       }
     })
   }
   return lines
+}
+
+/**
+ * Which positions of the source are inside a string or a comment, as the
+ * highlighter said, so a bracket there is not matched.
+ */
+const quietOf = (runs: readonly SandboxToken[], length: number): Uint8Array => {
+  const quiet = new Uint8Array(length)
+  let at = 0
+  for (const { kind, text } of runs) {
+    if (kind === 'string' || kind === 'comment') {
+      quiet.fill(1, at, at + text.length)
+    }
+    at += text.length
+  }
+  return quiet
 }
 
 /**
@@ -81,6 +158,34 @@ const linesOf = (runs: readonly SandboxToken[]): SandboxToken[][] => {
  * Enter keeps the indentation of the line it breaks, and the new line is
  * undone with the next undo as typing is.
  *
+ * **The editing keys are CodeMirror's.** Tab with text selected indents every
+ * line the selection touches. `Mod+]` indents the lines and `Mod+[` outdents
+ * them, and `Mod+/` comments them out or back in: `//` in a `js` pane, and one
+ * block comment in an `html` or `css` pane. `Mod` is Command on a Mac and
+ * Control elsewhere. Each is one step of undo.
+ *
+ * **`close-brackets` closes brackets and quotes** as you type them: `(`, `[`,
+ * `{` and the three quotes. A closing character typed before the same one
+ * steps over it, Backspace between an empty pair deletes both, and a bracket
+ * typed with text selected goes around the text. **`match-brackets` marks
+ * the bracket beside the caret and its pair** while the field has focus, each
+ * a `bracket` part, and a bracket with no pair is also `bracket-unmatched`.
+ * A bracket in a string or a comment is not matched, where `tokenize` says
+ * which runs those are.
+ *
+ * **`complete` offers completions as you type**: the words of the source and
+ * of `completions` that start with the word before the caret. They open in a
+ * list under the word. The arrow keys move through it, Enter or Tab takes the
+ * word, and Escape closes it. `Ctrl+Space` opens it where it is closed. The
+ * field is `aria-autocomplete="list"` and points at the word chosen with
+ * `aria-activedescendant`, so a screen reader reads each one. Give
+ * `completions` the names a page uses, such as the tag and attribute names of
+ * a custom elements manifest through `manifestWords`.
+ *
+ * **The pane is `:state(modified)` while its source differs from the source it
+ * was given**, the first `value` or the last one set from outside. `reset()`
+ * puts that source back, as an edit the sandbox passes on to its preview.
+ *
  * **The source can be written inside the pane** where `value` is not set: its
  * text, or the markup of a `<template>` it holds, without the indentation the
  * page gave it. Markup goes in a template so the page does not render it or
@@ -95,14 +200,22 @@ const linesOf = (runs: readonly SandboxToken[]): SandboxToken[][] => {
  * @event {HelixCaretEvent} helix-caret - Fired when the cursor moves.
  * @event {HelixEditEvent} helix-edit - Fired after the source was edited, with the new source.
  *
- * @csspart field - The box that scrolls the field and its colors together, under `tokenize` or `line-numbers`.
- * @csspart highlight - The colored copy of the source drawn under the field, under `tokenize` or `line-numbers`.
+ * @csspart bracket - The bracket beside the caret and its pair, under `match-brackets`.
+ * @csspart bracket-unmatched - A bracket beside the caret with no pair, under `match-brackets`.
+ * @csspart completion - One word in the list of completions, under `complete`.
+ * @csspart completion-active - The word chosen in that list, which Enter or Tab takes.
+ * @csspart completions - The list of completions under the word being typed, under `complete`.
+ * @csspart field - The box that scrolls the field and its colors together, under `tokenize`, `line-numbers`, `match-brackets` or `complete`.
+ * @csspart highlight - The colored copy of the source drawn under the field, under `tokenize`, `line-numbers`, `match-brackets` or `complete`.
  * @csspart line - One line of that copy, under `line-numbers`, numbered in the gutter by its `::before`.
  * @csspart source - The editable region.
  * @csspart token - One run of the source that has a kind, under `tokenize`.
  *
  * @cssproperty --sandbox-source-background-color - Fill behind the source.
+ * @cssproperty --sandbox-source-bracket-color - Fill behind a matched bracket, under `match-brackets`. Defaults to `--helix-color-accent-subtle`.
  * @cssproperty --sandbox-source-callable-color - Color of a `callable` run, under `tokenize`. Defaults to `--helix-color-syntax-callable`.
+ * @cssproperty --sandbox-source-completions-border-width - Width of the edge of the list of completions, under `complete`. Defaults to `--helix-border-floating`.
+ * @cssproperty --sandbox-source-completions-shadow - Shadow under the list of completions, under `complete`. Defaults to `--helix-shadow-floating`.
  * @cssproperty --sandbox-source-comment-color - Color of a `comment` run, under `tokenize`. Defaults to `--helix-color-syntax-comment`.
  * @cssproperty --sandbox-source-constant-color - Color of a `constant` run, under `tokenize`. Defaults to `--helix-color-syntax-constant`.
  * @cssproperty --sandbox-source-invalid-color - Color of an `invalid` run, under `tokenize`. Defaults to `--helix-color-syntax-invalid`.
@@ -112,6 +225,8 @@ const linesOf = (runs: readonly SandboxToken[]): SandboxToken[][] => {
  * @cssproperty --sandbox-source-name-color - Color of a `name` run, under `tokenize`. Defaults to `--helix-color-syntax-name`.
  * @cssproperty --sandbox-source-string-color - Color of a `string` run, under `tokenize`. Defaults to `--helix-color-syntax-string`.
  * @cssproperty --sandbox-source-tag-color - Color of a `tag` run, under `tokenize`. Defaults to `--helix-color-syntax-tag`.
+ *
+ * @cssstate modified - While the source differs from the source the pane was given, until `reset()` or a new `value`.
  */
 @customElement('helix-sandbox-source')
 export class HelixSandboxSource extends HelixElement {
@@ -120,6 +235,35 @@ export class HelixSandboxSource extends HelixElement {
    * `registerWords('de', { 'helix-sandbox-source': { fieldLabel: 'Quelltext' } })`.
    */
   static words = 'helix-sandbox-source'
+
+  /**
+   * Whether typing an opening bracket or quote types its closing one too, and
+   * a bracket typed with text selected goes around it.
+   */
+  @property({ attribute: 'close-brackets', type: Boolean })
+  closeBrackets = false
+
+  /**
+   * Whether the pane offers completions for the word before the caret, from
+   * the words of the source and of `completions`.
+   */
+  @property({ type: Boolean })
+  complete = false
+
+  /**
+   * Words the pane offers under `complete` beside the words of the source,
+   * such as tag and attribute names. `manifestWords` reads them from a custom
+   * elements manifest. Set it as JSON in the attribute or as an array.
+   */
+  @property({ type: Array })
+  completions: readonly string[] = []
+
+  /**
+   * The name of the list of completions, read by screen readers.
+   */
+  @words
+  @property({ attribute: 'completions-label' })
+  completionsLabel = 'Completions'
 
   /**
    * The editable region's name, read by screen readers.
@@ -157,6 +301,13 @@ export class HelixSandboxSource extends HelixElement {
    */
   @property({ attribute: 'line-numbers', reflect: true, type: Boolean })
   lineNumbers = false
+
+  /**
+   * Whether the bracket beside the caret and its pair are marked while the
+   * field has focus.
+   */
+  @property({ attribute: 'match-brackets', type: Boolean })
+  matchBrackets = false
 
   /**
    * Which source this pane holds. Every `helix-before-edit` event includes it.
@@ -200,6 +351,50 @@ export class HelixSandboxSource extends HelixElement {
   /** Set by Escape, so the next Tab leaves the field. */
   private escaped = false
 
+  /** The source the pane was given, which `reset()` puts back. */
+  private baseline = ''
+
+  /** The source the last edit left, to tell an edit from a `value` set from outside. */
+  private edited: string | undefined
+
+  /** Where the caret is, while nothing is selected, for `match-brackets`. */
+  @state()
+  private caret = -1
+
+  /** The completions open under the word being typed, under `complete`. */
+  @state()
+  private offered: Completions | undefined
+
+  /** Which of the completions Enter or Tab takes. */
+  @state()
+  private chosen = 0
+
+  /** Set while a completion is written, so writing it does not offer more. */
+  private accepting = false
+
+  /**
+   * Whether the source differs from the source the pane was given: its first
+   * `value`, or the last one set from outside.
+   */
+  get modified(): boolean {
+    return this.value === this.edited && this.value !== this.baseline
+  }
+
+  /**
+   * Puts back the source the pane was given, as an edit: `helix-before-edit`
+   * is sent first and can refuse it, and the sandbox passes it to its preview.
+   */
+  reset(): void {
+    const field = this.field
+    if (field && this.modified) {
+      this.edit(field, this.baseline)
+    }
+  }
+
+  private get field(): HTMLTextAreaElement | null {
+    return this.renderRoot.querySelector('textarea')
+  }
+
   /** Whether the source written inside the pane has been read. */
   private read = false
 
@@ -242,6 +437,28 @@ export class HelixSandboxSource extends HelixElement {
     if (!this.hasUpdated) {
       this.readWritten()
     }
+    /* A `value` set from outside is the new source given, and an edit is not. */
+    if (this.value !== this.edited) {
+      this.baseline = this.value
+      this.edited = undefined
+    }
+    this.toggleState('modified', this.modified)
+  }
+
+  /** Places the completions under the word they complete, and keeps the chosen one in view. */
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    const list = this.renderRoot.querySelector<HTMLElement>('[part="completions"]')
+    const anchor = this.renderRoot.querySelector('#anchor')
+    const box = this.renderRoot.querySelector<HTMLElement>('[part="field"]')
+    if (!list || !anchor || !box) {
+      return
+    }
+    const at = anchor.getBoundingClientRect()
+    const frame = box.getBoundingClientRect()
+    list.style.top = `${at.bottom - frame.top + box.scrollTop}px`
+    list.style.left = `${at.left - frame.left + box.scrollLeft}px`
+    list.querySelector('[aria-selected="true"]')?.scrollIntoView?.({ block: 'nearest' })
   }
 
   /**
@@ -264,6 +481,9 @@ export class HelixSandboxSource extends HelixElement {
     const field = event.target as HTMLTextAreaElement
     const at = field.selectionStart ?? 0
     const before = field.value.slice(0, at)
+    if (this.matchBrackets) {
+      this.caret = at === field.selectionEnd ? at : -1
+    }
     this.dispatchEvent(
       new HelixCaretEvent({
         column: at - (before.lastIndexOf('\n') + 1) + 1,
@@ -289,6 +509,69 @@ export class HelixSandboxSource extends HelixElement {
     const field = event.target as HTMLTextAreaElement
     this.edit(field, field.value)
     this.reportCaret(event)
+    /* Typing a word offers its completions, and anything else typed closes
+       them, unless they are open and the word is still being typed. */
+    const typed = (event as InputEvent).inputType ?? ''
+    if (
+      this.complete &&
+      !this.accepting &&
+      (this.offered || /^insert(?:Text|Replacement)/.test(typed))
+    ) {
+      this.offer(field)
+    } else {
+      this.offered = undefined
+    }
+  }
+
+  /** Opens the completions for the word before the caret, or closes them where there are none. */
+  private offer(field: HTMLTextAreaElement): void {
+    const at = field.selectionStart
+    this.offered =
+      at === field.selectionEnd ? suggest(field.value, at, this.completions) : undefined
+    this.chosen = 0
+  }
+
+  /** Writes the chosen completion over the word it completes. */
+  private accept(field: HTMLTextAreaElement, index: number): void {
+    const offered = this.offered
+    const word = offered?.words[index]
+    this.offered = undefined
+    if (!offered || word === undefined) {
+      return
+    }
+    this.accepting = true
+    this.apply(field, {
+      from: offered.from,
+      selection: [offered.from + word.length, offered.from + word.length],
+      text: word,
+      to: field.selectionEnd,
+    })
+    this.accepting = false
+  }
+
+  /**
+   * The keys of the open completions. Returns whether the key was theirs.
+   */
+  private completionKey(event: KeyboardEvent, field: HTMLTextAreaElement): boolean {
+    const offered = this.offered
+    if (!offered) {
+      return false
+    }
+    const count = offered.words.length
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      this.chosen = (this.chosen + (event.key === 'ArrowDown' ? 1 : count - 1)) % count
+    } else if (event.key === 'Enter' || (event.key === 'Tab' && !event.shiftKey)) {
+      this.accept(field, this.chosen)
+    } else if (event.key === 'Escape') {
+      this.offered = undefined
+    } else {
+      if (/^(?:Arrow|Home|End|Page)/.test(event.key)) {
+        this.offered = undefined
+      }
+      return false
+    }
+    event.preventDefault()
+    return true
   }
 
   /**
@@ -299,6 +582,7 @@ export class HelixSandboxSource extends HelixElement {
     const request = new HelixBeforeEditEvent({ value: next })
     const accepted = this.dispatchEvent(request)
     if (accepted) {
+      this.edited = next
       this.value = next
     }
     restoreValue(field, this.value)
@@ -308,6 +592,10 @@ export class HelixSandboxSource extends HelixElement {
   }
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {
+    const field = event.target as HTMLTextAreaElement
+    if (this.completionKey(event, field)) {
+      return
+    }
     if (event.key === 'Escape') {
       this.escaped = true
       return
@@ -315,6 +603,11 @@ export class HelixSandboxSource extends HelixElement {
     /* A modifier on its own is the first half of a chord, and pressing Shift
        to go back after Escape must not undo the Escape. */
     if (MODIFIERS.has(event.key)) {
+      return
+    }
+    if (this.command(event, field)) {
+      this.escaped = false
+      event.preventDefault()
       return
     }
     if (
@@ -335,7 +628,70 @@ export class HelixSandboxSource extends HelixElement {
     }
 
     event.preventDefault()
-    this.insert(event.target as HTMLTextAreaElement, '  ')
+    if (field.selectionStart === field.selectionEnd) {
+      this.insert(field, '  ')
+    } else {
+      this.apply(field, indentLines(field.value, field.selectionStart, field.selectionEnd))
+    }
+  }
+
+  /**
+   * The editing commands: the `Mod` keys for indenting and comments, and, where
+   * they are on, closing brackets and opening completions. Returns whether the
+   * key was one, so it does nothing else.
+   */
+  private command(event: KeyboardEvent, field: HTMLTextAreaElement): boolean {
+    const { selectionEnd: to, selectionStart: from, value } = field
+    const mod = (event.ctrlKey || event.metaKey) && !event.altKey
+    if (event.isComposing) {
+      return false
+    }
+    if (mod && (event.key === ']' || event.key === '[')) {
+      this.apply(field, (event.key === ']' ? indentLines : outdentLines)(value, from, to))
+      return true
+    }
+    const syntax = syntaxOf(this.name)
+    if (mod && event.key === '/' && syntax) {
+      this.apply(field, toggleComment(value, from, to, syntax))
+      return true
+    }
+    if (this.complete && event.ctrlKey && event.key === ' ') {
+      this.offer(field)
+      return true
+    }
+    if (!this.closeBrackets || mod || event.altKey) {
+      return false
+    }
+    const change =
+      event.key === 'Backspace'
+        ? deletePair(value, from, to)
+        : event.key.length === 1
+          ? closeBracket(value, from, to, event.key)
+          : undefined
+    this.apply(field, change)
+    return change !== undefined
+  }
+
+  /**
+   * Makes a change as typing would, through `insert`, and puts the selection
+   * where the change says. A change that refuses nothing and replaces nothing
+   * only moves the caret.
+   */
+  private apply(field: HTMLTextAreaElement, change: SourceEdit | undefined): void {
+    if (!change) {
+      return
+    }
+    const { from, selection, text, to } = change
+    const next = `${field.value.slice(0, from)}${text}${field.value.slice(to)}`
+    if (text !== '' || from !== to) {
+      field.setSelectionRange(from, to)
+      this.insert(field, text)
+    }
+    /* Only where the edit was taken: a refused one left the source, and the
+       selection with it. */
+    if (field.value === next) {
+      field.setSelectionRange(...selection)
+    }
   }
 
   /**
@@ -371,7 +727,9 @@ export class HelixSandboxSource extends HelixElement {
     if (
       focused &&
       typeof ownerDocument.execCommand === 'function' &&
-      ownerDocument.execCommand('insertText', false, text)
+      (text === ''
+        ? ownerDocument.execCommand('delete')
+        : ownerDocument.execCommand('insertText', false, text))
     ) {
       return
     }
@@ -381,7 +739,7 @@ export class HelixSandboxSource extends HelixElement {
 
   protected override render(): TemplateResult {
     const field = this.renderField()
-    if (!this.tokenize && !this.lineNumbers) {
+    if (!this.tokenize && !this.lineNumbers && !this.matchBrackets && !this.complete) {
       return field
     }
     /* A throw is the page's fault and must not cost the reader the field, so
@@ -393,11 +751,18 @@ export class HelixSandboxSource extends HelixElement {
     } catch (error) {
       globalThis.reportError?.(error)
     }
-    const runs = drawnRuns(this.value, given)
-    const draw = (some: readonly SandboxToken[]) =>
-      some.map(({ kind, text }) =>
-        kind ? html`<span part="token" data-kind=${kind}>${text}</span>` : text,
-      )
+    const runs = this.mark(drawnRuns(this.value, given))
+    const draw = (some: readonly Piece[]) =>
+      some.map(({ kind, mark, text }) => {
+        const lone = mark === 'unmatched'
+        const shown =
+          mark === 'anchor'
+            ? html`<span id="anchor"></span>`
+            : mark
+              ? html`<span part="bracket${lone ? ' bracket-unmatched' : ''}">${text}</span>`
+              : text
+        return kind ? html`<span part="token" data-kind=${kind}>${shown}</span>` : shown
+      })
     if (this.lineNumbers) {
       /* A line to a block, so a line that wraps is one block and its number
          stands beside its first row. The gutter is as wide as the last
@@ -407,15 +772,64 @@ export class HelixSandboxSource extends HelixElement {
         <pre part="highlight" aria-hidden="true">${lines.map(
           (line) => html`<span part="line">${draw(line)}</span>`,
         )}</pre>
-        ${field}
+        ${field}${this.renderCompletions()}
       </div>`
     }
     /* The trailing newline gives a last empty line its height, as the field
        gives it one. */
     return html`<div part="field">
       <pre part="highlight" aria-hidden="true">${draw(runs)}${'\n'}</pre>
-      ${field}
+      ${field}${this.renderCompletions()}
     </div>`
+  }
+
+  /**
+   * The runs with the brackets beside the caret and the completions' anchor
+   * marked, where either is on.
+   */
+  private mark(runs: readonly SandboxToken[]): Piece[] {
+    const marks = new Map<number, Mark>()
+    if (this.matchBrackets && this.caret >= 0) {
+      const quiet = quietOf(runs, this.value.length)
+      const found = matchBracket(this.value, this.caret, (index) => quiet[index] === 1)
+      if (found) {
+        marks.set(found.at, found.match === undefined ? 'unmatched' : 'bracket')
+        if (found.match !== undefined) {
+          marks.set(found.match, 'bracket')
+        }
+      }
+    }
+    if (this.offered) {
+      marks.set(this.offered.from, 'anchor')
+    }
+    return cut(runs, marks)
+  }
+
+  /** The list of completions, while it is open. */
+  private renderCompletions(): TemplateResult | typeof nothing {
+    const offered = this.offered
+    if (!offered) {
+      return nothing
+    }
+    return html`<div part="completions" id="completions" role="listbox" aria-label=${this.completionsLabel}>
+      ${offered.words.map((word, at) => {
+        const chosen = at === this.chosen
+        return html`<div part="completion${chosen ? ' completion-active' : ''}" id=${`completion-${at}`}
+          role="option" aria-selected=${chosen ? 'true' : 'false'}
+          @pointerdown=${(event: PointerEvent) => {
+            event.preventDefault()
+            const field = this.field
+            if (field) {
+              this.accept(field, at)
+            }
+          }}>${word}</div>`
+      })}
+    </div>`
+  }
+
+  /** Closes the completions, as the field loses focus. */
+  private readonly close = (): void => {
+    this.offered = undefined
   }
 
   /** The field itself and its description, which is the whole pane without `tokenize`. */
@@ -428,9 +842,14 @@ export class HelixSandboxSource extends HelixElement {
           : this.fieldLabel
       }
       aria-describedby=${this.tabIndents ? 'keys' : nothing}
+      aria-autocomplete=${this.complete ? 'list' : nothing}
+      aria-controls=${this.offered ? 'completions' : nothing}
+      aria-activedescendant=${this.offered ? `completion-${this.chosen}` : nothing}
       spellcheck="false"
       .value=${this.value}
+      @blur=${this.close}
       @focus=${this.reportCaret}
+      @pointerdown=${this.close}
       @input=${this.handleInput}
       @keydown=${this.handleKeydown}
       @keyup=${this.reportCaret}
