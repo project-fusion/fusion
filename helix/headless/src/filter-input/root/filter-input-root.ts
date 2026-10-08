@@ -219,8 +219,8 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * ```
  *
  * In development, a field holding an option nobody registered says so once the
- * page has loaded, with the line to add. The options `source` gives are drawn by
- * the field, which registers them the first time it draws one.
+ * page has loaded, with the line to add. The options `source` gives are drawn
+ * as this Option too, and need the same import.
  *
  * @since 0.1.0
  * @status stable
@@ -1042,8 +1042,8 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
   /**
    * Draws what `source` gave as options in the `suggestions` slot, in place of
    * the ones it gave before, and leaves the ones you slotted alone. The
-   * options are this tier's `Option`, which the field registers the first time
-   * it draws one: you never write these, so their import is not yours.
+   * options are this tier's `Option`, which a page on the headless tier
+   * imports; one not registered is reported.
    */
   private drawSourced(suggestions: readonly FilterSuggestion[]): void {
     for (const option of this.sourced) {
@@ -1051,7 +1051,14 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
     }
     const tag = `${(this.constructor as typeof HelixFormElement).tier}option`
     if (suggestions.length > 0 && !customElements.get(tag)) {
-      void this.defineOption().then(() => this.handleSuggestions())
+      const entry = tag.startsWith('helix-headless-')
+        ? '@fusion.dev/helix-headless'
+        : '@fusion.dev/helix'
+      reportRuntime({
+        kind: 'unregistered-part',
+        message: `<${tag}> is not registered, so the suggestions \`source\` gave cannot be chosen. Import '${entry}/option'.`,
+        tag: this.localName,
+      })
     }
     this.sourced = suggestions.map((suggestion) => {
       const { disabled, label, value } =
@@ -1069,14 +1076,6 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
     })
     this.append(...this.sourced)
     this.handleSuggestions()
-  }
-
-  /**
-   * Registers the option `source`'s suggestions are drawn as, this tier's. The
-   * styled tier imports its own, as each tier imports the elements it draws.
-   */
-  protected defineOption(): Promise<unknown> {
-    return import('../../option/root/index.js')
   }
 
   /**

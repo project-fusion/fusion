@@ -51,10 +51,6 @@ export class HelixListbox extends HelixHeadlessListbox {
     fieldStackedStyles,
     styles,
   ]
-
-  protected override defineOption(): Promise<unknown> {
-    return import('../../option/root/index.js')
-  }
 }
 
 declare global {

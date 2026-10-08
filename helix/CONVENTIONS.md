@@ -344,18 +344,22 @@ import alone. Registering every child in every container would carry each
 child's code in each container. One rule across the containers is something a
 reader can predict, and the reference can state.
 
-**An element a family draws from data is the second rule's, even in light
-DOM.** Listbox draws its tier's options in its own shadow root for `items`, and
-Filter Input appends options to itself for what `source` returns. The page
-wrote neither, so the family registers each with an `import()` the first time
-it draws one, through a `defineOption` each tier overrides, and a list of
-children carries none of the option's code.
+**An option drawn from data is the page's import as well.** Listbox draws its
+tier's options in its own shadow root for `items`, and Filter Input appends
+options to itself for what `source` returns, so by the second rule each would
+register Option. Listbox cannot: Select, Combobox and Command each draw a
+Listbox, so Option would be registered by all three again. An `import()` on the
+first draw was tried and measured: Bun inlined it, Select's styled entry grew by
+2.9 KB gzip where it was meant to shrink, and a Rollup build to one file refused
+the second chunk. So a page using `items` or `source` imports Option as a page
+writing options does, and the audit below reports the draw.
 
 **A missing child is reported once, in development.** A container calls
 core's `auditChildren` with the child's tag and entry; once the page has
 loaded and painted, a child of that tag that is still undefined is reported as
 `unregistered-part`, once for each container and child tag, naming the line to
-add. It is a development-only audit, `#audit-children`, as `missing-name` is.
+add. Listbox calls it with `drawn` when `items` is set, which reports the tag
+without one in the light DOM. It is a development-only audit, `#audit-children`, as `missing-name` is.
 The same kind reports a Filter Menu written without `filter-input/menu`, which
 is the first rule's case: a part with an entry of its own.
 

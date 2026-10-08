@@ -179,7 +179,7 @@ describe('what it says and shows', () => {
     const el = (await mount(
       '<helix-headless-copy-button value="one"></helix-headless-copy-button>',
     )) as Updatable
-    const tip = el.shadowRoot?.querySelector('helix-headless-tooltip') as HTMLElement & {
+    const tip = el.shadowRoot?.querySelector('helix-headless-tooltip') as unknown as {
       internals: ElementInternals
       updateComplete: Promise<unknown>
     }

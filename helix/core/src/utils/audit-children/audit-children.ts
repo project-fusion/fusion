@@ -25,13 +25,17 @@ const reported = new Set<string>()
  *
  * `part` is the child's tag after the tier, such as `option`, and `entry` its
  * family's entry, such as `option`; the host's `tier` gives the rest of both.
- * `consequence` says what the missing child costs, after "so".
+ * `consequence` says what the missing child costs, after "so". `drawn` is for
+ * children the host draws from data, such as the options of Listbox's `items`:
+ * the page wrote none, so an undefined tag is reported without one in the
+ * host's light DOM.
  */
 export const auditChildren = (
   host: HTMLElement,
   part: string,
   entry: string,
   consequence: string,
+  drawn = false,
 ): void => {
   if (typeof window === 'undefined') {
     return
@@ -47,7 +51,7 @@ export const auditChildren = (
       reported.has(key) ||
       !host.isConnected ||
       customElements.get(tag) !== undefined ||
-      host.querySelector(tag) === null
+      (!drawn && host.querySelector(tag) === null)
     ) {
       return
     }

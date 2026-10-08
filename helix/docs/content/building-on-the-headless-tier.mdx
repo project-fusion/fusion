@@ -90,8 +90,7 @@ A select renders none of the options you write in it, so `acme-select` needs
 your `acme-option` registered beside it. In development, a component holding a
 child of its tier that nobody registered says so once, with the import to add.
 A listbox given `items` and a filter input given a `source` draw options of
-their own, and register them through `defineOption`, which imports this
-package's option. Override it on your subclass to register `acme-option`.
+your tier from data, and those need `acme-option` registered too.
 
 We generate the table from the manifest, which publishes the graph as
 `helix.renders` on every element that interpolates a tag. We kept the table by

@@ -151,8 +151,8 @@ type Entry = HelixHeadlessOption | (DataOption & { href?: undefined })
  * ```
  *
  * In development, a list holding an option nobody registered says so once the
- * page has loaded, with the line to add. The options `items` draws are the
- * list's own, which it registers the first time it draws them.
+ * page has loaded, with the line to add. The options `items` draws are this
+ * Option too, and need the same import.
  *
  * @since 0.1.0
  * @status stable
@@ -336,8 +336,8 @@ export class HelixHeadlessListbox extends MixinCollection(
    *
    * **The list needs a height to scroll in**: the styled tier's
    * `--listbox-max-block-size`, or a `max-block-size` on `::part(items)` in the
-   * headless tier. The options drawn are this tier's Option, which the list
-   * registers the first time it draws them.
+   * headless tier. The options drawn are this tier's Option, which the page
+   * imports, as it imports the options it writes.
    * A server sends the list empty, and the options are drawn once it hydrates.
    */
   @property({ attribute: false })
@@ -731,14 +731,6 @@ export class HelixHeadlessListbox extends MixinCollection(
    */
   private get groups(): HTMLElement[] {
     return this.among((node) => node.localName.endsWith('-option-group'), this.children)
-  }
-
-  /**
-   * Registers the option `items` draws, this tier's. The styled tier imports its
-   * own, as each tier imports the elements it draws.
-   */
-  protected defineOption(): Promise<unknown> {
-    return import('../../option/root/index.js')
   }
 
   /** Every option the list reads: the records of `items`, or the elements. */
@@ -1281,12 +1273,11 @@ export class HelixHeadlessListbox extends MixinCollection(
     if (this.childrenKnown) {
       this.seedDeclared()
     }
-    /* The options `items` draws are drawn in this shadow root, where the page
-       never writes one, so the list registers them itself, and only once it
-       draws them: a list of children carries none of the option's code. */
-    const { tier } = this.constructor as typeof HelixFormElement
-    if (changed.has('items') && this.items && !customElements.get(`${tier}option`)) {
-      void this.defineOption()
+    /* The options `items` draws are the Option family's, the page's import as
+       the options it writes are: registering them here would register them in
+       every Select, Combobox and Command, which each draw a list. */
+    if (changed.has('items') && this.items) {
+      auditChildren(this, 'option', 'option', 'the items draw no choices', true)
     }
     /* Before the render, so the empty state and the matches it draws are this
        update's rather than the last one's. Not on the server, whose element
