@@ -39,6 +39,10 @@ export interface AriaForwardOptions {
    * How to name the control, said in a warning when it has no accessible
    * name once it has rendered. Absent, the name is not checked.
    *
+   * A sentence, or the key of one `audit-name.ts` keeps, as `'button'` is. A
+   * key keeps the sentence out of a production build, where the check does
+   * nothing.
+   *
    * For a control named by its content or a host attribute, as a button is. A
    * field is checked by `MixinField`, which knows its label.
    */

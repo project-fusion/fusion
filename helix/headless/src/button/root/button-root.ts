@@ -93,7 +93,7 @@ export class HelixHeadlessButton extends HelixFormElementBase {
   protected readonly aria = new AriaForwardController(this, {
     label: () => this.forwardsLabel,
     target: () => this.partNamed('button'),
-    unnamed: 'Give it words, a `label`, or an `aria-label`.',
+    unnamed: 'button',
   })
 
   /**

@@ -80,6 +80,20 @@ const implicitRole = (element: HTMLElement): string => {
   return element.localName === 'a' && element.hasAttribute('href') ? 'link' : ''
 }
 
+/**
+ * The sentences a control names by a key, so its words ship in a development
+ * build only.
+ *
+ * **A sentence passed as an argument is in every build.** The call is a no-op
+ * in production, and the string it is handed is still in the bundle: measured
+ * on the styled Button bundled alone, October 7, 2026, its sentence was 52 bytes
+ * brotli. A key costs a word, and the sentence lives here.
+ */
+const FIXES = new Map([
+  ['button', 'Give it words, a `label`, or an `aria-label`.'],
+  ['virtual-list', 'Give it a `label`, or an `aria-label` that says what the items are.'],
+])
+
 /** The elements whose name has been read, so each is warned about once. */
 const audited = new WeakSet<HTMLElement>()
 
@@ -120,9 +134,9 @@ const readWaiting = (): void => {
  * read: the host is then read again the next time it asks.
  *
  * `also` answers for a name the component gave through its internals, which no
- * attribute shows. `fix` is the sentence that says how to name it. `shown` is
- * the part where the control shows its value or its placeholder, whose words
- * are no name.
+ * attribute shows. `fix` is the sentence that says how to name it, or its key
+ * in `FIXES`. `shown` is the part where the control shows its value or its
+ * placeholder, whose words are no name.
  */
 export const auditName = (
   host: HTMLElement,
@@ -155,11 +169,12 @@ export const auditName = (
       return
     }
     const placeholder = [host, inner].some((one) => one?.getAttribute('placeholder')?.trim())
+    const sentence = FIXES.get(fix) ?? fix
     reportRuntime({
       kind: 'missing-name',
       message: placeholder
-        ? `<${host.localName}> is named only by its placeholder, which is gone once a person types. ${fix}`
-        : `<${host.localName}> has no accessible name, so a screen reader announces it by its role alone. ${fix}`,
+        ? `<${host.localName}> is named only by its placeholder, which is gone once a person types. ${sentence}`
+        : `<${host.localName}> has no accessible name, so a screen reader announces it by its role alone. ${sentence}`,
       tag: host.localName,
     })
   })
