@@ -97,7 +97,7 @@ gh api "repos/$REPO/contents/fusion/scripts/bump.mjs?ref=$BASE_SHA" \
 # highest major rather than the last tag: refs come back in alphabetical order,
 # where `v9` sits after `v10`.
 zero=''
-for domain in helix cortex; do
+for domain in helix cortex proof; do
   major=$(gh api "repos/$REPO/git/matching-refs/tags/$domain-v" \
     --jq "[.[].ref | sub(\"^refs/tags/$domain-v\"; \"\") | split(\".\")[0] | tonumber?] | max // 0")
   if [ "$major" = '0' ]; then
@@ -115,7 +115,7 @@ report=$(
   echo "### What merging this would release"
   echo
   if [ "$resolved" = '[]' ]; then
-    echo 'Nothing. No subject carries a `helix` or `cortex` scope with a releasing type.'
+    echo 'Nothing. No subject carries a `helix`, `cortex`, or `proof` scope with a releasing type.'
   else
     jq -r '.[] | "- `\(.domain)`: **\(.level)**"' <<<"$resolved"
   fi

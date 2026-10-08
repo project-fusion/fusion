@@ -35,9 +35,10 @@ describe('which types release', () => {
 })
 
 describe('which scopes release', () => {
-  test('both domains, and the first segment names them', () => {
+  test('every domain, and the first segment names them', () => {
     expect(resolve(['fix(helix/cli): x'])).toEqual([{ domain: 'helix', level: 'patch' }])
     expect(resolve(['fix(cortex/docs): x'])).toEqual([{ domain: 'cortex', level: 'patch' }])
+    expect(resolve(['feat(proof/cli): x'])).toEqual([{ domain: 'proof', level: 'minor' }])
   })
 
   test('a scope outside them, or none at all, releases nothing', () => {

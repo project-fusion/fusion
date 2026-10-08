@@ -1,14 +1,15 @@
-# The `helix` binary, built for every platform package.
+# The `helix` and `proof` binaries, built for every platform package.
 #
 # Called by `release.yml` and `release-experimental.yml` before they pack, with
-# the version they are about to publish. Each binary lands as an artifact named
-# for its platform package, the release puts it where that package's `files`
-# says, and `publish.mjs` refuses a platform package without it:
-# [RELEASING.md](../RELEASING.md#the-binary).
+# the domain and the version they are about to publish. Each binary lands as an
+# artifact named for its platform package, the release puts it where that
+# package's `files` says, and `publish.mjs` refuses a platform package without
+# it: [RELEASING.md](../RELEASING.md#the-binary).
 #
-# **And on a pull request that could break one**, at the placeholder and
-# uploading nothing. A platform that stops compiling would otherwise be found
-# by the release, which then ships no Helix at all until somebody fixes it.
+# **And on a pull request that could break one**, both domains, at the
+# placeholder and uploading nothing. A platform that stops compiling would
+# otherwise be found by the release, which then ships nothing of that domain
+# until somebody fixes it.
 #
 # **One build serves many releases.** The binary reads its version from the
 # package installed beside it rather than compiling one in, so the cache below
@@ -20,6 +21,10 @@ name: binaries
 on:
   workflow_call:
     inputs:
+      domain:
+        description: The domain whose command line to build, `helix` or `proof`.
+        required: true
+        type: string
       version:
         description: The version being published, which each binary is proved to report once installed.
         required: true
@@ -29,22 +34,31 @@ on:
       - .github/workflows/binaries.yml
       - Cargo.lock
       - Cargo.toml
-      # The two crates the binary is built from, beside its own.
+      # The crates each binary is built from, beside its own.
       - fusion/rules/**
       - helix/cli/**
       - helix/theme/**
+      - proof/cli/**
 
 permissions:
   contents: read
 
 jobs:
   build:
-    name: build (${{ matrix.platform }})
+    name: build (${{ matrix.domain }}, ${{ matrix.platform }})
     strategy:
       # A platform with no binary is a release that installs a command running
       # nothing there, so the first failure is the answer.
       fail-fast: true
       matrix:
+        # The one domain a release asked for, and both on a pull request.
+        domain: ${{ fromJSON(inputs.domain && format('["{0}"]', inputs.domain) || '["helix", "proof"]') }}
+        platform: [darwin-arm64, darwin-x64, linux-arm64, linux-x64, win32-x64]
+        # **Keyed on `platform` alone.** An entry naming a domain matches no
+        # combination when the release asked for the other one, and GitHub then
+        # adds it as a job of its own, with no runner. What differs by domain
+        # is derived from its name below: the crate is `fusion-<domain>-cli`
+        # and the platform package is read from the tree.
         include:
           - platform: darwin-arm64
             runner: macos-14
@@ -71,7 +85,7 @@ jobs:
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 30
     env:
-      BINARY: target/${{ matrix.target }}/release/helix${{ startsWith(matrix.platform, 'win32') && '.exe' || '' }}
+      BINARY: target/${{ matrix.target }}/release/${{ matrix.domain }}${{ startsWith(matrix.platform, 'win32') && '.exe' || '' }}
       # What the proof below holds the binary to. A pull request has no release
       # to be about, and the placeholder is deliberately not the `0.0.0-dev` the
       # crate compiles at: the check is that the binary read the manifest beside
@@ -96,20 +110,29 @@ jobs:
       #
       # **Narrower than this workflow's `pull_request` filter, on purpose.**
       # That filter says what could break a build and this says what changes
-      # one. `helix/cli/**` covered the npm manifests, which the release stamps
-      # on every publish, and `helix/theme/**` covers that package's TypeScript,
-      # which the crate does not read: hashing either meant a key that moved
-      # when the binary did not. The crate's sources are `helix/theme/rust`.
+      # one. `helix/cli/**` and `proof/cli/**` cover the npm manifests, which
+      # the release stamps on every publish, and `helix/theme/**` covers that
+      # package's TypeScript, which the crate does not read: hashing any of them
+      # meant a key that moved when the binary did not. The crate's sources are
+      # `helix/theme/rust`.
+      #
+      # **One list per domain**, so a change to one binary's sources leaves the
+      # other's cached build where it is.
       - name: Restore a binary built from these sources
         id: built
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           key: >-
-            helix-cli-${{ matrix.target }}-${{ hashFiles(
+            ${{ matrix.domain }}-cli-${{ matrix.target }}-${{ matrix.domain == 'helix'
+            && hashFiles(
             '.github/workflows/binaries.yml', 'Cargo.lock', 'Cargo.toml',
             'fusion/rules/Cargo.toml', 'fusion/rules/src/**',
             'helix/cli/Cargo.toml', 'helix/cli/src/**',
-            'helix/theme/Cargo.toml', 'helix/theme/rust/**') }}
+            'helix/theme/Cargo.toml', 'helix/theme/rust/**')
+            || hashFiles(
+            '.github/workflows/binaries.yml', 'Cargo.lock', 'Cargo.toml',
+            'fusion/rules/Cargo.toml', 'fusion/rules/src/**',
+            'proof/cli/Cargo.toml', 'proof/cli/src/**') }}
           path: ${{ env.BINARY }}
 
       # Statically linked, so one binary runs on a glibc distribution and on
@@ -135,7 +158,7 @@ jobs:
       # `Cargo.lock` naming a version the tree no longer had.
       - name: Build
         if: steps.built.outputs.cache-hit != 'true'
-        run: cargo build --release --locked -p fusion-helix-cli --target ${{ matrix.target }}
+        run: cargo build --release --locked -p fusion-${{ matrix.domain }}-cli --target ${{ matrix.target }}
 
       # **The version a consumer would see, which is the binary with its package
       # beside it.** That manifest is what the binary reads, so the check has to
@@ -159,11 +182,15 @@ jobs:
           mkdir -p "$installed"
           name=$(basename "$BINARY")
           cp "$BINARY" "$installed/$name"
-          printf '{ "name": "@fusion.dev/helix-cli-%s", "version": "%s" }\n' \
-            "$PLATFORM" "$VERSION" >"$installed/package.json"
+          # The platform package's own name, read from the tree, which is the
+          # name the binary accepts a manifest under.
+          package=$(jq -r .name "$DOMAIN/cli/platforms/$PLATFORM/package.json")
+          printf '{ "name": "%s", "version": "%s" }\n' \
+            "$package" "$VERSION" >"$installed/package.json"
           said=$("./$installed/$name" --version)
-          [ "$said" = "helix $VERSION" ] || { echo "::error::$BINARY says '$said', not 'helix $VERSION'"; exit 1; }
+          [ "$said" = "$DOMAIN $VERSION" ] || { echo "::error::$BINARY says '$said', not '$DOMAIN $VERSION'"; exit 1; }
         env:
+          DOMAIN: ${{ matrix.domain }}
           PLATFORM: ${{ matrix.platform }}
 
       - name: Upload
@@ -171,5 +198,5 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           if-no-files-found: error
-          name: helix-cli-${{ matrix.platform }}
+          name: ${{ matrix.domain }}-cli-${{ matrix.platform }}
           path: ${{ env.BINARY }}
