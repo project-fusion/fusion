@@ -41,7 +41,7 @@ describe('stat', () => {
 
   test('the figure is on the display face at a size that scales with its surroundings', () => {
     /* A ratio off the ramp rather than a rung, because a figure in a donut's
-       hole has to grow with the ring, and a 44px number does not. */
+       hole has to grow with the ring, and a 42px number does not. */
     const value = rule('helix-stat', '[part="value"]')
     expect(value).toContain('font-family: var(--helix-font-display)')
     expect(value).toContain(
