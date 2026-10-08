@@ -2,8 +2,14 @@
  * The landing page: its light, its bands and the rhythm between them.
  */
 
-/* The containing block for the aura, which is absolute against it. */
+/* The page under the header, and the stacking context the strands sit in. */
 .reel {
+  /* **Its own stacking context, so the strands behind it show.** Strands in
+     `travel` sits at `--helix-layer-beneath`, and without this it went beneath
+     the theme scope's own ground, which is opaque, and nothing of it showed but
+     what the translucent header let through. Isolation does not start a
+     backdrop root, so the glass over it still blurs it. */
+  isolation: isolate;
   /*
  * *Clipped, because an absolutely positioned child pushes the page taller.**
  *      Abspos boxes do not take part in flow but they do contribute scrollable
@@ -47,33 +53,11 @@
  * nearest ancestor that does form one and paints behind that element's opaque
  * background, and the field disappears. `.reel > section` is what orders this.
  */
-.reelAura {
-  /* Absolute against the reel, not fixed against the window. Fixed pins the
-     light to the viewport, so the content slides over a field that never moves,
-     which is a wallpaper rather than a page. */
-  block-size: auto;
-  inset: 0;
-  /* Half strength. The field is the page's ground rather than its subject.
-     `gain` was the other lever and flattens the braid: it brightens the lit
-     parts and leaves the dark ones, where opacity takes the whole field down
-     evenly and keeps its shape.
-
-     Safe on this element specifically: an opacity below 1 makes a backdrop root
-     of its own descendants, and this has none. */
-  opacity: 0.5;
-  /* **Faded out at the bottom, because the shape does not reliably do it.** Each
-   shape ends with a vertical envelope written against an unscaled box, and
-   `scale` multiplies the sampled coordinates after the rotation, so the light
-   can reach past the edge and simply stop where the canvas does. A mask holds
-   for every shape, tilt and scale, including the ones nobody has tried.
-
-   The mark is late because the fade only has to begin below the last thing a
-   reader looks at. Measured at 1200 wide: the 98 percent mark falls at 6499
-   and the closing call to action stops around 6452, so it runs in the padding
-   under it. */
-  mask-image: linear-gradient(to bottom, black 0%, black 98%, transparent 100%);
+/* **Strands, behind the whole page.** With `travel` the element fixes itself
+   to the viewport beneath the content and lays one strand down the page, so it
+   needs no box here, only to stay out of the way of the pointer. */
+.reelStrands {
   pointer-events: none;
-  position: absolute;
 }
 
 /* Every band sits over the light, so every band has to be positioned or it
@@ -385,10 +369,28 @@
  * would have reversed the cascade for every future rule too. Naming the
  * attribute three times reaches (0,4,0) and wins on the same terms.
  */
+/* **The close stands apart in the brand's own fill.** Every card above it is
+   glass, so the one place the page asks for something is the one solid object
+   on it, and its words and button invert to stay readable on the fill. */
 .noRules :global([data-closing][data-closing][data-closing]) {
-  backdrop-filter: var(--site-glass-backdrop);
-  background: var(--site-glass);
+  backdrop-filter: none;
+  background: var(--helix-color-primary-surface);
   border-color: transparent;
+  box-shadow: 0 24px 60px -30px color-mix(in oklab, var(--helix-color-primary-surface) 70%, transparent);
+  color: var(--helix-color-foreground-on-primary);
+}
+
+.closingCard :global([data-section-title]),
+.closingCard :global(helix-text) {
+  --text-color: var(--helix-color-foreground-on-primary);
+
+  color: var(--helix-color-foreground-on-primary);
+}
+
+.closingCard :global([data-button][data-button]) {
+  background: var(--helix-color-foreground-on-primary);
+  border-color: var(--helix-color-foreground-on-primary);
+  color: var(--helix-color-primary-surface);
 }
 
 /* ── The figure answers the pointer ────────────────────────────────── */
@@ -458,15 +460,16 @@
    elements are made of glass, because that is a page saying what its panels are.
    See `[data-substrate]` there. */
 
-/**
- * Room at the foot of the page for the pill to float over nothing.
- */
-.fabClearance {
-  padding-block-end: calc(
-    var(--helix-space-lg) *
-    2 +
-    var(--helix-size-control-md) +
-    var(--helix-space-2xs) +
-    env(safe-area-inset-bottom, 0px)
-  );
+
+/* The showcase band's words, on the field beside the live panel. On a phone
+   the shell has no inset, so the words take one back, as `.fieldStack` does. */
+.split {
+  align-items: start;
+  gap: var(--helix-space-xl);
+}
+
+@media (max-width: 40rem) {
+  .split > :first-child {
+    padding-inline: var(--site-inset);
+  }
 }
