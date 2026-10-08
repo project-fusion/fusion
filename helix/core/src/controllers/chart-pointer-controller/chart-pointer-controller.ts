@@ -56,6 +56,12 @@ export interface ChartPointerHost extends ReactiveControllerHost, HTMLElement {
    */
   showsReading?(at: number): boolean
   /**
+   * The readings in the order the keys walk them, by place, for a chart whose
+   * drawing does not follow the table: a scatter's points from left to right.
+   * Absent, the keys walk the table's order.
+   */
+  readingOrder?(): number[]
+  /**
    * Where PageUp or PageDown goes from the reading at `at`, by place among the
    * readings, for a chart whose page is no fixed count: a calendar's month.
    * Undefined keeps the fixed page.
@@ -292,7 +298,7 @@ export class ChartPointerController implements ReactiveController {
    */
   private shown(): number[] {
     const host = this.host
-    const all = Array.from({ length: host.readings }, (_, at) => at)
+    const all = host.readingOrder?.() ?? Array.from({ length: host.readings }, (_, at) => at)
     return host.showsReading === undefined
       ? all
       : all.filter((at) => host.showsReading?.(at) !== false)

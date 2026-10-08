@@ -1,8 +1,8 @@
 /*
  *  The words a chart shows in place of its drawing: `empty-text` when the table
  *    has no readings and `loading-text` while they load, or what a page slotted
- *    for either. Shared by the four charts on axes, which take them from one
- *    mixin and draw them in the same box.
+ *    for either. Shared by the four charts on axes and Donut Chart, which take
+ *    them from one mixin and draw them in the same box.
  *
  *  In the middle of the plot, which keeps the height it has with a drawing, so
  *    the page does not move when the readings arrive.
@@ -18,4 +18,16 @@
   place-content: center;
   position: absolute;
   text-align: center;
+}
+
+/* The readings as a table, drawn where they came from `data`: read by a
+   screen reader, and not shown, the chart being the picture of it. */
+[part="table"] {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  margin: var(--helix-space-none);
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
 }

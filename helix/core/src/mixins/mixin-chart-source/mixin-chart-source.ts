@@ -1,4 +1,4 @@
-import type { PropertyValues } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { ChartPointerController } from '../../controllers/chart-pointer-controller/chart-pointer-controller.js'
 import { SourceController } from '../../controllers/source-controller/source-controller.js'
@@ -215,6 +215,11 @@ export declare class MixinChartSourceInterface {
    * Finds the reading nearest the pointer, so the tooltip can sit on it.
    */
   pointer: ChartPointerController
+  /**
+   * The readings as a table, for a screen reader, where they were drawn from
+   * `data`: there is then no table on the page to read. Nothing otherwise.
+   */
+  protected renderTable(): TemplateResult | typeof nothing
 }
 
 /**
@@ -252,7 +257,9 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
     protected readonly source = new SourceController(this)
 
     /**
-     * Finds the reading nearest the pointer, so the tooltip can sit on it.
+     * @internal Finds the reading nearest the pointer, so the tooltip can sit
+     * on it. Left out of the manifest: a page hears the reading through
+     * `helix-reading-change`.
      *
      * Public for the same reason `series` and `named` are: a protected member
      * cannot be cast onto across unrelated classes, so it would be invisible to
@@ -334,7 +341,7 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
     positionLabel = '{position} of {count}'
 
     /**
-     * Hears an `aria-label` written on the chart, which no property mirrors,
+     * @internal Hears an `aria-label` written on the chart, which no property mirrors,
      * so a page that names the chart that way names its plot.
      *
      * Lit observes the attributes of its own properties only, and `ariaLabel`
@@ -353,8 +360,8 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
     }
 
     /**
-     * Called by the browser when an observed attribute changes. A new
-     * `aria-label` asks for an update, because it names the plot.
+     * @internal Called by the browser when an observed attribute changes. A
+     * new `aria-label` asks for an update, because it names the plot.
      */
     override attributeChangedCallback(
       name: string,
@@ -417,8 +424,8 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
     }
 
     /**
-     * Whether the readings have been looked for: false on the server and
-     * while hydrating, where no table is resolved and no data is read. A
+     * @internal Whether the readings have been looked for: false on the server
+     * and while hydrating, where no table is resolved and no data is read. A
      * chart says it has no readings only once this is true.
      */
     get readingsKnown(): boolean {
@@ -426,7 +433,7 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
     }
 
     /**
-     * Every row of the table, with each cell's text and number.
+     * @internal Every row of the table, with each cell's text and number.
      *
      * This is where a tooltip's content comes from, and it is deliberately not
      * `series`. A chart draws numbers; a reader resting a pointer on one wants
@@ -517,7 +524,32 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
     get readings(): number {
       return this.sourceRows.length
     }
+
+    /**
+     * The readings as a table, for a screen reader, where they were drawn from
+     * `data`: there is then no table on the page to read, and a chart's
+     * summary gives only what the readings come to. Nothing where a table on
+     * the page was read, which is already the readable version.
+     *
+     * The `table` part, named by the chart, its cells as `data` writes them.
+     */
+    protected renderTable(): TemplateResult | typeof nothing {
+      const rows = this.sourceRows
+      if (this.source.element || rows.length === 0) {
+        return nothing
+      }
+      const width = Math.max(...rows.map((row) => row.cells.length))
+      const columns = Array.from({ length: width }, (_, cell) => this.columnName(cell))
+      return html`<table part="table">
+        ${this.named ? html`<caption>${this.named}</caption>` : nothing}
+        <thead><tr><th scope="col">${this.data?.columns[0] ?? ''}</th>${columns.map((name) => html`<th scope="col">${name}</th>`)}</tr></thead>
+        <tbody>${rows.map(
+          (row) =>
+            html`<tr><th scope="row">${row.label}</th>${columns.map((_, cell) => html`<td>${row.cells[cell]?.text ?? ''}</td>`)}</tr>`,
+        )}</tbody>
+      </table>`
+    }
   }
 
-  return ChartSourceElement as T & Constructor<MixinChartSourceInterface>
+  return ChartSourceElement as unknown as T & Constructor<MixinChartSourceInterface>
 }
