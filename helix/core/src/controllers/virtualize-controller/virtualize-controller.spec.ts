@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, test } from 'bun:test'
 import { VirtualizeController } from './virtualize-controller.js'
+import { Waterfall } from './waterfall.js'
 
 /**
  * The arithmetic on its own, with a box that reports numbers and nothing else.
@@ -976,5 +977,76 @@ describe('a reader in the middle of a fling', () => {
     expect(box.scrollTop).toBe(500)
     expect(controller.offsetOf(50)).toBe(520)
     controller.hostDisconnected()
+  })
+})
+
+/* A waterfall: items down several columns, each under the column that ends
+   highest. The window is every item that reaches into the box. */
+describe('a set laid out as a waterfall', () => {
+  const laid = (scrollTop: number, heights: number[] = []) => {
+    const owner = host()
+    const box = scroller(scrollTop, 100)
+    const waterfall = new Waterfall()
+    waterfall.lanes = 3
+    let rows = drawn(heights)
+    const controller = new VirtualizeController(owner, {
+      container: () => box,
+      count: () => 300,
+      estimate: () => 20,
+      overscan: 0,
+      rows: () => rows,
+      waterfall: () => waterfall,
+    })
+    controller.measure()
+    return {
+      box,
+      controller,
+      owner,
+      redraw: (next: number[], from = 0) => {
+        rows = drawn(next, from)
+        controller.hostUpdated()
+      },
+      waterfall,
+    }
+  }
+
+  test('draws every item that reaches into the box, a line of three at a time', () => {
+    // Every item at 20, three to a line: the box of 100 holds five lines.
+    const { controller } = laid(0)
+    expect(controller.window).toEqual({ after: 0, before: 0, first: 0, last: 15 })
+    expect(controller.extent()).toBe(2000)
+    const { controller: down } = laid(200)
+    expect(down.window.first).toBe(30)
+    expect(down.visible()).toEqual({ first: 30, last: 45 })
+  })
+
+  test('places each item by its measured height, and asks for the render that moves it', () => {
+    const { controller, owner, waterfall, redraw } = laid(0)
+    const asked = owner.updates
+    redraw([90, 10, 10, 10, 10])
+    // Items 1 and 2 are short, so items 3 and 4 go under them.
+    expect([3, 4, 5].map((at) => waterfall.lane(at))).toEqual([1, 2, 1])
+    expect(controller.offsetOf(5)).toBe(20)
+    expect(owner.updates).toBeGreaterThan(asked)
+  })
+
+  test('scrolls to an item where its column puts it', () => {
+    const { box, controller } = laid(0)
+    controller.reveal(31, 0, { align: 'start' })
+    expect(box.scrollTop).toBe(200)
+  })
+
+  test('is not laid out by a list that measures one column', () => {
+    const box = scroller(0, 100)
+    const controller = new VirtualizeController(host(), {
+      container: () => box,
+      count: () => 300,
+      estimate: () => 20,
+      overscan: 0,
+      rows: () => [],
+    })
+    controller.measure()
+    expect(controller.window.last).toBe(5)
+    expect(controller.extent()).toBe(6000)
   })
 })

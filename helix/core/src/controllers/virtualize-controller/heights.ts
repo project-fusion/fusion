@@ -34,6 +34,9 @@ export class Heights {
   /** The estimate the sums were built against, so a change to it rebuilds. */
   private built = 0
 
+  /** Counts each change to a height, for a placement built from them. */
+  private changes = 0
+
   constructor(estimate: () => number) {
     this.estimate = estimate
   }
@@ -70,6 +73,7 @@ export class Heights {
       return false
     }
     this.dirty = Math.min(this.dirty, index)
+    this.changes += 1
     return true
   }
 
@@ -77,6 +81,14 @@ export class Heights {
   before(index: number, count: number): number {
     this.build(count)
     return this.sums[Math.max(0, Math.min(index, count))] ?? 0
+  }
+
+  /**
+   * Says which heights these are: a placement built from a stamp it was
+   * given again holds, and one built from another stamp is out of date.
+   */
+  stamp(): string {
+    return `${this.changes}:${this.estimate()}`
   }
 
   /** The room the whole set takes. */
@@ -130,6 +142,7 @@ export class Heights {
       }
     }
     this.dirty = 0
+    this.changes += 1
   }
 
   /**
@@ -143,6 +156,7 @@ export class Heights {
     this.seen.clear()
     this.dirty = 0
     this.sums = [0]
+    this.changes += 1
   }
 
   /** Brings the sums up to date, from the first index that changed. */
