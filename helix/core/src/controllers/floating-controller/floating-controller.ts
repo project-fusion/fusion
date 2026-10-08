@@ -132,7 +132,7 @@ export interface FloatingOptions {
    * On by default. A menu that opens off the bottom of the window is one the
    * reader cannot use.
    */
-  flip?: boolean
+  flip?: boolean | (() => boolean)
 
   /**
    * Told the placement the element landed on, after every measurement, and
@@ -372,7 +372,8 @@ export class FloatingController implements ReactiveController {
     const edge = asked === undefined ? {} : { padding: asked }
     const middleware: Middleware[] = [offset({ crossAxis: cross, mainAxis: gap ?? 0 })]
     let room: number | undefined
-    if (this.options.flip !== false) {
+    const flips = typeof this.options.flip === 'function' ? this.options.flip() : this.options.flip
+    if (flips !== false) {
       const side = (preferred ?? 'bottom-start').split('-')[0]
       /* **A panel beside its anchor may leave for the axis across, and one
          above or below may not.** The asymmetry is the one `size` makes further

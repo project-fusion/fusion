@@ -558,6 +558,13 @@ describe('where the panel opens', () => {
     expect(host.placedAgainst).toBe(host.querySelector('[slot="trigger"]') as HTMLElement)
   })
 
+  test('`flip` is on unless written false, as React Aria’s `shouldFlip`', async () => {
+    const plain = (await popover()) as Popover & { flip: boolean }
+    expect(plain.flip).toBe(true)
+    const kept = (await popover('flip="false"')) as Popover & { flip: boolean }
+    expect(kept.flip).toBe(false)
+  })
+
   test('the alignment it landed on is a state, beside the side', async () => {
     const host = await popover('placement="bottom-end"')
     host.show()
