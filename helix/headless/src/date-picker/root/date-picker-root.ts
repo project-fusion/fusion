@@ -40,6 +40,12 @@ import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
+/**
+ * The date the bad-input message names, its day past twelve so no order of day
+ * and month misreads it.
+ */
+const EXAMPLE = '2026-08-24'
+
 /** Keys the grid answers to, per the APG date grid. */
 const KEYS = new Set([
   'ArrowDown',
@@ -181,13 +187,17 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
    * **Every sentence a control raises in the browser's bubble is a property**,
    * named for the validity flag it reports, so a form in another language
    * speaks it. Unset is the sentence registered for the page's language, then
-   * the English. `{mode}` is `single`, `range` or `multiple`, so each can have
-   * its own sentence.
+   * the English. `{example}` is a date written as the calendar names one,
+   * `August 24, 2026` in `en-US` and `24. August 2026` in `de-DE`, and `{mode}`
+   * is `single`, `range` or `multiple`, so each can have its own sentence.
+   *
+   * **The default names a date in words.** It said "Enter a date as
+   * YYYY-MM-DD.", and a pattern token is words for a developer.
    */
   @words
   @property({ attribute: 'bad-input-message' })
   badInputMessage =
-    '{mode, select, single {Enter a date as YYYY-MM-DD.} other {Enter dates as YYYY-MM-DD, separated by commas.}}'
+    '{mode, select, single {Enter a date such as {example}.} other {Enter dates such as {example}, separated by commas.}}'
 
   /**
    * The calendar the heading, the days, and the months are written in.
@@ -1221,7 +1231,10 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
     if (held.length > 0 && held.some((one) => asDate(one) === null)) {
       return [
         { badInput: true },
-        formatWords(this, 'badInputMessage', { mode: this.mode ?? 'single' }),
+        formatWords(this, 'badInputMessage', {
+          example: this.spoken(EXAMPLE),
+          mode: this.mode ?? 'single',
+        }),
       ]
     }
     for (const one of held) {

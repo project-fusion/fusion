@@ -46,10 +46,13 @@ describe('a date picker on a page in another language', () => {
     expect(bubble(host)).toBe('Wähle ein Datum ab dem 10. März 2026.')
   })
 
-  test('says the sentence for its mode where a value is no date', async () => {
-    expect(bubble(await picker('', 'value="not-a-date"'))).toBe('Enter a date as YYYY-MM-DD.')
-    expect(bubble(await picker('', 'mode="multiple" value="not-a-date"'))).toBe(
-      'Enter dates as YYYY-MM-DD, separated by commas.',
+  /* It named a pattern token, "Enter a date as YYYY-MM-DD.". */
+  test('says the sentence for its mode where a value is no date, with a date in words', async () => {
+    expect(bubble(await picker('', 'locale="en-US" value="not-a-date"'))).toBe(
+      'Enter a date such as August 24, 2026.',
+    )
+    expect(bubble(await picker('lang="de"', 'mode="multiple" value="not-a-date"'))).toBe(
+      'Enter dates such as 24. August 2026, separated by commas.',
     )
   })
 
