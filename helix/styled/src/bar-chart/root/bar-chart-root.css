@@ -64,18 +64,25 @@
  *
  * Rounding every segment cuts a notch at each join. The headless tier marks
  * the outermost segment in each direction as `bar-end`, and the segments
- * between meet square. The end below zero grows the other way, so its round
- * corners are the bottom ones, or the left ones when the bars run across.
+ * between meet square.
  */
 :host([stacked]) [part~="bar"]:not([part~="bar-end"]) {
   --_bar-chart-corners: 0;
 }
 
-:host([stacked]) [part~="bar-end"][data-end="negative"] {
+/*
+ *  A bar below zero grows the other way, so its far end is the other end.
+ *
+ * Its round corners are the bottom ones, or the left ones when the bars run
+ * across, and it meets the baseline square. The headless tier names every far
+ * end below zero `bar-end-negative`, a column standing alone or the end of a
+ * stack. A right-to-left page mirrors the whole drawing, and the clip with it.
+ */
+[part~="bar-end-negative"] {
   --_bar-chart-corners: 0 0 var(--bar-chart-bar-radius, 2px) var(--bar-chart-bar-radius, 2px);
 }
 
-:host([stacked][orientation="horizontal"]) [part~="bar-end"][data-end="negative"] {
+:host([orientation="horizontal"]) [part~="bar-end-negative"] {
   --_bar-chart-corners: var(--bar-chart-bar-radius, 2px) 0 0 var(--bar-chart-bar-radius, 2px);
 }
 
