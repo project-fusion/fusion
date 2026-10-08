@@ -382,3 +382,63 @@ describe('what a sheet can read of the group', () => {
     expect(hasState(group, 'pressed')).toBe(true)
   })
 })
+
+describe('a disabled button group', () => {
+  type Disableable = Group & { disabled: boolean; internals?: ElementInternals }
+
+  test('disables every button in it and says so on the group, as React Aria isDisabled does', async () => {
+    const group = (await mountGroup(view.replace('label=', 'disabled label='))) as Disableable
+    expect(group.internals?.ariaDisabled).toBe('true')
+    expect(
+      buttonsOf(group).map((button) => (button as Pressable & { disabled: boolean }).disabled),
+    ).toEqual([true, true, true])
+    inner(buttonsOf(group)[0] as Element).click()
+    await flush(group)
+    expect(group.value).toBe('week')
+  })
+
+  test('gives back what each button said for itself once the group is enabled', async () => {
+    const group = (await mountGroup(`<helix-headless-button-group label="Text" disabled>
+      <helix-headless-button>Bold</helix-headless-button>
+      <helix-headless-button disabled>Clear</helix-headless-button>
+      <button type="button">Native</button>
+    </helix-headless-button-group>`)) as Disableable
+    const native = group.querySelector('button') as HTMLButtonElement
+    expect(native.disabled).toBe(true)
+    group.disabled = false
+    await flush(group)
+    expect(group.internals?.ariaDisabled).toBeNull()
+    expect(
+      buttonsOf(group).map((button) => (button as Pressable & { disabled: boolean }).disabled),
+    ).toEqual([false, true])
+    expect(native.disabled).toBe(false)
+  })
+
+  test('a button added to a disabled group is disabled too', async () => {
+    const group = (await mountGroup(view.replace('label=', 'disabled label='))) as Disableable
+    const added = document.createElement('helix-headless-button') as Pressable & {
+      disabled: boolean
+    }
+    added.setAttribute('value', 'year')
+    group.append(added)
+    await added.updateComplete
+    await flush(group)
+    expect(added.disabled).toBe(true)
+  })
+})
+
+describe('the values of a button group', () => {
+  test('are a list of the pressed values, and writing one presses exactly those', async () => {
+    const group = (await mountGroup(view.replace('"single"', '"multiple"'))) as Group & {
+      values: string[]
+    }
+    expect(group.values).toEqual(['week'])
+    group.values = ['day', 'month']
+    await flush(group)
+    expect(group.value).toBe('day,month')
+    expect(pressedOf(group)).toEqual(['true', 'false', 'true'])
+    group.selectionMode = undefined
+    await flush(group)
+    expect(group.values).toEqual([])
+  })
+})

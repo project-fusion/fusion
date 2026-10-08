@@ -2,8 +2,10 @@ import {
   auditName,
   commaList,
   customElement,
+  type DisableableItem,
   HelixElement,
   hostAria,
+  inheritDisabled,
   inlineStep,
   pressedValue,
   reportRuntime,
@@ -94,6 +96,12 @@ const isGroupButton = (child: Element): child is GroupButton =>
  * a named `group`, and the toolbar's own arrow keys walk its buttons, so a
  * reader meets one toolbar. Under `single` it is a `radiogroup` either way.
  *
+ * **Disabled.** `disabled` on the group disables every button in it, Helix
+ * and native alike, and says so on the group with `aria-disabled`, as React
+ * Aria's `isDisabled` does. A button disabled on its own stays disabled when
+ * the group is enabled again, and a button that leaves the group gets back
+ * what it said for itself.
+ *
  * @since 0.1.0
  * @status stable
  * @category actions
@@ -111,6 +119,13 @@ const isGroupButton = (child: Element): child is GroupButton =>
  */
 @customElement('helix-headless-button-group')
 export class HelixHeadlessButtonGroup extends HelixElement {
+  /**
+   * Disables every button in the group, and says so on the group with
+   * `aria-disabled`. Reflected, so a stylesheet can select on it.
+   */
+  @property({ reflect: true, type: Boolean })
+  disabled = false
+
   /**
    * Keeps at least one button pressed once one is, as React Aria's
    * `disallowEmptySelection`: a press that would leave none pressed is
@@ -171,6 +186,19 @@ export class HelixHeadlessButtonGroup extends HelixElement {
   value = ''
 
   /**
+   * The pressed values as a list, in a selection mode, and an empty list
+   * otherwise. Written, it presses exactly those buttons.
+   */
+  @property({ attribute: false })
+  get values(): string[] {
+    return this.selectionMode ? commaList(this.value) : []
+  }
+
+  set values(next: string[]) {
+    this.value = next.join(',')
+  }
+
+  /**
    * The Helix buttons of a group in a selection mode, in the order they are
    * written, and none otherwise. Empty on a server, which has no tree.
    */
@@ -206,11 +234,52 @@ export class HelixHeadlessButtonGroup extends HelixElement {
 
   private watcher: MutationObserver | undefined
 
+  /** The children that can be disabled: Helix buttons and native ones alike. Empty on a server. */
+  private get members(): DisableableItem[] {
+    return this.children
+      ? [...this.children].filter(
+          (child): child is DisableableItem => child instanceof HTMLElement && 'disabled' in child,
+        )
+      : []
+  }
+
+  /** The members this group has disabled, so one that leaves is given back its own answer. */
+  private readonly held = new Set<DisableableItem>()
+
+  /**
+   * Passes `disabled` down to the members, and gives a member that left
+   * what it said for itself.
+   *
+   * A member already disabled is not written to again: the watcher hears
+   * every write to a native button's `disabled`, changed or not, and would
+   * answer it with this.
+   */
+  private cascade(): void {
+    const members = this.members
+    for (const gone of this.held) {
+      if (!members.includes(gone)) {
+        inheritDisabled(false, [gone])
+        this.held.delete(gone)
+      }
+    }
+    if (this.disabled) {
+      const live = members.filter((member) => !member.disabled)
+      inheritDisabled(true, live)
+      for (const member of live) {
+        this.held.add(member)
+      }
+    } else if (this.held.size > 0) {
+      inheritDisabled(false, [...this.held])
+      this.held.clear()
+    }
+  }
+
   /**
    * Tells every button whether it is pressed and whether it holds the stop,
    * and puts back the ones that left.
    */
   private sync(): void {
+    this.cascade()
     const buttons = this.buttons
     const roving = this.roving
     const stop = roving
@@ -241,10 +310,19 @@ export class HelixHeadlessButtonGroup extends HelixElement {
     }
     /* A button whose definition has not loaded is no button yet, so it is
        read again once it is. A native one is told it cannot be a toggle. */
-    for (const child of this.selectionMode && this.children ? this.children : []) {
-      if (child.localName.includes('-') && !isGroupButton(child)) {
+    const reading = Boolean(this.selectionMode) || this.disabled
+    for (const child of reading && this.children ? this.children : []) {
+      if (
+        child.localName.includes('-') &&
+        !isGroupButton(child) &&
+        !customElements.get(child.localName)
+      ) {
         void customElements.whenDefined(child.localName).then(() => this.sync())
-      } else if (child.localName === 'button' && !child.hasAttribute('aria-pressed')) {
+      } else if (
+        this.selectionMode &&
+        child.localName === 'button' &&
+        !child.hasAttribute('aria-pressed')
+      ) {
         this.warn(child)
       }
     }
@@ -418,6 +496,7 @@ export class HelixHeadlessButtonGroup extends HelixElement {
       role: radios ? 'radiogroup' : toolbar ? 'toolbar' : 'group',
     })
     this.internals.ariaOrientation = toolbar ? (this.orientation ?? null) : null
+    this.internals.ariaDisabled = this.disabled ? 'true' : null
     this.toggleState('pressed', Boolean(this.selectionMode) && commaList(this.value).length > 0)
   }
 
