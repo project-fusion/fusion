@@ -859,6 +859,33 @@ describe('canvas connections and removal', () => {
     expect(asked).toHaveLength(1)
   })
 
+  test('the board is a single tab stop, held by a card, and plus and minus zoom from the card', async () => {
+    const host = await canvas()
+    const region = part(host, 'region') as HTMLElement
+    const zoom = (): number => (host as unknown as { view: { zoom: number } }).view.zoom
+    /* The card holds the stop, and the region leaves the tab order for it. */
+    expect(stopOf(host)).toBeDefined()
+    expect(region.getAttribute('tabindex')).toBe('-1')
+    const before = zoom()
+    expect(press(card(host, 'a'), '+').defaultPrevented).toBe(true)
+    await host.updateComplete
+    expect(zoom()).toBeGreaterThan(before)
+    press(card(host, 'a'), '-')
+    await host.updateComplete
+    expect(zoom()).toBeCloseTo(before)
+    /* Escape still goes back out to the board, which still pans. */
+    press(card(host, 'a'), 'Escape')
+    await host.updateComplete
+    expect(host.shadowRoot?.activeElement).toBe(region)
+    /* An empty board is its own stop. */
+    for (const one of [...host.children]) {
+      one.remove()
+    }
+    await host.updateComplete
+    await host.updateComplete
+    expect(region.getAttribute('tabindex')).toBe('0')
+  })
+
   test('a double click on the empty board zooms in about it, and with Shift out', async () => {
     const host = await canvas()
     const zoom = (): number => (host as unknown as { view: { zoom: number } }).view.zoom
