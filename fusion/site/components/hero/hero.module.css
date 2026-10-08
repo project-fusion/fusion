@@ -118,7 +118,7 @@
  * target holds. The `max` follows the ramp wherever it is large enough and stops
  * following it down past a floor that is not about type at all.
  */
-  --icon-button-radius: var(--helix-radii-xs);
+  --icon-button-radius: var(--helix-radii-sm);
   --icon-button-size: max(1.5rem, calc(var(--helix-text-sm) * 1.8));
 
   margin-inline-end: calc(var(--helix-space-2xs) * -1);

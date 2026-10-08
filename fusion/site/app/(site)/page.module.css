@@ -383,8 +383,6 @@
 
 .closingCard :global([data-section-title]),
 .closingCard :global(helix-text) {
-  --text-color: var(--helix-color-foreground-on-primary);
-
   color: var(--helix-color-foreground-on-primary);
 }
 
