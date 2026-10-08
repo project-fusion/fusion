@@ -43,7 +43,9 @@ export const reflectElements = (
 
 /**
  * Adds `by` to the elements that describe `target`, where that is safe, and
- * says whether `target` is now described by it.
+ * says whether it wrote the link, which is then the caller's to take back with
+ * `unlinkDescription`. A `target` described by `by` already is left alone and
+ * answers false.
  *
  * Through element reflection, and only where no framework is watching:
  *
@@ -64,8 +66,14 @@ export const linkDescription = (target: Element, by: Element, light: boolean): b
     return false
   }
   const current = element.ariaDescribedByElements ?? []
+  /* **Already there is not written here, so it is not the caller's to take
+     back.** The reference came from somewhere else, most often the consumer's
+     own `aria-describedby` naming `by`, which reflection reads as an element.
+     Answered true, the caller recorded a link it had not made, and its
+     `unlinkDescription` then removed the consumer's attribute: a Tooltip
+     defined before its Helix trigger took the trigger's description away. */
   if (current.includes(by)) {
-    return true
+    return false
   }
   const shadowed = typeof ShadowRoot !== 'undefined' && target.getRootNode() instanceof ShadowRoot
   if (

@@ -639,6 +639,36 @@ describe('the trigger is described by the tooltip itself', () => {
     expect(button.ariaDescribedByElements).toBeNull()
   })
 
+  /* The consumer named the tooltip in the trigger's own `aria-describedby`,
+     which reflection reads back as the tooltip. A tooltip defined before its
+     Helix trigger found that reference on the host, took it for a link of its
+     own, and took it back on moving to the control inside, which removed the
+     consumer's attribute and the trigger's description with it. */
+  test('a reference the consumer wrote is theirs, and stays when the link moves inside', async () => {
+    const trigger = reflecting(document.createElement('div'))
+    trigger.id = 'own-reference'
+    document.body.append(trigger)
+    const tip = document.createElement('helix-headless-tooltip') as unknown as Tooltip & HTMLElement
+    tip.id = 'own-reference-tip'
+    tip.setAttribute('for', 'own-reference')
+    tip.setAttribute('content', 'Writes the file')
+    trigger.ariaDescribedByElements = [tip]
+    document.body.append(tip)
+    await tip.updateComplete
+
+    const root = trigger.attachShadow({ delegatesFocus: true, mode: 'open' })
+    root.innerHTML = '<button>Save</button>'
+    const inner = reflecting(root.querySelector('button') as HTMLElement)
+    inner.dispatchEvent(new Event('focusin', { bubbles: true, composed: true }))
+    // By identity: a deep comparison of two elements walks the whole document.
+    expect(trigger.ariaDescribedByElements?.length).toBe(1)
+    expect(trigger.ariaDescribedByElements?.[0] === tip).toBe(true)
+    expect(inner.ariaDescribedByElements?.length).toBe(1)
+    expect(inner.ariaDescribedByElements?.[0] === tip).toBe(true)
+    tip.remove()
+    trigger.remove()
+  })
+
   test('a control inside a component’s shadow root is described where it takes focus', async () => {
     const host = await mount(
       '<div><div id="save"></div><helix-headless-tooltip for="save" content="Writes the file"></helix-headless-tooltip></div>',

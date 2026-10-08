@@ -89,6 +89,18 @@ describe('linking a description', () => {
     expect(linkDescription(owned, tip, true)).toBe(false)
   })
 
+  /* The consumer's own `aria-describedby` naming the tooltip reads back as the
+     tooltip element. Answered true, the caller took the link for its own and
+     later unlinked it, removing the consumer's attribute. */
+  test('a link already there is not written, so it is not the caller’s', () => {
+    const tip = bubble()
+    const button = reflecting(document.createElement('button'))
+    document.body.append(button)
+    button.ariaDescribedByElements = [tip]
+    expect(linkDescription(button, tip, true)).toBe(false)
+    expect(button.ariaDescribedByElements).toEqual([tip])
+  })
+
   test('nothing where the engine has no reflection', () => {
     expect(linkDescription(document.createElement('button'), bubble(), true)).toBe(false)
   })
