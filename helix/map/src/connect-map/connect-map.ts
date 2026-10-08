@@ -718,6 +718,11 @@ export const connectMap = (
   driver: MapDriver,
   options: ConnectOptions = {},
 ): MapConnection => {
+  /* Whether the connection still stands, and whether it is still being set
+     up. First, since a renderer can call back into the connector while it is
+     still setting up. */
+  let live = true
+  let starting = true
   const handlePan = (event: Event): void => {
     const { by, to } = (event as CustomEvent<ViewportPanDetail>).detail
     const { height, width } = viewportOf(frame)
@@ -1246,7 +1251,9 @@ export const connectMap = (
         layer.dispatchEvent(new HelixActivateEvent({ value }))
       }
     },
-    settled: () => look(),
+    /* A task later while connecting: Leaflet says it is still from inside
+       its first draw, while this call is still returning what `look` reads. */
+    settled: () => (starting ? queueMicrotask(look) : look()),
   })
   const place = (): void => {
     if (!driver.project) {
@@ -1555,7 +1562,6 @@ export const connectMap = (
      redrawn: a walker's step is not a reason to settle every route's colors
      and hand the renderer every line again. Several in one task, a walker
      moving and its route's progress with it, are one of each. */
-  let live = true
   let placing = false
   let drawing = false
   let queued = false
@@ -1740,6 +1746,7 @@ export const connectMap = (
   frame.addEventListener('keydown', handleFanKey)
   frame.addEventListener('pointerdown', handleFanDown)
   frame.addEventListener('click', handleFanPress)
+  starting = false
 
   return {
     disconnect(): void {

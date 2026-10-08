@@ -1254,6 +1254,40 @@ describe('connectMap with a points layer', () => {
     }
   }
 
+  /* Leaflet draws its layers as it is handed them, and says it has gone still
+     from inside that first draw. The connector heard it before it had finished
+     setting up, and connecting threw "Cannot access before initialization". */
+  test('a driver that says it is still from inside its first draw is connected', async () => {
+    const host = await frame(
+      '<helix-headless-map-points label="Cafés"></helix-headless-map-points>',
+    )
+    const points = host.querySelector('helix-headless-map-points') as Points
+    points.data = [{ label: 'Cafe A', lat: 1, lng: 2 }]
+    await points.updateComplete
+    let walked = 0
+    const driver: MapDriver = {
+      layers: (read, heard) => {
+        read()
+        heard?.settled?.()
+        return {
+          inView: () => {
+            walked += 1
+            return []
+          },
+          stop: () => {},
+          update: () => {},
+        }
+      },
+      panBy: () => {},
+      project: ({ lat, lng }) => ({ x: lng, y: lat }),
+      zoomBy: () => {},
+    }
+    const connection = connectMap(host, driver)
+    await settle()
+    expect(walked).toBeGreaterThan(0)
+    connection.disconnect()
+  })
+
   test('points set as data are drawn as one layer, the same array while the data is, and a press says which', async () => {
     const host = await frame(
       '<helix-headless-map-points label="Cafés" cluster></helix-headless-map-points>',
