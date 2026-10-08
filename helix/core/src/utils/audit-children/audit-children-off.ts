@@ -1,4 +1,4 @@
-import type { auditChildren as audit } from './audit-children.js'
+import type { auditChildren as audit, auditEntry as entry } from './audit-children.js'
 
 /**
  * The unregistered-child warning in a production build: nothing.
@@ -9,3 +9,6 @@ import type { auditChildren as audit } from './audit-children.js'
  * builds. See `audit-children.ts`.
  */
 export const auditChildren: typeof audit = () => {}
+
+/** The missing-entry warning in a production build: nothing. See `auditEntry`. */
+export const auditEntry: typeof entry = () => {}

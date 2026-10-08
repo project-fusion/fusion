@@ -1,6 +1,6 @@
 /* The unregistered-child warning, which a production build resolves to a
    function that does nothing. See `utils/audit-children`. */
-export { auditChildren } from '#audit-children'
+export { auditChildren, auditEntry } from '#audit-children'
 /* The missing-name warning, which a production build resolves to a function
    that does nothing. See `utils/audit-name`. */
 export { auditName } from '#audit-name'

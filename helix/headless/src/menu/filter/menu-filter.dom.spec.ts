@@ -1,10 +1,17 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { hasState, mount, part, registerDom, role, settle } from '@fusion.dev/helix-testing/dom'
 
-/* happy-dom before the element, for the reason the root's own spec gives. */
+/* happy-dom before the element, for the reason the root's own spec gives. The
+   filter is an entry of its own, imported beside the menu's. */
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  await import('./index.js')
+})
+
+const warn = console.warn
+afterEach(() => {
+  console.warn = warn
 })
 
 type Menu = HTMLElement & {
@@ -201,5 +208,25 @@ describe('a filterable menu', () => {
     expect(row(host, 'cut').shadowRoot?.querySelector('[part="item"]')?.getAttribute('role')).toBe(
       'menuitem',
     )
+  })
+
+  /* The filter is `menu/filter`, so a menu that never filters carries none of
+     it. A menu built where that entry was never imported has no filter, which
+     is what taking it away from this one stands in for. */
+  test('without its entry, `filterable` draws no field, and a development build names the import', async () => {
+    const warnings: string[] = []
+    console.warn = (message: string) => warnings.push(message)
+    const host = (await mount(
+      `<helix-headless-menu filterable><button slot="trigger">Edit</button>${ROWS}</helix-headless-menu>`,
+    )) as Menu & { requestUpdate(): void }
+    ;(host as unknown as { filterer: unknown }).filterer = undefined
+    host.show()
+    await settle(host)
+    expect(part(host, 'search-field')).toBeNull()
+    expect(part(host, 'surface')?.getAttribute('role')).toBe('menu')
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+    expect(warnings).toEqual([
+      "<helix-headless-menu> has `filterable` and its entry is not imported, so it shows no filter field. Import '@fusion.dev/helix-headless/menu/filter'.",
+    ])
   })
 })
