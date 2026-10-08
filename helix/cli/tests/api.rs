@@ -23,6 +23,20 @@ fn binary() -> PathBuf {
 /// A project with Helix installed, cleaned up when it drops.
 struct Project(PathBuf);
 
+/// The lint data `analyze` writes for the fixture's tags, which `helix scan`
+/// and `helix_check` judge against.
+fn lint() -> Value {
+    json!({
+        "package": "@fusion.dev/helix",
+        "tags": {
+            "helix-menu": { "attributes": {}, "family": "menu", "hooks": [], "parts": [], "written": [] },
+            "helix-option": { "attributes": {}, "family": "option", "hooks": [], "parts": [], "written": [] },
+            "helix-select": { "attributes": { "emphasis": ["ghost"] }, "family": "select", "hooks": [], "parts": [], "written": [] },
+        },
+        "version": "1.2.3",
+    })
+}
+
 impl Project {
     fn new(name: &str) -> Self {
         let path = std::env::temp_dir().join(format!("fusion-helix-api-{name}"));
@@ -101,21 +115,11 @@ impl Project {
                             "package": "@fusion.dev/helix",
                         }),
                     ),
-                    (
-                        "lint.json",
-                        json!({
-                            "package": "@fusion.dev/helix",
-                            "tags": {
-                                "helix-menu": { "attributes": {}, "family": "menu", "hooks": [], "parts": [], "written": [] },
-                                "helix-option": { "attributes": {}, "family": "option", "hooks": [], "parts": [], "written": [] },
-                                "helix-select": { "attributes": { "emphasis": ["ghost"] }, "family": "select", "hooks": [], "parts": [], "written": [] },
-                            },
-                            "version": "1.2.3",
-                        }),
-                    ),
+                    ("lint.json", lint()),
                     (
                         "examples.json",
                         json!({
+                            "environment": { "browser": "chromium 1" },
                             "examples": {
                                 "select": [
                                     {
@@ -123,6 +127,7 @@ impl Project {
                                         "html": "<helix-select><helix-option>A</helix-option></helix-select>",
                                         "imports": ["import '@fusion.dev/helix/select'", "import '@fusion.dev/helix/option'"],
                                         "label": "Preview",
+                                        "renders": [{ "file": "preview.png", "shot": "wide" }],
                                         "slug": "preview",
                                     },
                                     { "description": "Grouped.", "html": "<helix-select></helix-select>", "imports": [], "label": "Grouped", "slug": "grouped" },
@@ -287,6 +292,11 @@ fn an_example_carries_the_imports_it_needs() {
             "import '@fusion.dev/helix/option'"
         ])
     );
+    assert_eq!(
+        first["renders"],
+        json!([{ "shot": "wide", "url": "https://fusion.dev/helix/components/select/preview.png" }])
+    );
+    assert_eq!(first["environment"]["browser"], "chromium 1");
     let named = project.json(&["api", "example", "select", "grouped"]);
     assert_eq!(named["example"]["slug"], "grouped");
     let missing = project.failure(&["api", "example", "select", "nope"]);

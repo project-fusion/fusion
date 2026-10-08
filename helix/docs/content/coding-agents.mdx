@@ -66,6 +66,10 @@ like. Keeping pictures out of the reference keeps it the one place you can trust
 to be complete. An agent cannot use the sandbox, and it reads an example as
 text, so the `.md` file includes the examples.
 
+Each example the visual check pictures links its pictures under it: wide at
+640 pixels, narrow at 390, and dark at 640, taken in the environment that
+`examples.json` records. Compare a render of your own to them.
+
 The `.json` file has the same family as structured data, and three fields an
 agent uses most:
 
@@ -156,7 +160,7 @@ project. It has eight tools:
 |---|---|
 | `helix_find` | The families that answer a name, an alias, a tag, or a purpose, best first |
 | `helix_family` | One family's tags, properties and their unions, events and their React props, slots, parts, custom properties, words, and import lines |
-| `helix_example` | One example as HTML and TSX, with its stylesheet and the import lines it needs |
+| `helix_example` | One example as HTML and TSX, with its stylesheet, the import lines it needs, and links to its pictures |
 | `helix_imports` | The import lines for a list of tags, and the closest tag to any unknown one |
 | `helix_tokens` | The semantic tokens, by a word in the name or description and by category |
 | `helix_check` | The findings `helix scan` reports for the files you name, or for a snippet before you write it |
