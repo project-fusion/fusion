@@ -15,8 +15,9 @@
   --_button-fill-hover: var(--_button-tone-hover);
   --_button-on-tone: var(--helix-color-background);
   --_button-tone: var(--helix-color-foreground);
-  /* `Loader`'s own turn, so two rings on one page agree. No rung of the
-     duration scale is that long. */
+  /* `Loader`'s own turn and crawl, so two rings on one page agree. No rung of
+     the duration scale is that long. */
+  --_button-crawl: 4s;
   --_button-turn: 0.8s;
   /* Softened toward the page rather than deepened, because neutral's tone is
      already the darkest ink there is and there is nothing past it to go to. */
@@ -279,10 +280,13 @@
 }
 
 /* Slowed rather than stopped, as `Loader` does: a ring that holds still reads
-   as broken, and the wait is still the thing to show. */
+   as broken, and the wait is still the thing to show. The crawl is a fixed
+   rate. The base layer sets every duration token to 0.01ms under the
+   preference, so a rate scaled from one turned the ring about eight thousand
+   times a second. */
 @media (prefers-reduced-motion: reduce) {
   [part="spinner"] {
-    animation-duration: calc(var(--helix-duration-slow) * 12);
+    animation-duration: var(--_button-crawl);
   }
 }
 

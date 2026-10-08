@@ -108,8 +108,13 @@ slot[name="label"]::slotted(*) {
    30%` puts the leading edge three tenths along and `scale: 0.6` makes it six
    tenths wide, and the two compose without either needing to know the track's
    pixel width. */
-/* Slow enough to read as work rather than as a stripe going past. */
+/* Slow enough to read as work rather than as a stripe going past. The crawl is
+   the ring's turn under reduced motion, twelve cycles long, and a fixed rate:
+   the base layer sets every duration token to 0.01ms under the preference, so
+   a crawl scaled from the cycle turned the ring about seventeen hundred times a
+   second. */
 :host([indeterminate]) {
+  --_progress-crawl: 19.2s;
   --_progress-cycle: calc(var(--helix-duration-slow) * 5);
 }
 
@@ -354,7 +359,7 @@ slot[name="label"]::slotted(*) {
   }
 
   :host([shape="ring"][indeterminate]) [part="track"] {
-    animation-duration: calc(var(--_progress-cycle) * 12);
+    animation-duration: var(--_progress-crawl);
   }
 
   :host([shape="ring"][indeterminate]) [part="indicator"] {
