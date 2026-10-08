@@ -1,4 +1,4 @@
-import type { auditSource as audit } from './audit-source.js'
+import type { auditSource as audit, auditData as auditShape } from './audit-source.js'
 
 /**
  * The missing-table warning in a production build: nothing.
@@ -9,3 +9,6 @@ import type { auditSource as audit } from './audit-source.js'
  * builds. See `audit-source.ts`.
  */
 export const auditSource: typeof audit = () => {}
+
+/** The malformed-data warning in a production build: nothing. */
+export const auditData: typeof auditShape = () => {}

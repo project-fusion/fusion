@@ -3,6 +3,9 @@ import { reportRuntime } from '../report-runtime/report-runtime.js'
 /** The hosts already read, so each is reported at most once in its life. */
 const audited = new WeakSet<HTMLElement>()
 
+/** The hosts already reported for the shape of their `data`. */
+const misshapen = new WeakSet<HTMLElement>()
+
 /**
  * Reports a chart, a legend or a sparkline whose `for` names no table once the
  * page has loaded, the one mistake that leaves it drawing nothing and saying
@@ -46,4 +49,24 @@ export const auditSource = (
   } else {
     window.addEventListener('load', read, { once: true })
   }
+}
+
+/**
+ * Reports a chart whose `data` is not `{ columns, rows }`, such as an array of
+ * rows, once for each chart. The chart draws its empty state. In a development
+ * build only, as the missing-table warning is.
+ */
+export const auditData = (host: HTMLElement): void => {
+  if (misshapen.has(host)) {
+    return
+  }
+  misshapen.add(host)
+  reportRuntime({
+    kind: 'malformed-data',
+    message:
+      `<${host.localName}> was given \`data\` that is not { columns, rows }, so it draws nothing. ` +
+      "Pass an object such as { columns: ['Month', 'Sales'], rows: [['Jan', 10]] }, each row " +
+      'an array.',
+    tag: host.localName,
+  })
 }

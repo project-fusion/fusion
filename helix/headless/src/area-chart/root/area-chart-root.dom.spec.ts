@@ -377,6 +377,36 @@ describe('from data', () => {
     expect(part(chart, 'empty')?.textContent?.trim()).toBe('No readings')
   })
 
+  /* An array of rows in place of `{ columns, rows }` threw from the render,
+     and the page said nothing about why. */
+  test('of the wrong shape draws the empty state and warns in development', async () => {
+    const warnings: string[] = []
+    const warn = console.warn
+    console.warn = (message: string) => warnings.push(String(message))
+    try {
+      const chart = (await mount(
+        '<helix-headless-area-chart label="Sessions"></helix-headless-area-chart>',
+      )) as HTMLElement & { data: unknown; readings: number; updateComplete: Promise<boolean> }
+      for (const wrong of [
+        [
+          ['Month', 'Search'],
+          ['Jan', 10],
+        ],
+        { columns: ['Month', 'Search'] },
+        { columns: ['Month', 'Search'], rows: ['Jan', 10] },
+      ]) {
+        chart.data = wrong
+        await chart.updateComplete
+        expect(chart.readings).toBe(0)
+        expect(part(chart, 'empty')?.textContent?.trim()).toBe('No readings')
+      }
+      expect(warnings).toHaveLength(1)
+      expect(warnings[0]).toContain('{ columns, rows }')
+    } finally {
+      console.warn = warn
+    }
+  })
+
   test('a table named by for wins over data', async () => {
     await mount(
       `<div><table id="t"><caption>From the table</caption><thead><tr><th>Month</th><th>Direct</th></tr></thead><tbody><tr><th>Jan</th><td>3</td></tr></tbody></table><helix-headless-area-chart for="t"></helix-headless-area-chart></div>`,
