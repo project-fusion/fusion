@@ -603,10 +603,13 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
   }
 
   /** Says what is now chosen, by name, and puts it in the form. */
-  private settle(): void {
+  private settle(announce = true): void {
     this.committed = this.files
     this.sync()
     this.requestUpdate()
+    if (!announce) {
+      return
+    }
     /* Under the platform's own names, which is what `onChange` and `onInput`
        bind and what a native file input sends when the chosen files move: both,
        in that order, the way every other control here does.
@@ -754,15 +757,16 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
    *
    * Not through `commit`, and that is the point of the split: a reset is the
    * form's decision and there is nothing here for a listener to refuse. What it
-   * owes is the report and the platform's own announcement, which is what
-   * `settle` is.
+   * owes is the report to the form, and no `input` or `change`: a native file
+   * input sends neither on `form.reset()`, measured in Chromium, where this
+   * sent both.
    */
   override formResetCallback(): void {
     super.formResetCallback()
     if (this.control) {
       restoreValue(this.control, '')
     }
-    this.settle()
+    this.settle(false)
   }
 
   /*
