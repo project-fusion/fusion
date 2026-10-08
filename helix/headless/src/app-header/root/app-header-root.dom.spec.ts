@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, hasState, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -174,6 +174,23 @@ describe('a header that folds', () => {
     await header.updateComplete
     return header
   }
+
+  /* The fold reads the bar's width, and an inline host has none, so a bar
+     with no stylesheet from the page never folded. */
+  test('is a block in this tier, so the width it folds on is there to read', async () => {
+    const header = await folding()
+    if (hasLayout()) {
+      expect(getComputedStyle(header).display).toBe('block')
+      return
+    }
+    /* happy-dom resolves no cascade, so the rule the element adopts is read. */
+    const declared = (
+      customElements.get('helix-headless-app-header') as unknown as {
+        styles?: { cssText?: string }
+      }
+    ).styles
+    expect(declared?.cssText?.replace(/\s+/g, ' ')).toContain(':host { display: block; }')
+  })
 
   test('hides the middle region behind a named toggle that says whether it is open', async () => {
     const header = await folding()
