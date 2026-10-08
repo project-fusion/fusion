@@ -19,7 +19,7 @@ use super::markup::{Element, Value as Written};
 const AXES: [&str; 4] = ["emphasis", "material", "separation", "tone"];
 
 /// The diagnostics overlay, which the page leaves out of everything it counts.
-const OVERLAY: &str = "helix-diagnostics-overlay";
+pub(super) const OVERLAY: &str = "helix-diagnostics-overlay";
 
 /// The longest hook value kept, in UTF-16 code units, as the page cuts it, so
 /// a gradient or a data URL cannot swell a run.

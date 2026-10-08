@@ -488,6 +488,15 @@ impl<'a> Analyzer<'a> {
                         .or_insert((raw, 1));
                 }
                 let Some(published) = self.index.get(&element.tag) else {
+                    if let Some(raw) = self.unknown_tag(path, position, element) {
+                        let key = format!("{} {}", raw.kind, raw.subject);
+                        let order = keys.len();
+                        let order = *keys.entry(key.clone()).or_insert(order);
+                        grouped
+                            .entry((order, key))
+                            .and_modify(|(_, count)| *count += 1)
+                            .or_insert((raw, 1));
+                    }
                     continue;
                 };
                 for attribute in &element.attributes {
@@ -549,6 +558,49 @@ impl<'a> Analyzer<'a> {
             }
             self.found.findings.push(raw);
         }
+    }
+
+    /// A `helix-` element no installed package publishes, which the browser
+    /// draws as an unknown inline element with nothing in it working.
+    ///
+    /// **The prefix is the claim.** A tag that starts with `helix-` says it is
+    /// a Helix element, so one that no package lists is a misspelling, an
+    /// invented component, or a package that is not installed. A project that
+    /// names elements of its own this way turns the kind off for those tags in
+    /// `helix-diagnostics.json`.
+    fn unknown_tag(&self, path: &str, position: usize, element: &Element) -> Option<Raw> {
+        let tag = element.tag.as_str();
+        if !tag.starts_with("helix-") || tag == super::usage::OVERLAY {
+            return None;
+        }
+        /* Measured without the shared prefix, which would otherwise count
+        toward the third of a name a suggestion may be from it and offer
+        `helix-drilldown` for `helix-dropdown`. */
+        let suggestion = nearest(
+            &tag["helix-".len()..],
+            self.index
+                .tags
+                .iter()
+                .filter_map(|(name, _)| name.strip_prefix("helix-")),
+            None,
+        )
+        .map(|bare| format!("helix-{bare}"));
+        Some(Raw {
+            expected: suggestion.clone(),
+            kind: "unknown-tag",
+            message: match suggestion {
+                Some(suggestion) => format!("`{tag}` is in no Helix package your project installs, so the browser draws it as an unknown element. The closest tag is `{suggestion}`."),
+                None => format!("`{tag}` is in no Helix package your project installs, so the browser draws it as an unknown element. Check the spelling, or install the package that publishes the tag."),
+            },
+            origin: Origin {
+                index: position,
+                line: element.line,
+                sheet: path.to_owned(),
+                text: element.text.clone(),
+            },
+            subject: format!("<{tag}>"),
+            tag: tag.to_owned(),
+        })
     }
 
     /// A child naming a slot its Helix parent does not have, which the
@@ -742,6 +794,32 @@ mod tests {
             "helix-copy-button { --icon-button-size }"
         );
         assert_eq!(unsettled[0].message, "`helix-copy-button` has no hook `--icon-button-size`. `helix-icon-button` has it, so the rule works where one is inside `helix-copy-button`, which only the running page shows.");
+    }
+
+    #[test]
+    fn a_helix_tag_no_package_publishes_is_found_with_the_closest_tag() {
+        let index = index();
+        let listing = index.hooks();
+        let used = HashSet::new();
+        let mut analyzer = Analyzer::new(&index, &listing, &used);
+        let page = markup::read(
+            "<helix-cardd></helix-cardd><helix-dropdown></helix-dropdown><helix-dropdown></helix-dropdown><helix-diagnostics-overlay></helix-diagnostics-overlay><acme-card></acme-card>",
+            1,
+        );
+        analyzer.markup([("a.html", page.elements.as_slice())]);
+        let found: Vec<(&str, &str)> = analyzer
+            .found
+            .findings
+            .iter()
+            .map(|one| (one.kind, one.message.as_str()))
+            .collect();
+        assert_eq!(
+            found,
+            [
+                ("unknown-tag", "`helix-cardd` is in no Helix package your project installs, so the browser draws it as an unknown element. The closest tag is `helix-card`."),
+                ("unknown-tag", "`helix-dropdown` is in no Helix package your project installs, so the browser draws it as an unknown element. Check the spelling, or install the package that publishes the tag. On 2 elements."),
+            ]
+        );
     }
 
     #[test]

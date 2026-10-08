@@ -1049,10 +1049,23 @@ describe('attributes', () => {
     document.body.innerHTML = ''
   })
 
+  test('a helix tag no manifest lists is a finding, with the closest tag measured without the prefix', () => {
+    document.body.innerHTML =
+      '<helix-buton>Go</helix-buton><helix-dropdown></helix-dropdown><helix-diagnostics-overlay></helix-diagnostics-overlay><acme-thing></acme-thing>'
+    const found = markup(tags, document)
+    expect(found.map((one) => [one.kind, one.subject, one.expected])).toEqual([
+      ['unknown-tag', '<helix-buton>', 'helix-button'],
+      ['unknown-tag', '<helix-dropdown>', undefined],
+    ])
+    document.body.innerHTML = ''
+  })
+
   test('global attributes, framework prefixes, and Helix’s own markup are not findings', () => {
     document.body.innerHTML =
       '<helix-button class="a" id="b" slot="c" aria-label="d" data-e="f" hidden title="g" _ngcontent-abc="">Go</helix-button>'
-    const host = document.createElement('helix-card')
+    /* A host the manifest lists, so the only question asked is about the
+       markup inside it, which is Helix's own. */
+    const host = document.createElement('helix-breadcrumb')
     host.attachShadow({ mode: 'open' }).innerHTML = '<helix-button wrong="1"></helix-button>'
     document.body.append(host)
     expect(markup(tags, document)).toEqual([])

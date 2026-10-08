@@ -18,7 +18,7 @@
  */
 import type { Answered, Located, Readers } from './collect.js'
 import { nearest, type Published } from './manifest.js'
-import { type Page, pageOf } from './page.js'
+import { OVERLAY, type Page, pageOf } from './page.js'
 import type { Origin, Raw } from './report.js'
 
 /** Every `helix-*` tag a selector mentions, in source order. */
@@ -651,6 +651,38 @@ const PREFIXES = ['aria-', 'data-', 'on', '_ngcontent-', '_nghost-', 'ng-', 'v-'
 const HOOK_DISTANCE = 2
 
 /**
+ * A `helix-` element no manifest lists, which the browser draws as an unknown
+ * inline element with nothing in it working.
+ *
+ * **The prefix is the claim.** A tag that starts with `helix-` says it is a
+ * Helix element, so one that no manifest lists is a misspelling, an invented
+ * component, or a package the page does not load. A page that names elements
+ * of its own this way turns the kind off for those tags. The suggestion is
+ * measured without the shared prefix, as `helix scan` measures it.
+ */
+const unknownTag = (tags: Map<string, Published>, tag: string): Raw | undefined => {
+  if (!tag.startsWith('helix-') || tag === OVERLAY) {
+    return undefined
+  }
+  const bare = nearest(
+    tag.slice('helix-'.length),
+    [...tags.keys()]
+      .filter((name) => name.startsWith('helix-'))
+      .map((name) => name.slice('helix-'.length)),
+  )
+  const suggestion = bare === undefined ? undefined : `helix-${bare}`
+  return {
+    expected: suggestion,
+    kind: 'unknown-tag',
+    message: suggestion
+      ? `\`${tag}\` is in no manifest passed to the collector, so the browser draws it as an unknown element. The closest tag is \`${suggestion}\`.`
+      : `\`${tag}\` is in no manifest passed to the collector, so the browser draws it as an unknown element. Check the spelling, or load the package that publishes the tag.`,
+    subject: `<${tag}>`,
+    tag,
+  }
+}
+
+/**
  * The attributes on the page's Helix elements that do nothing: a name the
  * element does not take, and a value outside the ones a closed set allows.
  * Both are valid HTML and silent, since the element falls back to its default.
@@ -669,6 +701,18 @@ export const markup = (
     const host = element.getRootNode()
     const composed = host instanceof ShadowRoot && host.host.localName.startsWith('helix-')
     const published = composed ? undefined : tags.get(element.localName)
+    if (!(composed || published) && tags.size > 0) {
+      const raw = unknownTag(tags, element.localName)
+      if (raw) {
+        const key = `${raw.kind} ${raw.subject}`
+        const seen = found.get(key)
+        if (seen) {
+          seen.count += 1
+        } else {
+          found.set(key, { ...raw, count: 1 })
+        }
+      }
+    }
     if (published) {
       for (const { name, value } of Array.from(element.attributes)) {
         if (
