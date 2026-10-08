@@ -33,6 +33,10 @@ pub struct Config {
     pub network: Network,
     #[serde(default)]
     pub platform: Platform,
+    /// Where each run writes its report and its run record, relative to the
+    /// config.
+    #[serde(default = "report")]
+    pub report: String,
     /// How this project retakes its baselines, said when a run fails.
     pub retake: Option<String>,
     /// URL paths the harness serves from disk, relative to the config. A path
@@ -54,6 +58,10 @@ fn fingerprint() -> String {
     "proof.fingerprint.json".to_string()
 }
 
+fn report() -> String {
+    ".proof/report".to_string()
+}
+
 /// A wide width, a phone width, and dark, which is what the lessons say a
 /// project wants pictured when it says nothing.
 fn shots() -> Vec<Shot> {
@@ -64,13 +72,19 @@ fn shots() -> Vec<Shot> {
     ]
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Diff {
-    /// How many pixels may differ before a shot fails. Zero, because a single
-    /// moved pixel is the fault this exists to catch.
+    #[serde(default)]
+    pub mode: Mode,
+    /// How many pixels may differ before a shot fails, in the pixel mode.
+    /// Zero, because a single moved pixel is the fault this exists to catch.
     #[serde(default)]
     pub pixels: usize,
+    /// The lowest structural similarity a shot may score and pass, in the
+    /// perceptual mode, from 0 to 1.
+    #[serde(default = "ssim")]
+    pub ssim: f64,
     /// How far apart two colors may be and still be the same pixel, 0 to 1.
     #[serde(default = "threshold")]
     pub threshold: f64,
@@ -79,10 +93,28 @@ pub struct Diff {
 impl Default for Diff {
     fn default() -> Self {
         Self {
+            mode: Mode::default(),
             pixels: 0,
+            ssim: ssim(),
             threshold: threshold(),
         }
     }
+}
+
+/// How a shot is compared with its baseline.
+#[derive(Clone, Copy, Debug, Default, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "lowercase")]
+pub enum Mode {
+    /// Pixel by pixel, failing on any pixel past the threshold.
+    #[default]
+    Pixel,
+    /// By structural similarity, for photographs and gradients whose pixels
+    /// move a little on every render.
+    Perceptual,
+}
+
+fn ssim() -> f64 {
+    0.99
 }
 
 fn threshold() -> f64 {
@@ -219,15 +251,110 @@ fn height() -> u32 {
 #[derive(Debug, Deserialize)]
 #[serde(tag = "kind", rename_all = "lowercase")]
 pub enum Source {
+    Catalog(CatalogSource),
     Html(HtmlSource),
+    Server(ServerSource),
+    Storybook(StorybookSource),
 }
 
 impl Source {
     pub fn name(&self) -> &str {
         match self {
-            Self::Html(html) => &html.name,
+            Self::Catalog(one) => &one.server.name,
+            Self::Html(one) => &one.name,
+            Self::Server(one) => &one.server.name,
+            Self::Storybook(one) => &one.server.name,
         }
     }
+
+    /// The diff this source's shots are compared with, when it sets its own.
+    pub fn diff(&self) -> Option<&Diff> {
+        match self {
+            Self::Html(one) => one.diff.as_ref(),
+            _ => self.server().and_then(|server| server.diff.as_ref()),
+        }
+    }
+
+    /// The server a source pictures, for every kind but HTML files.
+    pub fn server(&self) -> Option<&Served> {
+        match self {
+            Self::Catalog(one) => Some(&one.server),
+            Self::Html(_) => None,
+            Self::Server(one) => Some(&one.server),
+            Self::Storybook(one) => Some(&one.server),
+        }
+    }
+}
+
+/// What every source on a server shares: where it is, how to start it, and
+/// where its baselines are kept.
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Served {
+    /// The directory the baselines are written in, relative to the config.
+    pub baselines: String,
+    /// The directory `start` runs in, relative to the config.
+    pub cwd: Option<String>,
+    pub diff: Option<Diff>,
+    pub name: String,
+    /// A shell command that starts the server. Left out, the server is
+    /// expected to be running already.
+    pub start: Option<String>,
+    /// Seconds to wait for the server to answer after `start`.
+    #[serde(default = "timeout")]
+    pub timeout: u64,
+    /// The server's address: `http://localhost:3000`.
+    pub url: String,
+}
+
+fn timeout() -> u64 {
+    120
+}
+
+/// Pages of any server, by route or from its sitemap.
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ServerSource {
+    #[serde(default)]
+    pub routes: Vec<Route>,
+    #[serde(flatten)]
+    pub server: Served,
+    /// A sitemap's path on the server, `/sitemap.xml`, read for its routes.
+    pub sitemap: Option<String>,
+}
+
+/// A route, and optionally the name its baselines take.
+#[derive(Clone, Debug, Deserialize)]
+#[serde(untagged)]
+pub enum Route {
+    Path(String),
+    Named { name: String, path: String },
+}
+
+/// Stories from a running Storybook, read from its `index.json`.
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct StorybookSource {
+    /// Stories carrying one of these tags are left out.
+    #[serde(default)]
+    pub exclude: Vec<String>,
+    /// Only stories carrying one of these tags, when any are given.
+    #[serde(default)]
+    pub include: Vec<String>,
+    #[serde(flatten)]
+    pub server: Served,
+}
+
+/// Entries listed in a JSON file, `[{ "id": "button-primary", "url": "/x" }]`,
+/// each `url` relative to the server: the format any component catalog can
+/// write.
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CatalogSource {
+    /// The catalog, relative to the config.
+    pub catalog: String,
+    #[serde(flatten)]
+    pub server: Served,
 }
 
 /// HTML files from a glob, each served from the harness origin inside a
@@ -235,6 +362,7 @@ impl Source {
 #[derive(Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct HtmlSource {
+    pub diff: Option<Diff>,
     /// Relative requests from a page, answered by another file beside it:
     /// `{ "styles.css": "{stem}.css" }`.
     #[serde(default)]
@@ -347,6 +475,49 @@ impl Config {
         Ok(config)
     }
 
+    /// The thresholds of every diff, and each server source's address and
+    /// pages.
+    fn validate_diffs(&self) -> Result<(), String> {
+        let owner_of = |source: &Source| format!("the source `{}`'s `diff`", source.name());
+        for (diff, owner) in std::iter::once((&self.diff, "`diff`".to_string())).chain(
+            self.sources
+                .iter()
+                .filter_map(|source| source.diff().map(|diff| (diff, owner_of(source)))),
+        ) {
+            if !(0.0..=1.0).contains(&diff.threshold) {
+                return Err(format!(
+                    "{owner} has a threshold from 0 to 1, and it is {}",
+                    diff.threshold
+                ));
+            }
+            if !(0.0..=1.0).contains(&diff.ssim) {
+                return Err(format!(
+                    "{owner} has an `ssim` from 0 to 1, and it is {}",
+                    diff.ssim
+                ));
+            }
+        }
+        for source in &self.sources {
+            if let Some(server) = source.server() {
+                if !(server.url.starts_with("http://") || server.url.starts_with("https://")) {
+                    return Err(format!(
+                        "the source `{}` has a `url` that is not http or https: `{}`",
+                        server.name, server.url
+                    ));
+                }
+            }
+            if let Source::Server(one) = source {
+                if one.routes.is_empty() && one.sitemap.is_none() {
+                    return Err(format!(
+                        "the source `{}` names no routes and no sitemap, so it has nothing to picture",
+                        one.server.name
+                    ));
+                }
+            }
+        }
+        Ok(())
+    }
+
     fn validate(&self) -> Result<(), String> {
         if self.sources.is_empty() {
             return Err("`sources` names nothing to picture".to_string());
@@ -354,12 +525,7 @@ impl Config {
         if self.shots.is_empty() {
             return Err("`shots` is empty, so nothing would be pictured".to_string());
         }
-        if !(0.0..=1.0).contains(&self.diff.threshold) {
-            return Err(format!(
-                "`diff.threshold` is from 0 to 1, and is {}",
-                self.diff.threshold
-            ));
-        }
+        self.validate_diffs()?;
         let mut names = std::collections::BTreeSet::new();
         for shot in &self.shots {
             if !names.insert(shot.name.as_str()) {
@@ -461,7 +627,9 @@ mod tests {
                 ("dark", 1280, Scheme::Dark)
             ]
         );
-        let Source::Html(html) = &config.sources[0];
+        let Source::Html(html) = &config.sources[0] else {
+            panic!("the source is HTML");
+        };
         let harness = html.harness.resolved().unwrap();
         assert_eq!(
             (
@@ -487,7 +655,9 @@ mod tests {
         let mut value = minimal();
         value["sources"][0]["harness"] = json!(false);
         let config = Config::parse(value).unwrap();
-        let Source::Html(html) = &config.sources[0];
+        let Source::Html(html) = &config.sources[0] else {
+            panic!("the source is HTML");
+        };
         assert!(html.harness.resolved().is_none());
     }
 

@@ -119,6 +119,97 @@ pub fn marked(before: &Image, after: &Image, threshold: f64) -> (usize, Image) {
     )
 }
 
+/// The structural similarity of two pictures of one size, from 0 to 1, where 1
+/// is the same picture.
+///
+/// **For pages a pixel count cannot judge.** A photograph scaled by the
+/// browser, or a gradient dithered differently on each render, moves
+/// thousands of pixels by a shade and changes nothing a reader sees, and a
+/// pixel diff fails it every time. Structural similarity compares the
+/// brightness, contrast and structure of each window instead, Wang, Bovik,
+/// Sheikh and Simoncelli, "Image quality assessment: from error visibility to
+/// structural similarity", 2004.
+///
+/// Measured on brightness, each pixel blended over white as `pixelmatch`'s
+/// gray drawing does, in 8 by 8 windows stepping by 4, and averaged. A picture
+/// smaller than one window is one window.
+///
+/// # Panics
+///
+/// When the two pictures differ in size.
+#[allow(clippy::cast_precision_loss)] // Pixel counts far below 2^52.
+pub fn ssim(before: &Image, after: &Image) -> f64 {
+    const WINDOW: usize = 8;
+    const STEP: usize = 4;
+    const C1: f64 = (0.01 * 255.0) * (0.01 * 255.0);
+    const C2: f64 = (0.03 * 255.0) * (0.03 * 255.0);
+    assert!(
+        before.width == after.width && before.height == after.height,
+        "the similarity compares pictures of one size"
+    );
+    let width = before.width as usize;
+    let height = before.height as usize;
+    let luma = |rgba: &[u8]| -> Vec<f64> {
+        rgba.chunks_exact(4)
+            .map(|pixel| {
+                let alpha = f64::from(pixel[3]) / 255.0;
+                let value = f64::from(pixel[0]) * 0.298_895_31
+                    + f64::from(pixel[1]) * 0.586_622_47
+                    + f64::from(pixel[2]) * 0.114_482_23;
+                value * alpha + 255.0 * (1.0 - alpha)
+            })
+            .collect()
+    };
+    let first = luma(&before.rgba);
+    let second = luma(&after.rgba);
+    let starts = |size: usize| -> Vec<usize> {
+        if size <= WINDOW {
+            vec![0]
+        } else {
+            let mut out: Vec<usize> = (0..=size - WINDOW).step_by(STEP).collect();
+            if out.last() != Some(&(size - WINDOW)) {
+                out.push(size - WINDOW);
+            }
+            out
+        }
+    };
+    let (columns, rows) = (starts(width), starts(height));
+    let mut total = 0.0;
+    let mut windows = 0.0;
+    for &top in &rows {
+        for &left in &columns {
+            let mut first_sum = 0.0;
+            let mut second_sum = 0.0;
+            let mut first_squares = 0.0;
+            let mut second_squares = 0.0;
+            let mut products = 0.0;
+            let mut count = 0.0;
+            for y in top..(top + WINDOW).min(height) {
+                for x in left..(left + WINDOW).min(width) {
+                    let one = first[y * width + x];
+                    let two = second[y * width + x];
+                    first_sum += one;
+                    second_sum += two;
+                    first_squares += one * one;
+                    second_squares += two * two;
+                    products += one * two;
+                    count += 1.0;
+                }
+            }
+            let first_mean = first_sum / count;
+            let second_mean = second_sum / count;
+            let first_variance = (first_squares / count - first_mean * first_mean).max(0.0);
+            let second_variance = (second_squares / count - second_mean * second_mean).max(0.0);
+            let covariance = products / count - first_mean * second_mean;
+            total += ((2.0 * first_mean * second_mean + C1) * (2.0 * covariance + C2))
+                / ((first_mean * first_mean + second_mean * second_mean + C1)
+                    * (first_variance + second_variance + C2));
+            windows += 1.0;
+        }
+    }
+    total / windows
+}
+
 /// The color a translucent pixel is blended over before it is compared, which
 /// `pixelmatch` draws as a checkerboard keyed on the pixel's byte offset.
 ///
@@ -411,6 +502,42 @@ mod tests {
             (hash ^ u32::from(byte)).wrapping_mul(16_777_619)
         });
         assert_eq!(hash, 3_569_531_285);
+    }
+
+    #[test]
+    fn the_same_picture_is_perfectly_similar() {
+        let one = filled(20, 12, [30, 60, 90, 255]);
+        assert!((ssim(&one, &one.clone()) - 1.0).abs() < 1e-12);
+    }
+
+    #[test]
+    fn a_shade_of_noise_stays_similar_and_a_new_shape_does_not() {
+        /* A soft gradient, then the same gradient a shade off on every other
+        pixel, which is what a re-dithered photograph looks like. */
+        let mut gradient = filled(32, 32, [0, 0, 0, 255]);
+        for y in 0..32 {
+            for x in 0..32 {
+                let value = u8::try_from(x * 4 + y * 3).unwrap();
+                set(&mut gradient, x, y, [value, value, value, 255]);
+            }
+        }
+        let mut dithered = gradient.clone();
+        for y in 0..32_usize {
+            for x in (y % 2..32).step_by(2) {
+                let at = (y * 32 + x) * 4;
+                dithered.rgba[at] = dithered.rgba[at].saturating_add(2);
+            }
+        }
+        assert!(count(&gradient, &dithered, 0.0, None) > 400);
+        assert!(ssim(&gradient, &dithered) > 0.99);
+
+        let mut marked = gradient.clone();
+        for y in 8..24 {
+            for x in 8..24 {
+                set(&mut marked, x, y, [255, 0, 0, 255]);
+            }
+        }
+        assert!(ssim(&gradient, &marked) < 0.9);
     }
 
     #[test]

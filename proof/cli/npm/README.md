@@ -5,9 +5,9 @@ pictures of your pages and components in a real browser, compares each one to
 a baseline kept in your git repository, and fails the run when a picture
 changes.
 
-**Fusion Proof is in development.** It pictures plain HTML files today. Server
-and Storybook sources, the HTML report, and the GitHub Action come next, in the
-roadmap below.
+**Fusion Proof is in development.** It pictures HTML files, any server's pages,
+Storybook stories, and entries from a JSON catalog, and it has a GitHub Action.
+What comes next is in the roadmap below.
 
 ```sh
 npm install --save-dev @fusion.dev/proof playwright
@@ -27,6 +27,7 @@ proof test                    compare every shot, and fail on a difference
 proof test button             only the entries named button
 proof update                  write only the baselines the comparison rejects
 proof test --shard 0 --of 4   the first of four shards, for CI
+proof report                  open the report of the last run
 proof compare a.png b.png     compare two PNG files, with no browser
 ```
 
@@ -36,6 +37,8 @@ proof compare a.png b.png     compare two PNG files, with no browser
   named `<stem><suffix>.diff.png`. Add `*.diff.png` to your `.gitignore`.
 - **`proof update`** pictures every entry and writes a baseline only where the
   comparison would fail. Review the files it writes before you commit them.
+- **`proof report`** opens the report the last run wrote. `--markdown` prints
+  its summary as Markdown instead, for a CI job's summary page.
 - **`proof compare`** compares two PNG files. `--diff` writes the image of the
   difference, and `--threshold` sets how far apart two colors may be and still
   count as the same pixel, from 0 to 1.
@@ -70,7 +73,18 @@ export default defineConfig({
 })
 ```
 
-- **`sources`**: where the entries come from. An `html` source reads every file
+- **`sources`**: where the entries come from, four kinds:
+  - `html` reads every file its `glob` matches under `root`, described next.
+  - `server` pictures a server's `routes`, and every route its `sitemap` lists.
+    `/` is named `index`, and a route given as `{ name, path }` takes its name.
+  - `storybook` pictures every story in a running Storybook's `index.json`.
+    `include` and `exclude` filter them by tag.
+  - `catalog` pictures every `{ id, url }` in a JSON file, each `url` relative to
+    the server.
+
+  The three on a server take its `url`, a `start` command that runs only when
+  nothing answers there and is stopped when the run ends, and `baselines`, the
+  directory their baselines are written in. An `html` source reads every file
   its `glob` matches under `root`. `{name}` is the path segment that names the
   entry, `*` matches within a segment, and `**` matches any number of
   directories. Each file is pictured inside a document that links `styles`,
@@ -85,8 +99,11 @@ export default defineConfig({
   ends in `/` serves a directory.
 - **`settle.readyProperty`**: a property your elements carry holding a promise
   that resolves once they have rendered. Proof awaits it before each shot.
-- **`diff`**: `threshold`, 0.1 unless you set it, and `pixels`, how many pixels
-  may differ, 0 unless you set it.
+- **`diff`**: how a shot is compared, for the whole config or for one source.
+  `mode: 'pixel'` counts the pixels past `threshold`, 0.1 unless you set it,
+  and fails above `pixels`, 0 unless you set it. `mode: 'perceptual'` scores
+  structural similarity and fails below `ssim`, 0.99 unless you set it, for
+  photographs and gradients whose pixels move a shade on every render.
 - **`exceptions`**: each names an `entry`, optionally a `shot`, and a `reason`.
   `unstable: true` skips the shot and names it in every run. `pixels` lets the
   shot differ by that many, and the run fails once the shot stops differing, so
@@ -98,6 +115,8 @@ export default defineConfig({
   by time. Entries with no measurement weigh `perShot` seconds a shot.
 - **`timings`**: a file to write each entry name's seconds to, which is how you
   measure `shard.cost`.
+- **`report`**: where each run writes its report, `.proof/report` unless you
+  set it. Add `.proof/` to your `.gitignore`.
 - **`retake`**: a sentence telling your team how to retake baselines, printed
   when a run fails.
 - **`fingerprint`**, **`network`**, and **`platform`** are described below.
@@ -123,6 +142,39 @@ export default defineConfig({
   browser version, and a hash of the installed fonts. A run on an environment
   that differs stops and names what differs, because every picture would
   differ for that reason alone.
+
+## The report
+
+Every `proof test` and `proof update` writes a report into the config's
+`report` directory: `index.html` to look at, and `run.json` for a program to
+read. The page shows each shot that failed with its baseline, its capture, and
+its difference side by side, and a swipe between the baseline and the capture.
+It lists the shots that needed a second take, the exceptions with their
+measurements, and what was skipped. The directory is emptied at the start of
+each run.
+
+## The GitHub Action
+
+The Action lives in this repository, in `proof/action`.
+
+```yaml
+- uses: project-fusion/fusion/proof/action@main
+  with:
+    mode: check
+```
+
+- **`mode: check`** installs Chromium and its system packages from the cache,
+  runs `proof test`, writes the summary to the job's summary page, and on a
+  failure uploads the report and the diff images.
+- **`mode: retake`** runs `proof update` and opens a pull request with what it
+  wrote, on a branch named for the ref. Give it `token` from a GitHub App or a
+  person: a pull request opened with `GITHUB_TOKEN` starts no checks. Run it on
+  `workflow_dispatch` only, with `concurrency` set to queue and never cancel, so
+  a retake is asked for and never cut in half.
+
+`args` passes arguments to `proof`, such as `--config` or `--shard`. `proof`
+and `playwright` name the commands that run each, `npx --no-install proof` and
+`npx --no-install playwright` unless you set them.
 
 ## How it works
 
