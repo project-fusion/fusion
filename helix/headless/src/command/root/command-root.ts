@@ -1,4 +1,5 @@
 import {
+  auditChildren,
   customElement,
   type DataOptionItem,
   drawStatus,
@@ -14,7 +15,7 @@ import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
 import type { HelixHeadlessListbox } from '../../listbox/root/listbox-root.js'
-import { optionsAmong } from '../../option/root/option-root.js'
+import { optionsAmong } from '../../option/among.js'
 /* Relative, so this registers the base pair and the styled file's identical
    imports register the styled pair. `tier` picks which the template asks for. */
 import '../../dialog/index.js'
@@ -97,6 +98,18 @@ const says = (element: Element | null, state: string): boolean => {
  * `aria-activedescendant` on the highlighted command, as the field of React
  * Aria's `Autocomplete` is. The commands are a `listbox` of `option`s. How many commands typing left, the empty text and
  * the loading text are said in a polite live region.
+ *
+ * **The commands are an import of their own.** A command is an option, the
+ * Option family's, which the palette does not register, so a page that writes
+ * one imports it beside the palette:
+ *
+ * ```js
+ * import '@fusion.dev/helix/command'
+ * import '@fusion.dev/helix/option'
+ * ```
+ *
+ * In development, a palette holding an option nobody registered says so once
+ * the page has loaded, with the line to add.
  *
  * @since 0.1.0
  * @status stable
@@ -543,6 +556,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
 
   override connectedCallback(): void {
     super.connectedCallback()
+    auditChildren(this, 'option', 'option', 'the palette lists no commands')
     this.addEventListener('helix-select', this.swallowOptionSelect)
     /* Capture, so both reach this before the listbox and the row do. */
     this.addEventListener('keydown', this.handleAlternate, { capture: true })

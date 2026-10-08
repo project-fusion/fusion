@@ -8,12 +8,10 @@ import { styles as floatingEntranceStyles } from '../../shared/floating/entrance
 import { styles as floatingPanelStyles } from '../../shared/floating/panel.css.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './select-root.css.js'
-/* Without these, a consumer importing `@fusion.dev/helix/select` alone gets a
-   select whose panel never upgrades. The suite hid it too, some other file
-   happening to supply the registration, so it showed as a spec that passes
-   together and fails alone. */
+/* The list the panel draws. Without it, a consumer importing
+   `@fusion.dev/helix/select` alone gets a select whose panel never upgrades.
+   The options are the page's to import, from `@fusion.dev/helix/option`. */
 import '../../listbox/index.js'
-import '../../option/index.js'
 
 /**
  * @summary A control that opens a list of options to choose from.

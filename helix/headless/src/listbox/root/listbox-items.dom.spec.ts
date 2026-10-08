@@ -11,6 +11,9 @@ import {
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  /* Registered here, so a spec reads the drawn options at once: the list
+     registers them itself on its first draw, which `listbox-children` holds. */
+  await import('../../option/index.js')
 })
 
 type Listbox = Updatable & {

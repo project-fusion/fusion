@@ -16,6 +16,7 @@ import {
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  await import('../../option/index.js')
   await import('./index.js')
 })
 

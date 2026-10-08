@@ -3,6 +3,7 @@ import {
   type Axis,
   anchorAt,
   arranged,
+  auditChildren,
   auditServed,
   commaList,
   countLabel,
@@ -71,7 +72,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
    text, which renders an element called `lit$…$` that lays out as nothing.
    Measured: the styled spec read `localName` as `lit$640177303$`. */
 import { html } from 'lit/static-html.js'
-import { edgeOf, type HelixHeadlessTableColumn } from '../../table/column/table-column.js'
+import type { HelixHeadlessTableColumn } from '../../table/column/table-column.js'
+import { edgeOf } from '../../table/edge.js'
 import '../../checkbox/index.js'
 import '../../pagination/index.js'
 import { toggledOpen } from '../keys.js'
@@ -218,6 +220,18 @@ const isControl = (element: HTMLElement): boolean =>
  * because its cells are markup you write and it can have no columns at all.
  * Written on `DataTable`, `columns` has no effect, so watch for it when you
  * move a table from `Table` to `DataTable`.
+ *
+ * **The columns are an import of their own.** A column is the Table family's
+ * `TableColumn`, which the data table does not register, so a page that writes
+ * one imports the Table entry beside the data table:
+ *
+ * ```js
+ * import '@fusion.dev/helix/data-table'
+ * import '@fusion.dev/helix/table'
+ * ```
+ *
+ * In development, a data table holding a column nobody registered says so once
+ * the page has loaded, with the line to add.
  *
  * @since 0.1.0
  * @status stable
@@ -2695,6 +2709,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    */
   override connectedCallback(): void {
     super.connectedCallback()
+    auditChildren(this, 'table-column', 'table', 'the table draws no columns')
     this.addEventListener('click', this.handleHeadClick)
     this.addEventListener('click', this.handleRowClick)
     this.addEventListener('pointerdown', this.notePress, true)

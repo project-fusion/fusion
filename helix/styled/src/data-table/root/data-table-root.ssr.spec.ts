@@ -8,6 +8,7 @@ import {
 } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
+import '../../table/index.js'
 
 const rows = [
   { name: 'alpha', size: 30 },

@@ -9,6 +9,7 @@ import {
 } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
+import '../../option/index.js'
 
 const TAG = 'helix-headless-listbox'
 

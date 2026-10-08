@@ -4,6 +4,7 @@ import { hasState, mount, part, registerDom, type Updatable } from '@fusion.dev/
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  await import('../../option/index.js')
   await import('../../button/index.js')
   await import('../../divider/index.js')
   await import('../../menu/index.js')

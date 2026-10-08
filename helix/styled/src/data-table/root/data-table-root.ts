@@ -6,7 +6,6 @@ import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './data-table-root.css.js'
 import '../../checkbox/index.js'
 import '../../pagination/index.js'
-import '../../table/index.js'
 
 /**
  * @summary A table drawn from an array of rows, with sorting, filtering, and paging.

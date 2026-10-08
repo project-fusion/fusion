@@ -4,6 +4,7 @@ import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  await import('../../option/index.js')
 })
 
 const OPTIONS = `<helix-headless-combobox label="Language">

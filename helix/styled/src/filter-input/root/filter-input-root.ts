@@ -1,10 +1,6 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessFilterInput } from '@fusion.dev/helix-headless/filter-input'
 import type { CSSResultGroup } from 'lit'
-/* The suggestions are `helix-option` elements a consumer slots in, and a custom
-   element registers on import: a consumer importing this family alone would
-   otherwise get inert unknown elements in the panel. */
-import '../../option/index.js'
 import { styles as collectionStateStyles } from '../../shared/collection/state.css.js'
 import { styles as fieldStyles } from '../../shared/field/field.css.js'
 import { styles as fieldFrameStyles } from '../../shared/field/field-frame.css.js'
@@ -77,6 +73,10 @@ export class HelixFilterInput extends HelixHeadlessFilterInput {
     collectionStateStyles,
     styles,
   ]
+
+  protected override defineOption(): Promise<unknown> {
+    return import('../../option/root/index.js')
+  }
 }
 
 declare global {

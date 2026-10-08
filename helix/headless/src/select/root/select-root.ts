@@ -1,6 +1,7 @@
 import {
   AriaForwardController,
   afterLinkFollowed,
+  auditChildren,
   chosenValues,
   customElement,
   type DataOption,
@@ -32,12 +33,11 @@ import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html } from 'lit/static-html.js'
 import type { HelixHeadlessListbox } from '../../listbox/root/listbox-root.js'
-import { type HelixHeadlessOption, optionsAmong } from '../../option/root/option-root.js'
-/* The list and every element an option is written as: a select imported alone
-   left its groups and separators undefined, and Chromium read the options as
-   one flat list with no group named. */
+import { optionsAmong } from '../../option/among.js'
+import type { HelixHeadlessOption } from '../../option/root/option-root.js'
+/* The list the panel draws. The options are the page's to import, from
+   `@fusion.dev/helix-headless/option`: see `auditChildren`. */
 import '../../listbox/index.js'
-import '../../option/index.js'
 import { over } from '../align.js'
 
 /**
@@ -95,6 +95,18 @@ import { over } from '../align.js'
  *
  * Set `autocomplete` to let a browser's autofill choose, as a native `<select>`
  * with the same attribute would.
+ *
+ * **The options are an import of their own.** An option is the Option family's,
+ * which the select does not register, so a page that writes one imports it
+ * beside the select:
+ *
+ * ```js
+ * import '@fusion.dev/helix/select'
+ * import '@fusion.dev/helix/option'
+ * ```
+ *
+ * In development, a select holding an option nobody registered says so once the
+ * page has loaded, with the line to add.
  *
  * @since 0.1.0
  * @status stable
@@ -545,6 +557,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
 
   override connectedCallback(): void {
     super.connectedCallback()
+    auditChildren(this, 'option', 'option', 'it offers no choices')
     this.addEventListener('helix-select', this.handleLinkFollowed)
     const words = new MutationObserver(() => this.requestUpdate())
     words.observe(this, {

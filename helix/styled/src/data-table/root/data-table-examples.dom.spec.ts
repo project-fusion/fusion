@@ -16,6 +16,7 @@ import windowing from '../.examples/windowing.html' with { type: 'text' }
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  await import('../../table/index.js')
   await import('../../flex/index.js')
   await import('../../list/index.js')
   await import('../../input/index.js')
