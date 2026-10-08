@@ -26,13 +26,23 @@ describe('afterManifest', () => {
 describe('dependenciesOf', () => {
   const at = (name: string) => join(import.meta.dir, '..', '..', name)
 
-  // The analyzer followed imports through the dependencies' own files, so a
-  // package naming only the styled tier was given headless and core as well.
-  test('reaches the manifests beneath the ones a package names', () => {
+  test('reaches the manifests a package names, in the order it names them', () => {
     expect([...dependenciesOf(at('sandbox')).keys()]).toEqual([
       '@fusion.dev/helix-core',
-      '@fusion.dev/helix',
       '@fusion.dev/helix-headless',
+      '@fusion.dev/helix',
+    ])
+  })
+
+  // The analyzer followed imports through the dependencies' own files, so a
+  // package naming only the styled tier was given headless and core as well.
+  // The site names the styled tier and not the two beneath it.
+  test('reaches the manifests beneath the ones a package names', () => {
+    expect([...dependenciesOf(join(at('..'), 'fusion', 'site')).keys()]).toEqual([
+      '@fusion.dev/helix',
+      '@fusion.dev/helix-core',
+      '@fusion.dev/helix-headless',
+      '@fusion.dev/helix-sandbox',
     ])
   })
 
