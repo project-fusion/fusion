@@ -600,6 +600,8 @@ export class HelixStrands extends HelixElement {
       placed.push({
         at: Number.isFinite(at) ? at : undefined,
         height: rect.height,
+        left: this.box.width ? rect.left / this.box.width : undefined,
+        right: this.box.width ? rect.right / this.box.width : undefined,
         top: rect.top + scroll,
         variant:
           variant === 'bend' || variant === 'sweep' || variant === 'waves' ? variant : 'ribbon',

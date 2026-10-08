@@ -317,21 +317,31 @@ describe('strands reach', () => {
 })
 
 describe('strands sweep', () => {
-  test('stays at the edge beside its target, and crosses only below it', () => {
-    /* A sweep is pointed at the words it has to leave clear, so nothing lit
-       crosses the middle of the page until the target ends. */
-    const target: PlacedStop = { at: 0.9, height: 450, top: 220, variant: 'sweep' }
-    const points = pagePath([target], 'ribbon', 1440, 900, 6000)
-    /* Its centerline runs just past the edge, with its strands reaching in. */
-    const beside = points.filter(
-      ([, y, , brightness]) => brightness > 0 && y > 0 && y < target.top + target.height,
-    )
-    expect(beside.length).toBeGreaterThan(0)
-    for (const [x] of beside) {
-      expect(x).toBeGreaterThan(0.95)
+  /* The first card below a hero: a sweep lands on its top left corner. */
+  const card: PlacedStop = {
+    at: 0.9,
+    height: 600,
+    left: 0.06,
+    right: 0.94,
+    top: 1000,
+    variant: 'sweep',
+  }
+  const points = pagePath([card], 'ribbon', 1440, 900, 6000)
+  const shown = points.filter(([, y, , brightness]) => brightness > 0 && y > 0)
+
+  test('comes down the page at the right edge until just above its target', () => {
+    /* Its centerline runs just past the edge, with its strands reaching in,
+       so a hero's words in the middle of the page stay clear. */
+    const above = shown.filter(([, y]) => y < card.top - 900 * 0.32 - 1)
+    expect(above.length).toBeGreaterThan(0)
+    for (const [x] of above) {
+      expect(x).toBeGreaterThan(1)
     }
-    const after = lit(points).filter(([, y]) => y > target.top + target.height + 900 * 0.8)
-    expect(Math.min(...after.map(([x]) => x))).toBeLessThan(0.3)
+  })
+
+  test("lands on the target's top left corner, heading down", () => {
+    const landing = shown.find(([x, y]) => Math.abs(y - card.top) < 2 && x < 0.1)
+    expect(landing?.[0]).toBeCloseTo(0.06, 2)
   })
 })
 
