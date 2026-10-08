@@ -512,21 +512,9 @@ export default async function FamilyDocs({
     return example ? [{ example, tier }] : []
   })
   const source = sourceUrl(family.source)
-  /* **The family's entry, then each entry of its own a part has**, with the
-     part it registers: `FilterMenu` registers only through
-     `filter-input/menu`, and a page that copied the family's line alone wrote
-     a picker that opened nothing. **Then each other family whose elements a
-     page writes inside this one**, such as Option inside Select, which the
-     family does not register: copied without it, the options were unknown
-     elements and the select offered nothing. */
-  const imports = (pkg: string, tier: 'headless' | 'styled'): string =>
-    [
-      `import '${pkg}/${family.slug}'`,
-      ...family.elements
-        .filter((element) => element.tier === tier && element.entry !== family.slug)
-        .map((element) => `import '${pkg}/${element.entry}' // ${element.label}`),
-      ...family.imports.map((entry) => `import '${pkg}/${entry}' // ${startCase(entry)}`),
-    ].join('\n')
+  /* The catalog writes the block, so this page, the family's `.md`, and its
+     `.json` import the same lines. */
+  const imports = (tier: 'headless' | 'styled'): string => family.usage[tier].join('\n')
 
   return (
     /* The shell and the rail are the layout's, so the nav survives a navigation
@@ -604,7 +592,7 @@ export default async function FamilyDocs({
                 <span
                   // biome-ignore lint/security/noDangerouslySetInnerHtml: markup this build produced from its own source
                   dangerouslySetInnerHTML={{
-                    __html: highlight(imports('@fusion.dev/helix', 'styled'), 'js'),
+                    __html: highlight(imports('styled'), 'js'),
                   }}
                 />
               </helix-code-block>
@@ -614,7 +602,7 @@ export default async function FamilyDocs({
                 <span
                   // biome-ignore lint/security/noDangerouslySetInnerHtml: markup this build produced from its own source
                   dangerouslySetInnerHTML={{
-                    __html: highlight(imports('@fusion.dev/helix-headless', 'headless'), 'js'),
+                    __html: highlight(imports('headless'), 'js'),
                   }}
                 />
               </helix-code-block>

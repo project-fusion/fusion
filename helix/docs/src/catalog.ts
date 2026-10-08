@@ -25,6 +25,9 @@ const CANONICAL = 'preview'
 
 /* The headless twin's slug, and the suffix every other one carries. */
 const HEADLESS = 'headless'
+
+/** The package each tier publishes, which every import line starts with. */
+const PACKAGE = { headless: '@fusion.dev/helix-headless', styled: '@fusion.dev/helix' } as const
 const HEADLESS_SUFFIX = /\.headless$/
 
 export interface ApiMember {
@@ -87,9 +90,19 @@ export interface Element {
   part: string
   properties: PropertyDoc[]
   slots: ApiMember[]
+  /**
+   * What a page imports to register the element: the tier's package and the
+   * entry, such as `@fusion.dev/helix/option`.
+   */
+  specifier: string
   summary: string
   tagName: string
   tier: 'headless' | 'styled'
+  /**
+   * The properties whose text a page translates with `registerWords`, under the
+   * key `words` names: `placeholder` and `emptyText` on Select. From `@words`.
+   */
+  words: string[]
 }
 
 export interface Example {
@@ -98,6 +111,13 @@ export interface Example {
   /** One line from the example's `@summary` comment, or empty where unwritten. */
   description: string
   html: string
+  /**
+   * The import lines that register every element the example writes, its own
+   * family's first: an example copied with these runs, and an example copied
+   * without them draws unknown elements wherever it writes another family's
+   * tag, such as Flex around a Button or Option inside Select.
+   */
+  imports: string[]
   label: string
   /**
    * The frame layout this example asks for, where it asks for one.
@@ -169,6 +189,13 @@ export interface Family {
   source: string
   status: string
   summary: string
+  /**
+   * The import block for each tier the family has: the family's entry, each
+   * entry of its own a part has, then each other family whose elements a page
+   * writes inside this one. The reference page's Usage shows it, and the `.md`
+   * prints it, so an agent reading either imports the same lines.
+   */
+  usage: { headless: string[]; styled: string[] }
 }
 
 /**
@@ -393,6 +420,8 @@ const examplesOf = (
           css: source.css,
           description: described.get(source.slug) ?? '',
           html: withoutAnnotations(source.html),
+          /* Written once the whole catalog is read, by `catalog`. */
+          imports: [],
           /* **The label is the file's name, with no special case.** `startCase`
            gives "Preview" for the canonical example on its own.
 
@@ -468,7 +497,7 @@ export const catalog = (manifests: HelixManifest[], examples: ExampleSource[] = 
     }
   }
 
-  return [...byFamily.entries()]
+  const families = [...byFamily.entries()]
     .map(([slug, entries]) => {
       /* The family's own description comes from its styled root: the element
          whose tag is the family name, rather than a part of it. */
@@ -521,9 +550,13 @@ export const catalog = (manifests: HelixManifest[], examples: ExampleSource[] = 
             part: entry.helix?.part ?? '',
             properties: properties(entry.members),
             slots: members(entry.slots),
+            specifier: `${PACKAGE[tierOf(entry.tagName as string)]}/${entryOf.get(entry) ?? slug}`,
             summary: entry.summary ?? '',
             tagName: entry.tagName as string,
             tier: tierOf(entry.tagName as string),
+            words: (entry.members ?? [])
+              .filter((member) => member.helix?.words === true && isPublic(member))
+              .map((member) => member.name ?? ''),
           }))
           /* Styled first, then headless. Alphabetical order would put the
              headless tier on top, which is the one most readers never reach
@@ -541,9 +574,78 @@ export const catalog = (manifests: HelixManifest[], examples: ExampleSource[] = 
         source: root.helix?.source ?? '',
         status: root.helix?.status ?? '',
         summary: root.summary ?? '',
+        usage: { headless: [], styled: [] },
       }
     })
     .sort((a, b) => a.label.localeCompare(b.label))
+
+  /* The import lines need every family's elements, so they are written once
+     the whole catalog is read: an example in Select writes Flex and Option,
+     and Select's own declarations cannot say where those come from. */
+  const specifiers = new Map(
+    families.flatMap((family) =>
+      family.elements.map((element) => [element.tagName, element.specifier] as const),
+    ),
+  )
+  return families.map((family) => ({
+    ...family,
+    examples: family.examples.map((example) => ({
+      ...example,
+      imports: importLines(example.html, family.slug, specifiers),
+    })),
+    usage: {
+      headless: usageOf(family, 'headless'),
+      styled: usageOf(family, 'styled'),
+    },
+  }))
+}
+
+/**
+ * The import lines an example needs: one per entry that registers an element
+ * it writes, the family's own entry first and the rest in order.
+ */
+const importLines = (html: string, slug: string, specifiers: Map<string, string>): string[] => {
+  const needed = new Set<string>()
+  for (const [, tag] of html.matchAll(/<(helix-[a-z0-9-]+)/g)) {
+    const specifier = specifiers.get(tag ?? '')
+    if (specifier) {
+      needed.add(specifier)
+    }
+  }
+  const own = (specifier: string): boolean =>
+    specifier.endsWith(`/${slug}`) || specifier.includes(`/${slug}/`)
+  return [...needed]
+    .sort((a, b) => Number(own(b)) - Number(own(a)) || a.localeCompare(b))
+    .map((specifier) => `import '${specifier}'`)
+}
+
+/**
+ * A tier's import block for the family: its entry, each entry of its own a
+ * part has, with the part it registers, then each other family whose elements
+ * a page writes inside it. Empty for a tier the family is not in.
+ *
+ * **The part's own entry is listed** because `FilterMenu` registers only
+ * through `filter-input/menu`, and a page that copied the family's line alone
+ * wrote a picker that opened nothing. **The other families are listed**
+ * because Select does not register Option: copied without it, the options
+ * were unknown elements and the select offered nothing.
+ */
+export const usageOf = (
+  family: Pick<Family, 'elements' | 'imports' | 'slug'>,
+  tier: 'headless' | 'styled',
+): string[] => {
+  if (!family.elements.some((element) => element.tier === tier)) {
+    return []
+  }
+  const pkg = PACKAGE[tier]
+  const parts = family.elements
+    .filter((element) => element.tier === tier && !element.specifier.endsWith(`/${family.slug}`))
+    .map((element) => `import '${element.specifier}' // ${element.label}`)
+  return [
+    `import '${pkg}/${family.slug}'`,
+    ...new Set(parts),
+    ...family.imports.map((entry) => `import '${pkg}/${entry}' // ${startCase(entry)}`),
+  ]
 }
 
 /**

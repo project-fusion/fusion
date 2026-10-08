@@ -282,3 +282,72 @@ describe('imports', () => {
     expect(catalog([manifest])[0]?.imports).toEqual([])
   })
 })
+
+/* An agent reading a family's `.md` or `.json` gets the lines to import, for
+   the family and for each example, so a copied example registers what it
+   writes. */
+describe('import lines', () => {
+  const library: HelixManifest = {
+    modules: [
+      {
+        declarations: [
+          {
+            description:
+              "```js\nimport '@fusion.dev/helix/select'\nimport '@fusion.dev/helix/option'\n```",
+            helix: { examples: [{ description: 'A select.', slug: 'preview' }] },
+            members: [
+              { helix: { words: true }, kind: 'field', name: 'placeholder' },
+              { kind: 'field', name: 'value' },
+            ],
+            name: 'HelixSelect',
+            tagName: 'helix-select',
+          },
+        ],
+        path: 'src/select/root/select-root.ts',
+      },
+      {
+        declarations: [{ name: 'HelixOption', tagName: 'helix-option' }],
+        path: 'src/option/root/option-root.ts',
+      },
+      {
+        declarations: [{ name: 'HelixFlex', tagName: 'helix-flex' }],
+        path: 'src/flex/root/flex-root.ts',
+      },
+    ],
+  }
+  const families = catalog(
+    [library],
+    [
+      {
+        css: '',
+        family: 'select',
+        html: '<helix-flex><helix-select><helix-option>A</helix-option></helix-select></helix-flex>',
+        slug: 'preview',
+        tsx: '',
+      },
+    ],
+  )
+  const select = findInCatalog(families, 'select')
+
+  test('each example lists every entry it writes, its own family first', () => {
+    expect(select?.examples[0]?.imports).toEqual([
+      "import '@fusion.dev/helix/select'",
+      "import '@fusion.dev/helix/flex'",
+      "import '@fusion.dev/helix/option'",
+    ])
+  })
+
+  test('the family’s usage is its entry and the families it imports beside it', () => {
+    expect(select?.usage).toEqual({
+      headless: [],
+      styled: ["import '@fusion.dev/helix/select'", "import '@fusion.dev/helix/option' // Option"],
+    })
+  })
+
+  test('each element names its specifier and the properties registerWords translates', () => {
+    expect([select?.elements[0]?.specifier, select?.elements[0]?.words]).toEqual([
+      '@fusion.dev/helix/select',
+      ['placeholder'],
+    ])
+  })
+})
