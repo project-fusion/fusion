@@ -27,6 +27,13 @@ export interface IndicatorOptions {
   observe?: () => readonly Element[]
 
   /**
+   * The last element marked, where the mark runs from `active` through several,
+   * as an outline marking every section on screen. The mark then covers both
+   * and everything between. Absent, or the same element, it covers `active`.
+   */
+  through?: () => HTMLElement | null | undefined
+
+  /**
    * The box the mark is positioned against, which is its containing block.
    *
    * Not the host. An absolutely positioned element is placed against its
@@ -161,7 +168,7 @@ export class IndicatorController implements ReactiveController {
       return
     }
 
-    const box = active.getBoundingClientRect()
+    const box = this.span(active)
     const own = surface.getBoundingClientRect()
     if (box.width === 0 && box.height === 0) {
       return
@@ -225,6 +232,23 @@ export class IndicatorController implements ReactiveController {
     indicator.addEventListener('transitionend', settle)
     this.waiting = { on: indicator, settle }
     this.settling = setTimeout(settle, 1000)
+  }
+
+  /** The box from `active` through the element `through` names, or `active`'s own. */
+  private span(
+    active: HTMLElement,
+  ): Pick<DOMRect, 'bottom' | 'height' | 'left' | 'right' | 'top' | 'width'> {
+    const first = active.getBoundingClientRect()
+    const end = this.options.through?.()
+    if (!end || end === active) {
+      return first
+    }
+    const last = end.getBoundingClientRect()
+    const top = Math.min(first.top, last.top)
+    const bottom = Math.max(first.bottom, last.bottom)
+    const left = Math.min(first.left, last.left)
+    const right = Math.max(first.right, last.right)
+    return { bottom, height: bottom - top, left, right, top, width: right - left }
   }
 
   /** Takes the pending listener and its guard off, wherever they came from. */

@@ -182,6 +182,53 @@ if (hasLayout()) {
       expect(outline.current).toBe('c')
     })
 
+    test('marks="visible" marks every section on screen, and the mark runs across them', async () => {
+      /* Zag's table of contents marks every heading in view. Sections of 300px
+         in a taller window put two or more on screen at once. */
+      const nav = (await mount(
+        `<helix-outline label="On this page" marks="visible">
+          <a href="#v1">One</a><a href="#v2">Two</a><a href="#v3">Three</a><a href="#v4">Four</a>
+        </helix-outline>
+        <div id="v1" style="height: 300px">One</div>
+        <div id="v2" style="height: 300px">Two</div>
+        <div id="v3" style="height: 300px">Three</div>
+        <div id="v4" style="height: 2000px">Four</div>`,
+      )) as Nav & { marked: string[] }
+      await nav.updateComplete
+      const scroller = document.scrollingElement as HTMLElement
+      const two = document.getElementById('v2') as HTMLElement
+      scroller.scrollTop = two.offsetTop + 10
+      await settle()
+      const shown = Math.ceil(scroller.clientHeight / 300)
+      expect(nav.marked[0]).toBe('v2')
+      expect(nav.marked.length).toBeGreaterThanOrEqual(Math.min(shown, 3))
+      expect(nav.current).toBe('v2')
+      expect(
+        [...nav.querySelectorAll('a[aria-current]')].map((a) => a.getAttribute('href')),
+      ).toEqual(nav.marked.map((id) => `#${id}`))
+      const mark = part(nav, 'indicator') as HTMLElement
+      const links = [...nav.querySelectorAll('a[aria-current]')] as HTMLElement[]
+      const span =
+        (links.at(-1) as HTMLElement).getBoundingClientRect().bottom -
+        (links[0] as HTMLElement).getBoundingClientRect().top
+      expect(Number.parseFloat(mark.style.getPropertyValue('--indicator-block-size'))).toBeCloseTo(
+        span,
+        0,
+      )
+    })
+
+    test('scrollToSection goes to a section and marks its link at once', async () => {
+      const nav = (await build()) as Nav & { scrollToSection(id: string): boolean }
+      window.scrollTo(0, 0)
+      await settle()
+      expect(nav.scrollToSection('three')).toBe(true)
+      expect(marked(nav)).toBe('#three')
+      await settle()
+      const three = document.getElementById('three') as HTMLElement
+      expect(Math.abs(three.getBoundingClientRect().top)).toBeLessThan(2)
+      expect(nav.scrollToSection('nowhere')).toBe(false)
+    })
+
     test('the mark is hidden until it has been measured', async () => {
       // Or it slides down from the top of the list on first paint, which reads
       // as the component correcting itself rather than as it arriving.
