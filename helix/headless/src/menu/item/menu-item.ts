@@ -104,6 +104,8 @@ import '../../kbd/index.js'
  * @csspart surface - The panel a submenu opens in beside the row, under the menu's `submenus="flyout"`.
  *
  * @cssstate checked - The row is checked.
+ * @cssstate disabled - The row is disabled.
+ * @cssstate expanded - Under `submenus="flyout"`, the row's submenu is open beside it.
  * @cssstate highlighted - In a menu with `filterable`, the arrow keys or the pointer reached the row while focus stays in the filter field.
  * @cssstate submenu-mark - Under `submenus="flyout"`, a row in this row's submenu can be ticked or opens a submenu, so the submenu keeps its trailing column.
  * @cssstate submenu-start - Under `submenus="flyout"`, a row in this row's submenu has content before its label, so the submenu keeps its leading column.
@@ -363,6 +365,10 @@ export class HelixHeadlessMenuItem extends HelixElement {
     super.willUpdate(changed)
     this.toggleState('checked', this.checked)
     this.toggleState('highlighted', this.virtual && this.highlighted)
+    /* As Option says it, so one selector serves a row disabled by its own
+       attribute or by a property a framework set. */
+    this.toggleState('disabled', this.disabled)
+    this.toggleState('expanded', this.expanded)
     if (!this.childrenKnown) {
       return
     }
