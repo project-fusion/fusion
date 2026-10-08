@@ -15,6 +15,17 @@ const options = (host: HTMLElement): HTMLElement[] => [
 
 const fill = (host: HTMLElement): string => part(host, 'marks')?.getAttribute('style') ?? ''
 
+/* The name of the marks as the platform computes it from the two attributes:
+   the elements `aria-labelledby` names, or else `aria-label`. */
+const nameOf = (host: HTMLElement): string => {
+  const marks = part(host, 'marks')
+  const ids = (marks?.getAttribute('aria-labelledby') ?? '').split(/\s+/).filter(Boolean)
+  if (ids.length === 0) {
+    return marks?.getAttribute('aria-label') ?? ''
+  }
+  return ids.map((id) => host.shadowRoot?.getElementById(id)?.textContent?.trim() ?? '').join(' ')
+}
+
 describe('rating', () => {
   test('is a radio group, because choosing one of five is what that is', async () => {
     const host = await rating('value="3"')
@@ -95,12 +106,26 @@ describe('rating', () => {
 
     test('reads as one thing, with the score in its name', async () => {
       const host = await rating('readonly value="4.2"')
-      expect(part(host, 'marks')?.getAttribute('aria-label')).toBe('4.2 out of 5')
+      expect(nameOf(host)).toBe('Rate this 4.2 out of 5')
+    })
+
+    /* The read-only branch named the image by its score alone, so a rating
+       labeled "Shown" was announced as "4 out of 5" with no subject. */
+    test('is named by its label and then its score', async () => {
+      const host = await rating('readonly value="4"')
+      expect(part(host, 'marks')?.getAttribute('aria-labelledby')).toBe('label score')
+      expect(part(host, 'marks')?.hasAttribute('aria-label')).toBe(false)
+      expect(nameOf(host)).toBe('Rate this 4 out of 5')
+    })
+
+    test('and by its score alone, with no label of its own', async () => {
+      const host = await mount('<helix-headless-rating readonly value="4"></helix-headless-rating>')
+      expect(part(host, 'marks')?.getAttribute('aria-label')).toBe('4 out of 5')
     })
 
     test('and says what it was given to say, when a number is not enough', async () => {
       const host = await rating('readonly value="4.2" value-text="4.2 from 318 reviews"')
-      expect(part(host, 'marks')?.getAttribute('aria-label')).toBe('4.2 from 318 reviews')
+      expect(nameOf(host)).toBe('Rate this 4.2 from 318 reviews')
     })
 
     test('still draws the fraction it was given', async () => {
@@ -610,7 +635,7 @@ describe('the names of the options', () => {
 
   test('and name a read-only score where value-text is empty', async () => {
     const host = await rating('readonly value="4" option-label="{score} von {max}"')
-    expect(part(host, 'marks')?.getAttribute('aria-label')).toBe('4 von 5')
+    expect(nameOf(host)).toBe('Rate this 4 von 5')
   })
 })
 
