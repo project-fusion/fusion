@@ -269,7 +269,12 @@ works on it:
 | `unknown-slot` | error | A child names a slot its Helix element does not have, so it is not drawn. Found by `helix scan`, from the templates |
 | `invalid-value` | error | An attribute with a closed set of values carries one outside it, so the element falls back to its default |
 | `unforwarded-part` | warn | The headless tier publishes the part and the styled tier does not forward it, which is a gap in Helix |
-| `unknown-tag` | error | A rule names a tag no manifest lists |
+| `unknown-tag` | error | A rule or an element names a tag no manifest lists |
+| `unknown-event` | error | A React `on` prop on a Helix element names an event the element does not dispatch, so the handler never runs. Found by `helix scan`, from the templates |
+| `unimported-tag` | warn | An element is written and nothing in the project imports the entry that registers it, so the browser draws an unknown element. Found by `helix scan`, from the imports |
+| `disabled-attribute` | error | A rule styles a form control's `[disabled]`, which a control disabled by a `<fieldset disabled>` does not carry. Write `:disabled`. Found by `helix scan` |
+| `primitive-token` | error | A rule reads a `--_helix-` primitive, which is internal to `@fusion.dev/helix-styles`. Found by `helix scan` |
+| `unknown-token` | error | A rule reads or sets a `--helix-` name the token set does not have, so it falls back silently. Found by `helix scan` |
 | `duplicate-registration` | error | Two copies of Helix are on the page |
 | `manifest-skew` | error | The manifest is from another version than the page runs. It replaces every other finding, since each would be judged against the wrong version. Turned off, the page is judged as usual |
 

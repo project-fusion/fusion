@@ -13,13 +13,18 @@ import type { FindingCategory, Identified, Kind, Owner, Raw } from './report.js'
 const CATEGORY: Readonly<Record<Kind, FindingCategory>> = {
   'dead-hook': 'styling',
   'dead-part': 'styling',
+  'disabled-attribute': 'styling',
   'duplicate-registration': 'integrity',
   'invalid-value': 'markup',
   'manifest-skew': 'integrity',
+  'primitive-token': 'styling',
   'unforwarded-part': 'styling',
+  'unimported-tag': 'integrity',
   'unknown-attribute': 'markup',
+  'unknown-event': 'markup',
   'unknown-slot': 'markup',
   'unknown-tag': 'integrity',
+  'unknown-token': 'styling',
 }
 
 /**
@@ -30,13 +35,18 @@ const CATEGORY: Readonly<Record<Kind, FindingCategory>> = {
 const OWNER: Readonly<Record<Kind, Owner>> = {
   'dead-hook': 'consumer',
   'dead-part': 'consumer',
+  'disabled-attribute': 'consumer',
   'duplicate-registration': 'consumer',
   'invalid-value': 'consumer',
   'manifest-skew': 'consumer',
+  'primitive-token': 'consumer',
   'unforwarded-part': 'helix',
+  'unimported-tag': 'consumer',
   'unknown-attribute': 'consumer',
+  'unknown-event': 'consumer',
   'unknown-slot': 'consumer',
   'unknown-tag': 'consumer',
+  'unknown-token': 'consumer',
 }
 
 /**

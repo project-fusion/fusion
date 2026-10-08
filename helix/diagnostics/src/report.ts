@@ -103,13 +103,18 @@ export interface Finding {
 export const KINDS = [
   'dead-hook',
   'dead-part',
+  'disabled-attribute',
   'duplicate-registration',
   'invalid-value',
   'manifest-skew',
+  'primitive-token',
   'unforwarded-part',
+  'unimported-tag',
   'unknown-attribute',
+  'unknown-event',
   'unknown-slot',
   'unknown-tag',
+  'unknown-token',
 ] as const
 
 /** A fault class. */

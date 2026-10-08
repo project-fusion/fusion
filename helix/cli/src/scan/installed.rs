@@ -1,0 +1,143 @@
+//! What the installed packages say beyond their lint data: the token set, the
+//! import that registers each tag, the events each element dispatches, and
+//! which elements are form controls.
+//!
+//! **Read from `api.json` and `tokens.json`, and absent where they are.** A
+//! project on a release from before the packages shipped their catalog still
+//! scans, and the checks that need it say nothing rather than guess.
+
+use std::collections::{HashMap, HashSet};
+use std::path::Path;
+use std::sync::LazyLock;
+
+use regex::Regex;
+
+use crate::api::Library;
+
+/// What the checks beyond the lint data read.
+#[derive(Default)]
+pub struct Installed {
+    /// Every event name any element dispatches.
+    pub dispatched: HashSet<String>,
+    /// Each tag's events, as `(name, reactProp)`.
+    pub events: HashMap<String, Vec<(String, String)>>,
+    /// The tags that are form controls, which `:disabled` matches.
+    pub forms: HashSet<String>,
+    /// Each tag's import specifier, such as `@fusion.dev/helix/option`.
+    pub specifiers: HashMap<String, String>,
+    /// Every semantic token name, or `None` where the token set is not installed.
+    pub tokens: Option<HashSet<String>>,
+}
+
+impl Installed {
+    /// What the packages installed from `root` up publish.
+    pub fn read(root: &Path) -> Self {
+        let mut installed = Self {
+            tokens: crate::api::token_names(root),
+            ..Self::default()
+        };
+        let Ok(library) = Library::load(root) else {
+            return installed;
+        };
+        for tier in &library.tiers {
+            for family in &tier.families {
+                for element in family["elements"].as_array().into_iter().flatten() {
+                    let tag = element["tagName"].as_str().unwrap_or_default().to_owned();
+                    if let Some(specifier) = element["specifier"].as_str() {
+                        installed
+                            .specifiers
+                            .insert(tag.clone(), specifier.to_owned());
+                    }
+                    let events: Vec<(String, String)> = element["events"]
+                        .as_array()
+                        .into_iter()
+                        .flatten()
+                        .map(|event| {
+                            (
+                                event["name"].as_str().unwrap_or_default().to_owned(),
+                                event["reactProp"].as_str().unwrap_or_default().to_owned(),
+                            )
+                        })
+                        .collect();
+                    installed
+                        .dispatched
+                        .extend(events.iter().map(|(name, _)| name.clone()));
+                    installed.events.insert(tag.clone(), events);
+                    /* `formAssociated` is static, and the catalog lists
+                    instance properties, so a form control is told by the
+                    `form` every one of them carries. */
+                    let form = element["properties"]
+                        .as_array()
+                        .into_iter()
+                        .flatten()
+                        .any(|property| property["name"] == "form");
+                    if form {
+                        installed.forms.insert(tag);
+                    }
+                }
+            }
+        }
+        installed
+    }
+
+    /// Whether `tag` is registered by something the project imports: its own
+    /// entry, an entry beneath it, or its package's barrel.
+    pub fn imported(&self, tag: &str, imports: &HashSet<String>) -> Option<bool> {
+        let specifier = self.specifiers.get(tag)?;
+        let package = if specifier.starts_with("@fusion.dev/helix-headless") {
+            "@fusion.dev/helix-headless"
+        } else {
+            "@fusion.dev/helix"
+        };
+        Some(imports.contains(specifier) || imports.contains(package))
+    }
+}
+
+/// A Helix import in a module or a page: a quoted specifier, or a CDN URL
+/// holding one, in either package. The path after the package, if any, is the
+/// entry, with a `dist/` and an `index.js` a CDN path carries taken off.
+static IMPORT: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r#"['"`](?:[^'"`\s]*/)?(@fusion\.dev/helix(?:-headless)?)(?:@[^/'"`\s]+)?((?:/[A-Za-z0-9._-]+)*)/?['"`]"#)
+        .expect("a literal pattern")
+});
+
+/// The Helix specifiers `text` imports, normalized: `@fusion.dev/helix` for
+/// the barrel and `@fusion.dev/helix/select` for an entry.
+pub fn imports(text: &str) -> impl Iterator<Item = String> + '_ {
+    IMPORT.captures_iter(text).map(|found| {
+        let package = found.get(1).map_or("", |one| one.as_str());
+        let path = found.get(2).map_or("", |one| one.as_str());
+        let path = path.strip_prefix("/dist").unwrap_or(path);
+        let path = path
+            .strip_suffix("/index.js")
+            .or_else(|| path.strip_suffix(".js"))
+            .unwrap_or(path);
+        format!("{package}{path}")
+    })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::imports;
+
+    #[test]
+    fn imports_read_specifiers_entries_and_cdn_paths() {
+        let text = r#"
+            import '@fusion.dev/helix/select'
+            import { HelixOption } from "@fusion.dev/helix/option"
+            import '@fusion.dev/helix-styles/helix.css'
+            import('@fusion.dev/helix-headless')
+            <script type="module" src="https://cdn.jsdelivr.net/npm/@fusion.dev/helix@0.184.0/dist/tabs/index.js"></script>
+        "#;
+        let found: Vec<String> = imports(text).collect();
+        assert_eq!(
+            found,
+            [
+                "@fusion.dev/helix/select",
+                "@fusion.dev/helix/option",
+                "@fusion.dev/helix-headless",
+                "@fusion.dev/helix/tabs",
+            ]
+        );
+    }
+}

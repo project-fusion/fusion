@@ -25,6 +25,7 @@ use regex::Regex;
 
 use super::css::StyleRule;
 use super::identity::nearest;
+use super::installed::Installed;
 use super::lint::{Allows, Index, Published};
 use super::markup::{Element, Value};
 
@@ -106,6 +107,42 @@ pub struct Raw {
     pub origin: Origin,
     pub subject: String,
     pub tag: String,
+}
+
+/// A Helix tag carrying an attribute selector for `disabled`.
+static DISABLED: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"(helix-[a-z0-9-]+)\[\s*disabled\s*\]").expect("a literal pattern")
+});
+
+/// One finding per kind and subject, counted, in the order first seen.
+fn keep(
+    grouped: &mut BTreeMap<(usize, String), (Raw, usize)>,
+    keys: &mut HashMap<String, usize>,
+    raw: Raw,
+) {
+    let key = format!("{} {}", raw.kind, raw.subject);
+    let order = keys.len();
+    let order = *keys.entry(key.clone()).or_insert(order);
+    grouped
+        .entry((order, key))
+        .and_modify(|(_, count)| *count += 1)
+        .or_insert((raw, 1));
+}
+
+/// `BeforeChange` as `before-change`.
+fn kebab(camel: &str) -> String {
+    let mut out = String::new();
+    for (index, letter) in camel.chars().enumerate() {
+        if letter.is_ascii_uppercase() {
+            if index > 0 {
+                out.push('-');
+            }
+            out.push(letter.to_ascii_lowercase());
+        } else {
+            out.push(letter);
+        }
+    }
+    out
 }
 
 static TAG: LazyLock<Regex> =
@@ -208,6 +245,9 @@ pub struct Analyzer<'a> {
     suggested: HashMap<String, Option<String>>,
     /// Every part name the project's own templates write, `part="name"`.
     declared: HashSet<String>,
+    /// What the installed packages publish beyond their lint data, and the
+    /// Helix specifiers the project imports, where the scan has them.
+    installed: Option<(&'a Installed, &'a HashSet<String>)>,
     pub found: Found,
 }
 
@@ -223,8 +263,17 @@ impl<'a> Analyzer<'a> {
             used,
             suggested: HashMap::new(),
             declared: HashSet::new(),
+            installed: None,
             found: Found::default(),
         }
+    }
+
+    /// The same analyzer, with the checks that read the installed packages'
+    /// catalog and token set, and the project's imports.
+    #[must_use]
+    pub fn with(mut self, installed: &'a Installed, imports: &'a HashSet<String>) -> Self {
+        self.installed = Some((installed, imports));
+        self
     }
 
     /// The part names the project's own templates write, read before the
@@ -257,6 +306,10 @@ impl<'a> Analyzer<'a> {
             };
             if rule.selector.contains("helix-") {
                 self.parts(rule, &origin);
+            }
+            if !own {
+                self.disabled(rule, &origin);
+                self.tokens(rule, &origin);
             }
             let known: Vec<String> = targets(&rule.selector)
                 .into_iter()
@@ -371,6 +424,42 @@ impl<'a> Analyzer<'a> {
                 .iter()
                 .flat_map(|element| element.hooks.iter().map(|(name, _)| name.as_str()));
             let suggestion = nearest(property, candidates, Some(HOOK_DISTANCE)).map(str::to_owned);
+            /* **A name in a tag's own prefix is the tag's**, so `--button-glow`
+            on `helix-button` claims to be a hook Button does not have, and no
+            project names its own property that way. */
+            let claimed = known.iter().find(|tag| {
+                tag.strip_prefix("helix-")
+                    .is_some_and(|bare| property.starts_with(&format!("--{bare}-")))
+            });
+            if let Some(claimed) = claimed.filter(|_| {
+                others.is_empty() && suggestion.is_none() && !self.used.contains(property)
+            }) {
+                let mut hooks: Vec<&str> = self
+                    .index
+                    .get(claimed)
+                    .map(|element| {
+                        element
+                            .hooks
+                            .iter()
+                            .map(|(name, _)| name.as_str())
+                            .collect()
+                    })
+                    .unwrap_or_default();
+                hooks.sort_unstable();
+                self.found.findings.push(Raw {
+                    expected: None,
+                    kind: "dead-hook",
+                    message: if hooks.is_empty() {
+                        format!("`{claimed}` has no hook `{property}`, so nothing reads it. It has no hooks.")
+                    } else {
+                        format!("`{claimed}` has no hook `{property}`, so nothing reads it. Its hooks are {}.", listed(&hooks, "and"))
+                    },
+                    origin: origin(),
+                    subject: format!("{} {{ {property} }}", rule.selector),
+                    tag: claimed.clone(),
+                });
+                continue;
+            }
             if others.is_empty() && (suggestion.is_none() || self.used.contains(property)) {
                 continue;
             }
@@ -479,23 +568,23 @@ impl<'a> Analyzer<'a> {
         for (path, elements) in files {
             for (position, element) in elements.iter().enumerate() {
                 if let Some(raw) = self.slot(path, position, element, elements) {
-                    let key = format!("{} {}", raw.kind, raw.subject);
-                    let order = keys.len();
-                    let order = *keys.entry(key.clone()).or_insert(order);
-                    grouped
-                        .entry((order, key))
-                        .and_modify(|(_, count)| *count += 1)
-                        .or_insert((raw, 1));
+                    keep(&mut grouped, &mut keys, raw);
+                }
+                let mut also = Vec::new();
+                if self.index.get(&element.tag).is_some() {
+                    also.extend(self.unimported(path, position, element));
+                    if std::path::Path::new(path).extension().is_some_and(|ext| {
+                        ext.eq_ignore_ascii_case("tsx") || ext.eq_ignore_ascii_case("jsx")
+                    }) {
+                        also.extend(self.events(path, position, element));
+                    }
+                }
+                for raw in also {
+                    keep(&mut grouped, &mut keys, raw);
                 }
                 let Some(published) = self.index.get(&element.tag) else {
                     if let Some(raw) = self.unknown_tag(path, position, element) {
-                        let key = format!("{} {}", raw.kind, raw.subject);
-                        let order = keys.len();
-                        let order = *keys.entry(key.clone()).or_insert(order);
-                        grouped
-                            .entry((order, key))
-                            .and_modify(|(_, count)| *count += 1)
-                            .or_insert((raw, 1));
+                        keep(&mut grouped, &mut keys, raw);
                     }
                     continue;
                 };
@@ -542,13 +631,7 @@ impl<'a> Analyzer<'a> {
                         },
                         Some(Allows::Any) => continue,
                     };
-                    let key = format!("{} {}", raw.kind, raw.subject);
-                    let order = keys.len();
-                    let order = *keys.entry(key.clone()).or_insert(order);
-                    grouped
-                        .entry((order, key))
-                        .and_modify(|(_, count)| *count += 1)
-                        .or_insert((raw, 1));
+                    keep(&mut grouped, &mut keys, raw);
                 }
             }
         }
@@ -558,6 +641,172 @@ impl<'a> Analyzer<'a> {
             }
             self.found.findings.push(raw);
         }
+    }
+
+    /// A rule styling a form control's `[disabled]`, which a control a
+    /// `<fieldset disabled>` disables never carries.
+    fn disabled(&mut self, rule: &StyleRule, origin: &dyn Fn() -> Origin) {
+        let Some((installed, _)) = self.installed else {
+            return;
+        };
+        for found in DISABLED.captures_iter(&rule.selector) {
+            let tag = found.get(1).map_or("", |one| one.as_str());
+            if !installed.forms.contains(tag) {
+                continue;
+            }
+            self.found.findings.push(Raw {
+                expected: Some(format!("{tag}:disabled")),
+                kind: "disabled-attribute",
+                message: format!("`{tag}[disabled]` misses a `{tag}` that a `<fieldset disabled>` disables, which sets no attribute, so it looks enabled and takes no input. Write `{tag}:disabled`."),
+                origin: origin(),
+                subject: format!("{tag}[disabled]"),
+                tag: tag.to_owned(),
+            });
+        }
+    }
+
+    /// The tokens a rule reads and sets: a `--_helix-` primitive read, and a
+    /// `--helix-` name the installed token set does not have.
+    fn tokens(&mut self, rule: &StyleRule, origin: &dyn Fn() -> Origin) {
+        let tag = targets(&rule.selector)
+            .into_iter()
+            .next()
+            .unwrap_or_default();
+        for (property, value) in &rule.declarations {
+            for read in super::css::reads(value) {
+                if read.starts_with("--_helix-") {
+                    self.found.findings.push(Raw {
+                        expected: None,
+                        kind: "primitive-token",
+                        message: format!("`{read}` is a primitive, internal to `@fusion.dev/helix-styles`, and it can be renamed in any release. Read the semantic token that refers to it, such as a `--helix-color-` token."),
+                        origin: origin(),
+                        subject: format!("{} {{ {property}: var({read}) }}", rule.selector),
+                        tag: tag.clone(),
+                    });
+                } else if let Some(raw) =
+                    self.unknown_token(read, "reads", rule, property, &tag, origin)
+                {
+                    self.found.findings.push(raw);
+                }
+            }
+            if let Some(raw) = self.unknown_token(property, "sets", rule, property, &tag, origin) {
+                self.found.findings.push(raw);
+            }
+        }
+    }
+
+    /// A `--helix-` name the token set does not have, read or set. The seeds
+    /// are inputs to the token set and are not in it.
+    fn unknown_token(
+        &self,
+        name: &str,
+        verb: &str,
+        rule: &StyleRule,
+        property: &str,
+        tag: &str,
+        origin: &dyn Fn() -> Origin,
+    ) -> Option<Raw> {
+        let (installed, _) = self.installed?;
+        let tokens = installed.tokens.as_ref()?;
+        if !name.starts_with("--helix-")
+            || name.starts_with("--helix-seed-")
+            || name == "--helix-density"
+            || tokens.contains(name)
+        {
+            return None;
+        }
+        let suggestion = nearest(name, tokens.iter().map(String::as_str), None).map(str::to_owned);
+        Some(Raw {
+            message: match &suggestion {
+                Some(close) => format!("This rule {verb} `{name}`, which is not a Helix token, so it falls back silently. The closest token is `{close}`."),
+                None => format!("This rule {verb} `{name}`, which is not a Helix token, so it falls back silently. `helix api tokens` lists the tokens."),
+            },
+            expected: suggestion,
+            kind: "unknown-token",
+            origin: origin(),
+            subject: format!("{} {{ {property} }} {name}", rule.selector),
+            tag: tag.to_owned(),
+        })
+    }
+
+    /// An element written where nothing in the project imports the entry that
+    /// registers it.
+    fn unimported(&self, path: &str, position: usize, element: &Element) -> Option<Raw> {
+        let (installed, imports) = self.installed?;
+        if installed.imported(&element.tag, imports)? {
+            return None;
+        }
+        let specifier = installed.specifiers.get(&element.tag)?;
+        let tag = element.tag.as_str();
+        Some(Raw {
+            expected: Some(format!("import '{specifier}'")),
+            kind: "unimported-tag",
+            message: format!("`{tag}` is written here, and nothing in the project imports `{specifier}`, which registers it, so the browser draws an unknown element. Add `import '{specifier}'`."),
+            origin: Origin {
+                index: position,
+                line: element.line,
+                sheet: path.to_owned(),
+                text: element.text.clone(),
+            },
+            subject: format!("<{tag}>"),
+            tag: tag.to_owned(),
+        })
+    }
+
+    /// The React `on` props on an element that bind nothing: a name in Helix's
+    /// camel case, which React reads as an event of that exact name, and a
+    /// hyphenated name the element does not dispatch.
+    fn events(&self, path: &str, position: usize, element: &Element) -> Vec<Raw> {
+        let Some((installed, _)) = self.installed else {
+            return Vec::new();
+        };
+        let tag = element.tag.as_str();
+        let mine = installed.events.get(tag).cloned().unwrap_or_default();
+        let mut found = Vec::new();
+        for attribute in &element.attributes {
+            let name = attribute.name.as_str();
+            let event = if let Some(rest) = name.strip_prefix("onHelix") {
+                format!("helix-{}", kebab(rest))
+            } else if name.starts_with("on") && name.contains('-') && !name.starts_with("on:") {
+                name[2..].to_owned()
+            } else {
+                continue;
+            };
+            if mine.iter().any(|(_, prop)| prop == name) {
+                continue;
+            }
+            let props: Vec<&str> = mine.iter().map(|(_, prop)| prop.as_str()).collect();
+            let close = mine
+                .iter()
+                .find(|(dispatched, _)| *dispatched == event)
+                .map(|(_, prop)| prop.clone())
+                .or_else(|| nearest(name, props.iter().copied(), None).map(str::to_owned));
+            let message = if installed.dispatched.contains(&event)
+                && !mine.iter().any(|(one, _)| *one == event)
+            {
+                format!("`{tag}` does not dispatch `{event}`, so `{name}` never runs. React wires an `on` prop only on the element that dispatches the event.")
+            } else {
+                match &close {
+                    Some(close) => format!("`{name}` on `{tag}` listens for an event named `{}`, and nothing dispatches it. Write `{close}`.", name.strip_prefix("on").unwrap_or(name)),
+                    None if props.is_empty() => format!("`{name}` on `{tag}` listens for an event named `{}`, and nothing dispatches it. `{tag}` dispatches no events of its own.", name.strip_prefix("on").unwrap_or(name)),
+                    None => format!("`{name}` on `{tag}` listens for an event named `{}`, and nothing dispatches it. `{tag}` takes {}.", name.strip_prefix("on").unwrap_or(name), listed(&props, "and")),
+                }
+            };
+            found.push(Raw {
+                expected: close,
+                kind: "unknown-event",
+                message,
+                origin: Origin {
+                    index: position,
+                    line: element.line,
+                    sheet: path.to_owned(),
+                    text: element.text.clone(),
+                },
+                subject: format!("<{tag} {name}>"),
+                tag: tag.to_owned(),
+            });
+        }
+        found
     }
 
     /// A `helix-` element no installed package publishes, which the browser
@@ -714,6 +963,136 @@ mod tests {
             .clone(),
             version: None,
         }])
+    }
+
+    /// What the installed packages add, for the checks that read it: Card is
+    /// a form control here so `[disabled]` has something to judge.
+    fn installed() -> super::super::installed::Installed {
+        let mut installed = super::super::installed::Installed {
+            tokens: Some(
+                ["--helix-color-surface", "--helix-space-md"]
+                    .map(str::to_owned)
+                    .into(),
+            ),
+            ..Default::default()
+        };
+        installed
+            .specifiers
+            .insert("helix-card".to_owned(), "@fusion.dev/helix/card".to_owned());
+        installed
+            .specifiers
+            .insert("helix-flex".to_owned(), "@fusion.dev/helix/flex".to_owned());
+        installed.events.insert(
+            "helix-card".to_owned(),
+            vec![("helix-select".to_owned(), "onhelix-select".to_owned())],
+        );
+        installed.dispatched.insert("helix-select".to_owned());
+        installed.dispatched.insert("helix-dismiss".to_owned());
+        installed.forms.insert("helix-card".to_owned());
+        installed
+    }
+
+    fn kinds(analyzer: &Analyzer<'_>) -> Vec<(&'static str, String)> {
+        analyzer
+            .found
+            .findings
+            .iter()
+            .map(|one| (one.kind, one.subject.clone()))
+            .collect()
+    }
+
+    #[test]
+    fn rules_reading_primitives_and_names_outside_the_token_set_are_found() {
+        let index = index();
+        let listing = index.hooks();
+        let used = HashSet::new();
+        let installed = installed();
+        let imports = HashSet::new();
+        let mut analyzer = Analyzer::new(&index, &listing, &used).with(&installed, &imports);
+        let rules = crate::scan::css::read(
+            ".a { color: var(--_helix-neutral-500); padding: var(--helix-space-md); }\n.b { --helix-color-surfce: red; --helix-seed-brand: red; }\nhelix-card[disabled], helix-flex[disabled] { opacity: .5 }",
+            1,
+            false,
+        );
+        analyzer.sheet("a.css", &rules, false);
+        assert_eq!(
+            kinds(&analyzer),
+            [
+                (
+                    "primitive-token",
+                    ".a { color: var(--_helix-neutral-500) }".to_owned()
+                ),
+                (
+                    "unknown-token",
+                    ".b { --helix-color-surfce } --helix-color-surfce".to_owned()
+                ),
+                ("disabled-attribute", "helix-card[disabled]".to_owned()),
+            ]
+        );
+    }
+
+    #[test]
+    fn a_name_in_a_tag_s_own_prefix_that_is_no_hook_is_found() {
+        let index = index();
+        let listing = index.hooks();
+        let used = HashSet::new();
+        let mut analyzer = Analyzer::new(&index, &listing, &used);
+        let rules =
+            crate::scan::css::read("helix-card { --card-glow: 1px; --my-own: 2px; }", 1, false);
+        analyzer.sheet("a.css", &rules, false);
+        assert_eq!(
+            kinds(&analyzer),
+            [("dead-hook", "helix-card { --card-glow }".to_owned())]
+        );
+    }
+
+    #[test]
+    fn an_element_whose_entry_nothing_imports_is_found_and_a_barrel_covers_all() {
+        let index = index();
+        let listing = index.hooks();
+        let used = HashSet::new();
+        let installed = installed();
+        let page = markup::read("<helix-card></helix-card><helix-flex></helix-flex>", 1);
+        let imports: HashSet<String> = ["@fusion.dev/helix/flex".to_owned()].into();
+        let mut analyzer = Analyzer::new(&index, &listing, &used).with(&installed, &imports);
+        analyzer.markup([("a.html", page.elements.as_slice())]);
+        assert_eq!(
+            kinds(&analyzer),
+            [("unimported-tag", "<helix-card>".to_owned())]
+        );
+
+        let barrel: HashSet<String> = ["@fusion.dev/helix".to_owned()].into();
+        let mut analyzer = Analyzer::new(&index, &listing, &used).with(&installed, &barrel);
+        analyzer.markup([("a.html", page.elements.as_slice())]);
+        assert!(kinds(&analyzer).is_empty());
+    }
+
+    #[test]
+    fn a_react_prop_naming_no_event_the_element_dispatches_is_found() {
+        let index = index();
+        let listing = index.hooks();
+        let used = HashSet::new();
+        let installed = installed();
+        let imports: HashSet<String> = ["@fusion.dev/helix".to_owned()].into();
+        let page = crate::scan::jsx::read(
+            "export const A = () => <helix-card onhelix-select={f} onHelixSelect={f} onhelix-dismiss={f} onClick={f} onhelix-selcet={f} />",
+            oxc_span::SourceType::tsx(),
+        )
+        .expect("JSX");
+        let mut analyzer = Analyzer::new(&index, &listing, &used).with(&installed, &imports);
+        analyzer.markup([("a.tsx", page.elements.as_slice())]);
+        assert_eq!(
+            kinds(&analyzer),
+            [
+                ("unknown-event", "<helix-card onHelixSelect>".to_owned()),
+                ("unknown-event", "<helix-card onhelix-dismiss>".to_owned()),
+                ("unknown-event", "<helix-card onhelix-selcet>".to_owned()),
+            ]
+        );
+        /* The same props in HTML are not React's, and are not judged. */
+        let mut analyzer = Analyzer::new(&index, &listing, &used).with(&installed, &imports);
+        analyzer.markup([("a.html", page.elements.as_slice())]);
+        assert!(kinds(&analyzer).is_empty());
     }
 
     #[test]
