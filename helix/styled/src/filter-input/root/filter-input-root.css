@@ -185,3 +185,13 @@ slot[name="end"]::slotted(*) {
   padding-inline: var(--helix-space-none);
   position: absolute;
 }
+
+/* The line the panel shows while it loads or when a filter hides every
+   suggestion is `shared/collection/state`'s. The inset is Listbox's, a step
+   tighter than the other collections', since this panel holds rows of the
+   same size. */
+[part="empty"],
+[part="loading"] {
+  --_collection-inset-block: var(--helix-space-xs);
+  --_collection-inset-inline: var(--helix-space-xs);
+}

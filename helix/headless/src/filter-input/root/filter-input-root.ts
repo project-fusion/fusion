@@ -160,6 +160,8 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * @slot feedback - The message that says what is wrong, for content richer than a string. It shows while there is a message.
  * @slot hint - Help under the control, for content richer than the `hint` text.
  * @slot label - The label, for content richer than the `label` text.
+ * @slot loading - What the panel shows while `loading` is set, for content richer than `loading-text`.
+ * @slot no-results - What the panel shows when `filter-suggestions` hides every suggestion, for content richer than `no-results-text`.
  * @slot start - Content before the text, such as a search icon.
  * @slot suggestions - Suggestions for what to type next, as `Option`s and `Option.Group`s.
  * @slot tags - The active filters, as `FilterChip`s or `Tag`s.
@@ -176,17 +178,21 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  *
  * @csspart clear - The button that empties the field.
  * @csspart control - The input itself.
+ * @csspart empty - Shown in the panel when `filter-suggestions` hides every suggestion.
  * @csspart feedback - The error message under the field.
  * @csspart field - The box that holds everything.
  * @csspart hint - The help text under the field, shown while there is no error.
  * @csspart label - The label above the field.
  * @csspart lead - The box before the text that holds the `start` slot.
  * @csspart live - The live region that says how many suggestions the open panel offers. It is rendered from the first time the panel opens with suggestions.
+ * @csspart loading - Shown in the panel while the suggestions load.
  * @csspart rest - The count of tokens that did not fit. It is a `<button>` with `expandable` and a `<span>` without it.
  * @csspart surface - The floating panel the suggestions sit in.
  * @csspart tags - The row the tokens sit in.
  *
  * @cssstate invalid - The field has an error to show, from the browser's validation or from your `feedback`.
+ * @cssstate loading - While `loading` is set.
+ * @cssstate no-results - `filter-suggestions` hid every suggestion, and `no-results-text` or the `no-results` slot says so.
  * @cssstate open - The suggestions are open.
  */
 @customElement('helix-headless-filter-input')
@@ -252,6 +258,34 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
   filterSuggestions = false
 
   /**
+   * Whether the suggestions are still loading, such as while a request for the
+   * values of a typed key is out.
+   *
+   * The panel opens on `loading-text`, or the `loading` slot, while the field
+   * has focus, and a screen reader hears it. Slot the options and clear this
+   * when they arrive.
+   */
+  @property({ reflect: true, type: Boolean })
+  loading = false
+
+  /**
+   * Text the panel shows while the suggestions load.
+   */
+  @words
+  @property({ attribute: 'loading-text' })
+  loadingText = 'Loading'
+
+  /**
+   * Text the panel shows when `filter-suggestions` hides every suggestion, such
+   * as "No matching filters".
+   *
+   * Empty, or no `no-results` slot, and the panel closes instead, as it does
+   * when it has nothing to offer.
+   */
+  @property({ attribute: 'no-results-text' })
+  noResultsText = ''
+
+  /**
    * The text shown while the field is empty.
    *
    * Not a label: it goes when typing starts.
@@ -311,12 +345,21 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
 
   /** Says how many suggestions the open panel offers, when that changes. */
   private sayCount(): void {
-    const count = this.open && this.suggesting ? this.suggestions.length : -1
+    /* `-2` for loading, so the count is said again once the suggestions come. */
+    const count = this.open && this.suggesting ? (this.loading ? -2 : this.suggestions.length) : -1
     if (count === this.saidCount) {
       return
     }
     this.saidCount = count
+    if (count === -2) {
+      this.status.sayNow(this.loadingText)
+      return
+    }
     if (count < 0) {
+      return
+    }
+    if (count === 0 && this.noResultsText !== '') {
+      this.status.sayNow(this.noResultsText)
       return
     }
     this.status.sayNow(
@@ -880,12 +923,23 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
   private refreshSuggesting(): void {
     this.narrow()
     const options = this.suggestions
-    this.suggesting = options.length > 0
+    this.suggesting = options.length > 0 || this.loading || this.unmatched
     /* Clamped rather than kept: the list under the highlight has just been
        replaced, and an index into the old one points at whatever happens to sit
        there now. Reset, so a reader who has not moved since is not holding a
        highlight they never put anywhere. */
     this.activeAt = this.activeAt < options.length ? this.activeAt : -1
+  }
+
+  /**
+   * Whether `filter-suggestions` has hidden every suggestion there is, where a
+   * `no-results-text` or a `no-results` slot says so. The panel stays open on
+   * it, and `:state(no-results)` is on the host.
+   */
+  private get unmatched(): boolean {
+    const said =
+      this.noResultsText !== '' || this.knownChildren.some((child) => child.slot === 'no-results')
+    return said && !this.loading && this.options.length > 0 && this.suggestions.length === 0
   }
 
   /** The panel again, whenever what is in it changes. */
@@ -1010,6 +1064,8 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
        `updateComplete` would read the count from before the change. */
     this.handleTokens()
     this.refreshSuggesting()
+    this.toggleState('loading', this.loading)
+    this.toggleState('no-results', this.unmatched)
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
@@ -1157,6 +1213,14 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
       ?hidden=${!this.open}
     >
       <slot name="suggestions" @slotchange=${this.handleSuggestions}></slot>
+      <!-- Hidden from the tree, which a listbox keeps for its options: the
+           live region says these. -->
+      <div part="loading" aria-hidden="true" ?hidden=${!this.loading}>
+        <slot name="loading">${this.loadingText}</slot>
+      </div>
+      <div part="empty" aria-hidden="true" ?hidden=${!this.unmatched}>
+        <slot name="no-results">${this.noResultsText}</slot>
+      </div>
     </div>
     ${drawStatus(this.status)}
     ${this.renderHint()}${this.renderFeedback()}`
