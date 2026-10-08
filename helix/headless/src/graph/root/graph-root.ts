@@ -896,14 +896,14 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
         aria-selected=${chosen ? 'true' : 'false'}
         aria-posinset=${index + 1}
         aria-setsize=${total}
-        aria-description=${relation || nothing}
+        aria-describedby=${relation ? `note-${index}-relation` : nothing}
         @click=${() => {
           this.cursor = index
           this.choose(index)
         }}
       >
         <span part="note-name">${nameOf(entry.node)}</span>
-        ${relation ? html`<span part="note-relation" aria-hidden="true">${relation}</span>` : nothing}
+        ${relation ? html`<span part="note-relation" id=${`note-${index}-relation`} aria-hidden="true">${relation}</span>` : nothing}
       </div>`
       },
     )}`
@@ -972,7 +972,6 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
             data-scroller
             aria-label=${this.notesLabel}
             aria-activedescendant=${cursor}
-            aria-keyshortcuts="ArrowUp ArrowDown Home End PageUp PageDown Enter Space"
             @keydown=${this.handleListKeydown}
             @scroll=${() => this.virtualize.measure()}
           >
