@@ -428,8 +428,26 @@ leaves removing it to your framework.
 - The list is a listbox, named by `notes-label`. Arrow keys, Home, End, Page
   Up, and Page Down move through it, typing a letter moves to the next note
   whose name starts with it, and Enter or Space selects a note.
-- In the search field, Down moves into the list, and Escape empties the search.
-  With `no-panel`, Escape on an empty search closes the list.
+- The search field is a combobox that controls the list. Down and Up move
+  through the notes while the focus stays in the field, which names the note
+  the keys are on as its `aria-activedescendant`. Page Down and Page Up move a
+  page, and Enter selects the note. Typing, Left, Right, Home, and End go back
+  to the text. Escape first lets go of the note, then empties the search. With
+  `no-panel`, Escape on an empty search closes the list.
+- Alt and the arrow keys walk the links from the note the keys are on, in the
+  list or in the search field. Alt+Right follows a link to the first note it
+  links to or from. Alt+Down and Alt+Up move to the next or the previous note
+  linked to the note the step came from, and wrap. Alt+Left goes back along
+  the links walked. Right and Left swap on a right-to-left page. Screen
+  readers hear each note, how it stands to the note it came from, and its
+  place among that note's links, such as "Hiring plan. Linked from Roadmap. 2
+  of 3", from `walk-label`. A note with no links says so, from
+  `link-count-label`. Enter selects the note the walk reached.
+- While the list or the search field has the keys, the drawing marks the note
+  they are on as it marks the note under the pointer, with its name boxed and
+  its links lit, and a walk brings each note it reaches into view.
+  `sigmaDriver` draws the mark, and a driver of your own reads `keyed` from
+  the looks it is given.
 - The legend is a toolbar and one tab stop. Arrow keys, Home, and End move
   between its groups, typing a letter moves to the next group whose name
   starts with it, and Space or Enter shows or hides a group.
@@ -449,7 +467,8 @@ leaves removing it to your framework.
   When that note is removed, the keys move to the note that took its row.
 - Change the words with `search-label`, `count-label`, `selected-label`,
   `selection-label`,
-  `links-to-label`, `linked-from-label`, `linked-both-label`,
+  `links-to-label`, `linked-from-label`, `linked-both-label`, `walk-label`,
+  `link-count-label`,
   `moved-up-label`, `moved-down-label`, `moved-left-label`,
   `moved-right-label`, `zoomed-in-label`, and `zoomed-out-label`, or register
   them for a language with `registerWords` (see
@@ -479,8 +498,8 @@ The frame sends these events. Their names follow Map's: `helix-graph-pan`,
 To use another renderer, write a driver: an object with four methods.
 
 - `draw({ nodes, links })` draws the graph, each note at its `x` and `y`.
-- `look(looks)` says how each note and link is drawn, from the theme and the
-  selection.
+- `look(looks)` says how each note and link is drawn, from the theme, the
+  selection, and the note the keys are on, `looks.keyed`.
 - `panBy(x, y, animate)` moves the view by a number of pixels.
 - `zoomBy(direction, animate)` zooms in for `1` and out for `-1`.
 

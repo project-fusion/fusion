@@ -470,4 +470,22 @@ describe('connectGraph', () => {
     /* `a` and `b` share one link; `c` has none. */
     expect(sizes).toEqual({ a: 2, b: 2, c: 1 })
   })
+
+  test('brings a note a walk along the links reached into view, and not a note the list arrows reach', async () => {
+    const host = await frame()
+    const { asked, driver } = recording()
+    connectGraph(host, driver)
+    await settled(host)
+    const list = part(host, 'list') as HTMLElement
+    const press = (name: string, altKey = false): void => {
+      list.dispatchEvent(new KeyboardEvent('keydown', { altKey, bubbles: true, key: name }))
+    }
+    list.focus()
+    press('ArrowDown')
+    await settled(host)
+    expect(asked.centered).toEqual([])
+    press('ArrowRight', true)
+    await settled(host)
+    expect(asked.centered).toEqual(['a'])
+  })
 })

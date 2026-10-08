@@ -12,6 +12,7 @@ import {
   HelixGraphReadyEvent,
   HelixGraphSignalEvent,
   HelixGraphZoomEvent,
+  isRtl,
   KeyboardNavigationController,
   MixinControllerActive,
   MixinViewport,
@@ -64,6 +65,23 @@ import {
  * Set `depth` to show the local graph: only the notes within that many links
  * of the selected one.
  *
+ * The search field is a combobox over the list. Down and Up move through the
+ * notes while the focus stays in the field, and Enter selects one.
+ *
+ * **Walk the links with Alt and the arrow keys**, in the list or in the
+ * search field once its keys are on a note. The note the keys are on is
+ * marked in the drawing.
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Alt+Right | Follows a link, to the first note the one the keys are on links to or from. |
+ * | Alt+Down, Alt+Up | Moves to the next or the previous note linked to the one the step came from, wrapping. |
+ * | Alt+Left | Goes back along the links walked. |
+ *
+ * Right and Left swap on a right-to-left page. Each step says the note, how it
+ * stands to the note it came from, and its place among that note's links,
+ * such as "Hiring plan. Linked from Roadmap. 2 of 3". Enter selects the note.
+ *
  * Set `legend` to name the groups over the drawing, each a button that shows
  * or hides its notes. `hiddenGroups` holds the groups turned off, and the
  * list holds only what the drawing shows. The legend is a toolbar and one tab
@@ -103,7 +121,7 @@ import {
  * @event {HelixGraphFilterEvent} helix-graph-filter - A group in the legend was pressed, to show or hide its notes. The detail's `hidden` is every group that would be hidden. Cancelable: cancel it to keep the groups as they were, or to set `hiddenGroups` yourself.
  * @event {HelixGraphLayoutEvent} helix-graph-layout - A layout settled, with where it put each note, sent by `laidOut()`. Keep the positions and pass them back as each note's `x` and `y`, and `z` where a renderer draws in three dimensions.
  * @event {HelixGraphPanEvent} helix-graph-pan - A pan button or arrow key was pressed. `connectGraph` moves the drawing, then calls `moved()`.
- * @event {HelixGraphPartChangeEvent} helix-graph-part-change - The notes, the links, the selection, the depth or the gestures changed. Used by `connectGraph`; pages do not need to listen for it.
+ * @event {HelixGraphPartChangeEvent} helix-graph-part-change - The notes, the links, the selection, the depth, the note the keys are on, or the gestures changed. Used by `connectGraph`; pages do not need to listen for it.
  * @event {HelixGraphReadyEvent} helix-graph-ready - The graph has been drawn whole, laid out and settled. Sent each time `drawn()` says it is drawn after it was not.
  * @event {HelixGraphSignalEvent} helix-graph-signal - Something passed between two notes, sent by `signal()`. Used by `connectGraph`; pages do not need to listen for it.
  * @event {HelixGraphZoomEvent} helix-graph-zoom - A zoom button or key was pressed. `connectGraph` zooms the drawing, then calls `moved()`.
@@ -258,6 +276,15 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
   linksToLabel = 'Links to {note}'
 
   /**
+   * What screen readers hear when a walk along the links reaches a note that
+   * has no link to follow, or goes back to a note: `{note}` for its name and
+   * `{count}` for how many notes the list holds that it links to or from.
+   */
+  @words
+  @property({ attribute: 'link-count-label' })
+  linkCountLabel = '{note}. {count, plural, =0 {No links} one {# link} other {# links}}'
+
+  /**
    * Marks the graph as busy while its notes arrive: the list is `aria-busy`,
    * and the panel says so where it holds no notes yet.
    */
@@ -353,6 +380,16 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
   @property({ attribute: 'two-finger-hint-label' })
   override twoFingerHintLabel = 'Use two fingers to move the graph'
 
+  /**
+   * What screen readers hear when a walk along the links moves to a note:
+   * `{note}` for its name, `{relation}` for how it stands to the note the
+   * step came from, such as "Linked from Roadmap", and `{index}` and `{count}`
+   * for its place among that note's links.
+   */
+  @words
+  @property({ attribute: 'walk-label' })
+  walkLabel = '{note}. {relation}. {index} of {count}'
+
   /** The line shown while the graph, with `gestures="activate"`, has the gestures. */
   @words
   @property({ attribute: 'using-label' })
@@ -387,6 +424,28 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
   /** Whether the search and the list are open over the drawing, with `no-panel`. */
   @state()
   private panelOpen = false
+
+  /**
+   * Whether the search field's arrow keys have moved onto a note, which the
+   * field then names as its `aria-activedescendant` while the focus stays in
+   * it. Typing, Left, Right, Escape, and leaving the field let it go.
+   */
+  @state()
+  private fieldKeys = false
+
+  /** Whether the list has the focus, so the drawing marks the note its keys are on. */
+  @state()
+  private listKeys = false
+
+  /**
+   * The notes a walk along the links stepped from, by `id`, the last the one
+   * the note the keys are on was reached from. Empty when the keys moved some
+   * other way.
+   */
+  private trail: string[] = []
+
+  /** The note the drawing last heard the keys are on, so it hears each move once. */
+  private keyedSent: string | undefined
 
   /** Which notes link to and from each, read again when `links` changes. */
   private adjacency: Adjacency = new Map()
@@ -467,6 +526,22 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
    */
   get shown(): ReadonlySet<string> | undefined {
     return this.kept
+  }
+
+  /**
+   * @internal The note the keys are on, while the list or the search field
+   * has them, which `connectGraph` marks in the drawing as it marks the note
+   * under the pointer. `walked` is true where a walk along the links reached
+   * it, which brings it into view.
+   */
+  get keyed(): { id: string; walked: boolean } | undefined {
+    const id = this.keyedId()
+    return id === undefined ? undefined : { id, walked: this.trail.length > 0 }
+  }
+
+  /** The `id` of the note the keys are on, or `undefined` where neither the list nor the field has them. */
+  private keyedId(): string | undefined {
+    return this.listKeys || this.fieldKeys ? this.entries[this.cursor]?.node.id : undefined
   }
 
   /** Whether the graph has been drawn whole. For code that runs after `helix-graph-ready`. */
@@ -608,6 +683,7 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
         /* A new selection or a narrower list is a list read from its top,
            the selected note first. */
         this.cursor = 0
+        this.trail = []
         if (list) {
           list.scrollTop = 0
         }
@@ -648,9 +724,19 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
        many rows there are, and the window is the list's to settle. */
     this.virtualize.measure()
     /* What the renderer has to hear, which `connectGraph` listens for. */
+    /* The note the keys are on, which the drawing marks, travels with the
+       selection's own news where both changed. */
+    const keyed = this.keyedId()
+    const rekeyed = keyed !== this.keyedSent
+    this.keyedSent = keyed
     if (changed.has('nodes') || changed.has('links')) {
       this.dispatchEvent(new HelixGraphPartChangeEvent({ kind: 'data' }))
-    } else if (changed.has('active') || changed.has('depth') || changed.has('hiddenGroups')) {
+    } else if (
+      changed.has('active') ||
+      changed.has('depth') ||
+      changed.has('hiddenGroups') ||
+      rekeyed
+    ) {
       this.dispatchEvent(new HelixGraphPartChangeEvent({ kind: 'focus' }))
     }
   }
@@ -767,7 +853,10 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
    * outside it, so `aria-activedescendant` names a row that exists. The list
    * then scrolls to it, see `revealCursor`.
    */
-  private moveTo(index: number): void {
+  private moveTo(index: number, walking = false): void {
+    if (!walking) {
+      this.trail = []
+    }
     const last = this.entries.length - 1
     this.cursor = Math.min(Math.max(index, 0), Math.max(last, 0))
     void this.updateComplete.then(() => this.revealCursor())
@@ -816,6 +905,9 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
    * drawing: a reader moving through the list was moving the graph under it.
    */
   private readonly handleListKeydown = (event: KeyboardEvent): void => {
+    if (this.walk(event)) {
+      return
+    }
     const moves: Record<string, number> = {
       ArrowDown: this.cursor + 1,
       ArrowUp: this.cursor - 1,
@@ -863,6 +955,138 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
   }
 
   /**
+   * The rows of the notes `id` links to or is linked from, in the list's
+   * order, which is the order of their names. Only the notes the list holds:
+   * a search, the legend, or `depth` leaves the others out.
+   */
+  private linkedRows(id: string): number[] {
+    const near = this.adjacency.get(id)
+    if (!near) {
+      return []
+    }
+    const rows: number[] = []
+    for (const [index, entry] of this.entries.entries()) {
+      const other = entry.node.id
+      if (other !== id && (near.to.has(other) || near.from.has(other))) {
+        rows.push(index)
+      }
+    }
+    return rows
+  }
+
+  /** How the note `id` stands to the note `from`, in the words the list uses for the selection. */
+  private relationFrom(from: string, id: string): string {
+    const near = this.adjacency.get(from)
+    const origin = this.nodes.find((node) => node.id === from)
+    const note = origin ? nameOf(origin) : from
+    const to = near?.to.has(id) === true
+    const back = near?.from.has(id) === true
+    return formatWords(
+      this,
+      to && back ? 'linkedBothLabel' : to ? 'linkedFromLabel' : 'linksToLabel',
+      { note },
+    )
+  }
+
+  /**
+   * A walk along the links from the note the keys are on, with Alt and the
+   * arrow keys, so a reader follows the lines of the drawing and not only
+   * the order of the list. **The same four keys a tree takes**, with Alt,
+   * since the list's own arrows already move through it:
+   *
+   * - Alt+Right follows a link, to the first note the one the keys are on
+   *   links to or from.
+   * - Alt+Down and Alt+Up move to the next and the previous note linked to
+   *   the one the step came from, wrapping.
+   * - Alt+Left goes back along the links walked.
+   *
+   * Right and Left swap on a right-to-left page. Each step says the note, how
+   * it stands to the note it was reached from, and its place among that
+   * note's links. Returns whether the key was one of the walk's.
+   */
+  private walk(event: KeyboardEvent): boolean {
+    if (!event.altKey || event.ctrlKey || event.metaKey || this.entries.length === 0) {
+      return false
+    }
+    const flip = isRtl(this)
+    const key =
+      event.key === 'ArrowRight'
+        ? flip
+          ? 'back'
+          : 'follow'
+        : event.key === 'ArrowLeft'
+          ? flip
+            ? 'follow'
+            : 'back'
+          : event.key === 'ArrowDown'
+            ? 'next'
+            : event.key === 'ArrowUp'
+              ? 'previous'
+              : undefined
+    if (key === undefined) {
+      return false
+    }
+    event.preventDefault()
+    event.stopPropagation()
+    const here = this.entries[this.cursor]?.node.id
+    if (here === undefined) {
+      return true
+    }
+    if (key === 'back') {
+      const back = this.trail.pop()
+      const row =
+        back === undefined ? -1 : this.entries.findIndex((entry) => entry.node.id === back)
+      const at = row >= 0 ? row : this.cursor
+      this.moveTo(at, true)
+      this.sayLinks(at)
+      return true
+    }
+    /* Follow, or the first press of Down or Up, steps from the note the keys
+       are on; Down and Up after a step move among the links of the note it
+       came from. */
+    const from = key === 'follow' || this.trail.length === 0 ? here : (this.trail.at(-1) as string)
+    const rows = this.linkedRows(from)
+    if (rows.length === 0) {
+      this.sayLinks(this.cursor)
+      return true
+    }
+    let place: number
+    if (from === here) {
+      place = key === 'previous' ? rows.length - 1 : 0
+      this.trail.push(here)
+    } else {
+      const now = rows.indexOf(this.cursor)
+      const by = key === 'previous' ? -1 : 1
+      place = now < 0 ? 0 : (now + by + rows.length) % rows.length
+    }
+    const at = rows[place] as number
+    this.moveTo(at, true)
+    const entry = this.entries[at] as Entry
+    this.say(
+      formatWords(this, 'walkLabel', {
+        count: rows.length,
+        index: place + 1,
+        note: nameOf(entry.node),
+        relation: this.relationFrom(from, entry.node.id),
+      }),
+    )
+    return true
+  }
+
+  /** Says the note at row `at` and how many notes in the list it links to or from. */
+  private sayLinks(at: number): void {
+    const entry = this.entries[at]
+    if (entry) {
+      this.say(
+        formatWords(this, 'linkCountLabel', {
+          count: this.linkedRows(entry.node.id).length,
+          note: nameOf(entry.node),
+        }),
+      )
+    }
+  }
+
+  /**
    * How many rows Page Down and Page Up move: the rows that fit in the list's
    * box, or in the window where the list does not scroll, less one, so the
    * row at one edge lands at the other.
@@ -875,22 +1099,61 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
 
   /**
    * The search field's keys, which belong to the field and never pan the
-   * graph. Escape empties a search that has words in it, and passes through
-   * an empty one to whatever the page does with it.
+   * graph.
+   *
+   * **The field is a combobox over the list**, as React Aria's Autocomplete
+   * and the APG combobox are: the focus stays in the field, and Down and Up
+   * move the keys through the notes, which the field names as its
+   * `aria-activedescendant`. Down starts on the note the keys were last on,
+   * the first after a search, and Up on the last. Page Down and Page Up move
+   * a page, Enter selects, Alt and the arrows walk the links as in the list,
+   * and Left, Right, Home and End go back to the text.
+   *
+   * Escape lets the note go, then empties a search that has words in it, and
+   * passes through an empty one to whatever the page does with it.
    */
   private readonly handleSearchKeydown = (event: KeyboardEvent): void => {
-    if (event.key === 'ArrowDown') {
-      event.preventDefault()
-      this.partNamed('list')?.focus()
+    if (event.isComposing) {
+      return
     }
-    if (event.key === 'Escape') {
-      if (this.query === '') {
-        return
-      }
+    if (this.fieldKeys && this.walk(event)) {
+      return
+    }
+    const last = this.entries.length - 1
+    const moves: Record<string, number> = this.fieldKeys
+      ? {
+          ArrowDown: this.cursor + 1,
+          ArrowUp: this.cursor - 1,
+          PageDown: this.cursor + this.pageRows(),
+          PageUp: this.cursor - this.pageRows(),
+        }
+      : { ArrowDown: this.cursor, ArrowUp: last }
+    if (event.key in moves && !event.altKey && last >= 0) {
       event.preventDefault()
-      this.query = ''
+      this.fieldKeys = true
+      this.moveTo(moves[event.key] as number)
+    } else if (event.key === 'Enter' && this.fieldKeys) {
+      event.preventDefault()
+      this.choose(this.cursor)
+    } else if (event.key === 'Escape') {
+      if (this.fieldKeys) {
+        event.preventDefault()
+        this.fieldKeys = false
+      } else if (this.query === '') {
+        return
+      } else {
+        event.preventDefault()
+        this.query = ''
+      }
+    } else if (['ArrowLeft', 'ArrowRight', 'End', 'Home'].includes(event.key)) {
+      this.fieldKeys = false
     }
     event.stopPropagation()
+  }
+
+  /** Leaving the field lets go of the note its keys were on. */
+  private readonly handleSearchBlur = (): void => {
+    this.fieldKeys = false
   }
 
   /**
@@ -943,8 +1206,10 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
     </button>`
   }
 
+  /** Typing is a new search, read from its top, with no note under the keys until Down. */
   private readonly handleSearch = (event: Event): void => {
     this.query = (event.target as HTMLInputElement).value
+    this.fieldKeys = false
   }
 
   /**
@@ -1058,11 +1323,17 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
             <input
               part="search-field"
               type="text"
+              role="combobox"
               autocomplete="off"
               spellcheck="false"
               aria-label=${this.searchLabel}
+              aria-autocomplete="list"
+              aria-controls="note-list"
+              aria-expanded=${this.entries.length > 0 ? 'true' : 'false'}
+              aria-activedescendant=${this.fieldKeys ? cursor : nothing}
               placeholder=${this.searchLabel}
               .value=${this.query}
+              @blur=${this.handleSearchBlur}
               @input=${this.handleSearch}
               @keydown=${this.handleSearchKeydown}
             />
@@ -1070,12 +1341,20 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
           </div>
           <div
             part="list"
+            id="note-list"
             role="listbox"
             tabindex="0"
             data-scroller
             aria-label=${this.notesLabel}
             aria-activedescendant=${cursor}
             aria-busy=${this.loading ? 'true' : nothing}
+            aria-keyshortcuts="Alt+ArrowRight Alt+ArrowLeft Alt+ArrowDown Alt+ArrowUp"
+            @blur=${() => {
+              this.listKeys = false
+            }}
+            @focus=${() => {
+              this.listKeys = true
+            }}
             @keydown=${this.handleListKeydown}
             @scroll=${() => this.virtualize.measure()}
           >

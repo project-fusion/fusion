@@ -133,6 +133,12 @@ export interface NodeLook {
   glow: number
   /** What it is drawn as made of, where the note says. */
   material?: 'frosted' | 'glass' | undefined
+  /**
+   * The note the keys are on in the frame's list or search field, which a
+   * renderer marks as it marks the note under the pointer, so a reader moving
+   * by the keys sees where they are in the drawing.
+   */
+  keyed?: boolean | undefined
   /** Drawn over the rest, as the selected note and its neighbors are. */
   raised: boolean
   /** The selected note. */
@@ -181,6 +187,8 @@ export interface GraphLooks {
   ground: string
   /** The color the labels are drawn in. */
   ink: string
+  /** The note the keys are on in the frame's list or search field, which a renderer marks as it marks the note under the pointer. */
+  keyed?: string | undefined
   /** What a name is drawn on while the pointer is over its note. */
   overlay: string
   /** The quieter ink a name at rest is drawn in, beside the selected note's and its neighbors'. */
@@ -216,6 +224,8 @@ export const looksOf = (options: {
   colors: GraphColors
   font?: string | undefined
   groups: readonly string[]
+  /** The note the keys are on in the frame's list or search field, where they are on one. */
+  keyed?: string | undefined
   /** How many links the graph draws, which sets how far a link at rest steps back. */
   links?: number | undefined
   near: ReadonlySet<string>
@@ -223,7 +233,7 @@ export const looksOf = (options: {
   selected: string | undefined
   shown: ReadonlySet<string> | undefined
 }): GraphLooks => {
-  const { colors, near, noteOf, selected, shown } = options
+  const { colors, keyed, near, noteOf, selected, shown } = options
   const order = new Map([...new Set(options.groups)].sort().map((group, at) => [group, at]))
   const own = (id: string): string => {
     const note = noteOf(id)
@@ -251,6 +261,7 @@ export const looksOf = (options: {
     font: options.font || 'sans-serif',
     ground: colors.ground,
     ink: colors.ink,
+    keyed,
     link: (source, target) => {
       const touches =
         focused &&
@@ -280,19 +291,24 @@ export const looksOf = (options: {
           color: own(id),
           glow: 1,
           hidden: hidden(id),
+          keyed: id === keyed,
           label: 'always',
           raised: true,
           selected: true,
         }
       }
       const neighbor = focused && near.has(id)
+      /* The note the keys are on keeps its color and its name wherever it
+         is, as the note under the pointer does. */
+      const faded = focused && !neighbor && id !== keyed
       return {
         ...facts,
-        color: focused && !neighbor ? mixRgb(own(id), colors.ground, FADED) : own(id),
+        color: faded ? mixRgb(own(id), colors.ground, FADED) : own(id),
         glow: 0,
         hidden: hidden(id),
-        label: focused && !neighbor ? 'never' : 'room',
-        raised: neighbor,
+        keyed: id === keyed,
+        label: id === keyed ? 'always' : faded ? 'never' : 'room',
+        raised: neighbor || id === keyed,
         selected: false,
       }
     },

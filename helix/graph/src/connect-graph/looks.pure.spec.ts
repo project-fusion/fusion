@@ -36,6 +36,26 @@ describe('mixRgb', () => {
 })
 
 describe('looksOf', () => {
+  test('names the note the keys are on and keeps its color, where the selection fades the rest', () => {
+    const drawn = looksOf({
+      colors,
+      groups: ['work', 'home', 'work'],
+      keyed: 'd',
+      near: new Set(['b']),
+      noteOf: (id: string) => ({ group: groups[id] }),
+      selected: 'a',
+      shown: undefined,
+    })
+    expect(drawn.keyed).toBe('d')
+    expect(drawn.node('d')).toMatchObject({
+      color: 'rgb(0, 255, 0)',
+      keyed: true,
+      label: 'always',
+      raised: true,
+    })
+    expect(drawn.node('c')).toMatchObject({ keyed: false, label: 'never' })
+  })
+
   test('names every note where there is room while nothing is selected', () => {
     expect(looks().node('d').label).toBe('room')
   })
