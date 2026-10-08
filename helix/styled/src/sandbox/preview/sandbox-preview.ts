@@ -187,6 +187,15 @@ export class HelixSandboxPreview extends HelixElement {
   direction?: 'rtl'
 
   /**
+   * The packages an example can import by name in the built-in document,
+   * each mapped to the address of an ES module, as an import map's `imports`.
+   * Set it as JSON in the attribute or as an object. Not read where `src` is
+   * set.
+   */
+  @property({ type: Object })
+  imports?: Record<string, string>
+
+  /**
    * The frame's name, read by screen readers.
    */
   @words
@@ -208,15 +217,6 @@ export class HelixSandboxPreview extends HelixElement {
    */
   @property()
   layout?: 'padded' | 'centered' | 'fullscreen' | 'hug'
-
-  /**
-   * The packages an example can import by name in the built-in document,
-   * each mapped to the address of an ES module, as an import map's `imports`.
-   * Set it as JSON in the attribute or as an object. Not read where `src` is
-   * set.
-   */
-  @property({ type: Object })
-  imports?: Record<string, string>
 
   /**
    * The name of the button that opens the example in a new tab, under

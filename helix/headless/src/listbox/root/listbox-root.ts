@@ -238,6 +238,14 @@ export class HelixHeadlessListbox extends MixinCollection(
   private filterState: string | undefined = undefined
 
   /**
+   * @internal Set by `Command` under `home-end="list"`: whether Home and End
+   * in the filter field move the highlight, without Shift, rather than the
+   * caret. A property, as coordination between elements.
+   */
+  @property({ attribute: false })
+  fieldHomeEnd = false
+
+  /**
    * The text the list is filtered by, if any.
    *
    * Filtering hides rather than removes, so nothing about the value changes and
@@ -266,14 +274,6 @@ export class HelixHeadlessListbox extends MixinCollection(
    */
   @property({ attribute: 'filterable', reflect: true, type: Boolean })
   filterable = false
-
-  /**
-   * @internal Set by `Command` under `home-end="list"`: whether Home and End
-   * in the filter field move the highlight, without Shift, rather than the
-   * caret. A property, as coordination between elements.
-   */
-  @property({ attribute: false })
-  fieldHomeEnd = false
 
   /**
    * How long typing in the filter field rests before the list is filtered, in

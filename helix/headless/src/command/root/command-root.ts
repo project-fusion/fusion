@@ -181,18 +181,6 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
   filterMatch?: ((text: string, filter: string) => boolean) | undefined
 
   /**
-   * The key that opens the palette, written as `mod+k`, `shift+p`, or `k`,
-   * in Kbd's chord spelling: `mod` is Command or Control, `ctrl`, `cmd`,
-   * `alt` and `shift` the keys they name.
-   *
-   * Empty turns it off, for a consumer who opens the palette from a button or
-   * from their own shortcut handler. There is no list of defaults to fight
-   * with: one key, said once.
-   */
-  @property()
-  hotkey = 'mod+k'
-
-  /**
    * Where Home and End go from the filter field.
    *
    * Absent, they move the caret, as APG's combobox has them. `list` moves the
@@ -203,12 +191,16 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
   homeEnd?: 'list'
 
   /**
-   * How the commands are laid out, as Listbox's `layout`: `grid` draws them in
-   * rows and columns, for a palette of icons or emoji, and the arrow keys
-   * follow the rows and the columns. Absent is one command under another.
+   * The key that opens the palette, written as `mod+k`, `shift+p`, or `k`,
+   * in Kbd's chord spelling: `mod` is Command or Control, `ctrl`, `cmd`,
+   * `alt` and `shift` the keys they name.
+   *
+   * Empty turns it off, for a consumer who opens the palette from a button or
+   * from their own shortcut handler. There is no list of defaults to fight
+   * with: one key, said once.
    */
-  @property({ reflect: true })
-  layout?: 'grid' | 'stack'
+  @property()
+  hotkey = 'mod+k'
 
   /**
    * Draws the palette in the page, where it stands, with no dialog: a search
@@ -240,6 +232,14 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
   @words
   @property()
   label = 'Commands'
+
+  /**
+   * How the commands are laid out, as Listbox's `layout`: `grid` draws them in
+   * rows and columns, for a palette of icons or emoji, and the arrow keys
+   * follow the rows and the columns. Absent is one command under another.
+   */
+  @property({ reflect: true })
+  layout?: 'grid' | 'stack'
 
   /**
    * What the list says when its commands could not be loaded, such as after a

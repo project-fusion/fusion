@@ -222,6 +222,13 @@ export class HelixHeadlessCodeBlock extends HelixElement {
   static words = 'helix-code-block'
 
   /**
+   * The lines to mark as inserted, as numbers and ranges counted from 1, such
+   * as `3-4`. Drawn as `mark-lines` is, in the added color. Not for a diff.
+   */
+  @property({ attribute: 'added-lines' })
+  addedLines = ''
+
+  /**
    * The name of a block that scrolls, which is a tab stop while it does.
    *
    * Where the block has a name, the scroller says it too, such as "Code,
@@ -399,20 +406,6 @@ export class HelixHeadlessCodeBlock extends HelixElement {
   markLines = ''
 
   /**
-   * The lines to mark as inserted, as numbers and ranges counted from 1, such
-   * as `3-4`. Drawn as `mark-lines` is, in the added color. Not for a diff.
-   */
-  @property({ attribute: 'added-lines' })
-  addedLines = ''
-
-  /**
-   * The lines to mark as deleted, as numbers and ranges counted from 1. Drawn
-   * as `mark-lines` is, in the removed color. Not for a diff.
-   */
-  @property({ attribute: 'removed-lines' })
-  removedLines = ''
-
-  /**
    * Whether to leave the copy button off.
    *
    * Negative, which is not a style choice. A boolean attribute is true whenever
@@ -435,6 +428,13 @@ export class HelixHeadlessCodeBlock extends HelixElement {
    */
   @property({ attribute: 'no-copy', reflect: true, type: Boolean })
   noCopy = false
+
+  /**
+   * The lines to mark as deleted, as numbers and ranges counted from 1. Drawn
+   * as `mark-lines` is, in the removed color. Not for a diff.
+   */
+  @property({ attribute: 'removed-lines' })
+  removedLines = ''
 
   /**
    * The words of a button that shows a folded run of unchanged lines, in a
@@ -937,18 +937,23 @@ export class HelixHeadlessCodeBlock extends HelixElement {
        to the code still reaches `slotchange` and the code stays the page's. */
     /* Bands behind the runs `mark-lines` names, placed once the lines are laid
        out. Not on a server, which lays nothing out. */
-    const kinds = [
-      ['mark', this.markLines],
-      ['mark mark-added', this.addedLines],
-      ['mark mark-removed', this.removedLines],
-    ] as const
+    /* Each kind written out whole, so the parts a band carries are in the
+       markup to read. */
     const marks = this.childrenKnown
-      ? kinds.flatMap(([kind, list]) =>
-          lineRuns(list).map(
+      ? [
+          ...lineRuns(this.markLines).map(
             ([first, last]) =>
-              html`<span part=${kind} aria-hidden="true" data-lines="${first}-${last}"></span>`,
+              html`<span part="mark" aria-hidden="true" data-lines="${first}-${last}"></span>`,
           ),
-        )
+          ...lineRuns(this.addedLines).map(
+            ([first, last]) =>
+              html`<span part="mark mark-added" aria-hidden="true" data-lines="${first}-${last}"></span>`,
+          ),
+          ...lineRuns(this.removedLines).map(
+            ([first, last]) =>
+              html`<span part="mark mark-removed" aria-hidden="true" data-lines="${first}-${last}"></span>`,
+          ),
+        ]
       : []
     const code =
       highlighted === undefined

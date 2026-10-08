@@ -332,7 +332,7 @@ describe('a reader moving between turns of a long transcript', () => {
         `<helix-chat label="Support" style="display: flex; block-size: 400px">${turns}</helix-chat>`,
       )) as Chat
       await frames(element)
-      const all = [...element.querySelectorAll('helix-chat-message')]
+      const all: Element[] = [...element.querySelectorAll('helix-chat-message')]
       expect(fromBottom(element)).toBeLessThan(1)
       log(element).focus()
       press(log(element), 'PageDown')
