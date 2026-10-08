@@ -41,6 +41,23 @@ describe('one tab', () => {
     expect(ignored).toBe(0)
   })
 
+  /* A script's `click()` lands on the host, which answers nothing, so it chose
+     no tab where a press on the control does. */
+  test('is chosen by its own click(), once, as by a press on its control', async () => {
+    const host = await tab()
+    const heard: string[] = []
+    host.addEventListener('helix-select', (event) => {
+      heard.push((event as CustomEvent<{ value: string }>).detail.value)
+    })
+    let clicks = 0
+    host.addEventListener('click', () => {
+      clicks += 1
+    })
+    host.click()
+    expect(heard).toEqual(['one'])
+    expect(clicks).toBe(1)
+  })
+
   /* **The two live in different places, and the split is the point.**
      `disabled` is a consumer's declaration and reflects, so a document rule can
      select it and a server can emit it. `selected` is the tab strip's own

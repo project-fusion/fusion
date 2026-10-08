@@ -37,6 +37,23 @@ describe('one menu row', () => {
     expect(part(plain, 'item')?.tagName).toBe('DIV')
   })
 
+  /* A script's `click()` lands on the host, which answers nothing, so it chose
+     no row where a press on the control does. */
+  test('is chosen by its own click(), once, as by a press on its control', async () => {
+    const host = await row('value="a"')
+    const heard: string[] = []
+    host.addEventListener('helix-select', (event) => {
+      heard.push((event as CustomEvent<{ value: string }>).detail.value)
+    })
+    let clicks = 0
+    host.addEventListener('click', () => {
+      clicks += 1
+    })
+    host.click()
+    expect(heard).toEqual(['a'])
+    expect(clicks).toBe(1)
+  })
+
   /* A disabled anchor is not a thing the platform has, and `aria-disabled` alone
      still navigates, so a refusing row gives up the `href` rather than dressing
      it. This is the row's own judgment: the menu never sees the difference. */

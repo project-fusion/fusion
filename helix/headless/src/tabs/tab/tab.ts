@@ -189,6 +189,20 @@ export class HelixHeadlessTab extends MixinDismissible(MixinSelectableItem(Helix
     this.finishHydration()
   }
 
+  /**
+   * Presses the tab, as `click()` presses a native button: passed to the
+   * control inside, which is what answers a click, so a script's `click()`
+   * selects the tab, or follows its link, once.
+   */
+  override click(): void {
+    const control = this.partNamed('tab')
+    if (control) {
+      control.click()
+    } else {
+      super.click()
+    }
+  }
+
   protected override render(): TemplateResult {
     /* `aria-controls` is an element reference, written in `updated`, and
      * never an IDREF. An IDREF resolves only within the tree it is written in,
