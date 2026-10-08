@@ -29,6 +29,31 @@ interface Inside {
 }
 
 /**
+ * The field and then the `menu`: a menu holds menu items and nothing else, so
+ * the field stands beside it, as React Aria's `Autocomplete` puts its search
+ * field beside its menu. The menu calls it through its filter, so the parts it
+ * writes are the menu's.
+ */
+export const drawFilter = (
+  host: HelixHeadlessMenu,
+  rows: TemplateResult,
+  busy: string | typeof nothing,
+  onInput: (event: Event) => void,
+): TemplateResult =>
+  html`<input
+    part="search-field"
+    type="text"
+    autocomplete="off"
+    spellcheck="false"
+    .value=${host.filter}
+    placeholder=${host.filterLabel}
+    aria-label=${host.filterLabel}
+    aria-autocomplete="list"
+    aria-controls="items"
+    @input=${onInput}
+  /><div id="items" role="menu" aria-busy=${busy} aria-label=${host.label || nothing}>${rows}</div>`
+
+/**
  * Narrows a `filterable` menu's rows as the reader types in a field above
  * them, with focus staying in the field and the highlight moving through the
  * rows that are left.
@@ -234,25 +259,9 @@ export class MenuFilterController implements ReactiveController {
       : undefined
   }
 
-  /**
-   * The field and then the `menu`: a menu holds menu items and nothing else,
-   * so the field stands beside it, as React Aria's `Autocomplete` puts its
-   * search field beside its menu.
-   */
-  render(rows: TemplateResult, busy: string | typeof nothing): TemplateResult {
-    const { host } = this
-    return html`<input
-        part="search-field"
-        type="text"
-        autocomplete="off"
-        spellcheck="false"
-        .value=${host.filter}
-        placeholder=${host.filterLabel}
-        aria-label=${host.filterLabel}
-        aria-autocomplete="list"
-        aria-controls="items"
-        @input=${this.handleInput}
-      /><div id="items" role="menu" aria-busy=${busy} aria-label=${host.label || nothing}>${rows}</div>`
+  /** The field and then the `menu`, for the menu to draw in its surface. See `drawFilter`. */
+  drawFilter(rows: TemplateResult, busy: string | typeof nothing): TemplateResult {
+    return drawFilter(this.host, rows, busy, this.handleInput)
   }
 
   /**

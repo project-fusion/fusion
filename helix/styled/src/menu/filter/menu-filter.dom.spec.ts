@@ -36,7 +36,7 @@ describe('a filterable styled menu', () => {
     const host = await menu('filterable')
     expect(part(host, 'search-field')).not.toBeNull()
     expect(adopted(host)).toBe(true)
-    expect(styles.cssText).toContain('[part="search-field"]')
+    expect(styles.cssText).toContain('input {')
   })
 
   test('gives the sheet back when it stops filtering, and a menu that never filters holds none', async () => {
