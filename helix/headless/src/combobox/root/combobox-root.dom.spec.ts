@@ -1186,6 +1186,32 @@ describe('a list opened with focus elsewhere', () => {
   })
 })
 
+/* Measured before this in Chromium: a combobox filtering on a server, which
+   cancels `helix-filter`, sets `loading` and replaces the options, left the
+   list's live region empty once the options arrived. */
+describe('a combobox that loads its options', () => {
+  test('says how many arrived when the load ends', async () => {
+    const host = (await combobox('open')) as Updatable & { loading: boolean }
+    const listbox = part(host as HTMLElement, 'listbox') as unknown as Updatable
+    const live = (): string | undefined =>
+      (listbox as unknown as HTMLElement).shadowRoot
+        ?.querySelector('[part="live"]')
+        ?.textContent?.trim()
+    host.addEventListener('helix-filter', (event) => event.preventDefault())
+    await type(host, 'q')
+    host.loading = true
+    await settle(host)
+    await settle(listbox)
+    expect(live()).toBe('Loading')
+    host.loading = false
+    host.innerHTML = `<helix-headless-option value="a">Server a</helix-headless-option>
+      <helix-headless-option value="b">Server b</helix-headless-option>`
+    await settle(host)
+    await settle(listbox)
+    expect(live()).toBe('2 results')
+  })
+})
+
 describe('a combobox heard through VoiceOver', () => {
   /* The region fills a frame after it is drawn, so that a reader hears it. */
   const said = async (host: Updatable): Promise<string | undefined> => {
