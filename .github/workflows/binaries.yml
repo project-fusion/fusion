@@ -147,11 +147,18 @@ jobs:
         with:
           targets: ${{ matrix.target }}
 
+      # **Saved by the release on `main`, and restored on a pull request.** A
+      # cache that a pull request saves is visible to that pull request only.
+      # Five targets at 100 to 370 MB each made every pull request that touched
+      # the Rust about 1 GB of entries no other branch could read: 3.6 GB of
+      # the repository's 10 GB on October 8, 2026, enough to evict the Cargo
+      # caches `verify` builds from.
       - name: Restore the Cargo cache
         if: steps.built.outputs.cache-hit != 'true'
         uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
           key: ${{ matrix.target }}
+          save-if: ${{ github.ref == 'refs/heads/main' }}
 
       # **`--locked` now, because nothing rewrites a manifest before this.** The
       # version was stamped into `helix/cli/Cargo.toml` here, which is what left

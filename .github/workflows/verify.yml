@@ -103,11 +103,14 @@ jobs:
         run: |
           echo "version=$(grep -oE '"playwright-core@[^"]+"' bun.lock | head -1 | tr -d '"' | cut -d@ -f2)" >> "$GITHUB_OUTPUT"
           echo "image=$ImageOS-$ImageVersion" >> "$GITHUB_OUTPUT"
+      - name: Key the dependencies as `.github/actions/setup` keys them
+        id: key
+        run: echo "key=$(.github/scripts/bun-cache-key.sh)" >> "$GITHUB_OUTPUT"
       - name: Look up the dependencies
         id: dependencies
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+          key: ${{ steps.key.outputs.key }}
           lookup-only: true
           path: ~/.bun/install/cache
       - name: Look up the browser
