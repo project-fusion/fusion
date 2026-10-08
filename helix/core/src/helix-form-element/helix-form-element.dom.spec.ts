@@ -46,6 +46,15 @@ beforeAll(async () => {
       }
     },
   )
+  const { HelixFormElementBase } = await import('./helix-form-element-base.js')
+  customElements.define(
+    'probe-form-base',
+    class extends HelixFormElementBase {
+      protected override render(): TemplateResult {
+        return html`<span part="frame"><button tabindex="-1">-</button><button part="control">+</button></span>`
+      }
+    },
+  )
   customElements.define(
     'probe-form-field',
     class extends MixinField(HelixFormElement) {
@@ -188,5 +197,40 @@ describe('a label that arrives after the control', () => {
     await new Promise((done) => setTimeout(done, 0))
     expect(asked).toBeGreaterThan(0)
     host.remove()
+  })
+})
+
+describe('a control that reports no verdict of its own, as Button does', () => {
+  const base = (markup = '<probe-form-base></probe-form-base>'): Promise<Probe> =>
+    mount(markup, 'probe-form-base')
+
+  test('is valid until a custom message says otherwise, and valid again once it is cleared', async () => {
+    const host = await base()
+    expect(host.validity.valid).toBe(true)
+    expect(host.willValidate).toBe(true)
+    host.setCustomValidity('Pick a plan first.')
+    expect(host.validity.customError).toBe(true)
+    expect(host.validationMessage).toBe('Pick a plan first.')
+    expect(host.checkValidity()).toBe(false)
+    host.setCustomValidity('')
+    expect(host.validity.valid).toBe(true)
+    expect(host.validationMessage).toBe('')
+  })
+
+  test('takes focus at its first tab stop', async () => {
+    const host = await base()
+    host.focus()
+    expect(host.shadowRoot?.activeElement).toBe(
+      host.shadowRoot?.querySelector('[part="control"]') ?? null,
+    )
+  })
+
+  test('is held by a fieldset once its own disabled is removed', async () => {
+    const host = await base(
+      '<fieldset disabled><probe-form-base disabled></probe-form-base></fieldset>',
+    )
+    host.disabled = false
+    await host.updateComplete
+    expect(host.isDisabled).toBe(true)
   })
 })

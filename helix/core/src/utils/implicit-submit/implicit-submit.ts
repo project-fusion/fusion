@@ -1,4 +1,4 @@
-import { HelixFormElement } from '../../helix-form-element/helix-form-element.js'
+import { HelixFormElementBase } from '../../helix-form-element/helix-form-element-base.js'
 
 /** The native input types that count against implicit submission, from the HTML standard. */
 const BLOCKING_TYPES = new Set([
@@ -18,7 +18,7 @@ const BLOCKING_TYPES = new Set([
 
 /**
  * The three hooks a Helix control answers implicit submission with, protected
- * on `HelixFormElement` because only this module reads them.
+ * on `HelixFormElementBase` because only this module reads them.
  */
 interface Submitter {
   activate(): void
@@ -27,11 +27,11 @@ interface Submitter {
 }
 
 /** A Helix control seen through its implicit-submission hooks. */
-const hooks = (element: HelixFormElement): Submitter => element as unknown as Submitter
+const hooks = (element: HelixFormElementBase): Submitter => element as unknown as Submitter
 
 /** Whether `element` is a submit button, native or Helix. */
 export const submits = (element: Element): boolean => {
-  if (element instanceof HelixFormElement) {
+  if (element instanceof HelixFormElementBase) {
     return hooks(element).submitsForm
   }
   if (element instanceof HTMLButtonElement) {
@@ -77,7 +77,7 @@ export const submitImplicitly = (form: HTMLFormElement | null): void => {
     if (button.matches(':disabled')) {
       return
     }
-    if (button instanceof HelixFormElement) {
+    if (button instanceof HelixFormElementBase) {
       hooks(button).activate()
     } else {
       ;(button as HTMLElement).click()
@@ -85,7 +85,7 @@ export const submitImplicitly = (form: HTMLFormElement | null): void => {
     return
   }
   const blocking = [...form.elements].filter((element) =>
-    element instanceof HelixFormElement
+    element instanceof HelixFormElementBase
       ? hooks(element).blocksImplicitSubmission
       : element instanceof HTMLInputElement && BLOCKING_TYPES.has(element.type),
   )

@@ -5,7 +5,7 @@ import {
   drawStatus,
   elementById,
   HelixFallbackCommandEvent,
-  HelixFormElement,
+  HelixFormElementBase,
   HelixPressEvent,
   pressType,
   type RecentPress,
@@ -78,7 +78,7 @@ import { submitAs } from '../submitter.js'
  * @cssstate pressed - A Button Group in a selection mode has this button pressed.
  */
 @customElement('helix-headless-button')
-export class HelixHeadlessButton extends HelixFormElement {
+export class HelixHeadlessButton extends HelixFormElementBase {
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-button': { pendingLabel: 'Wird geladen' } })`.
@@ -318,7 +318,7 @@ export class HelixHeadlessButton extends HelixFormElement {
 
   /** Moves focus to the inner control, so the host is never the focus target. */
   static override shadowRootOptions: ShadowRootInit = {
-    ...HelixFormElement.shadowRootOptions,
+    ...HelixFormElementBase.shadowRootOptions,
     delegatesFocus: true,
   }
 
