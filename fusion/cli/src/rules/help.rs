@@ -54,7 +54,10 @@ fn unrenderable(text: &str) -> Option<&'static str> {
     }
     /* A path into this repository is a maintainer's landmark: a reader of
     `--help` has this tool and not necessarily its source. */
-    if text.contains("`helix/") || text.contains("`fusion/") || text.contains("`cortex/") {
+    if ["`cortex/", "`fusion/", "`helix/", "`proof/"]
+        .iter()
+        .any(|root| text.contains(root))
+    {
         return Some("a path into this repository, which a reader of the help does not have");
     }
     None
