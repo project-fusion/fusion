@@ -42,12 +42,29 @@ const PANEL_MAX = 0.8
 /** The preview property each pane name writes. */
 const PANE_KEYS = { css: 'styles', html: 'source', js: 'script' } as const
 
-/** A pane name the sandbox writes into its previews. */
-type PaneName = keyof typeof PANE_KEYS
+/** A module file's name, which the other scripts import by its path. */
+const MODULE = /\.m?js$/
 
-/** Whether a pane's name is one the sandbox writes into its previews. */
-const isPaneName = (name: unknown): name is PaneName =>
-  typeof name === 'string' && Object.hasOwn(PANE_KEYS, name)
+/** The pane whose `dependencies` the previews load. */
+const MANIFEST = 'package.json'
+
+/**
+ * Whether a pane's name is one the sandbox writes into its previews: `html`,
+ * `css` or `js`, a module file such as `utils.js`, or `package.json`.
+ */
+const isPaneName = (name: unknown): name is string =>
+  typeof name === 'string' &&
+  (Object.hasOwn(PANE_KEYS, name) || MODULE.test(name) || name === MANIFEST)
+
+/** The `dependencies` of a `package.json`, or `undefined` while it is not valid JSON. */
+const dependenciesOf = (text: string): Record<string, string> | undefined => {
+  try {
+    const { dependencies } = JSON.parse(text) as { dependencies?: Record<string, string> }
+    return { ...dependencies }
+  } catch {
+    return undefined
+  }
+}
 
 /** A source pane's `name`, as the property or the attribute holds it. */
 const nameOf = (pane: Element): string => {
@@ -74,10 +91,22 @@ const fileOf = (pane: Element): string => {
  * milliseconds by default, so a word typed reloads it once. A pane's text when the sandbox starts reaches it at once.
  *
  * The event carries the pane's `name`, so one sandbox can hold several panes.
- * `html` sets the preview's markup, `css` sets its stylesheet, and `js` sets
- * a script that runs as a module after the markup. The sandbox ignores a pane
- * with any other name, so that pane can show content without changing the
- * preview.
+ * The names the sandbox writes into its previews:
+ *
+ * - `html` sets the preview's markup.
+ * - `css` sets its stylesheet.
+ * - `js` sets a script that runs as a module after the markup.
+ * - A module file name ending in `.js` or `.mjs`, such as `utils.js`, is a
+ *   module the other scripts import by its path, `./utils.js`.
+ * - `package.json` sets the npm packages the scripts import by name, from its
+ *   `dependencies`, which load from the preview's `cdn`.
+ *
+ * The sandbox ignores a pane with any other name, so that pane can show
+ * content without changing the preview.
+ *
+ * **The sandbox is `:state(modified)` while a source pane holds an edit**, and
+ * that pane's file tab is also `file-modified` and described as modified to
+ * a screen reader. `reset()` puts every pane back to the source it was given.
  *
  * **The dividers are two nested `helix-splitter` elements**, which handle the
  * pointer, the keyboard, and the corner. The inner splitter holds the panes and
@@ -140,6 +169,7 @@ const fileOf = (pane: Element): string => {
  * @csspart body - The splitter holding the panes above the panel. `::part(body):state(dragging)` matches while its divider is held.
  * @csspart corner - The handle where the two dividers cross.
  * @csspart file - One file tab, `aria-selected` while its pane is shown.
+ * @csspart file-modified - A file tab whose pane holds an edit.
  * @csspart files - The file tabs over the source panes, where there are several.
  * @csspart pane - Either pane.
  * @csspart panel - The box that holds the slotted panel.
@@ -150,6 +180,7 @@ const fileOf = (pane: Element): string => {
  * @cssproperty --sandbox-min-block-size - Minimum height of the sandbox.
  * @cssproperty --sandbox-separator-color - Color of the divider.
  *
+ * @cssstate modified - While a source pane holds an edit, until `reset()`.
  * @cssstate panel-collapsed - While there is a panel and it is no taller than `panel-collapsed-size`.
  */
 @customElement('helix-sandbox')
@@ -228,6 +259,14 @@ export class HelixSandbox extends HelixElement {
   lead: 'source' | 'preview' = 'source'
 
   /**
+   * The description of a file tab whose pane holds an edit, read by screen
+   * readers after the file's name.
+   */
+  @words
+  @property({ attribute: 'modified-label' })
+  modifiedLabel = 'Modified'
+
+  /**
    * Whether the panes sit side by side or stacked.
    *
    * Not reflected, for `lead`'s reason above: no rule selects on it. The axis
@@ -278,7 +317,56 @@ export class HelixSandbox extends HelixElement {
   previewDelay = 300
 
   /** The edits waiting out `previewDelay`, the last text of each pane. */
-  private readonly edits = new Map<PaneName, string>()
+  private readonly edits = new Map<string, string>()
+
+  /** The source each pane was given, for a pane that does not say whether it is modified. */
+  private readonly given = new Map<Element, string>()
+
+  /** The source each pane holds since its last edit. */
+  private readonly texts = new Map<Element, string>()
+
+  /** The source panes slotted here. */
+  private get sources(): Element[] {
+    const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="source"]')
+    return slot?.assignedElements({ flatten: true }) ?? []
+  }
+
+  /**
+   * Whether a pane holds an edit: as the pane says, where it has `modified`,
+   * as `helix-sandbox-source` has, and otherwise against the text it started
+   * with.
+   */
+  private modifiedOf(pane: Element): boolean {
+    const { modified } = pane as { modified?: unknown }
+    if (typeof modified === 'boolean') {
+      return modified
+    }
+    return this.texts.has(pane) && this.texts.get(pane) !== this.given.get(pane)
+  }
+
+  /**
+   * Puts every source pane back to the source it was given: through the
+   * pane's own `reset()` where it has one, which sends an edit the previews
+   * take, and otherwise by setting its `value` and writing it into the
+   * previews.
+   */
+  reset(): void {
+    for (const pane of this.sources) {
+      const { reset } = pane as { reset?: unknown }
+      const text = this.given.get(pane)
+      const name = nameOf(pane)
+      if (typeof reset === 'function') {
+        reset.call(pane)
+      } else if (text !== undefined && this.modifiedOf(pane)) {
+        ;(pane as { value?: string }).value = text
+        this.texts.delete(pane)
+        if (isPaneName(name)) {
+          this.write(name, text, false)
+        }
+      }
+    }
+    this.requestUpdate()
+  }
 
   /** The wait before the edits reach the previews. */
   private readonly resting = new DelayController(this, { renders: false })
@@ -374,7 +462,7 @@ export class HelixSandbox extends HelixElement {
     event.preventDefault()
     this.chooseFile(pane)
     void this.updateComplete.then(() => {
-      this.renderRoot.querySelector<HTMLElement>(`[part="file"][aria-selected="true"]`)?.focus()
+      this.renderRoot.querySelector<HTMLElement>(`[part~="file"][aria-selected="true"]`)?.focus()
     })
   }
 
@@ -387,10 +475,13 @@ export class HelixSandbox extends HelixElement {
     return html`<div part="files" role="tablist" aria-label=${this.filesLabel} @keydown=${this.handleFileKey}>
       ${this.files.map((pane, at) => {
         const selected = pane === shown
-        return html`<button part="file" id=${`file-${at}`} role="tab" type="button"
-          aria-controls="files-panel" aria-selected=${selected ? 'true' : 'false'}
+        const modified = this.modifiedOf(pane)
+        return html`<button part="file${modified ? ' file-modified' : ''}" id=${`file-${at}`}
+          role="tab" type="button" aria-controls="files-panel"
+          aria-describedby=${modified ? 'modified' : nothing} aria-selected=${selected ? 'true' : 'false'}
           tabindex=${selected ? '0' : '-1'} @click=${() => this.chooseFile(pane)}>${fileOf(pane)}</button>`
       })}
+      <span id="modified" hidden>${this.modifiedLabel}</span>
     </div>`
   }
 
@@ -539,9 +630,7 @@ export class HelixSandbox extends HelixElement {
        component as though it were markup. */
     const pane = event.composedPath()[0] as { name?: string }
     const name = pane?.name
-    if (!isPaneName(name)) {
-      return
-    }
+    const source = this.sources.find((each) => each === pane || each.contains(pane as Node))
     /* **After the dispatch, and only if nobody refused.** This listener is
        on the host from connection, so it runs before any listener a consumer
        adds, while `defaultPrevented` is still unanswered: a refused edit kept
@@ -549,6 +638,13 @@ export class HelixSandbox extends HelixElement {
        so a microtask reads the final answer. */
     queueMicrotask(() => {
       if (event.defaultPrevented) {
+        return
+      }
+      if (source) {
+        this.texts.set(source, value)
+        this.requestUpdate()
+      }
+      if (!isPaneName(name)) {
         return
       }
       this.edits.set(name, value)
@@ -566,11 +662,20 @@ export class HelixSandbox extends HelixElement {
    * `seeding` writes only into a preview that has nothing yet, so a preview
    * given its own `source` keeps it until the first edit.
    */
-  private write(name: PaneName, value: string, seeding: boolean): void {
+  private write(name: string, value: string, seeding: boolean): void {
+    const dependencies = name === MANIFEST ? dependenciesOf(value) : undefined
     for (const preview of this.previews) {
-      const key = PANE_KEYS[name]
-      if (!seeding || !preview[key]) {
-        preview[key] = value
+      if (Object.hasOwn(PANE_KEYS, name)) {
+        const key = PANE_KEYS[name as keyof typeof PANE_KEYS]
+        if (!seeding || !preview[key]) {
+          preview[key] = value
+        }
+      } else if (dependencies) {
+        if (!seeding || !preview.dependencies) {
+          preview.dependencies = dependencies
+        }
+      } else if (MODULE.test(name) && (!seeding || preview.modules?.[name] === undefined)) {
+        preview.modules = { ...preview.modules, [name]: value }
       }
     }
   }
@@ -588,6 +693,9 @@ export class HelixSandbox extends HelixElement {
     for (const pane of slot?.assignedElements({ flatten: true }) ?? []) {
       const { name, value } = pane as Element & { name?: unknown; value?: unknown }
       const text = typeof value === 'string' ? value : pane.getAttribute('value')
+      if (text !== null && !this.given.has(pane)) {
+        this.given.set(pane, text)
+      }
       if (isPaneName(name) && text) {
         this.write(name, text, true)
       }
@@ -1020,6 +1128,10 @@ export class HelixSandbox extends HelixElement {
     if (changed.has('files') || changed.has('file')) {
       this.showFile()
     }
+    this.toggleState(
+      'modified',
+      this.sources.some((pane) => this.modifiedOf(pane)),
+    )
     /* A development build warns about a file tab with no words, a source pane
        with no `label` and no `name`. Read on the first tab with none, or the
        first tab where every one has words. */
@@ -1027,7 +1139,7 @@ export class HelixSandbox extends HelixElement {
       auditName(
         this,
         () => {
-          const tabs = [...this.renderRoot.querySelectorAll<HTMLElement>('[part="file"]')]
+          const tabs = [...this.renderRoot.querySelectorAll<HTMLElement>('[part~="file"]')]
           return tabs.find((tab) => !tab.textContent?.trim()) ?? tabs[0]
         },
         'Give each source pane a `label` or a `name`, which its file tab shows.',

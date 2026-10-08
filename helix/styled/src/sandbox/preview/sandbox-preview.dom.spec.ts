@@ -103,6 +103,53 @@ describe('the built-in frame document', () => {
     expect(plain).not.toContain('importmap')
   })
 
+  /* An example needed the address of every package it imported, where a
+     `package.json` names a package by its version. */
+  test('loads `dependencies` by version from `cdn`, and `imports` wins over one of the same name', async () => {
+    const own = (await preview(
+      `src="" dependencies='{"canvas-confetti": "^1.9", "lodash-es": "4"}' imports='{"lodash-es": "/lodash.js"}'`,
+    )) as Preview & { cdn: string }
+    const mapOf = (): Record<string, string> => {
+      const document = part(own, 'frame')?.getAttribute('srcdoc') ?? ''
+      return JSON.parse(document.match(/<script type="importmap">(.*?)<\/script>/)?.[1] ?? '{}')
+        .imports
+    }
+    expect(mapOf()).toEqual({
+      'canvas-confetti': 'https://esm.sh/canvas-confetti@^1.9',
+      'canvas-confetti/': 'https://esm.sh/canvas-confetti@^1.9/',
+      'lodash-es': '/lodash.js',
+      'lodash-es/': 'https://esm.sh/lodash-es@4/',
+    })
+    own.cdn = 'https://cdn.jsdelivr.net/npm/'
+    await own.updateComplete
+    expect(mapOf()['canvas-confetti']).toBe('https://cdn.jsdelivr.net/npm/canvas-confetti@^1.9')
+    expect(hasState(own, 'loading')).toBe(true)
+  })
+
+  test('maps each of `modules` to its source, for the scripts and for each other', async () => {
+    const own = (await preview('src=""')) as Preview & { modules: Record<string, string> }
+    own.modules = {
+      'lib/math.js': 'export const two = 2',
+      'utils.js': "export * from './lib/math.js'",
+    }
+    await own.updateComplete
+    const document = part(own, 'frame')?.getAttribute('srcdoc') ?? ''
+    const map = JSON.parse(document.match(/<script type="importmap">(.*?)<\/script>/)?.[1] ?? '{}')
+      .imports as Record<string, string>
+    const text = (address = ''): string => decodeURIComponent(address.replace(/^data:[^,]*,/, ''))
+    expect(Object.keys(map).sort()).toEqual([
+      './lib/math.js',
+      './utils.js',
+      'sandbox:/lib/math.js',
+      'sandbox:/utils.js',
+    ])
+    expect(text(map['./lib/math.js'])).toBe('export const two = 2')
+    /* A `data:` module has no folder, so its relative import names its neighbor's own key. */
+    expect(text(map['./utils.js'])).toBe("export * from 'sandbox:/lib/math.js'")
+    /* The same module either way, so it runs once. */
+    expect(map['sandbox:/utils.js']).toBe(map['./utils.js'])
+  })
+
   test('keeps the sandbox, with scripts and no origin of its own', async () => {
     const own = part(await preview(''), 'frame') as HTMLIFrameElement
     expect((own.getAttribute('sandbox') ?? '').split(/\s+/).sort()).toEqual([
@@ -241,11 +288,14 @@ describe('the error, and the controls', () => {
     )
     await host.updateComplete
     expect(part(host, 'error')?.textContent).toBe('Uncaught TypeError: x is not a function')
+    /* The frame is described by the error while it shows. */
+    expect(frame.getAttribute('aria-describedby')).toBe(part(host, 'error')?.id)
     host.source = '<p>Fixed</p>'
     await host.updateComplete
     await new Promise((resolve) => setTimeout(resolve, 150))
     await host.updateComplete
     expect(part(host, 'error')).toBeNull()
+    expect(frame.hasAttribute('aria-describedby')).toBe(false)
   })
 
   test('draws no buttons without `controls`, and a named reload and open with it', async () => {
