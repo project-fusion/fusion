@@ -191,6 +191,34 @@ describe('orb', () => {
      document listener among it held the element for the life of the page.
      Both lanes: happy-dom refuses the context, but the asking is what is
      counted. */
+  /* The dots were the only shape an orb could take: a page with a mark of its
+     own gave up the orb's name and states to draw it. */
+  test('a shape in the default slot takes the place of the dots, and the orb keeps its name', async () => {
+    const host = (await mount(
+      '<helix-orb state="working"><svg viewBox="0 0 1 1"></svg></helix-orb>',
+    )) as Upgraded
+    const turn = async (): Promise<void> => {
+      await new Promise((resolve) => setTimeout(resolve, 0))
+      await host.updateComplete
+    }
+    await turn()
+    const canvas = host.shadowRoot?.querySelector('canvas')
+    expect(host.shadowRoot?.querySelector('slot:not([name])')).not.toBeNull()
+    expect(canvas?.hasAttribute('hidden')).toBe(true)
+    expect(role(host)).toBe('progressbar')
+    expect(label(host)).toBe('Working')
+    expect(hasState(host, 'working')).toBe(true)
+    if (hasLayout()) {
+      expect(await framesBooked(4)).toBe(0)
+    }
+    host.replaceChildren()
+    await turn()
+    expect(canvas?.hasAttribute('hidden')).toBe(false)
+    if (hasLayout()) {
+      expect(await framesBooked(4)).toBeGreaterThan(0)
+    }
+  })
+
   test('removed before its first update, it never sets up', async () => {
     const host = document.createElement('helix-orb')
     const original = HTMLCanvasElement.prototype.getContext

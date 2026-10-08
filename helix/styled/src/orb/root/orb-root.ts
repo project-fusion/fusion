@@ -5,6 +5,7 @@ import {
   hostAria,
   PaintGateController,
   readColorAlpha,
+  slotFilled,
   words,
   wordsConverter,
 } from '@fusion.dev/helix-core'
@@ -83,10 +84,18 @@ const GRAY: ColorBytesAlpha = [128, 128, 128, 1]
  *
  * The orb is styled only and has behavior, which the tier split does not
  * otherwise allow. Its role, name and busy state follow `state`, unless
- * `announce` makes it a status region, and the rest
- * is drawing dots to a canvas, so there is no structure to restyle. For a
- * drawing of your own, the headless `Loader` holds the same busy progress bar
- * and its name.
+ * `announce` makes it a status region, and the rest is drawing dots to a
+ * canvas.
+ *
+ * **A shape of your own goes in the default slot**, such as an SVG, an
+ * image, or an animation. The orb draws it over its box in place of the dots
+ * and stops drawing them, and keeps its role, name, busy state and custom
+ * states, so your stylesheet can change what you slotted by state, such as
+ * `helix-orb:state(working) svg { animation-duration: 1s }`. What you slot is
+ * for the eye: a screen reader hears the orb's name.
+ *
+ * `--orb-speed` scales how fast the dots move, so `0.5` is a calmer orb at
+ * half the tempo.
  *
  * Each state is also a custom state, such as `:state(thinking)` or
  * `:state(done)`, so a page can style what sits around an orb by what it shows,
@@ -98,12 +107,15 @@ const GRAY: ColorBytesAlpha = [128, 128, 128, 1]
  * @aliases Thinking, Activity, Agent, Status
  * @documentation https://fusion.dev/helix/components/orb
  *
- * @csspart canvas - The canvas the dots are drawn on.
+ * @slot - A shape of your own, drawn over the orb's box in place of the dots.
+ *
+ * @csspart canvas - The canvas the dots are drawn on. Hidden while the default slot holds a shape.
  * @csspart live - The word for the state, which the orb says as it changes when `announce` is set. Rendered only then, and clipped out of view.
  *
  * @cssproperty --orb-color - The color of the nearest dots. Defaults to `currentColor`.
  * @cssproperty --orb-ground - The color the farthest dots fade toward. Defaults to the page's background.
  * @cssproperty --orb-size - The diameter. Overrides `size`.
+ * @cssproperty --orb-speed - How fast the dots move, as a multiple of each state's own tempo. Defaults to `1`.
  *
  * @cssstate connecting - The orb shows `connecting`.
  * @cssstate done - The orb shows `done`.
@@ -212,6 +224,13 @@ export class HelixOrb extends HelixElement {
   private context: CanvasRenderingContext2D | null = null
 
   /**
+   * Whether the default slot holds a shape of the page's, which the dots give
+   * way to. A plain field, written to the canvas by hand as a lost context is,
+   * so finding a shape on the first update asks for no second one.
+   */
+  private own = false
+
+  /**
    * Whether anybody is looking, and the loop that draws for them.
    *
    * A context it has not been given and one the browser has taken are both
@@ -221,7 +240,7 @@ export class HelixOrb extends HelixElement {
    * and only the gate's own three answers stop it.
    */
   private readonly gate = new PaintGateController(this, {
-    canRun: () => !!this.context && !this.lost,
+    canRun: () => !!this.context && !this.lost && !this.own,
     onFrame: (delta) => {
       this.paint(delta)
     },
@@ -318,9 +337,24 @@ export class HelixOrb extends HelixElement {
 
        Under `announce` the word is served with the first render, so the orb
        arrives saying its first state and speaks only when the word changes. */
-    return html`<canvas part="canvas" aria-hidden="true"></canvas>${
-      this.announce ? html`<span part="live">${this.word}</span>` : nothing
-    }`
+    return html`<canvas part="canvas" aria-hidden="true"></canvas
+      ><slot @slotchange=${this.handleSlotChange}></slot>${
+        this.announce ? html`<span part="live">${this.word}</span>` : nothing
+      }`
+  }
+
+  /** Stops the dots for a shape the page slotted, and starts them again once it is gone. */
+  private readonly handleSlotChange = (event: Event): void => {
+    this.own = slotFilled(event.target as HTMLSlotElement)
+    this.canvas?.toggleAttribute('hidden', this.own || this.lost)
+    if (this.own) {
+      this.gate.stop()
+    } else if (this.hasUpdated) {
+      this.box = 0
+      this.measure()
+      this.paint(0)
+      this.gate.play()
+    }
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
@@ -378,6 +412,8 @@ export class HelixOrb extends HelixElement {
       return
     }
     this.canvas = canvas
+    this.own = slotFilled(this.renderRoot.querySelector('slot'))
+    canvas.toggleAttribute('hidden', this.own || this.lost)
     this.context ??= canvas.getContext('2d')
     if (!this.context) {
       return
@@ -389,7 +425,7 @@ export class HelixOrb extends HelixElement {
        never reports a loss may not have it. */
     if (this.lost && !this.context.isContextLost()) {
       this.lost = false
-      canvas.toggleAttribute('hidden', false)
+      canvas.toggleAttribute('hidden', this.own)
     }
 
     this.gate.watch()
@@ -485,7 +521,7 @@ export class HelixOrb extends HelixElement {
    */
   private readonly handleRestored = (): void => {
     this.lost = false
-    this.canvas?.toggleAttribute('hidden', false)
+    this.canvas?.toggleAttribute('hidden', this.own)
     this.box = 0
     this.measure()
     this.paint(0)
@@ -507,13 +543,14 @@ export class HelixOrb extends HelixElement {
     }
     const still = this.gate.reduced
     const params = still ? paramsFor(this.state) : this.paramsNow()
-    this.phase += dt * params.rate
-
     /* Read off the canvas rather than the host: the stylesheet resolves both
        ends of the ramp onto color-typed properties there, for the reason its
        comment gives. A mid gray is what an unreadable value answers, which is
        visible against either mode's ground rather than disappearing into one. */
     const painted = getComputedStyle(ctx.canvas)
+    /* Carried on an inert property for the reason the colors are. */
+    const speed = Number.parseFloat(painted.animationIterationCount)
+    this.phase += dt * params.rate * (Number.isFinite(speed) ? speed : 1)
     const ink = readColorAlpha(painted.color) ?? GRAY
     const ground = readColorAlpha(painted.textDecorationColor) ?? GRAY
 
