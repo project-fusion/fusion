@@ -500,15 +500,21 @@ export const pagePath = (
   /* The axis the next stretch of ribbon swings about, which a bend sets so the
      ribbon picks up where its arm leaves off. */
   let axis = 0.5
+  /* Whether the ribbon carries on out of the wave before it, lit, rather
+     than coming back in from the edge. */
+  let carried = false
 
   const gap = (to: number, next: StrandsVariant | undefined): void => {
-    if (to - cursor < height * 0.7) {
+    /* **A ribbon a wave carried on runs on to the next form**, however near
+       it is: the wave has already turned down into it, and dropping it left
+       the strand ending in the middle of the page. */
+    if (to - cursor < height * (carried ? 0.4 : 0.7)) {
       return
     }
     /* Waves a screen or so apart read as a set, each alone. Across a longer
        gap the ribbon comes back, so the page holds one strand from top to
        bottom and the next wave does not arrive from nowhere. */
-    if (previous === 'waves' && next === 'waves' && to - cursor < height * 1.5) {
+    if (previous === 'waves' && next === 'waves' && !carried && to - cursor < height * 1.5) {
       return
     }
     const end = next === 'waves' ? to - height * 0.95 : to - height * 0.45
@@ -537,7 +543,7 @@ export const pagePath = (
     /* After a wave, the ribbon comes back on the side the wave came in from
        and lights up as it comes. The stretch from the wave's far edge back
        across is unlit, so the strand never visibly doubles back. */
-    if (previous === 'waves' && run.length > 1) {
+    if (previous === 'waves' && !carried && run.length > 1) {
       run = run.map(
         (point, k): PathPoint =>
           k < 3 ? [point[0], point[1], point[2], point[3] * Math.max(0, k - 1) * 0.5] : point,
@@ -551,9 +557,17 @@ export const pagePath = (
     }
   }
 
-  for (const stop of placed) {
+  /* Whether a ribbon is laid between a stop that ends at `from` and the stop
+     after it, by the same rule `gap` keeps. */
+  const ribbonAfter = (from: number, next: PlacedStop | undefined): boolean =>
+    next !== undefined &&
+    next.top - from >= height * 0.7 &&
+    !(next.variant === 'waves' && next.top - from < height * 1.5)
+
+  for (const [index, stop] of placed.entries()) {
     joined = undefined
     gap(stop.top, stop.variant)
+    carried = false
     if (stop.variant === 'bend') {
       const span = Math.min(stop.height, height)
       const at = stop.at ?? BEND_AT
@@ -617,25 +631,112 @@ export const pagePath = (
       }
       fromRight = true
     } else if (stop.variant === 'waves') {
-      const crossing = wave(stop.top, height, fromRight, narrow, width, joined)
-      /* A ribbon that ended at its crest well above the wave reaches it in
-         even steps. One long span beside the wave's short ones bent the
-         spline hardest where the spacing changed. */
+      const carries =
+        joined !== undefined && ribbonAfter(stop.top + height * 0.5, placed[index + 1])
       const end = points.at(-1)
-      const lead = crossing[0]
-      if (joined !== undefined && end && lead) {
-        points.push(...bridge(end, lead, height * RIBBON_STEP, height * 0.26))
+      if (carries && end) {
+        /* **A wave the ribbon carries on out of is one sweep across the
+           page**, half a sine from a crest on one side to a crest a tenth of
+           the screen in from the other, centered on the wave's height. The
+           ribbon narrows to the wave's width on the way into it and widens
+           again on the way out, and carries on from the far crest with its
+           axis moved to meet it.
+
+           **A sine, because its curvature never jumps.** Built from quarter
+           circles and a straight run, every joint went from no curvature to
+           a circle's at once, and the spline overshot there to twice the
+           circle's. The sweep descends far enough that its crests, its
+           tightest places, are wider than a wave's strands reach.
+
+           It used to run off the far edge while the ribbon came back in from
+           the near one, unlit for its first screen, so the page went dark for
+           a screen in the middle. Waves close together still each run off the
+           edge, so each reads alone. */
+        const way = end[0] < 0.5 ? 1 : -1
+        const wide = narrow ? 0.45 : WIDTH.ribbon
+        const thin = narrow ? WIDTH.waves * 2 : WIDTH.waves
+        const glow = narrow ? GLOW.waves * 0.65 : GLOW.waves
+        const blend = (a: number, b: number, f: number): number => a + (b - a) * f
+        const from = end[0]
+        const to = 0.5 + way * 0.4
+        /* Half the crossing, in pixels, and the descent that keeps each
+           crest's radius, `descent^2 / (pi^2 * amplitude)`, wider than the
+           strands reach. */
+        const amplitude = (Math.abs(to - from) * width) / 2
+        const radius = Math.max(reachOf(thin, width), 0.3 * Math.min(width, height)) * 1.15
+        const descent = Math.PI * Math.sqrt(radius * amplitude)
+        const begins = Math.max(end[1] + height * 0.3, stop.top - descent / 2)
+        const spacing = height * 0.12
+        /* Straight down from the ribbon's crest to where the sweep begins,
+           narrowing to the wave as it goes, spaced from the ribbon's step
+           down to the sweep's. */
+        const top: PathPoint = [from, begins, thin, glow * 0.7]
+        const mirror = ([x, y, w, g]: PathPoint): PathPoint => [x, -y, w, g]
+        points.push(
+          ...bridge(mirror(top), mirror(end), spacing, height * RIBBON_STEP)
+            .map(mirror)
+            .reverse(),
+          top,
+        )
+        const count = Math.max(4, Math.ceil(descent / spacing))
+        for (let k = 1; k <= count; k++) {
+          const f = k / count
+          points.push([
+            from + ((to - from) * (1 - Math.cos(Math.PI * f))) / 2,
+            begins + descent * f,
+            thin,
+            blend(glow * 0.7, glow, Math.sin(Math.PI * f)),
+          ])
+        }
+        const bottom = points.at(-1) as PathPoint
+        const swing = swingOf(height, width, narrow)
+        axis = bottom[0] - way * swing
+        /* The ribbon's first points lie on its own curve from the crest,
+           spaced as the sweep's are and growing a third a step to its own
+           spacing, widening to the ribbon as they go: the spline bends
+           hardest where the spacing jumps. */
+        let phaseAt = way > 0 ? Math.PI / 2 : Math.PI * 1.5
+        let y = bottom[1]
+        let gap = spacing
+        const ramp = Math.ceil(Math.log((height * RIBBON_STEP) / spacing) / Math.log(1.33))
+        let k = 0
+        while (gap < height * RIBBON_STEP) {
+          y += gap
+          phaseAt += (gap / (PERIOD * height)) * Math.PI
+          k += 1
+          const f = Math.min(1, k / Math.max(ramp, 1))
+          points.push([
+            axis + swing * Math.sin(phaseAt),
+            y,
+            blend(thin, wide, f),
+            blend(glow * 0.7, GLOW.ribbon, f),
+          ])
+          gap *= 1.33
+        }
+        phase = phaseAt
+        cursor = y + height * RIBBON_STEP - height * 0.2
+        fromRight = way > 0
+        carried = true
+      } else {
+        const crossing = wave(stop.top, height, fromRight, narrow, width, joined)
+        /* A ribbon that ended at its crest well above the wave reaches it in
+           even steps. One long span beside the wave's short ones bent the
+           spline hardest where the spacing changed. */
+        const lead = crossing[0]
+        if (joined !== undefined && end && lead) {
+          points.push(...bridge(end, lead, height * RIBBON_STEP, height * 0.26))
+        }
+        points.push(...crossing)
+        /* A ribbon after a wave it led into comes back on the side the wave
+           came in from, at the crest of its curve there. After a flat wave,
+           it comes back in on the side the wave left by. */
+        phase =
+          joined === undefined
+            ? (fromRight ? Math.PI * 1.5 : Math.PI / 2) - turn
+            : (fromRight ? Math.PI / 2 : Math.PI * 1.5) - turn
+        fromRight = joined === undefined ? !fromRight : fromRight
+        cursor = stop.top + height * (joined === undefined ? 0.35 : 0.5)
       }
-      points.push(...crossing)
-      /* A ribbon after a wave it led into comes back on the side the wave
-         came in from, at the crest of its curve there. After a flat wave, it
-         comes back in on the side the wave left by. */
-      phase =
-        joined === undefined
-          ? (fromRight ? Math.PI * 1.5 : Math.PI / 2) - turn
-          : (fromRight ? Math.PI / 2 : Math.PI * 1.5) - turn
-      fromRight = joined === undefined ? !fromRight : fromRight
-      cursor = stop.top + height * (joined === undefined ? 0.35 : 0.5)
     } else {
       const y = stop.top + Math.min(stop.height, height) / 2
       points.push([stop.at ?? 0.5, y, WIDTH.ribbon, GLOW.ribbon])
