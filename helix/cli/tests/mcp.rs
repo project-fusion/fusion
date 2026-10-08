@@ -220,3 +220,49 @@ fn an_unknown_method_is_a_protocol_error_with_the_right_code() {
     ]);
     assert_eq!(replies[1]["error"]["code"], -32601);
 }
+
+/// `ping` is answered with an empty result, as the specification requires of
+/// every receiver.
+#[test]
+fn a_ping_is_answered_with_an_empty_result() {
+    let replies = talk(&[HELLO, r#"{"jsonrpc":"2.0","id":2,"method":"ping"}"#]);
+    assert_eq!(replies[1]["id"], 2);
+    assert_eq!(replies[1]["result"], serde_json::json!({}));
+}
+
+/// **The audit has one shape**, key for key with `helix theme audit --json`,
+/// so an agent that learned one has learned the other.
+#[test]
+fn the_audit_has_the_keys_the_command_line_prints() {
+    let replies = talk(&[
+        HELLO,
+        r##"{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"helix_audit_theme","arguments":{"intent":{"brand":"#3b82f6"}}}}"##,
+    ]);
+    let (_, text) = answer(&replies[1]);
+    let served: serde_json::Value = serde_json::from_str(&text).expect("the report is JSON");
+
+    let dir = std::env::temp_dir().join("fusion-helix-cli-mcp-shape");
+    let _ = std::fs::remove_dir_all(&dir);
+    std::fs::create_dir_all(&dir).expect("a temp directory");
+    std::fs::write(dir.join(".git"), "").expect("a root marker");
+    std::fs::write(dir.join("helix.theme.json"), r##"{ "brand": "#3b82f6" }"##).expect("an intent");
+    let printed = Command::new(binary())
+        .args(["--json", "theme", "audit"])
+        .current_dir(&dir)
+        .output()
+        .expect("helix runs");
+    let printed: serde_json::Value =
+        serde_json::from_slice(&printed.stdout).expect("the audit is JSON");
+    let _ = std::fs::remove_dir_all(&dir);
+
+    let keys = |report: &serde_json::Value| -> Vec<String> {
+        report
+            .as_object()
+            .expect("an object")
+            .keys()
+            .cloned()
+            .collect()
+    };
+    assert_eq!(keys(&served), keys(&printed));
+    assert_eq!(served["pairings"], printed["pairings"]);
+}

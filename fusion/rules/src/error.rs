@@ -30,6 +30,10 @@ use crate::exit::Code;
 /// A failure, ready to render.
 #[derive(Clone, Debug)]
 pub struct Failure {
+    /// The names that would have been accepted, where the input named one that
+    /// is not: the rules for `--only`, the verbs for a mistyped command. A list
+    /// for a script to match against, beside the sentence in `why`.
+    pub choices: Vec<String>,
     pub code: Code,
     /// The next command to run, where there is an honest one.
     pub hint: Option<String>,
@@ -42,6 +46,7 @@ pub struct Failure {
 impl Failure {
     pub fn new(code: Code, what: impl Into<String>, why: impl Into<String>) -> Self {
         Self {
+            choices: Vec::new(),
             code,
             hint: None,
             what: what.into(),
@@ -57,6 +62,12 @@ impl Failure {
     #[must_use]
     pub fn hint(mut self, hint: impl Into<String>) -> Self {
         self.hint = Some(hint.into());
+        self
+    }
+
+    #[must_use]
+    pub fn choices(mut self, choices: Vec<String>) -> Self {
+        self.choices = choices;
         self
     }
 
@@ -80,7 +91,12 @@ impl Failure {
     pub fn as_json(&self) -> serde_json::Value {
         serde_json::json!({
             "code": self.code.as_i32(),
-            "error": { "hint": self.hint, "what": self.what, "why": self.why },
+            "error": {
+                "choices": self.choices,
+                "hint": self.hint,
+                "what": self.what,
+                "why": self.why,
+            },
         })
     }
 }

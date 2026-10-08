@@ -62,9 +62,9 @@ pub fn run(args: &Diagnostics, from: &Path, json: bool, paint: Paint) -> Outcome
     /* **The first line is the address**, so a script that asked for port 0
     learns which one it got. */
     if json {
-        println!("{}", json!({ "listening": format!("http://{address}") }));
+        fusion_rules::say!("{}", json!({ "listening": format!("http://{address}") }));
     } else {
-        println!("helix diagnostics: listening on http://{address}");
+        fusion_rules::say!("helix diagnostics: listening on http://{address}");
     }
     let _ = std::io::stdout().flush();
     let settings = args
@@ -372,7 +372,7 @@ impl Relay {
                 "page": page,
                 "runtime": heard,
             });
-            println!("{line}");
+            fusion_rules::say!("{line}");
             let _ = std::io::stdout().flush();
             return;
         }
@@ -405,7 +405,7 @@ impl Relay {
                 String::new()
             }
         );
-        println!(
+        fusion_rules::say!(
             "{}",
             if counts.0 + counts.1 + counts.3 > 0 {
                 self.paint.fail(&heading)
@@ -415,21 +415,21 @@ impl Relay {
         );
         for finding in fresh {
             let text = |key: &str| finding.get(key).and_then(Value::as_str).unwrap_or("");
-            println!(
+            fusion_rules::say!(
                 "  {} {}",
                 self.paint
                     .bold(&format!("{} {}", text("severity"), text("kind"))),
                 text("subject")
             );
-            println!("    {}", text("message"));
+            fusion_rules::say!("    {}", text("message"));
             if let Some(sheet) = finding.pointer("/origin/sheet").and_then(Value::as_str) {
-                println!("    {}", self.paint.dim(&format!("in {sheet}")));
+                fusion_rules::say!("    {}", self.paint.dim(&format!("in {sheet}")));
             }
         }
         for event in heard {
             let text = |key: &str| event.get(key).and_then(Value::as_str).unwrap_or("");
             let tag = text("tag");
-            println!(
+            fusion_rules::say!(
                 "  {}{}",
                 self.paint
                     .bold(&format!("{} runtime {}", text("level"), text("kind"))),
@@ -439,7 +439,7 @@ impl Relay {
                     format!(" <{tag}>")
                 }
             );
-            println!("    {}", text("message"));
+            fusion_rules::say!("    {}", text("message"));
         }
         let _ = std::io::stdout().flush();
     }

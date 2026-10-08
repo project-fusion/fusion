@@ -39,7 +39,7 @@ pub fn run(args: &Audit, from: &Path, json: bool, paint: Paint) -> Outcome<Code>
     let code = verdict(&themes);
 
     if json {
-        println!("{}", report(&themes, &source));
+        fusion_rules::say!("{}", report(&themes, &source));
         return Ok(code);
     }
     /* **The tty decides, and `--plain` is the only override.** A screen written
@@ -50,7 +50,7 @@ pub fn run(args: &Audit, from: &Path, json: bool, paint: Paint) -> Outcome<Code>
     if args.plain || !std::io::stdout().is_terminal() {
         for (at, theme) in themes.iter().enumerate() {
             if at > 0 {
-                println!();
+                fusion_rules::say!();
             }
             matrix(theme, &title(&source, &themes, theme), paint);
         }
@@ -81,7 +81,7 @@ pub fn check(args: &Common, from: &Path, json: bool) -> Outcome<Code> {
     let code = verdict(&themes);
 
     if json {
-        println!("{}", report(&themes, &source));
+        fusion_rules::say!("{}", report(&themes, &source));
         return Ok(code);
     }
     /* A clean theme says nothing at all, so a green pipeline stays quiet and the
@@ -159,8 +159,14 @@ pub fn measurement(themes: &[Theme]) -> serde_json::Map<String, serde_json::Valu
             })
         })
         .collect();
+    let failed = themes
+        .iter()
+        .flat_map(|theme| &theme.pairings)
+        .filter(|pairing| pairing.status == Pair::Fail)
+        .count();
     let mut report = serde_json::Map::new();
     report.insert("collisions".to_owned(), collisions.into());
+    report.insert("failed".to_owned(), failed.into());
     report.insert("pairings".to_owned(), pairings.into());
     report.insert("violations".to_owned(), violations(themes).into());
     report
@@ -173,8 +179,8 @@ pub fn measurement(themes: &[Theme]) -> serde_json::Map<String, serde_json::Valu
 /// looking at, and a file whose contents depend on a flag is a file two runs
 /// cannot be compared across.
 fn matrix(theme: &Theme, source: &str, paint: Paint) {
-    println!("{}", paint.bold(source));
-    println!();
+    fusion_rules::say!("{}", paint.bold(source));
+    fusion_rules::say!();
 
     let rows = rows(&theme.pairings, Filter::All, Order::Source);
     let (ink, ground) = widths(&rows);
@@ -189,7 +195,7 @@ fn matrix(theme: &Theme, source: &str, paint: Paint) {
         table that prints a number only where it failed makes the reader trust a
         blank, and a pair that cleared its target by a hundredth is the one worth
         seeing before somebody nudges a color. */
-        println!(
+        fusion_rules::say!(
             "  {mark}  {:ink$}  on  {:ground$}  {} / {:.1}",
             row.ink,
             row.ground,
@@ -198,11 +204,13 @@ fn matrix(theme: &Theme, source: &str, paint: Paint) {
         );
     }
 
-    println!();
+    fusion_rules::say!();
     let counts = Counts::of(&theme.pairings);
-    println!(
+    fusion_rules::say!(
         "  {} passed, {} failed, {} unverifiable",
-        counts.passed, counts.failed, counts.unverifiable
+        counts.passed,
+        counts.failed,
+        counts.unverifiable
     );
 
     /* **Collisions are a second finding and are printed as one.** Contrast is a
@@ -210,9 +218,9 @@ fn matrix(theme: &Theme, source: &str, paint: Paint) {
     palette can be perfectly legible with three statuses that look like one
     color. Folding them into the same count would hide that. */
     if !theme.collisions.is_empty() {
-        println!();
+        fusion_rules::say!();
         for line in &theme.collisions {
-            println!("  {} {line}", paint.fail("!"));
+            fusion_rules::say!("  {} {line}", paint.fail("!"));
         }
     }
 }

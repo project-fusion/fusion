@@ -9,6 +9,8 @@ rust-version.workspace = true
 version = "0.0.0-dev"
 
 [dependencies]
+# `args::parse`, which reads the command line every binary here declares with it.
+clap = { version = "4", features = ["derive"] }
 # The audit screen, and nothing else here draws.
 ratatui = { workspace = true }
 serde = { workspace = true }

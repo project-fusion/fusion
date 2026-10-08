@@ -11,7 +11,7 @@
 //! process and have no answer inside one.
 
 use std::path::{Path, PathBuf};
-use std::process::{Command, Output};
+use std::process::{Command, Output, Stdio};
 
 /// The binary under test.
 ///
@@ -326,6 +326,84 @@ fn an_incomplete_command_is_a_usage_error() {
         let output = run(&sandbox.0, &args);
         assert_eq!(code(&output), 2, "{args:?} did not exit 2");
     }
+}
+
+/// **Under `--json`, a usage error is the object every other error is**, on
+/// stderr with code 2, and the verbs that would have parsed are `choices`.
+#[test]
+fn a_usage_error_under_json_is_a_json_error_with_the_choices() {
+    let sandbox = Sandbox::new("usage-json", Some(CLEAN));
+    for (args, choices) in [
+        (
+            vec!["--json", "frobnicate"],
+            vec![
+                "mcp",
+                "component",
+                "diagnostics",
+                "manifest",
+                "new",
+                "scan",
+                "theme",
+            ],
+        ),
+        (
+            vec!["--json", "theme"],
+            vec!["init", "build", "audit", "check"],
+        ),
+        (
+            vec!["--json", "theme", "biuld"],
+            vec!["init", "build", "audit", "check"],
+        ),
+    ] {
+        let output = run(&sandbox.0, &args);
+        assert_eq!(code(&output), 2, "{args:?} did not exit 2");
+        assert_eq!(out(&output), "", "an error reached stdout");
+        let object: serde_json::Value =
+            serde_json::from_str(&err(&output)).expect("the error on stderr is JSON");
+        assert_eq!(object["code"], 2);
+        assert_eq!(
+            object["error"]["choices"],
+            serde_json::json!(choices),
+            "{args:?}"
+        );
+    }
+    /* Help is an answer, so it prints as help in both modes. */
+    let help = run(&sandbox.0, &["--json", "--help"]);
+    assert_eq!(code(&help), 0);
+    assert!(out(&help).contains("Usage"));
+}
+
+/// **A closed pipe ends the output and leaves the verdict alone.** The reader
+/// that closed it has what it asked for, so nothing panics, and a failing
+/// check still exits 1.
+#[test]
+fn a_closed_pipe_is_not_a_panic_and_the_exit_code_stands() {
+    let sandbox = Sandbox::new("pipe", Some(FAILING));
+    let mut child = Command::new(binary())
+        .args(["--json", "theme", "audit"])
+        .current_dir(&sandbox.0)
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .expect("helix starts");
+    /* Closed before a byte is read, which is `| head -c 0`. */
+    drop(child.stdout.take());
+    let output = child.wait_with_output().expect("helix exits");
+    assert_eq!(code(&output), 1, "{}", err(&output));
+    assert!(!err(&output).contains("panicked"), "{}", err(&output));
+}
+
+/// A brand the engine cannot read is refused before the file is written.
+#[test]
+fn init_refuses_a_brand_it_cannot_read() {
+    let sandbox = Sandbox::new("init-brand", None);
+    let refused = run(&sandbox.0, &["theme", "init", "--brand", "red"]);
+    assert_eq!(code(&refused), 3);
+    assert!(err(&refused).contains("red"), "{}", err(&refused));
+    assert!(
+        !sandbox.0.join("helix.theme.json").exists(),
+        "the file was written anyway"
+    );
 }
 
 /* `--version`, which is the interface a release is checked against.

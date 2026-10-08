@@ -113,6 +113,9 @@ fn handle(line: &str) -> Option<String> {
                 "serverInfo": { "name": "helix", "version": crate::shipped() },
             }),
         )),
+        /* Answered with an empty result, as the specification requires of
+        every receiver, so a client checking the server is alive is told so. */
+        "ping" => Some(result(id, &serde_json::json!({}))),
         "tools/list" => Some(result(
             id,
             &serde_json::json!({ "tools": tools::catalog() }),

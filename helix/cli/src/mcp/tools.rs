@@ -12,7 +12,6 @@
 //! long before it wants the first.
 
 use fusion_helix_theme::css::{to_css, to_css_modes};
-use fusion_helix_theme::derive::report::Outcome as Pair;
 use fusion_helix_theme::intent::ThemeIntent;
 
 use crate::theme::audit::measurement;
@@ -78,16 +77,12 @@ pub fn call(name: &str, arguments: &serde_json::Value) -> Result<String, String>
 
     match name {
         "helix_audit_theme" => {
-            let failed = themes
-                .iter()
-                .flat_map(|theme| &theme.pairings)
-                .filter(|pairing| pairing.status == Pair::Fail)
-                .count();
-            /* The same shape `helix theme audit --json` emits, deliberately. Two
+            /* The shape `helix theme audit --json` emits, key for key. Two
             representations of one report would be two things to keep true, and
-            an agent that learned one has learned the other. */
+            an agent that learned one has learned the other. There is no file,
+            so `source` is null. */
             let mut report = measurement(&themes);
-            report.insert("failed".to_owned(), failed.into());
+            report.insert("source".to_owned(), serde_json::Value::Null);
             Ok(serde_json::Value::Object(report).to_string())
         }
         "helix_derive_theme" => {

@@ -28,8 +28,10 @@
 //! `fusion workspace audit` does not, and those are decisions about a
 //! product's report rather than about what a rule is.
 
+pub mod args;
 pub mod error;
 pub mod exit;
+pub mod out;
 pub mod source;
 pub mod style;
 pub mod tui;
@@ -200,7 +202,8 @@ pub fn only_known<C>(noun: &str, rules: &[Rule<C>], only: &[String]) -> Outcome<
         Some(first) => Err(Failure::input(
             format!("no {noun} rule called `{first}`"),
             format!("the rules are {}", known.join(", ")),
-        )),
+        )
+        .choices(known.iter().map(|&name| name.to_owned()).collect())),
         None => Ok(()),
     }
 }
@@ -352,18 +355,18 @@ pub fn fix<C>(
                 "rule": rule,
             })).collect::<Vec<_>>(),
         });
-        println!("{payload:#}");
+        crate::say!("{payload:#}");
         return Ok(Code::Ok);
     }
     if wrote.is_empty() {
         let plural = if ran == 1 { "" } else { "s" };
-        println!("{label}: {ran} rule{plural} can write, and nothing needed it");
+        crate::say!("{label}: {ran} rule{plural} can write, and nothing needed it");
     } else {
         for (rule, file) in &wrote {
-            println!("  {}  {file}", paint.bold(rule));
+            crate::say!("  {}  {file}", paint.bold(rule));
         }
         let plural = if wrote.len() == 1 { "" } else { "s" };
-        println!("{label}: {} file{plural} written", wrote.len());
+        crate::say!("{label}: {} file{plural} written", wrote.len());
     }
     Ok(Code::Ok)
 }

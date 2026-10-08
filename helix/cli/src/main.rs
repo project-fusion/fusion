@@ -27,7 +27,6 @@ mod theme;
 
 use std::path::PathBuf;
 
-use clap::Parser;
 use fusion_rules::error::Failure;
 use fusion_rules::exit::Code;
 use fusion_rules::style::Paint;
@@ -48,7 +47,7 @@ fn shipped() -> &'static str {
 }
 
 fn main() {
-    let cli = Cli::parse();
+    let cli: Cli = fusion_rules::args::parse(PRODUCT);
     let paint = if cli.json {
         Paint::never()
     } else {

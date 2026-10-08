@@ -85,7 +85,7 @@ pub fn run(args: &Build, from: &Path, json: bool) -> Outcome<Code> {
         /* The CSS is a field rather than the whole document, so a caller reading
         the JSON gets the violations beside it and does not have to run the
         command twice to learn whether `--force` was carrying anything. */
-        println!(
+        fusion_rules::say!(
             "{}",
             serde_json::json!({
                 "css": css,
@@ -95,7 +95,7 @@ pub fn run(args: &Build, from: &Path, json: bool) -> Outcome<Code> {
             })
         );
     } else if written.is_none() {
-        print!("{css}");
+        fusion_rules::put!("{css}");
     } else {
         /* **To stderr, because stdout is the artifact even when it went to a
         file.** A caller redirecting stdout and passing `--out` gets an empty

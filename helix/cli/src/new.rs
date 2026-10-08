@@ -236,7 +236,7 @@ pub fn run(args: &New, from: &Path, json: bool, paint: Paint) -> Outcome<Code> {
     )?;
 
     if json {
-        println!(
+        fusion_rules::say!(
             "{}",
             serde_json::json!({
                 "files": files.len(),
@@ -250,7 +250,7 @@ pub fn run(args: &New, from: &Path, json: bool, paint: Paint) -> Outcome<Code> {
         /* **The Helix it asks for is said**, since nothing here asks the registry
         whether it is the newest: a reader who expected another version sees it
         before installing, and `npm create` is the door that checks. */
-        println!(
+        fusion_rules::say!(
             "{} {} files from {}, Helix {}, into {}",
             paint.pass("wrote"),
             files.len(),
@@ -264,7 +264,7 @@ pub fn run(args: &New, from: &Path, json: bool, paint: Paint) -> Outcome<Code> {
         absolute path instead is correct and unreadable for the ordinary case, so
         it is shortened back against where they are standing. */
         let where_ = target.strip_prefix(from).unwrap_or(&target);
-        println!("\n  cd {}\n  npm install\n  npm run dev", where_.display());
+        fusion_rules::say!("\n  cd {}\n  npm install\n  npm run dev", where_.display());
     }
     Ok(Code::Ok)
 }
@@ -276,7 +276,7 @@ pub fn run(args: &New, from: &Path, json: bool, paint: Paint) -> Outcome<Code> {
 /// exist is a no rather than a broken command line.
 fn offer(register: &Register, json: bool, paint: Paint, unknown: Option<&str>) -> Code {
     if json {
-        println!(
+        fusion_rules::say!(
             "{}",
             serde_json::json!({
                 "templates": register
@@ -293,16 +293,16 @@ fn offer(register: &Register, json: bool, paint: Paint, unknown: Option<&str>) -
         );
     } else {
         if let Some(named) = unknown {
-            println!(
+            fusion_rules::say!(
                 "{} is not a template. There are {}:",
                 paint.fail(named),
                 register.templates.len()
             );
         } else {
-            println!("Choose a template with --template:");
+            fusion_rules::say!("Choose a template with --template:");
         }
         for one in &register.templates {
-            println!("  {:<14} {}", paint.pass(&one.id), one.description);
+            fusion_rules::say!("  {:<14} {}", paint.pass(&one.id), one.description);
         }
     }
     if unknown.is_some() {
