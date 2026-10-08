@@ -326,7 +326,7 @@ diagnostics counts it by kind and tag. None fails a CI job.
 | `unknown-icon` | An icon's `name` is not in the Helix set, so it draws nothing |
 | `unlinked-trigger` | A tooltip's trigger does not name it in `aria-describedby` |
 | `unreachable-label` | A text is rendered as a label, a deprecated value that labels no control |
-| `unregistered-part` | A part with an entry of its own, such as a filter menu, is in the page and its entry was never imported |
+| `unregistered-part` | A part or a feature with an entry of its own, such as a filter menu or a map's compass, is in the page or asked for, and its entry was never imported |
 | `unscannable-logo` | A QR code holds a logo at a correction level below `H`, so it may not scan |
 | `unsettled-window` | A virtualized list's box has no height of its own |
 | `unslotted-item` | A tree item holds another without `slot="children"`, so the inner item is read as the label. Development builds only (the `development` export condition) |
