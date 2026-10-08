@@ -594,3 +594,47 @@ describe('a palette with pages', () => {
     expect(host.page).toBe('')
   })
 })
+
+/* Home and End moved the caret in the filter, as APG's combobox has them,
+   and React Aria's Autocomplete moves the highlight with them instead. */
+describe('a palette whose Home and End go to the list', () => {
+  const key = (field: HTMLElement, name: string, extra: KeyboardEventInit = {}): boolean => {
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key: name,
+      ...extra,
+    })
+    field.dispatchEvent(event)
+    return event.defaultPrevented
+  }
+  const highlighted = (host: Palette): string | undefined =>
+    [...host.querySelectorAll('helix-headless-option')].find(
+      (option) => (option as HTMLElement & { active: boolean }).active,
+    )?.textContent ?? undefined
+
+  test('moves the highlight to the first and the last command, and Shift keeps the text', async () => {
+    const host = await palette(
+      markup.replace('label="Commands"', 'label="Commands" home-end="list"'),
+    )
+    host.open = true
+    await settle(host)
+    const field = listbox(host).shadowRoot?.querySelector('[part="search-field"]') as HTMLElement
+    expect(key(field, 'End')).toBe(true)
+    await settle(host)
+    expect(highlighted(host)).toBe('Switch color mode')
+    expect(key(field, 'Home')).toBe(true)
+    await settle(host)
+    expect(highlighted(host)).toBe('New file')
+    expect(key(field, 'End', { shiftKey: true })).toBe(false)
+  })
+
+  test('and leaves them to the caret unless asked', async () => {
+    const host = await palette()
+    host.open = true
+    await settle(host)
+    const field = listbox(host).shadowRoot?.querySelector('[part="search-field"]') as HTMLElement
+    expect(key(field, 'End')).toBe(false)
+  })
+})
