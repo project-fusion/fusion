@@ -536,10 +536,6 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
   rangeLengthMessage = 'A range is two dates.'
 
   /**
-   * The message shown when a date is after `max`. `{max}` is replaced with
-   * `max`, written the way the field writes dates.
-   */
-  /**
    * The message shown when a range ends before it starts. `{start}` is
    * replaced with the start, written the way the field writes dates.
    */
@@ -547,6 +543,10 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
   @property({ attribute: 'range-order-message' })
   rangeOrderMessage = 'Choose an end on or after {start}.'
 
+  /**
+   * The message shown when a date is after `max`. `{max}` is replaced with
+   * `max`, written the way the field writes dates.
+   */
   @words
   @property({ attribute: 'range-overflow-message' })
   rangeOverflowMessage = 'Choose a date on or before {max}.'
