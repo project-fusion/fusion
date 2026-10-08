@@ -2,9 +2,9 @@
   <img src=".github/fusion-logo.svg" width="88" alt="Fusion" />
   <h1>Fusion Development Group</h1>
   <p>
-    <strong>Helix</strong>, a design system of web components that derives its
-    own accessible palette, and <strong>Cortex</strong>, a memory and provenance
-    substrate.
+    <strong>Helix</strong>, a design system of web components that computes
+    your color tokens from a few inputs such as your brand color, and
+    <strong>Cortex</strong>, a memory and provenance substrate.
   </p>
   <p>
     <a href="https://fusion.dev/helix/docs">Documentation</a> ·
@@ -41,23 +41,23 @@ import '@fusion.dev/helix'
 <helix-accordion separation="outlined">
   <helix-accordion-item default-open>
     <span slot="summary">What is Helix?</span>
-    <p>A design system that derives its own accessible palette.</p>
+    <p>A design system of web components that computes its theme from a few inputs.</p>
   </helix-accordion-item>
 </helix-accordion>
 ```
 
-Two things make it different from a component library.
+Two things set Helix apart.
 
-**Theming is derivation, not override.** You supply a handful of intent inputs
-and the engine computes a complete token set whose every foreground and
-background pair meets its contrast target by construction. There is no palette
-to hand-check, because a derivation that could not clear a pair reports it.
+**Helix computes your theme.** You give it a few inputs, such as your brand
+color, and the theme engine computes every color token from them. Each
+foreground and background pair meets its contrast target. When a pair cannot
+meet it, the engine reports that pair, so there is no palette to check by hand.
 
-**AI is a first-class consumer.** Every component is described by a custom
-elements manifest with typed enums, documented parts and generated React prop
-names, so an agent can write correct Helix code from the types alone. That is
-why conventions like inline literal unions and documented CSS parts are enforced
-at analysis time rather than left to review.
+**Agents can write Helix from its types.** Every component is described by a
+custom elements manifest with typed enums, documented parts, and generated React
+prop names, so an agent can write correct Helix code from the types alone. The
+analyzer enforces the conventions this depends on, such as inline literal unions
+and documented CSS parts.
 
 | Package | Use when |
 |---|---|
