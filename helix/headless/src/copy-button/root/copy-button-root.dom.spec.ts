@@ -172,6 +172,20 @@ describe('what it says and shows', () => {
     button.dispatchEvent(new Event('focusin', { bubbles: true, composed: true }))
     expect(button.ariaDescribedByElements).toBeNull()
   })
+
+  /* The tooltip around the button was a generic named and described "Copy"
+     beside the button named Copy, in Chromium's tree. */
+  test('draws no box of its tooltip beside the button', async () => {
+    const el = (await mount(
+      '<helix-headless-copy-button value="one"></helix-headless-copy-button>',
+    )) as Updatable
+    const tip = el.shadowRoot?.querySelector('helix-headless-tooltip') as HTMLElement & {
+      internals: ElementInternals
+      updateComplete: Promise<unknown>
+    }
+    await tip.updateComplete
+    expect(tip.internals.role).toBe('none')
+  })
 })
 
 /**

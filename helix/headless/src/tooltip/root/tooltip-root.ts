@@ -990,6 +990,12 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
        * In both forms, since the host is what the trigger's link references
        * whether it wraps the trigger or sits beside it. */
       label: this.describedText,
+      /* **And no box of its own.** Named and described, the host was a
+         generic in Chromium's tree beside the trigger it wraps, read as a
+         second copy of the description. `none` takes it out, its children
+         stay, and a reference still reads its name: measured in Chromium, the
+         trigger is described the same with the bubble up or down. */
+      role: 'none',
     })
     /* **Out of the tree while it is down, in the `for` form.** The host is a
        box with no role that names itself only so the trigger's reference has
