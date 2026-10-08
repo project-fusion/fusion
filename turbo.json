@@ -42,6 +42,33 @@
   // binary is a function of the Rust sources `analyze` already hashes.
   "globalPassThroughEnv": ["GITHUB_OUTPUT", "HELIX_BIN"],
   "tasks": {
+    // **The specs read packages this one does not depend on, so their files are
+    // inputs here.** `dependenciesOf` walks the `dependencies` of
+    // `helix/sandbox` and of every helix package it reaches, and the spec
+    // asserts the order it finds them in. No `^build` hash carries those
+    // manifests. On October 8, 2026, #323 added `@fusion.dev/helix-headless` to
+    // the sandbox's `dependencies`: its own run replayed a cached pass, and the
+    // next run on `main` (37842746140) failed the spec. The walk also opens the
+    // manifests of the registry packages the sandbox names, and `bun.lock` pins
+    // those. `jsx-declared-events.spec.ts` imports core's React table by path,
+    // which is what `helix/core/src` is here for.
+    "@fusion.dev/helix-cem#test": {
+      "dependsOn": ["^build", "analyze"],
+      "inputs": [
+        "src/**",
+        "tests/**",
+        "$TURBO_ROOT$/bun.lock",
+        "$TURBO_ROOT$/helix/core/package.json",
+        "$TURBO_ROOT$/helix/core/src/**",
+        "!$TURBO_ROOT$/helix/core/src/**/*.spec.ts",
+        "$TURBO_ROOT$/helix/headless/package.json",
+        "$TURBO_ROOT$/helix/icons/package.json",
+        "$TURBO_ROOT$/helix/sandbox/package.json",
+        "$TURBO_ROOT$/helix/styled/package.json",
+        "$TURBO_ROOT$/helix/styles/package.json"
+      ],
+      "outputs": []
+    },
     // `metrics` and `docs` run at the head of this build, so what they write is
     // build output and an undeclared one is what a cache hit does not restore.
     //
@@ -113,6 +140,25 @@
       "dependsOn": ["^build", "^analyze", "analyze", "icons", "styles"],
       "outputs": ["dist/**", "src/element-events.generated.ts"]
     },
+    // **The styled tier's source is an input, because two specs read it.**
+    // `menu-filter.pure.spec.ts` and `among.pure.spec.ts` follow the import
+    // graph through both tiers and read its modules and one stylesheet. The
+    // styled tier depends on this one, so no `^build` hash carries its files.
+    // The generated modules are left out for the reason `elements-css` gives:
+    // they are written from the files that are in.
+    "@fusion.dev/helix-headless#test": {
+      "dependsOn": ["^build", "analyze"],
+      "inputs": [
+        "src/**",
+        "tests/**",
+        "$TURBO_ROOT$/helix/styled/src/**/*.css",
+        "$TURBO_ROOT$/helix/styled/src/**/*.ts",
+        "!$TURBO_ROOT$/helix/styled/src/**/*.spec.ts",
+        "!$TURBO_ROOT$/helix/styled/src/**/*.css.ts",
+        "!$TURBO_ROOT$/helix/styled/src/**/*.generated.ts"
+      ],
+      "outputs": []
+    },
     // **The tiers' `typecheck` waits for their own `build`, because the examples
     // are consumers.** `typecheck` runs `tsconfig.examples.json` after the
     // sources, and an example reaches the package it sits beside by name:
@@ -159,6 +205,18 @@
     "@fusion.dev/insights#build": {
       "dependsOn": ["^build"],
       "outputs": ["src/pages.generated.ts", "src/sources.generated.ts"]
+    },
+    // `bump.spec.mjs` reads the release scripts and `fusion.json` at the root,
+    // which belong to no package, so they are named here.
+    "@fusion.dev/scripts#test": {
+      "dependsOn": ["^build", "analyze"],
+      "inputs": [
+        "src/**",
+        "tests/**",
+        "$TURBO_ROOT$/.github/scripts/*.sh",
+        "$TURBO_ROOT$/fusion.json"
+      ],
+      "outputs": []
     },
     // **The generators are tasks this depends on, not a chain the script runs.**
     // `build` was `faces && themed-page && catalog && frame && specs && next
