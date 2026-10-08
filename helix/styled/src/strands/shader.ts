@@ -8,9 +8,10 @@ import { MAX_POINTS } from './path.js'
  * **Distance along the path, never the spline's parameter, sets every
  * frequency.** The parameter runs from 0 to 1 whatever the path's length, so a
  * twist written against it is tight in a box and stretched across a page. The
- * running sum of `y` and `x` in pixels, which grows along a vertical stretch and
- * a horizontal wave alike, keeps a strand's twist, sway and traveling light the
- * same size everywhere.
+ * arc length in pixels, measured on the CPU and handed over beside the points as
+ * `uLen`, keeps a strand's twist, sway and traveling light the same size
+ * everywhere, and only grows, so none of them runs backward where the path
+ * heads left (see `arcLengths`).
  */
 
 /**
@@ -37,6 +38,7 @@ import { MAX_POINTS } from './path.js'
  */
 const PATH = `
 uniform vec4 uPts[${MAX_POINTS}];
+uniform vec4 uLen[${MAX_POINTS / 4}];
 uniform int uCount;
 uniform vec2 uView;
 uniform float uScroll;
@@ -66,6 +68,26 @@ vec4 spline(float t) {
 
 vec2 place(vec4 c) { return vec2(c.x * uView.x, c.y - uScroll); }
 
+float len(int i) {
+  int k = clamp(i, 0, uCount - 1);
+  return uLen[k >> 2][k & 3];
+}
+
+/* Arc length at \`t\`, on the same spline as the centerline, so it only grows. */
+float lengthAt(float t) {
+  float s = clamp(t, 0.0, 1.0) * float(uCount - 1);
+  int i = min(int(floor(s)), uCount - 2);
+  float f = s - float(i);
+  float f2 = f * f;
+  float f3 = f2 * f;
+  float p0 = len(i - 1);
+  float p1 = len(i);
+  float p2 = len(i + 1);
+  float p3 = len(i + 2);
+  return 0.5 * ((2.0 * p1) + (-p0 + p2) * f + (2.0 * p0 - 5.0 * p1 + 4.0 * p2 - p3) * f2
+    + (-p0 + 3.0 * p1 - 3.0 * p2 + p3) * f3);
+}
+
 vec3 strandAt(float id, float t, out vec3 info) {
   vec4 c = spline(t);
   vec2 p = place(c);
@@ -81,7 +103,7 @@ vec3 strandAt(float id, float t, out vec3 info) {
   float r9 = h1(id + 17.3);
   float n = (r1 + r2 + r3) / 1.5 - 1.0;
   float z = (r4 - 0.5) * 2.0;
-  float along = c.y + c.x * uView.x;
+  float along = lengthAt(t);
   float pace = 1.0 + uDrift * (r8 - 0.5) * 1.2;
   float th = along * 0.002 * (1.0 + uDrift * (r9 - 0.5) * 0.3) + uTime * 0.25 * pace
     + r2 * (0.5 + uDrift * 2.6);
@@ -94,6 +116,25 @@ vec3 strandAt(float id, float t, out vec3 info) {
   float lat = sway + breadth * (n * ct + z * 0.55 * st) * (1.0 + uDepth * 0.35 * depth);
   lat += sin(along * 0.006 * (1.0 + uDrift * (r9 - 0.5) * 0.3) + uTime * (0.6 + 0.5 * r1) * pace
     + r1 * 6.283) * 12.0 * (0.3 + r3) * (1.0 + uDrift * 0.5);
+  /* **No strand crosses the center of the turn it is on.** A strand is the
+     centerline moved sideways by \`lat\`, and on the inside of a turn whose
+     radius is less than that, the moved line runs back over itself: a loop,
+     or a fold where its quads flip. \`curve\` is the turn's curvature toward
+     \`nr\`, from the spline either side of this point, and an offset on the
+     inside is eased toward the center so that \`curve * lat\` stays under 1.
+     Offsets on the outside, and on a straight run, are left as they are. */
+  /* **Smooth, or it kinks every strand.** The spline's own curvature jumps at
+     each point, so the turn is read across a whole segment, which averages the
+     jump away. The squeeze eases in as a soft maximum of zero and the turn, so
+     there is no corner where a turn to one side becomes a turn to the other. */
+  float reach = 0.5 / float(max(uCount - 1, 1));
+  vec2 back = place(spline(t - reach));
+  vec2 ahead = place(spline(t + reach));
+  vec2 velocity = (ahead - back) * 0.5;
+  float curve = dot(ahead - 2.0 * p + back, nr) / max(dot(velocity, velocity), 1e-2);
+  float inward = curve * lat;
+  float squeeze = 0.5 * (inward + sqrt(inward * inward + 0.01));
+  lat /= 1.0 + squeeze;
   info = vec3(max(c.w, 0.0), width, along);
   return vec3(p + nr * lat, depth);
 }

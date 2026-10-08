@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import {
+  arcLengths,
   boxPath,
   catmull,
   lookup,
@@ -237,6 +238,38 @@ describe('strands page path', () => {
   test('never carries more points than the shader holds', () => {
     const points = pagePath([], 'ribbon', view.width, view.height, 800 * 200)
     expect(points.length).toBeLessThanOrEqual(MAX_POINTS)
+  })
+})
+
+describe('strands arc length', () => {
+  const grows = (lengths: Float32Array): boolean =>
+    lengths.every((one, i) => i === 0 || one > (lengths[i - 1] ?? 0))
+
+  test("only grows along a bend's upper arm, which heads left faster than down", () => {
+    /* The sum of y and x the shader used ran backward there, and the strands'
+       twist turned a corner. */
+    expect(grows(arcLengths(boxPath('bend', 0.5, 600, 1440), 1440))).toBe(true)
+  })
+
+  test('only grows across a wave that sweeps left', () => {
+    const stop = (top: number, variant: PlacedStop['variant']): PlacedStop => ({
+      at: undefined,
+      height: 700,
+      top,
+      variant,
+    })
+    const points = pagePath([stop(0, 'bend'), stop(3000, 'waves')], 'ribbon', 1280, 800, 6000)
+    expect(grows(arcLengths(points, 1280))).toBe(true)
+  })
+
+  test('measures the drawn spline in pixels', () => {
+    /* A straight run down the page is as long as it is tall. */
+    const straight: PathPoint[] = [
+      [0.5, 0, 0.2, 1],
+      [0.5, 100, 0.2, 1],
+      [0.5, 200, 0.2, 1],
+    ]
+    expect(arcLengths(straight, 1000).at(-1)).toBeCloseTo(200, 3)
   })
 })
 
