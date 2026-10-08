@@ -563,19 +563,25 @@ export class HelixHeadlessListbox extends MixinCollection(
    * sounded the same. Said when the filter changes and the count with it, so
    * a keystroke that leaves the same options says nothing new. An empty filter
    * says nothing, being the list as it was given; no matches is `empty-text`,
-   * which the region says in place of this.
+   * which the region says in place of this. A load that ends says the count
+   * too, whatever the filter.
    */
   private tell(changed: PropertyValues): void {
     if (!this.hasUpdated) {
       return
     }
-    if (!changed.has('filter')) {
+    /* **A load that ends says what it brought.** A combobox filtering on a
+       server cancels `helix-filter`, sets `loading` and replaces the options,
+       so the filter here never moves: the region said "Loading" and then
+       nothing, and the new count was never heard. */
+    const loaded = changed.get('loading') === true && !this.loading
+    if (!changed.has('filter') && !loaded) {
       this.tellActive(changed)
       return
     }
     const count = this.shown.length
     this.announced =
-      this.filter.trim() && count
+      (this.filter.trim() || loaded) && count
         ? this.resultLabel
           ? countLabel(count, this.resultLabel, this.resultsLabel, wordsLocale(this))
           : formatWords(this, 'resultsLabel', { count })
