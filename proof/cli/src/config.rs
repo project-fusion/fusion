@@ -164,6 +164,10 @@ pub enum Platform {
 #[derive(Debug, Default, Deserialize)]
 #[serde(deny_unknown_fields, rename_all = "camelCase")]
 pub struct Settle {
+    /// Only custom elements whose tag starts with this are awaited, and one
+    /// left undefined fails the entry. A framework's own hyphenated tags,
+    /// such as Next.js's `next-route-announcer`, are never defined.
+    pub elements: Option<String>,
     /// A property each element may carry holding a promise that resolves when
     /// it has finished rendering, awaited before every shot.
     pub ready_property: Option<String>,

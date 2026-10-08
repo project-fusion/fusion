@@ -295,11 +295,11 @@ fn capture(
     items: &[Value],
     keys: &BTreeMap<String, usize>,
     shots: &[Shot],
-    ready: Option<&str>,
+    (ready, elements): (Option<&str>, Option<&str>),
 ) -> Outcome<Captured> {
     let internal = |why: String| Failure::new(Code::Internal, "the driver", why);
     driver
-        .send(&json!({ "items": items, "op": "capture", "readyProperty": ready }))
+        .send(&json!({ "elements": elements, "items": items, "op": "capture", "readyProperty": ready }))
         .map_err(internal)?;
     let mut captured = Captured {
         broken: BTreeMap::new(),
@@ -603,7 +603,10 @@ pub fn run(options: &Options) -> Outcome<Code> {
         .enumerate()
         .map(|(at, entry)| (entry.id.clone(), at))
         .collect();
-    let ready = config.settle.ready_property.as_deref();
+    let ready = (
+        config.settle.ready_property.as_deref(),
+        config.settle.elements.as_deref(),
+    );
     let mut items = Vec::new();
     for entry in &mine {
         let shots: Vec<&Shot> = taken(entry)

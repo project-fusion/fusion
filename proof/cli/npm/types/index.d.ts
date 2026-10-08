@@ -213,6 +213,12 @@ export interface Config {
   serve?: Record<string, string>
   /** What the harness waits for before each picture. */
   settle?: {
+    /**
+     * Only custom elements whose tag starts with this are awaited, and one left undefined fails the
+     * entry. Set it for a framework that writes hyphenated tags of its own, such as Next.js's
+     * `next-route-announcer`. Every custom element when not given.
+     */
+    elements?: string
     /** A property each element may carry holding a promise that resolves when it has rendered. */
     readyProperty?: string
   }
