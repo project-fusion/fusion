@@ -534,8 +534,14 @@ export class HelixHeadlessButton extends HelixFormElement {
     return this.type === 'submit'
   }
 
-  /** @internal Pressed as the form's default button, through the inner control. */
+  /**
+   * @internal Pressed as the form's default button, through the inner control.
+   *
+   * Only Enter in a field of the form presses it this way, so `helix-press`
+   * says `keyboard`, where the script click it makes read as `virtual`.
+   */
   protected override activate(): void {
+    this.recent = { key: true }
     this.partNamed('button')?.click()
   }
 
