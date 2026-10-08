@@ -127,6 +127,17 @@ export class HelixHeadlessRadio extends MixinSelectableItem(HelixElement) {
     this.finishHydration()
   }
 
+  /**
+   * Chooses the radio, as `click()` does a native radio: passed to the control
+   * inside, so the one click a listener hears is the control's, after it has
+   * moved. See `HostClickController`.
+   */
+  override click(): void {
+    if (!this.clicks.click()) {
+      super.click()
+    }
+  }
+
   protected override render(): TemplateResult {
     /* Roving `tabindex`: one stop for the whole set, which is what a radio
        group is in the tab order, and the arrow keys move within it. The group
