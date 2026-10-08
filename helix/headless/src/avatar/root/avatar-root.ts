@@ -50,7 +50,7 @@ export const initialsOf = (name: string): string => {
  * @aliases Profile picture, Gravatar
  * @documentation https://fusion.dev/helix/components/avatar
  *
- * @slot - Shown when there is no usable image, in place of the initials.
+ * @slot - Shown when there is no usable image, in place of the initials. Hidden from assistive technology when the avatar has a `name`, which the host announces.
  *
  * @event {Event} error - Relayed from the image when it fails.
  * @event {Event} load - Relayed from the image once it has loaded.
@@ -280,7 +280,12 @@ export class HelixHeadlessAvatar extends HelixElement {
    * has to reimplement the whole template to reach three elements.
    */
   protected renderInitials(): TemplateResult {
-    return html`<slot>
+    /* **A named avatar hides what is slotted, as it hides the initials.** The
+       host is the image and carries the name. A slotted glyph stayed in the
+       tree under it, and Chromium exposed an unnamed image inside the named
+       one. With no name the host has no role, so what is slotted is the only
+       thing a screen reader can find, and it stays. */
+    return html`<slot aria-hidden=${this.name === '' ? nothing : 'true'}>
       <span part="initials" aria-hidden="true">${this.initials ?? initialsOf(this.name)}</span>
     </slot>`
   }

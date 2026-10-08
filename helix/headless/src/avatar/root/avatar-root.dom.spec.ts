@@ -41,6 +41,20 @@ describe('avatar', () => {
     expect(part(avatar, 'initials')?.getAttribute('aria-hidden')).toBe('true')
   })
 
+  /* A slotted glyph stayed in the tree under the named host, and Chromium
+     exposed an unnamed image inside the image named for the person. */
+  test('what is slotted is hidden from assistive technology when the host is named', async () => {
+    const named = await mount(
+      '<helix-headless-avatar name="Cy"><svg viewBox="0 0 10 10"></svg></helix-headless-avatar>',
+    )
+    expect(named.shadowRoot?.querySelector('slot')?.getAttribute('aria-hidden')).toBe('true')
+
+    const unnamed = await mount(
+      '<helix-headless-avatar><svg role="img" aria-label="Team"></svg></helix-headless-avatar>',
+    )
+    expect(unnamed.shadowRoot?.querySelector('slot')?.hasAttribute('aria-hidden')).toBe(false)
+  })
+
   test('the name is announced from the host, not from a wrapper', async () => {
     // Through internals, so the host carries no attribute a consumer's server
     // markup lacks, and the avatar itself is what announces rather than a span
