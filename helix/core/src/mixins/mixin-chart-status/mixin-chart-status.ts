@@ -1,5 +1,6 @@
-import { html, nothing, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { CHART_PLOT } from '../../controllers/chart-pointer-controller/chart-pointer-controller.js'
 import type { HelixElement } from '../../helix-element/helix-element.js'
 import { words } from '../../words/words.js'
 
@@ -10,6 +11,10 @@ type Constructor<T> = new (...args: any[]) => T
 interface ChartHost extends HelixElement {
   /** Whether the readings have been looked for, which a server never does. */
   readonly readingsKnown: boolean
+  /** The chart's name, which the plot keeps while it has nothing to draw. */
+  readonly named: string
+  /** The reading shown, by its place, or -1 for none. */
+  readonly pointer: { readonly at: number }
 }
 
 /**
@@ -40,6 +45,11 @@ export declare class MixinChartStatusInterface {
    * line, the `empty` line, or nothing while the table cannot be read yet.
    */
   protected renderStatus(): TemplateResult | typeof nothing
+  /**
+   * The plot while there is nothing to draw: a group named as the chart is,
+   * holding `renderStatus`.
+   */
+  protected renderEmpty(): TemplateResult
 }
 
 /**
@@ -58,9 +68,16 @@ export declare class MixinChartStatusInterface {
  * there would be a claim about readings nobody has looked at. `Heatmap` keeps
  * the same rule for its own `empty-text`.
  *
- * Applied by the four charts that draw on axes. The slots and parts are
- * documented on each of them, a class-level tag on a mixin reaching no
- * manifest.
+ * **The plot keeps the chart's name while it has nothing to draw**, as a
+ * group around the words, so the chart is still found by its name.
+ *
+ * **Three custom states follow:** `active` while a reading is shown, under the
+ * pointer or the keys, with its tooltip open; `empty` while the empty words
+ * stand in the plot; and `loading` while the loading words do.
+ *
+ * Applied by the four charts that draw on axes and by Donut Chart. The slots,
+ * parts and states are documented on each of them, a class-level tag on a
+ * mixin reaching no manifest.
  */
 export const MixinChartStatus = <T extends Constructor<ChartHost>>(
   Base: T,
@@ -114,6 +131,29 @@ export const MixinChartStatus = <T extends Constructor<ChartHost>>(
       return this.readingsKnown
         ? html`<p dir="auto" part="empty"><slot name="empty">${this.emptyText}</slot></p>`
         : nothing
+    }
+
+    /**
+     * The plot while there is nothing to draw: a group named as the chart is,
+     * holding `renderStatus`. Not focusable, there being no reading to walk.
+     */
+    protected renderEmpty(): TemplateResult {
+      const named = this.named
+      return html`<div
+        aria-label=${named || nothing}
+        id=${CHART_PLOT}
+        part="plot"
+        role=${named ? 'group' : nothing}
+      >${this.renderStatus()}</div>`
+    }
+
+    /** Records what the plot shows as the `active`, `empty` and `loading` states. */
+    protected override updated(changed: PropertyValues): void {
+      super.updated(changed)
+      const root = this.renderRoot
+      this.toggleState('active', this.pointer.at >= 0)
+      this.toggleState('empty', root.querySelector('[part="empty"]') !== null)
+      this.toggleState('loading', root.querySelector('[part="loading"]') !== null)
     }
   }
 
