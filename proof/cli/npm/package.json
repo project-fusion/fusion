@@ -10,9 +10,17 @@
     "url": "git+https://github.com/project-fusion/fusion.git"
   },
   "type": "module",
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "default": "./index.mjs"
+    }
+  },
   "files": [
     "bin.mjs",
-    "driver.mjs"
+    "driver.mjs",
+    "index.mjs",
+    "types"
   ],
   "bin": {
     "proof": "./bin.mjs"
@@ -38,5 +46,8 @@
   },
   "publishConfig": {
     "access": "restricted"
+  },
+  "peerDependencies": {
+    "playwright": ">=1.50"
   }
 }

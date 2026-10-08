@@ -15,6 +15,8 @@ name = "proof"
 path = "src/main.rs"
 
 [dependencies]
+# The driver sends each picture inside a JSON line.
+base64 = "0.22"
 clap = { version = "4", features = ["derive"] }
 # **The version a release installs, read beside the binary.** Shared with the
 # other two command lines and owned by none of them, so this is no dependency on
@@ -25,6 +27,8 @@ fusion-rules = { workspace = true }
 # measured in the proposal on an 8.1 megapixel page, and it cross-compiles to
 # every platform package with nothing to link.
 png = "0.18"
+serde = { workspace = true }
+serde_json = { workspace = true }
 
 [dev-dependencies]
 # The contract tests write their own pictures rather than reading committed ones.
