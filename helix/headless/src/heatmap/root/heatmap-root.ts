@@ -25,6 +25,7 @@ import {
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import '../../tooltip/index.js'
+import { inSequence, rectangleOf } from '../rectangle.js'
 import { fits, monthPage, overviewOf, type Reading, toneOf } from './buckets.js'
 
 /**
@@ -74,6 +75,16 @@ import { fits, monthPage, overviewOf, type Reading, toneOf } from './buckets.js'
  * `helix-before-change` and tells with `change`, and the `selection` part says
  * how many are selected, in `selection-label`.
  *
+ * **`selection-shape="rectangle"` selects a rectangle of cells** under
+ * `multiple`, as a spreadsheet selects a range: the cells between two corners
+ * by row and by column, such as the same weekdays across three weeks with
+ * `rows="7"`. Shift with a key that moves grows or shrinks it from the cell
+ * last pressed, Shift with a click takes it to the cell clicked, and a click
+ * with Ctrl or Command selects one cell or lets it go and starts the next
+ * rectangle there. The rectangle is the same cells on a right-to-left page,
+ * where the columns run from the right, a short last column adds only the
+ * cells it has, and `value` lists the selected days in the table's order.
+ *
  * **Under `selection-mode` the strip is a grid**, so the selection is state a
  * reader is told rather than words alone: each column of the strip is a `row`,
  * a week with `rows="7"`, and each cell a `gridcell` named by its row in the
@@ -104,6 +115,7 @@ import { fits, monthPage, overviewOf, type Reading, toneOf } from './buckets.js'
  * | Page Down, Page Up | Moves a month on or back where the rows carry dates, and four columns otherwise. |
  * | Enter, Space | Presses the cell, which sends `helix-reading-press`, and selects it or lets it go under `selection-mode`. |
  * | Shift with an arrow, Home, End, Page Up or Page Down | Selects every cell from the last one pressed to where the key went, under `selection-mode="multiple"`. |
+ * | Shift with an arrow, Home, End, Page Up or Page Down, with `selection-shape="rectangle"` | Grows or shrinks the rectangle from the last cell pressed to where the key went, in rows and columns, under `selection-mode="multiple"`. |
  * | Escape | Puts the cell's tooltip away. |
  *
  * @since 0.1.0
@@ -274,6 +286,14 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
   selectionMode?: 'multiple' | 'single'
 
   /**
+   * What Shift takes in under `selection-mode="multiple"`: `linear`, every
+   * cell between two in the table's order, or `rectangle`, the cells between
+   * two corners by row and by column, as a spreadsheet selects a range.
+   */
+  @property({ attribute: 'selection-shape' })
+  selectionShape: 'linear' | 'rectangle' = 'linear'
+
+  /**
    * The strip's name where the chart has none: no `aria-label`, `label`, or
    * table caption.
    */
@@ -389,6 +409,18 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
   /** Where a range taken in with Shift starts: the cell last pressed, or none. */
   private anchor = -1
 
+  /** The cell the keys rested on before the key now being handled moved them. */
+  private left = -1
+
+  /**
+   * What a rectangle is added to: the selection when it was started, less its
+   * anchor, kept while `value` is still the rectangle last written.
+   */
+  private base: string[] | undefined = undefined
+
+  /** The `value` the last rectangle wrote. */
+  private shaped: string | undefined = undefined
+
   /** The region a change of selection is said in, rendered from the first change. */
   private readonly status = new StatusController(this)
 
@@ -429,7 +461,35 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
       return
     }
     this.anchor = index
+    this.base = undefined
     this.choose(pressedValue(mode, this.value, key))
+  }
+
+  /**
+   * Selects the rectangle from the anchor to the drawn cell at `to`, beside
+   * what was selected before it started, under `selection-shape="rectangle"`.
+   * Without an anchor it starts where the keys were.
+   */
+  private stretch(to: number): void {
+    const keys = this.keysOf(this.drawn)
+    if (this.anchor < 0) {
+      this.anchor = this.left < 0 ? to : this.left
+    }
+    if (this.base === undefined || this.value !== this.shaped) {
+      const corner = keys[this.anchor]
+      this.base = commaList(this.value).filter((one) => one !== corner)
+    }
+    const taken = rectangleOf(keys.length, this.rowCount, this.anchor, to).map(
+      (at) => keys[at] ?? '',
+    )
+    const all = this.keysOf(this.points)
+    this.choose(inSequence([...this.base, ...taken].filter(Boolean), all).join(', '))
+    this.shaped = this.value
+  }
+
+  /** Notes where the keys rest before the pointer controller moves them. */
+  private readonly onStripKeydown = (): void => {
+    this.left = this.pointer.at
   }
 
   /**
@@ -451,6 +511,10 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
     if (!event.shiftKey || !moves || this.selectionMode !== 'multiple') {
       return
     }
+    if (this.selectionShape === 'rectangle') {
+      this.stretch(at)
+      return
+    }
     const keys = this.keysOf(this.drawn)
     const added = rangeAdd(commaList(this.value), keys, this.anchor < 0 ? at : this.anchor, at)
     if (added) {
@@ -458,11 +522,20 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
     }
   }
 
-  /** A press on a cell selects it, under `selection-mode`. */
+  /**
+   * A press on a cell selects it, under `selection-mode`, and Shift takes the
+   * rectangle to it under `selection-shape="rectangle"`.
+   */
   private readonly onClick = (event: MouseEvent): void => {
     const cell = (event.target as Element | null)?.closest?.('[part~="cell"]')
     const index = Number(cell?.getAttribute('data-index') ?? -1)
-    if (cell && Number.isInteger(index) && index >= 0) {
+    if (!cell || !Number.isInteger(index) || index < 0) {
+      return
+    }
+    const rectangle = this.selectionMode === 'multiple' && this.selectionShape === 'rectangle'
+    if (rectangle && event.shiftKey && this.anchor >= 0) {
+      this.stretch(index)
+    } else {
       this.press(index)
     }
   }
@@ -754,6 +827,7 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
         style="--heatmap-rows: ${this.rowCount}"
         tabindex=${readable ? '0' : nothing}
         @click=${this.onClick}
+        @keydown=${this.onStripKeydown}
         @pointerover=${this.onPointerOver}
         @pointerleave=${this.onPointerLeave}
         @pointerup=${this.onPointerUp}
