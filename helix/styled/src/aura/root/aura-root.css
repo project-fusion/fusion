@@ -87,6 +87,55 @@
   display: none;
 }
 
+/* **The pause control, in the trailing corner over the field**, drawn as the
+   controls over a map are: the floating ground, so it reads over any frame
+   of the field. Above the content, which covers the aura, and hit-testable
+   where the aura at rest is not. */
+[part="pause"] {
+  align-items: center;
+  background-color: var(--aura-pause-background-color, var(--helix-color-surface-overlay));
+  block-size: var(--helix-size-control-sm);
+  border: var(--helix-border-floating) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-full);
+  box-shadow: var(--helix-shadow-floating);
+  color: var(--helix-color-foreground);
+  cursor: pointer;
+  display: inline-flex;
+  inline-size: var(--helix-size-control-sm);
+  inset-block-end: var(--helix-space-sm);
+  inset-inline-end: var(--helix-space-sm);
+  justify-content: center;
+  padding: 0;
+  pointer-events: auto;
+  position: absolute;
+}
+
+[part="pause-mark"] {
+  block-size: var(--helix-size-icon-sm);
+  inline-size: var(--helix-size-icon-sm);
+}
+
+[part="pause"]:hover {
+  background-color: color-mix(
+    in oklab,
+    var(--helix-color-foreground) 10%,
+    var(--aura-pause-background-color, var(--helix-color-surface-overlay))
+  );
+}
+
+[part="pause"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* Nothing moves for a reader who asked for reduced motion, so there is nothing
+   to pause. */
+@media (prefers-reduced-motion: reduce) {
+  [part="pause"] {
+    display: none;
+  }
+}
+
 /* A printer drops it or renders a gray slab. */
 @media print {
   :host {

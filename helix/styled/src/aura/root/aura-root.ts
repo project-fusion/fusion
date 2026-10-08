@@ -6,10 +6,13 @@ import {
   MAX_FRAME_STEP,
   PaintGateController,
   readColor,
+  words,
 } from '@fusion.dev/helix-core'
+import { pause, play } from '@fusion.dev/helix-icons'
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
-import { html } from 'lit'
+import { html, nothing } from 'lit'
 import { property } from 'lit/decorators.js'
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { tiltFor } from '../axis.js'
 import { type AuraPalette, paletteOf, RESTING_PALETTE } from '../palette.js'
 import { FRAGMENT, INTERACTIONS, SHAPES, VERTEX } from '../shader.js'
@@ -93,8 +96,8 @@ const OPENING_PATIENCE = 500
  * The shader stops drawing in these cases:
  * - The element is off screen or in a background tab.
  * - `prefers-reduced-motion` is set. The element shows one still frame.
- * - `paused` is set, from a pause control on your page. The element holds the
- *   frame it shows.
+ * - `paused` is set, from a pause control on your page or from the aura's own
+ *   under `pause-control`. The element holds the frame it shows.
  * - The browser takes back the drawing context, on a GPU reset or past its
  *   limit of about sixteen contexts. The gradient shows until the context
  *   returns.
@@ -118,6 +121,13 @@ const OPENING_PATIENCE = 500
  * changed while the aura draws, by a class, a style or the color mode,
  * reaches the shader on the next frame.
  *
+ * **`pause-control` draws a control that stops the motion and starts it
+ * again**, in the trailing corner of the field, as WCAG 2.2.2 asks of
+ * anything that moves for more than five seconds. It is a toggle button named
+ * by `pause-label`, which says it is pressed while the field is paused, and a
+ * press sends `change`. A reader who asked for reduced motion sees no motion
+ * and no control.
+ *
  * Where the gradient shows in place of the shader, the aura matches
  * `:state(fallback)` and sends `helix-aura-fallback` with the reason.
  *
@@ -129,14 +139,18 @@ const OPENING_PATIENCE = 500
  *
  * @slot - Content drawn over the field, such as a heading.
  *
+ * @event {Event} change - Fired when the aura's own pause control pauses the field or starts it again.
  * @event {HelixAuraFallbackEvent} helix-aura-fallback - Fired each time the aura stops drawing its shader and shows its gradient, with the reason.
  *
  * @csspart canvas - The surface the shader draws into.
  * @csspart content - The box over the field that holds the content. It covers the aura.
+ * @csspart pause - The control that pauses the field and starts it again, drawn under `pause-control`.
+ * @csspart pause-mark - The glyph on the pause control: pause while the field moves, play while it is paused.
  *
  * @cssproperty --aura-glow - The bright stop of the ramp. Defaults to `--helix-color-primary`.
  * @cssproperty --aura-ground - The page the field fades into. Defaults to `--helix-color-background`.
  * @cssproperty --aura-haze - The faint stop between the ground and the glow. Defaults to `--helix-color-primary-subtle`.
+ * @cssproperty --aura-pause-background-color - The pause control's ground. Defaults to `--helix-color-surface-overlay`.
  * @cssproperty --aura-peak - The hottest stop, at the center of a shape. Defaults to `--helix-color-primary-active` on a light page and `--helix-color-foreground` on a dark one.
  *
  * @cssstate fallback - The aura shows its gradient: the renderer draws on the CPU, there is no WebGL, or the browser took the context back. Cleared once the shader draws again.
@@ -144,6 +158,12 @@ const OPENING_PATIENCE = 500
 @customElement('helix-aura')
 export class HelixAura extends HelixElement {
   static override styles: CSSResultGroup = styles
+
+  /**
+   * The key this family's words are registered under:
+   * `registerWords('de', { 'helix-aura': { pauseLabel: 'Bewegung anhalten' } })`.
+   */
+  static words = 'helix-aura'
 
   /**
    * How soft the falloff is, `0` tight and `1` diffuse.
@@ -212,6 +232,23 @@ export class HelixAura extends HelixElement {
    */
   @property({ type: Boolean })
   paused = false
+
+  /**
+   * Whether the aura draws its own control that pauses the field and starts it
+   * again, in its trailing corner. Absent draws none, for a page with a pause
+   * control of its own.
+   */
+  @property({ attribute: 'pause-control', type: Boolean })
+  pauseControl = false
+
+  /**
+   * The pause control's name, read by screen readers. The control is a toggle
+   * and says it is pressed while the field is paused, so the name stays the
+   * same.
+   */
+  @words
+  @property({ attribute: 'pause-label' })
+  pauseLabel = 'Pause the motion'
 
   /**
    * How far the pointer reaches into the field, `0` upward.
@@ -491,7 +528,27 @@ export class HelixAura extends HelixElement {
        may want to label the region this sits behind and a hidden host would
        take that with it. The canvas itself never has anything to announce. */
     return html`<canvas part="canvas" aria-hidden="true"></canvas>
-      <div part="content"><slot></slot></div>`
+      <div part="content"><slot></slot></div>${this.renderPause()}`
+  }
+
+  /** The aura's own pause control, under `pause-control`. */
+  private renderPause(): TemplateResult | typeof nothing {
+    if (!this.pauseControl) {
+      return nothing
+    }
+    const glyph = this.paused ? play : pause
+    return html`<button
+      part="pause"
+      type="button"
+      aria-label=${this.pauseLabel}
+      aria-pressed=${this.paused ? 'true' : 'false'}
+      @click=${this.togglePause}
+    ><svg aria-hidden="true" data-glyph fill="currentColor" part="pause-mark" viewBox=${glyph.viewBox}>${unsafeSVG(glyph.content)}</svg></button>`
+  }
+
+  private readonly togglePause = (): void => {
+    this.paused = !this.paused
+    this.dispatchEvent(new Event('change', { bubbles: true }))
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
