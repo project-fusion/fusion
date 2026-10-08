@@ -156,6 +156,57 @@ describe('a transcript fed as data', () => {
     return element
   }
 
+  /**
+   * The fling's own clock, sixteen milliseconds a frame, which is the pace a
+   * phone's momentum scrolls at.
+   *
+   * **The transcript reads the time between scroll events, and a runner's frames
+   * are not a phone's.** The controller takes a box still for 150 milliseconds
+   * as a fling that has ended, and squares its spacer with the scroll offset.
+   * On a two-core runner one frame of this spec once took longer than that, so
+   * the square landed mid-fling and was counted as the transcript ending it:
+   * "expected 1 to be 0". While the clock runs, a timer with a delay waits for
+   * the frames the spec draws, and every other timer runs as it would.
+   */
+  const flingClock = (): { stop: () => void; tick: (ms: number) => void } => {
+    const set = window.setTimeout
+    const clear = window.clearTimeout
+    const due = new Map<number, { at: number; run: () => void }>()
+    let now = 0
+    let next = 0
+    window.setTimeout = ((run: TimerHandler, delay?: number, ...rest: unknown[]) => {
+      if (!delay || typeof run !== 'function') {
+        return set(run, delay, ...rest)
+      }
+      next -= 1
+      due.set(next, { at: now + delay, run: () => run(...rest) })
+      return next
+    }) as typeof window.setTimeout
+    window.clearTimeout = ((id?: number) => {
+      if (id === undefined || !due.delete(id)) {
+        clear(id)
+      }
+    }) as typeof window.clearTimeout
+    return {
+      stop: () => {
+        window.setTimeout = set
+        window.clearTimeout = clear
+        for (const timer of due.values()) {
+          set(timer.run, Math.max(0, timer.at - now))
+        }
+        due.clear()
+      },
+      tick: (ms) => {
+        now += ms
+        for (const [id, timer] of [...due].sort(([, a], [, b]) => a.at - b.at)) {
+          if (timer.at <= now && due.delete(id)) {
+            timer.run()
+          }
+        }
+      },
+    }
+  }
+
   const drawn = (element: Chat): HTMLElement[] => [
     ...(element.shadowRoot?.querySelectorAll<HTMLElement>('[part="turn"]') ?? []),
   ]
@@ -243,25 +294,32 @@ describe('a transcript fed as data', () => {
           let shift = 0
           let before = offsets()
           let velocity = speed
-          for (let frame = 0; frame < 24; frame++) {
-            driving = true
-            box.scrollTop += velocity
-            driving = false
-            velocity *= 0.95
-            /* Read once the frame is painted. A turn's message draws itself after
-             the transcript, so its height is heard through a resize observer,
-             which runs after the animation frame callbacks and before paint. */
-            await new Promise((resolve) => requestAnimationFrame(resolve))
-            await new Promise((resolve) => setTimeout(resolve))
-            await element.updateComplete
-            const after = offsets()
-            const still = [...after].find(([index]) => before.has(index))
-            if (still) {
-              shift = Math.max(shift, Math.abs(still[1] - (before.get(still[0]) ?? 0) - wrote))
+          const clock = flingClock()
+          try {
+            for (let frame = 0; frame < 24; frame++) {
+              driving = true
+              box.scrollTop += velocity
+              driving = false
+              velocity *= 0.95
+              /* Read once the frame is painted. A turn's message draws itself
+               after the transcript, so its height is heard through a resize
+               observer, which runs after the animation frame callbacks and
+               before paint. */
+              await new Promise((resolve) => requestAnimationFrame(resolve))
+              await new Promise((resolve) => setTimeout(resolve))
+              await element.updateComplete
+              const after = offsets()
+              const still = [...after].find(([index]) => before.has(index))
+              if (still) {
+                shift = Math.max(shift, Math.abs(still[1] - (before.get(still[0]) ?? 0) - wrote))
+              }
+              writes += wrote === 0 ? 0 : 1
+              wrote = 0
+              before = after
+              clock.tick(16)
             }
-            writes += wrote === 0 ? 0 : 1
-            wrote = 0
-            before = after
+          } finally {
+            clock.stop()
           }
           expect(writes).toBe(0)
           expect(shift).toBeLessThan(1)
