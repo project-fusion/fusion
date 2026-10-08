@@ -352,19 +352,18 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
   noResultsText = 'No matches'
 
   /**
-   * What a screen reader hears when the filter narrows the rows. `{count}` is
-   * how many rows are left, written in the locale, and each language writes
-   * the forms it has, as Listbox's `results-label` does.
-   */
-  @words
-  @property({ attribute: 'results-label' })
-  resultsLabel = '{count, plural, one {# result} other {# results}}'
-
-  /**
    * Space between the trigger and the surface, in pixels.
    */
   @property({ type: Number })
   offset = 4
+
+  /**
+   * What opens the menu from its trigger. `long-press` leaves a press to the
+   * trigger's own action and opens the menu on a press held for half a second,
+   * or on Alt+Down or Alt+Up.
+   */
+  @property({ attribute: 'open-on' })
+  openOn: 'click' | 'long-press' = 'click'
 
   /** Whether the trigger opens the menu only on a held press. */
   private get pressHeld(): boolean {
@@ -394,20 +393,21 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
   private heldAt: { x: number; y: number } | undefined
 
   /**
-   * What opens the menu from its trigger. `long-press` leaves a press to the
-   * trigger's own action and opens the menu on a press held for half a second,
-   * or on Alt+Down or Alt+Up.
-   */
-  @property({ attribute: 'open-on' })
-  openOn: 'click' | 'long-press' = 'click'
-
-  /**
    * The side the menu opens on, when there is room.
    *
    * It moves if that side does not fit.
    */
   @property()
   placement: Placement = 'bottom-start'
+
+  /**
+   * What a screen reader hears when the filter narrows the rows. `{count}` is
+   * how many rows are left, written in the locale, and each language writes
+   * the forms it has, as Listbox's `results-label` does.
+   */
+  @words
+  @property({ attribute: 'results-label' })
+  resultsLabel = '{count, plural, one {# result} other {# results}}'
 
   /**
    * How a submenu opens. `drill` shows it in place of the page showing, with

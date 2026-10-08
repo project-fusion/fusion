@@ -545,7 +545,7 @@ describe('where the panel opens', () => {
           <button slot="trigger">Open</button><span>Body</span>
         </helix-headless-popover></div>`,
     )
-    const host = page.querySelector('helix-headless-popover') as Popover & {
+    const host = page.querySelector('helix-headless-popover') as unknown as Popover & {
       anchor: Element | string
       placedAgainst: HTMLElement
     }
