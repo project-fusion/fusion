@@ -377,12 +377,18 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
 
   /**
    * The message for text that is no time, where `bad-input-message` is not
-   * set. `{mode}` is `single`, `range`, or `multiple`, and `{shape}` is `HH:mm`, or `HH:mm:ss` with `seconds`.
+   * set. `{mode}` is `single`, `range`, or `multiple`, `{example}` is a time
+   * written as the field writes one, `2:30 PM` in `en-US` and `14:30` in
+   * `de-DE`, and `{shape}` is `HH:mm`, or `HH:mm:ss` with `seconds`.
+   *
+   * **The default names a time the field reads back.** It said "Enter a time
+   * as HH:mm." to a reader whose field showed `2:30 PM`, and a pattern token
+   * is words for a developer.
    */
   @words
   @property({ attribute: 'unreadable-message' })
   unreadableMessage =
-    '{mode, select, single {Enter a time as {shape}.} other {Enter times as {shape}, separated by commas.}}'
+    '{mode, select, single {Enter a time such as {example}.} other {Enter times such as {example}, separated by commas.}}'
 
   /** Every time in the value, which may hold more than one. */
   private get held(): string[] {
@@ -621,11 +627,14 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
        chosen from the picker reported "Enter a time as HH:mm" and the field went
        invalid on being used correctly. */
     const held = this.held
-    const shape = this.seconds ? 'HH:mm:ss' : 'HH:mm'
     if (held.length > 0 && !held.every((one) => this.isTime(one))) {
       return (
         this.badInputMessage ||
-        formatWords(this, 'unreadableMessage', { mode: this.mode ?? 'single', shape })
+        formatWords(this, 'unreadableMessage', {
+          example: this.written(this.seconds ? '14:30:15' : '14:30'),
+          mode: this.mode ?? 'single',
+          shape: this.seconds ? 'HH:mm:ss' : 'HH:mm',
+        })
       )
     }
     /* Each fault across every time, in the order the messages take, so a

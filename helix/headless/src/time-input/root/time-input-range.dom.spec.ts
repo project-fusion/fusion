@@ -46,13 +46,13 @@ describe('a time input holding more than one time', () => {
   test('one bad time in a set is still bad, and says so in the plural', async () => {
     const host = await field('mode="range"', '09:00,tea time')
 
-    expect(complaint(host)).toBe('Enter times as HH:mm, separated by commas.')
+    expect(complaint(host)).toBe('Enter times such as 2:30 PM, separated by commas.')
   })
 
   test('a single field keeps the singular message', async () => {
     const host = await field('', 'tea time')
 
-    expect(complaint(host)).toBe('Enter a time as HH:mm.')
+    expect(complaint(host)).toBe('Enter a time such as 2:30 PM.')
   })
 
   test('a bound is compared against each time rather than the list', async () => {
