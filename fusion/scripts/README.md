@@ -23,7 +23,7 @@ The `.mjs` files beside them are the generators themselves, run as turbo tasks
 rather than imported: `build-elements-css.mjs`, `build-metrics.mjs`,
 `build-element-events.mjs` and the rest. They resolve their own paths from
 `import.meta.dirname`, so a `package.json` script never names a path out of its
-own package, which `fusion workspace`'s `reaching` rule holds them to.
+own package, which `fusion x workspace`'s `reaching` rule holds them to.
 
 **Everything runs under bun**, including the files with a `#!/usr/bin/env node`
 shebang. There is no Node on a CI runner for `verify`.

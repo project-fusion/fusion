@@ -280,7 +280,10 @@ pub fn rules(host: &Arc<Host>, noun: &'static str) -> Result<(Vec<Rule>, Vec<Str
         }
         if mine == 0 {
             return Err(Failure::input(
-                format!("`{}` provides no rule `fusion {noun}` can run", loaded.name),
+                format!(
+                    "`{}` provides no rule `fusion x {noun}` can run",
+                    loaded.name
+                ),
                 format!(
                     "every rule it provides reads something this noun does not compose, which is \
                      {}",

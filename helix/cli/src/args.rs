@@ -78,8 +78,10 @@ pub enum Noun {
     },
 
     /* **The design system saying whether you extended it correctly**, rather
-    than a linter to be configured into usefulness. */
+    than a linter to be configured into usefulness. Only in this repository's
+    builds: the published binary is built without the `internal` feature. */
     /// Hold components to the conventions Helix is built on.
+    #[cfg(feature = "internal")]
     ///
     /// Reads the tiers named by a `helix` key in `fusion.json`, or by
     /// `helix.json` where that product is not in use.
@@ -350,6 +352,7 @@ pub struct ManifestDiff {
 }
 
 /// What can be asked of the component rules.
+#[cfg(feature = "internal")]
 #[derive(Debug, Subcommand)]
 pub enum Component {
     /// Report every rule and what it found, and exit 1 on a finding.
@@ -361,6 +364,7 @@ pub enum Component {
 }
 
 /// What `component audit` takes, which is the rules plus how to show them.
+#[cfg(feature = "internal")]
 #[derive(Args, Debug)]
 pub struct ComponentAudit {
     #[command(flatten)]
@@ -378,6 +382,7 @@ pub struct ComponentAudit {
 }
 
 /// What the component verbs take.
+#[cfg(feature = "internal")]
 #[derive(Args, Debug)]
 pub struct Rules {
     /// Run just these rules.

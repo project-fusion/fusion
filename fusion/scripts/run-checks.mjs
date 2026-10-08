@@ -54,7 +54,7 @@ const DEDICATED = new Set([
      `Killed` at exit 137, a SIGTERM, and the neighbors canceled behind them. */
   'bun run check:css:seeds',
   'bun run check:prose',
-  'bun run fusion spec check',
+  'bun run fusion x spec check',
   'bun run rs:check',
   'bun run rs:test',
   'bun run test',

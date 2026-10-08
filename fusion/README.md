@@ -13,8 +13,8 @@ What belongs to the company rather than to a product.
 Nothing here publishes to npm.
 
 **A check belongs to a CLI noun; a script belongs where its output belongs.**
-Everything that judges the workspace is a rule under `fusion workspace`,
-`fusion prose`, `fusion spec` or `helix component`, reached from the root by one
+Everything that judges the workspace is a rule under `fusion x workspace`,
+`fusion x prose`, `fusion x spec` or `helix component`, reached from the root by one
 delegating script apiece. Everything that *writes* something lives in the package
 that owns what it writes, so `helix/docs` builds the docs and `helix/styles`
 builds the token layer.

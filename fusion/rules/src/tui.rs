@@ -22,7 +22,7 @@
 //! **One screen for both command lines, and the product's name is the one
 //! thing it takes from its caller.** The keys and the shape are the same on
 //! purpose: a reader who learns `helix component audit` has learned
-//! `fusion workspace audit`, and `fusion helix component audit` reaches the
+//! `fusion x workspace audit`, and `fusion helix component audit` reaches the
 //! first through the second. The word in the corner says which binary is
 //! answering.
 //!

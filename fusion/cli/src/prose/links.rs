@@ -16,14 +16,14 @@
 //! for every host but one. A link to the site this repository builds is as
 //! answerable as a link to a file in it, and answering it is this rule.
 //!
-//! **A `fusion prose` rule rather than a `helix component` one.** `helix
+//! **A `fusion x prose` rule rather than a `helix component` one.** `helix
 //! component` is the design system telling a *consumer* whether they extended it
 //! correctly, and it runs in their repository against their components. Their
 //! `@documentation` tags point at their own documentation, which this workspace
 //! has never heard of and has no catalog for, so the rule would be unrunnable
 //! everywhere it was meant to run. The subject here is narrower and local: what
 //! this repository wrote down about the site this repository publishes, which is
-//! what `fusion prose` is for. It is also the only side that sees the whole
+//! what `fusion x prose` is for. It is also the only side that sees the whole
 //! corpus. The tags are in two component tiers, and the same dead host was in
 //! eight package READMEs, an issue template and a unit test's fixtures, none of
 //! which a component rule reads.

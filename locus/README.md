@@ -39,7 +39,7 @@ Made by the owner on October 8, 2026.
   load-testing tool one letter away.
 - **One visibility for every package.** Locus publishes with the same
   `publishConfig.access` as every other package, and changes with them when
-  they go public. `fusion workspace`'s `publishable` holds them to one value.
+  they go public. `fusion x workspace`'s `publishable` holds them to one value.
 - **MIT**, the license of the rest of this repository.
 - **The GitHub Action lives in this repository.**
 - **A GitHub App is wanted**, in a later phase, so a retake can open its

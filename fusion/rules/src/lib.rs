@@ -8,7 +8,7 @@
 //! sentence.
 //!
 //! **This crate carries no product, which is what lets both depend on it.**
-//! `helix component` and `fusion workspace` were one command line written
+//! `helix component` and `fusion x workspace` were one command line written
 //! twice: the rule and report types, the runner that measures a set of rules,
 //! the `fix` verb, the `--only` check, the JSON payload, the audit screen, the
 //! exit codes, the error format, color and the walker, about eight hundred
@@ -25,7 +25,7 @@
 //! **What stays per product is what differs.** Each command line keeps its
 //! context and settings, its rule set, its floor rule and when that runs, and
 //! its printed forms: `helix component audit` prints a rule's notes and
-//! `fusion workspace audit` does not, and those are decisions about a
+//! `fusion x workspace audit` does not, and those are decisions about a
 //! product's report rather than about what a rule is.
 
 pub mod args;

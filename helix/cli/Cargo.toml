@@ -54,5 +54,12 @@ oxc_ast_visit = "0.152.0"
 # rather than reading an artifact somebody committed.
 wit-component = "0.260"
 
+# **On in every build here, and off in the binaries `binaries.yml` publishes**,
+# which build with `--no-default-features`. It holds `helix component`, the rules Helix's own components are held to:
+# this repository's tooling, which serves nobody who installs the command.
+[features]
+default = ["internal"]
+internal = []
+
 [lints]
 workspace = true

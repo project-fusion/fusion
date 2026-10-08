@@ -69,7 +69,7 @@ struct Verdict {
 fn judge(tree: &Tree, noun: &str, only: &str, rule: &str) -> Verdict {
     let root = tree.0.to_str().expect("a temp path is text");
     let output = Command::new(env!("CARGO_BIN_EXE_fusion"))
-        .args([noun, "check", "--json", "--only", only, "--root", root])
+        .args(["x", noun, "check", "--json", "--only", only, "--root", root])
         .env("NO_COLOR", "1")
         .output()
         .expect("the binary runs");

@@ -16,7 +16,7 @@ import { auditReactProps } from '#react-audit'
  * resolves to `react-audit.ts` and every other build to a function that does
  * nothing, as `#audit-name` is. See `react-audit.ts`.
  *
- * `fusion workspace audit`'s `react-bridge` reads `REACT_PROPS` out of whichever
+ * `fusion x workspace audit`'s `react-bridge` reads `REACT_PROPS` out of whichever
  * file declares it and holds the installed `react-dom` to the version the
  * notes below were measured against.
  */

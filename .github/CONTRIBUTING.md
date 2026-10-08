@@ -36,7 +36,7 @@ is the one copy. The three that come up on a first change:
 - **Anything a user reads follows [VOICE.md](VOICE.md)**: the site, the docs, the
   reference, interface text and errors, and new code comments.
 - **American spelling** everywhere, comments and prose alike. `bun run fix:dialect`
-  rewrites and `fusion prose`'s `dialect` judges. Comments are in scope because an
+  rewrites and `fusion x prose`'s `dialect` judges. Comments are in scope because an
   unwritten convention is learned from the corpus.
 - **Comments say why, not what.** A comment earns its place by recording a
   decision, a measurement, or a thing that was tried and did not work. Where

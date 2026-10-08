@@ -19,7 +19,7 @@
  * name rather than passing quietly, so a spec reaching for one is a visible
  * failure and not a green tick.
  *
- * `fusion spec`'s `matchers` reads the specs and this file against each other, so the
+ * `fusion x spec`'s `matchers` reads the specs and this file against each other, so the
  * list moves whenever a spec reaches for something new and a count written
  * beside it is stale by the next one.
  */
@@ -128,7 +128,7 @@ export const beforeAll = (body: () => unknown): void => {
  * Runs after every test in the block it was declared in, passed or failed.
  *
  * **Every name `bun:test` exports has to exist here too**, which is what
- * `fusion spec`'s `matchers` polices: `build-specs.mjs` points `bun:test` at this file
+ * `fusion x spec`'s `matchers` polices: `build-specs.mjs` points `bun:test` at this file
  * for the browser, so a spec importing something this module lacks compiles
  * under happy-dom and fails to bundle here. The error names the missing export
  * rather than the spec's own line, so it reads as a harness fault and is one.
@@ -839,7 +839,7 @@ export const notYetDefined = (base: string): { define: () => void; element: HTML
  * `await host.updateComplete` reads the state from before the last update
  * landed, and an unbounded loop hangs the whole run when a component never
  * settles. Written twice because the two harnesses share no code, which is the
- * arrangement `fusion spec`'s `matchers` already exists to police from the other side.
+ * arrangement `fusion x spec`'s `matchers` already exists to police from the other side.
  */
 export const settle = async (host: Updatable, turns = 40): Promise<void> => {
   let taken = 0

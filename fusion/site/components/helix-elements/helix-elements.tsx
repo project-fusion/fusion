@@ -24,7 +24,7 @@ import { useEffect, useState } from 'react'
  * returns `null` and is a leaf, so where it renders is the whole of the
  * decision: `(site)`'s layout, the theme builder's layout, and the sandbox
  * *page* rather than the sandbox layout, which is an ancestor of `specs/`.
- * `fusion spec`'s `isolated` fails if the specs document ever registers the
+ * `fusion x spec`'s `isolated` fails if the specs document ever registers the
  * library again, whichever way it is kept out.
  */
 
