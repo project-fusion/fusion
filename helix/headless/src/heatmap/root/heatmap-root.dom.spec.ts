@@ -537,6 +537,26 @@ describe('selecting cells', () => {
     expect(part(element, 'live')?.textContent).toBe('Mon: 1 (1 of 4, gewählt)')
   })
 
+  /* The value named each day by its header's words, "1 Jun", where the
+     header carried the date itself in a `<time datetime>`. */
+  test('names a day by its `<time datetime>` where the row carries one', async () => {
+    const rows = ['2026-06-01', '2026-06-02', '2026-06-03']
+      .map(
+        (date, day) =>
+          `<tr><th scope="row"><time datetime="${date}">${day + 1} Jun</time></th><td>${day}</td></tr>`,
+      )
+      .join('')
+    const host = (await mount(
+      `<div><table id="june"><tbody>${rows}</tbody></table><helix-headless-heatmap for="june" selection-mode="multiple" value="2026-06-01"></helix-headless-heatmap></div>`,
+    )) as HTMLElement
+    const element = host.querySelector('helix-headless-heatmap') as Selecting
+    await element.updateComplete
+    expect(selected(element)).toEqual(['0'])
+    ;(cells(element)[2] as HTMLElement).click()
+    await element.updateComplete
+    expect(element.value).toBe('2026-06-01, 2026-06-03')
+  })
+
   test('selects nothing without `selection-mode`', async () => {
     const element = (await strip('', WEEK)) as Selecting
     key(element, 'Home')
