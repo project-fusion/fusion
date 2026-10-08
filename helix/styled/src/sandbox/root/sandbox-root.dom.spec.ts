@@ -1015,3 +1015,71 @@ describe('a file with no name', () => {
     expect(warnings).toEqual([])
   })
 })
+
+describe('the files a sandbox runs', () => {
+  test('a module file and `package.json` reach the preview, which loads them by path and by name', async () => {
+    const sandbox = await mount(`
+      <helix-sandbox preview-delay="0">
+        <helix-sandbox-source slot="source" name="js" value="import { two } from './utils.js'"></helix-sandbox-source>
+        <helix-sandbox-source slot="source" name="utils.js" value="export const two = 2"></helix-sandbox-source>
+        <helix-sandbox-source slot="source" name="package.json" value='{"dependencies": {"canvas-confetti": "1.9.3"}}'></helix-sandbox-source>
+        <helix-sandbox-preview slot="preview"></helix-sandbox-preview>
+      </helix-sandbox>`)
+    await (sandbox as Updatable).updateComplete
+    const preview = sandbox.querySelector('helix-sandbox-preview') as Updatable & {
+      dependencies?: Record<string, string>
+      modules?: Record<string, string>
+      script: string
+    }
+    expect(preview.script).toBe("import { two } from './utils.js'")
+    expect(preview.modules).toEqual({ 'utils.js': 'export const two = 2' })
+    expect(preview.dependencies).toEqual({ 'canvas-confetti': '1.9.3' })
+
+    /* A `package.json` that is not valid JSON while it is typed keeps the last one. */
+    const manifest = sandbox.querySelectorAll('helix-sandbox-source')[2] as HTMLElement
+    const field = part(manifest, 'source') as HTMLTextAreaElement
+    field.value = '{"dependencies": {'
+    field.dispatchEvent(new Event('input', { bubbles: true }))
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(preview.dependencies).toEqual({ 'canvas-confetti': '1.9.3' })
+  })
+})
+
+describe('a sandbox holding edits', () => {
+  const files = `
+    <helix-sandbox preview-delay="0">
+      <helix-sandbox-source slot="source" name="html" label="index.html" value="<p>one</p>"></helix-sandbox-source>
+      <helix-sandbox-source slot="source" name="css" label="styles.css" value="p {}"></helix-sandbox-source>
+      <helix-sandbox-preview slot="preview"></helix-sandbox-preview>
+    </helix-sandbox>`
+
+  test('marks the file tab of an edited pane, says so to a screen reader, and `reset()` puts it back', async () => {
+    const sandbox = (await mount(files)) as Updatable & { reset(): void }
+    await sandbox.updateComplete
+    const tabs = (): HTMLElement[] => [
+      ...(sandbox.shadowRoot?.querySelectorAll<HTMLElement>('[role="tab"]') ?? []),
+    ]
+    expect(tabs().map((tab) => tab.getAttribute('part'))).toEqual(['file', 'file'])
+    expect(hasState(sandbox, 'modified')).toBe(false)
+
+    const pane = sandbox.querySelector('helix-sandbox-source') as Updatable & { value: string }
+    const field = part(pane, 'source') as HTMLTextAreaElement
+    field.value = '<p>two</p>'
+    field.dispatchEvent(new Event('input', { bubbles: true }))
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await sandbox.updateComplete
+    expect(tabs().map((tab) => tab.getAttribute('part'))).toEqual(['file file-modified', 'file'])
+    expect(tabs()[0]?.getAttribute('aria-describedby')).toBe('modified')
+    expect(sandbox.shadowRoot?.getElementById('modified')?.textContent).toBe('Modified')
+    expect(hasState(sandbox, 'modified')).toBe(true)
+
+    const preview = sandbox.querySelector('helix-sandbox-preview') as Updatable & { source: string }
+    sandbox.reset()
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await sandbox.updateComplete
+    expect(pane.value).toBe('<p>one</p>')
+    expect(preview.source).toBe('<p>one</p>')
+    expect(tabs().map((tab) => tab.getAttribute('part'))).toEqual(['file', 'file'])
+    expect(hasState(sandbox, 'modified')).toBe(false)
+  })
+})

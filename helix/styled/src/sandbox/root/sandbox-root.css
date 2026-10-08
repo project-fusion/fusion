@@ -67,7 +67,7 @@
   overflow-x: auto;
 }
 
-[part="file"] {
+[part~="file"] {
   background-color: transparent;
   border: none;
   border-block-end: var(--helix-border-thick) solid transparent;
@@ -78,16 +78,28 @@
   white-space: nowrap;
 }
 
-[part="file"]:hover {
+[part~="file"]:hover {
   color: var(--helix-color-foreground);
 }
 
-[part="file"][aria-selected="true"] {
+[part~="file"][aria-selected="true"] {
   border-block-end-color: var(--helix-color-accent);
   color: var(--helix-color-foreground);
 }
 
-[part="file"]:focus-visible {
+/* A file whose pane holds an edit: a dot after its name. */
+[part~="file-modified"]::after {
+  background-color: currentcolor;
+  block-size: var(--helix-space-xs);
+  border-radius: var(--helix-radii-full);
+  content: "";
+  display: inline-block;
+  inline-size: var(--helix-space-xs);
+  margin-inline-start: var(--helix-space-xs);
+  vertical-align: middle;
+}
+
+[part~="file"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }

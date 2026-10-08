@@ -25,6 +25,24 @@ import { styles as sheet } from './sandbox-preview.css.js'
 /** What the frame is allowed, here and in a tab `open()` makes. */
 const SANDBOX = 'allow-scripts allow-forms'
 
+/** A relative module specifier in an `import` or an `export ... from`. */
+const RELATIVE = /(\bfrom\s*|\bimport\s*\(?\s*)(["'])(\.{1,2}\/[^"']+)\2/g
+
+/**
+ * A module file's source as the frame loads it, from a `data:` address. A
+ * `data:` address has no folder for a relative import to start from, so each
+ * relative specifier is written as the module's own address in the import
+ * map, `sandbox:/` and its path.
+ */
+const moduleText = (path: string, source: string): string =>
+  `data:text/javascript;charset=utf-8,${encodeURIComponent(
+    source.replace(
+      RELATIVE,
+      (_, lead: string, quote: string, specifier: string) =>
+        `${lead}${quote}${new URL(specifier, `sandbox:/${path}`).href}${quote}`,
+    ),
+  )}`
+
 /** The frame saying it has a listener, and where to answer it. */
 export interface PreviewReady {
   type: 'helix-preview-ready'
@@ -98,6 +116,16 @@ export type PreviewMessage =
  * since a browser reads one only as a document starts. A `src` document
  * declares its own.
  *
+ * **`dependencies` names packages by version instead**, as a `package.json`
+ * does: `{"canvas-confetti": "^1.9"}` loads `canvas-confetti` and the paths
+ * under it from `cdn`, `https://esm.sh/` by default, at the version or range
+ * given. An address in `imports` wins over a package of the same name.
+ *
+ * **`modules` holds files the example imports by a relative path**: each path,
+ * such as `utils.js`, to its source, and `import { add } from './utils.js'`
+ * in the `js` pane or in another module loads it. A sandbox writes each pane
+ * named for a module file here.
+ *
  * **Examples render in a frame**, so an example's styles and scripts do not
  * affect the page around the sandbox, and `position: fixed` stays inside the
  * pane. The frame starts empty, with its own stylesheets and its own custom
@@ -118,8 +146,9 @@ export type PreviewMessage =
  *
  * **A failed preview shows the error over the example**, in the `error` part,
  * until the next source is sent. The terminal says it too, so the part is not
- * announced. Hide it with `::part(error) { display: none }` where the page
- * draws its own.
+ * announced, and it is the frame's description while it shows, so a screen
+ * reader reads it with the frame. Hide it with `::part(error) { display: none }`
+ * where the page draws its own.
  *
  * **`controls` draws two buttons in the preview's corner**: one reloads the
  * frame's document, as `reload()` does, and one opens the example in a new
@@ -151,6 +180,13 @@ export class HelixSandboxPreview extends HelixElement {
   static words = 'helix-sandbox-preview'
 
   /**
+   * The address the packages in `dependencies` load from, which the name, an
+   * `@` and the version follow.
+   */
+  @property()
+  cdn = 'https://esm.sh/'
+
+  /**
    * The color mode the frame renders in.
    *
    * **The frame is a document and a document has its own color mode.** Setting
@@ -174,6 +210,15 @@ export class HelixSandboxPreview extends HelixElement {
    */
   @property({ reflect: true, type: Boolean })
   controls = false
+
+  /**
+   * The npm packages an example can import by name in the built-in document,
+   * each name to a version or a range, as a `package.json` lists them. Each
+   * loads from `cdn`. Set it as JSON in the attribute or as an object. Not
+   * read where `src` is set.
+   */
+  @property({ type: Object })
+  dependencies?: Record<string, string>
 
   /**
    * Writing direction inside the frame.
@@ -217,6 +262,14 @@ export class HelixSandboxPreview extends HelixElement {
    */
   @property()
   layout?: 'padded' | 'centered' | 'fullscreen' | 'hug'
+
+  /**
+   * Module files an example imports by a relative path in the built-in
+   * document, each path, such as `utils.js`, to its source. Not read where
+   * `src` is set.
+   */
+  @property({ type: Object })
+  modules?: Record<string, string>
 
   /**
    * The name of the button that opens the example in a new tab, under
@@ -286,6 +339,25 @@ export class HelixSandboxPreview extends HelixElement {
 
   private get frame(): HTMLIFrameElement | null {
     return this.renderRoot.querySelector('iframe')
+  }
+
+  /**
+   * The import map of the built-in document: each module file, by its path
+   * and by the address its neighbors import it at, each package in
+   * `dependencies` and the paths under it, and `imports` over all of them.
+   */
+  private get importMap(): Record<string, string> {
+    const map: Record<string, string> = {}
+    for (const [name, version] of Object.entries(this.dependencies ?? {})) {
+      const address = `${this.cdn}${name}@${version}`
+      map[name] = address
+      map[`${name}/`] = `${address}/`
+    }
+    for (const [given, source] of Object.entries(this.modules ?? {})) {
+      const path = given.replace(/^\.?\//, '')
+      map[`./${path}`] = map[`sandbox:/${path}`] = moduleText(path, source)
+    }
+    return { ...map, ...this.imports }
   }
 
   /**
@@ -479,7 +551,7 @@ export class HelixSandboxPreview extends HelixElement {
     frame.title = this.label
     frame.style.cssText = 'block-size: 100vh; border: none; display: block; inline-size: 100vw'
     if (this.src === '') {
-      frame.srcdoc = defaultFrame(this.imports)
+      frame.srcdoc = defaultFrame(this.importMap)
     } else {
       /* As this element's own frame resolved it, against this page, which the
          tab's blank document does not share. */
@@ -526,11 +598,14 @@ frame.onload = () => frame.contentWindow.postMessage(${JSON.stringify(this.messa
     }
     this.unready()
     if (this.src === '') {
-      frame.srcdoc = defaultFrame(this.imports)
+      frame.srcdoc = defaultFrame(this.importMap)
       return
     }
     frame.src = this.src
   }
+
+  /** The import map the built-in document was last loaded with, as JSON. */
+  private loadedMap = ''
 
   /**
    * A new document is on its way, so nothing is sent until it listens, and
@@ -549,7 +624,10 @@ frame.onload = () => frame.contentWindow.postMessage(${JSON.stringify(this.messa
     // A new document has to say it is listening again before anything is sent.
     /* A new import map is a new document as well, the built-in one loading
        again with it. */
-    if (changed.has('src') || (changed.has('imports') && this.src === '')) {
+    const map = this.src === '' ? JSON.stringify(this.importMap) : ''
+    const remapped = map !== this.loadedMap
+    this.loadedMap = map
+    if (changed.has('src') || remapped) {
       this.unready()
       return
     }
@@ -595,12 +673,15 @@ frame.onload = () => frame.contentWindow.postMessage(${JSON.stringify(this.messa
       part="frame"
       @load=${this.handleFrameLoad}
       src=${this.src || nothing}
-      srcdoc=${this.src === '' ? defaultFrame(this.imports) : nothing}
+      srcdoc=${this.src === '' ? defaultFrame(this.importMap) : nothing}
       title=${this.label}
+      aria-describedby=${this.failure === undefined ? nothing : 'error'}
       allow="clipboard-write *; fullscreen *"
       sandbox=${SANDBOX}
     ></iframe>${
-      this.failure === undefined ? nothing : html`<pre part="error">${this.failure}</pre>`
+      this.failure === undefined
+        ? nothing
+        : html`<pre part="error" id="error">${this.failure}</pre>`
     }${this.renderControls()}`
   }
 
