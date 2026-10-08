@@ -325,6 +325,9 @@ export class HelixSandbox extends HelixElement {
   /** The source each pane holds since its last edit. */
   private readonly texts = new Map<Element, string>()
 
+  /** Whether each pane held an edit when the file tabs were last drawn. */
+  private readonly drawnModified = new Map<Element, boolean>()
+
   /** The source panes slotted here. */
   private get sources(): Element[] {
     const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="source"]')
@@ -365,6 +368,7 @@ export class HelixSandbox extends HelixElement {
         }
       }
     }
+    this.drawnModified.clear()
     this.requestUpdate()
   }
 
@@ -636,9 +640,15 @@ export class HelixSandbox extends HelixElement {
       if (event.defaultPrevented) {
         return
       }
+      /* Drawn again only when a pane starts or stops holding an edit, and
+         not on every keystroke. */
       if (source) {
         this.texts.set(source, value)
-        this.requestUpdate()
+        const modified = this.modifiedOf(source)
+        if (this.drawnModified.get(source) !== modified) {
+          this.drawnModified.set(source, modified)
+          this.requestUpdate()
+        }
       }
       if (!isPaneName(name)) {
         return
