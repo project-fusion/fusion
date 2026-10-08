@@ -27,6 +27,7 @@ import { DOCS } from './docs.ts'
 
     <section class="section">
       <helix-data-table
+        columns="minmax(5.5rem, 1.6fr) minmax(4.5rem, 1fr) minmax(4.5rem, 1fr) max-content"
         default-sort="name:asc"
         label="Roster"
         :page-size="6"
@@ -34,20 +35,21 @@ import { DOCS } from './docs.ts'
         :rows="members"
         selectable
       >
-        <!-- **Every column declares what it may give up.** A floor and a share:
-             the floor is what the words need, and the share is how the slack is
-             divided. At 390 the four columns and the checkboxes fit the box, and
-             below 376 the table scrolls its own box. -->
-        <helix-table-column field="name" sortable width="minmax(5.5rem, 1.6fr)">
+        <!-- **`columns` says what each column may give up**, a track to a column:
+             a floor, which is what the words need, and a share of the slack. The
+             numerals take `max-content`, their one right width. At 390 the four
+             columns and the checkboxes fit the box, and below 376 the table
+             scrolls its own box. On the table, so a page rendered on a server is
+             laid out at these widths before the script runs. -->
+        <helix-table-column field="name" sortable>
           Name
         </helix-table-column>
-        <helix-table-column field="team" sortable width="minmax(4.5rem, 1fr)">
+        <helix-table-column field="team" sortable>
           Team
         </helix-table-column>
-        <helix-table-column field="role" width="minmax(4.5rem, 1fr)">Role</helix-table-column>
-        <!-- `end` lines the digits up under each other. `max-content`, since a
-             column of numerals has one right width. -->
-        <helix-table-column field="reviews" sortable text-align="end" width="max-content">
+        <helix-table-column field="role">Role</helix-table-column>
+        <!-- `end` lines the digits up under each other. -->
+        <helix-table-column field="reviews" sortable text-align="end">
           Reviews
         </helix-table-column>
 

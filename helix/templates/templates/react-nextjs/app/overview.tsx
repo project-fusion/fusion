@@ -37,6 +37,7 @@ export function Overview() {
 
       <section className="section">
         <helix-data-table
+          columns="minmax(5.5rem, 1.6fr) minmax(4.5rem, 1fr) minmax(4.5rem, 1fr) max-content"
           default-sort="name:asc"
           label="Roster"
           page-size={6}
@@ -44,31 +45,33 @@ export function Overview() {
           rows={members}
           selectable
         >
-          {/* **Every column declares what it may give up, which is the whole of
-              the narrow-window story.** A column left to itself takes
+          {/* **`columns` says what each column may give up, which is the whole
+              of the narrow-window story**, one track to a column in the order
+              they are written. A column left to itself takes
               `minmax(max-content, 1fr)`, which never goes below its longest
               cell, so the last column is pushed outside the box and you have to
-              scroll the table sideways to read a value. Each column here has a
+              scroll the table sideways to read a value. Each track here has a
               floor and a share: the floor is what the words need, and the share
               is how the spare width is divided. Measured September 16, 2026: at
               390 the four columns and the checkboxes come to 358 in a box of
               358, so nothing is cut and nothing wraps. The floors alone come to
               344, so at a 376 pixel window they exactly fit, and below it the
               table scrolls its own box and fades whichever edge has more behind
-              it. */}
-          <helix-table-column field="name" sortable width="minmax(5.5rem, 1.6fr)">
+              it. The last is `max-content`, since a column of numerals has one
+              right width. On the table, so a page rendered on a server is laid
+              out at these widths before the script runs. */}
+          <helix-table-column field="name" sortable>
             Name
           </helix-table-column>
-          <helix-table-column field="team" sortable width="minmax(4.5rem, 1fr)">
+          <helix-table-column field="team" sortable>
             Team
           </helix-table-column>
-          <helix-table-column field="role" width="minmax(4.5rem, 1fr)">
+          <helix-table-column field="role">
             Role
           </helix-table-column>
           {/* `end` lines the digits up under each other, which is what makes a
-              number column different from a text one. `max-content`, since a
-              column of numerals has one right width. */}
-          <helix-table-column field="reviews" sortable text-align="end" width="max-content">
+              number column different from a text one. */}
+          <helix-table-column field="reviews" sortable text-align="end">
             Reviews
           </helix-table-column>
 
