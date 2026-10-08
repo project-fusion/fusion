@@ -94,3 +94,20 @@ describe('words on the bar', () => {
     expect(words).toContain('calc(var(--progress-fraction, 0) * 100%)')
   })
 })
+
+/* Under reduced motion the base layer sets every duration token to 0.01ms, so a
+   crawl scaled from the cycle turned the ring about seventeen hundred times a
+   second. */
+describe('the indeterminate ring under reduced motion', () => {
+  test('turns once in twelve cycles, on no duration token', () => {
+    const turn =
+      sheet()
+        .split('@media (prefers-reduced-motion: reduce)')
+        .slice(1)
+        .map((block) => block.split('[part="track"] {')[1]?.split('}')[0] ?? '')
+        .find((declarations) => declarations.includes('animation-duration')) ?? ''
+    expect(turn).toContain('animation-duration: var(--_progress-crawl)')
+    expect(turn).not.toContain('--_progress-cycle')
+    expect(rule(':host([indeterminate])')).toContain('--_progress-crawl: 19.2s')
+  })
+})
