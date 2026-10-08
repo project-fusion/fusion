@@ -1411,7 +1411,6 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
     this.reachHistory()
   }
 
-  /** The turns fed as data, a window of them, between the room the rest would take. */
   /**
    * The `resume` slot, with the way back drawn where nothing is slotted, behind a seam:
    * the slot answers a page, and this answers the tier above.

@@ -379,6 +379,39 @@ those lines into `Family.imports`, which the reference lists under the
 family's own entries in Usage. The barrels, `@fusion.dev/helix` and
 `@fusion.dev/helix-headless`, register everything and need nothing more.
 
+### A feature a page opts into has an entry of its own
+
+A part with an entry of its own, Filter Menu's, is an element. A feature is
+code that draws inside an element a page already registered: Map's compass and
+layers menu, Canvas's minimap, label editor, `arrange()` and paste, Chat's turns
+drawn from `turns`. Each was paid for by every page that imported the family,
+whether it drew one or not: 3.5 kB gzip of Canvas's 25.4, and 8.2 kB of
+Map's 16.4 with its layers. So each is an entry, `map/compass` beside `map`,
+and the family's entry draws nothing there until it is imported.
+
+- **The element asks its class as it draws.** The entry hands its drawing to
+  core's `addFeature`, which sets it on the tier's class and has the elements
+  of that class already on the page draw again, and the element reads it off
+  `this.constructor`. A styled class without its own reads the headless tier's.
+- **A drawing the element calls is a `draw…` helper the element names**:
+  `const { drawCompass } = added(this)` and then `drawCompass(this, …)`. That
+  is the call `helix component` follows, so the parts the helper writes count
+  as the element's, and the element documents them.
+- **The styled entry hands in its sheet**, and the helper adopts it with core's
+  `adoptSheet`, after the element's own sheets. A rule that reads the
+  element's own attributes, such as `:host([fill])`, stays in the element's
+  sheet, where an attribute the element declares can be checked.
+- **State a stylesheet selects on stays on the element.** `:state(layers-open)`
+  is recorded by Map, and the entry sets the state Map draws it from.
+- **A page that asks without the import is told**: core's `auditEntry`, in a
+  development build only, reports `unregistered-part` once the page has loaded,
+  with the line to add. A part with its own entry is reported by
+  `auditChildren`, as the section above says.
+- **The barrels import every entry**, so the docs site, the sandbox and the
+  examples draw every feature. A family's specs import the entries they test,
+  and each entry has a spec of a class no entry was added to, which is what a
+  page that never imported it gets.
+
 ## Server rendering
 
 Every component must render on a server with no DOM. The app no longer ships
