@@ -1,3 +1,4 @@
+import { VERSION } from '@fusion.dev/helix-core'
 import Link from 'next/link'
 import { FusionMark } from '@/components/fusion-mark/fusion-mark'
 import { PRODUCTS } from '@/content/products/products'
@@ -79,6 +80,11 @@ export function SiteFooter() {
           <helix-text variant="body-strong">Fusion Development Group</helix-text>
           <helix-text emphasis="subtle" variant="caption">
             Interface and AI software.
+          </helix-text>
+          {/* **The Helix release the site runs on.** Read from the package,
+              which each release stamps, so it never trails one. */}
+          <helix-text emphasis="muted" variant="caption">
+            Helix {VERSION}
           </helix-text>
 
           {/* **Anchors, not `helix-icon-button`.** That component is a
