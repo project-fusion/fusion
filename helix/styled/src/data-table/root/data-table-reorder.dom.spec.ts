@@ -53,7 +53,7 @@ describe('a data table with reorderable-rows', () => {
   test('keeps a row that is moving a row of the one grid', () => {
     /* A row carries `row-dragging` or `row-drop-*` beside `row` while a move
        runs, and an exact `[part="row"]` would give it a box of its own. */
-    expect(rule('[part="head"],\n[part~="row"]')).toContain('display: contents')
+    expect(rule('[part="head"], [part~="row"]')).toContain('display: contents')
     expect(sheet()).not.toMatch(/\[part="row"\]/)
   })
 

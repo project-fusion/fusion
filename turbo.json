@@ -633,7 +633,9 @@
         "!src/elements.css",
         "!src/tokens.css",
         "$TURBO_ROOT$/fusion/scripts/build-styles.mjs",
-        "$TURBO_ROOT$/fusion/scripts/build-elements-css.mjs"
+        "$TURBO_ROOT$/fusion/scripts/build-elements-css.mjs",
+        "$TURBO_ROOT$/fusion/scripts/lib/join-lines.mjs",
+        "$TURBO_ROOT$/fusion/scripts/lib/tighten.mjs"
       ],
       "outputs": ["src/**/*.css.ts"]
     },

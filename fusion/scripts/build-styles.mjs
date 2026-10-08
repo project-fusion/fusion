@@ -21,6 +21,7 @@ import { readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node
 import { join, relative, sep } from 'node:path'
 import { joinLines } from '@fusion.dev/scripts/join-lines'
 import { template } from '@fusion.dev/scripts/literal'
+import { tighten } from '@fusion.dev/scripts/tighten'
 
 /* `.examples` holds the sandbox's own files, `<slug>.html` and `<slug>.css`.
    They are a consumer's stylesheet rather than a component's, read at runtime by
@@ -129,7 +130,7 @@ for (const file of walk(root, '.css')) {
   const source = `// Generated from ${rel} by \`turbo run styles\`. Do not edit.
 import { createSheet } from '@fusion.dev/helix-core'
 
-export const styles = createSheet(\`${template(stripComments(css))}\`)
+export const styles = createSheet(\`${template(tighten(stripComments(css)))}\`)
 `
 
   // Only write on change, so an unchanged run does not invalidate the cache.
