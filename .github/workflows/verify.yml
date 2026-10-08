@@ -276,7 +276,24 @@ jobs:
       # a restore, not a wrong answer: a task this misses is one the shard
       # builds itself.
       - name: Build, and write the manifests and the catalog
-        run: bunx turbo run build analyze catalog
+        run: bunx turbo run build analyze catalog --summarize
+      - name: Probe core scaling
+        run: |
+          nproc; free -m
+          for cpus in 0 0-1; do
+            s=$(date +%s%N); taskset -c "$cpus" bun fusion/scripts/build-metrics.mjs; echo "metrics on cpus $cpus: $(( ($(date +%s%N) - s) / 1000000 )) ms"
+            s=$(date +%s%N); (cd helix/styled && taskset -c "$cpus" bun --bun helix-cem); echo "styled analyze on cpus $cpus: $(( ($(date +%s%N) - s) / 1000000 )) ms"
+            s=$(date +%s%N); (cd helix/headless && taskset -c "$cpus" bun --bun helix-cem); echo "headless analyze on cpus $cpus: $(( ($(date +%s%N) - s) / 1000000 )) ms"
+          done
+          /usr/bin/time -v bun fusion/scripts/build-metrics.mjs 2>&1 | grep -E 'Elapsed|User time|System time|Percent|Maximum resident'
+          s=$(date +%s%N); "$HELIX_BIN" --version; echo "helix version: $(( ($(date +%s%N) - s) / 1000000 )) ms"
+      - name: Keep the run summary
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          include-hidden-files: true
+          name: turbo-summary-warm
+          path: .turbo/runs/*.json
+          retention-days: 3
 
   # **The part of the build the browser jobs render, on its own.** They read the
   # frame and the spec bundles and nothing else of the site, and those wait for
@@ -458,7 +475,20 @@ jobs:
       - name: Set up bun and the dependencies
         uses: ./.github/actions/setup
       - name: Run the specs
-        run: bun run test
+        run: bun run test --summarize
+      - name: Probe the test:dom split
+        run: .github/scripts/probe-split.sh
+      - name: Keep the probe output
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          include-hidden-files: true
+          name: probe-tests
+          path: |
+            ${{ runner.temp }}/junit
+            ${{ runner.temp }}/*.log
+            .turbo/runs/*.json
+          retention-days: 3
 
   # **Cargo, from the first second of the run.** It was one job holding every
   # step that touches Rust, and `needs: warm` put the toolchain install, the

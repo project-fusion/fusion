@@ -219,6 +219,12 @@ const helix = (): string => createRequire(import.meta.url).resolve('@fusion.dev/
  * typings generators write where they are told relative to that.
  */
 export const analyze = (options: HelixCemOptions, cwd = process.cwd()): HelixManifest => {
+  const t0 = performance.now()
+  const lap = (what: string, from: number): number => {
+    const now = performance.now()
+    console.error(`helix-cem probe: ${options.tier} ${what} ${(now - from).toFixed(0)}ms`)
+    return now
+  }
   const dependencies = dependenciesOf(cwd)
   const flags = [...dependencies].flatMap(([name, at]) => ['--dependency', `${name}=${at}`])
   const built = spawnSync(
@@ -229,9 +235,11 @@ export const analyze = (options: HelixCemOptions, cwd = process.cwd()): HelixMan
   if (built.status !== 0) {
     throw new Error(`helix manifest build exited ${built.status} in ${cwd}`)
   }
+  let t = lap('spawn helix manifest build', t0)
   writeFileSync(join(cwd, MANIFEST), built.stdout)
 
   const customElementsManifest = JSON.parse(built.stdout) as HelixManifest
+  t = lap(`write and parse manifest (${built.stdout.length} chars)`, t)
   /* Only where the package declares an element: core's manifest holds the
      base classes, which nothing diagnoses. */
   const name = (JSON.parse(readFileSync(join(cwd, 'package.json'), 'utf8')) as { name: string })
@@ -240,20 +248,24 @@ export const analyze = (options: HelixCemOptions, cwd = process.cwd()): HelixMan
   if (Object.keys(lint.tags).length > 0) {
     writeFileSync(join(cwd, LINT), `${JSON.stringify(lint)}\n`)
   }
+  t = lap('lintOf and lint.json', t)
   const context: HelixContext = {
     thirdPartyCEMs: [...dependencies.values()].map(
       (at) => JSON.parse(readFileSync(at, 'utf8')) as HelixManifest,
     ),
   }
+  t = lap('parse dependency manifests', t)
   const back = process.cwd()
   process.chdir(cwd)
   try {
     for (const step of afterManifest(options)) {
       step.packageLinkPhase?.({ context, customElementsManifest })
+      t = lap(`plugin ${step.name}`, t)
     }
   } finally {
     process.chdir(back)
   }
+  lap('total', t0)
   return customElementsManifest
 }
 
