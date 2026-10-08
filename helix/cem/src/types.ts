@@ -294,6 +294,8 @@ export interface HelixDeclaration extends Documented {
 
 export interface HelixModule {
   declarations?: HelixDeclaration[]
+  /** What the module exports, with the module each re-export comes from. */
+  exports?: { declaration?: { module?: string; name?: string }; kind?: string; name?: string }[]
   path?: string
 }
 
