@@ -86,6 +86,8 @@ fusion/site/public/maplibre/
 # history is the baseline a reviewer approved, not the run that disagreed.
 *.diff.png
 *.parity.png
+# The report Fusion Proof writes on every run, beside each config.
+.proof/
 
 # A second checkout of this repo, so tracking it would track everything twice.
 .claude/worktrees/
