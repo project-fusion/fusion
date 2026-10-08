@@ -19,6 +19,7 @@ import {
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { wordsIn } from '../description.js'
+import { closeOnDialogSubmit } from '../form-method.js'
 
 /**
  * @summary A modal window built on the native `<dialog>` element.
@@ -310,27 +311,9 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
     this.relayNativeEvent(event)
   }
 
-  /**
-   * A `<form method="dialog">` slotted into the dialog, closed the way the
-   * platform closes its own.
-   *
-   * **The platform cannot find this dialog from the form.** A submit with the
-   * `dialog` method closes the nearest `<dialog>` ancestor, and a slotted form's
-   * ancestors are the light DOM, where there is none. So the submit is read
-   * here, and the submitter's `value` is the `returnValue`, as it would be.
-   */
+  /** A `<form method="dialog">` slotted into the dialog closes it. */
   private readonly handleSubmit = (event: SubmitEvent): void => {
-    const form = event.target
-    if (!(form instanceof HTMLFormElement) || form.closest('dialog')) {
-      return
-    }
-    const submitter = event.submitter as HTMLButtonElement | HTMLInputElement | null
-    const method = submitter?.hasAttribute('formmethod') ? submitter.formMethod : form.method
-    if (method !== 'dialog') {
-      return
-    }
-    event.preventDefault()
-    this.close(submitter?.hasAttribute('value') ? submitter.value : undefined)
+    closeOnDialogSubmit(event, (value) => this.close(value))
   }
 
   /** Whether the `header` slot's heading is what currently names the dialog. */
