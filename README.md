@@ -2,9 +2,8 @@
   <img src=".github/fusion-logo.svg" width="88" alt="Fusion" />
   <h1>Fusion Development Group</h1>
   <p>
-    <strong>Helix</strong>, a design system of web components that computes
-    your color tokens from a few inputs such as your brand color, and
-    <strong>Cortex</strong>, a memory and provenance substrate.
+    Fusion builds an intelligent design system, intelligent tooling, and
+    intelligent services on one foundation.
   </p>
   <p>
     <a href="https://fusion.dev/helix/docs">Documentation</a> ·
