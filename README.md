@@ -2,8 +2,8 @@
   <img src=".github/fusion-logo.svg" width="88" alt="Fusion" />
   <h1>Fusion Development Group</h1>
   <p>
-    Fusion builds an intelligent design system, intelligent tooling, and
-    intelligent services on one foundation.
+    An intelligent design system, intelligent tooling, and intelligent
+    services on one foundation.
   </p>
   <p>
     <a href="https://fusion.dev/helix/docs">Documentation</a> ·
