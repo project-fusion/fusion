@@ -1,5 +1,12 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { mount, notYetDefined, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import {
+  hasState,
+  mount,
+  notYetDefined,
+  part,
+  registerDom,
+  role,
+} from '@fusion.dev/helix-testing/dom'
 
 /* A set of tags as one control: a grid of rows with one tab stop, moved through
    with the arrow keys, emptied with Delete and Backspace, and selected with
@@ -485,5 +492,21 @@ describe('a tag whose definition loads after it was added', () => {
     late.define()
     await upgraded(group, late.element)
     expect(role(late.element)).toBe('row')
+  })
+})
+
+describe('what a sheet can read of a tag in a group', () => {
+  test('a tag says with a state while its cell shows keyboard focus, and not after', async () => {
+    const one = await group('', FRUIT)
+    const [apple, , plum] = one.tags as [Tag, Tag, Tag]
+    /* happy-dom does not decide `:focus-visible`, so the cell says it shows a ring. */
+    for (const tag of [apple, plum]) {
+      cell(tag).matches = (selector: string) => selector === ':focus-visible'
+    }
+    cell(apple).focus()
+    expect(hasState(apple, 'focus-visible')).toBe(true)
+    cell(plum).focus()
+    expect(hasState(apple, 'focus-visible')).toBe(false)
+    expect(hasState(plum, 'focus-visible')).toBe(true)
   })
 })

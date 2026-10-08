@@ -63,6 +63,12 @@ export type TagSelectionMode = SelectionMode
  * Where only disabled tags are left, the first of them holds the tab stop and
  * takes focus, so the reader stays in the set.
  *
+ * **Typing new tags.** A field where people type tags and press Enter to add
+ * each one is Combobox with `multiple` and `allows-custom-value`, or
+ * `creatable` to ask first with `helix-create`. It draws each value as a tag,
+ * Backspace on the empty field removes the last one, and the arrow keys move
+ * between them.
+ *
  * @since 0.1.0
  * @status stable
  * @aliases Tag list, Chip group, Token list
