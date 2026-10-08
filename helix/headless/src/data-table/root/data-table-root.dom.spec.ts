@@ -749,6 +749,18 @@ describe('windowing', () => {
         ?.match(/([\d.]+)px/)?.[1] ?? '0',
     )
 
+  /* `core` ships `[data-scroller] { overflow: auto }`. Before the mark the
+     overflow came from the styled sheet, and a headless page drew every row:
+     measured in Chromium, 5,001 rows for 5,000. */
+  test('marks the box it scrolls, and only while windowed', async () => {
+    const { element, remove } = await mount(WINDOWED, many(20))
+    expect(part(element, 'table')?.hasAttribute('data-scroller')).toBe(true)
+    element.windowed = false
+    await element.updateComplete
+    expect(part(element, 'table')?.hasAttribute('data-scroller')).toBe(false)
+    remove()
+  })
+
   test('draws a window, and stands room in for the rest', async () => {
     const { element, remove } = await mount(WINDOWED, many(500))
     const drawn = bodyRows(element).length

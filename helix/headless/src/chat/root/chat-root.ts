@@ -175,6 +175,12 @@ const drawnInFull = ({ element }: Rendered): boolean =>
  * conversations. `turns` draws a long
  * transcript one window at a time, so the log needs a block size of its own.
  *
+ * The log scrolls on this tier. It carries `data-scroller`, and `core` ships
+ * `[data-scroller] { overflow: auto }` into every shadow root, so pinning,
+ * history and the window work with no stylesheet. You still need to give the
+ * log a block size, such as `helix-headless-chat::part(log) { block-size:
+ * 20rem }`.
+ *
  * **A conversation is built from three elements.** The chat holds the
  * transcript, a `Chat.Message` stands for each turn, and a `Chat.Composer` sits
  * in the `composer` slot. When the user sends, `helix-send` reaches the chat:
@@ -248,7 +254,7 @@ const drawnInFull = ({ element }: Rendered): boolean =>
  * @csspart indicator - The three dots before the words that say who is typing, which the styled tier animates as a message's are. Hidden from screen readers.
  * @csspart live - The region where screen readers announce each turn once it has arrived.
  * @csspart loading - Shown while the history loads.
- * @csspart log - The transcript, which scrolls.
+ * @csspart log - The transcript, which scrolls. On this tier, it needs only a block size.
  * @csspart message - The message drawn for a turn from `turns`, forwarded whole.
  * @csspart message-actions - The controls on a turn from `turns`, beside its time.
  * @csspart message-avatar - The avatar box of a turn from `turns`.
@@ -1519,6 +1525,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
         part="log"
         role="log"
         aria-live="off"
+        data-scroller
         aria-label=${this.label || this.fallbackLabel}
         aria-busy=${busy ? 'true' : nothing}
         ?data-windowed=${fed}

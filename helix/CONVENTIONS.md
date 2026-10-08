@@ -36,19 +36,22 @@ height, an `overscroll-behavior`, a scrollbar treatment. Those stay in
 `helix/styled`.
 
 **A component marks a box whose scroll state it reads, with `data-scroller`, and
-no other.** `ScrollArea`, `VirtualList`, `Carousel` and `ObjectInspector` do.
+no other.** `ScrollArea`, `VirtualList`, `Carousel`, `ObjectInspector`, `Chat`
+and a `windowed` `DataTable` do.
 `Megamenu`'s panel also scrolls and is deliberately unmarked, because it scrolls
 only from a `max-block-size` the styled tier chose and the headless tier never
 asks it where it is scrolled to. That line was found by measurement rather than
 by argument: marking it moved a heading four pixels, `overflow` establishing a
 block formatting context and margins that had been collapsing stopping.
 
-**`Chat` and `DataTable` are a departure and not a second exception.** Both read
-`scrollTop` on the headless tier and both take the `overflow` that makes the
-reading mean anything from their styled sheet, so the window each of them draws
-is inert on a page that loads only `helix/headless`. Written down rather than
-corrected in passing, because marking a box is the change `Megamenu` says to
-measure first.
+**`Chat` and `DataTable` were a departure, and are marked now.** Both read
+`scrollTop` on the headless tier and both took the `overflow` that makes the
+reading mean anything from their styled sheet, so the window each of them drew
+was inert on a page that loads only `helix/headless`: a windowed table drew all
+5,000 of its rows. Marking a box is the change `Megamenu` says to measure
+first, and the measurement was that nothing moved on the styled tier, where
+each box already scrolled. A headless page still gives each box its block
+size, and a box with none draws every row and says so in the console.
 
 **A chart marks the drawing that runs along the line of text, with
 `data-mirror`**, and on a right-to-left page `core` turns it about its vertical
