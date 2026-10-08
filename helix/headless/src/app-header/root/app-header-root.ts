@@ -10,7 +10,14 @@ import {
   words,
 } from '@fusion.dev/helix-core'
 import { list } from '@fusion.dev/helix-icons'
-import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import {
+  type CSSResultGroup,
+  css,
+  html,
+  nothing,
+  type PropertyValues,
+  type TemplateResult,
+} from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { inSectioningContent } from '../sectioning.js'
@@ -105,6 +112,16 @@ export class HelixHeadlessAppHeader extends MixinControllerOpen(HelixElement) {
    * `registerWords('de', { 'helix-app-header': { menuLabel: 'Menü' } })`.
    */
   static words = 'helix-app-header'
+
+  /* A banner is a block, with no stylesheet from the page, and `fold-below`
+     needs one: it folds on the bar's width, and an inline host has none to
+     observe, so a headless bar never folded. The styled tier replaces the
+     sheet and sets its own `display`. */
+  static override styles: CSSResultGroup = css`
+    :host {
+      display: block;
+    }
+  `
 
   /**
    * Where the middle region sits in the bar.
