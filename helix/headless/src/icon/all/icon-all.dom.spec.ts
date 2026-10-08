@@ -6,36 +6,20 @@ beforeAll(() => {
   registerDom()
 })
 
-/* The thirteen the family's entry registers, written out, so a glyph added to
-   or taken from the small set is a change somebody makes here on purpose. */
-const SMALL = [
-  'arrow-left',
-  'arrow-right',
-  'caret-down',
-  'caret-left',
-  'caret-right',
-  'caret-up',
-  'check',
-  'info',
-  'magnifying-glass',
-  'minus',
-  'plus',
-  'warning',
-  'x',
-]
-
 describe('the names the entries register', () => {
-  test('the family entry registers the small set', async () => {
+  test('the family entry registers every glyph of the set', async () => {
     const { resolveIcon } = await import('../index.js')
-    for (const name of SMALL) {
-      expect(resolveIcon(name)).toBe(icons[name])
+    for (const [name, glyph] of Object.entries(icons)) {
+      expect(resolveIcon(name)).toBe(glyph)
     }
   })
 
-  test('and icon/all registers every glyph of the set', async () => {
-    const { resolveIcon } = await import('./index.js')
+  test('and icon/all is the same entry', async () => {
+    const all = await import('./index.js')
+    const family = await import('../index.js')
+    expect(all.resolveIcon).toBe(family.resolveIcon)
     for (const [name, glyph] of Object.entries(icons)) {
-      expect(resolveIcon(name)).toBe(glyph)
+      expect(all.resolveIcon(name)).toBe(glyph)
     }
   })
 })

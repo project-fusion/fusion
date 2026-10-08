@@ -1,4 +1,4 @@
-// Re-exported from the headless family's entry, which registers a small set. See `all`.
+// Re-exported from the headless family's entry, which registers the whole set.
 export {
   type IconLibraryOptions,
   type IconResolver,

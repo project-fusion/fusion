@@ -8,8 +8,7 @@ import {
   withoutStyles,
 } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
-// `gear` is outside the small set the family's entry registers.
-import '../all/index.js'
+import '../index.js'
 
 describe('icon server output', () => {
   test('the glyph is in the served markup, so the picture is there before any script runs', () => {

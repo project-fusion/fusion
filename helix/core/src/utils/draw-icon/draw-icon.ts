@@ -14,7 +14,7 @@ export interface DrawIconOptions {
  * Draws an icon that was imported by name, rather than looked up by string.
  *
  * **`<helix-icon name="play">` looks its glyph up in a registry at runtime.**
- * The registry holds the whole set once `@fusion.dev/helix-headless/icon/all`
+ * The registry holds the whole set once `@fusion.dev/helix-headless/icon`
  * registers it, and no bundler can shake a lookup by string, so every consumer
  * of any component that renders one ships all of the generated path data: measured at 50,814 bytes raw and 15,010 gzipped for 102 icons, and
  * growing about 147 gzipped bytes per icon added. A named import ships one path

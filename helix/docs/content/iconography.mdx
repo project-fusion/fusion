@@ -17,36 +17,15 @@ Phosphor. We use the bold weight because Phosphor's regular weight is a
 hairline beside the medium weight of Helix text. An icon that looks lighter than
 the words next to it does not work as a mark.
 
-## Register the names a page draws
+## Register the set
 
 ```ts
 import '@fusion.dev/helix/icon'
 ```
 
-The family's entry registers thirteen names, the glyphs a control most often
-needs: `caret-down`, `caret-left`, `caret-right`, `caret-up`, `arrow-left`,
-`arrow-right`, `check`, `x`, `plus`, `minus`, `magnifying-glass`, `info` and
-`warning`. They cost about 700 bytes gzipped.
-
-```ts
-import '@fusion.dev/helix/icon/all'
-```
-
-`icon/all` registers all 126 names, for 15 kB gzipped. Import it when a page
-draws glyphs outside the thirteen by name, such as `trash` above. A name that
-resolves to nothing draws nothing, fires `error`, and prints a warning that
-names this entry. `import '@fusion.dev/helix'`, which registers every element,
-registers every name too.
-
-`icon/root` registers no names. Import it with `registerIcons` to ship exactly
-the glyphs you name:
-
-```ts
-import { registerIcons } from '@fusion.dev/helix/icon/root'
-import { gear, trash } from '@fusion.dev/helix-icons'
-
-registerIcons([gear, trash])
-```
+The Icon entry registers all 126 glyphs by name, so `name` draws any glyph in
+the set. `@fusion.dev/helix/icon/all` is the same entry and registers the same
+set.
 
 ## Size and color come from the surrounding text
 
@@ -119,9 +98,10 @@ import { trash } from '@fusion.dev/helix-icons'
 string. Frameworks can set properties. Plain HTML cannot, so it uses `name`. If
 both are set, `icon` wins.
 
-`icon` also keeps your bundle small. `name` looks up glyphs in an index, and no
-bundler can tree-shake an index. With `icon`, you ship only the glyph you
-import.
+`icon` also keeps your bundle small. `name` looks up glyphs in an index of the
+whole set, and no bundler can tree-shake that index. If you render one icon by
+`name`, you ship the whole set: 17 kB gzipped for 126 glyphs. With `icon`, you
+ship only the glyph you import.
 
 `icon` also draws glyphs from outside this set. Anything that exports the same
 shape works:
@@ -148,7 +128,7 @@ Phosphor's weights are outlined, filled paths. `caret-down` is `a12,12` at bold
 and `a8,8` at regular, so CSS cannot turn one weight into another, and every
 weight offered adds bytes. Bundlers tree-shake a subpath at each import site. A
 `weight` attribute would put every weight into the index that `name` reads, and
-raise `icon/all` from 15 kB to about 90.
+raise your bundle from 15 kB to about 90.
 
 Only the default weight has that index, so `name` always draws bold. To use the
 set in another weight, import the glyphs and pass them to `icon`.
