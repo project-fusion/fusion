@@ -446,10 +446,16 @@ describe('no family lets an inner native control speak in its name', () => {
        say so rather than pass by having nothing to leak. */
     expect(inners.length).toBeGreaterThan(0)
 
+    /* A control the consumer slotted in speaks under its own name, which is
+       its own: Chat's composer is a field of its own, and its `input` bubbles
+       as a native field's does, so a listener on the transcript hears the
+       composer as the target. A native control is never one of these. */
+    const placed = (from: Element): boolean =>
+      from.parentElement === host && from.localName.includes('-')
     const escaped: string[] = []
     host.addEventListener('input', (event) => {
       const from = event.composedPath()[0] as Element
-      if (from !== host) {
+      if (from !== host && !placed(from)) {
         escaped.push(`${from.localName}[${(from as HTMLInputElement).type}]`)
       }
     })
