@@ -2,7 +2,7 @@
  * What a paste adds to a board: the arithmetic, kept apart from the board that
  * adds it.
  */
-import type { CanvasDocument, CanvasEdge, CanvasNode } from './root/canvas-document.js'
+import type { CanvasDocument, CanvasEdge, CanvasNode } from '../root/canvas-document.js'
 
 /** Whether a value is a finite number. */
 const finite = (value: unknown): value is number =>

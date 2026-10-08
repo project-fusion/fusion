@@ -1,5 +1,6 @@
 import {
   assignSlots,
+  auditEntry,
   auditName,
   type CanvasView,
   capturePointer,
@@ -7,9 +8,7 @@ import {
   formatPercent,
   formatWords,
   HelixBeforeMoveEvent,
-  HelixBeforePasteEvent,
   HelixBeforeReconnectEvent,
-  HelixBeforeRelabelEvent,
   HelixCanvasEditEvent,
   HelixCanvasPanEvent,
   HelixCanvasViewEvent,
@@ -17,9 +16,7 @@ import {
   HelixConnectEvent,
   HelixElement,
   HelixMoveEvent,
-  HelixPastedEvent,
   HelixReconnectEvent,
-  HelixRelabelEvent,
   HelixRemoveEvent,
   HelixSelectEvent,
   hostAria,
@@ -28,7 +25,6 @@ import {
   MixinViewport,
   type MoveDetail,
   type ReconnectDetail,
-  type RelabelDetail,
   type ViewportPanDetail,
   type ViewportWay,
   type ViewportZoomDetail,
@@ -38,13 +34,13 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
-import { arrangement, type CanvasArrangeOptions } from '../arrange.js'
+import type { CanvasArrangeOptions } from '../arrange/arrangement.js'
+import { INTERACTIVE, NUDGE } from '../board.js'
 import { descriptionOf } from '../describe.js'
 import { HelixHeadlessCanvasEdge } from '../edge/canvas-edge.js'
 import { EdgePan } from '../edge-pan.js'
 import { neighborOf } from '../neighbor.js'
 import { HelixHeadlessCanvasNode } from '../node/canvas-node.js'
-import { parseCanvas, pasteInto } from '../paste.js'
 import { snapBox, snapTo, stepTo } from '../snap.js'
 import {
   type CanvasDocument,
@@ -59,14 +55,14 @@ import {
   distanceTo,
   ends,
   extent,
-  fromJsonCanvas,
   inside,
+  MARGIN,
   port,
   reading,
   sideNear,
 } from './canvas-document.js'
 
-export type { CanvasArrangeOptions } from '../arrange.js'
+export type { CanvasArrangeOptions } from '../arrange/arrangement.js'
 export type {
   CanvasDocument,
   CanvasEdge,
@@ -83,31 +79,12 @@ export type {
 export { fromJsonCanvas } from './canvas-document.js'
 
 /**
- * The breathing room the plane keeps around the document's own extent.
- *
- * **A board drawn exactly to its extent clips what sits outside it**, and two
- * things do: a group's name, which is drawn above the box it names, and a
- * connector, whose curve bows past the cards it joins. The margin is the same on
- * every side and in the document's own units, so it scales with the zoom like
- * everything else.
- */
-const MARGIN = 32
-
-/**
  * The arrowhead, named once inside this shadow root.
  *
  * An id is scoped to the root it is written in, so two boards on one page do not
  * collide and a constant is safe where a generated one would only be noise.
  */
 const ARROW = 'canvas-arrow'
-
-/**
- * How far a key press moves a card, in the document's own units.
- *
- * Half the ruling's default spacing, so two presses cross one square and a card
- * moved by keys lands where one moved by hand could.
- */
-const NUDGE = 16
 
 /**
  * The least a card can be resized to, in the document's own units: a line of
@@ -176,16 +153,39 @@ const onPlane = (node: CanvasNode, origin: { x: number; y: number }): CanvasNode
   y: node.y - origin.y,
 })
 
+/** A label being edited in place: whose, and what it said before. */
+export interface CanvasEditing {
+  key: string
+  target: 'edge' | 'group'
+  was: string
+}
+
 /**
- * Whether an event began on something inside a card that answers a press
- * itself: a field, a button, a link, text being edited.
+ * What the family's own entries add to the board once imported: the minimap
+ * from `canvas/minimap`, the field that edits a label from
+ * `canvas/label-editor`, `arrange()` from `canvas/arrange`, and copy and
+ * paste from `canvas/paste`.
  *
- * **Those are the card's, not the board's.** A press on a button in a card
- * dragged the card, and a page editing a card's text in place could not put a
- * caret in it, because every press became a move.
+ * **Set on the class by the entry**, so each tier's entry hands in its own
+ * sheet, and a board whose page never imports one carries none of its code.
  */
-const INTERACTIVE =
-  'input, textarea, select, button, a[href], [contenteditable]:not([contenteditable="false"])'
+export interface CanvasAdditions {
+  arrange?: (board: HelixHeadlessCanvas, options: CanvasArrangeOptions) => boolean
+  clipboard?: (board: HelixHeadlessCanvas, event: ClipboardEvent) => void
+  labelEditor?: {
+    open: (board: HelixHeadlessCanvas, editing: CanvasEditing) => void
+    render: (
+      board: HelixHeadlessCanvas,
+      origin: { x: number; y: number },
+    ) => TemplateResult | typeof nothing
+  }
+  minimap?: (board: HelixHeadlessCanvas) => TemplateResult | typeof nothing
+  paste?: (board: HelixHeadlessCanvas, document: CanvasDocument | string) => boolean
+  settle?: (board: HelixHeadlessCanvas) => void
+}
+
+/** What the entries have added to this board's class. */
+const added = (board: HelixHeadlessCanvas): CanvasAdditions => board.constructor as CanvasAdditions
 
 /** One stop in the walk: a card, or a connection leaving one. */
 type Stop = { kind: 'node'; key: string } | { kind: 'edge'; key: string; edge: CanvasEdge }
@@ -267,12 +267,14 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  * - What a key changes that a reader cannot see is said: where a card moved
  *   to, its new size, how many cards are selected, and the zoom. A selected
  *   card or connection says so when a reader arrives on it.
- * - Control or Command with C copies the selected cards, and the connections
- *   between them, as a JSON Canvas document in text, which another board or
- *   an app that reads the format takes.
- * - Control or Command with V pastes a JSON Canvas document: the board adds
- *   its cards and connections, a step down and to the right of any card they
- *   would sit on, and selects them. It asks with `helix-before-paste` first.
+ * - With `canvas/paste` imported, Control or Command with C copies the
+ *   selected cards, and the connections between them, as a JSON Canvas
+ *   document in text, which another board or an app that reads the format
+ *   takes.
+ * - With `canvas/paste` imported, Control or Command with V pastes a JSON
+ *   Canvas document: the board adds its cards and connections, a step down
+ *   and to the right of any card they would sit on, and selects them. It
+ *   asks with `helix-before-paste` first.
  *   A page that renders its cards from its own state cancels it and adds the
  *   detail's document to that state, through `fromJsonCanvas`. `paste()` does
  *   the same from a script.
@@ -282,10 +284,10 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  *   with `helix-move`, as a move does, so a board that holds its positions in
  *   your state is undone through your state.
  *
- * **`arrange()` moves every card so that none overlaps another**, in layers
- * that follow the arrows, or in a grid on a board with no connections. The
- * cards glide for as long as the board's own transition, and `undo()` puts
- * them back.
+ * **`arrange()` moves every card so that none overlaps another**, with
+ * `canvas/arrange` imported, in layers that follow the arrows, or in a grid
+ * on a board with no connections. The cards glide for as long as the board's
+ * own transition, and `undo()` puts them back.
  *
  * Every drag also works with clicks, as WCAG 2.5.7 requires for a pointer that
  * cannot hold a button down. Click a selected card's move handle, a corner, a
@@ -316,10 +318,31 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  * is the line drawn, the line pressed and focused, and the one an arrowhead
  * sits at the end of. Nothing back draws the board's own.
  *
- * Add `minimap` to `controls` for a picture of the whole board in a corner:
- * each card as a box, and a frame around what is on screen. A press or a drag
- * on it brings that place to the middle of the view. It is for a pointer, and
- * a screen reader skips it: the arrow keys and `show()` reach every card.
+ * Import `canvas/minimap` and add `minimap` to `controls` for a picture of
+ * the whole board in a corner: each card as a box, and a frame around what
+ * is on screen. A press or a drag on it brings that place to the middle of
+ * the view. It is for a pointer, and a screen reader skips it: the arrow keys
+ * and `show()` reach every card.
+ *
+ * With `canvas/label-editor` imported, a double click or F2 on a connection
+ * edits its label in place, and on a group its name, and Enter does on a
+ * group too. The board asks with `helix-before-relabel` and tells with
+ * `helix-relabel`.
+ *
+ * **The minimap, the label editor, `arrange()`, and copy and paste are
+ * imports of their own**, so a board carries only what it uses. A board that
+ * uses all four imports:
+ *
+ * ```js
+ * import '@fusion.dev/helix/canvas'
+ * import '@fusion.dev/helix/canvas/arrange'
+ * import '@fusion.dev/helix/canvas/label-editor'
+ * import '@fusion.dev/helix/canvas/minimap'
+ * import '@fusion.dev/helix/canvas/paste'
+ * ```
+ *
+ * In development, a board asked for one of them without its entry says so
+ * once the page has loaded, with the line to add.
  *
  * Cards and connections are `helix-canvas-node` and `helix-canvas-edge`
  * elements, so they are in the served markup whichever renderer wrote them. The
@@ -702,12 +725,6 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   @words
   @property({ attribute: 'stopped-label' })
   stoppedLabel = 'Stopped connecting.'
-
-  /**
-   * A label being edited in place: whose, and what it said before.
-   */
-  @state()
-  private editing: { target: 'edge' | 'group'; key: string; was: string } | undefined
 
   /**
    * What each tone means on this board, in words read out with the cards and
@@ -2030,217 +2047,47 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     return true
   }
 
-  /**
-   * A copy on the board with cards selected writes them, and the connections
-   * between them, as a JSON Canvas document in text. Not from a field a card
-   * holds, nor over text a reader selected, which are the platform's to copy.
-   */
-  private readonly handleCopy = (event: ClipboardEvent): void => {
-    const origin = event.composedPath()[0] as Element | undefined
-    const text = globalThis.getSelection?.()?.toString() ?? ''
-    if (this.picked.length === 0 || !event.clipboardData || text !== '') {
-      return
-    }
-    if (origin?.closest?.(INTERACTIVE)) {
-      return
-    }
-    const picked = new Set(this.picked)
-    const whole = this.toJsonCanvas()
-    const copy: CanvasDocument = {
-      edges: (whole.edges ?? []).filter(
-        (edge) => picked.has(edge.fromNode) && picked.has(edge.toNode),
-      ),
-      nodes: (whole.nodes ?? []).filter((node) => picked.has(node.id)),
-    }
-    event.clipboardData.setData('text/plain', JSON.stringify(copy))
-    event.preventDefault()
-    this.say(formatWords(this, 'copiedLabel', { count: copy.nodes?.length ?? 0 }))
-  }
-
-  /**
-   * A paste on the board of a JSON Canvas document, the text a copy writes,
-   * adds its cards and connections. Not into a field a card holds, nor onto a
-   * `readonly` board, nor text that is not a board, which are the platform's.
-   */
-  private readonly handlePaste = (event: ClipboardEvent): void => {
-    const origin = event.composedPath()[0] as Element | undefined
-    if (event.defaultPrevented || origin?.closest?.(INTERACTIVE)) {
-      return
-    }
-    if (this.paste(event.clipboardData?.getData('text/plain') ?? '')) {
-      event.preventDefault()
-    }
+  /** A copy or a paste on the board, which `canvas/paste` answers. */
+  private readonly handleClipboard = (event: ClipboardEvent): void => {
+    added(this).clipboard?.(this, event)
   }
 
   /**
    * Adds the cards and connections of a JSON Canvas document, as a paste does,
-   * and selects the cards. Ids the board already holds are given a count after
-   * them, and the cards move a step down and to the right while they would sit
-   * on cards already there.
+   * and selects the cards, once `canvas/paste` is imported. Ids the board
+   * already holds are given a count after them, and the cards move a step down
+   * and to the right while they would sit on cards already there.
    *
    * Asks with `helix-before-paste` first: cancel it to add the detail's
    * document to your own state. Returns whether the board added the cards:
-   * false on a `readonly` board, for text that is not a board, or when the
-   * request was refused.
+   * false on a `readonly` board, for text that is not a board, when the
+   * request was refused, or without the import.
    */
   paste(document: CanvasDocument | string): boolean {
-    const read = typeof document === 'string' ? parseCanvas(document) : document
-    if (this.readOnly || !read?.nodes?.length) {
-      return false
-    }
-    const taken = new Set(this.edgeElements.map((one) => one.name).filter(Boolean))
-    const placed = pasteInto(
-      read,
-      this.nodes,
-      taken,
-      (this.snap ?? 0) > 0 ? (this.snap as number) : NUDGE * 2,
-    )
-    if (!this.dispatchEvent(new HelixBeforePasteEvent({ document: placed }))) {
-      return false
-    }
-    const tier = (this.constructor as typeof HelixElement).tier
-    /* Attributes, so the cards are in the markup as a page writes them. */
-    const add = (
-      name: string,
-      attributes: Record<string, string | number | boolean | undefined>,
-      color: string | undefined,
-      text = '',
-    ): void => {
-      const element = this.ownerDocument.createElement(`${tier}${name}`)
-      for (const [key, value] of Object.entries(attributes)) {
-        if (value !== undefined && value !== false && value !== '') {
-          element.setAttribute(key, value === true ? '' : String(value))
-        }
-      }
-      if (color) {
-        element.style.setProperty(`--${name}-color`, color)
-      }
-      element.textContent = text
-      this.append(element)
-    }
-    const { edges, nodes } = fromJsonCanvas(placed)
-    for (const one of nodes) {
-      const { color, group, height, label, name, text, tone, width, x, y } = one
-      add(
-        'canvas-node',
-        { group, height, label, name, tone, width, x, y },
-        color,
-        text ?? one.url ?? one.file,
-      )
-    }
-    for (const one of edges) {
-      add(
-        'canvas-edge',
-        {
-          from: one.from,
-          'from-end': one.fromEnd,
-          'from-side': one.fromSide,
-          label: one.label,
-          name: one.name,
-          to: one.to,
-          'to-end': one.toEnd,
-          'to-side': one.toSide,
-          tone: one.tone,
-        },
-        one.color,
-      )
-    }
-    this.requestUpdate()
-    this.choose(nodes.map((one) => one.name))
-    this.say(formatWords(this, 'pastedLabel', { count: nodes.length }))
-    this.dispatchEvent(new HelixPastedEvent({ document: placed }))
-    return true
+    auditEntry(this, 'canvas/paste', 'was asked to paste', () => !added(this).paste)
+    return added(this).paste?.(this, document) ?? false
   }
 
-  /** The glide `arrange()` started, while it runs. */
-  private gliding: { frame: number; to: MoveDetail['nodes'] } | undefined
-
-  /** Ends a glide where it was going. */
+  /** Ends the glide `arrange()` started, where it was going. */
   private settle(): void {
-    const glide = this.gliding
-    if (!glide) {
-      return
-    }
-    cancelAnimationFrame(glide.frame)
-    this.gliding = undefined
-    for (const { name, x, y } of glide.to) {
-      const card = this.byName.get(name)
-      if (card) {
-        card.x = x
-        card.y = y
-      }
-    }
-    this.requestUpdate()
+    added(this).settle?.(this)
   }
 
   /**
-   * Moves the cards so that none overlaps another: in layers that follow the
-   * connections, or in a grid where there are none. A group moves as one box
-   * with its cards. Each place lands on a multiple of `snap` where it is set.
+   * Moves the cards so that none overlaps another, once `canvas/arrange` is
+   * imported: in layers that follow the connections, or in a grid where there
+   * are none. A group moves as one box with its cards. Each place lands on a
+   * multiple of `snap` where it is set.
    *
    * Asks with `helix-before-move` first and tells with `helix-move`, as a
    * move does, so `undo()` puts every card back. The cards glide to their
    * places for as long as the board's plane takes to glide, and land at once
    * where it does not, such as under `prefers-reduced-motion`. Returns whether
-   * the cards moved.
+   * the cards moved: false without the import.
    */
   arrange(options: CanvasArrangeOptions = {}): boolean {
-    this.settle()
-    const places = arrangement(this.nodes, this.edges, options, this.snap)
-    const from = new Map(this.cards.map((card) => [card.name, { x: card.x, y: card.y }]))
-    const detail: MoveDetail = {
-      nodes: [...places]
-        .filter(([name, at]) => from.get(name)?.x !== at.x || from.get(name)?.y !== at.y)
-        .map(([name, at]) => ({ name, ...at })),
-    }
-    if (this.readOnly || detail.nodes.length === 0 || !this.requestMove(detail)) {
-      return false
-    }
-    this.finishMove(detail)
-    this.say(this.arrangedLabel)
-    /* The plane's own glide, read with the board out of its direct state,
-       which a board that has only settled into its box is still in. */
-    const board = this.partNamed('board')
-    let time = 0
-    if (board && !globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
-      this.toggleState('direct', false)
-      time = Number.parseFloat(getComputedStyle(board).transitionDuration) * 1000
-      this.toggleState('direct', this.direct)
-    }
-    if (!(time > 0) || typeof requestAnimationFrame === 'undefined') {
-      return true
-    }
-    /* Back where they started before anything draws, and on from there. */
-    for (const { name } of detail.nodes) {
-      const card = this.byName.get(name)
-      const start = from.get(name)
-      if (card && start) {
-        card.x = start.x
-        card.y = start.y
-      }
-    }
-    const begun = performance.now()
-    const step = (now: number): void => {
-      const t = Math.min(1, (now - begun) / time)
-      /* Ease in and out, as the board's own glide does. */
-      const eased = t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2
-      for (const { name, x, y } of detail.nodes) {
-        const card = this.byName.get(name)
-        const start = from.get(name)
-        if (card && start) {
-          card.x = start.x + (x - start.x) * eased
-          card.y = start.y + (y - start.y) * eased
-        }
-      }
-      this.requestUpdate()
-      if (t < 1 && this.gliding) {
-        this.gliding.frame = requestAnimationFrame(step)
-      } else {
-        this.gliding = undefined
-      }
-    }
-    this.gliding = { frame: requestAnimationFrame(step), to: detail.nodes }
-    return true
+    auditEntry(this, 'canvas/arrange', 'was asked to arrange its cards', () => !added(this).arrange)
+    return added(this).arrange?.(this, options) ?? false
   }
 
   /**
@@ -3324,8 +3171,9 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   }
 
   /**
-   * Edits a stop: a connection's label or a group's name in place, which the
-   * board draws; a card's content by asking, which the board does not.
+   * Edits a stop: a connection's label or a group's name in place, which
+   * `canvas/label-editor` draws; a card's content by asking, which the board
+   * does not.
    */
   private editStop(key: string): void {
     if (this.readOnly) {
@@ -3334,7 +3182,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     if (key.startsWith('edge:')) {
       const edge = this.edgeElement(key)
       if (edge && !edge.readOnly) {
-        this.editing = { key, target: 'edge', was: edge.label ?? '' }
+        this.relabel({ key, target: 'edge', was: edge.label ?? '' })
       }
       return
     }
@@ -3343,10 +3191,21 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       return
     }
     if (card.group) {
-      this.editing = { key, target: 'group', was: card.label }
+      this.relabel({ key, target: 'group', was: card.label })
       return
     }
     this.dispatchEvent(new HelixCanvasEditEvent({ name: card.name }))
+  }
+
+  /** Opens the field for a label, which `canvas/label-editor` draws. */
+  private relabel(editing: CanvasEditing): void {
+    auditEntry(
+      this,
+      'canvas/label-editor',
+      'was asked to edit a label',
+      () => !added(this).labelEditor,
+    )
+    added(this).labelEditor?.open(this, editing)
   }
 
   /**
@@ -3401,101 +3260,6 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       x: event.clientX - box.left,
       y: event.clientY - box.top,
     })
-  }
-
-  /**
-   * Finishes editing a label: asks, writes it where the page did not refuse,
-   * and says it did. The same value is no change and asks nothing.
-   */
-  private finishEditing(field: HTMLInputElement | undefined, keep: boolean): void {
-    const editing = this.editing
-    if (!editing) {
-      return
-    }
-    this.editing = undefined
-    const label = (field?.value ?? '').trim()
-    const back = (): void => {
-      void this.updateComplete.then(() => this.focusStop(editing.key))
-    }
-    if (!keep || label === editing.was) {
-      back()
-      return
-    }
-    const edge = editing.target === 'edge' ? this.edgeElement(editing.key) : undefined
-    const card = editing.target === 'group' ? this.cardNamed(editing.key) : undefined
-    const detail: RelabelDetail = {
-      label,
-      name: edge ? edge.name : (card?.name ?? ''),
-      target: editing.target,
-      was: editing.was,
-      ...(edge ? { from: edge.from, to: edge.to } : {}),
-    }
-    if (this.dispatchEvent(new HelixBeforeRelabelEvent(detail))) {
-      if (edge) {
-        edge.label = label || undefined
-      } else if (card) {
-        card.label = label
-      }
-      this.dispatchEvent(new HelixRelabelEvent(detail))
-    }
-    back()
-  }
-
-  /**
-   * The keys in a label being edited, which are the field's: Enter keeps,
-   * Escape puts it back, and nothing reaches the board, whose arrows would
-   * otherwise pan it out from under the caret.
-   */
-  private readonly handleEditorKeydown = (event: KeyboardEvent): void => {
-    event.stopPropagation()
-    if (event.key === 'Enter' || event.key === 'Escape') {
-      event.preventDefault()
-      this.finishEditing(event.currentTarget as HTMLInputElement, event.key === 'Enter')
-    }
-  }
-
-  private readonly handleEditorBlur = (event: FocusEvent): void => {
-    this.finishEditing(event.currentTarget as HTMLInputElement, true)
-  }
-
-  /** The field a label is edited in, where the label is, while one is. */
-  private renderEditor(origin: { x: number; y: number }) {
-    const editing = this.editing
-    if (!editing) {
-      return nothing
-    }
-    let at: { x: number; y: number } | undefined
-    let named = ''
-    if (editing.target === 'edge') {
-      const edge = this.edges.find((one) => this.keyOf(one) === editing.key)
-      const drawn = edge ? this.geometryOf(edge, origin) : undefined
-      if (drawn) {
-        at = drawn.mid
-        named = formatWords(this, 'connectionLabel', {
-          from: this.textOf(drawn.from),
-          to: this.textOf(drawn.to),
-        })
-      }
-    } else {
-      const group = this.byId.get(editing.key)
-      if (group) {
-        at = { x: group.x - origin.x, y: group.y - origin.y }
-        named = this.textOf(group)
-      }
-    }
-    if (!at) {
-      return nothing
-    }
-    return html`<input
-      part="label-editor"
-      aria-label=${formatWords(this, 'labelEditorLabel', { name: named })}
-      data-target=${editing.target}
-      style=${`--_canvas-editor-x: ${at.x}px; --_canvas-editor-y: ${at.y}px`}
-      type="text"
-      .value=${editing.was}
-      @blur=${this.handleEditorBlur}
-      @keydown=${this.handleEditorKeydown}
-    />`
   }
 
   /** The box a Shift-drag is drawing, on the plane, while it is. */
@@ -3885,13 +3649,6 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     if (this.holding && !this.held) {
       this.letGo()
     }
-    /* A field just opened takes the caret with what it says selected, so
-       typing replaces it and an arrow key keeps it. */
-    if (changed.has('editing') && this.editing) {
-      const field = this.partNamed<HTMLInputElement>('label-editor')
-      field?.focus()
-      field?.select()
-    }
     this.place({ x: extent(this.nodes).x - MARGIN, y: extent(this.nodes).y - MARGIN })
     /* Said once per change of view, whatever changed it, and not for a render
        that left it where it was. */
@@ -4035,6 +3792,12 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    */
   override connectedCallback(): void {
     super.connectedCallback()
+    auditEntry(
+      this,
+      'canvas/minimap',
+      'names `minimap` in `controls`',
+      () => this.drawsControls('minimap') && !added(this).minimap,
+    )
     this.watchBox()
     this.watchWords()
     this.addEventListener('dblclick', this.handleDoubleClick)
@@ -4042,8 +3805,8 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     this.addEventListener('focusout', this.handleFocusOut)
     this.addEventListener('keydown', this.handleStopKeydown)
     this.addEventListener('keydown', this.handleHistoryKey)
-    this.addEventListener('copy', this.handleCopy)
-    this.addEventListener('paste', this.handlePaste)
+    this.addEventListener('copy', this.handleClipboard)
+    this.addEventListener('paste', this.handleClipboard)
     this.addEventListener('pointercancel', this.handlePointerUp)
     this.addEventListener('pointerdown', this.handlePointerDown)
     this.addEventListener('pointermove', this.handlePointerMove)
@@ -4068,8 +3831,8 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     this.removeEventListener('focusout', this.handleFocusOut)
     this.removeEventListener('keydown', this.handleStopKeydown)
     this.removeEventListener('keydown', this.handleHistoryKey)
-    this.removeEventListener('copy', this.handleCopy)
-    this.removeEventListener('paste', this.handlePaste)
+    this.removeEventListener('copy', this.handleClipboard)
+    this.removeEventListener('paste', this.handleClipboard)
     this.settle()
     this.removeEventListener('pointercancel', this.handlePointerUp)
     this.removeEventListener('pointerdown', this.handlePointerDown)
@@ -4489,111 +4252,6 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     return nothing
   }
 
-  /** The part of the document on screen, in its own units. */
-  private get onScreen(): { x: number; y: number; width: number; height: number } {
-    const board = extent(this.nodes)
-    const { height, width } = this.box
-    const { x, y, zoom } = this.at
-    return {
-      height: height / zoom,
-      width: width / zoom,
-      x: board.x - MARGIN - x / zoom,
-      y: board.y - MARGIN - y / zoom,
-    }
-  }
-
-  /** What the minimap shows: every card and what is on screen, with room around them. */
-  private get minimapArea(): { x: number; y: number; width: number; height: number } {
-    const board = extent(this.nodes)
-    const view = this.onScreen
-    const x = Math.min(board.x, view.x)
-    const y = Math.min(board.y, view.y)
-    const width = Math.max(board.x + board.width, view.x + view.width) - x
-    const height = Math.max(board.y + board.height, view.y + view.height) - y
-    const room = Math.max(width, height) * 0.05
-    return {
-      height: height + room * 2,
-      width: width + room * 2,
-      x: x - room,
-      y: y - room,
-    }
-  }
-
-  /**
-   * A press or a drag on the minimap, which brings the place under it to the
-   * middle of the view.
-   *
-   * **The point is read through the picture's own scale**: the area is drawn
-   * whole and centered in the box, so the box's spare width or height is split
-   * either side of it.
-   */
-  private readonly handleMinimapPointer = (event: PointerEvent): void => {
-    if (event.type === 'pointermove' && (event.buttons & 1) === 0) {
-      return
-    }
-    const picture = event.currentTarget as SVGSVGElement
-    if (event.type === 'pointerdown') {
-      if (event.button !== 0) {
-        return
-      }
-      capturePointer(picture, event.pointerId)
-    }
-    event.preventDefault()
-    const area = this.minimapArea
-    const shown = picture.getBoundingClientRect()
-    const scale = Math.min(shown.width / area.width, shown.height / area.height) || 1
-    const point = {
-      x: area.x + (event.clientX - shown.left - (shown.width - area.width * scale) / 2) / scale,
-      y: area.y + (event.clientY - shown.top - (shown.height - area.height * scale) / 2) / scale,
-    }
-    const board = extent(this.nodes)
-    const { zoom } = this.at
-    this.direct = event.type === 'pointermove'
-    this.touched = true
-    this.at = {
-      ...this.at,
-      x: this.box.width / 2 - (point.x - board.x + MARGIN) * zoom,
-      y: this.box.height / 2 - (point.y - board.y + MARGIN) * zoom,
-    }
-  }
-
-  /**
-   * The minimap, under `controls="minimap"`: each card as a box, and a frame
-   * around what is on screen.
-   *
-   * **A picture for a pointer**, hidden from screen readers and taking no
-   * focus, as a map's own overview is: the arrow keys and `show()` already take
-   * a keyboard to any card, and a second way that says nothing a reader can
-   * use would be a stop that does nothing.
-   */
-  private renderMinimap(): TemplateResult | typeof nothing {
-    const nodes = this.nodes
-    if (!this.drawsControls('minimap') || nodes.length === 0) {
-      return nothing
-    }
-    const area = this.minimapArea
-    const view = this.onScreen
-    /* A size of its own, which a sheet overrides: one drawn from the viewBox
-       alone took its height from the area's shape, and in the flow of a
-       headless region that moved the box the area is measured from. */
-    return html`<svg
-      part="minimap"
-      aria-hidden="true"
-      height="120"
-      preserveAspectRatio="xMidYMid meet"
-      viewBox=${`${area.x} ${area.y} ${area.width} ${area.height}`}
-      width="160"
-      @pointerdown=${this.handleMinimapPointer}
-      @pointermove=${this.handleMinimapPointer}
-    >
-      ${nodes.map(
-        (node) =>
-          svg`<rect part="minimap-node" data-group=${node.type === 'group' ? '' : nothing} x=${node.x} y=${node.y} width=${node.width} height=${node.height} />`,
-      )}
-      ${svg`<rect part="minimap-view" x=${view.x} y=${view.y} width=${view.width} height=${view.height} />`}
-    </svg>`
-  }
-
   protected override render(): TemplateResult {
     const nodes = this.nodes
     const drawn = extent(nodes)
@@ -4651,14 +4309,15 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
           ${this.renderStops(origin, box)}
           <slot @slotchange=${this.handleSlotChange}></slot>
           ${this.renderEnds(origin)}
-          ${this.renderEditor(origin)}
+          ${added(this).labelEditor?.render(this, origin) ?? nothing}
           ${this.renderMarquee(origin)}
         </div>
         <slot name="empty"></slot>
         ${this.loading ? html`<slot name="loading"></slot>` : nothing}
         ${this.renderGestures()}
       </div>
-      ${this.renderControls()} ${this.renderMinimap()}
+      ${this.renderControls()}
+      ${this.drawsControls('minimap') && nodes.length > 0 ? (added(this).minimap?.(this) ?? nothing) : nothing}
       <span part="live" role="status">${this.said}</span>
       <div part="footer">
         <slot name="footer"></slot>

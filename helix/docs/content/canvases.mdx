@@ -29,6 +29,19 @@ document's own units, and a connection names its two cards by `name`:
 import '@fusion.dev/helix/canvas'
 ```
 
+The family's entry registers the board, its cards, and its connections. Four
+features are imports of their own, so a board carries only what it uses:
+
+| Feature | The entry to import |
+|---|---|
+| `arrange()`, which moves the cards so that none overlaps another | `@fusion.dev/helix/canvas/arrange` |
+| The field that edits a connection's label or a group's name | `@fusion.dev/helix/canvas/label-editor` |
+| The minimap, where `controls` names `minimap` | `@fusion.dev/helix/canvas/minimap` |
+| Copy and paste as JSON Canvas, and `paste()` | `@fusion.dev/helix/canvas/paste` |
+
+In development, a board asked for one of these without its entry says so in
+the console once the page has loaded, with the line to add.
+
 Give the board a `label` that says what it holds. A screen reader announces it
 as "Launch plan, canvas".
 
@@ -103,13 +116,13 @@ The board is one tab stop. A card holds it, and Tab leaves the board.
 | Control or Command with A | A card or a connection | Select everything |
 | Shift with an arrow key | A card | Move the card by 16 units, or to the next multiple of `snap` |
 | Alt with an arrow key | A card | Resize the card from its bottom right corner |
-| Enter or F2 | A card | Ask to edit it, with `helix-canvas-edit`, or edit a group's name |
+| Enter or F2 | A card | Ask to edit it, with `helix-canvas-edit`, or edit a group's name, with `canvas/label-editor` |
 | Enter | A connection | Move to the card it arrives at |
-| F2 | A connection | Edit its label |
+| F2 | A connection | Edit its label, with `canvas/label-editor` |
 | C, then Enter on another card | A card | Ask to connect the two, with `helix-connect` |
 | C | A connection | Pick up its end, to move it to another card with Enter |
 | Delete or Backspace | A card or a connection | Ask to remove what is selected, with `helix-remove` |
-| Control or Command with C, V | The board | Copy the selected cards as JSON Canvas, and paste a document |
+| Control or Command with C, V | The board | Copy the selected cards as JSON Canvas, and paste a document, with `canvas/paste` |
 | Control or Command with Z | The board | Undo the last move or resize. With Shift, or Control with Y, make it again |
 | Plus, minus | The board, a card, or a connection | Zoom in or out |
 | Escape | A card or a connection | Stop connecting, or go out to the board |

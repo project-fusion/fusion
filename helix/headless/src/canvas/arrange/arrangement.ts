@@ -2,8 +2,8 @@
  * Where `arrange()` puts every card: the arithmetic, kept apart from the board
  * that moves them there.
  */
-import { type CanvasEdge, type CanvasNode, groupOf, reading } from './root/canvas-document.js'
-import { snapTo } from './snap.js'
+import { type CanvasEdge, type CanvasNode, groupOf, reading } from '../root/canvas-document.js'
+import { snapTo } from '../snap.js'
 
 /** How a board is arranged. */
 export interface CanvasArrangeOptions {

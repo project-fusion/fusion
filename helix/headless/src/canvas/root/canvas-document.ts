@@ -618,3 +618,14 @@ export const colorOf = (tone: CanvasTone | undefined, custom: string): string | 
   const at = tone === undefined ? -1 : PRESETS.indexOf(tone)
   return at >= 0 ? String(at + 1) : custom.trim() || undefined
 }
+
+/**
+ * The breathing room the plane keeps around the document's own extent.
+ *
+ * **A board drawn exactly to its extent clips what sits outside it**, and two
+ * things do: a group's name, which is drawn above the box it names, and a
+ * connector, whose curve bows past the cards it joins. The margin is the same on
+ * every side and in the document's own units, so it scales with the zoom like
+ * everything else.
+ */
+export const MARGIN = 32

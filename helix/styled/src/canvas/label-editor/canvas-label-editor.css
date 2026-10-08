@@ -1,0 +1,34 @@
+/* The field that edits a label, which `@fusion.dev/helix/canvas/label-editor`
+   adopts into the board after the board's own sheet. */
+
+/* **The field sits where the label does**, on the plane, so it scales and
+   moves with the board and a reader types where they were looking. Over the
+   cards, which it is placed after. A group's name is above its box, so its
+   field is too. */
+[part="label-editor"] {
+  background-color: var(--helix-color-surface);
+  border: var(--helix-border-thin) solid var(--helix-color-accent);
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  color: var(--helix-color-foreground);
+  font-family: var(--helix-font-sans);
+  font-size: max(var(--helix-text-field-min), var(--helix-text-xs));
+  inline-size: var(--canvas-label-editor-inline-size, 12rem);
+  left: var(--_canvas-editor-x);
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+  position: absolute;
+  text-align: center;
+  top: var(--_canvas-editor-y);
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+
+[part="label-editor"][data-target="group"] {
+  text-align: start;
+  transform: translate(0, -100%);
+}
+
+[part="label-editor"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}

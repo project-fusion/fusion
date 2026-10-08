@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
-import { parseCanvas, pasteInto } from './paste.js'
-import type { CanvasNode } from './root/canvas-document.js'
+import type { CanvasNode } from '../root/canvas-document.js'
+import { parseCanvas, pasteInto } from './place.js'
 
 const card = (id: string, x: number, y: number): CanvasNode => ({
   height: 50,

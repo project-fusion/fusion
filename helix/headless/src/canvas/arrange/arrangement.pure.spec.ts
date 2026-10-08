@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
-import { arrangement } from './arrange.js'
-import type { CanvasEdge, CanvasNode } from './root/canvas-document.js'
+import type { CanvasEdge, CanvasNode } from '../root/canvas-document.js'
+import { arrangement } from './arrangement.js'
 
 const card = (id: string, x: number, y: number, width = 100, height = 50): CanvasNode => ({
   height,

@@ -12,6 +12,10 @@ import editing from '../.examples/editing.html' with { type: 'text' }
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  await import('../arrange/index.js')
+  await import('../label-editor/index.js')
+  await import('../minimap/index.js')
+  await import('../paste/index.js')
 })
 
 /* Browser only: happy-dom does not run a script inserted by script. */

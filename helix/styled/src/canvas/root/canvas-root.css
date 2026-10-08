@@ -30,45 +30,6 @@
   position: relative;
 }
 
-/* **The minimap, in the corner below the controls**, floating as they do, and
-   in the opposite corner where the controls are moved to the bottom. The area
-   is drawn whole, so the box's spare room is the minimap's own well. */
-[part="minimap"] {
-  background-color: var(--viewport-control-background-color, var(--helix-color-surface-overlay));
-  block-size: var(--canvas-minimap-block-size, 7.5rem);
-  border: var(--helix-border-floating) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-sm);
-  box-shadow: var(--helix-shadow-floating);
-  box-sizing: border-box;
-  cursor: pointer;
-  inline-size: var(--canvas-minimap-inline-size, 10rem);
-  inset-block-end: var(--helix-space-sm);
-  inset-inline-end: var(--helix-space-sm);
-  position: absolute;
-  touch-action: none;
-}
-
-:host([controls-placement^="bottom"]) [part="minimap"] {
-  inset-block: var(--helix-space-sm) auto;
-}
-
-[part="minimap-node"] {
-  fill: var(--helix-color-foreground-subtle);
-}
-
-[part="minimap-node"][data-group] {
-  fill: none;
-  stroke: var(--helix-color-foreground-subtle);
-  vector-effect: non-scaling-stroke;
-}
-
-[part="minimap-view"] {
-  fill: color-mix(in oklab, var(--helix-color-accent) 12%, transparent);
-  stroke: var(--helix-color-accent);
-  stroke-width: var(--helix-border-thick);
-  vector-effect: non-scaling-stroke;
-}
-
 /* What a consumer slots for an empty board, shown only when it is one: the
    markup is always there, because the shape of the template cannot depend on
    what the server could not count. */
@@ -243,38 +204,6 @@
    in hand until the next press puts it down. */
 :host(:state(holding)) [part="viewport"] {
   cursor: grabbing;
-}
-
-/* **The field sits where the label does**, on the plane, so it scales and
-   moves with the board and a reader types where they were looking. Over the
-   cards, which it is placed after. A group's name is above its box, so its
-   field is too. */
-[part="label-editor"] {
-  background-color: var(--helix-color-surface);
-  border: var(--helix-border-thin) solid var(--helix-color-accent);
-  border-radius: var(--helix-radii-sm);
-  box-sizing: border-box;
-  color: var(--helix-color-foreground);
-  font-family: var(--helix-font-sans);
-  font-size: max(var(--helix-text-field-min), var(--helix-text-xs));
-  inline-size: var(--canvas-label-editor-inline-size, 12rem);
-  left: var(--_canvas-editor-x);
-  padding: var(--helix-space-2xs) var(--helix-space-xs);
-  position: absolute;
-  text-align: center;
-  top: var(--_canvas-editor-y);
-  transform: translate(-50%, -50%);
-  z-index: 1;
-}
-
-[part="label-editor"][data-target="group"] {
-  text-align: start;
-  transform: translate(0, -100%);
-}
-
-[part="label-editor"]:focus-visible {
-  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  outline-offset: var(--helix-size-focus-offset);
 }
 
 /* **The box a Shift-drag draws**, on the plane with the cards it selects. */

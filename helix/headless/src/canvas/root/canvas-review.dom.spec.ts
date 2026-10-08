@@ -7,6 +7,10 @@ import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/do
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  await import('../arrange/index.js')
+  await import('../label-editor/index.js')
+  await import('../minimap/index.js')
+  await import('../paste/index.js')
 })
 
 type Canvas = HTMLElement & {
