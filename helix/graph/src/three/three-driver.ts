@@ -52,18 +52,23 @@ import {
   signalsOver,
 } from '../overlay/overlay.js'
 import { surfaceOf } from '../shapes/surface.js'
+import { type Holder, pageBudget } from './budget.js'
 
 /** How the three.js driver behaves where the page does not say. */
 export interface ThreeDriverOptions {
   /**
-   * How many pixels the drawing has for each of the page's. By default half
-   * as many again as the screen has, at least two and at most three, which
-   * smooths every edge. Fewer is faster on a slow GPU.
+   * How many pixels the drawing has for each of the page's. By default, on
+   * a screen worked with a mouse, half as many again as the screen has, at
+   * least two and at most three, which smooths every edge; on a touch
+   * screen, as many as the screen has, at most two. Fewer is faster on a
+   * slow GPU.
    */
   density?: number | undefined
   /**
-   * Whether the graph turns slowly while nobody is handling it. On by
-   * default, and never for a reader who asks for less motion.
+   * Whether the graph turns slowly for its first five seconds, until the
+   * reader handles it. On by default, and never for a reader who asks for
+   * less motion. It stops for good after five seconds, since motion that
+   * starts by itself and runs longer needs a way to pause it.
    */
   autoRotate?: boolean | undefined
   /** Whether each group's name is drawn over its notes. On by default. */
@@ -99,8 +104,14 @@ const SAMPLE = 96
  */
 const LINKS = { dark: { close: 0.16, far: 0.025 }, light: { close: 0.36, far: 0.07 } }
 
-/** How long the graph rests after the reader lets go before it turns again, in milliseconds. */
-const REST = 8000
+/**
+ * How long the graph turns by itself, in milliseconds, from when the driver
+ * starts. **No longer than five seconds**, so it needs no pause control:
+ * WCAG 2.2.2 asks for one on motion that starts by itself and runs longer,
+ * and a graph turning on beside a page's text is that motion. It stopped and
+ * started again after every interaction before, so it never ended at all.
+ */
+const TURNING = 5000
 
 /**
  * How a shape's surface is washed in its notes' colors: how strongly, on a
@@ -473,11 +484,14 @@ const depthOf = (id: string): number => {
  * **A layout runs in three dimensions**, with d3-force-3d, where notes have no
  * place; with a solid `stencil`, the notes are drawn in its shape and none
  * runs. Dragging turns the graph, the wheel and a pinch bring it nearer, and
- * it turns slowly by itself while nobody is handling it, unless the reader
- * asks for less motion. It draws only while something moves, and not at all
- * while the box is out of view or off the page.
+ * it turns slowly by itself for its first five seconds, until the reader
+ * handles it, unless the reader asks for less motion. It draws only while
+ * something moves, and not at all while the box is out of view or off the
+ * page.
  *
- * The renderer is the driver's own, and `disconnect()` frees it.
+ * The renderer is the driver's own, and `disconnect()` frees it. Every
+ * three.js graph on a page shares six WebGL contexts: past six, one far off
+ * screen gives its context back and takes it again as it comes near.
  */
 export const threeDriver = (
   container: HTMLElement,
@@ -489,10 +503,15 @@ export const threeDriver = (
   const renderer = new WebGLRenderer({ alpha: true, antialias: true })
   /* **Drawn finer than the screen and smoothed down**: half as many pixels
      again as the screen has, and never fewer than two for each of the
-     page's, so on a screen of one every edge is drawn twice as finely, and
-     a dense phone's three are met. A page with a slow GPU asks for fewer. */
+     page's, so on a screen of one every edge is drawn twice as finely. **A
+     touch screen gets the screen's own, at most two**: a phone of three drew
+     nine pixels for each of the page's, with a phone's GPU and battery, and
+     an edge there is already finer than an eye at arm's length can tell. A
+     page with a slow GPU asks for fewer. */
+  const screen = window.devicePixelRatio || 1
+  const touch = window.matchMedia?.('(pointer: coarse)').matches ?? false
   renderer.setPixelRatio(
-    options.density ?? Math.min(Math.max((window.devicePixelRatio || 1) * 1.5, 2), 3),
+    options.density ?? (touch ? Math.min(screen, 2) : Math.min(Math.max(screen * 1.5, 2), 3)),
   )
   renderer.setClearColor(0x000000, 0)
   const canvas = renderer.domElement
@@ -522,7 +541,9 @@ export const threeDriver = (
   /* Whether the reader has moved the view since the graph was drawn, after
      which the view is theirs and nothing fits it again. */
   let moved = false
-  let handled = 0
+  /* Until when the graph turns by itself, unless the reader handles it first. */
+  const turnUntil = performance.now() + TURNING
+  let touched = false
 
   /* **Positions in the connector's units**, scaled so the graph reaches
      `REACH` whatever its units are, and settled on the first drawing. */
@@ -962,6 +983,7 @@ export const threeDriver = (
       return
     }
     glide = { duration, from, fromDistance, start: performance.now(), to, toDistance: distance }
+    invalidate()
   }
 
   /** The middle of a set of notes, and how far out the furthest is from it. */
@@ -1377,22 +1399,28 @@ export const threeDriver = (
     quiet.material.opacity = shade.far + (shade.close - shade.far) * closeness
   }
 
-  /* **Drawn only while something changes**: a glide, a layout, the reader's
-     hands, the turning, or a paint. A graph at rest costs the GPU nothing. */
-  let dirty = true
-  const invalidate = (): void => {
-    dirty = true
-  }
   /* Whether the box is in view: out of it, or off the page, nothing is drawn
      and no frame is asked for, until it is back. */
   let visible = true
   let pending = 0
+  /* **Drawn only while something changes**: a glide, a layout, the reader's
+     hands, the turning, or a paint. **And no frame is asked for at rest**:
+     the loop ends once a frame changes nothing, and anything that changes
+     the drawing asks for the next one here, so a graph at rest costs the
+     page nothing, where it had woken sixty times a second to find nothing
+     to draw. */
+  let dirty = true
+  const invalidate = (): void => {
+    dirty = true
+    if (!pending && !stopped && visible && container.isConnected) {
+      pending = requestAnimationFrame(tick)
+    }
+  }
   const tick = (now: number): void => {
     pending = 0
     if (stopped || !visible || !container.isConnected) {
       return
     }
-    pending = requestAnimationFrame(tick)
     const moving = glide !== undefined || morph !== undefined || layout !== undefined
     if (glide) {
       const through = Math.min((now - glide.start) / glide.duration, 1)
@@ -1443,18 +1471,29 @@ export const threeDriver = (
         fitAll(0)
       }
     }
-    /* Turning by itself only while nobody is on a note or has just let go. */
+    /* Turning by itself for its first five seconds, while nobody is on a
+       note, and never again once the reader has handled it. */
     controls.autoRotate =
       !still() &&
       options.autoRotate !== false &&
+      !touched &&
       hovered === undefined &&
       selected === undefined &&
-      now - handled > REST
-    controls.enableDamping = !still()
+      now < turnUntil
+    /* Eased while it turns by itself and under the reader's hands, and not
+       after: once the five seconds are up it stops on the next frame, where
+       easing to a stop took seconds more on a slow GPU. */
+    controls.enableDamping = !still() && (touched || now < turnUntil)
     /* The controls say whether they moved the camera: turning, easing to a stop, or handled. */
     const turned = controls.update()
     if (!(moving || turned || dirty)) {
+      /* Nothing changed, so the loop rests until something asks again. */
       return
+    }
+    /* The next frame, while anything is still moving: a glide, a morph, a
+       layout, the turning, or the camera easing to a stop. */
+    if (!pending) {
+      pending = requestAnimationFrame(tick)
     }
     dirty = false
     cue()
@@ -1468,9 +1507,6 @@ export const threeDriver = (
   /** Asks for frames again, where none is asked for and the box can be drawn. */
   const wake = (): void => {
     invalidate()
-    if (!pending && !stopped && visible && container.isConnected) {
-      pending = requestAnimationFrame(tick)
-    }
   }
   const seen =
     typeof IntersectionObserver === 'function'
@@ -1494,6 +1530,37 @@ export const threeDriver = (
     invalidate()
   }
   let resizing = 0
+  /* **A context given back is drawn again at once.** three.js rebuilds its
+     own state when the browser restores a lost context, and draws nothing
+     until asked, so a graph that lost its context stayed blank. */
+  const restored = (): void => {
+    invalidate()
+  }
+  canvas.addEventListener('webglcontextrestored', restored)
+
+  /* **The page's contexts are shared out**, through the budget every
+     three.js driver on the page joins: past its cap, a graph far off screen
+     gives its context back and takes it again as it comes within half a
+     screen, so it is drawn before it is seen. */
+  const holder: Holder = {
+    release: () => renderer.forceContextLoss(),
+    restore: () => renderer.forceContextRestore(),
+  }
+  pageBudget.join(holder)
+  const nearby =
+    typeof IntersectionObserver === 'function'
+      ? new IntersectionObserver(
+          (entries) => {
+            if (entries.at(-1)?.isIntersecting ?? true) {
+              pageBudget.near(holder)
+            } else {
+              pageBudget.far(holder, performance.now())
+            }
+          },
+          { rootMargin: '50%' },
+        )
+      : undefined
+  nearby?.observe(container)
   const sized = new ResizeObserver(() => {
     cancelAnimationFrame(resizing)
     resizing = requestAnimationFrame(resize)
@@ -1504,12 +1571,13 @@ export const threeDriver = (
 
   controls.addEventListener('start', () => {
     moved = true
-    handled = Number.POSITIVE_INFINITY
+    touched = true
     glide = undefined
     wake()
   })
-  controls.addEventListener('end', () => {
-    handled = performance.now()
+  /* The camera moved under the reader's hands, which the next frame draws. */
+  controls.addEventListener('change', () => {
+    invalidate()
   })
 
   /**
@@ -1720,6 +1788,7 @@ export const threeDriver = (
       const step = (now: number): void => {
         const through = Math.min((now - start) / STEP, 1)
         camera.position.copy(from.clone().lerp(to, ease(through)))
+        invalidate()
         if (through < 1 && !stopped) {
           requestAnimationFrame(step)
         }
@@ -1810,6 +1879,9 @@ export const threeDriver = (
     },
     stop: () => {
       stopped = true
+      canvas.removeEventListener('webglcontextrestored', restored)
+      nearby?.disconnect()
+      pageBudget.leave(holder)
       cancelAnimationFrame(pending)
       cancelAnimationFrame(hovering)
       cancelAnimationFrame(resizing)

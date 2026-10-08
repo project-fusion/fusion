@@ -333,20 +333,28 @@ connectGraph(frame, threeDriver(box), {
   with every fold the field's cells are too coarse to hold.
 - **Without a stencil, a layout runs in three dimensions** with d3-force-3d.
 - **Dragging turns the graph, and the wheel and a pinch bring it nearer.** It
-  turns slowly by itself while nobody is handling it, and never for a reader
-  who asks for less motion.
+  turns slowly by itself for its first five seconds, stops for good the moment
+  the reader handles it, and never turns for a reader who asks for less
+  motion. Motion that starts by itself and runs longer than five seconds needs
+  a pause control, and this one ends first.
 - **The far side recedes.** Through a graph, its far notes are a little
   quieter than its near ones.
-- **Edges are smooth at any density.** The drawing has half as many pixels again as the screen, at least two for each of the page's, and links are lines of a set width with smooth edges, where WebGL draws its own a device pixel wide.
+- **Edges are smooth at any density.** On a screen worked with a mouse, the drawing has half as many pixels again as the screen, at least two for each of the page's. On a touch screen it has the screen's own, at most two, so a phone draws less than half the pixels it did. Links are lines of a set width with smooth edges, where WebGL draws its own a device pixel wide.
 - **Each group is named over its near side**, and a group's name moves a line
   where it would cover another's.
 - **It draws only while something moves**: the reader's hands, the turning, a
-  layout, or a glide. It draws nothing while its box is out of view.
+  layout, or a glide. At rest it asks the browser for no frames at all, and it
+  draws nothing while its box is out of view.
+- **Every graph on a page shares six WebGL contexts.** A browser holds only
+  about sixteen and drops the oldest past that. Past six, a graph far off
+  screen gives its context back, the one away longest first, and takes it
+  again within half a screen of coming into view. A graph whose context the
+  browser restores is drawn again at once.
 
 | `threeDriver` option | Default | What else it takes |
 |---|---|---|
-| `autoRotate` | `true` | `false` leaves the graph still until the reader turns it |
-| `density` | screen × 1.5, 2 to 3 | How many pixels the drawing has for each of the page's; fewer is faster on a slow GPU |
+| `autoRotate` | `true` | `false` leaves the graph still until the reader turns it. It turns for five seconds at most |
+| `density` | screen × 1.5, 2 to 3; on a touch screen, the screen's own, at most 2 | How many pixels the drawing has for each of the page's; fewer is faster on a slow GPU |
 | `shape` | `circle` | `square` or `diamond`, for every note that does not say; a `ring` is drawn as a circle |
 | `groupLabels` | `true` | `false` leaves each group unnamed |
 | `layoutLimit` | `10000` | The longest a layout runs, in milliseconds |

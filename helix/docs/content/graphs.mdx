@@ -106,8 +106,13 @@ const connection = connectGraph(frame, threeDriver(frame.querySelector('div')))
 ```
 
 Drag to turn a 3D graph, and use the wheel or a pinch to zoom. It turns slowly
-on its own until someone handles it, unless they asked for reduced motion. Set
+on its own for its first five seconds, and stops as soon as someone handles it.
+It does not turn for a reader who asked for reduced motion. Set
 `autoRotate: false` to keep it still.
+
+A 3D graph draws only while something moves. Every 3D graph on a page shares
+six WebGL contexts: past six, a graph far off screen gives its context back
+and takes it again as it comes near.
 
 ## Draw an isometric diagram
 
