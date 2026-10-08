@@ -376,7 +376,8 @@
   backdrop-filter: none;
   background: var(--helix-color-primary-surface);
   border-color: transparent;
-  box-shadow: 0 24px 60px -30px color-mix(in oklab, var(--helix-color-primary-surface) 70%, transparent);
+  box-shadow: 0 24px 60px -30px
+    color-mix(in oklab, var(--helix-color-primary-surface) 70%, transparent);
   color: var(--helix-color-foreground-on-primary);
 }
 
