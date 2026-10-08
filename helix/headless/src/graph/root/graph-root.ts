@@ -85,6 +85,7 @@ import {
  * @slot footer - Content below the graph.
  * @slot fullscreen-icon - Replaces the glyph inside the fullscreen button.
  * @slot header - Content above the graph.
+ * @slot loading - What the panel shows while `loading` is set and the list holds no notes. Defaults to `loading-label`.
  * @slot pan-down-icon - Replaces the glyph inside the pan down button.
  * @slot pan-end-icon - Replaces the glyph inside the button that pans toward the end of a line of text.
  * @slot pan-start-icon - Replaces the glyph inside the button that pans toward the start of a line of text.
@@ -121,6 +122,7 @@ import {
  * @csspart legend-swatch - The mark in a group's color, before its name.
  * @csspart list - The list of notes, which draws only the rows in view.
  * @csspart live - What screen readers hear: how many notes there are when a search or the legend changes it, and which way the drawing went after a key or a control moved it.
+ * @csspart loading - The box in place of the list while `loading` is set and it holds no notes, holding the `loading` slot.
  * @csspart note - One note in the list.
  * @csspart note-cursor - The note the keyboard is on in the list.
  * @csspart note-linked - A note linked to or from the selected one.
@@ -144,6 +146,7 @@ import {
  * @cssstate empty - The list holds no notes: the graph has none, or a search or the groups hid them all.
  * @cssstate fullscreen - The graph fills the screen.
  * @cssstate idle - The user has been still long enough for the header and footer to fade.
+ * @cssstate loading - While `loading` is set.
  * @cssstate local - The drawing shows the selected note's local graph, with `depth`.
  * @cssstate panel-open - A graph with `no-panel` has the search and the list open over the drawing.
  * @cssstate ready - The graph has been drawn whole, after `helix-graph-ready`.
@@ -248,6 +251,18 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
   @words
   @property({ attribute: 'links-to-label' })
   linksToLabel = 'Links to {note}'
+
+  /**
+   * Marks the graph as busy while its notes arrive: the list is `aria-busy`,
+   * and the panel says so where it holds no notes yet.
+   */
+  @property({ reflect: true, type: Boolean })
+  loading = false
+
+  /** What the panel says while `loading` is set and the list holds no notes. */
+  @words
+  @property({ attribute: 'loading-label' })
+  loadingLabel = 'Loading notes'
 
   /** What screen readers hear once the drawing has moved down, after `moved()`. */
   @words
@@ -512,6 +527,7 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
     super.willUpdate(changed)
     this.toggleState('fullscreen', this.filled)
     this.toggleState('idle', this.resting)
+    this.toggleState('loading', this.loading)
     this.toggleState('panel-open', this.noPanel && this.panelOpen)
     this.toggleState('searching', this.query.trim() !== '')
     this.toggleState('selected', this.active !== '')
@@ -987,6 +1003,7 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
             data-scroller
             aria-label=${this.notesLabel}
             aria-activedescendant=${cursor}
+            aria-busy=${this.loading ? 'true' : nothing}
             @keydown=${this.handleListKeydown}
             @scroll=${() => this.virtualize.measure()}
           >
@@ -999,7 +1016,9 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
                words in one would be read as a note. The live region already
                says the count, so this is for the eye. */
             this.entries.length === 0
-              ? html`<div part="empty"><slot name="empty">${this.emptyLabel}</slot></div>`
+              ? this.loading
+                ? html`<div part="loading"><slot name="loading">${this.loadingLabel}</slot></div>`
+                : html`<div part="empty"><slot name="empty">${this.emptyLabel}</slot></div>`
               : nothing
           }
         </div>
