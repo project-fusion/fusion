@@ -235,6 +235,43 @@ describe('selection behavior and an empty selection', () => {
     )
   }
 
+  /* React Aria's TagGroup clears its selection on Escape, as its GridList does. */
+  test('Escape lets go of the selection, asking first, and keeps the key only where it cleared something', async () => {
+    const one = await group('selection-mode="multiple" value="Apple, Plum"', PLAIN)
+    const [apple] = one.tags as [Tag]
+    const asked: string[] = []
+    one.group.addEventListener('helix-before-change', (event) =>
+      asked.push((event as CustomEvent<{ value: string }>).detail.value),
+    )
+    const escape = (): KeyboardEvent => {
+      const event = new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        key: 'Escape',
+      })
+      cell(apple).dispatchEvent(event)
+      return event
+    }
+    const first = escape()
+    expect([asked, one.group.value, first.defaultPrevented]).toEqual([[''], '', true])
+    const again = escape()
+    expect([asked.length, again.defaultPrevented]).toEqual([1, false])
+  })
+
+  test('and keeps the one selected tag under disallow-empty-selection', async () => {
+    const one = await group('selection-mode="single" disallow-empty-selection value="Pear"', PLAIN)
+    cell(one.tags[0] as Tag).dispatchEvent(
+      new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        key: 'Escape',
+      }),
+    )
+    expect(one.group.value).toBe('Pear')
+  })
+
   test('under replace, a press selects the tag alone, Control adds one, and Shift a range', async () => {
     const one = await group('selection-mode="multiple" selection-behavior="replace"', PLAIN)
     const [apple, pear, , plum] = one.tags as [Tag, Tag, Tag, Tag]
