@@ -21,6 +21,7 @@ export function Hero({ announcement }: { announcement?: SitePage | undefined }) 
         data-shell
         direction="column"
         gap="lg"
+        id="hero-words"
       >
         {/*
          *  What is coming, which is what a chip under a heading about the

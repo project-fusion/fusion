@@ -43,12 +43,13 @@ export default function Home() {
     <ThemeScope>
       <div className={`${styles.reel} ${styles.fabClearance} ${styles.noRules}`}>
         {/* **One strand down the whole page, behind everything.** It comes
-            down the hero's right edge, clear of its words, turns across above
-            the first card, and lands on its top left corner; it runs down the
+            in at the top right corner and crosses in one diagonal to the first
+            card's top left corner, dimmed to a faint glow behind the hero's
+            words so they stay crisp; it runs down the
             margin behind the sections, and sweeps across above the numbers
             and above the close. Scrolling travels along it. Strands is a Helix
             component, so the light behind the page is the product too. */}
-        <helix-strands class={styles.reelStrands} travel>
+        <helix-strands class={styles.reelStrands} dust={1.3} quiet="hero-words" speed={1.2} travel>
           <helix-strands-stop at={0.9} for="problem-card" variant="sweep"></helix-strands-stop>
           <helix-strands-stop for="proof" variant="waves"></helix-strands-stop>
           <helix-strands-stop for="close" variant="waves"></helix-strands-stop>
