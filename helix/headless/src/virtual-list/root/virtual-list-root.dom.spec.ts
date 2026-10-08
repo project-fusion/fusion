@@ -873,6 +873,29 @@ describe('choosing items', () => {
     expect(row(host, 1).hasAttribute('aria-selected')).toBe(false)
   })
 
+  /* React Aria's rows carry `data-selected` and `data-disabled` for a
+     stylesheet, and the row the keys are on was told apart from the others
+     only while it held focus. */
+  test('marks each row for a stylesheet: chosen, disabled, and the one the keys are on', async () => {
+    const host = await fed(named(10))
+    host.selectionMode = 'multiple'
+    host.keyField = 'name'
+    host.value = 'Row 2'
+    host.disabledKeys = 'Row 3'
+    await settle(host)
+    const marks = (attribute: string) =>
+      [0, 1, 2, 3].map((at) => row(host, at).hasAttribute(attribute))
+    expect(marks('data-selected')).toEqual([false, true, false, false])
+    expect(marks('data-disabled')).toEqual([false, false, true, false])
+    expect(marks('data-active')).toEqual([true, false, false, false])
+    row(host, 0).focus()
+    await press(host, 'ArrowDown')
+    expect(marks('data-active')).toEqual([false, true, false, false])
+    host.selectionMode = undefined
+    await settle(host)
+    expect(marks('data-selected')).toEqual([false, false, false, false])
+  })
+
   test('selects with Space or a press, asking first, and keeps the keys in order', async () => {
     const host = await fed(named(50))
     host.selectionMode = 'multiple'
