@@ -21,8 +21,12 @@ import {
  * message, `aria-describedby`, so a family that gains a control is covered
  * without this file being edited.
  */
+/** The form's own `checkValidity()`, read before any Helix control connects. */
+let nativeCheck: () => boolean
+
 beforeAll(async () => {
   registerDom()
+  nativeCheck = HTMLFormElement.prototype.checkValidity
   /* The families this exercises, not the barrel: see `native-events.dom.spec.ts`
      for why importing the barrel here would empty `hydration.dom.spec.ts`. */
   await Promise.all([
@@ -250,6 +254,24 @@ describe('a form checked from a script', () => {
   ]
 
   type Checked = Updatable & { checkValidity(): boolean }
+
+  /* The check is wrapped on the form a Helix control belongs to, never on the
+     prototype: a library that changed `HTMLFormElement.prototype` would change
+     every form on the page and stack under other code that wraps it. */
+  test('wraps the form a Helix control is in, and leaves the prototype and every other form alone', async () => {
+    document.body.innerHTML = `<form id="helix">${FIELDS[0]}</form>
+      <form id="plain"><input required aria-label="Plain" /></form>`
+    const helix = document.getElementById('helix') as HTMLFormElement
+    const plain = document.getElementById('plain') as HTMLFormElement
+    await settle(helix.firstElementChild as Checked)
+    expect(HTMLFormElement.prototype.checkValidity).toBe(nativeCheck)
+    expect(Object.hasOwn(helix, 'checkValidity')).toBe(true)
+    expect(Object.hasOwn(plain, 'checkValidity')).toBe(false)
+    let fired = 0
+    plain.addEventListener('invalid', () => fired++, true)
+    expect(plain.checkValidity()).toBe(false)
+    expect(fired).toBe(1)
+  })
 
   ;(hasLayout() ? test : test.skip)(
     'form.checkValidity() fires invalid on each field and marks none',

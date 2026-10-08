@@ -62,15 +62,16 @@ const firstTabStop = (node: Element | ShadowRoot): HTMLElement | null => {
   return null
 }
 
-/** How many `form.checkValidity()` calls are running, nested ones included. */
+/** How many `form.checkValidity()` calls on a watched form are running, nested ones included. */
 let formChecks = 0
 
-/** Whether `form.checkValidity()` is wrapped yet, done once per copy of this module. */
-let formChecksWatched = false
+/** The forms whose `checkValidity()` is wrapped, so several controls share one wrapper. */
+const watchedForms = new WeakSet<HTMLFormElement>()
 
 /**
- * Wraps `HTMLFormElement.prototype.checkValidity` so a control can tell its
- * `invalid` from a form's check apart from one from a submission attempt.
+ * Wraps `checkValidity()` on the one form a control belongs to, so the control
+ * can tell the `invalid` from a form's check apart from one from a submission
+ * attempt.
  *
  * **The platform gives the two no difference to read.** Measured in Chromium,
  * the `invalid` that `form.checkValidity()` fires and the one a submit button,
@@ -80,20 +81,28 @@ let formChecksWatched = false
  * apart: after a submission attempt every invalid native field in the form
  * matches `:user-invalid`, and after `form.checkValidity()` none does. So the
  * check is the call that is marked, for as long as it runs, and every other
- * source keeps counting as an attempt. Shoelace wraps a form's validity calls
- * for the same reason.
+ * source keeps counting as an attempt.
  *
- * Only the check is wrapped. The platform runs a submission's validation
+ * **On the form instance, never on `HTMLFormElement.prototype`**, as
+ * Shoelace's `FormControlController` wraps the form it is associated with: a
+ * library that changed the prototype would change every form on the page,
+ * one with no Helix control included, and stack under other code that wraps
+ * it. Only the check is wrapped. The platform runs a submission's validation
  * without calling it, so a submit button, Enter and `requestSubmit()` still
  * reach a control as an attempt.
+ *
+ * **Left in place when the controls leave.** The wrapper only counts and
+ * calls the form's own method, so a form whose Helix controls are gone checks
+ * exactly as before; taking it off would mean counting the controls in each
+ * form through every move between forms, for no difference anyone can see.
  */
-const watchFormChecks = (): void => {
-  if (formChecksWatched || typeof HTMLFormElement === 'undefined') {
+const watchFormChecks = (form: HTMLFormElement | null): void => {
+  if (!form || watchedForms.has(form)) {
     return
   }
-  formChecksWatched = true
-  const check = HTMLFormElement.prototype.checkValidity
-  HTMLFormElement.prototype.checkValidity = function checkValidity(this: HTMLFormElement) {
+  watchedForms.add(form)
+  const check = form.checkValidity
+  form.checkValidity = function checkValidity(this: HTMLFormElement): boolean {
     formChecks += 1
     try {
       return check.call(this)
@@ -582,7 +591,7 @@ export class HelixFormElement extends HelixElement {
 
   override connectedCallback(): void {
     super.connectedCallback()
-    watchFormChecks()
+    watchFormChecks(this.internals.form)
     this.addEventListener('click', this.focusFromLabel)
     this.addEventListener('invalid', this.refreshAnchor)
     /* A `<label for>` a framework renders after the control names it through
@@ -597,6 +606,14 @@ export class HelixFormElement extends HelixElement {
     this.removeEventListener('invalid', this.refreshAnchor)
     this.unwatchLabels?.()
     this.unwatchLabels = undefined
+  }
+
+  /**
+   * Called by the browser when the control's form changes: watches the new
+   * form's `checkValidity()`, as connecting does for the form it starts in.
+   */
+  formAssociatedCallback(form: HTMLFormElement | null): void {
+    watchFormChecks(form)
   }
 
   /**
