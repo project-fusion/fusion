@@ -503,7 +503,11 @@ slot[name="filter-icon"]::slotted(*) {
     forced-color-adjust: none;
   }
 
-  [part="list"]:focus-visible [part~="note-cursor"] {
+  /* The note the keys are on is a background image, which forced colors
+     drop, so it takes an outline here, from the list or from the search field
+     that drives it. */
+  [part="list"]:focus-visible [part~="note-cursor"],
+  [part="search"]:has([aria-activedescendant]) ~ [part="list"] [part~="note-cursor"] {
     outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
     outline-offset: calc(var(--helix-size-focus-offset) * -1);
   }
