@@ -71,7 +71,11 @@ const nameOf = (block: Element): string => {
  * from the accessibility tree and left out of a copy. Set `mark-lines` to
  * mark lines a reader should look at, such as `2, 4-6`: the block draws a
  * band behind each run, placed where the lines are laid out, so it follows a
- * highlighter's markup and lines that wrap. Set `wrap` to wrap long lines
+ * highlighter's markup and lines that wrap. `added-lines` and
+ * `removed-lines` mark lines the same way as inserted and deleted, as
+ * Expressive Code's `ins` and `del` do, in code that is not a diff. The bands
+ * are drawn and hidden from screen readers, so say in the text around the
+ * block what a marked line means. Set `wrap` to wrap long lines
  * rather than scroll them; a gutter then numbers each line where it starts.
  * Set `wrappable` for a button in the header that turns `wrap` on and off,
  * pressed while the lines wrap.
@@ -144,6 +148,8 @@ const nameOf = (block: Element): string => {
  *
  * @slot - The code.
  * @slot actions - Controls for the block, in the header before the copy button.
+ * @slot expand-icon - An icon on the button that shows every line of a capped block, before its words.
+ * @slot label - The block's name in the header, such as a file icon beside the file name. Replaces `label` and `language` there, and draws the header.
  * @slot copied-icon - The copy button's icon after a copy. Defaults to a check mark.
  * @slot copy-icon - The copy button's icon before a copy. Defaults to a clipboard.
  *
@@ -187,7 +193,9 @@ const nameOf = (block: Element): string => {
  * @csspart header - The bar that holds the name and the copy button, shown when there is a name.
  * @csspart hunk - In a diff, a `@@` line saying where the lines under it are.
  * @csspart label - The block's name: its `label`, or its `language` where it has no label.
- * @csspart mark - The band behind a run of lines `mark-lines` names. The block writes where the run is laid out into `--code-block-mark-start`, `--code-block-mark-size`, and `--code-block-mark-inline-size` on it. Hidden from the accessibility tree.
+ * @csspart mark-added - The band behind a run of lines `added-lines` names. Applied with `mark`.
+ * @csspart mark-removed - The band behind a run of lines `removed-lines` names. Applied with `mark`.
+ * @csspart mark - The band behind a run of lines `mark-lines`, `added-lines` or `removed-lines` names. The block writes where the run is laid out into `--code-block-mark-start`, `--code-block-mark-size`, and `--code-block-mark-inline-size` on it. Hidden from the accessibility tree.
  * @csspart marker - In a diff, the `+`, `-`, or space that starts a line.
  * @csspart new - In a split diff, the new version's `<pre>`.
  * @csspart number - In a diff, a line number. In a `wrap` block with `line-numbers`, one line's number in the gutter, which the block makes as tall as the line it numbers through `--code-block-line-size`.
@@ -389,6 +397,20 @@ export class HelixHeadlessCodeBlock extends HelixElement {
    */
   @property({ attribute: 'mark-lines' })
   markLines = ''
+
+  /**
+   * The lines to mark as inserted, as numbers and ranges counted from 1, such
+   * as `3-4`. Drawn as `mark-lines` is, in the added color. Not for a diff.
+   */
+  @property({ attribute: 'added-lines' })
+  addedLines = ''
+
+  /**
+   * The lines to mark as deleted, as numbers and ranges counted from 1. Drawn
+   * as `mark-lines` is, in the removed color. Not for a diff.
+   */
+  @property({ attribute: 'removed-lines' })
+  removedLines = ''
 
   /**
    * Whether to leave the copy button off.
@@ -711,7 +733,7 @@ export class HelixHeadlessCodeBlock extends HelixElement {
    */
   private placeLines(): void {
     const code = this.renderRoot.querySelector<HTMLElement>('[part="code"]')
-    const marks = [...this.renderRoot.querySelectorAll<HTMLElement>('[part="mark"]')]
+    const marks = [...this.renderRoot.querySelectorAll<HTMLElement>('[part~="mark"]')]
     const numbers = [
       ...this.renderRoot.querySelectorAll<HTMLElement>('[part="gutter"] > [part="number"]'),
     ]
@@ -915,11 +937,19 @@ export class HelixHeadlessCodeBlock extends HelixElement {
        to the code still reaches `slotchange` and the code stays the page's. */
     /* Bands behind the runs `mark-lines` names, placed once the lines are laid
        out. Not on a server, which lays nothing out. */
-    const runs = this.childrenKnown ? lineRuns(this.markLines) : []
-    const marks = runs.map(
-      ([first, last]) =>
-        html`<span part="mark" aria-hidden="true" data-lines="${first}-${last}"></span>`,
-    )
+    const kinds = [
+      ['mark', this.markLines],
+      ['mark mark-added', this.addedLines],
+      ['mark mark-removed', this.removedLines],
+    ] as const
+    const marks = this.childrenKnown
+      ? kinds.flatMap(([kind, list]) =>
+          lineRuns(list).map(
+            ([first, last]) =>
+              html`<span part=${kind} aria-hidden="true" data-lines="${first}-${last}"></span>`,
+          ),
+        )
+      : []
     const code =
       highlighted === undefined
         ? html`<code part="code">${marks}<slot @slotchange=${() => this.requestUpdate()}></slot></code>`
@@ -956,7 +986,7 @@ export class HelixHeadlessCodeBlock extends HelixElement {
     /* A file under tabs is named by its tab, and its copy button still says
        its name. */
     const drawn = this.tabbed ? '' : name
-    return html`${this.renderHeader(name, undefined, drawn)}
+    return html`${this.renderHeader(name, undefined, drawn, true)}
       <div part="frame">
         <pre id="block" part="block" translate="no">${gutter}${code}</pre>
         ${this.headed(drawn) ? nothing : this.renderCopy()}
@@ -985,13 +1015,20 @@ export class HelixHeadlessCodeBlock extends HelixElement {
         this.toggleState('expanded', this.expanded)
       }}
     >
-      ${this.expanded ? this.collapseLabel : this.expandLabel}
+      ${this.slotted('expand-icon') ? html`<slot name="expand-icon"></slot>` : nothing}${
+        this.expanded ? this.collapseLabel : this.expandLabel
+      }
     </button>`
   }
 
   /** Whether the block draws a header: it has a name, a wrap button, or a control in `actions`. */
   private headed(name: string): boolean {
-    return name !== '' || (this.wrappable && !this.diff) || this.slotted('actions')
+    return (
+      name !== '' ||
+      (this.wrappable && !this.diff) ||
+      this.slotted('actions') ||
+      (!this.diff && !this.tabbed && this.slotted('label'))
+    )
   }
 
   /**
@@ -1011,10 +1048,19 @@ export class HelixHeadlessCodeBlock extends HelixElement {
     name: string,
     value?: string,
     drawn = name,
+    own = false,
   ): TemplateResult | typeof nothing {
     const acting = this.slotted('actions')
+    /* The block's own header offers the `label` slot. A diff's file headers
+       are named by their files, and a file under tabs by its tab. */
+    const label =
+      own && !this.tabbed && this.slotted('label')
+        ? html`<span part="label"><slot name="label">${drawn}</slot></span>`
+        : drawn
+          ? html`<span part="label">${drawn}</span>`
+          : nothing
     return this.headed(drawn)
-      ? html`<div part="header">${drawn ? html`<span part="label">${drawn}</span>` : nothing}${
+      ? html`<div part="header">${label}${
           acting ? html`<span part="actions"><slot name="actions"></slot></span>` : nothing
         }${this.renderWrapToggle()}${this.renderCopy(value, name)}</div>`
       : nothing

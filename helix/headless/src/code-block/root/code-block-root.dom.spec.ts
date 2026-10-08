@@ -468,6 +468,53 @@ describe('marked lines', () => {
   })
 })
 
+/* Expressive Code marks a line inserted or deleted in code that is not a
+   diff, and the block had one kind of mark. */
+describe('lines marked added or removed', () => {
+  test('draw bands of their own kind, beside the plain marks, hidden from the tree', async () => {
+    const el = (await mount(
+      '<helix-headless-code-block mark-lines="1" added-lines="2-3" removed-lines="4">a\nb\nc\nd</helix-headless-code-block>',
+    )) as Updatable
+    await el.updateComplete
+    const bands = [...(el.shadowRoot?.querySelectorAll('[part~="mark"]') ?? [])]
+    expect(
+      bands.map((band) => [band.getAttribute('part'), band.getAttribute('data-lines')]),
+    ).toEqual([
+      ['mark', '1-1'],
+      ['mark mark-added', '2-3'],
+      ['mark mark-removed', '4-4'],
+    ])
+    expect(bands.every((band) => band.getAttribute('aria-hidden') === 'true')).toBe(true)
+    const placed = part(el as HTMLElement, 'mark-added') as HTMLElement
+    expect(placed.style.getPropertyValue('--code-block-mark-size')).toMatch(/px$/)
+  })
+})
+
+describe('the header’s own content', () => {
+  /* The name was text only, so a file icon or a link beside it meant
+     rebuilding the header. */
+  test('a slotted label replaces the name, and draws a header without one', async () => {
+    const el = (await mount(
+      '<helix-headless-code-block><span slot="label">app.ts</span>let a = 1</helix-headless-code-block>',
+    )) as Updatable
+    await el.updateComplete
+    const label = part(el as HTMLElement, 'label') as HTMLElement
+    expect(label).not.toBeNull()
+    expect(label.querySelector('slot[name="label"]')).not.toBeNull()
+  })
+
+  test('a slotted icon goes on the button that shows every line', async () => {
+    const el = (await mount(
+      '<helix-headless-code-block expandable><span slot="expand-icon">v</span>a</helix-headless-code-block>',
+    )) as Updatable & { capped: boolean }
+    await el.updateComplete
+    ;(el as unknown as { capped: boolean }).capped = true
+    await el.updateComplete
+    const expand = part(el as HTMLElement, 'expand') as HTMLElement
+    expect(expand.querySelector('slot[name="expand-icon"]')).not.toBeNull()
+  })
+})
+
 describe('wrapping', () => {
   test('wrappable draws a pressed button that asks, then wraps the lines', async () => {
     const el = (await mount(
