@@ -21,39 +21,93 @@
  *
  * **Loaded the first time a module needs it**, from the preview's `cdn` as a
  * package in `dependencies` is, so the published package carries no compiler
- * and a sandbox with no TypeScript loads none. It runs in the page, and reads
- * the source as text: the example itself still runs only in the frame.
+ * and a sandbox with no TypeScript loads none.
+ *
+ * **In a worker of its own**, which has no access to the page and keeps a
+ * long compile off the page's thread. The worker's script is text, so the
+ * `import()` of an address known only at run time is one no bundler reads:
+ * written in this module, Turbopack refused to build a page that imported
+ * it, the TypeScript build having dropped the comments that tell bundlers to
+ * leave it alone. The compiler reads the source as text, and the example
+ * itself still runs only in the frame.
  */
 export const COMPILER = 'sucrase@3.35.1'
 
 /** Whether a module file is TypeScript or JSX, which a browser cannot run as written. */
 export const COMPILED = /\.(?:[cm]?ts|[jt]sx)$/
 
-/** Sucrase's `transform`, as much of it as this calls. */
+/** Sucrase's `transform`, as the worker runs it: rejects with what failed. */
 type Transform = (
   source: string,
   options: Record<string, unknown>,
-) => { code: string; sourceMap?: Record<string, unknown> }
+) => Promise<{ code: string; sourceMap?: Record<string, unknown> }>
 
-/** The compiler loaded from each address, so each loads once a page. */
-export const compilers = new Map<string, Promise<Transform>>()
-
-/** The compiler at `cdn`, loaded once, or again after a load that failed. */
-const compilerAt = (cdn: string): Promise<Transform> => {
-  let loading = compilers.get(cdn)
-  if (!loading) {
-    const address = `${cdn}${COMPILER}`
-    loading = import(/* @vite-ignore */ /* webpackIgnore: true */ address).then(
-      (loaded: { transform: Transform }) => loaded.transform,
-    )
-    loading.catch(() => compilers.delete(cdn))
-    compilers.set(cdn, loading)
+/**
+ * The worker's script. Each message names the compiler's address, which it
+ * loads once, and again after a load that failed, and is answered with what
+ * `transform` returned or with what went wrong.
+ */
+const WORKER = `const loaded = {}
+onmessage = async ({ data: [id, address, source, options] }) => {
+  let compiler
+  try {
+    compiler = await (loaded[address] ??= import(address))
+  } catch (error) {
+    delete loaded[address]
+    return postMessage([id, undefined, options.filePath + ' needs ' + address + ', which did not load: ' + error])
   }
-  return loading
-}
+  try {
+    postMessage([id, compiler.transform(source, options)])
+  } catch (error) {
+    postMessage([id, undefined, String(error && error.message)])
+  }
+}`
 
-/** A module that throws `message` when it runs, which the frame reports as uncaught. */
-const throwing = (message: string): string => `throw new SyntaxError(${JSON.stringify(message)})`
+/** The one worker every preview on the page compiles in, started on the first compile. */
+let worker: Worker | undefined
+
+/** How many messages the worker has been sent, which numbers each. */
+let sent = 0
+
+/** The answers the worker owes, by the number of the message they answer. */
+const owed = new Map<number, (answer: [number, Awaited<ReturnType<Transform>>?, string?]) => void>()
+
+/** The compiler at an address, in the worker. */
+const inWorker =
+  (address: string): Transform =>
+  (source, options) => {
+    if (!worker) {
+      worker = new Worker(URL.createObjectURL(new Blob([WORKER], { type: 'text/javascript' })), {
+        type: 'module',
+      })
+      worker.onmessage = ({ data }: MessageEvent<[number]>) => {
+        owed.get(data[0])?.(data)
+        owed.delete(data[0])
+      }
+    }
+    sent += 1
+    const id = sent
+    worker.postMessage([id, address, source, options])
+    return new Promise((resolve, reject) => {
+      owed.set(id, ([, result, error]) => (result ? resolve(result) : reject(new Error(error))))
+    })
+  }
+
+/**
+ * The compiler for each `cdn`, so each is set up once a page. A spec puts a
+ * stand-in here, for an address of its own.
+ */
+export const compilers = new Map<string, Transform>()
+
+/** The compiler at `cdn`. */
+const compilerAt = (cdn: string): Transform => {
+  let compiler = compilers.get(cdn)
+  if (!compiler) {
+    compiler = inWorker(`${cdn}${COMPILER}`)
+    compilers.set(cdn, compiler)
+  }
+  return compiler
+}
 
 /**
  * A module file compiled to JavaScript, with its source map inline, for the
@@ -71,14 +125,8 @@ const throwing = (message: string): string => `throw new SyntaxError(${JSON.stri
  * terminal, and only where the example imports the file.
  */
 export const compile = async (cdn: string, path: string, source: string): Promise<string> => {
-  let transform: Transform
   try {
-    transform = await compilerAt(cdn)
-  } catch (error) {
-    return throwing(`${path} needs ${COMPILER} from ${cdn}, which did not load: ${error}`)
-  }
-  try {
-    const { code, sourceMap } = transform(source, {
+    const { code, sourceMap } = await compilerAt(cdn)(source, {
       filePath: path,
       jsxImportSource: /@jsxImportSource\s+(\S+)/.exec(source)?.[1],
       jsxRuntime: 'automatic',
@@ -92,6 +140,6 @@ export const compile = async (cdn: string, path: string, source: string): Promis
     const map = JSON.stringify({ ...sourceMap, sourcesContent: [source] })
     return `${code}\n//# sourceMappingURL=data:application/json;charset=utf-8,${encodeURIComponent(map)}`
   } catch (error) {
-    return throwing((error as Error).message)
+    return `throw new SyntaxError(${JSON.stringify((error as Error).message)})`
   }
 }

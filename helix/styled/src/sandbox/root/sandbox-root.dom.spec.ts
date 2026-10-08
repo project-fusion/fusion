@@ -1021,10 +1021,7 @@ describe('the files a sandbox runs', () => {
      showed its text beside a preview that ran none of it. */
   test('a module file in TypeScript or JSX reaches the preview, which compiles it', async () => {
     const { compilers } = await import('../compile.js')
-    compilers.set(
-      'test-root:/',
-      Promise.resolve((source: string) => ({ code: source })),
-    )
+    compilers.set('test-root:/', async (source: string) => ({ code: source }))
     const sandbox = await mount(`
       <helix-sandbox preview-delay="0">
         <helix-sandbox-source slot="source" name="js" value="import './app.tsx'"></helix-sandbox-source>
