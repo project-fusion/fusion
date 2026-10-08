@@ -264,6 +264,17 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
     this.partNamed('label')?.toggleAttribute('hidden', !filled)
   }
 
+  /**
+   * Ticks or clears the box, as `click()` does a native checkbox: passed to the control
+   * inside, so the one click a listener hears is the control's, after it has
+   * moved. See `HostClickController`.
+   */
+  override click(): void {
+    if (!this.clicks.click()) {
+      super.click()
+    }
+  }
+
   protected override render(): TemplateResult {
     /* A real `<label>` around both, which is the whole of what makes the text a
        target. A `<span>` beside the input leaves pressing the words doing

@@ -175,6 +175,17 @@ export class HelixHeadlessSwitch extends MixinControllerChecked(MixinField(Helix
     return nothing
   }
 
+  /**
+   * Turns the switch on or off, as `click()` does a native checkbox: passed to the control
+   * inside, so the one click a listener hears is the control's, after it has
+   * moved. See `HostClickController`.
+   */
+  override click(): void {
+    if (!this.clicks.click()) {
+      super.click()
+    }
+  }
+
   protected override render(): TemplateResult {
     /* A real `<label>` around both, so pressing the words works with no click
        handler: the browser does the forwarding.

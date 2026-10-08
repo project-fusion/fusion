@@ -158,6 +158,17 @@ export class HelixHeadlessToggle extends MixinSelectableItem(HelixElement) {
     )
   }
 
+  /**
+   * Presses the toggle, as `click()` does a native button: passed to the control
+   * inside, so the one click a listener hears is the control's, after it has
+   * moved. See `HostClickController`.
+   */
+  override click(): void {
+    if (!this.clicks.click()) {
+      super.click()
+    }
+  }
+
   protected override render(): TemplateResult {
     /* **A render the group has not reached holds the stop open.** `selected`
        and `focusable` are both the group's word and the group reads its
