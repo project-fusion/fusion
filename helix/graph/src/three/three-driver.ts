@@ -1,4 +1,4 @@
-import { reportRuntime } from '@fusion.dev/helix-core'
+import { type Holder, pageBudget, reportRuntime } from '@fusion.dev/helix-core'
 import type { Simulation, SimulationNode } from 'd3-force-3d'
 import {
   AdditiveBlending,
@@ -52,7 +52,6 @@ import {
   signalsOver,
 } from '../overlay/overlay.js'
 import { surfaceOf } from '../shapes/surface.js'
-import { type Holder, pageBudget } from './budget.js'
 
 /** How the three.js driver behaves where the page does not say. */
 export interface ThreeDriverOptions {
@@ -1546,15 +1545,15 @@ export const threeDriver = (
     release: () => renderer.forceContextLoss(),
     restore: () => renderer.forceContextRestore(),
   }
-  pageBudget.join(holder)
+  pageBudget().join(holder)
   const nearby =
     typeof IntersectionObserver === 'function'
       ? new IntersectionObserver(
           (entries) => {
             if (entries.at(-1)?.isIntersecting ?? true) {
-              pageBudget.near(holder)
+              pageBudget().near(holder)
             } else {
-              pageBudget.far(holder, performance.now())
+              pageBudget().far(holder, performance.now())
             }
           },
           { rootMargin: '50%' },
@@ -1881,7 +1880,7 @@ export const threeDriver = (
       stopped = true
       canvas.removeEventListener('webglcontextrestored', restored)
       nearby?.disconnect()
-      pageBudget.leave(holder)
+      pageBudget().leave(holder)
       cancelAnimationFrame(pending)
       cancelAnimationFrame(hovering)
       cancelAnimationFrame(resizing)

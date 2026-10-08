@@ -391,6 +391,20 @@ export interface GraphPartChangeDetail {
   kind: 'data' | 'focus' | 'gestures'
 }
 
+/** Detail carried by `helix-plot-change`. */
+export interface PlotChangeDetail {
+  /** `data` for the points or the axes, which are drawn again; `focus` for the point the keys rest on. */
+  kind: 'data' | 'focus'
+}
+
+/** Detail carried by `helix-plot-turn`. */
+export interface PlotTurnDetail {
+  /** Steps to turn about the vertical, positive to the right. */
+  across: number
+  /** Steps to tilt, positive to look from higher. */
+  up: number
+}
+
 /** One signal between two notes, as the frame's `signal()` sends it. */
 export interface GraphSignalDetail {
   /** The note the signal leaves, by its `id`. */

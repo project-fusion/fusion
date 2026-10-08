@@ -1,5 +1,5 @@
 /**
- * How many WebGL contexts the three.js driver keeps live on one page.
+ * How many WebGL contexts Helix's three.js drivers keep live on one page.
  *
  * **A browser holds only so many, and drops the oldest without asking**:
  * Chrome about sixteen on a desktop and fewer on a phone. A page of 3D panels
@@ -72,5 +72,19 @@ export const contextBudget = (cap: number = LIVE) => {
   }
 }
 
-/** The budget every three.js driver on the page shares. */
-export const pageBudget = contextBudget()
+type Budget = ReturnType<typeof contextBudget>
+
+/**
+ * The budget every three.js driver on the page shares: the graph's and the
+ * plot's, whichever package and whichever copy of Helix each came from.
+ *
+ * **Kept on the page, under a registered symbol**, since a page can load two
+ * copies of this module, one bundled with each driver, and two budgets of six
+ * would let the page hold twelve.
+ */
+export const pageBudget = (): Budget => {
+  const key = Symbol.for('fusion.dev/helix/context-budget')
+  const page = globalThis as unknown as Record<symbol, Budget | undefined>
+  page[key] ??= contextBudget()
+  return page[key]
+}

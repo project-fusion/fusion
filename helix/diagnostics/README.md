@@ -335,6 +335,7 @@ diagnostics counts it by kind and tag. None fails a CI job.
 | `missing-trigger` | A tooltip's `for` names no element in its own tree |
 | `negative-value` | An area chart was given a negative number, which it draws as none |
 | `not-a-graph` | `connectGraph` was given an element that is not a graph frame |
+| `not-a-plot` | `connectScatter3d` was given an element that is not a 3D Scatter chart |
 | `picture-in-picture-refused` | The browser refused picture in picture |
 | `refused-length` | A grid's `min` is not a length it can write, so it lays out by `columns` |
 | `removed-callback` | A React prop is a callback that was removed and never ran from JSX. Development builds only (the `development` export condition) |
