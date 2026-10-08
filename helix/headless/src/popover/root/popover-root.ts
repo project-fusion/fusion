@@ -12,6 +12,7 @@ import {
   lockScroll,
   MixinControllerOpen,
   OpenPhaseController,
+  onUnlessFalse,
   type Placement,
   PopoverController,
   reflectElements,
@@ -81,8 +82,9 @@ import { hideOutside } from '../hide-outside.js'
  *
  * The panel opens against the trigger, or against the element `anchor` names,
  * such as a field beside the button that opens it. `offset` moves it away from
- * that element, `cross-offset` slides it along the side it is on, and
- * `container-padding` keeps it that far from the window's edges.
+ * that element, `cross-offset` slides it along the side it is on,
+ * `container-padding` keeps it that far from the window's edges, and
+ * `flip="false"` keeps it on its side where the other side has more room.
  *
  * `arrow` draws a point on the panel's edge facing the trigger. The side the
  * panel landed on is on the host as `:state(placed-top)` and its kin, its
@@ -162,6 +164,14 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
    */
   @property({ attribute: 'cross-offset', type: Number })
   crossOffset = 0
+
+  /**
+   * Whether the panel moves to the other side of the trigger when its own
+   * side has no room. On by default. Write `flip="false"` to keep it on its
+   * side, where it shrinks to fit, as React Aria's `shouldFlip` turns off.
+   */
+  @property({ converter: onUnlessFalse })
+  flip = true
 
   /**
    * Draws a point on the panel's edge facing the trigger.
@@ -244,6 +254,7 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
        close it on `pointerdown` and reopen it on the `click` that follows. */
     boundary: (): (HTMLElement | undefined)[] => [this, this.invoker],
     crossOffset: () => this.crossOffset,
+    flip: () => this.flip,
     /* Measured to the point where there is one, as `Tooltip` measures it: the
        arrow is a square turned on its center, which reaches `n / sqrt(2)` past
        the edge it sits on. */
