@@ -267,6 +267,18 @@ describe('tooltip for', () => {
     expect(tip.internals?.ariaLabel ?? null).toBe('Regenerates the manifests')
   })
 
+  /* Named and described by its words, the host was a generic of its own
+     beside the trigger in Chromium's tree, a second copy of the description.
+     `none` takes the box out and leaves the name the trigger's reference
+     reads, which Chromium still resolves. */
+  test('the host is no box of its own in the accessibility tree, in both forms', async () => {
+    const tip = await tooltip()
+    await tip.updateComplete
+    expect(tip.internals?.role).toBe('none')
+    const { tip: beside } = await pair()
+    expect(beside.internals?.role).toBe('none')
+  })
+
   test('an id that names nothing resolves to no trigger', async () => {
     const { tip } = await pair('id="tip" for="absent" content="Nothing"')
     expect((tip as unknown as { named: HTMLElement | null }).named).toBeNull()
