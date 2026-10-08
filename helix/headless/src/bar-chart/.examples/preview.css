@@ -60,8 +60,18 @@ helix-headless-bar-chart::part(svg) {
 }
 
 helix-headless-bar-chart::part(bar) {
-  clip-path: inset(0 round 2px 2px 0 0);
+  clip-path: inset(0);
   fill: var(--chart-series, var(--chart-series-1));
+}
+
+/* Rounded at the far end only, the end away from zero, so a stack meets square
+   at its joins and a bar below zero meets the baseline square. */
+helix-headless-bar-chart::part(bar-end) {
+  clip-path: inset(0 round 2px 2px 0 0);
+}
+
+helix-headless-bar-chart::part(bar-end-negative) {
+  clip-path: inset(0 round 0 0 2px 2px);
 }
 
 helix-headless-bar-chart::part(baseline) {

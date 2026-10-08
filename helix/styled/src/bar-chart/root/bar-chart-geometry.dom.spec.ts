@@ -60,6 +60,54 @@ if (hasLayout()) {
   })
 
   /**
+   * Which corners of a column are round, from the clip that takes them off:
+   * the four corners from the top left, clockwise, `r` round and `-` square.
+   *
+   * **The far end only.** A negative column hung below zero with its round
+   * corners on the baseline, because the rule rounded the top whatever the
+   * sign.
+   */
+  describe('bar chart corners', () => {
+    const SIGNS = `<table id="signs">
+      <thead><tr><th>Quarter</th><th>Net</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Q1</th><td data-value="3">3</td></tr>
+        <tr><th scope="row">Q2</th><td data-value="-4">-4</td></tr>
+      </tbody>
+    </table>`
+    const corners = (one: Element): string => {
+      const round = /round (.+)\)$/.exec(getComputedStyle(one).clipPath)?.[1] ?? '0px'
+      const radii = round.split(' / ')[0]?.trim().split(/\s+/) ?? []
+      const [a = '0px', b = a, c = a, d = b] = radii
+      return [a, b, c, d].map((radius) => (Number.parseFloat(radius) > 0 ? 'r' : '-')).join('')
+    }
+    const columns = async (attributes: string): Promise<string[]> => {
+      const host = await chart(SIGNS, `for="signs" ${attributes}`)
+      return [...(host.shadowRoot?.querySelectorAll('[part~="bar"]') ?? [])].map(corners)
+    }
+
+    test('a column above zero rounds its top, and one below rounds its bottom', async () => {
+      expect(await columns('')).toEqual(['rr--', '--rr'])
+    })
+
+    test('a bar right of zero rounds its right, and one left of it rounds its left', async () => {
+      expect(await columns('orientation="horizontal"')).toEqual(['-rr-', 'r--r'])
+    })
+
+    test('the end of a stack below zero rounds its bottom, and the joins are square', async () => {
+      const host = await chart(
+        `<table id="stack">
+          <thead><tr><th>Quarter</th><th>A</th><th>B</th><th>C</th></tr></thead>
+          <tbody><tr><th scope="row">Q1</th><td>3</td><td>-2</td><td>-1</td></tr></tbody>
+        </table>`,
+        'for="stack" stacked',
+      )
+      const drawn = [...(host.shadowRoot?.querySelectorAll('[part~="bar"]') ?? [])].map(corners)
+      expect(drawn).toEqual(['rr--', '----', '--rr'])
+    })
+  })
+
+  /**
    * Which end the first category is drawn at, and whether everything read
    * against the drawing agrees.
    *
@@ -79,7 +127,7 @@ if (hasLayout()) {
       test(`the first category is at the inline start, under its own name, ${dir}`, async () => {
         document.documentElement.dir = dir
         const host = await chart(REVENUE, 'for="revenue"')
-        const bars = [...(host.shadowRoot?.querySelectorAll('[part="bar"]') ?? [])]
+        const bars = [...(host.shadowRoot?.querySelectorAll('[part~="bar"]') ?? [])]
         await Promise.all(bars.map((one) => settled(one)))
         const [first, , last] = bars.map((one) => center(one.getBoundingClientRect()))
         const names = [...(host.shadowRoot?.querySelectorAll('[part="label"]') ?? [])]
@@ -103,7 +151,7 @@ if (hasLayout()) {
     test('a pointer over the column named Q1 is asking about Q1, rtl', async () => {
       document.documentElement.dir = 'rtl'
       const host = await chart(REVENUE, 'for="revenue"')
-      const bars = [...(host.shadowRoot?.querySelectorAll('[part="bar"]') ?? [])]
+      const bars = [...(host.shadowRoot?.querySelectorAll('[part~="bar"]') ?? [])]
       await Promise.all(bars.map((one) => settled(one)))
       const name = (part(host, 'label') as HTMLElement).getBoundingClientRect()
       const plot = (part(host, 'plot') as HTMLElement).getBoundingClientRect()

@@ -346,7 +346,7 @@ describe('toggling a series', () => {
     await bars.updateComplete
     expect(part(ring, 'summary')?.textContent).toBe('Accounts by plan: Free 96%, Enterprise 4%.')
     expect(
-      [...(bars.shadowRoot?.querySelectorAll('[part="bar"]') ?? [])].map((one) =>
+      [...(bars.shadowRoot?.querySelectorAll('[part~="bar"]') ?? [])].map((one) =>
         one.getAttribute('data-series'),
       ),
     ).toEqual(['2', '2'])

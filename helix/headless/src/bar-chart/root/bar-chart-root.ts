@@ -101,7 +101,8 @@ import '../../tooltip/index.js'
  * @csspart axis - The numbers of one scale: the primary under `value-axis`, and both when `secondary` splits the chart into two scales.
  * @csspart band - The category band under the pointer.
  * @csspart bar - One column. Under `stacked`, one segment of a category's column.
- * @csspart bar-end - Under `stacked`, the segment at a column's far end: the last positive segment above zero and the last negative one below it. Its `data-end` is `positive` or `negative`. A blank or a zero segment is never the end. Set together with `bar`.
+ * @csspart bar-end - The bar at a column's far end, the end away from zero, which is the end to round. A column standing alone is its own far end. Under `stacked`, the last positive segment above zero and the last negative one below it. Its `data-end` is `positive` or `negative`. A blank or a zero is never the end. Set together with `bar`.
+ * @csspart bar-end-negative - A far end below zero, whose far end is its bottom, or its inline start when the bars run across. Set together with `bar-end`.
  * @csspart bar-wash-end - The far stop of a bar's gradient, where one is used.
  * @csspart bar-wash-start - The stop of a bar's gradient at its base.
  * @csspart baseline - The line the columns stand on.
@@ -572,7 +573,7 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
             data-series=${seriesIndex(tone)}
             height=${thickness}
             style="--chart-series: var(--chart-series-${seriesIndex(tone)}); --chart-bar-wash: url(#helix-bar-wash-${seriesIndex(tone)})"
-            part="bar${end ? ' bar-end' : ''}"
+            part="bar${end ? ' bar-end' : ''}${end === 'negative' ? ' bar-end-negative' : ''}"
             width=${size}
             x=${along}
             y=${across}
@@ -582,7 +583,7 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
             data-series=${seriesIndex(tone)}
             height=${size}
             style="--chart-series: var(--chart-series-${seriesIndex(tone)}); --chart-bar-wash: url(#helix-bar-wash-${seriesIndex(tone)})"
-            part="bar${end ? ' bar-end' : ''}"
+            part="bar${end ? ' bar-end' : ''}${end === 'negative' ? ' bar-end-negative' : ''}"
             width=${thickness}
             x=${across}
             y=${along}
@@ -654,11 +655,21 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
                   ? this.renderStack(columns, index, against, bar)
                   : columns.map(({ slots, one, tone }, depth) => {
                       const point = slots[index]
-                      /* A blank cell is no column at all, which is what a blank says.
-                   A column of no height would claim a zero. */
+                      /* A blank cell is no column at all, which is what a
+                         blank says. A column of no height would claim a zero.
+                         A column alone is a stack of one, so it is its own
+                         far end, above zero or below it. */
                       return point === undefined
                         ? nothing
-                        : bar(point.value, index, depth, tone, against(one))
+                        : bar(
+                            point.value,
+                            index,
+                            depth,
+                            tone,
+                            against(one),
+                            undefined,
+                            stackFarEnds([point.value])[0],
+                          )
                     })
               }
             </g>`,
