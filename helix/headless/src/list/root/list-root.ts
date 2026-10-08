@@ -11,6 +11,7 @@ import {
   HelixLoadMoreEvent,
   hostAria,
   inlineStep,
+  inRowOrder,
   KeyboardNavigationController,
   type NavigableItem,
   placeKey,
@@ -333,7 +334,8 @@ export class HelixHeadlessList extends HelixElement {
   /**
    * The selected rows' values, separated by commas with no spaces, such as `a,c`, in a list that selects.
    *
-   * Set it to start with rows selected. A row's value is its `value`, or its
+   * A press or a key writes it in row order, as Data Table does, whatever
+   * order the rows were chosen in. Set it to start with rows selected. A row's value is its `value`, or its
    * words where it has none.
    */
   @property()
@@ -578,12 +580,20 @@ export class HelixHeadlessList extends HelixElement {
   /**
    * Selects what a press or a key leaves, asking first. `helix-before-change`
    * carries the `value` it would leave, and `change` follows once it has moved.
+   *
+   * In row order, as Data Table and Table write theirs, whatever order the
+   * rows were chosen in: a press on the fourth row and then the first is
+   * `a,d`.
    */
   private choose(next: string | null): void {
     if (next === null) {
       return
     }
-    requestValue(this, next, (value) => {
+    const ordered = inRowOrder(
+      commaList(next),
+      this.rows.map((row) => this.valueFor(row)),
+    ).join(',')
+    requestValue(this, ordered, (value) => {
       this.value = value
     })
   }
