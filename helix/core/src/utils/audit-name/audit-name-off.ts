@@ -1,4 +1,8 @@
-import type { auditName as audit } from './audit-name.js'
+import type {
+  auditName as audit,
+  auditField as field,
+  auditIconControl as iconControl,
+} from './audit-name.js'
 
 /**
  * The missing-name warning in a production build: nothing.
@@ -9,3 +13,9 @@ import type { auditName as audit } from './audit-name.js'
  * builds. See `audit-name.ts`.
  */
 export const auditName: typeof audit = () => {}
+
+/** The field's missing-name warning in a production build: nothing. */
+export const auditField: typeof field = () => {}
+
+/** The warning about a control named by a decorative icon, in a production build: nothing. */
+export const auditIconControl: typeof iconControl = () => {}

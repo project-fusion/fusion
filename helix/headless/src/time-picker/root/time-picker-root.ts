@@ -1130,7 +1130,7 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
     auditName(
       this,
       () => null,
-      'Give it a `label`, a label in the `label` slot, or an `aria-label` that says what the time is for.',
+      'time-picker',
       () => this.listName !== '',
     )
     const list = this.partNamed('list')

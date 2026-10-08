@@ -423,7 +423,7 @@ export class HelixHeadlessMenuItem extends HelixElement {
         /* A row whose page closed before the read draws nothing, and is read
            when its page next shows. */
         () => this.partNamed('item') ?? undefined,
-        'Give the row words in its default slot, or a label on the icon it holds.',
+        'row',
       )
     }
   }

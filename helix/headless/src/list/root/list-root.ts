@@ -826,7 +826,7 @@ export class HelixHeadlessList extends HelixElement {
       auditName(
         this,
         () => null,
-        'Give it a `label`, or an `aria-label` that says what the rows are.',
+        'list',
         () => this.label !== '',
       )
     }

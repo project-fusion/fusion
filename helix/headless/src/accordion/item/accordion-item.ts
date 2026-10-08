@@ -255,7 +255,7 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
     auditName(
       this,
       () => this.renderRoot.querySelector<HTMLElement>(`#${TRIGGER_ID}`),
-      'Write its title in the `summary` slot.',
+      'accordion-item',
     )
   }
 

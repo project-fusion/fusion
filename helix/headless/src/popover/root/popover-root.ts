@@ -602,7 +602,7 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
       auditName(
         this,
         () => null,
-        'Give it a `label`, or a heading in the panel.',
+        'popover',
         () => this.label !== '' || this.namedByHeading || headingIn(this.slotted) != null,
       )
     }

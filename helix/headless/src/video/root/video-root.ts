@@ -1515,7 +1515,7 @@ export class HelixHeadlessVideo extends HelixElement {
     auditName(
       this,
       () => null,
-      'Give it a `label` that says what the video shows, such as "Product tour".',
+      'video',
       () => this.label !== '',
     )
     const video = this.video

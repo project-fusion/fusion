@@ -1,5 +1,5 @@
 import {
-  auditName,
+  auditIconControl,
   customElement,
   HelixElement,
   hostAria,
@@ -253,7 +253,7 @@ export class HelixHeadlessIcon extends HelixElement {
     super.updated(changed)
     if (this.drawn !== undefined) {
       this.mutate()
-      this.auditControl()
+      auditIconControl(this, this.label)
     }
     const asked = this.asked
     if (this.arrived === asked && this.drawn !== undefined) {
@@ -276,32 +276,6 @@ export class HelixHeadlessIcon extends HelixElement {
     const mutator = this.icon === undefined && this.src === '' ? iconMutator(this.name) : undefined
     if (svg && mutator) {
       mutator(svg)
-    }
-  }
-
-  /**
-   * Asks the button or link a decorative icon sits in whether it has a name.
-   * Its content is this icon alone where it has none, and the audit says so
-   * once, in a development build only. A Helix button reports its own name.
-   */
-  private auditControl(): void {
-    if (this.label !== '' || this.hasAttribute('aria-label')) {
-      return
-    }
-    const control = this.closest<HTMLElement>(
-      'a[href], button, summary, [role="button"], [role="link"]',
-    )
-    if (control) {
-      /* Words or a named picture beside the icon name the control from its
-         content, which the audit reads for a button and not for a link. */
-      auditName(
-        control,
-        () => null,
-        `Its only content is <${this.localName}>, which is decorative: give the icon a \`label\`, or the control an \`aria-label\`.`,
-        () =>
-          (control.textContent ?? '').trim() !== '' ||
-          control.querySelector('[alt]:not([alt=""]), [aria-label]:not([aria-label=""])') !== null,
-      )
     }
   }
 
