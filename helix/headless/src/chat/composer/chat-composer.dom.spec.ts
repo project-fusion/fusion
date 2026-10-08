@@ -412,6 +412,36 @@ describe('constraints', () => {
     expect(hasState(element, 'invalid')).toBe(true)
   })
 
+  /* Every field takes `feedback`, and the composer took only
+     `setCustomValidity`, which a template cannot write. */
+  test('feedback marks the composer at once, says why, and stops the send', async () => {
+    const element = (await composer('feedback="That model is busy."')) as Checked & {
+      feedback: string
+    }
+    await element.updateComplete
+    await element.updateComplete
+    const field = part(element, 'field') as HTMLTextAreaElement
+    const message = part(element, 'feedback') as HTMLElement
+    expect(message.textContent?.trim()).toBe('That model is busy.')
+    expect(message.getAttribute('role')).toBe('alert')
+    expect(field.getAttribute('aria-describedby')).toBe('feedback')
+    expect(hasState(element, 'invalid')).toBe(true)
+    expect(element.validity.customError).toBe(true)
+    let sent = 0
+    element.addEventListener('helix-send', () => {
+      sent += 1
+    })
+    await type(element, 'hello')
+    expect(element.send()).toBe(false)
+    expect(sent).toBe(0)
+    element.feedback = ''
+    await element.updateComplete
+    await element.updateComplete
+    expect(part(element, 'feedback')).toBeNull()
+    expect(hasState(element, 'invalid')).toBe(false)
+    expect(element.send()).toBe(true)
+  })
+
   test('a reset takes the mark away', async () => {
     const element = (await composer('required')) as Checked
     element.dispatchEvent(new Event('invalid'))
