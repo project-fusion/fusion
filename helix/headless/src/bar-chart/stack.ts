@@ -35,6 +35,21 @@ export const stackSpans = (values: readonly (number | undefined)[]): (Span | und
   })
 }
 
+/** Which way a stack's end segment grows from zero. */
+export type StackEnd = 'positive' | 'negative'
+
+/**
+ * The segments at a stack's two far ends, in the order given: the last
+ * positive reading is the end of the stack above zero, and the last negative
+ * reading is the end of the stack below it. A blank or a zero has no length,
+ * so it is never an end. Every other segment is `undefined`.
+ */
+export const stackFarEnds = (values: readonly (number | undefined)[]): (StackEnd | undefined)[] => {
+  const up = values.findLastIndex((value) => value !== undefined && value > 0)
+  const down = values.findLastIndex((value) => value !== undefined && value < 0)
+  return values.map((_, at) => (at === up ? 'positive' : at === down ? 'negative' : undefined))
+}
+
 /**
  * Every end a stack reaches across the categories, which is what its scale
  * has to hold: the top of each stack of positives and the foot of each stack

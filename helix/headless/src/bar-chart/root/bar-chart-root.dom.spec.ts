@@ -28,7 +28,7 @@ const chart = async (table: string, attributes: string): Promise<HTMLElement> =>
 }
 
 const bars = (host: HTMLElement): Element[] => [
-  ...(host.shadowRoot?.querySelectorAll('[part="bar"]') ?? []),
+  ...(host.shadowRoot?.querySelectorAll('[part~="bar"]') ?? []),
 ]
 
 const labels = (host: HTMLElement): string[] =>
@@ -356,6 +356,83 @@ describe('stacked', () => {
     const [q1New = [], q1Renewed = []] = bars(host).map(box)
     expect(q1New[0]).not.toBe(q1Renewed[0])
     expect(near(q1Renewed[3] ?? 0, 100 / 6)).toBe(true)
+  })
+  /* Every segment was rounded at its far end, so the stack showed a notch at
+     each join. */
+  describe('marks the segment at each far end, which the stylesheet rounds', () => {
+    /* Each category's segments in series order: an end's `data-end`, and `-`
+       for a segment that is not an end. The part and the attribute must agree. */
+    const ends = (host: HTMLElement): string[][] =>
+      [...(host.shadowRoot?.querySelectorAll('[part~="group"]') ?? [])].map((group) =>
+        [...group.querySelectorAll('[part~="bar"]')].map((one) => {
+          const end = one.getAttribute('data-end') ?? '-'
+          const marked = one.getAttribute('part') === 'bar bar-end'
+          return marked === (end !== '-') ? end : `mismatch ${end}`
+        }),
+      )
+    const table = (rows: string): string => `<table id="signs">
+      <thead><tr><th>Quarter</th><th>A</th><th>B</th><th>C</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`
+
+    test('the top segment of a positive stack', async () => {
+      const host = await chart(
+        table('<tr><th>Q1</th><td>3</td><td>4</td><td>2</td></tr>'),
+        'for="signs" stacked',
+      )
+      expect(ends(host)).toEqual([['-', '-', 'positive']])
+    })
+
+    test('the bottom segment of a negative stack', async () => {
+      const host = await chart(
+        table('<tr><th>Q1</th><td>-3</td><td>-4</td><td>-2</td></tr>'),
+        'for="signs" stacked',
+      )
+      expect(ends(host)).toEqual([['-', '-', 'negative']])
+    })
+
+    test('one segment in each direction when the stack grows both ways', async () => {
+      const host = await chart(
+        table(
+          '<tr><th>Q1</th><td>3</td><td>-2</td><td>-1</td></tr><tr><th>Q2</th><td>-1</td><td>2</td><td>5</td></tr>',
+        ),
+        'for="signs" stacked',
+      )
+      expect(ends(host)).toEqual([
+        ['positive', '-', 'negative'],
+        ['negative', '-', 'positive'],
+      ])
+    })
+
+    test('the last segment with length, past a blank or a zero', async () => {
+      const host = await chart(
+        table(
+          '<tr><th>Q1</th><td>3</td><td>4</td><td>0</td></tr><tr><th>Q2</th><td>3</td><td>4</td><td></td></tr>',
+        ),
+        'for="signs" stacked',
+      )
+      /* The zero is drawn with no length and the blank is not drawn at all. */
+      expect(ends(host)).toEqual([
+        ['-', 'positive', '-'],
+        ['-', 'positive'],
+      ])
+    })
+
+    test('along the measure when the bars run across', async () => {
+      const host = await chart(
+        table('<tr><th>Q1</th><td>3</td><td>-4</td><td>2</td></tr>'),
+        'for="signs" stacked orientation="horizontal"',
+      )
+      expect(ends(host)).toEqual([['-', 'negative', 'positive']])
+    })
+
+    test('none when the columns stand side by side', async () => {
+      const host = await chart(
+        table('<tr><th>Q1</th><td>3</td><td>-4</td><td>2</td></tr>'),
+        'for="signs"',
+      )
+      expect(ends(host)).toEqual([['-', '-', '-']])
+    })
   })
 })
 
