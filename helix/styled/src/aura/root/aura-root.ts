@@ -93,6 +93,8 @@ const OPENING_PATIENCE = 500
  * The shader stops drawing in these cases:
  * - The element is off screen or in a background tab.
  * - `prefers-reduced-motion` is set. The element shows one still frame.
+ * - `paused` is set, from a pause control on your page. The element holds the
+ *   frame it shows.
  * - The browser takes back the drawing context, on a GPU reset or past its
  *   limit of about sixteen contexts. The gradient shows until the context
  *   returns.
@@ -199,6 +201,17 @@ export class HelixAura extends HelixElement {
    */
   @property({ reflect: true, type: Boolean })
   interactive = false
+
+  /**
+   * Whether the field holds still on the frame it shows.
+   *
+   * Set it from a pause control on your page, so a reader can stop the motion,
+   * as WCAG 2.2.2 asks of anything that moves for more than five seconds. A
+   * change to another property still repaints the frame. Clearing it starts
+   * the field from where it stopped.
+   */
+  @property({ type: Boolean })
+  paused = false
 
   /**
    * How far the pointer reaches into the field, `0` upward.
@@ -407,7 +420,8 @@ export class HelixAura extends HelixElement {
    * each have their own note about.
    */
   private readonly gate = new PaintGateController(this, {
-    canRun: () => !!this.gl && !this.gl.isContextLost() && this.width > 0 && this.opened,
+    canRun: () =>
+      !this.paused && !!this.gl && !this.gl.isContextLost() && this.width > 0 && this.opened,
     onFrame: (delta) => {
       this.advance(delta)
     },
@@ -678,7 +692,15 @@ export class HelixAura extends HelixElement {
     }
   }
 
-  protected override updated(): void {
+  protected override updated(changed: PropertyValues): void {
+    /* Paused stops the loop where it is, and the canvas keeps that frame. */
+    if (changed.has('paused')) {
+      if (this.paused) {
+        this.gate.stop()
+      } else {
+        this.gate.play()
+      }
+    }
     /* A property change has to reach the screen even when the loop is stopped,
        which is every reader who asked for no motion. The canvas holds its last
        frame and no re-render repaints it. */
