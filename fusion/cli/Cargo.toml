@@ -34,5 +34,12 @@ serde_json = { workspace = true, features = ["preserve_order"] }
 # toolchain does: the end-to-end test takes the path an author takes.
 wit-component = "0.260"
 
+# **On in every build here, and off in the binaries `binaries.yml` publishes**,
+# which build with `--no-default-features`. It holds `fusion x`, this repository's own checks:
+# this repository's tooling, which serves nobody who installs the command.
+[features]
+default = ["internal"]
+internal = []
+
 [lints]
 workspace = true

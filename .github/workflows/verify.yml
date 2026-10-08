@@ -655,7 +655,7 @@ jobs:
       - name: Prose
         run: bun run check:prose
       - name: Spec rules
-        run: bun run fusion spec check
+        run: bun run fusion x spec check
 
   # Every example rendered, pictured and measured, in a browser, because
   # `verify` deliberately does not have one: everything in `verify` runs

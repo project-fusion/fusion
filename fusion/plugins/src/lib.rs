@@ -4,7 +4,7 @@
 //! a string and what it hands back is a string, so this crate knows what a
 //! module is, what version of the world it speaks and what a finding looks like,
 //! and never what a component or a workspace is. `helix component check` is the
-//! first verb to take plugins and `fusion prose check` is the same shape over
+//! first verb to take plugins and `fusion x prose check` is the same shape over
 //! different input: a type here that named a manifest would have to be widened
 //! or copied on the day the second one arrives.
 //!

@@ -1,4 +1,4 @@
-//! A rule from outside, run by `fusion prose` as one of its own.
+//! A rule from outside, run by `fusion x prose` as one of its own.
 //!
 //! **The second noun to take plugins**, which is what the host was shaped for:
 //! the same modules, the same world and the same register, over a payload this
@@ -101,7 +101,7 @@ impl Drop for Tree {
 #[test]
 fn a_plugin_rule_runs_under_prose() {
     let tree = Tree::new("prose", "Some prose, and no heading above it.\n", "prose");
-    let output = run(&tree.0, &["prose", "check", "--only", "titled"]);
+    let output = run(&tree.0, &["x", "prose", "check", "--only", "titled"]);
     assert!(
         out(&output).contains("plugin example sha256:"),
         "the register: {}",
@@ -119,7 +119,7 @@ fn a_plugin_rule_runs_under_prose() {
 #[test]
 fn a_plugin_rule_that_finds_nothing_leaves_prose_clean() {
     let tree = Tree::new("titled", "# A guide\n\nAnd its prose.\n", "prose");
-    let output = run(&tree.0, &["prose", "check", "--only", "titled"]);
+    let output = run(&tree.0, &["x", "prose", "check", "--only", "titled"]);
     assert_eq!(
         output.status.code(),
         Some(0),
@@ -133,7 +133,10 @@ fn a_plugin_rule_that_finds_nothing_leaves_prose_clean() {
 #[test]
 fn the_register_is_in_the_json_prose_prints() {
     let tree = Tree::new("json", "# A guide\n", "prose");
-    let output = run(&tree.0, &["prose", "check", "--json", "--only", "titled"]);
+    let output = run(
+        &tree.0,
+        &["x", "prose", "check", "--json", "--only", "titled"],
+    );
     let said: serde_json::Value = serde_json::from_str(&out(&output)).expect("parseable JSON");
     assert_eq!(said["plugins"][0]["name"], "example");
     assert_eq!(said["rules"][0]["name"], "titled");
@@ -143,16 +146,16 @@ fn the_register_is_in_the_json_prose_prints() {
 /// A module with nothing for this noun is refused where it was found.
 ///
 /// **The thing only a second noun can test.** The example's rules read
-/// documents, stylesheets and manifests, and `fusion spec` composes specs: every
+/// documents, stylesheets and manifests, and `fusion x spec` composes specs: every
 /// rule it has would be skipped, and a plugin loaded to do nothing is a wrong
 /// directory rather than a clean run.
 #[test]
 fn a_module_with_nothing_for_this_noun_is_refused() {
     let tree = Tree::new("misplaced", "# A guide\n", "spec");
-    let output = run(&tree.0, &["spec", "check"]);
+    let output = run(&tree.0, &["x", "spec", "check"]);
     assert_eq!(output.status.code(), Some(3), "an input fault");
     assert!(
-        err(&output).contains("provides no rule `fusion spec` can run"),
+        err(&output).contains("provides no rule `fusion x spec` can run"),
         "says so: {}",
         err(&output)
     );
@@ -172,7 +175,7 @@ fn a_module_with_nothing_for_this_noun_is_refused() {
 #[test]
 fn a_rule_for_another_noun_is_named_rather_than_dropped() {
     let tree = Tree::new("skipped", "# A guide\n", "prose");
-    let output = run(&tree.0, &["prose", "check", "--only", "titled"]);
+    let output = run(&tree.0, &["x", "prose", "check", "--only", "titled"]);
     assert!(
         out(&output).contains("plugin example: unfinished is another noun's"),
         "names what it left alone: {}",
@@ -196,7 +199,7 @@ fn a_workspace_with_no_plugins_prints_no_register() {
     std::fs::write(at.join("fusion.json"), "{}").expect("the settings");
     std::fs::write(at.join("guide.md"), "# A guide\n").expect("a document");
 
-    let output = run(&at, &["prose", "check", "--only", "dashes"]);
+    let output = run(&at, &["x", "prose", "check", "--only", "dashes"]);
     assert!(
         !out(&output).contains("plugin "),
         "nothing to register: {}",

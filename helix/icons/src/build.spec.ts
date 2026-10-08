@@ -50,7 +50,7 @@ describe('a set of somebody else\u2019s drawings', () => {
     /* The type comes from the package a consumer installed, rather than from a
        relative path that only resolves inside this repository. Matched rather
        than compared, because a spec holding its own package's specifier as a
-       string reads to `fusion spec`'s `hazards` exactly like one importing it. */
+       string reads to `fusion x spec`'s `hazards` exactly like one importing it. */
     expect(module).toMatch(/import type \{ HelixIcon \} from '[^']*helix-icons'/)
   })
 

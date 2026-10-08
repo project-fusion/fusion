@@ -50,7 +50,7 @@ const walk = (dir) =>
 
    Resolved from this file rather than taken as arguments, the way the two
    generators beside it already do. A path in a `package.json` script is a path
-   out of that package, which `fusion workspace`'s `reaching` rule reads and is
+   out of that package, which `fusion x workspace`'s `reaching` rule reads and is
    right to; and the answer here is not a caller's to give, there being exactly
    one element package and one style package. */
 const source = join(root, 'helix/styled')

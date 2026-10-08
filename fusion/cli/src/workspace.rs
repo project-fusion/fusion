@@ -14,12 +14,14 @@
 //! **The walkers are `fusion-rules`'s.** Which directories hold build output
 //! is not a fact about a workspace, and `helix component` skips the same list.
 
+#[cfg(feature = "internal")]
 use std::collections::BTreeMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 
 use serde_json::Value;
 
+#[cfg(feature = "internal")]
 /// One package manifest, with the path it was read from.
 pub struct Manifest {
     /// Relative to the root, and empty for the root itself.
@@ -29,6 +31,7 @@ pub struct Manifest {
     pub value: Value,
 }
 
+#[cfg(feature = "internal")]
 impl Manifest {
     /// The manifest's `scripts`, or an empty map when it declares none.
     pub fn scripts(&self) -> BTreeMap<&str, &str> {
@@ -83,6 +86,7 @@ pub fn find_root(from: &Path) -> Option<PathBuf> {
     }
 }
 
+#[cfg(feature = "internal")]
 /// Every workspace directory, with `dir/*` globs expanded.
 fn directories(root: &Path) -> Vec<PathBuf> {
     let Ok(raw) = fs::read_to_string(root.join("package.json")) else {
@@ -121,6 +125,7 @@ fn directories(root: &Path) -> Vec<PathBuf> {
     found
 }
 
+#[cfg(feature = "internal")]
 /// Every manifest in the workspace, the root's included.
 ///
 /// **The root is here and is not a workspace member**, which is the distinction

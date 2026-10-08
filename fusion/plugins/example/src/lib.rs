@@ -90,7 +90,7 @@ impl Guest for Plugin {
             },
             /* A rule for another noun, from the same module, which is what the
                mechanism allows and the directory decides: this one is only ever
-               loaded by `fusion prose`, whose payload has documents in it. */
+               loaded by `fusion x prose`, whose payload has documents in it. */
             Rule {
                 name: "titled".to_owned(),
                 summary: "a document opens with a heading rather than with prose".to_owned(),

@@ -1,19 +1,35 @@
 # fusion-cli
 
-Rules a workspace can be held to. Ships as the `fusion` binary.
+The Fusion command line. Ships as the `fusion` binary.
 
 ```sh
-fusion workspace audit     # every rule and what it found
-fusion workspace check     # the CI shape: nothing printed on success
-fusion workspace fix       # the rules that can write
+fusion helix theme audit    # the Helix command line, routed
+fusion proof test           # the Fusion Proof command line, routed
+fusion x workspace check    # this repository's own checks
 ```
 
-| Verb | What it holds | Rules |
+| Route | What it does |
+|---|---|
+| `helix` | Runs the `helix` binary with the rest of the line and returns its exit code |
+| `proof` | Runs the `proof` binary the same way |
+| `x` | Runs the checks this repository holds itself to. Only in this repository's builds |
+
+Each product's command line works on its own, and `fusion` routes to it rather
+than reimplementing it.
+
+## `fusion x`, this repository's checks
+
+The `internal` feature holds them. It is on by default, so every build in this
+repository has `x`, and `binaries.yml` builds with `--no-default-features`, so a
+published binary does not. `helix component` sits behind the same feature in the
+`helix` binary. `x` is the name the Rust compiler's own repository gives its
+internal tooling.
+
+| Noun | What it holds | Rules |
 |---|---|---|
 | `workspace` | What a workspace says about itself | `barrels` `help` `icons` `modules` `node` `order` `prerequisites` `publishable` `reaching` `react-bridge` `registration` `scoped` `scripts` `shaders` `shipped` `strays` `warnings` |
 | `prose` | The prose against what it describes | `art` `dashes` `dialect` `documented` `links` `orphans` `references` `repository` `tag-order` `voice` |
 | `spec` | The specs against being specs | `hazards` `isolated` `matchers` `runners` |
-| `helix` | Runs the Helix command line, which owns its own nouns | |
 
 `--only <rule>` runs one. Every group also carries `floors`, which is the rule
 about the rules.

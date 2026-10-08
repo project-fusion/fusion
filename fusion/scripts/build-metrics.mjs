@@ -149,7 +149,7 @@ const lastInSection = () => {
  * `@fusion.dev/helix-headless` is deliberately not in here. It is a tier rather than a
  * runtime: a page with one styled component has some of it and never all of
  * it, so a floor containing it would credit every family with code no page
- * loads. the `barrels` rule in `fusion workspace` is what keeps that true.
+ * loads. the `barrels` rule in `fusion x workspace` is what keeps that true.
  *
  * **`export *`, not a bare import, and the difference is the whole floor.**
  * `@fusion.dev/helix-core` is `sideEffects: false`, so `import '@fusion.dev/helix-core'` for
@@ -896,7 +896,7 @@ const lines = [
   '',
   `Across the ${styled.rows.length} styled components, the smallest is \`${cheapest.family}\` at ${grouped(cheapest.alone.gzip)} bytes gzipped alone, and the largest is \`${dearest.family}\` at ${grouped(dearest.alone.gzip)}. Every family together is ${grouped(wholeStyled.gzip)}.`,
   '',
-  `No family imports a barrel. The \`barrels\` rule in \`fusion workspace\` enforces that. \`@fusion.dev/helix-headless\` marks every module in \`dist\` as having side effects, which is true of a file that calls \`customElements.define\`. A bundler can remove none of it. One \`import { HelixHeadlessButton } from '@fusion.dev/helix-headless'\` costs ${grouped(wholeHeadless.gzip)} bytes gzipped, whatever else the page imports. That is ${barrelMultiple} times the median family above. ${barrelled.size === 0 ? `All ${styled.rows.length} styled families import the headless family they extend directly.` : `${barrelled.size} families still import the barrel.`} The rule checks the shape of the import, so it applies to any package that sets \`sideEffects\`, whatever its name.`,
+  `No family imports a barrel. The \`barrels\` rule in \`fusion x workspace\` enforces that. \`@fusion.dev/helix-headless\` marks every module in \`dist\` as having side effects, which is true of a file that calls \`customElements.define\`. A bundler can remove none of it. One \`import { HelixHeadlessButton } from '@fusion.dev/helix-headless'\` costs ${grouped(wholeHeadless.gzip)} bytes gzipped, whatever else the page imports. That is ${barrelMultiple} times the median family above. ${barrelled.size === 0 ? `All ${styled.rows.length} styled families import the headless family they extend directly.` : `${barrelled.size} families still import the barrel.`} The rule checks the shape of the import, so it applies to any package that sets \`sideEffects\`, whatever its name.`,
   '',
   `The headless tier never had the problem, so it serves as the control. \`@fusion.dev/helix-core\` is \`sideEffects: false\`, and the median headless family is ${grouped(median(headlessGzip))} bytes gzipped alone.`,
   '',

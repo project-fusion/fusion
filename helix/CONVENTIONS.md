@@ -1465,7 +1465,7 @@ looks. `Video` declares 48 parts and had its `captions-menu-*` family in three
 separate runs with the whole `overflow-*` set between them. No line of it was
 wrong, and no reader who did not already know the answer could have found one.
 
-`bun run fix:tag-order` rewrites, `fusion prose`'s `tag-order` judges, and `verify` runs it.
+`bun run fix:tag-order` rewrites, `fusion x prose`'s `tag-order` judges, and `verify` runs it.
 Only blocks carrying `@summary` are touched: a member's JSDoc uses `@internal`,
 `@param` and `@reference`, whose order is the order of the thing they describe.
 

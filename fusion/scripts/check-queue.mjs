@@ -37,7 +37,7 @@ const problems = []
  *
  * The scopes were swept out of this file on 31 Aug and writing that check found
  * a larger drift underneath: 219 of the `check:*` names here resolved to no
- * script, because the gates moved into `helix component` and `fusion prose` and
+ * script, because the gates moved into `helix component` and `fusion x prose` and
  * the rows kept citing the scripts they used to be. A name that runs nothing is
  * an instruction that cannot be followed, and it is the kind that reads as
  * current right up until somebody types it.

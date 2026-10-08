@@ -311,7 +311,7 @@ pub fn run(context: &Context) -> Report {
             };
             findings.push(Finding {
                 detail: "An unwritten convention is learned from the corpus, so prose in the \
-                         wrong dialect teaches the next person to write it. Run `fusion prose \
+                         wrong dialect teaches the next person to write it. Run `fusion x prose \
                          fix --only dialect`."
                     .to_owned(),
                 file: format!("{where_}:{}", number + 1),

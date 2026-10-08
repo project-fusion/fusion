@@ -29,8 +29,8 @@ one that does not return a broken result the model has no way to detect.
 ## Intelligent tooling
 
 Our tools check the work and report numbers. `helix component` audits the
-library rule by rule and returns a count for each rule. `fusion prose`, `fusion
-spec`, and `fusion workspace` do the same for the writing, the specs, and the
+library rule by rule and returns a count for each rule. `fusion x prose`, `fusion x
+spec`, and `fusion x workspace` do the same for the writing, the specs, and the
 packages. The MCP server is a subcommand of the same binary, and it talks over
 stdio to the client you choose.
 

@@ -235,7 +235,7 @@ Three conventions come up on the first change, and
   parentheses.
 - **American spelling** everywhere, comments and prose alike. It is checked
   rather than asked for, because an unwritten convention is learned from the
-  corpus. `bun run fix:dialect` rewrites; `fusion prose`'s `dialect` judges.
+  corpus. `bun run fix:dialect` rewrites; `fusion x prose`'s `dialect` judges.
 - **Alphabetize** object keys, interface members and exported types, except
   where order is semantic: positional arguments, middleware chains, CSS box-side
   shorthand, export conditions.

@@ -31,7 +31,7 @@ loaded by name and digest, and runs the rules the modules provide beside its
 own.
 
 What a noun composes is what its rules read. `helix component` has `manifests`
-and `sheets`; `fusion prose` has `documents`; `fusion spec` has `specs`. One
+and `sheets`; `fusion x prose` has `documents`; `fusion x spec` has `specs`. One
 module may provide rules for several nouns: each run takes the ones whose parts
 it composes, names the others in the register so a rule that is not running is
 visible, and refuses a module with nothing for it at all.

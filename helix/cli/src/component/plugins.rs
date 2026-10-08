@@ -1,8 +1,8 @@
 //! The rules somebody else wrote, as rules this command line runs.
 //!
 //! **The host knows what a module is and this knows what a component is.** What
-//! `fusion-plugins` passes a plugin is a string, because `fusion prose check`
-//! and `fusion spec check` are the same shape over different input and a host
+//! `fusion-plugins` passes a plugin is a string, because `fusion x prose check`
+//! and `fusion x spec check` are the same shape over different input and a host
 //! that named a manifest would have to be widened on the day the second one
 //! arrives. What is in that string is this file's business: the manifests and
 //! the stylesheet text, which is what the rules compiled in here read and so is
@@ -51,7 +51,7 @@ pub fn read(root: &Path, at: &str) -> Result<Host, Failure> {
 /// The parts of the payload this command line can compose, by the name a rule
 /// asks for them by.
 ///
-/// **Named rather than numbered, because a third one is coming.** `fusion prose
+/// **Named rather than numbered, because a third one is coming.** `fusion x prose
 /// check` composes different parts under the same mechanism, and a rule that
 /// asked for part 0 would be asking a different question of each verb.
 pub const PARTS: [&str; 2] = ["manifests", "sheets"];

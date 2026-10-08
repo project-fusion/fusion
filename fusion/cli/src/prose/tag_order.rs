@@ -315,7 +315,7 @@ pub fn run(context: &Context) -> Report {
                 findings.push(Finding {
                     detail: "The reference page is generated from this order, so an unsorted \
                              block is a published API table a reader scans and does not find a \
-                             part in. Run `fusion prose fix --only tag-order`."
+                             part in. Run `fusion x prose fix --only tag-order`."
                         .to_owned(),
                     file: format!("{where_}:{line}"),
                     message: one,

@@ -16,7 +16,7 @@
 //! into them before the TypeScript was deleted.
 //!
 //! **The exception is the em dash.** The plugin forbade em and en dashes in a
-//! description, and `fusion prose`'s `dashes` already holds every line a person
+//! description, and `fusion x prose`'s `dashes` already holds every line a person
 //! writes to no em dash, doc comments included, which is where a description comes
 //! from. An en dash is the half nobody else checks, so it is the half kept.
 //!
@@ -90,7 +90,7 @@ const RELAYED: [&str; 35] = [
 /// The metadata every component carries, and the tag it comes from.
 const REQUIRED: [&str; 3] = ["since", "status", "documentation"];
 
-/// The one dash left to this rule; the em dash is `fusion prose`'s.
+/// The one dash left to this rule; the em dash is `fusion x prose`'s.
 const EN_DASH: char = '\u{2013}';
 
 /// A field of an entry, as text, empty where it is absent.
@@ -497,7 +497,7 @@ mod tests {
         ));
     }
 
-    /// The en dash is this rule's; the em dash is `fusion prose`'s `dashes`.
+    /// The en dash is this rule's; the em dash is `fusion x prose`'s `dashes`.
     #[test]
     fn an_en_dash_is_reported_and_an_em_dash_is_left_to_the_prose_rule() {
         assert!(says(

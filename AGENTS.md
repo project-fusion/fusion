@@ -164,7 +164,7 @@ Rust for backend and substrate cores. TypeScript for frontend.
   stands, which Node below 22.18 cannot. **Node still has a floor**, because what carries a Node shebang and is
   not run with `--bun` runs under it: Next's `bin` in `build` and `dev`, and
   npm in the release. `engines.node` states the floor,
-  `fusion workspace --only node` holds `@types/node` to it, and the release
+  `fusion x workspace --only node` holds `@types/node` to it, and the release
   workflows pin it.
 
 ## Layout
@@ -199,8 +199,8 @@ fusion/    cli docs plugins rules scripts site: what belongs to the company
   3.7, so splitting it would trade a real boundary for a saving that does not
   exist.
 - **A check belongs to a CLI noun; a script belongs where its output belongs.**
-  Everything that judges the workspace is a rule under `fusion workspace`,
-  `fusion prose`, `fusion spec` or `helix component`, reached from the root by
+  Everything that judges the workspace is a rule under `fusion x workspace`,
+  `fusion x prose`, `fusion x spec` or `helix component`, reached from the root by
   one delegating script apiece. Everything that *writes* something lives in the
   package that owns what it writes, declared in that package's own manifest, so
   `helix/docs` builds the docs and `helix/styles` builds the token layer.
@@ -216,8 +216,8 @@ fusion/    cli docs plugins rules scripts site: what belongs to the company
   edit pointing outside the workspace is refused.
 
   **A plugin belongs to the noun whose payload it reads.** `helix component`
-  looks in `.helix/plugins` and composes `manifests` and `sheets`; `fusion prose`
-  and `fusion spec` look in `.fusion/plugins/<noun>` and compose `documents` and
+  looks in `.helix/plugins` and composes `manifests` and `sheets`; `fusion x prose`
+  and `fusion x spec` look in `.fusion/plugins/<noun>` and compose `documents` and
   `specs`. One module may hold rules for several nouns, and each run takes the
   ones it can answer, names the rest in the register, and refuses a module with
   nothing for it at all.
@@ -302,7 +302,7 @@ that `@fusion.dev/helix-headless@x` works with `@fusion.dev/helix@x`.
 `[workspace.package]` holds the edition, the license and the toolchain floor,
 which are facts about the workspace; a version is a fact about a domain.
 `release.yml` computes each domain from its own tags, so a shared field would
-take several numbers and keep whichever stamped last. `fusion workspace`'s `publishable`
+take several numbers and keep whichever stamped last. `fusion x workspace`'s `publishable`
 fails both on a crate taking `version.workspace = true` and on
 `[workspace.package]` declaring a version at all.
 
@@ -340,7 +340,7 @@ directions, so the day the flag changes is the day the workflow has to.
   manifest once `helix` has written it and `@fusion.dev/helix-sandbox` the editor and spec runner, both
   Helix byproducts and both build tooling for this repository. Naming them
   `@fusion.dev/*` to say "does not publish" would claim they are general Fusion
-  tooling, which is the one thing they are not. `fusion workspace --only publishable`
+  tooling, which is the one thing they are not. `fusion x workspace --only publishable`
   enforces the rest: `@fusion.dev/*` is always private, a published package may
   never depend on an unpublished one, and every published package agrees on
   visibility.
@@ -364,7 +364,7 @@ directions, so the day the flag changes is the day the workflow has to.
   rather than asked for, because an unwritten convention is learned from the
   corpus: prose in the wrong dialect teaches the next contributor to write it,
   which is why comments are in scope and not only copy. `bun run fix:dialect`
-  rewrites; `fusion prose`'s `dialect` judges.
+  rewrites; `fusion x prose`'s `dialect` judges.
 - **Alphabetize** object keys, interface members, and exported types
   (case-insensitive). Skip where order is semantic: positional arguments,
   middleware chains, CSS box-side shorthand, export conditions.

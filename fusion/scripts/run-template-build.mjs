@@ -156,7 +156,7 @@ const SHOTS = [
 /**
  * A template's words for its framework, and React on Vite's for the same
  * places: the footer's last link, and the entry file the landing page names.
- * The docs address is written out whole, so `fusion prose` can check it.
+ * The docs address is written out whole, so `fusion x prose` can check it.
  */
 const framework = (name, docs, entry) => ({
   text: [[name, 'React'], ...(entry ? [[entry, 'src/main.tsx']] : [])],

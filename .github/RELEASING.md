@@ -205,7 +205,7 @@ release, so the first merge after the hold is lifted releases every commit that
 merged while it was held, at the highest bump they ask for. A held domain with
 no tag starts from `0.0.0`, so a `feat` makes its first release `0.1.0`.
 
-`fusion workspace`'s `publishable` fails on a name under `held` that is not in
+`fusion x workspace`'s `publishable` fails on a name under `held` that is not in
 `domains`, since a misspelled entry holds nothing back, and on an entry with no
 reason. `bump.spec.mjs` asserts a held domain gets no leg and that each script
 reads the list.

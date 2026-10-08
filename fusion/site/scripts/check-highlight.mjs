@@ -18,7 +18,7 @@
  *   in each language it accepts
  *
  * `build` runs this after `next build`, so the build fails and Vercel deploys
- * nothing. It writes nothing, and `fusion workspace`'s `prerequisites` rule
+ * nothing. It writes nothing, and `fusion x workspace`'s `prerequisites` rule
  * reads every step ahead of the compiler as something `typecheck` has to
  * build too.
  */

@@ -163,9 +163,13 @@ jobs:
       # **`--locked` now, because nothing rewrites a manifest before this.** The
       # version was stamped into `helix/cli/Cargo.toml` here, which is what left
       # `Cargo.lock` naming a version the tree no longer had.
+      # **`--no-default-features`, because the default is this repository's.**
+      # Each CLI's `internal` feature, on in every build here, holds the commands
+      # that check Fusion's own sources, such as `helix component`, and nobody
+      # who installs the binary runs them.
       - name: Build
         if: steps.built.outputs.cache-hit != 'true'
-        run: cargo build --release --locked -p fusion-${{ matrix.domain }}-cli --target ${{ matrix.target }}
+        run: cargo build --release --locked --no-default-features -p fusion-${{ matrix.domain }}-cli --target ${{ matrix.target }}
 
       # **The version a consumer would see, which is the binary with its package
       # beside it.** That manifest is what the binary reads, so the check has to
@@ -199,6 +203,19 @@ jobs:
         env:
           DOMAIN: ${{ matrix.domain }}
           PLATFORM: ${{ matrix.platform }}
+
+      # A restored binary as well as a built one, for the reason the step above
+      # gives: a key that matched a build with the default features would ship
+      # this repository's commands.
+      - name: Prove it carries no internal commands
+        if: matrix.runs && matrix.domain == 'helix'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if "$BINARY" component --help >/dev/null 2>&1; then
+            echo "::error::$BINARY has \`helix component\`, which only this repository's builds carry"
+            exit 1
+          fi
 
       - name: Upload
         if: inputs.version != ''

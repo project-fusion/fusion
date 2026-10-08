@@ -55,7 +55,7 @@ fn prepare(args: &Rules, from: &Path) -> Result<Prepared, Failure> {
     on the plugins they point at. But a workspace with no configuration has no
     plugin directory either, so the rules it could have are the ones compiled in:
     a name none of them has is a typo, which is the more useful of the two things
-    to be told and is what `fusion workspace` says in the same position. */
+    to be told and is what `fusion x workspace` says in the same position. */
     let settings = match Settings::read(&root) {
         Ok(settings) => settings,
         Err(unconfigured) => {

@@ -4,9 +4,9 @@ The npm shim for the `fusion` command. **Private**: it is how this workspace's
 own checks reach a Rust binary from a `bun run` line.
 
 ```sh
-bun run fusion workspace       # the rules a workspace is held to
-bun run fusion prose check     # every doc block, judged
-bun run fusion spec check      # the spec rules
+bun run fusion x workspace       # the rules a workspace is held to
+bun run fusion x prose check     # every doc block, judged
+bun run fusion x spec check      # the spec rules
 ```
 
 **A near-copy of `helix/cli/npm/bin.mjs`, deliberately.** Sharing one would put

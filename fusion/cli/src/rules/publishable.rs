@@ -139,7 +139,7 @@ fn targets(node: &Value, found: &mut BTreeSet<String>) {
 /// The root's own, and not a file of the same name anywhere below it.
 ///
 /// `licen` rather than the two spellings npm accepts. Listing both would put a
-/// British word in the source, which `fusion prose` refuses and is right to:
+/// British word in the source, which `fusion x prose` refuses and is right to:
 /// the prefix covers `LICENSE` and `LICENCE` both. dialect:quoted, those are
 /// filenames npm accepts rather than words this repository writes. This read
 /// `["readme", "license", "license", "changelog"]` until the review of 19
@@ -599,7 +599,7 @@ mod tests {
     /// A duplicated literal in the array this reads was live and invisible:
     /// `clippy::pedantic` does not look inside one, and every name the check
     /// cared about still matched, so nothing failed. The entry meant to be
-    /// there was the British spelling, which `fusion prose` refuses in source,
+    /// there was the British spelling, which `fusion x prose` refuses in source,
     /// so the fix was a prefix covering both rather than a second word.
     ///
     /// Naming each file npm always packs is what makes a dropped one fail here.

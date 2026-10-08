@@ -1,18 +1,16 @@
-//! `fusion`, the command line for rules a workspace can be held to.
+//! `fusion`, the Fusion command line: the door to each product's, and this
+//! repository's own checks behind `x`.
 //!
-//! **Noun then verb, both required**, so a bare `fusion` or a bare
-//! `fusion workspace` prints help and exits 2 rather than guessing. That is the
-//! grammar `helix` already sets, and two command lines from one company that
-//! disagree about their own shape are worse than either shape.
+//! **Each product's command line is routed, never reimplemented.** `fusion
+//! helix ...` and `fusion proof ...` hand the rest of the line to that binary and
+//! return its exit code, and each works on its own without this one.
 //!
-//! **`audit` reports and gates; `check` is its quiet form.** Same measurement,
-//! same exit code, different volume: `audit` prints every rule and what it
-//! found, `check` prints nothing on success so a green pipeline stays quiet.
-//! `fix` is the same rule set again, running the ones that can write.
-//!
-//! **Selection is a flag, never a verb.** A verb per rule multiplies with every
-//! rule added, and the set a caller wants is rarely the set anybody would have
-//! named.
+//! **This repository's checks are under `x`, and only in its own builds.**
+//! `workspace`, `prose` and `spec` hold this repository to its conventions, which
+//! serve nobody who installs Fusion, so they sit behind the `internal` feature:
+//! on by default, which is every build here, and off in the binaries
+//! `binaries.yml` publishes, which never show `x`. `x` is the name the Rust
+//! compiler's own repository gives its internal tooling.
 //!
 //! **The shape is `helix`'s, because the two read it from one crate.** Exit
 //! codes, the error format, color, the runner and the audit screen are
@@ -22,24 +20,23 @@
 //! and `fusion helix ...` returning its child's code untouched is only honest
 //! while the two tables are one table.
 
+#[cfg(feature = "internal")]
 mod plugins;
+#[cfg(feature = "internal")]
 mod prose;
 mod route;
+#[cfg(feature = "internal")]
 mod rules;
+#[cfg(feature = "internal")]
 mod spec;
 mod workspace;
+#[cfg(feature = "internal")]
+mod x;
 
-use std::io::IsTerminal;
-use std::path::PathBuf;
-use std::sync::Arc;
-
-use clap::{Args, Parser, Subcommand};
+use clap::{Parser, Subcommand};
 use fusion_rules::error::{Failure, Outcome};
 use fusion_rules::exit::Code;
 use fusion_rules::style::Paint;
-use fusion_rules::{measure, only_known, payload, tui, verdict};
-
-use crate::rules::{all, Context, Settings};
 
 /// The word every printed failure opens with, and the corner of every screen.
 const PRODUCT: &str = "fusion";
@@ -54,17 +51,10 @@ fn shipped() -> &'static str {
     fusion_rules::version::shipped(PACKAGE, env!("CARGO_PKG_VERSION"))
 }
 
-/* Every rule borrows the one context from its own thread, which is what this
-holds `Context` to. */
-const _: fn() = || {
-    fn shared<T: Sync>() {}
-    shared::<Context>();
-};
-
 #[derive(Debug, Parser)]
 #[command(
     name = "fusion",
-    about = "Rules a workspace can be held to.",
+    about = "The Fusion command line: Helix, Proof, and the checks this repository holds itself to.",
     version = shipped(),
     subcommand_required = true,
     arg_required_else_help = true
@@ -110,104 +100,23 @@ enum Noun {
         #[arg(allow_hyphen_values = true, trailing_var_arg = true)]
         args: Vec<String>,
     },
-
-    /* **A separate noun rather than more workspace rules**, because the subject
-    is different and a consumer asking one question should not pay for the
-    other: a workspace rule reads manifests and build output, and a prose rule
-    reads what people wrote. */
-    /// Hold the prose to what it describes.
-    #[command(subcommand_required = true, arg_required_else_help = true)]
-    Prose {
-        #[command(subcommand)]
-        verb: Verb,
-    },
-    /// Hold the specs to being specs, rather than to what they test.
-    #[command(subcommand_required = true, arg_required_else_help = true)]
-    Spec {
-        #[command(subcommand)]
-        verb: Verb,
-    },
-
-    /// Hold a workspace to what it says about itself.
-    #[command(subcommand_required = true, arg_required_else_help = true)]
-    Workspace {
-        #[command(subcommand)]
-        verb: Verb,
-    },
-}
-
-impl Noun {
-    /// The verb asked of a noun this binary answers for itself.
+    /// Run the Fusion Proof command line, which owns its own nouns.
     ///
-    /// **A routed noun never reaches here.** `main` hands its line to the other
-    /// product before reading a verb, because the verbs are that product's and
-    /// this one has no business naming them.
-    fn verb(&self) -> &Verb {
-        match self {
-            Self::Prose { verb } | Self::Spec { verb } | Self::Workspace { verb } => verb,
-            Self::Helix { .. } => unreachable!("routed before a verb is read"),
-        }
-    }
-
-    /// The rules this noun holds, which is the whole of what makes it a noun.
-    fn rules(&self) -> Vec<rules::Rule> {
-        match self {
-            Self::Prose { .. } => prose::all(),
-            Self::Spec { .. } => spec::all(),
-            Self::Workspace { .. } => all(),
-            Self::Helix { .. } => unreachable!("routed before a rule set is asked for"),
-        }
-    }
-
-    /// The word the reader typed, for a message that names it back.
-    fn name(&self) -> &'static str {
-        match self {
-            Self::Helix { .. } => "helix",
-            Self::Prose { .. } => "prose",
-            Self::Spec { .. } => "spec",
-            Self::Workspace { .. } => "workspace",
-        }
-    }
-}
-
-#[derive(Debug, Subcommand)]
-enum Verb {
-    /// Report every rule and what it found, and exit 1 on a finding.
-    Audit(Common),
-    /// The CI shape of `audit`: same measurement, nothing printed on success.
-    Check(Common),
-    /// Run the rules that can write.
-    Fix(Common),
-}
-
-#[derive(Args, Debug)]
-struct Common {
-    /// Run just these rules.
-    #[arg(long, value_delimiter = ',')]
-    only: Vec<String>,
-
-    /* **The tty already decides and this is the override.** A screen written to
-    a pipe is escape sequences in a log file, so `audit` prints when stdout is
-    not a terminal. */
-    /// Print the audit rather than drawing it.
-    ///
-    /// `audit` already prints when its output is not a terminal. Use this at
-    /// one, to copy the lines, to grep them, or because a screen is the wrong
-    /// shape for what you are doing.
-    #[arg(long)]
-    plain: bool,
-
-    /// The workspace to read. Defaults to the nearest one above the cwd.
-    #[arg(long)]
-    root: Option<PathBuf>,
-}
-
-impl Verb {
-    fn common(&self) -> &Common {
-        match self {
-            Self::Audit(common) | Self::Check(common) | Self::Fix(common) => common,
-        }
-    }
+    /// Everything after `proof` is passed to it as written, and its exit code
+    /// is returned. Needs `proof` installed.
+    #[command(disable_help_flag = true)]
+    Proof {
+        /// Everything after `proof`, handed over as written.
+        #[arg(allow_hyphen_values = true, trailing_var_arg = true)]
+        args: Vec<String>,
+    },
+    /// Run this repository's own checks and fixes.
+    #[cfg(feature = "internal")]
+    #[command(subcommand_required = true, arg_required_else_help = true)]
+    X {
+        #[command(subcommand)]
+        noun: x::Internal,
+    },
 }
 
 fn main() {
@@ -247,216 +156,24 @@ const _: () = {
     assert!(Code::Usage as i32 == 2);
     assert!(Code::Internal as i32 == 4);
 };
-
 /// The whole command, as the exit code it ends with.
 ///
 /// **A routed noun returns the child's own code**, whatever it was, which is
 /// why this is an `i32` rather than a [`Code`]: `fusion helix theme check` is
 /// `helix theme check`, and a caller reading its exit reads `helix`'s table.
 /// The two tables are the same table, on purpose.
+#[cfg_attr(
+    not(feature = "internal"),
+    expect(
+        unused_variables,
+        reason = "paint is for `x`, which this build leaves out"
+    )
+)]
 fn run(cli: &Cli, paint: Paint) -> Outcome<i32> {
-    /* **Routed before anything else is read**, because a routed noun has no verb
-    and no rule set: everything below belongs to the nouns this binary answers
-    for itself, and asking a route for its rules is a question with no answer. */
-    if let Noun::Helix { args } = &cli.noun {
-        return route::to("helix", args);
+    match &cli.noun {
+        Noun::Helix { args } => route::to("helix", args),
+        Noun::Proof { args } => route::to("proof", args),
+        #[cfg(feature = "internal")]
+        Noun::X { noun } => x::run(noun, cli.json, paint),
     }
-
-    let verb = cli.noun.verb();
-    let common = verb.common();
-
-    let cwd = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
-    let Some(root) = common.root.clone().or_else(|| workspace::find_root(&cwd)) else {
-        return Err(Failure::input(
-            format!("no workspace at {}", cwd.display()),
-            "no `package.json` here or in any directory above it",
-        )
-        .hint(format!(
-            "fusion {} check --root <workspace>",
-            cli.noun.name()
-        )));
-    };
-
-    /* **The plugins are read before `--only` is judged**, because a rule a
-    plugin provides is a rule this noun has: naming one and being told there is
-    no such rule would be true of the binary and false of the run. A noun with no
-    parts to compose takes none, which is `workspace` until somebody asks. */
-    let mut rules = cli.noun.rules();
-    let noun = cli.noun.name();
-    let mut register = Vec::new();
-    let mut listed = serde_json::Value::Array(Vec::new());
-    if !plugins::parts(noun).is_empty() {
-        let host = Arc::new(plugins::read(&root, noun)?);
-        let loaded = host.loaded();
-        let (provided, elsewhere) = plugins::rules(&host, noun)?;
-        register = plugins::register(&loaded, &elsewhere);
-        listed = plugins::listed(&loaded);
-        rules.extend(provided);
-    }
-    only_known(noun, &rules, &common.only)?;
-
-    let settings = Settings::read(&root)?;
-    let context = Context::new(root, settings);
-    let selected: Vec<rules::Rule> = rules
-        .into_iter()
-        .filter(|rule| common.only.is_empty() || common.only.iter().any(|one| one == rule.name))
-        .collect();
-
-    /* **Every module, on every run and every verb.** Discovery by directory is
-    a rule being a file rather than a file and an entry in a manifest, and a line
-    per module is what stops one arriving without anybody noticing. */
-    if !cli.json {
-        for line in &register {
-            fusion_rules::say!("{line}");
-        }
-    }
-
-    let code = match verb {
-        Verb::Fix(_) => fusion_rules::fix(&selected, &context, cli.json, paint, PRODUCT)?,
-        /* **The tty decides here, where the verb is known**, rather than inside
-        the renderer: a screen written to a pipe is escape sequences in a log
-        file, and `check` never draws whatever the terminal is. */
-        Verb::Audit(_) => {
-            let form = if cli.json {
-                Form::Json
-            } else if common.plain || !std::io::stdout().is_terminal() {
-                Form::Printed { loud: true }
-            } else {
-                Form::Screen
-            };
-            report(&selected, &context, &form, noun, paint, &listed)?
-        }
-        Verb::Check(_) => {
-            let form = if cli.json {
-                Form::Json
-            } else {
-                Form::Printed { loud: false }
-            };
-            report(&selected, &context, &form, noun, paint, &listed)?
-        }
-    };
-    Ok(code.as_i32())
-}
-
-/// How a measurement comes out, which is one choice rather than four flags.
-///
-/// **Named rather than four bools**, because they were never independent: JSON
-/// outranks the rest, a screen is only ever an `audit` on a terminal, and
-/// `check`'s whole shape is silence on success, which a screen cannot be. As
-/// bools that is four values with three illegal combinations; as this it is
-/// three, and the call site says which one it means.
-enum Form {
-    /// Machine-readable on stdout. The contract, on every verb, always.
-    Json,
-    /// Every rule and its findings, printed. `loud` prints the clean ones too.
-    Printed { loud: bool },
-    /// Drawn, for a reader at a terminal who asked for an audit.
-    Screen,
-}
-
-fn report(
-    selected: &[rules::Rule],
-    context: &Context,
-    form: &Form,
-    noun: &str,
-    paint: Paint,
-    listed: &serde_json::Value,
-) -> Outcome<Code> {
-    let reports = measure(selected, context);
-    let failed: Vec<&(&rules::Rule, rules::Report)> =
-        reports.iter().filter(|(_, report)| !report.ok()).collect();
-
-    if matches!(form, Form::Json) {
-        let mut said = payload(&reports);
-        if let Some(fields) = said.as_object_mut() {
-            fields.insert("plugins".to_owned(), listed.clone());
-        }
-        fusion_rules::say!("{said:#}");
-        return Ok(verdict(&reports));
-    }
-
-    /* Both forms read the same measurement, so nothing here can disagree with
-    what the other would have shown. */
-    if matches!(form, Form::Screen) {
-        let code = verdict(&reports);
-        let drawn: Vec<(&rules::Rule, &rules::Report)> = reports
-            .iter()
-            .map(|(rule, report)| (*rule, report))
-            .collect();
-        tui::run(PRODUCT, &drawn).map_err(|why| {
-            Failure::new(
-                Code::Internal,
-                "cannot open the audit screen",
-                format!("{why}. Run `fusion {noun} audit --plain` for the report."),
-            )
-        })?;
-        return Ok(code);
-    }
-
-    if matches!(form, Form::Printed { loud: true }) {
-        for (rule, report) in &reports {
-            /* Padded before painting: a width applies to bytes, and an escape
-            sequence is bytes that occupy no column. */
-            let mark = if report.ok() {
-                " ".to_owned()
-            } else {
-                paint.fail("x")
-            };
-            fusion_rules::say!(
-                "{mark} {}{} {} checked",
-                paint.bold(&format!("{:<15}", rule.name)),
-                report.checked,
-                report.unit
-            );
-        }
-        /* Notes after the table, as `helix component` prints them: work rather
-        than fault, so they are not a mark in the margin, and not only in
-        `--json`, or a note is registered where nobody running the audit reads. */
-        for (rule, report) in reports
-            .iter()
-            .filter(|(_, report)| !report.notes.is_empty())
-        {
-            fusion_rules::say!();
-            fusion_rules::say!(
-                "{} {}",
-                paint.bold(rule.name),
-                paint.dim(&format!("{} noted, not failing", report.notes.len()))
-            );
-            for note in &report.notes {
-                fusion_rules::say!("  {note}");
-            }
-        }
-        fusion_rules::say!();
-    }
-
-    for (rule, report) in &failed {
-        /* The summary once per rule, because a finding says what is wrong and
-        the summary says what was wanted, and a reader needs both. */
-        eprintln!("{} {}", paint.bold(rule.name), paint.dim(rule.summary));
-        for finding in &report.findings {
-            eprintln!(
-                "{} {}  {}",
-                paint.fail("x"),
-                paint.bold(rule.name),
-                finding.file
-            );
-            eprintln!("    {}", finding.message);
-            eprintln!("{}", paint.dim(&format!("    {}", finding.detail)));
-        }
-    }
-
-    if !failed.is_empty() {
-        let total: usize = failed.iter().map(|(_, report)| report.findings.len()).sum();
-        let plural = if total == 1 { "" } else { "s" };
-        eprintln!(
-            "\nfusion: {total} finding{plural} across {} rules",
-            failed.len()
-        );
-        return Ok(Code::Failed);
-    }
-
-    if matches!(form, Form::Printed { loud: true }) {
-        fusion_rules::say!("fusion: {} rules, every one clean", reports.len());
-    }
-    Ok(Code::Ok)
 }

@@ -108,6 +108,7 @@ fn an_unknown_rule_is_the_same_input_error_in_both_binaries() {
         &fusion(),
         &sandbox.0,
         &[
+            "x",
             "workspace",
             "check",
             "--only",
@@ -147,6 +148,7 @@ fn a_clean_rule_checks_quietly() {
         &fusion(),
         &sandbox.0,
         &[
+            "x",
             "workspace",
             "check",
             "--only",
@@ -177,6 +179,7 @@ fn a_finding_exits_one_and_names_the_file() {
         &fusion(),
         &sandbox.0,
         &[
+            "x",
             "workspace",
             "check",
             "--only",
@@ -200,6 +203,7 @@ fn an_unparseable_settings_file_names_the_file_and_the_line() {
         &fusion(),
         &sandbox.0,
         &[
+            "x",
             "workspace",
             "check",
             "--only",
@@ -221,6 +225,7 @@ fn a_missing_settings_file_is_not_a_violation() {
         &fusion(),
         &sandbox.0,
         &[
+            "x",
             "workspace",
             "check",
             "--only",
@@ -243,6 +248,7 @@ fn errors_are_json_on_stderr_and_never_on_stdout() {
         &fusion(),
         &sandbox.0,
         &[
+            "x",
             "workspace",
             "check",
             "--json",
@@ -268,6 +274,7 @@ fn every_verb_has_a_json_form_and_it_parses() {
             &fusion(),
             &sandbox.0,
             &[
+                "x",
                 "workspace",
                 verb,
                 "--json",
@@ -287,7 +294,12 @@ fn every_verb_has_a_json_form_and_it_parses() {
 #[test]
 fn an_incomplete_command_is_a_usage_error() {
     let sandbox = Sandbox::new("usage", ORDERED, Some("{}"));
-    for args in [vec![], vec!["workspace"], vec!["workspace", "frobnicate"]] {
+    for args in [
+        vec![],
+        vec!["x"],
+        vec!["x", "workspace"],
+        vec!["x", "workspace", "frobnicate"],
+    ] {
         let output = run(&fusion(), &sandbox.0, &args);
         assert_eq!(code(&output), 2, "{args:?} did not exit 2");
     }
