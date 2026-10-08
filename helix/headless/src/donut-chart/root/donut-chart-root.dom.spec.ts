@@ -392,3 +392,115 @@ describe('slice labels', () => {
     expect(labels(host).map((one) => one.textContent)).toEqual(['98%'])
   })
 })
+
+/* A negative row was left out of the ring and still listed in the summary as
+   0%, against the docs. */
+describe('a row the ring leaves out', () => {
+  test('is left out of the summary too', async () => {
+    const host = await chart(NEGATIVE, 'for="negative" label="Revenue"')
+    expect(part(host, 'summary')?.textContent?.trim()).toBe('Revenue: Direct 75%, Search 25%.')
+  })
+})
+
+/* A donut with no table drew a focusable application described by a summary
+   it had not rendered, and said nothing about having no readings. */
+describe('a donut with nothing to draw', () => {
+  test('says so in the plot, keeps its name, and takes no focus', async () => {
+    const host = await chart('', 'label="Share of sessions"')
+    const plot = part(host, 'plot')
+    expect(part(host, 'empty')?.textContent?.trim()).toBe('No readings')
+    expect(plot?.getAttribute('role')).toBe('group')
+    expect(plot?.getAttribute('aria-label')).toBe('Share of sessions')
+    expect(plot?.hasAttribute('tabindex')).toBe(false)
+    expect(plot?.hasAttribute('aria-describedby')).toBe(false)
+    expect(part(host, 'summary')).toBeNull()
+  })
+
+  test('says it is loading while loading is set', async () => {
+    const host = await chart('', 'loading')
+    expect(part(host, 'empty')).toBeNull()
+    expect(part(host, 'loading')?.textContent?.trim()).toBe('Loading readings')
+  })
+})
+
+/* A page could not hear which slice a reader was on, or that one was pressed. */
+describe('the slice, heard by the page', () => {
+  test('is sent as it moves, by its own row, and when Enter presses it', async () => {
+    const GAP = `<table id="gap"><tbody>
+      <tr><th>Direct</th><td>40</td></tr>
+      <tr><th>Email</th><td>n/a</td></tr>
+      <tr><th>Search</th><td>30</td></tr>
+    </tbody></table>`
+    const host = (await chart(GAP, 'for="gap"')) as HTMLElement & {
+      updateComplete: Promise<unknown>
+    }
+    const heard: [string, { index: number; label: string; pointerType: string }][] = []
+    for (const type of ['helix-reading-change', 'helix-reading-press']) {
+      host.addEventListener(type, (event) => {
+        const { index, label, pointerType } = (event as CustomEvent).detail
+        heard.push([type, { index, label, pointerType }])
+      })
+    }
+    segments(host)[1]?.dispatchEvent(new PointerEvent('pointerenter', { pointerType: 'mouse' }))
+    await host.updateComplete
+    const plot = part(host, 'plot')
+    plot?.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        key: 'Enter',
+      }),
+    )
+    expect(heard).toEqual([
+      ['helix-reading-change', { index: 2, label: 'Search', pointerType: 'mouse' }],
+      ['helix-reading-press', { index: 2, label: 'Search', pointerType: 'keyboard' }],
+    ])
+  })
+
+  test('a tap on a slice shows it', async () => {
+    const host = (await chart(TRAFFIC, 'for="traffic"')) as HTMLElement & {
+      updateComplete: Promise<unknown>
+    }
+    segments(host)[2]?.dispatchEvent(
+      new PointerEvent('pointerup', { bubbles: true, pointerType: 'touch' }),
+    )
+    await host.updateComplete
+    expect(host.shadowRoot?.querySelector('[part="tooltip-label"]')?.textContent).toBe('Social')
+  })
+})
+
+/* The slice shown and the empty ring could not be styled from outside: no
+   state said either. happy-dom has no `ElementInternals.states`, so the set
+   is supplied, as `field-invalid.dom.spec.ts` reads it. */
+describe('the states a stylesheet reads', () => {
+  const states = (host: HTMLElement): Set<string> => {
+    const internals = (host as unknown as { internals: ElementInternals }).internals
+    if (!('states' in internals)) {
+      Object.defineProperty(internals, 'states', { value: new Set<string>() })
+    }
+    return internals.states as unknown as Set<string>
+  }
+
+  test('are active while a slice is shown, and empty with nothing to draw', async () => {
+    const host = (await chart(TRAFFIC, 'for="traffic"')) as HTMLElement & {
+      pointer: { set: (at: number) => void }
+      updateComplete: Promise<unknown>
+    }
+    const set = states(host)
+    host.pointer.set(1)
+    await host.updateComplete
+    expect([...set]).toEqual(['active'])
+    host.pointer.set(-1)
+    await host.updateComplete
+    expect([...set]).toEqual([])
+    const empty = (await chart('', '')) as HTMLElement & {
+      requestUpdate: () => void
+      updateComplete: Promise<unknown>
+    }
+    const none = states(empty)
+    empty.requestUpdate()
+    await empty.updateComplete
+    expect([...none]).toEqual(['empty'])
+  })
+})

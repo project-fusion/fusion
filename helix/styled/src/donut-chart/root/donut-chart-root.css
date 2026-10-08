@@ -25,6 +25,17 @@
   inline-size: 100%;
 }
 
+/* With nothing to draw, the plot keeps the ring's box, so the empty and
+   loading words stand where the ring will be and the page does not move when
+   the readings arrive. */
+[part="plot"]:not(:has(svg)) {
+  aspect-ratio: 1;
+}
+
+:host([sweep="half"]) [part="plot"]:not(:has(svg)) {
+  aspect-ratio: 2;
+}
+
 /* Square, and it stays square. */
 [part="plot"] svg {
   aspect-ratio: 1;

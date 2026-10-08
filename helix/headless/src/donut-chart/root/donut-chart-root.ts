@@ -3,7 +3,10 @@ import {
   customElement,
   drawTooltip,
   HelixElement,
+  HelixReadingChangeEvent,
+  HelixReadingPressEvent,
   MixinChartSource,
+  MixinChartStatus,
   PLOT_HEIGHT,
   PLOT_WIDTH,
   type Row,
@@ -111,6 +114,27 @@ export interface DonutShare {
  * follows, the `live` part says the slice in words, and Escape puts the
  * tooltip away.
  *
+ * **A tap shows the slice under it**, and keeps it until a tap lands
+ * elsewhere. `helix-reading-change` says each move of the slice shown, by
+ * pointer, tap or key, and `helix-reading-press` says a slice was clicked,
+ * tapped, or pressed with Enter or Space, for a page that opens what a slice
+ * stands for. `index` is the slice's row in the table.
+ *
+ * **A chart with nothing to draw says so.** A table with no readings shows
+ * `empty-text`, "No readings", in the plot, and `loading` shows `loading-text`
+ * there until readings arrive. The `empty` and `loading` slots take markup in
+ * their place.
+ *
+ * **Keyboard.** The plot is one tab stop.
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Tab | Moves focus to the plot and shows the first slice. |
+ * | Any arrow | Right and Down move to the next slice, Left and Up to the previous. On a right-to-left page, Left moves to the next. |
+ * | Home, End | Moves to the first or the last slice. |
+ * | Enter, Space | Presses the slice shown, which sends `helix-reading-press`. |
+ * | Escape | Puts the slice and its tooltip away. |
+ *
  * @since 0.1.0
  * @status stable
  * @category charts
@@ -118,16 +142,24 @@ export interface DonutShare {
  * @documentation https://fusion.dev/helix/components/donut-chart
  *
  * @slot - Content in the middle of the ring, usually a total. It is read by screen readers, while the ring itself is hidden from them.
+ * @slot empty - Content shown in place of the ring when the table has no readings. Falls back to `empty-text`.
+ * @slot loading - Content shown in place of the ring while `loading` is set and there are no readings yet. Falls back to `loading-text`.
+ *
+ * @event {HelixReadingChangeEvent} helix-reading-change - The slice shown moved, or was put away: `index` is the slice's row, or `-1` for none, with its `label` and the `pointerType` that moved it.
+ * @event {HelixReadingPressEvent} helix-reading-press - A slice was clicked, tapped, or pressed with Enter or Space, with the same detail as `helix-reading-change`.
  *
  * @csspart center - The middle of the ring, holding whatever is slotted.
+ * @csspart empty - The words in place of the ring when the table has no readings: the `empty` slot, falling back to `empty-text`. Not drawn while the table cannot be read yet, on the server and during hydration.
  * @csspart live - The readout: a polite live region that says the slice the keys moved to. Hide it visually.
+ * @csspart loading - The words in place of the ring while `loading` is set and there are no readings: the `loading` slot, falling back to `loading-text`.
  * @csspart mark - The invisible point the tooltip is anchored to.
- * @csspart plot - The drawing, which takes focus to be read by key.
+ * @csspart plot - The drawing, which takes focus to be read by key. With nothing to draw, a group named as the chart is, holding the `empty` or `loading` part.
  * @csspart segment - One slice.
  * @csspart segment-active - The slice under the pointer. Set alongside `segment`.
  * @csspart segment-edge - One slice as a closed shape, used to draw its outline.
  * @csspart slice-label - One slice's share, written on the slice under `slice-labels`. Placed with `left` and `top`, or `inset-inline-start` and `top` on a half ring, and carries its series color as `--chart-series`.
  * @csspart summary - The chart's name and each slice's share, written as a sentence for screen readers. Hide it visually.
+ * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`. Hide it visually.
  * @csspart tooltip - The bubble, forwarded from `Tooltip`.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
  * @csspart tooltip-arrow - The bubble's point, forwarded from `Tooltip`.
@@ -147,9 +179,13 @@ export interface DonutShare {
  * @csspart track - The ring the slices are drawn on.
  *
  * @cssproperty --donut-chart-stroke - How thick the ring is drawn, derived from `hole`.
+ *
+ * @cssstate active - While a slice is shown, under the pointer or the keys, with its tooltip open.
+ * @cssstate empty - While the `empty` part stands in place of the ring.
+ * @cssstate loading - While the `loading` part stands in place of the ring.
  */
 @customElement('helix-headless-donut-chart')
-export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
+export class HelixHeadlessDonutChart extends MixinChartStatus(MixinChartSource(HelixElement)) {
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-donut-chart': { positionLabel: '{position} von {count}' } })`.
@@ -174,6 +210,15 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
   override connectedCallback(): void {
     super.connectedCallback()
     this.pointer.axis = 'none'
+    /* Sent with the slice's row, which is not its place among the slices
+       once a row with no amount is left out. */
+    this.pointer.onReading = (heard, detail) => {
+      const row = this.shares[detail.index]?.row ?? -1
+      const told = { ...detail, index: row, label: this.sourceRows[row]?.label ?? '' }
+      this.dispatchEvent(
+        heard === 'press' ? new HelixReadingPressEvent(told) : new HelixReadingChangeEvent(told),
+      )
+    }
   }
 
   /**
@@ -330,12 +375,15 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
 
   protected override render(): TemplateResult {
     const shares = this.shares
+    /* The ring's frame is served before the readings are known, so the page
+       does not move when they arrive, and the empty words once they are. */
+    if (shares.length === 0 && (this.readingsKnown || this.loading)) {
+      return this.renderEmpty()
+    }
     /* No middle where there is no hole. A `center` part over a pie would put
        slotted content on top of the slices, and a slot nobody can see is worse
        than one that is not there: a consumer fills it and nothing happens. */
-    return html`${this.renderPlot(shares)}${
-      shares.length === 0 ? nothing : this.renderSummary(shares)
-    }`
+    return html`${this.renderPlot(shares)}${shares.length === 0 ? nothing : this.renderSummary(shares)}${this.renderTable()}`
   }
 
   /**
@@ -345,12 +393,14 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
    * The shares, because they are what the ring shows and the table does not:
    * the table holds the amounts, and the percentages are this chart's
    * arithmetic. In the ring's order, which is the table's and the legend's.
+   * A row the ring leaves out, a negative amount or a slice a legend hid, is
+   * left out here too.
    */
   protected renderSummary(shares: DonutShare[]): TemplateResult {
     const rows = this.sourceRows
     const locale = wordsLocale(this)
     const parts = shares
-      .filter((share) => this.showsSeries(rows[share.row]?.label ?? ''))
+      .filter((share) => share.fraction > 0)
       .map((share) => `${rows[share.row]?.label ?? ''} ${percentIn(locale).format(share.fraction)}`)
     const named = this.named ? `${this.named}: ` : ''
     /* Listed as the locale lists, which in English is with commas. */
@@ -372,15 +422,18 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
        never sideways, so `[part="center"]` is a sibling of the circles and would
        only ever read the fallback, sizing the hole as if every ring were the
        resting thickness. */
+    /* A frame served before the readings are known has no summary to point
+       at and no slice to walk, so it is a group until they arrive. */
+    const drawn = shares.length > 0
     return html`<div
-      aria-describedby=${this.named ? `helix-chart-summary${this.hole === 'none' ? '' : ' helix-chart-center'}` : nothing}
+      aria-describedby=${drawn && this.named ? `helix-chart-summary${this.hole === 'none' ? '' : ' helix-chart-center'}` : nothing}
       aria-label=${this.named || nothing}
-      aria-labelledby=${this.named ? nothing : 'helix-chart-summary'}
+      aria-labelledby=${drawn && !this.named ? 'helix-chart-summary' : nothing}
       id=${CHART_PLOT}
       part="plot"
-      role="application"
+      role=${drawn ? 'application' : this.named ? 'group' : nothing}
       style="--donut-chart-stroke: ${this.thickness}"
-      tabindex="0"
+      tabindex=${drawn ? '0' : nothing}
     >
       <svg
         aria-hidden="true"
@@ -477,6 +530,11 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
       @pointerenter=${(event: PointerEvent) => {
         if (this.pointer.accepts(event)) {
           this.pointer.set(index)
+        }
+      }}
+      @pointerup=${(event: PointerEvent) => {
+        if (event.pointerType === 'touch') {
+          this.pointer.tapTo(index)
         }
       }}
       part="segment${active ? ' segment-active' : ''}"
