@@ -1,12 +1,44 @@
-import { icons } from '@fusion.dev/helix-icons'
+import {
+  arrowLeft,
+  arrowRight,
+  caretDown,
+  caretLeft,
+  caretRight,
+  caretUp,
+  check,
+  info,
+  magnifyingGlass,
+  minus,
+  plus,
+  warning,
+  x,
+} from '@fusion.dev/helix-icons'
 import { registerIcons } from './registry.js'
 
 /*
- * The whole Helix set, registered by name.
+ * The glyphs the family's entry registers by name: the ones a control most
+ * often needs. The four carets, the two horizontal arrows, `check`, `x`,
+ * `plus`, `minus`, `magnifying-glass`, `info` and `warning`.
  *
- * The family's entry imports this, so `<helix-icon name="check">` draws with
- * nothing else written, as it always has. The element's own entry,
- * `icon/root`, leaves it out, so a page that registers the glyphs it names
- * ships those and not the 15 kB of the set.
+ * **A small set, because a name is resolved through an index no bundler can
+ * shake.** The whole set is 15 kB gzipped, and the family's entry used to
+ * register all of it, so a page that drew one glyph by name shipped every one.
+ * These thirteen cost about 700 bytes. A page that names any other glyph
+ * imports `icon/all`, which registers the whole set, and an element whose
+ * name resolves to nothing says which entry to add.
  */
-registerIcons(icons)
+registerIcons([
+  arrowLeft,
+  arrowRight,
+  caretDown,
+  caretLeft,
+  caretRight,
+  caretUp,
+  check,
+  info,
+  magnifyingGlass,
+  minus,
+  plus,
+  warning,
+  x,
+])

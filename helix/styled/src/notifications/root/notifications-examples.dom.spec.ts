@@ -12,7 +12,7 @@ beforeAll(async () => {
   await import('../../list/index.js')
   await import('../../avatar/index.js')
   await import('../../button/index.js')
-  await import('../../icon/index.js')
+  await import('../../icon/all/index.js')
   await import('../../badge/index.js')
   await import('../../icon-button/index.js')
   await import('../../drawer/index.js')

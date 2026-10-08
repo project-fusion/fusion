@@ -73,6 +73,8 @@ describe('icon rendering', () => {
     }
     expect(warnings.length).toBe(1)
     expect(warnings[0]).toContain('not-a-real-icon')
+    // The family's entry registers a small set, so the warning names the entry with the rest.
+    expect(warnings[0]).toContain("'@fusion.dev/helix-headless/icon/all'")
   })
 
   /* `label` was the only way in, so an `aria-label` written on the element,

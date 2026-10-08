@@ -20,6 +20,11 @@ import { styles } from './icon-root.css.js'
  * Reduced motion stills every animation. `auto-width` gives the box the
  * glyph's own proportions, for a mark wider than it is tall.
  *
+ * **`@fusion.dev/helix/icon` registers thirteen glyphs by name**, the ones a
+ * control most often needs, and `@fusion.dev/helix/icon/all` registers the
+ * whole set. The headless element lists the thirteen and says how a name is
+ * resolved.
+ *
  * @since 0.1.0
  * @status stable
  * @category media
