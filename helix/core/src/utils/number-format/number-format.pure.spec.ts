@@ -54,6 +54,17 @@ describe('reading a number', () => {
     expect(parseNumber('1.2.3', 'de-DE')).toBeNull()
   })
 
+  /* A format that writes no fraction or no groups still has the locale's
+     separators. Measured before this: a whole percent in `de-DE` took a point
+     for its decimal, the mark it groups with, and refused `0.25` and `12,5 %`. */
+  test("reads the locale's separators where the options write none", () => {
+    const percent: Intl.NumberFormatOptions = { style: 'percent' }
+    expect(parseNumber('0.25', 'de-DE', percent)).toBe(0.25)
+    expect(parseNumber('12,5 %', 'de-DE', percent)).toBe(0.125)
+    expect(parseNumber('1.234,5', 'de-DE', { maximumFractionDigits: 0 })).toBe(1234.5)
+    expect(parseNumber('12,5', 'de-DE', { useGrouping: false })).toBe(12.5)
+  })
+
   /* A keyboard in Arabic types its own digits. Measured before this: `١٢٣` in
      `ar-EG` was no number, and the field refused it. */
   test('reads the digits a locale writes, and what it writes back', () => {
