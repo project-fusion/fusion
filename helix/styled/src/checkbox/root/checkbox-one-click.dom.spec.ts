@@ -1,5 +1,12 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
+import {
+  hasLayout,
+  mount,
+  part,
+  registerDom,
+  settle,
+  type Updatable,
+} from '@fusion.dev/helix-testing/dom'
 
 /**
  * One press, one click, as from a native control, on every host that passes a
@@ -19,32 +26,33 @@ import { mount, part, registerDom, settle, type Updatable } from '@fusion.dev/he
  * host, and at the document in both phases, for what a page or a framework's
  * root listener hears.
  */
-/** The families whose hosts are pressed. */
-const FAMILIES = [
-  'button',
-  'checkbox',
-  'copy-button',
-  'drilldown',
-  'icon-button',
-  'menu',
-  'radio',
-  'speed-dial',
-  'switch',
-  'tabs',
-  'toggle',
-]
-
 beforeAll(async () => {
   registerDom()
   /* The styled tier first, which brings the headless tier it extends, then
-     each headless family by name. One at a time, so each module is evaluated
-     once. */
-  for (const family of FAMILIES) {
-    await import(`../../${family}/index.js`)
-  }
-  for (const family of FAMILIES) {
-    await import(`@fusion.dev/helix-headless/${family}`)
-  }
+     each headless family by name. One at a time and written out, so the
+     browser's bundler sees every one. */
+  await import('../../button/index.js')
+  await import('../index.js')
+  await import('../../copy-button/index.js')
+  await import('../../drilldown/index.js')
+  await import('../../icon-button/index.js')
+  await import('../../menu/index.js')
+  await import('../../radio/index.js')
+  await import('../../speed-dial/index.js')
+  await import('../../switch/index.js')
+  await import('../../tabs/index.js')
+  await import('../../toggle/index.js')
+  await import('@fusion.dev/helix-headless/button')
+  await import('@fusion.dev/helix-headless/checkbox')
+  await import('@fusion.dev/helix-headless/copy-button')
+  await import('@fusion.dev/helix-headless/drilldown')
+  await import('@fusion.dev/helix-headless/icon-button')
+  await import('@fusion.dev/helix-headless/menu')
+  await import('@fusion.dev/helix-headless/radio')
+  await import('@fusion.dev/helix-headless/speed-dial')
+  await import('@fusion.dev/helix-headless/switch')
+  await import('@fusion.dev/helix-headless/tabs')
+  await import('@fusion.dev/helix-headless/toggle')
 })
 
 afterEach(() => {
@@ -268,6 +276,27 @@ describe('a click sent to the host moves the control, and is the only click', ()
       await settled()
       expect(heard).toEqual(once(one))
       expect(state(target)).toBe(!before)
+    })
+  }
+})
+
+describe('a press on a <label for> is one click on the host', () => {
+  /* The label's own click, and the one it sends the box: two at the document
+     and one at the host, as for a native checkbox. In the browser only:
+     happy-dom's label sends no click to a custom element, so there it would
+     assert nothing. */
+  const browser = hasLayout() ? test : (): void => {}
+  for (const one of BOXES) {
+    browser(title(one), async () => {
+      const target = await host({
+        ...one,
+        markup: `${one.markup}<label id="label" for="host">L</label>`,
+      })
+      const label = document.getElementById('label') as HTMLLabelElement
+      const heard = hear(target, () => label.click())
+      await settled()
+      expect(heard).toEqual({ bubble: 2, capture: 2, change: 1, host: 1, input: 1 })
+      expect(state(target)).toBe(true)
     })
   }
 })
