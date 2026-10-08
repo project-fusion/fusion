@@ -1,5 +1,13 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, part, registerDom, role, slotted } from '@fusion.dev/helix-testing/dom'
+import {
+  hasLayout,
+  hasState,
+  mount,
+  part,
+  registerDom,
+  role,
+  slotted,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -23,6 +31,25 @@ describe('pagination', () => {
     // On internals, so a consumer's own `aria-label` beats it without the
     // element having written an attribute their server output never had.
     expect(nav.getAttributeNames()).toEqual(['pages'])
+  })
+
+  /* An ordered list numbers its items, and the run of pages starts wherever
+     the current page puts it, so a reader heard "3." before "Page 4". */
+  test('draws no list markers in this tier either', async () => {
+    const nav = await mount(
+      '<helix-headless-pagination pages="9" page="5"></helix-headless-pagination>',
+    )
+    if (hasLayout()) {
+      expect(getComputedStyle(part(nav, 'list') as Element).listStyleType).toBe('none')
+      return
+    }
+    /* happy-dom resolves no cascade, so the rule the element adopts is read. */
+    const declared = (
+      customElements.get('helix-headless-pagination') as unknown as {
+        styles?: { cssText?: string }
+      }
+    ).styles
+    expect(declared?.cssText?.replace(/\s+/g, ' ')).toContain("[part='list'] { list-style: none; }")
   })
 
   test('shows the whole range while there is nothing to hide', async () => {
