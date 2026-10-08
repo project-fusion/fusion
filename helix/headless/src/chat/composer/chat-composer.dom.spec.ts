@@ -278,14 +278,16 @@ describe('in a form', () => {
     return element
   }
 
-  test('the draft is the value it submits, and an empty one submits nothing', async () => {
+  /* An empty composer was left out of the form, where a native
+     `<textarea name="draft">` submits `draft=`. */
+  test('the draft is the value it submits, and an empty one an empty entry', async () => {
     const element = await inForm()
-    expect(formValue(element)).toBeNull()
+    expect(formValue(element)).toBe('')
     await type(element, 'Where is my order?')
     expect(formValue(element)).toBe('Where is my order?')
     element.send()
     await element.updateComplete
-    expect(formValue(element)).toBeNull()
+    expect(formValue(element)).toBe('')
   })
 
   test('a reset puts back the draft the markup declared', async () => {
@@ -311,7 +313,7 @@ describe('in a form', () => {
     await type(element, 'Kept')
     await type(element, '')
     expect(saved).toEqual(['Kept', ''])
-    expect(formValue(element)).toBeNull()
+    expect(formValue(element)).toBe('')
     element.formStateRestoreCallback(saved.at(-1) as string)
     expect(element.value).toBe('')
   })
