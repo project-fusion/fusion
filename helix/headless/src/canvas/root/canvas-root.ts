@@ -332,6 +332,7 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  *
  * @slot - The board's `helix-canvas-node` and `helix-canvas-edge` elements, drawn on the plane.
  * @slot empty - Content shown when the document has no nodes.
+ * @slot loading - Content shown while `loading` is set, such as a progress bar while the document arrives.
  * @slot footer - Content below the board.
  * @slot fullscreen-icon - Replaces the glyph inside the fullscreen button.
  * @slot header - Content above the board.
@@ -395,6 +396,7 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  * @cssstate fullscreen - While the board fills the screen.
  * @cssstate holding - An item picked up with a click follows the pointer until the next press puts it down.
  * @cssstate idle - The user has been still for `idle-delay` milliseconds. The board's own controls stay; select on it to hide chrome of your own.
+ * @cssstate loading - While `loading` is set.
  * @cssstate pressing - While a press on the board, its cards or its connections is under way.
  * @cssstate sharing - The page keeps the plain wheel and one finger, with `gestures="cooperative"` or while a board with `gestures="activate"` waits to be pressed.
  * @cssstate using - A board with `gestures="activate"` has been pressed and has the gestures.
@@ -525,6 +527,13 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   @words
   @property({ attribute: 'linked-label' })
   linkedLabel = '{leadsTo}; {comesFrom}'
+
+  /**
+   * Marks the board as busy while its document arrives: the board is
+   * `aria-busy`, and the `loading` slot is shown.
+   */
+  @property({ reflect: true, type: Boolean })
+  loading = false
 
   /**
    * What screen readers hear after a key moves a card, with `{name}` for the
@@ -4090,6 +4099,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     this.toggleState('empty', this.nodes.length === 0)
     this.toggleState('fullscreen', this.filled)
     this.toggleState('idle', this.resting)
+    this.toggleState('loading', this.loading)
   }
 
   /**
@@ -4571,6 +4581,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       role="group"
       aria-label=${this.label || this.getAttribute?.('aria-label') || this.fallbackLabel}
       aria-roledescription=${(this.label || this.getAttribute?.('aria-label')) && this.roleLabel ? this.roleLabel : nothing}
+      aria-busy=${this.loading ? 'true' : nothing}
       aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight Plus Minus"
       tabindex="0"
       @focusin=${this.idle.stir}
@@ -4621,6 +4632,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
           ${this.renderMarquee(origin)}
         </div>
         <slot name="empty"></slot>
+        ${this.loading ? html`<slot name="loading"></slot>` : nothing}
         ${this.renderGestures()}
       </div>
       ${this.renderControls()} ${this.renderMinimap()}
