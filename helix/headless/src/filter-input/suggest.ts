@@ -14,6 +14,78 @@ export const currentTerm = (text: string, caret: number = text.length): string =
   return (colon === -1 ? word : word.slice(colon + 1)).replace(/^-/u, '')
 }
 
+/**
+ * The field the term at the caret is a value of: the word before its colon,
+ * without a leading `-`, so `-status:ope` is a value of `status`. Empty where
+ * the term has no colon, which is a key being typed.
+ */
+export const currentField = (text: string, caret: number = text.length): string => {
+  const before = text.slice(0, caret)
+  const word = before.slice(before.search(/\S*$/u))
+  const colon = word.indexOf(':')
+  return colon === -1 ? '' : word.slice(0, colon).replace(/^-/u, '')
+}
+
+/**
+ * The text with a suggestion written over the term at the caret, and where
+ * the caret goes after it.
+ *
+ * The word's field and its colon stay, and a leading `-`, so a value chosen
+ * for `-status:op` gives `-status:open`. A space follows, ready for the next
+ * term, unless the suggestion ends with a colon, which is a key whose value
+ * comes next.
+ */
+export const completeTerm = (
+  text: string,
+  caret: number,
+  value: string,
+): { caret: number; text: string } => {
+  const before = text.slice(0, caret)
+  const start = before.search(/\S*$/u)
+  const word = before.slice(start)
+  const colon = word.indexOf(':')
+  const kept = colon === -1 ? (word.startsWith('-') ? '-' : '') : word.slice(0, colon + 1)
+  const after = text.slice(caret).replace(/^\S*/u, '')
+  const space = value.endsWith(':') ? '' : ' '
+  const written = `${text.slice(0, start)}${kept}${value}${space}`
+  return { caret: written.length, text: `${written}${space ? after.replace(/^\s+/u, '') : after}` }
+}
+
+/** One suggestion a `source` gives: its words, or its value with the words a reader sees. */
+export type FilterSuggestion =
+  | string
+  | {
+      /** Shown, and skipped by the arrow keys. */
+      disabled?: boolean | undefined
+      /** What a reader sees. The value where unset. */
+      label?: string | undefined
+      /** What is written over the term when the suggestion is chosen. */
+      value: string
+    }
+
+/** What a `source` is asked for. */
+export interface FilterSourceRequest {
+  /**
+   * The field the term is a value of, where the caret is after `field:`, as
+   * `currentField` reads it. Empty while a key is being typed.
+   */
+  field: string
+  /** Aborted once a later keystroke asks again, or the field leaves the page. */
+  signal: AbortSignal
+  /** The term at the caret, after its colon, as `currentTerm` reads it. */
+  term: string
+  /** The whole text. */
+  text: string
+}
+
+/**
+ * Where the suggestions come from: given the term at the caret, the
+ * suggestions for it, or a promise of them.
+ */
+export type FilterSource = (
+  request: FilterSourceRequest,
+) => readonly FilterSuggestion[] | PromiseLike<readonly FilterSuggestion[]>
+
 /** Whether a suggestion's words hold the term, ignoring case and accents. */
 export const suggests = (words: string, term: string): boolean => {
   const plain = (text: string): string => text.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase()

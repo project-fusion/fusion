@@ -2,6 +2,7 @@ import {
   AriaForwardController,
   countLabel,
   customElement,
+  DelayController,
   drawIcon,
   drawStatus,
   type FacetDetail,
@@ -27,7 +28,15 @@ import { property, state } from 'lit/decorators.js'
 import type { HelixHeadlessFilterChip } from '../chip/filter-chip.js'
 import { HelixHeadlessFilterField } from '../field/filter-field.js'
 import { readFilterText } from '../grammar.js'
-import { currentTerm, suggests, tokenEntry } from '../suggest.js'
+import {
+  completeTerm,
+  currentField,
+  currentTerm,
+  type FilterSource,
+  type FilterSuggestion,
+  suggests,
+  tokenEntry,
+} from '../suggest.js'
 
 /**
  * A picker that holds what is ticked for its fields, which is what `FilterMenu`
@@ -139,9 +148,15 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  *
  * **The picker has an entry of its own.** `FilterMenu` draws its pages with
  * `Menu`, which a field without a picker does not need, so this family's entry
- * leaves it out. A page that writes one imports
- * `@fusion.dev/helix/filter-input/menu` as well, and a picker written without it
- * is reported once the page has loaded, with the entry to add.
+ * leaves it out. A page that writes a `FilterMenu` imports both entries:
+ *
+ * ```js
+ * import '@fusion.dev/helix/filter-input'
+ * import '@fusion.dev/helix/filter-input/menu'
+ * ```
+ *
+ * A picker written without the second is reported once the page has loaded,
+ * with the entry to add.
  *
  * **Suggestions.** Slot options into `suggestions` and the field shows them,
  * moves through them with the arrow keys, and presses one on Enter. The option
@@ -156,6 +171,24 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * values next. Use `selectionStart` and `setSelectionRange` to write a
  * completion back and put the caret after it, or the next parse reads the wrong
  * term.
+ *
+ * **Suggestions from a source.** Set `source` to a function, and the field asks
+ * it for suggestions as the text changes and draws them as options in the
+ * panel. It is given the term at the caret, the field the term is a value of,
+ * the whole text, and an `AbortSignal`, and returns the suggestions or a
+ * promise of them. `filter-delay` waits for typing to rest before asking, and
+ * a later keystroke aborts a request still out. While a promise is pending, the
+ * panel shows `loading-text` and a screen reader hears it, then the count.
+ * Choosing a suggestion writes its value over the term at the caret, and a
+ * finished `field:value` is read into a chip as Enter would. Cancel its
+ * `helix-select` to write it yourself.
+ *
+ * ```js
+ * filter.source = async ({ field, term, signal }) => {
+ *   const response = await fetch(`/values?field=${field}&q=${term}`, { signal })
+ *   return response.json()
+ * }
+ * ```
  *
  * **State.** Three things have three different owners:
  *
@@ -198,7 +231,7 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the suggestions open. Cancelable: call `preventDefault()` to keep them closed.
  * @event {HelixDismissEvent} helix-dismiss - Fired when the user removes a token with its remove button or with Backspace in an empty field. A `FilterChip` that names a declared field sends `helix-facet` instead. Cancelable: call `preventDefault()` to keep the token.
  * @event {HelixFacetEvent} helix-facet - Fired when a filter changes, whether it was typed, picked, or removed. Cancelable: call `preventDefault()` to leave the text and the chip as they were.
- * @event {HelixSelectEvent} helix-select - Fired by an option in `suggestions` when it is chosen, and bubbles out of the field. Cancelable: call `preventDefault()` to stop other listeners acting on it. The field takes no action on a choice; you decide what it does.
+ * @event {HelixSelectEvent} helix-select - Fired by an option in `suggestions` when it is chosen, and bubbles out of the field. Cancelable: call `preventDefault()` to stop other listeners acting on it. The field takes no action on an option you slotted, and you decide what it does. A suggestion from `source` is written over the term at the caret unless you cancel it.
  * @event {Event} input - Fired when the text changes.
  * @event {ToggleEvent} toggle - Fired when the suggestions panel opens or closes, with `newState` and `oldState`.
  *
@@ -211,13 +244,13 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * @csspart label - The label above the field.
  * @csspart lead - The box before the text that holds the `start` slot.
  * @csspart live - The live region that says how many suggestions the open panel offers. It is rendered from the first time the panel opens with suggestions.
- * @csspart loading - Shown in the panel while the suggestions load.
+ * @csspart loading - Shown in the panel while the suggestions load: while `loading` is set, or a request to `source` is out.
  * @csspart rest - The count of tokens that did not fit. It is a `<button>` with `expandable` and a `<span>` without it.
  * @csspart surface - The floating panel the suggestions sit in.
  * @csspart tags - The row the tokens sit in.
  *
  * @cssstate invalid - The field has an error to show, from the browser's validation or from your `feedback`.
- * @cssstate loading - While `loading` is set.
+ * @cssstate loading - While `loading` is set, or a request to `source` is out.
  * @cssstate no-results - `filter-suggestions` hid every suggestion, and `no-results-text` or the `no-results` slot says so.
  * @cssstate open - The suggestions are open.
  */
@@ -282,6 +315,25 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
    */
   @property({ attribute: 'filter-suggestions', type: Boolean })
   filterSuggestions = false
+
+  /**
+   * How long typing rests before `source` is asked, in milliseconds. A delay
+   * sends one request for a word in place of one for each letter. The arrow
+   * keys and Enter ask at once. `0` asks on every keystroke.
+   */
+  @property({ attribute: 'filter-delay', type: Number })
+  filterDelay = 0
+
+  /**
+   * Where the suggestions come from: a function given the term at the caret,
+   * the field it is a value of, the whole text, and an `AbortSignal`, which
+   * returns the suggestions or a promise of them. Each is a string, or a
+   * `value` with a `label` and `disabled`. The field draws them as options in
+   * the panel, beside any you slot. A property only, there being no way to
+   * write a function in markup. See the class description.
+   */
+  @property({ attribute: false })
+  source?: FilterSource | undefined
 
   /**
    * Whether the suggestions are still loading, such as while a request for the
@@ -372,7 +424,7 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
   /** Says how many suggestions the open panel offers, when that changes. */
   private sayCount(): void {
     /* `-2` for loading, so the count is said again once the suggestions come. */
-    const count = this.open && this.suggesting ? (this.loading ? -2 : this.suggestions.length) : -1
+    const count = this.open && this.suggesting ? (this.busy ? -2 : this.suggestions.length) : -1
     if (count === this.saidCount) {
       return
     }
@@ -593,6 +645,7 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
        now. */
     this.dismissed = false
     this.settleOpen()
+    this.askSoon()
     /* **A paste is read at once**, as Enter reads what was typed: a pasted
        `status:open` is a finished filter, and leaving it as text until the
        reader thought to press Enter showed a query the results did not
@@ -732,13 +785,32 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
       return
     }
     const field = chip.getAttribute('name') ?? ''
-    const menu = field === '' ? null : this.menuFor(field)
-    if (!menu) {
+    /* **Any declared field, in the menu or outside it.** Only a field in a
+       picker was taken, so a chip for `assignee`, declared outside the menu
+       because its values cannot be listed, sent `helix-dismiss` where every
+       other declared chip sent `helix-facet`. */
+    const declared =
+      field === '' ? undefined : this.fields.find((one) => (one.name ?? '') === field)
+    if (!declared) {
       return
     }
     event.preventDefault()
     event.stopPropagation()
-    menu.apply(field, [])
+    const menu = this.menuFor(field)
+    if (menu) {
+      menu.apply(field, [])
+      return
+    }
+    const { label, operators } = declared.vocabulary
+    const usual = operators.find((operator) => operator.default) ?? operators[0]
+    this.announceFacet({
+      arity: usual?.arity ?? 'many',
+      field,
+      label,
+      operator: usual?.name ?? '',
+      operatorLabel: '',
+      values: [],
+    })
   }
 
   /**
@@ -845,6 +917,193 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
     this.requestOpen(this.suggesting && !this.dismissed && !this.isDisabled && focused)
   }
 
+  /** Whether a request to `source` is out, which the panel shows as loading. */
+  @state()
+  private fetching = false
+
+  /** Whether the suggestions are loading: `loading`, or a request to `source` out. */
+  private get busy(): boolean {
+    return this.loading || this.fetching
+  }
+
+  /** The request to `source` still out, which a later one aborts. */
+  private request: AbortController | undefined
+
+  /** The text `source` was last asked about, so focus alone does not ask again. */
+  private asked: string | undefined
+
+  /** The source the suggestions drawn now came from. */
+  private used: FilterSource | undefined
+
+  /** The options this element drew from what `source` gave, which the next answer replaces. */
+  private sourced: SuggestionOption[] = []
+
+  /** The request waiting out `filterDelay`, if any. */
+  private readonly asking = new DelayController(this, { renders: false })
+
+  /**
+   * A new source, or none: what the old one gave goes, and the new one is
+   * asked where the reader is in the field.
+   */
+  private resetSource(): void {
+    /* Asked already, as focus arriving with the new source in place does. */
+    if (this.source === this.used) {
+      return
+    }
+    this.used = this.source
+    this.request?.abort()
+    this.request = undefined
+    this.fetching = false
+    this.asked = undefined
+    if (this.sourced.length > 0) {
+      this.drawSourced([])
+    }
+    if (this.source && (this.matches(':focus-within') || this.contains(document.activeElement))) {
+      this.ask()
+    }
+  }
+
+  /** Asks `source` once typing rests for `filterDelay`, or at once without one. */
+  private askSoon(): void {
+    if (!this.source) {
+      return
+    }
+    this.asking.cancel()
+    if (this.filterDelay > 0) {
+      this.asking.start(this.filterDelay, () => this.ask())
+    } else {
+      this.ask()
+    }
+  }
+
+  /**
+   * Asks `source` for suggestions for the term at the caret, and draws what
+   * it gives.
+   *
+   * **A later request aborts this one, and an answer that arrives late is
+   * dropped**, whether or not the source heeds the signal: the panel shows
+   * what the text says now.
+   */
+  private ask(): void {
+    this.asking.cancel()
+    const source = this.source
+    if (!source) {
+      return
+    }
+    this.used = source
+    this.request?.abort()
+    const request = new AbortController()
+    this.request = request
+    const text = this.value
+    const caret = this.control?.selectionStart ?? text.length
+    this.asked = text
+    const take = (suggestions: readonly FilterSuggestion[] | undefined): void => {
+      if (this.request !== request) {
+        return
+      }
+      this.request = undefined
+      this.fetching = false
+      this.drawSourced(Array.isArray(suggestions) ? suggestions : [])
+    }
+    let answer: ReturnType<FilterSource>
+    try {
+      answer = source({
+        field: currentField(text, caret),
+        signal: request.signal,
+        term: currentTerm(text, caret),
+        text,
+      })
+    } catch {
+      take([])
+      return
+    }
+    if (typeof (answer as PromiseLike<unknown>)?.then !== 'function') {
+      take(answer as readonly FilterSuggestion[])
+      return
+    }
+    this.fetching = true
+    ;(answer as PromiseLike<readonly FilterSuggestion[]>).then(take, () => take([]))
+  }
+
+  /**
+   * Draws what `source` gave as options in the `suggestions` slot, in place of
+   * the ones it gave before, and leaves the ones you slotted alone. The
+   * options are this tier's `Option`, which a page on the headless tier
+   * imports; one not registered is reported.
+   */
+  private drawSourced(suggestions: readonly FilterSuggestion[]): void {
+    for (const option of this.sourced) {
+      option.remove()
+    }
+    const tag = `${(this.constructor as typeof HelixFormElement).tier}option`
+    if (suggestions.length > 0 && !customElements.get(tag)) {
+      const entry = tag.startsWith('helix-headless-')
+        ? '@fusion.dev/helix-headless'
+        : '@fusion.dev/helix'
+      reportRuntime({
+        kind: 'unregistered-part',
+        message: `<${tag}> is not registered, so the suggestions \`source\` gave cannot be chosen. Import '${entry}/option'.`,
+        tag: this.localName,
+      })
+    }
+    this.sourced = suggestions.map((suggestion) => {
+      const { disabled, label, value } =
+        typeof suggestion === 'string'
+          ? { disabled: false, label: undefined, value: suggestion }
+          : suggestion
+      const option = document.createElement(tag) as SuggestionOption
+      option.slot = 'suggestions'
+      option.setAttribute('value', value)
+      option.textContent = label ?? value
+      if (disabled) {
+        option.setAttribute('disabled', '')
+      }
+      return option
+    })
+    this.append(...this.sourced)
+    this.handleSuggestions()
+  }
+
+  /**
+   * A suggestion `source` gave, chosen: its value written over the term at the
+   * caret, and a finished `field:value` read into a chip, as Enter reads it.
+   *
+   * **After every listener has had its turn**, as a chip under `chips` is
+   * drawn, so a `preventDefault()` on the `helix-select` is read and leaves the
+   * text to you.
+   */
+  private readonly handleSourcedSelect = (event: Event): void => {
+    const option = event.composedPath()[0]
+    if (!this.sourced.includes(option as SuggestionOption)) {
+      return
+    }
+    queueMicrotask(() => {
+      if (event.defaultPrevented || !this.sourced.includes(option as SuggestionOption)) {
+        return
+      }
+      const value = (option as SuggestionOption).value
+      const written = completeTerm(
+        this.value,
+        this.control?.selectionStart ?? this.value.length,
+        value,
+      )
+      if (!this.requestValue(written.text)) {
+        return
+      }
+      const control = this.control
+      if (control) {
+        restoreValue(control, this.value)
+        control.setSelectionRange(written.caret, written.caret)
+      }
+      this.activeAt = -1
+      this.dismissed = false
+      if (currentField(written.text, written.caret - 1) !== '') {
+        this.readFilters()
+      }
+      this.ask()
+    })
+  }
+
   /** Moves the highlight, wrapping, and opens the panel if it was closed. */
   private move(by: number): void {
     const options = this.suggestions
@@ -874,6 +1133,11 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
     }
     if (this.tokenKeydown(event, this.value)) {
       return
+    }
+    /* A key that acts on the suggestions acts on what was typed, so a request
+       still waiting out `filterDelay` goes now, as Combobox narrows. */
+    if (['ArrowDown', 'ArrowUp', 'Enter'].includes(event.key)) {
+      this.asking.flush()
     }
 
     /* Enter over a highlighted suggestion is that suggestion's, and falls
@@ -974,7 +1238,7 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
   private refreshSuggesting(): void {
     this.narrow()
     const options = this.suggestions
-    this.suggesting = options.length > 0 || this.loading || this.unmatched
+    this.suggesting = options.length > 0 || this.busy || this.unmatched
     /* Clamped rather than kept: the list under the highlight has just been
        replaced, and an index into the old one points at whatever happens to sit
        there now. Reset, so a reader who has not moved since is not holding a
@@ -990,7 +1254,7 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
   private get unmatched(): boolean {
     const said =
       this.noResultsText !== '' || this.knownChildren.some((child) => child.slot === 'no-results')
-    return said && !this.loading && this.options.length > 0 && this.suggestions.length === 0
+    return said && !this.busy && this.options.length > 0 && this.suggestions.length === 0
   }
 
   /** The panel again, whenever what is in it changes. */
@@ -1002,6 +1266,12 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
   /** Focus arriving in the field is a reader asking what they can type. */
   private readonly handleFocusIn = (): void => {
     this.settleOpen()
+    /* What can be typed here, before anything is: the keys a source offers
+       for an empty field. Once for each text, so focus moving between the
+       text and a token asks nothing. */
+    if (this.source && this.asked !== this.value) {
+      this.ask()
+    }
   }
 
   /**
@@ -1080,12 +1350,17 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
     super.connectedCallback()
     this.addEventListener('helix-dismiss', this.handleDismiss, { capture: true })
     this.addEventListener(HelixFacetEvent.eventName, this.handleFacet)
+    this.addEventListener('helix-select', this.handleSourcedSelect)
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('helix-dismiss', this.handleDismiss, { capture: true })
     this.removeEventListener(HelixFacetEvent.eventName, this.handleFacet)
+    this.removeEventListener('helix-select', this.handleSourcedSelect)
+    this.request?.abort()
+    this.request = undefined
+    this.fetching = false
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -1115,7 +1390,7 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
        `updateComplete` would read the count from before the change. */
     this.handleTokens()
     this.refreshSuggesting()
-    this.toggleState('loading', this.loading)
+    this.toggleState('loading', this.busy)
     this.toggleState('no-results', this.unmatched)
   }
 
@@ -1162,6 +1437,9 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    if (changed.has('source')) {
+      queueMicrotask(() => this.resetSource())
+    }
     this.releaseCaret?.()
     this.releaseCaret = undefined
     /* The text as the restore state, because with tokens the value is a
@@ -1298,7 +1576,7 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
       <slot name="suggestions" @slotchange=${this.handleSuggestions}></slot>
       <!-- Hidden from the tree, which a listbox keeps for its options: the
            live region says these. -->
-      <div part="loading" aria-hidden="true" ?hidden=${!this.loading}>
+      <div part="loading" aria-hidden="true" ?hidden=${!this.busy}>
         <slot name="loading">${this.loadingText}</slot>
       </div>
       <div part="empty" aria-hidden="true" ?hidden=${!this.unmatched}>

@@ -282,6 +282,34 @@ describe('a chip asking to go', () => {
     expect(heard[0]?.values).toEqual(['refunded'])
   })
 
+  /* A field whose values cannot be listed is declared outside the menu, and
+     its chip sent `helix-dismiss` where a chip for a field in the menu sent
+     `helix-facet`, which the field's contract says of any declared field. */
+  test('sends helix-facet for a field declared outside the menu as well', async () => {
+    const host = await mount(
+      `${FIELDS}<helix-headless-filter-field name="assignee" label="Assignee"></helix-headless-filter-field>`,
+    )
+    const chip = await chipFor(host, 'assignee')
+    const heard = watch(host)
+    let dismissed = 0
+    host.addEventListener('helix-dismiss', () => {
+      dismissed += 1
+    })
+    ;(chip as unknown as { dismiss: () => boolean }).dismiss()
+    await settle(host)
+    expect(dismissed).toBe(0)
+    expect(heard).toEqual([
+      {
+        arity: 'many',
+        field: 'assignee',
+        label: 'Assignee',
+        operator: 'any',
+        operatorLabel: '',
+        values: [],
+      },
+    ])
+  })
+
   test('a token naming no declared field is still the consumer’s to answer', async () => {
     const host = await mount()
     const tag = document.createElement('helix-headless-filter-chip')
