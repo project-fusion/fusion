@@ -33,7 +33,7 @@ any of them.
 
 **An allowlist of what is skippable, not a denylist of what is not.** The set is
 the paths that reach no component and no page: `fusion/docs/` is the
-repository's own writing, a `.md` anywhere is a document no browser job reads, `cortex/` is Rust and MDX with nothing rendered, `.claude/` is tooling
+repository's own writing, a `.md` anywhere is a document no browser job reads, `cortex/` is Rust and MDX with nothing rendered, `proof/` is a command line no browser job runs yet, `.claude/` is tooling
 for the agent. Everything else runs the browser jobs, `tooling/` included,
 because `build-frame.mjs` and `build-styles.mjs` live there and both are read by
 every example. A path nobody thought about lands outside the list and runs, which
