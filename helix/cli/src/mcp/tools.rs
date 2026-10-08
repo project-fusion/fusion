@@ -1,4 +1,4 @@
-//! The tools: five lookups and two derivations.
+//! The tools: five lookups, a check, and two derivations.
 //!
 //! **The lookups answer from the installed packages.** Each is one decision an
 //! agent makes while writing a page: which family, what it takes, an example
@@ -6,6 +6,10 @@
 //! `examples.json`, and `tokens.json` the project's Helix packages ship, so an
 //! answer is the installed version's and names it. Each is a `helix api` verb
 //! as well, so a script and an agent get the same answer from one function.
+//!
+//! **The check is `helix scan` on the agent's own code**: files in the
+//! project, or a snippet before it is written, judged against everything the
+//! project installs and imports, with the findings in the scan's own shape.
 //!
 //! **The derivations answer what no file can hold**: what a brand color
 //! derives to, and whether it clears its contrast targets. They split the way
@@ -160,6 +164,21 @@ pub fn catalog() -> Vec<Value> {
             "title": "Find Helix tokens",
         }),
         json!({
+            "annotations": annotations("Check Helix code"),
+            "description": "Checks Helix code you wrote against the installed packages, as `helix scan` does: unknown tags, attributes, values, slots, parts, hooks, events, and tokens, a `--_helix-` primitive read, `[disabled]` on a form control, and a tag whose entry nothing imports. Pass `files`, paths in the project, or `code` with its `language`. The whole project is read, so imports elsewhere count. Fix every finding at `error`.",
+            "inputSchema": {
+                "properties": {
+                    "code": { "description": "A snippet to check before you write it.", "type": "string" },
+                    "files": { "description": "Paths of files in the project, relative to it.", "items": { "type": "string" }, "type": "array" },
+                    "language": { "description": "The snippet's language: `tsx`, `jsx`, `html`, `vue`, `svelte`, `css`, and the like. Defaults to `tsx`.", "type": "string" },
+                },
+                "type": "object",
+            },
+            "name": "helix_check",
+            "outputSchema": output(&[("counts", "object"), ("findings", "array"), ("unsettled", "array"), ("versions", "object")]),
+            "title": "Check Helix code",
+        }),
+        json!({
             "annotations": annotations("Derive a Helix theme"),
             "description": "Derives a complete Helix token set from a brand color, or from none for ink, and returns the CSS to write, with each color a `light-dark()` pair unless the intent names one mode. Every foreground and background pair meets its contrast target by construction. Use this when you need the actual custom properties for a theme.",
             "inputSchema": intent_schema(),
@@ -267,12 +286,53 @@ pub fn call(name: &str, arguments: &Value, from: &Path) -> Result<Answer, String
         )
         .map(Answer::of)
         .map_err(|failure| said(&failure)),
+        "helix_check" => check(arguments, from),
         "helix_audit_theme" | "helix_derive_theme" => theme(name, arguments),
         _ => Err(format!(
             "no tool named {name}. This server has {}.",
             names().join(", ")
         )),
     }
+}
+
+/// `helix scan`, narrowed to the files or the snippet asked about.
+fn check(arguments: &Value, from: &Path) -> Result<Answer, String> {
+    let files: Vec<std::path::PathBuf> = arguments["files"]
+        .as_array()
+        .map(|files| {
+            files
+                .iter()
+                .filter_map(Value::as_str)
+                .map(std::path::PathBuf::from)
+                .collect()
+        })
+        .unwrap_or_default();
+    let code = arguments["code"].as_str();
+    if files.is_empty() && code.is_none() {
+        return Err(
+            "give `files`, paths in the project, or `code` with its `language`.".to_owned(),
+        );
+    }
+    let scan = crate::args::Scan {
+        build: None,
+        config: None,
+        dir: None,
+        file: files,
+        out: None,
+        stdin: code.map(|_| arguments["language"].as_str().unwrap_or("tsx").to_owned()),
+    };
+    let (run, _) = crate::scan::scanned(&scan, from, code).map_err(|failure| said(&failure))?;
+    let count = |severity: &str| {
+        run["findings"].as_array().map_or(0, |all| {
+            all.iter().filter(|one| one["severity"] == severity).count()
+        })
+    };
+    Ok(Answer::of(json!({
+        "counts": { "error": count("error"), "info": count("info"), "warn": count("warn") },
+        "findings": run["findings"],
+        "unsettled": run["unsettled"],
+        "versions": run["versions"],
+    })))
 }
 
 /// The two derivations.
