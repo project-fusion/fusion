@@ -558,7 +558,7 @@ export class HelixStrands extends HelixElement {
       )
       this.table = lookup(path)
     } else {
-      path = boxPath(variant, this.at, this.box.height)
+      path = boxPath(variant, this.at, this.box.height, this.box.width)
     }
     this.points.fill(0)
     path.forEach((point, i) => {

@@ -61,33 +61,69 @@ const WIDTH = { fan: 0.12, ribbon: 0.24, waves: 0.06 } as const
 /** Where a fan's bend sits across its box, when `at` is not given. */
 const FAN_AT = 0.5
 
-/** Where a fan's lower arm leaves it, below the bend, as a share of its height. */
-const FAN_EXIT = 0.62
+/**
+ * Where a fan's lower arm hands over to the ribbon after it, below the bend,
+ * as a share of its height. Inside a box, where nothing follows, the arm runs
+ * on out of the box.
+ *
+ * As far as the ribbon can follow: the arm's slope there, 0.6 across for each
+ * pixel down, is one the ribbon's curve reaches. Further on, the arm ran
+ * flatter than the ribbon ever does, and the strand bent to meet it.
+ */
+const FAN_EXIT = 0.3
 
 /**
- * A fan: a tight, bright bend with its arms opening toward the right.
+ * The tightest any form turns, as a share of the box's height: the radius of
+ * its sharpest curve.
+ *
+ * Half the height. A fan's bend a few dozen pixels round kinked the strands
+ * that ran along its inside, and read as a fold in the light where every form
+ * is meant to be one sweep. `path.pure.spec.ts` measures it on every form.
+ */
+export const TURN = 0.5
+
+/**
+ * A fan: a bright bend with its arms opening toward the right.
  *
  * The bend sits at `at` across and at 58% of `height` down from `top`, and the
  * arms leave above and below it. The width narrows at the bend, which is what
  * makes the strands converge into one hot line there.
  *
- * **The lower arm leaves heading down**, at the ribbon's own width, to where a
- * ribbon after it turns: an arm that ran out to the side and a ribbon that
- * started back toward the middle met in a hook, and a strand a third of the
- * ribbon's width met one three times as wide.
+ * **A parabola in pixels**, so the bend is the tightest point and its radius
+ * is `TURN` of the height whatever the box's shape: drawn in shares of the
+ * width, a wide box flattened the bend and a narrow one folded it.
+ *
+ * @param width The box's width, in CSS pixels, to draw the parabola in.
+ * @param reach How far the lower arm runs below the bend, as a share of the
+ *   height. It widens toward the ribbon's width on the way.
  */
-const fan = (top: number, height: number, at: number, narrow: boolean): PathPoint[] => {
+const fan = (
+  top: number,
+  height: number,
+  at: number,
+  narrow: boolean,
+  width: number,
+  reach: number,
+): PathPoint[] => {
   const x = narrow ? Math.max(at, 0.8) : at
   const y = top + height * 0.58
-  const arm = narrow ? 0.12 : 0.15
-  const exit = narrow ? 0.12 : 0.33
-  return [
-    [x + 0.38, y - height * 0.73, WIDTH.fan, 0.2],
-    [x + arm, y - height * 0.3, WIDTH.fan * 0.6, 0.9],
-    [x, y, 0.012, GLOW.fan],
-    [x + arm, y + height * 0.3, WIDTH.fan * 0.6, 0.9],
-    [x + exit, y + height * FAN_EXIT, WIDTH.fan * 1.4, 0.55],
-  ]
+  /* Across, as a share of the width, at `down` heights from the bend. */
+  const out = (down: number): number => x + (down * down * height) / (2 * TURN) / width
+  /* Evenly spaced, because a spline through points spaced unevenly bends
+     hardest where the spacing changes, which put a fold in the arm. The upper
+     arm fades in from above the box; the lower one widens toward the
+     ribbon's width and dims toward its brightness. */
+  const points: PathPoint[] = []
+  for (let step = -7; step * 0.15 <= reach + 1e-9; step++) {
+    const down = step * 0.15
+    const upper = down < 0
+    const wide = upper
+      ? 0.02 + (WIDTH.fan - 0.02) * Math.min(1, -down / 0.6)
+      : 0.02 + (WIDTH.fan * 1.4 - 0.02) * (down / reach)
+    const glow = upper ? Math.max(0, 1 + down * 1.07) : 1 - down * 0.73
+    points.push([out(down), y + down * height, wide, GLOW.fan * glow])
+  }
+  return points
 }
 
 /**
@@ -97,38 +133,108 @@ const fan = (top: number, height: number, at: number, narrow: boolean): PathPoin
  * `fromRight` says which side it enters from, so consecutive waves alternate
  * and the ribbon turns off screen between them.
  *
- * **A wave the ribbon leads into sweeps down across the page**, gathering from
- * the ribbon's width on the side the ribbon is on, so the ribbon leans into it.
- * A flat wave entered from off screen met a ribbon running down the page at a
- * right angle.
+ * **A wave the ribbon leads into sweeps down across the page from where the
+ * ribbon left off**, gathering from the ribbon's width, so the ribbon leans
+ * into it. A flat wave entered from off screen met a ribbon running down the
+ * page at a right angle, and one that started at a fixed place made a ribbon
+ * that ended elsewhere double back to reach it.
+ *
+ * A flat wave drops in and climbs out a box's height beyond each edge,
+ * so its turns happen off screen at any shape of box: a fixed share of the
+ * width put them just inside a narrow box.
+ *
+ * @param width The box's width, in CSS pixels.
+ * @param from Where the ribbon before it ended, as a share of the width, or
+ *   `undefined` where no ribbon leads into it.
  */
 const wave = (
   y: number,
   height: number,
   fromRight: boolean,
   narrow: boolean,
-  joined = false,
+  width: number,
+  from?: number,
 ): PathPoint[] => {
   const w = narrow ? WIDTH.waves * 2 : WIDTH.waves
   const glow = narrow ? GLOW.waves * 0.65 : GLOW.waves
   const side = (share: number): number => (fromRight ? 1 - share : share)
-  if (joined) {
+  if (from !== undefined) {
+    /* Each point a share of the way from the ribbon to the far edge. */
+    const across = (share: number): number => from + ((fromRight ? 0 : 1) - from) * share
     return [
-      [side(0.1), y - height * 0.32, WIDTH.ribbon * 0.5, glow * 0.55],
-      [side(0.38), y - height * 0.08, w, glow],
-      [side(0.68), y + height * 0.04, w, glow],
-      [side(0.96), y + height * 0.16, w, glow * 0.6],
-      [side(1.16), y + height * 0.4, w, 0],
+      [across(0.03), y - height * 0.62, WIDTH.ribbon * 0.7, GLOW.ribbon],
+      [across(0.12), y - height * 0.36, WIDTH.ribbon * 0.5, glow * 0.55],
+      [across(0.38), y - height * 0.1, w, glow],
+      [across(0.66), y + height * 0.04, w, glow],
+      [across(1), y + height * 0.14, w, glow * 0.6],
+      [across(1.5), y + height * 0.3, w, 0],
     ]
   }
-  return [
-    [side(-0.15), y - height * 0.35, w, 0],
-    [side(-0.05), y, w, glow * 0.6],
-    [side(0.3), y + 18, w, glow],
-    [side(0.7), y - 18, w, glow],
-    [side(1.05), y, w, glow * 0.6],
-    [side(1.15), y + height * 0.35, w, 0],
-  ]
+  /* One smooth line sampled at even steps: a rise and fall across the box,
+     scaled to the width it spans up to 18 pixels, and a curve in and out of
+     a parabola beyond each edge. Points placed by hand were spaced unevenly,
+     and the spline bent hardest where the spacing changed. */
+  const beyond = height / width
+  const rise = Math.min(18, width / 80)
+  const span = 1 + 2 * beyond
+  const steps = Math.ceil(span / ((height * 0.45) / width))
+  const points: PathPoint[] = []
+  for (let k = 0; k <= steps; k++) {
+    const share = -beyond + (k / steps) * span
+    const out = share < 0 ? -share / beyond : share > 1 ? (share - 1) / beyond : 0
+    const lift = share < 0 ? -out * out : out * out
+    const ripple = share >= 0 && share <= 1 ? rise * Math.sin(2 * Math.PI * share) : 0
+    points.push([
+      side(share),
+      y + lift * height * 0.35 + ripple,
+      w,
+      glow * Math.max(0, 1 - out * 1.6),
+    ])
+  }
+  return points
+}
+
+/** How far a ribbon swings either side of its axis, as a share of the width. */
+const swingOf = (height: number, width: number, narrow: boolean): number =>
+  Math.min(narrow ? 0.26 : 0.3, (height * TURN) / width)
+
+/** How far apart a ribbon's points are, as a share of the height. */
+const RIBBON_STEP = 0.35
+
+/**
+ * Points on the line from `from` to `to`, both ends left out, spaced from
+ * `first` apart at `from` to `last` apart at `to`, a third more each step.
+ *
+ * **Graded, because the spline is uniform.** It gives every span between two
+ * points the same share of its parameter, so where one span is far longer
+ * than the next, the curve bends hardest at the point between them. A fan's
+ * points are close and a ribbon's far apart, and each change of spacing
+ * folded the strand where the two met.
+ */
+const bridge = (from: PathPoint, to: PathPoint, first: number, last: number): PathPoint[] => {
+  const length = to[1] - from[1]
+  const gaps: number[] = []
+  let gap = first
+  let sum = 0
+  while (sum + Math.min(gap, last) * 1.5 < length) {
+    gaps.push(Math.min(gap, last))
+    sum += Math.min(gap, last)
+    gap *= 1.33
+  }
+  const scale = length / (sum + Math.min(gap, last))
+  const out: PathPoint[] = []
+  let at = 0
+  for (const one of gaps) {
+    at += one * scale
+    const f = at / length
+    out.push([
+      from[0] + (to[0] - from[0]) * f,
+      from[1] + (to[1] - from[1]) * f,
+      from[2] + (to[2] - from[2]) * f,
+      from[3] + (to[3] - from[3]) * f,
+    ])
+  }
+  return out
 }
 
 /**
@@ -136,6 +242,11 @@ const wave = (
  *
  * `phase` continues the curve from where the last stretch left it, so two
  * stretches meet as one.
+ *
+ * **The swing is capped in pixels.** It is a share of the width and its
+ * length a share of the height, so a wide, short box crammed a wide swing
+ * into a short curve and turned it tight. Half the height across, at most,
+ * keeps each crest's radius above `TURN`.
  */
 const ribbon = (
   from: number,
@@ -144,10 +255,11 @@ const ribbon = (
   at: number,
   phase: number,
   narrow: boolean,
+  width: number,
 ): { phase: number; points: PathPoint[] } => {
   const points: PathPoint[] = []
-  const step = height * 0.55
-  const swing = narrow ? 0.26 : 0.3
+  const step = height * RIBBON_STEP
+  const swing = swingOf(height, width, narrow)
   const wide = narrow ? 0.45 : WIDTH.ribbon
   const glow = narrow ? GLOW.ribbon * 0.65 : GLOW.ribbon
   let a = phase
@@ -165,27 +277,29 @@ const ribbon = (
  * @param variant The form to draw.
  * @param at Where it sits across the box, as a share of the width. A wave
  *   crosses the whole width and does not read it.
- * @param height The box's height, in CSS pixels. Its width needs no
- *   argument: `x` is a share of it.
+ * @param height The box's height, in CSS pixels.
+ * @param width The box's width, in CSS pixels. `x` is a share of it, and a
+ *   fan's bend is drawn in pixels so it keeps its radius at any shape.
  */
 export const boxPath = (
   variant: StrandsVariant,
   at: number | undefined,
   height: number,
+  width: number,
 ): PathPoint[] => {
   /* **A box is never narrow.** The narrow layout keeps a phone's text clear by
      pushing each form to the edge of the viewport; a box is the frame the
      consumer chose, so its form stays where `at` puts it at any width. */
   const narrow = false
   if (variant === 'fan') {
-    return fan(0, height, at ?? FAN_AT, narrow)
+    return fan(0, height, at ?? FAN_AT, narrow, width, 0.6)
   }
   if (variant === 'waves') {
-    return wave(height * 0.5, height, false, narrow)
+    return wave(height * 0.5, height, false, narrow, width)
   }
   const start = -height * 0.4
   const lead: PathPoint = [at ?? 0.5, start - height * 0.4, WIDTH.ribbon, 0]
-  const body = ribbon(start, height * 1.4, height, at ?? 0.5, 0, narrow).points.map(
+  const body = ribbon(start, height * 1.4, height, at ?? 0.5, 0, narrow, width).points.map(
     ([x, y, w]): PathPoint => [x, y, w, narrow ? GLOW.ribbon * 0.65 * 1.4 : GLOW.ribbon * 1.4],
   )
   return [lead, ...body]
@@ -231,13 +345,13 @@ export const pagePath = (
 
   const points: PathPoint[] = [[0.6, -height * 0.9, WIDTH.ribbon, 0]]
   /* How far the ribbon's curve turns between two of its points. */
-  const turn = ((height * 0.55) / (1.7 * height)) * Math.PI
+  const turn = (RIBBON_STEP / 1.7) * Math.PI
   let phase = 1.2
   let cursor = 0
   let fromRight = true
   let previous: StrandsVariant | undefined
-  /* Whether the last thing laid down was ribbon, which a wave then leans out of. */
-  let joined = false
+  /* Where the ribbon last laid down ended, which a wave then leans out of. */
+  let joined: number | undefined
 
   const gap = (to: number, next: StrandsVariant | undefined): void => {
     if (to - cursor < height * 0.7) {
@@ -250,33 +364,93 @@ export const pagePath = (
       return
     }
     const end = next === 'waves' ? to - height * 0.95 : to - height * 0.45
-    const stretch = ribbon(cursor + height * 0.2, end, height, 0.5, phase, narrow)
+    const stretch = ribbon(cursor + height * 0.2, end, height, 0.5, phase, narrow, width)
     phase = stretch.phase
-    points.push(...stretch.points)
-    const last = stretch.points.at(-1)
+    let run = stretch.points
+    /* Before a wave, the ribbon ends at a crest, where it runs straight down,
+       and the wave sweeps away from that side. Ended anywhere else, it was
+       either heading out to its side, and doubled back to cross, or crossing
+       at its steepest, and bent hard into the line down to the wave. */
+    /* With no crest to end at, the wave sweeps the way the ribbon is heading. */
+    let heading: boolean | undefined
+    if (next === 'waves') {
+      for (let k = run.length - 2; k > 0; k--) {
+        const [one, two, three] = run.slice(k - 1, k + 2) as [PathPoint, PathPoint, PathPoint]
+        if ((two[0] - one[0]) * (three[0] - two[0]) <= 0) {
+          run = run.slice(0, k + 1)
+          break
+        }
+        if (k === 1) {
+          heading = three[0] < two[0]
+        }
+      }
+    }
+    /* After a wave, the ribbon comes back on the side the wave came in from
+       and lights up as it comes. The stretch from the wave's far edge back
+       across is unlit, so the strand never visibly doubles back. */
+    if (previous === 'waves' && run.length > 1) {
+      run = run.map(
+        (point, k): PathPoint =>
+          k < 3 ? [point[0], point[1], point[2], point[3] * Math.max(0, k - 1) * 0.5] : point,
+      )
+    }
+    points.push(...run)
+    const last = run.at(-1)
     if (last) {
-      fromRight = last[0] > 0.5
-      joined = true
+      fromRight = heading ?? last[0] > 0.5
+      joined = last[0]
     }
   }
 
   for (const stop of placed) {
-    joined = false
+    joined = undefined
     gap(stop.top, stop.variant)
     if (stop.variant === 'fan') {
       const span = Math.min(stop.height, height)
-      points.push(...fan(stop.top, span, stop.at ?? FAN_AT, narrow))
-      cursor = stop.top + span * (0.58 + FAN_EXIT) + height * 0.1
-      /* The ribbon picks up at the crest of its curve on the right, where
-         the fan's lower arm is heading. */
-      phase = Math.PI / 2 - turn
+      const at = stop.at ?? FAN_AT
+      /* The ribbon takes over where its curve runs at the arm's slope, and
+         the two meet in even steps along that slope. On a phone the bend
+         sits at the right edge and the ribbon cannot run that way, so the
+         arm runs off the screen and the ribbon comes back in at its crest. */
+      const slope = FAN_EXIT / TURN
+      const swing = swingOf(height, width, narrow)
+      const steepest = (swing * width * Math.PI) / (1.7 * height)
+      const a = Math.acos(Math.min(1, slope / steepest))
+      const x = 0.5 + swing * Math.sin(a)
+      const fanned = fan(stop.top, span, at, narrow, width, narrow ? 0.6 : FAN_EXIT)
+      const exit = fanned.at(-1) as PathPoint
+      points.push(...fanned)
+      if (!narrow && x > exit[0]) {
+        const drop = Math.max(height * 0.3, ((x - exit[0]) * width) / slope)
+        const start: PathPoint = [x, exit[1] + drop, WIDTH.ribbon, GLOW.ribbon]
+        points.push(...bridge(exit, start, span * 0.15, height * RIBBON_STEP))
+        cursor = start[1] - height * 0.2
+        phase = a - turn
+      } else {
+        cursor = exit[1] + height * 0.1
+        phase = Math.PI / 2 - turn
+      }
       fromRight = true
     } else if (stop.variant === 'waves') {
-      points.push(...wave(stop.top, height, fromRight, narrow, joined))
-      /* A ribbon after the wave comes back in on the side it left by. */
-      phase = (fromRight ? Math.PI * 1.5 : Math.PI / 2) - turn
-      fromRight = !fromRight
-      cursor = stop.top + height * (joined ? 0.5 : 0.35)
+      const crossing = wave(stop.top, height, fromRight, narrow, width, joined)
+      /* A ribbon that ended at its crest well above the wave reaches it in
+         even steps. One long span beside the wave's short ones bent the
+         spline hardest where the spacing changed. */
+      const end = points.at(-1)
+      const lead = crossing[0]
+      if (joined !== undefined && end && lead) {
+        points.push(...bridge(end, lead, height * RIBBON_STEP, height * 0.26))
+      }
+      points.push(...crossing)
+      /* A ribbon after a wave it led into comes back on the side the wave
+         came in from, at the crest of its curve there. After a flat wave, it
+         comes back in on the side the wave left by. */
+      phase =
+        joined === undefined
+          ? (fromRight ? Math.PI * 1.5 : Math.PI / 2) - turn
+          : (fromRight ? Math.PI / 2 : Math.PI * 1.5) - turn
+      fromRight = joined === undefined ? !fromRight : fromRight
+      cursor = stop.top + height * (joined === undefined ? 0.35 : 0.5)
     } else {
       const y = stop.top + Math.min(stop.height, height) / 2
       points.push([stop.at ?? 0.5, y, WIDTH.ribbon, GLOW.ribbon])
@@ -287,8 +461,13 @@ export const pagePath = (
   if (previous !== 'waves') {
     gap(page + height * 0.4, undefined)
   }
+  /* The path ends the way it was heading, then below the page. Dropped
+     straight from its last point, the spline bent toward the drop before the
+     last point, at the edge of the screen. */
   const last = points.at(-1) ?? [0.5, page, WIDTH.ribbon, 0]
-  points.push([last[0], Math.max(last[1], page) + height, last[2], 0])
+  const before = points.at(-2) ?? last
+  const on: PathPoint = [2 * last[0] - before[0], 2 * last[1] - before[1], last[2], 0]
+  points.push(on, [on[0], Math.max(on[1], page) + height, last[2], 0])
   return points.slice(0, MAX_POINTS)
 }
 
