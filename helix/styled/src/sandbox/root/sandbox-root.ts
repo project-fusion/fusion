@@ -42,15 +42,19 @@ const PANEL_MAX = 0.8
 /** The preview property each pane name writes. */
 const PANE_KEYS = { css: 'styles', html: 'source', js: 'script' } as const
 
-/** A module file's name, which the other scripts import by its path. */
-const MODULE = /\.m?js$/
+/**
+ * A module file's name, which the other scripts import by its path: one in
+ * JavaScript, or in TypeScript or JSX, which the preview compiles.
+ */
+const MODULE = /\.(?:m?js|[cm]?ts|[jt]sx)$/
 
 /** The pane whose `dependencies` the previews load. */
 const MANIFEST = 'package.json'
 
 /**
  * Whether a pane's name is one the sandbox writes into its previews: `html`,
- * `css` or `js`, a module file such as `utils.js`, or `package.json`.
+ * `css` or `js`, a module file such as `utils.js` or `app.tsx`, or
+ * `package.json`.
  */
 const isPaneName = (name: unknown): name is string =>
   typeof name === 'string' &&
@@ -98,6 +102,10 @@ const fileOf = (pane: Element): string => {
  * - `js` sets a script that runs as a module after the markup.
  * - A module file name ending in `.js` or `.mjs`, such as `utils.js`, is a
  *   module the other scripts import by its path, `./utils.js`.
+ * - A module file name ending in `.ts`, `.tsx` or `.jsx`, such as `app.tsx`,
+ *   is one too, which the preview compiles to JavaScript first. The `js` pane
+ *   runs it with `import './app.tsx'`. A file that does not compile shows
+ *   why over the preview, as an error the example threw.
  * - `package.json` sets the npm packages the scripts import by name, from its
  *   `dependencies`, which load from the preview's `cdn`.
  *

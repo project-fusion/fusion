@@ -1017,6 +1017,30 @@ describe('a file with no name', () => {
 })
 
 describe('the files a sandbox runs', () => {
+  /* Panes named for TypeScript or JSX were ignored, so an example in them
+     showed its text beside a preview that ran none of it. */
+  test('a module file in TypeScript or JSX reaches the preview, which compiles it', async () => {
+    const { compilers } = await import('../compile.js')
+    compilers.set(
+      'test-root:/',
+      Promise.resolve((source: string) => ({ code: source })),
+    )
+    const sandbox = await mount(`
+      <helix-sandbox preview-delay="0">
+        <helix-sandbox-source slot="source" name="js" value="import './app.tsx'"></helix-sandbox-source>
+        <helix-sandbox-source slot="source" name="app.tsx" value="export const view = <p>Hi</p>"></helix-sandbox-source>
+        <helix-sandbox-source slot="source" name="math.ts" value="export const two: number = 2"></helix-sandbox-source>
+        <helix-sandbox-source slot="source" name="card.jsx" value="export const card = <p>Card</p>"></helix-sandbox-source>
+        <helix-sandbox-preview slot="preview" cdn="test-root:/"></helix-sandbox-preview>
+      </helix-sandbox>`)
+    await (sandbox as Updatable).updateComplete
+    const preview = sandbox.querySelector('helix-sandbox-preview') as Updatable & {
+      modules?: Record<string, string>
+    }
+    expect(Object.keys(preview.modules ?? {}).sort()).toEqual(['app.tsx', 'card.jsx', 'math.ts'])
+    compilers.clear()
+  })
+
   test('a module file and `package.json` reach the preview, which loads them by path and by name', async () => {
     const sandbox = await mount(`
       <helix-sandbox preview-delay="0">
