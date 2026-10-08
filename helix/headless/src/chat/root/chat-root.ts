@@ -1,6 +1,7 @@
 import {
   ChildrenController,
   customElement,
+  deepActiveElement,
   drawIcon,
   focusableElements,
   formatWords,
@@ -190,7 +191,9 @@ const drawnInFull = ({ element }: Rendered): boolean =>
  * turn says its place, such as "3 of 40", windowed or not. The transcript is
  * a tab stop while it holds a turn, and the turn a reader moved to is one
  * too. Moving to an older turn unpins a transcript that scrolls and scrolls
- * the turn into view, and moving to the newest pins it again.
+ * the turn into view, and moving to the newest pins it again. When the turn
+ * holding focus is removed, focus moves to the turn that took its place, or to
+ * the one before it where it was the last.
  *
  * | Key | What it does |
  * |---|---|
@@ -1000,6 +1003,8 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
     /* The one thing inside a turn worth hearing about, and `attributeFilter`
        keeps it to that: a subtree watch of `state` alone never sees a token. */
     this.addEventListener('keydown', this.handleKeydown)
+    this.addEventListener('focusin', this.handleFocusIn)
+    this.addEventListener('focusout', this.handleFocusOut)
     this.settling = new MutationObserver(this.handleSettle)
     this.settling.observe(this, { attributeFilter: ['state'], subtree: true })
     /* Children a parser is still adding when this upgrades are the transcript
@@ -1025,6 +1030,8 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('keydown', this.handleKeydown)
+    this.removeEventListener('focusin', this.handleFocusIn)
+    this.removeEventListener('focusout', this.handleFocusOut)
     this.settling?.disconnect()
     this.settling = undefined
     this.grower?.disconnect()
@@ -1117,6 +1124,60 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
     this.remember()
     this.reachHistory()
     this.announce()
+    this.followRemoved()
+  }
+
+  /** The turn focus is in, by its place and its identity, once a reader is in one. */
+  private held: { at: number; id: unknown } | undefined
+
+  /** Notes the turn focus went into, or that it went somewhere else. */
+  private readonly handleFocusIn = (event: FocusEvent): void => {
+    const at = this.turnFrom(event.composedPath())
+    if (at === undefined || at < 0) {
+      this.held = undefined
+      return
+    }
+    const id = this.fed ? this.identity(this.turns[at]) : this.messages[at]
+    this.held = { at, id }
+  }
+
+  /**
+   * Forgets the turn once focus moves to something outside the transcript.
+   * A move to nothing is kept, since removing the turn that held focus is
+   * one.
+   */
+  private readonly handleFocusOut = (event: FocusEvent): void => {
+    const to = event.relatedTarget
+    if (to instanceof Node && !this.contains(to) && !this.renderRoot?.contains?.(to)) {
+      this.held = undefined
+    }
+  }
+
+  /**
+   * Moves focus to a neighbor where removing the turn that held it dropped
+   * focus to the body: the turn that took its place, or the one before it
+   * where it was the last.
+   *
+   * **Focus went to the body**, and Page Down did nothing until the reader
+   * tabbed back into the transcript. List and Virtual List move focus to a
+   * neighbor the same way, as React Aria's GridList does. Focus anywhere but
+   * the body is where you put it, and is left there.
+   */
+  private followRemoved(): void {
+    const held = this.held
+    if (held === undefined) {
+      return
+    }
+    const ids = this.fed ? this.turns.map((turn) => this.identity(turn)) : this.messages
+    if (ids.includes(held.id as never)) {
+      return
+    }
+    this.held = undefined
+    const active = deepActiveElement()
+    if (ids.length === 0 || (active !== null && active !== document.body)) {
+      return
+    }
+    void this.focusTurn(Math.min(held.at, ids.length - 1))
   }
 
   /**

@@ -529,6 +529,52 @@ describe('moving between turns', () => {
     expect(element.pinned).toBe(true)
   })
 
+  /* Measured in Chromium before this: removing the turn that held focus left
+     focus on the body, and Page Down did nothing until the reader tabbed back
+     in. List and Virtual List move focus to a neighbor. */
+  test('removing the turn that holds focus moves focus to the one in its place', async () => {
+    const element = (await mount(three)) as Chat
+    await element.updateComplete
+    const [first, second, third] = [
+      ...element.querySelectorAll('helix-headless-chat-message'),
+    ] as HTMLElement[] as [HTMLElement, HTMLElement, HTMLElement]
+    page(first, 'PageDown')
+    expect(document.activeElement).toBe(second)
+    second.remove()
+    await element.updateComplete
+    await element.updateComplete
+    expect(document.activeElement).toBe(third)
+    /* The last one gives focus to the turn before it. */
+    third.remove()
+    await element.updateComplete
+    await element.updateComplete
+    expect(document.activeElement).toBe(first)
+  })
+
+  test('and from turns given as data', async () => {
+    const element = (await mount(
+      '<helix-headless-chat label="Support"></helix-headless-chat>',
+    )) as Chat & {
+      turns: { author: string; key: string; text: string }[]
+    }
+    element.turns = ['One', 'Two', 'Three'].map((text) => ({ author: 'them', key: text, text }))
+    await element.updateComplete
+    await element.updateComplete
+    const drawn = (text: string): HTMLElement | undefined =>
+      [...(element.shadowRoot?.querySelectorAll<HTMLElement>('[part="turn"] > *') ?? [])].find(
+        (turn) => turn.textContent?.trim() === text,
+      )
+    ;(drawn('One') as HTMLElement).focus()
+    page(drawn('One') as HTMLElement, 'PageDown')
+    await element.updateComplete
+    expect(element.shadowRoot?.activeElement).toBe(drawn('Two'))
+    element.turns = element.turns.filter((turn) => turn.text !== 'Two')
+    await element.updateComplete
+    await element.updateComplete
+    await element.updateComplete
+    expect(element.shadowRoot?.activeElement).toBe(drawn('Three'))
+  })
+
   test('Control with End leaves for the composer', async () => {
     const element = (await mount(three)) as Chat
     await element.updateComplete
