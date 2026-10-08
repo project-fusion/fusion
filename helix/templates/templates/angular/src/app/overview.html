@@ -33,6 +33,17 @@
       Reviews
     </helix-table-column>
 
+    <!-- The first page as rows, so a page rendered on a server carries the
+         values. The table draws its own rows from `members` in their place. -->
+    @for (member of firstPage; track member.id) {
+      <helix-table-row>
+        <helix-table-cell header>{{ member.name }}</helix-table-cell>
+        <helix-table-cell>{{ member.team }}</helix-table-cell>
+        <helix-table-cell>{{ member.role }}</helix-table-cell>
+        <helix-table-cell>{{ member.reviews }}</helix-table-cell>
+      </helix-table-row>
+    }
+
     <!-- The footer is a row across the table: anything you slot goes at the
          start, and the table's own pagination sits at the end. -->
     <helix-text emphasis="subtle" slot="footer" variant="caption">

@@ -10,7 +10,7 @@
   `app.css` paints the chosen row through the parts the table names for it.
 -->
 <script lang="ts">
-  import { members } from './data.ts'
+  import { firstPage, members } from './data.ts'
   import { DOCS } from './docs.ts'
 </script>
 
@@ -49,6 +49,17 @@
       <helix-table-column field="reviews" sortable text-align="end" width="max-content">
         Reviews
       </helix-table-column>
+
+      <!-- The first page as rows, so a page rendered on a server carries the
+           values. The table draws its own rows from `members` in their place. -->
+      {#each firstPage as member (member.id)}
+        <helix-table-row>
+          <helix-table-cell header>{member.name}</helix-table-cell>
+          <helix-table-cell>{member.team}</helix-table-cell>
+          <helix-table-cell>{member.role}</helix-table-cell>
+          <helix-table-cell>{member.reviews}</helix-table-cell>
+        </helix-table-row>
+      {/each}
 
       <!-- The footer is a row across the table: anything you slot goes at the
            start, and the table's own pagination sits at the end. -->
