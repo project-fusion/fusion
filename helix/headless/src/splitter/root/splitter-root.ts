@@ -81,7 +81,11 @@ const FOCUSABLE =
  * back to the position where the collapsing gesture began. A drag records that position
  * on press, and every other way of collapsing records it in `settle`.
  * `collapsed-size` keeps a sliver of the pane visible, such as a tab strip.
- * Collapsing overrides `min` and `max`.
+ * Collapsing overrides `min` and `max`. `collapsible` says which panes can be
+ * collapsed at all, as Zag's panels each say.
+ *
+ * `min` is the least the start pane keeps and `end-min` the least the end pane
+ * keeps, each a percentage or a CSS length such as `16rem`.
  *
  * Set `primary` to the pane that keeps its size when the splitter's own size
  * changes, such as a sidebar beside a window being resized. The other pane
@@ -102,7 +106,7 @@ const FOCUSABLE =
  * | Left, Right | Moves a side-by-side divider by `step`. On a right-to-left page, Left moves it toward the end. |
  * | Up, Down | Moves a stacked divider by `step`. |
  * | Home, End | Moves the divider to its bounds. |
- * | Enter | Collapses the start pane, and opens it again. |
+ * | Enter | Collapses the start pane, or the end pane where `collapsible="end"`, and opens it again. |
  * | F6 | Moves focus from one pane to the first control in the other, and from the divider to the start pane. |
  *
  * @since 0.1.0
@@ -223,6 +227,17 @@ export class HelixHeadlessSplitter extends HelixElement {
   collapsedSize = 0
 
   /**
+   * Which panes can be collapsed, as Zag's panels each take `collapsible`:
+   * `start`, `end`, `both`, or `none`. A pane that cannot be collapsed stops
+   * at the edge without shutting. `Enter` collapses the end pane where only
+   * the end pane can be collapsed, and the start pane otherwise.
+   *
+   * Unset is `both`, and the attribute stays absent until you write it.
+   */
+  @property()
+  collapsible?: 'both' | 'end' | 'none' | 'start'
+
+  /**
    * The name of the handle where two dividers cross, read by screen readers.
    */
   @words
@@ -253,6 +268,16 @@ export class HelixHeadlessSplitter extends HelixElement {
    */
   @property({ attribute: 'default-position', type: Number })
   defaultPosition = 50
+
+  /**
+   * The least the end pane keeps, in the units `min` takes: a percentage, or
+   * a CSS length such as `16rem` resolved against the splitter's box. The
+   * divider stops that far from the end, whatever `max` allows, so `min` and
+   * `end-min` hold a minimum for each pane, as Zag's panels each take
+   * `minSize`.
+   */
+  @property({ attribute: 'end-min' })
+  endMin: number | string = 0
 
   /**
    * The divider's name, read by screen readers.
@@ -338,7 +363,7 @@ export class HelixHeadlessSplitter extends HelixElement {
 
   /** `max` as a percentage, whichever way it was written. */
   private get maxPercent(): number {
-    return this.toPercent(this.max, 100)
+    return Math.min(this.toPercent(this.max, 100), 100 - this.toPercent(this.endMin, 0))
   }
 
   /**
@@ -715,10 +740,16 @@ export class HelixHeadlessSplitter extends HelixElement {
    */
   private shutAt(position: number): 'end' | 'start' | undefined {
     const size = this.sliver
-    if (position <= size) {
+    if (position <= size && this.canCollapse('start')) {
       return 'start'
     }
-    return position >= 100 - size ? 'end' : undefined
+    return position >= 100 - size && this.canCollapse('end') ? 'end' : undefined
+  }
+
+  /** Whether `collapsible` lets this pane be collapsed. */
+  private canCollapse(pane: 'end' | 'start'): boolean {
+    const collapsible = this.collapsible ?? 'both'
+    return collapsible === 'both' || collapsible === pane
   }
 
   /** Pulled between the bounds, which are the ends unless a consumer moved them. */
@@ -1116,6 +1147,10 @@ export class HelixHeadlessSplitter extends HelixElement {
    */
   private toggleCollapse(): void {
     const shut = this.collapsed
+    const pane = this.collapsible === 'end' ? 'end' : 'start'
+    if (!shut && !this.canCollapse(pane)) {
+      return
+    }
     const opened = shut ? undefined : this.position
     requestChange({
       apply: (value) => {
@@ -1131,7 +1166,7 @@ export class HelixHeadlessSplitter extends HelixElement {
       },
       event: (value) => new HelixBeforeCollapseEvent({ value }),
       host: this,
-      next: shut ? '' : 'start',
+      next: shut ? '' : pane,
     })
   }
 
