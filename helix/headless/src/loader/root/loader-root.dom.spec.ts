@@ -187,7 +187,7 @@ describe('a loader that stands in for its content', () => {
     )
     await frame()
     const region = wrapper.querySelector('#saved') as HTMLElement
-    const host = wrapper.querySelector('helix-headless-loader') as Loader
+    const host = wrapper.querySelector('helix-headless-loader') as unknown as Loader
     expect(region.hasAttribute('aria-busy')).toBe(false)
     host.idle = false
     await host.updateComplete
