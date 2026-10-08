@@ -311,7 +311,20 @@ export const analyze = (options: HelixCemOptions, cwd = process.cwd()): HelixMan
   const lint = lintOf(customElementsManifest as ManifestSource, name)
   if (Object.keys(lint.tags).length > 0) {
     writeFileSync(join(cwd, LINT), `${JSON.stringify(lint)}\n`)
-    const families = catalog([customElementsManifest], examplesOnDisk(cwd))
+    /* **Read with the tiers this one builds on, then narrowed to its own.**
+       A container's import block can sit on the tier below it alone: Select,
+       Combobox, and Data Table write theirs in the headless description, and
+       a styled catalog read on its own lost the Option and Table lines. */
+    const below = [...dependencies]
+      .filter(([dependency]) => dependency.startsWith('@fusion.dev/helix'))
+      .map(([, at]) => JSON.parse(readFileSync(at, 'utf8')) as HelixManifest)
+    const own = options.tier === 'headless' ? 'headless' : 'styled'
+    const families = catalog([customElementsManifest, ...below], examplesOnDisk(cwd))
+      .map((family) => ({
+        ...family,
+        elements: family.elements.filter((element) => element.tier === own),
+      }))
+      .filter((family) => family.elements.length > 0)
     writeFileSync(
       join(cwd, API),
       `${JSON.stringify({ families: families.map(({ examples: _, ...family }) => family), package: name })}\n`,
