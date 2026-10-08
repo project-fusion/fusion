@@ -23,6 +23,12 @@
       "helix-development": "./dist/utils/audit-name/audit-name.js",
       "default": "./dist/utils/audit-name/audit-name-off.js"
     },
+    "./audits/nesting": {
+      "types": "./dist/utils/audit-nesting/audit-nesting.d.ts",
+      "development": "./dist/utils/audit-nesting/audit-nesting.js",
+      "helix-development": "./dist/utils/audit-nesting/audit-nesting.js",
+      "default": "./dist/utils/audit-nesting/audit-nesting-off.js"
+    },
     "./audits/react": {
       "types": "./dist/helix-element/react-audit.d.ts",
       "development": "./dist/helix-element/react-audit.js",
@@ -76,6 +82,11 @@
       "development": "./src/utils/audit-name/audit-name.ts",
       "helix-development": "./src/utils/audit-name/audit-name.ts",
       "default": "./src/utils/audit-name/audit-name-off.ts"
+    },
+    "#audit-nesting": {
+      "development": "./src/utils/audit-nesting/audit-nesting.ts",
+      "helix-development": "./src/utils/audit-nesting/audit-nesting.ts",
+      "default": "./src/utils/audit-nesting/audit-nesting-off.ts"
     },
     "#audit-served": {
       "development": "./src/utils/audit-served/audit-served.ts",

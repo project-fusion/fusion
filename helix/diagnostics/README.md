@@ -328,6 +328,7 @@ diagnostics counts it by kind and tag. None fails a CI job.
 | `unregistered-part` | A part with an entry of its own, such as a filter menu, is in the page and its entry was never imported |
 | `unscannable-logo` | A QR code holds a logo at a correction level below `H`, so it may not scan |
 | `unsettled-window` | A virtualized list's box has no height of its own |
+| `unslotted-item` | A tree item holds another without `slot="children"`, so the inner item is read as the label. Development builds only (the `development` export condition) |
 | `untold-toggle` | A native button in a button group with `selection-mode`, which cannot carry `aria-pressed` |
 | `untold-trigger` | A slotted trigger is a plain element, which cannot carry `aria-expanded` |
 | `wrapped-trigger` | A tooltip wraps a trigger that does not name it, and opened before a reader reached the trigger |

@@ -102,6 +102,11 @@ export type RuntimeKind =
   | 'unscannable-logo'
   /** A virtualized list's box has no height of its own, so its window never settles. */
   | 'unsettled-window'
+  /**
+   * An item is nested in another of its tag without the slot that nests it, so it is read as
+   * the label. Development builds only.
+   */
+  | 'unslotted-item'
   /** A native button in a Button Group with `selection-mode`, which cannot be told it is pressed. */
   | 'untold-toggle'
   /** A slotted trigger is a plain element, which cannot be told it opens something. */
