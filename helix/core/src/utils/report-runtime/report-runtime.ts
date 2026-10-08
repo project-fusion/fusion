@@ -104,7 +104,7 @@ export type RuntimeKind =
   | 'untold-toggle'
   /** A slotted trigger is a plain element, which cannot be told it opens something. */
   | 'untold-trigger'
-  /** A tooltip wraps its trigger, so its text reaches no screen reader. */
+  /** A tooltip wraps a trigger that does not name it, and opened before a reader reached the trigger. */
   | 'wrapped-trigger'
 
 /** One event: what went wrong, where, and the sentence that says what to do. */

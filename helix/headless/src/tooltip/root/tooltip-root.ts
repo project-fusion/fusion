@@ -67,8 +67,11 @@ const warmth = (): Warmth => {
  * markup is described when you first point at it or focus it, so a screen
  * reader in reading mode meets it with no description until then. Where the
  * browser has no element references, nothing links the two, and the tooltip
- * warns once on first open. The tooltip can also wrap its trigger, which
- * describes a Helix component and leaves a plain element undescribed. In the
+ * warns once on first open. The tooltip can also wrap its trigger. A Helix
+ * component inside is described at once, and a plain element as in the `for`
+ * form: when you first point at it or focus it, or at rest where it names the
+ * tooltip's `id` in its own `aria-describedby`, which a reference to the
+ * element around it allows. In the
  * `for` form the tooltip itself is out of the accessibility tree while its
  * bubble is down, so you meet its words once, as the trigger's description.
  * A trigger whose name is already the tooltip's words, such as an icon button
@@ -802,19 +805,19 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
     if (this.linked) {
       return
     }
-    /* **The unlinked form is the one that describes nothing, so it is the one
-       warned about.** This returned on `for === ''`, which made the guard the
-       exact inverse of the risk: the wrapping form is never linked, so it was
-       the single form that could never be reported.
-
-       Measured in Chrome's accessibility tree,
-       `<helix-headless-tooltip content="..."><helix-headless-button>Save</helix-headless-button></helix-headless-tooltip>`
-       exposes `button name="Save" desc=""`. All three routes to fixing it are
-       closed: an `aria-describedby` IDREF resolves only within one tree,
-       `ariaDescribedByElements` is valid outward and this points inward, and
-       `aria-description` is a hydration mismatch this library refuses. So the
-       wrapping form is not the documented API, and this says so once, where
-       somebody using it will see it. */
+    /* Described already, by an `aria-describedby` or `aria-labelledby` the
+       consumer wrote naming this tooltip. In the wrapping form too: an IDREF
+       resolves within one tree, and the host is in the trigger's tree, around
+       it, so a trigger naming the tooltip that wraps it is described at rest. */
+    const trigger = this.for === '' ? this.trigger : this.named
+    const names = `${trigger?.getAttribute('aria-describedby') ?? ''} ${
+      trigger?.getAttribute('aria-labelledby') ?? ''
+    }`
+      .split(/\s+/)
+      .filter(Boolean)
+    if (this.id !== '' && names.includes(this.id)) {
+      return
+    }
     if (this.for === '') {
       /* **Unless the trigger's name already says it.** An icon button named
          Settings under a tooltip reading Settings loses a reader nothing, and
@@ -824,18 +827,20 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
       if (this.triggerSays(this.describedText)) {
         return
       }
+      /* A plain trigger the tooltip wraps is linked by reference once a reader
+         points at it or focuses it, as in the `for` form, so a bubble opened
+         some other way has described nothing yet. */
       reportRuntime({
         kind: 'wrapped-trigger',
         message:
-          `<${this.localName}> is wrapping its trigger rather than naming one, so its text ` +
-          "reaches no screen reader: a description in this element's shadow root cannot be " +
-          'referenced from a trigger in the light DOM. Give this tooltip an `id`, set `for` to ' +
-          'the trigger\'s id, and add `aria-describedby="<that id>"` to the trigger.',
+          `<${this.localName}> opened before its trigger was described, so a screen reader ` +
+          'reading the page meets the trigger without its text. Give this tooltip an `id` and ' +
+          'add `aria-describedby="<that id>"` to the trigger inside it. Written in your own ' +
+          'markup it describes the trigger at rest and survives server rendering.',
         tag: this.localName,
       })
       return
     }
-    const trigger = this.named
     if (!trigger) {
       reportRuntime({
         kind: 'missing-trigger',
@@ -845,14 +850,6 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
           'element inside another shadow root is not reachable from here.',
         tag: this.localName,
       })
-      return
-    }
-    const names = `${trigger.getAttribute('aria-describedby') ?? ''} ${
-      trigger.getAttribute('aria-labelledby') ?? ''
-    }`
-      .split(/\s+/)
-      .filter(Boolean)
-    if (this.id !== '' && names.includes(this.id)) {
       return
     }
     reportRuntime({

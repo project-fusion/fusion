@@ -329,7 +329,7 @@ diagnostics counts it by kind and tag. None fails a CI job.
 | `unsettled-window` | A virtualized list's box has no height of its own |
 | `untold-toggle` | A native button in a button group with `selection-mode`, which cannot carry `aria-pressed` |
 | `untold-trigger` | A slotted trigger is a plain element, which cannot carry `aria-expanded` |
-| `wrapped-trigger` | A tooltip wraps its trigger, so its text reaches no screen reader |
+| `wrapped-trigger` | A tooltip wraps a trigger that does not name it, and opened before a reader reached the trigger |
 
 ## Performance
 
