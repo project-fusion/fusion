@@ -149,3 +149,51 @@ describe('a loader with a delay', () => {
     expect(part(loader, 'svg')?.hasAttribute('hidden')).toBe(false)
   })
 })
+
+/* Radix Themes' Spinner takes the content it stands in for, keeps its size
+   while the work runs, and shows it once the work is done. A loader here was
+   only ever a ring beside the content. */
+describe('a loader that stands in for its content', () => {
+  type Loader = HTMLElement & {
+    idle: boolean
+    internals: ElementInternals
+    updateComplete: Promise<unknown>
+  }
+  const frame = (): Promise<void> => new Promise((done) => requestAnimationFrame(() => done()))
+
+  test('hides and stills the content while the work runs, and shows it once idle', async () => {
+    const host = (await mount(
+      '<helix-headless-loader><button slot="content">Save</button></helix-headless-loader>',
+    )) as Loader
+    const content = part(host, 'content') as HTMLElement
+    expect(content.hasAttribute('inert')).toBe(true)
+    expect(content.getAttribute('style')).toContain('visibility: hidden')
+    expect(part(host, 'svg')).not.toBeNull()
+    expect(role(host)).toBe('progressbar')
+
+    host.idle = true
+    await host.updateComplete
+    const shown = part(host, 'content') as HTMLElement
+    expect(shown.hasAttribute('inert')).toBe(false)
+    expect(shown.hasAttribute('style')).toBe(false)
+    expect(part(host, 'svg')).toBeNull()
+    expect(role(host)).toBeNull()
+    expect(host.internals.ariaBusy).toBeNull()
+  })
+
+  test('marks its region busy only while the work runs', async () => {
+    const wrapper = await mount(
+      '<div><section id="saved"></section><helix-headless-loader for="saved" idle></helix-headless-loader></div>',
+    )
+    await frame()
+    const region = wrapper.querySelector('#saved') as HTMLElement
+    const host = wrapper.querySelector('helix-headless-loader') as Loader
+    expect(region.hasAttribute('aria-busy')).toBe(false)
+    host.idle = false
+    await host.updateComplete
+    expect(region.getAttribute('aria-busy')).toBe('true')
+    host.idle = true
+    await host.updateComplete
+    expect(region.hasAttribute('aria-busy')).toBe(false)
+  })
+})

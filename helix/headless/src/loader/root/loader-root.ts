@@ -7,7 +7,7 @@ import {
   reportRuntime,
   words,
 } from '@fusion.dev/helix-core'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { awaitRegion, claimBusy, releaseBusy } from '../busy.js'
 
@@ -45,6 +45,13 @@ import { awaitRegion, claimBusy, releaseBusy } from '../busy.js'
  * hidden, and silent, for that many milliseconds, and appears only if the work
  * is still going. While it waits it carries `:state(waiting)`.
  *
+ * **The loader can stand in for what it wraps.** Put the content in the
+ * `content` slot, such as a button or a card, and set `idle` while no work is
+ * in progress. While the work runs, the content keeps its size and is hidden
+ * and inert, and the ring draws over it. While `idle` is set, the loader draws
+ * nothing of its own, has no role, and marks no region busy, so only the
+ * content shows. Clearing `idle` starts `delay` again.
+ *
  * @since 0.1.0
  * @status stable
  * @category feedback
@@ -52,7 +59,9 @@ import { awaitRegion, claimBusy, releaseBusy } from '../busy.js'
  * @documentation https://fusion.dev/helix/components/loader
  *
  * @slot - An icon or logo that stays still at the center. Empty by default.
+ * @slot content - What the loader stands in for while the work runs, such as a button. It keeps its size, hidden and inert, until `idle` is set.
  *
+ * @csspart content - The box that holds the `content` slot. Hidden while the work runs, and shown while `idle` is set.
  * @csspart indicator - The arc that turns.
  * @csspart mark - The region that holds the slotted content at the center.
  * @csspart svg - The rotating circle pair.
@@ -89,6 +98,14 @@ export class HelixHeadlessLoader extends HelixElement {
   for = ''
 
   /**
+   * Whether no work is in progress. The loader draws nothing of its own, has
+   * no role, and marks no region busy, and what is in the `content` slot
+   * shows. Clearing it starts `delay` again.
+   */
+  @property({ type: Boolean })
+  idle = false
+
+  /**
    * The loader's name, announced by screen readers while the work is in
    * progress.
    */
@@ -110,7 +127,7 @@ export class HelixHeadlessLoader extends HelixElement {
 
   /** Whether the loader is still waiting out its `delay`. */
   private get waiting(): boolean {
-    return this.delay > 0 && !this.due.elapsed
+    return !this.idle && this.delay > 0 && !this.due.elapsed
   }
 
   override connectedCallback(): void {
@@ -147,7 +164,7 @@ export class HelixHeadlessLoader extends HelixElement {
   private mark(): void {
     this.stopAwaiting?.()
     this.stopAwaiting = undefined
-    const named = this.isConnected && this.for !== ''
+    const named = this.isConnected && this.for !== '' && !this.idle
     const region = named ? elementById(this, this.for) : null
     if (named && !region) {
       /* Not drawn yet: marked when it arrives. */
@@ -181,21 +198,44 @@ export class HelixHeadlessLoader extends HelixElement {
       this.found = false
       this.mark()
     }
+    /* Busy again: the region is marked again, and a quick spell of work still
+       draws nothing. */
+    if (changed.has('idle') && changed.get('idle') !== undefined) {
+      if (!this.idle && this.delay > 0) {
+        this.due.start(this.delay)
+      }
+      this.mark()
+    }
   }
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    hostAria(this.internals, { label: this.label, role: 'progressbar' })
-    this.internals.ariaBusy = 'true'
+    hostAria(this.internals, {
+      label: this.idle ? '' : this.label,
+      role: this.idle ? '' : 'progressbar',
+    })
+    this.internals.ariaBusy = this.idle ? null : 'true'
     /* Silent while it waits, as well as unseen. */
     this.internals.ariaHidden = this.waiting ? 'true' : null
     this.toggleState('waiting', this.waiting)
   }
 
   protected override render(): TemplateResult {
+    /* What the loader stands in for keeps its box while the work runs, hidden
+       and inert in the markup itself, so it holds on every tier, a sheet or
+       none. */
+    const content = html`<span
+      part="content"
+      ?inert=${!this.idle}
+      style=${this.idle ? nothing : 'visibility: hidden'}
+      ><slot name="content"></slot
+    ></span>`
+    if (this.idle) {
+      return content
+    }
     /* `hidden` on the drawing while it waits, which is the state on every tier,
        a sheet or none. */
-    return html`<svg part="svg" viewBox="0 0 24 24" aria-hidden="true" ?hidden=${this.waiting}>
+    return html`${content}<svg part="svg" viewBox="0 0 24 24" aria-hidden="true" ?hidden=${this.waiting}>
         <circle part="track" cx="12" cy="12" r="10" fill="none" />
         <circle part="indicator" cx="12" cy="12" r="10" fill="none" />
       </svg>
