@@ -787,6 +787,22 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
   stepMismatchMessage = 'Choose one of the times on offer.'
 
   /**
+   * What each time in the list shows: a function given the time as `HH:mm`,
+   * or `HH:mm:ss` with `seconds`, and the time as the row writes it, that
+   * returns text, an element or a Lit template.
+   *
+   * For the seats left at a time, or a caption under it, as React Aria's
+   * `ListBoxItem` takes children. Content with `slot="start"`, `slot="end"`
+   * or `slot="description"` goes to that slot of the row, and a description
+   * is read after the time. The row is still named by the written time, and
+   * typeahead still finds it by that. Return the written time with your
+   * content where it should still show. A property only, there being no way
+   * to write a function in markup. The wheels draw their own figures.
+   */
+  @property({ attribute: false })
+  timeContent?: ((time: string, written: string) => unknown) | undefined
+
+  /**
    * The validation message for a time that `disable-times` bars.
    */
   @words
@@ -1320,6 +1336,8 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
       ${this.times.map((seconds) => {
         const at = this.valueFor(seconds)
         const between = this.between(at)
+        const written = writeClock(at, this.clock, this.seconds)
+        const drawn = this.timeContent
         return html`<${this.tag('option')}
           part="option${between ? ' option-between' : ''}"
           exportparts="description: option-description, item: option-item,
@@ -1329,7 +1347,9 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
           ?disabled=${this.barred(at)}
           ?selected=${this.held.includes(at)}
           data-between=${between ? '' : nothing}
-          >${writeClock(at, this.clock, this.seconds)}</${this.tag('option')}
+          aria-label=${drawn ? written : nothing}
+          text-value=${drawn ? written : nothing}
+          >${drawn ? drawn(at, written) : written}</${this.tag('option')}
         >`
       })}
       <slot name="empty" slot="empty">${this.emptyText}</slot>
