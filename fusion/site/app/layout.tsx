@@ -32,6 +32,12 @@ const DESCRIPTION =
 export const metadata: Metadata = {
   description: DESCRIPTION,
   metadataBase: siteUrl,
+  /* **The commit this build came from**, for checking which one fusion.dev
+     serves: `<meta name="fusion-commit">` in any page's source. Vercel sets
+     the variable on every build; a local build has none, and writes nothing. */
+  ...(process.env.VERCEL_GIT_COMMIT_SHA
+    ? { other: { 'fusion-commit': process.env.VERCEL_GIT_COMMIT_SHA } }
+    : {}),
   openGraph: {
     description: DESCRIPTION,
     siteName: 'Fusion',
