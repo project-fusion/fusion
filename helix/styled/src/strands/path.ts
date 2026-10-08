@@ -236,6 +236,24 @@ const reachOf = (wide: number, width: number): number => wide * SPREAD * width *
 const PERIOD = 1.7
 
 /**
+ * The shape of the ribbon down a page, each as a multiplier or a share of the
+ * width, so a page can try another without the path's arithmetic changing.
+ */
+export interface PathShape {
+  /** How far the ribbon swings side to side, over the most its turns allow. */
+  swing: number
+  /** How long one S takes, over `PERIOD` screens. */
+  period: number
+  /** How far the ribbon's axis sits from the middle, as a share of the width; positive is right. */
+  lean: number
+  /** How far from the middle a wave's sweep lands, as a share of the width. */
+  sweep: number
+}
+
+/** The shape a page draws unless it asks for another. */
+export const SHAPE: PathShape = { lean: 0, period: 1, sweep: 0.4, swing: 1 }
+
+/**
  * How far a ribbon swings either side of its axis, as a share of the width.
  *
  * **No crest turns tighter than the strands reach.** A strand is the
@@ -245,10 +263,15 @@ const PERIOD = 1.7
  * reach of the ribbon's widest strands is the most it may take, and on a wide
  * screen, where the ribbon is wider, it swings less.
  */
-const swingOf = (height: number, width: number, narrow: boolean): number => {
+const swingOf = (
+  height: number,
+  width: number,
+  narrow: boolean,
+  shape: PathShape = SHAPE,
+): number => {
   const reach = reachOf((narrow ? 0.45 : WIDTH.ribbon) * 1.1, width)
-  const gentle = (PERIOD * height) ** 2 / (Math.PI ** 2 * reach * 1.15)
-  return Math.min(narrow ? 0.26 : 0.3, (height * TURN) / width, gentle / width)
+  const gentle = (PERIOD * shape.period * height) ** 2 / (Math.PI ** 2 * reach * 1.15)
+  return Math.min((narrow ? 0.26 : 0.3) * shape.swing, (height * TURN) / width, gentle / width)
 }
 
 /** How far apart a ribbon's points are, as a share of the height. */
@@ -309,15 +332,16 @@ const ribbon = (
   phase: number,
   narrow: boolean,
   width: number,
+  shape: PathShape = SHAPE,
 ): { phase: number; points: PathPoint[] } => {
   const points: PathPoint[] = []
   const step = height * RIBBON_STEP
-  const swing = swingOf(height, width, narrow)
+  const swing = swingOf(height, width, narrow, shape)
   const wide = narrow ? 0.45 : WIDTH.ribbon
   const glow = narrow ? GLOW.ribbon * 0.65 : GLOW.ribbon
   let a = phase
   for (let y = from; y < to; y += step) {
-    a += (step / (PERIOD * height)) * Math.PI
+    a += (step / (PERIOD * shape.period * height)) * Math.PI
     points.push([at + swing * Math.sin(a), y, wide * (0.8 + 0.3 * Math.sin(a * 0.63 + 0.4)), glow])
   }
   return { phase: a, points }
@@ -468,6 +492,7 @@ const relax = (points: PathPoint[], width: number, height: number): PathPoint[] 
  * @param width The viewport's width, in CSS pixels.
  * @param height The viewport's height, in CSS pixels.
  * @param page The page's height, in CSS pixels.
+ * @param shape The ribbon's shape down the page.
  */
 export const pagePath = (
   stops: readonly PlacedStop[],
@@ -475,7 +500,11 @@ export const pagePath = (
   width: number,
   height: number,
   page: number,
+  shape: PathShape = SHAPE,
 ): PathPoint[] => {
+  const period = PERIOD * shape.period
+  /* Where the ribbon's axis rests between the forms that move it. */
+  const home = 0.5 + shape.lean
   const narrow = width < NARROW
   const placed = [...stops].sort((one, two) => one.top - two.top)
   if (placed.length === 0) {
@@ -490,7 +519,7 @@ export const pagePath = (
 
   const points: PathPoint[] = [[0.6, -height * 0.9, WIDTH.ribbon, 0]]
   /* How far the ribbon's curve turns between two of its points. */
-  const turn = (RIBBON_STEP / PERIOD) * Math.PI
+  const turn = (RIBBON_STEP / period) * Math.PI
   let phase = 1.2
   let cursor = 0
   let fromRight = true
@@ -499,7 +528,7 @@ export const pagePath = (
   let joined: number | undefined
   /* The axis the next stretch of ribbon swings about, which a bend sets so the
      ribbon picks up where its arm leaves off. */
-  let axis = 0.5
+  let axis = home
   /* Whether the ribbon carries on out of the wave before it, lit, rather
      than coming back in from the edge. */
   let carried = false
@@ -518,8 +547,8 @@ export const pagePath = (
       return
     }
     const end = next === 'waves' ? to - height * 0.95 : to - height * 0.45
-    const stretch = ribbon(cursor + height * 0.2, end, height, axis, phase, narrow, width)
-    axis = 0.5
+    const stretch = ribbon(cursor + height * 0.2, end, height, axis, phase, narrow, width, shape)
+    axis = home
     phase = stretch.phase
     let run = stretch.points
     /* Before a wave, the ribbon ends at a crest, where it runs straight down,
@@ -581,8 +610,8 @@ export const pagePath = (
          and the ribbon cannot run that way, so the arm runs off the screen
          and the ribbon comes back in at its crest. */
       const slope = BEND_EXIT / TURN
-      const swing = swingOf(height, width, narrow)
-      const steepest = (swing * width * Math.PI) / (PERIOD * height)
+      const swing = swingOf(height, width, narrow, shape)
+      const steepest = (swing * width * Math.PI) / (period * height)
       const a = Math.acos(Math.min(1, slope / steepest))
       const bent = bend(stop.top, span, at, narrow, width, narrow ? 0.6 : BEND_EXIT)
       const exit = bent.at(-1) as PathPoint
@@ -610,7 +639,7 @@ export const pagePath = (
         const steps = Math.ceil(Math.log((height * RIBBON_STEP) / spacing) / Math.log(1.33))
         while (spacing < height * RIBBON_STEP) {
           y += spacing
-          phaseAt += (spacing / (PERIOD * height)) * Math.PI
+          phaseAt += (spacing / (period * height)) * Math.PI
           k += 1
           const f = Math.min(1, k / Math.max(steps, 1))
           points.push([
@@ -658,7 +687,7 @@ export const pagePath = (
         const glow = narrow ? GLOW.waves * 0.65 : GLOW.waves
         const blend = (a: number, b: number, f: number): number => a + (b - a) * f
         const from = end[0]
-        const to = 0.5 + way * 0.4
+        const to = 0.5 + way * shape.sweep
         /* Half the crossing, in pixels, and the descent that keeps each
            crest's radius, `descent^2 / (pi^2 * amplitude)`, wider than the
            strands reach. */
@@ -689,7 +718,7 @@ export const pagePath = (
           ])
         }
         const bottom = points.at(-1) as PathPoint
-        const swing = swingOf(height, width, narrow)
+        const swing = swingOf(height, width, narrow, shape)
         axis = bottom[0] - way * swing
         /* The ribbon's first points lie on its own curve from the crest,
            spaced as the sweep's are and growing a third a step to its own
@@ -702,7 +731,7 @@ export const pagePath = (
         let k = 0
         while (gap < height * RIBBON_STEP) {
           y += gap
-          phaseAt += (gap / (PERIOD * height)) * Math.PI
+          phaseAt += (gap / (period * height)) * Math.PI
           k += 1
           const f = Math.min(1, k / Math.max(ramp, 1))
           points.push([
