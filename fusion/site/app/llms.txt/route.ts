@@ -34,7 +34,7 @@ export async function GET() {
   ]
 
   /* **The machine-readable surfaces first, because they are not pages.**
-     Everything after this is a document with a sentence about it; these three are
+     Everything after this is a document with a sentence about it; these are
      the vocabulary, and an agent that reads the manifest does not need to be told
      in prose what a component accepts. It went above the sections rather than
      below them for the reason `coding-agents.mdx` gives about starting here
@@ -48,6 +48,7 @@ export async function GET() {
     '## Machine-readable',
     '',
     `- [Custom elements manifest](${SITE}/helix/custom-elements.json): Every tag, property with its literal union, event with its class, slot, part and custom property. The vocabulary: a tag not in it does not exist.`,
+    `- [Catalog](${SITE}/helix/api.json): Every family with its tags, properties, events and their React props, slots, parts, words, and the import lines to copy, in one file without the examples. The same file \`@fusion.dev/helix\` ships, which \`helix mcp\` reads from your project.`,
     `- [Token set](${SITE}/helix/tokens.json): Every semantic token with its value, category and description. The closed set: a name not in it resolves to nothing and the property silently falls back.`,
     `- [One family as data](${SITE}/helix/components/button.json): Any family's \`.md\` also answers as \`.json\`, the same content structured. Swap the slug.`,
     '',
