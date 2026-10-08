@@ -163,6 +163,25 @@ describe('strands page path', () => {
     expect(between).toEqual([])
   })
 
+  test('carries the ribbon on out of a wave it led into, lit, with no dark stretch', () => {
+    /* The wave ran off the far edge while the ribbon came back in unlit from
+       the near one, so the page went dark for a screen in the middle. */
+    const points = pagePath(
+      [stop(0, 'bend', 0.86), stop(4000, 'waves'), stop(7600, 'waves')],
+      'ribbon',
+      view.width,
+      view.height,
+      8400,
+    )
+    const shown = lit(points)
+      .map(([, y]) => y)
+      .filter((y) => y > 4000 && y < 7600)
+      .sort((one, two) => one - two)
+    const gaps = shown.slice(1).map((y, i) => y - (shown[i] ?? y))
+    expect(shown[0]).toBeLessThan(4000 + view.height * 0.5)
+    expect(Math.max(...gaps)).toBeLessThan(view.height * 0.5)
+  })
+
   test('brings the ribbon back across a longer gap between two waves', () => {
     const points = pagePath(
       [stop(0, 'bend'), stop(3000, 'waves'), stop(7000, 'waves')],
@@ -173,8 +192,11 @@ describe('strands page path', () => {
     )
     const between = lit(points).filter(([, y]) => y > 3600 && y < 6200)
     expect(between.length).toBeGreaterThan(2)
+    /* Ribbon, not wave: wider than a wave everywhere. The ribbon's width
+       breathes down to half of its 0.18, so twice a wave's was a floor the
+       narrower ribbon no longer clears at the bottom of its breath. */
     for (const [, , width] of between) {
-      expect(width).toBeGreaterThan(0.06 * 2)
+      expect(width).toBeGreaterThan(0.06 * 1.4)
     }
   })
 
