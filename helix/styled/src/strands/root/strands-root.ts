@@ -71,12 +71,12 @@ const PACE = 0.25
  * `--helix-color-background`. On a light page the light becomes ink, because
  * light added to near-white cannot be seen.
  *
- * **Three forms, set with `variant`.** `fan` is a tight, bright bend with its
+ * **Three forms, set with `variant`.** `bend` turns bright strands through one tight point, with its
  * arms opening to the right. `ribbon`, the default, is a broad, soft ribbon in
  * long curves. `waves` is sharp strands crossing the full width.
  *
  * **In its own box, by default.** The element fills the box it is given, the
- * way an image does, and `at` places the fan's bend or the ribbon's axis across
+ * way an image does, and `at` places the bend's apex or the ribbon's axis across
  * it. Content placed inside sits over the ribbon, in the `content` part.
  *
  * **Down the whole page, with `travel`.** The element fixes itself behind the
@@ -127,9 +127,9 @@ export class HelixStrands extends HelixElement {
   static override styles: CSSResultGroup = styles
 
   /**
-   * Where the form sits across the box, as a share of the width: the fan's
-   * bend or the ribbon's axis. `0` is the left edge and `1` the right. A wave
-   * crosses the whole width and does not read it. Unset, a fan bends at `0.5`
+   * Where the form sits across the box, as a share of the width: the bend's
+   * apex or the ribbon's axis. `0` is the left edge and `1` the right. A wave
+   * crosses the whole width and does not read it. Unset, a bend's apex sits at `0.5`
    * and a ribbon runs down the middle.
    *
    * **A share rather than a length**, so the ribbon keeps its place when the
@@ -193,7 +193,7 @@ export class HelixStrands extends HelixElement {
   /**
    * The share of strands drawn out of focus where the ribbon is wide, from `0`,
    * every strand sharp, to `1`, every one soft. Clamped to that range. A tight
-   * form, such as a fan's bend or a wave, stays sharp whatever this says.
+   * form, such as a bend's apex or a wave, stays sharp whatever this says.
    */
   @property({ type: Number })
   softness = 0
@@ -592,7 +592,7 @@ export class HelixStrands extends HelixElement {
         at: Number.isFinite(at) ? at : undefined,
         height: rect.height,
         top: rect.top + scroll,
-        variant: variant === 'fan' || variant === 'waves' ? variant : 'ribbon',
+        variant: variant === 'bend' || variant === 'waves' ? variant : 'ribbon',
       })
     }
     return placed

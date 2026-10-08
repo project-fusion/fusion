@@ -11,7 +11,7 @@ import {
   visibleRange,
 } from './path.js'
 
-/** The point a form is narrowest at, which for a fan is its bend. */
+/** The point a form is narrowest at, which for a bend is its apex. */
 const narrowest = (points: readonly PathPoint[]): PathPoint =>
   points.reduce((one, two) => (two[2] < one[2] ? two : one))
 
@@ -50,16 +50,16 @@ const tightest = (points: readonly PathPoint[], width: number, height: number): 
 }
 
 describe('strands box path', () => {
-  test('a fan bends at its narrowest and brightest point, where `at` puts it, 58% down', () => {
-    const points = boxPath('fan', 0.3, 400, 800)
+  test('a bend turns at its narrowest and brightest point, where `at` puts it, 58% down', () => {
+    const points = boxPath('bend', 0.3, 400, 800)
     const bend = narrowest(points)
     expect(bend[0]).toBe(0.3)
     expect(bend[1]).toBeCloseTo(232)
     expect(bend[3]).toBe(Math.max(...points.map((one) => one[3])))
   })
 
-  test("a fan's arms leave the box above and below the bend, opening to the right", () => {
-    const points = boxPath('fan', undefined, 400, 800)
+  test("a bend's arms leave the box above and below its apex, opening to the right", () => {
+    const points = boxPath('bend', undefined, 400, 800)
     const first = points[0] as PathPoint
     const last = points.at(-1) as PathPoint
     const bend = narrowest(points)
@@ -69,11 +69,11 @@ describe('strands box path', () => {
     expect(last[0]).toBeGreaterThan(bend[0])
   })
 
-  test('a fan in a narrow box stays where `at` puts it', () => {
+  test('a bend in a narrow box stays where `at` puts it', () => {
     /* The narrow rule is for the viewport in `travel`. A box is the frame the
        consumer chose, so a box only a few hundred pixels wide must not push the
        bend to the edge, which is what an early version did. */
-    expect(narrowest(boxPath('fan', 0.2, 300, 240))[0]).toBe(0.2)
+    expect(narrowest(boxPath('bend', 0.2, 300, 240))[0]).toBe(0.2)
   })
 
   test('a wave enters off one edge and leaves off the other, through the middle', () => {
@@ -89,7 +89,7 @@ describe('strands box path', () => {
   })
 
   test('no form turns tighter than half the box is tall, at any shape of box', () => {
-    /* A fan's bend a few dozen pixels round folded the light, and a ribbon in
+    /* A bend's apex a few dozen pixels round folded the light, and a ribbon in
        a wide, short box crammed its swing into a tight curve. The spline is
        sampled, so a turn may read a few per cent under its true radius. */
     for (const [width, height] of [
@@ -97,15 +97,15 @@ describe('strands box path', () => {
       [800, 400],
       [300, 400],
     ] as const) {
-      for (const variant of ['fan', 'ribbon', 'waves'] as const) {
+      for (const variant of ['bend', 'ribbon', 'waves'] as const) {
         const points = boxPath(variant, undefined, height, width)
         expect(tightest(points, width, height)).toBeGreaterThan(height * TURN * 0.9)
       }
     }
   })
 
-  test("a fan's bend is its tightest turn, at exactly the floor", () => {
-    expect(tightest(boxPath('fan', 0.4, 500, 1440), 1440, 500)).toBeCloseTo(250, -1)
+  test("a bend's apex is its tightest turn, at exactly the floor", () => {
+    expect(tightest(boxPath('bend', 0.4, 500, 1440), 1440, 500)).toBeCloseTo(250, -1)
   })
 
   test('a ribbon runs the full height of the box around `at`, with nothing unlit inside it', () => {
@@ -131,7 +131,7 @@ describe('strands page path', () => {
   })
 
   test('places the stops in page order, whatever order they were written in', () => {
-    const written = [stop(4000, 'waves'), stop(0, 'fan'), stop(5200, 'waves')]
+    const written = [stop(4000, 'waves'), stop(0, 'bend'), stop(5200, 'waves')]
     const points = pagePath(written, 'ribbon', view.width, view.height, 6400)
     const bend = narrowest(points)
     expect(bend[1]).toBeLessThan(800)
@@ -150,7 +150,7 @@ describe('strands page path', () => {
 
   test('turns off screen between two waves a screen apart, so each reads alone', () => {
     const points = pagePath(
-      [stop(0, 'fan'), stop(4000, 'waves'), stop(5200, 'waves')],
+      [stop(0, 'bend'), stop(4000, 'waves'), stop(5200, 'waves')],
       'ribbon',
       view.width,
       view.height,
@@ -163,7 +163,7 @@ describe('strands page path', () => {
 
   test('brings the ribbon back across a longer gap between two waves', () => {
     const points = pagePath(
-      [stop(0, 'fan'), stop(3000, 'waves'), stop(7000, 'waves')],
+      [stop(0, 'bend'), stop(3000, 'waves'), stop(7000, 'waves')],
       'ribbon',
       view.width,
       view.height,
@@ -176,16 +176,16 @@ describe('strands page path', () => {
     }
   })
 
-  test('never turns tight where it is lit, from the fan through the waves and back', () => {
-    /* Each hand-over used to meet in a corner: the fan's arm and the ribbon
+  test('never turns tight where it is lit, from the bend through the waves and back', () => {
+    /* Each hand-over used to meet in a corner: the bend's arm and the ribbon
        in a hook, a ribbon heading out to its side and the wave it doubled
        back to reach, and a ribbon coming back across after a wave. A tenth of
        the screen's height is generous; on a page a hand-over now turns
        through more than a quarter of it. */
     const layouts: [number, number, PlacedStop[], number][] = [
-      [1440, 900, [stop(57, 'fan', 0.47), stop(5379, 'waves'), stop(8345, 'waves')], 9068],
-      [1280, 800, [stop(0, 'fan'), stop(3000, 'waves'), stop(7000, 'waves')], 8000],
-      [390, 844, [stop(57, 'fan', 0.47), stop(7207, 'waves'), stop(12200, 'waves')], 13409],
+      [1440, 900, [stop(57, 'bend', 0.47), stop(5379, 'waves'), stop(8345, 'waves')], 9068],
+      [1280, 800, [stop(0, 'bend'), stop(3000, 'waves'), stop(7000, 'waves')], 8000],
+      [390, 844, [stop(57, 'bend', 0.47), stop(7207, 'waves'), stop(12200, 'waves')], 13409],
     ]
     for (const [width, height, stops, page] of layouts) {
       const points = pagePath(stops, 'ribbon', width, height, page)
@@ -195,7 +195,7 @@ describe('strands page path', () => {
 
   test('ends on the last wave rather than bringing the ribbon back', () => {
     const points = pagePath(
-      [stop(0, 'fan'), stop(4000, 'waves')],
+      [stop(0, 'bend'), stop(4000, 'waves')],
       'ribbon',
       view.width,
       view.height,
@@ -204,9 +204,9 @@ describe('strands page path', () => {
     expect(lit(points).filter(([, y]) => y > 4000 + 160)).toEqual([])
   })
 
-  test('fills the gap between a fan and a wave with soft ribbon', () => {
+  test('fills the gap between a bend and a wave with soft ribbon', () => {
     const points = pagePath(
-      [stop(0, 'fan'), stop(4000, 'waves')],
+      [stop(0, 'bend'), stop(4000, 'waves')],
       'ribbon',
       view.width,
       view.height,
@@ -225,12 +225,12 @@ describe('strands page path', () => {
     expect(Math.max(...lit(ribbon).map(([, y]) => y))).toBeGreaterThan(7000)
     const waves = pagePath([], 'waves', view.width, view.height, 8000)
     expect(waves.filter(([x]) => x < 0).length).toBeGreaterThan(3)
-    const fan = pagePath([], 'fan', view.width, view.height, 8000)
-    expect(narrowest(fan)[1]).toBeLessThan(800)
+    const bend = pagePath([], 'bend', view.width, view.height, 8000)
+    expect(narrowest(bend)[1]).toBeLessThan(800)
   })
 
-  test('on a phone, a fan keeps to the right edge, clear of the text', () => {
-    const points = pagePath([stop(0, 'fan', 0.3)], 'ribbon', 390, 844, 4000)
+  test('on a phone, a bend keeps to the right edge, clear of the text', () => {
+    const points = pagePath([stop(0, 'bend', 0.3)], 'ribbon', 390, 844, 4000)
     expect(narrowest(points)[0]).toBeGreaterThanOrEqual(0.8)
   })
 

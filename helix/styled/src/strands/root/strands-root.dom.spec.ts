@@ -123,7 +123,7 @@ describe('strands', () => {
        a traveling host to the viewport; nothing selects on the rest. */
     const host = (await mount(undrawn())) as Strands
     host.travel = true
-    host.variant = 'fan'
+    host.variant = 'bend'
     host.density = 0.4
     host.speed = 2
     await host.updateComplete

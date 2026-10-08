@@ -10,8 +10,8 @@ import { styles } from './strands-stop.css.js'
  *
  * @description
  * Placed inside a `helix-strands` with `travel`, a stop names an element with
- * `for` and says which form the ribbon takes when the page reaches it: a `fan`
- * bending through it, a `ribbon` passing through `at`, or `waves` crossing at
+ * `for` and says which form the ribbon takes when the page reaches it: a `bend`
+ * turning through it, a `ribbon` passing through `at`, or `waves` crossing at
  * its top edge. The stops are read in page order, whatever order they are
  * written in, and a stop naming no element is skipped.
  *
@@ -31,9 +31,9 @@ export class HelixStrandsStop extends HelixElement {
   static override styles: CSSResultGroup = styles
 
   /**
-   * Where the form sits across the page, as a share of the width: the fan's
-   * bend or the ribbon's axis. A wave crosses the whole width and does not
-   * read it. Unset, a fan bends at `0.4` and a ribbon runs down the middle.
+   * Where the form sits across the page, as a share of the width: the bend's
+   * apex or the ribbon's axis. A wave crosses the whole width and does not
+   * read it. Unset, a bend's apex sits at `0.5` and a ribbon runs down the middle.
    */
   @property({ reflect: true, type: Number })
   at?: number

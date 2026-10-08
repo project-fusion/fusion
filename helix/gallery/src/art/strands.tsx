@@ -1,15 +1,15 @@
 import type { CSSProperties, ReactNode } from 'react'
 
 /**
- * A fan of strands bending through one point, with its arms opening to the
+ * A bend: strands turning through one point, with their arms opening to the
  * right.
  *
- * **Lines, not a glow.** The component's light is additive, and the hot bend
+ * **Lines, not a glow.** The component's light is additive, and the hot apex
  * is where the strands overlap; drawn as seven strokes at the three ink steps,
- * the overlap is what makes the bend read as the brightest place, with no
+ * the overlap is what makes the apex read as the brightest place, with no
  * gradient the system does not allow.
  *
- * The strands converge to within a few units at the bend and part toward the
+ * The strands converge to within a few units at the apex and part toward the
  * edges, the way a ribbon seen at an angle does. The outer ones are the
  * faintest, so the bundle reads as having depth rather than as a stack of
  * equal lines.
