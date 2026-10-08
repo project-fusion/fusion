@@ -8,7 +8,7 @@
  */
 
 /** The three forms the ribbon takes. */
-export type StrandsVariant = 'fan' | 'ribbon' | 'waves'
+export type StrandsVariant = 'bend' | 'ribbon' | 'waves'
 
 /**
  * One point on the centerline: `x` as a share of the width, `y` in CSS pixels,
@@ -49,20 +49,20 @@ const NARROW = 760
 /**
  * The brightness of each form, before `gain`.
  *
- * The fan is the one loud thing, so it peaks at full strength. A ribbon runs
+ * The bend is the one loud thing, so it peaks at full strength. A ribbon runs
  * behind content for screens at a time, so it is dimmer, and a wave crosses
  * a gap between sections, between the two.
  */
-const GLOW = { fan: 1, ribbon: 0.36, waves: 0.7 } as const
+const GLOW = { bend: 1, ribbon: 0.36, waves: 0.7 } as const
 
 /** The width of each form, as a share of the width, before `spread`. */
-const WIDTH = { fan: 0.12, ribbon: 0.24, waves: 0.06 } as const
+const WIDTH = { bend: 0.12, ribbon: 0.24, waves: 0.06 } as const
 
-/** Where a fan's bend sits across its box, when `at` is not given. */
-const FAN_AT = 0.5
+/** Where a bend's apex sits across its box, when `at` is not given. */
+const BEND_AT = 0.5
 
 /**
- * Where a fan's lower arm hands over to the ribbon after it, below the bend,
+ * Where a bend's lower arm hands over to the ribbon after it, below the apex,
  * as a share of its height. Inside a box, where nothing follows, the arm runs
  * on out of the box.
  *
@@ -70,34 +70,35 @@ const FAN_AT = 0.5
  * pixel down, is one the ribbon's curve reaches. Further on, the arm ran
  * flatter than the ribbon ever does, and the strand bent to meet it.
  */
-const FAN_EXIT = 0.3
+const BEND_EXIT = 0.3
 
 /**
  * The tightest any form turns, as a share of the box's height: the radius of
  * its sharpest curve.
  *
- * Half the height. A fan's bend a few dozen pixels round kinked the strands
+ * Half the height. A bend's apex a few dozen pixels round kinked the strands
  * that ran along its inside, and read as a fold in the light where every form
  * is meant to be one sweep. `path.pure.spec.ts` measures it on every form.
  */
 export const TURN = 0.5
 
 /**
- * A fan: a bright bend with its arms opening toward the right.
+ * A bend: bright strands turning through one point, with their arms opening
+ * toward the right.
  *
- * The bend sits at `at` across and at 58% of `height` down from `top`, and the
- * arms leave above and below it. The width narrows at the bend, which is what
+ * The apex sits at `at` across and at 58% of `height` down from `top`, and the
+ * arms leave above and below it. The width narrows at the apex, which is what
  * makes the strands converge into one hot line there.
  *
- * **A parabola in pixels**, so the bend is the tightest point and its radius
+ * **A parabola in pixels**, so the apex is the tightest point and its radius
  * is `TURN` of the height whatever the box's shape: drawn in shares of the
- * width, a wide box flattened the bend and a narrow one folded it.
+ * width, a wide box flattened the apex and a narrow one folded it.
  *
  * @param width The box's width, in CSS pixels, to draw the parabola in.
- * @param reach How far the lower arm runs below the bend, as a share of the
+ * @param reach How far the lower arm runs below the apex, as a share of the
  *   height. It widens toward the ribbon's width on the way.
  */
-const fan = (
+const bend = (
   top: number,
   height: number,
   at: number,
@@ -107,7 +108,7 @@ const fan = (
 ): PathPoint[] => {
   const x = narrow ? Math.max(at, 0.8) : at
   const y = top + height * 0.58
-  /* Across, as a share of the width, at `down` heights from the bend. */
+  /* Across, as a share of the width, at `down` heights from the apex. */
   const out = (down: number): number => x + (down * down * height) / (2 * TURN) / width
   /* Evenly spaced, because a spline through points spaced unevenly bends
      hardest where the spacing changes, which put a fold in the arm. The upper
@@ -118,10 +119,10 @@ const fan = (
     const down = step * 0.15
     const upper = down < 0
     const wide = upper
-      ? 0.02 + (WIDTH.fan - 0.02) * Math.min(1, -down / 0.6)
-      : 0.02 + (WIDTH.fan * 1.4 - 0.02) * (down / reach)
+      ? 0.02 + (WIDTH.bend - 0.02) * Math.min(1, -down / 0.6)
+      : 0.02 + (WIDTH.bend * 1.4 - 0.02) * (down / reach)
     const glow = upper ? Math.max(0, 1 + down * 1.07) : 1 - down * 0.73
-    points.push([out(down), y + down * height, wide, GLOW.fan * glow])
+    points.push([out(down), y + down * height, wide, GLOW.bend * glow])
   }
   return points
 }
@@ -207,7 +208,7 @@ const RIBBON_STEP = 0.35
  *
  * **Graded, because the spline is uniform.** It gives every span between two
  * points the same share of its parameter, so where one span is far longer
- * than the next, the curve bends hardest at the point between them. A fan's
+ * than the next, the curve bends hardest at the point between them. A bend's
  * points are close and a ribbon's far apart, and each change of spacing
  * folded the strand where the two met.
  */
@@ -279,7 +280,7 @@ const ribbon = (
  *   crosses the whole width and does not read it.
  * @param height The box's height, in CSS pixels.
  * @param width The box's width, in CSS pixels. `x` is a share of it, and a
- *   fan's bend is drawn in pixels so it keeps its radius at any shape.
+ *   bend's apex is drawn in pixels so it keeps its radius at any shape.
  */
 export const boxPath = (
   variant: StrandsVariant,
@@ -291,8 +292,8 @@ export const boxPath = (
      pushing each form to the edge of the viewport; a box is the frame the
      consumer chose, so its form stays where `at` puts it at any width. */
   const narrow = false
-  if (variant === 'fan') {
-    return fan(0, height, at ?? FAN_AT, narrow, width, 0.6)
+  if (variant === 'bend') {
+    return bend(0, height, at ?? BEND_AT, narrow, width, 0.6)
   }
   if (variant === 'waves') {
     return wave(height * 0.5, height, false, narrow, width)
@@ -313,7 +314,7 @@ export const boxPath = (
  * the ribbon fills the gap with soft S-curves in `fill`'s place, except
  * between two waves less than a screen and a half apart, where it turns off
  * screen so each wave reads alone.
- * Without stops, `fill` runs the length of the page: a fan opens the page and
+ * Without stops, `fill` runs the length of the page: a bend opens the page and
  * a ribbon follows it, waves cross every screen and a third, and a ribbon
  * meanders the whole way. After a last wave the ribbon does not come back, so
  * the page ends on the wave.
@@ -338,8 +339,8 @@ export const pagePath = (
       for (let y = height * 0.6; y < page; y += height * 1.3) {
         placed.push({ at: undefined, height, top: y, variant: 'waves' })
       }
-    } else if (fill === 'fan') {
-      placed.push({ at: undefined, height, top: 0, variant: 'fan' })
+    } else if (fill === 'bend') {
+      placed.push({ at: undefined, height, top: 0, variant: 'bend' })
     }
   }
 
@@ -405,21 +406,21 @@ export const pagePath = (
   for (const stop of placed) {
     joined = undefined
     gap(stop.top, stop.variant)
-    if (stop.variant === 'fan') {
+    if (stop.variant === 'bend') {
       const span = Math.min(stop.height, height)
-      const at = stop.at ?? FAN_AT
+      const at = stop.at ?? BEND_AT
       /* The ribbon takes over where its curve runs at the arm's slope, and
-         the two meet in even steps along that slope. On a phone the bend
+         the two meet in even steps along that slope. On a phone the apex
          sits at the right edge and the ribbon cannot run that way, so the
          arm runs off the screen and the ribbon comes back in at its crest. */
-      const slope = FAN_EXIT / TURN
+      const slope = BEND_EXIT / TURN
       const swing = swingOf(height, width, narrow)
       const steepest = (swing * width * Math.PI) / (1.7 * height)
       const a = Math.acos(Math.min(1, slope / steepest))
       const x = 0.5 + swing * Math.sin(a)
-      const fanned = fan(stop.top, span, at, narrow, width, narrow ? 0.6 : FAN_EXIT)
-      const exit = fanned.at(-1) as PathPoint
-      points.push(...fanned)
+      const bent = bend(stop.top, span, at, narrow, width, narrow ? 0.6 : BEND_EXIT)
+      const exit = bent.at(-1) as PathPoint
+      points.push(...bent)
       if (!narrow && x > exit[0]) {
         const drop = Math.max(height * 0.3, ((x - exit[0]) * width) / slope)
         const start: PathPoint = [x, exit[1] + drop, WIDTH.ribbon, GLOW.ribbon]

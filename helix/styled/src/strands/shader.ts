@@ -86,12 +86,12 @@ vec3 strandAt(float id, float t, out vec3 info) {
   float th = along * 0.002 * (1.0 + uDrift * (r9 - 0.5) * 0.3) + uTime * 0.25 * pace
     + r2 * (0.5 + uDrift * 2.6);
   float width = c.z * uSpread;
-  float fan = width * uView.x * (1.0 + 0.25 * sin(uTime * 0.4 + along * 0.0045));
+  float breadth = width * uView.x * (1.0 + 0.25 * sin(uTime * 0.4 + along * 0.0045));
   float sway = sin(along * 0.006 + uTime * 0.23) * mix(6.0, 30.0, smoothstep(0.02, 0.2, width));
   float ct = cos(th);
   float st = sin(th);
   float depth = clamp((z * 0.55 * ct - n * st) / 1.15, -1.0, 1.0);
-  float lat = sway + fan * (n * ct + z * 0.55 * st) * (1.0 + uDepth * 0.35 * depth);
+  float lat = sway + breadth * (n * ct + z * 0.55 * st) * (1.0 + uDepth * 0.35 * depth);
   lat += sin(along * 0.006 * (1.0 + uDrift * (r9 - 0.5) * 0.3) + uTime * (0.6 + 0.5 * r1) * pace
     + r1 * 6.283) * 12.0 * (0.3 + r3) * (1.0 + uDrift * 0.5);
   info = vec3(max(c.w, 0.0), width, along);

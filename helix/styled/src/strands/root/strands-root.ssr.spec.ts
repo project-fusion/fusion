@@ -9,7 +9,7 @@ describe('strands server output', () => {
        emitted a uniform, a program or a frame would be a server pretending to
        have a GPU, so the whole list is asked for rather than a few things a
        spec author thought to rule out. */
-    expect(servedParts(ssr(html`<helix-strands variant="fan"></helix-strands>`))).toEqual([
+    expect(servedParts(ssr(html`<helix-strands variant="bend"></helix-strands>`))).toEqual([
       'canvas',
       'content',
     ])

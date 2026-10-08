@@ -6,7 +6,7 @@ export function Example() {
       <helix-strands travel>
         <helix-strands-stop
           for="travel-opening"
-          variant="fan"
+          variant="bend"
         ></helix-strands-stop>
         <helix-strands-stop
           for="travel-closing"
