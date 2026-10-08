@@ -99,11 +99,11 @@ export class HelixHeadlessBlockquote extends HelixElement {
   @property({ reflect: true, type: Boolean })
   marks = false
 
-  /** Whether this blockquote has said its passage starts with a typed mark, so it says so once. */
-  private warned = false
-
   /** Whether this blockquote has said its `cite` holds words, so it says so once. */
   private citeWarned = false
+
+  /** Whether this blockquote has said its passage starts with a typed mark, so it says so once. */
+  private warned = false
 
   /**
    * Says on the caption whether there is an attribution in it.
