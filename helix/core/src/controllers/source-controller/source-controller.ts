@@ -1,7 +1,12 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
-import { auditSource } from '#audit-source'
+import { auditData, auditSource } from '#audit-source'
 import { elementById, searchableById } from '../../utils/element-by-id/element-by-id.js'
-import { type ChartData, rowsFromData, seriesFromData } from '../../utils/read-data/read-data.js'
+import {
+  type ChartData,
+  isChartData,
+  rowsFromData,
+  seriesFromData,
+} from '../../utils/read-data/read-data.js'
 import {
   type Row,
   readRows,
@@ -156,6 +161,12 @@ export class SourceController implements ReactiveController {
   private get data(): ChartData | undefined {
     const host = this.host as Partial<Element> & SourceHost
     if (host.data === undefined || typeof host.closest !== 'function' || this.hydrating) {
+      return undefined
+    }
+    /* Any other shape, such as an array of rows, is read as no readings, and
+       a development build says so. */
+    if (!isChartData(host.data)) {
+      auditData(host as unknown as HTMLElement)
       return undefined
     }
     return host.data

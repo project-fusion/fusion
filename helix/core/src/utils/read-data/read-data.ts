@@ -37,6 +37,22 @@ export interface ChartData {
   rows: ReadonlyArray<readonly [label: string, ...cells: ChartDatum[]]>
 }
 
+/**
+ * Whether `data` has the shape a chart reads: an object with an array of
+ * `columns` and an array of `rows`, each row an array. Any other value draws
+ * the empty state, where it would throw from the render.
+ */
+export const isChartData = (data: unknown): data is ChartData => {
+  const shape = data as Partial<ChartData> | null
+  return (
+    typeof shape === 'object' &&
+    shape !== null &&
+    Array.isArray(shape.columns) &&
+    Array.isArray(shape.rows) &&
+    shape.rows.every((row) => Array.isArray(row))
+  )
+}
+
 /** The number in a cell and the words it is shown as, written in `locale`. */
 const cellOf = (datum: ChartDatum, locale: string): { text: string; value?: number } => {
   if (datum === null || datum === undefined) {

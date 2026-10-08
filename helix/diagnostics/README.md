@@ -297,6 +297,7 @@ diagnostics counts it by kind and tag. None fails a CI job.
 | `duplicate-name` | Two navigation landmarks on the page share a name, so a screen reader lists them alike |
 | `duplicate-registration` | Two copies of Helix are on the page. Also the finding of the same name |
 | `fullscreen-refused` | The browser refused fullscreen, usually in a frame without `allow="fullscreen"` |
+| `malformed-data` | A chart's `data` is not `{ columns, rows }`, so it draws its empty state. Development builds only (the `development` export condition) |
 | `min-out-of-range` | A rating's `min` is not a score between 0 and its `max` |
 | `misplaced-handler` | A React `on` prop names an event that another element dispatches. Development builds only (the `development` export condition) |
 | `mixed-turns` | A chat was given turns both as children and as `turns` data, and draws them as two runs |

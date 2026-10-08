@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { type ChartData, rowsFromData, seriesFromData } from './read-data.js'
+import { type ChartData, isChartData, rowsFromData, seriesFromData } from './read-data.js'
 
 const CHANNELS: ChartData = {
   caption: 'Sessions by channel',
@@ -51,5 +51,26 @@ describe('data read as rows', () => {
       label: 'Jan',
     })
     expect(feb?.cells[0]).toEqual({ name: 'Direct', text: '' })
+  })
+})
+
+/* An array of rows in place of `{ columns, rows }` threw from a chart's render. */
+describe('the shape of data', () => {
+  test('is columns and rows, each row an array', () => {
+    expect(isChartData(CHANNELS)).toBe(true)
+    expect(isChartData({ columns: [], rows: [] })).toBe(true)
+  })
+
+  test('and anything else is refused', () => {
+    expect(
+      isChartData([
+        ['Month', 'Direct'],
+        ['Jan', 1],
+      ]),
+    ).toBe(false)
+    expect(isChartData({ columns: ['Month'] })).toBe(false)
+    expect(isChartData({ columns: ['Month'], rows: ['Jan', 1] })).toBe(false)
+    expect(isChartData(null)).toBe(false)
+    expect(isChartData('Jan,1')).toBe(false)
   })
 })
