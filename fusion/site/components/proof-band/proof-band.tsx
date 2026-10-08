@@ -52,33 +52,27 @@ export const ProofBand = () => (
         </helix-text>
       </helix-flex>
 
-      {/* **Two columns, because "ours" is a fact about the data.** A single
-          series paints every bar the same, leaving a reader to find Helix by
-          reading labels. `Helix` and `Others` give the chart two series to color
-          and the legend something true to say, and each row still carries
-          exactly one number.
-
-          **Stacked, so each row is one bar.** Side by side, the empty half of
-          each row still took its slot, and the gaps between bars came out
-          uneven. Horizontal, so each system's name reads on one line. */}
+      {/* **One column, and Helix's cell names its own tone.** It was split
+          into a `Helix` column and an `Others` column only so the chart had a
+          second series to color Helix's bar with, and every tooltip then showed
+          the empty one: hovering Material Web read "Helix" over nothing and
+          "Others 12,591". `data-tone` colors the one bar, so the table says
+          what it measures and the tooltip reads one system and one number.
+          Horizontal, so each system's name reads on one line. */}
       <table data-hidden-visually id="proof-button">
         <caption>One button and its runtime, brotli bytes, by design system</caption>
         <thead>
           <tr>
             <th scope="col">System</th>
-            <th scope="col">Helix</th>
-            <th scope="col">Others</th>
+            <th scope="col">Brotli bytes</th>
           </tr>
         </thead>
         <tbody>
           {BUTTON.map((rival) => (
             <tr key={rival.name}>
               <th scope="row">{rival.name}</th>
-              <td data-value={rival.ours ? rival.brotli : 0}>
-                {rival.ours ? rival.brotli.toLocaleString('en-US') : ''}
-              </td>
-              <td data-value={rival.ours ? 0 : rival.brotli}>
-                {rival.ours ? '' : rival.brotli.toLocaleString('en-US')}
+              <td data-tone={rival.ours ? 'primary' : undefined} data-value={rival.brotli}>
+                {rival.brotli.toLocaleString('en-US')}
               </td>
             </tr>
           ))}
@@ -90,10 +84,8 @@ export const ProofBand = () => (
         emphasis="outlined"
         for="proof-button"
         orientation="horizontal"
-        stacked
         wash="gradient"
       ></helix-bar-chart>
-      <helix-legend class={styles.proofLegend} for="proof-button"></helix-legend>
 
       <helix-flex class="siteActions" data-density="lg">
         <a data-button="subtle" href={METRICS_HREF}>

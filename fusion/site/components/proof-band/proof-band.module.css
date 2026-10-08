@@ -15,7 +15,8 @@
  * Tall enough for five bars to be compared rather than glanced at.
  */
 .proofBars {
-  block-size: 14rem;
+  --bar-chart-block-size: 14rem;
+
   inline-size: 100%;
 }
 
@@ -26,14 +27,8 @@
  * full-width row of bars, so a left-aligned key sits under the first bar and
  * reads as belonging to that one rather than to the row.
  */
-.proofLegend {
-  display: flex;
-  justify-content: center;
-}
-
-/* On the panel rather than the chart, because the legend is the chart's sibling
-   and would otherwise keep the default palette while the bars changed. */
+/* The other systems in a quiet ink, so the one bar in the brand's color,
+   Helix's, is the one a reader finds first. */
 .proofPanel {
-  --helix-color-series-1: var(--helix-color-primary);
-  --helix-color-series-2: var(--helix-color-foreground-subtle);
+  --helix-color-series-1: var(--helix-color-foreground-subtle);
 }
