@@ -55,8 +55,15 @@ const NARROW = 760
  */
 const GLOW = { bend: 1, ribbon: 0.36, waves: 0.7 } as const
 
-/** The width of each form, as a share of the width, before `spread`. */
-const WIDTH = { bend: 0.12, ribbon: 0.24, waves: 0.06 } as const
+/**
+ * The width of each form, as a share of the width, before `spread`.
+ *
+ * The ribbon's is the 0.24 it was drawn at before a `spread` of 1 came to
+ * mean 1.35, which was tuned on the bend: carried to the ribbon, with depth
+ * pushing the near strands further out, it ran most of half a page wide and
+ * read as loose strands rather than a band.
+ */
+const WIDTH = { bend: 0.12, ribbon: 0.18, waves: 0.06 } as const
 
 /** Where a bend's apex sits across its box, when `at` is not given. */
 const BEND_AT = 0.5
