@@ -114,7 +114,8 @@ const firstOf = (year: number, month: number): Date =>
  * when Previous or Next is pressed. Neither moves past `min` or `max`, and the
  * keys stop at them too. A value outside the bounds, on a barred day, or off
  * `step` reports `rangeUnderflow`, `rangeOverflow`, `badInput` or
- * `stepMismatch`, so a form does not submit it.
+ * `stepMismatch`, so a form does not submit it. A range set from a script
+ * whose end is before its start reports `rangeUnderflow` as well.
  *
  * @since 0.1.0
  * @status stable
@@ -1009,6 +1010,14 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
   }
 
   /**
+   * The validation message for a range that ends before it starts. `{start}`
+   * is replaced with the start, written as a date in `locale`.
+   */
+  @words
+  @property({ attribute: 'range-order-message' })
+  rangeOrderMessage = 'Choose an end on or after {start}.'
+
+  /**
    * The validation message for a date before `min`. `{min}` is replaced with
    * `min`, written as a date in `locale`.
    */
@@ -1242,6 +1251,16 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
       if (fault) {
         return [{ [fault[0]]: true }, fault[1]]
       }
+    }
+    /* A range the calendar picks is in order, the two days sorted as they are
+       chosen, so only a value set from outside can end before it starts: Date
+       Input reports the same pair the same way. */
+    const [start, end] = held
+    if (this.mode === 'range' && start !== undefined && end !== undefined && end < start) {
+      return [
+        { rangeUnderflow: true },
+        formatWords(this, 'rangeOrderMessage', { start: this.spoken(start) }),
+      ]
     }
     return undefined
   }
