@@ -25,8 +25,14 @@
  * something releases. Deciding it here instead means the pull request comment,
  * the experimental stamp and the release matrix all say the same number.
  *
- * The caller names those domains, because this file is given commit messages and
- * nothing else: it runs from `/tmp` under `pull_request_target`, where reading a
+ * **A held domain releases nothing, whatever its subjects ask.** `held` in
+ * `fusion.json` names a domain that is not on the registry yet, so its work
+ * builds and is tested on every merge and adds no leg to a release. Its
+ * subjects stay in the window, which runs from the domain's last release, so
+ * the first merge after the hold is lifted releases all of it.
+ *
+ * The caller names those domains, and the held ones, because this file is given
+ * commit messages and nothing else: it runs from `/tmp` under `pull_request_target`, where reading a
  * manifest or a tag is not available to it.
  *
  * Usage:
@@ -34,6 +40,7 @@
  *   node fusion/scripts/bump.mjs <range>     # `a..b`, as git takes it
  *   node fusion/scripts/bump.mjs --stdin     # messages, NUL separated
  *   node fusion/scripts/bump.mjs <range> --zero helix,cortex,proof
+ *   node fusion/scripts/bump.mjs <range> --held proof
  *
  * **The stdin form exists for `release-intent`**, which runs as
  * `pull_request_target` with no checkout on purpose: it has a writable token
@@ -113,8 +120,10 @@ export function bumpOf(message) {
  * `zero` names the domains whose major is still 0, where a breaking change is a
  * minor. A subject still asks for what it asks for: `bumpOf` reports the major,
  * and the project's phase decides what number that comes to.
+ *
+ * `held` names the domains kept out of the release, which get no entry at all.
  */
-export function resolve(messages, zero = new Set()) {
+export function resolve(messages, zero = new Set(), held = new Set()) {
   const highest = new Map()
   for (const message of messages) {
     const asked = bumpOf(message)
@@ -126,7 +135,7 @@ export function resolve(messages, zero = new Set()) {
       highest.set(asked.domain, asked.level)
     }
   }
-  return DOMAINS.filter((one) => highest.has(one)).map((domain) => ({
+  return DOMAINS.filter((one) => highest.has(one) && !held.has(one)).map((domain) => ({
     domain,
     level: highest.get(domain) === 'major' && zero.has(domain) ? 'minor' : highest.get(domain),
   }))
@@ -134,12 +143,19 @@ export function resolve(messages, zero = new Set()) {
 
 if (import.meta.main) {
   const argv = process.argv.slice(2)
-  const at = argv.indexOf('--zero')
-  /* Taken out before the range is read, so `--zero` can sit on either side. */
-  const zero = new Set(at === -1 ? [] : (argv[at + 1] ?? '').split(',').filter(Boolean))
-  if (at !== -1) {
+  /* Each list is taken out before the range is read, so a flag can sit on
+     either side of it. */
+  const list = (flag) => {
+    const at = argv.indexOf(flag)
+    if (at === -1) {
+      return new Set()
+    }
+    const found = new Set((argv[at + 1] ?? '').split(',').filter(Boolean))
     argv.splice(at, 2)
+    return found
   }
+  const zero = list('--zero')
+  const held = list('--held')
   const argument = argv[0]
   if (!argument) {
     console.error('bump: a git range is required, as `a..b`, or `--stdin`.')
@@ -159,5 +175,5 @@ if (import.meta.main) {
     .split('\0')
     .map((one) => one.trim())
     .filter(Boolean)
-  console.log(JSON.stringify(resolve(messages, zero)))
+  console.log(JSON.stringify(resolve(messages, zero, held)))
 }

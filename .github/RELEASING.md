@@ -181,6 +181,48 @@ other.
 An experimental release has no token to ask with, so it doesn't preflight. A
 new package stops it at that package, which spends no number.
 
+## A held domain
+
+**A domain that is not on the registry yet is held, and the release leaves it
+out.** `held` in `fusion.json` maps each such domain to the reason:
+
+```json
+"held": {
+  "proof": "Not on the registry yet. ..."
+}
+```
+
+`resolve-intent.sh` passes the names to `bump.mjs --held`, which drops them from
+the intent, so `release.yml` gives a held domain no version job, no binaries and
+no leg, and spends no number. `stamp-experimental.sh` does the same for a
+preview, and `report-intent.sh` says on the pull request that the domain is
+held. Everything else is unchanged: `verify` builds and tests the domain on
+every push, and `binaries.yml` builds its binary on a pull request that could
+break it.
+
+**Its subjects stay in the window.** The range runs from the domain's last
+release, so the first merge after the hold is lifted releases every commit that
+merged while it was held, at the highest bump they ask for. A held domain with
+no tag starts from `0.0.0`, so a `feat` makes its first release `0.1.0`.
+
+`fusion workspace`'s `publishable` fails on a name under `held` that is not in
+`domains`, since a misspelled entry holds nothing back, and on an entry with no
+reason. `bump.spec.mjs` asserts a held domain gets no leg and that each script
+reads the list.
+
+**Lifting the hold** is three steps, in order:
+
+1. Publish the placeholders, once, from a machine that is logged in to npm:
+   `bun run build`, then
+   `node fusion/scripts/publish.mjs --domain proof --bootstrap`.
+2. Register trusted publishing for them: `bun run trust --apply`.
+3. Delete the domain's entry under `held` in `fusion.json`. Merging that
+   change releases the domain, because the intent reads `fusion.json` from the
+   merged tree and the domain's earlier subjects are still in its window.
+
+Holding a domain again is the reverse: add the entry back. Nothing published is
+withdrawn, and the next releasing merge leaves the domain out.
+
 ## The scripts
 
 Anything longer than a few lines lives in `scripts/` rather than inline, so it

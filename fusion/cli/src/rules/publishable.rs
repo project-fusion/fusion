@@ -34,6 +34,9 @@
 //! **Lockstep, per product**, which is what makes one version of a package work
 //! with the same version of its sibling. A release stamps whatever it finds.
 //!
+//! **A held domain that is not a domain**, which holds nothing back and reads as
+//! if it did.
+//!
 //! **And the Rust half, which fails in the one direction nothing else watches.**
 //! A product spanning two package managers carries a version in each, and a
 //! release pushes its tag whether or not a crate ever leaves: the day somebody
@@ -257,6 +260,7 @@ pub fn run(context: &Context) -> Report {
     }
 
     agreed(&access, &versions, context, &mut findings);
+    checked += held(context, &mut findings);
     checked += cargo(context, &mut findings);
 
     Report {
@@ -315,6 +319,35 @@ fn agreed(
             ),
         });
     }
+}
+
+/// Every domain the release holds back is a domain, and says why.
+///
+/// **A misspelled name holds nothing back.** The release scripts drop the
+/// domains `held` names from the matrix and read nothing else, so `proff`
+/// there would leave Proof releasing on the next merge, to a registry that has
+/// never seen it, with a clean workspace reporting the hold in place.
+fn held(context: &Context, findings: &mut Vec<Finding>) -> usize {
+    for (domain, reason) in &context.settings.held {
+        if !context.settings.domains.contains(domain) {
+            findings.push(Finding {
+                detail: "The release drops the names listed here and checks nothing else, so this \
+                         holds no domain back."
+                    .to_owned(),
+                file: "fusion.json".to_owned(),
+                message: format!("`held` names `{domain}`, which is not in `domains`"),
+            });
+        }
+        if reason.trim().is_empty() {
+            findings.push(Finding {
+                detail: "Say why, and what lifts it, so the entry is removed on the day it can be."
+                    .to_owned(),
+                file: "fusion.json".to_owned(),
+                message: format!("`held` gives no reason for `{domain}`"),
+            });
+        }
+    }
+    context.settings.held.len()
 }
 
 /// What a published manifest has to carry, and what it may depend on.
