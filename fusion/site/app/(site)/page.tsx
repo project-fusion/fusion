@@ -42,13 +42,14 @@ export default function Home() {
   return (
     <ThemeScope>
       <div className={`${styles.reel} ${styles.fabClearance} ${styles.noRules}`}>
-        {/* **One strand down the whole page, behind everything.** It bends
-            through the hero beside the claim, runs down the
+        {/* **One strand down the whole page, behind everything.** It comes
+            down the hero's right edge, clear of its words, turns across above
+            the first card, and lands on its top left corner; it runs down the
             margin behind the sections, and sweeps across above the numbers
             and above the close. Scrolling travels along it. Strands is a Helix
             component, so the light behind the page is the product too. */}
         <helix-strands class={styles.reelStrands} travel>
-          <helix-strands-stop at={0.9} for="hero-copy" variant="sweep"></helix-strands-stop>
+          <helix-strands-stop at={0.9} for="problem-card" variant="sweep"></helix-strands-stop>
           <helix-strands-stop for="proof" variant="waves"></helix-strands-stop>
           <helix-strands-stop for="close" variant="waves"></helix-strands-stop>
         </helix-strands>
@@ -57,7 +58,7 @@ export default function Home() {
 
         {/* The problem, before the answer. A reader who recognizes themselves in
           this reads the next band; one who does not was never the buyer. */}
-        <Band>
+        <Band cardId="problem-card">
           <helix-flex class={band.bandSection} direction="column" gap="md">
             <SectionTitle>{PROBLEM.title}</SectionTitle>
             <Lede>{PROBLEM.lede}</Lede>
