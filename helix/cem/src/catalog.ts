@@ -11,9 +11,8 @@
  * files hold the markup. Nothing about a component is written down here, which
  * is what keeps a site from drifting away from the library it documents.
  */
-import type { HelixDeclaration, HelixManifest, HelixMember } from '@fusion.dev/helix-cem'
-import { displayName, startCase, tierOf } from './naming.js'
-import { place } from './reference.js'
+import { displayName, place, startCase, tierOf } from './naming.js'
+import type { HelixDeclaration, HelixManifest, HelixMember } from './types.js'
 
 /**
  * The canonical example's slug, named once because three places ask for it.

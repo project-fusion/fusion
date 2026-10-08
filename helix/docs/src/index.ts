@@ -1,3 +1,5 @@
+/* The catalog and its naming live in `@fusion.dev/helix-cem`, which writes each
+   tier's `api.json` from them, and are re-exported here for the site. */
 export type {
   ApiMember,
   Element,
@@ -6,11 +8,16 @@ export type {
   ExampleSource,
   Family,
   PropertyDoc,
-} from './catalog.js'
-export { catalog, findInCatalog } from './catalog.js'
-export { displayName, startCase, tierOf } from './naming.js'
+} from '@fusion.dev/helix-cem'
 export {
+  catalog,
+  displayName,
+  findInCatalog,
   place,
+  startCase,
+  tierOf,
+} from '@fusion.dev/helix-cem'
+export {
   type ReferenceFamily,
   type ReferenceOptions,
   reference,

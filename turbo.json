@@ -338,7 +338,9 @@
         "$TURBO_ROOT$/helix/cli/src/**"
       ],
       "outputs": [
+        "api.json",
         "custom-elements.json",
+        "examples.json",
         "lint.json",
         "types/jsx.d.ts",
         "types/svelte.d.ts",

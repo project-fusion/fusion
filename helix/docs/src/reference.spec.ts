@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
-import type { HelixManifest } from '@fusion.dev/helix-cem'
-import { place, reference, referenceFamilies } from './reference.js'
+import { type HelixManifest, place } from '@fusion.dev/helix-cem'
+import { reference, referenceFamilies } from './reference.js'
 
 /**
  * A manifest small enough to read, carrying one of everything the renderer

@@ -21,7 +21,9 @@
       "types": "./dist/*/index.d.ts",
       "default": "./dist/*/index.js"
     },
+    "./api.json": "./api.json",
     "./custom-elements.json": "./custom-elements.json",
+    "./examples.json": "./examples.json",
     "./jsx": "./types/jsx.d.ts",
     "./lint.json": "./lint.json",
     "./rehype": {
@@ -33,8 +35,10 @@
     "./words": "./types/words.d.ts"
   },
   "files": [
+    "api.json",
     "custom-elements.json",
     "dist",
+    "examples.json",
     "lint.json",
     "types"
   ],
