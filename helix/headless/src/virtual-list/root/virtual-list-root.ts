@@ -301,17 +301,6 @@ export class HelixHeadlessVirtualList extends HelixElement {
   columns = 1
 
   /**
-   * How items of more than one column are laid out. `grid`, the default, puts
-   * them in lines of equal columns. `waterfall` puts each item, in the order
-   * of the set, under the column that ends highest, as a wall of photos of
-   * different heights is: `columns`, or `min-column-width`, says how many
-   * columns. Rows of a waterfall are measured, and Up and Down move along a
-   * column.
-   */
-  @property()
-  layout: 'grid' | 'waterfall' = 'grid'
-
-  /**
    * The keys of the items a reader cannot choose or move to, separated by
    * commas, as `value` writes keys. Their rows carry `aria-disabled`.
    */
@@ -377,6 +366,17 @@ export class HelixHeadlessVirtualList extends HelixElement {
    */
   @property()
   label = ''
+
+  /**
+   * How items of more than one column are laid out. `grid`, the default, puts
+   * them in lines of equal columns. `waterfall` puts each item, in the order
+   * of the set, under the column that ends highest, as a wall of photos of
+   * different heights is: `columns`, or `min-column-width`, says how many
+   * columns. Rows of a waterfall are measured, and Up and Down move along a
+   * column.
+   */
+  @property()
+  layout: 'grid' | 'waterfall' = 'grid'
 
   /**
    * Marks the list as busy fetching more items, and draws a row after the last
