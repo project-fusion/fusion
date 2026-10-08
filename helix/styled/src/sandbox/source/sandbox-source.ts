@@ -216,9 +216,9 @@ const quietOf = (runs: readonly SandboxToken[], length: number): Uint8Array => {
  * @cssproperty --sandbox-source-background-color - Fill behind the source.
  * @cssproperty --sandbox-source-bracket-color - Fill behind a matched bracket, under `match-brackets`. Defaults to `--helix-color-accent-subtle`.
  * @cssproperty --sandbox-source-callable-color - Color of a `callable` run, under `tokenize`. Defaults to `--helix-color-syntax-callable`.
+ * @cssproperty --sandbox-source-comment-color - Color of a `comment` run, under `tokenize`. Defaults to `--helix-color-syntax-comment`.
  * @cssproperty --sandbox-source-completions-border-width - Width of the edge of the list of completions, under `complete`. Defaults to `--helix-border-floating`.
  * @cssproperty --sandbox-source-completions-shadow - Shadow under the list of completions, under `complete`. Defaults to `--helix-shadow-floating`.
- * @cssproperty --sandbox-source-comment-color - Color of a `comment` run, under `tokenize`. Defaults to `--helix-color-syntax-comment`.
  * @cssproperty --sandbox-source-constant-color - Color of a `constant` run, under `tokenize`. Defaults to `--helix-color-syntax-constant`.
  * @cssproperty --sandbox-source-invalid-color - Color of an `invalid` run, under `tokenize`. Defaults to `--helix-color-syntax-invalid`.
  * @cssproperty --sandbox-source-keyword-color - Color of a `keyword` run, under `tokenize`. Defaults to `--helix-color-syntax-keyword`.
