@@ -62,7 +62,7 @@ describe('a board without the entries', () => {
     expect(part(host, 'zoom-in')).not.toBeNull()
     await painted()
     expect(warnings).toEqual([
-      "<bare-board> names `minimap` in `controls`, which does nothing until its entry is imported. Import '@fusion.dev/helix-headless/canvas/minimap'.",
+      "<bare-board> has `controls` and its entry is not imported, so it draws no minimap. Import '@fusion.dev/helix-headless/canvas/minimap'.",
     ])
   })
 
@@ -77,8 +77,8 @@ describe('a board without the entries', () => {
     expect(host.querySelectorAll('helix-headless-canvas-node').length).toBe(2)
     await painted()
     expect(warnings).toEqual([
-      "<bare-board> was asked to arrange its cards, which does nothing until its entry is imported. Import '@fusion.dev/helix-headless/canvas/arrange'.",
-      "<bare-board> was asked to paste, which does nothing until its entry is imported. Import '@fusion.dev/helix-headless/canvas/paste'.",
+      "<bare-board> has `arrange()` and its entry is not imported, so the cards stay where they are. Import '@fusion.dev/helix-headless/canvas/arrange'.",
+      "<bare-board> has `paste()` and its entry is not imported, so nothing is pasted. Import '@fusion.dev/helix-headless/canvas/paste'.",
     ])
   })
 
@@ -94,7 +94,7 @@ describe('a board without the entries', () => {
     expect(part(host, 'label-editor')).toBeNull()
     await painted()
     expect(warnings).toEqual([
-      "<bare-board> was asked to edit a label, which does nothing until its entry is imported. Import '@fusion.dev/helix-headless/canvas/label-editor'.",
+      "<helix-headless-canvas-edge> has `label` and its entry is not imported, so it cannot be edited in place. Import '@fusion.dev/helix-headless/canvas/label-editor'.",
     ])
   })
 })

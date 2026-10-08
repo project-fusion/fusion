@@ -2062,7 +2062,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    * request was refused, or without the import.
    */
   paste(document: CanvasDocument | string): boolean {
-    auditEntry(this, 'canvas/paste', 'was asked to paste', () => !added(this).paste)
+    auditEntry(this, 'paste()', 'canvas/paste', 'nothing is pasted', () => !added(this).paste)
     return added(this).paste?.(this, document) ?? false
   }
 
@@ -2084,7 +2084,13 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    * the cards moved: false without the import.
    */
   arrange(options: CanvasArrangeOptions = {}): boolean {
-    auditEntry(this, 'canvas/arrange', 'was asked to arrange its cards', () => !added(this).arrange)
+    auditEntry(
+      this,
+      'arrange()',
+      'canvas/arrange',
+      'the cards stay where they are',
+      () => !added(this).arrange,
+    )
     return added(this).arrange?.(this, options) ?? false
   }
 
@@ -3180,7 +3186,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     if (key.startsWith('edge:')) {
       const edge = this.edgeElement(key)
       if (edge && !edge.readOnly) {
-        this.relabel({ key, target: 'edge', was: edge.label ?? '' })
+        this.relabel(edge, { key, target: 'edge', was: edge.label ?? '' })
       }
       return
     }
@@ -3189,18 +3195,19 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       return
     }
     if (card.group) {
-      this.relabel({ key, target: 'group', was: card.label })
+      this.relabel(card, { key, target: 'group', was: card.label })
       return
     }
     this.dispatchEvent(new HelixCanvasEditEvent({ name: card.name }))
   }
 
   /** Opens the field for a label, which `canvas/label-editor` draws. */
-  private relabel(editing: CanvasEditing): void {
+  private relabel(element: HTMLElement, editing: CanvasEditing): void {
     auditEntry(
-      this,
+      element,
+      'label',
       'canvas/label-editor',
-      'was asked to edit a label',
+      'it cannot be edited in place',
       () => !added(this).openLabelEditor,
     )
     added(this).openLabelEditor?.(this, editing)
@@ -3792,8 +3799,9 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     super.connectedCallback()
     auditEntry(
       this,
+      'controls',
       'canvas/minimap',
-      'names `minimap` in `controls`',
+      'it draws no minimap',
       () => this.drawsControls('minimap') && !added(this).drawMinimap,
     )
     this.watchBox()

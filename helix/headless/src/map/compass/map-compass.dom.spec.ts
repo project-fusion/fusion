@@ -63,7 +63,7 @@ describe('the compass entry', () => {
     expect(part(map, 'zoom-in')).not.toBeNull()
     await painted()
     expect(warnings).toEqual([
-      "<bare-compass-map> has the compass among its controls, which does nothing until its entry is imported. Import '@fusion.dev/helix-headless/map/compass'.",
+      "<bare-compass-map> has `controls` and its entry is not imported, so it draws no compass. Import '@fusion.dev/helix-headless/map/compass'.",
     ])
   })
 })

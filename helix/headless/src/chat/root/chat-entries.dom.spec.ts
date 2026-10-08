@@ -45,7 +45,7 @@ describe('a chat without the entries', () => {
     expect(chat.shadowRoot?.querySelector('[part="turn"]')).toBeNull()
     await painted()
     expect(warnings).toEqual([
-      "<bare-chat> was given `turns`, which does nothing until its entry is imported. Import '@fusion.dev/helix-headless/chat/turns'.",
+      "<bare-chat> has `turns` and its entry is not imported, so it draws its children alone. Import '@fusion.dev/helix-headless/chat/turns'.",
     ])
   })
 

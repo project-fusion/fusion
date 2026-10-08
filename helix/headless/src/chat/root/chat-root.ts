@@ -1065,8 +1065,9 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
       added(this).followTurns?.(this, changed.get('turns') as readonly ChatTurn[] | undefined)
       auditEntry(
         this,
+        'turns',
         'chat/turns',
-        'was given `turns`',
+        'it draws its children alone',
         () => this.turns.length > 0 && !added(this).drawTurns,
       )
     }

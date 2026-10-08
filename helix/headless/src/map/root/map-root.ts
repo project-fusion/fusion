@@ -802,14 +802,16 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     }
     auditEntry(
       this,
+      'controls',
       'map/compass',
-      'has the compass among its controls',
+      'it draws no compass',
       () => this.drawsCompass && !added(this).drawCompass,
     )
     auditEntry(
       this,
+      'controls',
       'map/layers',
-      'names `layers` in `controls`',
+      'it draws no layers button',
       () => this.drawsControls('layers') && this.layers.length > 0 && !added(this).drawLayersMenu,
     )
     this.addEventListener(HelixMapPartChangeEvent.eventName, this.handlePartChange)

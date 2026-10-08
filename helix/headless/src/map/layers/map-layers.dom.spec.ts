@@ -59,7 +59,7 @@ describe('the layers entry', () => {
     expect(part(map, 'layers-toggle')).toBeNull()
     await painted()
     expect(warnings).toEqual([
-      "<bare-layers-map> names `layers` in `controls`, which does nothing until its entry is imported. Import '@fusion.dev/helix-headless/map/layers'.",
+      "<bare-layers-map> has `controls` and its entry is not imported, so it draws no layers button. Import '@fusion.dev/helix-headless/map/layers'.",
     ])
   })
 })
