@@ -10,7 +10,6 @@ import { ProofBand } from '@/components/proof-band/proof-band'
 import { SectionTitle } from '@/components/section-title/section-title'
 import { Showcase } from '@/components/showcase/showcase'
 import { ThemeScope } from '@/components/theme-context/theme-context'
-import { ThemeFab } from '@/components/theme-fab/theme-fab'
 import { INSIGHTS } from '@/content/insights'
 import {
   DELIVERY,
@@ -41,83 +40,58 @@ export default function Home() {
 
   return (
     <ThemeScope>
-      <div className={`${styles.reel} ${styles.fabClearance} ${styles.noRules}`}>
-        {/* **The field, and nothing tempering it.** A scrim over this, a
-          vertical gradient of the page background holding the aura back
-          everywhere at once, answers a problem already solved elsewhere: every
-          claim on the page sits on glass, so the ground behind the type is the
-          card rather than the field. */}
-        {/* **Coarser features, because the box grew and the field does not
-            repeat to fill it.**
-
-            `p.y` spans -1 to 1 over the box whatever the box is, so `scale` sets
-            how much field fits top to bottom and the height only sets how many
-            pixels that is: one shape-unit is `H / 2 / scale` of them. Six
-            band-sized boxes became one the length of the page, and at 1.7 the
-            same braid was drawn across three times the pixels, coming out as a
-            smooth gradient with no variation inside any one screen.
-
-            A card on glass reads by contrast against what is behind it rather
-            than by how bright that is, so an even field gives it nothing to
-            separate from and it goes flat however correct its blur is. Raising
-            `gain` toward 1 makes that worse by evening the field further.
-
-            Multiplied rather than divided, so a shape-unit stays near the size
-            the two-screen box drew at 1.7. The cost is the ends, since `flow`
-            closes on `exp(-0.55 * scale)` of its center brightness at the box
-            edge: 39% at 1.7, 15% at 3.5. Hero and
-            footer sit dimmer than the middle bands do, which is a page-length
-            gradient rather than a seam, and is the price of one canvas over nine
-            screens instead of two over four.
-
-            **`gain` at 1.05, in Fusion's blue.** The field is drawn in the
-            primary, which in dark mode sits at lightness 0.67. Under ink it was
-            a near-white at 0.91, about two and a half times the light, and the
-            gain went to 0.75 while the site wore it. */}
-        <helix-aura
-          class={styles.reelAura}
-          data-layer
-          gain={1.05}
-          scale={3.5}
-          speed={1}
-          terminus={0.5625}
-          variant="caustics"
-        ></helix-aura>
+      <div className={`${styles.reel} ${styles.noRules}`}>
+        {/* **One strand down the whole page, behind everything.** It bends
+            through the hero between the claim and the card, runs down the
+            margin behind the sections, and sweeps across above the numbers
+            and above the close. Scrolling travels along it. Strands is a Helix
+            component, so the light behind the page is the product too. */}
+        <helix-strands class={styles.reelStrands} travel>
+          <helix-strands-stop at={0.5} for="hero" variant="bend"></helix-strands-stop>
+          <helix-strands-stop for="proof" variant="waves"></helix-strands-stop>
+          <helix-strands-stop for="close" variant="waves"></helix-strands-stop>
+        </helix-strands>
 
         <Hero announcement={announcements} />
 
         {/* The problem, before the answer. A reader who recognizes themselves in
           this reads the next band; one who does not was never the buyer. */}
-        <Band>
-          <helix-flex class={band.bandSection} direction="column" gap="md">
-            <SectionTitle>{PROBLEM.title}</SectionTitle>
-            <Lede>{PROBLEM.lede}</Lede>
-          </helix-flex>
+        <Band card={false}>
+          <div className={band.fieldStack}>
+            <helix-flex class={band.fieldIntro} direction="column" gap="md">
+              <SectionTitle>{PROBLEM.title}</SectionTitle>
+              <Lede>{PROBLEM.lede}</Lede>
+            </helix-flex>
 
-          <div className={`${band.bandRow} ${styles.stagger}`}>
-            {MECHANISMS.map((one) => (
-              <helix-flex class={band.bandCell} direction="column" gap="md" key={one.name}>
-                <Eyebrow>{one.name}</Eyebrow>
-                <Claim>{one.claim}</Claim>
-                <ul className={styles.proofList}>
-                  {one.bullets.map((line) => (
-                    <li key={line}>{line}</li>
-                  ))}
-                </ul>
-              </helix-flex>
-            ))}
+            <div className={`${band.fieldCards} ${styles.stagger}`}>
+              {MECHANISMS.map((one) => (
+                <div className={band.fieldCard} data-material="glass" data-substrate key={one.name}>
+                  <Eyebrow>{one.name}</Eyebrow>
+                  <Claim>{one.claim}</Claim>
+                  <ul className={styles.proofList}>
+                    {one.bullets.map((line) => (
+                      <li key={line}>{line}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
           </div>
         </Band>
 
-        <Band id="mechanism">
-          {/* The eyebrow repeats the name of the card above that this band
-              explains, so you can see it is the same subject in more depth. */}
-          <helix-flex class={band.bandSection} direction="column" gap="md">
-            <Eyebrow>Theming</Eyebrow>
-            <SectionTitle>Every pair checked for contrast</SectionTitle>
-            <Lede>You enter one brand color, and Helix computes every token from it.</Lede>
-          </helix-flex>
-          <DerivationDiagrams className={band.bandSection} />
+        <Band card={false} id="mechanism">
+          <div className={band.fieldStack}>
+            {/* The eyebrow repeats the name of the card above that this band
+                explains, so you can see it is the same subject in more depth. */}
+            <helix-flex class={band.fieldIntro} direction="column" gap="md">
+              <Eyebrow>Theming</Eyebrow>
+              <SectionTitle>Every pair checked for contrast</SectionTitle>
+              <Lede>You enter one brand color, and Helix computes every token from it.</Lede>
+            </helix-flex>
+            <div className={band.fieldPanel} data-material="glass" data-substrate>
+              <DerivationDiagrams className={band.bandSection} />
+            </div>
+          </div>
         </Band>
 
         {/* **The band does not paint its own ground.** An opaque fill here cut
@@ -126,8 +100,8 @@ export default function Home() {
           attention. With the showcase in a card of the same glass as the others,
           the card is the surface and the field runs behind it like everywhere
           else. */}
-        <Band shell="plain" wide>
-          <div className={band.bandSplit}>
+        <Band card={false} shell="plain" wide>
+          <div className={`${band.bandSplit} ${styles.split}`}>
             <helix-flex class={band.bandSection} direction="column" gap="md">
               {/* Named after the card above that this band explains, like the
                   Theming band. */}
@@ -159,7 +133,11 @@ export default function Home() {
               </helix-flex>
             </helix-flex>
 
-            <div className={band.bandSection}>
+            <div
+              className={`${band.fieldPanel} ${band.bandSection}`}
+              data-material="glass"
+              data-substrate
+            >
               <Showcase />
             </div>
           </div>
@@ -182,29 +160,36 @@ export default function Home() {
           one it is really lighting: an absolutely positioned child at 200svh
           starts at this band's top and carries down through the close, so the
           page ends in light rather than trailing off into flat ground. */}
-        <Band>
-          <helix-flex class={band.bandSection} direction="column" gap="md">
-            <Eyebrow>Services</Eyebrow>
-            <SectionTitle>{DELIVERY.title}</SectionTitle>
-            <Lede>{DELIVERY.lede}</Lede>
-          </helix-flex>
+        <Band card={false}>
+          <div className={band.fieldStack}>
+            <helix-flex class={band.fieldIntro} direction="column" gap="md">
+              <Eyebrow>Services</Eyebrow>
+              <SectionTitle>{DELIVERY.title}</SectionTitle>
+              <Lede>{DELIVERY.lede}</Lede>
+            </helix-flex>
 
-          <div className={`${band.bandRow} ${styles.stagger}`}>
-            {SERVICES.map((service) => (
-              <helix-flex class={band.bandCell} direction="column" gap="sm" key={service.name}>
-                <Claim>{service.name}</Claim>
-                <helix-text as="p" emphasis="muted">
-                  {service.summary}
-                </helix-text>
-              </helix-flex>
-            ))}
+            <div className={`${band.fieldCards} ${styles.stagger}`}>
+              {SERVICES.map((service) => (
+                <div
+                  className={band.fieldCard}
+                  data-material="glass"
+                  data-substrate
+                  key={service.name}
+                >
+                  <Claim>{service.name}</Claim>
+                  <helix-text as="p" emphasis="muted">
+                    {service.summary}
+                  </helix-text>
+                </div>
+              ))}
+            </div>
+
+            <helix-flex class="siteActions" data-density="lg">
+              <Link data-button="subtle" href="/company/services">
+                Compare the services
+              </Link>
+            </helix-flex>
           </div>
-
-          <helix-flex class={`${band.bandSection} siteActions`} data-density="lg">
-            <Link data-button="subtle" href="/company/services">
-              Compare the services
-            </Link>
-          </helix-flex>
         </Band>
 
         {/* **What the work is, after what it costs.** The band above is three
@@ -213,21 +198,23 @@ export default function Home() {
           to know what having them in the repository is like, and the honest
           answers are that the system is already built, that this is why it is
           quick, that they keep it, and that we say what is unfinished. */}
-        <Band>
-          <helix-flex class={band.bandSection} direction="column" gap="md">
-            <Eyebrow>Working with us</Eyebrow>
-            <SectionTitle>{ENGAGEMENT_COPY.title}</SectionTitle>
-          </helix-flex>
+        <Band card={false}>
+          <div className={band.fieldStack}>
+            <helix-flex class={band.fieldIntro} direction="column" gap="md">
+              <Eyebrow>Working with us</Eyebrow>
+              <SectionTitle>{ENGAGEMENT_COPY.title}</SectionTitle>
+            </helix-flex>
 
-          <div className={`${band.bandRow} ${styles.stagger}`}>
-            {ENGAGEMENT.map((one) => (
-              <helix-flex class={band.bandCell} direction="column" gap="sm" key={one.name}>
-                <Claim>{one.name}</Claim>
-                <helix-text as="p" emphasis="muted">
-                  {one.body}
-                </helix-text>
-              </helix-flex>
-            ))}
+            <div className={`${band.fieldCards} ${styles.stagger}`}>
+              {ENGAGEMENT.map((one) => (
+                <div className={band.fieldCard} data-material="glass" data-substrate key={one.name}>
+                  <Claim>{one.name}</Claim>
+                  <helix-text as="p" emphasis="muted">
+                    {one.body}
+                  </helix-text>
+                </div>
+              ))}
+            </div>
           </div>
         </Band>
 
@@ -237,50 +224,52 @@ export default function Home() {
          *           the offer and the close: a reader who is not ready to talk has
          *           somewhere to go that is not away.
          */}
-        <Band>
-          <helix-flex class={band.bandSection} direction="column" gap="md">
-            <helix-flex align-items="center" gap="md" justify-content="between" wrap>
-              <helix-flex direction="column" gap="sm">
-                <Eyebrow>Insights</Eyebrow>
-                <SectionTitle>How we decide, and why</SectionTitle>
-              </helix-flex>
-              <Link className="siteActions" data-button="subtle" href="/insights">
-                Read all articles
-              </Link>
-            </helix-flex>
-          </helix-flex>
-
-          {/* **No card and no art, because the band is the card.**
-                  `InsightCard` here would be a card inside a card: two edges, and
-                  a `backdrop-filter` sampling a surface that is already frosted.
-                  The three things a reader chooses from, what it is about, what it
-                  is called and what it argues, remove the nesting rather than
-                  exempting it, and the cell is the link so the whole of it is the
-                  target. The full card, with its art and its glass, is what
-                  `/insights` shows. */}
-          <div className={`${band.bandRow} ${styles.insightRow}`}>
-            {INSIGHTS.slice(0, 4).map((insight) => (
-              <Link
-                className={`${band.bandCell} ${styles.insightCell}`}
-                href={`/insights/${insight.slug}`}
-                key={insight.slug}
-              >
-                <helix-flex align-items="center" data-density="sm" gap="sm" wrap>
-                  <helix-tag tone="primary">{insight.topic}</helix-tag>
-                  <helix-tag>{insight.kind}</helix-tag>
+        <Band card={false}>
+          <div className={band.fieldStack}>
+            <helix-flex class={band.fieldIntro} direction="column" gap="md">
+              <helix-flex align-items="center" gap="md" justify-content="between" wrap>
+                <helix-flex direction="column" gap="sm">
+                  <Eyebrow>Insights</Eyebrow>
+                  <SectionTitle>How we decide, and why</SectionTitle>
                 </helix-flex>
-                <helix-text as="h3" variant="title">
-                  {insight.title}
-                </helix-text>
-                <helix-text emphasis="muted" variant="caption">
-                  {insight.summary}
-                </helix-text>
-              </Link>
-            ))}
+                <Link className="siteActions" data-button="subtle" href="/insights">
+                  Read all articles
+                </Link>
+              </helix-flex>
+            </helix-flex>
+
+            {/* **Each essay a card, and the card the link.** The heading sits on
+              the field like every other band's, so a card here is one card,
+              not a card inside one. The three things a reader chooses from,
+              what it is about, what it is called and what it argues, fill it,
+              and the whole of it is the target. The full card, with its art,
+              is what `/insights` shows. */}
+            <div className={`${band.fieldCards} ${styles.insightRow}`}>
+              {INSIGHTS.slice(0, 4).map((insight) => (
+                <Link
+                  className={`${band.fieldCard} ${styles.insightCell}`}
+                  data-material="glass"
+                  data-substrate
+                  href={`/insights/${insight.slug}`}
+                  key={insight.slug}
+                >
+                  <helix-flex align-items="center" data-density="sm" gap="sm" wrap>
+                    <helix-tag tone="primary">{insight.topic}</helix-tag>
+                    <helix-tag>{insight.kind}</helix-tag>
+                  </helix-flex>
+                  <helix-text as="h3" variant="title">
+                    {insight.title}
+                  </helix-text>
+                  <helix-text emphasis="muted" variant="caption">
+                    {insight.summary}
+                  </helix-text>
+                </Link>
+              ))}
+            </div>
           </div>
         </Band>
 
-        <section className={styles.closingCard} data-band data-closing data-material="glass">
+        <section className={styles.closingCard} data-band data-closing id="close">
           <helix-flex align-items="center" data-shell direction="column" gap="lg">
             <SectionTitle>Work with us</SectionTitle>
             <Lede>
@@ -297,8 +286,6 @@ export default function Home() {
             </a>
           </helix-flex>
         </section>
-
-        <ThemeFab />
       </div>
     </ThemeScope>
   )
