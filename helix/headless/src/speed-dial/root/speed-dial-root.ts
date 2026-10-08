@@ -415,6 +415,8 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
     this.addEventListener('click', this.handleHeldClick, true)
     this.addEventListener('pointerenter', this.handlePointerEnter)
     this.addEventListener('pointerleave', this.handlePointerLeave)
+    this.addEventListener('focusin', this.handleReach)
+    this.addEventListener('pointerover', this.handleReach)
   }
 
   override disconnectedCallback(): void {
@@ -429,6 +431,8 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
     this.removeEventListener('click', this.handleHeldClick, true)
     this.removeEventListener('pointerenter', this.handlePointerEnter)
     this.removeEventListener('pointerleave', this.handlePointerLeave)
+    this.removeEventListener('focusin', this.handleReach)
+    this.removeEventListener('pointerover', this.handleReach)
     this.stay()
   }
 
@@ -454,13 +458,58 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
    * attribute the consumer's server never sent is a mismatch whether or not it
    * moves afterwards, measured in both load orders, and a trigger that says it
    * is expanded is already saying it has something to expand.
+   *
+   * **A plain trigger once a reader has reached it.** A `<button>` of yours has
+   * no shadow root, so it takes `aria-haspopup="menu"` and `aria-expanded` as
+   * attributes, written only once focus or a pointer has reached it. That is
+   * after hydration, which is the only time React compares them. A trigger
+   * that carries either attribute itself is yours to keep up to date.
    */
   private announce(): void {
     const trigger = this.trigger
-    if (trigger === this.partNamed('trigger')) {
+    if (trigger === this.partNamed('trigger') || trigger === this) {
       return
     }
-    tellDisclosure(trigger, this.open, 'menu')
+    if (trigger !== this.toldPlain) {
+      this.untellPlain()
+    }
+    if (trigger.localName.includes('-')) {
+      tellDisclosure(trigger, this.open, 'menu')
+      return
+    }
+    if (trigger !== this.toldPlain) {
+      if (
+        !this.reached ||
+        trigger.hasAttribute('aria-expanded') ||
+        trigger.hasAttribute('aria-haspopup')
+      ) {
+        return
+      }
+      this.toldPlain = trigger
+    }
+    trigger.setAttribute('aria-haspopup', 'menu')
+    trigger.setAttribute('aria-expanded', String(this.open))
+  }
+
+  /** The plain trigger this dial has written its state on, so it can be taken back. */
+  private toldPlain: Element | undefined
+
+  /** Whether a reader has reached the trigger, by focus or a pointer, which is after hydration. */
+  private reached = false
+
+  /** Takes the state off a plain trigger that is no longer this dial's. */
+  private untellPlain(): void {
+    this.toldPlain?.removeAttribute('aria-haspopup')
+    this.toldPlain?.removeAttribute('aria-expanded')
+    this.toldPlain = undefined
+  }
+
+  /** A reader reaching the trigger, which lets a plain one be told its state. */
+  private readonly handleReach = (event: Event): void => {
+    if (!this.reached && event.composedPath().includes(this.trigger)) {
+      this.reached = true
+      this.announce()
+    }
   }
 
   /** The control the dial has described, so the description can be taken back. */
