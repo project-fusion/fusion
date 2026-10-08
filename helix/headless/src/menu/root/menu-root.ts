@@ -16,6 +16,7 @@ import {
   MixinCollection,
   MixinControllerOpen,
   markMatches,
+  OpenPhaseController,
   onUnlessFalse,
   type Placement,
   PopoverController,
@@ -185,6 +186,8 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
  * @cssproperty --floating-available-block-size - The room between the panel and the edge of the screen it opens toward, written on the panel while it is open. Read it; a value set here is written over.
  *
  * @cssstate drilled - A submenu's page is showing, so content that is not a row can hide with the top page.
+ * @cssstate entering - From the moment the panel shows until its entrance has finished.
+ * @cssstate exiting - From the moment the panel hides until its exit has finished.
  * @cssstate mark - A row on the current page has a checkbox or a link, so every row keeps the trailing column.
  * @cssstate open - While the menu is open.
  * @cssstate placed-bottom - While the open panel sits below its trigger.
@@ -456,6 +459,18 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     reserved: () => ['ArrowLeft', 'ArrowRight'],
     selects: () => false,
     typeahead: typeaheadBy((item) => slottedWords(item as HelixHeadlessMenuItem, [''])),
+  })
+
+  /* On its way in or out, for a sheet that draws the journey, as Popover has
+     it: `:state(open)` turns at once, which is too early for an exit to know
+     it is one. */
+  protected readonly phases = new OpenPhaseController(this, {
+    mark: {
+      entering: (on) => this.toggleState('entering', on),
+      exiting: (on) => this.toggleState('exiting', on),
+    },
+    open: () => this.open,
+    surface: () => this.partNamed('surface'),
   })
 
   /** Carries a host `aria-label` and `aria-labelledby` to the surface. */

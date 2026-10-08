@@ -83,6 +83,20 @@ describe('the checked rows in one place', () => {
   })
 })
 
+/* Popover's two journeys, for a sheet that draws the panel's way in and out. */
+describe('entering and exiting', () => {
+  test('the panel showing is entering, and one hiding is exiting', async () => {
+    const host = await menu()
+    host.open = true
+    await host.updateComplete
+    expect(hasState(host, 'entering')).toBe(true)
+    host.open = false
+    await host.updateComplete
+    expect(hasState(host, 'exiting')).toBe(true)
+    expect(hasState(host, 'entering')).toBe(false)
+  })
+})
+
 /* Data Table's and Web Awesome's status slots: the empty and loading lines
    take content of a page's own, with the text as the fallback. */
 describe('the empty and loading lines', () => {
