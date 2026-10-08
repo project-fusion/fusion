@@ -49,16 +49,6 @@ const MAX_CANVAS_PIXELS = 4_194_304
 const OPENING_PATIENCE = 500
 
 /**
- * How quickly the drawn position catches the scroll position in `travel`, as a
- * time constant in seconds.
- *
- * A wheel moves the page in steps, and a ribbon pinned to each step jumps with
- * it. Eased over about a tenth of a second the steps join into one glide, and
- * the ribbon still arrives before a reader notices it was behind.
- */
-const TRAVEL_EASE = 0.09
-
-/**
  * How fast a `speed` of `1` moves, against the time the motion was written
  * in. A slow drift reads as depth; at the written pace the strands' crossings
  * flicker past before a reader can follow one.
@@ -104,7 +94,7 @@ const PACE = 0.25
  *
  * The ribbon stops moving in these cases:
  * - `prefers-reduced-motion` is set. The element shows one still frame, and in
- *   `travel` still follows the scroll, without easing.
+ *   `travel` still follows the scroll.
  * - The element is off screen or in a background tab.
  *
  * It shows a gradient from the same tokens in these cases, and matches
@@ -300,7 +290,7 @@ export class HelixStrands extends HelixElement {
   /** In `travel`, the path's `y` at even steps of its parameter. */
   private table: Float32Array = new Float32Array(1)
 
-  /** In `travel`, the scroll position the ribbon is drawn at, easing toward the page's. */
+  /** In `travel`, the scroll position the ribbon was last drawn at. */
   private offset = 0
 
   /** Whether the opening frame has been drawn. Aura's settle: see `open`. */
@@ -705,8 +695,8 @@ export class HelixStrands extends HelixElement {
   }
 
   /**
-   * The page scrolled. A running loop eases toward it on its own; a stopped
-   * one, for a reader who asked for no motion, jumps there and paints once.
+   * The page scrolled. A running loop draws the new position on its next
+   * frame; a stopped one, for a reader who asked for no motion, paints once.
    */
   private readonly handleScroll = (): void => {
     if (!this.gate.running) {
@@ -818,12 +808,14 @@ export class HelixStrands extends HelixElement {
     const step = Math.min(this.held, MAX_FRAME_STEP)
     this.held = 0
     this.elapsed += step * PACE * Math.max(0, this.speed)
+    /* **Drawn where the page is, every frame.** The ribbon eased toward the
+       scroll over a tenth of a second, to join a wheel's steps into a glide,
+       and so it chased the page: measured on the landing page, a 3,000 px/s
+       flick left it 290 px behind the cards, and it glided on for 0.6 s after
+       they stopped, so the strands and the page moved at two speeds. The
+       browser already smooths a wheel's steps into the scroll itself. */
     if (this.travel) {
-      const target = window.scrollY
-      this.offset += (target - this.offset) * (1 - Math.exp(-step / TRAVEL_EASE))
-      if (Math.abs(target - this.offset) < 0.5) {
-        this.offset = target
-      }
+      this.offset = window.scrollY
     }
     this.paint()
   }
