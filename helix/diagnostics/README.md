@@ -299,6 +299,7 @@ diagnostics counts it by kind and tag. None fails a CI job.
 | `fullscreen-refused` | The browser refused fullscreen, usually in a frame without `allow="fullscreen"` |
 | `min-out-of-range` | A rating's `min` is not a score between 0 and its `max` |
 | `misplaced-handler` | A React `on` prop names an event that another element dispatches. Development builds only (the `development` export condition) |
+| `mixed-turns` | A chat was given turns both as children and as `turns` data, and draws them as two runs |
 | `misread-direction` | A stat was given `up`, `down` or `neutral`, which are Trend's directions and lay nothing out |
 | `missing-alt` | An image has no `alt`, so a screen reader announces its file name |
 | `missing-layout` | The three.js graph driver could not load `d3-force-3d` |
