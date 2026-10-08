@@ -56,6 +56,7 @@ import {
   typesCharacter,
   VirtualizeController,
   valueAt,
+  whenHydrated,
   window_,
   words,
   wordsLocale,
@@ -2221,24 +2222,30 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     const shown = this.shownColumns
     const android = onAndroid()
     for (const column of this.tableColumns) {
-      /* Whether a reader may move it, pushed down for the same reason: the order
-         is the table's, and the grip is drawn by the column. */
-      column.movable = this.reorderable && column.field !== ''
-      /* A cell of this grid, and its one tab stop when the stop is on it. */
-      column.gridCell = true
-      column.tabStop = shown.indexOf(column) + offset === stop
-      column.sorted =
-        current && column.canSort && column.field === current.field
-          ? current.direction === 'asc'
-            ? 'ascending'
-            : 'descending'
-          : undefined
-      /* TalkBack reads no `aria-sort`, so on Android the sorted column's button
-         says it, as React Aria's column header does. */
-      column.sortWords =
-        android && column.sorted
-          ? this.sortSaid(column.textContent?.trim() || column.field, column.sorted)
-          : ''
+      /* Not into a column still hydrating what a server sent, which renders the
+         server's markup first: see `whenHydrated`. A column defined after the
+         table, as the barrel defines Table after Data Table, upgraded with
+         these already written and hydrated to a different header. */
+      whenHydrated(column, () => {
+        /* Whether a reader may move it, pushed down for the same reason: the order
+           is the table's, and the grip is drawn by the column. */
+        column.movable = this.reorderable && column.field !== ''
+        /* A cell of this grid, and its one tab stop when the stop is on it. */
+        column.gridCell = true
+        column.tabStop = shown.indexOf(column) + offset === stop
+        column.sorted =
+          current && column.canSort && column.field === current.field
+            ? current.direction === 'asc'
+              ? 'ascending'
+              : 'descending'
+            : undefined
+        /* TalkBack reads no `aria-sort`, so on Android the sorted column's button
+           says it, as React Aria's column header does. */
+        column.sortWords =
+          android && column.sorted
+            ? this.sortSaid(column.textContent?.trim() || column.field, column.sorted)
+            : ''
+      })
     }
   }
 
