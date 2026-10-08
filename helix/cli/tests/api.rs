@@ -1,0 +1,473 @@
+//! `helix api` and the MCP server's lookups, driven through the real binary
+//! over a `node_modules` written for the test.
+//!
+//! **One fixture for both surfaces**, because the claim is that they are one
+//! answer: a lookup over stdio returns, as its structured content, exactly what
+//! the same verb prints under `--json`.
+
+use std::io::Write;
+use std::path::{Path, PathBuf};
+use std::process::{Command, Output, Stdio};
+
+use serde_json::{json, Value};
+
+fn binary() -> PathBuf {
+    let mut path = std::env::current_exe().expect("a test knows where it is");
+    path.pop();
+    if path.ends_with("deps") {
+        path.pop();
+    }
+    path.join("helix")
+}
+
+/// A project with Helix installed, cleaned up when it drops.
+struct Project(PathBuf);
+
+impl Project {
+    fn new(name: &str) -> Self {
+        let path = std::env::temp_dir().join(format!("fusion-helix-api-{name}"));
+        let _ = std::fs::remove_dir_all(&path);
+        std::fs::create_dir_all(&path).expect("a temp directory");
+        Self(path)
+    }
+
+    fn package(&self, name: &str, version: &str, files: &[(&str, Value)]) -> &Self {
+        let dir = self.0.join("node_modules").join(name);
+        std::fs::create_dir_all(&dir).expect("a package directory");
+        std::fs::write(
+            dir.join("package.json"),
+            json!({ "name": name, "version": version }).to_string(),
+        )
+        .expect("a manifest");
+        for (file, body) in files {
+            let path = dir.join(file);
+            std::fs::create_dir_all(path.parent().expect("a parent")).expect("a directory");
+            std::fs::write(path, body.to_string()).expect("a file");
+        }
+        self
+    }
+
+    /// Helix as `analyze` writes it: Select and its Option, Menu, and the
+    /// tokens.
+    fn helix(name: &str) -> Self {
+        let project = Self::new(name);
+        let element = |tag: &str, specifier: &str| {
+            json!({
+                "events": [{ "name": "change", "reactProp": "onchange" }],
+                "properties": [{ "name": "placeholder", "type": "string" }],
+                "specifier": specifier,
+                "tagName": tag,
+                "tier": "styled",
+                "words": ["placeholder"],
+            })
+        };
+        project
+            .package(
+                "@fusion.dev/helix",
+                "1.2.3",
+                &[
+                    (
+                        "api.json",
+                        json!({
+                            "families": [
+                                {
+                                    "aliases": ["Dropdown", "Action menu"],
+                                    "elements": [element("helix-menu", "@fusion.dev/helix/menu")],
+                                    "label": "Menu",
+                                    "slug": "menu",
+                                    "summary": "A menu of commands.",
+                                    "usage": { "headless": [], "styled": ["import '@fusion.dev/helix/menu'"] },
+                                },
+                                {
+                                    "aliases": [],
+                                    "elements": [element("helix-option", "@fusion.dev/helix/option")],
+                                    "label": "Option",
+                                    "slug": "option",
+                                    "summary": "One choice in a list.",
+                                    "usage": { "headless": [], "styled": ["import '@fusion.dev/helix/option'"] },
+                                },
+                                {
+                                    "aliases": ["Dropdown", "Picker"],
+                                    "elements": [element("helix-select", "@fusion.dev/helix/select")],
+                                    "label": "Select",
+                                    "slug": "select",
+                                    "summary": "A control that opens a list of options.",
+                                    "usage": {
+                                        "headless": [],
+                                        "styled": ["import '@fusion.dev/helix/select'", "import '@fusion.dev/helix/option' // Option"],
+                                    },
+                                },
+                            ],
+                            "package": "@fusion.dev/helix",
+                        }),
+                    ),
+                    (
+                        "examples.json",
+                        json!({
+                            "examples": {
+                                "select": [
+                                    {
+                                        "description": "A select.",
+                                        "html": "<helix-select><helix-option>A</helix-option></helix-select>",
+                                        "imports": ["import '@fusion.dev/helix/select'", "import '@fusion.dev/helix/option'"],
+                                        "label": "Preview",
+                                        "slug": "preview",
+                                    },
+                                    { "description": "Grouped.", "html": "<helix-select></helix-select>", "imports": [], "label": "Grouped", "slug": "grouped" },
+                                ],
+                            },
+                            "package": "@fusion.dev/helix",
+                        }),
+                    ),
+                ],
+            )
+            .package(
+                "@fusion.dev/helix-styles",
+                "1.2.3",
+                &[(
+                    "dist/tokens.json",
+                    json!({
+                        "categories": ["color", "space"],
+                        "tokens": [
+                            { "category": "color", "description": "The page background.", "name": "--helix-color-background", "value": "#fff" },
+                            { "category": "color", "description": "A raised surface.", "name": "--helix-color-surface-raised", "value": "#f5f5f5" },
+                            { "category": "space", "description": "The medium gap.", "name": "--helix-space-md", "value": "1rem" },
+                        ],
+                    }),
+                )],
+            );
+        project
+    }
+
+    fn run(&self, args: &[&str]) -> Output {
+        Command::new(binary())
+            .args(args)
+            .current_dir(&self.0)
+            .output()
+            .expect("helix runs")
+    }
+
+    fn json(&self, args: &[&str]) -> Value {
+        let mut all = vec!["--json"];
+        all.extend_from_slice(args);
+        let output = self.run(&all);
+        assert_eq!(
+            output.status.code(),
+            Some(0),
+            "{args:?}: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+        serde_json::from_slice(&output.stdout).expect("the answer is JSON")
+    }
+
+    fn failure(&self, args: &[&str]) -> Value {
+        let mut all = vec!["--json"];
+        all.extend_from_slice(args);
+        let output = self.run(&all);
+        assert_eq!(output.status.code(), Some(3), "{args:?}");
+        assert!(output.stdout.is_empty(), "an error reached stdout");
+        serde_json::from_slice(&output.stderr).expect("the error is JSON")
+    }
+
+    /// Every response to these messages, sent to `helix mcp` started here.
+    fn talk(&self, messages: &[Value]) -> Vec<Value> {
+        let mut child = Command::new(binary())
+            .arg("mcp")
+            .current_dir(&self.0)
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()
+            .expect("the server starts");
+        {
+            let stdin = child.stdin.as_mut().expect("a pipe");
+            for message in messages {
+                writeln!(stdin, "{message}").expect("the server is reading");
+            }
+        }
+        let output = child.wait_with_output().expect("the server exits");
+        String::from_utf8(output.stdout)
+            .expect("utf8")
+            .lines()
+            .map(|line| serde_json::from_str(line).expect("a JSON-RPC message"))
+            .collect()
+    }
+
+    fn call(&self, tool: &str, arguments: &Value) -> Value {
+        let replies = self.talk(&[json!({
+            "id": 1,
+            "jsonrpc": "2.0",
+            "method": "tools/call",
+            "params": { "arguments": arguments, "name": tool },
+        })]);
+        replies[0]["result"].clone()
+    }
+
+    fn path(&self) -> &Path {
+        &self.0
+    }
+}
+
+impl Drop for Project {
+    fn drop(&mut self) {
+        let _ = std::fs::remove_dir_all(&self.0);
+    }
+}
+
+#[test]
+fn find_lists_the_families_a_name_or_purpose_answers_best_first() {
+    let project = Project::helix("find");
+    let found = project.json(&["api", "find", "dropdown"]);
+    let slugs: Vec<&str> = found["matches"]
+        .as_array()
+        .expect("matches")
+        .iter()
+        .filter_map(|one| one["slug"].as_str())
+        .collect();
+    assert_eq!(slugs, ["menu", "select"]);
+    assert_eq!(found["versions"]["@fusion.dev/helix"], "1.2.3");
+}
+
+#[test]
+fn a_family_answers_to_its_slug_tag_or_alias_with_its_examples_and_version() {
+    let project = Project::helix("family");
+    for name in ["select", "helix-select", "Picker"] {
+        let answer = project.json(&["api", "family", name]);
+        assert_eq!(answer["family"]["slug"], "select", "{name}");
+        assert_eq!(answer["version"], "1.2.3");
+        assert_eq!(answer["examples"][1]["slug"], "grouped");
+        assert_eq!(
+            answer["family"]["usage"]["styled"][1],
+            "import '@fusion.dev/helix/option' // Option"
+        );
+    }
+}
+
+/// **An alias two families share is refused, never picked**, with both as
+/// choices.
+#[test]
+fn a_name_two_families_answer_to_is_refused_with_both() {
+    let project = Project::helix("ambiguous");
+    let failure = project.failure(&["api", "family", "Dropdown"]);
+    assert_eq!(failure["error"]["choices"], json!(["menu", "select"]));
+}
+
+#[test]
+fn an_unknown_family_names_the_families_there_are() {
+    let project = Project::helix("unknown");
+    let failure = project.failure(&["api", "family", "selct"]);
+    assert_eq!(failure["error"]["hint"], "helix api family select");
+    assert_eq!(
+        failure["error"]["choices"],
+        json!(["menu", "option", "select"])
+    );
+}
+
+#[test]
+fn an_example_carries_the_imports_it_needs() {
+    let project = Project::helix("example");
+    let first = project.json(&["api", "example", "select"]);
+    assert_eq!(first["example"]["slug"], "preview");
+    assert_eq!(
+        first["example"]["imports"],
+        json!([
+            "import '@fusion.dev/helix/select'",
+            "import '@fusion.dev/helix/option'"
+        ])
+    );
+    let named = project.json(&["api", "example", "select", "grouped"]);
+    assert_eq!(named["example"]["slug"], "grouped");
+    let missing = project.failure(&["api", "example", "select", "nope"]);
+    assert_eq!(missing["error"]["choices"], json!(["preview", "grouped"]));
+}
+
+#[test]
+fn imports_name_the_line_for_each_tag_and_the_closest_to_an_unknown_one() {
+    let project = Project::helix("imports");
+    let answer = project.json(&[
+        "api",
+        "imports",
+        "helix-select",
+        "<helix-option>",
+        "helix-selct",
+    ]);
+    assert_eq!(
+        answer["lines"],
+        json!([
+            "import '@fusion.dev/helix/select'",
+            "import '@fusion.dev/helix/option'"
+        ])
+    );
+    assert_eq!(
+        answer["unknown"],
+        json!([{ "closest": "helix-select", "tag": "helix-selct" }])
+    );
+}
+
+#[test]
+fn tokens_filter_by_a_word_and_a_category() {
+    let project = Project::helix("tokens");
+    let answer = project.json(&["api", "tokens", "surface", "--category", "color"]);
+    let names: Vec<&str> = answer["tokens"]
+        .as_array()
+        .expect("tokens")
+        .iter()
+        .filter_map(|token| token["name"].as_str())
+        .collect();
+    assert_eq!(names, ["--helix-color-surface-raised"]);
+    assert_eq!(answer["version"], "1.2.3");
+}
+
+#[test]
+fn no_helix_installed_says_what_to_install() {
+    let project = Project::new("none");
+    let failure = project.failure(&["api", "family", "select"]);
+    assert_eq!(failure["error"]["hint"], "npm install @fusion.dev/helix");
+}
+
+#[test]
+fn a_helix_from_before_api_json_says_to_update() {
+    let project = Project::new("old");
+    project.package("@fusion.dev/helix", "0.1.0", &[]);
+    let failure = project.failure(&["api", "family", "select"]);
+    assert_eq!(
+        failure["error"]["what"],
+        "@fusion.dev/helix 0.1.0 has no api.json"
+    );
+}
+
+/// **The two surfaces are one answer**: a tool's structured content is what
+/// the same verb prints under `--json`.
+#[test]
+fn each_lookup_over_mcp_is_the_verb_s_json() {
+    let project = Project::helix("same");
+    for (tool, arguments, verb) in [
+        (
+            "helix_family",
+            json!({ "family": "select" }),
+            vec!["api", "family", "select"],
+        ),
+        (
+            "helix_example",
+            json!({ "family": "select", "example": "grouped" }),
+            vec!["api", "example", "select", "grouped"],
+        ),
+        (
+            "helix_imports",
+            json!({ "tags": ["helix-select"] }),
+            vec!["api", "imports", "helix-select"],
+        ),
+        (
+            "helix_tokens",
+            json!({ "query": "space" }),
+            vec!["api", "tokens", "space"],
+        ),
+        (
+            "helix_find",
+            json!({ "query": "picker" }),
+            vec!["api", "find", "picker"],
+        ),
+    ] {
+        let result = project.call(tool, &arguments);
+        assert_eq!(result["isError"], false, "{tool}: {result}");
+        assert_eq!(result["structuredContent"], project.json(&verb), "{tool}");
+        let text: Value =
+            serde_json::from_str(result["content"][0]["text"].as_str().expect("text"))
+                .expect("the text is the same JSON");
+        assert_eq!(text, result["structuredContent"], "{tool}");
+    }
+}
+
+#[test]
+fn a_lookup_that_fails_is_a_tool_error_naming_the_choices() {
+    let project = Project::helix("tool-error");
+    let result = project.call("helix_family", &json!({ "family": "Dropdown" }));
+    assert_eq!(result["isError"], true);
+    let text = result["content"][0]["text"].as_str().expect("text");
+    assert!(text.contains("menu, select"), "{text}");
+    let missing = project.call("helix_family", &json!({}));
+    assert_eq!(missing["isError"], true);
+}
+
+#[test]
+fn every_tool_declares_an_output_schema_and_read_only_annotations() {
+    let project = Project::helix("list");
+    let replies = project.talk(&[json!({ "id": 1, "jsonrpc": "2.0", "method": "tools/list" })]);
+    let tools = replies[0]["result"]["tools"].as_array().expect("tools");
+    assert_eq!(tools.len(), 7);
+    for tool in tools {
+        assert_eq!(tool["outputSchema"]["type"], "object", "{}", tool["name"]);
+        assert_eq!(
+            tool["annotations"]["readOnlyHint"], true,
+            "{}",
+            tool["name"]
+        );
+        assert!(tool["title"].is_string(), "{}", tool["name"]);
+    }
+}
+
+/// **A known revision is answered in kind, and any other with the newest.**
+/// The instructions stay under 2,048 characters, where one client cuts them.
+#[test]
+fn initialize_negotiates_the_revision_and_sends_short_instructions() {
+    let project = Project::helix("initialize");
+    let hello = |version: &str| {
+        json!({
+            "id": 1,
+            "jsonrpc": "2.0",
+            "method": "initialize",
+            "params": { "capabilities": {}, "clientInfo": { "name": "t", "version": "1" }, "protocolVersion": version },
+        })
+    };
+    let known = project.talk(&[hello("2025-06-18")]);
+    assert_eq!(known[0]["result"]["protocolVersion"], "2025-06-18");
+    let unknown = project.talk(&[hello("1900-01-01")]);
+    assert_eq!(unknown[0]["result"]["protocolVersion"], "2025-11-25");
+    let instructions = known[0]["result"]["instructions"]
+        .as_str()
+        .expect("instructions");
+    assert!(
+        instructions.len() < 2048,
+        "{} characters",
+        instructions.len()
+    );
+    assert!(instructions.contains("helix_family"));
+}
+
+#[test]
+fn mcp_init_adds_the_server_and_keeps_the_others() {
+    let project = Project::new("init");
+    std::fs::write(
+        project.path().join(".mcp.json"),
+        json!({ "mcpServers": { "other": { "command": "other" } } }).to_string(),
+    )
+    .expect("a config");
+    let written = project.run(&["mcp", "init", "--client", "claude"]);
+    assert_eq!(written.status.code(), Some(0));
+    let config: Value = serde_json::from_str(
+        &std::fs::read_to_string(project.path().join(".mcp.json")).expect("the config"),
+    )
+    .expect("JSON");
+    assert_eq!(config["mcpServers"]["other"]["command"], "other");
+    assert_eq!(
+        config["mcpServers"]["helix"],
+        json!({ "args": ["@fusion.dev/helix-cli", "mcp"], "command": "npx" })
+    );
+
+    let again = project.run(&["mcp", "init", "--client", "claude"]);
+    assert_eq!(
+        again.status.code(),
+        Some(3),
+        "an existing helix server was replaced"
+    );
+    let forced = project.run(&["mcp", "init", "--client", "claude", "--force"]);
+    assert_eq!(forced.status.code(), Some(0));
+
+    let vscode = project.run(&["mcp", "init", "--client", "vscode"]);
+    assert_eq!(vscode.status.code(), Some(0));
+    let config: Value = serde_json::from_str(
+        &std::fs::read_to_string(project.path().join(".vscode/mcp.json")).expect("the config"),
+    )
+    .expect("JSON");
+    assert_eq!(config["servers"]["helix"]["type"], "stdio");
+}

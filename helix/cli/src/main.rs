@@ -15,6 +15,7 @@
 //! protocol, and a protocol designed against one plugin is an abstraction
 //! validated against nothing, so it is deliberately not built.
 
+mod api;
 mod args;
 mod component;
 mod config;
@@ -31,7 +32,7 @@ use fusion_rules::error::Failure;
 use fusion_rules::exit::Code;
 use fusion_rules::style::Paint;
 
-use crate::args::{Cli, Component, Manifest, Noun, Theme};
+use crate::args::{Api, Cli, Component, Manifest, McpVerb, Noun, Theme};
 
 /// The word every printed failure opens with, and the corner of every screen.
 const PRODUCT: &str = "helix";
@@ -59,7 +60,30 @@ fn main() {
         /* **No `--json` branch and no paint.** The protocol *is* the format, and
         a server that honored a flag about human output would be a server whose
         stream a client could not parse. */
-        Noun::Mcp => mcp::run(),
+        Noun::Mcp(args) => match &args.verb {
+            None => mcp::run(),
+            Some(McpVerb::Init(init)) => mcp::init::run(init, &from, cli.json),
+        },
+        Noun::Api { verb } => {
+            let answer = match verb {
+                Api::Find(args) => api::find(&from, &args.query, args.limit),
+                Api::Family(args) => api::family(&from, &args.family, args.tier.as_deref()),
+                Api::Example(args) => api::example(
+                    &from,
+                    &args.family,
+                    args.example.as_deref(),
+                    args.tier.as_deref(),
+                ),
+                Api::Imports(args) => api::imports(&from, &args.tags),
+                Api::Tokens(args) => {
+                    api::tokens(&from, args.query.as_deref(), args.category.as_deref())
+                }
+            };
+            answer.map(|answer| {
+                api::print(&answer, cli.json);
+                fusion_rules::exit::Code::Ok
+            })
+        }
         Noun::Component { verb } => match verb {
             Component::Audit(args) => component::run::audit(args, &from, cli.json, paint),
             Component::Check(args) => component::run::check(args, &from, cli.json, paint),
