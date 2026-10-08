@@ -1,4 +1,4 @@
-<!-- @summary Revenue by quarter, drawn from a table whose cells show text and hold the plotted number in `data-value`, then signups by channel stacked into one column a quarter, and a net figure that goes below zero. -->
+<!-- @summary Revenue by quarter, drawn from a table whose cells show text and hold the plotted number in `data-value`, then signups by channel stacked into one column a quarter, and a net figure that goes below zero, outlined. -->
 
 <helix-flex
   direction="column"
@@ -104,5 +104,8 @@
       </tr>
     </tbody>
   </table>
-  <helix-bar-chart for="net"></helix-bar-chart>
+  <helix-bar-chart
+    emphasis="outlined"
+    for="net"
+  ></helix-bar-chart>
 </helix-flex>
