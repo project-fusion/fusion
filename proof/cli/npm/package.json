@@ -44,10 +44,10 @@
     "@fusion.dev/proof-linux-x64": "workspace:*",
     "@fusion.dev/proof-win32-x64": "workspace:*"
   },
-  "publishConfig": {
-    "access": "restricted"
-  },
   "peerDependencies": {
     "playwright": ">=1.50"
+  },
+  "publishConfig": {
+    "access": "restricted"
   }
 }
