@@ -28,6 +28,13 @@ import { styles } from './virtual-list-root.css.js'
  *
  * @cssproperty --virtual-list-block-size - How tall the scrolling box is. A list that runs across is as tall as its rows unless you set it.
  * @cssproperty --virtual-list-disabled-opacity - How faint a row `disabled-keys` names is drawn.
+ * @cssproperty --virtual-list-drag-preview-background-color - The fill behind the copy of a row a pointer drags, in a `reorderable` list with `@fusion.dev/helix/virtual-list/reorder` imported.
+ * @cssproperty --virtual-list-drag-preview-opacity - The opacity of the copy of a row a pointer drags.
+ * @cssproperty --virtual-list-drag-preview-radius - The corner radius of the copy of a row a pointer drags.
+ * @cssproperty --virtual-list-drag-preview-shadow - The shadow that raises the copy of a row a pointer drags over the page.
+ * @cssproperty --virtual-list-dragging-opacity - The opacity of a row being dragged, in a `reorderable` list with `@fusion.dev/helix/virtual-list/reorder` imported.
+ * @cssproperty --virtual-list-drop-indicator-color - The color of the line where a dragged row would land.
+ * @cssproperty --virtual-list-drop-indicator-size - The thickness of the line where a dragged row would land.
  * @cssproperty --virtual-list-empty-color - The color of the text in the row shown when there are no items.
  * @cssproperty --virtual-list-empty-padding - The space around the text in the row shown when there are no items.
  * @cssproperty --virtual-list-loading-color - The color of the text in the row drawn while `loading` is set.
