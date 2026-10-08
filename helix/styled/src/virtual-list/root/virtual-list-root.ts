@@ -29,6 +29,8 @@ import { styles } from './virtual-list-root.css.js'
  * @cssproperty --virtual-list-block-size - How tall the scrolling box is. A list that runs across is as tall as its rows unless you set it.
  * @cssproperty --virtual-list-disabled-opacity - How faint a row `disabled-keys` names is drawn.
  * @cssproperty --virtual-list-drag-preview-background-color - The fill behind the copy of a row a pointer drags, in a `reorderable` list with `@fusion.dev/helix/virtual-list/reorder` imported.
+ * @cssproperty --virtual-list-drag-preview-border-color - The color of the edge around the copy of a row a pointer drags.
+ * @cssproperty --virtual-list-drag-preview-border-width - The width of the edge around the copy of a row a pointer drags. None by default, where the shadow lifts it.
  * @cssproperty --virtual-list-drag-preview-opacity - The opacity of the copy of a row a pointer drags.
  * @cssproperty --virtual-list-drag-preview-radius - The corner radius of the copy of a row a pointer drags.
  * @cssproperty --virtual-list-drag-preview-shadow - The shadow that raises the copy of a row a pointer drags over the page.

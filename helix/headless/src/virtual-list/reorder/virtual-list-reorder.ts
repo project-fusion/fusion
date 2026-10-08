@@ -59,7 +59,6 @@ export class VirtualListReorderController implements ReactiveController {
     this.host = host
     this.sheet = sheet
     host.addController(this)
-    host.addEventListener('helix-reorder', this.handleReorder)
     this.reorder = new ReorderController(host, {
       get axis() {
         return host.orientation === 'horizontal' ? 'inline' : 'block'
@@ -107,7 +106,12 @@ export class VirtualListReorderController implements ReactiveController {
     queueMicrotask(() => this.mark())
   }
 
+  hostConnected(): void {
+    this.host.addEventListener('helix-reorder', this.handleReorder)
+  }
+
   hostDisconnected(): void {
+    this.host.removeEventListener('helix-reorder', this.handleReorder)
     this.waiting = undefined
   }
 
