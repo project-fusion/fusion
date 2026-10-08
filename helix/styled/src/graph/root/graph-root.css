@@ -435,12 +435,14 @@ slot[name="filter-icon"]::slotted(*) {
   user-select: none;
 }
 
-/* The wash a hovered option takes, on the row the keyboard is on as well. A
+/* The wash a hovered option takes, on the row the keyboard is on as well,
+   from the list or from the search field once its keys are on a note. A
    ring there drew a box inside the list's own ring. An image and not a
    color, so it lies over the selected row's surface and the keyboard shows
    on the row it starts on. */
 [part~="note"]:hover,
-[part="list"]:focus-visible [part~="note-cursor"] {
+[part="list"]:focus-visible [part~="note-cursor"],
+[part="search"]:has([aria-activedescendant]) ~ [part="list"] [part~="note-cursor"] {
   --_graph-wash: var(
     --graph-note-hover-color,
     light-dark(

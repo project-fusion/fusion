@@ -576,6 +576,9 @@ export const sigmaDriver = <G extends SigmaGraph>(
           forceLabel: look.label === 'always',
           glow: look.glow,
           hidden: look.hidden,
+          /* The note the keys are on in the frame's list, boxed as the note
+             under the pointer is, so a reader moving by the keys sees it. */
+          highlighted: look.keyed === true,
           label: named ? data.label : null,
           materialCode: MATERIALS[look.material ?? options.material ?? 'flat'],
           shapeCode: SHAPES[look.shape ?? options.shape ?? 'circle'],
@@ -589,11 +592,13 @@ export const sigmaDriver = <G extends SigmaGraph>(
          ends, so `draw` writes the ends onto it as `from` and `to`. */
       sigma.setSetting('edgeReducer', (_edge: string, data: Record<string, unknown>) => {
         const look = looks.link(String(data.from), String(data.to))
-        /* The note under the pointer lights its links in its own color. */
-        const lit = hovered !== undefined && (data.from === hovered || data.to === hovered)
+        /* The note under the pointer lights its links in its own color, and
+           the note the keys are on where the pointer is on none. */
+        const near = hovered ?? looks.keyed
+        const lit = near !== undefined && (data.from === near || data.to === near)
         return {
           ...data,
-          color: lit ? looks.node(hovered as string).color : look.color,
+          color: lit ? looks.node(near as string).color : look.color,
           hidden: look.hidden,
           size: look.raised || lit ? 1.6 : 0.8,
           zIndex: look.raised || lit ? 1 : 0,

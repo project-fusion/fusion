@@ -369,14 +369,75 @@ describe('graph frame', () => {
     expect(names(host).length).toBe(5)
   })
 
-  test('ArrowDown in the search moves to the list, and the frame keeps its keys', async () => {
+  test('the search field is a combobox over the list, and the frame keeps its keys', async () => {
     const host = await graph()
+    const field = part(host, 'search-field') as HTMLInputElement
     const panned: unknown[] = []
     host.addEventListener('helix-graph-pan', (event) => panned.push(event.detail))
-    key(part(host, 'search-field') as HTMLElement, 'ArrowDown')
-    key(part(host, 'search-field') as HTMLElement, 'ArrowLeft')
-    expect(host.shadowRoot?.activeElement).toBe(list(host))
+    expect(field.getAttribute('role')).toBe('combobox')
+    expect(field.getAttribute('aria-autocomplete')).toBe('list')
+    expect(field.getAttribute('aria-controls')).toBe(list(host).id)
+    expect(field.getAttribute('aria-expanded')).toBe('true')
+    expect(field.hasAttribute('aria-activedescendant')).toBe(false)
+    field.focus()
+    key(field, 'ArrowDown')
+    await settle(host)
+    expect(field.getAttribute('aria-activedescendant')).toBe('note-0')
+    key(field, 'ArrowDown')
+    await settle(host)
+    /* The focus stays in the field, which names the note the keys are on. */
+    expect(host.shadowRoot?.activeElement).toBe(field)
+    expect(field.getAttribute('aria-activedescendant')).toBe('note-1')
+    expect(host.shadowRoot?.getElementById('note-1')?.textContent).toContain('Bravo')
+    key(field, 'ArrowLeft')
+    await settle(host)
+    expect(field.hasAttribute('aria-activedescendant')).toBe(false)
     expect(panned).toEqual([])
+  })
+
+  test('Up in the search starts on the last note, and Enter selects the note the keys are on', async () => {
+    const host = await graph()
+    const field = part(host, 'search-field') as HTMLInputElement
+    key(field, 'ArrowUp')
+    await settle(host)
+    expect(field.getAttribute('aria-activedescendant')).toBe('note-4')
+    key(field, 'Enter')
+    await settle(host)
+    expect(host.active).toBe('e')
+    expect(names(host)[0]).toBe('Echo')
+  })
+
+  test('typing and Escape let go of the note, and a second Escape empties the search', async () => {
+    const host = await graph()
+    const field = part(host, 'search-field') as HTMLInputElement
+    key(field, 'ArrowDown')
+    await settle(host)
+    field.value = 'a'
+    field.dispatchEvent(new InputEvent('input', { bubbles: true, composed: true }))
+    await settle(host)
+    expect(field.hasAttribute('aria-activedescendant')).toBe(false)
+    key(field, 'ArrowDown')
+    await settle(host)
+    expect(field.getAttribute('aria-activedescendant')).toBe('note-0')
+    key(field, 'Escape')
+    await settle(host)
+    expect(field.hasAttribute('aria-activedescendant')).toBe(false)
+    expect(field.value).toBe('a')
+    key(field, 'Escape')
+    await settle(host)
+    expect(field.value).toBe('')
+  })
+
+  test('the field says it controls nothing open while the list holds no notes', async () => {
+    const host = await graph()
+    const field = part(host, 'search-field') as HTMLInputElement
+    field.value = 'zz'
+    field.dispatchEvent(new InputEvent('input', { bubbles: true, composed: true }))
+    await settle(host)
+    expect(field.getAttribute('aria-expanded')).toBe('false')
+    key(field, 'ArrowDown')
+    await settle(host)
+    expect(field.hasAttribute('aria-activedescendant')).toBe(false)
   })
 
   test('depth keeps the notes near the selected one, and shows every note without it', async () => {
@@ -701,12 +762,18 @@ describe('a list with no notes', () => {
     expect(list(host).hasAttribute('aria-busy')).toBe(false)
   })
 
-  /* The frame's keys pan and zoom, which are its commands. The list's are a
-     listbox's own moves, which `aria-keyshortcuts` is not for. */
-  test('lists its pan and zoom keys on the frame, and none on the list', async () => {
+  /* The frame's keys pan and zoom, which are its commands. The list's arrows
+     are a listbox's own moves, which `aria-keyshortcuts` is not for, and its
+     walk along the links is a command of its own. */
+  test('lists its pan and zoom keys on the frame, and only the walk on the list', async () => {
     const host = await graph()
     expect(part(host, 'region')?.getAttribute('aria-keyshortcuts')).toContain('Plus')
-    expect(list(host).hasAttribute('aria-keyshortcuts')).toBe(false)
+    expect(list(host).getAttribute('aria-keyshortcuts')?.split(' ')).toEqual([
+      'Alt+ArrowRight',
+      'Alt+ArrowLeft',
+      'Alt+ArrowDown',
+      'Alt+ArrowUp',
+    ])
   })
 })
 
@@ -726,5 +793,119 @@ describe('what a screen reader calls a graph', () => {
     }
     await unnamed.updateComplete
     expect(part(unnamed, 'region')?.hasAttribute('aria-roledescription')).toBe(false)
+  })
+})
+
+/* The list was the only keyboard path through the notes, in the order of
+   their names, so a reader could not follow the lines the drawing shows. */
+describe('a walk along the links', () => {
+  const alt = (target: Element, name: string): void => {
+    target.dispatchEvent(
+      new KeyboardEvent('keydown', { altKey: true, bubbles: true, composed: true, key: name }),
+    )
+  }
+  const live = (host: Graph): string => (part(host, 'live')?.textContent ?? '').trim()
+  const on = (host: Graph): string =>
+    host.shadowRoot
+      ?.getElementById(list(host).getAttribute('aria-activedescendant') ?? '')
+      ?.querySelector('[part="note-name"]')?.textContent ?? ''
+
+  test('follows a link from the note the keys are on, and says how it stands', async () => {
+    const host = await graph()
+    list(host).focus()
+    alt(list(host), 'ArrowRight')
+    await settle(host)
+    expect(on(host)).toBe('Bravo')
+    expect(live(host)).toBe('Bravo. Linked from Alpha. 1 of 2')
+  })
+
+  test('moves among the links of the note the step came from, wrapping, and goes back', async () => {
+    const host = await graph()
+    list(host).focus()
+    alt(list(host), 'ArrowRight')
+    alt(list(host), 'ArrowDown')
+    await settle(host)
+    expect(on(host)).toBe('Charlie')
+    expect(live(host)).toBe('Charlie. Links to Alpha. 2 of 2')
+    alt(list(host), 'ArrowDown')
+    await settle(host)
+    expect(on(host)).toBe('Bravo')
+    alt(list(host), 'ArrowUp')
+    await settle(host)
+    expect(on(host)).toBe('Charlie')
+    alt(list(host), 'ArrowLeft')
+    await settle(host)
+    expect(on(host)).toBe('Alpha')
+    expect(live(host)).toBe('Alpha. 2 links')
+  })
+
+  test('steps on from the note it reached, and back along the way it came', async () => {
+    const host = await graph()
+    list(host).focus()
+    key(list(host), 'End')
+    alt(list(host), 'ArrowRight')
+    await settle(host)
+    expect(on(host)).toBe('Delta')
+    expect(live(host)).toBe('Delta. Links to Echo. 1 of 1')
+    alt(list(host), 'ArrowRight')
+    await settle(host)
+    expect(on(host)).toBe('Echo')
+    alt(list(host), 'ArrowLeft')
+    alt(list(host), 'ArrowLeft')
+    await settle(host)
+    expect(on(host)).toBe('Echo')
+  })
+
+  test('says a note has no links, and stays on it', async () => {
+    const host = await graph('', [...nodes, { id: 'f', label: 'Foxtrot' }])
+    list(host).focus()
+    key(list(host), 'End')
+    alt(list(host), 'ArrowRight')
+    await settle(host)
+    expect(on(host)).toBe('Foxtrot')
+    expect(live(host)).toBe('Foxtrot. No links')
+  })
+
+  test('follows with Alt+Left on a right-to-left page', async () => {
+    const host = await graph('dir="rtl"')
+    list(host).focus()
+    alt(list(host), 'ArrowLeft')
+    await settle(host)
+    expect(on(host)).toBe('Bravo')
+  })
+
+  test('walks from the search field once its keys are on a note', async () => {
+    const host = await graph()
+    const field = part(host, 'search-field') as HTMLInputElement
+    key(field, 'ArrowDown')
+    alt(field, 'ArrowRight')
+    await settle(host)
+    expect(field.getAttribute('aria-activedescendant')).toBe('note-1')
+    expect(live(host)).toBe('Bravo. Linked from Alpha. 1 of 2')
+  })
+
+  test('tells the drawing which note the keys are on, and that a walk reached it', async () => {
+    const host = (await graph()) as Graph & {
+      keyed?: { id: string; walked: boolean } | undefined
+    }
+    const told: string[] = []
+    host.addEventListener('helix-graph-part-change', (event) =>
+      told.push((event as CustomEvent<{ kind: string }>).detail.kind),
+    )
+    expect(host.keyed).toBeUndefined()
+    list(host).focus()
+    await settle(host)
+    expect(host.keyed).toEqual({ id: 'a', walked: false })
+    expect(told).toEqual(['focus'])
+    alt(list(host), 'ArrowRight')
+    await settle(host)
+    expect(host.keyed).toEqual({ id: 'b', walked: true })
+    key(list(host), 'ArrowDown')
+    await settle(host)
+    expect(host.keyed).toEqual({ id: 'c', walked: false })
+    list(host).blur()
+    await settle(host)
+    expect(host.keyed).toBeUndefined()
+    expect(told).toEqual(['focus', 'focus', 'focus', 'focus'])
   })
 })

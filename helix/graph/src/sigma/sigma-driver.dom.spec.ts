@@ -224,6 +224,26 @@ describe('sigmaDriver', () => {
     expect(settings.get('labelFont')).toBe('Inter')
   })
 
+  test('boxes the note the keys are on as the note under the pointer, and lights its links', () => {
+    const { settings, sigma } = rendererOf()
+    sigmaDriver(sigma).look({
+      ...looks,
+      keyed: 'd',
+      node: (id) => ({ ...looks.node(id), keyed: id === 'd' }),
+    })
+    const node = settings.get('nodeReducer') as (
+      id: string,
+      data: object,
+    ) => Record<string, unknown>
+    const edge = settings.get('edgeReducer') as (
+      id: string,
+      data: object,
+    ) => Record<string, unknown>
+    expect(node('d', {}).highlighted).toBe(true)
+    expect(node('b', {}).highlighted).toBe(false)
+    expect(edge('e', { from: 'b', to: 'd' })).toMatchObject({ color: 'rgb(7, 7, 7)', size: 1.6 })
+  })
+
   test('draws every note with its own program, in its shape and the driver’s material', () => {
     const { settings, sigma } = rendererOf()
     const driver = sigmaDriver(sigma, { emphasis: 'subtle', material: 'glass' })

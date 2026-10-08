@@ -205,6 +205,7 @@ interface Frame extends HTMLElement {
   active?: string
   drawn?(whole?: boolean): void
   gestureMode?: ViewportGestureMode
+  keyed?: { id: string; walked: boolean } | undefined
   laidOut?(positions: Record<string, GraphPoint>): void
   moved?(): void
   links?: readonly { label?: string | undefined; source: string; target: string }[]
@@ -359,6 +360,7 @@ export const connectGraph = (
         ?.trim()
         .replace(/^["']|["']$/g, ''),
       groups: nodes.flatMap((node) => (node.group === undefined ? [] : [node.group])),
+      keyed: graph.keyed?.id,
       links: links.length,
       near: reached?.near ?? new Set(),
       noteOf: (id) => notes.get(id),
@@ -634,6 +636,28 @@ export const connectGraph = (
     pressed = undefined
   }
 
+  /** The note the keys were last on, so a walk brings each note it reaches into view once. */
+  let keyedShown: string | undefined
+
+  /**
+   * Brings the note a walk along the links reached into the middle of the
+   * view, as a selection made in the list is: the reader is following a line
+   * of the drawing to wherever it goes.
+   */
+  const showKeyed = (): void => {
+    const keyed = graph.keyed
+    const id = keyed?.id
+    if (
+      id !== keyedShown &&
+      keyed?.walked &&
+      drawnNodes.has(keyed.id) &&
+      options.center !== false
+    ) {
+      driver.center?.(keyed.id, !still())
+    }
+    keyedShown = id
+  }
+
   const handlePartChange = (event: Event): void => {
     const { kind } = (event as HelixGraphPartChangeEvent).detail
     if (kind === 'data') {
@@ -644,6 +668,7 @@ export const connectGraph = (
     } else if (kind === 'focus') {
       restyle()
       frameSelection()
+      showKeyed()
     } else {
       driver.gestures?.(graph.gestureMode ?? 'free')
     }
