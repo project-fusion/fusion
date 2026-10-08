@@ -14,7 +14,7 @@ procedure.
 - [ ] 1. Decide the family, parts, and whether it is form-associated
 - [ ] 2. Headless tier: structure, ARIA, state
 - [ ] 3. Styled tier: CSS file plus the element
-- [ ] 4. Barrels
+- [ ] 4. Barrels and registration
 - [ ] 5. Specs: dom, ssr, and any pure-logic
 - [ ] 6. Verify
 ```
@@ -78,10 +78,25 @@ static override styles: CSSResultGroup = styles
 - Use semantic tokens only. Expose per-component hooks that default to one:
   `padding: var(--card-padding, var(--helix-space-md))`.
 
-## 4. Barrels
+## 4. Barrels and registration
 
 Each family's `index.ts` re-exports its parts; the package `index.ts` re-exports
 each family.
+
+**A container does not register another family's children.** Who registers an
+element follows from who writes it:
+
+- The family's entry registers its own parts.
+- The family registers every element it renders in its own shadow root.
+- An element the page writes in light DOM that belongs to another family, such
+  as `<helix-option>` inside a Select, is the page's import. The container
+  calls core's `auditChildren` with the child's tag and entry, so a missing
+  import is reported once in development, and its description shows the import
+  block, which the catalog reads into the family's `imports` and `usage`.
+
+Import a helper shared with the child's family from a module that registers
+nothing, such as `option/among.ts`. "A container does not register another
+family's children" in `helix/CONVENTIONS.md` has the whole rule.
 
 ## 5. Specs
 

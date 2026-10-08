@@ -45,15 +45,20 @@ type such as `ButtonEmphasis` sends you somewhere else to look.
 ## Markdown and JSON for each component family
 
 ```
-/components/<family>.md
-/components/<family>.json
+https://fusion.dev/helix/components/<family>.md
+https://fusion.dev/helix/components/<family>.json
 ```
 
-These are static files. The `.md` file has:
+These are static files, one pair for each family. Read the family you are
+writing instead of the whole manifest. The manifest holds every family in one
+file, and it is several megabytes.
+
+The `.md` file has:
 
 - the family's metadata
+- a Usage block with the import lines for the family
 - every element's description and API tables
-- the examples
+- the examples, each with the import lines it needs
 
 The HTML page leaves the examples out on purpose. The page lists what a
 component can do, and the sandbox beside it shows what the component looks
@@ -61,24 +66,43 @@ like. Keeping pictures out of the reference keeps it the one place you can trust
 to be complete. An agent cannot use the sandbox, and it reads an example as
 text, so the `.md` file includes the examples.
 
-The `.json` file has the same family as structured data.
+The `.json` file has the same family as structured data, and three fields an
+agent uses most:
 
-## Rules the build checks
+- `usage`, the import block for each tier
+- `imports` on each example, an import line for every element it writes
+- `specifier` and `words` on each element: the line that registers it, and the
+  properties `registerWords` translates
 
-Code that looks right can still fail these checks:
+## Import every family you write
 
-| Rule | Check |
+Each tag needs its family's entry imported. A family registers its own parts,
+so `@fusion.dev/helix/tabs` registers Tab and Tab Panel. A family does not
+register another family's elements that you write inside it:
+
+```js
+import '@fusion.dev/helix/select'
+import '@fusion.dev/helix/option'
+```
+
+Without the Option import, the options are unknown elements and the Select
+offers nothing. The same is true
+of the layout around an example: a Button inside a Flex needs both imports.
+Copy the import lines above an example together with its markup.
+
+## Check the code you wrote
+
+These checks run on your project, and each one prints JSON with `--json`:
+
+| Command | What it finds |
 |---|---|
-| A dispatched event must be declared | `helix component --only events` |
-| A documented part must be rendered | `helix component`'s `parts` |
-| A documented CSS hook must be read | `helix component --only hooks` |
-| A visual property draws from its axis | `helix component`'s `axes` |
-| A form control styles with `:disabled` | `helix component --only disabled` |
-| A component that animates supports reduced motion | `helix component --only motion` |
-| No component reads a primitive token | `helix component`'s `tokens` |
+| `helix scan` | Unknown tags, attributes, values, and slots, parts no element publishes, and hook names one or two edits from a real one, each with its file and line |
+| `helix theme audit` | Every foreground and background pair in your theme that misses its contrast target |
+| `initDiagnostics()` from `@fusion.dev/helix-diagnostics` | The same findings on the running page, and what the library reports as it runs, such as an option nobody imported |
 
-If you generate Helix code, watch the first two rules. Breaking them produces
-output that looks like it works and is wrong.
+`helix scan` and `helix theme audit` exit 1 when they find an error and 0 when
+they find none. Run them after you write Helix code, and fix each finding
+before you finish.
 
 ## The index
 

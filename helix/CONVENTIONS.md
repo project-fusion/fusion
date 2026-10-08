@@ -383,7 +383,9 @@ fails where one reaches the child's module again.
 
 **Each container's description shows the import block**, and the catalog reads
 those lines into `Family.imports`, which the reference lists under the
-family's own entries in Usage. The barrels, `@fusion.dev/helix` and
+family's own entries in Usage. The catalog writes that block once, as
+`Family.usage`, for the page, the family's `.md`, and its `.json`, and it gives
+each example the import lines for every element it writes. The barrels, `@fusion.dev/helix` and
 `@fusion.dev/helix-headless`, register everything and need nothing more.
 
 ## Server rendering

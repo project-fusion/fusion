@@ -1,5 +1,5 @@
 ---
-description: Four mistakes that look like Helix bugs, and the files an agent should read.
+description: Five mistakes that look like Helix bugs, and the files an agent should read.
 parent: coding-agents
 section: Getting started
 title: Using Helix with an agent
@@ -24,42 +24,53 @@ link to. Paste the link into the file your tool reads. [The MCP
 server](./coding-agents) works with any vendor and runs code, and Claude,
 Cursor, Windsurf, and Zed all support it.
 
-## Read the manifest before writing a tag
+## Read the family before writing its tags
 
 ```
-https://fusion.dev/helix/custom-elements.json
-@fusion.dev/helix/custom-elements.json
+https://fusion.dev/helix/components/<family>.md
+https://fusion.dev/helix/components/<family>.json
 ```
 
-The manifest lists:
+Each family's file lists:
 
+- the import lines for the family
 - every tag
 - every property, with its literal union
-- every event, with its class
+- every event, with its class and its React prop
 - every slot, part, and custom property
+- the examples, each with the import lines it needs
 
-**If a tag is not in the manifest, it does not exist.** A property value outside
-a declared union is invalid. Property types are literal unions for this reason.
-`'ghost' | 'outlined' | 'solid' | 'subtle'` shows you the values, and a named
-type such as `ButtonEmphasis` sends you somewhere else to find them.
+**If a tag is not in a family's file, it does not exist.** A property value
+outside a declared union is invalid. Property types are literal unions for this
+reason. `'ghost' | 'outlined' | 'solid' | 'subtle'` shows you the values, and a
+named type such as `ButtonEmphasis` sends you somewhere else to find them.
 
-When you need one family, fetch it as data:
+The manifest at `https://fusion.dev/helix/custom-elements.json` holds every
+family in one file, which is several megabytes. Read the families you use.
+Start from `https://fusion.dev/llms.txt`. In one request, it names every
+document and the machine-readable sources.
 
-```
-https://fusion.dev/helix/components/<family>.json
-https://fusion.dev/helix/components/<family>.md
-```
-
-The `.md` file has the API tables and the examples. The HTML page leaves the
-examples out on purpose. Start from `https://fusion.dev/llms.txt`. In one
-request, it names every document and these two sources.
-
-## Four mistakes that look like Helix bugs
+## Five mistakes that look like Helix bugs
 
 Each of these looks like a bug in Helix. They are listed from the most common to
 the least common.
 
-### 1. Blocking a change without `preventDefault()`
+### 1. Writing a tag without importing its family
+
+Each tag needs its family's entry imported. A family does not register another
+family's elements that you write inside it, so a Select needs Option imported
+beside it, and a Data Table needs Table:
+
+```js
+import '@fusion.dev/helix/select'
+import '@fusion.dev/helix/option'
+```
+
+Without the second line, the options are unknown elements and the Select offers
+nothing. Each family's Usage block and each example list the lines to import.
+Copy them with the markup.
+
+### 2. Blocking a change without `preventDefault()`
 
 **Setting `value`, `open`, `checked`, or `active` sets the starting state and
 corrects the current state.** The element starts in that state and then applies
@@ -91,7 +102,7 @@ block a change, call `preventDefault()` on the matching `helix-before-*` event:
 A form reset returns the element to `default-value` and the matching attributes
 for the other states. See [State and control](./state-and-control).
 
-### 2. Using the exact event name
+### 3. Using the exact event name
 
 In React, write `onhelix-before-open`. `onHelixOpen` and `onOpen` do not work.
 React removes `on` from the prop name and listens for exactly the rest, so the
@@ -105,7 +116,7 @@ so a menu closing inside a dialog does not close the dialog. `helix-select`,
 listen for them on a container. If a listener on a wrapper receives nothing, the
 event is a lifecycle event. Put the listener on the element.
 
-### 3. Styling a disabled control with `:disabled`
+### 4. Styling a disabled control with `:disabled`
 
 ```css
 helix-input:disabled { … }   /* right: matches a disabled fieldset too */
@@ -116,7 +127,7 @@ The browser disables a control inside `<fieldset disabled>` without adding an
 attribute to it. The `[disabled]` selector does not match it, so the control
 looks enabled while it does not accept input.
 
-### 4. Loading every style layer before the elements
+### 5. Loading every style layer before the elements
 
 ```ts
 import '@fusion.dev/helix-styles/helix.css'
