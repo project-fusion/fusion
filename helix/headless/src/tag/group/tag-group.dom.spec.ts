@@ -243,7 +243,7 @@ describe('selection behavior and an empty selection', () => {
     one.group.addEventListener('helix-before-change', (event) =>
       asked.push((event as CustomEvent<{ value: string }>).detail.value),
     )
-    const escape = (): KeyboardEvent => {
+    const pressEscape = (): KeyboardEvent => {
       const event = new KeyboardEvent('keydown', {
         bubbles: true,
         cancelable: true,
@@ -253,9 +253,9 @@ describe('selection behavior and an empty selection', () => {
       cell(apple).dispatchEvent(event)
       return event
     }
-    const first = escape()
+    const first = pressEscape()
     expect([asked, one.group.value, first.defaultPrevented]).toEqual([[''], '', true])
-    const again = escape()
+    const again = pressEscape()
     expect([asked.length, again.defaultPrevented]).toEqual([1, false])
   })
 
