@@ -1,0 +1,104 @@
+{
+  "tasks": [
+    {
+      "id": "select",
+      "prompt": "Using Helix, build this as a page: A native select with a label and a hint.",
+      "requires": ["helix-option", "helix-select"]
+    },
+    {
+      "id": "data-table",
+      "prompt": "Using Helix, build this as a page: A table that sorts when you click a heading, with pages for the rest of the rows.",
+      "requires": ["helix-data-table", "helix-table-column"]
+    },
+    {
+      "id": "tabs",
+      "prompt": "Using Helix, build this as a page: Panels behind tabs, with a marker that moves to the active tab.",
+      "requires": ["helix-tab", "helix-tab-panel", "helix-tabs"]
+    },
+    {
+      "id": "menu",
+      "prompt": "Using Helix, build this as a page: A menu with items, a submenu, and a separator.",
+      "requires": ["helix-menu", "helix-menu-item"]
+    },
+    {
+      "id": "date-picker",
+      "prompt": "Using Helix, build this as a page: A month, with a day already chosen.",
+      "requires": ["helix-date-picker"]
+    },
+    {
+      "id": "accordion",
+      "prompt": "Using Helix, build this as a page: Sections that open one at a time or together, with the first already open.",
+      "requires": ["helix-accordion", "helix-accordion-item"]
+    },
+    {
+      "id": "combobox",
+      "prompt": "Using Helix, build this as a page: Type to narrow a list, and choose from what is left.",
+      "requires": ["helix-combobox", "helix-option"]
+    },
+    {
+      "id": "breadcrumbs",
+      "prompt": "Using Helix, build this as a page: The path to the current page, ending with the page you are on.",
+      "requires": ["helix-breadcrumb", "helix-breadcrumbs"]
+    },
+    {
+      "id": "pagination",
+      "prompt": "Using Helix, build this as a page: Numbered pages with the current one marked.",
+      "requires": ["helix-pagination"]
+    },
+    {
+      "id": "tooltip",
+      "prompt": "Using Helix, build this as a page: A short explanation shown on hover and on focus.",
+      "requires": ["helix-tooltip"]
+    },
+    {
+      "id": "slider",
+      "prompt": "Using Helix, build this as a page: A value along a track, with the number shown.",
+      "requires": ["helix-slider"]
+    },
+    {
+      "id": "radio",
+      "prompt": "Using Helix, build this as a page: One choice from several, with a hint under the label.",
+      "requires": ["helix-radio", "helix-radio-group"]
+    },
+    {
+      "id": "switch",
+      "prompt": "Using Helix, build this as a page: A setting that takes effect as soon as it is switched.",
+      "requires": ["helix-switch"]
+    },
+    {
+      "id": "progress",
+      "prompt": "Using Helix, build this as a page: How far along a task is, with the number shown.",
+      "requires": ["helix-progress"]
+    },
+    {
+      "id": "drawer",
+      "prompt": "Using Helix, build this as a page: A panel that slides in from an edge, opened by a button.",
+      "requires": ["helix-drawer"]
+    },
+    {
+      "id": "dialog",
+      "prompt": "Using Helix, build this as a page: A dialog opened by a button, with actions in its footer.",
+      "requires": ["helix-dialog"]
+    },
+    {
+      "id": "checkbox-group",
+      "prompt": "Using Helix, build this as a page: Several checkboxes under one label. Each checkbox submits its own value.",
+      "requires": ["helix-checkbox-group"]
+    },
+    {
+      "id": "toast",
+      "prompt": "Using Helix, build this as a page: A message over the page, in the corner set by its placement.",
+      "requires": ["helix-toast", "helix-toast-item"]
+    },
+    {
+      "id": "settings-form",
+      "prompt": "Using Helix in React, build a settings form: a Language select with English, Spanish, and French, a Save button, and a dialog that confirms the save. Keep the chosen language in React state.",
+      "requires": ["helix-button", "helix-dialog", "helix-option", "helix-select"]
+    },
+    {
+      "id": "themed-card",
+      "prompt": "Using Helix, build a storage card on a page, styled only with Helix tokens and the card's own custom properties: the page on the surface color with medium padding, and the card with a medium gap and the border color.",
+      "requires": ["helix-card"]
+    }
+  ]
+}

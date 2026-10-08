@@ -226,7 +226,8 @@ fusion/    cli docs plugins rules scripts site: what belongs to the company
 
   **What is left over is `fusion/scripts`, and it is small on purpose.** A
   script goes there when it is genuinely cross-cutting and cannot be a rule: the
-  ones that drive a browser, the pair that builds and runs the eval corpus, and
+  ones that drive a browser, the pair that builds and runs the eval corpus, the
+  grader of the agent task suite, and
   the meta-check that floors the generators. Anything that could be a rule should be
   one, because a rule returns a count that `floors` can read and a script returns
   a sentence somebody has to parse.
