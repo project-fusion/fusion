@@ -207,11 +207,12 @@
   font-weight: var(--helix-weight-medium);
 }
 
-/* The readout and the overview are for screen readers, and the bubble and
-   the footer are what a sighted reader reads. */
+/* The readout, the overview, and the table drawn from `data` are for screen
+   readers, and the bubble and the footer are what a sighted reader reads. */
 [part="live"],
 [part="overview"],
-[part="selection"] {
+[part="selection"],
+[part="table"] {
   block-size: 1px;
   clip-path: inset(50%);
   inline-size: 1px;

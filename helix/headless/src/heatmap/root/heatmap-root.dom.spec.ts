@@ -588,3 +588,27 @@ describe('a month by key', () => {
     expect(part(element, 'live')?.textContent).toBe('2026-02-02: 32 (33 of 70)')
   })
 })
+
+/* Drawn from data, the strip had no table on the page for a screen reader. */
+describe('a strip drawn from data', () => {
+  test('renders its readings as a table', async () => {
+    const element = (await mount('<helix-headless-heatmap></helix-headless-heatmap>')) as Strip & {
+      data: unknown
+    }
+    element.data = {
+      columns: ['Day', 'Deploys'],
+      rows: [
+        ['Mon', 2],
+        ['Tue', 5],
+      ],
+    }
+    await element.updateComplete
+    const rows = [...(part(element, 'table')?.querySelectorAll('tbody tr') ?? [])].map((tr) =>
+      [...tr.children].map((cell) => cell.textContent),
+    )
+    expect(rows).toEqual([
+      ['Mon', '2'],
+      ['Tue', '5'],
+    ])
+  })
+})
