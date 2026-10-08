@@ -300,6 +300,34 @@ describe('a chip asking to go', () => {
   })
 })
 
+describe('a paste', () => {
+  test('is read at once, as Enter reads what was typed', async () => {
+    const host = await mount()
+    const heard = watch(host)
+    const field = control(host)
+    field.value = 'refund disposition:settled'
+    field.dispatchEvent(
+      new InputEvent('input', { bubbles: true, composed: true, inputType: 'insertFromPaste' }),
+    )
+    await settle(host)
+    expect(heard.map((facet) => facet.values)).toEqual([['settled']])
+    expect(field.value).toBe('refund')
+  })
+})
+
+describe('Escape with the panel shut', () => {
+  test('empties the text and stops there, and an empty field leaves the key to the page', async () => {
+    const host = await mount()
+    await type(host, 'refund')
+    const first = await press(host, 'Escape')
+    expect(first.defaultPrevented).toBe(true)
+    expect((host as unknown as { value: string }).value).toBe('')
+    expect(control(host).value).toBe('')
+    const second = await press(host, 'Escape')
+    expect(second.defaultPrevented).toBe(false)
+  })
+})
+
 describe('the rest of the reading', () => {
   test('the negation is there without anybody declaring it', async () => {
     const host = await mount()
