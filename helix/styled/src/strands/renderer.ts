@@ -22,6 +22,20 @@ const SEGMENTS = 320
 /** Specks of dust around the strands. */
 const DUST = 600
 
+/*
+ * What a multiplier of `1` draws. `spread`, `bloom`, and `gain` each scale
+ * these, so a page that asks for twice the default asks for `2`.
+ */
+
+/** The ribbon's width over each form's own, which the path keeps in shares of the width. */
+const SPREAD = 1.35
+
+/** How much the two levels of glow add over the strands themselves. */
+const BLOOM = 0.75
+
+/** The light's strength into the composite. */
+const GAIN = 1.615
+
 /** What one frame needs, all of it already resolved by the element. */
 export interface StrandsFrame {
   /** How much the glow around the strands adds, as a multiplier. */
@@ -226,8 +240,8 @@ export class StrandsRenderer {
     this.vec3(this.composite, 'uGround', palette.ground)
     this.vec3(this.composite, 'uInk', palette.peak)
     this.float(this.composite, 'uLight', palette.light ? 1 : 0)
-    this.float(this.composite, 'uGain', (1.7 * frame.gain) / this.scale)
-    this.float(this.composite, 'uBloom', frame.bloom)
+    this.float(this.composite, 'uGain', (GAIN * frame.gain) / this.scale)
+    this.float(this.composite, 'uBloom', BLOOM * frame.bloom)
     gl.bindVertexArray(this.empty)
     gl.drawArrays(gl.TRIANGLES, 0, 3)
   }
@@ -293,7 +307,7 @@ export class StrandsRenderer {
     gl.uniform1f(program.uniforms.get('uScroll') ?? null, frame.scroll)
     gl.uniform2f(program.uniforms.get('uT') ?? null, frame.range[0], frame.range[1])
     gl.uniform1f(program.uniforms.get('uTime') ?? null, frame.time)
-    gl.uniform1f(program.uniforms.get('uSpread') ?? null, frame.spread)
+    gl.uniform1f(program.uniforms.get('uSpread') ?? null, SPREAD * frame.spread)
     gl.uniform1f(program.uniforms.get('uDepth') ?? null, frame.depth)
     gl.uniform1f(program.uniforms.get('uDrift') ?? null, frame.drift)
     gl.uniform1f(program.uniforms.get('uDpr') ?? null, frame.dpr)

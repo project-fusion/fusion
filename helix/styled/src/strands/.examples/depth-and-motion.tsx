@@ -11,12 +11,7 @@ export function Example() {
         ></helix-strands>
       </div>
       <div className="stage">
-        <helix-strands
-          bloom={0.6}
-          contrast={1}
-          depth={1}
-          drift={1}
-        ></helix-strands>
+        <helix-strands></helix-strands>
       </div>
     </div>
   )

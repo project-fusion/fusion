@@ -59,7 +59,7 @@ const GLOW = { fan: 1, ribbon: 0.36, waves: 0.7 } as const
 const WIDTH = { fan: 0.12, ribbon: 0.24, waves: 0.06 } as const
 
 /** Where a fan's bend sits across its box, when `at` is not given. */
-const FAN_AT = 0.4
+const FAN_AT = 0.5
 
 /** Where a fan's lower arm leaves it, below the bend, as a share of its height. */
 const FAN_EXIT = 0.62
