@@ -444,6 +444,19 @@ describe('the keyboard in a select', () => {
     expect(shown(host)).toBe('Alpha')
   })
 
+  /* `inlineStep`'s rule, which every horizontal pair here follows. Measured
+     before this: ArrowLeft on a closed right-to-left select picked the option
+     before. */
+  test('the other way round on a right-to-left page', async () => {
+    const host = (await select('dir="rtl" default-value="one"')) as Select
+    key(trigger(host), 'ArrowLeft')
+    await settle(host)
+    expect(host.value).toBe('two')
+    key(trigger(host), 'ArrowRight')
+    await settle(host)
+    expect(host.value).toBe('one')
+  })
+
   test('and choose nothing with multiple, where a choice is made in the list', async () => {
     const host = (await select('multiple')) as Select
     const event = key(trigger(host), 'ArrowRight')
