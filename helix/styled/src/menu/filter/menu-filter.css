@@ -1,10 +1,16 @@
 /* What a `filterable` menu adopts while it filters, so a menu that never
-   filters carries none of it. */
+   filters carries none of it.
+
+   **By element, where the menu's own sheet says `search-field` and `surface`.**
+   The filter's field is the one `input` in the menu's shadow root, and
+   `data-filtered` is on the surface alone. A sheet the menu adopts has no
+   component of its own, so a part named here is one nothing can check the
+   menu renders. */
 
 /* The filter field, a row of its own over the rows, which stays in view as
    they scroll. The surface's own fill behind it, so a row scrolled under it
    does not show through. */
-[part="search-field"] {
+input {
   appearance: none;
   background-color: var(--menu-background-color, var(--helix-color-surface-overlay));
   border: none;
@@ -26,12 +32,12 @@
 
 /* No ring: the field is where focus stays, and the caret says so. Listbox's
    filter field draws none for the same reason. */
-[part="search-field"]:focus-visible {
+input:focus-visible {
   outline: none;
 }
 
 /* A divider separates nothing while the filter has hidden rows on either side
    of it. */
-[part="surface"][data-filtered] slot::slotted(helix-divider) {
+[data-filtered] slot::slotted(helix-divider) {
   display: none;
 }

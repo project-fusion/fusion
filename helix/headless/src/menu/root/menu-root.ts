@@ -1481,7 +1481,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
         data-filtered=${filters?.filtering ? '' : nothing}
         ?hidden=${!this.open}
       >
-        ${filters ? filters.render(rows, busy) : rows}
+        ${filters ? filters.drawFilter(rows, busy) : rows}
       </div>${this.renderLive(this.hasRows)}`
   }
 }
