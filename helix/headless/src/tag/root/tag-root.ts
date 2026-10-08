@@ -243,13 +243,18 @@ export class HelixHeadlessTag extends MixinDismissible(HelixElement) {
       this.dismissible ? this.renderDismiss() : nothing
     }`
     /* A cell only in a group, so a tag on its own renders exactly what it did:
-       a grid row needs a cell to hold what it shows, and a lone tag is no row. */
+       a grid row needs a cell to hold what it shows, and a lone tag is no row.
+
+       **A disabled cell takes no focus**, so it is not exposed as focusable:
+       the arrow keys pass over it. It keeps the tab stop only where every tag
+       is disabled and the group gives it the stop. */
+    const stop = this.focusable ? '0' : this.disabled ? nothing : '-1'
     return this.grouped
       ? html`<span
           aria-label=${this.words || nothing}
           part="cell"
           role="gridcell"
-          tabindex=${this.focusable ? '0' : '-1'}
+          tabindex=${stop}
           @focus=${this.handleCellFocus}
           @blur=${this.handleCellFocus}
           >${content}</span

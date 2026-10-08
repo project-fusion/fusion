@@ -82,10 +82,12 @@ describe('a tag group', () => {
     ])
   })
 
-  /* One tab stop for the set, and the remove buttons out of the tab order. */
+  /* One tab stop for the set, and the remove buttons out of the tab order. A
+     disabled tag's cell takes no focus at all: with `tabindex="-1"` Chromium
+     exposed it as focusable, though the arrow keys pass over it. */
   test('holds one tab stop, on the first tag, and keeps the remove buttons out of the order', async () => {
     const one = await group('', FRUIT)
-    expect(one.tags.map((tag) => cell(tag).getAttribute('tabindex'))).toEqual(['0', '-1', '-1'])
+    expect(one.tags.map((tag) => cell(tag).getAttribute('tabindex'))).toEqual(['0', null, '-1'])
     expect(part(one.tags[0] as Tag, 'dismiss')?.getAttribute('tabindex')).toBe('-1')
   })
 
@@ -95,7 +97,7 @@ describe('a tag group', () => {
     press(one.tags[0] as Tag, 'ArrowRight')
     await settle(one)
     expect(document.activeElement).toBe(one.tags[2] as Element)
-    expect(one.tags.map((tag) => cell(tag).getAttribute('tabindex'))).toEqual(['-1', '-1', '0'])
+    expect(one.tags.map((tag) => cell(tag).getAttribute('tabindex'))).toEqual(['-1', null, '0'])
   })
 
   test('goes to the ends with Home and End, and does not wrap', async () => {
@@ -164,9 +166,22 @@ describe('selecting tags', () => {
     expect(one.tags.map((tag) => tag.selected)).toEqual([false, false, true])
     cell(one.tags[0] as Tag).click()
     await settle(one)
-    expect(one.group.value).toBe('Plum, Apple')
+    expect(one.group.value).toBe('Plum,Apple')
     const internals = (one.group as unknown as { internals: ElementInternals }).internals
     expect(internals.ariaMultiSelectable).toBe('true')
+  })
+
+  /* Toggle Group and Table write their lists with a bare comma, and the tag
+     group wrote ", ". It still reads a list written either way. */
+  test('writes its list with a bare comma, and reads one written with spaces', async () => {
+    const one = await group('selection-mode="multiple" value="Plum ,  Apple"', FRUIT)
+    expect(one.tags.map((tag) => tag.selected)).toEqual([true, false, true])
+    cell(one.tags[2] as Tag).click()
+    await settle(one)
+    expect(one.group.value).toBe('Apple')
+    cell(one.tags[2] as Tag).click()
+    await settle(one)
+    expect(one.group.value).toBe('Apple,Plum')
   })
 
   test('keeps the selection when the request is refused, and never selects a disabled tag', async () => {
@@ -198,17 +213,17 @@ describe('selecting tags', () => {
     expect(one.group.value).toBe('Apple')
     key(apple, { key: 'ArrowRight', shiftKey: true })
     await settle(one)
-    expect(one.group.value).toBe('Apple, Pear')
+    expect(one.group.value).toBe('Apple,Pear')
     key(pear, { key: 'ArrowRight', shiftKey: true })
     await settle(one)
-    expect(one.group.value).toBe('Apple, Pear, Plum')
+    expect(one.group.value).toBe('Apple,Pear,Plum')
     key(plum, { key: 'ArrowLeft', shiftKey: true })
     await settle(one)
-    expect(one.group.value).toBe('Apple, Pear')
+    expect(one.group.value).toBe('Apple,Pear')
     key(pear, { key: 'ArrowRight' })
     key(plum, { ctrlKey: true, key: 'a' })
     await settle(one)
-    expect(one.group.value).toBe('Apple, Pear, Plum')
+    expect(one.group.value).toBe('Apple,Pear,Plum')
   })
 
   /* A press on a remove button is a press on that button, not on the tag. */
@@ -281,11 +296,11 @@ describe('selection behavior and an empty selection', () => {
     expect(one.group.value).toBe('Pear')
     click(plum, { ctrlKey: true })
     await settle(one)
-    expect(one.group.value).toBe('Pear, Plum')
+    expect(one.group.value).toBe('Pear,Plum')
     click(apple)
     click(plum, { shiftKey: true })
     await settle(one)
-    expect(one.group.value).toBe('Apple, Pear, Plum')
+    expect(one.group.value).toBe('Apple,Pear,Plum')
   })
 
   test('under replace, the arrow keys carry the selection, and Control moves without it', async () => {
@@ -301,7 +316,7 @@ describe('selection behavior and an empty selection', () => {
     expect(one.group.value).toBe('Pear')
     key(plum, { ctrlKey: true, key: ' ' })
     await settle(one)
-    expect(one.group.value).toBe('Pear, Plum')
+    expect(one.group.value).toBe('Pear,Plum')
   })
 
   test('under toggle, the default, the arrow keys move focus alone', async () => {
