@@ -85,12 +85,23 @@ and all of them pay for it.
 **Two warm jobs, because the browser jobs want a fraction of the build.** They
 render from the frame and the spec bundles, which wait for the components and
 not for the docs, so `warm-browser` builds those and finishes while `warm` is
-still measuring bundle sizes for `metrics` and running `next build`. Both build
+still writing the docs and measuring bundle sizes for `metrics`. Both build
 the components, side by side, which is a minute of compute bought for the same
 minute off every browser job.
 
-**Everything else waits on `warm`**, `floors`, `packaging`, `types` and both
-test jobs included. They each built their own before, beside it: 139 seconds in
+**`warm` leaves out `next build`.** No job after it reads `.next`, so
+`.github/scripts/build-for-checks.sh` builds everything `turbo run build` does
+except the site's own build, in `warm` and in each job that restores it.
+`packaging` builds the whole workspace for `smoke:template`, and that is where
+`next build` and `check-highlight.mjs` run.
+
+**`tests` waits on `warm-browser`.** Every spec but those of `helix-docs` reads
+the components and the testing harness, which `warm-browser` builds. The
+`helix-docs` and site specs read what `metrics` writes, so `floors` runs them
+after `warm`, and the two filtered runs together are `turbo run test`.
+
+**Everything else waits on `warm`**, `floors`, `packaging` and `types`
+included. They each built their own before, beside it: 139 seconds in
 `floors` and 214 in `packaging`, measured September 15, 2026, to make what `warm` was
 making at the same time. `lint` reads files and builds nothing, so it alone
 starts at once.
