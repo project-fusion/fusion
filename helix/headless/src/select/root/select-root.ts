@@ -33,7 +33,11 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html } from 'lit/static-html.js'
 import type { HelixHeadlessListbox } from '../../listbox/root/listbox-root.js'
 import { type HelixHeadlessOption, optionsAmong } from '../../option/root/option-root.js'
+/* The list and every element an option is written as: a select imported alone
+   left its groups and separators undefined, and Chromium read the options as
+   one flat list with no group named. */
 import '../../listbox/index.js'
+import '../../option/index.js'
 import { over } from '../align.js'
 
 /**
@@ -46,7 +50,9 @@ import { over } from '../align.js'
  * place for focus to return to when the list closes.
  *
  * Your options stay in your light DOM and are slotted through into the listbox,
- * so the listbox looks through slots to find them. For a list too long to draw
+ * so the listbox looks through slots to find them. Write them as `Option`,
+ * group them in `Option.Group`, and divide them with `Option.Separator`.
+ * Importing Select registers all three in the same tier. For a list too long to draw
  * whole, set `items` instead: the list draws only the options in sight, as
  * Listbox's `items` does, and the trigger, its keys and the form read the
  * whole set.
