@@ -219,6 +219,7 @@ if (hasLayout()) {
 
     test('scrollToSection goes to a section and marks its link at once', async () => {
       const nav = (await build()) as Nav & { scrollToSection(id: string): boolean }
+      nav.behavior = 'instant'
       window.scrollTo(0, 0)
       await settle()
       expect(nav.scrollToSection('three')).toBe(true)
