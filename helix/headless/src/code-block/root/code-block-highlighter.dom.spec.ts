@@ -1,14 +1,11 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { mount, registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
 
-/* Code Block ships no grammar; an entry registers one for every block. Lit
-   after happy-dom, as every element is, so it reads the DOM the specs run in. */
+/* Code Block ships no grammar; an entry registers one for every block. */
 let registerHighlighter: typeof import('./code-block-root.js').registerHighlighter
-let css: typeof import('lit').css
 beforeAll(async () => {
   registerDom()
   ;({ registerHighlighter } = await import('../index.js'))
-  ;({ css } = await import('lit'))
 })
 
 /* The registration is the page's, so each test takes it away again, and a
@@ -66,11 +63,11 @@ describe('a highlighter registered for every block', () => {
   test('reaches the blocks already on the page, and gives each the sheet that colors it', async () => {
     const el = await block('language="ts"')
     expect(plain(el)).toBe(true)
-    const sheet = css`
-      .tok-keyword {
-        color: red;
-      }
-    `
+    /* What a block adopts is the sheet a `CSSResult` holds, which is all
+       this stand-in has. */
+    const sheet = { styleSheet: new CSSStyleSheet() } as unknown as Parameters<
+      typeof registerHighlighter
+    >[1] & { styleSheet: CSSStyleSheet }
     registerHighlighter(tsOnly, sheet)
     await el.updateComplete
     expect(drawn(el)).toBe('const a = 1')
