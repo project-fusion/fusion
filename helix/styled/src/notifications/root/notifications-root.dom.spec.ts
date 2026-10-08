@@ -31,7 +31,7 @@ describe('the styled feed', () => {
   test('it is still a named region holding a list', async () => {
     const element = await mount(markup)
     expect(role(element)).toBe('region')
-    expect(part(element, 'list')?.getAttribute('role')).toBe('list')
+    expect(part(element, 'list')?.getAttribute('role')).toBe('feed')
   })
 
   test('unread is a custom state, which is how a stylesheet knows', async () => {

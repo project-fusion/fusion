@@ -157,13 +157,12 @@ export class HelixHeadlessNotificationGroup extends MixinControllerOpen(HelixEle
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    /* **An item of the feed, holding a list of its own.** The feed is a
-       `list`, and the group was a `group` inside it, so the notifications in it
-       were list items with no list above them and every count and position a
-       reader heard was wrong. The name is the nested list's, from the label in
+    /* **An article of the feed, holding a feed of its own.** A feed owns
+       articles and nothing else, so the group is one, and the notifications in
+       it are the articles of the nested feed, which is named by the label in
        its own tree. Not `region`, which is a landmark: a feed cut into five
        days would put five landmarks on the page. */
-    hostAria(this.internals, { role: 'listitem' })
+    hostAria(this.internals, { label: this.label, role: 'article' })
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
@@ -274,7 +273,7 @@ export class HelixHeadlessNotificationGroup extends MixinControllerOpen(HelixEle
         }
         <span part="actions"><slot name="actions"></slot></span>
       </div>
-      <div id=${ITEMS_ID} part="items" role="list" aria-labelledby=${LABEL_ID}>
+      <div id=${ITEMS_ID} part="items" role="feed" aria-labelledby=${LABEL_ID}>
         <slot></slot>
       </div>`
   }

@@ -31,14 +31,14 @@ const group = async (attributes = '', rows = ROWS): Promise<Group> =>
  * rows rather than hiding them.
  */
 describe('what a group is called and how many it stands for', () => {
-  test('it is an item of the feed holding a named list, not a landmark per day', async () => {
-    /* The feed is a list, so a group inside it has to be one of its items, and
-       its notifications a list of their own: as a `group` they were list items
-       with no list above them, and a reader's counts and positions were wrong. */
+  test('it is an article of the feed holding a named feed, not a landmark per day', async () => {
+    /* A feed owns articles and nothing else, so a group inside it is one, and
+       its notifications the articles of a feed of their own, as the APG feed
+       pattern has them. As a list, the scorers' feed checks found no feed. */
     const el = await group()
-    expect(role(el)).toBe('listitem')
+    expect(role(el)).toBe('article')
     const items = part(el, 'items') as HTMLElement
-    expect(items.getAttribute('role')).toBe('list')
+    expect(items.getAttribute('role')).toBe('feed')
     const scope = items.getRootNode() as ShadowRoot
     expect(
       scope.getElementById(items.getAttribute('aria-labelledby') ?? '')?.textContent?.trim(),

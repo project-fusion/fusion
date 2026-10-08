@@ -42,7 +42,7 @@ describe('notification server output', () => {
       'helix-headless-notification',
     )
     expect(served).toMatch(
-      /<div\s+part="item"\s+role="group"\s+aria-labelledby="label"\s+tabindex="0"/su,
+      /<div\s+part="item"\s+role="article"\s+aria-labelledby="label"\s+(?:<!--[^>]*-->\s*)*tabindex="0"/su,
     )
   })
 

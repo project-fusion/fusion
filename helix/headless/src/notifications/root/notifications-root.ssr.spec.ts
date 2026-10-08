@@ -55,7 +55,7 @@ describe('notifications server output', () => {
   })
 
   test('the region and the list are both served', () => {
-    expect(partTag(markup, 'list')).toContain('role="list"')
+    expect(partTag(markup, 'list')).toContain('role="feed"')
   })
 
   test('the rows are projected rather than drawn from data, which is what markup children buy', () => {

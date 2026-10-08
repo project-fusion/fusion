@@ -45,7 +45,7 @@ describe('the list', () => {
   test('the host is a named region holding a list', async () => {
     const element = await feed()
     expect(role(element)).toBe('region')
-    expect(part(element, 'list')?.getAttribute('role')).toBe('list')
+    expect(part(element, 'list')?.getAttribute('role')).toBe('feed')
   })
 
   test('the items declared as children are the list', async () => {
@@ -629,10 +629,10 @@ describe('moving through the feed with the keys', () => {
     expect(rows.map((row) => box(row).getAttribute('tabindex'))).toEqual(['0', '-1', '-1'])
   })
 
-  test('each row is a group named by its label, which says it is unread', async () => {
+  test('each row is an article named by its label, which says it is unread', async () => {
     const [row] = await settled(await feed())
     const item = box(row as Row)
-    expect(item.getAttribute('role')).toBe('group')
+    expect(item.getAttribute('role')).toBe('article')
     const label = item.querySelector(`#${item.getAttribute('aria-labelledby')}`)
     expect(label?.getAttribute('part')).toBe('label')
   })
@@ -682,12 +682,9 @@ describe('moving through the feed with the keys', () => {
         <helix-headless-notification>One</helix-headless-notification>
         <helix-headless-notification>Two</helix-headless-notification>
       </helix-headless-notifications>`)
-    const rows = (await settled(element)) as unknown as Array<Row & { internals: ElementInternals }>
-    const internals = rows.map(
-      (row) => (row as unknown as { internals: ElementInternals }).internals,
-    )
-    expect(internals.map((one) => one.ariaPosInSet)).toEqual(['1', '2'])
-    expect(internals.map((one) => one.ariaSetSize)).toEqual(['40', '40'])
+    const rows = await settled(element)
+    expect(rows.map((row) => box(row).getAttribute('aria-posinset'))).toEqual(['1', '2'])
+    expect(rows.map((row) => box(row).getAttribute('aria-setsize'))).toEqual(['40', '40'])
   })
 
   test('with a total, a row inside a group says its place among all the rows', async () => {
@@ -700,18 +697,12 @@ describe('moving through the feed with the keys', () => {
         </helix-headless-notification-group>
       </helix-headless-notifications>`)
     const rows = await settled(element)
-    const internals = rows.map(
-      (row) => (row as unknown as { internals: ElementInternals }).internals,
-    )
-    expect(internals.map((one) => one.ariaPosInSet)).toEqual(['1', '2', '3'])
+    expect(rows.map((row) => box(row).getAttribute('aria-posinset'))).toEqual(['1', '2', '3'])
   })
 
   test('without one, the browser counts and nothing is written', async () => {
     const rows = await settled(await feed())
-    const internals = rows.map(
-      (row) => (row as unknown as { internals: ElementInternals }).internals,
-    )
-    expect(internals.map((one) => one.ariaSetSize ?? null)).toEqual([null, null, null])
+    expect(rows.map((row) => box(row).getAttribute('aria-setsize'))).toEqual([null, null, null])
   })
 })
 

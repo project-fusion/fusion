@@ -41,8 +41,9 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
  * the items and written to an attribute, so a stylesheet and a badge can both
  * use it without counting.
  *
- * **The feed is one `Tab` stop for its rows.** Each row takes focus itself and
- * is read by its label. `ArrowDown` and `ArrowUp` move to the next and the
+ * **The feed is one `Tab` stop for its rows.** It is an APG feed: the list is
+ * a `feed`, busy while `loading` is set, and each row is an `article` that
+ * takes focus itself and is read by its label. `ArrowDown` and `ArrowUp` move to the next and the
  * previous row, `Home` and `End` to the first and the last, and `PageDown` and
  * `PageUp` move a row on or back from anywhere inside one, as in the APG feed
  * pattern. The controls inside a row stay in the `Tab` order. Set `total` when
@@ -97,7 +98,7 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
  * @csspart error - Shown while `load-error` is set, under any rows there are, in place of the empty and loading lines.
  * @csspart footer - The region below the list.
  * @csspart header - The region above the list.
- * @csspart list - The list itself.
+ * @csspart list - The list itself, a `feed` whose rows are its articles.
  * @csspart live - A copy of the empty, loading and error messages, in a live region that screen readers announce when they change. Visually hidden in the styled tier.
  * @csspart loading - Shown while the feed is loading.
  * @csspart mark-all - The control that marks everything read.
@@ -697,7 +698,7 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
       </div>
       <div
         part="list"
-        role="list"
+        role="feed"
         aria-busy=${this.loading ? 'true' : nothing}
         aria-label=${this.label || nothing}
       >
