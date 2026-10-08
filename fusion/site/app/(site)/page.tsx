@@ -10,6 +10,7 @@ import { ProofBand } from '@/components/proof-band/proof-band'
 import { SectionTitle } from '@/components/section-title/section-title'
 import { Showcase } from '@/components/showcase/showcase'
 import { ThemeScope } from '@/components/theme-context/theme-context'
+import { ThemeFab } from '@/components/theme-fab/theme-fab'
 import { INSIGHTS } from '@/content/insights'
 import {
   DELIVERY,
@@ -40,14 +41,14 @@ export default function Home() {
 
   return (
     <ThemeScope>
-      <div className={`${styles.reel} ${styles.noRules}`}>
+      <div className={`${styles.reel} ${styles.fabClearance} ${styles.noRules}`}>
         {/* **One strand down the whole page, behind everything.** It bends
-            through the hero between the claim and the card, runs down the
+            through the hero beside the claim, runs down the
             margin behind the sections, and sweeps across above the numbers
             and above the close. Scrolling travels along it. Strands is a Helix
             component, so the light behind the page is the product too. */}
         <helix-strands class={styles.reelStrands} travel>
-          <helix-strands-stop at={0.5} for="hero" variant="bend"></helix-strands-stop>
+          <helix-strands-stop at={0.86} for="hero" variant="bend"></helix-strands-stop>
           <helix-strands-stop for="proof" variant="waves"></helix-strands-stop>
           <helix-strands-stop for="close" variant="waves"></helix-strands-stop>
         </helix-strands>
@@ -265,6 +266,8 @@ export default function Home() {
             </a>
           </helix-flex>
         </section>
+
+        <ThemeFab />
       </div>
     </ThemeScope>
   )

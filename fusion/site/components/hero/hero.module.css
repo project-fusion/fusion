@@ -41,24 +41,9 @@
  * over a field of moving light, and a claim pushed to one edge leaves the other
  * two thirds of the field looking like space nobody used.
  */
-/* The claim and the theme card side by side, stacked below 64rem. */
-.heroSplit {
-  align-items: center;
-  display: grid;
-  gap: var(--helix-space-2xl);
-  grid-template-columns: minmax(0, 1fr);
-  position: relative;
-}
-
-@media (min-width: 64rem) {
-  .heroSplit {
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-  }
-}
-
 .heroShell {
-  min-inline-size: 0;
   position: relative;
+  text-align: center;
 }
 
 /* **`max-content` around `stretch`, so the buttons name the width.**
@@ -251,7 +236,7 @@
   /* Fluid between two rungs of the ramp rather than between two numbers
      nobody chose. `helix component`'s `tokens` was right to flag the originals: a page that
      invents its own sizes is how a scale stops being one. */
-  font-size: clamp(var(--helix-text-3xl), 4.4vw, calc(var(--helix-text-3xl) * 1.45));
+  font-size: clamp(var(--helix-text-3xl), 5.6vw, calc(var(--helix-text-3xl) * 1.6));
   font-weight: var(--helix-weight-semibold);
   letter-spacing: -0.028em;
   line-height: 1.02;
