@@ -27,7 +27,7 @@
     "check:spec:diagnostics": "turbo run @fusion.dev/helix#analyze @fusion.dev/helix-headless#analyze frame && bun fusion/scripts/check-diagnostics.mjs",
     "check:spec:dsd": "turbo run frame && bun fusion/scripts/check-dsd.mjs",
     "check:spec:floors": "bun fusion/scripts/check-floors.mjs",
-    "check:spec:visual": "turbo run frame && bun fusion/scripts/check-visual.mjs",
+    "check:spec:visual": "turbo run frame && bun proof/cli/npm/bin.mjs test",
     "check:spec:visual-parity": "turbo run frame && bun fusion/scripts/check-visual-parity.mjs",
     "check:withheld": "bun fusion/scripts/check-withheld.mjs",
     "clean": "rm -rf node_modules target .turbo && find cortex fusion helix proof -type d \\( -name dist -o -name node_modules -o -name .next -o -name .next-dev -o -name .turbo -o -name .tsbuild \\) -prune -exec rm -rf {} +",
@@ -67,7 +67,7 @@
     "trust": "bun fusion/scripts/trust.mjs",
     "typecheck": "turbo run typecheck",
     "verify": "biome ci . && turbo run token-layer -- --check && bun run typecheck && bun run analyze && bun run check:cli && turbo run docs-check && turbo run samples -- --check && bun run check:gen:eval && turbo run content -- --check && turbo run catalog && turbo run routes-check && turbo run register -- --check && bun run check:gen:metrics && bun run check:css:seeds && turbo run wasm-check && bun run check:prose && bun run check:withheld && turbo run themed-page-check && bun run check:gen:element-events && bun run fusion spec check && bun run check:spec:floors && bun run test && bun run rs:check && bun run rs:test",
-    "visual:update": "turbo run frame && bun fusion/scripts/check-visual.mjs --update",
+    "visual:update": "turbo run frame && bun proof/cli/npm/bin.mjs update",
     "watch": "turbo watch frame catalog --filter=@fusion.dev/site"
   },
   "devDependencies": {

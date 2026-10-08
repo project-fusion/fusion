@@ -3,8 +3,10 @@
 # **A baseline is a Linux artifact and development is darwin.** No headless
 # example sets `font-family`, so the font stack, rasterizer and antialiasing all
 # differ and a baseline taken on a Mac fails on `ubuntu-latest` at nearly every
-# glyph. `check:spec:visual` refuses to compare across platforms rather than
-# widening a threshold until real faults fit under it.
+# glyph. Fusion Proof, which `check:spec:visual` runs, refuses to compare across
+# platforms rather than widening a threshold until real faults fit under it, and
+# records the environment the baselines were taken in beside them, in
+# `proof.fingerprint.json`.
 #
 # **`workflow_dispatch`, never a trigger.** A baseline that refreshes itself on
 # push agrees with whatever just landed and reports success forever. A person
@@ -58,11 +60,18 @@ jobs:
       - name: Build
         run: bun run build
 
+      # **The browser and its system packages as `verify` installs them**, from
+      # the same cache. The packages carry the fonts, and the fingerprint holds
+      # the fonts, so a retake installed another way would record an
+      # environment the browser jobs do not run in.
       - name: Install Chromium
-        run: bunx playwright install --with-deps chromium
+        uses: ./.github/actions/browser
 
-      # A blank input retakes every picture in both tiers. A family present in
-      # one tier only is retaken there and reported.
+      - name: Put the proof binary on disk
+        uses: ./.github/actions/proof
+
+      # A blank input retakes every picture in both tiers and writes the
+      # fingerprint. A family present in one tier only is retaken there.
       - name: Retake the baselines
         run: bun run visual:update ${{ inputs.family }}
 
@@ -105,6 +114,8 @@ jobs:
             is the platform check:spec:visual compares on. Look at the diff images
             before approving: a baseline is what every future run is judged
             against, so an unreviewed one turns a regression into the new truth.
+            A change to proof.fingerprint.json is a change to the environment
+            the baselines are compared in.
           body: |
             Taken by the `Visual baselines` workflow.
 

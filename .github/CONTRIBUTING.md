@@ -71,9 +71,9 @@ which keyboard was used rather than who decided anything.
 
 One change per pull request. `verify` has to pass. If your change is visual,
 `bun run visual:update` on Linux takes the new baselines and the review is the
-diff on them. Baselines taken on macOS or Windows fail in CI. If you do not work
-on Linux, say so in the pull request, and a maintainer retakes them with the
-Visual baselines workflow.
+diff on them. On macOS or Windows it takes none and says so, because a baseline
+taken there fails in CI. If you do not work on Linux, say so in the pull
+request, and a maintainer retakes them with the Visual baselines workflow.
 
 We would rather read a small pull request that does one thing than a large one
 that does four, and we will say so rather than merging it out of politeness.

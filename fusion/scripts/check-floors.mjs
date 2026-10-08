@@ -106,7 +106,7 @@ const EXEMPT = [
   'fusion/scripts/check-contrast.mjs',
   'fusion/scripts/check-diagnostics.mjs',
   'fusion/scripts/check-dsd.mjs',
-  'fusion/scripts/check-visual.mjs',
+  'proof/cli/npm/bin.mjs test',
   'fusion/scripts/check-visual-parity.mjs',
   /* The three that compare a committed file against a fresh derivation of the
      whole corpus. What guards a generator is that its output is committed and
