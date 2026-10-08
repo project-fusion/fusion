@@ -164,6 +164,11 @@ const ROWS = ':scope > [data-index], :scope > [data-section] > [data-index]'
  * commas. Their rows carry `aria-disabled`, the keys and typing pass over
  * them, and a press, Space, or Control with A does not select them.
  *
+ * **Rows a stylesheet can tell apart.** A chosen row carries `data-selected`,
+ * a disabled one `data-disabled`, as React Aria's rows do, and the row the
+ * keys are on, which holds the tab stop, `data-active`, whether or not the
+ * list has focus.
+ *
  * **Loading more.** `helix-range-change` fires as the items on screen change,
  * and `range` holds them. `helix-load-more` fires once a reader is within one
  * screen of the end, once for each length of the set: add to `items` and it can
@@ -1223,6 +1228,9 @@ export class HelixHeadlessVirtualList extends HelixElement {
    * `option` with `aria-selected` there, and `listitem` otherwise, and
    * `aria-disabled` on an item `disabled-keys` names. Every pass,
    * since a choice changes no row's content.
+   *
+   * `data-selected` and `data-disabled` say the same to a stylesheet, as
+   * React Aria's rows do, so one rule reads the same in either kind of list.
    */
   private mark(
     element: Element,
@@ -1231,16 +1239,20 @@ export class HelixHeadlessVirtualList extends HelixElement {
     off: ReadonlySet<string>,
   ): void {
     element.setAttribute('role', this.selectionMode ? 'option' : 'listitem')
+    const selected = Boolean(this.selectionMode) && chosen.has(this.keyAt(at))
     if (this.selectionMode) {
-      element.setAttribute('aria-selected', String(chosen.has(this.keyAt(at))))
+      element.setAttribute('aria-selected', String(selected))
     } else {
       element.removeAttribute('aria-selected')
     }
-    if (off.size > 0 && off.has(this.keyAt(at))) {
+    element.toggleAttribute('data-selected', selected)
+    const disabled = off.size > 0 && off.has(this.keyAt(at))
+    if (disabled) {
       element.setAttribute('aria-disabled', 'true')
     } else {
       element.removeAttribute('aria-disabled')
     }
+    element.toggleAttribute('data-disabled', disabled)
   }
 
   /** Writes a row's place in the set. */
@@ -1411,6 +1423,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
       }
       const stop = at === this.active
       group[0]?.setAttribute('tabindex', stop ? '0' : '-1')
+      group[0]?.toggleAttribute('data-active', stop)
       if (stop && (fresh.has(at) || this.released !== at)) {
         releaseControls(group)
       } else if (!stop && (fresh.has(at) || this.released === at)) {
