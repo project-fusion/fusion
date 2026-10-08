@@ -187,7 +187,9 @@ void main() {
   gl_Position = vec4(px.x / res.x * 2.0 - 1.0, 1.0 - px.y / res.y * 2.0, 0.0, 1.0);
   gl_PointSize = mix(1.2, 3.4, r2 * r2) * uDpr;
   float tw = 0.35 + 0.65 * (0.5 + 0.5 * sin(uTime * (0.5 + 1.8 * r) + r2 * 40.0));
-  vColor = mix(uGlow, uPeak, 0.55) * tw * mix(0.2, 0.9, r) * info.x * 0.8;
+  /* By the root of the ribbon's brightness, so specks show along a dim ribbon
+     as well as round a bright bend. */
+  vColor = mix(uGlow, uPeak, 0.55) * tw * mix(0.2, 0.9, r) * sqrt(info.x) * 0.8;
 }
 `
 

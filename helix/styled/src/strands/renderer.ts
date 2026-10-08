@@ -19,8 +19,11 @@ export const MIN_STRANDS = 60
 /** Segments along each strand, across whatever stretch of the path is on screen. */
 const SEGMENTS = 320
 
-/** Specks of dust around the strands. */
-const DUST = 600
+/** Specks of dust around the strands at a `dust` of `1`. */
+export const DUST = 600
+
+/** The most specks a frame draws, at a `dust` of `4`. */
+export const MAX_DUST = DUST * 4
 
 /*
  * What a multiplier of `1` draws. `spread`, `bloom`, and `gain` each scale
@@ -46,6 +49,8 @@ export interface StrandsFrame {
   count: number
   /** How much nearness shows, from `0`, flat, to `1`. */
   depth: number
+  /** How many specks of dust drift around the strands. */
+  dust: number
   /** How differently each strand moves, from `0`, as one, to `1`. */
   drift: number
   /** The device pixels per CSS pixel the buffer was sized at. */
@@ -219,7 +224,9 @@ export class StrandsRenderer {
       this.vec3(this.dust, 'uPeak', palette.peak)
       this.float(this.dust, 'uStrands', frame.strands)
       gl.bindVertexArray(this.empty)
-      gl.drawArrays(gl.POINTS, 0, DUST)
+      if (frame.dust > 0) {
+        gl.drawArrays(gl.POINTS, 0, frame.dust)
+      }
       gl.disable(gl.BLEND)
     }
 
