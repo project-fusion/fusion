@@ -2,6 +2,7 @@ import type { ReactiveController, ReactiveControllerHost } from 'lit'
 import { endInSight } from '../../utils/load-more/load-more.js'
 import { reportRuntime } from '../../utils/report-runtime/report-runtime.js'
 import { Heights } from './heights.js'
+import type { Waterfall } from './waterfall.js'
 
 /** What the controller needs of a set and the box it is shown in. */
 export interface VirtualizeOptions {
@@ -79,6 +80,16 @@ export interface VirtualizeOptions {
    * scroll offset during a fling.
    */
   anchor?: () => boolean
+  /**
+   * Lays the items out down several columns, each item under the column that
+   * ends highest, as a wall of photos is: a `Waterfall`, whose `lanes` says how
+   * many columns. The window is then every item that reaches into the box, in
+   * the order of the set, and a host draws each item at its column,
+   * `waterfall.lane(index)`, and at `offsetOf(index)` down the set, which
+   * `extent()` is the length of. Items are placed by measurement, so a host
+   * supplies `rows`. None by default.
+   */
+  waterfall?: () => Waterfall | undefined
 }
 
 /** A row that has been drawn, and which item of the set it drew. */
@@ -530,17 +541,21 @@ export class VirtualizeController implements ReactiveController {
       return
     }
     const overscan = this.options.overscan ?? 4
-    let next = this.measuring()
-      ? this.placed(box, total, overscan)
-      : this.uniform(box, total, size, overscan)
+    const choose = (): Window => {
+      const lanes = this.laned(total)
+      return lanes
+        ? this.inLanes(box, total, overscan, lanes)
+        : this.measuring()
+          ? this.placed(box, total, overscan)
+          : this.uniform(box, total, size, overscan)
+    }
+    let next = choose()
     /* The spacer cannot carry a negative drift past zero, and a positive one
        at the start of the set would leave room above the first row. Squared
        now, during the scroll, which is the one write this cannot put off. */
     if (this.drift !== 0 && (next.before < 0 || next.first === 0)) {
       this.square()
-      next = this.measuring()
-        ? this.placed(box, total, overscan)
-        : this.uniform(box, total, size, overscan)
+      next = choose()
     }
     /* The host's own numbers changing is an outside cause, the same as a scroll
        or a resize: a set that grew is not this controller chasing itself. */
@@ -656,7 +671,44 @@ export class VirtualizeController implements ReactiveController {
 
   /** Whether this pass places by measurement: offered, and wanted or needed. */
   private measuring(): boolean {
-    return this.options.rows !== undefined && (this.uneven || (this.options.measured?.() ?? true))
+    return (
+      this.options.rows !== undefined &&
+      (this.uneven ||
+        this.options.waterfall?.() !== undefined ||
+        (this.options.measured?.() ?? true))
+    )
+  }
+
+  /** The waterfall the host lays its items out in, placed by the heights known now. */
+  private laned(total: number): Waterfall | undefined {
+    const lanes = this.options.rows ? this.options.waterfall?.() : undefined
+    lanes?.place(total, (index) => this.heights.at(index), this.heights.stamp())
+    return lanes
+  }
+
+  /** Where item `index` starts down the set, before any drift: in its column, or after the items before it. */
+  private startOf(index: number, total: number): number {
+    return this.laned(total)?.start(index) ?? this.heights.before(index, total)
+  }
+
+  /**
+   * The waterfall's window: from the first item that reaches into the box to
+   * the last that starts in it, each widened by the overscan's lines of
+   * items. The drift is carried as `before`, where a host draws it as the
+   * room above every item.
+   */
+  private inLanes(box: HTMLElement, total: number, overscan: number, lanes: Waterfall): Window {
+    const top = this.offset(box)
+    const lead = this.lead(box)
+    const more = overscan * lanes.lanes
+    const first = Math.max(0, lanes.from(this.heading < 0 ? top - lead : top) - more)
+    const bottom = top + this.span(box) + (this.heading > 0 ? lead : 0)
+    return {
+      after: 0,
+      before: this.drift,
+      first: Math.min(first, total),
+      last: Math.min(total, lanes.to(bottom) + more),
+    }
   }
 
   /**
@@ -702,6 +754,11 @@ export class VirtualizeController implements ReactiveController {
     }
     const top = Math.max(0, this.offset(box))
     const bottom = top + this.span(box)
+    const lanes = this.laned(total)
+    if (lanes) {
+      const first = Math.min(lanes.from(top), total)
+      return { first, last: Math.max(first, Math.min(total, lanes.to(bottom))) }
+    }
     if (!this.measuring()) {
       const size = this.line()
       const first = Math.min(Math.floor(top / size), total)
@@ -724,12 +781,22 @@ export class VirtualizeController implements ReactiveController {
    */
   remaining(): number {
     const box = this.options.container()
-    const total = Math.max(0, this.options.count())
     if (!box) {
       return 0
     }
-    const length = this.measuring() ? this.heights.total(total) : total * this.line()
-    return Math.max(0, length - Math.max(0, this.offset(box)) - this.span(box))
+    return Math.max(0, this.extent() - Math.max(0, this.offset(box)) - this.span(box))
+  }
+
+  /**
+   * How long the whole set is along the scroll axis, in pixels: what was
+   * measured and estimated, or where the longest column of a waterfall ends.
+   */
+  extent(): number {
+    const total = Math.max(0, this.options.count())
+    return (
+      this.laned(total)?.length() ??
+      (this.measuring() ? this.heights.total(total) : total * this.line())
+    )
   }
 
   /**
@@ -845,8 +912,8 @@ export class VirtualizeController implements ReactiveController {
     const box = this.options.container()
     const from = box ? this.noteClamp(box) : this.lastTop
     const top = box ? this.offset(box) : 0
-    const anchor = this.target ?? this.heights.indexAt(top, total)
-    const was = this.heights.before(anchor, total)
+    const anchor = this.target ?? this.laned(total)?.from(top) ?? this.heights.indexAt(top, total)
+    const was = this.startOf(anchor, total)
     let news = false
     for (const { element, index } of rows) {
       if (this.heights.record(index, this.length(element) + this.gap())) {
@@ -859,7 +926,7 @@ export class VirtualizeController implements ReactiveController {
     /* An outside cause, on the same terms as a resize: the set told this
        something it did not know. Bounded, per the note above. */
     this.settling = 0
-    const moved = this.heights.before(anchor, total) - was
+    const moved = this.startOf(anchor, total) - was
     if (box && top > 0 && moved !== 0 && (this.options.anchor?.() ?? true)) {
       if (this.scrolling()) {
         this.drift -= moved
@@ -868,6 +935,11 @@ export class VirtualizeController implements ReactiveController {
            moved by part of the same difference. */
         this.scrollBox(box, from + moved)
       }
+    }
+    /* In a waterfall an item measured anywhere can move the items under it
+       without moving the window, so the host draws them where they are now. */
+    if (this.laned(total)) {
+      this.host.requestUpdate()
     }
     this.measure()
   }
@@ -890,7 +962,7 @@ export class VirtualizeController implements ReactiveController {
     }
     const count = Math.max(0, this.options.count())
     this.heights.shift(by)
-    const room = this.heights.before(by, count)
+    const room = this.startOf(by, count)
     this.window = {
       ...this.window,
       before: this.window.before + room,
@@ -966,7 +1038,7 @@ export class VirtualizeController implements ReactiveController {
   offsetOf(index: number): number {
     const total = Math.max(0, this.options.count())
     return this.measuring()
-      ? this.heights.before(index, total) + this.drift
+      ? this.startOf(index, total) + this.drift
       : Math.max(0, Math.min(index, total)) * this.line()
   }
 
