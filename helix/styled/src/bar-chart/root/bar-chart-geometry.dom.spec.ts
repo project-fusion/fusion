@@ -108,6 +108,71 @@ if (hasLayout()) {
   })
 
   /**
+   * Which edge of a column `outlined` and `subtle` leave open, from the clip's
+   * inset: the one side taken in by half the stroke.
+   *
+   * **The edge on the baseline, whichever way the column grows.** A column
+   * below zero left open its far end and drew its edge along the baseline,
+   * because the inset took the bottom whatever the sign.
+   */
+  describe('bar chart edges', () => {
+    const SIDES = ['top', 'right', 'bottom', 'left']
+    const open = (one: Element): string => {
+      const inset = /inset\(([^)]*?)(?: round .*)?\)$/.exec(getComputedStyle(one).clipPath)?.[1]
+      const [a = '0px', b = a, c = a, d = b] = inset?.trim().split(/\s+/) ?? []
+      const taken = [a, b, c, d].flatMap((side, at) =>
+        Number.parseFloat(side) > 0 ? [SIDES[at]] : [],
+      )
+      return taken.join(' ') || 'none'
+    }
+    const edges = async (table: string, attributes: string): Promise<string[]> => {
+      const host = await chart(table, attributes)
+      return [...(host.shadowRoot?.querySelectorAll('[part~="bar"]') ?? [])].map(open)
+    }
+    const SIGNS = `<table id="signs">
+      <thead><tr><th>Quarter</th><th>Net</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Q1</th><td data-value="3">3</td></tr>
+        <tr><th scope="row">Q2</th><td data-value="-4">-4</td></tr>
+      </tbody>
+    </table>`
+    const STACK = `<table id="stack">
+      <thead><tr><th>Quarter</th><th>A</th><th>B</th><th>C</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Q1</th><td>3</td><td>-2</td><td>-1</td></tr>
+        <tr><th scope="row">Q2</th><td>2</td><td>1</td><td>-3</td></tr>
+      </tbody>
+    </table>`
+
+    test('a column above zero leaves open its bottom, and one below its top', async () => {
+      for (const emphasis of ['outlined', 'subtle']) {
+        expect(await edges(SIGNS, `for="signs" emphasis="${emphasis}"`)).toEqual(['bottom', 'top'])
+      }
+    })
+
+    test('a bar right of zero leaves open its left, and one left of it its right', async () => {
+      expect(
+        await edges(SIGNS, 'for="signs" emphasis="outlined" orientation="horizontal"'),
+      ).toEqual(['left', 'right'])
+    })
+
+    test('each segment of a stack leaves open the edge nearer zero, so every join is drawn once', async () => {
+      expect(await edges(STACK, 'for="stack" emphasis="outlined" stacked')).toEqual([
+        'bottom',
+        'top',
+        'top',
+        'bottom',
+        'bottom',
+        'top',
+      ])
+    })
+
+    test('a filled column leaves nothing open', async () => {
+      expect(await edges(SIGNS, 'for="signs"')).toEqual(['none', 'none'])
+    })
+  })
+
+  /**
    * Which end the first category is drawn at, and whether everything read
    * against the drawing agrees.
    *

@@ -86,6 +86,24 @@
   --_bar-chart-corners: var(--bar-chart-bar-radius, 2px) 0 0 var(--bar-chart-bar-radius, 2px);
 }
 
+/*
+ *  Below zero, the base is the top edge.
+ *
+ * `outlined` and `subtle` leave open the edge on the baseline, which
+ * `--_bar-chart-base` names. Below zero that edge is the top, or the right
+ * when the bars run across. The headless tier names every bar below zero
+ * `bar-negative`, each segment of a stack included, so each segment leaves
+ * open its edge nearer zero and draws its far one, and the line between two
+ * segments is drawn once.
+ */
+[part~="bar-negative"] {
+  --_bar-chart-base: calc(var(--bar-chart-bar-stroke, var(--helix-border-thick)) / 2) 0 0 0;
+}
+
+:host([orientation="horizontal"]) [part~="bar-negative"] {
+  --_bar-chart-base: 0 calc(var(--bar-chart-bar-stroke, var(--helix-border-thick)) / 2) 0 0;
+}
+
 [part="labels"] {
   display: grid;
   grid-auto-columns: 1fr;

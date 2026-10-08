@@ -117,6 +117,7 @@ const toned = (tone: string | undefined): string | undefined =>
  * @csspart bar - One column. Under `stacked`, one segment of a category's column.
  * @csspart bar-end - The bar at a column's far end, the end away from zero, which is the end to round. A column standing alone is its own far end. Under `stacked`, the last positive segment above zero and the last negative one below it. Its `data-end` is `positive` or `negative`. A blank or a zero is never the end. Set together with `bar`.
  * @csspart bar-end-negative - A far end below zero, whose far end is its bottom, or its inline start when the bars run across. Set together with `bar-end`.
+ * @csspart bar-negative - A bar below zero, standing alone or any segment of a stack below it, whose base is its top, or its inline end when the bars run across. Set together with `bar`.
  * @csspart bar-wash-end - The far stop of a bar's gradient, where one is used.
  * @csspart bar-wash-start - The stop of a bar's gradient at its base.
  * @csspart baseline - The line the columns stand on.
@@ -596,8 +597,10 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
         ? `--chart-series: var(--bar-chart-tone-${ink}, var(--chart-series-${seriesIndex(tone)})); --chart-bar-wash: url(#helix-bar-wash-tone-${ink})`
         : `--chart-series: var(--chart-series-${seriesIndex(tone)}); --chart-bar-wash: url(#helix-bar-wash-${seriesIndex(tone)})`
       /* Compared out here, because every quoted word inside a part's
-         interpolation is read as a name the element can carry. */
+         interpolation is read as a name the element can carry. A segment
+         grows down from where it starts, or from zero when it stands alone. */
       const below = end === 'negative'
+      const sinks = value < (from ?? 0)
       return sideways
         ? svg`<rect
             data-end=${end ?? nothing}
@@ -605,7 +608,7 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
             data-tone=${ink ?? nothing}
             height=${thickness}
             style=${paint}
-            part="bar${end ? ' bar-end' : ''}${below ? ' bar-end-negative' : ''}"
+            part="bar${sinks ? ' bar-negative' : ''}${end ? ' bar-end' : ''}${below ? ' bar-end-negative' : ''}"
             width=${size}
             x=${along}
             y=${across}
@@ -616,7 +619,7 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
             data-tone=${ink ?? nothing}
             height=${size}
             style=${paint}
-            part="bar${end ? ' bar-end' : ''}${below ? ' bar-end-negative' : ''}"
+            part="bar${sinks ? ' bar-negative' : ''}${end ? ' bar-end' : ''}${below ? ' bar-end-negative' : ''}"
             width=${thickness}
             x=${across}
             y=${along}
