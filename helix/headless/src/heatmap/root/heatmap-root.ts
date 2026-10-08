@@ -111,6 +111,7 @@ import { fits, monthPage, overviewOf, type Reading, toneOf } from './buckets.js'
  * @csspart start - The leading slot's box.
  * @csspart strip - The grid of cells, which takes focus to be read by key. It is named by the host's `aria-labelledby` or `aria-label`, then by `label`, then by the caption of the table.
  * @csspart summary - The middle slot's box.
+ * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`. Hide it visually.
  * @csspart tooltip - The bubble, forwarded from `Tooltip`.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
  * @csspart tooltip-arrow - The bubble's point, forwarded from `Tooltip`.
@@ -753,7 +754,7 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
         this.status.spoken
           ? html`<span part="selection" role="status">${this.status.said}</span>`
           : nothing
-      }`
+      }${this.renderTable()}`
   }
 
   /**
