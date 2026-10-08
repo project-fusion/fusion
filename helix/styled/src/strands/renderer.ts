@@ -1,4 +1,5 @@
 import type { StrandsPalette } from './palette.js'
+import { SPREAD } from './path.js'
 import {
   BLUR_FRAGMENT,
   COMPOSITE_FRAGMENT,
@@ -29,9 +30,6 @@ export const MAX_DUST = DUST * 4
  * What a multiplier of `1` draws. `spread`, `bloom`, and `gain` each scale
  * these, so a page that asks for twice the default asks for `2`.
  */
-
-/** The ribbon's width over each form's own, which the path keeps in shares of the width. */
-const SPREAD = 1.35
 
 /** How much the two levels of glow add over the strands themselves. */
 const BLOOM = 0.75

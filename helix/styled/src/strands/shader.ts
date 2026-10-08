@@ -113,7 +113,14 @@ vec3 strandAt(float id, float t, out vec3 info) {
   float ct = cos(th);
   float st = sin(th);
   float depth = clamp((z * 0.55 * ct - n * st) / 1.15, -1.0, 1.0);
-  float lat = sway + breadth * (n * ct + z * 0.55 * st) * (1.0 + uDepth * 0.35 * depth);
+  /* **No strand sits further out than the path allows for.** The path keeps
+     every turn wider than 1.3 breadths, the reach \`path.ts\` lays it by, and a
+     few strands, at the edge of the cross-section and near in depth, reached
+     past that and hooked in a turn. A soft limit leaves the strands near the
+     axis where they are and eases the far ones in toward 1.3 breadths. */
+  float limit = breadth * 1.3 + 1.0;
+  float across = breadth * (n * ct + z * 0.55 * st) * (1.0 + uDepth * 0.35 * depth);
+  float lat = sway + limit * tanh(across / limit);
   lat += sin(along * 0.006 * (1.0 + uDrift * (r9 - 0.5) * 0.3) + uTime * (0.6 + 0.5 * r1) * pace
     + r1 * 6.283) * 12.0 * (0.3 + r3) * (1.0 + uDrift * 0.5);
   /* **No strand crosses the center of the turn it is on.** A strand is the
@@ -125,15 +132,23 @@ vec3 strandAt(float id, float t, out vec3 info) {
      Offsets on the outside, and on a straight run, are left as they are. */
   /* **Smooth, or it kinks every strand.** The spline's own curvature jumps at
      each point, so the turn is read across a whole segment, which averages the
-     jump away. The squeeze eases in as a soft maximum of zero and the turn, so
-     there is no corner where a turn to one side becomes a turn to the other. */
+     jump away. The squeeze eases in as a soft maximum, so there is no corner
+     where it starts.
+
+     **A safety net, not the shape.** The path keeps every turn wider than
+     its strands reach, so a strand on the inside stays under 0.9 of the way
+     to the center and needs nothing. The squeeze waits until 0.6 of the way
+     and acts gently past it: squeezing from the first sign of a turn
+     compressed the inside strands wherever the curvature changed, and they
+     turned in an L where the ribbon swept round. */
   float reach = 0.5 / float(max(uCount - 1, 1));
   vec2 back = place(spline(t - reach));
   vec2 ahead = place(spline(t + reach));
   vec2 velocity = (ahead - back) * 0.5;
   float curve = dot(ahead - 2.0 * p + back, nr) / max(dot(velocity, velocity), 1e-2);
   float inward = curve * lat;
-  float squeeze = 0.5 * (inward + sqrt(inward * inward + 0.01));
+  float excess = inward - 0.6;
+  float squeeze = 0.5 * (excess + sqrt(excess * excess + 0.01));
   lat /= 1.0 + squeeze;
   info = vec3(max(c.w, 0.0), width, along);
   return vec3(p + nr * lat, depth);

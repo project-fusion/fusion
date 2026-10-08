@@ -209,9 +209,47 @@ const wave = (
   return points
 }
 
-/** How far a ribbon swings either side of its axis, as a share of the width. */
-const swingOf = (height: number, width: number, narrow: boolean): number =>
-  Math.min(narrow ? 0.26 : 0.3, (height * TURN) / width)
+/**
+ * The ribbon's width over each form's own at a `spread` of `1`, which the
+ * renderer multiplies in. Here so the path can know how far its strands reach.
+ */
+export const SPREAD = 1.35
+
+/**
+ * How far the strands reach either side of the centerline, as a multiple of
+ * the ribbon's breadth: the strand's place across the ribbon, its depth, and
+ * the breath of the ribbon's width together. A few strands reach further,
+ * and the shader eases those in a turn rather than folding them.
+ */
+const REACH = 1.3
+
+/** What the shader's sway and wave add to a strand's reach, in pixels. */
+const WOBBLE = 40
+
+/**
+ * How far a strand of a form this wide can sit from the centerline, in
+ * pixels, at the default spread.
+ */
+const reachOf = (wide: number, width: number): number => wide * SPREAD * width * REACH + WOBBLE
+
+/** How many screen heights the ribbon takes for one S, from one crest to the next. */
+const PERIOD = 1.7
+
+/**
+ * How far a ribbon swings either side of its axis, as a share of the width.
+ *
+ * **No crest turns tighter than the strands reach.** A strand is the
+ * centerline moved sideways, so on the inside of a turn whose radius is less
+ * than that move, it has nowhere to go but back over itself. The swing that
+ * keeps a crest's radius, `(PERIOD * height)^2 / (pi^2 * swing)`, above the
+ * reach of the ribbon's widest strands is the most it may take, and on a wide
+ * screen, where the ribbon is wider, it swings less.
+ */
+const swingOf = (height: number, width: number, narrow: boolean): number => {
+  const reach = reachOf((narrow ? 0.45 : WIDTH.ribbon) * 1.1, width)
+  const gentle = (PERIOD * height) ** 2 / (Math.PI ** 2 * reach * 1.15)
+  return Math.min(narrow ? 0.26 : 0.3, (height * TURN) / width, gentle / width)
+}
 
 /** How far apart a ribbon's points are, as a share of the height. */
 const RIBBON_STEP = 0.35
@@ -279,7 +317,7 @@ const ribbon = (
   const glow = narrow ? GLOW.ribbon * 0.65 : GLOW.ribbon
   let a = phase
   for (let y = from; y < to; y += step) {
-    a += (step / (1.7 * height)) * Math.PI
+    a += (step / (PERIOD * height)) * Math.PI
     points.push([at + swing * Math.sin(a), y, wide * (0.8 + 0.3 * Math.sin(a * 0.63 + 0.4)), glow])
   }
   return { phase: a, points }
@@ -318,6 +356,98 @@ export const boxPath = (
     ([x, y, w]): PathPoint => [x, y, w, narrow ? GLOW.ribbon * 0.65 * 1.4 : GLOW.ribbon * 1.4],
   )
   return [lead, ...body]
+}
+
+/**
+ * The tightest turn the drawn spline makes between two points where a reader
+ * can see it, lit and on the screen or near it, as the radius in pixels,
+ * sampled at eight places, and the reach of its strands there.
+ */
+const tightestIn = (
+  points: readonly PathPoint[],
+  i: number,
+  width: number,
+): { radius: number; reach: number } => {
+  const n = points.length
+  const at = (k: number, c: number): number => points[Math.max(0, Math.min(n - 1, k))]?.[c] ?? 0
+  const sample = (f: number): [number, number, number, number] => {
+    const along = (c: number): number =>
+      catmull(at(i - 1, c), at(i, c), at(i + 1, c), at(i + 2, c), f)
+    return [along(0) * width, along(1), along(2), along(3)]
+  }
+  let radius = Number.POSITIVE_INFINITY
+  let reach = 0
+  for (let k = 1; k < 8; k++) {
+    const [ax, ay] = sample((k - 0.5) / 8)
+    const [bx, by, wide, glow] = sample(k / 8)
+    const [cx, cy] = sample((k + 0.5) / 8)
+    /* An unlit turn, or one off the screen, is where the ribbon turns
+       round out of sight on purpose: off the edge between two waves. */
+    if (glow < 0.1 || bx < -0.1 * width || bx > 1.1 * width) {
+      continue
+    }
+    const area = Math.abs((bx - ax) * (cy - ay) - (by - ay) * (cx - ax)) / 2
+    const r =
+      area < 1e-6
+        ? Number.POSITIVE_INFINITY
+        : (Math.hypot(bx - ax, by - ay) *
+            Math.hypot(cx - bx, cy - by) *
+            Math.hypot(cx - ax, cy - ay)) /
+          (4 * area)
+    if (r < radius) {
+      radius = r
+      reach = reachOf(Math.max(0, wide), width)
+    }
+  }
+  return { radius, reach }
+}
+
+/**
+ * The path with every turn eased until it is wider than the strands on it
+ * reach.
+ *
+ * **One rule at every join, after the forms are laid down.** Each form keeps
+ * its own turns gentle, and each hand-over between two of them, a bend into
+ * the ribbon, the ribbon into a wave, a wave back into the ribbon, met in a
+ * turn its own arithmetic did not see: on a wide screen, where the ribbon is
+ * wider in pixels, a join a few hundred pixels round held strands that
+ * reached six hundred, and the inside ones folded. Measured on the drawn
+ * spline between each pair of points, since a curve through points a third of
+ * a screen apart turns far tighter between them than the points themselves
+ * say. Where a lit stretch turns tighter than its reach, or than a quarter of
+ * the screen's shorter side, its two ends move a quarter of the way across
+ * toward their neighbors, and the pass runs again until none does, or for
+ * eighty passes.
+ *
+ * Across only: a point keeps its place down the page, so a form keeps the
+ * section it was pinned to.
+ */
+const relax = (points: PathPoint[], width: number, height: number): PathPoint[] => {
+  const out = points.map((point): PathPoint => [...point])
+  const floor = 0.3 * Math.min(width, height)
+  const ease = (i: number): void => {
+    const a = out[i - 1]
+    const b = out[i]
+    const c = out[i + 1]
+    if (a && b && c) {
+      out[i] = [b[0] + ((a[0] + c[0]) / 2 - b[0]) / 4, b[1], b[2], b[3]]
+    }
+  }
+  for (let pass = 0; pass < 80; pass++) {
+    let eased = false
+    for (let i = 1; i < out.length - 2; i++) {
+      const { radius, reach } = tightestIn(out, i, width)
+      if (radius < Math.max(reach * 1.1, floor)) {
+        ease(i)
+        ease(i + 1)
+        eased = true
+      }
+    }
+    if (!eased) {
+      break
+    }
+  }
+  return out
 }
 
 /**
@@ -360,13 +490,16 @@ export const pagePath = (
 
   const points: PathPoint[] = [[0.6, -height * 0.9, WIDTH.ribbon, 0]]
   /* How far the ribbon's curve turns between two of its points. */
-  const turn = (RIBBON_STEP / 1.7) * Math.PI
+  const turn = (RIBBON_STEP / PERIOD) * Math.PI
   let phase = 1.2
   let cursor = 0
   let fromRight = true
   let previous: StrandsVariant | undefined
   /* Where the ribbon last laid down ended, which a wave then leans out of. */
   let joined: number | undefined
+  /* The axis the next stretch of ribbon swings about, which a bend sets so the
+     ribbon picks up where its arm leaves off. */
+  let axis = 0.5
 
   const gap = (to: number, next: StrandsVariant | undefined): void => {
     if (to - cursor < height * 0.7) {
@@ -379,7 +512,8 @@ export const pagePath = (
       return
     }
     const end = next === 'waves' ? to - height * 0.95 : to - height * 0.45
-    const stretch = ribbon(cursor + height * 0.2, end, height, 0.5, phase, narrow, width)
+    const stretch = ribbon(cursor + height * 0.2, end, height, axis, phase, narrow, width)
+    axis = 0.5
     phase = stretch.phase
     let run = stretch.points
     /* Before a wave, the ribbon ends at a crest, where it runs straight down,
@@ -424,23 +558,59 @@ export const pagePath = (
       const span = Math.min(stop.height, height)
       const at = stop.at ?? BEND_AT
       /* The ribbon takes over where its curve runs at the arm's slope, and
-         the two meet in even steps along that slope. On a phone the apex
-         sits at the right edge and the ribbon cannot run that way, so the
-         arm runs off the screen and the ribbon comes back in at its crest. */
+         the two meet in even steps along that slope. **Its axis moves to
+         meet the arm**, so wherever `at` puts the apex, the ribbon picks up
+         beside the arm's end and carries on the way it was heading: with the
+         axis held in the middle, an apex right of the ribbon's reach left the
+         ribbon to turn back across in a quarter of a screen, tighter than
+         the strands were wide. On a phone the apex sits at the right edge
+         and the ribbon cannot run that way, so the arm runs off the screen
+         and the ribbon comes back in at its crest. */
       const slope = BEND_EXIT / TURN
       const swing = swingOf(height, width, narrow)
-      const steepest = (swing * width * Math.PI) / (1.7 * height)
+      const steepest = (swing * width * Math.PI) / (PERIOD * height)
       const a = Math.acos(Math.min(1, slope / steepest))
-      const x = 0.5 + swing * Math.sin(a)
       const bent = bend(stop.top, span, at, narrow, width, narrow ? 0.6 : BEND_EXIT)
       const exit = bent.at(-1) as PathPoint
       points.push(...bent)
-      if (!narrow && x > exit[0]) {
-        const drop = Math.max(height * 0.3, ((x - exit[0]) * width) / slope)
-        const start: PathPoint = [x, exit[1] + drop, WIDTH.ribbon, GLOW.ribbon]
-        points.push(...bridge(exit, start, span * 0.15, height * RIBBON_STEP))
-        cursor = start[1] - height * 0.2
-        phase = a - turn
+      if (!narrow) {
+        /* **The ribbon's own curve starts at the arm's end**, where its slope
+           is the arm's, with its axis moved so the two meet: one line from
+           the arm into the ribbon, with no straight piece and no turn at the
+           join. Its first points are spaced as the bend's are and grow a
+           third a step to the ribbon's own spacing, because the spline is
+           uniform and bends hardest where the spacing jumps.
+
+           The axis may put a crest a little past the edge: strands partly
+           off the screen read as the ribbon passing by. Where it would have
+           to go further it stops there, and the curve starts as near the
+           arm's slope as that axis allows. A bridge dropped straight down
+           from the arm, or a ribbon started short of it, turned a corner
+           there tighter than the strands reach. */
+        axis = Math.min(1.08 - swing, Math.max(swing - 0.08, exit[0] - swing * Math.sin(a)))
+        let phaseAt = Math.asin(Math.max(-1, Math.min(1, (exit[0] - axis) / swing)))
+        phaseAt = Math.max(phaseAt, Math.min(a, Math.PI / 2))
+        let y = exit[1]
+        let spacing = span * 0.15
+        let k = 0
+        const steps = Math.ceil(Math.log((height * RIBBON_STEP) / spacing) / Math.log(1.33))
+        while (spacing < height * RIBBON_STEP) {
+          y += spacing
+          phaseAt += (spacing / (PERIOD * height)) * Math.PI
+          k += 1
+          const f = Math.min(1, k / Math.max(steps, 1))
+          points.push([
+            axis + swing * Math.sin(phaseAt),
+            y,
+            exit[2] + (WIDTH.ribbon - exit[2]) * f,
+            exit[3] + (GLOW.ribbon - exit[3]) * f,
+          ])
+          spacing *= 1.33
+        }
+        /* The ribbon lays its first point one step on, which is where `gap`
+           starts it from `cursor`. */
+        cursor = y + height * RIBBON_STEP - height * 0.2
+        phase = phaseAt
       } else {
         cursor = exit[1] + height * 0.1
         phase = Math.PI / 2 - turn
@@ -483,7 +653,7 @@ export const pagePath = (
   const before = points.at(-2) ?? last
   const on: PathPoint = [2 * last[0] - before[0], 2 * last[1] - before[1], last[2], 0]
   points.push(on, [on[0], Math.max(on[1], page) + height, last[2], 0])
-  return points.slice(0, MAX_POINTS)
+  return relax(points.slice(0, MAX_POINTS), width, height)
 }
 
 /** One coordinate of a uniform Catmull-Rom segment, the same one the shader runs. */
