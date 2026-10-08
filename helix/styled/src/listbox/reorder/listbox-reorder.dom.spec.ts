@@ -64,13 +64,13 @@ describe('a reorderable styled listbox', () => {
 
   test('draws a grab cursor, a faded option, and a line where it lands, through the family hooks', () => {
     const text = styles.cssText
-    expect(text).toContain('* {cursor: grab;}')
+    expect(text).toContain('* {cursor: grab}')
     expect(text).toContain('opacity: var(--listbox-dragging-opacity, 0.5)')
     expect(text).toContain('var(--listbox-drop-indicator-color, var(--helix-color-primary))')
     expect(text).toContain('var(--listbox-drop-indicator-size, var(--helix-border-thick))')
     /* On the option's host, whose ::after is free, since its row's ::after is a
        chosen option's check mark. */
-    expect(text).toContain(':host(:state(drop-after))::before {inset-block-end: 0;}')
+    expect(text).toContain(':host(:state(drop-after))::before {inset-block-end: 0}')
   })
 
   test('moves the highlighted option with Alt and Down, and says so', async () => {

@@ -43,7 +43,7 @@ describe('a reorderable tree', () => {
       'opacity: var(--tree-dragging-opacity, 0.5)',
     )
     const line = rule(
-      ':host(:state(drop-before)) [part="item"]::before,\n:host(:state(drop-after)) [part="item"]::after',
+      ':host(:state(drop-before)) [part="item"]::before, :host(:state(drop-after)) [part="item"]::after',
     )
     expect(line).toContain('var(--tree-drop-indicator-color, var(--helix-color-primary))')
     expect(line).toContain('var(--tree-drop-indicator-size, var(--helix-border-thick))')

@@ -71,7 +71,7 @@ describe('list', () => {
     /* The rows are numbered by the `list-item` counter, which, with no `<ol>`
        to own them, a size container above made one count for every list under
        it: four steps after three lists of three came out 10 to 13. */
-    expect(rule('helix-list', ':host([kind="ordered"]),\n:host([kind="unordered"])')).toContain(
+    expect(rule('helix-list', ':host([kind="ordered"]), :host([kind="unordered"])')).toContain(
       'contain: style',
     )
   })

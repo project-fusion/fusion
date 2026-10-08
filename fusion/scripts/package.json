@@ -27,6 +27,7 @@
     "./shard": "./lib/shard.mjs",
     "./theme-facts": "./lib/theme-facts.mjs",
     "./theme-intents": "./lib/theme-intents.mjs",
+    "./tighten": "./lib/tighten.mjs",
     "./workspace": "./lib/workspace.mjs"
   },
   "bin": {

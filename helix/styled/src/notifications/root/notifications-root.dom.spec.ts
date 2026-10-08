@@ -132,10 +132,10 @@ describe('separation on the feed', () => {
   test('takes the rule under the header away and puts the gap between boxes before the first', () => {
     const text = feedSheet()
     expect(text).toContain(
-      ':host([separation="filled"]) [part="header"],\n:host([separation="outlined"]) [part="header"] {border-block-end: none;}',
+      ':host([separation="filled"]) [part="header"], :host([separation="outlined"]) [part="header"] {border-block-end: none}',
     )
     expect(text).toContain(
-      ':host([separation="filled"]) [part="list"],\n:host([separation="outlined"]) [part="list"] {padding-block-start: var(--notifications-item-gap, var(--helix-space-xs));}',
+      ':host([separation="filled"]) [part="list"], :host([separation="outlined"]) [part="list"] {padding-block-start: var(--notifications-item-gap, var(--helix-space-xs))}',
     )
   })
 })

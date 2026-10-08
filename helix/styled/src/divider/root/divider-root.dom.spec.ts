@@ -110,7 +110,7 @@ describe('divider', () => {
 describe('content placement', () => {
   test('keeps a short line before the content at the start, or after it at the end', () => {
     const placed = rule(
-      ':host([content-placement="start"]) [part="line"]:has(+ [part="content"]:not([data-empty])),\n:host([content-placement="end"]) [part="content"]:not([data-empty]) + [part="line"]',
+      ':host([content-placement="start"]) [part="line"]:has(+ [part="content"]:not([data-empty])), :host([content-placement="end"]) [part="content"]:not([data-empty]) + [part="line"]',
     )
     expect(placed).toContain('flex: 0 0 var(--divider-content-offset, var(--helix-space-lg))')
   })
