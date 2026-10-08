@@ -86,24 +86,63 @@ jobs:
           level=$(jq -r '.[] | select(.domain == "helix") | .level' <<<"$DOMAINS")
           bun fusion/scripts/version.mjs --domain helix --bump "$level"
 
-  binaries:
+  helix-binaries:
     needs: helix-version
     uses: ./.github/workflows/binaries.yml
     with:
+      domain: helix
       version: ${{ needs.helix-version.outputs.version }}
 
-  # **Not held back by the binaries**, which only Helix ships: a Cortex release
-  # goes ahead whatever they did, and Helix refuses in its first step. So the
-  # condition is written out rather than left to the default, which skips a job
-  # whose dependency was skipped, and on one line so it can carry the marker a
-  # folded block cannot.
+  # The same pair for Proof, whose `proof` binary ships the way `helix` does.
+  proof-version:
+    needs: intent
+    if: >-
+      contains(needs.intent.outputs.domains, '"proof"')
+      && contains(fromJSON('["experimental", "on"]'), vars.PUBLISHING)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Fetch the tags, which carry the version
+        run: git fetch --tags --force
+
+      - name: Set up bun and the dependencies
+        uses: ./.github/actions/setup
+
+      - name: Compute the version from the tags
+        id: version
+        env:
+          DOMAINS: ${{ needs.intent.outputs.domains }}
+        run: |
+          set -euo pipefail
+          level=$(jq -r '.[] | select(.domain == "proof") | .level' <<<"$DOMAINS")
+          bun fusion/scripts/version.mjs --domain proof --bump "$level"
+
+  proof-binaries:
+    needs: proof-version
+    uses: ./.github/workflows/binaries.yml
+    with:
+      domain: proof
+      version: ${{ needs.proof-version.outputs.version }}
+
+  # **Not held back by the binaries**, which only Helix and Proof ship: a
+  # Cortex release goes ahead whatever they did, and a domain whose binaries
+  # did not build refuses in its first step. So the condition is written out
+  # rather than left to the default, which skips a job whose dependency was
+  # skipped, and on one line so it can carry the marker a folded block cannot.
   release:
-    needs: [intent, binaries]
+    needs: [intent, helix-binaries, proof-binaries]
     if: ${{ !cancelled() && needs.intent.result == 'success' && needs.intent.outputs.domains != '[]' && contains(fromJSON('["experimental", "on"]'), vars.PUBLISHING) }}  # dialect:quoted, GitHub's function
     runs-on: ubuntu-latest
     timeout-minutes: 40
     strategy:
-      # One domain must not take the other down with it, and two domains must
+      # One domain must not take another down with it, and two domains must
       # not race to move the same tag.
       fail-fast: false
       max-parallel: 1
@@ -125,12 +164,18 @@ jobs:
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      # Before a number is allocated, so a Helix release that cannot ship its
-      # binary burns nothing.
+      # Before a number is allocated, so a release that cannot ship its binary
+      # burns nothing.
       - name: Refuse Helix without its binaries
-        if: matrix.target.domain == 'helix' && needs.binaries.result != 'success'
+        if: matrix.target.domain == 'helix' && needs.helix-binaries.result != 'success'
         run: |
-          echo "::error::The binaries did not build (${{ needs.binaries.result }}), and every platform package ships one."
+          echo "::error::The binaries did not build (${{ needs.helix-binaries.result }}), and every platform package ships one."
+          exit 1
+
+      - name: Refuse Proof without its binaries
+        if: matrix.target.domain == 'proof' && needs.proof-binaries.result != 'success'
+        run: |
+          echo "::error::The binaries did not build (${{ needs.proof-binaries.result }}), and every platform package ships one."
           exit 1
 
       - name: Check out
@@ -220,17 +265,17 @@ jobs:
         run: bun run analyze
 
       - name: Fetch the binaries
-        if: matrix.target.domain == 'helix'
+        if: contains(fromJSON('["helix", "proof"]'), matrix.target.domain)
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          pattern: helix-cli-*
+          pattern: ${{ matrix.target.domain }}-cli-*
           path: ${{ runner.temp }}/binaries
 
       # `publish.mjs` then refuses one that is missing, is not executable, or
       # says a version other than this one.
       - name: Put each binary in its platform package
-        if: matrix.target.domain == 'helix'
-        run: .github/scripts/place-binaries.sh "$RUNNER_TEMP/binaries"
+        if: contains(fromJSON('["helix", "proof"]'), matrix.target.domain)
+        run: .github/scripts/place-binaries.sh "${{ matrix.target.domain }}" "$RUNNER_TEMP/binaries"
 
       - name: Publish to staging
         run: bun fusion/scripts/publish.mjs --domain "${{ matrix.target.domain }}" --tag next

@@ -9,7 +9,7 @@
 set -euo pipefail
 
 : > /tmp/entries
-for domain in helix cortex; do
+for domain in helix cortex proof; do
   last=$(git tag --list "$domain-v*" --sort=-v:refname | head -1)
   # No tag is the first release, and the range is then all of history.
   range=$SHA

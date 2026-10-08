@@ -8,11 +8,11 @@
  * from `feat` to `minor` would have three copies and the one that drifts is the
  * one nobody runs.
  *
- * **The scope names the domain, and only `helix` and `cortex` publish.** A
- * scope of `helix/cli` releases Helix; `fusion/site` and `turbo` release
- * nothing, being the site and the tooling. A subject with no scope releases
- * nothing, which is the honest reading of a commit that does not say what it
- * touched rather than a default anybody has to remember.
+ * **The scope names the domain, and only `helix`, `cortex`, and `proof`
+ * publish.** A scope of `helix/cli` releases Helix; `fusion/site` and `turbo`
+ * release nothing, being the site and the tooling. A subject with no scope
+ * releases nothing, which is the honest reading of a commit that does not say
+ * what it touched rather than a default anybody has to remember.
  *
  * **A `!` outranks the type**, and so does a `BREAKING CHANGE:` trailer, which
  * is why the body is read and not only the subject.
@@ -33,7 +33,7 @@
  *
  *   node fusion/scripts/bump.mjs <range>     # `a..b`, as git takes it
  *   node fusion/scripts/bump.mjs --stdin     # messages, NUL separated
- *   node fusion/scripts/bump.mjs <range> --zero helix,cortex
+ *   node fusion/scripts/bump.mjs <range> --zero helix,cortex,proof
  *
  * **The stdin form exists for `release-intent`**, which runs as
  * `pull_request_target` with no checkout on purpose: it has a writable token
@@ -77,8 +77,8 @@ const LEVELS = {
   style: 'patch',
 }
 
-/** The two domains that publish. A scope outside them is not a release. */
-const DOMAINS = ['helix', 'cortex']
+/** The domains that publish. A scope outside them is not a release. */
+const DOMAINS = ['helix', 'cortex', 'proof']
 
 const RANK = { major: 3, minor: 2, patch: 1 }
 

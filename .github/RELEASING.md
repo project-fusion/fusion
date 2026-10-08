@@ -112,6 +112,13 @@ and skips the rest.
 | `helix-cli-linux-x64` | `ubuntu-latest` | `x86_64-unknown-linux-musl` |
 | `helix-cli-win32-x64` | `windows-latest` | `x86_64-pc-windows-msvc` |
 
+**`proof` ships the same way.** `@fusion.dev/proof` is its launcher, and
+`@fusion.dev/proof-<platform>` are its platform packages, one for each row
+above. `binaries.yml` takes the domain as an input and builds the
+`fusion-<domain>-cli` crate, so both commands share one workflow, one runner
+table and one proof of the version. A pull request that could break either
+builds both.
+
 **Built before the release computes its number, from the same tags.**
 `binaries.yml` builds each platform, the release computes the number,
 `place-binaries.sh` puts each binary in its package, and `publish.mjs` refuses a
@@ -137,8 +144,8 @@ release has stamped it, which is the arrangement a consumer installs.
 **A Linux binary is static**, linked against musl, so one file runs on a glibc
 distribution and on Alpine alike, and the packages declare no `libc`.
 
-**A Helix release with no binaries refuses in its first step**, before a number
-is allocated. A Cortex release in the same run goes ahead.
+**A Helix or Proof release with no binaries refuses in its first step**, before
+a number is allocated. A Cortex release in the same run goes ahead.
 
 **Nothing in a checkout needs them.** The files are gitignored, and the shim runs
 the cargo target's build before a platform package's, so a checkout runs what it
@@ -187,7 +194,7 @@ can be read, and so its reasoning sits with the code rather than above the step.
 | `stamp-manifests.sh` | Writes the published version back into the manifests |
 | `stamp-experimental.sh` | Stamps a preview version into every domain a branch touches |
 | `comment-install.sh` | Comments on the pull request with how to install it |
-| `place-binaries.sh` | Puts each built `helix` in its platform package, executable |
+| `place-binaries.sh` | Puts each built `helix` or `proof` in its platform package, executable |
 | `touched.sh` | Whether a push can reach the browser, so `verify` can skip |
 
 ## Why the range runs from the tag
