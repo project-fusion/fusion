@@ -595,6 +595,65 @@ describe('a palette with pages', () => {
   })
 })
 
+/* The first opening highlighted nothing and the second opened on the
+   highlight the first one left, or on the first command where a filter was
+   emptied on closing, so Down went to the second command and Enter ran one
+   the reader never chose. */
+describe('each opening of the palette', () => {
+  const highlighted = (host: Palette): string | null =>
+    [...host.querySelectorAll('helix-headless-option')].find(
+      (option) => (option as HTMLElement & { active: boolean }).active,
+    )?.textContent ?? null
+  const field = (host: Palette): HTMLElement =>
+    listbox(host).shadowRoot?.querySelector('[part="search-field"]') as HTMLElement
+  const down = (host: Palette): void => {
+    field(host).dispatchEvent(
+      new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        key: 'ArrowDown',
+      }),
+    )
+  }
+
+  test('starts with no command highlighted, and Down goes to the first', async () => {
+    const host = await palette()
+    const seen: (string | null)[] = []
+    for (const filter of ['', 'o']) {
+      press('k', { metaKey: true })
+      await settle(host)
+      seen.push(highlighted(host))
+      if (filter) {
+        listbox(host).requestFilter(filter)
+        await settle(host)
+        seen.push(highlighted(host))
+      }
+      down(host)
+      await settle(host)
+      seen.push(highlighted(host))
+      press('k', { metaKey: true })
+      await settle(host)
+    }
+    press('k', { metaKey: true })
+    await settle(host)
+    seen.push(highlighted(host))
+    down(host)
+    await settle(host)
+    seen.push(highlighted(host))
+    /* Typing highlights the first match, as in React Aria and cmdk. */
+    expect(seen).toEqual([
+      null,
+      'New file',
+      null,
+      'Open recent',
+      'Switch color mode',
+      null,
+      'New file',
+    ])
+  })
+})
+
 /* Home and End moved the caret in the filter, as APG's combobox has them,
    and React Aria's Autocomplete moves the highlight with them instead. */
 describe('a palette whose Home and End go to the list', () => {

@@ -73,8 +73,10 @@ const says = (element: Element | null, state: string): boolean => {
  * the full list. Combobox and Select do the same. As typing narrows the list, a
  * screen reader hears how many commands are left, such as "3 commands".
  *
- * **Keyboard.** Focus goes to the filter field as the palette opens, and the
- * highlight moves through the commands while you type.
+ * **Keyboard.** Focus goes to the filter field as the palette opens, with no
+ * command highlighted, as in React Aria's Autocomplete, so Enter runs nothing
+ * until you type or press Down. Typing highlights the first command left, and
+ * the highlight moves through the commands while you type.
  *
  * | Key | What it does |
  * |---|---|
@@ -626,6 +628,12 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
       return
     }
     if (this.open) {
+      /* Each opening starts with no command highlighted, as React Aria's
+         Autocomplete does, so Enter runs nothing until a reader types or moves.
+         The highlight a reader left on closing stayed, and a filter emptied on
+         closing put it on the first command, so the second opening began on a
+         command where the first began on none. */
+      this.listbox?.highlight('none')
       /* The field takes focus as the palette arrives. A reader who pressed a
          key to summon a search expects to be typing in it, and the dialog would
          otherwise put focus on itself. */
