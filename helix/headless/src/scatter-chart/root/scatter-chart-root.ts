@@ -114,10 +114,10 @@ const nice = ([low, high]: [number, number]): [number, number] => {
  * readers.
  *
  * **The plot is read by key.** It takes focus, named by `label` or the caption.
- * The left and right arrows move from row to row in the table's order, Home
- * and End go to the first and the last, and the up and down arrows move among
- * the series of a row. The tooltip sits on that point, the `live` part says the
- * row in words, and Escape puts the tooltip away.
+ * The left and right arrows move from point to point, left to right across
+ * the plot, Home and End go to the first and the last, and the up and down
+ * arrows move among the series of a row. The tooltip sits on that point, the
+ * `live` part says the row in words, and Escape puts the tooltip away.
  *
  * Each point is a `<span>` placed by percentage over the drawing, as
  * `LineChart` places its end points, so points stay round when the drawing
@@ -144,6 +144,18 @@ const nice = ([low, high]: [number, number]): [number, number] => {
  * there until readings arrive. The `empty` and `loading` slots take markup in
  * their place, such as a link to add the first reading.
  *
+ * **Keyboard.** The plot is one tab stop.
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Tab | Moves focus to the plot and shows the first reading. |
+ * | Right, Left | Moves to the next or the previous point, left to right across the plot. On a right-to-left page, Left moves to the next. |
+ * | Down, Up | Moves among the series of the point. With one series, moves to the next or the previous point. |
+ * | Home, End | Moves to the first or the last point. |
+ * | Page Down, Page Up | Moves a tenth of the points on or back. |
+ * | Enter, Space | Presses the point shown, which sends `helix-reading-press`. |
+ * | Escape | Puts the point and its tooltip away. |
+ *
  * @since 0.1.0
  * @status stable
  * @category charts
@@ -162,11 +174,12 @@ const nice = ([low, high]: [number, number]): [number, number] => {
  * @csspart loading - The words in place of the drawing while `loading` is set and there are no readings: the `loading` slot, falling back to `loading-text`.
  * @csspart mark - The invisible point the tooltip is anchored to.
  * @csspart plane - The grid that holds the plot, both axes, and their names. It runs left to right on every page.
- * @csspart plot - The drawing, which takes focus to be read by key.
+ * @csspart plot - The drawing, which takes focus to be read by key. With nothing to draw, a group named as the chart is, holding the `empty` or `loading` part.
  * @csspart point - One row, as a point.
  * @csspart point-active - A point in the row under the pointer. Set alongside `point`.
  * @csspart summary - The text that says how strongly the measures relate, for people who cannot see the points.
  * @csspart svg - The drawing surface the gridlines and the trend lines sit on.
+ * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`. Hide it visually.
  * @csspart tooltip - The bubble, forwarded from `Tooltip`.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
  * @csspart tooltip-arrow - The bubble's point, forwarded from `Tooltip`.
@@ -186,7 +199,7 @@ const nice = ([low, high]: [number, number]): [number, number] => {
  * @csspart trend - One series' line of best fit, under `trend`. Carries its series color as `--chart-series`.
  * @csspart x-axis - The values along the horizontal axis, under the plot.
  * @csspart x-name - The name of the horizontal measure.
- * @csspart x-tick - One labeled value on the horizontal axis. Each axis has its own tick part, because `::part()` cannot tell which axis a tick is on.
+ * @csspart x-tick - One labeled value on the horizontal axis. Each axis has its own tick part, because `::part()` cannot tell which axis a tick is on. The one at the far edge carries `data-edge="end"`.
  * @csspart y-axis - The values along the vertical axis, beside the plot.
  * @csspart y-name - The name of the vertical measure.
  * @csspart y-tick - One labeled value on the vertical axis.
@@ -195,6 +208,10 @@ const nice = ([low, high]: [number, number]): [number, number] => {
  * @cssproperty --chart-point-x - A point's horizontal position, as a percentage. The component writes it.
  * @cssproperty --chart-point-y - A point's vertical position, as a percentage from the top. The component writes it.
  * @cssproperty --chart-tick - A tick's position along its axis, as a percentage. The component writes it.
+ *
+ * @cssstate active - While a reading is shown, under the pointer or the keys, with its tooltip open.
+ * @cssstate empty - While the `empty` part stands in the plot.
+ * @cssstate loading - While the `loading` part stands in the plot.
  */
 @customElement('helix-headless-scatter-chart')
 export class HelixHeadlessScatterChart extends MixinChartStatus(MixinChartSource(HelixElement)) {
@@ -393,12 +410,26 @@ export class HelixHeadlessScatterChart extends MixinChartStatus(MixinChartSource
     }
   }
 
+  /**
+   * @internal The rows in the order the keys walk them: by the measure across,
+   * left to right, so a reader moves through the points as they are drawn. A
+   * row with nothing across comes last, in the table's order.
+   */
+  readingOrder(): number[] {
+    const across = this.plottedColumns[0]
+    const rows = this.sourceRows
+    const x = (at: number): number =>
+      (across === undefined ? undefined : rows[at]?.cells[across]?.value) ??
+      Number.POSITIVE_INFINITY
+    return rows.map((_, at) => at).sort((one, two) => x(one) - x(two) || one - two)
+  }
+
   protected override render(): TemplateResult {
     const field = this.field
     this.drawn = field.points
     if (field.points.length === 0) {
       return html`<div dir="ltr" part="plane">
-        <div id=${CHART_PLOT} part="plot">${this.renderStatus()}</div>
+        ${this.renderEmpty()}
       </div>`
     }
     const format = formatNumbers(wordsLocale(this))
@@ -407,10 +438,17 @@ export class HelixHeadlessScatterChart extends MixinChartStatus(MixinChartSource
     return html`<div dir="ltr" part="plane">
         ${this.renderPlot(field, along, up)}
         <div aria-hidden="true" part="x-axis">
-          ${ticks(field.x).map(
-            (level) =>
-              html`<span part="x-tick" style="--chart-tick: ${along(level)}%">${format(level)}</span>`,
-          )}
+          ${ticks(field.x).map((level) => {
+            /* Marked at the far edge, where a label centered on its level
+               would hang half past the chart. */
+            const place = along(level)
+            return html`<span
+              data-edge=${place >= PLOT_WIDTH ? 'end' : nothing}
+              part="x-tick"
+              style="--chart-tick: ${place}%"
+              >${format(level)}</span
+            >`
+          })}
         </div>
         <div aria-hidden="true" part="y-axis">
           ${ticks(field.y).map(
@@ -421,7 +459,7 @@ export class HelixHeadlessScatterChart extends MixinChartStatus(MixinChartSource
         <span aria-hidden="true" dir="auto" part="x-name">${field.xName}</span>
         <span aria-hidden="true" dir="auto" part="y-name">${field.yNames.join(', ')}</span>
       </div>
-      ${this.renderSummary(field)}`
+      ${this.renderSummary(field)}${this.renderTable()}`
   }
 
   /** The rules and the points, behind a seam the styled tier can move. */

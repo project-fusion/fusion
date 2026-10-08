@@ -91,6 +91,17 @@ describe('points', () => {
     expect(up.at(-1)?.style.getPropertyValue('--chart-tick')).toBe('0%')
   })
 
+  /* The label at the far end was centered on the plot's right edge, so half of
+     it hung past the chart and was cut off by the box around it. */
+  test('the label at the far end across is marked, so it can end at the edge', async () => {
+    const host = await chart(LOAD, 'for="load"')
+    const across = all(host, 'x-tick')
+    expect(across.map((one) => one.getAttribute('data-edge'))).toEqual([
+      ...across.slice(0, -1).map(() => null),
+      'end',
+    ])
+  })
+
   test('each axis says what it measures, in the table’s own words', async () => {
     const host = await chart(LOAD, 'for="load"')
     expect(part(host, 'x-name')?.textContent).toBe('Rate')
@@ -204,6 +215,29 @@ describe('reading by key', () => {
     expect(part(host, 'live')?.textContent).toBe('E: Spend 5, Revenue 10 (5 of 5)')
     expect(part(host, 'tooltip-label')?.textContent).toBe('E')
     expect(part(host, 'point-active')).not.toBeNull()
+  })
+
+  /* The arrows walked the table's rows, so a table out of order sent a reader
+     back and forth across the plane. */
+  test('the arrows walk the points from left to right, whatever order the table is in', async () => {
+    const MIXED = `<table id="mixed"><tbody>
+      <tr><th>C</th><td>30</td><td>1</td></tr>
+      <tr><th>A</th><td>10</td><td>2</td></tr>
+      <tr><th>B</th><td>20</td><td>3</td></tr>
+    </tbody></table>`
+    const host = (await chart(MIXED, 'for="mixed"')) as HTMLElement & {
+      updateComplete: Promise<boolean>
+    }
+    const said: string[] = []
+    for (const key of ['Home', 'ArrowRight', 'ArrowRight']) {
+      part(host, 'plot')?.dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key }),
+      )
+      await host.updateComplete
+      said.push(part(host, 'tooltip-label')?.textContent ?? '')
+    }
+    expect(said).toEqual(['A', 'B', 'C'])
+    expect(part(host, 'live')?.textContent).toContain('(3 of 3)')
   })
 })
 
@@ -339,6 +373,17 @@ describe('with nothing to draw', () => {
     const linked = await host(EMPTY, 'for="none"', '<a slot="empty" href="#add">Add a reading</a>')
     const slot = part(linked, 'empty')?.querySelector('slot[name="empty"]') as HTMLSlotElement
     expect(slot.assignedElements().map((one) => one.textContent)).toEqual(['Add a reading'])
+  })
+
+  /* An empty chart lost its name: the plot was a bare box around the words. */
+  test('keeps its name, as a group around the words, and takes no focus', async () => {
+    const chart = await host(EMPTY, 'for="none" label="Nothing"')
+    const plot = part(chart, 'plot')
+    expect([plot?.getAttribute('role'), plot?.getAttribute('aria-label')]).toEqual([
+      'group',
+      'Nothing',
+    ])
+    expect(plot?.hasAttribute('tabindex')).toBe(false)
   })
 
   test('says it is loading while loading is set, and keeps drawing readings it has', async () => {
