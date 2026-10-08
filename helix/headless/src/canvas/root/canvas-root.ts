@@ -248,7 +248,11 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  * double click zooms out.
  *
  * Keyboard behavior:
- * - One card holds the board's tab stop.
+ * - One card holds the board's tab stop, and the board itself leaves the tab
+ *   order while a card can hold it. Escape on a card goes back out to the
+ *   board, where the arrow keys pan it.
+ * - Plus and minus zoom the board, on the board and on a card or a
+ *   connection.
  * - The arrow keys move through the cards in reading order. The card you land
  *   on scrolls into view, and its connections are announced with it.
  * - The card you land on is selected. Control or Command with an arrow key,
@@ -3045,6 +3049,14 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       }
       return
     }
+    /* **Plus and minus zoom from a card or a connection**, as they do from
+       the board: the board's own region left the tab order once a card held
+       its stop, and a reader on a card had no key left that zoomed. */
+    if (plain && ['+', '=', '-', '_'].includes(event.key)) {
+      event.preventDefault()
+      this.zoom(event.key === '+' || event.key === '=' ? 1 : -1)
+      return
+    }
     /* Space adds the stop to the selection or takes it away; Command or
        Control with A selects everything. */
     if (event.key === ' ' && !this.linking) {
@@ -4122,6 +4134,17 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       this.stop !== undefined && this.keyNamed(this.stop) === this.stop
         ? this.stop
         : reading(all, this.edges, this.order ?? 'spatial')[0]?.id
+    /* **One tab stop for the board.** A card or a connection holds it, so
+       the region leaves the tab order while one can: Tab came to the board
+       and then to its first card, two stops for one composite. The region
+       still takes focus from Escape on a card, where the arrows pan the
+       board, and is the stop again on an empty board and on the server,
+       which counts no cards. Written here and not in the template, which
+       the server renders before any card is known. */
+    const holds =
+      stop !== undefined &&
+      (stop.startsWith('edge:') || this.cards.some((card) => card.name === stop))
+    this.partNamed('region')?.setAttribute('tabindex', holds ? '-1' : '0')
     for (const card of this.cards) {
       /* Written only where it moved: a drag of three cards on a board of
          eight hundred rewrote every card's place on every step. **Into the
@@ -4321,7 +4344,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
         d=${drawn.d}
         data-edge=${key}
         fill="none"
-        aria-keyshortcuts="Enter F2 Space Control+ArrowDown Control+ArrowUp C Delete"
+        aria-keyshortcuts="Enter F2 Space Control+ArrowDown Control+ArrowUp C Delete Plus Minus"
         role="button"
         tabindex=${key === stop ? '0' : '-1'}
       />

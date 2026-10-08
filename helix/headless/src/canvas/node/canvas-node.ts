@@ -335,7 +335,7 @@ export class HelixHeadlessCanvasNode extends HelixElement {
       aria-describedby=${this.status || this.meaning || this.links ? 'about' : nothing}
       aria-label=${this.label || nothing}
       aria-labelledby=${this.label || this.group ? nothing : 'content'}
-      aria-keyshortcuts=${this.connectable ? 'Enter F2 Space Control+ArrowDown Control+ArrowUp Shift+ArrowRight Shift+ArrowDown Alt+ArrowRight Alt+ArrowDown C Delete' : nothing}
+      aria-keyshortcuts=${this.connectable ? 'Enter F2 Space Control+ArrowDown Control+ArrowUp Shift+ArrowRight Shift+ArrowDown Alt+ArrowRight Alt+ArrowDown C Delete Plus Minus' : nothing}
       role=${this.group ? 'group' : 'article'}
       tabindex=${this.current ? '0' : '-1'}
     >
