@@ -101,18 +101,29 @@ vec3 strandAt(float id, float t, out vec3 info) {
   float r4 = h1(id + 5.93);
   float r8 = h1(id + 13.7);
   float r9 = h1(id + 17.3);
+  /* **Laminar: every strand keeps its lane.** A strand's place across the
+     ribbon is its lane \`n\`, and a thin second coordinate \`z\` gives the
+     sheet a little thickness. The whole sheet rolls by one angle, so where it
+     turns edge on, every strand converges at once and fans out again, as a
+     twisted band of silk does. Each strand rolling at its own random pace and
+     waving its own random wave crossed every neighbor and read as tangled
+     hair.
+
+     **Drift is shear, smooth across the lanes.** The roll's phase and pace,
+     and the ribbon's wave, vary with the lane rather than with a random
+     number, so neighbors move together and the edges of the ribbon flow at
+     their own pace past the middle, like layers of a fluid. */
   float n = (r1 + r2 + r3) / 1.5 - 1.0;
-  float z = (r4 - 0.5) * 2.0;
+  float z = (r4 - 0.5) * 2.0 * 0.3;
   float along = lengthAt(t);
-  float pace = 1.0 + uDrift * (r8 - 0.5) * 1.2;
-  float th = along * 0.002 * (1.0 + uDrift * (r9 - 0.5) * 0.3) + uTime * 0.25 * pace
-    + r2 * (0.5 + uDrift * 2.6);
+  float pace = 1.0 + uDrift * 0.25 * n;
+  float th = along * 0.002 + uTime * 0.25 * pace + uDrift * 0.6 * n;
   float width = c.z * uSpread;
   float breadth = width * uView.x * (1.0 + 0.25 * sin(uTime * 0.4 + along * 0.0045));
   float sway = sin(along * 0.006 + uTime * 0.23) * mix(6.0, 30.0, smoothstep(0.02, 0.2, width));
   float ct = cos(th);
   float st = sin(th);
-  float depth = clamp((z * 0.55 * ct - n * st) / 1.15, -1.0, 1.0);
+  float depth = clamp((z * 0.55 * ct - n * st) / 1.0, -1.0, 1.0);
   /* **No strand sits further out than the path allows for.** The path keeps
      every turn wider than 1.3 breadths, the reach \`path.ts\` lays it by, and a
      few strands, at the edge of the cross-section and near in depth, reached
@@ -121,8 +132,7 @@ vec3 strandAt(float id, float t, out vec3 info) {
   float limit = breadth * 1.3 + 1.0;
   float across = breadth * (n * ct + z * 0.55 * st) * (1.0 + uDepth * 0.35 * depth);
   float lat = sway + limit * tanh(across / limit);
-  lat += sin(along * 0.006 * (1.0 + uDrift * (r9 - 0.5) * 0.3) + uTime * (0.6 + 0.5 * r1) * pace
-    + r1 * 6.283) * 12.0 * (0.3 + r3) * (1.0 + uDrift * 0.5);
+  lat += sin(along * 0.0045 + uTime * 0.5 * pace + uDrift * 1.2 * n) * 10.0 * (1.0 + uDrift * 0.5);
   /* **No strand crosses the center of the turn it is on.** A strand is the
      centerline moved sideways by \`lat\`, and on the inside of a turn whose
      radius is less than that, the moved line runs back over itself: a loop,
@@ -186,7 +196,7 @@ void main() {
   /* Nearer is thicker, and the back of the ribbon falls out of focus: wider
      at the same energy, so it reads as haze behind the sharp strands. */
   float base = mix(0.35, 1.3, r7 * r7) * uDpr * (1.0 + (0.3 + 0.5 * uDepth) * a.z);
-  float focus = uDepth * smoothstep(-0.1, -0.9, a.z) * 10.0 * uDpr;
+  float focus = uDepth * smoothstep(-0.1, -0.9, a.z) * 4.0 * uDpr;
   float w = max(base + soft * mix(8.0, 36.0, r6) * uDpr + focus, 1.0);
   /* **A profile no narrower than a pixel can carry.** The strand's light falls
      off across it as a Gaussian a quarter of its width wide, which for a strand
@@ -203,12 +213,14 @@ void main() {
   gl_Position = vec4(px.x / res.x * 2.0 - 1.0, 1.0 - px.y / res.y * 2.0, 0.0, 1.0);
   vSide = aVert.y * drawW * 0.5;
   vSigma = sigma;
-  float shimmer = 0.5 + 0.5 * sin(info.z * 0.044 - uTime * (2.0 + 2.0 * r5) + r6 * 6.283);
-  shimmer *= shimmer;
+  /* **Light travels along the strand slowly and long.** A pulse every 140
+     pixels broke each strand into dashes; one every 1,800 or so is light
+     moving down a fiber. */
+  float shimmer = 0.5 + 0.5 * sin(info.z * 0.0035 - uTime * (0.6 + 0.4 * r5) + r6 * 6.283);
   /* Contrast spreads the strands' brightness: a few burn and most fall back.
      The mean is held, so the ribbon as a whole keeps its strength. */
   float spread = mix(1.4, 4.5, uContrast);
-  float least = mix(0.25, 0.04, uContrast);
+  float least = mix(0.35, 0.14, uContrast);
   float bright = mix(least, 1.0, pow(r5, spread)) * 0.5625 / (least + (1.0 - least) / (spread + 1.0));
   float energy = min(base, w) / w;
   float fall = 0.3 + 0.5 * uDepth;
