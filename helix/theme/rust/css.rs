@@ -302,7 +302,10 @@ fn font_faces(theme: &Theme, namespace: &str, lines: &mut Vec<String>) {
         lines.push(format!("  --{namespace}-font-sans: {};", stack(body, SANS)));
     }
     if let Some(display) = font.display.as_ref().or(font.body.as_ref()) {
-        lines.push(format!("  --{namespace}-font-display: {};", stack(display, SANS)));
+        lines.push(format!(
+            "  --{namespace}-font-display: {};",
+            stack(display, SANS)
+        ));
     }
     if let Some(mono) = &font.mono {
         lines.push(format!("  --{namespace}-font-mono: {};", stack(mono, MONO)));
@@ -399,9 +402,9 @@ fn text_ramp(theme: &Theme, namespace: &str, lines: &mut Vec<String>) {
     /* **Compounded from the rounded step, not from the base.** A designer builds
     a scale by taking the last round number and multiplying it, which is why real
     ramps are whole pixels the whole way up; compounding from the base and
-    rounding once at the end produces a run that is a pixel off itself in the
-    middle. Measured at 1.32: 18, 24, 32, 42 from the rounded chain against 19,
-    25, 33, 44 from the base. */
+    rounding once at the end lets the unrounded error accumulate up the ramp.
+    Measured at 1.32: 18, 24, 32, 42 from the rounded chain against 18, 24, 32,
+    43 from the base, where the top step is 42.5 before it rounds. */
     let mut above: Vec<f64> = Vec::with_capacity(4);
     for index in 0..4 {
         let from = if index == 0 { body } else { above[index - 1] };
