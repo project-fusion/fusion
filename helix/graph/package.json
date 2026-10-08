@@ -21,6 +21,10 @@
       "types": "./dist/cosmos/index.d.ts",
       "default": "./dist/cosmos/index.js"
     },
+    "./isometric": {
+      "types": "./dist/isometric/index.d.ts",
+      "default": "./dist/isometric/index.js"
+    },
     "./model": {
       "types": "./dist/model/index.d.ts",
       "default": "./dist/model/index.js"

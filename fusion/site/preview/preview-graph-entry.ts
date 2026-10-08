@@ -12,6 +12,7 @@
  */
 
 import { connectGraph } from '@fusion.dev/helix-graph'
+import { isometricDriver } from '@fusion.dev/helix-graph/isometric'
 import { sigmaDriver } from '@fusion.dev/helix-graph/sigma'
 import Graph from 'graphology'
 import forceAtlas2 from 'graphology-layout-forceatlas2'
@@ -26,11 +27,27 @@ const start = (frame: HTMLElement): (() => void) => {
   if (!box) {
     return () => undefined
   }
+  const asked = frame.dataset
+  /* **An isometric diagram is SVG**, drawn by Helix with no renderer to make,
+     so it shares this chunk and costs it a few kilobytes. */
+  if (asked.previewGraph === 'isometric') {
+    const connection = connectGraph(
+      frame,
+      isometricDriver(box, {
+        flat: asked.previewGraphFlat !== undefined,
+        shape: asked.previewGraphShape as never,
+      }),
+    )
+    window.addEventListener(RESTYLED, connection.restyle)
+    return () => {
+      window.removeEventListener(RESTYLED, connection.restyle)
+      connection.disconnect()
+    }
+  }
   const sigma = new Sigma(new Graph(), box, { allowInvalidContainer: true })
   /* **The drawing the example asks for**, as `data-preview-graph-material`,
      `-shape` and `-emphasis`, which are `sigmaDriver`'s options written as
      attributes. */
-  const asked = frame.dataset
   const connection = connectGraph(
     frame,
     sigmaDriver(sigma, {

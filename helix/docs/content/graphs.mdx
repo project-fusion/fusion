@@ -1,5 +1,5 @@
 ---
-description: Add interactive graphs to your site, styled with your theme and drawn by Sigma.js, cosmos.gl, or three.js.
+description: Add interactive graphs and isometric diagrams to your site, styled with your theme and drawn by Sigma.js, cosmos.gl, three.js, or Helix.
 section: Essentials
 title: Graphs
 ---
@@ -7,7 +7,7 @@ title: Graphs
 # Graphs
 
 Helix Graph puts a frame around a graph drawn by Sigma.js, cosmos.gl, three.js,
-or a renderer of your own. The frame adds a searchable list of every note, zoom
+a renderer of your own, or Helix's own isometric diagram. The frame adds a searchable list of every note, zoom
 and fullscreen buttons, and keyboard controls. You give the frame notes and
 links, and `@fusion.dev/helix-graph` draws them with the renderer, colored by
 your theme.
@@ -81,6 +81,7 @@ thousands of notes written as markup would be thousands of elements.
 | Sigma.js | Graphs of thousands of notes | `sigma graphology graphology-layout-forceatlas2` | `sigmaDriver` from `@fusion.dev/helix-graph/sigma` |
 | cosmos.gl | Graphs of tens of thousands of notes or more, laid out on the GPU | `@cosmos.gl/graph` | `cosmosDriver` from `@fusion.dev/helix-graph/cosmos` |
 | three.js | Graphs in 3D, and graphs on the surface of a 3D model | `three d3-force-3d` | `threeDriver` from `@fusion.dev/helix-graph/three` |
+| Helix, in SVG | Architecture and flow diagrams of up to a few hundred notes, drawn as solids on an isometric floor | Nothing more | `isometricDriver` from `@fusion.dev/helix-graph/isometric` |
 
 None of the renderers is bundled with Helix, so you can use the version you
 already have.
@@ -107,6 +108,41 @@ const connection = connectGraph(frame, threeDriver(frame.querySelector('div')))
 Drag to turn a 3D graph, and use the wheel or a pinch to zoom. It turns slowly
 on its own until someone handles it, unless they asked for reduced motion. Set
 `autoRotate: false` to keep it still.
+
+## Draw an isometric diagram
+
+`isometricDriver` draws the graph as an isometric diagram in SVG, with nothing
+more to install. Pass it the box:
+
+```js
+import { isometricDriver } from '@fusion.dev/helix-graph/isometric'
+
+frame.nodes = [
+  { id: 'gateway', label: 'API gateway', group: 'Edge', x: 0, y: 0 },
+  { id: 'orders', label: 'Orders', group: 'Services', x: 3, y: 0 },
+  { id: 'ledger', label: 'Order ledger', group: 'Data', shape: 'circle', x: 6, y: 0 },
+]
+frame.links = [
+  { source: 'gateway', target: 'orders' },
+  { source: 'orders', target: 'ledger' },
+]
+const connection = connectGraph(frame, isometricDriver(frame.querySelector('div')))
+```
+
+- **Each note stands on a cell of the floor** at its `x` and `y`: `x` runs
+  across, and `y` runs back. A note with no `x` and `y` is put on the nearest
+  free cell beside the notes it links to.
+- **A note's `shape` picks its solid.** `square` is a block, which is the
+  default, `circle` is a cylinder, and `diamond` is a pyramid. Its `size` sets
+  its height.
+- **Each face is shaded from the note's color**, so the diagram takes your
+  theme. Each group stands on a plate of its color, with its name written on
+  the floor.
+- **Links run along the floor**, with an arrow halfway that points the way the
+  link runs.
+
+Drag to pan, and use the wheel to zoom. Set `flat: true` to draw every note at
+no height, as a plan. The drawing is still, so there is no motion to pause.
 
 ## Free the renderer
 
