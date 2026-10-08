@@ -18,12 +18,16 @@
 name: Visual baselines
 
 # **Queued rather than canceled**, for the reason the timeout below gives: a
-# retake killed halfway leaves the `visual-baselines` branch holding part of a
-# set that is only meaningful whole. Two dispatches would otherwise both push to
-# that one branch and the pull request would carry a mix of the two.
+# retake killed halfway leaves its baselines branch holding part of a set that
+# is only meaningful whole. Two dispatches on one ref would otherwise both push
+# to that ref's branch and the pull request would carry a mix of the two.
+#
+# **One group and one branch per ref.** Every retake shared the one
+# `visual-baselines` branch, so a dispatch on one feature branch reset the
+# branch under another's open pull request, which then showed the second set.
 concurrency:
   cancel-in-progress: false
-  group: ${{ github.workflow }}
+  group: ${{ github.workflow }}-${{ github.ref }}
 
 on:
   workflow_dispatch:
@@ -93,7 +97,7 @@ jobs:
         uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:
           token: ${{ steps.app.outputs.token }}
-          branch: visual-baselines
+          branch: visual-baselines-${{ github.ref_name }}
           # **Conventional, because `resolve` reads these.** `report-intent.sh`
           # checks every subject on a pull request *and its title*, and reads
           # the release bump off them. A generated subject that does not parse
