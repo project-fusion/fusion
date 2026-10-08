@@ -637,6 +637,20 @@ describe('a list with no notes', () => {
     expect(rows(host)).toHaveLength(0)
   })
 
+  /* A graph whose notes were still on their way said it had none. */
+  test('says it is loading in place of empty, and the list is busy, while loading is set', async () => {
+    const host = (await graph('loading', [], [])) as Graph & { loading: boolean }
+    expect(part(host, 'loading')?.textContent?.trim()).toBe('Loading notes')
+    expect(part(host, 'empty')).toBeNull()
+    expect(list(host).getAttribute('aria-busy')).toBe('true')
+    expect(hasState(host, 'loading')).toBe(true)
+    host.loading = false
+    await host.updateComplete
+    expect(part(host, 'loading')).toBeNull()
+    expect(part(host, 'empty')).not.toBeNull()
+    expect(list(host).hasAttribute('aria-busy')).toBe(false)
+  })
+
   /* The frame's keys pan and zoom, which are its commands. The list's are a
      listbox's own moves, which `aria-keyshortcuts` is not for. */
   test('lists its pan and zoom keys on the frame, and none on the list', async () => {

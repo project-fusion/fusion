@@ -404,7 +404,8 @@ slot[name="filter-icon"]::slotted(*) {
    padding holds the first and last clear of the bar and the frame. */
 /* In the list's own cell, over the empty list, so the panel keeps its two
    rows whether the list holds notes or not. */
-[part="empty"] {
+[part="empty"],
+[part="loading"] {
   color: var(--helix-color-foreground-muted);
   font-size: var(--helix-text-sm);
   grid-area: 2 / 1;
