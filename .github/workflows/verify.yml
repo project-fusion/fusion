@@ -141,6 +141,9 @@ jobs:
       # A hit is one restore of the binary; a miss builds and saves it.
       - name: Put the helix binary on disk
         uses: ./.github/actions/helix
+      # The same for `proof`, which the visual shards run.
+      - name: Put the proof binary on disk
+        uses: ./.github/actions/proof
 
   # The shard counts live in one place each and the matrices are built from
   # them, so a matrix of six against `--of 8` cannot silently drop a third of
@@ -296,6 +299,12 @@ jobs:
         uses: ./.github/actions/setup
       - name: Build the frame and the spec bundles
         run: bunx turbo run frame specs
+      # **The `proof` binary the visual shards run, built here when it is not
+      # cached**, so the shards restore it and none of them compiles it. A miss
+      # is a change to the Rust under `proof/cli` or `fusion/rules`, and costs
+      # this job about a minute after the build above.
+      - name: Put the proof binary on disk
+        uses: ./.github/actions/proof
 
   # **Three shards, because they are off the critical path.** Every check here
   # is seconds of work behind a job's setup, so ten shards finished no sooner
@@ -658,6 +667,12 @@ jobs:
 
       - name: Install Chromium
         uses: ./.github/actions/browser
+
+      # `check:spec:visual` runs Fusion Proof, and `warm-browser` saved the
+      # binary for this tree, so this is a restore.
+      - name: Put the proof binary on disk
+        if: matrix.task == 'visual'
+        uses: ./.github/actions/proof
 
       # Each check builds what it reads, `turbo run frame` first, which after
       # `warm-browser` is a restore.

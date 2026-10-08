@@ -395,7 +395,7 @@ const shell = (tier, body, script) =>
   '<style>:root{color-scheme:light}' +
   `body{margin:0;padding:24px;background:#fff;width:${WIDTH}px;box-sizing:border-box}` +
   '#root{display:contents}</style>' +
-  /* `defer`, for the reason `check-visual.mjs` records: loaded eagerly the
+  /* `defer`, for the reason Fusion Proof's harness records: loaded eagerly the
      bundle runs mid-parse, an element upgrades the moment the parser reaches it,
      and anything it looks up by id further down the document is not there yet.
      Virtual List reads its rows from a `<script type="application/json">` that

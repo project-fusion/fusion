@@ -20,10 +20,10 @@ total=$(printf '%s\n' "$changed" | grep -c . || true)
 # reads one, and every document, README and convention file is `.md`. The
 # `.mdx` under the docs packages are not here, because the site renders them.
 #
-# **`proof/` until the browser checks run on it.** Nothing a browser job reads
-# imports it today. The day `fusion/scripts` takes `settle`, `pool` or `shard`
-# from the package, or a check pictures through `proof`, it leaves this list.
-skippable=$(printf '%s\n' "$changed" | grep -cE '^(fusion/docs/|cortex/|proof/|\.claude/|\.agents/)|\.md$' || true)
+# **Not `proof/`**, because `check:spec:visual` pictures every example through
+# it: a change to the capture driver or the diff moves what the visual shards
+# compare.
+skippable=$(printf '%s\n' "$changed" | grep -cE '^(fusion/docs/|cortex/|\.claude/|\.agents/)|\.md$' || true)
 
 if [ "$total" -gt 0 ] && [ "$total" -eq "$skippable" ]; then
   echo 'browser=false' >> "$GITHUB_OUTPUT"

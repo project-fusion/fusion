@@ -84,6 +84,13 @@ const scaled = (task) => {
 }
 
 /**
+ * Every family `task` was measured over, as `{ family: seconds on a runner }`,
+ * for a reader that takes plain data: Fusion Proof's `shard.cost`, which packs
+ * the visual shards by the same seconds `costOf` gives the plan.
+ */
+export const measured = (task) => Object.fromEntries(scaled(task) ?? [])
+
+/**
  * `family -> seconds on a runner` for `task`, from the measurement where it
  * knows the family and from `units(family)` times the per-unit estimate where
  * it does not.
