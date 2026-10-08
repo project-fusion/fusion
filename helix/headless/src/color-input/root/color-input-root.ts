@@ -53,7 +53,8 @@ import '../../color-picker/index.js'
  *
  * The trigger and ArrowDown open the panel with focus in the square. Tab moves
  * between the panel's controls without leaving it, and Escape closes it and
- * returns focus to the field.
+ * returns focus to the control that opened it: the trigger after a press, and
+ * the field after ArrowDown.
  *
  * The component sets `--color-input-swatch`, so do not set it yourself. It
  * holds the resolved color, so the styled tier can paint the swatch without
@@ -470,6 +471,37 @@ export class HelixHeadlessColorInput extends MixinPickerField(
     if (changed.has('value') && parseColor(this.value)) {
       this.settled = this.value
     }
+    if (changed.has('open') && !this.open) {
+      this.pressedOpen = false
+    }
+  }
+
+  /** Whether the trigger's press opened the panel that is open now. */
+  private pressedOpen = false
+
+  /**
+   * The trigger's press, which notes that it opened the panel, so Escape hands
+   * focus back to the trigger.
+   */
+  private readonly handlePress = (): void => {
+    const opening = !this.open
+    this.handleTriggerClick()
+    this.pressedOpen = opening && this.open
+  }
+
+  /**
+   * Hands focus back to the control that opened the panel: the trigger after
+   * its press, which is the APG date picker dialog's rule, and the text after
+   * ArrowDown from it.
+   */
+  protected override returnFocus(): void {
+    const trigger = this.pressedOpen ? this.partNamed('trigger') : null
+    this.pressedOpen = false
+    if (trigger) {
+      trigger.focus()
+      return
+    }
+    super.returnFocus()
   }
 
   /*
@@ -586,7 +618,7 @@ export class HelixHeadlessColorInput extends MixinPickerField(
               : nothing
           }
           ?disabled=${this.isDisabled}
-          @click=${this.handleTriggerClick}
+          @click=${this.handlePress}
         >
           <span
             part="preview"
