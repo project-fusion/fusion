@@ -172,9 +172,10 @@ export class HelixStrands extends HelixElement {
   depth = 1
 
   /**
-   * How differently each strand moves, from `0`, the whole ribbon rolling and
-   * waving as one, to `1`, each strand at its own pace and angle, crossing
-   * over the others. Clamped to that range.
+   * How differently the strands move across the ribbon, from `0`, the whole
+   * ribbon rolling and waving as one, to `1`, its edges flowing at their own
+   * pace past its middle. Neighbors always move together, so no strand leaves
+   * its lane. Clamped to that range.
    */
   @property({ type: Number })
   drift = 1
