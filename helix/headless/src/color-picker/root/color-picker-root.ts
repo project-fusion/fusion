@@ -663,10 +663,14 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
     }
   }
 
-  /** The line `said` holds, or nothing while it is empty. */
+  /**
+   * The line `said` holds, or nothing while it is empty. `role="alert"`, as
+   * every field's feedback line has, so the message is announced when it
+   * appears.
+   */
   protected override renderPickerFeedback(): TemplateResult | typeof nothing {
     const said = this.said
-    return said === '' ? nothing : html`<p part="feedback" id="feedback">${said}</p>`
+    return said === '' ? nothing : html`<p part="feedback" id="feedback" role="alert">${said}</p>`
   }
 
   /** Whether a pointer is dragging the square's handle, said as `:state(dragging)`. */

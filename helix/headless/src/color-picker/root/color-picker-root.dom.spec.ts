@@ -586,6 +586,9 @@ describe('an answer the picker refuses', () => {
     expect(message.textContent?.trim()).toBe(
       'Enter a color, like #ff0000, rgb(255 0 0) or hsl(0 100% 50%).',
     )
+    /* Announced when it appears, as every field's feedback line is. It was a
+       plain paragraph, which a screen reader heard only by moving to it. */
+    expect(message.getAttribute('role')).toBe('alert')
     expect(field.getAttribute('aria-describedby')).toContain(message.id)
     /* The text stays where the reader can correct it, and the value and the
        form keep the last color, as a native number field keeps "12e". */
