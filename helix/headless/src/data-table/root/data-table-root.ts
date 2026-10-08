@@ -34,6 +34,7 @@ import {
   hostAria,
   inlineStep,
   inRowOrder,
+  MIRROR_RULE,
   MixinCollection,
   markRegion,
   onAndroid,
@@ -47,6 +48,7 @@ import {
   reportRuntime,
   requestChange,
   requestReorder,
+  SCROLLER_RULE,
   scrollingAncestor,
   scrollRoom,
   selectsAll,
@@ -54,6 +56,7 @@ import {
   toggleEvery,
   treeArrow,
   typesCharacter,
+  VIRTUAL_RULE,
   VirtualizeController,
   valueAt,
   whenHydrated,
@@ -327,6 +330,8 @@ const isControl = (element: HTMLElement): boolean =>
  */
 @customElement('helix-headless-data-table')
 export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
+  protected static override markRules = [SCROLLER_RULE, VIRTUAL_RULE, MIRROR_RULE]
+
   /**
    * Nothing is assigned by name, so the columns can be put in a header row.
    *

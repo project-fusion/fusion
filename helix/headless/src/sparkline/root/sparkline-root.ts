@@ -12,6 +12,7 @@ import {
   HelixReadingPressEvent,
   linear,
   linePath,
+  MIRROR_RULE,
   PLOT_WIDTH,
   type Point,
   type Series,
@@ -118,6 +119,8 @@ const STRIP_HEIGHT = 32
  */
 @customElement('helix-headless-sparkline')
 export class HelixHeadlessSparkline extends HelixElement {
+  protected static override markRules = [MIRROR_RULE]
+
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-sparkline': { positionLabel: '{position} von {count}' } })`.

@@ -17,6 +17,7 @@ import {
   isRtl,
   keyClaimed,
   lockScroll,
+  MIRROR_RULE,
   MixinControllerActive,
   MixinControllerOpen,
   OpenPhaseController,
@@ -166,6 +167,8 @@ const keyOf = (item: HelixHeadlessLightboxItem, index: number): string =>
 export class HelixHeadlessLightbox extends MixinControllerActive(
   MixinControllerOpen(HelixElement),
 ) {
+  protected static override markRules = [MIRROR_RULE]
+
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-lightbox': { nextLabel: 'Weiter' } })`.

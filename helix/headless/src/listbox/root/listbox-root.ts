@@ -36,6 +36,7 @@ import {
   toggleEvery,
   typesCharacter,
   UpgradeController,
+  VIRTUAL_RULE,
   words,
   wordsLocale,
 } from '@fusion.dev/helix-core'
@@ -201,6 +202,8 @@ type Entry = HelixHeadlessOption | (DataOption & { href?: undefined })
 export class HelixHeadlessListbox extends MixinCollection(
   MixinControllerValue(MixinField(HelixFormElement)),
 ) {
+  protected static override markRules = [VIRTUAL_RULE]
+
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-listbox': { filterLabel: 'Filtern' } })`.

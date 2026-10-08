@@ -5,6 +5,7 @@ import {
   HelixElement,
   HelixReadingChangeEvent,
   HelixReadingPressEvent,
+  MIRROR_RULE,
   MixinChartSource,
   MixinChartStatus,
   PLOT_HEIGHT,
@@ -186,6 +187,8 @@ export interface DonutShare {
  */
 @customElement('helix-headless-donut-chart')
 export class HelixHeadlessDonutChart extends MixinChartStatus(MixinChartSource(HelixElement)) {
+  protected static override markRules = [MIRROR_RULE]
+
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-donut-chart': { positionLabel: '{position} von {count}' } })`.

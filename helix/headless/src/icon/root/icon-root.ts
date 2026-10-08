@@ -3,6 +3,7 @@ import {
   customElement,
   HelixElement,
   hostAria,
+  MIRROR_RULE,
   reportRuntime,
 } from '@fusion.dev/helix-core'
 import type { HelixIcon } from '@fusion.dev/helix-icons'
@@ -77,6 +78,8 @@ import { afterPageSettles } from '../settle.js'
  */
 @customElement('helix-headless-icon')
 export class HelixHeadlessIcon extends HelixElement {
+  protected static override markRules = [MIRROR_RULE]
+
   /**
    * The icon to draw, as an object you import.
    *

@@ -307,6 +307,12 @@ export {
   type ViewportZoomDetail,
 } from './events/events.js'
 export { HelixElement, whenHydrated } from './helix-element/helix-element.js'
+export {
+  MIRROR_RULE,
+  SCROLLER_RULE,
+  SPOKEN_RULE,
+  VIRTUAL_RULE,
+} from './helix-element/mark-rules.js'
 export { HelixFormElement } from './helix-form-element/helix-form-element.js'
 export { HelixFormElementBase } from './helix-form-element/helix-form-element-base.js'
 export {

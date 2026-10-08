@@ -21,9 +21,13 @@ shipped one package in five files.
 **It is a rule about the dependency, not about the character `{`.** `core`
 already ships token-free rules into every shadow root through
 `HelixElement.finalizeStyles`: `box-sizing`, `:host([hidden]) { display: none }`,
-a scroll container's `overflow`, the mirror a chart's drawing and a caret take
-on a right-to-left page, and the transition suppression that stops a component
-animating its own arrival. `HIDDEN` is the clearest case, because the
+and the transition suppression that stops a component animating its own
+arrival. It ships four more into the shadow root of a component that writes
+the mark each one matches and names it in `markRules`: a scroll container's
+`overflow`, a virtual window's scroll anchoring, the words only a screen reader
+reads, and the mirror a chart's drawing and a caret take on a right-to-left
+page. `mark-rules.pure.spec.ts` holds every headless family to naming the rules
+for the marks it writes. `HIDDEN` is the clearest case, because the
 notes below argue that `hidden` is base-tier *state* on the grounds that the
 platform acts on it, and the way the headless tier makes the platform act is a CSS
 rule shipped from here.

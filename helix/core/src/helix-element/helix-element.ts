@@ -47,130 +47,6 @@ const BOX_SIZING = '*,::before,::after{box-sizing:border-box}'
 const HIDDEN = ":host([hidden]:not([hidden='until-found'])){display:none}"
 
 /**
- * Makes an element a scroll container, where a component says it is one.
- *
- * **A box that scrolls is the headless tier's, and the headless tier had no way to say
- * so.** `overflow` is what creates a scrollport: without it `scrollTop` is
- * permanently zero and every scroll API on the element is inert. So a component
- * that reads `scrollTop` and cannot declare `overflow` is one whose behavior
- * lives in somebody else's stylesheet.
- *
- * Measured before deciding: `helix-headless-scroll-area`, the component whose
- * entire purpose is scrolling, computes `overflow-y: visible` on its viewport
- * with `scrollHeight` equal to `clientHeight`. Standing alone it is a div, and
- * the virtual list is worse because it *acts* on the reading.
- *
- * **It goes here rather than in a stylesheet**, beside `BOX_SIZING`, `HIDDEN`
- * and `SETTLED`, which are the token-free structural rules `core` ships into
- * every shadow root. "The headless tier has no CSS" has never meant `core` has
- * none; it means `helix/headless` must not depend on
- * `@fusion.dev/helix-styles`, and a rule with no token in it does not.
- *
- * **And a rule rather than an inline style, which was the first idea and is
- * wrong.** An inline `style` on a rendered part outranks every author rule
- * short of `!important`, so a consumer wanting `overflow: hidden` on that part
- * would have to fight it and would need `!important` of their own. A shadow rule
- * loses to a document rule, so `::part(viewport) { overflow: … }` from a
- * consumer simply wins, which is the right way round.
- *
- * Both axes, and nothing else. Which *kind* of scrolling, how much room,
- * `overscroll-behavior`, `scroll-snap`, a gutter, a scrollbar treatment: those
- * are decisions and stay in `helix/styled`. This is only the mechanism, and the
- * styled sheet is prepended-after so it overrides at equal specificity anyway.
- *
- * **A component marks a box whose scroll state it reads, and no other**, which
- * is narrower than "every box that ends up scrolling". `Megamenu`'s panel
- * scrolls, and only because the styled tier gives it a `max-block-size`: that is
- * a decision, the `overflow` that serves it belongs with it, and the headless
- * tier never asks the panel where it is scrolled to. Marking it anyway moved a
- * heading four pixels, because `overflow` establishes a block formatting context
- * and margins that had been collapsing stopped. A mechanism with a layout
- * consequence is one to apply exactly where it is needed.
- *
- * `ScrollArea`, `VirtualList`, `Carousel`, `ObjectInspector`, `Chat` and a
- * `windowed` `DataTable` mark theirs, each reading `scrollTop` or `scrollLeft`
- * and acting on the answer. The last two took their `overflow` from their
- * styled sheet until they were marked, so the window each drew was inert on a
- * page that loads only `helix/headless`; marking them moved nothing on the
- * styled tier, where both boxes already scrolled.
- */
-const SCROLLER = '[data-scroller]{overflow:auto}'
-
-/**
- * A box whose rows are drawn and taken away as it scrolls, which
- * `VirtualizeController` marks `data-virtual` once it watches it.
- *
- * **The browser's scroll anchoring fights the window.** Chromium keeps the
- * content a reader was looking at in place when what is above it changes, and
- * a virtual window changes exactly that on every move: the spacer above grows
- * and the rows are swapped. Measured on a 500 row list scrolled to 330, the
- * offset went to 138, then 522, then back to 330 before it settled, and the
- * list reported four ranges for one scroll. The window already keeps the rows
- * where they belong, so anchoring has nothing left to do here but move them.
- */
-const VIRTUAL = '[data-virtual]{overflow-anchor:none}'
-
-/**
- * Words a screen reader reads where the eye reads something else, which a
- * component marks `data-spoken`: `⇧⌘P` in Kbd is read as `Shift Command P`.
- *
- * The drawn text is `aria-hidden` and the words sit beside it, in no box the
- * eye sees. The rule takes the words out of the layout and paints none of
- * them, and names no token, so it belongs with the mechanisms here. Without
- * it a page that loads only `helix/headless` showed both.
- */
-const SPOKEN =
-  '[data-spoken]{position:absolute;inline-size:1px;block-size:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}'
-
-/**
- * Turns a drawing that runs along the line of text, or a glyph that points
- * along it, round with it on a right-to-left page.
- *
- * **A chart computes its geometry from the left, because an SVG's coordinates
- * do.** `x` grows rightward whatever `direction` says, while the words around a
- * drawing are HTML written in logical properties and turn on their own. Before
- * this, a bar chart on an Arabic page wrote Q4 to Q1 from the left under
- * columns still drawn Q1 to Q4, so each name stood under its mirror's column.
- *
- * **A rule rather than a second set of coordinates, and three things decide
- * it.** A server renders the same markup whichever way the page reads, so the
- * drawing it sends is right before a script runs. Everything drawn on a mark
- * turns with it: a column rounded at its far end, a gradient toward its base,
- * the hole a ring terminus cuts, each of which arithmetic would have to mirror
- * again in every stylesheet that draws one. And it follows `dir` when it
- * changes, which a render would only do on its next update.
- *
- * **About the vertical axis, never the horizontal.** Up is more in every
- * script, so a value keeps its height and only the run along the line turns.
- * The numbers are text beside the drawing rather than inside it, so they read
- * the right way round.
- *
- * **Keyed on `:dir()`, which is what every sheet here mirrors a caret with.**
- * The pointer arithmetic that has to agree with it asks the computed
- * `direction`, the question the table and the splitter already ask, and the two
- * part only where a sheet sets `direction` without `dir`.
- *
- * A component marks the drawing with `data-mirror`, and a drawing with no line
- * of text to follow is left unmarked: a whole ring's slices run clockwise from
- * twelve, which is a clock's convention and not a script's. `scale` rather than
- * `transform`, so a consumer's `transform` on the same part composes with it,
- * and a consumer's `scale` there wins, a shadow rule losing to a document one.
- *
- * **A glyph that points along the line is the same case, marked the same
- * way**: a caret meaning next or previous, the one between two crumbs, a shut
- * disclosure. The component drawing it knows what it means, so the headless
- * tier points it the right way with no stylesheet at all. Before the mark each
- * styled sheet turned its own and a headless page had to know to, which the
- * carousel's and the pagination's did not. A glyph a *sheet* stands on its side
- * is that sheet's to turn: a tree draws its chevron pointing down, and a mark
- * would come out right under a `transform: rotate()`, which applies before
- * `scale`, and do nothing under the `rotate` property, which applies after it.
- * A glyph for playing media is left unmarked too, a tape running one way
- * whatever the script, and so is a picture of a key.
- */
-const MIRROR = ':host(:dir(rtl)) [data-mirror]{scale:-1 1}'
-
-/**
  * Stops a component animating its own arrival.
  *
  * A shadow root's stylesheets are adopted when the element upgrades, which is
@@ -228,15 +104,18 @@ const SETTLED =
   ':host(:not(:state(settled))),:host(:not(:state(settled))) *{transition:none!important}'
 
 /**
- * The rules above as one sheet, prepended to every component's styles.
+ * The rules above as one sheet, prepended to the styles of every component
+ * that names no mark rules.
  *
  * **Plain strings joined into one sheet.** Written as six `css` blocks, each
  * shipped its indentation and became a constructed sheet of its own: six
  * adopted sheets in every shadow root for six declarations, and 181 bytes
- * gzip more in Format Date under Rollup. The order is the same, so the
- * cascade is too.
+ * gzip more in Format Date under Rollup. A component with `markRules` gets
+ * the same sheet with its rules between `HIDDEN` and `SETTLED`, which is
+ * where all four sat when every component carried them, so the cascade is the
+ * same.
  */
-const BASE = unsafeCSS(BOX_SIZING + HIDDEN + SCROLLER + VIRTUAL + SPOKEN + MIRROR + SETTLED)
+const BASE = unsafeCSS(BOX_SIZING + HIDDEN + SETTLED)
 
 /**
  * How long an element keeps looking for React's props, and how often.
@@ -632,13 +511,29 @@ export class HelixElement extends LitElement {
   }
 
   /**
+   * The rules from `mark-rules.ts` for the marks this element writes in its
+   * own shadow root: `data-scroller`, `data-virtual`, `data-spoken` and
+   * `data-mirror`.
+   *
+   * A component that writes a mark names its rule here, and a subclass
+   * inherits the list. One that writes none takes only the three rules every
+   * shadow root gets, which is what keeps the other four out of a Button.
+   */
+  protected static markRules: readonly string[] = []
+
+  /**
    * Prepends the shadow-root reset to every subclass's styles, so no component
-   * has to remember to include it.
+   * has to remember to include it, with the rules for the marks it writes.
    */
   protected static override finalizeStyles(
     styles?: CSSResultOrNative | CSSResultOrNative[],
   ): CSSResultOrNative[] {
-    return [BASE, ...LitElement.finalizeStyles(styles)]
+    // biome-ignore lint/complexity/noThisInStatic: Lit finalizes each class with that class as this, so a subclass's own list is read, where the class name would read the base's empty one
+    const marks = this.markRules
+    return [
+      marks.length === 0 ? BASE : unsafeCSS(BOX_SIZING + HIDDEN + marks.join('') + SETTLED),
+      ...LitElement.finalizeStyles(styles),
+    ]
   }
 
   /**

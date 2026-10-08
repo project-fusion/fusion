@@ -1,4 +1,4 @@
-import { customElement, HelixElement } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, SCROLLER_RULE } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { type Bar, ScrollbarController } from '../scrollbar-controller.js'
@@ -83,6 +83,8 @@ const EDGES = ['block-start', 'block-end', 'inline-start', 'inline-end'] as cons
  */
 @customElement('helix-headless-scroll-area')
 export class HelixHeadlessScrollArea extends HelixElement {
+  protected static override markRules = [SCROLLER_RULE]
+
   /**
    * How long the scrollbars stay after the content stops moving, or the pointer
    * leaves, in milliseconds. Read under `scrollbars="scroll"` and

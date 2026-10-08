@@ -5,6 +5,7 @@ import {
   HelixElement,
   HelixSelectEvent,
   hostAria,
+  MIRROR_RULE,
   slotFilled,
   slotNamed,
 } from '@fusion.dev/helix-core'
@@ -72,6 +73,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  */
 @customElement('helix-headless-drilldown-item')
 export class HelixHeadlessDrilldownItem extends HelixElement {
+  protected static override markRules = [MIRROR_RULE]
+
   /**
    * Whether the row can be reached at all.
    */

@@ -3,6 +3,7 @@ import {
   HelixElement,
   HelixSelectEvent,
   hostAria,
+  MIRROR_RULE,
   plainClick,
   slotFilled,
   slotNamed,
@@ -74,6 +75,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  */
 @customElement('helix-headless-breadcrumb')
 export class HelixHeadlessBreadcrumb extends HelixElement {
+  protected static override markRules = [MIRROR_RULE]
+
   /* The first crumb has nothing before it to separate it from, so its
      separator is not drawn, in this tier as in the styled one. Content, as
      `Blockquote`'s marks are, so it is decided here; the styled tier replaces

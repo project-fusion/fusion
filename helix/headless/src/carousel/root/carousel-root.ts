@@ -9,7 +9,9 @@ import {
   hostAria,
   inlineStep,
   isRtl,
+  MIRROR_RULE,
   requestChange,
+  SCROLLER_RULE,
   words,
 } from '@fusion.dev/helix-core'
 import { caretLeft, caretRight, play, stop } from '@fusion.dev/helix-icons'
@@ -143,6 +145,8 @@ const DRAG_SLOP = 4
  */
 @customElement('helix-headless-carousel')
 export class HelixHeadlessCarousel extends HelixElement {
+  protected static override markRules = [SCROLLER_RULE, MIRROR_RULE]
+
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-carousel': { nextLabel: 'Nächste Folie' } })`.

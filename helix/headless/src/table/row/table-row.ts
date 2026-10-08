@@ -3,6 +3,7 @@ import {
   followLink,
   HelixElement,
   hostAria,
+  MIRROR_RULE,
   pressedOwnControl,
 } from '@fusion.dev/helix-core'
 import { caretRight, dotsSixVertical } from '@fusion.dev/helix-icons'
@@ -87,6 +88,8 @@ export type TableRowMove = 'dragging' | 'drop-after' | 'drop-before'
  */
 @customElement('helix-headless-table-row')
 export class HelixHeadlessTableRow extends HelixElement {
+  protected static override markRules = [MIRROR_RULE]
+
   /**
    * @internal Read by the table to find its rows among its children, the way it
    * finds its columns. Not a consumer's to read or set.

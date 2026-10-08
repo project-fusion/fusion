@@ -9,6 +9,7 @@ import {
   HelixSelectEvent,
   hostAria,
   isRtl,
+  MIRROR_RULE,
   onApple,
   onUnlessFalse,
   PopoverController,
@@ -112,6 +113,8 @@ import '../../kbd/index.js'
  */
 @customElement('helix-headless-menu-item')
 export class HelixHeadlessMenuItem extends HelixElement {
+  protected static override markRules = [MIRROR_RULE]
+
   /**
    * Whether the row is one of a set of choices.
    *

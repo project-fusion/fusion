@@ -13,6 +13,7 @@ import {
   inlineStep,
   KeyboardNavigationController,
   linkDescription,
+  MIRROR_RULE,
   MixinCollection,
   MixinControllerOpen,
   markMatches,
@@ -198,6 +199,8 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
  */
 @customElement('helix-headless-menu')
 export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(HelixElement)) {
+  protected static override markRules = [MIRROR_RULE]
+
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-menu': { backLabel: 'Zurück' } })`.

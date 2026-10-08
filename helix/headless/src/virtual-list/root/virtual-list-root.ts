@@ -13,11 +13,13 @@ import {
   type Rendered,
   rangeAdd,
   requestValue,
+  SCROLLER_RULE,
   searchableById,
   selectsAll,
   Typeahead,
   toggleValue,
   typesCharacter,
+  VIRTUAL_RULE,
   VirtualizeController,
   words,
 } from '@fusion.dev/helix-core'
@@ -250,6 +252,8 @@ const ROWS = ':scope > [data-index], :scope > [data-section] > [data-index]'
  */
 @customElement('helix-headless-virtual-list')
 export class HelixHeadlessVirtualList extends HelixElement {
+  protected static override markRules = [SCROLLER_RULE, VIRTUAL_RULE]
+
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-virtual-list': { loadingLabel: 'Weitere werden geladen' } })`.
