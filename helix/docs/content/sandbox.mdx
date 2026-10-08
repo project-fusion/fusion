@@ -42,12 +42,17 @@ without tracking which element sent each event. The names the sandbox reads:
 - A pane named `html` sets the preview's markup.
 - A pane named `css` sets its stylesheet.
 - A pane named `js` sets a script, which runs as a module after the markup.
+- A pane named for a module file, ending in `.js` or `.mjs`, such as
+  `utils.js`, is a module the other scripts import by its path.
+- A pane named `package.json` sets the npm packages the scripts import by name,
+  from its `dependencies`.
 
 The sandbox ignores a pane with any other name, so that pane only displays its
 contents.
 
-A pane's text goes in its `value`. The pane renders no children. The sandbox
-also hands each pane's `value` to the preview when it starts, so you write the
+A pane's text goes in its `value`, or inside the pane where `value` is not set.
+Put markup inside a `<template>`, so the page does not render it. The sandbox
+also hands each pane's text to the preview when it starts, so you write the
 text once, in the pane. A preview given its own `source` keeps it until the
 first edit.
 
@@ -79,6 +84,72 @@ holds the `name` of the pane shown. The arrow keys move between the tabs, and
 `Home` and `End` go to the first and the last. Choosing a tab sends
 `helix-before-change` with the pane's `name`, which you can cancel, and
 `change` once `file` holds it. The panes not shown carry `hidden`.
+
+## Packages and module files
+
+In the built-in document, an example imports npm packages by name and its own
+files by path, as it would in a project. A `package.json` pane lists the
+packages and their versions, and each package loads from the preview's `cdn`,
+`https://esm.sh/` by default, at the version or range given. Each module pane
+is a file the scripts import by a relative path:
+
+```html
+<helix-sandbox>
+  <helix-sandbox-source label="main.js" name="js" slot="source">
+    import confetti from 'canvas-confetti'
+    import { cheer } from './cheer.js'
+
+    confetti()
+    cheer()
+  </helix-sandbox-source>
+  <helix-sandbox-source name="cheer.js" slot="source">
+    export const cheer = () => console.log('Done')
+  </helix-sandbox-source>
+  <helix-sandbox-source name="package.json" slot="source">
+    { "dependencies": { "canvas-confetti": "^1.9" } }
+  </helix-sandbox-source>
+  <helix-sandbox-preview slot="preview"></helix-sandbox-preview>
+</helix-sandbox>
+```
+
+The preview takes the same lists as `dependencies` and `modules` without a
+sandbox around it. `imports` maps a name to an address of your own, and wins
+over a package of the same name. The preview loads its document again when one
+of them changes, because a browser reads an import map only as a document
+starts. A `src` document declares its own import map.
+
+## Editing keys
+
+In a source pane, Tab inserts two spaces. Shift+Tab moves focus back, and
+Escape then Tab moves it forward. The field's description says this to a
+screen reader. The other keys follow CodeMirror. `Mod` is Command on a Mac and
+Control elsewhere.
+
+| Key | Does |
+|---|---|
+| Tab, with text selected | Indents every line the selection touches |
+| `Mod+]` | Indents the lines |
+| `Mod+[` | Outdents the lines |
+| `Mod+/` | Comments the lines out, or back in |
+| Enter | Breaks the line and keeps its indentation |
+
+Three editing aids are off until you set them:
+
+- `close-brackets` closes brackets and quotes as you type them. A closing
+  character typed before the same one steps over it, and Backspace between an
+  empty pair deletes both.
+- `match-brackets` marks the bracket beside the caret and its pair while the
+  field has focus.
+- `complete` offers the words of the source that start with the word you are
+  typing, and the words in `completions`. The arrow keys move through the list,
+  Enter or Tab takes a word, and Escape closes it. `manifestWords` reads the tag
+  names, attribute names, and custom properties of a custom elements manifest
+  into `completions`.
+
+A pane is `:state(modified)` while it holds an edit, and so is the sandbox
+around it. The file tab of an edited pane has a dot after its name, and a
+screen reader reads it as modified. `reset()` on a pane, or on the sandbox for
+every pane, puts back the source it was given.
 
 ## Your own editor
 
@@ -125,10 +196,6 @@ customElements.define('code-editor', CodeEditor)
   <helix-sandbox-preview slot="preview"></helix-sandbox-preview>
 </helix-sandbox>
 ```
-
-In a source pane, Tab inserts two spaces. Shift+Tab moves focus back, and
-Escape then Tab moves it forward. The field's description says this to a
-screen reader.
 
 Each request has a notification once it is applied: `helix-edit` after
 `helix-before-edit`, `helix-split` after `helix-before-split`, and
