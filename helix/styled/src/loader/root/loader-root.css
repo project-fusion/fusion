@@ -3,13 +3,15 @@
      `--loader-size: 1em` for one that should match the text beside it, which
      is the case inside a button. */
   --_loader-size: var(--helix-size-loader-md);
-  /* The two rates and the stroke, named once. Neither rate is on the duration
+  /* The three rates and the stroke, named once. No rate is on the duration
      scale, whose longest rung is 320ms and is for a control answering a hand:
      a turn at 0.8s is the speed a spinner is read as busy at rather than
      frantic, and `Video` turns its own at the same 0.8s so two spinners on one
-     page agree. The stroke is two user units of a 24-unit drawing, which is a
+     page agree. The crawl is the turn under reduced motion, one turn in four
+     seconds. The stroke is two user units of a 24-unit drawing, which is a
      fact about the arc rather than a width in the border scale. */
   --_loader-breathe: 2.4s;
+  --_loader-crawl: 4s;
   --_loader-stroke: 2;
   --_loader-turn: 0.8s;
   color: inherit;
@@ -119,12 +121,14 @@
 
 /* Reduced motion still needs the work to read as outstanding, so the turn slows
    to a crawl rather than stopping: a frozen loader reads as broken rather than
-   as busy. Scaled from a token instead of a raw duration, and it has to be
-   declared here at all because the base layer's blanket rule is a document rule
-   and does not reach into a shadow root. */
+   as busy. The crawl is a fixed rate. The base layer sets every duration token
+   to 0.01ms under the preference, so a rate scaled from one turned the arc
+   about eight thousand times a second. It has to be declared here at all
+   because the base layer's blanket rule is a document rule and does not reach
+   into a shadow root. */
 @media (prefers-reduced-motion: reduce) {
   [part="svg"] {
-    animation-duration: calc(var(--helix-duration-slow) * 12);
+    animation-duration: var(--_loader-crawl);
   }
 }
 

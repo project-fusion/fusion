@@ -13,7 +13,8 @@
  */
 :host {
   --_icon-button-edge: var(--helix-color-border);
-  /* `Loader`'s own turn, so two rings on one page agree. */
+  /* `Loader`'s own turn and crawl, so two rings on one page agree. */
+  --_icon-button-crawl: 4s;
   --_icon-button-turn: 0.8s;
   --_icon-button-ink: var(--helix-color-foreground-muted);
   --_icon-button-ink-hover: var(--helix-color-foreground);
@@ -336,10 +337,12 @@
   }
 }
 
-/* Slowed rather than stopped, as `Loader` does. */
+/* Slowed rather than stopped, as `Loader` does, to a fixed rate. The base layer
+   sets every duration token to 0.01ms under the preference, so a rate scaled
+   from one turned the ring about eight thousand times a second. */
 @media (prefers-reduced-motion: reduce) {
   [part="spinner"] {
-    animation-duration: calc(var(--helix-duration-slow) * 12);
+    animation-duration: var(--_icon-button-crawl);
   }
 }
 
