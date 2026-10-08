@@ -79,7 +79,7 @@
    cells were correct, the columns were 50px apart, and nothing read as a week.
    A track the size of a cell is what makes the strip a block, and
    `justify-content` says the leftover belongs at the end rather than between. */
-[part="strip"] {
+[part~="strip"] {
   display: grid;
   gap: var(--heatmap-gap, var(--helix-space-2xs));
   grid-auto-columns: var(--_heatmap-cell-width);
@@ -172,7 +172,7 @@
     outline-offset: var(--helix-border-thin);
   }
 
-  [part="strip"]:not([data-spaced]) [part~="cell"]:hover {
+  [part~="strip"]:not([data-spaced]) [part~="cell"]:hover {
     outline-offset: calc(var(--helix-border-thin) * -1);
   }
 }
@@ -184,7 +184,7 @@
   outline-offset: var(--helix-border-thin);
 }
 
-[part="strip"]:not([data-spaced]) [part~="cell-active"] {
+[part~="strip"]:not([data-spaced]) [part~="cell-active"] {
   outline-offset: calc(var(--helix-border-thin) * -1);
 }
 
@@ -197,7 +197,7 @@
 
 /* The strip takes focus once it has cells to read, so it draws the ring:
    outside, the default situation. */
-[part="strip"]:focus-visible {
+[part~="strip"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
 }

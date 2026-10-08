@@ -53,16 +53,16 @@ describe('heatmap server output', () => {
    * was true and `part="empty"` was served beside it, so a heatmap over a table
    * of ninety days came out of the server saying "No readings".
    *
-   * So what is served is the strip and the footer it sits above, and nothing
-   * else: no cells, no tooltip, and no empty state, an unresolved table being
-   * unknown rather than empty.
+   * So what is served is the strip, which is also the plot, and the footer it
+   * sits above, and nothing else: no cells, no tooltip, and no empty state, an
+   * unresolved table being unknown rather than empty.
    *
    * The reading itself is the consumer's `<table>`, which this component neither
    * renders nor can remove, so `toContain('81%')` was reading the spec's own
    * template back out of the document and held whatever the heatmap drew.
    */
   test('the frame is served and nothing is drawn in it', () => {
-    expect(servedParts(markup)).toEqual(['end', 'footer', 'start', 'strip', 'summary'])
+    expect(servedParts(markup)).toEqual(['end', 'footer', 'plot', 'start', 'strip', 'summary'])
   })
 
   /**
