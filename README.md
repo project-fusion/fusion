@@ -158,7 +158,7 @@ bun run helix --help     # component conventions, theme derivation, an MCP serve
 
 ## Where things are
 
-Three product domains at the root, packages flat inside each. A new product gets
+Four domains at the root, packages flat inside each. A new product gets
 a new top-level folder. The folder drops the domain prefix and the package name
 keeps it: `helix/styled` is `@fusion.dev/helix`, `cortex/core` is the crate
 `fusion-cortex-core`. Scope a search by path rather than by folder name, since
@@ -184,6 +184,8 @@ bare leaf names recur across domains.
 | | provenance capture | `cortex/trace` |
 | | the memory store | `cortex/engram` |
 | | the documentation, as content | [cortex/docs](cortex/docs/README.md) |
+| **[Proof](proof/README.md)** | visual regression testing, in development | |
+| | `proof`, the Rust core, its npm package and the capture driver | `proof/cli` |
 | **[Fusion](fusion/README.md)** | what belongs to the company | |
 | | the published writing | `fusion/docs` |
 | | the site that renders all of it | `fusion/site` |

@@ -11,6 +11,9 @@ for `helix/**`, [cortex/CONVENTIONS.md](cortex/CONVENTIONS.md) for `cortex/**`. 
 
 - **Two cores.** **Helix** is the DNA (design system). **Cortex** is the mind
   (memory, provenance, context). Products build *on top of* them.
+- **Fusion Proof** is visual regression testing with baselines kept in git, a
+  tool for any web project. Building: [proof/README.md](proof/README.md) has
+  the decisions and the phases.
 - **Thesis: intelligence belongs in the foundation.** An intelligent design
   system, intelligent tooling and intelligent services, built on one substrate
   rather than bolted onto three.
@@ -170,10 +173,11 @@ Rust for backend and substrate cores. TypeScript for frontend.
 helix/     styles core headless styled icons theme cem docs diagnostics
            gallery sandbox testing cli templates create-app
 cortex/    core trace engram docs
+proof/     cli: the Rust core, its npm package and the capture driver
 fusion/    cli docs plugins rules scripts site: what belongs to the company
            rather than to a product. `docs/insights` is the published writing;
-           `rules` is the crate both command lines take, which is what a rule is
-           and not what either product's rules read; `plugins` is the host that
+           `rules` is the crate every command line takes, which is what a rule
+           is and not what any product's rules read; `plugins` is the host that
            runs one somebody else wrote
 .local/    per-machine scratch, gitignored
 ```
@@ -185,8 +189,8 @@ fusion/    cli docs plugins rules scripts site: what belongs to the company
 - **Product domains at root, packages flat inside.** A new product gets a new
   top-level folder.
 - **A crate exists when something outside the binary consumes it**, and not to
-  make a large one smaller. Three do: `fusion-rules` because both command lines
-  take it and neither product may depend on the other, `fusion-helix-theme`
+  make a large one smaller. Three do: `fusion-rules` because every command line
+  takes it and no product may depend on another, `fusion-helix-theme`
   because the site needs it as WASM and a crate pulling in a terminal backend
   would carry that into the build, and `fusion-plugins` because both command
   lines host it. **Compile time is not the reason it looks like.** Measured 22
@@ -269,8 +273,8 @@ fusion/    cli docs plugins rules scripts site: what belongs to the company
   beside a package root and none is copied into `src`.
 - **`<domain>/docs` is a content package, not a site**: versioned MDX plus a
   typed registry. The site that renders it is separate and depends on it.
-- **`fusion/` is the company tier, and it is a domain like the other two.** It
-  holds what belongs to Fusion rather than to Helix or Cortex: the CLI, the
+- **`fusion/` is the company tier, and it is a domain like the others.** It
+  holds what belongs to Fusion rather than to a product: the CLI, the
   writing, and the site that renders everything above it. `fusion/docs/insights`
   is what gets published.
 
@@ -296,8 +300,8 @@ that `@fusion.dev/helix-headless@x` works with `@fusion.dev/helix@x`.
 **Rust crates carry their own version and never inherit one.**
 `[workspace.package]` holds the edition, the license and the toolchain floor,
 which are facts about the workspace; a version is a fact about a domain.
-`release.yml` computes `helix` and `cortex` from separate tags, so a shared field
-would take two numbers and keep whichever stamped last. `fusion workspace`'s `publishable`
+`release.yml` computes each domain from its own tags, so a shared field would
+take several numbers and keep whichever stamped last. `fusion workspace`'s `publishable`
 fails both on a crate taking `version.workspace = true` and on
 `[workspace.package]` declaring a version at all.
 
@@ -322,13 +326,14 @@ directions, so the day the flag changes is the day the workflow has to.
 
 - **Verticals get descriptive names**: Fusion Studio, Fusion Design, Fusion
   Mind.
-- **Products get evocative names**: Helix, Cortex. A module earns one only when
-  it carries a differentiated idea: inside Cortex that is exactly three, Engram
-  (memory), Trace (provenance), Recall (context). The rest stay descriptive.
-- **npm scopes name the domain, not the audience**: `@fusion.dev/helix-*` and
-  `@fusion.dev/cortex-*` for anything belonging to that product, `@fusion.dev/*`
-  for what spans the company. Package names drop the product prefix:
-  `@fusion.dev/helix`, not `@fusion.dev/helix-helix-styled`.
+- **Products get evocative names**: Helix, Cortex, Proof. A module earns one
+  only when it carries a differentiated idea: inside Cortex that is exactly
+  three, Engram (memory), Trace (provenance), Recall (context). The rest stay
+  descriptive.
+- **npm scopes name the domain, not the audience**: `@fusion.dev/helix-*`,
+  `@fusion.dev/cortex-*` and `@fusion.dev/proof-*` for anything belonging to
+  that product, `@fusion.dev/*` for what spans the company. Package names drop
+  the product prefix: `@fusion.dev/helix`, not `@fusion.dev/helix-helix-styled`.
 - **`private` decides what ships, and the scope does not.** A package can belong
   to Helix and still never leave: `@fusion.dev/helix-cem` is what runs over a
   manifest once `helix` has written it and `@fusion.dev/helix-sandbox` the editor and spec runner, both
