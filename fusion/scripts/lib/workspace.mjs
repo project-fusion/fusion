@@ -67,6 +67,7 @@ export const SOURCE = {
   graph: 'helix/graph/src',
   headless: 'helix/headless/src',
   map: 'helix/map/src',
+  plot: 'helix/plot/src',
   sandbox: 'helix/sandbox/src',
   styled: 'helix/styled/src',
   styles: 'helix/styles/src',
@@ -117,11 +118,11 @@ export const TIERS = [SOURCE.headless, SOURCE.styled]
 /**
  * The packages that connect a family to someone else's renderer, by the
  * family they serve: `connectGraph` and its drivers for Graph, `connectMap`
- * and its drivers for Map. Their DOM specs run with the family's in a
+ * and its drivers for Map, `connectScatter3d` and its driver for 3D Scatter. Their DOM specs run with the family's in a
  * browser, where a driver meets a real canvas, a real WebGL context, and a
  * layout, none of which happy-dom has.
  */
-export const CONNECTORS = { graph: SOURCE.graph, map: SOURCE.map }
+export const CONNECTORS = { graph: SOURCE.graph, map: SOURCE.map, 'scatter-3d': SOURCE.plot }
 
 /** Every workspace directory, with `dir/*` globs expanded. */
 export function directories() {

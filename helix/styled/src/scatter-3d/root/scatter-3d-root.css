@@ -1,0 +1,90 @@
+:host {
+  display: block;
+}
+
+/* The box the 3D drawing is made in, and the flat scatter beside it until
+   then. The renderer's box is the page's own element, and it fills the plot. */
+[part="plot"] {
+  background-color: var(--helix-color-surface-sunken);
+  block-size: var(--scatter-3d-block-size, 22em);
+  border-radius: var(--helix-radii-md);
+  overflow: hidden;
+  position: relative;
+}
+
+::slotted(*) {
+  inset: 0;
+  position: absolute;
+}
+
+[part="plot"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* The flat scatter, inset from the box so no point sits half outside it. */
+[part="fallback"] {
+  inset: var(--helix-space-lg);
+  pointer-events: none;
+  position: absolute;
+}
+
+[part="fallback"][hidden] {
+  display: none;
+}
+
+[part~="point"] {
+  background-color: var(--chart-series, var(--helix-color-primary));
+  block-size: var(--scatter-3d-point-size, 0.5rem);
+  border-radius: var(--helix-radii-full);
+  inline-size: var(--scatter-3d-point-size, 0.5rem);
+  position: absolute;
+  translate: -50% -50%;
+}
+
+[part~="point-active"] {
+  outline: var(--helix-border-thick) solid var(--helix-color-foreground);
+  outline-offset: var(--helix-border-thin);
+}
+
+/* The readout, the summary, and the table drawn from `data` are for screen readers. */
+[part="live"],
+[part="summary"],
+[part="table"] {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  margin: var(--helix-space-none);
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
+[part="empty"],
+[part="loading"] {
+  color: var(--helix-color-foreground-subtle);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  margin: var(--helix-space-none);
+  text-align: center;
+}
+
+/* Print: a point is a fill, so each takes an edge as well. */
+@media print {
+  [part~="point"] {
+    outline: var(--helix-border-thin) solid var(--helix-color-border);
+  }
+}
+
+/* Forced colors paint every background the page's Canvas color, so the
+   points keep their colors and take an edge in the system's text color. */
+@media (forced-colors: active) {
+  [part~="point"] {
+    forced-color-adjust: none;
+    outline: var(--helix-border-thin) solid CanvasText;
+  }
+
+  [part~="point-active"] {
+    outline: var(--helix-border-thick) solid Highlight;
+  }
+}

@@ -24,7 +24,8 @@ export const helixEventNames: ReadonlySet<string> = new Set(
     'connect console copy copy-error create dismiss edit end expand facet filter ' +
     'filtered graph-filter graph-layout graph-pan graph-part-change graph-ready ' +
     'graph-signal graph-zoom history load load-more map-cluster map-pan map-part-change ' +
-    'map-ready map-rotate map-tilt map-zoom move navigate next panel-resize pasted pin press ' +
+    'map-ready map-rotate map-tilt map-zoom move navigate next panel-resize pasted pin plot-change ' +
+    'plot-turn press ' +
     'preview previous range-change read reading-change reading-press reconnect reject ' +
     'relabel remove reorder ' +
     'reordered resize resized sample-end sample-start scrolled select selected send ' +

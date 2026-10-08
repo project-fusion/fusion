@@ -29,6 +29,7 @@ declare const __PREVIEW_GRAPH_THREE_URL__: string
 declare const __PREVIEW_GRAPH_URL__: string
 declare const __PREVIEW_MAP_URL__: string
 declare const __PREVIEW_MAPLIBRE_URL__: string
+declare const __PREVIEW_PLOT_THREE_URL__: string
 
 interface RenderMessage {
   colorMode?: 'dark' | 'light'
@@ -124,6 +125,16 @@ const mountGraphs = (root: HTMLElement, at: number): void => {
       .then(() => {
         if (at === generation && window.helixPreviewGraphThree) {
           mounted.push(window.helixPreviewGraphThree.mount(root))
+        }
+      })
+      .catch((error: unknown) => console.error(String(error)))
+  }
+  /* A 3D Scatter chart three.js draws, from a chunk of its own. */
+  if (root.querySelector('helix-scatter-3d[data-preview-plot="three"]')) {
+    void load(__PREVIEW_PLOT_THREE_URL__)
+      .then(() => {
+        if (at === generation && window.helixPreviewPlotThree) {
+          mounted.push(window.helixPreviewPlotThree.mount(root))
         }
       })
       .catch((error: unknown) => console.error(String(error)))
