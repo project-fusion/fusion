@@ -18,6 +18,10 @@ import { styles } from './canvas-root.css.js'
  * that one transform reads, so the cards are placed once in the document's
  * coordinates and are not laid out again.
  *
+ * The [Canvases](https://fusion.dev/helix/docs/canvases) guide loads and saves
+ * a board, keeps it in your state, and lists every key and the roles a screen
+ * reader meets.
+ *
  * @since 0.100.0
  * @status experimental
  * @category media

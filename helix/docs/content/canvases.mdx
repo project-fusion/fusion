@@ -1,0 +1,141 @@
+---
+description: Add a board of cards and connections that people can move, connect, and read with any input, and save it as JSON Canvas.
+section: Essentials
+title: Canvases
+---
+
+# Canvases
+
+Helix Canvas draws a board of cards and the connections between them. People
+pan and zoom the board, move and resize cards, draw connections, and walk the
+board in reading order from the keyboard. The board reads and writes
+[JSON Canvas](https://jsoncanvas.org), an open format.
+
+## Add a board
+
+Write each card as a `helix-canvas-node` and each connection as a
+`helix-canvas-edge`. A card's `x`, `y`, `width`, and `height` are in the
+document's own units, and a connection names its two cards by `name`:
+
+```html
+<helix-canvas label="Launch plan">
+  <helix-canvas-node name="draft" x="0" y="0" width="160" height="64">Draft the email</helix-canvas-node>
+  <helix-canvas-node name="ship" tone="success" x="256" y="0" width="160" height="64">Publish the release</helix-canvas-node>
+  <helix-canvas-edge from="draft" to="ship"></helix-canvas-edge>
+</helix-canvas>
+```
+
+```js
+import '@fusion.dev/helix/canvas'
+```
+
+Give the board a `label` that says what it holds. A screen reader announces it
+as "Launch plan, canvas".
+
+## Load and save a document
+
+`fromJsonCanvas` turns a JSON Canvas document into the props of the elements.
+What a card shows is yours to render, so this example writes each text card's
+text:
+
+```js
+import { fromJsonCanvas } from '@fusion.dev/helix/canvas'
+
+const board = document.querySelector('helix-canvas')
+const { nodes, edges } = fromJsonCanvas(saved)
+for (const node of nodes) {
+  const card = document.createElement('helix-canvas-node')
+  const { group, height, label, name, tone, width, x, y } = node
+  Object.assign(card, { group, height, label, name, tone, width, x, y })
+  card.textContent = node.text ?? ''
+  board.append(card)
+}
+for (const edge of edges) {
+  const line = document.createElement('helix-canvas-edge')
+  const { from, fromSide, label, name, to, toSide, tone } = edge
+  Object.assign(line, { from, fromSide, label, name, to, toSide, tone })
+  board.append(line)
+}
+```
+
+`board.toJsonCanvas()` writes the board back out as a JSON Canvas document.
+
+## Keep the board in your state
+
+The board moves a card itself and sends `helix-move` when the move is finished.
+To keep positions in your own state, cancel `helix-before-move` and write the
+positions from its detail:
+
+```js
+board.addEventListener('helix-before-move', (event) => {
+  event.preventDefault()
+  for (const { name, x, y } of event.detail.nodes) {
+    const card = board.querySelector(`[name="${name}"]`)
+    card.x = x
+    card.y = y
+  }
+})
+```
+
+Connecting and removing are requests that your page applies, because a new
+connection is a new element:
+
+- `helix-connect` names two cards and their sides. Add a `helix-canvas-edge`
+  that joins them.
+- `helix-remove` names the cards and connections to remove, including every
+  connection that removing a card would leave without an end. Remove those
+  elements.
+- `helix-canvas-edit` asks you to edit a card. Open your own editor in it.
+
+Set `readonly` on the board to keep every card in place, or on one card or
+connection to keep only that one.
+
+## Keyboard and screen readers
+
+The board is one tab stop. A card holds it, and Tab leaves the board.
+
+| Keys | On | What they do |
+|---|---|---|
+| Arrow keys | A card or a connection | Move through the cards in reading order, each card's connections straight after it, and select what they land on |
+| Home, End | A card or a connection | Move to the first or the last stop |
+| Control or Command with an arrow key, Home, or End | A card or a connection | Move without changing the selection |
+| Space | A card or a connection | Add it to the selection or take it out |
+| Control or Command with A | A card or a connection | Select everything |
+| Shift with an arrow key | A card | Move the card by 16 units, or to the next multiple of `snap` |
+| Alt with an arrow key | A card | Resize the card from its bottom right corner |
+| Enter or F2 | A card | Ask to edit it, with `helix-canvas-edit`, or edit a group's name |
+| Enter | A connection | Move to the card it arrives at |
+| F2 | A connection | Edit its label |
+| C, then Enter on another card | A card | Ask to connect the two, with `helix-connect` |
+| C | A connection | Pick up its end, to move it to another card with Enter |
+| Delete or Backspace | A card or a connection | Ask to remove what is selected, with `helix-remove` |
+| Control or Command with C, V | The board | Copy the selected cards as JSON Canvas, and paste a document |
+| Control or Command with Z | The board | Undo the last move or resize. With Shift, or Control with Y, make it again |
+| Plus, minus | The board, a card, or a connection | Zoom in or out |
+| Escape | A card or a connection | Stop connecting, or go out to the board |
+| Arrow keys | The board, after Escape | Pan the board |
+
+Every drag also works with clicks. Click a selected card's move handle, a
+corner, a card's connection point, or the end of a selected connection to pick
+it up, then click where it goes. Escape puts it back.
+
+Screen readers meet these roles and names:
+
+| Part | Role | Named by |
+|---|---|---|
+| The board | `group`, described as "canvas" | `label` |
+| A card | `article` | Its content, or its `label` |
+| A group card | `group` | Its `label` |
+| A connection | `button` | "From Draft to Ship", from `connection-label` |
+| The controls | `group` | "Board controls", from `controls-label` |
+| What changed | `status` | The board's own words |
+
+A card is also described by its connections, such as "leads to Ship", and by
+whether it is selected and what its tone means, from `tone-labels`. After a key
+moves, resizes, selects, copies, pastes, undoes, or zooms, screen readers hear
+what changed, such as "Ship moved to 16, 200". Each sentence is a `-label`
+property, so you can write it in your page's language, or register the words
+for a language with `registerWords` (see [Localization](./localization)).
+
+When your page removes the card that has focus, focus moves to the next stop,
+or to the one before when it was the last.
