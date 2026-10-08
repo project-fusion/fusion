@@ -8,7 +8,7 @@ beforeAll(async () => {
   await import('../index.js')
   await import('../../flex/index.js')
   await import('../../list/index.js')
-  await import('../../icon/all/index.js')
+  await import('../../icon/index.js')
 })
 
 /* Browser only: happy-dom does not run a script inserted by script. */

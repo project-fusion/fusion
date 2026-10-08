@@ -85,28 +85,28 @@ describe('the icon registry', () => {
   })
 })
 
-/* The family's entry registers a small set, `all` the whole set, and the
-   element's own entry none, which is the whole point of having three. */
+/* The family's entry registers the set; the element's own does not, which is
+   the whole point of having two. `all` is the family's entry under a second
+   name. */
 describe('the entries', () => {
   const read = (path: string) => readFileSync(join(import.meta.dir, path), 'utf8')
   const carriesTheSet = (source: string) =>
-    /import \{[^}]*\bicons\b[^}]*\} from '@fusion\.dev\/helix-icons'/.test(source)
+    /import \{[^}]*\bicons\b[^}]*\} from '@fusion\.dev\/helix-icons'/.test(source) ||
+    source.includes("'./set.js'") ||
+    source.includes("'../set.js'")
 
-  test('the family entry registers a small set and not the whole one', () => {
+  test('the family entry registers the whole set', () => {
     expect(read('index.ts')).toContain("import './set.js'")
-    expect(read('set.ts')).toContain('registerIcons(')
-    expect(carriesTheSet(read('index.ts'))).toBe(false)
-    expect(carriesTheSet(read('set.ts'))).toBe(false)
+    expect(carriesTheSet(read('set.ts'))).toBe(true)
   })
 
-  test('and `all` registers the whole set', () => {
-    expect(carriesTheSet(read('all/index.ts'))).toBe(true)
+  test('and `all` is the family entry', () => {
+    expect(read('all/index.ts')).toContain("export * from '../index.js'")
   })
 
   test('the element and its own entry carry no glyph', () => {
     for (const path of ['root/index.ts', 'root/icon-root.ts', 'registry.ts']) {
       expect(carriesTheSet(read(path))).toBe(false)
-      expect(read(path)).not.toContain('set.js')
     }
   })
 })

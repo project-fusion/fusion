@@ -4,7 +4,7 @@ import { html } from 'lit'
 import './index.js'
 
 describe('icon/all server output', () => {
-  test('a glyph outside the small set is in the served markup', () => {
+  test('a glyph of the set is in the served markup', () => {
     const markup = withoutStyles(ssr(html`<helix-headless-icon name="gear"></helix-headless-icon>`))
     expect(rendered(markup, 'helix-headless-icon')).toContain('<svg')
   })

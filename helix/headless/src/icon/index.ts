@@ -1,4 +1,4 @@
-// The small set first, so its names resolve from the first render. See `set.ts`.
+// The set first, so a name resolves from the first render.
 import './set.js'
 
 export {
