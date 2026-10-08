@@ -1095,12 +1095,16 @@ describe('a grid of columns that fit', () => {
     await settle(host)
     await new Promise((resolve) => setTimeout(resolve, 50))
     await settle(host)
-    const slot = host.shadowRoot?.querySelector('slot:not([name])') as HTMLElement
-    expect(slot.getAttribute('style')).toContain('repeat(4,')
+    // The element around the rows of the grid, which lays out its columns.
+    const grid = (): HTMLElement | null | undefined =>
+      host.shadowRoot?.querySelector('[role="row"]')?.parentElement
+    expect(grid()?.getAttribute('style')).toContain('repeat(4,')
+    expect(part(host, 'viewport')?.getAttribute('aria-colcount')).toBe('4')
     host.style.inlineSize = '220px'
     await new Promise((resolve) => setTimeout(resolve, 50))
     await settle(host)
-    expect(slot.getAttribute('style')).toContain('repeat(2,')
+    expect(grid()?.getAttribute('style')).toContain('repeat(2,')
+    expect(part(host, 'viewport')?.getAttribute('aria-colcount')).toBe('2')
   })
 })
 
@@ -1119,14 +1123,73 @@ describe('a grid', () => {
       part(host, 'viewport')?.querySelector('slot:not([name])') as HTMLSlotElement
     expect(slot().getAttribute('style')).toBe(null)
     host.columns = 4
+    host.selectionMode = 'single'
     await settle(host)
     expect(slot().style.display).toBe('grid')
     /* A browser writes the zero back with its unit. */
     expect(slot().style.gridTemplateColumns.replace('0px', '0')).toBe('repeat(4, minmax(0, 1fr))')
-    // Every item still says its place in the whole set.
+    // A list box in a grid still says each item's place in the whole set.
+    expect(part(host, 'viewport')?.getAttribute('role')).toBe('listbox')
     expect(drawn(host).map((row) => row.getAttribute('aria-posinset'))).toEqual(
       Array.from({ length: 10 }, (_, at) => String(at + 1)),
     )
+  })
+
+  /* A grid of items said it was a list of list items, so a reader heard no
+     lines or columns and the arrows moved where nothing said they could. */
+  test('is a grid of rows and cells to a reader, without `selection-mode`', async () => {
+    const host = await fed(named(10))
+    host.columns = 4
+    await settle(host)
+    const viewport = part(host, 'viewport') as HTMLElement
+    expect(viewport.getAttribute('role')).toBe('grid')
+    expect(viewport.getAttribute('aria-rowcount')).toBe('3')
+    expect(viewport.getAttribute('aria-colcount')).toBe('4')
+    const rows = [...viewport.querySelectorAll('[role="row"]')]
+    expect(rows.map((row) => row.getAttribute('aria-rowindex'))).toEqual(['1', '2', '3'])
+    // Each line's cells are drawn in that line's row, and stay the list's children.
+    const slots = rows.map((row) => row.querySelector('slot')?.getAttribute('name') ?? null)
+    const cells = drawn(host)
+    expect(cells.map((cell) => cell.getAttribute('role'))).toEqual(Array(10).fill('gridcell'))
+    expect(cells.map((cell) => cell.getAttribute('slot'))).toEqual(
+      [0, 0, 0, 0, 1, 1, 1, 1, 2, 2].map((line) => slots[line] ?? null),
+    )
+    expect(cells.map((cell) => cell.getAttribute('aria-colindex'))).toEqual([
+      '1',
+      '2',
+      '3',
+      '4',
+      '1',
+      '2',
+      '3',
+      '4',
+      '1',
+      '2',
+    ])
+    // A cell is no list item, so it says no place in a set.
+    expect(cells.some((cell) => cell.hasAttribute('aria-posinset'))).toBe(false)
+    // The rows lay the cells out in the columns of the grid around them.
+    const grid = rows[0]?.parentElement as HTMLElement
+    expect(grid.style.display).toBe('grid')
+    expect((rows[0] as HTMLElement).style.gridTemplateColumns).toBe('subgrid')
+    // A list again once a line holds one item.
+    host.columns = 1
+    await settle(host)
+    expect(viewport.getAttribute('role')).toBe('list')
+    expect(viewport.querySelector('[role="row"]')).toBeNull()
+    expect(drawn(host).every((cell) => cell.getAttribute('role') === 'listitem')).toBe(true)
+    expect(drawn(host).some((cell) => cell.hasAttribute('slot'))).toBe(false)
+    expect(drawn(host)[3]?.getAttribute('aria-posinset')).toBe('4')
+  })
+
+  test('draws the rows that are not items as a row of one cell', async () => {
+    const host = await fed(named(10))
+    host.columns = 4
+    host.loading = true
+    await settle(host)
+    const loading = part(host, 'loading') as HTMLElement
+    expect(loading.getAttribute('role')).toBe('row')
+    expect(loading.firstElementChild?.getAttribute('role')).toBe('gridcell')
   })
 
   test('windows the set a line at a time, and reports the items on screen', async () => {
@@ -1157,10 +1220,30 @@ describe('a grid', () => {
     expect(focusedAt()).toBe('5')
     await press(host, 'ArrowLeft')
     expect(focusedAt()).toBe('4')
+    // Home and End keep to the line, as the APG's grid has them.
     await press(host, 'End')
+    expect(focusedAt()).toBe('7')
+    await press(host, 'Home')
+    expect(focusedAt()).toBe('4')
+    // Control with them goes to either end of the set.
+    await press(host, 'End', { ctrlKey: true })
     expect(focusedAt()).toBe('3999')
     await press(host, 'ArrowUp')
     expect(focusedAt()).toBe('3995')
+    await press(host, 'Home', { metaKey: true })
+    expect(focusedAt()).toBe('0')
+  })
+
+  test('goes to either end of the set with Home and End, in a list box', async () => {
+    const host = await fed(named(4000))
+    host.columns = 4
+    host.selectionMode = 'single'
+    await settle(host)
+    ;(host.querySelector('[data-index="5"]') as HTMLElement).focus()
+    await press(host, 'End')
+    expect(focusedAt()).toBe('3999')
+    await press(host, 'Home')
+    expect(focusedAt()).toBe('0')
   })
 
   test('takes in a range along the line with Shift, in a list that selects', async () => {
@@ -1174,6 +1257,143 @@ describe('a grid', () => {
     await press(host, 'ArrowRight', { shiftKey: true })
     await press(host, 'ArrowDown', { shiftKey: true })
     expect(host.value).toBe('Row 1,Row 2,Row 3,Row 4,Row 5,Row 6')
+  })
+})
+
+/* A set of items of different heights in a grid left a hole under each
+   short one, as tall as the tallest of its line. A waterfall puts each item
+   under the column that ends highest. */
+describe('a waterfall', () => {
+  const press = async (host: Updatable, key: string, init: KeyboardEventInit = {}) => {
+    ;(document.activeElement as HTMLElement).dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key, ...init }),
+    )
+    await settle(host)
+  }
+  const focusedAt = (): string | undefined => (document.activeElement as HTMLElement).dataset.index
+  /* No gap here: happy-dom lays nothing out, so every item measures the gap
+     alone, which would place it at that height. */
+  const laid = async (count: number) => {
+    const host = await fed(named(count))
+    host.layout = 'waterfall'
+    host.columns = 3
+    await settle(host)
+    return host
+  }
+
+  test('stands each item in its column, down the set, and is a list to a reader', async () => {
+    const host = await laid(10)
+    const viewport = part(host, 'viewport') as HTMLElement
+    expect(viewport.getAttribute('role')).toBe('list')
+    const items = drawn(host) as HTMLElement[]
+    expect(items.map((item) => item.getAttribute('role'))).toEqual(Array(10).fill('listitem'))
+    expect(items[4]?.getAttribute('aria-posinset')).toBe('5')
+    // Each 32 tall, so a line of three every 32 pixels.
+    expect(
+      items.slice(0, 4).map((item) => item.style.getPropertyValue('inset-block-start')),
+    ).toEqual(['0px', '0px', '0px', '32px'])
+    // Item 3 in the first column again, and item 1 in the next.
+    const across = items.map((item) => item.style.getPropertyValue('inset-inline-start'))
+    expect(across[3]).toBe(across[0] as string)
+    expect(across[1]).not.toBe(across[0] as string)
+    expect(items[0]?.style.getPropertyValue('inline-size')).not.toBe('')
+    expect(items[0]?.style.position).toBe('absolute')
+    // The box the items stand in is as long as the longest column.
+    const slot = viewport.querySelector('slot:not([name])') as HTMLElement
+    expect(slot.style.blockSize).toBe('128px')
+  })
+
+  test('moves down a column, across to the next, and to either end', async () => {
+    const host = await laid(40)
+    ;(host.querySelector('[data-index="0"]') as HTMLElement).focus()
+    await press(host, 'ArrowDown')
+    expect(focusedAt()).toBe('3')
+    await press(host, 'ArrowRight')
+    expect(focusedAt()).toBe('4')
+    await press(host, 'ArrowRight')
+    expect(focusedAt()).toBe('5')
+    // No column past the last.
+    await press(host, 'ArrowRight')
+    expect(focusedAt()).toBe('5')
+    await press(host, 'ArrowUp')
+    expect(focusedAt()).toBe('2')
+    await press(host, 'End')
+    expect(focusedAt()).toBe('39')
+    await press(host, 'Home')
+    expect(focusedAt()).toBe('0')
+  })
+
+  test('turns the keys along the line on a right-to-left page', async () => {
+    const host = await laid(10)
+    host.setAttribute('dir', 'rtl')
+    ;(host.querySelector('[data-index="0"]') as HTMLElement).focus()
+    await press(host, 'ArrowLeft')
+    expect(focusedAt()).toBe('1')
+    await press(host, 'ArrowRight')
+    expect(focusedAt()).toBe('0')
+  })
+
+  test('passes over a disabled item down the column', async () => {
+    const host = await laid(20)
+    host.keyField = 'name'
+    host.disabledKeys = 'Row 4'
+    await settle(host)
+    ;(host.querySelector('[data-index="0"]') as HTMLElement).focus()
+    await press(host, 'ArrowDown')
+    expect(focusedAt()).toBe('6')
+  })
+
+  test('is a grid layout again without the attribute, its items out of their places', async () => {
+    const host = await laid(10)
+    host.layout = 'grid'
+    await settle(host)
+    const items = drawn(host) as HTMLElement[]
+    expect(items.some((item) => item.style.position === 'absolute')).toBe(false)
+    expect(part(host, 'viewport')?.getAttribute('role')).toBe('grid')
+  })
+
+  inBrowser('places items of different heights with no hole under any of them', async () => {
+    const heights = [120, 40, 80, 60, 30, 100, 50, 70, 90, 20, 60, 40]
+    const host = await fed(
+      heights.map((height, at) => ({ height, name: `Row ${at + 1}` })),
+      '<template><div><span data-field="name"></span></div></template>',
+    )
+    host.renderItem = (item: { height: number; name: string }) => {
+      const tile = document.createElement('div')
+      tile.style.blockSize = `${item.height}px`
+      tile.textContent = item.name
+      return tile
+    }
+    host.layout = 'waterfall'
+    host.columns = 3
+    host.gap = 8
+    await settle(host)
+    await new Promise((done) => setTimeout(done, 50))
+    await settle(host)
+    const boxes = (drawn(host) as HTMLElement[])
+      .sort((a, b) => Number(a.dataset.index) - Number(b.dataset.index))
+      .map((item) => item.getBoundingClientRect())
+    const lefts = [...new Set(boxes.map((box) => Math.round(box.left)))].sort((a, b) => a - b)
+    expect(lefts).toHaveLength(3)
+    // Each item stands under the column that ended highest when it came.
+    const ends = [0, 0, 0]
+    const top = Math.min(...boxes.map((box) => box.top))
+    for (const box of boxes) {
+      const column = ends.indexOf(Math.min(...ends))
+      expect(Math.round(box.left)).toBe(lefts[column] as number)
+      expect(Math.round(box.top - top)).toBe(Math.round(ends[column] as number))
+      ends[column] = (ends[column] as number) + box.height + 8
+    }
+    // Eight pixels between two columns, as between two items of one.
+    expect(
+      Math.round((lefts[1] as number) - (lefts[0] as number) - (boxes[0] as DOMRect).width),
+    ).toBe(8)
+    // Down from the first goes to the next item under it in its column.
+    ;(host.querySelector('[data-index="0"]') as HTMLElement).focus()
+    await press(host, 'ArrowDown')
+    const below = (document.activeElement as HTMLElement).getBoundingClientRect()
+    expect(Math.round(below.left)).toBe(lefts[0] as number)
+    expect(Math.round(below.top)).toBe(Math.round((boxes[0] as DOMRect).bottom + 8))
   })
 })
 
